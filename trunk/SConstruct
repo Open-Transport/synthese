@@ -44,7 +44,7 @@ SConsEnvironment.DefaultTestModuleName=DefaultTestModuleName
 
 mode = ARGUMENTS.get('mode', 'release')  
 platform = ARGUMENTS.get('os', str (Platform()))
-if platform = 'darwin' : platform = 'posix'
+if platform == 'darwin' : platform = 'posix'
 
 
 librepo = ''
