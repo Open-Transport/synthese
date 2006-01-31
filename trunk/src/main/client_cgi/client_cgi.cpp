@@ -19,6 +19,9 @@ using std::endl;
 int main(int argc, char **argv)
 #endif
 #ifdef WIN32
+#include <io.h>
+
+
 int main(int argc, TCHAR* argv[], TCHAR* envp[])
 #endif
 {
