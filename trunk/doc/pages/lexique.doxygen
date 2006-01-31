@@ -1,0 +1,116 @@
+/**
+
+@page lexique Lexique métier
+
+@section lexiqueLignes Lignes et axes
+
+@subsection defLigneCommerciale Ligne commerciale
+
+Une ligne commerciale est un ensemble de circulations regroupées selon des critères de similitude géographique en général. La ligne commerciale porte l'identification client des services (ex : Ligne 2).
+
+@subsection defLigne Ligne technique
+
+Une ligne technique est un regroupement de services, constitué dans un but d’amélioration des performances de la recherche d'itinéraires. En effet, plusieurs services groupés dans une ligne ne comptent que pour un dans leur participation au temps de calcul, ce qui rend tout son intérêt au regroupement des services en lignes.
+
+Cependant, pour assurer la justesse des calculs, les regroupements en ligne doivent respecter des conditions strictes, constituant ainsi la théorie des lignes&nbsp;:
+ - Les services d’une même ligne doivent desservir exactement les mêmes points d’arrêt, dans le même ordre
+ - Les conditions de desserte de chaque point d’arrêt (départ/passage/arrivée et horaires saisis/non saisis) sont les mêmes pour tous les services d’une ligne
+ - Les services d’une même ligne sont assurés par le même matériel roulant, observent les mêmes conditions de réservation, appartiennent au même réseau de transport, et suivent la même tarification
+ - Un service d’une ligne ne doit pas desservir un point d’arrêt à la même heure qu’un autre service de la même ligne
+ - Un service d’une ligne desservant un point d’arrêt avant un autre de la même ligne ne doit pas desservir un autre point d’arrêt après ce dernier&nbsp;: deux services ne doivent pas se «&nbsp;doubler&nbsp;»
+
+NB : la correspondance entre deux services d'une même ligne est interdite.
+
+Le regroupement en lignes techniques s'effectue, par convention, uniquement à l'intérieur des \ref defLigneCommerciale "lignes commerciales". Ainsi deux services pouvant être groupés selon les critères ci-dessus, mais n'appartenant pas à la même ligne commerciale, ne seront pas groupés dans une ligne technique. De ce fait, les lignes techniques sont considérés comme des subdivisions de lignes commerciales.
+
+Les lignes techniques sont implémentées par la classe cLigne.
+
+@subsection defAxe Axe
+
+Regroupement technique de lignes techniques, donnant lieu à l'application de propriétés aux lignes contenues, dont par défaut :
+ - la correspondance entre deux services de lignes incluses dans un même axe est interdite.
+
+Le regroupement en axes s'effectue, par convention, uniquement à l'intérieur des \ref defLigneCommerciale "lignes commerciales". Ainsi deux services pouvant être groupés selon les critères ci-dessus, mais n'appartenant pas à la même ligne commerciale, ne seront pas groupés dans une ligne technique. De ce fait, les axes sont considérés comme des subdivisions de lignes commerciales.
+
+Les axes sont implémentés par la classe cAxe.
+
+@subsubsection defAxeLibre Axe libre
+
+Axe permettant la correspondance entre tous les services contenus, y compris entre deux services de la même ligne
+
+@subsubsection defAxeInterdit Axe interdit
+
+Axe contenant des lignes ne prenant pas de voyageurs (ex : trajets haut le pied)
+
+@section defCirculation Circulation
+
+Les circulations sont identifiées au sein de leur @ref defLigneCommerciale par un code alphanumérique unique de 6 cractères maximum.
+
+Les circulations sont implémentées par la classe cTrain.
+
+@subsection defServiceContinu Service continu
+
+Service attente + temps de trajet
+
+@section defMateriel Matériel roulant
+
+Type de véhicules utilisés par les circulations, faisant intervenir certaines propriétés communes.
+
+Les matériels roulants sont implémentés par la classe cMateriel.
+
+@section defCalendrier Calendrier de circulation
+
+Les services ne circulent pas tous tous les jours. Ils suivent un calendrier de circulation, indiquant les jours où sont effectués des départs de l'origine des services qui le respectent.
+
+@subsection defCategorieCalendrier Catégorie de calendrier
+
+Pour choisir le calendrier le plus simple d’affichage, pour l’édition des renvois d’indicateur par exemple, les calendriers sont rangés par catégorie, selon le format binaire suivant&nbsp;:</p>
+
+<table class="tableau">
+<tr><td colspan="2">Plage de dates</td><td></td><td></td><td>Influence période scolaire</td><td></td><td></td><td>Tout/partiel</td></tr>
+<tr><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
+<tr><td>7</td><td colspan="6"></td><td>0</td></tr>
+</table>
+
+On obtient la classification de catégories suivante :
+<table class="tableau">
+<tr><th>Plage de dates</th><th>Influence période scolaire</th><th>Tout/partiel</th><th>Code binaire</th><th>Code décimal</th></tr>
+<tr><td rowspan="4">Service complet</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>00000000</td><td>0</td></tr>
+<tr><td>Restriction</td><td>00000001</td><td>1</td></tr>
+<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>00001000</td><td>0</td></tr>
+<tr><td>Restriction</td><td>00001001</td><td>1</td></tr>
+<tr><td rowspan="4">Service de transporteur (été, hiver, SNCF, etc.)</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>01000000</td><td>0</td></tr>
+<tr><td>Restriction</td><td>01000001</td><td>1</td></tr>
+<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>01001000</td><td>0</td></tr>
+<tr><td>Restriction</td><td>01001001</td><td>1</td></tr>
+<tr><td rowspan="4">Plage restreinte (ski...)</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>10000000</td><td>0</td></tr>
+<tr><td>Restriction</td><td>10000001</td><td>1</td></tr>
+<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>10001000</td><td>0</td></tr>
+<tr><td>Restriction</td><td>10001001</td><td>1</td></tr>
+<tr><td colspan="3">Autres calendriers (défaut)</td><td>11111111</td><td>255</td></tr>
+</table>
+
+@section defGeolocalisation Géolocalisation
+
+La géolocalisation est la fourniture des coordonnées géographiques des objets, permettant de les situer précisément. Le système de coordonnées utilisé dans SYNTHESE est le Lambert II Etendu, valable en France.
+
+Les géolocalisations sont disponibles d’après les CD CartoExploreur ou d’après la lecture des chiffres bleus situés à l’intérieur des cadres des cartes IGN 1/25000<sup>ème</sup>. En cas d’absence de l’un de ces deux outils pour un point d’arrêt, utiliser l’utilitaire d’importation des coordonnées géographiques moyens des communes (base de données INSEE)</p>
+
+La géolocalisation est implémentée par la classe cPoint.
+
+@section defVitessesMax Vitesses maximales (optimisation)
+
+Les vitesses maximales interviennent dans l'optimisaion.
+
+Les vitesses maximales sont fabriquées automatiquement dans le programme d’administration. Lancer la procédure et patienter quelques minutes&nbsp;: le fichier <b>.vmax.per</b> est alors écrit. Vérifier à l’intérieur de ce fichier les dépassements de 200 km/h qui sont tous signalés par un message adéquat (<i>Attention, V&gt;200 km/h</i>).
+
+Corriger éventuellement les données correspondant à ces dépassements s’ils sont anormaux.
+
+Les sources d’erreurs les plus fréquentes sont&nbsp;:
+	- Erreur de géolocalisation d’un point d’arrêt (se voit lorsque beaucoup de vitesses supérieures à 200 sont signalées sur un même point d’arrêt)
+	- Erreur d’horaires. (voir le fichier <b>log.txt</b> pour d’éventuelles correspondances avec des dépassements de vitesse de matériel, remarqués au stade du chargement des lignes)
+	- Erreur de code point d’arrêt dans un fichier d’horaires
+
+Une fois validé le fichier <b>.vmax.per</b>, lancer l’importation dans l’assistant de saisie des données. Les Vmax sont saisies automatiquement dans le fichier des points d’arret, remplaçant ainsi les anciens.
+
+*/

@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="fichier_environnement" type="type_fichier_environnement"/>
+
+    <xs:complexType name="type_delai">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="origine" type="xs:integer" use="optional"/>
+        <xs:attribute name="destination" type="xs:integer" use="optional"/>
+        <xs:attribute name="valeur" type="xs:integer" use="required"/>
+        <!-- TODO check for emptiness -->
+    </xs:complexType>
+    
+    
+    
+    <xs:complexType name="type_designation_commune">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="commune" type="xs:integer" use="optional"/>
+        <xs:attribute name="nom_commune" type="xs:string" use="required"/>
+        <xs:attribute name="nom_arret" type="xs:string" use="required"/>
+        <xs:attribute name="type" type="xs:string" use="required"/> <!-- should be enumerated values -->
+        
+    </xs:complexType>
+    
+    
+    
+    <xs:complexType name="type_designation_alerte">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="langue" type="xs:string" use="required"/>
+        <xs:attribute name="message" type="xs:string" use="required"/>
+    </xs:complexType>
+    
+    
+    
+    <xs:complexType name="type_alerte">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="designation" type="type_designation_alerte" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="xs:string" use="optional"/>
+        <xs:attribute name="date_min" type="xs:string" use="required"/> <!-- define a date type -->
+        <xs:attribute name="date_max" type="xs:string" use="required"/> <!-- define a date type -->
+        
+    </xs:complexType>
+    
+    
+    
+    
+    <xs:complexType name="type_interdiction_correspondance">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="axe" type="xs:string" use="required"/> 
+    </xs:complexType>
+    
+
+    <xs:group name="groupe_point_ou_arret">
+        <xs:choice>
+            <xs:element name="point" type="type_point"/>
+            <xs:element name="arret" type="type_arret"/>
+        </xs:choice>
+        
+    </xs:group>
+    
+    
+    <xs:complexType name="type_ligne">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="calendriers" type="type_calendriers" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="numeros" type="type_numeros" minOccurs="1" maxOccurs="1"/>
+            <xs:group ref="groupe_point_ou_arret" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="reseau" type="xs:integer" use="required"/> 
+        <xs:attribute name="reservation" type="xs:integer" use="required"/>
+        <xs:attribute name="cartouche" type="xs:integer" use="required"/> 
+        <xs:attribute name="style" type="xs:integer" use="required"/>
+        <xs:attribute name="indicateur" type="xs:integer" use="required"/> 
+        <xs:attribute name="materiel" type="xs:integer" use="required"/>
+        <xs:attribute name="tarif" type="xs:integer" use="required"/> 
+        
+    </xs:complexType>
+    
+    
+    <xs:complexType name="type_axe">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="interdiction_correspondance" type="type_interdiction_correspondance" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="ligne" type="type_ligne" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:attribute name="code" type="xs:string" use="required"/> 
+        
+    </xs:complexType>
+    
+    
+
+    
+    
+    <xs:complexType name="type_calendriers">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="valeurs" type="xs:string" use="required"/> 
+    </xs:complexType>
+    
+    
+    
+    
+    <xs:complexType name="type_numeros">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="valeurs" type="xs:string" use="required"/> 
+    </xs:complexType>
+    
+    
+    
+    <xs:complexType name="type_point">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        
+        <xs:attribute name="pm" type="xs:string" use="optional"/>
+        <xs:attribute name="x" type="xs:integer" use="required"/> 
+        <xs:attribute name="y" type="xs:integer" use="required"/>
+        
+    </xs:complexType>
+    
+    
+    <xs:complexType name="type_arret">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+            
+        <xs:attribute name="pm" type="xs:string" use="optional"/>
+        <xs:attribute name="id" type="xs:string" use="required"/> 
+        <xs:attribute name="quai" type="xs:string" use="required"/>
+        <xs:attribute name="type" type="xs:string" use="required"/> 
+        <xs:attribute name="departs" type="xs:string" use="optional"/>
+        <xs:attribute name="arrivees" type="xs:string" use="optional"/> 
+        <xs:attribute name="passages" type="xs:string" use="optional"/> 
+        
+    </xs:complexType>
+    
+    
+    
+    
+    <xs:complexType name="type_materiel">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="designation_materiel" type="type_designation_materiel" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence> 
+        <xs:attribute name="id" type="xs:integer" use="required"/> 
+        <xs:attribute name="vitesse" type="xs:integer" use="required"/>
+        
+    </xs:complexType>
+    
+    
+    
+    
+    <xs:complexType name="type_designation_materiel">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="langue" type="xs:string" use="required"/> 
+        <xs:attribute name="nom" type="xs:string" use="required"/>
+        <xs:attribute name="article" type="xs:string" use="required"/> 
+        <xs:attribute name="indicateur" type="xs:string" use="required"/>
+     </xs:complexType>
+    
+    
+    <xs:group name="groupe_op_calendrier">
+        <xs:choice>
+            <xs:element name="add_date" type="type_add_date"/>
+            <xs:element name="sub_date" type="type_sub_date"/>
+            <xs:element name="add_calendrier" type="type_add_calendrier"/>
+        </xs:choice>
+    </xs:group>
+    
+    <xs:complexType name="type_calendrier">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:group ref="groupe_op_calendrier" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required"/> 
+        
+    </xs:complexType>
+    
+    
+    
+    
+    <xs:complexType name="type_add_date">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="date_min" type="xs:string" use="required"/> 
+        <xs:attribute name="date_max" type="xs:string" use="optional"/> 
+        <xs:attribute name="pas" type="xs:string" use="optional"/> 
+        
+    </xs:complexType>
+    
+    <xs:complexType name="type_sub_date">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="date_min" type="xs:string" use="required"/> 
+        
+    </xs:complexType>
+    
+    
+    
+    <xs:complexType name="type_add_calendrier">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="id" type="xs:string" use="required"/> 
+    </xs:complexType>
+    
+    
+    
+    <xs:complexType name="type_designation_resa">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="langue" type="xs:string" use="required"/> 
+        <xs:attribute name="tel" type="xs:string" use="required"/> 
+        <xs:attribute name="heures" type="xs:string" use="required"/> 
+        
+    </xs:complexType>
+    
+    
+    
+    
+    
+    
+    <xs:complexType name="type_modalite_resa">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="designation_resa" type="type_designation_resa"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required"/> 
+        <xs:attribute name="type" type="xs:string" use="required"/> 
+        <xs:attribute name="nom" type="xs:string" use="required"/> 
+        <xs:attribute name="minutes_min" type="xs:string" use="required"/> 
+        <xs:attribute name="enligne" type="xs:string" use="required"/> 
+        <xs:attribute name="champ_telephone" type="xs:string" use="required"/> 
+        <xs:attribute name="champ_prenom" type="xs:string" use="required"/> 
+        
+    </xs:complexType>
+    
+    
+
+    
+    
+    <xs:complexType name="type_arret_physique">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="rang" type="xs:string" use="required"/> 
+        <xs:attribute name="nom" type="xs:string" use="required"/> 
+        <xs:attribute name="x" type="xs:string" use="required"/> 
+        <xs:attribute name="y" type="xs:string" use="required"/> 
+        
+    </xs:complexType>
+    
+    
+    
+    <xs:complexType name="type_arret_logique">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="arret_physique" type="type_arret_physique" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="delai" type="type_delai" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="designation" type="type_designation_commune" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:element name="alerte" type="type_alerte" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required"/> 
+        <xs:attribute name="type" type="xs:string" use="required"/> 
+        <xs:attribute name="x" type="xs:integer" use="required"/> 
+        <xs:attribute name="y" type="xs:integer" use="required"/> 
+        
+    </xs:complexType>
+    
+    
+    
+    <xs:complexType name="type_fichier_environnement">
+        <xs:annotation>
+            <xs:documentation></xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="arret_logique" type="type_arret_logique" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="axe" type="type_axe" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="materiel" type="type_materiel" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="calendrier" type="type_calendrier" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="modalite_resa" type="type_modalite_resa" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/> 
+        <xs:attribute name="description" type="xs:string" use="required"/> 
+        
+    </xs:complexType>
+    
+    
+    
+</xs:schema>

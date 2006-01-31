@@ -1,0 +1,261 @@
+/** @page uc Cas d'utilisation
+
+	- @subpage uc0
+	- @subpage uc1
+	- @subpage uc3
+	- @subpage uc5
+	- @subpage uc6
+	- @subpage uc7
+	- @subpage uc9
+
+@page uc0 0 Entrées de données
+
+	- @subpage uc01 01 Entrées fichier
+	- @subpage uc02
+	- @subpage uc03
+	
+@page uc1 1 Validation d'entrées utilisateur
+
+	- @subpage uc11
+	- @subpage uc12
+	- @subpage uc13
+	- @subpage uc14
+	- @subpage uc15
+	- @subpage uc16
+
+@page uc1 2 Recherche d'itinéraires
+
+	- @subpage uc21 21 Fiche horaire
+	- @subpage uc22 22 Feuille de route
+	- @subpage uc23 23 Cartographie de trajet
+	
+@page uc3 3 Information aux arrêts
+
+	- @subpage uc31 31 Tableau d'affichage pour écran
+	- @subpage uc32 32 Tableau d'affichage journée
+	- @subpage uc33 33 Tableau d'affichage miniature pour site web
+	- @subpage uc34 34 Fiche arrêt avec photos
+	- @subpage uc35 35 Cartographie de voisinage
+	
+@page uc5 5 Etats et accès à la base
+
+	- @subpage uc51 51 Génération d'indicateurs papier
+	- @subpage uc52 52 Traçage de carte de lignes (avec possibilité d'apport de tracés supplémentaires)
+	- @subpage uc53 53 Accès à la commune d'un point géographique
+	- @subpage uc54
+	- @subpage uc55
+	- @subpage uc56
+
+@page uc6 6 Médias
+
+	- @subpage uc61
+	- @subpage uc62
+	- @subpage uc63
+
+@page uc7 7 Réservation
+
+	- @subpage uc71 71 Contrôle de places disponibles d'un service
+	- @subpage uc72 72 Prise de réservation
+	- @subpage uc73 73 Annulation de réservation
+	- @subpage uc74 74 Recherche de réservation
+	- @subpage uc75 75 Liste de réservations par service
+	- @subpage uc76 76 Envoi de rapport de réservation par e-mail
+	- @subpage uc77 77 Export de la liste des réservations
+	
+@page uc9 9 Profils utilisateurs
+
+	- @subpage uc91 91 Création d'un profil utilisateur
+	- @subpage uc92 92 Modification des droits d'un profil utilisateur dont suppression
+	- @subpage uc93 93 Connexion en tant que profil
+	- @subpage uc94 94 Déconnexion en tant que profil
+	- @subpage uc95 95 Edition des requêtes favorites
+
+
+@page uc02 02 Entrées temps réel messages d'alerte
+
+Ecran réservé aux utilisateur ayant le droit d'accès (voir @ref uc9), permettant l'entrée de messages d'alerte (voir @ref uc54) :
+	- sélection de la destination du message : 
+		- choix de ligne
+		- choix d'arrêt logique pour tous dispositifs installés
+		- choix d'arrêt logique pour écrans concernant plusieurs quais
+		- choix d'arrêt physique pour tout écrans le concernant (généraux + spécifiques)
+		- choix d'arrêt physique pour écran ne concernant que ce quai
+		- choix d'afficheur
+	- remplissage du contenu du message
+	
+Le résultat de l'entrée temps réel d'un message est le suivant :
+	- prise en compte immédiate par impact sur mémoire vive
+	- journalisation sur fichier pour conservation en cas de redémarrage du serveur
+
+@page uc03 03 Activation/désactivation de ligne en temps réel
+	
+	- choix de ligne
+	- destinataire (web, afficheurs, web+afficheurs)
+	- bouton activer ou désactiver
+
+Le résultat de l'entrée temps réel d'une activation/désactivation de ligne est le suivant :
+	- prise en compte immédiate par impact sur mémoire vive
+	- journalisation sur fichier pour conservation en cas de redémarrage du serveur
+
+@page uc31 31 Tableaux de gare
+
+@image html uc36.png
+
+@page uc11 11 Recherche de commune à partir de texte
+
+Cette fonctionnalité consiste en la recherche de communes dont le nom est susceptible de correspondre au texte entré en paramètre.
+
+Deux cas se présentent : 
+ - soit une commune peut être choisie sans ambiguité, elle est alors retournée seule
+ - soit plusieurs communes répondent à la demande sans possibilité de départager avec certitude, la liste est alors retournée dans l'ordre décroissant de probabilité de choix
+
+L'ambiguité et plus généralement le score de probabilité de choix sont évalués selon la formule suivante :
+@f$  @f$
+
+@page uc12 Recherche d'adresse (arrêt, lieu public, domicile) dans une commune spécifiée, à partir de texte
+
+La recherche se fait sur les noms d'adresse uniquement et sur le territoire communal spécifié uniquement
+
+Deux cas se présentent : 
+ - soit un arrêt peut être choisi sans ambiguité, il est alors retourné seul
+ - soit plusieurs arrêts répondent à la demande sans possibilité de départager avec certitude, la liste est alors retournée dans l'ordre décroissant de probabilité de choix
+
+L'ambiguité et plus généralement le score de probabilité de choix sont évalués selon la formule suivante :
+@f$  @f$
+
+@page uc13 13 Recherche d'adresse (arrêt, lieu public, domicile) à partir de deux textes : un pour la commune, un pour l'arret
+
+La recherche se fait en deux temps :
+ - recherche de communes sur le premier texte (fonction @ref uc11 )
+ - recherche d'adresse sur chaque commune retournée (fonction @ref uc12 )
+
+@page uc14 14 Recherche d'adresse (arrêt, lieu public, domicile) à partir d'un texte unique
+
+A REMPLIR PAR CHRISTOPHE
+
+@page uc15 15 Recherche d'arrêts à partir d'une adresse avec trajet routier
+
+Cette fonctionnalité consiste en la détermination de l'ensemble des points d'arrêt accessibles en un temps maximal fixé avec le descriptif du trajet d'approche à effectuer à pied, à partir des éléments suivants :
+ - voirie : on ne suit que des cheminements réels
+ - limites de communes : permet de déterminer la commune du point géographique, ainsi que le parcours le plus court pour pénétrer aux communes proches dans le but d'y trouver un éventuel arrêt tout lieux.
+
+@image html uc35-source.png
+
+Le processus complet est le suivant, avec application sur l'exemple ci-dessus :
+	- Etape 1 : Lecture de la commune du point géographique (module @ref m03), et extraction du « Tous lieux » de la commune s'il existe :
+		<center><table class="tableau"><tr><th>Point d'arrêt</th><th>Durée</th></tr>
+		<tr><td>PA 6</td><td>0</td></tr>
+		</table></center>
+
+	- Etape 2 : Calcul d'approche vers des communes proches (module @ref m40), et extraction de « Tous lieux » des communes s'ils existent :
+		<center><table class="Tableau"><tr><th>Communes</th><th>Point d'arrêt</th><th>Durée</th></tr>
+		<tr><td>A</td><td>PA 4</td><td>7</td></tr>	
+		<tr><td>B</td><td>PA 5</td><td>5</td></tr>
+		</table></center>
+
+	- Etape 3 : Calcul d'approche vers des points d'arrêt proches (module @ref m40) :
+		<center><table class="tableau"><tr><th>Point d'arrêt</th><th>Durée</th></tr>
+		<tr><td>PA 1</td><td>8</td></tr>
+		<tr><td>PA 2</td><td>12</td></tr>
+		</table></center>
+
+L'objet final construit est donc le suivant, incluant les descriptions de trajet représentées sur le schéma en suivant :
+	
+	<center><table class="tableau"><tr><th>Point d'arrêt</th><th>Durée</th></tr>
+	<tr><td>PA 1</td><td>8</td></tr>
+	<tr><td>PA 2</td><td>12</td></tr>
+	<tr><td>PA 4</td><td>7</td></tr>
+	<tr><td>PA 5</td><td>5</td></tr>
+	<tr><td>PA 6</td><td>0</td></tr>
+	</table></center>
+
+@image html uc35-resultat.png
+
+Remarques :
+Le point d'arrêt PA 3 a été ignoré car il n'est pas accessible malgré sa proximité à vol d'oiseau
+Les désignations de référence des points d'arrêts PA 1 et PA 2 n'ont pas besoin d'être copiées, puisque la distance vers les communes A et B est forcément plus courte
+
+
+@page uc16 16 Sélection d'une adresse sur carte
+
+L'adresse sélectionnée est ensuite envoyée à @ref uc15.
+
+@page uc54 54 Messages d'alerte
+
+Données :
+	- date de début
+	- date de fin
+	- texte court
+	- texte long
+	- priorité (information/complémentaire, alerte/prioritaire)
+	- destination (web, afficheurs, web+afficheurs)
+
+@page uc55 55 Liste des messages d'alerte en cours
+
+Liste de tous les messages d'alerte, avec leur statut :
+	- provenance (fichier/temps réel)
+	- priorité
+	- destination
+	- lien vers page de modification (voir @ref uc54)
+	
+@page uc56 56 Liste des tableaux de départ
+
+Liste complète des tableaux présents, avec pour chaque tableau un lien vers son rendu :
+	- tableau de type web : lien simple
+	- tableau de type afficheur matériel spécifique : forçage d'une interface générique en lieu et place du codage technique
+
+Le lien pointe vers la fonction @ref uc31.
+
+
+@page uc61 61 Intégration à un site web
+
+L'utilisation historique de SYNTHESE consiste à l'utilisation de ses fonctionnalités au travers d'un site web.
+
+Afin de fonctionner sur un maximum de plateformes serveur, cette intégration se fait en respectant la norme CGI.
+
+Un @ref m71 "Client CGI" est réalisé à cette fin.
+
+Il effectue les opérations suivantes :
+ - lancement par le serveur web lors d'une requête
+ - vérifications de base sur la requête
+ - transmission de la requête au serveur, complétée par des informations sur le client final
+ - réception du résultat
+ - transmission du résultat au serveur web
+ - fin de l'éxécution
+
+@page uc62 62 Téléaffichage
+
+Le téléaffichage consiste en la diffusion de la liste des prochains départs aux arrêts, de manière dynamique.
+
+Plusieurs dispositifs peuvent être utilisés pour le téléaffichage :
+ - ecran de type VGA connecté sur unité centrale ou terminal RDP
+ - écran de type analogique, connecté sur un générateur de caractères (Velec...)
+ - afficheurs de type LCD, pilotés par port RS485 (protocole Lumiplan)
+ - afficheurs mécaniques, pilotés par port RS485 (protocole Velec)
+ - etc.
+
+Hormis le premier cas assimilé à une utilisation web de SYNTHESE, il est nécessaire d'implanter un client TCP sur l'ordinateur relié aux dispositifs de téléaffichage, chargé de transmettre les pages résultat au travers du port RS485.
+
+Un @ref m72 "Client RS485" est donc nécessaire pour gérer l'ensemble des cas. Les différents protocoles sont implémentés sous forme d'interfaces, et la définition des contenus est faite dans des descriptions de tableaux, comme pour les interfaces HTML.
+
+Il assure en service continu les opérations suivantes :
+ - demande du contenu au serveur, en spécifiant la clé de l'afficheur, ce qui détermine à la fois le protocole et le contenu
+ - stockage du contenu reçu
+ - transmission du contenu au port RS485
+ - attente minute suivante
+
+Lorsque l'architecture matérielle le nécessite, le client RS485 doit gérer l'alimentation de plusieurs dispositifs branchés en parallèle sur le même port. La boucle de fonctionnement est alors la suivante :
+ - demande des contenus au serveur, en spécifiant la clé de chaque afficheur
+ - stockage des contenus reçus
+ - transmission des contenus au port RS485, afficheur par afficheur
+ - attente minute suivante
+
+@page uc63 63 Terminal d'accès direct et de test
+
+Un @ref m70 "accès terminal" permet les fonctionnalités suivantes :
+ - utilisation de fonctions de SYNTHESE directement depuis la ligne de commande
+ - interface de menus d'accès textuels permettant l'utilisation quasi normale de SYNTHESE, sans dispositif d'affichage graphique
+ - accès aux commandes de tests et à toute autre fonction non disponible via le module d'interface
+
+
+*/

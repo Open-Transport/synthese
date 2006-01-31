@@ -1,0 +1,32 @@
+import os.path
+
+Import ('mainenv')
+moduleenv = mainenv.Copy()
+
+includes = '*.cpp'
+excludes = ['cServeurMnesia.cpp']
+
+moduleenv.Append (CPPPATH = [Dir('..').srcnode().abspath] )
+
+if (moduleenv['PLATFORM'] == 'posix'):
+  excludes.append ('stdafx.cpp')
+  moduleenv.Append (CCFLAGS= '-pthread' )
+  moduleenv.Append (LIBS= ['pthread'] ) 
+
+elif (moduleenv['PLATFORM'] == 'win32'):
+  moduleenv.Append ( LIBS = ['ws2_32.lib'] )  
+
+
+moduleenv.Append ( LIBPATH = ['../map'] )  
+moduleenv.Append ( LIBPATH = ['../tcp'] )  
+moduleenv.Append ( LIBS = ['map'] )  
+moduleenv.Append ( LIBS = ['tcp'] )  
+moduleenv.Append ( LIBS = ['boost_filesystem'] )  
+
+
+
+files = moduleenv.Glob(includes, excludes)
+
+
+
+moduleenv.Program(moduleenv.DefaultModuleName (), files)

@@ -1,0 +1,59 @@
+/** @page historique Historique et futur de synthese
+
+Evolutions passées :
+ - 2000 : lancement du développement, mise au point de l'algorithme principal du calculateur d'itinéraires et démonstrateur visual basic
+ - 2001 : version ß1 : calcul d'itinéraires,  tableaux de départs. Technologie ISAPI (Windows/IIS) développé en C++. Base de données multimodale sur la Haute Garonne. Version présentée à la SNCF, utilisée expérimentalement pour gérer une situation perturbée avec succès.
+ - 2002 : version ß2 : fiche arrêt (visites photo), indicateurs papier, module d'interfaces simplifié. Base de données multimodale exhaustive sur Midi-Pyrénées. Version présentée au public au SITEF sur le stand de la SEMVAT. De nombreux visiteurs ont manifesté leur intérêt pour le produit tel que présenté.
+ - 2003 : Version 1 : interface semvat.com, mise en place de la procédure d'alimentation semi-automatique des données bus (Hastus), et des procédures manuelles d'alimentation en données (9 sources de données contractualisées), portage en technologie FastCGI sous Linux. Version mise en ligne sur le site Internet semvat.com (interface utilisateur WS Interactive ne prenant pas en charge l'impression des feuilles de route), toutefois bridée aux seules données du réseau urbain de la SEMVAT suite à l'interdiction du SMTC de proposer la base multimodale Midi-Pyrénées.
+ - 2004 : version 1.1 : module de réservation pour le TAD 106, et procédure de génération automatique des horaires selon les règles particulières. Version mise en ligne à la centrale de réservation RCS.
+ - @subpage v20 : refonte technique (serveur TCP fonctionnant sur toutes les plateformes serveur (Linux, Windows, etc) + client TCP pour CGI), amélioration des performances, module d'interface évolué, clients pour matériels d'affichage de tableaux de départs propriétaires (Windows/RDP, Lumiplan, Hantarex/Velec, Varacter/Velec). Version mise en ligne sur le site tisseo.fr (interface graphique RCS conforme à la charte graphique Systonic/Tisséo), toujours bridée à la base de données urbaine. RCS met en place parallèlement un démonstrateur européen, faisant de la base SYNTHESE la plus importante base multimodale de l'histoire en nombre de circulations gérées.
+
+Evolutions prévues :
+ - @subpage v21 : module cartographique, module de recherche d'adresses, module de réservation distribué, gestion de profils utilisateur (pour réservation des TAD en ligne sur tisseo.fr), améliorations diverses interface (gestion navigateurs mobiles)
+ - 2007 : version 3 : base de données distribuée, modifiable à chaud (prise en charge du temps réel, prêt pour connexion SAE)
+
+
+@page v20 2005 : Version 2.0
+
+@section v200 25/8/2005 - Version 2.0.0
+
+
+@section v201 1/9/2005 - Version 2.0.1
+
+	- Correction du @ref bug1
+
+@section v202 10/2005 - Version 2.0.2
+
+	- Remise en fonction téléaffichage
+
+@section v203 7/12/2005 - Version 2.0.3
+
+	- Correction du @ref bug2
+	- Correction du @ref bug3
+	
+@page v21 2006 : Version 2.1
+
+@section v21contexte Contexte
+
+Trois besoins émergent à l'utilisation de SYNTHESE :
+ - Trouver un ou plusieurs arrêts logiques à partir d'une adresse
+ - Afficher le tracé d'une solution
+ - Afficher le plan du voisinage d'un arrêt de correspondance  ou d'extrémité
+
+Un module de cartographie apparaît alors nécessaire.
+
+@subsection v21refres Référentiel réseau
+
+Le référentiel réseau, en cours de développement, est une base de données contenant l'ensemble des informations topographiques concernant les différents éléments du réseau, avec historisation complète.
+
+Bon nombre de représentations cartographiques du référentiel sont envisageables, et certaines d'entre elles sont nécessaires dès l'ouverture du référentiel réseau :
+ - Tracé de ligne
+ - Tracé de points d'arrêt
+ - Tracés comparatifs entre plusieurs versions d'un objet , selon la date
+
+@section v21mutualisation Mutualisation
+
+Les besoins de SYNTHESE et du référentiel réseau étant très étroitement liés, il apparaît judicieux de développer un serveur de cartographie adapté à la problématique transports, pouvant être appelé par ces deux applications, et éventuellement par d'autres dans le futur.
+
+
+*/

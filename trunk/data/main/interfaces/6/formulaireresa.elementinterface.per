@@ -1,0 +1,62 @@
+> 000
+T <script type="text/javascript" language="javascript" src="/bi/4/js/frmResa.js"></script>
+T &nbsp;<table width="100%" border="0" cellpadding="0" cellspacing="0">
+T <tr valign="top"><td><img src="/bi/4/img/titre-calcul-itineraire.gif" alt="Calcul d'itinéraires" border="0" /></td>
+T <td width="100%" align="right">&nbsp;<br/>&nbsp;<a href="javascript:top.close();" class="lienBleuFonce">Fermer&nbsp;[x]</a></td></tr></table>
+T <br/>
+T <table width="90%" border="0" cellpadding="0" cellspacing="0">
+T <tr bgcolor="#FFF883" valign="top"><td align="left"><img src="/bi/4/img/jaune-puce-hg.gif" alt="-" border="0" /></td>
+T <td align="left"width="100%" valign="middle" class="txtFormulairesRouges"><b>VOUS DESIREZ RESERVER:</b></td>
+T <td align="left"><img src="/bi/4/img/jaune-hd.gif" alt="-" border="0" /></td></tr>
+T <tr bgcolor="#FFF883" valign="top"><td>&nbsp;</td><td align="left" class="txtFormulairesRouges">
+T <table id="recap"><tr><td class="txtFormulairesRouges"><b>le service</b></td><td id="cellservice" class="txtFormulairesRouges">
+P 1
+T </td></tr><tr><td class="txtFormulairesRouges"><b>de</b></td><td id="celldepart" class="txtFormulairesRouges">
+P 3
+T &nbsp;<i>
+P 4
+T </i></td></tr><tr><td class="txtFormulairesRouges"><b>à</b></td><td id="cellarrivee" class="txtFormulairesRouges">
+P 6
+T &nbsp;<i>
+P 7
+T </i></td></tr><tr><td class="txtFormulairesRouges"><b>départ le</b></td><td id="celldate" class="txtFormulairesRouges">
+P 9
+T </td></tr></table>
+T </td><td>&nbsp;</td></tr>
+T <tr align="left" bgcolor="#FFF883" valign="bottom"><td><img src="/bi/4/img/jaune-bg.gif" alt="-" border="0" /></td>
+T <td><img src="/bi/4/img/trans.gif" width="1" height="1" border="0" alt="-" /></td>
+T <td><img src="/bi/4/img/jaune-bd.gif" alt="-" border="0" /></td></tr></table>
+T <br>
+T <form name="saisie" method="post" action="/synthese/mainCGIPreFork.fcp">
+T <input type="hidden" name="fonction" value="vres" />
+T <input type="hidden" name="site" value="
+P 0
+T " /><input type="hidden" name="lig" value="
+P 2
+T " /><input type="hidden" name="serv" value="
+P 18
+T " /><input type="hidden" name="res" value="
+P 19
+T " /><input type="hidden" name="npad" value="
+P 5
+T " /><input type="hidden" name="npaa" value="
+P 8
+T " /><input type="hidden" name="date" value="
+P 10
+T " />
+T <table  bgcolor="#FFF883" width="90%" border="0" cellpadding="0" cellspacing="0">
+T <tr bgcolor="#FFF883" valign="top"><td align="left"><img src="/bi/4/img/jaune-puce-hg.gif" alt="-" border="0" /></td>
+T <td align="left"width="100%" valign="middle" class="txtFormulairesBleus"><b>VEUILLEZ REMPLIR LE FORMULAIRE:</b></td>
+T <td align="left"><img src="/bi/4/img/jaune-hd.gif" alt="-" border="0" /></td></tr>
+T <tr><td>&nbsp;</td><td><table>
+O 033 {<td class="txtFormulairesBleus"><b>Nom:</b></td>} {<td class="txtFormulairesBleus"><b>Prénom:</b></td>} P11 {<td class="txtFormulairesBleus"><b>Adresse:</b></td>} P12 {<td class="txtFormulairesBleus"><b>Email:</b></td>} P13 {<td class="txtFormulairesBleus"><b>Téléphone:</b></td>} P14 {<td class="txtFormulairesBleus"><b>Numéro d'abonné:</b></td>} P15 {<td class="txtFormulairesBleus"><b>Adresse de départ:</b></td>} P16 {<td class="txtFormulairesBleus"><b>Adresse d'arrivée:</b></td>} P17 {<td class="txtFormulairesBleus"><b>Nombres de places:</b></td>} {<tr><td colspan=2 class="txtFormulairesBleus">(*) champs obligatoires</td></tr>}
+T </tr></table></td><td>&nbsp;</td></tr>
+T <tr><td>&nbsp;</td><td align="center"><input type="button" value="Réserver" onClick="reservation()"><input type="reset" value="Effacer"></td>
+T <td>&nbsp;</td></tr>
+T <tr align="left" bgcolor="#FFF883" valign="bottom"><td><img src="/bi/4/img/jaune-bg.gif" alt="-" border="0" /></td>
+T <td><img src="/bi/4/img/trans.gif" width="1" height="1" border="0" alt="-" /></td>
+T <td><img src="/bi/4/img/jaune-bd.gif" alt="-" border="0" /></td></tr></table>
+T </table>
+T </form>
+> 001
+           

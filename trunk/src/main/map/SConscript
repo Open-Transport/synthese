@@ -1,0 +1,16 @@
+import os.path
+
+Import ('mainenv')
+moduleenv = mainenv.Copy()
+
+includes = '*.cpp'
+excludes = []
+
+
+files = moduleenv.Glob(includes, excludes)
+
+moduleenv.Append ( LIBS = ['boost_filesystem'] )  
+
+moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
+
+

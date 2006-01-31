@@ -1,0 +1,1402 @@
+/**
+
+@page erreurs Messages d'erreur et alertes
+
+Les tableaux reprennent l’ensemble des erreurs et alertes produits par SYNTHESE et lisibles sur le fichier journal (LOG) lors du chargement des fichiers.
+
+@section er01 01 Compilation du fichier des importations
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Code</p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Libellé</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Conséquence</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Résolution</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>01001</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Nombre d’importations non documenté, chargement
+  interrompu.</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Interruption du chargement</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Insérer la commande <i>NOMBRE=</i> en début de
+  fichier</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>01002</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Numéro d’importation trop grand</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Interruption du chargement</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Mettre à jour la commande NOMBRE= en début de
+  fichier ou modifier le numéro de l’importation</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>01003</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Type d’importation inconnu</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Interruption du chargement</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier le paramètre &lt;type&gt; dans la
+  déclaration</p>
+  </td>
+ </tr>
+</table>
+
+<h2><a name="_Toc36664827"><span style='font-family:Symbol;font-weight:normal'><img
+width=16 height=16 src="module.doxygen_fichiers/image002.gif" alt="*"><span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>02 Compilation du fichier des points d’arrêt</a></h2>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Code</p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Libellé</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Conséquence</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Résolution</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>02001</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Nombre de points d’arrêt non documenté,
+  chargement interrompu.</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Interruption du chargement</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Insérer la commande <i>NOMBRE=</i> en début de
+  fichier</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>02002</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Point d’Arrêt mal déclaré</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Point d’arrêt ignoré</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier le paramètre <i>&lt;type&gt;</i> dans
+  la déclaration.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>02003</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Désignation de point d’arrêt mal déclarée</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Désignation ignorée, erreur ultérieure probable</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier le respect des normes de désignation</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>02004</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Déclaration de quai invalide</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Quai ignoré</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier le nombre de quais alloués</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>02005</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Numéro de point d’arrêt trop grand</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Point d’arrêt ignoré</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Mettre à jour la commande <i>NOMBRE=</i> en
+  début de fichier</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>02006</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Quai non déclaré</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Erreur de données possible</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Déclarer le quai manquant ou modifier le nombre
+  de quais du point d’arrêt</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>02007</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Trop de désignations</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Désignation ignorée</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Augmenter le nombre de désignation allouées</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>02008</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Coordonnées X incorrectes</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Coordonnées ignorées</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la valeur des coordonnées</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>02009</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Coordonnées Y incorrectes</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Coordonnées ignorées</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la valeur des coordonnées</p>
+  </td>
+ </tr>
+</table>
+
+<h2><a name="_Toc36664828"></a><a name="_Toc31714139"></a><a name="_Toc31713873"></a><a
+name="_Toc31713607"></a><a name="_Toc31713341"></a><a name="_Toc31713074"><span
+style='font-family:Symbol;font-weight:normal'><img width=16 height=16
+src="module.doxygen_fichiers/image002.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>03 Compilation des fichiers des horaires</a></h2>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Code</p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Libellé</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Conséquence</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Résolution</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>03001</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Erreur de croissance de point hectométrique</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Erreur de calcul d’heures sur point d’arrêt à
+  horaires non saisis</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la valeur PH, notamment qu’il respecte
+  bien le sens de croissance de la ligne.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>03002</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Point d’arrêt inexistant</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>GareLigne ignorée</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier le code du point d’arrêt dans le
+  fichier des points d’arrêt.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>03003</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Debut de ligne sans horaire</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>GareLigne ignorée</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Donner l’horaire pour le premier point d’arret
+  de la ligne.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>03004</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Fin de ligne sans horaire</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>GareLigne sans heures&nbsp;: erreurs à venir
+  dans le calcul</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Donner l’horaire pour le dernier point d’arret
+  de la ligne.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>03005</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Quai inexistant dans le point d’arrêt</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Affectation du quai 1</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la valeur du quai dans le fichier
+  d’horaires</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>03006</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Erreur de cohérence géographique (trajet trop
+  long)</p>
+  </td>
+  <td width=194 rowspan=2 valign=top style='width:145.45pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Données ne correspondant pas à la réalité.
+  (erreur de point d’arrêt)</p>
+  </td>
+  <td width=223 rowspan=2 valign=top style='width:167.2pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier le code du point d’arrêt dans la fiche
+  de la ligne et dans le fichier des points d’arrêt, ou les PH, ou les
+  coordonnées des points d’arrêt</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>03007</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Erreur de cohérence géographique (trajet trop
+  court)</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>03008</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Numéro de jour de circulation invalide</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Le service circule tous les jours, ce qui ne
+  correspond pas à la réalité</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la valeur CIS du service en question</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>03009</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Erreur de chronologie verticale</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>GareLigne ignorée</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la valeur de l’horaire par rapport à
+  la GareLigne précédente</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>03010</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Erreur de chronologie horizontale</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>GareLigne ignorée</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la valeur de l’horaire par rapport au
+  départ précédent</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>03011</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Erreur de données horaires</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>GareLigne ignorée</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la valeur de l’horaire</p>
+  </td>
+ </tr>
+</table>
+
+<h2><a name="_Toc36664829"></a><a name="_Toc31714140"></a><a name="_Toc31713874"></a><a
+name="_Toc31713608"></a><a name="_Toc31713342"></a><a name="_Toc31713075"><span
+style='font-family:Symbol;font-weight:normal'><img width=16 height=16
+src="module.doxygen_fichiers/image002.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>04 Compilation des interfaces</a></h2>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Code</p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Libellé</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Conséquence</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Résolution</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>04001</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Nombre d’interfaces non documenté, chargement
+  interrompu.</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Interruption du chargement</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Insérer la commande <i>NOMBRE=</i> en début de
+  fichier</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>04002</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Tentative d’inclusion d’élément non défini</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Inclusion ignorée</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Modifier l’ordre de chargement des éléments
+  pour charger l’élément inclus avant l’élément demandant l’inclusion.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>04003</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Paramètre obligatoire non fourni</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Objet à inclure ignoré</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la fourniture des paramètres aux
+  objets par défaut.</p>
+  </td>
+ </tr>
+</table>
+
+<h2><a name="_Toc36664830"><span style='font-family:Symbol;font-weight:normal'><img
+width=16 height=16 src="module.doxygen_fichiers/image002.gif" alt="*"><span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>05 Compilation du fichier du matériel roulant</a></h2>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Code</p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Libellé</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Conséquence</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Résolution</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>05001</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Nombre de matériels non documenté, chargement
+  interrompu</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Interruption du chargement</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Insérer la commande <i>NOMBRE=</i> en début de
+  fichier</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>05002</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Numéro de matériel trop grand</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Matériel ignoré</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Mettre à jour la commande NOMBRE= en début de
+  fichier ou modifier le numéro du matériel</p>
+  </td>
+ </tr>
+</table>
+
+<h2><a name="_Toc36664831"><span style='font-family:Symbol;font-weight:normal'><img
+width=16 height=16 src="module.doxygen_fichiers/image002.gif" alt="*"><span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>06 Compilation du fichier des jours de circulation</a></h2>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Code</p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Libellé</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Conséquence</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Résolution</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>06001</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>&nbsp;</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>&nbsp;</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>&nbsp;</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>06002</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Numéro JC déjà utilisé</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Erreur de données le JC sera faux</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Modifier le numéro du second JC portant le
+  numéro</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>06003</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Années non documentées</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Interruption du chargement</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Insérer la commande <i>Service=</i> en début de
+  fichier</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>06004</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Années incorrectes</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Interruption du chargement</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la valeur des années dans la commande <i>Service=</i>
+  notamment leur ordre.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>06005</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Commande inconnue</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Commande ignorée&nbsp;: le JC sera probablement
+  faux</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la commande</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>06006</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Date non valide</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Commande stoppée&nbsp;: le JC sera probablement
+  faux</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier la/les date(s) de la commande</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>06007</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Dates non valides</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Commande ignorée, le JC sera faux.</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier les dates de commande dans une plage
+  de dates. Ex&nbsp;: choisir entre absolu et générique</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>06008</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Numéro d’importation incorrect</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Commande ignorée</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier que l’importation existe</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement><b>06009</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Numéro de JC inclus incorrect</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Commande ignorée</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Vérifier que le JC existe</p>
+  </td>
+ </tr>
+</table>
+
+<h2><a name="_Toc36664832"><span style='font-family:Symbol;font-weight:normal'><img
+width=16 height=16 src="module.doxygen_fichiers/image002.gif" alt="*"><span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>07 Compilation du fichier des modalités de réservation</a></h2>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Code</p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Libellé</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Conséquence</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border:solid windowtext 1.0pt;
+  border-left:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement>Résolution</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07001</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Nombre de modalités de
+  réservation non documenté, chargement interrompu.</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Interruption du chargement</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Insérer la commande <i>NOMBRE=</i>
+  en début de fichier</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07002</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Numéro de modalité de
+  réservation trop grand</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Modalité de
+  réservation ignorée</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Mettre à jour la
+  commande NOMBRE= en début de fichier ou modifier le numéro de la modalité de
+  réservation</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07003</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Délai min Heure max
+  incorrecte</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Commande ignorée,
+  modalité de réservation fausse</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Vérifier la valeur du
+  paramètre</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07004</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Type de réservation
+  incorrect</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Commande ignorée, type
+  de réservation probablement faux</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Vérifier la valeur du
+  paramètre</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07005</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Délai minimal en
+  minutes incorrect</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Commande ignorée,
+  modalité de réservation fausse</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Vérifier la valeur du
+  paramètre</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07006</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Délai minimal en jours
+  incorrect</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Commande ignorée,
+  modalité de réservation fausse</p>
+  </td>
+  <td width=223 rowspan=2 valign=top style='width:167.2pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Vérifier la valeur du
+  paramètre et notamment que le délai minimal est bien inférieur au délai
+  maximal en jours</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07007</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Délai maximal en jours
+  incorrect</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Commande ignorée,
+  modalité de réservation fausse</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07008</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur de copie
+  Documentation</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Documentation ignorée,
+  affichage futur incomplet</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur interne</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07009</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Prix incorrect</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Prix ignoré</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Vérifier la valeur du
+  paramètre</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07010</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur de copie Numéro
+  Téléphone</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Numéro Téléphone
+  ignoré, affichage futur incomplet</p>
+  </td>
+  <td width=223 rowspan=10 valign=top style='width:167.2pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur interne</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07011</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur de copie
+  Horaires Téléphone</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Horaires Téléphone
+  ignoré, affichage futur incomplet</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07012</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur de copie E-mail</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>E-mail ignoré,
+  affichage futur incomplet</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07013</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur de copie Site
+  web</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Site web ignoré,
+  affichage futur incomplet</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07014</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur Reservation En
+  Ligne</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Réservation En Ligne
+  supprimée</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07015</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur REL Nom</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>&nbsp;</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07016</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur REL Prenom</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>&nbsp;</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07017</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur REL Adresse</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>&nbsp;</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07018</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur REL e-mail</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>&nbsp;</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07019</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Erreur REL Numéro Abo</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>&nbsp;</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=55 valign=top style='width:41.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'><b>07020</b></p>
+  </td>
+  <td width=223 valign=top style='width:166.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Commande inconnue</p>
+  </td>
+  <td width=194 valign=top style='width:145.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Commande ignorée</p>
+  </td>
+  <td width=223 valign=top style='width:167.2pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=Normalsansespacement style='background:white'>Vérifier la commande</p>
+  </td>
+ </tr>
+</table>
+
+*/

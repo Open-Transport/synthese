@@ -1,0 +1,18 @@
+/**
+
+@page admin Administration de SYNTHESE
+	- @subpage install
+	- @subpage data
+	- @subpage deploiement
+	- @subpage binaires
+
+@page binaires Binaires
+	- @subpage server
+	
+@page server Serveur
+
+@code
+synthese.server -b <base> [-l <niveau> [-d <repertoire>]] [-p <port>] [-t <threads>]
+@endcode
+
+*/

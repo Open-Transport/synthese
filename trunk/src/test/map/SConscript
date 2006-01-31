@@ -1,0 +1,12 @@
+Import ('testenv')
+testmoduleenv = testenv.Copy()
+
+includes = '*.cpp'
+excludes = []
+
+
+files = testmoduleenv.Glob(includes, excludes)
+
+
+testmoduleenv.Library(testmoduleenv.DefaultTestModuleName (), files)
+

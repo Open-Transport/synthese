@@ -1,0 +1,43 @@
+> 000
+T <script language="JavaScript1.2" type="text/javascript" src="/bi/4/js/FicheHoraire.js"></script><table width="98%" border="0" cellpadding="0" cellspacing="0"><tr valign="top"><td><img src="/bi/4/img/titre-calcul-itineraire.gif" alt="Calcul d'itinéraire" border="0" /></td><td width="100%" align="right">&nbsp;<br /><a href="#" class="lienBleuFonce">Aide&nbsp;[?]</a>&nbsp;&nbsp;<a href="javascript:top.close();" class="lienBleuFonce">Fermer&nbsp;[x]</a></td></tr></table><br /><table border="0" cellpadding="0" cellspacing="0"><tr><td bgcolor="#fdfcde"><img src="/bi/4/img/pop-tit-g.gif" alt="-" border="0" /></td><td bgcolor="#fdfcde" class="bleu"><b>
+O 008
+T </b></td><td bgcolor="#fdfcde"><img src="/bi/4/img/pop-tit-d.gif" alt="-" border="0" /></td></tr></table><br />
+O 009	
+T <div style="position:absolute; top:135px; left:15px; width:216px; height:180px;"><table width="216" border="0" cellpadding="3" cellspacing="0"><tr><th class="thHorairesPopUp" align="left">Prochains&nbsp;Départs</th><th class="thHorairesPopUp" align="right" ID="Heure"></th></tr></table>
+T <iframe frameborder="0" width="216" height="132" src="/synthese/mainCGIPreFork.fcp?fonction=mtd&npa=
+O 010
+T &np=6
+T &site=
+P 0
+T "></iframe><table width="216" border="0" cellpadding="3" cellspacing="0"><tr><td class="tdHoraires1" align="left"><a href="javascript:tbdepgare();"><nobr>Ecran de gare</nobr></a></td></tr><tr><td class="tdHoraires2" align="left"><nobr><a href="javascript:tbdep();">Tableau complet</a><br /><form name="frmTbdep"><select size="1" class="frmField" name="jour">
+O 000 {0}
+T </select><select size="1" class="frmField" name="mois">
+O 001 {0} {1}
+T </select><select size="1" class="frmField" name="annee">
+O 002 {0} {0} {2005}
+T </select></form></nobr></td></tr></table></div><div style="position:absolute; left:15px; top: 350px; width:216px;"><table width="216" border="0" cellpadding="3" cellspacing="0" style="font-size:10pt"><tr><th class="thHorairesPopUp" align="left">Informations</th>
+O 011 {<tr><td style="background:#dfdfdf; font-size:10px;">} {<b>Plan du secteur</b>} {</td></tr>}
+T <tr><td style="background:#C4C3C3; font-size:10px;"><b>Points de montée</b>
+O 012 {<br />- } {Arr&ecirc;t } {}
+O 013 {<br />- } {} {<tr><td style="background:#dfdfdf; font-size:10px;"><b>Autres photos:</b>} {</td></tr>}
+O 014 {<br />- } {} {<tr><td style="background:#C4C3C3; font-size:10px;"><b>Services:</b>} {</td></tr>}
+T </table></div><div class="Meteo">
+O 015
+T </div>			
+O 016 {<div style="position: absolute; top: 135px; left: 248px; width: 512px; background:#FFFFFF; height: 370px; z-index: 0; magin: 0px;" ID="PS" class="Zone"><table width="512" border="0" cellpadding="3" cellspacing="0"><tr><th class="thHorairesPopUp" align="left"><nobr>Plan du secteur</nobr></th></tr></table>} {</div>}
+O 017
+O 018
+O 019
+O 020			
+T <script>function tbdepgare() { var str="/synthese/mainCGIPreFork.fcp?fonction=tdg&npa=
+O 010
+T &np=8&site=
+P 0
+T ";
+T window.open(str, 'Ville','status=no,scrollbars=no,fullscreen=yes'); } function tbdep() { var str="/synthese/mainCGIPreFork.fcp?fonction=td&date=" + document.frmTbdep.annee[document.frmTbdep.annee.selectedIndex].value+ document.frmTbdep.mois[document.frmTbdep.mois.selectedIndex].value+ document.frmTbdep.jour[document.frmTbdep.jour.selectedIndex].value + "&npa=
+O 010
+T &site=
+P 0
+T "; window.open(str, 'Ville','top=0,left=0,scrollbars=yes,width=800,height=600'); } function AfficheHeure() { var d = new Date(); var s = d.getHours() + ":"; if ( d.getMinutes() < 10) s+='0'; s+= d.getMinutes(); document.all.Heure.innerHTML=s; setTimeout("AfficheHeureSansPoint();",500); } function AfficheHeureSansPoint() { var d = new Date(); var s = d.getHours() + '<span style="color: #281B81;">:</span>'; if ( d.getMinutes() < 10) s+='0'; s+= d.getMinutes(); document.all.Heure.innerHTML=s; setTimeout("AfficheHeure();",500); } AfficheHeure();
+T </script>
+> 001

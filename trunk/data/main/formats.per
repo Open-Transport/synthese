@@ -1,0 +1,371 @@
+// Fichier de format - permet la personnalisation des champs et facilite leur modifications
+// Pour chaque section (#):
+// Sous section ([) descriptions lignes
+// puis sous section descriptions colonnes
+
+// LIGNES
+
+// Deux premiers octets: position de la chaine à chercher
+// Deux octets suivants: longueur de la chaine à chercher
+// Ensuite: chaine à trouver
+// Puis: type de la donnée (voir types.txt)
+// Puis: i ou g (i=grille info, g=grille)
+// Puis zone de commentaires (non lue)
+
+// COLONNES
+// Deux premiers octets: position de la colonne
+// Deux octets suivants: longueur de la colonne
+// Ensuite description de la colonne
+
+// NB la dernière colonne pourra être utilisée pour le calcul des colonnes de tableaux
+// à l'aide de la formule POS + n * LONGUEUR
+
+// Attention les positions commencent à 0 !
+// Attention ne pas modifier les intitulés de sections !
+
+
+#horaires
+[
+0003DOCHTMi Documentation HTML sur la ligne (pour affichage page d'infos)
+0003CILCIRi Jours de circulation de la ligne (INUTILISE)
+0003RESRESi Reseau contenant la ligne (> RESEAUX.PER)
+0003CARHTMi HTML à insérer dans le dessin du cartouche dans le champ "ligne"
+0003STYSTYi Style du cartouche (> GENERAUX.CSS)
+0003MATMATi Matériel utilisé sur la ligne (> MATERIEL.PER)
+0003RSARSAi Modalités de réservation (> RESA.PER)
+0003VELVELi Modalités d'acceptation des bicyclettes (> velo.per)
+0003TARTARi Code tarification (> tarif.per)
+0003CISCIRg Jours de circulation des services (> JOURS.PER)
+0003ATTMINg Attente (services continus) OBLIGATOIRE APRES LA LIGNE PRECEDENTE
+0003FINHORg Fin de la plage horaire (services continus) OBLIGATOIRE APRES LA LIGNE PRECEDENTE
+0003NUMNUMg Numéro du service
+0601*HORg   Ligne d'horaire
+0003AFF     Indique si la ligne doit être affichée sur le tableau des départs (0/1)
+0003IND     Code de ligne à afficher sur l'indicateur
+0003IMP     Code de l'importation source
+0003COR     Code des services dans la base trains (Apres CIS)
+0003DES     Libellé complet
+0003IMG     Image
+0003AFI     Indique si la ligne doit etre affichee sur les indicateurs
+0003DEP     Code du depot (> GARES.PER)
+0003HANHANi Modalités d'acceptation des handicapes (> handicape.per)
+0003ALEALEi Message d'alerte à afficher pour cette ligne
+0003ALDALDi Debut de l'affichage du message d'alerte (ex : ALD YYYYMMDDHHMM)
+0003ALFALFi Fin de l'affichage  du message d'alerte (ex : ALF YYYYMMDDHHMM)
+0003GIR     Girouette
+[
+0006 Point hectométrique
+0706 Code point d'arrêt
+1301 Type point d'arrêt (D/A/a/d non traité)
+1402 Quai desservi en théorie
+1706 Horaire ou autre colonne
+0412 Date d'alerte
+0301 Message d'alerte
+
+// #jours
+
+#pointsarret
+[
+0002NQ      Nombre de quais
+0002ND      Nombre de descriptions Commune(Nom
+0002GX      Coordonnées X GPS
+0002GY      Coordonnées Y GPS
+0002DE      Description Commune(Nom
+0002HT      HTML
+0201:       Description du quai
+0002OD      Dénomination pour utilisation PostScript en origine ou destination
+0002PH      Photo
+0002NP      Nombre photos
+0002VM      Vitesses max
+0002CR      Code RIHO
+0002IR      ImportationRIHO
+0002MA      Code Maporama
+0002ME      Code Météo
+0002NS      Nombre de services
+0002SE      Service
+0003ALE     Message d'alerte
+0003ALD     Debut de l'affichage du message d'alerte (ex : ALD YYYYMMDDHHMM)
+0003ALF     Fin de l'affichage  du message d'alerte (ex : ALF YYYYMMDDHHMM)
+[
+0300        Colonne standard
+0303        Colonne VMax
+0301        Colonne Service/Type
+0506        Colonne Service/Photo
+1200        Colonne Designation
+0400        Libellé de DE
+0301        Type de DE
+0412        Date alerte
+0301        Message d'alerte
+0002        Index quai
+0303        Matrice délai correspondances
+
+#materiel
+[
+0003NOMHTM Nom du matériel
+0003DOCHTM Documentation HTML sur le matériel
+0003VIT    Vitesse moyenne maximale entre deux points d'arret
+0003IND    Libellé pour l'indicateur
+0003ART    Article pour libellé complet
+[
+0406 Colonne standard
+
+#resa
+[
+0003TYPTRSi Type de réservation (O = Obligatoire, F = Facultative, N = Impossible)
+0003MIMMINi Délai minimal entre la réservation et le départ (en minutes)
+0003MIHMINi Heure max pour délai min
+0003MIJJOUi Délai minimal entre le jour de réservation et le jour de départ (en jours)
+0003MAJJOUi Délai maximal entre le jour de réservation et le jour de départ (en jours)
+0003DESHTMi Documentation HTML sur la modalité de réservation
+0003PRIEURi Prix de la réservation (en centimes d'Euro)
+0003TEL     Téléphone
+0003HTL     Horaires d'accueil téléphonique
+0003EML     E-mail reservation
+0003EMC     E-mail copie infos
+0003URL     Site web de réservation
+0003REL     Réservation En Ligne
+0003RLP     REL Champ Prenom
+0003RLA     REL Champ Adresse
+0003RLE     REL Champ EMail
+0003RLT     REL Champ Telephone
+0003RLN     REL Champ Numero Abonné
+0003MAX     Nombre maximum de resa
+0003SEU     Seuil de resa avant mail (plusieurs possibles sur plusieurs lignes)
+0003REO     L'heure de référence est à l'origine du service (1) ou à l'heure de montée du voyageur (0 - défaut)
+[
+0400 Colonne standard
+0404 Colonne heure
+
+#velo
+[
+0003TYPi Type d'accès vélo (O = Oui N = Non)
+0003NBRi Nombre maximal de vélos embarqués
+0003DOCi Documentation HTML sur la modalité de réservation
+0003PRIi Prix de l'accès vélo
+0003RSAi Modalité de réservation de l'accès vélo
+[
+0406 Colonne standard
+
+#handicape
+[
+0003TYPi Type d'accès handicapé (O = Oui N = Non)
+0003NBRi Nombre maximal de personnes handicapées embarquées
+0003DOCi Documentation HTML sur la modalité de réservation
+0003PRIi Prix de l'accès handicapé
+0003RSAi Modalité de réservation de l'accès handicapé
+[
+0406 Colonne standard
+
+#sites
+[
+0003ENVi Numéro d'environnement rattaché au site (0 par défaut)
+0003INTi Numero d'interface rattachée au site
+0003IDEi Identifiant
+0003DADi Date de début de validité
+0003DAFi Date de fin de validité
+0016RESA EN LIGNE = Activation de la résa en ligne (1 par défaut)
+0013URL CLIENT = URL permettant d'appeler le client web
+0028AFFICHE SOLUTIONS PASSEES = Active l'affichage du passé (défaut = 0)
+[
+0406 Colonne Standard
+0115 Clef du sites
+0408 Colonne Date
+1300 Colonne URL client
+2800 Colonne solutions passées
+1600 Colonne résa en ligne
+
+#reseaux
+[
+0003NOMHTMi Nom du réseau (HTML)
+0003URLHTMi Adresse internet du réseau
+0003DOCHTMi Documentation HTML sur le réseau (pour affichage page d'infos)
+0003CARHTMi HTML à insérer dans le dessin du cartouche dans le champ "reseau" (¤ contenant le HTML de la ligne)
+[
+006 Colonne standard
+
+// Projet
+
+#tarif
+[
+0003TYPTYTi Type de description kilométrique (Z=Zonage (absolu), S=Section (relatif), D=Distance (cumulatif))
+0003NBCINTi Nombre maximal de correspondances
+0003DURMINi Durée maximale d'un trajet
+0003PKTHMTg Tranches de points kilométriques tarifaires (y placer les zones, les sections)
+0003PRAFLOg Coefficient directeur du prix sur chaque tranche
+0003PRBEURg Ordonnée à l'origine du prix sur chaque tranche 
+0003LIBLIBg Libelle de la tarification
+[
+0406 Colonne standard
+
+#indicateurs
+[
+0002JC Jour de circulations de base de la page
+0201: Gare (ordre important)
+0002CP Commence Page (force le saut de page avant premier tableau)
+[
+0306 Colonne standard
+0101 Obligatoire ou Facultatif
+0001 Depart Arrivee Passage
+
+#photos
+[
+0002DE Designation générale
+0002DL Designation locale
+0002MU Zone cliquable sur photo donnant sur URL
+0002MP Zone cliquable sur photo donnant autre photo
+0002NM Nombre de zones de map
+0002NF Nom de fichier
+[
+0319 Coordonnées de map
+2306 Numéro de photo liée
+3000 Alt Map photo
+2300 Alt#URL Map URL
+0300 Colonne standard
+
+#importation
+[
+0002MA Type d'importation
+0002RE Repertoire des donnees
+0002FG Fichier gares
+0002FU Fichier index gares
+0002FP Fichier donnees JC
+0002FR Fichier description JC
+0002FT Fichier index services
+0002FD Fichier donnees services
+0002F1 Fichier donnees services 1
+0002DD Date debut
+0002DF Date fin
+0002EX Service exclu
+0002FI Fichier adresses services
+0002LI Libellé de l'importation
+[
+0300 Colonne standard
+0301 Code RIHO Matériel
+0502 Code RIHO Synthese
+
+#interfaces
+[
+0001E Element
+0005PARAM Parametre (ne fonctionne plus)
+0007PERIODE
+0004JOUR
+0004MOIS
+0006ALERTE
+[
+0104 Numero
+0600 Chemin
+0804 Heure du début de la période
+1304 Heure de fin de la période
+1800 Libellé de la période
+0501 Index du jour de semaine libellé
+0700 Libellé du jour de semaine
+0502 Index du mois libelle
+0800 Libelle du mois
+0702 Niveau de message d'alerte
+1000 Texte de message d'alerte
+
+#elementsinterface
+[
+0001T Texte
+0001> Inclusion
+0001O Objet par defaut
+0001P Paramètre
+0001? IfThenElse
+0001A Attribut
+0001G Goto
+0001L Ligne n°
+[
+0203 Numero
+0600 Commande
+0200 Commande pour element statique
+
+#stats
+[
+0002GD Gare départ
+0002GA Gare arrivée
+[
+0306 Colonne Standard
+
+#etudes
+[
+0003RLT Roulement
+0003PAD PA Origine
+0003PAA PA Destination
+0003PAP PA Origine Destination
+0003JCB JC de base
+0003CHE Chemin d'écriture des fichiers
+0003AMT Attente Maximale au Terminus avant retour au dépot
+0003DPS Délai de Prise de Service
+0003LIG Ligne hors roulement
+0003DER Délai regroupement
+[
+0400 Colonne standard
+
+#envs
+[
+0003REPi Repertoire racine de l'environnement
+[
+0406 Colonne Standard
+0104 Numero env
+
+#tbdep
+[
+0003ENV Environnement de données
+0003INT Interface du tableau
+0003TIT Titre
+0003ORI Origines uniquement
+0003+PA Arrêt logique
+0003+QU Quai à afficher
+0003+AF Destination à afficher
+0003+SE Destination de sélection
+0003NBR Nombre de départs affichés par écran
+[
+0400 Colonne standard
+0101 Type de tableau (S = Sélection; C = Chronologie)
+0215 Code du tableau
+
+#serveursdata
+[
+0011HOST       
+0011LOGIN      
+0011PASSWORD   
+0011BASE       
+[
+1100 Colonne Standard
+
+#databases
+[
+0034SERVEUR                           
+0034TABLE RESERVATIONS                
+0034CHAMP ID                          
+0034METHODE ID                         (Date/cle, 7Caracteres)
+0034CHAMP NOM                         
+0034CHAMP PRENOM                      
+0034CHAMP ADRESSE                     
+0034CHAMP TELEPHONE                   
+0034CHAMP E-MAIL                      
+0034CHAMP NUMERO ABONNE               
+0034CHAMP NOMBRE PLACES               
+0034CHAMP CODE LIGNE                  
+0034CHAMP LIBELLE LIGNE               
+0034CHAMP CODE MODALITE RESERVATION   
+0034CHAMP NUMERO SERVICE              
+0034CHAMP ARRET DEPART                
+0034CHAMP DESIGNATION ARRET DEPART    
+0034CHAMP ARRET ARRIVEE               
+0034CHAMP DESIGNATION ARRET ARRIVEE   
+0034CHAMP MOMENT DEPART               
+0034CHAMP E-MAIL TRANSPORTEUR 1       
+0034CHAMP E-MAIL TRANSPORTEUR 2       
+0034CHAMP PALIER                      
+0034CHAMP DATE ENVOI E-MAIL           
+0034CHAMP DATE RESERVATION            
+0034CHAMP DATE ANNULATION             
+0034CHAMP ETAT                        
+0034CHAMP RAISON ECHEC                
+0034TABLE COMPTEUR PAR JOUR           
+0034CHAMP JOUR COMPTEUR               
+0034CHAMP COMPTEUR                    
+[
+3400 Colonne standard
+

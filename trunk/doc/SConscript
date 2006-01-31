@@ -1,0 +1,14 @@
+import os
+
+
+os.system ('cd doc; doxygen Doxyfile.doxyfile; cd -')
+
+#source = 'Doxyfile.doxyfile'
+#target = ['html/index.html']
+
+#Command(target, source, 'doxygen $SOURCES')
+
+
+
+
+

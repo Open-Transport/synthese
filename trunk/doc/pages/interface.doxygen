@@ -1,0 +1,439 @@
+/** @page interface Fichiers d'interface
+
+	- @subpage fint
+	- @subpage feint 
+	- @subpage eint
+	- @subpage oint
+	- @subpage aint
+	- @subpage exemplesinterfaces
+
+@page fint Fichiers d'interfaces
+
+@section intdecl Déclaration
+@copydoc INTERFACESFORMATLIGNEInterface
+
+@section intDefinition Définition du rendu
+@copydoc INTERFACESFORMATLIGNEElement
+@copydoc INTERFACESFORMATLIGNEParametre
+
+@section intparam Paramètres de fonctionnement
+@copydoc INTERFACESFORMATLIGNEPeriode
+
+@section intdico Dictionnaire
+@copydoc INTERFACESFORMATLIGNELibelleJour
+@copydoc INTERFACESFORMATLIGNELibelleMois
+@copydoc INTERFACESFORMATLIGNEPrefixeAlerte
+
+
+@page feint Fichiers d'éléments d'interface
+
+@section feintdes Production de contenu
+@copydoc ELEMENTSINTERFACEFORMATLIGNETexte
+@copydoc ELEMENTSINTERFACEFORMATLIGNEInclusion
+@copydoc ELEMENTSINTERFACEFORMATLIGNEObjet
+@copydoc ELEMENTSINTERFACEFORMATLIGNEParametre
+@copydoc ELEMENTSINTERFACEFORMATLIGNEIfThenElse
+@copydoc ELEMENTSINTERFACEFORMATLIGNEAttribut
+
+@section feintbr Branchements
+@copydoc ELEMENTSINTERFACEFORMATLIGNELigne
+@copydoc ELEMENTSINTERFACEFORMATLIGNEGoto
+
+
+@page eint Pages standard d'interface
+
+@section eintref Référence
+@copydoc INTERFACEEnTete
+@copydoc INTERFACEPied
+@copydoc INTERFACEFormulaireEntree
+@copydoc INTERFACENomArret
+@copydoc INTERFACEDesignationLigne
+@copydoc INTERFACECartoucheLigne
+@copydoc INTERFACEListeCommunesDepart
+@copydoc INTERFACEListeCommunesArrivee
+@copydoc INTERFACEListeArretsDepart
+@copydoc INTERFACEListeArretsArrivee
+@copydoc INTERFACEErreurArretsFicheHoraire
+@copydoc INTERFACEAttente
+@copydoc INTERFACETbDepGare
+@copydoc INTERFACETbDep
+@copydoc INTERFACEFormResa
+@copydoc INTERFACEValidResa
+@copydoc INTERFACEFicheHoraireColonne
+@copydoc INTERFACEFeuilleRoute
+@copydoc INTERFACELigneFeuilleRouteArret
+@copydoc INTERFACELigneFeuilleRouteCirculation
+@copydoc INTERFACELigneFeuilleRouteJonction
+@copydoc INTERFACEFicheArret
+@copydoc INTERFACECaseLignes
+@copydoc INTERFACEAucuneSolutionFicheHoraire
+@copydoc INTERFACECaseDuree
+@copydoc INTERFACECaseRenvoi
+@copydoc INTERFACEFicheHoraireLigne
+@copydoc INTERFACEDuree
+@copydoc INTERFACEMiniTbDepGare
+@copydoc INTERFACEPageAccueil
+@copydoc INTERFACEFicheHoraire
+@copydoc INTERFACELigneTableauDepart
+@copydoc INTERFACECaseParticularite
+
+
+@page oint Objets d'interface de la bibliothèque
+@section ointref Référence
+@subsection ointreffh Fiche horaire
+@copydoc ELEMENTINTERFACEFicheHoraire
+@copydoc EI_OBJETDYNAMIQUE_ListeLignesTrajets
+@copydoc EI_OBJETDYNAMIQUE_ListeLignesTrajet
+@copydoc ELEMENTINTERFACEFeuillesRoute
+@copydoc ELEMENTINTERFACEFeuilleRoute
+@copydoc EI_BIBLIOTHEQUE_FicheHoraire_LigneDurees
+@copydoc EI_BIBLIOTHEQUE_Trajet_Duree
+@copydoc EI_BIBLIOTHEQUE_Cases_Particularites
+
+@subsection ointreftdg Tableaux de départs
+@copydoc ELEMENTINTERFACETbDepGare
+@copydoc ELEMENTINTERFACETbDep
+@copydoc ELEMENTINTERFACEMiniTbDepGare
+@copydoc EI_BIBLIOTHEQUE_DescriptionPassage_Ligne
+@copydoc EI_BIBLIOTHEQUE_DescriptionPassage_Parcours
+@copydoc EI_BIBLIOTHEQUE_DescriptionPassage_Destination
+@copydoc EI_BIBLIOTHEQUE_DescriptionPassage_Quai
+@copydoc EI_BIBLIOTHEQUE_DescriptionPassage_Heure
+
+@subsection ointreffa Fiche arrêt
+@copydoc ELEMENTINTERFACELieuArret
+@copydoc ELEMENTINTERFACELienPhotosQuais
+@copydoc ELEMENTINTERFACELienAutresPhotos
+@copydoc ELEMENTINTERFACELienServices
+@copydoc ELEMENTINTERFACEDivQuais
+@copydoc ELEMENTINTERFACEDivPhotos
+@copydoc ELEMENTINTERFACEDivServices
+@copydoc ELEMENTINTERFACEFicheArretScript
+
+@subsection ointrefresa Réservation
+@copydoc ELEMENTINTERFACEChampsReservation
+
+@subsection ointrefecr Ecrans de dialogue
+@copydoc ELEMENTINTERFACEListeCommunes
+@copydoc ELEMENTINTERFACEListeArrets
+
+@subsection ointrefdico Utilisation du dictionnaire
+@copydoc EI_BIBLIOTHEQUE_PERIODE
+@copydoc EI_BIBLIOTHEQUE_Date	
+@copydoc EI_BIBLIOTHEQUE_Interface_PrefixeAlerte
+
+@subsection ointrefobj Propriétés d'objets
+@copydoc ELEMENTINTERFACENomCommune
+@copydoc EI_BIBLIOTHEQUE_Ligne_Destination
+
+@subsection ointrefform Gestion des formulaires HTML
+@copydoc ELEMENTINTERFACEURLFormulaire
+@copydoc ELEMENTINTERFACEInputHTML
+@copydoc ELEMENTINTERFACESelecteurVelo
+@copydoc ELEMENTINTERFACESelecteurTaxiBus
+
+
+
+@page aint Attributs d'objets de données accessibles depuis l'interface
+
+@section aintpa Points d'arrêts
+@copydoc EI_ATTRIBUT_PointArret_Nom
+@copydoc EI_ATTRIBUT_PointArret_NomCommune
+
+@section aintlig Lignes
+@copydoc EI_ATTRIBUT_Ligne_LibelleSimple
+@copydoc EI_ATTRIBUT_Ligne_Image
+
+
+@page exemplesinterfaces Exemples d'interface
+
+	- @subpage intweb
+	- @subpage intlumiplan
+	- @subpage intvelec
+
+@page intweb Exemple d'interface web : le démonstrateur RCS
+
+A détailler
+
+@page intlumiplan Exemple d'interface Lumiplan page entière
+
+Cet exemple ne concerne que les tableaux de départs.
+
+A remplir à l'aide du guide lumiplan à lier en pdf
+
+@page intvelec Exemple d'interface Velec
+
+Cet exemple ne concerne que les tableaux de départs.
+
+A remplir à l'aide du guide velec à lier en pdf
+
+
+
+
+
+
+
+@page intpoubelle Vieille page interface à vider
+
+\section InterfaceArchitecture Architecture
+
+L'application SYNTHESE produit des résultats de calculs avancés fonctions des données présentes dans sa base. Les résultats de calculs sont systématiquement fournis à travers le <b>module d'interface</b>, chargé de les mettre en forme avant de les envoyer sur la sortie désirée.
+
+Identiquement, un seul point d'entrée est disponible pour demander des calculs : la classe SYNTHESE elle-même est l'unique entité proposant de telles fonctionnalités, à travers ses \ref InterfaceMethodesInteractivite , décrites dans le présent document.
+
+\subsection InterfaceArchitectureInterface Architecture du module d'interface
+
+Au niveau fonctionnel, le module d'interface est défini par des objets.
+
+Chaque méthode d'interactivité lance le calcul des résultats demandés, puis déclenche le module d'interface en lui fournissant les résultats produits. Lors de l'appel à ce module, la classe cInterface est sollicitée, via la méthode cInterface::Affiche(), en spécifiant quelle représentation des résultats doit être faite.
+
+Les représentation possibles pour les résultats sont décrites dans des \ref InterfaceObjetsStandard .
+ 
+\section InterfaceMethodesInteractivite Méthodes d'interactivité
+
+\subsection InterfaceMethodesInteractivite Validation des entrées du formulaire de recherche d'itinéraire : ValidFH
+
+\copydoc SYNTHESE::ValidFH()
+
+
+Les descriptions des objets de sortie sont codées par listes chaînées d'éléments de plusieurs types. Un polymorphisme permet de masquer ces variations aux classes faisant appel aux interfaces.
+
+Les types d'éléments sont différenciés pour permettre leur conception à deux stades différents&nbsp;: les éléments statiques sont entièrement définis lors de la création de l'interface (charte graphique), alors que les éléments dynamiques dépendent de données (résultats de calculs) et sont préparés lors de la création de l'interface, pour être finalisés lors de l'exécution.
+
+<p class=MsoNormal>Les objets statiques sont codés directement dans les
+éléments d’interface, par le texte à envoyer au client. Les objets dynamiques
+sont de deux types&nbsp;:</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Les paramètres dynamiques, fournis lors de l’exécution,</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Les objets dynamiques par défaut, définis dans le code source
+dans la fonction <b>AfficheObjetDynamique</b>.</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>Pour l’affichage, les objets disposent de tous les
+paramètres fournis, ainsi que d’un pointeur vers l’environnement, donnant par
+les index l’accès à tous les objets.</p>
+
+<h2><a name="_Toc36664775"></a><a name="_Toc31714094"></a><a name="_Toc31713828"></a><a
+name="_Toc31713562"></a><a name="_Toc31713296"></a><a name="_Toc31713029"></a><a
+name="_Toc59936208"><span style='font-family:Symbol;font-weight:normal'><img
+width=13 height=13 src="interface.doxygen_fichiers/image002.gif" alt="*"><span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Description des classes</a></h2>
+
+<h3><a name="_Toc59936209"><span style='font-family:Symbol;font-weight:normal;
+font-style:normal'><img width=15 height=15
+src="interface.doxygen_fichiers/image003.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Classe cInterface</a></h3>
+
+<p class=MsoNormal>La classe cInterface est donc constituée de&nbsp;:</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><b>ExtensionFichier&nbsp;</b>: extension du fichier de sortie
+(texte)</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><b>Elements&nbsp;</b>: Tableau des premiers éléments de la liste
+chaînée, de longueur égale au nombre d’éléments fixé par convention dans
+Parametres.h.</p>
+
+<p class=MsoNormal>Le nombre d’éléments est stocké dans la constante INTERFACESNOMBREELEMENTS à mettre à jour à chaque ajout d’élément.</p>
+
+<h3><a name="_Toc59936210"></a><a name="_Toc36664776"></a><a name="_Toc31714095"></a><a
+name="_Toc31713829"></a><a name="_Toc31713563"></a><a name="_Toc31713297"></a><a
+name="_Toc31713030"><span style='font-family:Symbol;font-weight:normal;
+font-style:normal'><img width=15 height=15
+src="interface.doxygen_fichiers/image003.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Classe cElementInterface</a></h3>
+
+<p class=MsoNormal>Les éléments d’interface sont de plusieurs types. Un
+polymorphisme permet de masquer cette diversité. La classe cElementInterface ne
+contient à la base que le pointeur <b>Suivant </b>qui permet le chaînage, et
+une méthode virtuelle <b>Affiche(Flux de sortie, Paramètres)</b> permettant
+dans tous les cas l’affichage.</p>
+
+<p class=MsoNormal>La méthode ElementRang permet l’accès au nième élément d’une liste cElementInterface.</p>
+
+<h3><a name="_Toc59936211"></a><a name="_Toc36664777"></a><a name="_Toc31714096"></a><a
+name="_Toc31713830"></a><a name="_Toc31713564"></a><a name="_Toc31713298"></a><a
+name="_Toc31713031"><span style='font-family:Symbol;font-weight:normal;
+font-style:normal'><img width=15 height=15
+src="interface.doxygen_fichiers/image003.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Classe dérivée cElementInterfaceStatique</a></h3>
+
+<p class=MsoNormal>La classe cElementInterfaceStatique dérivée de
+cElementInterface est la plus simple&nbsp;: elle contient le texte à afficher.</p>
+
+<p class=MsoNormal>La classe cElementInterfaceStatique est donc constituée
+de&nbsp;:</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Texte</p>
+
+<p class=MsoNormal>La méthode <b>Affiche</b> consiste en le simple envoi du
+texte au flux de sortie, indépendamment des paramètres fournis.</p>
+
+<h3><a name="_Toc59936212"></a><a name="_Toc36664778"></a><a name="_Toc31714097"></a><a
+name="_Toc31713831"></a><a name="_Toc31713565"></a><a name="_Toc31713299"></a><a
+name="_Toc31713032"><span style='font-family:Symbol;font-weight:normal;
+font-style:normal'><img width=15 height=15
+src="interface.doxygen_fichiers/image003.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Classe dérivée cElementInterfaceParametreDynamique</a></h3>
+
+<p class=MsoNormal>La classe cElementInterfaceParametreDynamique dérivée de
+cElementInterface contient un numéro de paramètre à lire lors de l’exécution.</p>
+
+<p class=MsoNormal>La classe cElementInterfaceParametreDynamique est donc
+constituée de&nbsp;:</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Code paramètre</p>
+
+<p class=MsoNormal>La méthode <b>Affiche</b> consiste en l’appel de cette
+dernière sur le paramètre fourni en entrée de rang <b>Code paramètre</b>. Ce
+paramètre doit, lors de l’exécution, être un cElementInterfaceStatique.</p>
+
+<h3><a name="_Toc59936213"></a><a name="_Toc36664779"></a><a name="_Toc31714098"></a><a
+name="_Toc31713832"></a><a name="_Toc31713566"></a><a name="_Toc31713300"></a><a
+name="_Toc31713033"><span style='font-family:Symbol;font-weight:normal;
+font-style:normal'><img width=15 height=15
+src="interface.doxygen_fichiers/image003.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Classe dérivée cElementInterfaceObjetDynamique</a></h3>
+
+<p class=MsoNormal>La classe cElementInterfaceObjetDynamique dérivée de
+cElementInterface contient un numéro d’objet à construire lors de l’exécution,
+à partir de paramètres statiques ou dynamiques.</p>
+
+<p class=MsoNormal>La classe cElementInterfaceObjetDynamique est donc
+constituée de&nbsp;:</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><b>Code objet</b> qui respecte la nomenclature fournie plus loin</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><b>Parametres</b> qui contient la définition des paramètres
+d’entrée de l’objet, définis plus loin. Ces paramètres sont de type
+cElementInterface et peuvent être soit des éléments statiques, soit des
+paramètres dynamiques (qui seront donc lus au moment de l’exécution de la méthode Affiche)</p>
+
+<h2><a name="_Toc59936214"></a><a name="_Toc36664780"></a><a name="_Toc31714099"></a><a
+name="_Toc31713833"></a><a name="_Toc31713567"></a><a name="_Toc31713301"></a><a
+name="_Toc31713034"><span style='font-family:Symbol;font-weight:normal'><img
+width=13 height=13 src="interface.doxygen_fichiers/image002.gif" alt="*"><span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Construction des objets</a></h2>
+
+<p class=MsoNormal>La construction d’une interface se fait par la juxtaposition
+des cElementInterface au fur et à mesure de la lecture des données mémoire
+morte, à l’aide d’une fonction par type de construction, gérant le chaînage, et
+retournant un pointeur vers le dernier élément créé&nbsp;:</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><b>Ajoute(char*)&nbsp;</b>: chargée de l’ajout d’un objet
+statique simple (texte)</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><b>Ajoute(cElementInterface* Paramètres,
+tNumeroParametreInterface NumeroParametre)&nbsp;</b>: chargée de l’ajout d’un
+paramètre. L’élément créé est dynamique si le paramètre indiqué par
+NumeroParamètre l’est, et est statique sinon.</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><b>AjouteObjet(Code de l’objet)&nbsp;</b>: chargée de l’ajout
+d’un objet. La création de la sortie se fait au moment de la lecture de
+l’interface et non de son chargement. </p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><b>AjouteAutreElement(cElementInterface*</b>)&nbsp;: chargée de
+l’inclusion d’un objet de sortie <u>déjà défini</u>.</p>
+
+<p class=MsoNormal><b>NB&nbsp;: La déclaration des éléments se fait dans un
+ordre quelconque. De ce fait, ordonner les déclarations de manière à ce que
+chaque inclusion fasse appel à un élément déjà défini. Dans le cas d’une
+tentative d’inclusion d’un élément non défini, l’inclusion est ignorée (voir
+erreur 04002)</b></p>
+
+<p class=MsoNormal>Pour les deux dernières fonctions, des paramètres sont
+passés lors de l’inclusion pour personnaliser la sortie. Ces paramètres sont fournis en tant que chaîne de caractères, séparés par des espaces
+et sous la forme P## pour faire référence à un paramètre de l’objet demandant
+l’inclusion, ou bien {##} pour fournir directement leur contenu. Une fonction
+spéciale lit le nième paramètre depuis une telle chaîne de caractères, et
+fonctionne selon le même principe que les quatre précédentes&nbsp;:</p>
+
+<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
+color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>ListeParametres(char*).</p>
+
+
+
+
+\section InterfaceObjetsStandard Objets standard
+
+Les objets standard sont des objets d'interface définis comme suit :
+ - La définition de leur modèle d'affichage est effectuée au niveau de la base de données
+ - La fabrication des résultats et effectuée à l'éxécution en fonction :
+  - d'une liste chaînée d'éléments paramètres
+  - d'un pointeur vers le résultat à afficher
+  - d'un pointeur vers l'environnement ayant servi à la fabrication du résultat
+
+En règle générale, les méthodes d'interactivité de SYNTHESE déclenchent l'affichage de l'un des objets standard pour afficher le résultat.
+
+Ce paragraphe contient une liste des objets standard, fournissant les éléments suivants :
+ - Spécification de la liste chaînée des paramètres à fournir pour l'affichage
+ - Spécification de l'objet résultat à fournir
+ - Conseil de rédaction d'un modèle d'affichage HTML pour l'objet
+
+
+
+
+
+
+
+
+\section InterfaceAttribut Attributs d'objet (texte dynamique)
+
+\copydoc cInterface_Objet_Element_Parametre_DonneeEnvironnement::Texte
+
+\section IHM Interface homme machine
+
+\subsection IHMElementsFonctionnels Eléments fonctionnels 
+
+\subsubsection IHMFiltreHandicape Filtre handicapés
+
+Le filtre handicapés est une fonctionnalité permettant à l'utilisateur de spécifier que la recherche d'itinéraires ne doit prendre en compte que les services ouverts au transport des handicapés.
+
+En cas d'activation de ce filtre, l'interface peut afficher le nombre de places disponibles dans les véhicules. Cet élément est en général affiché dans la feuille de route.
+
+\subsubsection IHMFiltreVelo Filtre vélos
+
+Le filtre vélos est une fonctionnalité permettant à l'utilisateur de spécifier que la recherche d'itinéraires ne doit prendre encompte que les services ouverts au transport des vélos.
+
+En cas d'activation de ce filtre, l'interface peut afficher le nombre de places disponibles dans les véhicules. Cet élément est en général affiché dans la feuille de route.
+
+
+
+
+
+
+
+
+
+
+
+
+*/

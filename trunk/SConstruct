@@ -1,0 +1,133 @@
+
+
+# -------------------------------------------------------
+# Common methods
+# -------------------------------------------------------
+import os, fnmatch
+
+# Allows to glob files from the buld directory going
+# through scons nodes
+def Glob( env, pattern = '*.*', excludes = [], dir = '.' ):
+    files = []
+    for file in os.listdir( Dir(dir).srcnode().abspath ):
+        if fnmatch.fnmatch(file, pattern) :
+            excluded = False
+            for xpattern in excludes :
+              if fnmatch.fnmatch(file, xpattern) :
+                excluded = True
+
+            if excluded == False :
+              files.append( os.path.join( dir, file ) )
+
+    return files
+
+
+def DefaultModuleName ( env, dir = '.' ):
+    return os.path.basename (os.path.abspath (dir))
+
+def DefaultTestModuleName ( env, dir = '.' ):
+    return os.path.basename (os.path.abspath (dir) + '_test')
+
+
+
+
+# Declare common methods
+from SCons.Script.SConscript import SConsEnvironment
+SConsEnvironment.Glob=Glob
+SConsEnvironment.DefaultModuleName=DefaultModuleName
+SConsEnvironment.DefaultTestModuleName=DefaultTestModuleName
+
+
+# -------------------------------------------------------
+# Command line arguments
+# -------------------------------------------------------
+
+mode = ARGUMENTS.get('mode', 'release')  
+platform = ARGUMENTS.get('os', str (Platform()))
+
+librepo = ''
+if (platform=='win32'):
+    # Check for lib repository argument
+    # If none default to environment variable WINLIBS_PATH
+    librepo = ARGUMENTS.get('winlibs_path', os.environ['WINLIBS_PATH'])
+    print "winlibs path = ", librepo
+    
+
+# -------------------------------------------------------
+# Common build configuration
+# -------------------------------------------------------
+
+env = Environment()
+
+env.Replace ( PLATFORM = platform )
+
+if (platform=='posix'):
+    env.Append ( CPPDEFINES = ['UNIX'] )
+    env.Append ( LINKFLAGS = ['-static', '-static-libgcc'] )
+    if (mode=='debug'):
+        env.Append ( CPPDEFINES = ['DEBUG'] )
+        env.Append ( CCFLAGS = ['-ggdb', '-fno-inline'] )
+    else:
+        env.Append ( CCFLAGS = ['-O3', '-fno-inline', '-fno-strength-reduce'] )
+
+  
+if (platform=='win32'):
+    env.Append ( CPPDEFINES = ['_MBCS', '_CONSOLE', '_USE_MATH_DEFINES', '__WIN32__', 'WIN32', '_AFXDLL' ] )
+    env.Append ( CCFLAGS = ['/EHsc', '/GS', '/W3', '/nologo', '/c', '/Wp64', '/TP'] )
+    env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
+    env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
+    env.Append ( LINKFLAGS = ['/INCREMENTAL', '/NOLOGO', '/MACHINE:X86', '/SUBSYSTEM:CONSOLE'] )
+
+    if (mode=='debug'):
+        env.Append ( CPPDEFINES = ['DEBUG', '_DEBUG'] )
+        env.Append ( CCFLAGS = ['/Od', '/MDd', '/Gm', '/RTC1', '/ZI'] )
+        env.Append ( LINKFLAGS = ['/DEBUG', '/NODEFAULTLIB:msvcrt.lib'] )
+        env.Append ( LIBS = ['msvcrtd.lib'] )  
+
+    else:  
+        env.Append ( CPPDEFINES = ['NDEBUG'] )
+        env.Append ( CCFLAGS = ['/Ox', '/FD', '/MD', '/Zi'] )
+        env.Append ( LINKFLAGS = ['/NODEFAULTLIB:msvcrtd.lib'] )
+        env.Append ( LIBS = ['msvcrt.lib'] )  
+
+
+env.Replace ( BUILDROOT = '#build' + '/' + platform + '/' + mode )
+
+
+# -------------------------------------------------------
+# Custom builders
+# -------------------------------------------------------
+
+
+
+
+# -------------------------------------------------------
+# Build process
+# -------------------------------------------------------
+
+Export('env')
+
+builddir = '#build' + '/' + platform + '/' + mode
+
+
+
+if 'doc' in COMMAND_LINE_TARGETS:
+    env.SConscript ('doc/SConscript')
+else:
+    env.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
+    env.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)
+
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+

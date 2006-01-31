@@ -1,0 +1,63 @@
+import os
+import os.path
+
+
+Import ('env')
+
+testenv = env.Copy()
+
+# Add specific configuration for building test modules
+# ...
+
+testenv.Append ( LIBS = 'cppunit' )
+#testenv.Append ( LINKFLAGS= ['-ldl'] )
+
+Export ('testenv')
+
+
+builddir = testenv['BUILDROOT'] + '/' + 'test'
+
+
+srcpath = Dir('.').srcnode().abspath
+files = os.listdir( srcpath )
+
+modules = []
+
+
+# Build the list of modules to be processed
+for f in files:
+  if not os.path.isdir (os.path.join (srcpath, f)): continue
+  if not os.path.exists (os.path.join (srcpath, f, 'SConscript')): continue
+  modules.append (f)
+    
+
+#conf = Configure(testenv)
+#if not conf.CheckLibWithHeader('cppunit', 'cppunit/TestCase.h'):
+#  print 'Did not find lib.a or m.lib, exiting!'
+#  Exit(1)
+
+for module in modules:
+  testenv.SConscript(os.path.join (srcpath, module, 'SConscript'),
+                     build_dir=os.path.join (builddir, module),
+                     duplicate=0)
+  
+
+
+
+
+# Build the global testrunner
+includes = '*.cpp'
+excludes = []
+files = testenv.Glob (includes, excludes)
+
+
+# mauvais : faire en sorte que le testrunner soit un runner comme les autres
+# le include path doit etre par defaut la racine des modules
+# idem pour le lib path ??
+
+
+for module in modules:
+  testenv.Append ( LIBPATH = [ os.path.join (builddir, module) ])
+  testenv.Append ( LIBS = [ module + '_test' ])
+
+testenv.Program("testrunner", files)

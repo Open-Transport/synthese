@@ -1,0 +1,22 @@
+/**
+@mainpage Documentation de SYNTHESE
+
+@section sommaire Sommaire
+ - @subpage metier
+ - @subpage admin
+ - @subpage mod
+ - @subpage annexes
+
+@page metier Environnement métier et spécifications
+ - @subpage lexique
+ - @subpage uc
+
+@page annexes Annexes
+	- @subpage historique
+	- @subpage todo
+	- @subpage deprecated
+	- @subpage bugs
+	- @subpage erreurs
+
+
+*/
