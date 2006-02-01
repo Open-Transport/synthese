@@ -975,7 +975,7 @@ cFichierXML::chargeAxe (XMLNode& node, cEnvironnement& env)
 		autorise = false;
 	}
 
-	cAxe* axe = new cAxe (libre, cTexte (codeAttr.c_str ()), autorise);
+	cAxe* axe = new cAxe (libre, cTexte (codeAttr.c_str ()), cTexte("pasutile"), autorise);
 	
 	
 	

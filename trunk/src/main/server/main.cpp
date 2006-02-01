@@ -19,7 +19,7 @@
 #include "cTexteRequeteSYNTHESE.h"
 
 
-
+/*
 
 #include "map/Geometry.h"
 #include "map/DBLComparator.h"
@@ -299,7 +299,7 @@ void testWithPlentyOfLines () {
 	
 	map.dump();
 }	
-
+*/
 
 
 #ifdef _DEBUG
@@ -313,12 +313,12 @@ void testWithPlentyOfLines () {
 
 //! @name Constantes serveur TCP
 //@{
-// Masque réseau des machines authorisées à se connecter:
-// localhost implique connection uniquement depuis la même machine
+// Masque rï¿½seau des machines authorisï¿½es ï¿½ se connecter:
+// localhost implique connection uniquement depuis la mï¿½me machine
 // * implique connection depuis toute machine
-// 255.255.255.0 implique connection uniquement depuis le réseau local
+// 255.255.255.0 implique connection uniquement depuis le rï¿½seau local
 #define DEF_SERV       "*"
-// Port d'écoute par défaut du serveur
+// Port d'ï¿½coute par dï¿½faut du serveur
 #define DEF_PORT       3591
 // Protocole de communication: "tcp" ou "udp"
 #define DEF_PROTO      "tcp"
@@ -326,19 +326,19 @@ void testWithPlentyOfLines () {
 #define WELCOME_MSG    "Welcome to SYNTHESE"
 // Nombre de threads client
 #define NB_MAX_CLIENT  32
-// Délai de réception de la requête avant fermeture d'une connection en secondes
+// Dï¿½lai de rï¿½ception de la requï¿½te avant fermeture d'une connection en secondes
 #define CLIENT_TIMEOUT 10
-// Taille du tampon d'échange sur le réseau
+// Taille du tampon d'ï¿½change sur le rï¿½seau
 #define BUFFER_SIZE    4096
-// Délai au delà duquel un thread est déclaré en défaut
-// en cas de défaut, le calcul est annulé et le thread réinitialisé
+// Dï¿½lai au delï¿½ duquel un thread est dï¿½clarï¿½ en dï¿½faut
+// en cas de dï¿½faut, le calcul est annulï¿½ et le thread rï¿½initialisï¿½
 // le temps est un multiple de THREAD_PROBE
 #define THREAD_TIMEOUT 12
-// Période de vérification des threads en seconde
+// Pï¿½riode de vï¿½rification des threads en seconde
 #define THREAD_PROBE   10
 //@}
 
-//! @name Compatibilité UNIX<>Win32
+//! @name Compatibilitï¿½ UNIX<>Win32
 #ifdef UNIX
 #define SOCKET int
 #define closesocket(s) close(s)
@@ -347,7 +347,7 @@ void testWithPlentyOfLines () {
 // Instance de Synthese
 SYNTHESE Synthese;
 
-// Instance de la couche réseau
+// Instance de la couche rï¿½seau
 cSocket Socket;
 
 // Application Win32
@@ -360,9 +360,9 @@ using namespace std;
 
 
 #ifdef UNIX
-// Mutex associé au serveur
+// Mutex associï¿½ au serveur
 pthread_mutex_t ServerMutex = PTHREAD_MUTEX_INITIALIZER;
-// Mutex associé au calculateur
+// Mutex associï¿½ au calculateur
 pthread_mutex_t CalculMutex = PTHREAD_MUTEX_INITIALIZER;
 // Informations threads
 pthread_attr_t ThreadsAttr;
@@ -410,16 +410,16 @@ void ServerExit(int sig)
 }
 #endif
 
-/** \brief Prise en compte d'une requête client au sein d'un thread dédié
+/** \brief Prise en compte d'une requï¿½te client au sein d'un thread dï¿½diï¿½
     \author Christophe Romain
     \date 2005
 */
 void *ServerThread(void *args)
 {
     char __Buffer[BUFFER_SIZE];
-	// Le numéro de thread est passé en argument
+	// Le numï¿½ro de thread est passï¿½ en argument
     int __ThreadNumber = (int)args;
-	// Récupération de contexte de ce thread
+	// Rï¿½cupï¿½ration de contexte de ce thread
     thread_context_t *pContext = &ThreadsContext[__ThreadNumber];
 
 #ifdef WIN32
@@ -427,7 +427,7 @@ void *ServerThread(void *args)
 	pContext->id = 0;
 #endif
 #ifdef UNIX
-    // Définition du gestionnaire de signaux. USR1 provoque la terminaison.
+    // Dï¿½finition du gestionnaire de signaux. USR1 provoque la terminaison.
     signal(SIGUSR1, ThreadExit);
 #endif
     
@@ -446,7 +446,7 @@ void *ServerThread(void *args)
         pthread_mutex_lock( &ServerMutex );
         pContext->socket = Socket.Accept();
         pthread_mutex_unlock( &ServerMutex );
-        // Mise à jour du contexte, utilisation en cours
+        // Mise ï¿½ jour du contexte, utilisation en cours
         pthread_mutex_lock( &CalculMutex );
         RunningThreads++;
         pthread_mutex_unlock( &CalculMutex );
@@ -472,7 +472,7 @@ void *ServerThread(void *args)
 #ifdef DEBUG
                 cout << "waiting for query" << endl;
 #endif
-                // Attente de la requête
+                // Attente de la requï¿½te
                 Socket.Read(pContext->socket, __Buffer, BUFFER_SIZE, CLIENT_TIMEOUT);
                 
                 // Utilisation des objets Synthese et appel du calculateur
@@ -486,10 +486,10 @@ void *ServerThread(void *args)
 #ifdef DEBUG
                 cout << "sending result" << endl;
 #endif
-                // Envoi de la réponse
+                // Envoi de la rï¿½ponse
                 Socket.Write(pContext->socket, pCtxt.str().data(), pCtxt.str().size(), 0);
                 /** TODO: ATTENTION
-                  ajouter une séquence de terminaison
+                  ajouter une sï¿½quence de terminaison
                   et n'envoyer que cela si timeout calculateur
                  */
             }
@@ -514,7 +514,7 @@ void *ServerThread(void *args)
     return NULL;
 }
 
-/** \brief suppervise les threads et détruit les problèmes
+/** \brief suppervise les threads et dï¿½truit les problï¿½mes
     \author Christophe Romain
     \date 2005
 */
@@ -531,20 +531,20 @@ void timer(int sig)
 #endif
         if(++(pContext->counter) >= THREAD_TIMEOUT)
         {
-            // Réinitialisation des compteur
+            // Rï¿½initialisation des compteur
             pContext->counter = 0;
-            // Terminaison des threads en défaut
+            // Terminaison des threads en dï¿½faut
             if(pContext->running)
             {
 #ifdef DEBUG
                 cout << "kill " << pContext->id << endl;
 #endif
-                /** Un thread est considéré en défaut lorsque son état
-                  est en cours de calcul et lorsque son délai d'execution
-                  dépasse THREAD_TIMEOUT.
-                  La socket est alors fermée (note: on peut envoyer un message ?)
-                  Le thread est détruit
-                  Un nouveau thread est créé pour le remplacer
+                /** Un thread est considï¿½rï¿½ en dï¿½faut lorsque son ï¿½tat
+                  est en cours de calcul et lorsque son dï¿½lai d'execution
+                  dï¿½passe THREAD_TIMEOUT.
+                  La socket est alors fermï¿½e (note: on peut envoyer un message ?)
+                  Le thread est dï¿½truit
+                  Un nouveau thread est crï¿½ï¿½ pour le remplacer
                   */
                 Socket.Close(pContext->socket);
 #ifdef UNIX
@@ -563,7 +563,7 @@ void timer(int sig)
 }
 
 /*!    \brief Usage de la commande
-  \param __Nom Nom de l'éxécutable
+  \param __Nom Nom de l'ï¿½xï¿½cutable
   \author Hugues Romain
   \date 2003-2005
   */
@@ -573,9 +573,9 @@ void AfficheUsage(const cTexte& __Nom)
     cout << " -l [all|debug|info|warning|error|none]   niveau de log" << endl;
     cout << " -d chemin                                repertoire d'ecriture des fichiers de log" << endl;
     cout << " -c [0-n]            nombre maximal calculateurs par environnement" << endl;
-    cout << " -t [1-1024]         nombre de connexions simultanées gérées" << endl;
-    cout << " -p port_num         écoute sur le port spécifié" << endl;
-    cout << " -b database         path vers le répertoire base de donnée" << endl;
+    cout << " -t [1-1024]         nombre de connexions simultanï¿½es gï¿½rï¿½es" << endl;
+    cout << " -p port_num         ï¿½coute sur le port spï¿½cifiï¿½" << endl;
+    cout << " -b database         path vers le rï¿½pertoire base de donnï¿½e" << endl;
     exit(EXIT_FAILURE);
 }
 
@@ -588,21 +588,21 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 {
 #ifdef WIN32
     int nRetCode = 0;
-    // Initialise MFC et affiche un message d'erreur en cas d'échec
+    // Initialise MFC et affiche un message d'erreur en cas d'ï¿½chec
     if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
     {
         // TODO : modifiez le code d'erreur selon les besoins
-        _tprintf(_T("Erreur irrécupérable : l'initialisation MFC a échoué\n"));
+        _tprintf(_T("Erreur irrï¿½cupï¿½rableï¿½: l'initialisation MFC a ï¿½chouï¿½\n"));
         nRetCode = 1;
     }
     else
     {
 #endif
       // Test marc
-	 testWithPlentyOfLines ();
+	 // testWithPlentyOfLines ();
 	 // fin test marc 
 
-        // Déclarations
+        // Dï¿½clarations
         int i;
         int __NombreCalculateursParEnvironnement = NOMBRE_CALCULATEURS_PAR_ENVIRONNEMENT_DEFAUT;
         int __PortServeur = DEF_PORT;
@@ -670,7 +670,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 
         try
         {
-            // Initialisation de la couche réseau en mode serveur
+            // Initialisation de la couche rï¿½seau en mode serveur
             Socket.Open(DEF_SERV, __PortServeur, DEF_PROTO);
             Socket.Server();
         }
@@ -687,7 +687,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
         ServerThread((void*)0);
 #endif
 #ifdef UNIX
-        // Création des threads
+        // Crï¿½ation des threads
         pthread_attr_init(&ThreadsAttr);
         //pthread_attr_setdetachstate(&ThreadsAttr, PTHREAD_CREATE_DETACHED);
         //pthread_attr_setstacksize(&ThreadsAttr, 1048576);
@@ -696,7 +696,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
         for(int t=0; t<NumberOfThreads; t++, pContext++)
             pthread_create(&(pContext->id), &ThreadsAttr, ServerThread, (void*)t);
 
-        // Définition des gestionnaires de signaux
+        // Dï¿½finition des gestionnaires de signaux
         // TERM et KILL stoppe le serveur
         // ALRM active la sentinelle
         signal(SIGINT, ServerExit);
@@ -713,7 +713,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
             pContext = ThreadsContext;
             for(int t=0; t<NumberOfThreads; t++, pContext++)
                 pthread_join(pContext->id, NULL);
-            cout << "Problèmes de calculateur ??" << endl;
+            cout << "Problï¿½mes de calculateur ??" << endl;
         } 
 #endif
 

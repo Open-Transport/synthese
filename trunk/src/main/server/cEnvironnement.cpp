@@ -90,11 +90,11 @@ bool cEnvironnement::Charge(const cTexte& __Chemin, const cTexte& __CheminFormat
 	// Chargement fichier mat�riel
 	vNomFichierMateriel << __Chemin << MATERIELSEXTENSION;
 	_FormatMateriel = new cFormatFichier(__CheminFormats, MATERIELSFORMAT, MATERIELSFORMATLIGNENombreFormats, MATERIELSFORMATCOLONNESNombreFormats);
-/* MJ	if (!_FormatMateriel || !ChargeFichierMateriel())
+	if (!_FormatMateriel || !ChargeFichierMateriel())
 	{
 		envOk=false;
 		return false;
-	}  */
+	} 
 
 	// Chargement fichier des jours de circulation
 	__NomFichier = __Chemin;
@@ -118,7 +118,7 @@ bool cEnvironnement::Charge(const cTexte& __Chemin, const cTexte& __CheminFormat
 	// Chargement fichier des prises en charges des v�los
 	vNomFichierVelo << __Chemin << VELOSEXTENSION;
 	_FormatVelo = new cFormatFichier(__CheminFormats, VELOSFORMAT, VELOSFORMATLIGNENombreFormats, VELOSFORMATCOLONNESNombreFormats);
-/* MJ	if (!_FormatVelo || !ChargeFichierVelo())
+	if (!_FormatVelo || !ChargeFichierVelo())
 	{
 		envOk=false;
 		return false;
@@ -151,7 +151,6 @@ bool cEnvironnement::Charge(const cTexte& __Chemin, const cTexte& __CheminFormat
 		envOk=false;
 		return false;
 	}
-*/
 
 	// Chargement fichier des horaires
 	vPremiereLigne = NULL;
@@ -192,37 +191,43 @@ cEnvironnement::~cEnvironnement()
 
 	for(std::vector<cModaliteReservation*>::iterator iter = vResa.begin(); 
 		iter != vResa.end(); ++iter) {
-		delete (*iter);
+	  if (*iter == 0) continue;
+	  delete (*iter);
 	}
 	vResa.clear();
 	
 	for(std::vector<cReseau*>::iterator iter = vReseau.begin(); 
 		iter != vReseau.end(); ++iter) {
-		delete (*iter);
+	  if (*iter == 0) continue;
+	  delete (*iter);
 	}
 	vReseau.clear();
 	
 	for(std::vector<cVelo*>::iterator iter = vVelo.begin(); 
 		iter != vVelo.end(); ++iter) {
-		delete (*iter);
+	  if (*iter == 0) continue;
+	  delete (*iter);
 	}
 	vVelo.clear();
 	
 	for(std::vector<cHandicape*>::iterator iter = vHandicape.begin(); 
 		iter != vHandicape.end(); ++iter) {
-		delete (*iter);
+	  if (*iter == 0) continue;
+	  delete (*iter);
 	}
 	vHandicape.clear();
 	
 	for(std::vector<cTarif*>::iterator iter = vTarif.begin(); 
 		iter != vTarif.end(); ++iter) {
-		delete (*iter);
+	  if (*iter == 0) continue;
+	  delete (*iter);
 	}
 	vTarif.clear();
 	
 	for(std::vector<cMateriel*>::iterator iter = vMateriel.begin(); 
 		iter != vMateriel.end(); ++iter) {
-		delete (*iter);
+	  if (*iter == 0) continue;
+	  delete (*iter);
 	}
 	vMateriel.clear();
 	
@@ -472,15 +477,15 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 			switch (Tampon[1])
 			{
 			case '#':
-// MJ 				curAxe = new cAxe(true, Tampon.Extrait(2), NomFichierComplet);
+ 				curAxe = new cAxe(true, Tampon.Extrait(2), NomFichierComplet);
 				break;
 
 			case '�':
-// MJ 			curAxe = new cAxe(false, Tampon.Extrait(2), NomFichierComplet, false);
+     			curAxe = new cAxe(false, Tampon.Extrait(2), NomFichierComplet, false);
 				break;
 
-// MJ 				default:
-// MJ 				curAxe = new cAxe(false, Tampon.Extrait(1), NomFichierComplet);
+			default:
+ 				curAxe = new cAxe(false, Tampon.Extrait(1), NomFichierComplet);
 			}
 
 			nAxes++;
@@ -985,7 +990,7 @@ bool cEnvironnement::ChargeFichierResa()
 	if (Tampon.Compare(RESASFORMATLIGNENombre, 6))
 	{
 		vNombreResa = Tampon.GetNombre(0, 7);
-		// MJ vResa = (cModaliteReservation**) malloc(vNombreResa * sizeof(cModaliteReservation*));
+		for (unsigned int i=0; i<vNombreResa; ++i) vResa.push_back (0); //dirty hack
 	}
 	else
 	{
@@ -1176,7 +1181,7 @@ bool cEnvironnement::ChargeFichierResa()
 }
 
 
-/* MJ
+
 bool cEnvironnement::ChargeFichierHandicape()
 {
 	// Variables
@@ -1206,7 +1211,8 @@ bool cEnvironnement::ChargeFichierHandicape()
 	if (Tampon.Compare("Nombre=", 6))
 	{
 		vNombreHandicape = (tIndex) Tampon.GetNombre(0, 7);
-		vHandicape = (cHandicape**) malloc((vNombreHandicape+1) * sizeof(cHandicape*));
+        // Hugues, pourquoi +1 ??
+		for (unsigned int i=0; i<vNombreHandicape+1; ++i) vHandicape.push_back (0); //dirty hack
 	}
 	else
 	{
@@ -1267,9 +1273,6 @@ bool cEnvironnement::ChargeFichierHandicape()
 
 }
 
-*/
-
-/* MJ
 
 bool cEnvironnement::ChargeFichierTarif()
 {
@@ -1300,7 +1303,7 @@ bool cEnvironnement::ChargeFichierTarif()
 	if (Tampon.Compare("Nombre=", 6))
 	{
 		vNombreTarif = (tNumeroTarif) Tampon.GetNombre(0, 7);
-		vTarif = (cTarif**) malloc(vNombreTarif * sizeof(cTarif*));
+		for (unsigned int i=0; i<vNombreTarif; ++i) vTarif.push_back (0); //dirty hack
 	}
 	else
 	{
@@ -1358,10 +1361,6 @@ bool cEnvironnement::ChargeFichierTarif()
 }
 
 
-*/
-
-
-/* MJ
  
 bool cEnvironnement::ChargeFichierVelo()
 {
@@ -1392,7 +1391,7 @@ bool cEnvironnement::ChargeFichierVelo()
 	if (Tampon.Compare("Nombre=", 6))
 	{
 		vNombreVelo = (tIndex) Tampon.GetNombre(0, 7);
-		vVelo = (cVelo**) malloc((vNombreVelo+1) * sizeof(cVelo*));
+		for (unsigned int i=0; i<vNombreVelo; ++i) vVelo.push_back (0); //dirty hack
 	}
 	else
 	{
@@ -1453,10 +1452,6 @@ bool cEnvironnement::ChargeFichierVelo()
 }
 
 
-*/
-
-
-/* MJ
 
 bool cEnvironnement::ChargeFichierReseaux()
 {
@@ -1487,7 +1482,7 @@ bool cEnvironnement::ChargeFichierReseaux()
 	if (Tampon.Compare("Nombre=", 6))
 	{
 		vNombreReseaux = (tNumeroReseau) Tampon.GetNombre(0, 7);
-		vReseau = (cReseau**) malloc(vNombreReseaux * sizeof(cReseau*));
+		for (unsigned int i=0; i<vNombreReseaux; ++i) vReseau.push_back (0); //dirty hack
 	}
 	else
 	{
@@ -1542,9 +1537,7 @@ bool cEnvironnement::ChargeFichierReseaux()
 	return true;
 
 }
-*/
 
-/* MJ 
 bool cEnvironnement::ChargeFichierMateriel()
 {
 	// Variables
@@ -1575,7 +1568,7 @@ bool cEnvironnement::ChargeFichierMateriel()
 	if (Tampon.Compare("Nombre=", 6))
 	{
 		vNombreMateriels = (tIndex) Tampon.GetNombre(0, 7);
-		vMateriel = (cMateriel**) malloc(vNombreMateriels * sizeof(cMateriel*));
+		for (unsigned int i=0; i<vNombreMateriels; ++i) vMateriel.push_back (0); //dirty hack
 	}
 	else
 	{
@@ -1645,7 +1638,7 @@ bool cEnvironnement::ChargeFichierMateriel()
 
 	return true;
 }
-*/
+
 
 /*! \brief Chargement du fichier des photos
 	\author Hugues Romain

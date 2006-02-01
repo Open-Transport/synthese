@@ -13,12 +13,14 @@
 	\author Hugues Romain
 	\date 2001
 */
-cAxe::cAxe(bool newLibre, const cTexte& newCode, bool newAutorise)
+cAxe::cAxe(bool newLibre, const cTexte& newCode, const cTexte& newNomFichier, bool newAutorise)
 {
 	vLibre = newLibre;
 	vAutorise = newAutorise;
 	vCode.Vide();
 	vCode << newCode;
+	vNomFichier.Vide();
+	vNomFichier << newNomFichier;
 }
 
 
