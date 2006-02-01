@@ -41,10 +41,13 @@ SConsEnvironment.DefaultTestModuleName=DefaultTestModuleName
 # -------------------------------------------------------
 # Command line arguments
 # -------------------------------------------------------
+env = Environment()
 
 mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
 if platform == 'darwin' : platform = 'posix'
+
+env.Replace ( PLATFORM = platform )
 
 
 librepo = ''
@@ -52,18 +55,26 @@ if (platform=='win32'):
     # Check for lib repository argument
     # If none default to environment variable WINLIBS_PATH
     librepo = ARGUMENTS.get('winlibs_path', os.environ['WINLIBS_PATH'])
-    print "winlibs path = ", librepo
+    env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
+    env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
+elif (platform=='posix'):
+    librepo = '/usr/local'
+    env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
+    env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
+    librepo = '/opt/local'
+    env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
+    env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
+    
     
 
 # -------------------------------------------------------
 # Common build configuration
 # -------------------------------------------------------
 
-env = Environment()
 
-env.Replace ( PLATFORM = platform )
 
 if (platform=='posix'):
+    
     env.Append ( CPPDEFINES = ['UNIX'] )
     env.Append ( LINKFLAGS = ['-static', '-static-libgcc'] )
     if (mode=='debug'):
@@ -76,8 +87,6 @@ if (platform=='posix'):
 if (platform=='win32'):
     env.Append ( CPPDEFINES = ['_MBCS', '_CONSOLE', '_USE_MATH_DEFINES', '__WIN32__', 'WIN32', '_AFXDLL' ] )
     env.Append ( CCFLAGS = ['/EHsc', '/GS', '/W3', '/nologo', '/c', '/Wp64', '/TP'] )
-    env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
-    env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
     env.Append ( LINKFLAGS = ['/INCREMENTAL', '/NOLOGO', '/MACHINE:X86', '/SUBSYSTEM:CONSOLE'] )
 
     if (mode=='debug'):
