@@ -1,0 +1,116 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tcp", "..\tcp\tcp.vcproj", "{DA117A1B-1070-4B32-A00E-79D664F92307}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_cgi", "..\client_cgi\client_cgi.vcproj", "{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "map", "..\map\map.vcproj", "{CAF59F96-B29D-4974-8778-724DBF9C7153}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_rs485", "..\client_rs485\client_rs485.vcproj", "{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "..\server\server.vcproj", "{BC1E5A8F-2079-435E-9047-7532C871426A}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "doc", "..\doc\doc.vcproj", "{8EAB5AED-37BA-4795-9F4F-FD1143673342}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Local Php 4 = Local Php 4
+		Local Php 5 = Local Php 5
+		Release = Release
+		Remote Php 4 = Remote Php 4
+		Remote Php 5 = Remote Php 5
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Debug.ActiveCfg = Debug|Win32
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Debug.Build.0 = Debug|Win32
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Local Php 4.ActiveCfg = Release|Win32
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Local Php 4.Build.0 = Release|Win32
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Local Php 5.ActiveCfg = Release|Win32
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Local Php 5.Build.0 = Release|Win32
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Release.ActiveCfg = Release|Win32
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Release.Build.0 = Release|Win32
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Remote Php 4.ActiveCfg = Release|Win32
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Remote Php 4.Build.0 = Release|Win32
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Remote Php 5.ActiveCfg = Release|Win32
+		{DA117A1B-1070-4B32-A00E-79D664F92307}.Remote Php 5.Build.0 = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Debug.ActiveCfg = Debug|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Debug.Build.0 = Debug|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Local Php 4.ActiveCfg = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Local Php 4.Build.0 = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Local Php 5.ActiveCfg = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Local Php 5.Build.0 = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Release.ActiveCfg = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Release.Build.0 = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Remote Php 4.ActiveCfg = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Remote Php 4.Build.0 = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Remote Php 5.ActiveCfg = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Remote Php 5.Build.0 = Release|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Debug.ActiveCfg = Debug|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Debug.Build.0 = Debug|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Local Php 4.ActiveCfg = Release|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Local Php 4.Build.0 = Release|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Local Php 5.ActiveCfg = Release|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Local Php 5.Build.0 = Release|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Release.ActiveCfg = Release|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Release.Build.0 = Release|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Remote Php 4.ActiveCfg = Release|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Remote Php 4.Build.0 = Release|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Remote Php 5.ActiveCfg = Release|Win32
+		{CAF59F96-B29D-4974-8778-724DBF9C7153}.Remote Php 5.Build.0 = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Debug.ActiveCfg = Debug|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Debug.Build.0 = Debug|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Local Php 4.ActiveCfg = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Local Php 4.Build.0 = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Local Php 5.ActiveCfg = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Local Php 5.Build.0 = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Release.ActiveCfg = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Release.Build.0 = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Remote Php 4.ActiveCfg = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Remote Php 4.Build.0 = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Remote Php 5.ActiveCfg = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Remote Php 5.Build.0 = Release|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Debug.ActiveCfg = Debug|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Debug.Build.0 = Debug|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Local Php 4.ActiveCfg = Release|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Local Php 4.Build.0 = Release|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Local Php 5.ActiveCfg = Release|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Local Php 5.Build.0 = Release|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Release.ActiveCfg = Release|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Release.Build.0 = Release|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Remote Php 4.ActiveCfg = Release|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Remote Php 4.Build.0 = Release|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Remote Php 5.ActiveCfg = Release|Win32
+		{BC1E5A8F-2079-435E-9047-7532C871426A}.Remote Php 5.Build.0 = Release|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Debug.ActiveCfg = Debug|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Debug.Build.0 = Debug|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Local Php 4.ActiveCfg = Release|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Local Php 4.Build.0 = Release|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Local Php 5.ActiveCfg = Release|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Local Php 5.Build.0 = Release|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Release.ActiveCfg = Release|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Release.Build.0 = Release|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Remote Php 4.ActiveCfg = Release|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Remote Php 4.Build.0 = Release|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Remote Php 5.ActiveCfg = Release|Win32
+		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Remote Php 5.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionItems) = postSolution
+		..\..\..\SConstruct = ..\..\..\SConstruct
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

@@ -42,7 +42,7 @@ SConsEnvironment.DefaultTestModuleName=DefaultTestModuleName
 # Command line arguments
 # -------------------------------------------------------
 
-mode = ARGUMENTS.get('mode', 'release')  
+mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
 if platform == 'darwin' : platform = 'posix'
 
