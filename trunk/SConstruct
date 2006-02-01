@@ -108,8 +108,15 @@ env.Replace ( BUILDROOT = '#build' + '/' + platform + '/' + mode )
 # -------------------------------------------------------
 # Custom builders
 # -------------------------------------------------------
+def builder_unit_test(target, source, env):
+    app = str(source[0].abspath)
+    if os.system(app)==0:
+        open(str(target[0]),'w').write("PASSED\n")
+    else:
+        return 1
 
-
+bld = Builder(action = builder_unit_test)
+env.Append(BUILDERS = {'Test' :  bld})
 
 
 # -------------------------------------------------------

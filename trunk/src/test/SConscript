@@ -45,19 +45,3 @@ for module in modules:
 
 
 
-# Build the global testrunner
-includes = '*.cpp'
-excludes = []
-files = testenv.Glob (includes, excludes)
-
-
-# mauvais : faire en sorte que le testrunner soit un runner comme les autres
-# le include path doit etre par defaut la racine des modules
-# idem pour le lib path ??
-
-
-for module in modules:
-  testenv.Append ( LIBPATH = [ os.path.join (builddir, module) ])
-  testenv.Append ( LIBS = [ module + '_test' ])
-
-testenv.Program("testrunner", files)
