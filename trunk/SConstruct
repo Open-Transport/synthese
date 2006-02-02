@@ -128,6 +128,10 @@ def AppendMultithreadConf (env):
         env.Append (CCFLAGS= '-pthread' )
         env.Append (LIBS= ['pthread'] ) 
 
+    if (platform == 'darwin'):
+        env.Append (CCFLAGS= '-pthread' )
+        env.Append (LIBS= ['pthread'] ) 
+
     elif (platform == 'win32'):
         env.Append ( LIBS = ['ws2_32.lib'] )  
 
