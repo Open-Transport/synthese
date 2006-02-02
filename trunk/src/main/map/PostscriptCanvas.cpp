@@ -26,6 +26,39 @@ const std::string PostscriptCanvas::SQUARE_DEF = "\
 
 
 
+
+// % string bgcolor width height sticker
+const std::string PostscriptCanvas::STICKER_DEF = "\
+/sticker {\
+ gsave gsave gsave\
+ /sh exch def\
+ /sw exch def\
+ /bgcolor exch def\
+ /str exch def\
+ str false charpath flattenpath pathbbox\
+ exch 4 1 roll exch\
+ sub /strh exch def\
+ sub /strw exch def\
+ str stringwidth pop\
+ /sw2 exch def\
+ sw2 sw gt {/sw sw2 10 add def} if\
+ strh sh gt {/sh strh 10 add def} if\
+ grestore \
+ sw 0 rlineto\
+ 0 sh rlineto\
+ sw neg 0 rlineto\
+ 0 sh neg rlineto\
+ bgcolor aload pop setrgbcolor false upath ufill\
+ 1 setlinewidth\
+ 0 0 0 setrgbcolor stroke\
+ grestore\
+ sw sw2 sub 2 div sh strh sub 2 div rmoveto\
+ str show\
+ grestore\
+ sw 0 rmoveto\
+} def";
+
+
 	
 const std::string PostscriptCanvas::PATHTEXT_DEF = "\
 /pathtextdict 26 dict def\n\
