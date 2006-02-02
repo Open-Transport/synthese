@@ -29,6 +29,110 @@ def DefaultTestModuleName ( env, dir = '.' ):
     return os.path.basename (os.path.abspath (dir) + '_test')
 
 
+def DefineDefaultLibPath (env):
+    platform = env['PLATFORM']
+    if (platform=='win32'):
+        # Check for lib repository argument
+        # If none default to environment variable WINLIBS_PATH
+        librepo = ARGUMENTS.get('winlibs_path', os.environ['WINLIBS_PATH'])
+        env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
+        env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
+    elif (platform=='darwin'):
+        librepo = '/opt/local'
+        env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
+        env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
+    elif (platform=='posix'):
+        librepo = '/usr/local'
+        env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
+        env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
+
+    
+def DefineDefaultCPPDefines (env):
+    platform = env['PLATFORM']
+    mode = env['MODE']
+
+    if (platform=='posix') or (platform=='darwin'):
+        env.Append ( CPPDEFINES = ['UNIX'] )
+        if (mode=='debug'):
+            env.Append ( CPPDEFINES = ['DEBUG'] )
+    
+    elif (platform=='win32'):
+        env.Append ( CPPDEFINES = ['_MBCS', '_CONSOLE', '_USE_MATH_DEFINES', '__WIN32__', 'WIN32', '_AFXDLL' ] )
+        if (mode=='debug'):
+            env.Append ( CPPDEFINES = ['DEBUG', '_DEBUG'] )
+        else:  
+            env.Append ( CPPDEFINES = ['NDEBUG'] )
+
+
+def DefineDefaultCCFlags (env):
+    platform = env['PLATFORM']
+    mode = env['MODE']
+
+    if (platform=='posix'):
+        if (mode=='debug'):
+            env.Append ( CCFLAGS = ['-ggdb', '-fno-inline'] )
+        else:
+            env.Append ( CCFLAGS = ['-O3', '-fno-inline', '-fno-strength-reduce'] )
+
+    elif (platform=='darwin'):
+        if (mode=='debug'):
+            env.Append ( CCFLAGS = ['-ggdb', '-fno-inline'] )
+        else:
+            env.Append ( CCFLAGS = ['-O3', '-fno-inline', '-fno-strength-reduce'] )
+
+
+    elif (platform=='win32'):
+        env.Append ( CCFLAGS = ['/EHsc', '/GS', '/W3', '/nologo', '/c', '/Wp64', '/TP'] )
+
+        if (mode=='debug'):
+            env.Append ( CCFLAGS = ['/Od', '/MDd', '/Gm', '/RTC1', '/ZI'] )
+        else:  
+            env.Append ( CCFLAGS = ['/Ox', '/FD', '/MD', '/Zi'] )
+    
+  
+def DefineDefaultLinkFlags (env):
+    platform = env['PLATFORM']
+    mode = env['MODE']
+
+    if (platform=='posix'):
+        # By default, everything has to be linked statically
+        # (except on MacOS X, TODO: find a workaround so as not to use dylibs)
+
+        env.Append ( LINKFLAGS = ['-static', '-static-libgcc'] )
+
+    if (platform=='win32'):
+        env.Append ( LINKFLAGS = ['/INCREMENTAL', '/NOLOGO', '/MACHINE:X86', '/SUBSYSTEM:CONSOLE'] )
+        if (mode=='debug'):
+            env.Append ( LINKFLAGS = ['/DEBUG', '/NODEFAULTLIB:msvcrt.lib'] )
+        else:  
+            env.Append ( LINKFLAGS = ['/NODEFAULTLIB:msvcrtd.lib'] )
+
+
+
+def DefineDefaultLibs (env):
+    platform = env['PLATFORM']
+    mode = env['MODE']
+
+    if (platform=='win32'):
+        if (mode=='debug'):
+            env.Append ( LIBS = ['msvcrtd.lib'] )  
+        else:  
+            env.Append ( LIBS = ['msvcrt.lib'] )  
+
+
+def AppendMultithreadConf (env):
+    platform = env['PLATFORM']
+    mode = env['MODE']
+
+    if (platform == 'posix'):
+        env.Append (CCFLAGS= '-pthread' )
+        env.Append (LIBS= ['pthread'] ) 
+
+    elif (platform == 'win32'):
+        env.Append ( LIBS = ['ws2_32.lib'] )  
+
+
+
 
 
 # Declare common methods
@@ -36,6 +140,12 @@ from SCons.Script.SConscript import SConsEnvironment
 SConsEnvironment.Glob=Glob
 SConsEnvironment.DefaultModuleName=DefaultModuleName
 SConsEnvironment.DefaultTestModuleName=DefaultTestModuleName
+SConsEnvironment.DefineDefaultLibPath=DefineDefaultLibPath
+SConsEnvironment.DefineDefaultCPPDefines=DefineDefaultCPPDefines
+SConsEnvironment.DefineDefaultCCFlags=DefineDefaultCCFlags
+SConsEnvironment.DefineDefaultLinkFlags=DefineDefaultLinkFlags
+SConsEnvironment.DefineDefaultLibs=DefineDefaultLibs
+SConsEnvironment.AppendMultithreadConf=AppendMultithreadConf
 
 
 # -------------------------------------------------------
@@ -45,61 +155,19 @@ env = Environment()
 
 mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
-if platform == 'darwin' : platform = 'posix'
 
 env.Replace ( PLATFORM = platform )
-
-
-librepo = ''
-if (platform=='win32'):
-    # Check for lib repository argument
-    # If none default to environment variable WINLIBS_PATH
-    librepo = ARGUMENTS.get('winlibs_path', os.environ['WINLIBS_PATH'])
-    env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
-    env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
-elif (platform=='posix'):
-    librepo = '/usr/local'
-    env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
-    env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
-    librepo = '/opt/local'
-    env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
-    env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
-    
-    
+env.Replace ( MODE = mode )
 
 # -------------------------------------------------------
 # Common build configuration
 # -------------------------------------------------------
 
-
-
-if (platform=='posix'):
-    
-    env.Append ( CPPDEFINES = ['UNIX'] )
-    env.Append ( LINKFLAGS = ['-static', '-static-libgcc'] )
-    if (mode=='debug'):
-        env.Append ( CPPDEFINES = ['DEBUG'] )
-        env.Append ( CCFLAGS = ['-ggdb', '-fno-inline'] )
-    else:
-        env.Append ( CCFLAGS = ['-O3', '-fno-inline', '-fno-strength-reduce'] )
-
-  
-if (platform=='win32'):
-    env.Append ( CPPDEFINES = ['_MBCS', '_CONSOLE', '_USE_MATH_DEFINES', '__WIN32__', 'WIN32', '_AFXDLL' ] )
-    env.Append ( CCFLAGS = ['/EHsc', '/GS', '/W3', '/nologo', '/c', '/Wp64', '/TP'] )
-    env.Append ( LINKFLAGS = ['/INCREMENTAL', '/NOLOGO', '/MACHINE:X86', '/SUBSYSTEM:CONSOLE'] )
-
-    if (mode=='debug'):
-        env.Append ( CPPDEFINES = ['DEBUG', '_DEBUG'] )
-        env.Append ( CCFLAGS = ['/Od', '/MDd', '/Gm', '/RTC1', '/ZI'] )
-        env.Append ( LINKFLAGS = ['/DEBUG', '/NODEFAULTLIB:msvcrt.lib'] )
-        env.Append ( LIBS = ['msvcrtd.lib'] )  
-
-    else:  
-        env.Append ( CPPDEFINES = ['NDEBUG'] )
-        env.Append ( CCFLAGS = ['/Ox', '/FD', '/MD', '/Zi'] )
-        env.Append ( LINKFLAGS = ['/NODEFAULTLIB:msvcrtd.lib'] )
-        env.Append ( LIBS = ['msvcrt.lib'] )  
+env.DefineDefaultLibPath ()
+env.DefineDefaultCPPDefines ()
+env.DefineDefaultCCFlags ()
+env.DefineDefaultLinkFlags ()
+env.DefineDefaultLibs ()
 
 
 env.Replace ( BUILDROOT = '#build' + '/' + platform + '/' + mode )

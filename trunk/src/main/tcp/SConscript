@@ -6,6 +6,7 @@ moduleenv = mainenv.Copy()
 includes = '*.cpp'
 excludes = []
 
+moduleenv.AppendMultithreadConf ()
 
 files = moduleenv.Glob(includes, excludes)
 
