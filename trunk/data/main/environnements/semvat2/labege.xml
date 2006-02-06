@@ -122,6 +122,22 @@
 	...
 </indicateurs>
 	
+
+<commune id="1" code_insee="44" departement="31" code_postal_defaut="31000">
+	<route id="1" id_commune="1" nom="avenue de Lardenne" 
+	                             discriminant="Lardenne">
+
+		<segment_route id="1" noDebutDroite="2" noFinDroite="16"
+			noDebutGauche="1" noFinGauche="17">
+			<point x="534556.5" y="1834563.54"/>
+			<point x="534556.5" y="1834563.54"/>
+			<point x="534556.5" y="1834563.54"/>
+			...			
+		</segment_route>
+		                       	                             
+	</route>
+</commune>
+
 	
 	
 	
