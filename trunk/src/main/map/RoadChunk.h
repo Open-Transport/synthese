@@ -2,11 +2,15 @@
 #define ROADCHUNK_H_
 
 #include "Referrant.h"
+#include <vector>
+
+
 
 namespace synmap
 {
 
 class Vertex;
+class Location;
 class Topography;
 
 
@@ -21,8 +25,7 @@ public:
 	
 private:
 	
-	const Vertex* _start;   // Not oriented.
-	const Vertex* _end;		// Not oriented.
+	const std::vector<const Location*> steps;
 	
 	const AddressNumber _rightStartNumber;   // inclusive
 	const AddressNumber _rightEndNumber;     // inclusive
@@ -33,16 +36,14 @@ private:
 public:
 
 	RoadChunk(Topography* topography,
-			  int key,
-			  const Vertex* start, 
-			  const Vertex* end, 
-			  AddressNumber rightStartNumber, 
-			  AddressNumber rightEndNumber, 
-			  AddressNumber leftStartNumber, 
-			  AddressNumber leftEndNumber);
-			  
+		  int key,
+		  const std::vector<const Location*>& steps,
+		  AddressNumber rightStartNumber, 
+		  AddressNumber rightEndNumber, 
+		  AddressNumber leftStartNumber, 
+		  AddressNumber leftEndNumber);
+	
 	virtual ~RoadChunk();
-
 
 
 	AddressNumber getRightStartNumber () const { return _rightStartNumber; }
@@ -53,8 +54,6 @@ public:
 	AddressNumberSide getSideForNumber (AddressNumber number) const;
 	bool hasNumber (AddressNumber number) const;
 
-	const Vertex* getStart () const { return _start; }
-	const Vertex* getEnd () const { return _end; }
 
 
 };

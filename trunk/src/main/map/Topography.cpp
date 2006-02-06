@@ -1,6 +1,8 @@
 #include "Topography.h"
 #include "Vertex.h"
+#include "Location.h"
 #include "Edge.h"
+#include "Road.h"
 #include "RoadChunk.h"
 #include "Itinerary.h"
 #include "PhysicalStop.h"
@@ -95,6 +97,16 @@ Topography::newVertex (double x, double y)
 	return newVertexPtr (x, y);  
 }
 
+
+
+const Location* 
+Topography::newLocation (int key, double x, double y) {
+  const Location* location = new Location (this, key, newVertex (x, y));
+  return location;
+}
+
+
+
 const Edge* 
 Topography::newEdge (const Vertex* from, const Vertex* to) 
 {
@@ -127,31 +139,50 @@ Topography::getEdge (const Vertex* from, const Vertex* to)
 
 
 
+const Road* 
+Topography::newRoad (int key,
+		     const std::string& name,
+		     const std::string& discriminant) 
+{
+  Road* road = new Road (this, 
+			 key, 
+			 name, 
+			 discriminant);
+  
+  _roads.insert (make_pair (key, road));
+
+}
+
+
+
 const RoadChunk* 
 Topography::newRoadChunk (int key,
- 				  		  const Vertex* start,  
-						  const Vertex* end, 
-				  		  int rightStartNumber, 
-				  		  int rightEndNumber, 
-				  		  int leftStartNumber, 
-				  		  int leftEndNumber)
+			  const std::vector<const Location*>& steps,
+			  int rightStartNumber, 
+			  int rightEndNumber, 
+			  int leftStartNumber, 
+			  int leftEndNumber)
 {
-	RoadChunk* chunk = new RoadChunk (this, key, start, end, 
-									  rightStartNumber,
-									  rightEndNumber,
-									  leftStartNumber,
-									  leftEndNumber);	
-	
-	_roadChunks.insert (make_pair (key, chunk));
-	
-	addVertexReferrant (start, chunk);
-	addVertexReferrant (end, chunk);
-	
-	// We consider for now that the road chunk is always double side.
-	addEdgeReferrant (getEdge(start, end), chunk);
-	addEdgeReferrant (getEdge(end, start), chunk);
-
-	return chunk;	
+  RoadChunk* chunk = new RoadChunk (this, key, steps,
+				    rightStartNumber,
+				    rightEndNumber,
+				    leftStartNumber,
+				    leftEndNumber);	
+  
+  _roadChunks.insert (make_pair (key, chunk));
+  for (std::vector<const Location*>::const_iterator iter = steps.begin ();
+       iter != steps.end (); ++iter) 
+    {
+      addVertexReferrant ((*iter)->getVertex (), chunk);
+    }
+  
+  
+  // We consider for now that the road chunk is always double side.
+  // TODO : edge referrants necessary ??
+  //  addEdgeReferrant (getEdge(start, end), chunk);
+  // addEdgeReferrant (getEdge(end, start), chunk);
+  
+  return chunk;	
 }
 
 
@@ -159,12 +190,11 @@ Topography::newRoadChunk (int key,
 
 const PhysicalStop* 
 Topography::newPhysicalStop (int key,
-                             const Itinerary* itinerary, 
-							 int position, 
-							 const Vertex* vertex)
+			     int position, 
+			     const Vertex* vertex)
 {
 	assert (vertex != 0);
-	PhysicalStop* stop = new PhysicalStop (this, key, itinerary, position, vertex);
+	PhysicalStop* stop = new PhysicalStop (this, key, position, vertex);
 	
 	_physicalStops.insert (make_pair (key, stop));
 	
@@ -178,17 +208,16 @@ Topography::newPhysicalStop (int key,
 
 const Itinerary* 
 Topography::newItinerary (int key,
-                          const std::vector<const Vertex*>& vertices, 
-					      const std::vector<bool>& physicalStop)
+                          const std::vector<const Location*>& steps)
+
 {
-	assert (vertices.size () > 1);
-	assert (vertices.size () == physicalStop.size ());
-	Itinerary* itinerary = new Itinerary (this, key, vertices, physicalStop);
+	assert (steps.size () > 1);
+	Itinerary* itinerary = new Itinerary (this, key, steps);
 	
 	_itineraries.insert (make_pair (key, itinerary));
 	
-	for (unsigned int i=0; i<vertices.size(); ++i) {
-		addVertexReferrant (vertices[i], itinerary);
+	for (unsigned int i=0; i<steps.size(); ++i) {
+	  addVertexReferrant (steps[i]->getVertex(), itinerary);
 	}
 
 	std::vector<const Edge*> edges = itinerary->getEdges ();
@@ -338,8 +367,8 @@ void Topography::findPhysicalStops (const Vertex* vertex,
 
 
 void Topography::findItineraries (const Vertex* vertex, 
-								  std::vector<const Itinerary*>& dst,
-								  const ItineraryFilter filter) const
+				  std::vector<const Itinerary*>& dst,
+				  const ItineraryFilter filter) const
 {
 	VertexRefMap::const_iterator vit = _vertexReferrants.find (vertex);
 	if (vit == _vertexReferrants.end ()) return;

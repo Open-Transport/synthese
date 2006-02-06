@@ -15,8 +15,6 @@ namespace synmap
 
 
 
-
-
 double calculateAngle (const XYPoint& a, const XYPoint& b, const XYPoint& c)
 {
 	double angle = atan2 (c.getY()-b.getY(), c.getX()-b.getX()) - atan2 (a.getY()-b.getY(), a.getX()-b.getX());
@@ -24,9 +22,9 @@ double calculateAngle (const XYPoint& a, const XYPoint& b, const XYPoint& c)
 	if (angle > M_PI) angle = angle - 2*M_PI;
 	if (angle < -M_PI) angle = angle + 2*M_PI;
 	
-	// cout << "Angle = " << angle << endl;
 	return angle;	
 }
+
 
 
 double calculateDistance (const XYPoint& a, const XYPoint& b) 

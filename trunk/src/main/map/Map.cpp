@@ -7,6 +7,7 @@
 #include "DrawableTerminusBoard.h"
 #include "Itinerary.h"
 #include "Topography.h"
+#include "Location.h"
 #include "Edge.h"
 #include "Vertex.h"
 #include "MapBackground.h"
@@ -21,6 +22,7 @@
 #include <cmath>
 
 using namespace std;
+
 
 
 namespace synmap
@@ -334,7 +336,7 @@ Map::assignShiftFactors (const DrawableBusLine* reference,
 	for (unsigned int j=0; j<busLine->getItinerary()->getVertices().size (); ++j) {
 		// cout << "Processing point " << j << endl;
 		
-		const Vertex* v = busLine->getItinerary()->getVertex(j);
+		const Vertex* v = busLine->getItinerary()->getVertices()[j];
 		
 		// Looks in the exclusion for the right most line to this vertex 
 		// and the left most line to this vertex.
@@ -520,8 +522,8 @@ Map::prepareTerminusBoards ()
         const DrawableBusLine* dbl = *it;
         
         // Add the drawabale busline start and end to the terminus
-        const Vertex* firstVertex = dbl->getItinerary()->getFirstVertex ();
-        const Vertex* lastVertex = dbl->getItinerary()->getLastVertex ();
+        const Vertex* firstVertex = dbl->getItinerary()->getFirstStep ()->getVertex ();
+        const Vertex* lastVertex = dbl->getItinerary()->getLastStep ()->getVertex ();
         DrawableTerminusBoard* board = getTerminusBoard (firstVertex);
         board->addDrawableBusLine (dbl);
         board = getTerminusBoard (lastVertex);
