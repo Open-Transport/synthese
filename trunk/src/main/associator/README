@@ -1,0 +1,16 @@
+pour générer le réseaux de neurones
+
+mettre dans le fichier coutes.csv la description carto
+mettre dans le fichier gares.per la liste des arrets
+
+puis lancer les commandes suivantes,
+
+./per2csv.py
+cat gares.csv routes.csv > arrets.csv
+./csv2net.py
+
+les fichiers csv générés sont de la forme
+Ville : Lieu ou Arret : Mot discriminant : Identifiant
+
+le fichier arrets.net contient la description texte du reseaux
+le fichier arrets.bin contient le reseaux exploitable par programme

@@ -1,0 +1,94 @@
+digraph assoc
+{
+ label="associateur"
+
+subgraph cluster_commune_in
+{
+ label="entree commune"
+ ca [label="a"]
+ cb [label="b"]
+ cl [label="l"]
+ cm [label="m"]
+ cm [label="m"]
+ cn [label="n"]
+ co [label="o"]
+ cs [label="s"]
+}
+
+subgraph cluster_lieu_in
+{
+ label="entree lieu"
+ aa [label="a"]
+ aa [label="a"]
+ ae [label="e"]
+ ae [label="e"]
+ ai [label="i"]
+ am [label="m"]
+ am [label="m"]
+ ap [label="p"]
+ ar [label="r"]
+ ar [label="r"]
+}
+
+subgraph cluster_communes
+{
+ label="communes"
+ mons
+ balma
+}
+
+subgraph cluster_lieux
+{
+ label="lieux"
+ pampare
+ mairie
+}
+
+subgraph cluster_pade
+{
+ label="AccesPADe"
+ pade1 [label="mons:pampare"]
+ pade2 [label="balma:mairie"]
+}
+
+ ca -> balma
+ cb -> balma
+ cl -> balma
+ cm -> mons
+ cm -> balma
+ cn -> mons
+ co -> mons
+ cs -> mons
+ aa -> pampare
+ aa -> mairie
+ ae -> pampare
+ ae -> mairie
+ ai -> mairie
+ am -> pampare
+ am -> mairie
+ ap -> pampare
+ ar -> pampare
+ ar -> mairie
+
+ mons -> pade1
+ pampare -> pade1
+ balma -> pade2
+ mairie -> pade2
+
+subgraph cluster_net
+{
+ label="net"
+ l0 [label="entree commune"]
+ l1 [label="entree lieu"]
+ l3 [label="communes"]
+ l4 [label="lieux"]
+ l5 [label="AccesPADe"]
+ l0 -> l3
+ l1 -> l4
+ l3 -> l5
+ l4 -> l5
+ l5
+}
+
+
+}
