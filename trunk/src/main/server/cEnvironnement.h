@@ -12,6 +12,7 @@ class cFormatFichier;
 #include "cModaliteReservation.h"
 #include <iostream>
 #include <vector>
+#include <string>
 #include "cTexte.h"
 #include "cIndicateurs.h"
 #include "cMateriel.h"
@@ -28,6 +29,11 @@ class cFormatFichier;
 #include "Parametres.h"
 #include "cFichierPourEnvironnement.h"
 #include "cDocument.h"
+#include "map/Topography.h"
+
+
+using namespace synmap;
+
 
 /** @defgroup m05 05 Classes m�tier
 	@{
@@ -115,7 +121,8 @@ class cEnvironnement
 	cTexte			vNomFichierHandicape;
 	cTexte			vNomFichierTarif;
 	cTexte			vNomFichierResa;
-	cTexte			vNomRepertoireHoraires;
+	cTexte          vNomRepertoireHoraires;
+	std::string          vNomRepertoireCarto;
 	//@}
 
 	//! \name Formats de fichiers (� remplacer par des cFichier)
@@ -141,15 +148,17 @@ class cEnvironnement
 	//! \name Fonctions de Chargement (� int�grer � un h�ritage de cFichier avec une m�thode virtuelle Charge)
 	//@{
 	bool		ChargeFichierHoraires(const cTexte& NomFichier);
-    bool		ChargeFichierMateriel();
-    bool		ChargeFichierReseaux();
+	bool		ChargeFichierMateriel();
+	bool		ChargeFichierReseaux();
 	bool		ChargeFichierVelo();
 	bool		ChargeFichierHandicape();
 	bool		ChargeFichierTarif();
 	bool		ChargeFichierResa();
 	bool		ChargeFichierPhotos();
+	bool            ChargeFichiersRoutes ();
 	//@}
 
+	Topography      _topography;
 	
 public:
 	//!	\name M�thodes d'enregistrement
@@ -242,6 +251,8 @@ public:
 	tAnnee					PremiereAnnee()												const;
 	cLigne*					PremiereLigne()												const;
 	tIndex	  				getNombreTarif()											const;
+	
+	Topography&                             getTopography () { return _topography; }
 	//@}
 	
 //	bool				AfficheListeGaresAlpha() const;

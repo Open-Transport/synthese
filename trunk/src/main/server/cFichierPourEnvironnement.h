@@ -842,6 +842,12 @@ Fonds de carte
 #define RESEAUXFORMATCOLONNESNombreFormats			1
 //@}
 
+
+//! @name Format du repertoire de donnees carto
+//@{
+#define CARTOEXTENSION "carto"
+
+
 //!	@name Format du fichier du mat�riel
 //@{
 #define MATERIELSFORMAT "materiel"

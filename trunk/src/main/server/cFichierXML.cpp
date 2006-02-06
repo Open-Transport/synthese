@@ -29,6 +29,16 @@
 
 #include "cDate.h"
 
+#include "map/Topography.h"
+
+#include <boost/filesystem/path.hpp>
+
+#include <boost/filesystem/operations.hpp>
+
+namespace fs = boost::filesystem;
+
+using namespace synmap;
+
 
 const std::string cFichierXML::SYNTHESE_TAG = "synthese";
 
@@ -312,6 +322,25 @@ const std::string cFichierXML::INDICATEUR_ARRET_TYPE_INDICATEUR_ATTR_OBLIGATOIRE
 const std::string cFichierXML::INDICATEUR_ARRET_TYPE_INDICATEUR_ATTR_FACULTATIF = "facultatif";
 const std::string cFichierXML::INDICATEUR_ARRET_TYPE_INDICATEUR_ATTR_SUFFISANT = "suffisant";
 
+const std::string cFichierXML::COMMUNE_TAG = "commune";
+const std::string cFichierXML::COMMUNE_ID_ATTR = "id";
+const std::string cFichierXML::COMMUNE_NOM_ATTR = "nom";
+const std::string cFichierXML::COMMUNE_CODE_INSEE_ATTR = "code_insee";
+const std::string cFichierXML::COMMUNE_DEPARTEMENT_ATTR = "departement";
+const std::string cFichierXML::COMMUNE_CODE_POSTAL_DEFAUT_ATTR = "code_postal_defaut";
+
+const std::string cFichierXML::ROUTE_TAG = "route";
+const std::string cFichierXML::ROUTE_ID_ATTR = "id";
+const std::string cFichierXML::ROUTE_NOM_ATTR = "nom";
+const std::string cFichierXML::ROUTE_DISCRIMINANT_ATTR = "discriminant";
+
+const std::string cFichierXML::SEGMENT_ROUTE_TAG = "segment_route";
+const std::string cFichierXML::SEGMENT_ROUTE_ID_ATTR = "id";
+const std::string cFichierXML::SEGMENT_ROUTE_NO_DEBUT_DROITE_ATTR = "noDebutDroite";
+const std::string cFichierXML::SEGMENT_ROUTE_NO_FIN_DROITE_ATTR = "noFinDroite";
+const std::string cFichierXML::SEGMENT_ROUTE_NO_DEBUT_GAUCHE_ATTR = "noDebutGauche";
+const std::string cFichierXML::SEGMENT_ROUTE_NO_FIN_GAUCHE_ATTR = "noFinGauche";
+
 
 
 cFichierXML::cFichierXML(const std::string& basePath)
@@ -421,6 +450,97 @@ cFichierXML::chargeDonneesTransport (istream& xmlStream, cEnvironnement& env)
 
 	return chargeDonneesTransport(root, env);	
 }
+
+
+// Implémentation temporaire du chargement des routes
+void
+cFichierXML::chargeDonneesRoutes (const std::string& repertoire, cEnvironnement& env) 
+{
+   boost::filesystem::path rep (repertoire);
+   if (exists (rep)) return;
+   fs::directory_iterator end_iter;
+   for ( fs::directory_iterator dir_itr( rep );
+          dir_itr != end_iter;
+          ++dir_itr )
+    {
+        std::string filepath = dir_itr->string();
+        std::string filename = dir_itr->leaf ();
+        
+        if (filename.substr (filename.size ()-4, 4) == ".xml") {
+            std::ifstream filestream (filepath.c_str ());
+	    log (filepath);
+            chargeDonneesRoutesCommune (filestream, env);
+        }
+    }
+}
+
+
+
+void
+cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement& env) 
+{
+  Topography* topo = new Topography ();
+
+  // transfert vers une string 
+  char ch;
+  std::string buf("");
+  while (xmlStream.get(ch)) buf += ch;
+  
+  // Creation de l'arbre XML
+  XMLNode root = XMLNode::parseString(buf.c_str(), COMMUNE_TAG.c_str());
+  
+  int nbRoutes = root.nChildNode(ROUTE_TAG.c_str());
+
+  // log ("looking for routes...");
+
+  for (int i=0; i<nbRoutes; ++i) {
+    XMLNode routeNode = root.getChildNode(ROUTE_TAG.c_str(), i);
+
+    int routeId = atoi (routeNode.getAttribute (ROUTE_ID_ATTR.c_str()));
+    std::string routeNameAttr (routeNode.getAttribute (ROUTE_NOM_ATTR.c_str()));
+    std::string routeDiscrAttr (routeNode.getAttribute (ROUTE_DISCRIMINANT_ATTR.c_str()));
+
+    // log (routeNameAttr);
+    
+    topo->newRoad (routeId, routeNameAttr, routeDiscrAttr);
+    
+    int nbSegmentsRoutes = routeNode.nChildNode(SEGMENT_ROUTE_TAG.c_str());
+    for (int j=0; j<nbSegmentsRoutes; ++j) {
+      XMLNode segRouteNode = routeNode.getChildNode(SEGMENT_ROUTE_TAG.c_str(), j);
+      int segmentRouteId = atoi (segRouteNode.getAttribute (SEGMENT_ROUTE_ID_ATTR.c_str()));
+
+      double ndd = atof (segRouteNode.getAttribute (SEGMENT_ROUTE_NO_DEBUT_DROITE_ATTR.c_str()));
+      double nfd = atof (segRouteNode.getAttribute (SEGMENT_ROUTE_NO_FIN_DROITE_ATTR.c_str()));
+      double ndg = atof (segRouteNode.getAttribute (SEGMENT_ROUTE_NO_DEBUT_GAUCHE_ATTR.c_str()));
+      double nfg = atof (segRouteNode.getAttribute (SEGMENT_ROUTE_NO_FIN_GAUCHE_ATTR.c_str()));
+
+      std::vector<const Location*> steps;
+      int nbLocations = segRouteNode.nChildNode(POINT_TAG.c_str());
+      for (int k=0; k<nbLocations; ++k) {
+	XMLNode locationNode = segRouteNode.getChildNode(POINT_TAG.c_str(), k);
+	double x = atof (locationNode.getAttribute (POINT_X_ATTR.c_str()));
+	double y = atof (locationNode.getAttribute (POINT_Y_ATTR.c_str()));
+	
+	// TODO Rajouter les arrets physiques ici !
+
+	steps.push_back (topo->newLocation (-1, x, y));  // Pas d'id
+							 // pour les
+							 // points via
+      }
+      
+      //      log ("Segment loaded");
+      topo->newRoadChunk (segmentRouteId, steps, ndd, nfd, ndg, nfg);
+      
+    }
+    
+
+
+      
+  }
+    
+
+}
+
 
 
 

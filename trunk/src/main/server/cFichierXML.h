@@ -299,7 +299,26 @@ private:
 	static const std::string INDICATEUR_ARRET_TYPE_INDICATEUR_ATTR_FACULTATIF;
 	static const std::string INDICATEUR_ARRET_TYPE_INDICATEUR_ATTR_SUFFISANT;
 	
-	
+	static const std::string COMMUNE_TAG;
+    static const std::string COMMUNE_ID_ATTR;
+    static const std::string COMMUNE_NOM_ATTR;
+    static const std::string COMMUNE_CODE_INSEE_ATTR;
+    static const std::string COMMUNE_DEPARTEMENT_ATTR;
+    static const std::string COMMUNE_CODE_POSTAL_DEFAUT_ATTR;
+    
+    static const std::string ROUTE_TAG;
+    static const std::string ROUTE_ID_ATTR;
+    static const std::string ROUTE_NOM_ATTR;
+    static const std::string ROUTE_DISCRIMINANT_ATTR;
+    
+    static const std::string SEGMENT_ROUTE_TAG;
+    static const std::string SEGMENT_ROUTE_ID_ATTR;
+    static const std::string SEGMENT_ROUTE_NO_DEBUT_DROITE_ATTR;
+    static const std::string SEGMENT_ROUTE_NO_FIN_DROITE_ATTR;
+    static const std::string SEGMENT_ROUTE_NO_DEBUT_GAUCHE_ATTR;
+    static const std::string SEGMENT_ROUTE_NO_FIN_GAUCHE_ATTR;
+    
+    
 	const std::string _basePath;
 	
 private:
@@ -315,6 +334,9 @@ public:
 	SYNTHESE* chargeSynthese (const std::string& filename);
 	
 	void chargeDonneesTransport (std::istream& xmlStream, cEnvironnement& env);
+    void chargeDonneesRoutes (const std::string& repertoire, cEnvironnement& env);
+    void chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement& env);
+    
 	void chargeDonneesTransport (XMLNode& node, cEnvironnement& env);
 	
 	void chargeArretLogique (XMLNode& node, cEnvironnement& env);

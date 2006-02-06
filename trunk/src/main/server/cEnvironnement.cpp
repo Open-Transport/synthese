@@ -8,6 +8,9 @@
 #include "cFormatFichier.h"
 #include "cModaliteReservationEnLigne.h"
 #include <string.h>
+#include "cFichierXML.h"
+
+
 
 #ifdef UNIX
 #include <pthread.h>
@@ -172,6 +175,17 @@ bool cEnvironnement::Charge(const cTexte& __Chemin, const cTexte& __CheminFormat
 		return false;
 	}
 	
+	// Chargement des donnees carto
+	vNomRepertoireCarto = std::string (__Chemin.Texte());
+	vNomRepertoireCarto += std::string (CARTOEXTENSION);
+    
+	if (!ChargeFichiersRoutes())
+	  {
+	    envOk=false;
+	    return false;
+	  }
+	
+    
 	// Mise � disposition des calculateurs
 	for (int __i = 0; __i < _NombreCalculateurs; __i++)
   		_Calculateur[__i].setEnvironnement(this);
@@ -2876,4 +2890,16 @@ tIndex cEnvironnement::Enregistre(cReseau *newVal, tIndex index)
 	vReseau[index] = newVal;
 	return index;	
 }
+
+
+
+bool        
+cEnvironnement::ChargeFichiersRoutes () {
+  cFichierXML fichierXML ("");
+  fichierXML.chargeDonneesRoutes (vNomRepertoireCarto, *this);
+    
+}
+
+
+
 
