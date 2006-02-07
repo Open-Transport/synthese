@@ -7,6 +7,8 @@
 #include <set>
 #include <map>
 
+#include "RoadChunk.h"
+
 
 namespace synmap
 {
@@ -125,10 +127,10 @@ namespace synmap
 
       RoadChunk* newRoadChunk (int key,
 			       const std::vector<const Location*>& steps,
-			       int rightStartNumber, 
-			       int rightEndNumber, 
-			       int leftStartNumber, 
-			       int leftEndNumber);
+			       const RoadChunk::AddressNumber& rightStartNumber, 
+			       const RoadChunk::AddressNumber& rightEndNumber, 
+			       const RoadChunk::AddressNumber& leftStartNumber, 
+			       const RoadChunk::AddressNumber& leftEndNumber);
 
 	
       const PhysicalStop* newPhysicalStop (int key,

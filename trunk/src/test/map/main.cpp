@@ -9,12 +9,14 @@
 #include "DBLComparatorTest.h"
 #include "MapTest.h"
 #include "RoadChunkTest.h"
+#include "RoadTest.h"
 
 
 
 
 CPPUNIT_TEST_SUITE_REGISTRATION(synmap::DBLComparatorTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synmap::RoadChunkTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(synmap::RoadTest);
 
 
 

@@ -19,10 +19,10 @@ class RoadChunk : public Referrant
 {
 public:
 	
-	typedef int AddressNumber;
+	typedef double AddressNumber;
 	typedef enum { RIGHT_SIDE, LEFT_SIDE, UNKNOWN_SIDE } AddressNumberSide;
 
-	static const AddressNumber ADDRESS_NUMBER_UNKNOWN = 0;
+	static const AddressNumber ADDRESS_NUMBER_UNKNOWN;
 	
 private:
 	

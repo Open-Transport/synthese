@@ -2,6 +2,7 @@
 #define ROAD_H_
 
 #include "Referrant.h"
+#include "RoadChunk.h"
 #include <string>
 #include <vector>
 
@@ -12,7 +13,7 @@ namespace synmap
 
 
 class Topography;
-class RoadChunk;
+
 
 
 class Road : public Referrant
@@ -39,6 +40,8 @@ public:
   const std::string& getDiscriminant () const { return _discriminant; }
 
   const std::vector<const RoadChunk*>& getChunks () const { return _chunks; }
+
+  const RoadChunk* findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) const;
 
 
 };

@@ -11,6 +11,7 @@ namespace synmap
 class RoadChunkTest : public CPPUNIT_NS::TestCase
 {
   CPPUNIT_TEST_SUITE(RoadChunkTest);
+  CPPUNIT_TEST(testConstruction);
   CPPUNIT_TEST(testAddressNumbers1);
   CPPUNIT_TEST(testAddressNumbers2);
   CPPUNIT_TEST(testAddressNumbers3);
@@ -24,6 +25,7 @@ public:
 
 protected:
 
+  void testConstruction ();
   void testAddressNumbers1();
   void testAddressNumbers2();
   void testAddressNumbers3();

@@ -27,6 +27,31 @@ namespace synmap
   } 
 
 
+  void
+  RoadChunkTest::testConstruction ()
+  {
+    Topography topo;
+    std::vector<const Location*> steps;
+    
+    RoadChunk::AddressNumber rightStartNumber = 3;
+    RoadChunk::AddressNumber rightEndNumber = 21;
+    RoadChunk::AddressNumber leftStartNumber = 4;
+    RoadChunk::AddressNumber leftEndNumber = 24;
+
+    const RoadChunk* chunk = topo.newRoadChunk (0, steps,
+						rightStartNumber, rightEndNumber,
+						leftStartNumber, leftEndNumber);
+
+    CPPUNIT_ASSERT_EQUAL (rightStartNumber, chunk->getRightStartNumber ());
+    CPPUNIT_ASSERT_EQUAL (rightEndNumber, chunk->getRightEndNumber ());
+    CPPUNIT_ASSERT_EQUAL (leftStartNumber, chunk->getLeftStartNumber ());
+    CPPUNIT_ASSERT_EQUAL (leftEndNumber, chunk->getLeftEndNumber ());
+    
+
+  }
+    
+
+
 
   void
   RoadChunkTest::testAddressNumbers1 ()
@@ -151,12 +176,14 @@ namespace synmap
 						rightStartNumber, rightEndNumber,
 						leftStartNumber, leftEndNumber);
 
+    CPPUNIT_ASSERT_EQUAL (true, chunk->hasNumber (3));
+    CPPUNIT_ASSERT_EQUAL (true, chunk->hasNumber (28));
+
     CPPUNIT_ASSERT_EQUAL (false, chunk->hasNumber (25));
     CPPUNIT_ASSERT_EQUAL (false, chunk->hasNumber (23));
     CPPUNIT_ASSERT_EQUAL (false, chunk->hasNumber (2));
     CPPUNIT_ASSERT_EQUAL (false, chunk->hasNumber (1));
 
-    CPPUNIT_ASSERT_EQUAL (false, chunk->hasNumber (3));
     CPPUNIT_ASSERT_EQUAL (false, chunk->hasNumber (4));
     CPPUNIT_ASSERT_EQUAL (false, chunk->hasNumber (21));
     CPPUNIT_ASSERT_EQUAL (false, chunk->hasNumber (24));
