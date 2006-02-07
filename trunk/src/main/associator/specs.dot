@@ -19,14 +19,10 @@ subgraph cluster_lieu_in
 {
  label="entree lieu"
  aa [label="a"]
- aa [label="a"]
- ae [label="e"]
  ae [label="e"]
  ai [label="i"]
  am [label="m"]
- am [label="m"]
  ap [label="p"]
- ar [label="r"]
  ar [label="r"]
 }
 
