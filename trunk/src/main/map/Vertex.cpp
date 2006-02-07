@@ -108,11 +108,10 @@ Vertex::findCloseNeighbors (double distance,
 
 
 
-std::vector< std::vector<const Vertex*> >
+std::set< std::vector<const Vertex*> >
 Vertex::findPathsToCloseNeighbors (double distance) const {
-  std::vector< std::vector<const Vertex*> > result;
+  std::set <std::vector<const Vertex*> > result;
   std::vector<const Vertex*> initialPath;
-
   findPathsToCloseNeighbors (distance, initialPath, result);
 
   return result;
@@ -123,7 +122,7 @@ Vertex::findPathsToCloseNeighbors (double distance) const {
 void
 Vertex::findPathsToCloseNeighbors (double distance, 
 				   std::vector<const Vertex*>& currentPath,
-				   std::vector< std::vector<const Vertex*> >& result) const {
+				   std::set< std::vector<const Vertex*> >& result) const {
   
   const std::vector<const Edge*>& outEdges = getOutgoingEdges ();
   for (int i=0; i<outEdges.size (); ++i) {
@@ -139,7 +138,7 @@ Vertex::findPathsToCloseNeighbors (double distance,
 						    result);
     } else {
       if (path.size () > 0) {
-	result.push_back (path);
+	result.insert (path);
       }
     }
   }

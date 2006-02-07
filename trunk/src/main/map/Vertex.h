@@ -42,7 +42,7 @@ public:
 
 	std::set<const Vertex*> findCloseNeighbors (double distance) const;
 
-	std::vector< std::vector<const Vertex*> >
+	std::set< std::vector<const Vertex*> >
 	  findPathsToCloseNeighbors (double distance) const;
 
 	
@@ -53,7 +53,7 @@ private:
 	
 	void findPathsToCloseNeighbors (double distance, 
 					std::vector<const Vertex*>& currentPath,
-					std::vector< std::vector<const Vertex*> >& result) const;
+					std::set< std::vector<const Vertex*> >& result) const;
 
 	void addEdge (const Edge* edge);
 	
