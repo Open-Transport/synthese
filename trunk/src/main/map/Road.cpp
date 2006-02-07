@@ -8,6 +8,8 @@
 namespace synmap
 {
 
+
+
 Road::Road(Topography* topography,
 	   int key,
 	   const std::string& name,
@@ -38,7 +40,6 @@ Road::~Road()
 const RoadChunk* 
 Road::findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) const
 {
-
   // Warning : this algorithm works only assuming that chunks are ordered!
 
   RoadChunk::AddressNumber closestMin = std::numeric_limits<double>::min ();
@@ -115,6 +116,36 @@ Road::findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) c
 
 }
 
+
+
+/*
+typedef std::vector<const Vertex*> Path;
+
+
+
+std::set<const PhysicalStop*> 
+Road::findClosestPhysicalStops (RoadChunk::AddressNumber addressNumber, double distance) const
+{
+  const RoadChunk* chunk = findMostPlausibleChunkForNumber (addressNumber);
+  
+  // Start on the first vertex
+  // TODO : add an algorithm to find more precisely the vertex to
+  // start from
+
+  const Vertex* start = chunk->getStep (0);
+
+  std::set<const Vertex*> walkedVertices;
+  
+  
+  // Walk all vertices from start not passing 2 times through
+  // the same vertex. 
+  // As an output we expect a list of all path measuring less than
+  // distance
+
+
+}
+  
+*/
 
 
 

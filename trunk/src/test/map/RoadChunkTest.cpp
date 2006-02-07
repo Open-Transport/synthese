@@ -88,7 +88,6 @@ namespace synmap
   }
 
 
-
   void
   RoadChunkTest::testAddressNumbers2 ()
   {

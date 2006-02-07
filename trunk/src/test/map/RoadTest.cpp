@@ -32,6 +32,7 @@ namespace synmap
   void
   RoadTest::testMostPlausibleAddressNumber1 ()
   {
+
     // R 1      ? 7           21 23    31 ?       ?
     //   <======> <============> <======> <=======>
     // L 2      ? ?           24 26    32 ?       ?
@@ -66,6 +67,7 @@ namespace synmap
     CPPUNIT_ASSERT (chunk4 == road->findMostPlausibleChunkForNumber (37));
 
   }
+
 
 
 }

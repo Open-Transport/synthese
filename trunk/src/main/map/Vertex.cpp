@@ -4,6 +4,7 @@
 #include "Geometry.h"
 
 #include <limits>
+#include <iostream>
 
 
 namespace synmap
@@ -27,13 +28,13 @@ Vertex::Vertex(const Vertex& ref)
 void 
 Vertex::addEdge (const Edge* edge)
 {
-	if (edge->getFrom() == this) {
-		_outEdges.push_back(edge);
-		_outVertices.push_back(edge->getTo());
-	} else if (edge->getTo() == this) {
-		_inEdges.push_back(edge);
-		_outVertices.push_back(edge->getTo());
-	}
+  if (edge->getFrom() == this) {
+    _outEdges.push_back(edge);
+    _outVertices.push_back(edge->getTo());
+  } else if (edge->getTo() == this) {
+    _inEdges.push_back(edge);
+    _outVertices.push_back(edge->getTo());
+  }
 
 }
 
@@ -72,6 +73,36 @@ Vertex::isInside (const Zone* zone) const
 }
 
 
+
+std::set<const Vertex*> 
+Vertex::findCloseNeighbors (double distance) const
+{
+  std::set<const Vertex*> result;
+  result.insert (this);
+  findCloseNeighbors (distance, result);
+  result.erase (this);
+  return result;
+}
+
+
+void
+Vertex::findCloseNeighbors (double distance, 
+			      std::set<const Vertex*>& result) const {
+  
+  const std::vector<const Edge*>& outEdges = getOutgoingEdges ();
+  for (int i=0; i<outEdges.size (); ++i) {
+    const Edge* outEdge = outEdges[i];
+    if (result.find (outEdge->getTo ()) != result.end ()) continue;
+
+    if (outEdge->getLength () < distance) {
+      
+      result.insert (outEdge->getTo ());
+      outEdge->getTo ()->findCloseNeighbors (distance - outEdge->getLength (),
+					      result);
+    }
+    
+  }
+}
 
 
 

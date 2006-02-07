@@ -26,7 +26,7 @@ public:
 	
 private:
 	
-	const std::vector<const Location*> steps;
+	const std::vector<const Location*> _steps;
 
 	const AddressNumber _rightStartNumber;   // inclusive
 	const AddressNumber _rightEndNumber;     // inclusive
@@ -60,7 +60,7 @@ public:
 	AddressNumberSide getSideForNumber (AddressNumber number) const;
 	bool hasNumber (AddressNumber number) const;
 
-
+	const Location* getStep (int index) const { return _steps[index]; }
 
 };
 

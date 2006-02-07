@@ -19,6 +19,9 @@ Topography::Topography()
 
 Topography::~Topography()
 {
+	for (unsigned int i=0; i<_roads.size (); ++i) {
+		delete _roads[i];	
+	}
 	for (unsigned int i=0; i<_roadChunks.size (); ++i) {
 		delete _roadChunks[i];	
 	}
@@ -82,6 +85,8 @@ Topography::newEdgePtr (const Vertex* from, const Vertex* to)
 	Edge* edge = (*frommap)[to];
 	if (edge == 0) {
 		edge = new Edge (from, to);
+		((Vertex*) from)->addEdge (edge);
+		((Vertex*) to)->addEdge (edge);
 		(*frommap)[to] = edge;
 	}
 	
@@ -181,9 +186,15 @@ Topography::newRoadChunk (int key,
   
   
   // We consider for now that the road chunk is always double side.
-  // TODO : edge referrants necessary ??
-  //  addEdgeReferrant (getEdge(start, end), chunk);
-  // addEdgeReferrant (getEdge(end, start), chunk);
+  // pourquoi marche pas ????????????
+  std::vector<const Edge*> edges;
+  for (unsigned int i=0; i+1<steps.size (); ++i) {
+    const Edge* edge = newEdge (steps[i]->getVertex(), steps[i+1]->getVertex());
+    addEdgeReferrant (edge, chunk);
+    edge = newEdge (steps[i+1]->getVertex(), steps[i]->getVertex());
+    addEdgeReferrant (edge, chunk);
+    }
+  
   
   return chunk;	
 }
@@ -196,14 +207,14 @@ Topography::newPhysicalStop (int key,
 			     int position, 
 			     const Vertex* vertex)
 {
-	assert (vertex != 0);
-	PhysicalStop* stop = new PhysicalStop (this, key, position, vertex);
-	
-	_physicalStops.insert (make_pair (key, stop));
-	
-	addVertexReferrant (vertex, stop);
-	
-	return stop;
+  assert (vertex != 0);
+  PhysicalStop* stop = new PhysicalStop (this, key, position, vertex);
+  
+  _physicalStops.insert (make_pair (key, stop));
+  
+  addVertexReferrant (vertex, stop);
+  
+  return stop;
 	
 }
 

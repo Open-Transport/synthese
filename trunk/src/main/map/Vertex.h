@@ -3,6 +3,7 @@
 
 #include "XYPoint.h"
 #include <vector>
+#include <set>
 
 namespace synmap
 {
@@ -33,14 +34,24 @@ public:
 	const std::vector<const Edge*>& getIncomingEdges () const { return _inEdges; }
 	const std::vector<const Edge*>& getOutgoingEdges () const { return _outEdges; }
 	
+	const std::vector<const Vertex*>& getInVertices () const { return _inVertices; }
+	const std::vector<const Vertex*>& getOutVertices () const { return _outVertices; }
+	
 	bool isInside (const Zone* zone) const;
 	
+
+	std::set<const Vertex*> findCloseNeighbors (double distance) const;
+
 	
 private:
+
+	void findCloseNeighbors (double distance, 
+				 std::set<const Vertex*>& result) const;
 
 	void addEdge (const Edge* edge);
 	
 	friend class Topography;
+
 };
 
 }

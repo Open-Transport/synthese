@@ -144,8 +144,6 @@ namespace synmap
 			   const std::vector<const Vertex*>& vertices);
 	
     
-      const Itinerary* getItinerary (int key) const;
-
       void removeItinerary (int key);
 
 
@@ -178,9 +176,9 @@ namespace synmap
 	
 	
       const map<int, const Itinerary*>& getItineraries () const { return _itineraries; }
+      const Itinerary* getItinerary (int key) const;
 
-	
-	
+
 	
     private:
 

@@ -21,8 +21,7 @@ public:
 
 protected:
 
-  void testMostPlausibleAddressNumber1();
-
+  void testMostPlausibleAddressNumber1 ();
 
 
 };

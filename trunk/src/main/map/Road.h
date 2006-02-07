@@ -5,6 +5,7 @@
 #include "RoadChunk.h"
 #include <string>
 #include <vector>
+#include <set>
 
 
 
@@ -13,6 +14,7 @@ namespace synmap
 
 
 class Topography;
+class PhysicalStop;
 
 
 
@@ -21,7 +23,8 @@ class Road : public Referrant
 public:
 	
 private:
-	
+  
+
   const std::string _name;
   const std::string _discriminant;
   std::vector<const RoadChunk*> _chunks;
@@ -42,7 +45,9 @@ public:
   const std::vector<const RoadChunk*>& getChunks () const { return _chunks; }
 
   const RoadChunk* findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) const;
-
+  std::set<const PhysicalStop*> findClosestPhysicalStops (
+			     RoadChunk::AddressNumber addressNumber) const;
+  
 
 };
 
