@@ -119,12 +119,9 @@ Road::findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) c
 
 
 /*
-typedef std::vector<const Vertex*> Path;
-
-
 
 std::set<const PhysicalStop*> 
-Road::findClosestPhysicalStops (RoadChunk::AddressNumber addressNumber, double distance) const
+Road::findClosePhysicalStops (RoadChunk::AddressNumber addressNumber, double distance) const
 {
   const RoadChunk* chunk = findMostPlausibleChunkForNumber (addressNumber);
   
@@ -133,7 +130,7 @@ Road::findClosestPhysicalStops (RoadChunk::AddressNumber addressNumber, double d
   // start from
 
   const Vertex* start = chunk->getStep (0);
-
+  
   std::set<const Vertex*> walkedVertices;
   
   
@@ -144,9 +141,7 @@ Road::findClosestPhysicalStops (RoadChunk::AddressNumber addressNumber, double d
 
 
 }
-  
-*/
-
+  */
 
 
 }

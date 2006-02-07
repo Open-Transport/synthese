@@ -4,6 +4,7 @@
 #include "Geometry.h"
 
 #include <limits>
+#include <algorithm>
 #include <iostream>
 
 
@@ -101,6 +102,46 @@ Vertex::findCloseNeighbors (double distance,
 					      result);
     }
     
+  }
+}
+
+
+
+
+std::vector< std::vector<const Vertex*> >
+Vertex::findPathsToCloseNeighbors (double distance) const {
+  std::vector< std::vector<const Vertex*> > result;
+  std::vector<const Vertex*> initialPath;
+
+  findPathsToCloseNeighbors (distance, initialPath, result);
+
+  return result;
+}
+
+
+
+void
+Vertex::findPathsToCloseNeighbors (double distance, 
+				   std::vector<const Vertex*>& currentPath,
+				   std::vector< std::vector<const Vertex*> >& result) const {
+  
+  const std::vector<const Edge*>& outEdges = getOutgoingEdges ();
+  for (int i=0; i<outEdges.size (); ++i) {
+    std::vector<const Vertex*> path = currentPath;
+    const Edge* outEdge = outEdges[i];
+    if (find (path.begin (), path.end (), outEdge->getTo ()) != path.end ()) continue;
+
+    if (outEdge->getLength () < distance) {
+      
+      path.push_back (outEdge->getTo ());
+      outEdge->getTo ()->findPathsToCloseNeighbors (distance - outEdge->getLength (),
+						    path, 
+						    result);
+    } else {
+      if (path.size () > 0) {
+	result.push_back (path);
+      }
+    }
   }
 }
 

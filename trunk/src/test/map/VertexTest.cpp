@@ -1,6 +1,7 @@
 #include "VertexTest.h"
 
 #include <iostream>
+#include <algorithm>
 #include <set>
 
 #include "Vertex.h"
@@ -159,6 +160,44 @@ namespace synmap
   }
 
 
+  void
+  VertexTest::testFindingPathsToCloseNeighbors ()
+  {
+    Topography topo;
+    const Vertex* A = topo.newVertex (1.0, 1.0);
+    const Vertex* B = topo.newVertex (4.0, 2.0);
+    const Vertex* C = topo.newVertex (6.0, 3.0);
+    const Vertex* D = topo.newVertex (4.0, 5.0);
+    const Vertex* E = topo.newVertex (5.0, 6.0);
+    const Vertex* F = topo.newVertex (7.0, 9.0);
+    const Vertex* G = topo.newVertex (12.0, 8.0);
+    const Vertex* H = topo.newVertex (8.0, 2.0);
+    const Vertex* I = topo.newVertex (13.0, 2.0);
+    const Vertex* J = topo.newVertex (15.0, 5.0);
+
+    topo.newEdge (C, B); topo.newEdge (B, A);
+    topo.newEdge (C, D); topo.newEdge (D, E);
+    topo.newEdge (C, F);
+    topo.newEdge (C, G);
+    topo.newEdge (C, J);
+    topo.newEdge (C, H); topo.newEdge (H, I);
+
+    std::vector< std::vector<const Vertex*> > paths =
+      C->findPathsToCloseNeighbors (4.0);
+    
+    CPPUNIT_ASSERT_EQUAL (3, (int) paths.size ());
+
+    std::vector<const Vertex*> expected;
+    expected.push_back (B);
+    CPPUNIT_ASSERT (find (paths.begin (), paths.end (), expected) != paths.end ());
+    expected.clear();
+    expected.push_back (D);
+    CPPUNIT_ASSERT (find (paths.begin (), paths.end (), expected) != paths.end ());
+    expected.clear();
+    expected.push_back (H);
+    CPPUNIT_ASSERT (find (paths.begin (), paths.end (), expected) != paths.end ());
+
+  }
 
 
 }

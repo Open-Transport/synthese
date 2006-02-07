@@ -13,6 +13,7 @@ class VertexTest : public CPPUNIT_NS::TestCase
   CPPUNIT_TEST_SUITE(VertexTest);
   CPPUNIT_TEST(testFindingCloseNeighbors);
   CPPUNIT_TEST(testFindingCloseNeighborsWithLoops);
+  CPPUNIT_TEST(testFindingPathsToCloseNeighbors);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -24,7 +25,7 @@ protected:
 
   void testFindingCloseNeighbors ();
   void testFindingCloseNeighborsWithLoops ();
-
+  void testFindingPathsToCloseNeighbors ();
 
 };
 
