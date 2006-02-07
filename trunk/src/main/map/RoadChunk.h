@@ -12,6 +12,7 @@ namespace synmap
 class Vertex;
 class Location;
 class Topography;
+class Road;
 
 
 class RoadChunk : public Referrant
@@ -21,17 +22,19 @@ public:
 	typedef int AddressNumber;
 	typedef enum { RIGHT_SIDE, LEFT_SIDE, UNKNOWN_SIDE } AddressNumberSide;
 
-	static const AddressNumber ADDRESS_NUMBER_UNKNOWN = -1;
+	static const AddressNumber ADDRESS_NUMBER_UNKNOWN = 0;
 	
 private:
 	
 	const std::vector<const Location*> steps;
-	
+
 	const AddressNumber _rightStartNumber;   // inclusive
 	const AddressNumber _rightEndNumber;     // inclusive
 	
 	const AddressNumber _leftStartNumber;    // inclusive
 	const AddressNumber _leftEndNumber;      // inclusive
+
+	const Road* _road;
 
 public:
 
@@ -45,6 +48,9 @@ public:
 	
 	virtual ~RoadChunk();
 
+
+	const Road* getRoad () const { return _road; }
+	void setRoad (const Road* road) { _road = road; }
 
 	AddressNumber getRightStartNumber () const { return _rightStartNumber; }
 	AddressNumber getRightEndNumber () const { return _rightEndNumber; }

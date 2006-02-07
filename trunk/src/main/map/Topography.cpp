@@ -142,12 +142,14 @@ Topography::getEdge (const Vertex* from, const Vertex* to)
 const Road* 
 Topography::newRoad (int key,
 		     const std::string& name,
-		     const std::string& discriminant) 
+		     const std::string& discriminant,
+		     const std::vector<RoadChunk*>& chunks)
 {
   Road* road = new Road (this, 
 			 key, 
 			 name, 
-			 discriminant);
+			 discriminant,
+			 chunks);
   
   _roads.insert (make_pair (key, road));
 
@@ -155,7 +157,7 @@ Topography::newRoad (int key,
 
 
 
-const RoadChunk* 
+RoadChunk* 
 Topography::newRoadChunk (int key,
 			  const std::vector<const Location*>& steps,
 			  int rightStartNumber, 

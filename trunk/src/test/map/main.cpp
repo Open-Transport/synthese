@@ -4,20 +4,23 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/CompilerOutputter.h>
 
 #include "DBLComparatorTest.h"
 #include "MapTest.h"
+#include "RoadChunkTest.h"
 
 
 
 
-CPPUNIT_TEST_SUITE_REGISTRATION(synmap::MapTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synmap::DBLComparatorTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(synmap::RoadChunkTest);
 
 
 
 int main( int argc, char **argv )
 {
+
   // Create the event manager and test controller
   CPPUNIT_NS::TestResult controller;
 
@@ -31,8 +34,21 @@ int main( int argc, char **argv )
 
   // Add the top suite to the test runner
   CPPUNIT_NS::TestRunner runner;
-  runner.addTest( CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest() );
-  runner.run( controller );
 
+
+  runner.addTest( CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest() );
+
+
+  runner.run( controller );
+      
+  std::cerr << std::endl;
+      
+  // Print test in a compiler compatible format.
+  CppUnit::CompilerOutputter outputter( &result, std::cerr );
+  outputter.write();                      
+
+  
+  // runner.run( controller );
+  
   return result.wasSuccessful() ? 0 : 1;
 }

@@ -46,16 +46,22 @@ RoadChunk::hasNumber (AddressNumber number) const
   
   if (ans == RIGHT_SIDE) {
     
+    if (getRightStartNumber() == ADDRESS_NUMBER_UNKNOWN) return false;
+    if (getRightEndNumber() == ADDRESS_NUMBER_UNKNOWN) return false;
+
     if ((getRightStartNumber() <= number) &&
 	(getRightEndNumber() >= number)) return true; 
     
   } else if (ans == LEFT_SIDE) {
     
+    if (getLeftStartNumber() == ADDRESS_NUMBER_UNKNOWN) return false;
+    if (getLeftEndNumber() == ADDRESS_NUMBER_UNKNOWN) return false;
+
     if ((getLeftStartNumber() <= number) &&
 	(getLeftEndNumber() >= number)) return true; 
     
   }
-	return false;
+  return false;
 }
 
 

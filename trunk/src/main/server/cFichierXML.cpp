@@ -502,8 +502,7 @@ cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement
 
     // log (routeNameAttr);
     
-    topo->newRoad (routeId, routeNameAttr, routeDiscrAttr);
-    
+    std::vector<RoadChunk*> chunks;
     int nbSegmentsRoutes = routeNode.nChildNode(SEGMENT_ROUTE_TAG.c_str());
     for (int j=0; j<nbSegmentsRoutes; ++j) {
       XMLNode segRouteNode = routeNode.getChildNode(SEGMENT_ROUTE_TAG.c_str(), j);
@@ -529,11 +528,11 @@ cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement
       }
       
       //      log ("Segment loaded");
-      topo->newRoadChunk (segmentRouteId, steps, ndd, nfd, ndg, nfg);
+      chunks.push_back (topo->newRoadChunk (segmentRouteId, steps, ndd, nfd, ndg, nfg));
       
     }
     
-
+    topo->newRoad (routeId, routeNameAttr, routeDiscrAttr, chunks);
 
       
   }

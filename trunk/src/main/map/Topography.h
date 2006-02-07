@@ -119,15 +119,16 @@ namespace synmap
 
       const Road* newRoad (int key,
 			   const std::string& name,
-			   const std::string& discriminant);
+			   const std::string& discriminant,
+			   const std::vector<RoadChunk*>& chunks);
 
 
-      const RoadChunk* newRoadChunk (int key,
-				     const std::vector<const Location*>& steps,
-				     int rightStartNumber, 
-				     int rightEndNumber, 
-				     int leftStartNumber, 
-				     int leftEndNumber);
+      RoadChunk* newRoadChunk (int key,
+			       const std::vector<const Location*>& steps,
+			       int rightStartNumber, 
+			       int rightEndNumber, 
+			       int leftStartNumber, 
+			       int leftEndNumber);
 
 	
       const PhysicalStop* newPhysicalStop (int key,
