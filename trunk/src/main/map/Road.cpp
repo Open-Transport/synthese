@@ -2,12 +2,16 @@
 #include "RoadChunk.h"
 #include "Location.h"
 #include "Vertex.h"
+#include "Edge.h"
 #include "PhysicalStop.h"
 #include "Topography.h"
 
 
 #include <cmath>
 #include <assert.h>
+
+#include <iostream>
+using namespace std;
 
 
 namespace synmap
@@ -26,7 +30,7 @@ Road::Road(Topography* topography,
     , _discriminant (discriminant)
     , _cityKey (cityKey)
 {
-  for (std::vector<RoadChunk*>::const_iterator iter (chunks.begin ());
+  for(std::vector<RoadChunk*>::const_iterator iter (chunks.begin ());
        iter != chunks.end (); ++iter) {
     RoadChunk* chunk = *iter;
     chunk->setRoad (this);
@@ -128,7 +132,7 @@ Road::findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) c
 
 std::set< Road::PathToPhysicalStop >
 Road::findPathsToPhysicalStops (RoadChunk::AddressNumber addressNumber, 
-				double distance) {
+				double distance) const {
   const RoadChunk* chunk = findMostPlausibleChunkForNumber (addressNumber);
   // TODO : add an algorithm to find more precisely the vertex to
   // start from ?
@@ -139,6 +143,7 @@ Road::findPathsToPhysicalStops (RoadChunk::AddressNumber addressNumber,
   std::set< Road::PathToPhysicalStop > result;
 
   RoadChunkVector tmpChunks;
+  std::vector<const PhysicalStop*> tmpPhysicalStops;
 
   for (std::set< std::vector<const Vertex*> >::iterator path = paths.begin ();
        path != paths.end ();
@@ -146,78 +151,55 @@ Road::findPathsToPhysicalStops (RoadChunk::AddressNumber addressNumber,
     
     for (int i=0; i<path->size (); ++i) {
       const Vertex* v = path->at (i);
-      const PhysicalStop* pstop = dynamic_cast<const PhysicalStop*> (v);
-      if (pstop != 0) {
+      
+      // Is there any physical stop located at this vertex ?
+      tmpPhysicalStops.clear ();
+      getTopography()->findPhysicalStops (v, tmpPhysicalStops);
+
+      for (std::vector<const PhysicalStop*>::const_iterator 
+	     itPstop = tmpPhysicalStops.begin ();
+	   itPstop != tmpPhysicalStops.end ();
+	     ++itPstop) {
+	const PhysicalStop* pstop = *itPstop;
+
 	// Create an entry in result which is a path from start
 	// to the found physical stop
 	RoadChunkVector pathChunks;
-
+	
 	for (int j=0; j+1<=i; ++j) {
 	  const Edge* edge = getTopography()->getEdge (path->at (j), path->at (j+1));
 	  
 	  // Normally, there can be only one road chunk associated
 	  // with an edge.
+	  tmpChunks.clear ();
 	  getTopography ()->findRoadChunks (edge, tmpChunks);
-	  assert (tmpChunks.size () == 1);
-	  pathChunks.push_back (tmpChunks.at (0));
-	}
 
+	  assert (tmpChunks.size () == 1);
+
+	  // If the last chunk inserted is the same than the one 
+	  // we just found, do nothing.
+	  if ((pathChunks.size () > 0) &&
+	      (tmpChunks.at(0) == pathChunks[pathChunks.size ()-1])) continue;
+
+	  pathChunks.push_back (tmpChunks.at (0));
+
+	}
+	
 	result.insert (PathToPhysicalStop (pathChunks, pstop));
+	  
 	
       }
 
     }
-    return result;
-
   }
   
 
-  
-
-
-  
-
+  return result;
 
 } 
 
 
 
-/*
-
-std::set<const PhysicalStop*> 
-Road::findClosePhysicalStops (RoadChunk::AddressNumber addressNumber, double distance) const
-{
-  const RoadChunk* chunk = findMostPlausibleChunkForNumber (addressNumber);
-  
-  // Start on the first vertex
-  // TODO : add an algorithm to find more precisely the vertex to
-  // start from
-
-  const Vertex* start = chunk->getStep (0);
-  
-  std::set<const Vertex*> walkedVertices;
-  
-  
-  // Walk all vertices from start not passing 2 times through
-  // the same vertex. 
-  // As an output we expect a list of all path measuring less than
-  // distance
-
-
-
-
-
-
-
-
-1. find path to vertices within the given distance
-2. go through paths and create a separate path for each physical stop encountered
-   filtering those who contains none
-3. for each reamining path, take edges one by one and add the corresponding roadchunk
-
-
-}
-  */
 
 
 }

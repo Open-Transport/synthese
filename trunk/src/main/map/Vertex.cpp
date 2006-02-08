@@ -8,6 +8,8 @@
 #include <iostream>
 
 
+using namespace std;
+
 namespace synmap
 {
 
@@ -95,7 +97,7 @@ Vertex::findCloseNeighbors (double distance,
     const Edge* outEdge = outEdges[i];
     if (result.find (outEdge->getTo ()) != result.end ()) continue;
 
-    if (outEdge->getLength () < distance) {
+    if (outEdge->getLength () <= distance) {
       
       result.insert (outEdge->getTo ());
       outEdge->getTo ()->findCloseNeighbors (distance - outEdge->getLength (),
@@ -112,6 +114,7 @@ std::set< std::vector<const Vertex*> >
 Vertex::findPathsToCloseNeighbors (double distance) const {
   std::set <std::vector<const Vertex*> > result;
   std::vector<const Vertex*> initialPath;
+  initialPath.push_back (this);
   findPathsToCloseNeighbors (distance, initialPath, result);
 
   return result;
@@ -125,23 +128,28 @@ Vertex::findPathsToCloseNeighbors (double distance,
 				   std::set< std::vector<const Vertex*> >& result) const {
   
   const std::vector<const Edge*>& outEdges = getOutgoingEdges ();
+
+  bool longer = false;
   for (int i=0; i<outEdges.size (); ++i) {
     std::vector<const Vertex*> path = currentPath;
     const Edge* outEdge = outEdges[i];
     if (find (path.begin (), path.end (), outEdge->getTo ()) != path.end ()) continue;
 
-    if (outEdge->getLength () < distance) {
+    if (outEdge->getLength () <= distance) {
       
       path.push_back (outEdge->getTo ());
       outEdge->getTo ()->findPathsToCloseNeighbors (distance - outEdge->getLength (),
 						    path, 
 						    result);
-    } else {
-      if (path.size () > 0) {
-	result.insert (path);
-      }
-    }
+      longer = true;
+    } 
   }
+
+  if (longer == false) {
+    result.insert (currentPath);
+    return;
+  }
+
 }
 
 

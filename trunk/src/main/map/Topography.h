@@ -90,6 +90,7 @@ namespace synmap
 
 
       const Location* newLocation (double x, double y);
+      const Location* newLocation (const Vertex* vertex);
 
 	
       //! Creates the unique edge associated with 2 vertices.

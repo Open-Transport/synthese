@@ -17,10 +17,11 @@ RoadChunk::RoadChunk(Topography* topography,
 		     AddressNumber leftStartNumber, 
 		     AddressNumber leftEndNumber)
   : Referrant (topography, key)
-  , _rightStartNumber (rightStartNumber)
-  , _rightEndNumber (rightEndNumber)
-  , _leftStartNumber (leftStartNumber)
-  , _leftEndNumber (leftEndNumber)
+    , _steps (steps)
+    , _rightStartNumber (rightStartNumber)
+    , _rightEndNumber (rightEndNumber)
+    , _leftStartNumber (leftStartNumber)
+    , _leftEndNumber (leftEndNumber)
 {
 }
 

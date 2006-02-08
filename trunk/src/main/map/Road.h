@@ -53,7 +53,7 @@ public:
   const RoadChunk* findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) const;
   std::set< PathToPhysicalStop >
     findPathsToPhysicalStops (RoadChunk::AddressNumber addressNumber, 
-				    double distance);
+				    double distance) const;
 
 
 };

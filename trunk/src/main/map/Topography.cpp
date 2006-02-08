@@ -110,11 +110,16 @@ Topography::newVertex (double x, double y)
 
 const Location* 
 Topography::newLocation (double x, double y) {
-  const Location* location = new Location (newVertex (x, y));
+  return newLocation (newVertex (x, y));
+}
+
+
+const Location* 
+Topography::newLocation (const Vertex* vertex) {
+  const Location* location = new Location (vertex);
   _locations.push_back (location);
   return location;
 }
-
 
 
 const Edge* 

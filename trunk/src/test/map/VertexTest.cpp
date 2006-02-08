@@ -188,17 +188,24 @@ namespace synmap
     CPPUNIT_ASSERT_EQUAL (3, (int) paths.size ());
 
     std::vector<const Vertex*> expected;
+    expected.push_back (C);
     expected.push_back (B);
     CPPUNIT_ASSERT (paths.find(expected) != paths.end ());
     expected.clear();
+    expected.push_back (C);
     expected.push_back (D);
     CPPUNIT_ASSERT (paths.find(expected) != paths.end ());
     expected.clear();
+    expected.push_back (C);
     expected.push_back (H);
     CPPUNIT_ASSERT (paths.find(expected) != paths.end ());
 
+    paths = C->findPathsToCloseNeighbors (20.0);
 
+    // Only the longest paths are preserved in the result list
+    CPPUNIT_ASSERT_EQUAL (6, (int) paths.size ());
   }
+
 
   void
   VertexTest::testFindingPathsToCloseNeighborsWithLoops ()
@@ -234,12 +241,15 @@ namespace synmap
     CPPUNIT_ASSERT_EQUAL (3, (int) paths.size ());
 
     std::vector<const Vertex*> expected;
+    expected.push_back (C);
     expected.push_back (B);
     CPPUNIT_ASSERT (paths.find(expected) != paths.end ());
     expected.clear();
+    expected.push_back (C);
     expected.push_back (D);
     CPPUNIT_ASSERT (paths.find(expected) != paths.end ());
     expected.clear();
+    expected.push_back (C);
     expected.push_back (H);
     CPPUNIT_ASSERT (paths.find(expected) != paths.end ());
 
