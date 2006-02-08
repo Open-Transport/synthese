@@ -153,12 +153,14 @@ const Road*
 Topography::newRoad (int key,
 		     const std::string& name,
 		     const std::string& discriminant,
+		     int cityKey,
 		     const std::vector<RoadChunk*>& chunks)
 {
   Road* road = new Road (this, 
 			 key, 
 			 name, 
 			 discriminant,
+			 cityKey,
 			 chunks);
   
   _roads.insert (make_pair (key, road));
@@ -271,6 +273,15 @@ Topography::getItinerary (int key) const
 {
     if (_itineraries.find (key) == _itineraries.end ()) return 0;
     return _itineraries.find (key)->second;  
+}
+
+
+
+const Road* 
+Topography::getRoad (int key) const 
+{
+  if (_roads.find (key) == _roads.end ()) return 0;
+  return _roads.find (key)->second;  
 }
 
 

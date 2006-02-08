@@ -124,6 +124,7 @@ namespace synmap
       const Road* newRoad (int key,
 			   const std::string& name,
 			   const std::string& discriminant,
+			   int cityKey,
 			   const std::vector<RoadChunk*>& chunks);
 
 
@@ -178,6 +179,9 @@ namespace synmap
 	
       const map<int, const Itinerary*>& getItineraries () const { return _itineraries; }
       const Itinerary* getItinerary (int key) const;
+
+      const map<int, const Road*>& getRoads () const { return _roads; }
+      const Road* getRoad (int key) const;
 
 
 	

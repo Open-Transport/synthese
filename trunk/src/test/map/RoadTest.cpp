@@ -52,7 +52,7 @@ namespace synmap
     chunks.push_back (chunk3);
     chunks.push_back (chunk4);
 
-    const Road* road = topo.newRoad (0, "name", "dicr", chunks);
+    const Road* road = topo.newRoad (0, "name", "dicr", 0, chunks);
     
     // If one of the chunk has the number unambiguously, return it.
     CPPUNIT_ASSERT (chunk2 == road->findMostPlausibleChunkForNumber (9));
@@ -70,8 +70,56 @@ namespace synmap
 
   void
   RoadTest::testFindingPathsToPhysicalStops () {
+    /*
+
+    S = Start
+    + = Chunk start/end
+    # = physical stop
+
+    A         B        C        D        E
+    +----S----+--------+--------+----#---+  <- Road1
+                       |             ps1
+                       # ps2
+                       |        G        H
+                     F +--------+----#---+  <- Road2
+                       |        |    ps3
+                       |        |
+                       |        |
+                     I +      J +
+                                |
+                Road3 -^        |
+                                |
+                              K +
+                        
+                                ^- Road4
+    */
+
     
-    
+    Topography topo;
+    const Vertex* A = topo.newVertex (0.0, 8.0);
+    const Vertex* vS = topo.newVertex (1.0, 8.0);
+    const Vertex* B = topo.newVertex (2.0, 8.0);
+    const Vertex* C = topo.newVertex (4.0, 8.0);
+    const Vertex* D = topo.newVertex (6.0, 8.0);
+    const Vertex* vPs1 = topo.newVertex (7.0, 8.0);
+    const Vertex* E = topo.newVertex (8.0, 8.0);
+    const Vertex* F = topo.newVertex (4.0, 6.0);
+    const Vertex* vPs2 = topo.newVertex (4.0, 7.0);
+    const Vertex* G = topo.newVertex (6.0, 6.0);
+    const Vertex* vPs3 = topo.newVertex (7.0, 6.0);
+    const Vertex* H = topo.newVertex (8.0, 6.0);
+    const Vertex* I = topo.newVertex (4.0, 4.0);
+    const Vertex* J = topo.newVertex (6.0, 4.0);
+    const Vertex* K = topo.newVertex (6.0, 2.0);
+
+    const PhysicalStop* ps1 = topo.newPhysicalStop (1, vPs1);
+    const PhysicalStop* ps2 = topo.newPhysicalStop (2, vPs2);
+    const PhysicalStop* ps3 = topo.newPhysicalStop (3, vPs3);
+
+
+
+
+
 
 
   }

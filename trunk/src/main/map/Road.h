@@ -30,6 +30,7 @@ private:
 
   const std::string _name;
   const std::string _discriminant;
+  const int _cityKey;
   RoadChunkVector _chunks;
 
 public:
@@ -38,13 +39,15 @@ public:
        int key,
        const std::string& name,
        const std::string& discriminant,
+       const int cityKey, // TODO change this and create a city class
        const std::vector<RoadChunk*>& chunks);
 	
   virtual ~Road();
 
   const std::string& getName () const { return _name; }
   const std::string& getDiscriminant () const { return _discriminant; }
-
+  int getCityKey () const { return _cityKey; }
+  
   const RoadChunkVector& getChunks () const { return _chunks; }
 
   const RoadChunk* findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) const;

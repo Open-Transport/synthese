@@ -488,7 +488,8 @@ cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement
   
   // Creation de l'arbre XML
   XMLNode root = XMLNode::parseString(buf.c_str(), COMMUNE_TAG.c_str());
-  
+  int communeId = atoi (root.getAttribute (COMMUNE_ID_ATTR.c_str()));
+
   int nbRoutes = root.nChildNode(ROUTE_TAG.c_str());
 
   // log ("looking for routes...");
@@ -532,7 +533,7 @@ cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement
       
     }
     
-    topo->newRoad (routeId, routeNameAttr, routeDiscrAttr, chunks);
+    topo->newRoad (routeId, routeNameAttr, routeDiscrAttr, communeId, chunks);
 
       
   }
