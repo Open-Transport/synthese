@@ -22,12 +22,15 @@ class Road : public Referrant
 {
 public:
 	
+  typedef std::vector<const RoadChunk*> RoadChunkVector;
+  typedef std::pair<RoadChunkVector, const PhysicalStop*> PathToPhysicalStop;
+
 private:
   
 
   const std::string _name;
   const std::string _discriminant;
-  std::vector<const RoadChunk*> _chunks;
+  RoadChunkVector _chunks;
 
 public:
 
@@ -42,12 +45,13 @@ public:
   const std::string& getName () const { return _name; }
   const std::string& getDiscriminant () const { return _discriminant; }
 
-  const std::vector<const RoadChunk*>& getChunks () const { return _chunks; }
+  const RoadChunkVector& getChunks () const { return _chunks; }
 
   const RoadChunk* findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) const;
-  std::set<const PhysicalStop*> findClosestPhysicalStops (
-			     RoadChunk::AddressNumber addressNumber) const;
-  
+  std::set< PathToPhysicalStop >
+    findPathsToPhysicalStops (RoadChunk::AddressNumber addressNumber, 
+				    double distance);
+
 
 };
 

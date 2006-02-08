@@ -48,6 +48,10 @@ Topography::~Topography()
 			delete eit1->second; // delete the edge.
 		}
 	}
+	for (unsigned int i=0; i<_locations.size (); ++i) {
+		delete _locations[i];	
+	}
+
 		
 	
 }
@@ -105,8 +109,9 @@ Topography::newVertex (double x, double y)
 
 
 const Location* 
-Topography::newLocation (int key, double x, double y) {
-  const Location* location = new Location (this, key, newVertex (x, y));
+Topography::newLocation (double x, double y) {
+  const Location* location = new Location (newVertex (x, y));
+  _locations.push_back (location);
   return location;
 }
 
@@ -137,9 +142,9 @@ Topography::hasEdge (const Vertex* from, const Vertex* to)
 
 
 const Edge* 
-Topography::getEdge (const Vertex* from, const Vertex* to) 
+Topography::getEdge (const Vertex* from, const Vertex* to) const
 {
-	return (*_edges[from])[to];
+  return (_edges.find (from)->second->find (to)->second);
 }
 
 
@@ -204,11 +209,10 @@ Topography::newRoadChunk (int key,
 
 const PhysicalStop* 
 Topography::newPhysicalStop (int key,
-			     int position, 
 			     const Vertex* vertex)
 {
   assert (vertex != 0);
-  PhysicalStop* stop = new PhysicalStop (this, key, position, vertex);
+  PhysicalStop* stop = new PhysicalStop (this, key, vertex);
   
   _physicalStops.insert (make_pair (key, stop));
   

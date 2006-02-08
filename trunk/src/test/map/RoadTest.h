@@ -11,7 +11,8 @@ namespace synmap
 class RoadTest : public CPPUNIT_NS::TestCase
 {
   CPPUNIT_TEST_SUITE(RoadTest);
-  CPPUNIT_TEST(testMostPlausibleAddressNumber1);
+  CPPUNIT_TEST(testMostPlausibleAddressNumber);
+  CPPUNIT_TEST(testFindingPathsToPhysicalStops);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -21,7 +22,8 @@ public:
 
 protected:
 
-  void testMostPlausibleAddressNumber1 ();
+  void testMostPlausibleAddressNumber ();
+  void testFindingPathsToPhysicalStops ();
 
 
 };

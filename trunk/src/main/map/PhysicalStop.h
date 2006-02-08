@@ -2,6 +2,7 @@
 #define PHYSICALSTOP_H_
 
 #include "Location.h"
+#include "Referrant.h"
 
 
 namespace synmap
@@ -11,27 +12,21 @@ class Vertex;
 class Itinerary;
 
 
-class PhysicalStop : public Location
+class PhysicalStop : public Location, public Referrant
 {
 	
 private:
 
-	const int _position;
 	
 public:
 
 	PhysicalStop(Topography* topography, 
 		     int key,
-		     int position, 
 		     const Vertex* vertex);
 				 
 	virtual ~PhysicalStop();
 
 
-
-	
-	int getPosition () const { return _position; }
-	
 	
 	friend class Topography;
 };

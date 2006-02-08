@@ -496,7 +496,7 @@ pattern8 ()
 */
 
 
-
+/*
 
 void testWithOnlyReversedLine ()
 {
@@ -1040,12 +1040,6 @@ void testWithPlentyOfLines2 () {
   locations.push_back (F); 
   locations.push_back (S); 
 
-  // A crossing line
-  /*   Itinerary* iti11 = (Itinerary*) topo.newItinerary(iti_key++, locations);
-       iti11->setProperty("name", "bus11");
-       iti11->setProperty("lineNumber", "11");
-       iti11->setProperty("color", "blue");
-  */ 
   // Do some testing...
   DrawableBusLine* dbl1 = new DrawableBusLine (iti1);
   DrawableBusLine* dbl2 = new DrawableBusLine (iti2);
@@ -1143,9 +1137,6 @@ testL24 () {
   iti3->setProperty("color", "cyan");
     
 
-
-
-  /*    
 	locations.clear (); pstops.clear ();
 	locations.push_back (topo.newLocation (loc_key++,526582,  1849455)); 
 	locations.push_back (topo.newLocation (loc_key++,526692,  1849016)); 
@@ -1182,7 +1173,7 @@ testL24 () {
 	iti2->setProperty("lineNumber", "10");
 	iti2->setProperty("color", "green");
   */ 
-    
+    /*   
     
   // Finally dump a map
   // for (int i=0; i<100; ++i) 
@@ -1195,7 +1186,7 @@ testL24 () {
   }
 
 }    
-    
+    */
     
 //synmap::MapBackground mbg ("/home/mjambert/rcs/data/processed_map_data/TILES/scale_0.121037924152_0.12103792408"); // 25k 0.8
 //synmap::MapBackground mbg ("/home/mjambert/rcs/data/processed_map_data/TILES/scale_0.15129740519_0.15129740519");  // 25k 1.0
@@ -1214,9 +1205,9 @@ int main(int argc, char **argv) {
   */
 
   //	 testWithOnlyReversedLine ();
-  testWithPlentyOfLines ();
-  testWithPlentyOfLines2 ();
-  testL24 ();
+  //  testWithPlentyOfLines ();
+  //testWithPlentyOfLines2 ();
+  // testL24 ();
     
   /*
     Topography topo;

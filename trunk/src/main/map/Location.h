@@ -10,21 +10,22 @@ namespace synmap
 class Vertex;
 
 
-class Location : public Referrant
+class Location 
 {
 	
 private:
 
 	const Vertex* _vertex;
 
+ protected:
+
+	Location(const Vertex* vertex);
+
 	
 public:
 
-	Location(Topography* topography, 
-		 int key,
-		 const Vertex* vertex);
-				 
 	virtual ~Location();
+
 
 	const Vertex* getVertex () const { return _vertex; }
 	

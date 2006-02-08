@@ -58,6 +58,8 @@ namespace synmap
       EdgeRefMap   _edgeReferrants;
 	
 
+      vector<const Location*> _locations;
+
       map<int, const Road*> _roads;
       map<int, const RoadChunk*> _roadChunks;
       map<int, const PhysicalStop*> _physicalStops;
@@ -87,7 +89,7 @@ namespace synmap
 
 
 
-      const Location* newLocation (int key, double x, double y);
+      const Location* newLocation (double x, double y);
 
 	
       //! Creates the unique edge associated with 2 vertices.
@@ -108,7 +110,7 @@ namespace synmap
 	\param to The target vertex.
 	\return The immutable edge.
       */
-      const Edge* getEdge (const Vertex* from, const Vertex* to);
+      const Edge* getEdge (const Vertex* from, const Vertex* to) const;
 
       //! Gets the unique vertex associated with x and y.
       /*!
@@ -134,7 +136,6 @@ namespace synmap
 
 	
       const PhysicalStop* newPhysicalStop (int key,
-					   int position, 
 					   const Vertex* vertex);
 	
       const Itinerary* newItinerary (int key,

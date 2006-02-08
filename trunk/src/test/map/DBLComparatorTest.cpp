@@ -39,30 +39,30 @@ namespace synmap
   DBLComparatorTest::testVariousComparisons () {
     Topography topo;
     int iti_key = 0;
-    const Location* A = topo.newLocation (-1, 2.0, 3.0);
-    const Location* B = topo.newLocation (-1, 6.0, 6.0);
-    const Location* C = topo.newLocation (-1, 9.0, 5.0);
-    const Location* D = topo.newLocation (-1, 12.0, 9.0);
-    const Location* E = topo.newLocation (-1, 12.0, 13.0);
-    const Location* F = topo.newLocation (-1, 15.0, 15.0);
-    const Location* G = topo.newLocation (-1, 18.0, 18.0);
-    const Location* H = topo.newLocation (-1, 20.0, 20.0);
-    const Location* I = topo.newLocation (-1, 18.0, 23.0);
+    const Location* A = topo.newLocation (2.0, 3.0);
+    const Location* B = topo.newLocation (6.0, 6.0);
+    const Location* C = topo.newLocation (9.0, 5.0);
+    const Location* D = topo.newLocation (12.0, 9.0);
+    const Location* E = topo.newLocation (12.0, 13.0);
+    const Location* F = topo.newLocation (15.0, 15.0);
+    const Location* G = topo.newLocation (18.0, 18.0);
+    const Location* H = topo.newLocation (20.0, 20.0);
+    const Location* I = topo.newLocation (18.0, 23.0);
 
-    const Location* J = topo.newLocation (-1, 8.0, 14.0);
-    const Location* K = topo.newLocation (-1, 16.0, 22.0);
+    const Location* J = topo.newLocation (8.0, 14.0);
+    const Location* K = topo.newLocation (16.0, 22.0);
 
-    const Location* L = topo.newLocation (-1, 16.0, 7.0);
-    const Location* M = topo.newLocation (-1, 26.0, 20.0);
-    const Location* N = topo.newLocation (-1, 19.0, 8.0);
+    const Location* L = topo.newLocation (16.0, 7.0);
+    const Location* M = topo.newLocation (26.0, 20.0);
+    const Location* N = topo.newLocation (19.0, 8.0);
 
-    const Location* O = topo.newLocation (-1, 12.0, 1.0);
-    const Location* P = topo.newLocation (-1, 14.0, 9.0);
+    const Location* O = topo.newLocation (12.0, 1.0);
+    const Location* P = topo.newLocation (14.0, 9.0);
 
-    const Location* Q = topo.newLocation (-1, 29.0, 14.0);
+    const Location* Q = topo.newLocation (29.0, 14.0);
 
-    const Location* R = topo.newLocation (-1, 10.0, 20.0);
-    const Location* S = topo.newLocation (-1, 20.0, 10.0);
+    const Location* R = topo.newLocation (10.0, 20.0);
+    const Location* S = topo.newLocation (20.0, 10.0);
 
 
     std::vector<const Location*> locations;

@@ -1,8 +1,13 @@
 #include "Road.h"
 #include "RoadChunk.h"
+#include "Location.h"
+#include "Vertex.h"
+#include "PhysicalStop.h"
+#include "Topography.h"
 
 
 #include <cmath>
+#include <assert.h>
 
 
 namespace synmap
@@ -118,6 +123,63 @@ Road::findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) c
 
 
 
+
+std::set< Road::PathToPhysicalStop >
+Road::findPathsToPhysicalStops (RoadChunk::AddressNumber addressNumber, 
+				double distance) {
+  const RoadChunk* chunk = findMostPlausibleChunkForNumber (addressNumber);
+  // TODO : add an algorithm to find more precisely the vertex to
+  // start from ?
+  const Vertex* start = chunk->getStep (0)->getVertex ();
+  std::set< std::vector<const Vertex*> > paths = 
+    start->findPathsToCloseNeighbors (distance);
+
+  std::set< Road::PathToPhysicalStop > result;
+
+  RoadChunkVector tmpChunks;
+
+  for (std::set< std::vector<const Vertex*> >::iterator path = paths.begin ();
+       path != paths.end ();
+       ++path) {
+    
+    for (int i=0; i<path->size (); ++i) {
+      const Vertex* v = path->at (i);
+      const PhysicalStop* pstop = dynamic_cast<const PhysicalStop*> (v);
+      if (pstop != 0) {
+	// Create an entry in result which is a path from start
+	// to the found physical stop
+	RoadChunkVector pathChunks;
+
+	for (int j=0; j+1<=i; ++j) {
+	  const Edge* edge = getTopography()->getEdge (path->at (j), path->at (j+1));
+	  
+	  // Normally, there can be only one road chunk associated
+	  // with an edge.
+	  getTopography ()->findRoadChunks (edge, tmpChunks);
+	  assert (tmpChunks.size () == 1);
+	  pathChunks.push_back (tmpChunks.at (0));
+	}
+
+	result.insert (PathToPhysicalStop (pathChunks, pstop));
+	
+      }
+
+    }
+    return result;
+
+  }
+  
+
+  
+
+
+  
+
+
+} 
+
+
+
 /*
 
 std::set<const PhysicalStop*> 
@@ -138,6 +200,18 @@ Road::findClosePhysicalStops (RoadChunk::AddressNumber addressNumber, double dis
   // the same vertex. 
   // As an output we expect a list of all path measuring less than
   // distance
+
+
+
+
+
+
+
+
+1. find path to vertices within the given distance
+2. go through paths and create a separate path for each physical stop encountered
+   filtering those who contains none
+3. for each reamining path, take edges one by one and add the corresponding roadchunk
 
 
 }
