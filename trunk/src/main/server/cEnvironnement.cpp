@@ -10,6 +10,8 @@
 #include <string.h>
 #include "cFichierXML.h"
 
+#include <iostream>
+
 
 
 #ifdef UNIX
@@ -2891,9 +2893,13 @@ tIndex cEnvironnement::Enregistre(cReseau *newVal, tIndex index)
 
 bool        
 cEnvironnement::ChargeFichiersRoutes () {
+ 
+  /*
   cFichierXML fichierXML ("");
   fichierXML.chargeDonneesRoutes (vNomRepertoireCarto, *this);
-    
+  */
+
+  return true;
 }
 
 
