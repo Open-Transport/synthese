@@ -457,7 +457,7 @@ void
 cFichierXML::chargeDonneesRoutes (const std::string& repertoire, cEnvironnement& env) 
 {
    boost::filesystem::path rep (repertoire);
-   if (exists (rep)) return;
+   if (exists (rep) == false) return;
    fs::directory_iterator end_iter;
    for ( fs::directory_iterator dir_itr( rep );
           dir_itr != end_iter;
