@@ -393,6 +393,12 @@
 				RelativePath="..\..\..\src\main\server\cInterface_Objet_Element_Parametre_DonneeEnvironnement.h">
 			</File>
 			<File
+				RelativePath="..\..\..\src\main\server\cInterpreteur.h">
+			</File>
+			<File
+				RelativePath=".\cInterpreteur.h">
+			</File>
+			<File
 				RelativePath="..\..\..\src\main\server\cJour.h">
 			</File>
 			<File

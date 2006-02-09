@@ -16,6 +16,7 @@
 	- @subpage pm04
 	- @subpage pm05
 	- @subpage pm06
+	- @subpage pm07
 	- @subpage pm09
 
 @page m1 1 Entrées
@@ -68,6 +69,9 @@
 
 @page pm06 06 Documents
 	@htmlonly <script>document.location.replace('group__m06.html');</script> @endhtmlonly
+
+@page pm07 07 Interpréteur de textes
+	@htmlonly <script>document.location.replace('group__m07.html');</script> @endhtmlonly
 
 @page pm09 09 Documents
 	@htmlonly <script>document.location.replace('group__m09.html');</script> @endhtmlonly
