@@ -19,9 +19,9 @@ enum tTypeAccesPADe
 	eQuelconque 		= 0,	//<! Arrêt standard
 	ePrincipale 		= 1,	//<! Arrêt principal de la commune
 	eToutLieu   		= 2,	//<! Arrêt virtuel tout lieu de la commune
-	eLieuPublic 		= 3,	//<! Lieu public (adresse précise)
+	eLieuPublic 		= 3,	//<! Lieu public enregistré en base (adresse précise)
 	eLieuQuelconque 	= 4,	//<! Adresse large (
-	ePrincipaleDefaut	= 5
+	ePrincipaleDefaut	= 5		//<! A SUPPRIMER
 };
 
 #include "cTexte.h"
@@ -37,7 +37,7 @@ enum tTypeAccesPADe
 	@author Hugues Romain
 	@date 2001-2006
 	
-Les objets de cette classe correspondent � des lieux r�els ou virtuels, associ�s � une description de l'acc�s �/aux point(s) d'arr�t le(s) plus proche(s).
+Les objets de cette classe correspondent à des désignations de lieux réels ou virtuels, associés � une description de l'acc�s �/aux point(s) d'arr�t le(s) plus proche(s).
 
 Les objets de cette classe peuvent �tre issus de plusieurs origines, d�crites par la variable vTypeAcces :
 	- <b>D�signations de point d'arr�t</b>

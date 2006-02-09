@@ -1,25 +1,25 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tcp", "..\tcp\tcp.vcproj", "{DA117A1B-1070-4B32-A00E-79D664F92307}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tcp", "..\..\src\main\tcp\tcp.vcproj", "{DA117A1B-1070-4B32-A00E-79D664F92307}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_cgi", "..\client_cgi\client_cgi.vcproj", "{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_cgi", "..\..\src\main\client_cgi\client_cgi.vcproj", "{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "map", "..\map\map.vcproj", "{CAF59F96-B29D-4974-8778-724DBF9C7153}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "map", "..\..\src\main\map\map.vcproj", "{CAF59F96-B29D-4974-8778-724DBF9C7153}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_rs485", "..\client_rs485\client_rs485.vcproj", "{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client_rs485", "..\..\src\main\client_rs485\client_rs485.vcproj", "{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "..\server\server.vcproj", "{BC1E5A8F-2079-435E-9047-7532C871426A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "..\..\src\main\server\server.vcproj", "{BC1E5A8F-2079-435E-9047-7532C871426A}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "doc", "..\doc\doc.vcproj", "{8EAB5AED-37BA-4795-9F4F-FD1143673342}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "doc", "doc\doc.vcproj", "{8EAB5AED-37BA-4795-9F4F-FD1143673342}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -107,7 +107,7 @@ Global
 		{8EAB5AED-37BA-4795-9F4F-FD1143673342}.Remote Php 5.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
-		..\..\..\SConstruct = ..\..\..\SConstruct
+		..\..\SConstruct = ..\..\SConstruct
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

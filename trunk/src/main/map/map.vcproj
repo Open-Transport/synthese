@@ -17,9 +17,9 @@
 			ConfigurationType="0">
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				ReBuildCommandLine="../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				CleanCommandLine="../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				BuildCommandLine="../../../proj/vs/vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				ReBuildCommandLine="../../../proj/vs/vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				CleanCommandLine="../../../proj/vs/vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
 		</Configuration>
 		<Configuration
@@ -29,9 +29,9 @@
 			ConfigurationType="0">
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				ReBuildCommandLine="../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				CleanCommandLine="../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				BuildCommandLine="../../../proj/vs/vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				ReBuildCommandLine="../../../proj/vs/vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				CleanCommandLine="../../../proj/vs/vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
 		</Configuration>
 	</Configurations>

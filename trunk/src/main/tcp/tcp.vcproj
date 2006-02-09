@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="client_cgi"
-	ProjectGUID="{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}"
-	RootNamespace="client_cgi"
+	Name="tcp"
+	ProjectGUID="{DA117A1B-1070-4B32-A00E-79D664F92307}"
+	RootNamespace="tcp"
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
@@ -18,10 +18,10 @@
 			ConfigurationType="0">
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				ReBuildCommandLine="../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				CleanCommandLine="../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"/>
+				BuildCommandLine="../../../proj/vs/vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				ReBuildCommandLine="../../../proj/vs/vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				CleanCommandLine="../../../proj/vs/vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
@@ -30,10 +30,10 @@
 			ConfigurationType="0">
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				ReBuildCommandLine="../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				CleanCommandLine="../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"/>
+				BuildCommandLine="../../../proj/vs/vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				ReBuildCommandLine="../../../proj/vs/vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				CleanCommandLine="../../../proj/vs/vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -44,7 +44,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\..\..\src\main\client_cgi\client_cgi.cpp">
+				RelativePath="..\..\..\src\main\tcp\cSocket.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -52,7 +52,7 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\..\..\src\main\client_cgi\client_cgi.h">
+				RelativePath="..\..\..\src\main\tcp\cSocket.h">
 			</File>
 		</Filter>
 		<Filter
@@ -60,7 +60,7 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 			<File
-				RelativePath="..\..\..\src\main\client_cgi\SConscript">
+				RelativePath="..\..\..\src\main\tcp\SConscript">
 			</File>
 		</Filter>
 	</Files>
