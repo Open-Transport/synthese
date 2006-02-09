@@ -179,11 +179,7 @@ bool cEnvironnement::Charge(const cTexte& __Chemin, const cTexte& __CheminFormat
 	vNomRepertoireCarto = std::string (__Chemin.Texte());
 	vNomRepertoireCarto += std::string (CARTOEXTENSION);
     
-	if (!ChargeFichiersRoutes())
-	  {
-	    envOk=false;
-	    return false;
-	  }
+	ChargeFichiersRoutes();
 	
     
 	// Mise � disposition des calculateurs

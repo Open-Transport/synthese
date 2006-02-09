@@ -136,12 +136,16 @@ class cEnvironnement
 	cFormatFichier* 	_FormatTarif;
 	cFormatFichier* 	_FormatReseaux;
 	cFormatFichier* 	_FormatMateriel;
+
+	Topography      _topography;
+
 	//@}
 
 	//!	\name Espaces de calcul pour threads
 	//@{
 	tIndex			_NombreCalculateurs;	//!< Nombre d'espaces m�moires disponibles pour les calculs
-	cCalculateur*	_Calculateur;			//!< Espaces m�moires d�di�s aux threads
+	cCalculateur*	_Calculateur;			//!< Espaces
+	//m�moires d�di�s aux threads
 	//@}
 	
 	
@@ -158,7 +162,6 @@ class cEnvironnement
 	bool            ChargeFichiersRoutes ();
 	//@}
 
-	Topography      _topography;
 	
 public:
 	//!	\name M�thodes d'enregistrement

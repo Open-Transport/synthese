@@ -479,7 +479,7 @@ cFichierXML::chargeDonneesRoutes (const std::string& repertoire, cEnvironnement&
 void
 cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement& env) 
 {
-  Topography* topo = new Topography ();
+  Topography& topo = env.getTopography ();
 
   // transfert vers une string 
   char ch;
@@ -523,17 +523,17 @@ cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement
 	
 	// TODO Rajouter les arrets physiques ici !
 
-	steps.push_back (topo->newLocation (x, y));  // Pas d'id
+	steps.push_back (topo.newLocation (x, y));  // Pas d'id
 	                                             // pour les
 	                                             // points via
       }
       
       //      log ("Segment loaded");
-      chunks.push_back (topo->newRoadChunk (segmentRouteId, steps, ndd, nfd, ndg, nfg));
+      chunks.push_back (topo.newRoadChunk (segmentRouteId, steps, ndd, nfd, ndg, nfg));
       
     }
     
-    topo->newRoad (routeId, routeNameAttr, routeDiscrAttr, communeId, chunks);
+    topo.newRoad (routeId, routeNameAttr, routeDiscrAttr, communeId, chunks);
 
       
   }
