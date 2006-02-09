@@ -523,9 +523,9 @@ cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement
 	
 	// TODO Rajouter les arrets physiques ici !
 
-	steps.push_back (topo->newLocation (-1, x, y));  // Pas d'id
-							 // pour les
-							 // points via
+	steps.push_back (topo->newLocation (x, y));  // Pas d'id
+	                                             // pour les
+	                                             // points via
       }
       
       //      log ("Segment loaded");
