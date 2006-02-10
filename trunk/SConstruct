@@ -127,6 +127,7 @@ def AppendMultithreadConf (env):
     if (platform == 'posix'):
         env.Append (CCFLAGS= '-pthread' )
         env.Append (LIBS= ['pthread'] ) 
+        env.Append (CPPDEFINES = ['_PTHREADS'])
 
     if (platform == 'darwin'):
         env.Append (CCFLAGS= '-pthread' )
@@ -162,6 +163,11 @@ platform = ARGUMENTS.get('os', str (Platform()))
 
 env.Replace ( PLATFORM = platform )
 env.Replace ( MODE = mode )
+
+# At the moment, problem with __mt_allocator in g++ 4
+# Default to g++ 3.3
+if (platform=='posix') or (platform=='darwin'):
+    env.Replace ( CXX = 'g++-3.3' )
 
 # -------------------------------------------------------
 # Common build configuration

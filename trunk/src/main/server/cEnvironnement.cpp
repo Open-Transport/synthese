@@ -2894,10 +2894,8 @@ tIndex cEnvironnement::Enregistre(cReseau *newVal, tIndex index)
 bool        
 cEnvironnement::ChargeFichiersRoutes () {
  
-  /*
   cFichierXML fichierXML ("");
   fichierXML.chargeDonneesRoutes (vNomRepertoireCarto, *this);
-  */
 
   return true;
 }
