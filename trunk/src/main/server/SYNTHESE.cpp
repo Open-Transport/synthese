@@ -6,6 +6,10 @@
 #include "cAccesPADe.h"
 #include "cArretLogique.h"
 
+#ifdef UNIX
+pthread_mutex_t mutex_associateur = PTHREAD_MUTEX_INITIALIZER;
+#endif
+
 SYNTHESE::SYNTHESE()
 {
 	_NiveauLOG = LogInfo;
@@ -15,8 +19,6 @@ SYNTHESE::SYNTHESE()
 SYNTHESE::~SYNTHESE()
 {
 }
-
-
 
 
 /*!	\brief Enregistrement d'un site client dans le tableau des pointeurs
@@ -53,7 +55,7 @@ void SYNTHESE::ChargeMessagesStandard()
 		/*! <tr><th colspan="4">Application SYNTHESE</th></tr>
 		<tr><td>APP-001</td><td>Normal</td><td>Indique un dï¿½marrage de l'application.</td><td></td></tr>" */
 		_CodesMessageStandard.SetElement("APP-001", MESSAGE_APP_START);
-		_MessageStandard.SetElement("Dï¿½marrage de l'application. Ouverture des fichiers de log standard", MESSAGE_APP_START);
+		_MessageStandard.SetElement("Démarrage de l'application. Ouverture des fichiers de log standard", MESSAGE_APP_START);
 		_NiveauMessageStandard.SetElement(LogInfo, MESSAGE_APP_START);
 
 		/*! <tr><th colspan="4">Sites</th></tr>
@@ -64,36 +66,36 @@ void SYNTHESE::ChargeMessagesStandard()
 
 		/*! <tr><td>SIT-002</td><td>Erreur fatale</td><td>Le fichier sites.per n'a pas ï¿½tï¿½ trouvï¿½ dans le rï¿½pertoire de l'environnement.</td><td>Vï¿½rifier que le fichier existe et que son nom est bien orthographiï¿½</td></tr>" */
 		_CodesMessageStandard.SetElement("SIT-002", MESSAGE_SITES_PBOUVRIR);
-		_MessageStandard.SetElement("Fichier sites.per non trouvï¿½", MESSAGE_SITES_PBOUVRIR);
+		_MessageStandard.SetElement("Fichier sites.per non trouv2", MESSAGE_SITES_PBOUVRIR);
 		_NiveauMessageStandard.SetElement(LogError, MESSAGE_SITES_PBOUVRIR);
 
 		/*! <tr><td>SIT-003</td><td>Element ignorï¿½</td><td>Un site n'a pu ï¿½tre enregistrï¿½ dans l'application ete n sera donc pas disponible.</td><td></td></tr>" */
 		_CodesMessageStandard.SetElement("SIT-003", MESSAGE_SITES_PBENREG);
-		_MessageStandard.SetElement("Problï¿½me d'enregistrement du site", MESSAGE_SITES_PBENREG);
+		_MessageStandard.SetElement("Problème d'enregistrement du site", MESSAGE_SITES_PBENREG);
 		_NiveauMessageStandard.SetElement(LogWarning, MESSAGE_SITES_PBENREG);
 		
 		/*! <tr><td>SIT-004</td><td>Element ignorï¿½</td><td>Un site pointe sur un environnement inexistant et ne sera donc pas disponible.</td><td>Vï¿½rifier la valeur du champ environnement dans la description du site</td></tr>" */
 		_CodesMessageStandard.SetElement("SIT-004", MESSAGE_SITES_PBENV);
-		_MessageStandard.SetElement("Site : Environnement incorrect dï¿½clarï¿½", MESSAGE_SITES_PBENV);
+		_MessageStandard.SetElement("Site : Environnement incorrect déclaré", MESSAGE_SITES_PBENV);
 		_NiveauMessageStandard.SetElement(LogWarning, MESSAGE_SITES_PBENV);
 
 		/*! <tr><td>SIT-005</td><td>Element ignorï¿½</td><td>Un site pointe sur une interface inexistante et ne sera donc pas disponible.</td><td>Vï¿½rifier la valeur du champ interface dans la description du site</td></tr>" */
 		_CodesMessageStandard.SetElement("SIT-005", MESSAGE_SITES_PBINT);
-		_MessageStandard.SetElement("Site : Environnement incorrect dï¿½clarï¿½", MESSAGE_SITES_PBINT);
+		_MessageStandard.SetElement("Site : Environnement incorrect déclaré", MESSAGE_SITES_PBINT);
 		_NiveauMessageStandard.SetElement(LogWarning, MESSAGE_SITES_PBINT);
 		
 
 		/*! <tr><th colspan="4">Points d'arrï¿½t</th></tr>
 		<tr><td>GAR-001</td><td>Elï¿½ment ignorï¿½</td><td>La dï¿½signation de l'arrï¿½t n'est pas correctement entrï¿½e</td><td>Vï¿½rifier la conformitï¿½ de la dï¿½signation</tr>" */
 		_CodesMessageStandard.SetElement("GAR-001", MESSAGE_GARE_DESIGNATION_INCORRECTE);
-		_MessageStandard.SetElement("Dï¿½signation incorrecte", MESSAGE_GARE_DESIGNATION_INCORRECTE);
+		_MessageStandard.SetElement("Désignation incorrecte", MESSAGE_GARE_DESIGNATION_INCORRECTE);
 		_NiveauMessageStandard.SetElement(LogError, MESSAGE_GARE_DESIGNATION_INCORRECTE);
 		
 		
 		/*! <tr><th colspan="4">Calculateur</th></tr>
 		<tr><td>CAL-001</td><td>Calcul annulï¿½</td><td>Le nombre maximal de calculs simultanï¿½s par a ï¿½tï¿½ dï¿½passï¿½.</td><td>Si cela se produit trop souvent, augmenter le nombre de serveurs</td></tr>" */
 		_CodesMessageStandard.SetElement("CAL-001", MESSAGE_CALC_SATURE);
-		_MessageStandard.SetElement("Nombre de calculs simultanï¿½s dï¿½passï¿½", MESSAGE_CALC_SATURE);
+		_MessageStandard.SetElement("Nombre de calculs simultanés dépassé", MESSAGE_CALC_SATURE);
 		_NiveauMessageStandard.SetElement(LogError, MESSAGE_CALC_SATURE);
 
 	}
@@ -444,24 +446,89 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 						const cDate& __DateDepart, tIndex codePeriode,
 						tBool3 velo, tBool3 handicape, tBool3 taxibus, tNumeroTarif tarif) const
 {
+    /* patch de test
+       aucune intégration
+       pour intégration au model synthese, voir version full c++ en cours
+       ceci ne fonctionne qu'avec un fichier de réseau de neurones généré avec csv2net
+       avec la ligne 115 definie comme suit: final = city+':'+stop
+       */
+    cAssocResult resPD, resPA;
+    cAssocResult::iterator it;
+    vector<string> output;
+    cTexte newtxtCD,newtxtAD,newtxtCA,newtxtAA;
+#ifdef UNIX
+    pthread_mutex_lock( &mutex_associateur );
+#endif
+    // utilisation de l'associateur pour le départ
+    _Associator->Try(txtCD.Texte(),txtAD.Texte());
+    resPD = _Associator->MatchCity(1); // liste des communes
+    it = resPD.begin();
+    cout << "commune " << it->id << " ";
+    resPD = _Associator->MatchPoint(10); // liste des arrets
+    // vérification d'ambiguité sur les arrets
+    it = resPD.begin();
+    _Associator->tokenize(it->id, output, ":");
+    cout << "depart " << output[0] << "-" << output[1] << endl;
+    newtxtCD = output[0];
+    newtxtAD = output[1];
+    /*
+    if((it->score == 100) && (it->delta >= 10)) // && resPT.size() < 10 ??
+        cout << "best: " << it->id << endl;
+    else for(; it!=resPD.end(); ++it)
+        cout << it->id << " " << it->score << " " << it->delta << endl;
+        */
+    //resPL = _Associator->MatchPlace(10); // liste des adresses
+    // vérification d'ambiguité sur les arrets
+
+    // utilisation de l'associateur pour l'arrivée
+    _Associator->Try(txtCA.Texte(),txtAA.Texte());
+    resPA = _Associator->MatchCity(1); // liste des communes
+    it = resPA.begin();
+    cout << "commune " << it->id << " ";
+    resPA = _Associator->MatchPoint(10); // liste des arrets
+    it = resPA.begin();
+    _Associator->tokenize(it->id, output, ":");
+    cout << "arrivee " << output[0] << "-" << output[1] << endl;
+    newtxtCA = output[0];
+    newtxtAA = output[1];
+    /*
+    if((it->score == 100) && (it->delta >= 10)) // && resPT.size() < 10 ??
+        cout << "best: " << it->id << endl;
+    else for(; it!=resPA.end(); ++it)
+        cout << it->id << " " << it->score << " " << it->delta << endl;
+        */
+#ifdef UNIX
+    pthread_mutex_unlock( &mutex_associateur );
+#endif
+
+        // si pas ambiguité arret mais ambiguité lieu, prendre arret
+        // si embiguité arret mais pas ambiguité lieu, demander arret à carto
+        // si ambiguite arret et lieu, présenter liste
+        // si pas ambiguité arret et pas ambiguité lieu, présenter couple
+
+        // chopper topographie
+        // route=getroad(idroute)
+        //getcommune(pade)->index()
+
+
 	// Test des entrï¿½es
-	if(	(nCD == INCONNU || __Site->getEnvironnement()->ControleNumeroTexteCommune(nCD, txtCD))
-	&&	(nAD == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAD, nCD, nDD, txtAD))
-	&&	(nCA == INCONNU || __Site->getEnvironnement()->ControleNumeroTexteCommune(nCA, txtCA))
-	&&	(nAA == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAA, nCA, nDA, txtAA))
+	if(	(nCD == INCONNU || __Site->getEnvironnement()->ControleNumeroTexteCommune(nCD, newtxtCD))
+	&&	(nAD == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAD, nCD, nDD, newtxtAD))
+	&&	(nCA == INCONNU || __Site->getEnvironnement()->ControleNumeroTexteCommune(nCA, newtxtCA))
+	&&	(nAA == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAA, nCA, nDA, newtxtAA))
 	&& 	__DateDepart.OK()
 	&&	__Site->getEnvironnement()->isTarif(tarif))
 	{
-		// Dï¿½clarations
-		cCommune** tbCommune=NULL;
-		cAccesPADe** tbPADe=NULL;
+		// Déclarations
+        cCommune** tbCommune=NULL;
+        cAccesPADe** tbPADe=NULL;
 
-		// Traitement des entrï¿½es
+		// Traitement des entrées
 		if (nAD == INCONNU)
 		{
 			if (nCD == INCONNU)
 			{
-				tbCommune = __Site->getEnvironnement()->TextToCommune(txtCD, 2);
+				tbCommune = __Site->getEnvironnement()->TextToCommune(newtxtCD, 2);
 				if (tbCommune[0] != NULL)
 					nCD = tbCommune[0]->Index();
 			}
@@ -475,7 +542,7 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 				}
 				else
 				{
-					tbPADe = __Site->getEnvironnement()->getCommune(nCD)->textToPADe(txtAD, 2);
+					tbPADe = __Site->getEnvironnement()->getCommune(nCD)->textToPADe(newtxtAD, 2);
 					if (tbPADe[0] != NULL)
 					{
 						nAD = tbPADe[0]->numeroArretLogique();
@@ -489,7 +556,7 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 		{
 			if (nCA == INCONNU)
 			{
-				tbCommune = __Site->getEnvironnement()->TextToCommune(txtCA, 2);
+				tbCommune = __Site->getEnvironnement()->TextToCommune(newtxtCA, 2);
 				if (tbCommune[0] != NULL)
 					nCA = tbCommune[0]->Index();
 			}
@@ -502,7 +569,7 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 				}
 				else
 				{
-					tbPADe = __Site->getEnvironnement()->getCommune(nCA)->textToPADe(txtAA, 2);
+					tbPADe = __Site->getEnvironnement()->getCommune(nCA)->textToPADe(newtxtAA, 2);
 					if (tbPADe[0] != NULL)
 					{
 						nAA = tbPADe[0]->numeroArretLogique();
@@ -819,18 +886,18 @@ bool SYNTHESE::ListeArrets(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 	
 	// 1: Recherche de la commune entrï¿½e.
 	cCommune* curCommune = __Site->getEnvironnement()->GetCommune(NumeroCommune);
-
+    
 	if (curCommune == NULL)
 	{
 		cCommune** tbCommune = __Site->getEnvironnement()->TextToCommune(Commune, 0);
 		if ((tbCommune[0] == NULL) && depart)
 		{
-			pCtxt << "<script>alert(\"Aucune commune de dï¿½part ne correspond. Veuillez la modifier.\")</script>";
+			pCtxt << "<script>alert(\"Aucune commune de départ ne correspond. Veuillez la modifier.\")</script>";
 			ListeCommunes(pCtxt, pCerr, __Site, true, Commune);
 		}
 		else if ((tbCommune[0] == NULL) && !depart)
 		{
-			pCtxt << "<script>alert(\"Aucune commune d'arrivï¿½e ne correspond. Veuillez la modifier.\")</script>";
+			pCtxt << "<script>alert(\"Aucune commune d'arrivée ne correspond. Veuillez la modifier.\")</script>";
 			ListeCommunes(pCtxt, pCerr, __Site, false, Commune);
 		}
 		else
@@ -1006,6 +1073,8 @@ bool SYNTHESE::ExecuteRequete(ostream &pCtxt, ostream &pCerr, cTexteRequeteSYNTH
 	//				, __Requete.getInt(NOMBRE_PROPOSITIONS)	// A mettre dans l'interface
 	//				);
 		
+        /* cela ne fonctionne plus comme ça, donc ces fonctions deviennent inutile
+        note: j'ai aussi change interfaces/6/formulaireentree.elementinterface.per
 		if (__Fonction == FONCTION_LISTE_COMMUNE)
 			return ListeCommunes(pCtxt, pCerr, __Site
 					, __Requete.getInt(REQUETE_COMMANDE_SENS) != 0
@@ -1019,7 +1088,8 @@ bool SYNTHESE::ExecuteRequete(ostream &pCtxt, ostream &pCerr, cTexteRequeteSYNTH
 					, __Requete.getInt(REQUETE_COMMANDE_NUMERO_COMMUNE)
 					, __Requete.getTexte(REQUETE_COMMANDE_RECHERCHE)
 					);
-			
+			*/
+
 		if (__Fonction == FONCTION_VALID_FICHE_HORAIRE)
 			return ValidFH(pCtxt, pCerr, __Site
 					, __Requete.getTexte(REQUETE_COMMANDE_COMMUNE_DEPART)
@@ -1218,3 +1288,10 @@ cTableauDynamique<cTableauAffichage*>& SYNTHESE::TableauTableauxAffichage()
 {
 	return _TableauxAffichage;
 }
+
+bool SYNTHESE::InitAssociateur(const cTexte& __NomAssociateur)
+{
+    _Associator = new cAssociator(__NomAssociateur.Texte());
+    return _Associator->IsLoaded();
+}
+

@@ -1,9 +1,15 @@
+/*
+   Mnesia<->C++ Wrapper
+   Christophe Romain <chris@erlang-fr.org>
+   2005
+*/
+
 #include "cServeurMnesia.h"
 #include <stdlib.h>
 #include <iostream>
 
 
-// #define DEMO // juste le temps de debuger
+// #define TESTING // juste le temps de debuger
 
 
 unsigned short cServeurMnesia::_NodeId = 1;
@@ -43,7 +49,7 @@ tIndex cServeurMnesia::Select(const cTexte& __Table,const cTableauDynamique<cTex
     __Eres = _call("rcsdb","select",__Args);
     if (__Eres)
     {
-        ETERM *__List,
+        ETERM *__List;
         __Resultat.Vide();
         for (__List = __Eres; ! ERL_IS_EMPTY_LIST(__List); __List = ERL_CONS_TAIL(__List)) 
         {
@@ -53,18 +59,29 @@ tIndex cServeurMnesia::Select(const cTexte& __Table,const cTableauDynamique<cTex
             {
                 for(int __Position = 0; __Position < ERL_TUPLE_SIZE(__Tuple); __Position++)
                 {
-                    ETERM *__Value = erl_element(__Position, __Tuple)
-                    cResultatBaseDeDonnees_Cellule __Cellule;
+                    ETERM *__Value = erl_element(__Position, __Tuple);
+                    /*
+                    cResultatBaseDeDonnees_Cellule_Nombre __Num;
+                    cResultatBaseDeDonnees_Cellule_Texte __Txt;
                     // nom du champ
                     //__Resultat.SetPositionChamp("label", __Position);
                     // champ entier
-                    if (ERL_IS_INTEGER(__Value)) __Resultat.SetValeur(__Position, ERL_INT_VALUE(t));
-                    if (ERL_IS_UNSIGNED_INTEGER(__Value)) __Resultat.SetValeur(__Position, ERL_INT_UVALUE(t));
+                    if (ERL_IS_INTEGER(__Value))
+                        __Num = ERL_INT_VALUE(__Value);
+                    if (ERL_IS_UNSIGNED_INTEGER(__Value))
+                        __Num = ERL_INT_UVALUE(__Value);
                     // champ flotant
-                    if (ERL_IS_FLOAT(__Value)) __Resultat.SetValeur(__Position, ERL_FLOAT_VALUE(t));
+                    if (ERL_IS_FLOAT(__Value))
+                        __Num = ERL_FLOAT_VALUE(__Value);
                     // chaine
-                    if (ERL_IS_ATOM(__Value)) __Resultat.SetValeur(__Position, ERL_ATOM_PTR(t));
-                    if (ERL_IS_LIST(__Value)) __Resultat.SetValeur(__Position, ERL_ATOM_PTR(t));
+                    if (ERL_IS_ATOM(__Value))
+                        __Txt = ERL_ATOM_PTR(__Value);
+                    if (ERL_IS_LIST(__Value))
+                        __Txt = erl_iolist_to_string(__Value);
+                    // enregistrement du résultat
+                    //__Resultat.SetValeur(__Position,__Cellue);
+                    */
+                    erl_free_term(__Value);
                 }
             }
         }
@@ -73,14 +90,13 @@ tIndex cServeurMnesia::Select(const cTexte& __Table,const cTableauDynamique<cTex
     return __Count;
 }
 
-bool cServeurMnesia::Insert(const cTexte& __Table,cResultatBaseDeDonnees& __Valeurs,bool __Replace=true)
+bool cServeurMnesia::Insert(const cTexte& __Table,const cTexte& __Valeurs,bool __Replace=true)
 {
     cTexte __Args;
     ETERM *__Eres;
     bool __IsOK = false;
     __Args << "[" << __Table;
-    // A FINIR, la version SQL est OK
-    // -> __Args << "," << "[{nom,\"toto\"},{prenom,\"titi\"}]";
+    __Args << _value2erl(__Valeurs);
     __Args << "]";
     __Eres = _call("rcsdb","insert",__Args);
     if (__Eres)
@@ -91,14 +107,13 @@ bool cServeurMnesia::Insert(const cTexte& __Table,cResultatBaseDeDonnees& __Vale
     return __IsOK;
 }
 
-tIndex cServeurMnesia::Update(const cTexte& __Table,const cTableauDynamique<cTexte>& __Champs,const cTableauDynamique<cTexte>& __Valeurs,const cTexte& __Where,tIndex __Limite = INCONNU) 
+tIndex cServeurMnesia::Update(const cTexte& __Table,const cTableauDynamique<cTexte>& __Champs,const cTexte& __Valeurs,const cTexte& __Where,tIndex __Limite = INCONNU) 
 {
     cTexte __Args;
     ETERM *__Eres;
     tIndex __Count = -1;
     __Args << "[" << __Table << ",";
-    // A FINIR, utiliser le insert SQL
-    // -> __Args << "," << "[{nom,\"toto\"},{prenom,\"titi\"}]";
+    __Args << _value2erl(__Valeurs);
     __Args << _where2erl(__Where);
     __Args << "]";
     __Eres = _call("rcsdb","update",__Args);
@@ -178,9 +193,9 @@ tIndex cServeurMnesia::NextID(const cTexte& __Table)
 // fonction obsolete, laissé au cas ou
 void cServeurMnesia::SQL(const cTexteSQL& __RequeteSQL)
 {
-    // ETERM *__Eres;
-    // __Eres = _call("rcsdb","sql",__RequeteSQL.Texte());
-    //erl_free_term(__Eres);
+    ETERM *__Eres;
+    __Eres = _call("rcsdb","sql",__RequeteSQL.Texte());
+    erl_free_term(__Eres);
 }
 
 // fonction temporaire pour format where
@@ -234,7 +249,7 @@ cTexte cServeurMnesia::_where2erl(const cTexte& __Where)
 // seul AND est géré
 cTexte cServeurMnesia::_value2erl(const cTexte& __Where)
 {
-    // in:  nom = toto AND prenom = titi
+    // in:  nom = "toto" AND prenom = "titi"
     // out: [{nom,"toto"},{prenom,"titi"}]
     cTexte __Final;
     char buffer[1024];
@@ -243,7 +258,25 @@ cTexte cServeurMnesia::_value2erl(const cTexte& __Where)
     __Final << "[";
     strncpy(buffer,__Where.Texte(),1024);
     ptr = buffer;
-    // A FINIR
+    while(cont)
+    {
+        while(*ptr == ' ') ptr++;
+        last = ptr;
+        while(*ptr != ' ') ptr++;
+        *ptr = 0; ptr++;
+        __Final << "{" << cTexte(last);
+        while(*ptr == ' ' || *ptr == '=') ptr++;
+        last = ptr;
+        while(*ptr != ' ') ptr++;
+        *ptr = 0; ptr++;
+        __Final << "," << cTexte(last) << "}";
+        while(*ptr == ' ') ptr++;
+        last = ptr; // contiendra AND ou rien
+        while(*ptr != ' ' && *ptr) ptr++;
+        cont = *ptr;
+        *ptr = 0; ptr++;
+        if(cont) __Final << ",";
+    }
     __Final << "]";
     return __Final;
 }
@@ -255,8 +288,8 @@ ETERM *cServeurMnesia::_call(const cTexte& __Mod,const cTexte& __Fun,const cText
     __Eres = NULL;
     if (_ErlFD > 0)
     {
-#ifdef DEMO
-        printf("> %s:%s(%s).\n",__Mod.Texte(),__Fun.Texte(),__Args.Texte());
+#ifdef TESTING
+        cout << "> " << __Mod << ":" << __Fun << __Args << endl;
 #endif
         __Earg = erl_format(__Args.Texte());
         __Eres = erl_rpc(_ErlFD,__Mod.Texte(),__Fun.Texte(),__Earg);
@@ -319,12 +352,13 @@ void cServeurMnesia::_recv()
 }
 
 
-#ifdef DEMO
+#ifdef TESTING
 int main(int argc, char **argv)
 {
     cServeurMnesia __srv("db0@iBook","rcs");
     cResultatBaseDeDonnees __Resultat;
 
+    cout << __srv._value2erl(" nom = \"toto\" AND prenom = \"titi\"");
     cTexte __Table("personnes");
     cTexte __Where1("where nom = \"romain\"");
     cTexte __Where2("where nom = \"romain\" and id < 5");

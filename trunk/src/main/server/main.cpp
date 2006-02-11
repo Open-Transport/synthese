@@ -445,11 +445,8 @@ void *ServerThread(void *args)
         // Attente de connection
         pthread_mutex_lock( &ServerMutex );
         pContext->socket = Socket.Accept();
-        pthread_mutex_unlock( &ServerMutex );
-        // Mise � jour du contexte, utilisation en cours
-        pthread_mutex_lock( &CalculMutex );
         RunningThreads++;
-        pthread_mutex_unlock( &CalculMutex );
+        pthread_mutex_unlock( &ServerMutex );
 #endif
         pContext->counter = 0;
         pContext->running = true;
@@ -506,9 +503,9 @@ void *ServerThread(void *args)
         }
         // fin d'utilisation
 #ifdef UNIX
-        pthread_mutex_lock( &CalculMutex );
+        pthread_mutex_lock( &ServerMutex );
         RunningThreads--;
-        pthread_mutex_unlock( &CalculMutex );
+        pthread_mutex_unlock( &ServerMutex );
 #endif
     }
     return NULL;
@@ -576,6 +573,7 @@ void AfficheUsage(const cTexte& __Nom)
     cout << " -t [1-1024]         nombre de connexions simultan�es g�r�es" << endl;
     cout << " -p port_num         �coute sur le port sp�cifi�" << endl;
     cout << " -b database         path vers le r�pertoire base de donn�e" << endl;
+    cout << " -a dict             path vers le dictionnaire de l'associateur" << endl;
     exit(EXIT_FAILURE);
 }
 
@@ -606,7 +604,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
         int i;
         int __NombreCalculateursParEnvironnement = NOMBRE_CALCULATEURS_PAR_ENVIRONNEMENT_DEFAUT;
         int __PortServeur = DEF_PORT;
-        cTexte database;
+        cTexte database, associator;
 
         //recuperation des arguments
         for (i = 1; i < argc; i++) 
@@ -638,6 +636,10 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
                         if(++i >= argc) AfficheUsage(argv[0]);
                         database = cTexte(argv[i]);
                         break;
+                    case 'a':    // Associator
+                        if(++i >= argc) AfficheUsage(argv[0]);
+                        associator = cTexte(argv[i]);
+                        break;
                     case 'c':    // Calculateurs
                         if(++i >= argc) AfficheUsage(argv[0]);
                         __NombreCalculateursParEnvironnement = atoi(argv[i]);
@@ -659,11 +661,15 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
         }
 
         /* Verification du renseignement des variables */
-        if(!database.Taille())
+        if(!database.Taille() || !associator.Taille())
             AfficheUsage(argv[0]);
 
         /* Chargement de Synthese */
         if(!Synthese.Charge(database, __NombreCalculateursParEnvironnement))
+            return EXIT_FAILURE;
+        
+        /* Chargement de Synthese */
+        if(!Synthese.InitAssociateur(associator))
             return EXIT_FAILURE;
         
         cout << "Chargement termine." << endl;

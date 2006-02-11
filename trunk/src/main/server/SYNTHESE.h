@@ -17,6 +17,7 @@ class SYNTHESE;
 #include "cTexteRequeteSYNTHESE.h"
 #include "cLog.h"
 #include "cTableauAffichage.h"
+#include "cAssociator.h"
 
 /**	@defgroup m00 00 Architecture : serveur TCP et main
 
@@ -73,6 +74,7 @@ class SYNTHESE
 	cTableauDynamiquePointeurs<cInterface*>			_Interface;			//!< Interfaces d'affichage
 	cTableauDynamiquePointeurs<cSite*>				_Site;				//!< Sites d'acc�s
 	cTableauDynamiquePointeurs<cTableauAffichage*>	_TableauxAffichage;	//Tableaux d'affichage
+    cAssociator *_Associator; // Dictionnaire des arrets et lieux
 	//@}
 	
 	//!	\name Fichier de log
@@ -151,6 +153,7 @@ public:
 
 	//!	\name Modificateurs
 	//@{
+	bool	InitAssociateur(const cTexte& NomAssociateur);
 	bool	Charge(const cTexte& NomFichier, int __NombreCalculateursParEnvironnement);
 	void	SetNiveauLog(tNiveauLog);
 	void	SetCheminLog(const cTexte&);
