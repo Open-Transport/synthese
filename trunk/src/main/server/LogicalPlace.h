@@ -189,11 +189,11 @@ public:
     //@{
     // cElementTrajet*   ProchainDirect(LogicalPlace* Destination, cMoment& MomentDepart, const cMoment& ArriveeMax
     //        , tIndex ArretPhysiqueArriveePrecedente)          const;
-    cMoment     MomentArriveePrecedente (const cMoment& MomentArrivee, const cMoment& MomentArriveeMin)  const;
-    cMoment     MomentDepartSuivant(const cMoment& MomentDepart, const cMoment& MomentDepartMax
-                                    , const cMoment& __MomentCalcul)          const;
-    cGareLigne*    DessertAuDepart (const cLigne*)                const;
-    cGareLigne*    DessertALArrivee    (const cLigne*)            const;
+//    cMoment     MomentArriveePrecedente (const cMoment& MomentArrivee, const cMoment& MomentArriveeMin)  const;
+  //  cMoment     MomentDepartSuivant(const cMoment& MomentDepart, const cMoment& MomentDepartMax
+    //                                , const cMoment& __MomentCalcul)          const;
+  //  cGareLigne*    DessertAuDepart (const cLigne*)                const;
+  //  cGareLigne*    DessertALArrivee    (const cLigne*)            const;
     tNiveauCorrespondance NiveauCorrespondance   (const cDistanceCarree& D)         const;
     LogicalPlace*   accurateAddressLogicalPlace(synmap::Address::AddressNumber addressNumber)       ;
     //@}

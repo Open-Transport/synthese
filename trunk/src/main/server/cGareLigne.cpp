@@ -863,8 +863,8 @@ void cGareLigne::setPADepartSuivant()
 {
 //	if (!vLigne->EstUneRoute())
 //	{
-		vPADepartSuivant = vArretLogique->PremiereGareLigneDep();
-		vArretLogique->setPremiereGareLigneDep(this);
+		vPADepartSuivant = _physicalStop->PremiereGareLigneDep();
+		_physicalStop->setPremiereGareLigneDep(this);
 //	}
 }
 
@@ -872,8 +872,8 @@ void cGareLigne::setPAArriveeSuivant()
 {
 //	if (!vLigne->EstUneRoute())
 //	{
-		vPAArriveeSuivante = vArretLogique->PremiereGareLigneArr();
-		vArretLogique->setPremiereGareLigneArr(this);
+	vPAArriveeSuivante = _physicalStop->PremiereGareLigneArr();
+		_physicalStop->setPremiereGareLigneArr(this);
 //	}
 }
 

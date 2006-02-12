@@ -16,6 +16,9 @@
 cArretPhysique::cArretPhysique(LogicalPlace* logicalPlace, size_t rank)
 : NetworkAccessPoint(logicalPlace, rank)
 {
+	_firstArrivalLineStop = NULL;
+	_firstDepartureLineStop = NULL;
+
 }
 
 cArretPhysique::~cArretPhysique()

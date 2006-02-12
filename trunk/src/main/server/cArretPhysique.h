@@ -12,6 +12,8 @@
 
 #include "NetworkAccessPoint.h"
 
+class cGareLigne;
+
 /*! \brief Arr�ts physiques (quais, arr�ts de bus, etc.)
 	@ingroup m05
 */
