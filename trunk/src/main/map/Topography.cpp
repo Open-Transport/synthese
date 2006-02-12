@@ -157,6 +157,7 @@ Topography::getEdge (const Vertex* from, const Vertex* to) const
 const Road* 
 Topography::newRoad (int key,
 		     const std::string& name,
+		     const Road::RoadType& type,
 		     const std::string& discriminant,
 		     const cCommune* town,
 		     const std::vector<RoadChunk*>& chunks)
@@ -164,6 +165,7 @@ Topography::newRoad (int key,
   Road* road = new Road (this, 
 			 key, 
 			 name, 
+			 type,
 			 discriminant,
 			 town,
 			 chunks);
@@ -215,13 +217,15 @@ Topography::newRoadChunk (int key,
 
 
 const PhysicalStop* 
-Topography::newPhysicalStop (int key,
-			     const Vertex* vertex)
+Topography::newPhysicalStop (
+			   int logicalPlaceId,
+			   int rank,
+			   const Vertex* vertex)
 {
   assert (vertex != 0);
-  PhysicalStop* stop = new PhysicalStop (this, key, vertex);
+  PhysicalStop* stop = new PhysicalStop (this, logicalPlaceId, rank, vertex);
   
-  _physicalStops.insert (make_pair (key, stop));
+  _physicalStops.insert (make_pair (stop->getKey (), stop));
   
   addVertexReferrant (vertex, stop);
   

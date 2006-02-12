@@ -5,10 +5,13 @@ namespace synmap
 {
 
 PhysicalStop::PhysicalStop(Topography* topography, 
-			   int key,
+			   int logicalPlaceId,
+			   int rank,
 			   const Vertex* vertex)
   : Location (vertex)
-  , Referrant (topography, key)
+  , Referrant (topography, logicalPlaceId * 1000 + rank)
+  , _logicalPlaceId (logicalPlaceId)
+  , _rank (rank)
 {
   
 }

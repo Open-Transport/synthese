@@ -17,15 +17,21 @@ class PhysicalStop : public Location, public Referrant
 	
 private:
 
+  const int _logicalPlaceId;
+  const int _rank;
 	
 public:
 
 	PhysicalStop(Topography* topography, 
-		     int key,
+		     int logicalPlaceId,
+		     int rank,
 		     const Vertex* vertex);
 				 
 	virtual ~PhysicalStop();
 
+
+	int getLogicalPlaceId () const { return _logicalPlaceId; }
+	int getRank () const { return _rank; }
 
 	
 	friend class Topography;

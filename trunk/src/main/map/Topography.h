@@ -7,6 +7,7 @@
 #include <set>
 #include <map>
 
+#include "Road.h"
 #include "RoadChunk.h"
 #include "Address.h"
 
@@ -128,6 +129,7 @@ namespace synmap
 
       const Road* newRoad (int key,
 			   const std::string& name,
+			   const Road::RoadType& type,
 			   const std::string& discriminant,
 			   const cCommune* town,
 			   const std::vector<RoadChunk*>& chunks);
@@ -141,7 +143,9 @@ namespace synmap
 			       const Address::AddressNumber& leftEndNumber);
 
 	
-      const PhysicalStop* newPhysicalStop (int key,
+      const PhysicalStop* newPhysicalStop (
+					   int logicalPlaceId,
+					   int rank,
 					   const Vertex* vertex);
 	
       const Itinerary* newItinerary (int key,

@@ -65,6 +65,7 @@ const std::string cFichierXML::ARRET_PHYSIQUE_RANG_ATTR = "rang";
 const std::string cFichierXML::ARRET_PHYSIQUE_NOM_ATTR = "nom";
 const std::string cFichierXML::ARRET_PHYSIQUE_X_ATTR = "x";
 const std::string cFichierXML::ARRET_PHYSIQUE_Y_ATTR = "y";
+const std::string cFichierXML::ARRET_PHYSIQUE_LIEU_LOGIQUE_ATTR = "lieu_logique";
 	
 const std::string cFichierXML::DELAI_TAG = "delai";
 const std::string cFichierXML::DELAI_ORIGINE_ATTR = "origine";
@@ -332,7 +333,21 @@ const std::string cFichierXML::COMMUNE_CODE_POSTAL_DEFAUT_ATTR = "code_postal_de
 const std::string cFichierXML::ROUTE_TAG = "route";
 const std::string cFichierXML::ROUTE_ID_ATTR = "id";
 const std::string cFichierXML::ROUTE_NOM_ATTR = "nom";
+const std::string cFichierXML::ROUTE_TYPE_ATTR = "type";
 const std::string cFichierXML::ROUTE_DISCRIMINANT_ATTR = "discriminant";
+
+const std::string cFichierXML::ROUTE_TYPE_AUTOROUTE = "autoroute";
+const std::string cFichierXML::ROUTE_TYPE_ATTR_ROUTE_CHAUSSEES_SEPAREES = "route a chaussees separees";
+const std::string cFichierXML::ROUTE_TYPE_ATTR_AXE_PRINCIPAL = "axe principal";
+const std::string cFichierXML::ROUTE_TYPE_ATTR_AXE_SECONDAIRE = "axe secondaire";
+const std::string cFichierXML::ROUTE_TYPE_ATTR_PONT = "pont";
+const std::string cFichierXML::ROUTE_TYPE_ATTR_RUE = "rue";
+const std::string cFichierXML::ROUTE_TYPE_ATTR_RUE_PIETONNE = "rue pietonne";
+const std::string cFichierXML::ROUTE_TYPE_ATTR_BRETELLE = "bretelle";
+const std::string cFichierXML::ROUTE_TYPE_ATTR_VOIE_PRIVEE = "voie privee";
+const std::string cFichierXML::ROUTE_TYPE_ATTR_CHEMIN = "chemin";
+const std::string cFichierXML::ROUTE_TYPE_ATTR_TUNNEL = "tunnel";
+const std::string cFichierXML::ROUTE_TYPE_ATTR_ROUTE_SECONDAIRE = "route secondaire";
 
 const std::string cFichierXML::SEGMENT_ROUTE_TAG = "segment_route";
 const std::string cFichierXML::SEGMENT_ROUTE_ID_ATTR = "id";
@@ -500,6 +515,21 @@ cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement
     int routeId = atoi (routeNode.getAttribute (ROUTE_ID_ATTR.c_str()));
     std::string routeNameAttr (routeNode.getAttribute (ROUTE_NOM_ATTR.c_str()));
     std::string routeDiscrAttr (routeNode.getAttribute (ROUTE_DISCRIMINANT_ATTR.c_str()));
+    std::string routeType = routeNode.getAttribute (ROUTE_TYPE_ATTR.c_str());
+    
+    Road::RoadType type = Road::UNKNOWN_ROAD_TYPE;
+    if (routeType == ROUTE_TYPE_AUTOROUTE) type = Road::MOTORWAY;
+    else if (routeType == ROUTE_TYPE_ATTR_ROUTE_CHAUSSEES_SEPAREES) type = Road::MEDIAN_STRIPPED_ROAD;
+    else if (routeType == ROUTE_TYPE_ATTR_AXE_PRINCIPAL) type = Road::PRINCIPLE_AXIS;
+    else if (routeType == ROUTE_TYPE_ATTR_AXE_SECONDAIRE) type = Road::SECONDARY_AXIS;
+    else if (routeType == ROUTE_TYPE_ATTR_PONT) type = Road::BRIDGE;
+    else if (routeType == ROUTE_TYPE_ATTR_RUE) type = Road::STREET;
+    else if (routeType == ROUTE_TYPE_ATTR_RUE_PIETONNE) type = Road::PEDESTRIAN_STREET;
+    else if (routeType == ROUTE_TYPE_ATTR_BRETELLE) type = Road::ACCESS_ROAD;
+    else if (routeType == ROUTE_TYPE_ATTR_VOIE_PRIVEE) type = Road::PRIVATE_WAY;
+    else if (routeType == ROUTE_TYPE_ATTR_CHEMIN) type = Road::PEDESTRIAN_PATH;
+    else if (routeType == ROUTE_TYPE_ATTR_TUNNEL) type = Road::TUNNEL;
+    else if (routeType == ROUTE_TYPE_ATTR_ROUTE_SECONDAIRE) type = Road::HIGHWAY;
 
     // log (routeNameAttr);
     
@@ -515,25 +545,50 @@ cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement
       double nfg = atof (segRouteNode.getAttribute (SEGMENT_ROUTE_NO_FIN_GAUCHE_ATTR.c_str()));
 
       std::vector<const Location*> steps;
-      int nbLocations = segRouteNode.nChildNode(POINT_TAG.c_str());
+
+
+      /*
+	for (int i=0; i<node.nChildNode(); ++i) 
+	{
+		XMLNode childNode = node.getChildNode(i);
+		// const XMLNodeContents& childElt = node.enumContents(i);
+		std::string name = childNode.getName ();
+		
+		if (name == ARRET_LOGIQUE_TAG) 
+      */
+
+
+      int nbLocations = segRouteNode.nChildNode();
       for (int k=0; k<nbLocations; ++k) {
-	XMLNode locationNode = segRouteNode.getChildNode(POINT_TAG.c_str(), k);
-	double x = atof (locationNode.getAttribute (POINT_X_ATTR.c_str()));
-	double y = atof (locationNode.getAttribute (POINT_Y_ATTR.c_str()));
+	XMLNode locationNode = segRouteNode.getChildNode(k);
+	std::string locationTag = locationNode.getName ();
+	if (locationTag == POINT_TAG) {
+	  double x = atof (locationNode.getAttribute (POINT_X_ATTR.c_str()));
+	  double y = atof (locationNode.getAttribute (POINT_Y_ATTR.c_str()));
 	
 	// TODO Rajouter les arrets physiques ici !
 
-	steps.push_back (topo.newLocation (x, y));  // Pas d'id
+	  steps.push_back (topo.newLocation (x, y));  // Pas d'id
 	                                             // pour les
 	                                             // points via
+	} else if (locationTag == ARRET_PHYSIQUE_TAG) {
+	  
+	  int logicalPlaceId = atoi (locationNode.getAttribute (ARRET_PHYSIQUE_LIEU_LOGIQUE_ATTR.c_str()));
+	  int rang = atoi (locationNode.getAttribute (ARRET_PHYSIQUE_RANG_ATTR.c_str()));
+	  double x = atof (locationNode.getAttribute (ARRET_PHYSIQUE_X_ATTR.c_str()));
+	  double y = atof (locationNode.getAttribute (ARRET_PHYSIQUE_Y_ATTR.c_str()));
+	  
+	  const Vertex* vertex = topo.newVertex (x, y);
+	  steps.push_back (topo.newPhysicalStop (logicalPlaceId, rang, vertex));
+	}
       }
-      
+	
       //      log ("Segment loaded");
       chunks.push_back (topo.newRoadChunk (segmentRouteId, steps, ndd, nfd, ndg, nfg));
       
     }
     
-    topo.newRoad (routeId, routeNameAttr, routeDiscrAttr, communeId, chunks);
+    topo.newRoad (routeId, routeNameAttr, type, routeDiscrAttr, communeId, chunks);
 
       
   }

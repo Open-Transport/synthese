@@ -22,13 +22,15 @@ namespace synmap
 Road::Road(Topography* topography,
 	   int key,
 	   const std::string& name,
+	   const RoadType& type,
 	   const std::string& discriminant,
 	   const cCommune* town,
 	   const std::vector<RoadChunk*>& chunks)
   : Referrant (topography, key)
-    , _name (name)
-    , _discriminant (discriminant)
-    , _town (town)
+  , _name (name)
+  , _type (type)
+  , _discriminant (discriminant)
+  , _town (town)
 {
   for(std::vector<RoadChunk*>::const_iterator iter (chunks.begin ());
        iter != chunks.end (); ++iter) {

@@ -43,6 +43,7 @@ private:
 	static const std::string ARRET_PHYSIQUE_NOM_ATTR;
 	static const std::string ARRET_PHYSIQUE_X_ATTR;
 	static const std::string ARRET_PHYSIQUE_Y_ATTR;
+	static const std::string ARRET_PHYSIQUE_LIEU_LOGIQUE_ATTR;
 	
 	static const std::string DELAI_TAG;
 	static const std::string DELAI_ORIGINE_ATTR;
@@ -309,6 +310,21 @@ private:
     static const std::string ROUTE_TAG;
     static const std::string ROUTE_ID_ATTR;
     static const std::string ROUTE_NOM_ATTR;
+    static const std::string ROUTE_TYPE_ATTR;
+
+    static const std::string ROUTE_TYPE_AUTOROUTE;
+    static const std::string ROUTE_TYPE_ATTR_ROUTE_CHAUSSEES_SEPAREES;
+    static const std::string ROUTE_TYPE_ATTR_AXE_PRINCIPAL;
+    static const std::string ROUTE_TYPE_ATTR_AXE_SECONDAIRE;
+    static const std::string ROUTE_TYPE_ATTR_PONT;
+    static const std::string ROUTE_TYPE_ATTR_RUE;
+    static const std::string ROUTE_TYPE_ATTR_RUE_PIETONNE;
+    static const std::string ROUTE_TYPE_ATTR_BRETELLE;
+    static const std::string ROUTE_TYPE_ATTR_VOIE_PRIVEE;
+    static const std::string ROUTE_TYPE_ATTR_CHEMIN;
+    static const std::string ROUTE_TYPE_ATTR_TUNNEL;
+    static const std::string ROUTE_TYPE_ATTR_ROUTE_SECONDAIRE;
+
     static const std::string ROUTE_DISCRIMINANT_ATTR;
     
     static const std::string SEGMENT_ROUTE_TAG;
