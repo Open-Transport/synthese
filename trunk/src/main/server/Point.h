@@ -44,7 +44,7 @@ public:
 	
 	//! \name Accesseurs
 	//@{
-	bool 		EstInconnu()	const;
+	bool 		unknownLocation()	const;
 	CoordonneeKMM	XKMM()		const;
 	CoordonneeKMM	YKMM()		const;
 	//@}
@@ -79,7 +79,7 @@ inline CoordonneeKMM cPoint::YKMM() const
 		return _YKM * 1000 + _YM;
 }
 
-inline bool cPoint::EstInconnu() const
+inline bool cPoint::unknownLocation() const
 {
 	return _XKM == INCONNU || _YKM == INCONNU;
 }

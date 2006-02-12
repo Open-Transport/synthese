@@ -249,95 +249,42 @@ cEnvironnement::~cEnvironnement()
 
 
 
-/*!	\brief Recherche de commune par nom
-	\param Entree Nom � rechercher
+/*!	Recherche de commune par nom.
+	\param name Nom a rechercher
 	\param n Nombre de communes � retourner
 	\return Liste de communes pouvant correspondre
 	
-La liste de communes retourn�e poss�de les caract�ristiques suivantes :
- - le premier �l�ment n'est renseign� que par une commune qui peut �tre d�sign�e sans ambiguit� d'apr�s le nom recherch�. Si aucune commune ne peut �tre d�sign�e sans ambiguit�, alors le premier �l�ment contient le pointeur NULL
- - les �l�ments suivants contiennent les communes dans l'ordre d�croissant de pertinence. Le nombre d'�l�ments fournis est limit� � n.
- - l'�l�ment suivant le dernier �l�ment renseign� contient le pointeur NULL, ainsi le parcours de la liste peut �tre stopp� au premier �l�ment NULL rencontr�.
-
-La comparaison s'effectue sur les cha�nes de caract�res sans accent et en minuscules
+	@todo HR terminer l'implémentation
 */
-cCommune** cEnvironnement::TextToCommune(const cTexte& Entree, size_t n) const
+vector<cCommune*> cEnvironnement::searchTown(const std::string& name, size_t n) const
 {
-	// Variables
-	cCommune** tbCommunes = (cCommune**) calloc(n+2, sizeof(cCommune*));
-	tIndex iCommune;
-	cTexteMinuscules EntreeFiltree;
-	EntreeFiltree << Entree;
+	// Recherche
+	vector<Interpretor::Result> matches = _towns.search(name, n);
 
-	if (n)
-	{
-		size_t nbCommunes = 0;
-		size_t j;
+	// METTRE ICI UNE DISCUSSION SUR L'AMBIGUITE AVEC CRITERES METIER
 
-		for (size_t LongueurComparaison = EntreeFiltree.Taille(); LongueurComparaison && nbCommunes < n; LongueurComparaison--)
-		{
-			for (iCommune=0; iCommune< _Commune.Taille(); iCommune++)
-			{
-				if (!LongueurComparaison || EntreeFiltree.Compare(_Commune[iCommune]->GetNom(), LongueurComparaison))
-				{
-					if (nbCommunes == n)
-						break;
-
-					// Pour eviter de retrouver une commune deja trouvee avec LongueurComparaison superieur
-					for (j=1; j <= nbCommunes; j++)
-						if (tbCommunes[j] == _Commune[iCommune])
-							break;
-
-					if (j > nbCommunes)
-					{
-						tbCommunes[nbCommunes + 1] = _Commune[iCommune];
-						nbCommunes++;
-						// Commune d�termin�e sans ambiguit� si comparaison exacte
-						if (!tbCommunes[0] && EntreeFiltree.Taille() == _Commune[iCommune]->GetNom().Taille())
-							tbCommunes[0] = tbCommunes[1];
-					}
-
-				}
-			}
-
-			// Commune d�termin�e sans ambiguit� si une seule dans un balayage donn�
-			if (!tbCommunes[0] && nbCommunes == 1)
-				tbCommunes[0] = tbCommunes[1];
-		}
-	}
-	else
-	{
-		for (iCommune=0; iCommune< _Commune.Taille(); iCommune++)
-			if (EntreeFiltree.Compare(_Commune[iCommune]->GetNom()))
-				break;
-		if (iCommune < _Commune.Taille())
-			tbCommunes[0] = _Commune[iCommune];
-	}
-
-	return tbCommunes;
+	// Sortie
+	vector<cCommune*> result;
+	for (size_t i=0; i<matches.size(); i++)
+		result.push_back(getCommune(matches[i]));
+	return result;
 }
 
 
 
-/*!	\brief Recherche de commune dans l'environnement avec cr�ation si non trouv�e
+/*!	Recherche de commune dans l'environnement avec création si non trouvée.
 	\param Entree Nom de la commune � trouver
 	\return La commune trouv�e ou cr��e
 	\author Hugues Romain
-	\date 2001-2005
+	\date 2001-2006
 */
-cCommune* cEnvironnement::GetCommuneAvecCreation(const cTexte& Entree)
+cCommune* cEnvironnement::GetCommuneAvecCreation(const std::string& name)
 {
-	cCommune** tbCommunes = TextToCommune(Entree);
-	cCommune* CommuneRetour;
-	if (tbCommunes[0] == NULL)
-	{
-		CommuneRetour = new cCommune(Entree);
-		Enregistre(CommuneRetour);
-	}
-	else
-		CommuneRetour = tbCommunes[0];
-	free(tbCommunes);
-	return CommuneRetour;
+	for (Interpretor::Index i=0; i<_towns.size(); i++)
+		if (getCommune(i)->getName() == name)
+			return getCommune(i);
+
+	return addTown(new cCommune(INCONNU, name));
 }
 
 
@@ -2672,57 +2619,12 @@ bool cEnvironnement::Enregistre(cAccesPADe* Objet, tTypeAccesPADe TypeAccesPADe)
 
 
 
-/*!	\brief Enregistrement d'une commune dans l'environnement
-	\param Objet la commune
-	\return l'index de la commune dans l'environnement
-	\author Hugues Romain
-	\date 2005
-	
-Les communes sont ind�x�es dans l'ordre alphab�tique. L'enregistrement d'une commune peut donc provoquer le changement d'index des autres communes.
-Pour une utilisation temps r�el de la fonction, il peut �tre n�cessaire d'employer une section critique.
-*/	
-tIndex cEnvironnement::Enregistre(cCommune* Objet)
-{
-	tIndex Numero = _Commune.Taille();
-
-	// Se r�server la main
-#ifdef UNIX
-	pthread_mutex_lock( &mutex_environnement );
-#endif
-	 
-	for (; Numero!=0; Numero--)
-	{
-		cTexteMinuscules txt1;
-		txt1 << _Commune[Numero-1]->GetNom();
-		cTexteMinuscules txt2;
-		txt2 << Objet->GetNom();
-		if (strcmp(txt1.Texte(), txt2.Texte()) < 0)
-			break;
-		else
-		{
-			_Commune.CopieElement(Numero-1, Numero);
-			_Commune[Numero]->SetNumero(Numero);
-		}
-	}
-	Objet->SetNumero(Numero);
-	_Commune.SetElement(Objet, Numero);
-	
-	// Rendre la main
-#ifdef UNIX
-	pthread_mutex_unlock( &mutex_environnement );
-#endif
-	 
-	return Numero;
-}
-
-
 bool	cEnvironnement::ControleNumeroTexteCommune(int nC, const cTexte& txtC) const
 {
 	return	(	GetCommune(nC) != NULL
 			&&	getCommune(nC)->GetNom().Compare(txtC)
 			);
 }
-
 
 
 

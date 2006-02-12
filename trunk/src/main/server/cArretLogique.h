@@ -17,6 +17,7 @@ enum tNiveauCorrespondance
 };
 class cArretLogique;
 class cServiceEnGare;
+class cLieuLogique;
 
 #include "cAccesPADe.h"
 #include "cAlerte.h"
@@ -28,30 +29,32 @@ class cServiceEnGare;
 #include "Parametres.h"
 #include "cGareLigne.h"
 #include "cDistanceCarree.h"
+#include <vector>
 
 #define POINTS_ARRETS_NOMBRE_DESIGNATIONS_DEFAUT 5
 
 
 
-/** Points d'arr�t
+/** Arrêts logiques.
 	@ingroup m05
-	\author Hugues Romain
-	\date 2000-2005
+	@author Hugues Romain
+	@date 2000-2006
 */
 class cArretLogique
 {
 	//! \name D�signations et localisation
 	//@{
-	cTableauDynamique<cAccesPADe*>	_AccesPADe;		//!< Tableau des d�signations du point d'arr�t
-	cPoint							vPoint;			//!< Point de g�olocalisation
-    cTexte                          _Designation13; //!< D�signation de 13 caract�res de long
-    cTexte                          _Designation26; //!< D�signation de 26 caract�res de long
+	//cTableauDynamique<cAccesPADe*>	_AccesPADe;		//!< Tableau des d�signations du point d'arr�t
+	vector<cLieuLogique*>			_Designations;		//!< Tableau des désignations du point d'arrêt
+	cPoint							vPoint;				//!< Point de g�olocalisation
+    cTexte                          _Designation13;		//!< D�signation de 13 caract�res de long
+    cTexte                          _Designation26;		//!< D�signation de 26 caract�res de long
 	//@}
 	
 	//! \name Documentation
 	//@{
 	cAlerte					vAlerte;			//!< Alerte en cours de validit�
-	cTextePostScript		vDesignationOD;	//!< D�signation pour affichage en tant que destination ou origine d'un service (indicateurs)
+	cTextePostScript		vDesignationOD;		//!< D�signation pour affichage en tant que destination ou origine d'un service (indicateurs)
 	cTexteHTML				vHTML;				//!< Description HTML (inutilis� : A SUPPRIMER ?)
 	//@}
 	

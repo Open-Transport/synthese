@@ -8,94 +8,54 @@
 #ifndef SYNTHESE_CCOMMUNE_H
 #define SYNTHESE_CCOMMUNE_H
 
-class cCommune;
-
 #include "Point.h"
 #include "cTexte.h"
-#include "cAccesPADe.h"
 
 #define COMMUNES_NOMBRE_DESIGNATIONS_DEFAUT 10
 
+class LogicalPlace;
 
 
 /** Commune
 	@ingroup m05
-	\author Hugues Romain
-	\version 2.0
+	@author Hugues Romain
 */
-class cCommune
+class cCommune : public cPoint
 {
-	cPoint							vPoint;			//!< Coordonnées de la commune
-	cTexte							vNom;			//!< Nom officiel de la commune
-	tIndex							_Index;			//!< Index de la commune (non conservé en mémoire morte)
-	cAccesPADe*						_AccesPADeToutLieu;	//!< Arrêt tout lieu s'il existe
-	cTableauDynamique<cAccesPADe*>	_AccesPADe;		//!< Tableau des désignations d'arrêt de la commune
+	const std::string							_name;			//!< Nom officiel de la commune
+	const tIndex							_id;			//!< Index de la commune (non conservé en mémoire morte)
+	Interpretor<LogicalPlace*>	_logicalPlaces;	//!< Tableau des lieux logiques avec recherche par réseau de neurone
+	LogicalPlace				_mainLogicalPlace;	//!< Arrêts sélectionnés si lieu de départ non précisé
+	LogicalPlace*					_allPlaces;			//!< Arrêt tout lieu
 	
 public:
 	
 	//!	\name Accesseurs
 	//@{
-	const cTexte&	GetNom()			const;
-	cAccesPADe*	GetPADePrincipale()	const;
-	cAccesPADe*	GetPADeToutLieu()	const;
-	tIndex		Index()			const;
+		const std::string&	getName()			const;
+		tIndex		getId()			const;
+		LogicalPlace*	getMainLogicalPlace() const { return _mainLogicalPlace; }
+		LogicalPlace*	getAllPlaces() const { return _allPlaces; }
 	//@}
 	
-	//!	\name Constructeurs
+	//!	\name Constructeur et destructeur
 	//@{
-	explicit cCommune(const cTexte& newNom);
+		cCommune(tIndex, std::string);
+		~cCommune();
 	//@}
 	
 	//!	\name Modificateurs
 	//@{
-	void SetNumero(tIndex newNumero);
-	bool addDesignation(cAccesPADe* newAccesPADe, tTypeAccesPADe);
+		void addLogicalPlace(const LogicalPlace*);
+		void addToMainLogicalPlace(const LogicalPlace*);
+		void setAtAllPlaces(const LogicalPlace*);
 	//@}
 
 	//!	\name Calculateurs
 	//@{
-	cAccesPADe** textToPADe(const cTexte& Entree, size_t n=0) const;
+		vector<LogicalPlace*> searchLogicalPlaces(std::string, size_t) const;
 	//@}
-	
-	/*template <class T> T& toXML(T& Objet) const
-	{
-		Objet << "\n<commune>" << GetNom() << "</commune>";
-		return(Objet);
-	}*/
 };
-
-#define SYNTHESE_CCOMMUNE_CLASSE
-
-inline const cTexte& cCommune::GetNom() const
-{ 
-	return vNom;
-}
-
-inline void cCommune::SetNumero(tIndex newNumero)
-{
-	_Index = newNumero;
-}
-
-inline tIndex cCommune::Index() const
-{
-	return _Index;
-}
-
-
-
-/** Accesseur désignation de l'arrêt principal de commune.
-	@return L'arrêt principal de la commune s'il existe, le premier arrêt dans l'ordre alphabétique sinon
-	@author Hugues Romain
-*/
-inline cAccesPADe* cCommune::GetPADePrincipale() const
-{
-	return _AccesPADe[0] ? _AccesPADe[0] : _AccesPADe[1];
-}
-
-inline cAccesPADe* cCommune::GetPADeToutLieu() const
-{
-	return _AccesPADeToutLieu;
-}
 
 
 
@@ -106,10 +66,8 @@ inline cAccesPADe* cCommune::GetPADeToutLieu() const
 template <class T>
 inline T& operator<<(T& flux, const cCommune& Obj)
 {
-	flux << Obj.GetNom();
+	flux << Obj.getName();
 	return flux;
 }
-
-#include "cCommuneAccesPADe.inline.h"
 
 #endif

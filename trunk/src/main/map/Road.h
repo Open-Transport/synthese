@@ -14,8 +14,7 @@ namespace synmap
 
 
 class Topography;
-class PhysicalStop;
-
+class cCommune;
 
 
 class Road : public Referrant
@@ -23,14 +22,13 @@ class Road : public Referrant
 public:
 	
   typedef std::vector<const RoadChunk*> RoadChunkVector;
-  typedef std::pair<RoadChunkVector, const PhysicalStop*> PathToPhysicalStop;
 
 private:
   
 
   const std::string _name;
   const std::string _discriminant;
-  const int _cityKey;
+  cCommune* const _town;
   RoadChunkVector _chunks;
 
 public:
@@ -39,22 +37,19 @@ public:
        int key,
        const std::string& name,
        const std::string& discriminant,
-       const int cityKey, // TODO change this and create a city class
+       cCommune* const town, 
        const std::vector<RoadChunk*>& chunks);
 	
   virtual ~Road();
 
   const std::string& getName () const { return _name; }
   const std::string& getDiscriminant () const { return _discriminant; }
-  int getCityKey () const { return _cityKey; }
+  cCommune* getTown () const { return _town; }
   
   const RoadChunkVector& getChunks () const { return _chunks; }
 
   const RoadChunk* findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) const;
-  std::set< PathToPhysicalStop >
-    findPathsToPhysicalStops (RoadChunk::AddressNumber addressNumber, 
-				    double distance) const;
-
+  
 
 };
 

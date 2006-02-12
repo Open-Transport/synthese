@@ -33,7 +33,7 @@ RoadChunk::~RoadChunk()
 
 
 RoadChunk::AddressNumberSide 
-RoadChunk::getSideForNumber (AddressNumber number) const
+RoadChunk::getSideForNumber (Address::AddressNumber number) const
 {
   int n = (int) std::floor (number);
   int rsn = (int) std::floor (_rightStartNumber);
@@ -54,7 +54,7 @@ RoadChunk::getSideForNumber (AddressNumber number) const
 
 
 bool 
-RoadChunk::hasNumber (AddressNumber number) const
+RoadChunk::hasNumber (Address::AddressNumber number) const
 {
   AddressNumberSide ans = getSideForNumber(number);
 

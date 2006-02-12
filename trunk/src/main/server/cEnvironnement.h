@@ -72,110 +72,109 @@ class cEnvironnement
 {
 	//! \name Attributs priv� d�crivant les tailles des tableaux d'index 
 	//@{ 
-	tIndex	vNombreResa;			//!< Index maximal des modalit�s de r�servation
-	tIndex	vNombreIndicateurs;		//!< Index maximal des paragraphes d'indicateur horaire
-	tIndex	vNombreMateriels;		//!< Index maximal des mat�riels roulants
-	tIndex	vNombreReseaux;			//!< Index maximal des r�seaux de transport
-	tIndex	vNombreVelo;			//!< Index maximal des modalit�s de prise en charge des v�los
-	tIndex	vNombreHandicape;		//!< Index maximal des modalit�s d'acceptation des handicap�s
-	tIndex 	vNombreTarif;			//!< Index maximal des tarifications
+		tIndex	vNombreResa;			//!< Index maximal des modalit�s de r�servation
+		tIndex	vNombreIndicateurs;		//!< Index maximal des paragraphes d'indicateur horaire
+		tIndex	vNombreMateriels;		//!< Index maximal des mat�riels roulants
+		tIndex	vNombreReseaux;			//!< Index maximal des r�seaux de transport
+		tIndex	vNombreVelo;			//!< Index maximal des modalit�s de prise en charge des v�los
+		tIndex	vNombreHandicape;		//!< Index maximal des modalit�s d'acceptation des handicap�s
+		tIndex 	vNombreTarif;			//!< Index maximal des tarifications
 	//@}
 	
 	//! \name Tableaux priv�s indexant les donn�es
 	//@{
-	cTableauDynamiquePointeurs<cArretLogique*>				_ArretLogique;		//!< Points d'arr�t logiques
-	cTableauDynamiquePointeurs<cCommune*>			_Commune;			//!< Communes
-	cTableauDynamiquePointeurs<cJC*>				_JC;				//!< Calendriers de circulations
-	cTableauDynamiquePointeurs<cDocument*>			_Documents;			//!< Documents
-	std::vector<cModaliteReservation*>				vResa;			//!< Modalit�s de r�servation
-	std::vector<cReseau*>							vReseau;		//!< R�seaux de transport
-	std::vector<cVelo*>					vVelo;			//!< Modalit�s de prise en charge des v�los
-	std::vector<cHandicape*>			vHandicape;		//!< Modalit�s d'acceptation des handicap�s
-	std::vector<cTarif*>				vTarif;			//!< Tarifications
-	std::vector<cMateriel*>				vMateriel;		//!< Mat�riels roulants
-	cIndicateurs**						vIndicateurs;	//!< Indicateurs horaires
-	cLigne*								vPremiereLigne;	//!< Acc�s � la premi�re ligne de transport
+		cTableauDynamiquePointeurs<cArretLogique*>				_ArretLogique;		//!< Points d'arr�t logiques
+		Interpretor<cCommune*>							_towns;	//!< Communes
+		cTableauDynamiquePointeurs<cJC*>				_JC;				//!< Calendriers de circulations
+		cTableauDynamiquePointeurs<cDocument*>			_Documents;			//!< Documents
+		std::vector<cModaliteReservation*>				vResa;			//!< Modalit�s de r�servation
+		std::vector<cReseau*>							vReseau;		//!< R�seaux de transport
+		std::vector<cVelo*>					vVelo;			//!< Modalit�s de prise en charge des v�los
+		std::vector<cHandicape*>			vHandicape;		//!< Modalit�s d'acceptation des handicap�s
+		std::vector<cTarif*>				vTarif;			//!< Tarifications
+		std::vector<cMateriel*>				vMateriel;		//!< Mat�riels roulants
+		cIndicateurs**						vIndicateurs;	//!< Indicateurs horaires
+		cLigne*								vPremiereLigne;	//!< Acc�s � la premi�re ligne de transport
 	//@}
 	
 	//! \name Parametres
 	//@{
-	tAnnee			vPremiereAnnee; 	//!< Premi�re ann�e des calendriers de circulation en m�moire
-	tAnnee			vDerniereAnnee; 	//!< Derni�re ann�e des calendriers de circulation en m�moire
-	tIndex			Code;				//!< Code de l'environnement
+		tAnnee			vPremiereAnnee; 	//!< Premi�re ann�e des calendriers de circulation en m�moire
+		tAnnee			vDerniereAnnee; 	//!< Derni�re ann�e des calendriers de circulation en m�moire
+		tIndex			Code;				//!< Code de l'environnement
 	//@}
 	
 	//! \name Variables d'analyse
 	//@{
-	cDate			vDateMin;			//!< Premier jour de circulation effective dans la base de donn�es
-	cDate			vDateMax;			//!< Dernier jour de circulation effective dans la base de donn�es
+		cDate			vDateMin;			//!< Premier jour de circulation effective dans la base de donn�es
+		cDate			vDateMax;			//!< Dernier jour de circulation effective dans la base de donn�es
 	//@}
 
 	//! \name Noms des fichiers de donn�es (� remplacer par des cFichier)
 	//@{
-	cTexte			vNomFichier; 			//!< Partie commune des noms de fichiers
-	cTexte			vNomRepEnv;			//!< Partie commune des envs
-	cTexte			vNomFichierPhotos;
-	cTexte			vNomFichierMateriel;
-	cTexte			vNomFichierReseaux;
-	cTexte			vNomFichierVelo;
-	cTexte			vNomFichierHandicape;
-	cTexte			vNomFichierTarif;
-	cTexte			vNomFichierResa;
-	cTexte          vNomRepertoireHoraires;
-	std::string          vNomRepertoireCarto;
+		cTexte			vNomFichier; 			//!< Partie commune des noms de fichiers
+		cTexte			vNomRepEnv;			//!< Partie commune des envs
+		cTexte			vNomFichierPhotos;
+		cTexte			vNomFichierMateriel;
+		cTexte			vNomFichierReseaux;
+		cTexte			vNomFichierVelo;
+		cTexte			vNomFichierHandicape;
+		cTexte			vNomFichierTarif;
+		cTexte			vNomFichierResa;
+		cTexte          vNomRepertoireHoraires;
+		std::string          vNomRepertoireCarto;
 	//@}
 
 	//! \name Formats de fichiers (� remplacer par des cFichier)
 	//@{
-	cFormatFichier*		_FormatHoraire;
-	cFormatFichier*		_FormatResa;
-	cFormatFichier*		_FormatPhoto;
-	cFormatFichier* 	_FormatIndicateurs;
-	cFormatFichier* 	_FormatVelo;
-	cFormatFichier* 	_FormatHandicape;
-	cFormatFichier* 	_FormatTarif;
-	cFormatFichier* 	_FormatReseaux;
-	cFormatFichier* 	_FormatMateriel;
+		cFormatFichier*		_FormatHoraire;
+		cFormatFichier*		_FormatResa;
+		cFormatFichier*		_FormatPhoto;
+		cFormatFichier* 	_FormatIndicateurs;
+		cFormatFichier* 	_FormatVelo;
+		cFormatFichier* 	_FormatHandicape;
+		cFormatFichier* 	_FormatTarif;
+		cFormatFichier* 	_FormatReseaux;
+		cFormatFichier* 	_FormatMateriel;
 
-	Topography      _topography;
+		Topography      _topography;
 
 	//@}
 
 	//!	\name Espaces de calcul pour threads
 	//@{
-	tIndex			_NombreCalculateurs;	//!< Nombre d'espaces m�moires disponibles pour les calculs
-	cCalculateur*	_Calculateur;			//!< Espaces
+		tIndex			_NombreCalculateurs;	//!< Nombre d'espaces m�moires disponibles pour les calculs
+		cCalculateur*	_Calculateur;			//!< Espaces
 	//m�moires d�di�s aux threads
 	//@}
 	
 	
 	//! \name Fonctions de Chargement (� int�grer � un h�ritage de cFichier avec une m�thode virtuelle Charge)
 	//@{
-	bool		ChargeFichierHoraires(const cTexte& NomFichier);
-	bool		ChargeFichierMateriel();
-	bool		ChargeFichierReseaux();
-	bool		ChargeFichierVelo();
-	bool		ChargeFichierHandicape();
-	bool		ChargeFichierTarif();
-	bool		ChargeFichierResa();
-	bool		ChargeFichierPhotos();
-	bool            ChargeFichiersRoutes ();
+		bool		ChargeFichierHoraires(const cTexte& NomFichier);
+		bool		ChargeFichierMateriel();
+		bool		ChargeFichierReseaux();
+		bool		ChargeFichierVelo();
+		bool		ChargeFichierHandicape();
+		bool		ChargeFichierTarif();
+		bool		ChargeFichierResa();
+		bool		ChargeFichierPhotos();
+		bool            ChargeFichiersRoutes ();
 	//@}
 
 	
 public:
 	//!	\name M�thodes d'enregistrement
 	//@{
-	bool		Enregistre(cLigne*);
-	bool		Enregistre(cAccesPADe*, tTypeAccesPADe);
-	tIndex		Enregistre(cJC*, tIndex Index=INCONNU);
-	tIndex		Enregistre(cModaliteReservation*, tIndex);
-	tIndex		Enregistre(cTarif*, tIndex);
-	tIndex		Enregistre(cCommune*);
-	tIndex		Enregistre(cMateriel*, tIndex);
-	tIndex		Enregistre(cHandicape*, tIndex);
-	tIndex		Enregistre(cVelo*, tIndex);
-	tIndex		Enregistre(cReseau*, tIndex);
+		bool		Enregistre(cLigne*);
+		bool		Enregistre(cAccesPADe*, tTypeAccesPADe);
+		tIndex		Enregistre(cJC*, tIndex Index=INCONNU);
+		tIndex		Enregistre(cModaliteReservation*, tIndex);
+		tIndex		Enregistre(cTarif*, tIndex);
+		tIndex		Enregistre(cMateriel*, tIndex);
+		tIndex		Enregistre(cHandicape*, tIndex);
+		tIndex		Enregistre(cVelo*, tIndex);
+		tIndex		Enregistre(cReseau*, tIndex);
 	//@}
 
 	bool envOk;
@@ -190,22 +189,23 @@ public:
 	
 	//! \name Modificateurs
 	//@{
-	cCommune*		GetCommuneAvecCreation(const cTexte& Entree);
-	cArretLogique*			GetGareAvecCreation(tNiveauCorrespondance newNiveauCorrespondance, tIndex newNumeroArretLogique=0);
-//	cSauvegarde*	JCSauvegardeModifier(tNumeroJC NumeroNewJC, const cTexte& newIntitule);
-	void			JCSupprimerInutiles(bool Supprimer=false);
-	void			SetDateMinReelle(const cDate&);
-	void			SetDateMaxReelle(const cDate&);
-	void			SetDatesService(tAnnee, tAnnee);
-	bool			Charge(const cTexte& __Chemin, const cTexte& __CheminFormats);
-	bool			SetIndex(tIndex);
+		cCommune*		addTown(const cCommune* town)		{ _towns.add(town.getName(), town); return town; }
+		cCommune*		GetCommuneAvecCreation(const std::string&);
+		cArretLogique*			GetGareAvecCreation(tNiveauCorrespondance newNiveauCorrespondance, tIndex newNumeroArretLogique=0);
+	//	cSauvegarde*	JCSauvegardeModifier(tNumeroJC NumeroNewJC, const cTexte& newIntitule);
+		void			JCSupprimerInutiles(bool Supprimer=false);
+		void			SetDateMinReelle(const cDate&);
+		void			SetDateMaxReelle(const cDate&);
+		void			SetDatesService(tAnnee, tAnnee);
+		bool			Charge(const cTexte& __Chemin, const cTexte& __CheminFormats);
+		bool			SetIndex(tIndex);
 	
 	//@}
 
 	//! \name Calculateurs
 	//@{
 	cCalculateur*		CalculateurLibre();
-	cCommune**			TextToCommune(const cTexte& Entree, size_t n=0)										const;
+	vector<cCommune*>	searchTown(const std::string&, size_t n=0)										const;
 	void				NomLigneUnique(cTexte& NomBase)														const;
 	bool				ControleNumerosArretCommuneDesignation(int nA, int nC, int nD, const cTexte& txtA)	const;
 	bool				ControleNumeroTexteCommune(int nC, const cTexte& txtC)								const;
@@ -229,7 +229,7 @@ public:
 	const cDate&			DateMinReelle()												const;
 	tAnnee					DerniereAnnee()												const;
 	cCalculateur&			getCalculateur(size_t n);
-	cCommune*				getCommune(tIndex NumeroCommune)							const;
+	cCommune*				getCommune(Interpretor::Index id)	const { return _town[id]; }
 	cCommune*				GetCommune(int NumeroCommune)								const;
 	cJC*					GetJC(int n)												const;
 	cJC*					getJC(tIndex n)												const;

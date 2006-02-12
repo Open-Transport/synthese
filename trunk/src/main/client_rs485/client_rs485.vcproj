@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="client_rs485"
+	Name="72 client_rs485"
 	ProjectGUID="{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}"
 	RootNamespace="client_rs485"
 	Keyword="MakeFileProj">

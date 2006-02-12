@@ -18,7 +18,8 @@ class cElementTrajet;
 enum tTypeElementTrajet
 {
 	eTrajetAvecVoyageurs	= 0,
-	eTrajetAVide			= 1
+	eTrajetAVide			= 1,
+	eTrajetVoirie			= 2		// Trajetà pied sur voirie
 };
 
 #include "Temps.h"
@@ -41,11 +42,11 @@ friend class cTrajet;
 protected:
 	//! \name Donn�es
 	//@{
-	const cArretLogique*			vGareDepart;				//!< Point d'arr�t de d�part
+	const cArretLogique*			vGareDepart;				//!< Point d'arr�t de d�part @todo le remplacer par l'ID de l'arret
 	tNumeroVoie				vVoieDepart;				//!< ArretPhysique de d�part au niveau du point d'arr�t
 	cMoment					vMomentDepart;				//!< Moment du d�part (premier si service continu)
 	cDureeEnMinutes			vAmplitudeServiceContinu;	//!< Amplitude du service continu (0 si service unique)
-	const cArretLogique*			vGareArrivee;				//!< Point d'arr�t d'arriv�e
+	const cArretLogique*			vGareArrivee;				//!< Point d'arr�t d'arriv�e @todo le remplacer par l'ID de l'arret
 	tNumeroVoie				vVoieArrivee;				//!< ArretPhysique d'arriv�e au niveau du point d'arr�t
 	cMoment					vMomentArrivee;				//!< Moment d'arriv�e (premier si service continu)
 	tNumeroService			vNumeroService;				//!< Index du service utilis� au sein de la ligne

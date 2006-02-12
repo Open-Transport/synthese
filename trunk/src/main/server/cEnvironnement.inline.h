@@ -4,23 +4,9 @@
 
 
 
-/*!	\brief Accesseur sans contr�le commune de l'environnement
-	\param NumeroCommune Index de la commune dans l'environnement
-	\return Pointeur vers la commune recherch�e
-	\author Hugues Romain
-	\date 2000-2005
-*/
-inline cCommune* cEnvironnement::getCommune(tIndex NumeroCommune) const
+inline cCommune* cEnvironnement::GetCommune(int id) const
 {
-	return(_Commune[NumeroCommune]);
-}
-
-inline cCommune* cEnvironnement::GetCommune(int NumeroCommune) const
-{
-	if (NumeroCommune >= 0 && NumeroCommune < _Commune.Taille())
-		return(_Commune[NumeroCommune]);
-	else
-		return(NULL);
+	return (id >= 0 && id < _town.size()) ? getCommune(id) : NULL;
 }
 
 inline cArretLogique* cEnvironnement::GetArretLogique(int n) const

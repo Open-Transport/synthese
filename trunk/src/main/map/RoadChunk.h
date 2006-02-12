@@ -19,10 +19,17 @@ class RoadChunk : public Referrant
 {
 public:
 	
-	typedef double AddressNumber;
 	typedef enum { RIGHT_SIDE, LEFT_SIDE, UNKNOWN_SIDE } AddressNumberSide;
 
+	/** Numéro d'adresse.
+		Ex : 70 rue de Paris : le numéro d'adresse est 70.
+	*/
+	typedef double AddressNumber;
+
+	/** Constante numéro d'adresse inconnu.
+	*/
 	static const AddressNumber ADDRESS_NUMBER_UNKNOWN;
+
 	
 private:
 	

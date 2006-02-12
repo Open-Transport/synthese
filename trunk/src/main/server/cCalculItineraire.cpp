@@ -1,7 +1,7 @@
-/** @file cCalculItineraire.cpp
-	\author Hugues Romain
-	\date 2000/2002
-	\brief Impl�mentation cCalculateur
+/** Implémentation classe calculateur d'itinéraires.
+	@file cCalculItineraire.cpp
+	@author Hugues Romain
+	@date 2000-2006
 */
  
 #include "cCalculItineraire.h"
@@ -9,6 +9,7 @@
 #include "cAccesPADe.h"
 #include "cArretLogique.h"
 #include "SYNTHESE.h"
+#include "cAccesReseau.h"
 
 #ifdef UNIX
 #include <sys/stat.h>
@@ -1464,9 +1465,9 @@ void cCalculateur::SetET(const cArretLogique* curPA, cElementTrajet* NewET, tNum
 
 
 
-/*!	\brief Pr�paration d'un calcul de fiche horaire journ�e
-	\param Origine Lieu d'origine du calcul
-	\param Destination Lieu de destination du calcul
+/**	Préparation d'un calcul de fiche horaire journée.
+	@param __LieuOrigine Lieu d'origine du calcul
+	@param __LieuDestination Lieu de destination du calcul
 	\param __DateDepart Date de la fiche horaire.
 	\param iPeriode P�riode de la journ�e � afficher
 	\param besoinVelo Filtre prise en charge des v�los
@@ -1475,16 +1476,18 @@ void cCalculateur::SetET(const cArretLogique* curPA, cElementTrajet* NewET, tNum
 	\param codeTarif Filtre tarif
 	\return true si une fiche horaire peut �tre calcul�e, false sinon. La valeur false peut survenir si la date de calcul est ant�rieure au moment pr�sent et si les solutions pass�es ne doivent pas �tre affich�es
 	\author Hugues Romain
-	\date 2001-2005
+	\date 2001-2006
 
-La pr�paration du calcul de fiche horaire journ�e effectue les initialisations de tous les param�tres.
+La pr�paration du calcul de fiche horaire journ�e effectue les initialisations de tous les param�tres :
+	- Prise en compte des divers paramètre transmis directement
+	- Construction des accès au réseau de transport (départ et arrivée) à partir des lieux logiques d'origine et de destination
 
 La variable vArriveeMax, qui permet de limiter le moment d'arriv�e lors du calcul est initalis�e comme suit :
- - Application de la p�riode aux moments de d�but et de fin de calcul
- - Ajout d'une minute par kilom�tre � vol d'oiseau pour permettre des solutions dont l'arriv�e d�passe la fin de p�riode, et pouvant �tre toutefois utile � fournir (ex: train de nuit)
+	- Application de la p�riode aux moments de d�but et de fin de calcul
+	- Ajout d'une minute par kilom�tre � vol d'oiseau pour permettre des solutions dont l'arriv�e d�passe la fin de p�riode, et pouvant �tre toutefois utile � fournir (ex: train de nuit)
 */
 bool cCalculateur::InitialiseFicheHoraireJournee(
-	const cAccesPADe *Origine, const cAccesPADe* Destination
+	const cLieuLogique* __LieuOrigine, const cLieuLogique* __LieuDestination
 	, const cDate& __DateDepart
 	, const cPeriodeJournee* __PeriodeJournee
 	, tBool3 besoinVelo, tBool3 besoinHandicape
@@ -1504,7 +1507,11 @@ bool cCalculateur::InitialiseFicheHoraireJournee(
 		_BaseTempsReel = true;
 	else
 		_BaseTempsReel = false;
-	
+
+	// Construction des accès au réseau départ et arrivée
+	_ConstructionAccesDepart(__LieuOrigine);
+	_ConstructionAccesArrivee(__LieuDestination);
+
 	// Application de la plage horaire
 	if (!__PeriodeJournee->AppliquePeriode(vMomentDebut, vArriveeMax, _MomentCalcul, __SolutionsPassees))
 		return false;
@@ -1515,10 +1522,6 @@ bool cCalculateur::InitialiseFicheHoraireJournee(
 	vBesoinHandicape = besoinHandicape;
 	vBesoinTaxiBus = besoinTaxiBus;
 	vCodeTarif = codeTarif;
-
-	// Enregistrement des lieux d�part/arriv�e
-	vPADeOrigine = Origine;
-	vPADeDestination = Destination;
 
 	// Optimisations (int�ret � v�rifier)
 	vMomentDebut = vPADeOrigine->momentDepartSuivant(vMomentDebut, vArriveeMax, _MomentCalcul);
@@ -1762,3 +1765,23 @@ cCalculateur* cCalculateur::Prend()
 	// Retour Echec
 	return NULL;
 }
+
+
+/** Fabrication de la liste complète des accès au réseau de transport.
+	@param __MomentDepart Moment de départ du lieu
+	@param __MomentMax Moment maximal de départ du lieu
+	@return Liste complète des accès au réseau de transport
+
+	L'accès au réseau de transport, pour un départ, est construit par les opérations suivantes :
+		- pour chaque adresse accessible immédiatement, fabrication de la liste des trajets possibles vers des arrêts en respectant les critères
+		- un filtrage des points d'entrée inutiles est opéré
+			- l'objet cAccesReseau est construit et transmis au calculateur
+*/
+void cCalculateur::_ConstructionAccesOrigine(const cLieuLogique* __LieuOrigine)
+{
+	_AccesDepart.
+
+	for (tIndex __i = 0; __LieuOrigine->GetArretLogique(__i); __i++)
+
+}
+

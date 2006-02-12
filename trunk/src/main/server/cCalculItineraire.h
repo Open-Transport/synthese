@@ -6,6 +6,7 @@
 #define SYNTHESE_cCalculateur_H
 
 class cCalculateur;
+class cAccesReseau;
 
 #include "cTrajets.h"
 #include "cTrajets.h"
@@ -13,12 +14,13 @@ class cCalculateur;
 #include "Temps.h"
 #include "cEnvironnement.h"
 #include "cPeriodeJournee.h"
-#include "cArretLogique.h"
 
 #ifdef UNIX
 #include <pthread.h>
 extern pthread_mutex_t mutex_calcul;
 #endif
+
+class LogicalPlace;
 
 /**	@defgroup m33 33 Recherche d'itin�raires
 	@{
@@ -52,14 +54,14 @@ class cCalculateur
 	//@{
 	cMoment*				vMeilleurTemps;							//!< Meilleur temps de trajet trouv� vers chaque arr�t
 	cElementTrajet**		vET;									//!< Solution trouv�e depuis/vers chaque arr�t
-	cMoment**				vMeilleurTempsArretPhysique;						//!< Meilleur temps de trajet trouv� depuis/vers chaque quai de chaque arr�t
-	cElementTrajet***		vETArretPhysique;							//!< Solution trouv�e depuis/vers chaque quai de chaque arr�t
+	cMoment**				vMeilleurTempsArretPhysique;			//!< Meilleur temps de trajet trouv� depuis/vers chaque quai de chaque arr�t
+	cElementTrajet***		vETArretPhysique;						//!< Solution trouv�e depuis/vers chaque quai de chaque arr�t
 	cMoment					vArriveeMax;							//!< Moment d'arriv�e maximal
 	cMoment					vDepartMin;								//!< Moment de d�part minimal
-	cDureeEnMinutes			vDureeServiceContinuPrecedent;		//!< Dur�e du trajet dans le service continu trouv� pr�c�demment
+	cDureeEnMinutes			vDureeServiceContinuPrecedent;			//!< Dur�e du trajet dans le service continu trouv� pr�c�demment
 	cMoment					vDernierDepartServiceContinuPrecedent;	//!< Moment de fin de l'amplitude de validit� du service continu trouv� pr�c�demment
-	int						vIterationsDep;						//!< Compteur d'it�rations pour les calculs de meilleur d�part
-	int						vIterationsArr;						//!< Compteur d'it�rations pour les calculs de meilleure arriv�e
+	int						vIterationsDep;							//!< Compteur d'it�rations pour les calculs de meilleur d�part
+	int						vIterationsArr;							//!< Compteur d'it�rations pour les calculs de meilleure arriv�e
 	cLog					_LogTrace;								//!< Fichier log de tracage des recursions
 	cTexte					_CheminLog;								//!< Chemin des log de tracage des recursions
 	//@}
@@ -72,8 +74,8 @@ class cCalculateur
 	//! \name Parametres de calcul
 	//@{
 	const cEnvironnement*	vEnvironnement;		//!< Environnement de calcul
-	const cAccesPADe*		vPADeOrigine;		//!< Liste des arr�ts d'origine
-	const cAccesPADe*		vPADeDestination;	//!< Liste des arr�ts de destination
+	LogicalPlace*			_Origin;			//!< Lieu de départ
+	LogicalPlace*			_Destination;		//!< Lieu d'arrivée
 	cMoment					vMomentDebut;		//!< Moment de d�but du calcul (premier d�part)
 	cMoment					vMomentFin;			//!< Moment de fin du calcul (dernier d�part)
 	cMoment					_MomentCalcul;		//!< Moment de lancement du calcul (pour filtrage r�sa et d�parts pass�s)
@@ -133,6 +135,11 @@ class cCalculateur
 // 	bool				HoraireArriveeDepart(cTrajet& __Resultat);
 	//@}
 	
+	//!	@name Calculateurs d'initialisation
+	//@{
+		void			_buildTransportNetworkAccessForDeparture(const cLieuLogique* __LieuOrigine, bool __AvecApprocheAPied=true);
+		void			_buildTransportNetworkAccessForArrival(const cLieuLogique* __LieuDestination, bool __AvecApprocheAPied=true);
+	//@}
 	
 public:
 	//!	\name Accesseurs
@@ -142,7 +149,7 @@ public:
 	
 	//!	\name Modificateurs
 	//@{
-	bool 				InitialiseFicheHoraireJournee(const cAccesPADe* Origine, const cAccesPADe* Destination
+	bool 				InitialiseFicheHoraireJournee(const cLieuLogique* __LieuOrigine, const cLieuLogique* __LieuDestination
 								, const cDate& MomentDepartMin, const cPeriodeJournee*, tBool3 besoinVelo
 								, tBool3 besoinHandicape, tBool3 besoinTaxiBus, tNumeroTarif codeTarif
 								, bool __SolutionsPassees);

@@ -91,6 +91,9 @@
 				RelativePath="..\..\..\src\main\server\cElementTrajet.cpp">
 			</File>
 			<File
+				RelativePath=".\cElementTrajetVoirie.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\main\server\cEnvironnement.cpp">
 			</File>
 			<File
@@ -249,6 +252,9 @@
 				RelativePath="..\..\..\src\main\server\cAccesPADe.inline.h">
 			</File>
 			<File
+				RelativePath=".\cAccesReseau.h">
+			</File>
+			<File
 				RelativePath="..\..\..\src\main\server\cAlerte.h">
 			</File>
 			<File
@@ -328,6 +334,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cElementTrajet.inline.h">
+			</File>
+			<File
+				RelativePath=".\cElementTrajetVoirie.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cEnvironnement.h">
@@ -517,6 +526,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cVelo.h">
+			</File>
+			<File
+				RelativePath=".\LogicalPlace.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\Parametres.h">

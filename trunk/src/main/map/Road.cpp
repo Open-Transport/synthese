@@ -23,12 +23,12 @@ Road::Road(Topography* topography,
 	   int key,
 	   const std::string& name,
 	   const std::string& discriminant,
-	   int cityKey,
+	   cCommune* const town,
 	   const std::vector<RoadChunk*>& chunks)
   : Referrant (topography, key)
     , _name (name)
     , _discriminant (discriminant)
-    , _cityKey (cityKey)
+    , _town (town)
 {
   for(std::vector<RoadChunk*>::const_iterator iter (chunks.begin ());
        iter != chunks.end (); ++iter) {
@@ -130,73 +130,6 @@ Road::findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) c
 
 
 
-std::set< Road::PathToPhysicalStop >
-Road::findPathsToPhysicalStops (RoadChunk::AddressNumber addressNumber, 
-				double distance) const {
-  const RoadChunk* chunk = findMostPlausibleChunkForNumber (addressNumber);
-  // TODO : add an algorithm to find more precisely the vertex to
-  // start from ?
-  const Vertex* start = chunk->getStep (0)->getVertex ();
-  std::set< std::vector<const Vertex*> > paths = 
-    start->findPathsToCloseNeighbors (distance);
-
-  std::set< Road::PathToPhysicalStop > result;
-
-  RoadChunkVector tmpChunks;
-  std::vector<const PhysicalStop*> tmpPhysicalStops;
-
-  for (std::set< std::vector<const Vertex*> >::iterator path = paths.begin ();
-       path != paths.end ();
-       ++path) {
-    
-    for (int i=0; i<path->size (); ++i) {
-      const Vertex* v = path->at (i);
-      
-      // Is there any physical stop located at this vertex ?
-      tmpPhysicalStops.clear ();
-      getTopography()->findPhysicalStops (v, tmpPhysicalStops);
-
-      for (std::vector<const PhysicalStop*>::const_iterator 
-	     itPstop = tmpPhysicalStops.begin ();
-	   itPstop != tmpPhysicalStops.end ();
-	     ++itPstop) {
-	const PhysicalStop* pstop = *itPstop;
-
-	// Create an entry in result which is a path from start
-	// to the found physical stop
-	RoadChunkVector pathChunks;
-	
-	for (int j=0; j+1<=i; ++j) {
-	  const Edge* edge = getTopography()->getEdge (path->at (j), path->at (j+1));
-	  
-	  // Normally, there can be only one road chunk associated
-	  // with an edge.
-	  tmpChunks.clear ();
-	  getTopography ()->findRoadChunks (edge, tmpChunks);
-
-	  assert (tmpChunks.size () == 1);
-
-	  // If the last chunk inserted is the same than the one 
-	  // we just found, do nothing.
-	  if ((pathChunks.size () > 0) &&
-	      (tmpChunks.at(0) == pathChunks[pathChunks.size ()-1])) continue;
-
-	  pathChunks.push_back (tmpChunks.at (0));
-
-	}
-	
-	result.insert (PathToPhysicalStop (pathChunks, pstop));
-	  
-	
-      }
-
-    }
-  }
-  
-
-  return result;
-
-} 
 
 
 
