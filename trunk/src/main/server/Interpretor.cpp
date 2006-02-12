@@ -96,7 +96,7 @@ T& Interpretor<T>::operator[](Interpretor<T>::Index id)
 /** Nombre d'enregistrements contenus.
 */
 template <class T>
-Interpretor::Index Interpretor<T>::() const
+Interpretor<T>::Index Interpretor<T>::size () const
 {
 	return _vector.size();
 }
@@ -115,6 +115,7 @@ Interpretor::Index Interpretor<T>::() const
 	@todo CR : A implémenter
 */
 template <class T>
-vector<Result> Interpretor<T>::search(const Interpretor<T>::Key& key, Interpretor<T>::Index size) const
+vector<Interpretor<T>::Result> 
+Interpretor<T>::search(const Key& key, Index size) const
 {
 }
