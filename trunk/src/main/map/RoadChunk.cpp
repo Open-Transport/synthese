@@ -2,6 +2,9 @@
 
 #include <cmath>
 #include "Address.h"
+#include "Location.h"
+#include "PhysicalStop.h"
+#include "Vertex.h"
 
 
 namespace synmap
@@ -17,10 +20,12 @@ RoadChunk::RoadChunk(Topography* topography,
 		     Address::AddressNumber leftEndNumber)
   : Referrant (topography, key)
     , _steps (steps)
+    , _passagePoints (filterPhysicalStops (steps))
     , _rightStartNumber (rightStartNumber)
     , _rightEndNumber (rightEndNumber)
     , _leftStartNumber (leftStartNumber)
     , _leftEndNumber (leftEndNumber)
+    , _length (computeTotalLength (_passagePoints))
 {
 }
 
@@ -80,6 +85,37 @@ RoadChunk::hasNumber (Address::AddressNumber number) const
     
   }
   return false;
+}
+
+
+
+double 
+RoadChunk::computeTotalLength (const std::vector<const Vertex*>& passagePoints) {
+  double totalLength = 0.0;
+  for (int i=0; i+1<passagePoints.size (); ++i) {
+    totalLength += 
+      passagePoints[i]->distanceTo (*(passagePoints[i+1]));
+  }
+  return totalLength;
+}
+
+
+
+std::vector<const Vertex*> 
+RoadChunk::filterPhysicalStops (const std::vector<const Location*>& steps) 
+{
+  std::vector<const Vertex*> passagePoints;
+  for (std::vector<const Location*>::const_iterator iter (steps.begin());
+       iter != steps.end ();
+       ++iter) {
+    const Location* location = *iter;
+    if (!dynamic_cast<const PhysicalStop*> (location)) {
+      passagePoints.push_back (location->getVertex ());
+    }
+  }
+  return passagePoints;
+  
+
 }
 
 

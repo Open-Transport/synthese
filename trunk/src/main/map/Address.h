@@ -67,8 +67,12 @@ public:
     //! @name Calculateurs
     //@{
     std::set
+      < std::pair<double, const PhysicalStop*> >
+      findDistancesToPhysicalStops (double maxDistance) const;
+
+    std::set
         < PathToPhysicalStop >
-        findPathsToPhysicalStops (double distance) const;
+        findPathsToPhysicalStops (double maxDistance) const;
 
     //@}
 

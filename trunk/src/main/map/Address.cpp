@@ -31,9 +31,39 @@ Address::~Address()
 {}
 
 
+
+std::set
+    < std::pair<double, const PhysicalStop*> >
+Address::findDistancesToPhysicalStops (double maxDistance) const
+{
+  std::set
+    < Address::PathToPhysicalStop > paths = findPathsToPhysicalStops (maxDistance);
+
+  std::set
+    < std::pair<double, const PhysicalStop*> > result;
+  
+  double pathLength = 0.0;
+  for (std::set < Address::PathToPhysicalStop >::const_iterator iter (paths.begin ());
+       iter != paths.end ();
+       ++iter) {
+    for (std::vector<const RoadChunk*>::const_iterator iterChunk (iter->first.begin ());
+	 iterChunk != iter->first.end ();
+	 ++iterChunk) {
+      pathLength += (*iterChunk)->getLength ();
+      
+    }
+    result.insert (make_pair (pathLength, iter->second));
+
+  }
+  return result;
+
+}
+
+
+
 /** Recherche des arrêts physiques situés à proximité de l'adresse.
  
- @param distance Distance maximale à parcourir
+ @param maxDistance Distance maximale à parcourir
  
  L'algorithme consiste en un parcours intégral du graphe des segments de route, borné par une distance maximale parcourue.
  
@@ -43,7 +73,7 @@ Address::~Address()
 */
 std::set
     < Address::PathToPhysicalStop >
-Address::findPathsToPhysicalStops (double distance) const
+Address::findPathsToPhysicalStops (double maxDistance) const
     {
         const RoadChunk* chunk = _road->findMostPlausibleChunkForNumber (_number);
         // TODO : add an algorithm to find more precisely the vertex to
@@ -51,7 +81,7 @@ Address::findPathsToPhysicalStops (double distance) const
         const Vertex* start = chunk->getStep (0)->getVertex ();
         std::set
             < std::vector<const Vertex*> > paths =
-                start->findPathsToCloseNeighbors (distance);
+                start->findPathsToCloseNeighbors (maxDistance);
 
         std::set
             < PathToPhysicalStop > result;

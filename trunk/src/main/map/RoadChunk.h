@@ -23,6 +23,7 @@ public:
 private:
 	
 	const std::vector<const Location*> _steps;
+	const std::vector<const Vertex*> _passagePoints;
 
 	const Address::AddressNumber _rightStartNumber;   // inclusive
 	const Address::AddressNumber _rightEndNumber;     // inclusive
@@ -31,6 +32,8 @@ private:
 	const Address::AddressNumber _leftEndNumber;      // inclusive
 
 	const Road* _road;
+
+	const double _length; // total length of the road chunk in meters.
 
 public:
 
@@ -57,6 +60,15 @@ public:
 	bool hasNumber (Address::AddressNumber number) const;
 
 	const Location* getStep (int index) const { return _steps[index]; }
+
+	double getLength () const { return _length; }
+
+private:
+
+	static double 
+	  computeTotalLength (const std::vector<const Vertex*>& passagePoints);
+	static std::vector<const Vertex*> 
+	  filterPhysicalStops (const std::vector<const Location*>& steps);
 
 };
 
