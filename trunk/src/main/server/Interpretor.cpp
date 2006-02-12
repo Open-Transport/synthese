@@ -1,5 +1,7 @@
 
 
+#include "Interpretor.h"
+
 
 
 /** Constructeur.
@@ -26,7 +28,7 @@ Interpretor<T>::Interpretor()
 	@todo Mettre une section critique + CR implémenter le lien réseau neurone
 */
 template <class T>
-Index Interpretor<T>::add(const Key& key, const T& element, Index id=INCONNU)
+Interpretor<T>::Index Interpretor<T>::add(const Interpretor<T>::Key& key, const T& element, Interpretor<T>::Index id)
 {
 	// Stockage dans le vecteur
 	if (id == INCONNU)
@@ -56,7 +58,7 @@ Index Interpretor<T>::add(const Key& key, const T& element, Index id=INCONNU)
 	@todo CR : Implémenter, ça ne concerne que le réseau de neurone
 */
 template <class T>
-void Interpretor<T>::erase(const Key& key)
+void Interpretor<T>::erase(const Interpretor<T>::Key& key)
 {
 	
 }
@@ -66,13 +68,13 @@ void Interpretor<T>::erase(const Key& key)
 
 	La suppression par élément supprime la totalité des liens vers l'élément.
 
-	@param __Index Index de l'élément à supprimer
+	@param id Index de l'élément à supprimer
 	@return true si Suppression OK (peut être changé)
 
 	@todo CR : faire la partie réseau neurone
 */
 template <class T>
-bool Interpretor<T>::erase(Index id)
+bool Interpretor<T>::erase(Interpretor<T>::Index id)
 {
 	// CR : ici l'effacement de toutes les clés dans le réseau
 	
@@ -85,7 +87,7 @@ bool Interpretor<T>::erase(Index id)
 	@return Objet demandé
 */
 template <class T>
-T& Interpretor<T>::operator[](Index id)
+T& Interpretor<T>::operator[](Interpretor<T>::Index id)
 {
 	return _vector.operator [](id);
 }
@@ -94,7 +96,7 @@ T& Interpretor<T>::operator[](Index id)
 /** Nombre d'enregistrements contenus.
 */
 template <class T>
-Index Interpretor<T>::() const
+Interpretor::Index Interpretor<T>::() const
 {
 	return _vector.size();
 }
@@ -113,6 +115,6 @@ Index Interpretor<T>::() const
 	@todo CR : A implémenter
 */
 template <class T>
-vector<Result> Interpretor<T>::search(const Key& key, Index size) const
+vector<Result> Interpretor<T>::search(const Interpretor<T>::Key& key, Interpretor<T>::Index size) const
 {
 }

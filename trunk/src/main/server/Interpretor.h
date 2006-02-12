@@ -2,6 +2,17 @@
 	@file Interpretor.h
 */
 
+#ifndef SYNTHESE_INTERPRETOR_H
+#define SYNTHESE_INTERPRETOR_H
+
+#include <utility>
+#include <string>
+#include <vector>
+#include "cAssociator.h"
+
+using namespace std;
+
+
 /** @defgroup m07 07 Interpréteur de textes
 	@{
 
@@ -49,14 +60,14 @@ public:
 	/** Score d'un résultat (à déplacer dans associator je pense) */
 	typedef int Score;
 
-	/** Résultat */
-	typedef pair<tIndex, Score> Result;
-
 	/** Index */
 	typedef int Index;
 
+	/** Résultat */
+	typedef pair<Index, Score> Result;
+
 	/** Clé */
-	typedef std::string Key;
+	typedef string Key;
 
 
 protected:
@@ -91,3 +102,5 @@ public:
 };
 
 /** @} */
+
+#endif
