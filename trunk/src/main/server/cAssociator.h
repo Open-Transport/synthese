@@ -17,6 +17,8 @@
 #include <vector>
 #include <string>
 
+using namespace std;
+
 
 typedef short          sint16;
 typedef long           sint32;
