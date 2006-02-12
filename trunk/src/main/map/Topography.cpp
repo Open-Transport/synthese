@@ -13,7 +13,8 @@
 namespace synmap
 {
 
-Topography::Topography()
+Topography::Topography(const cEnvironnement* _environment)
+: _environment (environment)
 {
 }
 

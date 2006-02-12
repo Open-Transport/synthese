@@ -8,9 +8,11 @@
 
 #include <vector>
 #include <set>
-#include "NetworkAccessPoint.h"
+#include "server/NetworkAccessPoint.h"
 
 class LogicalPlace;
+
+
 
 namespace synmap
 {
@@ -45,8 +47,8 @@ public:
 	
 
 
-    /** Chemin d'accès aux arrêts physiques depuis l'adresse */
-    typedef std::pair< std::vector<const RoadChunk*>, const PhysicalStop*> PathToPhysicalStop;
+    /** Chemin d'accès a une adresse depuis l'adresse */
+	typedef std::pair< std::vector<const RoadChunk*>, const Address*> PathToAddress;
 
 protected:
 
@@ -62,21 +64,30 @@ public:
 
     //! @name Constructeur et destructeur
     //@{
-    Address(LogicalPlace*, Road* road, size_t, AddressNumber number = UNKNOWN_ADDRESS_NUMBER);
+
+    Address(LogicalPlace* logicalPlace,
+	    size_t rankInLogicalPlace,
+	    Road* road, 
+	    double metricOffset,
+	    AddressNumber number = UNKNOWN_ADDRESS_NUMBER);
+
+
     ~Address();
     //@}
 
     //! @name Calculateurs
     //@{
     std::set
-      < std::pair<double, const PhysicalStop*> >
-      findDistancesToPhysicalStops (double maxDistance) const;
+      < std::pair<double, const Address*> >
+      findDistancesToAddresses (double maxDistance) const;
+
+
 
     std::set
-        < PathToPhysicalStop >
-        findPathsToPhysicalStops (double maxDistance) const;
+        < PathToAddress >
+        findPathsToAddresses (double maxDistance) const;
 
-		NetworkAccessPoint::AddressList getAddresses(bool forDeparture) const;
+    NetworkAccessPoint::AddressList getAddresses(bool forDeparture) const;
 
     //@}
 
@@ -94,6 +105,11 @@ public:
     {
         return _number;
     }
+
+
+    //    virtual AddressList getAddresses(bool forDeparture) const = 0;
+    NetworkAccessPoint::AddressList getAddresses(bool forDeparture);
+
     //@}
 };
 

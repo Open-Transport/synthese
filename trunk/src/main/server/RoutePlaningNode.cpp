@@ -1,6 +1,8 @@
 
 #include "RoutePlanningNode.h"
 #include "LogicalPlace.h"
+#include "cArretPhysique.h"
+#include "map/Address.h"
 
 #include <assert.h>
 
@@ -23,45 +25,50 @@ RoutePlanningNode::RoutePlanningNode(LogicalPlace* logicalPlace,
   : _logicalPlace(logicalPlace)
 {
 
-      // take physical stops contained in the logical place
-	const LogicalPlace::PhysicalStopsMap& physicalStops = logicalPlace->getPhysicalStops ();
-	for (LogicalPlace::PhysicalStopsMap::const_iterator iter = (physicalStops.begin ());
-	   iter != physicalStops.end (); ++iter) {
-	
-	double approachDuration = 0.0; // TODO .
-	_accessPointsWithDistance.push_back (make_pair (*iter, approachDuration));
+  // take physical stops contained in the logical place
+  const LogicalPlace::PhysicalStopsMap& physicalStops = logicalPlace->getPhysicalStops ();
+  for (LogicalPlace::PhysicalStopsMap::const_iterator iter = (physicalStops.begin ());
+       iter != physicalStops.end (); ++iter) {
+    cArretPhysique* physicalStop = iter->second;
+    double approachDuration = 0.0; // TODO .
+    std::pair<NetworkAccessPoint*, double> 
+      accessPointWithDistance (physicalStop, approachDuration);
+    
+    _accessPointsWithDistance.push_back (accessPointWithDistance);
+    
+  }
 
-      }
-
-	   // search of other logical places reached with road network
+  // search of other logical places reached with road network
   if (maxApproachDistance > 0)
     {
-      const map<size_t, Address*>& adresses = getAddresses ();
+      const map<size_t, Address*>& adresses = logicalPlace->getAddresses ();
       for (map<size_t, Address*>::const_iterator iter = adresses.begin ();
 	   iter != adresses.end (); ++iter)
         {
 	  std::set
-	    < std::pair<double, const PhysicalStop*> > reachableStops =
-	    iter->second->findDistancesToPhysicalStops (distanceMax);
+	    < std::pair<double, const Address*> > reachableAddresses =
+	    iter->second->findDistancesToAddresses (maxApproachDistance);
 
 	  for (std::set
-		 < std::pair<double, const PhysicalStop*> >::iterator
-		 distanceAndStop (reachableStops.begin ());
-	       distanceAndStop != reachableStops.end ();
-	       ++distanceAndStop)
+		 < std::pair<double, const Address*> >::iterator
+		 distanceAndAddress (reachableAddresses.begin ());
+	       distanceAndAddress != reachableAddresses.end ();
+	       ++distanceAndAddress)
 	    {
 
-	      double approachDistance = distanceAndStop->first;
+	      double approachDistance = distanceAndAddress->first;
 //	      const LogicalPlace* reachableLogicalPlace = 
 //		env.getLogicalPlace (distanceAndStop->second->getLogicalPlaceId ());
 		    
 //	      cArretPhysique* physicalStop = *(reachableLogicalPlace->
 //					       getPhysicalStops().find (distanceAndStop->second->getRank ()));
 
-//	      double approachDuration = approachDistance / approachSpeed; // seconds
+	      double approachDuration = approachDistance / approachSpeed; // seconds
 		    
-	      _accessPointsWithDistance.push_back (
-			  make_pair (distanceAndStop->second, approachDistance));
+	      std::pair<NetworkAccessPoint*, double> accessPointWithDistance
+		(((NetworkAccessPoint*) distanceAndAddress->second), approachDuration);
+
+	      _accessPointsWithDistance.push_back (accessPointWithDistance);
 		    
 	    }
 
@@ -69,24 +76,25 @@ RoutePlanningNode::RoutePlanningNode(LogicalPlace* logicalPlace,
 	}
 	
       // Prise en compte des lieux inclus
-		for (vector<LogicalPlace*>::iterator included = _logicalPlace->getAliasedLogicalPlaces().begin();
-			included != _logicalPlace->getAliasedLogicalPlaces().end()
-			++included
-			)
+      for (vector<LogicalPlace*>::iterator included = _logicalPlace->getAliasedLogicalPlaces().begin();
+	   included != _logicalPlace->getAliasedLogicalPlaces().end();
+	     ++included
+	   )
 	{
-		const LogicalPlace::PhysicalStopsMap& physicalStops = included->getPhysicalStops ();
-      
+	  const LogicalPlace::PhysicalStopsMap& physicalStops = (*included)->getPhysicalStops ();
+	  
 
-		      // take physical stops contained in the logical place
-		
-      for (PhysicalStopsMap::const_iterator iter = ( physicalStops.begin ());
-	   iter != physicalStops.end (); ++iter) {
+	  // take physical stops contained in the logical place
+	  
+	  for (LogicalPlace::PhysicalStopsMap::const_iterator iter = ( physicalStops.begin ());
+	       iter != physicalStops.end (); ++iter) {
 	
-	double approachDuration = 0.0; // TODO .
-	_accessPointsWithDistance.push_back (make_pair (*iter, approachDuration));
+	    double approachDuration = 0.0; // TODO .
+	    std::pair<NetworkAccessPoint*, double> accessPointWithDistance
+	      (( iter->second), approachDuration);
 
-      }
-
+	  }
+	  
 	}
     }
 }

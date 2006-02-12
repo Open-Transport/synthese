@@ -4,9 +4,10 @@
 
 #include <vector>
 #include "cTableauDynamique.h"
+#include "cTrajet.h"
 
 class LogicalPlace;
-class cTrajet;
+
 
 /** Liste de trajets
 	@ingroup m33

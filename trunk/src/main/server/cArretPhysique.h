@@ -23,7 +23,7 @@ public:
 
 	//!	@name Calculateurs
 	//@{
-		NetworkAccessPoint::AddressList getAddresses(bool forDeparture) const;
+		AddressList getAddresses(bool forDeparture) const;
 	//@}
 
 

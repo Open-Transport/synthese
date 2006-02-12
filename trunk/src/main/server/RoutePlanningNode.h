@@ -6,7 +6,7 @@
 #define SYNTHESE_ROUTEPLANNINGNODE_H
 
 #include <vector>
-#include "temps.h"
+#include "Temps.h"
 
 class LogicalPlace;
 class NetworkAccessPoint;
@@ -21,8 +21,8 @@ private:
 
     //! @name Données
     //@{
-    LogicalPlace* const        _logicalPlace; //!< Lieu logique à l'origine de l'objet
-	vector<pair<NetworkAccessPoint*, double> > _accessPointsWithDistance; //!< Points d'entrée sur le calcul d'itinéraire
+  LogicalPlace* const        _logicalPlace; //!< Lieu logique à l'origine de l'objet
+  vector<pair<NetworkAccessPoint*, double> > _accessPointsWithDistance; //!< Points d'entrée sur le calcul d'itinéraire
     //@}
 
 public:

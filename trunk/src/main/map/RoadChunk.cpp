@@ -109,12 +109,45 @@ RoadChunk::filterPhysicalStops (const std::vector<const Location*>& steps)
        iter != steps.end ();
        ++iter) {
     const Location* location = *iter;
-    if (!dynamic_cast<const PhysicalStop*> (location)) {
+    const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (location);
+    if (!physicalStop) {
       passagePoints.push_back (location->getVertex ());
-    }
+    } 
   }
   return passagePoints;
   
+
+}
+
+
+void 
+RoadChunk::setRoad (const Road* road) { 
+  _road = road; 
+
+
+  // ceci est la suite de la bidouille infame commencee dans
+  // physical stop: on profite de l'occasion pour leur affecter leur
+  // point metrique et leur route, ce qui va creer son adresse. infect.
+  ((PhysicalStop*) physicalStop)->setMetricOffset ()
+	
+  double metricOffset = 0.0;
+  const Vertex* previousVertex = 0;
+  for (std::vector<const Location*>::const_iterator iter (steps.begin());
+       iter != steps.end ();
+       ++iter) {
+    const Location* location = *iter;
+    
+    const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (location);
+    if (!physicalStop) {
+      if (previousVertex != 0) {
+	metricOffset += previousVertex->distanceTo (*location->getVertex ());
+	previousVertex = location->getVertex ();
+    } else {
+      // TODO : on neglige la distance entre les deux vertex de passage pour l'instant
+      // faire l'export des coordonnnes projetees depuis intranet...
+      physicalStop->setMetricOffset (_road, metricOffset);
+    }
+  }
 
 }
 

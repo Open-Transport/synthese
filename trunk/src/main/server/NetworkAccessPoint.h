@@ -4,22 +4,27 @@
 
 #include "Point.h"
 #include <string>
-#include "temps.h"
+#include "Temps.h"
 #include <vector>
 #include <utility>
 
 
 class LogicalPlace;
-class Address;
+
+namespace synmap {
+  class Address;
+}
+
+
 
 class NetworkAccessPoint : public cPoint
 {
 public:
 
-	/** Accès à adresse avec durée */
-	typedef pair<Address*, cDureeEnMinutes> AddressWithAccessDuration;
 
-	/** Liste d'adresses avec durée d'accès */
+	/** Liste d'adresses avec durÃ©e d'accÃ¨s */
+	/** Accès à adresse avec durée */
+	typedef pair<synmap::Address*, cDureeEnMinutes> AddressWithAccessDuration;
 	typedef vector<AddressWithAccessDuration> AddressList;
 
 private:
@@ -37,7 +42,7 @@ public:
 
 	//!	@name Calculateurs
 	//@{
-		virtual AddressList getAddresses(bool forDeparture) const = 0;
+		virtual AddressList getAddresses(bool forDeparture) = 0;
 	//@}
 	
 	//!	@name Modificateurs
@@ -48,7 +53,7 @@ public:
 	//!	@name Constructeur et destructeur
 	//@{
 		NetworkAccessPoint(LogicalPlace*, size_t);
-		~NetworkAccessPoint();
+		virtual ~NetworkAccessPoint();
 	//@}
 
 };

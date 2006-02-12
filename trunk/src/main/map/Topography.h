@@ -13,6 +13,8 @@
 
 
 class cCommune;
+class cEnvironnement;
+
 
 
 namespace synmap
@@ -54,7 +56,7 @@ namespace synmap
       typedef map< const Vertex*, Referrants*>  VertexRefMap;
       typedef map< const Edge*,   Referrants*>  EdgeRefMap;
 
-		
+      const cEnvironnement* _environment;
 	
       VertexMap2D _vertices;
       EdgeMap2D   _edges;
@@ -79,10 +81,13 @@ namespace synmap
       typedef bool (*ItineraryFilter) (const Itinerary*);
       typedef bool (*ZoneFilter) (const Zone*);
 
-      Topography();
+      Topography(const cEnvironnement* environment = 0);
       virtual ~Topography();
 	
 	
+      const cEnvironnement* getEnvironment () const { return _environment; }
+
+
       //! Creates the unique vertex associated with x and y.
       //! If the vertex already exists it is returned.
       /*!

@@ -1,4 +1,4 @@
-/** Implémentation lieu logique
+/** ImplÃ©mentation lieu logique
 	@file LogicalPlace.cpp
 */
 
@@ -51,12 +51,12 @@ LogicalPlace::LogicalPlace(tIndex id, tNiveauCorrespondance __transferRules)
 	_firstArrivalLineStop = NULL;
 	_firstDepartureLineStop = NULL;
 	
-	// Valeurs initialisées
+	// Valeurs initialisÃ©es
 	_minTransferDelay = CorrespondanceAutorisee() != CorrInterdite ? FORBIDDEN_TRANSFER_DELAY : 0;
 }
 
 
-/** Constructeur de lieu logique de type route entière.
+/** Constructeur de lieu logique de type route entiÃ¨re.
 	@param id ID du lieu logique
 	@param road Route support du lieu logique
 
@@ -73,14 +73,14 @@ LogicalPlace::LogicalPlace(Road* road)
 	_firstArrivalLineStop = NULL;
 	_firstDepartureLineStop = NULL;
 
-	// Valeurs initialisées
+	// Valeurs initialisÃ©es
 	_minTransferDelay = FORBIDDEN_TRANSFER_DELAY;
 
 	setDesignation(road->getTown(), road->getName());
 }
 
 
-/** Constructeur de lieu logique de type adresse précise.
+/** Constructeur de lieu logique de type adresse prÃ©cise.
 	@param address Adresse
 */
 LogicalPlace::LogicalPlace(synmap::Address* address)
@@ -175,33 +175,33 @@ LogicalPlace::tNiveauCorrespondance LogicalPlace::NiveauCorrespondance(const cDi
 
 
 
-/**	Modificateur d'un délai minimal de correspondance entre deux quais.
-	@param NumeroArretPhysiqueDepart ArretPhysique de départ (indique la ligne dans la matrice de délais de correspondance)
-	@param NumeroArretPhysiqueArrivee ArretPhysique d'arrivée (indique la colonne dans la matrice de délais de correspondance)
-	@param delay le délai minimal de correspondance entre les deux quais, indiqué en minutes (format numérique).
+/**	Modificateur d'un dÃ©lai minimal de correspondance entre deux quais.
+	@param NumeroArretPhysiqueDepart ArretPhysique de dÃ©part (indique la ligne dans la matrice de dÃ©lais de correspondance)
+	@param NumeroArretPhysiqueArrivee ArretPhysique d'arrivÃ©e (indique la colonne dans la matrice de dÃ©lais de correspondance)
+	@param delay le dÃ©lai minimal de correspondance entre les deux quais, indiquÃ© en minutes (format numÃ©rique).
 
 	Voir
 		- LogicalPlace::UNKNOWN_TRANSFER_DELAY
 		- LogicalPlace::FORBIDDEN_TRANSFER_DELAY
 
-	@return true si l'opération a été effectuée avec succès
+	@return true si l'opÃ©ration a Ã©tÃ© effectuÃ©e avec succÃ¨s
 	@author Hugues Romain
 	@date 2005-2006
 */
 bool LogicalPlace::setDelaiCorrespondance(tIndex NumeroArretPhysiqueDepart, tIndex NumeroArretPhysiqueArrivee, tDureeEnMinutes delay)
 {
-	// Ecriture de la donnée
+	// Ecriture de la donnÃ©e
 	try
 	{
 		_transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee] = delay;
 
 		if (delay != UNKNOWN_TRANSFER_DELAY && delay != FORBIDDEN_TRANSFER_DELAY)
 		{
-			// Ecriture du délai minimal le plus important attente au départ du quai de départ spécifié
+			// Ecriture du dÃ©lai minimal le plus important attente au dÃ©part du quai de dÃ©part spÃ©cifiÃ©
 			if (_transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee] > _maxTransferDelay[NumeroArretPhysiqueDepart])
 				_maxTransferDelay[NumeroArretPhysiqueDepart] = _transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee];
 			
-			// Ecriture du délai minimal le plus faible du point d'arrêt
+			// Ecriture du dÃ©lai minimal le plus faible du point d'arrÃªt
 			if (_transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee] < _minTransferDelay)
 				_minTransferDelay = _transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee];
 		}
@@ -211,7 +211,7 @@ bool LogicalPlace::setDelaiCorrespondance(tIndex NumeroArretPhysiqueDepart, tInd
 		return false;
 	}
 
-	// Succès
+	// SuccÃ¨s
 	return true;
 }
 
@@ -358,7 +358,7 @@ cGareLigne* LogicalPlace::DessertALArrivee(const cLigne* Ligne) const
 }
 */
 
-/*!	Modificateur désignation courte pour indicateur papier.
+/*!	Modificateur dÃ©signation courte pour indicateur papier.
 	\param newDesignationOD Designation courte de l'arret
 	\author Hugues Romain
 	\date 2001-2005
@@ -404,7 +404,7 @@ void LogicalPlace::setAlerteFin(cMoment& momentFin)
 
 
 
-/** Modificateur désignation de 13 caracteres.
+/** Modificateur dÃ©signation de 13 caracteres.
     @param __Designation13 Valeur a donner a la designation de 13 caracteres.En cas de chaine de longueur trop importante, la valeur est tronquee.
     return true si la copie a ete effectuee integralement, false si elle a ete tronquee.
 */
@@ -416,7 +416,7 @@ bool LogicalPlace::setDesignation13(const cTexte& __Designation13)
 
 
 
-/** Modificateur désignation de 26 caracteres.
+/** Modificateur dÃ©signation de 26 caracteres.
     @param __Designation26 Valeur a donner a la designation de 26 caracteres.En cas de chaine de longueur trop importante, la valeur est tronquee.
     return true si la copie a ete effectuee integralement, false si elle a ete tronquee.
 */
@@ -428,8 +428,8 @@ bool LogicalPlace::setDesignation26(const cTexte& __Designation26)
 
 
 
-/** Accesseur désignation 13 caractères.
-    @return Désignation de 13 caractères du point d'arrêt.
+/** Accesseur dÃ©signation 13 caractÃ¨res.
+    @return DÃ©signation de 13 caractÃ¨res du point d'arrÃªt.
 */
 const cTexte& 
 LogicalPlace::getDesignation13() const
@@ -439,8 +439,8 @@ LogicalPlace::getDesignation13() const
 
 
 
-/** Accesseur désignation 26 caractères.
-    @return Désignation de 26 caractères du point d'arrêt.
+/** Accesseur dÃ©signation 26 caractÃ¨res.
+    @return DÃ©signation de 26 caractÃ¨res du point d'arrÃªt.
 */
 const cTexte& 
 LogicalPlace::getDesignation26() const
@@ -590,44 +590,45 @@ T& operator<<(T& flux, const LogicalPlace& Obj)
 }
 
 
-/** Création d'un lieu spécifique précis sur un lieu route entière à partir d'un numéro d'adresse.
-	@param addressNumber Numéro d'adresse (vide/INCONNU = pas de numéro fourni)
-	@return Pointeur vers le lieu le plus précis possible :
-		- rue entiere si impossible de préciser (this non jetable)
-		- pointeur vers un lieu créé et contenant l'adresse précise, avec l'attribut _Jetable à true.
-		- NULL si numéro d'adresse identifié comme invalide par les données de la rues si disponibles
+/** CrÃ©ation d'un lieu spÃ©cifique prÃ©cis sur un lieu route entiÃ¨re Ã  partir d'un numÃ©ro d'adresse.
+	@param addressNumber NumÃ©ro d'adresse (vide/INCONNU = pas de numÃ©ro fourni)
+	@return Pointeur vers le lieu le plus prÃ©cis possible :
+		- rue entiere si impossible de prÃ©ciser (this non jetable)
+		- pointeur vers un lieu crÃ©Ã© et contenant l'adresse prÃ©cise, avec l'attribut _Jetable Ã  true.
+		- NULL si numÃ©ro d'adresse identifiÃ© comme invalide par les donnÃ©es de la rues si disponibles
 
-	@warning Vérifier la valeur _volatile du lieu retourné. Si elle est à true, alors il faut détruire l'objet après utilisation sous peine de fuites mémoires.
+	@warning VÃ©rifier la valeur _volatile du lieu retournÃ©. Si elle est Ã  true, alors il faut dÃ©truire l'objet aprÃ¨s utilisation sous peine de fuites mÃ©moires.
 
-	La création d'un lieu spécifique est effectuée si et seulement si :
-		- un numéro d'adresse non inconnu est fourni
-		- la route du lieu courant a les capacités de déterminer la position désignée par le numéro d'adresse
-		- le numéro d'adresse appartient bel et bien à la plage d'adresses de la rue
+	La crÃ©ation d'un lieu spÃ©cifique est effectuÃ©e si et seulement si :
+		- un numÃ©ro d'adresse non inconnu est fourni
+		- la route du lieu courant a les capacitÃ©s de dÃ©terminer la position dÃ©signÃ©e par le numÃ©ro d'adresse
+		- le numÃ©ro d'adresse appartient bel et bien Ã  la plage d'adresses de la rue
 
-	@todo MJ Implémentation à terminer
+	@todo MJ ImplÃ©mentation Ã  terminer
 */
 LogicalPlace* LogicalPlace::accurateAddressLogicalPlace(synmap::Address::AddressNumber addressNumber)
 {
-	if (false) // Clause Calcul d'une adresse précise possible à implémenter 
+	if (false) // Clause Calcul d'une adresse prÃ©cise possible Ã  implÃ©menter 
 	{
 		
-		return new LogicalPlace(new synmap::Address(this, _road, 0, addressNumber));
+// TODO : verifier l'argument rang ici 
+            return new LogicalPlace(new synmap::Address(this, 0, _road, addressNumber));
 	}
 
-	// Retour par défaut
+	// Retour par dÃ©faut
 	return this;
 }
 
 
-/** Ajout d'accès à réseau.
-	@param networkAccessPoint Adresse à ajouter
-	@return le rang de l'élément ajouté (INCONNU si erreur)
+/** Ajout d'accÃ¨s Ã  rÃ©seau.
+	@param networkAccessPoint Adresse Ã  ajouter
+	@return le rang de l'Ã©lÃ©ment ajoutÃ© (INCONNU si erreur)
 
-	Cette méthode effectue les actions suivantes :
+	Cette mÃ©thode effectue les actions suivantes :
 */
 tIndex LogicalPlace::addNetworkAccessPoint(NetworkAccessPoint* networkAccessPoint, tIndex id)
 {
-	/** - Insertion de l'élément */
+	/** - Insertion de l'Ã©lÃ©ment */
 	try
 	{
 		if (id == INCONNU)
@@ -643,7 +644,7 @@ tIndex LogicalPlace::addNetworkAccessPoint(NetworkAccessPoint* networkAccessPoin
 		return INCONNU;
 	}
 
-	/** - Initialisation de la matrice de correspondances pour le nouvel arrivé à la valeur inconnu */
+	/** - Initialisation de la matrice de correspondances pour le nouvel arrivÃ© Ã  la valeur inconnu */
 	if (CorrespondanceAutorisee() != CorrInterdite)
 	{
 		_maxTransferDelay[id] = 0;
@@ -655,7 +656,7 @@ tIndex LogicalPlace::addNetworkAccessPoint(NetworkAccessPoint* networkAccessPoin
 		setDelaiCorrespondance(id,id,FORBIDDEN_TRANSFER_DELAY);
 	}
 
-	/** - Gestion des coordonnées géographiques */
+	/** - Gestion des coordonnÃ©es gÃ©ographiques */
 	if (!_networkAccessPoints[id]->unknownLocation())
 	{
 		int avgX = 0;
@@ -687,7 +688,7 @@ void LogicalPlace::setDesignation(cCommune* town, string name)
 	_town = town;
 	_name = name;
 
-	// Génération automatique de Designation OD si besoin
+	// GÃ©nÃ©ration automatique de Designation OD si besoin
 	if (!_nameAsDestinationForTimetable.Taille())
 	{
 		cTexte newDesignationOD;
@@ -705,8 +706,8 @@ void LogicalPlace::setDesignation(cCommune* town, string name)
 }
 
 
-/** Ajout de lieu logique inclus/alisé.
-	@param logicalPlace Lieu logique à inclure/aliaser
+/** Ajout de lieu logique inclus/alisÃ©.
+	@param logicalPlace Lieu logique Ã  inclure/aliaser
 */
 void LogicalPlace::addAliasedLogicalPlace(LogicalPlace* logicalPlace)
 {
@@ -714,7 +715,7 @@ void LogicalPlace::addAliasedLogicalPlace(LogicalPlace* logicalPlace)
 }
 
 
-/** Accesseur arrêts physiques.
+/** Accesseur arrÃªts physiques.
 
 */
 LogicalPlace::PhysicalStopsMap LogicalPlace::getPhysicalStops() const

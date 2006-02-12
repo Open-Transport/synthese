@@ -38,6 +38,8 @@ NetworkAccessPoint::NetworkAccessPoint(LogicalPlace* logicalPlace, size_t rank)
 , _logicalPlace(logicalPlace)
 , _rank(rank)
 {
+  // TODO ajouter insertion dans la logical place je pense
+  // avec index si rank est connu sinon en push_back
 
 }
 

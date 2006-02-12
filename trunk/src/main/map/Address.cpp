@@ -9,6 +9,7 @@
 #include <assert.h>
 
 
+
 namespace synmap
 {
 
@@ -21,10 +22,16 @@ namespace synmap
  
  @todo Gérer ici immédiatement le PM : soit il est fourni, soit il est extrapolé d'après le numéro, soit on prend le milieu
 */
-Address::Address(LogicalPlace* logicalPlace, Road* road, size_t rankInLogicalPlace, AddressNumber number)
-: NetworkAccessPoint(logicalPlace, rankInLogicalPlace)
-		, _road(road)
-        , _number(number)
+Address::Address(LogicalPlace* logicalPlace,
+		 size_t rankInLogicalPlace,
+		 Road* road, 
+		 double metricOffset,
+		 AddressNumber number)
+  : NetworkAccessPoint (logicalPlace, rankInLogicalPlace)
+  , _road(road)
+  , _metricOffset (metricOffset)
+  , _number(number)
+
 {}
 
 
@@ -36,17 +43,17 @@ Address::~Address()
 
 
 std::set
-    < std::pair<double, const PhysicalStop*> >
-Address::findDistancesToPhysicalStops (double maxDistance) const
+    < std::pair<double, const Address*> >
+Address::findDistancesToAddresses (double maxDistance) const
 {
   std::set
-    < Address::PathToPhysicalStop > paths = findPathsToPhysicalStops (maxDistance);
+    < Address::PathToAddress > paths = findPathsToAddresses (maxDistance);
 
   std::set
-    < std::pair<double, const PhysicalStop*> > result;
+    < std::pair<double, const Address*> > result;
   
   double pathLength = 0.0;
-  for (std::set < Address::PathToPhysicalStop >::const_iterator iter (paths.begin ());
+  for (std::set < Address::PathToAddress >::const_iterator iter (paths.begin ());
        iter != paths.end ();
        ++iter) {
     for (std::vector<const RoadChunk*>::const_iterator iterChunk (iter->first.begin ());
@@ -64,7 +71,7 @@ Address::findDistancesToPhysicalStops (double maxDistance) const
 
 
 
-/** Recherche des arrêts physiques situés à proximité de l'adresse.
+/** Recherche des adresses situés à proximité de l'adresse.
  
  @param maxDistance Distance maximale à parcourir
  
@@ -75,8 +82,8 @@ Address::findDistancesToPhysicalStops (double maxDistance) const
  @author Marc Jambert
 */
 std::set
-    < Address::PathToPhysicalStop >
-Address::findPathsToPhysicalStops (double maxDistance) const
+< Address::PathToAddress >
+Address::findPathsToAddresses (double maxDistance) const
     {
         const RoadChunk* chunk = _road->findMostPlausibleChunkForNumber (_number);
         // TODO : add an algorithm to find more precisely the vertex to
@@ -87,7 +94,7 @@ Address::findPathsToPhysicalStops (double maxDistance) const
                 start->findPathsToCloseNeighbors (maxDistance);
 
         std::set
-            < PathToPhysicalStop > result;
+            < PathToAddress > result;
 
         Road::RoadChunkVector tmpChunks;
         std::vector<const PhysicalStop*> tmpPhysicalStops;
@@ -138,7 +145,7 @@ Address::findPathsToPhysicalStops (double maxDistance) const
 
                         }
 
-                        result.insert (PathToPhysicalStop (pathChunks, pstop));
+                        result.insert (PathToAddress (pathChunks, pstop->getAddress ()));
 
 
                     }
@@ -156,12 +163,14 @@ Address::findPathsToPhysicalStops (double maxDistance) const
 
 
 	
-	NetworkAccessPoint::AddressList AddressList getAddresses(bool forDeparture) const
-	{
-		NetworkAccessPoint::AddressList result;
-		result.insert(pair(this, cDureeEnMinutes(0)));
-		return result;
-	}
+NetworkAccessPoint::AddressList 
+Address::getAddresses(bool forDeparture)
+{
+  AddressList result;
+  AddressWithAccessDuration addressAndDuration = make_pair (this, cDureeEnMinutes(0));
+  result.push_back(addressAndDuration);
+  return result;
+}
 
 
 

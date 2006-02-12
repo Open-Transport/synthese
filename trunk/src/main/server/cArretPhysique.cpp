@@ -5,7 +5,7 @@
 #include "cArretPhysique.h"
 #include "LogicalPlace.h"
 #include "map/Address.h"
-#include "temps.h"
+#include "Temps.h"
 
 
 /*!	\brief Constructeur

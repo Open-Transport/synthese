@@ -49,7 +49,7 @@ public:
 
 
 	const Road* getRoad () const { return _road; }
-	void setRoad (const Road* road) { _road = road; }
+	void setRoad (const Road* road);
 
 	Address::AddressNumber getRightStartNumber () const { return _rightStartNumber; }
 	Address::AddressNumber getRightEndNumber () const { return _rightEndNumber; }
