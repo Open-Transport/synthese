@@ -49,9 +49,6 @@
 				RelativePath="..\..\..\src\main\server\cAlternance.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\cArretLogique.cpp">
-			</File>
-			<File
 				RelativePath="..\..\..\src\main\server\cArretPhysique.cpp">
 			</File>
 			<File

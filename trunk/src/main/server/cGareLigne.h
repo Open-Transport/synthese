@@ -16,7 +16,6 @@ class cArretPhysique;
 class cLigne;
 
 #include "Temps.h"
-#include "cArretPhysique.h"
 #include "cVelo.h"
 #include "cHandicape.h"
 #include "cDistanceCarree.h"

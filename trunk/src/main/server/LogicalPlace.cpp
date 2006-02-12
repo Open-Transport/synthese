@@ -468,15 +468,6 @@ cArretPhysique* LogicalPlace::GetArretPhysique(int n) const
 
 
 
-cGareLigne* LogicalPlace::PremiereGareLigneDep() const
-{
-	return _firstDepartureLineStop;
-}
-
-cGareLigne* LogicalPlace::PremiereGareLigneArr() const
-{
-	return _firstArrivalLineStop;
-}
 
 tIndex LogicalPlace::Index() const
 {
@@ -484,15 +475,6 @@ tIndex LogicalPlace::Index() const
 }
 
 
-void LogicalPlace::setPremiereGareLigneDep(cGareLigne* curGareLigne)
-{
-	_firstDepartureLineStop = curGareLigne;
-}
-
-void LogicalPlace::setPremiereGareLigneArr(cGareLigne* curGareLigne)
-{
-	_firstArrivalLineStop = curGareLigne;
-}
 	
 const cTexte& LogicalPlace::getDesignationOD() const
 {

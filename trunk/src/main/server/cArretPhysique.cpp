@@ -42,3 +42,23 @@ NetworkAccessPoint::AddressList cArretPhysique::getAddresses(bool forDeparture) 
 
 	return result;
 }
+
+void cArretPhysique::setPremiereGareLigneDep(cGareLigne* curGareLigne)
+{
+	_firstDepartureLineStop = curGareLigne;
+}
+
+void cArretPhysique::setPremiereGareLigneArr(cGareLigne* curGareLigne)
+{
+	_firstArrivalLineStop = curGareLigne;
+}
+
+cGareLigne* cArretPhysique::PremiereGareLigneDep() const
+{
+	return _firstDepartureLineStop;
+}
+
+cGareLigne* cArretPhysique::PremiereGareLigneArr() const
+{
+	return _firstArrivalLineStop;
+}

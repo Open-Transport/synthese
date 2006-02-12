@@ -433,7 +433,7 @@ bool cLigne::allowAddServiceHoraire(const cHoraire* tbHoraires) const
 
 	En cas de succession d'arr�ts identiques, la relation entre les deux arr�ts n'est pas possible.
 */
-cGareLigne* cLigne::addGareLigne(const cGareLigne* GLigneACopier, tDistanceM newPM, tIndex newArretPhysique, tTypeGareLigneDA newType, LogicalPlace* newPA, bool newHorairesSaisis, bool Route)
+cGareLigne* cLigne::addGareLigne(const cGareLigne* GLigneACopier, tDistanceM newPM, cArretPhysique* newArretPhysique, tTypeGareLigneDA newType, bool newHorairesSaisis, bool Route)
 {
 	cGareLigne* newGareLigne;
 	if (GLigneACopier == NULL)

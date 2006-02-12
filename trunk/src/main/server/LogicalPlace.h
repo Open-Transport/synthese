@@ -138,8 +138,6 @@ protected:
     //! \name Chainage et indexation
     //@{
     const tIndex _id;    //!< Index du lieu logique dans l'environnement
-    cGareLigne*  _firstDepartureLineStop; //!< Pointeur vers le premier départ de ligne (ordre aléatoire) \todo trier par orientation ?
-    cGareLigne*  _firstArrivalLineStop; //!< Pointeur vers la première arrivée de ligne (ordre aléatoire) \todo trier par orientation ?
     //@}
 
 
@@ -174,8 +172,6 @@ public:
 
     tIndex     Index()             const;
     const cDureeEnMinutes& PireAttente(tIndex i)         const;
-    cGareLigne*    PremiereGareLigneArr()         const;
-    cGareLigne*    PremiereGareLigneDep()         const;
     bool getVolatile() const
     {
         return _volatile;
@@ -209,8 +205,6 @@ public:
     void setAlerteDebut(cMoment& momentDebut);
     void setAlerteFin(cMoment& momentFin);
     void setAlerteMessage(cTexte& message);
-    void setPremiereGareLigneDep(cGareLigne*);
-    void setPremiereGareLigneArr(cGareLigne*);
     bool setDelaiCorrespondance(tIndex __VoieDepart, tIndex __VoieArrivee, tDureeEnMinutes);
     void setDesignationOD(const cTexte&);
     // bool setVMax(tCategorieDistance, tVitesseKMH);
