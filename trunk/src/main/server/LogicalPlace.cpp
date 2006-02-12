@@ -18,6 +18,24 @@ using namespace synmap;
 const tDureeEnMinutes LogicalPlace::UNKNOWN_TRANSFER_DELAY = -1;
 const tDureeEnMinutes LogicalPlace::FORBIDDEN_TRANSFER_DELAY = 99;
 
+/** Constructeur de lieu logique de type alias.
+	@todo A REVOIR
+*/
+LogicalPlace::LogicalPlace(LogicalPlace* logicalPlace)
+: cPoint(&logicalPlace)
+, _volatile(false)
+, _transferRules(CorrInterdite)
+, _id(0)
+, _road(NULL)
+{
+	// Aucune desserte par des lignes
+	_firstArrivalLineStop = NULL;
+	_firstDepartureLineStop = NULL;
+
+	addAliasedLogicalPlace(logicalPlace);
+}
+
+
 /** Constructeur de lieu logique de type standard
 	@author Hugues Romain
 	@date 2001-2006
@@ -727,3 +745,4 @@ LogicalPlace::AddressesMap LogicalPlace::getAddresses() const
 	}
 	return result;
 }
+

@@ -190,7 +190,7 @@ public:
 	
 	//! \name Modificateurs
 	//@{
-		void			addLogicalPlace(size_t, LogicalPlace*);
+		void			addLogicalPlace(LogicalPlace*);
 		void			addTown(const cCommune* town);
 	//	cSauvegarde*	JCSauvegardeModifier(tNumeroJC NumeroNewJC, const cTexte& newIntitule);
 		void			JCSupprimerInutiles(bool Supprimer=false);
@@ -206,6 +206,7 @@ public:
 	//@{
 	cCalculateur*		CalculateurLibre();
 	vector<cCommune*>	searchTown(const std::string&, size_t n=0)										const;
+	cCommune*			getTown(const std::string&)	const;
 	void				NomLigneUnique(cTexte& NomBase)														const;
 	bool				ControleNumerosArretCommuneDesignation(int nA, int nC, int nD, const cTexte& txtA)	const;
 	bool				ControleNumeroTexteCommune(int nC, const cTexte& txtC)								const;

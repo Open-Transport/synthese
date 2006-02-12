@@ -2745,3 +2745,21 @@ LogicalPlace* cEnvironnement::getLogicalPlace(size_t id)
 {
 	return _logicalPlaces[id];
 }
+
+void cEnvironnement::addLogicalPlace(LogicalPlace* logicalPlace)
+{
+	_logicalPlaces[logicalPlace->getId()] = logicalPlace;
+}
+
+
+/** Recherche de commune par nom, en correspondance exacte.
+	@param name Nom de la commune à chercher
+	@return Commune trouvée NULL sinon
+*/
+cCommune* cEnvironnement::getTown(const std::string& name)	const
+{
+	for (size_t i=0; i < _towns.size(); ++i)
+		if (_towns[i]->getName() == name)
+			return _towns[i];
+	return NULL;
+}

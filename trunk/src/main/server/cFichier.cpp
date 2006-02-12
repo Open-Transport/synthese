@@ -19,6 +19,8 @@
 
 #include "cTableauAffichageSelectifDestinations.h"
 
+#include "LogicalPlace.h"
+
 extern SYNTHESE Synthese;
 
 /*!	\brief Constructeur
@@ -1044,7 +1046,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 	bool PasTermineSousSection = true;
 	bool PasTermineElement = false;
 	tCategorieDistance iCategorieDistance;
-	tNiveauCorrespondance curNiveauCorrespondance = CorrInterdite;;
+	LogicalPlace::tNiveauCorrespondance curNiveauCorrespondance = CorrInterdite;;
 	// Tampon
 	cTexte Tampon(TAILLETAMPON, true);
 	cTexte TamponCalcul(TAILLETAMPON, true);
@@ -1053,6 +1055,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 	LogicalPlace* curArretLogique = NULL;
 	cArretPhysique* curArretPhysique = NULL;
 	tIndex curNumeroArretPhysique;
+	size_t mainDesignation;
 
 	if (!Ouvrir())
 	{
@@ -1069,24 +1072,26 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 			PasTermineElement = true;
 			switch (Tampon[1])
 			{
-			case 'C': curNiveauCorrespondance = CorrAutorisee;			break;
-			case 'Q': curNiveauCorrespondance = CorrRecommandeeCourt;	break;
-			case 'R': curNiveauCorrespondance = CorrRecommandee;		break;
-			case 'S': curNiveauCorrespondance = CorrInterdite;			break;
+			case 'C': curNiveauCorrespondance = LogicalPlace::CorrAutorisee;			break;
+			case 'Q': curNiveauCorrespondance = LogicalPlace::CorrRecommandeeCourt;	break;
+			case 'R': curNiveauCorrespondance = LogicalPlace::CorrRecommandee;		break;
+			case 'S': curNiveauCorrespondance = LogicalPlace::CorrInterdite;			break;
 			default:
-				curNiveauCorrespondance = CorrInterdite;
+				curNiveauCorrespondance = LogicalPlace::CorrInterdite;
 // 				Synthese.FichierLogBoot().Ecrit("Point d'Arr�t mal d�clar�", Tampon);
 				//! \todo Standardiser la sortie log
 			}
 
-			if (PasTermineElement)
-				curArretLogique = __Environnement->GetGareAvecCreation(curNiveauCorrespondance, Tampon.GetNombre(0,2));
+			curArretLogique = new LogicalPlace(Tampon.GetNombre(0,2), curNiveauCorrespondance);
+			__Environnement->addLogicalPlace(curArretLogique);
 
 			if (curArretLogique == NULL)
 			{
 				Tampon.Vide();
 				PasTermineElement = false;
 			}
+
+			mainDesignation = true;
 
 		}
 		else
@@ -1105,10 +1110,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 				break;
 
 			case PAFORMATLIGNEGpsx:
-				if (!curArretLogique->SetPoint(_Format->GetNombre(Tampon, PAFORMATCOLONNEStandard), curArretLogique->getPoint().YKMM()))
-				{}
-					//Synthese.FichierLogBoot().Ecrit("Coordonn�es X incorrectes", TXT(curPA->Index()), Tampon);
-					//!	\todo LOG
+				curArretLogique->setX(_Format->GetNombre(Tampon, PAFORMATCOLONNEStandard));
 				break;
 
 			case PAFORMATLIGNEAlerte:
@@ -1148,39 +1150,60 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 				}
 
 			case PAFORMATLIGNEGpsy:
-				if (!curArretLogique->SetPoint
-					(
-						curArretLogique->getPoint().XKMM()
-						, _Format->GetNombre(Tampon, PAFORMATCOLONNEStandard)
-					))
-				{}
-// 					Erreur("Coordonn�es Y incorrectes", TXT(curPA->Index()), Tampon, "02009");
+				curArretLogique->setY(_Format->GetNombre(Tampon, PAFORMATCOLONNEStandard));
 				break;
 
 			case PAFORMATLIGNEDescription:
-				// S�paration Commune et nom
-				// Tampon donne le nom de la commune
-				// PositionNom donne le nom de l'arr�t.
 				{
+					cCommune* commune;
+
 					tIndex Position = Tampon.RechercheOccurenceGauche('(', 1
 						, _Format->GetColonnePosition(PAFORMATCOLONNEDesignationLibelle)	);
+
+					int designationType = _Format->GetNombre(Tampon, PAFORMATCOLONNEDesignationType)
+
  					if (!Position)
 					{}
 // 						Erreur("D�signation de point d'arr�t mal d�clar�e", TXT(curPA->Index()), Tampon, "02003");
+//							Synthese.FichierLogBoot().Ecrit(MESSAGE_GARE_DESIGNATION_INCORRECTE, TXT(curArretLogique->Index()), Tampon);
 					else
 					{
-						if (!__Environnement->Enregistre(
-							new cAccesPADe(
-								curArretLogique
-								, __Environnement->GetCommuneAvecCreation(
-									Tampon.Extrait(
-										_Format->GetColonnePosition(PAFORMATCOLONNEDesignationLibelle)
-										, Position - _Format->GetColonnePosition(PAFORMATCOLONNEDesignationLibelle)
-									)	), Tampon.Extrait(Position+1)
-								), (tTypeAccesPADe) _Format->GetNombre(Tampon, PAFORMATCOLONNEDesignationType)
-							)	
-						)
-							Synthese.FichierLogBoot().Ecrit(MESSAGE_GARE_DESIGNATION_INCORRECTE, TXT(curArretLogique->Index()), Tampon);
+
+						// All places virtual stop
+						if (designationType == 2)
+						{
+							/** @todo ARRET TOUT LIEU NON GERE : le signaler avec un autre truc que la désignation */
+						}
+
+						// Normal logical stop
+						if (designationType == 0 || designationType == 1)
+						{
+							LogicalPlace* designation;
+
+							string townName = string(Tampon.Extrait(_Format->GetColonnePosition(PAFORMATCOLONNEDesignationLibelle)
+								, Position - _Format->GetColonnePosition(PAFORMATCOLONNEDesignationLibelle)
+										).Texte()));
+							string name = string(Tampon.Extrait(Position+1).Texte());
+
+							if (!(commune = __Environnement->getTown(townName))
+								commune = __Environnement->addTown(new cCommune(__Environnement, -1, townName));
+
+							if (mainDesignation)
+							{
+								designation = curArretLogique;
+								mainDesignation = false;
+							}
+							else
+								designation = new LogicalPlace(this);
+							
+							designation->setDesignation(commune, name);
+						
+							// Main stop in town
+							if (designationType == 1)
+							{
+								commune->addToMainLogicalPlace(designation);
+							}
+						}
 					}
 				}
 				break;
@@ -1191,68 +1214,62 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 
 			case PAFORMATLIGNEArretPhysique:
 				// Cr�ation du quai
-				curArretPhysique = new cArretPhysique;
 				curNumeroArretPhysique = (tIndex) _Format->GetNombre(Tampon, PAFORMATCOLONNEIndexArretPhysique);
-				if (!curArretLogique->AddArretPhysique(curNumeroArretPhysique, curArretPhysique))
+				curArretPhysique = new cArretPhysique(curArretLogique, curNumeroArretPhysique);
+				
+				// Matrice des correspondances et position du curseur de texte
+				int Position;
+				if (curArretLogique->CorrespondanceAutorisee() != CorrInterdite)
 				{
-// 					Erreur("D�claration de quai invalide", TXT(curPA->Index()), Tampon, "02004");
-					delete curArretPhysique;
+					// Ecriture de chaque d�lai de correspondance
+					for (tIndex iNumeroArretPhysiqueDest = 0; iNumeroArretPhysiqueDest < curArretLogique->NombreArretPhysiques(); iNumeroArretPhysiqueDest++)
+						curArretLogique->setDelaiCorrespondance(curNumeroArretPhysique, iNumeroArretPhysiqueDest + 1
+							, _Format->GetNombre(Tampon, PAFORMATCOLONNEDelaiCorrespondance, iNumeroArretPhysiqueDest)	);
+						
+					// Position du pointeur apr�s la matrice de d�lais de correspondances
+					Position = _Format->GetColonnePosition(PAFORMATCOLONNEDelaiCorrespondance, curArretLogique->NombreArretPhysiques());
 				}
-				else
-				{				
-					// Matrice des correspondances et position du curseur de texte
-					int Position;
-					if (curArretLogique->CorrespondanceAutorisee() != CorrInterdite)
+				else // Sinon position du pointeur imm�diatement apr�s le num�ro du quai
+					Position = _Format->GetColonnePosition(PAFORMATCOLONNEDelaiCorrespondance, 0);
+				
+				// Interpr�tation de la d�signation du quai
+				/*!	\todo Int�grer ce type d'interpr�tation lin�aire dans une description type XML assist�e par un fichier de format
+						Etape indispensable pour augmenter le type d'informations li�es au quai, notamment si longueur variable
+				*/
+				for(; Position < Tampon.Taille(); Position++)
+				{
+					if (Tampon[Position]=='#')
 					{
-						// Ecriture de chaque d�lai de correspondance
-						for (tIndex iNumeroArretPhysiqueDest = 0; iNumeroArretPhysiqueDest < curArretLogique->NombreArretPhysiques(); iNumeroArretPhysiqueDest++)
-							curArretLogique->setDelaiCorrespondance(curNumeroArretPhysique, iNumeroArretPhysiqueDest + 1
-								, _Format->GetNombre(Tampon, PAFORMATCOLONNEDelaiCorrespondance, iNumeroArretPhysiqueDest)	);
-							
-						// Position du pointeur apr�s la matrice de d�lais de correspondances
-						Position = _Format->GetColonnePosition(PAFORMATCOLONNEDelaiCorrespondance, curArretLogique->NombreArretPhysiques());
-					}
-					else // Sinon position du pointeur imm�diatement apr�s le num�ro du quai
-						Position = _Format->GetColonnePosition(PAFORMATCOLONNEDelaiCorrespondance, 0);
-					
-					// Interpr�tation de la d�signation du quai
-					/*!	\todo Int�grer ce type d'interpr�tation lin�aire dans une description type XML assist�e par un fichier de format
-							Etape indispensable pour augmenter le type d'informations li�es au quai, notamment si longueur variable
-					*/
-					for(; Position < Tampon.Taille(); Position++)
+						if (Tampon.Compare("GX", 2, Position+1)) // Coordonn�es X
+						{
+							curArretPhysique->setX((CoordonneeKMM) Tampon.GetNombre(7, Position+3));
+							Position += 9;
+						}
+						if (Tampon.Compare("GY", 2, Position+1)) // Coordonn�es Y
+						{
+							curArretPhysique->setY((CoordonneeKMM) Tampon.GetNombre(7, Position+3));
+							Position += 9;
+						}
+/*						if (Tampon.Compare("PH", 2, Position+1)) // Photo
+						{
+							curArretPhysique->setPhoto((cPhoto*) __Environnement->GetDocument(Tampon.GetNombre(6, Position+3)));
+							Position += 9;
+						}
+						if (Tampon.Compare("APS", 3, Position+1)) // Compatibilit� ancienne donn�e (ignor�e)
+						{
+							Position += 9;
+						}
+						if (Tampon.Compare("RET", 3, Position+1)) // Compatibilit� ancienne donn�e (ignor�e)
+						{
+							Position += 6;
+						}
+*/					}
+					else
 					{
-						if (Tampon[Position]=='#')
-						{
-							if (Tampon.Compare("GX", 2, Position+1)) // Coordonn�es X
-							{
-								curArretPhysique->setX((CoordonneeKMM) Tampon.GetNombre(7, Position+3));
-								Position += 9;
-							}
-							if (Tampon.Compare("GY", 2, Position+1)) // Coordonn�es Y
-							{
-								curArretPhysique->setY((CoordonneeKMM) Tampon.GetNombre(7, Position+3));
-								Position += 9;
-							}
-							if (Tampon.Compare("PH", 2, Position+1)) // Photo
-							{
-								curArretPhysique->setPhoto((cPhoto*) __Environnement->GetDocument(Tampon.GetNombre(6, Position+3)));
-								Position += 9;
-							}
-							if (Tampon.Compare("APS", 3, Position+1)) // Compatibilit� ancienne donn�e (ignor�e)
-							{
-								Position += 9;
-							}
-							if (Tampon.Compare("RET", 3, Position+1)) // Compatibilit� ancienne donn�e (ignor�e)
-							{
-								Position += 6;
-							}
-						}
-						else
-						{
-							// Le reste du texte correspond au nom du quai
-							curArretPhysique->setNom(Tampon.Extrait(Position,1));
-						}
+						// Le reste du texte correspond au nom du quai
+						curArretPhysique->setNom(Tampon.Extrait(Position,1));
 					}
+					curArretLogique->addNetworkAccessPoint(curArretPhysique, curNumeroArretPhysique);
 				}
 				break;
 
@@ -1260,7 +1277,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 				curArretLogique->setDesignationOD(Tampon.Extrait(_Format->GetColonnePosition(PAFORMATCOLONNEStandard)));
 				break;
 
-			case PAFORMATLIGNEPhoto:
+/*			case PAFORMATLIGNEPhoto:
 				curArretLogique->addPhoto((cPhoto*) __Environnement->GetDocument(_Format->GetNombre(Tampon, PAFORMATCOLONNEStandard)));
 				break;
 
@@ -1279,7 +1296,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 				, (cPhoto*) __Environnement->GetDocument(_Format->GetNombre(Tampon, PAFORMATCOLONNEServicePhoto))
 					, _Format->Extrait(Tampon, PAFORMATCOLONNEServiceDesignation)	);
 				break;
-
+*/
 			case PAFORMATLIGNEDesignation13:	//20 / D13
 				curArretLogique->setDesignation13(Tampon.Extrait(_Format->GetColonnePosition(PAFORMATCOLONNEStandard)));
 				break;

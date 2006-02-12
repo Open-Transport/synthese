@@ -227,6 +227,7 @@ public:
     LogicalPlace(cCommune*, std::string);
     LogicalPlace(tIndex, cCommune*);
     LogicalPlace(cCommune*);
+	LogicalPlace(LogicalPlace*);
     ~LogicalPlace();
     //@}
 
