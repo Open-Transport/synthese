@@ -7,10 +7,10 @@
 
 class cSite;
 class cInterface_Objet_Connu_ListeParametres;
+class cEnvironnement;
 
 #include "Temps.h"
 #include "cTexte.h"
-#include "cEnvironnement.h"
 #include "cInterface.h"
 #include "cCalculItineraire.h"
 #include <iostream>
@@ -64,7 +64,7 @@ public:
 	//! \name Accesseurs
 	//@{
 	const cTexte&			getClef()				const;
-	const cEnvironnement*	getEnvironnement()		const;
+	cEnvironnement*	getEnvironnement()		const;
 	const cTexte&			getIdentifiant()		const;
 	const cInterface*		getInterface()			const;
 	const cDate& 			getDateDebut()			const;

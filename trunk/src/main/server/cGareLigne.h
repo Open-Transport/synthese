@@ -11,15 +11,16 @@ enum tTypeGareLigneDA
 	Arrivee = 'A',
 	Passage = 'P'
 };
-class cGareLigne;
-#include "cArretLogique.h"
-#include "cLigne.h"
+
+class cArretPhysique;
+class cLigne;
+
 #include "Temps.h"
 #include "cArretPhysique.h"
 #include "cVelo.h"
 #include "cHandicape.h"
 #include "cDistanceCarree.h"
-#include "cAccesPADe.h"
+
 
 /** Liaison entre points d'arr�t et lignes
 	@ingroup m05
@@ -33,8 +34,7 @@ private:
 
 	//! \name Variables Gare
 	//@{
-	cArretLogique*			vArretLogique;			//!< Arr�t logique desservi par la ligne
-	tNumeroVoie		vVoie;				//!< Num�ro du quai desservi par la ligne, au sein de l'arr�t
+	cArretPhysique* const			_physicalStop;			//!< Arrêt physique desservi par la gare ligne
 	cGareLigne*		vPADepartSuivant;		//!< Ligne suivante au d�part de l'arr�t
 	cGareLigne*		vPAArriveeSuivante;		//!< Ligne suivante � l'arriv�e � l'arr�t
 	cGareLigne*		vPADepartAxeSuivant;	//!< Ligne suivante au d�part de l'arr�t, d'un axe diff�rent
@@ -43,10 +43,10 @@ private:
 	
 	//! \name Variables Ligne
 	//@{
-	cLigne*				vLigne;						//!< Ligne desservant l'arr�t
-	tDistanceM			vPM;						//!< Point m�trique de l'arr�t sur la ligne
-	tTypeGareLigneDA	vTypeDA;						//!< Gare de d�part, d'arriv�e, ou de passage
-	bool			 	vHorairesSaisis;				//!< Horaires avec ou sans saisie
+	cLigne* const				vLigne;						//!< Ligne desservant l'arr�t
+	tDistanceM const			vPM;						//!< Point m�trique de l'arr�t sur la ligne
+	tTypeGareLigneDA 	vTypeDA;						//!< Gare de d�part, d'arriv�e, ou de passage
+	const bool			 	vHorairesSaisis;				//!< Horaires avec ou sans saisie
 	cGareLigne*			vDepartPrecedent;				//!< Arr�t de passage au d�part pr�c�dent sur la ligne
 	cGareLigne*			vDepartCorrespondancePrecedent;	//!< Arr�t de correspondance au d�part pr�c�dent sur la ligne
 	cGareLigne*			vArriveeSuivante;				//!< Arr�t de passage � l'arriv�e suivant sur la ligne
@@ -78,17 +78,17 @@ public:
 	
 	//! \name Constructeurs et destructeurs
 	//@{
-	cGareLigne (
-		cLigne*, 
-		tDistanceM, 
-		tNumeroVoie, 
-		tTypeGareLigneDA, 
-		cArretLogique*, 
-		bool newHorairesSaisis
-	);
-	cGareLigne(cLigne*, const cGareLigne&);
-	cGareLigne(cLigne*);
-	~cGareLigne();
+		cGareLigne (
+			cLigne*, 
+			tDistanceM, 
+			tTypeGareLigneDA, 
+			cArretPhysique*, 
+			bool newHorairesSaisis
+		);
+		cGareLigne(cLigne*, const cGareLigne&);
+	//	cGareLigne(cLigne*);
+		~cGareLigne();
+	//@}
 
 	
 	//! \name Modificateurs
@@ -109,8 +109,6 @@ public:
 	void setPADepartAxeSuivant(cGareLigne*);
 	void setPAArriveeAxeSuivant(cGareLigne*);
 	void setPM(tDistanceM newVal);
-	void setArretLogique(cArretLogique* newVal);
-	void setArretPhysique(tNumeroVoie newVal);
 	void setSuivant(cGareLigne* newVal);
 	void setPrecedent(cGareLigne*);
 	//@}
@@ -160,8 +158,8 @@ public:
 	cGareLigne*				getArriveeSuivante()							const;
 	cGareLigne*				getDepartCorrespondancePrecedent()				const;
 	cGareLigne*				getDepartPrecedent()							const;
-	const cGareLigne*		getLiaisonDirecteVers(const cAccesPADe*)		const;
-	const cGareLigne*		getLiaisonDirecteDepuis(const cAccesPADe*)		const;
+//	const cGareLigne*		getLiaisonDirecteVers(const cAccesPADe*)		const;
+//	const cGareLigne*		getLiaisonDirecteDepuis(const cAccesPADe*)		const;
 	const cHoraire&			getHoraireArriveeDernier(tNumeroService) 		const;
 	const cHoraire&			getHoraireArriveePremier(tNumeroService) 		const;
 	const cHoraire&			getHoraireArriveePremierReel(tNumeroService)	const;
@@ -179,8 +177,7 @@ public:
 	cGareLigne*				PADepartAxeSuivant()							const;
 	cGareLigne*				PADepartSuivant()								const;
 	tDistanceM				PM()											const;
-	cArretLogique*					ArretLogique()									const;
-	tNumeroVoie				ArretPhysique()											const;
+	cArretPhysique*				ArretPhysique()											const;
 	cGareLigne*				Suivant()										const;
 	tTypeGareLigneDA		TypeDA()										const;
 	//@}
@@ -210,10 +207,6 @@ inline bool cGareLigne::EstDepart() const
 	return(vTypeDA == Passage || vTypeDA == Depart);
 }
 
-inline cArretLogique* cGareLigne::ArretLogique() const
-{
-	return(vArretLogique);
-}
 
 inline cGareLigne*	cGareLigne::PADepartSuivant()									const
 {
@@ -235,9 +228,9 @@ inline cGareLigne*	cGareLigne::PAArriveeAxeSuivante() const
 	return(vPAArriveeAxeSuivante);
 }
 
-inline tNumeroVoie cGareLigne::ArretPhysique() const
+inline cArretPhysique* cGareLigne::ArretPhysique() const
 {
-	return(vVoie);
+	return _physicalStop;
 }
 
 inline tTypeGareLigneDA cGareLigne::TypeDA() const
@@ -345,25 +338,6 @@ inline tDistanceM	cGareLigne::PM() const
 	return(vPM);
 }
 	
-inline void cGareLigne::setArretLogique(cArretLogique *newVal)
-{
-	vArretLogique = newVal;
-}
-
-inline void cGareLigne::setArretPhysique(tNumeroVoie newVal)
-{
-	vVoie = newVal;
-}
-
-inline void cGareLigne::setPM(tDistanceM newVal)
-{
-	vPM = newVal;
-}
-
-inline void cGareLigne::setHorairesSaisis(bool newVal)
-{
-	vHorairesSaisis = newVal;
-}
 
 
 

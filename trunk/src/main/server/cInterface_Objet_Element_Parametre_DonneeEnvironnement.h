@@ -22,7 +22,7 @@ class cInterface_Objet_Element_Parametre_DonneeEnvironnement;
 
 /** Nom de point d'arr�t
 	@code A10 @endcode
-	@param Objet cArretLogique * Point d'arr�t
+	@param Objet LogicalPlace * Point d'arr�t
 	@param 0 Index de la d�signation utilis�e
 	@return Nom de point d'arr�t (selon d�signation en param�tre)
  */
@@ -31,7 +31,7 @@ class cInterface_Objet_Element_Parametre_DonneeEnvironnement;
 
 /**	Nom de commune de point d'arr�t
 	@code A11 @endcode
-	@param Objet cArretLogique * Point d'arr�t
+	@param Objet LogicalPlace * Point d'arr�t
 	@param 0 Index de la d�signation utilis�e
 	@return Nom de commune de point d'arr�t (selon d�signation en param�tre)
 */

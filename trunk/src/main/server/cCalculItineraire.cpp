@@ -6,8 +6,7 @@
  
 #include "cCalculItineraire.h"
 #include "cTrajet.h"
-#include "cAccesPADe.h"
-#include "cArretLogique.h"
+#include "LogicalPlace.h"
 #include "SYNTHESE.h"
 #include "cAccesReseau.h"
 
@@ -156,7 +155,7 @@ bool cCalculateur::HoraireDepartArrivee(cTrajet& __Resultat)
 }
 
 /*
-cElementTrajet* cEnvironnement::HoraireArriveeDepart(cArretLogique* GareOrigine, cArretLogique* GareDestination, cMoment& MomentArrivee, cMoment& DepartMin, DureeEnMinutes DureeMax, TSituation Situation, bool EcritLOG)
+cElementTrajet* cEnvironnement::HoraireArriveeDepart(LogicalPlace* GareOrigine, LogicalPlace* GareDestination, cMoment& MomentArrivee, cMoment& DepartMin, DureeEnMinutes DureeMax, TSituation Situation, bool EcritLOG)
 {
 	cElementTrajet* TempET = new cElementTrajet;
 	cElementTrajet* Resultat;
@@ -343,7 +342,7 @@ bool cCalculateur::FicheHoraire()
 // changement de jplus et mettre curdp sur premierdp en cas de changement. A
 // tester avec de telles lignes.
 //____________________________________________________________________________
-cDescriptionPassage* cEnvironnement::ListeDeparts(cArretLogique* curPA, cMoment MomentDebut, cMoment& MomentFin, signed int NombreReponses = -1)
+cDescriptionPassage* cEnvironnement::ListeDeparts(LogicalPlace* curPA, cMoment MomentDebut, cMoment& MomentFin, signed int NombreReponses = -1)
 {
 	// Variables
 	cGareLigne* curGLD;
@@ -1079,7 +1078,7 @@ bool cCalculateur::MeilleurDepart(cTrajet& __Resultat, cTrajet& __TrajetEffectue
 
 	// D�clarations
 //	cMoment			MomentMin = MomentMinAbsolu;
-//	cArretLogique*			GareDestination = TrajetEffectue->getGareDepart();
+//	LogicalPlace*			GareDestination = TrajetEffectue->getGareDepart();
 	const cAccesPADe*	GareDestination;
 	const cGareLigne*	CurrentGLD;
 	const cGareLigne*	CurrentGLA;
@@ -1352,7 +1351,7 @@ bool cCalculateur::MeilleurDepart(cTrajet& __Resultat, cTrajet& __TrajetEffectue
 */
 void cCalculateur::ResetMeilleursDeparts()
 {
-	tNumeroVoie iVoie;
+	tIndex iVoie;
 	for (tIndex i=0; i< vEnvironnement->NombrePointsArret(); i++)
 	{
 		vMeilleurTemps[i].setMoment(TEMPS_MIN);
@@ -1370,7 +1369,7 @@ void cCalculateur::ResetMeilleursDeparts()
 
 void cCalculateur::ResetMeilleuresArrivees()
 {
-	tNumeroVoie iVoie;
+	tIndex iVoie;
 	for (tIndex i=0; i<vEnvironnement->NombrePointsArret(); i++)
 	{
 		vMeilleurTemps[i].setMoment(TEMPS_MAX);
@@ -1386,13 +1385,13 @@ void cCalculateur::ResetMeilleuresArrivees()
 	}
 }
 
-void cCalculateur::SetMeilleurDepart(const cAccesPADe* curAccesPADe, const cMoment& NewMoment, tNumeroVoie NumVoie)
+void cCalculateur::SetMeilleurDepart(const cAccesPADe* curAccesPADe, const cMoment& NewMoment, tIndex NumVoie)
 {
 	for (; curAccesPADe != NULL; curAccesPADe = curAccesPADe->getSuivant())
 		SetMeilleurDepart(curAccesPADe->getArretLogique(), NewMoment, NumVoie);
 }
 
-void cCalculateur::SetMeilleurDepart(const cArretLogique* curPA, const cMoment& __Moment, tNumeroVoie NumVoie)
+void cCalculateur::SetMeilleurDepart(const LogicalPlace* curPA, const cMoment& __Moment, tIndex NumVoie)
 {
 	cMoment __MomentDepart = __Moment;
 	
@@ -1407,7 +1406,7 @@ void cCalculateur::SetMeilleurDepart(const cArretLogique* curPA, const cMoment& 
 		}
 		else
 		{
-			for (tNumeroVoie iVoie=1; iVoie<= curPA->NombreArretPhysiques(); iVoie++)
+			for (tIndex iVoie=1; iVoie<= curPA->NombreArretPhysiques(); iVoie++)
 				vMeilleurTempsArretPhysique[curPA->Index()][NumVoie] = __MomentDepart;
 			vMeilleurTemps[curPA->Index()] = __MomentDepart;
 		}
@@ -1416,7 +1415,7 @@ void cCalculateur::SetMeilleurDepart(const cArretLogique* curPA, const cMoment& 
 		vMeilleurTemps[curPA->Index()] = __MomentDepart;
 }
 
-void cCalculateur::SetMeilleureArrivee(const cAccesPADe* curAccesPADe, const cMoment& NewMoment, tNumeroVoie NumVoie)
+void cCalculateur::SetMeilleureArrivee(const cAccesPADe* curAccesPADe, const cMoment& NewMoment, tIndex NumVoie)
 {
 	for (; curAccesPADe != NULL; curAccesPADe = curAccesPADe->getSuivant())
 	{
@@ -1424,7 +1423,7 @@ void cCalculateur::SetMeilleureArrivee(const cAccesPADe* curAccesPADe, const cMo
 	}
 }
 
-void cCalculateur::SetMeilleureArrivee(const cArretLogique* curPA, const cMoment& __Moment, tNumeroVoie NumVoie)
+void cCalculateur::SetMeilleureArrivee(const LogicalPlace* curPA, const cMoment& __Moment, tIndex NumVoie)
 {
 	cMoment __MomentArrivee = __Moment;
 	
@@ -1439,7 +1438,7 @@ void cCalculateur::SetMeilleureArrivee(const cArretLogique* curPA, const cMoment
 		}
 		else
 		{
-			for (tNumeroVoie iVoie=1; iVoie<=curPA->NombreArretPhysiques(); iVoie++)
+			for (tIndex iVoie=1; iVoie<=curPA->NombreArretPhysiques(); iVoie++)
 				vMeilleurTempsArretPhysique[curPA->Index()][NumVoie] = __MomentArrivee;
 			vMeilleurTemps[curPA->Index()] = __MomentArrivee;
 		}
@@ -1448,7 +1447,7 @@ void cCalculateur::SetMeilleureArrivee(const cArretLogique* curPA, const cMoment
 		vMeilleurTemps[curPA->Index()] = __MomentArrivee;
 }
 
-cElementTrajet* cCalculateur::GetET(const cArretLogique* curPA, tNumeroVoie NumeroVoie)
+cElementTrajet* cCalculateur::GetET(const LogicalPlace* curPA, tIndex NumeroVoie)
 {
 	if (curPA->CorrespondanceAutorisee() && NumeroVoie)
 		return(vETArretPhysique[curPA->Index()][NumeroVoie]);
@@ -1456,7 +1455,7 @@ cElementTrajet* cCalculateur::GetET(const cArretLogique* curPA, tNumeroVoie Nume
 		return(vET[curPA->Index()]);
 }
 
-void cCalculateur::SetET(const cArretLogique* curPA, cElementTrajet* NewET, tNumeroVoie NumVoie)
+void cCalculateur::SetET(const LogicalPlace* curPA, cElementTrajet* NewET, tIndex NumVoie)
 {
 	if (curPA->CorrespondanceAutorisee() && NumVoie)
 		vETArretPhysique[curPA->Index()][NumVoie] = NewET;
@@ -1509,9 +1508,9 @@ bool cCalculateur::InitialiseFicheHoraireJournee(
 		_BaseTempsReel = false;
 
 	// Construction des accès au réseau départ et arrivée
-	_ConstructionAccesDepart(__LieuOrigine);
-	_ConstructionAccesArrivee(__LieuDestination);
-
+	_origin = new RoutePlanningNode(__LieuOrigine, true);
+	_destination = new RoutePlanningNode(__LieuDestination, true);
+	
 	// Application de la plage horaire
 	if (!__PeriodeJournee->AppliquePeriode(vMomentDebut, vArriveeMax, _MomentCalcul, __SolutionsPassees))
 		return false;
@@ -1533,9 +1532,9 @@ bool cCalculateur::InitialiseFicheHoraireJournee(
 
 
 
-/*!	\brief M�thode lib�rant l'espace de calcul pour un autre thread
-	\author Hugues Romain
-	\date 2001-2005
+/**	Libération de l'espace de calcul pour un autre thread avec remise à zéro
+	@author Hugues Romain
+	@date 2001-2006
 
 Cette m�thode supprime les objets temporaire stockant les r�sultats, et lib�re l'espace de calcul
 */
@@ -1545,6 +1544,8 @@ void cCalculateur::Libere()
 	pthread_mutex_lock( &CalculMutex );
 #endif
 	vSolution.Vide();
+	delete _origine;
+	delete _destination;
 	_Libre = true;
 #ifdef UNIX
 	pthread_mutex_unlock( &CalculMutex );
@@ -1635,7 +1636,7 @@ bool cCalculateur::ControleLigne(const cLigne* Ligne, const cTrajet& __Trajet) c
 	
 	Etapes de la fonction :
 */
-bool cCalculateur::DestinationUtilePourArriverTot(const cArretLogique* __ArretLogique, const cMoment& __Moment, cDistanceCarree& __DistanceCarreeBut) const
+bool cCalculateur::DestinationUtilePourArriverTot(const LogicalPlace* __ArretLogique, const cMoment& __Moment, cDistanceCarree& __DistanceCarreeBut) const
 {
 	//! <li>Calcul de la distance carr�e si non fournie</li>
 	if (__DistanceCarreeBut.EstInconnu())
@@ -1670,7 +1671,7 @@ bool cCalculateur::DestinationUtilePourArriverTot(const cArretLogique* __ArretLo
 		
 	Etapes de la fonction :
 */
-bool cCalculateur::ProvenanceUtilePourPartirTard(const cArretLogique* __ArretLogique, const cMoment& __Moment, cDistanceCarree& __DistanceCarreeBut) const
+bool cCalculateur::ProvenanceUtilePourPartirTard(const LogicalPlace* __ArretLogique, const cMoment& __Moment, cDistanceCarree& __DistanceCarreeBut) const
 {
 	//! <li>Calcul de la distance carr�e si non fournie</li>
 	if (__DistanceCarreeBut.EstInconnu())
@@ -1709,7 +1710,7 @@ bool cCalculateur::ControleTrajetRechercheDepart(cElementTrajet& __ET) const
 		&& ProvenanceUtilePourPartirTard(__ET.getGareDepart(), __ET.MomentDepart(), __ET.getDistanceCarreeObjectif());
 }
 
-const cMoment& cCalculateur::GetMeilleurDepart(const cArretLogique* curPA, tNumeroVoie NumeroVoie) const
+const cMoment& cCalculateur::GetMeilleurDepart(const LogicalPlace* curPA, tIndex NumeroVoie) const
 {
 	if (curPA->CorrespondanceAutorisee() && NumeroVoie && vMeilleurTempsArretPhysique[curPA->Index()][NumeroVoie] > vMeilleurTemps[curPA->Index()])
 		return(vMeilleurTempsArretPhysique[curPA->Index()][NumeroVoie]);
@@ -1717,7 +1718,7 @@ const cMoment& cCalculateur::GetMeilleurDepart(const cArretLogique* curPA, tNume
 		return(vMeilleurTemps[curPA->Index()]);
 }
 
-const cMoment& cCalculateur::GetMeilleureArrivee(const cArretLogique* curPA, tNumeroVoie NumeroVoie) const
+const cMoment& cCalculateur::GetMeilleureArrivee(const LogicalPlace* curPA, tIndex NumeroVoie) const
 {
 	if (curPA->CorrespondanceAutorisee() && NumeroVoie && vMeilleurTempsArretPhysique[curPA->Index()][NumeroVoie] < vMeilleurTemps[curPA->Index()])
 		return(vMeilleurTempsArretPhysique[curPA->Index()][NumeroVoie]);

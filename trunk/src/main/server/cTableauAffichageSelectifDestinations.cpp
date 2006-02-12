@@ -26,7 +26,7 @@ bool cTableauAffichageSelectifDestinations::AjouteDestinationsDefaut(void)
 }
 
 // Ajout de destination forc�e
-bool cTableauAffichageSelectifDestinations::AddDestination(const cArretLogique* __Destination)
+bool cTableauAffichageSelectifDestinations::AddDestination(const LogicalPlace* __Destination)
 {
 	return _DestinationsSelection.AddElementSiInexistant(__Destination) != INCONNU;
 }

@@ -3,17 +3,26 @@
 */
 
 #include "LogicalPlace.h"
+#include "map/Address.h"
+#include "map/Road.h"
+#include "cCommune.h"
+#include <sstream>
+#include "NetworkAccessPoint.h"
+#include "cDistanceCarree.h"
+#include "cGareLigne.h"
+#include "cArretPhysique.h"
 
+using namespace std;
+using namespace synmap;
 
 const tDureeEnMinutes LogicalPlace::UNKNOWN_TRANSFER_DELAY = -1;
 const tDureeEnMinutes LogicalPlace::FORBIDDEN_TRANSFER_DELAY = 99;
 
 /** Constructeur de lieu logique de type standard
-	@param __volatile Indique si l'objet est destiné à une seule utilisation immédiate ou s'il appartient à la base de données générale.
 	@author Hugues Romain
 	@date 2001-2006
 */
-LogicalPlace::LogicalPlace(tIndex __id, tNiveauCorrespondance __transferRules)
+LogicalPlace::LogicalPlace(tIndex id, tNiveauCorrespondance __transferRules)
 	: cPoint()
 	, _volatile(false)
 	, _transferRules(__transferRules)
@@ -54,11 +63,10 @@ LogicalPlace::LogicalPlace(Road* road)
 
 
 /** Constructeur de lieu logique de type adresse précise.
-	@param entireRoadLogicalPlace Lieu de type route entière à copier
 	@param address Adresse
 */
-LogicalPlace::LogicalPlace(Address* address)
-	: cPoint(entireRoadLogicalPlace)
+LogicalPlace::LogicalPlace(synmap::Address* address)
+	: cPoint()
 	, _volatile(true)
 	, _transferRules(CorrInterdite)
 	, _id(0)
@@ -68,9 +76,9 @@ LogicalPlace::LogicalPlace(Address* address)
 	_firstArrivalLineStop = NULL;
 	_firstDepartureLineStop = NULL;
 
-	std::string name;
-	name = address->getAddressNumber() + " " + address->getRoad()->getName();
-	setDesignation(address->getRoad()->getTown(), name);
+	stringstream name;
+	name << address->getAddressNumber() << " " << address->getRoad()->getName();
+	setDesignation(address->getRoad()->getTown(), name.str());
 }
 
 
@@ -78,17 +86,17 @@ LogicalPlace::LogicalPlace(Address* address)
 	@param town Commune
 */
 LogicalPlace::LogicalPlace(cCommune* town)
-	: cPoint(town)
+	: cPoint(*town)
 	, _volatile(false)
 	, _transferRules(CorrInterdite)
 	, _id(0)
-	, road(NULL)
+	, _road(NULL)
 {
 	// Aucune desserte par des lignes
 	_firstArrivalLineStop = NULL;
 	_firstDepartureLineStop = NULL;
 
-	setDesignation(town, town->GetNom().Texte());
+	setDesignation(town, town->getName());
 }
 
 
@@ -100,7 +108,7 @@ LogicalPlace::LogicalPlace(cCommune* town, std::string name)
 	, _volatile(false)
 	, _transferRules(CorrInterdite)
 	, _id(0)
-	, road(NULL)
+	, _road(NULL)
 {
 	// Aucune desserte par des lignes
 	_firstArrivalLineStop = NULL;
@@ -115,11 +123,11 @@ LogicalPlace::LogicalPlace(cCommune* town, std::string name)
 	@param town Commune
 */
 LogicalPlace::LogicalPlace(tIndex id, cCommune* town)
-	: cPoint(town)
+	: cPoint(*town)
 	, _volatile(false)
 	, _transferRules(CorrInterdite)
 	, _id(id)
-	, road(NULL)
+	, _road(NULL)
 {
 	// Aucune desserte par des lignes
 	_firstArrivalLineStop = NULL;
@@ -133,15 +141,15 @@ LogicalPlace::LogicalPlace(tIndex id, cCommune* town)
 */
 LogicalPlace::~LogicalPlace()
 {
-	for (size_t i=0; i<_networkAccesPoints.size(); i++)
-		delete _networkAccesPoints[i];
+	for (size_t i=0; i<_networkAccessPoints.size(); i++)
+		delete _networkAccessPoints[i];
 }
 
 
-tNiveauCorrespondance LogicalPlace::NiveauCorrespondance(const cDistanceCarree& D) const
+LogicalPlace::tNiveauCorrespondance LogicalPlace::NiveauCorrespondance(const cDistanceCarree& D) const
 {
 	if (_transferRules == CorrRecommandeeCourt)
-		return (D.DistanceCarree() > O2COURTLONG) ? CorrAutorisee : CorrRecommandee);
+		return (D.DistanceCarree() > O2COURTLONG) ? CorrAutorisee : CorrRecommandee;
 
 	return _transferRules;
 }
@@ -230,7 +238,7 @@ cMoment LogicalPlace::MomentDepartSuivant(const cMoment& MomentDepart, const cMo
 	\author Hugues Romain
 	\date 2001
 */
-/*cElementTrajet* cArretLogique::ProchainDirect(cArretLogique* Destination, cMoment& MomentDepart, const cMoment& ArriveeMax, tNumeroVoie ArretPhysiqueArriveePrecedente) const
+/*cElementTrajet* LogicalPlace::ProchainDirect(LogicalPlace* Destination, cMoment& MomentDepart, const cMoment& ArriveeMax, tIndex ArretPhysiqueArriveePrecedente) const
 {
 	cMoment tempMomentDepart;
 	cMoment tempMomentArrivee;
@@ -269,7 +277,7 @@ cMoment LogicalPlace::MomentDepartSuivant(const cMoment& MomentDepart, const cMo
 
 
 /* SET Enlever pour resa car non utilis
-cElementTrajet*	cArretLogique::AcheminementDepuisDepot(cArretLogique* Destination, const cMoment& MomentDepart, cReseau* Reseau) const
+cElementTrajet*	LogicalPlace::AcheminementDepuisDepot(LogicalPlace* Destination, const cMoment& MomentDepart, cReseau* Reseau) const
 {
 	for (cGareLigne* curGareLigne = PremiereGareLigneDep(); curGareLigne != NULL; curGareLigne = curGareLigne->PADepartSuivant())
 		if (!curGareLigne->Ligne()->Axe()->Autorise() && (Reseau == NULL || curGareLigne->Ligne()->getReseau() == Reseau) && curGareLigne->Destination()->ArretLogique() == Destination)
@@ -285,7 +293,7 @@ cElementTrajet*	cArretLogique::AcheminementDepuisDepot(cArretLogique* Destinatio
 }
 
 
-cElementTrajet*	cArretLogique::AcheminementVersDepot(cArretLogique* Origine, const cMoment& MomentArrivee, cReseau* Reseau) const
+cElementTrajet*	LogicalPlace::AcheminementVersDepot(LogicalPlace* Origine, const cMoment& MomentArrivee, cReseau* Reseau) const
 {
 	for (cGareLigne* curGareLigne = PremiereGareLigneArr(); curGareLigne != NULL; curGareLigne = curGareLigne->PAArriveeSuivante())
 		if (!curGareLigne->Ligne()->Axe()->Autorise() && (Reseau == NULL || curGareLigne->Ligne()->getReseau() == Reseau) && curGareLigne->Origine()->ArretLogique() == Origine)
@@ -319,26 +327,17 @@ cGareLigne* LogicalPlace::DessertALArrivee(const cLigne* Ligne) const
 	return(NULL);
 }
 
-const cTexte& LogicalPlace::getNom() const
-{
-	return _name;
-}
-
-cCommune* LogicalPlace::getCommune() const
-{
-	return _town;
-}
 
 /** Edition de VMax.
 	@author Hugues Romain
 	@date 2001
 */
-bool LogicalPlace::setVMax(tCategorieDistance CategorieDistance, tVitesseKMH newVitesseKMH)
+/*bool LogicalPlace::setVMax(tCategorieDistance CategorieDistance, tVitesseKMH newVitesseKMH)
 {
 	//vVitesseMax[CategorieDistance] = newVitesseKMH+1; 
 	return(true);
 }
-
+*/
 
 /*!	Modificateur désignation courte pour indicateur papier.
 	\param newDesignationOD Designation courte de l'arret
@@ -351,52 +350,22 @@ void LogicalPlace::setDesignationOD(const cTexte& newDesignationOD)
 	_nameAsDestinationForTimetable << newDesignationOD;
 }
 
-
+/*
 bool LogicalPlace::addService(char newType, cPhoto* newPhoto, const cTexte& newDesignation)
 {
-/*	// SET PORTAGE LINUX
+	// SET PORTAGE LINUX
 	size_t i;
 	for (i=0; vService[i]!=NULL; i++)
 	{ }
 	//END PORTAGE LINUX
 	vService[i] = new cServiceEnGare(newType, newPhoto, newDesignation);
 	return(true);
+}
 */
-}
-
-
-bool LogicalPlace::SetPoint(int X, int Y)
-{
-	bool Succes = true;
-	
-	if (X < 0)
-	{
-		if (X != INCONNU)
-			Succes = false;
-	}
-	else
-		_point.setX(X);
-	
-	if (Y < 0)
-	{
-		if (Y != INCONNU)
-			Succes = false;
-	}
-	else
-		_point.setY(Y);
-	
-	return Succes;
-}
 
 
 
-/**	Nombre de quais dans la gare.
-	\return Le nombre de quais dans la gare
-*/
-tIndex LogicalPlace::NombreArretPhysiques() const
-{
-	return _physicalStops.Taille() - 1;
-}
+
 
 void LogicalPlace::setAlerteMessage(cTexte& message)
 {
@@ -468,35 +437,16 @@ const cAlerte* LogicalPlace::getAlerte() const
 
 
 
-const cTexte& LogicalPlace::GetNom(int i) const
-{
-//	if (!_AccesPADe[i])
-//		i=0;
-	return(getNom());
-}
-
-cCommune* LogicalPlace::GetCommune(int i) const
-{
-//	if (!_AccesPADe[i])
-//		i=0;
-	return(getCommune());
-}
 
 
 cArretPhysique* LogicalPlace::GetArretPhysique(int n) const
 {
-	if (n < 1 || n > NombreArretPhysiques())
+	if (n < 1 || n > (int) _networkAccessPoints.size())
 		return NULL;
 	else
-		return getArretPhysique(n);
+		return (cArretPhysique*) getNetworkAccessPoint(n);
 }
 
-
-
-cArretPhysique* LogicalPlace::getArretPhysique(tIndex n) const
-{
-	return _physicalStops[n];
-}
 
 
 cGareLigne* LogicalPlace::PremiereGareLigneDep() const
@@ -509,7 +459,7 @@ cGareLigne* LogicalPlace::PremiereGareLigneArr() const
 	return _firstArrivalLineStop;
 }
 
-tIndex LogicalStop::Index() const
+tIndex LogicalPlace::Index() const
 {
 	return _id;
 }
@@ -532,7 +482,7 @@ const cTexte& LogicalPlace::getDesignationOD() const
 
 
 
-tNiveauCorrespondance LogicalPlace::CorrespondanceAutorisee() const
+LogicalPlace::tNiveauCorrespondance LogicalPlace::CorrespondanceAutorisee() const
 {
 	return _transferRules;
 }
@@ -544,7 +494,7 @@ cDureeEnMinutes LogicalPlace::AttenteCorrespondance(tIndex Dep, tIndex Arr) cons
 
 const cDureeEnMinutes& LogicalPlace::PireAttente(tIndex i) const
 {
-	if (i<1 || i> NombreArretPhysiques())
+	if (i<1 || i>= (tIndex) _maxTransferDelay.size())
 		i=0;
 	return _maxTransferDelay[i];
 }
@@ -558,7 +508,7 @@ bool LogicalPlace::declServices(size_t newNombreServices)
 */
 
 /*
-inline bool cArretLogique::addPhoto(cPhoto* Photo)
+inline bool LogicalPlace::addPhoto(cPhoto* Photo)
 {
 	// SET PORTAGE LINUX
 	size_t i;
@@ -577,24 +527,24 @@ const cDureeEnMinutes& LogicalPlace::AttenteMinimale() const
 }
 
 /*
-tVitesseKMH cArretLogique::vitesseMax(size_t Categorie) const
+tVitesseKMH LogicalPlace::vitesseMax(size_t Categorie) const
 {
 	return(vVitesseMax[Categorie]);
 }
 */
 /*
-inline tIndex	cArretLogique::NombrePhotos() const
+inline tIndex	LogicalPlace::NombrePhotos() const
 {
 	return(vNombrePhotos);
 }
 */
 /*
-inline const cPhoto* cArretLogique::getPhoto(tIndex iNumeroPhoto) const
+inline const cPhoto* LogicalPlace::getPhoto(tIndex iNumeroPhoto) const
 {
 	return(vPhoto[iNumeroPhoto]);
 }
 
-inline cServiceEnGare* cArretLogique::GetService(int i) const
+inline cServiceEnGare* LogicalPlace::GetService(int i) const
 {
 	if (vService)
 		return(vService[i]);
@@ -637,14 +587,12 @@ T& operator<<(T& flux, const LogicalPlace& Obj)
 
 	@todo MJ Implémentation à terminer
 */
-LogicalPlace* LogicalPlace::accurateAddressLogicalPlace(RoadChunk::AddressNumber addressNumber)
+LogicalPlace* LogicalPlace::accurateAddressLogicalPlace(synmap::Address::AddressNumber addressNumber)
 {
 	if (false) // Clause Calcul d'une adresse précise possible à implémenter 
 	{
-		Address accurateAddress = new Address(_road, addressNumber);
-		LogicalPlace accurateAddressLogicalPlace = new LogicalPlace(INCONNU, CorrInterdite, true);
-		accurateAddressLogicalPlace.addNetworkAccessPoint(accurateAddress);
-		return accurateAddressLogicalPlace;			
+		
+		return new LogicalPlace(new synmap::Address(_road, addressNumber));
 	}
 
 	// Retour par défaut
@@ -665,11 +613,11 @@ tIndex LogicalPlace::addNetworkAccessPoint(NetworkAccessPoint* networkAccessPoin
 	{
 		if (id == INCONNU)
 		{
-			_networkAccesPoints.push_back(networkAccessPoint);
-			id = _networkAccesPoints.size() - 1;
+			_networkAccessPoints.push_back(networkAccessPoint);
+			id = (int) _networkAccessPoints.size() - 1;
 		}
 		else
-			_networkAccesPoints[id] = networkAccessPoint;
+			_networkAccessPoints[id] = networkAccessPoint;
 	}
 	catch(...)
 	{
@@ -680,31 +628,31 @@ tIndex LogicalPlace::addNetworkAccessPoint(NetworkAccessPoint* networkAccessPoin
 	if (CorrespondanceAutorisee() != CorrInterdite)
 	{
 		_maxTransferDelay[id] = 0;
-		for (tIndex i=0; i<_networkAccesPoints.size(); i++)
+		for (size_t i=0; i< _networkAccessPoints.size(); i++)
 		{
-			setDelaiCorrespondance(i,id,UNKNOWN_TRANSFER_DELAY);
-			setDelaiCorrespondance(id,i,UNKNOWN_TRANSFER_DELAY);
+			setDelaiCorrespondance((tIndex)i,id,UNKNOWN_TRANSFER_DELAY);
+			setDelaiCorrespondance(id,(tIndex)i,UNKNOWN_TRANSFER_DELAY);
 		}
 		setDelaiCorrespondance(id,id,FORBIDDEN_TRANSFER_DELAY);
 	}
 
 	/** - Gestion des coordonnées géographiques */
-	if (!_networkAccesPoints[id]->unknownLocation())
+	if (!_networkAccessPoints[id]->unknownLocation())
 	{
 		int avgX = 0;
 		int avgY = 0;
 		int nbPoints = 0;
-		for (tIndex i=0; i <= _networkAccesPoints.size(); i++)
+		for (size_t i=0; i <= _networkAccessPoints.size(); i++)
 		{
-			if (_networkAccesPoints[i] != NULL && !_networkAccesPoints[i]->unknownLocation())
+			if (_networkAccessPoints[i] != NULL && !_networkAccessPoints[i]->unknownLocation())
 			{
-				avgX += curPoint->XKMM();
-				avgY += curPoint->YKMM();
+				avgX += _networkAccessPoints[i]->XKMM();
+				avgY += _networkAccessPoints[i]->YKMM();
 				nbPoints++;
 			}
 		}
-		_point.setX((CoordonneeKMM) (avgX / nbPoints));
-		_point.setY((CoordonneeKMM) (avgY / nbPoints));
+		setX((CoordonneeKMM) (avgX / nbPoints));
+		setY((CoordonneeKMM) (avgY / nbPoints));
 	}
 
 	return id;
@@ -715,7 +663,7 @@ tIndex LogicalPlace::addNetworkAccessPoint(NetworkAccessPoint* networkAccessPoin
 	@param town Commune
 	@param name Nom
 */
-void LogicalPlace::setDesignation(cCommune* town, std::string name)
+void LogicalPlace::setDesignation(cCommune* town, string name)
 {
 	_town = town;
 	_name = name;
@@ -723,8 +671,8 @@ void LogicalPlace::setDesignation(cCommune* town, std::string name)
 	// Génération automatique de Designation OD si besoin
 	if (!_nameAsDestinationForTimetable.Taille())
 	{
-		cTexte newDesignationOD(getNom().Taille() + getCommune()->GetNom().Taille() + 1);
-		newDesignationOD << getCommune()->GetNom() << " " << getNom();
+		cTexte newDesignationOD;
+		newDesignationOD << getTown()->getName() << " " << getName();
 		setDesignationOD(newDesignationOD);
 	}
 
@@ -744,4 +692,37 @@ void LogicalPlace::setDesignation(cCommune* town, std::string name)
 void LogicalPlace::addAliasedLogicalPlace(LogicalPlace* logicalPlace)
 {
 	_aliasedLogicalPlaces.push_back(logicalPlace);
+}
+
+
+/** Accesseur arrêts physiques.
+
+*/
+LogicalPlace::PhysicalStopsMap LogicalPlace::getPysicalStops() const
+{
+	LogicalPlace::PhysicalStopsMap result;
+	cArretPhysique* physicalStop;
+
+	for(size_t i=0; i<_networkAccessPoints.size(); i++)
+	{
+		if (physicalStop = dynamic_cast<cArretPhysique*>(_networkAccessPoints[i]))
+			result[i] = (cArretPhysique*) _networkAccessPoints[i];
+	}
+	return result;
+}
+
+
+/** Accesseur adresses.
+*/
+LogicalPlace::AddressesMap LogicalPlace::getAddresses() const
+{
+	LogicalPlace::AddressesMap result;
+	synmap::Address* address;
+
+	for(size_t  i=0; i<_networkAccessPoints.size(); i++)
+	{
+		if (address = dynamic_cast<synmap::Address*>(_networkAccessPoints[i]))
+			result[i] = (synmap::Address*) _networkAccessPoints[i];
+	}
+	return result;
 }

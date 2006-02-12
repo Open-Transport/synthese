@@ -26,7 +26,6 @@ enum tTypeAccesPADe
 
 #include "cTexte.h"
 #include "cCommune.h"
-#include "cArretLogique.h"
 #include "cLigne.h"
 #include "Temps.h"
 

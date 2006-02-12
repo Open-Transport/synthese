@@ -8,7 +8,7 @@
 
 #include <vector>
 #include <set>
-
+#include "NetworkAccessPoint.h"
 
 namespace synmap
 {
@@ -25,7 +25,7 @@ class RoadChunk;
  
  Le numéro d'adresse est une donnée de désignation de l'adresse, mais peut également suffire à déterminer la position dès lors que la rue possède les informations nécessaires.
 */
-class Address
+class Address : public NetworkAccessPoint
 {
 public:
 
@@ -73,6 +73,8 @@ public:
     std::set
         < PathToPhysicalStop >
         findPathsToPhysicalStops (double maxDistance) const;
+
+		NetworkAccessPoint::AddressList getAddresses(bool forDeparture) const;
 
     //@}
 

@@ -67,7 +67,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 			
 			// Initialisation des param�tres
 			tIndex iNumeroDesignation = _Parametres[ELEMENTINTERFACELieuArretNumeroDesignation]->Nombre(__Parametres);
-			cArretLogique* curPA = __Environnement->getArretLogique(_Parametres[ELEMENTINTERFACELieuArretNumeroArretLogique]->Nombre(__Parametres));
+			LogicalPlace* curPA = __Environnement->getArretLogique(_Parametres[ELEMENTINTERFACELieuArretNumeroArretLogique]->Nombre(__Parametres));
 			
 			// Affichage
 			// PROVISOIRE LANGAGE IMPOSE
@@ -345,7 +345,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 					else
 						curDP->getMomentReel().getHeure().toString(pCtxt);
 					pCtxt << "</b><td class=\"" << curAlternance << "\">";
-					cArretLogique* PAT = curDP->getGareLigne()->Destination()->ArretLogique();
+					LogicalPlace* PAT = curDP->getGareLigne()->Destination()->ArretLogique();
 					if (curDP->getSitPert() == NULL)
 					{ 
 							PAT->NomHTML(pCtxt);
@@ -375,12 +375,12 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 
 		{
 			// Initialisation des param�tres
-			const cArretLogique* __ArretLogique = (const cArretLogique*) __Objet;
+			const LogicalPlace* __ArretLogique = (const LogicalPlace*) __Objet;
 			cTexte __TexteEnTete = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesDebut]->Texte(__Parametres);
 			cTexte __TexteLibelle = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesLibelleDefaut]->Texte(__Parametres);
 			cTexte __TextePied = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesFin]->Texte(__Parametres);
 			
-			for (tNumeroVoie __ArretPhysique = 1; __ArretPhysique <= __ArretLogique->NombreArretPhysiques(); __ArretPhysique++)
+			for (tIndex __ArretPhysique = 1; __ArretPhysique <= __ArretLogique->NombreArretPhysiques(); __ArretPhysique++)
 			{
 				pCtxt << __TexteEnTete << "<a href=\"javascript:showdiv('Q" << __ArretPhysique << "');\">";
 				if (__ArretLogique->getArretPhysique(__ArretPhysique)->getNom().Taille() == 0)
@@ -395,7 +395,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 
 	case ELEMENTINTERFACELienAutresPhotos:
 		{
-			const cArretLogique* ArretLogique = (const cArretLogique*) __Objet;
+			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
 			cTexte __TexteEnTete = _Parametres[ELEMENTINTERFACELienAutresPhotosOuverture]->Texte(__Parametres);
 			cTexte __TexteLienDebut = _Parametres[ELEMENTINTERFACELienAutresPhotosDebut]->Texte(__Parametres);
 			cTexte __TexteLienFin = _Parametres[ELEMENTINTERFACELienAutresPhotosFin]->Texte(__Parametres);
@@ -404,7 +404,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 			if (ArretLogique->NombrePhotos())
 			{
 				pCtxt << __TexteEnTete;
-				for (tNumeroVoie iArretPhysique=0; iArretPhysique!=ArretLogique->NombrePhotos(); iArretPhysique++)
+				for (tIndex iArretPhysique=0; iArretPhysique!=ArretLogique->NombrePhotos(); iArretPhysique++)
 					pCtxt << __TexteLienDebut << "<a href=\"javascript:showdiv('P" << iArretPhysique << "');\">" << ArretLogique->getPhoto(iArretPhysique)->DescriptionLocale() << "</a>" << __TexteLienFin;
 				pCtxt << __TextePied;
 			}
@@ -413,7 +413,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 
 	case ELEMENTINTERFACELienServices:
 		{
-			const cArretLogique* ArretLogique = (const cArretLogique*) __Objet;
+			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
 			cTexte __TexteEnTete = _Parametres[ELEMENTINTERFACELienServicesOuverture]->Texte(__Parametres);
 			cTexte __TexteLienDebut = _Parametres[ELEMENTINTERFACELienServicesDebut]->Texte(__Parametres);
 			cTexte __TexteLienFin = _Parametres[ELEMENTINTERFACELienServicesFin]->Texte(__Parametres);
@@ -422,7 +422,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 			if (ArretLogique->GetService(0))
 			{
 				pCtxt << __TexteEnTete;
-				for (tNumeroVoie iArretPhysique=0; ArretLogique->GetService(iArretPhysique); iArretPhysique++)
+				for (tIndex iArretPhysique=0; ArretLogique->GetService(iArretPhysique); iArretPhysique++)
 				{
 					pCtxt << __TexteLienDebut;
 					if (ArretLogique->GetService(iArretPhysique)->getPhoto())
@@ -440,13 +440,13 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 	case ELEMENTINTERFACEDivArretPhysiques:
 		{
 			// Collecte des param�tres
-			const cArretLogique* ArretLogique = (const cArretLogique*) __Objet;
+			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
 			const cEnvironnement*	__Environnement = __Site->getEnvironnement();
 			
 			// Affichage
 			const cPhoto* curPhoto;
-			tNumeroVoie iArretPhysique2;
-			for (tNumeroVoie iArretPhysique=1; iArretPhysique <= ArretLogique->NombreArretPhysiques(); iArretPhysique++)
+			tIndex iArretPhysique2;
+			for (tIndex iArretPhysique=1; iArretPhysique <= ArretLogique->NombreArretPhysiques(); iArretPhysique++)
 			{
 				pCtxt << "<div id=\"Q" << iArretPhysique << "\" class=\"Q\">";
 				curPhoto = ArretLogique->getArretPhysique(iArretPhysique)->getPhoto();
@@ -500,12 +500,12 @@ LienPhoto()))
 
 	case ELEMENTINTERFACEDivPhotos:
 		{
-			const cArretLogique* ArretLogique = (const cArretLogique*) __Objet;
+			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
 			const cEnvironnement*	__Environnement = __Site->getEnvironnement();
 			
 			const cPhoto* curPhoto;
-			tNumeroVoie iArretPhysique2;
-			for (tNumeroVoie iArretPhysique=0; iArretPhysique!=ArretLogique->NombrePhotos(); iArretPhysique++)
+			tIndex iArretPhysique2;
+			for (tIndex iArretPhysique=0; iArretPhysique!=ArretLogique->NombrePhotos(); iArretPhysique++)
 			{
 				pCtxt << "<div id=\"P" << TXT(iArretPhysique) << "\" class=\"P\">";
 				curPhoto = ArretLogique->getPhoto(iArretPhysique);
@@ -559,12 +559,12 @@ LienPhoto()))
 	
 	case ELEMENTINTERFACEDivServices:
 	/*	{
-			cArretLogique* ArretLogique = (cArretLogique*) ObjetAAfficher;
+			LogicalPlace* ArretLogique = (LogicalPlace*) ObjetAAfficher;
 			cPhoto* curPhoto;
-			tNumeroVoie iArretPhysique2;
+			tIndex iArretPhysique2;
 			if (ArretLogique->Service != NULL)
 			{									
-				for (tNumeroVoie iArretPhysique=0; ArretLogique->Service[iArretPhysique]!=NULL; iArretPhysique++)
+				for (tIndex iArretPhysique=0; ArretLogique->Service[iArretPhysique]!=NULL; iArretPhysique++)
 				{
 					pCtxt << "<div id=\"S" << (short int) iArretPhysique << "\" class=\"S\">";
 					curPhoto = ArretLogique->Service[iArretPhysique]->Photo;
@@ -619,13 +619,13 @@ LienPhoto()))
 
 	case ELEMENTINTERFACEFicheArretScript:
 		{	// A VIRER
-			const cArretLogique* ArretLogique = (const cArretLogique*) __Objet;
+			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
 			pCtxt << "<script> function showdiv(s) {";
 			//pCtxt << "if (s=='PS') document.all.PS.style.visibility = 'visible'; else document.all.PS.style.visibility = 'hidden';";
 			pCtxt << "for (var k=1; k<=" << ArretLogique->NombreArretPhysiques() << "; k++) if (s=='Q'+k) eval(\"document.all.Q\" + k.toString() + \".style.visibility = 'visible';\"); else eval(\"document.all.Q\" + k.toString() + \".style.visibility = 'hidden';\");";
 			if (ArretLogique->NombrePhotos())
 				pCtxt << "for (k=0; k<" << ArretLogique->NombrePhotos() << "; k++) if (s=='P'+k) eval(\"document.all.P\" + k.toString() + \".style.visibility = 'visible';\"); else eval(\"document.all.P\" + k.toString() + \".style.visibility = 'hidden';\");";
-			for (tNumeroVoie iService=0; ArretLogique->GetService(iService); iService++)
+			for (tIndex iService=0; ArretLogique->GetService(iService); iService++)
 				if (ArretLogique->GetService(iService)->getPhoto())
 					pCtxt << "if (s=='S" << iService << "') eval(\"document.all.S" << iService << ".style.visibility = 'visible';\"); else eval(\"document.all.S" << iService << ".style.visibility = 'hidden';\");";
 			pCtxt << "} </script>";

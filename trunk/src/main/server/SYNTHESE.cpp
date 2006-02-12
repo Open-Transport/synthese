@@ -3,8 +3,8 @@
 */
 
 #include "SYNTHESE.h"
-#include "cAccesPADe.h"
-#include "cArretLogique.h"
+#include "LogicalPlace.h"
+#include "cCommune.h"
 
 #ifdef UNIX
 pthread_mutex_t mutex_associateur = PTHREAD_MUTEX_INITIALIZER;
@@ -256,13 +256,11 @@ const cSite* SYNTHESE::GetSite(const cTexte& __Cle) const
 bool SYNTHESE::FicheHoraire(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 						, tIndex NumeroGareOrigine, tIndex NumeroGareDestination, const cDate& __DateDepart
 						, tIndex __IndexPeriode, tBool3 velo, tBool3 handicape,tBool3 taxibus, tIndex tarif
-						, tIndex NumeroDesignationOrigine, tIndex NumeroDesignationDestination, long vThreadId)
+						, long vThreadId)
 {
 	// Test des entrï¿½es
-	if(	__Site->getEnvironnement()->getArretLogique(NumeroGareOrigine)
-	&&	__Site->getEnvironnement()->getArretLogique(NumeroGareOrigine)->GetAccesPADe(NumeroDesignationOrigine)
-	&&	__Site->getEnvironnement()->getArretLogique(NumeroGareDestination)
-	&&	__Site->getEnvironnement()->getArretLogique(NumeroGareDestination)->GetAccesPADe(NumeroDesignationDestination)
+	if(	__Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)
+	&&	__Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)
 	&&	__Site->getEnvironnement()->ControleDate(__DateDepart)
 	&&	__Site->getEnvironnement()->isTarif(tarif)
 	){
@@ -284,8 +282,8 @@ bool SYNTHESE::FicheHoraire(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 		
 		//calculateur->getEnvironnement()->FichierLOG() << "start fiche horaire";
 		if (__Calculateur->InitialiseFicheHoraireJournee(
-				__Site->getEnvironnement()->getArretLogique(NumeroGareOrigine)->getAccesPADe()
-				, __Site->getEnvironnement()->getArretLogique(NumeroGareDestination)->getAccesPADe()
+				__Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)
+				, __Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)
 				, __DateDepart
 				, __Site->getInterface()->GetPeriode(__IndexPeriode)
 				, velo
@@ -304,8 +302,8 @@ bool SYNTHESE::FicheHoraire(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 //!	\todo HRO
 				// pas de resultat avec le filtre periode, on relance sur toute la journee
 				__Calculateur->InitialiseFicheHoraireJournee(
-						__Site->getEnvironnement()->getArretLogique(NumeroGareOrigine)->getAccesPADe()
-					,	__Site->getEnvironnement()->getArretLogique(NumeroGareDestination)->getAccesPADe()
+						__Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)
+					,	__Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)
 					,	__DateDepart
 					,	__Site->getInterface()->GetPeriode()
 					,	velo
@@ -356,16 +354,16 @@ bool SYNTHESE::FicheHoraire(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 		}
 
 		cInterface_Objet_Connu_ListeParametres __Parametres;
-		__Parametres << *__Site->getEnvironnement()->getArretLogique(NumeroGareOrigine)->getCommune(NumeroDesignationOrigine);	//0
-		__Parametres << __Site->getEnvironnement()->getArretLogique(NumeroGareOrigine)->getCommune(NumeroDesignationOrigine)->Index();	//1
-		__Parametres << __Site->getEnvironnement()->getArretLogique(NumeroGareOrigine)->getNom(NumeroDesignationOrigine);	//2
+		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)->getTown()->getName();	//0
+		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)->getTown()->getId();	//1
+		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)->getName();	//2
 		__Parametres << NumeroGareOrigine;	//3
-		__Parametres << *__Site->getEnvironnement()->getArretLogique(NumeroGareDestination)->getCommune(NumeroDesignationDestination);	//4
-		__Parametres << __Site->getEnvironnement()->getArretLogique(NumeroGareDestination)->getCommune(NumeroDesignationDestination)->Index();	//5
-		__Parametres << __Site->getEnvironnement()->getArretLogique(NumeroGareDestination)->getNom(NumeroDesignationDestination);	//6
+		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)->getTown()->getName();	//4
+		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)->getTown()->getId();	//5
+		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)->getName();	//6
 		__Parametres << NumeroGareDestination;	//7
-		__Parametres << NumeroDesignationOrigine;	//8
-		__Parametres << NumeroDesignationDestination; //9
+		__Parametres << "";	//8 A VIRER
+		__Parametres << ""; //9 A VIRER
 		__Parametres << __IndexPeriode;//10
 		__Parametres << velo;//11
 		__Parametres << handicape;//12
@@ -520,33 +518,31 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 	&&	__Site->getEnvironnement()->isTarif(tarif))
 	{
 		// Déclarations
-        cCommune** tbCommune=NULL;
-        cAccesPADe** tbPADe=NULL;
+		vector<cCommune*>	tbCommune;
+		vector<LogicalPlace*>	tbPADe;
 
 		// Traitement des entrées
 		if (nAD == INCONNU)
 		{
 			if (nCD == INCONNU)
 			{
-				tbCommune = __Site->getEnvironnement()->TextToCommune(newtxtCD, 2);
-				if (tbCommune[0] != NULL)
-					nCD = tbCommune[0]->Index();
+				tbCommune = __Site->getEnvironnement()->searchTown(string(newtxtCD.Texte()), 2);
+				if (tbCommune.size() == 1)
+					nCD = tbCommune[0]->getId();
 			}
 
 			if (nCD != INCONNU)
 			{
 				if (txtAD.Taille() == 0)
 				{
-					nAD = __Site->getEnvironnement()->getCommune(nCD)->GetPADePrincipale()->numeroArretLogique();
-					nDD = 0;
+					nAD = __Site->getEnvironnement()->getTown(nCD)->getMainLogicalPlace()->getId();
 				}
 				else
 				{
-					tbPADe = __Site->getEnvironnement()->getCommune(nCD)->textToPADe(newtxtAD, 2);
-					if (tbPADe[0] != NULL)
+					tbPADe = __Site->getEnvironnement()->getTown(nCD)->searchLogicalPlaces(string(newtxtAD.Texte()), 2);
+					if (tbPADe.size() == 1)
 					{
-						nAD = tbPADe[0]->numeroArretLogique();
-						nDD = tbPADe[0]->numeroDesignation();
+						nAD = tbPADe[0]->getId();
 					}
 				}
 			}
@@ -556,24 +552,22 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 		{
 			if (nCA == INCONNU)
 			{
-				tbCommune = __Site->getEnvironnement()->TextToCommune(newtxtCA, 2);
-				if (tbCommune[0] != NULL)
-					nCA = tbCommune[0]->Index();
+				tbCommune = __Site->getEnvironnement()->searchTown(string(newtxtCA.Texte()), 2);
+				if (tbCommune.size() == 1)
+					nCA = tbCommune[0]->getId();
 			}
 			if (nCA != INCONNU)
 			{
 				if (txtAA.Taille() == 0)
 				{
-					nAA = __Site->getEnvironnement()->getCommune(nCA)->GetPADePrincipale()->numeroArretLogique();
-					nDA = 0;
+					nAA = __Site->getEnvironnement()->getTown(nCA)->getMainLogicalPlace()->getId();
 				}
 				else
 				{
-					tbPADe = __Site->getEnvironnement()->getCommune(nCA)->textToPADe(newtxtAA, 2);
-					if (tbPADe[0] != NULL)
+					tbPADe = __Site->getEnvironnement()->getTown(nCA)->searchLogicalPlaces(string(newtxtAA.Texte()), 2);
+					if (tbPADe.size() == 1)
 					{
-						nAA = tbPADe[0]->numeroArretLogique();
-						nDA = tbPADe[0]->numeroDesignation();
+						nAA = tbPADe[0]->getId();
 					}
 				}
 			}
@@ -589,8 +583,8 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 			cTexteCodageInterne __txtDate;
 			__txtDate << __DateDepart;	
 			__Parametres << __txtDate;	//2
-			__Parametres << nDD;	//3
-			__Parametres << nDA;	//4
+			__Parametres << "";	//3
+			__Parametres << "";	//4
 			__Parametres << codePeriode;	//5
 			__Parametres << velo;	//6
 			__Parametres << handicape;	//7
@@ -603,33 +597,16 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 			cInterface_Objet_Connu_ListeParametres __Parametres;
 			__Parametres << __Site->getClef();	//0
 
-			// Depart	//1
-			if (nCD != INCONNU)
-  				__Parametres << *__Site->getEnvironnement()->getCommune(nCD);
-			else
-				__Parametres << txtCD;
+			__Parametres << ((nCD != INCONNU) ? __Site->getEnvironnement()->getTown(nCD)->getName() : txtCD);	//1
 			__Parametres << nCD;	//2
-
-			if (nAD != INCONNU && nDD != INCONNU) //3
-				__Parametres << __Site->getEnvironnement()->getArretLogique(nAD)->getNom(nDD);
-			else
-				__Parametres << txtAD;
+			__Parametres << ((nAD != INCONNU && nDD != INCONNU) ? __Site->getEnvironnement()->getLogicalPlace(nAD)->getName() : txtAD);	//3
 			__Parametres << nAD;	//4
-
-			if (nCA != INCONNU)	//5
-				__Parametres << *__Site->getEnvironnement()->getCommune(nCA);
-			else
-				__Parametres << txtCA;
+			__Parametres << ((nCA != INCONNU) ? __Site->getEnvironnement()->getTown(nCA)->getName() : txtCA);	//5
 			__Parametres << nCA;	//6
-
-			if (nAA != INCONNU && nDA != INCONNU) //7
-				__Parametres << __Site->getEnvironnement()->getArretLogique(nAA)->getNom(nDA);
-			else
-				__Parametres << txtAA;
+			__Parametres << ((nAA != INCONNU && nDA != INCONNU) ? __Site->getEnvironnement()->getLogicalPlace(nAA)->getName(nDA) : txtAA);	//7
 			__Parametres << nAA; //8
-
-			__Parametres << nDD; //9
-			__Parametres << nDA; //10
+			__Parametres << ""; //9
+			__Parametres << ""; //10
 			__Parametres << __DateDepart.Jour(); //11
 			__Parametres << __DateDepart.Mois(); //12
 			__Parametres << __DateDepart.Annee(); //13
@@ -744,8 +721,8 @@ bool SYNTHESE::ValidationReservation(ostream &pCtxt, ostream& pCerr, const cSite
 {
 /*	// Variables locales
 	const cLigne*	curLigne;
-	const cArretLogique*	curPADepart;
-	const cArretLogique*	curPAArrivee;
+	const LogicalPlace*	curPADepart;
+	const LogicalPlace*	curPAArrivee;
 	const cTrain*	curService;
 	cMoment MomentDepart;
 	MomentDepart = tDateDepart;

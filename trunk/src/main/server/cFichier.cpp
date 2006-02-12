@@ -1050,9 +1050,9 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 	cTexte TamponCalcul(TAILLETAMPON, true);
 
 	// Objets courants
-	cArretLogique* curArretLogique = NULL;
+	LogicalPlace* curArretLogique = NULL;
 	cArretPhysique* curArretPhysique = NULL;
-	tNumeroVoie curNumeroArretPhysique;
+	tIndex curNumeroArretPhysique;
 
 	if (!Ouvrir())
 	{
@@ -1098,7 +1098,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 			switch (LireLigneFormat(Tampon))
 			{
 			case PAFORMATLIGNENombreArretPhysiques:
-				curArretLogique->setNbArretPhysiques((tNumeroVoie) _Format->GetNombre(Tampon, PAFORMATCOLONNEStandard));
+				curArretLogique->setNbArretPhysiques((tIndex) _Format->GetNombre(Tampon, PAFORMATCOLONNEStandard));
 				break;
 
 			case PAFORMATLIGNENombreDescriptions:
@@ -1192,7 +1192,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 			case PAFORMATLIGNEArretPhysique:
 				// Cr�ation du quai
 				curArretPhysique = new cArretPhysique;
-				curNumeroArretPhysique = (tNumeroVoie) _Format->GetNombre(Tampon, PAFORMATCOLONNEIndexArretPhysique);
+				curNumeroArretPhysique = (tIndex) _Format->GetNombre(Tampon, PAFORMATCOLONNEIndexArretPhysique);
 				if (!curArretLogique->AddArretPhysique(curNumeroArretPhysique, curArretPhysique))
 				{
 // 					Erreur("D�claration de quai invalide", TXT(curPA->Index()), Tampon, "02004");
@@ -1205,7 +1205,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 					if (curArretLogique->CorrespondanceAutorisee() != CorrInterdite)
 					{
 						// Ecriture de chaque d�lai de correspondance
-						for (tNumeroVoie iNumeroArretPhysiqueDest = 0; iNumeroArretPhysiqueDest < curArretLogique->NombreArretPhysiques(); iNumeroArretPhysiqueDest++)
+						for (tIndex iNumeroArretPhysiqueDest = 0; iNumeroArretPhysiqueDest < curArretLogique->NombreArretPhysiques(); iNumeroArretPhysiqueDest++)
 							curArretLogique->setDelaiCorrespondance(curNumeroArretPhysique, iNumeroArretPhysiqueDest + 1
 								, _Format->GetNombre(Tampon, PAFORMATCOLONNEDelaiCorrespondance, iNumeroArretPhysiqueDest)	);
 							

@@ -6,11 +6,11 @@
 #define SYNTHESE_CTRAIN_H
 
 class cTrain;
+class cLigne;
 typedef short int tNumeroService;
 
 #include "cTexte.h"
 #include "cJourCirculation.h"
-#include "cLigne.h"
 #include "cSitPert.h"
 #include "cModaliteReservation.h"
 

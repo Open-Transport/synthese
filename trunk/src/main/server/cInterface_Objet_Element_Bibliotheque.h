@@ -70,7 +70,7 @@
 
 /** Liens vers photos de quais
 	@code O12 @endcode
-	@param Objet cArretLogique * Point d�arr�t
+	@param Objet LogicalPlace * Point d�arr�t
 	@param 0 Texte du d�but du lien
 	@param 1 Texte du lien si pas de nom de quai
 	@param 2 Texte de fin du lien
@@ -82,7 +82,7 @@
 
 /** Liens vers autres photos
 	@code O13 @endcode
-	@param Objet cArretLogique * : Point d'arr�t
+	@param Objet LogicalPlace * : Point d'arr�t
 	@param 0 Texte du d�but du lien
 	@param 1 Texte de fin du lien
 	@param 2 Texte d�ouverture de la zone
@@ -95,7 +95,7 @@
 
 /** Liens et description des services
 	@code O14 @endcode
-	@param Objet cArretLogique * : Point d�arr�t
+	@param Objet LogicalPlace * : Point d�arr�t
 	@param 0 Texte du d�but du lien
 	@param 1 Texte de fin du lien
 	@param 2 Texte d�ouverture de la zone
@@ -108,7 +108,7 @@
 
 /** Div de quais
 	@code O17 @endcode
-	@param Objet cArretLogique * : Point d'arr�t
+	@param Objet LogicalPlace * : Point d'arr�t
 	@return Div de quais
 	@deprecated A remettre aux normes
 */
@@ -117,7 +117,7 @@
 
 /** Div de photos
 	@code O18 @endcode
-	@param Objet cArretLogique * : Point d'arr�t
+	@param Objet LogicalPlace * : Point d'arr�t
 	@return Div de photos
 	@deprecated A remettre aux normes
 */
@@ -126,7 +126,7 @@
 
 /** Div de services
 	@code O19 @endcode
-	@param Objet cArretLogique * : Point d'arr�t
+	@param Objet LogicalPlace * : Point d'arr�t
 	@return Div de services
 	@deprecated A remettre aux normes
 */
@@ -135,7 +135,7 @@
 
 /** Scripts de fiche arr�t
 	@code O20 @endcode
-	@param Objet cArretLogique * : Point d'arr�t
+	@param Objet LogicalPlace * : Point d'arr�t
 	@return Scripts de fiche arr�t
 	@deprecated A remettre aux normes
 */

@@ -9,7 +9,7 @@ class cTableauAffichageSelectifDestinations :
 	public cTableauAffichage
 {
 protected:
-	cTableauDynamique<const cArretLogique*>	_DestinationsSelection;	//!< Destinations � afficher absolument
+	cTableauDynamique<const LogicalPlace*>	_DestinationsSelection;	//!< Destinations � afficher absolument
 	cDureeEnMinutes					_DureePresenceDestinationForcee;	//!< Dur�e pendant laquelle une destination est forc�e
 
 public:
@@ -18,7 +18,7 @@ public:
 	// Ajoute les terminus des lignes au d�part de l'arr�t
 	bool AjouteDestinationsDefaut(void);
 	// Ajout de destination forc�e
-	bool AddDestination(const cArretLogique* __Destination);
+	bool AddDestination(const LogicalPlace* __Destination);
 	// Calcul de la liste des d�parts � afficher
 	cDescriptionPassage* Calcule(const cMoment& __MomentDebut);
 };

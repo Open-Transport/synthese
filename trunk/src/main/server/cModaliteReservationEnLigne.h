@@ -63,7 +63,7 @@ public:
 	//@{
 /*	size_t		Disponibilite(const cTrain* Circulation, const cMoment&, cDatabaseManager* tBaseManager)	const;
 	tSeuilResa	getSeuil(const int ancienneValeur, const int nouvelleValeur) 						const;
-	bool		Reserver(const cTrain* Service	, const cArretLogique* tPADepart, const cArretLogique* tPAArrivee
+	bool		Reserver(const cTrain* Service	, const LogicalPlace* tPADepart, const LogicalPlace* tPAArrivee
 						, const cMoment& DateDepart, const cTexteSQL& tNom, const cTexteSQL& tNomBrut
 						, const cTexteSQL& tPrenom, const cTexteSQL& tAdresse, const cTexteSQL& tEmail
 						, const cTexteSQL& tTelephone, const cTexteSQL& tNumAbonne

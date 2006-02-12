@@ -82,7 +82,7 @@ cMoment cDescriptionPassage::MomentArriveeDestination() const
 	return __MomentArrivee;
 }
 
-const cArretLogique* cDescriptionPassage::Destination()
+const LogicalPlace* cDescriptionPassage::Destination()
 {
 	return _Gare.getDernier();
 }

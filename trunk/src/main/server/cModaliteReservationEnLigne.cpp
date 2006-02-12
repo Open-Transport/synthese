@@ -320,7 +320,7 @@ Cette mï¿½thode raisonne sur le principe d'un nombre maximal de places rï¿½servï
 	\todo Faire une classe client contenant toutes ses coordonnï¿½es et pouvant ï¿½tre retrouvï¿½e dans un fichier ou dans la base
 */
 /*bool cModaliteReservationEnLigne::Reserver(const cTrain* tService
-					, const cArretLogique* tPADepart, const cArretLogique* tPAArrivee
+					, const LogicalPlace* tPADepart, const LogicalPlace* tPAArrivee
 					, const cMoment& tDateDepart
 					, const cTexteSQL& tNom, const cTexteSQL& tNomBrut, const cTexteSQL& tPrenom
 					, const cTexteSQL& tAdresse, const cTexteSQL& tEmail, const cTexteSQL& tTelephone, const cTexteSQL& tNumAbonne

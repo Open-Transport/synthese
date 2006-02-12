@@ -20,3 +20,7 @@ cPoint::cPoint()
 	setY(INCONNU);
 }
 
+
+cPoint::~cPoint()
+{
+}

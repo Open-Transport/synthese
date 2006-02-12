@@ -6,7 +6,7 @@
 	\author Hugues Romain
 	\date 2001
 */
-const cTexte& NetworkAccessPoint::getNom() const
+const std::string& NetworkAccessPoint::getNom() const
 {
 	return _name;
 }
@@ -18,11 +18,9 @@ const cTexte& NetworkAccessPoint::getNom() const
 	\author Hugues Romain
 	\date 2005
 */
-bool NetworkAccessPoint::setNom(const cTexte& Nom)
+void NetworkAccessPoint::setNom(const std::string& Nom)
 {
-	_name.Vide();
-	_name << Nom;
-	return true;
+	_name = Nom;
 }
 
 
@@ -31,3 +29,16 @@ bool NetworkAccessPoint::setNom(const cTexte& Nom)
 NetworkAccessPoint::~NetworkAccessPoint()
 {
 }
+
+/** Constructeur.
+	@param _logicalPlace Lieu logique auquel appartient le point d'accès
+*/
+NetworkAccessPoint::NetworkAccessPoint(LogicalPlace* logicalPlace, size_t rank)
+:	cPoint()
+, _logicalPlace(logicalPlace)
+, _rank(rank)
+{
+
+}
+
+

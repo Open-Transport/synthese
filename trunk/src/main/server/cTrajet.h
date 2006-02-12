@@ -44,8 +44,8 @@ public:
 	const cMoment&			getMomentArrivee()				const;
 	const cMoment&			getMomentDepart()				const;
 	const cTexte&			getNiveauMaxAlerte()			const;
-	const cArretLogique*			getArretLogiqueArrivee()			const;
-	const cArretLogique*			getArretLogiqueDepart()			const;
+	tIndex			getArretLogiqueArrivee()			const;
+	tIndex			getArretLogiqueDepart()			const;
 	cElementTrajet*			getPremierElement();
 	const cElementTrajet*	PremierElement()				const;
 	const cElementTrajet*	DernierElement()				const;

@@ -48,7 +48,7 @@ private:
   const std::string _name;
   const RoadType _type;
   const std::string _discriminant;
-  const cCommune* _town;
+  cCommune* _town;
   RoadChunkVector _chunks;
 
 public:
@@ -58,7 +58,7 @@ public:
        const std::string& name,
        const RoadType& type,
        const std::string& discriminant,
-       const cCommune* town, 
+       cCommune* town, 
        const std::vector<RoadChunk*>& chunks);
 	
   virtual ~Road();
@@ -66,7 +66,7 @@ public:
   const std::string& getName () const { return _name; }
   const RoadType& getType () const { return _type; }
   const std::string& getDiscriminant () const { return _discriminant; }
-  const cCommune* getTown () const { return _town; }
+  cCommune* getTown () const { return _town; }
   
   const RoadChunkVector& getChunks () const { return _chunks; }
 

@@ -50,10 +50,10 @@ const cTexte& cInterface_Objet_Element_Parametre_DonneeEnvironnement::Texte(cons
 	switch (_NumeroObjet)
 	{
 	case EI_ATTRIBUT_ArretLogique_Nom:
-		return ((const cArretLogique*) __Objet)->getNom(__Parametres[EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation]->Nombre(__Parametres));
+		return ((const LogicalPlace*) __Objet)->getNom(__Parametres[EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation]->Nombre(__Parametres));
 
 	case EI_ATTRIBUT_ArretLogique_NomCommune:
-		return ((const cArretLogique*) __Objet)->getCommune(__Parametres[EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation]->Nombre(__Parametres))->GetNom();
+		return ((const LogicalPlace*) __Objet)->getCommune(__Parametres[EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation]->Nombre(__Parametres))->GetNom();
 	
 	case EI_ATTRIBUT_Ligne_LibelleSimple:
 		return ((const cLigne*) __Objet)->getLibelleSimple();

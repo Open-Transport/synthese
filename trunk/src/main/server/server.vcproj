@@ -43,9 +43,6 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\..\..\src\main\server\cAccesPADe.cpp">
-			</File>
-			<File
 				RelativePath="..\..\..\src\main\server\cAlerte.cpp">
 			</File>
 			<File
@@ -184,6 +181,9 @@
 				RelativePath="..\..\..\src\main\server\cServeurMnesia.cpp">
 			</File>
 			<File
+				RelativePath=".\cServiceEnGare.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\main\server\cSite.cpp">
 			</File>
 			<File
@@ -223,10 +223,22 @@
 				RelativePath="..\..\..\src\main\server\cVelo.cpp">
 			</File>
 			<File
+				RelativePath=".\Interpretor.cpp">
+			</File>
+			<File
+				RelativePath=".\LogicalPlace.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\main\server\main.cpp">
 			</File>
 			<File
+				RelativePath=".\NetworkAccessPoint.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\main\server\Point.cpp">
+			</File>
+			<File
+				RelativePath=".\RoutePlaningNode.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\stdafx.cpp">
@@ -246,15 +258,6 @@
 				RelativePath="..\..\..\src\main\server\ANTIDEBUG.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\cAccesPADe.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\main\server\cAccesPADe.inline.h">
-			</File>
-			<File
-				RelativePath=".\cAccesReseau.h">
-			</File>
-			<File
 				RelativePath="..\..\..\src\main\server\cAlerte.h">
 			</File>
 			<File
@@ -262,15 +265,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cAnnee.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\main\server\cArretLogique.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\main\server\cArretLogique.inline.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\main\server\cArretLogiqueAccesPADe.inline.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cArretPhysique.h">
@@ -402,9 +396,6 @@
 				RelativePath="..\..\..\src\main\server\cInterface_Objet_Element_Parametre_DonneeEnvironnement.h">
 			</File>
 			<File
-				RelativePath=".\cInterpreteur.h">
-			</File>
-			<File
 				RelativePath="..\..\..\src\main\server\cJour.h">
 			</File>
 			<File
@@ -528,7 +519,13 @@
 				RelativePath="..\..\..\src\main\server\cVelo.h">
 			</File>
 			<File
+				RelativePath=".\Interpretor.h">
+			</File>
+			<File
 				RelativePath=".\LogicalPlace.h">
+			</File>
+			<File
+				RelativePath=".\NetworkAccessPoint.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\Parametres.h">
@@ -538,6 +535,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\Resource.h">
+			</File>
+			<File
+				RelativePath=".\RoutePlanningNode.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\stdafx.h">

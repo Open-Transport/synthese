@@ -7,18 +7,20 @@
 
 class cEnvironnement;
 class cFormatFichier;
-
+class cIndicateurs;
+class LogicalPlace;
+class cCommune;
 
 #include "cModaliteReservation.h"
 #include <iostream>
+#include <map>
 #include <vector>
 #include <string>
 #include "cTexte.h"
-#include "cIndicateurs.h"
+#include "Interpretor.h"
 #include "cMateriel.h"
 #include "cJourCirculation.h"
 #include "Temps.h"
-#include "cArretLogique.h"
 #include "cPhoto.h"
 #include "cReseau.h"
 #include "cVelo.h"
@@ -30,7 +32,7 @@ class cFormatFichier;
 #include "cFichierPourEnvironnement.h"
 #include "cDocument.h"
 #include "map/Topography.h"
-
+#include "LogicalPlace.h"
 
 using namespace synmap;
 
@@ -83,8 +85,8 @@ class cEnvironnement
 	
 	//! \name Tableaux priv�s indexant les donn�es
 	//@{
-		cTableauDynamiquePointeurs<cArretLogique*>				_ArretLogique;		//!< Points d'arr�t logiques
-		Interpretor<cCommune*>							_towns;	//!< Communes
+		map<size_t, LogicalPlace*>				_logicalPlaces;		//!< Arrêts logiques enregistrés
+		interpretor::Interpretor<cCommune*>							_towns;	//!< Communes
 		cTableauDynamiquePointeurs<cJC*>				_JC;				//!< Calendriers de circulations
 		cTableauDynamiquePointeurs<cDocument*>			_Documents;			//!< Documents
 		std::vector<cModaliteReservation*>				vResa;			//!< Modalit�s de r�servation
@@ -167,7 +169,6 @@ public:
 	//!	\name M�thodes d'enregistrement
 	//@{
 		bool		Enregistre(cLigne*);
-		bool		Enregistre(cAccesPADe*, tTypeAccesPADe);
 		tIndex		Enregistre(cJC*, tIndex Index=INCONNU);
 		tIndex		Enregistre(cModaliteReservation*, tIndex);
 		tIndex		Enregistre(cTarif*, tIndex);
@@ -189,9 +190,8 @@ public:
 	
 	//! \name Modificateurs
 	//@{
-		cCommune*		addTown(const cCommune* town)		{ _towns.add(town.getName(), town); return town; }
-		cCommune*		GetCommuneAvecCreation(const std::string&);
-		cArretLogique*			GetGareAvecCreation(tNiveauCorrespondance newNiveauCorrespondance, tIndex newNumeroArretLogique=0);
+		void			addLogicalPlace(size_t, LogicalPlace*);
+		void			addTown(const cCommune* town);
 	//	cSauvegarde*	JCSauvegardeModifier(tNumeroJC NumeroNewJC, const cTexte& newIntitule);
 		void			JCSupprimerInutiles(bool Supprimer=false);
 		void			SetDateMinReelle(const cDate&);
@@ -218,51 +218,48 @@ public:
 	//@{
 	cTableauDynamique<cJC*>&				TableauJC();
 	cTableauDynamique<cDocument*>&			TableauDocuments();
-	cTableauDynamique<cArretLogique*>&				TableauPointsArret();
+	cTableauDynamique<LogicalPlace*>&				TableauPointsArret();
 	//@}
 	
 	//! \name Accesseurs
 	//@{
-	cDate					DateMaxPossible()											const;
-	cDate					DateMinPossible()											const;
-	const cDate&			DateMaxReelle()												const;
-	const cDate&			DateMinReelle()												const;
-	tAnnee					DerniereAnnee()												const;
-	cCalculateur&			getCalculateur(size_t n);
-	cCommune*				getCommune(Interpretor::Index id)	const { return _town[id]; }
-	cCommune*				GetCommune(int NumeroCommune)								const;
-	cJC*					GetJC(int n)												const;
-	cJC*					getJC(tIndex n)												const;
-	cJC*					GetJC(const tMasque* MasqueAIdentifer, const cJC& JCBase)	const;
-	cLigne*					GetLigne(const cTexte&)										const;
-	cMateriel*				GetMateriel(tIndex n)										const;
-	const cTexte&			getNomRepertoireHoraires()									const;
-	cDocument*				GetDocument(tIndex)											const;
-	cArretLogique*					getArretLogique(tIndex)										const;
-	cArretLogique*					GetArretLogique(int n)										const;
-	cModaliteReservation*	getResa(tIndex)												const;
-	cVelo*					getVelo(tIndex n)											const;
-	cReseau*				getReseau(tIndex n)											const;
-	cHandicape*				getHandicape(tIndex)										const;
-	cTarif*					getTarif(tNumeroTarif n)									const;
-	tIndex					Index()														const;
-	bool					isTarif(tNumeroTarif n)										const;
-	tAnnee					NombreAnnees(tAnnee)										const;
-	tAnnee					NombreAnnees()												const;
-	size_t					NombreLignes(const cTexte& MasqueCode)						const; 
-	tIndex					NombrePointsArret(bool Reel = false)						const;
-	tAnnee					PremiereAnnee()												const;
-	cLigne*					PremiereLigne()												const;
-	tIndex	  				getNombreTarif()											const;
-	
-	Topography&                             getTopography () { return _topography; }
+		cCommune*				getTown(size_t)												;
+		LogicalPlace*			getLogicalPlace(size_t)										;
+		cDate					DateMaxPossible()											const;
+		cDate					DateMinPossible()											const;
+		const cDate&			DateMaxReelle()												const;
+		const cDate&			DateMinReelle()												const;
+		tAnnee					DerniereAnnee()												const;
+		cCalculateur&			getCalculateur(size_t n);
+		cJC*					GetJC(int n)												const;
+		cJC*					getJC(tIndex n)												const;
+		cJC*					GetJC(const tMasque* MasqueAIdentifer, const cJC& JCBase)	const;
+		cLigne*					GetLigne(const cTexte&)										const;
+		cMateriel*				GetMateriel(tIndex n)										const;
+		const cTexte&			getNomRepertoireHoraires()									const;
+		cDocument*				GetDocument(tIndex)											const;
+		cModaliteReservation*	getResa(tIndex)												const;
+		cVelo*					getVelo(tIndex n)											const;
+		cReseau*				getReseau(tIndex n)											const;
+		cHandicape*				getHandicape(tIndex)										const;
+		cTarif*					getTarif(tNumeroTarif n)									const;
+		tIndex					Index()														const;
+		bool					isTarif(tNumeroTarif n)										const;
+		tAnnee					NombreAnnees(tAnnee)										const;
+		tAnnee					NombreAnnees()												const;
+		size_t					NombreLignes(const cTexte& MasqueCode)						const; 
+		tAnnee					PremiereAnnee()												const;
+		cLigne*					PremiereLigne()												const;
+		tIndex	  				getNombreTarif()											const;
+		
+		Topography&                             getTopography () { return _topography; }
 	//@}
 	
 //	bool				AfficheListeGaresAlpha() const;
 
 	
 	// Chargement horaires
-	void RemplitDistances(cArretLogique*, cArretLogique*, int);
+	void RemplitDistances(LogicalPlace*, LogicalPlace*, int);
 	void RemplitProchainAxe();
 	void RemplitCIL();
 

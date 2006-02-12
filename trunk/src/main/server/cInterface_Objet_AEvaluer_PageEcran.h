@@ -83,7 +83,7 @@ public:
 
 /** Nom de point d'arr�t
 	@code >03 @endcode
-	@param Objet cArretLogique * : Point d'arr�t � nommer
+	@param Objet LogicalPlace * : Point d'arr�t � nommer
 	@param 0 Num�ro de d�signation
 	@return Nom de point d'arr�t
 */
@@ -337,7 +337,7 @@ De ce fait, ce message va afficher, pour le d�part et l�arriv�e&nbsp;:
 
 /** Ligne de fiche horaire
 	@code >28 @endcode
-	@param Objet cArretLogique * : Point d'arr�t de la ligne
+	@param Objet LogicalPlace * : Point d'arr�t de la ligne
 	@param 0 Texte colonnes
 	@param 1 Parit� du rang de la ligne, valeurs :
 		- 0 = pair

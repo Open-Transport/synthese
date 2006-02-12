@@ -32,7 +32,7 @@ private:
 	cSitPert*						vSitPert;
 	tNumeroService					vNumArret;
 	cGareLigne*						_GareLigne;
-	cTableauDynamique<cArretLogique*>		_Gare;
+	cTableauDynamique<LogicalPlace*>		_Gare;
 	
 	cDescriptionPassage*	vSuivant;
 	cDescriptionPassage*	vPrecedent;
@@ -40,7 +40,7 @@ private:
 public:
 	//!	\name Accesseurs
 	//@{
-	cArretLogique*					GetGare(tIndex __i=0)		const;
+	LogicalPlace*					GetGare(tIndex __i=0)		const;
 	tIndex					NombreGares()				const;
 	cGareLigne*				getGareLigne()				const;
 	const cMoment&			getMomentPrevu()			const;
@@ -54,7 +54,7 @@ public:
 	//!	\name Calculateurs
 	//@{
 	cMoment					MomentArriveeDestination()	const;
-	const cArretLogique*			Destination()				;
+	const LogicalPlace*			Destination()				;
 	//@}
 
 	// Constructeur et fonctions de construction
@@ -92,7 +92,7 @@ inline cDescriptionPassage* cDescriptionPassage::Suivant() const
 	return(vSuivant);
 }
 
-inline cArretLogique* cDescriptionPassage::GetGare(tIndex __i) const
+inline LogicalPlace* cDescriptionPassage::GetGare(tIndex __i) const
 {
 	return _Gare.IndexValide(__i) ? _Gare[__i] : NULL;
 }

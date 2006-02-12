@@ -4,7 +4,7 @@ Import ('mainenv')
 moduleenv = mainenv.Copy()
 
 includes = '*.cpp'
-excludes = ['cServeurMnesia.cpp']
+excludes = ['cServeurMnesia.cpp', 'cIndicateurs.cpp', 'cAccesPADe.cpp' ]
 
 moduleenv.Append (CPPPATH = [Dir('..').srcnode().abspath] )
 

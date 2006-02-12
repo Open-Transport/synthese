@@ -4,8 +4,7 @@
 
 #include "cElementInterface.h"
 #include "cTexteRequeteSYNTHESE.h"
-#include "cAccesPADe.h"
-#include "cArretLogique.h"
+#include "LogicalPlace.h"
 #include "cPhoto.h"
 
 /*!	\brief Constructeur

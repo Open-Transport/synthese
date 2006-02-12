@@ -186,7 +186,7 @@ inline int cDistanceCarree::operator == (const cDistanceCarree& Autre)	const
 */
 inline void cDistanceCarree::setFromPoints(const cPoint& Point1, const cPoint& Point2)
 {
-	if (Point1.EstInconnu() || Point2.EstInconnu())
+	if (Point1.unknownLocation() || Point2.unknownLocation())
 		setFromKM2(INCONNU);
 	else
 		setFromKM2((Point1._XKM - Point2._XKM) * (Point1._XKM - Point2._XKM) + (Point1._YKM - Point2._YKM) * (Point1._YKM - Point2._YKM));

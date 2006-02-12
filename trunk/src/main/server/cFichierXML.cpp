@@ -7,7 +7,6 @@
 #include "cEnvironnement.h"
 #include "cArretPhysique.h"
 #include "cCommune.h"
-#include "cAccesPADe.h"
 #include "cAxe.h"
 #include "cHeure.h"
 #include "cDureeEnMinutes.h"
@@ -685,7 +684,7 @@ cFichierXML::chargeArretLogique (XMLNode& node, cEnvironnement& env)
 	const char* yAttr = node.getAttribute (ARRET_LOGIQUE_Y_ATTR.c_str());
 	int y = atoi (yAttr);
 	
-	cArretLogique* al = env.GetGareAvecCreation(curNiveauCorrespondance, id);
+	LogicalPlace* al = env.GetGareAvecCreation(curNiveauCorrespondance, id);
 
 	al->SetPoint(x, y);
 
@@ -1098,7 +1097,7 @@ cFichierXML::chargeIndicateurs (XMLNode& node, cEnvironnement& env)
 			int refid = atoi (indicateurArretNode.getAttribute (INDICATEUR_ARRET_REF_ATTR.c_str()));
 			std::string typeIndicateur (indicateurArretNode.getAttribute (INDICATEUR_ARRET_TYPE_INDICATEUR_ATTR.c_str()));
 
-			cArretLogique* refAL = env.getArretLogique(refid);
+			LogicalPlace* refAL = env.getArretLogique(refid);
 
 			tTypeGareLigneDA typeDA = Depart;
 			if (typeArret == INDICATEUR_ARRET_TYPE_ARRET_ATTR_DEPART) {
@@ -1412,7 +1411,7 @@ cFichierXML::chargeTableauDeparts (XMLNode& node, SYNTHESE& synthese) {
 	for (int i=0; i<nbRefArretLogique; ++i) {
 		XMLNode refALNode = node.getChildNode(REF_ARRET_LOGIQUE_TAG.c_str(), i);
 		int alId = atoi (refALNode.getAttribute (REF_ARRET_LOGIQUE_ID_ATTR.c_str()));
-		cArretLogique* al = env->getArretLogique(alId);
+		LogicalPlace* al = env->getArretLogique(alId);
 
 		int nbRefArretPhysique = refALNode.nChildNode(REF_ARRET_PHYSIQUE_TAG.c_str());
 		for (int j=0; j<nbRefArretPhysique; ++j) {

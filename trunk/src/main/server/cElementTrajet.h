@@ -23,7 +23,6 @@ enum tTypeElementTrajet
 };
 
 #include "Temps.h"
-#include "cArretLogique.h"
 #include "cLigne.h"
 #include "cDistanceCarree.h"
 #include "cArretPhysique.h"
@@ -42,12 +41,12 @@ friend class cTrajet;
 protected:
 	//! \name Donn�es
 	//@{
-	const cArretLogique*			vGareDepart;				//!< Point d'arr�t de d�part @todo le remplacer par l'ID de l'arret
-	tNumeroVoie				vVoieDepart;				//!< ArretPhysique de d�part au niveau du point d'arr�t
+	tIndex			_idOriginLogicalPlace;				//!< Point d'arr�t de d�part @todo le remplacer par l'ID de l'arret
+	tIndex	vVoieDepart;				//!< ArretPhysique de d�part au niveau du point d'arr�t
 	cMoment					vMomentDepart;				//!< Moment du d�part (premier si service continu)
 	cDureeEnMinutes			vAmplitudeServiceContinu;	//!< Amplitude du service continu (0 si service unique)
-	const cArretLogique*			vGareArrivee;				//!< Point d'arr�t d'arriv�e @todo le remplacer par l'ID de l'arret
-	tNumeroVoie				vVoieArrivee;				//!< ArretPhysique d'arriv�e au niveau du point d'arr�t
+	tIndex			_idDestinationLogicalPlace;				//!< Point d'arr�t d'arriv�e @todo le remplacer par l'ID de l'arret
+	tIndex		vVoieArrivee;				//!< ArretPhysique d'arriv�e au niveau du point d'arr�t
 	cMoment					vMomentArrivee;				//!< Moment d'arriv�e (premier si service continu)
 	tNumeroService			vNumeroService;				//!< Index du service utilis� au sein de la ligne
 	const cLigne*			vLigne;						//!< Ligne utilis�e
@@ -76,10 +75,10 @@ public :
 	const cDistanceCarree&	DistanceCarreeObjectif()			const;
 	tDistanceM				DistanceParcourue()					const;
 	const cDureeEnMinutes&	DureeEnMinutesRoulee()				const;
-	const cArretLogique*			getGareArrivee()					const;
-	const cArretLogique*			getGareDepart()						const;
-	const cArretPhysique*			getArretPhysiqueArrivee()					const;
-	const cArretPhysique*			getArretPhysiqueDepart()						const;
+	tIndex			getGareArrivee()					const;
+	tIndex			getGareDepart()						const;
+	tIndex			getArretPhysiqueArrivee()					const;
+	tIndex			getArretPhysiqueDepart()						const;
 	tNumeroService 			getService()						const;
 	const cLigne*			getLigne()							const;
 	const cMoment&			MomentArrivee()						const;
@@ -87,8 +86,8 @@ public :
 	const cElementTrajet*	Precedent()							const;
 	const cElementTrajet*	Suivant()							const;
 	tTypeElementTrajet		Type()								const;
-	tNumeroVoie				VoieArrivee()						const;
-	tNumeroVoie				VoieDepart()						const;
+	tIndex			VoieArrivee()						const;
+	tIndex VoieDepart()						const;
 	//@}
 	
 	//! \name Accesseurs d'objet permettant la modification
@@ -116,25 +115,25 @@ public :
 
 	//! \name Modificateurs
 	//@{
-	void			CalculeDureeEnMinutesRoulee();
-	cElementTrajet*	deleteChainageColonne();
-	void			setAmplitudeServiceContinu(const cDureeEnMinutes& newVal);
-	void			setDistanceCarreeObjectif(const cDistanceCarree& newVal);
-	void			setDureeEnMinutesRoulee(const cDureeEnMinutes& newVal);
-	void			setInformations(const cGareLigne* GLA, const cGareLigne* GLD, const cMoment& MomentDepart
-										, const cMoment& MomentArrivee);
-	void			setInformations(const cGareLigne* GLA, const cGareLigne* GLD, const cDate& DateDepart
-										, tNumeroService iNumeroService);
-	void			setLigne(const cLigne* newVal);
-	void			setMomentArrivee(const cMoment& newVal);
-	void			setMomentDepart(const cMoment& newVal);
-	void			setArretLogiqueArrivee(const cArretLogique* newVal);
-	void			setArretLogiqueDepart(const cArretLogique* newVal);
-	void			setArretPhysiqueArrivee(tNumeroVoie newVal);
-	void			setArretPhysiqueDepart(tNumeroVoie newVal);
-	void			setService(const tNumeroService newVal);
-  	void			setSuivant(cElementTrajet* newVal);
-	void			setType(tTypeElementTrajet newVal);
+		void			CalculeDureeEnMinutesRoulee();
+		cElementTrajet*	deleteChainageColonne();
+		void			setAmplitudeServiceContinu(const cDureeEnMinutes& newVal);
+		void			setDistanceCarreeObjectif(const cDistanceCarree& newVal);
+		void			setDureeEnMinutesRoulee(const cDureeEnMinutes& newVal);
+		void			setInformations(const cGareLigne* GLA, const cGareLigne* GLD, const cMoment& MomentDepart
+											, const cMoment& MomentArrivee);
+		void			setInformations(const cGareLigne* GLA, const cGareLigne* GLD, const cDate& DateDepart
+											, tNumeroService iNumeroService);
+		void			setLigne(const cLigne* newVal);
+		void			setMomentArrivee(const cMoment& newVal);
+		void			setMomentDepart(const cMoment& newVal);
+		void			setArretLogiqueArrivee(const tIndex newVal);
+		void			setArretLogiqueDepart(const tIndex newVal);
+		void			setArretPhysiqueArrivee(tIndex newVal);
+		void			setArretPhysiqueDepart(tIndex newVal);
+		void			setService(const tNumeroService newVal);
+  		void			setSuivant(cElementTrajet* newVal);
+		void			setType(tTypeElementTrajet newVal);
 	//@}
 	
   	//! \name Fonctions d'affichage	

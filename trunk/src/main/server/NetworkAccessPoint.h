@@ -1,26 +1,51 @@
 
-class cPoint;
+#ifndef SYNTHESE_NETWORKACCESSPOINT_H
+#define SYNTHESE_NETWORKACCESSPOINT_H
+
+#include "Point.h"
+#include <string>
+#include "temps.h"
+#include <set>
+#include <utility>
+
+class Address;
+class LogicalPlace;
 
 class NetworkAccessPoint : public cPoint
 {
+public:
+
+	/** Liste d'adresses avec durée d'accès */
+	typedef set<pair<Address*, cDureeEnMinutes> > AddressList;
+
 private:
-	cTexte		_name;	//!< Nom
+	std::string		_name;	//!< Nom
+	LogicalPlace* const	_logicalPlace;	//!< Lieu logique
+	const size_t		_rank;			//!< Position dans le lieu logique
 
 public:
 	//!	@name Accesseurs
 	//@{
-		const cTexte&	getNom()		const;
+		const std::string&	getNom()		const;
+		LogicalPlace*		getLogicalPlace() const { return _logicalPlace; }
+	//@}
+
+	//!	@name Calculateurs
+	//@{
+		virtual AddressList getAddresses(bool forDeparture) const = 0;
 	//@}
 	
 	//!	@name Modificateurs
 	//@{
-		bool setNom(const cTexte&);
+		void setNom(const std::string&);
 	//@}
 
 	//!	@name Constructeur et destructeur
 	//@{
-		NetworkAccessPoint() : cPoint() { }
+		NetworkAccessPoint(LogicalPlace*, size_t);
 		~NetworkAccessPoint();
 	//@}
 
 };
+
+#endif

@@ -335,7 +335,7 @@ bool cLigne::Sauvegarde() const
 // 
 // 
 // ____________________________________________________________________________ 
-bool cLigne::Identifie(const cArretLogique** tbGares, const cMateriel* testMateriel) const
+bool cLigne::Identifie(const LogicalPlace** tbGares, const cMateriel* testMateriel) const
 {
 	// D�faut de mat�riel si sp�cifi�
 	if (vMateriel != NULL && testMateriel!=NULL && vMateriel != testMateriel)
@@ -433,7 +433,7 @@ bool cLigne::allowAddServiceHoraire(const cHoraire* tbHoraires) const
 
 	En cas de succession d'arr�ts identiques, la relation entre les deux arr�ts n'est pas possible.
 */
-cGareLigne* cLigne::addGareLigne(const cGareLigne* GLigneACopier, tDistanceM newPM, tNumeroVoie newArretPhysique, tTypeGareLigneDA newType, cArretLogique* newPA, bool newHorairesSaisis, bool Route)
+cGareLigne* cLigne::addGareLigne(const cGareLigne* GLigneACopier, tDistanceM newPM, tIndex newArretPhysique, tTypeGareLigneDA newType, LogicalPlace* newPA, bool newHorairesSaisis, bool Route)
 {
 	cGareLigne* newGareLigne;
 	if (GLigneACopier == NULL)

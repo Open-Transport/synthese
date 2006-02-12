@@ -16,7 +16,7 @@ cElementTrajet** cCalculVmax::ListeDestinations(cElementTrajet* TrajetEffectue, 
 
 	// D�clarations
 	cElementTrajet** TableauRetour;
-	cArretLogique*			 GareOrigine = TrajetEffectue->Dernier()->getGareArrivee();
+	LogicalPlace*			 GareOrigine = TrajetEffectue->Dernier()->getGareArrivee();
 	cGareLigne*		 CurrentGLD;
 	cGareLigne*		 CurrentGLA;
 	cElementTrajet*	 CurrentET;
@@ -177,7 +177,7 @@ void cCalculVmax::CalculRecursif(cElementTrajet* TrajetEffectue, bool EnCorrespo
 
 void cCalculVmax::Calcule()
 {
-	cArretLogique* curArretLogique;
+	LogicalPlace* curArretLogique;
 	cDistanceCarree DCarre;	// Pour contenir la distance carr�e entre chaque point test et chaque point courant
 	tDistanceKM D;			// Pour contenir la distance entre chaque point test et chaque point courant
 	float T;

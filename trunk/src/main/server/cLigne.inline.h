@@ -193,12 +193,12 @@ inline void cLigne::setAAfficherSurIndicateurs(bool newVal)
 }
 
 #ifdef ClasseAdmin
-inline void cLigne::setDepot(cArretLogique* newVal)
+inline void cLigne::setDepot(LogicalPlace* newVal)
 {
 	vDepot = newVal;
 }
 
-inline cArretLogique* cLigne::getDepot() const
+inline LogicalPlace* cLigne::getDepot() const
 {
 	return(vDepot);
 }

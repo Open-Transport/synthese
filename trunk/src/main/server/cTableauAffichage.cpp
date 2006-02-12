@@ -20,7 +20,7 @@ bool cTableauAffichage::SetOriginesSeulement(bool __Valeur)
 }
 
 // Modificateur du point d'arr�t
-bool cTableauAffichage::SetArretLogique(const cArretLogique* __ArretLogique)
+bool cTableauAffichage::SetArretLogique(const LogicalPlace* __ArretLogique)
 {
 	return (_ArretLogique = __ArretLogique) != NULL;
 }
@@ -156,7 +156,7 @@ bool cTableauAffichage::SetTitre(const cTexte&__Titre)
 	return _Titre.Compare(__Titre);
 }
 
-tIndex cTableauAffichage::AddDestinationAffichee(const cArretLogique* __ArretLogique)
+tIndex cTableauAffichage::AddDestinationAffichee(const LogicalPlace* __ArretLogique)
 {
 	return _DestinationsAffichees.SetElement(__ArretLogique);
 }

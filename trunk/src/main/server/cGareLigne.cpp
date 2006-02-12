@@ -4,7 +4,7 @@
 
 #include "cGareLigne.h"
 
-/*! \brief Constructeur - Cr�e une instance de cGareLigne sur la ligne et le point d'arr�t fournis
+/** Constructeur.
 	\param newLigne Ligne � laquelle appartient l'objet
 	\param newPH	Positionnement lin�aire : Point hectom�trique de l'arr�t sur la ligne
 	\param newArretPhysique	Num�ro de l'arr�t physique desservi par la ligne au sein de l'arr�t logique
@@ -13,7 +13,7 @@
 	\author Hugues Romain
 	\date 2001
 */
-cGareLigne::cGareLigne(cLigne* newLigne, tDistanceM newPM, tNumeroVoie newArretPhysique, tTypeGareLigneDA newType, cArretLogique* newPA, bool newHorairesSaisis)
+cGareLigne::cGareLigne(cLigne* newLigne, tDistanceM newPM, tIndex newArretPhysique, tTypeGareLigneDA newType, LogicalPlace* newPA, bool newHorairesSaisis)
 {
 	vDepartCorrespondancePrecedent = NULL;
 	vDepartPrecedent = NULL;
@@ -89,7 +89,7 @@ cGareLigne::cGareLigne(cLigne* newLigne, const cGareLigne& GLACopier)
 	\author Hugues Romain
 	\date 2001
 */
-cGareLigne::cGareLigne(cLigne* newLigne)
+/*cGareLigne::cGareLigne(cLigne* newLigne)
 {
 	vSuivant = NULL;
 	_Precedent = NULL;
@@ -106,6 +106,7 @@ cGareLigne::cGareLigne(cLigne* newLigne)
 	if (newLigne->NombreServices())
 		AlloueHoraires();
 }
+*/
 
 /*! \brief Destructeur
 */

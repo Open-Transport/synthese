@@ -4,28 +4,6 @@
 
 
 
-inline cCommune* cEnvironnement::GetCommune(int id) const
-{
-	return (id >= 0 && id < _town.size()) ? getCommune(id) : NULL;
-}
-
-inline cArretLogique* cEnvironnement::GetArretLogique(int n) const
-{
-	if(n >= 0 && n < _ArretLogique.Taille())
-		return(getArretLogique(n));
-	else
-		return(NULL);
-}
-
-inline cArretLogique* cEnvironnement::getArretLogique(tIndex n) const
-{
-	return(_ArretLogique[n]);
-}
-
-
-
-
-
 
 inline cJC* cEnvironnement::getJC(tIndex n) const
 {
@@ -67,13 +45,6 @@ inline cDocument* cEnvironnement::GetDocument(tIndex n) const
 		return(NULL);
 }
 
-inline tIndex cEnvironnement::NombrePointsArret(bool Reel) const
-{
-	if (Reel)
-		return _ArretLogique.NombreReel();
-	else
-		return _ArretLogique.Taille();
-}
 
 inline const cTexte& cEnvironnement::getNomRepertoireHoraires() const
 {

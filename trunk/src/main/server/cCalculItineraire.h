@@ -6,7 +6,8 @@
 #define SYNTHESE_cCalculateur_H
 
 class cCalculateur;
-class cAccesReseau;
+class RoutePlanningNode;
+class LogicalPlace;
 
 #include "cTrajets.h"
 #include "cTrajets.h"
@@ -73,9 +74,9 @@ class cCalculateur
 
 	//! \name Parametres de calcul
 	//@{
-	const cEnvironnement*	vEnvironnement;		//!< Environnement de calcul
-	LogicalPlace*			_Origin;			//!< Lieu de départ
-	LogicalPlace*			_Destination;		//!< Lieu d'arrivée
+	const cEnvironnement* 	vEnvironnement;		//!< Environnement de calcul
+	RoutePlanningNode*		_origin;			//!< Lieu de départ
+	RoutePlanningNode*		_destination;		//!< Lieu d'arrivée
 	cMoment					vMomentDebut;		//!< Moment de d�but du calcul (premier d�part)
 	cMoment					vMomentFin;			//!< Moment de fin du calcul (dernier d�part)
 	cMoment					_MomentCalcul;		//!< Moment de lancement du calcul (pour filtrage r�sa et d�parts pass�s)
@@ -91,26 +92,26 @@ class cCalculateur
 	bool				ControleLigne(const cLigne*, const cTrajet&)						const;
 	bool				ControleTrajetRechercheArrivee(cElementTrajet&)						const;
 	bool				ControleTrajetRechercheDepart(cElementTrajet&)						const;
-	bool				DestinationUtilePourArriverTot(const cArretLogique*, const cMoment&
+	bool				DestinationUtilePourArriverTot(const LogicalPlace*, const cMoment&
 							, cDistanceCarree& __DistanceCarreeBut) 						const;
-	bool				ProvenanceUtilePourPartirTard(const cArretLogique*, const cMoment&
+	bool				ProvenanceUtilePourPartirTard(const LogicalPlace*, const cMoment&
 							, cDistanceCarree& __DistanceCarreeBut) 						const;
 	//@}
 	
 	//!	\name Accesseurs variables temporaires de calcul d'itin�raire
 	//@{
-	const cMoment&		GetMeilleurDepart(const cArretLogique* curPA, tNumeroVoie NumeroVoie=0)		const;
-	const cMoment&		GetMeilleureArrivee(const cArretLogique* curPA, tNumeroVoie NumeroVoie=0)	const;
-	cElementTrajet*		GetET(const cArretLogique* curPA, tNumeroVoie NumVoie=0);
+	const cMoment&		GetMeilleurDepart(const LogicalPlace* curPA, tIndex NumeroVoie=0)		const;
+	const cMoment&		GetMeilleureArrivee(const LogicalPlace* curPA, tIndex NumeroVoie=0)	const;
+	cElementTrajet*		GetET(const LogicalPlace* curPA, tIndex NumVoie=0);
 	//@}
 	
 	//!	\name Modificateurs et gestionnaires des variables temporaires de la recherche d'itin�raire
 	//@{
-	void				SetET(const cArretLogique* curPA, cElementTrajet* newET, tNumeroVoie NumVoie=0);
-	void				SetMeilleureArrivee(const cArretLogique* curPA, const cMoment& NewMoment, tNumeroVoie NumVoie=0);
-	void				SetMeilleureArrivee(const cAccesPADe* curAccesPADe, const cMoment& NewMoment, tNumeroVoie NumVoie=0);
-	void				SetMeilleurDepart(const cArretLogique* curPA, const cMoment& NewMoment, tNumeroVoie NumVoie=0);
-	void				SetMeilleurDepart(const cAccesPADe* curAccesPADe, const cMoment& NewMoment, tNumeroVoie NumVoie=0);
+	void				SetET(const LogicalPlace* curPA, cElementTrajet* newET, tIndex NumVoie=0);
+	void				SetMeilleureArrivee(const LogicalPlace* curPA, const cMoment& NewMoment, tIndex NumVoie=0);
+	void				SetMeilleureArrivee(const RoutePlanningNode* curAccesPADe, const cMoment& NewMoment, tIndex NumVoie=0);
+	void				SetMeilleurDepart(const LogicalPlace* curPA, const cMoment& NewMoment, tIndex NumVoie=0);
+	void				SetMeilleurDepart(const RoutePlanningNode* curAccesPADe, const cMoment& NewMoment, tIndex NumVoie=0);
 	void				ResetMeilleuresArrivees();
 	void				ResetMeilleursDeparts();
 	//@}
@@ -135,12 +136,6 @@ class cCalculateur
 // 	bool				HoraireArriveeDepart(cTrajet& __Resultat);
 	//@}
 	
-	//!	@name Calculateurs d'initialisation
-	//@{
-		void			_buildTransportNetworkAccessForDeparture(const cLieuLogique* __LieuOrigine, bool __AvecApprocheAPied=true);
-		void			_buildTransportNetworkAccessForArrival(const cLieuLogique* __LieuDestination, bool __AvecApprocheAPied=true);
-	//@}
-	
 public:
 	//!	\name Accesseurs
 	//@{
@@ -149,7 +144,7 @@ public:
 	
 	//!	\name Modificateurs
 	//@{
-	bool 				InitialiseFicheHoraireJournee(const cLieuLogique* __LieuOrigine, const cLieuLogique* __LieuDestination
+	bool 				InitialiseFicheHoraireJournee(const LogicalPlace* __LieuOrigine, const LogicalPlace* __LieuDestination
 								, const cDate& MomentDepartMin, const cPeriodeJournee*, tBool3 besoinVelo
 								, tBool3 besoinHandicape, tBool3 besoinTaxiBus, tNumeroTarif codeTarif
 								, bool __SolutionsPassees);

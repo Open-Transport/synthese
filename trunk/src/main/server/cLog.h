@@ -7,7 +7,6 @@ class cLog;
 #include <fstream>
 #include "cElementTrajet.h"
 #include "cTrajet.h"
-#include "cArretLogique.h"
 
 #define LOG_FICHIER_BOOT "boot.log"
 #define LOG_FICHIER_ACCES "acces.log"

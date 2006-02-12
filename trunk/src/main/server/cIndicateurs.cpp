@@ -30,7 +30,7 @@ cColonneIndicateurs::cColonneIndicateurs(size_t newNombreGares, cLigne* newLigne
 
 
 
-cGareIndicateurs::cGareIndicateurs(cArretLogique* newPA, tTypeGareLigneDA newTypeDA, tTypeGareIndicateur newObligatoire)
+cGareIndicateurs::cGareIndicateurs(LogicalPlace* newPA, tTypeGareLigneDA newTypeDA, tTypeGareIndicateur newObligatoire)
 {
 	vPA = newPA;
 	vTypeDA = newTypeDA;
@@ -497,7 +497,7 @@ cGareIndicateurs* cGareIndicateurs::getSuivant() const
 	return(vSuivant);
 }
 
-cArretLogique* cGareIndicateurs::getArretLogique() const
+LogicalPlace* cGareIndicateurs::getArretLogique() const
 {
 	return(vPA);
 }
@@ -527,7 +527,7 @@ void cIndicateurs::setJC(const cJC& newVal, const cJC& newVal2)
 	vJC.setMasque(newVal.Et(newVal2));
 }
 
-void cIndicateurs::addArretLogique(cArretLogique *newArretLogique, tTypeGareLigneDA newTypeDA, tTypeGareIndicateur newTypeGI)
+void cIndicateurs::addArretLogique(LogicalPlace *newArretLogique, tTypeGareLigneDA newTypeDA, tTypeGareIndicateur newTypeGI)
 {
 	if (newArretLogique)
 	{

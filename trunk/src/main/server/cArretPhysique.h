@@ -10,12 +10,7 @@
 #ifndef SYNTHESE_CQUAI_H
 #define SYNTHESE_CQUAI_H
 
-typedef short int tNumeroVoie;
-class cArretPhysique;
-
-#include "cTexte.h"
-#include "cPhoto.h"
-#include "Point.h"
+#include "NetworkAccessPoint.h"
 
 /*! \brief Arr�ts physiques (quais, arr�ts de bus, etc.)
 	@ingroup m05
@@ -24,10 +19,18 @@ class cArretPhysique : public NetworkAccessPoint
 {
 
 public:
-	
+
+
+	//!	@name Calculateurs
+	//@{
+		NetworkAccessPoint::AddressList getAddresses(bool forDeparture) const;
+	//@}
+
+
 	//!	\name Constructeur
 	//@{
 	cArretPhysique();
+	~cArretPhysique();
 	//@}
 };
 

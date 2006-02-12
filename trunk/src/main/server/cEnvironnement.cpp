@@ -9,6 +9,7 @@
 #include "cModaliteReservationEnLigne.h"
 #include <string.h>
 #include "cFichierXML.h"
+#include "cCommune.h"
 
 #include <iostream>
 
@@ -294,7 +295,7 @@ cCommune* cEnvironnement::GetCommuneAvecCreation(const std::string& name)
 	\param __Index Num�ro de point d'arr�t
 	\return Pointeur sur l'objet trouv� ou cr��
 */
-cArretLogique* cEnvironnement::GetGareAvecCreation(tNiveauCorrespondance __NiveauCorrespondance, tIndex __Index)
+LogicalPlace* cEnvironnement::GetGareAvecCreation(tNiveauCorrespondance __NiveauCorrespondance, tIndex __Index)
 {
 	// Recherche arr�t existant
 	if (__Index != INCONNU || !GetArretLogique(__Index))
@@ -303,7 +304,7 @@ cArretLogique* cEnvironnement::GetGareAvecCreation(tNiveauCorrespondance __Nivea
 		if (__Index < 0)
 			__Index = INCONNU;
 
-		_ArretLogique.SetElement(new cArretLogique(__Index, __NiveauCorrespondance), __Index);
+		_ArretLogique.SetElement(new LogicalPlace(__Index, __NiveauCorrespondance), __Index);
 	}
 
 	return getArretLogique(__Index);
@@ -401,12 +402,12 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 	cAxe*			curAxe=NULL;
 	cLigne*			curLigne=NULL;
 	cGareLigne*		curGareLigne=NULL;
-	cArretLogique*			curArretLogique=NULL;
+	LogicalPlace*			curArretLogique=NULL;
 	tIndex			NumeroArretLogiquePrecedent=0;
 	bool				DeuxiemePassage = false;
 	tBool3			PHCroissants=Indifferent;	//!< Inconnu
 	cGareLigne*		lastGareLigne=NULL;
-	tNumeroVoie		curNumeroVoie;
+	tIndex		curNumeroVoie;
 	tVitesseKMH		Vitesse;
 	tDistanceHM		Distance;
 	int				TailleTotalePileGLSansHoraire;
@@ -664,7 +665,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 							break;
 						}
 
-						curNumeroVoie = (tNumeroVoie) vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEArretPhysique);
+						curNumeroVoie = (tIndex) vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEArretPhysique);
 
 						// Err 005: Test existence du quai
 						if (curArretLogique->GetArretPhysique(curNumeroVoie) == NULL)
@@ -2193,7 +2194,7 @@ bool cEnvironnement::ConstruitIndicateur()
 // ____________________________________________________________________________
 // L'axe n'est pas document�. Il DOIT �tre renseign� par la suite.
 // ____________________________________________________________________________
-cLigne* cEnvironnement::ConstruitLigne(cArretLogique** tbGares, char* newCode, cMateriel* newMateriel)
+cLigne* cEnvironnement::ConstruitLigne(LogicalPlace** tbGares, char* newCode, cMateriel* newMateriel)
 {
 	cLigne* curLigne = new cLigne(newCode, NULL, this);
 	curLigne->Materiel = newMateriel;
@@ -2459,43 +2460,6 @@ size_t cEnvironnement::NombreLignes(const cTexte& MasqueCode) const
 }
 
 
-/*
-bool cEnvironnement::AfficheListeGaresAlpha() const
-//END PORTAGE
-{
-	ofstream FichierTexte;
-	// SET PORTAGE LINUX
-	FichierTexte.open(NOMFICHIERGARE.Texte());
-	if (!FichierTexte.is_open())
-	{
-		cout << "*** ERREUR Impossible d'ouvrir le fichier " << NOMFICHIERGARE << "\n";
-		return false;
-	}
-	// END PORTAGE
-
-	cCommune* curCommune;
-	cAccesPADe** tbAccesPADe=NULL;
-	size_t i;
-
-	for (tIndex iNumeroCommune=0; iNumeroCommune< vNombreCommunes; iNumeroCommune++)
-	{
-		curCommune = GetCommune(iNumeroCommune);
-		tbAccesPADe = curCommune->textToPADe(cTexte("a"));
-		for (i=0; tbAccesPADe[i]!=NULL; i++)
-		{
-			FichierTexte << TXT(tbAccesPADe[i]->getArretLogique()->Index()) << TXT("/") << TXT(tbAccesPADe[i]->numeroDesignation()) << TXT(" - ") << tbAccesPADe[i]->getNom();
-			//if (curAccesPADe == curCommune->PrincipaleG)
-			//	cout << " *";
-			FichierTexte << "\n";
-		}
-	}
-	free(tbAccesPADe); // CORRECTION GESTION FUITES MEMOIRE HR
-	FichierTexte.close();
-
-	return true;
-}*/
-
-
 
 /*!	\brief Date interpr�t�e en fonction d'un texte descriptif et des donn�es de l'environnement
 	\param Texte Texte contenant la date ou la commande
@@ -2579,43 +2543,6 @@ bool cEnvironnement::Enregistre(cLigne* Obj)
 
 
 
-
-/*!	\brief Enregistrement d'une d�signation de point d'arr�t dans l'environnement, en tant que l'une des d�signations officielles d'un arr�t et dans une commune
-	\param Objet La d�signation
-	\param TypeAccesPADe Le type de d�signation (voir cAccesPADe::TypeAccesPADe())
-	\return true si l'enregistrement a �t� effectu� avec succ�s
-	\author Hugues Romain
-	\date 2005
-	\todo Finaliser la d�finition de lieux publics
-
-Pour plus d'informations sur les concepts, voir cAccesPADe
-
-Lors de l'int�gration d'une d�signations � l'environnement, les op�rations suivantes sont r�alis�es :
- - Mise � jour du type de la d�signation
- - Lancement de la proc�dure de laision � l'arr�t (voir cArretLogique::addDesignation())
- - Lancement de la proc�dure de liaison � la commune (voir cCommune::addDesignation())
-*/
-bool cEnvironnement::Enregistre(cAccesPADe* Objet, tTypeAccesPADe TypeAccesPADe)
-{
-	// R�sultat
-	bool	_Retour = true;
-	tIndex	__Index;
-	
-	// Liaison avec le point d'arr�t
-	if (TypeAccesPADe == ePrincipale || TypeAccesPADe == eQuelconque || TypeAccesPADe == eToutLieu)
-	{
-		__Index = Objet->getArretLogique()->TableauAccesPADe().SetElement(Objet);
-		Objet->setNumeroDesignation(__Index);
-		_Retour = _Retour && __Index != INCONNU;
-	}
-	
-	// Liaision avec la commune
-	if (TypeAccesPADe == ePrincipale || TypeAccesPADe == eQuelconque || TypeAccesPADe == eToutLieu || TypeAccesPADe == eLieuPublic)
-		_Retour = _Retour && Objet->getCommune()->addDesignation(Objet, TypeAccesPADe);
-	
-	// Sortie
-	return _Retour;
-}
 
 
 
@@ -2804,4 +2731,17 @@ cEnvironnement::ChargeFichiersRoutes () {
 
 
 
+void cEnvironnement::addTown(const cCommune* town)
+{
+	_towns.add(town->getName(), town);
+}
 
+cCommune* cEnvironnement::getTown(size_t id)
+{
+	return _towns[id];
+}
+
+LogicalPlace* cEnvironnement::getLogicalPlace(size_t id)
+{
+	return _logicalPlaces[id];
+}

@@ -162,7 +162,7 @@ cElementTrajet* cElementTrajet::operator += (cElementTrajet* AutreElementTrajet)
 */
 /*cElementTrajet* cElementTrajet::Imite(const cMoment& MomentDepart, const cMoment& ArriveeMax) const
 {
-	tNumeroVoie tempArretPhysique=0;
+	tIndex tempArretPhysique=0;
 	cMoment tempMomentDepart=MomentDepart;
 	cElementTrajet* newET;
 	cElementTrajet* firstET=NULL;
@@ -188,7 +188,7 @@ cElementTrajet* cElementTrajet::operator += (cElementTrajet* AutreElementTrajet)
 }*/
 
 /*
-cElementTrajet::setOD(const cArretLogique* Origine, const cArretLogique* Destination)
+cElementTrajet::setOD(const LogicalPlace* Origine, const LogicalPlace* Destination)
 {
 	vGareDepart = Origine;
 	vGareArrivee = Destination;

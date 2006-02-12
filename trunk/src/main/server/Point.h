@@ -52,6 +52,7 @@ public:
 	//! \name Constructeur
 	//@{
 	cPoint();
+	virtual ~cPoint();
 	//@}
 
 	//! \name Modificateurs
@@ -65,7 +66,7 @@ public:
 
 inline CoordonneeKMM cPoint::XKMM() const
 {
-	if (EstInconnu())
+	if (unknownLocation())
 		return INCONNU;
 	else
 		return _XKM * 1000 + _XM;
@@ -73,7 +74,7 @@ inline CoordonneeKMM cPoint::XKMM() const
 
 inline CoordonneeKMM cPoint::YKMM() const
 {
-	if (EstInconnu())
+	if (unknownLocation())
 		return INCONNU;
 	else
 		return _YKM * 1000 + _YM;
@@ -131,11 +132,12 @@ inline void cPoint::setY(const CoordonneeKMM __YKMM)
 inline int cPoint::operator== (const cPoint& __Point) const
 {
 	// Un des points est inconnu : pas d'égalité
-	if (EstInconnu() || __Point.EstInconnu())
+	if (unknownLocation() || __Point.unknownLocation())
 		return false;
 	
 	// Test d'égalité
 	return __Point._XKM == _XKM && __Point._YKM == _YKM;
 }
+
 
 #endif

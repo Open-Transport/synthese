@@ -10,11 +10,11 @@
 
 #include "Point.h"
 #include "cTexte.h"
-
-#define COMMUNES_NOMBRE_DESIGNATIONS_DEFAUT 10
+#include "Interpretor.h"
 
 class LogicalPlace;
 
+using namespace interpretor;
 
 /** Commune
 	@ingroup m05
@@ -34,7 +34,7 @@ public:
 	//@{
 		const std::string&	getName()			const;
 		tIndex		getId()			const;
-		LogicalPlace*	getMainLogicalPlace() const { return _mainLogicalPlace; }
+		LogicalPlace*	getMainLogicalPlace()  { return &_mainLogicalPlace; }
 		LogicalPlace*	getAllPlaces() const { return _allPlaces; }
 	//@}
 	

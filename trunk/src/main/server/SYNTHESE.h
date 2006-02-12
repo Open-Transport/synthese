@@ -10,7 +10,6 @@ class SYNTHESE;
 #include "cTexte.h"
 #include "Temps.h"
 #include "cSite.h"
-#include "cEnvironnement.h"
 #include "cInterface.h"
 #include "cCalculItineraire.h"
 #include "cFichiersPourSYNTHESE.h"
@@ -103,7 +102,6 @@ class SYNTHESE
 					, tIndex NumeroGareOrigine, tIndex NumeroGareDestination
 					, const cDate& DateDepart, tIndex codePeriode
 					, tBool3 velo, tBool3 handicape, tBool3 taxibus, tIndex tarif
-					, tIndex NumeroDesignationOrigine, tIndex NumeroDesignationDestination
 					, long vThreadId);
 	bool ListeCommunes(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 					, bool depart, const cTexte& Entree)												const;

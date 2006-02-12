@@ -5,7 +5,7 @@
 #ifndef SYNTHESE_CLIGNE_H
 #define SYNTHESE_CLIGNE_H
 
-class cLigne;
+class cLieuLogique;
 
 #include "cTexte.h"
 #include "cTrain.h"
@@ -18,7 +18,6 @@ class cLigne;
 #include "cHandicape.h"
 #include "cTarif.h"
 #include "cAlerte.h"
-#include "cArretLogique.h"
 #include "cArretPhysique.h"
 #include "cDistanceCarree.h"
 
@@ -76,8 +75,8 @@ public:
 	
 	//! \name Modificateurs
 	//@{
-	cGareLigne*			addGareLigne(const cGareLigne* GLigneACopier=NULL, tDistanceM newPM=0, tNumeroVoie newArretPhysique=0
-								, tTypeGareLigneDA newType=Passage, cArretLogique* newPA=NULL, bool newHorairesSaisis=true
+	cGareLigne*			addGareLigne(const cGareLigne* GLigneACopier=NULL, tDistanceM newPM=0, cArretPhysique* newArretPhysique=NULL
+								, tTypeGareLigneDA newType=Passage, bool newHorairesSaisis=true
 								, bool Route=false);
 	void				Ferme();
 	void				MajCirculation();
@@ -122,7 +121,7 @@ public:
 	//@{
 //	tNumeroService	addServiceHoraire(const cHoraire* tbHoraires, const cTexte& newNumero, cJC* newCIS, tCodeBaseTrains newCodeBaseTrains=0, tNumeroService NombreNouveauxServices=1);
 	bool			allowAddServiceHoraire(const cHoraire*)											const;
-	bool			Identifie(const cArretLogique**, const cMateriel* testMateriel=NULL)					const; // Identification d'un service � la ligne, en fonction des arrets (tous et eux seuls doivent y appartenir) et du materiel (pour importation)
+	bool			Identifie(const cLieuLogique**, const cMateriel* testMateriel=NULL)					const; // Identification d'un service � la ligne, en fonction des arrets (tous et eux seuls doivent y appartenir) et du materiel (pour importation)
 	bool			Sauvegarde()																	const;
 //	void				updateServiceHoraire(tNumeroService curNumeroService, const cHoraire* tbHoraires, const cTexte& newNumero, cJC* newCIS, tCodeBaseTrains newCodeBaseTrains=0);
 	//@}

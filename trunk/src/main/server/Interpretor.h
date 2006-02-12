@@ -10,7 +10,23 @@
 #include <vector>
 #include "cAssociator.h"
 
-using namespace std;
+namespace interpretor
+{
+
+	/** Score d'un résultat (à déplacer dans associator je pense) */
+	typedef int Score;
+
+	/** Index */
+	typedef int Index;
+
+	/** Résultat */
+	typedef pair<Index, Score> Result;
+
+	/** Clé */
+	typedef string Key;
+
+	/** ID inconnu */
+	const Index UNKNOWN_INDEX = -1;
 
 
 /** @defgroup m07 07 Interpréteur de textes
@@ -38,6 +54,8 @@ using namespace std;
 
 
 
+
+
 /** Classe interpréteur de textes (template générique).
 
 	L'interpréteur générique fonctionne comme un map où les objets sont doublement indexés :
@@ -55,19 +73,6 @@ using namespace std;
 template <class T>
 class Interpretor
 {
-public:
-
-	/** Score d'un résultat (à déplacer dans associator je pense) */
-	typedef int Score;
-
-	/** Index */
-	typedef int Index;
-
-	/** Résultat */
-	typedef pair<Index, Score> Result;
-
-	/** Clé */
-	typedef string Key;
 
 
 protected:
@@ -103,4 +108,5 @@ public:
 
 /** @} */
 
+}
 #endif

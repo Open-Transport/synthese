@@ -23,9 +23,9 @@ inline cElementTrajet* cElementTrajet::getSuivant()
 	return vSuivant;
 }
 
-inline const cArretLogique* cElementTrajet::getGareDepart() const
+inline tIndex cElementTrajet::getGareDepart() const
 {
-	return vGareDepart;
+	return _idOriginLogicalPlace;
 }
 
 inline const cLigne* cElementTrajet::getLigne() const
@@ -38,14 +38,14 @@ inline const cDureeEnMinutes& cElementTrajet::AmplitudeServiceContinu() const
 	return(vAmplitudeServiceContinu);
 }
 
-inline const cArretLogique* cElementTrajet::getGareArrivee() const
+inline tIndex cElementTrajet::getGareArrivee() const
 {
-	return vGareArrivee;
+	return _idDestinationLogicalPlace;
 }
 
-inline void cElementTrajet::setArretLogiqueArrivee(const cArretLogique *newVal)
+inline void cElementTrajet::setArretLogiqueArrivee(tIndex newVal)
 {
-	vGareArrivee = newVal;
+	_idDestinationLogicalPlace = newVal;
 }
 
 inline void cElementTrajet::setMomentArrivee(const cMoment &newVal)
@@ -53,9 +53,9 @@ inline void cElementTrajet::setMomentArrivee(const cMoment &newVal)
 	vMomentArrivee = newVal;
 }
 
-inline void cElementTrajet::setArretLogiqueDepart(const cArretLogique *newVal)
+inline void cElementTrajet::setArretLogiqueDepart(tIndex newVal)
 {
-	vGareDepart = newVal;
+	_idOriginLogicalPlace = newVal;
 }
 
 inline void cElementTrajet::setMomentDepart(const cMoment &newVal)
@@ -68,12 +68,12 @@ inline void cElementTrajet::setAmplitudeServiceContinu(const cDureeEnMinutes& ne
 	vAmplitudeServiceContinu = newVal;
 }
 
-inline tNumeroVoie cElementTrajet::VoieArrivee() const
+inline tIndex cElementTrajet::VoieArrivee() const
 {
 	return(vVoieArrivee);
 }
 
-inline tNumeroVoie cElementTrajet::VoieDepart() const
+inline tIndex cElementTrajet::VoieDepart() const
 {
 	return(vVoieDepart);
 }
@@ -95,7 +95,7 @@ inline cDistanceCarree& cElementTrajet::getDistanceCarreeObjectif()
 	return vDistanceCarreeObjectif;
 }
 
-inline void cElementTrajet::setArretPhysiqueArrivee(tNumeroVoie newVal)
+inline void cElementTrajet::setArretPhysiqueArrivee(tIndex newVal)
 {
 	vVoieArrivee = newVal;
 }
@@ -105,7 +105,7 @@ inline void cElementTrajet::setDistanceCarreeObjectif(const cDistanceCarree& new
 	vDistanceCarreeObjectif = newVal;
 }
 
-inline void cElementTrajet::setArretPhysiqueDepart(tNumeroVoie newVal)
+inline void cElementTrajet::setArretPhysiqueDepart(tIndex newVal)
 {
 	vVoieDepart = newVal;
 }
@@ -193,10 +193,10 @@ inline T& operator<<(T& flux, const cElementTrajet& Obj)
 inline cElementTrajet* cElementTrajet::operator = (const cElementTrajet& Op2)
 {
 	vAmplitudeServiceContinu= Op2.vAmplitudeServiceContinu;
-	vGareDepart				= Op2.vGareDepart;
+	_idOriginLogicalPlace= Op2._idOriginLogicalPlace;
 	vVoieDepart				= Op2.vVoieDepart;
 	vMomentDepart			= Op2.vMomentDepart;
-	vGareArrivee			= Op2.vGareArrivee;
+	_idDestinationLogicalPlace	= Op2._idDestinationLogicalPlace;
 	vVoieArrivee			= Op2.vVoieArrivee;
 	vMomentArrivee			= Op2.vMomentArrivee;
 	vLigne					= Op2.vLigne;

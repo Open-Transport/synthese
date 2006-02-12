@@ -2,10 +2,22 @@
 	@file cLieuLogique.h
 */
 
+#ifndef SYNTHESE_LOGICALPLACE_H
+#define SYNTHESE_LOGICALPLACE_H
+
+#include "Point.h"
+#include "Temps.h"
+#include "cTexte.h"
+#include "cAlerte.h"
+#include <vector>
+#include <map>
+#include "map/Address.h"
+
 class cCommune;
-class cArretLogique;
-class Address;
-class Road;
+class NetworkAccessPoint;
+class cGareLigne;
+class cArretPhysique;
+class cLigne;
 
 /** Classe lieu logique.
 	@ingroup m03
@@ -59,17 +71,33 @@ public:
 	/** Durée de correspondance factice indiquant que la correspondance entre deux points d'accès est interdite */
 	static const tDureeEnMinutes FORBIDDEN_TRANSFER_DELAY;
 
+	/** Règles de correspondance */
+	enum tNiveauCorrespondance
+	{
+		CorrInterdite = 0,
+		CorrAutorisee = 1,
+		CorrRecommandeeCourt = 2,
+		CorrRecommandee = 3
+	};
+
+	/** Map vers les arrêts physiques */
+	typedef map<size_t, cArretPhysique*> PhysicalStopsMap;
+
+	/** Map vers les adresses routières */
+	typedef map<size_t, synmap::Address*>	AddressesMap;
+
+
 protected:
 
 	//!	@name Localisation
 	//@{
 		cCommune*		_town;	//!< Commune dans laquelle se trouve le lieu
-		Road* const		_road;		//!< Route si lieu route entière
+		synmap::Road* const		_road;		//!< Route si lieu route entière
     //@}
 
 	//!	@name Composition
 	//@{
-		vector<NetworkAccessPoint*>	_networkAccesPoints;	// Points d'entrée dans les réseaux
+		vector<NetworkAccessPoint*>	_networkAccessPoints;	// Points d'entrée dans les réseaux
 		vector<LogicalPlace*>		_aliasedLogicalPlaces;	//!< Lieux logiques inclus
 	//@}
 
@@ -97,8 +125,8 @@ protected:
 	//@{
 		cDureeEnMinutes			_minTransferDelay;			//!< Délai minimal de correspondance entre point d'entrée réseaux le plus faible du lieu
 		const tNiveauCorrespondance	_transferRules;			//!< Type d'autorisation de correspondance
-		vector<cDureeEnMinutes>		_maxTransferDelay;				//!< Tableau des plus longs délais minimaux de correspondance au départ de chaque point d'entrée de réseau
-		vector<vector<cDureeEnMinutes>>		_transferDelay;			//!< Tableau des délais minimaux de correspondance entre quais
+		vector< cDureeEnMinutes >		_maxTransferDelay;				//!< Tableau des plus longs délais minimaux de correspondance au départ de chaque point d'entrée de réseau
+		vector< vector< cDureeEnMinutes > >		_transferDelay;			//!< Tableau des délais minimaux de correspondance entre quais
 	//@}
 	
 	
@@ -119,56 +147,41 @@ public:
 
 	//!	@name Accesseurs
 	//@{
-
-		/** Acces aux arrêts.
-			@param __Index Index de l'arrêt à retourner
-			@return Arrêt, NULL si index trop grand
-		*/
-	//	cArretLogique* GetArretLogique(tIndex __Index) const { return (__Index >= _Arrets.size()) ? _Arrets[__Index] : NULL; }
-
-
-		/** Accès aux adresses.
-			@param __Index Index de l'adresse à retourner
-			@return Adresse, NULL si index trop grand
-		*/
-	//	cAdresse* GetAdresse(tIndex __Index) const { return (__Index >= _Adresses.size()) ? _Adresses[__Index] : NULL; }
-
-
 		cDureeEnMinutes			AttenteCorrespondance(tIndex Dep, tIndex Arr)			const;
 		const cDureeEnMinutes&	AttenteMinimale()										const;
 		tNiveauCorrespondance	CorrespondanceAutorisee()								const;
-		cAccesPADe*				GetAccesPADe(int i)										const;
-		cAccesPADe*				getAccesPADe(tIndex i=0)								const;
 		const cAlerte*			getAlerte() 											const;
-		cCommune*				GetCommune(int i)										const;
-		cCommune*				getCommune(tIndex i=0)									const;
 		const cTexte&			getDesignationOD()										const;
-		const cTexte&			GetNom(int i)											const;
-		const cTexte&			getNom(tIndex i=0)										const;
 		cArretPhysique*			GetArretPhysique(int)									const;
-		cArretPhysique*			getArretPhysique(tIndex)								const;
+		NetworkAccessPoint*		getNetworkAccessPoint(tIndex id)	const { return _networkAccessPoints[id]; }
 		const cTexte&           getDesignation13()                                      const;
 		const cTexte&           getDesignation26()                                      const;
+		const cTexte&			getName() const { return _name; }
+		cCommune*				getTown() const { return _town; }
+		tIndex					getId() const {return _id; }
 	    
 		tIndex					Index()													const;
-		tIndex					NombreArretPhysiques()									const;
 		const cDureeEnMinutes&	PireAttente(tIndex i)									const;
 		cGareLigne*				PremiereGareLigneArr()									const;
 		cGareLigne*				PremiereGareLigneDep()									const;
+		bool	getVolatile()	const { return _volatile; }
+		vector<LogicalPlace*>	getAliasedLogicalPlaces()	const { return _aliasedLogicalPlaces; }
+		PhysicalStopsMap	getPysicalStops()										const;
+		AddressesMap	getAddresses()										const;
 	//	tVitesseKMH				vitesseMax(size_t Categorie)							const;
 	//@}
 	
 	//! \name Calculateurs
 	//@{	
-	//	cElementTrajet*			ProchainDirect(cArretLogique* Destination, cMoment& MomentDepart, const cMoment& ArriveeMax
-	//								, tNumeroVoie ArretPhysiqueArriveePrecedente)										const;
+	//	cElementTrajet*			ProchainDirect(LogicalPlace* Destination, cMoment& MomentDepart, const cMoment& ArriveeMax
+	//								, tIndex ArretPhysiqueArriveePrecedente)										const;
 		cMoment					MomentArriveePrecedente (const cMoment& MomentArrivee, const cMoment& MomentArriveeMin)		const;
 		cMoment					MomentDepartSuivant(const cMoment& MomentDepart, const cMoment& MomentDepartMax
 													, const cMoment& __MomentCalcul)										const;
 		cGareLigne*				DessertAuDepart	(const cLigne*)																const;
 		cGareLigne*				DessertALArrivee				(const cLigne*)												const;
 		tNiveauCorrespondance	NiveauCorrespondance			(const cDistanceCarree& D)									const;
-		LogicalPlace*			accurateAddressLogicalPlace(RoadChunk::AddressNumber addressNumber)							const;
+		LogicalPlace*			accurateAddressLogicalPlace(synmap::Address::AddressNumber addressNumber)							;
 	//@}
 
 	//! \name Modificateurs
@@ -191,11 +204,14 @@ public:
 	//! \name Constructeurs et destructeur
 	//@{
 		LogicalPlace(tIndex, tNiveauCorrespondance);
-		LogicalPlace(tIndex, Road*);
-		LogicalPlace(Address*);
-		LogicalPlace(cCommune*);
+		LogicalPlace(synmap::Road*);
+		LogicalPlace(synmap::Address*);
+		LogicalPlace(cCommune*, std::string);
 		LogicalPlace(tIndex, cCommune*);
+		LogicalPlace(cCommune*);
 		~LogicalPlace();
 	//@}
 
 };
+
+#endif

@@ -5,7 +5,7 @@
 class cReservation;
 
 #include "cModaliteReservation.h"
-#include "cArretLogique.h"
+#include "LogicalPlace.h"
 #include "cAxe.h"
 #include "cTexte.h"
 #include "cTexteSQL.h"
@@ -23,8 +23,8 @@ class cReservation
 	//@{
 	cAxe*							_AxeLigne;				//!< Axe de la ligne � la demande
 	cTexte							_CodeService;			//!< Code du service au sein l'axe
-	cArretLogique*							_ArretLogiqueMontee;		//!< Code du point d'arr�t de mont�e
-	cArretLogique*							_ArretLogiqueDescente;	//!< Code du point d'arr�t de descente
+	LogicalPlace*							_ArretLogiqueMontee;		//!< Code du point d'arr�t de mont�e
+	LogicalPlace*							_ArretLogiqueDescente;	//!< Code du point d'arr�t de descente
 	cModaliteReservationEnLigne*	_ModaliteReservation;	//!< Code de la modalit� de reservation
 	cTexte							_AdresseDepart;			//!< Adresse du d�part
 	cTexte							_AdresseArrivee;		//!< Adresse d'arriv�e
@@ -52,7 +52,7 @@ class cReservation
 public:
 	//!	\name Modificateurs
 	//@{
-	void	SetValeurs(const cTrain* Service	, const cArretLogique* tPADepart, const cArretLogique* tPAArrivee
+	void	SetValeurs(const cTrain* Service	, const LogicalPlace* tPADepart, const LogicalPlace* tPAArrivee
 						, const cMoment& DateDepart, const cTexteSQL& tNom, const cTexteSQL& tNomBrut
 						, const cTexteSQL& tPrenom, const cTexteSQL& tAdresse, const cTexteSQL& tEmail
 						, const cTexteSQL& tTelephone, const cTexteSQL& tNumAbonne

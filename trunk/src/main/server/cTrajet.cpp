@@ -190,13 +190,13 @@ const cMoment& cTrajet::getMomentDepart() const
 
 
 
-const cArretLogique* cTrajet::getArretLogiqueArrivee() const
+const LogicalPlace* cTrajet::getArretLogiqueArrivee() const
 {
 	return _DernierET->getGareArrivee();
 }
 
 
-const cArretLogique* cTrajet::getArretLogiqueDepart() const
+const LogicalPlace* cTrajet::getArretLogiqueDepart() const
 {
 	return _PremierET->getGareDepart();
 }

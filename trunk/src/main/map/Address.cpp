@@ -152,7 +152,13 @@ Address::findPathsToPhysicalStops (double maxDistance) const
 
 
 
-
+	
+	NetworkAccessPoint::AddressList AddressList getAddresses(bool forDeparture) const
+	{
+		NetworkAccessPoint::AddressList result;
+		result.insert(pair(this, cDureeEnMinutes(0)));
+		return result;
+	}
 
 
 

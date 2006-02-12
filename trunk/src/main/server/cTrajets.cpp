@@ -401,7 +401,7 @@ int cTrajets::OrdrePAEchangeSiPossible(int PositionActuelle, int PositionGareSou
 	bool* LignesAPermuter = (bool*) calloc(PositionActuelle+1,sizeof(bool));
 	bool* curLignesET = (bool*) malloc((PositionActuelle+1)*sizeof(bool));
 	bool Echangeable = true;
-	const cArretLogique* tempGare;
+	const LogicalPlace* tempGare;
 	int i;
 	int j;
 	
@@ -475,7 +475,7 @@ int cTrajets::OrdrePAEchangeSiPossible(int PositionActuelle, int PositionGareSou
 
 	L'insertion d�cale les arr�ts suivants une ligne plus bas. Si un trajet pi�ton (repr�sent� par deux fl�ches devant �tre attenantes) se trouve � la position demand�e, alors l'arr�t est plac� en suivant pour ne pas rompre le cheminement pi�ton.
 */
-int cTrajets::OrdrePAInsere(const cArretLogique* ArretLogique, tIndex Position)
+int cTrajets::OrdrePAInsere(const LogicalPlace* ArretLogique, tIndex Position)
 {
 	// Saut de ligne v�rouill�e par un cheminement pi�ton
 	for (; _LigneVerrouillee.IndexValide(Position) && _LigneVerrouillee[Position]; Position++);
@@ -495,7 +495,7 @@ int cTrajets::OrdrePAInsere(const cArretLogique* ArretLogique, tIndex Position)
 
 /*!	\brief Recherche de point d'arr�t dans la liste des points d'arr�t
 */
-bool cTrajets::OrdrePARechercheGare(int& i, const cArretLogique* GareAChercher)
+bool cTrajets::OrdrePARechercheGare(int& i, const LogicalPlace* GareAChercher)
 {
 	// Recherche de la gare en suivant � partir de la position i
 	for (; _ListeOrdonneePointsArret.IndexValide(i) && _ListeOrdonneePointsArret[i] != NULL && _ListeOrdonneePointsArret[i] != GareAChercher; i++);
@@ -552,4 +552,19 @@ void cTrajets::Finalise()
 const cTexte& cTrajets::getAuMoinsUneAlerte() const
 {
 	return _AuMoinsUneAlerte;
+}
+
+int cTrajets::TailleListeOrdonneePointsArret() const
+{
+	return _ListeOrdonneePointsArret.Taille();
+}
+
+const LogicalPlace* cTrajets::getListeOrdonneePointsArret(tIndex __i) const
+{
+	return _ListeOrdonneePointsArret[__i];
+}
+
+const cTexte& cTrajets::GetTailleTexte() const
+{
+	return _txtTaille;
 }
