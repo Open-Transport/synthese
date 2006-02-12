@@ -29,7 +29,7 @@ public:
 
 	//!	\name Constructeur
 	//@{
-	cArretPhysique();
+	cArretPhysique(LogicalPlace*, size_t);
 	~cArretPhysique();
 	//@}
 };

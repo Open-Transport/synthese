@@ -603,7 +603,7 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 			__Parametres << nAD;	//4
 			__Parametres << ((nCA != INCONNU) ? __Site->getEnvironnement()->getTown(nCA)->getName() : txtCA);	//5
 			__Parametres << nCA;	//6
-			__Parametres << ((nAA != INCONNU && nDA != INCONNU) ? __Site->getEnvironnement()->getLogicalPlace(nAA)->getName(nDA) : txtAA);	//7
+			__Parametres << ((nAA != INCONNU && nDA != INCONNU) ? __Site->getEnvironnement()->getLogicalPlace(nAA)->getName() : txtAA);	//7
 			__Parametres << nAA; //8
 			__Parametres << ""; //9
 			__Parametres << ""; //10
@@ -632,10 +632,6 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 			__Site->Affiche(pCtxt, INTERFACEErreurArretsFicheHoraire, __Parametres);
 		}
 
-		if (tbCommune!=NULL)
-			free(tbCommune);
-		if (tbPADe!=NULL)
-			free(tbPADe);
 			
 		return true;
 	}
@@ -663,8 +659,8 @@ bool SYNTHESE::FormulaireReservation(ostream &pCtxt, ostream& pCerr, const cSite
 	cLigne* curLigne;
 	
 	if(	(curLigne = __Site->getEnvironnement()->GetLigne(tCodeLigne))
-	&&	__Site->getEnvironnement()->GetArretLogique(iNumeroPADepart)
-	&&	__Site->getEnvironnement()->GetArretLogique(iNumeroPAArrivee)
+	&&	__Site->getEnvironnement()->getLogicalPlace(iNumeroPADepart)
+	&&	__Site->getEnvironnement()->getLogicalPlace(iNumeroPAArrivee)
 	&&	curLigne->GetResa()
 //	&& 	curLigne->GetResa()->ReservationEnLigne()
 	&&	__DateDepart.OK()
@@ -862,24 +858,18 @@ bool SYNTHESE::ListeArrets(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 	Arret = __Arret;
 	
 	// 1: Recherche de la commune entrï¿½e.
-	cCommune* curCommune = __Site->getEnvironnement()->GetCommune(NumeroCommune);
+	cCommune* curCommune = __Site->getEnvironnement()->getTown(NumeroCommune);
     
 	if (curCommune == NULL)
 	{
-		cCommune** tbCommune = __Site->getEnvironnement()->TextToCommune(Commune, 0);
-		if ((tbCommune[0] == NULL) && depart)
+		vector<cCommune*> tbCommune = __Site->getEnvironnement()->searchTown(string(Commune.Texte()), 2);
+		if (tbCommune.size() != 1)
 		{
-			pCtxt << "<script>alert(\"Aucune commune de départ ne correspond. Veuillez la modifier.\")</script>";
-			ListeCommunes(pCtxt, pCerr, __Site, true, Commune);
-		}
-		else if ((tbCommune[0] == NULL) && !depart)
-		{
-			pCtxt << "<script>alert(\"Aucune commune d'arrivée ne correspond. Veuillez la modifier.\")</script>";
-			ListeCommunes(pCtxt, pCerr, __Site, false, Commune);
+			pCtxt << "<script>alert(\"Aucune commune " << (depart ? "de départ" : "d'arrivée") << " ne correspond. Veuillez la modifier.\")</script>";
+			ListeCommunes(pCtxt, pCerr, __Site, depart, Commune);
 		}
 		else
 			curCommune = tbCommune[0];
-		free(tbCommune);
 	}
 
 	if (curCommune != NULL)
@@ -889,11 +879,8 @@ bool SYNTHESE::ListeArrets(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 
 		cInterface_Objet_Connu_ListeParametres __Parametres;
 		__Parametres << Arret;
-		__Parametres << curCommune->Index();
-		if (depart)
-			__Site->Affiche(pCtxt, INTERFACEListeArretsDepart, __Parametres);
-		else
-			__Site->Affiche(pCtxt, INTERFACEListeArretsArrivee, __Parametres);
+		__Parametres << curCommune->getId();
+		__Site->Affiche(pCtxt, depart ? INTERFACEListeArretsDepart : INTERFACEListeArretsArrivee, __Parametres);
 	}
 	
 	return true;
@@ -1027,8 +1014,6 @@ bool SYNTHESE::ExecuteRequete(ostream &pCtxt, ostream &pCerr, cTexteRequeteSYNTH
 					, __Requete.getBool3(REQUETE_COMMANDE_HANDICAPE)
 					, __Requete.getBool3(REQUETE_COMMANDE_TAXIBUS)
 					, __Requete.getInt(REQUETE_COMMANDE_TARIF)
-					, __Requete.getInt(REQUETE_COMMANDE_NUMERO_DESIGNATION_DEPART)
-					, __Requete.getInt(REQUETE_COMMANDE_NUMERO_DESIGNATION_ARRIVEE)
 					, vThreadId
 						);
 		

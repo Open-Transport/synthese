@@ -60,7 +60,7 @@ public:
 
     //! @name Constructeur et destructeur
     //@{
-    Address(Road* road, AddressNumber number = UNKNOWN_ADDRESS_NUMBER);
+    Address(LogicalPlace*, size_t, Road* road, AddressNumber number = UNKNOWN_ADDRESS_NUMBER);
     ~Address();
     //@}
 

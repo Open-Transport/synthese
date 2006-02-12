@@ -16,7 +16,7 @@ class NetworkAccessPoint : public cPoint
 public:
 
 	/** Liste d'adresses avec durée d'accès */
-	typedef set<pair<Address*, cDureeEnMinutes> > AddressList;
+	typedef vector<pair<Address*, cDureeEnMinutes> > AddressList;
 
 private:
 	std::string		_name;	//!< Nom

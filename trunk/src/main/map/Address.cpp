@@ -16,11 +16,14 @@ namespace synmap
 /** Constructeur.
  @param road Route sur laquelle se trouve l'adresse
  @param number Numéro d'adresse (rien = numéro inconnu)
+ @param logicalPlace Lieu logique auquel appartient l'adresse (NULL si aucun)
+ @param rankInLogicalPlace Rang de l'adresse au sein du lieu logique
  
  @todo Gérer ici immédiatement le PM : soit il est fourni, soit il est extrapolé d'après le numéro, soit on prend le milieu
 */
-Address::Address(Road* road, AddressNumber number)
-        : _road(road)
+Address::Address(LogicalPlace* logicalPlace, Road* road, size_t rankInLogicalPlace, AddressNumber number)
+: NetworkAccessPoint(logicalPlace, rankInLogicalPlace)
+		, _road(road)
         , _number(number)
 {}
 

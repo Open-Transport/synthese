@@ -9,8 +9,8 @@
 	\author Hugues Romain
 	\date 2001-2005
 */
-cArretPhysique::cArretPhysique()
-: NetworkAccessPoint()
+cArretPhysique::cArretPhysique(LogicalPlace* logicalPlace, size_t rank)
+: NetworkAccessPoint(logicalPlace, rank)
 {
 }
 
