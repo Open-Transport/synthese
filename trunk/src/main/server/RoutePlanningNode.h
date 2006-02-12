@@ -1,5 +1,5 @@
 /** En-tête classe Noeud de calcul d'itinéraires.
-	@file RoutePlanningBound.h
+ @file RoutePlanningBound.h
 */
 
 #ifndef SYNTHESE_ROUTEPLANNINGNODE_H
@@ -17,29 +17,32 @@ class RoutePlanningNode
 {
 private:
 
-	//!	@name Données
-	//@{
-		LogicalPlace* const								_logicalPlace;	//!< Lieu logique à l'origine de l'objet
-		vector<pair<cArretPhysique*, cDureeEnMinutes> >	_pysicalStops;	//!< Points d'entrée sur le calcul d'itinéraire
-	//@}
+    //! @name Données
+    //@{
+    LogicalPlace* const        _logicalPlace; //!< Lieu logique à l'origine de l'objet
+    vector<pair<cArretPhysique*, cDureeEnMinutes> > _physicalStops; //!< Points d'entrée sur le calcul d'itinéraire
+    //@}
 
 public:
 
-	//!	@name Calculateurs
-	//@{
-		bool	includes(const cArretPhysique*) const;
-	//@}
+    //! @name Calculateurs
+    //@{
+    bool includes(const cArretPhysique*) const;
+    //@}
 
-	//!	@name Modificateurs
-	//@{
-		void	addPhysicalStop(cArretPhysique*);
-	//@}
+    //! @name Modificateurs
+    //@{
+    void addPhysicalStop(cArretPhysique*);
+    //@}
 
-	//!	@name Constructeur et destructeur
-	//@{
-		RoutePlanningNode(LogicalPlace*, bool);
-		~RoutePlanningNode();
-	//@}
+    //! @name Constructeur et destructeur
+    //@{
+    RoutePlanningNode(LogicalPlace*, 
+		      double maxApproachDistance,  
+		      double approachSpeed);
+
+    ~RoutePlanningNode();
+    //@}
 };
 
 #endif

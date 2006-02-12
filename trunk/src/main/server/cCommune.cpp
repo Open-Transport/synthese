@@ -12,11 +12,13 @@
 	@author Hugues Romain
 	@date 2001-2006
 */
-cCommune::cCommune(tIndex id, std::string name)
-: cPoint()
-	, _id(id)
-	, _name(name)
-	, _mainLogicalPlace(this));
+cCommune::cCommune(tIndex id, const cEnvironnement& environment, std::string name)
+  : cPoint()
+  , _id(id)
+  , _name(name)
+  , _mainLogicalPlace(this)
+  , _environment (environment)
+  
 {
 	_allPlaces = NULL;
 }
