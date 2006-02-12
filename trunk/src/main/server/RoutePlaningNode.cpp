@@ -23,21 +23,19 @@ RoutePlanningNode::RoutePlanningNode(LogicalPlace* logicalPlace,
   : _logicalPlace(logicalPlace)
 {
 
-  if (distanceMax == 0)
-    {
-      // Just take physical stops contained in the logical place
-      const PhysicalStopsMap& physicalStops = logicalPlace->getPhysicalStops ();
-      for (PhysicalStopsMap::const_iterator iter = (physicalStops.begin ());
+      // take physical stops contained in the logical place
+	const LogicalPlace::PhysicalStopsMap& physicalStops = logicalPlace->getPhysicalStops ();
+	for (LogicalPlace::PhysicalStopsMap::const_iterator iter = (physicalStops.begin ());
 	   iter != physicalStops.end (); ++iter) {
 	
 	double approachDuration = 0.0; // TODO .
-	_physicalStops.push_back (make_pair (*iter, approachDuration));
+	_accessPointsWithDistance.push_back (make_pair (*iter, approachDuration));
 
       }
-    }
-  else
+
+	   // search of other logical places reached with road network
+  if (maxApproachDistance > 0)
     {
-      const cEnvironnement& env = logicalPlace->getEnvironment ();
       const map<size_t, Address*>& adresses = getAddresses ();
       for (map<size_t, Address*>::const_iterator iter = adresses.begin ();
 	   iter != adresses.end (); ++iter)
@@ -54,17 +52,16 @@ RoutePlanningNode::RoutePlanningNode(LogicalPlace* logicalPlace,
 	    {
 
 	      double approachDistance = distanceAndStop->first;
-	      const LogicalPlace* reachableLogicalPlace = 
-		env.getLogicalPlace (distanceAndStop->second->getLogicalPlaceId ());
+//	      const LogicalPlace* reachableLogicalPlace = 
+//		env.getLogicalPlace (distanceAndStop->second->getLogicalPlaceId ());
 		    
-	      cArretPhysique* physicalStop = *(reachableLogicalPlace->
-					       getPhysicalStops().find (distanceAndStop->second->getRank ()));
+//	      cArretPhysique* physicalStop = *(reachableLogicalPlace->
+//					       getPhysicalStops().find (distanceAndStop->second->getRank ()));
 
-	      double approachDuration = approachDistance / approachSpeed; // seconds
+//	      double approachDuration = approachDistance / approachSpeed; // seconds
 		    
-	      _physicalStops.push_back (
-					make_pair (physicalStop, 
-						   cDureeEnMinutes (approachDuration / 60.0)));
+	      _accessPointsWithDistance.push_back (
+			  make_pair (distanceAndStop->second, approachDistance));
 		    
 	    }
 
@@ -72,10 +69,24 @@ RoutePlanningNode::RoutePlanningNode(LogicalPlace* logicalPlace,
 	}
 	
       // Prise en compte des lieux inclus
-      for (size_t  i=0; i<_logicalPlace->getAliasedLogicalPlaces().size(); i++)
+		for (vector<LogicalPlace*>::iterator included = _logicalPlace->getAliasedLogicalPlaces().begin();
+			included != _logicalPlace->getAliasedLogicalPlaces().end()
+			++included
+			)
 	{
-	  // ?????? On se moque des alias non ? ils ont exactement
-	  // les memes donnees que this.
+		const LogicalPlace::PhysicalStopsMap& physicalStops = included->getPhysicalStops ();
+      
+
+		      // take physical stops contained in the logical place
+		
+      for (PhysicalStopsMap::const_iterator iter = ( physicalStops.begin ());
+	   iter != physicalStops.end (); ++iter) {
+	
+	double approachDuration = 0.0; // TODO .
+	_accessPointsWithDistance.push_back (make_pair (*iter, approachDuration));
+
+      }
+
 	}
     }
 }

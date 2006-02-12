@@ -9,7 +9,9 @@
 #include "temps.h"
 
 class LogicalPlace;
+class NetworkAccessPoint;
 class cArretPhysique;
+
 
 /** Extrémité de calcul d'itinéraires.
 */
@@ -20,7 +22,7 @@ private:
     //! @name Données
     //@{
     LogicalPlace* const        _logicalPlace; //!< Lieu logique à l'origine de l'objet
-    vector<pair<cArretPhysique*, cDureeEnMinutes> > _physicalStops; //!< Points d'entrée sur le calcul d'itinéraire
+	vector<pair<NetworkAccessPoint*, double> > _accessPointsWithDistance; //!< Points d'entrée sur le calcul d'itinéraire
     //@}
 
 public:

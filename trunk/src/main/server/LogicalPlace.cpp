@@ -699,7 +699,7 @@ void LogicalPlace::addAliasedLogicalPlace(LogicalPlace* logicalPlace)
 /** Accesseur arrêts physiques.
 
 */
-LogicalPlace::PhysicalStopsMap LogicalPlace::getPysicalStops() const
+LogicalPlace::PhysicalStopsMap LogicalPlace::getPhysicalStops() const
 {
 	LogicalPlace::PhysicalStopsMap result;
 	cArretPhysique* physicalStop;
