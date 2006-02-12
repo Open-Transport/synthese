@@ -79,6 +79,7 @@ LogicalPlace::LogicalPlace(synmap::Address* address)
 	stringstream name;
 	name << address->getAddressNumber() << " " << address->getRoad()->getName();
 	setDesignation(address->getRoad()->getTown(), name.str());
+	addNetworkAccessPoint(address, 0);
 }
 
 
@@ -592,7 +593,7 @@ LogicalPlace* LogicalPlace::accurateAddressLogicalPlace(synmap::Address::Address
 	if (false) // Clause Calcul d'une adresse précise possible à implémenter 
 	{
 		
-		return new LogicalPlace(new synmap::Address(this, 0, _road, addressNumber));
+		return new LogicalPlace(new synmap::Address(this, _road, 0, addressNumber));
 	}
 
 	// Retour par défaut

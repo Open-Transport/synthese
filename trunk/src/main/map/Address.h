@@ -10,6 +10,8 @@
 #include <set>
 #include "NetworkAccessPoint.h"
 
+class LogicalPlace;
+
 namespace synmap
 {
 
@@ -60,7 +62,7 @@ public:
 
     //! @name Constructeur et destructeur
     //@{
-    Address(LogicalPlace*, Road* road, size_t AddressNumber number = UNKNOWN_ADDRESS_NUMBER);
+    Address(LogicalPlace*, Road* road, size_t, AddressNumber number = UNKNOWN_ADDRESS_NUMBER);
     ~Address();
     //@}
 

@@ -5,18 +5,22 @@
 #include "Point.h"
 #include <string>
 #include "temps.h"
-#include <set>
+#include <vector>
 #include <utility>
 
-class Address;
+
 class LogicalPlace;
+class Address;
 
 class NetworkAccessPoint : public cPoint
 {
 public:
 
+	/** Accès à adresse avec durée */
+	typedef pair<Address*, cDureeEnMinutes> AddressWithAccessDuration;
+
 	/** Liste d'adresses avec durée d'accès */
-	typedef vector<pair<Address*, cDureeEnMinutes> > AddressList;
+	typedef vector<AddressWithAccessDuration> AddressList;
 
 private:
 	std::string		_name;	//!< Nom
@@ -28,6 +32,7 @@ public:
 	//@{
 		const std::string&	getNom()		const;
 		LogicalPlace*		getLogicalPlace() const { return _logicalPlace; }
+		size_t				getRankInLogicalPlace() const { return _rank; }
 	//@}
 
 	//!	@name Calculateurs

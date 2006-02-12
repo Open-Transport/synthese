@@ -3,6 +3,10 @@
 */
 
 #include "cArretPhysique.h"
+#include "LogicalPlace.h"
+#include "map/Address.h"
+#include "temps.h"
+
 
 /*!	\brief Constructeur
 	\version 2
@@ -14,7 +18,7 @@ cArretPhysique::cArretPhysique(LogicalPlace* logicalPlace, size_t rank)
 {
 }
 
-cArretPhysique::~cArretPhsyique()
+cArretPhysique::~cArretPhysique()
 {
 }
 
@@ -29,11 +33,11 @@ NetworkAccessPoint::AddressList cArretPhysique::getAddresses(bool forDeparture) 
 	LogicalPlace::AddressesMap addresslist = getLogicalPlace()->getAddresses();
 	
 	for (LogicalPlace::AddressesMap::iterator element = addresslist.begin(); element != addresslist.end(); element++)
-		result.insert(pair(
-			element->second()
+		result.push_back(AddressWithAccessDuration(
+			element->second
 			, forDeparture 
-				? getLogicalPlace()->AttenteCorrespondance(rank, element->first())
-				: getLogicalPlace()->AttenteCorrespondance(element->first(), rank)
+				? getLogicalPlace()->AttenteCorrespondance((int)getRankInLogicalPlace(), (int)element->first)
+				: getLogicalPlace()->AttenteCorrespondance((int)element->first, (int)getRankInLogicalPlace())
 		));
 
 	return result;
