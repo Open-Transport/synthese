@@ -592,7 +592,7 @@ LogicalPlace* LogicalPlace::accurateAddressLogicalPlace(synmap::Address::Address
 	if (false) // Clause Calcul d'une adresse précise possible à implémenter 
 	{
 		
-		return new LogicalPlace(new synmap::Address(_road, addressNumber));
+		return new LogicalPlace(new synmap::Address(this, 0, _road, addressNumber));
 	}
 
 	// Retour par défaut
