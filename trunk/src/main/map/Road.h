@@ -8,13 +8,14 @@
 #include <set>
 
 
+class cCommune;
+
 
 namespace synmap
 {
 
 
 class Topography;
-class cCommune;
 
 
 class Road : public Referrant
@@ -28,7 +29,7 @@ private:
 
   const std::string _name;
   const std::string _discriminant;
-  cCommune* const _town;
+  const cCommune* _town;
   RoadChunkVector _chunks;
 
 public:
@@ -37,18 +38,18 @@ public:
        int key,
        const std::string& name,
        const std::string& discriminant,
-       cCommune* const town, 
+       const cCommune* town, 
        const std::vector<RoadChunk*>& chunks);
 	
   virtual ~Road();
 
   const std::string& getName () const { return _name; }
   const std::string& getDiscriminant () const { return _discriminant; }
-  cCommune* getTown () const { return _town; }
+  const cCommune* getTown () const { return _town; }
   
   const RoadChunkVector& getChunks () const { return _chunks; }
 
-  const RoadChunk* findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) const;
+  const RoadChunk* findMostPlausibleChunkForNumber (const Address::AddressNumber& number) const;
   
 
 };

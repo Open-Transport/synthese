@@ -8,6 +8,10 @@
 #include <map>
 
 #include "RoadChunk.h"
+#include "Address.h"
+
+
+class cCommune;
 
 
 namespace synmap
@@ -125,16 +129,16 @@ namespace synmap
       const Road* newRoad (int key,
 			   const std::string& name,
 			   const std::string& discriminant,
-			   int cityKey,
+			   const cCommune* town,
 			   const std::vector<RoadChunk*>& chunks);
 
 
       RoadChunk* newRoadChunk (int key,
 			       const std::vector<const Location*>& steps,
-			       const RoadChunk::AddressNumber& rightStartNumber, 
-			       const RoadChunk::AddressNumber& rightEndNumber, 
-			       const RoadChunk::AddressNumber& leftStartNumber, 
-			       const RoadChunk::AddressNumber& leftEndNumber);
+			       const Address::AddressNumber& rightStartNumber, 
+			       const Address::AddressNumber& rightEndNumber, 
+			       const Address::AddressNumber& leftStartNumber, 
+			       const Address::AddressNumber& leftEndNumber);
 
 	
       const PhysicalStop* newPhysicalStop (int key,

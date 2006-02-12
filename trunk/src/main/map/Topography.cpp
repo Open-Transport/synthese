@@ -158,14 +158,14 @@ const Road*
 Topography::newRoad (int key,
 		     const std::string& name,
 		     const std::string& discriminant,
-		     int cityKey,
+		     const cCommune* town,
 		     const std::vector<RoadChunk*>& chunks)
 {
   Road* road = new Road (this, 
 			 key, 
 			 name, 
 			 discriminant,
-			 cityKey,
+			 town,
 			 chunks);
   
   _roads.insert (make_pair (key, road));
@@ -178,10 +178,10 @@ Topography::newRoad (int key,
 RoadChunk* 
 Topography::newRoadChunk (int key,
 			  const std::vector<const Location*>& steps,
-			  const RoadChunk::AddressNumber& rightStartNumber, 
-			  const RoadChunk::AddressNumber& rightEndNumber, 
-			  const RoadChunk::AddressNumber& leftStartNumber, 
-			  const RoadChunk::AddressNumber& leftEndNumber)
+			  const Address::AddressNumber& rightStartNumber, 
+			  const Address::AddressNumber& rightEndNumber, 
+			  const Address::AddressNumber& leftStartNumber, 
+			  const Address::AddressNumber& leftEndNumber)
 {
   RoadChunk* chunk = new RoadChunk (this, key, steps,
 				    rightStartNumber,

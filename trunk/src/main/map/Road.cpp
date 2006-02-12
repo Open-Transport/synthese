@@ -23,7 +23,7 @@ Road::Road(Topography* topography,
 	   int key,
 	   const std::string& name,
 	   const std::string& discriminant,
-	   cCommune* const town,
+	   const cCommune* town,
 	   const std::vector<RoadChunk*>& chunks)
   : Referrant (topography, key)
     , _name (name)
@@ -49,17 +49,17 @@ Road::~Road()
 
 
 const RoadChunk* 
-Road::findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) const
+Road::findMostPlausibleChunkForNumber (const Address::AddressNumber& number) const
 {
   // Warning : this algorithm works only assuming that chunks are ordered!
 
-  RoadChunk::AddressNumber closestMin = std::numeric_limits<double>::min ();
+  Address::AddressNumber closestMin = std::numeric_limits<double>::min ();
   int closestMinChunk = -1;
 
-  RoadChunk::AddressNumber closestMax = std::numeric_limits<double>::max ();
+  Address::AddressNumber closestMax = std::numeric_limits<double>::max ();
   int closestMaxChunk = -1;
 
-  RoadChunk::AddressNumber unknown = RoadChunk::ADDRESS_NUMBER_UNKNOWN;
+  Address::AddressNumber unknown = Address::UNKNOWN_ADDRESS_NUMBER;
 
   int index = 0;
 
@@ -72,8 +72,8 @@ Road::findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) c
     if (chunk->hasNumber (number)) return chunk;
 
     
-    RoadChunk::AddressNumber rsn = chunk->getRightStartNumber ();
-    RoadChunk::AddressNumber lsn = chunk->getLeftStartNumber ();
+    Address::AddressNumber rsn = chunk->getRightStartNumber ();
+    Address::AddressNumber lsn = chunk->getLeftStartNumber ();
     if ((rsn != unknown) && (rsn < number) && rsn > closestMin) {
       closestMin = rsn;
       closestMinChunk = index;
@@ -82,8 +82,8 @@ Road::findMostPlausibleChunkForNumber (const RoadChunk::AddressNumber& number) c
       closestMinChunk = index;
     }
 
-    RoadChunk::AddressNumber ren = chunk->getRightEndNumber ();
-    RoadChunk::AddressNumber len = chunk->getLeftEndNumber ();
+    Address::AddressNumber ren = chunk->getRightEndNumber ();
+    Address::AddressNumber len = chunk->getLeftEndNumber ();
     if ((ren != unknown) && (ren > number) && ren < closestMax) {
       closestMax = ren;
       closestMaxChunk = index;
