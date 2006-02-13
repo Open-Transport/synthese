@@ -13,7 +13,7 @@
 namespace synmap
 {
 
-Topography::Topography(const cEnvironnement* _environment)
+Topography::Topography(const cEnvironnement* environment)
 : _environment (environment)
 {
 }
@@ -168,7 +168,7 @@ Topography::newRoad (int key,
 			 name, 
 			 type,
 			 discriminant,
-			 town,
+			 (cCommune*) town,
 			 chunks);
   
   _roads.insert (make_pair (key, road));

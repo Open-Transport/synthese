@@ -24,7 +24,7 @@ Road::Road(Topography* topography,
 	   const std::string& name,
 	   const RoadType& type,
 	   const std::string& discriminant,
-	   const cCommune* town,
+	   cCommune* town,
 	   const std::vector<RoadChunk*>& chunks)
   : Referrant (topography, key)
   , _name (name)
