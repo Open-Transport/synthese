@@ -9,7 +9,6 @@
 #include <assert.h>
 
 
-
 namespace synmap
 {
 
@@ -52,17 +51,10 @@ Address::findDistancesToAddresses (double maxDistance) const
   std::set
     < std::pair<double, const Address*> > result;
   
-  double pathLength = 0.0;
   for (std::set < Address::PathToAddress >::const_iterator iter (paths.begin ());
        iter != paths.end ();
        ++iter) {
-    for (std::vector<const RoadChunk*>::const_iterator iterChunk (iter->first.begin ());
-	 iterChunk != iter->first.end ();
-	 ++iterChunk) {
-      pathLength += (*iterChunk)->getLength ();
-      
-    }
-    result.insert (make_pair (pathLength, iter->second));
+    result.insert (make_pair (computePathLength (*iter), iter->second));
 
   }
   return result;
@@ -157,6 +149,56 @@ Address::findPathsToAddresses (double maxDistance) const
         return result;
 
     }
+
+
+
+double 
+Address::computePathLength (const PathToAddress& path) {
+  double pathLength = 0.0;
+  for (std::vector<const RoadChunk*>::const_iterator iterChunk (path.first.begin ());
+       iterChunk != path.first.end ();
+       ++iterChunk) {
+    pathLength += (*iterChunk)->getLength ();
+  }
+
+  return pathLength;
+
+}
+
+
+
+
+Address::PathToAddress
+Address::findShortestPath (std::set<Address*> originAddresses,
+			   std::set<Address*> destinationAddresses,
+			   double maxDistance) 
+{
+  
+  double minPathLength = 100000.0;
+  PathToAddress shortestPath;
+  
+  // Algo mega-bourrin pour determiner le plus court chemin entre
+  // un choix d'adresses de départ et d'arrivée
+  for (std::set<Address*>::const_iterator from = originAddresses.begin ();
+       from != originAddresses.end ();
+       ++from) {
+    
+    std::set< Address::PathToAddress > paths = (*from)->findPathsToAddresses (maxDistance);
+    for (std::set<PathToAddress>::const_iterator path = paths.begin ();
+	 path != paths.end ();
+	 ++path) {
+      if (destinationAddresses.find ((Address*) path->second) != destinationAddresses.end ()) 
+	{
+	  double pathLength = computePathLength (*path);
+	  if (pathLength < minPathLength) {
+	    shortestPath = *path;
+	  }
+	}
+    }
+  }
+	
+  return shortestPath;
+}
 
 
 

@@ -89,6 +89,14 @@ public:
 
     NetworkAccessPoint::AddressList getAddresses(bool forDeparture) const;
 
+
+    static double computePathLength (const PathToAddress& path);
+
+    static PathToAddress findShortestPath (std::set<Address*> originAddresses,
+					   std::set<Address*> destinationAddresses,
+					   double maxDistance);
+
+
     //@}
 
     //! @name Accesseurs
