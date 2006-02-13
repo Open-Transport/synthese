@@ -22,7 +22,7 @@ private:
 	// Variables
 	cEnvironnement*		vEnvironnement;
 	cElementTrajet**	vET;				// Par point d'arr�t
-	cDureeEnMinutes*		vMeilleureDuree;	// Par point d'arr�t
+	tDureeEnMinutes*		vMeilleureDuree;	// Par point d'arr�t
 	
 	// Methodes
 	cElementTrajet**	ListeDestinations(cElementTrajet* TrajetEffectue, bool EnCorrespondance, ofstream& F);

@@ -32,57 +32,30 @@ Les objets environnement sont initialis�s par les valeurs par d�faut suivant
 Les �l�ments suivants sont d'ores et d�j� initialis�s :
  - Cr�ation d'espaces de calcul pour threads.
 */
-cEnvironnement::cEnvironnement(int __NombreCalculateurs)
+cEnvironnement::cEnvironnement(int __NombreCalculateurs, string directory, string pathToFormat, size_t id)
+: Code(code)
+, _path(directory)
 {
 	// Plage de date de taille nulle
 	vDateMin.setDate(TEMPS_MAX);
 	vDateMax.setDate(TEMPS_MIN);
 	
-	// Cr�ation des espaces de calcul
-	_NombreCalculateurs = __NombreCalculateurs;
-	_Calculateur = new cCalculateur[_NombreCalculateurs];
-}
-
-
-
-/*!	\brief D�signation d'un espace de calcul libre d'utilisation pour un thread
-	\return Pointeur vers l'espace de calcul d�sign�, NULL si aucun disponible
-	\author Hugues Romain
-	\date 2005
-*/
-cCalculateur* cEnvironnement::CalculateurLibre()
-{
-	// Parcours de la liste des espaces de calcul de l'environnement
-	for (tIndex __Index = 0; __Index < _NombreCalculateurs; __Index++)
-		if (_Calculateur[__Index].Prend())
-			return &_Calculateur[__Index];
-	
-	// Retour echec
-	return NULL;
-}
-
-
-
-/*!	\brief Chargement de toutes les donn�es � partir des fichiers
-	\param __Chemin Partie commune des noms de fichiers de donn�es pr�sents dans la racine de l'environnement (laisser le / terminal du r�pertoire si pas de nom de fichier). A cette partie commune se rajoutent les extensions de chaque type de fichier
-	\param __CheminFormats Chemin d'acc�s au fichier des formats de fichiers (habituellement __Chemin/../formats.per)
-	\return true Si le chargement a �t� effectu� avec succ�s
-	\author Hugues Romain
-	\date 2000-2005
-*/
-bool cEnvironnement::Charge(const cTexte& __Chemin, const cTexte& __CheminFormats)
-{
 	cTexte __NomFichier;
+	cTexte __Chemin;
+	__Chemin << directory;
+
+	cTexte __CheminFormats;
+	__CheminFormats << pathToFormat;
 	
 	// Chargement des photos
-	vNomFichierPhotos << __Chemin << PHEXTENSION;
+/*	vNomFichierPhotos << __Chemin << PHEXTENSION;
 	_FormatPhoto = new cFormatFichier(__CheminFormats, PHFORMAT, PHFORMATLIGNENombreFormats, PHFORMATCOLONNENombreFormats);
 	if (!_FormatPhoto || !ChargeFichierPhotos())
 	{
 		envOk=false;
 		return false;
 	}
-
+*/
 	// Chargement fichier des points d'arr�t
 	__NomFichier = __Chemin;
 	__NomFichier << PAEXTENSION;
@@ -186,10 +159,27 @@ bool cEnvironnement::Charge(const cTexte& __Chemin, const cTexte& __CheminFormat
 	
     
 	// Mise � disposition des calculateurs
-	for (int __i = 0; __i < _NombreCalculateurs; __i++)
-  		_Calculateur[__i].setEnvironnement(this);
+	for (int __i = 0; __i < __NombreCalculateurs; __i++)
+		_Calculateur[__i] = new cCalculateur(this);
 
-	return true;
+}
+
+
+
+/*!	\brief D�signation d'un espace de calcul libre d'utilisation pour un thread
+	\return Pointeur vers l'espace de calcul d�sign�, NULL si aucun disponible
+	\author Hugues Romain
+	\date 2005
+*/
+cCalculateur* cEnvironnement::CalculateurLibre()
+{
+	// Parcours de la liste des espaces de calcul de l'environnement
+	for (tIndex __Index = 0; __Index < _NombreCalculateurs; __Index++)
+		if (_Calculateur[__Index].Prend())
+			return &_Calculateur[__Index];
+	
+	// Retour echec
+	return NULL;
 }
 
 
@@ -608,7 +598,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 
 				case HORAIRESFORMATLIGNEAttente:
 					for (iService=0; iService!=curLigne->NombreServices(); iService++)
-						curLigne->setAttente(iService, cDureeEnMinutes(vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire, iService)));
+						curLigne->setAttente(iService, tDureeEnMinutes(vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire, iService)));
 					break;
 
 				case HORAIRESFORMATLIGNEFin:

@@ -85,8 +85,8 @@ public:
 	void				setAAfficherSurTableauDeparts(bool newVal);
 	void				setAAfficherSurIndicateurs(bool newVal);
 	bool				SetAUtiliserDansCalculateur(bool __Valeur);
-	void				setAmplitudeServiceContinu(tNumeroService iNumeroService, const cDureeEnMinutes& newVal);
-	void				setAttente(tNumeroService iService, const cDureeEnMinutes& newVal);
+	void				setAmplitudeServiceContinu(tNumeroService iNumeroService, const tDureeEnMinutes& newVal);
+	void				setAttente(tNumeroService iService, const tDureeEnMinutes& newVal);
 	void				setGirouette(const cTexte& newGirouette);
 	void				setHoraireDepart(tNumeroService, cHoraire*);
 	void				setImage(const cTexte& newImage);
@@ -130,13 +130,13 @@ public:
 	//@{
 	bool					AAfficherSurTableauDeparts()		const;
 	bool					AAfficherSurIndicateurs()			const;
-	const cDureeEnMinutes&	Attente(tNumeroService i)			const;
+	const tDureeEnMinutes&	Attente(tNumeroService i)			const;
 	cAxe*					Axe()								const;
 	cGareLigne*				DerniereGareLigne()					const;
 	bool					EstCadence(tNumeroService)			const;
 	bool					EstUneRoute()						const;
 	bool					EstUneLigneAPied()					const;
-	const cDureeEnMinutes&	EtalementCadence(tNumeroService)	const;
+	const tDureeEnMinutes&	EtalementCadence(tNumeroService)	const;
 	const cAlerte*   		getAlerte()							const;
 	const cTexte&			getCode()							const;
 	const cTexte&			getGirouette()						const;

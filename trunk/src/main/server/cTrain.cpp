@@ -66,22 +66,22 @@ bool cTrain::EstCadence() const
 	return(vEstCadence);
 }
 
-const cDureeEnMinutes& cTrain::EtalementCadence() const
+const tDureeEnMinutes& cTrain::EtalementCadence() const
 {
 	return(vEtalementCadence);
 }
 
-const cDureeEnMinutes& cTrain::Attente() const
+const tDureeEnMinutes& cTrain::Attente() const
 {
 	return(vAttente);
 }
 
-void cTrain::setAttente(const cDureeEnMinutes& newVal)
+void cTrain::setAttente(const tDureeEnMinutes& newVal)
 {
 	vAttente = newVal;
 }
 
-void cTrain::setAmplitudeServiceContinu(const cDureeEnMinutes& newVal)
+void cTrain::setAmplitudeServiceContinu(const tDureeEnMinutes& newVal)
 {
 	//#ifndef OS_LINUX
 	//_ASSERTE(newVal >= 0 && newVal <= MinutesParJour);

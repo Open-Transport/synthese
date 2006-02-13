@@ -543,8 +543,6 @@ bool cFichierEnvironnements::Charge(int __NombreCalculateurs)
 		if (ProchaineSection(Tampon, TYPESousSection))
 		{
 			numeroEnv = _Format->GetNombre(Tampon, ENVSFORMATCOLONNENumero);
-			__Environnement = new cEnvironnement(__NombreCalculateurs);
-			if (Synthese.Enregistre(__Environnement, numeroEnv) == INCONNU)
 			{
 // 				Base.Erreur("Echec de l'enregistrement de l'environnement", _Chemin, Tampon, "");
 				Tampon.Vide();
@@ -567,13 +565,13 @@ bool cFichierEnvironnements::Charge(int __NombreCalculateurs)
 			{
 				case ENVSFORMATLIGNERepertoire:
 				{
-					cTexte rep = Tampon.Extrait(_Format->GetColonnePosition(ENVSFORMATLIGNERepertoire)).fAdresseComplete(_Chemin).Copie(SEPARATEUR_REPERTOIRE_TXT);
-					if (!__Environnement->Charge(rep, _CheminFichierFormats))
-					{
-// 						Base.Erreur("Probleme d'initialisation de l'environnement", TXT(numeroEnv), "", "");
-						Fermer();
-						return false;
-					}
+					__Environnement = new cEnvironnement(
+						__NombreCalculateurs
+						, Tampon.Extrait(_Format->GetColonnePosition(ENVSFORMATLIGNERepertoire)).fAdresseComplete(_Chemin).Copie(SEPARATEUR_REPERTOIRE_TXT).Texte()
+						, string(_CheminFichierFormats.Texte())
+						, numeroEnv
+					);
+					Synthese.Enregistre(__Environnement, numeroEnv);
 					break;
 				}
 

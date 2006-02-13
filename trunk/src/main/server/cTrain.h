@@ -19,8 +19,8 @@ typedef short int tNumeroService;
 */
 class cTrain
 {
-	cDureeEnMinutes		vAttente;			//!< Attente maximale (service continu)
-	cDureeEnMinutes		vEtalementCadence;	//!< Dur�e de la plage de service continu
+	tDureeEnMinutes		vAttente;			//!< Attente maximale (service continu)
+	tDureeEnMinutes		vEtalementCadence;	//!< Dur�e de la plage de service continu
 	cJC*				vCirculation;		//!< Calendrier de circulation
 	cTexte				vNumero;			//!< Num�ro officiel de la circulation
 	bool				vEstCadence;		//!< Indique si la circulation est un service continu
@@ -32,9 +32,9 @@ class cTrain
 public:
 	//! \name Accesseurs
 	//@{
-	const cDureeEnMinutes&	Attente()					const;
+	const tDureeEnMinutes&	Attente()					const;
 	bool					EstCadence()				const;
-	const cDureeEnMinutes&	EtalementCadence()			const;
+	const tDureeEnMinutes&	EtalementCadence()			const;
 	cJC*					getJC()						const;
 	const cTexte&			getNumero()					const;
 	cLigne*					getLigne()					const;
@@ -49,8 +49,8 @@ public:
 	
 	//! \name Modificateurs
 	//@{
-	void	setAmplitudeServiceContinu	(const cDureeEnMinutes& newVal);
-	void	setAttente					(const cDureeEnMinutes& newVal);
+	void	setAmplitudeServiceContinu	(const tDureeEnMinutes& newVal);
+	void	setAttente					(const tDureeEnMinutes& newVal);
 	void	setNumero					(const cTexte&);
 	void	setServiceContinu			();
 //	cTrain* operator =  (const cTrain&);

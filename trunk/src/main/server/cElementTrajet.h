@@ -41,12 +41,10 @@ friend class cTrajet;
 protected:
 	//! \name Donn�es
 	//@{
-	tIndex			_idOriginLogicalPlace;				//!< Point d'arr�t de d�part @todo le remplacer par l'ID de l'arret
-	tIndex	vVoieDepart;				//!< ArretPhysique de d�part au niveau du point d'arr�t
+	NetworkAccessPoint*			_origin;			// Origine
+	NetworkAccessPoint*			_destination;		// Destination
 	cMoment					vMomentDepart;				//!< Moment du d�part (premier si service continu)
-	cDureeEnMinutes			vAmplitudeServiceContinu;	//!< Amplitude du service continu (0 si service unique)
-	tIndex			_idDestinationLogicalPlace;				//!< Point d'arr�t d'arriv�e @todo le remplacer par l'ID de l'arret
-	tIndex		vVoieArrivee;				//!< ArretPhysique d'arriv�e au niveau du point d'arr�t
+	tDureeEnMinutes			vAmplitudeServiceContinu;	//!< Amplitude du service continu (0 si service unique)
 	cMoment					vMomentArrivee;				//!< Moment d'arriv�e (premier si service continu)
 	tNumeroService			vNumeroService;				//!< Index du service utilis� au sein de la ligne
 	const cLigne*			vLigne;						//!< Ligne utilis�e
@@ -61,7 +59,7 @@ protected:
 	
 	//! \name Donn�es pr�calcul�es
 	//@{
-	cDureeEnMinutes			vDureeEnMinutesRoulee;		//!< Temps pass� dans les circulations
+	tDureeEnMinutes			vDureeEnMinutesRoulee;		//!< Temps pass� dans les circulations
 	cDistanceCarree			vDistanceCarreeObjectif;	//!< Carr� de la distance entre la destination de l'�l�ment et la destination finale du trajet (avec l'incertitude habituelle de ce type de donn�es)
 	tDistanceM				vDistanceParcourue;			//!< Distance lin�aire parcourue aucours du trajet
 	//@}
@@ -70,15 +68,11 @@ public :
 	
 	//! \name Accesseurs
 	//@{
-	const cDureeEnMinutes&	AmplitudeServiceContinu()			const;
+	const tDureeEnMinutes&	AmplitudeServiceContinu()			const;
 	const cAxe*				Axe()								const;
 	const cDistanceCarree&	DistanceCarreeObjectif()			const;
 	tDistanceM				DistanceParcourue()					const;
-	const cDureeEnMinutes&	DureeEnMinutesRoulee()				const;
-	tIndex			getGareArrivee()					const;
-	tIndex			getGareDepart()						const;
-	tIndex			getArretPhysiqueArrivee()					const;
-	tIndex			getArretPhysiqueDepart()						const;
+	const tDureeEnMinutes&	DureeEnMinutesRoulee()				const;
 	tNumeroService 			getService()						const;
 	const cLigne*			getLigne()							const;
 	const cMoment&			MomentArrivee()						const;
@@ -86,8 +80,8 @@ public :
 	const cElementTrajet*	Precedent()							const;
 	const cElementTrajet*	Suivant()							const;
 	tTypeElementTrajet		Type()								const;
-	tIndex			VoieArrivee()						const;
-	tIndex VoieDepart()						const;
+	NetworkAccessPoint*		getOrigin() const { return _origin; }
+	NetworkAccessPoint*		getDestination() const { return _destination; }
 	//@}
 	
 	//! \name Accesseurs d'objet permettant la modification
@@ -117,9 +111,9 @@ public :
 	//@{
 		void			CalculeDureeEnMinutesRoulee();
 		cElementTrajet*	deleteChainageColonne();
-		void			setAmplitudeServiceContinu(const cDureeEnMinutes& newVal);
+		void			setAmplitudeServiceContinu(const tDureeEnMinutes& newVal);
 		void			setDistanceCarreeObjectif(const cDistanceCarree& newVal);
-		void			setDureeEnMinutesRoulee(const cDureeEnMinutes& newVal);
+		void			setDureeEnMinutesRoulee(const tDureeEnMinutes& newVal);
 		void			setInformations(const cGareLigne* GLA, const cGareLigne* GLD, const cMoment& MomentDepart
 											, const cMoment& MomentArrivee);
 		void			setInformations(const cGareLigne* GLA, const cGareLigne* GLD, const cDate& DateDepart
@@ -127,13 +121,11 @@ public :
 		void			setLigne(const cLigne* newVal);
 		void			setMomentArrivee(const cMoment& newVal);
 		void			setMomentDepart(const cMoment& newVal);
-		void			setArretLogiqueArrivee(const tIndex newVal);
-		void			setArretLogiqueDepart(const tIndex newVal);
-		void			setArretPhysiqueArrivee(tIndex newVal);
-		void			setArretPhysiqueDepart(tIndex newVal);
 		void			setService(const tNumeroService newVal);
   		void			setSuivant(cElementTrajet* newVal);
 		void			setType(tTypeElementTrajet newVal);
+		void			setDestination(NetworkAccessPoint* destination)  { _destination = destination; }
+		void			setOrigin(NetworkAccessPoint* origin)   { _origin = origin; }
 	//@}
 	
   	//! \name Fonctions d'affichage	
@@ -163,7 +155,7 @@ public :
 		return(Objet);
 	}	
 
-	/*template <class T> T& toXML(T& Objet, cMoment momentDepart, const cDureeEnMinutes& amplitudeServiceContinu) const
+	/*template <class T> T& toXML(T& Objet, cMoment momentDepart, const tDureeEnMinutes& amplitudeServiceContinu) const
 	{
 		cMoment debutArret, finArret;
 

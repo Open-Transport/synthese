@@ -237,19 +237,19 @@ void cGareLigne::ChaineAvecHoraireSuivant(const cGareLigne& AHPrecedent, const c
 		DureeAAjouter = CoefficientPosition * (AHSuivant.vHoraireDepartPremier[iService] - AHPrecedent.vHoraireDepartPremier[iService]).Valeur();
 
 		vHoraireDepartPremier[iService]		= 	AHPrecedent.vHoraireDepartPremier[iService];
-		vHoraireDepartPremier[iService]		+= 	cDureeEnMinutes((int) floor(DureeAAjouter));
+		vHoraireDepartPremier[iService]		+= 	tDureeEnMinutes((int) floor(DureeAAjouter));
 		vHoraireDepartPremierReel[iService]	= 	vHoraireDepartPremier[iService];
 		vHoraireDepartDernier[iService]		= 	AHPrecedent.vHoraireDepartDernier[iService];
-		vHoraireDepartDernier[iService]		+= 	cDureeEnMinutes((int) floor(DureeAAjouter));
+		vHoraireDepartDernier[iService]		+= 	tDureeEnMinutes((int) floor(DureeAAjouter));
 
 // MODIF HR PBCOLDBLE SOL 2
 		DureeAAjouter = CoefficientPosition * (AHSuivant.vHoraireArriveePremier[iService] - AHPrecedent.vHoraireArriveePremier[iService]).Valeur();
 
 		vHoraireArriveePremier[iService]	 	=	AHPrecedent.vHoraireArriveePremier[iService];
-		vHoraireArriveePremier[iService]		+= 	cDureeEnMinutes((int) ceil(DureeAAjouter));
+		vHoraireArriveePremier[iService]		+= 	tDureeEnMinutes((int) ceil(DureeAAjouter));
 		vHoraireArriveePremierReel[iService] 	=	vHoraireArriveePremier[iService];
 		vHoraireArriveeDernier[iService]	 	=	AHPrecedent.vHoraireArriveeDernier[iService];
-		vHoraireArriveeDernier[iService]		+= 	cDureeEnMinutes((int) ceil(DureeAAjouter));
+		vHoraireArriveeDernier[iService]		+= 	tDureeEnMinutes((int) ceil(DureeAAjouter));
 	}
 
 	EcritIndexArrivee();
@@ -473,7 +473,7 @@ tNumeroService cGareLigne::Prochain(
 tNumeroService cGareLigne::Prochain(
 	cMoment&			MomentDepart
 	, const cMoment&	MomentDepartMax
-	, cDureeEnMinutes&	AmplitudeServiceContinu
+	, tDureeEnMinutes&	AmplitudeServiceContinu
 	, tNumeroService	NumProchainMin
 	, const cMoment&	__MomentCalcul
 ) const {
@@ -573,7 +573,7 @@ tNumeroService cGareLigne::Precedent(cMoment &MomentArrivee, const cMoment& Mome
 tNumeroService cGareLigne::Precedent(
 	cMoment &			MomentArrivee
 	, const cMoment&	MomentArriveeMin
-	, cDureeEnMinutes&	AmplitudeServiceContinu
+	, tDureeEnMinutes&	AmplitudeServiceContinu
 ) const {
 	
 	tNumeroService NumPrecedent = Precedent(MomentArrivee, MomentArriveeMin); 
@@ -649,10 +649,10 @@ bool cGareLigne::EstArrivee()
 
 
 
-cDureeEnMinutes cGareLigne::MeilleurTempsParcours(const cGareLigne& autreGL) const
+tDureeEnMinutes cGareLigne::MeilleurTempsParcours(const cGareLigne& autreGL) const
 {
-	cDureeEnMinutes curT;
-	cDureeEnMinutes bestT;
+	tDureeEnMinutes curT;
+	tDureeEnMinutes bestT;
 	
 	for (tNumeroService iNumeroService=0; iNumeroService!= vLigne->NombreServices(); iNumeroService++)
 	{
@@ -889,7 +889,7 @@ void cGareLigne::AlloueHoraires()
 	vHoraireDepartPremierReel = new cHoraire[vLigne->NombreServices()];
 }
 
-const cDureeEnMinutes& cGareLigne::Attente(tNumeroService iNumeroService) const
+const tDureeEnMinutes& cGareLigne::Attente(tNumeroService iNumeroService) const
 {
 	return(vLigne->Attente(iNumeroService));
 }

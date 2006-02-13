@@ -39,8 +39,8 @@ public :
 	//! \name Modificateurs
 	//@{
 	void			setHeure(tHeure newHeure = 'A', tMinute newMinutes = 'I');
-	tDureeEnJours	operator += (const cDureeEnMinutes&);
-	tDureeEnJours	operator -= (const cDureeEnMinutes&);
+	tDureeEnJours	operator += (const tDureeEnMinutes&);
+	tDureeEnJours	operator -= (const tDureeEnMinutes&);
 //	cHeure&		operator =  (int);
 	cHeure&		operator =  (const cTexte&);
 	cHeure&		operator =  (const cHoraire&);
@@ -54,7 +54,7 @@ public :
 	int				operator <  (const cHeure&)	const;
 	int				operator >= (const cHeure&)	const;
 	int				operator >  (const cHeure&)	const;
-	cDureeEnMinutes	operator -  (const cHeure&) 	const;
+	tDureeEnMinutes	operator -  (const cHeure&) 	const;
 	bool				OK() 					const;
 	//@}
 

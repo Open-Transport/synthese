@@ -312,9 +312,6 @@
 				RelativePath="..\..\..\src\main\server\cDocumentHoraire.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\cDureeEnMinutes.h">
-			</File>
-			<File
 				RelativePath="..\..\..\src\main\server\cElementInterface.h">
 			</File>
 			<File

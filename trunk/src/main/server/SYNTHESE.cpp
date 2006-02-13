@@ -120,9 +120,6 @@ tIndex SYNTHESE::Enregistre(cEnvironnement* __Objet, tIndex __Index)
 	if (__Index == INCONNU)
 		return INCONNU;
 	
-	// Ecriture de l'index d'enregistrement dans l'objet
-	__Objet->SetIndex(__Index);
-	
 	// Sortie OK
 	return __Index;
 }

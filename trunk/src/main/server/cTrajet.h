@@ -24,9 +24,9 @@ protected:
 	cElementTrajet*	_PremierET;					//!< Acc�s aux donn�es du trajet
 	cElementTrajet*	_DernierET;					//!< Acc�s direct au dernier �l�ment du trajet
 	int				_Taille;					//!< Nombre d'�l�ments contenus dans le trajet
-	cDureeEnMinutes	_Duree;						//!< Dur�e totale du trajet
-	cDureeEnMinutes	_DureeRoulee;				//!< Temps pass� dans les transports
-	cDureeEnMinutes _AmplitudeServiceContinu;	//!< Amplitude de desserte si service continu
+	tDureeEnMinutes	_Duree;						//!< Dur�e totale du trajet
+	tDureeEnMinutes	_DureeRoulee;				//!< Temps pass� dans les transports
+	tDureeEnMinutes _AmplitudeServiceContinu;	//!< Amplitude de desserte si service continu
 		
 	//!	\name M�thode de finalisation
 	//@{
@@ -36,21 +36,19 @@ protected:
 public:
 	//!	\name Accesseurs
 	//@{
+	NetworkAccessPoint*		getOrigin()						const;
+	NetworkAccessPoint*		getDestination()				const;
 	cElementTrajet*			getDernierElement();
-	const cDureeEnMinutes&	getDuree()						const;
-	const cDureeEnMinutes&	getDureeRoulee()				const;
-	tIndex					getIndexArretPhysiqueArrivee()			const;
-	tIndex					getIndexArretPhysiqueDepart()			const;
+	const tDureeEnMinutes&	getDuree()						const;
+	const tDureeEnMinutes&	getDureeRoulee()				const;
 	const cMoment&			getMomentArrivee()				const;
 	const cMoment&			getMomentDepart()				const;
 	const cTexte&			getNiveauMaxAlerte()			const;
-	tIndex			getArretLogiqueArrivee()			const;
-	tIndex			getArretLogiqueDepart()			const;
 	cElementTrajet*			getPremierElement();
 	const cElementTrajet*	PremierElement()				const;
 	const cElementTrajet*	DernierElement()				const;
 	int						Taille()						const;
-	cDureeEnMinutes			getAmplitudeServiceContinu()	const;
+	tDureeEnMinutes			getAmplitudeServiceContinu()	const;
 	//@}
 
 	//!	\name Modificateurs
@@ -61,7 +59,7 @@ public:
 	void					LieEnPremier(cElementTrajet*);
 	void					LieEnDernier(cElementTrajet*);
 	int						GenererNiveauxAlerte();
-	void					setAmplitudeServiceContinu(const cDureeEnMinutes&);
+	void					setAmplitudeServiceContinu(const tDureeEnMinutes&);
 	//void					setPremierET(cElementTrajet*);
 	void					SupprimeDernier();
 	void					SupprimePremier();
@@ -121,13 +119,13 @@ inline const cElementTrajet* cTrajet::PremierElement() const
 	return _PremierET;
 }
 
-inline const cDureeEnMinutes& cTrajet::getDuree() const
+inline const tDureeEnMinutes& cTrajet::getDuree() const
 {
 	return _Duree;
 }
 
 
-inline const cDureeEnMinutes& cTrajet::getDureeRoulee() const
+inline const tDureeEnMinutes& cTrajet::getDureeRoulee() const
 {
 	return _DureeRoulee;
 }

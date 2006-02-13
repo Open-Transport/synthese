@@ -10,7 +10,7 @@ class cTableauAffichageSelectifDestinations :
 {
 protected:
 	cTableauDynamique<const LogicalPlace*>	_DestinationsSelection;	//!< Destinations � afficher absolument
-	cDureeEnMinutes					_DureePresenceDestinationForcee;	//!< Dur�e pendant laquelle une destination est forc�e
+	tDureeEnMinutes					_DureePresenceDestinationForcee;	//!< Dur�e pendant laquelle une destination est forc�e
 
 public:
 	cTableauAffichageSelectifDestinations(const cTexte& __Code);

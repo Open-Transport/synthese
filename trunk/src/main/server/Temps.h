@@ -36,6 +36,8 @@
 
 typedef int			tDureeEnJours;
 typedef int 		tDureeEnMinutes;
+#define MAX_MINUTES_DURATION = 9999999;	// Mettre le vrai max
+
 typedef short int	tJour;
 typedef short int	tMois;
 typedef short int	tAnnee;
@@ -44,7 +46,6 @@ typedef short int	tHeure;
 class cAnnee;
 class cMois;
 class cMoment;
-class cDureeEnMinutes;
 class cDate;
 class cHoraire;
 class cHeure;
@@ -52,7 +53,6 @@ class cHeure;
 /** @} */
 
 // Inclusion des classes de temps
-#include "cDureeEnMinutes.h"
 #include "cMoment.h"
 
 

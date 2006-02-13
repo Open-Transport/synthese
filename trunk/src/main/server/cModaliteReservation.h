@@ -50,7 +50,7 @@ protected:
 	//! \name Délai de réservation
 	//@{
 	bool			vReferenceEstLOrigine;	//!< Indique si le moment de départ de référence est celle du départ de la circulation à son origine (true) ou bien s'il s'agit du moment de départ du voyageur (false)
-	cDureeEnMinutes	vDelaiMinMinutes;		//!< Délai minimal en minutes entre la réservation et le moment de référence
+	tDureeEnMinutes	vDelaiMinMinutes;		//!< Délai minimal en minutes entre la réservation et le moment de référence
 	tDureeEnJours	vDelaiMinJours;			//!< Délai minimal en jours entre la réservation et le moment de référence
 	cHeure			vDelaiMinHeureMax;		//!< Heure maximale de réservation le dernier jour de la période d'ouverture à la réservation
 	tDureeEnJours	vDelaiMaxJours;		//!< Nombre maximal de jours entre la réservation et le départ du service
@@ -96,7 +96,7 @@ public:
 	bool	SetDelaiMinJours		(const int);
 	void	setDelaiMinJours		(const tDureeEnJours);
 	bool	SetDelaiMinMinutes		(const int);
-	void	setDelaiMinMinutes		(const cDureeEnMinutes&);
+	void	setDelaiMinMinutes		(const tDureeEnMinutes&);
 	bool	SetDoc				(const cTexte&);
 	bool	SetHorairesTel			(const cTexte&);
 	bool setIndex				(tIndex);

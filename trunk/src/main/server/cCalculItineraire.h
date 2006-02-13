@@ -46,6 +46,12 @@ Pour les op�rations se rapportant � la r�servation en ligne, se r�f�re
 */
 class cCalculateur
 {
+public:
+
+	/** Tableaux temporaires de meilleurs temps */
+	typedef map<const cArretPhysique*, cMoment> BestTimeMap;
+
+private:
 	//!	\name Occupation de l'espace
 	//@{
 	bool					_Libre;							//!< Indicateur d'espace libre ou occup� par un thread
@@ -53,13 +59,11 @@ class cCalculateur
 	
 	//! \name Variables de travail recherche d'itin�raire
 	//@{
-	cMoment*				vMeilleurTemps;							//!< Meilleur temps de trajet trouv� vers chaque arr�t
-	cElementTrajet**		vET;									//!< Solution trouv�e depuis/vers chaque arr�t
-	cMoment**				vMeilleurTempsArretPhysique;			//!< Meilleur temps de trajet trouv� depuis/vers chaque quai de chaque arr�t
-	cElementTrajet***		vETArretPhysique;						//!< Solution trouv�e depuis/vers chaque quai de chaque arr�t
-	cMoment					vArriveeMax;							//!< Moment d'arriv�e maximal
-	cMoment					vDepartMin;								//!< Moment de d�part minimal
-	cDureeEnMinutes			vDureeServiceContinuPrecedent;			//!< Dur�e du trajet dans le service continu trouv� pr�c�demment
+	map<LogicalPlace*, cMoment>				_bestTimeByLogicalPlace;							//!< Meilleur temps de trajet trouv� vers chaque arr�t
+	map<LogicalPlace*, cElementTrajet*>		_bestSolutionByLogicalPlace;									//!< Solution trouv�e depuis/vers chaque arr�t
+	BestTimeMap				_bestTimeByPhysicalStop;			//!< Meilleur temps de trajet trouv� depuis/vers chaque quai de chaque arr�t
+	map<cArretPhysique*, cElementTrajet*>		_bestSolutionsByPhysicalStop;						//!< Solution trouv�e depuis/vers chaque quai de chaque arr�t
+	tDureeEnMinutes			vDureeServiceContinuPrecedent;			//!< Dur�e du trajet dans le service continu trouv� pr�c�demment
 	cMoment					vDernierDepartServiceContinuPrecedent;	//!< Moment de fin de l'amplitude de validit� du service continu trouv� pr�c�demment
 	int						vIterationsDep;							//!< Compteur d'it�rations pour les calculs de meilleur d�part
 	int						vIterationsArr;							//!< Compteur d'it�rations pour les calculs de meilleure arriv�e
@@ -74,7 +78,7 @@ class cCalculateur
 
 	//! \name Parametres de calcul
 	//@{
-	const cEnvironnement* 	vEnvironnement;		//!< Environnement de calcul
+	const cEnvironnement* const 	vEnvironnement;		//!< Environnement de calcul
 	RoutePlanningNode*		_origin;			//!< Lieu de départ
 	RoutePlanningNode*		_destination;		//!< Lieu d'arrivée
 	cMoment					vMomentDebut;		//!< Moment de d�but du calcul (premier d�part)
@@ -100,20 +104,17 @@ class cCalculateur
 	
 	//!	\name Accesseurs variables temporaires de calcul d'itin�raire
 	//@{
-	const cMoment&		GetMeilleurDepart(const LogicalPlace* curPA, tIndex NumeroVoie=0)		const;
-	const cMoment&		GetMeilleureArrivee(const LogicalPlace* curPA, tIndex NumeroVoie=0)	const;
 	cElementTrajet*		GetET(const LogicalPlace* curPA, tIndex NumVoie=0);
+	const cMoment&			getBestTime(const NetworkAccessPoint*, bool isArrival)	const;
+	const cMoment&			absoluteBestTime(bool isArrival)	const;
 	//@}
 	
 	//!	\name Modificateurs et gestionnaires des variables temporaires de la recherche d'itin�raire
 	//@{
 	void				SetET(const LogicalPlace* curPA, cElementTrajet* newET, tIndex NumVoie=0);
-	void				SetMeilleureArrivee(const LogicalPlace* curPA, const cMoment& NewMoment, tIndex NumVoie=0);
-	void				SetMeilleureArrivee(const RoutePlanningNode* curAccesPADe, const cMoment& NewMoment, tIndex NumVoie=0);
-	void				SetMeilleurDepart(const LogicalPlace* curPA, const cMoment& NewMoment, tIndex NumVoie=0);
-	void				SetMeilleurDepart(const RoutePlanningNode* curAccesPADe, const cMoment& NewMoment, tIndex NumVoie=0);
-	void				ResetMeilleuresArrivees();
-	void				ResetMeilleursDeparts();
+	void				setBestTime(const RoutePlanningNode*, const cMoment&, bool isArrival);
+	void				setBestTime(const NetworkAccessPoint*, const cMoment&, bool isArrival, bool withRecursion=true);
+	void				resetIntermediatesVariables();
 	//@}
 	
 	//!	\name Calculateurs pour la recherche d'itin�raires utilis�es dans la r�cursion (sym�triques)
@@ -121,11 +122,11 @@ class cCalculateur
 	bool				EvalueGareLigneArriveeCandidate(const cGareLigne* __GareLigneArr, const cMoment& __MomentDepart
 							, const cGareLigne* __GareLigneDep, tIndex __IndexService
 							, cTrajet& __SuiteElementsTrajets, const cTrajet& __TrajetEffectue
-							, bool _OptimisationAFaire, const cDureeEnMinutes& __AmplitudeServiceContinu, cLog&);
+							, bool _OptimisationAFaire, const tDureeEnMinutes& __AmplitudeServiceContinu, cLog&);
 	bool				EvalueGareLigneDepartCandidate(const cGareLigne* __GareLigneDep, const cMoment& __MomentArrivee
 							, const cGareLigne* __GareLigneArr, tIndex __IndexService, cTrajet& __SuiteElementsTrajets
 							, const cTrajet& __TrajetEffectue, bool __OptimisationAFaire
-							, const cDureeEnMinutes& __AmplitudeServiceContinu);
+							, const tDureeEnMinutes& __AmplitudeServiceContinu);
 	cElementTrajet**	ListeDestinations (const cTrajet& TrajetEffectue, bool MomentDepartStrict, bool OptimisationAFaire);
 	cElementTrajet**	ListeProvenances  (const cTrajet& TrajetEffectue, bool MomentArriveeStrict, bool OptimisationAFaire);
 	bool				MeilleureArrivee(cTrajet& __Resultat, cTrajet& __TrajetEffectue, bool MomentDepartStrict
@@ -150,7 +151,6 @@ public:
 								, bool __SolutionsPassees);
 	void 				Libere();
 	cCalculateur*		Prend();
-	bool				setEnvironnement(const cEnvironnement*);
 	//@}
 	
 	//!	\name Calculateurs
@@ -160,7 +160,7 @@ public:
 
 	//!	\name Constructeur et destructeur
 	//@{
-	cCalculateur();
+	cCalculateur(const cEnvironnement*);
 	~cCalculateur();
 	//@}
 };

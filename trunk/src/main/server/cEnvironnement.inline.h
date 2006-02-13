@@ -136,15 +136,6 @@ Cette m�thode met � jour la derni�re date o� circule au moins un service
 
 
 
-/*!	\brief Modificateur Index
-*/
-inline bool cEnvironnement::SetIndex(tIndex __Valeur)
-{
-	Code = __Valeur;
-	return true;
-}
-
-
 
 /*!	\brief Accesseur Index
 	\return L'index de l'environnement dans la base SYNTHESE

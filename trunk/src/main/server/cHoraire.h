@@ -28,7 +28,7 @@ public:
 	cHoraire&	setJPlus(tDureeEnJours JPlus);
 	cHoraire&	operator =  (const cTexte&);
 //	cHoraire&	operator =  (int);
-	cHoraire&	operator += (const cDureeEnMinutes&);
+	cHoraire&	operator += (const tDureeEnMinutes&);
 	//@}
 	
 	//! \name Op�rateurs
@@ -40,7 +40,7 @@ public:
 	int				operator >= (const cHoraire&)	const;
 	int				operator >= (const cHeure&)	const;
 	int				operator >  (const cHeure&)	const;
-	cDureeEnMinutes	operator -  (const cHoraire&)	const;
+	tDureeEnMinutes	operator -  (const cHoraire&)	const;
 	bool				OK()						const;
 	//@}
 };
@@ -59,7 +59,7 @@ inline bool cHoraire::OK() const
 	\author Hugues Romain 
 	\date 2000/2001
 	*/
-inline cHoraire& cHoraire::operator += (const cDureeEnMinutes& DureeAAjouter)
+inline cHoraire& cHoraire::operator += (const tDureeEnMinutes& DureeAAjouter)
 {
 	vJPlus = (tDureeEnJours) (vJPlus + (vHeure += DureeAAjouter));
 	return(*this);

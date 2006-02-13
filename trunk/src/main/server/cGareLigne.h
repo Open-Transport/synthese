@@ -133,15 +133,15 @@ public:
 	bool			CoherenceGeographique(const cGareLigne& AutreGareLigne)								const;
 //	bool			ControleAxe(const cElementTrajet* ET, tBool3 velo, tBool3 handicape, tBool3 taxibus, int codeTarif)	const;
 	bool			controleHoraire(const cGareLigne* GareLigneAvecHorairesPrecedente)						const;
-	cDureeEnMinutes	MeilleurTempsParcours(const cGareLigne& autreGL)										const;
+	tDureeEnMinutes	MeilleurTempsParcours(const cGareLigne& autreGL)										const;
 	tNumeroService	Prochain(cMoment &MomentDepart, const cMoment& MomentDepartMax
-							, cDureeEnMinutes& AmplitudeServiceContinu, tNumeroService NumProchainMin
+							, tDureeEnMinutes& AmplitudeServiceContinu, tNumeroService NumProchainMin
 							, const cMoment& __MomentCalcul)												const;
 	tNumeroService	Prochain(cMoment &MomentDepart, const cMoment& MomentDepartMax
 							, const cMoment& __MomentCalcul
 							, tNumeroService NumProchainMin=INCONNU)												const;
 	tNumeroService	Precedent(cMoment &MomentArrivee, const cMoment& MomentArriveeMin
-							, cDureeEnMinutes& AmplitudeServiceContinu)									const;
+							, tDureeEnMinutes& AmplitudeServiceContinu)									const;
 	tNumeroService	Precedent(cMoment &MomentArrivee, const cMoment& MomentArriveeMin)					const;
 //	void			RemplitDP(cDescriptionPassage& curDP, const cMoment& tempMomentDepart
 //							, const tNumeroService& iNumeroService)										const;
@@ -149,7 +149,7 @@ public:
 	
 	//! \name Accesseurs
 	//@{
-	const cDureeEnMinutes&	Attente(tNumeroService iNumeroService)			const;
+	const tDureeEnMinutes&	Attente(tNumeroService iNumeroService)			const;
 	cGareLigne*				Destination()									const;
 	bool					EstArrivee()									const;
 	bool					EstDepart()										const;

@@ -336,12 +336,12 @@ void cTrajet::Vide()
 /*!	\brief Amplitude de la plage horaire couverte par la solution
 	\return Dur�e en minute d'amplitude, 0 si service unique
 */
-cDureeEnMinutes cTrajet::getAmplitudeServiceContinu() const
+tDureeEnMinutes cTrajet::getAmplitudeServiceContinu() const
 {
 	return _AmplitudeServiceContinu;
 }
 
-void cTrajet::setAmplitudeServiceContinu(const cDureeEnMinutes& __Duree)
+void cTrajet::setAmplitudeServiceContinu(const tDureeEnMinutes& __Duree)
 {
 	_AmplitudeServiceContinu = __Duree;
 }
@@ -357,4 +357,14 @@ void cTrajet::Finalise()
 		if (!_AmplitudeServiceContinu.Valeur())
 			break;
 	}
+}
+
+NetworkAccessPoint* cTrajet::getOrigin() const
+{
+	return _PremierET->getOrigin();
+}
+
+NetworkAccessPoint* cTrajet::getDestination() const
+{
+	return _DernierET->getDestination();
 }

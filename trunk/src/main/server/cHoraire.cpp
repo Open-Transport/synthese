@@ -33,9 +33,9 @@ cHoraire& cHoraire::operator = (const cTexte& op)
 	\author Hugues Romain 
 	\date 2000/2001
 	*/
-cDureeEnMinutes cHoraire::operator - (const cHoraire& Op2) const
+tDureeEnMinutes cHoraire::operator - (const cHoraire& Op2) const
 {
-	cDureeEnMinutes DureeCalculee;
+	tDureeEnMinutes DureeCalculee;
 	int Retenue = 0;
 	
 	// 1: Heure

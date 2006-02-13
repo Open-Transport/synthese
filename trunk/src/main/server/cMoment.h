@@ -28,8 +28,8 @@ public:
 	cMoment& subDureeEnJours(tDureeEnJours Val);
 	cMoment& operator ++ 	(int);
 	cMoment& operator -- 	(int);
-	cMoment& operator += 	(const cDureeEnMinutes&);
-	cMoment& operator -= 	(const cDureeEnMinutes&);
+	cMoment& operator += 	(const tDureeEnMinutes&);
+	cMoment& operator -= 	(const tDureeEnMinutes&);
 	cMoment& operator = 	(const cTexte&);
 	cMoment& operator =		(const cDate&);
 	cMoment& operator =		(const cHeure&);
@@ -79,7 +79,7 @@ public:
 	int			   	operator >= 	(const cHoraire&)		const;
 	int			   	operator >  	(const cMoment&)		const;
 	int			   	operator >  	(const cHoraire&)		const;
-	cDureeEnMinutes	operator -  	(const cMoment&)		const;
+	tDureeEnMinutes	operator -  	(const cMoment&)		const;
 	bool			OK				()						const;
 	//@}
 	
@@ -137,13 +137,13 @@ inline int cMoment::operator > (const cMoment &AutreMoment) const
 	return(vDate > AutreMoment.vDate || (vDate == AutreMoment.vDate && vHeure > AutreMoment.vHeure));
 }
 
-inline cMoment& cMoment::operator += (const cDureeEnMinutes& Op2)
+inline cMoment& cMoment::operator += (const tDureeEnMinutes& Op2)
 {
 	vDate += (vHeure += Op2);
 	return(*this);
 }
 
-inline cMoment& cMoment::operator -= (const cDureeEnMinutes& Op2)
+inline cMoment& cMoment::operator -= (const tDureeEnMinutes& Op2)
 {
 	vDate -= (vHeure -= Op2);
 	return(*this);

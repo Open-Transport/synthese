@@ -24,7 +24,7 @@ public:
 
 	/** Liste d'adresses avec durÃ©e d'accÃ¨s */
 	/** Accès à adresse avec durée */
-	typedef pair<synmap::Address*, cDureeEnMinutes> AddressWithAccessDuration;
+	typedef pair<synmap::Address*, tDureeEnMinutes> AddressWithAccessDuration;
 	typedef vector<AddressWithAccessDuration> AddressList;
 
 private:

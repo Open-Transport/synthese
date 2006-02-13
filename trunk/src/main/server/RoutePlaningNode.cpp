@@ -17,7 +17,7 @@ using namespace std;
  
     Le constructeur remplit la liste des arrêts physiques du noeud
  
-    @tod
+    @todo voir si on garde la distance ou la durée ou les deux
 */
 RoutePlanningNode::RoutePlanningNode(LogicalPlace* logicalPlace,
                                      double maxApproachDistance,   // in meters
@@ -31,11 +31,10 @@ RoutePlanningNode::RoutePlanningNode(LogicalPlace* logicalPlace,
        iter != physicalStops.end (); ++iter) {
     cArretPhysique* physicalStop = iter->second;
     double approachDuration = 0.0; // TODO .
-    std::pair<NetworkAccessPoint*, double> 
-      accessPointWithDistance (physicalStop, approachDuration);
     
-    _accessPointsWithDistance.push_back (accessPointWithDistance);
+	addAccessPoint(physicalStop, approachDuration);
     
+   
   }
 
   // search of other logical places reached with road network
@@ -64,11 +63,8 @@ RoutePlanningNode::RoutePlanningNode(LogicalPlace* logicalPlace,
 //					       getPhysicalStops().find (distanceAndStop->second->getRank ()));
 
 	      double approachDuration = approachDistance / approachSpeed; // seconds
-		    
-	      std::pair<NetworkAccessPoint*, double> accessPointWithDistance
-		(((NetworkAccessPoint*) distanceAndAddress->second), approachDuration);
 
-	      _accessPointsWithDistance.push_back (accessPointWithDistance);
+		  addAccessPoint((NetworkAccessPoint*) distanceAndAddress->second, approachDuration);
 		    
 	    }
 
@@ -111,3 +107,17 @@ RoutePlanningNode::~RoutePlanningNode()
 }
       
     
+/** Test of appartenance of a network access point.
+	@param accessPoint Network access point
+*/
+bool RoutePlanningNode::includes(const NetworkAccessPoint* accessPoint) const
+{
+	return _accessPointsWithDistance.find(accessPoint) != _accessPointsWithDistance.end();
+}
+
+/** Addition of network access point, with approach duration.
+*/
+void RoutePlanningNode::addAccessPoint(const NetworkAccessPoint* accessPoint, const tDureeEnMinutes& approachDuration)
+{
+	_accessPointsWithDistance[accessPoint] = approachDuration;
+}

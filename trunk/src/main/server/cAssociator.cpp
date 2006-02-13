@@ -92,7 +92,8 @@ cAssociator::cAssociator(const char *netfile)
         for(unsigned int i=0; i<_hdr.infos; i++)
         {
             char buffer[128];
-            bzero(buffer,128);
+			memset(buffer, 0, 128);
+//			bzero(buffer,128);
             net.getline(buffer,128,'\0');
             _dct.push_back(buffer);
         }
@@ -100,8 +101,10 @@ cAssociator::cAssociator(const char *netfile)
         for(unsigned int i=0; i<_hdr.alias; i++)
         {
             char word[128],alias[128];
-            bzero(word,128);
-            bzero(alias,128);
+            memset(word, 0, 128);
+			//bzero(word,128);
+			memset(alias, 0, 128);
+            //bzero(alias,128);
             net.getline(word,128,'\0');
             net.getline(alias,128,'\0');
             _alias[string(alias)] = string(word);
@@ -157,7 +160,8 @@ cAssociator::~cAssociator()
     delete _lnk;
     delete _nde;
     delete _lyr;
-    bzero(&_hdr,sizeof(header));
+	memset(&_hdr, 0, sizeof(header));
+//	bzero(&_hdr,sizeof(header));
 }
 
 void cAssociator::tokenize(const string& str, vector<string>& tokens, const string& delimiters)

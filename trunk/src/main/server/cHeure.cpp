@@ -9,9 +9,9 @@
 	\author Hugues Romain
 	\date 2000/2001
 */
-cDureeEnMinutes cHeure::operator-(const cHeure &Op2) const
+tDureeEnMinutes cHeure::operator-(const cHeure &Op2) const
 {
-	cDureeEnMinutes DureeCalculee;
+	tDureeEnMinutes DureeCalculee;
 	int Retenue;
 	
 	// 1: Minutes
@@ -29,7 +29,7 @@ cDureeEnMinutes cHeure::operator-(const cHeure &Op2) const
 	\author Hugues Romain 
 	\date 2000/2001
 	*/		
-tDureeEnJours cHeure::operator+=(const cDureeEnMinutes& DureeEnMinutesAAjouter)
+tDureeEnJours cHeure::operator+=(const tDureeEnMinutes& DureeEnMinutesAAjouter)
 {	
 	int Retenue;
 	int tempCalcul;
@@ -51,7 +51,7 @@ tDureeEnJours cHeure::operator+=(const cDureeEnMinutes& DureeEnMinutesAAjouter)
 	\author Hugues Romain 
 	\date 2000/2001
 	*/
-tDureeEnJours cHeure::operator-=(const cDureeEnMinutes& DureeEnMinutesAEnlever)
+tDureeEnJours cHeure::operator-=(const tDureeEnMinutes& DureeEnMinutesAEnlever)
 {
 	int HeuresAEnlever;
 	int Retenue;

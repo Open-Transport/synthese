@@ -604,7 +604,7 @@ tNumeroService cLigne::NombreServices(int newNombreServices)
 
 
 
-const cDureeEnMinutes& cLigne::Attente(tNumeroService iNumeroService) const
+const tDureeEnMinutes& cLigne::Attente(tNumeroService iNumeroService) const
 {
 	// SET PORTAGE LINUX
 	//_ASSERTE(iNumeroService >= 0 && iNumeroService < vNombreServices);
@@ -620,7 +620,7 @@ void cLigne::setJC(tNumeroService i, cJC *newVal)
 	vTrain[i].setJC(newVal);
 }
 
-void cLigne::setAttente(tNumeroService iService, const cDureeEnMinutes& newVal)
+void cLigne::setAttente(tNumeroService iService, const tDureeEnMinutes& newVal)
 {
 	// SET PORTAGE LINUX
 	//_ASSERTE(iService >= 0 && iService < vNombreServices);
@@ -644,7 +644,7 @@ bool cLigne::EstCadence(tNumeroService iNumeroService) const
 	return(vTrain[iNumeroService].EstCadence());
 }
 
-void cLigne::setAmplitudeServiceContinu(tNumeroService iNumeroService, const cDureeEnMinutes& newVal)
+void cLigne::setAmplitudeServiceContinu(tNumeroService iNumeroService, const tDureeEnMinutes& newVal)
 {
 	
 	//_ASSERTE(iNumeroService >= 0 && iNumeroService < vNombreServices);
@@ -652,7 +652,7 @@ void cLigne::setAmplitudeServiceContinu(tNumeroService iNumeroService, const cDu
 	vTrain[iNumeroService].setAmplitudeServiceContinu(newVal);
 }
 
-const cDureeEnMinutes& cLigne::EtalementCadence(tNumeroService iNumeroService) const
+const tDureeEnMinutes& cLigne::EtalementCadence(tNumeroService iNumeroService) const
 {
 	
 	//_ASSERTE(iNumeroService >= 0 && iNumeroService < vNombreServices);

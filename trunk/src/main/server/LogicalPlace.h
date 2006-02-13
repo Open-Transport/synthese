@@ -86,6 +86,8 @@ public:
     /** Map vers les adresses routières */
     typedef map<size_t, synmap::Address*> AddressesMap;
 
+	/** Vecteur vers les points d'accès */
+	typedef vector<NetworkAccessPoint*> AccessPointsVector;
 
 protected:
 
@@ -97,7 +99,7 @@ protected:
 
     //! @name Composition
     //@{
-    vector<NetworkAccessPoint*> _networkAccessPoints; // Points d'entrée dans les réseaux
+    AccessPointsVector _networkAccessPoints; // Points d'entrée dans les réseaux
     vector<LogicalPlace*>  _aliasedLogicalPlaces; //!< Lieux logiques inclus
     //@}
 
@@ -123,10 +125,10 @@ protected:
 
     //! \name Gestion des correspondances
     //@{
-    cDureeEnMinutes   _minTransferDelay;   //!< Délai minimal de correspondance entre point d'entrée réseaux le plus faible du lieu
+//    tDureeEnMinutes   _minTransferDelay;   //!< Délai minimal de correspondance entre point d'entrée réseaux le plus faible du lieu
     const tNiveauCorrespondance _transferRules;   //!< Type d'autorisation de correspondance
-    vector< cDureeEnMinutes >  _maxTransferDelay;    //!< Tableau des plus longs délais minimaux de correspondance au départ de chaque point d'entrée de réseau
-    vector< vector< cDureeEnMinutes > >  _transferDelay;   //!< Tableau des délais minimaux de correspondance entre quais
+//    vector< tDureeEnMinutes >  _maxTransferDelay;    //!< Tableau des plus longs délais minimaux de correspondance au départ de chaque point d'entrée de réseau
+    vector< vector< tDureeEnMinutes > >  _transferDelay;   //!< Tableau des délais minimaux de correspondance entre quais
     //@}
 
 
@@ -145,8 +147,8 @@ public:
 
     //! @name Accesseurs
     //@{
-    cDureeEnMinutes   AttenteCorrespondance(tIndex Dep, tIndex Arr)   const;
-    const cDureeEnMinutes& AttenteMinimale()          const;
+    tDureeEnMinutes   AttenteCorrespondance(tIndex Dep, tIndex Arr)   const;
+    const tDureeEnMinutes& AttenteMinimale()          const;
     tNiveauCorrespondance CorrespondanceAutorisee()        const;
     const cAlerte*   getAlerte()            const;
     const cTexte&   getDesignationOD()          const;
@@ -155,7 +157,9 @@ public:
     {
         return _networkAccessPoints[id];
     }
-    const cTexte&           getDesignation13()                                      const;
+	const AccessPointsVector& getNetworkAccessPoints() const { return _networkAccessPoints; }
+	
+	const cTexte&           getDesignation13()                                      const;
     const cTexte&           getDesignation26()                                      const;
     const cTexte&   getName() const
     {
@@ -171,7 +175,7 @@ public:
     }
 
     tIndex     Index()             const;
-    const cDureeEnMinutes& PireAttente(tIndex i)         const;
+//    const tDureeEnMinutes& PireAttente(tIndex i)         const;
     bool getVolatile() const
     {
         return _volatile;
@@ -205,7 +209,7 @@ public:
     void setAlerteDebut(cMoment& momentDebut);
     void setAlerteFin(cMoment& momentFin);
     void setAlerteMessage(cTexte& message);
-    bool setDelaiCorrespondance(tIndex __VoieDepart, tIndex __VoieArrivee, tDureeEnMinutes);
+    void setDelaiCorrespondance(tIndex __VoieDepart, tIndex __VoieArrivee, tDureeEnMinutes);
     void setDesignationOD(const cTexte&);
     // bool setVMax(tCategorieDistance, tVitesseKMH);
     bool    setDesignation13(const cTexte&);

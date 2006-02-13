@@ -38,9 +38,9 @@ cMoment& cMoment::operator = (const cTexte& Moment)
 /** Durée en minutes entre deux moments.
 	@param Op2 Moment le plus tôt
 */
-cDureeEnMinutes cMoment::operator - (const cMoment& Op2) const
+tDureeEnMinutes cMoment::operator - (const cMoment& Op2) const
 {
-	cDureeEnMinutes DureeCalculee;
+	tDureeEnMinutes DureeCalculee;
 	int Retenue = 0;
 	
 	// 1: Heure

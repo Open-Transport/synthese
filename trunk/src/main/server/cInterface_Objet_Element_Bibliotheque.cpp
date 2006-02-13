@@ -1610,7 +1610,7 @@ LienPhoto()))
 
 			cMoment __Maintenant;
 			__Maintenant.setMoment(TEMPS_ACTUEL);
-			cDureeEnMinutes __Duree = __Moment - __Maintenant;
+			tDureeEnMinutes __Duree = __Moment - __Maintenant;
 			
 			if (__Duree.Valeur() <= 1)
 				pCtxt << __AvantSiImminent;

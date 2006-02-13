@@ -45,7 +45,7 @@ LogicalPlace::LogicalPlace(tIndex id, tNiveauCorrespondance __transferRules)
 	, _road(NULL)
 {
 	// Valeurs initialisées
-	_minTransferDelay = CorrespondanceAutorisee() != CorrInterdite ? FORBIDDEN_TRANSFER_DELAY : 0;
+//	_minTransferDelay = CorrespondanceAutorisee() != CorrInterdite ? FORBIDDEN_TRANSFER_DELAY : 0;
 }
 
 
@@ -63,7 +63,7 @@ LogicalPlace::LogicalPlace(Road* road)
 	, _road(road)
 {
 	// Valeurs initialisées
-	_minTransferDelay = FORBIDDEN_TRANSFER_DELAY;
+//	_minTransferDelay = FORBIDDEN_TRANSFER_DELAY;
 
 	setDesignation(road->getTown(), road->getName());
 }
@@ -161,31 +161,21 @@ LogicalPlace::tNiveauCorrespondance LogicalPlace::NiveauCorrespondance(const cDi
 	@author Hugues Romain
 	@date 2005-2006
 */
-bool LogicalPlace::setDelaiCorrespondance(tIndex NumeroArretPhysiqueDepart, tIndex NumeroArretPhysiqueArrivee, tDureeEnMinutes delay)
+void LogicalPlace::setDelaiCorrespondance(tIndex NumeroArretPhysiqueDepart, tIndex NumeroArretPhysiqueArrivee, tDureeEnMinutes delay)
 {
 	// Ecriture de la donnée
-	try
-	{
 		_transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee] = delay;
 
-		if (delay != UNKNOWN_TRANSFER_DELAY && delay != FORBIDDEN_TRANSFER_DELAY)
+/*		if (delay != UNKNOWN_TRANSFER_DELAY && delay != FORBIDDEN_TRANSFER_DELAY)
 		{
 			// Ecriture du délai minimal le plus important attente au départ du quai de départ spécifié
-			if (_transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee] > _maxTransferDelay[NumeroArretPhysiqueDepart])
-				_maxTransferDelay[NumeroArretPhysiqueDepart] = _transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee];
+//			if (_transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee] > _maxTransferDelay[NumeroArretPhysiqueDepart])
+//				_maxTransferDelay[NumeroArretPhysiqueDepart] = _transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee];
 			
 			// Ecriture du délai minimal le plus faible du point d'arrêt
-			if (_transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee] < _minTransferDelay)
-				_minTransferDelay = _transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee];
-		}
-	}
-	catch(...)
-	{
-		return false;
-	}
-
-	// Succès
-	return true;
+//			if (_transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee] < _minTransferDelay)
+//				_minTransferDelay = _transferDelay[NumeroArretPhysiqueDepart][NumeroArretPhysiqueArrivee];
+*/
 }
 
 
@@ -197,7 +187,7 @@ cMoment LogicalPlace::MomentArriveePrecedente(const cMoment& MomentArrivee, cons
 	for (cGareLigne* curGLA = _firstArrivalLineStop; curGLA != NULL; curGLA = curGLA->PAArriveeSuivante())
 	{
 		tempMomentArrivee = MomentArrivee;
-		tempMomentArrivee -= cDureeEnMinutes(1);
+		tempMomentArrivee -= tDureeEnMinutes(1);
 		if (curGLA->Precedent(tempMomentArrivee, MomentArriveeMin) != -1)
 		{
 			if (tempMomentArrivee > tempMomentArriveePrecedente)
@@ -214,7 +204,7 @@ cMoment LogicalPlace::MomentDepartSuivant(const cMoment& MomentDepart, const cMo
 	for (cGareLigne* curGLD= _firstDepartureLineStop; curGLD!=NULL; curGLD=curGLD->PADepartSuivant())
 	{
 		tempMomentDepart = MomentDepart;
-		tempMomentDepart += cDureeEnMinutes(1);
+		tempMomentDepart += tDureeEnMinutes(1);
 		if (curGLD->Prochain(tempMomentDepart, MomentDepartMax, __MomentCalcul) != INCONNU)
 		{
 			if (tempMomentDepart < tempMomentDepartSuivant)
@@ -462,18 +452,19 @@ LogicalPlace::tNiveauCorrespondance LogicalPlace::CorrespondanceAutorisee() cons
 	return _transferRules;
 }
 
-cDureeEnMinutes LogicalPlace::AttenteCorrespondance(tIndex Dep, tIndex Arr) const
+tDureeEnMinutes LogicalPlace::AttenteCorrespondance(tIndex Dep, tIndex Arr) const
 {
-	return _transferRules ? _transferDelay[Dep][Arr] : cDureeEnMinutes(0);
+	return _transferRules ? _transferDelay[Dep][Arr] : tDureeEnMinutes(0);
 }
 
-const cDureeEnMinutes& LogicalPlace::PireAttente(tIndex i) const
+/*
+const tDureeEnMinutes& LogicalPlace::PireAttente(tIndex i) const
 {
 	if (i<1 || i>= (tIndex) _maxTransferDelay.size())
 		i=0;
 	return _maxTransferDelay[i];
 }
-
+*/
 /*
 bool LogicalPlace::declServices(size_t newNombreServices)
 {
@@ -495,12 +486,12 @@ inline bool LogicalPlace::addPhoto(cPhoto* Photo)
 
 }
 */
-
-const cDureeEnMinutes& LogicalPlace::AttenteMinimale() const
+/*
+const tDureeEnMinutes& LogicalPlace::AttenteMinimale() const
 {
 	return _minTransferDelay;
 }
-
+*/
 /*
 tVitesseKMH LogicalPlace::vitesseMax(size_t Categorie) const
 {
@@ -603,7 +594,7 @@ tIndex LogicalPlace::addNetworkAccessPoint(NetworkAccessPoint* networkAccessPoin
 	/** - Initialisation de la matrice de correspondances pour le nouvel arrivé à la valeur inconnu */
 	if (CorrespondanceAutorisee() != CorrInterdite)
 	{
-		_maxTransferDelay[id] = 0;
+//		_maxTransferDelay[id] = 0;
 		for (size_t i=0; i< _networkAccessPoints.size(); i++)
 		{
 			setDelaiCorrespondance((tIndex)i,id,UNKNOWN_TRANSFER_DELAY);

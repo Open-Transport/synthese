@@ -103,7 +103,7 @@ class cEnvironnement
 	//@{
 		tAnnee			vPremiereAnnee; 	//!< Premi�re ann�e des calendriers de circulation en m�moire
 		tAnnee			vDerniereAnnee; 	//!< Derni�re ann�e des calendriers de circulation en m�moire
-		tIndex			Code;				//!< Code de l'environnement
+		const tIndex			Code;				//!< Code de l'environnement
 	//@}
 	
 	//! \name Variables d'analyse
@@ -115,7 +115,7 @@ class cEnvironnement
 	//! \name Noms des fichiers de donn�es (� remplacer par des cFichier)
 	//@{
 		cTexte			vNomFichier; 			//!< Partie commune des noms de fichiers
-		cTexte			vNomRepEnv;			//!< Partie commune des envs
+		const std::string	_path;			//!< Partie commune des envs
 		cTexte			vNomFichierPhotos;
 		cTexte			vNomFichierMateriel;
 		cTexte			vNomFichierReseaux;
@@ -145,9 +145,7 @@ class cEnvironnement
 
 	//!	\name Espaces de calcul pour threads
 	//@{
-		tIndex			_NombreCalculateurs;	//!< Nombre d'espaces m�moires disponibles pour les calculs
-		cCalculateur*	_Calculateur;			//!< Espaces
-	//m�moires d�di�s aux threads
+		vector<cCalculateur*>	_Calculateur;			//!< Espaces
 	//@}
 	
 	
@@ -182,10 +180,6 @@ public:
 
 	bool		ChargeFichierIndicateurs();
 
-	
-	// Chargement points d'arr�t
-	void TrieAlphabetiquePointsArret();
-	cTableauDynamique<tIndex>	ArretLogiqueAlpha;
 
 	
 	//! \name Modificateurs
@@ -197,9 +191,6 @@ public:
 		void			SetDateMinReelle(const cDate&);
 		void			SetDateMaxReelle(const cDate&);
 		void			SetDatesService(tAnnee, tAnnee);
-		bool			Charge(const cTexte& __Chemin, const cTexte& __CheminFormats);
-		bool			SetIndex(tIndex);
-	
 	//@}
 
 	//! \name Calculateurs

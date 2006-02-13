@@ -290,7 +290,7 @@ bool cModaliteReservation::SetDelaiMinMinutes(const int newVal)
 {
 	if (newVal >= 0)
 	{
-		cDureeEnMinutes NewVal;
+		tDureeEnMinutes NewVal;
 		setDelaiMinMinutes(NewVal = newVal);
 		return(true);
 	}
@@ -298,7 +298,7 @@ bool cModaliteReservation::SetDelaiMinMinutes(const int newVal)
 		return(false);
 }
 
-void cModaliteReservation::setDelaiMinMinutes(const cDureeEnMinutes& newVal)
+void cModaliteReservation::setDelaiMinMinutes(const tDureeEnMinutes& newVal)
 {
 	vDelaiMinMinutes = newVal;
 }

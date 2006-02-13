@@ -9,7 +9,7 @@
 #include "cCommune.h"
 #include "cAxe.h"
 #include "cHeure.h"
-#include "cDureeEnMinutes.h"
+#include "tDureeEnMinutes.h"
 #include "cJourCirculation.h"
 #include "cHandicape.h"
 #include "cVelo.h"
@@ -1220,7 +1220,7 @@ cFichierXML::chargeAxe (XMLNode& node, cEnvironnement& env)
 		
 		int attente = atoi (ligneNode.getAttribute (LIGNE_ATTENTE_ATTR.c_str()));
 		for (int k=0; k < ligne->NombreServices(); ++k) {
-			ligne->setAttente (k, cDureeEnMinutes(attente));
+			ligne->setAttente (k, tDureeEnMinutes(attente));
 		}
 		
 		
