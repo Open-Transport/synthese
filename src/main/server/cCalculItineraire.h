@@ -59,9 +59,7 @@ private:
 	
 	//! \name Variables de travail recherche d'itin�raire
 	//@{
-	map<LogicalPlace*, cMoment>				_bestTimeByLogicalPlace;							//!< Meilleur temps de trajet trouv� vers chaque arr�t
-	map<LogicalPlace*, cElementTrajet*>		_bestSolutionByLogicalPlace;									//!< Solution trouv�e depuis/vers chaque arr�t
-	BestTimeMap				_bestTimeByPhysicalStop;			//!< Meilleur temps de trajet trouv� depuis/vers chaque quai de chaque arr�t
+	BestTimeMap				_bestTimes;			//!< Meilleur temps de trajet trouv� depuis/vers chaque quai de chaque arr�t
 	map<cArretPhysique*, cElementTrajet*>		_bestSolutionsByPhysicalStop;						//!< Solution trouv�e depuis/vers chaque quai de chaque arr�t
 	tDureeEnMinutes			vDureeServiceContinuPrecedent;			//!< Dur�e du trajet dans le service continu trouv� pr�c�demment
 	cMoment					vDernierDepartServiceContinuPrecedent;	//!< Moment de fin de l'amplitude de validit� du service continu trouv� pr�c�demment
@@ -69,6 +67,8 @@ private:
 	int						vIterationsArr;							//!< Compteur d'it�rations pour les calculs de meilleure arriv�e
 	cLog					_LogTrace;								//!< Fichier log de tracage des recursions
 	cTexte					_CheminLog;								//!< Chemin des log de tracage des recursions
+	cMoment					_startTime;								//!< Time cursor in the timetable during the computing
+	cMoment					_absoluteBestTime;						//!< Best time in goal
 	//@}
 
 	//! \name R�sultats

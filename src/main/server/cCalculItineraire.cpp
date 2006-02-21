@@ -58,13 +58,12 @@ bool cCalculateur::HoraireDepartArrivee(cTrajet& __Resultat)
 	
 	// Mises � z�ro
 	
-	vDepartMin = vMomentDebut;
-	vArriveeMax = vMomentFin;
+	_startTime = vMomentDebut;
 	__Resultat.Vide();
 
 	// Meilleures arriv�es
 	resetIntermediatesVariables();
-	setBestTime(_destination, vArriveeMax, true);
+	setBestTime(_destination, vMomentFin, true);
 	setBestTime(_origin, vMomentDebut, true);
 	
 	// Calcul de la meilleure arriv�e possible
@@ -84,8 +83,7 @@ bool cCalculateur::HoraireDepartArrivee(cTrajet& __Resultat)
 		setBestTime(_destination, __Resultat.getMomentArrivee(), false);
 		
 		// Bornes du calcul
-		vDepartMin = __Resultat.getMomentDepart();
-		vArriveeMax = __Resultat.getMomentArrivee();
+		_startTime = __Resultat.getMomentArrivee();
 
 		return MeilleurDepart(__Resultat, __TrajetEffectue, true, true);
 	}
@@ -206,7 +204,7 @@ bool cCalculateur::FicheHoraire()
 		}
 
 		//!	<li>Si rien trouv� et si service pr�c�dent continu alors reprise a l'issue de la p�riode de continuit�</li>
-		if (!__Trajet.Taille() && vSolution.Taille() && vSolution.getDernier().getAmplitudeServiceContinu().Valeur())
+		if (!__Trajet.Taille() && vSolution.Taille() && vSolution.getDernier().getAmplitudeServiceContinu())
 		{
 			vMomentDebut = vDernierDepartServiceContinuPrecedent;
 			vMomentDebut += tDureeEnMinutes(1);
@@ -223,7 +221,7 @@ bool cCalculateur::FicheHoraire()
 			break;
 
 		/*!	<li>En cas de rupture du service continu pr�c�dent, correction de de son amplitude</li>	*/
-		if (vSolution.Taille() && vSolution.getDernier().getAmplitudeServiceContinu().Valeur() && __Trajet.getMomentDepart() <= vDernierDepartServiceContinuPrecedent)
+		if (vSolution.Taille() && vSolution.getDernier().getAmplitudeServiceContinu() && __Trajet.getMomentDepart() <= vDernierDepartServiceContinuPrecedent)
 		{
 			tDureeEnMinutes Duree;
 			Duree = __Trajet.getMomentArrivee() - vSolution.getDernier().getMomentArrivee();
@@ -232,7 +230,7 @@ bool cCalculateur::FicheHoraire()
 		}
 		
 		/*!	<li>En cas de nouveau service continu, enregistrement de valeur pour le calcul de la prochaine solution</li>	*/
-		if (__Trajet.getAmplitudeServiceContinu().Valeur() > 1)
+		if (__Trajet.getAmplitudeServiceContinu() > 1)
 		{
 			vDureeServiceContinuPrecedent = __Trajet.getMomentArrivee() - __Trajet.getMomentDepart();
 			vDernierDepartServiceContinuPrecedent = __Trajet.getMomentDepart();
@@ -389,7 +387,7 @@ inline bool cCalculateur::EvalueGareLigneArriveeCandidate(const cGareLigne* __Ga
 //		return false;
 							
 	// Ruptures de services continus
-	if (vDureeServiceContinuPrecedent.Valeur())
+	if (vDureeServiceContinuPrecedent)
 	{
 		if (__TrajetEffectue.Taille())
 		{
@@ -405,8 +403,8 @@ inline bool cCalculateur::EvalueGareLigneArriveeCandidate(const cGareLigne* __Ga
 	}
 
 	// Ecriture de l'ET si n�cessaire
-	if ((__MomentArrivee < getGetMeilleureArrivee(__GareLigneArr->ArretLogique(), __GareLigneArr->ArretPhysique()))
-	|| (__OptimisationAFaire && __MomentArrivee == GetMeilleureArrivee(__GareLigneArr->ArretLogique(), __GareLigneArr->ArretPhysique())))
+	if ((__MomentArrivee < getBestTime(__GareLigneArr->ArretPhysique(), true))
+	|| (__OptimisationAFaire && __MomentArrivee == getBestTime(__GareLigneArr->ArretPhysique(), true)))
 	{
 		cElementTrajet* __ElementTrajet;
 		// On fait mieux, donc ET doit etre gard�.
@@ -444,9 +442,10 @@ inline bool cCalculateur::EvalueGareLigneArriveeCandidate(const cGareLigne* __Ga
 			__LogTrace.Ecrit(LogDebug, __ElementTrajet, __Message, "");
 		}
 		
-		if (vPADeDestination->inclue(__GareLigneArr->ArretLogique()))
+		setBestTime(__GareLigneArr->ArretPhysique(), __MomentArrivee, true);	// Enregistrement meilleure arriv�e
+/*		if (_destination->includes(__GareLigneArr->ArretPhysique()))
 		{
-			SetMeilleureArrivee(__GareLigneArr->ArretLogique(), __MomentArrivee);	// Enregistrement meilleure arriv�e
+			setBestTime(__GareLigneArr->ArretPhysique(), __MomentArrivee);	// Enregistrement meilleure arriv�e
 
 			if (__OptimisationAFaire)
 				vArriveeMax = __MomentArrivee;
@@ -455,10 +454,10 @@ inline bool cCalculateur::EvalueGareLigneArriveeCandidate(const cGareLigne* __Ga
 		}
 		else
 			SetMeilleureArrivee(__GareLigneArr->ArretLogique(), __MomentArrivee, __GareLigneArr->ArretPhysique());	// Enregistrement meilleure arriv�e
-	}
+*/	}
 	
 	// Retour arr�ter le parcours de la ligne si la destination a �t� atteinte
-	return !vPADeDestination->inclue(__GareLigneArr->ArretLogique());
+		return !_destination->includes(__GareLigneArr->ArretPhysique());
 }
 
 
@@ -516,10 +515,10 @@ inline bool cCalculateur::EvalueGareLigneDepartCandidate(const cGareLigne* __Gar
 	{
 		cElementTrajet* __ElementTrajet;
 		// On fait mieux, donc ET doit etre gard�.
-		if (vPADeOrigine->inclue(__GareLigneDep->ArretLogique()))
-			__ElementTrajet = GetET(__GareLigneDep->ArretLogique());
+		if (_origin->includes(__GareLigneDep->ArretPhysique()))
+			__ElementTrajet = GetET(__GareLigneDep->ArretPhysique());
 		else
-			__ElementTrajet = GetET(__GareLigneDep->ArretLogique(), __GareLigneDep->ArretPhysique());
+			__ElementTrajet = GetET(__GareLigneDep->ArretPhysique()));
 
 		if (__ElementTrajet == NULL)
 		{
@@ -537,10 +536,12 @@ inline bool cCalculateur::EvalueGareLigneDepartCandidate(const cGareLigne* __Gar
 		__ElementTrajet->setMomentArrivee(__MomentArrivee);						// Ecriture Moment d'arriv�e
 		__ElementTrajet->setService(__IndexService);							//Ecriture du num�ro de service
 
-		if (vPADeOrigine->inclue(__GareLigneDep->ArretLogique()))
+		setBestTime(__GareLigneDep->ArretPhysique(), __MomentDepart, false);	// Enregistrement meilleure arriv�e
+/*		if (vPADeOrigine->inclue(__GareLigneDep->ArretLogique()))
 		{
-			SetMeilleurDepart(__GareLigneDep->ArretLogique(), __MomentDepart);	// Enregistrement meilleure arriv�e
-
+		
+setBestTime(__GareLigneDep->ArretPhysique(), __MomentDepart, false);	// Enregistrement meilleure arriv�e
+		
 			if (__OptimisationAFaire)
 				vDepartMin = __MomentDepart;
 			else
@@ -548,7 +549,7 @@ inline bool cCalculateur::EvalueGareLigneDepartCandidate(const cGareLigne* __Gar
 		}
 		else
 			SetMeilleurDepart(__GareLigneDep->ArretLogique(), __MomentDepart, __GareLigneDep->ArretPhysique());	// Enregistrement meilleure arriv�e
-	}
+*/	}
 	
 	// Retour arr�ter le parcours de la ligne si la destination a �t� atteinte
 	return !vPADeOrigine->inclue(__GareLigneDep->ArretLogique());
@@ -1625,8 +1626,8 @@ bool cCalculateur::ControleTrajetRechercheDepart(cElementTrajet& __ET) const
 */
 const cMoment& cCalculateur::getBestTime(const NetworkAccessPoint* accessPoint, bool isArrival) const
 {
-	BestTimeMap::iterator bestTime = _bestTimeByPhysicalStop.find(accessPoint);
-	return (bestTime == _bestTimeByPhysicalStop.end())
+	BestTimeMap::iterator bestTime = _bestTimes.find(accessPoint);
+	return (bestTime == _bestTimes.end() || _bestTime->second > _absoluteBestTime)
 		? _absoluteBestTime
 		: _bestTime->second;
 }
@@ -1691,6 +1692,11 @@ void cCalculateur::_ConstructionAccesOrigine(const cLieuLogique* __LieuOrigine)
 }
 
 
+/** Sets the best time for each access points of a node.
+	@param node Node
+	@param moment Time
+	@param isArrival true id time is an arrival time, false if departure time
+*/
 void cCalculateur::setBestTime(const RoutePlanningNode* node, const cMoment& moment, bool isArrival)
 {
 	// Best time for each access point reachable by the node
@@ -1708,29 +1714,60 @@ void cCalculateur::setBestTime(const RoutePlanningNode* node, const cMoment& mom
 }
 
 
-void cCalculateur::setBestTime(const NetworkAccessPoint* accessPoint, const cMoment& datetime, bool isArrival, bool withRecursion)
+
+/** Sets the best time for an access point.
+	@param accessPoint Access Point
+	@param datetime Time
+	@param isArrival true if time is an arrival time, false if departure time
+	@param forOptimizing true if the better solution is computed, false if only the best time is computed
+	@param withRecursion true if the time of the reachables access points of the logical point should be updated
+*/
+void cCalculateur::setBestTime(const NetworkAccessPoint* accessPoint, const cMoment& datetime, bool isArrival, bool forOptimizing, bool withRecursion)
 {
+	// the goal
+	RoutePlanningNode* goal = isArrival ? _destination : _origin;
+
+	// if optimization : the research continues even if the duration is the same as the best one. If not, the research continues only if the duration is strictly lower than the best one
+	tDureeEnMinutes optimizationDuration = forOptimizing ? 0 : 1;
+
 	// saving the best moment if better or if first passage
 	if (_bestTimeByPhysicalStop.find(accessPoint) == _bestTimeByPhysicalStop.end() || _bestTimeByPhysicalStop[accessPoint] > moment)
 		_bestTimeByPhysicalStop[accessPoint] = datetime;
 
 	// Best time on the other access points reachable by a transfer in the logical place
-	if (withRecursion && accessPoint->getLogicalPlace()->CorrespondanceAutorisee() != LogicalPlace::CorrInterdite)
-		for (LogicalPlace::AccessPointsVector::iterator otherAccessPoint = accessPoint->getLogicalPlace()->getNetworkAccessPoints().begin()
-			otherAccessPoint != accessPoint->getLogicalPlace()->getNetworkAccessPoints().end();
-			++otherAccessPoint)
+	if (withRecursion)
+	{
+		// The access point belongs to the goal : updating other points of the goal, and updating the whole already reached access points
+		if (goal->includes(accessPoint))
 		{
-			const tDureeEnMinutes& transferDuration = accessPoint->getLogicalPlace()->AttenteCorrespondance(accessPoint->getRankInLogicalPlace(), otherAccessPoint->getRankInLogicalPlace();
-			const cMoment otherdatetime = datetime;
-			if (isArrival)
-				otherdatetime += transferDuration;
-			else
-				otherdatetime -= transferDuration;
+			for (RoutePlanningNode::AccessPointsWithDistance::const_iterator item = goal->getAccessPoints().begin();
+				item != goal->getAccessPoints().end();
+				++item)
+			{
+				const cMoment otherDateTime = datetime;
+				otherDateTime += accessPoint->second;
+				otherDateTime -= item->second;
+				setBestArrivalTime(item, otherDateTime, isArrival, forOptimizing, false);
+			}
+		}	// The access point allows transfers
+		else if (accessPoint->getLogicalPlace()->CorrespondanceAutorisee() != LogicalPlace::CorrInterdite)
+			for (LogicalPlace::AccessPointsVector::iterator otherAccessPoint = accessPoint->getLogicalPlace()->getNetworkAccessPoints().begin()
+				otherAccessPoint != accessPoint->getLogicalPlace()->getNetworkAccessPoints().end();
+				++otherAccessPoint)
+			{
+				const tDureeEnMinutes& transferDuration = accessPoint->getLogicalPlace()->AttenteCorrespondance(
+					(isArrival ? accessPoint : otherAccessPoint)->getRankInLogicalPlace()
+					, (isArrival ? otherAccessPoint : accessPoint)->getRankInLogicalPlace()
+				);
+				if (transferDuration != LogicalPlace::FORBIDDEN_TRANSFER_DELAY)
+				{
+					const cMoment otherdatetime = datetime;
+					otherdatetime += isArrival ? transferDuration + optimizationDuration : -transferDuration - optimizationDuration;
+					setBestArrivalTime(otherAccessPoint, otherdatetime, isArrival, forOptimizing, false);
+				}
+			}
+	}		
 
-			if (transferDuration != LogicalPlace::FORBIDDEN_TRANSFER_DELAY)
-				setBestArrivalTime(otherAccessPoint, otherdatetime, false);
-		}
-	
 }
 
 
