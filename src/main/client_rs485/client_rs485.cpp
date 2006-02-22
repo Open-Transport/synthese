@@ -1,5 +1,5 @@
 
-#ifdef UNIX
+#ifdef LINUX
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -15,6 +15,7 @@
 #include <windows.h>
 #endif
 
+#include <time.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +24,8 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <time.h>
+#include <fstream>
+#include <iostream>
 
 #include "client_rs485.h"
 
@@ -32,7 +35,9 @@
 
 extern int errno;
 
-#ifdef UNIX
+using namespace std;
+
+#ifdef LINUX
 #define SOCKET int
 void closesocket(SOCKET sock)
 {
@@ -155,6 +160,8 @@ int main(int argc, char* argv[])
 	BOOL fSuccess;
 	char *pcCommPort = "COM3";
 
+	std::ofstream fichier("C:\\CLIENT_RS485.LOG", std::ios_base::app);
+
 	/* get parameters */
 	if(argc > MAX_CLIENTS+3 || argc < 3) exit(-1);
 	server = argv[1];
@@ -214,7 +221,9 @@ int main(int argc, char* argv[])
 		{
 			if(outdate[client] != stamp)
 			{
-				if(server_connect(server, port) != -1)
+				if(!SetCommState(hCom, &dcb))
+					fichier << "erreur reinit port com" << endl;
+				if(server_connect(server, port)!=-1)
 				{
 					int pos = 0;
 					memset(buffer, 0, sizeof(buffer));
@@ -224,12 +233,12 @@ int main(int argc, char* argv[])
 					} while(*(buffer+pos-1) != '\r' && *(buffer+pos-1) != '\n');
 					if( strncmp(buffer, WELCOME_MSG, strlen(WELCOME_MSG)) )
 					{
-						fprintf(stderr, "no synthese server found\n");
+						fichier << "no synthese server found" << endl;
 						server_disconnect();
 					} else {
 						sprintf(buffer, "%s%s\n", QUERY_BASE, codes[client]);
 						send(sock, buffer, strlen(buffer), 0);
-						fprintf(stdout, buffer);
+						//fprintf(stdout, buffer);
 						nbread = 0;
 						pos = 0;
 						memset(buffer, 0, sizeof(buffer));
@@ -237,22 +246,27 @@ int main(int argc, char* argv[])
 							nbread = recv(sock, buffer+pos, sizeof(buffer)-pos, 0);
 							if (nbread > 0) pos += nbread;
 						} while(nbread > 0);
-						printf("sending %s\n",buffer);
+						//printf("sending %s\n",buffer);
+						time_t heure;
+						struct tm* timeinfo;
+						time(&heure);
+						timeinfo = localtime(&heure);
+						fichier << "Date: " << asctime(timeinfo) << "Message: " << buffer << std::endl;
 						for(char *bufptr = buffer; *bufptr; bufptr++)
 							TransmitCommChar(hCom, *bufptr);
 						server_disconnect();
 						outdate[client] = stamp;
 					}
 				} else {
-					fprintf(stderr, "can not connect to synthese\n");
+					fichier << "can not connect to synthese" << endl;
 				}
-			}
+			} 
 		}
 
 #ifdef WIN32
 	Sleep(1000);
 #endif
-#ifdef UNIX
+#ifdef LINUX
 	sleep(1);
 #endif
 
