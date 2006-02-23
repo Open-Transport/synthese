@@ -6,16 +6,17 @@
 #define SYNTHESE_SYNTHESE_H
 
 class SYNTHESE;
+class cInterface;
+class cEnvironnement;
+class cSite;
+class cTableauAffichage;
+class cCalculateur;
 
 #include "cTexte.h"
 #include "Temps.h"
-#include "cSite.h"
-#include "cInterface.h"
-#include "cCalculItineraire.h"
 #include "cFichiersPourSYNTHESE.h"
 #include "cTexteRequeteSYNTHESE.h"
 #include "cLog.h"
-#include "cTableauAffichage.h"
 #include "cAssociator.h"
 
 /**	@defgroup m00 00 Architecture : serveur TCP et main
@@ -67,6 +68,8 @@ class SYNTHESE;
 */
 class SYNTHESE
 {
+private:
+
 	//!	\name Tableaux de donn�es
 	//@{
 	cTableauDynamiquePointeurs<cEnvironnement*>		_Environnement;		//!< Environnements de donn�es
@@ -113,7 +116,7 @@ class SYNTHESE
 					, const cTexte& txtCA, tIndex nCA, tIndex nAA, tIndex nDA
 					, const cTexte& txtAD, const cTexte& txtAA
 					, const cDate& DateDepart, tIndex codePeriode
-					, tBool3 velo, tBool3 handicape, tBool3 taxibus, tNumeroTarif tarif)				const;
+					, tBool3 velo, tBool3 handicape, tBool3 taxibus, tIndex tarif)				const;
 	bool FormulaireReservation(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 					, const cTexte& tCodeLigne, tIndex iNumeroService
 					, tIndex iNumeroPADepart, tIndex iNumeroPAArrivee, const cDate& tDateDepart)		const;

@@ -8,6 +8,9 @@
  *---------------------------------------*/
 
 #include "cDescriptionPassage.h"
+#include "cArretPhysique.h"
+#include "cGareLigne.h"
+#include "cLigne.h"
 
 /*
 void cDescriptionPassage::Remplit(cMoment& newMoment, cGareLigne* newGareLigne, tNumeroService newNumeroService, cHoraire& newHoraire, DureeEnMinutes newAttente)
@@ -62,14 +65,14 @@ cDescriptionPassage* cDescriptionPassage::Insere(cDescriptionPassage* newDP)
 	@param iNumeroService Rang de la circulation sur la ligne
 	@todo URGENT Faire un controle sur l'horaire réel qui doit toujours être après l'horaire théorique (voir si on ne devrai pas changer HoraireReel par un delta)
 */
-void cDescriptionPassage::Remplit(cGareLigne* GareLigne, const cMoment& tempMomentDepart, const tNumeroService& iNumeroService)
+void cDescriptionPassage::Remplit(cGareLigne* GareLigne, const cMoment& tempMomentDepart, const size_t& iNumeroService)
 {
 	vMomentPrevu = tempMomentDepart;
 	vMomentReel = tempMomentDepart;
 	vMomentReel = GareLigne->getHoraireDepartPremierReel(iNumeroService);
 	
 //	vSitPert = GareLigne->GetArretDepart(iNumeroService).SituationPerturbee();
-	_Gare.SetElement(GareLigne->ArretLogique(), 0);
+	_Gare.SetElement(GareLigne->ArretPhysique()->getLogicalPlace(), 0);
 	_GareLigne = GareLigne;
 	vNumArret = iNumeroService;
 }
@@ -78,7 +81,7 @@ void cDescriptionPassage::Remplit(cGareLigne* GareLigne, const cMoment& tempMome
 cMoment cDescriptionPassage::MomentArriveeDestination() const
 {
 	cMoment __MomentArrivee;
-	_GareLigne->Destination()->CalculeArrivee(*_GareLigne, vNumArret, vMomentReel, __MomentArrivee);
+	_GareLigne->Ligne()->getLineStops().back()->CalculeArrivee(*_GareLigne, vNumArret, vMomentReel, __MomentArrivee);
 	return __MomentArrivee;
 }
 
@@ -95,4 +98,51 @@ cGareLigne*	cDescriptionPassage::getGareLigne() const
 tIndex cDescriptionPassage::NombreGares() const
 {
 	return _Gare.Taille();
+}
+
+
+cDescriptionPassage* cDescriptionPassage::GetDernierEtLibere()
+{
+	cDescriptionPassage* newDP = vPrecedent;
+	vPrecedent = newDP->vPrecedent;
+	vPrecedent->vSuivant = NULL;
+	_Gare.Vide();
+	return(newDP);
+}
+
+const cMoment& cDescriptionPassage::MomentFin() const
+{	
+	const cDescriptionPassage* curDP=this;
+	for (; curDP->vSuivant != NULL; curDP = curDP->vPrecedent);
+	return(curDP->vMomentPrevu);
+}
+
+const cMoment& cDescriptionPassage::getMomentPrevu() const
+{
+	return(vMomentPrevu);
+}
+
+cDescriptionPassage* cDescriptionPassage::Suivant() const
+{
+	return(vSuivant);
+}
+
+LogicalPlace* cDescriptionPassage::GetGare(tIndex __i) const
+{
+	return _Gare.IndexValide(__i) ? _Gare[__i] : NULL;
+}
+
+const cMoment& cDescriptionPassage::getMomentReel() const
+{
+	return(vMomentReel);
+}
+
+cSitPert* cDescriptionPassage::getSitPert() const
+{
+	return(vSitPert);
+}
+
+const size_t& cDescriptionPassage::NumArret() const
+{
+	return(vNumArret);
 }

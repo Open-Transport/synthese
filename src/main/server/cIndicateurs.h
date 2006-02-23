@@ -53,6 +53,7 @@ typedef float tDistancePt;
 #include "cTexte.h"
 #include "Temps.h"
 #include "cEnvironnement.h"
+#include "cGareLigne.h"
 
 /** Ligne de tableau d'indicateur
 	@author Hugues Romain
@@ -69,7 +70,7 @@ class cGareIndicateurs
 private:
 	// Variables
 	LogicalPlace*				vPA;
-	tTypeGareLigneDA	vTypeDA;	//!< Gare de d�part, d'arriv�e, ou de passage
+	cGareLigne::tTypeGareLigneDA	vTypeDA;	//!< Gare de d�part, d'arriv�e, ou de passage
 	tTypeGareIndicateur	vObligatoire;
 	cGareIndicateurs*		vSuivant;
 
@@ -78,7 +79,7 @@ public:
 	LogicalPlace*				getArretLogique()	const;
 	cGareIndicateurs*		getSuivant()		const;
 	tTypeGareIndicateur 	Obligatoire() 		const;
-	tTypeGareLigneDA	TypeDA()		const;
+	cGareLigne::tTypeGareLigneDA	TypeDA()		const;
 	
 	// Calculateurs
 	bool EstDepart() const;
@@ -88,7 +89,7 @@ public:
 	void setSuivant(cGareIndicateurs* newVal);
 	
 	// Constructeur
-	cGareIndicateurs(LogicalPlace*, tTypeGareLigneDA, tTypeGareIndicateur);
+	cGareIndicateurs(LogicalPlace*, cGareLigne::tTypeGareLigneDA, tTypeGareIndicateur);
 };
 
 
@@ -211,7 +212,7 @@ public:
 	cRenvoiIndicateurs*	Renvoi(size_t)		const;
 	
 	// Modificateurs
-	void addArretLogique(LogicalPlace* newArretLogique, tTypeGareLigneDA newTypeDA, tTypeGareIndicateur newTypeGI);
+	void addArretLogique(LogicalPlace* newArretLogique, cGareLigne::tTypeGareLigneDA newTypeDA, tTypeGareIndicateur newTypeGI);
 	void ConstruitRenvois();
 	void Reset();
 	void setJC(const cJC& newVal, const cJC& newVal2);

@@ -10,13 +10,9 @@
 
 #include "Point.h"
 #include "cTexte.h"
+#include "LogicalPlace.h"
 #include "Interpretor.h"
 
-class cEnvironnement;
-
-class LogicalPlace;
-
-using namespace interpretor;
 
 /** Commune
  @ingroup m05
@@ -24,21 +20,23 @@ using namespace interpretor;
 */
 class cCommune : public cPoint
 {
+public:
+	/** Interpréteur de nom de commune */
+	typedef interpretor::Interpretor<LogicalPlace*> LogicalPlaceInterpretor;
+
  private:
     const std::string       _name;   //!< Nom officiel de la commune
-    const tIndex       _id;   //!< Index de la commune (non conservé en mémoire morte)
-    Interpretor<LogicalPlace*> _logicalPlaces; //!< Tableau des lieux logiques avec recherche par réseau de neurone
+    const size_t       _id;   //!< Index de la commune (non conservé en mémoire morte)
+    LogicalPlaceInterpretor _logicalPlaces; //!< Tableau des lieux logiques avec recherche par réseau de neurone
     LogicalPlace    _mainLogicalPlace; //!< Arrêts sélectionnés si lieu de départ non précisé
     LogicalPlace*     _allPlaces;   //!< Arrêt tout lieu
-    const cEnvironnement& _environment;  //!< L'environnement
-					 //contenant cette commune
   
 public:
 
     //! \name Accesseurs
     //@{
     const std::string& getName()   const;
-    tIndex  getId()   const;
+	const size_t& getId()   const { return _id; }
     LogicalPlace* getMainLogicalPlace()
     {
         return &_mainLogicalPlace;
@@ -48,22 +46,20 @@ public:
         return _allPlaces;
     }
 
-    const cEnvironnement& getEnvironment () const { return _environment; }
-
 
     //@}
 
     //! \name Constructeur et destructeur
     //@{
-    cCommune(const cEnvironnement& environment, tIndex, std::string);
+    cCommune(tIndex, std::string);
     ~cCommune();
     //@}
 
     //! \name Modificateurs
     //@{
-    void addLogicalPlace(const LogicalPlace*);
-    void addToMainLogicalPlace(const LogicalPlace*);
-    void setAtAllPlaces(const LogicalPlace*);
+    void addLogicalPlace(LogicalPlace* const);
+    void addToMainLogicalPlace(LogicalPlace* const);
+    void setAtAllPlaces(LogicalPlace* const);
     //@}
 
     //! \name Calculateurs

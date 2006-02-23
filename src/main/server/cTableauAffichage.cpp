@@ -1,4 +1,9 @@
 #include "cTableauAffichage.h"
+#include "LogicalPlace.h"
+#include "cArretPhysique.h"
+#include "cGareLigne.h"
+#include "cDescriptionPassage.h"
+#include "cLigne.h"
 
 cTableauAffichage::cTableauAffichage(const cTexte& __Code)
 : cSite(__Code)
@@ -20,7 +25,7 @@ bool cTableauAffichage::SetOriginesSeulement(bool __Valeur)
 }
 
 // Modificateur du point d'arr�t
-bool cTableauAffichage::SetArretLogique(const LogicalPlace* __ArretLogique)
+bool cTableauAffichage::SetArretLogique(LogicalPlace* const __ArretLogique)
 {
 	return (_ArretLogique = __ArretLogique) != NULL;
 }
@@ -32,17 +37,16 @@ bool cTableauAffichage::SetNombreDeparts(tIndex __NombreDeparts)
 }
 
 // Ajout de ligne ne devant pas �tre affich�e sur le tableau
-bool cTableauAffichage::AddLigneInterdte(const cLigne* __Ligne)
+void cTableauAffichage::AddLigneInterdte(cLigne* __Ligne)
 {
-	return _LignesInterdites.SetElement(__Ligne) != INCONNU;
+	_LignesInterdites.insert(__Ligne);
 }
 
 // Ajout de quai � afficher. Si aucun quai ajout� alors tous les quais du point d'arr�t sont affich�s
-bool cTableauAffichage::AddArretPhysiqueAutorise(tIndex __NumeroArretPhysique)
+void cTableauAffichage::AddArretPhysiqueAutorise(tIndex __NumeroArretPhysique)
 {
-	return	_ArretLogique && _ArretLogique->GetArretPhysique(__NumeroArretPhysique) 
-		?	_ArretPhysiques.SetElement(_ArretLogique->GetArretPhysique(__NumeroArretPhysique)) != INCONNU 
-		:	false;
+	if (_ArretLogique && _ArretLogique->GetArretPhysique(__NumeroArretPhysique))
+		_ArretPhysiques.insert(_ArretLogique->GetArretPhysique(__NumeroArretPhysique));
 }
 
 // Accesseur Environnement
@@ -50,45 +54,57 @@ cDescriptionPassage* cTableauAffichage::Calcule(const cMoment& __MomentDebut) co
 {
 	// Variables
 	cMoment __MomentFin = _MomentFin(__MomentDebut);
-	cGareLigne* curGLD;
-	tNumeroService iNumeroService;
+	tIndex iNumeroService;
 	cDescriptionPassage* firstDP=NULL;
 	cDescriptionPassage* newDP;
 	cMoment tempMomentDepart;
 	tIndex nDP = 0;
 
 	// Parcours sur toutes les lignes au d�part et sur tous les services
-	for (curGLD = _ArretLogique->PremiereGareLigneDep(); curGLD!= NULL; curGLD=curGLD->PADepartSuivant())
-		if (_LigneAutorisee(curGLD)
-	){
-		// Parcours des services de la GLD
-		tempMomentDepart = __MomentDebut;
-		iNumeroService=-2;
-		while ((iNumeroService=curGLD->Prochain(tempMomentDepart, __MomentFin, __MomentDebut, iNumeroService+1))!=INCONNU)
+	LogicalPlace::PhysicalStopsMap physicalStops = _ArretLogique->getPhysicalStops();
+	for (LogicalPlace::PhysicalStopsMap::const_iterator liter = physicalStops.begin();
+		liter != physicalStops.end();
+		++liter)
+
+		for (cArretPhysique::LineStopVector::const_iterator piter = liter->second->departureLineStopVector().begin();
+			piter != liter->second->departureLineStopVector().end();
+			++piter)
+
 		{
-			// 1: Cas tableau pas rempli
-			if (_NombreDeparts == INCONNU || nDP < _NombreDeparts)
+			cGareLigne* curGLD = *piter;
+
+
+			if (_LigneAutorisee(curGLD))
 			{
-				newDP = new cDescriptionPassage;
-				nDP++;
+				// Parcours des services de la GLD
+				tempMomentDepart = __MomentDebut;
+				iNumeroService=-2;
+				while ((iNumeroService=curGLD->Prochain(tempMomentDepart, __MomentFin, __MomentDebut, iNumeroService+1))!=INCONNU)
+				{
+					// 1: Cas tableau pas rempli
+					if (_NombreDeparts == INCONNU || nDP < _NombreDeparts)
+					{
+						newDP = new cDescriptionPassage;
+						nDP++;
+					}
+					else // 2: Cas du tableau rempli: r�cup�ration du dernier
+						newDP = firstDP->GetDernierEtLibere();
+					
+					// 3: Ecriture des donn�es du DP
+					newDP->Remplit(curGLD, tempMomentDepart, iNumeroService);
+
+					// 4: Chainage du DP � la bonne position
+					if (nDP==1)
+						firstDP = newDP;
+					else
+						firstDP = firstDP->Insere(newDP);
+
+					// 5: Si d�passement du nombre de DP voulus
+					if (nDP == _NombreDeparts)
+						__MomentFin = firstDP->MomentFin();
+				}
 			}
-			else // 2: Cas du tableau rempli: r�cup�ration du dernier
-				newDP = firstDP->GetDernierEtLibere();
-			
-			// 3: Ecriture des donn�es du DP
-			newDP->Remplit(curGLD, tempMomentDepart, iNumeroService);
-
-			// 4: Chainage du DP � la bonne position
-			if (nDP==1)
-				firstDP = newDP;
-			else
-				firstDP = firstDP->Insere(newDP);
-
-			// 5: Si d�passement du nombre de DP voulus
-			if (nDP == _NombreDeparts)
-				__MomentFin = firstDP->MomentFin();
 		}
-	}
 	ListeArretsAffiches(firstDP);
 	return firstDP;
 }
@@ -122,11 +138,11 @@ cMoment cTableauAffichage::_MomentFin(const cMoment& __MomentDebut) const
 bool cTableauAffichage::_LigneAutorisee(const cGareLigne* __GareLigne) const
 {
 	return 	__GareLigne->Ligne()->AAfficherSurTableauDeparts()
-			&&	_LignesInterdites.Recherche(__GareLigne->Ligne()) == INCONNU
-			&&	(!_ArretPhysiques.Taille() || _ArretPhysiques.Recherche(__GareLigne->getVoie()) != INCONNU)
+			&&	_LignesInterdites.find(__GareLigne->Ligne()) == _LignesInterdites.end()
+			&&	(!_ArretPhysiques.size() || _ArretPhysiques.find(__GareLigne->ArretPhysique()) != _ArretPhysiques.end())
 			&& (!_OriginesSeulement || !__GareLigne->getDepartPrecedent())
-			&& (__GareLigne->getArriveeSuivante()->ArretLogique() != _ArretLogique 
-                || __GareLigne->Destination()->ArretLogique() != _ArretLogique)
+			&& (__GareLigne->getArriveeSuivante()->ArretPhysique()->getLogicalPlace() != _ArretLogique 
+                || __GareLigne->Ligne()->getLineStops().back()->ArretPhysique()->getLogicalPlace() != _ArretLogique)
 	;
 }
 
@@ -139,12 +155,12 @@ void cTableauAffichage::ListeArretsAffiches(cDescriptionPassage* __DP) const
 	{
 		for (cGareLigne* __GL = __DP->getGareLigne(); __GL; __GL=__GL->getArriveeSuivante())
 		{
-			if ((	_DestinationsAffichees.Recherche(__GL->ArretLogique()) != INCONNU 
+			if ((	_DestinationsAffichees.find(__GL->ArretPhysique()->getLogicalPlace()) != _DestinationsAffichees.end()
 					|| __GL->getArriveeSuivante()==NULL
 					|| __GL == __DP->getGareLigne()
-				) &&	__DP->_Gare.Recherche(__GL->ArretLogique()) == INCONNU
+				) &&	__DP->_Gare.Recherche(__GL->ArretPhysique()->getLogicalPlace()) == INCONNU
 			){
-				__DP->_Gare.SetElement(__GL->ArretLogique());
+				__DP->_Gare.SetElement(__GL->ArretPhysique()->getLogicalPlace());
 			}
 		}
 	}
@@ -156,9 +172,9 @@ bool cTableauAffichage::SetTitre(const cTexte&__Titre)
 	return _Titre.Compare(__Titre);
 }
 
-tIndex cTableauAffichage::AddDestinationAffichee(const LogicalPlace* __ArretLogique)
+void cTableauAffichage::AddDestinationAffichee(LogicalPlace* __ArretLogique)
 {
-	return _DestinationsAffichees.SetElement(__ArretLogique);
+	_DestinationsAffichees.insert(__ArretLogique);
 }
 
 const cTexte& cTableauAffichage::getTitre() const

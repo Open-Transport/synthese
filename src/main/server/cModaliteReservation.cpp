@@ -69,7 +69,7 @@ cMoment cModaliteReservation::momentLimiteReservation(const cTrain* tCirculation
 	cMoment momentMinutes = MomentDeReference;
 	cMoment momentJours = MomentDeReference;
 	
-	if (vDelaiMinMinutes.Valeur())
+	if (vDelaiMinMinutes)
 		momentMinutes -= vDelaiMinMinutes;
 	
 	if (vDelaiMinJours)

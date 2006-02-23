@@ -18,7 +18,7 @@ class cInterface;
 #include "cTexte.h"
 
 #include <string>
-
+#include <vector>
 
 /** Impl�mentation de la notion d'Interface
 	\author Hugues Romain
@@ -39,9 +39,14 @@ Les p�riodes de la journ�e correspondent � des masques permettant de n'eff
 */
 class cInterface
 {
+public:
+	/** Période journée */
+	static const size_t ALL_DAY_PERIOD;
+
+private:
 	tIndex											_Index;									//!< Index de l'interface dans la base de donn�es SYNTHESE
 	cInterface_Objet_AEvaluer_PageEcran*			_Element;								//!< Tableau des �l�ments standard d�finis
-	cTableauDynamiquePointeurs<cPeriodeJournee*>	_Periode;								//!< Tableau des p�riodes de la journ�e
+	vector<cPeriodeJournee*>	_Periode;								//!< Tableau des p�riodes de la journ�e
 	cTexte											_LibelleJourSemaine[JOURS_PAR_SEMAINE];	//!< Tableau des libell�s des jours de semaine
 	cTexte											_LibelleMois[MOIS_PAR_AN + 1];			//!< Tableau des libell�s des mois
 	cTableauDynamiqueObjets<cTexte>					_PrefixesAlerte;						//!< Pr�fixes de messages d'alerte
@@ -58,7 +63,7 @@ public:
 	cInterface_Objet_AEvaluer_PageEcran&		Element(tIndex);
 	const cInterface_Objet_AEvaluer_PageEcran&	operator[](tIndex)									const;
 	tIndex										Index()												const;
-	const cPeriodeJournee*						GetPeriode(tIndex __Index = TABLEAU_ELEMENT_DEFAUT)	const;
+	const cPeriodeJournee*						GetPeriode(size_t __Index = ALL_DAY_PERIOD)	const;
 	const cTexte&								getPrefixeAlerte(tIndex __NiveauAlerte)				const;
 // 	const cTexte&								LibelleJourSemaine(tIndex)							const;
 	//@}
@@ -96,7 +101,7 @@ public:
 	//!	\name Modificateurs
 	//@{
 	bool					SetIndex(tIndex);
-	bool					AddPeriode(cPeriodeJournee*);
+	void					AddPeriode(cPeriodeJournee*);
 	bool					SetLibelleJour(tIndex, const cTexte&);
 	bool					SetLibelleMois(tIndex, const cTexte&);
 	bool					SetPrefixeAlerte(tIndex, const cTexte&);

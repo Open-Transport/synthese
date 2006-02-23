@@ -5,6 +5,13 @@
 #include "SYNTHESE.h"
 #include "LogicalPlace.h"
 #include "cCommune.h"
+#include "cInterface.h"
+#include "cDescriptionPassage.h"
+#include "cTableauAffichage.h"
+#include "cEnvironnement.h"
+#include "cCalculItineraire.h"
+
+using namespace std;
 
 #ifdef UNIX
 pthread_mutex_t mutex_associateur = PTHREAD_MUTEX_INITIALIZER;
@@ -259,27 +266,14 @@ bool SYNTHESE::FicheHoraire(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 	if(	__Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)
 	&&	__Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)
 	&&	__Site->getEnvironnement()->ControleDate(__DateDepart)
-	&&	__Site->getEnvironnement()->isTarif(tarif)
+	&&	__Site->getEnvironnement()->getTarif(tarif)
 	){
 		// Message d'alerte
 		cTexte alerte = cTexte("");
 
-		// Obtention d'un espace de calcul libre
-		cCalculateur* __Calculateur = __Site->CalculateurLibre();
-		
-		// Espace saturï¿½
-		if (!__Calculateur)
-		{
-			FichierLogAcces().Ecrit(MESSAGE_CALC_SATURE, __Site->getIdentifiant());
-			return false;
-		}
-		
-		// Definition du lien identifiant de thread -> espace calculateur
-		_ThreadCalculateur[vThreadId] = __Calculateur;
-		
-		//calculateur->getEnvironnement()->FichierLOG() << "start fiche horaire";
-		if (__Calculateur->InitialiseFicheHoraireJournee(
-				__Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)
+		// Nouveau calculateur
+		cCalculateur __Calculateur(__Site->getEnvironnement()
+				, __Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)
 				, __Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)
 				, __DateDepart
 				, __Site->getInterface()->GetPeriode(__IndexPeriode)
@@ -288,29 +282,34 @@ bool SYNTHESE::FicheHoraire(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 				, taxibus
 				, tarif
 				, __Site->getSolutionsPassees()
-			)
-		){
+				, 0, 0
+				);
+		
+		// Espace saturï¿½
+//		if (!__Calculateur)
+//		{
+//			FichierLogAcces().Ecrit(MESSAGE_CALC_SATURE, __Site->getIdentifiant());
+//			return false;
+//		}
+		
+		// Definition du lien identifiant de thread -> espace calculateur UTILE ?
+		_ThreadCalculateur[vThreadId] = &__Calculateur;
+		
+		//calculateur->getEnvironnement()->FichierLOG() << "start fiche horaire";
 
-			// Calcul fiche horaire
-			if (!__Calculateur->FicheHoraire() && (__IndexPeriode != TABLEAU_ELEMENT_DEFAUT))
-			{
-				//prï¿½paration du message d'alerte periode
-//				alerte << MESSAGE_PERIODE;
-//!	\todo HRO
-				// pas de resultat avec le filtre periode, on relance sur toute la journee
-				__Calculateur->InitialiseFicheHoraireJournee(
-						__Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)
-					,	__Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)
-					,	__DateDepart
-					,	__Site->getInterface()->GetPeriode()
-					,	velo
-					,	handicape
-					,	taxibus
-					,	tarif
-					, __Site->getSolutionsPassees()
-					);
-				__Calculateur->FicheHoraire();
-			}
+		// Calcul fiche horaire
+		if (!__Calculateur.FicheHoraire() && (__IndexPeriode != cInterface::ALL_DAY_PERIOD))
+		{
+			// pas de resultat avec le filtre periode, on relance sur toute la journee (pérvoir alerte)
+
+			FicheHoraire(pCtxt, pCerr, __Site
+					, NumeroGareOrigine, NumeroGareDestination, __DateDepart
+					, cInterface::ALL_DAY_PERIOD
+					, velo, handicape,taxibus, tarif
+					, vThreadId);
+		}
+		else
+		{
 /*			//Entete XML
 			pCtxt << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
 			//pCtxt << "<!DOCTYPE fichehoraire SYSTEM \"/bl/fichehoraire.dtd\">";
@@ -348,33 +347,31 @@ bool SYNTHESE::FicheHoraire(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 			pCtxt << "\n</fichehoraire>";
 		}
 	*/	
+
+			cInterface_Objet_Connu_ListeParametres __Parametres;
+			__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)->getTown()->getName();	//0
+			__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)->getTown()->getId();	//1
+			__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)->getName();	//2
+			__Parametres << NumeroGareOrigine;	//3
+			__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)->getTown()->getName();	//4
+			__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)->getTown()->getId();	//5
+			__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)->getName();	//6
+			__Parametres << NumeroGareDestination;	//7
+			__Parametres << "";	//8 A VIRER
+			__Parametres << ""; //9 A VIRER
+			__Parametres << __IndexPeriode;//10
+			__Parametres << velo;//11
+			__Parametres << handicape;//12
+			__Parametres << taxibus;//13
+			__Parametres << tarif;//14
+			cTexteCodageInterne __txtDateDepart;
+			__txtDateDepart << __DateDepart;
+			__Parametres << __txtDateDepart;	//15
+			__Site->Affiche(pCtxt, INTERFACEFicheHoraire, __Parametres, (const void*) &__Calculateur.getSolution());
+
+			// Remise ï¿½ disposition de l'espace de calcul
+			_ThreadCalculateur.erase(vThreadId);
 		}
-
-		cInterface_Objet_Connu_ListeParametres __Parametres;
-		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)->getTown()->getName();	//0
-		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)->getTown()->getId();	//1
-		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareOrigine)->getName();	//2
-		__Parametres << NumeroGareOrigine;	//3
-		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)->getTown()->getName();	//4
-		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)->getTown()->getId();	//5
-		__Parametres << __Site->getEnvironnement()->getLogicalPlace(NumeroGareDestination)->getName();	//6
-		__Parametres << NumeroGareDestination;	//7
-		__Parametres << "";	//8 A VIRER
-		__Parametres << ""; //9 A VIRER
-		__Parametres << __IndexPeriode;//10
-		__Parametres << velo;//11
-		__Parametres << handicape;//12
-		__Parametres << taxibus;//13
-		__Parametres << tarif;//14
-		cTexteCodageInterne __txtDateDepart;
-		__txtDateDepart << __DateDepart;
-		__Parametres << __txtDateDepart;	//15
-		__Site->Affiche(pCtxt, INTERFACEFicheHoraire, __Parametres, (const void*) &__Calculateur->getSolution());
-
-		// Remise ï¿½ disposition de l'espace de calcul
-		__Calculateur->Libere();
-		_ThreadCalculateur.erase(vThreadId);
-		
 		return true;
 	}
 	else
@@ -439,7 +436,7 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 						const cTexte& txtCA, tIndex nCA, tIndex nAA, tIndex nDA, 
 						const cTexte& txtAD, const cTexte& txtAA, 
 						const cDate& __DateDepart, tIndex codePeriode,
-						tBool3 velo, tBool3 handicape, tBool3 taxibus, tNumeroTarif tarif) const
+						tBool3 velo, tBool3 handicape, tBool3 taxibus, tIndex tarif) const
 {
     /* patch de test
        aucune intégration
@@ -508,11 +505,11 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 
 	// Test des entrï¿½es
 	if(	(nCD == INCONNU || __Site->getEnvironnement()->ControleNumeroTexteCommune(nCD, newtxtCD))
-	&&	(nAD == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAD, nCD, nDD, newtxtAD))
+	&&	(nAD == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAD, nCD, newtxtAD))
 	&&	(nCA == INCONNU || __Site->getEnvironnement()->ControleNumeroTexteCommune(nCA, newtxtCA))
-	&&	(nAA == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAA, nCA, nDA, newtxtAA))
+	&&	(nAA == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAA, nCA, newtxtAA))
 	&& 	__DateDepart.OK()
-	&&	__Site->getEnvironnement()->isTarif(tarif))
+	&&	__Site->getEnvironnement()->getTarif(tarif))
 	{
 		// Déclarations
 		vector<cCommune*>	tbCommune;
@@ -655,7 +652,7 @@ bool SYNTHESE::FormulaireReservation(ostream &pCtxt, ostream& pCerr, const cSite
 {
 	cLigne* curLigne;
 	
-	if(	(curLigne = __Site->getEnvironnement()->GetLigne(tCodeLigne))
+	if(	(curLigne = __Site->getEnvironnement()->GetLigne(string(tCodeLigne.Texte())))
 	&&	__Site->getEnvironnement()->getLogicalPlace(iNumeroPADepart)
 	&&	__Site->getEnvironnement()->getLogicalPlace(iNumeroPAArrivee)
 	&&	curLigne->GetResa()
@@ -1079,12 +1076,12 @@ bool SYNTHESE::ExecuteRequete(ostream &pCtxt, ostream &pCerr, cTexteRequeteSYNTH
     \return true si l'opï¿½ration a ï¿½tï¿½ effectuï¿½e avec succï¿½s
     \author Christophe Romain
     \date 2005
+	@todo UTILITE ?
   */
 bool SYNTHESE::TermineCalculateur(long vThreadId)
 {
     if(!_ThreadCalculateur.count(vThreadId))
         return false;
-    _ThreadCalculateur[vThreadId]->Libere();
     _ThreadCalculateur.erase(vThreadId);
     return true;
 }

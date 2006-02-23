@@ -5,11 +5,15 @@
 */
 
 #include "cTrain.h"
+#include "cLigne.h"
+#include "cJourCirculation.h"
+#include "cModaliteReservation.h"
 
 
-/*! \brief Constructeur
+/*! Constructeur.
 */
-cTrain::cTrain()
+cTrain::cTrain(cLigne* const line)
+: vLigne(line)
 {
 	vEtalementCadence = 0;
 	vAttente = 0;
@@ -99,10 +103,6 @@ cLigne* cTrain::getLigne() const
 	return(vLigne);
 }
 
-void cTrain::setLigne(cLigne* newVal)
-{
-	vLigne = newVal;
-}
 
 /*!	\brief Horaire de départ de la circulation
 	\author Hugues Romain

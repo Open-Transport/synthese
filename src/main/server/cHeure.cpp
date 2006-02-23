@@ -35,7 +35,7 @@ tDureeEnJours cHeure::operator+=(const tDureeEnMinutes& DureeEnMinutesAAjouter)
 	int tempCalcul;
 
 	// 1: Minutes
-	tempCalcul = vMinutes + DureeEnMinutesAAjouter.Valeur();
+	tempCalcul = vMinutes + DureeEnMinutesAAjouter;
 	Retenue = tempCalcul / MINUTES_PAR_HEURE;
 	vMinutes = (tMinute) (tempCalcul % MINUTES_PAR_HEURE);
 	
@@ -57,8 +57,8 @@ tDureeEnJours cHeure::operator-=(const tDureeEnMinutes& DureeEnMinutesAEnlever)
 	int Retenue;
 	
 	// 1: Minutes
-	Retenue = (MINUTES_PAR_HEURE - 1 + DureeEnMinutesAEnlever.Valeur() - vMinutes) / MINUTES_PAR_HEURE;
-	vMinutes = (tMinute) (Retenue * MINUTES_PAR_HEURE + vMinutes - DureeEnMinutesAEnlever.Valeur());
+	Retenue = (MINUTES_PAR_HEURE - 1 + DureeEnMinutesAEnlever - vMinutes) / MINUTES_PAR_HEURE;
+	vMinutes = (tMinute) (Retenue * MINUTES_PAR_HEURE + vMinutes - DureeEnMinutesAEnlever);
 	HeuresAEnlever = Retenue;
 
 	// 2: Heures

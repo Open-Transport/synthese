@@ -13,12 +13,10 @@
 	\author Hugues Romain
 	\date 2001-2005
 */
-cArretPhysique::cArretPhysique(LogicalPlace* logicalPlace, size_t rank)
+cArretPhysique::cArretPhysique(LogicalPlace* const logicalPlace, size_t rank)
 : NetworkAccessPoint(logicalPlace, rank)
 {
-	_firstArrivalLineStop = NULL;
-	_firstDepartureLineStop = NULL;
-
+	
 }
 
 cArretPhysique::~cArretPhysique()
@@ -46,22 +44,23 @@ NetworkAccessPoint::AddressList cArretPhysique::getAddresses(bool forDeparture) 
 	return result;
 }
 
-void cArretPhysique::setPremiereGareLigneDep(cGareLigne* curGareLigne)
+
+/** Adds a Line-Stop to the physical stop.
+
+	@todo Sort of the line stops by angle
+*/
+void cArretPhysique::addDepartureLineStop(cGareLigne* const curGareLigne)
 {
-	_firstDepartureLineStop = curGareLigne;
+	_departureLineStopVector.insert(curGareLigne);
 }
 
-void cArretPhysique::setPremiereGareLigneArr(cGareLigne* curGareLigne)
+
+/** Adds a Line-Stop to the physical stop.
+
+	@todo Sort of the line stops by angle
+*/
+void cArretPhysique::addArrivalLineStop(cGareLigne* const curGareLigne)
 {
-	_firstArrivalLineStop = curGareLigne;
+	_arrivalLineStopVector.insert(curGareLigne);
 }
 
-cGareLigne* cArretPhysique::PremiereGareLigneDep() const
-{
-	return _firstDepartureLineStop;
-}
-
-cGareLigne* cArretPhysique::PremiereGareLigneArr() const
-{
-	return _firstArrivalLineStop;
-}

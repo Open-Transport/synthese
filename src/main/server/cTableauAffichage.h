@@ -3,14 +3,16 @@
 #define SYNTHESE_CTABLEAUAFFICHAGE_H
 
 class cTableauAffichage;
+class cLigne;
+class cDescriptionPassage;
+class cArretPhysique;
+class LogicalPlace;
+class cGareLigne;
 
 #include "cSite.h"
 #include "Parametres.h"
-#include "cDescriptionPassage.h"
-#include "LogicalPlace.h"
-#include "cArretPhysique.h"
-#include "cLigne.h"
 #include "Temps.h"
+#include <set>
 
 /** @defgroup m34 34 Tableaux d'affichage
 	@{
@@ -33,10 +35,10 @@ protected:
 
 	//!	\name Donn�es
 	//@{
-	const LogicalPlace*						_ArretLogique;		//!< Point d'arr�t affich�
-	cTableauDynamique<const cArretPhysique*>		_ArretPhysiques;				//!< ArretPhysique(s) affich�s
-	cTableauDynamique<const cLigne*>	_LignesInterdites;	//!< Lignes ne devant pas �tre affich�es
-	cTableauDynamique<const LogicalPlace*>		_DestinationsAffichees;
+	LogicalPlace*						_ArretLogique;		//!< Point d'arr�t affich�
+	set<cArretPhysique*>		_ArretPhysiques;				//!< ArretPhysique(s) affich�s
+	set<cLigne*>	_LignesInterdites;	//!< Lignes ne devant pas �tre affich�es
+	set<LogicalPlace*>		_DestinationsAffichees;
 	//@}
 
 	//!	\name M�thodes prot�g�es
@@ -54,13 +56,13 @@ public:
 
 	//!	\name Modificateurs
 	//@{
-	virtual bool	SetArretLogique(const LogicalPlace* __ArretLogique);
+	virtual bool	SetArretLogique(LogicalPlace* const __ArretLogique);
 	bool			SetNombreDeparts(tIndex __NombreDeparts);
-	bool			AddLigneInterdte(const cLigne* __Ligne);
-	bool			AddArretPhysiqueAutorise(tIndex __NumeroArretPhysique);
+	void			AddLigneInterdte(cLigne* __Ligne);
+	void			AddArretPhysiqueAutorise(tIndex __NumeroArretPhysique);
 	bool			SetTitre(const cTexte&);
 	bool			SetOriginesSeulement(bool __Valeur);
-	tIndex			AddDestinationAffichee(const LogicalPlace* __ArretLogique);
+	void			AddDestinationAffichee(LogicalPlace* __ArretLogique);
 	void			SetNumeroPanneau(tIndex);
 	//@}
 

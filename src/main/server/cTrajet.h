@@ -19,7 +19,7 @@ class cTrajet;
 */
 class cTrajet
 {
-protected:
+private:
 	cTexte			_NiveauMaxAlerte;			//!< Niveau maximal de messages d'alerte du trajet, li�s aux arr�ts ou aux lignes
 	cElementTrajet*	_PremierET;					//!< Acc�s aux donn�es du trajet
 	cElementTrajet*	_DernierET;					//!< Acc�s direct au dernier �l�ment du trajet
@@ -36,8 +36,8 @@ protected:
 public:
 	//!	\name Accesseurs
 	//@{
-	NetworkAccessPoint*		getOrigin()						const;
-	NetworkAccessPoint*		getDestination()				const;
+	const NetworkAccessPoint*		getOrigin()						const;
+	const NetworkAccessPoint*		getDestination()				const;
 	cElementTrajet*			getDernierElement();
 	const tDureeEnMinutes&	getDuree()						const;
 	const tDureeEnMinutes&	getDureeRoulee()				const;

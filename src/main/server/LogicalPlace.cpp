@@ -71,6 +71,7 @@ LogicalPlace::LogicalPlace(Road* road)
 
 /** Constructeur de lieu logique de type adresse précise.
 	@param address Adresse
+	@todo Faire le nom qui marche pas
 */
 LogicalPlace::LogicalPlace(synmap::Address* address)
 	: cPoint()
@@ -452,7 +453,7 @@ LogicalPlace::tNiveauCorrespondance LogicalPlace::CorrespondanceAutorisee() cons
 	return _transferRules;
 }
 
-tDureeEnMinutes LogicalPlace::AttenteCorrespondance(tIndex Dep, tIndex Arr) const
+tDureeEnMinutes LogicalPlace::AttenteCorrespondance(size_t Dep, size_t Arr) const
 {
 	return _transferRules ? _transferDelay[Dep][Arr] : tDureeEnMinutes(0);
 }

@@ -2,6 +2,7 @@
 #include "cTrajet.h"
 #include "cAlerte.h"
 #include "cModaliteReservation.h"
+#include "LogicalPlace.h"
 
 
 /*!	\brief Constructeur
@@ -55,23 +56,23 @@ int cTrajet::GenererNiveauxAlerte()
 		// Fin alerte = dernier d�part
 		__debutAlerte = __ET->MomentDepart();
 		__finAlerte = __debutAlerte;
-		if (getAmplitudeServiceContinu().Valeur())
+		if (getAmplitudeServiceContinu())
 			__finAlerte += getAmplitudeServiceContinu();
-		if (__ET->getGareDepart()->getAlerte()->showMessage(__debutAlerte, __finAlerte)
-		&&	__NiveauMaxAlerte < __ET->getGareDepart()->getAlerte()->Niveau())
-			__NiveauMaxAlerte = __ET->getGareDepart()->getAlerte()->Niveau();
+		if (__ET->getOrigin()->getLogicalPlace()->getAlerte()->showMessage(__debutAlerte, __finAlerte)
+		&&	__NiveauMaxAlerte < __ET->getOrigin()->getLogicalPlace()->getAlerte()->Niveau())
+			__NiveauMaxAlerte = __ET->getOrigin()->getLogicalPlace()->getAlerte()->Niveau();
 		
 		// Circulation � r�servation obligatoire
 		maintenant.setMoment();
 		if (__ET->getLigne()->GetResa()->TypeResa() == Obligatoire
-		&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getLigne()->GetTrain(__ET->getService()), maintenant, __ET->MomentDepart())
+		&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getService(), maintenant, __ET->MomentDepart())
 		&&	__NiveauMaxAlerte < ALERTE_ATTENTION)
 			__NiveauMaxAlerte = ALERTE_ATTENTION;
 		
 		// Circulation � r�servation possible
 		maintenant.setMoment();
 		if (__ET->getLigne()->GetResa()->TypeResa() == Facultative
-		&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getLigne()->GetTrain(__ET->getService()), maintenant, __ET->MomentDepart())
+		&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getService(), maintenant, __ET->MomentDepart())
 		&&	__NiveauMaxAlerte < ALERTE_INFO)
 			__NiveauMaxAlerte = ALERTE_INFO;
 		
@@ -80,7 +81,7 @@ int cTrajet::GenererNiveauxAlerte()
 		// Fin alerte = derni�re arriv�e
 		__debutAlerte = __ET->MomentDepart();
 		__finAlerte = __ET->MomentArrivee();
-		if (getAmplitudeServiceContinu().Valeur())
+		if (getAmplitudeServiceContinu())
 			__finAlerte += getAmplitudeServiceContinu();
 		if (__ET->getLigne()->getAlerte()->showMessage(__debutAlerte, __finAlerte)
 		&&	__NiveauMaxAlerte < __ET->getLigne()->getAlerte()->Niveau())
@@ -91,13 +92,13 @@ int cTrajet::GenererNiveauxAlerte()
 		// Fin alerte = dernier d�part de l'arr�t si correspondnce, derni�re arriv�e sinon
 		__debutAlerte = __ET->MomentArrivee();
 		__finAlerte = __debutAlerte;
-		if (__ET->Suivant() != NULL)
-			__finAlerte = __ET->Suivant()->MomentDepart();
-		if (getAmplitudeServiceContinu().Valeur())
+		if (__ET->getSuivant() != NULL)
+			__finAlerte = __ET->getSuivant()->MomentDepart();
+		if (getAmplitudeServiceContinu())
 			__finAlerte += getAmplitudeServiceContinu();
-		if (__ET->getGareArrivee()->getAlerte()->showMessage(__debutAlerte, __finAlerte)
-		&&	__NiveauMaxAlerte < __ET->getGareArrivee()->getAlerte()->Niveau())
-			__NiveauMaxAlerte = __ET->getGareArrivee()->getAlerte()->Niveau();
+		if (__ET->getDestination()->getLogicalPlace()->getAlerte()->showMessage(__debutAlerte, __finAlerte)
+		&&	__NiveauMaxAlerte < __ET->getDestination()->getLogicalPlace()->getAlerte()->Niveau())
+			__NiveauMaxAlerte = __ET->getDestination()->getLogicalPlace()->getAlerte()->Niveau();
 	}
 	
 	// Stockage du r�sultat au format texte pour module d'interface
@@ -189,29 +190,6 @@ const cMoment& cTrajet::getMomentDepart() const
 }
 
 
-
-const LogicalPlace* cTrajet::getArretLogiqueArrivee() const
-{
-	return _DernierET->getGareArrivee();
-}
-
-
-const LogicalPlace* cTrajet::getArretLogiqueDepart() const
-{
-	return _PremierET->getGareDepart();
-}
-
-
-tIndex cTrajet::getIndexArretPhysiqueArrivee() const
-{
-	return _DernierET->VoieArrivee();
-}
-
-
-tIndex cTrajet::getIndexArretPhysiqueDepart() const
-{
-	return _PremierET->VoieDepart();
-}
 
 
 void cTrajet::LieEnPremier(cElementTrajet* __ET)
@@ -350,21 +328,21 @@ void cTrajet::Finalise()
 {
 	// Calcul de l'amplitude du service continu
 	_AmplitudeServiceContinu = INCONNU;
-	for (const cElementTrajet* __ET = _PremierET; __ET; __ET = __ET->Suivant())
+	for (const cElementTrajet* __ET = _PremierET; __ET; __ET = __ET->getSuivant())
 	{
-		if (_AmplitudeServiceContinu.Valeur() == INCONNU || __ET->AmplitudeServiceContinu() < _AmplitudeServiceContinu)
+		if (_AmplitudeServiceContinu == INCONNU || __ET->AmplitudeServiceContinu() < _AmplitudeServiceContinu)
 			_AmplitudeServiceContinu = __ET->AmplitudeServiceContinu();
-		if (!_AmplitudeServiceContinu.Valeur())
+		if (!_AmplitudeServiceContinu)
 			break;
 	}
 }
 
-NetworkAccessPoint* cTrajet::getOrigin() const
+const NetworkAccessPoint* cTrajet::getOrigin() const
 {
 	return _PremierET->getOrigin();
 }
 
-NetworkAccessPoint* cTrajet::getDestination() const
+const NetworkAccessPoint* cTrajet::getDestination() const
 {
 	return _DernierET->getDestination();
 }

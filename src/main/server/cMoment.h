@@ -83,7 +83,8 @@ public:
 	bool			OK				()						const;
 	//@}
 	
-	cMoment() {}
+	explicit cMoment(tJour Jour='A', tMois Mois='I', tAnnee Annee='I', tHeure Heures='I', tMinute Minutes='I') { setMoment(Jour, Mois, Annee, Heures, Minutes); }
+	cMoment(const cDate& date) { operator=(date); }
 	~cMoment() {}
 };
 

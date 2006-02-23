@@ -3,6 +3,9 @@
 */
 
 #include "cGareLigne.h"
+#include "cLigne.h"
+#include "cTrain.h"
+#include "cArretPhysique.h"
 
 /** Constructeur.
 	\param newLigne Ligne � laquelle appartient l'objet
@@ -13,106 +16,30 @@
 	\author Hugues Romain
 	\date 2001
 */
-cGareLigne::cGareLigne(cLigne* newLigne, tDistanceM newPM, tIndex newArretPhysique, tTypeGareLigneDA newType, LogicalPlace* newPA, bool newHorairesSaisis)
+cGareLigne::cGareLigne(cLigne* newLigne, tDistanceM newPM, tTypeGareLigneDA newType, cArretPhysique* const physicalStop, bool newHorairesSaisis)
+: _physicalStop(physicalStop)
+, vLigne(newLigne)
+, vPM(newPM)
+, vHorairesSaisis(newHorairesSaisis)
 {
 	vDepartCorrespondancePrecedent = NULL;
 	vDepartPrecedent = NULL;
 	vArriveeCorrespondanceSuivante = NULL;
 	vArriveeSuivante = NULL;
-	vPAArriveeAxeSuivante = NULL;
-	vPAArriveeSuivante = NULL;
-	vPADepartAxeSuivant = NULL;
-	vPADepartSuivant = NULL;
 	vSuivant = NULL;
 	_Precedent = NULL;
 
 	// Ligne
-	
 	setTypeDA(newType);		   // Type
-	vPM = newPM;			  // PM
-	vVoie = newArretPhysique;		 // ArretPhysique
-	vArretLogique = newPA;	// Point d'arr�t	
-
-	vHorairesSaisis = newHorairesSaisis;
-
-	// Uniquement si ligne contenant des services (pas une route)
-	if (newLigne->NombreServices())
-	{
-		if (EstDepart())
-			setPADepartSuivant();
-		if (EstArrivee())
-			setPAArriveeSuivant();
-		AlloueHoraires();
-	}
-
+	
+	AlloueHoraires();
 }
 
-
-/*! \brief Constructeur - Cr�e une instance de cGareLigne sur la ligne, les autres informations �tant copi�es d'apr�s une autre ligne
-	\param newLigne Ligne � laquelle appartient l'objet
-	\param GLACopier Objet � copier
-	\author Hugues Romain
-	\date 2001
-*/
-cGareLigne::cGareLigne(cLigne* newLigne, const cGareLigne& GLACopier)
-{
-	vDepartCorrespondancePrecedent = NULL;
-	vDepartPrecedent = NULL;
-	vArriveeCorrespondanceSuivante = NULL;
-	vArriveeSuivante = NULL;
-	vPAArriveeAxeSuivante = NULL;
-	vPAArriveeSuivante = NULL;
-	vPADepartAxeSuivant = NULL;
-	vPADepartSuivant = NULL;
-	vSuivant = NULL;
-	_Precedent = NULL;
-	vLigne = newLigne;
-	vPM = GLACopier.vPM;
-	vVoie = GLACopier.vVoie;
-	vTypeDA = GLACopier.vTypeDA;
-	vArretLogique = GLACopier.vArretLogique;
-	vHorairesSaisis = GLACopier.vHorairesSaisis;
-	if (newLigne->NombreServices())
-	{
-		if (EstDepart())
-			setPADepartSuivant();
-		if (EstArrivee())
-			setPAArriveeSuivant();
-		AlloueHoraires();
-	}
-}
-
-
-/*! 	\brief Constructeur : cr�e une instance de cGareLigne sur la ligne fournie, sans sp�cification de point d'arr�t
-	\param newLigne Ligne � laquelle appartient la gareligne
-	\version 2.0
-	\author Hugues Romain
-	\date 2001
-*/
-/*cGareLigne::cGareLigne(cLigne* newLigne)
-{
-	vSuivant = NULL;
-	_Precedent = NULL;
-	vDepartCorrespondancePrecedent = NULL;
-	vDepartPrecedent = NULL;
-	vArriveeCorrespondanceSuivante = NULL;
-	vArriveeSuivante = NULL;
-	vPAArriveeAxeSuivante = NULL;
-	vPAArriveeSuivante = NULL;
-	vPADepartAxeSuivant = NULL;
-	vPADepartSuivant = NULL;
-	vPM=0;
-	vLigne = newLigne;
-	if (newLigne->NombreServices())
-		AlloueHoraires();
-}
-*/
 
 /*! \brief Destructeur
 */
 cGareLigne::~cGareLigne()
 {
-	delete vSuivant;
 	delete[] vHoraireArriveeDernier;
 	delete[] vHoraireArriveePremier;
 	delete[] vHoraireArriveePremierReel;
@@ -135,28 +62,28 @@ cGareLigne::~cGareLigne()
 */
 void cGareLigne::setHoraires(const cTexte& Tampon, tIndex Position, tIndex LargeurColonne, bool DepartDifferentPassage)
 {
-	for (tNumeroService iService=0; iService<vLigne->NombreServices(); iService++)
+	for (size_t iService=0; iService<vLigne->getServices().size(); iService++)
 	{
 		vHoraireDepartPremier[iService]	    = Tampon.Extrait(Position);
 		vHoraireDepartPremierReel[iService]	= vHoraireDepartPremier[iService];
 		vHoraireDepartDernier[iService]		= vHoraireDepartPremier[iService];
-		vHoraireDepartDernier[iService]	   += vLigne->EtalementCadence(iService);
+		vHoraireDepartDernier[iService]	   += vLigne->getTrain(iService)->EtalementCadence();
 		if (!DepartDifferentPassage)
 		{
 			vHoraireArriveePremier[iService]	 = vHoraireDepartPremier[iService];
 			// HR ESSAI PBFREQ2
-			vHoraireArriveePremier[iService] += Attente(iService);
+			vHoraireArriveePremier[iService] += vLigne->getTrain(iService)->Attente();
 			vHoraireArriveePremierReel[iService] = vHoraireArriveePremier[iService];
 			// HR ESSAI PBFREQ2
-			vHoraireArriveePremierReel[iService] += Attente(iService);
+			vHoraireArriveePremierReel[iService] += vLigne->getTrain(iService)->Attente();
 			vHoraireArriveeDernier[iService]	 = vHoraireDepartDernier[iService];
 			// HR ESSAI PBFREQ2
-			vHoraireArriveeDernier[iService] += Attente(iService);
+			vHoraireArriveeDernier[iService] += vLigne->getTrain(iService)->Attente();
 		}
 		
 		// Ecriture de l'horaire de d�part des circulations si au d�part de la ligne
-		if (Ligne()->PremiereGareLigne() == this)
-			Ligne()->setHoraireDepart(iService, &vHoraireDepartPremier[iService]);
+		if (Ligne()->getLineStops().front() == this)
+			Ligne()->getTrain(iService)->setHoraireDepart(&vHoraireDepartPremier[iService]);
 		
 		Position += LargeurColonne;
 	}
@@ -176,23 +103,21 @@ void cGareLigne::setHoraires(const cTexte& Tampon, tIndex Position, tIndex Large
 */
 bool cGareLigne::controleHoraire(const cGareLigne* GareLigneAvecHorairesPrecedente) const
 {
-	tNumeroService iNumeroService;
-
 	// Test de chronologie verticale
 	if (GareLigneAvecHorairesPrecedente != NULL)
 	{
-		for (iNumeroService = 0; iNumeroService< vLigne->NombreServices(); iNumeroService++)
+		for (size_t iNumeroService = 0; iNumeroService< vLigne->getServices().size(); iNumeroService++)
 			if (vHoraireDepartPremier[iNumeroService] < GareLigneAvecHorairesPrecedente->vHoraireDepartPremier[iNumeroService])
 				return false;
 	}
 
 	// Test de chronologie horizontale
-	for (iNumeroService = 1; iNumeroService < vLigne->NombreServices(); iNumeroService++)
+	for (size_t iNumeroService = 1; iNumeroService < vLigne->getServices().size(); iNumeroService++)
 		if (vHoraireDepartPremier[iNumeroService] < vHoraireDepartPremier[iNumeroService-1])
 			return false;
 
 	// Test d'existence des heurs
-	for (iNumeroService = 1; iNumeroService < vLigne->NombreServices(); iNumeroService++)
+	for (size_t iNumeroService = 1; iNumeroService < vLigne->getServices().size(); iNumeroService++)
 		if (!vHoraireArriveePremier[iNumeroService].OK() || !vHoraireDepartPremier[iNumeroService].OK())
 			return false;
 
@@ -212,10 +137,8 @@ bool cGareLigne::controleHoraire(const cGareLigne* GareLigneAvecHorairesPreceden
 	
   La fonction calcule les heures de d�part et d'arriv�e de chaque GareLigne en interpolant � partir des GareLigne Precedent et Suivant.
 */
-void cGareLigne::ChaineAvecHoraireSuivant(const cGareLigne& AHPrecedent, const cGareLigne& AHSuivant, size_t Position, size_t Nombre, tNumeroService NumeroServiceATraiter)
+void cGareLigne::ChaineAvecHoraireSuivant(const cGareLigne& AHPrecedent, const cGareLigne& AHSuivant, size_t Position, size_t Nombre, tIndex NumeroServiceATraiter)
 {
-	tNumeroService iService;
-
 	// Coefficient pour interpolation
 	float CoefficientPosition;
 	if (AHPrecedent.vPM == AHSuivant.vPM)
@@ -225,16 +148,14 @@ void cGareLigne::ChaineAvecHoraireSuivant(const cGareLigne& AHPrecedent, const c
 
 	// Ecriture des arr�ts
 	float DureeAAjouter;
-	if (NumeroServiceATraiter==-1)
-		iService=0;
-	else
-		iService=NumeroServiceATraiter;
 
-	for (; NumeroServiceATraiter!=-1 && iService==NumeroServiceATraiter || NumeroServiceATraiter==-1 && iService< vLigne->NombreServices(); iService++)
+	for (size_t iService = NumeroServiceATraiter==-1 ? 0 : NumeroServiceATraiter; 
+		NumeroServiceATraiter!=-1 && iService==NumeroServiceATraiter || NumeroServiceATraiter==-1 && iService< vLigne->getServices().size();
+		++iService)
 	{
 		// Calcul de l'horaire
 // MODIF HR PBCOLDBLE SOL 2		DureeAAjouter = CoefficientPosition * (AHSuivant.vHoraireArriveePremier[iService] - AHPrecedent.vHoraireDepartPremier[iService]);
-		DureeAAjouter = CoefficientPosition * (AHSuivant.vHoraireDepartPremier[iService] - AHPrecedent.vHoraireDepartPremier[iService]).Valeur();
+		DureeAAjouter = CoefficientPosition * (AHSuivant.vHoraireDepartPremier[iService] - AHPrecedent.vHoraireDepartPremier[iService]);
 
 		vHoraireDepartPremier[iService]		= 	AHPrecedent.vHoraireDepartPremier[iService];
 		vHoraireDepartPremier[iService]		+= 	tDureeEnMinutes((int) floor(DureeAAjouter));
@@ -243,7 +164,7 @@ void cGareLigne::ChaineAvecHoraireSuivant(const cGareLigne& AHPrecedent, const c
 		vHoraireDepartDernier[iService]		+= 	tDureeEnMinutes((int) floor(DureeAAjouter));
 
 // MODIF HR PBCOLDBLE SOL 2
-		DureeAAjouter = CoefficientPosition * (AHSuivant.vHoraireArriveePremier[iService] - AHPrecedent.vHoraireArriveePremier[iService]).Valeur();
+		DureeAAjouter = CoefficientPosition * (AHSuivant.vHoraireArriveePremier[iService] - AHPrecedent.vHoraireArriveePremier[iService]);
 
 		vHoraireArriveePremier[iService]	 	=	AHPrecedent.vHoraireArriveePremier[iService];
 		vHoraireArriveePremier[iService]		+= 	tDureeEnMinutes((int) ceil(DureeAAjouter));
@@ -268,18 +189,17 @@ Ecrit tous les index d'un coup (contrairement � la version 1)
 */
 void cGareLigne::EcritIndexDepart()
 {
-	tNumeroService iNumeroService;
 	tHeure iNumeroHeure;
 
 	tHeure DerniereHeure=25; // MODIF HR
-	tNumeroService NumeroServicePassantMinuit = 0; // MODIF HR
+	size_t NumeroServicePassantMinuit = 0; // MODIF HR
 
 	// RAZ
 	for (iNumeroHeure = 0; iNumeroHeure < HEURES_PAR_JOUR; iNumeroHeure++)
 		vIndexDepart[iNumeroHeure ] = -1;
 	
 	// Ecriture service par service
-	for (iNumeroService = 0; iNumeroService< vLigne->NombreServices(); iNumeroService++)
+	for (size_t iNumeroService = 0; iNumeroService< vLigne->getServices().size(); iNumeroService++)
 	{
 		if (vHoraireDepartDernier[iNumeroService].Heures() < DerniereHeure)
 			NumeroServicePassantMinuit = iNumeroService;
@@ -317,7 +237,6 @@ Ecrit tous les index d'un coup (contrairement � la version 1)
 */
 void cGareLigne::EcritIndexArrivee()
 {
-	tNumeroService iNumeroService;
 	tHeure iNumeroHeure;
 
 	// RAZ
@@ -325,9 +244,9 @@ void cGareLigne::EcritIndexArrivee()
 		vIndexArrivee[iNumeroHeure] = -1;
 
 	tHeure DerniereHeure=25;
-	tNumeroService NumeroServicePassantMinuit = vLigne->NombreServices();
+	size_t NumeroServicePassantMinuit = vLigne->getServices().size();
 	
-	for (iNumeroService = vLigne->NombreServices() - 1; iNumeroService >= 0; iNumeroService--)
+	for (size_t iNumeroService = vLigne->getServices().size() - 1; iNumeroService >= 0; iNumeroService--)
 	{
 		if (vHoraireArriveePremier[iNumeroService].Heures() > DerniereHeure)
 			NumeroServicePassantMinuit = iNumeroService;
@@ -365,19 +284,19 @@ void cGareLigne::EcritIndexArrivee()
 	\date 2003-2005
 	\author Hugues Romain
 */
-tNumeroService cGareLigne::Prochain(
+tIndex cGareLigne::Prochain(
 	cMoment &MomentDepart
 	, const cMoment& MomentDepartMax
 	, const cMoment& __MomentCalcul
-	, tNumeroService NumProchainMin
+	, tIndex NumProchainMin
 ) const {
-	tNumeroService NumProchain;
+	tIndex NumProchain;
 	
 	// Recherche de l'horaire
 	// On se positionne par rapport � un tableau d'index par heure
 	NumProchain = vIndexDepart[MomentDepart.Heures()];
 	if (NumProchain == INCONNU)
-		NumProchain = vLigne->NombreServices();
+		NumProchain = vLigne->getServices().size();
 	
 	if (NumProchainMin > NumProchain)
 		NumProchain = NumProchainMin;
@@ -387,11 +306,11 @@ tNumeroService cGareLigne::Prochain(
 		// Exploration des horaires si la ligne circule
 		if (vLigne->PeutCirculer(MomentDepart.getDate()))
 		{
-			while (NumProchain < vLigne->NombreServices()) // boucle sur les services
+			while (NumProchain < vLigne->getServices().size()) // boucle sur les services
 			{
 				// TEST 12
 				// Cas JPlus != en service continu
-				if (vLigne->EstCadence(NumProchain) && vHoraireDepartPremier[NumProchain].JPlus() != vHoraireDepartDernier[NumProchain].JPlus())
+				if (vLigne->getTrain(NumProchain)->EstCadence() && vHoraireDepartPremier[NumProchain].JPlus() != vHoraireDepartDernier[NumProchain].JPlus())
 				{
 					// Si service apres momentdepart alors modification
 					if (MomentDepart > vHoraireDepartDernier[NumProchain] && MomentDepart < vHoraireDepartPremier[NumProchain])
@@ -470,21 +389,21 @@ tNumeroService cGareLigne::Prochain(
 	\author Hugues Romain
 	\date 2003
 */
-tNumeroService cGareLigne::Prochain(
+tIndex cGareLigne::Prochain(
 	cMoment&			MomentDepart
 	, const cMoment&	MomentDepartMax
 	, tDureeEnMinutes&	AmplitudeServiceContinu
-	, tNumeroService	NumProchainMin
+	, tIndex	NumProchainMin
 	, const cMoment&	__MomentCalcul
 ) const {
 	
-	tNumeroService NumProchain = Prochain(MomentDepart, MomentDepartMax, __MomentCalcul, NumProchainMin);
+	tIndex NumProchain = Prochain(MomentDepart, MomentDepartMax, __MomentCalcul, NumProchainMin);
 	
 	// TEST 5
-	if (NumProchain != INCONNU && vLigne->EstCadence(NumProchain))
+	if (NumProchain != INCONNU && vLigne->getTrain(NumProchain)->EstCadence())
 	{
 		if (MomentDepart > vHoraireDepartDernier[NumProchain])
-			AmplitudeServiceContinu = 1440 - (MomentDepart.getHeure() - vHoraireDepartDernier[NumProchain].getHeure()).Valeur();
+			AmplitudeServiceContinu = 1440 - (MomentDepart.getHeure() - vHoraireDepartDernier[NumProchain].getHeure());
 		else
 			AmplitudeServiceContinu = vHoraireDepartDernier[NumProchain].getHeure() - MomentDepart.getHeure();
 	} // FIN TEST 5
@@ -504,9 +423,9 @@ tNumeroService cGareLigne::Prochain(
 	\retval MomentArrivee Moment pr�cis de l'arriv�e. Inutilisable si INCONNU retourn�
 	\warning La v�rification de l'utilisabilit� du service vis � vis d'un �ventuel d�lai de r�servation doit �tre ffectu�e lors de la d�termination de l'�arr�t de d�part, dont l'heure de passage fait foi pour le calcul du d�lai
 */
-tNumeroService cGareLigne::Precedent(cMoment &MomentArrivee, const cMoment& MomentArriveeMin) const
+tIndex cGareLigne::Precedent(cMoment &MomentArrivee, const cMoment& MomentArriveeMin) const
 {
-	tNumeroService NumPrecedent;
+	tIndex NumPrecedent;
 	
 	// Recherche de l'horaire
 	NumPrecedent = vIndexArrivee[MomentArrivee.Heures()];
@@ -518,7 +437,7 @@ tNumeroService cGareLigne::Precedent(cMoment &MomentArrivee, const cMoment& Mome
 			while (NumPrecedent >= 0) // boucle sur les services
 			{
 				// Cas JPlus != en service continu
-				if (vLigne->EstCadence(NumPrecedent) && vHoraireArriveePremier[NumPrecedent].JPlus() != vHoraireArriveeDernier[NumPrecedent].JPlus())
+				if (vLigne->getTrain(NumPrecedent)->EstCadence() && vHoraireArriveePremier[NumPrecedent].JPlus() != vHoraireArriveeDernier[NumPrecedent].JPlus())
 				{
 					// Si service apres momentdepart alors modification
 					if (MomentArrivee > vHoraireArriveeDernier[NumPrecedent] && MomentArrivee < vHoraireArriveePremier[NumPrecedent])
@@ -561,7 +480,7 @@ tNumeroService cGareLigne::Precedent(cMoment &MomentArrivee, const cMoment& Mome
 
 		MomentArrivee--;
 		MomentArrivee.setHeure(23,59);
-// MODIF HR FIN JOURNEE NON PRESENT		NumPrecedent = vLigne->NombreServices() - 1;
+// MODIF HR FIN JOURNEE NON PRESENT		NumPrecedent = vLigne->getServices().size() - 1;
 		NumPrecedent = vIndexArrivee[23];
 	}
 
@@ -570,18 +489,18 @@ tNumeroService cGareLigne::Precedent(cMoment &MomentArrivee, const cMoment& Mome
 
 
 
-tNumeroService cGareLigne::Precedent(
+tIndex cGareLigne::Precedent(
 	cMoment &			MomentArrivee
 	, const cMoment&	MomentArriveeMin
 	, tDureeEnMinutes&	AmplitudeServiceContinu
 ) const {
 	
-	tNumeroService NumPrecedent = Precedent(MomentArrivee, MomentArriveeMin); 
+	tIndex NumPrecedent = Precedent(MomentArrivee, MomentArriveeMin); 
 	
-	if (NumPrecedent != INCONNU && vLigne->EstCadence(NumPrecedent))
+	if (NumPrecedent != INCONNU && vLigne->getTrain(NumPrecedent)->EstCadence())
 	{
 		if (MomentArrivee > vHoraireArriveeDernier[NumPrecedent])
-			AmplitudeServiceContinu = 1440 - (MomentArrivee.getHeure() - vHoraireArriveeDernier[NumPrecedent].getHeure()).Valeur();
+			AmplitudeServiceContinu = 1440 - (MomentArrivee.getHeure() - vHoraireArriveeDernier[NumPrecedent].getHeure());
 // HR PBFREQ ESSAI1			AmplitudeServiceContinu = 1440 - (MomentArrivee.getHeure() - vHoraireArriveeDernier[NumPrecedent].getHeure()) + Attente(NumPrecedent);
 		else
 			AmplitudeServiceContinu = vHoraireArriveeDernier[NumPrecedent].getHeure() - MomentArrivee.getHeure();
@@ -654,12 +573,12 @@ tDureeEnMinutes cGareLigne::MeilleurTempsParcours(const cGareLigne& autreGL) con
 	tDureeEnMinutes curT;
 	tDureeEnMinutes bestT;
 	
-	for (tNumeroService iNumeroService=0; iNumeroService!= vLigne->NombreServices(); iNumeroService++)
+	for (size_t iNumeroService=0; iNumeroService!= vLigne->getServices().size(); iNumeroService++)
 	{
 		curT = autreGL.vHoraireArriveePremier[iNumeroService] - vHoraireDepartPremier[iNumeroService];
-		if (curT.Valeur() < 1)
+		if (curT < 1)
 			curT = 1;
-		if (bestT.Valeur() == 0 || curT < bestT)
+		if (bestT == 0 || curT < bestT)
 			bestT = curT;
 	}
 	return(bestT);
@@ -684,7 +603,7 @@ bool cGareLigne::CoherenceGeographique(const cGareLigne& AutreGareLigne) const
 		DeltaPM = (vPM - AutreGareLigne.vPM) / 1000;
 	else
 		DeltaPM = (AutreGareLigne.vPM - vPM) / 1000;
-	tDistanceKM DeltaGPS = cDistanceCarree(ArretLogique()->getPoint(), AutreGareLigne.ArretLogique()->getPoint()).Distance();
+	tDistanceKM DeltaGPS = cDistanceCarree(*((const cPoint*) ArretPhysique()->getLogicalPlace()), *((const cPoint*) AutreGareLigne.ArretPhysique()->getLogicalPlace())).Distance();
 	
 	if (DeltaPM > 10 * DeltaGPS && DeltaPM - DeltaGPS > 1)
 	{
@@ -730,21 +649,21 @@ bool cGareLigne::Circule(const cMoment& MomentDebut, const cMoment& MomentFin) c
 }
 
 
-void cGareLigne::RealloueHoraires(tNumeroService newService)
+void cGareLigne::RealloueHoraires(size_t newService)
 {
 	// SET PORTAGE LINUX
-	//_ASSERTE(vLigne->NombreServices() > 0);
+	//_ASSERTE(vLigne->getServices().size() > 0);
 	//END PORTAGE LINUX
 	
-	if (vLigne->NombreServices() == 1)
+	if (vLigne->getServices().size() == 1)
 		AlloueHoraires();
 	else
 	{
-		tNumeroService iNumeroService;
+		size_t iNumeroService;
 		cHoraire* newHoraire;
 		
-		newHoraire = new cHoraire[vLigne->NombreServices()];
-		for (iNumeroService = 0; iNumeroService < vLigne->NombreServices() - 1; iNumeroService++)
+		newHoraire = new cHoraire[vLigne->getServices().size()];
+		for (iNumeroService = 0; iNumeroService < vLigne->getServices().size() - 1; iNumeroService++)
 			if (iNumeroService >= newService)
 				newHoraire[iNumeroService + 1] = vHoraireArriveeDernier[iNumeroService];
 			else
@@ -752,8 +671,8 @@ void cGareLigne::RealloueHoraires(tNumeroService newService)
 		delete[] vHoraireArriveeDernier;
 		vHoraireArriveeDernier = newHoraire;
 		
-		newHoraire = new cHoraire[vLigne->NombreServices()];
-		for (iNumeroService = 0; iNumeroService < vLigne->NombreServices() - 1; iNumeroService++)
+		newHoraire = new cHoraire[vLigne->getServices().size()];
+		for (iNumeroService = 0; iNumeroService < vLigne->getServices().size() - 1; iNumeroService++)
 			if (iNumeroService >= newService)
 				newHoraire[iNumeroService + 1] = vHoraireArriveePremier[iNumeroService];
 			else
@@ -761,8 +680,8 @@ void cGareLigne::RealloueHoraires(tNumeroService newService)
 		delete[] vHoraireArriveePremier;
 		vHoraireArriveePremier = newHoraire;
 		
-		newHoraire = new cHoraire[vLigne->NombreServices()];
-		for (iNumeroService = 0; iNumeroService < vLigne->NombreServices() - 1; iNumeroService++)
+		newHoraire = new cHoraire[vLigne->getServices().size()];
+		for (iNumeroService = 0; iNumeroService < vLigne->getServices().size() - 1; iNumeroService++)
 			if (iNumeroService >= newService)
 				newHoraire[iNumeroService + 1] = vHoraireArriveePremierReel[iNumeroService];
 			else
@@ -770,8 +689,8 @@ void cGareLigne::RealloueHoraires(tNumeroService newService)
 		delete[] vHoraireArriveePremierReel;
 		vHoraireArriveePremierReel = newHoraire;
 
-		newHoraire = new cHoraire[vLigne->NombreServices()];
-		for (iNumeroService = 0; iNumeroService < vLigne->NombreServices() - 1; iNumeroService++)
+		newHoraire = new cHoraire[vLigne->getServices().size()];
+		for (iNumeroService = 0; iNumeroService < vLigne->getServices().size() - 1; iNumeroService++)
 			if (iNumeroService >= newService)
 				newHoraire[iNumeroService + 1] = vHoraireDepartDernier[iNumeroService];
 			else
@@ -779,8 +698,8 @@ void cGareLigne::RealloueHoraires(tNumeroService newService)
 		delete[] vHoraireDepartDernier;
 		vHoraireDepartDernier = newHoraire;
 
-		newHoraire = new cHoraire[vLigne->NombreServices()];
-		for (iNumeroService = 0; iNumeroService < vLigne->NombreServices() - 1; iNumeroService++)
+		newHoraire = new cHoraire[vLigne->getServices().size()];
+		for (iNumeroService = 0; iNumeroService < vLigne->getServices().size() - 1; iNumeroService++)
 			if (iNumeroService >= newService)
 				newHoraire[iNumeroService + 1] = vHoraireDepartPremier[iNumeroService];
 			else
@@ -788,8 +707,8 @@ void cGareLigne::RealloueHoraires(tNumeroService newService)
 		delete[] vHoraireDepartPremier;
 		vHoraireDepartPremier = newHoraire;
 
-		newHoraire = new cHoraire[vLigne->NombreServices()];
-		for (iNumeroService = 0; iNumeroService < vLigne->NombreServices() - 1; iNumeroService++)
+		newHoraire = new cHoraire[vLigne->getServices().size()];
+		for (iNumeroService = 0; iNumeroService < vLigne->getServices().size() - 1; iNumeroService++)
 			if (iNumeroService >= newService)
 				newHoraire[iNumeroService + 1] = vHoraireDepartPremierReel[iNumeroService];
 			else
@@ -800,10 +719,10 @@ void cGareLigne::RealloueHoraires(tNumeroService newService)
 }
 
 
-void cGareLigne::CalculeArrivee(const cGareLigne &GareLigneDepart, tNumeroService iNumeroService, const cMoment &MomentDepart, cMoment &MomentArrivee) const
+void cGareLigne::CalculeArrivee(const cGareLigne &GareLigneDepart, size_t iNumeroService, const cMoment &MomentDepart, cMoment &MomentArrivee) const
 {
 	// TEST 5
-	if (vLigne->EstCadence(iNumeroService))
+	if (vLigne->getTrain(iNumeroService)->EstCadence())
 	{
 		MomentArrivee = MomentDepart;
 // HR ESSAI PBFREQ2		MomentArrivee += vLigne->Attente(iNumeroService);
@@ -816,10 +735,10 @@ void cGareLigne::CalculeArrivee(const cGareLigne &GareLigneDepart, tNumeroServic
 	}
 }
 
-void cGareLigne::CalculeDepart(const cGareLigne &GareLigneArrivee, tNumeroService iNumeroService, const cMoment &MomentArrivee, cMoment &MomentDepart) const
+void cGareLigne::CalculeDepart(const cGareLigne &GareLigneArrivee, size_t iNumeroService, const cMoment &MomentArrivee, cMoment &MomentDepart) const
 {
 	// TEST 5
-	if (vLigne->EstCadence(iNumeroService))
+	if (vLigne->getTrain(iNumeroService)->EstCadence())
 	{
 		MomentDepart = MomentArrivee;
 // HR ESSAI PBFREQ2		MomentDepart -= vLigne->Attente(iNumeroService);
@@ -840,86 +759,209 @@ void cGareLigne::CalculeDepart(const cGareLigne &GareLigneArrivee, tNumeroServic
 	return(tempMoment);
 }*/
 
-/*! 	\brief Premi�re GareLigne de la ligne
-	\author Hugues Romain
-	\date 2001
-*/
-cGareLigne* cGareLigne::Origine() const
-{
-	return(vLigne->PremiereGareLigne());
-}
 
-
-/*! \brief Derniere GareLigne de la ligne.
-	\author Hugues Romain
-	\date 2001
-*/
-cGareLigne* cGareLigne::Destination() const
-{
-	return(vLigne->DerniereGareLigne());
-}
-
-void cGareLigne::setPADepartSuivant()
-{
-//	if (!vLigne->EstUneRoute())
-//	{
-		vPADepartSuivant = _physicalStop->PremiereGareLigneDep();
-		_physicalStop->setPremiereGareLigneDep(this);
-//	}
-}
-
-void cGareLigne::setPAArriveeSuivant()
-{
-//	if (!vLigne->EstUneRoute())
-//	{
-	vPAArriveeSuivante = _physicalStop->PremiereGareLigneArr();
-		_physicalStop->setPremiereGareLigneArr(this);
-//	}
-}
 
 void cGareLigne::AlloueHoraires()
 {
-	//_ASSERTE(vLigne->NombreServices() > 0);
+	//_ASSERTE(vLigne->getServices().size() > 0);
 	
-	vHoraireArriveeDernier = new cHoraire[vLigne->NombreServices()];
-	vHoraireArriveePremier = new cHoraire[vLigne->NombreServices()];
-	vHoraireArriveePremierReel = new cHoraire[vLigne->NombreServices()];
-	vHoraireDepartDernier = new cHoraire[vLigne->NombreServices()];
-	vHoraireDepartPremier = new cHoraire[vLigne->NombreServices()];
-	vHoraireDepartPremierReel = new cHoraire[vLigne->NombreServices()];
+	vHoraireArriveeDernier = new cHoraire[vLigne->getServices().size()];
+	vHoraireArriveePremier = new cHoraire[vLigne->getServices().size()];
+	vHoraireArriveePremierReel = new cHoraire[vLigne->getServices().size()];
+	vHoraireDepartDernier = new cHoraire[vLigne->getServices().size()];
+	vHoraireDepartPremier = new cHoraire[vLigne->getServices().size()];
+	vHoraireDepartPremierReel = new cHoraire[vLigne->getServices().size()];
 }
 
-const tDureeEnMinutes& cGareLigne::Attente(tNumeroService iNumeroService) const
-{
-	return(vLigne->Attente(iNumeroService));
-}
-
-const cTexte& cGareLigne::getNomArretPhysique() const
-{
-	return(vArretLogique->getArretPhysique(vVoie)->getNom());
-}
 
 void cGareLigne::setDepartPrecedent(cGareLigne *newVal)
 {
 	vDepartPrecedent = newVal;
 }
 
-const cArretPhysique* cGareLigne::getVoie() const
-{
-	return vArretLogique->getArretPhysique(vVoie);
-}
 
 void cGareLigne::setDepartCorrespondancePrecedent(cGareLigne* __GL)
 {
 	vDepartCorrespondancePrecedent = __GL;
 }
 
-void cGareLigne::setPrecedent(cGareLigne* __GL)
+
+
+/*!	\brief Recherche de liaison directe vers un groupe d'arr�ts en empruntant la ligne
+	\param __Destination Groupe d'arr�t � rejoindre
+	\return Adresse de la GareLigne permettant d'arriver au plus t�t � destination en empruntant la ligne courante, � partir de l'arr�t courant. NULL si liaison impossible selon ces conditions.
+	\author Hugues Romain
+	\date 2005
+*/
+/*const cGareLigne* cGareLigne::getLiaisonDirecteVers(const cAccesPADe* __Destination) const
 {
-	_Precedent = __GL;
+	// Initialisation � la gareligne en cours
+	const cGareLigne* __GareLigne = this; 
+	
+	while (true)
+	{
+		// Avancement de noeud en noeud si la destination est forc�ment un noeud (plus rapide), avncement d'arr�t en arr�t sinon
+		if(__Destination->TousArretsDeCorrespondance())
+			__GareLigne = __GareLigne->getArriveeCorrespondanceSuivante();
+		else
+			__GareLigne = __GareLigne->getArriveeSuivante();
+		
+		// Sortie si fin de ligne ou si arr�t reli� faisant partie de la destination
+		if (__GareLigne == NULL || __Destination->inclue(__GareLigne->ArretLogique()))
+			break;
+	}
+	
+	// Sortie
+	return __GareLigne;
+}
+*/
+
+
+/*!	\brief Recherche de liaison directe depuis un groupe d'arr�ts en empruntant la ligne
+	\param __Provenance Groupe d'arr�t depuis lequel rejoindre
+	\return Adresse de la GareLigne permettant de partir au plus tard de la provenance en empruntant la ligne courante, vers l'arr�t courant. NULL si liaison impossible selon ces conditions.
+	\author Hugues Romain
+	\date 2005
+*/
+/*const cGareLigne* cGareLigne::getLiaisonDirecteDepuis(const cAccesPADe* __Provenance) const
+{
+	// Initialisation � la gareligne en cours
+	const cGareLigne* __GareLigne = this; 
+	
+	while (true)
+	{
+		// Avancement de noeud en noeud si la destination est forc�ment un noeud (plus rapide), avncement d'arr�t en arr�t sinon
+		if(__Provenance->TousArretsDeCorrespondance())
+			__GareLigne = __GareLigne->getDepartCorrespondancePrecedent();
+		else
+			__GareLigne = __GareLigne->getDepartPrecedent();
+		
+		// Sortie si fin de ligne ou si arr�t reli� faisant partie de la destination
+		if (__GareLigne == NULL || __Provenance->inclue(__GareLigne->ArretLogique()))
+			break;
+	}
+	
+	// Sortie
+	return __GareLigne;
+}
+*/
+
+cLigne* cGareLigne::Ligne() const
+{
+	return(vLigne);
 }
 
-cGareLigne* cGareLigne::getPrecedent() const
+void cGareLigne::setTypeDA(tTypeGareLigneDA newVal)
 {
-	return _Precedent;
+	vTypeDA = newVal;
+	if (EstDepart())
+		_physicalStop->addDepartureLineStop(this);
+	if (EstArrivee())
+		_physicalStop->addArrivalLineStop(this);
 }
+
+bool cGareLigne::EstArrivee() const
+{
+	return(vTypeDA == Passage || vTypeDA == Arrivee);	
+}
+
+bool cGareLigne::EstDepart() const
+{
+	return(vTypeDA == Passage || vTypeDA == Depart);
+}
+
+
+
+cArretPhysique* cGareLigne::ArretPhysique() const
+{
+	return _physicalStop;
+}
+
+cGareLigne::tTypeGareLigneDA cGareLigne::TypeDA() const
+{
+	return(vTypeDA);
+}
+
+
+bool cGareLigne::HorairesSaisis() const
+{
+	return(vHorairesSaisis);
+}
+
+
+cGareLigne* cGareLigne::getArriveeSuivante() const
+{
+	return(vArriveeSuivante);
+}
+
+cGareLigne* cGareLigne::getArriveeCorrespondanceSuivante() const
+{
+	return(vArriveeCorrespondanceSuivante);
+}
+
+cGareLigne* cGareLigne::getDepartPrecedent() const
+{
+	return(vDepartPrecedent);
+}
+
+cGareLigne* cGareLigne::getDepartCorrespondancePrecedent() const
+{
+	return(vDepartCorrespondancePrecedent);
+}
+
+const cHoraire& cGareLigne::getHoraireDepartPremier(size_t iService) const
+{
+	//_ASSERTE(iService >= 0 && iService < vLigne->getServices().size());
+	
+	return(vHoraireDepartPremier[iService]);
+}
+
+
+const cHoraire& cGareLigne::getHoraireDepartDernier(size_t iNumeroService) const
+{
+	//_ASSERTE(iNumeroService >= 0 && iNumeroService < vLigne->getServices().size());
+	
+	return(vHoraireDepartDernier[iNumeroService]);
+}
+
+const cHoraire& cGareLigne::getHoraireArriveePremier(size_t iNumeroService) const
+{
+	//_ASSERTE(iNumeroService >= 0 && iNumeroService < vLigne->getServices().size());
+	
+	return(vHoraireArriveePremier[iNumeroService]);
+}
+
+
+const cHoraire& cGareLigne::getHoraireArriveeDernier(size_t iNumeroService) const
+{
+	//_ASSERTE(iNumeroService >= 0 && iNumeroService < vLigne->getServices().size());
+	
+	return(vHoraireArriveeDernier[iNumeroService]);
+}
+
+void cGareLigne::setArriveeSuivante(cGareLigne *newVal)
+{
+	vArriveeSuivante = newVal;
+}
+
+void cGareLigne::setArriveeCorrespondanceSuivante(cGareLigne *newVal)
+{
+	vArriveeCorrespondanceSuivante = newVal;
+}
+
+const cHoraire& cGareLigne::getHoraireDepartPremierReel(size_t iNumeroService) const
+{
+	return(vHoraireDepartPremierReel[iNumeroService]);
+}
+
+const cHoraire& cGareLigne::getHoraireArriveePremierReel(size_t iNumeroService) const
+{
+	return(vHoraireArriveePremierReel[iNumeroService]);
+}
+
+tDistanceM	cGareLigne::PM() const
+{
+	return(vPM);
+}
+	
+

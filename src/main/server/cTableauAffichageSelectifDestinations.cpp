@@ -1,4 +1,8 @@
 #include "cTableauAffichageSelectifDestinations.h"
+#include "cLigne.h"
+#include "cGareLigne.h"
+#include "cArretPhysique.h"
+#include "LogicalPlace.h"
 
 cTableauAffichageSelectifDestinations::cTableauAffichageSelectifDestinations(const cTexte& __Code)
 : cTableauAffichage(__Code)
@@ -14,12 +18,20 @@ cTableauAffichageSelectifDestinations::~cTableauAffichageSelectifDestinations(vo
 // Ajoute les terminus des lignes au d�part de l'arr�t
 bool cTableauAffichageSelectifDestinations::AjouteDestinationsDefaut(void)
 {
-	for (const cGareLigne* __GareLigne = _ArretLogique->PremiereGareLigneDep();
-		__GareLigne;
-		__GareLigne = __GareLigne->PADepartSuivant()
-	){
-		if (_ArretPhysiques.Recherche(__GareLigne->getVoie()))
-			if (!AddDestination(__GareLigne->Destination()->ArretLogique()))
+	LogicalPlace::PhysicalStopsMap physicalStops = _ArretLogique->getPhysicalStops();
+	for (LogicalPlace::PhysicalStopsMap::const_iterator liter = physicalStops.begin();
+		liter != physicalStops.end();
+		++liter)
+
+		for (cArretPhysique::LineStopVector::const_iterator piter = liter->second->departureLineStopVector().begin();
+			piter != liter->second->departureLineStopVector().end();
+			++piter)
+
+		{
+			cGareLigne* __GareLigne = *piter;
+
+		if (_ArretPhysiques.find(__GareLigne->ArretPhysique()) != _ArretPhysiques.end())
+			if (!AddDestination(__GareLigne->Ligne()->getLineStops().back()->ArretPhysique()->getLogicalPlace()))
 				return false;
 	}
 	return true;

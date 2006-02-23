@@ -7,6 +7,7 @@
 #include "cInterface.h"
 
 
+const size_t cInterface::ALL_DAY_PERIOD = 0;
 
 /*!	\brief Constructeur
 	\author Hugues Romain
@@ -87,5 +88,22 @@ bool cInterface::SetPrefixeAlerte(tIndex __Niveau, const cTexte& __Message)
 const cTexte& cInterface::getPrefixeAlerte(tIndex __Niveau) const
 {
 	return _PrefixesAlerte[__Niveau];
+}
+
+
+/*!	\brief Accesseur pointeur vers période de la journée avec contrôle
+	\param __Index Numéro de la période
+	\author Hugues Romain
+	\date 2005
+*/
+const cPeriodeJournee* cInterface::GetPeriode(size_t __Index) const
+{
+	return (__Index < _Periode.size()) ? _Periode.at(__Index) : NULL;
+}
+
+
+void cInterface::AddPeriode(cPeriodeJournee* __Element)
+{
+	_Periode.push_back(__Element);
 }
 

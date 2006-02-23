@@ -12,13 +12,11 @@
 	@author Hugues Romain
 	@date 2001-2006
 */
-cCommune::cCommune(tIndex id, const cEnvironnement& environment, std::string name)
+cCommune::cCommune(tIndex const id, std::string name)
   : cPoint()
   , _id(id)
   , _name(name)
   , _mainLogicalPlace(this)
-  , _environment (environment)
-  
 {
 	_allPlaces = NULL;
 }
@@ -38,14 +36,14 @@ cCommune::cCommune(tIndex id, const cEnvironnement& environment, std::string nam
 vector<LogicalPlace*> cCommune::searchLogicalPlaces(std::string name, size_t n) const
 {
 	// Recherche
-	vector<Interpretor::Result> matches = _logicalPlaces.search(name, n);
+	set<interpretor::Result> matches = _logicalPlaces.search(name, n);
 
 	// METTRE ICI UNE DISCUSSION SUR L'AMBIGUITE AVEC CRITERES METIER, AINSI QU'UN FILTRAGE SI LIEUX DONNANT ARRETS IDENTIQUES
 
 	// Sortie
 	vector<LogicalPlace*> result;
-	for (size_t i=0; i<matches.size(); i++)
-		result.push_back(_logicalPlaces[matches[i]]);
+//	for (size_t i=0; i<matches.size(); i++)
+//		result.push_back(_logicalPlaces[matches[i]]);
 	return result;
 }
 
@@ -54,23 +52,25 @@ vector<LogicalPlace*> cCommune::searchLogicalPlaces(std::string name, size_t n) 
 /** Ajout de lieu logique.
 	@param logicalPlace Lieu logique à ajouter
 */
-void cCommune::addLogicalPlace(const LogicalPlace* logicalPlace)
+void cCommune::addLogicalPlace(LogicalPlace* const logicalPlace)
 {
-	_logicalPlaces.Ajout(logicalPlace->getName(), logicalPlace);
+	_logicalPlaces.add(string(logicalPlace->getName().Texte()), logicalPlace, logicalPlace->getId());
 }
 
 
 /** Intégration d'un arrêt tout lieu
 	@param allPlaces Tout lieu à intégrer
 */
-void cCommune::setAtAllPlaces(const LogicalPlace* allPlaces)
+void cCommune::setAtAllPlaces(LogicalPlace* const allPlaces)
 {
 	// Liaison
 	_allPlaces = allPlaces;
 
 	// Mise à jour de tous les lieux logiques
-	for (Interpretor::Index i=0; i<_logicalPlaces.size(); i++)
-		_logicalPlaces[i]->addAliasedLogicalPlace(_allPlaces);
+	for (LogicalPlaceInterpretor::MapType::const_iterator iter = _logicalPlaces.getMap().begin();
+		iter != _logicalPlaces.getMap().end();
+		++iter)
+			iter->second->addAliasedLogicalPlace(_allPlaces);
 }
 
 
@@ -79,6 +79,19 @@ void cCommune::setAtAllPlaces(const LogicalPlace* allPlaces)
 cCommune::~cCommune()
 {
 	delete _allPlaces;
-	for (tIndex i=0; i<_logicalPlaces.size(); i++)
-		delete _logicalPlaces[i];
+	for (LogicalPlaceInterpretor::MapType::const_iterator iter = _logicalPlaces.getMap().begin();
+		iter != _logicalPlaces.getMap().end();
+		++iter)
+		delete iter->second;
+}
+
+
+const string& cCommune::getName() const
+{
+	return _name;
+}
+
+void cCommune::addToMainLogicalPlace(LogicalPlace* const logicalPlace)
+{
+	_mainLogicalPlace.addAliasedLogicalPlace(logicalPlace);
 }

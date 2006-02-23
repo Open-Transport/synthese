@@ -11,28 +11,32 @@
 #define SYNTHESE_CQUAI_H
 
 #include "NetworkAccessPoint.h"
+#include <set>
 
 class cGareLigne;
 
-/*! \brief Arr�ts physiques (quais, arr�ts de bus, etc.)
+/*! \brief Arrêts physiques (quais, arrêts de bus, etc.)
 	@ingroup m05
 */
 class cArretPhysique : public NetworkAccessPoint
 {
+public:
+	/** Vector of Line-Stops */
+	typedef set<cGareLigne*> LineStopVector;
 
 private:
 	//! @name Chainages
 	//@{
-    cGareLigne*  _firstDepartureLineStop; //!< Pointeur vers le premier départ de ligne (ordre aléatoire) \todo trier par orientation ?
-    cGareLigne*  _firstArrivalLineStop; //!< Pointeur vers la première arrivée de ligne (ordre aléatoire) \todo trier par orientation ?
+		LineStopVector	_departureLineStopVector;	//!< Vector of line-stops of the physical stop
+		LineStopVector	_arrivalLineStopVector;	//!< Vector of line-stops of the physical stop
 	//@}
 
 public:
 
 	//!	@name Accesseurs
 	//@{
-	    cGareLigne*    PremiereGareLigneArr()         const;
-	    cGareLigne*    PremiereGareLigneDep()         const;
+		const LineStopVector& departureLineStopVector() const { return _departureLineStopVector; }
+		const LineStopVector& arrivalLineStopVector() const { return _arrivalLineStopVector; }
 	//@}
 
 	//!	@name Calculateurs
@@ -43,15 +47,15 @@ public:
 
 	//! @name Modificateurs
 	//@{
-	    void setPremiereGareLigneDep(cGareLigne*);
-	    void setPremiereGareLigneArr(cGareLigne*);
+	    void addDepartureLineStop(cGareLigne* const);
+		void addArrivalLineStop(cGareLigne* const);
 	//@}
 
 
 	//!	\name Constructeur
 	//@{
-	cArretPhysique(LogicalPlace*, size_t);
-	~cArretPhysique();
+		cArretPhysique(LogicalPlace* const, size_t);
+		~cArretPhysique();
 	//@}
 };
 

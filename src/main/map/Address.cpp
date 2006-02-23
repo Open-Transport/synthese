@@ -13,6 +13,8 @@ namespace synmap
 {
 
 
+	const 	Address::AddressNumber Address::UNKNOWN_ADDRESS_NUMBER = -1;
+
 /** Constructeur.
  @param road Route sur laquelle se trouve l'adresse
  @param number Numéro d'adresse (rien = numéro inconnu)
@@ -209,7 +211,7 @@ NetworkAccessPoint::AddressList
 Address::getAddresses(bool forDeparture)
 {
   AddressList result;
-  AddressWithAccessDuration addressAndDuration = make_pair (this, cDureeEnMinutes(0));
+  AddressWithAccessDuration addressAndDuration = make_pair (this, 0);
   result.push_back(addressAndDuration);
   return result;
 }

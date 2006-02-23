@@ -8,8 +8,7 @@
 #define SYNTHESE_CPERIODEJOURNEE_H
 
 #include "Temps.h"
-#include "cTexte.h"
-
+#include <string>
 
 
 /** Période de la journée
@@ -21,19 +20,21 @@ Les objets périodes de la journée décrivent pour une interface une tranche horai
 */
 class cPeriodeJournee
 {
-	cHeure	_HeureDebut;	//!< Heure du début de la période
-	cHeure	_HeureFin;	//!< Heure de fin de la période
-	cTexte	_Libelle;		//!< Libellé de la période pour utilisation dans un formulaire par exemple
-	
+	const cHeure	_HeureDebut;	//!< Heure du début de la période
+	const cHeure	_HeureFin;	//!< Heure de fin de la période
+	const std::string	_Libelle;		//!< Libellé de la période pour utilisation dans un formulaire par exemple
+	size_t	_id;	//!< ID de la période dans l'interface
+
 public:
-	//! \name Modificateurs
+	//!	@name Modificateurs
 	//@{
-	bool SetValeurs(const cHeure& __HeureDebut, const cHeure& __HeureFin, const cTexte& __Libelle);
+//	void setId(const size_t& id) { _id = id; }
 	//@}
-	
+
 	//! \name Accesseur
 	//@{
-	const cTexte& Libelle()		const;
+	const std::string& Libelle()		const { return _Libelle; }
+//	const size_t& getId() const { return _id; }
 	//@}
 	
 	//!	\name Calculateur
@@ -43,35 +44,11 @@ public:
 	
 	//! \name Constructeur
 	//@{
-	cPeriodeJournee() {}
+	cPeriodeJournee(const std::string name, const cHeure& startTime, const cHeure& endTime) : _Libelle(name), _HeureDebut(startTime), _HeureFin(endTime) {}
 	~cPeriodeJournee() {}
 	//@}
 };
 
-
-
-/*!	\brief Modificateur complet de l'objet
-	\param __HeureDebut Heure du début de la période de la journée
-	\param __HeureFin Heure de fin de la période de la journée
-	\param __Libelle Libellé de l'objet
-	\return true si les heures de début et de fin sont valides, false sinon
-	
-La modification des valeurs ne s'effectue que si l'ensemble des données est valide (retour true)
-*/
-inline bool cPeriodeJournee::SetValeurs(const cHeure& __HeureDebut, const cHeure& __HeureFin, const cTexte& __Libelle)
-{
-	// Contrôle des entrées
-	if (	!__HeureDebut.OK() || !__HeureFin.OK())
-		return false;
-		
-	// Affectation des valeurs
-	_HeureDebut = __HeureDebut;
-	_HeureFin = __HeureFin;
-	_Libelle = __Libelle;
-	
-	// Sortie OK
-	return true;
-}
 
 
 
@@ -113,16 +90,5 @@ inline bool cPeriodeJournee::AppliquePeriode(
 	return true;
 }
 	
-
-
-/*!	\brief Accesseur libellé
-	\return Le libellé de l'objet
-	\author Hugues Romain
-	\date 2005
-*/
-inline const cTexte& cPeriodeJournee::Libelle() const
-{
-	return _Libelle;
-}
 
 #endif

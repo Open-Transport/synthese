@@ -27,8 +27,9 @@ enum tTypeTarif
 */
 class cTarif
 {
+private:
 	
-	tNumeroTarif	vIndex;		//!< Index du tarif
+	const size_t	_id;		//!< Index du tarif
 	tTypeTarif	vTypeTarif;	//!< Type de tarif
 	cTexte		vLibelle;	//!< Nom du tarif
 	
@@ -36,53 +37,21 @@ class cTarif
 public:
 	//! \name constructeur
 	//@{
-	cTarif();
+	cTarif(const size_t&);
 	//@}
 
 	//! \name Modificateurs
 	//@{
 	void setTypeTarif(const tTypeTarif newVal);
 	void setLibelle(const cTexte& libelle);
-	void setNumeroTarif(const tNumeroTarif newVal);
 	//@}
 	
 	//! \name Accesseurs
 	//@{
 	tTypeTarif 	getTypeTarif()		const;
 	const cTexte&	getLibelle()		const;
-	tNumeroTarif	getNumeroTarif()	const;
+	size_t	getNumeroTarif()	const;
 	//@}
 };
-
-inline void cTarif::setTypeTarif(const tTypeTarif newVal)
-{
-	vTypeTarif = newVal;
-}
-
-inline tTypeTarif cTarif::getTypeTarif() const
-{
-	return(vTypeTarif);
-}
-
-inline void cTarif::setNumeroTarif(const tNumeroTarif newVal)
-{
-	vIndex = newVal;
-}
-
-inline void cTarif::setLibelle(const cTexte& libelle)
-{
-	vLibelle.Vide();
-	vLibelle << libelle;
-}
-
-inline const cTexte& cTarif::getLibelle() const
-{
-	return (vLibelle);
-}
-
-inline tNumeroTarif cTarif::getNumeroTarif() const
-{
-	return(vIndex);
-}
 
 #endif

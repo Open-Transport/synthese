@@ -1,5 +1,5 @@
 #include "cTrajets.h"
-
+#include "cMateriel.h"
 
 
 
@@ -326,17 +326,15 @@ src="interface.doxygen_fichiers/image030.gif"></span></span></p>
 void cTrajets::GenererListeOrdonneePointsArrets()
 {
 	// Variables locales
-	int i;
-	int dernieri;
+	size_t i;
+	size_t dernieri;
 
 	// Allocation
-	_LigneVerrouillee.Vide();
-	_ListeOrdonneePointsArret.Vide();
-	_LigneVerrouillee.AlloueSiBesoin(NMAXGARESFICHEHORAIRE);
-	_ListeOrdonneePointsArret.AlloueSiBesoin(NMAXGARESFICHEHORAIRE);
-
+	_LigneVerrouillee.clear();
+	_ListeOrdonneePointsArret.clear();
+	
 	// Boucle horizontale
-	for (int __Col=0; __Col< Taille(); __Col++)
+	for (size_t __Col=0; __Col< Taille(); __Col++)
 	{
 		i = 0;
 		dernieri = -1;
@@ -345,20 +343,20 @@ void cTrajets::GenererListeOrdonneePointsArrets()
 		for(cElementTrajet* curET = _Element[__Col].getPremierElement(); curET != NULL; curET = curET->getSuivant())
 		{
 			// Recherche de la gare � partir de la gare pr�c�dente
-			if (OrdrePARechercheGare(i, curET->getGareDepart()))
+			if (OrdrePARechercheGare(i, curET->getOrigin()->getLogicalPlace()))
 			{
 				if (i<dernieri)
 					i = OrdrePAEchangeSiPossible(dernieri, i);
 			}
 			else
-				i = OrdrePAInsere(curET->getGareDepart(), dernieri+1);
+				i = OrdrePAInsere(curET->getOrigin()->getLogicalPlace(), dernieri+1);
 			dernieri = i;
 			i++;
 
 			// Controle gare suivante pour trajet � pied
-			if (curET->getLigne()->Materiel()->Code() == MATERIELPied && _ListeOrdonneePointsArret[i] != curET->getGareArrivee() && curET->Suivant() != NULL)
+			if (curET->getLigne()->Materiel()->Code() == MATERIELPied && _ListeOrdonneePointsArret[i] != curET->getDestination()->getLogicalPlace() && curET->getSuivant() != NULL)
 			{
-				if (OrdrePARechercheGare(i, curET->getGareArrivee()))
+				if (OrdrePARechercheGare(i, curET->getDestination()->getLogicalPlace()))
 				{
 					OrdrePAEchangeSiPossible(dernieri, i);
 					i = dernieri + 1;
@@ -366,16 +364,16 @@ void cTrajets::GenererListeOrdonneePointsArrets()
 				else
 				{
 					i = dernieri + 1;
-					OrdrePAInsere(curET->getGareArrivee(), i);
+					OrdrePAInsere(curET->getDestination()->getLogicalPlace(), i);
 				}
-				_LigneVerrouillee.SetElement(true, i);
+				_LigneVerrouillee.insert(_LigneVerrouillee.begin()+ i, true);
 			}
 		}
 	}
 
 	// Ajout de la destination finale en fin de tableau
 	if (Taille())
-		_ListeOrdonneePointsArret.SetElement(operator[](0).getArretLogiqueArrivee());
+		_ListeOrdonneePointsArret.push_back(operator[](0).getDestination()->getLogicalPlace());
 }
 
 
@@ -385,10 +383,10 @@ void cTrajets::OrdrePAConstruitLignesAPermuter(const cTrajet& __TrajetATester, b
 {
 	const cElementTrajet* curET = __TrajetATester.PremierElement();
 	for (int i = 0; _ListeOrdonneePointsArret[i] != NULL && i<= LigneMax; i++)
-		if (curET != NULL && _ListeOrdonneePointsArret[i] == curET->getGareDepart())
+		if (curET != NULL && _ListeOrdonneePointsArret[i] == curET->getOrigin()->getLogicalPlace())
 		{
 			Resultat[i]=true;
-			curET = curET->Suivant();
+			curET = curET->getSuivant();
 		}
 		else
 			Resultat[i]=false;
@@ -396,14 +394,14 @@ void cTrajets::OrdrePAConstruitLignesAPermuter(const cTrajet& __TrajetATester, b
 
 
 //! \todo A revoir
-int cTrajets::OrdrePAEchangeSiPossible(int PositionActuelle, int PositionGareSouhaitee)
+size_t cTrajets::OrdrePAEchangeSiPossible(size_t PositionActuelle, size_t PositionGareSouhaitee)
 {
 	bool* LignesAPermuter = (bool*) calloc(PositionActuelle+1,sizeof(bool));
 	bool* curLignesET = (bool*) malloc((PositionActuelle+1)*sizeof(bool));
 	bool Echangeable = true;
-	const LogicalPlace* tempGare;
-	int i;
-	int j;
+	LogicalPlace* tempGare;
+	size_t i;
+	size_t j;
 	
 	// Construction de l'ensemble des lignes a permuter
 	LignesAPermuter[PositionActuelle]=true;
@@ -420,7 +418,7 @@ int cTrajets::OrdrePAEchangeSiPossible(int PositionActuelle, int PositionGareSou
 
 	// Tests d'�changeabilit� binaire
 	// A la premiere contradiction on s'arrete
-	for (int __i=0; __i<Taille(); __i++)
+	for (size_t __i=0; __i<Taille(); __i++)
 	{
 		OrdrePAConstruitLignesAPermuter(getElement(__i), curLignesET, PositionActuelle);
 		i = PositionGareSouhaitee;
@@ -458,8 +456,8 @@ int cTrajets::OrdrePAEchangeSiPossible(int PositionActuelle, int PositionGareSou
 
 			tempGare = _ListeOrdonneePointsArret[i];
 			for (; i>PositionGareSouhaitee+j; i--)
-				_ListeOrdonneePointsArret.CopieElement(i-1, i);
-			_ListeOrdonneePointsArret.SetElement(tempGare, i);
+				_ListeOrdonneePointsArret[i-1] = _ListeOrdonneePointsArret[i];
+			_ListeOrdonneePointsArret[i] = tempGare;
 		}
 		return PositionGareSouhaitee+j;
 	}
@@ -475,17 +473,17 @@ int cTrajets::OrdrePAEchangeSiPossible(int PositionActuelle, int PositionGareSou
 
 	L'insertion d�cale les arr�ts suivants une ligne plus bas. Si un trajet pi�ton (repr�sent� par deux fl�ches devant �tre attenantes) se trouve � la position demand�e, alors l'arr�t est plac� en suivant pour ne pas rompre le cheminement pi�ton.
 */
-int cTrajets::OrdrePAInsere(const LogicalPlace* ArretLogique, tIndex Position)
+size_t cTrajets::OrdrePAInsere(LogicalPlace* const ArretLogique, size_t Position)
 {
 	// Saut de ligne v�rouill�e par un cheminement pi�ton
-	for (; _LigneVerrouillee.IndexValide(Position) && _LigneVerrouillee[Position]; Position++);
+	for (; Position<_LigneVerrouillee.size() && _LigneVerrouillee[Position]; Position++);
 
 	// D�calage des arr�ts suivants
-	for (int i=_ListeOrdonneePointsArret.Taille(); i>Position; i--)
-		_ListeOrdonneePointsArret.CopieElement(i-1, i);
+	for (size_t i=_ListeOrdonneePointsArret.size(); i>Position; i--)
+		_ListeOrdonneePointsArret[i-1] = _ListeOrdonneePointsArret[i];
 
 	// Stockage de l'arr�t demand�
-	_ListeOrdonneePointsArret.SetElement(ArretLogique, Position);
+	_ListeOrdonneePointsArret[Position] = ArretLogique;
 	
 	// Retour de la position choisie
 	return Position;
@@ -495,19 +493,19 @@ int cTrajets::OrdrePAInsere(const LogicalPlace* ArretLogique, tIndex Position)
 
 /*!	\brief Recherche de point d'arr�t dans la liste des points d'arr�t
 */
-bool cTrajets::OrdrePARechercheGare(int& i, const LogicalPlace* GareAChercher)
+bool cTrajets::OrdrePARechercheGare(size_t& i, LogicalPlace* const GareAChercher)
 {
 	// Recherche de la gare en suivant � partir de la position i
-	for (; _ListeOrdonneePointsArret.IndexValide(i) && _ListeOrdonneePointsArret[i] != NULL && _ListeOrdonneePointsArret[i] != GareAChercher; i++);
+	for (; i<_ListeOrdonneePointsArret.size() && _ListeOrdonneePointsArret[i] != NULL && _ListeOrdonneePointsArret[i] != GareAChercher; ++i);
 
 	// Gare trouv�e en suivant avant la fin du tableau
-	if (_ListeOrdonneePointsArret.IndexValide(i) && _ListeOrdonneePointsArret[i] != NULL)
+	if (i < _ListeOrdonneePointsArret.size() && _ListeOrdonneePointsArret[i] != NULL)
 		return true;
 
 	// Recherche de position ant�rieure � i
-	for (i = 0; _ListeOrdonneePointsArret.IndexValide(i) && _ListeOrdonneePointsArret[i] != NULL && _ListeOrdonneePointsArret[i] != GareAChercher; i++);
+	for (i = 0; i < _ListeOrdonneePointsArret.size() && _ListeOrdonneePointsArret[i] != NULL && _ListeOrdonneePointsArret[i] != GareAChercher; ++i);
 
-	return _ListeOrdonneePointsArret.IndexValide(i) && _ListeOrdonneePointsArret[i] != NULL;
+	return i <_ListeOrdonneePointsArret.size() && _ListeOrdonneePointsArret[i] != NULL;
 }
 
 
@@ -554,12 +552,12 @@ const cTexte& cTrajets::getAuMoinsUneAlerte() const
 	return _AuMoinsUneAlerte;
 }
 
-int cTrajets::TailleListeOrdonneePointsArret() const
+size_t cTrajets::TailleListeOrdonneePointsArret() const
 {
-	return _ListeOrdonneePointsArret.Taille();
+	return _ListeOrdonneePointsArret.size();
 }
 
-const LogicalPlace* cTrajets::getListeOrdonneePointsArret(tIndex __i) const
+LogicalPlace* cTrajets::getListeOrdonneePointsArret(tIndex __i) const
 {
 	return _ListeOrdonneePointsArret[__i];
 }

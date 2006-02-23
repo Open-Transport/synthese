@@ -10,9 +10,20 @@
 #include <string.h>
 #include "cFichierXML.h"
 #include "cCommune.h"
+#include "cIndicateurs.h"
+#include "cAxe.h"
+#include "cLigne.h"
+#include "cPhoto.h"
+#include "cArretPhysique.h"
+#include "cReseau.h"
+#include "cHandicape.h"
+#include "cVelo.h"
+#include "cTarif.h"
 
 #include <iostream>
 
+using namespace std;
+using namespace synmap;
 
 
 #ifdef UNIX
@@ -31,9 +42,11 @@ Les objets environnement sont initialis�s par les valeurs par d�faut suivant
 
 Les �l�ments suivants sont d'ores et d�j� initialis�s :
  - Cr�ation d'espaces de calcul pour threads.
+
+ @todo Generer une exception si fichier pas ouvert (remplacer les envOk = false)
 */
-cEnvironnement::cEnvironnement(int __NombreCalculateurs, string directory, string pathToFormat, size_t id)
-: Code(code)
+cEnvironnement::cEnvironnement(string directory, string pathToFormat, size_t id)
+: Code(id)
 , _path(directory)
 {
 	// Plage de date de taille nulle
@@ -63,7 +76,6 @@ cEnvironnement::cEnvironnement(int __NombreCalculateurs, string directory, strin
 	if (!__FichierPA.Charge(this))
 	{
 		envOk=false;
-		return false;
 	}
 
 	// Chargement fichier mat�riel
@@ -72,7 +84,6 @@ cEnvironnement::cEnvironnement(int __NombreCalculateurs, string directory, strin
 	if (!_FormatMateriel || !ChargeFichierMateriel())
 	{
 		envOk=false;
-		return false;
 	} 
 
 	// Chargement fichier des jours de circulation
@@ -82,7 +93,6 @@ cEnvironnement::cEnvironnement(int __NombreCalculateurs, string directory, strin
 	if (!__FichierJC.Charge(this))
 	{
 		envOk=false;
-		return false;
 	}
 
 	// Chargement fichier des modalit�s de r�servation
@@ -91,7 +101,6 @@ cEnvironnement::cEnvironnement(int __NombreCalculateurs, string directory, strin
 	if (!_FormatResa || !ChargeFichierResa())
 	{
 		envOk=false;
-		return false;
 	}
 
 	// Chargement fichier des prises en charges des v�los
@@ -100,7 +109,6 @@ cEnvironnement::cEnvironnement(int __NombreCalculateurs, string directory, strin
 	if (!_FormatVelo || !ChargeFichierVelo())
 	{
 		envOk=false;
-		return false;
 	}
 
 	// Chargement fichier des prises en charges des personnes handicap�es
@@ -109,7 +117,6 @@ cEnvironnement::cEnvironnement(int __NombreCalculateurs, string directory, strin
 	if (!_FormatHandicape || !ChargeFichierHandicape())
 	{
 		envOk=false;
-		return false;
 	}
 
 	// Chargement fichier des tarifications
@@ -118,7 +125,6 @@ cEnvironnement::cEnvironnement(int __NombreCalculateurs, string directory, strin
 	if (!_FormatTarif || !ChargeFichierTarif())
 	{
 		envOk=false;
-		return false;
 	}
 
 
@@ -128,27 +134,20 @@ cEnvironnement::cEnvironnement(int __NombreCalculateurs, string directory, strin
 	if (!_FormatReseaux	|| !ChargeFichierReseaux())
 	{
 		envOk=false;
-		return false;
 	}
 
 	// Chargement fichier des horaires
-	vPremiereLigne = NULL;
 	_FormatHoraire = new cFormatFichier(__CheminFormats, HORAIRESFORMAT, HORAIRESFORMATLIGNENombreFormats, HORAIRESFORMATCOLONNENombreFormats);
 	if (!_FormatHoraire	|| !ChargeFichierHoraires(__Chemin))
 	{
 		envOk=false;
-		return false;
 	}
-
-	RemplitProchainAxe();
-	RemplitCIL();
 
 	// Chargement format Indicateurs
 	_FormatIndicateurs = new cFormatFichier(__CheminFormats, INDICATEURSFORMAT, INDICATEURSFORMATLIGNENombreFormats, INDICATEURSFORMATCOLONNENombreFormats);
 	if (!_FormatIndicateurs)
 	{
 		envOk = false;
-		return false;
 	}
 	
 	// Chargement des donnees carto
@@ -157,29 +156,6 @@ cEnvironnement::cEnvironnement(int __NombreCalculateurs, string directory, strin
     
 	ChargeFichiersRoutes();
 	
-    
-	// Mise � disposition des calculateurs
-	for (int __i = 0; __i < __NombreCalculateurs; __i++)
-		_Calculateur[__i] = new cCalculateur(this);
-
-}
-
-
-
-/*!	\brief D�signation d'un espace de calcul libre d'utilisation pour un thread
-	\return Pointeur vers l'espace de calcul d�sign�, NULL si aucun disponible
-	\author Hugues Romain
-	\date 2005
-*/
-cCalculateur* cEnvironnement::CalculateurLibre()
-{
-	// Parcours de la liste des espaces de calcul de l'environnement
-	for (tIndex __Index = 0; __Index < _NombreCalculateurs; __Index++)
-		if (_Calculateur[__Index].Prend())
-			return &_Calculateur[__Index];
-	
-	// Retour echec
-	return NULL;
 }
 
 
@@ -190,8 +166,6 @@ cCalculateur* cEnvironnement::CalculateurLibre()
 */
 cEnvironnement::~cEnvironnement()
 {
-	delete[] _Calculateur;
-
 	for(std::vector<cModaliteReservation*>::iterator iter = vResa.begin(); 
 		iter != vResa.end(); ++iter) {
 	  if (*iter == 0) continue;
@@ -220,10 +194,9 @@ cEnvironnement::~cEnvironnement()
 	}
 	vHandicape.clear();
 	
-	for(std::vector<cTarif*>::iterator iter = vTarif.begin(); 
+	for(FaresMap::const_iterator iter = vTarif.begin(); 
 		iter != vTarif.end(); ++iter) {
-	  if (*iter == 0) continue;
-	  delete (*iter);
+			delete iter->second;
 	}
 	vTarif.clear();
 	
@@ -233,9 +206,7 @@ cEnvironnement::~cEnvironnement()
 	  delete (*iter);
 	}
 	vMateriel.clear();
-	
-	free(vIndicateurs);
-	free(vPremiereLigne);
+
 }
 
 
@@ -250,14 +221,14 @@ cEnvironnement::~cEnvironnement()
 vector<cCommune*> cEnvironnement::searchTown(const std::string& name, size_t n) const
 {
 	// Recherche
-	vector<Interpretor::Result> matches = _towns.search(name, n);
+	set<interpretor::Result> matches = _towns.search(name, n);
 
 	// METTRE ICI UNE DISCUSSION SUR L'AMBIGUITE AVEC CRITERES METIER
 
 	// Sortie
 	vector<cCommune*> result;
-	for (size_t i=0; i<matches.size(); i++)
-		result.push_back(getCommune(matches[i]));
+//	for (size_t i=0; i<matches.size(); i++)
+//		result.push_back(getTown(matches[i]));
 	return result;
 }
 
@@ -269,7 +240,7 @@ vector<cCommune*> cEnvironnement::searchTown(const std::string& name, size_t n) 
 	\author Hugues Romain
 	\date 2001-2006
 */
-cCommune* cEnvironnement::GetCommuneAvecCreation(const std::string& name)
+/*cCommune* cEnvironnement::GetCommuneAvecCreation(const std::string& name)
 {
 	for (Interpretor::Index i=0; i<_towns.size(); i++)
 		if (getCommune(i)->getName() == name)
@@ -277,7 +248,7 @@ cCommune* cEnvironnement::GetCommuneAvecCreation(const std::string& name)
 
 	return addTown(new cCommune(INCONNU, name));
 }
-
+*/
 
 
 /*!	\brief Accesseur point d'arr�t, avec cr�ation de point d'arr�t si index non existant
@@ -285,7 +256,7 @@ cCommune* cEnvironnement::GetCommuneAvecCreation(const std::string& name)
 	\param __Index Num�ro de point d'arr�t
 	\return Pointeur sur l'objet trouv� ou cr��
 */
-LogicalPlace* cEnvironnement::GetGareAvecCreation(tNiveauCorrespondance __NiveauCorrespondance, tIndex __Index)
+/*LogicalPlace* cEnvironnement::GetGareAvecCreation(tNiveauCorrespondance __NiveauCorrespondance, tIndex __Index)
 {
 	// Recherche arr�t existant
 	if (__Index != INCONNU || !GetArretLogique(__Index))
@@ -299,7 +270,7 @@ LogicalPlace* cEnvironnement::GetGareAvecCreation(tNiveauCorrespondance __Niveau
 
 	return getArretLogique(__Index);
 }
-
+*/
 
 
 
@@ -402,7 +373,6 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 	tDistanceHM		Distance;
 	int				TailleTotalePileGLSansHoraire;
 	bool				DernierPAHorairesSaisis=false;
-	tNumeroService		iService; //, NombreServices;
 	cHoraire			HeureDernier;
 	cHoraire			HeurePremier;
 	cFormatFichier&	vFormatHoraire = *_FormatHoraire;
@@ -592,61 +562,45 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 					break;
 
 				case HORAIRESFORMATLIGNEJoursCirculationServices:
-					for (iService=0; iService!=curLigne->NombreServices(vFormatHoraire.Longueur(Tampon, HORAIRESFORMATCOLONNEHoraire)); iService++)
-						curLigne->setJC(iService, GetJC(vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire, iService)));
+					for (size_t iService=0; iService<vFormatHoraire.Longueur(Tampon, HORAIRESFORMATCOLONNEHoraire); iService++)
+					{
+						cTrain* service = new cTrain(curLigne);
+						curLigne->addService(service);
+						service->setJC(GetJC(vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire, iService)));
+					}
 					break;
 
 				case HORAIRESFORMATLIGNEAttente:
-					for (iService=0; iService!=curLigne->NombreServices(); iService++)
-						curLigne->setAttente(iService, tDureeEnMinutes(vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire, iService)));
+					for (size_t i=0; i<curLigne->getServices().size(); ++i)
+						curLigne->getTrain(i)->setAttente(tDureeEnMinutes(vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire, i)));
 					break;
 
 				case HORAIRESFORMATLIGNEFin:
-					for (iService=0; iService!=curLigne->NombreServices(vFormatHoraire.Longueur(Tampon, HORAIRESFORMATCOLONNEHoraire)); iService++)
+					for (iService=0; iService<curLigne->getServices().size(); ++iService)
 						if (vFormatHoraire.GetColonnePosition(HORAIRESFORMATCOLONNEHoraire, iService) < Tampon.Taille() && Tampon[vFormatHoraire.GetColonnePosition(HORAIRESFORMATCOLONNEHoraire, iService)]!=' ')
 						{
 							HeureDernier = vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNEHoraire, iService);
-							curLigne->setServiceContinu(iService);
+							curLigne->getTrain(iService)->setServiceContinu();
 						}
 					break;
 
 				case HORAIRESFORMATLIGNENumero:
-					for (iService=0; iService!=curLigne->NombreServices(); iService++)
-						curLigne->setNumeroService(iService, vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNEHoraire, iService));
-					break;
-
-				case HORAIRESFORMATLIGNECodeImportationSource:
-#ifdef ClasseAdmin
-					curLigne->setImportSource(vImportation[vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire)]);
-#endif
-					break;
-
-				case HORAIRESFORMATLIGNECodeBaseTrains:
-#ifdef ClasseAdmin
-					for (iService=0; iService!=curLigne->NombreServices(); iService++)
-						curLigne->Train(iService).setCodeBaseTrains(vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire, iService));
-#endif
-					break;
-
-				case HORAIRESFORMATLIGNEDepot:
-#ifdef ClasseAdmin
-					curLigne->setDepot(GetArretLogique(vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire)));
-#endif
+					for (iService=0; iService!=curLigne->getServices().size(); iService++)
+						curLigne->getTrain(i)->setNumero(vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNEHoraire, iService));
 					break;
 
 				// Enregistrement des horaires g�r� par des piles.
 				// En plusieurs parties
 				case HORAIRESFORMATLIGNEHoraires:
 					// Partie 1 - Enregistrement de la gareligne et cr�ation des sp�cificit�s
-					if (lastGareLigne != NULL && NumeroArretLogiquePrecedent == vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEArretLogique) && lastGareLigne->TypeDA() == Arrivee && (tTypeGareLigneDA) vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNETypeArretLogique)[0] == Depart)
+					if (lastGareLigne != NULL && NumeroArretLogiquePrecedent == vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEArretLogique) && lastGareLigne->TypeDA() == cGareLigne::Arrivee && (cGareLigne::tTypeGareLigneDA) vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNETypeArretLogique)[0] == cGareLigne::Depart)
 					{
-						curGareLigne->setTypeDA(Passage);
-						curGareLigne->setPADepartSuivant();
+						curGareLigne->setTypeDA(cGareLigne::Passage);
 						DeuxiemePassage = true;
 					}
 					else
 					{
-						curArretLogique = GetArretLogique(vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEArretLogique));
+						curArretLogique = getLogicalPlace(vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEArretLogique));
 
 						// Err 002: Test existence du point d'arret
 						if (curArretLogique == NULL)
@@ -658,7 +612,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 						curNumeroVoie = (tIndex) vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEArretPhysique);
 
 						// Err 005: Test existence du quai
-						if (curArretLogique->GetArretPhysique(curNumeroVoie) == NULL)
+						if (curArretLogique->getNetworkAccessPoint(curNumeroVoie) == NULL)
 						{
 
 // 							Erreur("ArretPhysique inexistant dans le point d'arr�t", "", Tampon, "03005");
@@ -667,21 +621,21 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 						}
 
 						// Allocation
-						curGareLigne = curLigne->addGareLigne(NULL,
-							(tDistanceHM) vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEPointHectometrique),
-							curNumeroVoie,
-							(tTypeGareLigneDA) vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNETypeArretLogique)[0],
-							curArretLogique,
-							Tampon.Taille() >= vFormatHoraire.GetColonnePosition(HORAIRESFORMATCOLONNEHoraire) + vFormatHoraire.GetColonneLargeur(HORAIRESFORMATCOLONNEHoraire) * curLigne->NombreServices() - 1,
-							false
+						curGareLigne = new cGareLigne(
+							curLigne
+							, (tDistanceHM) vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEPointHectometrique)
+							, (cGareLigne::tTypeGareLigneDA) vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNETypeArretLogique)[0]
+							, (cArretPhysique*) curArretLogique->getNetworkAccessPoint(curNumeroVoie)
+								, Tampon.Taille() >= vFormatHoraire.GetColonnePosition(HORAIRESFORMATCOLONNEHoraire) + vFormatHoraire.GetColonneLargeur(HORAIRESFORMATCOLONNEHoraire) * curLigne->getServices().size() - 1
 						);
+							curLigne->addGareLigne(curGareLigne);
 						DeuxiemePassage = false;
 
 						// Err 001: Controle de croissance des PH
 						switch (PHCroissants)
 						{
 						case Indifferent:
-							if (curLigne->PremiereGareLigne() != curGareLigne)
+							if (curLigne->getLineStops().front() != curGareLigne)
 							{
 								if (curGareLigne->PM() > lastGareLigne->PM())
 									PHCroissants = Vrai;
@@ -712,12 +666,12 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 
 
 					// Service continu
-					if (curLigne->PremiereGareLigne() == curGareLigne)
-						for (iService = 0; iService != curLigne->NombreServices(); iService++)
-							if (curLigne->EstCadence(iService))
+					if (curLigne->getLineStops().front() == curGareLigne)
+						for (iService = 0; iService != curLigne->getServices().size(); iService++)
+							if (curLigne->getTrain(iService)->EstCadence())
 							{
 								HeurePremier = vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNEHoraire, iService);
-								curLigne->setAmplitudeServiceContinu(iService, HeureDernier - HeurePremier);
+								curLigne->getTrain(iService)->setAmplitudeServiceContinu(HeureDernier - HeurePremier);
 							}
 
 					// Partie 2: Horaires Avec ou sans horaires
@@ -735,16 +689,16 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 
 						// Controle de vitesse
 						if (DerniereGLAvecHoraires != NULL)
-							for (iService=0; iService!=curLigne->NombreServices(); iService++)
+							for (iService=0; iService!=curLigne->getServices().size(); iService++)
 							{
 								if (curGareLigne->PM() > DerniereGLAvecHoraires->PM())
 									Distance = curGareLigne->PM() - DerniereGLAvecHoraires->PM();
 								else
 									Distance = DerniereGLAvecHoraires->PM() - curGareLigne->PM();
 
-								if ((curGareLigne->getHoraireArriveePremier(iService) - DerniereGLAvecHoraires->getHoraireDepartPremier(iService)).Valeur() != 0)
+								if ((curGareLigne->getHoraireArriveePremier(iService) - DerniereGLAvecHoraires->getHoraireDepartPremier(iService)) != 0)
 								{
-									Vitesse = Distance / (curGareLigne->getHoraireArriveePremier(iService) - DerniereGLAvecHoraires->getHoraireDepartPremier(iService)).Valeur();
+									Vitesse = Distance / (curGareLigne->getHoraireArriveePremier(iService) - DerniereGLAvecHoraires->getHoraireDepartPremier(iService));
 									Vitesse *= 6;
 									if (Vitesse > curGareLigne->Ligne()->Materiel()->VitesseMoyenneMax())
 									{
@@ -784,8 +738,10 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 					// Controle d'erreur: ne doit pas terminer sans horaires, stockage pour controle en fin de ligne
 					DernierPAHorairesSaisis = curGareLigne->HorairesSaisis();
 					
-					NumeroArretLogiquePrecedent = curGareLigne->ArretLogique()->Index();
+					NumeroArretLogiquePrecedent = curGareLigne->ArretPhysique()->getLogicalPlace()->getId();
 					lastGareLigne = curGareLigne;
+
+					curLigne->MajCirculation();	//! @todo Optimiser
 					break;
 
 				case -TYPEVide:
@@ -832,55 +788,6 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 	return true;
 //	vFichierLOG << nLignes << "L " << (short int) nTrains << " T\n";
 }
-
-
-
-
-
-
-
-void cEnvironnement::RemplitProchainAxe()
-{
-	cGareLigne* GLAModifier;
-	cGareLigne* GLTest;
-
-	for (tIndex iNumeroArretLogique = 0; iNumeroArretLogique < NombrePointsArret(); iNumeroArretLogique++)
-		if (getArretLogique(iNumeroArretLogique) != NULL)
-		{
-			// Departs
-			for (GLAModifier = getArretLogique(iNumeroArretLogique)->PremiereGareLigneDep(); GLAModifier!=NULL; )
-			{
-				for (GLTest = GLAModifier->PADepartSuivant(); GLTest != NULL && (GLTest->Ligne()->Axe() == GLAModifier->Ligne()->Axe() || !GLTest->Ligne()->Axe()->Autorise()); GLTest = GLTest->PADepartSuivant())
-				{ }
-				for (; GLAModifier != GLTest; GLAModifier = GLAModifier->PADepartSuivant())
-					GLAModifier->setPADepartAxeSuivant(GLTest);
-			}
-
-			// Arrivees
-			for (GLAModifier = getArretLogique(iNumeroArretLogique)->PremiereGareLigneArr(); GLAModifier!=NULL; )
-			{
-				for (GLTest = GLAModifier->PAArriveeSuivante(); GLTest!=NULL && (GLTest->Ligne()->Axe() == GLAModifier->Ligne()->Axe() || !GLTest->Ligne()->Axe()->Autorise()); GLTest = GLTest->PAArriveeSuivante())
-				{ }
-				for (; GLAModifier != GLTest; GLAModifier = GLAModifier->PAArriveeSuivante())
-					GLAModifier->setPAArriveeAxeSuivant(GLTest);
-			}
-
-}
-
-}
-
-
-
-
-void cEnvironnement::RemplitCIL()
-{
-	for (cLigne* curLigne = vPremiereLigne; curLigne!=NULL; curLigne=curLigne->Suivant())
-		curLigne->MajCirculation();
-}
-
-
-
-
 
 
 
@@ -1227,7 +1134,6 @@ bool cEnvironnement::ChargeFichierHandicape()
 bool cEnvironnement::ChargeFichierTarif()
 {
 	// Variables
-	tNumeroTarif NombreTarifReel = 0;
 	bool PasTermineSousSection = true;
 	bool PasTermineElement=false;
 	cFormatFichier& vFormatTarif = *_FormatTarif;
@@ -1248,35 +1154,16 @@ bool cEnvironnement::ChargeFichierTarif()
 		return false;
 	}
 
-	// Nombre d'�l�ments
-	Tampon.LireLigne(Fichier);
-	if (Tampon.Compare("Nombre=", 6))
-	{
-		vNombreTarif = (tNumeroTarif) Tampon.GetNombre(0, 7);
-		for (unsigned int i=0; i<vNombreTarif; ++i) vTarif.push_back (0); //dirty hack
-	}
-	else
-	{
-// 		vFichierLOG << "*** ERREUR Nombre de type de tarifications non document�, chargement interrompu.\n\n";
-		return(false);
-	}
-
 	// Boucle sur les Sous Sections
 	while (PasTermineSousSection)
 	{
 		if (Tampon.ProchaineSection(Fichier, TYPESousSection))
 		{
-			curTarif = new cTarif;
-			if (Enregistre(curTarif, Tampon.GetNombre(0, 1)) != INCONNU)
+			curTarif = new cTarif(Tampon.GetNombre(0, 1));
+			if (!Enregistre(curTarif))
 			{
-// 				vFichierLOG << "Ajout de tarif " << Tampon.GetNombre(0, 1) << "\n";
-				NombreTarifReel++;
+				// METTRE UN WARNING SUR LE DOUBLON DE NUMERO
 				PasTermineElement = true;
-			}
-			else
-			{
-				delete curTarif;
-// 				Erreur("Num�ro de modalit� de tarification trop grand", "", Tampon, "07002");
 			}
 		}
 		else
@@ -1637,7 +1524,7 @@ bool cEnvironnement::ChargeFichierPhotos()
 		if (Tampon.ProchaineSection(Fichier, TYPESousSection))
 		{
 			curPhoto = new cPhoto((tIndex) Tampon.GetNombre(0, 1));
-			_Documents.SetElement(curPhoto, curPhoto->Index());
+			_Documents[curPhoto->Index()] = curPhoto;
 			PasTermineElement = true;
 		}
 		else
@@ -1760,23 +1647,20 @@ bool cEnvironnement::ChargeFichierPhotos()
 
 
 /*!	\brief Recherche d'une ligne � partir de son code
-	\param CodeLigne Code � comparer
+	\param code Code � comparer
 	\author Hugues Romain
 	\date 2000
 */
-cLigne* cEnvironnement::GetLigne(const cTexte& CodeLigne) const
+cLigne* cEnvironnement::GetLigne(const string& code) const
 {
-	cLigne* curLigne = PremiereLigne();
-	for (; curLigne != NULL; curLigne = curLigne->Suivant())
-		if (curLigne->getCode().Compare(CodeLigne))
-			break;
-	return curLigne;
+	LinesMap::const_iterator iter = _lines.find(code);
+	return iter == _lines.end() ? NULL : iter->second;
 }
 
 bool cEnvironnement::ChargeFichierIndicateurs()
 {
 	// Variables
-	tNumeroIndicateur NombreIndicateursCharges = 0;
+	size_t NombreIndicateursCharges = 0;
 	bool PasTermineSousSection = true;
 	bool PasTermineElement=false;
 	cJC* JCBase = NULL;
@@ -1789,7 +1673,7 @@ bool cEnvironnement::ChargeFichierIndicateurs()
 	// Ouverture du fichier
 	ifstream Fichier;
 	cTexte NomFichierComplet;
-	NomFichierComplet << vNomRepEnv << INDICATEURSEXTENSION;
+	NomFichierComplet << _path << INDICATEURSEXTENSION;
 	Fichier.open(NomFichierComplet.Texte());
 
 	//SET PORTAGE LINUX
@@ -1804,8 +1688,7 @@ bool cEnvironnement::ChargeFichierIndicateurs()
 	Tampon.LireLigne(Fichier);
 	if (Tampon.Compare("Nombre=", 7))
 	{
-		vNombreIndicateurs = (tNumeroIndicateur) Tampon.GetNombre(0, 7);
-		vIndicateurs = (cIndicateurs**) malloc(vNombreIndicateurs * sizeof(cIndicateurs*));
+		vNombreIndicateurs = (size_t) Tampon.GetNombre(0, 7);
 	}
 	else
 	{
@@ -1858,8 +1741,8 @@ bool cEnvironnement::ChargeFichierIndicateurs()
 
 			case INDICATEURSFORMATLIGNEGare:
 				curIndicateur->addArretLogique(
-					getArretLogique(vFormatIndicateurs.GetNombre(Tampon, INDICATEURSFORMATCOLONNEStandard)),
-					(tTypeGareLigneDA) Tampon[vFormatIndicateurs.GetColonnePosition(INDICATEURSFORMATCOLONNEDepartArrivee)],
+					getLogicalPlace(vFormatIndicateurs.GetNombre(Tampon, INDICATEURSFORMATCOLONNEStandard)),
+					(cGareLigne::tTypeGareLigneDA) Tampon[vFormatIndicateurs.GetColonnePosition(INDICATEURSFORMATCOLONNEDepartArrivee)],
 					(tTypeGareIndicateur) Tampon[vFormatIndicateurs.GetColonnePosition(INDICATEURSFORMATCOLONNEObligatoire)]
 					);
 				break;
@@ -1970,7 +1853,7 @@ void cEnvironnement::ConstruitColonnesIndicateur(cIndicateurs* curIndicateur)
 			if (LigneSelectionnee)
 			{
 				// Parcours colonne par colonne
-				for (iNumeroService = 0; iNumeroService < curLigne->NombreServices(); iNumeroService++)
+				for (iNumeroService = 0; iNumeroService < curLigne->getServices().size(); iNumeroService++)
 				{
 					// Test de JC et rejet des cadences
 					if (curLigne->GetTrain(iNumeroService)->getJC()->UnPointCommun(curIndicateur->getJC()) && !curLigne->GetTrain(iNumeroService)->EstCadence())
@@ -2228,20 +2111,21 @@ cJC* cEnvironnement::GetJC(const tMasque* MasqueAIdentifer, const cJC& JCBase) c
 	cJC* curJC;
 	cJC* JCIdentifie = NULL;
 
-	for (tIndex iNumeroJC = 0; iNumeroJC < _JC.Taille(); iNumeroJC++)
+	for (CalendarsMap::const_iterator iter = _JC.begin();
+		iter != _JC.end();
+		++iter)
 	{
-		curJC = _JC[iNumeroJC];
-		if (curJC != NULL)
-//			if ((curJC->Categorie >= Categorie) && (TousPointsCommuns(curJC->JoursAnnee, Masque)))
-			if (JCBase.TousPointsCommuns(*curJC, MasqueAIdentifer))
-				if (JCIdentifie == NULL)
+		curJC = iter->second;
+//		if ((curJC->Categorie >= Categorie) && (TousPointsCommuns(curJC->JoursAnnee, Masque)))
+		if (JCBase.TousPointsCommuns(*curJC, MasqueAIdentifer))
+			if (JCIdentifie == NULL)
+				JCIdentifie = curJC;
+			else
+				if (curJC->Categorie() < JCIdentifie->Categorie())
 					JCIdentifie = curJC;
 				else
-					if (curJC->Categorie() < JCIdentifie->Categorie())
+					if (curJC->Categorie() == JCIdentifie->Categorie() && JCBase.Card(*curJC) < JCBase.Card(*JCIdentifie))
 						JCIdentifie = curJC;
-					else
-						if (curJC->Categorie() == JCIdentifie->Categorie() && JCBase.Card(*curJC) < JCBase.Card(*JCIdentifie))
-							JCIdentifie = curJC;
 	}
 	return(JCIdentifie);
 }
@@ -2276,11 +2160,7 @@ tIndex cEnvironnement::Enregistre(cJC* JCAAjouter, tIndex Code)
 		Code = ProchainNumeroJC();
 
 	// Cr�ation du lien dans le tableau des pointeurs de l'environnement
-	Code = _JC.SetElement(JCAAjouter, Code);
-	
-	// Test lien effectu� avec succ�s
-	if (Code == INCONNU)
-		return INCONNU;
+	_JC[(size_t) Code] = JCAAjouter;
 	
 	// MAJ du code dans l'objet
 	JCAAjouter->setIndex(Code);
@@ -2363,7 +2243,7 @@ void cEnvironnement::JCSupprimerInutiles(bool Supprimer)
 
 	// D�termination des JC utiles dans les horaires
 	for (cLigne* curLigne = PremiereLigne(); curLigne != NULL; curLigne = curLigne->Suivant())
-		for (tNumeroService iNumeroService = 0; iNumeroService != curLigne->NombreServices(); iNumeroService++)
+		for (tNumeroService iNumeroService = 0; iNumeroService != curLigne->getServices().size(); iNumeroService++)
 			JCUtile[curLigne->getCirculation(iNumeroService).Index()] = true;
 
 	// D�termination des JC utiles dans les d�finitions de JC
@@ -2419,8 +2299,8 @@ size_t cEnvironnement::NombreLignes(const cTexte& MasqueCode) const
 
 	// Cas 1: Code fourni vide: comptage de toutes les lignes
 	if (!MasqueCode.Taille())
-		for (cLigne* curLigne = PremiereLigne(); curLigne != NULL; curLigne = curLigne->Suivant())
-			lNombreLignes++;
+		return _lines.size();
+
 	// Cas 2: Un seul code fourni
 	else
 	{
@@ -2432,10 +2312,10 @@ size_t cEnvironnement::NombreLignes(const cTexte& MasqueCode) const
 				lLongueur += 1;
 
 			// Boucle sur les lignes de l'environnement
-			for (cLigne* curLigne = PremiereLigne(); curLigne != NULL; curLigne = curLigne->Suivant())
+			for (LinesMap::const_iterator iter = _lines.begin(); iter != _lines.end(); ++iter)
 			{
 				// Correspondance au code fourni si non nul, comptage syst�matique sinon
-				if (!MasqueCode.Taille() || curLigne->getCode().Compare(MasqueCode, lLongueur, 0, lPosition))
+				if (!MasqueCode.Taille() || iter->second->getCode().Compare(MasqueCode, lLongueur, 0, lPosition))
 					lNombreLignes++;
 			}
 
@@ -2488,12 +2368,12 @@ cDate cEnvironnement::dateInterpretee(const cTexte& Texte) const
 	return tempDate;
 }
 
-bool cEnvironnement::ControleNumerosArretCommuneDesignation(int nA, int nC, int nD, const cTexte& txtA) const
+
+bool cEnvironnement::ControleNumerosArretCommuneDesignation(int nA, int nC, const cTexte& txtA) const
 {
-	return	(	GetArretLogique(nA) != NULL
-			&&	getArretLogique(nA)->GetAccesPADe(nD)
-			&&	getArretLogique(nA)->getCommune(nD)->Index() == nC
-			&&	getArretLogique(nA)->getNom(nD).Compare(txtA)
+	return	(	getLogicalPlace(nA) != NULL
+			&&	getLogicalPlace(nA)->getTown()->getId() == nC
+			&&	getLogicalPlace(nA)->getName().Compare(txtA)
 			);
 }
 
@@ -2524,8 +2404,7 @@ bool cEnvironnement::Enregistre(cLigne* Obj)
 	Obj->setAnneesCirculation(PremiereAnnee(), DerniereAnnee());
 	
 	// Chainage
-	Obj->setSuivant(PremiereLigne());
-	vPremiereLigne = Obj;
+	_lines[string(Obj->getCode().Texte())] = Obj;
 	
 	// Succ�s
 	return true;
@@ -2538,21 +2417,18 @@ bool cEnvironnement::Enregistre(cLigne* Obj)
 
 bool	cEnvironnement::ControleNumeroTexteCommune(int nC, const cTexte& txtC) const
 {
-	return	(	GetCommune(nC) != NULL
-			&&	getCommune(nC)->GetNom().Compare(txtC)
+	return	(	getTown((size_t) nC) != NULL
+		&&	getTown(nC)->getName() == string(txtC.Texte())
 			);
 }
 
 
 
 
-cJC* cEnvironnement::GetJC(int n) const
+cJC* cEnvironnement::GetJC(size_t n) const
 {
-	// Test de validit� du num�ro
-	if (_JC.IndexValide(n))
-		return _JC[n];
-	else
-		return NULL;
+	CalendarsMap::const_iterator iter = _JC.find(n);
+	return iter == _JC.end() ? NULL : iter->second;
 }
 
 
@@ -2561,13 +2437,19 @@ cJC* cEnvironnement::GetJC(int n) const
 	\author Hugues Romain
 	\date 2001
 */ 
-tIndex cEnvironnement::ProchainNumeroJC() const
+size_t cEnvironnement::ProchainNumeroJC() const
 {
-	tIndex i;
-	for (i=0; i<_JC.Taille(); i++)
-		if (!GetJC(i))
+	size_t expectedNumber = 1;
+	for( CalendarsMap::const_iterator iter = _JC.begin();
+		iter != _JC.end();
+		++iter)
+	{
+		if (iter->first > expectedNumber)
 			break;
-	return(i);
+		++expectedNumber;
+	}
+
+	return expectedNumber;
 }
 
 
@@ -2655,19 +2537,18 @@ tIndex cEnvironnement::Enregistre(cModaliteReservation* newVal, tIndex index)
 /*!	\brief M�thode d'enregistrement d'un objet tarification dans l'environnement
 	\param newVal La tarification � ajouter � l'environnement
 	\param newNum L'index de la tarification dans l'environnement
-	\return L'index de la tarification dans l'environnement (INCONNU si la tarification n'a pu �tre enregistr�e)
+	\return false si un tarif a été écrasé, true sinon
 	\author Hugues Romain
 	\date 2001-2005
 */
-tIndex cEnvironnement::Enregistre(cTarif *newVal, tIndex index)
+bool cEnvironnement::Enregistre(cTarif* const newVal)
 {
-	//! \todo throw an exception on duplicate element ([index] != NULL)
-	if (index >= vTarif.size()) {
-		// resize the vector
-		vTarif.resize(index+1, NULL);
-	}
-	vTarif[index] = newVal;
-	return index;	
+	FaresMap::const_iterator iter = vTarif.find(newVal->getNumeroTarif());
+	if (iter != vTarif.end())
+		delete iter->second;
+
+	vTarif[newVal->getNumeroTarif()] = newVal;
+	return iter == vTarif.end();
 }
 
 
@@ -2721,19 +2602,21 @@ cEnvironnement::ChargeFichiersRoutes () {
 
 
 
-void cEnvironnement::addTown(const cCommune* town)
+void cEnvironnement::addTown(cCommune* const town)
 {
-	_towns.add(town->getName(), town);
+	_towns.add(town->getName(), town, town->getId());
 }
 
-cCommune* cEnvironnement::getTown(size_t id)
+cCommune* cEnvironnement::getTown(size_t id) const
 {
-	return _towns[id];
+	TownsMap::MapType::const_iterator iter = _towns.getMap().find(id);
+	return iter == _towns.getMap().end() ? NULL : iter->second;
 }
 
-LogicalPlace* cEnvironnement::getLogicalPlace(size_t id)
+LogicalPlace* cEnvironnement::getLogicalPlace(size_t id) const
 {
-	return _logicalPlaces[id];
+	LogicalPlacesMap::const_iterator iter = _logicalPlaces.find(id);
+	return iter == _logicalPlaces.end() ? NULL : iter->second;
 }
 
 void cEnvironnement::addLogicalPlace(LogicalPlace* logicalPlace)
@@ -2748,8 +2631,148 @@ void cEnvironnement::addLogicalPlace(LogicalPlace* logicalPlace)
 */
 cCommune* cEnvironnement::getTown(const std::string& name)	const
 {
-	for (size_t i=0; i < _towns.size(); ++i)
-		if (_towns[i]->getName() == name)
-			return _towns[i];
+	for (TownsMap::MapType::const_iterator iter = _towns.getMap().begin();
+		iter != _towns.getMap().end();
+		++iter)
+		if (iter->second->getName() == name)
+			return iter->second;
 	return NULL;
 }
+
+
+
+
+
+
+tAnnee cEnvironnement::NombreAnnees() const
+{
+	return(vDerniereAnnee - vPremiereAnnee);
+}
+
+tAnnee cEnvironnement::NombreAnnees(tAnnee AutreAnnee) const
+{
+	return(AutreAnnee - vPremiereAnnee);
+}
+
+tAnnee cEnvironnement::PremiereAnnee() const
+{
+	return(vPremiereAnnee);
+}
+
+tAnnee cEnvironnement::DerniereAnnee() const
+{
+	return(vDerniereAnnee);
+}
+
+
+
+cDocument* cEnvironnement::GetDocument(size_t n) const
+{
+	DocumentsMap::const_iterator iter = _Documents.find(n);
+	return iter == _Documents.end() ? NULL : iter->second;
+}
+
+
+const cTexte& cEnvironnement::getNomRepertoireHoraires() const
+{
+	return(vNomRepertoireHoraires);
+}
+
+
+cModaliteReservation* cEnvironnement::getResa(tIndex n) const
+{
+	return vResa.at (n);
+}
+
+
+cReseau* cEnvironnement::getReseau(tIndex n) const
+{
+	return vReseau.at (n);
+}
+
+
+
+cVelo* cEnvironnement::getVelo(tIndex n) const
+{
+	return(vVelo.at (n));
+}
+
+cHandicape* cEnvironnement::getHandicape(tIndex n) const
+{
+	return(vHandicape. at (n));
+}
+
+
+cTarif* cEnvironnement::getTarif(size_t n) const
+{
+	FaresMap::const_iterator iter = vTarif.find(n);
+	return iter == vTarif.end() ? NULL : iter->second;
+}
+
+
+const cDate& cEnvironnement::DateMinReelle() const
+{
+	return (vDateMin);
+}
+
+const cDate& cEnvironnement::DateMaxReelle() const
+{
+	return (vDateMax);
+}
+
+
+
+/*!	\brief Modificateur de la premi�re date o� circule au moins un service de l'environnement
+	\param newDate Date de circulation d'un service � prendre en compte
+	\author Hugues Romain
+	\date 2005
+	
+Cette m�thode met � jour la premi�re date o� circule au moins un service de l'environnement, si la date fournie est ant�rieure � la premi�re date connue.
+*/
+void cEnvironnement::SetDateMinReelle(const cDate& newDate)
+{
+	if (newDate < vDateMin)
+		vDateMin = newDate;
+}
+
+
+
+/*!	\brief Modificateur de la derni�re date o� circule au moins un service de l'environnement
+	\param newDate Date de circulation d'un service � prendre en compte
+	\author Hugues Romain
+	\date 2005
+	
+Cette m�thode met � jour la derni�re date o� circule au moins un service de l'environnement, si la date fournie est post�rieure � la derni�re date connue.
+*/
+void cEnvironnement::SetDateMaxReelle(const cDate& newDate)
+{
+	if (newDate > vDateMax)
+		vDateMax = newDate;
+}
+
+
+
+
+/*!	\brief Accesseur Index
+	\return L'index de l'environnement dans la base SYNTHESE
+	\author Hugues Romain
+	\date 2005
+*/
+tIndex cEnvironnement::Index() const
+{
+	return Code;
+}
+
+
+void cEnvironnement::SetDatesService(tAnnee __AnneeMin, tAnnee __AnneeMax)
+{
+	vPremiereAnnee = __AnneeMin;
+	vDerniereAnnee = __AnneeMax;
+}
+
+
+bool cEnvironnement::ControleDate(const cDate& __Date) const
+{
+	return vDateMin <= __Date && __Date <= vDateMax;
+}
+

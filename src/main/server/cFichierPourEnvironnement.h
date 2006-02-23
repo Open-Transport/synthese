@@ -903,17 +903,19 @@ Fonds de carte
 //@}
 
 
-#include "cFichier.h"
-#include "cEnvironnement.h"
 
+#include "cFichier.h"
+#include "cJourCirculation.h"
+
+class cEnvironnement;
 
 
 /** Fichier d�crivant un calendrier de circulation
 */
 class cFichierJoursCirculation : public cFichier
 {
-	bool 		JCExecuterCommande(cJC& JC, tSens Sens, cTexte& Tampon, cEnvironnement*);
-	TypeSection 	RemplirJC(cJC& JC, tSens Sens, cTexte& Tampon, cEnvironnement*);
+	bool 		JCExecuterCommande(cJC& JC, cJC::tSens Sens, cTexte& Tampon, cEnvironnement*);
+	TypeSection 	RemplirJC(cJC& JC, cJC::tSens Sens, cTexte& Tampon, cEnvironnement*);
 
 public:
 	bool Charge(cEnvironnement*);

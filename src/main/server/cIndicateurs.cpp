@@ -8,6 +8,11 @@
  *--------------------------------------*/
 
 #include "cIndicateurs.h"
+#include "cGareLigne.h"
+#include "cLigne.h"
+#include "cArretPhysique.h"
+#include "LogicalPlace.h"
+#include "cCommune.h"
 
 /*! \brief Constructeur
 	\param NombrePA Nombre de lignes de la colonne
@@ -30,7 +35,7 @@ cColonneIndicateurs::cColonneIndicateurs(size_t newNombreGares, cLigne* newLigne
 
 
 
-cGareIndicateurs::cGareIndicateurs(LogicalPlace* newPA, tTypeGareLigneDA newTypeDA, tTypeGareIndicateur newObligatoire)
+cGareIndicateurs::cGareIndicateurs(LogicalPlace* newPA, cGareLigne::tTypeGareLigneDA newTypeDA, tTypeGareIndicateur newObligatoire)
 {
 	vPA = newPA;
 	vTypeDA = newTypeDA;
@@ -53,12 +58,12 @@ cIndicateurs::cIndicateurs(const cTexte& newTitre, cEnvironnement* newEnvironnem
 // NUL Gerer �a avec une petite classe cTypeDA...
 bool cGareIndicateurs::EstDepart() const
 {
-	return(vTypeDA == Depart || vTypeDA == Passage);
+	return(vTypeDA == cGareLigne::Depart || vTypeDA == cGareLigne::Passage);
 }
 
 bool cGareIndicateurs::EstArrivee() const
 {
-	return(vTypeDA == Arrivee || vTypeDA == Passage);
+	return(vTypeDA == cGareLigne::Arrivee || vTypeDA == cGareLigne::Passage);
 }
 
 
@@ -157,9 +162,9 @@ bool cIndicateurs::Add(cColonneIndicateurs* newCI, cJC* JC)
 			}
 			if (newCI->getPostScript().Compare(curCIInd->getPostScript()))
 			{
-				if (curCIInd->getLigne()->PremiereGareLigne()->ArretLogique() != newCI->getLigne()->PremiereGareLigne()->ArretLogique())
+				if (curCIInd->getLigne()->getLineStops().front()->ArretPhysique()->getLogicalPlace() != newCI->getLigne()->getLineStops().front()->ArretPhysique()->getLogicalPlace())
 					curCIInd->setOrigineSpeciale(Indetermine);
-				if (curCIInd->getLigne()->PremiereGareLigne()->Destination()->ArretLogique() != newCI->getLigne()->PremiereGareLigne()->Destination()->ArretLogique())
+				if (curCIInd->getLigne()->getLineStops().back()->ArretPhysique()->getLogicalPlace() != newCI->getLigne()->getLineStops().back()->ArretPhysique()->getLogicalPlace())
 					curCIInd->setDestinationSpeciale(Indetermine);
 				JC->SetInclusionToMasque(curCIInd->getMasque());
 				delete newCI;
@@ -309,7 +314,7 @@ void cIndicateurs::EcritTableaux(size_t HDispo, size_t NumeroColonne, size_t Nom
 	FichierSortie << "/garesarray [ [";
 	for (curGI = vPremiereGI; curGI!=NULL; curGI = curGI->getSuivant())
 	{
-		FichierSortie << "(" << curGI->getArretLogique()->getNom() << ") ";
+		FichierSortie << "(" << curGI->getArretLogique()->getName() << ") ";
 	}
 	FichierSortie << "] ] def\n";
 
@@ -319,10 +324,10 @@ void cIndicateurs::EcritTableaux(size_t HDispo, size_t NumeroColonne, size_t Nom
 	for (curGI = vPremiereGI; curGI!=NULL; curGI = curGI->getSuivant())
 	{
 		FichierSortie << "(";
-		if (curGI->getArretLogique()->getCommune() != curCommune)
+		if (curGI->getArretLogique()->getTown() != curCommune)
 		{
-			curCommune = curGI->getArretLogique()->getCommune();
-			FichierSortie << curCommune->GetNom();
+			curCommune = curGI->getArretLogique()->getTown();
+			FichierSortie << curCommune->getName();
 		}
 		FichierSortie << ") ";
 	}
@@ -341,9 +346,9 @@ void cIndicateurs::EcritTableaux(size_t HDispo, size_t NumeroColonne, size_t Nom
 	for (curGI = vPremiereGI; curGI!=NULL; curGI = curGI->getSuivant())
 	{
 		FichierSortie << "(";
-		if (curGI->TypeDA() == Depart)
+		if (curGI->TypeDA() == cGareLigne::Depart)
 			FichierSortie << "D";
-		else if (curGI->TypeDA() == Arrivee)
+		else if (curGI->TypeDA() == cGareLigne::Arrivee)
 			FichierSortie << "A";
 
 		FichierSortie << ") ";
@@ -384,7 +389,7 @@ void cIndicateurs::EcritTableaux(size_t HDispo, size_t NumeroColonne, size_t Nom
 		switch (curCI->OrigineSpeciale())
 		{
 		case Texte:
-			FichierSortie << "0 (" << curCI->getLigne()->PremiereGareLigne()->ArretLogique()->getDesignationOD() << ") ";
+			FichierSortie << "0 (" << curCI->getLigne()->getLineStops().front()->ArretPhysique()->getLogicalPlace()->getDesignationOD() << ") ";
 			break;
 
 		case Terminus:
@@ -398,7 +403,7 @@ void cIndicateurs::EcritTableaux(size_t HDispo, size_t NumeroColonne, size_t Nom
 		switch (curCI->DestinationSpeciale())
 		{
 		case Texte:
-			FichierSortie << "0 (" << curCI->getLigne()->PremiereGareLigne()->Destination()->ArretLogique()->getDesignationOD() << ") ";
+			FichierSortie << "0 (" << curCI->getLigne()->getLineStops().back()->ArretPhysique()->getLogicalPlace()->getDesignationOD() << ") ";
 			break;
 
 		case Terminus:
@@ -502,7 +507,7 @@ LogicalPlace* cGareIndicateurs::getArretLogique() const
 	return(vPA);
 }
 
-tTypeGareLigneDA cGareIndicateurs::TypeDA() const
+cGareLigne::tTypeGareLigneDA cGareIndicateurs::TypeDA() const
 {
 	return(vTypeDA);
 }
@@ -527,7 +532,7 @@ void cIndicateurs::setJC(const cJC& newVal, const cJC& newVal2)
 	vJC.setMasque(newVal.Et(newVal2));
 }
 
-void cIndicateurs::addArretLogique(LogicalPlace *newArretLogique, tTypeGareLigneDA newTypeDA, tTypeGareIndicateur newTypeGI)
+void cIndicateurs::addArretLogique(LogicalPlace *newArretLogique, cGareLigne::tTypeGareLigneDA newTypeDA, tTypeGareIndicateur newTypeGI)
 {
 	if (newArretLogique)
 	{

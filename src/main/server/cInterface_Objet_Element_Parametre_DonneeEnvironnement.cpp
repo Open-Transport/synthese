@@ -1,6 +1,10 @@
 
 #include "cInterface_Objet_Element_Parametre_DonneeEnvironnement.h"
-
+#include "LogicalPlace.h"
+#include "cCommune.h"
+#include "cLigne.h"
+#include "cTrajets.h"
+#include "cMateriel.h"
 
 
 /*!	\brief Constructeur
@@ -50,10 +54,10 @@ const cTexte& cInterface_Objet_Element_Parametre_DonneeEnvironnement::Texte(cons
 	switch (_NumeroObjet)
 	{
 	case EI_ATTRIBUT_ArretLogique_Nom:
-		return ((const LogicalPlace*) __Objet)->getNom(__Parametres[EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation]->Nombre(__Parametres));
+		return ((const LogicalPlace*) __Objet)->getName(); // getNom(__Parametres[EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation]->Nombre(__Parametres));
 
 	case EI_ATTRIBUT_ArretLogique_NomCommune:
-		return ((const LogicalPlace*) __Objet)->getCommune(__Parametres[EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation]->Nombre(__Parametres))->GetNom();
+		return ((const LogicalPlace*) __Objet)->getTown()->getName(); // getCommune(__Parametres[EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation]->Nombre(__Parametres))->GetNom();
 	
 	case EI_ATTRIBUT_Ligne_LibelleSimple:
 		return ((const cLigne*) __Objet)->getLibelleSimple();

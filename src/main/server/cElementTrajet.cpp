@@ -1,21 +1,34 @@
 
 #include "cElementTrajet.h"
-
+#include "LogicalPlace.h"
 
 
 /*!	\brief Constructeur
 	\author Hugues Romain
 	\date 2001-2005
 */
-cElementTrajet::cElementTrajet()
+cElementTrajet::cElementTrajet(const NetworkAccessPoint* const			origin,
+	const NetworkAccessPoint* const			destination,
+	const cMoment&					departureDate,
+	const cMoment&					arrivalDate,
+	const size_t& serviceNumber,
+	const cLigne* const			line,
+	const tTypeElementTrajet		type,
+	tDureeEnMinutes amplitude,
+	const cDistanceCarree& squaredDistanceFromGoal
+
+	) : _origin(origin)
+	, _destination(destination)
+	, vMomentDepart(departureDate)
+	, vMomentArrivee(arrivalDate)
+	, vLigne(line)
+	, vType(type)
+	, vDureeEnMinutesRoulee(vMomentArrivee - vMomentDepart)
+	, vAmplitudeServiceContinu(amplitude)
+	, vDistanceCarreeObjectif(squaredDistanceFromGoal)
+	, vNumeroService(serviceNumber)
 {
-	vGareDepart					= NULL;
-	vGareArrivee				= NULL;
 	vSuivant					= NULL;
-	vLigne						= NULL;
-	vNumeroService				= INCONNU;
-	vAmplitudeServiceContinu	= 0;
-	vDistanceCarreeObjectif		= 0;
 }
 
 
@@ -25,134 +38,10 @@ cElementTrajet::~cElementTrajet()
 }
 
 
-
-void cElementTrajet::setInformations(const cGareLigne* GLA, const cGareLigne* GLD, const cMoment& newMomentDepart, const cMoment& newMomentArrivee)
+const cDistanceCarree& cElementTrajet::getDistanceCarreeObjectif() const
 {
-	if (GLA != NULL)
-	{
-		vLigne = GLA->Ligne();
-		vVoieArrivee = GLA->ArretPhysique();
-		vMomentArrivee = newMomentArrivee;
-		vGareArrivee = GLA->ArretLogique();
-	}
-	
-	if (GLD != NULL)
-	{
-		vLigne = GLD->Ligne();
-		vVoieDepart = GLD->ArretPhysique();
-		vMomentDepart = newMomentDepart;
-		vGareDepart = GLD->ArretLogique();
-	}
-	
-	if (GLA != NULL && GLD != NULL)
-	{
-		if (GLA->PM() > GLD->PM())
-			vDistanceParcourue = GLA->PM() - GLD->PM();
-		else
-			vDistanceParcourue = GLD->PM() - GLA->PM();
-			
-		vDureeEnMinutesRoulee = vMomentArrivee - vMomentDepart;
-//		if (vSuivant)
-//			vDureeEnMinutesRoulee += vSuivant->vDureeEnMinutesRoulee;
-	}
+	return vDistanceCarreeObjectif;
 }
-
-/*! \warning Sur services � horaires uniquement pour l'instant
-*/
-void cElementTrajet::setInformations(const cGareLigne* GLA, const cGareLigne* GLD, const cDate& newDateDepart, tNumeroService iNumeroService)
-{
-	tDureeEnJours curJPlus=0;
-
-	vMomentDepart = newDateDepart;
-	if (GLD != NULL)
-	{
-		vLigne = GLD->Ligne();
-		vVoieDepart = GLD->ArretPhysique();
-		vMomentDepart = GLD->getHoraireDepartPremier(iNumeroService);
-		curJPlus = GLD->getHoraireDepartPremier(iNumeroService).JPlus();
-		vGareDepart = GLD->ArretLogique();
-	}
-	if (GLA != NULL)
-	{
-		vLigne = GLA->Ligne();
-		vVoieArrivee = GLA->ArretPhysique();
-		vGareArrivee = GLA->ArretLogique();
-	}
-	if (GLA != NULL && GLD != NULL)
-	{
-		if (GLA->PM() > GLD->PM())
-			vDistanceParcourue = GLA->PM() - GLD->PM();
-		else
-			vDistanceParcourue = GLD->PM() - GLA->PM();
-			
-		vMomentArrivee = newDateDepart;
-		vMomentArrivee.addDureeEnJours(GLA->getHoraireArriveePremier(iNumeroService).JPlus() - curJPlus);
-		vMomentArrivee = GLA->getHoraireArriveePremier(iNumeroService);
-		vDureeEnMinutesRoulee = vMomentArrivee - vMomentDepart;
-//		if (vSuivant)
-//			vDureeEnMinutesRoulee += vSuivant->vDureeEnMinutesRoulee;
-	}
-}
-
-
-// Allocation
-/*
-void* cElementTrajet::operator new(size_t)
-{
-	void* Retour;
-
-	if (StockET == NULL)
-		InitStockET();
-	Retour = StockET;
-	StockET = StockET->Suivant;
-	Alloues++;
-	return(Retour);
-}
-
-
-// Desallocation
-void cElementTrajet::operator delete(void* Element)
-{
-	((cElementTrajet*) Element)->Suivant = StockET;
-	StockET = (cElementTrajet*) Element;
-	Alloues--;
-}
-*/
-
-//! \warning On suppose que les NombreElement des deux trajets sont corrects
-/*
-cElementTrajet* cElementTrajet::operator += (cElementTrajet* AutreElementTrajet)
-{
-	if (AutreElementTrajet != NULL)
-	{
-
-		cElementTrajet* pointeur;
-
-		// Ajustement du dernier d�part
-		if (AutreElementTrajet->vAmplitudeServiceContinu < vAmplitudeServiceContinu)
-			vAmplitudeServiceContinu = AutreElementTrajet->vAmplitudeServiceContinu;
-
-		// Pointeur Suivant
-		vDernier->vSuivant = AutreElementTrajet;
-
-		// Pointeur Avantdernier
-		if (AutreElementTrajet->vAvantDernier == NULL)
-			AutreElementTrajet->vAvantDernier = vDernier;
-
-		// Pointeurs Dernier et Nombre d'�l�ments
-		for (pointeur = this; pointeur != AutreElementTrajet; pointeur = pointeur->vSuivant)
-		{
-			pointeur->vDureeEnMinutesRoulee = vDureeEnMinutesRoulee.Valeur() + AutreElementTrajet->vDureeEnMinutesRoulee.Valeur();
-			pointeur->vAvantDernier	 =  AutreElementTrajet->vAvantDernier;
-			pointeur->vDernier		 =  AutreElementTrajet->vDernier;
-			pointeur->vNombreElements += AutreElementTrajet->vNombreElements;
-		}
-	}
-
-	return(this);
-}
-*/
-
 
 
 /*! \brief Optimisation 3 - Fonction d'imitation d'un ET � un autre moment
@@ -187,24 +76,7 @@ cElementTrajet* cElementTrajet::operator += (cElementTrajet* AutreElementTrajet)
 	return(firstET);
 }*/
 
-/*
-cElementTrajet::setOD(const LogicalPlace* Origine, const LogicalPlace* Destination)
-{
-	vGareDepart = Origine;
-	vGareArrivee = Destination;
-}
-*/
 
-
-const cArretPhysique* cElementTrajet::getArretPhysiqueArrivee() const
-{
-	return(vGareArrivee->getArretPhysique(vVoieArrivee));
-}
-
-const cArretPhysique* cElementTrajet::getArretPhysiqueDepart() const
-{
-	return(vGareDepart->getArretPhysique(vVoieDepart));
-}
 
 const cAxe* cElementTrajet::Axe() const
 {
@@ -223,8 +95,8 @@ const cAxe* cElementTrajet::Axe() const
 */
 int CompareUtiliteETPourMeilleurDepart(const void* ET1, const void* ET2)
 {
-	cElementTrajet* oET1 = * (cElementTrajet**) ET1;
-	cElementTrajet* oET2 = * (cElementTrajet**) ET2;
+	const cElementTrajet* oET1 = * (const cElementTrajet**) ET1;
+	const cElementTrajet* oET2 = * (const cElementTrajet**) ET2;
 	
 	//! <li> depart du lieu souhaite</li>
 	if (oET1->getDistanceCarreeObjectif() == 0)
@@ -237,8 +109,8 @@ int CompareUtiliteETPourMeilleurDepart(const void* ET1, const void* ET2)
 		return(false);
 
 	//! <li>diff�rence de niveau</li>
-	if (oET1->getGareDepart()->NiveauCorrespondance(oET1->getDistanceCarreeObjectif()) != oET2->getGareDepart()->NiveauCorrespondance(oET2->getDistanceCarreeObjectif()))
-		return(oET2->getGareDepart()->NiveauCorrespondance(oET2->getDistanceCarreeObjectif()) - oET1->getGareDepart()->NiveauCorrespondance(oET1->getDistanceCarreeObjectif()));
+	if (oET1->getOrigin()->getLogicalPlace()->NiveauCorrespondance(oET1->getDistanceCarreeObjectif()) != oET2->getOrigin()->getLogicalPlace()->NiveauCorrespondance(oET2->getDistanceCarreeObjectif()))
+		return(oET2->getOrigin()->getLogicalPlace()->NiveauCorrespondance(oET2->getDistanceCarreeObjectif()) - oET1->getOrigin()->getLogicalPlace()->NiveauCorrespondance(oET1->getDistanceCarreeObjectif()));
 
 	//! <li>Comparaison directe des distances carr�es</li>
 	return(oET2->getDistanceCarreeObjectif() <= oET1->getDistanceCarreeObjectif());
@@ -253,8 +125,8 @@ int CompareUtiliteETPourMeilleurDepart(const void* ET1, const void* ET2)
 */
 int CompareUtiliteETPourMeilleureArrivee(const void* ET1, const void* ET2)
 {
-	cElementTrajet* oET1 = * (cElementTrajet**) ET1;
-	cElementTrajet* oET2 = * (cElementTrajet**) ET2;
+	const cElementTrajet* oET1 = * (const cElementTrajet**) ET1;
+	const cElementTrajet* oET2 = * (const cElementTrajet**) ET2;
 
 	//! <li>Arrivee au lieu souhaite</li>
 	if (oET1->getDistanceCarreeObjectif() == 0)
@@ -267,12 +139,82 @@ int CompareUtiliteETPourMeilleureArrivee(const void* ET1, const void* ET2)
 		return false;
 
 	//! <li>diff�rence de niveau</li>
-	if (oET1->getGareArrivee()->NiveauCorrespondance(oET1->getDistanceCarreeObjectif()) != oET2->getGareArrivee()->NiveauCorrespondance(oET2->getDistanceCarreeObjectif()))
-		return(oET2->getGareArrivee()->NiveauCorrespondance(oET2->getDistanceCarreeObjectif()) - oET1->getGareArrivee()->NiveauCorrespondance(oET1->getDistanceCarreeObjectif()));
+	if (oET1->getDestination()->getLogicalPlace()->NiveauCorrespondance(oET1->getDistanceCarreeObjectif()) != oET2->getDestination()->getLogicalPlace()->NiveauCorrespondance(oET2->getDistanceCarreeObjectif()))
+		return(oET2->getDestination()->getLogicalPlace()->NiveauCorrespondance(oET2->getDistanceCarreeObjectif()) - oET1->getDestination()->getLogicalPlace()->NiveauCorrespondance(oET1->getDistanceCarreeObjectif()));
 
 	//! <li>Comparaison directe des distances vers l'objectif</li>
 	return(oET2->getDistanceCarreeObjectif() <= oET1->getDistanceCarreeObjectif());
 }
 
 
+
+
+const cTrain* cElementTrajet::getService() const
+{
+	return vLigne->getTrain(vNumeroService); 
+}
+
+tDistanceHM cElementTrajet::DistanceParcourue() const
+{
+	return(vDistanceParcourue);
+}
+
+cElementTrajet* cElementTrajet::getSuivant() const
+{
+	return vSuivant;
+}
+
+
+const cLigne* cElementTrajet::getLigne() const
+{
+	return vLigne;
+}
+
+const tDureeEnMinutes& cElementTrajet::AmplitudeServiceContinu() const
+{
+	return(vAmplitudeServiceContinu);
+}
+
+void cElementTrajet::setAmplitudeServiceContinu(const tDureeEnMinutes& newVal)
+{
+	vAmplitudeServiceContinu = newVal;
+}
+
+void cElementTrajet::setSuivant(cElementTrajet *newVal)
+{
+	if (newVal != NULL)
+		newVal->_Precedent = this;
+	vSuivant = newVal;
+}
+
+
+const tDureeEnMinutes& cElementTrajet::DureeEnMinutesRoulee() const
+{
+	return(vDureeEnMinutesRoulee);
+}
+
+const cMoment& cElementTrajet::MomentDepart() const
+{
+	return(vMomentDepart);
+}
+
+const cMoment& cElementTrajet::MomentArrivee() const
+{
+	return(vMomentArrivee);
+}
+
+
+
+tTypeElementTrajet cElementTrajet::Type() const
+{
+	return(vType);
+}
+
+
+
+
+const cElementTrajet* cElementTrajet::Precedent() const
+{
+	return _Precedent;
+}
 

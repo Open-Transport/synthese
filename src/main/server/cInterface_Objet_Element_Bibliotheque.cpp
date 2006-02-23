@@ -3,7 +3,14 @@
 #include <sstream>
 
 #include "cTableauAffichage.h"
-
+#include "cEnvironnement.h"
+#include "cInterface.h"
+#include "cTrajets.h"
+#include "cCommune.h"
+#include "cDescriptionPassage.h"
+#include "cHandicape.h"
+#include "cVelo.h"
+#include "cGareLigne.h"
 
 
 /*!	\brief Copie d'un �l�ment objet dynamique, selon les param�tres fournis
@@ -67,14 +74,14 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 			
 			// Initialisation des param�tres
 			tIndex iNumeroDesignation = _Parametres[ELEMENTINTERFACELieuArretNumeroDesignation]->Nombre(__Parametres);
-			LogicalPlace* curPA = __Environnement->getArretLogique(_Parametres[ELEMENTINTERFACELieuArretNumeroArretLogique]->Nombre(__Parametres));
+			LogicalPlace* curPA = __Environnement->getLogicalPlace(_Parametres[ELEMENTINTERFACELieuArretNumeroArretLogique]->Nombre(__Parametres));
 			
 			// Affichage
 			// PROVISOIRE LANGAGE IMPOSE
 			cTexteHTML HTML;
-			if (iNumeroDesignation)
-				HTML << *curPA->GetAccesPADe(iNumeroDesignation) << "<br />Arr&ecirc;t: ";
-			HTML << *curPA; 
+//			if (iNumeroDesignation)
+//				HTML << *curPA->GetAccesPADe(iNumeroDesignation) << "<br />Arr&ecirc;t: ";
+			HTML << curPA->getName(); 
 			pCtxt << HTML;
 		}
 		break;
@@ -102,7 +109,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 				
 				// Parcours de chaque �l�ment de trajet
 				__Ligne=0;
-				for (curET = __Trajet->PremierElement(); curET != NULL; curET = curET->Suivant())
+				for (curET = __Trajet->PremierElement(); curET != NULL; curET = curET->getSuivant())
 				{
 					// Pr�paration des cases d�part et arriv�e
 					cInterface_Objet_Connu_ListeParametres __ParametresCaseDepart;
@@ -114,7 +121,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 					
 					//1 Derniere ligne ?
 					__ParametresCaseDepart << "1";
-					__ParametresCaseArrivee << (curET->Suivant() == NULL ? "1" : "");
+					__ParametresCaseArrivee << (curET->getSuivant() == NULL ? "1" : "");
 					
 					//2 Num�ro de colonne
 					__ParametresCaseDepart << __IndexTrajet + 1;
@@ -134,7 +141,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 					__ParametresCaseArrivee << __Heure;
 					
 					//5,6
-					if (__Trajet->getAmplitudeServiceContinu().Valeur())
+					if (__Trajet->getAmplitudeServiceContinu())
 					{
 						tempMoment = curET->MomentDepart();
 						tempMoment += __Trajet->getAmplitudeServiceContinu();
@@ -170,7 +177,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 					
 					// Affichage
 					__Site->Affiche(__Tampons[__Ligne], INTERFACEFicheHoraireColonne, __ParametresCaseDepart);
-					for (__Ligne++; __Trajets->getListeOrdonneePointsArret(__Ligne) != curET->getGareArrivee(); __Ligne++)
+					for (__Ligne++; __Trajets->getListeOrdonneePointsArret(__Ligne) != curET->getDestination()->getLogicalPlace(); __Ligne++)
  						__Site->Affiche(__Tampons[__Ligne], INTERFACEFicheHoraireColonne, __ParametresCaseVide);
 					__Site->Affiche(__Tampons[__Ligne], INTERFACEFicheHoraireColonne, __ParametresCaseArrivee);
 				}
@@ -315,7 +322,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 			__ParametresCaseLigne << _Parametres[EI_OBJETDYNAMIQUE_ListeLignesTrajet_HauteurCase]->Texte(__Parametres);
 			
 			// Fabrication de l'affichage
-			for (const cElementTrajet* __ET = __Trajet->PremierElement(); __ET != NULL; __ET = __ET->Suivant())
+			for (const cElementTrajet* __ET = __Trajet->PremierElement(); __ET != NULL; __ET = __ET->getSuivant())
 			{
 				if (__AfficherLignesPied || !__ET->getLigne()->EstUneLigneAPied())
 					__Site->Affiche(pCtxt, INTERFACECartoucheLigne, __ParametresCaseLigne, __ET->getLigne());
@@ -374,13 +381,13 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 	case ELEMENTINTERFACELienPhotosArretPhysiques:
 
 		{
-			// Initialisation des param�tres
+/*			// Initialisation des param�tres
 			const LogicalPlace* __ArretLogique = (const LogicalPlace*) __Objet;
 			cTexte __TexteEnTete = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesDebut]->Texte(__Parametres);
 			cTexte __TexteLibelle = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesLibelleDefaut]->Texte(__Parametres);
 			cTexte __TextePied = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesFin]->Texte(__Parametres);
 			
-			for (tIndex __ArretPhysique = 1; __ArretPhysique <= __ArretLogique->NombreArretPhysiques(); __ArretPhysique++)
+			for (tIndex __ArretPhysique = 1; __ArretPhysique <= __ArretLogique->getPhysicalStops().size(); __ArretPhysique++)
 			{
 				pCtxt << __TexteEnTete << "<a href=\"javascript:showdiv('Q" << __ArretPhysique << "');\">";
 				if (__ArretLogique->getArretPhysique(__ArretPhysique)->getNom().Taille() == 0)
@@ -389,13 +396,13 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 					pCtxt << __ArretLogique->getArretPhysique(__ArretPhysique)->getNom();
 				pCtxt << "</a>" << __TextePied;
 			}
-		}
+*/		}
 
 		break;
 
 	case ELEMENTINTERFACELienAutresPhotos:
 		{
-			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
+/*			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
 			cTexte __TexteEnTete = _Parametres[ELEMENTINTERFACELienAutresPhotosOuverture]->Texte(__Parametres);
 			cTexte __TexteLienDebut = _Parametres[ELEMENTINTERFACELienAutresPhotosDebut]->Texte(__Parametres);
 			cTexte __TexteLienFin = _Parametres[ELEMENTINTERFACELienAutresPhotosFin]->Texte(__Parametres);
@@ -408,12 +415,12 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 					pCtxt << __TexteLienDebut << "<a href=\"javascript:showdiv('P" << iArretPhysique << "');\">" << ArretLogique->getPhoto(iArretPhysique)->DescriptionLocale() << "</a>" << __TexteLienFin;
 				pCtxt << __TextePied;
 			}
-		}
+*/		}
 		break;
 
 	case ELEMENTINTERFACELienServices:
 		{
-			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
+/*			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
 			cTexte __TexteEnTete = _Parametres[ELEMENTINTERFACELienServicesOuverture]->Texte(__Parametres);
 			cTexte __TexteLienDebut = _Parametres[ELEMENTINTERFACELienServicesDebut]->Texte(__Parametres);
 			cTexte __TexteLienFin = _Parametres[ELEMENTINTERFACELienServicesFin]->Texte(__Parametres);
@@ -433,13 +440,13 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 				}
 				pCtxt << __TextePied;
 			}
-		}
+*/		}
 		break;
 
 
 	case ELEMENTINTERFACEDivArretPhysiques:
 		{
-			// Collecte des param�tres
+/*			// Collecte des param�tres
 			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
 			const cEnvironnement*	__Environnement = __Site->getEnvironnement();
 			
@@ -495,12 +502,12 @@ LienPhoto()))
 				}
 				pCtxt << "</div>";
 			}
-		}
+*/		}
 		break;
 
 	case ELEMENTINTERFACEDivPhotos:
 		{
-			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
+/*			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
 			const cEnvironnement*	__Environnement = __Site->getEnvironnement();
 			
 			const cPhoto* curPhoto;
@@ -553,7 +560,7 @@ LienPhoto()))
 				}
 				pCtxt << "</div>";
 			}
-		}
+*/		}
 		break;
 	
 	
@@ -619,7 +626,7 @@ LienPhoto()))
 
 	case ELEMENTINTERFACEFicheArretScript:
 		{	// A VIRER
-			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
+/*			const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
 			pCtxt << "<script> function showdiv(s) {";
 			//pCtxt << "if (s=='PS') document.all.PS.style.visibility = 'visible'; else document.all.PS.style.visibility = 'hidden';";
 			pCtxt << "for (var k=1; k<=" << ArretLogique->NombreArretPhysiques() << "; k++) if (s=='Q'+k) eval(\"document.all.Q\" + k.toString() + \".style.visibility = 'visible';\"); else eval(\"document.all.Q\" + k.toString() + \".style.visibility = 'hidden';\");";
@@ -629,7 +636,7 @@ LienPhoto()))
 				if (ArretLogique->GetService(iService)->getPhoto())
 					pCtxt << "if (s=='S" << iService << "') eval(\"document.all.S" << iService << ".style.visibility = 'visible';\"); else eval(\"document.all.S" << iService << ".style.visibility = 'hidden';\");";
 			pCtxt << "} </script>";
-		}
+*/		}
 		break;
 
 	case EI_BIBLIOTHEQUE_Date:
@@ -645,7 +652,7 @@ LienPhoto()))
 		{
 			const cEnvironnement*	__Environnement = __Site->getEnvironnement();
 			tIndex n = _Parametres[ELEMENTINTERFACEListeCommunesNombre]->Nombre(__Parametres);
-			cCommune** tbCommunes = __Environnement->TextToCommune(_Parametres[ELEMENTINTERFACEListeCommunesEntree]->Texte(__Parametres),n);
+			vector<cCommune*> tbCommunes = __Environnement->searchTown(string(_Parametres[ELEMENTINTERFACEListeCommunesEntree]->Texte(__Parametres).Texte()),n);
 			
 			
 			if (tbCommunes[1]==NULL)
@@ -656,9 +663,9 @@ LienPhoto()))
 				for (tIndex i=1; i <= n; i++)
 					if (tbCommunes[i]!=NULL)
 					{
-						pCtxt << "<script>Nom[" << i << "]=\"" << tbCommunes[i]->GetNom() << "\";Num[" << i << "]=" << tbCommunes[i]->Index() << ";</script>";
+						pCtxt << "<script>Nom[" << i << "]=\"" << tbCommunes[i]->getName() << "\";Num[" << i << "]=" << tbCommunes[i]->getId() << ";</script>";
 						pCtxt << _Parametres[ELEMENTINTERFACEListeCommunesOuverture]->Texte(__Parametres);
-						pCtxt << "<a href=\"javascript:MAJ(" << i << ")\">" << *tbCommunes[i] << "</a>";
+						pCtxt << "<a href=\"javascript:MAJ(" << i << ")\">" << tbCommunes[i]->getName() << "</a>";
 						pCtxt << _Parametres[ELEMENTINTERFACEListeCommunesFermeture]->Texte(__Parametres);
 					}
 					else
@@ -669,7 +676,7 @@ LienPhoto()))
 
 	case ELEMENTINTERFACEListeArrets:
 		{
-			const cEnvironnement*	__Environnement = __Site->getEnvironnement();
+/*			const cEnvironnement*	__Environnement = __Site->getEnvironnement();
 			tIndex n = _Parametres[ELEMENTINTERFACEListeArretsNombre]->Nombre(__Parametres);
 			cAccesPADe** tbAccesPADe = __Environnement->getCommune(_Parametres[ELEMENTINTERFACEListeArretsCommune]->Nombre(__Parametres))
 										->textToPADe(_Parametres[ELEMENTINTERFACEListeArretsEntree]->Texte(__Parametres),n);
@@ -689,15 +696,15 @@ LienPhoto()))
 					else
 						pCtxt << _Parametres[ELEMENTINTERFACEListeArretsTexteSiVide]->Texte(__Parametres);
 			}
-		}
+*/		}
 		break;
 
 	// 25 A mettre dans donn�e environnement
 	case ELEMENTINTERFACENomCommune:
 		{
 			const cEnvironnement*	__Environnement = __Site->getEnvironnement();
-			cCommune* curCommune = __Environnement->getCommune(_Parametres[ELEMENTINTERFACENomCommuneNumero]->Nombre(__Parametres));
-			pCtxt << curCommune->GetNom();
+			cCommune* curCommune = __Environnement->getTown(_Parametres[ELEMENTINTERFACENomCommuneNumero]->Nombre(__Parametres));
+			pCtxt << curCommune->getName();
 		}
 		break;
 	
@@ -975,7 +982,7 @@ LienPhoto()))
 			
 			// Affichage de chaque ligne de la feuille de route
 			bool __Couleur = false;
-			for (const cElementTrajet* __ET = __Trajet->PremierElement(); __ET != NULL; __ET = __ET->Suivant())
+			for (const cElementTrajet* __ET = __Trajet->PremierElement(); __ET != NULL; __ET = __ET->getSuivant())
 			{
 				// LIGNE ARRET MONTEE Si premier point d'arr�t et si alerte
 				if(__ET == __Trajet->PremierElement())
@@ -983,17 +990,17 @@ LienPhoto()))
 					cMoment debutPrem, finPrem;
 					debutPrem = __ET->MomentDepart();
 					finPrem = debutPrem;
-					if (__Trajet->getAmplitudeServiceContinu().Valeur())
+					if (__Trajet->getAmplitudeServiceContinu())
 						finPrem += __Trajet->getAmplitudeServiceContinu();
 							
-					if (__ET->getGareDepart()->getAlerte()->showMessage(debutPrem,finPrem))
+					if (__ET->getOrigin()->getLogicalPlace()->getAlerte()->showMessage(debutPrem,finPrem))
 					{
 						cInterface_Objet_Connu_ListeParametres __ParametresMontee;
 						__ParametresMontee << 0;
-						__ParametresMontee << __ET->getGareDepart()->getAlerte()->getMessage();
-						__ParametresMontee << __ET->getGareDepart()->getAlerte()->Niveau();
+						__ParametresMontee << __ET->getOrigin()->getLogicalPlace()->getAlerte()->getMessage();
+						__ParametresMontee << __ET->getOrigin()->getLogicalPlace()->getAlerte()->Niveau();
 						__ParametresMontee << "";
-						__ParametresMontee << *__ET->getGareDepart();
+						__ParametresMontee << __ET->getOrigin()->getLogicalPlace()->getName();
 						__ParametresMontee << (__Couleur ? "1" : "");
 						__Couleur = !__Couleur;
 
@@ -1012,7 +1019,7 @@ LienPhoto()))
 					
 					// 0/1 Heures de d�part
 					__ParametresLigne << __ET->MomentDepart().getHeure();	//0
-					if (__Trajet->getAmplitudeServiceContinu().Valeur())
+					if (__Trajet->getAmplitudeServiceContinu())
 					{
 						tempMoment = __ET->MomentDepart();
 						tempMoment += __Trajet->getAmplitudeServiceContinu();
@@ -1023,7 +1030,7 @@ LienPhoto()))
 					
 					// 2/3 Heures d'arriv�e
 					__ParametresLigne << __ET->MomentArrivee().getHeure();	//2
-					if (__Trajet->getAmplitudeServiceContinu().Valeur())
+					if (__Trajet->getAmplitudeServiceContinu())
 					{
 						tempMoment = __ET->MomentArrivee();
 						tempMoment += __Trajet->getAmplitudeServiceContinu();
@@ -1058,7 +1065,7 @@ LienPhoto()))
 					bool __ResaOuverte = false;
 					maintenant.setMoment();
 					if (__ET->getLigne()->GetResa()->TypeResa() == Obligatoire
-					&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getLigne()->GetTrain(__ET->getService()), maintenant, __ET->MomentDepart())
+						&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getService(), maintenant, __ET->MomentDepart())
 					) {
 						__ParametresLigne << "1"; //12
 						__ResaOuverte = true;
@@ -1068,7 +1075,7 @@ LienPhoto()))
 					
 					maintenant.setMoment();
 					if (__ET->getLigne()->GetResa()->TypeResa() == Facultative
-					&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getLigne()->GetTrain(__ET->getService()), maintenant, __ET->MomentDepart())
+					&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getService(), maintenant, __ET->MomentDepart())
 					) {
 						__ParametresLigne << "1"; //13
 						__ResaOuverte = true;
@@ -1078,7 +1085,7 @@ LienPhoto()))
 					
 					if (__ResaOuverte)
 					{	
-						__ParametresLigne << __ET->getLigne()->GetResa()->momentLimiteReservation(__ET->getLigne()->GetTrain(__ET->getService()), __ET->MomentDepart());	//14
+						__ParametresLigne << __ET->getLigne()->GetResa()->momentLimiteReservation(__ET->getService(), __ET->MomentDepart());	//14
 						
 						__ParametresLigne << __ET->getLigne()->GetResa()->GetTelephone(); //15
 						__ParametresLigne << __ET->getLigne()->GetResa()->GetHorairesTelephone(); //16
@@ -1090,10 +1097,10 @@ LienPhoto()))
 							__Requete.AddParam(REQUETE_COMMANDE_FONCTION, FONCTION_FORMULAIRE_RESA);
 							__Requete.AddParam(REQUETE_COMMANDE_SITE, __Site->getClef());
 							__Requete.AddParam(REQUETE_COMMANDE_CODE_LIGNE, __ET->getLigne()->getCode());
-							__Requete.AddParam(REQUETE_COMMANDE_NUMERO_SERVICE, (__ET->getLigne()->GetTrain(__ET->getService()))->getNumero());
+							__Requete.AddParam(REQUETE_COMMANDE_NUMERO_SERVICE, (__ET->getService()->getNumero()));
 							__Requete.AddParam(REQUETE_COMMANDE_CODE_RESA, __ET->getLigne()->GetResa()->Index());
-							__Requete.AddParam(REQUETE_COMMANDE_NUMERO_POINT_ARRET_DEPART, __ET->getGareDepart()->Index());
-							__Requete.AddParam(REQUETE_COMMANDE_NUMERO_POINT_ARRET_ARRIVEE, __ET->getGareArrivee()->Index());
+							__Requete.AddParam(REQUETE_COMMANDE_NUMERO_POINT_ARRET_DEPART, __ET->getOrigin()->getLogicalPlace()->getId());
+							__Requete.AddParam(REQUETE_COMMANDE_NUMERO_POINT_ARRET_ARRIVEE, __ET->getDestination()->getLogicalPlace()->getId());
 							__Requete.AddParam(REQUETE_COMMANDE_DATE, __ET->MomentDepart());
 							__URLResa << __Site->getURLClient() << "?" << __Requete;
 							__ParametresLigne << __URLResa;	//18
@@ -1140,14 +1147,14 @@ LienPhoto()))
 					cMoment debutArret, finArret;
 					debutArret = __ET->MomentArrivee();
 					finArret = debutArret;
-					if (__ET->Suivant() != NULL)
-						finArret = __ET->Suivant()->MomentDepart();
-					if (__Trajet->getAmplitudeServiceContinu().Valeur())
+					if (__ET->getSuivant() != NULL)
+						finArret = __ET->getSuivant()->MomentDepart();
+					if (__Trajet->getAmplitudeServiceContinu())
 						finArret += __Trajet->getAmplitudeServiceContinu();
-					if (__ET->getGareArrivee()->getAlerte()->showMessage(debutArret,finArret))
+					if (__ET->getDestination()->getLogicalPlace()->getAlerte()->showMessage(debutArret,finArret))
 					{
-						__ParametresDescente << __ET->getGareArrivee()->getAlerte()->getMessage();	//1
-						__ParametresDescente << __ET->getGareArrivee()->getAlerte()->Niveau();		//2
+						__ParametresDescente << __ET->getDestination()->getLogicalPlace()->getAlerte()->getMessage();	//1
+						__ParametresDescente << __ET->getDestination()->getLogicalPlace()->getAlerte()->Niveau();		//2
 					}
 					else
 					{
@@ -1156,9 +1163,9 @@ LienPhoto()))
 					}	
 									
 					// 3/4 Informations sur le point d'arr�t 
-					__ParametresDescente << (__ET->getGareArrivee() == __ET->getLigne()->DerniereGareLigne()->ArretLogique() ? "1" : "");
+					__ParametresDescente << (__ET->getDestination()->getLogicalPlace() == __ET->getLigne()->getLineStops().back()->ArretPhysique()->getLogicalPlace() ? "1" : "");
 					cTexteHTML NomArret;	//!< \todo PROVISOIRE METTRE HTML EN MEMOIRE QUELQUE PART
-					NomArret << *__ET->getGareArrivee();
+					NomArret << __ET->getDestination()->getLogicalPlace()->getName();
 					__ParametresDescente << NomArret; //4
 
 					// 5 Couleur du fond de case
@@ -1167,7 +1174,7 @@ LienPhoto()))
 
 					// 6/7 Heures d'arriv�e
 					__ParametresDescente << __ET->MomentArrivee().getHeure();	//6
-					if (__Trajet->getAmplitudeServiceContinu().Valeur())
+					if (__Trajet->getAmplitudeServiceContinu())
 					{
 						tempMoment = __ET->MomentArrivee();
 						tempMoment += __Trajet->getAmplitudeServiceContinu();
@@ -1183,20 +1190,20 @@ LienPhoto()))
 					// LIGNE JONCTION A PIED (si applicable)
 					cInterface_Objet_Connu_ListeParametres __ParametresJonction;
 					
-					__ParametresJonction << __ET->getGareArrivee()->Index();	// 0
+					__ParametresJonction << __ET->getDestination()->getLogicalPlace()->Index();	// 0
 					
 					// 1/2 Alerte	
 					cMoment debutArret, finArret;
 					debutArret = __ET->MomentArrivee();
 					finArret = debutArret;
-					if (__ET->Suivant() != NULL)
-						finArret = __ET->Suivant()->MomentDepart();
-					if (__Trajet->getAmplitudeServiceContinu().Valeur())
+					if (__ET->getSuivant() != NULL)
+						finArret = __ET->getSuivant()->MomentDepart();
+					if (__Trajet->getAmplitudeServiceContinu())
 						finArret += __Trajet->getAmplitudeServiceContinu();
-					if (__ET->getGareArrivee()->getAlerte()->showMessage(debutArret,finArret))
+					if (__ET->getDestination()->getLogicalPlace()->getAlerte()->showMessage(debutArret,finArret))
 					{
-						__ParametresJonction << __ET->getGareArrivee()->getAlerte()->getMessage();	// 1
-						__ParametresJonction << __ET->getGareArrivee()->getAlerte()->Niveau();	// 2
+						__ParametresJonction << __ET->getDestination()->getLogicalPlace()->getAlerte()->getMessage();	// 1
+						__ParametresJonction << __ET->getDestination()->getLogicalPlace()->getAlerte()->Niveau();	// 2
 					}
 					else
 					{
@@ -1223,19 +1230,19 @@ LienPhoto()))
 			cInterface_Objet_Connu_ListeParametres __Parametres;
 			
 			//0 : Dur�e du trajet
-			__Parametres << __Trajet->getDuree().Valeur();
+			__Parametres << __Trajet->getDuree();
 			
 			//1 : Dur�e < 1h ?
-			__Parametres << (__Trajet->getDuree().Valeur() < MINUTES_PAR_HEURE ? "1" : "");
+			__Parametres << (__Trajet->getDuree() < MINUTES_PAR_HEURE ? "1" : "");
 				
 			//2 : Nombre d'heures
-			__Parametres << (__Trajet->getDuree().Valeur() / MINUTES_PAR_HEURE);
+			__Parametres << (__Trajet->getDuree() / MINUTES_PAR_HEURE);
 			
 			//3 : Nombre de minutes
-			__Parametres << (__Trajet->getDuree().Valeur() % MINUTES_PAR_HEURE);
+			__Parametres << (__Trajet->getDuree() % MINUTES_PAR_HEURE);
 
 			//4 : Nombre de minutes sup�rieur � 10 ou inf�rieur � 60 ?
-			__Parametres << (__Trajet->getDuree().Valeur() < MINUTES_PAR_HEURE || __Trajet->getDuree().Valeur() % MINUTES_PAR_HEURE >= 10 ? "1" : "");
+			__Parametres << (__Trajet->getDuree() < MINUTES_PAR_HEURE || __Trajet->getDuree() % MINUTES_PAR_HEURE >= 10 ? "1" : "");
 			
 			// Lancement de l'affichage					
 			__Site->Affiche(pCtxt, INTERFACEDuree, __Parametres, NULL);
@@ -1514,7 +1521,7 @@ LienPhoto()))
 				__ParametresLigne << "0";
 				
 				// Lancement de l'affichage
-				__Site->Affiche(pCtxt, INTERFACENomArret, __ParametresLigne, (const void*) __Ligne->DerniereGareLigne()->ArretLogique());
+				__Site->Affiche(pCtxt, INTERFACENomArret, __ParametresLigne, (const void*) __Ligne->getLineStops().back()->ArretPhysique()->getLogicalPlace());
 			}
 		}
 		break;
@@ -1560,7 +1567,7 @@ LienPhoto()))
 			cTexte __AvantCommune = _Parametres[4]->Texte(__Parametres);
 			cTexte __ApresCommune = _Parametres[5]->Texte(__Parametres);
 			
-			const cCommune* __DerniereCommune = __DP->GetGare(0)->getCommune();
+			const cCommune* __DerniereCommune = __DP->GetGare(0)->getTown();
 			
 			for (tIndex __i=1; __i < __DP->NombreGares(); __i++)
 			{
@@ -1573,17 +1580,17 @@ LienPhoto()))
 					
 					// Affichage de la commune dans les cas o� n�cessaire
 					if (__TypeAffichage.Compare("station_city")
-						|| __TypeAffichage.Compare("station_city_if_new") && __DP->GetGare(__i)->getCommune() != __DerniereCommune
+						|| __TypeAffichage.Compare("station_city_if_new") && __DP->GetGare(__i)->getTown() != __DerniereCommune
 					){
 						cTexteMinuscules __TexteMinuscule;
-						__TexteMinuscule << __DP->GetGare(__i)->getCommune()->GetNom();
+						__TexteMinuscule << __DP->GetGare(__i)->getTown()->getName();
 						pCtxt << __AvantCommune << __TexteMinuscule << __ApresCommune;
-						__DerniereCommune = __DP->GetGare(__i)->getCommune();
+						__DerniereCommune = __DP->GetGare(__i)->getTown();
 					}
 
 					// Affichage du nom d'arr�t dans les cas o� n�cessaire
 					if (__TypeAffichage.Compare("station", 6))
-						pCtxt << __DP->GetGare(__i)->getNom();
+						pCtxt << __DP->GetGare(__i)->getName();
 
 					// Affichage de la destination 13 caract�res dans les cas o� n�cessaire
 					if (__TypeAffichage.Compare("char(13)"))
@@ -1612,12 +1619,12 @@ LienPhoto()))
 			__Maintenant.setMoment(TEMPS_ACTUEL);
 			tDureeEnMinutes __Duree = __Moment - __Maintenant;
 			
-			if (__Duree.Valeur() <= 1)
+			if (__Duree <= 1)
 				pCtxt << __AvantSiImminent;
 			if (__Moment.getHeure().Heures() < 10)
 				pCtxt << __Zero;
             pCtxt << __Moment.getHeure();
-			if (__Duree.Valeur() <= 1)
+			if (__Duree <= 1)
 				pCtxt << __ApresSiImminent;
 		}
 		break;

@@ -40,7 +40,7 @@ tDureeEnMinutes cHoraire::operator - (const cHoraire& Op2) const
 	
 	// 1: Heure
 	DureeCalculee = vHeure - Op2.vHeure;
-	if (DureeCalculee.Valeur() < 0)
+	if (DureeCalculee < 0)
 	{
 		Retenue = 1;
 		DureeCalculee += MINUTES_PAR_JOUR;

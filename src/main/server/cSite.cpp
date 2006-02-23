@@ -5,6 +5,8 @@
 
 
 #include "cSite.h"	
+#include "cObjetInterface.h"
+#include "cInterface.h"
 
 
 
@@ -71,18 +73,6 @@ bool cSite::valide() const
 	
 	// Retour OK
 	return true;
-}
-
-
-
-/*!	\brief Renvoi d'un espace de calcul utilisable
-	\return Pointeur vers un espace de calcul utilisable (NULL si aucun disponible)
-	\author Hugues Romain
-	\date 2005
-*/
-cCalculateur* cSite::CalculateurLibre() const
-{
-	return _Environnement->CalculateurLibre();
 }
 
 
@@ -196,7 +186,7 @@ bool cSite::SetInterface(const cInterface* __Objet)
 
 /*!	\brief Accesseur Environnement
 */
-const cEnvironnement* cSite::getEnvironnement() const
+cEnvironnement* cSite::getEnvironnement() const
 {
 	return _Environnement;
 }

@@ -19,7 +19,11 @@
 
 #include "cTableauAffichageSelectifDestinations.h"
 
+#include "cArretPhysique.h"
 #include "LogicalPlace.h"
+#include "cCommune.h"
+#include "cPeriodeJournee.h"
+#include "cEnvironnement.h"
 
 extern SYNTHESE Synthese;
 
@@ -451,7 +455,7 @@ bool cFichierTbDep::Charge()
 					break;
 				
 				case TBDEPFORMATLIGNEArretLogique:
-					__TbDep->SetArretLogique(__TbDep->getEnvironnement()->GetArretLogique(_Format->GetNombre(Tampon, TBDEPFORMATCOLONNEStandard)));
+					__TbDep->SetArretLogique(__TbDep->getEnvironnement()->getLogicalPlace(_Format->GetNombre(Tampon, TBDEPFORMATCOLONNEStandard)));
 					break;
 
 				case TBDEPFORMATLIGNEArretPhysique:
@@ -459,13 +463,13 @@ bool cFichierTbDep::Charge()
 					break;
 
 				case TBDEPFORMATLIGNEDestinationAffichee:
-					__TbDep->AddDestinationAffichee(__TbDep->getEnvironnement()->GetArretLogique(_Format->GetNombre(Tampon, TBDEPFORMATCOLONNEStandard)));
+					__TbDep->AddDestinationAffichee(__TbDep->getEnvironnement()->getLogicalPlace(_Format->GetNombre(Tampon, TBDEPFORMATCOLONNEStandard)));
 					break;
 
 				case TBDEPFORMATLIGNEDestinationSelection:
 					if (__TbDepSelect != NULL)
 					{
-						__TbDepSelect->AddDestination(__TbDep->getEnvironnement()->GetArretLogique(_Format->GetNombre(Tampon, TBDEPFORMATCOLONNEStandard)));
+						__TbDepSelect->AddDestination(__TbDep->getEnvironnement()->getLogicalPlace(_Format->GetNombre(Tampon, TBDEPFORMATCOLONNEStandard)));
 					}
 					break;
 
@@ -511,7 +515,6 @@ bool cFichierEnvironnements::Charge(int __NombreCalculateurs)
 {
 	// Variables locales
 	cTexte					vNomFichierSites;
-	tIndex NombreEnvsCharges = 0;
 	bool PasTermineSousSection = true;
 	bool PasTermineElement=false;
 
@@ -543,15 +546,7 @@ bool cFichierEnvironnements::Charge(int __NombreCalculateurs)
 		if (ProchaineSection(Tampon, TYPESousSection))
 		{
 			numeroEnv = _Format->GetNombre(Tampon, ENVSFORMATCOLONNENumero);
-			{
-// 				Base.Erreur("Echec de l'enregistrement de l'environnement", _Chemin, Tampon, "");
-				Tampon.Vide();
-			}
-			else
-			{
-				PasTermineElement = true;
-				NombreEnvsCharges++;
-			}
+			PasTermineElement = true;
 		}
 		else
 		{
@@ -566,8 +561,7 @@ bool cFichierEnvironnements::Charge(int __NombreCalculateurs)
 				case ENVSFORMATLIGNERepertoire:
 				{
 					__Environnement = new cEnvironnement(
-						__NombreCalculateurs
-						, Tampon.Extrait(_Format->GetColonnePosition(ENVSFORMATLIGNERepertoire)).fAdresseComplete(_Chemin).Copie(SEPARATEUR_REPERTOIRE_TXT).Texte()
+						Tampon.Extrait(_Format->GetColonnePosition(ENVSFORMATLIGNERepertoire)).fAdresseComplete(_Chemin).Copie(SEPARATEUR_REPERTOIRE_TXT).Texte()
 						, string(_CheminFichierFormats.Texte())
 						, numeroEnv
 					);
@@ -664,11 +658,10 @@ bool cFichierInterfaces::Charge()
 			
 			case INTERFACESFORMATLIGNEPeriode:
 			{
-				cPeriodeJournee* __Periode = new cPeriodeJournee;
-				if (__Periode->SetValeurs(cHeure() = _Format->Extrait(Tampon, INTERFACESFORMATCOLONNEPeriodeDebut)
+				cPeriodeJournee* __Periode = new cPeriodeJournee(string(_Format->Extrait(Tampon, INTERFACESFORMATCOLONNEPeriodeLibelle).Texte())
+								, cHeure() = _Format->Extrait(Tampon, INTERFACESFORMATCOLONNEPeriodeDebut)
 								, cHeure() = _Format->Extrait(Tampon, INTERFACESFORMATCOLONNEPeriodeFin)
-								, _Format->Extrait(Tampon, INTERFACESFORMATCOLONNEPeriodeLibelle)
-								))
+								);
 					curInterface->AddPeriode(__Periode);
 				break;
 			}
@@ -818,10 +811,6 @@ bool cFichierJoursCirculation::Charge(cEnvironnement* __Environnement)
 	tIndex		NumeroJC;
 	
 
-	// Allocation pr�alable du tableau des JC
-	if (!__Environnement->TableauJC().AlloueSiBesoin(NombreElementsAAllouer()))
-		return false;
-	
 	// Ouverture
 	if (!Ouvrir())
 	{
@@ -870,7 +859,7 @@ bool cFichierJoursCirculation::Charge(cEnvironnement* __Environnement)
 			//else
 			//	JCEncours = __Environnement->getJC(NumeroJC);
 
-			TS = RemplirJC(*JCEncours, Positif, Tampon, __Environnement);
+				TS = RemplirJC(*JCEncours, cJC::Positif, Tampon, __Environnement);
 			if (TS==TYPEError)
 				return false;
 		}
@@ -888,7 +877,7 @@ bool cFichierJoursCirculation::Charge(cEnvironnement* __Environnement)
 	return true;
 }
 
-TypeSection cFichierJoursCirculation::RemplirJC(cJC& JC, tSens Sens, cTexte& Tampon, cEnvironnement* __Environnement)
+TypeSection cFichierJoursCirculation::RemplirJC(cJC& JC, cJC::tSens Sens, cTexte& Tampon, cEnvironnement* __Environnement)
 {
 	while (true)
 	{
@@ -915,14 +904,14 @@ TypeSection cFichierJoursCirculation::RemplirJC(cJC& JC, tSens Sens, cTexte& Tam
 
 Lorsque des jours de circulation sont ajout�s, les variables contenant les premi�res et derni�res dates de circulation de l'environnement sont mises � jour le cas �ch�ant (voir cEnvironnement::SetDateMinReelle() et cEnvironnement::SetDateMaxReelle())
 */
-bool cFichierJoursCirculation::JCExecuterCommande(cJC& JC, tSens Sens, cTexte& Tampon, cEnvironnement* __Environnement)
+bool cFichierJoursCirculation::JCExecuterCommande(cJC& JC, cJC::tSens Sens, cTexte& Tampon, cEnvironnement* __Environnement)
 {
 	cFichierJoursCirculation* Fichier2 = NULL;
 	cTexte	 NomFichier2;
 	cDate	 Date1;
 	cDate	 Date2;
 	tJour	 Pas;
-	tSens	 CurSens = Sens;
+	cJC::tSens	 CurSens = Sens;
 
 	switch (Tampon[0])
 	{
@@ -935,10 +924,10 @@ bool cFichierJoursCirculation::JCExecuterCommande(cJC& JC, tSens Sens, cTexte& T
 		break;
 
 	case JCFORMATLIGNESuppressionDate:
-		if (Sens == Positif)
-			CurSens = Negatif;
+		if (Sens == cJC::Positif)
+			CurSens = cJC::Negatif;
 		else
-			CurSens = Positif;
+			CurSens = cJC::Positif;
 	
 	case JCFORMATLIGNEAjoutDate:
 		switch (Tampon[1])
@@ -947,7 +936,7 @@ bool cFichierJoursCirculation::JCExecuterCommande(cJC& JC, tSens Sens, cTexte& T
 			if (__Environnement->GetJC(Tampon.GetNombre(4,2)))
 			{
 				//if (Chargement)
-					__Environnement->getJC(Tampon.GetNombre(4,2))->SetInclusionToMasque(JC, CurSens);
+					__Environnement->GetJC(Tampon.GetNombre(4,2))->SetInclusionToMasque(JC, CurSens);
 				//else
 				//	JCUtile[Tampon.GetNombre(4,2)] = true;
 			}
@@ -990,7 +979,7 @@ bool cFichierJoursCirculation::JCExecuterCommande(cJC& JC, tSens Sens, cTexte& T
 					if (JC.SetCircule(Date1, Date2, CurSens, Pas))
 					{
 						// Si ajout de dates, mise � jour �ventuel des premi�res et derni�res dates circul�es
-						if (CurSens == Positif)
+						if (CurSens == cJC::Positif)
 						{
 							__Environnement->SetDateMinReelle(Date1);
 							__Environnement->SetDateMaxReelle(Date2);
@@ -1007,7 +996,7 @@ bool cFichierJoursCirculation::JCExecuterCommande(cJC& JC, tSens Sens, cTexte& T
 					if (JC.SetCircule(Date1, CurSens))
 					{
 						// Si ajout de dates, mise � jour �ventuel des premi�res et derni�res dates circul�es
-						if (CurSens == Positif)
+						if (CurSens == cJC::Positif)
 						{
 							__Environnement->SetDateMinReelle(Date1);
 							__Environnement->SetDateMaxReelle(Date1);
@@ -1044,7 +1033,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 	bool PasTermineSousSection = true;
 	bool PasTermineElement = false;
 	tCategorieDistance iCategorieDistance;
-	LogicalPlace::tNiveauCorrespondance curNiveauCorrespondance = CorrInterdite;;
+	LogicalPlace::tNiveauCorrespondance curNiveauCorrespondance = LogicalPlace::CorrInterdite;;
 	// Tampon
 	cTexte Tampon(TAILLETAMPON, true);
 	cTexte TamponCalcul(TAILLETAMPON, true);
@@ -1100,13 +1089,6 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 		{
 			switch (LireLigneFormat(Tampon))
 			{
-			case PAFORMATLIGNENombreArretPhysiques:
-				curArretLogique->setNbArretPhysiques((tIndex) _Format->GetNombre(Tampon, PAFORMATCOLONNEStandard));
-				break;
-
-			case PAFORMATLIGNENombreDescriptions:
-				break;
-
 			case PAFORMATLIGNEGpsx:
 				curArretLogique->setX(_Format->GetNombre(Tampon, PAFORMATCOLONNEStandard));
 				break;
@@ -1158,7 +1140,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 					tIndex Position = Tampon.RechercheOccurenceGauche('(', 1
 						, _Format->GetColonnePosition(PAFORMATCOLONNEDesignationLibelle)	);
 
-					int designationType = _Format->GetNombre(Tampon, PAFORMATCOLONNEDesignationType)
+					int designationType = _Format->GetNombre(Tampon, PAFORMATCOLONNEDesignationType);
 
  					if (!Position)
 					{}
@@ -1178,13 +1160,18 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 						{
 							LogicalPlace* designation;
 
-							string townName = string(Tampon.Extrait(_Format->GetColonnePosition(PAFORMATCOLONNEDesignationLibelle)
-								, Position - _Format->GetColonnePosition(PAFORMATCOLONNEDesignationLibelle)
-										).Texte()));
+							string townName = string(
+								Tampon.Extrait(
+									_Format->GetColonnePosition(PAFORMATCOLONNEDesignationLibelle)
+									, Position - _Format->GetColonnePosition(PAFORMATCOLONNEDesignationLibelle)
+								).Texte());
 							string name = string(Tampon.Extrait(Position+1).Texte());
 
-							if (!(commune = __Environnement->getTown(townName))
-								commune = __Environnement->addTown(new cCommune(__Environnement, -1, townName));
+							if (!(commune = __Environnement->getTown(townName)))
+							{
+								commune = new cCommune(-1, townName);
+								__Environnement->addTown(commune);
+							}
 
 							if (mainDesignation)
 							{
@@ -1192,7 +1179,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 								mainDesignation = false;
 							}
 							else
-								designation = new LogicalPlace(this);
+								designation = new LogicalPlace(curArretLogique);
 							
 							designation->setDesignation(commune, name);
 						
@@ -1217,15 +1204,15 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 				
 				// Matrice des correspondances et position du curseur de texte
 				int Position;
-				if (curArretLogique->CorrespondanceAutorisee() != CorrInterdite)
+				if (curArretLogique->CorrespondanceAutorisee() != LogicalPlace::CorrInterdite)
 				{
 					// Ecriture de chaque d�lai de correspondance
-					for (tIndex iNumeroArretPhysiqueDest = 0; iNumeroArretPhysiqueDest < curArretLogique->NombreArretPhysiques(); iNumeroArretPhysiqueDest++)
-						curArretLogique->setDelaiCorrespondance(curNumeroArretPhysique, iNumeroArretPhysiqueDest + 1
-							, _Format->GetNombre(Tampon, PAFORMATCOLONNEDelaiCorrespondance, iNumeroArretPhysiqueDest)	);
+					for (size_t i=0; i<curArretLogique->getNetworkAccessPoints().size(); ++i)
+						curArretLogique->setDelaiCorrespondance(curNumeroArretPhysique, i
+							, _Format->GetNombre(Tampon, PAFORMATCOLONNEDelaiCorrespondance, i-1)	);
 						
 					// Position du pointeur apr�s la matrice de d�lais de correspondances
-					Position = _Format->GetColonnePosition(PAFORMATCOLONNEDelaiCorrespondance, curArretLogique->NombreArretPhysiques());
+					Position = _Format->GetColonnePosition(PAFORMATCOLONNEDelaiCorrespondance, curArretLogique->getNetworkAccessPoints().size());
 				}
 				else // Sinon position du pointeur imm�diatement apr�s le num�ro du quai
 					Position = _Format->GetColonnePosition(PAFORMATCOLONNEDelaiCorrespondance, 0);
@@ -1265,7 +1252,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 					else
 					{
 						// Le reste du texte correspond au nom du quai
-						curArretPhysique->setNom(Tampon.Extrait(Position,1));
+						curArretPhysique->setNom(string(Tampon.Extrait(Position,1).Texte()));
 					}
 					curArretLogique->addNetworkAccessPoint(curArretPhysique, curNumeroArretPhysique);
 				}
@@ -1307,9 +1294,6 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 				Tampon.Vide();
 			case -TYPESousSection:
 				PasTermineElement = false;
-				if (curArretLogique != NULL)
-					if (!curArretLogique->Ferme())
-					{}
 // 						Erreur("ArretPhysique manquant", TXT(curPA->Index()), TXT(""), "02006");
 			}
 		}

@@ -42,7 +42,7 @@ public:
 
 	//!	@name Calculateurs
 	//@{
-		virtual AddressList getAddresses(bool forDeparture) = 0;
+		//virtual AddressList getAddresses(bool forDeparture) = 0;
 	//@}
 	
 	//!	@name Modificateurs
@@ -52,8 +52,8 @@ public:
 
 	//!	@name Constructeur et destructeur
 	//@{
-		NetworkAccessPoint(LogicalPlace*, size_t);
-		virtual ~NetworkAccessPoint();
+		NetworkAccessPoint(LogicalPlace* const, size_t);
+		~NetworkAccessPoint();
 	//@}
 
 };

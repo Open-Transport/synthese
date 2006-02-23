@@ -288,9 +288,6 @@
 				RelativePath="..\..\..\src\main\server\cCommune.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\cCommuneAccesPADe.inline.h">
-			</File>
-			<File
 				RelativePath="..\..\..\src\main\server\cDate.h">
 			</File>
 			<File
@@ -321,16 +318,10 @@
 				RelativePath="..\..\..\src\main\server\cElementTrajet.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\cElementTrajet.inline.h">
-			</File>
-			<File
 				RelativePath=".\cElementTrajetVoirie.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cEnvironnement.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\main\server\cEnvironnement.inline.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cFichier.h">
@@ -352,9 +343,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cGareLigne.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\main\server\cGareLigneAccesPADe.inline.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cHandicape.h">
@@ -397,9 +385,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cLigne.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\main\server\cLigne.inline.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cLog.h">

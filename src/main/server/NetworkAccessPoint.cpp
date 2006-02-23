@@ -33,7 +33,7 @@ NetworkAccessPoint::~NetworkAccessPoint()
 /** Constructeur.
 	@param _logicalPlace Lieu logique auquel appartient le point d'accès
 */
-NetworkAccessPoint::NetworkAccessPoint(LogicalPlace* logicalPlace, size_t rank)
+NetworkAccessPoint::NetworkAccessPoint(LogicalPlace* const logicalPlace, size_t rank)
 :	cPoint()
 , _logicalPlace(logicalPlace)
 , _rank(rank)

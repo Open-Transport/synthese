@@ -8,11 +8,10 @@
 class cSite;
 class cInterface_Objet_Connu_ListeParametres;
 class cEnvironnement;
+class cInterface;
 
 #include "Temps.h"
 #include "cTexte.h"
-#include "cInterface.h"
-#include "cCalculItineraire.h"
 #include <iostream>
 
 /** Gestion des sites Internet clients
@@ -77,7 +76,6 @@ public:
 	//! \name Calculateurs
 	//@{	
 	bool				valide()																const;
-	cCalculateur*		CalculateurLibre()														const;
 	void				Affiche(ostream&, tIndex __IndexObjet, const cInterface_Objet_Connu_ListeParametres&
 								, const void* __Objet=NULL)									const;
 	

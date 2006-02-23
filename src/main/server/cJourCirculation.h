@@ -14,12 +14,6 @@
 // Jours de circulation
 typedef unsigned long tMasque;
 typedef unsigned char tCategorieJC;
-enum tSens
-{
-	Positif = '+',
-	Negatif = '-'
-};
-class cJC;
 
 #include "cTexte.h"
 #include "Temps.h"
@@ -31,6 +25,15 @@ class cJC;
  */
 class cJC
 {
+public:
+
+	enum tSens
+	{
+		Positif = '+',
+		Negatif = '-'
+	};
+
+private:
 	tMasque*		vJoursAnnee; 		//!< Tableau contenant les bits correspondant à chaque jour (l'élement 0 est inutilisé)
 	cAnnee			_PremiereAnnee;		//!< Année réelle correspondant au premier octet du masque
 	cAnnee			_DerniereAnnee;		//!< Année réelle correspondant au dernier octet du masque

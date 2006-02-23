@@ -39,29 +39,29 @@ class cElementTrajet
 friend class cTrajet;
 
 protected:
-	//! \name Donn�es
+	//! \name Données
 	//@{
-	NetworkAccessPoint*			_origin;			// Origine
-	NetworkAccessPoint*			_destination;		// Destination
-	cMoment					vMomentDepart;				//!< Moment du d�part (premier si service continu)
-	tDureeEnMinutes			vAmplitudeServiceContinu;	//!< Amplitude du service continu (0 si service unique)
-	cMoment					vMomentArrivee;				//!< Moment d'arriv�e (premier si service continu)
-	tNumeroService			vNumeroService;				//!< Index du service utilis� au sein de la ligne
-	const cLigne*			vLigne;						//!< Ligne utilis�e
-	tTypeElementTrajet		vType;
+		const NetworkAccessPoint* const			_origin;			// Origine
+		const NetworkAccessPoint* const			_destination;		// Destination
+		const cMoment					vMomentDepart;				//!< Moment du d�part (premier si service continu)
+		const cMoment					vMomentArrivee;				//!< Moment d'arriv�e (premier si service continu)
+		const size_t			vNumeroService;				//!< Index du service utilis� au sein de la ligne
+		const cLigne* const			vLigne;						//!< Ligne utilis�e
+		const tTypeElementTrajet		vType;
+		tDureeEnMinutes			vAmplitudeServiceContinu;	//!< Amplitude du service continu (0 si service unique)
 	//@}
 
-	//! \name Chainages
+	//! \name Chainages dans trajet (à virer)
 	//@{
-	cElementTrajet*			vSuivant;					//!< Element de trajet suivant en correspondance
-	cElementTrajet*			_Precedent;					//!< Element de trajet precedent
+		cElementTrajet*			vSuivant;					//!< Element de trajet suivant en correspondance
+		cElementTrajet*			_Precedent;					//!< Element de trajet precedent
 	//@}
 	
 	//! \name Donn�es pr�calcul�es
 	//@{
-	tDureeEnMinutes			vDureeEnMinutesRoulee;		//!< Temps pass� dans les circulations
-	cDistanceCarree			vDistanceCarreeObjectif;	//!< Carr� de la distance entre la destination de l'�l�ment et la destination finale du trajet (avec l'incertitude habituelle de ce type de donn�es)
-	tDistanceM				vDistanceParcourue;			//!< Distance lin�aire parcourue aucours du trajet
+		const tDureeEnMinutes			vDureeEnMinutesRoulee;		//!< Temps pass� dans les circulations
+		const cDistanceCarree			vDistanceCarreeObjectif;	//!< Carr� de la distance entre la destination de l'�l�ment et la destination finale du trajet (avec l'incertitude habituelle de ce type de donn�es)
+		tDistanceM				vDistanceParcourue;			//!< Distance lin�aire parcourue aucours du trajet
 	//@}
 
 public :
@@ -70,30 +70,28 @@ public :
 	//@{
 	const tDureeEnMinutes&	AmplitudeServiceContinu()			const;
 	const cAxe*				Axe()								const;
-	const cDistanceCarree&	DistanceCarreeObjectif()			const;
+	const cDistanceCarree&	getDistanceCarreeObjectif()			const;
 	tDistanceM				DistanceParcourue()					const;
 	const tDureeEnMinutes&	DureeEnMinutesRoulee()				const;
-	tNumeroService 			getService()						const;
+	const cTrain* 			getService()						const;
 	const cLigne*			getLigne()							const;
 	const cMoment&			MomentArrivee()						const;
 	const cMoment&			MomentDepart()						const;
 	const cElementTrajet*	Precedent()							const;
-	const cElementTrajet*	Suivant()							const;
 	tTypeElementTrajet		Type()								const;
-	NetworkAccessPoint*		getOrigin() const { return _origin; }
-	NetworkAccessPoint*		getDestination() const { return _destination; }
+	const NetworkAccessPoint*		getOrigin() const { return _origin; }
+	const NetworkAccessPoint*		getDestination() const { return _destination; }
 	//@}
 	
 	//! \name Accesseurs d'objet permettant la modification
 	//@{
 	cDistanceCarree&		getDistanceCarreeObjectif();
-	cElementTrajet*			getSuivant();
+	cElementTrajet*			getSuivant() const;
 	//@}
 	
 	//! \name Operateurs
 	//@{
 	cElementTrajet* operator += (cElementTrajet*);
-	cElementTrajet* operator =  (const cElementTrajet&);
 	//@}
 
 	//! \name Calculateurs
@@ -103,29 +101,24 @@ public :
 
 	//! \name Constructeur et destructeur
 	//@{
-	cElementTrajet();
+	cElementTrajet(	const NetworkAccessPoint* const			_origin,
+	const NetworkAccessPoint* const			_destination,
+	const cMoment&					vMomentDepart,
+	const cMoment&					vMomentArrivee,
+	const size_t&			vNumeroService,
+	const cLigne* const			vLigne,
+	const tTypeElementTrajet		vType,
+	tDureeEnMinutes amplitude,
+	const cDistanceCarree& squaredDistanceFromGoal
+);
 	~cElementTrajet();
 	//@}
 
 	//! \name Modificateurs
 	//@{
-		void			CalculeDureeEnMinutesRoulee();
 		cElementTrajet*	deleteChainageColonne();
 		void			setAmplitudeServiceContinu(const tDureeEnMinutes& newVal);
-		void			setDistanceCarreeObjectif(const cDistanceCarree& newVal);
-		void			setDureeEnMinutesRoulee(const tDureeEnMinutes& newVal);
-		void			setInformations(const cGareLigne* GLA, const cGareLigne* GLD, const cMoment& MomentDepart
-											, const cMoment& MomentArrivee);
-		void			setInformations(const cGareLigne* GLA, const cGareLigne* GLD, const cDate& DateDepart
-											, tNumeroService iNumeroService);
-		void			setLigne(const cLigne* newVal);
-		void			setMomentArrivee(const cMoment& newVal);
-		void			setMomentDepart(const cMoment& newVal);
-		void			setService(const tNumeroService newVal);
-  		void			setSuivant(cElementTrajet* newVal);
-		void			setType(tTypeElementTrajet newVal);
-		void			setDestination(NetworkAccessPoint* destination)  { _destination = destination; }
-		void			setOrigin(NetworkAccessPoint* origin)   { _origin = origin; }
+		void			setSuivant(cElementTrajet* newVal);
 	//@}
 	
   	//! \name Fonctions d'affichage	
@@ -226,6 +219,5 @@ int CompareUtiliteETPourMeilleureArrivee(const void* ET1, const void* ET2);
 //@}s
 	
 
-#include "cElementTrajet.inline.h"
 
 #endif

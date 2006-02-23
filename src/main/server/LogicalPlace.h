@@ -89,7 +89,7 @@ public:
 	/** Vecteur vers les points d'accès */
 	typedef vector<NetworkAccessPoint*> AccessPointsVector;
 
-protected:
+private:
 
     //! @name Localisation
     //@{
@@ -147,7 +147,7 @@ public:
 
     //! @name Accesseurs
     //@{
-    tDureeEnMinutes   AttenteCorrespondance(tIndex Dep, tIndex Arr)   const;
+    tDureeEnMinutes   AttenteCorrespondance(size_t Dep, size_t Arr)   const;
     const tDureeEnMinutes& AttenteMinimale()          const;
     tNiveauCorrespondance CorrespondanceAutorisee()        const;
     const cAlerte*   getAlerte()            const;

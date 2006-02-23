@@ -9,7 +9,7 @@
 #include "cCommune.h"
 #include "cAxe.h"
 #include "cHeure.h"
-#include "tDureeEnMinutes.h"
+#include "temps.h"
 #include "cJourCirculation.h"
 #include "cHandicape.h"
 #include "cVelo.h"
@@ -368,101 +368,9 @@ cFichierXML::~cFichierXML()
 {
 }
 
-
 void 
 cFichierXML::log (const std::string& message) {
 	std::cout << "LOG   " << message << std::endl;
-}
-
-
-
-
-
-
-SYNTHESE*
-cFichierXML::chargeSynthese (const std::string& filename) 
-{
-	
-	log ("Chargement de synthese...");
-
-	std::string configPath (_basePath + "/" + filename);
-	
-    // Creation de l'arbre XML
-	XMLNode node = XMLNode::parseFile(configPath.c_str(), SYNTHESE_TAG.c_str());
-	
-	// Creation de l'objet environnement
-	SYNTHESE* synth = new SYNTHESE();
-	
-	for (int i=0; i<node.nChildNode(); ++i) 
-	{
-		XMLNode childNode = node.getChildNode(i);
-		// const XMLNodeContents& childElt = node.enumContents(i);
-		std::string name = childNode.getName ();
-		
-		if (name == ENVIRONNEMENT_TAG) 
-		  {
-		  	// Cree un nouvel environnement
-		  	int nbCalculateurs = 1;
-		  	cEnvironnement* env = new cEnvironnement (nbCalculateurs);
-		  	
-			int id = atoi (childNode.getAttribute (ENVIRONNEMENT_ID_ATTR.c_str()));
-			std::string nom (childNode.getAttribute (ENVIRONNEMENT_NOM_ATTR.c_str()));
-			std::string rep (childNode.getAttribute (ENVIRONNEMENT_REP_ATTR.c_str()));
-			
-			env->SetIndex(id);
-			//! \todo dates min et max heritees depuis main args
-			
-			std::string donneesEnvPath (_basePath);
-			donneesEnvPath += "/";
-			donneesEnvPath += rep;
-			donneesEnvPath += "/";
-			donneesEnvPath += nom;
-			donneesEnvPath += ".xml";
-			
-			std::ifstream ifs (donneesEnvPath.c_str());
-			chargeDonneesTransport (ifs, *env);
-			
-		    synth->Enregistre(env, id);
-		    
-		  }
-		 else if (name == INTERFACE_TAG) 
-		  {
-		    chargeInterface (childNode, *synth);
-		  }
-		 else if (name == SITE_TAG) 
-		  {
-		    chargeSite (childNode, *synth);
-		  }
-		 else if (name == TABLEAU_TAG) 
-		  {
-		  	std::cout << name << std::endl;
-		    chargeTableauDeparts (childNode, *synth);
-		  }
-
-	}
-	
-	log ("Chargement termine...");
-	
-	return synth;
-}
-
-
-
-
-
-void
-cFichierXML::chargeDonneesTransport (istream& xmlStream, cEnvironnement& env) 
-{
-	// transfert vers une string 
-	char ch;
-	std::string buf("");
-	while (xmlStream.get(ch)) buf += ch;
-	
-    // Creation de l'arbre XML
-	XMLNode root = XMLNode::parseString(buf.c_str(), DONNEES_TRANSPORT_TAG.c_str());
-
-
-	return chargeDonneesTransport(root, env);	
 }
 
 
@@ -487,7 +395,6 @@ cFichierXML::chargeDonneesRoutes (const std::string& repertoire, cEnvironnement&
         }
     }
 }
-
 
 
 void
@@ -578,7 +485,9 @@ cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement
 	  double y = atof (locationNode.getAttribute (ARRET_PHYSIQUE_Y_ATTR.c_str()));
 	  
 	  const Vertex* vertex = topo.newVertex (x, y);
-	  steps.push_back (topo.newPhysicalStop (logicalPlaceId, rang, vertex));
+
+	  //TODO CORRIGER CETTE LIGNE
+	  //	  steps.push_back (topo.newPhysicalStop (logicalPlaceId, rang, vertex));
 	}
       }
 	
@@ -587,13 +496,113 @@ cFichierXML::chargeDonneesRoutesCommune (std::istream& xmlStream, cEnvironnement
       
     }
     
-    topo.newRoad (routeId, routeNameAttr, type, routeDiscrAttr, communeId, chunks);
+	// TODO CORRIGER CETTE LIGNE
+//    topo.newRoad (routeId, routeNameAttr, type, routeDiscrAttr, communeId, chunks);
 
       
   }
     
 
 }
+
+
+#ifdef NESTPASDEFINI
+
+
+
+
+
+
+
+
+SYNTHESE*
+cFichierXML::chargeSynthese (const std::string& filename) 
+{
+	
+	log ("Chargement de synthese...");
+
+	std::string configPath (_basePath + "/" + filename);
+	
+    // Creation de l'arbre XML
+	XMLNode node = XMLNode::parseFile(configPath.c_str(), SYNTHESE_TAG.c_str());
+	
+	// Creation de l'objet environnement
+	SYNTHESE* synth = new SYNTHESE();
+	
+	for (int i=0; i<node.nChildNode(); ++i) 
+	{
+		XMLNode childNode = node.getChildNode(i);
+		// const XMLNodeContents& childElt = node.enumContents(i);
+		std::string name = childNode.getName ();
+		
+		if (name == ENVIRONNEMENT_TAG) 
+		  {
+		  	// Cree un nouvel environnement
+		  	int nbCalculateurs = 1;
+		  	cEnvironnement* env = new cEnvironnement ();
+		  	
+			int id = atoi (childNode.getAttribute (ENVIRONNEMENT_ID_ATTR.c_str()));
+			std::string nom (childNode.getAttribute (ENVIRONNEMENT_NOM_ATTR.c_str()));
+			std::string rep (childNode.getAttribute (ENVIRONNEMENT_REP_ATTR.c_str()));
+			
+			env->SetIndex(id);
+			//! \todo dates min et max heritees depuis main args
+			
+			std::string donneesEnvPath (_basePath);
+			donneesEnvPath += "/";
+			donneesEnvPath += rep;
+			donneesEnvPath += "/";
+			donneesEnvPath += nom;
+			donneesEnvPath += ".xml";
+			
+			std::ifstream ifs (donneesEnvPath.c_str());
+			chargeDonneesTransport (ifs, *env);
+			
+		    synth->Enregistre(env, id);
+		    
+		  }
+		 else if (name == INTERFACE_TAG) 
+		  {
+		    chargeInterface (childNode, *synth);
+		  }
+		 else if (name == SITE_TAG) 
+		  {
+		    chargeSite (childNode, *synth);
+		  }
+		 else if (name == TABLEAU_TAG) 
+		  {
+		  	std::cout << name << std::endl;
+		    chargeTableauDeparts (childNode, *synth);
+		  }
+
+	}
+	
+	log ("Chargement termine...");
+	
+	return synth;
+}
+
+
+
+
+
+void
+cFichierXML::chargeDonneesTransport (istream& xmlStream, cEnvironnement& env) 
+{
+	// transfert vers une string 
+	char ch;
+	std::string buf("");
+	while (xmlStream.get(ch)) buf += ch;
+	
+    // Creation de l'arbre XML
+	XMLNode root = XMLNode::parseString(buf.c_str(), DONNEES_TRANSPORT_TAG.c_str());
+
+
+	return chargeDonneesTransport(root, env);	
+}
+
+
+
 
 
 
@@ -1219,7 +1228,7 @@ cFichierXML::chargeAxe (XMLNode& node, cEnvironnement& env)
 		}
 		
 		int attente = atoi (ligneNode.getAttribute (LIGNE_ATTENTE_ATTR.c_str()));
-		for (int k=0; k < ligne->NombreServices(); ++k) {
+		for (int k=0; k < ligne->getServices().size(); ++k) {
 			ligne->setAttente (k, tDureeEnMinutes(attente));
 		}
 		
@@ -1230,7 +1239,7 @@ cFichierXML::chargeAxe (XMLNode& node, cEnvironnement& env)
 		XMLNode numerosNode = node.getChildNode(NUMEROS_TAG.c_str(), 0);
 		valeurs = ligneNode.getAttribute (NUMEROS_VALEURS_ATTR.c_str());
 
-		for (int k=0; k < ligne->NombreServices(); ++k) {
+		for (int k=0; k < ligne->getServices().size(); ++k) {
 			ligne->setNumeroService(k, cTexte (valeurs.substr (k*6, 6).c_str ()));
 		}
 		
@@ -1563,3 +1572,4 @@ cFichierXML::roleToIndex (const std::string& role) {
 	return 0;
 }
 
+#endif

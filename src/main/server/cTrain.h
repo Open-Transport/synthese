@@ -7,12 +7,11 @@
 
 class cTrain;
 class cLigne;
-typedef short int tNumeroService;
+class cSitPert;
+class cJC;
 
 #include "cTexte.h"
-#include "cJourCirculation.h"
-#include "cSitPert.h"
-#include "cModaliteReservation.h"
+#include "temps.h"
 
 /** Impl�mentation de la notion de @ref defCirculation
 	@ingroup m05
@@ -25,8 +24,8 @@ class cTrain
 	cTexte				vNumero;			//!< Num�ro officiel de la circulation
 	bool				vEstCadence;		//!< Indique si la circulation est un service continu
 	cSitPert*			vSitPert;			//!< Lien vers la situation perturb�e applicable � la circulation (NULL = pas de situation perturb�e)
-	cLigne*				vLigne;				//!< Ligne � laquelle appartient la circulation
-	tNumeroService		vIndex;				//!< Index de la circulation dans la ligne
+	cLigne* const				vLigne;				//!< Ligne � laquelle appartient la circulation
+	size_t				vIndex;				//!< Index de la circulation dans la ligne
 	cHoraire*			_HoraireDepart;		//!< Horaire de d�part de l'origine
 
 public:
@@ -43,7 +42,7 @@ public:
 
 	//! \name Constructeur et destructeur
 	//@{
-	cTrain();
+	cTrain(cLigne* const);
 	~cTrain();
 	//@}
 	
@@ -55,7 +54,6 @@ public:
 	void	setServiceContinu			();
 //	cTrain* operator =  (const cTrain&);
 	cJC*	setJC					(cJC*);
-	void	setLigne					(cLigne*);
 	void	setHoraireDepart			(cHoraire*);
 	//@}
 	

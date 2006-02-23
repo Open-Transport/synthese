@@ -8,6 +8,13 @@
 #include "cTrajet.h"
 #include "LogicalPlace.h"
 #include "SYNTHESE.h"
+#include "RoutePlanningNode.h"
+#include "cGareLigne.h"
+#include "cTrain.h"
+#include "cVelo.h"
+#include "cHandicape.h"
+#include "cTarif.h"
+#include "cElementTrajet.h"
 
 #ifdef UNIX
 #include <sys/stat.h>
@@ -23,19 +30,72 @@ extern SYNTHESE Synthese;
 extern pthread_mutex_t CalculMutex;
 #endif
 
-/*!	\brief Constructeur
+/**	Constructeur.
+
+
+	@param __LieuOrigine Lieu d'origine du calcul
+	@param __LieuDestination Lieu de destination du calcul
+	\param __DateDepart Date de la fiche horaire.
+	\param iPeriode P�riode de la journ�e � afficher
+	\param besoinVelo Filtre prise en charge des v�los
+	\param besoinHandicape Filtre prise en charge des handicap�s
+	\param besoinTaxiBus Filtre lignes � la demande
+	\param codeTarif Filtre tarif
+	\return true si une fiche horaire peut �tre calcul�e, false sinon. La valeur false peut survenir si la date de calcul est ant�rieure au moment pr�sent et si les solutions pass�es ne doivent pas �tre affich�es
 	\author Hugues Romain
-	\date 2000-2005
-	
-Le constructeur initialise les tableaux � NULL en attendant qu'ils re�oivent leurs donn�es, et indique que l'espace de calcul n'est pas disponible pour un calcul (car non encore allou�)
+	\date 2001-2006
+
+La pr�paration du calcul de fiche horaire journ�e effectue les initialisations de tous les param�tres :
+	- Prise en compte des divers paramètre transmis directement
+	- Construction des accès au réseau de transport (départ et arrivée) à partir des lieux logiques d'origine et de destination
+
+La variable vArriveeMax, qui permet de limiter le moment d'arriv�e lors du calcul est initalis�e comme suit :
+	- Application de la p�riode aux moments de d�but et de fin de calcul
+	- Ajout d'une minute par kilom�tre � vol d'oiseau pour permettre des solutions dont l'arriv�e d�passe la fin de p�riode, et pouvant �tre toutefois utile � fournir (ex: train de nuit)
+
 */
-cCalculateur::cCalculateur(const cEnvironnement* environnement)
-: vEnvironnement(environnement)
+cCalculateur::cCalculateur(const cEnvironnement* const environnement, const LogicalPlace* const __LieuOrigine, const LogicalPlace* const __LieuDestination
+	, const cDate& __DateDepart
+	, const cPeriodeJournee* const __PeriodeJournee
+	, const tBool3 besoinVelo, const tBool3 besoinHandicape
+	, const tBool3 besoinTaxiBus, const tIndex codeTarif
+	, const bool __SolutionsPassees
+	, const RoutePlanningNode::DistanceInMeters	 maxApproachDistance
+	, const RoutePlanningNode::SpeedInKmh			approachSpeed
+	)
+	: vEnvironnement(environnement)
+	, _maxApproachDistance(maxApproachDistance)
+	, _approachSpeed(approachSpeed)
+	, _origin(__LieuOrigine, true, _maxApproachDistance, _approachSpeed)
+	, _destination(__LieuDestination, false, _maxApproachDistance, _approachSpeed)
+	, _MomentCalcul()
+	, _BaseTempsReel(__DateDepart == _MomentCalcul.getDate())
+	, vBesoinVelo(besoinVelo)
+	, vBesoinHandicape(besoinHandicape)
+	, vBesoinTaxiBus(besoinTaxiBus)
+	, vCodeTarif(codeTarif)
 {
-	_BaseTempsReel = false;
-	Libere();
+	
+	vMomentDebut = __DateDepart;
+	vMomentFin = vMomentDebut;
+
+	
+	// Application de la plage horaire
+	__PeriodeJournee->AppliquePeriode(vMomentDebut, vMomentFin, _MomentCalcul, __SolutionsPassees);
+		
+	vMomentFin += tDureeEnMinutes(cDistanceCarree(*__LieuDestination, *__LieuOrigine).Distance());
+			
+
+	// Optimisations (int�ret � v�rifier)
+//	vMomentDebut = vPADeOrigine->momentDepartSuivant(vMomentDebut, vMomentFin, _MomentCalcul);
+//	vMomentFin = vPADeDestination->momentArriveePrecedente(vMomentFin, vMomentDebut);
+//	vMomentFin += tDureeEnMinutes(1);
 
 }
+
+
+
+
 
 /*!	\brief Destructeur
 */
@@ -63,8 +123,8 @@ bool cCalculateur::HoraireDepartArrivee(cTrajet& __Resultat)
 
 	// Meilleures arriv�es
 	resetIntermediatesVariables();
-	setBestTime(_destination, vMomentFin, true);
-	setBestTime(_origin, vMomentDebut, true);
+	setBestTime(_destination, vMomentFin, true, false);
+	setBestTime(_origin, vMomentDebut, true, false);
 	
 	// Calcul de la meilleure arriv�e possible
 	_LogTrace.Ecrit(LogDebug, "Recherche de la meilleure arriv�e", "");
@@ -79,8 +139,8 @@ bool cCalculateur::HoraireDepartArrivee(cTrajet& __Resultat)
 		// Meilleurs d�parts
 		resetIntermediatesVariables();
 		for (cElementTrajet* TempET = __Resultat.getPremierElement(); TempET!=NULL; TempET = TempET->getSuivant())
-			setBestTime(TempET->getOrigin(), TempET->MomentDepart(), false);
-		setBestTime(_destination, __Resultat.getMomentArrivee(), false);
+			setBestTime((cArretPhysique*) TempET->getOrigin(), TempET->MomentDepart(), false, true);
+		setBestTime(_destination, __Resultat.getMomentArrivee(), false, true);
 		
 		// Bornes du calcul
 		_startTime = __Resultat.getMomentArrivee();
@@ -260,102 +320,6 @@ bool cCalculateur::FicheHoraire()
 	return __AllocationOK;
 }	/*! </ul> */
 
-/*
-
-// ListeDeparts 1.0 - Fabrication de la liste des d�parts d'un point d'arr�t
-//____________________________________________________________________________
-//
-// curPA: Point d'arr�t � �tudier
-//
-// MomentDebut et MomentFin: indique la plage temporelle sur laquelle les
-// d�parts doivent etre donn�s.
-//
-// NombreReponses: facultatif, indique le nombre de d�parts � donner. L'absence
-// de param�tre signifie que la fonction rendra tous les d�parts de la plage.
-// (valeur -1)
-//
-// ERR PROBABLE A RESOUDRE: Il est possible que le passage � JPLUS sup�rieur
-// au sein d'une meme ligne ne soit pas g�r�. Rajouter alors un controle de
-// changement de jplus et mettre curdp sur premierdp en cas de changement. A
-// tester avec de telles lignes.
-//____________________________________________________________________________
-cDescriptionPassage* cEnvironnement::ListeDeparts(LogicalPlace* curPA, cMoment MomentDebut, cMoment& MomentFin, signed int NombreReponses = -1)
-{
-	// Variables
-	cGareLigne* curGLD;
-	tNumeroService iNumeroService;
-	cDescriptionPassage* PremierDP = new cDescriptionPassage(MomentDebut); // Sentinelle
-	cDescriptionPassage* curDP; // Curseur;
-	cDescriptionPassage* newDP;
-	cMoment tempMoment;
-	cHoraire tempHoraire;
-	DureeEnMinutes tempAttente;
-	int nombreDP = 0;
-
-	while (MomentDebut.Date <=MomentFin.Date)
-	{
-
-		// Parcours sur toutes les lignes au d�part et sur tous les services
-
-		for (curGLD=curPA->PremiereGareLigneDep; curGLD!= NULL; curGLD=curGLD->PADepartSuivant)
-			if (curGLD->Ligne->AAfficherSurTableauDeparts)
-			{
-				curDP = PremierDP;
-				for (iNumeroService=0; iNumeroService<curGLD->Ligne->NombreServices; iNumeroService++)
-//					if (curGLD->Circule(iNumeroService, Depart, MomentDebut.Date))
-					{
-						tempMoment = MomentDebut;
-						if ((curGLD->HeureDepartDA(iNumeroService, tempMoment, tempHoraire, tempAttente)) && (tempMoment < MomentFin))
-						{
-							// Recherche de l'emplacement
-							for (; ((curDP->Suivant != PremierDP) && (curDP->Suivant->Moment < tempMoment)); curDP = curDP->Suivant)
-							{ }
-
-							// Si d�passement du nombre de DP voulus
-
-							if (nombreDP != NombreReponses)
-							{
-								newDP = new cDescriptionPassage();
-								nombreDP++;
-							}
-							else
-							{
-								newDP = PremierDP->Precedent;
-								if (curDP->Suivant != newDP)
-								{
-									PremierDP->Precedent = newDP->Precedent;
-									PremierDP->Precedent->Suivant = PremierDP;
-								}
-							}
-							if (nombreDP == NombreReponses)
-								MomentFin = PremierDP->Precedent->Moment;
-
-							newDP->Remplit(tempMoment, curGLD, iNumeroService, tempHoraire, tempAttente);
-							if (curDP->Suivant != newDP)
-							{
-								newDP->Suivant = curDP->Suivant;
-								newDP->Precedent = curDP;
-								curDP->Suivant = newDP;
-								newDP->Suivant->Precedent = newDP;
-
-						}
-
-					}
-			}
-
-		MomentDebut.Date++;
-		MomentDebut.Heure.setMinimum();
-	}
-	PremierDP->Precedent->Suivant = NULL;
-	curDP = PremierDP->Suivant;
-	delete PremierDP;
-	return(curDP);
-}
-
-// � Hugues Romain 2001
-
-// ____________________________________________________________________________
-*/
 
 /*!	\brief Evaluation de l'opportunit� d'une gare ligne d'arriv�e de figurer dans la liste des destinations directes propos�es, pour donner lieu � une nouvelle r�cursivit� de MeilleureArrivee
 	\param __GareLigneArr Gareligne d'arriv�e � �tudier
@@ -372,7 +336,7 @@ cDescriptionPassage* cEnvironnement::ListeDeparts(LogicalPlace* curPA, cMoment M
 	
 	
 */
-inline bool cCalculateur::EvalueGareLigneArriveeCandidate(const cGareLigne* __GareLigneArr, const cMoment& __MomentDepart, const cGareLigne* __GareLigneDep, tIndex __IndexService, cTrajet& __SuiteElementsTrajets, const cTrajet& __TrajetEffectue, bool __OptimisationAFaire, const tDureeEnMinutes& __AmplitudeServiceContinu, cLog& __LogTrace)
+inline bool cCalculateur::EvalueGareLigneArriveeCandidate(const cGareLigne* __GareLigneArr, const cMoment& __MomentDepart, const cGareLigne* __GareLigneDep, tIndex __IndexService, BestSolutionMap& __SuiteElementsTrajets, const cTrajet& __TrajetEffectue, bool __OptimisationAFaire, const tDureeEnMinutes& __AmplitudeServiceContinu, cLog& __LogTrace)
 {
 	if (!__GareLigneArr)
 		return true;
@@ -406,34 +370,40 @@ inline bool cCalculateur::EvalueGareLigneArriveeCandidate(const cGareLigne* __Ga
 	if ((__MomentArrivee < getBestTime(__GareLigneArr->ArretPhysique(), true))
 	|| (__OptimisationAFaire && __MomentArrivee == getBestTime(__GareLigneArr->ArretPhysique(), true)))
 	{
-		cElementTrajet* __ElementTrajet;
-		// On fait mieux, donc ET doit etre gard�.
-		__ElementTrajet = GetET(__GareLigneArr->ArretPhysique());
+		cElementTrajet* __ElementTrajet = new cElementTrajet(
+			__GareLigneDep->ArretPhysique()
+			, __GareLigneArr->ArretPhysique()
+			, __MomentDepart
+			, __MomentArrivee
+			, __IndexService
+			, __GareLigneDep->Ligne()
+			, eTrajetAvecVoyageurs
+			, __AmplitudeServiceContinu
+			, __DistanceCarreeBut
+			);
 		
-		bool __ETCree = false;
-		if (__ElementTrajet == NULL)
+
+
+
+
+		// Arrêt physique déjà trouvé
+		// On prend la nouvelle solution si elle est strictement mieux (@todo A VERIFIER)
+		if (__SuiteElementsTrajets.find(__GareLigneArr->ArretPhysique()) == __SuiteElementsTrajets.end()
+			|| CompareUtiliteETPourMeilleureArrivee(&__ElementTrajet, &__SuiteElementsTrajets[__GareLigneArr->ArretPhysique()]))
 		{
-			__ElementTrajet = new cElementTrajet;								// Allocation
-			__SuiteElementsTrajets.LieEnPremier(__ElementTrajet);			__ElementTrajet->setArretLogiqueArrivee(__GareLigneArr->ArretLogique());	// Ecriture gare d'arriv�e
-			SetET(__GareLigneArr->ArretLogique(), __ElementTrajet, __GareLigneArr->ArretPhysique());	// Stockage dans la gare pour reutilisation eventuelle
-			__ElementTrajet->setArretPhysiqueArrivee(__GareLigneArr->ArretPhysique());
-			__ElementTrajet->setDistanceCarreeObjectif(__DistanceCarreeBut);
-			__ETCree = true;
+			delete __SuiteElementsTrajets[__GareLigneArr->ArretPhysique()];
+			__SuiteElementsTrajets[__GareLigneArr->ArretPhysique()] = __ElementTrajet;
 		}
-		__ElementTrajet->setArretLogiqueDepart(__GareLigneDep->ArretLogique());		// Ecriture gare de d�part
-		__ElementTrajet->setAmplitudeServiceContinu(__AmplitudeServiceContinu);
-		__ElementTrajet->setArretPhysiqueDepart(__GareLigneDep->ArretPhysique());
-		__ElementTrajet->setLigne(__GareLigneDep->Ligne());						// Ecriture ligne
-		__ElementTrajet->setMomentArrivee(__MomentArrivee);						// Ecriture Moment d'arriv�e
-		__ElementTrajet->setMomentDepart(__MomentDepart);						// Ecriture Moment de d�part
-		__ElementTrajet->setService(__IndexService);							//Ecriture du num�ro de service
+		else
+			delete __ElementTrajet;
+			
 		
 		// Gestion de logs
 		if (Synthese.getNiveauLog() <= LogDebug)
 		{
 			cTexte __Message;
-			if (__ETCree)
-				__Message << "***CREATION***";
+//			if (__ETCree)
+//				__Message << "***CREATION***";
 			if (__MomentArrivee <= __MomentDepart)
 			{
 				// Placer un breakpoint ici pour g�rer ce type d'erreur
@@ -442,7 +412,7 @@ inline bool cCalculateur::EvalueGareLigneArriveeCandidate(const cGareLigne* __Ga
 			__LogTrace.Ecrit(LogDebug, __ElementTrajet, __Message, "");
 		}
 		
-		setBestTime(__GareLigneArr->ArretPhysique(), __MomentArrivee, true);	// Enregistrement meilleure arriv�e
+		setBestTime(__GareLigneArr->ArretPhysique(), __MomentArrivee, true, __OptimisationAFaire);	// Enregistrement meilleure arriv�e
 /*		if (_destination->includes(__GareLigneArr->ArretPhysique()))
 		{
 			setBestTime(__GareLigneArr->ArretPhysique(), __MomentArrivee);	// Enregistrement meilleure arriv�e
@@ -457,7 +427,7 @@ inline bool cCalculateur::EvalueGareLigneArriveeCandidate(const cGareLigne* __Ga
 */	}
 	
 	// Retour arr�ter le parcours de la ligne si la destination a �t� atteinte
-		return !_destination->includes(__GareLigneArr->ArretPhysique());
+		return !_destination.includes(__GareLigneArr->ArretPhysique());
 }
 
 
@@ -477,7 +447,7 @@ inline bool cCalculateur::EvalueGareLigneArriveeCandidate(const cGareLigne* __Ga
 	
 	Cette fonction teste la compatibilit� avec la modalit�s de r�servation de la ligne, s'agissant de la premi�re d�couverte de l'heure de d�part
 */
-inline bool cCalculateur::EvalueGareLigneDepartCandidate(const cGareLigne* __GareLigneDep, const cMoment& __MomentArrivee, const cGareLigne* __GareLigneArr, tIndex __IndexService, cTrajet& __SuiteElementsTrajets, const cTrajet& __TrajetEffectue, bool __OptimisationAFaire, const tDureeEnMinutes& __AmplitudeServiceContinu)
+inline bool cCalculateur::EvalueGareLigneDepartCandidate(const cGareLigne* __GareLigneDep, const cMoment& __MomentArrivee, const cGareLigne* __GareLigneArr, tIndex __IndexService, BestSolutionMap& __SuiteElementsTrajets, const cTrajet& __TrajetEffectue, bool __OptimisationAFaire, const tDureeEnMinutes& __AmplitudeServiceContinu)
 {
 	if (!__GareLigneDep)
 		return true;
@@ -492,11 +462,11 @@ inline bool cCalculateur::EvalueGareLigneDepartCandidate(const cGareLigne* __Gar
 
 	// Utilit� de la ligne et du point d'arret
 	cDistanceCarree __DistanceCarreeBut;
-	if (!ProvenanceUtilePourPartirTard(__GareLigneDep->ArretLogique(), __MomentDepart, __DistanceCarreeBut))
+	if (!ProvenanceUtilePourPartirTard(__GareLigneDep->ArretPhysique()->getLogicalPlace(), __MomentDepart, __DistanceCarreeBut))
 		return false;
 	
 	// Controle de non d�passement de Dur�emax
-	if (vDureeServiceContinuPrecedent.Valeur())
+	if (vDureeServiceContinuPrecedent)
 	{
 		if (__MomentDepart <= vDernierDepartServiceContinuPrecedent)
 			if (__TrajetEffectue.Taille())
@@ -510,33 +480,35 @@ inline bool cCalculateur::EvalueGareLigneDepartCandidate(const cGareLigne* __Gar
 	}
 
 	// Ecriture de l'ET si n�cessaire
-	if ((__MomentDepart > GetMeilleurDepart(__GareLigneDep->ArretLogique(), __GareLigneDep->ArretPhysique()))
-	|| (__OptimisationAFaire && __MomentDepart == GetMeilleurDepart(__GareLigneDep->ArretLogique(), __GareLigneDep->ArretPhysique())))
+	if (__MomentDepart > getBestTime(__GareLigneDep->ArretPhysique(), false)
+	|| __OptimisationAFaire && __MomentDepart == getBestTime(__GareLigneDep->ArretPhysique(), false))
 	{
-		cElementTrajet* __ElementTrajet;
-		// On fait mieux, donc ET doit etre gard�.
-		if (_origin->includes(__GareLigneDep->ArretPhysique()))
-			__ElementTrajet = GetET(__GareLigneDep->ArretPhysique());
-		else
-			__ElementTrajet = GetET(__GareLigneDep->ArretPhysique()));
+		cElementTrajet* __ElementTrajet = new cElementTrajet(
+			__GareLigneDep->ArretPhysique()
+			, __GareLigneArr->ArretPhysique()
+			, __MomentDepart
+			, __MomentArrivee
+			, __IndexService
+			, __GareLigneDep->Ligne()
+			, eTrajetAvecVoyageurs
+			, __AmplitudeServiceContinu
+			, __DistanceCarreeBut
+			);
 
-		if (__ElementTrajet == NULL)
+		// Arrêt physique déjà trouvé
+		// On prend la nouvelle solution si elle est strictement mieux (@todo A VERIFIER)
+		if (__SuiteElementsTrajets.find(__GareLigneDep->ArretPhysique()) == __SuiteElementsTrajets.end()
+			|| CompareUtiliteETPourMeilleurDepart(&__ElementTrajet, &__SuiteElementsTrajets[__GareLigneDep->ArretPhysique()]))
 		{
-			__ElementTrajet = new cElementTrajet;								// Allocation
-			__SuiteElementsTrajets.LieEnPremier(__ElementTrajet);			__ElementTrajet->setArretLogiqueDepart(__GareLigneDep->ArretLogique());	// Ecriture gare d'arriv�e
-			SetET(__GareLigneDep->ArretLogique(), __ElementTrajet, __GareLigneDep->ArretPhysique());	// Stockage dans la gare pour reutilisation eventuelle
-			__ElementTrajet->setArretPhysiqueDepart(__GareLigneDep->ArretPhysique());
-			__ElementTrajet->setDistanceCarreeObjectif(__DistanceCarreeBut);
+			delete __SuiteElementsTrajets[__GareLigneDep->ArretPhysique()];
+			__SuiteElementsTrajets[__GareLigneDep->ArretPhysique()] = __ElementTrajet;
 		}
-		__ElementTrajet->setArretLogiqueArrivee(__GareLigneArr->ArretLogique());		// Ecriture gare de d�part
-		__ElementTrajet->setAmplitudeServiceContinu(__AmplitudeServiceContinu);
-		__ElementTrajet->setArretPhysiqueArrivee(__GareLigneArr->ArretPhysique());
-		__ElementTrajet->setLigne(__GareLigneArr->Ligne());						// Ecriture ligne
-		__ElementTrajet->setMomentDepart(__MomentDepart);						// Ecriture Moment de d�part
-		__ElementTrajet->setMomentArrivee(__MomentArrivee);						// Ecriture Moment d'arriv�e
-		__ElementTrajet->setService(__IndexService);							//Ecriture du num�ro de service
+		else
+			delete __ElementTrajet;
+			
 
-		setBestTime(__GareLigneDep->ArretPhysique(), __MomentDepart, false);	// Enregistrement meilleure arriv�e
+
+		setBestTime(__GareLigneDep->ArretPhysique(), __MomentDepart, false, __OptimisationAFaire);	// Enregistrement meilleure arriv�e
 /*		if (vPADeOrigine->inclue(__GareLigneDep->ArretLogique()))
 		{
 		
@@ -552,7 +524,7 @@ setBestTime(__GareLigneDep->ArretPhysique(), __MomentDepart, false);	// Enregist
 */	}
 	
 	// Retour arr�ter le parcours de la ligne si la destination a �t� atteinte
-	return !vPADeOrigine->inclue(__GareLigneDep->ArretLogique());
+		return !_origin.includes(__GareLigneDep->ArretPhysique());
 }
 
 
@@ -569,24 +541,22 @@ setBestTime(__GareLigneDep->ArretPhysique(), __MomentDepart, false);	// Enregist
 Au cours de l'�x�cution de la fonction, les �l�ments sont chain�s par le pointeur Suivant pour pouvoir etre repris ensuite. Sa fonction originelle est restitu�e en fin de fonction (mise � NULL)
 
 */
-inline cElementTrajet** cCalculateur::ListeDestinations(const cTrajet& TrajetEffectue, bool MomentDepartStrict, bool OptimisationAFaire)
+cCalculateur::BestSolutionMap cCalculateur::ListeDestinations(const cTrajet& TrajetEffectue, bool MomentDepartStrict, bool OptimisationAFaire)
 {
 	// D�clarations
-	cElementTrajet**	TableauRetour;
-
-	const cAccesPADe*	GareOrigine;
-	const cGareLigne*	CurrentGLD;
-	const cGareLigne*	CurrentGLA;
-	tNumeroService		NumArret;
+	RoutePlanningNode*	origins = TrajetEffectue.Taille() 
+							? new RoutePlanningNode(TrajetEffectue.getDestination(), true, _maxApproachDistance, _approachSpeed)
+							: new RoutePlanningNode(_origin);
+	tIndex		NumArret;
 	cMoment				MomentDepartInitial;
 	cMoment				MomentDepart;
 	cMoment				MomentArrivee;
-	cTrajet				__SuiteElementsTrajets;
-	tDureeEnMinutes		DureeEnMinutesCorrespondance;
+	BestSolutionMap		__SuiteElementsTrajets;
 	tDureeEnMinutes		AmplitudeServiceContinu;
 	cDistanceCarree		D;
 	cLog				__LogTrace;
 	
+	// Trace log
 	if (Synthese.getNiveauLog() <= LogDebug && _CheminLog.Taille())
 	{
 		cTexte __Chemin;
@@ -595,65 +565,66 @@ inline cElementTrajet** cCalculateur::ListeDestinations(const cTrajet& TrajetEff
 		__LogTrace.Ouvrir(__Chemin);
 	}
 
-	MomentDepartInitial = TrajetEffectue.Taille() ? TrajetEffectue.getMomentArrivee() : vDepartMin;
+	// Initial time
+	MomentDepartInitial = TrajetEffectue.Taille() ? TrajetEffectue.getMomentArrivee() : _startTime;
 
-	// Balayage des lignes
-	for (	GareOrigine = TrajetEffectue.Taille() ? TrajetEffectue.getArretLogiqueArrivee()->getAccesPADe() : vPADeOrigine;
-			GareOrigine != NULL; 
-			GareOrigine = GareOrigine->getSuivant()	)
+	// Iteration on start physical stops
+	for (	RoutePlanningNode::AccessPointsMap::const_iterator iterOrigin = origins->getAccessPoints().begin();
+		iterOrigin != origins->getAccessPoints().end(); 
+			iterOrigin++	)
 	{
-		for (CurrentGLD = GareOrigine->getPremiereGareLigneDep(); CurrentGLD != NULL; )
+		const cArretPhysique* const origin = iterOrigin->first;
+		const tDureeEnMinutes& transferDuration = iterOrigin->second.first;
+
+		// Iteration on line-stops
+		for (cArretPhysique::LineStopVector::const_iterator iterDepLineStop = origin->departureLineStopVector().begin();
+			iterDepLineStop != origin->departureLineStopVector().end();
+			++iterDepLineStop
+		)
 		{
+			const cGareLigne* const CurrentGLD = *iterDepLineStop;
+			
 			// La ligne est-elle utilisable ? (axe deja pris dans le trajet effectu�)
 			if (ControleLigne(CurrentGLD->Ligne(), TrajetEffectue))
 			{
 				// Moment de d�part
 				MomentDepart = MomentDepartInitial;
-				if (TrajetEffectue.Taille())
-					DureeEnMinutesCorrespondance = GareOrigine->getArretLogique()->AttenteCorrespondance(TrajetEffectue.getIndexArretPhysiqueArrivee(), CurrentGLD->ArretPhysique());
+				MomentDepart += transferDuration;
 
-				if (DureeEnMinutesCorrespondance.Valeur() != 99)
+				// La ligne courante permet elle d'atteindre la destination directement ?
+				const cGareLigne* CurrentGLA = NULL;
+				//const cGareLigne* CurrentGLA = CurrentGLD->getLiaisonDirecteVers(vPADeDestination);
+
+				// Tentative de cr�ation de nouvelle solution
+/*				NumArret = CurrentGLD->Prochain(
+					MomentDepart
+					, (CurrentGLA && OptimisationAFaire) 
+						? vMeilleurTemps[CurrentGLA->ArretLogique()->Index()]
+						: vArriveeMax
+					, AmplitudeServiceContinu
+					, INCONNU
+					, _MomentCalcul
+				); TODO REPRENDRE
+*/ 
+				if (NumArret != INCONNU && (!MomentDepartStrict || MomentDepart == MomentDepartInitial))
 				{
-					//Rajout de la dur�e de correspondance
-					MomentDepart += DureeEnMinutesCorrespondance;
-
-					// La ligne courante permet elle d'atteindre la destination directement ?
-					CurrentGLA = CurrentGLD->getLiaisonDirecteVers(vPADeDestination);
-
-					// Tentative de cr�ation de nouvelle solution
-					NumArret = CurrentGLD->Prochain(
-						MomentDepart
-						, (CurrentGLA && OptimisationAFaire) 
-							? vMeilleurTemps[CurrentGLA->ArretLogique()->Index()]
-							: vArriveeMax
-						, AmplitudeServiceContinu
-						, INCONNU
-						, _MomentCalcul
-					);
-
-					if (NumArret != INCONNU && (!MomentDepartStrict || MomentDepart == MomentDepartInitial))
+					// Evaluation de la gareligne rendant vers la destination si trouv�e
+					EvalueGareLigneArriveeCandidate(CurrentGLA, MomentDepart, CurrentGLD, NumArret, __SuiteElementsTrajets, TrajetEffectue, OptimisationAFaire, AmplitudeServiceContinu, __LogTrace);
+					
+					for (CurrentGLA = CurrentGLD->getArriveeCorrespondanceSuivante();
+						CurrentGLA != NULL;
+						CurrentGLA = CurrentGLA->getArriveeCorrespondanceSuivante())
 					{
-						// Evaluation de la gareligne rendant vers la destination si trouv�e
-						EvalueGareLigneArriveeCandidate(CurrentGLA, MomentDepart, CurrentGLD, NumArret, __SuiteElementsTrajets, TrajetEffectue, OptimisationAFaire, AmplitudeServiceContinu, __LogTrace);
-						
-						for (CurrentGLA = CurrentGLD->getArriveeCorrespondanceSuivante();
-							CurrentGLA != NULL;
-							CurrentGLA = CurrentGLA->getArriveeCorrespondanceSuivante())
-						{
-							if (!EvalueGareLigneArriveeCandidate(CurrentGLA, MomentDepart, CurrentGLD, NumArret, __SuiteElementsTrajets, TrajetEffectue, OptimisationAFaire, AmplitudeServiceContinu, __LogTrace))
-								break;
-						}//end boucle currentGLA
-					}//end num arret !=-1
-				}//end duree correspondance
-				CurrentGLD = CurrentGLD->PADepartSuivant();
-			}//end controle axe
-			else
-				CurrentGLD = CurrentGLD->PADepartAxeSuivant();
+						if (!EvalueGareLigneArriveeCandidate(CurrentGLA, MomentDepart, CurrentGLD, NumArret, __SuiteElementsTrajets, TrajetEffectue, OptimisationAFaire, AmplitudeServiceContinu, __LogTrace))
+							break;
+					}//end boucle currentGLA
+				}//end num arret !=-1
+			}//end controle ligne
 		}//end currentGLD
 	}//end gare origine
 
 	// Allocation du tableau de r�sultats
-	TableauRetour  = (cElementTrajet**) malloc ((__SuiteElementsTrajets.Taille()+1)*sizeof(cElementTrajet*));
+/*	TableauRetour  = (cElementTrajet**) malloc ((__SuiteElementsTrajets.Taille()+1)*sizeof(cElementTrajet*));
 		
 	// Stockage en supprimant les arriv�es trop tardives r�siduelles (parues avant la mise
 	// � jour de MomentMax
@@ -681,11 +652,11 @@ inline cElementTrajet** cCalculateur::ListeDestinations(const cTrajet& TrajetEff
 		}
 	}
 	TableauRetour[__NombreET]=NULL;
+*/
+	// Tri des ET TODO REACTIVER
+//	qsort(TableauRetour, __NombreET, sizeof(cElementTrajet*), CompareUtiliteETPourMeilleureArrivee);
 
-	// Tri des ET
-	qsort(TableauRetour, __NombreET, sizeof(cElementTrajet*), CompareUtiliteETPourMeilleureArrivee);
-
-	return TableauRetour;
+	return __SuiteElementsTrajets;
 }
 
 
@@ -701,10 +672,12 @@ inline cElementTrajet** cCalculateur::ListeDestinations(const cTrajet& TrajetEff
 
 Au cours de l'�x�cution de la fonction, les �l�ments sont chain�s par le pointeur Suivant pour pouvoir etre repris ensuite. Sa fonction originelle est restitu�e en fin de fonction (mise � NULL)
 
+	@todo A INTEGRER A LISTE DESTINATIONS REVERSIBLE
 */
-inline cElementTrajet** cCalculateur::ListeProvenances(const cTrajet& TrajetEffectue, bool MomentArriveeStrict, bool OptimisationAFaire)
+
+cCalculateur::BestSolutionMap cCalculateur::ListeProvenances(const cTrajet& TrajetEffectue, bool MomentArriveeStrict, bool OptimisationAFaire)
 {
-	// D�clarations
+/*	// D�clarations
 	cElementTrajet**	TableauRetour;
 
 	const cAccesPADe*	GareDestination;
@@ -806,7 +779,8 @@ inline cElementTrajet** cCalculateur::ListeProvenances(const cTrajet& TrajetEffe
 	qsort(TableauRetour, __NombreET, sizeof(cElementTrajet*), CompareUtiliteETPourMeilleurDepart);
 
 	return TableauRetour;
-}
+*/ return BestSolutionMap();
+	}
 
 
 
@@ -823,7 +797,6 @@ Cette m�thode rend TrajetEffectue intact malgr� les manipulations temporaire
 bool cCalculateur::MeilleureArrivee(cTrajet& __Resultat, cTrajet& __TrajetEffectue, bool MomentDepartStrict, bool OptimisationAFaire)
 {
 	// Variables locales
-	cElementTrajet**		__ElementsTrajetsDirects;	// Liste des �l�ments de trajet direct
 	cTrajet					__Candidat;					// Trajet Candidat
 	
 	// Sortie si trop de correspondances
@@ -835,30 +808,31 @@ bool cCalculateur::MeilleureArrivee(cTrajet& __Resultat, cTrajet& __TrajetEffect
 	_LogTrace.Ecrit(LogDebug, __TrajetEffectue, vIterationsArr, "", "");
 	
 	// Obtention de la liste des trajets directs possibles au d�part de l'arr�t
-	__ElementsTrajetsDirects = ListeDestinations(__TrajetEffectue, MomentDepartStrict, OptimisationAFaire);
+	BestSolutionMap& __ElementsTrajetsDirects = ListeDestinations(__TrajetEffectue, MomentDepartStrict, OptimisationAFaire);
 	
 	// Etude de chaque possibilit� en effectuant une correspondance par les �l�ments de trajet direct propos�s
-	for (int __i=0; __ElementsTrajetsDirects[__i] != NULL; __i++)
+	for (BestSolutionMap::iterator iterSolution = __ElementsTrajetsDirects.begin();
+		iterSolution != __ElementsTrajetsDirects.end();
+		++iterSolution)
 	{
 		// A ce stade, le Candidat est toujours vide.
 		// Cas �l�ment se rendant � destination le candidat est l'�l�ment
-		if (vPADeDestination->inclue(__ElementsTrajetsDirects[__i]->getGareArrivee()))
+		if (_destination.includes(iterSolution->first))
 		{
-			__Candidat.LieEnPremier(__ElementsTrajetsDirects[__i]);
+			__Candidat.LieEnPremier(iterSolution->second);
 			_LogTrace.Ecrit(LogDebug, __Candidat, vIterationsArr, "***RESULTAT***", "");
 		}
 		else	// Sinon r�cursion
 		{
 			// R��valuation du candidat
-			if (ControleTrajetRechercheArrivee(*__ElementsTrajetsDirects[__i]))
+			if (ControleTrajetRechercheArrivee(*iterSolution->second))
 			{
 				// Ajout de l'�l�ment de trajet �tuid� au trajet effectu�
-				__TrajetEffectue.LieEnDernier(__ElementsTrajetsDirects[__i]);
+				__TrajetEffectue.LieEnDernier(iterSolution->second);
 
 				// R�cursion		
 				if (!MeilleureArrivee(__Candidat, __TrajetEffectue, false, OptimisationAFaire))
 				{
-					free(__ElementsTrajetsDirects);
 					return false;	// Cas erreur technique (allocation)
 				}
 				
@@ -869,13 +843,13 @@ bool cCalculateur::MeilleureArrivee(cTrajet& __Resultat, cTrajet& __TrajetEffect
 				if (__Candidat.Taille())
 				{
 					// Insertion de l'�l�ment �tudi� en t�te du candidat pour produire un r�sultat potentiel
-					__Candidat.LieEnPremier(__ElementsTrajetsDirects[__i]);
+					__Candidat.LieEnPremier(iterSolution->second);
 				}
 				else
-					delete __ElementsTrajetsDirects[__i];
+					delete iterSolution->second;
 			}
 			else
-				delete __ElementsTrajetsDirects[__i];
+				delete iterSolution->second;
 		}
 		__Candidat.Finalise();
 
@@ -898,7 +872,6 @@ bool cCalculateur::MeilleureArrivee(cTrajet& __Resultat, cTrajet& __TrajetEffect
 	}
 
 	// Nettoyage du tableau interm�diaire
-	free(__ElementsTrajetsDirects);
 	return true;
 }
 
@@ -913,10 +886,12 @@ bool cCalculateur::MeilleureArrivee(cTrajet& __Resultat, cTrajet& __TrajetEffect
 	\return true si l'op�ration a �t� men�e avec succ�s (avec un r�sultat vide �ventuel), false sinon
 
 Cette m�thode rend TrajetEffectue intact malgr� les manipulations temporaires qui sont effectu�es sur l'objet.
+
+@todo A REINTEGRER A MEILLEUREARRIVEE REVERSIBLE
 */
 bool cCalculateur::MeilleurDepart(cTrajet& __Resultat, cTrajet& __TrajetEffectue, bool MomentArriveeStricte, bool OptimisationAFaire)
 {
-	// Variables locales
+/*	// Variables locales
 	cElementTrajet**		__ElementsTrajetsDirects;	// Liste des �l�ments de trajet direct
 	cTrajet					__Candidat;					// Trajet Candidat
 	
@@ -993,476 +968,22 @@ bool cCalculateur::MeilleurDepart(cTrajet& __Resultat, cTrajet& __TrajetEffectue
 
 	// Nettoyage du tableau interm�diaire
 	free(__ElementsTrajetsDirects);
-	return true;
+*/	return true;
 }
 
 
-
-/*!	\brief Calcul de la liste des points d'arr�t desquels existent une liaison directe vers l'arr�t de d�part du trajet fourni en param�tre
-	\param TrajetEffectue Trajet d�j� calcul� � partir du point d'arr�t en cours vers la destination
-	\param EnCorrespondance true si une correspondance est effectu�e au point d'arr�t en cours (la dur�e de correspondance inter-quais sera retir�e au moment de d�part pour obtenir l'arriv�e maximale au point d'arr�t en cours). false s'il s'agit de trouver les provenances directes vers la destination.
-	\param MomentArriveeStrict true si les solutions n'arrivant pas exactement � l'heure fournie doivent �tre filtr�es. Param�tre utile si l'heure d'arriv�e exacte a d�j� �t� calcul�e par ailleurs, et si cette fonction n'est utilis�e que dans le cadre d'une optimisation de la solution trouv�e
-	\param OptimisationAFaire true si le calcul est lanc� dans le cadre d'une optimisation d'une solution d�j� trouv�e (seuls les solutions permettant de gagner du temps strictement seront fournies)
-	\return Liste d'�l�ments de trajet dont chacun propose la solution la plus rapide pour rallier chacune des provenances possibles vers la gare de d�but de TrajetEffectue.
-	Les �l�ments retourn�s sont stock�s dans un tableau qu'il conviendra de d�truire ensuite.
-	Si la destination n'est pas atteinte, alors l'element 0 est a NULL.
-	Le tableau se termine par un pointeur NULL.
-	
-	Cette fonction est inline car appel�e en un seul point du code (aucune diff�rence de poids du programme une fois compil�), et appel�e tr�s fr�quemment � l'ex�cution (perte de temps de calcul si un appel de fonction devait s'op�rer � chaque fois).
-*/
-/*inline cElementTrajet** cCalculateur::ListeProvenances(const cTrajet& TrajetEffectue, bool EnCorrespondance, bool MomentArriveeStrict, bool OptimisationAFaire, TSituation Situation)
-{
-
-	// D�clarations
-//	cMoment			MomentMin = MomentMinAbsolu;
-//	LogicalPlace*			GareDestination = TrajetEffectue->getGareDepart();
-	const cAccesPADe*	GareDestination;
-	const cGareLigne*	CurrentGLD;
-	const cGareLigne*	CurrentGLA;
-	int					NumArret;
-	cMoment				MomentArriveeInitial;
-	cMoment				MomentDepart;
-	cMoment				MomentArrivee;
-	cElementTrajet*		CurrentET;
-	cElementTrajet*		__PremierET = NULL;
-	tIndex				__NombreET = 0;
-	cElementTrajet**	TableauRetour;
-	bool				DesserteAAffiner;
-	const cGareLigne*	LigneDesservantProvenance;
-	char				VoieDepart;
-	char				VoieArrivee;
-	tDureeEnMinutes		DureeEnMinutesCorrespondance;
-	tDureeEnMinutes		AmplitudeServiceContinu;
-	cDistanceCarree		D;
-
-	if (TrajetEffectue.Taille())
-	{
-		GareDestination = TrajetEffectue.getArretLogiqueDepart()->getAccesPADe();
-		MomentArriveeInitial = TrajetEffectue.getMomentDepart();
-	}
-	else
-	{
-		GareDestination = vPADeDestination;
-		MomentArriveeInitial = vArriveeMax;
-	}
-
-	//_ASSERTE (vMeilleurTemps[vPADeOrigine->getArretLogique()->Index()] <= vDepartMin);
-	
-//	vDepartMin = vMeilleurTemps[vPAOrigine->Index()];
-
-	// Remplissage des ET
-	for (; GareDestination != NULL; GareDestination = GareDestination->getSuivant())
-		for (CurrentGLA = GareDestination->getPremiereGareLigneArr(); CurrentGLA != NULL; )
-		{
-			if (ControleLigne(CurrentGLA->Ligne(), TrajetEffectue))
-			{
-				// Enregistrement des param�tres principaux dans des variables interm�diaires
-				VoieArrivee = CurrentGLA->ArretPhysique();
-
-				MomentArrivee = MomentArriveeInitial;
-				if (EnCorrespondance)
-					DureeEnMinutesCorrespondance = GareDestination->getArretLogique()->AttenteCorrespondance(VoieArrivee, TrajetEffectue.getIndexArretPhysiqueDepart());
-				if (DureeEnMinutesCorrespondance.Valeur() != 99)
-				{
-					MomentArrivee -= DureeEnMinutesCorrespondance;
-					
-					// Desserte de la provenance
-//					LigneDesservantProvenance = vPADeOrigine->DessertAuDepart(CurrentGLA->Ligne());
-
-					if (LigneDesservantProvenance && OptimisationAFaire)
-						// Tentative d'am�lioration de la solution en cours
-						NumArret = CurrentGLA->Precedent(MomentArrivee, vMeilleurTemps[LigneDesservantProvenance->ArretLogique()->Index()], AmplitudeServiceContinu);
-					else
-						// Tentative de cr�ation de nouvelle solution
-						NumArret = CurrentGLA->Precedent(MomentArrivee, vDepartMin, AmplitudeServiceContinu);
-
-					if (NumArret != INCONNU && (!MomentArriveeStrict || MomentArrivee == MomentArriveeInitial))
-					{
-						// Balayage des destinations selon le cas
-						DesserteAAffiner = false;
-// 						if (!vPADeOrigine->correspondanceAutorisee() && LigneDesservantProvenance)
-// 							DesserteAAffiner = true;
-// 						if (DesserteAAffiner)
-// 							CurrentGLD = CurrentGLA->getDepartPrecedent();
-// 						else
-// 							CurrentGLD = CurrentGLA->getDepartCorrespondancePrecedent();
-
-						while (CurrentGLD != NULL)
-						{
-							if (CurrentGLD->ArretLogique()->CorrespondanceAutorisee() || vPADeOrigine->inclue(CurrentGLD->ArretLogique()))
-							{
-								// Enregistrement des param�tres principaux dans des variables interm�diaires
-								VoieDepart = CurrentGLD->ArretPhysique();
-
-								// Horaire d�part
-								MomentDepart = MomentArrivee;
-								CurrentGLD->CalculeDepart(*CurrentGLA, NumArret, MomentArrivee, MomentDepart);
-
-								// Utilit� de la ligne et du point d'arr�t
-								D=0;
-// 								if (!vPADeOrigine->inclue(CurrentGLD->ArretLogique()) && !ProvenanceUtilePourPartirTard(CurrentGLD->ArretLogique(), MomentDepart, LigneDesservantProvenance, D))
-// 									break;
-								
-								//  SET FE.2.3.4.001 : rajout filtre resa : la ligne et le point d'arret ne sont pas OK	
-								if (!CurrentGLD->Ligne()->verificationReservation(MomentDepart, true))
-									break;
-								
-								// Controle de non d�passement de Dur�emax
-								if (vDureeServiceContinuPrecedent.Valeur())
-								{
-									if (MomentDepart <= vDernierDepartServiceContinuPrecedent)
-										if (TrajetEffectue.Taille())
-										{
-											if ((TrajetEffectue.getMomentArrivee() - MomentDepart) >= vDureeServiceContinuPrecedent)
-												break;
-										}
-										else
-											if ((MomentArrivee - MomentDepart) >= vDureeServiceContinuPrecedent)
-												break;
-								}
-
-								if ((MomentDepart > GetMeilleurDepart(CurrentGLD->ArretLogique(), VoieDepart))
-								|| (OptimisationAFaire && MomentDepart == GetMeilleurDepart(CurrentGLD->ArretLogique(), VoieDepart)))
-								{
-									if (vPADeOrigine->inclue(CurrentGLD->ArretLogique()))
-										CurrentET = GetET(CurrentGLD->ArretLogique());
-									else
-										CurrentET = GetET(CurrentGLD->ArretLogique(), VoieDepart);
-
-									if (CurrentET == NULL)
-									{
-										CurrentET = new cElementTrajet;
-										CurrentET->setSuivant(__PremierET);	// Chainage provisoire
-										SetET(CurrentGLD->ArretLogique(), CurrentET, VoieDepart);
-										CurrentET->setArretLogiqueDepart(CurrentGLD->ArretLogique());
-										CurrentET->setDistanceCarreeObjectif(D);
-										__PremierET = CurrentET;
-										__NombreET++;
-									}
-
-									CurrentET->setAmplitudeServiceContinu(AmplitudeServiceContinu);
-									CurrentET->setArretLogiqueArrivee(CurrentGLA->ArretLogique());
-									CurrentET->setArretPhysiqueDepart(VoieDepart);
-									CurrentET->setArretPhysiqueArrivee(VoieArrivee);
-									CurrentET->setLigne(CurrentGLA->Ligne());
-									CurrentET->setMomentArrivee(MomentArrivee);
-									CurrentET->setMomentDepart(MomentDepart);
-									CurrentET->CalculeDureeEnMinutesRoulee();
-									CurrentET->setService(NumArret);
-									
-									if (vPADeOrigine->inclue(CurrentGLD->ArretLogique()))
-									{
-										SetMeilleurDepart(CurrentGLD->ArretLogique(), MomentDepart);
-										if (OptimisationAFaire) // MODIF
-											vDepartMin = MomentDepart; // MODIF
-										else // MODIF
-											//vDepartMin = vPADeOrigine->momentDepartSuivant(CurrentET->MomentDepart(), TrajetEffectue->MomentArriveeFinale());
-											vDepartMin = vPADeOrigine->momentDepartSuivant(CurrentET->MomentDepart(), vMomentFin);
-									}
-									else
-										SetMeilleurDepart(CurrentGLD->ArretLogique(), MomentDepart, VoieDepart);
-								}
-							}
-							if (DesserteAAffiner)
-								CurrentGLD = CurrentGLD->getDepartPrecedent();
-							else
-								CurrentGLD = CurrentGLD->getDepartCorrespondancePrecedent();
-						}
-					}
-				}
-				CurrentGLA = CurrentGLA->PAArriveeSuivante();
-			}
-			else
-				CurrentGLA = CurrentGLA->PAArriveeAxeSuivante();
-		}
-
-	// Stockage des pointeurs et des distances dans le tableau
-	TableauRetour	= (cElementTrajet**) malloc((__NombreET+1)*sizeof(cElementTrajet*));
-	
-	__NombreET = 0;
-	for (CurrentET = __PremierET; CurrentET!=NULL; CurrentET = __PremierET)
-	{
-		SetET(CurrentET->getGareDepart(), NULL, CurrentET->VoieDepart());
-		__PremierET = CurrentET->getSuivant();
-
-		if (ProvenanceUtilePourPartirTard(CurrentET->getGareDepart(), CurrentET->MomentDepart(),  CurrentET->getDistanceCarreeObjectif()))
-		{
-			CurrentET->CalculeDureeEnMinutesRoulee();                        // DureeEnMinutes roulee
-			TableauRetour[__NombreET] = CurrentET;
-			TableauRetour[__NombreET]->setSuivant(NULL);
-			__NombreET++;
-		}
-		else
-		{ // Destruction de l'ET
-			delete CurrentET;
-		}
-	}
-	TableauRetour[__NombreET] = NULL;
-
-	qsort(TableauRetour, __NombreET, sizeof(cElementTrajet*), CompareUtiliteETPourMeilleurDepart);
-
-	return TableauRetour;
-}
-*/
-
-
-/*!	\brief Calcul de l'heure de d�part la plus tardive avec proposition d'une solution, permettant l'arriv�e � un point donn� depuis un autre point, � une heure donn�e
-	\retval __Resultat R�sultat du calcul
-	\param profondeur Nombre d'appels r�cursifs successifs (pour limiter)
-	\param TrajetEffectue Trajet d�j� calcul� par les appels r�cursifs pr�c�dents
-	\param EnCorrespondance Indique si l'�l�ment sera fix� en correspondance au trajet effectu� (voir profondeur)
-	\param MomentArriveeStrict Indique si l'heure d'arriv�e doit �tre strictement identique � l'heure but
-	\param OptimisationAFaire Indique si le calcul doit s�lectionner le meilleur trajet au sens de l'op�rateur > ou bien se contenter de fournir une solution valide
-	\param Situation Indique si l'usage de la base temps r�el doit �tre forc�
-	\param __Finaliste Proposition de r�sultat calcul�e par ailleurs (passage par valeur)
-	\return true si le calcul a pu �tre men� avec succ�s ind�pendamment du r�sultat, false sinon
-	\author Hugues Romain
-	\date 2000-2005
-*/
-/*bool cCalculateur::MeilleurDepart(cTrajet& __Resultat, cTrajet& __TrajetEffectue, bool EnCorrespondance, bool MomentArriveeStrict, bool OptimisationAFaire, TSituation Situation)
-{
-	// Variables locales
-	cElementTrajet**		__ElementsTrajetsDirects;	// Liste des �l�ments de trajet direct
-	cTrajet					__Candidat;					// Trajet Candidat
-	
-	// Sortie si trop de correspondances
-	if (__TrajetEffectue.Taille() > NMAXPROFONDEUR)
-		return true;
-	
-	// Obtention de la liste des trajets directs possibles au d�part de l'arr�t
-	__ElementsTrajetsDirects = ListeProvenances(__TrajetEffectue, EnCorrespondance, MomentArriveeStrict, OptimisationAFaire, Situation);
-	
-	// Etude de chaque possibilit� en effectuant une correspondance par les �l�ments de trajet direct propos�s
-	for (int __i=0; __ElementsTrajetsDirects[__i] != NULL; __i++)
-	{
-		// A ce stade, le Candidat est toujours vide.
-		// Cas �l�ment se rendant � destination le candidat est l'�l�ment
-		if (vPADeOrigine->inclue(__ElementsTrajetsDirects[__i]->getGareDepart()))
-		{
-			__Candidat.LieEnPremier(__ElementsTrajetsDirects[__i]);
-		}
-		else	// Sinon r�cursion
-		{
-			// R��valuation du candidat
-			if (ControleTrajetRechercheDepart(*__ElementsTrajetsDirects[__i]))
-			{
-				// Ajout de l'�l�ment de trajet �tuid� au trajet effectu�
-				__TrajetEffectue.LieEnPremier(__ElementsTrajetsDirects[__i]);
-
-				// R�cursion		
-				if (!MeilleurDepart(__Candidat, __TrajetEffectue, true, false, OptimisationAFaire, Situation))
-				{
-					free(__ElementsTrajetsDirects);
-					return false;	// Cas erreur technique (allocation)
-				}
-				
-				// Suppression du lien vers l'�l�ment de trajet �tudi� sur le trajet effectu�
-				__TrajetEffectue.DeliePremier();
-				
-				// Si r�cursion a produit un r�sultat : exploitation
-				if (__Candidat.Taille())
-				{
-					// Insertion de l'�l�ment �tudi� en t�te du candidat pour produire un r�sultat potentiel
-					__Candidat.LieEnDernier(__ElementsTrajetsDirects[__i]);
-				}
-			}
-		}
-
-		// Si un candidat est cr�� : �lection
-		if (__Candidat > __Resultat)
-		{
-			// Remplacement du r�sultat par le candidat (le r�sultat pr�c�dent est d�truit et le candidat est vid�)
-			__Resultat = __Candidat;
-		}
-		else
-		{
-			// Destruction du candidat
-			__Candidat.Vide();
-		}
-	}
-
-	// Nettoyage du tableau interm�diaire
-	free(__ElementsTrajetsDirects);
-	return true;
-}
-*/
 
 
 
 void cCalculateur::resetIntermediatesVariables()
 {
-	_bestSolutionByLogicalPlace.clear();
-	_bestSolutionsByPhysicalStop.clear();
-	_bestTimeByLogicalPlace.clear();
-	_bestSolutionsByPhysicalStop.clear();
-}
-
-void cCalculateur::SetMeilleurDepart(const cAccesPADe* curAccesPADe, const cMoment& NewMoment, tIndex NumVoie)
-{
-	for (; curAccesPADe != NULL; curAccesPADe = curAccesPADe->getSuivant())
-		SetMeilleurDepart(curAccesPADe->getArretLogique(), NewMoment, NumVoie);
-}
-
-void cCalculateur::SetMeilleurDepart(const LogicalPlace* curPA, const cMoment& __Moment, tIndex NumVoie)
-{
-	cMoment __MomentDepart = __Moment;
-	
-	if (curPA->CorrespondanceAutorisee())
-	{
-		if (NumVoie)
-		{
-			vMeilleurTempsArretPhysique[curPA->Index()][NumVoie] = __MomentDepart;
-			__MomentDepart -= curPA->PireAttente(NumVoie);
-			if (__MomentDepart > vMeilleurTemps[curPA->Index()])
-				vMeilleurTemps[curPA->Index()] = __MomentDepart;
-		}
-		else
-		{
-			for (tIndex iVoie=1; iVoie<= curPA->NombreArretPhysiques(); iVoie++)
-				vMeilleurTempsArretPhysique[curPA->Index()][NumVoie] = __MomentDepart;
-			vMeilleurTemps[curPA->Index()] = __MomentDepart;
-		}
-	}
-	else
-		vMeilleurTemps[curPA->Index()] = __MomentDepart;
-}
-
-void cCalculateur::SetMeilleureArrivee(const cAccesPADe* curAccesPADe, const cMoment& NewMoment, tIndex NumVoie)
-{
-	for (; curAccesPADe != NULL; curAccesPADe = curAccesPADe->getSuivant())
-	{
-		SetMeilleureArrivee(curAccesPADe->getArretLogique(), NewMoment, NumVoie);
-	}
-}
-
-void cCalculateur::SetMeilleureArrivee(const LogicalPlace* curPA, const cMoment& __Moment, tIndex NumVoie)
-{
-	cMoment __MomentArrivee = __Moment;
-	
-	if (curPA->CorrespondanceAutorisee())
-	{
-		if (NumVoie)
-		{
-			vMeilleurTempsArretPhysique[curPA->Index()][NumVoie] = __MomentArrivee;
-			__MomentArrivee += curPA->PireAttente(NumVoie);
-			if (__MomentArrivee < vMeilleurTemps[curPA->Index()])
-				vMeilleurTemps[curPA->Index()] = __MomentArrivee;
-		}
-		else
-		{
-			for (tIndex iVoie=1; iVoie<=curPA->NombreArretPhysiques(); iVoie++)
-				vMeilleurTempsArretPhysique[curPA->Index()][NumVoie] = __MomentArrivee;
-			vMeilleurTemps[curPA->Index()] = __MomentArrivee;
-		}
-	}
-	else
-		vMeilleurTemps[curPA->Index()] = __MomentArrivee;
-}
-
-cElementTrajet* cCalculateur::GetET(const LogicalPlace* curPA, tIndex NumeroVoie)
-{
-	if (curPA->CorrespondanceAutorisee() && NumeroVoie)
-		return(vETArretPhysique[curPA->Index()][NumeroVoie]);
-	else
-		return(vET[curPA->Index()]);
-}
-
-void cCalculateur::SetET(const LogicalPlace* curPA, cElementTrajet* NewET, tIndex NumVoie)
-{
-	if (curPA->CorrespondanceAutorisee() && NumVoie)
-		vETArretPhysique[curPA->Index()][NumVoie] = NewET;
-	vET[curPA->Index()] = NewET;
+	_bestTimes.clear();
 }
 
 
 
-/**	Préparation d'un calcul de fiche horaire journée.
-	@param __LieuOrigine Lieu d'origine du calcul
-	@param __LieuDestination Lieu de destination du calcul
-	\param __DateDepart Date de la fiche horaire.
-	\param iPeriode P�riode de la journ�e � afficher
-	\param besoinVelo Filtre prise en charge des v�los
-	\param besoinHandicape Filtre prise en charge des handicap�s
-	\param besoinTaxiBus Filtre lignes � la demande
-	\param codeTarif Filtre tarif
-	\return true si une fiche horaire peut �tre calcul�e, false sinon. La valeur false peut survenir si la date de calcul est ant�rieure au moment pr�sent et si les solutions pass�es ne doivent pas �tre affich�es
-	\author Hugues Romain
-	\date 2001-2006
-
-La pr�paration du calcul de fiche horaire journ�e effectue les initialisations de tous les param�tres :
-	- Prise en compte des divers paramètre transmis directement
-	- Construction des accès au réseau de transport (départ et arrivée) à partir des lieux logiques d'origine et de destination
-
-La variable vArriveeMax, qui permet de limiter le moment d'arriv�e lors du calcul est initalis�e comme suit :
-	- Application de la p�riode aux moments de d�but et de fin de calcul
-	- Ajout d'une minute par kilom�tre � vol d'oiseau pour permettre des solutions dont l'arriv�e d�passe la fin de p�riode, et pouvant �tre toutefois utile � fournir (ex: train de nuit)
-*/
-bool cCalculateur::InitialiseFicheHoraireJournee(
-	const cLieuLogique* __LieuOrigine, const cLieuLogique* __LieuDestination
-	, const cDate& __DateDepart
-	, const cPeriodeJournee* __PeriodeJournee
-	, tBool3 besoinVelo, tBool3 besoinHandicape
-	, tBool3 besoinTaxiBus, tNumeroTarif codeTarif
-	, bool __SolutionsPassees
-){
-	// Enregistrement de la date de la demande
-	_MomentCalcul.setMoment();
-
-	// Enregistrement de la plage temporelle de calcul
-	if (__DateDepart < _MomentCalcul.getDate())
-		return false;
-	
-	vMomentDebut = __DateDepart;
-	vArriveeMax = vMomentDebut;
-	if (__DateDepart == _MomentCalcul.getDate())
-		_BaseTempsReel = true;
-	else
-		_BaseTempsReel = false;
-
-	// Construction des accès au réseau départ et arrivée
-	_origin = new RoutePlanningNode(__LieuOrigine, true);
-	_destination = new RoutePlanningNode(__LieuDestination, true);
-	
-	// Application de la plage horaire
-	if (!__PeriodeJournee->AppliquePeriode(vMomentDebut, vArriveeMax, _MomentCalcul, __SolutionsPassees))
-		return false;
-	vArriveeMax += tDureeEnMinutes(cDistanceCarree(Destination->getArretLogique()->getPoint(), Origine->getArretLogique()->getPoint()).Distance());
-			
-	// enregistrement des filtres
-	vBesoinVelo = besoinVelo;
-	vBesoinHandicape = besoinHandicape;
-	vBesoinTaxiBus = besoinTaxiBus;
-	vCodeTarif = codeTarif;
-
-	// Optimisations (int�ret � v�rifier)
-	vMomentDebut = vPADeOrigine->momentDepartSuivant(vMomentDebut, vArriveeMax, _MomentCalcul);
-	vMomentFin = vPADeDestination->momentArriveePrecedente(vArriveeMax, vMomentDebut);
-	vMomentFin += tDureeEnMinutes(1);
-
-	return true;
-}
 
 
-
-/**	Libération de l'espace de calcul pour un autre thread avec remise à zéro
-	@author Hugues Romain
-	@date 2001-2006
-
-Cette m�thode supprime les objets temporaire stockant les r�sultats, et lib�re l'espace de calcul
-*/
-void cCalculateur::Libere()
-{
-#ifdef UNIX
-	pthread_mutex_lock( &CalculMutex );
-#endif
-	vSolution.Vide();
-	delete _origine;
-	delete _destination;
-	_Libre = true;
-#ifdef UNIX
-	pthread_mutex_unlock( &CalculMutex );
-#endif
-}
 
 
 
@@ -1523,7 +1044,7 @@ bool cCalculateur::ControleLigne(const cLigne* Ligne, const cTrajet& __Trajet) c
 	// Contr�le de l'axe vis � vis des axes d�j� emprunt�s, effectu� que si l'axe de la ligne est non libre et si un ET est fourni
 	if (!Ligne->Axe()->Libre() && __Trajet.Taille())
 	{
-		for (const cElementTrajet* curET = __Trajet.PremierElement(); curET != NULL; curET = curET->Suivant())
+		for (const cElementTrajet* curET = __Trajet.PremierElement(); curET != NULL; curET = curET->getSuivant())
 			if (curET->Axe() == Ligne->Axe())
 				return false;
 	}
@@ -1548,7 +1069,7 @@ bool cCalculateur::ControleLigne(const cLigne* Ligne, const cTrajet& __Trajet) c
 	
 	Etapes de la fonction :
 */
-bool cCalculateur::DestinationUtilePourArriverTot(const LogicalPlace* __ArretLogique, const cMoment& __Moment, cDistanceCarree& __DistanceCarreeBut) const
+bool cCalculateur::DestinationUtilePourArriverTot(const LogicalPlace* __ArretLogique, const cMoment& __Moment, const cDistanceCarree& __DistanceCarreeBut) const
 {
 /*	//! <li>Calcul de la distance carr�e si non fournie</li>
 	if (__DistanceCarreeBut.EstInconnu())
@@ -1583,7 +1104,7 @@ bool cCalculateur::DestinationUtilePourArriverTot(const LogicalPlace* __ArretLog
 		
 	Etapes de la fonction :
 */
-bool cCalculateur::ProvenanceUtilePourPartirTard(const LogicalPlace* __ArretLogique, const cMoment& __Moment, cDistanceCarree& __DistanceCarreeBut) const
+bool cCalculateur::ProvenanceUtilePourPartirTard(const LogicalPlace* __ArretLogique, const cMoment& __Moment, const cDistanceCarree& __DistanceCarreeBut) const
 {
 	//! <li>Calcul de la distance carr�e si non fournie</li>
 /*	if (__DistanceCarreeBut.EstInconnu())
@@ -1609,27 +1130,27 @@ bool cCalculateur::ProvenanceUtilePourPartirTard(const LogicalPlace* __ArretLogi
 	\author Hugues Romain
 	\date 2005
 */
-bool cCalculateur::ControleTrajetRechercheArrivee(cElementTrajet& __ET) const
+bool cCalculateur::ControleTrajetRechercheArrivee(const cElementTrajet& __ET) const
 {
-	return __ET.MomentArrivee() <= GetMeilleureArrivee(__ET.getGareArrivee(), __ET.VoieArrivee()) 
-		&&  DestinationUtilePourArriverTot(__ET.getGareArrivee(), __ET.MomentArrivee(), __ET.getDistanceCarreeObjectif());
+	return __ET.MomentArrivee() <= getBestTime((cArretPhysique*) __ET.getDestination(), true) 
+		&&  DestinationUtilePourArriverTot(__ET.getDestination()->getLogicalPlace(), __ET.MomentArrivee(), __ET.getDistanceCarreeObjectif());
 }
 
 
-bool cCalculateur::ControleTrajetRechercheDepart(cElementTrajet& __ET) const
+bool cCalculateur::ControleTrajetRechercheDepart(const cElementTrajet& __ET) const
 {
-	return __ET.MomentDepart() >= GetMeilleurDepart(__ET.getGareDepart(), __ET.VoieDepart())
-		&& ProvenanceUtilePourPartirTard(__ET.getGareDepart(), __ET.MomentDepart(), __ET.getDistanceCarreeObjectif());
+	return __ET.MomentDepart() >= getBestTime((cArretPhysique*) __ET.getOrigin(), false)
+		&& ProvenanceUtilePourPartirTard(__ET.getOrigin()->getLogicalPlace(), __ET.MomentDepart(), __ET.getDistanceCarreeObjectif());
 }
 
 /** Accesseur meilleur temps vers un arrêt 
 */
-const cMoment& cCalculateur::getBestTime(const NetworkAccessPoint* accessPoint, bool isArrival) const
+const cMoment& cCalculateur::getBestTime(const cArretPhysique* accessPoint, bool isArrival) const
 {
-	BestTimeMap::iterator bestTime = _bestTimes.find(accessPoint);
-	return (bestTime == _bestTimes.end() || _bestTime->second > _absoluteBestTime)
+	BestTimeMap::const_iterator bestTime = _bestTimes.find(accessPoint);
+	return (bestTime == _bestTimes.end() || bestTime->second > _absoluteBestTime)
 		? _absoluteBestTime
-		: _bestTime->second;
+		: bestTime->second;
 }
 
 /*!	\brief Accesseur solution du dernier calcul d'itin�raire
@@ -1644,72 +1165,25 @@ const cTrajets& cCalculateur::getSolution() const
 
 
 
-/*!	\brief Prise en possession de l'espace de calcul
-	\return Pointeur vers l'espace de calcul si disponible, NULL sinon
-	\author Hugues Romain
-	\date 2005
-*/
-cCalculateur* cCalculateur::Prend()
-{
-    // Prise de la possession de l'espace si disponible
-    // avec gestion mutex pour �viter la modification simultan�e
-#ifdef UNIX
-    pthread_mutex_lock( &CalculMutex );
-#endif
-    if (_Libre)
-    {
-        _Libre = false;
-#ifdef UNIX
-        pthread_mutex_unlock( &CalculMutex );
-#endif
-        return this;
-    }
-#ifdef UNIX
-    pthread_mutex_unlock( &CalculMutex );
-#endif
-	
-	// Retour Echec
-	return NULL;
-}
-
-
-/** Fabrication de la liste complète des accès au réseau de transport.
-	@param __MomentDepart Moment de départ du lieu
-	@param __MomentMax Moment maximal de départ du lieu
-	@return Liste complète des accès au réseau de transport
-
-	L'accès au réseau de transport, pour un départ, est construit par les opérations suivantes :
-		- pour chaque adresse accessible immédiatement, fabrication de la liste des trajets possibles vers des arrêts en respectant les critères
-		- un filtrage des points d'entrée inutiles est opéré
-			- l'objet cAccesReseau est construit et transmis au calculateur
-*/
-void cCalculateur::_ConstructionAccesOrigine(const cLieuLogique* __LieuOrigine)
-{
-	_AccesDepart.
-
-	for (tIndex __i = 0; __LieuOrigine->GetArretLogique(__i); __i++)
-
-}
-
 
 /** Sets the best time for each access points of a node.
 	@param node Node
 	@param moment Time
 	@param isArrival true id time is an arrival time, false if departure time
 */
-void cCalculateur::setBestTime(const RoutePlanningNode* node, const cMoment& moment, bool isArrival)
+void cCalculateur::setBestTime(const RoutePlanningNode& node, const cMoment& moment, bool isArrival, bool forOptimizing)
 {
 	// Best time for each access point reachable by the node
-	for (RoutePlanningNode::AccessPointsWithDistance::iterator accessPoint = node->getAccessPoints().begin();
-		accessPoint != node->getAccessPoints().end()
+	for (RoutePlanningNode::AccessPointsMap::const_iterator accessPoint = node.getAccessPoints().begin();
+		accessPoint != node.getAccessPoints().end();
 		++accessPoint)
 	{
 		cMoment otherDatetime = moment;
 		if (isArrival)
-			otherDatetime += accessPoint->second;
+			otherDatetime += accessPoint->second.first;
 		else
-			otherDatetime -= accessPoint->second;
-		setBestArrivalTime(accessPoint->first] = otherDatetime;
+			otherDatetime -= accessPoint->second.first;
+		setBestTime(accessPoint->first, otherDatetime, isArrival, forOptimizing, false);
 	}
 }
 
@@ -1722,48 +1196,49 @@ void cCalculateur::setBestTime(const RoutePlanningNode* node, const cMoment& mom
 	@param forOptimizing true if the better solution is computed, false if only the best time is computed
 	@param withRecursion true if the time of the reachables access points of the logical point should be updated
 */
-void cCalculateur::setBestTime(const NetworkAccessPoint* accessPoint, const cMoment& datetime, bool isArrival, bool forOptimizing, bool withRecursion)
+void cCalculateur::setBestTime(const cArretPhysique* accessPoint, const cMoment& datetime, bool isArrival, bool forOptimizing, bool withRecursion)
 {
 	// the goal
-	RoutePlanningNode* goal = isArrival ? _destination : _origin;
+	const RoutePlanningNode& goal = isArrival ? _destination : _origin;
 
 	// if optimization : the research continues even if the duration is the same as the best one. If not, the research continues only if the duration is strictly lower than the best one
 	tDureeEnMinutes optimizationDuration = forOptimizing ? 0 : 1;
 
 	// saving the best moment if better or if first passage
-	if (_bestTimeByPhysicalStop.find(accessPoint) == _bestTimeByPhysicalStop.end() || _bestTimeByPhysicalStop[accessPoint] > moment)
-		_bestTimeByPhysicalStop[accessPoint] = datetime;
+	if (_bestTimes.find(accessPoint) == _bestTimes.end() || _bestTimes[accessPoint] > datetime)
+		_bestTimes[accessPoint] = datetime;
 
 	// Best time on the other access points reachable by a transfer in the logical place
 	if (withRecursion)
 	{
 		// The access point belongs to the goal : updating other points of the goal, and updating the whole already reached access points
-		if (goal->includes(accessPoint))
+		if (goal.includes(accessPoint))
 		{
-			for (RoutePlanningNode::AccessPointsWithDistance::const_iterator item = goal->getAccessPoints().begin();
-				item != goal->getAccessPoints().end();
+			for (RoutePlanningNode::AccessPointsMap::const_iterator item = goal.getAccessPoints().begin();
+				item != goal.getAccessPoints().end();
 				++item)
 			{
 				const cMoment otherDateTime = datetime;
-				otherDateTime += accessPoint->second;
-				otherDateTime -= item->second;
-				setBestArrivalTime(item, otherDateTime, isArrival, forOptimizing, false);
+				// otherDateTime += accessPoint->second.first; ??
+				// otherDateTime -= item->second.first; ?? 
+				//! @todo REPARER
+				setBestTime(item->first, otherDateTime, isArrival, forOptimizing, false);
 			}
 		}	// The access point allows transfers
 		else if (accessPoint->getLogicalPlace()->CorrespondanceAutorisee() != LogicalPlace::CorrInterdite)
-			for (LogicalPlace::AccessPointsVector::iterator otherAccessPoint = accessPoint->getLogicalPlace()->getNetworkAccessPoints().begin()
+			for (LogicalPlace::AccessPointsVector::const_iterator otherAccessPoint = accessPoint->getLogicalPlace()->getNetworkAccessPoints().begin();
 				otherAccessPoint != accessPoint->getLogicalPlace()->getNetworkAccessPoints().end();
 				++otherAccessPoint)
 			{
 				const tDureeEnMinutes& transferDuration = accessPoint->getLogicalPlace()->AttenteCorrespondance(
-					(isArrival ? accessPoint : otherAccessPoint)->getRankInLogicalPlace()
-					, (isArrival ? otherAccessPoint : accessPoint)->getRankInLogicalPlace()
+					(isArrival ? accessPoint : *otherAccessPoint)->getRankInLogicalPlace()
+					, (isArrival ? *otherAccessPoint : accessPoint)->getRankInLogicalPlace()
 				);
 				if (transferDuration != LogicalPlace::FORBIDDEN_TRANSFER_DELAY)
 				{
 					const cMoment otherdatetime = datetime;
-					otherdatetime += isArrival ? transferDuration + optimizationDuration : -transferDuration - optimizationDuration;
-					setBestArrivalTime(otherAccessPoint, otherdatetime, isArrival, forOptimizing, false);
+					//otherdatetime += isArrival ? transferDuration + optimizationDuration : -transferDuration - optimizationDuration; ??
+					setBestTime((const cArretPhysique*) *otherAccessPoint, otherdatetime, isArrival, forOptimizing, false);
 				}
 			}
 	}		
@@ -1778,14 +1253,14 @@ void cCalculateur::setBestTime(const NetworkAccessPoint* accessPoint, const cMom
 */
 const cMoment& cCalculateur::absoluteBestTime(bool isArrival) const
 {
-	RoutePlanningNode* goal = isArrival ? _destination : _origin;
-	RoutePlanningNode::AccessPointsWithDistance::const_iterator bestItem = goal->getAccessPoints().begin();
-	for (RoutePlanningNode::AccessPointsWithDistance::const_iterator item = goal->getAccessPoints().begin()
-		item != goal->getAccessPoints().end();
+	const RoutePlanningNode& goal = isArrival ? _destination : _origin;
+	RoutePlanningNode::AccessPointsMap::const_iterator bestItem = goal.getAccessPoints().begin();
+	for (RoutePlanningNode::AccessPointsMap::const_iterator item = goal.getAccessPoints().begin();
+		item != goal.getAccessPoints().end();
 		++item)
 	{
-		if (getBestTime(item, isArrival) < getBestTime(bestItem, isArrival))
+		if (getBestTime(item->first, isArrival) < getBestTime(bestItem->first, isArrival))
 			bestItem = item;
 	}
-	return getBestTime(bestItem);
+	return getBestTime(bestItem->first, isArrival);
 }

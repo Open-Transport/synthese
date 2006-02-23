@@ -2,7 +2,13 @@
 	\brief Impl�mentation classe cLigne
 */
 
+#include "cGareLigne.h"
+#include "cArretPhysique.h"
+#include "LogicalPlace.h"
+#include "cTrain.h"
+#include "cMateriel.h"
 #include "cLigne.h"
+
 
 /*! \brief Destructeur
 	\author Hugues Romain
@@ -10,8 +16,6 @@
 */
 cLigne::~cLigne()
 {
-	delete vPremiereGareLigne;
-	delete[] vTrain;
 }
 
 
@@ -64,22 +68,19 @@ cLigne::cLigne(cLigne* LigneACopier, cEnvironnement* Environnement)
 	\author Hugues Romain
 	\date 2002
 	*/
-cLigne::cLigne(const cTexte& newCode, cAxe* newAxe)
+cLigne::cLigne(const cTexte& newCode, cAxe* const newAxe)
+: vAxe(newAxe)
 {
 	// Valeurs transmises
 	vCode << newCode;
-	vAxe = newAxe;
 	
 	// Valeurs par d�faut
 	vReseau = NULL;
 	vMateriel = NULL;
-	vPremiereGareLigne = NULL;
-	vDerniereGareLigne = NULL;
 	vTarif =NULL;
 	vVelo=NULL;
 	vHandicape=NULL;
 	vResa=NULL;
-	vNombreServices=0;
 	vAAfficherSurTableauDeparts = true;
 	vAAfficherSurIndicateurs = true;
 }
@@ -330,51 +331,6 @@ bool cLigne::Sauvegarde() const
 
 
 
-// cLigne - Identifie
-// ____________________________________________________________________________
-// 
-// 
-// ____________________________________________________________________________ 
-bool cLigne::Identifie(const LogicalPlace** tbGares, const cMateriel* testMateriel) const
-{
-	// D�faut de mat�riel si sp�cifi�
-	if (vMateriel != NULL && testMateriel!=NULL && vMateriel != testMateriel)
-		return(false);
-
-	cGareLigne* curGareLigne = vPremiereGareLigne;
-	for (size_t i=0; tbGares[i]!=NULL; i++)
-	{
-		// Arret commun ou avec horaire non commun suivant
-		for (; curGareLigne!=NULL && !curGareLigne->HorairesSaisis(); curGareLigne=curGareLigne->Suivant())
-		{ }
-
-		// Est on arriv� en fin de ligne pr�matur�ment ?
-		if (curGareLigne==NULL)
-			return(false);
-
-		// Arret non commun
-#ifdef ClasseAdmin
-		if (!curGareLigne->ArretLogique()->CompareCodeRIHO(*tbGares[i]))
-#else
-		if (curGareLigne->ArretLogique() != tbGares[i])
-#endif
-			return(false);
-
-		curGareLigne = curGareLigne->Suivant();
-	}
-	
-	// A t on parcouru tous les points d'arret ?
-	if (curGareLigne!=NULL)
-		return(false);
-	else
-		return(true);
-}
-
-
-
-
-
-
 bool cLigne::allowAddServiceHoraire(const cHoraire* tbHoraires) const
 {
 	bool ControleDepassementPositif = true;
@@ -383,19 +339,21 @@ bool cLigne::allowAddServiceHoraire(const cHoraire* tbHoraires) const
 	// D�termination du numero de service futur
 	// Insertion du service: d�termination du rang
 	
-	// SET PORTAGE LINUX
-	tNumeroService iNumeroService=0;
-	for (; iNumeroService!= vNombreServices; iNumeroService++)
-		if (tbHoraires[1] < vPremiereGareLigne->getHoraireDepartPremier(iNumeroService))
+	for (size_t iNumeroService=0; iNumeroService< vTrain.size(); iNumeroService++)
+		if (tbHoraires[1] < _lineStops.front() ->getHoraireDepartPremier(iNumeroService))
 			break;
 	//END PORTAGE LINUX
-	if (iNumeroService== vNombreServices)
+	if (iNumeroService== vTrain.size())
 		ControleDepassementPositif = false;
 	if (iNumeroService==0)
 		ControleDepassementNegatif = false;
 
 	size_t i=0;
-	for (cGareLigne* curGareLigne= vPremiereGareLigne; curGareLigne!=NULL; curGareLigne=curGareLigne->Suivant())
+	for (LineStops::const_iterator iter = _lineStops.begin();
+			iter != _lineStops.end();
+			++iter)
+	{
+		cGareLigne* curGareLigne = *iter;
 		if (curGareLigne->HorairesSaisis())
 		{
 			// Depassement negatif
@@ -415,7 +373,8 @@ bool cLigne::allowAddServiceHoraire(const cHoraire* tbHoraires) const
 			}
 			i += 2;
 		}
-	return(true);
+	}
+	return true;
 }
 
 
@@ -433,70 +392,40 @@ bool cLigne::allowAddServiceHoraire(const cHoraire* tbHoraires) const
 
 	En cas de succession d'arr�ts identiques, la relation entre les deux arr�ts n'est pas possible.
 */
-cGareLigne* cLigne::addGareLigne(const cGareLigne* GLigneACopier, tDistanceM newPM, cArretPhysique* newArretPhysique, tTypeGareLigneDA newType, bool newHorairesSaisis, bool Route)
+void cLigne::addGareLigne(cGareLigne* newGareLigne)
 {
-	cGareLigne* newGareLigne;
-	if (GLigneACopier == NULL)
-	{
-		newGareLigne = new cGareLigne(this);
-		newGareLigne->setPM(newPM);
-		newGareLigne->setArretPhysique(newArretPhysique);
-		newGareLigne->setArretLogique(newPA);
-		newGareLigne->setTypeDA(newType);
-		if (!Route)
-		{
-			if (newGareLigne->EstDepart())
-				newGareLigne->setPADepartSuivant();
-			if (newGareLigne->EstArrivee())
-				newGareLigne->setPAArriveeSuivant();
-		}
-		newGareLigne->setHorairesSaisis(newHorairesSaisis);
-	}
-	else
-		newGareLigne = new cGareLigne(this, *GLigneACopier);
+	_lineStops.push_back(newGareLigne);
 
-
-	if (vPremiereGareLigne == NULL)
-	{
-		vPremiereGareLigne = newGareLigne;
-		newGareLigne->setTypeDA(Depart);
-	}
-	else
+	if (_lineStops.size() > 1)
 	{
 		// Chainages d�part/arriv�e
-		for (cGareLigne* __GL = vDerniereGareLigne;
-			__GL && (
-				__GL->getArriveeSuivante() == NULL 
-				|| __GL->getArriveeCorrespondanceSuivante() == NULL 
-				|| newGareLigne->getDepartPrecedent() == NULL 
-				|| newGareLigne->getDepartCorrespondancePrecedent() == NULL
-			);
-			__GL=__GL->getPrecedent())
+		for (LineStops::reverse_iterator riter = _lineStops.rbegin();
+			(riter != _lineStops.rend())
+				&& (
+					(*riter)->getArriveeSuivante() == NULL 
+					|| (*riter)->getArriveeCorrespondanceSuivante() == NULL 
+					|| newGareLigne->getDepartPrecedent() == NULL 
+					|| newGareLigne->getDepartCorrespondancePrecedent() == NULL
+				);
+			++riter)
 		{
+			cGareLigne* __GL = *riter;
 			// On chaine uniquement les relations entre A et A, D et D, A et D si arr�ts diff�rents, D et A si arr�ts diff�rents
-			if (__GL->ArretLogique() != newGareLigne->ArretLogique() || __GL->TypeDA() == newGareLigne->TypeDA())
+			if (__GL->ArretPhysique()->getLogicalPlace() != newGareLigne->ArretPhysique()->getLogicalPlace() || __GL->TypeDA() == newGareLigne->TypeDA())
 			{
 				// Chainage arriv�es suivantes
 				if (__GL->getArriveeSuivante() == NULL && newGareLigne->EstArrivee())
 					__GL->setArriveeSuivante(newGareLigne);
-				if (__GL->getArriveeCorrespondanceSuivante() == NULL && newGareLigne->ArretLogique()->CorrespondanceAutorisee())
+				if (__GL->getArriveeCorrespondanceSuivante() == NULL && newGareLigne->ArretPhysique()->getLogicalPlace()->CorrespondanceAutorisee())
 					__GL->setArriveeCorrespondanceSuivante(newGareLigne);
 
 				if (__GL->EstDepart() && newGareLigne->getDepartPrecedent() == NULL)
 					newGareLigne->setDepartPrecedent(__GL);
-				if (__GL->EstDepart() && newGareLigne->getDepartCorrespondancePrecedent() == NULL && __GL->ArretLogique()->CorrespondanceAutorisee())
+				if (__GL->EstDepart() && newGareLigne->getDepartCorrespondancePrecedent() == NULL && __GL->ArretPhysique()->getLogicalPlace()->CorrespondanceAutorisee())
 					newGareLigne->setDepartCorrespondancePrecedent(__GL);
 			}
 		}
 	}
-
-	// Chainages pr�c�dent/suivant/dernier
-	newGareLigne->setPrecedent(vDerniereGareLigne);
-	if (vDerniereGareLigne != NULL)
-		vDerniereGareLigne->setSuivant(newGareLigne);
-	vDerniereGareLigne = newGareLigne;
-	
-	return newGareLigne;
 }
 
 
@@ -507,12 +436,15 @@ cGareLigne* cLigne::addGareLigne(const cGareLigne* GLigneACopier, tDistanceM new
 void cLigne::Ferme()
 {
 	// Suppression du statut arret de d�part de pas d'arriv�e � desservir et vv
-	for (cGareLigne* __GL = this->vPremiereGareLigne; __GL; __GL = __GL->Suivant())
+	for (LineStops::const_iterator iter = _lineStops.begin();
+		iter != _lineStops.end();
+		++iter)
 	{
+		cGareLigne* __GL = *iter;
 		if (__GL->getArriveeSuivante() == NULL)
-			__GL->setTypeDA(Arrivee);
+			__GL->setTypeDA(cGareLigne::Arrivee);
 		if (__GL->getDepartPrecedent() == NULL)
-			__GL->setTypeDA(Depart);
+			__GL->setTypeDA(cGareLigne::Depart);
 	}
 }
 
@@ -528,15 +460,15 @@ void cLigne::Ferme()
 void cLigne::MajCirculation()
 {
 	vCirculation.RAZMasque();
-	cGareLigne* lastGL = vPremiereGareLigne->Destination();
-	for (tNumeroService iNumeroService=0; iNumeroService!= vNombreServices; iNumeroService++)
+	cGareLigne* lastGL = _lineStops.back();
+	for (size_t iNumeroService=0; iNumeroService< vTrain.size(); iNumeroService++)
 	{
-		if (lastGL->getHoraireArriveeDernier(iNumeroService).JPlus() != vPremiereGareLigne->getHoraireDepartPremier(iNumeroService).JPlus())
+		if (lastGL->getHoraireArriveeDernier(iNumeroService).JPlus() != _lineStops.front()->getHoraireDepartPremier(iNumeroService).JPlus())
 		{
 			vCirculation.RAZMasque(true);
 			break;
 		}
-		vTrain[iNumeroService].getJC()->SetInclusionToMasque(vCirculation);
+		vTrain.at(iNumeroService)->getJC()->SetInclusionToMasque(vCirculation);
 	}
 }
 
@@ -570,112 +502,6 @@ cLigne* cLigne::operator =(const cLigne& LigneACopier)
 
 
 
-/*!	\brief Accesseur/Modificatieur Nombre de services dans la ligne
-	\param newNombreArrets Nombre de services � allouer si non encore fait
-	\return Le nombre de services appartenant � la ligne
-	\author Hugues Romain
-	\date 2001-2005
-	
-Si le nombre de services n'est pas configur� (valeur 0), alors newNombreArrets services sont cr��s :
- - la variable priv�e contenant le nombre de services est mise � jour
- - les services proprements dits sont allou�s dans le tableau vTrain
- - les cha�nages vers la ligne sur les services sont effectu�s
-
-Si le nombre de services est d�j� configur�, aucune op�ration n'est effectu�e
-*/
-tNumeroService cLigne::NombreServices(int newNombreServices)
-{
-	// Services d�j� configur�s ?
-	if (!vNombreServices)
-	{
-		// Mise � jour objet ligne
-		vNombreServices = (tNumeroService) newNombreServices;
-		
-		// Allocation des services
-		vTrain = new cTrain[vNombreServices];
-		
-		// Cha�nage
-		for (tNumeroService i=0; i<vNombreServices; i++)
-			vTrain[i].setLigne(this);
-	}
-	return(vNombreServices);	
-}
-
-
-
-
-const tDureeEnMinutes& cLigne::Attente(tNumeroService iNumeroService) const
-{
-	// SET PORTAGE LINUX
-	//_ASSERTE(iNumeroService >= 0 && iNumeroService < vNombreServices);
-	//END PORTAGE LINUX
-	return(vTrain[iNumeroService].Attente());
-}
-
-void cLigne::setJC(tNumeroService i, cJC *newVal)
-{
-	// SET PORTAGE LINUX
-	//_ASSERTE(i >= 0 && i < vNombreServices);
-	//END PORTAGE LINUX
-	vTrain[i].setJC(newVal);
-}
-
-void cLigne::setAttente(tNumeroService iService, const tDureeEnMinutes& newVal)
-{
-	// SET PORTAGE LINUX
-	//_ASSERTE(iService >= 0 && iService < vNombreServices);
-	//END PORTAGE LINUX
-	vTrain[iService].setAttente(newVal);
-}
-
-void cLigne::setServiceContinu(tNumeroService iService)
-{
-	
-	//_ASSERTE(iService >= 0 && iService < vNombreServices);
-	
-	vTrain[iService].setServiceContinu();
-}
-
-bool cLigne::EstCadence(tNumeroService iNumeroService) const
-{
-	
-	//_ASSERTE(iNumeroService >= 0 && iNumeroService < vNombreServices);
-	
-	return(vTrain[iNumeroService].EstCadence());
-}
-
-void cLigne::setAmplitudeServiceContinu(tNumeroService iNumeroService, const tDureeEnMinutes& newVal)
-{
-	
-	//_ASSERTE(iNumeroService >= 0 && iNumeroService < vNombreServices);
-	
-	vTrain[iNumeroService].setAmplitudeServiceContinu(newVal);
-}
-
-const tDureeEnMinutes& cLigne::EtalementCadence(tNumeroService iNumeroService) const
-{
-	
-	//_ASSERTE(iNumeroService >= 0 && iNumeroService < vNombreServices);
-	
-	return(vTrain[iNumeroService].EtalementCadence());
-}
-
-
-/*!	\brief Accesseur service appartenant � la ligne
-	\param iService Index du service au sein de la ligne
-	\return Pointeur vers le service demand� s'il existe, NULL sinon
-	\author Hugues Romain
-	\date 2001-2005
-*/
-const cTrain* cLigne::GetTrain(tNumeroService iService) const
-{
-	if (iService >= 0 && iService < vNombreServices)
-		return getTrain(iService);
-	else
-		return NULL;
-}
-
-
 
 /*!	\brief Modificateur des ann�es couvertes par un calendrier de circulation
 	\param PremiereAnnee la premi�re ann�e couverte par le calendrier
@@ -688,24 +514,6 @@ void	cLigne::setAnneesCirculation(tAnnee PremiereAnnee, tAnnee DerniereAnnee)
 	vCirculation.setAnnees(PremiereAnnee, DerniereAnnee);
 }
 
-
-
-/*!	\brief Modifie le pointeur vers l'horaire de d�part de l'origine du service s�lectionn�
-	\param NumeroService Index du service au sein de la ligne
-	\param Horaire	Pointeur vers l'horaire de d�part du service de son origine
-	\author Hugues Romain
-	\date 2005
-*/
-void cLigne::setHoraireDepart(tNumeroService NumeroService, cHoraire* Horaire)
-{
-	vTrain[NumeroService].setHoraireDepart(Horaire);
-}
-
-bool cLigne::setNumeroService(tNumeroService NumeroService, const cTexte& Texte)
-{
-	vTrain[NumeroService].setNumero(Texte);
-	return true;
-}
 
 
 
@@ -730,9 +538,9 @@ const cTexte& cLigne::getGirouette() const
 
 /*!	\brief Accesseur train
 */
-const cTrain* cLigne::getTrain(tNumeroService __NumeroService) const
+cTrain* cLigne::getTrain(size_t __NumeroService) const
 {
-	return vTrain + __NumeroService;
+	return (__NumeroService < vTrain.size()) ? vTrain.at(__NumeroService) : NULL;
 }
 
 
@@ -744,4 +552,238 @@ const cTrain* cLigne::getTrain(tNumeroService __NumeroService) const
 bool cLigne::PeutCirculer(const cDate& __Date) const
 {
 	return vCirculation.Circule(__Date);
+}
+
+bool cLigne::SetAUtiliserDansCalculateur(bool __Valeur)
+{
+	_AUtiliserDansCalculateur = __Valeur;
+	return true;
+}
+
+void cLigne::setImage(const cTexte& newImage)
+{
+	vImage.Vide();
+	vImage << newImage;
+}
+
+void cLigne::setLibelleComplet(const cTexte& newLibelleComplet)
+{
+	vLibelleComplet.Vide();
+	vLibelleComplet << newLibelleComplet;
+}
+	
+void cLigne::setAAfficherSurTableauDeparts(bool newVal)
+{
+	vAAfficherSurTableauDeparts = newVal;
+}
+
+bool cLigne::AAfficherSurTableauDeparts() const
+{
+	return(vAAfficherSurTableauDeparts);
+}
+
+void cLigne::setResa(cModaliteReservation* newVal)
+{
+	vResa = newVal;
+}
+
+void cLigne::setVelo(cVelo* newVal)
+{
+	vVelo = newVal;
+}
+
+void cLigne::setGirouette(const cTexte& newGirouette)
+{
+	vGirouette.Vide();
+	vGirouette << newGirouette;
+}
+	
+// SET Gestion du filtre Velo
+cVelo* cLigne::getVelo() const
+{
+	return(vVelo);
+}
+
+void cLigne::setHandicape(cHandicape* newVal)
+{
+	vHandicape = newVal;
+}
+
+cHandicape* cLigne::getHandicape() const
+{
+	return(vHandicape);
+}
+
+void cLigne::setTarif(cTarif* newVal)
+{
+	vTarif = newVal;
+}
+
+const cTarif* cLigne::getTarif() const
+{
+	return(vTarif);
+}
+
+void cLigne::setAlerteMessage(cTexte& message)
+{
+	vAlerte.setMessage(message);
+}
+
+void cLigne::setAlerteDebut(cMoment& momentDebut)
+{
+	vAlerte.setMomentDebut(momentDebut);
+}
+
+void cLigne::setAlerteFin(cMoment& momentFin)
+{
+	vAlerte.setMomentFin(momentFin);
+}
+
+const cAlerte* cLigne::getAlerte() const
+{
+	return(&vAlerte);
+}
+
+//END SET
+
+void cLigne::setMateriel(cMateriel* newVal)
+{
+	vMateriel = newVal;
+}
+
+
+cAxe* cLigne::Axe() const
+{
+	return(vAxe);
+}
+
+cMateriel* cLigne::Materiel() const
+{
+	return(vMateriel);
+}
+
+const cTexte& cLigne::getCode() const
+{
+	return(vCode);
+}
+
+const cTexte& cLigne::getNomPourIndicateur() const
+{
+	return(vNomPourIndicateur);
+}
+
+
+void cLigne::setStyle(const cTexte& newStyle)
+{
+	vStyle.Vide();
+	vStyle << newStyle;
+}
+
+void cLigne::setLibelleSimple(const cTexte& newNom)
+{
+	vLibelleSimple.Vide();
+	vLibelleSimple << newNom;
+	if (!vNomPourIndicateur.Taille())
+	{
+		vNomPourIndicateur.Vide();
+		vNomPourIndicateur << vLibelleSimple;
+	}
+}
+
+void cLigne::setNomPourIndicateur(const cTexte& newNom)
+{
+	vNomPourIndicateur.Vide();
+	vNomPourIndicateur << newNom;
+}
+
+
+void cLigne::setReseau(cReseau* newReseau)
+{
+	vReseau = newReseau;
+}
+
+
+cModaliteReservation* cLigne::GetResa() const
+{
+	return(vResa);
+}
+
+bool cLigne::AAfficherSurIndicateurs() const
+{
+	return(vAAfficherSurIndicateurs);
+}
+
+void cLigne::setAAfficherSurIndicateurs(bool newVal)
+{
+	vAAfficherSurIndicateurs = newVal;
+}
+
+cReseau* cLigne::getReseau() const
+{
+	return(vReseau);
+}
+
+/*!	\brief Accesseur libell� complet de la ligne
+	\return Si un libell� complet est d�fini, renvoie le libell� complet de la ligne. Sinon renvoie le libell� simple de la ligne.
+	\author Hugues Romain
+	\date 2005
+*/
+const cTexte& cLigne::getLibelleComplet() const
+{
+	return vLibelleComplet;
+}
+
+
+
+/*!	\brief Accesseur libell� simple de la ligne
+	\return Le libell� simple de la ligne.
+	\author Hugues Romain
+	\date 2005
+*/
+const cTexte& cLigne::getLibelleSimple() const
+{
+	return vLibelleSimple;
+}
+
+
+
+/*!	\brief Accesseur style CSS de la ligne
+	\return R�f�rence constante vers le style de la ligne
+	\author Hugues Romain
+	\date 2005
+*/
+const cTexte& cLigne::getStyle() const
+{
+	return vStyle;
+}
+
+
+
+/*!	\brief Accesseur logo image de la ligne
+	\return R�f�rence constante vers le chemin d'acc�s g�n�rique au logo image de la ligne
+	\author Hugues Romain
+	\date 2005
+*/
+const cTexte& cLigne::getImage() const
+{
+	return vImage;
+}
+
+
+
+/*!	\brief Code de la ligne sur nouvelle chaine de caract�res HTML
+	\author Hugues Romain
+	\date 2005
+*/ /*
+inline cTexte cLigne::Code() const
+{
+	cTexte tResultat;
+	Code(tResultat);
+	return tResultat;
+} */
+
+
+void cLigne::addService(cTrain* const service)
+{
+	vTrain.push_back(service);
 }

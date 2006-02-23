@@ -11,30 +11,65 @@ using namespace synmap;
 using namespace std;
 
 
-/** Constructeur.
-    @param logicalPlace Lieu logique donnant lieu à la fabrication du noeud
-    @param pedestrianApproach Prise en compte des arrêts physiques joignables à pied par le réseau de voirie
- 
-    Le constructeur remplit la liste des arrêts physiques du noeud
- 
-    @todo voir si on garde la distance ou la durée ou les deux
+/** Constructor from a network access point (transfer)
+
+	@param accessPoint Base access point from which getting the reachable access points
+	@param forDeparture true if the base access point is an arrival and the reachable access points will be used as departure, else false
+	@param maxApproachDistance Maximal approach distance, for integration of junctions (not yet implemented)
+	@param approachSpeed Speed of approach, for integration of junctions (not yet implemented)
+
+	@todo Junctions integration
+	
+	The list of network access points is made up of the reachable physical stops inside the logical place of the current access point.
+	
+	If the transfer is forbidden in the logicalplace, then the node will be empty
 */
-RoutePlanningNode::RoutePlanningNode(LogicalPlace* logicalPlace,
-                                     double maxApproachDistance,   // in meters
-                                     double approachSpeed)       // in meters/second
+RoutePlanningNode::RoutePlanningNode(const NetworkAccessPoint* accessPoint, const bool forDeparture
+									 , const DistanceInMeters& maxApproachDistance, const SpeedInKmh& approachSpeed)
+: _logicalPlace(accessPoint->getLogicalPlace())
+{
+	if (accessPoint->getLogicalPlace()->CorrespondanceAutorisee() != LogicalPlace::CorrInterdite)
+	{
+		// List of physical stops reachable by simple transfer in the logical place
+		const LogicalPlace::PhysicalStopsMap& physicalStops = accessPoint->getLogicalPlace()->getPhysicalStops();
+		for (LogicalPlace::PhysicalStopsMap::const_iterator iter = physicalStops.begin();
+			iter != physicalStops.end();
+			++iter)
+		{
+			tDureeEnMinutes transferDuration = _logicalPlace->AttenteCorrespondance( forDeparture ? accessPoint->getRankInLogicalPlace() : iter->second->getRankInLogicalPlace()
+				, forDeparture ? iter->second->getRankInLogicalPlace() : accessPoint->getRankInLogicalPlace() );
+			if (transferDuration != LogicalPlace::FORBIDDEN_TRANSFER_DELAY)
+				addAccessPoint(iter->second, transferDuration, 0);
+		}
+
+		// TODO junctions
+	}
+}
+
+
+/** Constructor from a logical place (beginning or end).
+
+    @param logicalPlace Base logical place frow which getting the reachable access points
+	@param forDeparture true if the base logical place is an arrival and the reachable access points will be used as departure, else false
+	@param maxApproachDistance Maximal approach distance
+	@param approachSpeed Speed of approach
+ 
+    The list of physical stops is made up of the reachable ones inside the logical place, and other ones around the logical place reachable using the road network
+*/
+RoutePlanningNode::RoutePlanningNode(const LogicalPlace* logicalPlace
+									, const bool forDeparture,
+                                     const DistanceInMeters& maxApproachDistance,   
+                                     const SpeedInKmh& approachSpeed)       
   : _logicalPlace(logicalPlace)
 {
 
-  // take physical stops contained in the logical place
+  // take physical stops contained in the logical place, which are considered equivalents and without approach
   const LogicalPlace::PhysicalStopsMap& physicalStops = logicalPlace->getPhysicalStops ();
   for (LogicalPlace::PhysicalStopsMap::const_iterator iter = (physicalStops.begin ());
-       iter != physicalStops.end (); ++iter) {
+       iter != physicalStops.end (); ++iter)
+  {
     cArretPhysique* physicalStop = iter->second;
-    double approachDuration = 0.0; // TODO .
-    
-	addAccessPoint(physicalStop, approachDuration);
-    
-   
+    addAccessPoint(physicalStop, 0, 0);
   }
 
   // search of other logical places reached with road network
@@ -62,9 +97,9 @@ RoutePlanningNode::RoutePlanningNode(LogicalPlace* logicalPlace,
 //	      cArretPhysique* physicalStop = *(reachableLogicalPlace->
 //					       getPhysicalStops().find (distanceAndStop->second->getRank ()));
 
-	      double approachDuration = approachDistance / approachSpeed; // seconds
+		  tDureeEnMinutes approachDuration = approachDistance / approachSpeed; // seconds
 
-		  addAccessPoint((NetworkAccessPoint*) distanceAndAddress->second, approachDuration);
+//		  addAccessPoint(distanceAndAddress->second, approachDuration, approachDistance);
 		    
 	    }
 
@@ -86,8 +121,8 @@ RoutePlanningNode::RoutePlanningNode(LogicalPlace* logicalPlace,
 	       iter != physicalStops.end (); ++iter) {
 	
 	    double approachDuration = 0.0; // TODO .
-	    std::pair<NetworkAccessPoint*, double> accessPointWithDistance
-	      (( iter->second), approachDuration);
+	   // std::pair<NetworkAccessPoint*, double> accessPointWithDistance
+	   //   (( iter->second), approachDuration);
 
 	  }
 	  
@@ -110,14 +145,14 @@ RoutePlanningNode::~RoutePlanningNode()
 /** Test of appartenance of a network access point.
 	@param accessPoint Network access point
 */
-bool RoutePlanningNode::includes(const NetworkAccessPoint* accessPoint) const
+bool RoutePlanningNode::includes(const cArretPhysique* const accessPoint) const
 {
-	return _accessPointsWithDistance.find(accessPoint) != _accessPointsWithDistance.end();
+	return _data.find(accessPoint) != _data.end();
 }
 
 /** Addition of network access point, with approach duration.
 */
-void RoutePlanningNode::addAccessPoint(const NetworkAccessPoint* accessPoint, const tDureeEnMinutes& approachDuration)
+void RoutePlanningNode::addAccessPoint(const cArretPhysique* const accessPoint, const tDureeEnMinutes& approachDuration, const DistanceInMeters& approachDistance)
 {
-	_accessPointsWithDistance[accessPoint] = approachDuration;
+	_data[accessPoint] = ApproachDescription(approachDuration, approachDistance);
 }

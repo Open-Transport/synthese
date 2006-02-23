@@ -24,10 +24,10 @@ protected:
 
 	//! \name M�thodes de gestion de la repr�sentation en tableau
 	//@{
-	int				OrdrePAEchangeSiPossible(int PositionOrigine, int PositionSouhaitee);
-	int				OrdrePAInsere(const LogicalPlace* ArretLogique, tIndex Position);
+	size_t				OrdrePAEchangeSiPossible(size_t PositionOrigine, size_t PositionSouhaitee);
+	size_t				OrdrePAInsere(LogicalPlace* const, size_t Position);
 	void			OrdrePAConstruitLignesAPermuter(const cTrajet& __TrajetATester, bool* Resultat, int LigneMax) const;
-	bool			OrdrePARechercheGare(int& i, const LogicalPlace* GareAChercher);
+	bool			OrdrePARechercheGare(size_t& i, LogicalPlace* const GareAChercher);
 	void			GenererNiveauxEtAuMoinsUneAlerte();
 	//@}
 
@@ -45,7 +45,7 @@ public:
 	//!	\name Accesseurs
 	//@{
 	LogicalPlace*	getListeOrdonneePointsArret(tIndex)	const;
- 	int				TailleListeOrdonneePointsArret()	const;
+ 	size_t				TailleListeOrdonneePointsArret()	const;
 	const cTexte&	GetTailleTexte()					const;
 	const cTexte&	getAuMoinsUneAlerte()				const;
 	//@}

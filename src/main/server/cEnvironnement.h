@@ -10,6 +10,12 @@ class cFormatFichier;
 class cIndicateurs;
 class LogicalPlace;
 class cCommune;
+class cLigne;
+class cDocument;
+class cReseau;
+class cVelo;
+class cHandicape;
+class cTarif;
 
 #include "cModaliteReservation.h"
 #include <iostream>
@@ -19,22 +25,12 @@ class cCommune;
 #include "cTexte.h"
 #include "Interpretor.h"
 #include "cMateriel.h"
-#include "cJourCirculation.h"
 #include "Temps.h"
-#include "cPhoto.h"
-#include "cReseau.h"
-#include "cVelo.h"
-#include "cHandicape.h"
-#include "cTarif.h"
-#include "cCalculItineraire.h"
-#include "cDescriptionPassage.h"
 #include "Parametres.h"
 #include "cFichierPourEnvironnement.h"
-#include "cDocument.h"
 #include "map/Topography.h"
 #include "LogicalPlace.h"
 
-using namespace synmap;
 
 
 /** @defgroup m05 05 Classes m�tier
@@ -72,6 +68,27 @@ Les m�thodes de l'environnement sont class�es en plusieurs groupes
 */
 class cEnvironnement
 {
+public:
+
+	/** lines map */
+	typedef std::map<std::string, cLigne*>	LinesMap;
+
+	/** logical places map */
+	typedef std::map<size_t, LogicalPlace*> LogicalPlacesMap;
+
+	/** towns map */
+	typedef interpretor::Interpretor<cCommune*> TownsMap;
+
+	/** calendars map */
+	typedef std::map<size_t, cJC*>	CalendarsMap;
+
+	/** documents map */
+	typedef std::map<size_t, cDocument*> DocumentsMap;
+
+	/** fares map */
+	typedef std::map<size_t, cTarif*> FaresMap;
+
+private:
 	//! \name Attributs priv� d�crivant les tailles des tableaux d'index 
 	//@{ 
 		tIndex	vNombreResa;			//!< Index maximal des modalit�s de r�servation
@@ -85,18 +102,18 @@ class cEnvironnement
 	
 	//! \name Tableaux priv�s indexant les donn�es
 	//@{
-		map<size_t, LogicalPlace*>				_logicalPlaces;		//!< Arrêts logiques enregistrés
-		interpretor::Interpretor<cCommune*>							_towns;	//!< Communes
-		cTableauDynamiquePointeurs<cJC*>				_JC;				//!< Calendriers de circulations
-		cTableauDynamiquePointeurs<cDocument*>			_Documents;			//!< Documents
+		LogicalPlacesMap				_logicalPlaces;		//!< Arrêts logiques enregistrés
+		TownsMap							_towns;	//!< Communes
+		CalendarsMap				_JC;				//!< Calendriers de circulations
+		DocumentsMap			_Documents;			//!< Documents
 		std::vector<cModaliteReservation*>				vResa;			//!< Modalit�s de r�servation
 		std::vector<cReseau*>							vReseau;		//!< R�seaux de transport
 		std::vector<cVelo*>					vVelo;			//!< Modalit�s de prise en charge des v�los
 		std::vector<cHandicape*>			vHandicape;		//!< Modalit�s d'acceptation des handicap�s
-		std::vector<cTarif*>				vTarif;			//!< Tarifications
+		FaresMap				vTarif;			//!< Tarifications
 		std::vector<cMateriel*>				vMateriel;		//!< Mat�riels roulants
-		cIndicateurs**						vIndicateurs;	//!< Indicateurs horaires
-		cLigne*								vPremiereLigne;	//!< Acc�s � la premi�re ligne de transport
+		std::map<size_t, cIndicateurs*>						vIndicateurs;	//!< Indicateurs horaires
+		LinesMap								_lines;	//!< Transport lines
 	//@}
 	
 	//! \name Parametres
@@ -139,15 +156,10 @@ class cEnvironnement
 		cFormatFichier* 	_FormatReseaux;
 		cFormatFichier* 	_FormatMateriel;
 
-		Topography      _topography;
+		synmap::Topography      _topography;
 
 	//@}
 
-	//!	\name Espaces de calcul pour threads
-	//@{
-		vector<cCalculateur*>	_Calculateur;			//!< Espaces
-	//@}
-	
 	
 	//! \name Fonctions de Chargement (� int�grer � un h�ritage de cFichier avec une m�thode virtuelle Charge)
 	//@{
@@ -169,7 +181,7 @@ public:
 		bool		Enregistre(cLigne*);
 		tIndex		Enregistre(cJC*, tIndex Index=INCONNU);
 		tIndex		Enregistre(cModaliteReservation*, tIndex);
-		tIndex		Enregistre(cTarif*, tIndex);
+		bool		Enregistre(cTarif* const);
 		tIndex		Enregistre(cMateriel*, tIndex);
 		tIndex		Enregistre(cHandicape*, tIndex);
 		tIndex		Enregistre(cVelo*, tIndex);
@@ -185,7 +197,7 @@ public:
 	//! \name Modificateurs
 	//@{
 		void			addLogicalPlace(LogicalPlace*);
-		void			addTown(const cCommune* town);
+		void			addTown(cCommune* const);
 	//	cSauvegarde*	JCSauvegardeModifier(tNumeroJC NumeroNewJC, const cTexte& newIntitule);
 		void			JCSupprimerInutiles(bool Supprimer=false);
 		void			SetDateMinReelle(const cDate&);
@@ -195,56 +207,43 @@ public:
 
 	//! \name Calculateurs
 	//@{
-	cCalculateur*		CalculateurLibre();
-	vector<cCommune*>	searchTown(const std::string&, size_t n=0)										const;
-	cCommune*			getTown(const std::string&)	const;
-	void				NomLigneUnique(cTexte& NomBase)														const;
-	bool				ControleNumerosArretCommuneDesignation(int nA, int nC, int nD, const cTexte& txtA)	const;
-	bool				ControleNumeroTexteCommune(int nC, const cTexte& txtC)								const;
-	tIndex				ProchainNumeroJC()																	const;
-	cDate				dateInterpretee(const cTexte& Texte)												const;
-	bool				ControleDate(const cDate&)															const;
+		vector<cCommune*>	searchTown(const std::string&, size_t n=0)										const;
+		cCommune*			getTown(const std::string&)	const;
+		void				NomLigneUnique(cTexte& NomBase)														const;
+		bool				ControleNumerosArretCommuneDesignation(int nA, int nC, const cTexte& txtA)	const;
+		bool				ControleNumeroTexteCommune(int nC, const cTexte& txtC)								const;
+		size_t			ProchainNumeroJC()																	const;
+		cDate				dateInterpretee(const cTexte& Texte)												const;
+		bool				ControleDate(const cDate&)															const;
 	//@}
 
-	//!	\name Accesseurs tableaux avec droit de modification
-	//@{
-	cTableauDynamique<cJC*>&				TableauJC();
-	cTableauDynamique<cDocument*>&			TableauDocuments();
-	cTableauDynamique<LogicalPlace*>&				TableauPointsArret();
-	//@}
-	
 	//! \name Accesseurs
 	//@{
-		cCommune*				getTown(size_t)												;
-		LogicalPlace*			getLogicalPlace(size_t)										;
+		cCommune*				getTown(size_t)												const;
+		LogicalPlace*			getLogicalPlace(size_t)										const;
 		cDate					DateMaxPossible()											const;
 		cDate					DateMinPossible()											const;
 		const cDate&			DateMaxReelle()												const;
 		const cDate&			DateMinReelle()												const;
 		tAnnee					DerniereAnnee()												const;
-		cCalculateur&			getCalculateur(size_t n);
-		cJC*					GetJC(int n)												const;
-		cJC*					getJC(tIndex n)												const;
+		cJC*					GetJC(size_t)												const;
 		cJC*					GetJC(const tMasque* MasqueAIdentifer, const cJC& JCBase)	const;
-		cLigne*					GetLigne(const cTexte&)										const;
+		cLigne*					GetLigne(const std::string&)										const;
 		cMateriel*				GetMateriel(tIndex n)										const;
 		const cTexte&			getNomRepertoireHoraires()									const;
-		cDocument*				GetDocument(tIndex)											const;
+		cDocument*				GetDocument(size_t)											const;
 		cModaliteReservation*	getResa(tIndex)												const;
 		cVelo*					getVelo(tIndex n)											const;
 		cReseau*				getReseau(tIndex n)											const;
 		cHandicape*				getHandicape(tIndex)										const;
-		cTarif*					getTarif(tNumeroTarif n)									const;
+		cTarif*					getTarif(size_t n)									const;
 		tIndex					Index()														const;
-		bool					isTarif(tNumeroTarif n)										const;
 		tAnnee					NombreAnnees(tAnnee)										const;
 		tAnnee					NombreAnnees()												const;
 		size_t					NombreLignes(const cTexte& MasqueCode)						const; 
 		tAnnee					PremiereAnnee()												const;
-		cLigne*					PremiereLigne()												const;
-		tIndex	  				getNombreTarif()											const;
 		
-		Topography&                             getTopography () { return _topography; }
+		synmap::Topography&                             getTopography () { return _topography; }
 	//@}
 	
 //	bool				AfficheListeGaresAlpha() const;
@@ -252,9 +251,7 @@ public:
 	
 	// Chargement horaires
 	void RemplitDistances(LogicalPlace*, LogicalPlace*, int);
-	void RemplitProchainAxe();
-	void RemplitCIL();
-
+	
 
 	// Fonctions Indicateurs
 	bool ConstruitIndicateur();
@@ -263,13 +260,12 @@ public:
 
 	//! \name Constructeurs et destructeurs
 	//@{	
-	cEnvironnement(int __NombreCalculateurs);
+	cEnvironnement(std::string directory, std::string pathToFormat, size_t id);
 	~cEnvironnement();
 	//@}
 };
 
 /** @} */
 
-#include "cEnvironnement.inline.h"
 
 #endif

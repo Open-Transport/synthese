@@ -30,20 +30,6 @@ inline bool cInterface::SetIndex(tIndex Valeur)
 
 
 
-/*!	\brief Accesseur pointeur vers période de la journée avec contrôle
-	\param __Index Numéro de la période
-	\author Hugues Romain
-	\date 2005
-*/
-inline const cPeriodeJournee* cInterface::GetPeriode(tIndex __Index) const
-{
-	if (_Periode.IndexValide(__Index))
-		return _Periode[__Index];
-	else
-		return NULL;
-}
-
-
 
 /*!	\brief Contrôle de la validité de l'objet
 	\return true si l'objet est utilisable, false sinon
@@ -55,7 +41,7 @@ L'objet est valide si :
 */
 inline bool cInterface::OK() const
 {
-	return _Periode.Taille() > 0;
+	return _Periode.size() > 0;
 }
 
 
@@ -106,11 +92,5 @@ inline const cTexte& cInterface::LibelleJourSemaine(tIndex __Index) const
 	return _LibelleJourSemaine[__Index];
 }*/
 
-
-inline bool cInterface::AddPeriode(cPeriodeJournee* __Element)
-{
-	_Periode += __Element;
-	return true;
-}
 
 
