@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="71 client_cgi"
+	Name="71_cgi_client"
 	ProjectGUID="{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}"
 	RootNamespace="client_cgi"
 	Keyword="MakeFileProj">
