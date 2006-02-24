@@ -77,7 +77,7 @@ Socket.Write(Client,Buffer,Size,Timeout);
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
 #endif
-
+using
 class cSocket
 {
 private:

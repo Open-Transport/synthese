@@ -21,14 +21,6 @@ class TimeTables;
 
 /**	@defgroup m00 00 Architecture : serveur TCP et main
 
-
-	@section m00principale Architecture principale
-
-	Pour pouvoir �tre appel� par plusieurs applications, le serveur SYNTHESE est un serveur TCP autonome, tout comme MySQL par exemple.
-
-	Pour l'interroger, des modules clients TCP sont d�velopp�s dans les applications clientes :
-		- Les clients autonomes : @ref m70, @ref m71, @ref m72
-		- Un client TCP int�gr� au r�f�rentiel r�seau (voir projet R�f�rentiel r�seau), permettant l'affichage cartographiques de donn�es inconnues de SYNTHESE
 	
 	@section m00carto Dispositions particuli�res fonctionnalit�s cartographiques
 
