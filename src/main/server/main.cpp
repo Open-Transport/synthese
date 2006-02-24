@@ -1,4 +1,5 @@
-/** @file main.cpp
+/** Main file of the SYNTHESE server. (MODULE 70)
+	@file main.cpp
 */
 
 

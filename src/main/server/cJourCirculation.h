@@ -17,7 +17,7 @@
 #include <vector>
 
 /** Calendrier de circulation
-	@ingroup m05
+	@ingroup m15
  
 	Un tableau de 32 bits est créé par mois, stocké dans un int. Le bit de poids faible correspond au jour 1, le bit de poinds fort au jour 32 (inutilisé).
  */

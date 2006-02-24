@@ -33,10 +33,6 @@ class cTarif;
 #include "cJourCirculation.h"
 
 
-/** @defgroup m05 05 Classes m�tier
-	@{
-*/
-
 
 //! @name Constantes de commande de temps relatives � l'environnement
 //@{
@@ -51,6 +47,7 @@ class cTarif;
 	\date 2000-2004
 	\author Hugues Romain
 	\version 1.0
+	@ingroup m15
 	
 Un environnement est un groupement d'objets d�crivant un espace de calcul autonome. Il contient tout type d'objet. Tout calcul d'itin�raire ou autre recherche se faisant sur un environnement ne fait intervenir que des objets lui appartenant.
 

@@ -14,7 +14,7 @@ class cJC;
 #include "Temps.h"
 
 /** Impl�mentation de la notion de @ref defCirculation
-	@ingroup m05
+	@ingroup m15
 */
 class cTrain
 {

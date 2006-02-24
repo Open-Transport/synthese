@@ -5,7 +5,7 @@
 #include "cTexteRequeteSYNTHESE.h"
 #include "cElementInterface.h"
 
-/*!	\addtogroup m51
+/*!	\addtogroup m11
 	@{
 */
 

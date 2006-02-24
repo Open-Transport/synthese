@@ -15,7 +15,7 @@ class cReservation;
 #include "cModaliteReservationEnLigne.h"
 
 /** R�servation de transport � la demande
-	@ingroup m37
+	@ingroup m31
 */
 class cReservation
 {

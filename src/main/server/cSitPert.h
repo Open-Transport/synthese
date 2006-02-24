@@ -15,6 +15,7 @@
 
   
  /*!	\brief Situation perturbée
+	@ingroup m15
  */
 class cSitPert
 {

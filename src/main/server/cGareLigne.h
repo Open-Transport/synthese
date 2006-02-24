@@ -15,7 +15,7 @@ class cHandicape;
 
 
 /** Liaison entre points d'arr�t et lignes
-	@ingroup m05
+	@ingroup m15
 	\author Hugues Romain
 	\date 2000-2003
 	\version 2.0

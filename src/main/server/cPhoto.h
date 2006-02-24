@@ -13,6 +13,7 @@
 /*! \brief Zone cliquable sur photo, donnant accès à une autre photo ou une URL
 	\author Hugues Romain
 	\date 2002
+	@ingroup m15
 */
 class cMapPhoto
 {
@@ -40,6 +41,7 @@ public:
 /*!  \brief Photo à afficher dans la fiche arrêt
 	\author Hugues Romain
 	\date 2002
+	@ingroup m15
 */
 class cPhoto : public cDocument
 {

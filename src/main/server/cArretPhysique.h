@@ -15,8 +15,8 @@
 
 class cGareLigne;
 
-/*! \brief Arrêts physiques (quais, arrêts de bus, etc.)
-	@ingroup m05
+/** Arrêts physiques (quais, arrêts de bus, etc.).
+	@ingroup m15
 */
 class cArretPhysique : public NetworkAccessPoint
 {

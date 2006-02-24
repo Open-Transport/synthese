@@ -2,10 +2,6 @@
 	\brief En-t�te classes d'interface
 */
 
-/*!	@defgroup m51 51 Module d'interface
-	@{
-*/
-
 #ifndef SYNTHESE_CINTERFACE_H
 #define SYNTHESE_CINTERFACE_H
 
@@ -24,6 +20,7 @@ class cInterface;
 	\author Hugues Romain
 	\date 2001-2005
 	\todo Lancer une d�marche globale de d�finition du format de sortie en collaboration avec cTexte et ses d�riv�s
+	@ingroup m11
 	
 Cette classe d�finit les diff�rentes interfaces pour l'affichage de r�sultats issus de calculs SYNTHESE. Une interface est constitu�e de mod�les d'affichage, permettant la d�finition du graphisme en sortie, fournis � SYNTHESE en tant que donn�es. Des mod�les de fichiers de sortie doivent �tre fournis au chargement d'apr�s un format de codage d�fini pour l'occasion.</p>
 

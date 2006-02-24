@@ -14,11 +14,8 @@ class cGareLigne;
 #include "cHeure.h"
 #include <set>
 
-/** @defgroup m34 34 Tableaux d'affichage
-	@{
-*/
-
-/** Tableau d'affichage
+/** Tableau d'affichage.
+	@ingroup m34
 */
 class cTableauAffichage : public cSite
 {

@@ -11,7 +11,7 @@ class cInterface_Objet_Element_Parametre_DonneeEnvironnement;
 #define EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation		0
 
 
-/*!	\addtogroup m51
+/*!	\addtogroup m11
 	@{
 */
 

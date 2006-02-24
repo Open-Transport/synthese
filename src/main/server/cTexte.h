@@ -34,6 +34,7 @@ typedef int TypeSection;
 La gestion de l'allocation mémoire est automatique.
 
 \todo Nettoyer les fonctions de copie
+	@ingroup m01
 */
 class cTexte : public cTableauDynamique<char>
 {

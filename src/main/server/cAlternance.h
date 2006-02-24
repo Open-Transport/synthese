@@ -8,6 +8,7 @@
 #include "cTexte.h"
 
 /*!	\brief Fournit un index modulo n
+	@ingroup m01
 
 Cette classe est utilis�e en particulier pour g�n�rer une alternance de styles pour une application sur des lignes de fiche horaire par exemple.
 */

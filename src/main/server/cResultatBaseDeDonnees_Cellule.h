@@ -5,6 +5,7 @@
 #include "cTexte.h"
 #include "cMoment.h"
 
+/** @ingroup m02 */
 class cResultatBaseDeDonnees_Cellule
 {
 protected:
@@ -18,6 +19,7 @@ public:
 
 
 
+/** @ingroup m02 */
 class cResultatBaseDeDonnees_Cellule_Nombre : public cResultatBaseDeDonnees_Cellule
 {
 protected:
@@ -40,6 +42,7 @@ public:
 
 
 
+/** @ingroup m02 */
 class cResultatBaseDeDonnees_Cellule_Texte : public cResultatBaseDeDonnees_Cellule
 {
 protected:
@@ -61,6 +64,7 @@ public:
 
 
 
+/** @ingroup m02 */
 class cResultatBaseDeDonnees_Cellule_Moment : public cResultatBaseDeDonnees_Cellule
 {
 protected:

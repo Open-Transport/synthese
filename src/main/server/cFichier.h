@@ -10,12 +10,8 @@
 #include "cTexte.h"
 #include <fstream>
 
-/** @defgroup m11 11 Lecture des fichiers de données
-	@{
-*/
-
 /** Fichier en lecture
-	@todo Créer un opérateur >> pour remplacer LireLigne
+	
 */
 class cFichier
 {

@@ -9,7 +9,7 @@ class cModaliteReservation;
 #include "Parametres.h"
 
 /** Modalit�s de prise en charge des v�los
-	@ingroup m05
+	@ingroup m15
  */
 class cVelo
 {

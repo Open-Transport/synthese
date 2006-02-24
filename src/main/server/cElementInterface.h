@@ -19,7 +19,7 @@ class cInterface_Objet_Element_TestConditionnel;
 
 
 /*!	\brief Element d'interface
-	@ingroup m51
+	@ingroup m11
 	\author Hugues Romain
 	\date 2001-2005
 	
@@ -82,6 +82,7 @@ public:
 /*!	\brief Elément d'interface pouvant être inclus dans des objets de type paramètre
 	\author Hugues Romain
 	\date 2005
+	@ingroup m11
 
 Cette classe déclare l'aptitude d'un élément d'interface à fournir une valeur référence texte ou numérique à l'éxécution, directement issue d'un objet en mémoire, à l'opposé des autres objets qui ne peuvent qu'alimenter un flux de données dans un processus d'évaluation plus complexe fabriquant le résultat en direct.
 
@@ -117,6 +118,7 @@ public:
 /*!	\brief Element d'interface contenant une chaîne de caractères prète à afficher
 	\author Hugues Romain
 	\date 2005
+	@ingroup m11
 */
 class cInterface_Objet_Element_Parametre_TexteConnu : public cInterface_Objet_Element_Parametre
 {
@@ -148,6 +150,7 @@ public:
 /*!	\brief Element d'interface de type paramètre à contenu non connu
 	\author Hugues Romain
 	\date 2005
+	@ingroup m11
 	
 Cette classe définit un élément qui détermine quel paramètre connu devra être évalué lors de la fabrication des résultats.
 */

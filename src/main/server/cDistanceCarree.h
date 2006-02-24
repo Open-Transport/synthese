@@ -19,6 +19,7 @@ tCategorieDistance CategorieDistance(tDistanceKM D, bool DAuCArre);
 /*!	\brief Carr� de distance entre deux points avec approximation de 2 km�
 	\author Hugues Romain
 	\date 2005
+	@ingroup m01
 	
 	Cette classe est utilis�e pour stocker des distances carr�es entre deux points, calcul�es � partir de coordonn�es g�ographiques dont la pr�cision n'exc�de pas le kilom�tre.
 	

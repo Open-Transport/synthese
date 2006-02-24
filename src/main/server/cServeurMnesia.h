@@ -12,6 +12,7 @@ extern "C"
 
 #define INCONNU -1
 
+/** @ingroup m02 */
 class cServeurMnesia : public cServeurBaseDeDonnees
 {
 private:

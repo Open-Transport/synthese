@@ -9,6 +9,7 @@
 #include "map/RoadChunk.h"
 
 /** Elément de trajet piéton empruntant la voirie.
+	@ingroup m33
 
 	Si l'arret de départ ou d'arrivée est à NULL, alors il s'agit des origines ou destinations de la recherche d'itinéraires
 */

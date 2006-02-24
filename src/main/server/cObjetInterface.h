@@ -12,7 +12,7 @@ class cInterface_Objet_AEvaluer_ListeParametres;
 
 #include "cElementInterface.h"
 
-/** @addtogroup m51
+/** @addtogroup m11
 	@{
 */
 

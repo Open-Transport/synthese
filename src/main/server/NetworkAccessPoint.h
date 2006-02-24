@@ -16,7 +16,7 @@ namespace synmap {
 }
 
 
-
+/** @ingroup m15 */
 class NetworkAccessPoint : public cPoint
 {
 public:

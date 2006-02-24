@@ -69,6 +69,9 @@ typedef struct _eval {
 } cAssocEval; 
 typedef vector<cAssocEval> cAssocResult;
 
+/** Associator.
+	@ingroup m07
+*/
 class cAssociator {
     header _hdr; // entête
     layer *_lyr; // couches

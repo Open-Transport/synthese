@@ -30,6 +30,7 @@ typedef enum
 typedef int tNumeroMessageStandard;
 
 /*!	\brief Fichier de log
+	@ingroup m01
 */
 class cLog
 {

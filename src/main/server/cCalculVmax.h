@@ -15,6 +15,8 @@
 #include "Temps.h"
 #include <fstream>
 
+/** @ingroup m33
+*/
 class cCalculVmax
 {
 private:

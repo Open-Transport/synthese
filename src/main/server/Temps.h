@@ -10,9 +10,6 @@
 #include "Parametres.h"
 #include "cTexte.h"
 
-/** @defgroup m04 04 Gestion du temps
-	@{
-*/
 
 
 	//! @name Caractères de codage de commandes
@@ -51,7 +48,6 @@
 	class cHoraire;
 	class cHeure;
 
-	/** @} */
 
 
 

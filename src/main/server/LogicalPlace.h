@@ -20,7 +20,7 @@ class cArretPhysique;
 class cLigne;
 
 /** Classe lieu logique.
- @ingroup m03
+ @ingroup m15
  
  Un lieu logique est un regrouppement de lieux physiques ponctuels permettant l'entrée dans les réseaux de transport et de voirie.
  

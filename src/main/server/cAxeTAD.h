@@ -12,7 +12,7 @@ class cAxeTAD;
 
 typedef int tNombrePlaces;
 
-/**
+/** @ingroup m31
 */
 class cAxeTAD: public cAxe
 {

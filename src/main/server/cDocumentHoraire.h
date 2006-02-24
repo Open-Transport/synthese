@@ -2,6 +2,7 @@
 #ifdef SYNTHESE_CDOCUMENTHORAIRE_H
 #define SYNTHESE_CDOCUMENTHORAIRE_H
 
+/** @ingroup m15 */
 class cDocumentHoraire : public cDocument
 {
 protected:

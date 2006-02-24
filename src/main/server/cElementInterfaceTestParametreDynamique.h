@@ -12,7 +12,7 @@
 
 
 /*!	\brief Element d'interface de test dynamique d'objet
-	@ingroup m51
+	@ingroup m11
 	\author Hugues Romain
 	\date 2005
 

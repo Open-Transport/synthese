@@ -13,6 +13,7 @@
 /**	Modalit� de r�servation permettant la r�servation en ligne
 	\author Hugues Romain
 	\date 2005
+	@ingroup m15
 */
 class cModaliteReservationEnLigne : public cModaliteReservation
 {

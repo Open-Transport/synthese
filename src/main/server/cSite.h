@@ -15,7 +15,7 @@ class cInterface;
 #include <string>
 
 /** Gestion des sites Internet clients
-	@ingroup m51
+	@ingroup m10
 	\author Hugues Romain
 	\date 2005
 */

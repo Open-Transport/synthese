@@ -15,7 +15,7 @@ class cAxe;
 #include "cTexte.h"
  
 /** Impl�mentation de la notion d'@ref defAxe
-	@ingroup m05
+	@ingroup m15
 */
 class cAxe
 {

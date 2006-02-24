@@ -8,6 +8,7 @@
 /*!	\brief Classe de texte destinée à recevoir des éléments de requête SQL
 
 Le but de cette classe est de gérer les problèmes de caractères interdits (guillemets...) ainsi que les tentatives de détournement possibles (insertion d'un ; et d'une seconde requete nuisible en suivant)
+	@ingroup m02
 */
 class cTexteSQL : public cTexte
 {

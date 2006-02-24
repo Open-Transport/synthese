@@ -15,7 +15,7 @@ class cModaliteReservation;
 
 
 /*!	\brief Types de prise en charge des handicap�s
-	@ingroup m05
+	@ingroup m15
 	\author Hugues Romain
 	\date 2005
 */

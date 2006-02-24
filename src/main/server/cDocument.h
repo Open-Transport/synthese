@@ -4,6 +4,7 @@
 
 #include <string>
 
+/** @ingroup m15 */
 class cDocument
 {
 public:

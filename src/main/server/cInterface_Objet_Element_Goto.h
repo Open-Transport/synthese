@@ -6,7 +6,7 @@
 
 
 /*!	\brief Objet d'interface contenant l'ordre d'avancer à la ligne portant le numéro enregistré
-	@ingroup m51
+	@ingroup m11
 	\warning S'assurer de l'unicité des numéros de ligne en les préfixant du numéro de la page écran
 	\warning La ligne numéro 0 correspond à la sortie du programme
 	\warning La ligne numéro 1 correspond à la prochaine ligne

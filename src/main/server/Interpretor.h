@@ -27,10 +27,24 @@ namespace interpretor
 	const size_t UNKNOWN_INDEX = -1;
 
 
-/** @defgroup m07 07 Interpréteur de textes
-	@{
 
-	@section m07integr Intégration du module Interpréteur de textes
+/** Classe interpréteur de textes (template générique).
+
+	L'interpréteur générique fonctionne comme un map où les objets sont doublement indexés :
+		- un inde textuel permet principalement une méthode d'interrogation d'après un texte entré inexact
+		- un index numérique simple
+	
+	Un même élément peut être indexé sous plusieurs indexs textes, mais sous un seul index numérique.
+
+	La recherche d'un élément peut se faire de deux manières :
+		- par la fourniture directe de l'index
+		- par la recherche préalable de l'index d'après un texte à rechercher
+
+
+	CR : tu gères tes attributs comme tu veux (avec peut etre une liste normale d'éléments en plus pour s'en servir comme tableau avec opérateur [])
+
+
+		@section m07integr Intégration du module Interpréteur de textes
 
 	Le module interpréteur de texte implémente une liste permettant la recherche via l'associateur basé sur un réseau de neurones.
 
@@ -47,26 +61,8 @@ namespace interpretor
 		- cCommune::addDesignation
 
 	Les méthodes de suppression seront utilisées dans le cadre de la mise en service des modifications temps réel de la base.
-*/
 
-
-
-
-
-
-/** Classe interpréteur de textes (template générique).
-
-	L'interpréteur générique fonctionne comme un map où les objets sont doublement indexés :
-		- un inde textuel permet principalement une méthode d'interrogation d'après un texte entré inexact
-		- un index numérique simple
-	
-	Un même élément peut être indexé sous plusieurs indexs textes, mais sous un seul index numérique.
-
-	La recherche d'un élément peut se faire de deux manières :
-		- par la fourniture directe de l'index
-		- par la recherche préalable de l'index d'après un texte à rechercher
-
-	CR : tu gères tes attributs comme tu veux (avec peut etre une liste normale d'éléments en plus pour s'en servir comme tableau avec opérateur [])
+	@ingroup m07
 */
 template <class T>
 class Interpretor

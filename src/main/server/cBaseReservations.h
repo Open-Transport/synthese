@@ -8,7 +8,7 @@ class cBaseReservation;
 #include "cServeurBaseDeDonnees.h"
 
 /** Base de réservations pour transport à la demande
-	@ingroup m37
+	@ingroup m31
 */
 class cBaseReservation
 {

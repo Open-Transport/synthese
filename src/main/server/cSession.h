@@ -1,8 +1,8 @@
 
 #include "cProfil.h"
 
-/*
-
+/** User session.
+	@ingroup m70
 */
 class cSession
 {

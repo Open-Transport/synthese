@@ -12,6 +12,7 @@
 /*! \brief Calcul de durée d'exécution entre deux points de mesure
 	\author Hugues Romain
 	\date 2000-2001
+	@ingroup m01
 */
 class cChronometre
 {

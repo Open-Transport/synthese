@@ -1,6 +1,7 @@
 
 #include "cTexte.h"
 
+/** @ingroup m10 */
 class cPersonne
 {
 		//!	\name Coordonnées de la personne

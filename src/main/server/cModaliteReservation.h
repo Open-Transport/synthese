@@ -14,6 +14,7 @@ class cModaliteReservationEnLigne;
 /*!	\brief Modalités de réservation
 	\author Hugues Romain
 	\date 2001-2005
+	@ingroup m15
 */
 class cModaliteReservation
 {

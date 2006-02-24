@@ -22,13 +22,10 @@ extern pthread_mutex_t mutex_calcul;
 #endif
 
 
-/**	@defgroup m33 33 Recherche d'itin�raires
-	@{
-*/
- 
 /** Espace de calcul pour thread et m�thodes de calcul
 	\author Hugues Romain
 	\date 2001
+	@ingroup m33
 	
 Cette classe contient l'ensemble de la m�moire allou�e disponible pour contenir les variables d'�tat n�cessaires aux diff�rents calculs complexes de SYNTHESE. Cette classe ne contient cependant pas d'espace allou� pour les objets temporaires g�n�r�s lors des phases r�cursives des calculs (qui sont g�r�s en direct par les m�thodes de calcul)
 
@@ -156,7 +153,5 @@ public:
 		~cCalculateur();
 	//@}
 };
-
-/** @} */
 
 #endif

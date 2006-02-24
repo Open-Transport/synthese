@@ -9,6 +9,7 @@
 typedef cTableauDynamiquePointeurs<cResultatBaseDeDonnees_Cellule*> tResultatBaseDeDonnees_Enregistrement;
 typedef map<char*, tIndex>											tPositionChamps;
 
+/** @ingroup m02 */
 class cResultatBaseDeDonnees
 {
 protected:

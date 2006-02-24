@@ -20,7 +20,7 @@ class cFormatFichier;
 
 
 /** Format de fichier
-	@ingroup m11
+	@ingroup m01
 */
 class cFormatFichier
 {

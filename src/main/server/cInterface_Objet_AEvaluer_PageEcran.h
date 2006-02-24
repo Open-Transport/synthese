@@ -9,7 +9,7 @@ class cInterface_Objet_AEvaluer_PageEcran;
 #include "cObjetInterface.h"
 
 
-/*!	\addtogroup m51
+/*!	\addtogroup m11
 	@{
 */
 

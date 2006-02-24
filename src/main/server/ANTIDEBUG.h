@@ -34,6 +34,9 @@ FALSE_DISASM : trompe les outils de désassemblage comme objdump.
 #include <sys/ptrace.h>
 #include <signal.h>
 
+/** @addtogroup m01
+	@{
+*/
 
 
 #if defined(__linux__) && !defined(DEBUG)
@@ -71,3 +74,4 @@ void handler(int sig) {}
 // puis FALSE_BREAKPOINT
 #endif
 
+/** @} */

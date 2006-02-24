@@ -10,7 +10,7 @@
 
 
 /** Alert message.
-	@ingroup m05
+	@ingroup m15
 */
 class cAlerte
 {

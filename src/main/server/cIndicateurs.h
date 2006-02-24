@@ -5,15 +5,6 @@
 #ifndef SYNTHESE_CINDICATEURS_H
 #define SYNTHESE_CINDICATEURS_H
 
-/** @degroup m35 35 Indicateurs papier
-
-	Le module d'indicateur papier doit �tre mis aux normes :
-		- r�duction du module � la simple fonction de calcul
-		- mise en place d'objets de biblioth�que d'interface
-		- mise en interface du rendu
-	@{
-*/
-
 // Indicateurs
 enum tTypeGareIndicateur
 {
@@ -58,6 +49,7 @@ typedef float tDistancePt;
 /** Ligne de tableau d'indicateur
 	@author Hugues Romain
 	@date 2001
+	@ingroup m35
  
  caract�ris�e par:
    - un point d'arr�t
@@ -96,6 +88,7 @@ public:
 /** Colonne de tableau d'indicateur papier
 	@author Hugues Romain
 	@date 2001
+	@ingroup m35
 
  caract�ris�e par:
    - des pointeurs vers les cArrets d�crits
@@ -151,6 +144,7 @@ public:
    Le libell� est clacul� en fonction du JC du renvoi, et de celui de la page d'indicateur (diff�rence).
    @author Hugues Romain
    @date 2001
+   @ingroup m35
 */
 class cRenvoiIndicateurs
 {
@@ -176,6 +170,7 @@ public:
    - Un titre
 	@author Hugues Romain
 	@date 2001
+	@ingroup m10
 */
 class cIndicateurs
 {

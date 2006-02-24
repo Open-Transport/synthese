@@ -14,7 +14,7 @@ class cMateriel;
 
 
 /** Impl�mentation de la notion de @ref defMateriel
-	@ingroup m05
+	@ingroup m15
 	@author Hugues Romain
 	@date 2001
 */

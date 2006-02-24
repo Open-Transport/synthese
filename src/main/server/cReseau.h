@@ -10,7 +10,7 @@
 #include <string>
  
 /** Réseau de transport
-	@ingroup m05
+	@ingroup m15
 */
 class cReseau
 {

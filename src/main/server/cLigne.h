@@ -25,7 +25,7 @@ class cEnvironnement;
 #include "cAlerte.h"
 
 /** Impl�mentation de la notion de @ref defLigne
-	@ingroup m05
+	@ingroup m15
 	@author Hugues Romain
 	@date 2000-2003
 */

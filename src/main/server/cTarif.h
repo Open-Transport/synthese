@@ -12,7 +12,7 @@ typedef int tNumeroTarif;
 class cTarif;
 
 /**
-	@ingroup m05
+	@ingroup m15
 */
 enum tTypeTarif
 {
@@ -23,7 +23,7 @@ enum tTypeTarif
 
 
  /** Classes de gestion des tarifications
- 	@ingroup m05
+ 	@ingroup m15
 */
 class cTarif
 {

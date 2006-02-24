@@ -11,9 +11,63 @@
 #include <map>
 #include <string>
 
-/** @defgroup m12 12 Requêtes
 
+//! Taille maximale d'une requête SYNTHESE
+#define TAILLE_MAX_REQUETE 4096
 
+//! Paramètre Fonction
+#define REQUETE_COMMANDE_FONCTION "fonction"
+	#define FONCTION_ACCUEIL "ac"
+	#define FONCTION_FICHE_HORAIRE "fh"
+	#define FONCTION_FICHE_ARRET "fa"
+	#define FONCTION_LISTE_COMMUNE "lc"
+	#define FONCTION_LISTE_POINT_ARRET "lpa"
+	#define FONCTION_VALID_FICHE_HORAIRE "vfh"
+	#define FONCTION_TABLEAU_DEPART_GARE "tdg"
+	#define FONCTION_TABLEAU_DEPART "td"
+	#define FONCTION_MINI_TABLEAU_DEPART "mtd"
+	#define FONCTION_FORMULAIRE_RESA "fres"
+	#define FONCTION_VALIDATION_RESA "vres"
+	#define FONCTION_ANNULATION_RESA "ares"
+
+#define REQUETE_COMMANDE_SITE "site"
+#define REQUETE_COMMANDE_RECHERCHE "rec"
+#define REQUETE_COMMANDE_COMMUNE "com"
+#define REQUETE_COMMANDE_NUMERO_COMMUNE "ncom"
+#define REQUETE_COMMANDE_SENS "sens"
+#define REQUETE_COMMANDE_DATE "date"
+#define REQUETE_COMMANDE_PERIODE "per"
+#define REQUETE_COMMANDE_TAXIBUS "tax"
+#define REQUETE_COMMANDE_VELO "vel"
+#define REQUETE_COMMANDE_HANDICAPE "han"
+#define REQUETE_COMMANDE_TARIF "tar"
+#define REQUETE_COMMANDE_COMMUNE_DEPART "comd"
+#define REQUETE_COMMANDE_COMMUNE_ARRIVEE "coma"
+#define REQUETE_COMMANDE_POINT_ARRET_DEPART "ad"
+#define REQUETE_COMMANDE_POINT_ARRET_ARRIVEE "aa"	
+#define REQUETE_COMMANDE_NUMERO_COMMUNE_DEPART "ncomd"
+#define REQUETE_COMMANDE_NUMERO_COMMUNE_ARRIVEE "ncoma"	
+#define REQUETE_COMMANDE_NUMERO_POINT_ARRET "npa"
+#define REQUETE_COMMANDE_NUMERO_POINT_ARRET_DEPART "npad"
+#define REQUETE_COMMANDE_NUMERO_POINT_ARRET_ARRIVEE "npaa"	
+#define REQUETE_COMMANDE_NUMERO_DESIGNATION_DEPART "ndd"
+#define REQUETE_COMMANDE_NUMERO_DESIGNATION_ARRIVEE "nda"	
+#define REQUETE_COMMANDE_NOMBRE_PROPOSITIONS "np"
+#define REQUETE_COMMANDE_CODE_LIGNE "lig"
+#define REQUETE_COMMANDE_NUMERO_SERVICE 	"serv"
+#define REQUETE_COMMANDE_CODE_RESA "res"
+#define REQUETE_COMMANDE_CLIENT_NOM "Nom"
+#define REQUETE_COMMANDE_CLIENT_PRENOM "Prenom"
+#define REQUETE_COMMANDE_CLIENT_ADRESSE					"Adresse"
+#define REQUETE_COMMANDE_CLIENT_EMAIL					"Email"
+#define REQUETE_COMMANDE_CLIENT_TELEPHONE				"Telephone"
+#define REQUETE_COMMANDE_CLIENT_NUMERO_ABONNE			"NumAbonne" 
+#define REQUETE_COMMANDE_ADRESSE_DEPART					"AdresseDepart" 
+#define REQUETE_COMMANDE_ADRESSE_ARRIVEE				"AdresseArrivee" 
+#define REQUETE_COMMANDE_NOMBRE_PLACES					"NbPlaces" 
+#define REQUETE_COMMANDE_CODE_TABLEAUDEPART				"tb"
+
+/** 
 
 Requêtes
 
@@ -74,70 +128,14 @@ Requête
 @param <arretslogiques> Sélection d'arrêts logiques @ref xx
 @param <arretsphysiques> Sélection d'arrêts physiques @ref xx
 
-	@{
 */
-
-//! Taille maximale d'une requête SYNTHESE
-#define TAILLE_MAX_REQUETE 4096
-
-//! Paramètre Fonction
-#define REQUETE_COMMANDE_FONCTION "fonction"
-	#define FONCTION_ACCUEIL "ac"
-	#define FONCTION_FICHE_HORAIRE "fh"
-	#define FONCTION_FICHE_ARRET "fa"
-	#define FONCTION_LISTE_COMMUNE "lc"
-	#define FONCTION_LISTE_POINT_ARRET "lpa"
-	#define FONCTION_VALID_FICHE_HORAIRE "vfh"
-	#define FONCTION_TABLEAU_DEPART_GARE "tdg"
-	#define FONCTION_TABLEAU_DEPART "td"
-	#define FONCTION_MINI_TABLEAU_DEPART "mtd"
-	#define FONCTION_FORMULAIRE_RESA "fres"
-	#define FONCTION_VALIDATION_RESA "vres"
-	#define FONCTION_ANNULATION_RESA "ares"
-
-#define REQUETE_COMMANDE_SITE "site"
-#define REQUETE_COMMANDE_RECHERCHE "rec"
-#define REQUETE_COMMANDE_COMMUNE "com"
-#define REQUETE_COMMANDE_NUMERO_COMMUNE "ncom"
-#define REQUETE_COMMANDE_SENS "sens"
-#define REQUETE_COMMANDE_DATE "date"
-#define REQUETE_COMMANDE_PERIODE "per"
-#define REQUETE_COMMANDE_TAXIBUS "tax"
-#define REQUETE_COMMANDE_VELO "vel"
-#define REQUETE_COMMANDE_HANDICAPE "han"
-#define REQUETE_COMMANDE_TARIF "tar"
-#define REQUETE_COMMANDE_COMMUNE_DEPART "comd"
-#define REQUETE_COMMANDE_COMMUNE_ARRIVEE "coma"
-#define REQUETE_COMMANDE_POINT_ARRET_DEPART "ad"
-#define REQUETE_COMMANDE_POINT_ARRET_ARRIVEE "aa"	
-#define REQUETE_COMMANDE_NUMERO_COMMUNE_DEPART "ncomd"
-#define REQUETE_COMMANDE_NUMERO_COMMUNE_ARRIVEE "ncoma"	
-#define REQUETE_COMMANDE_NUMERO_POINT_ARRET "npa"
-#define REQUETE_COMMANDE_NUMERO_POINT_ARRET_DEPART "npad"
-#define REQUETE_COMMANDE_NUMERO_POINT_ARRET_ARRIVEE "npaa"	
-#define REQUETE_COMMANDE_NUMERO_DESIGNATION_DEPART "ndd"
-#define REQUETE_COMMANDE_NUMERO_DESIGNATION_ARRIVEE "nda"	
-#define REQUETE_COMMANDE_NOMBRE_PROPOSITIONS "np"
-#define REQUETE_COMMANDE_CODE_LIGNE "lig"
-#define REQUETE_COMMANDE_NUMERO_SERVICE 	"serv"
-#define REQUETE_COMMANDE_CODE_RESA "res"
-#define REQUETE_COMMANDE_CLIENT_NOM "Nom"
-#define REQUETE_COMMANDE_CLIENT_PRENOM "Prenom"
-#define REQUETE_COMMANDE_CLIENT_ADRESSE					"Adresse"
-#define REQUETE_COMMANDE_CLIENT_EMAIL					"Email"
-#define REQUETE_COMMANDE_CLIENT_TELEPHONE				"Telephone"
-#define REQUETE_COMMANDE_CLIENT_NUMERO_ABONNE			"NumAbonne" 
-#define REQUETE_COMMANDE_ADRESSE_DEPART					"AdresseDepart" 
-#define REQUETE_COMMANDE_ADRESSE_ARRIVEE				"AdresseArrivee" 
-#define REQUETE_COMMANDE_NOMBRE_PLACES					"NbPlaces" 
-#define REQUETE_COMMANDE_CODE_TABLEAUDEPART				"tb"
-
 
 
 /*!	\brief Classe de texte contenant une requète SYNTHESE
 	\author Christophe Romain
 	\author Hugues Romain
 	\date 2005
+	@ingroup m70
 
 Cette classe permet de stocker une requête SYNTHESE, et fournit des méthodes d'accès rapide aux diverses informations
 contenues dans la requête.
@@ -214,5 +212,4 @@ void cTexteRequeteSYNTHESE::AfficheFormulaireHTML(C& __Flux)
 		__Flux << "<input type=\"hidden\" name=\"" << __Iter->first << "\" value=\"" << __Iter->second << "\" />";
 }
 
-/** @} */
 #endif

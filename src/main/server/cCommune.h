@@ -15,7 +15,7 @@
 
 
 /** Commune
- @ingroup m05
+ @ingroup m15
  @author Hugues Romain
 */
 class cCommune : public cPoint

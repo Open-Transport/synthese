@@ -13,6 +13,7 @@
 /*!	\brief Tableau avec gestion automatique de l'allocation
 	\todo bloquer les phases d'�criture avec des sections critiques pour un usage temps r�el
 	\warning De mani�re g�n�rale, il est fortement d�conseill� d'utiliser des pointeurs ou r�f�rences vers des �l�ments du tableau, ceux ci pouvant �tre d�plac�s dans la m�moire en cas d'agrandissement du tableau lors d'un ajout d'�l�ment par exemple. L'usage de telles r�f�rences doit se faire uniquement dans un contexte court avec acc�s en lecture uniquement et sous la protection d'une section critique.
+	@ingroup m01
 */
 template <class C>
 class cTableauDynamique

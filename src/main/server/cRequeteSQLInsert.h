@@ -6,6 +6,7 @@
 #include "cTexteSQL.h"
 
 /*!	\brief Classe de texte restinée à recevoir une requête SQL d'insertion
+	@ingroup m02
 
 Le but de cette classe est de permettre la construction d'une requête INSERT de manière claire et lisible.
 */

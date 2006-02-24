@@ -5,6 +5,7 @@
 #include "cTexteSQL.h"
 #include "cResultatBaseDeDonnees.h"
 
+/** @ingroup m02 */
 class cServeurBaseDeDonnees
 {
 public:

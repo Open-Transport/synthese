@@ -11,6 +11,7 @@ class cProfil;
 #include "cTarif.h"
 #include "Parametres.h"
 
+/** @ingroup m10 */
 class cProfil : public cPersonne
 {
 protected:

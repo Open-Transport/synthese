@@ -5,7 +5,9 @@
 #include "cSite.h"
 
 
-/** Timetables collection */
+/** Timetables collection.
+	@ingroup m35
+*/
 class TimeTables : public cSite
 {
 public:
