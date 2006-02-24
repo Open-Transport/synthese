@@ -8,6 +8,7 @@
 #include "cObjetInterface.h"
 #include "cInterface.h"
 
+using namespace std;
 
 
 /*! 	\brief Constructeur
@@ -24,11 +25,9 @@ Les objets site d'affichage sont initialis�s par les valeurs par d�faut suiv
 Par ailleurs, le constructeur initialise d'ores et d�j� les valeurs suivantes :
  - Cl� d'identification du site
 */
-cSite::cSite(const cTexte& clef)
+cSite::cSite(const string& clef)
+: vClef(clef)
 {
-	// Initialisation cl�
-	vClef = clef;
-	
 	// Interface et environnement non d�clar�s
 	_Interface = NULL;
 	_Environnement = NULL;
@@ -90,32 +89,31 @@ void cSite::Affiche(ostream& __Flux, tIndex __IndexObjet, const cInterface_Objet
 	\param __URLClient Valeur
 	\return true si la modification a �t� effectu�e avec succ�s
 */
-bool cSite::setURLClient(const cTexte& __URLClient)
+bool cSite::setURLClient(const string& __URLClient)
 {
-	_URLClient.Vide();
 	_URLClient = __URLClient;
-	return _URLClient.Taille() == __URLClient.Taille();
+	return true;
 }
 
 
 
-const cTexte& cSite::getURLClient() const
+const string& cSite::getURLClient() const
 {
 	return _URLClient;
 }
 
 
-const cTexte& cSite::getClef() const
+const string& cSite::getClef() const
 {
 	return vClef;
 }
 
-const cTexte& cSite::getIdentifiant() const
+const string& cSite::getIdentifiant() const
 {
 	return (vIdentifiant);
 }
 
-void cSite::setIdentifiant(const cTexte& id)
+void cSite::setIdentifiant(const string& id)
 {
 	vIdentifiant = id;
 }

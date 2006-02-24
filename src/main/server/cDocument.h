@@ -2,42 +2,47 @@
 #ifndef SYNTHESE_CDOCUMENT_H
 #define SYNTHESE_CDOCUMENT_H
 
-typedef enum
-{
-	PDF,
-	HTML,
-	GIF,
-	JPEG,
-	PNG
-} tFormatFichier;
+#include <string>
 
 class cDocument
 {
+public:
+	typedef enum
+	{
+		FileFormat_PDF,
+		FileFormat_HTML,
+		FileFormat_GIF,
+		FileFormat_JPEG,
+		FileFormat_PNG
+	} FileFormat;
+
+
 protected:
-	tIndex			_Index;					//!< Index du document dans l'environnement
-	cTexte			_URL;					//!< URL d'affichage du document sur le serveur web
-	tFormatFichier	_Format;				//!< Format du document
-	cTexte			_DescriptionGenerale;	//!< Description du document à afficher hors de tout contexte
-	cTexte			_DescriptionLocale;		//!< Description du document à afficher dans un contexte local au document (ex: si la photo est affichée sur une page relative à l'arrêt qu'elle décrit)
+	const size_t			_id;					//!< Index du document dans l'environnement
+	std::string			_URL;					//!< URL d'affichage du document sur le serveur web
+	FileFormat	_Format;				//!< Format du document
+	std::string			_DescriptionGenerale;	//!< Description du document à afficher hors de tout contexte
+	std::string			_DescriptionLocale;		//!< Description du document à afficher dans un contexte local au document (ex: si la photo est affichée sur une page relative à l'arrêt qu'elle décrit)
 
 public:
 	//!	\name Modificateurs
 	//@{
-	bool			SetURL(const cTexte&);
-	bool			SetFormat(tFormatFichier);
-	bool			setDescriptionGenerale(const cTexte&);
-	bool			setDescriptionLocale(const cTexte&);
+	bool			SetURL(const std::string&);
+	bool			SetFormat(const FileFormat&);
+	bool			setDescriptionGenerale(const std::string&);
+	bool			setDescriptionLocale(const std::string&);
 	//@}
 
 	//!	\name Accesseurs
 	//@{
-	const cTexte&	DescriptionLocale()	const;
-	const cTexte&	URL()				const;
-	tFormatFichier	Format()			const;
-	tIndex			Index()				const;
+	const std::string&	DescriptionLocale()	const;
+	const std::string&	URL()				const;
+	FileFormat	Format()			const;
+	const size_t&			getId()				const;
 	//@}
-};
 
-#include "cDocument.inline.h"
+	cDocument(const size_t&);
+	virtual ~cDocument();
+};
 
 #endif

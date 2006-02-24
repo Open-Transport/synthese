@@ -13,7 +13,7 @@ protected:
 	tDureeEnMinutes					_DureePresenceDestinationForcee;	//!< Dur�e pendant laquelle une destination est forc�e
 
 public:
-	cTableauAffichageSelectifDestinations(const cTexte& __Code);
+	cTableauAffichageSelectifDestinations(const std::string& __Code);
 	~cTableauAffichageSelectifDestinations(void);
 	// Ajoute les terminus des lignes au d�part de l'arr�t
 	bool AjouteDestinationsDefaut(void);

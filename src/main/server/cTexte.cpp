@@ -951,3 +951,57 @@ int cTexte::operator==(const char* __Objet) const
 {
 	return !strcmp(_Element, __Objet);
 }
+
+
+
+
+/*!	\brief Finalisation
+	\author Hugues Romain
+	\date 2005
+*/
+void cTexte::Finalise()
+{
+	_Element[_Taille] = 0;
+}
+
+
+
+
+
+/*!	\brief Ecriture sur l'objet depuis un tableau de caractères
+	\param Obj L'objet cTexte sur lequel écrire
+	\param Data Le tableau de caractères à copier
+	\return L'objet cTexte
+*/
+cTexte& operator<<(cTexte& Obj, const char* Data)
+{
+	Obj.Copie(Data);
+	return Obj;
+}
+
+
+
+/*!	\brief Ecriture sur l'objet depuis un entier
+	\param Obj L'objet cTexte sur lequel écrire
+	\param Data L'entier à copier
+	\return L'objet cTexte
+*/
+cTexte& operator<<(cTexte& Obj, int Data)
+{
+	Obj.Copie(Data);
+	return Obj;
+}
+
+
+
+/*!	\brief Ecriture sur l'objet depuis un autre
+	\param Obj L'objet cTexte sur lequel écrire
+	\param Data L'objet cTexte à copier
+	\return L'objet cTexte
+*/
+cTexte& operator<<(cTexte& Obj, const cTexte& Data)
+{
+	Obj.Copie(Data);
+	return Obj;
+}
+

@@ -44,7 +44,7 @@ public:
 	static const size_t ALL_DAY_PERIOD;
 
 private:
-	tIndex											_Index;									//!< Index de l'interface dans la base de donn�es SYNTHESE
+	const size_t _id;									//!< Index de l'interface dans la base de donn�es SYNTHESE
 	cInterface_Objet_AEvaluer_PageEcran*			_Element;								//!< Tableau des �l�ments standard d�finis
 	vector<cPeriodeJournee*>	_Periode;								//!< Tableau des p�riodes de la journ�e
 	cTexte											_LibelleJourSemaine[JOURS_PAR_SEMAINE];	//!< Tableau des libell�s des jours de semaine
@@ -62,7 +62,7 @@ public:
 	//@{
 	cInterface_Objet_AEvaluer_PageEcran&		Element(tIndex);
 	const cInterface_Objet_AEvaluer_PageEcran&	operator[](tIndex)									const;
-	tIndex										Index()												const;
+	const size_t&										Index()												const;
 	const cPeriodeJournee*						GetPeriode(size_t __Index = ALL_DAY_PERIOD)	const;
 	const cTexte&								getPrefixeAlerte(tIndex __NiveauAlerte)				const;
 // 	const cTexte&								LibelleJourSemaine(tIndex)							const;
@@ -100,20 +100,18 @@ public:
 	
 	//!	\name Modificateurs
 	//@{
-	bool					SetIndex(tIndex);
 	void					AddPeriode(cPeriodeJournee*);
 	bool					SetLibelleJour(tIndex, const cTexte&);
 	bool					SetLibelleMois(tIndex, const cTexte&);
 	bool					SetPrefixeAlerte(tIndex, const cTexte&);
 	//@}
 	
-	cInterface();
+	cInterface(const size_t&);
 	~cInterface();
 };
 
 
 /** @} */
 
-#include "cInterface.inline.h"
-	
+
 #endif

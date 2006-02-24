@@ -15,6 +15,7 @@
 #include "cHandicape.h"
 #include "cTarif.h"
 #include "cElementTrajet.h"
+#include "cModaliteReservation.h"
 
 #ifdef UNIX
 #include <sys/stat.h>
@@ -1027,7 +1028,7 @@ bool cCalculateur::ControleLigne(const cLigne* Ligne, const cTrajet& __Trajet) c
 	if (vBesoinTaxiBus == Vrai)
 	{
 		if (Ligne->GetResa()==NULL
-		|| Ligne->GetResa()->TypeResa() != Obligatoire)
+			|| Ligne->GetResa()->TypeResa() != cModaliteReservation::RuleType_COMPULSORY)
 			return false;
 	}
 

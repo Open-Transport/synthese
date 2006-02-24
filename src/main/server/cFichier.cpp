@@ -231,7 +231,6 @@ void cFichier::Fermer()
 bool cFichierSites::Charge()
 {
 	// Variables locales
-	tIndex NombreSitesCharges = 0;
 	bool PasTermineSousSection = true;
 	bool PasTermineElement=false;
 
@@ -241,13 +240,6 @@ bool cFichierSites::Charge()
 	// Objets courants
 	cSite* curSite=NULL;
 
-	// Allocation imm�diate de l'espace suffisant
-	if (!Synthese.TableauSites().AlloueSiBesoin(NumeroMaxElement()+1))
-	{
-		Synthese.FichierLogBoot().Ecrit(MESSAGE_SITES_PBALLOC, _Chemin);
-		return false;
-	}
-	
 	Tampon.Vide();
 	if (!Ouvrir())
 	{
@@ -260,18 +252,12 @@ bool cFichierSites::Charge()
 	{
 		if (ProchaineSection(Tampon, TYPESousSection))
 		{
-			cTexte clefSite = Tampon.Extrait(_Format->GetColonnePosition(SITESFORMATCOLONNEClef),_Format->GetColonneLargeur(SITESFORMATCOLONNEClef));
-			curSite = new cSite(clefSite);
-			if (Synthese.Enregistre(curSite) == INCONNU)
-			{
-				Synthese.FichierLogBoot().Ecrit(MESSAGE_SITES_PBENREG, Tampon);
-				Tampon.Vide();
-			}
-			else
-			{
-				PasTermineElement = true;
-				NombreSitesCharges++;
-			}
+			curSite = new cSite(string(
+				Tampon.Extrait(_Format->GetColonnePosition(SITESFORMATCOLONNEClef),_Format->GetColonneLargeur(SITESFORMATCOLONNEClef)).Texte()
+				));
+			if (Synthese.Enregistre(curSite))
+				Synthese.FichierLogBoot().Ecrit(MESSAGE_SITES_PBENREG, Tampon);	// Warning ID already in use
+			PasTermineElement = true;
 		}
 		else
 			PasTermineSousSection = false;
@@ -282,7 +268,7 @@ bool cFichierSites::Charge()
 			switch (LireLigneFormat(Tampon))
 			{
 				case SITESFORMATLIGNEEnv:
-					if (!curSite->SetEnvironnement(*Synthese.TableauEnvironnements().GetElement(_Format->GetNombre(Tampon, SITESFORMATCOLONNEStandard))))
+					if (!curSite->SetEnvironnement(Synthese.GetEnvironnement(_Format->GetNombre(Tampon, SITESFORMATCOLONNEStandard))))
 						Synthese.FichierLogBoot().Ecrit(MESSAGE_SITES_PBENV, curSite->getClef(), Tampon);
 					break;
 				
@@ -292,7 +278,7 @@ bool cFichierSites::Charge()
 					break;
 
 				case SITESFORMATLIGNEIdentifiant:
-					curSite->setIdentifiant(Tampon.Extrait(_Format->GetColonnePosition(SITESFORMATCOLONNEStandard)));
+					curSite->setIdentifiant(string(Tampon.Extrait(_Format->GetColonnePosition(SITESFORMATCOLONNEStandard)).Texte()));
 					break;
 				
 				case SITESFORMATLIGNEDateDebut:
@@ -331,7 +317,7 @@ bool cFichierSites::Charge()
 					break;
 
 				case SITESFORMATLIGNEURLClient:
-					curSite->setURLClient(_Format->Extrait(Tampon, SITESFORMATCOLONNEURLClient));
+					curSite->setURLClient(string(_Format->Extrait(Tampon, SITESFORMATCOLONNEURLClient).Texte()));
 					break;
 
 				case SITESFORMATLIGNESolutionsPassees:
@@ -384,13 +370,6 @@ bool cFichierTbDep::Charge()
 	cTableauAffichage*						__TbDep			= NULL;
 	cTableauAffichageSelectifDestinations*	__TbDepSelect	= NULL;
 
-	// Allocation imm�diate de l'espace suffisant
-	if (!Synthese.TableauTableauxAffichage().AlloueSiBesoin(NumeroMaxElement()+1))
-	{
-		Synthese.FichierLogBoot().Ecrit(MESSAGE_SITES_PBALLOC, _Chemin);
-		return false;
-	}
-	
 	Tampon.Vide();
 	if (!Ouvrir())
 	{
@@ -403,7 +382,7 @@ bool cFichierTbDep::Charge()
 	{
 		if (ProchaineSection(Tampon, TYPESousSection))
 		{
-			cTexte __Code = _Format->Extrait(Tampon, TBDEPFORMATCOLONNECode);
+			string __Code(_Format->Extrait(Tampon, TBDEPFORMATCOLONNECode).Texte());
 			cTexte __Methode = _Format->Extrait(Tampon, TBDEPFORMATCOLONNEMethode);
 			switch(__Methode[0])
 			{
@@ -417,16 +396,9 @@ bool cFichierTbDep::Charge()
 				__TbDep = new cTableauAffichage(__Code);
 				break;
 			}
-			if (Synthese.Enregistre(__TbDep) == INCONNU)
-			{
-				Synthese.FichierLogBoot().Ecrit(MESSAGE_SITES_PBENREG, Tampon);
-				Tampon.Vide();
-			}
-			else
-			{
-				PasTermineElement = true;
-//				NombreSitesCharges++;
-			}
+			if (Synthese.Enregistre(__TbDep))
+				Synthese.FichierLogBoot().Ecrit(MESSAGE_SITES_PBENREG, Tampon);	// Warning ID already in use
+			PasTermineElement = true;
 		}
 		else
 			PasTermineSousSection = false;
@@ -437,7 +409,7 @@ bool cFichierTbDep::Charge()
 			switch (LireLigneFormat(Tampon))
 			{
 				case TBDEPFORMATLIGNEEnvironnement:
-					if (!__TbDep->SetEnvironnement(*Synthese.TableauEnvironnements().GetElement(_Format->GetNombre(Tampon, TBDEPFORMATCOLONNEStandard))))
+					if (!__TbDep->SetEnvironnement(Synthese.GetEnvironnement(_Format->GetNombre(Tampon, TBDEPFORMATCOLONNEStandard))))
 						Synthese.FichierLogBoot().Ecrit(MESSAGE_SITES_PBENV, Tampon, Tampon);
 					break;
 				
@@ -511,7 +483,7 @@ bool cFichierTbDep::Charge()
 /*!	\brief Chargement des donn�es environnements
 	\return true si le chargment est fait sans erreur majeure, sinon false
 */
-bool cFichierEnvironnements::Charge(int __NombreCalculateurs)
+bool cFichierEnvironnements::Charge()
 {
 	// Variables locales
 	cTexte					vNomFichierSites;
@@ -524,13 +496,6 @@ bool cFichierEnvironnements::Charge(int __NombreCalculateurs)
 	// Objets courants
 	cEnvironnement* __Environnement=NULL;
 
-	// Allocation imm�diate de l'espace suffisant
-	if (!Synthese.TableauEnvironnements().AlloueSiBesoin(NumeroMaxElement()+1))
-	{
-// 		Base.Erreur("Echec de l'allocation du tableau des environnements", _Chemin, "", "");
-		return false;
-	}
-	
 	if (!Ouvrir())
 	{
 // 		Base.Erreur("Impossible d'ouvrir le fichier", _Chemin, "", "");
@@ -565,7 +530,7 @@ bool cFichierEnvironnements::Charge(int __NombreCalculateurs)
 						, string(_CheminFichierFormats.Texte())
 						, numeroEnv
 					);
-					Synthese.Enregistre(__Environnement, numeroEnv);
+					Synthese.Enregistre(__Environnement);
 					break;
 				}
 
@@ -594,7 +559,6 @@ bool cFichierEnvironnements::Charge(int __NombreCalculateurs)
 bool cFichierInterfaces::Charge()
 {
 	// Variables
-	tIndex NombreInterfacesReel = 0;
 	bool PasTermineSousSection = true;
 	bool PasTermineElement=false;
 
@@ -605,13 +569,6 @@ bool cFichierInterfaces::Charge()
 	// Objets courants
 	cInterface* curInterface=NULL;
 
-	// Allocation imm�diate de l'espace suffisant
-	if (!Synthese.TableauInterfaces().AlloueSiBesoin(NumeroMaxElement()+1))
-	{
-// 		Base.Erreur("Echec de l'allocation du tableau des interfaces", _Chemin, "", "");
-		return false;
-	}
-	
 	if (!Ouvrir())
 	{
 // 		Base.Erreur("Impossible d'ouvrir le fichier", _Chemin, "", "");
@@ -625,17 +582,12 @@ bool cFichierInterfaces::Charge()
 	{
 		if (ProchaineSection(Tampon, INTERFACESFORMATLIGNEInterface))
 		{
-			curInterface = new cInterface();
-			if (Synthese.Enregistre(curInterface, Tampon.GetNombre(0, 1)) == INCONNU)
+			curInterface = new cInterface(Tampon.GetNombre(0, 1));
+			if (Synthese.Enregistre(curInterface))
 			{
 // 				Base.Erreur("Echec enregistrement interface", _Chemin, Tampon, "");
-				Tampon.Vide();
 			}
-			else
-			{
-				NombreInterfacesReel++;
-				PasTermineElement = true;
-			}
+			PasTermineElement = true;
 		}
 		else
 			PasTermineSousSection = false;
@@ -808,7 +760,6 @@ bool cFichierJoursCirculation::Charge(cEnvironnement* __Environnement)
 	TypeSection	TS = TYPEVide;
 	bool			PasTermine = true;
 	cTexte		Tampon(TAILLETAMPON, true);
-	tIndex		NumeroJC;
 	
 
 	// Ouverture
@@ -843,23 +794,16 @@ bool cFichierJoursCirculation::Charge(cEnvironnement* __Environnement)
 	{
 		if (TS == JCFORMATLIGNECalendrier)
 		{
-			NumeroJC = Tampon.GetNombre(4, 1);
-
 			//if (Chargement)
 			//{
-				if (__Environnement->GetJC(NumeroJC))
-				{}
-// 					__Environnement->Erreur("Num�ro JC d�j� utilis�","",Tampon,"06002");
-				else
-				{
-					JCEncours = new cJC(__Environnement->PremiereAnnee(), __Environnement->DerniereAnnee(), Tampon.Extrait(5));
-					__Environnement->Enregistre(JCEncours, NumeroJC);
-				}
+			JCEncours = new cJC(__Environnement->PremiereAnnee(), __Environnement->DerniereAnnee(), Tampon.GetNombre(4, 1), string(Tampon.Extrait(5).Texte()));
+			__Environnement->Enregistre(JCEncours);
+
 			//}
 			//else
 			//	JCEncours = __Environnement->getJC(NumeroJC);
 
-				TS = RemplirJC(*JCEncours, cJC::Positif, Tampon, __Environnement);
+			TS = RemplirJC(*JCEncours, cJC::InclusionType_POSITIVE, Tampon, __Environnement);
 			if (TS==TYPEError)
 				return false;
 		}
@@ -877,7 +821,7 @@ bool cFichierJoursCirculation::Charge(cEnvironnement* __Environnement)
 	return true;
 }
 
-TypeSection cFichierJoursCirculation::RemplirJC(cJC& JC, cJC::tSens Sens, cTexte& Tampon, cEnvironnement* __Environnement)
+TypeSection cFichierJoursCirculation::RemplirJC(cJC& JC, cJC::InclusionType Sens, cTexte& Tampon, cEnvironnement* __Environnement)
 {
 	while (true)
 	{
@@ -904,30 +848,27 @@ TypeSection cFichierJoursCirculation::RemplirJC(cJC& JC, cJC::tSens Sens, cTexte
 
 Lorsque des jours de circulation sont ajout�s, les variables contenant les premi�res et derni�res dates de circulation de l'environnement sont mises � jour le cas �ch�ant (voir cEnvironnement::SetDateMinReelle() et cEnvironnement::SetDateMaxReelle())
 */
-bool cFichierJoursCirculation::JCExecuterCommande(cJC& JC, cJC::tSens Sens, cTexte& Tampon, cEnvironnement* __Environnement)
+bool cFichierJoursCirculation::JCExecuterCommande(cJC& JC, cJC::InclusionType Sens, cTexte& Tampon, cEnvironnement* __Environnement)
 {
 	cFichierJoursCirculation* Fichier2 = NULL;
 	cTexte	 NomFichier2;
 	cDate	 Date1;
 	cDate	 Date2;
 	tJour	 Pas;
-	cJC::tSens	 CurSens = Sens;
+	cJC::InclusionType	 CurSens = Sens;
 
 	switch (Tampon[0])
 	{
 	case JCFORMATLIGNECategorie:
 		//if (Chargement)
-			JC.setCategorie((tCategorieJC) Tampon.GetNombre(3,1));
+		JC.setCategorie((cJC::Category) Tampon.GetNombre(3,1));
 		break;
 
 	case 'I':
 		break;
 
 	case JCFORMATLIGNESuppressionDate:
-		if (Sens == cJC::Positif)
-			CurSens = cJC::Negatif;
-		else
-			CurSens = cJC::Positif;
+		CurSens = (Sens == cJC::InclusionType_POSITIVE) ? cJC::InclusionType_NEGATIVE : cJC::InclusionType_POSITIVE;
 	
 	case JCFORMATLIGNEAjoutDate:
 		switch (Tampon[1])
@@ -979,7 +920,7 @@ bool cFichierJoursCirculation::JCExecuterCommande(cJC& JC, cJC::tSens Sens, cTex
 					if (JC.SetCircule(Date1, Date2, CurSens, Pas))
 					{
 						// Si ajout de dates, mise � jour �ventuel des premi�res et derni�res dates circul�es
-						if (CurSens == cJC::Positif)
+						if (CurSens == cJC::InclusionType_POSITIVE)
 						{
 							__Environnement->SetDateMinReelle(Date1);
 							__Environnement->SetDateMaxReelle(Date2);
@@ -996,7 +937,7 @@ bool cFichierJoursCirculation::JCExecuterCommande(cJC& JC, cJC::tSens Sens, cTex
 					if (JC.SetCircule(Date1, CurSens))
 					{
 						// Si ajout de dates, mise � jour �ventuel des premi�res et derni�res dates circul�es
-						if (CurSens == cJC::Positif)
+						if (CurSens == cJC::InclusionType_POSITIVE)
 						{
 							__Environnement->SetDateMinReelle(Date1);
 							__Environnement->SetDateMaxReelle(Date1);
@@ -1070,7 +1011,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 			}
 
 			curArretLogique = new LogicalPlace(Tampon.GetNombre(0,2), curNiveauCorrespondance);
-			__Environnement->addLogicalPlace(curArretLogique);
+			__Environnement->Enregistre(curArretLogique);
 
 			if (curArretLogique == NULL)
 			{
@@ -1096,7 +1037,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 			case PAFORMATLIGNEAlerte:
 				{
 					cTexte messageAlerte = _Format->ExtraitComplet(Tampon, PAFORMATCOLONNEAlerte);
-					curArretLogique->setAlerteMessage(messageAlerte);
+					curArretLogique->getAlertForSettings().setMessage(string(messageAlerte.Texte()));
 					
 					break;
 				}
@@ -1110,7 +1051,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 						momentDebut.setMoment('m', 'm', __Environnement->PremiereAnnee());
 					else
 						momentDebut = dateDebut;
-					curArretLogique->setAlerteDebut(momentDebut);
+					curArretLogique->getAlertForSettings().setMomentDebut(momentDebut);
 
 					break;
 				}
@@ -1124,7 +1065,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 						momentFin.setMoment('M', 'M', __Environnement->DerniereAnnee());
 					else
 						momentFin = dateFin;
-					curArretLogique->setAlerteFin(momentFin);
+					curArretLogique->getAlertForSettings().setMomentFin(momentFin);
 
 					break;
 				}
@@ -1259,7 +1200,7 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 				break;
 
 			case PAFORMATLIGNEPostScriptOD:
-				curArretLogique->setDesignationOD(Tampon.Extrait(_Format->GetColonnePosition(PAFORMATCOLONNEStandard)));
+				curArretLogique->setDesignationOD(string(Tampon.Extrait(_Format->GetColonnePosition(PAFORMATCOLONNEStandard)).Texte()));
 				break;
 
 /*			case PAFORMATLIGNEPhoto:
@@ -1283,11 +1224,11 @@ bool cFichierPointsArret::Charge(cEnvironnement* __Environnement)
 				break;
 */
 			case PAFORMATLIGNEDesignation13:	//20 / D13
-				curArretLogique->setDesignation13(Tampon.Extrait(_Format->GetColonnePosition(PAFORMATCOLONNEStandard)));
+				curArretLogique->setDesignation13(string(Tampon.Extrait(_Format->GetColonnePosition(PAFORMATCOLONNEStandard)).Texte()));
 				break;
 
 			case PAFORMATLIGNEDesignation26:	//21 / D26
-				curArretLogique->setDesignation26(Tampon.Extrait(_Format->GetColonnePosition(PAFORMATCOLONNEStandard)));
+				curArretLogique->setDesignation26(string(Tampon.Extrait(_Format->GetColonnePosition(PAFORMATCOLONNEStandard)).Texte()));
 				break;
 
 			case -TYPEVide:
@@ -1309,3 +1250,104 @@ tIndex cFichier::NombreElementsAAllouer()
 	return NumeroMaxElement() + 1;
 }
 
+bool TimeTablesFile::load()
+{
+		// Variables
+	bool PasTermineSousSection = true;
+	bool PasTermineElement=false;
+	cEnvironnement* environment = NULL;
+	cJC* JCBase = NULL;
+	// Tampon
+	cTexte Tampon(TAILLETAMPON, true);
+	// Objets courants
+	cIndicateurs* curIndicateur=NULL;
+
+	// Ouverture du fichier
+	ifstream Fichier;
+	cTexte NomFichierComplet;
+	NomFichierComplet << _Chemin << INDICATEURSEXTENSION;
+	Fichier.open(NomFichierComplet.Texte());
+
+	//SET PORTAGE LINUX
+	if (!Fichier.is_open())
+	{
+		cout << "*** ERREUR Impossible d'ouvrir le fichier " << NomFichierComplet.Texte() << "\n";
+		return false;
+	}
+	//END PORTAGE LINUX
+
+	Tampon.LireLigne(Fichier);
+	if (Tampon.Compare("ENV=", 4))
+	{
+		environment = Synthese.GetEnvironnement(Tampon.GetNombre(0,4));
+	}
+	if (!environment)
+	{
+		Fichier.close();
+		return(false);
+	}
+
+	// Nombre d'�l�ments
+	Tampon.LireLigne(Fichier);
+	if (Tampon.Compare("JC=", 3))
+	{
+		JCBase = environment->GetJC(Tampon.GetNombre(0, 3));
+	}
+	if (!JCBase)
+	{
+		Fichier.close();
+		return(false);
+	}
+// @todo RAJOUTER SECTION = LIVRE INDICATEUR, SOuS SECTION = TABLEAU
+/*	// Boucle sur les Sous Sections
+	while (PasTermineSousSection)
+	{
+		if (Tampon.ProchaineSection(Fichier, TYPESousSection))
+		{
+			curIndicateur = new cIndicateurs(Tampon.Extrait(1), environment);
+			Enregistre(curIndicateur);
+			PasTermineElement = true;
+		}
+		else
+		{
+			PasTermineElement = false;
+			PasTermineSousSection = false;
+		}
+
+		// Boucle sur les propri�t�s d'un �l�ment
+		while (PasTermineElement)
+		{
+			switch (_Format.LireFichier(Fichier, Tampon))
+			{
+			case INDICATEURSFORMATLIGNECP:
+				curIndicateur->setCommencePage(true);
+				break;
+
+			case INDICATEURSFORMATLIGNEJC:
+				curIndicateur->setJC(*GetJC(_Format.GetNombre(Tampon, INDICATEURSFORMATCOLONNEStandard)), *JCBase);
+				break;
+
+			case INDICATEURSFORMATLIGNEGare:
+				curIndicateur->addArretLogique(
+					getLogicalPlace(vFormatIndicateurs.GetNombre(_Format, INDICATEURSFORMATCOLONNEStandard)),
+					(cGareLigne::tTypeGareLigneDA) Tampon[_Format.GetColonnePosition(INDICATEURSFORMATCOLONNEDepartArrivee)],
+					(tTypeGareIndicateur) Tampon[_Format.GetColonnePosition(INDICATEURSFORMATCOLONNEObligatoire)]
+					);
+				break;
+
+			//case INDICATEURSFORMATLIGNETxt:
+
+
+			case -TYPEVide:
+				Tampon.Vide();
+			case -TYPESousSection:
+				PasTermineElement = false;
+			}
+		}
+	}
+
+*/	Fichier.close();
+
+	return(true);
+
+}

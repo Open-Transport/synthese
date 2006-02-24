@@ -5,27 +5,10 @@
 #ifndef SYNTHESE_CRESA_H
 #define SYNTHESE_CRESA_H
 
-// Modalités de réservation
-class cModaliteReservation;
-typedef int tSeuilResa;
-enum tResa
-{
-	Impossible = 'N',
-	Facultative = 'F',
-	Obligatoire = 'O',
-	ObligatoireCollectivement = 'C'
-};
-enum tChampsResa
-{
-	eChampAbsent = 0,
-	eChampFacultatif = 1,
-	eChampObligatoire = 2
-};
+class cTrain;
+class cModaliteReservationEnLigne;
 
-#include "Parametres.h"
-#include "cTexte.h"
-#include "Temps.h"
-#include "cTrain.h"
+#include "cHeure.h"
 
 
 /*!	\brief Modalités de réservation
@@ -34,17 +17,29 @@ enum tChampsResa
 */
 class cModaliteReservation
 {
+public:
+
+	/** Type of reservation rule */
+	typedef enum
+	{
+		RuleType_IMPOSSIBLE = 'N',				//!< Reservation is not possible, services should be taken without any announcement
+		RuleType_OPTIONNAL = 'F',				//!< Reservation is possible but not compulsory, services should be taken with announcement for much security
+		RuleType_COMPULSORY = 'O',				//!< Reservation is compulsory, passengers without reservation are not accepted
+		RuleType_AT_LEAST_ONE_REQUIRED = 'C'	//!< At least on reservation is compulsory, the service do not go if no reservations are done, but will go if at least one is done, and will bi opened for passengers without reservation
+	} RuleType;
+
+
 protected:
 	//! \name Caractéristiques
 	//@{
-	tResa			vTypeResa;	 			//!< Type de réservation (possible, obligatoire, impossible)
+	RuleType		vTypeResa;	 			//!< Type de réservation (possible, obligatoire, impossible)
 	bool			vReservationEnLigne; 	//!< Réservation via SYNTHESE active
-	tPrix			vPrix;					//!< Coût de la réservation (inutilisé pour l'instant)
+	//tPrix			vPrix;					//!< Coût de la réservation (inutilisé pour l'instant)
 	//@}
 	
 	//! \name Chainage et indexation
 	//@{
-	tIndex			vIndex;				//!< Numéro de la modalité de réservation dans l'environnement
+	const size_t			_id;				//!< Numéro de la modalité de réservation dans l'environnement
 	//@}
 	
 	//! \name Délai de réservation
@@ -58,23 +53,23 @@ protected:
 	
 	//! \name Coordonnées de contact
 	//@{
-	cTexte			vNumeroTelephone;		//!< Numéro de téléphone de la centrale de réservation
-	cTexte			vHorairesTelephone;		//!< Description des horaires d'ouverture de la centrale de réservation
-	cTexte			vDescription;			//!< Informations complémentaires sur la centrale de réservation ou la modalité de réservation
-	cTexte			vSiteWeb;				//!< URL d'un site web permettant de réserver le service en ligne (incompatible avec la REL)
+	std::string			vNumeroTelephone;		//!< Numéro de téléphone de la centrale de réservation
+	std::string			vHorairesTelephone;		//!< Description des horaires d'ouverture de la centrale de réservation
+	std::string		vDescription;			//!< Informations complémentaires sur la centrale de réservation ou la modalité de réservation
+	std::string		vSiteWeb;				//!< URL d'un site web permettant de réserver le service en ligne (incompatible avec la REL)
 	//@}
 		
 public:
 
 	//! \name Accesseurs
 	//@{
-	tResa		TypeResa()									const;
+	const RuleType&		TypeResa()									const;
 	const cHeure&	GetDelaiMinHeureMax() 							const;
-	const cTexte&	GetHorairesTelephone()							const;
-	const cTexte&	GetSiteWeb()									const;
-	const cTexte&	GetTelephone()									const;
-	virtual bool 	ReservationEnLigne()							const;
-	tIndex		Index()										const;
+	const std::string&	GetHorairesTelephone()							const;
+	const std::string&	GetSiteWeb()									const;
+	const std::string&	GetTelephone()									const;
+	const cModaliteReservationEnLigne* 	ReservationEnLigne()							const;
+	const size_t&		Index()										const;
 	/*template <class T> 
 	T& 			toXML(T& Tampon, const cTrain*, cMoment momentDepart)	const;*/
 	//@}
@@ -97,23 +92,21 @@ public:
 	void	setDelaiMinJours		(const tDureeEnJours);
 	bool	SetDelaiMinMinutes		(const int);
 	void	setDelaiMinMinutes		(const tDureeEnMinutes&);
-	bool	SetDoc				(const cTexte&);
-	bool	SetHorairesTel			(const cTexte&);
-	bool setIndex				(tIndex);
-	bool	SetPrix				(const float);
-	void	setPrix				(const tPrix);
-	bool	SetReservationEnLigne 	(const bool);
-	bool	SetSiteWeb			(const cTexte&);
-	bool	SetTel				(const cTexte&);
+	bool	SetDoc				(const std::string&);
+	bool	SetHorairesTel			(const std::string&);
+	//bool	SetPrix				(const float);
+	//void	setPrix				(const tPrix);
+	bool	SetSiteWeb			(const std::string&);
+	bool	SetTel				(const std::string&);
 	bool	SetTypeResa			(const char);
-	void	setTypeResa			(const tResa);
+	void	setTypeResa			(const RuleType&);
 	bool	setReferenceEstLOrigine	(const bool);
 	//@}
 
 	//! \name Constructeurs et destructeurs
 	//@{
-	cModaliteReservation();
-	virtual ~cModaliteReservation() {}
+	cModaliteReservation(const size_t&);
+	virtual ~cModaliteReservation();
 	//@}	
 };
 

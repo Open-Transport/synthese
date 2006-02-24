@@ -11,7 +11,7 @@ class cGareLigne;
 
 #include "cSite.h"
 #include "Parametres.h"
-#include "Temps.h"
+#include "cheure.h"
 #include <set>
 
 /** @defgroup m34 34 Tableaux d'affichage
@@ -50,7 +50,7 @@ protected:
 public:
 	//!	\name Constructeur et destructeur
 	//@{
-	cTableauAffichage(const cTexte& __Code);
+	cTableauAffichage(const std::string& __Code);
 	~cTableauAffichage(void);
 	//@}
 

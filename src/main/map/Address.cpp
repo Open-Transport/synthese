@@ -99,7 +99,7 @@ Address::findPathsToAddresses (double maxDistance) const
                     ++path)
             {
 
-                for (int i=0; i<path->size (); ++i)
+                for (size_t i=0; i<path->size (); ++i)
                 {
                     const Vertex* v = path->at (i);
 
@@ -118,7 +118,7 @@ Address::findPathsToAddresses (double maxDistance) const
                         // to the found physical stop
                         Road::RoadChunkVector pathChunks;
 
-                        for (int j=0; j+1<=i; ++j)
+                        for (size_t j=0; j+1<=i; ++j)
                         {
                             const Edge* edge = _road->getTopography()->getEdge (path->at (j), path->at (j+1));
 

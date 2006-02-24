@@ -1,5 +1,5 @@
 
-#include "Temps.h"
+#include "cHeure.h"
 #include <time.h>
 
 /*! \brief Retourne le nombre de minutes écoulées entre les deux heures

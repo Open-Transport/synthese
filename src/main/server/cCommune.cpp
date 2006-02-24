@@ -54,7 +54,7 @@ vector<LogicalPlace*> cCommune::searchLogicalPlaces(std::string name, size_t n) 
 */
 void cCommune::addLogicalPlace(LogicalPlace* const logicalPlace)
 {
-	_logicalPlaces.add(string(logicalPlace->getName().Texte()), logicalPlace, logicalPlace->getId());
+	_logicalPlaces.add(logicalPlace->getName(), logicalPlace, logicalPlace->getId());
 }
 
 

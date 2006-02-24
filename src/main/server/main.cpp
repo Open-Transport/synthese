@@ -665,12 +665,12 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
             AfficheUsage(argv[0]);
 
         /* Chargement de Synthese */
-        if(!Synthese.Charge(database, __NombreCalculateursParEnvironnement))
+        if(!Synthese.Charge(database))
             return EXIT_FAILURE;
         
         /* Chargement de Synthese */
-        if(!Synthese.InitAssociateur(associator))
-            return EXIT_FAILURE;
+//        if(!Synthese.InitAssociateur(associator))
+  //          return EXIT_FAILURE;
         
         cout << "Chargement termine." << endl;
 

@@ -26,7 +26,7 @@ protected:
 	//@{
 	size_t				OrdrePAEchangeSiPossible(size_t PositionOrigine, size_t PositionSouhaitee);
 	size_t				OrdrePAInsere(LogicalPlace* const, size_t Position);
-	void			OrdrePAConstruitLignesAPermuter(const cTrajet& __TrajetATester, bool* Resultat, int LigneMax) const;
+	void			OrdrePAConstruitLignesAPermuter(const cTrajet& __TrajetATester, bool* Resultat, size_t LigneMax) const;
 	bool			OrdrePARechercheGare(size_t& i, LogicalPlace* const GareAChercher);
 	void			GenererNiveauxEtAuMoinsUneAlerte();
 	//@}
@@ -44,7 +44,7 @@ public:
 	
 	//!	\name Accesseurs
 	//@{
-	LogicalPlace*	getListeOrdonneePointsArret(tIndex)	const;
+	LogicalPlace*	getListeOrdonneePointsArret(size_t)	const;
  	size_t				TailleListeOrdonneePointsArret()	const;
 	const cTexte&	GetTailleTexte()					const;
 	const cTexte&	getAuMoinsUneAlerte()				const;

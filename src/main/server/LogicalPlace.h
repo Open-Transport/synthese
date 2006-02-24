@@ -6,12 +6,12 @@
 #define SYNTHESE_LOGICALPLACE_H
 
 #include "Point.h"
-#include "Temps.h"
-#include "cTexte.h"
 #include "cAlerte.h"
 #include <vector>
 #include <map>
 #include "map/Address.h"
+#include <string>
+#include "Temps.h"
 
 class cCommune;
 class NetworkAccessPoint;
@@ -93,53 +93,52 @@ private:
 
     //! @name Localisation
     //@{
-    cCommune*  _town; //!< Commune dans laquelle se trouve le lieu
-    synmap::Road* const  _road;  //!< Route si lieu route entière
+		cCommune*  _town; //!< Commune dans laquelle se trouve le lieu
+		synmap::Road* const  _road;  //!< Route si lieu route entière
     //@}
 
     //! @name Composition
     //@{
-    AccessPointsVector _networkAccessPoints; // Points d'entrée dans les réseaux
-    vector<LogicalPlace*>  _aliasedLogicalPlaces; //!< Lieux logiques inclus
+		AccessPointsVector _networkAccessPoints; // Points d'entrée dans les réseaux
+		vector<LogicalPlace*>  _aliasedLogicalPlaces; //!< Lieux logiques inclus
     //@}
 
     //! @name Désignation
     //@{
-    cTexte  _name; //!< Désignation du lieu
-    cTextePostScript  _nameAsDestinationForTimetable;  //!< Désignation pour affichage en tant que destination ou origine d'un service (indicateurs horaires)
-    cTexte  _name13;  //!< Désignation de 13 caractères de long (téléaffichage)
-    cTexte  _name26;  //!< Désignation de 26 caractères de long (téléaffichage)
-
+		std::string  _name; //!< Désignation du lieu
+		std::string  _nameAsDestinationForTimetable;  //!< Désignation pour affichage en tant que destination ou origine d'un service (indicateurs horaires)
+		std::string  _name13;  //!< Désignation de 13 caractères de long (téléaffichage)
+		std::string  _name26;  //!< Désignation de 26 caractères de long (téléaffichage)
     //@}
 
     //! @name Paramètres
     //@{
-    const bool  _volatile; //!< Indique si l'objet est destiné à une seule utilisation immédiate ou s'il appartient à la base de données générale.
+	    const bool  _volatile; //!< Indique si l'objet est destiné à une seule utilisation immédiate ou s'il appartient à la base de données générale.
     //@}
 
 
     //! \name Documentation
     //@{
-    cAlerte     _alert;   //!< Alerte en cours de validité
+		cAlerte     _alert;   //!< Alerte en cours de validité
     //@}
 
     //! \name Gestion des correspondances
     //@{
-//    tDureeEnMinutes   _minTransferDelay;   //!< Délai minimal de correspondance entre point d'entrée réseaux le plus faible du lieu
-    const tNiveauCorrespondance _transferRules;   //!< Type d'autorisation de correspondance
-//    vector< tDureeEnMinutes >  _maxTransferDelay;    //!< Tableau des plus longs délais minimaux de correspondance au départ de chaque point d'entrée de réseau
-    vector< vector< tDureeEnMinutes > >  _transferDelay;   //!< Tableau des délais minimaux de correspondance entre quais
+	//    tDureeEnMinutes   _minTransferDelay;   //!< Délai minimal de correspondance entre point d'entrée réseaux le plus faible du lieu
+		const tNiveauCorrespondance _transferRules;   //!< Type d'autorisation de correspondance
+	//    vector< tDureeEnMinutes >  _maxTransferDelay;    //!< Tableau des plus longs délais minimaux de correspondance au départ de chaque point d'entrée de réseau
+		vector< vector< tDureeEnMinutes > >  _transferDelay;   //!< Tableau des délais minimaux de correspondance entre quais
     //@}
 
 
     //! \name Donnes complmentaires
     //@{
-    //tVitesseKMH   vVitesseMax[NOMBREVMAX]; //!< Tableau des vitesses maximales par tranche de distance (temporairement inutilis)
+	//	tVitesseKMH   vVitesseMax[NOMBREVMAX]; //!< Tableau des vitesses maximales par tranche de distance (temporairement inutilis)
     //@}
 
     //! \name Chainage et indexation
     //@{
-    const tIndex _id;    //!< Index du lieu logique dans l'environnement
+	    const tIndex _id;    //!< Index du lieu logique dans l'environnement
     //@}
 
 
@@ -150,8 +149,8 @@ public:
     tDureeEnMinutes   AttenteCorrespondance(size_t Dep, size_t Arr)   const;
     const tDureeEnMinutes& AttenteMinimale()          const;
     tNiveauCorrespondance CorrespondanceAutorisee()        const;
-    const cAlerte*   getAlerte()            const;
-    const cTexte&   getDesignationOD()          const;
+    const cAlerte&   getAlerte()            const;
+	const std::string&   getDesignationOD()          const;
     cArretPhysique*   GetArretPhysique(int)         const;
     NetworkAccessPoint*  getNetworkAccessPoint(tIndex id) const
     {
@@ -159,12 +158,9 @@ public:
     }
 	const AccessPointsVector& getNetworkAccessPoints() const { return _networkAccessPoints; }
 	
-	const cTexte&           getDesignation13()                                      const;
-    const cTexte&           getDesignation26()                                      const;
-    const cTexte&   getName() const
-    {
-        return _name;
-    }
+	const std::string&           getDesignation13()                                      const;
+	const std::string&           getDesignation26()                                      const;
+	const std::string&   getName() const;
     cCommune*    getTown() const
     {
         return _town;
@@ -204,17 +200,15 @@ public:
 
     //! \name Modificateurs
     //@{
-    tIndex addNetworkAccessPoint(NetworkAccessPoint* networkAccessPoint, tIndex id=INCONNU);
-    void addAliasedLogicalPlace(LogicalPlace*);
-    void setAlerteDebut(cMoment& momentDebut);
-    void setAlerteFin(cMoment& momentFin);
-    void setAlerteMessage(cTexte& message);
-    void setDelaiCorrespondance(tIndex __VoieDepart, tIndex __VoieArrivee, tDureeEnMinutes);
-    void setDesignationOD(const cTexte&);
-    // bool setVMax(tCategorieDistance, tVitesseKMH);
-    bool    setDesignation13(const cTexte&);
-    bool    setDesignation26(const cTexte&);
-    void setDesignation(cCommune*, std::string);
+		tIndex addNetworkAccessPoint(NetworkAccessPoint* networkAccessPoint, tIndex id=INCONNU);
+		void addAliasedLogicalPlace(LogicalPlace*);
+		cAlerte&	getAlertForSettings();
+		void setDelaiCorrespondance(tIndex __VoieDepart, tIndex __VoieArrivee, tDureeEnMinutes);
+		void setDesignationOD(const std::string&);
+		// bool setVMax(tCategorieDistance, tVitesseKMH);
+		bool    setDesignation13(const std::string&);
+		bool    setDesignation26(const std::string&);
+		void setDesignation(cCommune*, const std::string&);
     //@}
 
     //! \name Constructeurs et destructeur

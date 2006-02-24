@@ -5,7 +5,7 @@
 #include "cDescriptionPassage.h"
 #include "cLigne.h"
 
-cTableauAffichage::cTableauAffichage(const cTexte& __Code)
+cTableauAffichage::cTableauAffichage(const string& __Code)
 : cSite(__Code)
 {
 	_NombreDeparts		= INCONNU;	// Illimit�

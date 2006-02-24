@@ -97,6 +97,9 @@ public:
 
 ostream& operator<<(ostream& flux, const cTexte& Obj);
 
+cTexte& operator<<(cTexte& Obj, const char* Data);
+cTexte& operator<<(cTexte& Obj, int Data);
+cTexte& operator<<(cTexte& Obj, const cTexte& Data);
 
 
 /*!	\brief Classe de texte destinée à recevoir du texte sans caractère accentué
@@ -191,6 +194,21 @@ public:
 };
 
 
-#include "cTexte.inline.h"
+/*!	\brief Ecriture sur l'objet depuis un flux d'entrée quelconque
+	\param flux Le flux d'entrée
+	\param Obj L'objet cTexte sur lequel écrire
+	\return Le flux d'entrée
+	\warning Cette fonction n'étant pas utilisée en production, elle utilise un espace mémoire inutilement important, et ne vérifie pas correctement l'allocation mémoire de Tampon
+*/
+template <class T>
+inline T& operator>>(T& flux, cTexte& Obj)
+{
+	char* Tampon = (char*) malloc(TAILLETAMPON * sizeof(char));
+	flux >> Tampon;
+	Obj.Vide();
+	Obj.Copie(Tampon);
+	free(Tampon);
+	return(flux);
+}
 
 #endif

@@ -2,7 +2,7 @@
 #ifndef SYNTHESE_CHORAIRE_H
 #define SYNTHESE_CHORAIRE_H
 
-#include "Temps.h"
+#include "cHeure.h"
 
 /** Horaires (heure + dur�e en jours depuis le d�part)
 	@ingroup m04
@@ -154,30 +154,6 @@ inline cHeure& cHeure::operator = (const cHoraire& Autre)
 	return(*this = Autre.getHeure());
 }
 
-/*
-template <class charT, class Traits> basic_ostream<charT, Traits>& operator<<(
-		basic_ostream<charT, Traits> &flux, const cHoraire& Obj)
-		{
-			typename basic_ostream<charT, Traits>::sentry init(flux);
-			if (init)
-			{
-				flux << Obj.JPlus() << " " << Obj.getHeure();
-			}
-			return(flux);
-		}
-		
-template <class Traits> basic_ostream<cTexteCodageInterne, Traits>& operator<<(
-		basic_ostream<cTexteCodageInterne, Traits> &flux, const cHoraire& Obj)
-		{
-			typename basic_ostream<cTexteCodageInterne, Traits>::sentry init(flux);
-			if (init)
-			{
-				flux << Obj.JPlus() << Obj.getHeure();
-			}
-			return(flux);
-		}
-*/
-
 template <class T>
 inline T& operator<<(T& flux, const cHoraire& Obj)
 {
@@ -189,7 +165,8 @@ inline T& operator<<(T& flux, const cHoraire& Obj)
 template <>
 inline cTexteCodageInterne& operator<< <cTexteCodageInterne>(cTexteCodageInterne& flux, const cHoraire& Obj)
 {
-	flux << Obj.JPlus() << Obj.getHeure();
+	flux << Obj.JPlus();
+	flux << Obj.getHeure();
 	return flux;
 }
 

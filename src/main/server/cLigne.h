@@ -16,6 +16,7 @@ class cMateriel;
 class cModaliteReservation;
 class cTarif;
 class cArretPhysique;
+class cEnvironnement;
 
 #include <vector>
 #include "cJourCirculation.h"
@@ -59,7 +60,7 @@ protected:
 	cTexte				vLibelleComplet;	//!< Libell� mentionn� dans la feuille de route
 	cTexte				vStyle;				//!< Style CSS du cartouche
 	cTexte				vImage;				//!< Image � afficher en tant que cartouche
-	cTexte				vCode;				//!< Code d'identification de la ligne
+	const std::string				vCode;				//!< Code d'identification de la ligne
 	cTexteSansAccent	vNomPourIndicateur;	//!< Lib�ll� mentionn� dans les tableaux d'indicateurs horaires
 	cTexte				vGirouette;			//!< Destination affich�e sur les v�hicules
 	//@}
@@ -69,13 +70,13 @@ protected:
 	bool			vAAfficherSurTableauDeparts;	//!< Indique si la ligne doit figurer sur les tableaux de d�part
 	bool			vAAfficherSurIndicateurs;		//!< Indique si la ligne doit figurer sur les tableaux d'indicateurs horaires
 	bool			_AUtiliserDansCalculateur;		//!< Indique si la ligne doit �tre utilis�e dans les recherches d'itin�raire
-	cJC				vCirculation;					//!< Calendrier de circulation de la ligne
+	cJC			vCirculation;					//!< Calendrier de circulation de la ligne
 	//@}
 	
 public:
 	//! \name Constructeurs et destructeur
 	//@{
-	cLigne(const cTexte& newCode, cAxe* const newAxe=NULL);
+	cLigne(const std::string& newCode, cAxe* const newAxe, cEnvironnement*);
 	~cLigne();
 	//@}
 	
@@ -103,10 +104,7 @@ public:
 		void				setVelo(cVelo*);
 		void				setHandicape(cHandicape*);
 		void				setTarif(cTarif*);
-		void				setAlerteMessage(cTexte& message);
-		void				setAlerteDebut(cMoment& momentDebut);
-		void				setAlerteFin(cMoment& momentFin);
-		void				setAnneesCirculation(tAnnee, tAnnee);
+		cAlerte&			getAlerteForModification();
 	//@}
 	
 	// Copie de la ligne sans les services
@@ -129,8 +127,8 @@ public:
 		cAxe*					Axe()								const;
 		cGareLigne*				DerniereGareLigne()					const;
 		bool					EstUneLigneAPied()					const;
-		const cAlerte*   		getAlerte()							const;
-		const cTexte&			getCode()							const;
+		const cAlerte&   		getAlerte()							const;
+		const std::string&			getCode()							const;
 		const cTexte&			getGirouette()						const;
 		cHandicape*				getHandicape()						const;
 		const cTexte&			getImage()							const;
@@ -174,14 +172,14 @@ public:
 		vMateriel->toXML(Tampon);
 		
 		//ajout messages
-		bool showMessage = getAlerte()->showMessage(debutLigne, finLigne);
+		bool showMessage = getAlerte().showMessage(debutLigne, finLigne);
 		bool showResa = GetResa()->TypeResa() == Obligatoire;
 		if	(showMessage || showResa)
 		{
 			Tampon << "<warnings>";
 			
 			if (showMessage)
-				getAlerte()->toXML(Tampon);
+				getAlerte().toXML(Tampon);
 
 			if (showResa)
 				GetResa()->toXML(Tampon, GetTrain(iNumeroService), momentDepart);

@@ -5,19 +5,20 @@
 */
 
 #include "cJourCirculation.h"
+#include "cDate.h"
 
-cJC::cJC()
-{
-	vJoursAnnee = NULL;
-}
+using namespace std;
 
-cJC::cJC(tAnnee PremiereAnnee, tAnnee DerniereAnnee, const cTexte& newIntitule)
+/** Constructor.
+*/
+cJC::cJC(const tAnnee& PremiereAnnee, const tAnnee& DerniereAnnee, const size_t& id, const string& newIntitule)
+: _PremiereAnnee(PremiereAnnee)
+, _DerniereAnnee(DerniereAnnee)
+, _id(id)
 {
 	// Masque
-	_PremiereAnnee = PremiereAnnee;
-	_DerniereAnnee = DerniereAnnee;
-	vJoursAnnee = AlloueMasque();
-	
+	vJoursAnnee.resize((_DerniereAnnee.Valeur() - _PremiereAnnee.Valeur() + 1) * MOIS_PAR_AN);
+
 	// Intitule
 	setIntitule(newIntitule);
 
@@ -32,7 +33,7 @@ cJC::cJC(tAnnee PremiereAnnee, tAnnee DerniereAnnee, const cTexte& newIntitule)
 	@param Sens Statut de la date : circule ou ne circule pas
 	@return true si la date fournie existe dans le calendrier, false sinon
 */
-bool cJC::SetCircule(const cDate& Date, tSens Sens)
+bool cJC::SetCircule(const cDate& Date, InclusionType Sens)
 {
 	if (Date.OK())
 	{
@@ -54,12 +55,12 @@ bool cJC::SetCircule(const cDate& Date, tSens Sens)
 		return false;
 }
 
-void cJC::setCircule(const cDate& Date, tSens Sens)
+void cJC::setCircule(const cDate& Date, InclusionType Sens)
 {
-	tMasque Masque = 1;
+	Mask Masque = 1;
 	Masque <<= (Date.Jour() - 1);
 
-	if (Sens == Positif)
+	if (Sens == InclusionType_POSITIVE)
 	{
 		vJoursAnnee[getIndexMois(Date)] |= Masque;
 		
@@ -71,15 +72,15 @@ void cJC::setCircule(const cDate& Date, tSens Sens)
 	}
 }
 
-void cJC::SetInclusionToMasque(tMasque* Masque, tSens Sens) const
+void cJC::SetInclusionToMasque(Calendar& Masque, InclusionType Sens) const
 {
-	if (Sens == Positif)
+	if (Sens == InclusionType_POSITIVE)
 		for (tAnnee iAnnee = _PremiereAnnee.Valeur(); iAnnee <= _DerniereAnnee.Valeur(); iAnnee++)
 			for (tMois iMois=1; iMois<= MOIS_PAR_AN; iMois++)
 				Masque[getIndexMois(iAnnee, iMois)] |= vJoursAnnee[getIndexMois(iAnnee, iMois)];
 	else
 	{
-		tMasque tempMasque;
+		Mask tempMasque;
 		for (tAnnee iAnnee = _PremiereAnnee.Valeur(); iAnnee <= _DerniereAnnee.Valeur(); iAnnee++)
 			for (tMois iMois=1; iMois<= MOIS_PAR_AN; iMois++)
 			{
@@ -101,12 +102,12 @@ bool cJC::Circule(const cDate& DateTest) const
 	if (DateTest.EstInconnue())
 		return false;
 
-	tMasque Masque = 1;
+	Mask Masque = 1;
 	Masque <<= (DateTest.Jour() - 1);
 	return (Masque & vJoursAnnee[getIndexMois(DateTest)]) != 0;
 }
 
-bool cJC::UnPointCommun(const tMasque* AutreMasque) const
+bool cJC::UnPointCommun(const Calendar& AutreMasque) const
 {
 	for (tAnnee iAnnee = _PremiereAnnee.Valeur(); iAnnee<= _DerniereAnnee.Valeur(); iAnnee++)
 		for (tMois iMois=1; iMois<=MOIS_PAR_AN; iMois++)
@@ -115,7 +116,7 @@ bool cJC::UnPointCommun(const tMasque* AutreMasque) const
 	return false;
 }
 
-bool cJC::TousPointsCommuns(const cJC& JCBase, const tMasque* Masque2) const
+bool cJC::TousPointsCommuns(const cJC& JCBase, const Calendar& Masque2) const
 {
 	for (tAnnee iAnnee = _PremiereAnnee.Valeur(); iAnnee <= _DerniereAnnee.Valeur(); iAnnee++)
 		for (tMois iMois=1; iMois<=MOIS_PAR_AN; iMois++)
@@ -135,30 +136,30 @@ cJC* cJC::MeilleurJC(cJC* AutreJC)
 }
 */
 
-tMasque* cJC::Et(const cJC& AutreJC) const
+cJC::Calendar cJC::Et(const cJC& AutreJC) const
 {
-	tMasque* newMasque = AlloueMasque();
+	Calendar newMasque;
 	for (tAnnee iAnnee = _PremiereAnnee.Valeur(); iAnnee <= _DerniereAnnee.Valeur(); iAnnee++)
 		for (tMois iMois=1; iMois<= MOIS_PAR_AN; iMois++)
 			newMasque[getIndexMois(iAnnee, iMois)] = AutreJC.vJoursAnnee[getIndexMois(iAnnee, iMois)] & vJoursAnnee[getIndexMois(iAnnee, iMois)];
 	return(newMasque);
 }
 
-tMasque* cJC::ElementsNonInclus(const cJC& AutreJC) const
+cJC::Calendar cJC::ElementsNonInclus(const cJC& AutreJC) const
 {
 	// L'opérateur ! ne semble pas convenir: est ce du bit a bit ?
-	tMasque* newMasque = AlloueMasque();
+	Calendar newMasque;
 	for (tAnnee iAnnee = _PremiereAnnee.Valeur(); iAnnee <= _DerniereAnnee.Valeur(); iAnnee++)
 		for (tMois iMois=1; iMois<= MOIS_PAR_AN; iMois++)
 			newMasque[getIndexMois(iAnnee, iMois)] = !vJoursAnnee[getIndexMois(iAnnee, iMois)] & AutreJC.vJoursAnnee[getIndexMois(iAnnee, iMois)];
 	return(newMasque);
 }
 
-size_t cJC::Card(const tMasque* Masque) const
+size_t cJC::Card(const Calendar& Masque) const
 {
 	size_t t=0;
-	tMasque tempMasque;
-	tMasque tempMasque2;
+	Mask tempMasque;
+	Mask tempMasque2;
 	for (tAnnee iAnnee=_PremiereAnnee.Valeur(); iAnnee <= _DerniereAnnee.Valeur(); iAnnee++)
 		for (tMois iMois=1; iMois<= MOIS_PAR_AN; iMois++)
 		{
@@ -195,10 +196,9 @@ void cJC::RAZMasque(bool ValeurBase)
 */
 cJC::~cJC()
 {
-	free(vJoursAnnee);
 }
 
-bool cJC::SetCircule(const cDate &DateDebut, const cDate &DateFin, tSens Sens, tDureeEnJours Pas)
+bool cJC::SetCircule(const cDate &DateDebut, const cDate &DateFin, InclusionType Sens, tDureeEnJours Pas)
 {
 	if (DateDebut.OK() && DateFin.OK() && Pas > 0 && DateDebut.AnneeEstInconnue() == DateFin.AnneeEstInconnue())
 	{
@@ -229,15 +229,8 @@ bool cJC::SetCircule(const cDate &DateDebut, const cDate &DateFin, tSens Sens, t
 		return(false);
 }
 
-tMasque* cJC::AlloueMasque() const
-{
-	if (_PremiereAnnee.Valeur() == INCONNU)
-		return(NULL);
-	else
-		return((tMasque*) calloc((_DerniereAnnee.Valeur() - _PremiereAnnee.Valeur() + 1) * (MOIS_PAR_AN + 1), sizeof(tMasque)));
-}
 
-void cJC::setMasque(const tMasque* AutreMasque)
+void cJC::setMasque(const Calendar& AutreMasque)
 {
 	for (size_t i=0; i< (size_t)((_DerniereAnnee.Valeur() - _PremiereAnnee.Valeur() + 1) * MOIS_PAR_AN); i++)
 		vJoursAnnee[i] = AutreMasque[i];
@@ -246,8 +239,8 @@ void cJC::setMasque(const tMasque* AutreMasque)
 cDate cJC::PremierJourFonctionnement() const
 {
 	cDate curDate;
-	tMasque tempMasque;
-	tMasque tempMasque2;
+	Mask tempMasque;
+	Mask tempMasque2;
 	
 	for (tAnnee iAnnee= _PremiereAnnee.Valeur(); iAnnee<= _DerniereAnnee.Valeur(); iAnnee++)
 		for (tMois iMois=1; iMois<= MOIS_PAR_AN; iMois++)
@@ -273,7 +266,7 @@ cDate cJC::PremierJourFonctionnement() const
 	@param __Date Jour quelconque dans le mois à lire
 	@return L'index du tableau de bits à lire pour accéder à un jour du mois
 */
-tIndex cJC::getIndexMois(const cDate& __Date)	const
+size_t cJC::getIndexMois(const cDate& __Date)	const
 {
 	return getIndexMois(__Date.Annee(), __Date.Mois());
 }
@@ -285,18 +278,11 @@ tIndex cJC::getIndexMois(const cDate& __Date)	const
 	@param __Mois Mois à lire
 	@return L'index du tableau de bits à lire pour accéder au mois
 */
-tIndex cJC::getIndexMois(tAnnee __Annee, tMois __Mois)	const
+size_t cJC::getIndexMois(tAnnee __Annee, tMois __Mois)	const
 {
 	return (__Annee - _PremiereAnnee.Valeur()) * MOIS_PAR_AN + __Mois;
 }
 
-
-void cJC::ReAlloueMasque()
-{
-	if (vJoursAnnee)
-		free(vJoursAnnee);
-	vJoursAnnee = AlloueMasque();
-}
 
 bool cJC::UnPointCommun(const cJC& AutreMasque) const
 {
@@ -308,20 +294,19 @@ size_t cJC::Card(const cJC& AutreJC) const
 	return(Card(AutreJC.vJoursAnnee));
 }
 
-tCategorieJC cJC::Categorie() const
+const cJC::Category& cJC::Categorie() const
 {
 	return(vCategorie);
 }
 
-void cJC::setCategorie(tCategorieJC newCategorie)
+void cJC::setCategorie(Category newCategorie)
 {
 	vCategorie = newCategorie;
 }
 
-void cJC::setIntitule(const cTexte& Texte)
+void cJC::setIntitule(const string& Texte)
 {
-	vIntitule.Vide();
-	vIntitule << Texte;
+	vIntitule = Texte;
 }
 
 
@@ -331,38 +316,18 @@ void cJC::setIntitule(const cTexte& Texte)
 	\author Hugues Romain
 	\date 2001-2005
 */
-tIndex cJC::Index() const
+const size_t& cJC::getId() const
 {
-	return(vCode);
+	return _id;
 }
 
-const tMasque* cJC::JoursAnnee() const
+const cJC::Calendar& cJC::JoursAnnee() const
 {
 	return(vJoursAnnee);
 }
 
-void cJC::SetInclusionToMasque(cJC &JourCirculation, tSens Sens) const
+void cJC::SetInclusionToMasque(cJC &JourCirculation, InclusionType Sens) const
 {
 	SetInclusionToMasque(JourCirculation.vJoursAnnee, Sens);
 }
 
-
-
-/*!	\brief Modificateur sans contrôle de valeur de l'index de l'objet dans l'environnement
-	\param newVal Index de l'objet dans l'environnement
-	\return true si la modification a été effectuée avec succès
-	\author Hugues Romain
-	\date 2001-2005
-*/
-bool cJC::setIndex(tIndex newVal)
-{
-	vCode = newVal;
-	return true;
-}
-
-void cJC::setAnnees(tAnnee PremiereAnnee, tAnnee DerniereAnnee)
-{
-	_PremiereAnnee = PremiereAnnee;
-	_DerniereAnnee = DerniereAnnee;
-	ReAlloueMasque();
-}

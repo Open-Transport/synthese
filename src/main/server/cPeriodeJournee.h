@@ -7,7 +7,8 @@
 #ifndef SYNTHESE_CPERIODEJOURNEE_H
 #define SYNTHESE_CPERIODEJOURNEE_H
 
-#include "Temps.h"
+#include "cMoment.h"
+#include "cHeure.h"
 #include <string>
 
 

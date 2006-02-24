@@ -8,8 +8,8 @@ using namespace std;
 
 #include "cTexteRequeteSYNTHESE.h"
 #include "Parametres.h"
-
-
+#include "cDate.h"
+#include "cMoment.h"
 
 
 /*!	\brief Parsage de la requête pour exploitation ultérieure

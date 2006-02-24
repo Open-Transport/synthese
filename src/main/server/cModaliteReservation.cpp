@@ -3,6 +3,9 @@
 */
 
 #include "cModaliteReservation.h"
+#include "cMoment.h"
+#include "cTrain.h"
+#include "cModaliteReservationEnLigne.h"
 
 
 /*! \brief Constructeur
@@ -10,7 +13,8 @@
 	\author Hugues Romain
 	\date 2001-2005
 */
-cModaliteReservation::cModaliteReservation()
+cModaliteReservation::cModaliteReservation(const size_t& id)
+: _id(id)
 {
 	vReferenceEstLOrigine	= false;
 	vDelaiMaxJours			= 0;
@@ -18,6 +22,12 @@ cModaliteReservation::cModaliteReservation()
 	vDelaiMinJours			= 0;
 	vDelaiMinMinutes		= 0;
 }
+
+
+/** Destructor.
+*/
+cModaliteReservation::~cModaliteReservation()
+{}
 
 /*! \brief  Fonction de r�f�rence pour le calcul de la date de d�but de r�servation
 	\param MomentResa Moment de la demande de r�servation
@@ -104,11 +114,11 @@ void cModaliteReservation::setDelaiMaxJours(const tDureeEnJours newVal)
 	\author Hugues Romain
 	\date 2002
 */
-void cModaliteReservation::setPrix(const tPrix newVal)
+/*void cModaliteReservation::setPrix(const tPrix newVal)
 {
 	vPrix = newVal;
 }
-
+*/
 
 /*!	\brief Modificateur avec contr�le de valeur du prix de la r�servation
 	\param newVal Prix
@@ -118,7 +128,7 @@ void cModaliteReservation::setPrix(const tPrix newVal)
 	
 Pour �tre accept�, le prix doit �tre positif.
 */
-bool cModaliteReservation::SetPrix(const float newVal)
+/*bool cModaliteReservation::SetPrix(const float newVal)
 {
 	if (newVal >= 0)
 	{
@@ -128,7 +138,7 @@ bool cModaliteReservation::SetPrix(const float newVal)
 	else
 		return false;
 }
-
+*/
 
 
 /*!	\brief Indique si la r�servation est possible sur un service � une date donn�e, en tenant compte des r�gles de d�lai
@@ -167,8 +177,8 @@ Cette m�thode contr�le les �l�ments suivants :
 */
 bool cModaliteReservation::circulationPossible(const cTrain* tCirculation, const cMoment &MomentResa, const cMoment &MomentDepart) const
 {
-	return	vTypeResa == Impossible
-		||	vTypeResa == Facultative
+	return	vTypeResa == RuleType_IMPOSSIBLE
+		||	vTypeResa == RuleType_OPTIONNAL
 		||	reservationPossible(tCirculation, MomentResa, MomentDepart);
 }
 
@@ -179,7 +189,7 @@ bool cModaliteReservation::circulationPossible(const cTrain* tCirculation, const
 	\author Hugues Romain
 	\date 2002
 */
-tResa cModaliteReservation::TypeResa() const
+const cModaliteReservation::RuleType& cModaliteReservation::TypeResa() const
 {
 	return vTypeResa;
 }
@@ -223,33 +233,30 @@ const cHeure& cModaliteReservation::GetDelaiMinHeureMax() const
 }
 
 
-bool cModaliteReservation::SetDoc(const cTexte& newVal)
+bool cModaliteReservation::SetDoc(const string& newVal)
 {
-	vDescription.Vide();
-	vDescription << newVal;
+	vDescription = newVal;
 	return(true);
 }
 
-bool cModaliteReservation::SetTel(const cTexte &newVal)
+bool cModaliteReservation::SetTel(const string& newVal)
 {
-	vNumeroTelephone.Vide();
-	vNumeroTelephone << newVal;
+	vNumeroTelephone = newVal;
 	return(true);
 }
 
-bool cModaliteReservation::SetHorairesTel(const cTexte &newVal)
+bool cModaliteReservation::SetHorairesTel(const string& newVal)
 {
-	vHorairesTelephone.Vide();
-	vHorairesTelephone << newVal;
+	vHorairesTelephone = newVal;
 	return(true);
 }
 
-const cTexte& cModaliteReservation::GetSiteWeb() const
+const string& cModaliteReservation::GetSiteWeb() const
 {
 	return(vSiteWeb);
 }
 
-const cTexte& cModaliteReservation::GetHorairesTelephone() const
+const string& cModaliteReservation::GetHorairesTelephone() const
 {
 	return(vHorairesTelephone);
 }
@@ -261,27 +268,27 @@ const cTexte& cModaliteReservation::GetHorairesTelephone() const
 	\author Hugues Romain
 	\date 2001-2005
 */
-tIndex cModaliteReservation::Index() const
+const size_t& cModaliteReservation::Index() const
 {
-	return(vIndex);
+	return _id;
 }
 
 
 bool cModaliteReservation::SetTypeResa(const char newVal)
 {
-	switch ((tResa) newVal)
+	switch ((RuleType) newVal)
 	{
-	case Obligatoire:
-	case Facultative:
-	case Impossible:
-	case ObligatoireCollectivement:
-		setTypeResa((tResa) newVal);
+	case RuleType_AT_LEAST_ONE_REQUIRED:
+	case RuleType_COMPULSORY:
+	case RuleType_IMPOSSIBLE:
+	case RuleType_OPTIONNAL:
+		setTypeResa((RuleType) newVal);
 		return(true);
 	}
 	return(false);
 }
 
-void cModaliteReservation::setTypeResa(const tResa newVal)
+void cModaliteReservation::setTypeResa(const RuleType& newVal)
 {
 	vTypeResa = newVal;
 }
@@ -341,9 +348,9 @@ bool cModaliteReservation::SetDelaiMaxJours(const tDureeEnJours newVal)
 	\author Hugues Romain
 	\date 2005
 */
-bool cModaliteReservation::ReservationEnLigne() const
+const cModaliteReservationEnLigne* cModaliteReservation::ReservationEnLigne() const
 {
-	return false;
+	return dynamic_cast<const cModaliteReservationEnLigne*>(this);
 }
 
 
@@ -391,16 +398,14 @@ bool	cModaliteReservation::setReferenceEstLOrigine	(const bool newVal)
 	return (Tampon);
 }*/
 
-
-
-/*!	\brief Modificateur sans contr�le de valeur de l'index de l'objet dans l'environnement
-	\author Hugues Romain
-	\date 2005
-	\param Index Index de l'objet
-	\return true si l'op�ration a �t� effectu�e avec succ�s, false sinon
-*/
-bool cModaliteReservation::setIndex(tIndex Index)
+bool cModaliteReservation::SetSiteWeb(const string &newVal)
 {
-	vIndex = Index;
-	return true;
+	vSiteWeb = newVal;
+	return(true);
 }
+
+const string& cModaliteReservation::GetTelephone() const
+{
+	return(vNumeroTelephone);
+}
+

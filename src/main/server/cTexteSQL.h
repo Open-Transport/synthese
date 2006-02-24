@@ -3,7 +3,7 @@
 #define SYNTHESE_CTEXTESQL_H
 
 #include "cTexte.h"
-#include "Temps.h"
+#include "cDate.h"
 
 /*!	\brief Classe de texte destinée à recevoir des éléments de requête SQL
 

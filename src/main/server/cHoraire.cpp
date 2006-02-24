@@ -1,5 +1,5 @@
 
-#include "Temps.h"
+#include "cHoraire.h"
 
 /*! \brief Cet opérateur remplit les variables de l'objet d'après les 5 premiers caractères de op.
 	\warning l'autorisation d'accès aux 5 caractères est à la charge de l'utilisateur.

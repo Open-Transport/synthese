@@ -7,43 +7,27 @@
 #ifndef SYNTHESE_CRESEAU_H
 #define SYNTHESE_CRESEAU_H
 
-#include "cTexte.h"
+#include <string>
  
-typedef int tNumeroReseau;
-
 /** Réseau de transport
 	@ingroup m05
 */
 class cReseau
 {
-	cTexte vNom;
-	cTexte vURL;
-	cTexte vDoc;
+	const size_t _id;
+	std::string vNom;
+	std::string vURL;
+	std::string vDoc;
 	
 public:
-	void setURL(const cTexte& newVal);
-	void setDoc(const cTexte& newVal);
-	void setNom(const cTexte& newVal);
+	const size_t& getId() const;
+
+	void setURL(const std::string& newVal);
+	void setDoc(const std::string& newVal);
+	void setNom(const std::string& newVal);
+
+	cReseau(const size_t&);
+	~cReseau();
 };
-
-inline void cReseau::setNom(const cTexte &newVal)
-{
-	vNom.Vide();
-	vNom << newVal;
-}
-
-
-inline void cReseau::setDoc(const cTexte &newVal)
-{
-	vDoc.Vide();
-	vDoc << newVal;
-}
-
-
-inline void cReseau::setURL(const cTexte &newVal)
-{
-	vURL.Vide();
-	vURL << newVal;
-}
 
 #endif

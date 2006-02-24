@@ -16,7 +16,7 @@ class cTrain;
 class cGareLigne;
 class cSitPert;
 
-#include "Temps.h"
+#include "cMoment.h"
  
 /** R�sultat de tableau d'affichage
 	@ingroup m34

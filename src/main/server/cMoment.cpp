@@ -1,5 +1,5 @@
 
-#include "Temps.h"
+#include "cMoment.h"
 
 /*!	\brief Crée un moment à partir d'une chaine de caractères
 	\param Moment si "m" alors on stocke le minimum (0000...) si "M" alors on stocke le maximum

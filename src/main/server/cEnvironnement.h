@@ -30,7 +30,7 @@ class cTarif;
 #include "cFichierPourEnvironnement.h"
 #include "map/Topography.h"
 #include "LogicalPlace.h"
-
+#include "cJourCirculation.h"
 
 
 /** @defgroup m05 05 Classes m�tier
@@ -88,31 +88,38 @@ public:
 	/** fares map */
 	typedef std::map<size_t, cTarif*> FaresMap;
 
+	/** reservation rules map */
+	typedef std::map<size_t, cModaliteReservation*> ReservationRulesMap;
+
+	/** rolling stock map */
+	typedef std::map<size_t, cMateriel*> RollingStockMap;
+
+	/** networks map */
+	typedef std::map<size_t, cReseau*> NetworksMap;
+
+	/** handicapped compliances map */
+	typedef std::map<size_t, cHandicape*> HandicappedCompliancesMap;
+
+	/** bikes compliances map */
+	typedef std::map<size_t, cVelo*> BikeCompliancesMap;
+
+	/** timetables map */
+	typedef std::map<size_t, cIndicateurs*> TimeTablesMap;
+
 private:
-	//! \name Attributs priv� d�crivant les tailles des tableaux d'index 
-	//@{ 
-		tIndex	vNombreResa;			//!< Index maximal des modalit�s de r�servation
-		tIndex	vNombreIndicateurs;		//!< Index maximal des paragraphes d'indicateur horaire
-		tIndex	vNombreMateriels;		//!< Index maximal des mat�riels roulants
-		tIndex	vNombreReseaux;			//!< Index maximal des r�seaux de transport
-		tIndex	vNombreVelo;			//!< Index maximal des modalit�s de prise en charge des v�los
-		tIndex	vNombreHandicape;		//!< Index maximal des modalit�s d'acceptation des handicap�s
-		tIndex 	vNombreTarif;			//!< Index maximal des tarifications
-	//@}
-	
-	//! \name Tableaux priv�s indexant les donn�es
+	//! \name SYNTHESE environment database
 	//@{
 		LogicalPlacesMap				_logicalPlaces;		//!< Arrêts logiques enregistrés
 		TownsMap							_towns;	//!< Communes
 		CalendarsMap				_JC;				//!< Calendriers de circulations
 		DocumentsMap			_Documents;			//!< Documents
-		std::vector<cModaliteReservation*>				vResa;			//!< Modalit�s de r�servation
-		std::vector<cReseau*>							vReseau;		//!< R�seaux de transport
-		std::vector<cVelo*>					vVelo;			//!< Modalit�s de prise en charge des v�los
-		std::vector<cHandicape*>			vHandicape;		//!< Modalit�s d'acceptation des handicap�s
+		ReservationRulesMap				vResa;			//!< Modalit�s de r�servation
+		NetworksMap							vReseau;		//!< R�seaux de transport
+		BikeCompliancesMap					vVelo;			//!< Modalit�s de prise en charge des v�los
+		HandicappedCompliancesMap			vHandicape;		//!< Modalit�s d'acceptation des handicap�s
 		FaresMap				vTarif;			//!< Tarifications
-		std::vector<cMateriel*>				vMateriel;		//!< Mat�riels roulants
-		std::map<size_t, cIndicateurs*>						vIndicateurs;	//!< Indicateurs horaires
+		RollingStockMap				vMateriel;		//!< Mat�riels roulants
+		TimeTablesMap						vIndicateurs;	//!< Indicateurs horaires @todo to be moved outside of the environment like cSite
 		LinesMap								_lines;	//!< Transport lines
 	//@}
 	
@@ -120,7 +127,7 @@ private:
 	//@{
 		tAnnee			vPremiereAnnee; 	//!< Premi�re ann�e des calendriers de circulation en m�moire
 		tAnnee			vDerniereAnnee; 	//!< Derni�re ann�e des calendriers de circulation en m�moire
-		const tIndex			Code;				//!< Code de l'environnement
+		const size_t			Code;				//!< Code de l'environnement
 	//@}
 	
 	//! \name Variables d'analyse
@@ -149,7 +156,6 @@ private:
 		cFormatFichier*		_FormatHoraire;
 		cFormatFichier*		_FormatResa;
 		cFormatFichier*		_FormatPhoto;
-		cFormatFichier* 	_FormatIndicateurs;
 		cFormatFichier* 	_FormatVelo;
 		cFormatFichier* 	_FormatHandicape;
 		cFormatFichier* 	_FormatTarif;
@@ -178,14 +184,15 @@ private:
 public:
 	//!	\name M�thodes d'enregistrement
 	//@{
-		bool		Enregistre(cLigne*);
-		tIndex		Enregistre(cJC*, tIndex Index=INCONNU);
-		tIndex		Enregistre(cModaliteReservation*, tIndex);
+		bool		Enregistre(cLigne* const);
+		bool		Enregistre(cJC* const);
+		bool		Enregistre(cModaliteReservation* const);
 		bool		Enregistre(cTarif* const);
-		tIndex		Enregistre(cMateriel*, tIndex);
-		tIndex		Enregistre(cHandicape*, tIndex);
-		tIndex		Enregistre(cVelo*, tIndex);
-		tIndex		Enregistre(cReseau*, tIndex);
+		bool		Enregistre(cMateriel* const);
+		bool		Enregistre(cHandicape* const);
+		bool		Enregistre(cVelo* const);
+		bool		Enregistre(cReseau* const);
+		bool		Enregistre(LogicalPlace* const);
 	//@}
 
 	bool envOk;
@@ -196,7 +203,6 @@ public:
 	
 	//! \name Modificateurs
 	//@{
-		void			addLogicalPlace(LogicalPlace*);
 		void			addTown(cCommune* const);
 	//	cSauvegarde*	JCSauvegardeModifier(tNumeroJC NumeroNewJC, const cTexte& newIntitule);
 		void			JCSupprimerInutiles(bool Supprimer=false);
@@ -227,17 +233,17 @@ public:
 		const cDate&			DateMinReelle()												const;
 		tAnnee					DerniereAnnee()												const;
 		cJC*					GetJC(size_t)												const;
-		cJC*					GetJC(const tMasque* MasqueAIdentifer, const cJC& JCBase)	const;
+		cJC*					GetJC(const cJC::Calendar& MasqueAIdentifer, const cJC& JCBase)	const;
 		cLigne*					GetLigne(const std::string&)										const;
-		cMateriel*				GetMateriel(tIndex n)										const;
+		cMateriel*				GetMateriel(size_t)										const;
 		const cTexte&			getNomRepertoireHoraires()									const;
 		cDocument*				GetDocument(size_t)											const;
-		cModaliteReservation*	getResa(tIndex)												const;
-		cVelo*					getVelo(tIndex n)											const;
-		cReseau*				getReseau(tIndex n)											const;
-		cHandicape*				getHandicape(tIndex)										const;
+		cModaliteReservation*	getResa(size_t)												const;
+		cVelo*					getVelo(size_t)											const;
+		cReseau*				getReseau(size_t)											const;
+		cHandicape*				getHandicape(size_t)										const;
 		cTarif*					getTarif(size_t n)									const;
-		tIndex					Index()														const;
+		const size_t&	Index()														const;
 		tAnnee					NombreAnnees(tAnnee)										const;
 		tAnnee					NombreAnnees()												const;
 		size_t					NombreLignes(const cTexte& MasqueCode)						const; 

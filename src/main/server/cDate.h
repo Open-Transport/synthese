@@ -5,8 +5,6 @@
 #ifndef SYNTHESE_CDATE_H
 #define SYNTHESE_CDATE_H
 
-using namespace std;
-
 #include <iostream>
 #include "Temps.h"
 #include "cAnnee.h"

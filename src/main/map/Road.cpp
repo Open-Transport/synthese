@@ -70,7 +70,7 @@ Road::findMostPlausibleChunkForNumber (const Address::AddressNumber& number) con
 
   /*  for (std::vector<const RoadChunk*>::const_iterator iter (_chunks.begin ());
       iter != _chunks.end (); ++iter) { */
-  for (int i=0; i<_chunks.size (); ++i) {
+  for (size_t i=0; i<_chunks.size (); ++i) {
 
     const RoadChunk* chunk = _chunks[i];
     // const RoadChunk* chunk = *iter;

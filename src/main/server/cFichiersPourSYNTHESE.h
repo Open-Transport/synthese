@@ -206,10 +206,41 @@
 #define DBFORMATCOLONNENombreFormats				1
 //@}
 
+//! @name Format du fichier des indicateurs
+//@{
+#define INDICATEURSFORMAT "indicateurs"
+#define INDICATEURSEXTENSION "indicateurs.per"
+
+#define INDICATEURSFORMATLIGNEJC					0
+#define INDICATEURSFORMATLIGNEGare					1
+#define INDICATEURSFORMATLIGNECP					2
+#define INDICATEURSFORMATLIGNENombreFormats			3
+
+#define INDICATEURSFORMATCOLONNEStandard			0
+#define INDICATEURSFORMATCOLONNEObligatoire			1
+#define INDICATEURSFORMATCOLONNEDepartArrivee		2
+#define INDICATEURSFORMATCOLONNENombreFormats		3
+//@}
+
+
 #include "cFichier.h"
 #include "SYNTHESE.h"
 #include "cFichierObjetInterfaceStandard.h"
 
+
+
+
+/** Timetables definition file.
+*/
+class TimeTablesFile : public cFichier
+{
+public:
+	bool load();
+
+	TimeTablesFile(const std::string& path, const std::string& formats_path)
+		: cFichier(cTexte(path).Copie(INDICATEURSEXTENSION), new cFormatFichier(formats_path, INDICATEURSFORMAT, INDICATEURSFORMATLIGNENombreFormats, INDICATEURSFORMATCOLONNENombreFormats))
+	{ }
+};
 
 
 /*!	\brief Fichier d�crivant des sites clients
@@ -231,7 +262,7 @@ public:
 class cFichierEnvironnements : public cFichier
 {
 public:
-	bool Charge(int __NombreCalculateurs);
+	bool Charge();
 	cFichierEnvironnements(const cTexte& NomFichier, const cTexte& NomFichierFormats)
 		: cFichier(cTexte(NomFichier).Copie(ENVSEXTENSION), new cFormatFichier(NomFichierFormats, ENVSFORMAT, ENVSFORMATLIGNENombreFormats, ENVSFORMATCOLONNENombreFormats))
 		{ _CheminFichierFormats = NomFichierFormats; }

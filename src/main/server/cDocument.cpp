@@ -1,13 +1,28 @@
+/** Implémentation classe document.
+	@file cDocument.cpp
+*/
+
+#include "cDocument.h"
+
+using namespace std;
+
+cDocument::cDocument(const size_t& id)
+: _id(id)
+{ }
+
+cDocument::~cDocument()
+{}
+
 
 /*! \brief Modificateur de la description générale de la photo
 	\param newDescriptionGenerale Nouvelle description générale
 	\author Hugues Romain
 	\date 2002
 */
-inline bool cDocument::setDescriptionGenerale(const cTexte& __DescriptionGenerale)
+bool cDocument::setDescriptionGenerale(const string& __DescriptionGenerale)
 {
 	_DescriptionGenerale = __DescriptionGenerale;
-	return _DescriptionGenerale.Taille() == __DescriptionGenerale.Taille();
+	return true;
 }
 
 
@@ -17,10 +32,10 @@ inline bool cDocument::setDescriptionGenerale(const cTexte& __DescriptionGeneral
 	\author Hugues Romain
 	\date 2002
 */
-inline bool cDocument::setDescriptionLocale(const cTexte& __DescriptionLocale)
+bool cDocument::setDescriptionLocale(const string& __DescriptionLocale)
 {
 	_DescriptionLocale = __DescriptionLocale;
-	return _DescriptionLocale.Taille() == __DescriptionLocale.Taille();
+	return true;
 }
 
 
@@ -30,10 +45,10 @@ inline bool cDocument::setDescriptionLocale(const cTexte& __DescriptionLocale)
 	\author Hugues Romain
 	\date 2002
 */
-inline bool cDocument::SetURL(const cTexte& __URL)
+bool cDocument::SetURL(const string& __URL)
 {
 	_URL = __URL;
-	return _URL.Taille() == __URL.Taille();
+	return true;
 }
 
 
@@ -42,14 +57,14 @@ inline bool cDocument::SetURL(const cTexte& __URL)
 	\author Hugues Romain
 	\date 2003-2005
 */
-inline const cTexte& cDocument::DescriptionLocale() const
+const string& cDocument::DescriptionLocale() const
 {
 	return _DescriptionLocale;
 }
 
 
 
-inline const cTexte& cDocument::URL()		const
+const string& cDocument::URL()		const
 {
 	return _URL;
 }
@@ -61,9 +76,9 @@ inline const cTexte& cDocument::URL()		const
 //
 // 
 // ____________________________________________________________________________ 
-inline tIndex cDocument::Index() const
+const size_t& cDocument::getId() const
 {
-	return _Index;
+	return _id;
 }
 // © Hugues Romain 2002
 // ____________________________________________________________________________ 

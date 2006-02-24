@@ -11,12 +11,10 @@
 #define SYNTHESE_CJOURCIRCULATION_H
  
 
-// Jours de circulation
-typedef unsigned long tMasque;
-typedef unsigned char tCategorieJC;
 
-#include "cTexte.h"
-#include "Temps.h"
+#include "cAnnee.h"
+#include <string>
+#include <vector>
 
 /** Calendrier de circulation
 	@ingroup m05
@@ -27,67 +25,75 @@ class cJC
 {
 public:
 
-	enum tSens
+	/** Type of inclusion */
+	typedef enum
 	{
-		Positif = '+',
-		Negatif = '-'
-	};
+		InclusionType_POSITIVE = '+',
+		InclusionType_NEGATIVE = '-'
+	} InclusionType;
+
+	/** Mask */
+	typedef unsigned long Mask;
+
+	/** Calendar */
+	typedef vector<Mask> Calendar;
+	
+	/** Category */
+	typedef unsigned char Category;
+
+	/** Max category */
+	static const Category Category_MAX = 255;
 
 private:
-	tMasque*		vJoursAnnee; 		//!< Tableau contenant les bits correspondant à chaque jour (l'élement 0 est inutilisé)
-	cAnnee			_PremiereAnnee;		//!< Année réelle correspondant au premier octet du masque
-	cAnnee			_DerniereAnnee;		//!< Année réelle correspondant au dernier octet du masque
-	tCategorieJC	vCategorie;
-	cTexte			vIntitule;
-	tIndex			vCode;
+	Calendar		vJoursAnnee; 		//!< Tableau contenant les bits correspondant à chaque jour (l'élement 0 est inutilisé)
+	const cAnnee			_PremiereAnnee;		//!< Année réelle correspondant au premier octet du masque
+	const cAnnee			_DerniereAnnee;		//!< Année réelle correspondant au dernier octet du masque
+	Category		vCategorie;
+	std::string			vIntitule;
+	const size_t			_id;
 
-	tIndex			getIndexMois(const cDate& __Date)	const;
-	tIndex			getIndexMois(tAnnee __Annee, tMois __Mois)	const;
+	size_t			getIndexMois(const cDate& __Date)	const;
+	size_t			getIndexMois(tAnnee __Annee, tMois __Mois)	const;
 
 public:
 	
 	//! \name Constructeurs, fonctions de construction, et destructeur
 	//@{
-	cJC();
-	cJC(tAnnee, tAnnee, const cTexte&);
+	cJC(const tAnnee&, const tAnnee&, const size_t&, const std::string&);
 	cJC(const cJC&);
 	~cJC();
-	tMasque*	AlloueMasque()									const;
 	//@}
 	
 	//! \name Modificateurs
 	//@{
 	void	RAZMasque(bool ValeurBase=false);
-	void	ReAlloueMasque();
-	void	setCategorie(tCategorieJC newCategorie=255); //!< Defaut = Reset
-	bool	SetCircule(const cDate&, tSens Sens = Positif);
-	void	setCircule(const cDate&, tSens Sens = Positif);
-	bool	SetCircule(const cDate& DateDebut, const cDate& DateFin, tSens Sens = Positif, tDureeEnJours Pas=1);
-	bool	setIndex(tIndex);
-	void	setIntitule(const cTexte& Texte);
-	void	setMasque(const tMasque*);
-	void	setAnnees(tAnnee, tAnnee);
+	void	setCategorie(Category newCategorie=Category_MAX); //!< Defaut = Reset
+	bool	SetCircule(const cDate&, InclusionType Sens = InclusionType_POSITIVE);
+	void	setCircule(const cDate&, InclusionType Sens = InclusionType_POSITIVE);
+	bool	SetCircule(const cDate& DateDebut, const cDate& DateFin, InclusionType Sens = InclusionType_POSITIVE, tDureeEnJours Pas=1);
+	void	setIntitule(const std::string& Texte);
+	void	setMasque(const Calendar&);
 	//@}
 		
 	//! \name Calculateurs
 	//@{
-	void		SetInclusionToMasque(tMasque*, tSens Sens=Positif)	const;
-	void		SetInclusionToMasque(cJC&, tSens Sens=Positif)		const;
-	bool		TousPointsCommuns(const cJC&, const tMasque*)		const; //!< Sur le masque de this uniquement: ce n'est pas l'égalité
-	bool		UnPointCommun(const tMasque*)						const;
+	void		SetInclusionToMasque(Calendar&, InclusionType Sens = InclusionType_POSITIVE)	const;
+	void		SetInclusionToMasque(cJC&, InclusionType Sens = InclusionType_POSITIVE)		const;
+	bool		TousPointsCommuns(const cJC&, const Calendar&)		const; //!< Sur le masque de this uniquement: ce n'est pas l'égalité
+	bool		UnPointCommun(const Calendar&)						const;
 	bool		UnPointCommun(const cJC&)							const;
-	size_t		Card(const tMasque*)								const; //!< Sur le masque de this uniquement
+	size_t		Card(const Calendar&)								const; //!< Sur le masque de this uniquement
 	size_t		Card(const cJC&)									const; //!< Sur le masque de this uniquement
 	bool		Circule(const cDate&)								const;
-	tMasque*	ElementsNonInclus(const cJC& AutreJC)				const;
-	tMasque*	Et(const cJC&)										const;
+	Calendar	ElementsNonInclus(const cJC& AutreJC)				const;
+	Calendar	Et(const cJC&)										const;
 	//@}
 	
 	//! \name Accesseurs
 	//@{
-	tCategorieJC	Categorie()								const;
-	tIndex			Index()									const;
-	const tMasque*	JoursAnnee()								const;
+	const Category&	Categorie()								const;
+	const size_t& getId()									const;
+	const Calendar&	JoursAnnee()								const;
 	cDate			PremierJourFonctionnement()					const;
 	//@}
 	

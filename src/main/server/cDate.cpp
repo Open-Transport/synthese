@@ -2,7 +2,7 @@
 	@file cDate.cpp
 */
 
-#include "Temps.h"
+#include "cDate.h"
 #include <time.h>
 #include <math.h>
 

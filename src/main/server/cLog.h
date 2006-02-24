@@ -84,6 +84,4 @@ public:
 #define MESSAGE_CALC_SATURE						6
 #define MESSAGE_GARE_DESIGNATION_INCORRECTE		7
 
-#include "cLog.inline.h"
-
 #endif

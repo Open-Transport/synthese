@@ -328,10 +328,9 @@ cGareLigne* LogicalPlace::DessertALArrivee(const cLigne* Ligne) const
 	\author Hugues Romain
 	\date 2001-2005
 */
-void LogicalPlace::setDesignationOD(const cTexte& newDesignationOD)
+void LogicalPlace::setDesignationOD(const string& newDesignationOD)
 {
-	_nameAsDestinationForTimetable.Vide();
-	_nameAsDestinationForTimetable << newDesignationOD;
+	_nameAsDestinationForTimetable = newDesignationOD;
 }
 
 /*
@@ -350,33 +349,14 @@ bool LogicalPlace::addService(char newType, cPhoto* newPhoto, const cTexte& newD
 
 
 
-
-void LogicalPlace::setAlerteMessage(cTexte& message)
-{
-	_alert.setMessage(message);
-}
-
-void LogicalPlace::setAlerteDebut(cMoment& momentDebut)
-{
-	_alert.setMomentDebut(momentDebut);
-}
-
-void LogicalPlace::setAlerteFin(cMoment& momentFin)
-{
-	_alert.setMomentFin(momentFin);
-}
-
-
-
-
 /** Modificateur désignation de 13 caracteres.
     @param __Designation13 Valeur a donner a la designation de 13 caracteres.En cas de chaine de longueur trop importante, la valeur est tronquee.
     return true si la copie a ete effectuee integralement, false si elle a ete tronquee.
 */
-bool LogicalPlace::setDesignation13(const cTexte& __Designation13)
+bool LogicalPlace::setDesignation13(const string& __Designation13)
 {
-	_name13 = __Designation13.Extrait(0, 13);
-    return _name13.Compare(__Designation13);
+	_name13 = __Designation13.substr(0, 13);
+	return _name13 == __Designation13;
 }
 
 
@@ -385,10 +365,10 @@ bool LogicalPlace::setDesignation13(const cTexte& __Designation13)
     @param __Designation26 Valeur a donner a la designation de 26 caracteres.En cas de chaine de longueur trop importante, la valeur est tronquee.
     return true si la copie a ete effectuee integralement, false si elle a ete tronquee.
 */
-bool LogicalPlace::setDesignation26(const cTexte& __Designation26)
+bool LogicalPlace::setDesignation26(const string& __Designation26)
 {
-    _name26 = __Designation26.Extrait(0, 26);
-	return _name26.Compare(__Designation26);
+    _name26 = __Designation26.substr(0, 26);
+	return _name26 == __Designation26;
 }
 
 
@@ -396,8 +376,7 @@ bool LogicalPlace::setDesignation26(const cTexte& __Designation26)
 /** Accesseur désignation 13 caractères.
     @return Désignation de 13 caractères du point d'arrêt.
 */
-const cTexte& 
-LogicalPlace::getDesignation13() const
+const string& LogicalPlace::getDesignation13() const
 {
     return _name13;
 }
@@ -407,16 +386,26 @@ LogicalPlace::getDesignation13() const
 /** Accesseur désignation 26 caractères.
     @return Désignation de 26 caractères du point d'arrêt.
 */
-const cTexte& 
-LogicalPlace::getDesignation26() const
+const string& LogicalPlace::getDesignation26() const
 {
     return _name26;
 }
 
 
-const cAlerte* LogicalPlace::getAlerte() const
+/** Accesseur alerte en lecture.
+*/
+const cAlerte& LogicalPlace::getAlerte() const
 {
-	return(&_alert);
+	return _alert;
+}
+
+
+
+/** Accesseur alerte en écriture.
+*/
+cAlerte& LogicalPlace::getAlertForSettings()
+{
+	return _alert;
 }
 
 
@@ -441,7 +430,7 @@ tIndex LogicalPlace::Index() const
 
 
 	
-const cTexte& LogicalPlace::getDesignationOD() const
+const string& LogicalPlace::getDesignationOD() const
 {
 	return _nameAsDestinationForTimetable;
 }
@@ -458,14 +447,6 @@ tDureeEnMinutes LogicalPlace::AttenteCorrespondance(size_t Dep, size_t Arr) cons
 	return _transferRules ? _transferDelay[Dep][Arr] : tDureeEnMinutes(0);
 }
 
-/*
-const tDureeEnMinutes& LogicalPlace::PireAttente(tIndex i) const
-{
-	if (i<1 || i>= (tIndex) _maxTransferDelay.size())
-		i=0;
-	return _maxTransferDelay[i];
-}
-*/
 /*
 bool LogicalPlace::declServices(size_t newNombreServices)
 {
@@ -488,21 +469,9 @@ inline bool LogicalPlace::addPhoto(cPhoto* Photo)
 }
 */
 /*
-const tDureeEnMinutes& LogicalPlace::AttenteMinimale() const
-{
-	return _minTransferDelay;
-}
-*/
-/*
 tVitesseKMH LogicalPlace::vitesseMax(size_t Categorie) const
 {
 	return(vVitesseMax[Categorie]);
-}
-*/
-/*
-inline tIndex	LogicalPlace::NombrePhotos() const
-{
-	return(vNombrePhotos);
 }
 */
 /*
@@ -529,11 +498,14 @@ inline const cTexte& cServiceEnGare::Designation() const
 	return(vDesignation);
 }
 */
+
+
+/** Affichage texte de la gare sur un flux (pour debug).
+*/
 template <class T>
 T& operator<<(T& flux, const LogicalPlace& Obj)
 {
-//	flux << *Obj.getAccesPADe();
-	flux << Obj.getCommune()->GetNom() << " " << _name;
+	flux << Obj.getTown()->getName() << " " << _name;
 	return flux;
 }
 
@@ -631,17 +603,15 @@ tIndex LogicalPlace::addNetworkAccessPoint(NetworkAccessPoint* networkAccessPoin
 	@param town Commune
 	@param name Nom
 */
-void LogicalPlace::setDesignation(cCommune* town, string name)
+void LogicalPlace::setDesignation(cCommune* town, const string& name)
 {
 	_town = town;
 	_name = name;
 
 	// Génération automatique de Designation OD si besoin
-	if (!_nameAsDestinationForTimetable.Taille())
+	if (!_nameAsDestinationForTimetable.size())
 	{
-		cTexte newDesignationOD;
-		newDesignationOD << getTown()->getName() << " " << getName();
-		setDesignationOD(newDesignationOD);
+		setDesignationOD(getTown()->getName() + " " + getName());
 	}
 
 	// Enregistrement sur la commune
@@ -695,3 +665,8 @@ LogicalPlace::AddressesMap LogicalPlace::getAddresses() const
 	return result;
 }
 
+const string&  LogicalPlace::getName() const
+    {
+        return _name;
+    }
+    

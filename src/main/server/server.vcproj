@@ -52,6 +52,9 @@
 				RelativePath="..\..\..\src\main\server\cArretPhysique.cpp">
 			</File>
 			<File
+				RelativePath=".\cAssociator.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\src\main\server\cAxe.cpp">
 			</File>
 			<File
@@ -74,6 +77,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cDistanceCarree.cpp">
+			</File>
+			<File
+				RelativePath=".\cDocument.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cElementInterface.cpp">
@@ -220,9 +226,6 @@
 				RelativePath="..\..\..\src\main\server\cVelo.cpp">
 			</File>
 			<File
-				RelativePath=".\Interpretor.cpp">
-			</File>
-			<File
 				RelativePath=".\LogicalPlace.cpp">
 			</File>
 			<File
@@ -242,6 +245,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\SYNTHESE.cpp">
+			</File>
+			<File
+				RelativePath=".\TimeTables.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\xmlParser.cpp">
@@ -265,6 +271,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cArretPhysique.h">
+			</File>
+			<File
+				RelativePath=".\cAssociator.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cAxe.h">
@@ -301,9 +310,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cDocument.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\main\server\cDocument.inline.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cDocumentHoraire.h">
@@ -360,9 +366,6 @@
 				RelativePath="..\..\..\src\main\server\cInterface.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\cInterface.inline.h">
-			</File>
-			<File
 				RelativePath="..\..\..\src\main\server\cInterface_Objet_AEvaluer_PageEcran.h">
 			</File>
 			<File
@@ -390,9 +393,6 @@
 				RelativePath="..\..\..\src\main\server\cLog.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\cLog.inline.h">
-			</File>
-			<File
 				RelativePath="..\..\..\src\main\server\cMateriel.h">
 			</File>
 			<File
@@ -418,9 +418,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cPhoto.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\main\server\cPhoto.inline.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cProfil.h">
@@ -469,9 +466,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cTexte.h">
-			</File>
-			<File
-				RelativePath="..\..\..\src\main\server\cTexte.inline.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cTexteRequeteSYNTHESE.h">
@@ -525,10 +519,10 @@
 				RelativePath="..\..\..\src\main\server\SYNTHESE.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\SYNTHESE.inline.h">
+				RelativePath="..\..\..\src\main\server\Temps.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\Temps.h">
+				RelativePath=".\TimeTables.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\WinSYNTHESE.h">

@@ -58,23 +58,23 @@ int cTrajet::GenererNiveauxAlerte()
 		__finAlerte = __debutAlerte;
 		if (getAmplitudeServiceContinu())
 			__finAlerte += getAmplitudeServiceContinu();
-		if (__ET->getOrigin()->getLogicalPlace()->getAlerte()->showMessage(__debutAlerte, __finAlerte)
-		&&	__NiveauMaxAlerte < __ET->getOrigin()->getLogicalPlace()->getAlerte()->Niveau())
-			__NiveauMaxAlerte = __ET->getOrigin()->getLogicalPlace()->getAlerte()->Niveau();
+		if (__ET->getOrigin()->getLogicalPlace()->getAlerte().showMessage(__debutAlerte, __finAlerte)
+		&&	__NiveauMaxAlerte < __ET->getOrigin()->getLogicalPlace()->getAlerte().Niveau())
+			__NiveauMaxAlerte = __ET->getOrigin()->getLogicalPlace()->getAlerte().Niveau();
 		
 		// Circulation � r�servation obligatoire
 		maintenant.setMoment();
-		if (__ET->getLigne()->GetResa()->TypeResa() == Obligatoire
+		if (__ET->getLigne()->GetResa()->TypeResa() == cModaliteReservation::RuleType_COMPULSORY
 		&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getService(), maintenant, __ET->MomentDepart())
-		&&	__NiveauMaxAlerte < ALERTE_ATTENTION)
-			__NiveauMaxAlerte = ALERTE_ATTENTION;
+		&&	__NiveauMaxAlerte < cAlerte::LEVEL_WARNING)
+			__NiveauMaxAlerte = cAlerte::LEVEL_WARNING;
 		
 		// Circulation � r�servation possible
 		maintenant.setMoment();
-		if (__ET->getLigne()->GetResa()->TypeResa() == Facultative
+		if (__ET->getLigne()->GetResa()->TypeResa() == cModaliteReservation::RuleType_OPTIONNAL
 		&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getService(), maintenant, __ET->MomentDepart())
-		&&	__NiveauMaxAlerte < ALERTE_INFO)
-			__NiveauMaxAlerte = ALERTE_INFO;
+		&&	__NiveauMaxAlerte < cAlerte::LEVEL_INFO)
+			__NiveauMaxAlerte = cAlerte::LEVEL_INFO;
 		
 		// Alerte sur circulation
 		// D�but alerte = premier d�part
@@ -83,9 +83,9 @@ int cTrajet::GenererNiveauxAlerte()
 		__finAlerte = __ET->MomentArrivee();
 		if (getAmplitudeServiceContinu())
 			__finAlerte += getAmplitudeServiceContinu();
-		if (__ET->getLigne()->getAlerte()->showMessage(__debutAlerte, __finAlerte)
-		&&	__NiveauMaxAlerte < __ET->getLigne()->getAlerte()->Niveau())
-			__NiveauMaxAlerte = __ET->getLigne()->getAlerte()->Niveau();
+		if (__ET->getLigne()->getAlerte().showMessage(__debutAlerte, __finAlerte)
+		&&	__NiveauMaxAlerte < __ET->getLigne()->getAlerte().Niveau())
+			__NiveauMaxAlerte = __ET->getLigne()->getAlerte().Niveau();
 		
 		// Alerte sur arr�t d'arriv�e
 		// D�but alerte = premi�re arriv�e
@@ -96,9 +96,9 @@ int cTrajet::GenererNiveauxAlerte()
 			__finAlerte = __ET->getSuivant()->MomentDepart();
 		if (getAmplitudeServiceContinu())
 			__finAlerte += getAmplitudeServiceContinu();
-		if (__ET->getDestination()->getLogicalPlace()->getAlerte()->showMessage(__debutAlerte, __finAlerte)
-		&&	__NiveauMaxAlerte < __ET->getDestination()->getLogicalPlace()->getAlerte()->Niveau())
-			__NiveauMaxAlerte = __ET->getDestination()->getLogicalPlace()->getAlerte()->Niveau();
+		if (__ET->getDestination()->getLogicalPlace()->getAlerte().showMessage(__debutAlerte, __finAlerte)
+		&&	__NiveauMaxAlerte < __ET->getDestination()->getLogicalPlace()->getAlerte().Niveau())
+			__NiveauMaxAlerte = __ET->getDestination()->getLogicalPlace()->getAlerte().Niveau();
 	}
 	
 	// Stockage du r�sultat au format texte pour module d'interface

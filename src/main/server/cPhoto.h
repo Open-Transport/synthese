@@ -55,7 +55,7 @@ public:
 	
 	//! \name Constructeur et fonctions de construction
 	//@{
-	cPhoto(tIndex);
+	cPhoto(const size_t&);
 	//@}
 	
 	//! \name Modificateurs
@@ -64,7 +64,5 @@ public:
 	bool addMapPhoto(const cTexte& newCoords, const cTexte& newURL, const cTexteHTML& newAlt);
 	//@}
 };
-
-#include "cPhoto.inline.h"
 
 #endif

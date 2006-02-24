@@ -11,7 +11,7 @@
  #define SYNTHESE_CSITPERT_H
  
 #include "Temps.h"
-#include "cTexte.h"
+#include "cMoment.h"
 
   
  /*!	\brief Situation perturbée

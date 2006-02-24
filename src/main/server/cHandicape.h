@@ -7,10 +7,9 @@
 #ifndef SYNTHESE_CHANDICAPE_H
 #define SYNTHESE_CHANDICAPE_H
 
-class cHandicape;
+class cModaliteReservation;
 
 #include "cTexte.h"
-#include "cModaliteReservation.h"
 #include "Parametres.h"
 
 
@@ -22,6 +21,7 @@ class cHandicape;
 */
 class cHandicape
 {
+	const size_t	_id;
 	tBool3					_Valeur;		//!< Type de prise en charge (Accept�/Interdit/Inconnu)
 	cModaliteReservation*	_Resa;		//!< Modalit� de r�servation de la prise en charge si applicable (NULL sinon)
 	tContenance				_Contenance;	//!< Nombre de places offertes aux handicap�s
@@ -40,50 +40,16 @@ public:
 	
 	//!	\name Accesseurs
 	//@{
-	tContenance getContenance();
-	tBool3 getTypeHandicape();
+	tContenance getContenance() const;
+	tBool3 getTypeHandicape() const;
+	const size_t& getId() const;
 	//@}
 	
 	//!	\name Constructeur et destructeur
 	//@{
-	cHandicape();
+	cHandicape(const size_t&);
+	~cHandicape();
 	//@}
 };
-
-inline void cHandicape::setTypeHandicape(tBool3 __Valeur)
-{
-	_Valeur = __Valeur;
-}
-
-inline tBool3 cHandicape::getTypeHandicape()
-{
-	return(_Valeur);
-}
-
-inline void cHandicape::setResa(cModaliteReservation* __Resa)
-{
-	_Resa = __Resa;
-}
-
-inline void cHandicape::setContenance(tContenance __Contenance)
-{
-	_Contenance = __Contenance;
-}
-
-inline tContenance cHandicape::getContenance()
-{
-	return _Contenance;
-}
-
-inline void cHandicape::setDoc(const cTexte& __Doc)
-{
-	_Doc = __Doc;
-}
-
-
-inline void cHandicape::setPrix(tPrix __Prix)
-{
-	_Prix = __Prix;
-}
 
 #endif

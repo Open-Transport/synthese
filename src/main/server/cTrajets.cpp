@@ -379,7 +379,7 @@ void cTrajets::GenererListeOrdonneePointsArrets()
 
 /*!	\brief Contr�le de la compatibilit� entre l'ordre des arr�ts dans la grille horaire et les arr�ts du trajet
 */
-void cTrajets::OrdrePAConstruitLignesAPermuter(const cTrajet& __TrajetATester, bool* Resultat, int LigneMax) const
+void cTrajets::OrdrePAConstruitLignesAPermuter(const cTrajet& __TrajetATester, bool* Resultat, size_t LigneMax) const
 {
 	const cElementTrajet* curET = __TrajetATester.PremierElement();
 	for (int i = 0; _ListeOrdonneePointsArret[i] != NULL && i<= LigneMax; i++)
@@ -557,7 +557,7 @@ size_t cTrajets::TailleListeOrdonneePointsArret() const
 	return _ListeOrdonneePointsArret.size();
 }
 
-LogicalPlace* cTrajets::getListeOrdonneePointsArret(tIndex __i) const
+LogicalPlace* cTrajets::getListeOrdonneePointsArret(size_t __i) const
 {
 	return _ListeOrdonneePointsArret[__i];
 }

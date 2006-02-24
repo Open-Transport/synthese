@@ -17,9 +17,54 @@ Les objets modalité de prise en charge des handicapés sont initialisés par les v
  - Pas de réservation
  - Une place par véhicule
 */
-cHandicape::cHandicape()
+cHandicape::cHandicape(const size_t& id)
+: _id(id)
 {
 	setPrix(0);
 	setResa(NULL);
 	setContenance(1);
+}
+
+cHandicape::~cHandicape()
+{}
+
+void cHandicape::setTypeHandicape(tBool3 __Valeur)
+{
+	_Valeur = __Valeur;
+}
+
+tBool3 cHandicape::getTypeHandicape() const
+{
+	return(_Valeur);
+}
+
+void cHandicape::setResa(cModaliteReservation* __Resa)
+{
+	_Resa = __Resa;
+}
+
+void cHandicape::setContenance(tContenance __Contenance)
+{
+	_Contenance = __Contenance;
+}
+
+tContenance cHandicape::getContenance() const
+{
+	return _Contenance;
+}
+
+void cHandicape::setDoc(const cTexte& __Doc)
+{
+	_Doc = __Doc;
+}
+
+
+void cHandicape::setPrix(tPrix __Prix)
+{
+	_Prix = __Prix;
+}
+
+const size_t& cHandicape::getId() const
+{
+	return _id;
 }

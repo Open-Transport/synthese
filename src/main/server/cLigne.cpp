@@ -8,7 +8,7 @@
 #include "cTrain.h"
 #include "cMateriel.h"
 #include "cLigne.h"
-
+#include "cEnvironnement.h"
 
 /*! \brief Destructeur
 	\author Hugues Romain
@@ -64,23 +64,22 @@ cLigne::cLigne(cLigne* LigneACopier, cEnvironnement* Environnement)
 /*! \brief Constructeur de base avec nom de code
 	\param newCode Code de la ligne r�sultat
 	\param newAxe Axe auquel appartiendra la ligne
-	\param Environnement Environnement auquel appartiendra la ligne
+	\param environment Environnement auquel appartiendra la ligne
 	\author Hugues Romain
 	\date 2002
 	*/
-cLigne::cLigne(const cTexte& newCode, cAxe* const newAxe)
+cLigne::cLigne(const string& newCode, cAxe* const newAxe, cEnvironnement* const environment)
 : vAxe(newAxe)
-{
-	// Valeurs transmises
-	vCode << newCode;
-	
+, vCirculation(environment->PremiereAnnee(), environment->DerniereAnnee(), 0, "")
+, vResa(environment->getResa(0))
+, vVelo(environment->getVelo(0))
+, vHandicape(environment->getHandicape(0))
+, vCode(newCode)
+{	
 	// Valeurs par d�faut
 	vReseau = NULL;
 	vMateriel = NULL;
 	vTarif =NULL;
-	vVelo=NULL;
-	vHandicape=NULL;
-	vResa=NULL;
 	vAAfficherSurTableauDeparts = true;
 	vAAfficherSurIndicateurs = true;
 }
@@ -503,20 +502,6 @@ cLigne* cLigne::operator =(const cLigne& LigneACopier)
 
 
 
-/*!	\brief Modificateur des ann�es couvertes par un calendrier de circulation
-	\param PremiereAnnee la premi�re ann�e couverte par le calendrier
-	\param DerniereAnnee la derni�re ann�e couverte par le calendrier
-	\author Hugues Romain
-	\date 2001-2004
-*/
-void	cLigne::setAnneesCirculation(tAnnee PremiereAnnee, tAnnee DerniereAnnee)
-{
-	vCirculation.setAnnees(PremiereAnnee, DerniereAnnee);
-}
-
-
-
-
 /*!	\brief Indique si la ligne correspond � une jonction � pied
 */
 bool cLigne::EstUneLigneAPied() const
@@ -624,24 +609,9 @@ const cTarif* cLigne::getTarif() const
 	return(vTarif);
 }
 
-void cLigne::setAlerteMessage(cTexte& message)
+const cAlerte& cLigne::getAlerte() const
 {
-	vAlerte.setMessage(message);
-}
-
-void cLigne::setAlerteDebut(cMoment& momentDebut)
-{
-	vAlerte.setMomentDebut(momentDebut);
-}
-
-void cLigne::setAlerteFin(cMoment& momentFin)
-{
-	vAlerte.setMomentFin(momentFin);
-}
-
-const cAlerte* cLigne::getAlerte() const
-{
-	return(&vAlerte);
+	return vAlerte;
 }
 
 //END SET
@@ -662,7 +632,7 @@ cMateriel* cLigne::Materiel() const
 	return(vMateriel);
 }
 
-const cTexte& cLigne::getCode() const
+const std::string& cLigne::getCode() const
 {
 	return(vCode);
 }
@@ -786,4 +756,9 @@ inline cTexte cLigne::Code() const
 void cLigne::addService(cTrain* const service)
 {
 	vTrain.push_back(service);
+}
+
+cAlerte& cLigne::getAlerteForModification()
+{
+	return vAlerte;
 }

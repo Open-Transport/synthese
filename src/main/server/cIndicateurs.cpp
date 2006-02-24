@@ -18,6 +18,7 @@
 	\param NombrePA Nombre de lignes de la colonne
 	\author Hugues Romain 
 	\date 2001
+	@todo VOIR A GERER L'ALLOCATION DU MASQUE QUI A ETE SUPPRIMEE
 */
 cColonneIndicateurs::cColonneIndicateurs(size_t newNombreGares, cLigne* newLigne, cJC* newJC)
 {
@@ -25,7 +26,6 @@ cColonneIndicateurs::cColonneIndicateurs(size_t newNombreGares, cLigne* newLigne
 	vOrigineSpeciale = Texte;
 	vDestinationSpeciale = Texte;
 	vSuivant = NULL;
-	vMasque = newJC->AlloueMasque();
 	newJC->SetInclusionToMasque(vMasque);
 	vColonne = (const cHoraire**) calloc(vNombreGares, sizeof(cHoraire*));
 	vLigne = newLigne;
@@ -43,16 +43,16 @@ cGareIndicateurs::cGareIndicateurs(LogicalPlace* newPA, cGareLigne::tTypeGareLig
 	vSuivant = NULL;
 }
 
-cIndicateurs::cIndicateurs(const cTexte& newTitre, cEnvironnement* newEnvironnement)
+cIndicateurs::cIndicateurs(const cTexte& newTitre, cEnvironnement* const newEnvironnement)
+: vEnvironnement(newEnvironnement)
+, vTitre(newTitre)
+, vJC(vEnvironnement->PremiereAnnee(), vEnvironnement->DerniereAnnee(), 0, "")
 {
-	vTitre << newTitre;
 	vPremiereCI = NULL;
 	vPremiereGI = NULL;
 	vDerniereGI = NULL;
 	vNombreGares = 0;
 	vCommencePage = false;
-	vEnvironnement = newEnvironnement;
-	vJC.setAnnees(newEnvironnement->PremiereAnnee(), newEnvironnement->DerniereAnnee());
 }
 
 // NUL Gerer �a avec une petite classe cTypeDA...
@@ -299,7 +299,7 @@ void cIndicateurs::EcritTableaux(size_t HDispo, size_t NumeroColonne, size_t Nom
 	cColonneIndicateurs* curCI;
 	cCommune* curCommune;
 	cGareIndicateurs* curGI;
-	int y;
+	size_t y;
 	size_t NumeroGare;
 	size_t iRenvoi;
 
@@ -467,7 +467,7 @@ void cColonneIndicateurs::setDestinationSpeciale(tTypeOD newVal)
 	vDestinationSpeciale = newVal;
 }
 
-tMasque* cColonneIndicateurs::getMasque() const
+cJC::Calendar& cColonneIndicateurs::getMasque()
 {
 	return(vMasque);
 }

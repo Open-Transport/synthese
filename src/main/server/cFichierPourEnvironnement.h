@@ -886,21 +886,6 @@ Fonds de carte
 #define MATERIELSFORMATCOLONNESNombreFormats			1
 //@}
 
-//! @name Format du fichier des indicateurs
-//@{
-#define INDICATEURSFORMAT "indicateurs"
-#define INDICATEURSEXTENSION "indicateurs.per"
-
-#define INDICATEURSFORMATLIGNEJC					0
-#define INDICATEURSFORMATLIGNEGare					1
-#define INDICATEURSFORMATLIGNECP					2
-#define INDICATEURSFORMATLIGNENombreFormats			3
-
-#define INDICATEURSFORMATCOLONNEStandard			0
-#define INDICATEURSFORMATCOLONNEObligatoire			1
-#define INDICATEURSFORMATCOLONNEDepartArrivee		2
-#define INDICATEURSFORMATCOLONNENombreFormats		3
-//@}
 
 
 
@@ -914,8 +899,8 @@ class cEnvironnement;
 */
 class cFichierJoursCirculation : public cFichier
 {
-	bool 		JCExecuterCommande(cJC& JC, cJC::tSens Sens, cTexte& Tampon, cEnvironnement*);
-	TypeSection 	RemplirJC(cJC& JC, cJC::tSens Sens, cTexte& Tampon, cEnvironnement*);
+	bool 		JCExecuterCommande(cJC& JC, cJC::InclusionType Sens, cTexte& Tampon, cEnvironnement*);
+	TypeSection 	RemplirJC(cJC& JC, cJC::InclusionType Sens, cTexte& Tampon, cEnvironnement*);
 
 public:
 	bool Charge(cEnvironnement*);

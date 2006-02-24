@@ -3,7 +3,7 @@
 #define SYNTHESE_CRESULTATBASEDEDONNEES_CELLULE_H
 
 #include "cTexte.h"
-#include "Temps.h"
+#include "cMoment.h"
 
 class cResultatBaseDeDonnees_Cellule
 {

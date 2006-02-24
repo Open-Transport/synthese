@@ -1,5 +1,13 @@
+/** Alert message class implementation.
+	@file cAlerte.cpp
+*/
+
 #include "cAlerte.h"
 
+using namespace std;
+
+const cAlerte::Level cAlerte::LEVEL_WARNING = 99;
+const cAlerte::Level cAlerte::LEVEL_INFO = 50;
 
 /*!	\brief Constructeur
 	\author Hugues Romain
@@ -13,7 +21,7 @@ cAlerte::cAlerte()
 {
 	_Debut.setMoment(TEMPS_MIN);
 	_Fin.setMoment(TEMPS_MAX);
-	_Niveau = ALERTE_ATTENTION;
+	_Niveau = LEVEL_WARNING;
 }
 
 
@@ -27,7 +35,7 @@ cAlerte::cAlerte()
 bool cAlerte::showMessage(const cMoment& __Debut, const cMoment& __Fin) const
 {
 	//pas de message
-	if (!_Message.Taille())
+	if (!_Message.size())
 		return false;
 		
 	//test de la validite du message
@@ -35,4 +43,40 @@ bool cAlerte::showMessage(const cMoment& __Debut, const cMoment& __Fin) const
 		return false;
 	
 	return true;		
+}
+
+
+const string& cAlerte::getMessage() const
+{
+	return (_Message);
+}
+
+void cAlerte::setMessage(const string& __Message)
+{
+	_Message = __Message;
+}
+
+void cAlerte::setMomentDebut(const cMoment& __Debut)
+{
+	_Debut = __Debut;
+}
+
+void cAlerte::setMomentFin(const cMoment& __Fin)
+{
+	_Fin = __Fin;
+}
+
+
+
+/*!	\brief Accesseur Niveau de l'alerte
+	\return Le niveau de l'alerte
+*/
+const cAlerte::Level& cAlerte::Niveau() const
+{
+	return _Niveau;
+}
+
+void cAlerte::setNiveau(const Level& __Niveau)
+{
+	_Niveau = __Niveau;
 }

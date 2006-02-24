@@ -5,8 +5,6 @@
 #ifndef SYNTHESE_CANNEE_H
 #define SYNTHESE_CANNEE_H
 
-using namespace std;
-
 #include <iostream>
 #include "Temps.h"
 

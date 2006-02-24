@@ -11,13 +11,13 @@ class cEnvironnement;
 class cSite;
 class cTableauAffichage;
 class cCalculateur;
+class TimeTables;
 
 #include "cTexte.h"
 #include "Temps.h"
 #include "cFichiersPourSYNTHESE.h"
 #include "cTexteRequeteSYNTHESE.h"
 #include "cLog.h"
-#include "cAssociator.h"
 
 /**	@defgroup m00 00 Architecture : serveur TCP et main
 
@@ -68,15 +68,31 @@ class cCalculateur;
 */
 class SYNTHESE
 {
+public:
+	/** Environments map */
+	typedef std::map<size_t, cEnvironnement*> EnvironmentsMap;
+
+	/** Interfaces map */
+	typedef std::map<size_t, cInterface*> InterfacesMap;
+
+	/** Sites map */
+	typedef std::map<std::string, cSite*> SitesMap;
+
+	/** Departures tables map */
+	typedef std::map<std::string, cTableauAffichage*> DeparturesTablesMap;
+
+	/** TimeTables map */
+	typedef std::map<std::string, TimeTables*> TimeTablesMap;
+
 private:
 
 	//!	\name Tableaux de donn�es
 	//@{
-	cTableauDynamiquePointeurs<cEnvironnement*>		_Environnement;		//!< Environnements de donn�es
-	cTableauDynamiquePointeurs<cInterface*>			_Interface;			//!< Interfaces d'affichage
-	cTableauDynamiquePointeurs<cSite*>				_Site;				//!< Sites d'acc�s
-	cTableauDynamiquePointeurs<cTableauAffichage*>	_TableauxAffichage;	//Tableaux d'affichage
-    cAssociator *_Associator; // Dictionnaire des arrets et lieux
+	EnvironmentsMap		_Environnement;		//!< Environnements de donn�es
+	InterfacesMap			_Interface;			//!< Interfaces d'affichage
+	SitesMap				_Site;				//!< Sites d'acc�s
+	DeparturesTablesMap	_TableauxAffichage;	//!< Tableaux d'affichage
+	TimeTablesMap		_timeTables;		//!< Time tables collections
 	//@}
 	
 	//!	\name Fichier de log
@@ -146,26 +162,19 @@ public:
 
 	//!	\name M�thodes d'enregistrement
 	//@{
-	tIndex	Enregistre(cSite*);
-	tIndex	Enregistre(cTableauAffichage*);
-	tIndex	Enregistre(cEnvironnement*, tIndex Index = INCONNU);
-	tIndex	Enregistre(cInterface*, tIndex Index = INCONNU);
+	bool	Enregistre(cSite*);
+	bool	Enregistre(cTableauAffichage*);
+	bool	Enregistre(cEnvironnement*);
+	bool	Enregistre(cInterface*);
+	bool	Enregistre(TimeTables*);
 	//@}
 
 	//!	\name Modificateurs
 	//@{
-	bool	InitAssociateur(const cTexte& NomAssociateur);
-	bool	Charge(const cTexte& NomFichier, int __NombreCalculateursParEnvironnement);
+//	bool	InitAssociateur(const cTexte& NomAssociateur);
+	bool	Charge(const cTexte& NomFichier);
 	void	SetNiveauLog(tNiveauLog);
 	void	SetCheminLog(const cTexte&);
-	//@}
-	
-	//!	\name Accesseurs tableaux avec droit de modification
-	//@{
-	cTableauDynamique<cEnvironnement*>&		TableauEnvironnements();
-	cTableauDynamique<cSite*>&				TableauSites();
-	cTableauDynamique<cInterface*>&			TableauInterfaces();
-	cTableauDynamique<cTableauAffichage*>&	TableauTableauxAffichage();
 	//@}
 	
 	//!	\name Accesseurs logs avec droit de modification
@@ -176,11 +185,11 @@ public:
 	
 	//!	\name Accesseurs
 	//@{
-	const cEnvironnement*		GetEnvironnement(tIndex)	const;
-	const cInterface*			GetInterface(tIndex)		const;
-	const cSite*				GetSite(tIndex)				const;
-	const cSite*				GetSite(const cTexte&)		const;
-	const cTableauAffichage*	GetTbDep(const cTexte&)		const;
+	cEnvironnement*		GetEnvironnement(size_t)	const;
+	cInterface*			GetInterface(size_t)		const;
+	cSite*				GetSite(const std::string&)		const;
+	cTableauAffichage*	GetTbDep(const std::string&)		const;
+	TimeTables*			getTimeTables(const std::string&)	const;
 	tNiveauLog					getNiveauLog()				const;
 	const cTexte&				getCheminLog()				const;
 	//@}
@@ -194,7 +203,5 @@ public:
 };
 
 /** @} */
-
-#include "SYNTHESE.inline.h"
 
 #endif

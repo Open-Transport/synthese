@@ -8,7 +8,6 @@
 using namespace std;
 
 #include <iostream>
-#include "Temps.h"
 
 /** Mois de l'ann�e
 	@ingroup m04
@@ -46,57 +45,6 @@ public:
 	tDureeEnJours	NombresJourJusquAMois(const cAnnee& anneeDep, const cMois& moisArr, const cAnnee& anneeArr) 	const;
 	bool		OK()												const;
 	//@}
-
-	//!	\name Sorties
-	//@{
-	template <class T> T& toString(T& Objet, tLangue CodeLangue) const
-	{
-		switch (CodeLangue)
-		{
-		case LANGUEFrancais:
-			switch (_Valeur)
-			{
-			case 1: Objet << "Janvier"; break;
-			case 2: Objet << "F�vrier"; break;
-			case 3: Objet << "Mars"; break;
-			case 4: Objet << "Avril"; break;
-			case 5: Objet << "Mai"; break;
-			case 6: Objet << "Juin"; break;
-			case 7: Objet << "Juillet"; break;
-			case 8: Objet << "Ao�t"; break;
-			case 9: Objet << "Septembre"; break;
-			case 10: Objet << "Octobre"; break;
-			case 11: Objet << "Novembre"; break;
-			case 12: Objet << "D�cembre"; break;
-			}
-			break;
-	
-		case LANGUEAnglais:
-			switch (_Valeur)
-			{
-			case 1: Objet << "January"; break;
-			case 2: Objet << "February"; break;
-			case 3: Objet << "March"; break;
-			case 4: Objet << "April"; break;
-			case 5: Objet << "May"; break;
-			case 6: Objet << "June"; break;
-			case 7: Objet << "July"; break;
-			case 8: Objet << "August"; break;
-			case 9: Objet << "September"; break;
-			case 10: Objet << "October"; break;
-			case 11: Objet << "November"; break;
-			case 12: Objet << "December"; break;
-			}
-			break;
-			
-		case LANGUECode:
-			Objet << _Valeur;
-			break;
-		}
-		return(Objet);
-	}
-	//@}
-	
 };
 
 /*!	\brief Nombre de jours dans un mois
@@ -190,29 +138,6 @@ inline tDureeEnJours cMois::NombresJourJusquAMois(const cAnnee& anneeDep, const 
 	return calcul;
 }
 
-/*
-template <class charT, class Traits> basic_ostream<charT, Traits>& operator<<(
-		basic_ostream<charT, Traits> &flux, const cMois& Obj)
-		{
-			typename basic_ostream<charT, Traits>::sentry init(flux);
-			if (init)
-			{
-				flux << Obj.Valeur();
-			}
-			return(flux);
-		}
-
-template <class Traits> basic_ostream<cTexteCodageInterne, Traits>& operator<<(
-		basic_ostream<cTexteCodageInterne, Traits> &flux, const cMois& Obj)
-		{
-			typename basic_ostream<cTexteCodageInterne, Traits>::sentry init(flux);
-			if (init)
-			{
-				flux << TXT2(Obj.Valeur(), 2);
-			}
-			return(flux);
-		}
-*/
 
 template <class T>
 inline T& operator<<(T& flux, const cMois& Obj)

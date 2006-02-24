@@ -7,9 +7,6 @@
 #define SYNTHESE_CMODALITERESERVATIONENLIGNE_H
 
 
-class cModaliteReservationEnLigne;
-
-
 #include "cModaliteReservation.h"
 
 
@@ -19,6 +16,20 @@ class cModaliteReservationEnLigne;
 */
 class cModaliteReservationEnLigne : public cModaliteReservation
 {
+public:
+
+	/** Field needs for formular building in interface module */
+	typedef enum
+	{
+		FieldNeed_NO_FIELD = 0,			//!< The field is not used
+		FieldNeed_OPTIONAL = 1,			//!< The field is drawn, the filling of a value is optional
+		FieldNeed_COMPULSORY = 2		//!< The field is drawn, the filling of a value is compulsory
+	} FieldNeed;
+
+	/** Level of seats occupation */
+	typedef int OccupationLevel;
+
+private:
 	//!	\name Connexion Mnesia
 	//@{
 	cTexte	_Noeud;		//!< Noeud mnesia � contacter en local (serveur)
@@ -56,7 +67,6 @@ public:
 	tBool3			GetRELEMail()			const;
 	tBool3			GetRELTel()				const;
 	tBool3			GetRELNumeroAbo()		const;
-	bool 			ReservationEnLigne()	const;
 	//@}
 	
 	//! \name Calculateurs
@@ -74,7 +84,7 @@ public:
 	
 	//! \name Modificateurs
 	//@{
-	bool	addSeuil		(const tSeuilResa valeur, const size_t NombreSeuils=0);
+	bool	addSeuil		(const OccupationLevel valeur, const size_t NombreSeuils=0);
 	bool	setMax			(const int valeur);
 	bool	SetRELAdresse	(const tBool3);
 	bool	SetRELEMail		(const tBool3);
@@ -87,7 +97,8 @@ public:
 
 	//! \name Constructeurs et destructeurs
 	//@{
-	cModaliteReservationEnLigne();
+	cModaliteReservationEnLigne(const size_t&);
+	~cModaliteReservationEnLigne();
 	//@}
 	
 };

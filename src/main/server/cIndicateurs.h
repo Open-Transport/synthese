@@ -110,7 +110,7 @@ private:
 	const cHoraire**		vColonne;
 	cColonneIndicateurs*	vSuivant;
 	cTexte				vPostScript;
-	tMasque*			vMasque;
+	cJC::Calendar			vMasque;
 	cRenvoiIndicateurs*	vRenvoi;
 	cLigne*				vLigne;
 	size_t				vNombreGares;
@@ -133,7 +133,7 @@ public:
 	tTypeOD			DestinationSpeciale()	const;
 	cLigne*				getLigne()			const;
 	const cTexte&		getPostScript()		const;
-	tMasque*			getMasque()			const;
+	cJC::Calendar&			getMasque()			;
 	cColonneIndicateurs*	getSuivant()			const;
 	cRenvoiIndicateurs*	getRenvoi()			const;
 	tTypeOD			OrigineSpeciale()		const;
@@ -183,14 +183,14 @@ private:
 	// Variables
 	bool				vCommencePage;
 	cGareIndicateurs*		vDerniereGI;
-	cEnvironnement*		vEnvironnement;
+	cEnvironnement* const		vEnvironnement;
 	cJC					vJC;
     	size_t				vNombreColonnes;
 	size_t				vNombreGares;
 	size_t				vNombreRenvois;
 	cColonneIndicateurs*	vPremiereCI;
 	cGareIndicateurs*		vPremiereGI;
-	cTexte				vTitre;
+	cTexte const				vTitre;
 	
 public:
 	

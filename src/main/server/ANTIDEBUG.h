@@ -1,14 +1,7 @@
-/** @file ANTIDEBUG.h
-*/
-
-#include <sys/types.h>
-#include <sys/ptrace.h>
-#include <signal.h>
-
-
-/** \brief Fonctions d'anti debuggage
-    \author Christophe
-    \date 2005
+/** Fonctions d'anti debuggage.
+	@file ANTIDEBUG.h
+    @author Christophe Romain
+    @date 2005
 
 Sont disponibles les macros suivantes:
 
@@ -36,6 +29,12 @@ FALSE_DISASM : trompe les outils de désassemblage comme objdump.
   en version non DEBUG.
   
 */
+
+#include <sys/types.h>
+#include <sys/ptrace.h>
+#include <signal.h>
+
+
 
 #if defined(__linux__) && !defined(DEBUG)
 #define ANTIDEBUG

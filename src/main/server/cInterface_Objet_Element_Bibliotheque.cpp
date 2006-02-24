@@ -11,7 +11,8 @@
 #include "cHandicape.h"
 #include "cVelo.h"
 #include "cGareLigne.h"
-
+#include "cModaliteReservationEnLigne.h"
+#include "cTrain.h"
 
 /*!	\brief Copie d'un �l�ment objet dynamique, selon les param�tres fournis
 	\param Parametres Chaine de param�tres desquels tenir compte
@@ -95,7 +96,7 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 			const cTrajets* __Trajets = (const cTrajets*) __Objet;
 			
 			const cElementTrajet* curET;
-			int __Ligne;
+			size_t __Ligne;
 			
 			cMoment tempMoment;
 
@@ -212,9 +213,9 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 					cMoment finPrem = debutPrem;
 					if (__Trajet->getAmplitudeServiceContinu().Valeur())
 						finPrem += __Trajet->getAmplitudeServiceContinu();
-					if (curET->getGareDepart()->getAlerte()->showMessage(__debutAlerte, __finAlerte)
-					&&	__NiveauRenvoiColonne < curET->getGareDepart()->getAlerte()->Niveau())
-						__NiveauRenvoiColonne = curET->getGareDepart()->getAlerte()->Niveau();
+					if (curET->getGareDepart()->getAlerte().showMessage(__debutAlerte, __finAlerte)
+					&&	__NiveauRenvoiColonne < curET->getGareDepart()->getAlerte().Niveau())
+						__NiveauRenvoiColonne = curET->getGareDepart()->getAlerte().Niveau();
 					
 					// Circulation � r�servation obligatoire
 					cMoment maintenant;
@@ -238,9 +239,9 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 					finPrem = curET->MomentArrivee();
 					if (__Trajet->getAmplitudeServiceContinu().Valeur())
 						finPrem += __Trajet->getAmplitudeServiceContinu();
-					if (curET->getLigne()->getAlerte()->showMessage(__debutAlerte, __finAlerte)
-					&&	__NiveauRenvoiColonne < curET->getLigne()->getAlerte()->Niveau())
-						__NiveauRenvoiColonne = curET->getLigne()->getAlerte()->Niveau();
+					if (curET->getLigne()->getAlerte().showMessage(__debutAlerte, __finAlerte)
+					&&	__NiveauRenvoiColonne < curET->getLigne()->getAlerte().Niveau())
+						__NiveauRenvoiColonne = curET->getLigne()->getAlerte().Niveau();
 					
 					// Alerte sur arr�t d'arriv�e
 					// D�but alerte = premi�re arriv�e
@@ -251,9 +252,9 @@ tIndex cInterface_Objet_Element_Bibliotheque::Evalue(ostream& pCtxt, const cInte
 						__finAlerte = curET->Suivant()->MomentDepart();
 					if (__Trajet->getAmplitudeServiceContinu().Valeur())
 						__finAlerte += __Trajet->getAmplitudeServiceContinu();
-					if (curET->getGareArrivee()->getAlerte()->showMessage(__debutAlerte, __finAlerte)
-					&&	__NiveauRenvoiColonne < curET->getGareArrivee()->getAlerte()->Niveau())
-						__NiveauRenvoiColonne = curET->getGareArrivee()->getAlerte()->Niveau();
+					if (curET->getGareArrivee()->getAlerte().showMessage(__debutAlerte, __finAlerte)
+					&&	__NiveauRenvoiColonne < curET->getGareArrivee()->getAlerte().Niveau())
+						__NiveauRenvoiColonne = curET->getGareArrivee()->getAlerte().Niveau();
 				}
 				
 				// Affichage du renvoi si necessaire
@@ -849,11 +850,11 @@ LienPhoto()))
 			pCtxt << "</td></tr>";					
 
 			// affichage du champ pr�nom
-			tChampsResa bPrenom = (tChampsResa) _Parametres[ELEMENTINTERFACEChampsReservationPrenomObligatoire]->Nombre(__Parametres);
-			if (bPrenom == eChampFacultatif || bPrenom == eChampObligatoire)
+			cModaliteReservationEnLigne::FieldNeed bPrenom = (cModaliteReservationEnLigne::FieldNeed) _Parametres[ELEMENTINTERFACEChampsReservationPrenomObligatoire]->Nombre(__Parametres);
+			if (bPrenom == cModaliteReservationEnLigne::FieldNeed_OPTIONAL || bPrenom == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 			{
 				pCtxt << "<tr>" << _Parametres[ELEMENTINTERFACEChampsReservationPrenom]->Texte(__Parametres) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_CLIENT_PRENOM << "\" class=\"frmField\" size=\"35\">";
-				if (bPrenom == eChampObligatoire)
+				if (bPrenom == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 				{
 					pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_PRENOM << "\"/>";
 				}
@@ -861,11 +862,11 @@ LienPhoto()))
 			}
 			
 			// affichage du champ adresse
-			tChampsResa bAdresse = (tChampsResa) _Parametres[ELEMENTINTERFACEChampsReservationAdresseObligatoire]->Nombre(__Parametres);
-			if (bAdresse == eChampFacultatif || bAdresse == eChampObligatoire)
+			cModaliteReservationEnLigne::FieldNeed bAdresse = (cModaliteReservationEnLigne::FieldNeed) _Parametres[ELEMENTINTERFACEChampsReservationAdresseObligatoire]->Nombre(__Parametres);
+			if (bAdresse == cModaliteReservationEnLigne::FieldNeed_OPTIONAL || bAdresse == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 			{
 				pCtxt << "<tr>" << _Parametres[ELEMENTINTERFACEChampsReservationAdresse]->Texte(__Parametres) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_CLIENT_ADRESSE << "\" class=\"frmField\" size=\"35\">";
-				if (bAdresse == eChampObligatoire)
+				if (bAdresse == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 				{
 					pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_ADRESSE << "\"/>";
 				}
@@ -873,11 +874,11 @@ LienPhoto()))
 			}
 
 			// affichage du champ email
-			tChampsResa bEmail = (tChampsResa) _Parametres[ELEMENTINTERFACEChampsReservationEmailObligatoire]->Nombre(__Parametres);
-			if (bEmail == eChampFacultatif || bEmail == eChampObligatoire)
+			cModaliteReservationEnLigne::FieldNeed bEmail = (cModaliteReservationEnLigne::FieldNeed) _Parametres[ELEMENTINTERFACEChampsReservationEmailObligatoire]->Nombre(__Parametres);
+			if (bEmail == cModaliteReservationEnLigne::FieldNeed_OPTIONAL || bEmail == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 			{
 				pCtxt << "<tr>" << _Parametres[ELEMENTINTERFACEChampsReservationEmail]->Texte(__Parametres) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_CLIENT_EMAIL << "\" class=\"frmField\" size=\"35\">";
-				if (bEmail == eChampObligatoire)
+				if (bEmail == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 				{
 					pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_EMAIL << "\"/>";
 				}
@@ -885,11 +886,11 @@ LienPhoto()))
 			}
 
 			// affichage du champ t�l�phone
-			tChampsResa bTelephone = (tChampsResa) _Parametres[ELEMENTINTERFACEChampsReservationTelephoneObligatoire]->Nombre(__Parametres);
-			if (bTelephone == eChampFacultatif || bTelephone == eChampObligatoire)
+			cModaliteReservationEnLigne::FieldNeed bTelephone = (cModaliteReservationEnLigne::FieldNeed) _Parametres[ELEMENTINTERFACEChampsReservationTelephoneObligatoire]->Nombre(__Parametres);
+			if (bTelephone == cModaliteReservationEnLigne::FieldNeed_OPTIONAL || bTelephone == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 			{
 				pCtxt << "<tr>" << _Parametres[ELEMENTINTERFACEChampsReservationTelephone]->Texte(__Parametres) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_CLIENT_TELEPHONE << "\" class=\"frmField\" size=\"35\">";
-				if (bTelephone == eChampObligatoire)
+				if (bTelephone == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 				{
 					pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_TELEPHONE << "\"/>";
 				}
@@ -897,11 +898,11 @@ LienPhoto()))
 			}
 
 			// affichage du champ num�ro d'abonn�
-			tChampsResa bNumAbonne = (tChampsResa) _Parametres[ELEMENTINTERFACEChampsReservationNumeroAbonneObligatoire]->Nombre(__Parametres);
-			if (bNumAbonne == eChampFacultatif || bNumAbonne == eChampObligatoire)
+			cModaliteReservationEnLigne::FieldNeed bNumAbonne = (cModaliteReservationEnLigne::FieldNeed) _Parametres[ELEMENTINTERFACEChampsReservationNumeroAbonneObligatoire]->Nombre(__Parametres);
+			if (bNumAbonne == cModaliteReservationEnLigne::FieldNeed_OPTIONAL || bNumAbonne == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 			{
 				pCtxt << "<tr>" << _Parametres[ELEMENTINTERFACEChampsReservationNumeroAbonne]->Texte(__Parametres) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_CLIENT_NUMERO_ABONNE << "\" class=\"frmField\" size=\"35\">";
-				if (bNumAbonne == eChampObligatoire)
+				if (bNumAbonne == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 				{
 					pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_NUMERO_ABONNE << "\"/>";
 				}
@@ -909,16 +910,16 @@ LienPhoto()))
 			}
 
 			// affichage du champ adresse d�part
-			tChampsResa bAdresseDepart = (tChampsResa) _Parametres[ELEMENTINTERFACEChampsReservationAdresseDepartObligatoire]->Nombre(__Parametres);
-			if (bAdresseDepart == eChampObligatoire)
+			cModaliteReservationEnLigne::FieldNeed bAdresseDepart = (cModaliteReservationEnLigne::FieldNeed) _Parametres[ELEMENTINTERFACEChampsReservationAdresseDepartObligatoire]->Nombre(__Parametres);
+			if (bAdresseDepart == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 			{
 				pCtxt << "<tr>" << _Parametres[ELEMENTINTERFACEChampsReservationAdresseDepart]->Texte(__Parametres) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_ADRESSE_DEPART << "\" class=\"frmField\" size=\"35\">";
 				pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_ADRESSE_DEPART << "\"/></td></tr>";
 			}
 
 			// affichage du champ adresse arriv�e
-			tChampsResa bAdresseArrivee = (tChampsResa) _Parametres[ELEMENTINTERFACEChampsReservationAdresseArriveeObligatoire]->Nombre(__Parametres);
-			if (bAdresseArrivee == eChampObligatoire)
+			cModaliteReservationEnLigne::FieldNeed bAdresseArrivee = (cModaliteReservationEnLigne::FieldNeed) _Parametres[ELEMENTINTERFACEChampsReservationAdresseArriveeObligatoire]->Nombre(__Parametres);
+			if (bAdresseArrivee == cModaliteReservationEnLigne::FieldNeed_COMPULSORY)
 			{
 				pCtxt << "<tr>" << _Parametres[ELEMENTINTERFACEChampsReservationAdresseArrivee]->Texte(__Parametres) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_ADRESSE_ARRIVEE << "\" class=\"frmField\" size=\"35\">";
 				pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_ADRESSE_ARRIVEE << "\"/></td></tr>";
@@ -993,12 +994,12 @@ LienPhoto()))
 					if (__Trajet->getAmplitudeServiceContinu())
 						finPrem += __Trajet->getAmplitudeServiceContinu();
 							
-					if (__ET->getOrigin()->getLogicalPlace()->getAlerte()->showMessage(debutPrem,finPrem))
+					if (__ET->getOrigin()->getLogicalPlace()->getAlerte().showMessage(debutPrem,finPrem))
 					{
 						cInterface_Objet_Connu_ListeParametres __ParametresMontee;
 						__ParametresMontee << 0;
-						__ParametresMontee << __ET->getOrigin()->getLogicalPlace()->getAlerte()->getMessage();
-						__ParametresMontee << __ET->getOrigin()->getLogicalPlace()->getAlerte()->Niveau();
+						__ParametresMontee << __ET->getOrigin()->getLogicalPlace()->getAlerte().getMessage();
+						__ParametresMontee << __ET->getOrigin()->getLogicalPlace()->getAlerte().Niveau();
 						__ParametresMontee << "";
 						__ParametresMontee << __ET->getOrigin()->getLogicalPlace()->getName();
 						__ParametresMontee << (__Couleur ? "1" : "");
@@ -1064,7 +1065,7 @@ LienPhoto()))
 					cMoment maintenant;
 					bool __ResaOuverte = false;
 					maintenant.setMoment();
-					if (__ET->getLigne()->GetResa()->TypeResa() == Obligatoire
+					if (__ET->getLigne()->GetResa()->TypeResa() == cModaliteReservation::RuleType_COMPULSORY
 						&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getService(), maintenant, __ET->MomentDepart())
 					) {
 						__ParametresLigne << "1"; //12
@@ -1074,7 +1075,7 @@ LienPhoto()))
 						__ParametresLigne << ""; //12
 					
 					maintenant.setMoment();
-					if (__ET->getLigne()->GetResa()->TypeResa() == Facultative
+					if (__ET->getLigne()->GetResa()->TypeResa() == cModaliteReservation::RuleType_OPTIONNAL
 					&&	__ET->getLigne()->GetResa()->reservationPossible(__ET->getService(), maintenant, __ET->MomentDepart())
 					) {
 						__ParametresLigne << "1"; //13
@@ -1118,10 +1119,10 @@ LienPhoto()))
 					}
 					
 					// 19/20 Alertes
-					if (__ET->getLigne()->getAlerte()->showMessage(debutLigne, finLigne))
+					if (__ET->getLigne()->getAlerte().showMessage(debutLigne, finLigne))
 					{
-						__ParametresLigne << __ET->getLigne()->getAlerte()->getMessage();	//19
-						__ParametresLigne << __ET->getLigne()->getAlerte()->Niveau();		//20
+						__ParametresLigne << __ET->getLigne()->getAlerte().getMessage();	//19
+						__ParametresLigne << __ET->getLigne()->getAlerte().Niveau();		//20
 					}
 					else
 					{
@@ -1151,10 +1152,10 @@ LienPhoto()))
 						finArret = __ET->getSuivant()->MomentDepart();
 					if (__Trajet->getAmplitudeServiceContinu())
 						finArret += __Trajet->getAmplitudeServiceContinu();
-					if (__ET->getDestination()->getLogicalPlace()->getAlerte()->showMessage(debutArret,finArret))
+					if (__ET->getDestination()->getLogicalPlace()->getAlerte().showMessage(debutArret,finArret))
 					{
-						__ParametresDescente << __ET->getDestination()->getLogicalPlace()->getAlerte()->getMessage();	//1
-						__ParametresDescente << __ET->getDestination()->getLogicalPlace()->getAlerte()->Niveau();		//2
+						__ParametresDescente << __ET->getDestination()->getLogicalPlace()->getAlerte().getMessage();	//1
+						__ParametresDescente << __ET->getDestination()->getLogicalPlace()->getAlerte().Niveau();		//2
 					}
 					else
 					{
@@ -1200,10 +1201,10 @@ LienPhoto()))
 						finArret = __ET->getSuivant()->MomentDepart();
 					if (__Trajet->getAmplitudeServiceContinu())
 						finArret += __Trajet->getAmplitudeServiceContinu();
-					if (__ET->getDestination()->getLogicalPlace()->getAlerte()->showMessage(debutArret,finArret))
+					if (__ET->getDestination()->getLogicalPlace()->getAlerte().showMessage(debutArret,finArret))
 					{
-						__ParametresJonction << __ET->getDestination()->getLogicalPlace()->getAlerte()->getMessage();	// 1
-						__ParametresJonction << __ET->getDestination()->getLogicalPlace()->getAlerte()->Niveau();	// 2
+						__ParametresJonction << __ET->getDestination()->getLogicalPlace()->getAlerte().getMessage();	// 1
+						__ParametresJonction << __ET->getDestination()->getLogicalPlace()->getAlerte().Niveau();	// 2
 					}
 					else
 					{

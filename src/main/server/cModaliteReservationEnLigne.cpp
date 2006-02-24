@@ -1,13 +1,17 @@
+/** Reservation rule with online booking class implementation.
+	@file cModaliteReservationEnLigne.cpp
+*/
+
 
 #include "cModaliteReservationEnLigne.h"
 
 
-/*! \brief Constructeur
-	\param newIndex Num�ro de la modalit� de r�servation dans l'environnement
+/** Constructeur.
+	@param id Num�ro de la modalit� de r�servation dans l'environnement
 	\author Hugues Romain
 	\date 2001-2005
 */
-cModaliteReservationEnLigne::cModaliteReservationEnLigne() : cModaliteReservation()
+cModaliteReservationEnLigne::cModaliteReservationEnLigne(const size_t& id) : cModaliteReservation(id)
 {
 	vRELAdresse			= Faux;
 	vRELNumeroAbonne	= Faux;
@@ -18,6 +22,12 @@ cModaliteReservationEnLigne::cModaliteReservationEnLigne() : cModaliteReservatio
 }
 
 
+/** Destructor.
+*/
+cModaliteReservationEnLigne::~cModaliteReservationEnLigne()
+{
+}
+
 /*! \brief Ajoute un palier de nombre de r�servations de d�clenchement d'alerte
 	\param valeur Nombre de r�servations � atteindre pour d�clencher l'envoi de l'alerte
 	\param NombreSeuils Nombre total de paliers pour l'allocation (utilis� lors du premier appel � la m�thode uniquement)
@@ -27,12 +37,12 @@ cModaliteReservationEnLigne::cModaliteReservationEnLigne() : cModaliteReservatio
 	\author Hugues Romain
 	\date 2005
 */
-bool cModaliteReservationEnLigne::addSeuil(const tSeuilResa valeur, const size_t NombreSeuils)
+bool cModaliteReservationEnLigne::addSeuil(const OccupationLevel valeur, const size_t NombreSeuils)
 {
 	// Si allocation non faite et si nombre total fourni
 	if (!vSeuils && NombreSeuils)
 		// Allocation du tableau de variables
-		vSeuils = (tSeuilResa*) calloc(NombreSeuils + 1, sizeof(tSeuilResa));
+		vSeuils = (OccupationLevel*) calloc(NombreSeuils + 1, sizeof(OccupationLevel));
 	// Si allocation effectu�e et si le seuil est fourni et est un nombre positif
 	if (vSeuils && valeur >= 0)
 	{
@@ -80,13 +90,6 @@ bool cModaliteReservationEnLigne::SetMailCopie(const cTexte &newVal)
 {
 	vEMailCopie.Vide();
 	vEMailCopie << newVal;
-	return(true);
-}
-
-bool cModaliteReservation::SetSiteWeb(const cTexte &newVal)
-{
-	vSiteWeb.Vide();
-	vSiteWeb << newVal;
 	return(true);
 }
 
@@ -145,11 +148,6 @@ tBool3 cModaliteReservationEnLigne::GetRELAdresse() const
 	return(vRELAdresse);
 }
 
-const cTexte& cModaliteReservation::GetTelephone() const
-{
-	return(vNumeroTelephone);
-}
-
 const cTexte& cModaliteReservationEnLigne::GetMail() const
 {
 	return(vEMail);
@@ -160,16 +158,6 @@ const cTexte& cModaliteReservationEnLigne::GetMailCopie() const
 	return(vEMailCopie);
 }
 
-
-/*!	\brief Accesseur Activation de la r�servation en ligne
-	\return true car la r�servation en ligne est possible sur cette classe
-	\author Hugues Romain
-	\date 2005
-*/
-bool cModaliteReservationEnLigne::ReservationEnLigne() const
-{
-	return true;
-}
 
 
 /*! \brief D�tection du franchissement d'un palier de nombre de r�servations pour envoi d'alerte

@@ -10,6 +10,7 @@
 #include "cTableauAffichage.h"
 #include "cEnvironnement.h"
 #include "cCalculItineraire.h"
+#include "TimeTables.h"
 
 using namespace std;
 
@@ -32,19 +33,43 @@ SYNTHESE::~SYNTHESE()
 	\param __Objet L'objet ï¿½ enregistrer
 	\return L'index de l'objet (INCONNU si ï¿½chec)
 */
-tIndex SYNTHESE::Enregistre(cSite* __Objet)
+bool SYNTHESE::Enregistre(cSite* __Objet)
 {
-	// Crï¿½ation du lien dans le tableau des pointeurs vers les sites
-	tIndex __Index = _Site.SetElement(__Objet);
-	
-	// Test lien effectuï¿½ avec succï¿½s
-	return __Index;
+	SitesMap::const_iterator iter = _Site.find(__Objet->getClef());
+
+	if (iter != _Site.end())
+		delete iter->second;
+
+	_Site[__Objet->getClef()] = __Objet;
+
+	return iter != _Site.end();
 }
 
-tIndex SYNTHESE::Enregistre(cTableauAffichage* __Objet)
+bool SYNTHESE::Enregistre(cTableauAffichage* __Objet)
 {
-	return _TableauxAffichage.SetElement(__Objet); 
+	DeparturesTablesMap::const_iterator iter = _TableauxAffichage.find(__Objet->getClef());
+
+	if (iter != _TableauxAffichage.end())
+		delete iter->second;
+
+	_TableauxAffichage[__Objet->getClef()] = __Objet;
+
+	return iter != _TableauxAffichage.end();
 }
+
+bool SYNTHESE::Enregistre(TimeTables* __Objet)
+{
+	TimeTablesMap::const_iterator iter = _timeTables.find(__Objet->getClef());
+
+	if (iter != _timeTables.end())
+		delete iter->second;
+
+	_timeTables[__Objet->getClef()] = __Objet;
+
+	return iter != _timeTables.end();
+}
+
+
 
 
 /*!	\brief Messages de log standardisï¿½s
@@ -118,17 +143,16 @@ void SYNTHESE::ChargeMessagesStandard()
 	\return L'index de l'objet (INCONNU si ï¿½chec)
 	\warning Pas de controle si l'index est dï¿½jï¿½ pris
 */
-tIndex SYNTHESE::Enregistre(cEnvironnement* __Objet, tIndex __Index)
+bool SYNTHESE::Enregistre(cEnvironnement* __Objet)
 {
-	// Crï¿½ation du lien dans le tableau des pointeurs vers les environnements
-	__Index = _Environnement.SetElement(__Objet, __Index);
-	
-	// Test lien effectuï¿½ avec succï¿½s
-	if (__Index == INCONNU)
-		return INCONNU;
-	
-	// Sortie OK
-	return __Index;
+	EnvironmentsMap::const_iterator iter = _Environnement.find(__Objet->Index());
+
+	if (iter != _Environnement.end())
+		delete iter->second;
+
+	_Environnement[__Objet->Index()] = __Objet;
+
+	return iter != _Environnement.end();
 }
 
 
@@ -141,20 +165,16 @@ tIndex SYNTHESE::Enregistre(cEnvironnement* __Objet, tIndex __Index)
 	\author Hugues Romain
 	\date 2005
 */
-tIndex SYNTHESE::Enregistre(cInterface* __Objet, tIndex __Index)
+bool SYNTHESE::Enregistre(cInterface* __Objet)
 {
-	// Crï¿½ation du lien dans le tableau des pointeurs vers les environnements
-	__Index = _Interface.SetElement(__Objet, __Index);
-	
-	// Test lien effectuï¿½ avec succï¿½s
-	if (__Index == INCONNU)
-		return INCONNU;
-	
-	// Ecriture de l'index d'enregistrement dans l'objet
-	__Objet->SetIndex(__Index);
-	
-	// Sortie OK
-	return __Index;
+	InterfacesMap::const_iterator iter = _Interface.find(__Objet->Index());
+
+	if (iter != _Interface.end())
+		delete iter->second;
+
+	_Interface[__Objet->Index()] = __Objet;
+
+	return iter != _Interface.end();
 }
 
 
@@ -168,7 +188,7 @@ tIndex SYNTHESE::Enregistre(cInterface* __Objet, tIndex __Index)
 
 Le chargement est interrompu au premier refus de fichier, car ces fichiers de donnï¿½es sont fondamentaux, et toute erreur critique sur ceux ci rendrait le service inutilisable.
 */
-bool SYNTHESE::Charge(const cTexte& __CheminRepertoire, int __NombreCalculateursParEnvironnement)
+bool SYNTHESE::Charge(const cTexte& __CheminRepertoire)
 {
 	// Prï¿½paration du nom des fichiers
 	cTexte __CheminFichiers(__CheminRepertoire);
@@ -176,7 +196,7 @@ bool SYNTHESE::Charge(const cTexte& __CheminRepertoire, int __NombreCalculateurs
 	
 	// Fichier des environnements
 	cFichierEnvironnements __FichierEnvironnements(__CheminFichiers, __CheminFichiers);
-	if (!__FichierEnvironnements.Charge(__NombreCalculateursParEnvironnement))
+	if (!__FichierEnvironnements.Charge())
 	{
 // 		Erreur("Erreur de chargement du fichier des environnements", "", __CheminFichiers, "");
 		return false;
@@ -217,24 +237,10 @@ bool SYNTHESE::Charge(const cTexte& __CheminRepertoire, int __NombreCalculateurs
 	\author Hugues Romain
 	\date 2005
 */
-const cSite* SYNTHESE::GetSite(const cTexte& __Cle) const
+cSite* SYNTHESE::GetSite(const string& __Cle) const
 {
-	const cSite* __Site = NULL;
-	
-	// Recherche du site par sa clï¿½
-	for (tIndex __Index = 0; __Index < _Site.Taille(); __Index++)
-		if (_Site[__Index] && _Site[__Index]->getClef().Compare(__Cle))
-		{
-			__Site = _Site[__Index];
-			break;
-		}
-	
-	// Test de la validitï¿½ du site
-	if (!__Site || !__Site->valide())
-		return NULL;
-	
-	// Sortie OK
-	return __Site;
+	SitesMap::const_iterator iter = _Site.find(__Cle);
+	return (iter != _Site.end() && iter->second->valide()) ? iter->second : NULL;
 }
 
 
@@ -444,7 +450,7 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
        ceci ne fonctionne qu'avec un fichier de réseau de neurones généré avec csv2net
        avec la ligne 115 definie comme suit: final = city+':'+stop
        */
-    cAssocResult resPD, resPA;
+/*    cAssocResult resPD, resPA;
     cAssocResult::iterator it;
     vector<string> output;
     cTexte newtxtCD,newtxtAD,newtxtCA,newtxtAA;
@@ -463,12 +469,12 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
     cout << "depart " << output[0] << "-" << output[1] << endl;
     newtxtCD = output[0];
     newtxtAD = output[1];
-    /*
+ */   /*
     if((it->score == 100) && (it->delta >= 10)) // && resPT.size() < 10 ??
         cout << "best: " << it->id << endl;
     else for(; it!=resPD.end(); ++it)
         cout << it->id << " " << it->score << " " << it->delta << endl;
-        */
+        */ /*
     //resPL = _Associator->MatchPlace(10); // liste des adresses
     // vérification d'ambiguité sur les arrets
 
@@ -483,7 +489,7 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
     cout << "arrivee " << output[0] << "-" << output[1] << endl;
     newtxtCA = output[0];
     newtxtAA = output[1];
-    /*
+*/    /*
     if((it->score == 100) && (it->delta >= 10)) // && resPT.size() < 10 ??
         cout << "best: " << it->id << endl;
     else for(; it!=resPA.end(); ++it)
@@ -504,10 +510,10 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 
 
 	// Test des entrï¿½es
-	if(	(nCD == INCONNU || __Site->getEnvironnement()->ControleNumeroTexteCommune(nCD, newtxtCD))
-	&&	(nAD == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAD, nCD, newtxtAD))
-	&&	(nCA == INCONNU || __Site->getEnvironnement()->ControleNumeroTexteCommune(nCA, newtxtCA))
-	&&	(nAA == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAA, nCA, newtxtAA))
+	if(	(nCD == INCONNU || __Site->getEnvironnement()->ControleNumeroTexteCommune(nCD, txtCD))
+	&&	(nAD == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAD, nCD, txtAD))
+	&&	(nCA == INCONNU || __Site->getEnvironnement()->ControleNumeroTexteCommune(nCA, txtCA))
+	&&	(nAA == INCONNU || __Site->getEnvironnement()->ControleNumerosArretCommuneDesignation(nAA, nCA, txtAA))
 	&& 	__DateDepart.OK()
 	&&	__Site->getEnvironnement()->getTarif(tarif))
 	{
@@ -520,7 +526,7 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 		{
 			if (nCD == INCONNU)
 			{
-				tbCommune = __Site->getEnvironnement()->searchTown(string(newtxtCD.Texte()), 2);
+				tbCommune = __Site->getEnvironnement()->searchTown(string(txtCD.Texte()), 2);
 				if (tbCommune.size() == 1)
 					nCD = tbCommune[0]->getId();
 			}
@@ -533,7 +539,7 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 				}
 				else
 				{
-					tbPADe = __Site->getEnvironnement()->getTown(nCD)->searchLogicalPlaces(string(newtxtAD.Texte()), 2);
+					tbPADe = __Site->getEnvironnement()->getTown(nCD)->searchLogicalPlaces(string(txtAD.Texte()), 2);
 					if (tbPADe.size() == 1)
 					{
 						nAD = tbPADe[0]->getId();
@@ -546,7 +552,7 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 		{
 			if (nCA == INCONNU)
 			{
-				tbCommune = __Site->getEnvironnement()->searchTown(string(newtxtCA.Texte()), 2);
+				tbCommune = __Site->getEnvironnement()->searchTown(string(txtCA.Texte()), 2);
 				if (tbCommune.size() == 1)
 					nCA = tbCommune[0]->getId();
 			}
@@ -558,7 +564,7 @@ bool SYNTHESE::ValidFH(ostream &pCtxt, ostream& pCerr, const cSite* __Site
 				}
 				else
 				{
-					tbPADe = __Site->getEnvironnement()->getTown(nCA)->searchLogicalPlaces(string(newtxtAA.Texte()), 2);
+					tbPADe = __Site->getEnvironnement()->getTown(nCA)->searchLogicalPlaces(string(txtAA.Texte()), 2);
 					if (tbPADe.size() == 1)
 					{
 						nAA = tbPADe[0]->getId();
@@ -950,7 +956,7 @@ bool SYNTHESE::ExecuteRequete(ostream &pCtxt, ostream &pCerr, cTexteRequeteSYNTH
 		return false;
 
 	// Mode tï¿½lï¿½affichage
-	if (__TableauAffichage = GetTbDep(__Requete.getTexte(REQUETE_COMMANDE_CODE_TABLEAUDEPART)))
+	if (__TableauAffichage = GetTbDep(string(__Requete.getTexte(REQUETE_COMMANDE_CODE_TABLEAUDEPART).Texte())))
 	{
 		if (__Fonction == FONCTION_TABLEAU_DEPART_GARE)
 			return TableauDepartsGare(pCtxt, pCerr, __TableauAffichage
@@ -959,7 +965,7 @@ bool SYNTHESE::ExecuteRequete(ostream &pCtxt, ostream &pCerr, cTexteRequeteSYNTH
 
 	}
 	// Mode site web
-	else if (__Site = GetSite(__Requete.getTexte(REQUETE_COMMANDE_SITE)))
+	else if (__Site = GetSite(string(__Requete.getTexte(REQUETE_COMMANDE_SITE).Texte())))
 	{
 		if (__Fonction == FONCTION_ACCUEIL)
 			return Accueil(pCtxt, pCerr, __Site
@@ -1159,36 +1165,10 @@ fourni (utilisation des guides).
 */ 
 
 
-/*!	\brief Accesseur ï¿½lï¿½ment site avec controle de l'index
-	\param __Index Index du site
-	\return L'objet demandï¿½, NULL si non trouvï¿½
-*/
-const cSite* SYNTHESE::GetSite(tIndex __Index) const
+cTableauAffichage* SYNTHESE::GetTbDep(const string& __Code) const
 {
-	if (_Site.IndexValide(__Index))
-		return _Site[__Index];
-	else
-		return NULL;
-}
-
-const cTableauAffichage* SYNTHESE::GetTbDep(const cTexte& __Code) const
-{
-	const cTableauAffichage* __TbDep = NULL;
-	
-	// Recherche du site par sa clï¿½
-	for (tIndex __Index = 0; __Index < _TableauxAffichage.Taille(); __Index++)
-		if (_TableauxAffichage[__Index] && _TableauxAffichage[__Index]->getClef().Compare(__Code))
-		{
-			__TbDep = _TableauxAffichage[__Index];
-			break;
-		}
-	
-	// Test de la validitï¿½ du site
-//	if (!__TbDep || !__TbDep->valide())
-//		return NULL;
-	
-	// Sortie OK
-	return __TbDep;
+	DeparturesTablesMap::const_iterator iter = _TableauxAffichage.find(__Code);
+	return (iter != _TableauxAffichage.end()) ? iter->second : NULL;
 }
 
 void SYNTHESE::SetNiveauLog(tNiveauLog __NiveauLog)
@@ -1220,34 +1200,60 @@ void SYNTHESE::OuvrirLogs()
 	\param __Index Index de l'environnement
 	\return L'objet demandï¿½, NULL si non trouvï¿½
 */
-const cEnvironnement* SYNTHESE::GetEnvironnement(tIndex __Index) const
+cEnvironnement* SYNTHESE::GetEnvironnement(size_t __Index) const
 {
-	if (_Environnement.IndexValide(__Index))
-		return _Environnement[__Index];
-	else
-		return NULL;
+	EnvironmentsMap::const_iterator iter = _Environnement.find(__Index);
+	return (iter != _Environnement.end()) ? iter->second : NULL;
 }
 
 /*!	\brief Accesseur ï¿½lï¿½ment interface avec controle de l'index
 	\param __Index Index de l'environnement
 	\return L'objet demandï¿½, NULL si non trouvï¿½
 */
-const cInterface* SYNTHESE::GetInterface(tIndex __Index) const
+cInterface* SYNTHESE::GetInterface(size_t __Index) const
 {
-	if (_Interface.IndexValide(__Index))
-		return _Interface[__Index];
-	else
-		return NULL;
+	InterfacesMap::const_iterator iter = _Interface.find(__Index);
+	return (iter != _Interface.end()) ? iter->second : NULL;
 }
 
-cTableauDynamique<cTableauAffichage*>& SYNTHESE::TableauTableauxAffichage()
-{
-	return _TableauxAffichage;
-}
-
+/*
 bool SYNTHESE::InitAssociateur(const cTexte& __NomAssociateur)
 {
     _Associator = new cAssociator(__NomAssociateur.Texte());
     return _Associator->IsLoaded();
 }
+*/
+/*!	\brief Accesseur niveau de log
+	\return le niveau de log
+*/
+tNiveauLog SYNTHESE::getNiveauLog() const
+{
+	return _NiveauLOG;
+}
 
+
+void	SYNTHESE::SetCheminLog(const cTexte& __CheminLog)
+{
+	_CheminLOG = __CheminLog;
+	OuvrirLogs();
+}
+
+
+
+/*!	\brief Accesseur chemin des log
+	\return le niveau de log
+*/
+const cTexte& SYNTHESE::getCheminLog() const
+{
+	return _CheminLOG;
+}
+
+cLog& SYNTHESE::FichierLogAcces()
+{
+	return _FichierLogAcces;
+}
+
+cLog& SYNTHESE::FichierLogBoot()
+{
+	return _FichierLogBoot;
+}

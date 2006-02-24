@@ -19,6 +19,9 @@
 #include "cHandicape.h"
 #include "cVelo.h"
 #include "cTarif.h"
+#include "cTrain.h"
+#include "cModaliteReservation.h"
+#include "cModaliteReservationEnLigne.h"
 
 #include <iostream>
 
@@ -143,13 +146,6 @@ cEnvironnement::cEnvironnement(string directory, string pathToFormat, size_t id)
 		envOk=false;
 	}
 
-	// Chargement format Indicateurs
-	_FormatIndicateurs = new cFormatFichier(__CheminFormats, INDICATEURSFORMAT, INDICATEURSFORMATLIGNENombreFormats, INDICATEURSFORMATCOLONNENombreFormats);
-	if (!_FormatIndicateurs)
-	{
-		envOk = false;
-	}
-	
 	// Chargement des donnees carto
 	vNomRepertoireCarto = std::string (__Chemin.Texte());
 	vNomRepertoireCarto += std::string (CARTOEXTENSION);
@@ -160,51 +156,41 @@ cEnvironnement::cEnvironnement(string directory, string pathToFormat, size_t id)
 
 
 
-/*! \brief Destructeur
+/** Destructor.
 	\author Hugues Romain
-	\date 2000-2001
+	@author Marc Jambert
+	\date 2000-2006
 */
 cEnvironnement::~cEnvironnement()
 {
-	for(std::vector<cModaliteReservation*>::iterator iter = vResa.begin(); 
-		iter != vResa.end(); ++iter) {
-	  if (*iter == 0) continue;
-	  delete (*iter);
-	}
+	for(ReservationRulesMap::const_iterator iter = vResa.begin(); 
+		iter != vResa.end(); ++iter)
+		delete iter->second;
 	vResa.clear();
 	
-	for(std::vector<cReseau*>::iterator iter = vReseau.begin(); 
-		iter != vReseau.end(); ++iter) {
-	  if (*iter == 0) continue;
-	  delete (*iter);
-	}
+	for(NetworksMap::const_iterator iter = vReseau.begin(); 
+		iter != vReseau.end(); ++iter)
+		delete iter->second;
 	vReseau.clear();
 	
-	for(std::vector<cVelo*>::iterator iter = vVelo.begin(); 
-		iter != vVelo.end(); ++iter) {
-	  if (*iter == 0) continue;
-	  delete (*iter);
-	}
+	for(BikeCompliancesMap::const_iterator iter = vVelo.begin(); 
+		iter != vVelo.end(); ++iter)
+		delete iter->second;
 	vVelo.clear();
 	
-	for(std::vector<cHandicape*>::iterator iter = vHandicape.begin(); 
-		iter != vHandicape.end(); ++iter) {
-	  if (*iter == 0) continue;
-	  delete (*iter);
-	}
+	for(HandicappedCompliancesMap::const_iterator iter = vHandicape.begin(); 
+		iter != vHandicape.end(); ++iter)
+		delete iter->second;
 	vHandicape.clear();
 	
 	for(FaresMap::const_iterator iter = vTarif.begin(); 
-		iter != vTarif.end(); ++iter) {
+		iter != vTarif.end(); ++iter)
 			delete iter->second;
-	}
 	vTarif.clear();
 	
-	for(std::vector<cMateriel*>::iterator iter = vMateriel.begin(); 
-		iter != vMateriel.end(); ++iter) {
-	  if (*iter == 0) continue;
-	  delete (*iter);
-	}
+	for(RollingStockMap::const_iterator iter = vMateriel.begin(); 
+		iter != vMateriel.end(); ++iter)
+		delete iter->second;
 	vMateriel.clear();
 
 }
@@ -400,7 +386,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
  				curAxe = new cAxe(true, Tampon.Extrait(2), NomFichierComplet);
 				break;
 
-			case '�':
+			case '¤':
      			curAxe = new cAxe(false, Tampon.Extrait(2), NomFichierComplet, false);
 				break;
 
@@ -422,7 +408,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 		{
 			if (Tampon.ProchaineSection(Fichier, HORAIRESFORMATLIGNELigne))
 			{
-				curLigne = new cLigne(Tampon.Extrait(1), curAxe);
+				curLigne = new cLigne(string(Tampon.Extrait(1).Texte()), curAxe, this);
 				Enregistre(curLigne);
 
 				TaillePileGLSansHoraire = 0;
@@ -502,21 +488,14 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 
 				case HORAIRESFORMATLIGNETarification:
 				{
-					if (vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire) >= vNombreTarif)
-					{
-// 						Erreur("Tarif inexistant", "", Tampon, "03012");
-					}
-					else
-					{
-						curLigne->setTarif(vTarif[vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire)]);
-					}
+					curLigne->setTarif(getTarif(vFormatHoraire.GetNombre(Tampon, HORAIRESFORMATCOLONNEHoraire)));
 					break;
 				}
 
 				case HORAIRESFORMATLIGNEAlerte:
 				{
 					cTexte messageAlerte = vFormatHoraire.ExtraitComplet(Tampon, HORAIRESFORMATCOLONNEAlerte);
-					curLigne->setAlerteMessage(messageAlerte);
+					curLigne->getAlerteForModification().setMessage(string(messageAlerte.Texte()));
 
 					break;
 				}
@@ -530,7 +509,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 						momentDebut.setMoment('m', 'm', this->PremiereAnnee());
 					else
 						momentDebut = dateDebut;
-					curLigne->setAlerteDebut(momentDebut);
+					curLigne->getAlerteForModification().setMomentDebut(momentDebut);
 
 					break;
 				}
@@ -544,7 +523,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 						momentFin.setMoment('M', 'M', this->DerniereAnnee());
 					else
 						momentFin = dateFin;
-					curLigne->setAlerteFin(momentFin);
+					curLigne->getAlerteForModification().setMomentFin(momentFin);
 
 					break;
 				}
@@ -842,19 +821,6 @@ bool cEnvironnement::ChargeFichierResa()
 		return false;
 	}
 	
-	// Nombre d'�l�ments
-	Tampon.LireLigne(Fichier);
-	if (Tampon.Compare(RESASFORMATLIGNENombre, 6))
-	{
-		vNombreResa = Tampon.GetNombre(0, 7);
-		for (unsigned int i=0; i<vNombreResa; ++i) vResa.push_back (0); //dirty hack
-	}
-	else
-	{
-// 		Erreur("Nombre de modalit�s de r�servation non document�, chargement interrompu.", "", Tampon, "07001");
-		return(false);
-	}
-
 
 	// Boucle sur les Sous Sections
 	while (PasTermineSousSection)
@@ -863,24 +829,18 @@ bool cEnvironnement::ChargeFichierResa()
 		{
 			if (Tampon.GetNombre(1, 1))
 			{
-				curResaEnLigne = new cModaliteReservationEnLigne();
+				curResaEnLigne = new cModaliteReservationEnLigne(Tampon.GetNombre(0, 1));
 				curResa = (cModaliteReservation*) curResaEnLigne;
 			}
 			else
 			{
-				curResa = new cModaliteReservation();
+				curResa = new cModaliteReservation(Tampon.GetNombre(0, 1));
 				curResaEnLigne = NULL;
 			}
-			if (Enregistre(curResa, Tampon.GetNombre(0, 1)) != INCONNU)
-			{
-				NombreResaReel++;
-				PasTermineElement = true;
-			}
-			else
-			{
-				delete curResa;
-// 				Erreur("Num�ro de modalit� de r�servation trop grand", "", Tampon, "07002");
-			}
+			if (Enregistre(curResa))
+			{ } // Message warning ID doublon
+			NombreResaReel++;
+			PasTermineElement = true;
 		}
 		else
 			PasTermineSousSection = false;
@@ -925,25 +885,25 @@ bool cEnvironnement::ChargeFichierResa()
 				break;
 
 			case RESASFORMATLIGNEDoc:
-				if (!curResa->SetDoc(vFormatResa.Extrait(Tampon, RESASFORMATCOLONNEStandard)))
+				if (!curResa->SetDoc(string(vFormatResa.Extrait(Tampon, RESASFORMATCOLONNEStandard).Texte())))
 				{}
 // 					Erreur("Erreur de copie Documentation", TXT(curResa->Index()), Tampon, "07008");
 				break;
 
 			case RESASFORMATLIGNEPrix:
-				if (!curResa->SetPrix((const float) vFormatResa.GetNombre(Tampon, RESASFORMATCOLONNEStandard)))
-				{}
+//				if (!curResa->SetPrix((const float) vFormatResa.GetNombre(Tampon, RESASFORMATCOLONNEStandard)))
+//				{}
 // 					Erreur("Prix incorrect", TXT(curResa->Index()), Tampon, "07009");
 				break;
 
 			case RESASFORMATLIGNETel:
-				if (!curResa->SetTel(vFormatResa.Extrait(Tampon, RESASFORMATCOLONNEStandard)))
+				if (!curResa->SetTel(string(vFormatResa.Extrait(Tampon, RESASFORMATCOLONNEStandard).Texte())))
 				{}
 // 					Erreur("Erreur de copie Num�ro T�l�phone", TXT(curResa->Index()), Tampon, "07010");
 				break;
 
 			case RESASFORMATLIGNEHorairesTel:
-				if (!curResa->SetHorairesTel(vFormatResa.Extrait(Tampon, RESASFORMATCOLONNEStandard)))
+				if (!curResa->SetHorairesTel(string(vFormatResa.Extrait(Tampon, RESASFORMATCOLONNEStandard).Texte())))
 				{}
 // 					Erreur("Erreur de copie Horaires T�l�phone", TXT(curResa->Index()), Tampon, "07011");
 				break;
@@ -961,7 +921,7 @@ bool cEnvironnement::ChargeFichierResa()
 				break;
 
 			case RESASFORMATLIGNESiteWeb:
-				if (!curResa->SetSiteWeb(vFormatResa.Extrait(Tampon, RESASFORMATCOLONNEStandard)))
+				if (!curResa->SetSiteWeb(string(vFormatResa.Extrait(Tampon, RESASFORMATCOLONNEStandard).Texte())))
 				{}
 // 					Erreur("Erreur de copie Site web", TXT(curResa->Index()), Tampon, "07013");
 				break;
@@ -1042,7 +1002,6 @@ bool cEnvironnement::ChargeFichierResa()
 bool cEnvironnement::ChargeFichierHandicape()
 {
 	// Variables
-	tIndex NombreHandicapeReel = 0;
 	bool PasTermineSousSection = true;
 	bool PasTermineElement=false;
 	cFormatFichier& vFormatHandicape = *_FormatHandicape;
@@ -1063,30 +1022,14 @@ bool cEnvironnement::ChargeFichierHandicape()
 		return false;
 	}
 
-	// Nombre d'�l�ments
-	Tampon.LireLigne(Fichier);
-	if (Tampon.Compare("Nombre=", 6))
-	{
-		vNombreHandicape = (tIndex) Tampon.GetNombre(0, 7);
-        // Hugues, pourquoi +1 ??
-		for (unsigned int i=0; i<vNombreHandicape+1; ++i) vHandicape.push_back (0); //dirty hack
-	}
-	else
-	{
-// 		vFichierLOG << "*** ERREUR Nombre de type handicap�s non document�, chargement interrompu.\n\n";
-		Fichier.close();
-		return(false);
-	}
-
 	// Boucle sur les Sous Sections
 	while (PasTermineSousSection)
 	{
 		if (Tampon.ProchaineSection(Fichier, TYPESousSection))
 		{
-			curHandicape = new cHandicape;
-			NombreHandicapeReel++;
+			curHandicape = new cHandicape(Tampon.GetNombre(0, 1));
+			Enregistre(curHandicape);
 			PasTermineElement = true;
-			vHandicape[Tampon.GetNombre(0, 1)] = curHandicape;
 		}
 		else
 			PasTermineSousSection = false;
@@ -1202,7 +1145,6 @@ bool cEnvironnement::ChargeFichierTarif()
 bool cEnvironnement::ChargeFichierVelo()
 {
 	// Variables
-	tIndex NombreVeloReel = 0;
 	bool PasTermineSousSection = true;
 	bool PasTermineElement=false;
 	cFormatFichier& vFormatVelo = *_FormatVelo;
@@ -1223,29 +1165,14 @@ bool cEnvironnement::ChargeFichierVelo()
 		return false;
 	}
 
-	// Nombre d'�l�ments
-	Tampon.LireLigne(Fichier);
-	if (Tampon.Compare("Nombre=", 6))
-	{
-		vNombreVelo = (tIndex) Tampon.GetNombre(0, 7);
-		for (unsigned int i=0; i<vNombreVelo; ++i) vVelo.push_back (0); //dirty hack
-	}
-	else
-	{
-// 		vFichierLOG << "*** ERREUR Nombre de v�los non document�, chargement interrompu.\n\n";
-		return(false);
-	}
-
-
 	// Boucle sur les Sous Sections
 	while (PasTermineSousSection)
 	{
 		if (Tampon.ProchaineSection(Fichier, TYPESousSection))
 		{
-			curVelo = new cVelo;
-			NombreVeloReel++;
+			curVelo = new cVelo(Tampon.GetNombre(0, 1));
+			Enregistre(curVelo);
 			PasTermineElement = true;
-			vVelo[Tampon.GetNombre(0, 1)] = curVelo;
 		}
 		else
 			PasTermineSousSection = false;
@@ -1264,7 +1191,7 @@ bool cEnvironnement::ChargeFichierVelo()
 				break;
 
 			case VELOSFORMATLIGNEDoc:
-				curVelo->setDoc(vFormatVelo.Extrait(Tampon, VELOSFORMATCOLONNEStandard));
+				curVelo->setDoc(string(vFormatVelo.Extrait(Tampon, VELOSFORMATCOLONNEStandard).Texte()));
 				break;
 
 			case VELOSFORMATLIGNEPrix:
@@ -1293,7 +1220,6 @@ bool cEnvironnement::ChargeFichierVelo()
 bool cEnvironnement::ChargeFichierReseaux()
 {
 	// Variables
-	tNumeroReseau NombreReseauxReel = 0;
 	bool PasTermineSousSection = true;
 	bool PasTermineElement=false;
 	cFormatFichier& vFormatReseaux = *_FormatReseaux;
@@ -1314,29 +1240,14 @@ bool cEnvironnement::ChargeFichierReseaux()
 		return false;
 	}
 
-	// Nombre d'�l�ments
-	Tampon.LireLigne(Fichier);
-	if (Tampon.Compare("Nombre=", 6))
-	{
-		vNombreReseaux = (tNumeroReseau) Tampon.GetNombre(0, 7);
-		for (unsigned int i=0; i<vNombreReseaux; ++i) vReseau.push_back (0); //dirty hack
-	}
-	else
-	{
-// 		vFichierLOG << "*** ERREUR Nombre de r�seaux non document�, chargement interrompu.\n\n";
-		return(false);
-	}
-
-
 	// Boucle sur les Sous Sections
 	while (PasTermineSousSection)
 	{
 		if (Tampon.ProchaineSection(Fichier, TYPESousSection))
 		{
-			curReseau = new cReseau;
-			NombreReseauxReel++;
+			curReseau = new cReseau(Tampon.GetNombre(0, 1));
+			Enregistre(curReseau);
 			PasTermineElement = true;
-			vReseau[Tampon.GetNombre(0, 1)] = curReseau;
 		}
 		else
 			PasTermineSousSection = false;
@@ -1347,15 +1258,15 @@ bool cEnvironnement::ChargeFichierReseaux()
 			switch (vFormatReseaux.LireFichier(Fichier, Tampon))
 			{
 			case RESEAUXFORMATLIGNENom:
-				curReseau->setNom(vFormatReseaux.Extrait(Tampon, RESEAUXFORMATCOLONNEStandard));
+				curReseau->setNom(string(vFormatReseaux.Extrait(Tampon, RESEAUXFORMATCOLONNEStandard).Texte()));
 				break;
 
 			case RESEAUXFORMATLIGNEUrl:
-				curReseau->setURL(vFormatReseaux.Extrait(Tampon, RESEAUXFORMATCOLONNEStandard));
+				curReseau->setURL(string(vFormatReseaux.Extrait(Tampon, RESEAUXFORMATCOLONNEStandard).Texte()));
 				break;
 
 			case RESEAUXFORMATLIGNEDoc:
-				curReseau->setDoc(vFormatReseaux.Extrait(Tampon, RESEAUXFORMATCOLONNEStandard));
+				curReseau->setDoc(string(vFormatReseaux.Extrait(Tampon, RESEAUXFORMATCOLONNEStandard).Texte()));
 				break;
 
 			case RESEAUXFORMATLIGNECartouche:
@@ -1378,10 +1289,8 @@ bool cEnvironnement::ChargeFichierReseaux()
 bool cEnvironnement::ChargeFichierMateriel()
 {
 	// Variables
-	tIndex NombreMaterielsReel = 0;
 	bool PasTermineSousSection = true;
 	bool PasTermineElement=false;
-	tIndex NumeroMateriel;
 	cFormatFichier& vFormatMateriel = *_FormatMateriel;
 	// Tampon
 
@@ -1400,37 +1309,15 @@ bool cEnvironnement::ChargeFichierMateriel()
 		return false;
 	}
 
-	// Nombre d'�l�ments
-	Tampon.LireLigne(Fichier);
-	if (Tampon.Compare("Nombre=", 6))
-	{
-		vNombreMateriels = (tIndex) Tampon.GetNombre(0, 7);
-		for (unsigned int i=0; i<vNombreMateriels; ++i) vMateriel.push_back (0); //dirty hack
-	}
-	else
-	{
-// 		Erreur("Nombre de materiels non document�, chargement interrompu.", "", Tampon, "05001");
-		Fichier.close();
-		return(false);
-	}
-
 
 	// Boucle sur les Sous Sections
 	while (PasTermineSousSection)
 	{
 		if (Tampon.ProchaineSection(Fichier, TYPESousSection))
 		{
-			NumeroMateriel = Tampon.GetNombre(0, 1);
-			if (NumeroMateriel < 0 || NumeroMateriel >= vNombreMateriels)
-			{}
-// 				Erreur("Numero de materiel trop grand", "", Tampon, "05002");
-			else
-			{
-				curMateriel = new cMateriel(NumeroMateriel);
-				vMateriel[curMateriel->Code()] = curMateriel;
-				NombreMaterielsReel++;
-				PasTermineElement = true;
-			}
+			curMateriel = new cMateriel(Tampon.GetNombre(0, 1));
+			Enregistre(curMateriel);
+			PasTermineElement = true;
 		}
 		else
 		{
@@ -1524,7 +1411,7 @@ bool cEnvironnement::ChargeFichierPhotos()
 		if (Tampon.ProchaineSection(Fichier, TYPESousSection))
 		{
 			curPhoto = new cPhoto((tIndex) Tampon.GetNombre(0, 1));
-			_Documents[curPhoto->Index()] = curPhoto;
+			_Documents[curPhoto->getId()] = curPhoto;
 			PasTermineElement = true;
 		}
 		else
@@ -1536,11 +1423,11 @@ bool cEnvironnement::ChargeFichierPhotos()
 			switch (vFormatPhoto.LireFichier(Fichier, Tampon))
 			{
 			case PHFORMATLIGNEDesignationGenerale:
-				curPhoto->setDescriptionGenerale(vFormatPhoto.ExtraitComplet(Tampon, PHFORMATCOLONNEStandard));
+				curPhoto->setDescriptionGenerale(string(vFormatPhoto.ExtraitComplet(Tampon, PHFORMATCOLONNEStandard).Texte()));
 				break;
 
 			case PHFORMATLIGNEDesignationLocale:
-				curPhoto->setDescriptionLocale(vFormatPhoto.ExtraitComplet(Tampon, PHFORMATCOLONNEStandard));
+				curPhoto->setDescriptionLocale(string(vFormatPhoto.ExtraitComplet(Tampon, PHFORMATCOLONNEStandard).Texte()));
 				break;
 
 			case PHFORMATLIGNEZoneCliquableURL:
@@ -1575,7 +1462,7 @@ bool cEnvironnement::ChargeFichierPhotos()
 				break;
 
 			case PHFORMATLIGNENomFichier:
-				curPhoto->SetURL(vFormatPhoto.ExtraitComplet(Tampon, PHFORMATCOLONNEStandard));
+				curPhoto->SetURL(string(vFormatPhoto.ExtraitComplet(Tampon, PHFORMATCOLONNEStandard).Texte()));
 				break;
 
 			case -TYPEVide:
@@ -1657,111 +1544,6 @@ cLigne* cEnvironnement::GetLigne(const string& code) const
 	return iter == _lines.end() ? NULL : iter->second;
 }
 
-bool cEnvironnement::ChargeFichierIndicateurs()
-{
-	// Variables
-	size_t NombreIndicateursCharges = 0;
-	bool PasTermineSousSection = true;
-	bool PasTermineElement=false;
-	cJC* JCBase = NULL;
-	cFormatFichier& vFormatIndicateurs = *_FormatIndicateurs;
-	// Tampon
-	cTexte Tampon(TAILLETAMPON, true);
-	// Objets courants
-	cIndicateurs* curIndicateur=NULL;
-
-	// Ouverture du fichier
-	ifstream Fichier;
-	cTexte NomFichierComplet;
-	NomFichierComplet << _path << INDICATEURSEXTENSION;
-	Fichier.open(NomFichierComplet.Texte());
-
-	//SET PORTAGE LINUX
-	if (!Fichier.is_open())
-	{
-		cout << "*** ERREUR Impossible d'ouvrir le fichier " << NomFichierComplet.Texte() << "\n";
-		return false;
-	}
-	//END PORTAGE LINUX
-
-	// Nombre d'�l�ments
-	Tampon.LireLigne(Fichier);
-	if (Tampon.Compare("Nombre=", 7))
-	{
-		vNombreIndicateurs = (size_t) Tampon.GetNombre(0, 7);
-	}
-	else
-	{
-		Fichier.close();
-		return(false);
-	}
-
-	// Nombre d'�l�ments
-	Tampon.LireLigne(Fichier);
-	if (Tampon.Compare("JC=", 3))
-	{
-		JCBase = GetJC(Tampon.GetNombre(0, 3));
-	}
-	if (!JCBase)
-	{
-		Fichier.close();
-		return(false);
-	}
-
-	// Boucle sur les Sous Sections
-	while (PasTermineSousSection)
-	{
-		if (vNombreIndicateurs == NombreIndicateursCharges)
-			break;
-		if (Tampon.ProchaineSection(Fichier, TYPESousSection))
-		{
-			curIndicateur = new cIndicateurs(Tampon.Extrait(1), this);
-			PasTermineElement = true;
-			vIndicateurs[NombreIndicateursCharges] = curIndicateur;
-			NombreIndicateursCharges++;
-		}
-		else
-		{
-			PasTermineElement = false;
-			PasTermineSousSection = false;
-		}
-
-		// Boucle sur les propri�t�s d'un �l�ment
-		while (PasTermineElement)
-		{
-			switch (vFormatIndicateurs.LireFichier(Fichier, Tampon))
-			{
-			case INDICATEURSFORMATLIGNECP:
-				curIndicateur->setCommencePage(true);
-				break;
-
-			case INDICATEURSFORMATLIGNEJC:
-				curIndicateur->setJC(*GetJC(vFormatIndicateurs.GetNombre(Tampon, INDICATEURSFORMATCOLONNEStandard)), *JCBase);
-				break;
-
-			case INDICATEURSFORMATLIGNEGare:
-				curIndicateur->addArretLogique(
-					getLogicalPlace(vFormatIndicateurs.GetNombre(Tampon, INDICATEURSFORMATCOLONNEStandard)),
-					(cGareLigne::tTypeGareLigneDA) Tampon[vFormatIndicateurs.GetColonnePosition(INDICATEURSFORMATCOLONNEDepartArrivee)],
-					(tTypeGareIndicateur) Tampon[vFormatIndicateurs.GetColonnePosition(INDICATEURSFORMATCOLONNEObligatoire)]
-					);
-				break;
-
-			//case INDICATEURSFORMATLIGNETxt:
-
-
-			case -TYPEVide:
-				Tampon.Vide();
-			case -TYPESousSection:
-				PasTermineElement = false;
-			}
-		}
-	}
-
-	Fichier.close();
-
-	return(true);
-}
 
 
 void cEnvironnement::ConstruitColonnesIndicateur(cIndicateurs* curIndicateur)
@@ -2106,7 +1888,7 @@ cLigne* cEnvironnement::ConstruitLigne(LogicalPlace** tbGares, char* newCode, cM
 
 
 
-cJC* cEnvironnement::GetJC(const tMasque* MasqueAIdentifer, const cJC& JCBase) const
+cJC* cEnvironnement::GetJC(const cJC::Calendar& MasqueAIdentifer, const cJC& JCBase) const
 {
 	cJC* curJC;
 	cJC* JCIdentifie = NULL;
@@ -2135,8 +1917,7 @@ cJC* cEnvironnement::GetJC(const tMasque* MasqueAIdentifer, const cJC& JCBase) c
 
 /*!	\brief M�thode d'enregistrement d'un calendrier de circulation
 	\param JCAAjouter Le calendrier � ajouter � l'environnement
-	\param Code L'index � donner � l'objet (INCONNU = attribution automatique de l'index au premier index libre connu)
-	\return L'index attribu� � l'objet dans l'environnement (INCONNU = echec de l'ajout)
+	\return false si OK, true si un JC a été écrasé
 	\todo Placer une section critique pour un usage temps r�el
 	\author Hugues Romain
 	\date 2003-2005
@@ -2148,23 +1929,23 @@ Pour rappel si besoin, anciens param�tres suppl�mentaires (code en commentai
                      Sinon -> sauvegarde le contenu de la variable sur le
                               fichier
 */
-tIndex cEnvironnement::Enregistre(cJC* JCAAjouter, tIndex Code)
+bool cEnvironnement::Enregistre(cJC* JCAAjouter)
 {
 	// Se r�server la main
 #ifdef UNIX
 	pthread_mutex_lock( &mutex_environnement );
 #endif
-	 
-	// D�termination du num�ro du JC
-	if (Code == INCONNU)
-		Code = ProchainNumeroJC();
 
-	// Cr�ation du lien dans le tableau des pointeurs de l'environnement
-	_JC[(size_t) Code] = JCAAjouter;
+	// Search of calendar with same id
+	CalendarsMap::const_iterator iter = _JC.find(JCAAjouter->getId());
 	
-	// MAJ du code dans l'objet
-	JCAAjouter->setIndex(Code);
+	// deletion of old calendar if exists
+	if (iter != _JC.end())
+		delete iter->second;
 
+	// link to the new calendar
+	_JC[JCAAjouter->getId()] = JCAAjouter;
+	
 	// Sauvegarde m�moire morte
 /*	if (Sauvegarde)
 	{
@@ -2231,7 +2012,7 @@ tIndex cEnvironnement::Enregistre(cJC* JCAAjouter, tIndex Code)
 #endif
 	 
 	// Sortie
-	return Code;
+	return iter != _JC.end();
 }
 
 
@@ -2290,6 +2071,7 @@ void cEnvironnement::JCSupprimerInutiles(bool Supprimer)
  - Si le masque est non vide, toutes les lignes dont le d�but du code correspond au masque sont compt�es
  - Si le masque est non vide et compos� de plusieurs codes s�par�s par des points virgules, alors les lignes sont successivement compar�es � chaque code fourni
 */
+/*
 size_t cEnvironnement::NombreLignes(const cTexte& MasqueCode) const
 {
 	// Variables locales
@@ -2315,7 +2097,7 @@ size_t cEnvironnement::NombreLignes(const cTexte& MasqueCode) const
 			for (LinesMap::const_iterator iter = _lines.begin(); iter != _lines.end(); ++iter)
 			{
 				// Correspondance au code fourni si non nul, comptage syst�matique sinon
-				if (!MasqueCode.Taille() || iter->second->getCode().Compare(MasqueCode, lLongueur, 0, lPosition))
+				if (!MasqueCode.Taille() || iter->second->getCode().substr(0,  == .Compare(MasqueCode, lLongueur, 0, lPosition))
 					lNombreLignes++;
 			}
 
@@ -2328,7 +2110,7 @@ size_t cEnvironnement::NombreLignes(const cTexte& MasqueCode) const
 	// Sortie
 	return(lNombreLignes);
 }
-
+*/
 
 
 /*!	\brief Date interpr�t�e en fonction d'un texte descriptif et des donn�es de l'environnement
@@ -2373,7 +2155,7 @@ bool cEnvironnement::ControleNumerosArretCommuneDesignation(int nA, int nC, cons
 {
 	return	(	getLogicalPlace(nA) != NULL
 			&&	getLogicalPlace(nA)->getTown()->getId() == nC
-			&&	getLogicalPlace(nA)->getName().Compare(txtA)
+			&&	getLogicalPlace(nA)->getName() == string(txtA.Texte())
 			);
 }
 
@@ -2395,19 +2177,14 @@ Cette m�thode effectue l'initialisation des param�tres d'une ligne en foncti
  
 \warning En raison des �critures de valeurs par d�faut, et des besoins de conna�tre ces valeurs pour compl�ter l'objet ligne, cette m�thode doit �tre appel�e le plus t�t possible apr�s la cr�ation de la ligne. En particulier, aucun service ne doit �tre ajout� � la ligne avant le lancement de cette m�thode.
 */
-bool cEnvironnement::Enregistre(cLigne* Obj)
+bool cEnvironnement::Enregistre(cLigne* const Obj)
 {
-	// Valeurs par d�faut selon r�gles de l'environnement
-	Obj->setResa(getResa(0));
-	Obj->setVelo(getVelo(0));
-	Obj->setHandicape(getHandicape(0));
-	Obj->setAnneesCirculation(PremiereAnnee(), DerniereAnnee());
-	
-	// Chainage
-	_lines[string(Obj->getCode().Texte())] = Obj;
-	
-	// Succ�s
-	return true;
+	cLigne* old = GetLigne(Obj->getCode());
+	delete old;
+
+	_lines[Obj->getCode()] = Obj;
+
+	return old != NULL;
 }
 
 
@@ -2488,48 +2265,43 @@ cDate cEnvironnement::DateMinPossible() const
 }
 
 
-cMateriel* cEnvironnement::GetMateriel(tIndex n) const
+cMateriel* cEnvironnement::GetMateriel(size_t n) const
 {
-	return vMateriel.at(n);
+	RollingStockMap::const_iterator iter = vMateriel.find(n);
+	return iter == vMateriel.end() ? NULL : iter->second;
 }
 
 
 
 
-/*!	\brief M�thode d'enregistrement d'un materiel dans l'environnement
+/** Enregistrement d'un materiel dans l'environnement
 	\param newVal Materiel a ajouter
-	\return l'index du materiel (INCONNU si le materiel n'a pu �tre ajout�e (contr�le de l'index)
+	@return false if OK (id was free), true else
 	\author Hugues Romain
-	\date 2001-2005
+	\date 2001-2006
 */
-tIndex		
-cEnvironnement::Enregistre(cMateriel* materiel, tIndex index) {
-	//! \todo throw an exception on duplicate element ([index] != NULL)
-	if (index >= vMateriel.size()) {
-		// resize the vector
-		vMateriel.resize(index+1, NULL);
-	}
-	vMateriel[index] = materiel;
-	return index;
+bool cEnvironnement::Enregistre(cMateriel* const materiel)
+{
+	cMateriel* old = GetMateriel(materiel->Code());
+	delete old;
+	vMateriel[materiel->Code()] = materiel;
+	return old != NULL;
 }
 
 
 
 /*!	\brief M�thode d'enregistrement d'une modalit� de r�servation dans l'environnement
 	\param newVal Modalit� de r�servation � ajouter
-	\return l'index de la modalit� de r�servation (INCONNU si la modalit� de r�servation n'a pu �tre ajout�e (contr�le de l'index)
+	\return false if OK the index was free, true else
 	\author Hugues Romain
 	\date 2001-2005
 */
-tIndex cEnvironnement::Enregistre(cModaliteReservation* newVal, tIndex index)
+bool cEnvironnement::Enregistre(cModaliteReservation* newVal)
 {
-	//! \todo throw an exception on duplicate element ([index] != NULL)
-	if (index >= vResa.size()) {
-		// resize the vector
-		vResa.resize(index+1, NULL);
-	}
-	vResa[index] = newVal;
-	return index;
+	cModaliteReservation* old = getResa(newVal->Index());
+	delete old;
+	vResa[newVal->Index()] = newVal;
+	return old != NULL;
 }
 
 
@@ -2537,56 +2309,53 @@ tIndex cEnvironnement::Enregistre(cModaliteReservation* newVal, tIndex index)
 /*!	\brief M�thode d'enregistrement d'un objet tarification dans l'environnement
 	\param newVal La tarification � ajouter � l'environnement
 	\param newNum L'index de la tarification dans l'environnement
-	\return false si un tarif a été écrasé, true sinon
+	\return true si un tarif a été écrasé, false sinon
 	\author Hugues Romain
 	\date 2001-2005
 */
 bool cEnvironnement::Enregistre(cTarif* const newVal)
 {
-	FaresMap::const_iterator iter = vTarif.find(newVal->getNumeroTarif());
-	if (iter != vTarif.end())
-		delete iter->second;
-
+	cTarif* old = getTarif(newVal->getNumeroTarif());
+	delete old;
 	vTarif[newVal->getNumeroTarif()] = newVal;
-	return iter == vTarif.end();
+	return old != NULL;
 }
 
 
 
 
-tIndex cEnvironnement::Enregistre(cHandicape *newVal, tIndex index)
+bool cEnvironnement::Enregistre(cHandicape * const newVal)
 {
-	//! \todo throw an exception on duplicate element ([index] != NULL)
-	if (index >= vHandicape.size()) {
-		// resize the vector
-		vHandicape.resize(index+1, NULL);
-	}
-	vHandicape[index] = newVal;
-	return index;	
+	cHandicape* old = getHandicape(newVal->getId());
+	delete old;
+	vHandicape[newVal->getId()] = newVal;
+	return old != NULL;
 }
 
 
-tIndex cEnvironnement::Enregistre(cVelo *newVal, tIndex index)
+bool cEnvironnement::Enregistre(cVelo * const newVal)
 {
-	//! \todo throw an exception on duplicate element ([index] != NULL)
-	if (index >= vVelo.size()) {
-		// resize the vector
-		vVelo.resize(index+1, NULL);
-	}
-	vVelo[index] = newVal;
-	return index;	
+	cVelo* old = getVelo(newVal->getId());
+	delete old;
+	vVelo[newVal->getId()] = newVal;
+	return old != NULL;
+}
+
+bool cEnvironnement::Enregistre(LogicalPlace* const item)
+{
+	LogicalPlace* old = getLogicalPlace(item->getId());
+	delete old;
+	_logicalPlaces[item->getId()] = item;
+	return old != NULL;
 }
 
 
-tIndex cEnvironnement::Enregistre(cReseau *newVal, tIndex index)
+bool cEnvironnement::Enregistre(cReseau *newVal)
 {
-	//! \todo throw an exception on duplicate element ([index] != NULL)
-	if (index >= vReseau.size()) {
-		// resize the vector
-		vReseau.resize(index+1, NULL);
-	}
-	vReseau[index] = newVal;
-	return index;	
+	cReseau* old = getReseau(newVal->getId());
+	delete old;
+	vReseau[newVal->getId()] = newVal;
+	return old != NULL;
 }
 
 
@@ -2619,10 +2388,6 @@ LogicalPlace* cEnvironnement::getLogicalPlace(size_t id) const
 	return iter == _logicalPlaces.end() ? NULL : iter->second;
 }
 
-void cEnvironnement::addLogicalPlace(LogicalPlace* logicalPlace)
-{
-	_logicalPlaces[logicalPlace->getId()] = logicalPlace;
-}
 
 
 /** Recherche de commune par nom, en correspondance exacte.
@@ -2679,27 +2444,31 @@ const cTexte& cEnvironnement::getNomRepertoireHoraires() const
 }
 
 
-cModaliteReservation* cEnvironnement::getResa(tIndex n) const
+cModaliteReservation* cEnvironnement::getResa(size_t n) const
 {
-	return vResa.at (n);
+	ReservationRulesMap::const_iterator iter = vResa.find(n);
+	return iter == vResa.end() ? NULL : iter->second;
 }
 
 
-cReseau* cEnvironnement::getReseau(tIndex n) const
+cReseau* cEnvironnement::getReseau(size_t n) const
 {
-	return vReseau.at (n);
+	NetworksMap::const_iterator iter = vReseau.find(n);
+	return iter == vReseau.end() ? NULL : iter->second;
 }
 
 
 
-cVelo* cEnvironnement::getVelo(tIndex n) const
+cVelo* cEnvironnement::getVelo(size_t n) const
 {
-	return(vVelo.at (n));
+	BikeCompliancesMap::const_iterator iter = vVelo.find(n);
+	return iter == vVelo.end() ? NULL : iter->second;
 }
 
-cHandicape* cEnvironnement::getHandicape(tIndex n) const
+cHandicape* cEnvironnement::getHandicape(size_t n) const
 {
-	return(vHandicape. at (n));
+	HandicappedCompliancesMap::const_iterator iter = vHandicape.find(n);
+	return iter == vHandicape.end() ? NULL : iter->second;
 }
 
 
@@ -2758,7 +2527,7 @@ void cEnvironnement::SetDateMaxReelle(const cDate& newDate)
 	\author Hugues Romain
 	\date 2005
 */
-tIndex cEnvironnement::Index() const
+const size_t& cEnvironnement::Index() const
 {
 	return Code;
 }
