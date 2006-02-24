@@ -555,7 +555,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 					break;
 
 				case HORAIRESFORMATLIGNEFin:
-					for (iService=0; iService<curLigne->getServices().size(); ++iService)
+					for (size_t iService=0; iService<curLigne->getServices().size(); ++iService)
 						if (vFormatHoraire.GetColonnePosition(HORAIRESFORMATCOLONNEHoraire, iService) < Tampon.Taille() && Tampon[vFormatHoraire.GetColonnePosition(HORAIRESFORMATCOLONNEHoraire, iService)]!=' ')
 						{
 							HeureDernier = vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNEHoraire, iService);
@@ -564,8 +564,8 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 					break;
 
 				case HORAIRESFORMATLIGNENumero:
-					for (iService=0; iService!=curLigne->getServices().size(); iService++)
-						curLigne->getTrain(i)->setNumero(vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNEHoraire, iService));
+					for (size_t iService=0; iService!=curLigne->getServices().size(); iService++)
+						curLigne->getTrain(iService)->setNumero(vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNEHoraire, iService));
 					break;
 
 				// Enregistrement des horaires g�r� par des piles.
@@ -646,7 +646,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 
 					// Service continu
 					if (curLigne->getLineStops().front() == curGareLigne)
-						for (iService = 0; iService != curLigne->getServices().size(); iService++)
+						for (size_t iService = 0; iService != curLigne->getServices().size(); iService++)
 							if (curLigne->getTrain(iService)->EstCadence())
 							{
 								HeurePremier = vFormatHoraire.Extrait(Tampon, HORAIRESFORMATCOLONNEHoraire, iService);
@@ -668,7 +668,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 
 						// Controle de vitesse
 						if (DerniereGLAvecHoraires != NULL)
-							for (iService=0; iService!=curLigne->getServices().size(); iService++)
+							for (size_t iService=0; iService!=curLigne->getServices().size(); iService++)
 							{
 								if (curGareLigne->PM() > DerniereGLAvecHoraires->PM())
 									Distance = curGareLigne->PM() - DerniereGLAvecHoraires->PM();

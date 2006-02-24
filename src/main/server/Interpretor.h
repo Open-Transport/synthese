@@ -127,7 +127,7 @@ public:
 				id = 0;
 		
 			// Adding of the element
-			add(Key, element, id);
+			add(key, element, id);
 
 			// returns the id
 			return id;

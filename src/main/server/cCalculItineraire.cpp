@@ -809,7 +809,7 @@ bool cCalculateur::MeilleureArrivee(cTrajet& __Resultat, cTrajet& __TrajetEffect
 	_LogTrace.Ecrit(LogDebug, __TrajetEffectue, vIterationsArr, "", "");
 	
 	// Obtention de la liste des trajets directs possibles au d�part de l'arr�t
-	BestSolutionMap& __ElementsTrajetsDirects = ListeDestinations(__TrajetEffectue, MomentDepartStrict, OptimisationAFaire);
+	BestSolutionMap __ElementsTrajetsDirects = ListeDestinations(__TrajetEffectue, MomentDepartStrict, OptimisationAFaire);
 	
 	// Etude de chaque possibilit� en effectuant une correspondance par les �l�ments de trajet direct propos�s
 	for (BestSolutionMap::iterator iterSolution = __ElementsTrajetsDirects.begin();

@@ -337,8 +337,9 @@ bool cLigne::allowAddServiceHoraire(const cHoraire* tbHoraires) const
 	
 	// D�termination du numero de service futur
 	// Insertion du service: d�termination du rang
-	
-	for (size_t iNumeroService=0; iNumeroService< vTrain.size(); iNumeroService++)
+	size_t iNumeroService;
+
+	for (iNumeroService=0; iNumeroService< vTrain.size(); iNumeroService++)
 		if (tbHoraires[1] < _lineStops.front() ->getHoraireDepartPremier(iNumeroService))
 			break;
 	//END PORTAGE LINUX

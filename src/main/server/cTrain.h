@@ -11,7 +11,7 @@ class cSitPert;
 class cJC;
 
 #include "cTexte.h"
-#include "temps.h"
+#include "Temps.h"
 
 /** Impl�mentation de la notion de @ref defCirculation
 	@ingroup m05

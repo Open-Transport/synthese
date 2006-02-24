@@ -11,7 +11,7 @@ class cGareLigne;
 
 #include "cSite.h"
 #include "Parametres.h"
-#include "cheure.h"
+#include "cHeure.h"
 #include <set>
 
 /** @defgroup m34 34 Tableaux d'affichage
