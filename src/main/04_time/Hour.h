@@ -26,7 +26,7 @@ class Hour
 
     public :
 
-        Hour ( int hours, int minutes );
+        Hour ( int hours = UNKNOWN_VALUE, int minutes = UNKNOWN_VALUE);
         Hour ( const Hour& ref );
 
 
@@ -37,6 +37,14 @@ class Hour
         int getMinutes() const;
         int getHours() const;
         //@}
+
+
+        //! @name Query methods
+        //@{
+	bool isValid () const;
+	bool isUnknown () const;
+	//@}
+
 
         //! @name Update methods
         //@{

@@ -17,6 +17,9 @@ namespace synthese
 namespace time
 {
 
+static const int UNKNOWN_VALUE = -1;
+
+
 static const int LEAP_YEAR_DAYS_COUNT = 366;
 static const int NON_LEAP_YEAR_DAYS_COUNT = 365;
 
@@ -30,6 +33,7 @@ static const char TIME_MAX = 'M';
 static const char TIME_UNCHANGED = '_';
 static const char TIME_SAME = 'I';
 static const char TIME_CURRENT = 'A';
+static const char TIME_UNKNOWN = '?';
 
 }
 

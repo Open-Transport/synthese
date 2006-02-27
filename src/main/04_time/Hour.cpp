@@ -16,8 +16,6 @@ Hour::Hour ( int hours, int minutes )
         : _hours ( hours )
         , _minutes ( minutes )
 {
-    assert ( ( _hours >= 0 ) && ( _hours < HOURS_PER_DAY ) );
-    assert ( ( _minutes >= 0 ) && ( _minutes < MINUTES_PER_HOUR ) );
 }
 
 
@@ -25,8 +23,7 @@ Hour::Hour ( const Hour& ref )
         : _hours ( ref._hours )
         , _minutes ( ref._minutes )
 {
-    assert ( ( _hours >= 0 ) && ( _hours < HOURS_PER_DAY ) );
-    assert ( ( _minutes >= 0 ) && ( _minutes < MINUTES_PER_HOUR ) );
+ 
 }
 
 
@@ -48,6 +45,22 @@ Hour::getHours() const
     return _hours;
 }
 
+
+
+bool 
+Hour::isValid () const
+{
+  return ( _hours >= 0 ) && ( _hours < HOURS_PER_DAY ) &&
+    ( _minutes >= 0 ) && ( _minutes < MINUTES_PER_HOUR );
+}
+
+
+
+bool 
+Hour::isUnknown () const
+{
+  return (_hours == UNKNOWN_VALUE) || (_minutes == UNKNOWN_VALUE);
+}
 
 
 
@@ -230,6 +243,8 @@ Hour::setTimePattern( int hours, int minutes )
         _hours = 23;
     else if ( hours == TIME_MIN )
         _hours = 0;
+    else if (hours == TIME_UNKNOWN)
+        _hours = UNKNOWN_VALUE;
     else if ( hours != TIME_UNCHANGED )
         _hours = hours;
 
@@ -239,6 +254,8 @@ Hour::setTimePattern( int hours, int minutes )
         _minutes = 59;
     else if ( minutes == TIME_MIN || minutes == TIME_SAME && hours == TIME_MIN )
         _minutes = 0;
+    else if (_minutes == TIME_UNKNOWN || minutes == TIME_SAME && hours == TIME_UNKNOWN)
+        _minutes = UNKNOWN_VALUE;
     else if ( minutes != TIME_UNCHANGED && ( minutes != TIME_SAME || hours != TIME_UNCHANGED ) )
         _minutes = minutes;
 }
