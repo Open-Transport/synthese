@@ -9,7 +9,7 @@ namespace time
 {
 
 
-Year::Year ( YearValue value )
+Year::Year ( int value )
         : _value ( value )
 {}
 
@@ -20,7 +20,7 @@ Year::Year ( const Year& ref )
 
 
 
-YearValue
+int
 Year::getValue () const
 {
     return _value;
@@ -39,7 +39,7 @@ Year::isLeapYear() const
 }
 
 
-DaysDuration
+int
 Year::getDaysCount () const
 {
     return isLeapYear () ? LEAP_YEAR_DAYS_COUNT :
@@ -52,7 +52,7 @@ Year::getDaysCount () const
 
 
 Year&
-Year::operator=( YearValue value )
+Year::operator=( int value )
 {
     _value = value;
     return *this;

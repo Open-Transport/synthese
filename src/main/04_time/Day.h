@@ -20,20 +20,20 @@ class Day
 {
     private:
 
-        DayValue _value; //!< Numeric value for day (1 .. 31)
+        int _value; //!< Numeric value for day (1 .. 31)
 
     public:
 
-        Day ( DayValue value );
+        Day ( int value );
         Day ( const Day& ref );
 
 
-        //! \name Getters/Setters
+        //! @name Getters/Setters
         //@{
-        DayValue getValue () const;
+        int getValue () const;
         //@}
 
-        Day& operator=( const DayValue );
+        Day& operator=( const int );
         Day& operator--( int );
         Day& operator++( int );
 

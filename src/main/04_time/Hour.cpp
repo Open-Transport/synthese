@@ -12,7 +12,7 @@ namespace time
 {
 
 
-Hour::Hour ( HourValue hours, MinuteValue minutes )
+Hour::Hour ( int hours, int minutes )
         : _hours ( hours )
         , _minutes ( minutes )
 {
@@ -35,14 +35,14 @@ Hour::~Hour()
 
 
 
-MinuteValue
+int
 Hour::getMinutes() const
 {
     return _minutes;
 }
 
 
-HourValue
+int
 Hour::getHours() const
 {
     return _hours;
@@ -124,10 +124,10 @@ std::ostream& operator<< ( std::ostream& os, const Hour& op )
 
 
 
-MinutesDuration
+int
 operator-( const Hour& op1, const Hour& op2 )
 {
-    MinutesDuration result = 0;
+    int result = 0;
 
     // 1: Minutes
     int retain = ( MINUTES_PER_HOUR - 1 + op2.getMinutes() - op1.getMinutes() ) / MINUTES_PER_HOUR;
@@ -143,8 +143,8 @@ operator-( const Hour& op1, const Hour& op2 )
 
 
 
-DaysDuration
-Hour::operator+=( MinutesDuration minutesToAdd )
+int
+Hour::operator+=( int minutesToAdd )
 {
     // 1: Minutes
     int calculatedTime = getMinutes () + minutesToAdd;
@@ -163,12 +163,9 @@ Hour::operator+=( MinutesDuration minutesToAdd )
 
 
 
-DaysDuration
-Hour::operator-=( MinutesDuration minutesToSubstract )
+int
+Hour::operator-=( int minutesToSubstract )
 {
-    int HeuresAEnlever;
-    int Retenue;
-
     // 1: Minutes
     int retain = ( MINUTES_PER_HOUR - 1 + minutesToSubstract - getMinutes() ) / MINUTES_PER_HOUR;
     _minutes = retain * MINUTES_PER_HOUR + _minutes - minutesToSubstract;
@@ -216,7 +213,7 @@ Hour::operator = ( const std::string& op )
 
 
 void
-Hour::setTimePattern( HourValue hours, MinuteValue minutes )
+Hour::setTimePattern( int hours, int minutes )
 {
     time_t rawtime;
     struct tm * timeinfo = 0;

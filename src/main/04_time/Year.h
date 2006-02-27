@@ -22,28 +22,28 @@ class Year
 {
     private:
 
-        YearValue _value; //!< Numeric value for year
+        int _value; //!< Numeric value for year
 
     public:
 
-        Year ( YearValue value );
+        Year ( int value );
         Year ( const Year& );
 
 
-        //! \name Getters/Setters
+        //! @name Getters/Setters
         //@{
-        YearValue getValue () const;
+        int getValue () const;
         //@}
 
 
-        //! \name Query methods
+        //! @name Query methods
         //@{
         bool isLeapYear () const;
-        DaysDuration getDaysCount () const;
+        int getDaysCount () const;
         //@}
 
 
-        Year& operator= ( YearValue value );
+        Year& operator= ( int value );
         Year& operator-- ( int );
         Year& operator++ ( int );
 

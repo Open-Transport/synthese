@@ -11,7 +11,7 @@ namespace time
 
 
 
-Schedule::Schedule ( const Hour& hour, DaysDuration daysSinceDeparture )
+Schedule::Schedule ( const Hour& hour, int daysSinceDeparture )
         : _hour ( hour )
         , _daysSinceDeparture ( daysSinceDeparture )
 {
@@ -44,7 +44,7 @@ Schedule::getHour() const
 
 
 
-HourValue
+int
 Schedule::getHours() const
 {
     return _hour.getHours ();
@@ -52,7 +52,7 @@ Schedule::getHours() const
 
 
 
-MinuteValue
+int
 Schedule::getMinutes() const
 {
     return _hour.getMinutes ();
@@ -60,7 +60,7 @@ Schedule::getMinutes() const
 
 
 
-DaysDuration
+int
 Schedule::getDaysSinceDeparture () const
 {
     return _daysSinceDeparture;
@@ -68,7 +68,7 @@ Schedule::getDaysSinceDeparture () const
 
 
 void
-Schedule::setDaysSinceDeparture ( DaysDuration daysSinceDeparture )
+Schedule::setDaysSinceDeparture ( int daysSinceDeparture )
 {
     _daysSinceDeparture = daysSinceDeparture;
 }
@@ -96,7 +96,7 @@ Schedule::setMaximum()
 
 
 Schedule&
-Schedule::operator += ( MinutesDuration op )
+Schedule::operator += ( int op )
 {
     _daysSinceDeparture = ( _daysSinceDeparture + ( _hour += op ) );
     return ( *this );
@@ -167,14 +167,13 @@ operator > ( const Schedule& op1, const Hour& op2 )
 
 
 
-MinutesDuration
+int
 operator - ( const Schedule& op1, const Schedule& op2 )
 {
-    MinutesDuration result;
     int retain = 0;
 
     // 1: Hour
-    result = op1.getHour () - op2.getHour ();
+    int result = op1.getHour () - op2.getHour ();
 
     if ( result < 0 )
     {

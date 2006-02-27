@@ -8,7 +8,7 @@ namespace synthese
 namespace time
 {
 
-Day::Day ( DayValue value )
+Day::Day ( int value )
         : _value ( value )
 {
     assert ( ( _value >= 1 ) && ( _value <= 31 ) );
@@ -22,7 +22,7 @@ Day::Day ( const Day& ref )
 }
 
 
-DayValue
+int
 Day::getValue () const
 {
     return _value;
@@ -32,7 +32,7 @@ Day::getValue () const
 
 
 Day&
-Day::operator= ( const DayValue value )
+Day::operator= ( const int value )
 {
     _value = value;
     return *this;

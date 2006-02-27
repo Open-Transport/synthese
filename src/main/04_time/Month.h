@@ -22,45 +22,45 @@ class Year;
 class Month
 {
     private:
-        MonthValue _value; //!< Numeric value for month (1=January ... 12=December)
+        int _value; //!< Numeric value for month (1=January ... 12=December)
 
     public:
 
-        Month ( MonthValue value );
+        Month ( int value );
         Month ( const Month& ref );
 
-        //! \name Getters/Setters
+        //! @name Getters/Setters
         //@{
-        MonthValue getValue () const;
+        int getValue () const;
         //@}
 
 
-        //! \name Query methods
+        //! @name Query methods
         //@{
 
-        /*! \brief Number of days in this month
+        /** Number of days in this month.
           \param year Year for this month
           \return Number of days in this month, taking into account leap years
         */
-        DaysDuration getDaysCount ( const Year& ) const;
+        int getDaysCount ( const Year& ) const;
 
-        /*! \brief Number of days left til the end of this month
+        /** Number of days left til the end of this month.
           \param day Current day of this month
           \param year Year of this month
           \return Number of days left til the end of this month,
           excluding current day
         */
-        DaysDuration getDaysLeftToEndOfMonth ( DayValue day, const Year& year ) const;
+        int getDaysLeftToEndOfMonth ( int day, const Year& year ) const;
 
 
-        DaysDuration getDaysLeftToMonth ( const Year& startYear,
-                                          MonthValue endMonth,
+        int getDaysLeftToMonth ( const Year& startYear,
+                                          int endMonth,
                                           const Year& endYear ) const;
 
         //@}
 
 
-        Month& operator=( MonthValue );
+        Month& operator=( int );
         Month& operator--( int );
         Month& operator++( int );
 

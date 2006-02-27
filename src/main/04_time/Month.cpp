@@ -15,7 +15,7 @@ namespace time
 
 
 
-Month::Month ( MonthValue value )
+Month::Month ( int value )
         : _value ( value )
 {
     assert ( ( _value >= 1 ) && ( _value <= 12 ) );
@@ -31,7 +31,7 @@ Month::Month ( const Month& ref )
 
 
 
-MonthValue
+int
 Month::getValue () const
 {
     return _value;
@@ -40,7 +40,7 @@ Month::getValue () const
 
 
 
-DaysDuration
+int
 Month::getDaysCount ( const Year& year ) const
 {
     switch ( _value )
@@ -67,8 +67,8 @@ Month::getDaysCount ( const Year& year ) const
 
 
 
-DaysDuration
-Month::getDaysLeftToEndOfMonth ( DayValue day, const Year& year ) const
+int
+Month::getDaysLeftToEndOfMonth ( int day, const Year& year ) const
 {
     return ( getDaysCount ( year ) - day );
 }
@@ -76,7 +76,7 @@ Month::getDaysLeftToEndOfMonth ( DayValue day, const Year& year ) const
 
 
 Month&
-Month::operator=( MonthValue value )
+Month::operator=( int value )
 {
     _value = value;
     return *this;
@@ -103,12 +103,12 @@ Month::operator++( int )
 
 
 
-DaysDuration
+int
 Month::getDaysLeftToMonth ( const Year& startYear,
-                            MonthValue endMonth,
+                            int endMonth,
                             const Year& endYear ) const
 {
-    DaysDuration result = 0;
+    int result = 0;
     Month startMonth ( *this );
 
     Year tmpStartYear ( startYear );

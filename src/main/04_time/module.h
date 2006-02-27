@@ -16,14 +16,6 @@ namespace synthese
 /** 04_time namespace */
 namespace time
 {
-typedef int YearValue;
-typedef int MonthValue;
-typedef int DayValue;
-typedef int HourValue;
-typedef int MinuteValue;
-
-typedef int DaysDuration;
-typedef int MinutesDuration;
 
 static const int LEAP_YEAR_DAYS_COUNT = 366;
 static const int NON_LEAP_YEAR_DAYS_COUNT = 365;
