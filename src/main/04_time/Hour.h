@@ -26,7 +26,7 @@ class Hour
 
     public :
 
-        Hour ( int hours = UNKNOWN_VALUE, int minutes = UNKNOWN_VALUE);
+        Hour ( int hours = UNKNOWN_VALUE, int minutes = UNKNOWN_VALUE );
         Hour ( const Hour& ref );
 
 
@@ -41,9 +41,9 @@ class Hour
 
         //! @name Query methods
         //@{
-	bool isValid () const;
-	bool isUnknown () const;
-	//@}
+        bool isValid () const;
+        bool isUnknown () const;
+        //@}
 
 
         //! @name Update methods
@@ -54,8 +54,8 @@ class Hour
           @param minutes Minutes (A=current, M=maximum, m=minimum,
                                   _=unchanged, I=same than hours)
         */
-        void setTimePattern( int hour = TIME_CURRENT,
-                             int minutes = TIME_SAME );
+        void updateHour ( int hour = TIME_CURRENT,
+                          int minutes = TIME_SAME );
 
         //@}
 

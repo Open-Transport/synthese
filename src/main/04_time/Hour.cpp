@@ -15,15 +15,13 @@ namespace time
 Hour::Hour ( int hours, int minutes )
         : _hours ( hours )
         , _minutes ( minutes )
-{
-}
+{}
 
 
 Hour::Hour ( const Hour& ref )
         : _hours ( ref._hours )
         , _minutes ( ref._minutes )
 {
- 
 }
 
 
@@ -47,19 +45,19 @@ Hour::getHours() const
 
 
 
-bool 
+bool
 Hour::isValid () const
 {
-  return ( _hours >= 0 ) && ( _hours < HOURS_PER_DAY ) &&
-    ( _minutes >= 0 ) && ( _minutes < MINUTES_PER_HOUR );
+    return ( _hours >= 0 ) && ( _hours < HOURS_PER_DAY ) &&
+           ( _minutes >= 0 ) && ( _minutes < MINUTES_PER_HOUR );
 }
 
 
 
-bool 
+bool
 Hour::isUnknown () const
 {
-  return (_hours == UNKNOWN_VALUE) || (_minutes == UNKNOWN_VALUE);
+    return ( _hours == UNKNOWN_VALUE ) || ( _minutes == UNKNOWN_VALUE );
 }
 
 
@@ -213,7 +211,7 @@ Hour::operator = ( const std::string& op )
     }
     else if ( op.size () == 1 )
     {
-        setTimePattern( op[ 0 ] );
+        updateHour ( op[ 0 ] );
     }
     else
     {
@@ -226,7 +224,7 @@ Hour::operator = ( const std::string& op )
 
 
 void
-Hour::setTimePattern( int hours, int minutes )
+Hour::updateHour ( int hours, int minutes )
 {
     time_t rawtime;
     struct tm * timeinfo = 0;
@@ -243,7 +241,7 @@ Hour::setTimePattern( int hours, int minutes )
         _hours = 23;
     else if ( hours == TIME_MIN )
         _hours = 0;
-    else if (hours == TIME_UNKNOWN)
+    else if ( hours == TIME_UNKNOWN )
         _hours = UNKNOWN_VALUE;
     else if ( hours != TIME_UNCHANGED )
         _hours = hours;
@@ -254,7 +252,7 @@ Hour::setTimePattern( int hours, int minutes )
         _minutes = 59;
     else if ( minutes == TIME_MIN || minutes == TIME_SAME && hours == TIME_MIN )
         _minutes = 0;
-    else if (_minutes == TIME_UNKNOWN || minutes == TIME_SAME && hours == TIME_UNKNOWN)
+    else if ( _minutes == TIME_UNKNOWN || minutes == TIME_SAME && hours == TIME_UNKNOWN )
         _minutes = UNKNOWN_VALUE;
     else if ( minutes != TIME_UNCHANGED && ( minutes != TIME_SAME || hours != TIME_UNCHANGED ) )
         _minutes = minutes;

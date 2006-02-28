@@ -1,5 +1,5 @@
 /** 04_time module wide definitions
-   @file module.h
+  @file module.h
 */
 
 #ifndef SYNTHESE_TIME_MODULE_H
@@ -9,7 +9,7 @@ namespace synthese
 {
 
 /** @defgroup m04 04 Time classes
-
+ 
 @{
 */
 
@@ -19,6 +19,7 @@ namespace time
 
 static const int UNKNOWN_VALUE = -1;
 
+static const int MAX_YEAR = 9999;
 
 static const int LEAP_YEAR_DAYS_COUNT = 366;
 static const int NON_LEAP_YEAR_DAYS_COUNT = 365;

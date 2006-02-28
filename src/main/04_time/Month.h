@@ -54,8 +54,8 @@ class Month
 
 
         int getDaysLeftToMonth ( const Year& startYear,
-                                          int endMonth,
-                                          const Year& endYear ) const;
+                                 int endMonth,
+                                 const Year& endYear ) const;
 
         //@}
 

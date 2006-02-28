@@ -43,8 +43,8 @@ class Schedule
 
         //! @name Update methods
         //@{
-        Schedule& setMinimum();
-        Schedule& setMaximum();
+        void setMinimum();
+        void setMaximum();
         //@}
 
 

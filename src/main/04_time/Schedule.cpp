@@ -32,8 +32,7 @@ Schedule::Schedule ( const Schedule& ref )
 
 
 Schedule::~Schedule ()
-{
-}
+{}
 
 
 const Hour&
@@ -76,22 +75,19 @@ Schedule::setDaysSinceDeparture ( int daysSinceDeparture )
 
 
 
-Schedule&
+void
 Schedule::setMinimum()
 {
     _daysSinceDeparture = 0;
-    _hour.setTimePattern( TIME_MIN, TIME_MIN );
-    return ( *this );
+    _hour.updateHour ( TIME_MIN, TIME_MIN );
 }
 
 
-Schedule&
+void
 Schedule::setMaximum()
 {
     _daysSinceDeparture = 255;
-    _hour.setTimePattern( TIME_MAX, TIME_MAX );
-    return ( *this );
-
+    _hour.updateHour( TIME_MAX, TIME_MAX );
 }
 
 
