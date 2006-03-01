@@ -10,6 +10,19 @@ body {
 img.titre {
 	margin:-5px;
 }
+
+.logo {
+  color: white;
+  background-color: rgb(0,25,80);
+  height: 50px;
+}
+
+.banner {
+  color: white;
+  background: url(banner.jpg) repeat-x top left;
+  height: 60px;
+}
+
 H1 {
 	text-align: right;
      font-weight: bold;
