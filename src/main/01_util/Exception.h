@@ -15,7 +15,7 @@ namespace util
 {
 
 /** Base exception class
-@ingroup m04
+@ingroup m01
 */
 class Exception : public std::exception
 {

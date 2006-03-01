@@ -179,25 +179,6 @@ class cTexteHTML : public cTexte
                 };
 
 
-                /*! \brief Classe de texte destinée à gérer du texte devant être comparé avec évaluation de pertinence, pour intégration à un moteur de recherche d'objets par leur nom
-                 \author Hugues Romain
-                 \date 2005
-                */
-            class cTexteRecherche : public cTexte
-                {
-
-                    protected:
-                        cTexteMinuscules* _Mots;  //!< Liste des mots contenus dans le texte de base
-                        int _NombreMots; //!< Nombre de mots
-
-                        void Finalise();
-
-                    public:
-                        cTexteRecherche();
-                        ~cTexteRecherche();
-                };
-
-
                 /*! \brief Ecriture sur l'objet depuis un flux d'entrée quelconque
                  \param flux Le flux d'entrée
                  \param Obj L'objet cTexte sur lequel écrire

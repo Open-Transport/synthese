@@ -1,0 +1,21 @@
+Import ('testenv')
+testmoduleenv = testenv.Copy()
+
+includes = '*.cpp'
+excludes = []
+
+testmoduleenv.Append (CPPPATH = [Dir('../../main/01_util').srcnode().abspath] )
+testmoduleenv.Append (LIBPATH = [Dir('../../main/01_util')] )
+
+testmoduleenv.Append (LIBS = ['01_util'] )
+testmoduleenv.Append (LIBS = ['boost_iostreams'] )
+
+files = testmoduleenv.Glob(includes, excludes)
+
+testmodulename = testmoduleenv.DefaultTestModuleName ()
+
+testprogram = testmoduleenv.Program(testmodulename, files)
+
+testmoduleenv.Test("test.passed", testprogram)
+
+

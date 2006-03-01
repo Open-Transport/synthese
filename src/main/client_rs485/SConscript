@@ -14,6 +14,6 @@ moduleenv.AppendMultithreadConf ()
 files = moduleenv.Glob(includes, excludes)
 
 
-if (moduleenv['PLATFORM'] == 'win32'):
-  # Does not compile under posix at the moment !
-  moduleenv.Program(moduleenv.DefaultModuleName (), files)
+#if (moduleenv['PLATFORM'] == 'win32'):
+# Does not compile under posix at the moment !
+moduleenv.Program(moduleenv.DefaultModuleName (), files)
