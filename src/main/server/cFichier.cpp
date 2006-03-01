@@ -22,7 +22,7 @@
 #include "cArretPhysique.h"
 #include "LogicalPlace.h"
 #include "cCommune.h"
-#include "cPeriodeJournee.h"
+#include "04_time/HourPeriod.h"
 #include "cEnvironnement.h"
 
 extern SYNTHESE Synthese;
@@ -610,8 +610,8 @@ bool cFichierInterfaces::Charge()
 
                 case INTERFACESFORMATLIGNEPeriode:
                     {
-		      cPeriodeJournee* __Periode = 
-			new cPeriodeJournee( 
+		      synthese::time::HourPeriod* __Periode = 
+			new synthese::time::HourPeriod( 
 					    std::string( _Format->Extrait( Tampon, INTERFACESFORMATCOLONNEPeriodeLibelle ).Texte() ),
 					    synthese::time::Hour() = std::string (_Format->Extrait( Tampon, INTERFACESFORMATCOLONNEPeriodeDebut ).Texte())
 					    , synthese::time::Hour() = std::string (_Format->Extrait( Tampon, INTERFACESFORMATCOLONNEPeriodeFin ).Texte())

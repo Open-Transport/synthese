@@ -57,7 +57,7 @@ La variable vArriveeMax, qui permet de limiter le moment d'arriv�e lors du cal
 */
 cCalculateur::cCalculateur( const cEnvironnement* const environnement, const LogicalPlace* const __LieuOrigine, const LogicalPlace* const __LieuDestination
                             , const synthese::time::Date& __DateDepart
-                            , const cPeriodeJournee* const __PeriodeJournee
+                            , const synthese::time::HourPeriod* const __PeriodeJournee
                             , const tBool3 besoinVelo, const tBool3 besoinHandicape
                             , const tBool3 besoinTaxiBus, const int codeTarif
                             , const bool __SolutionsPassees
@@ -82,7 +82,7 @@ cCalculateur::cCalculateur( const cEnvironnement* const environnement, const Log
 
 
     // Application de la plage horaire
-    __PeriodeJournee->AppliquePeriode( vMomentDebut, vMomentFin, _MomentCalcul, __SolutionsPassees );
+    __PeriodeJournee->applyPeriod( vMomentDebut, vMomentFin, _MomentCalcul, __SolutionsPassees );
 
     vMomentFin += int( cDistanceCarree( *__LieuDestination, *__LieuOrigine ).Distance() );
 

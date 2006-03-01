@@ -377,7 +377,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
             break;
 
         case EI_BIBLIOTHEQUE_PERIODE:
-            pCtxt << __Site->getInterface() ->GetPeriode( _Parametres[ EI_BIBLIOTHEQUE_PERIODE_INDEX ] ->Nombre( __Parametres ) ) ->Libelle();
+            pCtxt << __Site->getInterface() ->GetPeriode( _Parametres[ EI_BIBLIOTHEQUE_PERIODE_INDEX ] ->Nombre( __Parametres ) ) ->getCaption ();
             break;
 
         case ELEMENTINTERFACELienPhotosArretPhysiques:
@@ -1493,7 +1493,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                                 pCtxt << "<option ";
                                 if ( iPeriode == __IndexPeriodeDefaut )
                                     pCtxt << "selected ";
-                                pCtxt << "value=\"" << iPeriode << "\">" << __Site->getInterface() ->GetPeriode( iPeriode ) ->Libelle() << "</option>";
+                                pCtxt << "value=\"" << iPeriode << "\">" << __Site->getInterface() ->GetPeriode( iPeriode ) ->getCaption () << "</option>";
                             }
                         }
                         pCtxt << "</select>";

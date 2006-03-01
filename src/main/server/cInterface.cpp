@@ -96,13 +96,13 @@ const cTexte& cInterface::getPrefixeAlerte( int __Niveau ) const
  \author Hugues Romain
  \date 2005
 */
-const cPeriodeJournee* cInterface::GetPeriode( size_t __Index ) const
+const synthese::time::HourPeriod* cInterface::GetPeriode( size_t __Index ) const
 {
     return ( __Index < _Periode.size() ) ? _Periode.at( __Index ) : NULL;
 }
 
 
-void cInterface::AddPeriode( cPeriodeJournee* __Element )
+void cInterface::AddPeriode( synthese::time::HourPeriod* __Element )
 {
     _Periode.push_back( __Element );
 }

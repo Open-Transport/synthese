@@ -55,7 +55,8 @@ class Schedule
         //@}
 
 
-        /*! \param op Updates this schedule according to the meaning of
+        /**
+	   @param op Updates this schedule according to the meaning of
           the given special characters ( m => minimum, M =>
           maximum... max = 5 chars)
          */

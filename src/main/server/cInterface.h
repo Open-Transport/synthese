@@ -5,9 +5,9 @@
 #ifndef SYNTHESE_CINTERFACE_H
 #define SYNTHESE_CINTERFACE_H
 
-class cInterface;
 #include "cInterface_Objet_AEvaluer_PageEcran.h"
-#include "cPeriodeJournee.h"
+#include "04_time/HourPeriod.h"
+#include "04_time/Date.h"
 
 
 // Inclusions
@@ -18,6 +18,13 @@ class cInterface;
 
 #include <string>
 #include <vector>
+#include <iostream>
+
+class cInterface;
+
+
+
+
 
 /** Impl�mentation de la notion d'Interface
  \author Hugues Romain
@@ -46,7 +53,7 @@ class cInterface
     private:
         const size_t _id;         //!< Index de l'interface dans la base de donn�es SYNTHESE
         cInterface_Objet_AEvaluer_PageEcran* _Element;        //!< Tableau des �l�ments standard d�finis
-        vector<cPeriodeJournee*> _Periode;        //!< Tableau des p�riodes de la journ�e
+        std::vector<synthese::time::HourPeriod*> _Periode;        //!< Tableau des p�riodes de la journ�e
         cTexte _LibelleJourSemaine[ synthese::time::DAYS_PER_WEEK ]; //!< Tableau des libell�s des jours de semaine
         cTexte _LibelleMois[ synthese::time::MONTHS_PER_YEAR + 1 ];   //!< Tableau des libell�s des mois
         cTableauDynamiqueObjets<cTexte> _PrefixesAlerte;      //!< Pr�fixes de messages d'alerte
@@ -63,7 +70,7 @@ class cInterface
         cInterface_Objet_AEvaluer_PageEcran& Element( int );
         const cInterface_Objet_AEvaluer_PageEcran& operator[] ( int ) const;
         const size_t& Index() const;
-        const cPeriodeJournee* GetPeriode( size_t __Index = ALL_DAY_PERIOD ) const;
+        const synthese::time::HourPeriod* GetPeriode( size_t __Index = ALL_DAY_PERIOD ) const;
         const cTexte& getPrefixeAlerte( int __NiveauAlerte ) const;
         //  const cTexte&        LibelleJourSemaine(int)       const;
         //@}
@@ -78,7 +85,11 @@ class cInterface
          @param __JourDeSemaine true pour afficher le jour de la semaine (d�faut = true)
          @param __Annee true pour afficher l'ann�e (d�faut = true)
         */
-        void AfficheDate( std::ostream& __Flux, const synthese::time::Date& __Date, bool __Textuel = true, bool __JourDeSemaine = true, bool __Annee = true ) const
+        void AfficheDate( std::ostream& __Flux, 
+			  const synthese::time::Date& __Date, 
+			  bool __Textuel = true, 
+			  bool __JourDeSemaine = true, 
+			  bool __Annee = true ) const
         {
             if ( __JourDeSemaine && __Textuel )
                 __Flux << _LibelleJourSemaine[ __Date.getWeekDay() ] << " ";
@@ -100,7 +111,7 @@ class cInterface
 
         //! \name Modificateurs
         //@{
-        void AddPeriode( cPeriodeJournee* );
+        void AddPeriode( synthese::time::HourPeriod* );
         bool SetLibelleJour( int, const cTexte& );
         bool SetLibelleMois( int, const cTexte& );
         bool SetPrefixeAlerte( int, const cTexte& );

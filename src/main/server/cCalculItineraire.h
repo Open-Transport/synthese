@@ -13,7 +13,7 @@ class LogicalPlace;
 #include "cTrajets.h"
 #include "cLog.h"
 
-#include "cPeriodeJournee.h"
+#include "04_time/HourPeriod.h"
 #include "RoutePlanningNode.h"
 
 #ifdef UNIX
@@ -145,7 +145,7 @@ class cCalculateur
         //! \name Constructeur et destructeur
         //@{
         cCalculateur( const cEnvironnement* const environnement, const LogicalPlace* const __LieuOrigine, const LogicalPlace* const __LieuDestination
-                      , const synthese::time::Date& MomentDepartMin, const cPeriodeJournee* const, const tBool3 besoinVelo
+                      , const synthese::time::Date& MomentDepartMin, const synthese::time::HourPeriod* const, const tBool3 besoinVelo
                       , const tBool3 besoinHandicape, const tBool3 besoinTaxiBus, const int codeTarif
                       , const bool __SolutionsPassees, const RoutePlanningNode::DistanceInMeters maxApproachDistance
                       , const RoutePlanningNode::SpeedInKmh approachSpeed
