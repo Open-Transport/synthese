@@ -17,7 +17,7 @@ namespace util
 /** Base exception class
 @ingroup m04
 */
-class Exception
+class Exception : public std::exception
 {
  private:
 
@@ -26,8 +26,8 @@ class Exception
 
  public:
 
-    Exception ( const std::string& message );
-    ~Exception ();
+    Exception ( const std::string& message ) throw ();
+    ~Exception () throw ();
 
 
     //! @name Getters/Setters

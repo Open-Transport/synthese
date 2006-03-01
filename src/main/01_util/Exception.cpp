@@ -8,13 +8,13 @@ namespace util
 
 
 
-Exception::Exception ( const std::string& message )
+Exception::Exception ( const std::string& message ) throw ()
     : _message (message)
 {
 }
 
 
-Exception::~Exception ()
+Exception::~Exception () throw ()
 {
 }
 
