@@ -5,22 +5,22 @@
 /** @ingroup m15 */
 class cDocumentHoraire : public cDocument
 {
-protected:
-	cDate	_DateDebut;
-	cDate	_DateFin;
+    protected:
+        synthese::time::Date _DateDebut;
+        synthese::time::Date _DateFin;
 
-public:
-	//!	\name Calculateurs
-	//@{
-	bool	AAfficher(tDureeEnJours __DelaiAvant = 30, tDureeEnJours __DelaiApres = 0);
-	//@}
+    public:
+        //! \name Calculateurs
+        //@{
+        bool AAfficher( int __DelaiAvant = 30, int __DelaiApres = 0 );
+        //@}
 
-	//!	\name Modificateurs
-	//@{
-	bool	SetDateDebut(const cMoment&);
-	bool	SetDateFin(const cMoment&);
-	bool	SupprimerFichier();
-	//@}
+        //! \name Modificateurs
+        //@{
+        bool SetDateDebut( const synthese::time::DateTime& );
+        bool SetDateFin( const synthese::time::DateTime& );
+        bool SupprimerFichier();
+        //@}
 
 
 };

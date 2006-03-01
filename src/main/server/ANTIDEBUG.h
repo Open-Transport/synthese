@@ -1,33 +1,33 @@
 /** Fonctions d'anti debuggage.
-	@file ANTIDEBUG.h
-    @author Christophe Romain
-    @date 2005
+@file ANTIDEBUG.h
+   @author Christophe Romain
+   @date 2005
 
 Sont disponibles les macros suivantes:
 
 FALSE_BREAKPOINT : ajoute un point d'arrêt
-    ceci est à inclure dans les boucles et tous les endroits
-    génants en cas d'optention du debuggage.
-    attention, ceci provoque un appel de fonction. il conviens donc
-    de ne pas l'utiliser dans les algorithmes consomateurs de
-    ressources pour le service. préférer les boucles d'initialisation
-    ou les zones non consomatrices de puissance.
+   ceci est à inclure dans les boucles et tous les endroits
+   génants en cas d'optention du debuggage.
+   attention, ceci provoque un appel de fonction. il conviens donc
+   de ne pas l'utiliser dans les algorithmes consomateurs de
+   ressources pour le service. préférer les boucles d'initialisation
+   ou les zones non consomatrices de puissance.
 
 QUIT_IF_BREAKPOINT(fonction) : quitte si un point d'arrêt est posé sur
-    la fonction passé en paramètre. à parsemer dans l'initialisation
-    du programme pour toute fonction importante du programme:
-    algorithme, mécanismes de protection, lecture des données, etc...
+   la fonction passé en paramètre. à parsemer dans l'initialisation
+   du programme pour toute fonction importante du programme:
+   algorithme, mécanismes de protection, lecture des données, etc...
 
 QUIT_IF_DEBUG : quitte si le programme est debuggé ou tracé
-    ceci est à parsemer dans l'initialisation et cause la fin de
-    l'execution si le processus est en cours de debug ou de trace.
+   ceci est à parsemer dans l'initialisation et cause la fin de
+   l'execution si le processus est en cours de debug ou de trace.
 
 FALSE_DISASM : trompe les outils de désassemblage comme objdump.
-    ceci est à mêttre à quelques endroits répartis du code.
-    
-  Ces dispositifs ne sont installés que dans le binaire Linux
-  en version non DEBUG.
-  
+   ceci est à mêttre à quelques endroits répartis du code.
+   
+ Ces dispositifs ne sont installés que dans le binaire Linux
+ en version non DEBUG.
+ 
 */
 
 #include <sys/types.h>
@@ -35,7 +35,7 @@ FALSE_DISASM : trompe les outils de désassemblage comme objdump.
 #include <signal.h>
 
 /** @addtogroup m01
-	@{
+ @{
 */
 
 
@@ -69,7 +69,7 @@ l4: \
 #endif
 
 #ifdef ANTIDEBUG
-void handler(int sig) {}
+void handler( int sig ) {}
 // appeler signal(handler, SIGTRAP);
 // puis FALSE_BREAKPOINT
 #endif

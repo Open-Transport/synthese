@@ -1,33 +1,33 @@
 /*------------------*
- |                  |
- |  Classe Reseau   |
- |                  |
- *------------------*/
+|                  |
+|  Classe Reseau   |
+|                  |
+*------------------*/
 
 #ifndef SYNTHESE_CRESEAU_H
 #define SYNTHESE_CRESEAU_H
 
 #include <string>
- 
+
 /** Réseau de transport
-	@ingroup m15
+ @ingroup m15
 */
 class cReseau
 {
-	const size_t _id;
-	std::string vNom;
-	std::string vURL;
-	std::string vDoc;
-	
-public:
-	const size_t& getId() const;
+        const size_t _id;
+        std::string vNom;
+        std::string vURL;
+        std::string vDoc;
 
-	void setURL(const std::string& newVal);
-	void setDoc(const std::string& newVal);
-	void setNom(const std::string& newVal);
+    public:
+        const size_t& getId() const;
 
-	cReseau(const size_t&);
-	~cReseau();
+        void setURL( const std::string& newVal );
+        void setDoc( const std::string& newVal );
+        void setNom( const std::string& newVal );
+
+        cReseau( const size_t& );
+        ~cReseau();
 };
 
 #endif

@@ -43,6 +43,7 @@ class Hour
         //@{
         bool isValid () const;
         bool isUnknown () const;
+	std::string toString () const;
         //@}
 
 

@@ -1,25 +1,25 @@
 /*! \file Parametres.h
-	\brief Paramètres de compilation et constantes
-	*/
+\brief Paramètres de compilation et constantes
+*/
 
 #ifndef SYNTHESE_PARAMETRES_H
 #define SYNTHESE_PARAMETRES_H
 
 /** @addtogroup m00
-	@{
+ @{
 */
 
 //! @name Constantes
 //@{
-#define INCONNU -1
+#define INCONNU -1 
 //@}
 
-typedef int tIndex;	//!< Code d'index
-typedef enum tBool3	//!< Booleen 3 etats
+
+typedef enum tBool3 //!< Booleen 3 etats
 {
-	Faux = 0,
-	Vrai = 1,
-	Indifferent = INCONNU
+    Faux = 0,
+    Vrai = 1,
+    Indifferent = INCONNU
 };
 
 /** @} */
@@ -32,62 +32,62 @@ typedef long int tVitesseKMH;
 
 //! Séparateur de répertoire
 #ifdef WIN32
-#define SEPARATEUR_REPERTOIRE_TXT	"\\"
-#define SEPARATEUR_REPERTOIRE_CHAR	'\\'
+#define SEPARATEUR_REPERTOIRE_TXT "\\"
+#define SEPARATEUR_REPERTOIRE_CHAR '\\'
 #else
 #define SEPARATEUR_REPERTOIRE_TXT "/"
 #define SEPARATEUR_REPERTOIRE_CHAR '/'
 #endif
-	
-	
+
+
 //parametres pour verification de presence des champs
 #define CHECK_NOM "checkNom"
 #define CHECK_PRENOM "checkPrenom"
 #define CHECK_ADRESSE "checkAdresse"
 #define CHECK_EMAIL "checkEmail"
 #define CHECK_TELEPHONE "checkTelephone"
-#define CHECK_NUMERO_ABONNE	"checkNumAbonne" 
-#define CHECK_ADRESSE_DEPART "checkAdresseDepart" 
-#define CHECK_ADRESSE_ARRIVEE "checkAdresseArrivee" 
-#define CHECK_NOMBRE_PLACES "checkNbPlaces" 
-									
-	
+#define CHECK_NUMERO_ABONNE "checkNumAbonne"
+#define CHECK_ADRESSE_DEPART "checkAdresseDepart"
+#define CHECK_ADRESSE_ARRIVEE "checkAdresseArrivee"
+#define CHECK_NOMBRE_PLACES "checkNbPlaces"
+
+
 // Macro texte
 #define TXT(a) cTexte().Copie((int) a)
 #define TXT2(a, b) cTexte().Copie((int) a, b)
 
 
 // Base de données
-#define TABLE_RESERVATION 						"Réservation"
-#define TABLE_RESERVATION_NUMERO 				"Numéro"
-#define TABLE_RESERVATION_NOM 				"Nom"
-#define TABLE_RESERVATION_PRENOM 				"Prénom"
-#define TABLE_RESERVATION_ADRESSE				"Adresse"
-#define TABLE_RESERVATION_TELEPHONE			"Téléphone"
-#define TABLE_RESERVATION_EMAIL				"Email"
-#define TABLE_RESERVATION_NUM_ABONNE		 	"Numéro_abonné"
-#define TABLE_RESERVATION_NOMBRE_PLACES	 	"Nombre_places"
-#define TABLE_RESERVATION_CODE_LIGNE		 	"Code_ligne"
-#define TABLE_RESERVATION_LIBELLE_LIGNE	 		"Libellé_ligne"
-#define TABLE_RESERVATION_MOD_RESA			"Code_modalité_réservation"
-#define TABLE_RESERVATION_NUM_SERVICE		 	"Numéro_service"
-#define TABLE_RESERVATION_CODE_PA_DEPART 		"Code_PA_départ"
-#define TABLE_RESERVATION_DES_PA_DEPART	 	"Désignation_PA_départ"
-#define TABLE_RESERVATION_CODE_PA_ARRIVEE 		"Code_PA_arrivée"
-#define TABLE_RESERVATION_DES_PA_ARRIVEE		"Désignation_PA_arrivée"
-#define TABLE_RESERVATION_DATE_DEPART	 		"Date_départ"
-#define TABLE_RESERVATION_EMAIL_TRANSPORTEUR 	"Email_transporteur"
-#define TABLE_RESERVATION_EMAIL_COPIE	 		"Email_copie"
-#define TABLE_RESERVATION_PALIER	 			"Palier"
-#define TABLE_RESERVATION_DATE_ENVOI			"Date_envoi_mail"
-#define TABLE_RESERVATION_DATE_RESA			"Date_réservation"
-#define TABLE_RESERVATION_DATE_ANNUL			"Date_annulation"
-#define TABLE_RESERVATION_ETAT				"Etat"
-#define TABLE_RESERVATION_RAISON_ECHEC		"Raison_echec"
+#define TABLE_RESERVATION       "Réservation"
+#define TABLE_RESERVATION_NUMERO     "Numéro"
+#define TABLE_RESERVATION_NOM     "Nom"
+#define TABLE_RESERVATION_PRENOM     "Prénom"
+#define TABLE_RESERVATION_ADRESSE    "Adresse"
+#define TABLE_RESERVATION_TELEPHONE   "Téléphone"
+#define TABLE_RESERVATION_EMAIL    "Email"
+#define TABLE_RESERVATION_NUM_ABONNE    "Numéro_abonné"
+#define TABLE_RESERVATION_NOMBRE_PLACES   "Nombre_places"
+#define TABLE_RESERVATION_CODE_LIGNE    "Code_ligne"
+#define TABLE_RESERVATION_LIBELLE_LIGNE    "Libellé_ligne"
+#define TABLE_RESERVATION_MOD_RESA   "Code_modalité_réservation"
+#define TABLE_RESERVATION_NUM_SERVICE    "Numéro_service"
+#define TABLE_RESERVATION_CODE_PA_DEPART   "Code_PA_départ"
+#define TABLE_RESERVATION_DES_PA_DEPART   "Désignation_PA_départ"
+#define TABLE_RESERVATION_CODE_PA_ARRIVEE   "Code_PA_arrivée"
+#define TABLE_RESERVATION_DES_PA_ARRIVEE  "Désignation_PA_arrivée"
+#define TABLE_RESERVATION_DATE_DEPART    "Date_départ"
+#define TABLE_RESERVATION_EMAIL_TRANSPORTEUR  "Email_transporteur"
+#define TABLE_RESERVATION_EMAIL_COPIE    "Email_copie"
+#define TABLE_RESERVATION_PALIER     "Palier"
+#define TABLE_RESERVATION_DATE_ENVOI   "Date_envoi_mail"
+#define TABLE_RESERVATION_DATE_RESA   "Date_réservation"
+#define TABLE_RESERVATION_DATE_ANNUL   "Date_annulation"
+#define TABLE_RESERVATION_ETAT    "Etat"
+#define TABLE_RESERVATION_RAISON_ECHEC  "Raison_echec"
 
-#define TABLE_COMPTEUR						"Compteur"
-#define TABLE_COMPTEUR_JOUR					"Jour_réservation"
-#define TABLE_COMPTEUR_COMPTEUR				"Compteur"
+#define TABLE_COMPTEUR      "Compteur"
+#define TABLE_COMPTEUR_JOUR     "Jour_réservation"
+#define TABLE_COMPTEUR_COMPTEUR    "Compteur"
 
 
 // Tampon

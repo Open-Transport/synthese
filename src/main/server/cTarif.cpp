@@ -3,34 +3,33 @@
 
 /*! \brief Constructeur
 */
-cTarif::cTarif(const size_t& id)
-: _id(id)
-{
-}
+cTarif::cTarif( const size_t& id )
+        : _id( id )
+{}
 
-void cTarif::setTypeTarif(const tTypeTarif newVal)
+void cTarif::setTypeTarif( const tTypeTarif newVal )
 {
-	vTypeTarif = newVal;
+    vTypeTarif = newVal;
 }
 
 tTypeTarif cTarif::getTypeTarif() const
 {
-	return(vTypeTarif);
+    return ( vTypeTarif );
 }
 
-void cTarif::setLibelle(const cTexte& libelle)
+void cTarif::setLibelle( const cTexte& libelle )
 {
-	vLibelle.Vide();
-	vLibelle << libelle;
+    vLibelle.Vide();
+    vLibelle << libelle;
 }
 
 const cTexte& cTarif::getLibelle() const
 {
-	return (vLibelle);
+    return ( vLibelle );
 }
 
 size_t cTarif::getNumeroTarif() const
 {
-	return _id;
+    return _id;
 }
 

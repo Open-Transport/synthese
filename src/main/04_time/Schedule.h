@@ -24,6 +24,7 @@ class Schedule
 
     public:
 
+        Schedule ();
         Schedule ( const Hour& hour, int daysSinceDeparture );
         Schedule ( const Schedule& ref );
         ~Schedule ();
@@ -39,6 +40,12 @@ class Schedule
         void setDaysSinceDeparture ( int daysSinceDeparture );
 
         //@}
+
+
+        //! @name Query methods
+        //@{
+	bool isValid () const;
+	//@}
 
 
         //! @name Update methods

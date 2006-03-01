@@ -74,6 +74,17 @@ DateTime::operator = ( const Schedule& op )
 
 
 
+DateTime&
+DateTime::operator = ( const std::string& op )
+{
+  _date = op.substr (0, 8);
+  _hour = op.substr (8, 4);
+  return (*this);
+
+}
+
+
+
 bool
 DateTime::isValid () const
 {
@@ -163,6 +174,12 @@ DateTime::getHour() const
     return _hour;
 }
 
+
+void 
+DateTime::setHour ( const Hour& hour)
+{
+  _hour = hour;
+}
 
 
 
@@ -303,6 +320,23 @@ operator > ( const DateTime& op1, const DateTime &op2 )
 }
 
 
+int operator - ( const DateTime& op1, const DateTime& op2 )
+{
+  int result;
+  int retain = 0;
+  
+  // 1: Hour
+  result = op1.getHour () - op2.getHour ();
+  if (result < 0)
+    {
+      retain = 1;
+      result += MINUTES_PER_DAY;
+    }
+  
+  // 2: Days since departure
+  result += ((op1.getDate () - op2.getDate ()) - retain) * MINUTES_PER_DAY;
+  return result;
+}
 
 
 

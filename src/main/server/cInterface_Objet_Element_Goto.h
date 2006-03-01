@@ -5,29 +5,29 @@
 #include "cElementInterface.h"
 
 
-/*!	\brief Objet d'interface contenant l'ordre d'avancer à la ligne portant le numéro enregistré
-	@ingroup m11
-	\warning S'assurer de l'unicité des numéros de ligne en les préfixant du numéro de la page écran
-	\warning La ligne numéro 0 correspond à la sortie du programme
-	\warning La ligne numéro 1 correspond à la prochaine ligne
+/*! \brief Objet d'interface contenant l'ordre d'avancer à la ligne portant le numéro enregistré
+ @ingroup m11
+ \warning S'assurer de l'unicité des numéros de ligne en les préfixant du numéro de la page écran
+ \warning La ligne numéro 0 correspond à la sortie du programme
+ \warning La ligne numéro 1 correspond à la prochaine ligne
 */
 class cInterface_Objet_Element_Goto : public cInterface_Objet_Element
 {
-protected:
-	tIndex	_NumeroLigne;	//!< Numéro de ligne à rejoindre
+    protected:
+        int _NumeroLigne; //!< Numéro de ligne à rejoindre
 
-public:
-	//!	\name Calculateurs
-	//@{
-	tIndex						Evalue(ostream&, const cInterface_Objet_Connu_ListeParametres&
-									, const void* ObjetAAfficher=NULL, const cSite* __Site=NULL)			const;
-	cInterface_Objet_Element*	Copie(const cInterface_Objet_AEvaluer_ListeParametres& __Parametres)		const;
-	//@}
+    public:
+        //! \name Calculateurs
+        //@{
+        int Evalue( ostream&, const cInterface_Objet_Connu_ListeParametres&
+                       , const void* ObjetAAfficher = NULL, const cSite* __Site = NULL ) const;
+        cInterface_Objet_Element* Copie( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres ) const;
+        //@}
 
-	//!	\name Constructeur
-	//@{
-	explicit cInterface_Objet_Element_Goto(tIndex);
-	//@}
+        //! \name Constructeur
+        //@{
+        explicit cInterface_Objet_Element_Goto( int );
+        //@}
 };
 
 #endif

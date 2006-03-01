@@ -9,6 +9,9 @@ namespace time
 {
 
 
+  Schedule::Schedule () 
+  {
+  }
 
 
 Schedule::Schedule ( const Hour& hour, int daysSinceDeparture )
@@ -72,6 +75,14 @@ Schedule::setDaysSinceDeparture ( int daysSinceDeparture )
     _daysSinceDeparture = daysSinceDeparture;
 }
 
+
+bool 
+Schedule::isValid () const
+{
+  return(_daysSinceDeparture >= 0 && 
+	 _daysSinceDeparture <=28 && 
+	 _hour.isValid ());
+}
 
 
 

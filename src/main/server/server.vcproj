@@ -70,7 +70,7 @@
 				RelativePath="..\..\..\src\main\server\cCommune.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\cDate.cpp">
+				RelativePath="..\..\..\src\main\server\synthese::time::Date.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cDescriptionPassage.cpp">
@@ -157,7 +157,7 @@
 				RelativePath="..\..\..\src\main\server\cModaliteReservationEnLigne.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\cMoment.cpp">
+				RelativePath="..\..\..\src\main\server\synthese::time::DateTime.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cObjetInterface.cpp">
@@ -405,7 +405,7 @@
 				RelativePath="..\..\..\src\main\server\cMois.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\main\server\cMoment.h">
+				RelativePath="..\..\..\src\main\server\synthese::time::DateTime.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\main\server\cObjetInterface.h">

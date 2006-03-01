@@ -2,52 +2,52 @@
 
 using namespace std;
 
-cVelo::cVelo(const size_t& id)
-: _id(id)
+cVelo::cVelo( const size_t& id )
+        : _id( id )
 {}
 
 cVelo::~cVelo()
 {}
 
-void cVelo::setTypeVelo(tBool3 newVal)
+void cVelo::setTypeVelo( tBool3 newVal )
 {
-	vTypeVelo = newVal;
+    vTypeVelo = newVal;
 }
 
 tBool3 cVelo::TypeVelo() const
 {
-	return(vTypeVelo);
+    return ( vTypeVelo );
 }
 
-void cVelo::setResa(cModaliteReservation* newVal)
+void cVelo::setResa( cModaliteReservation* newVal )
 {
-	vResa = newVal;
+    vResa = newVal;
 }
 
 
-void cVelo::setContenance(tContenance newVal)
+void cVelo::setContenance( tContenance newVal )
 {
-	vContenance = newVal;
+    vContenance = newVal;
 }
 
 tContenance cVelo::Contenance() const
 {
-	return(vContenance);
+    return ( vContenance );
 }
 
 
-void cVelo::setDoc(const string &newVal)
+void cVelo::setDoc( const string &newVal )
 {
-	vDoc = newVal;
+    vDoc = newVal;
 }
 
 
-void cVelo::setPrix(tPrix newVal)
+void cVelo::setPrix( tPrix newVal )
 {
-	vPrix = newVal;
+    vPrix = newVal;
 }
 
 const size_t& cVelo::getId() const
 {
-	return _id;
+    return _id;
 }

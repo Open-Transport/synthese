@@ -1,5 +1,5 @@
 /*! \file cMateriel.h
-	\brief En-t�te classe cMateriel
+\brief En-t�te classe cMateriel
 */
 
 #ifndef SYNTHESE_CMATERIEL_H
@@ -14,56 +14,56 @@ class cMateriel;
 
 
 /** Impl�mentation de la notion de @ref defMateriel
-	@ingroup m15
-	@author Hugues Romain
-	@date 2001
+ @ingroup m15
+ @author Hugues Romain
+ @date 2001
 */
 class cMateriel
 {
-	cTexte			vLibelleSimple;
-	cTexte			vArticle;
-	cTexte			vDoc;
-	cTexte			vIndicateur;
-	tVitesseKMH		vVitesseMoyenneMax;
-	tIndex			vCode;
+        cTexte vLibelleSimple;
+        cTexte vArticle;
+        cTexte vDoc;
+        cTexte vIndicateur;
+        tVitesseKMH vVitesseMoyenneMax;
+        int vCode;
 
-public:
-	
-	//! \name Accesseurs
-	//@{
-	bool			EstAPied()			const;
-	const cTexte&	getArticle()		const;
-	const cTexte&	getIndicateur()		const;
-	const cTexte&	getLibelleSimple()	const;
-	tIndex			Code()				const;
-	tVitesseKMH		VitesseMoyenneMax()	const;
-	//@}
-	
-	//! \name Modificateurs
-	//@{
-	void setArticle(const cTexte& newArticle);
-	void setDoc(const cTexte& newVal);
-	void setIndicateur(const cTexte& newVal);
-	void setLibelleSimple(const cTexte& newLibelleSimple);
-	bool setVitesseMoyenneMax(tVitesseKMH);
-	//@}
+    public:
 
-	//! \name Constructeur et destructeur
-	//@{
-	cMateriel(tIndex);
-	~cMateriel();
-	//@}
-	
-	//! \name Sorties
-	//@{
-	/*template <class T> T& toXML(T& Tampon) const
-	{
-		Tampon << "<materiel code=\"" << vCode << "\">";
-		Tampon << "<libelle>" << vLibelleSimple << "</libelle></materiel>";
-		
-		return (Tampon);
-	}*/
-	//@}
+        //! \name Accesseurs
+        //@{
+        bool EstAPied() const;
+        const cTexte& getArticle() const;
+        const cTexte& getIndicateur() const;
+        const cTexte& getLibelleSimple() const;
+        int Code() const;
+        tVitesseKMH VitesseMoyenneMax() const;
+        //@}
+
+        //! \name Modificateurs
+        //@{
+        void setArticle( const cTexte& newArticle );
+        void setDoc( const cTexte& newVal );
+        void setIndicateur( const cTexte& newVal );
+        void setLibelleSimple( const cTexte& newLibelleSimple );
+        bool setVitesseMoyenneMax( tVitesseKMH );
+        //@}
+
+        //! \name Constructeur et destructeur
+        //@{
+        cMateriel( int );
+        ~cMateriel();
+        //@}
+
+        //! \name Sorties
+        //@{
+        /*template <class T> T& toXML(T& Tampon) const
+        {
+         Tampon << "<materiel code=\"" << vCode << "\">";
+         Tampon << "<libelle>" << vLibelleSimple << "</libelle></materiel>";
+         
+         return (Tampon);
+        }*/ 
+        //@}
 };
 
 #endif

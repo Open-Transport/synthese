@@ -7,25 +7,25 @@
 
 class cTranslation
 {
-private:
-	
-	static const std::string DEFAULT_LANGUAGE_CODE;
+    private:
 
-	std::map<std::string, std::string> _translations;	
+        static const std::string DEFAULT_LANGUAGE_CODE;
 
-public:
+        std::map<std::string, std::string> _translations;
 
-	cTranslation ();
-	cTranslation (const cTranslation&);
-	
-	~cTranslation ();
+    public:
 
-	void addTranslation (const std::string& languageCode, const std::string& translation);
+        cTranslation ();
+        cTranslation ( const cTranslation& );
 
-	const std::string& getTranslation (const std::string& code) const;
-	const std::string& getDefaultTranslation () const;
+        ~cTranslation ();
 
-	cTranslation& operator=(const cTranslation& rhs);
+        void addTranslation ( const std::string& languageCode, const std::string& translation );
+
+        const std::string& getTranslation ( const std::string& code ) const;
+        const std::string& getDefaultTranslation () const;
+
+        cTranslation& operator=( const cTranslation& rhs );
 };
 
 

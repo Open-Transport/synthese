@@ -8,14 +8,14 @@
 using namespace std;
 
 #include <iostream>
-#include "Temps.h"
+
 
 /** Jour
 	@ingroup m04
 */
 class cJour
 {
-	tJour		_Valeur;	//!< Jour (1 � 31)
+	int		_Valeur;	//!< Jour (1 � 31)
 	
 	template <class charT, class Traits>
 	friend basic_ostream<charT, Traits>& operator<<(
@@ -23,28 +23,28 @@ class cJour
 public:
 	//!	\name Modificateurs
 	//@{
-	cJour& operator=(const tJour);
+	cJour& operator=(const int);
 	cJour& operator--(int);
 	cJour& operator++(int);
 	//@}
 
 	//!	\name Accesseurs
 	//@{
-	tJour		Valeur() const;
+	int		Valeur() const;
 	//@}
 	
 	//!	\name Constructeur
 	//@{
-	explicit cJour(tJour valeur = INCONNU) : _Valeur (valeur) {}
+	explicit cJour(int valeur = INCONNU) : _Valeur (valeur) {}
 	//@}
 };
 
-inline tJour cJour::Valeur() const
+inline int cJour::Valeur() const
 {
 	return _Valeur;
 }
 
-inline cJour& cJour::operator=(const tJour Valeur)
+inline cJour& cJour::operator=(const int Valeur)
 {
 	_Valeur = Valeur;
 	return *this;

@@ -16,14 +16,14 @@ typedef int tNombrePlaces;
 */
 class cAxeTAD: public cAxe
 {
-protected:
-	cTexte									_Code;			//!< Prefixe des lignes de l'axe
+    protected:
+        cTexte _Code;   //!< Prefixe des lignes de l'axe
 
-public:
-	cTableauDynamiqueObjets<cReservation>	ListeReservations(const cTexte& __NumeroService);
-	tNombrePlaces							NombrePlacesDisponibles(const cTexte& __NumeroService);
-	tNombrePlaces							NombrePlacesReservees(const cTexte& __NumeroService);
-	cReservation							RechercheReservation(const cTexte& __NomPersonne, const cTexte& __NumeroPersonne);
+    public:
+        cTableauDynamiqueObjets<cReservation> ListeReservations( const cTexte& __NumeroService );
+        tNombrePlaces NombrePlacesDisponibles( const cTexte& __NumeroService );
+        tNombrePlaces NombrePlacesReservees( const cTexte& __NumeroService );
+        cReservation RechercheReservation( const cTexte& __NomPersonne, const cTexte& __NumeroPersonne );
 };
 
 #endif

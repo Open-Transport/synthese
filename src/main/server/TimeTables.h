@@ -6,13 +6,13 @@
 
 
 /** Timetables collection.
-	@ingroup m35
+ @ingroup m35
 */
 class TimeTables : public cSite
 {
-public:
-	TimeTables(const std::string&);
-	~TimeTables();
+    public:
+        TimeTables( const std::string& );
+        ~TimeTables();
 };
 
 #endif

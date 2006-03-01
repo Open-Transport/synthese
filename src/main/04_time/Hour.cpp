@@ -4,7 +4,7 @@
 #include "assert.h"
 
 #include <iomanip>
-
+#include <sstream>
 
 namespace synthese
 {
@@ -58,6 +58,18 @@ bool
 Hour::isUnknown () const
 {
     return ( _hours == UNKNOWN_VALUE ) || ( _minutes == UNKNOWN_VALUE );
+}
+
+
+std::string 
+Hour::toString () const
+{
+  std::stringstream os;
+  os << std::setw( 2 ) << std::setfill ( '0' )
+     << getHours () << ":" 
+     << std::setw( 2 ) << std::setfill ( '0' )
+     << getMinutes ();
+  return os.str ();
 }
 
 

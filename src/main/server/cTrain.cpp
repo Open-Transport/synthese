@@ -1,7 +1,7 @@
 /*! \file cTrain.cpp
-	\brief Implémentation classe cTrain
-	\author Hugues Romain
-	\date 2000-2003
+\brief Implémentation classe cTrain
+\author Hugues Romain
+\date 2000-2003
 */
 
 #include "cTrain.h"
@@ -12,127 +12,126 @@
 
 /*! Constructeur.
 */
-cTrain::cTrain(cLigne* const line)
-: vLigne(line)
+cTrain::cTrain( cLigne* const line )
+        : vLigne( line )
 {
-	vEtalementCadence = 0;
-	vAttente = 0;
-	vEstCadence = false;
+    vEtalementCadence = 0;
+    vAttente = 0;
+    vEstCadence = false;
 }
 
 
 /*! \brief Destructeur
 */
 cTrain::~cTrain()
-{
-}
+{}
 
 /*! \brief Vérification de critères d'utilisation du service par rapport à ses modalités de réservation
-	\param __MomentDepart Heure du départ souhaité
-	\param __MomentCalcul Moment du calcul pris comme référence pour le calcul du délai de réservation
-	\return true si le service peut être réservé : 
-		- soit la ligne n'a pas de modalité de réservation
-		- soit la modalité de réservation accepte les conditions
+ \param __MomentDepart Heure du départ souhaité
+ \param __MomentCalcul Moment du calcul pris comme référence pour le calcul du délai de réservation
+ \return true si le service peut être réservé : 
+  - soit la ligne n'a pas de modalité de réservation
+  - soit la modalité de réservation accepte les conditions
 */
-bool cTrain::ReservationOK(const cMoment& __MomentDepart, const cMoment& __MomentCalcul) const
+bool cTrain::ReservationOK( const synthese::time::DateTime& __MomentDepart, const synthese::time::DateTime& __MomentCalcul ) const
 {
-	return this->getLigne()->GetResa() == NULL
-		? true
-		: this->getLigne()->GetResa()->circulationPossible(this, __MomentCalcul, __MomentDepart);
+    return this->getLigne() ->GetResa() == NULL
+           ? true
+           : this->getLigne() ->GetResa() ->circulationPossible( this, __MomentCalcul, __MomentDepart );
 }
 
 
 
-void cTrain::setNumero(const cTexte& newVal)
+void cTrain::setNumero( const cTexte& newVal )
 {
-	vNumero.Vide();
-	vNumero << newVal;
+    vNumero.Vide();
+    vNumero << newVal;
 }
 
 void cTrain::setServiceContinu()
 {
-	vEstCadence = true;
+    vEstCadence = true;
 }
 
-cJC* cTrain::setJC(cJC* newVal)
+cJC* cTrain::setJC( cJC* newVal )
 {
-	vCirculation = newVal;
-	return(newVal);
+    vCirculation = newVal;
+    return ( newVal );
 }
 
 cJC* cTrain::getJC() const
 {
-	return(vCirculation);
+    return ( vCirculation );
 }
 
 bool cTrain::EstCadence() const
 {
-	return(vEstCadence);
+    return ( vEstCadence );
 }
 
-const tDureeEnMinutes& cTrain::EtalementCadence() const
+const int& cTrain::EtalementCadence() const
 {
-	return(vEtalementCadence);
+    return ( vEtalementCadence );
 }
 
-const tDureeEnMinutes& cTrain::Attente() const
+const int& cTrain::Attente() const
 {
-	return(vAttente);
+    return ( vAttente );
 }
 
-void cTrain::setAttente(const tDureeEnMinutes& newVal)
+void cTrain::setAttente( const int& newVal )
 {
-	vAttente = newVal;
+    vAttente = newVal;
 }
 
-void cTrain::setAmplitudeServiceContinu(const tDureeEnMinutes& newVal)
+void cTrain::setAmplitudeServiceContinu( const int& newVal )
 {
-	//#ifndef OS_LINUX
-	//_ASSERTE(newVal >= 0 && newVal <= MinutesParJour);
-	//#endif
-	vEtalementCadence = newVal;
+    //#ifndef OS_LINUX
+    //_ASSERTE(newVal >= 0 && newVal <= MinutesParJour);
+    //#endif
+    vEtalementCadence = newVal;
 }
 
 const cTexte& cTrain::getNumero() const
 {
-	return(vNumero);
+    return ( vNumero );
 }
 
 cLigne* cTrain::getLigne() const
 {
-	return(vLigne);
+    return ( vLigne );
 }
 
 
-/*!	\brief Horaire de départ de la circulation
-	\author Hugues Romain
-	\date 2005
-	\return Horaire de départ de la circulation (premier départ pour un service continu)
+/*! \brief Horaire de départ de la circulation
+ \author Hugues Romain
+ \date 2005
+ \return Horaire de départ de la circulation (premier départ pour un service continu)
 */
-const cHoraire* cTrain::getHoraireDepartPremier() const
+const synthese::time::Schedule* cTrain::getHoraireDepartPremier() const
 {
-	return _HoraireDepart;
+    return _HoraireDepart;
 }
 
-void cTrain::setHoraireDepart(cHoraire* Ptr)
+void cTrain::setHoraireDepart( synthese::time::Schedule* Ptr )
 {
-	_HoraireDepart = Ptr;
+    _HoraireDepart = Ptr;
 }
 
 
-/*!	\brief Calcul de la circulation du train le jour donné
-	\param __DateDepart Date de départ du voyageur
-	\param __JPlus Nombre de jours calendaires séparant la date de départ du voyageur de la date de départ de l'origine du train (référence du calendrier de circulation)
+/*! \brief Calcul de la circulation du train le jour donné
+ \param __DateDepart Date de départ du voyageur
+ \param __JPlus Nombre de jours calendaires séparant la date de départ du voyageur de la date de départ de l'origine du train (référence du calendrier de circulation)
 */
-bool cTrain::Circule(const cDate& __DateDepart, tDureeEnJours __JPlus) const
+bool cTrain::Circule( const synthese::time::Date& __DateDepart, int __JPlus ) const
 {
-	if (__JPlus > 0)
-	{
-		cDate __DateDepartOrigine;
-		__DateDepartOrigine = __DateDepart;
-		__DateDepartOrigine -= __JPlus;
-		return vCirculation->Circule(__DateDepartOrigine);
-	}
-	else
-		return vCirculation->Circule(__DateDepart);
+    if ( __JPlus > 0 )
+    {
+        synthese::time::Date __DateDepartOrigine;
+        __DateDepartOrigine = __DateDepart;
+        __DateDepartOrigine -= __JPlus;
+        return vCirculation->Circule( __DateDepartOrigine );
+    }
+    else
+        return vCirculation->Circule( __DateDepart );
 }

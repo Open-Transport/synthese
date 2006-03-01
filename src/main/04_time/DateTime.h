@@ -65,7 +65,7 @@ class DateTime
 
         void updateHour ( const std::string& );
         void subDaysDuration ( int daysDuration );
-        void addDaysDuration ( int daysDuration );
+        void addDaysDuration ( int daysDuration = 1);
         //@}
 
 

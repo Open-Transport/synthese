@@ -4,113 +4,113 @@
 
 bool cResultatBaseDeDonnees::AddEnregistrement()
 {
-	tResultatBaseDeDonnees_Enregistrement __Enregistrement;
-	_EnregistrementCourant = _Donnees.SetElement(__Enregistrement);
-	return _EnregistrementCourant != INCONNU;
+    tResultatBaseDeDonnees_Enregistrement __Enregistrement;
+    _EnregistrementCourant = _Donnees.SetElement( __Enregistrement );
+    return _EnregistrementCourant != INCONNU;
 }
 
-bool cResultatBaseDeDonnees::SetValeur(tIndex __Position, cResultatBaseDeDonnees_Cellule* __Cellule)
+bool cResultatBaseDeDonnees::SetValeur( int __Position, cResultatBaseDeDonnees_Cellule* __Cellule )
 {
-	return _Donnees.getElement(_EnregistrementCourant).SetElement(__Cellule, __Position) != INCONNU;
+    return _Donnees.getElement( _EnregistrementCourant ).SetElement( __Cellule, __Position ) != INCONNU;
 }
 
 void cResultatBaseDeDonnees::Vide()
 {
-	_Donnees.Vide();
-	_EnregistrementCourant = INCONNU;
-	_PositionChamps.clear();
+    _Donnees.Vide();
+    _EnregistrementCourant = INCONNU;
+    _PositionChamps.clear();
 }
 
-bool cResultatBaseDeDonnees::SetPositionChamp(char* __NomChamp, tIndex __Position)
+bool cResultatBaseDeDonnees::SetPositionChamp( char* __NomChamp, int __Position )
 {
-	_PositionChamps[__NomChamp] = __Position;
-	return true;
+    _PositionChamps[ __NomChamp ] = __Position;
+    return true;
 }
 
-int cResultatBaseDeDonnees::getNombre(const cTexte& __Champ, tIndex __Index)
+int cResultatBaseDeDonnees::getNombre( const cTexte& __Champ, int __Index )
 {
-	// Index
-	if (__Index == INCONNU)
-		__Index = _EnregistrementCourant;
-	if (!_Donnees.IndexValide(__Index))
-		return INCONNU;
+    // Index
+    if ( __Index == INCONNU )
+        __Index = _EnregistrementCourant;
+    if ( !_Donnees.IndexValide( __Index ) )
+        return INCONNU;
 
-	// Résultat
-	return _Donnees[__Index][_PositionChamps[__Champ.Texte()]]->getNombre();
-}
-
-
-
-cMoment cResultatBaseDeDonnees::getMoment(const cTexte& __Champ, tIndex __Index)
-{
-	// Index
-	if (__Index == INCONNU)
-		__Index = _EnregistrementCourant;
-	if (!_Donnees.IndexValide(__Index))
-		return cMoment();
-
-	// Résultat
-	return _Donnees[__Index][_PositionChamps[__Champ.Texte()]]->getMoment();
+    // Résultat
+    return _Donnees[ __Index ][ _PositionChamps[ __Champ.Texte() ] ] ->getNombre();
 }
 
 
 
-cTexte cResultatBaseDeDonnees::getTexte(const cTexte& __Champ, tIndex __Index)
+synthese::time::DateTime cResultatBaseDeDonnees::getMoment( const cTexte& __Champ, int __Index )
 {
-	// Index
-	if (__Index == INCONNU)
-		__Index = _EnregistrementCourant;
-	if (!_Donnees.IndexValide(__Index))
-		return cTexte();
+    // Index
+    if ( __Index == INCONNU )
+        __Index = _EnregistrementCourant;
+    if ( !_Donnees.IndexValide( __Index ) )
+        return synthese::time::DateTime();
 
-	// Résultat
-	return _Donnees[__Index][_PositionChamps[__Champ.Texte()]]->getTexte();
+    // Résultat
+    return _Donnees[ __Index ][ _PositionChamps[ __Champ.Texte() ] ] ->getMoment();
 }
 
 
 
-tBool3 cResultatBaseDeDonnees::getBool(const cTexte& __Champ, tIndex __Index)
+cTexte cResultatBaseDeDonnees::getTexte( const cTexte& __Champ, int __Index )
 {
-	// Index
-	if (__Index == INCONNU)
-		__Index = _EnregistrementCourant;
-	if (!_Donnees.IndexValide(__Index))
-		return Indifferent;
+    // Index
+    if ( __Index == INCONNU )
+        __Index = _EnregistrementCourant;
+    if ( !_Donnees.IndexValide( __Index ) )
+        return cTexte();
 
-	// Résultat
-	return _Donnees[__Index][_PositionChamps[__Champ.Texte()]]->getBool();
+    // Résultat
+    return _Donnees[ __Index ][ _PositionChamps[ __Champ.Texte() ] ] ->getTexte();
+}
+
+
+
+tBool3 cResultatBaseDeDonnees::getBool( const cTexte& __Champ, int __Index )
+{
+    // Index
+    if ( __Index == INCONNU )
+        __Index = _EnregistrementCourant;
+    if ( !_Donnees.IndexValide( __Index ) )
+        return Indifferent;
+
+    // Résultat
+    return _Donnees[ __Index ][ _PositionChamps[ __Champ.Texte() ] ] ->getBool();
 }
 
 
 bool cResultatBaseDeDonnees::GoPremier()
 {
-	if (_Donnees.Taille())
-	{
-		_EnregistrementCourant = 0;
-		return true;
-	} // if (_Donnees.Taille())
-	else
-	{
-		_EnregistrementCourant = INCONNU;
-		return false;
-	}
+    if ( _Donnees.Taille() )
+    {
+        _EnregistrementCourant = 0;
+        return true;
+    } // if (_Donnees.Taille())
+    else
+    {
+        _EnregistrementCourant = INCONNU;
+        return false;
+    }
 }
 
 bool cResultatBaseDeDonnees::GoSuivant()
 {
-	if (_EnregistrementCourant + 1 < _Donnees.Taille())
-	{
-		_EnregistrementCourant++;
-		return true;
-	}
-	else
-	{
-		_EnregistrementCourant = INCONNU;
-		return false;
-	}
+    if ( _EnregistrementCourant + 1 < _Donnees.Taille() )
+    {
+        _EnregistrementCourant++;
+        return true;
+    }
+    else
+    {
+        _EnregistrementCourant = INCONNU;
+        return false;
+    }
 }
 
-const tPositionChamps& cResultatBaseDeDonnees::getPositionsChamps()	const
+const tPositionChamps& cResultatBaseDeDonnees::getPositionsChamps() const
 {
-	return _PositionChamps;
+    return _PositionChamps;
 }

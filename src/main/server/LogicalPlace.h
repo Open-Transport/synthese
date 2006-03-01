@@ -1,5 +1,5 @@
 /** En-tête classe Lieu logique.
- @file cLieuLogique.h
+@file cLieuLogique.h
 */
 
 #ifndef SYNTHESE_LOGICALPLACE_H
@@ -11,7 +11,7 @@
 #include <map>
 #include "map/Address.h"
 #include <string>
-#include "Temps.h"
+
 
 class cCommune;
 class NetworkAccessPoint;
@@ -63,165 +63,165 @@ class cLigne;
 */
 class LogicalPlace : public cPoint
 {
-public:
+    public:
 
-    /** Durée de correspondance factice indiquant que le délai minimum pour la correspondance entre deux points d'accès est inconnu. */
-    static const tDureeEnMinutes UNKNOWN_TRANSFER_DELAY;
+        /** Durée de correspondance factice indiquant que le délai minimum pour la correspondance entre deux points d'accès est inconnu. */
+        static const int UNKNOWN_TRANSFER_DELAY;
 
-    /** Durée de correspondance factice indiquant que la correspondance entre deux points d'accès est interdite */
-    static const tDureeEnMinutes FORBIDDEN_TRANSFER_DELAY;
+        /** Durée de correspondance factice indiquant que la correspondance entre deux points d'accès est interdite */
+        static const int FORBIDDEN_TRANSFER_DELAY;
 
-    /** Règles de correspondance */
-    enum tNiveauCorrespondance
-    {
-        CorrInterdite = 0,
-        CorrAutorisee = 1,
-        CorrRecommandeeCourt = 2,
-        CorrRecommandee = 3
+        /** Règles de correspondance */
+        enum tNiveauCorrespondance
+        {
+            CorrInterdite = 0,
+            CorrAutorisee = 1,
+            CorrRecommandeeCourt = 2,
+            CorrRecommandee = 3
     };
 
-    /** Map vers les arrêts physiques */
-    typedef map<size_t, cArretPhysique*> PhysicalStopsMap;
+        /** Map vers les arrêts physiques */
+        typedef std::map<size_t, cArretPhysique*> PhysicalStopsMap;
 
-    /** Map vers les adresses routières */
-    typedef map<size_t, synmap::Address*> AddressesMap;
+        /** Map vers les adresses routières */
+        typedef std::map<size_t, synmap::Address*> AddressesMap;
 
-	/** Vecteur vers les points d'accès */
-	typedef vector<NetworkAccessPoint*> AccessPointsVector;
+        /** Vecteur vers les points d'accès */
+        typedef std::vector<NetworkAccessPoint*> AccessPointsVector;
 
-private:
+    private:
 
-    //! @name Localisation
-    //@{
-		cCommune*  _town; //!< Commune dans laquelle se trouve le lieu
-		synmap::Road* const  _road;  //!< Route si lieu route entière
-    //@}
+        //! @name Localisation
+        //@{
+        cCommune* _town; //!< Commune dans laquelle se trouve le lieu
+        synmap::Road* const _road;  //!< Route si lieu route entière
+        //@}
 
-    //! @name Composition
-    //@{
-		AccessPointsVector _networkAccessPoints; // Points d'entrée dans les réseaux
-		vector<LogicalPlace*>  _aliasedLogicalPlaces; //!< Lieux logiques inclus
-    //@}
+        //! @name Composition
+        //@{
+        AccessPointsVector _networkAccessPoints; // Points d'entrée dans les réseaux
+        std::vector<LogicalPlace*> _aliasedLogicalPlaces; //!< Lieux logiques inclus
+        //@}
 
-    //! @name Désignation
-    //@{
-		std::string  _name; //!< Désignation du lieu
-		std::string  _nameAsDestinationForTimetable;  //!< Désignation pour affichage en tant que destination ou origine d'un service (indicateurs horaires)
-		std::string  _name13;  //!< Désignation de 13 caractères de long (téléaffichage)
-		std::string  _name26;  //!< Désignation de 26 caractères de long (téléaffichage)
-    //@}
+        //! @name Désignation
+        //@{
+        std::string _name; //!< Désignation du lieu
+        std::string _nameAsDestinationForTimetable;  //!< Désignation pour affichage en tant que destination ou origine d'un service (indicateurs horaires)
+        std::string _name13;  //!< Désignation de 13 caractères de long (téléaffichage)
+        std::string _name26;  //!< Désignation de 26 caractères de long (téléaffichage)
+        //@}
 
-    //! @name Paramètres
-    //@{
-	    const bool  _volatile; //!< Indique si l'objet est destiné à une seule utilisation immédiate ou s'il appartient à la base de données générale.
-    //@}
-
-
-    //! \name Documentation
-    //@{
-		cAlerte     _alert;   //!< Alerte en cours de validité
-    //@}
-
-    //! \name Gestion des correspondances
-    //@{
-	//    tDureeEnMinutes   _minTransferDelay;   //!< Délai minimal de correspondance entre point d'entrée réseaux le plus faible du lieu
-		const tNiveauCorrespondance _transferRules;   //!< Type d'autorisation de correspondance
-	//    vector< tDureeEnMinutes >  _maxTransferDelay;    //!< Tableau des plus longs délais minimaux de correspondance au départ de chaque point d'entrée de réseau
-		vector< vector< tDureeEnMinutes > >  _transferDelay;   //!< Tableau des délais minimaux de correspondance entre quais
-    //@}
+        //! @name Paramètres
+        //@{
+        const bool _volatile; //!< Indique si l'objet est destiné à une seule utilisation immédiate ou s'il appartient à la base de données générale.
+        //@}
 
 
-    //! \name Donnes complmentaires
-    //@{
-	//	tVitesseKMH   vVitesseMax[NOMBREVMAX]; //!< Tableau des vitesses maximales par tranche de distance (temporairement inutilis)
-    //@}
+        //! \name Documentation
+        //@{
+        cAlerte _alert;   //!< Alerte en cours de validité
+        //@}
 
-    //! \name Chainage et indexation
-    //@{
-	    const tIndex _id;    //!< Index du lieu logique dans l'environnement
-    //@}
+        //! \name Gestion des correspondances
+        //@{
+        //    int   _minTransferDelay;   //!< Délai minimal de correspondance entre point d'entrée réseaux le plus faible du lieu
+        const tNiveauCorrespondance _transferRules;   //!< Type d'autorisation de correspondance
+        //    vector< int >  _maxTransferDelay;    //!< Tableau des plus longs délais minimaux de correspondance au départ de chaque point d'entrée de réseau
+        std::vector< std::vector< int > > _transferDelay;   //!< Tableau des délais minimaux de correspondance entre quais
+        //@}
 
 
-public:
+        //! \name Donnes complmentaires
+        //@{
+        // tVitesseKMH   vVitesseMax[NOMBREVMAX]; //!< Tableau des vitesses maximales par tranche de distance (temporairement inutilis)
+        //@}
 
-    //! @name Accesseurs
-    //@{
-    tDureeEnMinutes   AttenteCorrespondance(size_t Dep, size_t Arr)   const;
-    const tDureeEnMinutes& AttenteMinimale()          const;
-    tNiveauCorrespondance CorrespondanceAutorisee()        const;
-    const cAlerte&   getAlerte()            const;
-	const std::string&   getDesignationOD()          const;
-    cArretPhysique*   GetArretPhysique(int)         const;
-    NetworkAccessPoint*  getNetworkAccessPoint(tIndex id) const
-    {
-        return _networkAccessPoints[id];
-    }
-	const AccessPointsVector& getNetworkAccessPoints() const { return _networkAccessPoints; }
-	
-	const std::string&           getDesignation13()                                      const;
-	const std::string&           getDesignation26()                                      const;
-	const std::string&   getName() const;
-    cCommune*    getTown() const
-    {
-        return _town;
-    }
-    tIndex     getId() const
-    {
-        return _id;
-    }
+        //! \name Chainage et indexation
+        //@{
+        const int _id;    //!< Index du lieu logique dans l'environnement
+        //@}
 
-    tIndex     Index()             const;
-//    const tDureeEnMinutes& PireAttente(tIndex i)         const;
-    bool getVolatile() const
-    {
-        return _volatile;
-    }
-    vector<LogicalPlace*> getAliasedLogicalPlaces() const
-    {
-        return _aliasedLogicalPlaces;
-    }
-    PhysicalStopsMap getPhysicalStops()          const;
-    AddressesMap getAddresses()          const;
-    // tVitesseKMH    vitesseMax(size_t Categorie)       const;
-    //@}
 
-    //! \name Calculateurs
-    //@{
-    // cElementTrajet*   ProchainDirect(LogicalPlace* Destination, cMoment& MomentDepart, const cMoment& ArriveeMax
-    //        , tIndex ArretPhysiqueArriveePrecedente)          const;
-//    cMoment     MomentArriveePrecedente (const cMoment& MomentArrivee, const cMoment& MomentArriveeMin)  const;
-  //  cMoment     MomentDepartSuivant(const cMoment& MomentDepart, const cMoment& MomentDepartMax
-    //                                , const cMoment& __MomentCalcul)          const;
-  //  cGareLigne*    DessertAuDepart (const cLigne*)                const;
-  //  cGareLigne*    DessertALArrivee    (const cLigne*)            const;
-    tNiveauCorrespondance NiveauCorrespondance   (const cDistanceCarree& D)         const;
-    LogicalPlace*   accurateAddressLogicalPlace(synmap::Address::AddressNumber addressNumber)       ;
-    //@}
+    public:
 
-    //! \name Modificateurs
-    //@{
-		tIndex addNetworkAccessPoint(NetworkAccessPoint* networkAccessPoint, tIndex id=INCONNU);
-		void addAliasedLogicalPlace(LogicalPlace*);
-		cAlerte&	getAlertForSettings();
-		void setDelaiCorrespondance(tIndex __VoieDepart, tIndex __VoieArrivee, tDureeEnMinutes);
-		void setDesignationOD(const std::string&);
-		// bool setVMax(tCategorieDistance, tVitesseKMH);
-		bool    setDesignation13(const std::string&);
-		bool    setDesignation26(const std::string&);
-		void setDesignation(cCommune*, const std::string&);
-    //@}
+        //! @name Accesseurs
+        //@{
+        int AttenteCorrespondance( size_t Dep, size_t Arr ) const;
+        const int& AttenteMinimale() const;
+        tNiveauCorrespondance CorrespondanceAutorisee() const;
+        const cAlerte& getAlerte() const;
+        const std::string& getDesignationOD() const;
+        cArretPhysique* GetArretPhysique( int ) const;
+        NetworkAccessPoint* getNetworkAccessPoint( int id ) const
+        {
+            return _networkAccessPoints[ id ];
+        }
+        const AccessPointsVector& getNetworkAccessPoints() const { return _networkAccessPoints; }
 
-    //! \name Constructeurs et destructeur
-    //@{
-    LogicalPlace(tIndex, tNiveauCorrespondance);
-    LogicalPlace(synmap::Road*);
-    LogicalPlace(synmap::Address*);
-    LogicalPlace(cCommune*, std::string);
-    LogicalPlace(tIndex, cCommune*);
-    LogicalPlace(cCommune*);
-	LogicalPlace(LogicalPlace*);
-    ~LogicalPlace();
-    //@}
+        const std::string& getDesignation13() const;
+        const std::string& getDesignation26() const;
+        const std::string& getName() const;
+        cCommune* getTown() const
+        {
+            return _town;
+        }
+        int getId() const
+        {
+            return _id;
+        }
+
+        int Index() const;
+        //    const int& PireAttente(int i)         const;
+        bool getVolatile() const
+        {
+            return _volatile;
+        }
+        std::vector<LogicalPlace*> getAliasedLogicalPlaces() const
+        {
+            return _aliasedLogicalPlaces;
+        }
+        PhysicalStopsMap getPhysicalStops() const;
+        AddressesMap getAddresses() const;
+        // tVitesseKMH    vitesseMax(size_t Categorie)       const;
+        //@}
+
+        //! \name Calculateurs
+        //@{
+        // cElementTrajet*   ProchainDirect(LogicalPlace* Destination, synthese::time::DateTime& MomentDepart, const synthese::time::DateTime& ArriveeMax
+        //        , int ArretPhysiqueArriveePrecedente)          const;
+        //    synthese::time::DateTime     MomentArriveePrecedente (const synthese::time::DateTime& MomentArrivee, const synthese::time::DateTime& MomentArriveeMin)  const;
+        //  synthese::time::DateTime     MomentDepartSuivant(const synthese::time::DateTime& MomentDepart, const synthese::time::DateTime& MomentDepartMax
+        //                                , const synthese::time::DateTime& __MomentCalcul)          const;
+        //  cGareLigne*    DessertAuDepart (const cLigne*)                const;
+        //  cGareLigne*    DessertALArrivee    (const cLigne*)            const;
+        tNiveauCorrespondance NiveauCorrespondance ( const cDistanceCarree& D ) const;
+        LogicalPlace* accurateAddressLogicalPlace( synmap::Address::AddressNumber addressNumber ) ;
+        //@}
+
+        //! \name Modificateurs
+        //@{
+        int addNetworkAccessPoint( NetworkAccessPoint* networkAccessPoint, int id = INCONNU );
+        void addAliasedLogicalPlace( LogicalPlace* );
+        cAlerte& getAlertForSettings();
+        void setDelaiCorrespondance( int __VoieDepart, int __VoieArrivee, int );
+        void setDesignationOD( const std::string& );
+        // bool setVMax(tCategorieDistance, tVitesseKMH);
+        bool setDesignation13( const std::string& );
+        bool setDesignation26( const std::string& );
+        void setDesignation( cCommune*, const std::string& );
+        //@}
+
+        //! \name Constructeurs et destructeur
+        //@{
+        LogicalPlace( int, tNiveauCorrespondance );
+        LogicalPlace( synmap::Road* );
+        LogicalPlace( synmap::Address* );
+        LogicalPlace( cCommune*, std::string );
+        LogicalPlace( int, cCommune* );
+        LogicalPlace( cCommune* );
+        LogicalPlace( LogicalPlace* );
+        ~LogicalPlace();
+        //@}
 
 };
 
