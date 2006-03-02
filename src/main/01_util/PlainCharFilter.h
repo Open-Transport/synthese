@@ -193,67 +193,7 @@ PlainCharFilter::write(Sink& dest, const char* s, std::streamsize n)
     }
     return i;
 }
-/*
-  �
-�
-�
-�
-�
-�
-�
-�
-    
-    std::cout << ((unsigned char) c) << std::endl;
 
-    switch ( c )
-    {
-    case 'á':
-    case 'à':
-    case 'ä':
-    case 'â':
-	std::cout << "AAAA found !!" << std::endl;
-	return boost::iostreams::put (dest, 'a');
-
-    case 'é':
-    case 'è':
-    case 'ë':
-    case 'ê':
-	return boost::iostreams::put (dest, 'e');
-	
-    case 'í':
-    case 'ì':
-    case 'ï':
-    case 'î':
-	return boost::iostreams::put (dest, 'i');
-	
-    case 'ó':
-    case 'ò':
-    case 'ö':
-    case 'ô':
-	return boost::iostreams::put (dest, 'o');
-
-    case 'ú':
-    case 'ù':
-    case 'ü':
-    case 'û':
-	return boost::iostreams::put (dest, 'u');
-
-    case 'ç':
-	return boost::iostreams::put (dest, 'c');
-
-    case '(':
-    case ')':
-	return boost::iostreams::put (dest, ' ');
-	
-//    default: 
-    }
-	return boost::iostreams::put(dest, c);
-*/
-
-
-	
-	
-	
 	
 }
 }
