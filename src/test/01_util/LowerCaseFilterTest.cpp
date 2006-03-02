@@ -40,7 +40,7 @@ namespace util
 
       {
 	  out << "HeLLo WorLD !!!" << std::endl ;
-	  std::string expected ("hello world !!!\n");
+	  std::string expected ("hello world     ");
 	  CPPUNIT_ASSERT_EQUAL (expected, sout.str ());
       }
       sout.str ("");
@@ -48,6 +48,12 @@ namespace util
 	  
 	  out << "ABCDEFGHIJKLMNOPQRSTUVWXYZ" << std::flush ;;
 	  std::string expected ("abcdefghijklmnopqrstuvwxyz");
+	  CPPUNIT_ASSERT_EQUAL (expected, sout.str ());
+      }
+      sout.str ("");
+      {
+	  out << "Abc 1234 :,????Z" << std::flush ;;
+	  std::string expected ("abc 1234       z");
 	  CPPUNIT_ASSERT_EQUAL (expected, sout.str ());
       }
       

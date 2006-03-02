@@ -18,7 +18,9 @@ namespace util
 {
 
 
-/** 
+/** Converts any upper case letter going through this filter to lower case.
+Any numerical character is preserved. All other characters are converted to space.
+ *  
 @ingroup m01
 */
 class LowerCaseFilter : public boost::iostreams::output_filter {
@@ -44,9 +46,13 @@ LowerCaseFilter::put(Sink& dest, int c)
     {
 	return boost::iostreams::put(dest, c - 'A' + 'a');
     }
-    else 
+    else if ( c >= '0' && c <= '9' || c >= 'a' && c <= 'z' )
     {
 	return boost::iostreams::put(dest, c);
+    }
+    else 
+    {
+	return boost::iostreams::put(dest, ' ');
     }
 }
  

@@ -7,10 +7,12 @@
 #include <cppunit/CompilerOutputter.h>
 
 #include "LowerCaseFilterTest.h"
+#include "PlainCharFilterTest.h"
 
 
 
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::LowerCaseFilterTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::PlainCharFilterTest);
 
 
 
