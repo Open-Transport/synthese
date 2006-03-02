@@ -166,17 +166,6 @@ class cTexteHTML : public cTexte
 
 
 
-                /*! \brief Classe de texte destinée à recevoir des données uniquement en minuscules et sans accent (voir cTexteMinuscules::ConvertChar() pour les détails des règles)
-                 \author Hugues Romain
-                 \date 2005
-                */
-            class cTexteMinuscules : public cTexteSansAccent
-                {
-                    protected:
-                        int ConvertChar( const char c, char* Tampon = NULL ) const;
-
-                    public:
-                };
 
 
                 /*! \brief Ecriture sur l'objet depuis un flux d'entrée quelconque

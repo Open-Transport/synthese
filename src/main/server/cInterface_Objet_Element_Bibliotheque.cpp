@@ -14,6 +14,12 @@
 #include "cModaliteReservationEnLigne.h"
 #include "cTrain.h"
 
+#include "01_util/LowerCaseFilter.h"
+#include <boost/iostreams/filtering_stream.hpp>
+#include <sstream>
+
+
+
 /*! \brief Copie d'un �l�ment objet dynamique, selon les param�tres fournis
  \param Parametres Chaine de param�tres desquels tenir compte
  \author Hugues Romain
@@ -1597,10 +1603,20 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                                 || __TypeAffichage.Compare( "station_city_if_new" ) && __DP->GetGare( __i ) ->getTown() != __DerniereCommune
                            )
                         {
-                            cTexteMinuscules __TexteMinuscule;
-                            __TexteMinuscule << __DP->GetGare( __i ) ->getTown() ->getName();
-                            pCtxt << __AvantCommune << __TexteMinuscule << __ApresCommune;
+			    // BOOM!
+			    std::stringstream ss;
+			    boost::iostreams::filtering_ostream out;
+			    out.push (synthese::util::LowerCaseFilter());
+			    out.push (ss);
+			    
+			    out << __DP->GetGare( __i ) ->getTown() ->getName();
+
+                            // cTexteMinuscules __TexteMinuscule;
+                            // __TexteMinuscule << __DP->GetGare( __i ) ->getTown() ->getName();
+                            pCtxt << __AvantCommune << ss.str () << __ApresCommune;
                             __DerniereCommune = __DP->GetGare( __i ) ->getTown();
+
+
                         }
 
                         // Affichage du nom d'arr�t dans les cas o� n�cessaire
