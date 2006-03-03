@@ -16,10 +16,13 @@ namespace synthese
 	*/
 
 	/** 72 rs485_client namespace */
-	namespace rs485_client
+	namespace client
 	{
-
-
+        // mettre ici tout l'aspect client synthese tcp
+        namespace rs485
+        {
+            // mettre ici le code rs485
+        }
 	}
 
 	/** @} */
