@@ -28,6 +28,8 @@ public:
     
     PlainCharFilter () {}
 
+    /** @todo Complete filtering implementation for other special characters
+     */
     template<typename Sink> 
 	std::streamsize write(Sink& dest, const char* s, std::streamsize n);
 

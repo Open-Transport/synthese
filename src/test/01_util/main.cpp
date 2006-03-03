@@ -6,11 +6,13 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/CompilerOutputter.h>
 
+#include "HtmlFilterTest.h"
 #include "LowerCaseFilterTest.h"
 #include "PlainCharFilterTest.h"
 
 
 
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::HtmlFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::LowerCaseFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::PlainCharFilterTest);
 
