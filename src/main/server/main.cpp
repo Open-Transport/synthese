@@ -16,6 +16,11 @@
 #include <string>
 #include <sstream>
 #include "00_tcp/Socket.h"
+#include "01_util/HtmlFilter.h"
+
+#include <boost/iostreams/filtering_stream.hpp>
+
+
 #include "Parametres.h"
 #include "cTexteRequeteSYNTHESE.h"
 
@@ -197,7 +202,15 @@ void *ServerThread( void *args )
 
                 // Utilisation des objets Synthese et appel du calculateur
                 cTexteRequeteSYNTHESE query;
-                stringstream pCtxt;
+
+		// MJ : we set the HTML filter here and we do not use any cTexteHTML anymore. 
+		// The data is kept in its original format as long as possible
+		std::stringstream htmlResult;
+
+		boost::iostreams::filtering_ostream pCtxt;
+		pCtxt.push (synthese::util::HtmlFilter());
+		pCtxt.push (htmlResult);
+
                 query << __Buffer;
 #ifdef DEBUG
 
@@ -210,7 +223,7 @@ void *ServerThread( void *args )
                 cout << "sending result" << endl;
 #endif
                 // Envoi de la r�ponse
-                srvSocket.write( pContext->socket, pCtxt.str().data(), pCtxt.str().size(), 0 );
+                srvSocket.write( pContext->socket, htmlResult.str().c_str(), htmlResult.str().size(), 0 );
                 /** TODO: ATTENTION
                   ajouter une s�quence de terminaison
                   et n'envoyer que cela si timeout calculateur
