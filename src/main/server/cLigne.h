@@ -19,6 +19,7 @@ class cArretPhysique;
 class cEnvironnement;
 
 #include <vector>
+#include <string>
 #include "cJourCirculation.h"
 #include "cTexte.h"
 #include "cDistanceCarree.h"
@@ -61,7 +62,7 @@ class cLigne
         cTexte vStyle;    //!< Style CSS du cartouche
         cTexte vImage;    //!< Image � afficher en tant que cartouche
         const std::string vCode;    //!< Code d'identification de la ligne
-        cTexteSansAccent vNomPourIndicateur; //!< Lib�ll� mentionn� dans les tableaux d'indicateurs horaires
+        std::string vNomPourIndicateur; //!< Libelle mentionne dans les tableaux d'indicateurs horaires
         cTexte vGirouette;   //!< Destination affich�e sur les v�hicules
         //@}
 
@@ -95,7 +96,7 @@ class cLigne
         void setLibelleComplet( const cTexte& newLibelleComplet );
         void setLibelleSimple( const cTexte& newNom );
         void setMateriel( cMateriel* );
-        void setNomPourIndicateur( const cTexte& newNom );
+        void setNomPourIndicateur( const std::string& newNom );
         void setResa( cModaliteReservation* );
         void setReseau( cReseau* newReseau );
         // void    setServices(const cTexte& TamponJC, const cTexte& TamponAtt, const cTexte& TamponDernier
@@ -134,7 +135,7 @@ class cLigne
         const cTexte& getImage() const;
         const cTexte& getLibelleComplet() const;
         const cTexte& getLibelleSimple() const;
-        const cTexte& getNomPourIndicateur() const;
+        const std::string& getNomPourIndicateur() const;
         cModaliteReservation* GetResa() const;
         cReseau* getReseau() const;
         const cTexte& getStyle() const;

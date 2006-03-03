@@ -12,6 +12,10 @@
 
 #include "04_time/Schedule.h"
 
+#include <sstream>
+#include <01_util/PlainCharFilter.h>
+#include <boost/iostreams/filtering_stream.hpp>
+
 
 /*! \brief Destructeur
  \author Hugues Romain
@@ -87,248 +91,6 @@ cLigne::cLigne( const string& newCode, cAxe* const newAxe, cEnvironnement* const
 }
 
 
-
-/*! \brief Sauvegarde dans le fichier d'origine les donn�es de la ligne
- \todo A rendre compatible avec les FormatFichier pour rendre l'evolutivite.
- \todo G�rer tous les champs
- \todo GERER LES NOUVELLES LIGNES A PARTIR DE L'AXE OU NON
- \author Hugues Romain
- \date 2001
- */
-bool cLigne::Sauvegarde() const
-{
-    /* ifstream FichierActuel;
-     ofstream FichierFutur;
-     cTexte NomFichierTemp(vAxe->getNomFichier().GetTaille() + 5);
-     NomFichierTemp << vAxe->getNomFichier() << ".temp";
-     cTexte Tampon(TAILLETAMPON, true);
-     bool AxeTrouve = false;
-     bool LigneTrouvee = false;
-     bool FichierTermine = false;
-     
-     // Ouverture des fichiers 
-     FichierActuel.open(vAxe->getNomFichier().Texte());
-     //Sauvegarde = new cSauvegarde(Axe->NomFichier);
-     
-     //Sauvegarde->CopieJusqueA(Axe->Code, Code);
-     
-     // Si le fichier existe: Copie de la partie non utile
-     if (FichierActuel.is_open())
-     {
-      FichierFutur.open(NomFichierTemp.Texte());
-      while (!FichierActuel.eof() && !FichierTermine)
-      {
-       switch (Tampon.LireLigne(FichierActuel))
-       {
-       case TYPEVide:
-        FichierTermine = true;
-        break;
-     
-       case TYPESection:
-        // Recherche de l'axe
-        if (!AxeTrouve)
-        {
-         if (vAxe->Libre() && Tampon.Compare("##", 2))
-          Tampon.vPosition = 2;
-         else
-          Tampon.vPosition = 1;
-         if (Tampon.Compare(vAxe->getCode(), 0, Tampon.vPosition))
-          AxeTrouve = true;
-        }
-        else
-         FichierTermine = true;
-        break;
-     
-       case TYPESousSection:
-        // Recherche de la ligne
-        if (AxeTrouve && Tampon.Compare(vCode, 0, 1))
-        {
-         FichierFutur << Tampon << endl;
-         Tampon.Vide();
-         for (Tampon.LireLigne(FichierActuel); Tampon[0]!= '[' && Tampon[0] != '#'; )
-          if(Tampon.LireLigne(FichierActuel)==TYPEVide) 
-           break;
-         
-         LigneTrouvee = true;
-         FichierTermine = true;
-         break;
-        }
-     
-        // Controle de sortie
-        if (AxeTrouve && !Tampon.Compare("#", 1))
-         break;
-       }
-       if (FichierTermine)
-        break;
-     
-       // Copie de la chaine
-       FichierFutur << Tampon << endl;
-      }
-     }
-     else
-     {
-      FichierFutur.open(vAxe->getNomFichier().Texte());
-     }
-     
-     if (!AxeTrouve)
-     {
-      FichierFutur << endl << "#";
-      if (vAxe->Libre())
-       FichierFutur << "#";
-      FichierFutur << vAxe->getCode() << "\n";
-     }
-     else
-      FichierFutur << FINL;
-     
-     if (!LigneTrouvee)
-      FichierFutur << "[" << vCode << "\n";
-     
-     // Ecriture des donn�es de la ligne 
-     FichierFutur << "RES              000000\n"; // PROVISOIRE
-     if (vLibelleSimple.GetTaille())
-      FichierFutur << "CAR              " << vLibelleSimple << endl;
-     if (vLibelleComplet.GetTaille())
-      FichierFutur << "DES              " << vLibelleComplet << endl;
-     if (vImage.GetTaille())
-      FichierFutur << "IMG              " << vImage << endl;
-     if (vStyle.GetTaille())
-      FichierFutur << "STY              " << vStyle << endl;
-     FichierFutur << "IND              " << vNomPourIndicateur << endl;
-     FichierFutur << "MAT              " << TXT2(vMateriel->Code(),6) << "\n";
-     FichierFutur << "RSA              000000\n"; // PROVISOIRE
-     FichierFutur << "VEL              000000\n"; // PROVISOIRE
-     FichierFutur << "TAR              000000\n"; // PROVISOIRE
-    #ifdef ClasseAdmin
-     // ATTENTION La desactivation de cette partie dans la version non Admin
-     // implique la non conservation des infos d'importation en cas de
-     // sauvegarde � l'aide de cette fonction !
-     // R�gler cette question avant utilisation de la fonction Sauvegarde
-     // sur la base SEMVAT
-     if (vImportSource != NULL)
-      FichierFutur << "IMP              " << NombreFormate(vImportSource->Code(),6) << "\n";
-    #endif
-     
-     FichierFutur << "CIS              ";
-     // SET PORTAGE LINUX
-     tNumeroService iNumeroService=0;
-     for (; iNumeroService!=vNombreServices; iNumeroService++)
-      FichierFutur << TXT2(vTrain[iNumeroService].getJC()->Index(),6);
-     
-     //END PORTAGE LINUX
-     FichierFutur << "\n";
-     
-     FichierFutur << "ATT              ";
-     for (iNumeroService=0; iNumeroService!=vNombreServices; iNumeroService++)
-      if (vTrain[iNumeroService].EstCadence())
-       FichierFutur << TXT2(Attente(iNumeroService).Valeur(), 6);
-      else
-       FichierFutur << "      ";
-     FichierFutur << "\n";
-     
-     FichierFutur << "FIN              ";
-     for (iNumeroService=0; iNumeroService!= vNombreServices; iNumeroService++)
-      if (vTrain[iNumeroService].EstCadence())
-      {
-       cTexteCodageInterne Parametre;
-       Parametre << vPremiereGareLigne->getHoraireDepartDernier(iNumeroService);
-       FichierFutur << Parametre;
-      }
-      else
-       FichierFutur << "      ";
-     FichierFutur << "\n";
-     
-    #ifdef ClasseAdmin
-     // ATTENTION La desactivation de cette partie dans la version non Admin
-     // implique la non conservation des infos d'importation en cas de
-     // sauvegarde � l'aide de cette fonction !
-     // R�gler cette question avant utilisation de la fonction Sauvegarde
-     // sur la base SEMVAT
-     if (vImportSource != NULL)
-     {
-      FichierFutur << "COR              ";
-      for (iNumeroService=0; iNumeroService!= vNombreServices; iNumeroService++)
-       FichierFutur << NombreFormate(vTrain[iNumeroService].CodeBaseTrains(),6);
-      FichierFutur << "\n";
-     }
-    #endif
-     
-     FichierFutur << "NUM              ";
-     for (iNumeroService=0; iNumeroService!= vNombreServices; iNumeroService++)
-     {
-      FichierFutur << vTrain[iNumeroService].getNumero();
-      //SET PORTAGE LINUX
-      //for (int i=0; i<(6 - vTrain[iNumeroService].getNumero().GetTaille()); i++)
-      for (unsigned int i=0; i<(6 - vTrain[iNumeroService].getNumero().GetTaille()); i++)
-      //END PORTAGE
-       FichierFutur << " ";
-     }
-     FichierFutur << "\n";
-     
-     for (cGareLigne* curGareLigne= vPremiereGareLigne; curGareLigne!=NULL; curGareLigne=curGareLigne->Suivant())
-     {
-      if (curGareLigne->EstArrivee())
-      {
-       FichierFutur << TXT2(curGareLigne->PH(),6);
-       FichierFutur << "*";
-       FichierFutur << TXT2(curGareLigne->ArretLogique()->Index(),6);
-       FichierFutur << "A";
-       FichierFutur << TXT2(curGareLigne->ArretPhysique(), 2);
-       if (curGareLigne->HorairesSaisis())
-        for (iNumeroService=0; iNumeroService!= vNombreServices; iNumeroService++)
-        {
-         cTexteCodageInterne Parametre;
-         Parametre << curGareLigne->getHoraireArriveePremier(iNumeroService);
-         FichierFutur << " " << Parametre;
-        }
-       FichierFutur << endl;
-      }
-     
-      if (curGareLigne->EstDepart())
-      {
-       FichierFutur << TXT2(curGareLigne->PH(),6);
-       FichierFutur << "*";
-       FichierFutur << TXT2(curGareLigne->ArretLogique()->Index(),6);
-       FichierFutur << "D";
-       FichierFutur << TXT2(curGareLigne->ArretPhysique(), 2);
-       if (curGareLigne->HorairesSaisis())
-        for (iNumeroService=0; iNumeroService!= vNombreServices; iNumeroService++)
-        {
-         cTexteCodageInterne Parametre;
-         Parametre << curGareLigne->getHoraireDepartPremier(iNumeroService);
-         FichierFutur << " " << Parametre;
-        }
-       FichierFutur << endl;
-      }
-     }
-     
-     // Si le fichier existe: Copie de la partie non utile
-     if (FichierActuel.is_open())
-     {
-      if (!FichierActuel.eof())
-       FichierFutur << endl << Tampon << endl;
-      while (!FichierActuel.eof())
-      {
-       if (Tampon.LireLigne(FichierActuel) == TYPEVide)
-        break;
-       FichierFutur << Tampon << endl;
-      }
-      FichierActuel.close();
-      FichierFutur.close();
-      // SET PORTAGE LINUX
-     */ /*if (CopyFile(NomFichierTemp.Texte(), vAxe->getNomFichier().Texte(), false))
-       DeleteFile(NomFichierTemp.Texte());
-      else
-       return(false);
-      */ 
-    /*  //END PORTAGE LINUX
-     }
-     else
-     {
-      FichierFutur.close();
-     }
-     
-    */ return ( true );
-}
 
 
 
@@ -492,8 +254,7 @@ cLigne* cLigne::operator =( const cLigne& LigneACopier )
     vStyle << LigneACopier.vStyle;
     vImage.Vide();
     vImage << LigneACopier.vImage;
-    vNomPourIndicateur.Vide();
-    vNomPourIndicateur << LigneACopier.vNomPourIndicateur;
+    vNomPourIndicateur = LigneACopier.vNomPourIndicateur;
     vResa = LigneACopier.vResa;
     vVelo = LigneACopier.vVelo;
     vMateriel = LigneACopier.vMateriel;
@@ -640,7 +401,7 @@ const std::string& cLigne::getCode() const
     return ( vCode );
 }
 
-const cTexte& cLigne::getNomPourIndicateur() const
+const std::string& cLigne::getNomPourIndicateur() const
 {
     return ( vNomPourIndicateur );
 }
@@ -656,17 +417,22 @@ void cLigne::setLibelleSimple( const cTexte& newNom )
 {
     vLibelleSimple.Vide();
     vLibelleSimple << newNom;
-    if ( !vNomPourIndicateur.Taille() )
+    if ( vNomPourIndicateur.size() == 0)
     {
-        vNomPourIndicateur.Vide();
-        vNomPourIndicateur << vLibelleSimple;
+	setNomPourIndicateur (std::string (vLibelleSimple.Texte ()));
     }
 }
 
-void cLigne::setNomPourIndicateur( const cTexte& newNom )
+void cLigne::setNomPourIndicateur( const std::string& newNom )
 {
-    vNomPourIndicateur.Vide();
-    vNomPourIndicateur << newNom;
+    std::stringstream sout;
+    synthese::util::PlainCharFilter filter;
+    boost::iostreams::filtering_ostream out;
+    out.push (filter);
+    out.push (sout);
+    
+    out << newNom << flush;
+    vNomPourIndicateur = sout.str ();
 }
 
 

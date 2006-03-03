@@ -632,17 +632,7 @@ bool cTexte::CompareChar( const char c1, const char c2 ) const
 
 
 
-/*! \brief Comparaison de deux caractères
- \param c1 Caractère du même format que l'objet
- \param c2 Caractère de format quelconque à comparer à c1 une fois converti au même format
- \return true si les deux caractères sont égaux une fois convertis au format de l'objet
-*/
-bool cTexteSansAccent::CompareChar( const char c1, const char c2 ) const
-{
-    char Tampon[ 2 ];
-    ConvertChar( c2, Tampon );
-    return ( c1 == Tampon[ 0 ] );
-}
+
 
 
 
@@ -691,63 +681,6 @@ int cTexte::ConvertChar( const char c, char* Tampon ) const
 }
 
 
-
-/*! \brief Conversion d'un caractère standard en caractère non accentué (simulation si pas de chaîne fournie)
- \param c Caractère à convertir
- \retval Tampon char* où écrire le résultat (NULL = pas d'écriture)
- \return Longueur de la chaîne convertie
- \author Hugues Romain
- \date 2005
- \todo Terminer l'implémentation des cas les plus courants
-*/
-int cTexteSansAccent::ConvertChar( const char c, char* Tampon ) const
-{
-    if ( Tampon )
-        switch ( c )
-        {
-            case 'é':
-            case 'è':
-            case 'ë':
-            case 'ê':
-                *Tampon = 'e';
-                break;
-            case 'ú':
-            case 'ù':
-            case 'ü':
-            case 'û':
-                *Tampon = 'u';
-                break;
-            case 'á':
-            case 'à':
-            case 'ä':
-            case 'â':
-                *Tampon = 'a';
-                break;
-            case 'í':
-            case 'ì':
-            case 'ï':
-            case 'î':
-                *Tampon = 'i';
-                break;
-            case 'ó':
-            case 'ò':
-            case 'ö':
-            case 'ô':
-                *Tampon = 'o';
-                break;
-            case 'ç':
-                *Tampon = 'c';
-                break;
-            case '(':
-            case ')':
-                *Tampon = ' ';
-                break;
-
-            default:
-                *Tampon = c;
-        }
-    return 1;
-}
 
 
 /*! \brief Conversion d'un caractère standard en caractère PostScript (simulation si pas de chaîne fournie)

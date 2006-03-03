@@ -15,6 +15,7 @@
 #include "cTrain.h"
 
 #include "01_util/LowerCaseFilter.h"
+#include "01_util/PlainCharFilter.h"
 #include <boost/iostreams/filtering_stream.hpp>
 #include <sstream>
 
@@ -1603,10 +1604,10 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                                 || __TypeAffichage.Compare( "station_city_if_new" ) && __DP->GetGare( __i ) ->getTown() != __DerniereCommune
                            )
                         {
-			    // BOOM!
 			    std::stringstream ss;
 			    boost::iostreams::filtering_ostream out;
 			    out.push (synthese::util::LowerCaseFilter());
+			    out.push (synthese::util::PlainCharFilter());
 			    out.push (ss);
 			    
 			    out << __DP->GetGare( __i ) ->getTown() ->getName();

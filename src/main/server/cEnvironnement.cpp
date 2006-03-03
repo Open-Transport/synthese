@@ -536,7 +536,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 				}
 
 				case HORAIRESFORMATLIGNECodeIndicateur:
-					curLigne->setNomPourIndicateur(vFormatHoraire.ExtraitComplet(Tampon, HORAIRESFORMATCOLONNEHoraire));
+					curLigne->setNomPourIndicateur(std::string (vFormatHoraire.ExtraitComplet(Tampon, HORAIRESFORMATCOLONNEHoraire).Texte ()));
 					break;
 
 				case HORAIRESFORMATLIGNEAAfficher:

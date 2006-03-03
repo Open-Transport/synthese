@@ -103,21 +103,6 @@ cTexte& operator<<( cTexte& Obj, int Data );
 cTexte& operator<<( cTexte& Obj, const cTexte& Data );
 
 
-/*! \brief Classe de texte destinée à recevoir du texte sans caractère accentué
-*/
-class cTexteSansAccent : public cTexte
-{
-    protected:
-        int ConvertChar( const char c, char* Tampon = NULL ) const;
-        bool CompareChar( const char, const char ) const;
-
-    public:
-        //! \name Constructeurs et destructeurs
-        //@{
-        //@}
-};
-
-
 
 /*! \brief Classe de texte destinée à recevoir du texte au langage PostScript
 */
