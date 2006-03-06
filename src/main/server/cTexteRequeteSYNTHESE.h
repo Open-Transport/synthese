@@ -192,12 +192,14 @@ class cTexteRequeteSYNTHESE : public cTexte
 template <class T>
 void cTexteRequeteSYNTHESE::AddParam( const cTexte& __Parametre, const T& __Valeur )
 {
-    cTexteCodageInterne __Texte;
+    cTexte __Texte;  // MJ review this for codage interne
     if ( Taille() )
         __Texte << "&";
     __Texte << __Parametre << "=" << __Valeur;
     Copie( __Texte );
 }
+
+
 
 /*! \brief Affichage des paramètres de la requête sous forme de champs cachés HTML
  \param __Flux Flux sur lequel afficher

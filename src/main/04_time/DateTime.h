@@ -72,6 +72,7 @@ class DateTime
         //! @name Query methods
         //@{
         bool isValid () const;
+        std::string toInternalString () const;
         //@}
 
 

@@ -17,6 +17,9 @@
 #include "cElementTrajet.h"
 #include "cModaliteReservation.h"
 
+#include <string>
+
+
 #ifdef UNIX
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -216,12 +219,12 @@ bool cCalculateur::FicheHoraire()
     if ( Synthese.getNiveauLog() <= LogDebug && Synthese.getCheminLog().Taille() )
     {
         cTexte __Chemin;
-        cTexteCodageInterne __MomentInterne;
+
         synthese::time::DateTime __Maintenant;
         __Maintenant.updateDateTime();
-        // __MomentInterne << __Maintenant; // MJ review this
+        std::string now (__Maintenant.toInternalString ());
 
-        _CheminLog << Synthese.getCheminLog() << "/" << __MomentInterne;
+        _CheminLog << Synthese.getCheminLog() << "/" << now;
 #ifdef UNIX
 
         mkdir( _CheminLog.Texte(), 0770 );

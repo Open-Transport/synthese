@@ -979,8 +979,9 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                     __ParametresColonne << ( __n < __Trajets->Taille() - 1 ? __n + 2 : 0 );
 
                     // 5 : Date du d�part (format interne)
-                    cTexteCodageInterne __txtDate;
-                    // MJ review __txtDate << __Trajets->operator [] ( __n ).getMomentDepart().getDate();
+                    cTexte __txtDate;
+                    __txtDate << __Trajets->operator [] ( __n ).getMomentDepart().getDate().toInternalString ();
+
                     __ParametresColonne << __txtDate;
 
                     // Lancement de l'affichage
@@ -1477,11 +1478,11 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                             synthese::time::Date DateMax = __Environnement->dateInterpretee( _Parametres[ ELEMENTINTERFACEInputHTMLListeDatesMax ] ->Texte( __Parametres ) );
 
                             // Construction de l'objet HTML
-                            cTexteCodageInterne DateInterne;
+                            cTexte DateInterne;
                             for ( synthese::time::Date iDate = DateMin; iDate <= DateMax; iDate++ )
                             {
                                 DateInterne.Vide();
-                                // MJ review DateInterne << iDate;
+                                DateInterne << iDate.toInternalString();
 
                                 pCtxt << "<option ";
                                 if ( iDate == DateDefaut )

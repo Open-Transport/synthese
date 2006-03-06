@@ -73,6 +73,19 @@ Hour::toString () const
 }
 
 
+std::string 
+Hour::toInternalString () const
+{
+  std::stringstream os;
+
+  os << std::setw( 2 ) << std::setfill ( '0' )
+     << getHours ()
+     << std::setw( 2 ) << std::setfill ( '0' )
+     << getMinutes ();
+
+  return os.str ();
+}
+
 
 bool
 operator == ( const Hour& op1, const Hour& op2 )

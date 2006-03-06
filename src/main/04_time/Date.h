@@ -62,6 +62,9 @@ class Date
         bool isValid () const;
 
         bool isUnknown () const;
+
+        std::string toInternalString () const;
+
         //@}
 
 

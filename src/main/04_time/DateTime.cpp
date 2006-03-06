@@ -222,6 +222,15 @@ DateTime::updateDateTime ( int day, int month, int year, int hours, int minutes 
 
 
 
+std::string 
+DateTime::toInternalString () const
+{
+    return std::string (getDate ().toInternalString() + 
+			getHour ().toInternalString ());
+}
+
+
+
 
 std::ostream&
 operator<< ( std::ostream& os, const DateTime& op )

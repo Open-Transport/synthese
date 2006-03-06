@@ -1,6 +1,7 @@
 #include "Date.h"
 #include "DateTime.h"
 
+#include <sstream>
 #include <iomanip>
 
 
@@ -112,6 +113,22 @@ Date::isUnknown () const
 }
 
 
+
+std::string 
+Date::toInternalString () const
+{
+  std::stringstream os;
+    
+  os << std::setw( 4 ) << std::setfill ( '0' )
+     << getYear ()
+     << std::setw( 2 ) << std::setfill ( '0' )
+     << getMonth ()
+     << std::setw( 2 ) << std::setfill ( '0' )
+     << getDay ();
+
+  return os.str ();
+    
+}
 
 
 void

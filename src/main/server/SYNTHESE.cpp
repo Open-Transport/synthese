@@ -370,9 +370,8 @@ bool SYNTHESE::FicheHoraire( ostream &pCtxt, ostream& pCerr, const cSite* __Site
             __Parametres << handicape; //12
             __Parametres << taxibus; //13
             __Parametres << tarif; //14
-	    cTexteCodageInterne __txtDateDepart;
-            // __txtDateDepart << __DateDepart;  MJ Review this with
-            // standard <<
+	    cTexte __txtDateDepart;
+            __txtDateDepart << __DateDepart.toInternalString ();
             __Parametres << __txtDateDepart; //15
             __Site->Affiche( pCtxt, INTERFACEFicheHoraire, __Parametres, ( const void* ) & __Calculateur.getSolution() );
 
@@ -581,8 +580,8 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
             cInterface_Objet_Connu_ListeParametres __Parametres;
             __Parametres << nAD; //0
             __Parametres << nAA; //1
-            cTexteCodageInterne __txtDate;
-            // __txtDate << __DateDepart;  // MJ to be reviewed
+            cTexte __txtDate;
+            __txtDate << __DateDepart.toInternalString ();
             __Parametres << __txtDate; //2
             __Parametres << ""; //3
             __Parametres << ""; //4
@@ -629,8 +628,7 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
             __Parametres << handicape; //17
             __Parametres << taxibus; //18
             __Parametres << tarif; //19
-            __Parametres << cTexteCodageInterne(); // MJ to be reviewed
-						  // << __DateDepart; //20
+            __Parametres << cTexte() << __DateDepart.toInternalString (); //20
             __Site->Affiche( pCtxt, INTERFACEErreurArretsFicheHoraire, __Parametres );
         }
 
@@ -675,7 +673,7 @@ bool SYNTHESE::FormulaireReservation( ostream &pCtxt, ostream& pCerr, const cSit
         __Parametres << iNumeroService;      //2 numero service
         __Parametres << iNumeroPADepart;       //3
         __Parametres << iNumeroPAArrivee;       //4
-        __Parametres << cTexteCodageInterne(); // MJ review this << __DateDepart; //5
+        __Parametres << cTexte() << __DateDepart.toInternalString (); //5
 
         // Creation de l'affichage
         __Site->Affiche( pCtxt, INTERFACEFormResa, __Parametres );

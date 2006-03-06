@@ -338,8 +338,8 @@ Cette mï¿½thode raisonne sur le principe d'un nombre maximal de places rï¿½servï
   if (tNumeroResa)
   {
    //construction de l'id
-   cTexteCodageInterne tCodeResa;
-   tCodeResa << tMaintenant.getDate() << TXT2(tNumeroResa,6);
+   cTexte tCodeResa;
+   tCodeResa << tMaintenant.getDate().toInternalString () << TXT2(tNumeroResa,6);
    
    //preparation de la requete d'insertion des donnï¿½es
    cRequeteSQLInsert requete(TABLE_RESERVATION);

@@ -106,20 +106,6 @@ cTexte& operator<<( cTexte& Obj, const cTexte& Data );
 
 
 
-        /*! \brief Classe de texte destinée à recevoir des données suivant le format de codage interne à SYNTHESE (pour passage dans les URLs par exemple)
-        */
-    class cTexteCodageInterne : public cTexte
-        {
-            public:
-                cTexteCodageInterne() : cTexte() { } //!< Constructeur
-
-
-	};
-
-
-
-
-
                 /*! \brief Ecriture sur l'objet depuis un flux d'entrée quelconque
                  \param flux Le flux d'entrée
                  \param Obj L'objet cTexte sur lequel écrire
