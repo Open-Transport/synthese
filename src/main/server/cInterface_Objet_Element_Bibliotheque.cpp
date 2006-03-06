@@ -86,7 +86,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
 
                 // Affichage
                 // PROVISOIRE LANGAGE IMPOSE
-                cTexteHTML HTML;
+                cTexte HTML;
                 //   if (iNumeroDesignation)
                 //    HTML << *curPA->GetAccesPADe(iNumeroDesignation) << "<br />Arr&ecirc;t: ";
                 HTML << curPA->getName();
@@ -1060,12 +1060,12 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                         // 4/5/6 Description du mat�riel roulant
                         __ParametresLigne << __ET->getLigne() ->Materiel() ->Code(); //4
                         __ParametresLigne << __ET->getLigne() ->Materiel() ->getLibelleSimple(); //5
-                        cTexteHTML LibelleCompletMatosHTML; //!< \todo PROVISOIRE FAIRE UN OBJET STANDARD LIBELLECOMPLETMATOS
+                        cTexte LibelleCompletMatosHTML; //!< \todo PROVISOIRE FAIRE UN OBJET STANDARD LIBELLECOMPLETMATOS
                         //     __ET->getLigne()->LibelleComplet(LibelleCompletMatosHTML);
                         __ParametresLigne << LibelleCompletMatosHTML; //6
 
                         // 7 Destination du v�hicule
-                        cTexteHTML DestinationHTML; //!< \todo PROVISOIRE FAIRE UN OBJET STANDARD POINT D'ARRET pas si simple : il faut g�rer la destination forc�e
+                        cTexte DestinationHTML; //!< \todo PROVISOIRE FAIRE UN OBJET STANDARD POINT D'ARRET pas si simple : il faut g�rer la destination forc�e
                         //     __ET->getLigne()->LibelleDestination(DestinationHTML);
                         __ParametresLigne << DestinationHTML; //7
 
@@ -1184,7 +1184,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
 
                         // 3/4 Informations sur le point d'arr�t
                         __ParametresDescente << ( __ET->getDestination() ->getLogicalPlace() == __ET->getLigne() ->getLineStops().back() ->ArretPhysique() ->getLogicalPlace() ? "1" : "" );
-                        cTexteHTML NomArret; //!< \todo PROVISOIRE METTRE HTML EN MEMOIRE QUELQUE PART
+                        cTexte NomArret; //!< \todo PROVISOIRE METTRE HTML EN MEMOIRE QUELQUE PART
                         NomArret << __ET->getDestination() ->getLogicalPlace() ->getName();
                         __ParametresDescente << NomArret; //4
 

@@ -1116,7 +1116,7 @@ cFichierXML::chargePhoto ( XMLNode& node, cEnvironnement& env )
         std::string indication ( lienNode.getAttribute ( LIEN_PHOTO_INDICATION_ATTR.c_str() ) );
         int idCible = atoi ( lienNode.getAttribute ( LIEN_PHOTO_PHOTO_CIBLE_ATTR.c_str() ) );
 
-        cTexteHTML alt;
+        cTexte alt;
         alt << indication.c_str ();
 
         photo->addMapPhoto( cTexte( zclickable.c_str() ), idCible, alt );

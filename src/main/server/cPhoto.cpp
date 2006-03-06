@@ -26,7 +26,7 @@ Effectue la copie des chaines de caracètres fournies
  \author Hugues Romain
  \date 2002
 */
-bool cMapPhoto::SetDonnees( const cTexte& newCoords, int newLienPhoto, const cTexteHTML& newAlt )
+bool cMapPhoto::SetDonnees( const cTexte& newCoords, int newLienPhoto, const cTexte& newAlt )
 {
     vCoords = newCoords;
     vLienPhoto = newLienPhoto;
@@ -44,7 +44,7 @@ Effectue la copie des chaînes de caractères fournies
  \author Hugues Romain
  \date 2002
 */
-bool cMapPhoto::SetDonnees( const cTexte& newCoords, const cTexte& newURL, const cTexteHTML& newAlt )
+bool cMapPhoto::SetDonnees( const cTexte& newCoords, const cTexte& newURL, const cTexte& newAlt )
 {
     vCoords = newCoords;
     vLienPhoto = 0;
@@ -59,7 +59,7 @@ bool cMapPhoto::SetDonnees( const cTexte& newCoords, const cTexte& newURL, const
  \author Hugues Romain
  \date 2002
 */
-bool cPhoto::addMapPhoto( const cTexte& newCoords, int newLienPhoto, const cTexteHTML& newAlt )
+bool cPhoto::addMapPhoto( const cTexte& newCoords, int newLienPhoto, const cTexte& newAlt )
 {
     // Recherche du premier index disponible
     int NumeroMap = _Map.Active();
@@ -76,7 +76,7 @@ bool cPhoto::addMapPhoto( const cTexte& newCoords, int newLienPhoto, const cText
  \author Hugues Romain
  \date 2002
 */
-bool cPhoto::addMapPhoto( const cTexte& newCoords, const cTexte& newURL, const cTexteHTML& newAlt )
+bool cPhoto::addMapPhoto( const cTexte& newCoords, const cTexte& newURL, const cTexte& newAlt )
 {
     // Recherche du premier index disponible
     int NumeroMap = _Map.Active();
@@ -111,7 +111,7 @@ const cMapPhoto& cPhoto::Map( int i ) const
 
 
 
-const cTexteHTML& cMapPhoto::Alt() const
+const cTexte& cMapPhoto::Alt() const
 {
     return vAlt;
 }

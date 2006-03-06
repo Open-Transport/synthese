@@ -20,12 +20,12 @@ class cMapPhoto
         cTexte vCoords; //!< Chaîne de caractères décrivant les coordonnées de la zone cliquable, au format des MAP du langage HTML
         int vLienPhoto; //!< Numéro de la photo liée par la zone cliquable
         cTexte vURL;  //!< URL liée par la zone cliquable
-        cTexteHTML vAlt;  //!< Chaînes de caractères décrivant la zone cliquable
+        cTexte vAlt;  //!< Chaînes de caractères décrivant la zone cliquable
 
     public:
         //! \name Accesseurs
         //@{
-        const cTexteHTML& Alt() const;
+        const cTexte& Alt() const;
         const cTexte& Coords() const;
         const int LienPhoto() const;
         const cTexte& URL() const;
@@ -33,8 +33,8 @@ class cMapPhoto
 
         //! \name Modificateurs
         //@{
-        bool SetDonnees( const cTexte& newCoords, int newLienPhoto, const cTexteHTML& newAlt );
-        bool SetDonnees( const cTexte& newCoords, const cTexte& newURL, const cTexteHTML& newAlt );
+        bool SetDonnees( const cTexte& newCoords, int newLienPhoto, const cTexte& newAlt );
+        bool SetDonnees( const cTexte& newCoords, const cTexte& newURL, const cTexte& newAlt );
         //@}
 };
 
@@ -62,8 +62,8 @@ class cPhoto : public cDocument
 
         //! \name Modificateurs
         //@{
-        bool addMapPhoto( const cTexte& newCoords, int newLienPhoto, const cTexteHTML& newAlt );
-        bool addMapPhoto( const cTexte& newCoords, const cTexte& newURL, const cTexteHTML& newAlt );
+        bool addMapPhoto( const cTexte& newCoords, int newLienPhoto, const cTexte& newAlt );
+        bool addMapPhoto( const cTexte& newCoords, const cTexte& newURL, const cTexte& newAlt );
         //@}
 };
 

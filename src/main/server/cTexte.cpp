@@ -636,35 +636,6 @@ bool cTexte::CompareChar( const char c1, const char c2 ) const
 
 
 
-/*! \brief Conversion d'un caractère standard en caractère HTML (simulation si pas de chaîne fournie)
- \param c Caractère à convertir
- \retval Tampon char* où écrire le résultat (NULL = pas d'écriture)
- \return Longueur de la chaîne convertie
- \author Hugues Romain
- \date 2005
- \todo Terminer l'implémentation des cas les plus courants
-*/
-int cTexteHTML::ConvertChar( const char c, char* Tampon ) const
-{
-    switch ( c )
-    {
-        case 'à':
-            if ( Tampon )
-                strncpy( Tampon, "&agrave;", 8 );
-            return ( 8 );
-        case 'è':
-            if ( Tampon )
-                strncpy( Tampon, "&egrave;", 8 );
-            return ( 8 );
-            // REMPLIR ICI
-        default:
-            if ( Tampon )
-                * Tampon = c;
-            return ( 1 );
-    }
-}
-
-
 
 /*! \brief Conversion d'un caractère standard en caractère standard (simulation si pas de chaîne fournie)
  \param c Caractère à convertir

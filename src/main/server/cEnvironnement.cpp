@@ -1438,7 +1438,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 
 		    case PHFORMATLIGNEZoneCliquableURL:
 		      {
-			cTexteHTML __Alt;
+			cTexte __Alt;
 			Position = Tampon.RechercheOccurenceGauche( '#' );
 			__Alt << Tampon.Extrait
 			  (
@@ -1456,7 +1456,7 @@ bool cEnvironnement::ChargeFichierHoraires(const cTexte& NomFichier)
 
 		    case PHFORMATLIGNEZoneCliquablePhoto:
 		      {
-			cTexteHTML __Alt;
+			cTexte __Alt;
 			__Alt << vFormatPhoto.Extrait( Tampon, PHFORMATCOLONNEAltMapPhoto );
 			curPhoto->addMapPhoto
 			  (

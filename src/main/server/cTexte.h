@@ -119,25 +119,6 @@ class cTextePostScript : public cTexte
 
 
 
-/*! \brief Classe de texte destinée à recevoir du texte au langage HTML
- 
-Le but de cette classe est en particulier de remplacer les caractères accentués par les combinaisons standard de remplacement ex: é => &eacute;
-*/
-class cTexteHTML : public cTexte
-{
-    protected:
-        int ConvertChar( const char c, char* Tampon = NULL ) const;
-
-    public:
-        //! \name Constructeurs et destructeurs
-        //@{
-        cTexteHTML( int TailleMax = 0, bool AugmentationParDoublement = false ) : cTexte( TailleMax, AugmentationParDoublement ) { }
-        //@}
-       
-};
-
-
-
 
         /*! \brief Classe de texte destinée à recevoir des données suivant le format de codage interne à SYNTHESE (pour passage dans les URLs par exemple)
         */
