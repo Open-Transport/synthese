@@ -104,20 +104,6 @@ cTexte& operator<<( cTexte& Obj, const cTexte& Data );
 
 
 
-/*! \brief Classe de texte destinée à recevoir du texte au langage PostScript
-*/
-class cTextePostScript : public cTexte
-{
-    protected:
-        int ConvertChar( const char c, char* Tampon = NULL ) const;
-
-    public:
-        //! \name Constructeurs et destructeurs
-        //@{
-        //@}
-};
-
-
 
 
         /*! \brief Classe de texte destinée à recevoir des données suivant le format de codage interne à SYNTHESE (pour passage dans les URLs par exemple)
