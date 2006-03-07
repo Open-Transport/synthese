@@ -18,6 +18,8 @@ namespace synthese
 	/** 01_util namespace */
 	namespace util
 	{
+
+
 	    static const std::string AGRAVE_HTML_ENTITY ("&agrave;");
 	    static const std::string AACUTE_HTML_ENTITY ("&aacute;");
 	    static const std::string ACIRC_HTML_ENTITY ("&acirc;");

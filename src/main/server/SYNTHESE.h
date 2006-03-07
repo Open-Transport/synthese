@@ -16,8 +16,11 @@ class TimeTables;
 #include "cTexte.h"
 
 #include "cFichiersPourSYNTHESE.h"
-#include "cTexteRequeteSYNTHESE.h"
+#include "70_server/Request.h"
 #include "cLog.h"
+
+#include <boost/logic/tribool.hpp>
+
 
 /** Application SYNTHESE
  @author Hugues Romain
@@ -78,7 +81,7 @@ class SYNTHESE
         bool FicheHoraire( ostream &pCtxt, ostream& pCerr, const cSite* __Site
                            , int NumeroGareOrigine, int NumeroGareDestination
                            , const synthese::time::Date& DateDepart, int codePeriode
-                           , tBool3 velo, tBool3 handicape, tBool3 taxibus, int tarif
+                           , boost::logic::tribool velo, boost::logic::tribool handicape, boost::logic::tribool taxibus, int tarif
                            , long vThreadId );
         bool ListeCommunes( ostream &pCtxt, ostream& pCerr, const cSite* __Site
                             , bool depart, const cTexte& Entree ) const;
@@ -90,7 +93,7 @@ class SYNTHESE
                       , const cTexte& txtCA, int nCA, int nAA, int nDA
                       , const cTexte& txtAD, const cTexte& txtAA
                       , const synthese::time::Date& DateDepart, int codePeriode
-                      , tBool3 velo, tBool3 handicape, tBool3 taxibus, int tarif ) const;
+                      , boost::logic::tribool velo, boost::logic::tribool handicape, boost::logic::tribool taxibus, int tarif ) const;
         bool FormulaireReservation( ostream &pCtxt, ostream& pCerr, const cSite* __Site
                                     , const cTexte& tCodeLigne, int iNumeroService
                                     , int iNumeroPADepart, int iNumeroPAArrivee, const synthese::time::Date& tDateDepart ) const;
@@ -111,7 +114,7 @@ class SYNTHESE
     public:
         //! \name Exï¿½cution de requï¿½te
         //@{
-        bool ExecuteRequete( ostream& pCtxt, ostream& pCerr, cTexteRequeteSYNTHESE&, long vThreadId );
+        bool ExecuteRequete( ostream& pCtxt, ostream& pCerr, synthese::server::Request&, long vThreadId );
         //@}
         //! \name Terminaison forcée d'un calculateur
         //@{

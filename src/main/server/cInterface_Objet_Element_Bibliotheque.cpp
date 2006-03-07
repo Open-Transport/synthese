@@ -861,7 +861,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
         case ELEMENTINTERFACEChampsReservation:
             {
                 // affichage du champ nom
-                pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationNom ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_CLIENT_NOM << "\" class=\"frmField\" size=\"35\">";
+                pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationNom ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << synthese::server::PARAMETER_CLIENT_NAME << "\" class=\"frmField\" size=\"35\">";
                 pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_NOM << "\"/>";
                 pCtxt << "</td></tr>";
 
@@ -869,7 +869,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 cModaliteReservationEnLigne::FieldNeed bPrenom = ( cModaliteReservationEnLigne::FieldNeed ) _Parametres[ ELEMENTINTERFACEChampsReservationPrenomObligatoire ] ->Nombre( __Parametres );
                 if ( bPrenom == cModaliteReservationEnLigne::FieldNeed_OPTIONAL || bPrenom == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                 {
-                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationPrenom ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_CLIENT_PRENOM << "\" class=\"frmField\" size=\"35\">";
+                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationPrenom ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << synthese::server::PARAMETER_CLIENT_FIRST_NAME << "\" class=\"frmField\" size=\"35\">";
                     if ( bPrenom == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                     {
                         pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_PRENOM << "\"/>";
@@ -881,7 +881,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 cModaliteReservationEnLigne::FieldNeed bAdresse = ( cModaliteReservationEnLigne::FieldNeed ) _Parametres[ ELEMENTINTERFACEChampsReservationAdresseObligatoire ] ->Nombre( __Parametres );
                 if ( bAdresse == cModaliteReservationEnLigne::FieldNeed_OPTIONAL || bAdresse == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                 {
-                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationAdresse ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_CLIENT_ADRESSE << "\" class=\"frmField\" size=\"35\">";
+                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationAdresse ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << synthese::server::PARAMETER_CLIENT_ADDRESS << "\" class=\"frmField\" size=\"35\">";
                     if ( bAdresse == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                     {
                         pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_ADRESSE << "\"/>";
@@ -893,7 +893,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 cModaliteReservationEnLigne::FieldNeed bEmail = ( cModaliteReservationEnLigne::FieldNeed ) _Parametres[ ELEMENTINTERFACEChampsReservationEmailObligatoire ] ->Nombre( __Parametres );
                 if ( bEmail == cModaliteReservationEnLigne::FieldNeed_OPTIONAL || bEmail == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                 {
-                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationEmail ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_CLIENT_EMAIL << "\" class=\"frmField\" size=\"35\">";
+                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationEmail ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << synthese::server::PARAMETER_CLIENT_EMAIL << "\" class=\"frmField\" size=\"35\">";
                     if ( bEmail == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                     {
                         pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_EMAIL << "\"/>";
@@ -905,7 +905,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 cModaliteReservationEnLigne::FieldNeed bTelephone = ( cModaliteReservationEnLigne::FieldNeed ) _Parametres[ ELEMENTINTERFACEChampsReservationTelephoneObligatoire ] ->Nombre( __Parametres );
                 if ( bTelephone == cModaliteReservationEnLigne::FieldNeed_OPTIONAL || bTelephone == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                 {
-                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationTelephone ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_CLIENT_TELEPHONE << "\" class=\"frmField\" size=\"35\">";
+                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationTelephone ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << synthese::server::PARAMETER_CLIENT_PHONE << "\" class=\"frmField\" size=\"35\">";
                     if ( bTelephone == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                     {
                         pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_TELEPHONE << "\"/>";
@@ -917,7 +917,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 cModaliteReservationEnLigne::FieldNeed bNumAbonne = ( cModaliteReservationEnLigne::FieldNeed ) _Parametres[ ELEMENTINTERFACEChampsReservationNumeroAbonneObligatoire ] ->Nombre( __Parametres );
                 if ( bNumAbonne == cModaliteReservationEnLigne::FieldNeed_OPTIONAL || bNumAbonne == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                 {
-                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationNumeroAbonne ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_CLIENT_NUMERO_ABONNE << "\" class=\"frmField\" size=\"35\">";
+                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationNumeroAbonne ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << synthese::server::PARAMETER_CLIENT_REGISTRATION_NUMBER << "\" class=\"frmField\" size=\"35\">";
                     if ( bNumAbonne == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                     {
                         pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_NUMERO_ABONNE << "\"/>";
@@ -929,7 +929,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 cModaliteReservationEnLigne::FieldNeed bAdresseDepart = ( cModaliteReservationEnLigne::FieldNeed ) _Parametres[ ELEMENTINTERFACEChampsReservationAdresseDepartObligatoire ] ->Nombre( __Parametres );
                 if ( bAdresseDepart == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                 {
-                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationAdresseDepart ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_ADRESSE_DEPART << "\" class=\"frmField\" size=\"35\">";
+                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationAdresseDepart ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << synthese::server::PARAMETER_DEPARTURE_ADDRESS << "\" class=\"frmField\" size=\"35\">";
                     pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_ADRESSE_DEPART << "\"/></td></tr>";
                 }
 
@@ -937,12 +937,12 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 cModaliteReservationEnLigne::FieldNeed bAdresseArrivee = ( cModaliteReservationEnLigne::FieldNeed ) _Parametres[ ELEMENTINTERFACEChampsReservationAdresseArriveeObligatoire ] ->Nombre( __Parametres );
                 if ( bAdresseArrivee == cModaliteReservationEnLigne::FieldNeed_COMPULSORY )
                 {
-                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationAdresseArrivee ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_ADRESSE_ARRIVEE << "\" class=\"frmField\" size=\"35\">";
+                    pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationAdresseArrivee ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << synthese::server::PARAMETER_ARRIVAL_ADDRESS << "\" class=\"frmField\" size=\"35\">";
                     pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_ADRESSE_ARRIVEE << "\"/></td></tr>";
                 }
 
                 // affichage du champ nombre de places
-                pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationNbPlaces ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << REQUETE_COMMANDE_NOMBRE_PLACES << "\" class=\"frmField\" size=\"35\">";
+                pCtxt << "<tr>" << _Parametres[ ELEMENTINTERFACEChampsReservationNbPlaces ] ->Texte( __Parametres ) << "<td><input type=\"text\" name=\"" << synthese::server::PARAMETER_RESERVATION_COUNT << "\" class=\"frmField\" size=\"35\">";
                 pCtxt << "*<input type=\"hidden\" name=\"" << CHECK_NOMBRE_PLACES << "\"/>";
                 pCtxt << "</td></tr>";
 
@@ -1113,17 +1113,17 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                             if ( __Site->ResaEnLigne() && __ET->getLigne() ->GetResa() ->ReservationEnLigne() )
                             {
                                 cTexte __URLResa;
-                                cTexteRequeteSYNTHESE __Requete;
-                                __Requete.AddParam( REQUETE_COMMANDE_FONCTION, FONCTION_FORMULAIRE_RESA );
-                                __Requete.AddParam( REQUETE_COMMANDE_SITE, __Site->getClef() );
-                                __Requete.AddParam( REQUETE_COMMANDE_CODE_LIGNE, __ET->getLigne() ->getCode() );
-                                __Requete.AddParam( REQUETE_COMMANDE_NUMERO_SERVICE, ( __ET->getService() ->getNumero() ) );
-                                __Requete.AddParam( REQUETE_COMMANDE_CODE_RESA, __ET->getLigne() ->GetResa() ->Index() );
-                                __Requete.AddParam( REQUETE_COMMANDE_NUMERO_POINT_ARRET_DEPART, __ET->getOrigin() ->getLogicalPlace() ->getId() );
-                                __Requete.AddParam( REQUETE_COMMANDE_NUMERO_POINT_ARRET_ARRIVEE, __ET->getDestination() ->getLogicalPlace() ->getId() );
+                                synthese::server::Request request;
+                                request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_RESERVATION_FORM );
+                                request.addParameter( synthese::server::PARAMETER_SITE, __Site->getClef() );
+                                request.addParameter( synthese::server::PARAMETER_LINE_CODE, __ET->getLigne() ->getCode() );
+                                request.addParameter( synthese::server::PARAMETER_SERVICE_NUMBER, ( __ET->getService() ->getNumero().Texte() ) );
+                                request.addParameter( synthese::server::PARAMETER_SERVICE_NUMBER, __ET->getLigne() ->GetResa() ->Index() );
+                                request.addParameter( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER, __ET->getOrigin() ->getLogicalPlace() ->getId() );
+                                request.addParameter( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER, __ET->getDestination() ->getLogicalPlace() ->getId() );
 
-                                // MJ review __Requete.AddParam( REQUETE_COMMANDE_DATE, __ET->MomentDepart() );
-                                __URLResa << __Site->getURLClient() << "?" << __Requete;
+                                request.addParameter( synthese::server::PARAMETER_DATE, __ET->MomentDepart() );
+                                __URLResa << __Site->getURLClient() << "?" << request.toInternalString ();
                                 __ParametresLigne << __URLResa; //18
                             }
                             else
@@ -1294,72 +1294,75 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 const cTexte& __Fonction = _Parametres[ ELEMENTINTERFACEURLFormulaireFonction ] ->Texte( __Parametres );
 
                 // Fabrication de la requ�te
-                cTexteRequeteSYNTHESE __Requete;
+                synthese::server::Request request;
 
                 // Site d'affichage
-                __Requete.AddParam( REQUETE_COMMANDE_SITE, __Site->getClef() );
+                request.addParameter( synthese::server::PARAMETER_SITE, __Site->getClef() );
 
                 // Parametres cas validation fiche horaire
                 if ( __Fonction.Compare( "timetable validation" ) )
                 {
-                    __Requete.AddParam( REQUETE_COMMANDE_FONCTION, FONCTION_VALID_FICHE_HORAIRE );
-                    __Requete.AddParam( REQUETE_COMMANDE_NUMERO_COMMUNE_DEPART
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroCommuneDepart ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_NUMERO_POINT_ARRET_DEPART
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroArretDepart ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_NUMERO_DESIGNATION_DEPART
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroDesignationDepart ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_NUMERO_COMMUNE_ARRIVEE
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroCommuneArrivee ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_NUMERO_POINT_ARRET_ARRIVEE
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroArretArrivee ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_NUMERO_DESIGNATION_ARRIVEE
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroDesignationArrivee ] ->Texte( __Parametres ) );
+                    request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_SCHEDULE_SHEET_VALIDATION );
+
+                    request.addParameter( synthese::server::PARAMETER_DEPARTURE_CITY_NUMBER
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroCommuneDepart ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroArretDepart ] ->Texte( __Parametres ).Texte() );
+                    request.addParameter( synthese::server::PARAMETER_DEPARTURE_WORDING_NUMBER
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroDesignationDepart ] ->Texte( __Parametres ).Texte() );
+                    request.addParameter( synthese::server::PARAMETER_ARRIVAL_CITY_NUMBER
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroCommuneArrivee ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroArretArrivee ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_ARRIVAL_WORDING_NUMBER
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroDesignationArrivee ] ->Texte( __Parametres ).Texte () );
                 }
                 // Pour fiche horaire seulement
                 else if ( __Fonction.Compare( "timetable" ) )
                 {
-                    __Requete.AddParam( REQUETE_COMMANDE_FONCTION, FONCTION_FICHE_HORAIRE );
-                    __Requete.AddParam( REQUETE_COMMANDE_DATE
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHDate ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_PERIODE
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHPeriode ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_VELO
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHVelo ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_HANDICAPE
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHHandicape ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_TAXIBUS
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHResa ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_TARIF
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHTarif ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_NUMERO_POINT_ARRET_DEPART
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroArretDepart ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_NUMERO_DESIGNATION_DEPART
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroDesignationDepart ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_NUMERO_POINT_ARRET_ARRIVEE
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroArretArrivee ] ->Texte( __Parametres ) );
-                    __Requete.AddParam( REQUETE_COMMANDE_NUMERO_DESIGNATION_ARRIVEE
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroDesignationArrivee ] ->Texte( __Parametres ) );
+                    request.addParameter( synthese::server::PARAMETER_FUNCTION, 
+					  synthese::server::FUNCTION_SCHEDULE_SHEET );
+
+                    request.addParameter( synthese::server::PARAMETER_DATE
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHDate ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_PERIOD
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHPeriode ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_BIKE
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHVelo ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_HANDICAPPED
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHHandicape ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_TAXIBUS
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHResa ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_PRICE
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHTarif ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroArretDepart ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_DEPARTURE_WORDING_NUMBER
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroDesignationDepart ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroArretArrivee ] ->Texte( __Parametres ).Texte () );
+                    request.addParameter( synthese::server::PARAMETER_ARRIVAL_WORDING_NUMBER
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroDesignationArrivee ] ->Texte( __Parametres ).Texte () );
                 }
                 else if ( __Fonction.Compare( "from city list" ) )
                 {
-                    __Requete.AddParam( REQUETE_COMMANDE_FONCTION, FONCTION_LISTE_COMMUNE );
-                    __Requete.AddParam( REQUETE_COMMANDE_SENS, 1 );
+                    request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_CITY_LIST );
+                    request.addParameter( synthese::server::PARAMETER_DIRECTION, 1 );
                 }
                 else if ( __Fonction.Compare( "to city list" ) )
                 {
-                    __Requete.AddParam( REQUETE_COMMANDE_FONCTION, FONCTION_LISTE_COMMUNE );
-                    __Requete.AddParam( REQUETE_COMMANDE_SENS, 0 );
+                    request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_CITY_LIST );
+                    request.addParameter( synthese::server::PARAMETER_DIRECTION, 0 );
                 }
                 else if ( __Fonction.Compare( "from station list" ) )
                 {
-                    __Requete.AddParam( REQUETE_COMMANDE_FONCTION, FONCTION_LISTE_POINT_ARRET );
-                    __Requete.AddParam( REQUETE_COMMANDE_SENS, 1 );
+                    request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_STOP_LIST );
+                    request.addParameter( synthese::server::PARAMETER_DIRECTION, 1 );
                 }
                 else if ( __Fonction.Compare( "to station list" ) )
                 {
-                    __Requete.AddParam( REQUETE_COMMANDE_FONCTION, FONCTION_LISTE_POINT_ARRET );
-                    __Requete.AddParam( REQUETE_COMMANDE_SENS, 0 );
+                    request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_STOP_LIST );
+                    request.addParameter( synthese::server::PARAMETER_DIRECTION, 0 );
                 }
 
                 // Affichage de la requ�te au format voulu
@@ -1369,15 +1372,20 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                     pCtxt << __Site->getURLClient() << "?";
 
                     // Champ fonction
-                    pCtxt << __Requete;
+                    pCtxt << request.toInternalString ();
                 }
                 else if ( __TypeSortie.Compare( "form", 4 ) )
                 {
                     // Tag d'ouverture du formulaire
                     pCtxt << "<form method=\"get\" action=\"" << __Site->getURLClient() << "\" "
                     << __TypeSortie.Extrait( 5 ) << ">";
-
-                    __Requete.AfficheFormulaireHTML( pCtxt );
+		    
+		    for ( map<string, string>::const_iterator iter = request.getParameters().begin();
+			  iter != request.getParameters().end(); 
+			  ++iter )
+		    {
+			pCtxt << "<input type=\"hidden\" name=\"" << iter->first << "\" value=\"" << iter->second << "\" />";
+		    }
                 }
             }
             break;
@@ -1415,21 +1423,21 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 // Ecriture du nom du champ
                 pCtxt << " name=\"";
                 if ( __Champ.Compare( "date" ) )
-                    pCtxt << REQUETE_COMMANDE_DATE;
+                    pCtxt << synthese::server::PARAMETER_DATE;
                 else if ( __Champ.Compare( "period" ) )
-                    pCtxt << REQUETE_COMMANDE_PERIODE;
+                    pCtxt << synthese::server::PARAMETER_PERIOD;
                 else if ( __Champ.Compare( "from city" ) )
-                    pCtxt << REQUETE_COMMANDE_COMMUNE_DEPART;
+                    pCtxt << synthese::server::PARAMETER_DEPARTURE_CITY;
                 else if ( __Champ.Compare( "from station" ) )
-                    pCtxt << REQUETE_COMMANDE_POINT_ARRET_DEPART;
+                    pCtxt << synthese::server::PARAMETER_DEPARTURE_STOP;
                 else if ( __Champ.Compare( "to city" ) )
-                    pCtxt << REQUETE_COMMANDE_COMMUNE_ARRIVEE;
+                    pCtxt << synthese::server::PARAMETER_ARRIVAL_CITY;
                 else if ( __Champ.Compare( "to station" ) )
-                    pCtxt << REQUETE_COMMANDE_POINT_ARRET_ARRIVEE;
+                    pCtxt << synthese::server::PARAMETER_ARRIVAL_STOP;
                 else if ( __Champ.Compare( "handicap filter" ) )
-                    pCtxt << REQUETE_COMMANDE_HANDICAPE;
+                    pCtxt << synthese::server::PARAMETER_HANDICAPPED;
                 else if ( __Champ.Compare( "tariff" ) )
-                    pCtxt << REQUETE_COMMANDE_TARIF;
+                    pCtxt << synthese::server::PARAMETER_PRICE;
                 pCtxt << "\"";
 
                 // Cas champ checkbox
@@ -1707,3 +1715,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
 
     return INCONNU;
 }
+
+
+
+

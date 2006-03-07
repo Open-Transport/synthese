@@ -1,0 +1,23 @@
+Import ('testenv')
+testmoduleenv = testenv.Copy()
+
+includes = '*.cpp'
+excludes = []
+
+# testmoduleenv.Append (CPPPATH = [Dir('../../main/70_server').srcnode().abspath] )
+testmoduleenv.Append (CPPPATH = [Dir('../../main').srcnode().abspath] )
+
+testmoduleenv.Append (LIBPATH = [Dir('../../main/70_server')] )
+testmoduleenv.Append (LIBPATH = [Dir('../../main/04_time')] )
+
+testmoduleenv.Append (LIBS = ['70_server'] )
+testmoduleenv.Append (LIBS = ['04_time'] )
+
+files = testmoduleenv.Glob(includes, excludes)
+
+testmodulename = testmoduleenv.DefaultTestModuleName ()
+
+testprogram = testmoduleenv.Program(testmodulename, files)
+
+testmoduleenv.Test("test.passed", testprogram)
+

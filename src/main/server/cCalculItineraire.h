@@ -16,6 +16,9 @@ class LogicalPlace;
 #include "04_time/HourPeriod.h"
 #include "RoutePlanningNode.h"
 
+#include <boost/logic/tribool.hpp>
+
+
 #ifdef UNIX
 #include <pthread.h>
 extern pthread_mutex_t mutex_calcul;
@@ -77,9 +80,9 @@ class cCalculateur
         synthese::time::DateTime vMomentDebut;  //!< Moment de d�but du calcul (premier d�part) @todo rendre const
         synthese::time::DateTime vMomentFin;   //!< Moment de fin du calcul (dernier d�part) @todo rendre const
         const synthese::time::DateTime _MomentCalcul;  //!< Moment de lancement du calcul (pour filtrage r�sa et d�parts pass�s)
-        const tBool3 vBesoinVelo;  //!< Filtre v�lo
-        const tBool3 vBesoinHandicape; //!< Filtre PMR
-        const tBool3 vBesoinTaxiBus;  //!< Filtre TAD
+        const boost::logic::tribool vBesoinVelo;  //!< Filtre v�lo
+        const boost::logic::tribool vBesoinHandicape; //!< Filtre PMR
+        const boost::logic::tribool vBesoinTaxiBus;  //!< Filtre TAD
         const int vCodeTarif;   //!< Filtre tarification
         const bool _BaseTempsReel;  //!< Base utilis�e pour les calculs (v�rifier l'activation)
         const RoutePlanningNode::DistanceInMeters _maxApproachDistance; //!< Maximal approach distance
@@ -145,8 +148,8 @@ class cCalculateur
         //! \name Constructeur et destructeur
         //@{
         cCalculateur( const cEnvironnement* const environnement, const LogicalPlace* const __LieuOrigine, const LogicalPlace* const __LieuDestination
-                      , const synthese::time::Date& MomentDepartMin, const synthese::time::HourPeriod* const, const tBool3 besoinVelo
-                      , const tBool3 besoinHandicape, const tBool3 besoinTaxiBus, const int codeTarif
+                      , const synthese::time::Date& MomentDepartMin, const synthese::time::HourPeriod* const, const boost::logic::tribool besoinVelo
+                      , const boost::logic::tribool besoinHandicape, const boost::logic::tribool besoinTaxiBus, const int codeTarif
                       , const bool __SolutionsPassees, const RoutePlanningNode::DistanceInMeters maxApproachDistance
                       , const RoutePlanningNode::SpeedInKmh approachSpeed
                     );

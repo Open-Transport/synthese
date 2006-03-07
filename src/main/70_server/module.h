@@ -5,52 +5,81 @@
 #ifndef SYNTHESE_SERVER_MODULE_H
 #define SYNTHESE_SERVER_MODULE_H
 
+#include <string>
+
+
 namespace synthese
 {
 
-	/** @defgroup m70 70 SYNTHESE server
-		
-		Pour pouvoir ï¿½tre appelï¿½ par plusieurs applications, le serveur SYNTHESE est un serveur TCP autonome, tout comme MySQL par exemple. La couche TCP est basée sur le module @ref m00 .
-
-		Pour l'interroger, des modules clients TCP sont dï¿½veloppï¿½s dans les applications clientes :
-			- Les clients autonomes : @ref m71, @ref m71, @ref m73
-			- Un client TCP intï¿½grï¿½ au rï¿½fï¿½rentiel rï¿½seau (voir projet Rï¿½fï¿½rentiel rï¿½seau), permettant l'affichage cartographiques de donnï¿½es inconnues de SYNTHESE
-
-		@section m00carto Dispositions particuliï¿½res fonctionnalitï¿½s cartographiques
-
-		L'utilisation des fonctionnalitï¿½s cartographiques permettent de fournir au sein de la requï¿½te des donnï¿½es complï¿½mentaires ï¿½ afficher. A titre indicatif, l'utilisation prï¿½vue des clients pour le tracï¿½ de carte est la suivante :
-
-		<table class="tableau">
-		<tr><th>Client</th><th>Fournisseur de donnï¿½es</th><th>Utilisateur de donnï¿½es globales</th><th>Type de sï¿½lection</th></tr>
-		<tr><th>Rï¿½fï¿½rentiel rï¿½seau</th><td>Objets</td><td>Fonds	X, Y, ï¿½chelle</td></tr>
-		<tr><th>Client CGI</th><td>NON</td><td>Fonds + Objets</td><td>X,Y, ï¿½chelle</td></tr>
-		</table>
-
-		@subsection archicarte Architecture interne serveur cartographique modules 3 Tracï¿½ de carte
-
-		Chaque carte est obtenue par le passage d'une requï¿½te XML, composï¿½e de trois groupes d'ï¿½lï¿½ments :
-		- Des donnï¿½es dont la durï¿½e de vie est propre ï¿½ la requï¿½te
-		- Des instructions de sï¿½lection des donnï¿½es ï¿½ afficher
-		- Des paramï¿½tres d'affichage de la carte dont le format de sortie
-
-		L'interprï¿½tation d'une requï¿½te donne lieu, en fonction du format de sortie, ï¿½ la fabrication d'une carte vectorielle et/ou ï¿½ la fabrication d'une table de liens, en fonction des critï¿½res de sï¿½lection de donnï¿½es spï¿½cifiï¿½es dans la requï¿½te, et ï¿½ partir des donnï¿½es globales chargï¿½es dans le serveur, et des donnï¿½es spï¿½cifiques fournies dans la requï¿½te.
-
-		La carte vectorielle est initialement codï¿½e selon le standard PostScript, puis peut ï¿½tre exportï¿½e sous divers formats grï¿½ce ï¿½ la bibliothï¿½que GhostScript (PDF, JPEG, etcï¿½), ou bien peut ï¿½tre directement enregistrï¿½e au format PS pour impression.
-
-		La table de liens est stockï¿½e en mï¿½moire sur des structure de donnï¿½es simples (tableaux dynamiques) et est exportï¿½e selon divers formats (PDF, HTML, etc.)
-
-		Le schï¿½ma d'architecture interne concernant les fonctionnalitï¿½s cartographiques est le suivant :
-
-		@image html m3.png
+	/** @defgroup m70 70 synthese server
 
 
-		@{
+
+	@{
 	*/
 
 	/** 70_server namespace */
 	namespace server
 	{
 
+
+	    //! Function codes
+	    static const std::string FUNCTION_HOME ("ac");
+	    static const std::string FUNCTION_SCHEDULE_SHEET ("fh");
+	    static const std::string FUNCTION_STOP_DESCRIPTION ("fa");
+	    static const std::string FUNCTION_STOP_LIST ("lpa");
+	    static const std::string FUNCTION_CITY_LIST ("lc");
+	    static const std::string FUNCTION_SCHEDULE_SHEET_VALIDATION ("vfh");
+	    static const std::string FUNCTION_STATION_DEPARTURE_TABLE ("tdg");
+	    static const std::string FUNCTION_DEPARTURE_TABLE ("td");
+	    static const std::string FUNCTION_TINY_DEPARTURE_TABLE ("mtd");
+	    static const std::string FUNCTION_RESERVATION_FORM ("fres");
+	    static const std::string FUNCTION_RESERVATION_VALIDATION ("vres");
+	    static const std::string FUNCTION_RESERVATION_CANCELLING ("ares");
+
+	    static const std::string PARAMETER_FUNCTION ("fonction");
+	    static const std::string PARAMETER_SITE ("site");
+	    static const std::string PARAMETER_SEARCH ("rec");
+	    static const std::string PARAMETER_CITY ("com");
+	    static const std::string PARAMETER_CITY_NUMBER ("ncom");
+	    static const std::string PARAMETER_DIRECTION ("sens");
+	    static const std::string PARAMETER_DATE ("date");
+	    static const std::string PARAMETER_PERIOD ("per");
+	    static const std::string PARAMETER_TAXIBUS ("tax");
+	    static const std::string PARAMETER_BIKE ("vel");
+	    static const std::string PARAMETER_HANDICAPPED ("han");
+	    static const std::string PARAMETER_PRICE ("tar");
+	    static const std::string PARAMETER_DEPARTURE_CITY ("comd");
+	    static const std::string PARAMETER_ARRIVAL_CITY ("coma");
+
+	    static const std::string PARAMETER_DEPARTURE_STOP ("ad");
+	    static const std::string PARAMETER_ARRIVAL_STOP ("aa");
+
+	    static const std::string PARAMETER_DEPARTURE_CITY_NUMBER ("ncomd");
+	    static const std::string PARAMETER_ARRIVAL_CITY_NUMBER ("ncoma");
+	    static const std::string PARAMETER_STOP_NUMBER ("npa");
+	    static const std::string PARAMETER_DEPARTURE_STOP_NUMBER ("npad");
+	    static const std::string PARAMETER_ARRIVAL_STOP_NUMBER ("npaa");
+
+	    static const std::string PARAMETER_DEPARTURE_WORDING_NUMBER ("ndd");
+	    static const std::string PARAMETER_ARRIVAL_WORDING_NUMBER ("nda");
+	    static const std::string PARAMETER_PROPOSAL_COUNT ("np");
+	    static const std::string PARAMETER_LINE_CODE ("lig");
+	    static const std::string PARAMETER_SERVICE_NUMBER  ("serv");
+	    static const std::string PARAMETER_RESERVATION_CODE ("res");
+	    static const std::string PARAMETER_CLIENT_NAME ("Nom");
+	    static const std::string PARAMETER_CLIENT_FIRST_NAME ("Prenom");
+	    static const std::string PARAMETER_CLIENT_ADDRESS ("Adresse");
+	    static const std::string PARAMETER_CLIENT_EMAIL ("Email");
+	    static const std::string PARAMETER_CLIENT_PHONE ("Telephone");
+	    static const std::string PARAMETER_CLIENT_REGISTRATION_NUMBER ("NumAbonne");
+	    static const std::string PARAMETER_DEPARTURE_ADDRESS ("AdresseDepart");
+	    static const std::string PARAMETER_ARRIVAL_ADDRESS ("AdresseArrivee");
+
+	    static const std::string PARAMETER_RESERVATION_COUNT ("NbPlaces");
+	    static const std::string PARAMETER_DEPARTURE_TABLE_CODE ("tb");
+
+	    static const int UNKNOWN_PARAMETER_VALUE = -1;
 
 	}
 

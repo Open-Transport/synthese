@@ -22,7 +22,7 @@
 
 
 #include "Parametres.h"
-#include "cTexteRequeteSYNTHESE.h"
+#include "70_server/Request.h"
 
 
 
@@ -201,7 +201,7 @@ void *ServerThread( void *args )
                 srvSocket.read( pContext->socket, __Buffer, BUFFER_SIZE, CLIENT_TIMEOUT );
 
                 // Utilisation des objets Synthese et appel du calculateur
-                cTexteRequeteSYNTHESE query;
+                synthese::server::Request query (__Buffer);
 
 		// MJ : we set the HTML filter here and we do not use any cTexteHTML anymore. 
 		// The data is kept in its original format as long as possible
@@ -211,7 +211,6 @@ void *ServerThread( void *args )
 		pCtxt.push (synthese::util::HtmlFilter());
 		pCtxt.push (htmlResult);
 
-                query << __Buffer;
 #ifdef DEBUG
 
                 cout << "query: " << __Buffer << endl;

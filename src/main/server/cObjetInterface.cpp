@@ -183,6 +183,9 @@ cInterface_Objet_Connu_ListeParametres& cInterface_Objet_Connu_ListeParametres::
 
 
 
+
+
+
 /*! \brief Ajout d'un élément numérique en fin de chaîne
  \warning La réussite de la copie n'est pas contrôlée.
 */

@@ -12,7 +12,11 @@
 #include "cCalculItineraire.h"
 #include "TimeTables.h"
 
+#include "70_server/module.h"
+
+
 using namespace std;
+using namespace boost::logic;
 
 #ifdef UNIX
 pthread_mutex_t mutex_associateur = PTHREAD_MUTEX_INITIALIZER;
@@ -262,10 +266,18 @@ cSite* SYNTHESE::GetSite( const string& __Cle ) const
  \author Hugues Romain
  \date 2001
 */
-bool SYNTHESE::FicheHoraire( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                             , int NumeroGareOrigine, int NumeroGareDestination, const synthese::time::Date& __DateDepart
-                             , int __IndexPeriode, tBool3 velo, tBool3 handicape, tBool3 taxibus, int tarif
-                             , long vThreadId )
+bool SYNTHESE::FicheHoraire( ostream &pCtxt, 
+			     ostream& pCerr, 
+			     const cSite* __Site,
+                             int NumeroGareOrigine, 
+			     int NumeroGareDestination, 
+			     const synthese::time::Date& __DateDepart,
+                             int __IndexPeriode, 
+			     tribool velo, 
+			     tribool handicape, 
+			     tribool taxibus, 
+			     int tarif,
+                             long vThreadId )
 {
     // Test des entrï¿½es
     if ( __Site->getEnvironnement() ->getLogicalPlace( NumeroGareOrigine )
@@ -316,45 +328,9 @@ bool SYNTHESE::FicheHoraire( ostream &pCtxt, ostream& pCerr, const cSite* __Site
         }
         else
         {
-            /*   //Entete XML
-               pCtxt << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
-               //pCtxt << "<!DOCTYPE fichehoraire SYSTEM \"/bl/fichehoraire.dtd\">";
-               pCtxt << "\n<fichehoraire>";
-             
-               //Description de la fiche horaire
-               pCtxt << "\n<description>";
-               pCtxt << "\n<depart>";
-               synthese::time::DateTime pNull;
-               calculateur->getArretLogique(NumeroGareOrigine)->toXML(pCtxt, pNull, pNull, false);
-               pCtxt << "\n</depart>";
-               pCtxt << "\n<arrivee>";
-               calculateur->getArretLogique(NumeroGareDestination)->toXML(pCtxt, pNull, pNull, false);
-               pCtxt << "\n</arrivee>";
-               pCtxt << "\n<date jour=\""<< TXT(MomentDepart.getDay()) << "\" mois=\""<< TXT(MomentDepart.getMonth ()) << "\" annee=\""<< MomentDepart.getYear () << "\"/>";
-               pCtxt << "\n</description>";
-             
-             
-               cElementTrajet* curTrajet;
-               cElementTrajet* curElementTrajet;
-               //defilement sur les trajets (colonnes)
-               for (curTrajet = calculateur->getSolution(); curTrajet!=NULL; curTrajet = curTrajet->getTrajetSuivant())
-               {
-                pCtxt << "\n<trajet>";
-             
-                //defilement sur les elements du trajet (lignes)
-                for (curElementTrajet = curTrajet; curElementTrajet !=NULL; curElementTrajet = curElementTrajet->Suivant())
-                {
-                 curElementTrajet->toXML(pCtxt, MomentDepart , curTrajet->AmplitudeServiceContinu());
-                }
-             
-                pCtxt << "\n</trajet>";
-               }
-             
-               pCtxt << "\n</fichehoraire>";
-              }
-             */
-
             cInterface_Objet_Connu_ListeParametres __Parametres;
+	    /* MJ to review once cInterface...ListeParametres sera migré avec string ...ETC
+	    
             __Parametres << __Site->getEnvironnement() ->getLogicalPlace( NumeroGareOrigine ) ->getTown() ->getName(); //0
             __Parametres << __Site->getEnvironnement() ->getLogicalPlace( NumeroGareOrigine ) ->getTown() ->getId(); //1
             __Parametres << __Site->getEnvironnement() ->getLogicalPlace( NumeroGareOrigine ) ->getName(); //2
@@ -370,9 +346,10 @@ bool SYNTHESE::FicheHoraire( ostream &pCtxt, ostream& pCerr, const cSite* __Site
             __Parametres << handicape; //12
             __Parametres << taxibus; //13
             __Parametres << tarif; //14
+	    */
 	    cTexte __txtDateDepart;
             __txtDateDepart << __DateDepart.toInternalString ();
-            __Parametres << __txtDateDepart; //15
+            // MJ ro review __Parametres << __txtDateDepart; //15
             __Site->Affiche( pCtxt, INTERFACEFicheHoraire, __Parametres, ( const void* ) & __Calculateur.getSolution() );
 
             // Remise ï¿½ disposition de l'espace de calcul
@@ -442,7 +419,7 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
                         const cTexte& txtCA, int nCA, int nAA, int nDA,
                         const cTexte& txtAD, const cTexte& txtAA,
                         const synthese::time::Date& __DateDepart, int codePeriode,
-                        tBool3 velo, tBool3 handicape, tBool3 taxibus, int tarif ) const
+                        tribool velo, tribool handicape, tribool taxibus, int tarif ) const
 {
     /* patch de test
        aucune intégration
@@ -586,9 +563,11 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
             __Parametres << ""; //3
             __Parametres << ""; //4
             __Parametres << codePeriode; //5
+	    /* MJ to review once cInterface...ListeParametres sera migré avec string ...ETC
             __Parametres << velo; //6
             __Parametres << handicape; //7
             __Parametres << taxibus; //8
+	    */
             __Parametres << tarif; //9
             __Site->Affiche( pCtxt, INTERFACEAttente, __Parametres );
         }
@@ -624,9 +603,11 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
                 alerte << MESSAGE_ERREUR_ARRET_ARRIVEE;
             */
             __Parametres << alerte; //15
+	    /* MJ to review once cInterface...ListeParametres sera migré avec string ...ETC
             __Parametres << velo; //16
             __Parametres << handicape; //17
             __Parametres << taxibus; //18
+	    */
             __Parametres << tarif; //19
             __Parametres << cTexte() << __DateDepart.toInternalString (); //20
             __Site->Affiche( pCtxt, INTERFACEErreurArretsFicheHoraire, __Parametres );
@@ -930,7 +911,7 @@ bool SYNTHESE::TableauDepartsGare( ostream& pCtxt, ostream& pCerr, const cTablea
     \author Hugues Romain
     \date 2001-2005
  
-Cette mï¿½thode exï¿½cute la requï¿½te fournie en paramï¿½tre (voir cTexteRequeteSYNTHESE pour la documentation du format des requï¿½tes)
+Cette mï¿½thode exï¿½cute la requï¿½te fournie en paramï¿½tre (voir synthese::server::Request pour la documentation du format des requï¿½tes)
  
 Le rï¿½sultat de la requï¿½te est envoyï¿½ sur le flux de sortie, et les rapports d'erreurs sont envoyï¿½s au flux d'erreur.
  
@@ -945,145 +926,146 @@ La valeur de retour indique si la requï¿½te a donnï¿½ lieu ï¿½ l'ï¿½xï¿½cution d
  - Parametres fournis ï¿½ la fonction invalides
  - Site invalide
 */
-bool SYNTHESE::ExecuteRequete( ostream &pCtxt, ostream &pCerr, cTexteRequeteSYNTHESE& __Requete, long vThreadId )
+bool SYNTHESE::ExecuteRequete( ostream &pCtxt, ostream &pCerr, synthese::server::Request& request, long vThreadId )
 {
     const cTableauAffichage * __TableauAffichage;
     const cSite* __Site;
 
-    // rï¿½cupï¿½ration du paramï¿½tre fonction obligatoire
-    cTexte __Fonction = __Requete.getTexte( REQUETE_COMMANDE_FONCTION );
-    if ( !__Fonction.Taille() )
-        return false;
+    // Mandatory function parameter.
+    std::string function = request.getParameter ( synthese::server::PARAMETER_FUNCTION );
+
+    if ( function.empty() ) return false;
 
     // Mode tï¿½lï¿½affichage
-    if ( __TableauAffichage = GetTbDep( string( __Requete.getTexte( REQUETE_COMMANDE_CODE_TABLEAUDEPART ).Texte() ) ) )
+    if ( __TableauAffichage = GetTbDep( request.getParameter ( synthese::server::PARAMETER_DEPARTURE_TABLE_CODE ) ) )
     {
-        if ( __Fonction == FONCTION_TABLEAU_DEPART_GARE )
+        if ( function == synthese::server::FUNCTION_STATION_DEPARTURE_TABLE )
             return TableauDepartsGare( pCtxt, pCerr, __TableauAffichage
-                                       , __Requete.getMoment( REQUETE_COMMANDE_DATE )
-                                     );
+                                       , request.getParameterAsDateTime( synthese::server::PARAMETER_DATE )
+		);
 
     }
     // Mode site web
-    else if ( __Site = GetSite( string( __Requete.getTexte( REQUETE_COMMANDE_SITE ).Texte() ) ) )
+    else if ( __Site = GetSite (request.getParameter ( synthese::server::PARAMETER_SITE ) ) )
     {
-        if ( __Fonction == FONCTION_ACCUEIL )
+        if ( function == synthese::server::FUNCTION_HOME )
             return Accueil( pCtxt, pCerr, __Site
-                          );
+		);
 
-        if ( __Fonction == FONCTION_ANNULATION_RESA )
+        if ( function == synthese::server::FUNCTION_RESERVATION_CANCELLING )
             return AnnulationReservation( pCtxt, pCerr, __Site
-                                          , __Requete.getTexte( REQUETE_COMMANDE_CODE_RESA )
-                                          , __Requete.getTexte( REQUETE_COMMANDE_CLIENT_NOM )
-                                        );
+                                          , request.getParameter ( synthese::server::PARAMETER_RESERVATION_CODE )
+                                          , request.getParameter ( synthese::server::PARAMETER_CLIENT_NAME )
+		);
 
-        if ( __Fonction == FONCTION_VALIDATION_RESA )
+        if ( function == synthese::server::FUNCTION_RESERVATION_VALIDATION )
             return ValidationReservation( pCtxt, pCerr, __Site
-                                          , __Requete.getTexte( REQUETE_COMMANDE_CODE_LIGNE )
-                                          , __Requete.getInt( REQUETE_COMMANDE_NUMERO_SERVICE )
-                                          , __Requete.getInt( REQUETE_COMMANDE_NUMERO_POINT_ARRET_DEPART )
-                                          , __Requete.getInt( REQUETE_COMMANDE_NUMERO_POINT_ARRET_ARRIVEE )
-                                          , __Requete.getDate( REQUETE_COMMANDE_DATE )
-                                          , __Requete.getTexte( REQUETE_COMMANDE_CLIENT_NOM )
-                                          , __Requete.getTexte( REQUETE_COMMANDE_CLIENT_PRENOM )
-                                          , __Requete.getTexte( REQUETE_COMMANDE_CLIENT_ADRESSE )
-                                          , __Requete.getTexte( REQUETE_COMMANDE_CLIENT_EMAIL )
-                                          , __Requete.getTexte( REQUETE_COMMANDE_CLIENT_TELEPHONE )
-                                          , __Requete.getTexte( REQUETE_COMMANDE_CLIENT_NUMERO_ABONNE )
-                                          , __Requete.getTexte( REQUETE_COMMANDE_ADRESSE_ARRIVEE )
-                                          , __Requete.getTexte( REQUETE_COMMANDE_ADRESSE_DEPART )
-                                          , __Requete.getInt( REQUETE_COMMANDE_NOMBRE_PLACES )
-                                        );
+                                          , request.getParameter ( synthese::server::PARAMETER_LINE_CODE )
+                                          , request.getParameterAsInt( synthese::server::PARAMETER_SERVICE_NUMBER )
+                                          , request.getParameterAsInt( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER )
+                                          , request.getParameterAsInt( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER )
+                                          , request.getParameterAsDate( synthese::server::PARAMETER_DATE )
+                                          , request.getParameter ( synthese::server::PARAMETER_CLIENT_NAME )
+                                          , request.getParameter ( synthese::server::PARAMETER_CLIENT_FIRST_NAME )
+                                          , request.getParameter ( synthese::server::PARAMETER_CLIENT_ADDRESS )
+                                          , request.getParameter ( synthese::server::PARAMETER_CLIENT_EMAIL )
+                                          , request.getParameter ( synthese::server::PARAMETER_CLIENT_PHONE )
+                                          , request.getParameter ( synthese::server::PARAMETER_CLIENT_REGISTRATION_NUMBER )
+                                          , request.getParameter ( synthese::server::PARAMETER_ARRIVAL_ADDRESS )
+                                          , request.getParameter ( synthese::server::PARAMETER_DEPARTURE_ADDRESS )
+                                          , request.getParameterAsInt( synthese::server::PARAMETER_RESERVATION_COUNT )
+		);
 
-        if ( __Fonction == FONCTION_FORMULAIRE_RESA )
+        if ( function == synthese::server::FUNCTION_RESERVATION_FORM )
             return FormulaireReservation( pCtxt, pCerr, __Site
-                                          , __Requete.getTexte( REQUETE_COMMANDE_CODE_LIGNE )
-                                          , __Requete.getInt( REQUETE_COMMANDE_NUMERO_SERVICE )
-                                          , __Requete.getInt( REQUETE_COMMANDE_NUMERO_POINT_ARRET_DEPART )
-                                          , __Requete.getInt( REQUETE_COMMANDE_NUMERO_POINT_ARRET_ARRIVEE )
-                                          , __Requete.getDate( REQUETE_COMMANDE_DATE )
-                                        );
+                   , request.getParameter ( synthese::server::PARAMETER_LINE_CODE )
+                   , request.getParameterAsInt( synthese::server::PARAMETER_SERVICE_NUMBER )
+                   , request.getParameterAsInt( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER )
+                   , request.getParameterAsInt( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER )
+                   , request.getParameterAsDate( synthese::server::PARAMETER_DATE )
+		);
 
-        if ( __Fonction == FONCTION_FICHE_HORAIRE )
+        if ( function == synthese::server::FUNCTION_SCHEDULE_SHEET )
             return FicheHoraire( pCtxt, pCerr, __Site
-                                 , __Requete.getInt( REQUETE_COMMANDE_NUMERO_POINT_ARRET_DEPART )
-                                 , __Requete.getInt( REQUETE_COMMANDE_NUMERO_POINT_ARRET_ARRIVEE )
-                                 , __Requete.getDate( REQUETE_COMMANDE_DATE )
-                                 , __Requete.getInt( REQUETE_COMMANDE_PERIODE )
-                                 , __Requete.getBool3( REQUETE_COMMANDE_VELO )
-                                 , __Requete.getBool3( REQUETE_COMMANDE_HANDICAPE )
-                                 , __Requete.getBool3( REQUETE_COMMANDE_TAXIBUS )
-                                 , __Requete.getInt( REQUETE_COMMANDE_TARIF )
-                                 , vThreadId
-                               );
+            , request.getParameterAsInt( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER )
+            , request.getParameterAsInt( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER )
+            , request.getParameterAsDate( synthese::server::PARAMETER_DATE )
+            , request.getParameterAsInt( synthese::server::PARAMETER_PERIOD )
+            , request.getParameterAsTriBool( synthese::server::PARAMETER_BIKE )
+            , request.getParameterAsTriBool( synthese::server::PARAMETER_HANDICAPPED )
+            , request.getParameterAsTriBool( synthese::server::PARAMETER_TAXIBUS )
+            , request.getParameterAsInt( synthese::server::PARAMETER_PRICE )
+            , vThreadId
+		);
 
-        // if (__Fonction == FICHE_ARRET)
+
+        // if (function == synthese::server::FUNCTION_STOP_DESCRIPTION)
         //  return FicheArret(pCtxt, pCerr, __Site
-        //    , __Requete.getInt(NUMERO_POINT_ARRET)
+        //    , request.getParameterAsInt(synthese::server::PARAMETER_STOP_NUMBER)
         //    );
 
 
-        // if (__Fonction == TABLEAU_DEPART_GARE)
+        // if (function == FUNCTION_STATION_DEPARTURE_TABLE)
         //  return TableauDepartsGare(pCtxt, pCerr, __Site
-        //    , __Requete.getInt(NUMERO_POINT_ARRET)
-        //    , __Requete.getInt(NOMBRE_PROPOSITIONS) // A mettre dans l'interface
+        //    , request.getParameterAsInt(synthese::server::PARAMETER_STOP_NUMBER)
+        //    , request.getParameterAsInt(NOMB) // A mettre dans l'interface
         //    );
 
-        // if (__Fonction == MINI_TABLEAU_DEPART)
+        // if (function == FUNCTION_TINY_DEPARTURE_TABLE)
         //  return MiniTbDepGare(pCtxt, pCerr, __Site
-        //    , __Requete.getInt(NUMERO_POINT_ARRET)
-        //    , __Requete.getInt(NOMBRE_PROPOSITIONS) // A mettre dans l'interface
+        //    , request.getParameterAsInt(PARAMETER_STOP_NUMBER)
+        //    , request.getParameterAsInt(PARAMETER_PROPOSAL_COUNT) // A mettre dans l'interface
         //    );
 
         /* cela ne fonctionne plus comme ça, donc ces fonctions deviennent inutile
-        note: j'ai aussi change interfaces/6/formulaireentree.elementinterface.per
-        if (__Fonction == FONCTION_LISTE_COMMUNE)
-        return ListeCommunes(pCtxt, pCerr, __Site
-        , __Requete.getInt(REQUETE_COMMANDE_SENS) != 0
-        , __Requete.getTexte(REQUETE_COMMANDE_RECHERCHE)
-        );
+	   note: j'ai aussi change interfaces/6/formulaireentree.elementinterface.per
+	   if (function == synthese::server::FUNCTION_CITY_LIST)
+	   return ListeCommunes(pCtxt, pCerr, __Site
+	   , request.getParameterAsInt(synthese::server::PARAMETER_DIRECTION) != 0
+	   , request.getParameter (synthese::server::PARAMETER_SEARCH)
+	   );
 
-        if (__Fonction == FONCTION_LISTE_POINT_ARRET)
-        return ListeArrets(pCtxt, pCerr, __Site
-        , __Requete.getInt(REQUETE_COMMANDE_SENS) != 0
-        , __Requete.getTexte(REQUETE_COMMANDE_COMMUNE)
-        , __Requete.getInt(REQUETE_COMMANDE_NUMERO_COMMUNE)
-        , __Requete.getTexte(REQUETE_COMMANDE_RECHERCHE)
-        );
+	   if (function == synthese::server::FUNCTION_STOP_LIST)
+	   return ListeArrets(pCtxt, pCerr, __Site
+	   , request.getParameterAsInt(synthese::server::PARAMETER_DIRECTION) != 0
+	   , request.getParameter (synthese::server::PARAMETER_CITY)
+	   , request.getParameterAsInt(synthese::server::PARAMETER_CITY_NUMBER)
+	   , request.getParameter (synthese::server::PARAMETER_SEARCH)
+	   );
         */
 
-        if ( __Fonction == FONCTION_VALID_FICHE_HORAIRE )
+        if ( function == synthese::server::FUNCTION_SCHEDULE_SHEET_VALIDATION )
             return ValidFH( pCtxt, pCerr, __Site
-                            , __Requete.getTexte( REQUETE_COMMANDE_COMMUNE_DEPART )
-                            , __Requete.getInt( REQUETE_COMMANDE_NUMERO_COMMUNE_DEPART )
-                            , __Requete.getInt( REQUETE_COMMANDE_NUMERO_POINT_ARRET_DEPART )
-                            , __Requete.getInt( REQUETE_COMMANDE_NUMERO_DESIGNATION_DEPART )
-                            , __Requete.getTexte( REQUETE_COMMANDE_COMMUNE_ARRIVEE )
-                            , __Requete.getInt( REQUETE_COMMANDE_NUMERO_COMMUNE_ARRIVEE )
-                            , __Requete.getInt( REQUETE_COMMANDE_NUMERO_POINT_ARRET_ARRIVEE )
-                            , __Requete.getInt( REQUETE_COMMANDE_NUMERO_DESIGNATION_ARRIVEE )
-                            , __Requete.getTexte( REQUETE_COMMANDE_POINT_ARRET_DEPART )
-                            , __Requete.getTexte( REQUETE_COMMANDE_POINT_ARRET_ARRIVEE )
-                            , __Requete.getDate( REQUETE_COMMANDE_DATE )
-                            , __Requete.getInt( REQUETE_COMMANDE_PERIODE )
-                            , __Requete.getBool3( REQUETE_COMMANDE_VELO )
-                            , __Requete.getBool3( REQUETE_COMMANDE_HANDICAPE )
-                            , __Requete.getBool3( REQUETE_COMMANDE_TAXIBUS )
-                            , __Requete.getInt( REQUETE_COMMANDE_TARIF )
-                          );
+            , request.getParameter ( synthese::server::PARAMETER_DEPARTURE_CITY )
+            , request.getParameterAsInt( synthese::server::PARAMETER_DEPARTURE_CITY_NUMBER )
+            , request.getParameterAsInt( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER )
+            , request.getParameterAsInt( synthese::server::PARAMETER_DEPARTURE_WORDING_NUMBER )
+            , request.getParameter ( synthese::server::PARAMETER_ARRIVAL_CITY )
+            , request.getParameterAsInt( synthese::server::PARAMETER_ARRIVAL_CITY_NUMBER )
+            , request.getParameterAsInt( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER )
+            , request.getParameterAsInt( synthese::server::PARAMETER_ARRIVAL_WORDING_NUMBER )
+            , request.getParameter ( synthese::server::PARAMETER_DEPARTURE_STOP )
+            , request.getParameter ( synthese::server::PARAMETER_ARRIVAL_STOP )
+            , request.getParameterAsDate( synthese::server::PARAMETER_DATE )
+            , request.getParameterAsInt( synthese::server::PARAMETER_PERIOD )
+            , request.getParameterAsTriBool( synthese::server::PARAMETER_BIKE )
+            , request.getParameterAsTriBool( synthese::server::PARAMETER_HANDICAPPED )
+            , request.getParameterAsTriBool( synthese::server::PARAMETER_TAXIBUS )
+            , request.getParameterAsInt( synthese::server::PARAMETER_PRICE )
+		);
     }
 
     return false;
 }
 
 /*! \fn bool SYNTHESE::TermineCalculateur(int vThreadId)
-    \brief Assure la terminaison forcï¿½e d'un calculateur
-    \param vThreadId Identifiant du thread concernï¿½
-    \return true si l'opï¿½ration a ï¿½tï¿½ effectuï¿½e avec succï¿½s
-    \author Christophe Romain
-    \date 2005
- @todo UTILITE ?
-  */
+  \brief Assure la terminaison forcï¿½e d'un calculateur
+  \param vThreadId Identifiant du thread concernï¿½
+  \return true si l'opï¿½ration a ï¿½tï¿½ effectuï¿½e avec succï¿½s
+  \author Christophe Romain
+  \date 2005
+  @todo UTILITE ?
+*/
 bool SYNTHESE::TermineCalculateur( long vThreadId )
 {
     if ( !_ThreadCalculateur.count( vThreadId ) )
@@ -1092,68 +1074,68 @@ bool SYNTHESE::TermineCalculateur( long vThreadId )
     return true;
 }
 
-/*! \fn bool SYNTHESE::ValidFH(ostream &pCtxt, ostream &pCerr, const cSite *__Site, const cTexte &txtCD, int nCD, int nAD, int nDD, const cTexte &txtCA, int nCA, int nAA, int nDA, const cTexte &txtAD, const cTexte &txtAA, const synthese::time::Date &DateDepart, int codePeriode, tBool3 velo, tBool3 handicape, tBool3 taxibus, tNumeroTarif tarif) const
+/*! \fn bool SYNTHESE::ValidFH(ostream &pCtxt, ostream &pCerr, const cSite *__Site, const cTexte &txtCD, int nCD, int nAD, int nDD, const cTexte &txtCA, int nCA, int nAA, int nDA, const cTexte &txtAD, const cTexte &txtAA, const synthese::time::Date &DateDepart, int codePeriode, tribool velo, tribool handicape, tribool taxibus, tNumeroTarif tarif) const
  
- \brief Valide la saisie du formulaire d'entree de la recherche d'itinï¿½raire
-  \param pCtxt Le flux de sortie sur lequel ï¿½crire les rï¿½sultats
-  \param txtCD Nom de la commune de dï¿½part entrï¿½ dans le formulaire
-  \param nCD Numero de la commune de dï¿½part si dï¿½jï¿½ connu
-  \param nAD Numï¿½ro du point d'arrï¿½t de dï¿½part demandï¿½ si dï¿½jï¿½ connu
-  \param nDD Numï¿½ro de dï¿½signation du point d'arrï¿½t de dï¿½part demandï¿½ si dï¿½jï¿½ connu
-  \param txtCA Nom entrï¿½ de la commune d'arrivï¿½e
-  \param nCA Numero de la commune d'arrivï¿½e si dï¿½jï¿½ connu
-  \param nAA Numï¿½ro de PA d'arrivï¿½e si dï¿½jï¿½ connu
-  \param nDA Numï¿½ro de dï¿½signation du PA d'arrivï¿½e si dï¿½jï¿½ connu
-  \param txtAD Nom entrï¿½ de l'arret de depart
-  \param txtAA Nom entrï¿½ de l'arret d'arrivï¿½e
-  \param Date Date de recherche
-  \param PeriodeJournee Pï¿½riode de la journï¿½e
-  \param handicape Etat du filtre handicape
-  \param velo Etat du filtre velo
-  \param taxibus Etat du filtre taxibus
-  \param tarif code tarification ï¿½ filtrer
- \return true si l'opï¿½ration a ï¿½tï¿½ effectuï¿½e avec succï¿½s
- \author Hugues Romain
- \date 2000-2005
+\brief Valide la saisie du formulaire d'entree de la recherche d'itinï¿½raire
+\param pCtxt Le flux de sortie sur lequel ï¿½crire les rï¿½sultats
+\param txtCD Nom de la commune de dï¿½part entrï¿½ dans le formulaire
+\param nCD Numero de la commune de dï¿½part si dï¿½jï¿½ connu
+\param nAD Numï¿½ro du point d'arrï¿½t de dï¿½part demandï¿½ si dï¿½jï¿½ connu
+\param nDD Numï¿½ro de dï¿½signation du point d'arrï¿½t de dï¿½part demandï¿½ si dï¿½jï¿½ connu
+\param txtCA Nom entrï¿½ de la commune d'arrivï¿½e
+\param nCA Numero de la commune d'arrivï¿½e si dï¿½jï¿½ connu
+\param nAA Numï¿½ro de PA d'arrivï¿½e si dï¿½jï¿½ connu
+\param nDA Numï¿½ro de dï¿½signation du PA d'arrivï¿½e si dï¿½jï¿½ connu
+\param txtAD Nom entrï¿½ de l'arret de depart
+\param txtAA Nom entrï¿½ de l'arret d'arrivï¿½e
+\param Date Date de recherche
+\param PeriodeJournee Pï¿½riode de la journï¿½e
+\param handicape Etat du filtre handicape
+\param velo Etat du filtre velo
+\param taxibus Etat du filtre taxibus
+\param tarif code tarification ï¿½ filtrer
+\return true si l'opï¿½ration a ï¿½tï¿½ effectuï¿½e avec succï¿½s
+\author Hugues Romain
+\date 2000-2005
  
 La politique d'affichage est la mï¿½me pour le dï¿½part et l'arrivï¿½e :
  
 <table cellspacing="0" cellpadding="1" class="tableau">
- <tr>
-  <th rowspan="3">Commune</th>
-  <th colspan="4">Arrï¿½t</th>
- </tr>
- <tr>
-  <th rowspan="2">Validï¿½</th>
-  <th colspan="2">Validï¿½</th>
-  <th rowspan="2">Non saisi</th>
- </tr>
- <tr>
-  <th>Non ambigu</th>
-  <th>Ambigu</th>
- </tr>
- <tr>
-  <th>Validï¿½e</th>
-  <td>\ref InterfaceObjetsStandard4 </td>
-  <td>\ref InterfaceObjetsStandard4 </td>
-  <td>Arrï¿½t rejetï¿½ sur \ref InterfaceObjetsStandard11 </td>
-  <td>\ref InterfaceObjetsStandard4 <b>(avec arrï¿½t principal)</b></td>
- </tr>
- <tr>
-  <th>Non validï¿½e non ambiguï¿½</th>
-  <td>ï¿½&nbsp;Erreur de requï¿½te&nbsp;ï¿½</td>
-  <td>\ref InterfaceObjetsStandard4 </td>
-  <td> Arrï¿½t rejetï¿½ sur \ref InterfaceObjetsStandard11 </td>
-  <td>\ref InterfaceObjetsStandard4 <b>(avec arrï¿½t principal)</b></td>
- </tr>
- <tr>
-  <th>Non validï¿½e ambiguï¿½</th>
-  <td colspan="4"> Commune rejetï¿½e sur \ref InterfaceObjetsStandard11 </td>
- </tr>
- <tr>
-  <th>Non saisie</th>
-  <td colspan="4">ï¿½&nbsp;Erreur de requï¿½te&nbsp;ï¿½</td>
- </tr>
+<tr>
+<th rowspan="3">Commune</th>
+<th colspan="4">Arrï¿½t</th>
+</tr>
+<tr>
+<th rowspan="2">Validï¿½</th>
+<th colspan="2">Validï¿½</th>
+<th rowspan="2">Non saisi</th>
+</tr>
+<tr>
+<th>Non ambigu</th>
+<th>Ambigu</th>
+</tr>
+<tr>
+<th>Validï¿½e</th>
+<td>\ref InterfaceObjetsStandard4 </td>
+<td>\ref InterfaceObjetsStandard4 </td>
+<td>Arrï¿½t rejetï¿½ sur \ref InterfaceObjetsStandard11 </td>
+<td>\ref InterfaceObjetsStandard4 <b>(avec arrï¿½t principal)</b></td>
+</tr>
+<tr>
+<th>Non validï¿½e non ambiguï¿½</th>
+<td>ï¿½&nbsp;Erreur de requï¿½te&nbsp;ï¿½</td>
+<td>\ref InterfaceObjetsStandard4 </td>
+<td> Arrï¿½t rejetï¿½ sur \ref InterfaceObjetsStandard11 </td>
+<td>\ref InterfaceObjetsStandard4 <b>(avec arrï¿½t principal)</b></td>
+</tr>
+<tr>
+<th>Non validï¿½e ambiguï¿½</th>
+<td colspan="4"> Commune rejetï¿½e sur \ref InterfaceObjetsStandard11 </td>
+</tr>
+<tr>
+<th>Non saisie</th>
+<td colspan="4">ï¿½&nbsp;Erreur de requï¿½te&nbsp;ï¿½</td>
+</tr>
 </table>
  
 Une commune est dite ï¿½&nbsp;validï¿½e&nbsp;ï¿½ si son numï¿½ro est

@@ -17,9 +17,12 @@ if (moduleenv['PLATFORM'] != 'win32'):
 moduleenv.Append ( LIBPATH = ['../map'] )  
 moduleenv.Append ( LIBPATH = ['../00_tcp'] )  
 moduleenv.Append ( LIBPATH = ['../04_time'] )  
+moduleenv.Append ( LIBPATH = ['../70_server'] )  
+
 moduleenv.Append ( LIBS = ['map'] )  
 moduleenv.Append ( LIBS = ['00_tcp'] )  
 moduleenv.Append ( LIBS = ['04_time'] )  
+moduleenv.Append ( LIBS = ['70_server'] )  
 moduleenv.Append ( LIBS = ['boost_filesystem'] )  
 
 

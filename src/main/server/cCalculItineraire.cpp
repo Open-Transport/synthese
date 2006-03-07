@@ -19,6 +19,9 @@
 
 #include <string>
 
+using namespace boost::logic;
+
+
 
 #ifdef UNIX
 #include <sys/stat.h>
@@ -61,8 +64,8 @@ La variable vArriveeMax, qui permet de limiter le moment d'arriv�e lors du cal
 cCalculateur::cCalculateur( const cEnvironnement* const environnement, const LogicalPlace* const __LieuOrigine, const LogicalPlace* const __LieuDestination
                             , const synthese::time::Date& __DateDepart
                             , const synthese::time::HourPeriod* const __PeriodeJournee
-                            , const tBool3 besoinVelo, const tBool3 besoinHandicape
-                            , const tBool3 besoinTaxiBus, const int codeTarif
+                            , const tribool besoinVelo, const tribool besoinHandicape
+                            , const tribool besoinTaxiBus, const int codeTarif
                             , const bool __SolutionsPassees
                             , const RoutePlanningNode::DistanceInMeters maxApproachDistance
                             , const RoutePlanningNode::SpeedInKmh approachSpeed
