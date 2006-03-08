@@ -182,57 +182,6 @@ bool SYNTHESE::Enregistre( cInterface* __Objet )
 
 
 
-/*! \brief Chargement des donn�es depuis les fichiers
- \param __CheminRepertoire Chemin d'acc�s complet au r�pertoire contenant les fichiers de base (sans / � la fin)
- \param __NombreCalculateursParEnvironnement Nombre d'espaces de calcul � allouer pour chaque environnement
- \return true si le chargement a �t� effectu� avec succ�s
- \author Hugues Romain
- \date 2005
- 
-Le chargement est interrompu au premier refus de fichier, car ces fichiers de donn�es sont fondamentaux, et toute erreur critique sur ceux ci rendrait le service inutilisable.
-*/
-bool SYNTHESE::Charge( const cTexte& __CheminRepertoire )
-{
-    // Pr�paration du nom des fichiers
-    cTexte __CheminFichiers( __CheminRepertoire );
-    __CheminFichiers << "/";
-
-    // Fichier des environnements
-    cFichierEnvironnements __FichierEnvironnements( __CheminFichiers, __CheminFichiers );
-    if ( !__FichierEnvironnements.Charge() )
-    {
-        //   Erreur("Erreur de chargement du fichier des environnements", "", __CheminFichiers, "");
-        return false;
-    }
-
-    // Fichier des interfaces
-    cFichierInterfaces __FichierInterfaces( __CheminFichiers, __CheminFichiers );
-    if ( !__FichierInterfaces.Charge() )
-    {
-        //   Erreur("Erreur du chargement du fichier des interfaces", "", __CheminFichiers, "");
-        return false;
-    }
-
-    // Fichier des sites
-    cFichierSites __FichierSites( __CheminFichiers, __CheminFichiers );
-    if ( !__FichierSites.Charge() )
-    {
-        //   Erreur("Erreur du chargement du fichier des sites", "", __CheminFichiers, "");
-        return false;
-    }
-
-    // Fichier des tableaux d'affichage
-    cFichierTbDep __FichierTbDep( __CheminFichiers, __CheminFichiers );
-    if ( !__FichierTbDep.Charge() )
-    {
-        return false;
-    }
-
-    // Sortie OK
-    return true;
-}
-
-
 
 /*! \brief Accesseur site d'apr�s sa cl�
  \param __Cle Cl� du site � trouver

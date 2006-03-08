@@ -15,7 +15,6 @@ class TimeTables;
 
 #include "cTexte.h"
 
-#include "cFichiersPourSYNTHESE.h"
 #include "70_server/Request.h"
 #include "cLog.h"
 

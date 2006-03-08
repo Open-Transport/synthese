@@ -426,8 +426,8 @@ int _tmain( int argc, TCHAR* argv[], TCHAR* envp[] )
             AfficheUsage( argv[ 0 ] );
 
         /* Chargement de Synthese */
-        if ( !Synthese.Charge( database ) )
-            return EXIT_FAILURE;
+//        if ( !Synthese.Charge( database ) )  // MJ replace this by load SQLlite
+//            return EXIT_FAILURE;
 
         /* Chargement de Synthese */
         //        if(!Synthese.InitAssociateur(associator))

@@ -27,7 +27,6 @@ class cTarif;
 #include "cMateriel.h"
 
 #include "Parametres.h"
-#include "cFichierPourEnvironnement.h"
 #include "map/Topography.h"
 #include "LogicalPlace.h"
 #include "cJourCirculation.h"
