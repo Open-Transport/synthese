@@ -8,7 +8,9 @@
 
 
 #include "cModaliteReservation.h"
-#include "cTexte.h"
+#include <string>
+#include "Parametres.h"
+
 
 
 /** Modalit� de r�servation permettant la r�servation en ligne
@@ -34,14 +36,14 @@ class cModaliteReservationEnLigne : public cModaliteReservation
     private:
         //! \name Connexion Mnesia
         //@{
-        cTexte _Noeud;  //!< Noeud mnesia � contacter en local (serveur)
-        cTexte _Biscuit; //!< Passphrase commune � tous les noeuds du scope
+        std::string _Noeud;  //!< Noeud mnesia � contacter en local (serveur)
+        std::string _Biscuit; //!< Passphrase commune � tous les noeuds du scope
         //@}
 
         //! \name Adresses d'envoi des �tats
         //@{
-        cTexte vEMail;  //!< Adresse e-mail du destinataire des mails d'�tats de r�servations (ex: le transporteur)
-        cTexte vEMailCopie; //!< Adresse e-mail de copie des mails d'�tats de r�servations (ex: l'organisme autoritaire)
+        std::string vEMail;  //!< Adresse e-mail du destinataire des mails d'�tats de r�servations (ex: le transporteur)
+        std::string vEMailCopie; //!< Adresse e-mail de copie des mails d'�tats de r�servations (ex: l'organisme autoritaire)
         //@}
 
         //! \name Champs optionnels affich�s dans le formulaire
@@ -62,8 +64,8 @@ class cModaliteReservationEnLigne : public cModaliteReservation
     public:
         //! \name Accesseurs
         //@{
-        const cTexte& GetMail() const;
-        const cTexte& GetMailCopie() const;
+        const std::string& GetMail() const;
+        const std::string& GetMailCopie() const;
         tBool3 GetRELPrenom() const;
         tBool3 GetRELAdresse() const;
         tBool3 GetRELEMail() const;
@@ -76,12 +78,12 @@ class cModaliteReservationEnLigne : public cModaliteReservation
         /* size_t  Disponibilite(const cTrain* Circulation, const synthese::time::DateTime&, cDatabaseManager* tBaseManager) const;
          tSeuilResa getSeuil(const int ancienneValeur, const int nouvelleValeur)       const;
          bool  Reserver(const cTrain* Service , const LogicalPlace* tPADepart, const LogicalPlace* tPAArrivee
-              , const synthese::time::DateTime& DateDepart, const cTexteSQL& tNom, const cTexteSQL& tNomBrut
-              , const cTexteSQL& tPrenom, const cTexteSQL& tAdresse, const cTexteSQL& tEmail
-              , const cTexteSQL& tTelephone, const cTexteSQL& tNumAbonne
-              , const cTexteSQL& tAdressePAArrivee, const cTexteSQL& tAdressePADepart
+              , const synthese::time::DateTime& DateDepart, const std::stringSQL& tNom, const std::stringSQL& tNomBrut
+              , const std::stringSQL& tPrenom, const std::stringSQL& tAdresse, const std::stringSQL& tEmail
+              , const std::stringSQL& tTelephone, const std::stringSQL& tNumAbonne
+              , const std::stringSQL& tAdressePAArrivee, const std::stringSQL& tAdressePADepart
               , const size_t iNombrePlaces, cDatabaseManager* baseManager)    const;
-         bool  Annuler(const cTexte& CodeReservation, cDatabaseManager* tBaseManager)    const;
+         bool  Annuler(const std::string& CodeReservation, cDatabaseManager* tBaseManager)    const;
         */ //@}
 
         //! \name Modificateurs
@@ -93,8 +95,8 @@ class cModaliteReservationEnLigne : public cModaliteReservation
         bool SetRELNumeroAbo ( const tBool3 );
         bool SetRELPrenom ( const tBool3 );
         bool SetRELTel ( const tBool3 );
-        bool SetMail ( const cTexte& newVal );
-        bool SetMailCopie ( const cTexte& newVal );
+        bool SetMail ( const std::string& newVal );
+        bool SetMailCopie ( const std::string& newVal );
         //@}
 
         //! \name Constructeurs et destructeurs

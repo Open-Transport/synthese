@@ -4,6 +4,8 @@
 #include "cModaliteReservation.h"
 #include "LogicalPlace.h"
 
+#include "01_util/Conversion.h"
+
 
 /*! \brief Constructeur
  \author Hugues Romain
@@ -102,7 +104,7 @@ int cTrajet::GenererNiveauxAlerte()
     }
 
     // Stockage du r�sultat au format texte pour module d'interface
-    _NiveauMaxAlerte.Copie( __NiveauMaxAlerte );
+    _NiveauMaxAlerte = synthese::util::Conversion::ToString (__NiveauMaxAlerte);
 
     // Retour du r�sultat au format num�rique
     return __NiveauMaxAlerte;
@@ -110,14 +112,14 @@ int cTrajet::GenererNiveauxAlerte()
 
 /*! \brief Ecriture de l'objet vers un flux de sortie quelconque
  \param flux Le flux de sortie
- \param Obj L'objet cTexte � �crire
+ \param Obj L'objet std::string � �crire
  \author Hugues Romain
  \date 2005
  \return Le flux de sortie
 */
-ostream& operator<<( ostream& flux, const cTexte& Obj )
+std::ostream& operator<<( std::ostream& flux, const std::string& Obj )
 {
-    flux << Obj.Texte();
+    flux << Obj;
     return flux;
 }
 

@@ -1,17 +1,12 @@
 Import ('testenv')
-testmoduleenv = testenv.Copy()
+testmoduleenv = testenv.ModuleEnv()
 
 includes = '*.cpp'
 excludes = []
 
-# testmoduleenv.Append (CPPPATH = [Dir('../../main/70_server').srcnode().abspath] )
-testmoduleenv.Append (CPPPATH = [Dir('../../main').srcnode().abspath] )
+testmoduleenv.AddModuleDependency ('70_server')
+testmoduleenv.AddModuleDependency ('04_time')
 
-testmoduleenv.Append (LIBPATH = [Dir('../../main/70_server')] )
-testmoduleenv.Append (LIBPATH = [Dir('../../main/04_time')] )
-
-testmoduleenv.Append (LIBS = ['70_server'] )
-testmoduleenv.Append (LIBS = ['04_time'] )
 
 files = testmoduleenv.Glob(includes, excludes)
 

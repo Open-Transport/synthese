@@ -12,7 +12,7 @@
 
 
 #include "04_time/DateTime.h"
-#include "cTexte.h"
+#include <string>
 
 
 /*! \brief Situation perturbée
@@ -21,12 +21,12 @@
 class cSitPert
 {
         synthese::time::DateTime _DateDeclaration;
-        cTexte _Motif;
+        std::string _Motif;
 
     public:
 
         // Constructeur
-        cSitPert( const cTexte& newMotif );
+        cSitPert( const std::string& newMotif );
 };
 
 #endif

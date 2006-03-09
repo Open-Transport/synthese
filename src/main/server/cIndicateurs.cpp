@@ -39,7 +39,7 @@ cGareIndicateurs::cGareIndicateurs( LogicalPlace* newPA, cGareLigne::tTypeGareLi
     vSuivant = NULL;
 }
 
-cIndicateurs::cIndicateurs( const cTexte& newTitre, cEnvironnement* const newEnvironnement )
+cIndicateurs::cIndicateurs( const std::string& newTitre, cEnvironnement* const newEnvironnement )
         : vEnvironnement( newEnvironnement )
         , vTitre( newTitre )
         , vJC( vEnvironnement->PremiereAnnee(), vEnvironnement->DerniereAnnee(), 0, "" )
@@ -156,7 +156,7 @@ bool cIndicateurs::Add( cColonneIndicateurs* newCI, cJC* JC )
                 precCIInd->setSuivant( newCI );
                 break;
             }
-            if ( newCI->getPostScript().Compare( curCIInd->getPostScript() ) )
+            if ( newCI->getPostScript() == curCIInd->getPostScript() )
             {
                 if ( curCIInd->getLigne() ->getLineStops().front() ->ArretPhysique() ->getLogicalPlace() != newCI->getLigne() ->getLineStops().front() ->ArretPhysique() ->getLogicalPlace() )
                     curCIInd->setOrigineSpeciale( Indetermine );
@@ -290,7 +290,7 @@ cColonneIndicateurs* cIndicateurs::Colonne( size_t Numero ) const
 
 
 
-void cIndicateurs::EcritTableaux( size_t HDispo, size_t NumeroColonne, size_t NombreTableaux, bool RenvoisAEcrire, size_t NumeroPageRelatif, ofstream& FichierSortie ) const
+void cIndicateurs::EcritTableaux( size_t HDispo, size_t NumeroColonne, size_t NombreTableaux, bool RenvoisAEcrire, size_t NumeroPageRelatif, std::ofstream& FichierSortie ) const
 {
     cColonneIndicateurs * curCI;
     cCommune* curCommune;
@@ -443,7 +443,7 @@ void cColonneIndicateurs::setSuivant( cColonneIndicateurs *newVal )
     vSuivant = newVal;
 }
 
-const cTexte& cColonneIndicateurs::getPostScript() const
+const std::string& cColonneIndicateurs::getPostScript() const
 {
     return ( vPostScript );
 }
@@ -575,13 +575,13 @@ const cJC& cIndicateurs::getJC() const
 void cColonneIndicateurs::setColonne( size_t n, const synthese::time::Schedule* newVal )
 {
     vColonne[ n ] = newVal;
-    vPostScript << " ( ";
+    vPostScript.append (" ( ");
     if ( newVal == NULL )
-        vPostScript << "     ";
+        vPostScript.append ("     ");
     else
-      vPostScript << newVal->getHour ().toString();
+      vPostScript.append (newVal->getHour ().toString());
 
-    vPostScript << " )";
+    vPostScript.append (" )");
 }
 
 size_t cIndicateurs::NombreGares() const
@@ -589,9 +589,9 @@ size_t cIndicateurs::NombreGares() const
     return ( vNombreGares );
 }
 
-void cColonneIndicateurs::CopiePostScript( const cTexte &newVal )
+void cColonneIndicateurs::CopiePostScript( const std::string &newVal )
 {
-    vPostScript << newVal;
+    vPostScript.append (newVal);
 }
 
 bool cIndicateurs::CommencePage() const
@@ -609,7 +609,7 @@ size_t cIndicateurs::NombreRenvois() const
     return ( vNombreRenvois );
 }
 
-const cTexte& cIndicateurs::getTitre() const
+const std::string& cIndicateurs::getTitre() const
 {
     return ( vTitre );
 }

@@ -13,9 +13,9 @@
  \param __Message Message à afficher avant le compteur
  \param __Modulo Valeur à laquelle le compteur doit être réinitialisé lors des incrémentations
  */
-cAlternance::cAlternance( const cTexte& __Message, char __Modulo )
+cAlternance::cAlternance( const std::string& __Message, char __Modulo )
+    : _Message (__Message)
 {
-    _Message << __Message;
     _Modulo = __Modulo;
     _Valeur = 1;
 }

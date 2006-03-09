@@ -1,7 +1,7 @@
 
 #include "cInterface_Objet_Element_Goto.h"
 
-int cInterface_Objet_Element_Goto::Evalue( ostream&, const cInterface_Objet_Connu_ListeParametres&, const void* ObjetAAfficher, const cSite* __Site ) const
+int cInterface_Objet_Element_Goto::Evalue( std::ostream&, const cInterface_Objet_Connu_ListeParametres&, const void* ObjetAAfficher, const cSite* __Site ) const
 {
     return _NumeroLigne;
 }

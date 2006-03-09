@@ -6,6 +6,8 @@
 #include "cTrajets.h"
 #include "cMateriel.h"
 
+#include "01_util/Conversion.h"
+
 
 /*! \brief Constructeur
  \param __NumeroObjet Num�ro de l'objet texte dynamique qui sera �valu�
@@ -37,7 +39,7 @@ cInterface_Objet_Element* cInterface_Objet_Element_Parametre_DonneeEnvironnement
 
 int cInterface_Objet_Element_Parametre_DonneeEnvironnement::Nombre( const cInterface_Objet_Connu_ListeParametres& __Parametres, const void* __Objet ) const
 {
-    return Texte( __Parametres, __Objet ).GetNombre();
+    return synthese::util::Conversion::ToInt (Texte( __Parametres, __Objet ));
 }
 
 
@@ -49,7 +51,7 @@ int cInterface_Objet_Element_Parametre_DonneeEnvironnement::Nombre( const cInter
  \author Hugues Romain
  \date 2005
 */
-const cTexte& cInterface_Objet_Element_Parametre_DonneeEnvironnement::Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres, const void* __Objet ) const
+const std::string& cInterface_Objet_Element_Parametre_DonneeEnvironnement::Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres, const void* __Objet ) const
 {
     switch ( _NumeroObjet )
     {

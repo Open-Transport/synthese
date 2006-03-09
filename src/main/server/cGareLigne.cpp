@@ -64,11 +64,11 @@ cGareLigne::~cGareLigne()
  
  L'emploi de DepartDifferentPassage emp�che l'�crasement des horaires d'arriv�e dans le cas o� les horaires de d�part sont fournis sur une autre ligne de texte.
 */
-void cGareLigne::setHoraires( const cTexte& Tampon, int Position, int LargeurColonne, bool DepartDifferentPassage )
+void cGareLigne::setHoraires( const std::string& Tampon, int Position, int LargeurColonne, bool DepartDifferentPassage )
 {
     for ( size_t iService = 0; iService < vLigne->getServices().size(); iService++ )
     {
-        vHoraireDepartPremier[ iService ] = std::string (Tampon.Extrait( Position ).Texte ());
+        vHoraireDepartPremier[ iService ] = Tampon.substr ( Position );
         vHoraireDepartPremierReel[ iService ] = vHoraireDepartPremier[ iService ];
         vHoraireDepartDernier[ iService ] = vHoraireDepartPremier[ iService ];
         vHoraireDepartDernier[ iService ] += vLigne->getTrain( iService ) ->EtalementCadence();
@@ -615,14 +615,14 @@ bool cGareLigne::CoherenceGeographique( const cGareLigne& AutreGareLigne ) const
 
     if ( DeltaPM > 10 * DeltaGPS && DeltaPM - DeltaGPS > 1 )
     {
-        //  cTexte MessageErreur(TAILLETAMPON);
+        //  std::string MessageErreur(TAILLETAMPON);
         //  MessageErreur << "Ligne: " << vLigne->getCode() << " PH: " << vPH << " PA1: " << ArretLogique()->Index() << " PA2: " << AutreGareLigne.ArretLogique()->Index() << " DeltaPH: " << DeltaPH << " DeltaGPS: " << DeltaGPS;
         //  Erreur(FichierLOG, "Erreur de coh�rence g�ographique (trajet trop long)", MessageErreur, "03006");
         return false;
     }
     if ( DeltaPM < DeltaGPS && DeltaGPS - DeltaPM > 1 )
     {
-        //  cTexte MessageErreur(TAILLETAMPON);
+        //  std::string MessageErreur(TAILLETAMPON);
         //  MessageErreur << "Ligne: " << vLigne->getCode() << " PH: " << vPH << " PA1: " << ArretLogique()->Index() << " PA2: " << AutreGareLigne.ArretLogique()->index() << " DeltaPH: " << DeltaPH << " DeltaGPS: " << DeltaGPS;
         //  Erreur(FichierLOG, "Erreur de coh�rence g�ographique (trajet trop court)", MessageErreur, "03007");
         return false;

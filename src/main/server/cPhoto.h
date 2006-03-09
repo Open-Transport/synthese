@@ -7,8 +7,9 @@
 #ifndef SYNTHESE_CPHOTO_H
 #define SYNTHESE_CPHOTO_H
 
-#include "cTexte.h"
+#include <string>
 #include "cDocument.h"
+#include "cTableauDynamique.h"
 
 /*! \brief Zone cliquable sur photo, donnant accès à une autre photo ou une URL
  \author Hugues Romain
@@ -17,24 +18,24 @@
 */
 class cMapPhoto
 {
-        cTexte vCoords; //!< Chaîne de caractères décrivant les coordonnées de la zone cliquable, au format des MAP du langage HTML
+        std::string vCoords; //!< Chaîne de caractères décrivant les coordonnées de la zone cliquable, au format des MAP du langage HTML
         int vLienPhoto; //!< Numéro de la photo liée par la zone cliquable
-        cTexte vURL;  //!< URL liée par la zone cliquable
-        cTexte vAlt;  //!< Chaînes de caractères décrivant la zone cliquable
+        std::string vURL;  //!< URL liée par la zone cliquable
+        std::string vAlt;  //!< Chaînes de caractères décrivant la zone cliquable
 
     public:
         //! \name Accesseurs
         //@{
-        const cTexte& Alt() const;
-        const cTexte& Coords() const;
+        const std::string& Alt() const;
+        const std::string& Coords() const;
         const int LienPhoto() const;
-        const cTexte& URL() const;
+        const std::string& URL() const;
         //@}
 
         //! \name Modificateurs
         //@{
-        bool SetDonnees( const cTexte& newCoords, int newLienPhoto, const cTexte& newAlt );
-        bool SetDonnees( const cTexte& newCoords, const cTexte& newURL, const cTexte& newAlt );
+        bool SetDonnees( const std::string& newCoords, int newLienPhoto, const std::string& newAlt );
+        bool SetDonnees( const std::string& newCoords, const std::string& newURL, const std::string& newAlt );
         //@}
 };
 
@@ -62,8 +63,8 @@ class cPhoto : public cDocument
 
         //! \name Modificateurs
         //@{
-        bool addMapPhoto( const cTexte& newCoords, int newLienPhoto, const cTexte& newAlt );
-        bool addMapPhoto( const cTexte& newCoords, const cTexte& newURL, const cTexte& newAlt );
+        bool addMapPhoto( const std::string& newCoords, int newLienPhoto, const std::string& newAlt );
+        bool addMapPhoto( const std::string& newCoords, const std::string& newURL, const std::string& newAlt );
         //@}
 };
 

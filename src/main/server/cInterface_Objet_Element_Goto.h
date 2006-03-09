@@ -19,7 +19,7 @@ class cInterface_Objet_Element_Goto : public cInterface_Objet_Element
     public:
         //! \name Calculateurs
         //@{
-        int Evalue( ostream&, const cInterface_Objet_Connu_ListeParametres&
+        int Evalue( std::ostream&, const cInterface_Objet_Connu_ListeParametres&
                        , const void* ObjetAAfficher = NULL, const cSite* __Site = NULL ) const;
         cInterface_Objet_Element* Copie( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres ) const;
         //@}

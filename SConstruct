@@ -137,6 +137,21 @@ def AppendMultithreadConf (env):
         env.Append ( LIBS = ['ws2_32.lib'] )  
 
 
+def ModuleEnv (env):
+    moduleenv = env.Copy()
+    # Add default include path for dependencies
+    moduleenv.Append (CPPPATH = [Dir('../../main').srcnode().abspath] )
+    return moduleenv
+
+    
+
+def AddModuleDependency (env, modulename):
+    env.Append ( LIBPATH = ['../../main/' + modulename] )  
+    env.Append ( LIBS = [modulename] )  
+
+
+
+
 
 
 
@@ -151,6 +166,8 @@ SConsEnvironment.DefineDefaultCCFlags=DefineDefaultCCFlags
 SConsEnvironment.DefineDefaultLinkFlags=DefineDefaultLinkFlags
 SConsEnvironment.DefineDefaultLibs=DefineDefaultLibs
 SConsEnvironment.AppendMultithreadConf=AppendMultithreadConf
+SConsEnvironment.ModuleEnv=ModuleEnv
+SConsEnvironment.AddModuleDependency=AddModuleDependency
 
 
 # -------------------------------------------------------
@@ -178,6 +195,8 @@ env.DefineDefaultCPPDefines ()
 env.DefineDefaultCCFlags ()
 env.DefineDefaultLinkFlags ()
 env.DefineDefaultLibs ()
+
+
 
 
 env.Replace ( BUILDROOT = '#build' + '/' + platform + '/' + mode )

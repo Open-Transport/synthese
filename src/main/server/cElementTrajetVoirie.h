@@ -17,9 +17,9 @@ class cElementTrajetVoirie : public cElementTrajet
 {
         //! @name Données (A REVOIR PAR MJ : Une struct dans un seul tableau ? :)
         //@{
-        vector<int> _IDRue;  //!< ID de la rue empruntée
-        vector<tDistanceM> _PMDebut; //!< Point métrique de début d'utilisation de la rue
-        vector<tDistanceM> _PMFin;  //!< Point métrique de fin d'utilisation de la rue
+        std::vector<int> _IDRue;  //!< ID de la rue empruntée
+        std::vector<tDistanceM> _PMDebut; //!< Point métrique de début d'utilisation de la rue
+        std::vector<tDistanceM> _PMFin;  //!< Point métrique de fin d'utilisation de la rue
         //@}
 
 

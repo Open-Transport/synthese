@@ -9,7 +9,7 @@
 
 #include "cSitPert.h"
 
-cSitPert::cSitPert( const cTexte& newMotif )
+cSitPert::cSitPert( const std::string& newMotif )
+    : _Motif (newMotif)
 {
-    _Motif << newMotif;
 }

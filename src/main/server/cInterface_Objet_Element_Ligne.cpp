@@ -2,7 +2,7 @@
 
 #include "cInterface_Objet_Element_Ligne.h"
 
-int cInterface_Objet_Element_Ligne::Evalue( ostream&, const cInterface_Objet_Connu_ListeParametres&, const void* ObjetAAfficher, const cSite* __Site ) const
+int cInterface_Objet_Element_Ligne::Evalue( std::ostream&, const cInterface_Objet_Connu_ListeParametres&, const void* ObjetAAfficher, const cSite* __Site ) const
 {
     return INCONNU;
 }

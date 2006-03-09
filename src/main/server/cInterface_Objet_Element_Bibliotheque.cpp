@@ -16,6 +16,8 @@
 
 #include "01_util/LowerCaseFilter.h"
 #include "01_util/PlainCharFilter.h"
+#include "01_util/Conversion.h"
+
 #include <boost/iostreams/filtering_stream.hpp>
 #include <sstream>
 
@@ -50,7 +52,7 @@ cInterface_Objet_Element_Bibliotheque::cInterface_Objet_Element_Bibliotheque( in
 
 /*! \brief Constructeur
 */
-cInterface_Objet_Element_Bibliotheque::cInterface_Objet_Element_Bibliotheque( int __Index, const cTexte& __Texte )
+cInterface_Objet_Element_Bibliotheque::cInterface_Objet_Element_Bibliotheque( int __Index, const std::string& __Texte )
 {
     _Index = __Index;
     _Parametres.InterpreteTexte( cInterface_Objet_AEvaluer_ListeParametres(), __Texte );
@@ -68,7 +70,7 @@ cInterface_Objet_Element_Bibliotheque::cInterface_Objet_Element_Bibliotheque( in
  \date 2001-2005
  
 */
-int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterface_Objet_Connu_ListeParametres& __Parametres
+int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cInterface_Objet_Connu_ListeParametres& __Parametres
         , const void* __Objet, const cSite* __Site ) const
 {
     // PROVISOIRE
@@ -86,11 +88,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
 
                 // Affichage
                 // PROVISOIRE LANGAGE IMPOSE
-                cTexte HTML;
-                //   if (iNumeroDesignation)
-                //    HTML << *curPA->GetAccesPADe(iNumeroDesignation) << "<br />Arr&ecirc;t: ";
-                HTML << curPA->getName();
-                pCtxt << HTML;
+                pCtxt << (curPA->getName());
             }
             break;
 
@@ -108,7 +106,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 synthese::time::DateTime tempMoment;
 
                 // Initialisation des lignes de texte
-                stringstream* __Tampons = new stringstream [ __Trajets->TailleListeOrdonneePointsArret() ];
+                std::stringstream* __Tampons = new std::stringstream [ __Trajets->TailleListeOrdonneePointsArret() ];
 
                 // Parcours de chaque trajet
                 for ( int __IndexTrajet = 0; __IndexTrajet < __Trajets->Taille(); __IndexTrajet++ )
@@ -140,23 +138,19 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                         __ParametresCaseArrivee << ( curET->getLigne() ->EstUneLigneAPied() ? "1" : "" );
 
                         //4 Premier d�part
-                        cTexte __Heure;
-                        __Heure.Vide();
-                        // MJ review __Heure << curET->MomentDepart().getHour (); 
-                        __ParametresCaseDepart << __Heure; //4 Premier d�part
-                        __Heure.Vide();
-                        // MJ review __Heure << curET->MomentArrivee().getHour (); //4 Premier d�part
-                        __ParametresCaseArrivee << __Heure;
+                        __ParametresCaseDepart << curET->MomentDepart().getHour ().toString(); //4 Premier d�part
+                        __ParametresCaseArrivee << curET->MomentArrivee().getHour ().toString ();
 
                         //5,6
                         if ( __Trajet->getAmplitudeServiceContinu() )
                         {
                             tempMoment = curET->MomentDepart();
                             tempMoment += __Trajet->getAmplitudeServiceContinu();
-                            // MJ review __ParametresCaseDepart << tempMoment.getHour (); //5 Dernier d�part
+                            __ParametresCaseDepart << tempMoment.getHour ().toString (); //5 Dernier d�part
+
                             tempMoment = curET->MomentArrivee();
                             tempMoment += __Trajet->getAmplitudeServiceContinu();
-                            // MJ review __ParametresCaseArrivee << tempMoment.getHour (); //5 Dernier d�part
+                            __ParametresCaseArrivee << tempMoment.getHour ().toString (); //5 Dernier d�part
 
                             //6 Ligne service continu ?
                             __ParametresCaseDepart << "1";
@@ -344,7 +338,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                    
                    // SET PORTAGE LINUX
                    //cAlternance curAlternance("tdHoraires2",2);
-                   cAlternance curAlternance(cTexte("tdHoraires2"),2);
+                   cAlternance curAlternance(std::string("tdHoraires2"),2);
                    //END PORTAGE LINUX
                    if (curDP==NULL)
                     pCtxt << "<tr><td style=\"text-align:center\">Pas de d�part d'ici 24h";
@@ -392,14 +386,14 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
             {
                 /*   // Initialisation des param�tres
                    const LogicalPlace* __ArretLogique = (const LogicalPlace*) __Objet;
-                   cTexte __TexteEnTete = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesDebut]->Texte(__Parametres);
-                   cTexte __TexteLibelle = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesLibelleDefaut]->Texte(__Parametres);
-                   cTexte __TextePied = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesFin]->Texte(__Parametres);
+                   std::string __TexteEnTete = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesDebut]->Texte(__Parametres);
+                   std::string __TexteLibelle = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesLibelleDefaut]->Texte(__Parametres);
+                   std::string __TextePied = _Parametres[ELEMENTINTERFACELienPhotosArretPhysiquesFin]->Texte(__Parametres);
                    
                    for (int __ArretPhysique = 1; __ArretPhysique <= __ArretLogique->getPhysicalStops().size(); __ArretPhysique++)
                    {
                     pCtxt << __TexteEnTete << "<a href=\"javascript:showdiv('Q" << __ArretPhysique << "');\">";
-                    if (__ArretLogique->getArretPhysique(__ArretPhysique)->getNom().Taille() == 0)
+                    if (__ArretLogique->getArretPhysique(__ArretPhysique)->getNom().size () == 0)
                      pCtxt << __TexteLibelle << __ArretPhysique;
                     else
                      pCtxt << __ArretLogique->getArretPhysique(__ArretPhysique)->getNom();
@@ -413,10 +407,10 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
         case ELEMENTINTERFACELienAutresPhotos:
             {
                 /*   const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
-                   cTexte __TexteEnTete = _Parametres[ELEMENTINTERFACELienAutresPhotosOuverture]->Texte(__Parametres);
-                   cTexte __TexteLienDebut = _Parametres[ELEMENTINTERFACELienAutresPhotosDebut]->Texte(__Parametres);
-                   cTexte __TexteLienFin = _Parametres[ELEMENTINTERFACELienAutresPhotosFin]->Texte(__Parametres);
-                   cTexte __TextePied = _Parametres[ELEMENTINTERFACELienAutresPhotosFermeture]->Texte(__Parametres);
+                   std::string __TexteEnTete = _Parametres[ELEMENTINTERFACELienAutresPhotosOuverture]->Texte(__Parametres);
+                   std::string __TexteLienDebut = _Parametres[ELEMENTINTERFACELienAutresPhotosDebut]->Texte(__Parametres);
+                   std::string __TexteLienFin = _Parametres[ELEMENTINTERFACELienAutresPhotosFin]->Texte(__Parametres);
+                   std::string __TextePied = _Parametres[ELEMENTINTERFACELienAutresPhotosFermeture]->Texte(__Parametres);
                    
                    if (ArretLogique->NombrePhotos())
                    {
@@ -432,10 +426,10 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
         case ELEMENTINTERFACELienServices:
             {
                 /*   const LogicalPlace* ArretLogique = (const LogicalPlace*) __Objet;
-                   cTexte __TexteEnTete = _Parametres[ELEMENTINTERFACELienServicesOuverture]->Texte(__Parametres);
-                   cTexte __TexteLienDebut = _Parametres[ELEMENTINTERFACELienServicesDebut]->Texte(__Parametres);
-                   cTexte __TexteLienFin = _Parametres[ELEMENTINTERFACELienServicesFin]->Texte(__Parametres);
-                   cTexte __TextePied = _Parametres[ELEMENTINTERFACELienServicesFermeture]->Texte(__Parametres);
+                   std::string __TexteEnTete = _Parametres[ELEMENTINTERFACELienServicesOuverture]->Texte(__Parametres);
+                   std::string __TexteLienDebut = _Parametres[ELEMENTINTERFACELienServicesDebut]->Texte(__Parametres);
+                   std::string __TexteLienFin = _Parametres[ELEMENTINTERFACELienServicesFin]->Texte(__Parametres);
+                   std::string __TextePied = _Parametres[ELEMENTINTERFACELienServicesFermeture]->Texte(__Parametres);
                       
                    if (ArretLogique->GetService(0))
                    {
@@ -657,7 +651,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
         case EI_BIBLIOTHEQUE_Date:
             {
                 synthese::time::Date curDate;
-                curDate = std::string (_Parametres[ EI_BIBLIOTHEQUE_Date_Date ] ->Texte( __Parametres ).Texte ());
+                curDate = _Parametres[ EI_BIBLIOTHEQUE_Date_Date ] ->Texte( __Parametres );
                 synthese::time::Date& refDate = curDate;
                 __Site->getInterface() ->AfficheDate( pCtxt, refDate );
             }
@@ -667,7 +661,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
             {
                 const cEnvironnement* __Environnement = __Site->getEnvironnement();
                 int n = _Parametres[ ELEMENTINTERFACEListeCommunesNombre ] ->Nombre( __Parametres );
-                vector<cCommune*> tbCommunes = __Environnement->searchTown( string( _Parametres[ ELEMENTINTERFACEListeCommunesEntree ] ->Texte( __Parametres ).Texte() ), n );
+                std::vector<cCommune*> tbCommunes = __Environnement->searchTown( _Parametres[ ELEMENTINTERFACEListeCommunesEntree ] ->Texte( __Parametres ), n );
 
 
                 if ( tbCommunes[ 1 ] == NULL )
@@ -730,18 +724,19 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 // Lecture des param�tres
                 cDescriptionPassage* __DP = ( cDescriptionPassage* ) __Objet;
                 int __MultiplicateurRangee = _Parametres[ 0 ] ->Nombre( __Parametres ) ? _Parametres[ 0 ] ->Nombre( __Parametres ) : 1;
-                const cTexte& __Pages = _Parametres[ 1 ] ->Texte( __Parametres );
-                const cTexte& __SeparateurPage = _Parametres[ 2 ] ->Texte( __Parametres );
+                const std::string& __Pages = _Parametres[ 1 ] ->Texte( __Parametres );
+                const std::string& __SeparateurPage = _Parametres[ 2 ] ->Texte( __Parametres );
 
                 // Gestion des pages
                 int __NombrePages = 1;
-                if ( __Pages.Compare( "intermediate" ) || __Pages.Compare( "destination" ) )
+                if ( (__Pages == "intermediate" ) || 
+		     (__Pages == "destination" ) )
                 {
                     for ( cDescriptionPassage * ___DP = __DP; ___DP != NULL; ___DP = ___DP->Suivant() )
                         if ( ___DP->NombreGares() - 2 > __NombrePages )
                             __NombrePages = ___DP->NombreGares() - 2;
                 }
-                if ( __Pages.Compare( "destination" ) )
+                if (__Pages == "destination" ) 
                     __NombrePages++;
 
                 // Boucle sur les pages
@@ -759,7 +754,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                         cInterface_Objet_Connu_ListeParametres __ParametresColonne;
                         __ParametresColonne << __Rangee;  // 0 : Num�ro de rang�e
 
-                        int __NombrePagesRangee = ___DP->NombreGares() - 2 + ( __Pages.Compare( "destination" ) ? 1 : 0 );
+                        int __NombrePagesRangee = ___DP->NombreGares() - 2 + ( __Pages == "destination" ? 1 : 0 );
                         if ( !__NombrePagesRangee || __NumeroPage > __NombrePagesRangee * ( __NombrePages / __NombrePagesRangee ) )
                             __ParametresColonne << __NumeroPage;
                         else
@@ -787,7 +782,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                    int DerniereHeureAffichee = 25;
                    short int NombreReponses = 0;
                    
-                   cAlternance curAlternance(cTexte("tdHoraires2"),2);
+                   cAlternance curAlternance(std::string("tdHoraires2"),2);
                    
                    while (curDP!=NULL)
                    {
@@ -979,11 +974,8 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                     __ParametresColonne << ( __n < __Trajets->Taille() - 1 ? __n + 2 : 0 );
 
                     // 5 : Date du d�part (format interne)
-                    cTexte __txtDate;
-                    __txtDate << __Trajets->operator [] ( __n ).getMomentDepart().getDate().toInternalString ();
-
-                    __ParametresColonne << __txtDate;
-
+                    __ParametresColonne << __Trajets->operator [] ( __n ).getMomentDepart().getDate().toInternalString ();
+		    
                     // Lancement de l'affichage
                     __Site->Affiche( pCtxt, INTERFACEFeuilleRoute, __ParametresColonne, ( const void* ) & ( __Trajets->operator[] ( __n ) ) );
                 }
@@ -1061,12 +1053,12 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                         // 4/5/6 Description du mat�riel roulant
                         __ParametresLigne << __ET->getLigne() ->Materiel() ->Code(); //4
                         __ParametresLigne << __ET->getLigne() ->Materiel() ->getLibelleSimple(); //5
-                        cTexte LibelleCompletMatosHTML; //!< \todo PROVISOIRE FAIRE UN OBJET STANDARD LIBELLECOMPLETMATOS
+                        std::string LibelleCompletMatosHTML; //!< \todo PROVISOIRE FAIRE UN OBJET STANDARD LIBELLECOMPLETMATOS
                         //     __ET->getLigne()->LibelleComplet(LibelleCompletMatosHTML);
                         __ParametresLigne << LibelleCompletMatosHTML; //6
 
                         // 7 Destination du v�hicule
-                        cTexte DestinationHTML; //!< \todo PROVISOIRE FAIRE UN OBJET STANDARD POINT D'ARRET pas si simple : il faut g�rer la destination forc�e
+                        std::string DestinationHTML; //!< \todo PROVISOIRE FAIRE UN OBJET STANDARD POINT D'ARRET pas si simple : il faut g�rer la destination forc�e
                         //     __ET->getLigne()->LibelleDestination(DestinationHTML);
                         __ParametresLigne << DestinationHTML; //7
 
@@ -1112,19 +1104,17 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                             __ParametresLigne << __ET->getLigne() ->GetResa() ->GetSiteWeb(); //17
                             if ( __Site->ResaEnLigne() && __ET->getLigne() ->GetResa() ->ReservationEnLigne() )
                             {
-                                cTexte __URLResa;
                                 synthese::server::Request request;
                                 request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_RESERVATION_FORM );
                                 request.addParameter( synthese::server::PARAMETER_SITE, __Site->getClef() );
                                 request.addParameter( synthese::server::PARAMETER_LINE_CODE, __ET->getLigne() ->getCode() );
-                                request.addParameter( synthese::server::PARAMETER_SERVICE_NUMBER, ( __ET->getService() ->getNumero().Texte() ) );
+                                request.addParameter( synthese::server::PARAMETER_SERVICE_NUMBER, ( __ET->getService() ->getNumero() ) );
                                 request.addParameter( synthese::server::PARAMETER_SERVICE_NUMBER, __ET->getLigne() ->GetResa() ->Index() );
                                 request.addParameter( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER, __ET->getOrigin() ->getLogicalPlace() ->getId() );
                                 request.addParameter( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER, __ET->getDestination() ->getLogicalPlace() ->getId() );
 
                                 request.addParameter( synthese::server::PARAMETER_DATE, __ET->MomentDepart() );
-                                __URLResa << __Site->getURLClient() << "?" << request.toInternalString ();
-                                __ParametresLigne << __URLResa; //18
+                                __ParametresLigne << __Site->getURLClient() << "?" << request.toInternalString (); //18
                             }
                             else
                                 __ParametresLigne << ""; //18
@@ -1185,9 +1175,8 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
 
                         // 3/4 Informations sur le point d'arr�t
                         __ParametresDescente << ( __ET->getDestination() ->getLogicalPlace() == __ET->getLigne() ->getLineStops().back() ->ArretPhysique() ->getLogicalPlace() ? "1" : "" );
-                        cTexte NomArret; //!< \todo PROVISOIRE METTRE HTML EN MEMOIRE QUELQUE PART
-                        NomArret << __ET->getDestination() ->getLogicalPlace() ->getName();
-                        __ParametresDescente << NomArret; //4
+
+                        __ParametresDescente << __ET->getDestination() ->getLogicalPlace() ->getName(); //4
 
                         // 5 Couleur du fond de case
                         __ParametresDescente << ( __Couleur ? "1" : "" );
@@ -1290,8 +1279,8 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
         case ELEMENTINTERFACEURLFormulaire:
             {
                 // Initialisation des param�tres
-                const cTexte& __TypeSortie = _Parametres[ ELEMENTINTERFACEURLFormulaireTypeSortie ] ->Texte( __Parametres );
-                const cTexte& __Fonction = _Parametres[ ELEMENTINTERFACEURLFormulaireFonction ] ->Texte( __Parametres );
+                const std::string& __TypeSortie = _Parametres[ ELEMENTINTERFACEURLFormulaireTypeSortie ] ->Texte( __Parametres );
+                const std::string& __Fonction = _Parametres[ ELEMENTINTERFACEURLFormulaireFonction ] ->Texte( __Parametres );
 
                 // Fabrication de la requ�te
                 synthese::server::Request request;
@@ -1300,73 +1289,73 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 request.addParameter( synthese::server::PARAMETER_SITE, __Site->getClef() );
 
                 // Parametres cas validation fiche horaire
-                if ( __Fonction.Compare( "timetable validation" ) )
+                if ( __Fonction == "timetable validation" )
                 {
                     request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_SCHEDULE_SHEET_VALIDATION );
 
                     request.addParameter( synthese::server::PARAMETER_DEPARTURE_CITY_NUMBER
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroCommuneDepart ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroCommuneDepart ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroArretDepart ] ->Texte( __Parametres ).Texte() );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroArretDepart ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_DEPARTURE_WORDING_NUMBER
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroDesignationDepart ] ->Texte( __Parametres ).Texte() );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroDesignationDepart ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_ARRIVAL_CITY_NUMBER
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroCommuneArrivee ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroCommuneArrivee ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroArretArrivee ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroArretArrivee ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_ARRIVAL_WORDING_NUMBER
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroDesignationArrivee ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroDesignationArrivee ] ->Texte( __Parametres ) );
                 }
                 // Pour fiche horaire seulement
-                else if ( __Fonction.Compare( "timetable" ) )
+                else if ( __Fonction == "timetable" )
                 {
                     request.addParameter( synthese::server::PARAMETER_FUNCTION, 
 					  synthese::server::FUNCTION_SCHEDULE_SHEET );
 
                     request.addParameter( synthese::server::PARAMETER_DATE
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHDate ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHDate ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_PERIOD
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHPeriode ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHPeriode ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_BIKE
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHVelo ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHVelo ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_HANDICAPPED
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHHandicape ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHHandicape ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_TAXIBUS
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHResa ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHResa ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_PRICE
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHTarif ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHTarif ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroArretDepart ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroArretDepart ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_DEPARTURE_WORDING_NUMBER
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroDesignationDepart ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroDesignationDepart ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroArretArrivee ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroArretArrivee ] ->Texte( __Parametres ) );
                     request.addParameter( synthese::server::PARAMETER_ARRIVAL_WORDING_NUMBER
-                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroDesignationArrivee ] ->Texte( __Parametres ).Texte () );
+                                        , _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroDesignationArrivee ] ->Texte( __Parametres ) );
                 }
-                else if ( __Fonction.Compare( "from city list" ) )
+                else if ( __Fonction == ( "from city list" ) )
                 {
                     request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_CITY_LIST );
                     request.addParameter( synthese::server::PARAMETER_DIRECTION, 1 );
                 }
-                else if ( __Fonction.Compare( "to city list" ) )
+                else if ( __Fonction == ( "to city list" ) )
                 {
                     request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_CITY_LIST );
                     request.addParameter( synthese::server::PARAMETER_DIRECTION, 0 );
                 }
-                else if ( __Fonction.Compare( "from station list" ) )
+                else if ( __Fonction == ( "from station list" ) )
                 {
                     request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_STOP_LIST );
                     request.addParameter( synthese::server::PARAMETER_DIRECTION, 1 );
                 }
-                else if ( __Fonction.Compare( "to station list" ) )
+                else if ( __Fonction == ( "to station list" ) )
                 {
                     request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_STOP_LIST );
                     request.addParameter( synthese::server::PARAMETER_DIRECTION, 0 );
                 }
 
                 // Affichage de la requ�te au format voulu
-                if ( __TypeSortie.Compare( "url" ) )
+                if ( __TypeSortie == ( "url" ) )
                 {
                     // Partie ex�cutable de l'url
                     pCtxt << __Site->getURLClient() << "?";
@@ -1374,13 +1363,13 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                     // Champ fonction
                     pCtxt << request.toInternalString ();
                 }
-                else if ( __TypeSortie.Compare( "form", 4 ) )
+                else if ( __TypeSortie.substr (0, 4) == "form" )
                 {
                     // Tag d'ouverture du formulaire
                     pCtxt << "<form method=\"get\" action=\"" << __Site->getURLClient() << "\" "
-                    << __TypeSortie.Extrait( 5 ) << ">";
+                    << __TypeSortie.substr (5) << ">";
 		    
-		    for ( map<string, string>::const_iterator iter = request.getParameters().begin();
+		    for ( std::map<std::string, std::string>::const_iterator iter = request.getParameters().begin();
 			  iter != request.getParameters().end(); 
 			  ++iter )
 		    {
@@ -1393,27 +1382,27 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
         case ELEMENTINTERFACEInputHTML:  //41
             {
                 // Initialisation des param�tres
-                const cTexte& __Champ = _Parametres[ ELEMENTINTERFACEInputHTMLChamp ] ->Texte( __Parametres );
-                const cTexte& __Type = _Parametres[ ELEMENTINTERFACEInputHTMLType ] ->Texte( __Parametres );
+                const std::string& __Champ = _Parametres[ ELEMENTINTERFACEInputHTMLChamp ] ->Texte( __Parametres );
+                const std::string& __Type = _Parametres[ ELEMENTINTERFACEInputHTMLType ] ->Texte( __Parametres );
 
                 // Balise d'ouverture
-                cTexte __Balise;
-                if ( !__Type.Taille() )
+                std::string __Balise;
+                if ( !__Type.size () )
                 {
-                    if ( __Champ.Compare( "date" ) || __Champ.Compare( "period" ) )
+                    if ( __Champ == ( "date" ) || __Champ == ( "period" ) )
                         __Balise = "select";
-                    else if ( __Champ.Compare( "handicap filter" ) )
+                    else if ( __Champ == ( "handicap filter" ) )
                         __Balise = "input type=\"checkbox\"";
                     else
                         __Balise = "input type=\"text\"";
                 }
                 else
                 {
-                    if ( __Type.Compare( "text" ) )
+                    if ( __Type == ( "text" ) )
                         __Balise = "input type=\"text\"";
-                    else if ( __Type.Compare( "select" ) )
+                    else if ( __Type == ( "select" ) )
                         __Balise = "select";
-                    else if ( __Type.Compare( "checkbox", 8 ) )
+                    else if ( __Type.substr (0, 8) == "checkbox" )
                         __Balise = "input type=\"checkbox\"";
                 }
 
@@ -1422,36 +1411,36 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
 
                 // Ecriture du nom du champ
                 pCtxt << " name=\"";
-                if ( __Champ.Compare( "date" ) )
+                if ( __Champ == "date" )
                     pCtxt << synthese::server::PARAMETER_DATE;
-                else if ( __Champ.Compare( "period" ) )
+                else if ( __Champ == ( "period" ) )
                     pCtxt << synthese::server::PARAMETER_PERIOD;
-                else if ( __Champ.Compare( "from city" ) )
+                else if ( __Champ == ( "from city" ) )
                     pCtxt << synthese::server::PARAMETER_DEPARTURE_CITY;
-                else if ( __Champ.Compare( "from station" ) )
+                else if ( __Champ == ( "from station" ) )
                     pCtxt << synthese::server::PARAMETER_DEPARTURE_STOP;
-                else if ( __Champ.Compare( "to city" ) )
+                else if ( __Champ == ( "to city" ) )
                     pCtxt << synthese::server::PARAMETER_ARRIVAL_CITY;
-                else if ( __Champ.Compare( "to station" ) )
+                else if ( __Champ == ( "to station" ) )
                     pCtxt << synthese::server::PARAMETER_ARRIVAL_STOP;
-                else if ( __Champ.Compare( "handicap filter" ) )
+                else if ( __Champ == ( "handicap filter" ) )
                     pCtxt << synthese::server::PARAMETER_HANDICAPPED;
-                else if ( __Champ.Compare( "tariff" ) )
+                else if ( __Champ == ( "tariff" ) )
                     pCtxt << synthese::server::PARAMETER_PRICE;
                 pCtxt << "\"";
 
                 // Cas champ checkbox
-                if ( __Balise.Compare( "input type=\"checkbox\"" ) )
+                if ( __Balise == ( "input type=\"checkbox\"" ) )
                 {
                     // Etat coch�
                     tBool3 __Bool3Defaut = Faux;
 
                     // Chackbox filtre sur valeur
-                    if ( __Type.Taille() > 9 )
+                    if ( __Type.size () > 9 )
                     {
-                        if ( _Parametres[ ELEMENTINTERFACEInputHTMLValeurDefaut ] ->Texte( __Parametres ).Compare( __Type, 0, 0, 9 ) )
+                        if ( _Parametres[ ELEMENTINTERFACEInputHTMLValeurDefaut ] ->Texte( __Parametres ) ==  __Type.substr (9) )
                             __Bool3Defaut = Vrai;
-                        pCtxt << " value=\"" << __Type.Extrait( 9 ) << "\"";
+                        pCtxt << " value=\"" << __Type.substr( 9 ) << "\"";
                     }
                     else //Checkbox bool�en
                     {
@@ -1462,18 +1451,18 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                         pCtxt << " checked=\"1\"";
                     pCtxt << " />";
                 }
-                if ( __Balise.Compare( "input type=\"text\"" ) )  // Cas champ input texte
+                if ( __Balise == ( "input type=\"text\"" ) )  // Cas champ input texte
                 {
                     pCtxt << " value=\"" << _Parametres[ ELEMENTINTERFACEInputHTMLValeurDefaut ] ->Texte( __Parametres ) << "\" />";
                 }
-                else if ( __Balise.Compare( "select" ) )  // Cas champ select
+                else if ( __Balise == ( "select" ) )  // Cas champ select
                 {
                     pCtxt << ">";
 
                     // Si select auto alors fourniture des choix
-                    if ( !__Type.Taille() )
+                    if ( !__Type.size () )
                     {
-                        if ( __Champ.Compare( "date" ) )
+                        if ( __Champ == ( "date" ) )
                         {
                             // Collecte des param�tres sp�cifiques
                             const cEnvironnement * __Environnement = __Site->getEnvironnement();
@@ -1486,21 +1475,17 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                             synthese::time::Date DateMax = __Environnement->dateInterpretee( _Parametres[ ELEMENTINTERFACEInputHTMLListeDatesMax ] ->Texte( __Parametres ) );
 
                             // Construction de l'objet HTML
-                            cTexte DateInterne;
                             for ( synthese::time::Date iDate = DateMin; iDate <= DateMax; iDate++ )
                             {
-                                DateInterne.Vide();
-                                DateInterne << iDate.toInternalString();
-
                                 pCtxt << "<option ";
                                 if ( iDate == DateDefaut )
                                     pCtxt << "selected=\"1\" ";
-                                pCtxt << "value=\"" << DateInterne << "\">";
+                                pCtxt << "value=\"" << iDate.toInternalString() << "\">";
                                 __Site->getInterface() ->AfficheDate( pCtxt, iDate );
                                 pCtxt << "</option>";
                             }
                         }
-                        else if ( __Champ.Compare( "period" ) )
+                        else if ( __Champ == ( "period" ) )
                         {
                             int __IndexPeriodeDefaut = _Parametres[ ELEMENTINTERFACEInputHTMLValeurDefaut ] ->Nombre( __Parametres );
 
@@ -1539,7 +1524,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 const cLigne* __Ligne = ( const cLigne* ) __Objet;
 
                 // Affichage de la girouette
-                if ( __Ligne->getGirouette().Taille() )
+                if ( __Ligne->getGirouette().size () )
                     pCtxt << __Ligne->getGirouette();
                 else // Affichage du terminus
                 {
@@ -1589,28 +1574,28 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
             {
                 // Lecture des param�tres
                 const cDescriptionPassage* __DP = ( const cDescriptionPassage* ) __Objet;
-                cTexte __DestinationsAAfficher = _Parametres[ 0 ] ->Texte( __Parametres );
+                std::string __DestinationsAAfficher = _Parametres[ 0 ] ->Texte( __Parametres );
                 bool __AfficherTerminus = ( _Parametres[ 1 ] ->Nombre( __Parametres ) == 1 );
-                cTexte __TypeAffichage = _Parametres[ 2 ] ->Texte( __Parametres );
-                cTexte __SeparateurEntreArrets = _Parametres[ 3 ] ->Texte( __Parametres );
-                cTexte __AvantCommune = _Parametres[ 4 ] ->Texte( __Parametres );
-                cTexte __ApresCommune = _Parametres[ 5 ] ->Texte( __Parametres );
+                std::string __TypeAffichage = _Parametres[ 2 ] ->Texte( __Parametres );
+                std::string __SeparateurEntreArrets = _Parametres[ 3 ] ->Texte( __Parametres );
+                std::string __AvantCommune = _Parametres[ 4 ] ->Texte( __Parametres );
+                std::string __ApresCommune = _Parametres[ 5 ] ->Texte( __Parametres );
 
                 const cCommune* __DerniereCommune = __DP->GetGare( 0 ) ->getTown();
 
                 for ( int __i = 1; __i < __DP->NombreGares(); __i++ )
                 {
-                    if ( __DestinationsAAfficher.Compare( "all" ) && ( __i < __DP->NombreGares() - 1 || __AfficherTerminus )
-                            || __DestinationsAAfficher.Compare( "terminus" ) && __i == __DP->NombreGares() - 1
-                            || __DestinationsAAfficher.GetNombre() == __i && ( __i < __DP->NombreGares() - 1 || __AfficherTerminus )
+                    if ( __DestinationsAAfficher == ( "all" ) && ( __i < __DP->NombreGares() - 1 || __AfficherTerminus )
+                            || __DestinationsAAfficher == ( "terminus" ) && __i == __DP->NombreGares() - 1
+                            || synthese::util::Conversion::ToInt(__DestinationsAAfficher) == __i && ( __i < __DP->NombreGares() - 1 || __AfficherTerminus )
                        )
                     {
                         if ( __i > 1 )
                             pCtxt << __SeparateurEntreArrets;
 
                         // Affichage de la commune dans les cas o� n�cessaire
-                        if ( __TypeAffichage.Compare( "station_city" )
-                                || __TypeAffichage.Compare( "station_city_if_new" ) && __DP->GetGare( __i ) ->getTown() != __DerniereCommune
+                        if ( __TypeAffichage == ( "station_city" )
+                                || __TypeAffichage == ( "station_city_if_new" ) && __DP->GetGare( __i ) ->getTown() != __DerniereCommune
                            )
                         {
 			    std::stringstream ss;
@@ -1621,7 +1606,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
 			    
 			    out << __DP->GetGare( __i ) ->getTown() ->getName();
 
-                            // cTexteMinuscules __TexteMinuscule;
+                            // std::stringMinuscules __TexteMinuscule;
                             // __TexteMinuscule << __DP->GetGare( __i ) ->getTown() ->getName();
                             pCtxt << __AvantCommune << ss.str () << __ApresCommune;
                             __DerniereCommune = __DP->GetGare( __i ) ->getTown();
@@ -1630,15 +1615,15 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                         }
 
                         // Affichage du nom d'arr�t dans les cas o� n�cessaire
-                        if ( __TypeAffichage.Compare( "station", 6 ) )
+                        if ( __TypeAffichage.substr (0, 6) == "station" )
                             pCtxt << __DP->GetGare( __i ) ->getName();
 
                         // Affichage de la destination 13 caract�res dans les cas o� n�cessaire
-                        if ( __TypeAffichage.Compare( "char(13)" ) )
+                        if ( __TypeAffichage == "char(13)" )
                             pCtxt << __DP->GetGare( __i ) ->getDesignation13();
 
                         // Affichage de la destination 26 caract�res dans les cas o� n�cessaire
-                        if ( __TypeAffichage.Compare( "char(26)" ) )
+                        if ( __TypeAffichage == "char(26)" )
                             pCtxt << __DP->GetGare( __i ) ->getDesignation26();
                     }
                 }
@@ -1652,9 +1637,9 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
             {
                 // Lecture des param�tres
                 const synthese::time::DateTime& __Moment = ( ( const cDescriptionPassage* ) __Objet ) ->getMomentReel();
-                cTexte __Zero = _Parametres[ 0 ] ->Texte( __Parametres );
-                cTexte __AvantSiImminent = _Parametres[ 1 ] ->Texte( __Parametres );
-                cTexte __ApresSiImminent = _Parametres[ 2 ] ->Texte( __Parametres );
+                std::string __Zero = _Parametres[ 0 ] ->Texte( __Parametres );
+                std::string __AvantSiImminent = _Parametres[ 1 ] ->Texte( __Parametres );
+                std::string __ApresSiImminent = _Parametres[ 2 ] ->Texte( __Parametres );
 
                 synthese::time::DateTime __Maintenant;
                 __Maintenant.updateDateTime( synthese::time::TIME_CURRENT );
@@ -1697,9 +1682,9 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( ostream& pCtxt, const cInterf
                 // Lecture des param�tres
                 //   const cTableauAffichage* __Tb = (const cTableauAffichage*) __Objet;
                 int __Nombre = _Parametres[ 0 ] ->Nombre( __Parametres );
-                cTexte __Format = _Parametres[ 1 ] ->Texte( __Parametres );
+                std::string __Format = _Parametres[ 1 ] ->Texte( __Parametres );
 
-                if ( __Format.Compare( "char(2)" ) )
+                if ( __Format == "char(2)")
                 {
                     __Nombre = __Nombre % 100;
                     pCtxt << __Nombre / 10;

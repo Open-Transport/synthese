@@ -41,7 +41,9 @@ typedef float tDistancePt;
 #define IndicateursNombreLignesSupplementaires 5 
 //@}
 
-#include "cTexte.h"
+#include <string>
+#include <fstream>
+
 
 #include "cEnvironnement.h"
 #include "cGareLigne.h"
@@ -102,7 +104,7 @@ class cColonneIndicateurs
         // Variables
         const synthese::time::Schedule** vColonne;
         cColonneIndicateurs* vSuivant;
-        cTexte vPostScript;
+        std::string vPostScript;
         cJC::Calendar vMasque;
         cRenvoiIndicateurs* vRenvoi;
         cLigne* vLigne;
@@ -112,7 +114,7 @@ class cColonneIndicateurs
 
     public:
         // Modificateurs
-        void CopiePostScript( const cTexte& newVal );
+        void CopiePostScript( const std::string& newVal );
         void setColonne( size_t n, const synthese::time::Schedule *newVal );
         void setSuivant( cColonneIndicateurs* newVal );
         void setDestinationSpeciale( tTypeOD newVal );
@@ -125,7 +127,7 @@ class cColonneIndicateurs
         // Accesseurs
         tTypeOD DestinationSpeciale() const;
         cLigne* getLigne() const;
-        const cTexte& getPostScript() const;
+        const std::string& getPostScript() const;
         cJC::Calendar& getMasque() ;
         cColonneIndicateurs* getSuivant() const;
         cRenvoiIndicateurs* getRenvoi() const;
@@ -185,7 +187,7 @@ class cIndicateurs
         size_t vNombreRenvois;
         cColonneIndicateurs* vPremiereCI;
         cGareIndicateurs* vPremiereGI;
-        cTexte const vTitre;
+        std::string const vTitre;
 
     public:
 
@@ -193,14 +195,14 @@ class cIndicateurs
         bool Add( cColonneIndicateurs*, cJC* );
 
         // Calculateurs
-        void EcritTableaux( size_t HDispo, size_t NumeroColonne, size_t NombreTableaux, bool RenvoisAEcrire, size_t NumeroPageRelatif, ofstream& FichierSortie ) const;
+        void EcritTableaux( size_t HDispo, size_t NumeroColonne, size_t NombreTableaux, bool RenvoisAEcrire, size_t NumeroPageRelatif, std::ofstream& FichierSortie ) const;
 
         // Accesseurs
         cColonneIndicateurs* Colonne( size_t ) const;
         bool CommencePage() const;
         const cJC& getJC() const;
         cGareIndicateurs* getPremiereGI() const;
-        const cTexte& getTitre() const;
+        const std::string& getTitre() const;
         size_t NombreColonnes() const;
         size_t NombreGares() const;
         size_t NombreRenvois() const;
@@ -214,7 +216,7 @@ class cIndicateurs
         void setCommencePage( bool newVal );
 
         // Constructeur
-        cIndicateurs( const cTexte& newTitre, cEnvironnement* newEnvironnement );
+        cIndicateurs( const std::string& newTitre, cEnvironnement* newEnvironnement );
 };
 
 /** @} */

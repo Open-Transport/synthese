@@ -5,7 +5,7 @@
 #ifndef SYNTHESE_CTARIF_H
 #define SYNTHESE_CTARIF_H
 
-#include "cTexte.h"
+#include <string>
 
 // Modalités de tarification
 typedef int tNumeroTarif;
@@ -31,7 +31,7 @@ class cTarif
 
         const size_t _id;  //!< Index du tarif
         tTypeTarif vTypeTarif; //!< Type de tarif
-        cTexte vLibelle; //!< Nom du tarif
+        std::string vLibelle; //!< Nom du tarif
 
 
     public:
@@ -43,13 +43,13 @@ class cTarif
         //! \name Modificateurs
         //@{
         void setTypeTarif( const tTypeTarif newVal );
-        void setLibelle( const cTexte& libelle );
+        void setLibelle( const std::string& libelle );
         //@}
 
         //! \name Accesseurs
         //@{
         tTypeTarif getTypeTarif() const;
-        const cTexte& getLibelle() const;
+        const std::string& getLibelle() const;
         size_t getNumeroTarif() const;
         //@}
 };

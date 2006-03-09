@@ -12,7 +12,7 @@ class cGareLigne;
 #include "cSite.h"
 #include "Parametres.h"
 #include "04_time/Hour.h"
-#include "cTexte.h"
+#include <string>
 
 
 #include <set>
@@ -25,7 +25,7 @@ class cTableauAffichage : public cSite
     protected:
         //! \name Param�tres du tableau
         //@{
-        cTexte _Titre;    //!< Titre pour affichage
+        std::string _Titre;    //!< Titre pour affichage
         int _NombreDeparts;  //!< Nombre de d�parts affich�s
         int _PremierDepart;  //!< Premier d�part affich�
         synthese::time::Hour _HeureBascule;  //!< Heure de basculement entre deux jours
@@ -36,12 +36,9 @@ class cTableauAffichage : public cSite
         //! \name Donn�es
         //@{
         LogicalPlace* _ArretLogique;  //!< Point d'arr�t affich�
-        set
-            <cArretPhysique*> _ArretPhysiques;    //!< ArretPhysique(s) affich�s
-        set
-            <cLigne*> _LignesInterdites; //!< Lignes ne devant pas �tre affich�es
-        set
-            <LogicalPlace*> _DestinationsAffichees;
+        std::set<cArretPhysique*> _ArretPhysiques;    //!< ArretPhysique(s) affich�s
+        std::set<cLigne*> _LignesInterdites; //!< Lignes ne devant pas �tre affich�es
+        std::set<LogicalPlace*> _DestinationsAffichees;
         //@}
 
         //! \name M�thodes prot�g�es
@@ -63,7 +60,7 @@ class cTableauAffichage : public cSite
         bool SetNombreDeparts( int __NombreDeparts );
         void AddLigneInterdte( cLigne* __Ligne );
         void AddArretPhysiqueAutorise( int __NumeroArretPhysique );
-        bool SetTitre( const cTexte& );
+        bool SetTitre( const std::string& );
         bool SetOriginesSeulement( bool __Valeur );
         void AddDestinationAffichee( LogicalPlace* __ArretLogique );
         void SetNumeroPanneau( int );
@@ -71,7 +68,7 @@ class cTableauAffichage : public cSite
 
         //! \name Accesseurs
         //@{
-        const cTexte& getTitre() const;
+        const std::string& getTitre() const;
         int getNumeroPanneau() const;
         //@}
 

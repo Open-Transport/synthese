@@ -2,7 +2,7 @@
 #ifndef SYNTHESE_CREQUETESQLINSERT_H
 #define SYNTHESE_CREQUETESQLINSERT_H
 
-#include "cTexte.h"
+#include <string>
 #include "cTexteSQL.h"
 
 /*! \brief Classe de texte restinée à recevoir une requête SQL d'insertion
@@ -13,20 +13,20 @@ Le but de cette classe est de permettre la construction d'une requête INSERT de 
 class cRequeteSQLInsert : public cTexte
 {
     protected:
-        cTexte vNomTable;  //!< Table dans laquelle doit se faire l'insertion
-        cTexte vListeChamps;  //!< Liste des champs de la table à renseigner
-        cTexte vListeValeurs;  //!< Liste des valeurs que doivent prendre les champs
+        std::string vNomTable;  //!< Table dans laquelle doit se faire l'insertion
+        std::string vListeChamps;  //!< Liste des champs de la table à renseigner
+        std::string vListeValeurs;  //!< Liste des valeurs que doivent prendre les champs
 
     public:
         //! \name Modificateurs
         //@{
         template <class T>
-        void AddChamp( const cTexte& NomChamp, const T& Valeur, const bool Fonction = false );
+        void AddChamp( const std::string& NomChamp, const T& Valeur, const bool Fonction = false );
         //@}
 
         //! \name Constructeurs
         //@{
-        cRequeteSQLInsert( const cTexte& NomTable );
+        cRequeteSQLInsert( const std::string& NomTable );
         //@}
 };
 
@@ -44,10 +44,10 @@ class cRequeteSQLInsert : public cTexte
  \warning Si Fonction=true, il est nécessaire de s'assurer que Valeur ne comporte pas de danger, notamment si tout ou partie du paramètre est fourni par un utilisateur
 */
 template <class T>
-inline void cRequeteSQLInsert::AddChamp( const cTexte& NomChamp, const T& Valeur, const bool Fonction )
+inline void cRequeteSQLInsert::AddChamp( const std::string& NomChamp, const T& Valeur, const bool Fonction )
 {
     // Ajout des virgules si il s'agit de la seconde modification au moins
-    if ( vListeChamps.Taille() )
+    if ( vListeChamps.size () )
     {
         vListeChamps << ", ";
         vListeValeurs << ", ";
@@ -59,7 +59,7 @@ inline void cRequeteSQLInsert::AddChamp( const cTexte& NomChamp, const T& Valeur
         vListeValeurs << Valeur;
     else
     {
-        cTexteSQL Parametre;
+        std::stringSQL Parametre;
         Parametre << Valeur;
         vListeValeurs << "\"" << Parametre << "\"";
     }

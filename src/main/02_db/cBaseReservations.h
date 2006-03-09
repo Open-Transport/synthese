@@ -15,9 +15,9 @@ class cBaseReservation
         //! \name Paramètres
         //@{
         cServeurBaseDeDonnees* _Serveur;   //!< Serveur de base de données à utiliser
-        cTexte _TableReservations; //!< Nom de la table des réservations
-        cTexte _TableCompteur;  //!< Nom de la table des compteurs de réservations
-        cTexte _NomChampID;  //!< Nom du champ d'identification de la réservation
+        std::string _TableReservations; //!< Nom de la table des réservations
+        std::string _TableCompteur;  //!< Nom de la table des compteurs de réservations
+        std::string _NomChampID;  //!< Nom du champ d'identification de la réservation
         //@}
 
     public:

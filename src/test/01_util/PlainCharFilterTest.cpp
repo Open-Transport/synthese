@@ -1,5 +1,6 @@
 #include "PlainCharFilterTest.h"
-#include "PlainCharFilter.h"
+
+#include "01_util/PlainCharFilter.h"
 
 #include <sstream>
 

@@ -13,7 +13,6 @@ class cInterface_Objet_Element;
 class cInterface_Objet_Element_Parametre;
 class cInterface_Objet_Element_Parametre_TexteConnu;
 
-class cTexte;
 class cSite;
 
 #include <iostream>
@@ -96,7 +95,7 @@ class cInterface_Objet_Connu_ListeParametres : public cInterface_Objet
     public:
         //! \name Modificateurs
         //@{
-        cInterface_Objet_Connu_ListeParametres& operator<<( const cTexte& );
+        cInterface_Objet_Connu_ListeParametres& operator<<( const std::string& );
         cInterface_Objet_Connu_ListeParametres& operator<<( int );
         //@}
 
@@ -153,7 +152,7 @@ class cInterface_Objet_AEvaluer_ListeParametres : public cInterface_Objet_AEvalu
     public:
         //! \name Modificateurs
         //@{
-        bool InterpreteTexte( const cInterface_Objet_AEvaluer_ListeParametres&, const cTexte& );
+        bool InterpreteTexte( const cInterface_Objet_AEvaluer_ListeParametres&, const std::string& );
         //@}
 
         //! \name Constructeur et destructeurs

@@ -133,7 +133,7 @@ class LogicalPlace : public cPoint
 
         //! \name Donnes complmentaires
         //@{
-        // tVitesseKMH   vVitesseMax[NOMBREVMAX]; //!< Tableau des vitesses maximales par tranche de distance (temporairement inutilis)
+        // int   vVitesseMax[NOMBREVMAX]; //!< Tableau des vitesses maximales par tranche de distance (temporairement inutilis)
         //@}
 
         //! \name Chainage et indexation
@@ -182,7 +182,7 @@ class LogicalPlace : public cPoint
         }
         PhysicalStopsMap getPhysicalStops() const;
         AddressesMap getAddresses() const;
-        // tVitesseKMH    vitesseMax(size_t Categorie)       const;
+        // int    vitesseMax(size_t Categorie)       const;
         //@}
 
         //! \name Calculateurs
@@ -205,7 +205,7 @@ class LogicalPlace : public cPoint
         cAlerte& getAlertForSettings();
         void setDelaiCorrespondance( int __VoieDepart, int __VoieArrivee, int );
         void setDesignationOD( const std::string& );
-        // bool setVMax(tCategorieDistance, tVitesseKMH);
+        // bool setVMax(tCategorieDistance, int);
         bool setDesignation13( const std::string& );
         bool setDesignation26( const std::string& );
         void setDesignation( cCommune*, const std::string& );

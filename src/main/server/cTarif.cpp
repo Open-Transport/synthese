@@ -17,13 +17,12 @@ tTypeTarif cTarif::getTypeTarif() const
     return ( vTypeTarif );
 }
 
-void cTarif::setLibelle( const cTexte& libelle )
+void cTarif::setLibelle( const std::string& libelle )
 {
-    vLibelle.Vide();
-    vLibelle << libelle;
+    vLibelle = libelle;
 }
 
-const cTexte& cTarif::getLibelle() const
+const std::string& cTarif::getLibelle() const
 {
     return ( vLibelle );
 }

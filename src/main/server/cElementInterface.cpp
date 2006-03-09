@@ -6,6 +6,7 @@
 #include "70_server/Request.h"
 #include "LogicalPlace.h"
 #include "cPhoto.h"
+#include "01_util/Conversion.h"
 
 /*! \brief Constructeur
  \author Hugues Romain
@@ -35,7 +36,7 @@ int cInterface_Objet_Element_Parametre_TexteAEvaluer::Nombre( const cInterface_O
  \author Hugues Romain
  \date 2001-2005
 */
-const cTexte& cInterface_Objet_Element_Parametre_TexteAEvaluer::Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres, const void* ) const
+const std::string& cInterface_Objet_Element_Parametre_TexteAEvaluer::Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres, const void* ) const
 {
     return __Parametres[ _NumeroParametre ] ->Texte( __Parametres );
 }
@@ -47,9 +48,11 @@ const cTexte& cInterface_Objet_Element_Parametre_TexteAEvaluer::Texte( const cIn
  \author Hugues Romain
  \date 2000-2005
 */
-cInterface_Objet_Element_Parametre_TexteConnu::cInterface_Objet_Element_Parametre_TexteConnu( const cTexte& Valeur ) : cInterface_Objet_Element_Parametre()
+cInterface_Objet_Element_Parametre_TexteConnu::cInterface_Objet_Element_Parametre_TexteConnu( const std::string& Valeur ) 
+    : cInterface_Objet_Element_Parametre()
+    , _Texte (Valeur)
 {
-    _Texte << Valeur;
+    
 }
 
 
@@ -60,9 +63,11 @@ cInterface_Objet_Element_Parametre_TexteConnu::cInterface_Objet_Element_Parametr
  \author Hugues Romain
  \date 2005
 */
-cInterface_Objet_Element_Parametre_TexteConnu::cInterface_Objet_Element_Parametre_TexteConnu( const int Valeur ) : cInterface_Objet_Element_Parametre()
+cInterface_Objet_Element_Parametre_TexteConnu::cInterface_Objet_Element_Parametre_TexteConnu( const int Valeur ) 
+    : cInterface_Objet_Element_Parametre()
+    , _Texte (synthese::util::Conversion::ToString (Valeur))
 {
-    _Texte << Valeur;
+
 }
 
 

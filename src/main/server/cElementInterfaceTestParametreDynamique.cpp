@@ -10,6 +10,9 @@
 #include "cInterface_Objet_Element_Goto.h"
 #include "cInterface_Objet_Element_Ligne.h"
 
+#include "01_util/Conversion.h"
+#include <string>
+
 
 /*! \brief Constructeur à partir d'une chaîne de commandes
  \param __Texte Texte à interpréter
@@ -31,14 +34,14 @@ Valeur possible pour les élements à évaluer (cas vide ou non vide):
  - Axx Appel au xxème texte dynamique (Element dynamique)
  - {...} Copie directe du texte contenu entre les accolades (Element statique)
 */
-cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditionnel( const cTexte& __Texte )
+cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditionnel( const std::string& __Texte )
 {
     // Locales
     int __PositionDebut;
     int __Position;
 
     // PARAMETRE PREMIER Parcours de la chaîne de caractères en entier
-    for ( __Position = 0; __Position < __Texte.Taille(); __Position++ )
+    for ( __Position = 0; __Position < __Texte.size (); __Position++ )
         if ( __Texte[ __Position ] == 'P' )
         {
             for ( __PositionDebut = ++__Position; // Début de l'index du paramètre
@@ -48,7 +51,12 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
                 )
                 ;
 
-            _ObjetATester = new cInterface_Objet_Element_Parametre_TexteAEvaluer( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetATester = new cInterface_Objet_Element_Parametre_TexteAEvaluer( 
+		
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+		);
             break;
         }
         else if ( __Texte[ __Position ] == 'A' )
@@ -61,13 +69,18 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
                 ;
 
             // Chainage
-            _ObjetATester = new cInterface_Objet_Element_Parametre_DonneeEnvironnement( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetATester = new cInterface_Objet_Element_Parametre_DonneeEnvironnement( 
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+		);
             break;
         }
 
     // ELEMENT EVALUE SI NON VIDE
-    for ( ; __Position < __Texte.Taille(); __Position++ )
-        if ( __Texte.Compare( "break", 5, __Position ) )
+    for ( ; __Position < __Texte.size (); __Position++ )
+
+	if ("break" == __Texte.substr (__Position, 5))
         {
             _ObjetSiNonVide = NULL;
             __Position += 5;
@@ -83,7 +96,12 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
                 ;
 
             // Chainage
-            _ObjetSiNonVide = new cInterface_Objet_Element_Parametre_TexteAEvaluer( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetSiNonVide = new cInterface_Objet_Element_Parametre_TexteAEvaluer( 
+
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+);
             break;
         }
         else if ( __Texte[ __Position ] == 'G' )
@@ -96,7 +114,11 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
                 ;
 
             // Chainage
-            _ObjetSiNonVide = new cInterface_Objet_Element_Goto( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetSiNonVide = new cInterface_Objet_Element_Goto( 
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+		);
             break;
         }
         else if ( __Texte[ __Position ] == 'L' )
@@ -109,7 +131,11 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
                 ;
 
             // Chainage
-            _ObjetSiNonVide = new cInterface_Objet_Element_Ligne( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetSiNonVide = new cInterface_Objet_Element_Ligne( 
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+		);
             break;
         }
         else if ( __Texte[ __Position ] == 'A' )
@@ -122,7 +148,11 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
                 ;
 
             // Chainage
-            _ObjetSiNonVide = new cInterface_Objet_Element_Parametre_DonneeEnvironnement( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetSiNonVide = new cInterface_Objet_Element_Parametre_DonneeEnvironnement( 
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+		);
             break;
         }
         else if ( __Texte[ __Position ] == 'O' )
@@ -135,22 +165,29 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
                 ;
 
             // Chainage
-            _ObjetSiNonVide = new cInterface_Objet_Element_Bibliotheque( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetSiNonVide = new cInterface_Objet_Element_Bibliotheque( 
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+		);
             break;
         }
         else if ( __Texte[ __Position ] == '{' )
         {
             // Début du champ texte
             __PositionDebut = ++__Position;
-            __Position = __Texte.RechercheOccurenceGauche( '}', 1, __Position );
-            _ObjetSiNonVide = new cInterface_Objet_Element_Parametre_TexteConnu( __Texte.Extrait( __PositionDebut, __Position - __PositionDebut ) );
+
+            __Position = __Texte.find ("}", __Position);
+
+            _ObjetSiNonVide = new cInterface_Objet_Element_Parametre_TexteConnu( 
+		__Texte.substr (__PositionDebut, __Position - __PositionDebut));
             break;
         }
 
     // ELEMENT EVALUE SI VIDE
     bool __OKElse = false;
-    for ( ; __Position < __Texte.Taille(); __Position++ )
-        if ( __Texte.Compare( "break", 5, __Position ) )
+    for ( ; __Position < __Texte.size (); __Position++ )
+	if ("break" == __Texte.substr (__Position, 5))
         {
             _ObjetSiVide = NULL;
             __Position += 5;
@@ -167,7 +204,11 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
                 ;
 
             // Chainage
-            _ObjetSiVide = new cInterface_Objet_Element_Parametre_TexteAEvaluer( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetSiVide = new cInterface_Objet_Element_Parametre_TexteAEvaluer( 
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+		);
             __OKElse = true;
             break;
         }
@@ -183,7 +224,11 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
 
             // Chainage
             __OKElse = true;
-            _ObjetSiVide = new cInterface_Objet_Element_Goto( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetSiVide = new cInterface_Objet_Element_Goto( 
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+		);
             break;
         }
         else if ( __Texte[ __Position ] == 'L' )
@@ -197,7 +242,11 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
 
             // Chainage
             __OKElse = true;
-            _ObjetSiVide = new cInterface_Objet_Element_Ligne( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetSiVide = new cInterface_Objet_Element_Ligne( 
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+		);
             break;
         }
         else if ( __Texte[ __Position ] == 'A' )
@@ -210,7 +259,11 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
                 ;
 
             // Chainage
-            _ObjetSiVide = new cInterface_Objet_Element_Parametre_DonneeEnvironnement( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetSiVide = new cInterface_Objet_Element_Parametre_DonneeEnvironnement( 
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+		);
             __OKElse = true;
             break;
         }
@@ -224,7 +277,11 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
                 ;
 
             // Chainage
-            _ObjetSiVide = new cInterface_Objet_Element_Bibliotheque( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) );
+            _ObjetSiVide = new cInterface_Objet_Element_Bibliotheque( 
+		synthese::util::Conversion::ToInt (
+		    __Texte.substr (__PositionDebut, 
+				    __Position - __PositionDebut))
+		);
             __OKElse = true;
             break;
         }
@@ -232,8 +289,11 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
         {
             // Début du champ texte
             __PositionDebut = ++__Position;
-            __Position = __Texte.RechercheOccurenceGauche( '}', 1, __Position );
-            _ObjetSiVide = new cInterface_Objet_Element_Parametre_TexteConnu( __Texte.Extrait( __PositionDebut, __Position - __PositionDebut ) );
+            __Position = __Texte.find ("}", __Position);
+
+            _ObjetSiVide = new cInterface_Objet_Element_Parametre_TexteConnu(
+		__Texte.substr (__PositionDebut, 
+				__Position - __PositionDebut));
             __OKElse = true;
             break;
         }

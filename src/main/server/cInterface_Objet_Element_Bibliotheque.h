@@ -684,12 +684,12 @@ class cInterface_Objet_Element_Bibliotheque : public cInterface_Objet_Element
     public:
         //! \name Modificateurs
         //@{
-        void SetParametres( const cTexte& );
+        void SetParametres( const std::string& );
         //@}
 
         //! \name Calculateurs
         //@{
-        int Evalue( ostream&, const cInterface_Objet_Connu_ListeParametres&
+        int Evalue( std::ostream&, const cInterface_Objet_Connu_ListeParametres&
                        , const void* ObjetAAfficher = NULL, const cSite* __Site = NULL ) const;
         cInterface_Objet_Element* Copie( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres ) const;
         //@}
@@ -697,7 +697,7 @@ class cInterface_Objet_Element_Bibliotheque : public cInterface_Objet_Element
         //! \name Constructeurs
         //@{
         explicit cInterface_Objet_Element_Bibliotheque( int );
-        explicit cInterface_Objet_Element_Bibliotheque( int, const cTexte& );
+        explicit cInterface_Objet_Element_Bibliotheque( int, const std::string& );
         //@}
 };
 

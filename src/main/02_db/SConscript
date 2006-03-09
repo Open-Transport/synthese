@@ -3,7 +3,7 @@ import os.path
 Import ('mainenv')
 moduleenv = mainenv.Copy()
 
-includes = '*.cpp'
+includes = ''
 excludes = []
 
 moduleenv.AppendMultithreadConf ()

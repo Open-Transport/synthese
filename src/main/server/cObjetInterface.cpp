@@ -3,6 +3,9 @@
 #include "cInterface_Objet_AEvaluer_PageEcran.h"
 #include "cObjetInterface.h"
 
+#include "01_util/Conversion.h"
+
+
 /*! \brief Constructeur
  \author Hugues Romain
  \date 2005
@@ -44,13 +47,13 @@ La chaîne créée est une suite d'objets dont la description est séparée par des e
  - Axx Appel au xxème texte dynamique (Element dynamique)
  - {...} Copie directe du texte contenu entre les accolades (Element de type connu)
 */
-bool cInterface_Objet_AEvaluer_ListeParametres::InterpreteTexte( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres, const cTexte& __Texte )
+bool cInterface_Objet_AEvaluer_ListeParametres::InterpreteTexte( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres, const std::string& __Texte )
 {
     // Locales
     int __PositionDebut;
 
     // Parcours de la chaîne de caractères en entier
-    for ( int __Position = 0; __Position < __Texte.Taille(); __Position++ )
+    for ( int __Position = 0; __Position < __Texte.size (); __Position++ )
     {
         switch ( __Texte[ __Position ] )
         {
@@ -68,13 +71,16 @@ bool cInterface_Objet_AEvaluer_ListeParametres::InterpreteTexte( const cInterfac
                 // Chainage
                 if ( __Parametres.EstVide() )
                 {
-                    if ( !_Chaine( new cInterface_Objet_Element_Parametre_TexteAEvaluer( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) ) ) )
+                    if ( !_Chaine( new cInterface_Objet_Element_Parametre_TexteAEvaluer( 
+				       synthese::util::Conversion::ToInt (__Texte.substr (__PositionDebut, __Position - __PositionDebut)) 
+				       ) ) )
                         return false;
                 }
                 else
                 {
-                    if ( !_Chaine( __Parametres[ __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) ] ->Copie() ) )
-                        return false;
+                    if ( !_Chaine( __Parametres[ 
+				       synthese::util::Conversion::ToInt (__Texte.substr (__PositionDebut,  __Position - __PositionDebut)) ] ->Copie() ) )
+			 return false;
                 }
                 break;
 
@@ -90,15 +96,19 @@ bool cInterface_Objet_AEvaluer_ListeParametres::InterpreteTexte( const cInterfac
                 { }
 
                 // Chainage
-                if ( !_Chaine( new cInterface_Objet_Element_Parametre_DonneeEnvironnement( __Texte.GetNombre( __Position - __PositionDebut, __PositionDebut ) ) ) )
+                if ( !_Chaine( new cInterface_Objet_Element_Parametre_DonneeEnvironnement( 
+				   synthese::util::Conversion::ToInt (__Texte.substr( __PositionDebut, __Position - __PositionDebut ))
+				   ) ) )
                     return false;
                 break;
 
             case '{':
                 // Début du champ texte
                 __PositionDebut = ++__Position;
-                __Position = __Texte.RechercheOccurenceGauche( '}', 1, __Position );
-                if ( !_Chaine( new cInterface_Objet_Element_Parametre_TexteConnu( __Texte.Extrait( __PositionDebut, __Position - __PositionDebut ) ) ) )
+
+		__Position = __Texte.find ("}", __Position);
+
+                if ( !_Chaine( new cInterface_Objet_Element_Parametre_TexteConnu( __Texte.substr( __PositionDebut, __Position - __PositionDebut ) ) ) )
                     return false;
                 break;
         }
@@ -151,7 +161,7 @@ cInterface_Objet_Element* cInterface_Objet::_Chaine( cInterface_Objet_Element* _
  
 L'affichage s'interrompt si un élément renvoie false (commande break)
 */
-void cInterface_Objet::Evalue( ostream& __Flux, const cInterface_Objet_Connu_ListeParametres& __Parametres, const void* __Objet, const cSite* __Site ) const
+void cInterface_Objet::Evalue( std::ostream& __Flux, const cInterface_Objet_Connu_ListeParametres& __Parametres, const void* __Objet, const cSite* __Site ) const
 {
     int __LigneAAtteindre = INCONNU;
 
@@ -162,7 +172,7 @@ void cInterface_Objet::Evalue( ostream& __Flux, const cInterface_Objet_Connu_Lis
         {
             __LigneAAtteindre = __Element->Evalue( __Flux, __Parametres, __Objet, __Site );
 
-            if ( __LigneAAtteindre == NULL )
+            if ( __LigneAAtteindre == 0 )
                 break;
         }
     }
@@ -175,7 +185,7 @@ void cInterface_Objet::Evalue( ostream& __Flux, const cInterface_Objet_Connu_Lis
 /*! \brief Ajout d'un élément texte en fin de chaîne
  \warning La réussite de la copie n'est pas contrôlée.
 */
-cInterface_Objet_Connu_ListeParametres& cInterface_Objet_Connu_ListeParametres::operator<<( const cTexte& __Texte )
+cInterface_Objet_Connu_ListeParametres& cInterface_Objet_Connu_ListeParametres::operator<<( const std::string& __Texte )
 {
     _Chaine( new cInterface_Objet_Element_Parametre_TexteConnu( __Texte ) );
     return *this;

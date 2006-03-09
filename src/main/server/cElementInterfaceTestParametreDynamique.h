@@ -26,7 +26,7 @@ class cInterface_Objet_Element_TestConditionnel : public cInterface_Objet_Elemen
 
         //! \name Calculateurs
         //@{
-        int Evalue( ostream&, const cInterface_Objet_Connu_ListeParametres&
+        int Evalue( std::ostream&, const cInterface_Objet_Connu_ListeParametres&
                        , const void* ObjetAAfficher = NULL, const cSite* __Site = NULL ) const;
         cInterface_Objet_Element* Copie( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres ) const;
         //@}
@@ -36,7 +36,7 @@ class cInterface_Objet_Element_TestConditionnel : public cInterface_Objet_Elemen
         //! \name Constructeur
         //@{
         explicit cInterface_Objet_Element_TestConditionnel() : cInterface_Objet_Element() {}
-        explicit cInterface_Objet_Element_TestConditionnel( const cTexte& );
+        explicit cInterface_Objet_Element_TestConditionnel( const std::string& );
         //@}
 };
 
@@ -54,10 +54,10 @@ class cInterface_Objet_Element_TestConditionnel : public cInterface_Objet_Elemen
 Lance l'évaluation de l'élément "si vide" si l'objet à tester évalué retourne un texte vide ou bien le texte "0", l'autre élément sinon
  
 */
-inline int cInterface_Objet_Element_TestConditionnel::Evalue( ostream& __Flux, const cInterface_Objet_Connu_ListeParametres& __Parametres, const void* __Objet, const cSite* __Site ) const
+inline int cInterface_Objet_Element_TestConditionnel::Evalue( std::ostream& __Flux, const cInterface_Objet_Connu_ListeParametres& __Parametres, const void* __Objet, const cSite* __Site ) const
 {
-    const cTexte & __Texte = _ObjetATester->Texte( __Parametres, __Objet );
-    if ( __Texte.Taille() && !__Texte.Compare( "0" ) )
+    const std::string & __Texte = _ObjetATester->Texte( __Parametres, __Objet );
+    if ( __Texte.size () && __Texte != ( "0" ) )
         return _ObjetSiNonVide == NULL ? NULL : _ObjetSiNonVide->Evalue( __Flux, __Parametres, __Objet, __Site );
     else
         return _ObjetSiVide == NULL ? NULL : _ObjetSiVide->Evalue( __Flux, __Parametres, __Objet, __Site );

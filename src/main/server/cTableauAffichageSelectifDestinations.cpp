@@ -4,7 +4,7 @@
 #include "cArretPhysique.h"
 #include "LogicalPlace.h"
 
-cTableauAffichageSelectifDestinations::cTableauAffichageSelectifDestinations( const string& __Code )
+cTableauAffichageSelectifDestinations::cTableauAffichageSelectifDestinations( const std::string& __Code )
         : cTableauAffichage( __Code )
 {
     _DureePresenceDestinationForcee = 120;

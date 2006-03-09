@@ -78,17 +78,15 @@ bool cModaliteReservationEnLigne::setMax( const int valeur )
 }
 
 
-bool cModaliteReservationEnLigne::SetMail( const cTexte &newVal )
+bool cModaliteReservationEnLigne::SetMail( const std::string &newVal )
 {
-    vEMail.Vide();
-    vEMail << newVal;
+    vEMail = newVal;
     return ( true );
 }
 
-bool cModaliteReservationEnLigne::SetMailCopie( const cTexte &newVal )
+bool cModaliteReservationEnLigne::SetMailCopie( const std::string &newVal )
 {
-    vEMailCopie.Vide();
-    vEMailCopie << newVal;
+    vEMailCopie = newVal;
     return ( true );
 }
 
@@ -147,12 +145,12 @@ tBool3 cModaliteReservationEnLigne::GetRELAdresse() const
     return ( vRELAdresse );
 }
 
-const cTexte& cModaliteReservationEnLigne::GetMail() const
+const std::string& cModaliteReservationEnLigne::GetMail() const
 {
     return ( vEMail );
 }
 
-const cTexte& cModaliteReservationEnLigne::GetMailCopie() const
+const std::string& cModaliteReservationEnLigne::GetMailCopie() const
 {
     return ( vEMailCopie );
 }
@@ -231,20 +229,25 @@ Cette mï¿½thode raisonne sur le principe d'un nombre maximal de places rï¿½servï
  tMomentFinMaxCirculation++;
  
  //preparation de la requete
- cTexte requete;
- cTexteSQL Parametre;
- requete  << "SELECT IFNULL(SUM("<< TABLE_RESERVATION_NOMBRE_PLACES <<"),0)"
-   << " FROM "<< TABLE_RESERVATION 
-   << " WHERE " << TABLE_RESERVATION_CODE_LIGNE <<"='"<< tCirculation->getLigne()->Axe()->getCode()
-    <<"' AND " << TABLE_RESERVATION_NUM_SERVICE <<"='"<< tCirculation->getNumero() << "'";
-     Parametre.Vide(); Parametre << tMomentDebutCirculation; 
- requete   << " AND " << TABLE_RESERVATION_DATE_DEPART << " >= '" << Parametre << "'";
-     Parametre.Vide(); Parametre << tMomentFinMaxCirculation; 
- requete   << " AND " << TABLE_RESERVATION_DATE_DEPART << " < '" << Parametre << "'"
-    << " AND " << TABLE_RESERVATION_ETAT << "='R'"
-   << ";";
+ std::stringstream sout;
+ synthese::util::PlainCharFilter filter;
+ boost::iostreams::filtering_ostream requete;
+ requete.push (filter);
+ requete.push (sout);
+    
  
- bool status = tBaseManager->execute(requete);
+ requete  << "SELECT IFNULL(SUM("<< TABLE_RESERVATION_NOMBRE_PLACES <<"),0)"
+ << " FROM "<< TABLE_RESERVATION 
+ << " WHERE " << TABLE_RESERVATION_CODE_LIGNE <<"='"<< tCirculation->getLigne()->Axe()->getCode()
+ <<"' AND " << TABLE_RESERVATION_NUM_SERVICE <<"='"<< tCirculation->getNumero() << "'";
+     
+ requete   << " AND " << TABLE_RESERVATION_DATE_DEPART << " >= '" << tMomentDebutCirculation << "'";
+     
+ requete   << " AND " << TABLE_RESERVATION_DATE_DEPART << " < '" << tMomentFinMaxCirculation << "'"
+ << " AND " << TABLE_RESERVATION_ETAT << "='R'"
+ << ";";
+ 
+ bool status = tBaseManager->execute(sout.str ());
  try
  {
   if (status)
@@ -267,14 +270,14 @@ Cette mï¿½thode raisonne sur le principe d'un nombre maximal de places rï¿½servï
  }
  catch(BadConversion er)
  {
-//  cTexte temp;
-//  temp << "Problï¿½me de conversion des donnï¿½es:" << cTexte(er.data) << " en " << cTexte(er.type_name);
+//  std::string temp;
+//  temp << "Problï¿½me de conversion des donnï¿½es:" << std::string(er.data) << " en " << std::string(er.type_name);
 //  log(temp);
 //  Tampon << MESSAGE_ERREUR_GENERIQUE;
  }
  catch(BadNullConversion er)
  {
-//  log(cTexte("Problï¿½me de conversion d'une donnï¿½e nulle"));
+//  log(std::string("Problï¿½me de conversion d'une donnï¿½e nulle"));
 //  Tampon << MESSAGE_ERREUR_GENERIQUE;
  }
    
@@ -309,9 +312,9 @@ Cette mï¿½thode raisonne sur le principe d'un nombre maximal de places rï¿½servï
 /*bool cModaliteReservationEnLigne::Reserver(const cTrain* tService
      , const LogicalPlace* tPADepart, const LogicalPlace* tPAArrivee
      , const synthese::time::DateTime& tDateDepart
-     , const cTexteSQL& tNom, const cTexteSQL& tNomBrut, const cTexteSQL& tPrenom
-     , const cTexteSQL& tAdresse, const cTexteSQL& tEmail, const cTexteSQL& tTelephone, const cTexteSQL& tNumAbonne
-     , const cTexteSQL& tAdressePAArrivee, const cTexteSQL& tAdressePADepart
+     , const std::stringSQL& tNom, const std::stringSQL& tNomBrut, const std::stringSQL& tPrenom
+     , const std::stringSQL& tAdresse, const std::stringSQL& tEmail, const std::stringSQL& tTelephone, const std::stringSQL& tNumAbonne
+     , const std::stringSQL& tAdressePAArrivee, const std::stringSQL& tAdressePADepart
      , const size_t tNombrePlaces
      , cDatabaseManager* tBaseManager
      ) const
@@ -338,7 +341,7 @@ Cette mï¿½thode raisonne sur le principe d'un nombre maximal de places rï¿½servï
   if (tNumeroResa)
   {
    //construction de l'id
-   cTexte tCodeResa;
+   std::string tCodeResa;
    tCodeResa << tMaintenant.getDate().toInternalString () << TXT2(tNumeroResa,6);
    
    //preparation de la requete d'insertion des donnï¿½es
@@ -406,7 +409,7 @@ L'annulation est acceptï¿½e si :
  
  \todo Gï¿½rer les paliers
 */ 
-/*bool cModaliteReservationEnLigne::Annuler(const cTexte& CodeReservation, cDatabaseManager* tBaseManager) const
+/*bool cModaliteReservationEnLigne::Annuler(const std::string& CodeReservation, cDatabaseManager* tBaseManager) const
 { 
  // Statut de la demande
  bool vRetour = false;
@@ -417,11 +420,11 @@ L'annulation est acceptï¿½e si :
   // Date de la demande de rï¿½servation
   synthese::time::DateTime Maintenant;
   Maintenant.setMoment();
-  cTexteSQL sqlMaintenant; 
+  std::stringSQL sqlMaintenant; 
   sqlMaintenant << Maintenant;
   
   // Requete de modification incluant le test de non dï¿½passement de l'ï¿½chï¿½ance
-  cTexte Requete;
+  std::string Requete;
   Requete << "UPDATE " << TABLE_RESERVATION 
    << " SET " << TABLE_RESERVATION_ETAT << "='A'"
     << ", " << TABLE_RESERVATION_DATE_ANNUL << "='" << sqlMaintenant << "'"

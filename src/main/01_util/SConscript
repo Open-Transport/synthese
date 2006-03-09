@@ -1,7 +1,7 @@
 import os.path
 
 Import ('mainenv')
-moduleenv = mainenv.Copy()
+moduleenv = mainenv.ModuleEnv()
 
 includes = '*.cpp'
 excludes = []

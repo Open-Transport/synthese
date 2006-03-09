@@ -9,7 +9,7 @@
 
 class cModaliteReservation;
 
-#include "cTexte.h"
+#include <string>
 #include "Parametres.h"
 
 
@@ -25,14 +25,14 @@ class cHandicape
         tBool3 _Valeur;  //!< Type de prise en charge (Accept�/Interdit/Inconnu)
         cModaliteReservation* _Resa;  //!< Modalit� de r�servation de la prise en charge si applicable (NULL sinon)
         tContenance _Contenance; //!< Nombre de places offertes aux handicap�s
-        cTexte _Doc;  //!< Texte de description de la modalit�
+        std::string _Doc;  //!< Texte de description de la modalit�
         tPrix _Prix;  //!< Prix de l'utilisation du service par un handicap�
 
     public:
         //! \name Modificateurs
         //@{
         void setPrix( tPrix );
-        void setDoc( const cTexte& );
+        void setDoc( const std::string& );
         void setContenance( tContenance );
         void setResa( cModaliteReservation* );
         void setTypeHandicape( tBool3 );

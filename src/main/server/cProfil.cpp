@@ -6,9 +6,11 @@ bool cProfil::ResaAutorisee( const cReservation& __Reservation ) const
     return _ResaAll || _ResaPerso && __Reservation.GetPersonne() == this;
 }
 
-cTableauDynamiqueObjets<cReservation> cProfil::ListeReservations( bool _DontPassees ) const
+
+
+std::vector<cReservation> cProfil::ListeReservations( bool _DontPassees ) const
 {
-    cTableauDynamiqueObjets<cReservation> __Reservations;
+    std::vector<cReservation> __Reservations;
 
     /*!
     \todo CRO REQUETE MNESIA LISTE RESA PRISES PAR LE PROFIL, AVEC DATE DEPART PASSEE = _DontPassees
@@ -20,11 +22,14 @@ cTableauDynamiqueObjets<cReservation> cProfil::ListeReservations( bool _DontPass
     return __Reservations;
 }
 
-bool cProfil::SetLogin( const cTexte& __User, const cTexte& __Password )
+
+
+
+bool cProfil::SetLogin( const std::string& __User, const std::string& __Password )
 {
     _User = __User;
     _Password = __Password;
-    return _User.Taille() == __User.Taille() && _Password.Taille() == __Password.Taille();
+    return _User.size () == __User.size () && _Password.size () == __Password.size ();
 }
 
 bool cProfil::GestionPersonneAutorisee() const
@@ -49,8 +54,8 @@ cProfil::cProfil()
     _ViewDetailResaSansCode = false;
 }
 
-bool cProfil::PasswordCorrect( const cTexte& __Password ) const
+bool cProfil::PasswordCorrect( const std::string& __Password ) const
 {
-    return _Password.Compare( __Password );
+    return _Password == __Password;
 }
 

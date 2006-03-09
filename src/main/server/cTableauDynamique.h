@@ -260,8 +260,8 @@ La m�thode retourne true si :
  Si la seconde solution occupe toujours plus de m�moire que n�cessaire, elle permet d'�viter d'avoir fr�quemment recours � la r�allocation dans le cas o� la cha�ne de caract�res est susceptible de changer de taille fr�quemment.
  
  Pour activer la m�thode d'augmentation de l'espace allou�, deux solutions sont utilisables :
-  - d�clarer l'allocation par doublement par le constructeur : voir cTexte::cTexte(size_t, bool);
-  - activer l'allocation par doublement par le modificateur cTexte::setAugmentationParDoublement().
+  - d�clarer l'allocation par doublement par le constructeur : voir std::string::std::string(size_t, bool);
+  - activer l'allocation par doublement par le modificateur std::string::setAugmentationParDoublement().
 */
 template <class C>
 bool cTableauDynamique<C>::AlloueSiBesoin( int __TailleDemandee, bool __Relatif )

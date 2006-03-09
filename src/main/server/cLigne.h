@@ -21,7 +21,7 @@ class cEnvironnement;
 #include <vector>
 #include <string>
 #include "cJourCirculation.h"
-#include "cTexte.h"
+#include <string>
 #include "cDistanceCarree.h"
 #include "cAlerte.h"
 
@@ -35,10 +35,10 @@ class cLigne
     public:
 
         /** Vector of Line-stops */
-        typedef vector<cGareLigne*> LineStops;
+        typedef std::vector<cGareLigne*> LineStops;
 
         /** Vector of circulations */
-        typedef vector<cTrain*> CirculationsVector;
+        typedef std::vector<cTrain*> CirculationsVector;
 
     protected:
         //! @name Donn�es et chainages
@@ -57,13 +57,13 @@ class cLigne
 
         //! \name Identification de la ligne
         //@{
-        cTexte vLibelleSimple;  //!< Libell� mentionn� dans le cartouche
-        cTexte vLibelleComplet; //!< Libell� mentionn� dans la feuille de route
-        cTexte vStyle;    //!< Style CSS du cartouche
-        cTexte vImage;    //!< Image � afficher en tant que cartouche
+        std::string vLibelleSimple;  //!< Libell� mentionn� dans le cartouche
+        std::string vLibelleComplet; //!< Libell� mentionn� dans la feuille de route
+        std::string vStyle;    //!< Style CSS du cartouche
+        std::string vImage;    //!< Image � afficher en tant que cartouche
         const std::string vCode;    //!< Code d'identification de la ligne
         std::string vNomPourIndicateur; //!< Libelle mentionne dans les tableaux d'indicateurs horaires
-        cTexte vGirouette;   //!< Destination affich�e sur les v�hicules
+        std::string vGirouette;   //!< Destination affich�e sur les v�hicules
         //@}
 
         //! \name Parametres
@@ -91,17 +91,17 @@ class cLigne
         void setAAfficherSurTableauDeparts( bool newVal );
         void setAAfficherSurIndicateurs( bool newVal );
         bool SetAUtiliserDansCalculateur( bool __Valeur );
-        void setGirouette( const cTexte& newGirouette );
-        void setImage( const cTexte& newImage );
-        void setLibelleComplet( const cTexte& newLibelleComplet );
-        void setLibelleSimple( const cTexte& newNom );
+        void setGirouette( const std::string& newGirouette );
+        void setImage( const std::string& newImage );
+        void setLibelleComplet( const std::string& newLibelleComplet );
+        void setLibelleSimple( const std::string& newNom );
         void setMateriel( cMateriel* );
         void setNomPourIndicateur( const std::string& newNom );
         void setResa( cModaliteReservation* );
         void setReseau( cReseau* newReseau );
-        // void    setServices(const cTexte& TamponJC, const cTexte& TamponAtt, const cTexte& TamponDernier
+        // void    setServices(const std::string& TamponJC, const std::string& TamponAtt, const std::string& TamponDernier
         //        , size_t LargeurColonne, cEnvironnement* curEnv, ofstream& FichierLOG);
-        void setStyle( const cTexte& newStyle );
+        void setStyle( const std::string& newStyle );
         void setVelo( cVelo* );
         void setHandicape( cHandicape* );
         void setTarif( cTarif* );
@@ -115,10 +115,10 @@ class cLigne
 
         //! \name Fonctions de modification de la base � chaud
         //@{
-        // tNumeroService addServiceHoraire(const synthese::time::Schedule* tbHoraires, const cTexte& newNumero, cJC* newCIS, tCodeBaseTrains newCodeBaseTrains=0, tNumeroService NombreNouveauxServices=1);
+        // tNumeroService addServiceHoraire(const synthese::time::Schedule* tbHoraires, const std::string& newNumero, cJC* newCIS, tCodeBaseTrains newCodeBaseTrains=0, tNumeroService NombreNouveauxServices=1);
         bool allowAddServiceHoraire( const synthese::time::Schedule* ) const;
         bool Sauvegarde() const;
-        // void    updateServiceHoraire(tNumeroService curNumeroService, const synthese::time::Schedule* tbHoraires, const cTexte& newNumero, cJC* newCIS, tCodeBaseTrains newCodeBaseTrains=0);
+        // void    updateServiceHoraire(tNumeroService curNumeroService, const synthese::time::Schedule* tbHoraires, const std::string& newNumero, cJC* newCIS, tCodeBaseTrains newCodeBaseTrains=0);
         //@}
 
         //! \name Accesseurs
@@ -130,22 +130,22 @@ class cLigne
         bool EstUneLigneAPied() const;
         const cAlerte& getAlerte() const;
         const std::string& getCode() const;
-        const cTexte& getGirouette() const;
+        const std::string& getGirouette() const;
         cHandicape* getHandicape() const;
-        const cTexte& getImage() const;
-        const cTexte& getLibelleComplet() const;
-        const cTexte& getLibelleSimple() const;
+        const std::string& getImage() const;
+        const std::string& getLibelleComplet() const;
+        const std::string& getLibelleSimple() const;
         const std::string& getNomPourIndicateur() const;
         cModaliteReservation* GetResa() const;
         cReseau* getReseau() const;
-        const cTexte& getStyle() const;
+        const std::string& getStyle() const;
         const cTarif* getTarif() const;
-        const vector<cTrain*> getServices() const { return vTrain; }
+        const std::vector<cTrain*> getServices() const { return vTrain; }
         cTrain* getTrain( size_t ) const;
         cVelo* getVelo() const;
         cMateriel* Materiel() const;
         const LineStops& getLineStops() const { return _lineStops; }
-        // cTexte     Code()        const;
+        // std::string     Code()        const;
         //@}
 
         //! \name Calculateurs

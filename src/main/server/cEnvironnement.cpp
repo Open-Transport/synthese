@@ -57,13 +57,6 @@ cEnvironnement::cEnvironnement( string directory, string pathToFormat, size_t id
   vDateMin.updateDate( synthese::time::TIME_MAX );
   vDateMax.updateDate( synthese::time::TIME_MIN );
 
-  cTexte __NomFichier;
-  cTexte __Chemin;
-  __Chemin << directory;
-
-  cTexte __CheminFormats;
-  __CheminFormats << pathToFormat;
-
 
 }
 
@@ -246,7 +239,7 @@ vector<cCommune*> cEnvironnement::searchTown( const std::string& name, size_t n 
 
       // ERR: Pas de controle de xx si /Cxx trouv�
       // ____________________________________________________________________________
-      /*void cEnvironnement::NomLigneUnique(cTexte& NomBase) const
+      /*void cEnvironnement::NomLigneUnique(std::string& NomBase) const
         {
 	int DernierNumeroTrouve;
 	int CodeTeste;
@@ -404,7 +397,7 @@ vector<cCommune*> cEnvironnement::searchTown( const std::string& name, size_t n 
              
 	     //SET PORTAGE LINUX
 	     //curCI->CopiePostScript("[");
-	     curCI->CopiePostScript(cTexte("["));
+	     curCI->CopiePostScript(std::string("["));
 	     //END PORTAGE
              
 	     for (curGI = curIndicateur->getPremiereGI(); curGI != NULL; curGI = curGI->getSuivant())
@@ -436,7 +429,7 @@ vector<cCommune*> cEnvironnement::searchTown( const std::string& name, size_t n 
 	     NumeroGare++;
 	     }
              
-	     curCI->CopiePostScript(cTexte("]"));
+	     curCI->CopiePostScript(std::string("]"));
              
 	     if (GareLigneDepart2->ArretLogique() == curLigne->PremiereGareLigne()->ArretLogique())
 	     curCI->setOrigineSpeciale(Terminus);
@@ -717,7 +710,7 @@ vector<cCommune*> cEnvironnement::searchTown( const std::string& name, size_t n 
 	     *curSauvegarde << ContenuSauvegarde;
 	     else
 	     {
-	     cTexte NomFichierCommandes;
+	     std::string NomFichierCommandes;
 	     NomFichierCommandes << vNomRepEnv;
 	     NomFichierCommandes.Repertoire();
 	     NomFichierCommandes << "JoursCirculation\\JC" << TXT(Code) << JCEXTENSION;
@@ -825,7 +818,7 @@ vector<cCommune*> cEnvironnement::searchTown( const std::string& name, size_t n 
 	- Si le masque est non vide et compos� de plusieurs codes s�par�s par des points virgules, alors les lignes sont successivement compar�es � chaque code fourni
       */ 
       /*
-        size_t cEnvironnement::NombreLignes(const cTexte& MasqueCode) const
+        size_t cEnvironnement::NombreLignes(const std::string& MasqueCode) const
         {
 	// Variables locales
 	int lNombreLignes = 0;
@@ -884,12 +877,12 @@ vector<cCommune*> cEnvironnement::searchTown( const std::string& name, size_t n 
          
         La relation suivante est v�rifi�e en fonctionnement nominal : \f$ TEMPS_{INCONNU}<=TEMPS_{MIN}<=TEMPS_{MIN ENVIRONNEMENT}<=TEMPS_{MIN CIRCULATIONS}<=TEMPS_{ACTUEL}<=TEMPS_{MAX CIRCULATIONS}<=TEMPS_{MAX ENVIRONNEMENT}<=TEMPS_{MAX} \f$.
       */
-      synthese::time::Date cEnvironnement::dateInterpretee( const cTexte& Texte ) const
+      synthese::time::Date cEnvironnement::dateInterpretee( const std::string& Texte ) const
         {
 	  synthese::time::Date tempDate;
-	  if ( !Texte.Taille() )
+	  if ( !Texte.size () )
 	    tempDate.updateDate( synthese::time::TIME_CURRENT );
-	  else if ( Texte.Taille() == 1 )
+	  else if ( Texte.size () == 1 )
 	    switch ( Texte[ 0 ] )
 	      {
 	      case TEMPS_MIN_ENVIRONNEMENT:
@@ -908,16 +901,16 @@ vector<cCommune*> cEnvironnement::searchTown( const std::string& name, size_t n 
 		tempDate.updateDate( Texte[ 0 ] );
 	      }
 	  else
-	    tempDate = std::string (Texte.Texte());
+	    tempDate = Texte;
 	  return tempDate;
         }
 
 
-      bool cEnvironnement::ControleNumerosArretCommuneDesignation( int nA, int nC, const cTexte& txtA ) const
+      bool cEnvironnement::ControleNumerosArretCommuneDesignation( int nA, int nC, const std::string& txtA ) const
         {
 	  return ( getLogicalPlace( nA ) != NULL
 		   && getLogicalPlace( nA ) ->getTown() ->getId() == nC
-		   && getLogicalPlace( nA ) ->getName() == string( txtA.Texte() )
+		   && getLogicalPlace( nA ) ->getName() == txtA 
                    );
         }
 
@@ -954,10 +947,10 @@ vector<cCommune*> cEnvironnement::searchTown( const std::string& name, size_t n 
 
 
 
-      bool cEnvironnement::ControleNumeroTexteCommune( int nC, const cTexte& txtC ) const
+      bool cEnvironnement::ControleNumeroTexteCommune( int nC, const std::string& txtC ) const
         {
 	  return ( getTown( ( size_t ) nC ) != NULL
-		   && getTown( nC ) ->getName() == string( txtC.Texte() )
+		   && getTown( nC ) ->getName() == txtC
                    );
         }
 
@@ -1192,7 +1185,7 @@ vector<cCommune*> cEnvironnement::searchTown( const std::string& name, size_t n 
         }
 
 
-      const cTexte& cEnvironnement::getNomRepertoireHoraires() const
+      const std::string& cEnvironnement::getNomRepertoireHoraires() const
         {
 	  return ( vNomRepertoireHoraires );
         }

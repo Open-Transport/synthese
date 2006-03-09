@@ -22,7 +22,7 @@ class cTarif;
 #include <map>
 #include <vector>
 #include <string>
-#include "cTexte.h"
+#include <string>
 #include "Interpretor.h"
 #include "cMateriel.h"
 
@@ -134,16 +134,16 @@ class cEnvironnement
 
         //! \name Noms des fichiers de donn�es (� remplacer par des cFichier)
         //@{
-        cTexte vNomFichier;    //!< Partie commune des noms de fichiers
+        std::string vNomFichier;    //!< Partie commune des noms de fichiers
         const std::string _path;   //!< Partie commune des envs
-        cTexte vNomFichierPhotos;
-        cTexte vNomFichierMateriel;
-        cTexte vNomFichierReseaux;
-        cTexte vNomFichierVelo;
-        cTexte vNomFichierHandicape;
-        cTexte vNomFichierTarif;
-        cTexte vNomFichierResa;
-        cTexte vNomRepertoireHoraires;
+        std::string vNomFichierPhotos;
+        std::string vNomFichierMateriel;
+        std::string vNomFichierReseaux;
+        std::string vNomFichierVelo;
+        std::string vNomFichierHandicape;
+        std::string vNomFichierTarif;
+        std::string vNomFichierResa;
+        std::string vNomRepertoireHoraires;
         std::string vNomRepertoireCarto;
         //@}
 
@@ -165,7 +165,7 @@ class cEnvironnement
 
         //! \name Fonctions de Chargement (� int�grer � un h�ritage de cFichier avec une m�thode virtuelle Charge)
         //@{
-        bool ChargeFichierHoraires( const cTexte& NomFichier );
+        bool ChargeFichierHoraires( const std::string& NomFichier );
         bool ChargeFichierMateriel();
         bool ChargeFichierReseaux();
         bool ChargeFichierVelo();
@@ -200,7 +200,7 @@ class cEnvironnement
         //! \name Modificateurs
         //@{
         void addTown( cCommune* const );
-        // cSauvegarde* JCSauvegardeModifier(tNumeroJC NumeroNewJC, const cTexte& newIntitule);
+        // cSauvegarde* JCSauvegardeModifier(tNumeroJC NumeroNewJC, const std::string& newIntitule);
         void JCSupprimerInutiles( bool Supprimer = false );
         void SetDateMinReelle( const synthese::time::Date& );
         void SetDateMaxReelle( const synthese::time::Date& );
@@ -209,13 +209,13 @@ class cEnvironnement
 
         //! \name Calculateurs
         //@{
-        vector<cCommune*> searchTown( const std::string&, size_t n = 0 ) const;
+        std::vector<cCommune*> searchTown( const std::string&, size_t n = 0 ) const;
         cCommune* getTown( const std::string& ) const;
-        void NomLigneUnique( cTexte& NomBase ) const;
-        bool ControleNumerosArretCommuneDesignation( int nA, int nC, const cTexte& txtA ) const;
-        bool ControleNumeroTexteCommune( int nC, const cTexte& txtC ) const;
+        void NomLigneUnique( std::string& NomBase ) const;
+        bool ControleNumerosArretCommuneDesignation( int nA, int nC, const std::string& txtA ) const;
+        bool ControleNumeroTexteCommune( int nC, const std::string& txtC ) const;
         size_t ProchainNumeroJC() const;
-        synthese::time::Date dateInterpretee( const cTexte& Texte ) const;
+        synthese::time::Date dateInterpretee( const std::string& Texte ) const;
         bool ControleDate( const synthese::time::Date& ) const;
         //@}
 
@@ -232,7 +232,7 @@ class cEnvironnement
         cJC* GetJC( const cJC::Calendar& MasqueAIdentifer, const cJC& JCBase ) const;
         cLigne* GetLigne( const std::string& ) const;
         cMateriel* GetMateriel( size_t ) const;
-        const cTexte& getNomRepertoireHoraires() const;
+        const std::string& getNomRepertoireHoraires() const;
         cDocument* GetDocument( size_t ) const;
         cModaliteReservation* getResa( size_t ) const;
         cVelo* getVelo( size_t ) const;
@@ -242,7 +242,7 @@ class cEnvironnement
         const size_t& Index() const;
         int NombreAnnees( int ) const;
         int NombreAnnees() const;
-        size_t NombreLignes( const cTexte& MasqueCode ) const;
+        size_t NombreLignes( const std::string& MasqueCode ) const;
         int PremiereAnnee() const;
 
         synmap::Topography& getTopography () { return _topography; }

@@ -1,5 +1,6 @@
 #include "LowerCaseFilterTest.h"
-#include "LowerCaseFilter.h"
+
+#include "01_util/LowerCaseFilter.h"
 
 #include <sstream>
 

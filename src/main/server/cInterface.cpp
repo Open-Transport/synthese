@@ -69,12 +69,12 @@ cInterface_Objet_AEvaluer_PageEcran& cInterface::Element( int __Index )
  * \param __Message Pr�fixe � ajouter aux messages du niveau sp�cifi�
  * \return true si le message a bien �t� enregistr� (test sur la taille de texte enregistr� uniquement)
  */
-bool cInterface::SetPrefixeAlerte( int __Niveau, const cTexte& __Message )
+bool cInterface::SetPrefixeAlerte( int __Niveau, const std::string& __Message )
 {
     if ( _PrefixesAlerte.SetElement( __Message, __Niveau ) != __Niveau )
         return false;
     else
-        return _PrefixesAlerte[ __Niveau ].Taille() == __Message.Taille();
+        return _PrefixesAlerte[ __Niveau ].size () == __Message.size ();
 }
 
 
@@ -85,7 +85,7 @@ bool cInterface::SetPrefixeAlerte( int __Niveau, const cTexte& __Message )
  * \return Le pr�fixe � apposer au message d'alerte
  * \warning Le niveau d'alerte n'est pas control�. Une valleur erronn�e peut g�n�rer une erreur
  */
-const cTexte& cInterface::getPrefixeAlerte( int __Niveau ) const
+const std::string& cInterface::getPrefixeAlerte( int __Niveau ) const
 {
     return _PrefixesAlerte[ __Niveau ];
 }
@@ -147,7 +147,7 @@ bool cInterface::OK() const
  \author Hugues Romain
  \date 2005
 */
-bool cInterface::SetLibelleJour( int __Index, const cTexte& __Libelle )
+bool cInterface::SetLibelleJour( int __Index, const std::string& __Libelle )
 {
     if ( __Index < 0 || __Index >= synthese::time::DAYS_PER_WEEK )
         return false;
@@ -165,7 +165,7 @@ bool cInterface::SetLibelleJour( int __Index, const cTexte& __Libelle )
  \author Hugues Romain
  \date 2005
 */
-bool cInterface::SetLibelleMois( int __Index, const cTexte& __Libelle )
+bool cInterface::SetLibelleMois( int __Index, const std::string& __Libelle )
 {
     if ( __Index < 0 || __Index > synthese::time::MONTHS_PER_YEAR )
         return false;
@@ -181,7 +181,7 @@ bool cInterface::SetLibelleMois( int __Index, const cTexte& __Libelle )
  \author Hugues Romain
  \date 2005
 */ /*
- const cTexte& cInterface::LibelleJourSemaine(int __Index) const
+ const std::string& cInterface::LibelleJourSemaine(int __Index) const
 {
  return _LibelleJourSemaine[__Index];
 }*/

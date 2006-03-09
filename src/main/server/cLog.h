@@ -34,7 +34,7 @@ typedef int tNumeroMessageStandard;
 */
 class cLog
 {
-        ofstream _Fichier;    //!< Fichier sur lequel seront �crits les �v�nements
+        std::ofstream _Fichier;    //!< Fichier sur lequel seront �crits les �v�nements
         tNiveauLog _Niveau; //!< Niveau minimal des �v�nements � consign�s (les autres sont ignor�s)
 
         //! \name Calculateurs
@@ -49,8 +49,8 @@ class cLog
 
         //! \name Messages par objet
         //@{
-        void EcritElementTrajet( tNiveauLog, const cElementTrajet*, const cTexte& __Message, const cTexte& __Code );
-        void EcritTrajet( tNiveauLog, const cTrajet&, int __Numero, const cTexte& __Message, const cTexte& __Code );
+        void EcritElementTrajet( tNiveauLog, const cElementTrajet*, const std::string& __Message, const std::string& __Code );
+        void EcritTrajet( tNiveauLog, const cTrajet&, int __Numero, const std::string& __Message, const std::string& __Code );
         //@}
 
     public:
@@ -58,16 +58,16 @@ class cLog
         //! \name Modificateurs
         //@{
         void SetNiveau( tNiveauLog __Niveau );
-        void Ouvrir( const cTexte& __NomFichier );
+        void Ouvrir( const std::string& __NomFichier );
         void Fermer();
         //@}
 
         //! \name M�thodes d'�criture
         //@{
-        void Ecrit( tNiveauLog, const cTexte& __Message, const cTexte& __Code );
-        void Ecrit( tNiveauLog, const cElementTrajet* __ElementTrajet, const cTexte& __Message, const cTexte& __Code );
-        void Ecrit( tNiveauLog, const cTrajet& __Trajet, int __Numero, const cTexte& __Message, const cTexte& __Code );
-        void Ecrit( tNumeroMessageStandard, const cTexte& __Objet = "", const cTexte& __Donnees = "" );
+        void Ecrit( tNiveauLog, const std::string& __Message, const std::string& __Code );
+        void Ecrit( tNiveauLog, const cElementTrajet* __ElementTrajet, const std::string& __Message, const std::string& __Code );
+        void Ecrit( tNiveauLog, const cTrajet& __Trajet, int __Numero, const std::string& __Message, const std::string& __Code );
+        void Ecrit( tNumeroMessageStandard, const std::string& __Objet = "", const std::string& __Donnees = "" );
         //@}
 
         cLog( tNiveauLog __Niveau = LogInconnu );

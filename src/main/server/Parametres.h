@@ -25,7 +25,6 @@ typedef enum tBool3 //!< Booleen 3 etats
 /** @} */
 
 
-typedef long int tVitesseKMH;
 
 //! Nombre par défaut d'espaces de calcul alloués par environnement
 #define NOMBRE_CALCULATEURS_PAR_ENVIRONNEMENT_DEFAUT 10
@@ -53,8 +52,8 @@ typedef long int tVitesseKMH;
 
 
 // Macro texte
-#define TXT(a) cTexte().Copie((int) a)
-#define TXT2(a, b) cTexte().Copie((int) a, b)
+#define TXT(a) std::string().Copie((int) a)
+#define TXT2(a, b) std::string().Copie((int) a, b)
 
 
 // Base de données

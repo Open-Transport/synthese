@@ -6,12 +6,15 @@
 #define SYNTHESE_CINTERFACE_H
 
 #include "cInterface_Objet_AEvaluer_PageEcran.h"
+#include "cTableauDynamique.h"
+
 #include "04_time/HourPeriod.h"
 #include "04_time/Date.h"
 
 
 // Inclusions
-#include "cTexte.h"
+#include <string>
+#include <vector>
 
 #include "04_time/module.h"
 
@@ -29,7 +32,7 @@ class cInterface;
 /** Impl�mentation de la notion d'Interface
  \author Hugues Romain
  \date 2001-2005
- \todo Lancer une d�marche globale de d�finition du format de sortie en collaboration avec cTexte et ses d�riv�s
+ \todo Lancer une d�marche globale de d�finition du format de sortie en collaboration avec std::string et ses d�riv�s
  @ingroup m11
  
 Cette classe d�finit les diff�rentes interfaces pour l'affichage de r�sultats issus de calculs SYNTHESE. Une interface est constitu�e de mod�les d'affichage, permettant la d�finition du graphisme en sortie, fournis � SYNTHESE en tant que donn�es. Des mod�les de fichiers de sortie doivent �tre fournis au chargement d'apr�s un format de codage d�fini pour l'occasion.</p>
@@ -54,9 +57,9 @@ class cInterface
         const size_t _id;         //!< Index de l'interface dans la base de donn�es SYNTHESE
         cInterface_Objet_AEvaluer_PageEcran* _Element;        //!< Tableau des �l�ments standard d�finis
         std::vector<synthese::time::HourPeriod*> _Periode;        //!< Tableau des p�riodes de la journ�e
-        cTexte _LibelleJourSemaine[ synthese::time::DAYS_PER_WEEK ]; //!< Tableau des libell�s des jours de semaine
-        cTexte _LibelleMois[ synthese::time::MONTHS_PER_YEAR + 1 ];   //!< Tableau des libell�s des mois
-        cTableauDynamiqueObjets<cTexte> _PrefixesAlerte;      //!< Pr�fixes de messages d'alerte
+        std::string _LibelleJourSemaine[ synthese::time::DAYS_PER_WEEK ]; //!< Tableau des libell�s des jours de semaine
+        std::string _LibelleMois[ synthese::time::MONTHS_PER_YEAR + 1 ];   //!< Tableau des libell�s des mois
+        cTableauDynamique<std::string> _PrefixesAlerte;      //!< Pr�fixes de messages d'alerte
 
 
     public:
@@ -71,8 +74,8 @@ class cInterface
         const cInterface_Objet_AEvaluer_PageEcran& operator[] ( int ) const;
         const size_t& Index() const;
         const synthese::time::HourPeriod* GetPeriode( size_t __Index = ALL_DAY_PERIOD ) const;
-        const cTexte& getPrefixeAlerte( int __NiveauAlerte ) const;
-        //  const cTexte&        LibelleJourSemaine(int)       const;
+        const std::string& getPrefixeAlerte( int __NiveauAlerte ) const;
+        //  const std::string&        LibelleJourSemaine(int)       const;
         //@}
 
         //! \name Calculateurs
@@ -112,9 +115,9 @@ class cInterface
         //! \name Modificateurs
         //@{
         void AddPeriode( synthese::time::HourPeriod* );
-        bool SetLibelleJour( int, const cTexte& );
-        bool SetLibelleMois( int, const cTexte& );
-        bool SetPrefixeAlerte( int, const cTexte& );
+        bool SetLibelleJour( int, const std::string& );
+        bool SetLibelleMois( int, const std::string& );
+        bool SetPrefixeAlerte( int, const std::string& );
         //@}
 
         cInterface( const size_t& );

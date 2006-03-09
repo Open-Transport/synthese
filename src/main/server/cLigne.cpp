@@ -74,7 +74,7 @@ cLigne::cLigne(cLigne* LigneACopier, cEnvironnement* Environnement)
  \author Hugues Romain
  \date 2002
  */
-cLigne::cLigne( const string& newCode, cAxe* const newAxe, cEnvironnement* const environment )
+cLigne::cLigne( const std::string& newCode, cAxe* const newAxe, cEnvironnement* const environment )
         : vAxe( newAxe )
         , vCirculation( environment->PremiereAnnee(), environment->DerniereAnnee(), 0, "" )
         , vResa( environment->getResa( 0 ) )
@@ -246,14 +246,10 @@ void cLigne::MajCirculation()
 cLigne* cLigne::operator =( const cLigne& LigneACopier )
 {
     // Copie des parametres
-    vLibelleSimple.Vide();
-    vLibelleSimple << LigneACopier.vLibelleSimple;
-    vLibelleComplet.Vide();
-    vLibelleComplet << LigneACopier.vLibelleComplet;
-    vStyle.Vide();
-    vStyle << LigneACopier.vStyle;
-    vImage.Vide();
-    vImage << LigneACopier.vImage;
+    vLibelleSimple = LigneACopier.vLibelleSimple;
+    vLibelleComplet = LigneACopier.vLibelleComplet;
+    vStyle = LigneACopier.vStyle;
+    vImage = LigneACopier.vImage;
     vNomPourIndicateur = LigneACopier.vNomPourIndicateur;
     vResa = LigneACopier.vResa;
     vVelo = LigneACopier.vVelo;
@@ -278,7 +274,7 @@ bool cLigne::EstUneLigneAPied() const
 
 /*! \brief Accesseur Girouette
 */
-const cTexte& cLigne::getGirouette() const
+const std::string& cLigne::getGirouette() const
 {
     return vGirouette;
 }
@@ -309,16 +305,14 @@ bool cLigne::SetAUtiliserDansCalculateur( bool __Valeur )
     return true;
 }
 
-void cLigne::setImage( const cTexte& newImage )
+void cLigne::setImage( const std::string& newImage )
 {
-    vImage.Vide();
-    vImage << newImage;
+    vImage = newImage;
 }
 
-void cLigne::setLibelleComplet( const cTexte& newLibelleComplet )
+void cLigne::setLibelleComplet( const std::string& newLibelleComplet )
 {
-    vLibelleComplet.Vide();
-    vLibelleComplet << newLibelleComplet;
+    vLibelleComplet = newLibelleComplet;
 }
 
 void cLigne::setAAfficherSurTableauDeparts( bool newVal )
@@ -341,10 +335,9 @@ void cLigne::setVelo( cVelo* newVal )
     vVelo = newVal;
 }
 
-void cLigne::setGirouette( const cTexte& newGirouette )
+void cLigne::setGirouette( const std::string& newGirouette )
 {
-    vGirouette.Vide();
-    vGirouette << newGirouette;
+    vGirouette = newGirouette;
 }
 
 // SET Gestion du filtre Velo
@@ -407,19 +400,17 @@ const std::string& cLigne::getNomPourIndicateur() const
 }
 
 
-void cLigne::setStyle( const cTexte& newStyle )
+void cLigne::setStyle( const std::string& newStyle )
 {
-    vStyle.Vide();
-    vStyle << newStyle;
+    vStyle = newStyle;
 }
 
-void cLigne::setLibelleSimple( const cTexte& newNom )
+void cLigne::setLibelleSimple( const std::string& newNom )
 {
-    vLibelleSimple.Vide();
-    vLibelleSimple << newNom;
+    vLibelleSimple = newNom;
     if ( vNomPourIndicateur.size() == 0)
     {
-	setNomPourIndicateur (std::string (vLibelleSimple.Texte ()));
+	setNomPourIndicateur (vLibelleSimple);
     }
 }
 
@@ -431,7 +422,7 @@ void cLigne::setNomPourIndicateur( const std::string& newNom )
     out.push (filter);
     out.push (sout);
     
-    out << newNom << flush;
+    out << newNom << std::flush;
     vNomPourIndicateur = sout.str ();
 }
 
@@ -467,7 +458,7 @@ cReseau* cLigne::getReseau() const
  \author Hugues Romain
  \date 2005
 */
-const cTexte& cLigne::getLibelleComplet() const
+const std::string& cLigne::getLibelleComplet() const
 {
     return vLibelleComplet;
 }
@@ -479,7 +470,7 @@ const cTexte& cLigne::getLibelleComplet() const
  \author Hugues Romain
  \date 2005
 */
-const cTexte& cLigne::getLibelleSimple() const
+const std::string& cLigne::getLibelleSimple() const
 {
     return vLibelleSimple;
 }
@@ -491,7 +482,7 @@ const cTexte& cLigne::getLibelleSimple() const
  \author Hugues Romain
  \date 2005
 */
-const cTexte& cLigne::getStyle() const
+const std::string& cLigne::getStyle() const
 {
     return vStyle;
 }
@@ -503,7 +494,7 @@ const cTexte& cLigne::getStyle() const
  \author Hugues Romain
  \date 2005
 */
-const cTexte& cLigne::getImage() const
+const std::string& cLigne::getImage() const
 {
     return vImage;
 }
@@ -514,9 +505,9 @@ const cTexte& cLigne::getImage() const
  \author Hugues Romain
  \date 2005
 */ /*
-inline cTexte cLigne::Code() const
+inline std::string cLigne::Code() const
 {
- cTexte tResultat;
+ std::string tResultat;
  Code(tResultat);
  return tResultat;
 } */

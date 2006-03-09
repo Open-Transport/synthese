@@ -14,7 +14,7 @@
 
 unsigned short cServeurMnesia::_NodeId = 1;
 
-cServeurMnesia::cServeurMnesia( const cTexte& __Node, const cTexte& __Cookie )
+cServeurMnesia::cServeurMnesia( const std::string& __Node, const std::string& __Cookie )
 {
     _ErlFD = -1;
     erl_init( NULL, 0 );
@@ -35,13 +35,13 @@ cServeurMnesia::~cServeurMnesia()
     _ErlFD = -1;
 }
 
-int cServeurMnesia::Select( const cTexte& __Table, const cTableauDynamique<cTexte>& __Champs, const cTexte& __Where, const cTableauDynamique<cTexte>& __Ordre, int __Limite, cResultatBaseDeDonnees& __Resultat )
+int cServeurMnesia::Select( const std::string& __Table, const cTableauDynamique<std::string>& __Champs, const std::string& __Where, const cTableauDynamique<std::string>& __Ordre, int __Limite, cResultatBaseDeDonnees& __Resultat )
 {
-    cTexte __Args;
+    std::string __Args;
     ETERM *__Eres;
     int __Count = 0;
     __Args << "[" << __Table << ",[";
-    for ( int i = 0; i < __Champs.Taille(); i++ )
+    for ( int i = 0; i < __Champs.size (); i++ )
     {
         if ( i > 0 )
             __Args << ",";
@@ -94,9 +94,9 @@ int cServeurMnesia::Select( const cTexte& __Table, const cTableauDynamique<cText
     return __Count;
 }
 
-bool cServeurMnesia::Insert( const cTexte& __Table, const cTexte& __Valeurs, bool __Replace = true )
+bool cServeurMnesia::Insert( const std::string& __Table, const std::string& __Valeurs, bool __Replace = true )
 {
-    cTexte __Args;
+    std::string __Args;
     ETERM *__Eres;
     bool __IsOK = false;
     __Args << "[" << __Table;
@@ -112,9 +112,9 @@ bool cServeurMnesia::Insert( const cTexte& __Table, const cTexte& __Valeurs, boo
     return __IsOK;
 }
 
-int cServeurMnesia::Update( const cTexte& __Table, const cTableauDynamique<cTexte>& __Champs, const cTexte& __Valeurs, const cTexte& __Where, int __Limite = INCONNU )
+int cServeurMnesia::Update( const std::string& __Table, const cTableauDynamique<std::string>& __Champs, const std::string& __Valeurs, const std::string& __Where, int __Limite = INCONNU )
 {
-    cTexte __Args;
+    std::string __Args;
     ETERM *__Eres;
     int __Count = -1;
     __Args << "[" << __Table << ",";
@@ -130,9 +130,9 @@ int cServeurMnesia::Update( const cTexte& __Table, const cTableauDynamique<cText
     return __Count;
 }
 
-bool cServeurMnesia::Delete( const cTexte& __Table, const cTexte& __Where, const cTableauDynamique<cTexte>& __Ordre, int __Limite = INCONNU )
+bool cServeurMnesia::Delete( const std::string& __Table, const std::string& __Where, const cTableauDynamique<std::string>& __Ordre, int __Limite = INCONNU )
 {
-    cTexte __Args;
+    std::string __Args;
     ETERM *__Eres;
     bool __IsOK = false;
     __Args << "[" << __Table << ",";
@@ -148,9 +148,9 @@ bool cServeurMnesia::Delete( const cTexte& __Table, const cTexte& __Where, const
     return __IsOK;
 }
 
-int cServeurMnesia::Count( const cTexte& __Table, const cTexte& __Where )
+int cServeurMnesia::Count( const std::string& __Table, const std::string& __Where )
 {
-    cTexte __Args;
+    std::string __Args;
     int __Resultat = -1;
     ETERM *__Eres;
     __Args << "[" << __Table;
@@ -164,9 +164,9 @@ int cServeurMnesia::Count( const cTexte& __Table, const cTexte& __Where )
     return __Resultat;
 }
 
-int cServeurMnesia::Max( const cTexte& __Table, const cTexte& __Champ, const cTexte& __Where )
+int cServeurMnesia::Max( const std::string& __Table, const std::string& __Champ, const std::string& __Where )
 {
-    cTexte __Args;
+    std::string __Args;
     int __Resultat = -1;
     ETERM *__Eres;
     __Args << "[" << __Table;
@@ -181,9 +181,9 @@ int cServeurMnesia::Max( const cTexte& __Table, const cTexte& __Champ, const cTe
     return __Resultat;
 }
 
-int cServeurMnesia::NextID( const cTexte& __Table )
+int cServeurMnesia::NextID( const std::string& __Table )
 {
-    cTexte __Args;
+    std::string __Args;
     int __Resultat = -1;
     ETERM *__Eres;
     __Args << "[" << __Table << "]";
@@ -197,7 +197,7 @@ int cServeurMnesia::NextID( const cTexte& __Table )
 }
 
 // fonction obsolete, laissé au cas ou
-void cServeurMnesia::SQL( const cTexteSQL& __RequeteSQL )
+void cServeurMnesia::SQL( const std::stringSQL& __RequeteSQL )
 {
     ETERM * __Eres;
     __Eres = _call( "rcsdb", "sql", __RequeteSQL.Texte() );
@@ -209,11 +209,11 @@ void cServeurMnesia::SQL( const cTexteSQL& __RequeteSQL )
 // il faut ecrire en minuscule
 // les chaines doivent être avec " et non '
 // seul AND est géré
-cTexte cServeurMnesia::_where2erl( const cTexte& __Where )
+std::string cServeurMnesia::_where2erl( const std::string& __Where )
 {
     // in:  WHERE nom = "romain" AND id < 3
     // out: [{nom,'==',"romain"},{id,'<',3}]
-    cTexte __Final;
+    std::string __Final;
     char buffer[ 1024 ];
     char *ptr, *last;
     int cont = 1;
@@ -234,7 +234,7 @@ cTexte cServeurMnesia::_where2erl( const cTexte& __Where )
             ptr++;
         *ptr = 0;
         ptr++;
-        __Final << cTexte( last );
+        __Final << std::string( last );
         while ( *ptr == ' ' )
             ptr++;
         last = ptr;
@@ -245,7 +245,7 @@ cTexte cServeurMnesia::_where2erl( const cTexte& __Where )
         if ( *last == '=' )
             __Final << ",'==',";
         else
-            __Final << ",'" << cTexte( last ) << "',";
+            __Final << ",'" << std::string( last ) << "',";
         while ( *ptr == ' ' )
             ptr++;
         last = ptr;
@@ -254,7 +254,7 @@ cTexte cServeurMnesia::_where2erl( const cTexte& __Where )
         cont = *ptr;
         *ptr = 0;
         ptr++;
-        __Final << cTexte( last ) << "}";
+        __Final << std::string( last ) << "}";
         if ( cont )
             __Final << ",";
     }
@@ -267,11 +267,11 @@ cTexte cServeurMnesia::_where2erl( const cTexte& __Where )
 // il faut ecrire en minuscule
 // les chaines doivent être avec " et non '
 // seul AND est géré
-cTexte cServeurMnesia::_value2erl( const cTexte& __Where )
+std::string cServeurMnesia::_value2erl( const std::string& __Where )
 {
     // in:  nom = "toto" AND prenom = "titi"
     // out: [{nom,"toto"},{prenom,"titi"}]
-    cTexte __Final;
+    std::string __Final;
     char buffer[ 1024 ];
     char *ptr, *last;
     int cont = 1;
@@ -287,7 +287,7 @@ cTexte cServeurMnesia::_value2erl( const cTexte& __Where )
             ptr++;
         *ptr = 0;
         ptr++;
-        __Final << "{" << cTexte( last );
+        __Final << "{" << std::string( last );
         while ( *ptr == ' ' || *ptr == '=' )
             ptr++;
         last = ptr;
@@ -295,7 +295,7 @@ cTexte cServeurMnesia::_value2erl( const cTexte& __Where )
             ptr++;
         *ptr = 0;
         ptr++;
-        __Final << "," << cTexte( last ) << "}";
+        __Final << "," << std::string( last ) << "}";
         while ( *ptr == ' ' )
             ptr++;
         last = ptr; // contiendra AND ou rien
@@ -312,7 +312,7 @@ cTexte cServeurMnesia::_value2erl( const cTexte& __Where )
 }
 
 
-ETERM *cServeurMnesia::_call( const cTexte& __Mod, const cTexte& __Fun, const cTexte& __Args )
+ETERM *cServeurMnesia::_call( const std::string& __Mod, const std::string& __Fun, const std::string& __Args )
 {
     ETERM * __Eres, *__Earg;
     __Eres = NULL;
@@ -329,7 +329,7 @@ ETERM *cServeurMnesia::_call( const cTexte& __Mod, const cTexte& __Fun, const cT
     return __Eres;
 }
 
-void cServeurMnesia::_send( const cTexte& dst, const cTexte& msg )
+void cServeurMnesia::_send( const std::string& dst, const std::string& msg )
 {
     /*
     ETERM *edst,*emsg;
@@ -390,17 +390,17 @@ int main( int argc, char **argv )
     cResultatBaseDeDonnees __Resultat;
 
     cout << __srv._value2erl( " nom = \"toto\" AND prenom = \"titi\"" );
-    cTexte __Table( "personnes" );
-    cTexte __Where1( "where nom = \"romain\"" );
-    cTexte __Where2( "where nom = \"romain\" and id < 5" );
-    cTexte __Champ1( "nom" );
-    cTexte __Champ2( "prenom" );
-    cTableauDynamiqueObjets<cTexte> __Champs;
+    std::string __Table( "personnes" );
+    std::string __Where1( "where nom = \"romain\"" );
+    std::string __Where2( "where nom = \"romain\" and id < 5" );
+    std::string __Champ1( "nom" );
+    std::string __Champ2( "prenom" );
+    cTableauDynamiqueObjets<std::string> __Champs;
     __Champs += __Champ1;
     __Champs += __Champ2;
 
     __srv.Select( __Table, __Champs, __Where1, NULL, 0, __Resultat );
-    cout << __srv.Max( __Table, cTexte( "id" ), __Where1 ) << endl;
+    cout << __srv.Max( __Table, std::string( "id" ), __Where1 ) << endl;
     cout << __srv.Count( __Table, __Where1 ) << endl;
     cout << __srv.Count( __Table, __Where2 ) << endl;
 }

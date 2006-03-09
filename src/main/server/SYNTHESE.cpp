@@ -85,55 +85,56 @@ Nomenclature des messages :
 */
 void SYNTHESE::ChargeMessagesStandard()
 {
-    if ( !_MessageStandard.Taille() )
-    {
-        /*! <tr><th colspan="4">Application SYNTHESE</th></tr>
-        <tr><td>APP-001</td><td>Normal</td><td>Indique un dï¿½marrage de l'application.</td><td></td></tr>" */
-        _CodesMessageStandard.SetElement( "APP-001", MESSAGE_APP_START );
-        _MessageStandard.SetElement( "Démarrage de l'application. Ouverture des fichiers de log standard", MESSAGE_APP_START );
-        _NiveauMessageStandard.SetElement( LogInfo, MESSAGE_APP_START );
+// MJ    if ( !_MessageStandard.size() )
+//     {
+//         // <tr><th colspan="4">Application SYNTHESE</th></tr>
+//         // <tr><td>APP-001</td><td>Normal</td><td>Indique un dï¿½marrage de l'application.</td><td></td></tr>"
+ 
+//         _CodesMessageStandard.SetElement( "APP-001", MESSAGE_APP_START );
+//         _MessageStandard.SetElement( "Démarrage de l'application. Ouverture des fichiers de log standard", MESSAGE_APP_START );
+//         _NiveauMessageStandard.SetElement( LogInfo, MESSAGE_APP_START );
 
-        /*! <tr><th colspan="4">Sites</th></tr>
-        <tr><td>SIT-001</td><td>Erreur fatale</td><td>L'allocation des sites n'a pas fonctionnï¿½.</td><td>Augmenter l'espace mï¿½moire disponible</td></tr>" */
-        _CodesMessageStandard.SetElement( "SIT-001", MESSAGE_SITES_PBALLOC );
-        _MessageStandard.SetElement( "Erreur d'allocation fichier des sites", MESSAGE_SITES_PBALLOC );
-        _NiveauMessageStandard.SetElement( LogError, MESSAGE_SITES_PBALLOC );
+//         /*! <tr><th colspan="4">Sites</th></tr>
+//         <tr><td>SIT-001</td><td>Erreur fatale</td><td>L'allocation des sites n'a pas fonctionnï¿½.</td><td>Augmenter l'espace mï¿½moire disponible</td></tr>" */
+//         _CodesMessageStandard.SetElement( "SIT-001", MESSAGE_SITES_PBALLOC );
+//         _MessageStandard.SetElement( "Erreur d'allocation fichier des sites", MESSAGE_SITES_PBALLOC );
+//         _NiveauMessageStandard.SetElement( LogError, MESSAGE_SITES_PBALLOC );
 
-        /*! <tr><td>SIT-002</td><td>Erreur fatale</td><td>Le fichier sites.per n'a pas ï¿½tï¿½ trouvï¿½ dans le rï¿½pertoire de l'environnement.</td><td>Vï¿½rifier que le fichier existe et que son nom est bien orthographiï¿½</td></tr>" */
-        _CodesMessageStandard.SetElement( "SIT-002", MESSAGE_SITES_PBOUVRIR );
-        _MessageStandard.SetElement( "Fichier sites.per non trouv2", MESSAGE_SITES_PBOUVRIR );
-        _NiveauMessageStandard.SetElement( LogError, MESSAGE_SITES_PBOUVRIR );
+//         /*! <tr><td>SIT-002</td><td>Erreur fatale</td><td>Le fichier sites.per n'a pas ï¿½tï¿½ trouvï¿½ dans le rï¿½pertoire de l'environnement.</td><td>Vï¿½rifier que le fichier existe et que son nom est bien orthographiï¿½</td></tr>" */
+//         _CodesMessageStandard.SetElement( "SIT-002", MESSAGE_SITES_PBOUVRIR );
+//         _MessageStandard.SetElement( "Fichier sites.per non trouv2", MESSAGE_SITES_PBOUVRIR );
+//         _NiveauMessageStandard.SetElement( LogError, MESSAGE_SITES_PBOUVRIR );
 
-        /*! <tr><td>SIT-003</td><td>Element ignorï¿½</td><td>Un site n'a pu ï¿½tre enregistrï¿½ dans l'application ete n sera donc pas disponible.</td><td></td></tr>" */
-        _CodesMessageStandard.SetElement( "SIT-003", MESSAGE_SITES_PBENREG );
-        _MessageStandard.SetElement( "Problème d'enregistrement du site", MESSAGE_SITES_PBENREG );
-        _NiveauMessageStandard.SetElement( LogWarning, MESSAGE_SITES_PBENREG );
+//         /*! <tr><td>SIT-003</td><td>Element ignorï¿½</td><td>Un site n'a pu ï¿½tre enregistrï¿½ dans l'application ete n sera donc pas disponible.</td><td></td></tr>" */
+//         _CodesMessageStandard.SetElement( "SIT-003", MESSAGE_SITES_PBENREG );
+//         _MessageStandard.SetElement( "Problème d'enregistrement du site", MESSAGE_SITES_PBENREG );
+//         _NiveauMessageStandard.SetElement( LogWarning, MESSAGE_SITES_PBENREG );
 
-        /*! <tr><td>SIT-004</td><td>Element ignorï¿½</td><td>Un site pointe sur un environnement inexistant et ne sera donc pas disponible.</td><td>Vï¿½rifier la valeur du champ environnement dans la description du site</td></tr>" */
-        _CodesMessageStandard.SetElement( "SIT-004", MESSAGE_SITES_PBENV );
-        _MessageStandard.SetElement( "Site : Environnement incorrect déclaré", MESSAGE_SITES_PBENV );
-        _NiveauMessageStandard.SetElement( LogWarning, MESSAGE_SITES_PBENV );
+//         /*! <tr><td>SIT-004</td><td>Element ignorï¿½</td><td>Un site pointe sur un environnement inexistant et ne sera donc pas disponible.</td><td>Vï¿½rifier la valeur du champ environnement dans la description du site</td></tr>" */
+//         _CodesMessageStandard.SetElement( "SIT-004", MESSAGE_SITES_PBENV );
+//         _MessageStandard.SetElement( "Site : Environnement incorrect déclaré", MESSAGE_SITES_PBENV );
+//         _NiveauMessageStandard.SetElement( LogWarning, MESSAGE_SITES_PBENV );
 
-        /*! <tr><td>SIT-005</td><td>Element ignorï¿½</td><td>Un site pointe sur une interface inexistante et ne sera donc pas disponible.</td><td>Vï¿½rifier la valeur du champ interface dans la description du site</td></tr>" */
-        _CodesMessageStandard.SetElement( "SIT-005", MESSAGE_SITES_PBINT );
-        _MessageStandard.SetElement( "Site : Environnement incorrect déclaré", MESSAGE_SITES_PBINT );
-        _NiveauMessageStandard.SetElement( LogWarning, MESSAGE_SITES_PBINT );
-
-
-        /*! <tr><th colspan="4">Points d'arrï¿½t</th></tr>
-        <tr><td>GAR-001</td><td>Elï¿½ment ignorï¿½</td><td>La dï¿½signation de l'arrï¿½t n'est pas correctement entrï¿½e</td><td>Vï¿½rifier la conformitï¿½ de la dï¿½signation</tr>" */
-        _CodesMessageStandard.SetElement( "GAR-001", MESSAGE_GARE_DESIGNATION_INCORRECTE );
-        _MessageStandard.SetElement( "Désignation incorrecte", MESSAGE_GARE_DESIGNATION_INCORRECTE );
-        _NiveauMessageStandard.SetElement( LogError, MESSAGE_GARE_DESIGNATION_INCORRECTE );
+//         /*! <tr><td>SIT-005</td><td>Element ignorï¿½</td><td>Un site pointe sur une interface inexistante et ne sera donc pas disponible.</td><td>Vï¿½rifier la valeur du champ interface dans la description du site</td></tr>" */
+//         _CodesMessageStandard.SetElement( "SIT-005", MESSAGE_SITES_PBINT );
+//         _MessageStandard.SetElement( "Site : Environnement incorrect déclaré", MESSAGE_SITES_PBINT );
+//         _NiveauMessageStandard.SetElement( LogWarning, MESSAGE_SITES_PBINT );
 
 
-        /*! <tr><th colspan="4">Calculateur</th></tr>
-        <tr><td>CAL-001</td><td>Calcul annulï¿½</td><td>Le nombre maximal de calculs simultanï¿½s par a ï¿½tï¿½ dï¿½passï¿½.</td><td>Si cela se produit trop souvent, augmenter le nombre de serveurs</td></tr>" */
-        _CodesMessageStandard.SetElement( "CAL-001", MESSAGE_CALC_SATURE );
-        _MessageStandard.SetElement( "Nombre de calculs simultanés dépassé", MESSAGE_CALC_SATURE );
-        _NiveauMessageStandard.SetElement( LogError, MESSAGE_CALC_SATURE );
+//         /*! <tr><th colspan="4">Points d'arrï¿½t</th></tr>
+//         <tr><td>GAR-001</td><td>Elï¿½ment ignorï¿½</td><td>La dï¿½signation de l'arrï¿½t n'est pas correctement entrï¿½e</td><td>Vï¿½rifier la conformitï¿½ de la dï¿½signation</tr>" */
+//         _CodesMessageStandard.SetElement( "GAR-001", MESSAGE_GARE_DESIGNATION_INCORRECTE );
+//         _MessageStandard.SetElement( "Désignation incorrecte", MESSAGE_GARE_DESIGNATION_INCORRECTE );
+//         _NiveauMessageStandard.SetElement( LogError, MESSAGE_GARE_DESIGNATION_INCORRECTE );
 
-    }
+
+//         /*! <tr><th colspan="4">Calculateur</th></tr>
+//         <tr><td>CAL-001</td><td>Calcul annulï¿½</td><td>Le nombre maximal de calculs simultanï¿½s par a ï¿½tï¿½ dï¿½passï¿½.</td><td>Si cela se produit trop souvent, augmenter le nombre de serveurs</td></tr>" */
+//         _CodesMessageStandard.SetElement( "CAL-001", MESSAGE_CALC_SATURE );
+//         _MessageStandard.SetElement( "Nombre de calculs simultanés dépassé", MESSAGE_CALC_SATURE );
+//         _NiveauMessageStandard.SetElement( LogError, MESSAGE_CALC_SATURE );
+
+//     }
     /*! </table> */
 }
 
@@ -236,7 +237,7 @@ bool SYNTHESE::FicheHoraire( ostream &pCtxt,
        )
     {
         // Message d'alerte
-        cTexte alerte = cTexte( "" );
+        std::string alerte = std::string( "" );
 
         // Nouveau calculateur
         cCalculateur __Calculateur( __Site->getEnvironnement()
@@ -296,9 +297,7 @@ bool SYNTHESE::FicheHoraire( ostream &pCtxt,
             __Parametres << taxibus; //13
             __Parametres << tarif; //14
 	    */
-	    cTexte __txtDateDepart;
-            __txtDateDepart << __DateDepart.toInternalString ();
-            // MJ ro review __Parametres << __txtDateDepart; //15
+		// MJ __Parametres <<  __DateDepart.toInternalString (); //15
             __Site->Affiche( pCtxt, INTERFACEFicheHoraire, __Parametres, ( const void* ) & __Calculateur.getSolution() );
 
             // Remise ï¿½ disposition de l'espace de calcul
@@ -324,7 +323,7 @@ Cette mï¿½thode ne sollicite pas l'usage d'un espace de calcul.
 \todo Calculer la liste des communes avant l'affichage et passer le rï¿½sultat ï¿½ la methode d'interface. Pour cela rï¿½cupï¿½rer le parametre nombre d'arrets dans l'interface (ce qui permettra de virer dï¿½finitivement les .ini et compagnie)
  */
 bool SYNTHESE::ListeCommunes( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                              , bool depart, const cTexte& Entree ) const
+                              , bool depart, const std::string& Entree ) const
 {
     cInterface_Objet_Connu_ListeParametres __Parametres;
     __Parametres << Entree;
@@ -364,9 +363,9 @@ bool SYNTHESE::Accueil( ostream &pCtxt, ostream& pCerr, const cSite* __Site ) co
 //BEGIN Une documentation de grande taille est dï¿½crite pour cette entitï¿½ en fin de fichier.
 //END   Prendre garde ï¿½ mettre ï¿½ jour le lien dans ce fichier en cas de changement de prototype.
 bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                        , const cTexte& txtCD, int nCD, int nAD, int nDD,
-                        const cTexte& txtCA, int nCA, int nAA, int nDA,
-                        const cTexte& txtAD, const cTexte& txtAA,
+                        , const std::string& txtCD, int nCD, int nAD, int nDD,
+                        const std::string& txtCA, int nCA, int nAA, int nDA,
+                        const std::string& txtAD, const std::string& txtAA,
                         const synthese::time::Date& __DateDepart, int codePeriode,
                         tribool velo, tribool handicape, tribool taxibus, int tarif ) const
 {
@@ -379,12 +378,12 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
     /*    cAssocResult resPD, resPA;
         cAssocResult::iterator it;
         vector<string> output;
-        cTexte newtxtCD,newtxtAD,newtxtCA,newtxtAA;
+        std::string newtxtCD,newtxtAD,newtxtCA,newtxtAA;
     #ifdef UNIX
         pthread_mutex_lock( &mutex_associateur );
     #endif
         // utilisation de l'associateur pour le départ
-        _Associator->Try(txtCD.Texte(),txtAD.Texte());
+        _Associator->Try(txtCD,txtAD);
         resPD = _Associator->MatchCity(1); // liste des communes
         it = resPD.begin();
         cout << "commune " << it->id << " ";
@@ -405,7 +404,7 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
         // vérification d'ambiguité sur les arrets
      
         // utilisation de l'associateur pour l'arrivée
-        _Associator->Try(txtCA.Texte(),txtAA.Texte());
+        _Associator->Try(txtCA,txtAA);
         resPA = _Associator->MatchCity(1); // liste des communes
         it = resPA.begin();
         cout << "commune " << it->id << " ";
@@ -452,20 +451,20 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
         {
             if ( nCD == INCONNU )
             {
-                tbCommune = __Site->getEnvironnement() ->searchTown( string( txtCD.Texte() ), 2 );
+                tbCommune = __Site->getEnvironnement() ->searchTown( txtCD, 2 );
                 if ( tbCommune.size() == 1 )
                     nCD = tbCommune[ 0 ] ->getId();
             }
 
             if ( nCD != INCONNU )
             {
-                if ( txtAD.Taille() == 0 )
+                if ( txtAD.size () == 0 )
                 {
                     nAD = __Site->getEnvironnement() ->getTown( nCD ) ->getMainLogicalPlace() ->getId();
                 }
                 else
                 {
-                    tbPADe = __Site->getEnvironnement() ->getTown( nCD ) ->searchLogicalPlaces( string( txtAD.Texte() ), 2 );
+                    tbPADe = __Site->getEnvironnement() ->getTown( nCD ) ->searchLogicalPlaces( txtAD, 2 );
                     if ( tbPADe.size() == 1 )
                     {
                         nAD = tbPADe[ 0 ] ->getId();
@@ -478,19 +477,19 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
         {
             if ( nCA == INCONNU )
             {
-                tbCommune = __Site->getEnvironnement() ->searchTown( string( txtCA.Texte() ), 2 );
+                tbCommune = __Site->getEnvironnement() ->searchTown( txtCA, 2 );
                 if ( tbCommune.size() == 1 )
                     nCA = tbCommune[ 0 ] ->getId();
             }
             if ( nCA != INCONNU )
             {
-                if ( txtAA.Taille() == 0 )
+                if ( txtAA.size () == 0 )
                 {
                     nAA = __Site->getEnvironnement() ->getTown( nCA ) ->getMainLogicalPlace() ->getId();
                 }
                 else
                 {
-                    tbPADe = __Site->getEnvironnement() ->getTown( nCA ) ->searchLogicalPlaces( string( txtAA.Texte() ), 2 );
+                    tbPADe = __Site->getEnvironnement() ->getTown( nCA ) ->searchLogicalPlaces( txtAA, 2 );
                     if ( tbPADe.size() == 1 )
                     {
                         nAA = tbPADe[ 0 ] ->getId();
@@ -506,9 +505,7 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
             cInterface_Objet_Connu_ListeParametres __Parametres;
             __Parametres << nAD; //0
             __Parametres << nAA; //1
-            cTexte __txtDate;
-            __txtDate << __DateDepart.toInternalString ();
-            __Parametres << __txtDate; //2
+            __Parametres << __DateDepart.toInternalString (); //2
             __Parametres << ""; //3
             __Parametres << ""; //4
             __Parametres << codePeriode; //5
@@ -541,7 +538,7 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
             __Parametres << codePeriode; //14
 
             //Message d'alerte
-            cTexte alerte = cTexte( "" );
+            std::string alerte = std::string( "" );
             /*   if (nCD==-1)
             \todo REFAIRE HRO    alerte << MESSAGE_ERREUR_COMMUNE_DEPART;
                else if (nCA==-1)
@@ -558,7 +555,7 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
             __Parametres << taxibus; //18
 	    */
             __Parametres << tarif; //19
-            __Parametres << cTexte() << __DateDepart.toInternalString (); //20
+            __Parametres << std::string() << __DateDepart.toInternalString (); //20
             __Site->Affiche( pCtxt, INTERFACEErreurArretsFicheHoraire, __Parametres );
         }
 
@@ -583,12 +580,12 @@ bool SYNTHESE::ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
  \todo Voir pourquoi ReservationEnLigne renvoie faux
  */
 bool SYNTHESE::FormulaireReservation( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                                      , const cTexte& tCodeLigne, int iNumeroService
+                                      , const std::string& tCodeLigne, int iNumeroService
                                       , int iNumeroPADepart, int iNumeroPAArrivee, const synthese::time::Date& __DateDepart ) const
 {
     cLigne * curLigne;
 
-    if ( ( curLigne = __Site->getEnvironnement() ->GetLigne( string( tCodeLigne.Texte() ) ) )
+    if ( ( curLigne = __Site->getEnvironnement() ->GetLigne( tCodeLigne ) )
             && __Site->getEnvironnement() ->getLogicalPlace( iNumeroPADepart )
             && __Site->getEnvironnement() ->getLogicalPlace( iNumeroPAArrivee )
             && curLigne->GetResa()
@@ -603,7 +600,7 @@ bool SYNTHESE::FormulaireReservation( ostream &pCtxt, ostream& pCerr, const cSit
         __Parametres << iNumeroService;      //2 numero service
         __Parametres << iNumeroPADepart;       //3
         __Parametres << iNumeroPAArrivee;       //4
-        __Parametres << cTexte() << __DateDepart.toInternalString (); //5
+        __Parametres << std::string() << __DateDepart.toInternalString (); //5
 
         // Creation de l'affichage
         __Site->Affiche( pCtxt, INTERFACEFormResa, __Parametres );
@@ -638,11 +635,11 @@ bool SYNTHESE::FormulaireReservation( ostream &pCtxt, ostream& pCerr, const cSit
  \date 2005
  */
 bool SYNTHESE::ValidationReservation( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                                      , const cTexte& CodeLigne, int NumeroService, int iNumeroPADepart, int iNumeroPAArrivee
-                                      , const synthese::time::Date& tDateDepart, const cTexte& tNom
-                                      , const cTexte& tPrenom, const cTexte& tAdresse, const cTexte& tEmail
-                                      , const cTexte& tTelephone, const cTexte& tNumAbonne
-                                      , const cTexte& tAdressePADepart, const cTexte& tAdressePAArrivee
+                                      , const std::string& CodeLigne, int NumeroService, int iNumeroPADepart, int iNumeroPAArrivee
+                                      , const synthese::time::Date& tDateDepart, const std::string& tNom
+                                      , const std::string& tPrenom, const std::string& tAdresse, const std::string& tEmail
+                                      , const std::string& tTelephone, const std::string& tNumAbonne
+                                      , const std::string& tAdressePADepart, const std::string& tAdressePAArrivee
                                       , int iNombrePlaces ) const
 {
     /* // Variables locales
@@ -679,7 +676,7 @@ bool SYNTHESE::ValidationReservation( ostream &pCtxt, ostream& pCerr, const cSit
               , (size_t) iNombrePlaces, &DatabaseManager);
       
       // Preparation des parametres pour la construction de l'interface
-      cTexte message;
+      std::string message;
       if (Succes)
        message = "Rï¿½servation effectuï¿½e";
       else
@@ -711,7 +708,7 @@ bool SYNTHESE::ValidationReservation( ostream &pCtxt, ostream& pCerr, const cSit
  \return 0 si une sortie a ï¿½tï¿½ effectuï¿½e, 1 sinon
  \todo intï¿½grer les messages d'erreur ou de validation dans l'interface (ils ont rien compris......)
 */
-bool SYNTHESE::AnnulationReservation( ostream &pCtxt, ostream& pCerr, const cSite* __Site, const cTexte& CodeReservation, const cTexte& Nom ) const
+bool SYNTHESE::AnnulationReservation( ostream &pCtxt, ostream& pCerr, const cSite* __Site, const std::string& CodeReservation, const std::string& Nom ) const
 {
     /* // Gestionnaire de base de donnï¿½es
      cDatabaseManager DatabaseManager;
@@ -725,11 +722,11 @@ bool SYNTHESE::AnnulationReservation( ostream &pCtxt, ostream& pCerr, const cSit
       bool Succes = false;
       
       // Prï¿½paration de la requï¿½te de controle des coordonnï¿½es de la rï¿½servation
-      cTexte Requete;
+      std::string Requete;
       Requete << "SELECT " << TABLE_RESERVATION_MOD_RESA
         << " FROM " << TABLE_RESERVATION
-        << " WHERE LOWER(" << TABLE_RESERVATION_NOM << ")=LOWER('" << cTexteSQL(Nom) << "')"
-         << " AND " << TABLE_RESERVATION_NUMERO << "='" << cTexteSQL(CodeReservation) << "'"
+        << " WHERE LOWER(" << TABLE_RESERVATION_NOM << ")=LOWER('" << std::stringSQL(Nom) << "')"
+         << " AND " << TABLE_RESERVATION_NUMERO << "='" << std::stringSQL(CodeReservation) << "'"
         << " LIMIT 1;";
       
       // Lancement de la requï¿½te
@@ -748,7 +745,7 @@ bool SYNTHESE::AnnulationReservation( ostream &pCtxt, ostream& pCerr, const cSit
       }
       
       // Preparation des parametres pour la construction de l'interface
-      cTexte message;
+      std::string message;
       if (Succes)
        message = "Annulation effectuï¿½e";
       else
@@ -782,17 +779,16 @@ bool SYNTHESE::AnnulationReservation( ostream &pCtxt, ostream& pCerr, const cSit
 Liste des arrï¿½ts de la commune souhaitï¿½e. Si aucune commune sï¿½lectionnï¿½e liste des communes en premier.
 */
 bool SYNTHESE::ListeArrets( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                            , bool depart, const cTexte& Commune, int NumeroCommune, const cTexte& __Arret ) const
+                            , bool depart, const std::string& Commune, int NumeroCommune, const std::string& __Arret ) const
 {
-    cTexte Arret;
-    Arret = __Arret;
+    std::string Arret (__Arret) ;
 
     // 1: Recherche de la commune entrï¿½e.
     cCommune* curCommune = __Site->getEnvironnement() ->getTown( NumeroCommune );
 
     if ( curCommune == NULL )
     {
-        vector<cCommune*> tbCommune = __Site->getEnvironnement() ->searchTown( string( Commune.Texte() ), 2 );
+        vector<cCommune*> tbCommune = __Site->getEnvironnement() ->searchTown( Commune, 2 );
         if ( tbCommune.size() != 1 )
         {
             pCtxt << "<script>alert(\"Aucune commune " << ( depart ? "de départ" : "d'arrivée" ) << " ne correspond. Veuillez la modifier.\")</script>";
@@ -804,9 +800,6 @@ bool SYNTHESE::ListeArrets( ostream &pCtxt, ostream& pCerr, const cSite* __Site
 
     if ( curCommune != NULL )
     {
-        if ( Arret.Taille() == 0 )
-            Arret.Vide();
-
         cInterface_Objet_Connu_ListeParametres __Parametres;
         __Parametres << Arret;
         __Parametres << curCommune->getId();
@@ -1023,7 +1016,7 @@ bool SYNTHESE::TermineCalculateur( long vThreadId )
     return true;
 }
 
-/*! \fn bool SYNTHESE::ValidFH(ostream &pCtxt, ostream &pCerr, const cSite *__Site, const cTexte &txtCD, int nCD, int nAD, int nDD, const cTexte &txtCA, int nCA, int nAA, int nDA, const cTexte &txtAD, const cTexte &txtAA, const synthese::time::Date &DateDepart, int codePeriode, tribool velo, tribool handicape, tribool taxibus, tNumeroTarif tarif) const
+/*! \fn bool SYNTHESE::ValidFH(ostream &pCtxt, ostream &pCerr, const cSite *__Site, const std::string &txtCD, int nCD, int nAD, int nDD, const std::string &txtCA, int nCA, int nAA, int nDA, const std::string &txtAD, const std::string &txtAA, const synthese::time::Date &DateDepart, int codePeriode, tribool velo, tribool handicape, tribool taxibus, tNumeroTarif tarif) const
  
 \brief Valide la saisie du formulaire d'entree de la recherche d'itinï¿½raire
 \param pCtxt Le flux de sortie sur lequel ï¿½crire les rï¿½sultats
@@ -1105,15 +1098,17 @@ cTableauAffichage* SYNTHESE::GetTbDep( const string& __Code ) const
 void SYNTHESE::SetNiveauLog( tNiveauLog __NiveauLog )
 {
     _NiveauLOG = __NiveauLog;
-    _FichierLogAcces.SetNiveau( _NiveauLOG );
-    _FichierLogBoot.SetNiveau( _NiveauLOG );
+//    _FichierLogAcces.SetNiveau( _NiveauLOG );
+//    _FichierLogBoot.SetNiveau( _NiveauLOG );
 }
 
 void SYNTHESE::OuvrirLogs()
 {
-    if ( _CheminLOG.Taille() )
+    /* MJ review log
+
+    if ( _CheminLOG.size () )
     {
-        cTexte __Chemin;
+        std::string __Chemin;
 
         __Chemin << _CheminLOG << SEPARATEUR_REPERTOIRE_TXT << LOG_FICHIER_BOOT;
         _FichierLogBoot.Ouvrir( __Chemin );
@@ -1124,6 +1119,7 @@ void SYNTHESE::OuvrirLogs()
 
         _FichierLogBoot.Ecrit( MESSAGE_APP_START );
     }
+    */
 }
 
 
@@ -1148,9 +1144,9 @@ cInterface* SYNTHESE::GetInterface( size_t __Index ) const
 }
 
 /*
-bool SYNTHESE::InitAssociateur(const cTexte& __NomAssociateur)
+bool SYNTHESE::InitAssociateur(const std::string& __NomAssociateur)
 {
-    _Associator = new cAssociator(__NomAssociateur.Texte());
+    _Associator = new cAssociator(__NomAssociateur);
     return _Associator->IsLoaded();
 }
 */ 
@@ -1163,7 +1159,7 @@ tNiveauLog SYNTHESE::getNiveauLog() const
 }
 
 
-void SYNTHESE::SetCheminLog( const cTexte& __CheminLog )
+void SYNTHESE::SetCheminLog( const std::string& __CheminLog )
 {
     _CheminLOG = __CheminLog;
     OuvrirLogs();
@@ -1174,11 +1170,12 @@ void SYNTHESE::SetCheminLog( const cTexte& __CheminLog )
 /*! \brief Accesseur chemin des log
  \return le niveau de log
 */
-const cTexte& SYNTHESE::getCheminLog() const
+const std::string& SYNTHESE::getCheminLog() const
 {
     return _CheminLOG;
 }
 
+/*
 cLog& SYNTHESE::FichierLogAcces()
 {
     return _FichierLogAcces;
@@ -1188,3 +1185,4 @@ cLog& SYNTHESE::FichierLogBoot()
 {
     return _FichierLogBoot;
 }
+*/

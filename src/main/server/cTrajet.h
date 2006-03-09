@@ -20,7 +20,7 @@ class cTrajet;
 class cTrajet
 {
     private:
-        cTexte _NiveauMaxAlerte;   //!< Niveau maximal de messages d'alerte du trajet, li�s aux arr�ts ou aux lignes
+        std::string _NiveauMaxAlerte;   //!< Niveau maximal de messages d'alerte du trajet, li�s aux arr�ts ou aux lignes
         cElementTrajet* _PremierET;     //!< Acc�s aux donn�es du trajet
         cElementTrajet* _DernierET;     //!< Acc�s direct au dernier �l�ment du trajet
         int _Taille;     //!< Nombre d'�l�ments contenus dans le trajet
@@ -43,7 +43,7 @@ class cTrajet
         const int& getDureeRoulee() const;
         const synthese::time::DateTime& getMomentArrivee() const;
         const synthese::time::DateTime& getMomentDepart() const;
-        const cTexte& getNiveauMaxAlerte() const;
+        const std::string& getNiveauMaxAlerte() const;
         cElementTrajet* getPremierElement();
         const cElementTrajet* PremierElement() const;
         const cElementTrajet* DernierElement() const;
@@ -97,7 +97,7 @@ inline void cTrajet::DelieTous()
  \author Hugues Romain
  \date 2005
 */
-inline const cTexte& cTrajet::getNiveauMaxAlerte() const
+inline const std::string& cTrajet::getNiveauMaxAlerte() const
 {
     return _NiveauMaxAlerte;
 }

@@ -42,10 +42,9 @@ bool cTrain::ReservationOK( const synthese::time::DateTime& __MomentDepart, cons
 
 
 
-void cTrain::setNumero( const cTexte& newVal )
+void cTrain::setNumero( const std::string& newVal )
 {
-    vNumero.Vide();
-    vNumero << newVal;
+    vNumero = newVal;
 }
 
 void cTrain::setServiceContinu()
@@ -92,7 +91,7 @@ void cTrain::setAmplitudeServiceContinu( const int& newVal )
     vEtalementCadence = newVal;
 }
 
-const cTexte& cTrain::getNumero() const
+const std::string& cTrain::getNumero() const
 {
     return ( vNumero );
 }

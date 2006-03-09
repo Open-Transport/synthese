@@ -14,8 +14,6 @@ class cLigne;
 class cVelo;
 class cHandicape;
 
-class cTexte;
-
 namespace synthese
 {
 namespace time
@@ -114,7 +112,7 @@ class cGareLigne
         void setArriveeSuivante( cGareLigne* newVal );
         void setDepartCorrespondancePrecedent( cGareLigne* );
         void setDepartPrecedent( cGareLigne* newVal );
-        void setHoraires( const cTexte& Tampon, int Position, int LargeurColonne, bool DepartDifferentPassage );
+        void setHoraires( const std::string& Tampon, int Position, int LargeurColonne, bool DepartDifferentPassage );
         void setTypeDA( tTypeGareLigneDA );
         //@}
 

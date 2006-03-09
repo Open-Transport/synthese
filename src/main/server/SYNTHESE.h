@@ -13,7 +13,8 @@ class cTableauAffichage;
 class cCalculateur;
 class TimeTables;
 
-#include "cTexte.h"
+#include <string>
+#include <vector>
 
 #include "70_server/Request.h"
 #include "cLog.h"
@@ -44,6 +45,8 @@ class SYNTHESE
         /** TimeTables map */
         typedef std::map<std::string, TimeTables*> TimeTablesMap;
 
+	
+
     private:
 
         //! \name Tableaux de donnï¿½es
@@ -58,15 +61,23 @@ class SYNTHESE
         //! \name Fichier de log
         //@{
         tNiveauLog _NiveauLOG;    //!< Niveau de log
-        cTexte _CheminLOG;    //!< Rï¿½pertoire ou poser les fichiers de trace (vide = pas de trace)
+        std::string _CheminLOG;    //!< Rï¿½pertoire ou poser les fichiers de trace (vide = pas de trace)
+	/* MJ review log
         cLog _FichierLogBoot;  //!< Fichier de log du boot
         cLog _FichierLogAcces;  //!< Fichier de log des accï¿½s
         // cLog   _FichierLogResa;  //!< Fichier de log des rï¿½servations
-        cTableauDynamiqueObjets<cTexte> _MessageStandard;  //!< Messages standard
-        cTableauDynamiqueObjets<cTexte> _CodesMessageStandard; //!< Codes Messages standard
-        cTableauDynamique<tNiveauLog> _NiveauMessageStandard; //!< Messages standard
-        map<long, cCalculateur*> _ThreadCalculateur; //!< Lien thread->calculateur
-        friend void cLog::Ecrit( tNumeroMessageStandard, const cTexte&, const cTexte& );
+
+
+        std::vector<std::string> _MessageStandard;  //!< Messages standard
+        std::vector<std::string> _CodesMessageStandard; //!< Codes Messages standard
+        std::vector<tNiveauLog> _NiveauMessageStandard; //!< Messages standard
+
+	*/
+
+
+
+        std::map<long, cCalculateur*> _ThreadCalculateur; //!< Lien thread->calculateur
+        friend void cLog::Ecrit( tNumeroMessageStandard, const std::string&, const std::string& );
         //@}
 
         //! \name Fonctions de gestion des logs
@@ -77,43 +88,43 @@ class SYNTHESE
 
         //! \name Fonctions pouvant ï¿½tre appelï¿½es dans une requï¿½te
         //@{
-        bool FicheHoraire( ostream &pCtxt, ostream& pCerr, const cSite* __Site
+        bool FicheHoraire( std::ostream &pCtxt, std::ostream& pCerr, const cSite* __Site
                            , int NumeroGareOrigine, int NumeroGareDestination
                            , const synthese::time::Date& DateDepart, int codePeriode
                            , boost::logic::tribool velo, boost::logic::tribool handicape, boost::logic::tribool taxibus, int tarif
                            , long vThreadId );
-        bool ListeCommunes( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                            , bool depart, const cTexte& Entree ) const;
-        bool ListeArrets( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                          , bool depart, const cTexte& Commune, int NumeroCommune, const cTexte& Arret ) const;
-        bool Accueil( ostream &pCtxt, ostream& pCerr, const cSite* __Site ) const;
-        bool ValidFH( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                      , const cTexte& txtCD, int nCD, int nAD, int nDD
-                      , const cTexte& txtCA, int nCA, int nAA, int nDA
-                      , const cTexte& txtAD, const cTexte& txtAA
+        bool ListeCommunes( std::ostream &pCtxt, std::ostream& pCerr, const cSite* __Site
+                            , bool depart, const std::string& Entree ) const;
+        bool ListeArrets( std::ostream &pCtxt, std::ostream& pCerr, const cSite* __Site
+                          , bool depart, const std::string& Commune, int NumeroCommune, const std::string& Arret ) const;
+        bool Accueil( std::ostream &pCtxt, std::ostream& pCerr, const cSite* __Site ) const;
+        bool ValidFH( std::ostream &pCtxt, std::ostream& pCerr, const cSite* __Site
+                      , const std::string& txtCD, int nCD, int nAD, int nDD
+                      , const std::string& txtCA, int nCA, int nAA, int nDA
+                      , const std::string& txtAD, const std::string& txtAA
                       , const synthese::time::Date& DateDepart, int codePeriode
                       , boost::logic::tribool velo, boost::logic::tribool handicape, boost::logic::tribool taxibus, int tarif ) const;
-        bool FormulaireReservation( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                                    , const cTexte& tCodeLigne, int iNumeroService
+        bool FormulaireReservation( std::ostream &pCtxt, std::ostream& pCerr, const cSite* __Site
+                                    , const std::string& tCodeLigne, int iNumeroService
                                     , int iNumeroPADepart, int iNumeroPAArrivee, const synthese::time::Date& tDateDepart ) const;
-        bool ValidationReservation( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                                    , const cTexte& CodeLigne
+        bool ValidationReservation( std::ostream &pCtxt, std::ostream& pCerr, const cSite* __Site
+                                    , const std::string& CodeLigne
                                     , int NumeroService, int iNumeroPADepart, int iNumeroPAArrivee
-                                    , const synthese::time::Date& tDateDepart, const cTexte& tNom
-                                    , const cTexte& tPrenom, const cTexte& tAdresse, const cTexte& tEmail
-                                    , const cTexte& tTelephone, const cTexte& tNumAbonne
-                                    , const cTexte& tAdressePADepart, const cTexte& tAdressePAArrivee
+                                    , const synthese::time::Date& tDateDepart, const std::string& tNom
+                                    , const std::string& tPrenom, const std::string& tAdresse, const std::string& tEmail
+                                    , const std::string& tTelephone, const std::string& tNumAbonne
+                                    , const std::string& tAdressePADepart, const std::string& tAdressePAArrivee
                                     , int iNombrePlaces ) const;
-        bool AnnulationReservation( ostream &pCtxt, ostream& pCerr, const cSite* __Site
-                                    , const cTexte& CodeReservation, const cTexte& Nom ) const;
-        bool TableauDepartsGare( ostream& pCtxt, ostream& pCerr, const cTableauAffichage*
+        bool AnnulationReservation( std::ostream &pCtxt, std::ostream& pCerr, const cSite* __Site
+                                    , const std::string& CodeReservation, const std::string& Nom ) const;
+        bool TableauDepartsGare( std::ostream& pCtxt, std::ostream& pCerr, const cTableauAffichage*
                                  , const synthese::time::DateTime& ) const;
         //@}
 
     public:
         //! \name Exï¿½cution de requï¿½te
         //@{
-        bool ExecuteRequete( ostream& pCtxt, ostream& pCerr, synthese::server::Request&, long vThreadId );
+        bool ExecuteRequete( std::ostream& pCtxt, std::ostream& pCerr, synthese::server::Request&, long vThreadId );
         //@}
         //! \name Terminaison forcée d'un calculateur
         //@{
@@ -131,16 +142,18 @@ class SYNTHESE
 
         //! \name Modificateurs
         //@{
-        // bool InitAssociateur(const cTexte& NomAssociateur);
-        bool Charge( const cTexte& NomFichier );
+        // bool InitAssociateur(const std::string& NomAssociateur);
+        bool Charge( const std::string& NomFichier );
         void SetNiveauLog( tNiveauLog );
-        void SetCheminLog( const cTexte& );
+        void SetCheminLog( const std::string& );
         //@}
 
         //! \name Accesseurs logs avec droit de modification
         //@{
+/*
         cLog& FichierLogBoot();
         cLog& FichierLogAcces();
+*/
         //@}
 
         //! \name Accesseurs
@@ -151,7 +164,7 @@ class SYNTHESE
         cTableauAffichage* GetTbDep( const std::string& ) const;
         TimeTables* getTimeTables( const std::string& ) const;
         tNiveauLog getNiveauLog() const;
-        const cTexte& getCheminLog() const;
+        const std::string& getCheminLog() const;
         //@}
 
         //! \name Constructeur destructeur

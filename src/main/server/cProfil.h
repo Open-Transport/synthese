@@ -4,7 +4,9 @@
 
 class cProfil;
 
-#include "cTexte.h"
+#include <string>
+#include <vector>
+
 #include "cReservation.h" 
 //#include "cAxeTAD.h"    CRO supprimé car pas de paramètres au constructeur
 #include "cAxe.h"  // CRO
@@ -17,16 +19,16 @@ class cProfil : public cPersonne
     protected:
         //! \name login
         //@{
-        cTexte _User;
-        cTexte _Password;
+        std::string _User;
+        std::string _Password;
         //@}
 
         //! \name droits
         //@{
         bool _ResaPerso;     //!< Droit de prendre des réservations pour soi
         bool _ResaAll;     //!< Droit de prendre des réservations pour tous
-        // CRO cTableauDynamique<cAxeTAD*> _ViewResasAxe;    //!< Droit de consulter les réservations des axes TAD
-        cTableauDynamique<cAxe*> _ViewResasAxe;    //!< Droit de consulter les réservations des axes TAD
+
+        std::vector<cAxe*> _ViewResasAxe;    //!< Droit de consulter les réservations des axes TAD
         bool _GestionPersonne;   //!< Droit d'administrer une personne
         bool _GestionProfilNonPerso;  //!< Droit d'administrer le profil d'un autre
         bool _GestionProfilAdmin;  //!< Droit d'administrer le profil d'un administrateur
@@ -44,7 +46,7 @@ class cProfil : public cPersonne
     public:
         //! \name Calculateurs controle des droits
         //@{
-        bool PasswordCorrect( const cTexte& ) const;
+        bool PasswordCorrect( const std::string& ) const;
         bool ResaAutorisee( const cReservation& ) const;
         bool GestionPersonneAutorisee() const;
         bool GestionProfilNonPersoAutorisee() const;
@@ -52,12 +54,12 @@ class cProfil : public cPersonne
 
         //! \name Rapports
         //@{
-        cTableauDynamiqueObjets<cReservation> ListeReservations( bool _DontPassees = false ) const;
+        std::vector<cReservation> ListeReservations( bool _DontPassees = false ) const;
         //@}
 
         //! \name Modificateurs du profil
         //@{
-        bool SetLogin( const cTexte& __User, const cTexte& __Password );
+        bool SetLogin( const std::string& __User, const std::string& __Password );
         //@}
 
         cProfil();

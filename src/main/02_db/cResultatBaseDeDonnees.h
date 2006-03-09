@@ -5,9 +5,11 @@
 #include "cResultatBaseDeDonnees_Cellule.h"
 #include "Parametres.h"
 #include <map>
+#include "cTableauDynamique.h"
+
 
 typedef cTableauDynamiquePointeurs<cResultatBaseDeDonnees_Cellule*> tResultatBaseDeDonnees_Enregistrement;
-typedef map<char*, int> tPositionChamps;
+typedef std::map<char*, int> tPositionChamps;
 
 /** @ingroup m02 */
 class cResultatBaseDeDonnees
@@ -20,10 +22,10 @@ class cResultatBaseDeDonnees
     public:
         //! \name Accès aux données
         //@{
-        int getNombre ( const cTexte& __Champ, int __Index = INCONNU );
-        cTexte getTexte ( const cTexte& __Champ, int __Index = INCONNU );
-        synthese::time::DateTime getMoment ( const cTexte& __Champ, int __Index = INCONNU );
-        tBool3 getBool ( const cTexte& __Champ, int __Index = INCONNU );
+        int getNombre ( const std::string& __Champ, int __Index = INCONNU );
+        std::string getTexte ( const std::string& __Champ, int __Index = INCONNU );
+        synthese::time::DateTime getMoment ( const std::string& __Champ, int __Index = INCONNU );
+        tBool3 getBool ( const std::string& __Champ, int __Index = INCONNU );
         bool GoPremier();
         bool GoSuivant();
         //@}
@@ -31,7 +33,7 @@ class cResultatBaseDeDonnees
         //! \name Autres accesseurs
         //@{
         int Taille() const;
-        const map<char*, int>& getPositionsChamps() const;
+        const std::map<char*, int>& getPositionsChamps() const;
         //@}
 
         //! \name Modificateurs

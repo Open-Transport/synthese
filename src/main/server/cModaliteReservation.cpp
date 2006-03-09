@@ -234,30 +234,30 @@ const synthese::time::Hour& cModaliteReservation::GetDelaiMinHeureMax() const
 }
 
 
-bool cModaliteReservation::SetDoc( const string& newVal )
+bool cModaliteReservation::SetDoc( const std::string& newVal )
 {
     vDescription = newVal;
     return ( true );
 }
 
-bool cModaliteReservation::SetTel( const string& newVal )
+bool cModaliteReservation::SetTel( const std::string& newVal )
 {
     vNumeroTelephone = newVal;
     return ( true );
 }
 
-bool cModaliteReservation::SetHorairesTel( const string& newVal )
+bool cModaliteReservation::SetHorairesTel( const std::string& newVal )
 {
     vHorairesTelephone = newVal;
     return ( true );
 }
 
-const string& cModaliteReservation::GetSiteWeb() const
+const std::string& cModaliteReservation::GetSiteWeb() const
 {
     return ( vSiteWeb );
 }
 
-const string& cModaliteReservation::GetHorairesTelephone() const
+const std::string& cModaliteReservation::GetHorairesTelephone() const
 {
     return ( vHorairesTelephone );
 }
@@ -372,7 +372,7 @@ bool cModaliteReservation::setReferenceEstLOrigine ( const bool newVal )
 
 
 /*! \brief Affichage XML de la modalit� de r�servation
- \todo Refaire cete m�thode (ils ont rien compris.......) et la mettre sous forme de flux cTexteXML
+ \todo Refaire cete m�thode (ils ont rien compris.......) et la mettre sous forme de flux std::stringXML
 */ 
 /*template <class T> T& cModaliteReservation::toXML(T& Tampon, const cTrain* Circulation, synthese::time::DateTime momentDepart) const
 {
@@ -399,13 +399,13 @@ bool cModaliteReservation::setReferenceEstLOrigine ( const bool newVal )
  return (Tampon);
 }*/
 
-bool cModaliteReservation::SetSiteWeb( const string &newVal )
+bool cModaliteReservation::SetSiteWeb( const std::string &newVal )
 {
     vSiteWeb = newVal;
     return ( true );
 }
 
-const string& cModaliteReservation::GetTelephone() const
+const std::string& cModaliteReservation::GetTelephone() const
 {
     return ( vNumeroTelephone );
 }

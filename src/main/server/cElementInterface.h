@@ -9,7 +9,10 @@
 #include "cSite.h"
 #include "cObjetInterface.h"
 #include "Parametres.h"
-#include "cTexte.h"
+#include <string>
+
+#include "01_util/Conversion.h"
+
 
 class cInterface_Objet_Element;
 class cInterface_Objet_Element_Parametre;
@@ -105,7 +108,7 @@ class cInterface_Objet_Element_Parametre : public cInterface_Objet_Element
         virtual cInterface_Objet_Element* Copie( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres ) const = 0;
         virtual int Nombre( const cInterface_Objet_Connu_ListeParametres& __Parametres
                             , const void* __Objet = NULL ) const = 0;
-        virtual const cTexte& Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres
+        virtual const std::string& Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres
                                      , const void* __Objet = NULL ) const = 0;
         int Evalue( std::ostream&, const cInterface_Objet_Connu_ListeParametres&
                        , const void* ObjetAAfficher = NULL, const cSite* __Site = NULL ) const;
@@ -125,7 +128,7 @@ class cInterface_Objet_Element_Parametre : public cInterface_Objet_Element
 class cInterface_Objet_Element_Parametre_TexteConnu : public cInterface_Objet_Element_Parametre
 {
     protected:
-        cTexte _Texte; //!< Texte contenu par l'objet
+        std::string _Texte; //!< Texte contenu par l'objet
 
     public:
 
@@ -135,13 +138,13 @@ class cInterface_Objet_Element_Parametre_TexteConnu : public cInterface_Objet_El
         cInterface_Objet_Element* Copie( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres ) const;
         int Nombre( const cInterface_Objet_Connu_ListeParametres& __Parametres
                     , const void* __Objet = NULL ) const;
-        const cTexte& Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres
+        const std::string& Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres
                              , const void* __Objet = NULL ) const;
         //@}
 
         //! \name Constructeur
         //@{
-        explicit cInterface_Objet_Element_Parametre_TexteConnu( const cTexte& );
+        explicit cInterface_Objet_Element_Parametre_TexteConnu( const std::string& );
         explicit cInterface_Objet_Element_Parametre_TexteConnu( const int );
         ~cInterface_Objet_Element_Parametre_TexteConnu() { }
         //@}
@@ -169,7 +172,7 @@ class cInterface_Objet_Element_Parametre_TexteConnu : public cInterface_Objet_El
                 cInterface_Objet_Element* Copie( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres ) const;
                 int Nombre( const cInterface_Objet_Connu_ListeParametres& __Parametres
                             , const void* __Objet = NULL ) const;
-                const cTexte& Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres
+                const std::string& Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres
                                      , const void* __Objet = NULL ) const;
                 //@}
 
@@ -223,10 +226,10 @@ class cInterface_Objet_Element_Parametre_TexteConnu : public cInterface_Objet_El
 
         inline int cInterface_Objet_Element_Parametre_TexteConnu::Nombre( const cInterface_Objet_Connu_ListeParametres&, const void* ) const
         {
-            return _Texte.GetNombre();
+            return synthese::util::Conversion::ToInt (_Texte);
         }
 
-        inline const cTexte& cInterface_Objet_Element_Parametre_TexteConnu::Texte( const cInterface_Objet_Connu_ListeParametres&, const void* ) const
+        inline const std::string& cInterface_Objet_Element_Parametre_TexteConnu::Texte( const cInterface_Objet_Connu_ListeParametres&, const void* ) const
         {
             return _Texte;
         }

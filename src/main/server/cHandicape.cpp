@@ -53,7 +53,7 @@ tContenance cHandicape::getContenance() const
     return _Contenance;
 }
 
-void cHandicape::setDoc( const cTexte& __Doc )
+void cHandicape::setDoc( const std::string& __Doc )
 {
     _Doc = __Doc;
 }

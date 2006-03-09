@@ -1,5 +1,6 @@
 #include "HtmlFilterTest.h"
-#include "HtmlFilter.h"
+
+#include "01_util/HtmlFilter.h"
 
 #include <sstream>
 

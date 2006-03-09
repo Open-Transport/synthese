@@ -182,7 +182,7 @@ void cCalculVmax::Calcule()
     tDistanceKM D;   // Pour contenir la distance entre chaque point test et chaque point courant
     float T;
     tCategorieDistance CD;
-    tVitesseKMH V;
+    int V;
     tNumeroArretLogique iNumeroArretLogique2;
     ofstream F;
     F.open( NOMFICHIERVMAX.Texte() );
@@ -227,24 +227,24 @@ void cCalculVmax::Calcule()
                     D = DCarre.Distance();
                     CD = CategorieDistance( D, false );
                     T = vMeilleureDuree[ iNumeroArretLogique2 ];
-                    V = ( tVitesseKMH ) ( D / T * 60 );
+                    V = ( int ) ( D / T * 60 );
                     if ( V > 200 )
-                        F << cTexte( "Attention: V>200 vers le point d'arret " ) << TXT( iNumeroArretLogique2 ) << cTexte( "\n" );
+                        F << std::string( "Attention: V>200 vers le point d'arret " ) << TXT( iNumeroArretLogique2 ) << std::string( "\n" );
                     if ( V > curArretLogique->vitesseMax( CD ) )
                         curArretLogique->setVMax( CD, V );
                 }
 
-            F << cTexte( "[" ) << TXT( iNumeroArretLogique ) << cTexte( "\n" );
-            F << cTexte( "VM " );
+            F << std::string( "[" ) << TXT( iNumeroArretLogique ) << std::string( "\n" );
+            F << std::string( "VM " );
             for ( CD = 0; CD != NOMBREVMAX; CD++ )
             {
                 if ( curArretLogique->vitesseMax( CD ) < 100 )
-                    F << cTexte( "0" );
+                    F << std::string( "0" );
                 if ( curArretLogique->vitesseMax( CD ) < 10 )
-                    F << cTexte( "0" );
+                    F << std::string( "0" );
                 F << TXT( curArretLogique->vitesseMax( CD ) );
             }
-            F << cTexte( "\n" );
+            F << std::string( "\n" );
         }
     }
     F.close();

@@ -108,7 +108,7 @@ class cInterface_Objet_Element_Parametre_DonneeEnvironnement : public cInterface
 {
     protected:
         int _NumeroObjet; //!< Num�ro de l'objet � �valuer
-        cTexte _TexteVide;  //!< Texte vide � retourner en cas d'index inconnu
+        std::string _TexteVide;  //!< Texte vide � retourner en cas d'index inconnu
 
     public:
         //! \name Calculateurs
@@ -117,7 +117,7 @@ class cInterface_Objet_Element_Parametre_DonneeEnvironnement : public cInterface
         cInterface_Objet_Element* Copie( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres ) const;
         int Nombre( const cInterface_Objet_Connu_ListeParametres& __Parametres
                     , const void* __Objet = NULL ) const;
-        const cTexte& Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres
+        const std::string& Texte( const cInterface_Objet_Connu_ListeParametres& __Parametres
                              , const void* __Objet = NULL ) const;
         //@}
 

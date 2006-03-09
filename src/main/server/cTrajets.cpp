@@ -529,7 +529,7 @@ void cTrajets::GenererNiveauxEtAuMoinsUneAlerte()
     if ( __AuMoinsUneAlerte )
         _AuMoinsUneAlerte = "1";
     else
-        _AuMoinsUneAlerte.Vide();
+        _AuMoinsUneAlerte.clear();
 }
 
 
@@ -542,14 +542,13 @@ void cTrajets::Finalise()
 {
     GenererListeOrdonneePointsArrets();
     GenererNiveauxEtAuMoinsUneAlerte();
-    _txtTaille.Vide();
-    _txtTaille << Taille();
+    _txtTaille = Taille();
 }
 
 /** Accesseur propri�t� il y a une alerte pour au moins un �l�ment de la collection de trajet.
  @return propri�t� il y a une alerte pour au moins un �l�ment de la collection de trajet
 */
-const cTexte& cTrajets::getAuMoinsUneAlerte() const
+const std::string& cTrajets::getAuMoinsUneAlerte() const
 {
     return _AuMoinsUneAlerte;
 }
@@ -564,7 +563,7 @@ LogicalPlace* cTrajets::getListeOrdonneePointsArret( size_t __i ) const
     return _ListeOrdonneePointsArret[ __i ];
 }
 
-const cTexte& cTrajets::GetTailleTexte() const
+const std::string& cTrajets::GetTailleTexte() const
 {
     return _txtTaille;
 }

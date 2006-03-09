@@ -5,7 +5,9 @@
 #include "cDescriptionPassage.h"
 #include "cLigne.h"
 
-cTableauAffichage::cTableauAffichage( const string& __Code )
+
+
+cTableauAffichage::cTableauAffichage( const std::string& __Code )
         : cSite( __Code )
 {
     _NombreDeparts = INCONNU; // Illimit�
@@ -166,10 +168,10 @@ void cTableauAffichage::ListeArretsAffiches( cDescriptionPassage* __DP ) const
     }
 }
 
-bool cTableauAffichage::SetTitre( const cTexte&__Titre )
+bool cTableauAffichage::SetTitre( const std::string&__Titre )
 {
     _Titre = __Titre;
-    return _Titre.Compare( __Titre );
+    return _Titre == __Titre;
 }
 
 void cTableauAffichage::AddDestinationAffichee( LogicalPlace* __ArretLogique )
@@ -177,7 +179,7 @@ void cTableauAffichage::AddDestinationAffichee( LogicalPlace* __ArretLogique )
     _DestinationsAffichees.insert( __ArretLogique );
 }
 
-const cTexte& cTableauAffichage::getTitre() const
+const std::string& cTableauAffichage::getTitre() const
 {
     return _Titre;
 }

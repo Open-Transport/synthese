@@ -24,7 +24,7 @@ cMateriel::cMateriel( int newCode )
  \author Hugues Romain
  \date 2001
 */
-bool cMateriel::setVitesseMoyenneMax( tVitesseKMH newVitesseMoyenneMax )
+bool cMateriel::setVitesseMoyenneMax( int newVitesseMoyenneMax )
 {
     vVitesseMoyenneMax = newVitesseMoyenneMax;
     return ( true );
@@ -35,36 +35,34 @@ bool cMateriel::setVitesseMoyenneMax( tVitesseKMH newVitesseMoyenneMax )
 cMateriel::~cMateriel()
 {}
 
-void cMateriel::setLibelleSimple( const cTexte& newNom )
+void cMateriel::setLibelleSimple( const std::string& newNom )
 {
     vLibelleSimple = newNom;
 }
 
-void cMateriel::setArticle( const cTexte& newArticle )
+void cMateriel::setArticle( const std::string& newArticle )
 {
     vArticle = newArticle;
 }
 
 
-void cMateriel::setDoc( const cTexte &newVal )
+void cMateriel::setDoc( const std::string &newVal )
 {
-    vDoc.Vide();
-    vDoc << newVal;
+    vDoc = newVal;
 }
 
 
-void cMateriel::setIndicateur( const cTexte &newVal )
+void cMateriel::setIndicateur( const std::string &newVal )
 {
-    vIndicateur.Vide();
-    vIndicateur << newVal;
+    vIndicateur = newVal;
 }
 
-tVitesseKMH cMateriel::VitesseMoyenneMax() const
+int cMateriel::VitesseMoyenneMax() const
 {
     return ( vVitesseMoyenneMax );
 }
 
-const cTexte& cMateriel::getIndicateur() const
+const std::string& cMateriel::getIndicateur() const
 {
     return ( vIndicateur );
 }
@@ -74,7 +72,7 @@ int cMateriel::Code() const
     return ( vCode );
 }
 
-const cTexte& cMateriel::getLibelleSimple() const
+const std::string& cMateriel::getLibelleSimple() const
 {
     return ( vLibelleSimple );
 }
@@ -94,7 +92,7 @@ bool cMateriel::EstAPied() const
 
 /*! \brief Accesseur Article pr�c�dant le nom du mat�riel
 */
-const cTexte& cMateriel::getArticle() const
+const std::string& cMateriel::getArticle() const
 {
     return vArticle;
 }

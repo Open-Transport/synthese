@@ -8,7 +8,7 @@ PROJECT_NUMBER         =
 OUTPUT_DIRECTORY       = ../build
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = French
-USE_WINDOWS_ENCODING   = YES
+USE_WINDOWS_ENCODING   = NO
 BRIEF_MEMBER_DESC      = YES
 REPEAT_BRIEF           = YES
 ABBREVIATE_BRIEF       = "The $name class" \
@@ -82,12 +82,8 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = . \
-                         ../src/main/server \
-                         ../src/main/map \
-                         ../src/main/client_rs485 \
-                         ../src/main/client_cgi \
-                         ../src/main/client_term
+INPUT                  = .
+                         
 FILE_PATTERNS          = *.c \
                          *.cpp \
                          *.h \

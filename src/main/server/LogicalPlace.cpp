@@ -317,7 +317,7 @@ cGareLigne* LogicalPlace::DessertALArrivee(const cLigne* Ligne) const
  @author Hugues Romain
  @date 2001
 */ 
-/*bool LogicalPlace::setVMax(tCategorieDistance CategorieDistance, tVitesseKMH newVitesseKMH)
+/*bool LogicalPlace::setVMax(tCategorieDistance CategorieDistance, int newVitesseKMH)
 {
  //vVitesseMax[CategorieDistance] = newVitesseKMH+1; 
  return(true);
@@ -335,7 +335,7 @@ void LogicalPlace::setDesignationOD( const string& newDesignationOD )
 }
 
 /*
-bool LogicalPlace::addService(char newType, cPhoto* newPhoto, const cTexte& newDesignation)
+bool LogicalPlace::addService(char newType, cPhoto* newPhoto, const std::string& newDesignation)
 {
  // SET PORTAGE LINUX
  size_t i;
@@ -470,7 +470,7 @@ inline bool LogicalPlace::addPhoto(cPhoto* Photo)
 }
 */ 
 /*
-tVitesseKMH LogicalPlace::vitesseMax(size_t Categorie) const
+int LogicalPlace::vitesseMax(size_t Categorie) const
 {
  return(vVitesseMax[Categorie]);
 }
@@ -494,7 +494,7 @@ inline cPhoto* cServiceEnGare::getPhoto() const
  return(vPhoto);
 }
  
-inline const cTexte& cServiceEnGare::Designation() const
+inline const std::string& cServiceEnGare::Designation() const
 {
  return(vDesignation);
 }

@@ -27,7 +27,7 @@ bool cResultatBaseDeDonnees::SetPositionChamp( char* __NomChamp, int __Position 
     return true;
 }
 
-int cResultatBaseDeDonnees::getNombre( const cTexte& __Champ, int __Index )
+int cResultatBaseDeDonnees::getNombre( const std::string& __Champ, int __Index )
 {
     // Index
     if ( __Index == INCONNU )
@@ -41,7 +41,7 @@ int cResultatBaseDeDonnees::getNombre( const cTexte& __Champ, int __Index )
 
 
 
-synthese::time::DateTime cResultatBaseDeDonnees::getMoment( const cTexte& __Champ, int __Index )
+synthese::time::DateTime cResultatBaseDeDonnees::getMoment( const std::string& __Champ, int __Index )
 {
     // Index
     if ( __Index == INCONNU )
@@ -55,13 +55,13 @@ synthese::time::DateTime cResultatBaseDeDonnees::getMoment( const cTexte& __Cham
 
 
 
-cTexte cResultatBaseDeDonnees::getTexte( const cTexte& __Champ, int __Index )
+std::string cResultatBaseDeDonnees::getTexte( const std::string& __Champ, int __Index )
 {
     // Index
     if ( __Index == INCONNU )
         __Index = _EnregistrementCourant;
     if ( !_Donnees.IndexValide( __Index ) )
-        return cTexte();
+        return std::string();
 
     // Résultat
     return _Donnees[ __Index ][ _PositionChamps[ __Champ.Texte() ] ] ->getTexte();
@@ -69,7 +69,7 @@ cTexte cResultatBaseDeDonnees::getTexte( const cTexte& __Champ, int __Index )
 
 
 
-tBool3 cResultatBaseDeDonnees::getBool( const cTexte& __Champ, int __Index )
+tBool3 cResultatBaseDeDonnees::getBool( const std::string& __Champ, int __Index )
 {
     // Index
     if ( __Index == INCONNU )
@@ -84,11 +84,11 @@ tBool3 cResultatBaseDeDonnees::getBool( const cTexte& __Champ, int __Index )
 
 bool cResultatBaseDeDonnees::GoPremier()
 {
-    if ( _Donnees.Taille() )
+    if ( _Donnees.size () )
     {
         _EnregistrementCourant = 0;
         return true;
-    } // if (_Donnees.Taille())
+    } // if (_Donnees.size ())
     else
     {
         _EnregistrementCourant = INCONNU;
@@ -98,7 +98,7 @@ bool cResultatBaseDeDonnees::GoPremier()
 
 bool cResultatBaseDeDonnees::GoSuivant()
 {
-    if ( _EnregistrementCourant + 1 < _Donnees.Taille() )
+    if ( _EnregistrementCourant + 1 < _Donnees.size () )
     {
         _EnregistrementCourant++;
         return true;

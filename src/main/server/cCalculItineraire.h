@@ -48,10 +48,10 @@ class cCalculateur
     public:
 
         /** Tableaux temporaires de meilleurs temps */
-        typedef map<const cArretPhysique*, synthese::time::DateTime> BestTimeMap;
+        typedef std::map<const cArretPhysique*, synthese::time::DateTime> BestTimeMap;
 
         /** Tableaux des meilleures solutions vers chaque arrêt physique */
-        typedef map<cArretPhysique*, cElementTrajet*> BestSolutionMap;
+        typedef std::map<cArretPhysique*, cElementTrajet*> BestSolutionMap;
 
     private:
         //! \name Variables de travail recherche d'itin�raire
@@ -61,8 +61,8 @@ class cCalculateur
         synthese::time::DateTime vDernierDepartServiceContinuPrecedent; //!< Moment de fin de l'amplitude de validit� du service continu trouv� pr�c�demment
         int vIterationsDep;       //!< Compteur d'it�rations pour les calculs de meilleur d�part
         int vIterationsArr;       //!< Compteur d'it�rations pour les calculs de meilleure arriv�e
-        cLog _LogTrace;        //!< Fichier log de tracage des recursions
-        cTexte _CheminLog;        //!< Chemin des log de tracage des recursions
+// MJ        cLog _LogTrace;        //!< Fichier log de tracage des recursions
+        std::string _CheminLog;        //!< Chemin des log de tracage des recursions
         synthese::time::DateTime _startTime;        //!< Time cursor in the timetable during the computing
         synthese::time::DateTime _absoluteBestTime;      //!< Best time in goal
         //@}
@@ -116,10 +116,15 @@ class cCalculateur
 
         //! \name Calculateurs pour la recherche d'itin�raires utilis�es dans la r�cursion (sym�triques)
         //@{
-        bool EvalueGareLigneArriveeCandidate( const cGareLigne* __GareLigneArr, const synthese::time::DateTime& __MomentDepart
-                                              , const cGareLigne* __GareLigneDep, int __IndexService
-                                              , BestSolutionMap& __SuiteElementsTrajets, const cTrajet& __TrajetEffectue
-                                              , bool _OptimisationAFaire, const int& __AmplitudeServiceContinu, cLog& );
+        bool EvalueGareLigneArriveeCandidate( const cGareLigne* __GareLigneArr, 
+					      const synthese::time::DateTime& __MomentDepart,
+                                              const cGareLigne* __GareLigneDep, 
+					      int __IndexService,
+                                              BestSolutionMap& __SuiteElementsTrajets, 
+					      const cTrajet& __TrajetEffectue,
+                                              bool _OptimisationAFaire, 
+					      const int& __AmplitudeServiceContinu
+					      /* MJ , cLog&*/ );
         bool EvalueGareLigneDepartCandidate( const cGareLigne* __GareLigneDep, const synthese::time::DateTime& __MomentArrivee
                                              , const cGareLigne* __GareLigneArr, int __IndexService, BestSolutionMap& __SuiteElementsTrajets
                                              , const cTrajet& __TrajetEffectue, bool __OptimisationAFaire

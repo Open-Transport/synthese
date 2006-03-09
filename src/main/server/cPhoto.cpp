@@ -26,12 +26,12 @@ Effectue la copie des chaines de caracètres fournies
  \author Hugues Romain
  \date 2002
 */
-bool cMapPhoto::SetDonnees( const cTexte& newCoords, int newLienPhoto, const cTexte& newAlt )
+bool cMapPhoto::SetDonnees( const std::string& newCoords, int newLienPhoto, const std::string& newAlt )
 {
     vCoords = newCoords;
     vLienPhoto = newLienPhoto;
     vAlt = newAlt;
-    vURL.Vide();
+    vURL.clear ();
     return true;
 }
 
@@ -44,7 +44,7 @@ Effectue la copie des chaînes de caractères fournies
  \author Hugues Romain
  \date 2002
 */
-bool cMapPhoto::SetDonnees( const cTexte& newCoords, const cTexte& newURL, const cTexte& newAlt )
+bool cMapPhoto::SetDonnees( const std::string& newCoords, const std::string& newURL, const std::string& newAlt )
 {
     vCoords = newCoords;
     vLienPhoto = 0;
@@ -59,7 +59,7 @@ bool cMapPhoto::SetDonnees( const cTexte& newCoords, const cTexte& newURL, const
  \author Hugues Romain
  \date 2002
 */
-bool cPhoto::addMapPhoto( const cTexte& newCoords, int newLienPhoto, const cTexte& newAlt )
+bool cPhoto::addMapPhoto( const std::string& newCoords, int newLienPhoto, const std::string& newAlt )
 {
     // Recherche du premier index disponible
     int NumeroMap = _Map.Active();
@@ -76,7 +76,7 @@ bool cPhoto::addMapPhoto( const cTexte& newCoords, int newLienPhoto, const cText
  \author Hugues Romain
  \date 2002
 */
-bool cPhoto::addMapPhoto( const cTexte& newCoords, const cTexte& newURL, const cTexte& newAlt )
+bool cPhoto::addMapPhoto( const std::string& newCoords, const std::string& newURL, const std::string& newAlt )
 {
     // Recherche du premier index disponible
     int NumeroMap = _Map.Active();
@@ -111,12 +111,12 @@ const cMapPhoto& cPhoto::Map( int i ) const
 
 
 
-const cTexte& cMapPhoto::Alt() const
+const std::string& cMapPhoto::Alt() const
 {
     return vAlt;
 }
 
-const cTexte& cMapPhoto::Coords() const
+const std::string& cMapPhoto::Coords() const
 {
     return ( vCoords );
 }
@@ -126,7 +126,7 @@ const int cMapPhoto::LienPhoto() const
     return ( vLienPhoto );
 }
 
-const cTexte& cMapPhoto::URL() const
+const std::string& cMapPhoto::URL() const
 {
     return ( vURL );
 }

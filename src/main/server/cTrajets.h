@@ -17,10 +17,10 @@ class LogicalPlace;
 class cTrajets : public cTableauDynamiqueObjets<cTrajet>
 {
     protected:
-        cTexte _txtTaille;     //!< Nombre de trajets contenus dans l'objet (format chaine de caract�res)
-        cTexte _AuMoinsUneAlerte;   //!< Indique si au moins un trajet de la liste comporte une alerte en activit�
-        vector<LogicalPlace*> _ListeOrdonneePointsArret; //!< Liste ordonn�e des points d'arr�ts pour repr�sentation en fiche horaire
-        vector<bool> _LigneVerrouillee;   //!< Etat v�rouill� de la position de certaines lignes
+        std::string _txtTaille;     //!< Nombre de trajets contenus dans l'objet (format chaine de caract�res)
+        std::string _AuMoinsUneAlerte;   //!< Indique si au moins un trajet de la liste comporte une alerte en activit�
+        std::vector<LogicalPlace*> _ListeOrdonneePointsArret; //!< Liste ordonn�e des points d'arr�ts pour repr�sentation en fiche horaire
+        std::vector<bool> _LigneVerrouillee;   //!< Etat v�rouill� de la position de certaines lignes
 
         //! \name M�thodes de gestion de la repr�sentation en tableau
         //@{
@@ -46,8 +46,8 @@ class cTrajets : public cTableauDynamiqueObjets<cTrajet>
         //@{
         LogicalPlace* getListeOrdonneePointsArret( size_t ) const;
         size_t TailleListeOrdonneePointsArret() const;
-        const cTexte& GetTailleTexte() const;
-        const cTexte& getAuMoinsUneAlerte() const;
+        const std::string& GetTailleTexte() const;
+        const std::string& getAuMoinsUneAlerte() const;
         //@}
 
         cTrajets() : cTableauDynamiqueObjets<cTrajet>() { }

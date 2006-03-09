@@ -2,6 +2,9 @@
 #define SYNTHESE_CTABLEAUAFFICHAGESELECTIFDESTINATIONS_H
 #include "cTableauAffichage.h"
 
+#include "cTableauDynamique.h"
+
+
 /** Tableau d'affichage s�lectionnant les lignes � partir de la destination
  @ingroup m34
 */

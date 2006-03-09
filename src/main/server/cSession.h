@@ -6,7 +6,7 @@
 */
 class cSession
 {
-        cTexte _ID;
+        std::string _ID;
         tAdresseIP _IP;
         cProfil* _Proprietaire;
         cCalculateur* _CalculateurOccupe;
@@ -20,17 +20,17 @@ class cSession
         bool CalculPeutContinuer();
 
         /*! Controle si un calculateur est occupe si oui coupe le calcul */
-        bool ExecuteRequete( const cTexteRequete& );
+        bool ExecuteRequete( const std::stringRequete& );
 
 
         //! \name Actions
-        bool ModifieProfil( cProfil*, cTexte __User, cTexte __Password );
+        bool ModifieProfil( cProfil*, std::string __User, std::string __Password );
 
         bool AnnuleReservation( cReservation& );
 
 };
 
-bool cSession::ExecuteRequete( const cTexteRequete& __Requete, tAdresseIP __IP )
+bool cSession::ExecuteRequete( const std::stringRequete& __Requete, tAdresseIP __IP )
 {
     if ( __IP != _IP )
         return false;

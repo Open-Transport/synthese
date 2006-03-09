@@ -1,18 +1,16 @@
 import os.path
 
 Import ('mainenv')
-moduleenv = mainenv.Copy()
+moduleenv = mainenv.ModuleEnv()
 
 includes = '*.cpp'
 excludes = []
 
-moduleenv.Append (CPPPATH = [Dir('..').srcnode().abspath] )
 
 moduleenv.AppendMultithreadConf ()
 
 
-moduleenv.Append ( LIBPATH = ['../tcp'] )  
-moduleenv.Append ( LIBS = ['tcp'] )  
+moduleenv.AddModuleDependency ('00_tcp')
 
 
 files = moduleenv.Glob(includes, excludes)

@@ -2,7 +2,10 @@
 #ifndef SYNTHESE_CRESULTATBASEDEDONNEES_CELLULE_H
 #define SYNTHESE_CRESULTATBASEDEDONNEES_CELLULE_H
 
-#include "cTexte.h"
+#include <string>
+#include <sstream>
+
+#include "01_util/Conversion.h"
 #include "04_time/DateTime.h"
 
 /** @ingroup m02 */
@@ -12,7 +15,7 @@ class cResultatBaseDeDonnees_Cellule
 
     public:
         virtual int getNombre() const { return INCONNU; }
-        virtual cTexte getTexte() const { cTexte __Texte; return __Texte; }
+        virtual std::string getTexte() const { std::string __Texte; return __Texte; }
         virtual synthese::time::DateTime getMoment() const { return synthese::time::DateTime(); }
         virtual tBool3 getBool() const { return Indifferent; }
 };
@@ -30,7 +33,13 @@ class cResultatBaseDeDonnees_Cellule_Nombre : public cResultatBaseDeDonnees_Cell
         //! \name Accesseurs
         //@{
         int getNombre() const { return _Valeur; }
-        cTexte getTexte() const { cTexte __Valeur; __Valeur << _Valeur; return __Valeur; }
+        
+	std::string getTexte() const { 
+	    std::stringstream ss;
+	    ss << _Valeur; 
+	    return ss.str (); 
+	}
+
 tBool3 getBool() const { return _Valeur == INCONNU ? Indifferent : ( _Valeur > 0 ? Vrai : Faux ); }
         //@}
 
@@ -46,20 +55,20 @@ tBool3 getBool() const { return _Valeur == INCONNU ? Indifferent : ( _Valeur > 0
 class cResultatBaseDeDonnees_Cellule_Texte : public cResultatBaseDeDonnees_Cellule
 {
     protected:
-        cTexte _Valeur; //!< Valeur texte
+        std::string _Valeur; //!< Valeur texte
 
     public:
 
         //! \name Accesseurs
         //@{
-        int getNombre() const { return _Valeur.GetNombre(); }
-        cTexte getTexte() const { return _Valeur; }
+        int getNombre() const { return synthese::util::Conversion::ToInt (_Valeur); }
+        std::string getTexte() const { return _Valeur; }
         //@}
 
         /*! \brief Constructeur
          CRO : Ce constructeur peut être modifié en fonction des besoins
         */
-        cResultatBaseDeDonnees_Cellule_Texte( const cTexte& __Valeur ) { _Valeur = __Valeur; }
+        cResultatBaseDeDonnees_Cellule_Texte( const std::string& __Valeur ) { _Valeur = __Valeur; }
 };
 
 

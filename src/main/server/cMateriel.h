@@ -10,7 +10,7 @@ class cMateriel;
 //! Indique le code obligatoire pour le mat�riel repr�sentant les jonctions � pied (Provisoire : � remplacer par un param�tre)
 #define MATERIELPied 12
 
-#include "cTexte.h"
+#include <string>
 
 
 /** Impl�mentation de la notion de @ref defMateriel
@@ -20,11 +20,11 @@ class cMateriel;
 */
 class cMateriel
 {
-        cTexte vLibelleSimple;
-        cTexte vArticle;
-        cTexte vDoc;
-        cTexte vIndicateur;
-        tVitesseKMH vVitesseMoyenneMax;
+        std::string vLibelleSimple;
+        std::string vArticle;
+        std::string vDoc;
+        std::string vIndicateur;
+        int vVitesseMoyenneMax; // km/h
         int vCode;
 
     public:
@@ -32,20 +32,20 @@ class cMateriel
         //! \name Accesseurs
         //@{
         bool EstAPied() const;
-        const cTexte& getArticle() const;
-        const cTexte& getIndicateur() const;
-        const cTexte& getLibelleSimple() const;
+        const std::string& getArticle() const;
+        const std::string& getIndicateur() const;
+        const std::string& getLibelleSimple() const;
         int Code() const;
-        tVitesseKMH VitesseMoyenneMax() const;
+        int VitesseMoyenneMax() const;
         //@}
 
         //! \name Modificateurs
         //@{
-        void setArticle( const cTexte& newArticle );
-        void setDoc( const cTexte& newVal );
-        void setIndicateur( const cTexte& newVal );
-        void setLibelleSimple( const cTexte& newLibelleSimple );
-        bool setVitesseMoyenneMax( tVitesseKMH );
+        void setArticle( const std::string& newArticle );
+        void setDoc( const std::string& newVal );
+        void setIndicateur( const std::string& newVal );
+        void setLibelleSimple( const std::string& newLibelleSimple );
+        bool setVitesseMoyenneMax( int );
         //@}
 
         //! \name Constructeur et destructeur

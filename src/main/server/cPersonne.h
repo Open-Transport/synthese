@@ -1,24 +1,24 @@
 
-#include "cTexte.h"
+#include <string>
 
 /** @ingroup m10 */
 class cPersonne
 {
         //! \name Coordonnées de la personne
         //@{
-        cTexte
+        std::string
         _Prenom;    //!< Prénom du client
-        cTexte _Nom;
+        std::string _Nom;
         //!< Nom du client
-        cTexte _Adresse;
+        std::string _Adresse;
         //!< Adresse du client
-        cTexte _NumeroAbonne;
+        std::string _NumeroAbonne;
         //!< Numéro de l'abonnement du client
-        cTexte _Login;
+        std::string _Login;
         //!< Login du client
-        cTexte _Telephone;
+        std::string _Telephone;
         //!< Numéro de téléphone du client
-        cTexte _EMail;
+        std::string _EMail;
         //!< Adresse e-mail
         //@}
 
@@ -28,17 +28,17 @@ class cPersonne
 
         //! \name Accesseurs
         //@{
-        const cTexte& GetCode();
+        const std::string& GetCode();
 
         const cLigne* GetLigne();
-        const cTexte& GetCodeService();
-        const cTexte& GetPrenom();
-        const cTexte&
+        const std::string& GetCodeService();
+        const std::string& GetPrenom();
+        const std::string&
         GetNom();
-        const cTexte& GetAdresse();
-        const cTexte& GetNumeroAbonne();
-        const cTexte& GetTelephone();
+        const std::string& GetAdresse();
+        const std::string& GetNumeroAbonne();
+        const std::string& GetTelephone();
 
-        const cTexte& GetEMail();
+        const std::string& GetEMail();
 };
 

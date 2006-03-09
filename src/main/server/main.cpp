@@ -203,7 +203,7 @@ void *ServerThread( void *args )
                 // Utilisation des objets Synthese et appel du calculateur
                 synthese::server::Request query (__Buffer);
 
-		// MJ : we set the HTML filter here and we do not use any cTexteHTML anymore. 
+		// MJ : we set the HTML filter here and we do not use any std::stringHTML anymore. 
 		// The data is kept in its original format as long as possible
 		std::stringstream htmlResult;
 
@@ -311,7 +311,7 @@ void timer( int sig )
   \author Hugues Romain
   \date 2003-2005
   */
-void AfficheUsage( const cTexte& __Nom )
+void AfficheUsage( const std::string& __Nom )
 {
     cout << "Usage: " << __Nom << endl;
     cout << " -l [all|debug|info|warning|error|none]   niveau de log" << endl;
@@ -351,7 +351,7 @@ int _tmain( int argc, TCHAR* argv[], TCHAR* envp[] )
         int i;
         int __NombreCalculateursParEnvironnement = NOMBRE_CALCULATEURS_PAR_ENVIRONNEMENT_DEFAUT;
         int __PortServeur = DEF_PORT;
-        cTexte database, associator;
+        std::string database, associator;
 
         //recuperation des arguments
         for ( i = 1; i < argc; i++ )
@@ -391,12 +391,12 @@ int _tmain( int argc, TCHAR* argv[], TCHAR* envp[] )
                     case 'b':     // Database
                         if ( ++i >= argc )
                             AfficheUsage( argv[ 0 ] );
-                        database = cTexte( argv[ i ] );
+                        database = std::string( argv[ i ] );
                         break;
                     case 'a':     // Associator
                         if ( ++i >= argc )
                             AfficheUsage( argv[ 0 ] );
-                        associator = cTexte( argv[ i ] );
+                        associator = std::string( argv[ i ] );
                         break;
                     case 'c':     // Calculateurs
                         if ( ++i >= argc )
@@ -422,7 +422,7 @@ int _tmain( int argc, TCHAR* argv[], TCHAR* envp[] )
         }
 
         /* Verification du renseignement des variables */
-        if ( !database.Taille() || !associator.Taille() )
+        if ( !database.size () || !associator.size () )
             AfficheUsage( argv[ 0 ] );
 
         /* Chargement de Synthese */

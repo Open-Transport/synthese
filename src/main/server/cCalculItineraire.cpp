@@ -18,6 +18,7 @@
 #include "cModaliteReservation.h"
 
 #include <string>
+#include <sstream>
 
 using namespace boost::logic;
 
@@ -133,14 +134,14 @@ bool cCalculateur::HoraireDepartArrivee( cTrajet& __Resultat )
     setBestTime( _origin, vMomentDebut, true, false );
 
     // Calcul de la meilleure arriv�e possible
-    _LogTrace.Ecrit( LogDebug, "Recherche de la meilleure arriv�e", "" );
+//MJ    _LogTrace.Ecrit( LogDebug, "Recherche de la meilleure arriv�e", "" );
     if ( !MeilleureArrivee( __Resultat, __TrajetEffectue, false, false ) )
         return false;
 
     // Si un trajet a �t� trouv�, tentative d'optimisation en retardant au maximum l'heure de d�part
     if ( __Resultat.Taille() )
     {
-        _LogTrace.Ecrit( LogDebug, "Recherche du meilleur d�part", "" );
+//MJ          _LogTrace.Ecrit( LogDebug, "Recherche du meilleur d�part", "" );
 
         // Meilleurs d�parts
         resetIntermediatesVariables();
@@ -218,58 +219,58 @@ bool cCalculateur::FicheHoraire()
     vIterationsArr = 0;
     vIterationsDep = 0;
 
-    // Gestion des logs de debug
-    if ( Synthese.getNiveauLog() <= LogDebug && Synthese.getCheminLog().Taille() )
-    {
-        cTexte __Chemin;
+// MJ review log    // Gestion des logs de debug
+//     if ( Synthese.getNiveauLog() <= LogDebug && Synthese.getCheminLog().size () )
+//     {
+//         std::string __Chemin;
 
-        synthese::time::DateTime __Maintenant;
-        __Maintenant.updateDateTime();
-        std::string now (__Maintenant.toInternalString ());
+//         synthese::time::DateTime __Maintenant;
+//         __Maintenant.updateDateTime();
+//         std::string now (__Maintenant.toInternalString ());
 
-        _CheminLog << Synthese.getCheminLog() << "/" << now;
-#ifdef UNIX
+//         _CheminLog << Synthese.getCheminLog() << "/" << now;
+// #ifdef UNIX
 
-        mkdir( _CheminLog.Texte(), 0770 );
-#endif
-#ifdef WIN32
+//         mkdir( _CheminLog.Texte(), 0770 );
+// #endif
+// #ifdef WIN32
 
-        mkdir( _CheminLog.Texte() );
-#endif
+//         mkdir( _CheminLog.Texte() );
+// #endif
 
-        __Chemin << _CheminLog << "/" << LOG_FICHIER_TRACE;
-        _LogTrace.Ouvrir( __Chemin );
+//         __Chemin << _CheminLog << "/" << LOG_FICHIER_TRACE;
+//         _LogTrace.Ouvrir( __Chemin );
 
-        __Chemin.Vide();
-        __Chemin << _CheminLog << "/" << LOG_CHEMIN_DESTINATIONS;
-#ifdef UNIX
+//         __Chemin.Vide();
+//         __Chemin << _CheminLog << "/" << LOG_CHEMIN_DESTINATIONS;
+// #ifdef UNIX
 
-        mkdir( __Chemin.Texte(), 0770 );
-#endif
-#ifdef WIN32
+//         mkdir( __Chemin.Texte(), 0770 );
+// #endif
+// #ifdef WIN32
 
-        mkdir( __Chemin.Texte() );
-#endif
+//         mkdir( __Chemin.Texte() );
+// #endif
 
-        __Chemin.Vide();
-        __Chemin << _CheminLog << "/" << LOG_CHEMIN_PROVENANCES;
-#ifdef UNIX
+//         __Chemin.Vide();
+//         __Chemin << _CheminLog << "/" << LOG_CHEMIN_PROVENANCES;
+// #ifdef UNIX
 
-        mkdir( __Chemin.Texte(), 0770 );
-#endif
-#ifdef WIN32
+//         mkdir( __Chemin.Texte(), 0770 );
+// #endif
+// #ifdef WIN32
 
-        mkdir( __Chemin.Texte() );
-#endif
+//         mkdir( __Chemin.Texte() );
+// #endif
 
-    }
+//     }
 
 
     /*! <li>Boucle tant que l'on se trouve sur la plage horaire restreinte � l'utile</li><ul> */
     while ( true )
     {
         //! <li>Calcul du prochain trajet</li>
-        _LogTrace.Ecrit( LogDebug, "Nouveau calcul de trajet", "" );
+//MJ          _LogTrace.Ecrit( LogDebug, "Nouveau calcul de trajet", "" );
         if ( !HoraireDepartArrivee( __Trajet ) )
         {
             __AllocationOK = false;
@@ -328,7 +329,7 @@ bool cCalculateur::FicheHoraire()
     // Traitement pr�alable de la liste de trajets si besoin
     vSolution.Finalise();
 
-    _LogTrace.Fermer();
+//MJ      _LogTrace.Fermer();
 
     return __AllocationOK;
 } /*! </ul> */
@@ -349,7 +350,7 @@ bool cCalculateur::FicheHoraire()
  
  
 */
-inline bool cCalculateur::EvalueGareLigneArriveeCandidate( const cGareLigne* __GareLigneArr, const synthese::time::DateTime& __MomentDepart, const cGareLigne* __GareLigneDep, int __IndexService, BestSolutionMap& __SuiteElementsTrajets, const cTrajet& __TrajetEffectue, bool __OptimisationAFaire, const int& __AmplitudeServiceContinu, cLog& __LogTrace )
+ inline bool cCalculateur::EvalueGareLigneArriveeCandidate( const cGareLigne* __GareLigneArr, const synthese::time::DateTime& __MomentDepart, const cGareLigne* __GareLigneDep, int __IndexService, BestSolutionMap& __SuiteElementsTrajets, const cTrajet& __TrajetEffectue, bool __OptimisationAFaire, const int& __AmplitudeServiceContinu /*MJ, cLog& __LogTrace*/ )
 {
     if ( !__GareLigneArr )
         return true;
@@ -414,15 +415,15 @@ inline bool cCalculateur::EvalueGareLigneArriveeCandidate( const cGareLigne* __G
         // Gestion de logs
         if ( Synthese.getNiveauLog() <= LogDebug )
         {
-            cTexte __Message;
+            std::string __Message;
             //   if (__ETCree)
             //    __Message << "***CREATION***";
             if ( __MomentArrivee <= __MomentDepart )
             {
                 // Placer un breakpoint ici pour g�rer ce type d'erreur
-                __Message << "***ERREUR CHRONOLOGIE***";
+                __Message = "***ERREUR CHRONOLOGIE***";
             }
-            __LogTrace.Ecrit( LogDebug, __ElementTrajet, __Message, "" );
+//MJ              __LogTrace.Ecrit( LogDebug, __ElementTrajet, __Message, "" );
         }
 
         setBestTime( __GareLigneArr->ArretPhysique(), __MomentArrivee, true, __OptimisationAFaire ); // Enregistrement meilleure arriv�e
@@ -569,15 +570,15 @@ cCalculateur::BestSolutionMap cCalculateur::ListeDestinations( const cTrajet& Tr
     BestSolutionMap __SuiteElementsTrajets;
     int AmplitudeServiceContinu;
     cDistanceCarree D;
-    cLog __LogTrace;
+//MJ      cLog __LogTrace;
 
     // Trace log
-    if ( Synthese.getNiveauLog() <= LogDebug && _CheminLog.Taille() )
+    if ( Synthese.getNiveauLog() <= LogDebug && _CheminLog.size () )
     {
-        cTexte __Chemin;
+        std::stringstream __Chemin;
         __Chemin << _CheminLog;
         __Chemin << "/" << LOG_CHEMIN_DESTINATIONS << "/" << vIterationsArr << LOG_EXTENSION;
-        __LogTrace.Ouvrir( __Chemin );
+//MJ          __LogTrace.Ouvrir( __Chemin.str () );
     }
 
     // Initial time
@@ -624,13 +625,13 @@ cCalculateur::BestSolutionMap cCalculateur::ListeDestinations( const cTrajet& Tr
                 if ( NumArret != INCONNU && ( !MomentDepartStrict || MomentDepart == MomentDepartInitial ) )
                 {
                     // Evaluation de la gareligne rendant vers la destination si trouv�e
-                    EvalueGareLigneArriveeCandidate( CurrentGLA, MomentDepart, CurrentGLD, NumArret, __SuiteElementsTrajets, TrajetEffectue, OptimisationAFaire, AmplitudeServiceContinu, __LogTrace );
+                    EvalueGareLigneArriveeCandidate( CurrentGLA, MomentDepart, CurrentGLD, NumArret, __SuiteElementsTrajets, TrajetEffectue, OptimisationAFaire, AmplitudeServiceContinu /*MJ, __LogTrace*/ );
 
                     for ( CurrentGLA = CurrentGLD->getArriveeCorrespondanceSuivante();
                             CurrentGLA != 0;
                             CurrentGLA = CurrentGLA->getArriveeCorrespondanceSuivante() )
                     {
-                        if ( !EvalueGareLigneArriveeCandidate( CurrentGLA, MomentDepart, CurrentGLD, NumArret, __SuiteElementsTrajets, TrajetEffectue, OptimisationAFaire, AmplitudeServiceContinu, __LogTrace ) )
+                        if ( !EvalueGareLigneArriveeCandidate( CurrentGLA, MomentDepart, CurrentGLD, NumArret, __SuiteElementsTrajets, TrajetEffectue, OptimisationAFaire, AmplitudeServiceContinu /*MJ, __LogTrace*/ ) )
                             break;
                     } //end boucle currentGLA
                 } //end num arret !=-1
@@ -820,7 +821,7 @@ bool cCalculateur::MeilleureArrivee( cTrajet& __Resultat, cTrajet& __TrajetEffec
 
     // logs
     vIterationsArr++;
-    _LogTrace.Ecrit( LogDebug, __TrajetEffectue, vIterationsArr, "", "" );
+//MJ      _LogTrace.Ecrit( LogDebug, __TrajetEffectue, vIterationsArr, "", "" );
 
     // Obtention de la liste des trajets directs possibles au d�part de l'arr�t
     BestSolutionMap __ElementsTrajetsDirects = ListeDestinations( __TrajetEffectue, MomentDepartStrict, OptimisationAFaire );
@@ -835,7 +836,7 @@ bool cCalculateur::MeilleureArrivee( cTrajet& __Resultat, cTrajet& __TrajetEffec
         if ( _destination.includes( iterSolution->first ) )
         {
             __Candidat.LieEnPremier( iterSolution->second );
-            _LogTrace.Ecrit( LogDebug, __Candidat, vIterationsArr, "***RESULTAT***", "" );
+//MJ              _LogTrace.Ecrit( LogDebug, __Candidat, vIterationsArr, "***RESULTAT***", "" );
         }
         else // Sinon r�cursion
         {

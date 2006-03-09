@@ -5,7 +5,7 @@
 #ifndef SYNTHESE_CALTERNANCE_H
 #define SYNTHESE_CALTERNANCE_H
 
-#include "cTexte.h"
+#include <string>
 
 /*! \brief Fournit un index modulo n
  @ingroup m01
@@ -14,7 +14,7 @@ Cette classe est utilis�e en particulier pour g�n�rer une alternance de st
 */
 class cAlternance
 {
-        cTexte _Message; //!<Message � afficher avant le compteur
+        std::string _Message; //!<Message � afficher avant le compteur
         short int _Modulo; //!< Valeur � laquelle le compteur doit �tre r�initialis� lors des incr�mentations
         short int _Valeur; //!< Valeur de d�part
 
@@ -22,7 +22,7 @@ class cAlternance
 
     public:
         void Incrementer();
-        cAlternance( const cTexte& __Message, char __Modulo );
+        cAlternance( const std::string& __Message, char __Modulo );
 };
 
 
