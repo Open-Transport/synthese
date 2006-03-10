@@ -33,7 +33,6 @@ class Registrable
 
  public:
 
-//    typedef typename std::map<K, T*> Registry;
     typedef typename synthese::env::Registry<K, T> Registry;
     typedef typename synthese::env::RegistryKeyException<K> RegistryKeyException;
 
