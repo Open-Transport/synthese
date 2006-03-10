@@ -4,8 +4,16 @@ testmoduleenv = testenv.ModuleEnv()
 includes = '*.cpp'
 excludes = []
 
+# TODO : understand why link order is so important ??
+
 testmoduleenv.AddModuleDependency ('01_util')
+testmoduleenv.Append (LIBS = ['boost_thread'] )
 testmoduleenv.Append (LIBS = ['boost_iostreams'] )
+testmoduleenv.AppendMultithreadConf ();
+
+
+#testmoduleenv.Append (CPPDEFINES = ['BOOST_DISABLE_THREADS'])
+
 
 files = testmoduleenv.Glob(includes, excludes)
 

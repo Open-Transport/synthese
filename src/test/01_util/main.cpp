@@ -10,6 +10,7 @@
 #include "LowerCaseFilterTest.h"
 #include "PlainCharFilterTest.h"
 #include "SqlFilterTest.h"
+#include "LogTest.h"
 
 
 
@@ -17,6 +18,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::HtmlFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::LowerCaseFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::PlainCharFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::SqlFilterTest);
+
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::LogTest);
 
 
 
