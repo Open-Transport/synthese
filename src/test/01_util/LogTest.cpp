@@ -32,15 +32,74 @@ namespace util
   LogTest::testBasicLogging ()
   {
       std::stringstream buffer;
-      Log log (buffer);
+      Log log (buffer, Log::LEVEL_DEBUG);
+
+      CPPUNIT_ASSERT_EQUAL (Log::LEVEL_DEBUG, log.getLevel ());
 
       log.debug ("message 1");
       log.info ("message 2");
       log.warn ("message 3");
       log.error ("message 4");
       log.fatal ("message 5");
+      
+      // Default log level is INFO
+      char lineBuffer[256];
 
-      // Do some assertions later on...
+      {
+	  buffer.getline (lineBuffer, 256);
+	  std::string line (lineBuffer);
+	  CPPUNIT_ASSERT (line.find ("message 1") != std::string::npos);
+
+	  buffer.getline (lineBuffer, 256);
+	  line = lineBuffer;
+	  CPPUNIT_ASSERT (line.find ("message 2") != std::string::npos);
+
+	  buffer.getline (lineBuffer, 256);
+	  line = lineBuffer;
+	  CPPUNIT_ASSERT (line.find ("message 3") != std::string::npos);
+
+	  buffer.getline (lineBuffer, 256);
+	  line = lineBuffer;
+	  CPPUNIT_ASSERT (line.find ("message 4") != std::string::npos);
+
+	  buffer.getline (lineBuffer, 256);
+	  line = lineBuffer;
+	  CPPUNIT_ASSERT (line.find ("message 5") != std::string::npos);
+
+      }
+
+      log.setLevel (Log::LEVEL_ERROR);
+      CPPUNIT_ASSERT_EQUAL (Log::LEVEL_ERROR, log.getLevel ());
+
+      log.debug ("message 6");
+      log.info ("message 7");
+      log.warn ("message 8");
+      log.error ("message 9");
+      log.fatal ("message 10");
+
+      {
+	  buffer.getline (lineBuffer, 256);
+	  std::string line (lineBuffer);
+	  CPPUNIT_ASSERT (line.find ("message 9") != std::string::npos);
+
+	  buffer.getline (lineBuffer, 256);
+	  line = lineBuffer;
+	  CPPUNIT_ASSERT (line.find ("message 10") != std::string::npos);
+
+      }
+
+      log.setLevel (Log::LEVEL_NONE);
+      CPPUNIT_ASSERT_EQUAL (Log::LEVEL_NONE, log.getLevel ());
+
+      log.debug ("message 11");
+      log.info ("message 12");
+
+      {
+	  buffer.getline (lineBuffer, 256);
+	  std::string line (lineBuffer);
+	  CPPUNIT_ASSERT (line.empty ());
+      }
+
 
   }
 
@@ -64,7 +123,7 @@ namespace util
 	    {
 		// Print 1000 times the test message.
 		for (int i=0; i<1000; ++i) {
-		    _log.debug (_testMessage);
+		    _log.info (_testMessage);
 		    // Give some time for other threads to execute.
 		    boost::thread::yield ();
 		}
