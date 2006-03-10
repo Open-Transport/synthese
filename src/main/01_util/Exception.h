@@ -27,8 +27,10 @@ class Exception : public std::exception
  public:
 
     Exception ( const std::string& message ) throw ();
-    ~Exception () throw ();
+    Exception ( const Exception& ref );
 
+    ~Exception () throw ();
+    
 
     //! @name Getters/Setters
     //@{
@@ -38,12 +40,10 @@ class Exception : public std::exception
 
  private:
 
-    Exception ( const Exception& ref );
     Exception& operator= ( const Exception& rhs );
 
 };
 
-std::ostream& operator<< ( std::ostream& os, const Exception& op );
 
 
 

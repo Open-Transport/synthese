@@ -20,6 +20,13 @@ Exception::~Exception () throw ()
 
 
 
+Exception::Exception ( const Exception& ref )
+    : _message (ref._message)
+{
+}
+
+
+
 const std::string& 
 Exception::getMessage () const
 {
@@ -27,12 +34,6 @@ Exception::getMessage () const
 }
 
 
-
-std::ostream& 
-operator<< ( std::ostream& os, const Exception& op )
-{
-    os << op.getMessage ();
-}
 
 
 
