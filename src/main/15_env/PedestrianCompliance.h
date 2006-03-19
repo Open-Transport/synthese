@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_BIKE_COMPLIANCE_H
-#define SYNTHESE_BIKE_COMPLIANCE_H
+#ifndef SYNTHESE_PEDESTRIAN_COMPLIANCE_H
+#define SYNTHESE_PEDESTRIAN_COMPLIANCE_H
 
 
 #include "Compliance.h"
@@ -15,20 +15,20 @@ namespace env
 
 
 
-/** Bike compliance class.
+/** Pedestrian compliance class.
  @ingroup m15
  */
-class BikeCompliance : public Compliance
+class PedestrianCompliance : public Compliance
 {
 private:
 
 public:
 
-    BikeCompliance (const int& id, 
+    PedestrianCompliance (const int& id, 
 		    const boost::logic::tribool& compliant,
 		    const int& capacity);
 
-    ~BikeCompliance();
+    ~PedestrianCompliance();
 
 
 };

@@ -1,19 +1,7 @@
-/*! \file Point.cpp
-\brief Implémentation classe cPoint
-\author Hugues Romain
-\date 2000-2001
-*/
-
-
-
 #include "Point.h"
 
 
 
-/*! \brief Constructeur
- 
-Le point est initialisé aux coordonnées inconnues
-*/
 cPoint::cPoint()
 {
     setX( INCONNU );
@@ -27,7 +15,7 @@ cPoint::~cPoint()
 
 
 
-CoordonneeKMM cPoint::XKMM() const
+long int cPoint::XKMM() const
 {
     if ( unknownLocation() )
         return INCONNU;
@@ -35,7 +23,7 @@ CoordonneeKMM cPoint::XKMM() const
         return _XKM * 1000 + _XM;
 }
 
-CoordonneeKMM cPoint::YKMM() const
+long int cPoint::YKMM() const
 {
     if ( unknownLocation() )
         return INCONNU;
@@ -51,36 +39,36 @@ bool cPoint::unknownLocation() const
 
 
 /*! \brief Modificateur de la longitude
- \param newCoordonneeKMM Nouvelle longitude arrondie au mètre près (INCONNU pour coordonnées inconnues)
+ \param newlong int Nouvelle longitude arrondie au mètre près (INCONNU pour coordonnées inconnues)
  
  Ce modificateur assure la séparation de la longitude en deux valeurs : la valeur en kilomètres, et le reste en mètres
 */
-void cPoint::setX( const CoordonneeKMM __XKMM )
+void cPoint::setX( const long int __XKMM )
 {
     if ( __XKMM == INCONNU )
         _XKM = INCONNU;
     else
     {
-        _XKM = ( CoordonneeKM ) ( __XKMM / 1000 );
-        _XM = ( CoordonneeM ) ( __XKMM % 1000 );
+        _XKM = ( short int ) ( __XKMM / 1000 );
+        _XM = ( short int ) ( __XKMM % 1000 );
     }
 }
 
 
 
 /*! \brief Modificateur de la latitude
- \param newCoordonneeKMM Nouvelle latitude arrondie au mètre près (INCONNU pour coordonnées inconnues)
+ \param newlong int Nouvelle latitude arrondie au mètre près (INCONNU pour coordonnées inconnues)
  
  Ce modificateur assure la séparation de la longitude en deux valeurs : la valeur en kilomètres, et le reste en mètres
 */
-void cPoint::setY( const CoordonneeKMM __YKMM )
+void cPoint::setY( const long int __YKMM )
 {
     if ( __YKMM == INCONNU )
         _YKM = INCONNU;
     else
     {
-        _YKM = ( CoordonneeKM ) ( __YKMM / 1000 );
-        _YM = ( CoordonneeM ) ( __YKMM % 1000 );
+        _YKM = ( short int ) ( __YKMM / 1000 );
+        _YM = ( short int ) ( __YKMM % 1000 );
     }
 }
 

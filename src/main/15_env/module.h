@@ -16,7 +16,7 @@ namespace synthese
 	/** 15_env namespace */
 	namespace env
 	{
-
+	    static const int UNKNOWN_VALUE = -1;
 
 	}
 

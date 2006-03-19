@@ -3,111 +3,165 @@
 
 
 
-class cTrain;
-class cModaliteReservationEnLigne;
+#include "Registrable.h"
+
 
 #include "04_time/Hour.h"
 #include "04_time/DateTime.h"
 
 
-/*! \brief Modalités de réservation
- \author Hugues Romain
- \date 2001-2005
+namespace synthese
+{
+namespace env
+{
+
+class Service;
+
+
+
+/** Reservation rule.
  @ingroup m15
 */
-class cModaliteReservation
+class ReservationRule : public Registrable<int,ReservationRule>
 {
-    public:
+public:
 
-        /** Type of reservation rule */
-        typedef enum
-        {
-            RuleType_IMPOSSIBLE = 'N',     //!< Reservation is not possible, services should be taken without any announcement
-            RuleType_OPTIONNAL = 'F',     //!< Reservation is possible but not compulsory, services should be taken with announcement for much security
-            RuleType_COMPULSORY = 'O',     //!< Reservation is compulsory, passengers without reservation are not accepted
-            RuleType_AT_LEAST_ONE_REQUIRED = 'C' //!< At least on reservation is compulsory, the service do not go if no reservations are done, but will go if at least one is done, and will bi opened for passengers without reservation
-    } RuleType;
+    /** Type of reservation rule */
+    typedef enum
+    {
+	RESERVATION_TYPE_IMPOSSIBLE = 'N', //!< Reservation is not possible, services should be taken without any announcement
+        RESERVATION_TYPE_OPTIONNAL = 'F',     //!< Reservation is possible but not compulsory, services should be taken with announcement for much security
+	RESERVATION_TYPE_COMPULSORY = 'O',     //!< Reservation is compulsory, passengers without reservation are not accepted
+	RESERVATION_TYPE_AT_LEAST_ONE_REQUIRED = 'C' //!< At least on reservation is compulsory, the service do not go if no reservations are done, but will go if at least one is done, and will bi opened for passengers without reservation
+    } ReservationType;
 
 
-    protected:
-        //! \name Caractéristiques
-        //@{
-        RuleType vTypeResa;     //!< Type de réservation (possible, obligatoire, impossible)
-        bool vReservationEnLigne;  //!< Réservation via SYNTHESE active
-        //tPrix   vPrix;     //!< Coût de la réservation (inutilisé pour l'instant)
-        //@}
+private:
 
-        //! \name Chainage et indexation
-        //@{
-        const size_t _id;    //!< Numéro de la modalité de réservation dans l'environnement
-        //@}
+    ReservationType _type; //!< Reservation type
+    bool _online;  //!< Reservation via SYNTHESE active
 
-        //! \name Délai de réservation
-        //@{
-        bool vReferenceEstLOrigine; //!< Indique si le moment de départ de référence est celle du départ de la circulation à son origine (true) ou bien s'il s'agit du moment de départ du voyageur (false)
-        int vDelaiMinMinutes;  //!< Délai minimal en minutes entre la réservation et le moment de référence
-        int vDelaiMinJours;   //!< Délai minimal en jours entre la réservation et le moment de référence
-        synthese::time::Hour vDelaiMinHeureMax;  //!< Heure maximale de réservation le dernier jour de la période d'ouverture à la réservation
-        int vDelaiMaxJours;  //!< Nombre maximal de jours entre la réservation et le départ du service
-        //@}
+    bool _originIsReference; //!< Whether reference departure time is the line run departure time at its origin (true) or client departure time (false)
 
-        //! \name Coordonnées de contact
-        //@{
-        std::string vNumeroTelephone;  //!< Numéro de téléphone de la centrale de réservation
-        std::string vHorairesTelephone;  //!< Description des horaires d'ouverture de la centrale de réservation
-        std::string vDescription;   //!< Informations complémentaires sur la centrale de réservation ou la modalité de réservation
-        std::string vSiteWeb;    //!< URL d'un site web permettant de réserver le service en ligne (incompatible avec la REL)
-        //@}
+    int _minDelayMinutes;  //!< Minimum delay in minutes between reservation and reference moment
+    int _minDelayDays;   //!< Minimum delay in days between reservation and reference moment
+    int _maxDelayDays;  //!< Maxium number of days between reservation and departure.
 
-    public:
+    synthese::time::Hour _hourDeadLine; //!< Latest reservation hour the last day open for reservation
 
-        //! \name Accesseurs
-        //@{
-        const RuleType& TypeResa() const;
-        const synthese::time::Hour& GetDelaiMinHeureMax() const;
-        const std::string& GetHorairesTelephone() const;
-        const std::string& GetSiteWeb() const;
-        const std::string& GetTelephone() const;
-        const cModaliteReservationEnLigne* ReservationEnLigne() const;
-        const size_t& Index() const;
-        /*template <class T>
-        T&    toXML(T& Tampon, const cTrain*, synthese::time::DateTime momentDepart) const;*/ 
-        //@}
+    std::string _phoneExchangeNumber;  //!< Phone number for reservation
+    std::string _phoneExchangeOpeningHours;  //!< Opening hours for phone exchange
+    std::string _description;   //!< Additional info about phone exchange or reservation mode
+    std::string _webSiteUrl;    //!< URL of a website allowing online reservation
 
-        //! \name Calculateurs
-        //@{
-        synthese::time::DateTime momentLimiteReservation ( const cTrain*, const synthese::time::DateTime& MomentDepart ) const;
-        synthese::time::DateTime momentDebutReservation ( const synthese::time::DateTime& ) const;
-        bool circulationPossible ( const cTrain*, const synthese::time::DateTime& MomentResa, const synthese::time::DateTime& MomentDepart ) const;
-        bool reservationPossible ( const cTrain*, const synthese::time::DateTime& MomentResa, const synthese::time::DateTime& MomentDepart ) const;
-        //@}
+public:
 
-        //! \name Modificateurs
-        //@[
-        bool SetDelaiMaxJours ( const int );
-        void setDelaiMaxJours ( const int );
-        bool SetDelaiMinHeureMax ( const synthese::time::Hour& );
-        void setDelaiMinHeureMax ( const synthese::time::Hour& );
-        bool SetDelaiMinJours ( const int );
-        void setDelaiMinJours ( const int );
-        bool SetDelaiMinMinutes ( const int );
-        void setDelaiMinMinutes ( const int& );
-        bool SetDoc ( const std::string& );
-        bool SetHorairesTel ( const std::string& );
-        //bool SetPrix    (const float);
-        //void setPrix    (const tPrix);
-        bool SetSiteWeb ( const std::string& );
-        bool SetTel ( const std::string& );
-        bool SetTypeResa ( const char );
-        void setTypeResa ( const RuleType& );
-        bool setReferenceEstLOrigine ( const bool );
-        //@}
+    ReservationRule ( const int& id,
+		      const ReservationType& type,
+		      bool online,
+		      bool originIsReference,
+		      int minDelayMinutes,
+		      int minDelayDays,
+		      int maxDelayDays,
+		      synthese::time::Hour hourDeadLine,
+		      const std::string& phoneExchangeNumber,
+		      const std::string& phoneExchangeOpeningHours,
+		      const std::string& description,
+		      const std::string& webSiteUrl );
 
-        //! \name Constructeurs et destructeurs
-        //@{
-        cModaliteReservation( const size_t& );
-        virtual ~cModaliteReservation();
-        //@}
+
+    virtual ~ReservationRule();
+
+    //! @name Getters/Setters
+    //@{
+    const ReservationType& getType () const;
+    const synthese::time::Hour& getHourDeadLine () const;
+
+    const std::string& getPhoneExchangeOpeningHours () const;
+    const std::string& getWebSiteUrl () const;
+
+    const std::string& getPhoneExchangeNumber () const;
+    //@}
+
+
+    //! @name Query methods
+    //@{
+
+
+    /** Reference function for reservation dead line calculation.
+ 
+    It is done according to the following steps:
+    - Choice of reference time (client departure or line run departure at origin)
+    - Calculation 1 : x minutes before reference time :
+    - Decrease of _minDelayMinutes before reference
+
+    - Calculation 2 : x days before reference time :
+    - Decrease of _minDelayDays before reference
+    - Sets hour to _hourDeadLine
+
+    - The smallest date time is chosen.
+
+    If no explicit rule defines the reservation dead line, 
+    the actual reservation time is returned.
+    */
+    synthese::time::DateTime getReservationDeadLine (
+	const Service*, 
+	const synthese::time::DateTime& departureTime ) const;
+
+
+
+    /** Reference function for calculation of start reservation date time.
+	@param reservationTime Time when booking is done.
+	@return The minimum date time to make a reservation.
+	
+	If no explicit rule defines this minimum time, the actual reservation time is returned.
+    */
+    synthese::time::DateTime getReservationStartTime ( 
+	const synthese::time::DateTime& reservationTime) const;
+
+
+    
+    /** Indicates whether or not a path can be taken at a given date, 
+	taking into account reservation delay rules.
+	@param run Line run to test.
+	@param reservationTime Time of booking, if required.
+	@param departureTime Desired departure time.
+	@return true if the line run can be taken, false otherwise.
+
+	This methods checks the following conditions :
+	- if reservation is not compulsory, the run can be taken.
+	- if reservation is compulsory, reservation time must precede reservation 
+	dead line and be after reservation opening time.
+    */
+    bool isRunPossible ( const Service* run, 
+			 const synthese::time::DateTime& reservationTime, 
+			 const synthese::time::DateTime& departureTime ) const;
+    
+
+
+    /** Indicates whether or not a reservation is possible for a given line run,
+	at a certain date, taking into account delay rules.
+	@param run Line run asked for booking.
+	@param reservationTime Time of booking.
+	@param departureTime Desired departure time.
+	@return true if the reservation is possible, false otherwise.
+ 
+	This methods checks the following conditions :
+	- reservation time must precede reservation dead line
+	- reservation time must be later than reservation start time.
+    */
+    bool isReservationPossible ( const Service* run, 
+				 const synthese::time::DateTime& reservationTime, 
+				 const synthese::time::DateTime& departureTime ) const;
+
+    //@}
+
 };
+
+
+
+
+}
+}
 
 #endif

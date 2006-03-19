@@ -1,4 +1,4 @@
-#include "HandicappedCompliance.h"
+#include "PedestrianCompliance.h"
 
 
 
@@ -9,18 +9,19 @@ namespace env
 
 
 
-HandicappedCompliance::HandicappedCompliance (const int& id, 
+PedestrianCompliance::PedestrianCompliance (const int& id, 
 				const boost::logic::tribool& compliant,
 				const int& capacity)
     : Compliance (id, compliant, capacity)
 {
-    
+
 }
 
 
-HandicappedCompliance::~HandicappedCompliance()
+PedestrianCompliance::~PedestrianCompliance()
 {
 }
+
 
 
 

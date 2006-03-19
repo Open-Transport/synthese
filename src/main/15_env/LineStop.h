@@ -1,0 +1,262 @@
+#ifndef SYNTHESE_ENV_LINESTOP_H
+#define SYNTHESE_ENV_LINESTOP_H
+
+
+#include <string>
+#include "module.h"
+
+#include "04_time/DateTime.h"
+#include "04_time/Schedule.h"
+
+
+namespace synthese
+{
+namespace env
+
+{
+
+class PhysicalStop;
+class Line;
+
+
+
+/** Association class between line and physical stop.
+ @ingroup m15
+*/
+class LineStop
+{
+public:
+    
+    typedef enum 
+	{
+            LINE_STOP_DEPARTURE = 'D',
+            LINE_STOP_ARRIVAL = 'A',
+            LINE_STOP_PASSAGE = 'P'
+	} LineStopType;
+
+private:
+
+    const PhysicalStop*  _physicalStop;   //!< Physical stop
+    const Line* _line;      //!< Physical stop line
+    const int _metricOffset;      //!< Metric offset of stop on line
+    const bool _scheduleInput; //!< Schedule with or without input
+    LineStopType _type;      //!< Departure, arrival or passage
+    
+    const LineStop* _previousDeparture;  //!< ?
+    const LineStop* _previousConnectionDeparture; //!< ?
+    const LineStop* _followingArrival;  //!< ?
+    const LineStop* _followingConnectionArrival; //!< ?
+    const LineStop* _previous;      //!< ?
+    const LineStop* _following;      //!< ?
+    
+    synthese::time::Schedule* _firstDepartureSchedule;  //!< Theoretical first departure schedule
+    synthese::time::Schedule* _realFirstDepartureSchedule; //!< Real first departure schedule
+    synthese::time::Schedule* _lastDepartureSchedule;  //!< Theoretical last departure schedule
+    synthese::time::Schedule* _firstArrivalSchedule; //!< Theoretical first arrival schedule
+    synthese::time::Schedule* _realFirstArrivalSchedule; //!< Real first arrival schedule
+    synthese::time::Schedule* _lastArrivalSchedule;  //!< Theoretical last arrival schedule
+
+    int _departureIndex[24];     //!< Line service index by theoretical departure hour of day
+    int _realDepartureIndex[24]; //!< Line service index by real departure hour of day
+    int _arrivalIndex[24];  //!< Line service index by theoretical arrival hour of day
+    int _realArrivalIndex[24];  //!< Line service index by real arrival hour of day
+
+
+public:
+
+
+    LineStop (const Line* line,
+	      int metricOffset,
+	      LineStopType type,
+	      const PhysicalStop* physicalStop,
+	      bool scheduleInput);
+
+    ~LineStop();
+
+
+    //! @name Getters/Setters
+    //@{
+
+    const synthese::time::Schedule& 
+	getFirstDepartureSchedule (int serviceNumber) const;
+
+    const synthese::time::Schedule& 
+	getRealFirstDepartureSchedule (int serviceNumber) const;
+
+    const synthese::time::Schedule& 
+	getLastDepartureSchedule (int serviceNumber) const;
+
+    const synthese::time::Schedule& 
+	getFirstArrivalSchedule (int serviceNumber) const;
+
+    const synthese::time::Schedule& 
+	getRealFirstArrivalSchedule (int serviceNumber) const;
+
+    const synthese::time::Schedule& 
+	getLastArrivalSchedule (int serviceNumber) const;
+
+    
+    const LineStop* getPreviousDeparture () const;
+    void setPreviousDeparture ( const LineStop* previousDeparture);
+
+    const LineStop* getPreviousConnectionDeparture () const;
+    void setPreviousConnectionDeparture( const LineStop* previousConnectionDeparture);
+
+    const LineStop* getFollowingArrival () const;
+    void setFollowingArrival ( const LineStop* followingArrival);
+
+    const LineStop* getFollowingConnectionArrival () const;
+    void setFollowingConnectionArrival( const LineStop* followingConnectionArrival);
+
+    bool getScheduleInput () const;
+    const Line* getLine () const;
+    int getMetricOffset () const;
+    const PhysicalStop* getPhysicalStop () const;
+    
+    LineStopType getType () const;
+    void setType ( const LineStopType& type );
+
+
+    //@}
+
+
+    //! @name Query methods
+    //@{
+    bool isArrival () const;
+    bool isDeparture () const;
+    
+    bool isRunning( const synthese::time::DateTime& startMoment, 
+		    const synthese::time::DateTime& endMoment ) const;
+
+
+    void calculateArrival (const LineStop& departureLineStop, 
+			    int serviceNumber,
+			    const synthese::time::DateTime& departureMoment, 
+			    synthese::time::DateTime& arrivalMoment ) const;
+
+    void calculateDeparture (const LineStop& arrivalLineStop, 
+			     int serviceNumber,
+			     const synthese::time::DateTime& arrivalMoment, 
+			     synthese::time::DateTime& departureMoment ) const;
+
+    int getBestRunTime (const LineStop& other ) const;
+    
+    /** Checks consistency of input schedules.
+      @param lineStopWithPreviousSchedule Previous line stop with schedule
+      @return true if no problem detected, false otherwise
+    */
+    bool checkSchedule (const LineStop* lineStopWithPreviousSchedule ) const;
+    
+    /*! Estimates consistency of line stops sequence according to 
+      metric offsets and physical stops coordinates.
+      @param other Other line stop to compare.
+      @return true if data seems consistent, false otherwise.
+    */
+    bool seemsGeographicallyConsistent (const LineStop& other) const;
+
+
+    /** Provides next departure service number (method 1)
+	@param departureMoment Presence hour at departure place
+	@param maxDepartureMoment Maximum departure hour
+	@param minNextServiceNumber Index to start service search from
+	@param calculationMoment Calculation moment for reservation delay checking
+	@return Found service index or -1 if none was found.
+	@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
+	@retval continuousServiceAmplitude Continuous service amplitude. 0 means scheduled service.
+    */
+    int getNextService (synthese::time::DateTime& departureMoment, 
+			const synthese::time::DateTime& maxDepartureMoment,
+			const synthese::time::DateTime& calculationMoment,
+			int minNextServiceNumber = UNKNOWN_VALUE ) const;
+
+    
+    /** Provides next departure service number (method 2)
+	@param departureMoment Presence hour at departure place
+	@param maxDepartureMoment Maximum departure hour
+	@param continuousServiceAmplitude 
+	@param minNextServiceNumber Index to start service search from
+	@param calculationMoment Calculation moment for reservation delay checking
+	@return Found service index or -1 if none was found.
+	@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
+	@retval continuousServiceAmplitude Continuous service amplitude. 0 means scheduled service.
+    */
+    int getNextService ( synthese::time::DateTime& departureMoment, 
+			 const synthese::time::DateTime& maxDepartureMoment,
+			 int& continuousServiceAmplitude, 
+			 int minNextServiceNumber,
+			 const synthese::time::DateTime& calculationMoment ) const;
+ 
+
+    int getPreviousService ( synthese::time::DateTime& arrivalMoment, 
+			     const synthese::time::DateTime& minArrivalMoment,
+			     int continuousServiceAmplitude ) const;
+    
+    int getPreviousService ( synthese::time::DateTime& arrivalMoment, 
+			     const synthese::time::DateTime& minArrivalMoment ) const;
+    
+
+    //@}
+
+
+
+
+
+    //! @name Update methods
+    //@{
+ 
+    /** Calculates schedules at stops where no data were provided.
+      @param previous Previous stop with schedule data
+      @param following Following stop with schedule data
+      @param position Line stop rank inside segment in case metric offsets are not provided
+      @param number Total number of line stops inside segment
+      
+      This function calculates departure and arriavl hours for each line stop 
+      by interpolating data from previous and following stops.
+    */
+    void linkWithNextSchedule (const LineStop& previous, 
+			       const LineStop& following, 
+			       int position, 
+			       int number, 
+			       int serviceNumber = -1 );
+
+    void updateDepartureIndex();
+    void updateArrivalIndex();
+
+    /** Fills schedules from buffer.
+      @param buffer Buffer to parse
+      @param position First character to parse from.
+      @param columnWidth Number of characters between each schedule including data
+      @param departurePassageDifferent Indicates if the function is called 
+      a second time to describe departure schedules after having described arrival schedules.
+      
+      Use of departurePassageDifferent prevents overwriting arrival schedules 
+      in case departure schedules are provided on another text line.
+    */
+    void setSchedules ( const std::string& buffer, 
+			int position, 
+			int columnWidth,
+			bool departurePassageDifferent );
+
+    //@}
+
+
+private:
+
+    /** Allocates memory for holding schedules.
+     */
+    void allocateSchedules (); 
+
+
+
+
+};
+
+
+
+}
+}
+
+
+
+
+#endif
