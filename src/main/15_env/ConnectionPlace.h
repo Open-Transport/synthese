@@ -59,6 +59,7 @@ public:
     //@{
     const ConnectionType& getConnectionType () const;
     void setConnectionType (const ConnectionType& connectionType);
+    bool isConnectionAuthorized () const;
 
     int getTransferDelay (int departureRank, int arrivalRank) const;
     void setTransferDelay (int departureRank, int arrivalRank, int transferDelay);

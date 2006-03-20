@@ -4,6 +4,7 @@
 #include "Calendar.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
+#include "LogicalStop.h"
 
 
 namespace synthese
@@ -308,22 +309,25 @@ Line::addLineStop (LineStop* lineStop)
 		{
                     currentLineStop->setFollowingArrival ( lineStop );
 		}
-/* MJ compil                if ( currentLineStop->getFollowingConnectionArrival () == 0 && 
-		     lineStop->getPhysicalStop ()->getLogicalPlace()->CorrespondanceAutorisee() )
+		if ( currentLineStop->getFollowingConnectionArrival () == 0 && 
+		     lineStop->getPhysicalStop ()->getConnectionPlace()
+		     ->isConnectionAuthorized () )
 		{
                     currentLineStop->setFollowingConnectionArrival ( lineStop );
-		}  */
+		} 
                 if ( currentLineStop->isDeparture () && 
 		     lineStop->getPreviousDeparture () == 0 )
 		{   
 		    lineStop->setPreviousDeparture ( currentLineStop );
 		}
-/* MJ compil                if ( currentLineStop->isDeparture () && 
+
+		if ( currentLineStop->isDeparture () && 
 		     lineStop->getPreviousConnectionDeparture () == 0 && 
-		     currentLineStop->getPhysicalStop ()->getLogicalPlace()->CorrespondanceAutorisee() )
+		     currentLineStop->getPhysicalStop ()
+		     ->getConnectionPlace()->isConnectionAuthorized() )
 		{
                     lineStop->setPreviousConnectionDeparture ( currentLineStop );
-		    } */
+		}
             }
         }
     }

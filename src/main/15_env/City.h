@@ -29,6 +29,7 @@ class City : public Registrable<int, City>, public IncludingPlace
 {
  private:
 
+    // TODO add interpretor
 
  public:
 

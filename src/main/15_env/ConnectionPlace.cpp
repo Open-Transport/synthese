@@ -47,6 +47,12 @@ ConnectionPlace::setConnectionType (const ConnectionType& connectionType)
 
 
 
+bool 
+ConnectionPlace::isConnectionAuthorized () const
+{
+    return _connectionType != CONNECTION_TYPE_FORBIDDEN;
+}
+
 
 
 int 
