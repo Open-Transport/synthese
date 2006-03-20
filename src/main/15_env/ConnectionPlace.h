@@ -2,7 +2,7 @@
 #define SYNTHESE_ENV_CONNECTIONPLACE_H
 
 
-#include <vector>
+#include <map>
 
 #include "AddressablePlace.h"
 
@@ -41,7 +41,7 @@ public:
 private:
 
     ConnectionType _connectionType;
-    std::vector< std::vector< int > > _transferDelays; //!< Transfer delays between vertices
+    std::map< std::pair<int, int>, int > _transferDelays; //!< Transfer delays between vertices
 
 protected:
 

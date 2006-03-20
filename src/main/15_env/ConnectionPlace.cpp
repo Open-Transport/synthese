@@ -59,7 +59,12 @@ int
 ConnectionPlace::getTransferDelay (int departureRank, int arrivalRank) const
 {
     if (_connectionType == CONNECTION_TYPE_FORBIDDEN) return FORBIDDEN_TRANSFER_DELAY;
-    return _transferDelays.at (departureRank).at (arrivalRank);
+    std::map< std::pair<int, int>, int >::const_iterator iter = 
+	_transferDelays.find (std::make_pair (departureRank, arrivalRank));
+    
+    // If not defined in map, return unknown transfer delay constant
+    if (iter == _transferDelays.end ()) return UNKNOWN_TRANSFER_DELAY;
+    return iter->second;
 }
  
 
@@ -67,7 +72,7 @@ ConnectionPlace::getTransferDelay (int departureRank, int arrivalRank) const
 void 
 ConnectionPlace::setTransferDelay (int departureRank, int arrivalRank, int transferDelay)
 {
-    _transferDelays.at (departureRank).at (arrivalRank) = transferDelay;
+    _transferDelays[std::make_pair (departureRank, arrivalRank)] = transferDelay;
 }
     
 
