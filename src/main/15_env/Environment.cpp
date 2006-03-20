@@ -27,6 +27,22 @@ Environment::getCities ()
 
 
 
+Document::Registry&
+Environment::getDocuments ()
+{
+    return _documents;
+}
+
+
+
+Line::Registry&
+Environment::getLines ()
+{
+    return _lines;
+}
+
+
+
 
 
 

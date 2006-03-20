@@ -3,6 +3,8 @@
 
 
 #include "City.h"
+#include "Document.h"
+#include "Line.h"
 
 
 #include <string>
@@ -25,9 +27,9 @@ class Environment
  private:
 
     City::Registry _cities;
-
-    // 
-
+    Document::Registry _documents;
+    Line::Registry _lines;
+    
 
 
  public:
@@ -39,6 +41,9 @@ class Environment
     //! @name Getters/Setters
     //@{
     City::Registry& getCities ();
+    Document::Registry& getDocuments ();
+    Line::Registry& getLines ();
+    // ...
     //@}
 
 
