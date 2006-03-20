@@ -11,8 +11,9 @@ namespace env
 
 
 RoadChunk::RoadChunk (const Road* road,
-		      const Address* fromAddress)
-    : Edge ()
+		      const Address* fromAddress,
+		      const EdgeType& type)
+    : Edge (type)
     , _road (road)
     , _fromAddress (fromAddress)
 {

@@ -41,6 +41,41 @@ Vertex::getRankInConnectionPlace () const
 
 
 
+    
+const std::set<const Edge*>& 
+Vertex::getDepartureEdges () const
+{
+    return _departureEdges;
+}
+
+
+
+const std::set<const Edge*>& 
+Vertex::getArrivalEdges () const
+{
+    return _arrivalEdges;
+}
+
+
+
+
+ 
+
+void 
+Vertex::addDepartureEdge ( const Edge* edge )
+{
+    _departureEdges.insert (edge);    
+}
+
+
+
+void 
+Vertex::addArrivalEdge ( const Edge* edge )
+{
+    _arrivalEdges.insert (edge);    
+}
+
+
 
 
 

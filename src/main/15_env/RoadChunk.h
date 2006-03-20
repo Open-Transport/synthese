@@ -36,7 +36,8 @@ private:
 public:
 
   RoadChunk (const Road* road,
-	     const Address* fromAddress);
+	     const Address* fromAddress,
+	     const EdgeType& type);
   
   virtual ~RoadChunk ();
 

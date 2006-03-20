@@ -16,12 +16,12 @@ namespace env
 
 LineStop::LineStop (const Line* line,
 	      int metricOffset,
-	      LineStopType type,
+	      const EdgeType& type,
 	      const PhysicalStop* physicalStop,
 	      bool scheduleInput)
-    : _line (line)
+    : Edge (type)
+    , _line (line)
     , _metricOffset (metricOffset)
-    , _type (type)
     , _physicalStop (physicalStop)
     , _scheduleInput (scheduleInput)
 {
@@ -39,35 +39,6 @@ LineStop::~LineStop()
 }
 
 
-
-const LineStop* 
-LineStop::getPreviousDeparture () const
-{
-    return _previousDeparture;
-}
-
-
-
-const LineStop* 
-LineStop::getFollowingArrival () const
-{
-    return _followingArrival;
-}
-
-
-const LineStop* 
-LineStop::getPreviousConnectionDeparture () const
-{
-    return _previousConnectionDeparture;
-}
-
-
-
-const LineStop* 
-LineStop::getFollowingConnectionArrival () const
-{
-    return _followingConnectionArrival;
-}
 
 
 const synthese::time::Schedule& 
@@ -141,71 +112,6 @@ LineStop::getMetricOffset () const
 
 
     
-LineStop::LineStopType 
-LineStop::getType () const
-{
-    return _type;
-}
-
-
-
-void 
-LineStop::setType ( const LineStopType& type )
-{
-    _type = type;
-}
-
-
-
-void 
-LineStop::setPreviousDeparture ( const LineStop* previousDeparture)
-{
-    _previousDeparture = previousDeparture;
-}
-
-
-
-
-void 
-LineStop::setPreviousConnectionDeparture( const LineStop* previousConnectionDeparture)
-{
-    _previousConnectionDeparture = previousConnectionDeparture;
-}
-
-
-
-
-void 
-LineStop::setFollowingArrival ( const LineStop* followingArrival)
-{
-    _followingArrival = followingArrival;
-}
-
-
-
-
-void 
-LineStop::setFollowingConnectionArrival( const LineStop* followingConnectionArrival)
-{
-    _followingConnectionArrival = followingConnectionArrival;
-}
-
-
-
-bool 
-LineStop::isArrival () const
-{
-    return ( _type == LINE_STOP_PASSAGE || _type == LINE_STOP_ARRIVAL );
-}
-
-
-
-bool 
-LineStop::isDeparture () const
-{
-    return ( _type == LINE_STOP_PASSAGE || _type == LINE_STOP_DEPARTURE );
-}
-
 
 
 bool 

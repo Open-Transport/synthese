@@ -29,13 +29,6 @@ class Line;
 {
 public:
     
-    typedef enum 
-	{
-            LINE_STOP_DEPARTURE = 'D',
-            LINE_STOP_ARRIVAL = 'A',
-            LINE_STOP_PASSAGE = 'P'
-	} LineStopType;
-
 private:
 
     const PhysicalStop*  _physicalStop;   //!< Physical stop
@@ -43,13 +36,6 @@ private:
 
     const double _metricOffset;      //!< Metric offset of stop on line
     const bool _scheduleInput; //!< Schedule with or without input
-    LineStopType _type;      //!< Departure, arrival or passage    
-
-    // remonter sur edge (toujours vrai pour voirie)
-    const LineStop* _previousDeparture;  //!< ?
-    const LineStop* _previousConnectionDeparture; //!< ?
-    const LineStop* _followingArrival;  //!< ?
-    const LineStop* _followingConnectionArrival; //!< ?
 
     synthese::time::Schedule* _firstDepartureSchedule;  //!< First departure schedule
     synthese::time::Schedule* _lastDepartureSchedule;  //!< Last departure schedule
@@ -65,7 +51,7 @@ public:
 
     LineStop (const Line* line,
 	      int metricOffset,
-	      LineStopType type,
+	      const EdgeType& type,
 	      const PhysicalStop* physicalStop,
 	      bool scheduleInput);
 
@@ -92,33 +78,15 @@ public:
 	getLastArrivalSchedule (int serviceNumber) const;
 
     
-    const LineStop* getPreviousDeparture () const;
-    void setPreviousDeparture ( const LineStop* previousDeparture);
-
-    const LineStop* getPreviousConnectionDeparture () const;
-    void setPreviousConnectionDeparture( const LineStop* previousConnectionDeparture);
-
-    const LineStop* getFollowingArrival () const;
-    void setFollowingArrival ( const LineStop* followingArrival);
-
-    const LineStop* getFollowingConnectionArrival () const;
-    void setFollowingConnectionArrival( const LineStop* followingConnectionArrival);
-
     bool getScheduleInput () const;
     double getMetricOffset () const;
     
-    LineStopType getType () const;
-    void setType ( const LineStopType& type );
-
 
     //@}
 
 
     //! @name Query methods
     //@{
-    bool isArrival () const;
-    bool isDeparture () const;
-    
     bool isRunning( const synthese::time::DateTime& startMoment, 
 		    const synthese::time::DateTime& endMoment ) const;
 
@@ -156,7 +124,8 @@ public:
 	@param calculationMoment Calculation moment for reservation delay checking
 	@return Found service index or -1 if none was found.
 	@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
-	@retval continuousServiceAmplitude Continuous service amplitude. 0 means scheduled service.
+	@retval continuousServiceAmplitude Continuous service amplitude. 
+	0 means scheduled service.
     */
     int getNextService (synthese::time::DateTime& departureMoment, 
 			const synthese::time::DateTime& maxDepartureMoment,

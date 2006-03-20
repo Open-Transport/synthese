@@ -3,7 +3,6 @@
 
 
 #include "Vertex.h"
-#include <set>
 #include <string>
 
 
@@ -27,8 +26,6 @@ class PhysicalStop :
 private:
 
     const std::string _name; //! Physical stop name
-    std::set<const LineStop*> _departureLineStops; //!< Departure line stops of the physical stop
-    std::set<const LineStop*> _arrivalLineStops; //!< Arrival line stops of the physical stop
     
  public:
 
@@ -41,20 +38,8 @@ private:
 
     //! @name Getters/Setters
     //@{
-    const std::set<const LineStop*>& 
-	getDepartureLineStops () const;
-
-    const std::set<const LineStop*>& 
-	getArrivalLineStops () const;
-
     //@}
 
-
-    //! @name Update methods
-    //@{
-    void addDepartureLineStop ( const LineStop* lineStop );
-    void addArrivalLineStop ( const LineStop* lineStop );
-     //@}
 
 
 };

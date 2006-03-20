@@ -269,9 +269,9 @@ Line::postInit ()
         LineStop* lineStop = *iter;
 
         if ( lineStop->getFollowingArrival () == 0 )
-            lineStop->setType ( LineStop::LINE_STOP_ARRIVAL );
+            lineStop->setType ( Edge::EDGE_TYPE_ARRIVAL );
         if ( lineStop->getPreviousDeparture () == 0 )
-            lineStop->setType ( LineStop::LINE_STOP_DEPARTURE );
+            lineStop->setType ( Edge::EDGE_TYPE_DEPARTURE );
     }
 }
 
