@@ -11,17 +11,32 @@ namespace synthese
 namespace env
 {
 
+    class Address;
     class Road;
 
+
+
+/** Association class between road and address.
+A road chunk is always delimited by two adresses, with no other
+address in between.
+These delimiting addresses can correspond to :
+- a crossing address
+- a physical stop address
+- a public place address
+
+ @ingroup m15
+*/
 class RoadChunk : public Edge 
 {
 private:
-  
-  const Road* _road;
+
+    const Road* _road;
+    const Address* _fromAddress;
 
 public:
 
-  RoadChunk (const Road* road);
+  RoadChunk (const Road* road,
+	     const Address* fromAddress);
   
   virtual ~RoadChunk ();
 
@@ -29,9 +44,8 @@ public:
   //! @name Getters/Setters
   //@{
   const Path* getParentPath () const;
-
-  const Vertex* getFrom () const;
-  const Vertex* getTo () const;
+  const Vertex* getFromVertex () const;
+  double getMetricOffset () const;
   //@}
     
 

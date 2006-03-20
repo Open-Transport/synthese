@@ -77,12 +77,6 @@ LineStop::getFirstDepartureSchedule (int serviceNumber) const
 }
 
 
-const synthese::time::Schedule& 
-LineStop::getRealFirstDepartureSchedule (int serviceNumber) const
-{
-    return _realFirstDepartureSchedule[serviceNumber];
-}
-
 
 
 const synthese::time::Schedule& 
@@ -100,12 +94,6 @@ LineStop::getFirstArrivalSchedule (int serviceNumber) const
 }
 
 
-
-const synthese::time::Schedule& 
-LineStop::getRealFirstArrivalSchedule (int serviceNumber) const
-{
-    return _realFirstArrivalSchedule[serviceNumber];
-}
 
 
 
@@ -125,28 +113,31 @@ LineStop::getScheduleInput () const
 
 
 
-
-const Line* 
-LineStop::getLine () const
+const Path* 
+LineStop::getParentPath () const
 {
     return _line;
 }
 
 
 
-int 
+
+const Vertex* 
+LineStop::getFromVertex () const
+{
+    return _physicalStop;
+}
+
+
+
+
+
+double
 LineStop::getMetricOffset () const
 {
     return _metricOffset;
 }
 
-
-
-const PhysicalStop* 
-LineStop::getPhysicalStop () const
-{
-    return _physicalStop;
-}
 
 
     
@@ -321,15 +312,15 @@ LineStop::checkSchedule (const LineStop* lineStopWithPreviousSchedule ) const
 bool 
 LineStop::seemsGeographicallyConsistent (const LineStop& other) const
 {
-    int deltaMO; // meters
+    double deltaMO; // meters
     if ( getMetricOffset () > other.getMetricOffset () )
         deltaMO = ( getMetricOffset () - other.getMetricOffset () ) / 1000;
     else
         deltaMO = ( other.getMetricOffset () - getMetricOffset () ) / 1000;
 
     int deltaGPS = SquareDistance ( 
-	*getPhysicalStop (), 
-	*other.getPhysicalStop () ).getDistance(); // kilometers
+	*getFromVertex (), 
+	*other.getFromVertex () ).getDistance(); // kilometers
 
     if ( deltaMO > 10 * deltaGPS && deltaMO - deltaGPS > 1 )
     {
@@ -581,7 +572,6 @@ LineStop::linkWithNextSchedule (const LineStop& previous,
 
         _firstDepartureSchedule[ s ] = previous._firstDepartureSchedule[ s ];
         _firstDepartureSchedule[ s ] += int( ( int ) floor( durationToAdd ) );
-        _realFirstDepartureSchedule[ s ] = _firstDepartureSchedule[ s ];
         _lastDepartureSchedule[ s ] = previous._lastDepartureSchedule[ s ];
         _lastDepartureSchedule[ s ] += int( ( int ) floor( durationToAdd ) );
 
@@ -589,7 +579,6 @@ LineStop::linkWithNextSchedule (const LineStop& previous,
 
         _firstArrivalSchedule[ s ] = previous._firstArrivalSchedule[ s ];
         _firstArrivalSchedule[ s ] += int( ( int ) ceil( durationToAdd ) );
-        _realFirstArrivalSchedule[ s ] = _firstArrivalSchedule[ s ];
         _lastArrivalSchedule[ s ] = previous._lastArrivalSchedule[ s ];
         _lastArrivalSchedule[ s ] += int( ( int ) ceil( durationToAdd ) );
     }
@@ -625,7 +614,6 @@ LineStop::setSchedules ( const std::string& buffer,
 	
 
         _firstDepartureSchedule[ s ] = buffer.substr ( position );
-        _realFirstDepartureSchedule[ s ] = _firstDepartureSchedule[ s ];
         _lastDepartureSchedule[ s ] = _firstDepartureSchedule[ s ];
 	_lastDepartureSchedule[ s ] += duration;
 
@@ -634,8 +622,6 @@ LineStop::setSchedules ( const std::string& buffer,
         {
             _firstArrivalSchedule[ s ] = _firstDepartureSchedule[ s ];
             _firstArrivalSchedule[ s ] += periodicity;
-            _realFirstArrivalSchedule[ s ] = _firstArrivalSchedule[ s ];
-            _realFirstArrivalSchedule[ s ] += periodicity;
             _lastArrivalSchedule[ s ] = _lastDepartureSchedule[ s ];
             _lastArrivalSchedule[ s ] += periodicity;
         }
@@ -663,10 +649,8 @@ LineStop::allocateSchedules ()
 {
     _lastArrivalSchedule = new synthese::time::Schedule[ _line->getServices().size() ];
     _firstArrivalSchedule = new synthese::time::Schedule[ _line->getServices().size() ];
-    _realFirstArrivalSchedule = new synthese::time::Schedule[ _line->getServices().size() ];
     _lastDepartureSchedule = new synthese::time::Schedule[ _line->getServices().size() ];
     _firstDepartureSchedule = new synthese::time::Schedule[ _line->getServices().size() ];
-    _realFirstDepartureSchedule = new synthese::time::Schedule[ _line->getServices().size() ];
 }
 
 

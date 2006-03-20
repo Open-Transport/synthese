@@ -41,8 +41,15 @@ public:
     //! @name Getters/Setters
     //@{
     virtual const Path* getParentPath () const = 0;
-    virtual const Vertex* getFrom () const = 0;
-    virtual const Vertex* getTo () const = 0;
+
+    /** Returns this edge origin vertex.
+     */
+    virtual const Vertex* getFromVertex () const = 0;
+
+    /** Returns metric offset of this edge from
+	parent path origin vertex.
+    */
+    virtual double getMetricOffset () const = 0;
     //@}
 
     

@@ -4,6 +4,8 @@
 
 #include <string>
 #include "module.h"
+#include "Edge.h"
+
 
 #include "04_time/DateTime.h"
 #include "04_time/Schedule.h"
@@ -23,7 +25,7 @@ class Line;
 /** Association class between line and physical stop.
  @ingroup m15
 */
-class LineStop
+ class LineStop : public Edge
 {
 public:
     
@@ -37,29 +39,25 @@ public:
 private:
 
     const PhysicalStop*  _physicalStop;   //!< Physical stop
-    const Line* _line;      //!< Physical stop line
-    const int _metricOffset;      //!< Metric offset of stop on line
+    const Line* _line;      //!< Parent line
+
+    const double _metricOffset;      //!< Metric offset of stop on line
     const bool _scheduleInput; //!< Schedule with or without input
-    LineStopType _type;      //!< Departure, arrival or passage
-    
+    LineStopType _type;      //!< Departure, arrival or passage    
+
+    // remonter sur edge (toujours vrai pour voirie)
     const LineStop* _previousDeparture;  //!< ?
     const LineStop* _previousConnectionDeparture; //!< ?
     const LineStop* _followingArrival;  //!< ?
     const LineStop* _followingConnectionArrival; //!< ?
-    const LineStop* _previous;      //!< ?
-    const LineStop* _following;      //!< ?
-    
-    synthese::time::Schedule* _firstDepartureSchedule;  //!< Theoretical first departure schedule
-    synthese::time::Schedule* _realFirstDepartureSchedule; //!< Real first departure schedule
-    synthese::time::Schedule* _lastDepartureSchedule;  //!< Theoretical last departure schedule
-    synthese::time::Schedule* _firstArrivalSchedule; //!< Theoretical first arrival schedule
-    synthese::time::Schedule* _realFirstArrivalSchedule; //!< Real first arrival schedule
-    synthese::time::Schedule* _lastArrivalSchedule;  //!< Theoretical last arrival schedule
 
-    int _departureIndex[24];     //!< Line service index by theoretical departure hour of day
-    int _realDepartureIndex[24]; //!< Line service index by real departure hour of day
-    int _arrivalIndex[24];  //!< Line service index by theoretical arrival hour of day
-    int _realArrivalIndex[24];  //!< Line service index by real arrival hour of day
+    synthese::time::Schedule* _firstDepartureSchedule;  //!< First departure schedule
+    synthese::time::Schedule* _lastDepartureSchedule;  //!< Last departure schedule
+    synthese::time::Schedule* _firstArrivalSchedule; //!< First arrival schedule
+    synthese::time::Schedule* _lastArrivalSchedule;  //!< Last arrival schedule
+
+    int _departureIndex[24];     //!< First line service index by departure hour of day
+    int _arrivalIndex[24];  //!< First line service index by arrival hour of day
 
 
 public:
@@ -76,21 +74,19 @@ public:
 
     //! @name Getters/Setters
     //@{
+    const Path* getParentPath () const;
+    const Vertex* getFromVertex () const;
+
+
 
     const synthese::time::Schedule& 
 	getFirstDepartureSchedule (int serviceNumber) const;
-
-    const synthese::time::Schedule& 
-	getRealFirstDepartureSchedule (int serviceNumber) const;
 
     const synthese::time::Schedule& 
 	getLastDepartureSchedule (int serviceNumber) const;
 
     const synthese::time::Schedule& 
 	getFirstArrivalSchedule (int serviceNumber) const;
-
-    const synthese::time::Schedule& 
-	getRealFirstArrivalSchedule (int serviceNumber) const;
 
     const synthese::time::Schedule& 
 	getLastArrivalSchedule (int serviceNumber) const;
@@ -109,9 +105,7 @@ public:
     void setFollowingConnectionArrival( const LineStop* followingConnectionArrival);
 
     bool getScheduleInput () const;
-    const Line* getLine () const;
-    int getMetricOffset () const;
-    const PhysicalStop* getPhysicalStop () const;
+    double getMetricOffset () const;
     
     LineStopType getType () const;
     void setType ( const LineStopType& type );

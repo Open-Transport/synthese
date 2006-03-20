@@ -299,8 +299,8 @@ Line::addLineStop (LineStop* lineStop)
          
 	    // Chain only relations between A and A, D and D, A and D 
 	    // if different stops, D and A if different stops
-            if ( currentLineStop->getPhysicalStop ()->getConnectionPlace() != 
-		 lineStop->getPhysicalStop ()->getConnectionPlace() || 
+            if ( currentLineStop->getFromVertex ()->getConnectionPlace() != 
+		 lineStop->getFromVertex ()->getConnectionPlace() || 
 		 currentLineStop->getType () == lineStop->getType () )
             {
                 // Chain following arrivals
@@ -310,7 +310,7 @@ Line::addLineStop (LineStop* lineStop)
                     currentLineStop->setFollowingArrival ( lineStop );
 		}
 		if ( currentLineStop->getFollowingConnectionArrival () == 0 && 
-		     lineStop->getPhysicalStop ()->getConnectionPlace()
+		     lineStop->getFromVertex ()->getConnectionPlace()
 		     ->isConnectionAuthorized () )
 		{
                     currentLineStop->setFollowingConnectionArrival ( lineStop );
@@ -323,7 +323,7 @@ Line::addLineStop (LineStop* lineStop)
 
 		if ( currentLineStop->isDeparture () && 
 		     lineStop->getPreviousConnectionDeparture () == 0 && 
-		     currentLineStop->getPhysicalStop ()
+		     currentLineStop->getFromVertex ()
 		     ->getConnectionPlace()->isConnectionAuthorized() )
 		{
                     lineStop->setPreviousConnectionDeparture ( currentLineStop );

@@ -1,5 +1,6 @@
 #include "RoadChunk.h"
 #include "Road.h"
+#include "Address.h"
 
 
 
@@ -9,9 +10,11 @@ namespace env
 {
 
 
-RoadChunk::RoadChunk (const Road* road)
+RoadChunk::RoadChunk (const Road* road,
+		      const Address* fromAddress)
     : Edge ()
     , _road (road)
+    , _fromAddress (fromAddress)
 {
 }
 
@@ -23,6 +26,7 @@ RoadChunk::~RoadChunk ()
     
 
 
+
 const Path* 
 RoadChunk::getParentPath () const
 {
@@ -31,20 +35,22 @@ RoadChunk::getParentPath () const
 
 
 
+
 const Vertex* 
-RoadChunk::getFrom () const
+RoadChunk::getFromVertex () const
 {
-    return 0;
+    return _fromAddress;
 }
 
 
 
 
-const Vertex* 
-RoadChunk::getTo () const
+double
+RoadChunk::getMetricOffset () const
 {
-    return 0;
+    return _fromAddress->getMetricOffset ();
 }
+
 
 
 
