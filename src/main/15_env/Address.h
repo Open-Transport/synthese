@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <set>
-#include "Gateway.h"
+#include "Vertex.h"
 
 
 
@@ -21,8 +21,13 @@ class Road;
 
 /** Adress (road + metric offset)
  An address is a position on a road given a metric offset from the start of the road.
+
+An address may be associated with a connection place in the following cases :
+  - The address corresponds to a crossing between two roads
+  - The address belongs to a logical stop
+
 */
-class Address : public Gateway
+class Address : public Vertex
 {
 private:
 
@@ -31,9 +36,8 @@ private:
 
 public:
 
-    Address (int rank,
-	     const std::string& name,
-	     const LogicalPlace* logicalPlace,
+    Address (const ConnectionPlace* connectionPlace,
+	     int rankInConnectionPlace,
 	     const Road* road, 
 	     double metricOffset);
 

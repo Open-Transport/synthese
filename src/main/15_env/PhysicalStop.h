@@ -2,8 +2,9 @@
 #define SYNTHESE_ENV_PHYSICALSTOP_H
 
 
-#include "Gateway.h"
+#include "Vertex.h"
 #include <set>
+#include <string>
 
 
 namespace synthese
@@ -11,25 +12,30 @@ namespace synthese
 namespace env
 {
 
-class LineStop;
-
+ class LineStop;
+ class LogicalStop;
 
 
 /** Physical stop (bus stop, etc.).
     A physical stop is an entry point to the transport network.
  @ingroup m15
 */
-class PhysicalStop : public Gateway
+class PhysicalStop : 
+    public Vertex
 {
 
 private:
 
+    const std::string _name; //! Physical stop name
     std::set<const LineStop*> _departureLineStops; //!< Departure line stops of the physical stop
     std::set<const LineStop*> _arrivalLineStops; //!< Arrival line stops of the physical stop
     
  public:
 
-    PhysicalStop (int rank, const std::string& name, const LogicalPlace* logicalPlace);
+    PhysicalStop (const std::string& name, 
+		  int rankInLogicalStop,
+		  const LogicalStop* logicalStop);
+
     ~PhysicalStop ();
     
 

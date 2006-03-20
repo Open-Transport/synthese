@@ -327,10 +327,10 @@ LineStop::seemsGeographicallyConsistent (const LineStop& other) const
     else
         deltaMO = ( other.getMetricOffset () - getMetricOffset () ) / 1000;
 
-/* MJ compil
     int deltaGPS = SquareDistance ( 
-	*( getPhysicalStop ()->getLogicalPlace() ), 
-	*( other.getPhysicalStop ()->getLogicalPlace() ) ).getDistance(); // kilometers
+	*getPhysicalStop (), 
+	*other.getPhysicalStop () ).getDistance(); // kilometers
+
     if ( deltaMO > 10 * deltaGPS && deltaMO - deltaGPS > 1 )
     {
         return false;
@@ -339,7 +339,6 @@ LineStop::seemsGeographicallyConsistent (const LineStop& other) const
     {
         return false;
     }
-	*/
 
     return true;
     

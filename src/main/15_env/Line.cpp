@@ -298,8 +298,8 @@ Line::addLineStop (LineStop* lineStop)
          
 	    // Chain only relations between A and A, D and D, A and D 
 	    // if different stops, D and A if different stops
-            if ( currentLineStop->getPhysicalStop ()->getLogicalPlace() != 
-		 lineStop->getPhysicalStop ()->getLogicalPlace() || 
+            if ( currentLineStop->getPhysicalStop ()->getConnectionPlace() != 
+		 lineStop->getPhysicalStop ()->getConnectionPlace() || 
 		 currentLineStop->getType () == lineStop->getType () )
             {
                 // Chain following arrivals

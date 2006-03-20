@@ -13,7 +13,7 @@ LogicalStop::LogicalStop (const int& id,
 			  const std::string& name,
 			  const City* city)
     : Registrable<int,LogicalStop> (id)
-    , AddressablePlace (name, city)
+    , ConnectionPlace (name, city)
 {
 
 }

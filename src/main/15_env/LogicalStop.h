@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "Registrable.h"
-#include "AddressablePlace.h"
+#include "ConnectionPlace.h"
 
 
 namespace synthese
@@ -23,7 +23,7 @@ class PhysicalStop;
 */
 class LogicalStop : 
     public Registrable<int,LogicalStop>, 
-    public AddressablePlace
+    public ConnectionPlace
 {
 
 private:
@@ -46,6 +46,7 @@ public:
     //@{
     const std::vector<const PhysicalStop*>& getPhysicalStops () const;
     //@}
+
 
 
     //! @name Update methods.
