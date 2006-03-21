@@ -12,8 +12,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug"
+			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
+			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			ConfigurationType="0">
 			<Tool
 				Name="VCNMakeTool"
@@ -24,8 +24,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
+			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			ConfigurationType="0">
 			<Tool
 				Name="VCNMakeTool"
