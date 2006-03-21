@@ -1,6 +1,8 @@
 
 #include <cstdlib>
 #include <sstream>
+#include <assert.h>
+
 
 #include "Request.h"
 
@@ -106,6 +108,17 @@ Request::getParameters () const
 {
     return _parameters;
 }
+
+
+
+
+std::string 
+Request::getFunctionCode () const
+{
+    return getParameter (PARAMETER_FUNCTION);
+}
+
+
 
 
 bool 

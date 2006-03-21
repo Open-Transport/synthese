@@ -8,6 +8,7 @@
 #include <string.h>
 
 
+
 namespace synthese
 {
 namespace tcp
@@ -35,7 +36,7 @@ Socket::Socket()
 */
 Socket::~Socket()
 {
-    close();
+    closeSocket();
 #ifdef WIN32
     WSACleanup();
 #endif
@@ -46,14 +47,14 @@ Socket::~Socket()
     \date 2005
 */
 void 
-Socket::close()
+Socket::closeSocket()
 {
     if(_socket) closesocket(_socket);
 }
 
 
 void 
-Socket::close(SOCKET socket)
+Socket::closeSocket (SOCKET socket)
 {
     if(socket) closesocket(socket);
 }

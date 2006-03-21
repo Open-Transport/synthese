@@ -73,7 +73,7 @@ Socket socket;
 socket.open(hostmask,port,proto);
 socket.server();
 while(1) {
-    SOCKET client = socket.Accept();
+    SOCKET client = socket.acceptConnection();
     socket.read(client, buffer, size, timeout);
     socket.write(client, buffer, size, timeout);
     socket.close(client);
@@ -82,7 +82,7 @@ while(1) {
 Utilisation en mode client:
 Socket socket;
 socket.open(hostname,port,proto);
-socket.connect();
+socket.connectToServer();
 socket.read(Client,Buffer,Size,Timeout);
 socket.write(Client,Buffer,Size,Timeout);
 
@@ -100,8 +100,8 @@ protected:
 public:
     Socket();
     ~Socket();
-    void close();
-    void close(SOCKET socket);
+    void closeSocket();
+    void closeSocket (SOCKET socket);
     void open(const char* hostName, 
 	      const int portNumber, 
 	      const char* protoName);

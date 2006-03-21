@@ -31,8 +31,8 @@ Request syntax is quite similar to URL syntax :
  - parameters separator is & character.
 
 In most cases, a request must at least provide following parameters :
- - <i>fct</i> : function name
- - <i>site</i> : site code
+ - fct : function name
+ - site : site code
 
 @ingroup m70
 */
@@ -61,6 +61,10 @@ class Request
     //! @name Query methods
     //@{
 
+    /** Gets the parameter corresponding to function code.
+      @return The string value or the function code or empty if no such parameter.
+    */
+    std::string getFunctionCode () const;
 
     /** Tests whether or not a parameter is set in this request.
       @param name Parameter name.

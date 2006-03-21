@@ -38,8 +38,6 @@ class RegistryException : public synthese::util::Exception
 
  private:
 
-    Exception ( const Exception& ref );
-    Exception& operator= ( const Exception& rhs );
 
 };
 

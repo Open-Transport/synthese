@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 
 
 namespace synthese
@@ -81,7 +82,7 @@ Date::getWeekDay () const
     int s = az / 100;
     int e = az % 100;
 
-    int j = getDay () + ( int ) floor( 2.6 * mz - 0.2 );
+    int j = getDay () + ( int ) floor ( 2.6 * mz - 0.2 );
     j += e + ( e / 4 ) + ( s / 4 ) - 2 * s;
     if ( j >= 0 )
         j %= 7;

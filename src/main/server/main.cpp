@@ -439,7 +439,7 @@ int _tmain( int argc, TCHAR* argv[], TCHAR* envp[] )
         {
             // Initialisation de la couche r�seau en mode serveur
             srvSocket.open( DEF_SERV, __PortServeur, DEF_PROTO );
-            srvSocket.connectToServer();
+            srvSocket.server();
         }
         catch ( const char * err )
         {
