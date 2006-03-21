@@ -2,6 +2,7 @@
 
 #include "RequestException.h"
 
+#include <boost/iostreams/stream.hpp>
 #include <boost/thread/thread.hpp>
 
 
@@ -54,7 +55,16 @@ Server::~Server ()
 		    synthese::tcp::TcpServerSocket& serverSocket =
 			_tcpService->acceptConnection ();
 		    
-		    // TODO : treat the request...
+		    boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
+			tcpStream (serverSocket);
+
+		    std::string requestString;
+		    tcpStream >> requestString;
+		    
+		    // Echo...
+		    tcpStream << requestString << std::endl;
+
+		    _tcpService->closeConnection (serverSocket);
 		}
 	    }
     };
