@@ -2,7 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="01_util"
+	Name="00_tcp"
+	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
@@ -42,13 +43,19 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\Conversion.cpp">
+				RelativePath=".\Socket.cpp">
 			</File>
 			<File
-				RelativePath=".\Exception.cpp">
+				RelativePath=".\SocketException.cpp">
 			</File>
 			<File
-				RelativePath=".\Log.cpp">
+				RelativePath=".\TcpClientSocket.cpp">
+			</File>
+			<File
+				RelativePath=".\TcpServerSocket.cpp">
+			</File>
+			<File
+				RelativePath=".\TcpService.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -56,28 +63,22 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\Conversion.h">
-			</File>
-			<File
-				RelativePath=".\Exception.h">
-			</File>
-			<File
-				RelativePath=".\HtmlFilter.h">
-			</File>
-			<File
-				RelativePath=".\Log.h">
-			</File>
-			<File
-				RelativePath=".\LowerCaseFilter.h">
-			</File>
-			<File
 				RelativePath=".\module.h">
 			</File>
 			<File
-				RelativePath=".\PlainCharFilter.h">
+				RelativePath=".\Socket.h">
 			</File>
 			<File
-				RelativePath=".\SqlFilter.h">
+				RelativePath=".\SocketException.h">
+			</File>
+			<File
+				RelativePath=".\TcpClientSocket.h">
+			</File>
+			<File
+				RelativePath=".\TcpServerSocket.h">
+			</File>
+			<File
+				RelativePath=".\TcpService.h">
 			</File>
 		</Filter>
 		<File

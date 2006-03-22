@@ -2,7 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="01_util"
+	Name="33_route_planner"
+	ProjectGUID="{DCB40545-776B-4B6E-A050-D4A513880697}"
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
@@ -42,13 +43,10 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\Conversion.cpp">
+				RelativePath=".\Journey.cpp">
 			</File>
 			<File
-				RelativePath=".\Exception.cpp">
-			</File>
-			<File
-				RelativePath=".\Log.cpp">
+				RelativePath=".\JourneyLeg.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -56,28 +54,13 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\Conversion.h">
+				RelativePath=".\Journey.h">
 			</File>
 			<File
-				RelativePath=".\Exception.h">
-			</File>
-			<File
-				RelativePath=".\HtmlFilter.h">
-			</File>
-			<File
-				RelativePath=".\Log.h">
-			</File>
-			<File
-				RelativePath=".\LowerCaseFilter.h">
+				RelativePath=".\JourneyLeg.h">
 			</File>
 			<File
 				RelativePath=".\module.h">
-			</File>
-			<File
-				RelativePath=".\PlainCharFilter.h">
-			</File>
-			<File
-				RelativePath=".\SqlFilter.h">
 			</File>
 		</Filter>
 		<File

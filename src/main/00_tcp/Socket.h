@@ -35,10 +35,6 @@
     @{
 */
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
 
 #ifdef UNIX
 #define closesocket(s) close(s)

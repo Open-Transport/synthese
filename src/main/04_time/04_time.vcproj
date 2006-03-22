@@ -2,7 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="01_util"
+	Name="04_time"
+	ProjectGUID="{BB6C0975-210C-4358-82B6-B39EC3EE1AD4}"
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
@@ -42,13 +43,28 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\Conversion.cpp">
+				RelativePath=".\Date.cpp">
 			</File>
 			<File
-				RelativePath=".\Exception.cpp">
+				RelativePath=".\DateTime.cpp">
 			</File>
 			<File
-				RelativePath=".\Log.cpp">
+				RelativePath=".\Day.cpp">
+			</File>
+			<File
+				RelativePath=".\Hour.cpp">
+			</File>
+			<File
+				RelativePath=".\HourPeriod.cpp">
+			</File>
+			<File
+				RelativePath=".\Month.cpp">
+			</File>
+			<File
+				RelativePath=".\Schedule.cpp">
+			</File>
+			<File
+				RelativePath=".\Year.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -56,28 +72,31 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\Conversion.h">
+				RelativePath=".\Date.h">
 			</File>
 			<File
-				RelativePath=".\Exception.h">
+				RelativePath=".\DateTime.h">
 			</File>
 			<File
-				RelativePath=".\HtmlFilter.h">
+				RelativePath=".\Day.h">
 			</File>
 			<File
-				RelativePath=".\Log.h">
+				RelativePath=".\Hour.h">
 			</File>
 			<File
-				RelativePath=".\LowerCaseFilter.h">
+				RelativePath=".\HourPeriod.h">
 			</File>
 			<File
 				RelativePath=".\module.h">
 			</File>
 			<File
-				RelativePath=".\PlainCharFilter.h">
+				RelativePath=".\Month.h">
 			</File>
 			<File
-				RelativePath=".\SqlFilter.h">
+				RelativePath=".\Schedule.h">
+			</File>
+			<File
+				RelativePath=".\Year.h">
 			</File>
 		</Filter>
 		<File

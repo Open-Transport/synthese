@@ -2,7 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="01_util"
+	Name="70_server"
+	ProjectGUID="{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}"
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
@@ -19,7 +20,7 @@
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
@@ -31,7 +32,7 @@
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -42,13 +43,22 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\Conversion.cpp">
+				RelativePath=".\main.cpp">
 			</File>
 			<File
-				RelativePath=".\Exception.cpp">
+				RelativePath=".\Request.cpp">
 			</File>
 			<File
-				RelativePath=".\Log.cpp">
+				RelativePath=".\RequestDispatcher.cpp">
+			</File>
+			<File
+				RelativePath=".\RequestException.cpp">
+			</File>
+			<File
+				RelativePath=".\RequestHandler.cpp">
+			</File>
+			<File
+				RelativePath=".\Server.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -56,28 +66,22 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\Conversion.h">
-			</File>
-			<File
-				RelativePath=".\Exception.h">
-			</File>
-			<File
-				RelativePath=".\HtmlFilter.h">
-			</File>
-			<File
-				RelativePath=".\Log.h">
-			</File>
-			<File
-				RelativePath=".\LowerCaseFilter.h">
-			</File>
-			<File
 				RelativePath=".\module.h">
 			</File>
 			<File
-				RelativePath=".\PlainCharFilter.h">
+				RelativePath=".\Request.h">
 			</File>
 			<File
-				RelativePath=".\SqlFilter.h">
+				RelativePath=".\RequestDispatcher.h">
+			</File>
+			<File
+				RelativePath=".\RequestException.h">
+			</File>
+			<File
+				RelativePath=".\RequestHandler.h">
+			</File>
+			<File
+				RelativePath=".\Server.h">
 			</File>
 		</Filter>
 		<File

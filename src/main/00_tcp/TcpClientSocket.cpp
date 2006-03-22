@@ -45,7 +45,7 @@ TcpClientSocket::isConnected () const
 void 
 TcpClientSocket::tryToConnect () throw (SocketException)
 {
-    Socket* socket = new Socket ();
+	Socket* socket = new Socket ();
     try 
     {
 	socket->open (_hostName.c_str (),
