@@ -41,10 +41,10 @@ def DefineDefaultLibPath (env):
         librepo = '/opt/local'
         env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
         env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
-    elif (platform=='posix'):
-        librepo = '/usr/local'
-        env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
-        env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
+#    elif (platform=='posix'):
+#        librepo = '/usr/local'
+#        env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
+#        env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
 
     
 def DefineDefaultCPPDefines (env):
@@ -94,12 +94,6 @@ def DefineDefaultLinkFlags (env):
     platform = env['PLATFORM']
     mode = env['MODE']
 
-    if (platform=='posix'):
-        # By default, everything has to be linked statically
-        # (except on MacOS X, TODO: find a workaround so as not to use dylibs)
-
-        env.Append ( LINKFLAGS = ['-static', '-static-libgcc'] )
-
     if (platform=='win32'):
         env.Append ( LINKFLAGS = ['/INCREMENTAL', '/NOLOGO', '/MACHINE:X86', '/SUBSYSTEM:CONSOLE'] )
         if (mode=='debug'):
@@ -112,6 +106,11 @@ def DefineDefaultLinkFlags (env):
 def DefineDefaultLibs (env):
     platform = env['PLATFORM']
     mode = env['MODE']
+
+    if (platform=='posix'):
+        # By default, everything has to be linked dynamically on posix
+        # Too many problems with static links!
+        env.Append ( LIBS = ['dl'] )
 
     if (platform=='win32'):
         if (mode=='debug'):
@@ -183,8 +182,8 @@ env.Replace ( MODE = mode )
 
 # At the moment, problem with __mt_allocator in g++ 4
 # Default to g++ 3.3
-if (platform=='posix') or (platform=='darwin'):
-    env.Replace ( CXX = 'g++-3.3' )
+#if (platform=='posix') or (platform=='darwin'):
+#    env.Replace ( CXX = 'g++-3.3' )
 
 # -------------------------------------------------------
 # Common build configuration
