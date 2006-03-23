@@ -1,0 +1,22 @@
+import os.path
+
+Import ('mainenv')
+moduleenv = mainenv.ModuleEnv()
+
+includes = '*.cpp'
+excludes = []
+
+moduleenv.AddModuleDependency ('15_env')
+moduleenv.AddModuleDependency ('04_time')
+moduleenv.AddModuleDependency ('01_util')
+moduleenv.Append (LIBS = ['boost_thread'] )
+moduleenv.Append (LIBS = ['boost_iostreams'] )
+moduleenv.AppendMultithreadConf ();
+
+
+files = moduleenv.Glob(includes, excludes)
+
+
+moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
+
+
