@@ -21,7 +21,7 @@ except socket.error, msg:
 	
 # now=datetime.datetime.now()
 	
-s.send("HelloWorld\n") # pourquoi faut-il un separateur ?
+s.send("fonction=map&toto=titi\n")
 print 'waiting answer...'
 get = s.recv(1024)
 print get

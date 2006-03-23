@@ -1,9 +1,17 @@
 #include "Server.h"
 
-#include "RequestException.h"
+#include "ServerThread.h"
 
-#include <boost/iostreams/stream.hpp>
+
+#include "RequestException.h"
+#include "Request.h"
+#include "RequestDispatcher.h"
+
 #include <boost/thread/thread.hpp>
+
+#ifdef MODULE_39
+#include "39_carto/MapRequestHandler.h"
+#endif
 
 
 namespace synthese
@@ -33,43 +41,18 @@ Server::~Server ()
 
 
     
-    class ServerThread
-    {
-    private:
-	synthese::tcp::TcpService* _tcpService;
-    public:
 
-	ServerThread (synthese::tcp::TcpService* tcpService) 
-	    : _tcpService (tcpService)
-	{
-	}
 
-	
-	void operator()()
-	    {
-		std::cout << "* Server thread started *" << std::endl;
-    
-		while ( 1 )
-		{
-		    // No need to lock, TcpService methods are thread-safe.
-		    synthese::tcp::TcpServerSocket& serverSocket =
-			_tcpService->acceptConnection ();
-		    
-		    boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
-			tcpStream (serverSocket);
-
-		    std::string requestString;
-		    tcpStream >> requestString;
-		    
-		    // Echo...
-		    tcpStream << requestString << std::endl;
-
-		    _tcpService->closeConnection (serverSocket);
-		}
-	    }
-    };
+void 
+Server::registerHandlers ()
+{
+#ifdef MODULE_39
+    synthese::server::RequestDispatcher::getInstance ()->
+	registerHandler (new synthese::carto::MapRequestHandler ());
+#endif
     
 
+}
 
 
 
@@ -77,6 +60,8 @@ Server::~Server ()
 void 
 Server::run () 
 {
+    registerHandlers ();
+
     synthese::tcp::TcpService* service = 
 	synthese::tcp::TcpService::openService (_port);
     
@@ -86,7 +71,7 @@ Server::run ()
     ServerThread serverThread (service);
 
     // Creates all server threads.
-    for (int i=0; i<_nbThreads; ++i) 
+    for (int i=0; i< _nbThreads; ++i) 
     {
 	threads.create_thread (serverThread);
     }

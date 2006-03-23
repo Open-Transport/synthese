@@ -46,7 +46,7 @@ class RequestHandler
 
     //! @name Query methods
     //@{
-    void handleRequest (const Request& request) const;
+    virtual void handleRequest (const Request& request, std::ostream& stream) const = 0;
     //@}
 
 

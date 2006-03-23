@@ -30,25 +30,29 @@ class RequestDispatcher
 {
  private:
 
+    static RequestDispatcher* _instance;
+
     std::map<std::string, const RequestHandler*> _handlers;
+
+    RequestDispatcher ();
 
  protected:
 
 
  public:
 
-    RequestDispatcher ();
     ~RequestDispatcher ();
 
 
     //! @name Getters/Setters
     //@{
+    static RequestDispatcher* getInstance ();
     //@}
 
 
     //! @name Query methods
     //@{
-    void dispatchRequest (const Request& request) const;
+    void dispatchRequest (const Request& request, std::ostream& stream) const;
     //@}
 
 

@@ -68,6 +68,10 @@ class Server
 
     //@}
 
+ protected:
+
+    void registerHandlers ();
+
 
 };
 

@@ -37,12 +37,6 @@ RequestHandler::getFunctionCode () const
 
 
 
-void 
-RequestHandler::handleRequest (const Request& request) const
-{
-    
-}
-
 
 
 

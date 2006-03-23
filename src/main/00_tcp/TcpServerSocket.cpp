@@ -59,7 +59,7 @@ TcpServerSocket::write(const char* s, std::streamsize n) throw (SocketException)
 {
     try 
     {
-	return _service._socket->write (_socketId, s, n, 0);;
+	return _service._socket->write (_socketId, s, n, 0);
     }
     catch (const char* msg)
     {
