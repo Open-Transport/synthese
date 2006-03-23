@@ -43,8 +43,9 @@ class Registry
 
     //! @name Query methods
     //@{
-    bool contains (const K& key);
+    bool contains (const K& key) const;
     T* get (const K& key);
+    const T* get (const K& key) const;
 
     size_t size () const;
     //@}
@@ -88,7 +89,7 @@ Registry<K,T>::~Registry ()
 
 template<class K, class T>
 bool 
-Registry<K,T>::contains (const K& key)
+Registry<K,T>::contains (const K& key) const
 {
     return _registry.find (key) != _registry.end ();
 }
@@ -104,6 +105,20 @@ Registry<K,T>::get (const K& key)
 
     return _registry.find (key)->second;
 }
+
+
+
+template<class K, class T>
+const T* 
+Registry<K,T>::get (const K& key) const
+{
+    if (contains (key) == false) 
+	throw RegistryKeyException<K> ("No such key in registry", key);
+
+    return _registry.find (key)->second;
+}
+
+
 
 
 

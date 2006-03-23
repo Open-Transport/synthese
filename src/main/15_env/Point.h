@@ -25,11 +25,13 @@ class Point
 {
         friend class SquareDistance;
 
+        long int _xM;  //!< Accurate longitude in meters
+        long int _yM;  //!< Accurate latitude in meters
+
         short int _xKm; //!< Longitude in kilometers
         short int _yKm; //!< Latitude in kilometers
-        short int _xM;  //!< Remainder in meters
-        short int _yM;  //!< Remainder in meters
-        //@}
+        short int _xrM;  //!< Remainder in meters
+        short int _yrM;  //!< Remainder in meters
 
     public:
 

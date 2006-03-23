@@ -25,10 +25,23 @@ Environment::getCities ()
     return _cities;
 }
 
+const City::Registry&
+Environment::getCities () const
+{
+    return _cities;
+}
+
 
 
 Document::Registry&
 Environment::getDocuments ()
+{
+    return _documents;
+}
+
+
+const Document::Registry&
+Environment::getDocuments () const
 {
     return _documents;
 }
@@ -42,6 +55,27 @@ Environment::getLines ()
 }
 
 
+const Line::Registry&
+Environment::getLines () const
+{
+    return _lines;
+}
+
+
+
+LogicalStop::Registry&
+Environment::getLogicalStops ()
+{
+    return _logicalStops;
+}
+
+
+
+const LogicalStop::Registry&
+Environment::getLogicalStops () const
+{
+    return _logicalStops;
+}
 
 
 

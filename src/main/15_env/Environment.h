@@ -5,6 +5,7 @@
 #include "City.h"
 #include "Document.h"
 #include "Line.h"
+#include "LogicalStop.h"
 
 
 #include <string>
@@ -29,7 +30,8 @@ class Environment
     City::Registry _cities;
     Document::Registry _documents;
     Line::Registry _lines;
-    
+    LogicalStop::Registry _logicalStops;
+
 
 
  public:
@@ -41,8 +43,16 @@ class Environment
     //! @name Getters/Setters
     //@{
     City::Registry& getCities ();
+    const City::Registry& getCities () const;
+
     Document::Registry& getDocuments ();
+    const Document::Registry& getDocuments () const;
+
     Line::Registry& getLines ();
+    const Line::Registry& getLines () const;
+
+    LogicalStop::Registry& getLogicalStops ();
+    const LogicalStop::Registry& getLogicalStops () const;
     // ...
     //@}
 

@@ -9,6 +9,8 @@ namespace env
 
 
 Point::Point(long int x, long int y)
+    : _xM (x)
+    , _yM (y)
 {
     setX ( x );
     setY ( y );
@@ -25,20 +27,14 @@ Point::~Point()
 long int 
 Point::getX () const
 {
-    if ( isUnknown () )
-        return UNKNOWN_VALUE;
-    else
-        return _xKm * 1000 + _xM;
+    return _xM;
 }
 
 
 
 long int Point::getY () const
 {
-    if ( isUnknown () )
-        return UNKNOWN_VALUE;
-    else
-        return _yKm * 1000 + _yM;
+    return _yM;
 }
 
 
