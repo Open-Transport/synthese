@@ -126,7 +126,6 @@ def AppendMultithreadConf (env):
     if (platform == 'posix'):
         env.Append (CCFLAGS= '-pthread' )
         env.Append (LIBS= ['pthread'] ) 
-#        env.Append (CPPDEFINES = ['_PTHREADS'])
 
     if (platform == 'darwin'):
         env.Append (CCFLAGS= '-pthread' )
