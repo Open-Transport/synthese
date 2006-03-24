@@ -8,6 +8,7 @@
 #include "Line.h"
 #include "LogicalStop.h"
 #include "PhysicalStop.h"
+#include "Registrable.h"
 
 
 #include <string>
@@ -25,10 +26,12 @@ namespace env
 /** 
 @ingroup m15
 */
-class Environment
+class Environment : public Registrable<int,Environment>
 {
  private:
 
+    static Environment::Registry _environments;
+    
     Axis::Registry _axes;
     City::Registry _cities;
     Document::Registry _documents;
@@ -40,12 +43,14 @@ class Environment
 
  public:
 
-    Environment ();
+    Environment (const int& id);
     ~Environment ();
 
 
     //! @name Getters/Setters
     //@{
+    static Environment::Registry& GetEnvironments ();
+
     Axis::Registry& getAxes ();
     const Axis::Registry& getAxes () const;
 

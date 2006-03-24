@@ -9,7 +9,6 @@ excludes = []
 
 moduleenv.Append ( CPPDEFINES = ['MODULE_39'] )
 moduleenv.AddModuleDependency ('39_carto')
-
 moduleenv.AddModuleDependency ('04_time')
 moduleenv.AddModuleDependency ('00_tcp')
 moduleenv.AddModuleDependency ('01_util')

@@ -6,8 +6,11 @@ namespace synthese
 namespace env
 {
 
+Environment::Registry Environment::_environments;
 
-Environment::Environment ()
+
+Environment::Environment (const int& id)
+    : Registrable<int,Environment> (id)
 {
 }
 
@@ -16,6 +19,14 @@ Environment::Environment ()
 Environment::~Environment ()
 {
 
+}
+
+
+
+Environment::Registry& 
+Environment::GetEnvironments ()
+{
+    return _environments;
 }
 
 
