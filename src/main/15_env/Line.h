@@ -19,9 +19,10 @@ namespace env
     class Alarm;
     class Axis;
     class Fare;
-    class Service;
     class LineStop;
+    class Point;
     class RollingStock;
+    class Service;
     class TransportNetwork;
 
 
@@ -142,6 +143,13 @@ public:
     
     //! @name Query methods
     //@{
+    /** Gets all the geographical point linked by the line.
+	This includes :
+	- physical stops
+	- via points
+    */
+    std::vector<const Point*> getPoints () const;
+
     bool isReservable () const;
 
     bool isInService (const synthese::time::Date& date) const;

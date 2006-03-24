@@ -19,6 +19,15 @@ Edge::Edge (const EdgeType& type)
 
 Edge::~Edge ()
 {
+    // Delete via points
+    for (std::vector<const Point*>::iterator iter = _viaPoints.begin (); 
+	 iter != _viaPoints.end (); 
+	 ++iter)
+    {
+	delete (*iter);
+    }
+    _viaPoints.clear ();
+    
 }
 
 
@@ -51,6 +60,22 @@ bool
 Edge::isDeparture () const
 {
     return ( _type == EDGE_TYPE_PASSAGE || _type == EDGE_TYPE_DEPARTURE );
+}
+
+
+
+const Edge* 
+Edge::getNextInPath () const
+{
+    return _nextInPath;
+}
+
+
+
+void 
+Edge::setNextInPath (const Edge* nextInPath)
+{
+    _nextInPath = nextInPath;
 }
 
 
@@ -123,10 +148,19 @@ Edge::setFollowingConnectionArrival( const Edge* followingConnectionArrival)
 
 
 
+
+const std::vector<const Point*>& 
+Edge::getViaPoints () const
+{
+    return _viaPoints;
+}
+
+
+
 void 
 Edge::addViaPoint (const Point& viaPoint)
 {
-    _viaPoints.push_back (viaPoint);
+    _viaPoints.push_back (new Point (viaPoint));
 }
 
 

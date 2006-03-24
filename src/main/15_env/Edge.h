@@ -57,12 +57,14 @@ private:
 
     EdgeType _type;      //!< Departure, arrival or passage    
 
+    const Edge* _nextInPath; //!< Next edge in path.
+
     const Edge* _previousDeparture;  //!< Previous departure edge along path.
     const Edge* _previousConnectionDeparture; //!< Previous connection departure edge along path.
     const Edge* _followingArrival;  //!< Next arrival edge along path.
     const Edge* _followingConnectionArrival; //!< Next connection arrival edge along path.
 
-    std::vector<Point> _viaPoints; //!< Intemediate points along the edge.
+    std::vector<const Point*> _viaPoints; //!< Intermediate points along the edge.
 
 protected:
 
@@ -90,6 +92,8 @@ public:
     const EdgeType& getType () const;
     void setType ( const EdgeType& type );
 
+    const Edge* getNextInPath () const;
+    void setNextInPath (const Edge* nextInPath);
 
     const Edge* getPreviousDeparture () const;
     void setPreviousDeparture ( const Edge* previousDeparture);
@@ -102,7 +106,11 @@ public:
 
     const Edge* getFollowingConnectionArrival () const;
     void setFollowingConnectionArrival( const Edge* followingConnectionArrival);
-
+    
+    /** Gets intermediate points 
+     * between this line stop and the next in path.
+     */
+    const std::vector<const Point*>& getViaPoints () const;
     //@}
 
 

@@ -258,6 +258,32 @@ Line::getLineStops() const
 
 
 
+std::vector<const Point*> 
+Line::getPoints () const
+{
+    std::vector<const Point*> points;
+    
+    for (std::vector<LineStop*>::const_iterator iter = _lineStops.begin (); 
+	 iter != _lineStops.end (); 
+	 ++iter)
+    {
+	// Adds the line physical stop
+	points.push_back ((*iter)->getFromVertex ());
+	
+	// Adds all the via points of the line stop
+	const std::vector<const Point*>& viaPoints = (*iter)->getViaPoints ();
+	for (std::vector<const Point*>::const_iterator it = viaPoints.begin (); 
+	     it != viaPoints.end (); 
+	     ++it)
+	{
+	    points.push_back (*it);
+	}
+    }
+    return points;
+}
+
+
+
 
 void 
 Line::postInit ()
@@ -280,6 +306,11 @@ Line::postInit ()
 void 
 Line::addLineStop (LineStop* lineStop)
 {
+    if (_lineStops.empty () == false)
+    {
+	_lineStops.back ()->setNextInPath (lineStop);
+    }
+
     _lineStops.push_back( lineStop );
 
     if ( _lineStops.size() > 1 )
