@@ -3,7 +3,8 @@
 
 
 #include <vector>
-#include "XYPoint.h"
+
+#include "15_env/Point.h"
 
 
 namespace synthese
@@ -17,22 +18,27 @@ namespace carto
     /** Calculates the oriented angle formed by vectors -ba> and -bc>.
      * @return The angle in radians on [-PI..PI] domain.
      */
-    double calculateAngle (const XYPoint& a, const XYPoint& b, const XYPoint& c);
+    double calculateAngle (const synthese::env::Point& a, 
+			   const synthese::env::Point& b, 
+			   const synthese::env::Point& c);
 
 
     /** Calculates the euclidian distance between points a and b.
      * @return The calculated distance.
      */
-    double calculateDistance (const XYPoint& a, const XYPoint& b);
+    double calculateDistance (const synthese::env::Point& a, 
+			      const synthese::env::Point& b);
 	
 
     /** Returns symetric of a regarding b
      */
-    XYPoint calculateSymetric (const XYPoint& a, const XYPoint& b);
+    synthese::env::Point calculateSymetric (const synthese::env::Point& a, 
+					    const synthese::env::Point& b);
     
 	
     std::pair<double, double>
-	calculateAffineEquation (const XYPoint& p0, const XYPoint& p1);
+	calculateAffineEquation (const synthese::env::Point& p0, 
+				 const synthese::env::Point& p1);
 	
 
     /** Converts the given angle to degrees.
@@ -52,7 +58,10 @@ namespace carto
      * @param b2 
      * @return The intersection point.
      */
-    XYPoint calculateIntersection (double a1, double b1, double a2, double b2);
+    synthese::env::Point calculateIntersection (double a1, 
+						double b1, 
+						double a2, 
+						double b2);
 
 
     /** Calculates the intersection between two affines.
@@ -65,8 +74,11 @@ namespace carto
      @param p3 
      @return The intersection point.
     */
-    XYPoint calculateIntersection (const XYPoint& p0, const XYPoint& p1, 
-				   const XYPoint& p2, const XYPoint& p3);
+    synthese::env::Point calculateIntersection (
+	const synthese::env::Point& p0, 
+	const synthese::env::Point& p1, 
+	const synthese::env::Point& p2, 
+	const synthese::env::Point& p3);
     
 
 

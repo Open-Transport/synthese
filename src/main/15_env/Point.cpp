@@ -74,10 +74,17 @@ void Point::setY( double yM )
 
 
 bool 
-Point::operator== ( const Point& op ) const
+Point::operator == ( const Point& op ) const
 {
     if ( op.isUnknown () || isUnknown () ) return false;
     return op._xM == _xM && op._yM == _yM;
+}
+
+
+bool 
+Point::operator != ( const Point& op ) const
+{
+    return ! operator==(op);
 }
 
 

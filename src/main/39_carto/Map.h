@@ -3,42 +3,35 @@
 
 #include <iostream>
 
-#include "Geometry.h"
-#include "Rectangle.h"
-#include "XYPoint.h"
-
-
-#include "DrawableBusLine.h"
 
 #include "PostscriptCanvas.h"
+#include "Rectangle.h"
+
 
 #include <set>
 #include <map>
 
-using namespace std;
+
 
 namespace synthese
 {
+
+namespace env
+{
+    class Point;
+}
+
 namespace carto
 {
 
-
-
-class Topography;
-class Edge;
-class Vertex;
-class MapBackgroundManager;
-class DrawableTerminusBoard;
+    class DrawableLine;
+    class MapBackgroundManager;
 
 
 class Map
 {
 private:
-    typedef set<DrawableBusLine*> DrawableBusLineSet;     
-    typedef map<const Vertex*, DrawableTerminusBoard*> DrawableTerminusBoardMap;
-
-
-    Topography* _topography;
+    typedef std::set<DrawableLine*> DrawableLineSet;     
     
     Rectangle _realFrame;
     double _width;	
@@ -52,65 +45,59 @@ private:
     const MapBackgroundManager* _backgroundManager;
     
     // Dump objects
-    DrawableBusLineSet       _busLines;
-    DrawableTerminusBoardMap _terminusBoards;
+    DrawableLineSet       _drawableLines;
     // Dump objects
 
     
     
-    std::vector<DrawableBusLine*>
-	findBusLinesSharingVertex (const DrawableBusLineSet& busLines,
+    std::vector<DrawableLine*>
+	findLinesSharingPoint (const DrawableLineSet& drawableLines,
+				const synthese::env::Point* point) const;
     
     
-    std::pair<const Vertex*, int>
-	findMostSharedVertex (const DrawableBusLine* busLine, 
-			      const DrawableBusLineSet& exclusionList = DrawableBusLineSet ()) const;
+    std::pair<const synthese::env::Point*, int>
+	findMostSharedPoint (const DrawableLine* drawableLine, 
+			     const DrawableLineSet& exclusionList = DrawableLineSet ()) const;
     
-    DrawableBusLine* findMostSharedBusLine (const DrawableBusLineSet& busLines, 
-					    const DrawableBusLineSet& exclusionList) const;
+    DrawableLine* findMostSharedLine (const DrawableLineSet& drawableLines, 
+				      const DrawableLineSet& exclusionList) const;
     
     
-    std::pair<const DrawableBusLine*, int>
-	findLeftMostLine (const Vertex* vertex, 
-			  const DrawableBusLine* reference, 
-			  const DrawableBusLineSet& lines) const;
+    std::pair<const DrawableLine*, int>
+	findLeftMostLine (const synthese::env::Point* vertex, 
+			  const DrawableLine* reference, 
+			  const DrawableLineSet& lines) const;
     
-    std::pair<const DrawableBusLine*, int>
-	findRightMostLine (const Vertex* vertex, 
-			   const DrawableBusLine* reference, 
-			   const DrawableBusLineSet& lines) const;
+
+    std::pair<const DrawableLine*, int>
+	findRightMostLine (const synthese::env::Point* vertex, 
+			   const DrawableLine* reference, 
+			   const DrawableLineSet& lines) const;
     
     
     void 
-	assignShiftFactors (const DrawableBusLine* reference, 
-			    const Vertex* referenceVertex, 
-			    DrawableBusLine* busLine, 
-			    const DrawableBusLineSet& exclusionList);
+	assignShiftFactors (const DrawableLine* reference, 
+			    const synthese::env::Point* referencePoint, 
+			    DrawableLine* drawableLine, 
+			    const DrawableLineSet& exclusionList);
     
-    const DrawableBusLine*
-	findBestAvailableReference (const DrawableBusLine* busLine, 
-				    const std::vector<DrawableBusLine*>& lines) const;
-    
-    DrawableTerminusBoard*
-	getTerminusBoard (const Vertex* vertex);
-    
+    const DrawableLine*
+	findBestAvailableReference (const DrawableLine* drawableLine, 
+				    const std::vector<DrawableLine*>& lines) const;
     
     bool hasBackgroundManager () const;
     
-    void prepareBusLines ();
-    void prepareTerminusBoards ();
+    void prepareLines ();
     
     void prepare ();
     
     void dumpBackground ();
-    void dumpBusLines ();
-    void dumpTerminusBoards ();
+    void dumpLines ();
     
 public:
 
 
-    Map(Topography* topography,
-	std::ostream& output,
+    Map(std::ostream& output,
 	const Rectangle& realFrame, 
 	double width, 
 	double height,
@@ -118,8 +105,8 @@ public:
     
     virtual ~Map();
     
-    XYPoint toRealFrame (const XYPoint& p);
-    XYPoint toOutputFrame (const XYPoint& p);
+    synthese::env::Point toRealFrame (const synthese::env::Point& p);
+    synthese::env::Point toOutputFrame (const synthese::env::Point& p);
 	
     double getWidth () const { return _width; }
     double getHeight () const { return _height; }

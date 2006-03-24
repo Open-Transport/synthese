@@ -2,7 +2,10 @@
 
 #include <cmath>
 
-#include "XYPoint.h"
+#include "15_env/Point.h"
+
+using synthese::env::Point;
+
 
 
 using namespace std;
@@ -14,7 +17,7 @@ namespace carto
 
 
 double 
-calculateAngle (const XYPoint& a, const XYPoint& b, const XYPoint& c)
+calculateAngle (const Point& a, const Point& b, const Point& c)
 {
     double angle = atan2 (c.getY()-b.getY(), c.getX()-b.getX()) - 
 	atan2 (a.getY()-b.getY(), a.getX()-b.getX());
@@ -28,7 +31,7 @@ calculateAngle (const XYPoint& a, const XYPoint& b, const XYPoint& c)
 
 
 double 
-calculateDistance (const XYPoint& a, const XYPoint& b) 
+calculateDistance (const Point& a, const Point& b) 
 {
     return sqrt((b.getX()-a.getX())*(b.getX()-a.getX()) + 
 		(b.getY()-a.getY())*(b.getY()-a.getY()));
@@ -44,18 +47,18 @@ toDegrees (double angle)
 
 
 
-XYPoint  
-calculateSymetric (const XYPoint& a, const XYPoint& b)
+Point  
+calculateSymetric (const Point& a, const Point& b)
 {
     double deltax = b.getX() - a.getX();
     double deltay = b.getY() - a.getY();
-    return XYPoint (b.getX() + deltax, b.getY() + deltay);
+    return Point (b.getX() + deltax, b.getY() + deltay);
 } 
 
 
 
 
-XYPoint 
+Point 
 calculateIntersection (double a1, double b1, double a2, double b2)
 {
     // Intersection of :
@@ -64,7 +67,7 @@ calculateIntersection (double a1, double b1, double a2, double b2)
     
     if (a1 == a2) throw "No intersection";
     
-    return XYPoint ( (b2 - b1) / (a1 -a2),
+    return Point ( (b2 - b1) / (a1 -a2),
 		     (b2*a1 - a2*b1) / (a1 - a2) );
 }
 
@@ -72,7 +75,7 @@ calculateIntersection (double a1, double b1, double a2, double b2)
 
 
 std::pair<double, double>
-calculateAffineEquation (const XYPoint& p0, const XYPoint& p1) {
+calculateAffineEquation (const Point& p0, const Point& p1) {
     // Given 2 points return a and b so that y = a.x + b
     // goes through p0 and p1
     double u0 = p1.getX() - p0.getX ();
@@ -88,9 +91,9 @@ calculateAffineEquation (const XYPoint& p0, const XYPoint& p1) {
 
 
 
-XYPoint 
-calculateIntersection (const XYPoint& p0, const XYPoint& p1, 
-		       const XYPoint& p2, const XYPoint& p3)
+Point 
+calculateIntersection (const Point& p0, const Point& p1, 
+		       const Point& p2, const Point& p3)
 {
     double u0 = p1.getX() - p0.getX ();
     double v0 = p1.getY() - p0.getY ();

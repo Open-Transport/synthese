@@ -65,7 +65,14 @@ class Point
 	  @return true if meters coordinates are identical, 
 	  false otherwise or if one coordinate is unknown.
 	*/
-        bool operator== ( const Point& ) const;
+        bool operator == ( const Point& ) const;
+
+        /** Coordinates comparison operator.
+	  @param op Point to test
+	  @return false if meters coordinates are identical, 
+	  true otherwise or if one coordinate is unknown.
+	*/
+        bool operator != ( const Point& ) const;
 
 };
 
