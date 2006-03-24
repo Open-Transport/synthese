@@ -3,6 +3,7 @@
 
 
 
+#include <map>
 #include <string>
 #include <iostream>
 
@@ -19,6 +20,12 @@ namespace util
     class Exception;
 
 /** Thread-safe logging class.
+To get an instance of this class, the statis GetLog method must
+be invoked. With no argument, the default log is returned.
+
+Be careful : this class is not designed for efficiency,
+so log carefully...
+
 @ingroup m01
 */
 class Log
@@ -34,23 +41,32 @@ class Log
 
  private:
 
+    static const std::string DEFAULT_LOG_NAME;
+    static std::map<std::string, Log*> _logs;
+    static Log _defaultLog;
+
     boost::mutex _ioMutex; //!< For thread safety.
 
-    std::ostream& _outputStream; //!< Log output stream.
+    std::ostream* _outputStream; //!< Log output stream.
     Log::Level _level; //!< Log level.
 
     time_t _rawLogTime;
     struct tm* _logTimeInfo;
 
+
+    Log ( std::ostream* outputStream = &std::cout, 
+	  Log::Level level = Log::LEVEL_INFO );
+
  public:
 
-
-    Log ( std::ostream& outputStream, Log::Level level = Log::LEVEL_INFO );
     ~Log ();
 
+    static Log& GetInstance (const std::string& logName = DEFAULT_LOG_NAME);
 
     //! @name Getters/Setters
     //@{
+    void setOutputStream (std::ostream* outputStream);
+
     Log::Level getLevel () const;
     void setLevel (Log::Level level);
 
@@ -87,9 +103,6 @@ class Log
     void append (Log::Level level, 
 		 const std::string& message, 
 		 const Exception* exception = 0);
-
-    Log ( const Log& ref );
-    Log& operator= ( const Log& rhs );
 
 };
 

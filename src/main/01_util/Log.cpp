@@ -7,6 +7,10 @@ namespace synthese
 {
 namespace util
 {
+std::map<std::string, Log*> Log::_logs;
+Log Log::_defaultLog;
+
+const std::string Log::DEFAULT_LOG_NAME ("");
 
 const std::string Log::LOG_PREFIX_DEBUG ("DEBUG");
 const std::string Log::LOG_PREFIX_INFO  ("INFO ");
@@ -16,7 +20,7 @@ const std::string Log::LOG_PREFIX_FATAL ("FATAL");
 
 
 
-Log::Log ( std::ostream& outputStream, Log::Level level )
+Log::Log ( std::ostream* outputStream, Log::Level level )
     : _outputStream (outputStream)
     , _level (level)
 {
@@ -27,6 +31,31 @@ Log::~Log ()
 {
     
 }
+
+
+
+Log& 
+Log::GetInstance (const std::string& logName)
+{
+    if (logName.empty ()) return _defaultLog;
+    std::map<std::string, Log*>::iterator it = _logs.find (logName);
+    if (_logs.find (logName) == _logs.end ())
+    {
+	_logs.insert (std::make_pair (logName, new Log ()));
+    }
+    return *(_logs.find (logName)->second);
+}
+
+
+
+
+void 
+Log::setOutputStream (std::ostream* outputStream)
+{
+    _outputStream = outputStream;
+}
+
+
 
 
 Log::Level 
@@ -147,19 +176,19 @@ Log::append (Log::Level level,
     switch (level) 
     {
     case Log::LEVEL_DEBUG:
-	_outputStream << LOG_PREFIX_DEBUG;
+	(*_outputStream) << LOG_PREFIX_DEBUG;
 	break;
     case Log::LEVEL_INFO:
-	_outputStream << LOG_PREFIX_INFO;
+	(*_outputStream) << LOG_PREFIX_INFO;
 	break;
     case Log::LEVEL_WARN:
-	_outputStream << LOG_PREFIX_WARN;
+	(*_outputStream) << LOG_PREFIX_WARN;
 	break;
     case Log::LEVEL_ERROR:
-	_outputStream << LOG_PREFIX_ERROR;
+	(*_outputStream) << LOG_PREFIX_ERROR;
 	break;
     case Log::LEVEL_FATAL:
-	_outputStream << LOG_PREFIX_DEBUG;
+	(*_outputStream) << LOG_PREFIX_DEBUG;
 	break;
     }
 
@@ -167,7 +196,7 @@ Log::append (Log::Level level,
     time ( &_rawLogTime );
     _logTimeInfo = localtime ( &_rawLogTime );
 
-    _outputStream << " # " << std::setfill ('0')
+    (*_outputStream) << " # " << std::setfill ('0')
 		  << std::setw (4) << (1900 + _logTimeInfo->tm_year) << "/" 
 		  << std::setw (2) << (1 + _logTimeInfo->tm_mon) << "/"
 		  << std::setw (2) << _logTimeInfo->tm_mday << " "
@@ -178,12 +207,12 @@ Log::append (Log::Level level,
 
     if (exception != 0)
     {
-	_outputStream << " : " << exception;
+	(*_outputStream) << " : " << exception;
     }
 
 
 
-    _outputStream << std::endl;
+    (*_outputStream) << std::endl;
     // Locks is automatically released when goes out of scope.
     
 }

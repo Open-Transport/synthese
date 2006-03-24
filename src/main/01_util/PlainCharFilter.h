@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include <boost/iostreams/concepts.hpp>
+#include <boost/iostreams/write.hpp>
 
 
 
