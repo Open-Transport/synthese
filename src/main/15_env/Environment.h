@@ -6,6 +6,7 @@
 #include "City.h"
 #include "Document.h"
 #include "Line.h"
+#include "LineStop.h"
 #include "LogicalStop.h"
 #include "PhysicalStop.h"
 #include "Registrable.h"
@@ -38,7 +39,7 @@ class Environment : public Registrable<int,Environment>
     Line::Registry _lines;
     LogicalStop::Registry _logicalStops;
     PhysicalStop::Registry _physicalStops;
-
+    LineStop::Registry _lineStops;
 
 
  public:
@@ -68,6 +69,10 @@ class Environment : public Registrable<int,Environment>
 
     PhysicalStop::Registry& getPhysicalStops ();
     const PhysicalStop::Registry& getPhysicalStops () const;
+
+    LineStop::Registry& getLineStops ();
+    const LineStop::Registry& getLineStops () const;
+
     // ...
     //@}
 

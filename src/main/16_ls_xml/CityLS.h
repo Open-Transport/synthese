@@ -1,0 +1,75 @@
+#ifndef SYNTHESE_LSXML_CITYLS_H
+#define SYNTHESE_LSXML_CITYLS_H
+
+
+#include "module.h"
+#include <string>
+
+class XMLNode;
+
+
+namespace synthese
+{
+namespace env
+{
+    class Environment;
+    class City;
+}
+
+namespace lsxml
+{
+
+
+/** City XML loading/saving service class.
+
+Sample XML format :
+
+<city id="1"
+      name="Toulouse"/>
+
+ @ingroup m16
+*/
+class CityLS
+{
+ public:
+
+    static const std::string CITY_TAG;
+    static const std::string CITY_ID_ATTR;
+    static const std::string CITY_NAME_ATTR;
+
+ private:
+
+    CityLS ();
+    ~CityLS();
+
+
+ public:
+    
+    
+    //! @name Query methods.
+    //@{
+
+    /** Loads a city from an XML DOM node.
+	Conversion from ids to pointers is done thanks to the
+	environment parameter.
+     */
+    static synthese::env::City* Load (
+	XMLNode& node,
+	const synthese::env::Environment& environment);
+
+    /** @todo Not implemented.
+     **/
+    static XMLNode* Save (
+	const synthese::env::City* city);
+    //@}
+
+
+};
+
+
+
+}
+}
+
+
+#endif
