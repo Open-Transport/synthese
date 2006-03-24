@@ -14,6 +14,8 @@
 #include "00_tcp/TcpServerSocket.h"
 #include "00_tcp/TcpService.h"
 
+#include "01_util/Log.h"
+
 
 namespace synthese
 {
@@ -39,13 +41,13 @@ class Server
     int _port;
     int _nbThreads;
 
+
  protected:
 
 
  public:
 
-    Server (int port = 8899,
-	    int nbThreads = 10);
+    Server (int port, int nbThreads);
 
     ~Server ();
 

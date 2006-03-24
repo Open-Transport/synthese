@@ -123,7 +123,11 @@ Edge::setFollowingConnectionArrival( const Edge* followingConnectionArrival)
 
 
 
-
+void 
+Edge::addViaPoint (const Point& viaPoint)
+{
+    _viaPoints.push_back (viaPoint);
+}
 
 
 

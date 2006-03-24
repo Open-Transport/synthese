@@ -25,18 +25,16 @@ class Point
 {
         friend class SquareDistance;
 
-        long int _xM;  //!< Accurate longitude in meters
-        long int _yM;  //!< Accurate latitude in meters
+        double _xM;  //!< Accurate longitude in meters
+        double _yM;  //!< Accurate latitude in meters
 
         short int _xKm; //!< Longitude in kilometers
         short int _yKm; //!< Latitude in kilometers
-        short int _xrM;  //!< Remainder in meters
-        short int _yrM;  //!< Remainder in meters
 
     public:
 
-        Point(long int x = UNKNOWN_VALUE,
-	      long int y = UNKNOWN_VALUE);
+        Point(double x = UNKNOWN_VALUE,
+	      double y = UNKNOWN_VALUE);
 
         virtual ~Point();
 
@@ -47,18 +45,18 @@ class Point
 
 	//! @name Getters/Setters
 	//@{
-        long int getX () const;
-        long int getY () const;
+        double getX () const;
+        double getY () const;
 
         /** Longitude setter
 	    @param x New longitude in meters
 	*/
-        void setX ( const long int x);
+        void setX ( double x);
 
         /** Latitude setter
 	    @param x New longitude in meters
 	*/
-        void setY ( const long int y);
+        void setY ( double y);
 	//@}
 
 

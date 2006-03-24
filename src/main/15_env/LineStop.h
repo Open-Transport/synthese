@@ -5,6 +5,7 @@
 #include <string>
 #include "module.h"
 #include "Edge.h"
+#include "Registrable.h"
 
 
 #include "04_time/DateTime.h"
@@ -25,7 +26,9 @@ class Line;
 /** Association class between line and physical stop.
  @ingroup m15
 */
- class LineStop : public Edge
+ class LineStop : 
+     public Registrable<int,LineStop>,
+     public Edge
 {
 public:
     
@@ -49,8 +52,9 @@ private:
 public:
 
 
-    LineStop (const Line* line,
-	      int metricOffset,
+    LineStop (int id,
+	      const Line* line,
+	      double metricOffset,
 	      const EdgeType& type,
 	      const PhysicalStop* physicalStop,
 	      bool scheduleInput);

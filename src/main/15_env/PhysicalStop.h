@@ -1,8 +1,10 @@
 #ifndef SYNTHESE_ENV_PHYSICALSTOP_H
 #define SYNTHESE_ENV_PHYSICALSTOP_H
 
-
+#include "Registrable.h"
 #include "Vertex.h"
+#include "module.h"
+
 #include <string>
 
 
@@ -20,6 +22,7 @@ namespace env
  @ingroup m15
 */
 class PhysicalStop : 
+    public Registrable<int,PhysicalStop>,
     public Vertex
 {
 
@@ -29,9 +32,12 @@ private:
     
  public:
 
-    PhysicalStop (const std::string& name, 
+    PhysicalStop (int id,
+		  const std::string& name, 
 		  int rankInLogicalStop,
-		  const LogicalStop* logicalStop);
+		  const LogicalStop* logicalStop,
+		  double x = UNKNOWN_VALUE,
+		  double y = UNKNOWN_VALUE);
 
     ~PhysicalStop ();
     

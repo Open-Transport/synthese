@@ -9,10 +9,13 @@ namespace env
 {
 
 
-PhysicalStop::PhysicalStop (const std::string& name,
+PhysicalStop::PhysicalStop (int id,
+			    const std::string& name,
 			    int rankInLogicalStop,
-			    const LogicalStop* logicalStop)
-    : Vertex (logicalStop, rankInLogicalStop)
+			    const LogicalStop* logicalStop,
+			    double x, double y)
+    : Registrable<int,PhysicalStop> (id)
+    , Vertex (logicalStop, rankInLogicalStop, x, y)
     , _name (name)
 {
 

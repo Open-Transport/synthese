@@ -11,8 +11,10 @@ namespace env
 
 
 Vertex::Vertex (const ConnectionPlace* connectionPlace,
-		int rankInConnectionPlace) 
-    : Point () // By default geolocation is unknown.
+		int rankInConnectionPlace,
+		double x,
+		double y) 
+    : Point (x, y) // By default geolocation is unknown.
 {
     
 }

@@ -3,6 +3,10 @@
 
 
 
+#include <vector>
+#include "Point.h"
+
+
 namespace synthese
 {
 namespace env
@@ -58,6 +62,8 @@ private:
     const Edge* _followingArrival;  //!< Next arrival edge along path.
     const Edge* _followingConnectionArrival; //!< Next connection arrival edge along path.
 
+    std::vector<Point> _viaPoints; //!< Intemediate points along the edge.
+
 protected:
 
     Edge (const EdgeType& type);
@@ -104,6 +110,12 @@ public:
     //@{
     bool isArrival () const;
     bool isDeparture () const;
+    
+    //@}
+
+    //! @name Update methods
+    //@{
+    void addViaPoint (const Point& viaPoint);
     
     //@}
 

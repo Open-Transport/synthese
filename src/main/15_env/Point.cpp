@@ -8,7 +8,7 @@ namespace env
 
 
 
-Point::Point(long int x, long int y)
+Point::Point(double x, double y)
     : _xM (x)
     , _yM (y)
 {
@@ -24,7 +24,7 @@ Point::~Point()
 
 
 
-long int 
+double
 Point::getX () const
 {
     return _xM;
@@ -32,7 +32,8 @@ Point::getX () const
 
 
 
-long int Point::getY () const
+double
+Point::getY () const
 {
     return _yM;
 }
@@ -46,27 +47,27 @@ bool Point::isUnknown () const
 
 
 
-void Point::setX( const long int _xKmM )
+void Point::setX( double xM )
 {
-    if ( _xKmM == UNKNOWN_VALUE )
+    if ( xM == UNKNOWN_VALUE )
         _xKm = UNKNOWN_VALUE;
     else
     {
-        _xKm = ( short int ) ( _xKmM / 1000 );
-        _xM = ( short int ) ( _xKmM % 1000 );
+        _xKm = ( short int ) ( xM / 1000 );
+        _xM = xM;
     }
 }
 
 
 
-void Point::setY( const long int _yKmM )
+void Point::setY( double yM )
 {
-    if ( _yKmM == UNKNOWN_VALUE )
+    if ( yM == UNKNOWN_VALUE )
         _yKm = UNKNOWN_VALUE;
     else
     {
-        _yKm = ( short int ) ( _yKmM / 1000 );
-        _yM = ( short int ) ( _yKmM % 1000 );
+        _yKm = ( short int ) ( yM / 1000 );
+        _yM = yM;
     }
 }
 
@@ -76,7 +77,7 @@ bool
 Point::operator== ( const Point& op ) const
 {
     if ( op.isUnknown () || isUnknown () ) return false;
-    return op._xKm == _xKm && op._yKm == _yKm;
+    return op._xM == _xM && op._yM == _yM;
 }
 
 

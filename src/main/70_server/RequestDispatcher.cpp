@@ -41,8 +41,6 @@ void
 RequestDispatcher::dispatchRequest (const Request& request, 
 				    std::ostream& stream) const
 {
-    std::cout << "Request dispatch... Function code = " << request.getFunctionCode () 
-	      << std::flush << std::endl;
     std::map<std::string, const RequestHandler*>::const_iterator it =
 	_handlers.find (request.getFunctionCode ());
     if (it == _handlers.end ()) 
@@ -60,8 +58,6 @@ RequestDispatcher::dispatchRequest (const Request& request,
 void 
 RequestDispatcher::registerHandler (const RequestHandler* handler)
 {
-    std::cout << "Registering handler for function code " 
-	      << handler->getFunctionCode () << "!!" << std::endl;
     _handlers.insert (std::make_pair (handler->getFunctionCode (),
 				      handler));
 }

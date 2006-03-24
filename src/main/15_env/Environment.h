@@ -2,10 +2,12 @@
 #define SYNTHESE_ENV_ENVIRONMENT_H
 
 
+#include "Axis.h"
 #include "City.h"
 #include "Document.h"
 #include "Line.h"
 #include "LogicalStop.h"
+#include "PhysicalStop.h"
 
 
 #include <string>
@@ -27,10 +29,12 @@ class Environment
 {
  private:
 
+    Axis::Registry _axes;
     City::Registry _cities;
     Document::Registry _documents;
     Line::Registry _lines;
     LogicalStop::Registry _logicalStops;
+    PhysicalStop::Registry _physicalStops;
 
 
 
@@ -42,6 +46,9 @@ class Environment
 
     //! @name Getters/Setters
     //@{
+    Axis::Registry& getAxes ();
+    const Axis::Registry& getAxes () const;
+
     City::Registry& getCities ();
     const City::Registry& getCities () const;
 
@@ -53,6 +60,9 @@ class Environment
 
     LogicalStop::Registry& getLogicalStops ();
     const LogicalStop::Registry& getLogicalStops () const;
+
+    PhysicalStop::Registry& getPhysicalStops ();
+    const PhysicalStop::Registry& getPhysicalStops () const;
     // ...
     //@}
 

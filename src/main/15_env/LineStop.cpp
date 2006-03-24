@@ -14,12 +14,14 @@ namespace env
 {
 
 
-LineStop::LineStop (const Line* line,
-	      int metricOffset,
-	      const EdgeType& type,
-	      const PhysicalStop* physicalStop,
-	      bool scheduleInput)
-    : Edge (type)
+LineStop::LineStop (int id,
+		    const Line* line,
+		    double metricOffset,
+		    const EdgeType& type,
+		    const PhysicalStop* physicalStop,
+		    bool scheduleInput)
+    : Registrable<int,LineStop> (id)
+    , Edge (type)
     , _line (line)
     , _metricOffset (metricOffset)
     , _physicalStop (physicalStop)

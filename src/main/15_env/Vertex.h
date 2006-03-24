@@ -3,6 +3,7 @@
 
 #include <set>
 #include "Point.h"
+#include "module.h"
 
 
 namespace synthese
@@ -35,7 +36,9 @@ private:
 protected:
 
     Vertex (const ConnectionPlace* connectionPlace,
-	    int rankInConnectionPlace);
+	    int rankInConnectionPlace,
+	    double x = UNKNOWN_VALUE,
+	    double y = UNKNOWN_VALUE);
 
 public:
 

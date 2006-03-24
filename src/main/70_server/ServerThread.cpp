@@ -9,6 +9,9 @@
 
 #include <boost/iostreams/stream.hpp>
 
+#include "01_util/Log.h"
+
+using synthese::util::Log;
 
 namespace synthese
 {
@@ -26,8 +29,6 @@ ServerThread::ServerThread (synthese::tcp::TcpService* tcpService)
 void 
 ServerThread::operator()()
 {
-    std::cout << "* Server thread started *" << std::endl;
-    
     while ( 1 )
     {
 	// No need to lock, TcpService methods are thread-safe.
@@ -40,7 +41,9 @@ ServerThread::operator()()
 	std::string requestString;
 	tcpStream >> requestString;
 	
-	std::cout << "Received request : " << requestString << std::endl;
+	Log::GetInstance ().debug ("Received request : " + requestString);
+
+	// TODO : add a BIG try/catch here...
 	
 	// Parse request
 	Request request (requestString);

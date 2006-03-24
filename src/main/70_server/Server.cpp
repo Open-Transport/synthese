@@ -7,11 +7,15 @@
 #include "Request.h"
 #include "RequestDispatcher.h"
 
+#include "01_util/Log.h"
+
 #include <boost/thread/thread.hpp>
 
 #ifdef MODULE_39
 #include "39_carto/MapRequestHandler.h"
 #endif
+
+using synthese::util::Log;
 
 
 namespace synthese
@@ -60,6 +64,8 @@ Server::registerHandlers ()
 void 
 Server::run () 
 {
+    Log::GetInstance ().info ("Starting server...");
+
     registerHandlers ();
 
     synthese::tcp::TcpService* service = 
@@ -75,7 +81,8 @@ Server::run ()
     {
 	threads.create_thread (serverThread);
     }
-      
+
+    Log::GetInstance ().info ("Server ready.");
     threads.join_all();
 
     synthese::tcp::TcpService::closeService (_port);

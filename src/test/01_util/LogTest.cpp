@@ -32,7 +32,9 @@ namespace util
   LogTest::testBasicLogging ()
   {
       std::stringstream buffer;
-      Log log (buffer, Log::LEVEL_DEBUG);
+      Log& log = Log::GetInstance ();
+      log.setOutputStream (&buffer);
+      log.setLevel (Log::LEVEL_DEBUG);
 
       CPPUNIT_ASSERT_EQUAL (Log::LEVEL_DEBUG, log.getLevel ());
 
@@ -136,7 +138,8 @@ namespace util
   LogTest::testConcurrentLogging ()
   {
       std::stringstream buffer;
-      Log log (buffer);
+      Log& log = Log::GetInstance ();
+      log.setOutputStream (&buffer);
 
       boost::thread_group threads;
 
