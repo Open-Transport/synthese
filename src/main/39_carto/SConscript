@@ -4,7 +4,7 @@ Import ('mainenv')
 moduleenv = mainenv.ModuleEnv()
 
 includes = '*.cpp'
-excludes = ['MapBackgroundTile.cpp']
+excludes = []
 
 moduleenv.AddModuleDependency ('70_server')
 moduleenv.AddModuleDependency ('04_time')

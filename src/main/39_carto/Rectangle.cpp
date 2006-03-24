@@ -1,5 +1,9 @@
 #include "Rectangle.h"
-#include "XYPoint.h"
+
+#include "15_env/Point.h"
+
+using synthese::env::Point;
+
 
 namespace synthese
 {
@@ -25,7 +29,7 @@ namespace carto
     }
 
     bool
-    Rectangle::contains (const XYPoint& p) const
+    Rectangle::contains (const Point& p) const
     {
 	return (p.getX() >= _x) && (p.getX() < _x+_width) 
 	    && (p.getY() >= _y) && (p.getY() < _y+_height);

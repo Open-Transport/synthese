@@ -3,8 +3,12 @@
 #include "Map.h"
 #include "PostscriptCanvas.h"
 
+#include "15_env/Point.h"
+
 #include <iostream>
 #include <fstream>
+
+using synthese::env::Point;
 
 using namespace std;
 
@@ -78,8 +82,8 @@ MapBackgroundTile::postDraw (Map& map) const
 void
 MapBackgroundTile::draw (Map& map) const
 {
-    XYPoint tl = map.toOutputFrame (XYPoint (_topLeftX, _topLeftY));
-    XYPoint br = map.toOutputFrame (XYPoint (_bottomRightX, _bottomRightY));
+    Point tl = map.toOutputFrame (Point (_topLeftX, _topLeftY));
+    Point br = map.toOutputFrame (Point (_bottomRightX, _bottomRightY));
     
     double outputWidth = br.getX () - tl.getX ();
     double outputHeight = tl.getY () - br.getY ();

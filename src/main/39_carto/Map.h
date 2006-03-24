@@ -10,6 +10,7 @@
 
 #include <set>
 #include <map>
+#include <vector>
 
 
 
@@ -52,7 +53,7 @@ private:
     
     std::vector<DrawableLine*>
 	findLinesSharingPoint (const DrawableLineSet& drawableLines,
-				const synthese::env::Point* point) const;
+			       const synthese::env::Point* point) const;
     
     
     std::pair<const synthese::env::Point*, int>

@@ -3,10 +3,15 @@
 
 namespace synthese
 {
+namespace env
+{
+    class Point;
+}
+
+
 namespace carto
 {
 
-class XYPoint;
 
 
 class Rectangle
@@ -28,7 +33,7 @@ public:
 	double getWidth () const { return _width; }
 	double getHeight () const { return _height; }
 			
-	bool contains (const XYPoint& p) const;
+	bool contains (const synthese::env::Point& p) const;
 			
 	Rectangle& operator= (const Rectangle& rhs);
 	bool operator== (const Rectangle& rhs) const;
