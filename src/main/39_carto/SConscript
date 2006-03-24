@@ -4,7 +4,7 @@ Import ('mainenv')
 moduleenv = mainenv.ModuleEnv()
 
 includes = '*.cpp'
-excludes = []
+excludes = ['MapBackgroundTile.cpp']
 
 moduleenv.AddModuleDependency ('70_server')
 moduleenv.AddModuleDependency ('04_time')
@@ -14,8 +14,6 @@ moduleenv.Append (LIBS = ['boost_thread'] )
 moduleenv.Append (LIBS = ['boost_iostreams'] )
 moduleenv.AppendMultithreadConf ();
 
-
-moduleenv.AppendMultithreadConf ()
 
 files = moduleenv.Glob(includes, excludes)
 
