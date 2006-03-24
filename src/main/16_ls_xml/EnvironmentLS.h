@@ -26,6 +26,7 @@ Sample XML format :
 Warning: ordering of child elements is important!
 
 <environment id="0">
+
  <cities>
    <city id="1" name="Toulouse"/>
    <city id="2" name="Colomiers"/>
