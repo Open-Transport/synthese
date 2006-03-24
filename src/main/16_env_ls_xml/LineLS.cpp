@@ -13,7 +13,7 @@ namespace su = synthese::util;
 
 namespace synthese
 {
-namespace lsxml
+namespace envlsxml
 {
 
 const std::string LineLS::LINE_TAG ("line");

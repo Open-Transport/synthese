@@ -13,7 +13,7 @@ namespace su = synthese::util;
 
 namespace synthese
 {
-namespace lsxml
+namespace envlsxml
 {
 
 const std::string AxisLS::AXIS_TAG ("axis");

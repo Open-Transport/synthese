@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_LSXML_CITYLS_H
-#define SYNTHESE_LSXML_CITYLS_H
+#ifndef SYNTHESE_ENVLSXML_CITYLS_H
+#define SYNTHESE_ENVLSXML_CITYLS_H
 
 
 #include "module.h"
@@ -16,7 +16,7 @@ namespace env
     class City;
 }
 
-namespace lsxml
+namespace envlsxml
 {
 
 

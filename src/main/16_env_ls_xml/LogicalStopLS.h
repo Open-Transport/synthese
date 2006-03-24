@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_LSXML_LOGICALSTOPLS_H
-#define SYNTHESE_LSXML_LOGICALSTOPLS_H
+#ifndef SYNTHESE_ENVLSXML_LOGICALSTOPLS_H
+#define SYNTHESE_ENVLSXML_LOGICALSTOPLS_H
 
 
 #include "module.h"
@@ -16,7 +16,7 @@ namespace env
     class LogicalStop;
 }
 
-namespace lsxml
+namespace envlsxml
 {
 
 

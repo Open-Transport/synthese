@@ -19,7 +19,7 @@ namespace su = synthese::util;
 
 namespace synthese
 {
-namespace lsxml
+namespace envlsxml
 {
 
 const std::string EnvironmentLS::ENVIRONMENT_TAG ("environment");

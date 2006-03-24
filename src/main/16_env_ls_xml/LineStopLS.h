@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_LSXML_LINESTOPLS_H
-#define SYNTHESE_LSXML_LINESTOPLS_H
+#ifndef SYNTHESE_ENVLSXML_LINESTOPLS_H
+#define SYNTHESE_ENVLSXML_LINESTOPLS_H
 
 
 #include "module.h"
@@ -16,7 +16,7 @@ namespace env
     class LineStop;
 }
 
-namespace lsxml
+namespace envlsxml
 {
 
 

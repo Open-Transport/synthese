@@ -8,8 +8,8 @@
 #include "15_env/Environment.h"
 #include "15_env/LineStop.h"
 
-#include "16_ls_xml/PointLS.h"
-#include "16_ls_xml/Exception.h"
+#include "PointLS.h"
+#include "Exception.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -18,7 +18,7 @@ namespace su = synthese::util;
 
 namespace synthese
 {
-namespace lsxml
+namespace envlsxml
 {
 
 const std::string LineStopLS::LINESTOP_TAG ("lineStop");

@@ -12,7 +12,7 @@ namespace su = synthese::util;
 
 namespace synthese
 {
-namespace lsxml
+namespace envlsxml
 {
 
 const std::string PointLS::POINT_TAG ("point");

@@ -3,7 +3,7 @@
 
 namespace synthese
 {
-namespace lsxml
+namespace envlsxml
 {
 
 

@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_LSXML_LINELS_H
-#define SYNTHESE_LSXML_LINELS_H
+#ifndef SYNTHESE_ENVLSXML_LINELS_H
+#define SYNTHESE_ENVLSXML_LINELS_H
 
 
 #include "module.h"
@@ -16,7 +16,7 @@ namespace env
     class Line;
 }
 
-namespace lsxml
+namespace envlsxml
 {
 
 

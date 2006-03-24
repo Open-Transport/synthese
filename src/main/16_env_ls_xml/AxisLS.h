@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_LSXML_AXISLS_H
-#define SYNTHESE_LSXML_AXISLS_H
+#ifndef SYNTHESE_ENVLSXML_AXISLS_H
+#define SYNTHESE_ENVLSXML_AXISLS_H
 
 
 #include "module.h"
@@ -16,7 +16,7 @@ namespace env
     class Axis;
 }
 
-namespace lsxml
+namespace envlsxml
 {
 
 

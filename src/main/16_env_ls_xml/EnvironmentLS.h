@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_LSXML_ENVIRONMENTLS_H
-#define SYNTHESE_LSXML_ENVIRONMENTLS_H
+#ifndef SYNTHESE_ENVLSXML_ENVIRONMENTLS_H
+#define SYNTHESE_ENVLSXML_ENVIRONMENTLS_H
 
 
 #include "module.h"
@@ -15,7 +15,7 @@ namespace env
     class Environment;
 }
 
-namespace lsxml
+namespace envlsxml
 {
 
 

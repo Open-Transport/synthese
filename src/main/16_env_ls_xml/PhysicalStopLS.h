@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_LSXML_PHYSICALSTOPLS_H
-#define SYNTHESE_LSXML_PHYSICALSTOPLS_H
+#ifndef SYNTHESE_ENVLSXML_PHYSICALSTOPLS_H
+#define SYNTHESE_ENVLSXML_PHYSICALSTOPLS_H
 
 
 #include "module.h"
@@ -16,7 +16,7 @@ namespace env
     class PhysicalStop;
 }
 
-namespace lsxml
+namespace envlsxml
 {
 
 

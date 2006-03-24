@@ -15,7 +15,7 @@ namespace su = synthese::util;
 
 namespace synthese
 {
-namespace lsxml
+namespace envlsxml
 {
 
 const std::string PhysicalStopLS::PHYSICALSTOP_TAG ("physicalStop");

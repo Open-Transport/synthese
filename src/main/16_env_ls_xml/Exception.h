@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_LSXML_EXCEPTION_H
-#define SYNTHESE_LSXML_EXCEPTION_H
+#ifndef SYNTHESE_ENVLSXML_EXCEPTION_H
+#define SYNTHESE_ENVLSXML_EXCEPTION_H
 
 
 #include "01_util/Exception.h"
@@ -10,7 +10,7 @@
 
 namespace synthese
 {
-namespace lsxml
+namespace envlsxml
 {
 
 
