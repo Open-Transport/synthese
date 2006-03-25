@@ -64,7 +64,8 @@ public:
 
     const std::vector<const synthese::env::Point*>& 
 	getPoints () const;
-	
+    bool hasPoint (const synthese::env::Point*) const;
+
     int isShifted (int pointIndex) const;
     int getShift (int pointIndex) const;
     void setShift (int pointIndex, int shift);
@@ -80,12 +81,13 @@ public:
     
     virtual void postDraw (Map& map) const;
 
-private:
     
     /** Find first point in this line points
 	which is equal (by value) to a given point.
     */
     int firstIndexOf (const synthese::env::Point* p) const;
+
+private:
 
     const std::vector<synthese::env::Point> 
 	calculateShiftedPoints (const std::vector<synthese::env::Point>& points) const;

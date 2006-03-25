@@ -55,6 +55,12 @@ DrawableLine::~DrawableLine()
 }
 
 
+bool 
+DrawableLine::hasPoint (const synthese::env::Point* p) const
+{
+    return firstIndexOf (p) != -1;
+}
+
 
 
 const std::vector<const Point*>& 

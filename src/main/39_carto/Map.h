@@ -6,6 +6,7 @@
 
 #include "PostscriptCanvas.h"
 #include "Rectangle.h"
+#include "DrawableLineIndex.h"
 
 
 #include <set>
@@ -32,8 +33,6 @@ namespace carto
 class Map
 {
 private:
-    typedef std::set<DrawableLine*> DrawableLineSet;     
-    
     Rectangle _realFrame;
     double _width;	
     double _height;	
@@ -45,42 +44,39 @@ private:
     
     const MapBackgroundManager* _backgroundManager;
     
-    // Dump objects
-    DrawableLineSet       _drawableLines;
-    // Dump objects
-
-    
+    std::set<DrawableLine*> _selectedLines;
+    DrawableLineIndex _indexedLines;  //!< Drawable lines indexed by point.
     
     std::vector<DrawableLine*>
-	findLinesSharingPoint (const DrawableLineSet& drawableLines,
+	findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
 			       const synthese::env::Point* point) const;
-    
     
     std::pair<const synthese::env::Point*, int>
 	findMostSharedPoint (const DrawableLine* drawableLine, 
-			     const DrawableLineSet& exclusionList = DrawableLineSet ()) const;
+			     const std::set<DrawableLine*>& exclusionList = 
+			     std::set<DrawableLine*> ()) const;
     
-    DrawableLine* findMostSharedLine (const DrawableLineSet& drawableLines, 
-				      const DrawableLineSet& exclusionList) const;
+    DrawableLine* findMostSharedLine (const std::set<DrawableLine*>& drawableLines, 
+				      const std::set<DrawableLine*>& exclusionList) const;
     
     
     std::pair<const DrawableLine*, int>
 	findLeftMostLine (const synthese::env::Point* vertex, 
 			  const DrawableLine* reference, 
-			  const DrawableLineSet& lines) const;
+			  const std::set<DrawableLine*>& lines) const;
     
 
     std::pair<const DrawableLine*, int>
 	findRightMostLine (const synthese::env::Point* vertex, 
 			   const DrawableLine* reference, 
-			   const DrawableLineSet& lines) const;
+			   const std::set<DrawableLine*>& lines) const;
     
     
     void 
 	assignShiftFactors (const DrawableLine* reference, 
 			    const synthese::env::Point* referencePoint, 
 			    DrawableLine* drawableLine, 
-			    const DrawableLineSet& exclusionList);
+			    const std::set<DrawableLine*>& exclusionList);
     
     const DrawableLine*
 	findBestAvailableReference (const DrawableLine* drawableLine, 
@@ -99,6 +95,7 @@ public:
 
 
     Map(std::ostream& output,
+	const std::set<DrawableLine*> selectedLines,
 	const Rectangle& realFrame, 
 	double width, 
 	double height,
