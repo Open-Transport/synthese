@@ -43,12 +43,19 @@ Map::Map(std::ostream& output,
 , _canvas (output)
 , _backgroundManager (backgroundManager)
 {
-    // TODO here :
-    // Initialize the reverse mapping
-    // point => drawable lines traversing it.
 
-    // then replace topography interrogation with methods
-    // working on this mapping!
+    // Populate line index (indexed by point).
+    for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
+	 it != selectedLines.end ();
+	 ++it)
+    {
+	const std::vector<const Point*>& points = (*it)->getPoints ();
+	for (std::vector<const Point*>::const_iterator itp = points.begin ();
+	     itp != points.end () ; ++itp)
+	{
+	    _indexedLines.add (**itp, *it);
+	}
+    }
 
 }
 

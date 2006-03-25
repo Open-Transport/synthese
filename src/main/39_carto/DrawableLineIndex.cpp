@@ -52,6 +52,14 @@ DrawableLineIndex::find (const synthese::env::Point& point) const
 
 
 
+void 
+DrawableLineIndex::add (const synthese::env::Point& point, 
+			DrawableLine* line) const
+{
+    find (point).insert (line);
+}
+
+
 
 
 

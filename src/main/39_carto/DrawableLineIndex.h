@@ -37,6 +37,9 @@ public:
     std::set<DrawableLine*>&
 	find (const synthese::env::Point& point) const;
     
+    void add (const synthese::env::Point& point, 
+	      DrawableLine* line) const;
+    
 };
 
 }
