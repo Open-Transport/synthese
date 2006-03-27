@@ -34,10 +34,15 @@ const int   DrawableLine::BORDER_WIDTH = LINE_WIDTH+2;
 
 
 
-DrawableLine::DrawableLine (const Line* line)
+DrawableLine::DrawableLine (const Line* line,
+			    int fromLineStopIndex,
+			    int toLineStopIndex)
+)
     : _line (line)
-    , _points (line->getPoints ())
-      , _color (0,0,0)
+    , _fromLineStopIndex (fromLineStopIndex)
+    , _toLineStopIndex (toLineStopIndex)
+    , _points (line->getPoints (fromLineStopIndex, toLineStopIndex))
+    , _color (0,0,0)
 {
     for (unsigned int i=0; i<_points.size (); ++i) {
         // Shift initially to 0; 
@@ -569,7 +574,7 @@ DrawableLine::doDrawSquareTerminus (PostscriptCanvas& canvas,
 
 
 void 
-DrawableLine::preDraw (Map& map) const
+DrawableLine::preDraw (Map& map, PostscriptCanvas& canvas) const
 {
     std::vector<Point> points;
     
@@ -587,10 +592,8 @@ DrawableLine::preDraw (Map& map) const
 
 
 void 
-DrawableLine::postDraw (Map& map) const
+DrawableLine::postDraw (Map& map, PostscriptCanvas& canvas) const
 {
-    PostscriptCanvas& canvas = map.getCanvas ();
-    
     // Draw Terminuses
     if (_shiftedPoints.size () >= 2) {
 
@@ -624,11 +627,9 @@ DrawableLine::postDraw (Map& map) const
 
 
 void 
-DrawableLine::draw (Map& map) const
+DrawableLine::draw (Map& map, PostscriptCanvas& canvas) const
 {
 
-    PostscriptCanvas& canvas = map.getCanvas ();
-	
     canvas.setlinewidth (BORDER_WIDTH);
     canvas.setrgbcolor(BORDER_COLOR.r, BORDER_COLOR.g, BORDER_COLOR.b);
     doDrawCurvedLine(canvas, _shiftedPoints);

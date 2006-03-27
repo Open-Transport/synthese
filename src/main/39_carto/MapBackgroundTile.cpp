@@ -64,7 +64,7 @@ MapBackgroundTile::getHeight () const
 
 
 void 
-MapBackgroundTile::preDraw (Map& map) const
+MapBackgroundTile::preDraw (Map& map, PostscriptCanvas& canvas) const
 {
     
 }
@@ -72,7 +72,7 @@ MapBackgroundTile::preDraw (Map& map) const
 
 
 void 
-MapBackgroundTile::postDraw (Map& map) const
+MapBackgroundTile::postDraw (Map& map, PostscriptCanvas& canvas) const
 {
     
 }
@@ -80,7 +80,7 @@ MapBackgroundTile::postDraw (Map& map) const
 
 
 void
-MapBackgroundTile::draw (Map& map) const
+MapBackgroundTile::draw (Map& map, PostscriptCanvas& canvas) const
 {
     Point tl = map.toOutputFrame (Point (_topLeftX, _topLeftY));
     Point br = map.toOutputFrame (Point (_bottomRightX, _bottomRightY));
@@ -92,7 +92,6 @@ MapBackgroundTile::draw (Map& map) const
     double translateX = tl.getX ();
     double translateY = br.getY () ; //map.getHeight () - tl.getY ();
     
-    PostscriptCanvas& canvas = map.getCanvas ();
     ostream& os = canvas.getOutput ();
     
     // Dump the common procedure for drawing an image

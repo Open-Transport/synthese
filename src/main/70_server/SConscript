@@ -12,13 +12,12 @@ moduleenv.AddModuleDependency ('39_carto')
 moduleenv.AddModuleDependency ('04_time')
 moduleenv.AddModuleDependency ('00_tcp')
 moduleenv.AddModuleDependency ('01_util')
-moduleenv.Append (LIBS = ['boost_thread'] )
-moduleenv.Append (LIBS = ['boost_iostreams'] )
-moduleenv.Append (LIBS = ['boost_program_options'] )
+moduleenv.AddBoostDependency ('boost_thread')
+moduleenv.AddBoostDependency ('boost_iostreams')
+moduleenv.AddBoostDependency ('boost_program_options')
 moduleenv.AppendMultithreadConf ();
 
 
-moduleenv.AppendMultithreadConf ()
 
 files = moduleenv.Glob(includes, excludes)
 

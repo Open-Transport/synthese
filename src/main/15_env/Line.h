@@ -143,12 +143,18 @@ public:
     
     //! @name Query methods
     //@{
-    /** Gets all the geographical point linked by the line.
+    /** Gets all the geographical points linked by the line
+        between two of its line stops. If no from/to line stop
+	index is provided, all the stops are considered.
+	@param fromLineStopIndex 
+	@param toLineStopIndex 
+
 	This includes :
 	- physical stops
 	- via points
     */
-    std::vector<const Point*> getPoints () const;
+    std::vector<const Point*> getPoints (int fromLineStopIndex = 0,
+					 int toLineStopIndex = -1) const;
 
     bool isReservable () const;
 

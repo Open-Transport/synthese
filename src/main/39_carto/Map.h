@@ -4,7 +4,6 @@
 #include <iostream>
 
 
-#include "PostscriptCanvas.h"
 #include "Rectangle.h"
 #include "DrawableLineIndex.h"
 
@@ -28,6 +27,7 @@ namespace carto
 
     class DrawableLine;
     class MapBackgroundManager;
+    class PostscriptCanvas;
 
 
 class Map
@@ -39,8 +39,6 @@ private:
     
     double _mapScaleX;
     double _mapScaleY;
-    
-    PostscriptCanvas _canvas;
     
     const MapBackgroundManager* _backgroundManager;
     
@@ -85,17 +83,14 @@ private:
     bool hasBackgroundManager () const;
     
     void prepareLines ();
-    
     void prepare ();
-    
-    void dumpBackground ();
-    void dumpLines ();
+    void dumpBackground (PostscriptCanvas& canvas);
+    void dumpLines (PostscriptCanvas& canvas);
     
 public:
 
 
-    Map(std::ostream& output,
-	const std::set<DrawableLine*> selectedLines,
+    Map(const std::set<DrawableLine*> selectedLines,
 	const Rectangle& realFrame, 
 	double width, 
 	double height,
@@ -109,9 +104,7 @@ public:
     double getWidth () const { return _width; }
     double getHeight () const { return _height; }
     
-    PostscriptCanvas& getCanvas () { return _canvas; }
-	
-    void dump ();
+    void dump (PostscriptCanvas& canvas);
 };
 
 }

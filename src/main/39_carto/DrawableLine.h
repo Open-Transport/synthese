@@ -42,6 +42,8 @@ private:
     static const int      BORDER_WIDTH;
 
     const synthese::env::Line* _line;   //!< Reference line
+    const int _fromLineStopIndex;   //!< From line stop index (included)
+    const int _toLineStopIndex;     //!< To line stop index (included)
     const std::vector<const synthese::env::Point*> _points;  //!< Reference line points
 
     std::vector<int> _shifts;
@@ -53,7 +55,10 @@ private:
 
 public:
     
-    DrawableLine (const synthese::env::Line* line);
+    DrawableLine (const synthese::env::Line* line,
+		  int fromLineStopIndex,
+		  int toLineStopIndex);
+
     ~DrawableLine();
 
     //! @name Getters/Setters
@@ -75,11 +80,11 @@ public:
     bool isReverseWayAt (const synthese::env::Point* p, const DrawableLine* dbl) const;
     int numberOfCommonPointsWith (const DrawableLine* dbl) const;
 
-    virtual void preDraw (Map& map) const;
+    virtual void preDraw (Map& map, PostscriptCanvas& canvas) const;
     
-    virtual void draw (Map& map) const;
+    virtual void draw (Map& map, PostscriptCanvas& canvas) const;
     
-    virtual void postDraw (Map& map) const;
+    virtual void postDraw (Map& map, PostscriptCanvas& canvas) const;
 
     
     /** Find first point in this line points

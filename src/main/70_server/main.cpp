@@ -14,11 +14,10 @@ namespace po = boost::program_options;
 
 int main( int argc, char **argv )
 {
-    int port = 3591;
-    int threads = 10;
+    //  int port = 3591;
+    // int threads = 10;
 
-/*
-  boost program_options causes craches with GCC 4.0
+//  boost program_options causes crashes with GCC 4.0
 
     int port;
     int threads;
@@ -39,7 +38,7 @@ int main( int argc, char **argv )
 	std::cout << desc << std::endl;
 	return 1;
     }
-*/  
+
     // Configure default log (default output is cout).
     synthese::util::Log::GetInstance ().setLevel (Log::LEVEL_DEBUG);
     

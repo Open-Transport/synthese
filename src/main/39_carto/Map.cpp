@@ -7,6 +7,9 @@
 #include "MapBackground.h"
 #include "MapBackgroundManager.h"
 
+#include "PostscriptCanvas.h"
+
+
 #include <algorithm>
 #include <vector>
 #include <set>
@@ -27,8 +30,7 @@ namespace carto
 
 
 
-Map::Map(std::ostream& output,
-	 const std::set<DrawableLine*> selectedLines,
+Map::Map(const std::set<DrawableLine*> selectedLines,
 	 const Rectangle& realFrame, 
          double width, 
          double height,
@@ -40,7 +42,6 @@ Map::Map(std::ostream& output,
 , _height (height)
 , _mapScaleX (_width / _realFrame.getWidth ())
 , _mapScaleY (_height / _realFrame.getHeight ())
-, _canvas (output)
 , _backgroundManager (backgroundManager)
 {
 
@@ -430,7 +431,7 @@ Map::prepare ()
 
 
 void 
-Map::dumpBackground ()
+Map::dumpBackground (PostscriptCanvas& canvas)
 {
     if (hasBackgroundManager ()) 
     {
@@ -449,12 +450,10 @@ Map::dumpBackground ()
                     if (tile != 0) { // Any background available for this tile ?
                         // cout << "Drawing tile " << i << "," << j <<  "  "<< tile->getPath ().string () << endl;
                         ++nbtiles;
-                        tile->draw (*this);
+                        tile->draw (*this, canvas);
                     }
                 }
             }
-            // std::cout << "TL=" << tlIndexes.first << "," << tlIndexes.second << std::endl;
-            // std::cout << "BR=" << brIndexes.first << "," << brIndexes.second << std::endl;
         }
     }
     
@@ -464,26 +463,26 @@ Map::dumpBackground ()
 
 
 void 
-Map::dumpLines ()
+Map::dumpLines (PostscriptCanvas& canvas)
 {
     // Draw drawableLines
-    _canvas.setfont("Helvetica", 10);
-    _canvas.setlinejoin (1);
+    canvas.setfont("Helvetica", 10);
+    canvas.setlinejoin (1);
     
     for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
          it != _selectedLines.end () ; ++it) {
 	const DrawableLine* dbl = *it;
-	dbl->preDraw (*this);  
+	dbl->preDraw (*this, canvas);  
     }    
     for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
          it != _selectedLines.end () ; ++it) {
 	const DrawableLine* dbl = *it;
-	dbl->draw (*this);  
+	dbl->draw (*this, canvas);  
     }    
     for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
          it != _selectedLines.end () ; ++it) {
 	const DrawableLine* dbl = *it;
-	dbl->postDraw (*this);  
+	dbl->postDraw (*this, canvas);  
     }    
     
 }
@@ -494,14 +493,14 @@ Map::dumpLines ()
 
 
 void 
-Map::dump ()
+Map::dump (PostscriptCanvas& canvas)
 {
     prepare ();
 	
-    _canvas.startPage(0, 0, _width, _height);
+    canvas.startPage(0, 0, _width, _height);
     
-    dumpBackground ();
-    dumpLines ();
+    dumpBackground (canvas);
+    dumpLines (canvas);
 
 
 //	canvas.setRGBColor(c0.r, c0.g, c0.b);
@@ -536,7 +535,7 @@ drawStreet (_streets[i], canvas);
 */
 	
 	
-    _canvas.showPage();
+    canvas.showPage();
 	
 	
 }

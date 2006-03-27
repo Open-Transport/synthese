@@ -46,11 +46,11 @@ public:
     int getPixelWidth () const { return _pixelWidth; }
     int getPixelHeight () const { return _pixelHeight; }
     
-    virtual void preDraw (Map& map) const;
+    virtual void preDraw (Map& map, PostscriptCanvas& canvas) const;
     
-    virtual void draw (Map& map) const;
+    virtual void draw (Map& map, PostscriptCanvas& canvas) const;
 
-    virtual void postDraw (Map& map) const;
+    virtual void postDraw (Map& map, PostscriptCanvas& canvas) const;
     
     bool operator< (const MapBackgroundTile& rhs) const;
     

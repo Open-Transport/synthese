@@ -10,6 +10,7 @@ namespace carto
 
 
 class Map;
+class PostscriptCanvas;
 
 
 struct RGBColor
@@ -54,16 +55,16 @@ class Drawable
 	
 protected:
 
-	Drawable();
-	virtual ~Drawable();
+    Drawable();
+    virtual ~Drawable();
 	
 public:
 	
-    virtual void preDraw (Map& map) const = 0;
+    virtual void preDraw (Map& map, PostscriptCanvas& canvas) const = 0;
     
-    virtual void draw (Map& map) const = 0;
+    virtual void draw (Map& map, PostscriptCanvas& canvas) const = 0;
 	
-    virtual void postDraw (Map& map) const = 0;
+    virtual void postDraw (Map& map, PostscriptCanvas& canvas) const = 0;
     
 };
 
