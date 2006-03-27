@@ -15,6 +15,7 @@ class TcpServerSocketTest : public CPPUNIT_NS::TestCase
 {
   CPPUNIT_TEST_SUITE(TcpServerSocketTest);
   CPPUNIT_TEST(testSimpleConnection);
+  CPPUNIT_TEST(testSimpleConnectionWhitespaceTransfer);
   CPPUNIT_TEST(testMultipleConnections);
   CPPUNIT_TEST_SUITE_END();
 
@@ -26,6 +27,7 @@ public:
 protected:
 
   void testSimpleConnection ();
+  void testSimpleConnectionWhitespaceTransfer ();
   void testMultipleConnections ();
 
 };

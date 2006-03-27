@@ -7,8 +7,8 @@ excludes = []
 # TODO : understand why link order is so important ??
 
 testmoduleenv.AddModuleDependency ('01_util')
-testmoduleenv.Append (LIBS = ['boost_thread'] )
-testmoduleenv.Append (LIBS = ['boost_iostreams'] )
+testmoduleenv.AddBoostDependency ('boost_thread')
+testmoduleenv.AddBoostDependency ('boost_iostreams')
 testmoduleenv.AppendMultithreadConf ();
 
 

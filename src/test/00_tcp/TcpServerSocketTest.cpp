@@ -7,6 +7,7 @@
 
 
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 
 #include <boost/thread/thread.hpp>
@@ -36,10 +37,10 @@ namespace tcp
     
     struct TcpClientThread
     {
-	int _id;
+	std::string _replyToSend;
 
-	TcpClientThread (int id) 
-	    : _id (id)
+	TcpClientThread (const std::string& replyToSend) 
+	    : _replyToSend (replyToSend)
 	    {
 	    }
 	
@@ -68,7 +69,7 @@ namespace tcp
 		CPPUNIT_ASSERT_EQUAL (expectedMessage, message);
 
 		// Send a reply
-		cliSocketStream << "MessageToServerFromClient" << _id << std::endl;
+		cliSocketStream << _replyToSend << std::endl;
 		
 		cliSocketStream.close ();
 	    }
@@ -82,7 +83,7 @@ namespace tcp
   TcpServerSocketTest::testSimpleConnection () 
   {
       
-      TcpClientThread clientThread (0);
+      TcpClientThread clientThread ("MessageToServerFromClient0");
       boost::thread client (clientThread);
 
       TcpService* service = TcpService::openService (8899);
@@ -106,6 +107,55 @@ namespace tcp
 
 	  std::string expectedReply ("MessageToServerFromClient0");
 	  CPPUNIT_ASSERT_EQUAL (expectedReply, reply);
+
+	  
+	  srvSocketStream.close ();
+
+	  service->closeConnection (socket);
+	  CPPUNIT_ASSERT_EQUAL (0, service->getConnectionCount ());
+      } 
+      catch (SocketException& se)
+      {
+	  CPPUNIT_ASSERT (false);
+      }
+      
+      client.join ();
+
+
+      TcpService::closeService (8899);
+  } 
+
+
+
+  void 
+  TcpServerSocketTest::testSimpleConnectionWhitespaceTransfer () 
+  {
+      
+      TcpClientThread clientThread ("Message to server from client 0");
+      boost::thread client (clientThread);
+
+      TcpService* service = TcpService::openService (8899);
+
+      try 
+      {
+	  // Wait for client connection...
+	  TcpServerSocket& socket = service->acceptConnection ();
+
+	  CPPUNIT_ASSERT_EQUAL (1, service->getConnectionCount ());
+	  
+	  // Create commodity stream:
+	  boost::iostreams::stream<TcpServerSocket> srvSocketStream (socket);
+
+	  // Send a message to client:
+	  srvSocketStream << "MessageToClient" << std::endl;
+
+	  // Wait for a reply:
+	  char buffer[1024*64]; // 64K buffer max
+	  srvSocketStream.getline (buffer, 1024*64);
+	  std::string reply (buffer);
+
+	  std::string expectedReply ("Message to server from client 0");
+	  CPPUNIT_ASSERT_EQUAL (expectedReply, reply);
 	  
 	  srvSocketStream.close ();
 
@@ -127,15 +177,14 @@ namespace tcp
 
 
 
-
   void 
   TcpServerSocketTest::testMultipleConnections () 
   {
       TcpService* service = TcpService::openService (8899);
 
-      TcpClientThread clientThread0 (0);
-      TcpClientThread clientThread1 (1);
-      TcpClientThread clientThread2 (2);
+      TcpClientThread clientThread0 ("MessageToServerFromClient0");
+      TcpClientThread clientThread1 ("MessageToServerFromClient1");
+      TcpClientThread clientThread2 ("MessageToServerFromClient2");
 
       boost::thread client0 (clientThread0);
       TcpServerSocket& socket0 = service->acceptConnection ();
