@@ -100,6 +100,7 @@ Server::run ()
 	Log::GetInstance ().fatal ("Error during server init", ex);
     } 
 
+
     synthese::tcp::TcpService::closeService (_port);
 }
 
