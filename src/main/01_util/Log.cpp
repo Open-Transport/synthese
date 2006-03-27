@@ -189,7 +189,7 @@ Log::append (Log::Level level,
 	(*_outputStream) << LOG_PREFIX_ERROR;
 	break;
     case Log::LEVEL_FATAL:
-	(*_outputStream) << LOG_PREFIX_DEBUG;
+	(*_outputStream) << LOG_PREFIX_FATAL;
 	break;
     }
 

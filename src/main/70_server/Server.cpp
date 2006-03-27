@@ -68,29 +68,37 @@ Server::run ()
 
     registerHandlers ();
 
-    synthese::tcp::TcpService* service = 
-	synthese::tcp::TcpService::openService (_port);
-    
-    ServerThread serverThread (service);
-
-    if (_nbThreads == 1) 
+    try 
     {
-	// Monothread execution ; easier for debugging
-	Log::GetInstance ().info ("Server ready.");
-	serverThread ();
-    }
-    {
-	// Create the thread group.
-	boost::thread_group threads;
-
-	// Creates all server threads.
-	for (int i=0; i< _nbThreads; ++i) 
+	synthese::tcp::TcpService* service = 
+	    synthese::tcp::TcpService::openService (_port);
+	
+	ServerThread serverThread (service);
+	
+	if (_nbThreads == 1) 
 	{
-	    threads.create_thread (serverThread);
+	    // Monothread execution ; easier for debugging
+	    Log::GetInstance ().info ("Server ready.");
+	    serverThread ();
 	}
-	Log::GetInstance ().info ("Server ready.");
-	threads.join_all();
+	{
+	    // Create the thread group.
+	    boost::thread_group threads;
+	    
+	    // Creates all server threads.
+	    for (int i=0; i< _nbThreads; ++i) 
+	    {
+		threads.create_thread (serverThread);
+	    }
+	    Log::GetInstance ().info ("Server ready.");
+	    threads.join_all();
+	}
+	
     }
+    catch (synthese::util::Exception& ex)
+    {
+	Log::GetInstance ().fatal ("Error during server init", ex);
+    } 
 
     synthese::tcp::TcpService::closeService (_port);
 }
