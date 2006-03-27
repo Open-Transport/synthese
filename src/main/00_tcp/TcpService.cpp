@@ -22,6 +22,7 @@ TcpService::TcpService (int portNumber,
                   : PROTOCOL_TYPE_UDP )
     , _socket (0)
 {
+    initialize ();
 }
 
 
@@ -99,8 +100,6 @@ TcpServerSocket&
 TcpService::acceptConnection () throw (SocketException)
 {
     boost::mutex::scoped_lock lock (_serviceMutex);
-
-    if (_socket == 0) initialize ();
 
     try 
     {
