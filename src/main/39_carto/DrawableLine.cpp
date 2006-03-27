@@ -9,12 +9,14 @@
 
 #include "01_util/Conversion.h"
 #include "15_env/Line.h"
+#include "15_env/PhysicalStop.h"
 
 
 using synthese::util::Conversion;
 using synthese::util::RGBColor;
 using synthese::env::Line;
 using synthese::env::Point;
+using synthese::env::PhysicalStop;
 
 
 namespace synthese
@@ -188,6 +190,22 @@ DrawableLine::numberOfCommonPointsWith (const DrawableLine* dbl) const
     return nb;
 }
 
+
+
+bool 
+DrawableLine::isStopPoint (int pointIndex) const
+{
+    const Point* p = _points[pointIndex];
+    return dynamic_cast<const PhysicalStop*> (p) != 0;
+}
+
+
+
+bool 
+DrawableLine::isViaPoint (int pointIndex) const
+{
+    return !isStopPoint (pointIndex);
+}
 
 
 
@@ -637,15 +655,15 @@ DrawableLine::draw (Map& map, PostscriptCanvas& canvas) const
 	Point pt (_shiftedPoints[i].getX() + 100.0, _shiftedPoints[i].getY());
 	double angle = calculateAngle (pt, _shiftedPoints[i], _shiftedPoints[i+1]);
 
-	// if (angle < 0) angle += 2 * M_PI;
-	doDrawTriangleArrow(canvas, _shiftedPoints[i], toDegrees(angle - M_PI_2));
-	doDrawSquareStop(canvas, _shiftedPoints[i], toDegrees(angle - M_PI_2));
+	if (isStopPoint (i)) 
+	{
+	    doDrawTriangleArrow(canvas, _shiftedPoints[i], toDegrees(angle - M_PI_2));
+	    doDrawSquareStop(canvas, _shiftedPoints[i], toDegrees(angle - M_PI_2));
+	}
 	
     }
     
-	
     canvas.setrgbcolor (0.5, 0.5 , 0.5);
-    
     
     // For debug : draw unshifted points as circles
     // For debug : draw unshifted points as circles

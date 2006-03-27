@@ -68,6 +68,9 @@ public:
 	getPoints () const;
     bool hasPoint (const synthese::env::Point*) const;
 
+    bool isStopPoint (int pointIndex) const;
+    bool isViaPoint (int pointIndex) const;
+
     int isShifted (int pointIndex) const;
     int getShift (int pointIndex) const;
     void setShift (int pointIndex, int shift);

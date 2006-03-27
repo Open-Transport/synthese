@@ -18,7 +18,6 @@ namespace synthese
 namespace server
 {
 
-
 ServerThread::ServerThread (synthese::tcp::TcpService* tcpService) 
     : _tcpService (tcpService)
 {
