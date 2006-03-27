@@ -52,7 +52,6 @@ LineLS::Load (XMLNode& node,
     {
 	XMLNode lineStopNode = node.getChildNode (LineStopLS::LINESTOP_TAG.c_str(), i);
 	synthese::env::LineStop* lineStop = LineStopLS::Load (lineStopNode, line, environment);
-	environment.getLineStops ().add (lineStop);
 	line->addLineStop (lineStop);
     }
     

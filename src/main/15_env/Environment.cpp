@@ -122,21 +122,6 @@ Environment::getPhysicalStops () const
 }
 
 
-LineStop::Registry& 
-Environment::getLineStops () 
-{
-    return _lineStops;
-}
-
-
-const LineStop::Registry& 
-Environment::getLineStops () const
-{
-    return _lineStops;
-}
-
-
-
 
 
 

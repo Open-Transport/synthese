@@ -1,6 +1,7 @@
 #include "Log.h"
 
 #include <iomanip>
+#include "Exception.h"
 
 
 namespace synthese
@@ -207,7 +208,7 @@ Log::append (Log::Level level,
 
     if (exception != 0)
     {
-	(*_outputStream) << " : " << exception;
+	(*_outputStream) << " : " << exception->getMessage ();
     }
 
 

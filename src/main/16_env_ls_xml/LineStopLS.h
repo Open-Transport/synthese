@@ -25,7 +25,7 @@ namespace envlsxml
 
 Sample XML format :
 
-<lineStop id="4" lineId="1" metricOffset="352.2"
+<lineStop metricOffset="352.2"
 	  type="D" physicalStopId="3" scheduleInput="true">
   <point x="120.5" y="4444.2"/>
   <point x="130.5" y="4434.4"/>
@@ -39,7 +39,6 @@ class LineStopLS
  public:
 
     static const std::string LINESTOP_TAG;
-    static const std::string LINESTOP_ID_ATTR;
     static const std::string LINESTOP_LINEID_ATTR;
     static const std::string LINESTOP_METRICOFFSET_ATTR;
 

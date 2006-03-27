@@ -47,7 +47,7 @@ ServerThread::operator()()
 	Log::GetInstance ().debug ("Received request : " + requestString);
 
 	// TODO : add a BIG try/catch here...
-//	try
+	try
 	{
 	    // Parse request
 	    Request request (requestString);
@@ -55,10 +55,10 @@ ServerThread::operator()()
 	    // Send request to proper handler through dispatcher
 	    RequestDispatcher::getInstance ()->dispatchRequest (request, tcpStream);
 	}
-/*	catch (synthese::util::Exception& ex)
+	catch (synthese::util::Exception& ex)
 	{
-	    Log::GetInstance ().error ("Error while executing request : ", ex);
-	    } */
+	    Log::GetInstance ().error ("Error while executing request", ex);
+	} 
 	
 	_tcpService->closeConnection (serverSocket);
     }
