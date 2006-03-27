@@ -27,7 +27,8 @@ Sample XML format :
 <line id="L5"
       axisId="A2"
       firstYear="2006"
-      lastYear="2007">
+      lastYear="2007"
+      color="red">
 
    <lineStop id="1" metricOffset="0"
              type="departure" physicalStopId="1" scheduleInput="true">
@@ -53,6 +54,7 @@ class LineLS
     static const std::string LINE_AXISID_ATTR;
     static const std::string LINE_FIRSTYEAR_ATTR;
     static const std::string LINE_LASTYEAR_ATTR;
+    static const std::string LINE_COLOR_ATTR;
 
  private:
 

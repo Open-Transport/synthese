@@ -9,6 +9,13 @@
 
 namespace synthese
 {
+
+namespace util
+{
+    class RGBColor;
+}
+
+
 namespace carto
 {
 
@@ -47,6 +54,7 @@ class PostscriptCanvas
     void setlinecap (int lineCap);
     void setlinejoin (int lineJoin);
     void setlinewidth (int lineWidth);
+    void setrgbcolor (const synthese::util::RGBColor& color);
     void setrgbcolor (double red, double green, double blue);
     void text (const std::string& text);
     

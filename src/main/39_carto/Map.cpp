@@ -258,7 +258,7 @@ Map::assignShiftFactors (const DrawableLine* reference,
 	
     DrawableLineComparator cmp (reference, referencePoint, 0);
 	
-    cout << endl<< "******************* Processing line " << line->getLineNumber () << endl;
+    // cout << endl<< "******************* Processing line " << line->getLine ()->getId () << endl;
     for (unsigned int j=0; j<line->getPoints().size (); ++j) {
 	// cout << "Processing point " << j << endl;
 		
@@ -280,9 +280,12 @@ Map::assignShiftFactors (const DrawableLine* reference,
 		
 	cmp.setPoint (v);
 		
-	if ((rightMostLine == 0) && (leftMostLine == 0)) {
+	if ((rightMostLine == 0) && (leftMostLine == 0)) 
+	{
 	    line->setShift (j, 0);
-	} else {
+	} 
+	else 
+	{
 			
 	    // cout << "=== LeftMostLine  = " << leftMostLine->getLineNumber() << " lms=" << leftMostShift <<endl;
 	    // cout << "=== RightMostLine = " << rightMostLine->getLineNumber() << " rms=" << rightMostShift <<endl;

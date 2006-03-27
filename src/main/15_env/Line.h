@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 
+#include "01_util/RGBColor.h"
 #include "Registrable.h"
 #include "Calendar.h"
 #include "Path.h"
@@ -43,9 +44,10 @@ private:
     Fare* _fare;
     Alarm* _alarm;
     
-    
     std::string _shortName;  //!< Name (cartouche)
     std::string _longName; //!< Name for schedule card
+
+    synthese::util::RGBColor _color;  //!< Line color
     std::string _style;    //!< CSS style (cartouche)
     std::string _image;    //!< Display image (cartouche)
 
@@ -57,6 +59,7 @@ private:
     bool _departureBoardDisplay; 
     bool _timetableDisplay; 
     Calendar _calendar; 
+
 	
 
 public:
@@ -84,6 +87,9 @@ public:
     const Axis* getAxis () const;
 
     const Alarm* getAlarm() const;
+
+    const synthese::util::RGBColor& getColor () const;
+    void setColor (const synthese::util::RGBColor& color);
 
     const std::string& getDirection () const;
     void setDirection (const std::string& direction);

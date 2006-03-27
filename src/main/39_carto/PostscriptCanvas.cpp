@@ -1,5 +1,8 @@
 #include "PostscriptCanvas.h"
 
+#include "01_util/RGBColor.h"
+
+
 
 namespace synthese
 {
@@ -266,6 +269,13 @@ PostscriptCanvas:: setrgbcolor (double red, double green, double blue) {
     _output << red << " " << green << " " << blue << " setrgbcolor" << std::endl;
 }
 
+
+
+void 
+PostscriptCanvas::setrgbcolor (const synthese::util::RGBColor& color)
+{
+    setrgbcolor (color.r, color.g, color.b);
+}
 
 
 

@@ -3,6 +3,7 @@
 #include "DrawableLine.h"
 #include "Geometry.h"
 
+#include "15_env/Line.h"
 #include "15_env/Point.h"
 
 #include <cmath>
@@ -110,7 +111,7 @@ DrawableLineComparator::operator() (const DrawableLine* bl1,
     
     // Special case : the lines follow exactly same ways
     if (bl1->isFullySameWay(bl2)) {
-	bool result = bl1->getLineNumber() > bl2->getLineNumber ();
+	bool result = bl1->getLine ()->getId () > bl2->getLine ()->getId ();
 	if (bl1->isReverseWayAt(_referencePoint, _reference)) result = !result;
 	return result;
     }

@@ -7,6 +7,7 @@
 
 #include "Drawable.h"
 
+#include "01_util/RGBColor.h"
 #include "15_env/Point.h"
 
 
@@ -38,7 +39,7 @@ private:
     static const int      LINE_WIDTH;
     static const double   SPACING;
     
-    static const RGBColor BORDER_COLOR;
+    static const synthese::util::RGBColor BORDER_COLOR;
     static const int      BORDER_WIDTH;
 
     const synthese::env::Line* _line;   //!< Reference line
@@ -51,8 +52,6 @@ private:
 	
     mutable std::vector<synthese::env::Point> _shiftedPoints;
 
-    RGBColor _color;
-
 public:
     
     DrawableLine (const synthese::env::Line* line,
@@ -63,9 +62,7 @@ public:
 
     //! @name Getters/Setters
     //@{
-    // const std::string& getShortName () const;
-    int getLineNumber () const;
-    // const RGBColor& getColor () const;
+    const synthese::env::Line* getLine () const;
 
     const std::vector<const synthese::env::Point*>& 
 	getPoints () const;

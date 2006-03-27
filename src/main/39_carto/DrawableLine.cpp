@@ -12,6 +12,7 @@
 
 
 using synthese::util::Conversion;
+using synthese::util::RGBColor;
 using synthese::env::Line;
 using synthese::env::Point;
 
@@ -41,7 +42,6 @@ DrawableLine::DrawableLine (const Line* line,
     , _fromLineStopIndex (fromLineStopIndex)
     , _toLineStopIndex (toLineStopIndex)
     , _points (line->getPoints (fromLineStopIndex, toLineStopIndex))
-    , _color (0,0,0)
 {
     for (unsigned int i=0; i<_points.size (); ++i) {
         // Shift initially to 0; 
@@ -456,12 +456,6 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point>& points) const
 
 
 
-int 
-DrawableLine::getLineNumber () const
-{
-    // TODO : where to set number (on Line ?)
-    return 33;
-}
 
 
 
@@ -472,7 +466,7 @@ DrawableLine::doDrawCurvedLine (PostscriptCanvas& canvas,
     canvas.newpath();
     canvas.moveto(shiftedPoints[0].getX()+5, shiftedPoints[0].getY()+10);
     canvas.rotate (45.0);
-    canvas.text (std::string ("Line ") + Conversion::ToString (getLineNumber ()));
+    canvas.text (_line->getId ());
     canvas.rotate (-45.0);
     canvas.moveto(shiftedPoints[0].getX(), shiftedPoints[0].getY());
     
@@ -634,7 +628,8 @@ DrawableLine::draw (Map& map, PostscriptCanvas& canvas) const
     doDrawCurvedLine(canvas, _shiftedPoints);
     
     canvas.setlinewidth (LINE_WIDTH);
-    canvas.setrgbcolor(_color.r, _color.g, _color.b);
+    
+    canvas.setrgbcolor(_line->getColor ());
     doDrawCurvedLine(canvas, _shiftedPoints);
     
     for (unsigned int i=1; i<_shiftedPoints.size()-1; ++i) 
@@ -677,6 +672,12 @@ DrawableLine::draw (Map& map, PostscriptCanvas& canvas) const
 }
 
 
+
+const synthese::env::Line* 
+DrawableLine::getLine () const
+{
+    return _line;
+}
 
 
 

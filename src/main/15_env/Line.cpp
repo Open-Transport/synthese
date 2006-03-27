@@ -30,6 +30,7 @@ Line::Line (const std::string& id,
     , _fare (0)
     , _departureBoardDisplay (true)
     , _timetableDisplay (true)
+    , _color (0, 0, 0)
 {
 
 }
@@ -438,6 +439,19 @@ Line::getEdge (int index) const
 
 
 
+const synthese::util::RGBColor& 
+Line::getColor () const
+{
+    return _color;
+}
+
+
+
+void 
+Line::setColor (const synthese::util::RGBColor& color)
+{
+    _color = color;
+}
 
 
 
