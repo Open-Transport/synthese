@@ -27,7 +27,20 @@ Sample XML format :
 <line id="L5"
       axisId="A2"
       firstYear="2006"
-      lastYear="2007"/>
+      lastYear="2007">
+
+   <lineStop id="1" metricOffset="0"
+             type="departure" physicalStopId="1" scheduleInput="true">
+     <point x="120.5" y="4444.2"/>
+     <point x="130.5" y="4434.4"/>
+     <point x="140.2" y="4414.2"/>
+   </lineStop>
+
+   <lineStop id="2" metricOffset="100"
+             type="passage" physicalStopId="2" scheduleInput="true"/>
+
+</line>
+
 
  @ingroup m16
 */
@@ -59,7 +72,7 @@ class LineLS
      */
     static synthese::env::Line* Load (
 	XMLNode& node,
-	const synthese::env::Environment& environment);
+	synthese::env::Environment& environment);
 
     /** @todo Not implemented.
      **/

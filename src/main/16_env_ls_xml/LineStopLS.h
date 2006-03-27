@@ -13,6 +13,7 @@ namespace synthese
 namespace env
 {
     class Environment;
+    class Line;
     class LineStop;
 }
 
@@ -68,6 +69,7 @@ class LineStopLS
      */
     static synthese::env::LineStop* Load (
 	XMLNode& node,
+	const synthese::env::Line* line,
 	const synthese::env::Environment& environment);
 
     /** @todo Not implemented.

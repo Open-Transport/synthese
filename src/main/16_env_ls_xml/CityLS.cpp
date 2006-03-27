@@ -25,8 +25,6 @@ synthese::env::City*
 CityLS::Load (XMLNode& node,
 	      const synthese::env::Environment& environment)
 {
-    assert (CITY_TAG == node.getName ());
-
     int id (su::Conversion::ToInt (
 		node.getAttribute (CITY_ID_ATTR.c_str())));
     std::string name (node.getAttribute (CITY_NAME_ATTR.c_str()));

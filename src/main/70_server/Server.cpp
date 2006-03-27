@@ -71,19 +71,26 @@ Server::run ()
     synthese::tcp::TcpService* service = 
 	synthese::tcp::TcpService::openService (_port);
     
-    // Create the thread group.
-    boost::thread_group threads;
-
     ServerThread serverThread (service);
 
-    // Creates all server threads.
-    for (int i=0; i< _nbThreads; ++i) 
+    if (_nbThreads == 1) 
     {
-	threads.create_thread (serverThread);
+	// Monothread execution ; easier for debugging
+	Log::GetInstance ().info ("Server ready.");
+	serverThread ();
     }
+    {
+	// Create the thread group.
+	boost::thread_group threads;
 
-    Log::GetInstance ().info ("Server ready.");
-    threads.join_all();
+	// Creates all server threads.
+	for (int i=0; i< _nbThreads; ++i) 
+	{
+	    threads.create_thread (serverThread);
+	}
+	Log::GetInstance ().info ("Server ready.");
+	threads.join_all();
+    }
 
     synthese::tcp::TcpService::closeService (_port);
 }

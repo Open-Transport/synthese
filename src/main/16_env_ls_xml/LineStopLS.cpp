@@ -37,14 +37,15 @@ const std::string LineStopLS::LINESTOP_SCHEDULEINPUT_ATTR ("scheduleInput");
 
 synthese::env::LineStop* 
 LineStopLS::Load (XMLNode& node,
+		  const synthese::env::Line* line,
 		  const synthese::env::Environment& environment)
 {
-    assert (LINESTOP_TAG == node.getName ());
+    // assert (LINESTOP_TAG == node.getName ());
 
     int id (su::Conversion::ToInt (
 		node.getAttribute (LINESTOP_ID_ATTR.c_str())));
 
-    std::string lineId (node.getAttribute (LINESTOP_LINEID_ATTR.c_str()));
+    // std::string lineId (node.getAttribute (LINESTOP_LINEID_ATTR.c_str()));
 
     double metricOffset (su::Conversion::ToDouble (
 	node.getAttribute (LINESTOP_METRICOFFSET_ATTR.c_str())));
@@ -80,7 +81,7 @@ LineStopLS::Load (XMLNode& node,
 
     synthese::env::LineStop* lineStop = new synthese::env::LineStop (
 	id,
-	environment.getLines ().get (lineId), 
+	line, 
 	metricOffset, 
 	type,
 	environment.getPhysicalStops (). get (physicalStopId),
@@ -94,6 +95,8 @@ LineStopLS::Load (XMLNode& node,
 	XMLNode pointNode = node.getChildNode(PointLS::POINT_TAG.c_str(), i);
 	lineStop->addViaPoint (PointLS::Load (pointNode));
     }
+
+    
     
     return lineStop;
     

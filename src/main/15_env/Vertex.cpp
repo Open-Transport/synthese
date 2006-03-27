@@ -15,6 +15,8 @@ Vertex::Vertex (const ConnectionPlace* connectionPlace,
 		double x,
 		double y) 
     : Point (x, y) // By default geolocation is unknown.
+    , _connectionPlace (connectionPlace)
+    , _rankInConnectionPlace (rankInConnectionPlace)
 {
     
 }

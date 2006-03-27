@@ -36,7 +36,7 @@ synthese::carto::Map*
 MapLS::Load (XMLNode& node,
 	      const synthese::env::Environment& environment)
 {
-    assert (MAP_TAG == node.getName ());
+    // assert (MAP_TAG == node.getName ());
 
     int environmentId (su::Conversion::ToInt (
 			   node.getAttribute (MAP_ENVIRONMENTID_ATTR.c_str())));

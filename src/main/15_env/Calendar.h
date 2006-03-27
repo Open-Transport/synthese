@@ -45,7 +45,7 @@ public:
     typedef unsigned char Category;
     
     /** Max category */
-    static const Category CATEGORY_MAX = 255;
+    static const Category CATEGORY_MAX;
 
 private:
 

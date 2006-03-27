@@ -31,7 +31,7 @@ synthese::carto::DrawableLine*
 DrawableLineLS::Load (XMLNode& node,
 		      const synthese::env::Environment& environment)
 {
-    assert (DRAWABLELINE_TAG == node.getName ());
+    // assert (DRAWABLELINE_TAG == node.getName ());
 
     std::string lineId (node.getAttribute (DRAWABLELINE_LINEID_ATTR.c_str()));
 

@@ -37,6 +37,8 @@ class MapRequestHandler : public synthese::server::RequestHandler
  public:
 
     static const std::string FUNCTION_CODE;
+    static const std::string ENVIRONMENT_PARAMETER;
+    static const std::string MAP_PARAMETER;
 
  private:
     

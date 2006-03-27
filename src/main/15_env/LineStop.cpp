@@ -565,6 +565,97 @@ LineStop::allocateSchedules ()
 
 
 
+/*! \brief Ecriture des index de d�part de la gare ligne, � partir des horaires des arr�ts.
+ \version 2.1
+ \author Hugues Romain
+ \date 2001-2004
+ 
+Ecrit tous les index d'un coup (contrairement � la version 1)
+*/
+void 
+LineStop::updateDepartureIndex ()
+{
+/* MJ TO BE MIGRATED !!!
+    int iNumeroHeure;
+
+    int DerniereHeure = 25; // MODIF HR
+    size_t NumeroServicePassantMinuit = 0; // MODIF HR
+
+    // RAZ
+    for ( iNumeroHeure = 0; iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
+        vIndexDepart[ iNumeroHeure ] = -1;
+
+    // Ecriture service par service
+    for ( size_t iNumeroService = 0; iNumeroService < vLigne->getServices().size(); iNumeroService++ )
+    {
+        if ( vHoraireDepartDernier[ iNumeroService ].getHours () < DerniereHeure )
+            NumeroServicePassantMinuit = iNumeroService;
+        if ( vHoraireDepartDernier[ iNumeroService ].getHours () >= vHoraireDepartPremier[ iNumeroService ].getHours () )
+        {
+            for ( iNumeroHeure = 0; iNumeroHeure <= vHoraireDepartDernier[ iNumeroService ].getHours (); iNumeroHeure++ )
+                if ( vIndexDepart[ iNumeroHeure ] == -1 || vIndexDepart[ iNumeroHeure ] < NumeroServicePassantMinuit )
+                    vIndexDepart[ iNumeroHeure ] = iNumeroService;
+        }
+        else
+        {
+            for ( iNumeroHeure = 0; iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
+                if ( vIndexDepart[ iNumeroHeure ] == -1 )
+                    vIndexDepart[ iNumeroHeure ] = iNumeroService;
+        }
+        DerniereHeure = vHoraireDepartDernier[ iNumeroService ].getHours ();
+
+    }
+
+    // Ecriture du temps r�el
+    for ( iNumeroHeure = 0; iNumeroHeure < 24; iNumeroHeure++ )
+        vIndexDepartReel[ iNumeroHeure ] = vIndexDepart[ iNumeroHeure ];
+
+*/
+}
+
+
+
+
+
+void 
+LineStop::updateArrivalIndex ()
+{
+/* MJ TO BE MIRGATED !!!
+    int iNumeroHeure;
+
+    // RAZ
+    for ( iNumeroHeure = 0; iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
+        vIndexArrivee[ iNumeroHeure ] = -1;
+
+    int DerniereHeure = 25;
+    size_t NumeroServicePassantMinuit = vLigne->getServices().size();
+
+    for ( size_t iNumeroService = vLigne->getServices().size() - 1; iNumeroService >= 0; iNumeroService-- )
+    {
+        if ( vHoraireArriveePremier[ iNumeroService ].getHours () > DerniereHeure )
+            NumeroServicePassantMinuit = iNumeroService;
+        if ( vHoraireArriveeDernier[ iNumeroService ].getHours () >= vHoraireArriveePremier[ iNumeroService ].getHours () )
+        {
+            for ( iNumeroHeure = vHoraireArriveePremier[ iNumeroService ].getHours (); iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
+                if ( vIndexArrivee[ iNumeroHeure ] == -1 || vIndexArrivee[ iNumeroHeure ] > NumeroServicePassantMinuit )
+                    vIndexArrivee[ iNumeroHeure ] = iNumeroService;
+        }
+        else
+        {
+            for ( iNumeroHeure = 0; iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
+                if ( vIndexArrivee[ iNumeroHeure ] == -1 )
+                    vIndexArrivee[ iNumeroHeure ] = iNumeroService;
+        }
+        DerniereHeure = vHoraireArriveePremier[ iNumeroService ].getHours ();
+    }
+
+    // Ecriture du temps r�el
+    for ( iNumeroHeure = 0; iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
+        vIndexArriveeReel[ iNumeroHeure ] = vIndexArrivee[ iNumeroHeure ];
+*/
+}
+
+
 
 
 

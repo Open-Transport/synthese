@@ -7,6 +7,10 @@ namespace synthese
 namespace env
 {
 
+const Calendar::Category Calendar::CATEGORY_MAX (255);
+
+
+
     Calendar::Calendar( const int& id,
 			int firstYear, 
 			int lastYear,

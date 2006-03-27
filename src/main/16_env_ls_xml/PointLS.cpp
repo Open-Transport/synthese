@@ -23,7 +23,7 @@ const std::string PointLS::POINT_Y_ATTR ("y");
 synthese::env::Point
 PointLS::Load (XMLNode& node)
 {
-    assert (POINT_TAG == node.getName ());
+    // assert (POINT_TAG == node.getName ());
 
     double x (su::Conversion::ToDouble (
 		node.getAttribute (POINT_X_ATTR.c_str())));

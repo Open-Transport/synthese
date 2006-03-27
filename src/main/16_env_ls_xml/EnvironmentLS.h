@@ -39,12 +39,6 @@ Warning: ordering of child elements is important!
    <!-- ... -->
  </axes>
 
- <lines>
-   <line id="l1" axisId="a1" firstYear="2006" lastYear="2007"/>
-   <line id="l2" axisId="a2" firstYear="2006" lastYear="2007"/>
-   <!-- ... -->
- </lines>
-
  <logicalStops>
    <logicalStop id="1" name="Matabiau" cityId="1"/>
    <!-- ... -->
@@ -57,17 +51,28 @@ Warning: ordering of child elements is important!
    <!-- ... -->
  </physicalStops>
 
- <lineStops>
-   <lineStop id="1" lineId="1" metricOffset="0"
-	     type="D" physicalStopId="1" scheduleInput="true">
-     <point x="120.5" y="4444.2"/>
-     <point x="130.5" y="4434.4"/>
-     <point x="140.2" y="4414.2"/>
-   </lineStop>
-   <lineStop id="2" lineId="1" metricOffset="100"
-	     type="D" physicalStopId="2" scheduleInput="true"/>
+ <lines>
+   <line id="l1" axisId="a1" firstYear="2006" lastYear="2007">
+
+     <lineStop id="1" metricOffset="0"
+	       type="departure" physicalStopId="1" scheduleInput="true">
+       <point x="120.5" y="4444.2"/>
+       <point x="130.5" y="4434.4"/>
+       <point x="140.2" y="4414.2"/>
+     </lineStop>
+
+     <lineStop id="2" metricOffset="100"
+	       type="passage" physicalStopId="2" scheduleInput="true"/>
+
+   </line>
+
+   <line id="l2" axisId="a2" firstYear="2006" lastYear="2007">
+
+   </line>
+
    <!-- ... -->
- </lineStops>
+ </lines>
+
 
 </environment>
 
@@ -82,10 +87,9 @@ class EnvironmentLS
     static const std::string ENVIRONMENT_ID_ATTR;
     static const std::string ENVIRONMENT_CITIES_TAG;
     static const std::string ENVIRONMENT_AXES_TAG;
-    static const std::string ENVIRONMENT_LINES_TAG;
     static const std::string ENVIRONMENT_LOGICALSTOPS_TAG;
     static const std::string ENVIRONMENT_PHYSICALSTOPS_TAG;
-    static const std::string ENVIRONMENT_LINESTOPS_TAG;
+    static const std::string ENVIRONMENT_LINES_TAG;
 
  private:
 

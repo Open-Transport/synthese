@@ -29,7 +29,7 @@ synthese::env::PhysicalStop*
 PhysicalStopLS::Load (XMLNode& node,
 		      const synthese::env::Environment& environment)
 {
-    assert (PHYSICALSTOP_TAG == node.getName ());
+    // assert (PHYSICALSTOP_TAG == node.getName ());
 
     int id (su::Conversion::ToInt (
 		node.getAttribute (PHYSICALSTOP_ID_ATTR.c_str())));

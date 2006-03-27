@@ -37,7 +37,6 @@ const int   DrawableLine::BORDER_WIDTH = LINE_WIDTH+2;
 DrawableLine::DrawableLine (const Line* line,
 			    int fromLineStopIndex,
 			    int toLineStopIndex)
-)
     : _line (line)
     , _fromLineStopIndex (fromLineStopIndex)
     , _toLineStopIndex (toLineStopIndex)

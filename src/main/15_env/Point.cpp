@@ -40,14 +40,16 @@ Point::getY () const
 
 
 
-bool Point::isUnknown () const
+bool 
+Point::isUnknown () const
 {
     return _xKm == UNKNOWN_VALUE || _yKm == UNKNOWN_VALUE;
 }
 
 
 
-void Point::setX( double xM )
+void 
+Point::setX( double xM )
 {
     if ( xM == UNKNOWN_VALUE )
         _xKm = UNKNOWN_VALUE;
@@ -60,7 +62,8 @@ void Point::setX( double xM )
 
 
 
-void Point::setY( double yM )
+void 
+Point::setY( double yM )
 {
     if ( yM == UNKNOWN_VALUE )
         _yKm = UNKNOWN_VALUE;

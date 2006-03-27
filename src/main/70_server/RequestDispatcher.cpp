@@ -45,7 +45,6 @@ RequestDispatcher::dispatchRequest (const Request& request,
 	_handlers.find (request.getFunctionCode ());
     if (it == _handlers.end ()) 
     {
-	std::cout << "POUF" << std::flush << std::endl;
 	throw RequestException (std::string ("Unknown request function code : ") + 
 				request.getFunctionCode ());
     }

@@ -26,7 +26,7 @@ synthese::env::Axis*
 AxisLS::Load (XMLNode& node,
 	      const synthese::env::Environment& environment)
 {
-    assert (AXIS_TAG == node.getName ());
+    // assert (AXIS_TAG == node.getName ());
 
     std::string id (node.getAttribute (AXIS_ID_ATTR.c_str()));
 

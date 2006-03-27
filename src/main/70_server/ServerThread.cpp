@@ -38,18 +38,27 @@ ServerThread::operator()()
 	boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
 	    tcpStream (serverSocket);
 	
-	std::string requestString;
-	tcpStream >> requestString;
+	char buffer[1024*64]; // 64K buffer max
+	tcpStream.getline (buffer, 1024*64);
+
+	std::string requestString (buffer);
+	// tcpStream >> requestString;
 	
 	Log::GetInstance ().debug ("Received request : " + requestString);
 
 	// TODO : add a BIG try/catch here...
-	
-	// Parse request
-	Request request (requestString);
-
-	// Send request to proper handler through dispatcher
-	RequestDispatcher::getInstance ()->dispatchRequest (request, tcpStream);
+//	try
+	{
+	    // Parse request
+	    Request request (requestString);
+	    
+	    // Send request to proper handler through dispatcher
+	    RequestDispatcher::getInstance ()->dispatchRequest (request, tcpStream);
+	}
+/*	catch (synthese::util::Exception& ex)
+	{
+	    Log::GetInstance ().error ("Error while executing request : ", ex);
+	    } */
 	
 	_tcpService->closeConnection (serverSocket);
     }

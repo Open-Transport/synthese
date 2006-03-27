@@ -259,7 +259,7 @@ Line::getLineStops() const
 
 
 std::vector<const Point*> 
-LineStop::getPoints (int fromLineStopIndex,
+Line::getPoints (int fromLineStopIndex,
 		     int toLineStopIndex) const
 {
     if (toLineStopIndex == -1) toLineStopIndex = _lineStops.size () - 1;
@@ -419,6 +419,22 @@ Line::isInService (const synthese::time::Date& date) const
     return _calendar.isMarked ( date );
 
 }
+
+
+
+int 
+Line::getEdgesCount () const
+{
+    return _lineStops.size ();
+}
+
+
+const Edge* 
+Line::getEdge (int index) const
+{
+    return _lineStops[index];
+}
+
 
 
 
