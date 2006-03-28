@@ -6,8 +6,11 @@ excludes = []
 
 # TODO : understand why link order is so important ??
 
+testmoduleenv.AddModuleDependency ('39_carto')
 testmoduleenv.AddModuleDependency ('15_env')
+testmoduleenv.AddModuleDependency ('04_time')
 testmoduleenv.AddModuleDependency ('01_util')
+testmoduleenv.AddBoostDependency ('boost_filesystem')
 testmoduleenv.AddBoostDependency ('boost_thread')
 testmoduleenv.AddBoostDependency ('boost_iostreams')
 testmoduleenv.AppendMultithreadConf ();

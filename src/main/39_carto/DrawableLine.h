@@ -42,10 +42,9 @@ private:
     static const synthese::util::RGBColor BORDER_COLOR;
     static const int      BORDER_WIDTH;
 
-    const synthese::env::Line* _line;   //!< Reference line
-    const int _fromLineStopIndex;   //!< From line stop index (included)
-    const int _toLineStopIndex;     //!< To line stop index (included)
     const std::vector<const synthese::env::Point*> _points;  //!< Reference line points
+    const std::string _shortName;
+    const synthese::util::RGBColor _color;
 
     std::vector<int> _shifts;
     std::vector<bool> _shifted;
@@ -58,11 +57,15 @@ public:
 		  int fromLineStopIndex,
 		  int toLineStopIndex);
 
+    DrawableLine (const std::vector<const synthese::env::Point*>& points,
+		  const std::string& shortName,
+		  const synthese::util::RGBColor& color);
+
     ~DrawableLine();
 
     //! @name Getters/Setters
     //@{
-    const synthese::env::Line* getLine () const;
+    const std::string& getShortName () const;
 
     const std::vector<const synthese::env::Point*>& 
 	getPoints () const;

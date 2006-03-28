@@ -66,7 +66,6 @@ namespace synmap
 
 
     std::vector<const Location*> locations;
-
     locations.push_back (A); 
     locations.push_back (B); 
     locations.push_back (C); 

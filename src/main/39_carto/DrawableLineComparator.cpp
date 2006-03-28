@@ -43,7 +43,7 @@ DrawableLineComparator::firstIndexOf (const Point* point,
 {
     for (unsigned int i=0; i<points.size (); ++i)
     {
-	if ((*points[i]) == (*point)) return i;	 	
+	if ((*(points[i])) == (*point)) return i;	 	
     }
     return -1;
 }
@@ -111,7 +111,7 @@ DrawableLineComparator::operator() (const DrawableLine* bl1,
     
     // Special case : the lines follow exactly same ways
     if (bl1->isFullySameWay(bl2)) {
-	bool result = bl1->getLine ()->getId () > bl2->getLine ()->getId ();
+	bool result = bl1->getShortName () > bl2->getShortName ();
 	if (bl1->isReverseWayAt(_referencePoint, _reference)) result = !result;
 	return result;
     }
@@ -135,12 +135,13 @@ DrawableLineComparator::operator() (const DrawableLine* bl1,
     
     if ((index1_1 == -1) || (index1_2 == -1)) return 0; // ????
     
-    while ((firstIndexOf (curPoint, points1) != -1) && 
-	   (index1_2 >= 0) &&
-	   (index1_1 >= 0)) {
+    while ((index1_2 >= 0) &&
+	   (index1_1 >= 0) &&
+	   (firstIndexOf (curPoint, points1) != -1)) 
+    {
 	--index1_2;
 	--index1_1;
-	curPoint = points2[index1_2];
+	if (index1_2 >=0) curPoint = points2[index1_2];
     }
     
     if (index1_1 >= 0) {
@@ -157,12 +158,14 @@ DrawableLineComparator::operator() (const DrawableLine* bl1,
     index2_1 = firstIndexOf(curPoint, points1);
     index2_2 = firstIndexOf(curPoint, points2);
     
-    while ((firstIndexOf (curPoint, points1) != -1) && 
+    while (
 	   (index2_2 < (int) points2.size ()) &&
-	   (index2_1 < (int) points1.size ())) {
+	   (index2_1 < (int) points1.size ()) &&
+	   (firstIndexOf (curPoint, points1) != -1)) 
+    {
 	++index2_2;
 	++index2_1;
-	curPoint = points2[index2_2];
+	if (index2_2 <= points2.size ()-1) curPoint = points2[index2_2];
     }
     
     if (index2_1 < (int) points1.size ()) {
