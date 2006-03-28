@@ -82,6 +82,7 @@ private:
     
     bool hasBackgroundManager () const;
     
+    void populateLineIndex (const std::set<DrawableLine*>& selectedLines);
     void prepareLines ();
     void prepare ();
     void dumpBackground (PostscriptCanvas& canvas);
@@ -90,11 +91,18 @@ private:
 public:
 
 
-    Map(const std::set<DrawableLine*> selectedLines,
+    Map(const std::set<DrawableLine*>& selectedLines,
 	const Rectangle& realFrame, 
 	double width, 
 	double height,
         const MapBackgroundManager* backgroundManager = 0);
+
+
+    Map(const std::set<DrawableLine*>& selectedLines,
+	double width, 
+	double height,
+        const MapBackgroundManager* backgroundManager = 0);
+
     
     virtual ~Map();
     

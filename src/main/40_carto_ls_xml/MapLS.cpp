@@ -6,6 +6,7 @@
 
 #include "01_util/Conversion.h"
 #include "01_util/XmlParser.h"
+#include "01_util/Log.h"
 
 #include "15_env/Environment.h"
 
@@ -15,6 +16,7 @@
 
 
 using synthese::carto::MapBackgroundManager;
+using synthese::util::Log;
 
 namespace su = synthese::util;
 
@@ -44,22 +46,10 @@ MapLS::Load (XMLNode& node,
     int environmentId (su::Conversion::ToInt (
 			   node.getAttribute (MAP_ENVIRONMENTID_ATTR.c_str())));
 
-    double lowerLeftLatitude (su::Conversion::ToDouble (
-			 node.getAttribute (MAP_LOWERLEFTLATITUDE_ATTR.c_str())));
-    double lowerLeftLongitude (su::Conversion::ToDouble (
-			 node.getAttribute (MAP_LOWERLEFTLONGITUDE_ATTR.c_str())));
-
-    double upperRightLatitude (su::Conversion::ToDouble (
-			 node.getAttribute (MAP_UPPERRIGHTLATITUDE_ATTR.c_str())));
-    double upperRightLongitude (su::Conversion::ToDouble (
-			 node.getAttribute (MAP_UPPERRIGHTLONGITUDE_ATTR.c_str())));
-
     int outputWidth (su::Conversion::ToInt (
 			   node.getAttribute (MAP_OUTPUTWIDTH_ATTR.c_str())));
     int outputHeight (su::Conversion::ToInt (
 			   node.getAttribute (MAP_OUTPUTHEIGHT_ATTR.c_str())));
-
-    std::string backgroundId (node.getAttribute (MAP_BACKGROUNDID_ATTR.c_str()));
 
     // Drawable lines
     std::set<synthese::carto::DrawableLine*> selectedLines;
@@ -70,17 +60,56 @@ MapLS::Load (XMLNode& node,
 	selectedLines.insert (DrawableLineLS::Load (drawableLineNode, environment));
     }
 
-    const MapBackgroundManager* mbm = 
-	MapBackgroundManager::GetMapBackgroundManager (backgroundId);
+    const MapBackgroundManager* mbm = 0;
 
-    return new synthese::carto::Map (selectedLines,
-				     synthese::carto::Rectangle (lowerLeftLatitude,
-								 lowerLeftLongitude,
-								 upperRightLatitude - lowerLeftLatitude,
-								 upperRightLongitude - lowerLeftLongitude),
-				     outputWidth, 
-				     outputHeight, 
-				     mbm); 
+    if (node.getAttribute (MAP_BACKGROUNDID_ATTR.c_str()) != 0)
+    {
+	std::string backgroundId (node.getAttribute (MAP_BACKGROUNDID_ATTR.c_str()));
+	try 
+	{
+	    mbm = MapBackgroundManager::GetMapBackgroundManager (backgroundId);
+	}
+	catch (synthese::util::Exception& ex)
+	{
+	    Log::GetInstance ().error ("Cannot find background", ex);
+	}
+    }
+
+
+    // If one of the 4 coordinates is missing, let the autofit 
+    // feature process the right rectangle
+    if ( (node.getAttribute (MAP_LOWERLEFTLATITUDE_ATTR.c_str()) == 0)  ||
+	 (node.getAttribute (MAP_LOWERLEFTLONGITUDE_ATTR.c_str()) == 0) ||
+	 (node.getAttribute (MAP_UPPERRIGHTLATITUDE_ATTR.c_str()) == 0) ||
+	 (node.getAttribute (MAP_UPPERRIGHTLONGITUDE_ATTR.c_str()) == 0) )
+    {
+	return new synthese::carto::Map (selectedLines,
+					 outputWidth, 
+					 outputHeight, 
+					 mbm); 
+
+    }
+    else 
+    {
+	double lowerLeftLatitude (su::Conversion::ToDouble (
+				      node.getAttribute (MAP_LOWERLEFTLATITUDE_ATTR.c_str())));
+	double lowerLeftLongitude (su::Conversion::ToDouble (
+				       node.getAttribute (MAP_LOWERLEFTLONGITUDE_ATTR.c_str())));
+	
+	double upperRightLatitude (su::Conversion::ToDouble (
+				       node.getAttribute (MAP_UPPERRIGHTLATITUDE_ATTR.c_str())));
+	double upperRightLongitude (su::Conversion::ToDouble (
+					node.getAttribute (MAP_LOWERLEFTLATITUDE_ATTR.c_str())));
+
+	return new synthese::carto::Map (selectedLines,
+					 synthese::carto::Rectangle (lowerLeftLatitude,
+								     lowerLeftLongitude,
+								     upperRightLatitude - lowerLeftLatitude,
+								     upperRightLongitude - lowerLeftLongitude),
+					 outputWidth, 
+					 outputHeight, 
+					 mbm); 
+    }
 }
 
 

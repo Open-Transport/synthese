@@ -30,7 +30,7 @@ namespace carto
 
 
 
-Map::Map(const std::set<DrawableLine*> selectedLines,
+Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 const Rectangle& realFrame, 
          double width, 
          double height,
@@ -44,7 +44,63 @@ Map::Map(const std::set<DrawableLine*> selectedLines,
 , _mapScaleY (_height / _realFrame.getHeight ())
 , _backgroundManager (backgroundManager)
 {
+    populateLineIndex (selectedLines);
 
+}
+
+
+
+
+Map::Map(const std::set<DrawableLine*>& selectedLines,
+	 double width, 
+	 double height,
+	 const MapBackgroundManager* backgroundManager)
+: _realFrame (0,0,0,0)
+, _selectedLines (selectedLines)
+, _width (width)
+, _height (height)
+, _mapScaleX (_width / _realFrame.getWidth ())
+, _mapScaleY (_height / _realFrame.getHeight ())
+, _backgroundManager (backgroundManager)
+{
+    populateLineIndex (selectedLines);
+
+    
+    // The real frame is deduced to fit selected lines points
+    double lowerLeftLatitude = std::numeric_limits<double>::max ();
+    double lowerLeftLongitude = std::numeric_limits<double>::max ();
+    double upperRightLatitude = std::numeric_limits<double>::min ();
+    double upperRightLongitude = std::numeric_limits<double>::min ();
+
+    for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
+	 it != selectedLines.end ();
+	 ++it)
+    {
+	const std::vector<const Point*>& points = (*it)->getPoints ();
+	for (std::vector<const Point*>::const_iterator itp = points.begin ();
+	     itp != points.end () ; ++itp)
+	{
+	    const Point* p = *itp;
+	    if (p->getX () < lowerLeftLatitude) lowerLeftLatitude = p->getX ();
+	    if (p->getY () < lowerLeftLongitude) lowerLeftLongitude = p->getY ();
+	    if (p->getX () > upperRightLatitude) upperRightLatitude = p->getX ();
+	    if (p->getY () > upperRightLongitude) upperRightLongitude = p->getY ();
+	}
+    }
+
+    _realFrame = synthese::carto::Rectangle (lowerLeftLatitude,
+					     lowerLeftLongitude,
+					     upperRightLatitude - lowerLeftLatitude,
+					     upperRightLongitude - lowerLeftLongitude);
+
+}
+
+
+
+
+void 
+Map::populateLineIndex (const std::set<DrawableLine*>& selectedLines)
+{
     // Populate line index (indexed by point).
     for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
 	 it != selectedLines.end ();
@@ -58,7 +114,9 @@ Map::Map(const std::set<DrawableLine*> selectedLines,
 	}
     }
 
+
 }
+
 
 
 Map::~Map()
