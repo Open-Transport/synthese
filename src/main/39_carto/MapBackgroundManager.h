@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include <boost/filesystem/path.hpp>
 
@@ -21,16 +22,31 @@ class MapBackground;
 class MapBackgroundManager
 {
 private:
-    const boost::filesystem::path _backgroundDir;
-    std::vector<const MapBackground*> _backgrounds;
+
+    static boost::filesystem::path _backgroundsDir;
+    static std::map<std::string, MapBackgroundManager*> _managers;
+
+
+    std::vector<const MapBackground*> _backgrounds; //!< Each background is associated with one scale.
+
+
+    MapBackgroundManager(const boost::filesystem::path& backgroundDir);
     
 public:
     
-    MapBackgroundManager(const std::string& backgroundDir);
-    virtual ~MapBackgroundManager();
+    ~MapBackgroundManager();
     
+    
+
     const MapBackground* getBestScalingBackground (double mapScaleX, 
                                                    double mapScaleY) const;
+
+
+    static const MapBackgroundManager* GetMapBackgroundManager (const std::string& id);
+
+    static const boost::filesystem::path& GetBackgroundsDir ();
+    static void SetBackgroundsDir (const boost::filesystem::path& backgroundsDir);
+
 private:
 
     

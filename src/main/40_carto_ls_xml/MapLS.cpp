@@ -10,8 +10,11 @@
 #include "15_env/Environment.h"
 
 #include "39_carto/Map.h"
+#include "39_carto/MapBackgroundManager.h"
 #include "39_carto/Rectangle.h"
 
+
+using synthese::carto::MapBackgroundManager;
 
 namespace su = synthese::util;
 
@@ -56,8 +59,7 @@ MapLS::Load (XMLNode& node,
     int outputHeight (su::Conversion::ToInt (
 			   node.getAttribute (MAP_OUTPUTHEIGHT_ATTR.c_str())));
 
-    int backgroundId (su::Conversion::ToInt (
-			   node.getAttribute (MAP_BACKGROUNDID_ATTR.c_str())));
+    std::string backgroundId (node.getAttribute (MAP_BACKGROUNDID_ATTR.c_str()));
 
     // Drawable lines
     std::set<synthese::carto::DrawableLine*> selectedLines;
@@ -68,12 +70,17 @@ MapLS::Load (XMLNode& node,
 	selectedLines.insert (DrawableLineLS::Load (drawableLineNode, environment));
     }
 
+    const MapBackgroundManager* mbm = 
+	MapBackgroundManager::GetMapBackgroundManager (backgroundId);
+
     return new synthese::carto::Map (selectedLines,
 				     synthese::carto::Rectangle (lowerLeftLatitude,
 								 lowerLeftLongitude,
 								 upperRightLatitude - lowerLeftLatitude,
 								 upperRightLongitude - lowerLeftLongitude),
-				     outputWidth, outputHeight, 0); // TODO add bm management
+				     outputWidth, 
+				     outputHeight, 
+				     mbm); 
 }
 
 

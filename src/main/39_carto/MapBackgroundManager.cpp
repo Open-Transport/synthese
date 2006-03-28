@@ -1,5 +1,7 @@
 #include "MapBackgroundManager.h"
 
+#include "01_util/Exception.h"
+
 #include "MapBackground.h"
 
 
@@ -21,12 +23,15 @@ namespace carto
 {
 
 
+boost::filesystem::path MapBackgroundManager::_backgroundsDir;
+std::map<std::string, MapBackgroundManager*> MapBackgroundManager::_managers;
 
-MapBackgroundManager::MapBackgroundManager(const std::string& backgroundDir)
-: _backgroundDir (backgroundDir)
+
+MapBackgroundManager::MapBackgroundManager(const boost::filesystem::path& backgroundDir)
 {
+    // Go through each scale directory
     fs::directory_iterator end_iter;
-   for ( fs::directory_iterator dir_itr( _backgroundDir );
+   for ( fs::directory_iterator dir_itr( backgroundDir );
           dir_itr != end_iter;
           ++dir_itr )
     {
@@ -35,6 +40,7 @@ MapBackgroundManager::MapBackgroundManager(const std::string& backgroundDir)
         _backgrounds.push_back (background);
     }
 }
+
 
 
 
@@ -72,6 +78,45 @@ MapBackgroundManager::getBestScalingBackground (double mapScaleX,
     }
     return currentBackground;
 }
+
+
+
+const MapBackgroundManager*
+MapBackgroundManager::GetMapBackgroundManager (const std::string& id)
+{
+    if (_managers.find (id) == _managers.end ())
+    {
+	// Create new manager
+	boost::filesystem::path backgroundDir (_backgroundsDir / id);
+	if (boost::filesystem::exists (backgroundDir) == false)
+	{
+	    throw synthese::util::Exception ("Undefined background for id " + id);
+	}
+	MapBackgroundManager* manager = new MapBackgroundManager (backgroundDir);
+	_managers.insert (std::make_pair (id, manager));
+    }
+    return _managers.find (id)->second;
+}
+
+
+
+
+
+const boost::filesystem::path& 
+MapBackgroundManager::GetBackgroundsDir ()
+{
+    return _backgroundsDir;
+}
+
+
+
+void 
+MapBackgroundManager::SetBackgroundsDir (const boost::filesystem::path& backgroundsDir)
+{
+    _backgroundsDir = backgroundsDir;
+}
+
+
 
 
 

@@ -446,6 +446,8 @@ Map::dumpBackground (PostscriptCanvas& canvas)
 		_realFrame.getX () + _realFrame.getWidth (), 
 		_realFrame.getY () + _realFrame.getHeight ());
             
+	    // TODO : additional checks in case indexes are negative/out of frame.
+
             int nbtiles = 0;
             for (int i=tlIndexes.first; i<=brIndexes.first; ++i) {
                 for (int j=tlIndexes.second; j<=brIndexes.second; ++j) {

@@ -16,6 +16,8 @@
 
 #include "01_util/Log.h"
 
+#include <boost/filesystem/path.hpp>
+
 
 namespace synthese
 {
@@ -40,6 +42,7 @@ class Server
 
     int _port;
     int _nbThreads;
+    boost::filesystem::path _dataDir;
 
 
  protected:
@@ -47,7 +50,9 @@ class Server
 
  public:
 
-    Server (int port, int nbThreads);
+    Server (int port, 
+	    int nbThreads,
+	    const std::string& dataDir);
 
     ~Server ();
 
@@ -72,7 +77,7 @@ class Server
 
  protected:
 
-    void registerHandlers ();
+    void initialize ();
 
 
 };

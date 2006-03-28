@@ -8,11 +8,14 @@
 #include "RequestDispatcher.h"
 
 #include "01_util/Log.h"
+#include "01_util/Exception.h"
 
+#include <boost/filesystem/operations.hpp>
 #include <boost/thread/thread.hpp>
 
 #ifdef MODULE_39
 #include "39_carto/MapRequestHandler.h"
+#include "39_carto/MapBackgroundManager.h"
 #endif
 
 using synthese::util::Log;
@@ -25,9 +28,12 @@ namespace server
 
 
 
-Server::Server (int port, int nbThreads)
+Server::Server (int port, 
+		int nbThreads,
+		const std::string& dataDir)
     : _port (port)
     , _nbThreads (nbThreads)
+    , _dataDir (dataDir)
 {
 }
 
@@ -48,9 +54,19 @@ Server::~Server ()
 
 
 void 
-Server::registerHandlers ()
+Server::initialize ()
 {
+    _dataDir.normalize ();
+    if (boost::filesystem::exists (_dataDir) == false)
+    {
+	throw synthese::util::Exception ("Cannot find data directory '" + _dataDir.string () + "'");
+    }
+
 #ifdef MODULE_39
+    
+    // Initialize map background manager
+    synthese::carto::MapBackgroundManager::SetBackgroundsDir (_dataDir / "backgrounds");
+
     synthese::server::RequestDispatcher::getInstance ()->
 	registerHandler (new synthese::carto::MapRequestHandler ());
 #endif
@@ -66,7 +82,7 @@ Server::run ()
 {
     Log::GetInstance ().info ("Starting server...");
 
-    registerHandlers ();
+    initialize ();
 
     try 
     {
@@ -97,7 +113,7 @@ Server::run ()
     }
     catch (synthese::util::Exception& ex)
     {
-	Log::GetInstance ().fatal ("Error during server init", ex);
+	Log::GetInstance ().fatal ("", ex);
     } 
 
 
