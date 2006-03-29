@@ -99,7 +99,7 @@ MapLS::Load (XMLNode& node,
 	double upperRightLatitude (su::Conversion::ToDouble (
 				       node.getAttribute (MAP_UPPERRIGHTLATITUDE_ATTR.c_str())));
 	double upperRightLongitude (su::Conversion::ToDouble (
-					node.getAttribute (MAP_LOWERLEFTLATITUDE_ATTR.c_str())));
+					node.getAttribute (MAP_UPPERRIGHTLONGITUDE_ATTR.c_str())));
 
 	return new synthese::carto::Map (selectedLines,
 					 synthese::carto::Rectangle (lowerLeftLatitude,

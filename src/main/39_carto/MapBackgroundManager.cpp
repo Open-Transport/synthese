@@ -11,6 +11,11 @@
 
 #include <boost/filesystem/operations.hpp>
 
+#include "01_util/Log.h"
+
+using synthese::util::Log;
+
+
 
 namespace fs = boost::filesystem;
 
@@ -29,6 +34,9 @@ std::map<std::string, MapBackgroundManager*> MapBackgroundManager::_managers;
 
 MapBackgroundManager::MapBackgroundManager(const boost::filesystem::path& backgroundDir)
 {
+
+    Log::GetInstance ().debug ("Initializing backgrounds for " + backgroundDir.string ());
+
     // Go through each scale directory
     fs::directory_iterator end_iter;
    for ( fs::directory_iterator dir_itr( backgroundDir );
@@ -36,6 +44,7 @@ MapBackgroundManager::MapBackgroundManager(const boost::filesystem::path& backgr
           ++dir_itr )
     {
         std::string dirpath = dir_itr->string();
+
         const MapBackground* background = new MapBackground (dirpath);
         _backgrounds.push_back (background);
     }

@@ -3,6 +3,9 @@
 #include <iostream>
 #include <fstream>
 
+#include <stdlib.h>
+
+
 #include "01_util/XmlParser.h"
 
 #include "15_env/Environment.h"
@@ -72,8 +75,18 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     std::ofstream of ("/home/mjambert/temp/map.ps");
     synthese::carto::PostscriptCanvas canvas (of);
     map->dump (canvas);
-    
+    of.close ();
+
     stream << "Hello from map request handler !" << std::endl;
+
+    // Convert the ps file to png with ghostscript
+    int ret = system ("gs -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -dGraphicsAlphaBits=4 -sOutputFile=/home/mjambert/map.png /home/mjambert/temp/map.ps");
+    
+    if (ret != 0)
+    {
+	throw synthese::util::Exception ("Error executing GhostScript (gs executable in path ?)");
+    }
+
 
     delete map;
     delete env;

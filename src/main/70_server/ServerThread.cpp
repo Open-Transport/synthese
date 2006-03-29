@@ -57,10 +57,12 @@ ServerThread::operator()()
 	}
 	catch (synthese::util::Exception& ex)
 	{
-	    Log::GetInstance ().error ("Error while executing request", ex);
+	    Log::GetInstance ().error ("", ex);
 	} 
 	
     }
+
+    
 }
 
 
