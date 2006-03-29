@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <stdlib.h>
 
@@ -80,7 +81,12 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     stream << "Hello from map request handler !" << std::endl;
 
     // Convert the ps file to png with ghostscript
-    int ret = system ("gs -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -dGraphicsAlphaBits=4 -sOutputFile=/home/mjambert/map.png /home/mjambert/temp/map.ps");
+    std::stringstream gscmd;
+    gscmd << "gs -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -dGraphicsAlphaBits=4 -g" 
+	  << map->getWidth () << "x" << map->getHeight () 
+	  << " -sOutputFile=/home/mjambert/map.png /home/mjambert/temp/map.ps";
+    
+    int ret = system (gscmd.str ().c_str ());
     
     if (ret != 0)
     {

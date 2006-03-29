@@ -30,10 +30,12 @@ namespace server
 
 Server::Server (int port, 
 		int nbThreads,
-		const std::string& dataDir)
+		const std::string& dataDir,
+		const std::string& tempDir)
     : _port (port)
     , _nbThreads (nbThreads)
     , _dataDir (dataDir)
+    , _tempDir (tempDir)
 {
 }
 
@@ -42,10 +44,6 @@ Server::Server (int port,
 Server::~Server ()
 {
 }
-
-
-
-
 
 
 
@@ -60,6 +58,11 @@ Server::initialize ()
     if (boost::filesystem::exists (_dataDir) == false)
     {
 	throw synthese::util::Exception ("Cannot find data directory '" + _dataDir.string () + "'");
+    }
+    _tempDir.normalize ();
+    if (boost::filesystem::exists (_tempDir) == false)
+    {
+	throw synthese::util::Exception ("Cannot find temp directory '" + _tempDir.string () + "'");
     }
 
 #ifdef MODULE_39

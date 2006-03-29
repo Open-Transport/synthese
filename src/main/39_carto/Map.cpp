@@ -606,6 +606,20 @@ drawStreet (_streets[i], canvas);
 
 
 
+double 
+Map::getWidth () const 
+{ 
+    return _width; 
+}
+
+
+
+
+double 
+Map::getHeight () const 
+{ 
+    return _height; 
+}
 
 
 

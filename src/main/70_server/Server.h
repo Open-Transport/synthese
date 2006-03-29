@@ -43,7 +43,7 @@ class Server
     int _port;
     int _nbThreads;
     boost::filesystem::path _dataDir;
-
+    boost::filesystem::path _tempDir;
 
  protected:
 
@@ -52,7 +52,8 @@ class Server
 
     Server (int port, 
 	    int nbThreads,
-	    const std::string& dataDir);
+	    const std::string& dataDir,
+	    const std::string& tempDir);
 
     ~Server ();
 

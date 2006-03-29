@@ -109,8 +109,8 @@ public:
     synthese::env::Point toRealFrame (const synthese::env::Point& p);
     synthese::env::Point toOutputFrame (const synthese::env::Point& p);
 	
-    double getWidth () const { return _width; }
-    double getHeight () const { return _height; }
+    double getWidth () const;
+    double getHeight () const;
     
     void dump (PostscriptCanvas& canvas);
 };

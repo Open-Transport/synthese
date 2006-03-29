@@ -35,7 +35,7 @@ std::map<std::string, MapBackgroundManager*> MapBackgroundManager::_managers;
 MapBackgroundManager::MapBackgroundManager(const boost::filesystem::path& backgroundDir)
 {
 
-    Log::GetInstance ().debug ("Initializing backgrounds for " + backgroundDir.string ());
+    Log::GetInstance ().debug ("Initializing backgrounds in " + backgroundDir.string ());
 
     // Go through each scale directory
     fs::directory_iterator end_iter;

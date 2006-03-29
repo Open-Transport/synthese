@@ -10,6 +10,10 @@
 #include <limits>
 #include <cmath>
 
+#include "01_util/Log.h"
+
+using synthese::util::Log;
+
 using namespace std;
 
 
@@ -37,6 +41,8 @@ MapBackground::MapBackground(const std::string& tileDir)
     // Parse scalex and scaley
     _scaleX = atof ((++scaleTok_iter)->c_str ());
     _scaleY = atof ((++scaleTok_iter)->c_str ());
+
+    Log::GetInstance ().debug ("Initializing scaled background in " + tileDir);
    
    std::vector<MapBackgroundTile*> tiles;
    
