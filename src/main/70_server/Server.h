@@ -40,6 +40,8 @@ class Server
 {
  private:
 
+    static Server* _instance;
+
     int _port;
     int _nbThreads;
     boost::filesystem::path _dataDir;
@@ -50,17 +52,24 @@ class Server
 
  public:
 
-    Server (int port, 
-	    int nbThreads,
-	    const std::string& dataDir,
-	    const std::string& tempDir);
+    Server (int port = 3591, 
+	    int nbThreads = 10,
+	    const std::string& dataDir = ".",
+	    const std::string& tempDir = ".");
 
     ~Server ();
 
 
     //! @name Getters/Setters
     //@{
+    int getPort () const;
+    int getNbThreads () const;
+    const boost::filesystem::path& getDataDir () const;
+    const boost::filesystem::path& getTempDir () const;
 
+    static Server* GetInstance ();
+    static void SetInstance (Server* instance);
+    
     //@}
 
 

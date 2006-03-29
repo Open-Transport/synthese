@@ -7,6 +7,8 @@
 
 #include "70_server/RequestHandler.h"
 
+#include <boost/filesystem/path.hpp>
+
 #include <iostream>
 #include <string>
 
@@ -29,6 +31,9 @@ namespace carto
 /** Map request handler.
 
 Generates a map given all the information to be drawn.
+The response sent through the socket has the following format
+
+|{PNGFILESIZE}|:|{PNG FILE DATA}
 
 @ingroup m70
 */
@@ -41,7 +46,7 @@ class MapRequestHandler : public synthese::server::RequestHandler
     static const std::string MAP_PARAMETER;
 
  private:
-    
+
  protected:
 
  public:

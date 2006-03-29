@@ -61,9 +61,10 @@ int main( int argc, char **argv )
     Log::GetInstance ().info ("");
 
     synthese::server::Server server (port, threads, datadir, tempdir);
+    synthese::server::Server::SetInstance (&server);
     try
     {
-	server.run ();
+	synthese::server::Server::GetInstance ()->run ();
     }
     catch (synthese::util::Exception& ex)
     {

@@ -71,7 +71,7 @@ MapLS::Load (XMLNode& node,
 	}
 	catch (synthese::util::Exception& ex)
 	{
-	    Log::GetInstance ().error ("Cannot find background", ex);
+	    Log::GetInstance ().warn ("Cannot find background", ex);
 	}
     }
 

@@ -99,7 +99,7 @@ MapBackgroundManager::GetMapBackgroundManager (const std::string& id)
 	boost::filesystem::path backgroundDir (_backgroundsDir / id);
 	if (boost::filesystem::exists (backgroundDir) == false)
 	{
-	    throw synthese::util::Exception ("Undefined background for id " + id);
+	    throw synthese::util::Exception ("Missing background directory " + backgroundDir.string ());
 	}
 	MapBackgroundManager* manager = new MapBackgroundManager (backgroundDir);
 	_managers.insert (std::make_pair (id, manager));

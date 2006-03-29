@@ -4,10 +4,12 @@
 #include <fstream>
 #include <sstream>
 
+#include <assert.h>
 #include <stdlib.h>
 
 
 #include "01_util/XmlParser.h"
+#include "01_util/Conversion.h"
 
 #include "15_env/Environment.h"
 #include "16_env_ls_xml/EnvironmentLS.h"
@@ -16,13 +18,16 @@
 #include "39_carto/PostscriptCanvas.h"
 #include "40_carto_ls_xml/MapLS.h"
 
+#include "70_server/Server.h"
 #include "70_server/Request.h"
+
+#include <boost/filesystem/operations.hpp>
+
 
 
 using synthese::env::Environment;
 using synthese::carto::Map;
-
-
+using synthese::util::Conversion;
 
 
 namespace synthese
@@ -35,6 +40,7 @@ const std::string MapRequestHandler::FUNCTION_CODE ("map");
 
 const std::string MapRequestHandler::ENVIRONMENT_PARAMETER ("env");
 const std::string MapRequestHandler::MAP_PARAMETER ("map");
+
 
 
 MapRequestHandler::MapRequestHandler ()
@@ -72,19 +78,24 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 					    synthese::cartolsxml::MapLS::MAP_TAG.c_str ());
     Map* map = synthese::cartolsxml::MapLS::Load (mapNode, *env);
 
+    // Create a temporary file name based on system time
+    const boost::filesystem::path& tempDir = synthese::server::Server::GetInstance ()->getTempDir ();
+
+    // The request adress is taken as unique id for map tmp file.
+    const boost::filesystem::path tempPsFile (tempDir / ("map_" + Conversion::ToString ((unsigned long) &request) + ".ps"));
+    const boost::filesystem::path tempPngFile (tempDir / ("map_" + Conversion::ToString ((unsigned long) &request) + ".png"));
+
     // Create the postscript canvas for output
-    std::ofstream of ("/home/mjambert/temp/map.ps");
+    std::ofstream of (tempPsFile.string ().c_str ());
     synthese::carto::PostscriptCanvas canvas (of);
     map->dump (canvas);
     of.close ();
-
-    stream << "Hello from map request handler !" << std::endl;
 
     // Convert the ps file to png with ghostscript
     std::stringstream gscmd;
     gscmd << "gs -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -dGraphicsAlphaBits=4 -g" 
 	  << map->getWidth () << "x" << map->getHeight () 
-	  << " -sOutputFile=/home/mjambert/map.png /home/mjambert/temp/map.ps";
+	  << " -sOutputFile=" << tempPngFile.string () << " " << tempPsFile.string ();
     
     int ret = system (gscmd.str ().c_str ());
     
@@ -92,7 +103,31 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     {
 	throw synthese::util::Exception ("Error executing GhostScript (gs executable in path ?)");
     }
+    boost::filesystem::remove (tempPsFile);
 
+    // Now get size of the generated PNG file...
+    long size = boost::filesystem::file_size (tempPngFile);
+    
+    // ...and send the content of the file through the socket.
+    std::ifstream ifpng (tempPngFile.string ().c_str ());
+    char ch;
+    long nbChars = 0;
+
+    stream << size << ":";
+    for (int i=0; i<size; ++i)
+    {
+	ifpng.get(ch);
+	stream << ch;
+	++nbChars;
+    }
+    ifpng.close ();
+    
+    stream << std::flush;
+
+    // std::cout << "Sent << " << nbChars << std::endl;
+    // assert (nbChars == size);
+
+    // boost::filesystem::remove (tempPngFile);
 
     delete map;
     delete env;

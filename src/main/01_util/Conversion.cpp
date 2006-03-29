@@ -45,6 +45,35 @@ Conversion::ToString (int i)
 }
 
 
+std::string 
+Conversion::ToString (long l)
+{
+    std::stringstream ss;
+    ss << l;
+    return ss.str ();
+}
+
+
+
+std::string 
+Conversion::ToString (unsigned int i)
+{
+    std::stringstream ss;
+    ss << i;
+    return ss.str ();
+}
+
+
+
+std::string 
+Conversion::ToString (unsigned long l)
+{
+    std::stringstream ss;
+    ss << l;
+    return ss.str ();
+}
+
+
 
 
 

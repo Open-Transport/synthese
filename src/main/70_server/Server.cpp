@@ -27,6 +27,9 @@ namespace server
 {
 
 
+Server* Server::_instance = 0;
+
+
 
 Server::Server (int port, 
 		int nbThreads,
@@ -47,6 +50,23 @@ Server::~Server ()
 
 
 
+Server* 
+Server::GetInstance ()
+{
+    if (_instance == 0)
+    {
+	_instance = new Server ();
+    }
+    return _instance;
+}
+
+
+
+void 
+Server::SetInstance (Server* instance)
+{
+    _instance = instance;
+}
 
     
 
@@ -124,6 +144,42 @@ Server::run ()
 }
 
 
+
+
+int 
+Server::getPort () const
+{
+    return _port;
+}
+
+
+
+int 
+Server::getNbThreads () const
+{
+    return _nbThreads;
+}
+
+
+
+
+const boost::filesystem::path& 
+Server::getDataDir () const
+{
+    return _dataDir;
+}
+
+
+
+const boost::filesystem::path& 
+Server::getTempDir () const
+{
+    return _tempDir;
+}
+
+
+
+    
 
 
 

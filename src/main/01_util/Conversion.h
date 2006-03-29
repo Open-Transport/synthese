@@ -42,6 +42,10 @@ class Conversion
     static double ToDouble (const std::string& s);
 
     static std::string ToString (int i);
+    static std::string ToString (unsigned int i);
+
+    static std::string ToString (long l);
+    static std::string ToString (unsigned long l);
 
 
 };
