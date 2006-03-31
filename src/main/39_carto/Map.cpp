@@ -18,8 +18,10 @@
 #include <cmath>
 
 #include "15_env/Point.h"
+#include "15_env/PhysicalStop.h"
 
 using synthese::env::Point;
+using synthese::env::PhysicalStop;
 using namespace std;
 
 
@@ -537,16 +539,63 @@ Map::dumpLines (PostscriptCanvas& canvas)
 	const DrawableLine* dbl = *it;
 	dbl->preDraw (*this, canvas);  
     }    
+
+
     for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
          it != _selectedLines.end () ; ++it) {
 	const DrawableLine* dbl = *it;
 	dbl->draw (*this, canvas);  
     }    
+
+
     for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
          it != _selectedLines.end () ; ++it) {
 	const DrawableLine* dbl = *it;
 	dbl->postDraw (*this, canvas);  
     }    
+
+    // At this stage lines have all been shifted.
+    // Calculate locations for drawing physical stops labels now
+    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
+         it != _selectedLines.end () ; ++it) 
+    {
+	const DrawableLine* dbl = *it;
+	const std::vector<const Point*>& points = dbl->getPoints ();
+	for (int i=0; i<points.size (); ++i)
+	{
+	    const Point* p = points[i];
+
+	    const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (p);
+	    if (physicalStop)
+	    {
+		// Get all the lines going through this points and find the
+		// extrema shifts
+		
+		// Select the right direction to write the text
+		// (from start or from end)
+		
+		// ...
+
+		// Write text
+		Point cp = toOutputFrame (*physicalStop);
+		canvas.moveto (cp.getX (), cp.getY ());
+		canvas.text (physicalStop->getName ());
+	    }
+	}	    
+	    
+	for (std::vector<const Point*>::const_iterator itp = points.begin ();
+	     itp != points.end () ; ++itp) 
+	{
+	    
+
+	}
+	
+	dbl->preDraw (*this, canvas);  
+    }    
+    
+    
+
+
     
 }
 
