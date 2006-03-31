@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_CARTO_CITYTEST_H
-#define SYNTHESE_CARTO_CITYTEST_H
+#ifndef SYNTHESE_CARTO_DRAWABLELINECOMPARATORTEST_H
+#define SYNTHESE_CARTO_DRAWABLELINECOMPARATORTEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
