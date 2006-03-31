@@ -1,4 +1,4 @@
-
+1
 
 # -------------------------------------------------------
 # Common methods
@@ -31,20 +31,17 @@ def DefaultTestModuleName ( env, dir = '.' ):
 
 def DefineDefaultLibPath (env):
     platform = env['PLATFORM']
+    librepo = "#../libs/" + cxx
+
     if (platform=='win32'):
-        # Check for lib repository argument
-        # If none default to environment variable WINLIBS_PATH
-        librepo = ARGUMENTS.get('winlibs_path', os.environ['WINLIBS_PATH'])
         env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
         env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
     elif (platform=='darwin'):
-        librepo = '/opt/local'
+	env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
+        env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
+    elif (platform=='posix'):
         env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
         env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
-#    elif (platform=='posix'):
-#        librepo = '/usr/local'
-#        env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
-#        env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
 
     
 def DefineDefaultCPPDefines (env):
@@ -119,6 +116,31 @@ def DefineDefaultLibs (env):
             env.Append ( LIBS = ['msvcrt.lib'] )  
 
 
+
+def AddBoostDependency (env, libname):
+    platform = env['PLATFORM']
+    mode = env['MODE']
+    
+    boostlib = libname
+
+    if (platform == 'posix'):
+	boostlib = boostlib + "-gcc"
+
+    if (platform == 'darwin'):
+	boostlib = boostlib + "-gcc"
+
+    if (platform == 'win32'):
+	boostlib = boostlib + "-vc71"
+
+    # always multithreaded by now
+    boostlib = boostlib + "-mt"
+    if (mode == 'debug'):
+        boostlib = boostlib + "-d"
+
+    env.Append (LIBS = [boostlib] )
+    
+
+
 def AppendMultithreadConf (env):
     platform = env['PLATFORM']
     mode = env['MODE']
@@ -166,6 +188,7 @@ SConsEnvironment.DefineDefaultLibs=DefineDefaultLibs
 SConsEnvironment.AppendMultithreadConf=AppendMultithreadConf
 SConsEnvironment.ModuleEnv=ModuleEnv
 SConsEnvironment.AddModuleDependency=AddModuleDependency
+SConsEnvironment.AddBoostDependency=AddBoostDependency
 
 
 # -------------------------------------------------------
@@ -175,14 +198,21 @@ env = Environment()
 
 mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
+cxx = ''
 
 env.Replace ( PLATFORM = platform )
 env.Replace ( MODE = mode )
 
-# At the moment, problem with __mt_allocator in g++ 4
-# Default to g++ 3.3
-#if (platform=='posix') or (platform=='darwin'):
-#    env.Replace ( CXX = 'g++-3.3' )
+if (platform=='posix') or (platform=='darwin'):
+    cxx = 'g++-3.3'
+
+if (platform=='win32'):
+    cxx = 'vc71'
+
+
+env.Replace ( CXX = cxx )
+
+
 
 # -------------------------------------------------------
 # Common build configuration
