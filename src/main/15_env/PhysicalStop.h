@@ -44,6 +44,7 @@ private:
 
     //! @name Getters/Setters
     //@{
+    const std::string& getName () const;
     //@}
 
 

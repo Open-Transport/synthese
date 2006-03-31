@@ -29,6 +29,12 @@ PhysicalStop::~PhysicalStop()
 }
 
 
+const std::string& 
+PhysicalStop::getName () const
+{
+    return _name;
+}
+
 
 
 
