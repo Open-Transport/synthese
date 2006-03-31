@@ -7,11 +7,14 @@
 #include "00_tcp/TcpServerSocket.h"
 #include "00_tcp/TcpService.h"
 
+#include "01_util/Conversion.h"
+
 #include <boost/iostreams/stream.hpp>
 
 #include "01_util/Log.h"
 
 using synthese::util::Log;
+using synthese::util::Conversion;
 
 namespace synthese
 {
@@ -37,15 +40,18 @@ ServerThread::operator()()
 	boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
 	    tcpStream (serverSocket);
 	
+
 	char buffer[1024*64]; // 64K buffer max
 	tcpStream.getline (buffer, 1024*64);
-	    
+
 	try
 	{
 	    std::string requestString (buffer);
 	    // tcpStream >> requestString;
 	    
-	    Log::GetInstance ().debug ("Received request : " + requestString);
+	    Log::GetInstance ().debug ("Received request : " + 
+				       requestString + " (" + Conversion::ToString (requestString.size ()) + 
+		                       " bytes)");
 	    
 	    // Parse request
 	    Request request (requestString);
