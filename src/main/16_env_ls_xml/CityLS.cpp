@@ -39,6 +39,7 @@ XMLNode*
 CityLS::Save (const synthese::env::City* city)
 {
     // ...
+    return 0;
 }
 
 

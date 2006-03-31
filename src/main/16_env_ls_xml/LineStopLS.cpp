@@ -102,6 +102,8 @@ XMLNode*
 LineStopLS::Save (const synthese::env::LineStop* lineStop)
 {
     // ...
+    return 0;
+
 }
 
 

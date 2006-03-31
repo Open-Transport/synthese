@@ -1,4 +1,4 @@
-1
+
 
 # -------------------------------------------------------
 # Common methods
@@ -31,13 +31,14 @@ def DefaultTestModuleName ( env, dir = '.' ):
 
 def DefineDefaultLibPath (env):
     platform = env['PLATFORM']
-    librepo = "#../libs/" + cxx
+    # librepo = "#../libs/" + cxx
+    librepo = ARGUMENTS.get('libs_repo_home', os.environ['LIBS_REPO_HOME'])   
 
     if (platform=='win32'):
         env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
         env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
     elif (platform=='darwin'):
-	env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
+        env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
         env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
     elif (platform=='posix'):
         env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
@@ -110,6 +111,7 @@ def DefineDefaultLibs (env):
         env.Append ( LIBS = ['dl'] )
 
     if (platform=='win32'):
+        env.Append ( LIBS = ['advapi32.lib'] )  
         if (mode=='debug'):
             env.Append ( LIBS = ['msvcrtd.lib'] )  
         else:  
@@ -121,23 +123,18 @@ def AddBoostDependency (env, libname):
     platform = env['PLATFORM']
     mode = env['MODE']
     
-    boostlib = libname
-
-    if (platform == 'posix'):
-	boostlib = boostlib + "-gcc"
-
-    if (platform == 'darwin'):
-	boostlib = boostlib + "-gcc"
-
-    if (platform == 'win32'):
-	boostlib = boostlib + "-vc71"
-
+    boostlib = libname + '-.*-'
     # always multithreaded by now
     boostlib = boostlib + "-mt"
     if (mode == 'debug'):
         boostlib = boostlib + "-d"
 
-    env.Append (LIBS = [boostlib] )
+    librepo = ARGUMENTS.get('libs_repo_home', os.environ['LIBS_REPO_HOME'])   
+    for file in os.listdir( librepo ):
+        if fnmatch.fnmatch(file, boostlib) :
+            print "******", file
+
+    #env.Append (LIBS = [boostlib] )
     
 
 
@@ -205,12 +202,12 @@ env.Replace ( MODE = mode )
 
 if (platform=='posix') or (platform=='darwin'):
     cxx = 'g++-3.3'
+    env.Replace ( CXX = cxx )
 
 if (platform=='win32'):
     cxx = 'vc71'
 
 
-env.Replace ( CXX = cxx )
 
 
 

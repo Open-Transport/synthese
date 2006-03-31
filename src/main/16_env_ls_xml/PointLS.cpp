@@ -40,6 +40,8 @@ XMLNode*
 PointLS::Save (const synthese::env::Point* point)
 {
     // ...
+    return 0;
+
 }
 
 

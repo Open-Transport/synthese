@@ -12,7 +12,7 @@ namespace synthese
 
 namespace util
 {
-    class RGBColor;
+    struct RGBColor;
 }
 
 

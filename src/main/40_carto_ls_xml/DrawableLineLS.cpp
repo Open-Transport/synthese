@@ -66,6 +66,7 @@ XMLNode*
 DrawableLineLS::Save (const synthese::carto::DrawableLine* drawableLine)
 {
     // ...
+    return 0;
 }
 
 

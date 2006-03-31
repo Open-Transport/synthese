@@ -73,6 +73,8 @@ XMLNode*
 LineLS::Save (const synthese::env::Line* line)
 {
     // ...
+    return 0;
+
 }
 
 

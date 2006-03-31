@@ -58,6 +58,8 @@ XMLNode*
 PhysicalStopLS::Save (const synthese::env::PhysicalStop* physicalStop)
 {
     // ...
+    return 0;
+
 }
 
 

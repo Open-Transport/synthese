@@ -88,6 +88,8 @@ XMLNode*
 EnvironmentLS::Save (const synthese::env::Environment* environment)
 {
     // ...
+    return 0;
+
 }
 
 

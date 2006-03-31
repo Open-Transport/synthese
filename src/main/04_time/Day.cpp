@@ -57,6 +57,7 @@ Day::operator++( int )
 std::ostream& operator<< ( std::ostream& os, const Day& op )
 {
     os << op.getValue ();
+    return os;
 }
 
 

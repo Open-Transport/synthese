@@ -5,6 +5,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <ctime>
 
 namespace synthese
 {
@@ -156,6 +157,7 @@ std::ostream& operator<< ( std::ostream& os, const Hour& op )
     << op.getHours ()
     << std::setw( 2 ) << std::setfill ( '0' )
     << op.getMinutes ();
+    return os;
 }
 
 

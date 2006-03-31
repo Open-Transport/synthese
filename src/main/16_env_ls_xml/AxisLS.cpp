@@ -45,6 +45,7 @@ XMLNode*
 AxisLS::Save (const synthese::env::Axis* axis)
 {
     // ...
+    return 0;
 }
 
 

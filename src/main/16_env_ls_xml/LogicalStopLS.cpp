@@ -46,6 +46,8 @@ XMLNode*
 LogicalStopLS::Save (const synthese::env::LogicalStop* logicalStop)
 {
     // ...
+    return 0;
+
 }
 
 

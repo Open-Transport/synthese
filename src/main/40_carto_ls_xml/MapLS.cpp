@@ -119,6 +119,7 @@ XMLNode*
 MapLS::Save (const synthese::carto::Map* map)
 {
     // ...
+    return 0;
 }
 
 

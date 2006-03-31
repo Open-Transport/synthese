@@ -16,6 +16,7 @@
 #include <map>
 #include <fstream>
 #include <cmath>
+#include <limits>
 
 #include "15_env/Point.h"
 #include "15_env/PhysicalStop.h"
