@@ -122,19 +122,18 @@ def DefineDefaultLibs (env):
 def AddBoostDependency (env, libname):
     platform = env['PLATFORM']
     mode = env['MODE']
-    
-    boostlib = libname + '-.*-'
+
+    if platform == 'win32':
+        # automatic link, no need to add libs
+        return
+
+    boostlib = libname + '-gcc'
     # always multithreaded by now
     boostlib = boostlib + "-mt"
     if (mode == 'debug'):
         boostlib = boostlib + "-d"
 
-    librepo = ARGUMENTS.get('libs_repo_home', os.environ['LIBS_REPO_HOME'])   
-    for file in os.listdir( librepo ):
-        if fnmatch.fnmatch(file, boostlib) :
-            print "******", file
-
-    #env.Append (LIBS = [boostlib] )
+    env.Append (LIBS = [boostlib] )
     
 
 
