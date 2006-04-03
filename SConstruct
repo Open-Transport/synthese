@@ -31,7 +31,6 @@ def DefaultTestModuleName ( env, dir = '.' ):
 
 def DefineDefaultLibPath (env):
     platform = env['PLATFORM']
-    # librepo = "#../libs/" + cxx
     librepo = ARGUMENTS.get('libs_repo_home', os.environ['LIBS_REPO_HOME'])   
 
     if (platform=='win32'):
@@ -194,17 +193,14 @@ env = Environment()
 
 mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
-cxx = ''
+
+print "platform = ", platform
+print "mode     = ", mode
 
 env.Replace ( PLATFORM = platform )
 env.Replace ( MODE = mode )
 
-if (platform=='posix') or (platform=='darwin'):
-    cxx = 'g++-3.3'
-    env.Replace ( CXX = cxx )
-
-if (platform=='win32'):
-    cxx = 'vc71'
+#env.Replace ( CXX = 'g++-3.3' )
 
 
 

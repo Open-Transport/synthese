@@ -87,6 +87,7 @@ private:
     void prepare ();
     void dumpBackground (PostscriptCanvas& canvas);
     void dumpLines (PostscriptCanvas& canvas);
+    void dumpPhysicalStops (PostscriptCanvas& canvas);
     
 public:
 

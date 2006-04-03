@@ -40,6 +40,17 @@ public:
     ~DrawableLineComparator();
 	
     void setPoint (const synthese::env::Point* point);
+
+
+    std::pair<double, double>
+	calculateStartAngles (const std::vector<const synthese::env::Point*>& points1, int index1,
+			      const std::vector<const synthese::env::Point*>& points2, int index2) const;
+
+    std::pair<double, double>
+	calculateEndAngles (const std::vector<const synthese::env::Point*>& points1, int index1,
+			    const std::vector<const synthese::env::Point*>& points2, int index2) const;
+
+
 	
     double calculateStartAngleAtIndex (
 	const std::vector<const synthese::env::Point*>& points, 

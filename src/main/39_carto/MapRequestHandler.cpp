@@ -93,7 +93,7 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 
     // Convert the ps file to png with ghostscript
     std::stringstream gscmd;
-    gscmd << "gs -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -dGraphicsAlphaBits=4 -g" 
+    gscmd << "gs -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -g" 
 	  << map->getWidth () << "x" << map->getHeight () 
 	  << " -sOutputFile=" << tempPngFile.string () << " " << tempPsFile.string ();
     
@@ -103,7 +103,7 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     {
 	throw synthese::util::Exception ("Error executing GhostScript (gs executable in path ?)");
     }
-    boost::filesystem::remove (tempPsFile);
+    // boost::filesystem::remove (tempPsFile);
 
     // Now get size of the generated PNG file...
     long size = boost::filesystem::file_size (tempPngFile);

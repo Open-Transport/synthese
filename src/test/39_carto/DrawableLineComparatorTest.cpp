@@ -35,6 +35,146 @@ namespace carto
 
 
   void 
+  DrawableLineComparatorTest::testSameLines () 
+  {
+      const Point A1 (2.0, 2.0);
+      const Point B1 (4.0, 4.0);
+      const Point C1 (6.0, 6.0);
+
+      const Point A2 (2.0, 2.0);
+      const Point B2 (4.0, 4.0);
+      const Point C2 (6.0, 6.0);
+
+      std::vector<const Point*> points1;
+      points1.push_back (&A1); 
+      points1.push_back (&B1); 
+      points1.push_back (&C1); 
+
+      std::vector<const Point*> points2;
+      points2.push_back (&A2); 
+      points2.push_back (&B2); 
+      points2.push_back (&C2); 
+
+      DrawableLine line1 (points1, "L1", RGBColor ("blue"));
+      DrawableLine line2 (points2, "L2", RGBColor ("red"));
+
+      {
+	  DrawableLineComparator cmp (&line1, &A1, &A2);
+	  CPPUNIT_ASSERT_EQUAL (1, cmp (&line2, &line1)); // Following 1, 2 is on the right of 1
+	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line1, &line2)); // Following 1, 1 is on the left of 2
+      }
+      {
+	  DrawableLineComparator cmp (&line1, &B1, &B2);
+	  CPPUNIT_ASSERT_EQUAL (1, cmp (&line2, &line1)); // Following 1, 2 is on the right of 1
+	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line1, &line2)); // Following 1, 1 is on the left of 2
+      }
+      {
+	  DrawableLineComparator cmp (&line1, &C1, &C2);
+	  CPPUNIT_ASSERT_EQUAL (1, cmp (&line2, &line1)); // Following 1, 2 is on the right of 1
+	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line1, &line2)); // Following 1, 1 is on the left of 2
+      }
+      
+
+  }
+
+
+
+  void 
+  DrawableLineComparatorTest::testTiniestLines0 () 
+  {
+      /*
+       *       D x
+       *         |
+       *       C x   
+       *        /|
+       *       / |
+       *    A x  x B
+       *
+       *
+       * L1 : A -> C -> D
+       * L2 : B -> C -> D
+       */
+
+      const Point A (0.1, 0.1);
+      const Point B (3.1, 0.1);
+      const Point C (3.1, 3.1);
+      const Point D (3.1, 6.1);
+      
+      std::vector<const Point*> points;
+      points.push_back (&A); 
+      points.push_back (&C); 
+      points.push_back (&D); 
+      
+      DrawableLine line1 (points, "L1", RGBColor ("red"));
+	  
+      points.clear ();
+      
+      points.push_back (&B); 
+      points.push_back (&C); 
+      points.push_back (&D); 
+      
+      DrawableLine line2 (points, "L2", RGBColor ("black"));
+
+      {
+	  DrawableLineComparator cmp (&line1, &C, &C);
+	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line1, &line2)); // Following 1, 1 is on the left of 2
+	  CPPUNIT_ASSERT_EQUAL (1, cmp (&line2, &line1)); // Following 1, 2 is on the right of 1
+      }
+      {
+	  DrawableLineComparator cmp (&line1, &D, &D);
+	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line1, &line2)); // Following 1, 1 is on the left of 2
+	  CPPUNIT_ASSERT_EQUAL (1, cmp (&line2, &line1)); // Following 1, 2 is on the right of 1
+      }
+
+  }
+
+
+
+  void 
+  DrawableLineComparatorTest::testTiniestLines1 () 
+  {
+      /*
+       *       C x   
+       *        /|
+       *       / |
+       *    A x  x B
+       *
+       *
+       * L1 : A -> C
+       * L2 : B -> C
+       */
+
+      const Point A (0.1, 0.1);
+      const Point B (3.1, 0.1);
+      const Point C (3.1, 3.1);
+      
+      std::vector<const Point*> points;
+      points.push_back (&A); 
+      points.push_back (&C); 
+      
+      DrawableLine line1 (points, "L1", RGBColor ("red"));
+	  
+      points.clear ();
+      
+      points.push_back (&B); 
+      points.push_back (&C); 
+      
+      DrawableLine line2 (points, "L2", RGBColor ("black"));
+
+      {
+	  DrawableLineComparator cmp (&line1, &C, &C);
+	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line1, &line2)); // Following 1, 1 is on the left of 2
+	  CPPUNIT_ASSERT_EQUAL (1, cmp (&line2, &line1)); // Following 1, 2 is on the right of 1
+      }
+
+  }
+
+
+
+
+
+
+  void 
   DrawableLineComparatorTest::testVariousComparisons () 
   {
       const Point A (2.0, 3.0);
@@ -160,9 +300,58 @@ namespace carto
 	  CPPUNIT_ASSERT_EQUAL (1, cmp (&line6, &line5)); // Following 6, 6 is on the right of 5
 	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line5, &line6)); // Following 6, 5 is on the left of 6
       }
-      
 
   }
+
+
+
+
+  void 
+  DrawableLineComparatorTest::testLinesWithSharedBeginEnd ()
+  {
+      const Point A (5.0, 5.0);
+      const Point B (10.0, 10.0);
+      const Point C (15.0, 15.0);
+      const Point D (20.0, 30.0);
+      const Point E (40.0, 40.0);
+      const Point F (50.0, 40.0);
+
+      std::vector<const Point*> points;
+      points.push_back (&A); 
+      points.push_back (&B); 
+      points.push_back (&F); 
+
+      DrawableLine line1 (points, "L1", RGBColor ("cyan"));
+      DrawableLine line2 (points, "L2", RGBColor ("yellow"));
+
+      points.clear ();
+      points.push_back (&A); 
+      points.push_back (&B); 
+      points.push_back (&C); 
+      points.push_back (&D); 
+      points.push_back (&E); 
+      points.push_back (&F); 
+
+      DrawableLine line3 (points, "L3", RGBColor ("green"));
+
+      {
+	  DrawableLineComparator cmp (&line3, &A, &A);
+	  CPPUNIT_ASSERT_EQUAL (1, cmp (&line1, &line3)); // Following 3, 1 is on the right of 3
+	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line3, &line1)); // Following 3, 3 is on the left of 1
+      }
+      {
+	  DrawableLineComparator cmp (&line3, &B, &B);
+	  CPPUNIT_ASSERT_EQUAL (1, cmp (&line1, &line3)); // Following 3, 1 is on the right of 3
+	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line3, &line1)); // Following 3, 3 is on the left of 1
+      }
+      {
+	  DrawableLineComparator cmp (&line3, &F, &F);
+	  CPPUNIT_ASSERT_EQUAL (1, cmp (&line1, &line3)); // Following 3, 1 is on the right of 3
+	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line3, &line1)); // Following 3, 3 is on the left of 1
+      }
+
+  }
+
 
 
 

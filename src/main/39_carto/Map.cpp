@@ -319,7 +319,7 @@ Map::assignShiftFactors (const DrawableLine* reference,
 	
     DrawableLineComparator cmp (reference, referencePoint, 0);
 	
-    // cout << endl<< "******************* Processing line " << line->getLine ()->getId () << endl;
+    // cout << endl<< "******************* Processing line " << line->getShortName () << endl;
     for (unsigned int j=0; j<line->getPoints().size (); ++j) {
 	// cout << "Processing point " << j << endl;
 		
@@ -348,15 +348,17 @@ Map::assignShiftFactors (const DrawableLine* reference,
 	else 
 	{
 			
-	    // cout << "=== LeftMostLine  = " << leftMostLine->getLineNumber() << " lms=" << leftMostShift <<endl;
-	    // cout << "=== RightMostLine = " << rightMostLine->getLineNumber() << " rms=" << rightMostShift <<endl;
+	    // cout << "=== LeftMostLine  = " << leftMostLine->getShortName () << " lms=" << leftMostShift <<endl;
+	    // cout << "=== RightMostLine = " << rightMostLine->getShortName() << " rms=" << rightMostShift <<endl;
 		
 	    if (cmp (line, leftMostLine) == 0) {
+		// cout << "... left of leftMostLine" <<endl;
 		int newShift = leftMostShift + 1;
 		if (line->isReverseWayAt(referencePoint, reference)) newShift = -newShift;
 		line->setShift (j, newShift); 
 				
 	    } else if (cmp (line, rightMostLine) > 0) { 
+		// cout << "... right of rightMostLine" <<endl;
 		int newShift = rightMostShift - 1;
 		if (line->isReverseWayAt(referencePoint, reference)) newShift = -newShift;
 		line->setShift (j, newShift); 
@@ -373,9 +375,7 @@ Map::assignShiftFactors (const DrawableLine* reference,
 const DrawableLine*
 Map::findBestAvailableReference (const DrawableLine* line, 
 				 const std::vector<DrawableLine*>& lines) const {
-    // This function tries to find the best reference for line among lines.
-    // Lines are already processed, that is why they have to a reference whenever
-    // the most shared bus line joins one of them.
+    // This function tries to find the best reference for line among other lines.
     // The best candidate for being a reference is the one which shares the most points
     // with line.
 	
@@ -390,7 +390,7 @@ Map::findBestAvailableReference (const DrawableLine* line,
     }				 	
 								 	
     if (currentReference == 0) {
-	// If lines was empty or if no point was shared the best reference is
+	// If lines was empty or if no point was shared, the best reference is
 	// line itself.
 	return line;	
     }
@@ -416,7 +416,7 @@ Map::prepareLines ()
 	// Get the most shared bus line	
 	DrawableLine* mostSharedLine = findMostSharedLine (drawableLines, exclusionList);
 		
-	// cout <<  endl << endl << "%%%%% Most Shared Bus line = " << mostSharedLine->getLineNumber () << endl;
+	// cout <<  endl << endl << "%%%%% Most Shared Bus line = " << mostSharedLine->getShortName () << endl;
 		
 	// Get the most shared point of the most shared bus line
 	// TODO : check there cannot be an infinite loop going through this.
@@ -444,8 +444,8 @@ Map::prepareLines ()
 	DrawableLineComparator cmp (reference, pointAndCpt.first, pointAndCpt.first);
 	stable_sort (sharingLines.begin (), sharingLines.end (), cmp);
 
-	// cout << "Processing order (ref=" << reference->getLineNumber () << "): ";
-	// for (int l=0; l<sharingLines.size (); ++l) cout << sharingLines[l]->getLineNumber () << " ; ";
+	// cout << "Processing order (ref=" << reference->getShortName () << "): ";
+	for (int l=0; l<sharingLines.size (); ++l) cout << sharingLines[l]->getShortName () << " ; ";
 	// cout << endl;
 
 	// Find back the reference line index in the sorted list.
@@ -462,7 +462,7 @@ Map::prepareLines ()
 	    assignShiftFactors (reference, pointAndCpt.first, sharingLines[i], exclusionList);
 	    exclusionList.insert (sharingLines[i]);
 	}
-	// cout << "--------------------------------------" << endl;
+	// cout << "----------------- OTHER SIDE ---------------------" << endl;
 		
 	// ... and from referenceIndex (excluded) towards the end of the list
 	if (referenceIndex < (int) sharingLines.size ()-1) {
@@ -532,7 +532,6 @@ void
 Map::dumpLines (PostscriptCanvas& canvas)
 {
     // Draw drawableLines
-    canvas.setfont("Helvetica", 10);
     canvas.setlinejoin (1);
     
     for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
@@ -554,6 +553,19 @@ Map::dumpLines (PostscriptCanvas& canvas)
 	const DrawableLine* dbl = *it;
 	dbl->postDraw (*this, canvas);  
     }    
+
+
+
+    
+}
+
+
+
+void 
+Map::dumpPhysicalStops (PostscriptCanvas& canvas)
+{
+    canvas.setfont("Helvetica", 12);
+    canvas.setrgbcolor(0, 0, 0);
 
     // At this stage lines have all been shifted.
     // Calculate locations for drawing physical stops labels now
@@ -583,25 +595,12 @@ Map::dumpLines (PostscriptCanvas& canvas)
 		canvas.text (physicalStop->getName ());
 	    }
 	}	    
-	    
-	for (std::vector<const Point*>::const_iterator itp = points.begin ();
-	     itp != points.end () ; ++itp) 
-	{
-	    
-
-	}
 	
-	dbl->preDraw (*this, canvas);  
+	// dbl->preDraw (*this, canvas);  
     }    
-    
-    
 
 
-    
 }
-
-
-
 
 
 
@@ -614,6 +613,7 @@ Map::dump (PostscriptCanvas& canvas)
     
     dumpBackground (canvas);
     dumpLines (canvas);
+    dumpPhysicalStops (canvas);
 
 
 //	canvas.setRGBColor(c0.r, c0.g, c0.b);

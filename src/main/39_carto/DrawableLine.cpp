@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 #include "01_util/Conversion.h"
 #include "15_env/Line.h"
@@ -44,7 +45,11 @@ DrawableLine::DrawableLine (const Line* line,
     , _shortName (line->getId ())
     , _color (line->getColor ())
 {
+
+//    std::cout << "*** POINTs for line " << line->getId () << std::endl;
+    
     for (unsigned int i=0; i<_points.size (); ++i) {
+	//std::cout << i << "= " << _points[i]->getX () << " " << _points[i]->getY () << std::endl;
         // Shift initially to 0; 
 	_shifts.push_back (0); 
         
@@ -147,7 +152,7 @@ DrawableLine::isReverseWayAt (const Point* p,
     // which is the next one in points2 then reverse points2.
     int index1 = firstIndexOf (p);
     int index2 = dbl->firstIndexOf (p);
-    
+
     bool reverse = false;
     
     if ((index1+1 < (int) _points.size ())) 
