@@ -17,6 +17,14 @@ class PostscriptCanvas;
 
 class Drawable
 {
+
+public:
+
+    typedef enum { DRAW_DIRECTION_W, DRAW_DIRECTION_NW,
+		   DRAW_DIRECTION_N, DRAW_DIRECTION_NE,
+		   DRAW_DIRECTION_E, DRAW_DIRECTION_SE,
+		   DRAW_DIRECTION_S, DRAW_DIRECTION_SW
+    } DrawDirection;
 	
 protected:
 

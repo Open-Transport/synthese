@@ -82,7 +82,7 @@ private:
     
     bool hasBackgroundManager () const;
     
-    void populateLineIndex (const std::set<DrawableLine*>& selectedLines);
+    void populateLineIndex ();
     void prepareLines ();
     void prepare ();
     void dumpBackground (PostscriptCanvas& canvas);
