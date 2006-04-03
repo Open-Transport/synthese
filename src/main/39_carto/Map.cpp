@@ -47,7 +47,7 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _mapScaleY (_height / _realFrame.getHeight ())
 , _backgroundManager (backgroundManager)
 {
-    populateLineIndex (selectedLines);
+    populateLineIndex ();
 
 }
 
@@ -66,7 +66,7 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _mapScaleY (_height / _realFrame.getHeight ())
 , _backgroundManager (backgroundManager)
 {
-    populateLineIndex (selectedLines);
+    populateLineIndex ();
 
     
     // The real frame is deduced to fit selected lines points
@@ -102,11 +102,11 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 
 
 void 
-Map::populateLineIndex (const std::set<DrawableLine*>& selectedLines)
+Map::populateLineIndex ()
 {
     // Populate line index (indexed by point).
-    for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
-	 it != selectedLines.end ();
+    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
+	 it != _selectedLines.end ();
 	 ++it)
     {
 	const std::vector<const Point*>& points = (*it)->getPoints ();
@@ -124,6 +124,14 @@ Map::populateLineIndex (const std::set<DrawableLine*>& selectedLines)
 
 Map::~Map()
 {
+    // Delete drawable lines
+    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
+	 it != _selectedLines.end (); ++it) 
+    {
+	delete (*it);
+    }
+
+
 }
 
 
@@ -445,7 +453,7 @@ Map::prepareLines ()
 	stable_sort (sharingLines.begin (), sharingLines.end (), cmp);
 
 	// cout << "Processing order (ref=" << reference->getShortName () << "): ";
-	for (int l=0; l<sharingLines.size (); ++l) cout << sharingLines[l]->getShortName () << " ; ";
+	// for (int l=0; l<sharingLines.size (); ++l) cout << sharingLines[l]->getShortName () << " ; ";
 	// cout << endl;
 
 	// Find back the reference line index in the sorted list.
