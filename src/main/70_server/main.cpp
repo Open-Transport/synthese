@@ -58,7 +58,6 @@ int main( int argc, char **argv )
     synthese::util::Log::GetInstance ().setLevel (
 	(synthese::util::Log::Level) loglevel);
     
-    Log::GetInstance ().info ("Param datadir  = " + datadir);
     Log::GetInstance ().info ("");
     Log::GetInstance ().info ("Param datadir  = " + datadir);
     Log::GetInstance ().info ("Param tempdir  = " + tempdir);

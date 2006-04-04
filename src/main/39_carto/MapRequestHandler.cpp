@@ -113,7 +113,7 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     {
 	throw synthese::util::Exception ("Error executing GhostScript (gs executable in path ?)");
     }
-    boost::filesystem::remove (tempPsFile);
+    // boost::filesystem::remove (tempPsFile);
 
     // Now get size of the generated PNG file...
     long size = boost::filesystem::file_size (tempPngFile);

@@ -76,7 +76,9 @@ class PostscriptCanvas
     
     void triangle (double width);
     void square (double width);
-    
+    void sticker (const std::string& label, 
+                  const synthese::util::RGBColor& bgColor,
+                  double xMargin, double yMargin);
     
     
     

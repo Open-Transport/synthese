@@ -590,7 +590,7 @@ Map::dumpLines (PostscriptCanvas& canvas)
 void 
 Map::dumpPhysicalStops (PostscriptCanvas& canvas)
 {
-    canvas.setfont("Helvetica", 12);
+    canvas.setfont("Helvetica", 8);
     canvas.setrgbcolor(0, 0, 0);
 
     // At this stage lines have all been shifted.
@@ -618,7 +618,9 @@ Map::dumpPhysicalStops (PostscriptCanvas& canvas)
 		// Write text
 		Point cp = toOutputFrame (*physicalStop);
 		canvas.moveto (cp.getX (), cp.getY ());
-		canvas.text (physicalStop->getName ());
+        canvas.sticker (physicalStop->getName (), 
+                        synthese::util::RGBColor ("yellow"),
+                        10, 10);
 	    }
 	}	    
 	
