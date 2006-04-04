@@ -27,7 +27,7 @@ namespace carto
  0 size 2 mul rlineto\n\
  2 size mul 0 rlineto\n\
  0 size 2 mul neg rlineto\n\
- 2 size mul 0 neg rlineto\n\
+ 2 size mul neg 0 rlineto\n\
 } def\n";
 
 

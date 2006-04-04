@@ -141,7 +141,8 @@ Map::~Map()
     }
 
     for (std::set<DrawablePhysicalStop*>::const_iterator it = 
-        _selectedPhysicalStops.begin (); ++it)
+        _selectedPhysicalStops.begin (); it != _selectedPhysicalStops.end ();
+        ++it)
     {
 	delete (*it);
     }
