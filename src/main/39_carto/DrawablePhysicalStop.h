@@ -4,6 +4,7 @@
 #include <string>
 
 #include "Drawable.h"
+#include "15_env/Point.h"
 
 
 namespace synthese
@@ -33,16 +34,16 @@ public:
 private:
 
     const std::string _name;
-    
-    
-	
+    const synthese::env::Point _point;
+
 protected:
+
+public:
 
     DrawablePhysicalStop (const synthese::env::PhysicalStop* physicalStop);
     ~DrawablePhysicalStop ();
 	
-public:
-	
+
     void preDraw (Map& map, PostscriptCanvas& canvas) const;
     
     void draw (Map& map, PostscriptCanvas& canvas) const;

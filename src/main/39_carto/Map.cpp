@@ -3,6 +3,7 @@
 #include "Geometry.h"
 #include "DrawableLineComparator.h"
 #include "DrawableLine.h"
+#include "DrawablePhysicalStop.h"
 
 #include "MapBackground.h"
 #include "MapBackgroundManager.h"
@@ -139,6 +140,11 @@ Map::~Map()
 	delete (*it);
     }
 
+    for (std::set<DrawablePhysicalStop*>::const_iterator it = 
+        _selectedPhysicalStops.begin (); ++it)
+    {
+	delete (*it);
+    }
 
 }
 
@@ -590,8 +596,78 @@ Map::dumpLines (PostscriptCanvas& canvas)
 void 
 Map::dumpPhysicalStops (PostscriptCanvas& canvas)
 {
+    std::set<const PhysicalStop*> iteratedStops;
+
+    // Create drawable physical stops (for each physical stop right now)
+    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
+         it != _selectedLines.end () ; ++it) 
+    {
+	    const DrawableLine* dbl = *it;
+	    const std::vector<const Point*>& points = dbl->getPoints ();
+	    for (int i=0; i<points.size (); ++i)
+	    {
+	        const Point* p = points[i];
+
+	        const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (p);
+	        if (physicalStop)
+	        {
+                if (iteratedStops.find (physicalStop) == iteratedStops.end ())
+                {
+                    // Guarantees a physical stop is added only once as a 
+                    // DrawablePhysicalStop.
+                    iteratedStops.insert (physicalStop);
+                    _selectedPhysicalStops.insert (new DrawablePhysicalStop (physicalStop));
+                }
+            }
+        }
+    }
+
+
     canvas.setfont("Helvetica", 8);
     canvas.setrgbcolor(0, 0, 0);
+
+    for (std::set<DrawablePhysicalStop*>::const_iterator it = 
+        _selectedPhysicalStops.begin ();
+         it != _selectedPhysicalStops.end () ; ++it) 
+    {
+        const DrawablePhysicalStop* dps = *it;
+        dps->preDraw (*this, canvas);
+    }
+    for (std::set<DrawablePhysicalStop*>::const_iterator it = 
+        _selectedPhysicalStops.begin ();
+         it != _selectedPhysicalStops.end () ; ++it) 
+    {
+        const DrawablePhysicalStop* dps = *it;
+        dps->draw (*this, canvas);
+    }
+    for (std::set<DrawablePhysicalStop*>::const_iterator it = 
+        _selectedPhysicalStops.begin ();
+         it != _selectedPhysicalStops.end () ; ++it) 
+    {
+        const DrawablePhysicalStop* dps = *it;
+        dps->postDraw (*this, canvas);
+    }
+
+
+/*
+		// Get all the lines going through this points and find the
+		// extrema shifts
+		
+		// Select the right direction to write the text
+		// (from start or from end)
+		
+		// ...
+
+		// Write text
+		Point cp = toOutputFrame (*physicalStop);
+		canvas.moveto (cp.getX (), cp.getY ());
+        canvas.sticker (physicalStop->getName (), 
+                        synthese::util::RGBColor ("yellow"),
+                        10, 10);
+	    }
+	}	    
+    
+
 
     // At this stage lines have all been shifted.
     // Calculate locations for drawing physical stops labels now
@@ -627,7 +703,7 @@ Map::dumpPhysicalStops (PostscriptCanvas& canvas)
 	// dbl->preDraw (*this, canvas);  
     }    
 
-
+*/
 }
 
 

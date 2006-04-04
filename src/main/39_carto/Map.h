@@ -26,6 +26,7 @@ namespace carto
 {
 
     class DrawableLine;
+    class DrawablePhysicalStop;
     class MapBackgroundManager;
     class PostscriptCanvas;
 
@@ -43,6 +44,8 @@ private:
     const MapBackgroundManager* _backgroundManager;
     
     std::set<DrawableLine*> _selectedLines;
+    std::set<DrawablePhysicalStop*> _selectedPhysicalStops;
+
     DrawableLineIndex _indexedLines;  //!< Drawable lines indexed by point.
     
     std::vector<DrawableLine*>

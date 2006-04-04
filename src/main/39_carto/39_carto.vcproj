@@ -82,6 +82,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DrawablePhysicalStop.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Geometry.cpp"
 				>
 			</File>
@@ -137,6 +141,10 @@
 			</File>
 			<File
 				RelativePath=".\DrawableLineIndex.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DrawablePhysicalStop.h"
 				>
 			</File>
 			<File
