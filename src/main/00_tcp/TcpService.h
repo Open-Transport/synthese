@@ -5,7 +5,6 @@
 
 #include "module.h"
 
-#include "Socket.h"
 #include "SocketException.h"
 #include "TcpServerSocket.h"
 
@@ -16,6 +15,8 @@ namespace synthese
 {
 namespace tcp
 {
+    class Socket;
+
 
 /** TCP Service.
 

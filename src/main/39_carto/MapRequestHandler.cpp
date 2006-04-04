@@ -11,6 +11,9 @@
 #include "01_util/XmlParser.h"
 #include "01_util/Conversion.h"
 
+#include "70_server/Server.h"
+#include "70_server/Request.h"
+
 #include "15_env/Environment.h"
 #include "16_env_ls_xml/EnvironmentLS.h"
 
@@ -18,8 +21,6 @@
 #include "39_carto/PostscriptCanvas.h"
 #include "40_carto_ls_xml/MapLS.h"
 
-#include "70_server/Server.h"
-#include "70_server/Request.h"
 
 #include <boost/filesystem/operations.hpp>
 
