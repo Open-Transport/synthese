@@ -102,7 +102,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\maprequesthandler.cpp"
+				RelativePath=".\MapRequestHandler.cpp"
 				>
 			</File>
 			<File

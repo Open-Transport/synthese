@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <boost/program_options.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
 
 using synthese::util::Log;
 using synthese::util::Conversion;
@@ -48,10 +50,15 @@ int main( int argc, char **argv )
 	return 1;
     }
 
+    const boost::filesystem::path& workingDir = boost::filesystem::initial_path();
+    Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
+
+
     // Configure default log (default output is cout).
     synthese::util::Log::GetInstance ().setLevel (
 	(synthese::util::Log::Level) loglevel);
     
+    Log::GetInstance ().info ("Param datadir  = " + datadir);
     Log::GetInstance ().info ("");
     Log::GetInstance ().info ("Param datadir  = " + datadir);
     Log::GetInstance ().info ("Param tempdir  = " + tempdir);

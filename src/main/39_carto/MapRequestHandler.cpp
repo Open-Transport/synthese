@@ -21,7 +21,7 @@
 #include "39_carto/PostscriptCanvas.h"
 #include "40_carto_ls_xml/MapLS.h"
 
-
+#include "01_util/Log.h"
 #include <boost/filesystem/operations.hpp>
 
 
@@ -29,6 +29,8 @@
 using synthese::env::Environment;
 using synthese::carto::Map;
 using synthese::util::Conversion;
+using synthese::util::Log;
+
 
 
 namespace synthese
@@ -36,6 +38,11 @@ namespace synthese
 namespace carto
 {
 
+#ifdef WIN32
+const std::string MapRequestHandler::GHOSTSCRIPT_BIN ("gswin32");
+#else
+const std::string MapRequestHandler::GHOSTSCRIPT_BIN ("gs");
+#endif
 
 const std::string MapRequestHandler::FUNCTION_CODE ("map");
 
@@ -94,10 +101,12 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 
     // Convert the ps file to png with ghostscript
     std::stringstream gscmd;
-    gscmd << "gs -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -g" 
+    gscmd << GHOSTSCRIPT_BIN << " -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -g" 
 	  << map->getWidth () << "x" << map->getHeight () 
 	  << " -sOutputFile=" << tempPngFile.string () << " " << tempPsFile.string ();
     
+    Log::GetInstance ().debug (gscmd.str ());
+
     int ret = system (gscmd.str ().c_str ());
     
     if (ret != 0)
