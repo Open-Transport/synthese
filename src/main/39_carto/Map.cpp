@@ -21,6 +21,14 @@
 #include "15_env/Point.h"
 #include "15_env/PhysicalStop.h"
 
+
+#include "01_util/Log.h"
+#include "01_util/Conversion.h"
+
+using synthese::util::Log;
+using synthese::util::Conversion;
+
+
 using synthese::env::Point;
 using synthese::env::PhysicalStop;
 using namespace std;
@@ -508,7 +516,11 @@ Map::dumpBackground (PostscriptCanvas& canvas)
     if (hasBackgroundManager ()) 
     {
         const MapBackground* mbg = _backgroundManager->getBestScalingBackground (_mapScaleX, _mapScaleY);
-        if (mbg != 0) {
+        if (mbg != 0) 
+	{
+	    Log::GetInstance ().debug ("Best scaling background scaleX=" + 
+				       Conversion::ToString (mbg->getScaleX ()) + " scaleY=" + 
+				       Conversion::ToString (mbg->getScaleY ()));
             // Draw background
             std::pair<int,int>  tlIndexes = mbg->getIndexesOfTileContaining (_realFrame.getX(), _realFrame.getY ());
             std::pair<int,int>  brIndexes = mbg->getIndexesOfTileContaining (
@@ -518,9 +530,15 @@ Map::dumpBackground (PostscriptCanvas& canvas)
 	    // TODO : additional checks in case indexes are negative/out of frame.
 
             int nbtiles = 0;
-            for (int i=tlIndexes.first; i<=brIndexes.first; ++i) {
-                for (int j=tlIndexes.second; j<=brIndexes.second; ++j) {
+
+            for (int i=tlIndexes.first; i<=brIndexes.first; ++i) 
+	    {
+                for (int j=tlIndexes.second; j<=brIndexes.second; ++j) 
+		{
                     const MapBackgroundTile* tile = mbg->getTile (i, j);
+		    Log::GetInstance ().debug ("Dumping background tile [" + Conversion::ToString (i) + 
+			"," + Conversion::ToString (j) + "]");
+
                     if (tile != 0) { // Any background available for this tile ?
                         // cout << "Drawing tile " << i << "," << j <<  "  "<< tile->getPath ().string () << endl;
                         ++nbtiles;

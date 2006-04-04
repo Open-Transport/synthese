@@ -74,6 +74,14 @@ Conversion::ToString (unsigned long l)
 }
 
 
+std::string 
+Conversion::ToString (double d)
+{
+    std::stringstream ss;
+    ss << d;
+    return ss.str ();
+}
+
 
 
 

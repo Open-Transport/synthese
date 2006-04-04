@@ -116,8 +116,9 @@ MapBackgroundTile::draw (Map& map, PostscriptCanvas& canvas) const
     char buf[4096];
     while (ifs) {
         ifs.getline (buf, 4096);
-        os << buf << endl;
+        os << buf ;
     }
+    os << endl;
     
     os << "end grestore" << endl;
     
