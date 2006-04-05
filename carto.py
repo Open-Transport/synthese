@@ -22,7 +22,7 @@ f=open('./map.xml', 'r')
 maptxt=f.read ();
 maptxt= maptxt.replace ("\n", "")
 
-request="fonction=map&env=" + envtxt + "&map=" + maptxt + "\n"
+request="fonction=map&mode=1&env=" + envtxt + "&map=" + maptxt + "\n"
 
 
 for i in range (1,2):	

@@ -30,15 +30,18 @@ namespace server
 Server* Server::_instance = 0;
 
 
-
 Server::Server (int port, 
 		int nbThreads,
 		const std::string& dataDir,
-		const std::string& tempDir)
+		const std::string& tempDir,
+        const std::string& httpTempDir, 
+        const std::string& httpTempUrl)
     : _port (port)
     , _nbThreads (nbThreads)
     , _dataDir (dataDir)
     , _tempDir (tempDir)
+    , _httpTempDir (httpTempDir)
+    , _httpTempUrl (httpTempUrl)
 {
 }
 
@@ -55,7 +58,7 @@ Server::GetInstance ()
 {
     if (_instance == 0)
     {
-	_instance = new Server ();
+	    throw new synthese::util::Exception ("Server instance has never been set!");
     }
     return _instance;
 }
@@ -178,6 +181,18 @@ Server::getTempDir () const
 }
 
 
+const boost::filesystem::path& 
+Server::getHttpTempDir () const
+{
+    return _httpTempDir;
+}
+
+
+const std::string& 
+Server::getHttpTempUrl () const
+{
+    return _httpTempUrl;
+}
 
     
 

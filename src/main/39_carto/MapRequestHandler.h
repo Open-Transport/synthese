@@ -31,11 +31,29 @@ namespace carto
 /** Map request handler.
 
 Generates a map given all the information to be drawn.
-The response sent through the socket has the following format
 
-|{PNGFILESIZE}|:|{PNG FILE DATA}
+Two modes are available for requesting :
 
-@ingroup m70
+* Mode 1 : "Socket mode"
+  Request format : mode=1&env={XML_ENV}&map={XML_MAP}
+       where XML_ENV is the XML definition of the local
+       environment used for map generation; 
+       where XML_MAP is the XML definition of the map 
+       drawing parameters.
+  Response type : PNG file sent through socket
+  Response format : |{PNGFILESIZE}|:|{PNG FILE DATA}
+  
+* Mode 2 : "HTTP mode"
+  Request format : mode=2&env={XML_ENV}&map={XML_MAP}
+       where XML_ENV is the XML definition of the local
+       environment used for map generation; 
+       where XML_MAP is the XML definition of the map 
+       drawing parameters.
+  Response type : PNG file generated locally on server side.
+  Response format : |{PNG_URL}|
+       where PNG_URL is the url of the generated PNG file.
+  
+@ingroup m39
 */
 class MapRequestHandler : public synthese::server::RequestHandler
 {
@@ -44,8 +62,13 @@ class MapRequestHandler : public synthese::server::RequestHandler
     static const std::string GHOSTSCRIPT_BIN;
 
     static const std::string FUNCTION_CODE;
+
+    static const std::string MODE_PARAMETER;
     static const std::string ENVIRONMENT_PARAMETER;
     static const std::string MAP_PARAMETER;
+
+    static const int REQUEST_MODE_SOCKET;
+    static const int REQUEST_MODE_HTTP;
 
  private:
 

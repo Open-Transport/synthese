@@ -46,16 +46,20 @@ class Server
     int _nbThreads;
     boost::filesystem::path _dataDir;
     boost::filesystem::path _tempDir;
+    boost::filesystem::path _httpTempDir;
+    std::string _httpTempUrl;
 
  protected:
 
 
  public:
 
-    Server (int port = 3591, 
-	    int nbThreads = 10,
-	    const std::string& dataDir = ".",
-	    const std::string& tempDir = ".");
+    Server (int port, 
+	    int nbThreads,
+	    const std::string& dataDir,
+	    const std::string& tempDir,
+        const std::string& httpTempDir, 
+        const std::string& httpTempUrl);
 
     ~Server ();
 
@@ -66,6 +70,8 @@ class Server
     int getNbThreads () const;
     const boost::filesystem::path& getDataDir () const;
     const boost::filesystem::path& getTempDir () const;
+    const boost::filesystem::path& getHttpTempDir () const;
+    const std::string& getHttpTempUrl () const;
 
     static Server* GetInstance ();
     static void SetInstance (Server* instance);
