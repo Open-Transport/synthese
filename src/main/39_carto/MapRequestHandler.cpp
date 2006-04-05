@@ -119,23 +119,28 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     long size = boost::filesystem::file_size (tempPngFile);
     
     // ...and send the content of the file through the socket.
-    std::ifstream ifpng (tempPngFile.string ().c_str ());
-    char ch;
+    std::ifstream ifpng (tempPngFile.string ().c_str (), std::ifstream::binary);
     long nbChars = 0;
 
     stream << size << ":";
-    for (int i=0; i<size; ++i)
-    {
-	ifpng.get(ch);
-	stream << ch;
-	++nbChars;
-    }
-    ifpng.close ();
-    
-    stream << std::flush;
 
-    // std::cout << "Sent << " << nbChars << std::endl;
-    // assert (nbChars == size);
+  char * buffer;
+
+  buffer = new char [size];
+
+  // read content of infile
+  ifpng.read (buffer,size);
+
+  // write to outfile
+  stream.write (buffer,size);
+  
+  // release dynamically-allocated memory
+  delete[] buffer;
+
+  ifpng.close();
+
+    stream << std::flush;
+    Log::GetInstance ().debug ("Sent PNG result (" + Conversion::ToString (size) + " bytes)");
 
     // boost::filesystem::remove (tempPngFile);
 
