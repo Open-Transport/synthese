@@ -698,7 +698,7 @@ DrawableLine::draw (Map& map, PostscriptCanvas& canvas) const
     // For debug : draw unshifted points as circles
     // For debug : draw unshifted points as circles
     // For debug : draw unshifted points as circles
-    std::vector<Point> points;
+/*    std::vector<Point> points;
     
     // Convert coordinates to output frame
     for (unsigned int i=0; i<_points.size(); ++i) 
@@ -715,7 +715,7 @@ DrawableLine::draw (Map& map, PostscriptCanvas& canvas) const
 	canvas.square (3.0);
 	canvas.stroke ();
     } 
-    
+    */
 }
 
 

@@ -62,6 +62,7 @@ Request::truncateRequestStringIfNeeded (const std::string& requestString) const
     // Why do we need to filter '+' characters ?
     boost::algorithm::replace_all (s, "+", " ");
 
+    /*
     if (s.size () > MAX_REQUEST_SIZE) {
 	bool parameterTruncated = (s.substr (MAX_REQUEST_SIZE, 1) != PARAMETER_SEPARATOR);
 	s = s.substr (0, MAX_REQUEST_SIZE);
@@ -72,6 +73,7 @@ Request::truncateRequestStringIfNeeded (const std::string& requestString) const
 	    s = s.substr (0, s.rfind (PARAMETER_SEPARATOR));
 	}
     }
+    */
     return s;
 }
 
@@ -141,6 +143,7 @@ Request::getParameter (const std::string& name) const
     }
     else
     {
+        // TODO throw an exception here !!!
 	return std::string ("");
     }
 }
