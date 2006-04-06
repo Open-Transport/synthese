@@ -41,6 +41,7 @@ public:
     const MapBackground* getBestScalingBackground (double mapScaleX, 
                                                    double mapScaleY) const;
 
+    static void Initialize ();
 
     static const MapBackgroundManager* GetMapBackgroundManager (const std::string& id);
 

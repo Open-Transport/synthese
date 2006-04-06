@@ -90,20 +90,36 @@ MapBackgroundManager::getBestScalingBackground (double mapScaleX,
 
 
 
+void 
+MapBackgroundManager::Initialize ()
+{
+	// Create all managers
+	boost::filesystem::path backgroundDir (_backgroundsDir);
+    fs::directory_iterator end_iter;
+   for ( fs::directory_iterator dir_itr( _backgroundsDir );
+          dir_itr != end_iter;
+          ++dir_itr )
+    {
+        std::string dirpath = dir_itr->leaf();
+
+    	MapBackgroundManager* manager = new MapBackgroundManager (_backgroundsDir / dirpath);
+	    _managers.insert (std::make_pair (dirpath, manager));
+    }
+    
+}
+
+
+
+
+
 const MapBackgroundManager*
 MapBackgroundManager::GetMapBackgroundManager (const std::string& id)
 {
     if (_managers.find (id) == _managers.end ())
     {
-	// Create new manager
-	boost::filesystem::path backgroundDir (_backgroundsDir / id);
-	if (boost::filesystem::exists (backgroundDir) == false)
-	{
-	    throw synthese::util::Exception ("Missing background directory " + backgroundDir.string ());
-	}
-	MapBackgroundManager* manager = new MapBackgroundManager (backgroundDir);
-	_managers.insert (std::make_pair (id, manager));
+        throw synthese::util::Exception ("Missing background directory " + id);
     }
+
     return _managers.find (id)->second;
 }
 

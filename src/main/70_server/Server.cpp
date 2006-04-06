@@ -92,6 +92,7 @@ Server::initialize ()
     
     // Initialize map background manager
     synthese::carto::MapBackgroundManager::SetBackgroundsDir (_dataDir / "backgrounds");
+    synthese::carto::MapBackgroundManager::Initialize ();
 
     synthese::server::RequestDispatcher::getInstance ()->
 	registerHandler (new synthese::carto::MapRequestHandler ());
