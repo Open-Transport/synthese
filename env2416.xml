@@ -1,0 +1,85 @@
+<environment id="0">
+
+ <cities>
+
+   <city id="1" name="Toulouse"/>
+
+ </cities>
+
+ <axes>
+   <axis id="a1" free="true" authorized="false"/>  
+ </axes>
+
+
+ <logicalStops>
+   <logicalStop id="1" name="bidon" cityId="1"/>
+ </logicalStops>
+
+
+  <physicalStops>
+    <physicalStop id="1" x="524832" y="1846719" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="2" x="525024" y="1846471" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="3" x="525213" y="1846217" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="4" x="525377" y="1846002" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="5" x="525467" y="1845874" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="6" x="525944" y="1845731" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="7" x="526252" y="1845569" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="8" x="526772" y="1845419" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="9" x="526908" y="1845660" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="10" x="527162" y="1845815" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="11" x="527460" y="1845910" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="12" x="527815" y="1845779" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="13" x="527961" y="1845458" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="14" x="527957" y="1845141" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="15" x="528036" y="1844685" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="16" x="528283" y="1844689" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="17" x="528729" y="1844525" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="18" x="528867" y="1844633" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="19" x="529011" y="1844806" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="20" x="529487" y="1844676" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="21" x="529734" y="1844676" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="22" x="529734" y="1844685" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="23" x="530028" y="1844694" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="24" x="530263" y="1844703" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="25" x="530571" y="1844596" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="26" x="530866" y="1844304" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="27" x="531038" y="1844249" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+
+  </physicalStops>
+
+  <lines>
+   <line id="l1" axisId="a1" firstYear="2006" lastYear="2007" color="cyan">
+     <lineStop id="1" metricOffset="100" type="passage" physicalStopId="1" scheduleInput="true"></lineStop>
+     <lineStop id="2" metricOffset="100" type="passage" physicalStopId="2" scheduleInput="true"></lineStop>
+     <lineStop id="3" metricOffset="100" type="passage" physicalStopId="3" scheduleInput="true"></lineStop>
+     <lineStop id="4" metricOffset="100" type="passage" physicalStopId="4" scheduleInput="true"></lineStop>
+     <lineStop id="5" metricOffset="100" type="passage" physicalStopId="5" scheduleInput="true"></lineStop>
+     <lineStop id="6" metricOffset="100" type="passage" physicalStopId="6" scheduleInput="true"></lineStop>
+     <lineStop id="7" metricOffset="100" type="passage" physicalStopId="7" scheduleInput="true"></lineStop>
+     <lineStop id="8" metricOffset="100" type="passage" physicalStopId="8" scheduleInput="true"></lineStop>
+     <lineStop id="9" metricOffset="100" type="passage" physicalStopId="9" scheduleInput="true"></lineStop>
+     <lineStop id="10" metricOffset="100" type="passage" physicalStopId="10" scheduleInput="true"></lineStop>
+     <lineStop id="11" metricOffset="100" type="passage" physicalStopId="11" scheduleInput="true"></lineStop>
+     <lineStop id="12" metricOffset="100" type="passage" physicalStopId="12" scheduleInput="true"></lineStop>
+     <lineStop id="13" metricOffset="100" type="passage" physicalStopId="13" scheduleInput="true"></lineStop>
+     <lineStop id="14" metricOffset="100" type="passage" physicalStopId="14" scheduleInput="true"></lineStop>
+     <lineStop id="15" metricOffset="100" type="passage" physicalStopId="15" scheduleInput="true"></lineStop>
+     <lineStop id="16" metricOffset="100" type="passage" physicalStopId="16" scheduleInput="true"></lineStop>
+     <lineStop id="17" metricOffset="100" type="passage" physicalStopId="17" scheduleInput="true"></lineStop>
+     <lineStop id="18" metricOffset="100" type="passage" physicalStopId="18" scheduleInput="true"></lineStop>
+     <lineStop id="19" metricOffset="100" type="passage" physicalStopId="19" scheduleInput="true"></lineStop>
+     <lineStop id="20" metricOffset="100" type="passage" physicalStopId="20" scheduleInput="true"></lineStop>
+     <lineStop id="21" metricOffset="100" type="passage" physicalStopId="21" scheduleInput="true"></lineStop>
+     <lineStop id="22" metricOffset="100" type="passage" physicalStopId="22" scheduleInput="true"></lineStop>
+     <lineStop id="23" metricOffset="100" type="passage" physicalStopId="23" scheduleInput="true"></lineStop>
+     <lineStop id="24" metricOffset="100" type="passage" physicalStopId="24" scheduleInput="true"></lineStop>
+     <lineStop id="25" metricOffset="100" type="passage" physicalStopId="25" scheduleInput="true"></lineStop>
+     <lineStop id="26" metricOffset="100" type="passage" physicalStopId="26" scheduleInput="true"></lineStop>
+     <lineStop id="27" metricOffset="100" type="passage" physicalStopId="27" scheduleInput="true"></lineStop>
+  </line>
+
+
+ </lines>
+
+</environment>
+
