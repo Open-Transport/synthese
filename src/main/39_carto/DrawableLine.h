@@ -45,6 +45,7 @@ private:
     const std::vector<const synthese::env::Point*> _points;  //!< Reference line points
     const std::string _shortName;
     const synthese::util::RGBColor _color;
+    const bool _withPhysicalStops;
 
     std::vector<int> _shifts;
     std::vector<bool> _shifted;
@@ -55,17 +56,21 @@ public:
     
     DrawableLine (const synthese::env::Line* line,
 		  int fromLineStopIndex,
-		  int toLineStopIndex);
+		  int toLineStopIndex,
+          bool withPhysicalStops);
+
 
     DrawableLine (const std::vector<const synthese::env::Point*>& points,
 		  const std::string& shortName,
-		  const synthese::util::RGBColor& color);
+		  const synthese::util::RGBColor& color,
+          bool withPhysicalStops);
 
     ~DrawableLine();
 
     //! @name Getters/Setters
     //@{
     const std::string& getShortName () const;
+    bool getWithPhysicalStops () const;
 
     const std::vector<const synthese::env::Point*>& 
 	getPoints () const;

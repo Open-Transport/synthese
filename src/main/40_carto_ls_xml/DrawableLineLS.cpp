@@ -23,6 +23,7 @@ const std::string DrawableLineLS::DRAWABLELINE_TAG ("drawableLine");
 const std::string DrawableLineLS::DRAWABLELINE_LINEID_ATTR ("lineId");
 const std::string DrawableLineLS::DRAWABLELINE_FROMLINESTOPINDEX_ATTR ("fromLineStopId");
 const std::string DrawableLineLS::DRAWABLELINE_TOLINESTOPINDEX_ATTR ("toLineStopId");
+const std::string DrawableLineLS::DRAWABLELINE_WITHPHYSICALSTOPS_ATTR ("withPhysicalStops");
 
 
 
@@ -53,10 +54,17 @@ DrawableLineLS::Load (XMLNode& node,
 	toLineStopIndex = su::Conversion::ToInt (
 	    node.getAttribute (DRAWABLELINE_TOLINESTOPINDEX_ATTR.c_str()));
     }
+    bool withPhysicalStops = false;
+    if (node.getAttribute (DRAWABLELINE_WITHPHYSICALSTOPS_ATTR.c_str()) != 0)
+    {
+	withPhysicalStops = su::Conversion::ToBool (
+	    node.getAttribute (DRAWABLELINE_WITHPHYSICALSTOPS_ATTR.c_str()));
+    }
 
     return new synthese::carto::DrawableLine (line, 
 					      fromLineStopIndex, 
-					      toLineStopIndex);
+					      toLineStopIndex,
+                          withPhysicalStops);
 }
 
 

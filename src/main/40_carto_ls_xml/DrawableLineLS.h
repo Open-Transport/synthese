@@ -43,6 +43,7 @@ class DrawableLineLS
     static const std::string DRAWABLELINE_LINEID_ATTR;
     static const std::string DRAWABLELINE_FROMLINESTOPINDEX_ATTR;
     static const std::string DRAWABLELINE_TOLINESTOPINDEX_ATTR;
+    static const std::string DRAWABLELINE_WITHPHYSICALSTOPS_ATTR;
 
  private:
 

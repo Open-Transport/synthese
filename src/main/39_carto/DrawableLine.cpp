@@ -40,10 +40,12 @@ const int   DrawableLine::BORDER_WIDTH = LINE_WIDTH+2;
 
 DrawableLine::DrawableLine (const Line* line,
 			    int fromLineStopIndex,
-			    int toLineStopIndex)
+			    int toLineStopIndex,
+                bool withPhysicalStops)
     : _points (line->getPoints (fromLineStopIndex, toLineStopIndex))
     , _shortName (line->getId ())
     , _color (line->getColor ())
+    , _withPhysicalStops (withPhysicalStops)
 {
 
 //    std::cout << "*** POINTs for line " << line->getId () << std::endl;
@@ -64,10 +66,12 @@ DrawableLine::DrawableLine (const Line* line,
     
 DrawableLine::DrawableLine (const std::vector<const synthese::env::Point*>& points,
 			    const std::string& shortName,
-			    const synthese::util::RGBColor& color)
+			    const synthese::util::RGBColor& color,
+                bool withPhysicalStops)
     : _points (points)
     , _shortName (shortName)
     , _color (color)
+    , _withPhysicalStops (withPhysicalStops)
 {
     for (unsigned int i=0; i<_points.size (); ++i) {
         // Shift initially to 0; 
@@ -722,6 +726,12 @@ DrawableLine::getShortName () const
     return _shortName;
 }
 
+
+bool 
+DrawableLine::getWithPhysicalStops () const
+{
+    return _withPhysicalStops;
+}
 
 
 

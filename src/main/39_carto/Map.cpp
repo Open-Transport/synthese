@@ -642,6 +642,8 @@ Map::dumpPhysicalStops (PostscriptCanvas& canvas)
          it != _selectedLines.end () ; ++it) 
     {
 	    const DrawableLine* dbl = *it;
+        if (dbl->getWithPhysicalStops () == false) continue;
+
 	    const std::vector<const Point*>& points = dbl->getPoints ();
 	    for (int i=0; i<points.size (); ++i)
 	    {
