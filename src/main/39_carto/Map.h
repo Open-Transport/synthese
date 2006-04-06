@@ -38,6 +38,9 @@ private:
     double _width;	
     double _height;	
     
+    int _horizontalMargin;
+    int _verticalMargin;
+
     double _mapScaleX;
     double _mapScaleY;
     
@@ -113,9 +116,21 @@ public:
     synthese::env::Point toRealFrame (const synthese::env::Point& p);
     synthese::env::Point toOutputFrame (const synthese::env::Point& p);
 	
+    //! @name Getters/Setters
+    //@{
+
     double getWidth () const;
     double getHeight () const;
-    
+
+    int getHorizontalMargin () const;
+    void setHorizontalMargin (int horizintalMargin);
+
+    int getVerticalMargin () const;
+    void setVerticalMargin (int verticalMargin);
+
+    //@}
+
+
     void dump (PostscriptCanvas& canvas);
 };
 

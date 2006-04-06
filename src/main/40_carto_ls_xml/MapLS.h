@@ -33,6 +33,7 @@ Sample XML format :
      lowerLeftLatitude="526408" lowerLeftLongitude="1840480"
      upperRightLatitude="526908" upperRightLongitude="1840980"
      outputWidth="800" outputHeight="800"
+     outputHorizontalMargin="100" outputVerticalMargin="20"
      backgroundId="TLSE">
 
   <drawableLine lineId="L1" fromLineStopId="5" toLineStopId="10"/>
@@ -57,6 +58,8 @@ class MapLS
     static const std::string MAP_UPPERRIGHTLONGITUDE_ATTR;
     static const std::string MAP_OUTPUTWIDTH_ATTR;
     static const std::string MAP_OUTPUTHEIGHT_ATTR;
+    static const std::string MAP_OUTPUTHORIZONTALMARGIN_ATTR;
+    static const std::string MAP_OUTPUTVERTICALMARGIN_ATTR;
     static const std::string MAP_BACKGROUNDID_ATTR;
 
  private:

@@ -34,6 +34,9 @@ const std::string MapLS::MAP_UPPERRIGHTLATITUDE_ATTR ("upperRightLatitude");
 const std::string MapLS::MAP_UPPERRIGHTLONGITUDE_ATTR ("upperRightLongitude");
 const std::string MapLS::MAP_OUTPUTWIDTH_ATTR ("outputWidth");
 const std::string MapLS::MAP_OUTPUTHEIGHT_ATTR ("outputHeight");
+const std::string MapLS::MAP_OUTPUTHORIZONTALMARGIN_ATTR ("outputHorizontalMargin");
+const std::string MapLS::MAP_OUTPUTVERTICALMARGIN_ATTR ("outputVerticalMargin");
+
 const std::string MapLS::MAP_BACKGROUNDID_ATTR ("backgroundId");
 
 
@@ -75,6 +78,7 @@ MapLS::Load (XMLNode& node,
 	}
     }
 
+    synthese::carto::Map* map = 0;
 
     // If one of the 4 coordinates is missing, let the autofit 
     // feature process the right rectangle
@@ -83,7 +87,7 @@ MapLS::Load (XMLNode& node,
 	 (node.getAttribute (MAP_UPPERRIGHTLATITUDE_ATTR.c_str()) == 0) ||
 	 (node.getAttribute (MAP_UPPERRIGHTLONGITUDE_ATTR.c_str()) == 0) )
     {
-	return new synthese::carto::Map (selectedLines,
+	map = new synthese::carto::Map (selectedLines,
 					 outputWidth, 
 					 outputHeight, 
 					 mbm); 
@@ -101,7 +105,8 @@ MapLS::Load (XMLNode& node,
 	double upperRightLongitude (su::Conversion::ToDouble (
 					node.getAttribute (MAP_UPPERRIGHTLONGITUDE_ATTR.c_str())));
 
-	return new synthese::carto::Map (selectedLines,
+
+	 map = new synthese::carto::Map (selectedLines,
 					 synthese::carto::Rectangle (lowerLeftLatitude,
 								     lowerLeftLongitude,
 								     upperRightLatitude - lowerLeftLatitude,
@@ -109,7 +114,24 @@ MapLS::Load (XMLNode& node,
 					 outputWidth, 
 					 outputHeight, 
 					 mbm); 
+
+
     }
+
+    if (node.getAttribute (MAP_OUTPUTHORIZONTALMARGIN_ATTR.c_str()) != 0)
+    {
+	    int outputHorizontalMargin = su::Conversion::ToInt (
+            (node.getAttribute (MAP_OUTPUTHORIZONTALMARGIN_ATTR.c_str())));
+        map->setHorizontalMargin (outputHorizontalMargin);
+    }
+    if (node.getAttribute (MAP_OUTPUTVERTICALMARGIN_ATTR.c_str()) != 0)
+    {
+	    int outputVerticalMargin = su::Conversion::ToInt (
+            (node.getAttribute (MAP_OUTPUTVERTICALMARGIN_ATTR.c_str())));
+        map->setVerticalMargin (outputVerticalMargin);
+    }
+
+    return map;
 }
 
 

@@ -55,6 +55,9 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _mapScaleX (_width / _realFrame.getWidth ())
 , _mapScaleY (_height / _realFrame.getHeight ())
 , _backgroundManager (backgroundManager)
+, _horizontalMargin (0)
+, _verticalMargin (0)
+
 {
     populateLineIndex ();
 
@@ -74,6 +77,8 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _mapScaleX (_width / _realFrame.getWidth ())
 , _mapScaleY (_height / _realFrame.getHeight ())
 , _backgroundManager (backgroundManager)
+, _horizontalMargin (0)
+, _verticalMargin (0)
 {
     populateLineIndex ();
 
@@ -163,13 +168,46 @@ Map::toRealFrame (const Point& p)
 Point 
 Map::toOutputFrame (const Point& p)
 {
+    double widthWithoutMargin = _width - _horizontalMargin;
+    double heightWithoutMargin = _height - _verticalMargin;
+
     return Point (
-	((p.getX() - _realFrame.getX()) / _realFrame.getWidth ()) * _width,
-	((p.getY() - _realFrame.getY()) / _realFrame.getHeight()) * _height
+	((p.getX() - _realFrame.getX()) / _realFrame.getWidth ()) * widthWithoutMargin 
+            + _horizontalMargin / 2,
+	((p.getY() - _realFrame.getY()) / _realFrame.getHeight()) * heightWithoutMargin 
+            + _verticalMargin / 2
 	);
 }
 
 
+int 
+Map::getHorizontalMargin () const
+{
+    return _horizontalMargin;
+}
+
+
+void 
+Map::setHorizontalMargin (int horizintalMargin)
+{
+    _horizontalMargin = horizintalMargin;
+}
+
+
+
+int 
+Map::getVerticalMargin () const
+{
+    return _verticalMargin;
+}
+
+
+
+void 
+Map::setVerticalMargin (int verticalMargin)
+{
+    _verticalMargin = verticalMargin;
+}
 
 
 
