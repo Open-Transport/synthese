@@ -7,6 +7,9 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/date_time/microsec_time_clock.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "01_util/XmlParser.h"
 #include "01_util/Conversion.h"
@@ -23,8 +26,6 @@
 #include "40_carto_ls_xml/MapLS.h"
 
 #include "01_util/Log.h"
-#include <boost/filesystem/operations.hpp>
-
 
 
 using synthese::env::Environment;
@@ -32,7 +33,7 @@ using synthese::carto::Map;
 using synthese::util::Conversion;
 using synthese::util::Log;
 using synthese::server::Server;
-
+using namespace boost::posix_time;
 
 
 namespace synthese
@@ -102,9 +103,11 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
             ? Server::GetInstance ()->getTempDir ()
             : Server::GetInstance ()->getHttpTempDir ();
 
-    // The request memory adress is taken as unique id for map tmp file.
+    // Generate an id for the map file based on current time
+    ptime timems = boost::date_time::microsec_clock<ptime>::local_time ();
+
     const boost::filesystem::path tempPsFile (tempDir / ("map_" + Conversion::ToString ((unsigned long) &request) + ".ps"));
-    const std::string tempPngFilename = "map_" + Conversion::ToString ((unsigned long) &request) + ".png";
+    const std::string tempPngFilename = "map_" + to_iso_string (timems) + ".png";
     const boost::filesystem::path tempPngFile (tempDir / tempPngFilename);
 
     // Create the postscript canvas for output

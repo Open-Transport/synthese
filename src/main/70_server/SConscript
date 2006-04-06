@@ -21,6 +21,7 @@ moduleenv.AddBoostDependency ('boost_filesystem')
 moduleenv.AddBoostDependency ('boost_thread')
 moduleenv.AddBoostDependency ('boost_iostreams')
 moduleenv.AddBoostDependency ('boost_program_options')
+moduleenv.AddBoostDependency ('boost_date_time')
 moduleenv.AppendMultithreadConf ();
 
 
