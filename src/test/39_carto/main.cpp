@@ -7,11 +7,13 @@
 #include <cppunit/CompilerOutputter.h>
 
 #include "DrawableLineComparatorTest.h"
+#include "MapTest.h"
 #include "TileGridTest.h"
 
 
 
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::carto::DrawableLineComparatorTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::carto::MapTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::carto::TileGridTest);
 
 
