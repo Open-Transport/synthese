@@ -57,13 +57,13 @@ public:
     DrawableLine (const synthese::env::Line* line,
 		  int fromLineStopIndex,
 		  int toLineStopIndex,
-          bool withPhysicalStops);
+		  bool withPhysicalStops = true);
 
 
     DrawableLine (const std::vector<const synthese::env::Point*>& points,
 		  const std::string& shortName,
 		  const synthese::util::RGBColor& color,
-          bool withPhysicalStops);
+		  bool withPhysicalStops = true);
 
     ~DrawableLine();
 

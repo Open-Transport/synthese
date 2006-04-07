@@ -9,7 +9,7 @@ testenv = env.Copy()
 # Add specific configuration for building test modules
 # ...
 
-testenv.Append ( LIBS = 'cppunit' )
+testenv.Append ( LIBS = 'cppunitd' )
 #testenv.Append ( LINKFLAGS= ['-ldl'] )
 
 Export ('testenv')
