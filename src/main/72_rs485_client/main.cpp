@@ -1,20 +1,7 @@
 
-#ifdef LINUX
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <signal.h>
-#endif
-#ifdef WIN32
-#include <winsock2.h>
-#include <Ws2tcpip.h>
-#include <io.h>
-#include <windows.h>
-#endif
+#include <00_tcp/TcpClientSocket.h>
 
+/*
 #include <time.h>
 #include <string.h>
 #include <stdio.h>
@@ -26,7 +13,7 @@
 #include <time.h>
 #include <fstream>
 #include <iostream>
-
+*/
 #include "module.h"
 
 #ifdef LINUX
@@ -146,6 +133,8 @@ int main(int argc, char* argv[])
             exit(-2);
         }
     }
+
+    TcpClientSocket synthese(argv[1], atoi(argv[2]));
     
     while(1)
     {
@@ -161,8 +150,8 @@ int main(int argc, char* argv[])
             {
                 try
                 {
-                    sock.open(argv[1],argv[2]);
-                    sock.read(buffer, sizeof(buffer), 2);
+                    synthese.tryToConnect ();
+                    synthese.read(buffer,sizeof(buffer));
                 }
                 catch (const char *err)
                 {
@@ -177,8 +166,8 @@ int main(int argc, char* argv[])
                 try
                 {
                     sprintf(buffer, "%s%s\n", QUERY_BASE, codes[client]);
-                    sock.write(buffer, strlen(buffer), 0);
-                    sock.read(buffer, sizeof(buffer), 2);
+                    synthese.write(buffer, strlen(buffer));
+                    synthese.read(buffer, sizeof(buffer));
                 }
                 catch (const char *err)
                 {
@@ -190,12 +179,10 @@ int main(int argc, char* argv[])
                 logfile << "Date: " << asctime(hms) << "Message: " << buffer << endl;
                 if(useRS485)
                 {
-                    for(char *bufptr = buffer; *bufptr; bufptr++)
-                        TransmitCommChar(hCom, *bufptr);
+                    for(char *bufptr = buffer; *bufptr; bufptr++) rs485.write(*bufptr);
                     logfile << "Refresh OK" << endl;
                 }
                 outdate[client] = hms->tm_min;
-                sock.close();
                 Sleep(100);
             } 
         }
