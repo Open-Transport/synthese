@@ -79,7 +79,7 @@ def DefineDefaultCCFlags (env):
 
 
     elif (platform=='win32'):
-        env.Append ( CCFLAGS = ['/EHsc', '/GS', '/W3', '/nologo', '/c', '/Wp64', '/TP'] )
+        env.Append ( CCFLAGS = ['/EHsc', '/GR', '/GS', '/W3', '/nologo', '/c', '/Wp64', '/TP'] )
 
         if (mode=='debug'):
             env.Append ( CCFLAGS = ['/Od', '/MDd', '/Gm', '/RTC1', '/ZI'] )
