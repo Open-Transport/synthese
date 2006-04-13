@@ -190,6 +190,8 @@ SConsEnvironment.AddBoostDependency=AddBoostDependency
 # -------------------------------------------------------
 # Command line arguments
 # -------------------------------------------------------
+#env = Environment(ENV = {'PATH' : os.environ['PATH']})
+#env = Environment(ENV = os.environ)
 env = Environment()
 
 mode = ARGUMENTS.get('mode', 'release').lower()  

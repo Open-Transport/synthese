@@ -1,5 +1,7 @@
 
-SET PATH=%PATH%;C:\Program Files\Python24
+echo %PATH%
+
+SET PATH=%PATH%;C:\Python24
 SET PATH=%PATH%;C:\Program Files\doxygen\bin
 SET PATH=%PATH%;C:\Program Files\Graphviz\Graphviz\bin
 SET PATH=%PATH%;C:\Program Files\texmf\miktex\bin

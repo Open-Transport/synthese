@@ -25,7 +25,8 @@ stops (those taken by default when no stop is explicitly chosen).
 
 @ingroup m15
 */
-class City : public Registrable<int, City>, public IncludingPlace
+class City : public Registrable<int, City>, 
+	         public IncludingPlace
 {
  private:
 
