@@ -419,5 +419,10 @@ PostscriptCanvas::sticker (const std::string& label,
 
 
 
+
+
+
+
+
 }
 }

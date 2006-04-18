@@ -25,7 +25,7 @@ class PostscriptCanvas;
 
 
 
-class DrawablePhysicalStop : public Drawable
+class DrawablePhysicalStop 
 {
 
 public:
@@ -43,12 +43,13 @@ public:
     DrawablePhysicalStop (const synthese::env::PhysicalStop* physicalStop);
     ~DrawablePhysicalStop ();
 	
+    //! @name Getters/Setters
+    //@{
+    const std::string& getName () const;
+    const synthese::env::Point& getPoint () const;
 
-    void preDraw (Map& map, PostscriptCanvas& canvas) const;
-    
-    void draw (Map& map, PostscriptCanvas& canvas) const;
-	
-    void postDraw (Map& map, PostscriptCanvas& canvas) const;
+    //@}
+
     
 };
 

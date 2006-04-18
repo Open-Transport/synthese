@@ -2,7 +2,6 @@
 
 #include "Geometry.h"
 #include "Map.h"
-#include "PostscriptCanvas.h"
 
 #include <cmath>
 #include <algorithm>
@@ -26,15 +25,6 @@ namespace carto
 {
 
 
-const DrawableLine::PointShiftingMode 
-DrawableLine::POINT_SHIFTING_MODE = DOUBLE;
-const bool   DrawableLine::ENABLE_CURVES = false;
-const double   DrawableLine::RADIUS = 15.0;
-const double   DrawableLine::RADIUS_DELTA = 10.0;
-const int   DrawableLine::LINE_WIDTH = 5;
-const double   DrawableLine::SPACING = LINE_WIDTH+1;
-const RGBColor DrawableLine::BORDER_COLOR ("black");
-const int   DrawableLine::BORDER_WIDTH = LINE_WIDTH+2;
 
 
 
@@ -102,6 +92,14 @@ const std::vector<const Point*>&
 DrawableLine::getPoints () const
 {
     return _points;
+}
+
+
+
+const std::vector<synthese::env::Point>&
+DrawableLine::getShiftedPoints () const
+{
+    return _shiftedPoints;
 }
 
 
@@ -387,7 +385,9 @@ DrawableLine::calculateDoubleShiftedPoint (const Point& a,
 
 
 const std::vector<Point>
-DrawableLine::calculateShiftedPoints (const std::vector<Point>& points) const
+DrawableLine::calculateShiftedPoints (const std::vector<Point>& points, 
+				      double spacing, 
+				      PointShiftingMode shiftMode) const
 {
     std::vector<Point> shiftedPoints;
     
@@ -395,7 +395,7 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point>& points) const
     shiftedPoints.push_back (
 	calculateSingleShiftedPoint (points[0], 
 				     points[1], 
-				     _shifts[0]*SPACING));
+				     _shifts[0]*spacing));
     
     
     // All triplets in between
@@ -423,7 +423,7 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point>& points) const
 	    }	
 	    if (!previouslyShifted)	{
                 
-                if (POINT_SHIFTING_MODE == DOUBLE) 
+                if (shiftMode == DOUBLE) 
 		{
                     
                     int shift0 = _shifts[i];
@@ -445,8 +445,8 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point>& points) const
 			outgoingDistance = shift2;
 		    }
 		    
-                    incomingDistance *= SPACING; 
-                    outgoingDistance *= SPACING;
+                    incomingDistance *= spacing; 
+                    outgoingDistance *= spacing;
                     
                     shiftedPoints.push_back ( 
                         calculateDoubleShiftedPoint (p_i, 
@@ -457,7 +457,7 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point>& points) const
                 } 
 		else 
 		{
-                    double distance =  _shifts[i+1] * SPACING;
+                    double distance =  _shifts[i+1] * spacing;
                     shiftedPoints.push_back ( 
                         calculateSingleShiftedPoint (
 			    p_i, 
@@ -494,7 +494,7 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point>& points) const
 	shiftedPoints.push_back(
 	    calculateSingleShiftedPoint (points[_points.size()-1], 
 					 points[_points.size()-2], 
-					 -_shifts[_points.size()-1]*SPACING));
+					 -_shifts[_points.size()-1]*spacing));
     }
     
     return shiftedPoints;	
@@ -505,116 +505,52 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point>& points) const
 
 
 
-
-void 
-DrawableLine::doDrawCurvedLine (PostscriptCanvas& canvas, 
-				const std::vector<Point>& shiftedPoints) const
+const std::vector<Point>
+DrawableLine::calculateAbsoluteShiftedPoints (const std::vector<Point>& points, 
+										 double spacing) const
 {
-    canvas.newpath();
-    canvas.moveto(shiftedPoints[0].getX()+5, shiftedPoints[0].getY()+10);
-    canvas.rotate (45.0);
-    canvas.text (_shortName);
-    canvas.rotate (-45.0);
-    canvas.moveto(shiftedPoints[0].getX(), shiftedPoints[0].getY());
+    std::vector<Point> shiftedPoints;
     
-    for (unsigned int i=1; i<shiftedPoints.size (); ++i) 
+    // First point
+    shiftedPoints.push_back (
+	calculateSingleShiftedPoint (points[0], 
+				     points[1], 
+				     spacing));
+    
+    
+    // All triplets in between
+    for (unsigned int i=0; i<points.size()-2; ++i) 
     {
-	double x = shiftedPoints[i].getX();
-	double y = shiftedPoints[i].getY();
-	double radiusShift = 0.0;
-	
-	if (ENABLE_CURVES && (i < shiftedPoints.size () - 1)) 
-	{
-	    // Take care of intern/extern turn to invert radius
-	    const Point& p_minus_1 = shiftedPoints[i-1];
-	    const Point& p_plus_1 = shiftedPoints[i+1];
-	    
-	    double angle = calculateAngle (p_minus_1, shiftedPoints[i], p_plus_1);
-	    if (angle < 0) 
-	    {
-		radiusShift = -_shifts[i] * SPACING;
-	    } 
-	    else 
-	    {
-		radiusShift = +_shifts[i] * SPACING;
-	    } 
-	    
-	    
-	    double radiusToUse = RADIUS + radiusShift;
-	    if (radiusToUse > RADIUS + RADIUS_DELTA) radiusToUse = RADIUS + RADIUS_DELTA;
-	    if (radiusToUse < RADIUS - RADIUS_DELTA) radiusToUse = RADIUS - RADIUS_DELTA;
-	    
-	    
-	    canvas.arct(x, y, shiftedPoints[i+1].getX(), 
-			shiftedPoints[i+1].getY(), radiusToUse);
-	    
+		const Point& p_i = points[i]; 
+		const Point& p_i_plus_1 = points[i+1];
+		const Point& p_i_plus_2 = points[i+2];
+
+		double distance =  _shifts[i+1] * spacing;
+		shiftedPoints.push_back ( calculateSingleShiftedPoint (
+					p_i, 
+					p_i_plus_1, 
+					p_i_plus_2, 
+					spacing) );
 	} 
-	else 
-	{ 
-	    canvas.lineto(x, y);	
-	}
-	
-    }
+
+    // Last point 
+	shiftedPoints.push_back(
+	    calculateSingleShiftedPoint (points[_points.size()-1], 
+					 points[_points.size()-2], 
+					 -_shifts[_points.size()-1]*spacing));
     
-    canvas.stroke();
+    return shiftedPoints;	
     
 }
 
 
 
-void 
-DrawableLine::doDrawTriangleArrow (PostscriptCanvas& canvas, 
-				   const Point& point, 
-				   double angle) const
-{
-    canvas.gsave ();
-    canvas.setrgbcolor(0, 0, 0);
-    canvas.moveto(point.getX(), point.getY ());
-    canvas.rotate (angle);
-    canvas.rmoveto (0.0, LINE_WIDTH / 2.0 + 1);
-    canvas.triangle(LINE_WIDTH-1);  // size of the base side
-    canvas.fill ();
-    canvas.grestore ();	
-}
-
-
-
-void 
-DrawableLine::doDrawSquareStop (PostscriptCanvas& canvas, 
-				const Point& point, 
-				double angle) const
-{
-    canvas.gsave ();
-    canvas.setrgbcolor(0, 0, 0);
-    canvas.moveto(point.getX(), point.getY ());
-    canvas.rotate (angle);
-    canvas.square(LINE_WIDTH-1);  // size of the base side
-    canvas.fill ();
-    canvas.grestore ();	
-}
 
 
 
 
 void 
-DrawableLine::doDrawSquareTerminus (PostscriptCanvas& canvas, 
-				    const Point& point, 
-				    double angle) const
-{
-    canvas.gsave ();
-    canvas.setrgbcolor(0, 0, 0);
-    canvas.moveto(point.getX(), point.getY ());
-    canvas.rotate (angle);
-    canvas.square(LINE_WIDTH*2);  // size of the base side
-    canvas.fill ();
-    canvas.grestore (); 
-}
-
-
-
-
-void 
-DrawableLine::preDraw (Map& map, PostscriptCanvas& canvas) const
+DrawableLine::prepare (Map& map, double spacing, PointShiftingMode shiftMode) const
 {
     std::vector<Point> points;
     
@@ -623,100 +559,14 @@ DrawableLine::preDraw (Map& map, PostscriptCanvas& canvas) const
         points.push_back (map.toOutputFrame(*_points[i]));
     }
         
-    _shiftedPoints = (POINT_SHIFTING_MODE == NONE) ? points 
-	: calculateShiftedPoints (points);
-    
+    _shiftedPoints = (shiftMode == NONE) ? points 
+	: calculateShiftedPoints (points, spacing, shiftMode);
     
 }
 
 
 
-void 
-DrawableLine::postDraw (Map& map, PostscriptCanvas& canvas) const
-{
-    // Draw Terminuses
-    if (_shiftedPoints.size () >= 2) {
 
-        Point pt (_shiftedPoints[0].getX() + 100.0, 
-				 _shiftedPoints[0].getY());
-
-        double angle = calculateAngle (pt, 
-				       _shiftedPoints[0], 
-				       _shiftedPoints[1]);
-
-        doDrawSquareTerminus (canvas, 
-			      _shiftedPoints[0], 
-			      toDegrees(angle - M_PI_2));
-        
-        pt = Point (_shiftedPoints[_shiftedPoints.size ()-2].getX() + 100.0, 
-				   _shiftedPoints[_shiftedPoints.size ()-2].getY());
-
-        angle = calculateAngle (pt, 
-				_shiftedPoints[_shiftedPoints.size ()-2], 
-				_shiftedPoints[_shiftedPoints.size ()-1]);
-     
-	doDrawSquareTerminus (canvas, 
-			      _shiftedPoints[_shiftedPoints.size ()-1], 
-			      toDegrees(angle - M_PI_2));
-    }
-
-    // Clear cached information    
-    _shiftedPoints.clear ();
-}
-
-
-
-void 
-DrawableLine::draw (Map& map, PostscriptCanvas& canvas) const
-{
-
-    canvas.setlinewidth (BORDER_WIDTH);
-    canvas.setrgbcolor(BORDER_COLOR.r, BORDER_COLOR.g, BORDER_COLOR.b);
-    doDrawCurvedLine(canvas, _shiftedPoints);
-    
-    canvas.setlinewidth (LINE_WIDTH);
-    
-    canvas.setrgbcolor(_color);
-    doDrawCurvedLine(canvas, _shiftedPoints);
-    
-    for (unsigned int i=1; i<_shiftedPoints.size()-1; ++i) 
-    {
-	Point pt (_shiftedPoints[i].getX() + 100.0, _shiftedPoints[i].getY());
-	double angle = calculateAngle (pt, _shiftedPoints[i], _shiftedPoints[i+1]);
-
-	if (isStopPoint (i)) 
-	{
-	    doDrawTriangleArrow(canvas, _shiftedPoints[i], toDegrees(angle - M_PI_2));
-	    doDrawSquareStop(canvas, _shiftedPoints[i], toDegrees(angle - M_PI_2));
-	}
-	
-    }
-    
-    canvas.setrgbcolor (0.5, 0.5 , 0.5);
-    
-    // For debug : draw unshifted points as circles
-    // For debug : draw unshifted points as circles
-    // For debug : draw unshifted points as circles
-    // For debug : draw unshifted points as circles
-/*    std::vector<Point> points;
-    
-    // Convert coordinates to output frame
-    for (unsigned int i=0; i<_points.size(); ++i) 
-    {
-        points.push_back (map.toOutputFrame(*_points[i]));
-    }
-
-    canvas.setlinewidth (1);
-
-    for (unsigned int i=0; i<points.size(); ++i) 
-    {
-	canvas.newpath();
-	canvas.moveto (points[i].getX (), points[i].getY ());
-	canvas.square (3.0);
-	canvas.stroke ();
-    } 
-    */
-}
 
 
 
@@ -725,6 +575,16 @@ DrawableLine::getShortName () const
 {
     return _shortName;
 }
+
+
+
+const synthese::util::RGBColor& 
+DrawableLine::getColor () const
+{
+	return _color;
+}
+
+
 
 
 bool 

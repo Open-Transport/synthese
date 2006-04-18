@@ -12,6 +12,7 @@
 
 
 
+
 namespace synthese
 {
 namespace env
@@ -23,24 +24,12 @@ namespace env
 namespace carto
 {
 
-class PostscriptCanvas;
 
 
-class DrawableLine : public Drawable
+class DrawableLine 
 {
 private:
 
-    typedef enum { NONE, SINGLE, DOUBLE } PointShiftingMode;
-
-    static const PointShiftingMode POINT_SHIFTING_MODE;
-    static const bool     ENABLE_CURVES;
-    static const double   RADIUS;
-    static const double   RADIUS_DELTA;
-    static const int      LINE_WIDTH;
-    static const double   SPACING;
-    
-    static const synthese::util::RGBColor BORDER_COLOR;
-    static const int      BORDER_WIDTH;
 
     const std::vector<const synthese::env::Point*> _points;  //!< Reference line points
     const std::string _shortName;
@@ -53,6 +42,8 @@ private:
     mutable std::vector<synthese::env::Point> _shiftedPoints;
 
 public:
+
+    typedef enum { NONE, SINGLE, DOUBLE } PointShiftingMode;
     
     DrawableLine (const synthese::env::Line* line,
 		  int fromLineStopIndex,
@@ -70,10 +61,12 @@ public:
     //! @name Getters/Setters
     //@{
     const std::string& getShortName () const;
+	const synthese::util::RGBColor& getColor () const;
     bool getWithPhysicalStops () const;
 
     const std::vector<const synthese::env::Point*>& 
 	getPoints () const;
+
     bool hasPoint (const synthese::env::Point*) const;
 
     bool isStopPoint (int pointIndex) const;
@@ -83,33 +76,40 @@ public:
     int getShift (int pointIndex) const;
     void setShift (int pointIndex, int shift);
 
+    const std::vector<synthese::env::Point>& getShiftedPoints () const;
+
+    //@}
+
+
     bool isFullyReverseWay (const DrawableLine* dbl) const;
     bool isFullySameWay (const DrawableLine* dbl) const;
     bool isReverseWayAt (const synthese::env::Point* p, const DrawableLine* dbl) const;
     int numberOfCommonPointsWith (const DrawableLine* dbl) const;
 
-    virtual void preDraw (Map& map, PostscriptCanvas& canvas) const;
-    
-    virtual void draw (Map& map, PostscriptCanvas& canvas) const;
-    
-    virtual void postDraw (Map& map, PostscriptCanvas& canvas) const;
-
+    virtual void prepare (Map& map, double spacing, PointShiftingMode shiftMode = DOUBLE) const;
     
     /** Find first point in this line points
 	which is equal (by value) to a given point.
     */
     int firstIndexOf (const synthese::env::Point* p) const;
 
+    const std::vector<synthese::env::Point> 
+	calculateShiftedPoints (const std::vector<synthese::env::Point>& points, 
+				double spacing, 
+				PointShiftingMode shiftMode) const;
+
+	const std::vector<synthese::env::Point>
+	calculateAbsoluteShiftedPoints (const std::vector<synthese::env::Point>& points, 
+										 double spacing) const;
+
 private:
 
-    const std::vector<synthese::env::Point> 
-	calculateShiftedPoints (const std::vector<synthese::env::Point>& points) const;
-    
     
     synthese::env::Point  
 	calculateSingleShiftedPoint (const synthese::env::Point& a, 
 				     const synthese::env::Point& b, 
 				     double distance) const;
+
     synthese::env::Point  
 	calculateSingleShiftedPoint (const synthese::env::Point& a, 
 				     const synthese::env::Point& b, 
@@ -122,20 +122,6 @@ private:
 				     double incomingDistance, 
 				     double outgoingDistance) const;
     
-    void doDrawCurvedLine (PostscriptCanvas& canvas, 
-                           const std::vector<synthese::env::Point>& shiftedPoints) const;
-    
-    void doDrawTriangleArrow (PostscriptCanvas& canvas, 
-                              const synthese::env::Point& point, 
-                              double angle) const;
-    
-    void doDrawSquareStop (PostscriptCanvas& canvas, 
-                           const synthese::env::Point& point, 
-                           double angle) const;
-    
-    void doDrawSquareTerminus (PostscriptCanvas& canvas, 
-			       const synthese::env::Point& point, 
-			       double angle) const;
     
     
 };

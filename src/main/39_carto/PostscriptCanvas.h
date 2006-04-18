@@ -20,7 +20,7 @@ namespace carto
 {
 
 
-class PostscriptCanvas
+class PostscriptCanvas 
 {
  private:
 
@@ -79,7 +79,6 @@ class PostscriptCanvas
     void sticker (const std::string& label, 
                   const synthese::util::RGBColor& bgColor,
                   double xMargin, double yMargin);
-    
     
     
  private:

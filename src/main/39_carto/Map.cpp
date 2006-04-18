@@ -461,6 +461,40 @@ Map::findBestAvailableReference (const DrawableLine* line,
 
 
 
+
+void 
+Map::preparePhysicalStops () 
+{
+    std::set<const PhysicalStop*> iteratedStops;
+
+    // Create drawable physical stops (for each physical stop)
+    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
+         it != _selectedLines.end () ; ++it) 
+    {
+	    const DrawableLine* dbl = *it;
+        if (dbl->getWithPhysicalStops () == false) continue;
+
+	    const std::vector<const Point*>& points = dbl->getPoints ();
+	    for (int i=0; i<points.size (); ++i)
+	    {
+	        const Point* p = points[i];
+
+	        const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (p);
+	        if (physicalStop)
+	        {
+                if (iteratedStops.find (physicalStop) == iteratedStops.end ())
+                {
+                    // Guarantees a physical stop is added only once as a 
+                    // DrawablePhysicalStop.
+                    iteratedStops.insert (physicalStop);
+                    _selectedPhysicalStops.insert (new DrawablePhysicalStop (physicalStop));
+                }
+            }
+        }
+    }
+}
+
+
 void 
 Map::prepareLines ()
 {
@@ -535,6 +569,7 @@ Map::prepareLines ()
 	
     }
 
+
 }
 
 
@@ -548,255 +583,40 @@ Map::hasBackgroundManager () const
 
 
 
-void 
-Map::prepare () 
+
+const MapBackgroundManager* 
+Map::getBackgroundManager () const
 {
-    prepareLines ();
+    return _backgroundManager;   
 }
 
 
-void 
-Map::dumpBackground (PostscriptCanvas& canvas)
+
+Rectangle 
+Map::getRealFrame () const
 {
-    if (hasBackgroundManager ()) 
-    {
-        const MapBackground* mbg = _backgroundManager->getBestScalingBackground (_mapScaleX, _mapScaleY);
-        if (mbg != 0) 
-	{
-	    Log::GetInstance ().debug ("Best scaling background scaleX=" + 
-				       Conversion::ToString (mbg->getScaleX ()) + " scaleY=" + 
-				       Conversion::ToString (mbg->getScaleY ()));
-            // Draw background
-            std::pair<int,int>  tlIndexes = mbg->getIndexesOfTileContaining (_realFrame.getX(), _realFrame.getY ());
-            std::pair<int,int>  brIndexes = mbg->getIndexesOfTileContaining (
-		_realFrame.getX () + _realFrame.getWidth (), 
-		_realFrame.getY () + _realFrame.getHeight ());
-            
-	    // TODO : additional checks in case indexes are negative/out of frame.
+    return _realFrame;
+}
 
-            int nbtiles = 0;
 
-            for (int i=tlIndexes.first; i<=brIndexes.first; ++i) 
-	    {
-                for (int j=tlIndexes.second; j<=brIndexes.second; ++j) 
-		{
-                    const MapBackgroundTile* tile = mbg->getTile (i, j);
-		    Log::GetInstance ().debug ("Dumping background tile [" + Conversion::ToString (i) + 
-			"," + Conversion::ToString (j) + "]");
-
-                    if (tile != 0) { // Any background available for this tile ?
-                        // cout << "Drawing tile " << i << "," << j <<  "  "<< tile->getPath ().string () << endl;
-                        ++nbtiles;
-                        tile->draw (*this, canvas);
-                    }
-                }
-            }
-        }
-    }
-    
-    
+Rectangle 
+Map::getOutputFrame () const
+{
+    return Rectangle (0, 0, _width, _height);
 }
 
 
 
 void 
-Map::dumpLines (PostscriptCanvas& canvas)
+Map::prepare () 
 {
-    // Draw drawableLines
-    canvas.setlinejoin (1);
-    
-    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
-         it != _selectedLines.end () ; ++it) {
-	const DrawableLine* dbl = *it;
-	dbl->preDraw (*this, canvas);  
-    }    
-
-
-    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
-         it != _selectedLines.end () ; ++it) {
-	const DrawableLine* dbl = *it;
-	dbl->draw (*this, canvas);  
-    }    
-
-
-    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
-         it != _selectedLines.end () ; ++it) {
-	const DrawableLine* dbl = *it;
-	dbl->postDraw (*this, canvas);  
-    }    
-
-
-
-    
+    prepareLines ();
+    preparePhysicalStops ();
 }
 
 
 
-void 
-Map::dumpPhysicalStops (PostscriptCanvas& canvas)
-{
-    std::set<const PhysicalStop*> iteratedStops;
 
-    // Create drawable physical stops (for each physical stop right now)
-    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
-         it != _selectedLines.end () ; ++it) 
-    {
-	    const DrawableLine* dbl = *it;
-        if (dbl->getWithPhysicalStops () == false) continue;
-
-	    const std::vector<const Point*>& points = dbl->getPoints ();
-	    for (int i=0; i<points.size (); ++i)
-	    {
-	        const Point* p = points[i];
-
-	        const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (p);
-	        if (physicalStop)
-	        {
-                if (iteratedStops.find (physicalStop) == iteratedStops.end ())
-                {
-                    // Guarantees a physical stop is added only once as a 
-                    // DrawablePhysicalStop.
-                    iteratedStops.insert (physicalStop);
-                    _selectedPhysicalStops.insert (new DrawablePhysicalStop (physicalStop));
-                }
-            }
-        }
-    }
-
-
-    canvas.setfont("Helvetica", 8);
-    canvas.setrgbcolor(0, 0, 0);
-
-    for (std::set<DrawablePhysicalStop*>::const_iterator it = 
-        _selectedPhysicalStops.begin ();
-         it != _selectedPhysicalStops.end () ; ++it) 
-    {
-        const DrawablePhysicalStop* dps = *it;
-        dps->preDraw (*this, canvas);
-    }
-    for (std::set<DrawablePhysicalStop*>::const_iterator it = 
-        _selectedPhysicalStops.begin ();
-         it != _selectedPhysicalStops.end () ; ++it) 
-    {
-        const DrawablePhysicalStop* dps = *it;
-        dps->draw (*this, canvas);
-    }
-    for (std::set<DrawablePhysicalStop*>::const_iterator it = 
-        _selectedPhysicalStops.begin ();
-         it != _selectedPhysicalStops.end () ; ++it) 
-    {
-        const DrawablePhysicalStop* dps = *it;
-        dps->postDraw (*this, canvas);
-    }
-
-
-/*
-		// Get all the lines going through this points and find the
-		// extrema shifts
-		
-		// Select the right direction to write the text
-		// (from start or from end)
-		
-		// ...
-
-		// Write text
-		Point cp = toOutputFrame (*physicalStop);
-		canvas.moveto (cp.getX (), cp.getY ());
-        canvas.sticker (physicalStop->getName (), 
-                        synthese::util::RGBColor ("yellow"),
-                        10, 10);
-	    }
-	}	    
-    
-
-
-    // At this stage lines have all been shifted.
-    // Calculate locations for drawing physical stops labels now
-    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
-         it != _selectedLines.end () ; ++it) 
-    {
-	const DrawableLine* dbl = *it;
-	const std::vector<const Point*>& points = dbl->getPoints ();
-	for (int i=0; i<points.size (); ++i)
-	{
-	    const Point* p = points[i];
-
-	    const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (p);
-	    if (physicalStop)
-	    {
-		// Get all the lines going through this points and find the
-		// extrema shifts
-		
-		// Select the right direction to write the text
-		// (from start or from end)
-		
-		// ...
-
-		// Write text
-		Point cp = toOutputFrame (*physicalStop);
-		canvas.moveto (cp.getX (), cp.getY ());
-        canvas.sticker (physicalStop->getName (), 
-                        synthese::util::RGBColor ("yellow"),
-                        10, 10);
-	    }
-	}	    
-	
-	// dbl->preDraw (*this, canvas);  
-    }    
-
-*/
-}
-
-
-
-void 
-Map::dump (PostscriptCanvas& canvas)
-{
-    prepare ();
-	
-    canvas.startPage(0, 0, _width, _height);
-    
-    dumpBackground (canvas);
-    dumpLines (canvas);
-    dumpPhysicalStops (canvas);
-
-
-//	canvas.setRGBColor(c0.r, c0.g, c0.b);
-	
-/*	// Draw streets in two steps
-	for (unsigned int i=0; i<_streets.size(); ++i) {
-	drawStreet (_streets[i], canvas);	
-	}
-	
-	canvas.setLineWidth (3);
-//	canvas.setLineWidth (3);
-canvas.setRGBColor(c1.r, c1.g, c1.b);
-	
-for (unsigned int i=0; i<_streets.size(); ++i) {
-drawStreet (_streets[i], canvas);	
-}
-	
-*/
-    /*
-      canvas.setRGBColor(c0.r, c0.g, c0.b);
-      canvas.setFont("Helvetica", 10);
-      for (unsigned int i=0; i<_streets.size(); ++i) {
-      drawText (_streets[i], 0.0, "Rue des arbres", canvas);
-      } 
-    */
-	
-/*	canvas.newPath ();
-	canvas.moveTo (200.0, 200.0);
-	canvas.lineTo (200.0, 100.0);
-	canvas.lineTo (300.0, 300.0);
-	canvas.pathtext(50.0, "Salut merdeSalut merdeSalut merde");
-*/
-	
-	
-    canvas.showPage();
-	
-	
-}
 
 
 
@@ -816,6 +636,35 @@ Map::getHeight () const
     return _height; 
 }
 
+
+double 
+Map::getScaleX () const
+{
+    return _mapScaleX;
+}
+
+
+double 
+Map::getScaleY () const
+{
+    return _mapScaleY;
+}
+
+
+
+const std::set<DrawableLine*>& 
+Map::getSelectedLines () const
+{
+    return _selectedLines;
+}
+
+
+
+const std::set<DrawablePhysicalStop*>& 
+Map::getSelectedPhysicalStops () const
+{
+    return _selectedPhysicalStops;
+}
 
 
 

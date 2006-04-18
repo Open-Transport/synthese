@@ -22,7 +22,9 @@
 #include "16_env_ls_xml/EnvironmentLS.h"
 
 #include "39_carto/Map.h"
-#include "39_carto/PostscriptCanvas.h"
+#include "39_carto/RenderingConfig.h"
+#include "39_carto/PostscriptRenderer.h"
+#include "39_carto/HtmlMapRenderer.h"
 #include "40_carto_ls_xml/MapLS.h"
 
 #include "01_util/Log.h"
@@ -112,8 +114,15 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 
     // Create the postscript canvas for output
     std::ofstream of (tempPsFile.string ().c_str ());
-    synthese::carto::PostscriptCanvas canvas (of);
-    map->dump (canvas);
+
+    RenderingConfig conf;
+    synthese::carto::PostscriptRenderer psRenderer (conf, of);
+    psRenderer.render (*map);
+
+    std::ofstream of2 ("c:/temp/testmap.html");
+    synthese::carto::HtmlMapRenderer hmRenderer (conf, of2);
+    hmRenderer.render (*map);
+
     of.close ();
 
     // Convert the ps file to png with ghostscript
@@ -130,7 +139,7 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     {
 	throw synthese::util::Exception ("Error executing GhostScript (gs executable in path ?)");
     }
-    boost::filesystem::remove (tempPsFile);
+    // boost::filesystem::remove (tempPsFile);
 
     // Now get size of the generated PNG file...
     long size = boost::filesystem::file_size (tempPngFile);

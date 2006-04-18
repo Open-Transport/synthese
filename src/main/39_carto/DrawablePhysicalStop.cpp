@@ -30,28 +30,20 @@ DrawablePhysicalStop::~DrawablePhysicalStop ()
 }
 
 
-void 
-DrawablePhysicalStop::preDraw (Map& map, PostscriptCanvas& canvas) const
+const std::string& 
+DrawablePhysicalStop::getName () const
 {
-
+	return _name;
 }
 
 
-
-void 
-DrawablePhysicalStop::draw (Map& map, PostscriptCanvas& canvas) const
+const synthese::env::Point& 
+DrawablePhysicalStop::getPoint () const
 {
-	Point cp = map.toOutputFrame (_point);
-	canvas.moveto (cp.getX (), cp.getY ());
-    canvas.sticker (_name, synthese::util::RGBColor ("yellow"), 10, 10);
+	return _point;
 }
 
 
-void 
-DrawablePhysicalStop::postDraw (Map& map, PostscriptCanvas& canvas) const
-{
-
-}
 
 
 }

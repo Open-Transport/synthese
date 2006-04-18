@@ -86,11 +86,11 @@ private:
 	findBestAvailableReference (const DrawableLine* drawableLine, 
 				    const std::vector<DrawableLine*>& lines) const;
     
-    bool hasBackgroundManager () const;
+    
     
     void populateLineIndex ();
     void prepareLines ();
-    void prepare ();
+    void preparePhysicalStops ();
     void dumpBackground (PostscriptCanvas& canvas);
     void dumpLines (PostscriptCanvas& canvas);
     void dumpPhysicalStops (PostscriptCanvas& canvas);
@@ -119,8 +119,14 @@ public:
     //! @name Getters/Setters
     //@{
 
+    Rectangle getRealFrame () const;
+    Rectangle getOutputFrame () const;
+
     double getWidth () const;
     double getHeight () const;
+
+    double getScaleX () const;
+    double getScaleY () const;
 
     int getHorizontalMargin () const;
     void setHorizontalMargin (int horizintalMargin);
@@ -128,10 +134,19 @@ public:
     int getVerticalMargin () const;
     void setVerticalMargin (int verticalMargin);
 
+    bool hasBackgroundManager () const;
+    const MapBackgroundManager* getBackgroundManager () const;
+
+    const std::set<DrawableLine*>& getSelectedLines () const;
+    const std::set<DrawablePhysicalStop*>& getSelectedPhysicalStops () const;
+    
     //@}
 
+    //! @name Update methods
+    //@{
+    void prepare ();
+    //@}
 
-    void dump (PostscriptCanvas& canvas);
 };
 
 }
