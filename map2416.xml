@@ -1,13 +1,14 @@
 <map environmentId="0"
-     outputWidth="400" outputHeight="400"
+     outputWidth="800" outputHeight="800"
      outputHorizontalMargin="50" 
      outputVerticalMargin="50" 
-     lowerLeftLatitude="526408" lowerLeftLongitude="1840480"
-     upperRightLatitude="531908" upperRightLongitude="1845980"     
+     lowerLeftLatitude="524008" lowerLeftLongitude="1840080"
+     upperRightLatitude="531908" upperRightLongitude="1847980"     
      backgroundId="MP">
 
 
-  <drawableLine lineId="l1" withPhysicalStops="false"/>
+  <drawableLine lineId="l16" withPhysicalStops="true"/>
+  <!--   <drawableLine lineId="l24" withPhysicalStops="false"/> -->
 
   <!--  <drawableLine lineId="l2" withPhysicalStops="false"/>
   <drawableLine lineId="l3" withPhysicalStops="false"/> -->

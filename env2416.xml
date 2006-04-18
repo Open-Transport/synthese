@@ -45,10 +45,41 @@
     <physicalStop id="26" x="530866" y="1844304" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
     <physicalStop id="27" x="531038" y="1844249" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
 
+    <physicalStop id="28" x="526908" y="1845660" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="29" x="527162" y="1845815" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="30" x="527460" y="1845910" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="31" x="527815" y="1845779" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="32" x="527961" y="1845458" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="33" x="527957" y="1845141" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="34" x="527952" y="1844573" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="35" x="527965" y="1844363" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="36" x="528187" y="1844067" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="37" x="528464" y="1844058" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="38" x="528510" y="1843786" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="39" x="528483" y="1843587" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="40" x="528407" y="1843437" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="41" x="528454" y="1843127" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="42" x="528554" y="1842971" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="43" x="528688" y="1842824" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="44" x="528657" y="1842632" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="45" x="528717" y="1842429" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="46" x="528891" y="1842236" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="47" x="529106" y="1842338" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="48" x="529180" y="1842199" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="49" x="529090" y="1842085" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="50" x="529029" y="1841831" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="51" x="529160" y="1841554" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="52" x="529332" y="1841397" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+    <physicalStop id="53" x="529527" y="1840980" name="Arret 1" logicalStopId="1" rankInLogicalStop="1"/>
+
+
+
   </physicalStops>
 
+      
+  
   <lines>
-   <line id="l1" axisId="a1" firstYear="2006" lastYear="2007" color="cyan">
+   <line id="l16" axisId="a1" firstYear="2006" lastYear="2007" color="cyan">
      <lineStop id="1" metricOffset="100" type="passage" physicalStopId="1" scheduleInput="true"></lineStop>
      <lineStop id="2" metricOffset="100" type="passage" physicalStopId="2" scheduleInput="true"></lineStop>
      <lineStop id="3" metricOffset="100" type="passage" physicalStopId="3" scheduleInput="true"></lineStop>
@@ -78,8 +109,37 @@
      <lineStop id="27" metricOffset="100" type="passage" physicalStopId="27" scheduleInput="true"></lineStop>
   </line>
 
+    <line id="l24" axisId="a1" firstYear="2006" lastYear="2007" color="red">
+      <lineStop id="28" metricOffset="100" type="passage" physicalStopId="28" scheduleInput="true"></lineStop>
+      <lineStop id="29" metricOffset="100" type="passage" physicalStopId="29" scheduleInput="true"></lineStop>
+      <lineStop id="30" metricOffset="100" type="passage" physicalStopId="30" scheduleInput="true"></lineStop>
+      <lineStop id="31" metricOffset="100" type="passage" physicalStopId="31" scheduleInput="true"></lineStop>
+ <!--      <lineStop id="32" metricOffset="100" type="passage" physicalStopId="32" scheduleInput="true"></lineStop> -->
+      <lineStop id="33" metricOffset="100" type="passage" physicalStopId="33" scheduleInput="true"></lineStop> 
+      <lineStop id="34" metricOffset="100" type="passage" physicalStopId="34" scheduleInput="true"></lineStop>
+      <lineStop id="35" metricOffset="100" type="passage" physicalStopId="35" scheduleInput="true"></lineStop>
+      <lineStop id="36" metricOffset="100" type="passage" physicalStopId="36" scheduleInput="true"></lineStop>
+      <lineStop id="37" metricOffset="100" type="passage" physicalStopId="37" scheduleInput="true"></lineStop>
+      <lineStop id="38" metricOffset="100" type="passage" physicalStopId="38" scheduleInput="true"></lineStop>
+      <lineStop id="39" metricOffset="100" type="passage" physicalStopId="39" scheduleInput="true"></lineStop>
+      <lineStop id="40" metricOffset="100" type="passage" physicalStopId="40" scheduleInput="true"></lineStop>
+      <lineStop id="41" metricOffset="100" type="passage" physicalStopId="41" scheduleInput="true"></lineStop>
+      <lineStop id="42" metricOffset="100" type="passage" physicalStopId="42" scheduleInput="true"></lineStop>
+      <lineStop id="43" metricOffset="100" type="passage" physicalStopId="43" scheduleInput="true"></lineStop>
+      <lineStop id="44" metricOffset="100" type="passage" physicalStopId="44" scheduleInput="true"></lineStop>
+      <lineStop id="45" metricOffset="100" type="passage" physicalStopId="45" scheduleInput="true"></lineStop>
+      <lineStop id="46" metricOffset="100" type="passage" physicalStopId="46" scheduleInput="true"></lineStop>
+      <lineStop id="47" metricOffset="100" type="passage" physicalStopId="47" scheduleInput="true"></lineStop>
+      <lineStop id="48" metricOffset="100" type="passage" physicalStopId="48" scheduleInput="true"></lineStop>
+      <lineStop id="49" metricOffset="100" type="passage" physicalStopId="49" scheduleInput="true"></lineStop>
+      <lineStop id="50" metricOffset="100" type="passage" physicalStopId="50" scheduleInput="true"></lineStop>
+      <lineStop id="51" metricOffset="100" type="passage" physicalStopId="51" scheduleInput="true"></lineStop>
+      <lineStop id="52" metricOffset="100" type="passage" physicalStopId="52" scheduleInput="true"></lineStop>
+      <lineStop id="53" metricOffset="100" type="passage" physicalStopId="53" scheduleInput="true"></lineStop>
+    </line>
 
- </lines>
+
+  </lines>
 
 </environment>
 
