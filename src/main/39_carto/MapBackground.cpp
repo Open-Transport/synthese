@@ -28,7 +28,7 @@ namespace carto
 
 
 MapBackground::MapBackground(const std::string& tileDir)
-: _tileDir (tileDir)
+: _tileDir (tileDir, fs::native)
 {
     std::string tileDirStr = _tileDir.leaf (); 
     
@@ -80,7 +80,10 @@ MapBackground::MapBackground(const std::string& tileDir)
             if (bottomRightX > maxX) maxX = bottomRightX;
             if (bottomRightY < minY) minY = bottomRightY;
             
-            MapBackgroundTile* tile = new MapBackgroundTile (filepath, pixelWidth, pixelHeight, topLeftX, topLeftY, bottomRightX, bottomRightY);
+            MapBackgroundTile* tile = new MapBackgroundTile (
+				fs::path (filepath, fs::native), 
+				pixelWidth, pixelHeight, topLeftX, topLeftY, bottomRightX, bottomRightY);
+
             tiles.push_back (tile);
             
         }

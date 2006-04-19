@@ -28,7 +28,7 @@ private:
 public:
 
 
-    MapBackgroundTile(const boost::filesystem::path path,
+    MapBackgroundTile(const boost::filesystem::path& path,
                       int pixelWidth, int pixelHeight,
                       double topLeftX, double topLeftY,
                       double bottomRightX, double bottomRightY);

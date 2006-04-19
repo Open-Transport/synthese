@@ -167,9 +167,6 @@ def AddModuleDependency (env, modulename):
 
 
 
-
-
-
 # Declare common methods
 from SCons.Script.SConscript import SConsEnvironment
 SConsEnvironment.Glob=Glob

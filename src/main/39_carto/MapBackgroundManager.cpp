@@ -93,6 +93,12 @@ MapBackgroundManager::getBestScalingBackground (double mapScaleX,
 void 
 MapBackgroundManager::Initialize ()
 {
+	if (fs::exists (_backgroundsDir) == false)
+	{
+		Log::GetInstance ().warn ("Map backgrounds dir does not exist : " + _backgroundsDir.string ());
+		return;
+	}
+
 	// Create all managers
 	boost::filesystem::path backgroundDir (_backgroundsDir);
     fs::directory_iterator end_iter;

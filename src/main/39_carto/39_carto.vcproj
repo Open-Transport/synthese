@@ -42,13 +42,121 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			<File
+				RelativePath=".\Drawable.cpp">
+			</File>
+			<File
+				RelativePath=".\DrawableLine.cpp">
+			</File>
+			<File
+				RelativePath=".\DrawableLineComparator.cpp">
+			</File>
+			<File
+				RelativePath=".\DrawableLineIndex.cpp">
+			</File>
+			<File
+				RelativePath=".\DrawablePhysicalStop.cpp">
+			</File>
+			<File
+				RelativePath=".\Geometry.cpp">
+			</File>
+			<File
+				RelativePath=".\HtmlMapRenderer.cpp">
+			</File>
+			<File
+				RelativePath=".\Map.cpp">
+			</File>
+			<File
+				RelativePath=".\MapBackground.cpp">
+			</File>
+			<File
+				RelativePath=".\MapBackgroundManager.cpp">
+			</File>
+			<File
+				RelativePath=".\MapBackgroundTile.cpp">
+			</File>
+			<File
+				RelativePath=".\MapRequestHandler.cpp">
+			</File>
+			<File
+				RelativePath=".\PostscriptCanvas.cpp">
+			</File>
+			<File
+				RelativePath=".\PostscriptRenderer.cpp">
+			</File>
+			<File
+				RelativePath=".\Rectangle.cpp">
+			</File>
+			<File
+				RelativePath=".\Renderer.cpp">
+			</File>
+			<File
+				RelativePath=".\RenderingConfig.cpp">
+			</File>
+			<File
+				RelativePath=".\TileGrid.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath=".\Drawable.h">
+			</File>
+			<File
+				RelativePath=".\DrawableLine.h">
+			</File>
+			<File
+				RelativePath=".\DrawableLineComparator.h">
+			</File>
+			<File
+				RelativePath=".\DrawableLineIndex.h">
+			</File>
+			<File
+				RelativePath=".\DrawablePhysicalStop.h">
+			</File>
+			<File
+				RelativePath=".\Geometry.h">
+			</File>
+			<File
+				RelativePath=".\HtmlMapRenderer.h">
+			</File>
+			<File
+				RelativePath=".\Map.h">
+			</File>
+			<File
+				RelativePath=".\MapBackground.h">
+			</File>
+			<File
+				RelativePath=".\MapBackgroundManager.h">
+			</File>
+			<File
+				RelativePath=".\MapBackgroundTile.h">
+			</File>
+			<File
+				RelativePath=".\MapRequestHandler.h">
+			</File>
+			<File
 				RelativePath=".\module.h">
+			</File>
+			<File
+				RelativePath=".\PostscriptCanvas.h">
+			</File>
+			<File
+				RelativePath=".\PostscriptRenderer.h">
+			</File>
+			<File
+				RelativePath=".\Rectangle.h">
+			</File>
+			<File
+				RelativePath=".\Renderer.h">
+			</File>
+			<File
+				RelativePath=".\RenderingConfig.h">
+			</File>
+			<File
+				RelativePath=".\TileGrid.h">
 			</File>
 		</Filter>
 	</Files>

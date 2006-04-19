@@ -34,6 +34,11 @@ Exception::getMessage () const
 }
 
 
+const char* 
+Exception::what () const throw ()
+{
+	return _message.c_str ();
+}
 
 
 

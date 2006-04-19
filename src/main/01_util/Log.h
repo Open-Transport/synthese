@@ -17,7 +17,6 @@ namespace synthese
 namespace util
 {
 
-    class Exception;
 
 /** Thread-safe logging class.
 To get an instance of this class, the statis GetLog method must
@@ -75,19 +74,19 @@ class Log
     //! @name Update methods
     //@{
     void debug (const std::string& message);
-    void debug (const std::string& message, const Exception& exception);
+	void debug (const std::string& message, const std::exception& exception);
 
     void info (const std::string& message);
-    void info (const std::string& message, const Exception& exception);
+	void info (const std::string& message, const std::exception& exception);
 
     void warn (const std::string& message);
-    void warn (const std::string& message, const Exception& exception);
+	void warn (const std::string& message, const std::exception& exception);
 
     void error (const std::string& message);
-    void error (const std::string& message, const Exception& exception);
+    void error (const std::string& message, const std::exception& exception);
 
     void fatal (const std::string& message);
-    void fatal (const std::string& message, const Exception& exception);
+    void fatal (const std::string& message, const std::exception& exception);
 
     //@}
     
@@ -102,7 +101,7 @@ class Log
 
     void append (Log::Level level, 
 		 const std::string& message, 
-		 const Exception* exception = 0);
+		 const std::exception* exception = 0);
 
 };
 

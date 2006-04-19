@@ -37,6 +37,9 @@ class Exception : public std::exception
     const std::string& getMessage () const;
     //@}
     
+    //! @name Query methods
+    //@{
+	const char* what () const throw ();
 
  private:
 

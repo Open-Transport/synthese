@@ -1,7 +1,6 @@
 #include "Log.h"
 
 #include <iomanip>
-#include "Exception.h"
 
 
 namespace synthese
@@ -83,7 +82,7 @@ Log::debug (const std::string& message)
 }
 
 void 
-Log::debug (const std::string& message, const Exception& exception)
+Log::debug (const std::string& message, const std::exception& exception)
 {
     if (_level > Log::LEVEL_DEBUG) return;
     append (Log::LEVEL_DEBUG, message, &exception);
@@ -101,7 +100,7 @@ Log::info (const std::string& message)
 
 
 void 
-Log::info (const std::string& message, const Exception& exception)
+Log::info (const std::string& message, const std::exception& exception)
 {
     if (_level > Log::LEVEL_INFO) return;
     append (Log::LEVEL_INFO, message, &exception);
@@ -119,7 +118,7 @@ Log::warn (const std::string& message)
 
 
 void 
-Log::warn (const std::string& message, const Exception& exception)
+Log::warn (const std::string& message, const std::exception& exception)
 {
     if (_level > Log::LEVEL_WARN) return;
     append (Log::LEVEL_WARN, message, &exception);
@@ -136,7 +135,7 @@ Log::error (const std::string& message)
 
 
 void 
-Log::error (const std::string& message, const Exception& exception)
+Log::error (const std::string& message, const std::exception& exception)
 {
     if (_level > Log::LEVEL_ERROR) return;
     append (Log::LEVEL_ERROR, message, &exception);
@@ -155,7 +154,7 @@ Log::fatal (const std::string& message)
 
 
 void 
-Log::fatal (const std::string& message, const Exception& exception)
+Log::fatal (const std::string& message, const std::exception& exception)
 {
     if (_level > Log::LEVEL_FATAL) return;
     append (Log::LEVEL_FATAL, message, &exception);
@@ -167,7 +166,7 @@ Log::fatal (const std::string& message, const Exception& exception)
 void 
 Log::append (Log::Level level, 
 	     const std::string& message, 
-	     const Exception* exception)
+	     const std::exception* exception)
 {
     // Standard io streams are not thread safe.
     // Acquire lock here.
@@ -208,7 +207,7 @@ Log::append (Log::Level level,
 
     if (exception != 0)
     {
-	(*_outputStream) << " : " << exception->getMessage ();
+	(*_outputStream) << " : " << exception->what ();
     }
 
 

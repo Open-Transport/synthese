@@ -38,9 +38,9 @@ Server::Server (int port,
         const std::string& httpTempUrl)
     : _port (port)
     , _nbThreads (nbThreads)
-    , _dataDir (dataDir)
-    , _tempDir (tempDir)
-    , _httpTempDir (httpTempDir)
+	, _dataDir (dataDir, boost::filesystem::native)
+    , _tempDir (tempDir, boost::filesystem::native)
+    , _httpTempDir (httpTempDir, boost::filesystem::native)
     , _httpTempUrl (httpTempUrl)
 {
 }
@@ -109,10 +109,10 @@ Server::run ()
 {
     Log::GetInstance ().info ("Starting server...");
 
-    initialize ();
-
     try 
     {
+    initialize ();
+
 	synthese::tcp::TcpService* service = 
 	    synthese::tcp::TcpService::openService (_port);
 	
@@ -138,7 +138,7 @@ Server::run ()
 	}
 	
     }
-    catch (synthese::util::Exception& ex)
+	catch (std::exception& ex)
     {
 	Log::GetInstance ().fatal ("", ex);
     } 
