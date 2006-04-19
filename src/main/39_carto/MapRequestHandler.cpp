@@ -113,6 +113,8 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 					    synthese::cartolsxml::MapLS::MAP_TAG.c_str ());
 
     Map* map = synthese::cartolsxml::MapLS::Load (mapNode, *env);
+    // Prepare the map (once for all renderings!)
+    map->prepare ();
 
     // Create a temporary file name based on system time
     const boost::filesystem::path& tempDir = (mode == REQUEST_MODE_SOCKET) 

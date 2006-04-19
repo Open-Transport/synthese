@@ -56,9 +56,12 @@ HtmlMapRenderer::~HtmlMapRenderer()
 void 
 HtmlMapRenderer::render (Map& map)
 {
-    map.prepare ();
     _output << "<html><body>";
     _output << "<map name='mapid'>" << std::endl;
+
+    // Dump first physical stops cos the order of area elements in <map>
+    // specifies a kind of 'layer' priority for mouse capture.
+    renderPhysicalStops (map);
     renderLines (map);
     _output << "</map>" << std::endl;
     _output << "<img src='" << _mapImgFilename << "' usemap='#mapid'/>" << std::endl;
@@ -83,9 +86,6 @@ HtmlMapRenderer::renderLines (Map& map)
 		dbl->prepare (map, _config.getSpacing ());
     }    
     
-    
-
-    // Draw
     for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
          it != selectedLines.end () ; ++it) 
 	{
@@ -130,26 +130,22 @@ HtmlMapRenderer::renderLines (Map& map)
 void 
 HtmlMapRenderer::renderPhysicalStops (Map& map)
 {
-    // !! problem how to guess real size of sticker in pixel !!!!!
-    // First step : physical stops not included in html map
+    const std::set<DrawablePhysicalStop*>& selectedPhysicalStops = 
+	map.getSelectedPhysicalStops ();
 
-    /*
-    _canvas.setfont("Helvetica", 8);
-    _canvas.setrgbcolor(0, 0, 0);
-
-    // Draw
-    for (std::set<DrawablePhysicalStop*>::const_iterator it = 
-        map.getSelectedPhysicalStops ().begin ();
-         it != map.getSelectedPhysicalStops ().end () ; ++it) 
+    for (std::set<DrawablePhysicalStop*>::const_iterator it = selectedPhysicalStops.begin ();
+         it != selectedPhysicalStops.end () ; ++it) 
     {
-        const DrawablePhysicalStop* dps = *it;
-	
-	Point cp = map.toOutputFrame (dps->getPoint ());
-	_canvas.moveto (cp.getX (), cp.getY ());
-	_canvas.sticker (dps->getName (), synthese::util::RGBColor ("yellow"), 10, 10);
-    }
-    */
+	const DrawablePhysicalStop* dps = *it;
 
+	std::string href (_urlPattern);
+	boost::replace_all (href, "$id", Conversion::ToString (dps->getPhysicalStopId ()));
+
+	_output << "<area href='" << href << "' shape='circle' coords='";
+	_output << dps->getPoint ().getX ()  << "," 
+		<< (int) (map.getHeight () - dps->getPoint ().getY()) << "," 
+		<< _config.getLineWidth () << "'/>" << std::endl;
+    }
 }
 
 

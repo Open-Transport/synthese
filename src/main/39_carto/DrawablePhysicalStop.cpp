@@ -17,7 +17,8 @@ namespace carto
 
 
 DrawablePhysicalStop::DrawablePhysicalStop (const synthese::env::PhysicalStop* physicalStop)
-: _name (physicalStop->getName ())
+: _physicalStopId (physicalStop->getId ())
+, _name (physicalStop->getName ())
 , _point (*physicalStop)
 {
 
@@ -27,6 +28,14 @@ DrawablePhysicalStop::DrawablePhysicalStop (const synthese::env::PhysicalStop* p
 DrawablePhysicalStop::~DrawablePhysicalStop ()
 {
 
+}
+
+
+
+int 
+DrawablePhysicalStop::getPhysicalStopId () const
+{
+    return _physicalStopId;
 }
 
 
@@ -42,6 +51,15 @@ DrawablePhysicalStop::getPoint () const
 {
 	return _point;
 }
+
+
+
+void 
+DrawablePhysicalStop::prepare (Map& map)
+{
+    _point = map.toOutputFrame (_point);
+}
+
 
 
 

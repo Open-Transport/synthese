@@ -15,7 +15,7 @@ lowerLeftLatitude="0" lowerLeftLongitude="0"
 
   <drawableLine lineId="l1" withPhysicalStops="false"/>
   <drawableLine lineId="l2" withPhysicalStops="false"/>
-  <drawableLine lineId="l3" withPhysicalStops="false"/>
+  <drawableLine lineId="l3" withPhysicalStops="true"/>
 
 </map>
 

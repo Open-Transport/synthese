@@ -150,6 +150,7 @@ Map::~Map()
 	delete (*it);
     }
 
+    // Delete drawable physical stops
     for (std::set<DrawablePhysicalStop*>::const_iterator it = 
         _selectedPhysicalStops.begin (); it != _selectedPhysicalStops.end ();
         ++it)
@@ -503,7 +504,9 @@ Map::preparePhysicalStops ()
                     // Guarantees a physical stop is added only once as a 
                     // DrawablePhysicalStop.
                     iteratedStops.insert (physicalStop);
-                    _selectedPhysicalStops.insert (new DrawablePhysicalStop (physicalStop));
+		    DrawablePhysicalStop* dps = new DrawablePhysicalStop (physicalStop);
+		    dps->prepare (*this);
+                    _selectedPhysicalStops.insert (dps);
                 }
             }
         }

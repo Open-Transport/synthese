@@ -33,8 +33,9 @@ public:
 
 private:
 
+    const int _physicalStopId;
     const std::string _name;
-    const synthese::env::Point _point;
+    synthese::env::Point _point;
 
 protected:
 
@@ -45,11 +46,16 @@ public:
 	
     //! @name Getters/Setters
     //@{
+    int getPhysicalStopId () const;
     const std::string& getName () const;
     const synthese::env::Point& getPoint () const;
 
     //@}
 
+    //! @name Update methods.
+    //@{
+    void prepare (Map& map);
+    //@}
     
 };
 

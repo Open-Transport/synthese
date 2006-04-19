@@ -47,8 +47,6 @@ PostscriptRenderer::~PostscriptRenderer()
 void 
 PostscriptRenderer::render (Map& map)
 {
-    map.prepare ();
-    
     _canvas.startPage(0, 0, map.getWidth (), map.getHeight ());
     
     renderBackground (map);
