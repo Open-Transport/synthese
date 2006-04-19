@@ -1,60 +1,37 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="7.10"
 	Name="01_util"
-	ProjectGUID="{1D55EA50-6142-4DE9-80BF-79227326344A}"
-	Keyword="MakeFileProj"
-	>
+	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
-			Name="Win32"
-		/>
+			Name="Win32"/>
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			>
+			ConfigurationType="0">
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
-				PreprocessorDefinitions=""
-				IncludeSearchPath=""
-				ForcedIncludes=""
-				AssemblySearchPath=""
-				ForcedUsingAssemblies=""
-				CompileAsManaged=""
-			/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			>
+			ConfigurationType="0">
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
-				PreprocessorDefinitions=""
-				IncludeSearchPath=""
-				ForcedIncludes=""
-				AssemblySearchPath=""
-				ForcedUsingAssemblies=""
-				CompileAsManaged=""
-			/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -63,74 +40,48 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
-			>
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\Conversion.cpp"
-				>
+				RelativePath=".\Conversion.cpp">
 			</File>
 			<File
-				RelativePath=".\Exception.cpp"
-				>
+				RelativePath=".\Exception.cpp">
 			</File>
 			<File
-				RelativePath=".\Log.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\XmlParser.cpp"
-				>
+				RelativePath=".\Log.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
-			>
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\Conversion.h"
-				>
+				RelativePath=".\Conversion.h">
 			</File>
 			<File
-				RelativePath=".\Exception.h"
-				>
+				RelativePath=".\Exception.h">
 			</File>
 			<File
-				RelativePath=".\HtmlFilter.h"
-				>
+				RelativePath=".\HtmlFilter.h">
 			</File>
 			<File
-				RelativePath=".\Log.h"
-				>
+				RelativePath=".\Log.h">
 			</File>
 			<File
-				RelativePath=".\LowerCaseFilter.h"
-				>
+				RelativePath=".\LowerCaseFilter.h">
 			</File>
 			<File
-				RelativePath=".\module.h"
-				>
+				RelativePath=".\module.h">
 			</File>
 			<File
-				RelativePath=".\PlainCharFilter.h"
-				>
+				RelativePath=".\PlainCharFilter.h">
 			</File>
 			<File
-				RelativePath=".\RGBColor.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SqlFilter.h"
-				>
-			</File>
-			<File
-				RelativePath=".\XmlParser.h"
-				>
+				RelativePath=".\SqlFilter.h">
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\SConscript"
-			>
+			RelativePath=".\SConscript">
 		</File>
 	</Files>
 	<Globals>

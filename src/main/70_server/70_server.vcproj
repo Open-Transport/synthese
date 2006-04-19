@@ -1,60 +1,38 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="7.10"
 	Name="70_server"
 	ProjectGUID="{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}"
-	Keyword="MakeFileProj"
-	>
+	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
-			Name="Win32"
-		/>
+			Name="Win32"/>
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			>
+			ConfigurationType="0">
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"
-				PreprocessorDefinitions=""
-				IncludeSearchPath=""
-				ForcedIncludes=""
-				AssemblySearchPath=""
-				ForcedUsingAssemblies=""
-				CompileAsManaged=""
-			/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			>
+			ConfigurationType="0">
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"
-				PreprocessorDefinitions=""
-				IncludeSearchPath=""
-				ForcedIncludes=""
-				AssemblySearchPath=""
-				ForcedUsingAssemblies=""
-				CompileAsManaged=""
-			/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -63,74 +41,51 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
-			>
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\main.cpp"
-				>
+				RelativePath=".\main.cpp">
 			</File>
 			<File
-				RelativePath=".\Request.cpp"
-				>
+				RelativePath=".\Request.cpp">
 			</File>
 			<File
-				RelativePath=".\RequestDispatcher.cpp"
-				>
+				RelativePath=".\RequestDispatcher.cpp">
 			</File>
 			<File
-				RelativePath=".\RequestException.cpp"
-				>
+				RelativePath=".\RequestException.cpp">
 			</File>
 			<File
-				RelativePath=".\RequestHandler.cpp"
-				>
+				RelativePath=".\RequestHandler.cpp">
 			</File>
 			<File
-				RelativePath=".\Server.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ServerThread.cpp"
-				>
+				RelativePath=".\Server.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
-			>
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\module.h"
-				>
+				RelativePath=".\module.h">
 			</File>
 			<File
-				RelativePath=".\Request.h"
-				>
+				RelativePath=".\Request.h">
 			</File>
 			<File
-				RelativePath=".\RequestDispatcher.h"
-				>
+				RelativePath=".\RequestDispatcher.h">
 			</File>
 			<File
-				RelativePath=".\RequestException.h"
-				>
+				RelativePath=".\RequestException.h">
 			</File>
 			<File
-				RelativePath=".\RequestHandler.h"
-				>
+				RelativePath=".\RequestHandler.h">
 			</File>
 			<File
-				RelativePath=".\Server.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ServerThread.h"
-				>
+				RelativePath=".\Server.h">
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\SConscript"
-			>
+			RelativePath=".\SConscript">
 		</File>
 	</Files>
 	<Globals>
