@@ -29,8 +29,11 @@ namespace carto
 
 
 
-HtmlMapRenderer::HtmlMapRenderer(const RenderingConfig& config, std::ostream& output)
+HtmlMapRenderer::HtmlMapRenderer(const RenderingConfig& config, 
+				 const std::string& mapImgFilename,
+				 std::ostream& output)
     : Renderer (config)
+    , _mapImgFilename (mapImgFilename)
     , _output (output)
 {
 
@@ -50,11 +53,12 @@ void
 HtmlMapRenderer::render (Map& map)
 {
     map.prepare ();
-	_output << "<html><body>";
-    _output << "<map name='testmap'>" << std::endl;
+    _output << "<html><body>";
+    _output << "<map name='mapid'>" << std::endl;
     renderLines (map);
     _output << "</map>" << std::endl;
-	_output << "<img src='testmap.png' usemap='#testmap'/></body></html>";
+    _output << "<img src='" << _mapImgFilename << "' usemap='#mapid'/>" << std::endl;
+    _output << "</body></html>" << std::endl;
 
 
 }
@@ -109,53 +113,6 @@ HtmlMapRenderer::renderLines (Map& map)
 
 
 }
-
-
-
-
-
-
-
-
-
-
-void 
-HtmlMapRenderer::doDrawCurvedLine (const DrawableLine* dbl)
-{
-/*
-    const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
-    _canvas.newpath();
-    _canvas.moveto(shiftedPoints[0].getX(), shiftedPoints[0].getY());
-    
-    for (unsigned int i=1; i<shiftedPoints.size (); ++i) 
-    {
-	double x = shiftedPoints[i].getX();
-	double y = shiftedPoints[i].getY();
-	double radiusShift = 0.0;
-	
-	if (_config.getEnableCurves () && (i < shiftedPoints.size () - 1)) 
-	{
-	    // Not supported in html maps.
-	    // Really useful to keep it in Postscriptrendering ?? bof
-	} 
-	else 
-	{ 
-	    _canvas.lineto(x, y);	
-	}
-	
-    }
-    
-    _canvas.stroke();
-*/  
-}
-
-
-
-
-
-
-
-
 
 
 

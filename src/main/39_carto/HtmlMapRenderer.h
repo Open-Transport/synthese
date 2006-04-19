@@ -27,10 +27,20 @@ class HtmlMapRenderer : public Renderer
  private:
 
     std::ostream& _output; //!< Stream used for HTML map generation
+    std::string _mapImgFilename; //!< Filename of the img used in generated HTML map
     
  public:
 
-    HtmlMapRenderer (const RenderingConfig& config, std::ostream& output);
+
+    /** Constructor.
+     * @param config Rendering configuration.
+     * @param mapImgFilename Filename (without path) of the img used in generated HTML map
+     * @param output Output stream
+     */
+    HtmlMapRenderer (const RenderingConfig& config, 
+		     const std::string& mapImgFilename,
+		     std::ostream& output);
+
     virtual ~HtmlMapRenderer ();
 
     void render (Map& map);
@@ -39,8 +49,6 @@ class HtmlMapRenderer : public Renderer
 
     void renderLines (Map& map);
     void renderPhysicalStops (Map& map);
-
-    void doDrawCurvedLine (const DrawableLine* dbl);
 
  
 };

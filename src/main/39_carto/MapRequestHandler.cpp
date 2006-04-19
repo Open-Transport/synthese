@@ -52,11 +52,16 @@ const std::string MapRequestHandler::GHOSTSCRIPT_BIN ("gs");
 const std::string MapRequestHandler::FUNCTION_CODE ("map");
 
 const std::string MapRequestHandler::MODE_PARAMETER ("mode");
+const std::string MapRequestHandler::OUTPUT_PARAMETER ("output");
 const std::string MapRequestHandler::ENVIRONMENT_PARAMETER ("env");
 const std::string MapRequestHandler::MAP_PARAMETER ("map");
 
 const int MapRequestHandler::REQUEST_MODE_SOCKET (1);
 const int MapRequestHandler::REQUEST_MODE_HTTP (2);
+
+const std::string MapRequestHandler::REQUEST_OUTPUT_PS ("ps");
+const std::string MapRequestHandler::REQUEST_OUTPUT_PNG ("png");
+const std::string MapRequestHandler::REQUEST_OUTPUT_HTML ("html");
 
 
 MapRequestHandler::MapRequestHandler ()
@@ -91,6 +96,14 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
         throw synthese::server::RequestException ("Invalid map request mode " + Conversion::ToString (mode));
     }
 
+    std::string output = request.getParameter (OUTPUT_PARAMETER);
+    if ((output != REQUEST_OUTPUT_PS) && 
+	(output != REQUEST_OUTPUT_PNG) &&
+	(output != REQUEST_OUTPUT_HTML))
+    {
+        throw synthese::server::RequestException ("Invalid map output type " + output);
+    }
+    
     XMLNode envNode = XMLNode::parseString (request.getParameter (ENVIRONMENT_PARAMETER).c_str (),
 					    synthese::envlsxml::EnvironmentLS::ENVIRONMENT_TAG.c_str ());
 
@@ -98,6 +111,7 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 
     XMLNode mapNode = XMLNode::parseString (request.getParameter (MAP_PARAMETER).c_str (),
 					    synthese::cartolsxml::MapLS::MAP_TAG.c_str ());
+
     Map* map = synthese::cartolsxml::MapLS::Load (mapNode, *env);
 
     // Create a temporary file name based on system time
@@ -108,50 +122,79 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     // Generate an id for the map file based on current time
     ptime timems = boost::date_time::microsec_clock<ptime>::local_time ();
 
-    const boost::filesystem::path tempPsFile (tempDir / ("map_" + Conversion::ToString ((unsigned long) &request) + ".ps"));
-    const std::string tempPngFilename = "map_" + to_iso_string (timems) + ".png";
-    const boost::filesystem::path tempPngFile (tempDir / tempPngFilename);
+    std::string resultFilename = "map_" + to_iso_string (timems) + ".ps";
+    const boost::filesystem::path psFile (tempDir / resultFilename);
 
     // Create the postscript canvas for output
-    std::ofstream of (tempPsFile.string ().c_str ());
+    std::ofstream of (psFile.string ().c_str ());
 
+    // ---- Render postscript file ----
     RenderingConfig conf;
     synthese::carto::PostscriptRenderer psRenderer (conf, of);
     psRenderer.render (*map);
 
-    std::ofstream of2 ("c:/temp/testmap.html");
-    synthese::carto::HtmlMapRenderer hmRenderer (conf, of2);
-    hmRenderer.render (*map);
-
     of.close ();
 
-    // Convert the ps file to png with ghostscript
-    std::stringstream gscmd;
-    gscmd << GHOSTSCRIPT_BIN << " -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -g" 
-	  << map->getWidth () << "x" << map->getHeight () 
-	  << " -sOutputFile=" << tempPngFile.string () << " " << tempPsFile.string ();
-    
-    Log::GetInstance ().debug (gscmd.str ());
-
-    int ret = system (gscmd.str ().c_str ());
-    
-    if (ret != 0)
+    if ((output == REQUEST_OUTPUT_PNG) || (output == REQUEST_OUTPUT_HTML))
     {
-	throw synthese::util::Exception ("Error executing GhostScript (gs executable in path ?)");
-    }
-    // boost::filesystem::remove (tempPsFile);
+	// ---- Render PNG file ----
+	resultFilename = "map_" + to_iso_string (timems) + ".png";
+	const boost::filesystem::path pngFile (tempDir / resultFilename);
 
-    // Now get size of the generated PNG file...
-    long size = boost::filesystem::file_size (tempPngFile);
-    
-    std::ifstream ifpng (tempPngFile.string ().c_str (), std::ifstream::binary);
-    char * buffer;
-    buffer = new char [size];
-    ifpng.read (buffer, size);
-    ifpng.close();
+	// Convert the ps file to png with ghostscript
+	std::stringstream gscmd;
+	gscmd << GHOSTSCRIPT_BIN << " -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -g" 
+	      << map->getWidth () << "x" << map->getHeight () 
+	      << " -sOutputFile=" << pngFile.string () << " " << psFile.string ();
+	
+	Log::GetInstance ().debug (gscmd.str ());
+	
+	int ret = system (gscmd.str ().c_str ());
+	
+	if (ret != 0)
+	{
+	    throw synthese::util::Exception ("Error executing GhostScript (gs executable in path ?)");
+	}
+	
+	boost::filesystem::remove (psFile);
+
+	if (output == REQUEST_OUTPUT_HTML)
+	{
+	    std::string pngFilename (resultFilename);
+	    resultFilename = "map_" + to_iso_string (timems) + ".html";
+	    const boost::filesystem::path htmlFile (tempDir / resultFilename);
+
+	    std::ofstream ofhtml (htmlFile.string ().c_str ());
+	    synthese::carto::HtmlMapRenderer hmRenderer (conf, pngFilename, ofhtml);
+	    hmRenderer.render (*map);
+	    ofhtml.close ();
+
+	} 
+	else 
+	{
+	}
+
+    }
+
+
 
     if (mode == REQUEST_MODE_SOCKET) 
     {
+
+	Log::GetInstance ().warn ("!!! Removed implementation for socket mode !!!");
+
+	/* USELESS ! if one wants to pass args that exceed the limit, he just does not
+	   through the CGI interface but the return mechanism will still be an HTTP URL!! 
+
+	   // Now get size of the generated PNG file...
+	   long size = boost::filesystem::file_size (pngFile);
+
+	std::ifstream ifpng (tempPngFile.string ().c_str (), std::ifstream::binary);
+	char * buffer;
+	buffer = new char [size];
+	ifpng.read (buffer, size);
+	ifpng.close();
+
         // Send the content of the file through the socket.
         stream << size << ":";
         stream.write (buffer, size);
@@ -159,17 +202,22 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 
         // Remove the PNG file
         boost::filesystem::remove (tempPngFile);
+
+	delete[] buffer;
+	Log::GetInstance ().debug ("Sent PNG result (" + Conversion::ToString (size) + " bytes)");
+
+	*/
     }
     else if (mode == REQUEST_MODE_HTTP)
     {
+	std::string resultURL = Server::GetInstance ()->getHttpTempUrl () + "/" + resultFilename;
+
         // Send the URL to the the generated local PNG file.
-        stream << Server::GetInstance ()->getHttpTempUrl () 
-               << "/" << tempPngFilename << std::endl;
+        stream << resultURL << std::endl;
+
+	Log::GetInstance ().debug ("Sent result url " + resultURL);
     }
 
-    delete[] buffer;
-
-    Log::GetInstance ().debug ("Sent PNG result (" + Conversion::ToString (size) + " bytes)");
 
 
     delete map;
