@@ -61,7 +61,7 @@ ServerThread::operator()()
 
 	    _tcpService->closeConnection (serverSocket);
 	}
-	catch (synthese::util::Exception& ex)
+	catch (std::exception& ex)
 	{
 	    Log::GetInstance ().error ("", ex);
 	} 
