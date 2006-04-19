@@ -12,6 +12,8 @@
 #include <cmath>
 #include <algorithm>
 
+#include <boost/algorithm/string/replace.hpp>
+
 using synthese::util::RGBColor;
 using synthese::util::Log;
 using synthese::util::Conversion;
@@ -30,9 +32,11 @@ namespace carto
 
 
 HtmlMapRenderer::HtmlMapRenderer(const RenderingConfig& config, 
+				 const std::string& urlPattern,
 				 const std::string& mapImgFilename,
 				 std::ostream& output)
     : Renderer (config)
+    , _urlPattern (urlPattern)
     , _mapImgFilename (mapImgFilename)
     , _output (output)
 {
@@ -79,6 +83,8 @@ HtmlMapRenderer::renderLines (Map& map)
 		dbl->prepare (map, _config.getSpacing ());
     }    
     
+    
+
     // Draw
     for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
          it != selectedLines.end () ; ++it) 
@@ -88,22 +94,25 @@ HtmlMapRenderer::renderLines (Map& map)
 
 		// Shift them again on right and left of half-width to get the enveloppe.
 		const std::vector<synthese::env::Point> points1 =
-		  dbl->calculateAbsoluteShiftedPoints (shiftedPoints, 4);
+		  dbl->calculateAbsoluteShiftedPoints (shiftedPoints, (_config.getBorderWidth () / 2));
+		
+		std::string href (_urlPattern);
+		boost::replace_all (href, "$id", dbl->getLineId ());
 
-		_output << "<area href='#' shape='poly' coords='";
+		_output << "<area href='" << href << "' shape='poly' coords='";
 		for (int i=0; i<points1.size (); ++i)
 		{
-			_output << points1[i].getX () << "," << (map.getHeight () - points1[i].getY ()) << ",";
+			_output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";
 		}
 
 		std::vector<synthese::env::Point> points2 = 
-			dbl->calculateAbsoluteShiftedPoints (shiftedPoints, -4);
+			dbl->calculateAbsoluteShiftedPoints (shiftedPoints, - (_config.getBorderWidth () / 2));
 
 		std::reverse (points2.begin (), points2.end ());
 
 		for (int i=0; i<points2.size (); ++i)
 		{
-			_output << points2[i].getX () << "," << (map.getHeight () - points2[i].getY ());
+			_output << (int) points2[i].getX () << "," << (int) (map.getHeight () - points2[i].getY ());
 			if (i != points2.size ()-1) _output << ",";
 		}
 		_output << "'/>" << std::endl;

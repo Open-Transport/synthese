@@ -31,8 +31,9 @@ namespace carto
 DrawableLine::DrawableLine (const Line* line,
 			    int fromLineStopIndex,
 			    int toLineStopIndex,
-                bool withPhysicalStops)
-    : _points (line->getPoints (fromLineStopIndex, toLineStopIndex))
+			    bool withPhysicalStops)
+    : _lineId (line->getId ())
+    , _points (line->getPoints (fromLineStopIndex, toLineStopIndex))
     , _shortName (line->getId ())
     , _color (line->getColor ())
     , _withPhysicalStops (withPhysicalStops)
@@ -54,11 +55,13 @@ DrawableLine::DrawableLine (const Line* line,
 
 
     
-DrawableLine::DrawableLine (const std::vector<const synthese::env::Point*>& points,
+DrawableLine::DrawableLine (const std::string& lineId, 
+			    const std::vector<const synthese::env::Point*>& points,
 			    const std::string& shortName,
 			    const synthese::util::RGBColor& color,
-                bool withPhysicalStops)
-    : _points (points)
+			    bool withPhysicalStops)
+    : _lineId (lineId)
+    , _points (points)
     , _shortName (shortName)
     , _color (color)
     , _withPhysicalStops (withPhysicalStops)
@@ -78,6 +81,16 @@ DrawableLine::DrawableLine (const std::vector<const synthese::env::Point*>& poin
 DrawableLine::~DrawableLine()
 {
 }
+
+
+
+const std::string& 
+DrawableLine::getLineId () const
+{
+    return _lineId;
+}
+
+
 
 
 bool 

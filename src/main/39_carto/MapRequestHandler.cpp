@@ -165,7 +165,7 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 	    const boost::filesystem::path htmlFile (tempDir / resultFilename);
 
 	    std::ofstream ofhtml (htmlFile.string ().c_str ());
-	    synthese::carto::HtmlMapRenderer hmRenderer (conf, pngFilename, ofhtml);
+	    synthese::carto::HtmlMapRenderer hmRenderer (conf, map->getUrlPattern (), pngFilename, ofhtml);
 	    hmRenderer.render (*map);
 	    ofhtml.close ();
 

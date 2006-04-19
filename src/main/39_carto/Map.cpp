@@ -46,8 +46,9 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 const Rectangle& realFrame, 
          double width, 
          double height,
-         const MapBackgroundManager* backgroundManager)
-         
+         const MapBackgroundManager* backgroundManager,
+	 const std::string& urlPattern)
+    
 : _realFrame (realFrame)
 , _selectedLines (selectedLines)
 , _width (width)
@@ -55,6 +56,7 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _mapScaleX (_width / _realFrame.getWidth ())
 , _mapScaleY (_height / _realFrame.getHeight ())
 , _backgroundManager (backgroundManager)
+, _urlPattern (urlPattern)
 , _horizontalMargin (0)
 , _verticalMargin (0)
 
@@ -69,7 +71,9 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 double width, 
 	 double height,
-	 const MapBackgroundManager* backgroundManager)
+	 const MapBackgroundManager* backgroundManager,
+	 const std::string& urlPattern)
+
 : _realFrame (0,0,0,0)
 , _selectedLines (selectedLines)
 , _width (width)
@@ -77,6 +81,7 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _mapScaleX (_width / _realFrame.getWidth ())
 , _mapScaleY (_height / _realFrame.getHeight ())
 , _backgroundManager (backgroundManager)
+, _urlPattern (urlPattern)
 , _horizontalMargin (0)
 , _verticalMargin (0)
 {
@@ -178,6 +183,17 @@ Map::toOutputFrame (const Point& p)
             + _verticalMargin / 2
 	);
 }
+
+
+
+
+const std::string& 
+Map::getUrlPattern () const
+{
+    return _urlPattern;
+}
+
+
 
 
 int 

@@ -27,6 +27,7 @@ class HtmlMapRenderer : public Renderer
  private:
 
     std::ostream& _output; //!< Stream used for HTML map generation
+    std::string _urlPattern; //!< URL pattern ($id is replaced by the proper object id)
     std::string _mapImgFilename; //!< Filename of the img used in generated HTML map
     
  public:
@@ -34,10 +35,13 @@ class HtmlMapRenderer : public Renderer
 
     /** Constructor.
      * @param config Rendering configuration.
+     * @param urlPattern URL to be used in map output. In this URL, $id, will be replaced by
+       object id corresponding to the area (line, or physical stop).
      * @param mapImgFilename Filename (without path) of the img used in generated HTML map
      * @param output Output stream
      */
     HtmlMapRenderer (const RenderingConfig& config, 
+		     const std::string& urlPattern,
 		     const std::string& mapImgFilename,
 		     std::ostream& output);
 

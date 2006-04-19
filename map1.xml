@@ -2,7 +2,8 @@
      outputWidth="400" outputHeight="200"
      outputHorizontalMargin="200" 
      outputVerticalMargin="50" 
-     backgroundId="MP">
+     backgroundId="MP"
+     urlPattern="http://localhost/refres?id=$id">
 
 <!--     
      lowerLeftLatitude="526408" lowerLeftLongitude="1840480"

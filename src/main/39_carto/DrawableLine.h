@@ -31,6 +31,8 @@ class DrawableLine
 private:
 
 
+    const std::string _lineId;
+
     const std::vector<const synthese::env::Point*> _points;  //!< Reference line points
     const std::string _shortName;
     const synthese::util::RGBColor _color;
@@ -51,7 +53,8 @@ public:
 		  bool withPhysicalStops = true);
 
 
-    DrawableLine (const std::vector<const synthese::env::Point*>& points,
+    DrawableLine (const std::string& lineId,
+		  const std::vector<const synthese::env::Point*>& points,
 		  const std::string& shortName,
 		  const synthese::util::RGBColor& color,
 		  bool withPhysicalStops = true);
@@ -60,6 +63,8 @@ public:
 
     //! @name Getters/Setters
     //@{
+    const std::string& getLineId () const;
+
     const std::string& getShortName () const;
 	const synthese::util::RGBColor& getColor () const;
     bool getWithPhysicalStops () const;

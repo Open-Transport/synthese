@@ -34,6 +34,7 @@ namespace carto
 class Map
 {
 private:
+
     Rectangle _realFrame;
     double _width;	
     double _height;	
@@ -45,6 +46,7 @@ private:
     double _mapScaleY;
     
     const MapBackgroundManager* _backgroundManager;
+    const std::string _urlPattern;
     
     std::set<DrawableLine*> _selectedLines;
     std::set<DrawablePhysicalStop*> _selectedPhysicalStops;
@@ -102,13 +104,15 @@ public:
 	const Rectangle& realFrame, 
 	double width, 
 	double height,
-        const MapBackgroundManager* backgroundManager = 0);
+        const MapBackgroundManager* backgroundManager = 0,
+	const std::string& urlPattern = "");
 
 
     Map(const std::set<DrawableLine*>& selectedLines,
 	double width, 
 	double height,
-        const MapBackgroundManager* backgroundManager = 0);
+        const MapBackgroundManager* backgroundManager = 0,
+	const std::string& urlPattern = "");
 
     
     virtual ~Map();
@@ -136,6 +140,8 @@ public:
 
     bool hasBackgroundManager () const;
     const MapBackgroundManager* getBackgroundManager () const;
+
+    const std::string& getUrlPattern () const;
 
     const std::set<DrawableLine*>& getSelectedLines () const;
     const std::set<DrawablePhysicalStop*>& getSelectedPhysicalStops () const;

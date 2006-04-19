@@ -38,6 +38,7 @@ const std::string MapLS::MAP_OUTPUTHORIZONTALMARGIN_ATTR ("outputHorizontalMargi
 const std::string MapLS::MAP_OUTPUTVERTICALMARGIN_ATTR ("outputVerticalMargin");
 
 const std::string MapLS::MAP_BACKGROUNDID_ATTR ("backgroundId");
+const std::string MapLS::MAP_URLPATTERN_ATTR ("urlPattern");
 
 
 synthese::carto::Map* 
@@ -78,6 +79,12 @@ MapLS::Load (XMLNode& node,
 	}
     }
 
+    std::string urlPattern ("");
+    if (node.getAttribute (MAP_URLPATTERN_ATTR.c_str()) != 0)
+    {
+	urlPattern  = node.getAttribute (MAP_URLPATTERN_ATTR.c_str());
+    }
+
     synthese::carto::Map* map = 0;
 
     // If one of the 4 coordinates is missing, let the autofit 
@@ -90,7 +97,7 @@ MapLS::Load (XMLNode& node,
 	map = new synthese::carto::Map (selectedLines,
 					 outputWidth, 
 					 outputHeight, 
-					 mbm); 
+					 mbm, urlPattern); 
 
     }
     else 
@@ -113,7 +120,7 @@ MapLS::Load (XMLNode& node,
 								     upperRightLongitude - lowerLeftLongitude),
 					 outputWidth, 
 					 outputHeight, 
-					 mbm); 
+					 mbm, urlPattern); 
 
 
     }
