@@ -27,6 +27,9 @@ namespace server
 namespace carto
 {
 
+    class Map;
+    class RenderingConfig;
+
 
 /** Map request handler.
 
@@ -57,6 +60,7 @@ The different output types are :
   - ps  : PostScript
   - png : PNG bitmap
   - html : PNG + HTML map (only available in http mode)
+  - mapinfo : MID/MIF files returned in a zip
   
 @ingroup m39
 */
@@ -79,6 +83,7 @@ class MapRequestHandler : public synthese::server::RequestHandler
     static const std::string REQUEST_OUTPUT_PS;
     static const std::string REQUEST_OUTPUT_PNG;
     static const std::string REQUEST_OUTPUT_HTML;
+    static const std::string REQUEST_OUTPUT_MAPINFO;
 
  private:
 
@@ -112,7 +117,26 @@ class MapRequestHandler : public synthese::server::RequestHandler
 
  private:
 
-
+    std::string renderPsFile (const boost::filesystem::path& tempDir, 
+			      const std::string filenamePrefix,
+			      Map& map,
+			      const RenderingConfig& config) const;
+    
+    std::string renderPngFile (const boost::filesystem::path& tempDir, 
+			       const std::string filenamePrefix,
+			       Map& map,
+			       const RenderingConfig& config) const;
+    
+    std::string renderHtmlFile (const boost::filesystem::path& tempDir, 
+				const std::string filenamePrefix,
+				Map& map,
+				const RenderingConfig& config) const;
+    
+    std::string renderMapinfoFile (const boost::filesystem::path& tempDir, 
+				   const std::string filenamePrefix,
+				   Map& map,
+				   const RenderingConfig& config) const;
+    
 
 };
 
