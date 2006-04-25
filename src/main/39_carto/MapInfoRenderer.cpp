@@ -83,8 +83,8 @@ MapInfoRenderer::render (Map& map)
     mifof << "Index 52" << std::endl;
     mifof << "CoordSys Earth Projection 3, 1002, \"m\", 0, 46.8, 45.898918964419, 47.696014502038, 600000, 2200000 Bounds (-113967455.417, -106367759.649) (115167455.417, 122767151.185)" << std::endl; // this should never change...
     mifof << "Columns 1" << std::endl; 
-    
     mifof << "  Libelle Char(200)" << std::endl;
+    mifof << "Data" << std::endl << std::endl; 
 
     const std::set<DrawableLine*>& selectedLines = map.getSelectedLines ();
     for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
@@ -133,9 +133,12 @@ MapInfoRenderer::render (Map& map)
 		mifof << points[i]->getX () << " " << points[i]->getY () << std::endl;
 	    }
 	    mifof << "    Pen (" 
-		  << (int) dbl->getColor ().r << ","
-		  << (int) dbl->getColor ().g << ","
-		  << (int) dbl->getColor ().b << ")" << std::endl;
+		  << 3 << "," // pen width
+		  << 2 << "," // pen pattern
+		  << (((int) (dbl->getColor ().r * 65536) + 
+		       ((int) dbl->getColor ().g * 256) + 
+		       (int) dbl->getColor ().b)) // pen color
+		  << ")" << std::endl;
 
 	    midof << ((const PhysicalStop*) points[firstStopIndex])->getName ()
 		  << " > " << ((const PhysicalStop*) points[secondStopIndex])->getName ()
