@@ -55,8 +55,8 @@ namespace carto
       points2.push_back (&B2); 
       points2.push_back (&C2); 
 
-      DrawableLine line1 (points1, "L1", RGBColor ("blue"));
-      DrawableLine line2 (points2, "L2", RGBColor ("red"));
+      DrawableLine line1 ("1", points1, "L1", RGBColor ("blue"));
+      DrawableLine line2 ("2", points2, "L2", RGBColor ("red"));
 
       {
 	  DrawableLineComparator cmp (&line1, &A1, &A2);
@@ -105,7 +105,7 @@ namespace carto
       points.push_back (&C); 
       points.push_back (&D); 
       
-      DrawableLine line1 (points, "L1", RGBColor ("red"));
+      DrawableLine line1 ("1", points, "L1", RGBColor ("red"));
 	  
       points.clear ();
       
@@ -113,7 +113,7 @@ namespace carto
       points.push_back (&C); 
       points.push_back (&D); 
       
-      DrawableLine line2 (points, "L2", RGBColor ("black"));
+      DrawableLine line2 ("2", points, "L2", RGBColor ("black"));
 
       {
 	  DrawableLineComparator cmp (&line1, &C, &C);
@@ -152,14 +152,14 @@ namespace carto
       points.push_back (&A); 
       points.push_back (&C); 
       
-      DrawableLine line1 (points, "L1", RGBColor ("red"));
+      DrawableLine line1 ("1", points, "L1", RGBColor ("red"));
 	  
       points.clear ();
       
       points.push_back (&B); 
       points.push_back (&C); 
       
-      DrawableLine line2 (points, "L2", RGBColor ("black"));
+      DrawableLine line2 ("2", points, "L2", RGBColor ("black"));
 
       {
 	  DrawableLineComparator cmp (&line1, &C, &C);
@@ -208,7 +208,7 @@ namespace carto
       points.push_back (&H); 
       points.push_back (&I); 
       
-      DrawableLine line1 (points, "L1", RGBColor ("red"));
+      DrawableLine line1 ("1", points, "L1", RGBColor ("red"));
 
       points.clear ();
       points.push_back (&J); 
@@ -217,7 +217,7 @@ namespace carto
       points.push_back (&G); 
       points.push_back (&K); 
 
-      DrawableLine line2 (points, "L2", RGBColor ("blue"));
+      DrawableLine line2 ("2", points, "L2", RGBColor ("blue"));
 
       points.clear ();
       points.push_back (&M); 
@@ -226,21 +226,21 @@ namespace carto
       points.push_back (&F); 
       points.push_back (&L); 
 
-      DrawableLine line3 (points, "L3", RGBColor ("cyan"));
+      DrawableLine line3 ("3", points, "L3", RGBColor ("cyan"));
       points.clear ();
       points.push_back (&H); 
       points.push_back (&G); 
       points.push_back (&F); 
       points.push_back (&N); 
 
-      DrawableLine line4 (points, "L4", RGBColor ("yellow"));
+      DrawableLine line4 ("4", points, "L4", RGBColor ("yellow"));
 	
       points.clear ();
       points.push_back (&F); 
       points.push_back (&G); 
       points.push_back (&H); 
 
-      DrawableLine line5 (points, "L5", RGBColor ("green"));
+      DrawableLine line5 ("5", points, "L5", RGBColor ("green"));
 	
       points.clear ();
       points.push_back (&K); 
@@ -249,7 +249,7 @@ namespace carto
       points.push_back (&E); 
       points.push_back (&J); 
 
-      DrawableLine line6 (points, "L6", RGBColor ("magenta"));
+      DrawableLine line6 ("6", points, "L6", RGBColor ("magenta"));
       {
 	  DrawableLineComparator cmp (&line1, &F, &F);
 	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line2, &line1)); // Following 1, 2 is on the left of 1
@@ -321,8 +321,8 @@ namespace carto
       points.push_back (&B); 
       points.push_back (&F); 
 
-      DrawableLine line1 (points, "L1", RGBColor ("cyan"));
-      DrawableLine line2 (points, "L2", RGBColor ("yellow"));
+      DrawableLine line1 ("1", points, "L1", RGBColor ("cyan"));
+      DrawableLine line2 ("2", points, "L2", RGBColor ("yellow"));
 
       points.clear ();
       points.push_back (&A); 
@@ -332,7 +332,7 @@ namespace carto
       points.push_back (&E); 
       points.push_back (&F); 
 
-      DrawableLine line3 (points, "L3", RGBColor ("green"));
+      DrawableLine line3 ("3", points, "L3", RGBColor ("green"));
 
       {
 	  DrawableLineComparator cmp (&line3, &A, &A);

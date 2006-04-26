@@ -389,9 +389,25 @@ DrawableLine::calculateDoubleShiftedPoint (const Point& a,
         xk = (bk1 - bk0) / (a0 - a1);
         yk = a1 * xk + bk1;
     }
-    
-    return Point (xk, yk);
-    
+
+	Point k (xk, yk);
+
+	// <Heuristic 1 : 
+	// Note : this is experimental... but necessary. A better way
+	// to handle this would be to insert an extra point.
+
+	// If the distance of the shifted point relatively to B exceeds
+    // a certain amount, single shift the point to preserve good-looking
+	// display
+	double shiftDistance = calculateDistance (b, k);
+	if (shiftDistance > (incomingDistance+outgoingDistance) )
+	{
+		// We could even decrease this limit for aesthetic reasons...
+        return calculateSingleShiftedPoint (a, b, c, incomingDistance);
+	}
+	// Heuristic 1>
+
+    return k;
 }
 
 
