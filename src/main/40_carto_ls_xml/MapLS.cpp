@@ -50,10 +50,18 @@ MapLS::Load (XMLNode& node,
     int environmentId (su::Conversion::ToInt (
 			   node.getAttribute (MAP_ENVIRONMENTID_ATTR.c_str())));
 
-    int outputWidth (su::Conversion::ToInt (
+	int outputWidth = -1;
+	int outputHeight = -1;
+	if (node.getAttribute (MAP_OUTPUTWIDTH_ATTR.c_str()) != 0) 
+	{
+		outputWidth = (su::Conversion::ToInt (
 			   node.getAttribute (MAP_OUTPUTWIDTH_ATTR.c_str())));
-    int outputHeight (su::Conversion::ToInt (
+	}
+	if (node.getAttribute (MAP_OUTPUTHEIGHT_ATTR.c_str()) != 0) 
+	{
+	    outputHeight = (su::Conversion::ToInt (
 			   node.getAttribute (MAP_OUTPUTHEIGHT_ATTR.c_str())));
+	}
 
     // Drawable lines
     std::set<synthese::carto::DrawableLine*> selectedLines;

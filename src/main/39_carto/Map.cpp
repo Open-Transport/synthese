@@ -114,6 +114,15 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 					     lowerLeftLongitude,
 					     upperRightLatitude - lowerLeftLatitude,
 					     upperRightLongitude - lowerLeftLongitude);
+  _mapScaleX = _width / _realFrame.getWidth ();
+  _mapScaleY = _height / _realFrame.getHeight ();
+
+  if ((_width == -1) && (_height == -1)) _width = 400;
+  if (_width == -1) {
+	  _width = _height * _realFrame.getWidth () / _realFrame.getHeight ();
+  } else if (_height == -1) {
+	  _height = _width * _realFrame.getHeight () / _realFrame.getWidth ();
+  }
 
 }
 
