@@ -12,8 +12,10 @@
 #include <boost/filesystem/operations.hpp>
 
 #include "01_util/Log.h"
+#include "01_util/Conversion.h"
 
 using synthese::util::Log;
+using synthese::util::Conversion;
 
 
 
@@ -85,6 +87,13 @@ MapBackgroundManager::getBestScalingBackground (double mapScaleX,
             currentBackground = mbg;
         }
     }
+	Log::GetInstance ().info ("Best scale for " + 
+		Conversion::ToString (mapScaleX) + ", " + 
+		Conversion::ToString (mapScaleY) + " : " 
+		+ Conversion::ToString (currentBackground->getScaleX ()) + ", "
+		+ Conversion::ToString (currentBackground->getScaleY ()));
+
+
     return currentBackground;
 }
 

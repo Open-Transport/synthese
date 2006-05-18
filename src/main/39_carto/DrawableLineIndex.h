@@ -1,7 +1,10 @@
 #ifndef SYNTHESE_CARTO_DRAWABLELINEINDEX_H
 #define SYNTHESE_CARTO_DRAWABLELINEINDEX_H
 
+#include "15_env/Point.h"
+
 #include <map>
+#include <vector>
 #include <set>
 
 namespace synthese
@@ -26,20 +29,33 @@ private:
     typedef std::map<double, Index1D* > Index2D;
 	
     mutable Index2D _index;
+    double _minDistance;
+    
+    mutable std::vector<synthese::env::Point> _fuzzyPoints;
 
 protected:
 
 public:
 
-    DrawableLineIndex();
+    DrawableLineIndex(double minDistance);
     ~DrawableLineIndex();
 	
-    std::set<DrawableLine*>&
+    const std::set<DrawableLine*>&
 	find (const synthese::env::Point& point) const;
     
     void add (const synthese::env::Point& point, 
 	      DrawableLine* line) const;
-    
+
+    synthese::env::Point getFuzzyPoint (const synthese::env::Point& point) const;
+
+
+
+private:
+
+    std::set<DrawableLine*>&
+	doFind (const synthese::env::Point& point) const;
+
+
 };
 
 }

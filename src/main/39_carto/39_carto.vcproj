@@ -76,6 +76,9 @@
 				RelativePath=".\MapBackgroundTile.cpp">
 			</File>
 			<File
+				RelativePath=".\MapInfoRenderer.cpp">
+			</File>
+			<File
 				RelativePath=".\MapRequestHandler.cpp">
 			</File>
 			<File
@@ -133,6 +136,9 @@
 			</File>
 			<File
 				RelativePath=".\MapBackgroundTile.h">
+			</File>
+			<File
+				RelativePath=".\MapInfoRenderer.h">
 			</File>
 			<File
 				RelativePath=".\MapRequestHandler.h">

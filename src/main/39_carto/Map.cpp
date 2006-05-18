@@ -9,6 +9,8 @@
 #include "MapBackgroundManager.h"
 
 #include "PostscriptCanvas.h"
+#include "01_util/RGBColor.h"
+
 
 
 #include <algorithm>
@@ -53,15 +55,17 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _selectedLines (selectedLines)
 , _width (width)
 , _height (height)
+, _indexedLines (200.0)
 , _mapScaleX (_width / _realFrame.getWidth ())
 , _mapScaleY (_height / _realFrame.getHeight ())
 , _backgroundManager (backgroundManager)
 , _urlPattern (urlPattern)
 , _horizontalMargin (0)
 , _verticalMargin (0)
+, _lineGrouping (true)
 
 {
-    populateLineIndex ();
+    populateLineIndex (_indexedLines, _selectedLines);
 
 }
 
@@ -78,14 +82,16 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _selectedLines (selectedLines)
 , _width (width)
 , _height (height)
+, _indexedLines (200.0)
 , _mapScaleX (_width / _realFrame.getWidth ())
 , _mapScaleY (_height / _realFrame.getHeight ())
 , _backgroundManager (backgroundManager)
 , _urlPattern (urlPattern)
 , _horizontalMargin (0)
 , _verticalMargin (0)
+, _lineGrouping (true)
 {
-    populateLineIndex ();
+    populateLineIndex (_indexedLines, _selectedLines);
 
     
     // The real frame is deduced to fit selected lines points
@@ -98,15 +104,15 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 it != selectedLines.end ();
 	 ++it)
     {
-	const std::vector<const Point*>& points = (*it)->getPoints ();
-	for (std::vector<const Point*>::const_iterator itp = points.begin ();
+	const std::vector<Point>& points = (*it)->getFuzzyfiedPoints ();
+	for (std::vector<Point>::const_iterator itp = points.begin ();
 	     itp != points.end () ; ++itp)
 	{
-	    const Point* p = *itp;
-	    if (p->getX () < lowerLeftLatitude) lowerLeftLatitude = p->getX ();
-	    if (p->getY () < lowerLeftLongitude) lowerLeftLongitude = p->getY ();
-	    if (p->getX () > upperRightLatitude) upperRightLatitude = p->getX ();
-	    if (p->getY () > upperRightLongitude) upperRightLongitude = p->getY ();
+	    const Point& p = *itp;
+	    if (p.getX () < lowerLeftLatitude) lowerLeftLatitude = p.getX ();
+	    if (p.getY () < lowerLeftLongitude) lowerLeftLongitude = p.getY ();
+	    if (p.getX () > upperRightLatitude) upperRightLatitude = p.getX ();
+	    if (p.getY () > upperRightLongitude) upperRightLongitude = p.getY ();
 	}
     }
 
@@ -114,15 +120,16 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 					     lowerLeftLongitude,
 					     upperRightLatitude - lowerLeftLatitude,
 					     upperRightLongitude - lowerLeftLongitude);
-  _mapScaleX = _width / _realFrame.getWidth ();
-  _mapScaleY = _height / _realFrame.getHeight ();
-
   if ((_width == -1) && (_height == -1)) _width = 400;
   if (_width == -1) {
 	  _width = _height * _realFrame.getWidth () / _realFrame.getHeight ();
   } else if (_height == -1) {
 	  _height = _width * _realFrame.getHeight () / _realFrame.getWidth ();
   }
+  _mapScaleX = _width / _realFrame.getWidth ();
+  _mapScaleY = _height / _realFrame.getHeight ();
+
+
 
 }
 
@@ -130,20 +137,25 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 
 
 void 
-Map::populateLineIndex ()
+Map::populateLineIndex (const DrawableLineIndex& lineIndex, const std::set<DrawableLine*>& selectedLines)
 {
+	
     // Populate line index (indexed by point).
-    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
-	 it != _selectedLines.end ();
+    for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
+	 it != selectedLines.end ();
 	 ++it)
     {
-	const std::vector<const Point*>& points = (*it)->getPoints ();
-	for (std::vector<const Point*>::const_iterator itp = points.begin ();
-	     itp != points.end () ; ++itp)
-	{
-	    _indexedLines.add (**itp, *it);
+		(*it)->fuzzyfyPoints (lineIndex);
+
+		const std::vector<Point>& points = (*it)->getFuzzyfiedPoints ();
+		for (std::vector<Point>::const_iterator itp = points.begin ();
+			itp != points.end () ; ++itp)
+		{
+			lineIndex.add (*itp, *it);
+		}
+
 	}
-    }
+
 
 
 }
@@ -155,7 +167,8 @@ Map::~Map()
     // Delete drawable lines
     for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
 	 it != _selectedLines.end (); ++it) 
-    {
+    {	
+		//std::cerr << "Deleting " << ((long) (*it)) << std::endl;
 	delete (*it);
     }
 
@@ -240,10 +253,16 @@ Map::setVerticalMargin (int verticalMargin)
 
 std::vector<DrawableLine*>
 Map::findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
-			    const Point* point) const 
+			    const Point& point) const 
 {
+	// std::cerr << "*** findLinesSharingPoint " << drawableLines.size () << " x="
+	// 	<< point.getX () << " y=" << point.getY () << std::endl;
+	if (drawableLines.size () == 0) {
+		int a = 0;
+	}
+
     std::vector<DrawableLine*> sharingLines;
-    std::set<DrawableLine*> sharingSelectedLines = _indexedLines.find (*point);
+    const std::set<DrawableLine*>& sharingSelectedLines = _indexedLines.find (point);
     
     for (std::set<DrawableLine*>::const_iterator it = drawableLines.begin();
 	 it != drawableLines.end (); ++it) {
@@ -259,17 +278,18 @@ Map::findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
 
 
 
-std::pair<const Point*, int>
+std::pair<Point, int>
 Map::findMostSharedPoint (const DrawableLine* line, 
 			  const std::set<DrawableLine*>& exclusionList) const {
     int curPointIndex = -1;
     unsigned int cpt = 1;
 	
-    const std::vector<const Point*>& points = line->getPoints ();
+    const std::vector<Point>& points = line->getFuzzyfiedPoints ();
     for (unsigned int i=0; i<points.size (); ++i) 
     {
+	// Create a copy 
 	std::set<DrawableLine*> lines =
-	    _indexedLines.find (*points[i]);
+	    _indexedLines.find (points[i]);
 	
 	// Filter lines
 	for (std::set<DrawableLine*>::const_iterator it = exclusionList.begin ();
@@ -282,7 +302,7 @@ Map::findMostSharedPoint (const DrawableLine* line,
 	    curPointIndex = i;
 	}
     }
-    return std::pair<const Point*, int> (points[curPointIndex], cpt);
+    return std::pair<Point, int> (points[curPointIndex], cpt);
 }
 
 
@@ -301,24 +321,24 @@ Map::findMostSharedLine (const std::set<DrawableLine*>& drawableLines,
 	
     for (std::set<DrawableLine*>::const_iterator it = drawableLines.begin ();
 	 it != drawableLines.end (); ++it) {
-	DrawableLine* line = *it;
+		DrawableLine* line = *it;
 
-	if (exclusionList.find (line) != exclusionList.end ()) continue;
-		
-	int nbSharedPoints = 0;
-		
-	// Calculate the total of shared points of this line
-	for (int i=0; i<line->getPoints().size (); ++i) 
-	{
-	    nbSharedPoints += findLinesSharingPoint (
-		drawableLines, 
-		line->getPoints()[i]).size ();
-	}
-	if (nbSharedPoints > maxPoints) {
-	    maxPoints = nbSharedPoints;
-	    dbl = line;
-	}
-		
+		if (exclusionList.find (line) != exclusionList.end ()) continue;
+			
+		int nbSharedPoints = 0;
+			
+		// Calculate the total of shared points of this line
+		for (int i=0; i<line->getFuzzyfiedPoints().size (); ++i) 
+		{
+			nbSharedPoints += findLinesSharingPoint (
+			drawableLines, 
+			line->getFuzzyfiedPoints()[i]).size ();
+		}
+		if (nbSharedPoints > maxPoints) {
+			maxPoints = nbSharedPoints;
+			dbl = line;
+		}
+			
     }
     return dbl;
 }
@@ -330,7 +350,7 @@ Map::findMostSharedLine (const std::set<DrawableLine*>& drawableLines,
 
 
 std::pair<const DrawableLine*, int>
-Map::findLeftMostLine (const Point* v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
+Map::findLeftMostLine (const Point& v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
 {
     int leftMostShift = -10000;
     const DrawableLine* leftMostLine = 0;
@@ -364,7 +384,7 @@ Map::findLeftMostLine (const Point* v, const DrawableLine* reference, const std:
 
 
 std::pair<const DrawableLine*, int>
-Map::findRightMostLine (const Point* v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
+Map::findRightMostLine (const Point& v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
 {
     int rightMostShift = +10000;
     const DrawableLine* rightMostLine = 0;
@@ -396,7 +416,7 @@ Map::findRightMostLine (const Point* v, const DrawableLine* reference, const std
 
 void 
 Map::assignShiftFactors (const DrawableLine* reference, 
-			 const Point* referencePoint, 
+			 const Point& referencePoint, 
 			 DrawableLine* line, 
 			 const std::set<DrawableLine*>& exclusionList)
 {
@@ -407,11 +427,39 @@ Map::assignShiftFactors (const DrawableLine* reference,
     DrawableLineComparator cmp (reference, referencePoint, 0);
 	
     // cout << endl<< "******************* Processing line " << line->getShortName () << endl;
-    for (unsigned int j=0; j<line->getPoints().size (); ++j) {
+    for (unsigned int j=0; j<line->getFuzzyfiedPoints().size (); ++j) {
 	// cout << "Processing point " << j << endl;
+	
+	const Point& v = line->getFuzzyfiedPoints()[j];
+	
+	if (_lineGrouping)
+	{
+	    // For the current point, check if there is another line with the
+	    // same color which has been shifted for this point. If yes,
+	    // re-apply the same shift, otherwise process it.
+	    const std::set<DrawableLine*> sharingLines = 
+		_indexedLines.find (v);
+	    bool isGrouped (false);
+	    for (std::set<DrawableLine*>::const_iterator it = sharingLines.begin();
+		 (it != sharingLines.end()) && (!isGrouped); ++it) 
+	    {
+		const DrawableLine* itline = *it;
 		
-	const Point* v = line->getPoints()[j];
+		int index = itline->firstIndexOf (v);
+		if ((itline->getColor () == line->getColor ()) && 
+		    (itline->isShifted (index))) 
+		{
+		    line->setShift (j, itline->getShift (index));
+		    isGrouped = true;
+		}
 		
+	    }
+	    // On peut passer au point suivant si la ligne a été groupée
+	    // par sa couleur
+	    if (isGrouped) continue;
+	}
+	
+	
 	// Looks in the exclusion for the right most line to this point 
 	// and the left most line to this point.
 	std::pair<const DrawableLine*, int> leftMostLineAndShift  = 
@@ -527,8 +575,10 @@ void
 Map::prepareLines ()
 {
     std::set<DrawableLine*> drawableLines (_selectedLines);
+
     std::set<DrawableLine*> exclusionList;
 
+	
     while (exclusionList.size () < drawableLines.size ()) {
 	// Do the following until all the lines have been processed
 	// (as soon a line is processed it is in the exclusion list).
@@ -543,7 +593,7 @@ Map::prepareLines ()
 		
 	// Get the most shared point of the most shared bus line
 	// TODO : check there cannot be an infinite loop going through this.
-	std::pair<const Point*, int> pointAndCpt = findMostSharedPoint (mostSharedLine);
+	std::pair<Point, int> pointAndCpt = findMostSharedPoint (mostSharedLine);
 
 	// Check if the most shared bus line is sharing its most shared point
 	// with a line which is in the exclusion list. If yes, this line becomes
@@ -566,6 +616,7 @@ Map::prepareLines ()
 	// further for assigning shift factors.
 	DrawableLineComparator cmp (reference, pointAndCpt.first, pointAndCpt.first);
 	stable_sort (sharingLines.begin (), sharingLines.end (), cmp);
+
 
 	// cout << "Processing order (ref=" << reference->getShortName () << "): ";
 	// for (int l=0; l<sharingLines.size (); ++l) cout << sharingLines[l]->getShortName () << " ; ";
@@ -594,7 +645,7 @@ Map::prepareLines ()
 		exclusionList.insert (sharingLines[i]);
 	    }
 	}
-	
+
     }
 
 
@@ -638,7 +689,18 @@ Map::getOutputFrame () const
 void 
 Map::prepare () 
 {
-    prepareLines ();
+    // Create drawable physical stops (for each physical stop)
+    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
+         it != _selectedLines.end () ; ++it) 
+    {
+	    const DrawableLine* dbl = *it;
+	    // std::cerr << "selectedline " << dbl << std::endl;
+    }
+
+    
+
+
+	prepareLines ();
     preparePhysicalStops ();
 }
 
@@ -692,6 +754,28 @@ const std::set<DrawablePhysicalStop*>&
 Map::getSelectedPhysicalStops () const
 {
     return _selectedPhysicalStops;
+}
+
+
+bool
+Map::getLineGrouping () const
+{
+	return _lineGrouping;
+}
+
+
+void 
+Map::setLineGrouping (bool lineGrouping)
+{
+	_lineGrouping = lineGrouping;
+}
+
+
+
+const DrawableLineIndex& 
+Map::getLineIndex () const
+{
+	return _indexedLines;
 }
 
 

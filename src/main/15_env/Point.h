@@ -74,6 +74,7 @@ class Point
 	*/
         bool operator != ( const Point& ) const;
 
+
 };
 
 

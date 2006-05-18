@@ -109,7 +109,9 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
         throw synthese::server::RequestException ("Invalid map output type " + output);
     }
 
-    XMLNode envNode = XMLNode::parseString (request.getParameter (ENVIRONMENT_PARAMETER).c_str (),
+	std::string envXml (request.getParameter (ENVIRONMENT_PARAMETER));
+	// std::cerr << "envxml " << envXml.size () << std::endl;
+    XMLNode envNode = XMLNode::parseString (envXml.c_str (),
 					    synthese::envlsxml::EnvironmentLS::ENVIRONMENT_TAG.c_str ());
 
     Environment* env = synthese::envlsxml::EnvironmentLS::Load (envNode);
@@ -192,8 +194,6 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 
 	Log::GetInstance ().debug ("Sent result url " + resultURL);
     }
-
-
 
     delete map;
     delete env;
@@ -283,7 +283,8 @@ MapRequestHandler::renderHtmlFile (const boost::filesystem::path& tempDir,
     const boost::filesystem::path htmlFile (tempDir / resultFilename);
     
     std::ofstream ofhtml (htmlFile.string ().c_str ());
-    synthese::carto::HtmlMapRenderer hmRenderer (conf, map.getUrlPattern (), pngFilename, ofhtml);
+    synthese::carto::HtmlMapRenderer hmRenderer (conf, map.getUrlPattern (), 
+		Server::GetInstance ()->getHttpTempUrl () + "/" + pngFilename, ofhtml);
     hmRenderer.render (map);
     ofhtml.close ();
     

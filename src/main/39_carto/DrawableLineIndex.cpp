@@ -1,6 +1,10 @@
 #include "DrawableLineIndex.h"
 
-#include "15_env/Point.h"
+#include "Geometry.h"
+
+#include <iostream>
+
+using synthese::env::Point;
 
 
 namespace synthese
@@ -9,7 +13,8 @@ namespace carto
 {
 
 
-DrawableLineIndex::DrawableLineIndex()
+DrawableLineIndex::DrawableLineIndex(double minDistance)
+: _minDistance (minDistance)
 {
 
 }
@@ -18,6 +23,7 @@ DrawableLineIndex::DrawableLineIndex()
 
 DrawableLineIndex::~DrawableLineIndex()
 {
+	
     for (Index2D::iterator it2 = _index.begin (); 
 	 it2 != _index.end (); ++it2) 
     {
@@ -30,10 +36,19 @@ DrawableLineIndex::~DrawableLineIndex()
     }
 }
 
+
+
+
+
+const std::set<DrawableLine*>&
+DrawableLineIndex::find (const synthese::env::Point& point) const
+{
+    return doFind (point);
+}
 	
 
 std::set<DrawableLine*>&
-DrawableLineIndex::find (const synthese::env::Point& point) const
+DrawableLineIndex::doFind (const synthese::env::Point& point) const
 {
     Index1D* xmap = _index[point.getX ()];
     if (xmap == 0) {
@@ -56,10 +71,24 @@ void
 DrawableLineIndex::add (const synthese::env::Point& point, 
 			DrawableLine* line) const
 {
-    find (point).insert (line);
+    doFind (point).insert (line);
 }
 
 
+
+Point 
+DrawableLineIndex::getFuzzyPoint (const Point& point) const
+{
+	// Iterate on all stored points looking for one which is 
+	// distant to point of less than minDistance.
+	for (std::vector<Point>::iterator it = _fuzzyPoints.begin ();
+		it != _fuzzyPoints.end (); ++it) {
+	    double d = calculateDistance (point, *it);
+		if (d <= _minDistance) return (*it);
+	}
+	_fuzzyPoints.push_back (point);
+	return point;
+}
 
 
 

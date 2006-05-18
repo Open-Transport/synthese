@@ -33,6 +33,8 @@ namespace carto
 
 class Map
 {
+public:
+
 private:
 
     Rectangle _realFrame;
@@ -44,6 +46,8 @@ private:
 
     double _mapScaleX;
     double _mapScaleY;
+
+	bool _lineGrouping;
     
     const MapBackgroundManager* _backgroundManager;
     const std::string _urlPattern;
@@ -55,9 +59,9 @@ private:
     
     std::vector<DrawableLine*>
 	findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
-			       const synthese::env::Point* point) const;
+			       const synthese::env::Point& point) const;
     
-    std::pair<const synthese::env::Point*, int>
+    std::pair<synthese::env::Point, int>
 	findMostSharedPoint (const DrawableLine* drawableLine, 
 			     const std::set<DrawableLine*>& exclusionList = 
 			     std::set<DrawableLine*> ()) const;
@@ -67,20 +71,20 @@ private:
     
     
     std::pair<const DrawableLine*, int>
-	findLeftMostLine (const synthese::env::Point* vertex, 
+	findLeftMostLine (const synthese::env::Point& vertex, 
 			  const DrawableLine* reference, 
 			  const std::set<DrawableLine*>& lines) const;
     
 
     std::pair<const DrawableLine*, int>
-	findRightMostLine (const synthese::env::Point* vertex, 
+	findRightMostLine (const synthese::env::Point& vertex, 
 			   const DrawableLine* reference, 
 			   const std::set<DrawableLine*>& lines) const;
     
     
     void 
 	assignShiftFactors (const DrawableLine* reference, 
-			    const synthese::env::Point* referencePoint, 
+			    const synthese::env::Point& referencePoint, 
 			    DrawableLine* drawableLine, 
 			    const std::set<DrawableLine*>& exclusionList);
     
@@ -90,7 +94,7 @@ private:
     
     
     
-    void populateLineIndex ();
+    static void populateLineIndex (const DrawableLineIndex& lineIndex, const std::set<DrawableLine*>& selectedLines);
     void prepareLines ();
     void preparePhysicalStops ();
     void dumpBackground (PostscriptCanvas& canvas);
@@ -146,6 +150,11 @@ public:
     const std::set<DrawableLine*>& getSelectedLines () const;
     const std::set<DrawablePhysicalStop*>& getSelectedPhysicalStops () const;
     
+	bool getLineGrouping () const;
+	void setLineGrouping (bool lineGrouping);
+
+	const DrawableLineIndex& getLineIndex () const;
+
     //@}
 
     //! @name Update methods

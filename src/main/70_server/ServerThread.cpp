@@ -41,8 +41,8 @@ ServerThread::operator()()
 	    tcpStream (serverSocket);
 	
 
-	char buffer[1024*64]; // 64K buffer max
-	tcpStream.getline (buffer, 1024*64);
+	char buffer[1024*512]; // 512K buffer max
+	tcpStream.getline (buffer, 1024*512);
 
 	try
 	{

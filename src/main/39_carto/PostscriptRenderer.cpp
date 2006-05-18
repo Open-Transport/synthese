@@ -12,6 +12,7 @@
 #include "01_util/Conversion.h"
 
 #include <cmath>
+#include <iostream>
 
 using synthese::util::RGBColor;
 using synthese::util::Log;
@@ -49,7 +50,7 @@ PostscriptRenderer::render (Map& map)
 {
     _canvas.startPage(0, 0, map.getWidth (), map.getHeight ());
     
-    renderBackground (map);
+   renderBackground (map);
     renderLines (map);
     renderPhysicalStops (map);
 
@@ -91,10 +92,11 @@ PostscriptRenderer::renderBackground (Map& map)
 	    {
                 for (int j=tlIndexes.second; j<=brIndexes.second; ++j) 
 		{
+				if ((i < 0) || (j < 0)) continue; // guard
+
                     const MapBackgroundTile* tile = mbg->getTile (i, j);
 		    Log::GetInstance ().debug ("Dumping background tile [" + Conversion::ToString (i) + 
 			"," + Conversion::ToString (j) + "]");
-
                     if (tile != 0) { // Any background available for this tile ?
                         // cout << "Drawing tile " << i << "," << j <<  "  "<< tile->getPath ().string () << endl;
                         ++nbtiles;
@@ -124,21 +126,31 @@ PostscriptRenderer::renderLines (Map& map)
 	dbl->prepare (map, _config.getSpacing ());
     }    
 
+	_canvas.setlinewidth (_config.getBorderWidth ());
+	_canvas.setrgbcolor(_config.getBorderColor ());
     // Draw
     for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
          it != selectedLines.end () ; ++it) {
 	const DrawableLine* dbl = *it;
 	const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
 	
-	_canvas.setlinewidth (_config.getBorderWidth ());
-	_canvas.setrgbcolor(_config.getBorderColor ());
 	doDrawCurvedLine(dbl);
-    
+	}
 	_canvas.setlinewidth (_config.getLineWidth ());
     
+    for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
+         it != selectedLines.end () ; ++it) {
+	const DrawableLine* dbl = *it;
+	const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
 	_canvas.setrgbcolor(dbl->getColor ());
+
 	doDrawCurvedLine(dbl);
+		 }
     
+    for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
+         it != selectedLines.end () ; ++it) {
+	const DrawableLine* dbl = *it;
+	const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
 	for (unsigned int i=1; i<shiftedPoints.size()-1; ++i) 
 	{
 	    Point pt (shiftedPoints[i].getX() + 100.0, shiftedPoints[i].getY());

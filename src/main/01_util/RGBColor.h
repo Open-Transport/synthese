@@ -23,26 +23,7 @@ struct RGBColor
 	RGBColor (int red, int green, int blue) 
 		: r (red/255.0), g (green/255.0), b (blue/255.0) {}
 
-	RGBColor (const std::string& colorName) 
-	{
-	    if (colorName == "blue") {
-		r = 0; g = 0; b = 255;
-	    } else if (colorName == "red") {
-		r = 255; g = 0; b = 0;
-	    } else if (colorName == "green") {
-		r = 0; g = 255; b = 0;
-	    } else if (colorName == "yellow") {
-		r = 255; g = 255; b = 0;
-	    } else if (colorName == "magenta") {
-		r = 255; g = 0; b = 255;
-	    } else if (colorName == "cyan") {
-		r = 0; g = 255; b = 255;
-	    } else if (colorName == "white") {
-		r = 255; g = 255; b = 255;
-	    } else if (colorName == "black") {
-		r = 0; g = 0; b = 0;
-	    }
-	}
+	RGBColor (const std::string& colorName);
 	
 	
 };
@@ -51,5 +32,8 @@ struct RGBColor
 
 }
 }
+
+bool operator == ( const synthese::util::RGBColor& op1, const synthese::util::RGBColor& op2 );
+
 
 #endif

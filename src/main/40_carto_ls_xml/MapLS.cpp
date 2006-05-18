@@ -37,6 +37,8 @@ const std::string MapLS::MAP_OUTPUTHEIGHT_ATTR ("outputHeight");
 const std::string MapLS::MAP_OUTPUTHORIZONTALMARGIN_ATTR ("outputHorizontalMargin");
 const std::string MapLS::MAP_OUTPUTVERTICALMARGIN_ATTR ("outputVerticalMargin");
 
+const std::string MapLS::MAP_LINEGROUPING_ATTR ("lineGrouping");
+
 const std::string MapLS::MAP_BACKGROUNDID_ATTR ("backgroundId");
 const std::string MapLS::MAP_URLPATTERN_ATTR ("urlPattern");
 
@@ -144,6 +146,15 @@ MapLS::Load (XMLNode& node,
 	    int outputVerticalMargin = su::Conversion::ToInt (
             (node.getAttribute (MAP_OUTPUTVERTICALMARGIN_ATTR.c_str())));
         map->setVerticalMargin (outputVerticalMargin);
+    }
+
+	bool lineGrouping (true);
+    if (node.getAttribute (MAP_LINEGROUPING_ATTR.c_str()) != 0)
+    {
+		lineGrouping = su::Conversion::ToBool (
+			node.getAttribute (MAP_LINEGROUPING_ATTR.c_str()));
+
+		map->setLineGrouping (lineGrouping);
     }
 
     return map;
