@@ -150,6 +150,7 @@ PostscriptRenderer::renderLines (Map& map)
     for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
          it != selectedLines.end () ; ++it) {
 	const DrawableLine* dbl = *it;
+	if (dbl->getWithPhysicalStops() == false) continue;
 	const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
 	for (unsigned int i=1; i<shiftedPoints.size()-1; ++i) 
 	{
