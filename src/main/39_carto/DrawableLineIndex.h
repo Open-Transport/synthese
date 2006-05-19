@@ -29,7 +29,8 @@ private:
     typedef std::map<double, Index1D* > Index2D;
 	
     mutable Index2D _index;
-    double _minDistance;
+    double _scaleX;
+    double _scaleY;
     
     mutable std::vector<synthese::env::Point> _fuzzyPoints;
 
@@ -37,12 +38,16 @@ protected:
 
 public:
 
-    DrawableLineIndex(double minDistance);
+    DrawableLineIndex();
     ~DrawableLineIndex();
 	
     const std::set<DrawableLine*>&
 	find (const synthese::env::Point& point) const;
     
+
+	void setScaleX (double scaleX);
+	void setScaleY (double scaleY);
+
     void add (const synthese::env::Point& point, 
 	      DrawableLine* line) const;
 

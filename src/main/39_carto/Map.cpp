@@ -55,7 +55,6 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _selectedLines (selectedLines)
 , _width (width)
 , _height (height)
-, _indexedLines (200.0)
 , _mapScaleX (_width / _realFrame.getWidth ())
 , _mapScaleY (_height / _realFrame.getHeight ())
 , _backgroundManager (backgroundManager)
@@ -65,6 +64,8 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _lineGrouping (true)
 
 {
+	_indexedLines.setScaleX(_mapScaleX);
+	_indexedLines.setScaleY(_mapScaleY);
     populateLineIndex (_indexedLines, _selectedLines);
 
 }
@@ -82,7 +83,6 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _selectedLines (selectedLines)
 , _width (width)
 , _height (height)
-, _indexedLines (200.0)
 , _mapScaleX (_width / _realFrame.getWidth ())
 , _mapScaleY (_height / _realFrame.getHeight ())
 , _backgroundManager (backgroundManager)
@@ -91,8 +91,6 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _verticalMargin (0)
 , _lineGrouping (true)
 {
-    populateLineIndex (_indexedLines, _selectedLines);
-
     
     // The real frame is deduced to fit selected lines points
     double lowerLeftLatitude = std::numeric_limits<double>::max ();
@@ -104,15 +102,15 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 it != selectedLines.end ();
 	 ++it)
     {
-	const std::vector<Point>& points = (*it)->getFuzzyfiedPoints ();
-	for (std::vector<Point>::const_iterator itp = points.begin ();
+	const std::vector<const Point*>& points = (*it)->getPoints ();
+	for (std::vector<const Point*>::const_iterator itp = points.begin ();
 	     itp != points.end () ; ++itp)
 	{
-	    const Point& p = *itp;
-	    if (p.getX () < lowerLeftLatitude) lowerLeftLatitude = p.getX ();
-	    if (p.getY () < lowerLeftLongitude) lowerLeftLongitude = p.getY ();
-	    if (p.getX () > upperRightLatitude) upperRightLatitude = p.getX ();
-	    if (p.getY () > upperRightLongitude) upperRightLongitude = p.getY ();
+	    const Point* p = *itp;
+	    if (p->getX () < lowerLeftLatitude) lowerLeftLatitude = p->getX ();
+	    if (p->getY () < lowerLeftLongitude) lowerLeftLongitude = p->getY ();
+	    if (p->getX () > upperRightLatitude) upperRightLatitude = p->getX ();
+	    if (p->getY () > upperRightLongitude) upperRightLongitude = p->getY ();
 	}
     }
 
@@ -129,6 +127,10 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
   _mapScaleX = _width / _realFrame.getWidth ();
   _mapScaleY = _height / _realFrame.getHeight ();
 
+	_indexedLines.setScaleX(_mapScaleX);
+	_indexedLines.setScaleY(_mapScaleY);
+
+    populateLineIndex (_indexedLines, _selectedLines);
 
 
 }

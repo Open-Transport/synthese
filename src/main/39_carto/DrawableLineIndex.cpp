@@ -13,8 +13,9 @@ namespace carto
 {
 
 
-DrawableLineIndex::DrawableLineIndex(double minDistance)
-: _minDistance (minDistance)
+DrawableLineIndex::DrawableLineIndex()
+: _scaleX (0.0)
+, _scaleY (0.0)
 {
 
 }
@@ -36,6 +37,20 @@ DrawableLineIndex::~DrawableLineIndex()
     }
 }
 
+
+void 
+DrawableLineIndex::setScaleX (double scaleX)
+{
+	_scaleX = scaleX;
+}
+
+
+
+void 
+DrawableLineIndex::setScaleY (double scaleY)
+{
+	_scaleY = scaleY;
+}
 
 
 
@@ -80,11 +95,16 @@ Point
 DrawableLineIndex::getFuzzyPoint (const Point& point) const
 {
 	// Iterate on all stored points looking for one which is 
-	// distant to point of less than minDistance.
+	// distant to point of less than a minimum distance on the 
+	// final rendered map.
 	for (std::vector<Point>::iterator it = _fuzzyPoints.begin ();
 		it != _fuzzyPoints.end (); ++it) {
-	    double d = calculateDistance (point, *it);
-		if (d <= _minDistance) return (*it);
+		Point fuzzyOutputPoint (it->getX() * _scaleX, 
+								it->getY() * _scaleY);
+		Point outputPoint (point.getX() * _scaleX, 
+						   point.getY() * _scaleY);
+	    double d = calculateDistance (outputPoint, fuzzyOutputPoint);
+		if (d <= 10) return (*it); // 5 pixels
 	}
 	_fuzzyPoints.push_back (point);
 	return point;
