@@ -52,14 +52,14 @@ Two modes are available for requesting :
        environment used for map generation; 
        where XML_MAP is the XML definition of the map 
        drawing parameters.
-  Response type : PNG file generated locally on server side.
-  Response format : |{PNG_URL}|
+  Response type : JPEG file generated locally on server side.
+  Response format : |{JPEG_URL}|
        where PNG_URL is the url of the generated PNG file.
 
 The different output types are :
   - ps  : PostScript
-  - png : PNG bitmap
-  - html : PNG + HTML map (only available in http mode)
+  - jpeg : JPEG bitmap
+  - html : JPEG + HTML map (only available in http mode)
   - mapinfo : MID/MIF files returned in a zip
   
 @ingroup m39
@@ -81,7 +81,7 @@ class MapRequestHandler : public synthese::server::RequestHandler
     static const int REQUEST_MODE_HTTP;
 
     static const std::string REQUEST_OUTPUT_PS;
-    static const std::string REQUEST_OUTPUT_PNG;
+    static const std::string REQUEST_OUTPUT_JPEG;
     static const std::string REQUEST_OUTPUT_HTML;
     static const std::string REQUEST_OUTPUT_MAPINFO;
 
@@ -122,7 +122,7 @@ class MapRequestHandler : public synthese::server::RequestHandler
 			      Map& map,
 			      const RenderingConfig& config) const;
     
-    std::string renderPngFile (const boost::filesystem::path& tempDir, 
+    std::string renderJpegFile (const boost::filesystem::path& tempDir, 
 			       const std::string filenamePrefix,
 			       Map& map,
 			       const RenderingConfig& config) const;

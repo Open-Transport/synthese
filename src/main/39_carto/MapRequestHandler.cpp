@@ -63,7 +63,7 @@ const int MapRequestHandler::REQUEST_MODE_SOCKET (1);
 const int MapRequestHandler::REQUEST_MODE_HTTP (2);
 
 const std::string MapRequestHandler::REQUEST_OUTPUT_PS ("ps");
-const std::string MapRequestHandler::REQUEST_OUTPUT_PNG ("png");
+const std::string MapRequestHandler::REQUEST_OUTPUT_JPEG ("jpeg");
 const std::string MapRequestHandler::REQUEST_OUTPUT_HTML ("html");
 const std::string MapRequestHandler::REQUEST_OUTPUT_MAPINFO ("mapinfo");
 
@@ -102,7 +102,7 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 
     std::string output = request.getParameter (OUTPUT_PARAMETER);
     if ((output != REQUEST_OUTPUT_PS) && 
-	(output != REQUEST_OUTPUT_PNG) &&
+	(output != REQUEST_OUTPUT_JPEG) &&
 	(output != REQUEST_OUTPUT_HTML) &&
 	(output != REQUEST_OUTPUT_MAPINFO))
     {
@@ -140,9 +140,9 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     {
 	resultFilename = renderPsFile (tempDir, filePrefix, *map, conf);
     } 
-    else if (output == REQUEST_OUTPUT_PNG) 
+    else if (output == REQUEST_OUTPUT_JPEG) 
     {
-	resultFilename = renderPngFile (tempDir, filePrefix, *map, conf);
+	resultFilename = renderJpegFile (tempDir, filePrefix, *map, conf);
     }
     else if (output == REQUEST_OUTPUT_HTML) 
     {
@@ -163,25 +163,25 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 	/* USELESS ! if one wants to pass args that exceed the limit, he just does not
 	   through the CGI interface but the return mechanism will still be an HTTP URL!! 
 
-	   // Now get size of the generated PNG file...
-	   long size = boost::filesystem::file_size (pngFile);
+	   // Now get size of the generated JPEG file...
+	   long size = boost::filesystem::file_size (jpegFile);
 
-	std::ifstream ifpng (tempPngFile.string ().c_str (), std::ifstream::binary);
+	std::ifstream ifjpeg (tempJpegFile.string ().c_str (), std::ifstream::binary);
 	char * buffer;
 	buffer = new char [size];
-	ifpng.read (buffer, size);
-	ifpng.close();
+	ifjpeg.read (buffer, size);
+	ifjpeg.close();
 
         // Send the content of the file through the socket.
         stream << size << ":";
         stream.write (buffer, size);
         stream << std::flush;
 
-        // Remove the PNG file
-        boost::filesystem::remove (tempPngFile);
+        // Remove the JPEG file
+        boost::filesystem::remove (tempJpegFile);
 
 	delete[] buffer;
-	Log::GetInstance ().debug ("Sent PNG result (" + Conversion::ToString (size) + " bytes)");
+	Log::GetInstance ().debug ("Sent JPEG result (" + Conversion::ToString (size) + " bytes)");
 
 	*/
     }
@@ -189,7 +189,7 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     {
 	std::string resultURL = Server::GetInstance ()->getHttpTempUrl () + "/" + resultFilename;
 
-        // Send the URL to the the generated local PNG file.
+        // Send the URL to the the generated local JPEG file.
         stream << resultURL << std::endl;
 
 	Log::GetInstance ().debug ("Sent result url " + resultURL);
@@ -231,7 +231,7 @@ MapRequestHandler::renderPsFile (const boost::filesystem::path& tempDir,
 
 
 std::string 
-MapRequestHandler::renderPngFile (const boost::filesystem::path& tempDir, 
+MapRequestHandler::renderJpegFile (const boost::filesystem::path& tempDir, 
 				  const std::string filenamePrefix,
 				  Map& map,
 				  const RenderingConfig& conf) const
@@ -241,14 +241,14 @@ MapRequestHandler::renderPngFile (const boost::filesystem::path& tempDir,
     std::string psFilename = filenamePrefix + ".ps";
     const boost::filesystem::path psFile (tempDir / psFilename);
 
-    std::string resultFilename (filenamePrefix + ".png");
-    const boost::filesystem::path pngFile (tempDir / resultFilename);
+    std::string resultFilename (filenamePrefix + ".jpg");
+    const boost::filesystem::path jpegFile (tempDir / resultFilename);
     
-    // Convert the ps file to png with ghostscript
+    // Convert the ps file to jpeg with ghostscript
     std::stringstream gscmd;
-    gscmd << GHOSTSCRIPT_BIN << " -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -g" 
+    gscmd << GHOSTSCRIPT_BIN << " -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=jpeg -dJPEGQ=50 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -g" 
 	  << map.getWidth () << "x" << map.getHeight () 
-	  << " -sOutputFile=" << pngFile.string () << " " << psFile.string ();
+	  << " -sOutputFile=" << jpegFile.string () << " " << psFile.string ();
     
     Log::GetInstance ().debug (gscmd.str ());
     
@@ -275,16 +275,16 @@ MapRequestHandler::renderHtmlFile (const boost::filesystem::path& tempDir,
 				   Map& map,
 				   const RenderingConfig& conf) const
 {
-    renderPngFile (tempDir, filenamePrefix, map, conf);
+    renderJpegFile (tempDir, filenamePrefix, map, conf);
 
-    std::string pngFilename = filenamePrefix + ".png";
+    std::string jpegFilename = filenamePrefix + ".jpg";
 
     std::string resultFilename (filenamePrefix + ".html");
     const boost::filesystem::path htmlFile (tempDir / resultFilename);
     
     std::ofstream ofhtml (htmlFile.string ().c_str ());
     synthese::carto::HtmlMapRenderer hmRenderer (conf, map.getUrlPattern (), 
-		Server::GetInstance ()->getHttpTempUrl () + "/" + pngFilename, ofhtml);
+		Server::GetInstance ()->getHttpTempUrl () + "/" + jpegFilename, ofhtml);
     hmRenderer.render (map);
     ofhtml.close ();
     
