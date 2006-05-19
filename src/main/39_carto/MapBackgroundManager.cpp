@@ -87,11 +87,14 @@ MapBackgroundManager::getBestScalingBackground (double mapScaleX,
             currentBackground = mbg;
         }
     }
-	Log::GetInstance ().info ("Best scale for " + 
-		Conversion::ToString (mapScaleX) + ", " + 
-		Conversion::ToString (mapScaleY) + " : " 
-		+ Conversion::ToString (currentBackground->getScaleX ()) + ", "
-		+ Conversion::ToString (currentBackground->getScaleY ()));
+	if (currentBackground != 0) 
+	{
+		Log::GetInstance ().info ("Best scale for " + 
+			Conversion::ToString (mapScaleX) + ", " + 
+			Conversion::ToString (mapScaleY) + " : " 
+			+ Conversion::ToString (currentBackground->getScaleX ()) + ", "
+			+ Conversion::ToString (currentBackground->getScaleY ()));
+	}
 
 
     return currentBackground;

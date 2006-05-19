@@ -689,16 +689,7 @@ Map::getOutputFrame () const
 void 
 Map::prepare () 
 {
-    // Create drawable physical stops (for each physical stop)
-    for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
-         it != _selectedLines.end () ; ++it) 
-    {
-	    const DrawableLine* dbl = *it;
-	    // std::cerr << "selectedline " << dbl << std::endl;
-    }
-
-    
-
+	if (_selectedLines.size () == 0) return;
 
 	prepareLines ();
     preparePhysicalStops ();

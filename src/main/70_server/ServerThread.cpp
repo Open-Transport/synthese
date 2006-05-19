@@ -59,12 +59,12 @@ ServerThread::operator()()
 	    // Send request to proper handler through dispatcher
 	    RequestDispatcher::getInstance ()->dispatchRequest (request, tcpStream);
 
-	    _tcpService->closeConnection (serverSocket);
 	}
 	catch (std::exception& ex)
 	{
 	    Log::GetInstance ().error ("", ex);
 	} 
+	_tcpService->closeConnection (serverSocket);
 	
     }
 
