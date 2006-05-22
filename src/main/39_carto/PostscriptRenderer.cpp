@@ -344,7 +344,7 @@ PostscriptRenderer::renderPhysicalStops (Map& map)
     {
         const DrawablePhysicalStop* dps = *it;
 	
-	Point cp = map.toOutputFrame (dps->getPoint ());
+	Point cp = dps->getPoint ();
 	_canvas.moveto (cp.getX (), cp.getY ());
 	_canvas.sticker (dps->getName (), synthese::util::RGBColor ("yellow"), 10, 10);
     }

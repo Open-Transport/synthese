@@ -542,6 +542,7 @@ void
 Map::preparePhysicalStops () 
 {
     std::set<const PhysicalStop*> iteratedStops;
+	std::vector<Point> fuzzyStopPoints;
 
     // Create drawable physical stops (for each physical stop)
     for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
@@ -558,14 +559,22 @@ Map::preparePhysicalStops ()
 	        const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (p);
 	        if (physicalStop)
 	        {
-                if (iteratedStops.find (physicalStop) == iteratedStops.end ())
+				Point fuzzyPoint (_indexedLines.getFuzzyPoint (*p));
+                if ( (iteratedStops.find (physicalStop) == iteratedStops.end ()) &&
+					 (find (fuzzyStopPoints.begin(), fuzzyStopPoints.end(), fuzzyPoint) == fuzzyStopPoints.end ()) )
                 {
                     // Guarantees a physical stop is added only once as a 
                     // DrawablePhysicalStop.
                     iteratedStops.insert (physicalStop);
-		    DrawablePhysicalStop* dps = new DrawablePhysicalStop (physicalStop);
-		    dps->prepare (*this);
+
+					// Guarantees that two physical stops merged by fuzzyfication
+					// will be drawn only once.
+					fuzzyStopPoints.push_back (fuzzyPoint);
+
+					DrawablePhysicalStop* dps = new DrawablePhysicalStop (physicalStop);
+					dps->prepare (*this);
                     _selectedPhysicalStops.insert (dps);
+
                 }
             }
         }
