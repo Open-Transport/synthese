@@ -104,7 +104,7 @@ DrawableLineIndex::getFuzzyPoint (const Point& point) const
 		Point outputPoint (point.getX() * _scaleX, 
 						   point.getY() * _scaleY);
 	    double d = calculateDistance (outputPoint, fuzzyOutputPoint);
-		if (d <= 10) return (*it); // 5 pixels
+		if (d <= 20) return (*it); // 5 pixels
 	}
 	_fuzzyPoints.push_back (point);
 	return point;
