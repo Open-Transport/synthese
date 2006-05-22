@@ -33,6 +33,9 @@ private:
     double _tileWidth;
     double _tileHeight;
 
+    int _tilePixelWidth;
+    int _tilePixelHeight;
+
     int _numTilesX;
     int _numTilesY;
     
@@ -51,6 +54,11 @@ public:
     double getScaleX () const { return _scaleX; }
     double getScaleY () const { return _scaleY; }
     
+    int getTilePixelWidth () const { return _tilePixelWidth; }
+    int getTilePixelHeight () const { return _tilePixelHeight; }
+    
+    int getNbTilesX () const { return _numTilesX; }
+    int getNbTilesY () const { return _numTilesY; }
     
     void dumpTileGrid ();
     

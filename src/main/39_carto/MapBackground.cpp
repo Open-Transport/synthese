@@ -99,6 +99,8 @@ MapBackground::MapBackground(const std::string& tileDir)
     _maxY = maxY;
     _tileWidth = tiles[0]->getWidth ();
     _tileHeight = tiles[0]->getHeight ();
+    _tilePixelWidth = tiles[0]->getPixelWidth ();
+    _tilePixelHeight = tiles[0]->getPixelHeight ();
     
     _numTilesX = (int) ceil((_maxX - _minX) / _tileWidth);
     _numTilesY = (int) ceil((_maxY - _minY) / _tileHeight);
