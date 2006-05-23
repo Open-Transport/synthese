@@ -36,6 +36,7 @@ const std::string MapLS::MAP_OUTPUTWIDTH_ATTR ("outputWidth");
 const std::string MapLS::MAP_OUTPUTHEIGHT_ATTR ("outputHeight");
 const std::string MapLS::MAP_OUTPUTHORIZONTALMARGIN_ATTR ("outputHorizontalMargin");
 const std::string MapLS::MAP_OUTPUTVERTICALMARGIN_ATTR ("outputVerticalMargin");
+const std::string MapLS::MAP_PRESERVERATIO_ATTR ("preserveRatio");
 
 const std::string MapLS::MAP_LINEGROUPING_ATTR ("lineGrouping");
 
@@ -97,6 +98,14 @@ MapLS::Load (XMLNode& node,
 
     synthese::carto::Map* map = 0;
 
+
+	bool preserveRatio (true);
+    if (node.getAttribute (MAP_PRESERVERATIO_ATTR.c_str()) != 0)
+    {
+		preserveRatio = su::Conversion::ToBool (
+			node.getAttribute (MAP_PRESERVERATIO_ATTR.c_str()));
+    }
+
     // If one of the 4 coordinates is missing, let the autofit 
     // feature process the right rectangle
     if ( (node.getAttribute (MAP_LOWERLEFTLATITUDE_ATTR.c_str()) == 0)  ||
@@ -107,6 +116,7 @@ MapLS::Load (XMLNode& node,
 	map = new synthese::carto::Map (selectedLines,
 					 outputWidth, 
 					 outputHeight, 
+					 preserveRatio,
 					 mbm, urlPattern); 
 
     }
@@ -130,6 +140,7 @@ MapLS::Load (XMLNode& node,
 								     upperRightLongitude - lowerLeftLongitude),
 					 outputWidth, 
 					 outputHeight, 
+					 preserveRatio,
 					 mbm, urlPattern); 
 
 
@@ -156,6 +167,7 @@ MapLS::Load (XMLNode& node,
 
 		map->setLineGrouping (lineGrouping);
     }
+	
 
     return map;
 }

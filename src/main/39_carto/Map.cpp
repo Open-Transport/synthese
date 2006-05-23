@@ -46,17 +46,15 @@ namespace carto
 
 Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 const Rectangle& realFrame, 
-         double width, 
-         double height,
+    double width, 
+    double height,
+	bool preserveRatio,
          const MapBackgroundManager* backgroundManager,
 	 const std::string& urlPattern)
     
 : _realFrame (realFrame)
 , _selectedLines (selectedLines)
-, _width (width)
-, _height (height)
-, _mapScaleX (_width / _realFrame.getWidth ())
-, _mapScaleY (_height / _realFrame.getHeight ())
+, _preserveRatio (preserveRatio)
 , _backgroundManager (backgroundManager)
 , _urlPattern (urlPattern)
 , _horizontalMargin (0)
@@ -64,6 +62,14 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _lineGrouping (true)
 
 {
+   _width = width;
+   _height = height;
+   
+
+
+   _mapScaleX = (_width / _realFrame.getWidth ());
+   _mapScaleY = (_height / _realFrame.getHeight ());
+
 	_indexedLines.setScaleX(_mapScaleX);
 	_indexedLines.setScaleY(_mapScaleY);
     populateLineIndex (_indexedLines, _selectedLines);
@@ -76,15 +82,13 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 double width, 
 	 double height,
+	bool preserveRatio,
 	 const MapBackgroundManager* backgroundManager,
 	 const std::string& urlPattern)
 
 : _realFrame (0,0,0,0)
 , _selectedLines (selectedLines)
-, _width (width)
-, _height (height)
-, _mapScaleX (_width / _realFrame.getWidth ())
-, _mapScaleY (_height / _realFrame.getHeight ())
+, _preserveRatio (preserveRatio)
 , _backgroundManager (backgroundManager)
 , _urlPattern (urlPattern)
 , _horizontalMargin (0)
@@ -92,6 +96,9 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _lineGrouping (true)
 {
     
+   _width = width;
+   _height = height;
+
     // The real frame is deduced to fit selected lines points
     double lowerLeftLatitude = std::numeric_limits<double>::max ();
     double lowerLeftLongitude = std::numeric_limits<double>::max ();
@@ -119,11 +126,29 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 					     upperRightLatitude - lowerLeftLatitude,
 					     upperRightLongitude - lowerLeftLongitude);
   if ((_width == -1) && (_height == -1)) _width = 400;
-  if (_width == -1) {
+  if (_width == -1) 
+  {
 	  _width = _height * _realFrame.getWidth () / _realFrame.getHeight ();
-  } else if (_height == -1) {
+  } 
+  else if (_height == -1) 
+  {
 	  _height = _width * _realFrame.getHeight () / _realFrame.getWidth ();
   }
+  else 
+  {
+	  if (_preserveRatio)
+	  {
+		 double newHeight = _width * _realFrame.getHeight () / _realFrame.getWidth ();
+		 while (newHeight > height) 
+		 {
+			 _width -= 10;
+			 newHeight = _width * _realFrame.getHeight () / _realFrame.getWidth ();	
+		 }
+		 _height = newHeight;
+	  }
+  }
+
+
   _mapScaleX = _width / _realFrame.getWidth ();
   _mapScaleY = _height / _realFrame.getHeight ();
 

@@ -41,6 +41,8 @@ private:
     double _width;	
     double _height;	
     
+	bool _preserveRatio;
+
     int _horizontalMargin;
     int _verticalMargin;
 
@@ -108,6 +110,7 @@ public:
 	const Rectangle& realFrame, 
 	double width, 
 	double height,
+	bool preserveRatio,
         const MapBackgroundManager* backgroundManager = 0,
 	const std::string& urlPattern = "");
 
@@ -115,7 +118,8 @@ public:
     Map(const std::set<DrawableLine*>& selectedLines,
 	double width, 
 	double height,
-        const MapBackgroundManager* backgroundManager = 0,
+	bool preserveRatio,
+    const MapBackgroundManager* backgroundManager = 0,
 	const std::string& urlPattern = "");
 
     

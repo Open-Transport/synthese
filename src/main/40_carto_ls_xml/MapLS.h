@@ -59,6 +59,7 @@ class MapLS
     static const std::string MAP_UPPERRIGHTLONGITUDE_ATTR;
     static const std::string MAP_OUTPUTWIDTH_ATTR;
     static const std::string MAP_OUTPUTHEIGHT_ATTR;
+    static const std::string MAP_PRESERVERATIO_ATTR;
     static const std::string MAP_OUTPUTHORIZONTALMARGIN_ATTR;
     static const std::string MAP_OUTPUTVERTICALMARGIN_ATTR;
     static const std::string MAP_BACKGROUNDID_ATTR;
