@@ -50,7 +50,7 @@ PostscriptRenderer::render (Map& map)
 {
     _canvas.startPage(0, 0, map.getWidth (), map.getHeight ());
     
-   renderBackground (map);
+//  renderBackground (map);
     renderLines (map);
     renderPhysicalStops (map);
 

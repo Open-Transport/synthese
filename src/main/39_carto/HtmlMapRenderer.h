@@ -14,6 +14,10 @@
 
 namespace synthese
 {
+namespace env
+{
+	class Environment;
+}
 
 
 namespace carto
@@ -26,6 +30,7 @@ class HtmlMapRenderer : public Renderer
 {
  private:
 
+	 const synthese::env::Environment& _environment;
     std::ostream& _output; //!< Stream used for HTML map generation
     std::string _urlPattern; //!< URL pattern ($id is replaced by the proper object id)
     std::string _mapImgFilename; //!< Filename of the img used in generated HTML map
@@ -41,7 +46,8 @@ class HtmlMapRenderer : public Renderer
      * @param output Output stream
      */
     HtmlMapRenderer (const RenderingConfig& config, 
-		     const std::string& urlPattern,
+		const synthese::env::Environment& environment,
+			 const std::string& urlPattern,
 		     const std::string& mapImgFilename,
 		     std::ostream& output);
 

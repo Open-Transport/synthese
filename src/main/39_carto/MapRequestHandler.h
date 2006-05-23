@@ -22,6 +22,11 @@ namespace server
     class Request;
 }
 
+namespace env
+{
+    class Environment;
+}
+
 
 
 namespace carto
@@ -129,6 +134,7 @@ class MapRequestHandler : public synthese::server::RequestHandler
     
     std::string renderHtmlFile (const boost::filesystem::path& tempDir, 
 				const std::string filenamePrefix,
+				const synthese::env::Environment& environment,
 				Map& map,
 				const RenderingConfig& config) const;
     

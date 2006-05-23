@@ -3,14 +3,16 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 #include <assert.h>
 #include <stdlib.h>
 
 #include <boost/filesystem/operations.hpp>
-// not needed under linux #include <boost/date_time/microsec_time_clock.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 
+#include "01_util/PlainCharFilter.h"
 #include "01_util/XmlParser.h"
 #include "01_util/Conversion.h"
 
@@ -146,7 +148,7 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     }
     else if (output == REQUEST_OUTPUT_HTML) 
     {
-	resultFilename = renderHtmlFile (tempDir, filePrefix, *map, conf);
+	resultFilename = renderHtmlFile (tempDir, filePrefix, *env, *map, conf);
     }
     else if (output == REQUEST_OUTPUT_MAPINFO) 
     {
@@ -215,7 +217,14 @@ MapRequestHandler::renderPsFile (const boost::filesystem::path& tempDir,
     const boost::filesystem::path psFile (tempDir / resultFilename);
 
     // Create the postscript canvas for output
-    std::ofstream of (psFile.string ().c_str ());
+	std::ofstream of (psFile.string ().c_str ());
+
+	// Filter accents (temporary workaround til having found how to
+	// render accents properly in ghostscript.
+
+	// boost::iostreams::filtering_ostream fof;
+	// fof.push (synthese::util::PlainCharFilter());
+	// fof.push (of);
 
     // ---- Render postscript file ----
     synthese::carto::PostscriptRenderer psRenderer (conf, of);
@@ -254,7 +263,7 @@ MapRequestHandler::renderJpegFile (const boost::filesystem::path& tempDir,
     
     int ret = system (gscmd.str ().c_str ());
     
-    boost::filesystem::remove (psFile);
+    // boost::filesystem::remove (psFile);
 
     if (ret != 0)
     {
@@ -272,6 +281,7 @@ MapRequestHandler::renderJpegFile (const boost::filesystem::path& tempDir,
 std::string 
 MapRequestHandler::renderHtmlFile (const boost::filesystem::path& tempDir, 
 				   const std::string filenamePrefix,
+				   const Environment& environment,
 				   Map& map,
 				   const RenderingConfig& conf) const
 {
@@ -283,7 +293,7 @@ MapRequestHandler::renderHtmlFile (const boost::filesystem::path& tempDir,
     const boost::filesystem::path htmlFile (tempDir / resultFilename);
     
     std::ofstream ofhtml (htmlFile.string ().c_str ());
-    synthese::carto::HtmlMapRenderer hmRenderer (conf, map.getUrlPattern (), 
+    synthese::carto::HtmlMapRenderer hmRenderer (conf, environment, map.getUrlPattern (), 
 		Server::GetInstance ()->getHttpTempUrl () + "/" + jpegFilename, ofhtml);
     hmRenderer.render (map);
     ofhtml.close ();

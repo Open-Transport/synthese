@@ -8,6 +8,10 @@
 
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
+#include "15_env/Environment.h"
+#include "15_env/Line.h"
+#include "15_env/LineStop.h"
+
 
 #include <cmath>
 #include <algorithm>
@@ -17,7 +21,11 @@
 using synthese::util::RGBColor;
 using synthese::util::Log;
 using synthese::util::Conversion;
+
 using synthese::env::Point;
+using synthese::env::Environment;
+using synthese::env::Line;
+using synthese::env::LineStop;
 
 
 
@@ -32,10 +40,12 @@ namespace carto
 
 
 HtmlMapRenderer::HtmlMapRenderer(const RenderingConfig& config, 
+				 const Environment& environment,
 				 const std::string& urlPattern,
 				 const std::string& mapImgFilename,
 				 std::ostream& output)
     : Renderer (config)
+	, _environment (environment)
     , _urlPattern (urlPattern)
     , _mapImgFilename (mapImgFilename)
     , _output (output)
@@ -80,44 +90,61 @@ HtmlMapRenderer::renderLines (Map& map)
 {
     const std::set<DrawableLine*>& selectedLines = map.getSelectedLines ();
     
-    for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
-         it != selectedLines.end () ; ++it) {
-		const DrawableLine* dbl = *it;
-		dbl->prepare (map, _config.getSpacing ());
-    }    
-    
-    for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
-         it != selectedLines.end () ; ++it) 
+	for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
+		it != selectedLines.end () ; ++it) 
 	{
 		const DrawableLine* dbl = *it;
-		const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
+		dbl->prepare (map, _config.getSpacing ());
+	}    
 
-		// Shift them again on right and left of half-width to get the enveloppe.
-		const std::vector<synthese::env::Point> points1 =
-		  dbl->calculateAbsoluteShiftedPoints (shiftedPoints, (_config.getBorderWidth () / 2));
-		
-		std::string href (_urlPattern);
-		boost::replace_all (href, "$id", dbl->getLineId ());
+	// if (selectedLines.size () > 1) 
+	{
+		// Differentiation on lines
 
-		_output << "<area href='" << href << "' shape='poly' coords='";
-		for (int i=0; i<points1.size (); ++i)
+	    
+		for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
+			it != selectedLines.end () ; ++it) 
 		{
-			_output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";
-		}
+			const DrawableLine* dbl = *it;
+			const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
 
-		std::vector<synthese::env::Point> points2 = 
-			dbl->calculateAbsoluteShiftedPoints (shiftedPoints, - (_config.getBorderWidth () / 2));
+			// Shift them again on right and left of half-width to get the enveloppe.
+			const std::vector<synthese::env::Point> points1 =
+			dbl->calculateAbsoluteShiftedPoints (shiftedPoints, (_config.getBorderWidth () / 2));
+			
+			std::string href (_urlPattern);
+			boost::replace_all (href, "$id", dbl->getLineId ());
 
-		std::reverse (points2.begin (), points2.end ());
+			_output << "<area href='" << href << "' shape='poly' coords='";
+			for (int i=0; i<points1.size (); ++i)
+			{
+				_output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";
+			}
 
-		for (int i=0; i<points2.size (); ++i)
-		{
-			_output << (int) points2[i].getX () << "," << (int) (map.getHeight () - points2[i].getY ());
-			if (i != points2.size ()-1) _output << ",";
-		}
-		_output << "'/>" << std::endl;
+			std::vector<synthese::env::Point> points2 = 
+				dbl->calculateAbsoluteShiftedPoints (shiftedPoints, - (_config.getBorderWidth () / 2));
 
-    }    
+			std::reverse (points2.begin (), points2.end ());
+
+			for (int i=0; i<points2.size (); ++i)
+			{
+				_output << (int) points2[i].getX () << "," << (int) (map.getHeight () - points2[i].getY ());
+				if (i != points2.size ()-1) _output << ",";
+			}
+			_output << "'/>" << std::endl;
+
+		}    
+	} 
+	/* else if (selectedLines.size () == 1) 
+	{
+		// Differentiation on line stops
+		const DrawableLine* dbl = *(selectedLines.begin ());
+		const Line* line = _environment.getLines().get (dbl->getLineId ());
+		const std::vector<LineStop*>& lineStops =  line->getLineStops();
+
+		// TODO
+
+	} */
 
 
 
