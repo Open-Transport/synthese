@@ -34,8 +34,7 @@ const std::string MapLS::MAP_UPPERRIGHTLATITUDE_ATTR ("upperRightLatitude");
 const std::string MapLS::MAP_UPPERRIGHTLONGITUDE_ATTR ("upperRightLongitude");
 const std::string MapLS::MAP_OUTPUTWIDTH_ATTR ("outputWidth");
 const std::string MapLS::MAP_OUTPUTHEIGHT_ATTR ("outputHeight");
-const std::string MapLS::MAP_OUTPUTHORIZONTALMARGIN_ATTR ("outputHorizontalMargin");
-const std::string MapLS::MAP_OUTPUTVERTICALMARGIN_ATTR ("outputVerticalMargin");
+const std::string MapLS::MAP_NEIGHBORHOOD_ATTR ("neighborhood");
 const std::string MapLS::MAP_PRESERVERATIO_ATTR ("preserveRatio");
 
 const std::string MapLS::MAP_LINEGROUPING_ATTR ("lineGrouping");
@@ -106,6 +105,14 @@ MapLS::Load (XMLNode& node,
 			node.getAttribute (MAP_PRESERVERATIO_ATTR.c_str()));
     }
 
+	double neighborhood = 0;
+    if (node.getAttribute (MAP_NEIGHBORHOOD_ATTR.c_str()) != 0)
+    {
+	    neighborhood = su::Conversion::ToDouble (
+            (node.getAttribute (MAP_NEIGHBORHOOD_ATTR.c_str())));
+    }
+
+
     // If one of the 4 coordinates is missing, let the autofit 
     // feature process the right rectangle
     if ( (node.getAttribute (MAP_LOWERLEFTLATITUDE_ATTR.c_str()) == 0)  ||
@@ -116,6 +123,7 @@ MapLS::Load (XMLNode& node,
 	map = new synthese::carto::Map (selectedLines,
 					 outputWidth, 
 					 outputHeight, 
+					 neighborhood,
 					 preserveRatio,
 					 mbm, urlPattern); 
 
@@ -146,18 +154,6 @@ MapLS::Load (XMLNode& node,
 
     }
 
-    if (node.getAttribute (MAP_OUTPUTHORIZONTALMARGIN_ATTR.c_str()) != 0)
-    {
-	    int outputHorizontalMargin = su::Conversion::ToInt (
-            (node.getAttribute (MAP_OUTPUTHORIZONTALMARGIN_ATTR.c_str())));
-        map->setHorizontalMargin (outputHorizontalMargin);
-    }
-    if (node.getAttribute (MAP_OUTPUTVERTICALMARGIN_ATTR.c_str()) != 0)
-    {
-	    int outputVerticalMargin = su::Conversion::ToInt (
-            (node.getAttribute (MAP_OUTPUTVERTICALMARGIN_ATTR.c_str())));
-        map->setVerticalMargin (outputVerticalMargin);
-    }
 
 	bool lineGrouping (true);
     if (node.getAttribute (MAP_LINEGROUPING_ATTR.c_str()) != 0)

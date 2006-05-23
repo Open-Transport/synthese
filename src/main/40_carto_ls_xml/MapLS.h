@@ -33,7 +33,7 @@ Sample XML format :
      lowerLeftLatitude="526408" lowerLeftLongitude="1840480"
      upperRightLatitude="526908" upperRightLongitude="1840980"
      outputWidth="800" outputHeight="800"
-     outputHorizontalMargin="100" outputVerticalMargin="20"
+     neighborhood="500"
 	 lineGrouping="true"
      backgroundId="TLSE" urlPattern="http://localhost:8080?id=$id">
 
@@ -60,8 +60,7 @@ class MapLS
     static const std::string MAP_OUTPUTWIDTH_ATTR;
     static const std::string MAP_OUTPUTHEIGHT_ATTR;
     static const std::string MAP_PRESERVERATIO_ATTR;
-    static const std::string MAP_OUTPUTHORIZONTALMARGIN_ATTR;
-    static const std::string MAP_OUTPUTVERTICALMARGIN_ATTR;
+    static const std::string MAP_NEIGHBORHOOD_ATTR;
     static const std::string MAP_BACKGROUNDID_ATTR;
     static const std::string MAP_URLPATTERN_ATTR;
 

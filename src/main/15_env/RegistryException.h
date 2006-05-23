@@ -26,8 +26,8 @@ class RegistryException : public synthese::util::Exception
 
  public:
 
-    RegistryException ( const std::string& message, const K* key = 0 )
-    ~RegistryException ()
+    RegistryException ( const std::string& message, const K* key = 0 );
+    ~RegistryException ();
 
 
     //! @name Getters/Setters
@@ -40,8 +40,6 @@ class RegistryException : public synthese::util::Exception
 
 
 };
-
-std::ostream& operator<< ( std::ostream& os, const Exception& op );
 
 
 

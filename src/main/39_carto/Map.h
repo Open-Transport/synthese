@@ -40,11 +40,9 @@ private:
     Rectangle _realFrame;
     double _width;	
     double _height;	
-    
-	bool _preserveRatio;
+    double _neighborhood;
 
-    int _horizontalMargin;
-    int _verticalMargin;
+	bool _preserveRatio;
 
     double _mapScaleX;
     double _mapScaleY;
@@ -118,6 +116,7 @@ public:
     Map(const std::set<DrawableLine*>& selectedLines,
 	double width, 
 	double height,
+	double neighborhood,
 	bool preserveRatio,
     const MapBackgroundManager* backgroundManager = 0,
 	const std::string& urlPattern = "");
@@ -139,12 +138,6 @@ public:
 
     double getScaleX () const;
     double getScaleY () const;
-
-    int getHorizontalMargin () const;
-    void setHorizontalMargin (int horizintalMargin);
-
-    int getVerticalMargin () const;
-    void setVerticalMargin (int verticalMargin);
 
     bool hasBackgroundManager () const;
     const MapBackgroundManager* getBackgroundManager () const;

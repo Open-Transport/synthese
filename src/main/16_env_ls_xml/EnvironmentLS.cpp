@@ -6,10 +6,12 @@
 #include "01_util/XmlParser.h"
 
 #include "15_env/Environment.h"
+#include "15_env/Line.h"
 
 #include "AxisLS.h"
 #include "CityLS.h"
 #include "LineLS.h"
+#include "LineStopLS.h"
 #include "LogicalStopLS.h"
 #include "PhysicalStopLS.h"
 
@@ -73,8 +75,23 @@ EnvironmentLS::Load (XMLNode& node)
     int nbLines = linesNode.nChildNode(LineLS::LINE_TAG.c_str());
     for (int i=0; i<nbLines; ++i) 
     {
-	XMLNode lineNode = linesNode.getChildNode (LineLS::LINE_TAG.c_str(), i);
-	env->getLines ().add (LineLS::Load (lineNode, *env));
+		XMLNode lineNode = linesNode.getChildNode (LineLS::LINE_TAG.c_str(), i);
+		synthese::env::Line* line = LineLS::Load (lineNode, *env);
+		env->getLines ().add (line);
+
+		// Load line stops
+		int nbLineStops = lineNode.nChildNode(LineStopLS::LINESTOP_TAG.c_str());
+		for (int j=0; j<nbLineStops; ++j) 
+		{
+			XMLNode lineStopNode = lineNode.getChildNode (LineStopLS::LINESTOP_TAG.c_str(), j);
+			synthese::env::LineStop* lineStop = LineStopLS::Load (lineStopNode, line, *env);
+			line->addLineStop (lineStop);
+			if (env->getLineStops().contains (lineStop->getId ()) == false) 
+			{
+				env->getLineStops().add (lineStop);
+			}
+		}
+
     }
     
 

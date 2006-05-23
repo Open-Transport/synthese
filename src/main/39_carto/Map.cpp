@@ -57,8 +57,7 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _preserveRatio (preserveRatio)
 , _backgroundManager (backgroundManager)
 , _urlPattern (urlPattern)
-, _horizontalMargin (0)
-, _verticalMargin (0)
+, _neighborhood (0)
 , _lineGrouping (true)
 
 {
@@ -90,6 +89,7 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 double width, 
 	 double height,
+	 double neighborhood,
 	bool preserveRatio,
 	 const MapBackgroundManager* backgroundManager,
 	 const std::string& urlPattern)
@@ -99,8 +99,7 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 , _preserveRatio (preserveRatio)
 , _backgroundManager (backgroundManager)
 , _urlPattern (urlPattern)
-, _horizontalMargin (0)
-, _verticalMargin (0)
+, _neighborhood (neighborhood)
 , _lineGrouping (true)
 {
     
@@ -129,10 +128,10 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 	}
     }
 
-    _realFrame = synthese::carto::Rectangle (lowerLeftLatitude,
-					     lowerLeftLongitude,
-					     upperRightLatitude - lowerLeftLatitude,
-					     upperRightLongitude - lowerLeftLongitude);
+    _realFrame = synthese::carto::Rectangle (lowerLeftLatitude - _neighborhood,
+					     lowerLeftLongitude - _neighborhood,
+					     upperRightLatitude - lowerLeftLatitude + 2*_neighborhood,
+					     upperRightLongitude - lowerLeftLongitude + 2*_neighborhood);
   if ((_width == -1) && (_height == -1)) _width = 400;
   if (_width == -1) 
   {
@@ -231,15 +230,9 @@ Map::toRealFrame (const Point& p)
 Point 
 Map::toOutputFrame (const Point& p)
 {
-    double widthWithoutMargin = _width - _horizontalMargin;
-    double heightWithoutMargin = _height - _verticalMargin;
-
     return Point (
-	((p.getX() - _realFrame.getX()) / _realFrame.getWidth ()) * widthWithoutMargin 
-            + _horizontalMargin / 2,
-	((p.getY() - _realFrame.getY()) / _realFrame.getHeight()) * heightWithoutMargin 
-            + _verticalMargin / 2
-	);
+	((p.getX() - _realFrame.getX()) / _realFrame.getWidth ()) * _width ,
+	((p.getY() - _realFrame.getY()) / _realFrame.getHeight()) * _height );
 }
 
 
@@ -253,35 +246,6 @@ Map::getUrlPattern () const
 
 
 
-
-int 
-Map::getHorizontalMargin () const
-{
-    return _horizontalMargin;
-}
-
-
-void 
-Map::setHorizontalMargin (int horizintalMargin)
-{
-    _horizontalMargin = horizintalMargin;
-}
-
-
-
-int 
-Map::getVerticalMargin () const
-{
-    return _verticalMargin;
-}
-
-
-
-void 
-Map::setVerticalMargin (int verticalMargin)
-{
-    _verticalMargin = verticalMargin;
-}
 
 
 

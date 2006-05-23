@@ -48,14 +48,6 @@ LineLS::Load (XMLNode& node,
 				 firstYear,
 				 lastYear);
     
-    // Load line stops
-    int nbLineStops = node.nChildNode(LineStopLS::LINESTOP_TAG.c_str());
-    for (int i=0; i<nbLineStops; ++i) 
-    {
-	XMLNode lineStopNode = node.getChildNode (LineStopLS::LINESTOP_TAG.c_str(), i);
-	synthese::env::LineStop* lineStop = LineStopLS::Load (lineStopNode, line, environment);
-	line->addLineStop (lineStop);
-    }
 
     // Optional attributes
     if (node.getAttribute (LINE_COLOR_ATTR.c_str()) != 0)
@@ -63,6 +55,7 @@ LineLS::Load (XMLNode& node,
 	line->setColor (synthese::util::RGBColor (node.getAttribute (LINE_COLOR_ATTR.c_str())));
     }
     
+
     return line;
 }
 

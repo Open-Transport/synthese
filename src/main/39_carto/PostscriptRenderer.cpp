@@ -74,12 +74,6 @@ PostscriptRenderer::renderBackground (Map& map)
 								   map.getScaleY ());
 
 
-		int deltaX = map.getHorizontalMargin() / mbg->getTilePixelWidth ();
-		if (map.getHorizontalMargin() % mbg->getTilePixelWidth () != 0) ++deltaX;
-
-		int deltaY = map.getVerticalMargin() / mbg->getTilePixelHeight ();
-		if (map.getVerticalMargin() % mbg->getTilePixelHeight () != 0) ++deltaY;
-
         if (mbg != 0) 
 	{
 	    Log::GetInstance ().debug ("Best scaling background scaleX=" + 
@@ -95,12 +89,12 @@ PostscriptRenderer::renderBackground (Map& map)
 
             int nbtiles = 0;
 
-            for (int i=tlIndexes.first-deltaX; i<=brIndexes.first+deltaX; ++i) 
+            for (int i=tlIndexes.first; i<=brIndexes.first; ++i) 
 	    {
 				if (i < 0) continue; 
 				if (i > mbg->getNbTilesX()-1) continue;
 
-                for (int j=tlIndexes.second-deltaY; j<=brIndexes.second+deltaY; ++j) 
+                for (int j=tlIndexes.second; j<=brIndexes.second; ++j) 
 		{
 				if (j < 0) continue; 
 				if (j > mbg->getNbTilesY()-1) continue;

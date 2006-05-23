@@ -22,7 +22,7 @@ namespace envlsxml
 {
 
 const std::string LineStopLS::LINESTOP_TAG ("lineStop");
-const std::string LineStopLS::LINESTOP_LINEID_ATTR ("lineId");
+const std::string LineStopLS::LINESTOP_ID_ATTR ("id");
 const std::string LineStopLS::LINESTOP_METRICOFFSET_ATTR ("metricOffset");
 
 const std::string LineStopLS::LINESTOP_TYPE_ATTR ("type");
@@ -40,6 +40,8 @@ LineStopLS::Load (XMLNode& node,
 		  const synthese::env::Environment& environment)
 {
     // assert (LINESTOP_TAG == node.getName ());
+    int id (su::Conversion::ToInt (
+		       node.getAttribute (LINESTOP_ID_ATTR.c_str())));
 
     double metricOffset (su::Conversion::ToDouble (
 	node.getAttribute (LINESTOP_METRICOFFSET_ATTR.c_str())));
@@ -74,6 +76,7 @@ LineStopLS::Load (XMLNode& node,
 	node.getAttribute (LINESTOP_SCHEDULEINPUT_ATTR.c_str())));
 
     synthese::env::LineStop* lineStop = new synthese::env::LineStop (
+	id,
 	line, 
 	metricOffset, 
 	type,
@@ -89,8 +92,6 @@ LineStopLS::Load (XMLNode& node,
 	lineStop->addViaPoint (PointLS::Load (pointNode));
     }
 
-    
-    
     return lineStop;
     
 }
