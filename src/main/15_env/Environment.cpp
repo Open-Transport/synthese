@@ -23,6 +23,7 @@ Environment::~Environment ()
     _cities.clear ();
     _documents.clear ();
     _lines.clear ();
+    _lineStops.clear ();
     _logicalStops.clear ();
     _physicalStops.clear ();
 }

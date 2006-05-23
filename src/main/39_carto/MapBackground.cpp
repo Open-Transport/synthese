@@ -134,6 +134,13 @@ MapBackground::MapBackground(const std::string& tileDir)
 
 MapBackground::~MapBackground()
 {
+    for (int i=0; i<_numTilesX; ++i) {
+        for (int j=0; j<_numTilesY; ++j) {
+            delete _tileArray[i][j];
+        }
+		delete[] _tileArray[i];
+    }
+	delete[] _tileArray;
 }
 
 
