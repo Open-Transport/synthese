@@ -65,7 +65,15 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
    _width = width;
    _height = height;
    
-
+	  if (_preserveRatio)
+	  {
+		 _height = _width * _realFrame.getHeight () / _realFrame.getWidth ();
+		 while (_height > height) 
+		 {
+			 _width -= 10;
+			 _height = _width * _realFrame.getHeight () / _realFrame.getWidth ();	
+		 }
+	  }
 
    _mapScaleX = (_width / _realFrame.getWidth ());
    _mapScaleY = (_height / _realFrame.getHeight ());
@@ -138,14 +146,14 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
   {
 	  if (_preserveRatio)
 	  {
-		 double newHeight = _width * _realFrame.getHeight () / _realFrame.getWidth ();
-		 while (newHeight > height) 
+		 _height = _width * _realFrame.getHeight () / _realFrame.getWidth ();
+		 while (_height > height) 
 		 {
 			 _width -= 10;
-			 newHeight = _width * _realFrame.getHeight () / _realFrame.getWidth ();	
+			 _height = _width * _realFrame.getHeight () / _realFrame.getWidth ();	
 		 }
-		 _height = newHeight;
 	  }
+
   }
 
 
