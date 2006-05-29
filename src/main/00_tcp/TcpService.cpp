@@ -49,7 +49,7 @@ TcpService::initialize () throw (SocketException)
     Socket* socket = new Socket;
     try 
     {
-	socket->open ("localhost",
+	socket->open ("*",
 		     _portNumber, 
 		     _protocol.c_str () );
 	socket->server();

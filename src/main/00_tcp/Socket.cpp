@@ -86,6 +86,7 @@ Socket::name(const char* hostName, const int portNumber)
     _sockAddr.sin_family = AF_INET;
     _sockAddr.sin_port = htons(portNumber);
 
+
     if(strcmp(hostName, "*") == 0)
     {
         // Nommage pour toutes les adresses
