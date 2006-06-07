@@ -107,7 +107,7 @@ int main(int argc, char **argv)
     }
     catch (const char *err)
     {
-	socket.close();
+	socket.closeSocket();
 	cout << "HTTP/1.0 503 Service Unavailable: " << err << "\n\n";
 	exit(2);
     }
@@ -120,7 +120,7 @@ int main(int argc, char **argv)
     }
     catch (const char *err)
     {
-	socket.close();
+	socket.closeSocket();
 	cout << "HTTP/1.0 500 Internal Server Error\n\n";
 	exit(3);
     }
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
     */
 
     // Fin nominale
-    socket.close();
+    socket.closeSocket();
     exit(0);
 }
 
