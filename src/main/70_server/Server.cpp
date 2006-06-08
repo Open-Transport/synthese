@@ -1,5 +1,6 @@
 #include "Server.h"
 
+#include "CleanerThread.h"
 #include "ServerThread.h"
 
 
@@ -10,6 +11,8 @@
 #include "01_util/Log.h"
 #include "01_util/Exception.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 #include <boost/filesystem/operations.hpp>
 #include <boost/thread/thread.hpp>
 
@@ -19,6 +22,7 @@
 #endif
 
 using synthese::util::Log;
+using namespace boost::posix_time;
 
 
 namespace synthese
@@ -111,12 +115,18 @@ Server::run ()
 
     try 
     {
-    initialize ();
+	initialize ();
 
 	synthese::tcp::TcpService* service = 
 	    synthese::tcp::TcpService::openService (_port);
 	
+
 	ServerThread serverThread (service);
+	CleanerThread cleanerThread;
+
+	// Every 4 hours, old files of http temp dir are cleant 
+	time_duration checkPeriod = hours(4); 
+	cleanerThread.addTempDirectory (_httpTempDir, checkPeriod);
 	
 	if (_nbThreads == 1) 
 	{
@@ -133,12 +143,16 @@ Server::run ()
 	    {
 		threads.create_thread (serverThread);
 	    }
+
+	    // Create the cleaner thread
+	    threads.create_thread (cleanerThread);
+
 	    Log::GetInstance ().info ("Server ready.");
 	    threads.join_all();
 	}
 	
     }
-	catch (std::exception& ex)
+    catch (std::exception& ex)
     {
 	Log::GetInstance ().fatal ("", ex);
     } 

@@ -263,7 +263,7 @@ MapRequestHandler::renderJpegFile (const boost::filesystem::path& tempDir,
     
     int ret = system (gscmd.str ().c_str ());
     
-    // boost::filesystem::remove (psFile);
+    boost::filesystem::remove (psFile);
 
     if (ret != 0)
     {
