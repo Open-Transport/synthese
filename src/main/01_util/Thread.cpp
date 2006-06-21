@@ -2,11 +2,13 @@
 
 #include "ThreadException.h"
 #include "01_util/Log.h"
+#include "01_util/Conversion.h"
 
 #include <boost/thread/xtime.hpp>
 
 
 using synthese::util::Log;
+using synthese::util::Conversion;
 
 
 namespace synthese
@@ -15,10 +17,16 @@ namespace util
 {
 
 
-Thread::Thread (const std::string& name, ThreadExec& exec)
-: _name (name)
+ const std::string Thread::DEFAULT_NAME_PREFIX = "thread_";
+ int Thread::_NbThreads = 0;
+
+
+
+Thread::Thread (ThreadExec& exec, const std::string& name, int loopDelay)
+: _name ((name == "") ? DEFAULT_NAME_PREFIX + Conversion::ToString (_NbThreads++) : name)
 , _exec (exec)
 , _thread (0)
+, _loopDelay (loopDelay)
 {
 }
  
@@ -91,7 +99,7 @@ Thread::operator()()
 	while (_exec.getState () != ThreadExec::STOPPED) 
 	{
 	    if (_exec.getState () != ThreadExec::PAUSED) _exec.loop ();
-	    Sleep (1);
+	    Sleep (_loopDelay);
 	}
 	Log::GetInstance ().info ("Finalizing thread " + _name + "...");
 	_exec.finalize ();
@@ -108,13 +116,13 @@ Thread::operator()()
 
 
 
-
+/*
 void 
 Thread::Yield ()
 {
     boost::thread::yield ();
 }
-
+*/
 
 
 void 

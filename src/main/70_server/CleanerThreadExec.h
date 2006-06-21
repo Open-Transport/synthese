@@ -1,7 +1,10 @@
-#ifndef SYNTHESE_SERVER_CLEANERTHREAD_H
-#define SYNTHESE_SERVER_CLEANERTHREAD_H
+#ifndef SYNTHESE_SERVER_CLEANERTHREADEXEC_H
+#define SYNTHESE_SERVER_CLEANERTHREADEXEC_H
 
 #include "module.h"
+
+#include "01_util/ThreadExec.h"
+
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/filesystem/path.hpp>
@@ -21,7 +24,7 @@ This thread is aimed at cleaning temporary folders on a regular basis.
 
 @ingroup m70
 */
-class CleanerThread
+class CleanerThreadExec : public synthese::util::ThreadExec
 {
  private:
 
@@ -31,7 +34,7 @@ class CleanerThread
 
  public:
 
-    CleanerThread ();
+    CleanerThreadExec ();
 
 
     //! @name Update methods
@@ -45,11 +48,9 @@ class CleanerThread
 
     /** Execution body
      */
-    void operator()();
+    void loop();
 
  private:
-
-    void sleep (int nSeconds);
 
 
 };

@@ -95,7 +95,7 @@ namespace util
 
       TestExec exec;
 
-      Thread thread ("test_thread", exec);
+      Thread thread (exec);
       
       CPPUNIT_ASSERT_EQUAL (ThreadExec::NOT_STARTED, exec.getState ());
       CPPUNIT_ASSERT_EQUAL (-1, exec.getCalls ());

@@ -1,6 +1,6 @@
 #include "Server.h"
 
-#include "CleanerThread.h"
+#include "CleanerThreadExec.h"
 #include "ServerThread.h"
 
 
@@ -8,6 +8,7 @@
 #include "Request.h"
 #include "RequestDispatcher.h"
 
+#include "01_util/Thread.h"
 #include "01_util/Log.h"
 #include "01_util/Exception.h"
 
@@ -22,6 +23,8 @@
 #endif
 
 using synthese::util::Log;
+using synthese::util::Thread;
+
 using namespace boost::posix_time;
 
 
@@ -122,11 +125,12 @@ Server::run ()
 	
 
 	ServerThread serverThread (service);
-	CleanerThread cleanerThread;
+	CleanerThreadExec cleanerExec;
 
 	// Every 4 hours, old files of http temp dir are cleant 
 	time_duration checkPeriod = hours(4); 
-	cleanerThread.addTempDirectory (_httpTempDir, checkPeriod);
+	cleanerExec.addTempDirectory (_httpTempDir, checkPeriod);
+
 	
 	if (_nbThreads == 1) 
 	{
@@ -144,8 +148,9 @@ Server::run ()
 		threads.create_thread (serverThread);
 	    }
 
-	    // Create the cleaner thread
-	    threads.create_thread (cleanerThread);
+	    // Create the cleaner thread (check every 5s)
+	    Thread cleanerThread (cleanerExec, "*cleaner*", 5000);
+	    cleanerThread.start ();
 
 	    Log::GetInstance ().info ("Server ready.");
 	    threads.join_all();
