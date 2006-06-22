@@ -64,6 +64,10 @@ Thread::start ()
 {
     if (getState () != NOT_STARTED) throw ThreadException ("Thread was already started.");
     _thread = new boost::thread (*this);
+
+    // Now that ThreadExec pointer has been copied, reset this shared_ptr on thread exec
+    // so that this object does not prevent destruction of ThreadExec.
+    _exec.reset ();
 }
 
 
@@ -108,8 +112,8 @@ Thread::operator=(const Thread& ref)
 
     return (*this);
 }
-*/
 
+*/
 
 
 void 
@@ -128,14 +132,17 @@ Thread::operator()()
 	    if (getState () != PAUSED) _exec->loop ();
 	    Sleep (_loopDelay);
 	}
-	Log::GetInstance ().info ("Finalizing thread " + _name + "...");
-	_exec->finalize ();
 	Log::GetInstance ().info ("Thread " + _name +  " is stopped.");
     }
     catch (std::exception& ex)
     {
 	Log::GetInstance ().error ("Thread " + _name +  " has crashed.", ex);
     } 
+
+    // Finalization is done in ANY case even after a crash
+    Log::GetInstance ().info ("Finalizing thread " + _name + "...");
+    _exec->finalize ();
+    Log::GetInstance ().info ("Finalization done. " + _name + " is dead.");
 
 }
 

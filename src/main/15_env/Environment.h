@@ -31,7 +31,6 @@ class Environment : public Registrable<int,Environment>
 {
  private:
 
-    static Environment::Registry _environments;
     
     Axis::Registry _axes;
     City::Registry _cities;
@@ -49,7 +48,6 @@ class Environment : public Registrable<int,Environment>
 
     //! @name Getters/Setters
     //@{
-    static Environment::Registry& GetEnvironments ();
 
     Axis::Registry& getAxes ();
     const Axis::Registry& getAxes () const;

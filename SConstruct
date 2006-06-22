@@ -135,6 +135,15 @@ def AddBoostDependency (env, libname):
     env.Append (LIBS = [boostlib] )
     
 
+def AddSQLiteDependency (env):
+    platform = env['PLATFORM']
+    mode = env['MODE']
+
+    if platform == 'win32':
+	env.Append (LIBS = ['sqlite3'] )
+
+    
+
 
 def AppendMultithreadConf (env):
     platform = env['PLATFORM']
@@ -181,6 +190,7 @@ SConsEnvironment.AppendMultithreadConf=AppendMultithreadConf
 SConsEnvironment.ModuleEnv=ModuleEnv
 SConsEnvironment.AddModuleDependency=AddModuleDependency
 SConsEnvironment.AddBoostDependency=AddBoostDependency
+SConsEnvironment.AddSQLiteDependency=AddSQLiteDependency
 
 
 
@@ -226,11 +236,16 @@ env.Replace ( BUILDROOT = '#build' + '/' + platform + '/' + mode )
 # Custom builders
 # -------------------------------------------------------
 def builder_unit_test(target, source, env):
-    app = str(source[0].abspath)
-    if os.system(app)==0:
-        open(str(target[0]),'w').write("PASSED\n")
-    else:
-        return 1
+  app = str(source[0].abspath)
+  # Exec in the test program dir!
+  curdir = os.path.abspath (os.curdir)
+  os.chdir (os.path.dirname (source[0].abspath))
+  if os.system(app)==0:
+    os.chdir (curdir)
+    open(str(target[0]),'w').write("PASSED\n")
+  else:
+    os.chdir (curdir)
+    return 1
 
 bld = Builder(action = builder_unit_test)
 env.Append(BUILDERS = {'Test' :  bld})

@@ -46,7 +46,7 @@ Conversion::ToString (int i)
 
 
 std::string 
-Conversion::ToString (long l)
+Conversion::ToString (long long l)
 {
     std::stringstream ss;
     ss << l;

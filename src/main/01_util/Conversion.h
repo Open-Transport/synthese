@@ -44,7 +44,7 @@ class Conversion
     static std::string ToString (int i);
     static std::string ToString (unsigned int i);
 
-    static std::string ToString (long l);
+    static std::string ToString (long long l);
     static std::string ToString (unsigned long l);
 
     static std::string ToString (double d);

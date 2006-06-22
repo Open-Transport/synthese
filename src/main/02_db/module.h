@@ -5,6 +5,9 @@
 #ifndef SYNTHESE_DB_MODULE_H
 #define SYNTHESE_DB_MODULE_H
 
+
+#include <string>
+
 namespace synthese
 {
 
@@ -16,7 +19,6 @@ namespace synthese
 	/** 02_db namespace */
 	namespace db
 	{
-
 
 	}
 

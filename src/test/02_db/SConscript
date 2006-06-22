@@ -1,0 +1,29 @@
+Import ('testenv')
+testmoduleenv = testenv.ModuleEnv()
+
+includes = '*.cpp'
+excludes = []
+
+# TODO : understand why link order is so important ??
+
+testmoduleenv.AddModuleDependency ('04_time')
+testmoduleenv.AddModuleDependency ('02_db')
+testmoduleenv.AddModuleDependency ('01_util')
+testmoduleenv.AddSQLiteDependency ()
+testmoduleenv.AddBoostDependency ('boost_thread')
+testmoduleenv.AddBoostDependency ('boost_iostreams')
+testmoduleenv.AppendMultithreadConf ();
+
+
+#testmoduleenv.Append (CPPDEFINES = ['BOOST_DISABLE_THREADS'])
+
+
+files = testmoduleenv.Glob(includes, excludes)
+
+testmodulename = testmoduleenv.DefaultTestModuleName ()
+
+testprogram = testmoduleenv.Program(testmodulename, files)
+
+testmoduleenv.Test("test.passed", testprogram)
+
+
