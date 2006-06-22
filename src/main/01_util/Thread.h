@@ -28,6 +28,7 @@ class Thread
 {
  public:
     
+    typedef enum { NOT_STARTED, INIT, READY, PAUSED, STOPPED } ThreadState;
 
  private:
 
@@ -35,9 +36,13 @@ class Thread
     static int _NbThreads;
     
     const std::string _name;
-    ThreadExecPtr _exec;
+    boost::shared_ptr<ThreadExec> _exec;
     boost::thread* _thread;
     const int _loopDelay;  //!< Loop delay in milliseconds
+
+    boost::shared_ptr<ThreadState> _state;
+    boost::shared_ptr<boost::mutex> _stateMutex; 
+
 
  protected:
 
@@ -62,9 +67,12 @@ class Thread
     static void Sleep (int ms);
 //    static void Yield ();
 
+    ThreadState getState () const;
 
  private:
     
+    void setState (ThreadState state);
+
 
 };
 

@@ -8,6 +8,7 @@
 #include "Request.h"
 #include "RequestDispatcher.h"
 
+#include "01_util/Conversion.h"
 #include "01_util/Thread.h"
 #include "01_util/Log.h"
 #include "01_util/Exception.h"
@@ -21,6 +22,7 @@
 #include "39_carto/MapBackgroundManager.h"
 #endif
 
+using synthese::util::Conversion;
 using synthese::util::Log;
 using synthese::util::Thread;
 using synthese::util::ThreadExec;
@@ -149,18 +151,17 @@ Server::run ()
 	    for (int i=0; i< _nbThreads; ++i) 
 	    {
 		
-		// TODO : check if really necessary to duplicate the thread exec variable...
-//		ServerThreadExec serverThreadExec (service);
-		Thread serverThread (new ServerThreadExec (service));
+		// ServerThreadExec could be shared by all threads (no specific state variable)
+		Thread serverThread (new ServerThreadExec (service), "tcp_" + Conversion::ToString (i), 1);
 		serverThread.start ();
 	    }
 
 	    // Create the cleaner thread (check every 5s)
-	    Thread cleanerThread (cleanerExec, "*cleaner*", 5000);
+	    Thread cleanerThread (cleanerExec, "cleaner", 5000);
 	    cleanerThread.start ();
 
 	    Log::GetInstance ().info ("Server ready.");
-	    while (cleanerExec->getState () != ThreadExec::STOPPED) Thread::Sleep (100);
+	    while (cleanerThread.getState () != Thread::STOPPED) Thread::Sleep (100);
 	}
 	
     }

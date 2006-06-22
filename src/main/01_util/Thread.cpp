@@ -27,7 +27,20 @@ Thread::Thread (ThreadExec* exec, const std::string& name, int loopDelay)
 , _exec (exec)
 , _thread (0)
 , _loopDelay (loopDelay)
+, _state (new ThreadState (NOT_STARTED))
+, _stateMutex (new boost::mutex ())
 {
+    // Implementation note : _state and _stateMutex are shared pointers because
+    // when the thread will be spawned, this object will be first copied
+    // and then the operator() will be called on the copy.
+    // We want to keep in sync the state of the Thread object used 'internally'
+    // by the boost thread, and the one from the originally user created Thread object
+    // (which is the one likeky to be asked for its state).
+
+    // Moreover, this way, it is feasible to share the same ThreadExec between different
+    // Thread objects. Of course, using proper thread-local variables and mutexes in ThreadExec 
+    // derived classes is left to user responsability.
+
 }
  
 
@@ -49,7 +62,7 @@ Thread::getName () const
 void 
 Thread::start ()
 {
-    if (_exec->getState () != ThreadExec::NOT_STARTED) throw ThreadException ("Thread was already started.");
+    if (getState () != NOT_STARTED) throw ThreadException ("Thread was already started.");
     _thread = new boost::thread (*this);
 }
 
@@ -59,8 +72,8 @@ Thread::start ()
 void 
 Thread::stop ()
 {
-    if (_exec->getState () == ThreadExec::STOPPED) return;
-    _exec->setState (ThreadExec::STOPPED);
+    if (getState () == STOPPED) return;
+    setState (STOPPED);
 }
 
 
@@ -68,16 +81,16 @@ Thread::stop ()
 void 
 Thread::pause ()
 {
-    if (_exec->getState () == ThreadExec::STOPPED) throw ThreadException ("Thread was stopped.");
-    _exec->setState (ThreadExec::PAUSED);
+    if (getState () == STOPPED) throw ThreadException ("Thread was stopped.");
+    setState (PAUSED);
 }
 
 
 void 
 Thread::resume ()
 {
-    if (_exec->getState () != ThreadExec::PAUSED) throw ThreadException ("Thread is not paused.");
-    _exec->setState (ThreadExec::READY);
+    if (getState () != PAUSED) throw ThreadException ("Thread is not paused.");
+    setState (READY);
 }
 
 
@@ -90,15 +103,15 @@ Thread::operator()()
 {
     try
     {
-	_exec->setState (ThreadExec::INIT);
+	setState (INIT);
 	Log::GetInstance ().info ("Initializing thread " + _name +  "...");
 	_exec->initialize ();
-	_exec->setState (ThreadExec::READY);
+	setState (READY);
 	Log::GetInstance ().info ("Thread " + _name +  " is ready.");
 	
-	while (_exec->getState () != ThreadExec::STOPPED) 
+	while (getState () != STOPPED) 
 	{
-	    if (_exec->getState () != ThreadExec::PAUSED) _exec->loop ();
+	    if (getState () != PAUSED) _exec->loop ();
 	    Sleep (_loopDelay);
 	}
 	Log::GetInstance ().info ("Finalizing thread " + _name + "...");
@@ -144,6 +157,23 @@ Thread::Sleep (int ms)
 } 
 
 
+
+
+Thread::ThreadState 
+Thread::getState () const
+{
+    boost::mutex::scoped_lock lock (*_stateMutex);
+    return *_state;
+}
+
+
+
+void 
+Thread::setState (ThreadState state)
+{
+    boost::mutex::scoped_lock lock (*_stateMutex);
+    *_state = state;
+}
 
 
 

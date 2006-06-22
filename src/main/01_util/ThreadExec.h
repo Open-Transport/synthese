@@ -29,12 +29,8 @@ class ThreadExec
 {
  public:
 
-    typedef enum { NOT_STARTED, INIT, READY, PAUSED, STOPPED } ThreadState;
 
  private:
-
-    ThreadState _state;
-    mutable boost::mutex* _stateMutex; 
 
  protected:
 
@@ -49,14 +45,10 @@ class ThreadExec
 
     void loop (int nbLoops);
 
-    ThreadState getState () const;
-    void setState (ThreadState state);
-
  private:
     
 };
 
-typedef boost::shared_ptr<ThreadExec> ThreadExecPtr;
 
 
 
