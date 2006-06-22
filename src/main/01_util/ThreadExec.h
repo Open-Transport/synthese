@@ -9,12 +9,16 @@
 
 
 #include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
 
 
 namespace synthese
 {
 namespace util
 {
+
+
+
 
 /** Abstract class defining thread execution in terms of initialization
     and thread atomic loop.
@@ -34,10 +38,10 @@ class ThreadExec
 
  protected:
 
+ public:
+
     ThreadExec ();
     ~ThreadExec ();
-
- public:
 
     virtual void initialize ();
     virtual void loop () = 0;
@@ -51,6 +55,8 @@ class ThreadExec
  private:
     
 };
+
+typedef boost::shared_ptr<ThreadExec> ThreadExecPtr;
 
 
 

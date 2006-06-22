@@ -46,7 +46,7 @@ class CleanerThreadExec : public synthese::util::ThreadExec
     //@}
 
 
-    /** Execution body
+    /** Execution body.
      */
     void loop();
 

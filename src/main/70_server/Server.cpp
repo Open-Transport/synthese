@@ -1,7 +1,7 @@
 #include "Server.h"
 
 #include "CleanerThreadExec.h"
-#include "ServerThread.h"
+#include "ServerThreadExec.h"
 
 
 #include "RequestException.h"
@@ -15,7 +15,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <boost/filesystem/operations.hpp>
-#include <boost/thread/thread.hpp>
 
 #ifdef MODULE_39
 #include "39_carto/MapRequestHandler.h"
@@ -24,6 +23,7 @@
 
 using synthese::util::Log;
 using synthese::util::Thread;
+using synthese::util::ThreadExec;
 
 using namespace boost::posix_time;
 
@@ -124,28 +124,35 @@ Server::run ()
 	    synthese::tcp::TcpService::openService (_port);
 	
 
-	ServerThread serverThread (service);
-	CleanerThreadExec cleanerExec;
+	CleanerThreadExec* cleanerExec = new CleanerThreadExec ();
 
 	// Every 4 hours, old files of http temp dir are cleant 
 	time_duration checkPeriod = hours(4); 
-	cleanerExec.addTempDirectory (_httpTempDir, checkPeriod);
+	cleanerExec->addTempDirectory (_httpTempDir, checkPeriod);
 
 	
 	if (_nbThreads == 1) 
 	{
 	    // Monothread execution ; easier for debugging
+	    // Review this to allow going through all loops of each
+	    // ThreadExec in the same while loop !
 	    Log::GetInstance ().info ("Server ready.");
-	    serverThread ();
+	    ServerThreadExec serverThreadExec (service);
+	    while (1)
+	    {
+		serverThreadExec.loop ();
+	    }
 	}
+	else
 	{
-	    // Create the thread group.
-	    boost::thread_group threads;
 	    
-	    // Creates all server threads.
 	    for (int i=0; i< _nbThreads; ++i) 
 	    {
-		threads.create_thread (serverThread);
+		
+		// TODO : check if really necessary to duplicate the thread exec variable...
+//		ServerThreadExec serverThreadExec (service);
+		Thread serverThread (new ServerThreadExec (service));
+		serverThread.start ();
 	    }
 
 	    // Create the cleaner thread (check every 5s)
@@ -153,7 +160,7 @@ Server::run ()
 	    cleanerThread.start ();
 
 	    Log::GetInstance ().info ("Server ready.");
-	    threads.join_all();
+	    while (cleanerExec->getState () != ThreadExec::STOPPED) Thread::Sleep (100);
 	}
 	
     }

@@ -1,7 +1,9 @@
-#ifndef SYNTHESE_SERVER_THREAD_H
-#define SYNTHESE_SERVER_THREAD_H
+#ifndef SYNTHESE_SERVER_THREADEXEC_H
+#define SYNTHESE_SERVER_THREADEXEC_H
 
 #include "module.h"
+
+#include "01_util/ThreadExec.h"
 
 
 
@@ -27,18 +29,18 @@ to accept another client connection.
 
 @ingroup m70
 */
-class ServerThread
+class ServerThreadExec : public synthese::util::ThreadExec
 {
  private:
     synthese::tcp::TcpService* _tcpService;
 
  public:
 
-    ServerThread (synthese::tcp::TcpService* tcpService);
+    ServerThreadExec (synthese::tcp::TcpService* tcpService);
 
-    /** Execution body
+    /** Execution body.
      */
-    void operator()();
+    void loop ();
 
 };
 

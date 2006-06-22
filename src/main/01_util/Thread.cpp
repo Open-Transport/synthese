@@ -22,7 +22,7 @@ namespace util
 
 
 
-Thread::Thread (ThreadExec& exec, const std::string& name, int loopDelay)
+Thread::Thread (ThreadExec* exec, const std::string& name, int loopDelay)
 : _name ((name == "") ? DEFAULT_NAME_PREFIX + Conversion::ToString (_NbThreads++) : name)
 , _exec (exec)
 , _thread (0)
@@ -49,7 +49,7 @@ Thread::getName () const
 void 
 Thread::start ()
 {
-    if (_exec.getState () != ThreadExec::NOT_STARTED) throw ThreadException ("Thread was already started.");
+    if (_exec->getState () != ThreadExec::NOT_STARTED) throw ThreadException ("Thread was already started.");
     _thread = new boost::thread (*this);
 }
 
@@ -59,8 +59,8 @@ Thread::start ()
 void 
 Thread::stop ()
 {
-    if (_exec.getState () == ThreadExec::STOPPED) return;
-    _exec.setState (ThreadExec::STOPPED);
+    if (_exec->getState () == ThreadExec::STOPPED) return;
+    _exec->setState (ThreadExec::STOPPED);
 }
 
 
@@ -68,16 +68,16 @@ Thread::stop ()
 void 
 Thread::pause ()
 {
-    if (_exec.getState () == ThreadExec::STOPPED) throw ThreadException ("Thread was stopped.");
-    _exec.setState (ThreadExec::PAUSED);
+    if (_exec->getState () == ThreadExec::STOPPED) throw ThreadException ("Thread was stopped.");
+    _exec->setState (ThreadExec::PAUSED);
 }
 
 
 void 
 Thread::resume ()
 {
-    if (_exec.getState () != ThreadExec::PAUSED) throw ThreadException ("Thread is not paused.");
-    _exec.setState (ThreadExec::READY);
+    if (_exec->getState () != ThreadExec::PAUSED) throw ThreadException ("Thread is not paused.");
+    _exec->setState (ThreadExec::READY);
 }
 
 
@@ -90,19 +90,19 @@ Thread::operator()()
 {
     try
     {
-	_exec.setState (ThreadExec::INIT);
+	_exec->setState (ThreadExec::INIT);
 	Log::GetInstance ().info ("Initializing thread " + _name +  "...");
-	_exec.initialize ();
-	_exec.setState (ThreadExec::READY);
+	_exec->initialize ();
+	_exec->setState (ThreadExec::READY);
 	Log::GetInstance ().info ("Thread " + _name +  " is ready.");
 	
-	while (_exec.getState () != ThreadExec::STOPPED) 
+	while (_exec->getState () != ThreadExec::STOPPED) 
 	{
-	    if (_exec.getState () != ThreadExec::PAUSED) _exec.loop ();
+	    if (_exec->getState () != ThreadExec::PAUSED) _exec->loop ();
 	    Sleep (_loopDelay);
 	}
 	Log::GetInstance ().info ("Finalizing thread " + _name + "...");
-	_exec.finalize ();
+	_exec->finalize ();
 	Log::GetInstance ().info ("Thread " + _name +  " is stopped.");
     }
     catch (std::exception& ex)
