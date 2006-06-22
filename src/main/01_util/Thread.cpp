@@ -94,7 +94,21 @@ Thread::resume ()
 }
 
 
+/*
+Thread&
+Thread::operator=(const Thread& ref)
+{
+    if (&ref == this) return (*this);
+    _name = ref._name;
+    _exec = ref._exec;
+    _thread = 0; // ?
+    _loopDelay = ref._loopDelay;
+    _state = ref._state;
+    _stateMutex = ref._stateMutex;
 
+    return (*this);
+}
+*/
 
 
 

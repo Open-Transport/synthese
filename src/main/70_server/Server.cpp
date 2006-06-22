@@ -10,6 +10,7 @@
 
 #include "01_util/Conversion.h"
 #include "01_util/Thread.h"
+#include "01_util/ThreadGroup.h"
 #include "01_util/Log.h"
 #include "01_util/Exception.h"
 
@@ -25,6 +26,7 @@
 using synthese::util::Conversion;
 using synthese::util::Log;
 using synthese::util::Thread;
+using synthese::util::ThreadGroup;
 using synthese::util::ThreadExec;
 
 using namespace boost::posix_time;
@@ -125,6 +127,7 @@ Server::run ()
 	synthese::tcp::TcpService* service = 
 	    synthese::tcp::TcpService::openService (_port);
 	
+	ThreadGroup threadGroup;
 
 	CleanerThreadExec* cleanerExec = new CleanerThreadExec ();
 
@@ -150,18 +153,22 @@ Server::run ()
 	    
 	    for (int i=0; i< _nbThreads; ++i) 
 	    {
-		
 		// ServerThreadExec could be shared by all threads (no specific state variable)
 		Thread serverThread (new ServerThreadExec (service), "tcp_" + Conversion::ToString (i), 1);
+		threadGroup.addThread (serverThread);
 		serverThread.start ();
 	    }
 
 	    // Create the cleaner thread (check every 5s)
 	    Thread cleanerThread (cleanerExec, "cleaner", 5000);
+	    threadGroup.addThread (cleanerThread);
 	    cleanerThread.start ();
 
+	    threadGroup.waitForAllReady ();
+
 	    Log::GetInstance ().info ("Server ready.");
-	    while (cleanerThread.getState () != Thread::STOPPED) Thread::Sleep (100);
+
+	    threadGroup.waitForAllStopped ();
 	}
 	
     }

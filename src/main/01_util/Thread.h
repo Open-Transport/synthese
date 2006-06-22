@@ -35,10 +35,10 @@ class Thread
     static const std::string DEFAULT_NAME_PREFIX;
     static int _NbThreads;
     
-    const std::string _name;
+    std::string _name;
     boost::shared_ptr<ThreadExec> _exec;
     boost::thread* _thread;
-    const int _loopDelay;  //!< Loop delay in milliseconds
+    int _loopDelay;  //!< Loop delay in milliseconds
 
     boost::shared_ptr<ThreadState> _state;
     boost::shared_ptr<boost::mutex> _stateMutex; 
@@ -63,6 +63,8 @@ class Thread
     void stop ();
 
     void operator()();
+
+    //Thread& operator=(const Thread& ref);
 
     static void Sleep (int ms);
 //    static void Yield ();
