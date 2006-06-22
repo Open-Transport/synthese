@@ -93,42 +93,42 @@ namespace util
   ThreadTest::testStartPauseResumeStop ()
   {
 
-      TestExec exec;
+      TestExec* exec = new TestExec ();
 
       Thread thread (exec);
       
-      CPPUNIT_ASSERT_EQUAL (ThreadExec::NOT_STARTED, exec.getState ());
-      CPPUNIT_ASSERT_EQUAL (-1, exec.getCalls ());
+      CPPUNIT_ASSERT_EQUAL (Thread::NOT_STARTED, thread.getState ());
+      CPPUNIT_ASSERT_EQUAL (-1, exec->getCalls ());
       
       thread.start ();
 
-      while (exec.getState () != ThreadExec::INIT) Thread::Sleep (5);
+      while (thread.getState () != Thread::INIT) Thread::Sleep (5);
 
-      CPPUNIT_ASSERT_EQUAL (ThreadExec::INIT, exec.getState ());
-      CPPUNIT_ASSERT_EQUAL (0, exec.getCalls ());
+      CPPUNIT_ASSERT_EQUAL (Thread::INIT, thread.getState ());
+      CPPUNIT_ASSERT_EQUAL (0, exec->getCalls ());
 
-      while (exec.getState () != ThreadExec::READY) Thread::Sleep (5);
+      while (thread.getState () != Thread::READY) Thread::Sleep (5);
 
-      CPPUNIT_ASSERT_EQUAL (ThreadExec::READY, exec.getState ());
-      CPPUNIT_ASSERT (exec.getCalls () >= 0);
+      CPPUNIT_ASSERT_EQUAL (Thread::READY, thread.getState ());
+      CPPUNIT_ASSERT (exec->getCalls () >= 0);
 
       thread.pause ();
 
-      CPPUNIT_ASSERT_EQUAL (ThreadExec::PAUSED, exec.getState ());
-      int callsOnPause = exec.getCalls ();
+      CPPUNIT_ASSERT_EQUAL (Thread::PAUSED, thread.getState ());
+      int callsOnPause = exec->getCalls ();
       Thread::Sleep (100);
-      CPPUNIT_ASSERT_EQUAL (callsOnPause, exec.getCalls ());
+      CPPUNIT_ASSERT_EQUAL (callsOnPause, exec->getCalls ());
 
       thread.resume ();
 
       Thread::Sleep (100);
-      CPPUNIT_ASSERT_EQUAL (ThreadExec::READY, exec.getState ());
-      CPPUNIT_ASSERT (callsOnPause < exec.getCalls ());
+      CPPUNIT_ASSERT_EQUAL (Thread::READY, thread.getState ());
+      CPPUNIT_ASSERT (callsOnPause < exec->getCalls ());
 
       thread.stop ();
 
       Thread::Sleep (100);
-      CPPUNIT_ASSERT_EQUAL (ThreadExec::STOPPED, exec.getState ());
+      CPPUNIT_ASSERT_EQUAL (Thread::STOPPED, thread.getState ());
 
   }
 
