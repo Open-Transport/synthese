@@ -2,7 +2,7 @@
 #define SYNTHESE_ENV_CITY_H
 
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 #include "IncludingPlace.h"
 
 #include <string>
@@ -25,7 +25,7 @@ stops (those taken by default when no stop is explicitly chosen).
 
 @ingroup m15
 */
-class City : public Registrable<int, City>, 
+class City : public synthese::util::Registrable<int, City>, 
 	         public IncludingPlace
 {
  private:

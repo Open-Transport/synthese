@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_ENV_REGISTRY_H
-#define SYNTHESE_ENV_REGISTRY_H
+#ifndef SYNTHESE_UTIL_REGISTRY_H
+#define SYNTHESE_UTIL_REGISTRY_H
 
 
 
@@ -10,7 +10,7 @@
 
 namespace synthese
 {
-namespace env
+namespace util
 {
 
 class Exception;
@@ -22,7 +22,7 @@ class Exception;
     This class should not be used directly : use instead the
     "template" typedef in the classes derived from Registrable.
 
-@ingroup m15
+@ingroup m01
 */
 template<class K, class T>
 class Registry

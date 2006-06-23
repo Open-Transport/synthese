@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_ENV_REGISTRABLE_H
-#define SYNTHESE_ENV_REGISTRABLE_H
+#ifndef SYNTHESE_UTIL_REGISTRABLE_H
+#define SYNTHESE_UTIL_REGISTRABLE_H
 
 
 
@@ -13,7 +13,7 @@
 
 namespace synthese
 {
-namespace env
+namespace util
 {
 
 
@@ -22,7 +22,7 @@ namespace env
     Note that the registry has the responsability of destroying
     registered objects.
 
-@ingroup m15
+@ingroup m01
 */
 template<class K, class T>
 class Registrable
@@ -33,8 +33,8 @@ class Registrable
 
  public:
 
-    typedef typename synthese::env::Registry<K, T> Registry;
-    typedef typename synthese::env::RegistryKeyException<K> RegistryKeyException;
+    typedef typename synthese::util::Registry<K, T> Registry;
+    typedef typename synthese::util::RegistryKeyException<K> RegistryKeyException;
 
     Registrable (const K& key);
     virtual ~Registrable ();

@@ -23,7 +23,7 @@ ReservationRule::ReservationRule ( const int& id,
 				   const std::string& phoneExchangeOpeningHours,
 				   const std::string& description,
 				   const std::string& webSiteUrl )
-    : Registrable<int,ReservationRule> (id)
+    : synthese::util::Registrable<int,ReservationRule> (id)
     , _type (type)
     , _online (online)
     , _originIsReference (originIsReference)

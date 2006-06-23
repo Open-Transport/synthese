@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 #include "ConnectionPlace.h"
 
 
@@ -22,7 +22,7 @@ class PhysicalStop;
  @ingroup m15
 */
 class LogicalStop : 
-    public Registrable<int,LogicalStop>, 
+    public synthese::util::Registrable<int,LogicalStop>, 
     public ConnectionPlace
 {
 

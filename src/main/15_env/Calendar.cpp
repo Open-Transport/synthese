@@ -16,7 +16,7 @@ const Calendar::Category Calendar::CATEGORY_MAX (255);
 			int lastYear,
 			const std::string& name,
 			const Category& category)
-    : Registrable<int,Calendar> (id)
+    : synthese::util::Registrable<int,Calendar> (id)
     , _name (name)
     , _firstYear (firstYear)
     , _lastYear (lastYear)

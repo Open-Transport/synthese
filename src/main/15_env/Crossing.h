@@ -2,7 +2,7 @@
 #define SYNTHESE_ENV_CROSSING_H
 
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 #include "ConnectionPlace.h"
 #include <string>
 
@@ -22,7 +22,7 @@ different roads.
 
  @ingroup m15
 */
-class Crossing : public Registrable<int, Crossing>, public ConnectionPlace
+class Crossing : public synthese::util::Registrable<int, Crossing>, public ConnectionPlace
 {
 
 private:

@@ -1,7 +1,7 @@
 #ifndef SYNTHESE_ENV_PHYSICALSTOP_H
 #define SYNTHESE_ENV_PHYSICALSTOP_H
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 #include "Vertex.h"
 #include "module.h"
 
@@ -22,7 +22,7 @@ namespace env
  @ingroup m15
 */
 class PhysicalStop : 
-    public Registrable<int,PhysicalStop>,
+    public synthese::util::Registrable<int,PhysicalStop>,
     public Vertex
 {
 

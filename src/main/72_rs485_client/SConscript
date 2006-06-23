@@ -3,7 +3,8 @@ import os.path
 Import ('mainenv')
 moduleenv = mainenv.Copy()
 
-includes = '*.cpp'
+#includes = '*.cpp'
+includes = ''
 excludes = []
 
 moduleenv.Append (CPPPATH = [Dir('..').srcnode().abspath] )
@@ -14,6 +15,6 @@ moduleenv.AppendMultithreadConf ()
 files = moduleenv.Glob(includes, excludes)
 
 
-if (moduleenv['PLATFORM'] == 'win32'):
+#if (moduleenv['PLATFORM'] == 'win32'):
   # Does not compile under posix at the moment !
-  moduleenv.Program(moduleenv.DefaultModuleName (), files)
+  #moduleenv.Program(moduleenv.DefaultModuleName (), files)

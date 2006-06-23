@@ -20,7 +20,7 @@ LineStop::LineStop (int id,
 		    const EdgeType& type,
 		    const PhysicalStop* physicalStop,
 		    bool scheduleInput)
-    : Registrable<int,LineStop> (id)
+    : synthese::util::Registrable<int,LineStop> (id)
     , Edge (type)
     , _line (line)
     , _metricOffset (metricOffset)

@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_ENV_REGISTRABLETEST_H
-#define SYNTHESE_ENV_REGISTRABLETEST_H
+#ifndef SYNTHESE_UTIL_REGISTRABLETEST_H
+#define SYNTHESE_UTIL_REGISTRABLETEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
@@ -7,7 +7,7 @@
 
 namespace synthese
 {
-namespace env
+namespace util
   {
 
 

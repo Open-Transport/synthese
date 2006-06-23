@@ -2,7 +2,7 @@
 #define SYNTHESE_COMPLIANCE_H
 
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 
 #include <boost/logic/tribool.hpp>
 #include <string>
@@ -18,7 +18,7 @@ namespace env
 /** Compliance class.
  @ingroup m15
  */
-class Compliance : public Registrable<int,Compliance>
+class Compliance : public synthese::util::Registrable<int,Compliance>
 {
 private:
         boost::logic::tribool _compliant;

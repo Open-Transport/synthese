@@ -9,7 +9,7 @@
 #include "LineStop.h"
 #include "LogicalStop.h"
 #include "PhysicalStop.h"
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 
 
 #include <string>
@@ -27,7 +27,7 @@ namespace env
 /** 
 @ingroup m15
 */
-class Environment : public Registrable<int,Environment>
+class Environment : public synthese::util::Registrable<int,Environment>
 {
  private:
 

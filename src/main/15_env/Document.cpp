@@ -13,7 +13,7 @@ Document::Document( const int& id,
 		    const std::string& url,
 		    const std::string& globalDescription,
 		    const std::string& localDescription)
-    : Registrable<int,Document> (id)
+    : synthese::util::Registrable<int,Document> (id)
     , _url (url)
     , _globalDescription (globalDescription)
     , _localDescription (localDescription)

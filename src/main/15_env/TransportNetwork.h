@@ -1,7 +1,7 @@
 #ifndef SYNTHESE_ENV_TRANSPORTNETWORK_H
 #define SYNTHESE_ENV_TRANSPORTNETWORK_H
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 #include <string>
 
 
@@ -15,7 +15,7 @@ namespace env
 /** Transport network.
  @ingroup m15
 */
-class TransportNetwork : public Registrable<int,TransportNetwork>
+class TransportNetwork : public synthese::util::Registrable<int,TransportNetwork>
 {
     std::string _name;
 

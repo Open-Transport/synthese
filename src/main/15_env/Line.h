@@ -6,7 +6,7 @@
 #include <string>
 
 #include "01_util/RGBColor.h"
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 #include "Calendar.h"
 #include "Path.h"
 
@@ -31,7 +31,7 @@ namespace env
  @ingroup m15
 */
 class Line : 
-    public Registrable<std::string,Line>,
+    public synthese::util::Registrable<std::string,Line>,
     public Path
 {
 private:

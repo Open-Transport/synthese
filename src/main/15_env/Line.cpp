@@ -20,7 +20,7 @@ Line::Line (const std::string& id,
 	    const Axis* axis,
 	    int firstYear, 
 	    int lastYear)
-    : Registrable<std::string,Line> (id)
+    : synthese::util::Registrable<std::string,Line> (id)
     , Path ()
     , _axis (axis)
     , _calendar (firstYear, lastYear, 0, "")

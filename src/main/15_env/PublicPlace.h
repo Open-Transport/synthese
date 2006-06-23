@@ -2,7 +2,7 @@
 #define SYNTHESE_ENV_PUBLICPLACE_H
 
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 #include "Place.h"
 #include <string>
 
@@ -20,7 +20,7 @@ class City;
 
  @ingroup m15
 */
-class PublicPlace : public Registrable<int, PublicPlace>, public Place
+class PublicPlace : public synthese::util::Registrable<int, PublicPlace>, public Place
 {
 
 private:

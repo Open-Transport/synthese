@@ -14,7 +14,7 @@ Road::Road (const int& id,
 	    const City* city,
 	    const RoadType& type,
 	    const std::vector<const RoadChunk*>& chunks)
-    : Registrable<int,Road> (id)
+    : synthese::util::Registrable<int,Road> (id)
     , AddressablePlace (name, city)
     , _type (type)
     , _chunks (chunks)

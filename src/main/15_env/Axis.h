@@ -2,7 +2,7 @@
 #define SYNTHESE_ENV_AXIS_H
 
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 
 #include <string>
 
@@ -16,7 +16,7 @@ namespace env
 /** Axis handling class.
  @ingroup m15
 */
-class Axis : public Registrable<std::string,Axis>
+class Axis : public synthese::util::Registrable<std::string,Axis>
 {
 
     bool _free;   //!< Whether or not this axis is a free axis.

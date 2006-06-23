@@ -1,15 +1,14 @@
 #include "RegistrableTest.h"
 
-#include "15_env/RegistryKeyException.h"
-
-#include "15_env/Registrable.h"
+#include "01_util/RegistryKeyException.h"
+#include "01_util/Registrable.h"
 
 #include <iostream>
 
 
 namespace synthese
 {
-namespace env
+namespace util
 {
 
 
@@ -26,17 +25,19 @@ namespace env
 
   } 
 
-  
+
     class RegistrableForTest : public Registrable<int, RegistrableForTest>
     {
     public:
 
-	RegistrableForTest (int key) 
-	    : Registrable<int,RegistrableForTest>::Registrable (key)
-	{
-	}
+	RegistrableForTest (int key)
+	    : Registrable<int,RegistrableForTest> (key)
+	    {
+	    }
 	    
     };
+
+
 
 
   void

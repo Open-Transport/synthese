@@ -2,7 +2,7 @@
 #define SYNTHESE_ENV_ROLLING_STOCK_H
 
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 #include <string>
 
 namespace synthese
@@ -14,7 +14,7 @@ namespace env
 /** Rolling stock.
  @ingroup m15
 */
-class RollingStock : public Registrable<int,RollingStock>
+class RollingStock : public synthese::util::Registrable<int,RollingStock>
 {
 
         std::string _name;

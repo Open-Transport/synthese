@@ -2,7 +2,7 @@
 #define SYNTHESE_ENV_CALENDAR_H
 
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 
 
 #include "04_time/Year.h"
@@ -24,7 +24,7 @@ namespace env
  32 bits stored in an int. 
  The lowest bit is day one; the highest bit is day 32 (unused).
  */
-class Calendar : public Registrable<int,Calendar>
+class Calendar : public synthese::util::Registrable<int,Calendar>
 {
 public:
 

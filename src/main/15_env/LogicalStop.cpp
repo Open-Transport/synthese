@@ -12,7 +12,7 @@ namespace env
 LogicalStop::LogicalStop (const int& id,
 			  const std::string& name,
 			  const City* city)
-    : Registrable<int,LogicalStop> (id)
+    : synthese::util::Registrable<int,LogicalStop> (id)
     , ConnectionPlace (name, city)
 {
 

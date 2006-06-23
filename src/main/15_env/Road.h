@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 #include "AddressablePlace.h"
 #include "Path.h"
 
@@ -19,7 +19,7 @@ class RoadChunk;
 
 
 class Road : 
-    public Registrable<int,Road>, 
+    public synthese::util::Registrable<int,Road>, 
     public AddressablePlace,
     public Path
     

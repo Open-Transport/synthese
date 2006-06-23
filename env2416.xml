@@ -114,7 +114,7 @@
       <lineStop id="29" metricOffset="100" type="passage" physicalStopId="29" scheduleInput="true"></lineStop>
       <lineStop id="30" metricOffset="100" type="passage" physicalStopId="30" scheduleInput="true"></lineStop>
       <lineStop id="31" metricOffset="100" type="passage" physicalStopId="31" scheduleInput="true"></lineStop>
- <!--      <lineStop id="32" metricOffset="100" type="passage" physicalStopId="32" scheduleInput="true"></lineStop> -->
+      <lineStop id="32" metricOffset="100" type="passage" physicalStopId="32" scheduleInput="true"></lineStop> 
       <lineStop id="33" metricOffset="100" type="passage" physicalStopId="33" scheduleInput="true"></lineStop> 
       <lineStop id="34" metricOffset="100" type="passage" physicalStopId="34" scheduleInput="true"></lineStop>
       <lineStop id="35" metricOffset="100" type="passage" physicalStopId="35" scheduleInput="true"></lineStop>

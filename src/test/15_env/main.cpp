@@ -7,11 +7,9 @@
 #include <cppunit/CompilerOutputter.h>
 
 #include "CityTest.h"
-#include "RegistrableTest.h"
 
 
 
-CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::RegistrableTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::CityTest);
 
 

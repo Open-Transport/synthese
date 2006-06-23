@@ -3,7 +3,7 @@
 
 
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 
 
 #include "04_time/Hour.h"
@@ -22,7 +22,7 @@ class Service;
 /** Reservation rule.
  @ingroup m15
 */
-class ReservationRule : public Registrable<int,ReservationRule>
+class ReservationRule : public synthese::util::Registrable<int,ReservationRule>
 {
 public:
 

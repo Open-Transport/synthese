@@ -8,7 +8,7 @@
 
 
   <drawableLine lineId="l16" withPhysicalStops="true"/>
-  <!--   <drawableLine lineId="l24" withPhysicalStops="false"/> -->
+  <drawableLine lineId="l24" withPhysicalStops="false"/>
 
   <!--  <drawableLine lineId="l2" withPhysicalStops="false"/>
   <drawableLine lineId="l3" withPhysicalStops="false"/> -->

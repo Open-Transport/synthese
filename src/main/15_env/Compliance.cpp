@@ -12,7 +12,7 @@ namespace env
 Compliance::Compliance (const int& id, 
 			const boost::logic::tribool& compliant,
 			const int& capacity)
-    : Registrable<int,Compliance> (id)
+    : synthese::util::Registrable<int,Compliance> (id)
     , _compliant (compliant)
     , _capacity (capacity)
 {

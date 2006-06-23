@@ -2,7 +2,7 @@
 #define SYNTHESE_ENV_DOCUMENT_H
 
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 
 #include <string>
 
@@ -16,7 +16,7 @@ namespace env
 
 
 /** @ingroup m15 */
-class Document : public Registrable<int,Document>
+class Document : public synthese::util::Registrable<int,Document>
 {
 public:
     

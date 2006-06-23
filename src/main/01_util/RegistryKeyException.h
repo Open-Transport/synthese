@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_ENV_REGISTRYKEYEXCEPTION_H
-#define SYNTHESE_ENV_REGISTRYKEYEXCEPTION_H
+#ifndef SYNTHESE_UTIL_REGISTRYKEYEXCEPTION_H
+#define SYNTHESE_UTIL_REGISTRYKEYEXCEPTION_H
 
 
 #include "01_util/Exception.h"
@@ -11,13 +11,13 @@
 
 namespace synthese
 {
-namespace env
+namespace util
 {
 
 
 /** Registry key related exception class.
     Should not be used directly, use Registrable::RegistryKeyException.
-@ingroup m15
+@ingroup m01
 */
 template<class K>
 class RegistryKeyException : public synthese::util::Exception

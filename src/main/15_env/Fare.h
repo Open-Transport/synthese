@@ -2,7 +2,7 @@
 #define SYNTHESE_ENV_FARE_H
 
 
-#include "Registrable.h"
+#include "01_util/Registrable.h"
 #include <string>
 
 
@@ -16,7 +16,7 @@ namespace env
 /** Fare handling class
  @ingroup m15
 */
-class Fare : public Registrable<int,Fare>
+class Fare : public synthese::util::Registrable<int,Fare>
 {
  public:
     

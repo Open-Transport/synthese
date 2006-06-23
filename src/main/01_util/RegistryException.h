@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_ENV_REGISTRYEXCEPTION_H
-#define SYNTHESE_ENV_REGISTRYEXCEPTION_H
+#ifndef SYNTHESE_UTIL_REGISTRYEXCEPTION_H
+#define SYNTHESE_UTIL_REGISTRYEXCEPTION_H
 
 
 #include "01_util/Exception.h"
@@ -10,7 +10,7 @@
 
 namespace synthese
 {
-namespace env
+namespace util
 {
 
 

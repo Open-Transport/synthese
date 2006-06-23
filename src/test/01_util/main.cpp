@@ -11,17 +11,17 @@
 #include "PlainCharFilterTest.h"
 #include "SqlFilterTest.h"
 #include "LogTest.h"
+#include "RegistrableTest.h"
 #include "ThreadTest.h"
 
 
 
-/* CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::HtmlFilterTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::HtmlFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::LowerCaseFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::PlainCharFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::SqlFilterTest);
-
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::LogTest);
-*/
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::RegistrableTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::ThreadTest);
 
 

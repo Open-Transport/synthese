@@ -14,7 +14,7 @@ PhysicalStop::PhysicalStop (int id,
 			    int rankInLogicalStop,
 			    const LogicalStop* logicalStop,
 			    double x, double y)
-    : Registrable<int,PhysicalStop> (id)
+    : synthese::util::Registrable<int,PhysicalStop> (id)
     , Vertex (logicalStop, rankInLogicalStop, x, y)
     , _name (name)
 {

@@ -6,7 +6,7 @@
 #include "module.h"
 #include "Edge.h"
 
-#include "15_env/Registrable.h"
+#include "01_util/Registrable.h"
 
 #include "04_time/DateTime.h"
 #include "04_time/Schedule.h"
@@ -27,7 +27,7 @@ class Line;
  @ingroup m15
 */
  class LineStop : 
-     public Registrable<int,LineStop>, public Edge
+     public synthese::util::Registrable<int,LineStop>, public Edge
 {
 public:
     
