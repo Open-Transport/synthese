@@ -22,9 +22,11 @@ namespace db
 */
 class SQLiteResult : public DbResult
 {
+ public:
+    typedef std::vector<std::string> Row;
+
  private:
 
-    typedef std::vector<std::string> Row;
 
     int _nbColumns;
     int _nbRows;
@@ -43,16 +45,21 @@ class SQLiteResult : public DbResult
     int getNbColumns () const;
     int getNbRows () const;
 
-    const std::string& getColumnName (int column) const;
+    std::string getColumnName (int column) const;
     int getColumnIndex (const std::string& columnName) const;
 
-    const std::string& getColumn (int row, int column) const;
-    const std::string& getColumn (int row, const std::string& name) const;
+    std::string getColumn (int row, int column) const;
+    std::string getColumn (int row, const std::string& name) const;
+    std::vector<std::string> getColumns (int row) const;
+
     //@}
 
     //! @name Update methods.
     //@{
     void addRow (int nbColumns, char** values, char** columns);
+
+    void addRow (const std::vector<std::string>& values, 
+		 const std::vector<std::string>& columns);
     //@}
 
 };

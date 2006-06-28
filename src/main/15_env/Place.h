@@ -28,7 +28,7 @@ class Place
 
 private:
 
-    const std::string _name;  //! The name of this city
+    std::string _name;  //! The name of this city
     const City* _city; //!< The city where this place is located
 
 protected:

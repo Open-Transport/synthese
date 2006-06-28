@@ -54,6 +54,18 @@
 				RelativePath=".\RGBColor.cpp">
 			</File>
 			<File
+				RelativePath=".\Thread.cpp">
+			</File>
+			<File
+				RelativePath=".\ThreadException.cpp">
+			</File>
+			<File
+				RelativePath=".\ThreadExec.cpp">
+			</File>
+			<File
+				RelativePath=".\ThreadGroup.cpp">
+			</File>
+			<File
 				RelativePath=".\XmlParser.cpp">
 			</File>
 		</Filter>
@@ -83,10 +95,34 @@
 				RelativePath=".\PlainCharFilter.h">
 			</File>
 			<File
+				RelativePath=".\Registrable.h">
+			</File>
+			<File
+				RelativePath=".\Registry.h">
+			</File>
+			<File
+				RelativePath=".\RegistryException.h">
+			</File>
+			<File
+				RelativePath=".\RegistryKeyException.h">
+			</File>
+			<File
 				RelativePath=".\RGBColor.h">
 			</File>
 			<File
 				RelativePath=".\SqlFilter.h">
+			</File>
+			<File
+				RelativePath=".\Thread.h">
+			</File>
+			<File
+				RelativePath=".\ThreadException.h">
+			</File>
+			<File
+				RelativePath=".\ThreadExec.h">
+			</File>
+			<File
+				RelativePath=".\ThreadGroup.h">
 			</File>
 			<File
 				RelativePath=".\XmlParser.h">

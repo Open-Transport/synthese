@@ -29,7 +29,7 @@ class Registrable
 {
  private:
     
-    const K _key;
+    K _key;
 
  public:
 
@@ -49,9 +49,6 @@ class Registrable
 
 
  private:
-
-    Registrable ( const Registrable& ref );
-    Registrable& operator= ( const Registrable& rhs );
 
 };
 

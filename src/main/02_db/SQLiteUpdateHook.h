@@ -45,6 +45,8 @@ namespace db
 {
  public:
 
+ private:
+
  protected:
 
     SQLiteUpdateHook () {};
@@ -52,7 +54,7 @@ namespace db
 
  public:
 
-    /** Method callback on hook registration with the SQLiteThreadExex object.
+    /** Method callback on hook registration with the SQLiteThreadExec object.
      */
     virtual void registerCallback (const SQLiteThreadExec* emitter) = 0;
     

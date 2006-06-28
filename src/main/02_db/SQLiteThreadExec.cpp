@@ -173,9 +173,8 @@ SQLiteThreadExec::initialize()
 void
 SQLiteThreadExec::loop()
 {
-    if (hasEnqueuedEvent ()) 
+    while (hasEnqueuedEvent ()) 
     {
-	// Flush more than one event ??
 	postEvent (dequeueEvent ());
     }    
 }

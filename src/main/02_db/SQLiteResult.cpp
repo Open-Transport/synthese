@@ -41,7 +41,7 @@ SQLiteResult::getNbRows () const
 
 
 
-const std::string& 
+std::string
 SQLiteResult::getColumnName (int column) const
 {
     return _columnNames.at (column);
@@ -62,7 +62,7 @@ SQLiteResult::getColumnIndex (const std::string& columnName) const
 
 
 
-const std::string& 
+std::string
 SQLiteResult::getColumn (int row, int column) const
 {
     return _values.at (row).at (column);
@@ -70,7 +70,7 @@ SQLiteResult::getColumn (int row, int column) const
 
 
 
-const std::string& 
+std::string
 SQLiteResult::getColumn (int row, const std::string& name) const
 {
     int index = getColumnIndex (name);
@@ -79,6 +79,13 @@ SQLiteResult::getColumn (int row, const std::string& name) const
 }
 
 
+
+
+std::vector<std::string> 
+SQLiteResult::getColumns (int row) const
+{
+    return _values.at (row);
+}
 
 
 
@@ -104,6 +111,36 @@ SQLiteResult::addRow (int nbColumns, char** values, char** columns)
     _values.push_back (row);
 
 }
+
+
+
+
+void 
+SQLiteResult::addRow (const std::vector<std::string>& values, 
+		      const std::vector<std::string>& columns)
+{
+    int nbColumns = (int) values.size ();
+    ++_nbRows;
+    _nbColumns = nbColumns;
+
+    Row row;
+    if (_columnNames.size () == 0) 
+    {
+	for (int j=0; j<nbColumns; ++j)
+	{
+	    _columnNames.push_back (columns[j]);
+	}
+    }
+
+    for (int i=0; i<nbColumns; ++i)
+    {
+	row.push_back (values[i]);
+    }
+    _values.push_back (row);
+
+}
+
+
 
 
 

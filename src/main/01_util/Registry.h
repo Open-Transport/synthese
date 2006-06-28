@@ -59,6 +59,7 @@ class Registry
     void clear ();
 
     void add (T* ptr);
+    void replace (T* ptr);
     void remove (const K& key);
     //@}
     
@@ -155,6 +156,14 @@ Registry<K,T>::add (T* ptr)
     _registry.insert (std::make_pair (ptr->getKey (), ptr));
 }
 
+
+template<class K, class T>
+void 
+Registry<K,T>::replace (T* ptr)
+{
+    remove (ptr->getKey ());
+    _registry.insert (std::make_pair (ptr->getKey (), ptr));
+}
 
 
 

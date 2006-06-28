@@ -31,6 +31,9 @@ Place::getName () const
 
 
 
+
+
+
 const std::string& 
 Place::getOfficialName () const
 {

@@ -59,7 +59,13 @@
 				RelativePath=".\PlainCharFilterTest.cpp">
 			</File>
 			<File
+				RelativePath=".\RegistrableTest.cpp">
+			</File>
+			<File
 				RelativePath=".\SqlFilterTest.cpp">
+			</File>
+			<File
+				RelativePath=".\ThreadTest.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -79,7 +85,13 @@
 				RelativePath=".\PlainCharFilterTest.h">
 			</File>
 			<File
+				RelativePath=".\RegistrableTest.h">
+			</File>
+			<File
 				RelativePath=".\SqlFilterTest.h">
+			</File>
+			<File
+				RelativePath=".\ThreadTest.h">
 			</File>
 		</Filter>
 		<File
