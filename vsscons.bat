@@ -5,6 +5,7 @@ SET PATH=%PATH%;C:\Python24
 SET PATH=%PATH%;C:\Program Files\doxygen\bin
 SET PATH=%PATH%;C:\Program Files\Graphviz\Graphviz\bin
 SET PATH=%PATH%;C:\Program Files\texmf\miktex\bin
+SET PATH=%PATH%;%LIBS_REPO_HOME%\lib
 
 cd ../../..
 cd
