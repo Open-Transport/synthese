@@ -3,6 +3,7 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 
+
 namespace synthese
 {
 namespace util
@@ -24,6 +25,16 @@ int
 Conversion::ToInt (const std::string& s)
 {
     return atoi (s.c_str ());
+}
+
+
+
+long long 
+Conversion::ToLongLong (const std::string& s)
+{
+    long long int i;
+    sscanf(s.c_str (), "%I64i", &i);
+    return i;
 }
 
 
@@ -82,6 +93,12 @@ Conversion::ToString (double d)
     return ss.str ();
 }
 
+
+std::string 
+Conversion::ToString (const std::string& s)
+{
+    return s;
+}
 
 
 
