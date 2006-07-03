@@ -13,6 +13,7 @@
 #include "LogTest.h"
 #include "RegistrableTest.h"
 #include "ThreadTest.h"
+#include "ConversionTest.h"
 
 
 
@@ -23,6 +24,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::SqlFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::LogTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::RegistrableTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::ThreadTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::ConversionTest);
 
 
 
