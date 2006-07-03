@@ -32,8 +32,8 @@ Conversion::ToInt (const std::string& s)
 long long 
 Conversion::ToLongLong (const std::string& s)
 {
-    long long int i;
-    sscanf(s.c_str (), "%I64i", &i);
+    long long i;
+    sscanf(s.c_str (), INT64_FORMAT, &i);
     return i;
 }
 

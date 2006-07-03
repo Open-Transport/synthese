@@ -8,6 +8,14 @@
 #include <iostream>
 
 
+#ifdef WIN32
+#define INT64_FORMAT "%I64i"
+#endif
+
+#ifndef WIN32
+#define INT64_FORMAT "%lli"
+#endif
+
 
 namespace synthese
 {
