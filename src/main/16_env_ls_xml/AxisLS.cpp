@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "01_util/Conversion.h"
+#include "01_util/UId.h"
 #include "01_util/XmlParser.h"
 
 #include "15_env/Environment.h"
@@ -18,6 +19,7 @@ namespace envlsxml
 
 const std::string AxisLS::AXIS_TAG ("axis");
 const std::string AxisLS::AXIS_ID_ATTR ("id");
+const std::string AxisLS::AXIS_NAME_ATTR ("name");
 const std::string AxisLS::AXIS_FREE_ATTR ("free");
 const std::string AxisLS::AXIS_AUTHORIZED_ATTR ("authorized");
 
@@ -28,14 +30,17 @@ AxisLS::Load (XMLNode& node,
 {
     // assert (AXIS_TAG == node.getName ());
 
-    std::string id (node.getAttribute (AXIS_ID_ATTR.c_str()));
+    uid id (su::Conversion::ToLongLong (
+		   node.getAttribute (AXIS_ID_ATTR.c_str())));
+
+    std::string name (node.getAttribute (AXIS_NAME_ATTR.c_str()));
 
     bool free (su::Conversion::ToBool (
 		   node.getAttribute (AXIS_FREE_ATTR.c_str())));
     bool authorized (su::Conversion::ToBool (
 		   node.getAttribute (AXIS_AUTHORIZED_ATTR.c_str())));
 
-    return new synthese::env::Axis (id,	free, authorized);
+    return new synthese::env::Axis (id,	name, free, authorized);
 }
 
 

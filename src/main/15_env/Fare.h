@@ -3,6 +3,8 @@
 
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
 #include <string>
 
 
@@ -16,7 +18,7 @@ namespace env
 /** Fare handling class
  @ingroup m15
 */
-class Fare : public synthese::util::Registrable<int,Fare>
+class Fare : public synthese::util::Registrable<uid,Fare>
 {
  public:
     
@@ -31,7 +33,7 @@ class Fare : public synthese::util::Registrable<int,Fare>
 
  public:
     
-    Fare (const int& id, 
+    Fare (const uid& id, 
 	  const std::string& name,
 	  const FareType& type);
     ~Fare ();

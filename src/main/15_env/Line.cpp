@@ -16,12 +16,14 @@ namespace env
 
 
 
-Line::Line (const std::string& id, 
+Line::Line (const uid& id,
+	    const std::string& name, 
 	    const Axis* axis,
 	    int firstYear, 
 	    int lastYear)
-    : synthese::util::Registrable<std::string,Line> (id)
+    : synthese::util::Registrable<uid,Line> (id)
     , Path ()
+    , _name (name)
     , _axis (axis)
     , _calendar (firstYear, lastYear, 0, "")
     , _network (0)
@@ -39,6 +41,14 @@ Line::Line (const std::string& id,
 
 Line::~Line ()
 {
+}
+
+
+
+const std::string& 
+Line::getName () const
+{
+    return _name;
 }
 
 
@@ -378,6 +388,8 @@ Line::addLineStop (LineStop* lineStop)
 void 
 Line::updateCalendar ()
 {
+    /* Is it still useful for anything ????
+
     _calendar.reset ();
     LineStop* lastLineStop = _lineStops.back();
     for (int s=0; s<_services.size (); ++s)
@@ -391,6 +403,7 @@ Line::updateCalendar ()
 	// MJ constness problem !
         ((Service*) getService (s))->getCalendar ()->setInclusionToMask (_calendar);
     }
+    */
 
 }
 

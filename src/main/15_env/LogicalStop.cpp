@@ -9,10 +9,10 @@ namespace env
 
 
 
-LogicalStop::LogicalStop (const int& id,
+LogicalStop::LogicalStop (const uid& id,
 			  const std::string& name,
 			  const City* city)
-    : synthese::util::Registrable<int,LogicalStop> (id)
+    : synthese::util::Registrable<uid,LogicalStop> (id)
     , ConnectionPlace (name, city)
 {
 

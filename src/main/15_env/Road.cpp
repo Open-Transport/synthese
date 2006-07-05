@@ -9,12 +9,12 @@ namespace env
 {
 
 
-Road::Road (const int& id,
+Road::Road (const uid& id,
 	    const std::string& name,
 	    const City* city,
 	    const RoadType& type,
 	    const std::vector<const RoadChunk*>& chunks)
-    : synthese::util::Registrable<int,Road> (id)
+    : synthese::util::Registrable<uid,Road> (id)
     , AddressablePlace (name, city)
     , _type (type)
     , _chunks (chunks)

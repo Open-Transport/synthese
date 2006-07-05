@@ -25,6 +25,7 @@ namespace envlsxml
 Sample XML format :
 
 <axis id="1"
+      name="A1"
       free="true"
       authorized="false"/>
 
@@ -36,6 +37,7 @@ class AxisLS
 
     static const std::string AXIS_TAG;
     static const std::string AXIS_ID_ATTR;
+    static const std::string AXIS_NAME_ATTR;
     static const std::string AXIS_FREE_ATTR;
     static const std::string AXIS_AUTHORIZED_ATTR;
 

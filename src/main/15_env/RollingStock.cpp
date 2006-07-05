@@ -7,11 +7,11 @@ namespace env
 {
 
 
-RollingStock::RollingStock (const int& id,
+RollingStock::RollingStock (const uid& id,
 			    const std::string& name,
 			    const std::string& article,
 			    const std::string& indicator)
-    : synthese::util::Registrable<int,RollingStock> (id)
+    : synthese::util::Registrable<uid,RollingStock> (id)
     , _name (name)
     , _article (article)
     , _indicator (indicator)

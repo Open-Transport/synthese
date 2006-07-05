@@ -4,6 +4,7 @@
 
 #include "01_util/Conversion.h"
 #include "01_util/RGBColor.h"
+#include "01_util/UId.h"
 #include "01_util/XmlParser.h"
 
 #include "15_env/Environment.h"
@@ -21,6 +22,7 @@ namespace envlsxml
 
 const std::string LineLS::LINE_TAG ("line");
 const std::string LineLS::LINE_ID_ATTR ("id");
+const std::string LineLS::LINE_NAME_ATTR ("name");
 const std::string LineLS::LINE_AXISID_ATTR ("axisId");
 const std::string LineLS::LINE_FIRSTYEAR_ATTR ("firstYear");
 const std::string LineLS::LINE_LASTYEAR_ATTR ("lastYear");
@@ -34,8 +36,11 @@ LineLS::Load (XMLNode& node,
 {
     // assert (LINE_TAG == node.getName ());
 
-    std::string id (node.getAttribute (LINE_ID_ATTR.c_str()));
-    std::string axisId (node.getAttribute (LINE_AXISID_ATTR.c_str()));
+    uid id (su::Conversion::ToLongLong (node.getAttribute (LINE_ID_ATTR.c_str())));
+    std::string name (node.getAttribute (LINE_NAME_ATTR.c_str()));
+
+    uid axisId (su::Conversion::ToLongLong (
+		    node.getAttribute (LINE_AXISID_ATTR.c_str())));
     
     int firstYear (su::Conversion::ToInt (
 		       node.getAttribute (LINE_FIRSTYEAR_ATTR.c_str())));
@@ -44,6 +49,7 @@ LineLS::Load (XMLNode& node,
 
     synthese::env::Line* line = 
 	new synthese::env::Line (id,	
+				 name,
 				 environment.getAxes ().get (axisId),
 				 firstYear,
 				 lastYear);

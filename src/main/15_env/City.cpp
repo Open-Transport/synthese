@@ -7,9 +7,9 @@ namespace synthese
 namespace env
 {
 
-City::City (const int& key,
+City::City (const uid& key,
 	    const std::string& name)
-    : synthese::util::Registrable<int,City> (key)
+    : synthese::util::Registrable<uid,City> (key)
     , IncludingPlace (name, 0)  // Note this city's city is null ?
 {
 }

@@ -3,6 +3,7 @@
 
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
 #include "IncludingPlace.h"
 
 #include <string>
@@ -25,7 +26,7 @@ stops (those taken by default when no stop is explicitly chosen).
 
 @ingroup m15
 */
-class City : public synthese::util::Registrable<int, City>, 
+class City : public synthese::util::Registrable<uid, City>, 
 	         public IncludingPlace
 {
  private:
@@ -34,9 +35,9 @@ class City : public synthese::util::Registrable<int, City>,
 
  public:
 
-    City (const int& key,
+    City (const uid& key,
 	  const std::string& name);
-
+    
     ~City ();
 
 

@@ -14,13 +14,13 @@ namespace env
 {
 
 
-LineStop::LineStop (int id,
-			const Line* line,
+LineStop::LineStop (const uid& id,
+		    const Line* line,
 		    double metricOffset,
 		    const EdgeType& type,
 		    const PhysicalStop* physicalStop,
 		    bool scheduleInput)
-    : synthese::util::Registrable<int,LineStop> (id)
+    : synthese::util::Registrable<uid,LineStop> (id)
     , Edge (type)
     , _line (line)
     , _metricOffset (metricOffset)

@@ -2,6 +2,8 @@
 #define SYNTHESE_ENV_TRANSPORTNETWORK_H
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
 #include <string>
 
 
@@ -15,13 +17,13 @@ namespace env
 /** Transport network.
  @ingroup m15
 */
-class TransportNetwork : public synthese::util::Registrable<int,TransportNetwork>
+class TransportNetwork : public synthese::util::Registrable<uid,TransportNetwork>
 {
     std::string _name;
 
  public:
 
-    TransportNetwork ( const int& id,
+    TransportNetwork ( const uid& id,
 	      const std::string& name );
     ~TransportNetwork ();
 

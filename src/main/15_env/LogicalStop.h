@@ -5,6 +5,8 @@
 #include <vector>
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
 #include "ConnectionPlace.h"
 
 
@@ -22,7 +24,7 @@ class PhysicalStop;
  @ingroup m15
 */
 class LogicalStop : 
-    public synthese::util::Registrable<int,LogicalStop>, 
+    public synthese::util::Registrable<uid,LogicalStop>, 
     public ConnectionPlace
 {
 
@@ -35,7 +37,7 @@ protected:
 public:
 
 
-    LogicalStop (const int& id,
+    LogicalStop (const uid& id,
 		 const std::string& name,
 		 const City* city);
 

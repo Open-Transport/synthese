@@ -3,6 +3,7 @@
 
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
 #include "Place.h"
 #include <string>
 
@@ -20,14 +21,14 @@ class City;
 
  @ingroup m15
 */
-class PublicPlace : public synthese::util::Registrable<int, PublicPlace>, public Place
+class PublicPlace : public synthese::util::Registrable<uid, PublicPlace>, public Place
 {
 
 private:
 
 protected:
 
-    PublicPlace (const int& id,
+    PublicPlace (const uid& id,
 		 const std::string& name,
 		 const City* city);
 

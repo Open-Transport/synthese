@@ -3,6 +3,7 @@
 
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
 
 
 #include "04_time/Year.h"
@@ -24,7 +25,7 @@ namespace env
  32 bits stored in an int. 
  The lowest bit is day one; the highest bit is day 32 (unused).
  */
-class Calendar : public synthese::util::Registrable<int,Calendar>
+class Calendar : public synthese::util::Registrable<uid,Calendar>
 {
 public:
 
@@ -52,18 +53,18 @@ private:
     std::string _name;
 
     std::vector<Mask> _yearDays; //!< Array containing masks (one per month)
-    const synthese::time::Year _firstYear;  //!< Actual year for mask first byte
-    const synthese::time::Year _lastYear;  //!< Actual year for mask last byte
+    const synthese::time::Year _firstYear;  //!< Actual year for mask first byte (included)
+    const synthese::time::Year _lastYear;  //!< Actual year for mask last byte (included)
 
     Category _category;
 	
 public:
 
-    Calendar( const int& id,
-			 int firstYear, 
-			 int lastYear, 
-			 const std::string& name,
-			 const Category& category = CATEGORY_MAX);
+    Calendar( const uid& id,
+	      int firstYear, 
+	      int lastYear, 
+	      const std::string& name,
+	      const Category& category = CATEGORY_MAX);
     
     ~Calendar();
 
@@ -74,7 +75,7 @@ public:
     void setCategory (Category category);
 
     const std::vector<Mask>& getYearDays () const;
-    void setYearDays (const std::vector<Mask>& yearDays);
+//    void setYearDays (const std::vector<Mask>& yearDays);  // should be removed for integrity!
 
     void setName (const std::string& name);
     //@}
@@ -85,15 +86,17 @@ public:
     synthese::time::Date getFirstOperationDay () const;
 
     
-    void setInclusionToMask ( std::vector<Mask>& calendar, 
+/*    void setInclusionToMask ( std::vector<Mask>& calendar, 
 			      InclusionType type = INCLUSION_TYPE_POSITIVE ) const;
 
     void setInclusionToMask ( Calendar& calendar, 
 			      InclusionType type = INCLUSION_TYPE_POSITIVE ) const;
 
+
     bool sharesAllElements ( const Calendar& base, const std::vector<Mask>& other) const; 
     bool sharesOneElement ( const std::vector<Mask>& other) const;
     bool sharesOneElement ( const Calendar& other) const;
+*/
 
     int card ( const std::vector<Mask>& ) const; 
     int card ( const Calendar& ) const; 
@@ -103,8 +106,8 @@ public:
     */
     bool isMarked ( const synthese::time::Date& date) const;
 
-    std::vector<Mask> excludedElements ( const Calendar& other ) const;
-    std::vector<Mask> logicalAnd ( const Calendar& ) const;
+//    std::vector<Mask> excludedElements ( const Calendar& other ) const;
+//    std::vector<Mask> logicalAnd ( const Calendar& ) const;
 
     //@}
 
@@ -120,12 +123,14 @@ public:
 	@return true if the given dates exists in this calendar, false otherwise.
     */
     bool setMark ( const synthese::time::Date& date, 
-		     InclusionType type = INCLUSION_TYPE_POSITIVE );
+		   InclusionType type = INCLUSION_TYPE_POSITIVE );
     
+    /** Marks all dates between startDate (included) and endDate (included).
+    */
     bool setMark ( const synthese::time::Date& startDate, 
-		      const synthese::time::Date& endDate, 
-		      InclusionType type = INCLUSION_TYPE_POSITIVE, 
-		      int step = 1 );
+		   const synthese::time::Date& endDate, 
+		   InclusionType type = INCLUSION_TYPE_POSITIVE, 
+		   int step = 1 );
 
     //@}
 

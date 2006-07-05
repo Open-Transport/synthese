@@ -11,7 +11,7 @@ namespace env
 {
 
 
-ReservationRule::ReservationRule ( const int& id,
+ReservationRule::ReservationRule ( const uid& id,
 				   const ReservationType& type,
 				   bool online,
 				   bool originIsReference,
@@ -23,7 +23,7 @@ ReservationRule::ReservationRule ( const int& id,
 				   const std::string& phoneExchangeOpeningHours,
 				   const std::string& description,
 				   const std::string& webSiteUrl )
-    : synthese::util::Registrable<int,ReservationRule> (id)
+    : synthese::util::Registrable<uid,ReservationRule> (id)
     , _type (type)
     , _online (online)
     , _originIsReference (originIsReference)

@@ -9,12 +9,12 @@ namespace env
 {
 
 
-PhysicalStop::PhysicalStop (int id,
+PhysicalStop::PhysicalStop (const uid& id,
 			    const std::string& name,
 			    int rankInLogicalStop,
 			    const LogicalStop* logicalStop,
 			    double x, double y)
-    : synthese::util::Registrable<int,PhysicalStop> (id)
+    : synthese::util::Registrable<uid,PhysicalStop> (id)
     , Vertex (logicalStop, rankInLogicalStop, x, y)
     , _name (name)
 {

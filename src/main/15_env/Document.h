@@ -3,6 +3,7 @@
 
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
 
 #include <string>
 
@@ -16,7 +17,7 @@ namespace env
 
 
 /** @ingroup m15 */
-class Document : public synthese::util::Registrable<int,Document>
+class Document : public synthese::util::Registrable<uid,Document>
 {
 public:
     
@@ -39,7 +40,7 @@ private:
     
  public:
 
-        Document( const int& id,
+        Document( const uid& id,
 		  const std::string& url,
 		  const std::string& globalDescription,
 		  const std::string& localDescription);

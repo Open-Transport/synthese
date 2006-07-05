@@ -8,11 +8,11 @@ namespace env
 {
 
 
-Crossing::Crossing (const int& id,
+Crossing::Crossing (const uid& id,
 		    const std::string& name,
 		    const City* city,
 		    const ConnectionType& connectionType)
-    : synthese::util::Registrable<int, Crossing> (id)
+    : synthese::util::Registrable<uid, Crossing> (id)
     , ConnectionPlace (name, city, connectionType)
 {
 }

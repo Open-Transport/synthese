@@ -34,7 +34,7 @@ DrawableLine::DrawableLine (const Line* line,
 			    bool withPhysicalStops)
     : _lineId (line->getId ())
     , _points (line->getPoints (fromLineStopIndex, toLineStopIndex))
-    , _shortName (line->getId ())
+    , _shortName (line->getName ())
     , _color (line->getColor ())
     , _withPhysicalStops (withPhysicalStops)
 {
@@ -52,7 +52,7 @@ DrawableLine::DrawableLine (const Line* line,
 
 
     
-DrawableLine::DrawableLine (const std::string& lineId, 
+DrawableLine::DrawableLine (const uid& lineId, 
 			    const std::vector<const synthese::env::Point*>& points,
 			    const std::string& shortName,
 			    const synthese::util::RGBColor& color,
@@ -82,7 +82,7 @@ DrawableLine::~DrawableLine()
 
 
 
-const std::string& 
+const uid& 
 DrawableLine::getLineId () const
 {
     return _lineId;

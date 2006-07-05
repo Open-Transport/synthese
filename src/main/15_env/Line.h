@@ -7,6 +7,8 @@
 
 #include "01_util/RGBColor.h"
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
 #include "Calendar.h"
 #include "Path.h"
 
@@ -31,7 +33,7 @@ namespace env
  @ingroup m15
 */
 class Line : 
-    public synthese::util::Registrable<std::string,Line>,
+    public synthese::util::Registrable<uid,Line>,
     public Path
 {
 private:
@@ -44,6 +46,7 @@ private:
     Fare* _fare;
     Alarm* _alarm;
     
+    std::string _name;  //!< Name (id)
     std::string _shortName;  //!< Name (cartouche)
     std::string _longName; //!< Name for schedule card
 
@@ -64,7 +67,8 @@ private:
 
 public:
 
-    Line (const std::string& id, 
+    Line (const uid& id,
+	  const std::string& name, 
 	  const Axis* axis,
 	  int firstYear, 
 	  int lastYear);
@@ -75,6 +79,8 @@ public:
 
     //! @name Getters/Setters
     //@{
+    const std::string& getName () const;
+
     int getEdgesCount () const;
     const Edge* getEdge (int index) const;
 

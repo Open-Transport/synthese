@@ -9,10 +9,10 @@ namespace env
 
 
 
-Compliance::Compliance (const int& id, 
+Compliance::Compliance (const uid& id, 
 			const boost::logic::tribool& compliant,
 			const int& capacity)
-    : synthese::util::Registrable<int,Compliance> (id)
+    : synthese::util::Registrable<uid,Compliance> (id)
     , _compliant (compliant)
     , _capacity (capacity)
 {

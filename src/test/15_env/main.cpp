@@ -6,11 +6,15 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/CompilerOutputter.h>
 
+#include "CalendarTest.h"
 #include "CityTest.h"
+#include "EnvironmentTest.h"
 
 
 
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::CalendarTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::CityTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::EnvironmentTest);
 
 
 

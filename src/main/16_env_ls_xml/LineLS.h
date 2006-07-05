@@ -24,7 +24,8 @@ namespace envlsxml
 
 Sample XML format :
 
-<line id="L5"
+<line id="5"
+      name="L5"
       axisId="A2"
       firstYear="2006"
       lastYear="2007"
@@ -51,6 +52,7 @@ class LineLS
 
     static const std::string LINE_TAG;
     static const std::string LINE_ID_ATTR;
+    static const std::string LINE_NAME_ATTR;
     static const std::string LINE_AXISID_ATTR;
     static const std::string LINE_FIRSTYEAR_ATTR;
     static const std::string LINE_LASTYEAR_ATTR;

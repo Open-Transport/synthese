@@ -4,6 +4,7 @@
 
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
 
 
 #include "04_time/Hour.h"
@@ -22,7 +23,7 @@ class Service;
 /** Reservation rule.
  @ingroup m15
 */
-class ReservationRule : public synthese::util::Registrable<int,ReservationRule>
+class ReservationRule : public synthese::util::Registrable<uid,ReservationRule>
 {
 public:
 
@@ -56,7 +57,7 @@ private:
 
 public:
 
-    ReservationRule ( const int& id,
+    ReservationRule ( const uid& id,
 		      const ReservationType& type,
 		      bool online,
 		      bool originIsReference,

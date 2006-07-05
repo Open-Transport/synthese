@@ -9,7 +9,9 @@
 #include "LineStop.h"
 #include "LogicalStop.h"
 #include "PhysicalStop.h"
+
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
 
 
 #include <string>
@@ -27,7 +29,7 @@ namespace env
 /** 
 @ingroup m15
 */
-class Environment : public synthese::util::Registrable<int,Environment>
+class Environment : public synthese::util::Registrable<uid,Environment>
 {
  private:
 
@@ -42,7 +44,7 @@ class Environment : public synthese::util::Registrable<int,Environment>
 
  public:
 
-    Environment (const int& id);
+    Environment (const uid& id);
     ~Environment ();
 
 

@@ -7,10 +7,10 @@ namespace env
 
 
 
-Fare::Fare (const int& id, 
+Fare::Fare (const uid& id, 
 	    const std::string& name,
 	    const FareType& type)
-    : synthese::util::Registrable<int,Fare> (id)
+    : synthese::util::Registrable<uid,Fare> (id)
     , _name (name)
     , _type (type)
 {

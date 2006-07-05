@@ -3,6 +3,7 @@
 
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
 #include "ConnectionPlace.h"
 #include <string>
 
@@ -22,14 +23,14 @@ different roads.
 
  @ingroup m15
 */
-class Crossing : public synthese::util::Registrable<int, Crossing>, public ConnectionPlace
+class Crossing : public synthese::util::Registrable<uid, Crossing>, public ConnectionPlace
 {
 
 private:
 
 protected:
 
-    Crossing (const int& id,
+    Crossing (const uid& id,
 	      const std::string& name,
 	      const City* city,
 	      const ConnectionType& connectionType = CONNECTION_TYPE_AUTHORIZED);

@@ -7,8 +7,8 @@ namespace env
 {
 
 
-Environment::Environment (const int& id)
-    : synthese::util::Registrable<int,Environment> (id)
+Environment::Environment (const uid& id)
+    : synthese::util::Registrable<uid,Environment> (id)
 {
 }
 

@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "01_util/Conversion.h"
+#include "01_util/UId.h"
 #include "01_util/XmlParser.h"
 
 #include "15_env/Environment.h"
@@ -34,7 +35,8 @@ DrawableLineLS::Load (XMLNode& node,
 {
     // assert (DRAWABLELINE_TAG == node.getName ());
 
-    std::string lineId (node.getAttribute (DRAWABLELINE_LINEID_ATTR.c_str()));
+    uid lineId (su::Conversion::ToLongLong 
+		(node.getAttribute (DRAWABLELINE_LINEID_ATTR.c_str())));
 
     const synthese::env::Line* line = environment.getLines ().get (lineId);
     const std::vector<synthese::env::LineStop*>& lineStops = line->getLineStops ();

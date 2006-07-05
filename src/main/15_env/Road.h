@@ -4,6 +4,8 @@
 #include <string>
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
 #include "AddressablePlace.h"
 #include "Path.h"
 
@@ -19,7 +21,7 @@ class RoadChunk;
 
 
 class Road : 
-    public synthese::util::Registrable<int,Road>, 
+    public synthese::util::Registrable<uid,Road>, 
     public AddressablePlace,
     public Path
     
@@ -51,7 +53,7 @@ private:
 
 public:
 
-  Road (const int& id,
+  Road (const uid& id,
 	const std::string& name,
 	const City* city,
         const RoadType& type,

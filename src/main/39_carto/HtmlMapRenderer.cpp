@@ -113,7 +113,7 @@ HtmlMapRenderer::renderLines (Map& map)
 			dbl->calculateAbsoluteShiftedPoints (shiftedPoints, (_config.getBorderWidth () / 2));
 			
 			std::string href (_urlPattern);
-			boost::replace_all (href, "$id", dbl->getLineId ());
+			boost::replace_all (href, "$id", Conversion::ToString (dbl->getLineId ()));
 
 			_output << "<area href='" << href << "' shape='poly' coords='";
 			for (int i=0; i<points1.size (); ++i)

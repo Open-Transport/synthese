@@ -4,6 +4,7 @@
 
 #include "01_util/Conversion.h"
 #include "01_util/XmlParser.h"
+#include "01_util/UId.h"
 
 #include "15_env/Environment.h"
 #include "15_env/PhysicalStop.h"
@@ -31,7 +32,7 @@ PhysicalStopLS::Load (XMLNode& node,
 {
     // assert (PHYSICALSTOP_TAG == node.getName ());
 
-    int id (su::Conversion::ToInt (
+    uid id (su::Conversion::ToLongLong (
 		node.getAttribute (PHYSICALSTOP_ID_ATTR.c_str())));
     std::string name (node.getAttribute (PHYSICALSTOP_NAME_ATTR.c_str()));
     int logicalStopId (su::Conversion::ToInt (

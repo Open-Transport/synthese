@@ -4,6 +4,7 @@
 
 #include "01_util/Conversion.h"
 #include "01_util/XmlParser.h"
+#include "01_util/UId.h"
 
 #include "15_env/Environment.h"
 #include "15_env/Line.h"
@@ -35,7 +36,7 @@ const std::string EnvironmentLS::ENVIRONMENT_PHYSICALSTOPS_TAG ("physicalStops")
 synthese::env::Environment* 
 EnvironmentLS::Load (XMLNode& node)
 {
-    int id (su::Conversion::ToInt (
+    uid id (su::Conversion::ToLongLong (
 		node.getAttribute (ENVIRONMENT_ID_ATTR.c_str())));
     synthese::env::Environment* env = new synthese::env::Environment (id);
 

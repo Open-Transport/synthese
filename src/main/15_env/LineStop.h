@@ -7,6 +7,7 @@
 #include "Edge.h"
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
 
 #include "04_time/DateTime.h"
 #include "04_time/Schedule.h"
@@ -27,7 +28,7 @@ class Line;
  @ingroup m15
 */
  class LineStop : 
-     public synthese::util::Registrable<int,LineStop>, public Edge
+     public synthese::util::Registrable<uid,LineStop>, public Edge
 {
 public:
     
@@ -51,7 +52,7 @@ private:
 public:
 
 
-    LineStop (int id,
+    LineStop (const uid& id,
 		  const Line* line,
 	      double metricOffset,
 	      const EdgeType& type,

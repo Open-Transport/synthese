@@ -7,9 +7,9 @@ namespace env
 {
 
 
-TransportNetwork::TransportNetwork (const int& id, 
+TransportNetwork::TransportNetwork (const uid& id, 
 		  const std::string& name)
-    : synthese::util::Registrable<int,TransportNetwork> (id)
+    : synthese::util::Registrable<uid,TransportNetwork> (id)
     , _name (name)
 {
 }

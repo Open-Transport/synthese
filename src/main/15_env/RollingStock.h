@@ -3,6 +3,8 @@
 
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
 #include <string>
 
 namespace synthese
@@ -14,7 +16,7 @@ namespace env
 /** Rolling stock.
  @ingroup m15
 */
-class RollingStock : public synthese::util::Registrable<int,RollingStock>
+class RollingStock : public synthese::util::Registrable<uid,RollingStock>
 {
 
         std::string _name;
@@ -23,7 +25,7 @@ class RollingStock : public synthese::util::Registrable<int,RollingStock>
 
     public:
 
-        RollingStock (const int& id,
+        RollingStock (const uid& id,
 		      const std::string& name,
 		      const std::string& article,
 		      const std::string& indicator);

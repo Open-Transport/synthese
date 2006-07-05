@@ -8,6 +8,7 @@
 #include "Drawable.h"
 
 #include "01_util/RGBColor.h"
+#include "01_util/UId.h"
 #include "15_env/Point.h"
 
 
@@ -32,7 +33,7 @@ class DrawableLine
 private:
 
 
-    const std::string _lineId;
+    const uid _lineId;
 
     std::vector<const synthese::env::Point*> _points;  //!< Reference line points
     const std::string _shortName;
@@ -58,7 +59,7 @@ public:
 		  bool withPhysicalStops = true);
 
 
-    DrawableLine (const std::string& lineId,
+    DrawableLine (const uid& lineId,
 		  const std::vector<const synthese::env::Point*>& points,
 		  const std::string& shortName,
 		  const synthese::util::RGBColor& color,
@@ -68,7 +69,7 @@ public:
 
     //! @name Getters/Setters
     //@{
-    const std::string& getLineId () const;
+    const uid& getLineId () const;
 
     const std::string& getShortName () const;
 	const synthese::util::RGBColor& getColor () const;

@@ -8,11 +8,11 @@ namespace env
 {
 
 
-PublicPlace::PublicPlace (const int& id,
+PublicPlace::PublicPlace (const uid& id,
 			  const std::string& name,
 			  const City* city)
 
-    : synthese::util::Registrable<int,PublicPlace> (id)
+    : synthese::util::Registrable<uid,PublicPlace> (id)
     , Place (name, city)
 {
 

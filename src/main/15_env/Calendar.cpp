@@ -11,18 +11,23 @@ const Calendar::Category Calendar::CATEGORY_MAX (255);
 
 
 
-    Calendar::Calendar( const int& id,
+    Calendar::Calendar( const uid& id,
 			int firstYear, 
 			int lastYear,
 			const std::string& name,
 			const Category& category)
-    : synthese::util::Registrable<int,Calendar> (id)
+    : synthese::util::Registrable<uid,Calendar> (id)
     , _name (name)
     , _firstYear (firstYear)
     , _lastYear (lastYear)
     , _category (category)
 {
-    
+    // initialize year days
+    for ( int i = 0; i < ( _lastYear.getValue () - _firstYear.getValue () + 1 ) * 
+	      synthese::time::MONTHS_PER_YEAR ; i++ )
+    {
+        _yearDays.push_back (0);
+    }
 }
     
 
@@ -60,7 +65,7 @@ Calendar::getYearDays () const
 }
 
 
-
+/*
 void 
 Calendar::setYearDays ( const std::vector<Calendar::Mask>& yearDays )
 {
@@ -70,7 +75,7 @@ Calendar::setYearDays ( const std::vector<Calendar::Mask>& yearDays )
         _yearDays[i] = yearDays[i];
     }
 }
-
+*/
 
 
 
@@ -145,12 +150,13 @@ Calendar::isMarked ( const synthese::time::Date& date ) const
     
     Mask mask = 1;
     mask <<= ( date.getDay() - 1 );
-    return ( mask & _yearDays[ getMonthIndex( date ) ] ) != 0;
+
+    return ( mask & _yearDays[getMonthIndex (date)] ) != 0;
 }
 
 
 
-
+/*
 bool 
 Calendar::sharesAllElements ( const Calendar& base, 
 					  const std::vector<Calendar::Mask>& other) const
@@ -213,7 +219,7 @@ Calendar::excludedElements ( const Calendar& other ) const
     return ( newMask );
 }
 
-
+*/
 
 
 int 
@@ -281,13 +287,13 @@ Calendar::getMonthIndex (const synthese::time::Date& date) const
 int 
 Calendar::getMonthIndex ( int year, int month ) const
 {
-    return ( year - _firstYear.getValue () ) * synthese::time::MONTHS_PER_YEAR + month;
+    return ( year - _firstYear.getValue () ) * synthese::time::MONTHS_PER_YEAR + month - 1;
 }
 
 
 
 
-
+/*
 
 void 
 Calendar::setInclusionToMask ( std::vector<Calendar::Mask>& calendar, 
@@ -321,7 +327,7 @@ Calendar::setInclusionToMask ( Calendar& calendar,
 }
 
 
-
+*/
 
 synthese::time::Date 
 Calendar::getFirstOperationDay () const
