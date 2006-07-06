@@ -4,6 +4,7 @@
 #include "Service.h"
 #include <string>
 
+#include "01_util/Registrable.h"
 
 
 namespace synthese
@@ -18,16 +19,19 @@ namespace env
 
  @ingroup m15
 */
-class ScheduledService : public Service
+class ScheduledService : 
+    public synthese::util::Registrable<uid,ScheduledService>, 
+    public Service
 {
 private:
 
 public:
 
-    ScheduledService (const std::string& serviceNumber,
+    ScheduledService (const uid& id,
+		      const std::string& serviceNumber,
 		      const Path* path,
 		      Calendar* calendar,
-		      const synthese::time::Schedule* departureSchedule);
+		      const synthese::time::Schedule& departureSchedule);
 
     ~ScheduledService ();
 

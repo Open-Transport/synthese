@@ -4,6 +4,10 @@
 
 #include <vector>
 #include <set>
+
+#include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
 #include "Vertex.h"
 
 
@@ -27,7 +31,9 @@ An address may be associated with a connection place in the following cases :
   - The address belongs to a logical stop
 
 */
-class Address : public Vertex
+ class Address : 
+     public synthese::util::Registrable<uid,Address>,
+     public Vertex
 {
 private:
 
@@ -36,7 +42,8 @@ private:
 
 public:
 
-    Address (const ConnectionPlace* connectionPlace,
+    Address (const uid& id,
+	     const ConnectionPlace* connectionPlace,
 	     int rankInConnectionPlace,
 	     const Road* road, 
 	     double metricOffset);

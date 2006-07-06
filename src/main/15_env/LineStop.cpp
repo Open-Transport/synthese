@@ -537,7 +537,7 @@ LineStop::setSchedules ( const std::string& buffer,
         if (_line->getLineStops().front() == this)
 	{
 	    // MJ constness pb
-            ((Service*) service)->setDepartureSchedule ( &_firstDepartureSchedule[ s ] );
+            ((Service*) service)->setDepartureSchedule ( _firstDepartureSchedule[ s ] );
 	}
 
         position += columnWidth;

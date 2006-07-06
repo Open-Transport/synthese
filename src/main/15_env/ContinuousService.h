@@ -4,6 +4,7 @@
 #include "Service.h"
 #include <string>
 
+#include "01_util/Registrable.h"
 
 
 namespace synthese
@@ -19,7 +20,9 @@ namespace env
 
  @ingroup m15
 */
-class ContinuousService : public Service
+class ContinuousService : 
+    public synthese::util::Registrable<uid,ContinuousService>, 
+    public Service
 {
 private:
 
@@ -29,12 +32,13 @@ private:
 
 public:
 
-    ContinuousService (const std::string& serviceNumber,
-		      const Path* path,
-		      Calendar* calendar,
-		      const synthese::time::Schedule* departureSchedule,
-		      int range,
-		      int maxWaitingTime);
+    ContinuousService (const uid& id,
+		       const std::string& serviceNumber,
+		       const Path* path,
+		       Calendar* calendar,
+		       const synthese::time::Schedule& departureSchedule,
+		       int range,
+		       int maxWaitingTime);
 
     ~ContinuousService ();
 

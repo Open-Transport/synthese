@@ -12,11 +12,11 @@ namespace env
 {
 
 
-
+    
 Service::Service (const std::string& serviceNumber,
 		  const Path* path,
 		  Calendar* calendar,
-		  const synthese::time::Schedule* departureSchedule)
+		  const synthese::time::Schedule& departureSchedule)
     : Regulated (path)
     , _serviceNumber (serviceNumber)
     , _path (path)
@@ -57,7 +57,7 @@ Service::getCalendar ()
 
 
 
-const synthese::time::Schedule* 
+const synthese::time::Schedule&
 Service::getDepartureSchedule () const
 {
     return _departureSchedule;
@@ -66,7 +66,7 @@ Service::getDepartureSchedule () const
 
 
 void 
-Service::setDepartureSchedule (const synthese::time::Schedule* departureSchedule)
+Service::setDepartureSchedule (const synthese::time::Schedule& departureSchedule)
 {
     _departureSchedule = departureSchedule;
 }

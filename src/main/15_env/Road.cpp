@@ -12,12 +12,11 @@ namespace env
 Road::Road (const uid& id,
 	    const std::string& name,
 	    const City* city,
-	    const RoadType& type,
-	    const std::vector<const RoadChunk*>& chunks)
+	    const RoadType& type)
+
     : synthese::util::Registrable<uid,Road> (id)
     , AddressablePlace (name, city)
     , _type (type)
-    , _chunks (chunks)
 {
 
 }
@@ -64,6 +63,14 @@ const Road::RoadType&
 Road::getType () const
 {
     return _type;
+}
+
+
+
+void 
+Road::addChunk (const RoadChunk* chunk)
+{
+    _chunks.push_back (chunk);
 }
 
 

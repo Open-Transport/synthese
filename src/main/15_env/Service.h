@@ -5,6 +5,9 @@
 
 #include <string>
 
+#include "01_util/UId.h"
+
+#include "04_time/Schedule.h"
 
 
 
@@ -16,7 +19,6 @@ namespace time
 {
     class Date;
     class DateTime;
-    class Schedule;
 }
  
 namespace env
@@ -38,7 +40,8 @@ but also self-provided by the traveller himself
 
  @ingroup m15
 */
-class Service : public Regulated
+class Service : 
+     public Regulated
 {
 private:
     
@@ -47,14 +50,14 @@ private:
     
     Calendar* _calendar;  //!< Which days is this service available ?
 
-    const synthese::time::Schedule* _departureSchedule; //!< Service departure schedule.
-
+    synthese::time::Schedule _departureSchedule; //!< Service departure schedule.
+    
 public:
 
     Service (const std::string& serviceNumber,
 	     const Path* path,
 	     Calendar* calendar,
-	     const synthese::time::Schedule* departureSchedule);
+	     const synthese::time::Schedule& departureSchedule);
     ~Service ();
 
     
@@ -70,8 +73,8 @@ public:
 	(first course) is returned. Otherwise, it is the "normal" 
 	departure schedule.
     */
-    const synthese::time::Schedule* getDepartureSchedule () const;
-    void setDepartureSchedule (const synthese::time::Schedule* departureSchedule);
+    const synthese::time::Schedule& getDepartureSchedule () const;
+    void setDepartureSchedule (const synthese::time::Schedule& departureSchedule);
     //@}
 
 

@@ -4,6 +4,9 @@
 
 #include "Edge.h"
 
+#include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
 
 
 namespace synthese
@@ -26,7 +29,9 @@ These delimiting addresses can correspond to :
 
  @ingroup m15
 */
-class RoadChunk : public Edge 
+class RoadChunk : 
+    public synthese::util::Registrable<uid,RoadChunk>,
+    public Edge 
 {
 private:
 
@@ -35,7 +40,8 @@ private:
 
 public:
 
-  RoadChunk (const Road* road,
+  RoadChunk (const uid& id,
+	     const Road* road,
 	     const Address* fromAddress,
 	     const EdgeType& type);
   

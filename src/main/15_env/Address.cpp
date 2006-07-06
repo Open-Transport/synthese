@@ -7,11 +7,13 @@ namespace env
 
 
 
-Address::Address (const ConnectionPlace* connectionPlace,
+Address::Address (const uid& id,
+		  const ConnectionPlace* connectionPlace,
 		  int rankInConnectionPlace,
 		  const Road* road, 
 		  double metricOffset)
-    : Vertex (connectionPlace, rankInConnectionPlace)
+    : synthese::util::Registrable<uid,Address> (id)
+    , Vertex (connectionPlace, rankInConnectionPlace)
     , _road (road)
     , _metricOffset (metricOffset)
 {

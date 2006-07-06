@@ -9,13 +9,15 @@ namespace env
 
 
 
-ContinuousService::ContinuousService (const std::string& serviceNumber,
+ContinuousService::ContinuousService (const uid& id,
+				      const std::string& serviceNumber,
 				      const Path* path,
 				      Calendar* calendar,
-				      const synthese::time::Schedule* departureSchedule,
+				      const synthese::time::Schedule& departureSchedule,
 				      int range,
 				      int maxWaitingTime)
-    : Service (serviceNumber, path, calendar, departureSchedule)
+    : synthese::util::Registrable<uid,ContinuousService> (id)
+    , Service (serviceNumber, path, calendar, departureSchedule)
     , _range (range)
     , _maxWaitingTime (maxWaitingTime)
 {

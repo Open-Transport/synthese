@@ -99,9 +99,9 @@ ReservationRule::getReservationDeadLine (const Service* service,
     if ( _originIsReference )
     {
         // Departure hour at origin is superior to departure hour => day before
-        if ( *service->getDepartureSchedule () > departureTime.getHour () )
+        if ( service->getDepartureSchedule () > departureTime.getHour () )
             referenceTime--;
-        referenceTime = * service->getDepartureSchedule ();
+        referenceTime = service->getDepartureSchedule ();
     }
 
     synthese::time::DateTime minutesMoment = referenceTime;

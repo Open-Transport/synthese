@@ -10,10 +10,12 @@ namespace env
 {
 
 
-RoadChunk::RoadChunk (const Road* road,
+RoadChunk::RoadChunk (const uid& id,
+		      const Road* road,
 		      const Address* fromAddress,
 		      const EdgeType& type)
-    : Edge (type)
+    : synthese::util::Registrable<uid,RoadChunk> (id)
+    , Edge (type)
     , _road (road)
     , _fromAddress (fromAddress)
 {

@@ -49,15 +49,14 @@ public:
 private:
   
   const RoadType _type;
-  const std::vector<const RoadChunk*> _chunks;
+  std::vector<const RoadChunk*> _chunks;
 
 public:
 
   Road (const uid& id,
 	const std::string& name,
 	const City* city,
-        const RoadType& type,
-	const std::vector<const RoadChunk*>& chunks);
+        const RoadType& type);
 
   virtual ~Road();
 
@@ -76,6 +75,12 @@ public:
 
   //! @name Query methods.
   //@{
+  //@}
+
+  //! @name Update methods.
+  //@{
+  void addChunk (const RoadChunk* chunk);
+
   //@}
 
 };

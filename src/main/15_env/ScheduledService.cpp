@@ -8,11 +8,13 @@ namespace env
 
 
 
-ScheduledService::ScheduledService (const std::string& serviceNumber,
+ScheduledService::ScheduledService (const uid& id,
+				    const std::string& serviceNumber,
 				    const Path* path,
 				    Calendar* calendar,
-				    const synthese::time::Schedule* departureSchedule)
-    : Service (serviceNumber, path, calendar, departureSchedule)
+				    const synthese::time::Schedule& departureSchedule)
+    : synthese::util::Registrable<uid,ScheduledService> (id)
+    , Service (serviceNumber, path, calendar, departureSchedule)
 {
 
 }
