@@ -72,13 +72,35 @@ EnvironmentTest::testEnvironmentConstruction0 ()
 	env.getLines ().add (new Line (1, "line1", env.getAxes().get (0), 2000, 2010)); 
     }
 
+    // Roads
+    {
+	env.getRoads ().add (new Road (0, "road1", env.getCities ().get (0), Road::ROAD_TYPE_STREET));
+	env.getRoads ().add (new Road (1, "road2", env.getCities ().get (0), Road::ROAD_TYPE_STREET));
+	env.getRoads ().add (new Road (2, "road3", env.getCities ().get (0), Road::ROAD_TYPE_STREET));
+	env.getRoads ().add (new Road (3, "road4", env.getCities ().get (0), Road::ROAD_TYPE_STREET));
+    }
+
+    // Crossings
+    {
+	env.getCrossings ().add (new Crossing (0, "cg1", env.getCities ().get (0)));
+    }
+
+    // Logical stops
+    {
+	env.getLogicalStops ().add (new LogicalStop (0, "ls1", env.getCities ().get (0)));
+	env.getLogicalStops ().add (new LogicalStop (1, "ls2", env.getCities ().get (0)));
+    }
+
+
     // Addresses
+    { 
+	// road1
+	env.getAddresses ().add (new Address ());
+	
     
 
     // Road chunks
 
-
-    // Roads
 
 
     // Services
@@ -101,6 +123,7 @@ EnvironmentTest::testEnvironmentConstruction0 ()
 
 	// road0 (continuous service)
         // ...
+	env.getContinuousServices ().add (new ContinuousService (0, "", env.getRoads ().get ))
 
 	// road1 (continuous service)
         // ...

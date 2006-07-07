@@ -40,10 +40,10 @@ private:
     const double _metricOffset;      //!< Metric offset of stop on line
     const bool _scheduleInput; //!< Schedule with or without input
 
-    synthese::time::Schedule* _firstDepartureSchedule;  //!< First departure schedule
-    synthese::time::Schedule* _lastDepartureSchedule;  //!< Last departure schedule
-    synthese::time::Schedule* _firstArrivalSchedule; //!< First arrival schedule
-    synthese::time::Schedule* _lastArrivalSchedule;  //!< Last arrival schedule
+    synthese::time::Schedule* _departureBeginSchedule;  //!< First departure schedule
+    synthese::time::Schedule* _departureEndSchedule;  //!< Last departure schedule
+    synthese::time::Schedule* _arrivalBeginSchedule; //!< First arrival schedule
+    synthese::time::Schedule* _arrivalEndSchedule;  //!< Last arrival schedule
 
     int _departureIndex[24];     //!< First line service index by departure hour of day
     int _arrivalIndex[24];  //!< First line service index by arrival hour of day
@@ -70,16 +70,16 @@ public:
 
 
     const synthese::time::Schedule& 
-	getFirstDepartureSchedule (int serviceNumber) const;
+	getDepartureBeginSchedule (int serviceNumber) const;
 
     const synthese::time::Schedule& 
-	getLastDepartureSchedule (int serviceNumber) const;
+	getDepartureEndSchedule (int serviceNumber) const;
 
     const synthese::time::Schedule& 
-	getFirstArrivalSchedule (int serviceNumber) const;
+	getArrivalBeginSchedule (int serviceNumber) const;
 
     const synthese::time::Schedule& 
-	getLastArrivalSchedule (int serviceNumber) const;
+	getArrivalEndSchedule (int serviceNumber) const;
 
     
     bool getScheduleInput () const;
@@ -124,11 +124,9 @@ public:
     /** Provides next departure service number (method 1)
 	@param departureMoment Presence hour at departure place
 	@param maxDepartureMoment Maximum departure hour
-	@param minNextServiceNumber Index to start service search from
 	@param calculationMoment Calculation moment for reservation delay checking
 	@return Found service index or -1 if none was found.
 	@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
-	@retval continuousServiceAmplitude Continuous service amplitude. 
 	0 means scheduled service.
     */
     int getNextService (synthese::time::DateTime& departureMoment, 
@@ -171,23 +169,12 @@ public:
     //! @name Update methods
     //@{
  
-    /** Calculates schedules at stops where no data were provided.
-      @param previous Previous stop with schedule data
-      @param following Following stop with schedule data
-      @param position Line stop rank inside segment in case metric offsets are not provided
-      @param number Total number of line stops inside segment
-      
-      This function calculates departure and arriavl hours for each line stop 
-      by interpolating data from previous and following stops.
-    */
-    void linkWithNextSchedule (const LineStop& previous, 
-			       const LineStop& following, 
-			       int position, 
-			       int number, 
-			       int serviceNumber = -1 );
-
+    
     void updateDepartureIndex();
+
     void updateArrivalIndex();
+
+
 
     /** Fills schedules from buffer.
       @param buffer Buffer to parse
