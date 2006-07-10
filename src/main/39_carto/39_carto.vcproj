@@ -79,9 +79,6 @@
 				RelativePath=".\MapInfoRenderer.cpp">
 			</File>
 			<File
-				RelativePath=".\MapRequestHandler.cpp">
-			</File>
-			<File
 				RelativePath=".\PostscriptCanvas.cpp">
 			</File>
 			<File
@@ -139,9 +136,6 @@
 			</File>
 			<File
 				RelativePath=".\MapInfoRenderer.h">
-			</File>
-			<File
-				RelativePath=".\MapRequestHandler.h">
 			</File>
 			<File
 				RelativePath=".\module.h">
