@@ -7,29 +7,10 @@ includes = '*.cpp'
 excludes = []
 
 
-moduleenv.Append ( CPPDEFINES = ['MODULE_39'] )
-
-moduleenv.AddModuleDependency ('39_carto')
-moduleenv.AddModuleDependency ('40_carto_ls_xml')
-moduleenv.AddModuleDependency ('15_env')
-moduleenv.AddModuleDependency ('16_env_ls_xml')
-moduleenv.AddModuleDependency ('15_env')
-moduleenv.AddModuleDependency ('04_time')
-moduleenv.AddModuleDependency ('00_tcp')
-moduleenv.AddModuleDependency ('01_util')
-moduleenv.AddBoostDependency ('boost_filesystem')
-moduleenv.AddBoostDependency ('boost_thread')
-moduleenv.AddBoostDependency ('boost_iostreams')
-moduleenv.AddBoostDependency ('boost_program_options')
-moduleenv.AddBoostDependency ('boost_date_time')
-moduleenv.AppendMultithreadConf ();
-
-
-
 files = moduleenv.Glob(includes, excludes)
-
+moduleenv.AppendMultithreadConf ()
 
 moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
-moduleenv.Program ( moduleenv.DefaultModuleName(), files )
+
 
 

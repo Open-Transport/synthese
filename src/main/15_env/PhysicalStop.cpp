@@ -1,5 +1,4 @@
 #include "PhysicalStop.h"
-#include "LogicalStop.h"
 
 
 
@@ -11,11 +10,11 @@ namespace env
 
 PhysicalStop::PhysicalStop (const uid& id,
 			    const std::string& name,
-			    int rankInLogicalStop,
-			    const LogicalStop* logicalStop,
+			    int rankInConnectionPlace,
+			    const ConnectionPlace* connectionPlace,
 			    double x, double y)
     : synthese::util::Registrable<uid,PhysicalStop> (id)
-    , Vertex (logicalStop, rankInLogicalStop, x, y)
+    , Vertex (connectionPlace, rankInConnectionPlace, x, y)
     , _name (name)
 {
 

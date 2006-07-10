@@ -16,7 +16,7 @@ namespace env
 {
 
  class LineStop;
- class LogicalStop;
+ class ConnectionPlace;
 
 
 /** Physical stop (bus stop, etc.).
@@ -36,8 +36,8 @@ private:
 
     PhysicalStop (const uid& id,
 		  const std::string& name, 
-		  int rankInLogicalStop,
-		  const LogicalStop* logicalStop,
+		  int rankInConnectionPlace,
+		  const ConnectionPlace* connectionPlace,
 		  double x = UNKNOWN_VALUE,
 		  double y = UNKNOWN_VALUE);
 

@@ -1,4 +1,4 @@
-#include "Server.h"
+#include "70_server/Server.h"
 
 #include "01_util/Conversion.h"
 #include "01_util/Exception.h"
@@ -10,8 +10,18 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
+
+#ifdef MODULE_80
+#include "80_carto_service/MapRequestHandler.h"
+#include "39_carto/MapBackgroundManager.h"
+#endif
+
+
+
+
 using synthese::util::Log;
 using synthese::util::Conversion;
+using synthese::server::Server;
 
 
 namespace po = boost::program_options;
@@ -89,6 +99,18 @@ int main( int argc, char **argv )
     synthese::server::Server::SetInstance (&server);
     try
     {
+
+#ifdef MODULE_80
+    
+    // Initialize map background manager
+    synthese::carto::MapBackgroundManager::SetBackgroundsDir (server.getDataDir () / "backgrounds");
+    synthese::carto::MapBackgroundManager::Initialize ();
+
+    server.getRequestDispatcher ().
+	registerHandler (new synthese::cartoservice::MapRequestHandler ());
+#endif
+    
+
 	synthese::server::Server::GetInstance ()->run ();
     }
     catch (synthese::util::Exception& ex)

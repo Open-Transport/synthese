@@ -39,7 +39,7 @@ SQLiteSync::~SQLiteSync ()
 void 
 SQLiteSync::addTableSynchronizer (SQLiteTableSync* synchronizer)
 {
-    boost::mutex::scoped_lock lock (_tableSynchronizersMutex);
+    boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
     assert (synchronizer->getTableFormat ().empty () == false);
     _tableSynchronizers.insert (std::make_pair (synchronizer->getTableName (), synchronizer));
@@ -50,7 +50,7 @@ SQLiteSync::addTableSynchronizer (SQLiteTableSync* synchronizer)
 bool 
 SQLiteSync::hasTableSynchronizer (const std::string& tableName) const
 {
-    boost::mutex::scoped_lock lock (_tableSynchronizersMutex);
+    boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
     return _tableSynchronizers.find (tableName) != _tableSynchronizers.end ();
 }
 
@@ -59,7 +59,7 @@ SQLiteSync::hasTableSynchronizer (const std::string& tableName) const
 SQLiteTableSync* 
 SQLiteSync::getTableSynchronizer (const std::string& tableName) const
 {
-    boost::mutex::scoped_lock lock (_tableSynchronizersMutex);
+    boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
     if (hasTableSynchronizer (tableName) == false)
     {
 	throw SQLiteException ("No synchronizer for table '" + tableName + "'");
@@ -71,7 +71,7 @@ SQLiteSync::getTableSynchronizer (const std::string& tableName) const
 void 
 SQLiteSync::registerCallback (const SQLiteThreadExec* emitter)
 {
-    boost::mutex::scoped_lock lock (_tableSynchronizersMutex);
+    boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
     // Call the init sequence on all synchronizers.
     for (std::map<std::string, SQLiteTableSync*>::const_iterator it = _tableSynchronizers.begin ();
@@ -88,7 +88,7 @@ void
 SQLiteSync::eventCallback (const SQLiteThreadExec* emitter,
 			   const SQLiteEvent& event)
 {
-    boost::mutex::scoped_lock lock (_tableSynchronizersMutex);
+    boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
     for (std::map<std::string, SQLiteTableSync* >::const_iterator it = _tableSynchronizers.begin ();
 	 it != _tableSynchronizers.end (); ++it)

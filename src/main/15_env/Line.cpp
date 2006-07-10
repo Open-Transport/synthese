@@ -4,7 +4,7 @@
 #include "Calendar.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
-#include "LogicalStop.h"
+#include "ConnectionPlace.h"
 
 
 namespace synthese

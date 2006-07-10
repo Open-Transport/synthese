@@ -25,6 +25,7 @@ class ScheduledService :
 {
 private:
 
+
 public:
 
     ScheduledService (const uid& id,

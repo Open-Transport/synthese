@@ -3,10 +3,10 @@
 #include "CleanerThreadExec.h"
 #include "ServerThreadExec.h"
 
-
 #include "RequestException.h"
 #include "Request.h"
-#include "RequestDispatcher.h"
+
+#include "00_tcp/TcpService.h"
 
 #include "01_util/Conversion.h"
 #include "01_util/Thread.h"
@@ -14,14 +14,9 @@
 #include "01_util/Log.h"
 #include "01_util/Exception.h"
 
-#include <boost/date_time/posix_time/posix_time.hpp>
+
 
 #include <boost/filesystem/operations.hpp>
-
-#ifdef MODULE_39
-#include "39_carto/MapRequestHandler.h"
-#include "39_carto/MapBackgroundManager.h"
-#endif
 
 using synthese::util::Conversion;
 using synthese::util::Log;
@@ -99,16 +94,6 @@ Server::initialize ()
 	throw synthese::util::Exception ("Cannot find temp directory '" + _tempDir.string () + "'");
     }
 
-#ifdef MODULE_39
-    
-    // Initialize map background manager
-    synthese::carto::MapBackgroundManager::SetBackgroundsDir (_dataDir / "backgrounds");
-    synthese::carto::MapBackgroundManager::Initialize ();
-
-    synthese::server::RequestDispatcher::getInstance ()->
-	registerHandler (new synthese::carto::MapRequestHandler ());
-#endif
-    
 
 }
 
@@ -188,6 +173,15 @@ int
 Server::getPort () const
 {
     return _port;
+}
+
+
+
+
+RequestDispatcher& 
+Server::getRequestDispatcher () 
+{
+    return _requestDispatcher;
 }
 
 

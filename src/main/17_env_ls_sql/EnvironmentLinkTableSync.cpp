@@ -126,7 +126,7 @@ EnvironmentLinkTableSync::getComponentTable (const ComponentClass& componentClas
     if (componentClass == CITY_CLASS) return CITIES_TABLE_NAME;
     if (componentClass == LINE_CLASS) return LINES_TABLE_NAME;
     if (componentClass == LINESTOP_CLASS) return LINESTOPS_TABLE_NAME;
-    if (componentClass == LOGICALSTOP_CLASS) return LOGICALSTOPS_TABLE_NAME;
+    if (componentClass == CONNECTIONPLACE_CLASS) return CONNECTIONPLACES_TABLE_NAME;
     if (componentClass == PHYSICALSTOP_CLASS) return PHYSICALSTOPS_TABLE_NAME;
     
     // ...

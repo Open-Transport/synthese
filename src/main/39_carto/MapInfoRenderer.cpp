@@ -1,9 +1,5 @@
 #include "MapInfoRenderer.h"
 
-#include <boost/algorithm/string/replace.hpp>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
-
 #include "Geometry.h"
 #include "DrawableLine.h"
 #include "DrawablePhysicalStop.h"
@@ -14,11 +10,13 @@
 #include "01_util/Conversion.h"
 #include "15_env/PhysicalStop.h"
 
-#include "70_server/Server.h"
+#include <boost/algorithm/string/replace.hpp>
+
 
 #include <fstream>
 #include <cmath>
 #include <algorithm>
+#include <sstream>
 
 
 using synthese::util::RGBColor;
@@ -26,8 +24,6 @@ using synthese::util::Log;
 using synthese::util::Conversion;
 using synthese::env::Point;
 using synthese::env::PhysicalStop;
-using synthese::server::Server;
-using namespace boost::posix_time;
 
 
 

@@ -6,10 +6,10 @@
 #include "Address.h"
 #include "Calendar.h"
 #include "City.h"
+#include "ConnectionPlace.h"
 #include "Document.h"
 #include "Line.h"
 #include "LineStop.h"
-#include "LogicalStop.h"
 #include "PhysicalStop.h"
 #include "RoadChunk.h"
 #include "Road.h"
@@ -45,15 +45,25 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     Axis::Registry _axes;
     Calendar::Registry _calendars;
     City::Registry _cities;
+    ConnectionPlace::Registry _connectionPlaces;
     Document::Registry _documents;
     Line::Registry _lines;
     LineStop::Registry _lineStops;
-    LogicalStop::Registry _logicalStops;
     PhysicalStop::Registry _physicalStops;
     RoadChunk::Registry _roadChunks;
     Road::Registry _roads;
     ContinuousService::Registry _continuousServices;
     ScheduledService::Registry _scheduledServices;
+
+    // TODO : 
+    // including place
+    // public place
+    // fare alarm
+    // transport network
+    // alarm
+    // rolling stock
+
+    // zone
 
  public:
 
@@ -76,6 +86,9 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     City::Registry& getCities ();
     const City::Registry& getCities () const;
 
+    ConnectionPlace::Registry& getConnectionPlaces ();
+    const ConnectionPlace::Registry& getConnectionPlaces () const;
+
     Document::Registry& getDocuments ();
     const Document::Registry& getDocuments () const;
 
@@ -84,9 +97,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     LineStop::Registry& getLineStops ();
     const LineStop::Registry& getLineStops () const;
-
-    LogicalStop::Registry& getLogicalStops ();
-    const LogicalStop::Registry& getLogicalStops () const;
 
     PhysicalStop::Registry& getPhysicalStops ();
     const PhysicalStop::Registry& getPhysicalStops () const;

@@ -41,6 +41,8 @@ EnvironmentTest::tearDown ()
 void 
 EnvironmentTest::testEnvironmentConstruction0 ()
 {
+    /*
+
     Environment env (0);
 
     // Cities
@@ -136,7 +138,7 @@ EnvironmentTest::testEnvironmentConstruction0 ()
 	
     }
     
-    
+    */
     
 
     

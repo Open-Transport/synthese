@@ -17,7 +17,7 @@ SQLiteResult::SQLiteResult ()
 
 
 
-SQLiteResult::~SQLiteResult () throw ()
+SQLiteResult::~SQLiteResult ()
 {
 
 }

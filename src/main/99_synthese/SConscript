@@ -1,0 +1,54 @@
+import os.path
+
+Import ('mainenv')
+moduleenv = mainenv.ModuleEnv()
+
+includes = 'main.cpp'
+excludes = []
+
+
+files = moduleenv.Glob(includes, excludes)
+
+moduleenv.AppendMultithreadConf ()
+
+# NOTE : Create first a static library before linking the program,
+# otherwise, very strange gnu.link_once errors on boost time
+moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
+
+
+moduleenv = mainenv.ModuleEnv()
+includes = ''
+excludes = []
+files = moduleenv.Glob(includes, excludes)
+
+moduleenv.Append ( CPPDEFINES = ['MODULE_80'] )
+
+# Modules libs
+moduleenv.AddModuleDependency ('99_synthese')
+moduleenv.AddModuleDependency ('80_carto_service')
+moduleenv.AddModuleDependency ('40_carto_ls_xml')
+moduleenv.AddModuleDependency ('16_env_ls_xml')
+moduleenv.AddModuleDependency ('39_carto')
+
+moduleenv.AddModuleDependency ('15_env')
+
+moduleenv.AddModuleDependency ('70_server')
+
+# Generic libs
+moduleenv.AddModuleDependency ('04_time')
+moduleenv.AddModuleDependency ('00_tcp')
+moduleenv.AddModuleDependency ('01_util')
+
+
+moduleenv.AddBoostDependency ('boost_filesystem')
+moduleenv.AddBoostDependency ('boost_date_time')
+moduleenv.AddBoostDependency ('boost_thread')
+moduleenv.AddBoostDependency ('boost_iostreams')
+moduleenv.AddBoostDependency ('boost_program_options')
+#moduleenv.AddSQLiteDependency ()
+moduleenv.AppendMultithreadConf ()
+
+
+moduleenv.Program ( moduleenv.DefaultModuleName(), files )
+
+

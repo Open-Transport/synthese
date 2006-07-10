@@ -14,6 +14,7 @@
 #include <string>
 #include <deque>
 
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -44,8 +45,11 @@ namespace db
     of db events which are treated in FIFO mode inside the body of the thread. 
     
     This guarantees that the following SQLite constraints are satisfied :
-    - The db handle is used by one and only one thread, the one which created it
     - No database access is performed inside the body of sql3_update_hook 
+
+    It is safe to use the db handle created by the exec thread from another thread
+    (by calling execUpdate or execQuery) because this class guarantees that the db handle
+    is used by one thread at the same time.
 
  @ingroup m02
 */
@@ -62,8 +66,8 @@ namespace db
     std::vector<SQLiteUpdateHook*> _hooks;   //!< Hooks to trigger on db update.
 
     boost::shared_ptr<boost::mutex> _hooksMutex; 
-    boost::shared_ptr<boost::mutex> _queueMutex; 
-    boost::shared_ptr<boost::mutex> _dbMutex; 
+    boost::shared_ptr<boost::recursive_mutex> _queueMutex; 
+    boost::shared_ptr<boost::recursive_mutex> _dbMutex; 
 
  public:
     
@@ -73,16 +77,12 @@ namespace db
     
     //! @name Query methods.
     //@{
- private:
-    bool hasEnqueuedEvent () const;
-
     //@}
 
 
     //! @name Update methods.
     //@{
     void enqueueEvent (const SQLiteEvent& event);
-    SQLiteEvent dequeueEvent ();
     void postEvent (const SQLiteEvent& event) const;
 
  public:

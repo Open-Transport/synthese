@@ -4,17 +4,10 @@
 #include "module.h"
 
 
-#include <deque>
 #include <iostream>
 #include <string>
 
-#include "Request.h"
 #include "RequestDispatcher.h"
-
-#include "00_tcp/TcpServerSocket.h"
-#include "00_tcp/TcpService.h"
-
-#include "01_util/Log.h"
 
 #include <boost/filesystem/path.hpp>
 
@@ -42,6 +35,7 @@ class Server
 
     static Server* _instance;
 
+    RequestDispatcher _requestDispatcher;
     int _port;
     int _nbThreads;
     boost::filesystem::path _dataDir;
@@ -66,6 +60,8 @@ class Server
 
     //! @name Getters/Setters
     //@{
+    RequestDispatcher& getRequestDispatcher ();
+
     int getPort () const;
     int getNbThreads () const;
     const boost::filesystem::path& getDataDir () const;

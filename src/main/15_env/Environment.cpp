@@ -21,10 +21,10 @@ Environment::~Environment ()
     _axes.clear ();
     _calendars.clear ();
     _cities.clear ();
+    _connectionPlaces.clear ();
     _documents.clear ();
     _lines.clear ();
     _lineStops.clear ();
-    _logicalStops.clear ();
     _physicalStops.clear ();
     _roadChunks.clear ();
     _roads.clear ();
@@ -145,19 +145,20 @@ Environment::getLineStops () const
 
 
 
-LogicalStop::Registry&
-Environment::getLogicalStops ()
+ConnectionPlace::Registry&
+Environment::getConnectionPlaces ()
 {
-    return _logicalStops;
+    return _connectionPlaces;
 }
 
 
 
-const LogicalStop::Registry&
-Environment::getLogicalStops () const
+const ConnectionPlace::Registry&
+Environment::getConnectionPlaces () const
 {
-    return _logicalStops;
+    return _connectionPlaces;
 }
+
 
 
 PhysicalStop::Registry&

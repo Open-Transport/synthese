@@ -16,13 +16,12 @@ namespace synthese
 namespace env
 {
 
-    class LogicalStop;
 
 
 /** City class.
 
-A city holds in its included places the main logical 
-stops (those taken by default when no stop is explicitly chosen).
+A city holds in its included places the main connection places
+ (those taken by default when no stop is explicitly chosen).
 
 @ingroup m15
 */
@@ -49,9 +48,6 @@ class City : public synthese::util::Registrable<uid, City>,
     //! @name Update methods
     //@{
 
-    /** Adds a main logical stop to this city.
-     */
-    void addMainLogicalStop (const LogicalStop* logicalStop);
     //@}
 
 

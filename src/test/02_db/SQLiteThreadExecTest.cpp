@@ -112,7 +112,6 @@ namespace db
 	void eventCallback (const SQLiteThreadExec* emitter,
 			    const SQLiteEvent& event)
 	{
-	    
 	    if ((event.opType == SQLITE_INSERT) 
 		|| (event.opType == SQLITE_UPDATE))
 	    {
@@ -158,6 +157,7 @@ namespace db
 
       sqliteThread.start ();
 
+      
       while (sqliteThread.getState () != Thread::READY) Thread::Sleep (5);
 
       CPPUNIT_ASSERT (hook->wasRegisterCalled ());
@@ -166,6 +166,7 @@ namespace db
       sqliteExec->execUpdate ("INSERT INTO test_table VALUES (0, 'label0')");
 
       Thread::Sleep (100);
+
       CPPUNIT_ASSERT_EQUAL (1, (int) hook->getLabels().size ());
       CPPUNIT_ASSERT_EQUAL (std::string ("label0"), hook->getLabels()[0]);
 

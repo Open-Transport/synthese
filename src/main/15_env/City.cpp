@@ -1,5 +1,5 @@
 #include "City.h"
-#include "LogicalStop.h"
+
 
 
 namespace synthese
@@ -23,11 +23,6 @@ City::~City ()
 
 
 
-void 
-City::addMainLogicalStop (const LogicalStop* logicalStop)
-{
-    _includedPlaces.push_back (logicalStop);
-}
 
 
 

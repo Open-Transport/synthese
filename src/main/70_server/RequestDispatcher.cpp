@@ -10,8 +10,6 @@ namespace synthese
 namespace server
 {
 
-RequestDispatcher* RequestDispatcher::_instance = 0;
-    
 
 
 RequestDispatcher::RequestDispatcher ()
@@ -23,16 +21,6 @@ RequestDispatcher::~RequestDispatcher ()
 {
 }
 
-
-RequestDispatcher* 
-RequestDispatcher::getInstance ()
-{
-    if (_instance == 0)
-    {
-	_instance = new RequestDispatcher ();
-    }
-    return _instance;
-}
 
 
 

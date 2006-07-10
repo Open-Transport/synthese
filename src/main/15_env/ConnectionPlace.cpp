@@ -14,10 +14,12 @@ const int ConnectionPlace::FORBIDDEN_TRANSFER_DELAY = std::numeric_limits<int>::
 
 
 
-ConnectionPlace::ConnectionPlace (const std::string& name,
+ConnectionPlace::ConnectionPlace (const uid& id,
+				  const std::string& name,
 				  const City* city,
 				  const ConnectionType& connectionType)
-    : AddressablePlace (name, city)
+    : synthese::util::Registrable<uid,ConnectionPlace> (id)
+    , AddressablePlace (name, city)
     , _connectionType (connectionType)
 {
 }
@@ -70,11 +72,21 @@ ConnectionPlace::getTransferDelay (int departureRank, int arrivalRank) const
 
 
 void 
-ConnectionPlace::setTransferDelay (int departureRank, int arrivalRank, int transferDelay)
+ConnectionPlace::addTransferDelay (int departureRank, int arrivalRank, int transferDelay)
 {
     _transferDelays[std::make_pair (departureRank, arrivalRank)] = transferDelay;
 }
+
     
+
+void 
+ConnectionPlace::addPhysicalStop (const PhysicalStop* physicalStop)
+{
+    _physicalStops.push_back (physicalStop);
+}
+
+
+
 
 
 }

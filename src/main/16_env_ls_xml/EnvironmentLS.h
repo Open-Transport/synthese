@@ -39,14 +39,14 @@ Warning: ordering of child elements is important!
    <!-- ... -->
  </axes>
 
- <logicalStops>
-   <logicalStop id="1" name="Matabiau" cityId="1"/>
+ <connectionPlaces>
+   <connectionPlace id="1" name="Matabiau" cityId="1"/>
    <!-- ... -->
- </logicalStops>
+ </connectionPlaces>
 
  <physicalStops>
    <physicalStop id="1" name="Metro gare SNCF" 
-                 logicalStopId="1" rankInLogicalStop="1"
+                 connectionPlaceId="1" rankInConnectionPlace="1"
 	         x="1334.5" y="123.2"/>
    <!-- ... -->
  </physicalStops>
@@ -87,7 +87,7 @@ class EnvironmentLS
     static const std::string ENVIRONMENT_ID_ATTR;
     static const std::string ENVIRONMENT_CITIES_TAG;
     static const std::string ENVIRONMENT_AXES_TAG;
-    static const std::string ENVIRONMENT_LOGICALSTOPS_TAG;
+    static const std::string ENVIRONMENT_CONNECTIONPLACES_TAG;
     static const std::string ENVIRONMENT_PHYSICALSTOPS_TAG;
     static const std::string ENVIRONMENT_LINES_TAG;
 

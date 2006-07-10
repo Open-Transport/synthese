@@ -30,23 +30,20 @@ class RequestDispatcher
 {
  private:
 
-    static RequestDispatcher* _instance;
-
     std::map<std::string, const RequestHandler*> _handlers;
 
-    RequestDispatcher ();
 
  protected:
 
 
  public:
 
+    RequestDispatcher ();
     ~RequestDispatcher ();
 
 
     //! @name Getters/Setters
     //@{
-    static RequestDispatcher* getInstance ();
     //@}
 
 

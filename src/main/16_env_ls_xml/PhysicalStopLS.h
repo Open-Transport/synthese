@@ -26,8 +26,8 @@ Sample XML format :
 
 <physicalStop id="3"
               name="City Hall" 
-              logicalStopId="2"
-              rankInLogicalStop="1"
+              connectionPlaceId="2"
+              rankInConnectionPlace="1"
 	      x="1334.5"
 	      y="123.2"/>
 
@@ -40,8 +40,8 @@ class PhysicalStopLS
     static const std::string PHYSICALSTOP_TAG;
     static const std::string PHYSICALSTOP_ID_ATTR;
     static const std::string PHYSICALSTOP_NAME_ATTR;
-    static const std::string PHYSICALSTOP_LOGICALSTOPID_ATTR;
-    static const std::string PHYSICALSTOP_RANKINLOGICALSTOP_ATTR;
+    static const std::string PHYSICALSTOP_CONNECTIONPLACEID_ATTR;
+    static const std::string PHYSICALSTOP_RANKINCONNECTIONPLACE_ATTR;
 
  private:
 

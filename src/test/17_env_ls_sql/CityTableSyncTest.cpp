@@ -191,7 +191,7 @@ namespace envlssql
 	  delete sqliteExec;
 	  delete syncHook; 
 	  delete envSync;
-	  delete citySync;
+//	  delete citySync;
       }
       {
 	  // Recreate exactly the same context except that some 

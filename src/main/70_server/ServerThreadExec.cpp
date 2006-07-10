@@ -1,6 +1,8 @@
 #include "ServerThreadExec.h"
 
 
+#include "Server.h"
+
 #include "Request.h"
 #include "RequestDispatcher.h"
 
@@ -55,7 +57,7 @@ ServerThreadExec::loop ()
 	Request request (requestString);
 	
 	// Send request to proper handler through dispatcher
-	RequestDispatcher::getInstance ()->dispatchRequest (request, tcpStream);
+	Server::GetInstance ()->getRequestDispatcher ().dispatchRequest (request, tcpStream);
 	
     }
     catch (std::exception& ex)

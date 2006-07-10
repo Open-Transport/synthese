@@ -22,8 +22,8 @@ namespace envlsxml
 const std::string PhysicalStopLS::PHYSICALSTOP_TAG ("physicalStop");
 const std::string PhysicalStopLS::PHYSICALSTOP_ID_ATTR ("id");
 const std::string PhysicalStopLS::PHYSICALSTOP_NAME_ATTR ("name");
-const std::string PhysicalStopLS::PHYSICALSTOP_LOGICALSTOPID_ATTR ("logicalStopId");
-const std::string PhysicalStopLS::PHYSICALSTOP_RANKINLOGICALSTOP_ATTR ("rankInLogicalStop");
+const std::string PhysicalStopLS::PHYSICALSTOP_CONNECTIONPLACEID_ATTR ("connectionPlaceId");
+const std::string PhysicalStopLS::PHYSICALSTOP_RANKINCONNECTIONPLACE_ATTR ("rankInConnectionPlace");
 
 
 synthese::env::PhysicalStop* 
@@ -35,10 +35,10 @@ PhysicalStopLS::Load (XMLNode& node,
     uid id (su::Conversion::ToLongLong (
 		node.getAttribute (PHYSICALSTOP_ID_ATTR.c_str())));
     std::string name (node.getAttribute (PHYSICALSTOP_NAME_ATTR.c_str()));
-    int logicalStopId (su::Conversion::ToInt (
-	      node.getAttribute (PHYSICALSTOP_LOGICALSTOPID_ATTR.c_str())));
-    int rankInLogicalStop (su::Conversion::ToInt (
-	      node.getAttribute (PHYSICALSTOP_RANKINLOGICALSTOP_ATTR.c_str())));
+    int connectionPlaceId (su::Conversion::ToInt (
+	      node.getAttribute (PHYSICALSTOP_CONNECTIONPLACEID_ATTR.c_str())));
+    int rankInConnectionPlace (su::Conversion::ToInt (
+	      node.getAttribute (PHYSICALSTOP_RANKINCONNECTIONPLACE_ATTR.c_str())));
 
     double x (su::Conversion::ToDouble (
 		node.getAttribute (PointLS::POINT_X_ATTR.c_str())));
@@ -48,8 +48,8 @@ PhysicalStopLS::Load (XMLNode& node,
     return new synthese::env::PhysicalStop (
 	id,
 	name, 
-	rankInLogicalStop,
-	environment.getLogicalStops ().get (logicalStopId), x, y);
+	rankInConnectionPlace,
+	environment.getConnectionPlaces ().get (connectionPlaceId), x, y);
 }
 
 

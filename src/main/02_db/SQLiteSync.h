@@ -8,7 +8,7 @@
 #include <string>
 #include <iostream>
 
-#include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 
 namespace synthese
@@ -35,7 +35,7 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
     std::string _idColumnName;
 
     std::map<std::string, SQLiteTableSync* > _tableSynchronizers;
-    mutable boost::mutex _tableSynchronizersMutex; 
+    mutable boost::recursive_mutex _tableSynchronizersMutex; 
 
  public:
 

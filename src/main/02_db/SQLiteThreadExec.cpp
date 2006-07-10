@@ -59,8 +59,8 @@ SQLiteThreadExec::SQLiteThreadExec (const boost::filesystem::path& databaseFile)
 : _databaseFile (databaseFile)
 , _db (0)
 , _hooksMutex (new boost::mutex ())
-, _queueMutex (new boost::mutex ())
-, _dbMutex (new boost::mutex ())
+, _queueMutex (new boost::recursive_mutex ())
+, _dbMutex (new boost::recursive_mutex ())
 
 {
 }
@@ -80,7 +80,7 @@ SQLiteThreadExec::registerUpdateHook (SQLiteUpdateHook* hook)
     boost::mutex::scoped_lock hooksLock (*_hooksMutex);
 
     // Lock db til register callback is executed (can use this db connection)
-    boost::mutex::scoped_lock dbLock (*_dbMutex);
+    boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
 
     _hooks.push_back (hook);
     if (_db != 0)
@@ -114,30 +114,12 @@ SQLiteThreadExec::postEvent (const SQLiteEvent& event) const
 void 
 SQLiteThreadExec::enqueueEvent (const SQLiteEvent& event)
 {
-    boost::mutex::scoped_lock queueLock (*_queueMutex);
+    boost::recursive_mutex::scoped_lock queueLock (*_queueMutex);
     _eventQueue.push_back (event);
 }
 
 
 
-
-bool 
-SQLiteThreadExec::hasEnqueuedEvent () const
-{
-    boost::mutex::scoped_lock queueLock (*_queueMutex);
-    return _eventQueue.empty () == false;
-}
-
-
-
-SQLiteEvent 
-SQLiteThreadExec::dequeueEvent ()
-{
-    boost::mutex::scoped_lock queueLock (*_queueMutex);
-    SQLiteEvent event = _eventQueue.front ();
-    _eventQueue.pop_front ();
-    return event;
-}
 
 
 
@@ -148,7 +130,7 @@ SQLiteThreadExec::initialize()
 {
     // The database cannot be updated til all the hooks have been initialized
     // through their registerCallback.
-    boost::mutex::scoped_lock dbLock (*_dbMutex);
+    boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
 
     // No hook can be added til the thread has finished its initialization.
     boost::mutex::scoped_lock hooksLock (*_hooksMutex);
@@ -173,9 +155,15 @@ SQLiteThreadExec::initialize()
 void
 SQLiteThreadExec::loop()
 {
-    while (hasEnqueuedEvent ()) 
+    // Lock the db to ensure that the handle is used by only one thread at
+    // the same time!
+    boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
+    boost::recursive_mutex::scoped_lock queueLock (*_queueMutex);
+    while (_eventQueue.empty () == false) 
     {
-	postEvent (dequeueEvent ());
+	SQLiteEvent event = _eventQueue.front ();
+	_eventQueue.pop_front ();
+	postEvent (event);
     }    
 }
 
@@ -195,7 +183,7 @@ SQLiteResult
 SQLiteThreadExec::execQuery (const std::string& sql) const
 {
     // Only one thread can use this db at the same time.
-    boost::mutex::scoped_lock dbLock (*_dbMutex);
+    boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
 
     return SQLite::ExecQuery (_db, sql);
 }
@@ -207,8 +195,7 @@ void
 SQLiteThreadExec::execUpdate (const std::string& sql) const
 {
     // Only one thread can use this db at the same time.
-    boost::mutex::scoped_lock dbLock (*_dbMutex);
-
+    boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
     SQLite::ExecUpdate (_db, sql);
 }
 

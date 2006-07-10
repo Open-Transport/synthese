@@ -6,12 +6,6 @@ moduleenv = mainenv.ModuleEnv()
 includes = '*.cpp'
 excludes = []
 
-moduleenv.AddModuleDependency ('70_server')
-moduleenv.AddModuleDependency ('04_time')
-moduleenv.AddModuleDependency ('00_tcp')
-moduleenv.AddModuleDependency ('01_util')
-moduleenv.Append (LIBS = ['boost_thread'] )
-moduleenv.Append (LIBS = ['boost_iostreams'] )
 moduleenv.AppendMultithreadConf ();
 
 

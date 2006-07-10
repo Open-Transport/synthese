@@ -1,17 +1,5 @@
 #include "MapRequestHandler.h"
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
-
-#include <assert.h>
-#include <stdlib.h>
-
-#include <boost/filesystem/operations.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-
 #include "01_util/PlainCharFilter.h"
 #include "01_util/XmlParser.h"
 #include "01_util/Conversion.h"
@@ -34,9 +22,31 @@
 
 #include "01_util/Log.h"
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+
+#include <assert.h>
+#include <stdlib.h>
+
+
+using synthese::carto::Map;
+using synthese::carto::RenderingConfig;
+using synthese::carto::PostscriptRenderer;
+using synthese::carto::HtmlMapRenderer;
+using synthese::carto::MapInfoRenderer;
+
+using synthese::cartolsxml::MapLS;
+
 
 using synthese::env::Environment;
 using synthese::carto::Map;
+
 using synthese::util::Conversion;
 using synthese::util::Log;
 using synthese::server::Server;
@@ -45,7 +55,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-namespace carto
+namespace cartoservice
 {
 
 #ifdef WIN32
@@ -131,8 +141,7 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
             : Server::GetInstance ()->getHttpTempDir ();
 
     // Generate an id for the map file based on current time
-    ptime timems = boost::date_time::microsec_clock<ptime>::local_time ();
-
+    ptime timems (boost::date_time::microsec_clock<ptime>::local_time ());
     std::string filePrefix = "map_" + to_iso_string (timems);
 
     std::string resultFilename = "";

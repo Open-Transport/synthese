@@ -127,10 +127,12 @@ Thread::operator()()
 	setState (READY);
 	Log::GetInstance ().info ("Thread " + _name +  " is ready.");
 	
-	while (getState () != STOPPED) 
+	ThreadState state = getState ();
+	while (state != STOPPED) 
 	{
-	    if (getState () != PAUSED) _exec->loop ();
+	    if (state != PAUSED) _exec->loop ();
 	    Sleep (_loopDelay);
+	    state = getState ();
 	}
 	Log::GetInstance ().info ("Thread " + _name +  " is stopped.");
     }

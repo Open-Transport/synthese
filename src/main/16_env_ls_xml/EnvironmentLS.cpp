@@ -13,7 +13,7 @@
 #include "CityLS.h"
 #include "LineLS.h"
 #include "LineStopLS.h"
-#include "LogicalStopLS.h"
+#include "ConnectionPlaceLS.h"
 #include "PhysicalStopLS.h"
 
 
@@ -29,7 +29,7 @@ const std::string EnvironmentLS::ENVIRONMENT_ID_ATTR ("id");
 const std::string EnvironmentLS::ENVIRONMENT_CITIES_TAG ("cities");
 const std::string EnvironmentLS::ENVIRONMENT_AXES_TAG ("axes");
 const std::string EnvironmentLS::ENVIRONMENT_LINES_TAG ("lines");
-const std::string EnvironmentLS::ENVIRONMENT_LOGICALSTOPS_TAG ("logicalStops");
+const std::string EnvironmentLS::ENVIRONMENT_CONNECTIONPLACES_TAG ("connectionPlaces");
 const std::string EnvironmentLS::ENVIRONMENT_PHYSICALSTOPS_TAG ("physicalStops");
 
 
@@ -56,12 +56,12 @@ EnvironmentLS::Load (XMLNode& node)
 	env->getAxes ().add (AxisLS::Load (axisNode, *env));
     }
     
-    XMLNode logicalStopsNode = node.getChildNode(ENVIRONMENT_LOGICALSTOPS_TAG.c_str(), 0);
-    int nbLogicalStops = logicalStopsNode.nChildNode(LogicalStopLS::LOGICALSTOP_TAG.c_str());
-    for (int i=0; i<nbLogicalStops; ++i) 
+    XMLNode connectionPlacesNode = node.getChildNode(ENVIRONMENT_CONNECTIONPLACES_TAG.c_str(), 0);
+    int nbConnectionPlaces = connectionPlacesNode.nChildNode(ConnectionPlaceLS::CONNECTIONPLACE_TAG.c_str());
+    for (int i=0; i<nbConnectionPlaces; ++i) 
     {
-	XMLNode logicalStopNode = logicalStopsNode.getChildNode (LogicalStopLS::LOGICALSTOP_TAG.c_str(), i);
-	env->getLogicalStops ().add (LogicalStopLS::Load (logicalStopNode, *env));
+	XMLNode connectionPlaceNode = connectionPlacesNode.getChildNode (ConnectionPlaceLS::CONNECTIONPLACE_TAG.c_str(), i);
+	env->getConnectionPlaces ().add (ConnectionPlaceLS::Load (connectionPlaceNode, *env));
     }
     
     XMLNode physicalStopsNode = node.getChildNode(ENVIRONMENT_PHYSICALSTOPS_TAG.c_str(), 0);

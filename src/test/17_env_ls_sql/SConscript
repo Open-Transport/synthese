@@ -12,6 +12,7 @@ testmoduleenv.AddModuleDependency ('04_time')
 testmoduleenv.AddModuleDependency ('02_db')
 testmoduleenv.AddModuleDependency ('01_util')
 testmoduleenv.AddSQLiteDependency ()
+testmoduleenv.AddBoostDependency ('boost_filesystem')
 testmoduleenv.AddBoostDependency ('boost_thread')
 testmoduleenv.AddBoostDependency ('boost_iostreams')
 testmoduleenv.AppendMultithreadConf ();

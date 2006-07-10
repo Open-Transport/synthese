@@ -67,7 +67,7 @@ def DefineDefaultCCFlags (env):
 
     if (platform=='posix'):
         if (mode=='debug'):
-            env.Append ( CCFLAGS = ['-ggdb', '-fno-inline'] )
+            env.Append ( CCFLAGS = ['-ggdb'] )
         else:
             env.Append ( CCFLAGS = ['-O3', '-fno-inline', '-fno-strength-reduce'] )
 
@@ -139,8 +139,7 @@ def AddSQLiteDependency (env):
     platform = env['PLATFORM']
     mode = env['MODE']
 
-    if platform == 'win32':
-	env.Append (LIBS = ['sqlite3'] )
+    env.Append (LIBS = ['sqlite3'] )
 
     
 
@@ -210,7 +209,9 @@ print "mode     = ", mode
 env.Replace ( PLATFORM = platform )
 env.Replace ( MODE = mode )
 
-#env.Replace ( CXX = 'g++-3.3' )
+
+if (platform=='posix'):
+  env.Replace ( CXX = 'g++-3.3' )
 
 
 

@@ -1,9 +1,8 @@
-#ifndef SYNTHESE_CARTO_MAPREQUESTHANDLER_H
-#define SYNTHESE_CARTO_MAPREQUESTHANDLER_H
+#ifndef SYNTHESE_CARTOSERVICE_MAPREQUESTHANDLER_H
+#define SYNTHESE_CARTOSERVICE_MAPREQUESTHANDLER_H
 
 
 
-#include "module.h"
 
 #include "70_server/RequestHandler.h"
 
@@ -34,6 +33,11 @@ namespace carto
 
     class Map;
     class RenderingConfig;
+}
+
+
+namespace cartoservice
+{
 
 
 /** Map request handler.
@@ -67,7 +71,7 @@ The different output types are :
   - html : JPEG + HTML map (only available in http mode)
   - mapinfo : MID/MIF files returned in a zip
   
-@ingroup m39
+@ingroup m80
 */
 class MapRequestHandler : public synthese::server::RequestHandler
 {
@@ -124,24 +128,24 @@ class MapRequestHandler : public synthese::server::RequestHandler
 
     std::string renderPsFile (const boost::filesystem::path& tempDir, 
 			      const std::string filenamePrefix,
-			      Map& map,
-			      const RenderingConfig& config) const;
+			      synthese::carto::Map& map,
+			      const synthese::carto::RenderingConfig& config) const;
     
     std::string renderJpegFile (const boost::filesystem::path& tempDir, 
 			       const std::string filenamePrefix,
-			       Map& map,
-			       const RenderingConfig& config) const;
+			       synthese::carto::Map& map,
+			       const synthese::carto::RenderingConfig& config) const;
     
     std::string renderHtmlFile (const boost::filesystem::path& tempDir, 
 				const std::string filenamePrefix,
 				const synthese::env::Environment& environment,
-				Map& map,
-				const RenderingConfig& config) const;
+				synthese::carto::Map& map,
+				const synthese::carto::RenderingConfig& config) const;
     
     std::string renderMapinfoFile (const boost::filesystem::path& tempDir, 
 				   const std::string filenamePrefix,
-				   Map& map,
-				   const RenderingConfig& config) const;
+				   synthese::carto::Map& map,
+				   const synthese::carto::RenderingConfig& config) const;
     
 
 };
