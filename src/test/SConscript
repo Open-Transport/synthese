@@ -9,7 +9,11 @@ testenv = env.Copy()
 # Add specific configuration for building test modules
 # ...
 
-testenv.Append ( LIBS = 'cppunit' )
+if testenv['PLATFORM'] == 'win32':
+  testenv.Append ( LIBS = 'cppunitd' )
+else:
+  testenv.Append ( LIBS = 'cppunit' )
+
 #testenv.Append ( LINKFLAGS= ['-ldl'] )
 
 Export ('testenv')

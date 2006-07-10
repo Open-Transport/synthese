@@ -1,7 +1,22 @@
+
 #include "MapRequestHandler.h"
 
-#include "01_util/PlainCharFilter.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+
+#include <assert.h>
+#include <stdlib.h>
+
+#include <boost/filesystem/operations.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+
+
 #include "01_util/XmlParser.h"
+
+#include "01_util/PlainCharFilter.h"
 #include "01_util/Conversion.h"
 
 #include "70_server/Server.h"
@@ -22,17 +37,7 @@
 
 #include "01_util/Log.h"
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
-
-#include <assert.h>
-#include <stdlib.h>
 
 
 using synthese::carto::Map;

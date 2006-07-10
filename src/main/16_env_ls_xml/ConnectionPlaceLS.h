@@ -5,7 +5,7 @@
 #include "module.h"
 #include <string>
 
-class XMLNode;
+struct XMLNode;
 
 
 namespace synthese

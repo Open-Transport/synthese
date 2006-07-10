@@ -108,6 +108,7 @@ namespace db
 	    _registerCalled = true;
 	}
 	
+
 	
 	void eventCallback (const SQLiteThreadExec* emitter,
 			    const SQLiteEvent& event)
@@ -211,6 +212,7 @@ namespace db
 
       delete hook;
       boost::filesystem::remove ("test_db.s3db");
+
 
   }
 
