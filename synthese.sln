@@ -63,6 +63,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "17_env_ls_sql_test", "src\t
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "80_carto_service", "src\main\80_carto_service\80_carto_service.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "99_synthese", "src\main\99_synthese\99_synthese.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -133,6 +141,14 @@ Global
 		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Debug.Build.0 = Debug|Win32
 		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.ActiveCfg = Release|Win32
 		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.Build.0 = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.ActiveCfg = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.Build.0 = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.ActiveCfg = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.Build.0 = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.ActiveCfg = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.Build.0 = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.ActiveCfg = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
 		SConstruct = SConstruct

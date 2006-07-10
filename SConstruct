@@ -67,7 +67,7 @@ def DefineDefaultCCFlags (env):
 
     if (platform=='posix'):
         if (mode=='debug'):
-            env.Append ( CCFLAGS = ['-ggdb'] )
+            env.Append ( CCFLAGS = ['-ggdb', '-fno-inline'] )
         else:
             env.Append ( CCFLAGS = ['-O3', '-fno-inline', '-fno-strength-reduce'] )
 
