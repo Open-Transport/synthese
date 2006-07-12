@@ -31,7 +31,13 @@ namespace env
 /** Service abstract base class.
 
 A service represents the ability to follow a path
-at a certain moment.
+at certain days and hours.
+
+The days when the service is provided are stored in a Calendar object.
+Even if a Service intrinsically corresponds to a sequence of 
+(arrival schedule - departure schedule) couples, these schedules are not
+stored in Service objects but per Edge (Line/Road). However, this is how 
+Service objects are persisted.
 
 It is completely independent from the "vehicle" : this ability 
 can be provided by an external entity (bus, train...), 
@@ -46,11 +52,10 @@ class Service :
 private:
     
     const std::string _serviceNumber;
-    const Path* _path; //!< Path this service allows to follow.
-    
     Calendar* _calendar;  //!< Which days is this service available ?
+    const Path* _path;
 
-    synthese::time::Schedule _departureSchedule; //!< Service departure schedule.
+    synthese::time::Schedule _departureSchedule; //!< Service departure schedule (from the origin).
     
 public:
 
@@ -63,9 +68,10 @@ public:
     
     //! @name Getters/Setters
     //@{
-    const std::string& getServiceNumber () const;
     const Path* getPath () const;
+    const std::string& getServiceNumber () const;
     Calendar* getCalendar (); // MJ constness pb
+
 
     /** Returns the departure schedule for this service.
 

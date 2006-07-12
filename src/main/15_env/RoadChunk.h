@@ -35,15 +35,12 @@ class RoadChunk :
 {
 private:
 
-    const Road* _road;
     const Address* _fromAddress;
 
 public:
 
   RoadChunk (const uid& id,
-	     const Road* road,
-	     const Address* fromAddress,
-	     const EdgeType& type);
+	     const Address* fromAddress);
   
   virtual ~RoadChunk ();
 

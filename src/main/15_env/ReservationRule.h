@@ -55,7 +55,7 @@ private:
     std::string _description;   //!< Additional info about phone exchange or reservation mode
     std::string _webSiteUrl;    //!< URL of a website allowing online reservation
 
-public:
+ public:
 
     ReservationRule ( const uid& id,
 		      const ReservationType& type,

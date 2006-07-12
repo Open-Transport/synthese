@@ -11,9 +11,11 @@ Address::Address (const uid& id,
 		  const ConnectionPlace* connectionPlace,
 		  int rankInConnectionPlace,
 		  const Road* road, 
-		  double metricOffset)
+		  double metricOffset,
+		  double x,
+		  double y)
     : synthese::util::Registrable<uid,Address> (id)
-    , Vertex (connectionPlace, rankInConnectionPlace)
+    , Vertex (connectionPlace, rankInConnectionPlace, x, y)
     , _road (road)
     , _metricOffset (metricOffset)
 {

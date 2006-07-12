@@ -40,10 +40,10 @@ private:
     const double _metricOffset;      //!< Metric offset of stop on line
     const bool _scheduleInput; //!< Schedule with or without input
 
-    synthese::time::Schedule* _departureBeginSchedule;  //!< First departure schedule
-    synthese::time::Schedule* _departureEndSchedule;  //!< Last departure schedule
-    synthese::time::Schedule* _arrivalBeginSchedule; //!< First arrival schedule
-    synthese::time::Schedule* _arrivalEndSchedule;  //!< Last arrival schedule
+    synthese::time::Schedule* _departureBeginSchedule;  //!< 
+    synthese::time::Schedule* _departureEndSchedule;  //!< 
+    synthese::time::Schedule* _arrivalBeginSchedule; //!< 
+    synthese::time::Schedule* _arrivalEndSchedule;  //!< 
 
     int _departureIndex[24];     //!< First line service index by departure hour of day
     int _arrivalIndex[24];  //!< First line service index by arrival hour of day

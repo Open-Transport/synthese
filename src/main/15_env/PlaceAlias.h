@@ -6,6 +6,9 @@
 
 #include "IncludingPlace.h"
 
+#include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
 
 namespace synthese
 {
@@ -17,7 +20,9 @@ namespace env
 
  @ingroup m15
 */
-class PlaceAlias : public IncludingPlace
+class PlaceAlias : 
+    public synthese::util::Registrable<uid, PlaceAlias>,
+    public IncludingPlace
 {
 
 private:
@@ -25,7 +30,8 @@ private:
 
 public:
 
-    PlaceAlias (const std::string& name,
+    PlaceAlias (const uid& id,
+		const std::string& name,
 		const Place* aliasedPlace);
 
     virtual ~PlaceAlias ();

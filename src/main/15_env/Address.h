@@ -46,7 +46,9 @@ public:
 	     const ConnectionPlace* connectionPlace,
 	     int rankInConnectionPlace,
 	     const Road* road, 
-	     double metricOffset);
+	     double metricOffset,
+	     double x = UNKNOWN_VALUE,
+	     double y = UNKNOWN_VALUE);
 
     ~Address();
 

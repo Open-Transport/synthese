@@ -7,14 +7,18 @@
 #include "Calendar.h"
 #include "City.h"
 #include "ConnectionPlace.h"
+#include "ContinuousService.h"
 #include "Document.h"
 #include "Line.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
+#include "PlaceAlias.h"
+#include "PublicPlace.h"
 #include "RoadChunk.h"
 #include "Road.h"
+#include "RollingStock.h"
 #include "ScheduledService.h"
-#include "ContinuousService.h"
+#include "TransportNetwork.h"
 
 
 #include "01_util/Registrable.h"
@@ -46,22 +50,24 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     Calendar::Registry _calendars;
     City::Registry _cities;
     ConnectionPlace::Registry _connectionPlaces;
+    ContinuousService::Registry _continuousServices;
     Document::Registry _documents;
     Line::Registry _lines;
     LineStop::Registry _lineStops;
     PhysicalStop::Registry _physicalStops;
+    PlaceAlias::Registry _placeAliases; 
+    PublicPlace::Registry _publicPlaces;
     RoadChunk::Registry _roadChunks;
     Road::Registry _roads;
-    ContinuousService::Registry _continuousServices;
+    RollingStock::Registry _rollingStocks;
     ScheduledService::Registry _scheduledServices;
+    TransportNetwork::Registry _transportNetworks;
+    
+    
 
     // TODO : 
-    // including place
-    // public place
     // fare alarm
-    // transport network
     // alarm
-    // rolling stock
 
     // zone
 

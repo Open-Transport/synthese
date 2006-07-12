@@ -82,15 +82,10 @@ EnvironmentTest::testEnvironmentConstruction0 ()
 	env.getRoads ().add (new Road (3, "road4", env.getCities ().get (0), Road::ROAD_TYPE_STREET));
     }
 
-    // Crossings
+    // Connection places
     {
-	env.getCrossings ().add (new Crossing (0, "cg1", env.getCities ().get (0)));
-    }
-
-    // Logical stops
-    {
-	env.getLogicalStops ().add (new LogicalStop (0, "ls1", env.getCities ().get (0)));
-	env.getLogicalStops ().add (new LogicalStop (1, "ls2", env.getCities ().get (0)));
+	env.getConnectionPlaces ().add (new LogicalStop (0, "ls1", env.getCities ().get (0)));
+	env.getConnectionPlaces ().add (new LogicalStop (1, "ls2", env.getCities ().get (0)));
     }
 
 

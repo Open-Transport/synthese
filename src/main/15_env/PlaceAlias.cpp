@@ -7,9 +7,11 @@ namespace env
 {
 
 
-PlaceAlias::PlaceAlias (const std::string& name,
+PlaceAlias::PlaceAlias (const uid& id,
+			const std::string& name,
 			const Place* aliasedPlace)
-    : IncludingPlace (name, aliasedPlace->getCity ())
+: synthese::util::Registrable<uid,PlaceAlias> (id)
+, IncludingPlace (name, aliasedPlace->getCity ())
 {
     addIncludedPlace (aliasedPlace);
 }
