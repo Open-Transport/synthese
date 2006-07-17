@@ -40,7 +40,7 @@ SQLiteTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite,
 
     // Create the table if it does not already exist.
     std::string sql = "CREATE TABLE IF NOT EXISTS " + getTableName () + " (";
-    sql.append (format[0].first).append (" ").append (format[0].second).append (" PRIMARY KEY");
+    sql.append (format[0].first).append (" ").append (format[0].second).append (" UNIQUE PRIMARY KEY");
     for (int i=1; i< (int) format.size (); ++i)
     {
 	sql.append (", ").append (format[i].first).append (" ").append (format[i].second);

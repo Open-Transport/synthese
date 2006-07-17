@@ -54,7 +54,7 @@ class Log
 
 
     Log ( std::ostream* outputStream = &std::cout, 
-	  Log::Level level = Log::LEVEL_INFO );
+	  Log::Level level = Log::LEVEL_DEBUG );
 
  public:
 

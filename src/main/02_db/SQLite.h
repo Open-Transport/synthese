@@ -21,6 +21,10 @@ namespace db
     The return codes must be treated at this level and
     transformed into exceptions.
 
+    IMPORTANT : to fasten execution of queries, it is crucial
+    to wrap them into transations (the exexcution time is about
+    60x shorter!!)
+
  @ingroup m02
 */
 class SQLite
