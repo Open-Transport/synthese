@@ -26,6 +26,8 @@ namespace envlssql
     Synchronizer for environment link tables.
     This class holds a static mapping of classId <=> tableName to be maintained
     each time a new component registry is added to the environment.
+    This synchronizer MUST be registered after all component synchronizers so that the mapping
+    is complete.
 
 @ingroup m17
 */
@@ -34,14 +36,17 @@ class EnvironmentLinkTableSync : public synthese::db::SQLiteTableSync
 {
  private:
 
-    synthese::env::Environment& _environment;
+    synthese::env::Environment::Registry& _environments;
+    std::map<int, std::string> _componentTableNames; //!< Mapping (table id, table name)
+
     std::map<std::string, std::vector<std::string> > _cache;
 
 
  public:
 
-    EnvironmentLinkTableSync (const std::string& linkTableName, 
-			      synthese::env::Environment& environment);
+    EnvironmentLinkTableSync (const synthese::db::SQLiteSync* sync,
+			      synthese::env::Environment::Registry& environments);
+
     ~EnvironmentLinkTableSync ();
 
     void rowsAdded (const synthese::db::SQLiteThreadExec* sqlite, 
@@ -59,7 +64,6 @@ class EnvironmentLinkTableSync : public synthese::db::SQLiteTableSync
 
  private:
 
-    std::string getComponentTable (const ComponentClass& componentClass) const;
 
 
 

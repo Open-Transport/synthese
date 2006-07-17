@@ -58,7 +58,7 @@ class Registry
      */
     void clear ();
 
-    void add (T* ptr);
+    void add (T* ptr, bool failOnDuplicate = true);
     void replace (T* ptr);
     void remove (const K& key);
     //@}
@@ -148,9 +148,9 @@ Registry<K,T>::clear ()
 
 template<class K, class T>
 void 
-Registry<K,T>::add (T* ptr)
+Registry<K,T>::add (T* ptr, bool failOnDuplicate)
 {
-    if (contains (ptr->getKey ())) 
+    if (failOnDuplicate && (contains (ptr->getKey ()))) 
 	throw RegistryKeyException<K> ("Duplicate key in registry", ptr->getKey ());
     
     _registry.insert (std::make_pair (ptr->getKey (), ptr));

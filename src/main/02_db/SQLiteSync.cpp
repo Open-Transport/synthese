@@ -130,6 +130,11 @@ SQLiteSync::eventCallback (const SQLiteThreadExec* emitter,
 
 
 
+const std::map<std::string, SQLiteTableSync* >& 
+SQLiteSync::getTableSynchronizers () const
+{
+    return _tableSynchronizers;
+}
 
 
 

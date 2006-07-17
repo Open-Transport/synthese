@@ -1,6 +1,7 @@
 #include "EnvironmentTableSync.h"
 
 #include "01_util/Conversion.h"
+#include "01_util/UId.h"
 
 #include <sqlite/sqlite3.h>
 #include "02_db/SQLiteException.h"
@@ -28,7 +29,6 @@ EnvironmentTableSync::EnvironmentTableSync (synthese::env::Environment::Registry
   , _environments (environments)
 {
     addTableColumn (TABLE_COL_ID, "INTEGER");
-    addTableColumn (ENVIRONMENTS_TABLE_COL_LINKTABLE, "VARCHAR(50)");
 }
 
 
@@ -46,19 +46,9 @@ EnvironmentTableSync::rowsAdded (const synthese::db::SQLiteThreadExec* sqlite,
 {
     for (int i=0; i<rows.getNbRows (); ++i)
     {
-	int envId = Conversion::ToInt (rows.getColumn (i, TABLE_COL_ID)); // TODO UID
+	uid envId = Conversion::ToLongLong (rows.getColumn (i, TABLE_COL_ID));
 	synthese::env::Environment* newEnv = new synthese::env::Environment (envId);
 	_environments.add (newEnv);
-	
-	// Add a synchronizer on the new environment link table
-	EnvironmentLinkTableSync* linkSync = 
-	    new EnvironmentLinkTableSync (rows.getColumn (i, ENVIRONMENTS_TABLE_COL_LINKTABLE),
-					  *newEnv);
-
-	sync->addTableSynchronizer (linkSync);
-
-	// Calls the init sequence on the new synchronizer
-	linkSync->firstSync (sqlite, sync);
     }
 }
 
@@ -84,14 +74,14 @@ EnvironmentTableSync::rowsRemoved (const synthese::db::SQLiteThreadExec* sqlite,
     // Look in environment link tables for each row id
     for (int i=0; i<rows.getNbRows (); ++i)
     {
-	int envId = Conversion::ToInt (rows.getColumn (i, TABLE_COL_ID)); // TODO UID
-	std::string envTable = rows.getColumn (i, ENVIRONMENTS_TABLE_COL_LINKTABLE);
-	std::string linkTableName = rows.getColumn (i, ENVIRONMENTS_TABLE_COL_LINKTABLE);
-	// Drop the environment link table
-	sqlite->execQuery ("DROP TABLE " + linkTableName);
+	std::string envId = rows.getColumn (i, TABLE_COL_ID);
+
+	// Remove all environment links
+	sqlite->execQuery ("DELETE FROM " + ENVIRONMENT_LINKS_TABLE_NAME + " WHERE " 
+			   + ENVIRONMENT_LINKS_TABLE_COL_ENVIRONMENTID + "=" + envId);
 	
 	// Remove the environment
-	_environments.remove (envId);
+	_environments.remove (Conversion::ToLongLong (envId));
 	
     }
 }

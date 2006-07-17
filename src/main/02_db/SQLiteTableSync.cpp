@@ -56,12 +56,28 @@ SQLiteTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite,
 
     
 
+uid 
+SQLiteTableSync::encodeUId (int gridId, int gridNodeId, long objectId)
+{
+    return synthese::util::encodeUId (getTableId (), gridId, gridNodeId, objectId);
+}
+
+
+
 
 const std::string& 
 SQLiteTableSync::getTableName () const
 {
     return _tableName;
 }
+
+
+int 
+SQLiteTableSync::getTableId () const
+{
+    return Conversion::ToInt (getTableName ().substr (1, 4));
+}
+
 
 
 const SQLiteTableFormat& 

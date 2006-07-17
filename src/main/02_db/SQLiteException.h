@@ -15,7 +15,7 @@ namespace db
 
 
 /** SQLite related exception class
-@ingroup m17
+@ingroup m02
 */
 
 class SQLiteException : public synthese::util::Exception

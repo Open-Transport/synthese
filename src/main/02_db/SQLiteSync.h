@@ -54,6 +54,7 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
 
     bool hasTableSynchronizer (const std::string& tableName) const;
     SQLiteTableSync* getTableSynchronizer (const std::string& tableName) const;
+    const std::map<std::string, SQLiteTableSync* >& getTableSynchronizers () const;
 
  private:
 

@@ -32,16 +32,16 @@ class ComponentTableSync : public synthese::db::SQLiteTableSync
 {
  private:
     
-    ComponentClass _componentClass;
     synthese::env::Environment::Registry& _environments;
 
  public:
 
-    ComponentTableSync (const ComponentClass& componentClass,
-			const std::string& tableName, 
+    ComponentTableSync (const std::string& tableName, 
 			synthese::env::Environment::Registry& environments);
 
     ~ComponentTableSync ();
+
+
 
     void rowsAdded (const synthese::db::SQLiteThreadExec* sqlite, 
 		    synthese::db::SQLiteSync* sync,

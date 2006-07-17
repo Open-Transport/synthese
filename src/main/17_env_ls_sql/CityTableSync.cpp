@@ -22,7 +22,7 @@ namespace envlssql
 
 
 CityTableSync::CityTableSync (Environment::Registry& environments)
-: ComponentTableSync (CITY_CLASS, CITIES_TABLE_NAME, environments)
+: ComponentTableSync (CITIES_TABLE_NAME, environments)
 {
     addTableColumn (CITIES_TABLE_COL_NAME, "VARCHAR(50)");
 }
@@ -41,7 +41,7 @@ void
 CityTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
-    environment.getCities ().add (createFromRow (rows, rowIndex));
+    environment.getCities ().add (createFromRow (rows, rowIndex), false);
 }
 
 
@@ -64,7 +64,7 @@ void
 CityTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
-    environment.getCities ().remove (Conversion::ToInt (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    environment.getCities ().remove (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
 }
 
 
@@ -74,7 +74,7 @@ synthese::env::City*
 CityTableSync::createFromRow (const synthese::db::SQLiteResult& rows, int rowIndex) const
 {
     return new synthese::env::City (
-	Conversion::ToInt (rows.getColumn (rowIndex, TABLE_COL_ID)),
+	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
 	rows.getColumn (rowIndex, CITIES_TABLE_COL_NAME) );
     
 }

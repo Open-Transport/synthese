@@ -1,6 +1,7 @@
 #include "EnvironmentLinkTableSync.h"
 
 #include "01_util/Conversion.h"
+#include "EnvironmentSyncException.h"
 
 #include <sqlite/sqlite3.h>
 #include "02_db/SQLiteException.h"
@@ -14,6 +15,7 @@
 
 using synthese::util::Conversion;
 using synthese::db::SQLiteResult;
+using synthese::env::Environment;
 
 
 namespace synthese
@@ -23,14 +25,26 @@ namespace envlssql
 
 
 
-EnvironmentLinkTableSync::EnvironmentLinkTableSync (const std::string& linkTableName,
-						    synthese::env::Environment& environment)
-: synthese::db::SQLiteTableSync (linkTableName)
-, _environment (environment)
+EnvironmentLinkTableSync::EnvironmentLinkTableSync (const synthese::db::SQLiteSync* sync,
+						    Environment::Registry& environments)
+: synthese::db::SQLiteTableSync (ENVIRONMENT_LINKS_TABLE_NAME)
+, _environments (environments)
 {
     addTableColumn (TABLE_COL_ID, "INTEGER");
-    addTableColumn (ENVLINKS_TABLE_COL_LINKCLASS, "INTEGER");
-    addTableColumn (ENVLINKS_TABLE_COL_LINKID, "INTEGER");
+    addTableColumn (ENVIRONMENT_LINKS_TABLE_COL_ENVIRONMENTID, "INTEGER");
+    addTableColumn (ENVIRONMENT_LINKS_TABLE_COL_LINKTARGETID, "INTEGER");
+
+    const std::map<std::string, SQLiteTableSync* >& tableSynchronizers = sync->getTableSynchronizers ();
+    for (std::map<std::string, SQLiteTableSync* >::const_iterator it = tableSynchronizers.begin ();
+	 it != tableSynchronizers.end (); ++it)
+    {
+	const SQLiteTableSync* synchronizer = it->second;
+	std::string tableName = synchronizer->getTableName ();
+	
+        // Parse table id from table name
+	int tableId (synchronizer->getTableId ());
+	_componentTableNames.insert (std::make_pair (tableId, tableName));
+    }
 }
 
 
@@ -48,24 +62,29 @@ EnvironmentLinkTableSync::rowsAdded (const synthese::db::SQLiteThreadExec* sqlit
 {
     for (int i=0; i<rows.getNbRows (); ++i)
     {
+	uid envId = Conversion::ToLongLong (rows.getColumn (i, ENVIRONMENT_LINKS_TABLE_COL_ENVIRONMENTID));
+
+	std::string linkTargetStr (rows.getColumn (i, ENVIRONMENT_LINKS_TABLE_COL_LINKTARGETID));
+	uid linkTargetId = Conversion::ToLongLong (linkTargetStr);
+	int tableId = synthese::util::decodeTableId (linkTargetId);
+
+	// Find the corresponding table name
+	std::map<int, std::string>::const_iterator it = _componentTableNames.find (tableId);
+	if (it == _componentTableNames.end ()) continue;
+
 	// Update the cache
 	_cache.insert (std::make_pair (rows.getColumn (i, TABLE_COL_ID), rows.getColumns (i)));
 
-	ComponentClass componentClass = (ComponentClass) 
-	    Conversion::ToInt (rows.getColumn (i, ENVLINKS_TABLE_COL_LINKCLASS ));
-
-	std::string linkId = rows.getColumn (i, ENVLINKS_TABLE_COL_LINKID );
-
 	// Check if the component has already been added in its corresponding table
-	std::string componentTableName = getComponentTable (componentClass);
+	std::string componentTableName (it->second);
 	SQLiteResult existingRow = sqlite->execQuery ("SELECT * FROM " + componentTableName + 
-						      " WHERE " + TABLE_COL_ID + "=" + linkId);
+						      " WHERE " + TABLE_COL_ID + "=" + linkTargetStr);
 
 	if (existingRow.getNbRows () == 1) 
 	{
 	    ComponentTableSync* componentTableSync = dynamic_cast<ComponentTableSync*>
 		(sync->getTableSynchronizer (componentTableName));
-	    componentTableSync->doAdd (existingRow, 0, _environment);
+	    componentTableSync->doAdd (existingRow, 0, *_environments.get (envId));
 	}
     }
 }
@@ -92,24 +111,28 @@ EnvironmentLinkTableSync::rowsRemoved (const synthese::db::SQLiteThreadExec* sql
     {
 	std::string id = rows.getColumn (i, TABLE_COL_ID);
 
+
 	// Get back cached values for concerned rows
 	std::vector<std::string> cachedValues = _cache.find (id)->second;
+	uid envId = Conversion::ToLongLong (cachedValues.at (1));
+	std::string linkTargetStr = cachedValues.at (2);
 
-	ComponentClass componentClass = (ComponentClass)
-	    Conversion::ToInt (cachedValues.at (1));
-	
-	std::string linkId = cachedValues.at (2);
+	uid linkTargetId = Conversion::ToLongLong (linkTargetStr);
+	int tableId = synthese::util::decodeTableId (linkTargetId);
 
-	// Check if the component has already been added in its corresponding table
-	std::string componentTableName = getComponentTable (componentClass);
+	std::map<int, std::string>::const_iterator it = _componentTableNames.find (tableId);
+	if (it == _componentTableNames.end ()) continue;
+
+	std::string componentTableName (it->second);
+
 	SQLiteResult existingRow = sqlite->execQuery ("SELECT * FROM " + componentTableName + 
-						      " WHERE " + TABLE_COL_ID + "=" + linkId);
+						      " WHERE " + TABLE_COL_ID + "=" + linkTargetStr);
 
 	if (existingRow.getNbRows () == 1) 
 	{
 	    ComponentTableSync* componentTableSync = dynamic_cast<ComponentTableSync*>
 		(sync->getTableSynchronizer (componentTableName));
-	    componentTableSync->doRemove (existingRow, 0, _environment);
+	    componentTableSync->doRemove (existingRow, 0, *_environments.get (envId));
 	}
 	_cache.erase (id);
     }
@@ -119,19 +142,6 @@ EnvironmentLinkTableSync::rowsRemoved (const synthese::db::SQLiteThreadExec* sql
 	
 
 
-std::string 
-EnvironmentLinkTableSync::getComponentTable (const ComponentClass& componentClass) const
-{
-    if (componentClass == AXIS_CLASS) return AXES_TABLE_NAME;
-    if (componentClass == CITY_CLASS) return CITIES_TABLE_NAME;
-    if (componentClass == LINE_CLASS) return LINES_TABLE_NAME;
-    if (componentClass == LINESTOP_CLASS) return LINESTOPS_TABLE_NAME;
-    if (componentClass == CONNECTIONPLACE_CLASS) return CONNECTIONPLACES_TABLE_NAME;
-    if (componentClass == PHYSICALSTOP_CLASS) return PHYSICALSTOPS_TABLE_NAME;
-    
-    // ...
-    return "";
-}
 
 
 

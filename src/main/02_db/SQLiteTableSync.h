@@ -7,6 +7,8 @@
 #include <vector>
 #include <iostream>
 
+#include <01_util/UId.h>
+
 
 namespace synthese
 {
@@ -18,6 +20,9 @@ namespace db
     class SQLiteThreadExec;
 
 /** 
+    Base class for an SQLite table synchronizer.
+    By convention, the table name must always start with the t letter
+    followed by a unique 3 digits integer (SQLite does not allow ids starting with number).
 
 @ingroup m02
 */
@@ -38,8 +43,14 @@ class SQLiteTableSync
     ~SQLiteTableSync ();
 
     const std::string& getTableName () const;
+
+    /** Returns the unique integer identifying a table.
+     */
+    int getTableId () const;
+
     const SQLiteTableFormat& getTableFormat () const;
 
+    uid encodeUId (int gridId, int gridNodeId, long objectId);
 
     /** This method is called when the synchronizer is created
 	to sychronize it with pre-existing data in db.

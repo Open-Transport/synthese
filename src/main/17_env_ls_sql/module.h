@@ -17,22 +17,13 @@ namespace synthese
 	namespace envlssql
 	{
 
-	    typedef enum { ENVIRONMENT_CLASS = 0, 
-			   AXIS_CLASS,
-			   CITY_CLASS,
-			   LINE_CLASS,
-			   LINESTOP_CLASS,
-			   CONNECTIONPLACE_CLASS,
-			   PHYSICALSTOP_CLASS } ComponentClass;
-
-
 	    static const std::string TABLE_COL_ID ("id");
 
-	    static const std::string ENVIRONMENTS_TABLE_NAME ("tbl_environments");
-	    static const std::string ENVIRONMENTS_TABLE_COL_LINKTABLE ("link_table");
+	    static const std::string ENVIRONMENTS_TABLE_NAME ("t000_environments");
 
-	    static const std::string ENVLINKS_TABLE_COL_LINKCLASS ("link_class");
-	    static const std::string ENVLINKS_TABLE_COL_LINKID ("link_id");
+	    static const std::string ENVIRONMENT_LINKS_TABLE_NAME ("t001_environment_links");
+	    static const std::string ENVIRONMENT_LINKS_TABLE_COL_ENVIRONMENTID ("environment_id");
+	    static const std::string ENVIRONMENT_LINKS_TABLE_COL_LINKTARGETID ("link_target_id");
 
 
 
@@ -41,7 +32,7 @@ namespace synthese
 		- on update : 
 		- on delete : X
 	     */
-	    static const std::string ADDRESSES_TABLE_NAME ("tbl_addresses");
+	    static const std::string ADDRESSES_TABLE_NAME ("t002_addresses");
 	    static const std::string ADDRESSES_TABLE_COL_CONNECTIONPLACEID ("connection_place_id");  // NU
 	    static const std::string ADDRESSES_TABLE_COL_RANKINCONNECTIONPLACE ("rank_in_connection_place"); // NU
 	    static const std::string ADDRESSES_TABLE_COL_ROADID ("road_id");  // NU
@@ -55,7 +46,7 @@ namespace synthese
 		- on update : 
 		- on delete : X
 	     */
-	    static const std::string AXES_TABLE_NAME ("tbl_axes");
+	    static const std::string AXES_TABLE_NAME ("t004_axes");
 	    static const std::string AXES_TABLE_COL_NAME ("name");
 	    static const std::string AXES_TABLE_COL_FREE ("free");
 	    static const std::string AXES_TABLE_COL_AUTHORIZED ("authorized");
@@ -67,7 +58,7 @@ namespace synthese
 		- on update : update entry in associator
 		- on delete : X
 	     */
-	    static const std::string CITIES_TABLE_NAME ("tbl_cities");
+	    static const std::string CITIES_TABLE_NAME ("t006_cities");
 	    static const std::string CITIES_TABLE_COL_NAME ("name");
 
 
@@ -76,7 +67,7 @@ namespace synthese
 		- on update : 
 		- on delete : X
 	     */
-	    static const std::string CONNECTIONPLACES_TABLE_NAME ("tbl_connection_places");
+	    static const std::string CONNECTIONPLACES_TABLE_NAME ("t007_connection_places");
 	    static const std::string CONNECTIONPLACES_TABLE_COL_NAME ("name");
 	    static const std::string CONNECTIONPLACES_TABLE_COL_CITYID ("city_id");
 	    
@@ -86,7 +77,7 @@ namespace synthese
 		- on update : 
 		- on delete : X
 	     */
-	    static const std::string DOCUMENTS_TABLE_NAME ("tbl_documents");
+	    // static const std::string DOCUMENTS_TABLE_NAME ("tbl_documents");
 
 
 	    /** Lines table :
@@ -94,7 +85,7 @@ namespace synthese
 		- on update : 
 		- on delete : X
 	     */
-	    static const std::string LINES_TABLE_NAME ("tbl_lines");
+	    static const std::string LINES_TABLE_NAME ("t009_lines");
 	    static const std::string LINES_TABLE_COL_TRANSPORTNETWORKID ("transport_network_id");
 	    static const std::string LINES_TABLE_COL_AXISID ("axis_id");
 // 	    static const std::string LINES_TABLE_COL_CALENDARID ("calendar_id");   // Non car calculé
@@ -119,7 +110,7 @@ namespace synthese
 		- on update : 
 		- on delete : X
 	     */
-	    static const std::string LINESTOPS_TABLE_NAME ("tbl_line_stops");
+	    static const std::string LINESTOPS_TABLE_NAME ("t010_line_stops");
 	    static const std::string LINESTOPS_TABLE_COL_FROMPHYSICALSTOPID ("from_physical_stop_id");
 	    static const std::string LINESTOPS_TABLE_COL_LINEID ("line_id");
 	    static const std::string LINESTOPS_TABLE_COL_METRICOFFSET ("metric_offset");
@@ -136,7 +127,7 @@ namespace synthese
 		- on update : 
 		- on delete : X
 	     */
-	    static const std::string PHYSICALSTOPS_TABLE_NAME ("tbl_physical_stops");
+	    static const std::string PHYSICALSTOPS_TABLE_NAME ("t012_physical_stops");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID ("connection_place_id");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_RANKINCONNECTIONPLACE ("rank_in_connection_place");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_X ("x");
@@ -148,7 +139,7 @@ namespace synthese
 		- on update : 
 		- on delete : X
 	     */
-	    static const std::string ROADCHUNKS_TABLE_NAME ("tbl_road_chunks");
+	    static const std::string ROADCHUNKS_TABLE_NAME ("t014_road_chunks");
 	    static const std::string ROADCHUNKS_TABLE_COL_FROMADDRESSID ("from_address_id");
 	    static const std::string ROADCHUNKS_TABLE_COL_VIAPOINTS ("via_points");  // list of ids
 
@@ -158,16 +149,18 @@ namespace synthese
 		- on update : 
 		- on delete : X
 	     */
-	    static const std::string ROAD_TABLE_NAME ("tbl_roads");
-	    static const std::string ROAD_TABLE_COL_NAME ("name");
-	    static const std::string ROAD_TABLE_COL_CITY ("city_id");
-	    static const std::string ROAD_TABLE_COL_ROADTYPE ("road_type");
+	    static const std::string ROADS_TABLE_NAME ("t015_roads");
+	    static const std::string ROADS_TABLE_COL_NAME ("name");
+	    static const std::string ROADS_TABLE_COL_CITY ("city_id");
+	    static const std::string ROADS_TABLE_COL_ROADTYPE ("road_type");
 	    // list of chunk ids
 
 
-	    static const std::string SERVICE_TABLE_NAME ("tbl_services");
-	    static const std::string SERVICE_TABLE_COL_ISCONTINUOUS ("is_continuous");
-	    static const std::string SERVICE_TABLE_COL_SERVICENUMBER ("service_number");
+	    static const std::string SCHEDULEDSERVICES_TABLE_NAME ("t016_scheduled_services");
+
+
+	    static const std::string CONTINUOUSSERVICES_TABLE_NAME ("t017_continuous_services");
+
 	    //... 
 	    
 	    
