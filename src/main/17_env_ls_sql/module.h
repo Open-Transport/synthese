@@ -68,6 +68,11 @@ namespace synthese
 	    static const std::string CONNECTIONPLACES_TABLE_NAME ("t007_connection_places");
 	    static const std::string CONNECTIONPLACES_TABLE_COL_NAME ("name");
 	    static const std::string CONNECTIONPLACES_TABLE_COL_CITYID ("city_id");
+
+	    
+	    static const std::string FARES_TABLE_NAME ("t008_fares");
+	    static const std::string FARES_TABLE_COL_NAME ("name");
+	    static const std::string FARES_TABLE_COL_FARETYPE ("fare_type");
 	    
 
 	    /** Documents table :

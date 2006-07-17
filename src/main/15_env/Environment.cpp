@@ -101,6 +101,21 @@ Environment::getDocuments () const
 
 
 
+Fare::Registry&
+Environment::getFares ()
+{
+    return _fares;
+}
+
+
+const Fare::Registry&
+Environment::getFares () const
+{
+    return _fares;
+}
+
+
+
 Line::Registry&
 Environment::getLines ()
 {

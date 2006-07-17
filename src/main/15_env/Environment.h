@@ -8,6 +8,7 @@
 #include "ConnectionPlace.h"
 #include "ContinuousService.h"
 #include "Document.h"
+#include "Fare.h"
 #include "Line.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
@@ -50,6 +51,7 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     ConnectionPlace::Registry _connectionPlaces;
     ContinuousService::Registry _continuousServices;
     Document::Registry _documents;
+    Fare::Registry _fares;
     Line::Registry _lines;
     LineStop::Registry _lineStops;
     PhysicalStop::Registry _physicalStops;
@@ -92,6 +94,9 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     Document::Registry& getDocuments ();
     const Document::Registry& getDocuments () const;
+
+    Fare::Registry& getFares ();
+    const Fare::Registry& getFares () const;
 
     Line::Registry& getLines ();
     const Line::Registry& getLines () const;

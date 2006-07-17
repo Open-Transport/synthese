@@ -22,9 +22,9 @@ class Fare : public synthese::util::Registrable<uid,Fare>
 {
  public:
     
-    typedef enum { FARE_TYPE_ZONING, 
-		   FARE_TYPE_SECTION, 
-		   FARE_TYPE_DISTANCE } FareType;
+    typedef enum { FARE_TYPE_ZONING = 0, 
+		   FARE_TYPE_SECTION = 1, 
+		   FARE_TYPE_DISTANCE = 2 } FareType;
 
  private:
     
