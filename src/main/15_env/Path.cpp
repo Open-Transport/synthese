@@ -21,7 +21,7 @@ Path::Path ()
     , HandicappedComplyer (0) // No parent complyer right now
     , PedestrianComplyer (0) // No parent complyer right now
     , ReservationRuleComplyer (0) // No parent complyer right now
-      , _calendar (2006, 2006, 0, "") // MJ : todo review 
+      , _calendar (2006, 2006, "") // MJ : todo review 
 {
     
 }

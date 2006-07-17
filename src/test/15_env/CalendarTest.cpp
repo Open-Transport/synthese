@@ -33,7 +33,7 @@ void
 CalendarTest::testCalendarConstruction0 ()
 {
     int year = 2006;
-    Calendar calendar (0, year, year, "calendar0");
+    Calendar calendar (year, year, "calendar0");
     
     // Check no day is selected for the year 2006
     for (int m=1; m<=12; ++m)

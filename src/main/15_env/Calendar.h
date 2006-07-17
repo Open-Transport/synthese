@@ -2,9 +2,6 @@
 #define SYNTHESE_ENV_CALENDAR_H
 
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-
 
 #include "04_time/Year.h"
 #include "04_time/Date.h"
@@ -25,7 +22,7 @@ namespace env
  32 bits stored in an int. 
  The lowest bit is day one; the highest bit is day 32 (unused).
  */
-class Calendar : public synthese::util::Registrable<uid,Calendar>
+class Calendar 
 {
 public:
 
@@ -60,8 +57,7 @@ private:
 	
 public:
 
-    Calendar( const uid& id,
-	      int firstYear, 
+    Calendar( int firstYear, 
 	      int lastYear, 
 	      const std::string& name,
 	      const Category& category = CATEGORY_MAX);

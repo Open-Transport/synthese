@@ -11,13 +11,11 @@ const Calendar::Category Calendar::CATEGORY_MAX (255);
 
 
 
-    Calendar::Calendar( const uid& id,
-			int firstYear, 
+    Calendar::Calendar(	int firstYear, 
 			int lastYear,
 			const std::string& name,
 			const Category& category)
-    : synthese::util::Registrable<uid,Calendar> (id)
-    , _name (name)
+    : _name (name)
     , _firstYear (firstYear)
     , _lastYear (lastYear)
     , _category (category)

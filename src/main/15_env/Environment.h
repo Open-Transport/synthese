@@ -4,7 +4,6 @@
 
 #include "Axis.h"
 #include "Address.h"
-#include "Calendar.h"
 #include "City.h"
 #include "ConnectionPlace.h"
 #include "ContinuousService.h"
@@ -47,7 +46,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     
     Address::Registry _addresses;
     Axis::Registry _axes;
-    Calendar::Registry _calendars;
     City::Registry _cities;
     ConnectionPlace::Registry _connectionPlaces;
     ContinuousService::Registry _continuousServices;
@@ -85,9 +83,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     Axis::Registry& getAxes ();
     const Axis::Registry& getAxes () const;
-
-    Calendar::Registry& getCalendars ();
-    const Calendar::Registry& getCalendars () const;
 
     City::Registry& getCities ();
     const City::Registry& getCities () const;

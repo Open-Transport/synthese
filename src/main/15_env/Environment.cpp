@@ -19,7 +19,6 @@ Environment::~Environment ()
     // Delete all objects registered in this environment.
     _addresses.clear ();
     _axes.clear ();
-    _calendars.clear ();
     _cities.clear ();
     _connectionPlaces.clear ();
     _documents.clear ();
@@ -68,20 +67,6 @@ Environment::getAxes () const
 
 
 
-
-Calendar::Registry&
-Environment::getCalendars ()
-{
-    return _calendars;
-}
-
-
-
-const Calendar::Registry&
-Environment::getCalendars () const
-{
-    return _calendars;
-}
 
 
 
