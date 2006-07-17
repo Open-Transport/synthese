@@ -35,10 +35,8 @@ public:
 private:
 
     const PhysicalStop*  _physicalStop;   //!< Physical stop
-    const Line* _line;      //!< Parent line
 
     const double _metricOffset;      //!< Metric offset of stop on line
-    const bool _scheduleInput; //!< Schedule with or without input
 
     synthese::time::Schedule* _departureBeginSchedule;  //!< 
     synthese::time::Schedule* _departureEndSchedule;  //!< 
@@ -53,18 +51,17 @@ public:
 
 
     LineStop (const uid& id,
-		  const Line* line,
+	      const Line* line,
+	      int rankInPath,
 	      double metricOffset,
 	      const EdgeType& type,
-	      const PhysicalStop* physicalStop,
-	      bool scheduleInput);
+	      const PhysicalStop* physicalStop);
 
     ~LineStop();
 
 
     //! @name Getters/Setters
     //@{
-    const Path* getParentPath () const;
     const Vertex* getFromVertex () const;
 
 
@@ -82,7 +79,6 @@ public:
 	getArrivalEndSchedule (int serviceNumber) const;
 
     
-    bool getScheduleInput () const;
     double getMetricOffset () const;
     
 
@@ -91,9 +87,9 @@ public:
 
     //! @name Query methods
     //@{
+
     bool isRunning( const synthese::time::DateTime& startMoment, 
 		    const synthese::time::DateTime& endMoment ) const;
-
 
     void calculateArrival (const LineStop& departureLineStop, 
 			    int serviceNumber,

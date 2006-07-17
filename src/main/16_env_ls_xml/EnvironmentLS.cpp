@@ -85,7 +85,7 @@ EnvironmentLS::Load (XMLNode& node)
 		for (int j=0; j<nbLineStops; ++j) 
 		{
 			XMLNode lineStopNode = lineNode.getChildNode (LineStopLS::LINESTOP_TAG.c_str(), j);
-			synthese::env::LineStop* lineStop = LineStopLS::Load (lineStopNode, line, *env);
+			synthese::env::LineStop* lineStop = LineStopLS::Load (lineStopNode, line, j, *env);
 			if (env->getLineStops().contains (lineStop->getId ()) == false) 
 			{
 			    env->getLineStops().add (lineStop);

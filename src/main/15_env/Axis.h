@@ -22,20 +22,20 @@ class Axis : public synthese::util::Registrable<uid,Axis>
 
     std::string _name;   
     bool _free;   //!< Whether or not this axis is a free axis.
-    bool _authorized;  //!< Whether or not this axis is an authorized axis.
+    bool _allowed;  //!< Whether or not this axis is an allowed axis.
 
     public:
 
     Axis (const uid& id,
 	  const std::string& name,
-	  bool free = true, bool authorized = false);
+	  bool free = true, bool allowed = false);
     ~Axis ();
 
     //! @name Getters/Setters
     //@{
     const std::string& getName () const;
     bool isFree () const;
-    bool isAuthorized () const;
+    bool isAllowed () const;
     //@}
 
 

@@ -1,5 +1,9 @@
 #include "ScheduledService.h"
 
+#include "Path.h"
+#include "ReservationRule.h"
+
+
 
 namespace synthese
 {
@@ -14,6 +18,7 @@ ScheduledService::ScheduledService (const uid& id,
 				    Calendar* calendar,
 				    const synthese::time::Schedule& departureSchedule)
     : synthese::util::Registrable<uid,ScheduledService> (id)
+    , ReservationRuleComplyer (path) 
     , Service (serviceNumber, path, calendar, departureSchedule)
 {
 
@@ -35,6 +40,17 @@ ScheduledService::isContinuous () const
 }
 
 
+
+bool 
+ScheduledService::isReservationPossible ( const synthese::time::DateTime& departureMoment, 
+					  const synthese::time::DateTime& calculationMoment ) const
+{
+    if (getReservationRule () == 0) return true;
+
+    return getReservationRule ()->isRunPossible 
+	(this, calculationMoment, departureMoment );
+    
+}
 
 
 

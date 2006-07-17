@@ -27,19 +27,17 @@ Sample XML format :
 <line id="5"
       name="L5"
       axisId="A2"
-      firstYear="2006"
-      lastYear="2007"
       color="red">
 
    <lineStop id="1" metricOffset="0"
-             type="departure" physicalStopId="1" scheduleInput="true">
+             type="departure" physicalStopId="1">
      <point x="120.5" y="4444.2"/>
      <point x="130.5" y="4434.4"/>
      <point x="140.2" y="4414.2"/>
    </lineStop>
 
    <lineStop id="2" metricOffset="100"
-             type="passage" physicalStopId="2" scheduleInput="true"/>
+             type="passage" physicalStopId="2"/>
 
 </line>
 
@@ -54,8 +52,6 @@ class LineLS
     static const std::string LINE_ID_ATTR;
     static const std::string LINE_NAME_ATTR;
     static const std::string LINE_AXISID_ATTR;
-    static const std::string LINE_FIRSTYEAR_ATTR;
-    static const std::string LINE_LASTYEAR_ATTR;
     static const std::string LINE_COLOR_ATTR;
 
  private:

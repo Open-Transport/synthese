@@ -1,7 +1,9 @@
 #ifndef SYNTHESE_ENV_SERVICE_H
 #define SYNTHESE_ENV_SERVICE_H
 
-#include "Regulated.h"
+#include "BikeComplyer.h"
+#include "HandicappedComplyer.h"
+#include "PedestrianComplyer.h"
 
 #include <string>
 
@@ -47,7 +49,9 @@ but also self-provided by the traveller himself
  @ingroup m15
 */
 class Service : 
-     public Regulated
+    public BikeComplyer,
+    public HandicappedComplyer,
+    public PedestrianComplyer
 {
 private:
     
@@ -93,14 +97,10 @@ public:
 	@param departureMoment Desired departure moment
 	@param calculationMoment Calculation moment taken as reference 
 	for reservation delay calculation
-	@return true if service can be reserved, false otherwise.
-	
-	A service can be reserved if :
-	- the path does not have any reservation rule
-	- the reservation rule accepts condition
+	@return false in default implementation.
     */
-    bool isReservationPossible ( const synthese::time::DateTime& departureMoment, 
-				 const synthese::time::DateTime& calculationMoment ) const;
+    virtual bool isReservationPossible ( const synthese::time::DateTime& departureMoment, 
+					 const synthese::time::DateTime& calculationMoment ) const;
 
 
     /** Is this service providen a given day ?

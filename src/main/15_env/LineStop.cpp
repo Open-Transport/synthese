@@ -16,16 +16,14 @@ namespace env
 
 LineStop::LineStop (const uid& id,
 		    const Line* line,
+		    int rankInPath,
 		    double metricOffset,
 		    const EdgeType& type,
-		    const PhysicalStop* physicalStop,
-		    bool scheduleInput)
+		    const PhysicalStop* physicalStop)
     : synthese::util::Registrable<uid,LineStop> (id)
-    , Edge (type)
-    , _line (line)
+    , Edge (type, line, rankInPath)
     , _metricOffset (metricOffset)
     , _physicalStop (physicalStop)
-    , _scheduleInput (scheduleInput)
 {
 
 }
@@ -78,19 +76,6 @@ LineStop::getArrivalEndSchedule (int serviceNumber) const
 
 
 
-bool 
-LineStop::getScheduleInput () const
-{
-    return _scheduleInput;
-}
-
-
-
-const Path* 
-LineStop::getParentPath () const
-{
-    return _line;
-}
 
 
 
@@ -115,17 +100,17 @@ LineStop::getMetricOffset () const
 
     
 
-
 bool 
 LineStop::isRunning( const synthese::time::DateTime& startMoment, 
 		     const synthese::time::DateTime& endMoment ) const
 {
     synthese::time::Date startDate;
     for ( startDate = startMoment; startDate <= endMoment; startDate++ )
-        if ( _line->isInService ( startDate ) )
+        if ( getParentPath ()->isInService ( startDate ) )
             return true;
     return false;
 }
+
 
 
 
@@ -136,7 +121,7 @@ LineStop::calculateArrival (const LineStop& departureLineStop,
 			    const synthese::time::DateTime& departureMoment, 
 			    synthese::time::DateTime& arrivalMoment ) const
 {
-    if ( _line->getService (serviceNumber)->isContinuous () )
+    if ( getParentPath ()->getService (serviceNumber)->isContinuous () )
     {
         arrivalMoment = departureMoment;
         arrivalMoment += ( _arrivalBeginSchedule[serviceNumber ] - departureLineStop._departureBeginSchedule[ serviceNumber ] );
@@ -157,7 +142,7 @@ LineStop::calculateDeparture (const LineStop& arrivalLineStop,
 			      const synthese::time::DateTime& arrivalMoment, 
 			      synthese::time::DateTime& departureMoment ) const
 {
-    if ( _line->getService( serviceNumber )->isContinuous() )
+    if ( getParentPath ()->getService( serviceNumber )->isContinuous() )
     {
         departureMoment = arrivalMoment;
         departureMoment -= ( arrivalLineStop._arrivalBeginSchedule[ serviceNumber ] - _departureBeginSchedule[ serviceNumber ] );
@@ -177,7 +162,7 @@ LineStop::getBestRunTime (const LineStop& other ) const
     int curT;
     int bestT;
 
-    for ( int s = 0; s != _line->getServices().size(); s++ )
+    for ( int s = 0; s != getParentPath ()->getServices().size(); s++ )
     {
         curT = other._arrivalBeginSchedule[ s ] - _departureBeginSchedule[ s ];
         if ( curT < 1 )
@@ -196,18 +181,18 @@ LineStop::checkSchedule (const LineStop* lineStopWithPreviousSchedule ) const
     // Vertical chronology check
     if ( lineStopWithPreviousSchedule != NULL )
     {
-        for ( int s = 0; s < _line->getServices().size(); s++ )
+        for ( int s = 0; s < getParentPath ()->getServices().size(); s++ )
             if ( _departureBeginSchedule[ s ] < lineStopWithPreviousSchedule->_departureBeginSchedule[ s ] )
                 return false;
     }
 
     // Horizontal chronology check
-    for ( int s = 1; s < _line->getServices().size(); s++ )
+    for ( int s = 1; s < getParentPath ()->getServices().size(); s++ )
         if ( _departureBeginSchedule[ s ] < _departureBeginSchedule[ s - 1 ] )
             return false;
 
     // Check if hours exist
-    for ( size_t s = 1; s < _line->getServices().size(); s++ )
+    for ( size_t s = 1; s < getParentPath ()->getServices().size(); s++ )
         if ( !_arrivalBeginSchedule[ s ].isValid () || !_departureBeginSchedule[ s ].isValid () )
             return false;
 
@@ -257,7 +242,7 @@ LineStop::getNextService (synthese::time::DateTime& departureMoment,
     // Search schedule
     next = _departureIndex[ departureMoment.getHours () ];
     if ( next == UNKNOWN_VALUE )
-        next = _line->getServices().size();
+        next = getParentPath ()->getServices().size();
 
     if ( minNextServiceNumber > next )
         next = minNextServiceNumber;
@@ -265,12 +250,12 @@ LineStop::getNextService (synthese::time::DateTime& departureMoment,
     while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
     {
         // Look in schedule for when the line is in service
-        if ( _line->isInService( departureMoment.getDate() ) )
+        if ( getParentPath ()->isInService( departureMoment.getDate() ) )
         {
-            while ( next < _line->getServices().size() )  // boucle sur les services
+            while ( next < getParentPath ()->getServices().size() )  // boucle sur les services
             {
                 // Case != continuous service
-                if ( _line->getService( next )->isContinuous() && _departureBeginSchedule[ next ].getDaysSinceDeparture () != _departureEndSchedule[ next ].getDaysSinceDeparture () )
+                if ( getParentPath ()->getService( next )->isContinuous() && _departureBeginSchedule[ next ].getDaysSinceDeparture () != _departureEndSchedule[ next ].getDaysSinceDeparture () )
                 {
                     // if service after departure moment then modification
                     if ( departureMoment > _departureEndSchedule[ next ] && departureMoment < _departureBeginSchedule[ next ] )
@@ -280,16 +265,16 @@ LineStop::getNextService (synthese::time::DateTime& departureMoment,
                         return UNKNOWN_VALUE;
 
                     // Check for reservation possibility
-                    if ( _line->getService( next )->isReservationPossible( departureMoment, calculationMoment ) )
+                    if ( getParentPath ()->getService( next )->isReservationPossible( departureMoment, calculationMoment ) )
                     {
                         if ( departureMoment < _departureEndSchedule[ next ] )
                         {
-                            if (_line->getService (next)->isProvided ( departureMoment.getDate(),
+                            if (getParentPath ()->getService (next)->isProvided ( departureMoment.getDate(),
 								       _departureEndSchedule[ next ].getDaysSinceDeparture () ) )
                                 return next;
                         }
                         else
-                            if ( _line->getService( next )->isProvided( departureMoment.getDate(), 
+                            if ( getParentPath ()->getService( next )->isProvided( departureMoment.getDate(), 
 								      _departureBeginSchedule[ next ].getDaysSinceDeparture () ) )
                                 return next;
                     }
@@ -305,9 +290,9 @@ LineStop::getNextService (synthese::time::DateTime& departureMoment,
                         if ( departureMoment > maxDepartureMoment )
                             return UNKNOWN_VALUE;
 
-                        if ( _line->getService( next )->isProvided( departureMoment.getDate(), _departureBeginSchedule[ next ].getDaysSinceDeparture () ) )
+                        if ( getParentPath ()->getService( next )->isProvided( departureMoment.getDate(), _departureBeginSchedule[ next ].getDaysSinceDeparture () ) )
                         {
-                            if ( _line->getService( next )->isReservationPossible( departureMoment, calculationMoment ) )
+                            if ( getParentPath ()->getService( next )->isReservationPossible( departureMoment, calculationMoment ) )
                             {
                                 return next;
                             }
@@ -348,7 +333,7 @@ LineStop::getNextService ( synthese::time::DateTime& departureMoment,
 			       calculationMoment, 
 			       minNextServiceNumber );
 
-    if ( next != UNKNOWN_VALUE && _line->getService ( next )->isContinuous () )
+    if ( next != UNKNOWN_VALUE && getParentPath ()->getService ( next )->isContinuous () )
     {
         if ( departureMoment > _departureEndSchedule[ next ] )
             continuousServiceAmplitude = 1440 - ( departureMoment.getHour() - _departureEndSchedule[ next ].getHour() );
@@ -376,11 +361,11 @@ LineStop::getPreviousService ( synthese::time::DateTime& arrivalMoment,
 
     while ( arrivalMoment >= minArrivalMoment )  // Loop over dates
     {
-        if ( _line->isInService( arrivalMoment.getDate() ) )
+        if ( getParentPath ()->isInService( arrivalMoment.getDate() ) )
             while ( previous >= 0 )  // Loop over services
             {
                 // Case != continuous service
-                if ( _line->getService( previous )->isContinuous() && _arrivalBeginSchedule[ previous ].getDaysSinceDeparture () != _arrivalEndSchedule[ previous ].getDaysSinceDeparture () )
+                if ( getParentPath ()->getService( previous )->isContinuous() && _arrivalBeginSchedule[ previous ].getDaysSinceDeparture () != _arrivalEndSchedule[ previous ].getDaysSinceDeparture () )
                 {
                     // if service after departure moment then modification
                     if ( arrivalMoment > _arrivalEndSchedule[ previous ] && arrivalMoment < _arrivalBeginSchedule[ previous ] )
@@ -391,11 +376,11 @@ LineStop::getPreviousService ( synthese::time::DateTime& arrivalMoment,
 
                     if ( arrivalMoment > _departureBeginSchedule[ previous ] )
                     {
-                        if ( _line->getService( previous )->isProvided( arrivalMoment.getDate(), _arrivalBeginSchedule[ previous ].getDaysSinceDeparture () ) )
+                        if ( getParentPath ()->getService( previous )->isProvided( arrivalMoment.getDate(), _arrivalBeginSchedule[ previous ].getDaysSinceDeparture () ) )
                             return previous;
                     }
                     else
-                        if ( _line->getService( previous )->isProvided( arrivalMoment.getDate(), _arrivalEndSchedule[ previous ].getDaysSinceDeparture () ) )
+                        if ( getParentPath ()->getService( previous )->isProvided( arrivalMoment.getDate(), _arrivalEndSchedule[ previous ].getDaysSinceDeparture () ) )
                             return previous;
                 }
                 else
@@ -408,7 +393,7 @@ LineStop::getPreviousService ( synthese::time::DateTime& arrivalMoment,
                         if ( arrivalMoment < minArrivalMoment )
                             return UNKNOWN_VALUE;
 
-                        if ( _line->getService( previous )->isProvided( arrivalMoment.getDate(), _arrivalEndSchedule[ previous ].getDaysSinceDeparture () ) )
+                        if ( getParentPath ()->getService( previous )->isProvided( arrivalMoment.getDate(), _arrivalEndSchedule[ previous ].getDaysSinceDeparture () ) )
                             return previous;
                     }
                 }
@@ -438,7 +423,7 @@ LineStop::getPreviousService ( synthese::time::DateTime& arrivalMoment,
     int previous = getPreviousService ( arrivalMoment, minArrivalMoment );
 
     if ( previous != UNKNOWN_VALUE && 
-	 _line->getService( previous )->isContinuous() )
+	 getParentPath ()->getService( previous )->isContinuous() )
     {
         if ( arrivalMoment > _arrivalEndSchedule[ previous ] )
             continuousServiceAmplitude = 1440 - ( arrivalMoment.getHour() - _arrivalEndSchedule[ previous ].getHour () );
@@ -463,9 +448,9 @@ LineStop::setSchedules ( const std::string& buffer,
 			 int columnWidth,
 			 bool departurePassageDifferent )
 {
-    for ( int s = 0; s < _line->getServices().size(); s++ )
+    for ( int s = 0; s < getParentPath ()->getServices().size(); s++ )
     {
-	const Service* service = _line->getService (s);
+	const Service* service = getParentPath ()->getService (s);
 
 	int duration = 0;
 	int periodicity = 0;
@@ -491,7 +476,8 @@ LineStop::setSchedules ( const std::string& buffer,
             _arrivalEndSchedule[ s ] += periodicity;
         }
 
-        if (_line->getLineStops().front() == this)
+        // if (getParentPath ()->getLineStops().front() == this)
+        if (getRankInPath () == 0)
 	{
 	    // MJ constness pb
             ((Service*) service)->setDepartureSchedule ( _departureBeginSchedule[ s ] );
@@ -513,10 +499,10 @@ void
 LineStop::allocateSchedules ()
 {
     // Passer en vecteur
-    _arrivalEndSchedule = new synthese::time::Schedule[ _line->getServices().size() ];
-    _arrivalBeginSchedule = new synthese::time::Schedule[ _line->getServices().size() ];
-    _departureEndSchedule = new synthese::time::Schedule[ _line->getServices().size() ];
-    _departureBeginSchedule = new synthese::time::Schedule[ _line->getServices().size() ];
+    _arrivalEndSchedule = new synthese::time::Schedule[ getParentPath ()->getServices().size() ];
+    _arrivalBeginSchedule = new synthese::time::Schedule[ getParentPath ()->getServices().size() ];
+    _departureEndSchedule = new synthese::time::Schedule[ getParentPath ()->getServices().size() ];
+    _departureBeginSchedule = new synthese::time::Schedule[ getParentPath ()->getServices().size() ];
 }
 
 

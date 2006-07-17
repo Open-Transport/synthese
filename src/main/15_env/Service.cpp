@@ -2,7 +2,6 @@
 
 #include "Calendar.h"
 #include "Path.h"
-#include "ReservationRule.h"
 
 
 
@@ -17,7 +16,9 @@ Service::Service (const std::string& serviceNumber,
 		  const Path* path,
 		  Calendar* calendar,
 		  const synthese::time::Schedule& departureSchedule)
-    : Regulated (path)
+    : BikeComplyer (path) 
+    , HandicappedComplyer (path) 
+    , PedestrianComplyer (path) 
     , _serviceNumber (serviceNumber)
     , _path (path)
     , _calendar (calendar)
@@ -77,12 +78,9 @@ bool
 Service::isReservationPossible ( const synthese::time::DateTime& departureMoment, 
 				 const synthese::time::DateTime& calculationMoment ) const
 {
-    if (getReservationRule () == 0) return true;
-
-    return getReservationRule ()->isRunPossible 
-	(this, calculationMoment, departureMoment );
-    
+    return false;
 }
+
 
 
 

@@ -11,9 +11,10 @@ namespace env
 
 
 RoadChunk::RoadChunk (const uid& id,
-		      const Address* fromAddress)
+		      const Address* fromAddress,
+		      int rankInRoad)
     : synthese::util::Registrable<uid,RoadChunk> (id)
-    , Edge (EDGE_TYPE_PASSAGE)
+    , Edge (EDGE_TYPE_PASSAGE, fromAddress->getRoad (), rankInRoad)
     , _fromAddress (fromAddress)
 {
 }
@@ -24,14 +25,6 @@ RoadChunk::~RoadChunk ()
 }
 
     
-
-
-
-const Path* 
-RoadChunk::getParentPath () const
-{
-    return _fromAddress->getRoad ();
-}
 
 
 

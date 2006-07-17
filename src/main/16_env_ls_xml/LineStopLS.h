@@ -26,7 +26,7 @@ namespace envlsxml
 Sample XML format :
 
 <lineStop id="1" metricOffset="352.2"
-	  type="D" physicalStopId="3" scheduleInput="true">
+	  type="D" physicalStopId="3">
   <point x="120.5" y="4444.2"/>
   <point x="130.5" y="4434.4"/>
   <point x="140.2" y="4414.2"/>
@@ -48,7 +48,6 @@ class LineStopLS
     static const std::string LINESTOP_TYPE_ATTR_PASSAGE;
 
     static const std::string LINESTOP_PHYSICALSTOPID_ATTR;
-    static const std::string LINESTOP_SCHEDULEINPUT_ATTR;
 
  private:
 
@@ -68,7 +67,7 @@ class LineStopLS
      */
     static synthese::env::LineStop* Load (
 	XMLNode& node,
-	const synthese::env::Line* line,
+	const synthese::env::Line* line, int RankInLine,
 	const synthese::env::Environment& environment);
 
     /** @todo Not implemented.

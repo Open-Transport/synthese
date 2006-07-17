@@ -7,11 +7,11 @@ namespace env
 
 Axis::Axis (const uid& id,
 	    const std::string& name,
-	    bool free, bool authorized)
+	    bool free, bool allowed)
     : synthese::util::Registrable<uid,Axis> (id)
       , _name (name)
       , _free (free)
-      , _authorized (authorized)
+      , _allowed (allowed)
 {
 
 }
@@ -39,9 +39,9 @@ Axis::isFree () const
 
 
 bool 
-Axis::isAuthorized () const
+Axis::isAllowed () const
 {
-    return _authorized;
+    return _allowed;
 }
 
 

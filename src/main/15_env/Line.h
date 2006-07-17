@@ -9,7 +9,6 @@
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
-#include "Calendar.h"
 #include "Path.h"
 
 
@@ -19,9 +18,7 @@ namespace synthese
 namespace env
 {
 
-    class Alarm;
     class Axis;
-    class Fare;
     class LineStop;
     class Point;
     class RollingStock;
@@ -43,9 +40,6 @@ private:
     std::vector<LineStop*> _lineStops; 
     RollingStock* _rollingStock;
     
-    Fare* _fare;
-    Alarm* _alarm;
-    
     std::string _name;  //!< Name (id)
     std::string _shortName;  //!< Name (cartouche)
     std::string _longName; //!< Name for schedule card
@@ -59,19 +53,16 @@ private:
 
     bool _isWalkingLine;
     
-    bool _departureBoardDisplay; 
-    bool _timetableDisplay; 
-    Calendar _calendar; 
+    bool _useInDepartureBoards; 
+    bool _useInTimetables; 
+    bool _useInRoutePlanning; 
 
-	
 
 public:
 
     Line (const uid& id,
 	  const std::string& name, 
-	  const Axis* axis,
-	  int firstYear, 
-	  int lastYear);
+	  const Axis* axis);
 
     virtual ~Line();
 
@@ -84,15 +75,16 @@ public:
     int getEdgesCount () const;
     const Edge* getEdge (int index) const;
 
-    bool getDepartureBoardDisplay () const;
-    void setDepartureBoardDisplay (bool departureBoardDisplay);
+    bool getUseInDepartureBoards () const;
+    void setUseInDepartureBoards (bool useInDepartureBoards);
 
-    bool getTimetableDisplay () const;
-    void setTimetableDisplay (bool timetableDisplay);
+    bool getUseInTimetables () const;
+    void setUseInTimetables (bool useInTimetables);
+
+    bool getUseInRoutePlanning () const;
+    void setUseInRoutePlanning (bool useInRoutePlanning);
 
     const Axis* getAxis () const;
-
-    const Alarm* getAlarm() const;
 
     const synthese::util::RGBColor& getColor () const;
     void setColor (const synthese::util::RGBColor& color);
@@ -118,9 +110,6 @@ public:
     const std::string& getStyle () const;
     void setStyle (const std::string& style);
     
-    const Fare* getFare () const;
-    void setFare (Fare* fare);
-
     const RollingStock* getRollingStock () const;
     void setRollingStock (RollingStock* rollingStock);
 
@@ -139,18 +128,6 @@ public:
     void postInit ();
 
     void addLineStop (LineStop* lineStop);
-
-    /** Updates line calendar.
-
-    The generated calendar indicates whether or not a day contains at least one service.
-    It takes into account services running after midnight : if at least one minute
-    of a day is concerned by a service, then the whole day is selected.
-
-    Thus, if a calculation request is done on a deselected calendar day, the line 
-    can safely be filtered.
-    */
-    void updateCalendar ();
-    //@}
 
     
     //! @name Query methods

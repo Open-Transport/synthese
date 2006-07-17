@@ -1,7 +1,6 @@
 #include "Line.h"
 
 #include "Service.h"
-#include "Calendar.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
 #include "ConnectionPlace.h"
@@ -18,24 +17,23 @@ namespace env
 
 Line::Line (const uid& id,
 	    const std::string& name, 
-	    const Axis* axis,
-	    int firstYear, 
-	    int lastYear)
+	    const Axis* axis)
     : synthese::util::Registrable<uid,Line> (id)
     , Path ()
     , _name (name)
     , _axis (axis)
-    , _calendar (firstYear, lastYear, 0, "")
     , _network (0)
     , _rollingStock (0)
     , _isWalkingLine (false)
-    , _fare (0)
-    , _departureBoardDisplay (true)
-    , _timetableDisplay (true)
+    , _useInDepartureBoards (true)
+    , _useInTimetables (true)
+    , _useInRoutePlanning (true)
     , _color (0, 0, 0)
 {
 
 }
+
+
 
 
 
@@ -56,35 +54,54 @@ Line::getName () const
 
 
 bool 
-Line::getDepartureBoardDisplay () const
+Line::getUseInDepartureBoards () const
 {
-    return _departureBoardDisplay;
+    return _useInDepartureBoards;
 }
 
 
 
 void 
-Line::setDepartureBoardDisplay (bool departureBoardDisplay)
+Line::setUseInDepartureBoards (bool useInDepartureBoards)
 {
-    _departureBoardDisplay = departureBoardDisplay;
+    _useInDepartureBoards = useInDepartureBoards;
 }
 
 
 
 
 bool 
-Line::getTimetableDisplay () const
+Line::getUseInTimetables () const
 {
-    return _timetableDisplay;
+    return _useInTimetables;
 }
 
 
 
 void 
-Line::setTimetableDisplay (bool timetableDisplay)
+Line::setUseInTimetables (bool useInTimetables)
 {
-    _timetableDisplay = timetableDisplay;
+    _useInTimetables = useInTimetables;
 }
+
+
+
+
+bool 
+Line::getUseInRoutePlanning () const
+{
+    return _useInRoutePlanning;
+}
+
+
+
+
+void 
+Line::setUseInRoutePlanning (bool useInRoutePlanning)
+{
+    _useInRoutePlanning = useInRoutePlanning;
+}
+
 
 
 
@@ -96,13 +113,6 @@ Line::getAxis () const
 }
 
 
-
-
-const Alarm* 
-Line::getAlarm() const
-{
-    return _alarm;
-}
 
 
 
@@ -227,21 +237,6 @@ Line::setStyle (const std::string& style)
 
 
 	
-const Fare* 
-Line::getFare () const
-{
-    return _fare;
-}
-
-
-
-void 
-Line::setFare (Fare* fare)
-{
-    _fare = fare;
-}
-
-
 
 
 const RollingStock* 
@@ -385,29 +380,6 @@ Line::addLineStop (LineStop* lineStop)
 
 
 
-void 
-Line::updateCalendar ()
-{
-    /* Is it still useful for anything ????
-
-    _calendar.reset ();
-    LineStop* lastLineStop = _lineStops.back();
-    for (int s=0; s<_services.size (); ++s)
-    {
-        if ( lastLineStop->getLastArrivalSchedule (s).getDaysSinceDeparture() != 
-	     _lineStops.front()->getFirstDepartureSchedule(s).getDaysSinceDeparture() )
-        {
-            _calendar.reset (true);
-            break;
-        }
-	// MJ constness problem !
-        ((Service*) getService (s))->getCalendar ()->setInclusionToMask (_calendar);
-    }
-    */
-
-}
-
-
 
 
 void
@@ -426,13 +398,6 @@ Line::getWalkingLine () const
 
 
 
-
-bool 
-Line::isInService (const synthese::time::Date& date) const
-{
-    return _calendar.isMarked ( date );
-
-}
 
 
 

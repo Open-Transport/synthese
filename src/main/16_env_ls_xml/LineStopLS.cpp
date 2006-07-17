@@ -32,12 +32,11 @@ const std::string LineStopLS::LINESTOP_TYPE_ATTR_ARRIVAL ("arrival");
 const std::string LineStopLS::LINESTOP_TYPE_ATTR_PASSAGE ("passage");
 
 const std::string LineStopLS::LINESTOP_PHYSICALSTOPID_ATTR ("physicalStopId");
-const std::string LineStopLS::LINESTOP_SCHEDULEINPUT_ATTR ("scheduleInput");
 
 
 synthese::env::LineStop* 
 LineStopLS::Load (XMLNode& node,
-		  const synthese::env::Line* line,
+		  const synthese::env::Line* line, int rankInLine,
 		  const synthese::env::Environment& environment)
 {
     // assert (LINESTOP_TAG == node.getName ());
@@ -73,16 +72,13 @@ LineStopLS::Load (XMLNode& node,
     int physicalStopId (su::Conversion::ToInt (
 	node.getAttribute (LINESTOP_PHYSICALSTOPID_ATTR.c_str())));
 
-    bool scheduleInput (su::Conversion::ToInt (
-	node.getAttribute (LINESTOP_SCHEDULEINPUT_ATTR.c_str())));
-
     synthese::env::LineStop* lineStop = new synthese::env::LineStop (
 	id,
 	line, 
+	rankInLine, 
 	metricOffset, 
 	type,
-	environment.getPhysicalStops (). get (physicalStopId),
-	scheduleInput);
+	environment.getPhysicalStops (). get (physicalStopId));
 
 
     // Add via points

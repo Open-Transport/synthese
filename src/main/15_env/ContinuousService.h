@@ -26,7 +26,7 @@ class ContinuousService :
 {
 private:
 
-    int _range; //!< Continuous service range.
+    int _range; //!< Continuous service range (minutes).
     int _maxWaitingTime; //!< Max waiting waiting time before next service.
     
 

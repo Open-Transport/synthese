@@ -40,14 +40,14 @@ private:
 public:
 
   RoadChunk (const uid& id,
-	     const Address* fromAddress);
+	     const Address* fromAddress,
+	     int rankInRoad);
   
   virtual ~RoadChunk ();
 
 
   //! @name Getters/Setters
   //@{
-  const Path* getParentPath () const;
   const Vertex* getFromVertex () const;
   double getMetricOffset () const;
   //@}

@@ -6,6 +6,8 @@
 #include <vector>
 #include "Point.h"
 
+#include "04_time/DateTime.h"
+
 
 namespace synthese
 {
@@ -57,6 +59,10 @@ private:
 
     EdgeType _type;      //!< Departure, arrival or passage    
 
+    // TODO : remonter path
+    const Path* _parentPath;      //!< Parent path
+    int _rankInPath;  //!< Rank in path.
+
     const Edge* _nextInPath; //!< Next edge in path.
 
     const Edge* _previousDeparture;  //!< Previous departure edge along path.
@@ -68,7 +74,9 @@ private:
 
 protected:
 
-    Edge (const EdgeType& type);
+    Edge (const EdgeType& type,
+	  const Path* parentPath,
+	  int rankInPath);
 
 public:
 
@@ -78,7 +86,7 @@ public:
     //! @name Getters/Setters
     //@{
 
-    virtual const Path* getParentPath () const = 0;
+    const Path* getParentPath () const;
 
     /** Returns this edge origin vertex.
      */
@@ -116,6 +124,8 @@ public:
 
     //! @name Query methods
     //@{
+    int getRankInPath () const;
+
     bool isArrival () const;
     bool isDeparture () const;
     

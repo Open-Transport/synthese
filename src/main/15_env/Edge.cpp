@@ -10,8 +10,12 @@ namespace env
 
 
 
-Edge::Edge (const EdgeType& type) 
-    : _type (type)
+Edge::Edge (const EdgeType& type,
+	    const Path* parentPath,
+	    int rankInPath) 
+: _type (type)
+, _parentPath (parentPath)
+, _rankInPath (rankInPath)
 {
     
 }
@@ -162,6 +166,25 @@ Edge::addViaPoint (const Point& viaPoint)
 {
     _viaPoints.push_back (new Point (viaPoint));
 }
+
+
+
+int 
+Edge::getRankInPath () const
+{
+    return _rankInPath;
+}
+
+
+const Path* 
+Edge::getParentPath () const
+{
+    return _parentPath;
+}
+
+
+
+
 
 
 

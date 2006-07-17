@@ -24,8 +24,6 @@ const std::string LineLS::LINE_TAG ("line");
 const std::string LineLS::LINE_ID_ATTR ("id");
 const std::string LineLS::LINE_NAME_ATTR ("name");
 const std::string LineLS::LINE_AXISID_ATTR ("axisId");
-const std::string LineLS::LINE_FIRSTYEAR_ATTR ("firstYear");
-const std::string LineLS::LINE_LASTYEAR_ATTR ("lastYear");
 const std::string LineLS::LINE_COLOR_ATTR ("color");
 
 
@@ -42,18 +40,10 @@ LineLS::Load (XMLNode& node,
     uid axisId (su::Conversion::ToLongLong (
 		    node.getAttribute (LINE_AXISID_ATTR.c_str())));
     
-    int firstYear (su::Conversion::ToInt (
-		       node.getAttribute (LINE_FIRSTYEAR_ATTR.c_str())));
-    int lastYear (su::Conversion::ToInt (
-		       node.getAttribute (LINE_LASTYEAR_ATTR.c_str())));
-
     synthese::env::Line* line = 
 	new synthese::env::Line (id,	
 				 name,
-				 environment.getAxes ().get (axisId),
-				 firstYear,
-				 lastYear);
-    
+				 environment.getAxes ().get (axisId));    
 
     // Optional attributes
     if (node.getAttribute (LINE_COLOR_ATTR.c_str()) != 0)

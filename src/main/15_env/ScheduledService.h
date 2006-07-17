@@ -5,6 +5,7 @@
 #include <string>
 
 #include "01_util/Registrable.h"
+#include "ReservationRuleComplyer.h"
 
 
 namespace synthese
@@ -21,6 +22,7 @@ namespace env
 */
 class ScheduledService : 
     public synthese::util::Registrable<uid,ScheduledService>, 
+    public ReservationRuleComplyer,
     public Service
 {
 private:
@@ -44,6 +46,19 @@ public:
     //! @name Query methods
     //@{
     bool isContinuous () const;
+
+    /** Is this service reservable ?
+	@param departureMoment Desired departure moment
+	@param calculationMoment Calculation moment taken as reference 
+	for reservation delay calculation
+	@return true if service can be reserved, false otherwise.
+	
+	A service can be reserved if :
+	- the path does not have any reservation rule
+	- the reservation rule accepts condition
+    */
+    bool isReservationPossible ( const synthese::time::DateTime& departureMoment, 
+				 const synthese::time::DateTime& calculationMoment ) const;
     //@}
 
 };

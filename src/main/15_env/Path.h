@@ -2,7 +2,11 @@
 #define SYNTHESE_ENV_PATH_H
 
 
-#include "Regulated.h"
+#include "BikeComplyer.h"
+#include "HandicappedComplyer.h"
+#include "PedestrianComplyer.h"
+#include "ReservationRuleComplyer.h"
+#include "Calendar.h"
 
 #include <vector>
 
@@ -18,7 +22,9 @@ namespace time
 namespace env
 {
 
+    class Alarm;
     class Edge;
+    class Fare;
     class Service;
 
 /** Path abstract base class.
@@ -39,7 +45,12 @@ which types of entities are able to move along this path. For instance :
 
  @ingroup m15
 */
-class Path : public Regulated
+class Path : 
+    public BikeComplyer,
+    public HandicappedComplyer,
+    public PedestrianComplyer,
+    public ReservationRuleComplyer
+    
 {
 
 private:
@@ -48,6 +59,12 @@ protected:
 
     std::vector<Service*> _services;
 
+    Fare* _fare;
+    Alarm* _alarm;
+
+    // TODO remonter egalement les chaninages    
+
+    Calendar _calendar; //!< Calendar indicating if there is at least one service running on each day.
 
     Path ();
 
@@ -63,15 +80,36 @@ public:
 
     const std::vector<Service*>& getServices () const;
     const Service* getService (int serviceNumber) const;
+
+    const Fare* getFare () const;
+    void setFare (Fare* fare);
+
+    const Alarm* getAlarm() const;
+
     //@}
 
     //! @name Query methods.
     //@{
+    bool isInService (const synthese::time::Date& date) const;
     //@}
     
     //! @name Update methods.
     //@{
     void addService (Service* service);
+
+    /** Updates path calendar.
+
+    The generated calendar indicates whether or not a day contains at least one service.
+    It takes into account services running after midnight : if at least one minute
+    of a day is concerned by a service, then the whole day is selected.
+
+    Thus, if a calculation request is done on a deselected calendar day, the path 
+    can safely be filtered.
+    */
+    void updateCalendar ();
+    //@}
+
+
     //@}
     
     
