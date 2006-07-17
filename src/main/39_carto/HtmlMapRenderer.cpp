@@ -26,6 +26,7 @@ using synthese::env::Point;
 using synthese::env::Environment;
 using synthese::env::Line;
 using synthese::env::LineStop;
+using synthese::env::Edge;
 
 
 
@@ -140,7 +141,7 @@ HtmlMapRenderer::renderLines (Map& map)
 		// Differentiation on line stops
 		const DrawableLine* dbl = *(selectedLines.begin ());
 		const Line* line = _environment.getLines().get (dbl->getLineId ());
-		const std::vector<LineStop*>& lineStops =  line->getLineStops();
+		const std::vector<Edge*>& lineStops =  line->getEdges();
 		const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
 
 		// Shift them again on right and left of half-width to get the enveloppe.
@@ -153,17 +154,17 @@ HtmlMapRenderer::renderLines (Map& map)
 		// TODO : to be reviewed when via points will be added
 		for (int i=0; i<lineStops.size (); ++i) 
 		{
-			const LineStop* ls = lineStops.at(i);
-			std::string href (_urlPattern);
-			boost::replace_all (href, "$id", Conversion::ToString(ls->getId ()));
-			_output << "<area href='" << href << "' shape='poly' coords='";
-
-			_output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";
-			_output << (int) points1[i+1].getX () << "," << (int) (map.getHeight () - points1[i+1].getY ()) << ",";
-			_output << (int) points2[i+1].getX () << "," << (int) (map.getHeight () - points2[i+1].getY ()) << ",";
-			_output << (int) points2[i].getX () << "," << (int) (map.getHeight () - points2[i].getY ());
-			if (i < lineStops.size ()-1) _output << ",";
-			_output << "'/>" << std::endl;
+		    const LineStop* ls = dynamic_cast<const LineStop*> (lineStops.at(i));
+		    std::string href (_urlPattern);
+		    boost::replace_all (href, "$id", Conversion::ToString(ls->getId ()));
+		    _output << "<area href='" << href << "' shape='poly' coords='";
+		    
+		    _output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";
+		    _output << (int) points1[i+1].getX () << "," << (int) (map.getHeight () - points1[i+1].getY ()) << ",";
+		    _output << (int) points2[i+1].getX () << "," << (int) (map.getHeight () - points2[i+1].getY ()) << ",";
+		    _output << (int) points2[i].getX () << "," << (int) (map.getHeight () - points2[i].getY ());
+		    if (i < lineStops.size ()-1) _output << ",";
+		    _output << "'/>" << std::endl;
 		}
 	} 
 

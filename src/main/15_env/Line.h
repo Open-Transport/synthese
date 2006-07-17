@@ -20,7 +20,6 @@ namespace env
 
     class Axis;
     class LineStop;
-    class Point;
     class RollingStock;
     class Service;
     class TransportNetwork;
@@ -37,7 +36,6 @@ private:
     TransportNetwork* _network; 
     const Axis* _axis; 
     
-    std::vector<LineStop*> _lineStops; 
     RollingStock* _rollingStock;
     
     std::string _name;  //!< Name (id)
@@ -72,8 +70,6 @@ public:
     //@{
     const std::string& getName () const;
 
-    int getEdgesCount () const;
-    const Edge* getEdge (int index) const;
 
     bool getUseInDepartureBoards () const;
     void setUseInDepartureBoards (bool useInDepartureBoards);
@@ -113,8 +109,6 @@ public:
     const RollingStock* getRollingStock () const;
     void setRollingStock (RollingStock* rollingStock);
 
-    const std::vector<LineStop*>& getLineStops() const;
-
     bool getWalkingLine () const;
     void setWalkingLine (bool isWalkingLine);
     
@@ -125,29 +119,12 @@ public:
 
     //! @name Update methods
     //@{
-    void postInit ();
-
-    void addLineStop (LineStop* lineStop);
-
     
     //! @name Query methods
     //@{
-    /** Gets all the geographical points linked by the line
-        between two of its line stops. If no from/to line stop
-	index is provided, all the stops are considered.
-	@param fromLineStopIndex 
-	@param toLineStopIndex 
-
-	This includes :
-	- physical stops
-	- via points
-    */
-    std::vector<const Point*> getPoints (int fromLineStopIndex = 0,
-					 int toLineStopIndex = -1) const;
 
     bool isReservable () const;
 
-    bool isInService (const synthese::time::Date& date) const;
     //@}
     
     

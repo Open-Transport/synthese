@@ -3,7 +3,6 @@
 #include "Service.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
-#include "ConnectionPlace.h"
 
 
 namespace synthese
@@ -256,124 +255,11 @@ Line::setRollingStock (RollingStock* rollingStock)
 
 
 
-const std::vector<LineStop*>& 
-Line::getLineStops() const
-{
-    return _lineStops;
-}
-
-
-
-std::vector<const Point*> 
-Line::getPoints (int fromLineStopIndex,
-		     int toLineStopIndex) const
-{
-    if (toLineStopIndex == -1) toLineStopIndex = _lineStops.size () - 1;
-    std::vector<const Point*> points;
-    
-    for (int i=fromLineStopIndex; i<=toLineStopIndex; ++i)
-    {
-	// Adds the line physical stop
-	points.push_back (_lineStops[i]->getFromVertex ());
-	
-	// Adds all the via points of the line stop
-	const std::vector<const Point*>& viaPoints = _lineStops[i]->getViaPoints ();
-	for (std::vector<const Point*>::const_iterator it = viaPoints.begin (); 
-	     it != viaPoints.end (); 
-	     ++it)
-	{
-	    points.push_back (*it);
-	}
-    }
-    return points;
-}
 
 
 
 
 
-
-
-
-void 
-Line::postInit ()
-{
-    for ( std::vector<LineStop*>::const_iterator iter = _lineStops.begin();
-	  iter != _lineStops.end();
-	  ++iter )
-    {
-        LineStop* lineStop = *iter;
-
-        if ( lineStop->getFollowingArrival () == 0 )
-            lineStop->setType ( Edge::EDGE_TYPE_ARRIVAL );
-        if ( lineStop->getPreviousDeparture () == 0 )
-            lineStop->setType ( Edge::EDGE_TYPE_DEPARTURE );
-    }
-}
-
-
-
-void 
-Line::addLineStop (LineStop* lineStop)
-{
-    if (_lineStops.empty () == false)
-    {
-	_lineStops.back ()->setNextInPath (lineStop);
-    }
-
-    _lineStops.push_back( lineStop );
-
-    if ( _lineStops.size() > 1 )
-    {
-        // Chaining departure/arrival
-        for ( std::vector<LineStop*>::reverse_iterator riter = _lineStops.rbegin();
-	      ( riter != _lineStops.rend() )
-		  && (
-		      ( *riter )->getFollowingArrival () == 0
-		      || ( *riter )->getFollowingConnectionArrival() == 0
-		      || lineStop->getPreviousDeparture () == 0
-		      || lineStop->getPreviousConnectionDeparture() == 0
-		      );
-	      ++riter )
-        {
-            LineStop* currentLineStop = *riter;
-         
-	    // Chain only relations between A and A, D and D, A and D 
-	    // if different stops, D and A if different stops
-            if ( currentLineStop->getFromVertex ()->getConnectionPlace() != 
-		 lineStop->getFromVertex ()->getConnectionPlace() || 
-		 currentLineStop->getType () == lineStop->getType () )
-            {
-                // Chain following arrivals
-                if ( currentLineStop->getFollowingArrival () == 0 && 
-		     lineStop->isArrival () )
-		{
-                    currentLineStop->setFollowingArrival ( lineStop );
-		}
-		if ( currentLineStop->getFollowingConnectionArrival () == 0 && 
-		     lineStop->getFromVertex ()->getConnectionPlace()
-		     ->isConnectionAuthorized () )
-		{
-                    currentLineStop->setFollowingConnectionArrival ( lineStop );
-		} 
-                if ( currentLineStop->isDeparture () && 
-		     lineStop->getPreviousDeparture () == 0 )
-		{   
-		    lineStop->setPreviousDeparture ( currentLineStop );
-		}
-
-		if ( currentLineStop->isDeparture () && 
-		     lineStop->getPreviousConnectionDeparture () == 0 && 
-		     currentLineStop->getFromVertex ()
-		     ->getConnectionPlace()->isConnectionAuthorized() )
-		{
-                    lineStop->setPreviousConnectionDeparture ( currentLineStop );
-		}
-            }
-        }
-    }
-    
-}
 
 
 
@@ -399,20 +285,6 @@ Line::getWalkingLine () const
 
 
 
-
-
-int 
-Line::getEdgesCount () const
-{
-    return _lineStops.size ();
-}
-
-
-const Edge* 
-Line::getEdge (int index) const
-{
-    return _lineStops[index];
-}
 
 
 

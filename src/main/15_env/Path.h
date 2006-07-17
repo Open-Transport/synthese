@@ -25,6 +25,7 @@ namespace env
     class Alarm;
     class Edge;
     class Fare;
+    class Point;
     class Service;
 
 /** Path abstract base class.
@@ -57,6 +58,7 @@ private:
 
 protected:
 
+    std::vector<Edge*> _edges; 
     std::vector<Service*> _services;
 
     Fare* _fare;
@@ -75,8 +77,8 @@ public:
 
     //! @name Getters/Setters
     //@{
-    virtual int getEdgesCount () const = 0;
-    virtual const Edge* getEdge (int index) const = 0;
+    int getEdgesCount () const;
+    const Edge* getEdge (int index) const;
 
     const std::vector<Service*>& getServices () const;
     const Service* getService (int serviceNumber) const;
@@ -86,16 +88,37 @@ public:
 
     const Alarm* getAlarm() const;
 
+    const std::vector<Edge*>& getEdges () const;
+
     //@}
 
     //! @name Query methods.
     //@{
+
+    /** Gets all the geographical points linked by the path
+        between two of its edges. If no from/to edge
+	index is provided, all the edges are considered.
+	@param fromEdgeIndex 
+	@param toEdgeIndex 
+
+	This includes :
+	- vertices (address/physical stops)
+	- via points
+    */
+    std::vector<const Point*> getPoints (int fromEdgeIndex = 0,
+					 int toEdgeIndex = -1) const;
+
     bool isInService (const synthese::time::Date& date) const;
+
     //@}
     
     //! @name Update methods.
     //@{
+    void addEdge (Edge* edge);
     void addService (Service* service);
+
+    void postInit ();
+
 
     /** Updates path calendar.
 

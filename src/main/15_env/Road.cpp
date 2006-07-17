@@ -44,19 +44,6 @@ Road::getReservationRule () const
 
 
 
-int 
-Road::getEdgesCount () const
-{
-    return _chunks.size ();
-}
-
-
-const Edge* 
-Road::getEdge (int index) const
-{
-    return _chunks.at (index);
-}
-
 
 
 const Road::RoadType& 
@@ -65,13 +52,6 @@ Road::getType () const
     return _type;
 }
 
-
-
-void 
-Road::addChunk (const RoadChunk* chunk)
-{
-    _chunks.push_back (chunk);
-}
 
 
 

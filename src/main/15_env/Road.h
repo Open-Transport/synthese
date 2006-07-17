@@ -49,7 +49,6 @@ public:
 private:
   
   const RoadType _type;
-  std::vector<const RoadChunk*> _chunks;
 
 public:
 
@@ -66,9 +65,6 @@ public:
   bool hasReservationRule () const;
   const ReservationRule* getReservationRule () const;
 
-  int getEdgesCount () const;
-  const Edge* getEdge (int index) const;
-
   const RoadType& getType () const;
   //@}
     
@@ -79,7 +75,6 @@ public:
 
   //! @name Update methods.
   //@{
-  void addChunk (const RoadChunk* chunk);
 
   //@}
 

@@ -89,13 +89,13 @@ EnvironmentLS::Load (XMLNode& node)
 			if (env->getLineStops().contains (lineStop->getId ()) == false) 
 			{
 			    env->getLineStops().add (lineStop);
-			    line->addLineStop (lineStop);
+			    line->addEdge (lineStop);
 			}
 			else
 			{
 			    synthese::env::LineStop* existingLineStop = env->getLineStops().get (lineStop->getId ());
 			    delete lineStop;
-			    line->addLineStop (existingLineStop);
+			    line->addEdge (existingLineStop);
 			    
 			}
 		}

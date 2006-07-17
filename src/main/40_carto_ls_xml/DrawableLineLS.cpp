@@ -39,12 +39,12 @@ DrawableLineLS::Load (XMLNode& node,
 		(node.getAttribute (DRAWABLELINE_LINEID_ATTR.c_str())));
 
     const synthese::env::Line* line = environment.getLines ().get (lineId);
-    const std::vector<synthese::env::LineStop*>& lineStops = line->getLineStops ();
+    const std::vector<synthese::env::Edge*>& lineStops = line->getEdges ();
     
     assert (lineStops.size () >= 2);
 
     int fromLineStopIndex (0);
-    int toLineStopIndex (lineStops.size () - 1);
+    int toLineStopIndex ((int) lineStops.size () - 1);
 
     if (node.getAttribute (DRAWABLELINE_FROMLINESTOPINDEX_ATTR.c_str()) != 0)
     {
