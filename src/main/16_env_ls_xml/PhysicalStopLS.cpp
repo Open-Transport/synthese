@@ -48,8 +48,9 @@ PhysicalStopLS::Load (XMLNode& node,
     return new synthese::env::PhysicalStop (
 	id,
 	name, 
+	environment.getConnectionPlaces ().get (connectionPlaceId), 
 	rankInConnectionPlace,
-	environment.getConnectionPlaces ().get (connectionPlaceId), x, y);
+	x, y);
 }
 
 

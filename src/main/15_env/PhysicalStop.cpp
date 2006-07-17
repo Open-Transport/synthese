@@ -10,8 +10,8 @@ namespace env
 
 PhysicalStop::PhysicalStop (const uid& id,
 			    const std::string& name,
-			    int rankInConnectionPlace,
 			    const ConnectionPlace* connectionPlace,
+			    int rankInConnectionPlace,
 			    double x, double y)
     : synthese::util::Registrable<uid,PhysicalStop> (id)
     , Vertex (connectionPlace, rankInConnectionPlace, x, y)

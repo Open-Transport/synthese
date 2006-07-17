@@ -131,6 +131,7 @@ namespace synthese
 		- on delete : X
 	     */
 	    static const std::string PHYSICALSTOPS_TABLE_NAME ("t012_physical_stops");
+	    static const std::string PHYSICALSTOPS_TABLE_COL_NAME ("name");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID ("connection_place_id");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_RANKINCONNECTIONPLACE ("rank_in_connection_place");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_X ("x");

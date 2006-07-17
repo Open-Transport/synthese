@@ -30,14 +30,14 @@ class PhysicalStop :
 
 private:
 
-    const std::string _name; //! Physical stop name
+    std::string _name; //! Physical stop name
     
  public:
 
     PhysicalStop (const uid& id,
 		  const std::string& name, 
-		  int rankInConnectionPlace,
 		  const ConnectionPlace* connectionPlace,
+		  int rankInConnectionPlace,
 		  double x = UNKNOWN_VALUE,
 		  double y = UNKNOWN_VALUE);
 
