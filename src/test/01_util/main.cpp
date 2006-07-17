@@ -14,6 +14,7 @@
 #include "RegistrableTest.h"
 #include "ThreadTest.h"
 #include "ConversionTest.h"
+#include "UIdTest.h"
 
 
 
@@ -25,6 +26,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::LogTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::RegistrableTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::ThreadTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::ConversionTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::UIdTest);
 
 
 
