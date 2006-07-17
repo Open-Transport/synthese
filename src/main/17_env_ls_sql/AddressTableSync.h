@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_ENVLSSQL_CITYTABLESYNC_H
-#define SYNTHESE_ENVLSSQL_CITYTABLESYNC_H
+#ifndef SYNTHESE_ENVLSSQL_ADDRESSTABLESYNC_H
+#define SYNTHESE_ENVLSSQL_ADDRESSTABLESYNC_H
 
 
 #include <string>
@@ -14,7 +14,7 @@ namespace synthese
 
 namespace env
 {
-	class City;
+	class Address;
 }
 
 
@@ -24,19 +24,19 @@ namespace envlssql
 
 /** 
 
-City SQLite table synchronizer.
+Address SQLite table synchronizer.
 
 @ingroup m17
 */
 
-class CityTableSync : public ComponentTableSync
+class AddressTableSync : public ComponentTableSync
 {
  private:
 
  public:
 
-    CityTableSync (synthese::env::Environment::Registry& environments);
-    ~CityTableSync ();
+    AddressTableSync (synthese::env::Environment::Registry& environments);
+    ~AddressTableSync ();
 
  protected:
 
@@ -52,9 +52,9 @@ class CityTableSync : public ComponentTableSync
 
  private:
 
-    synthese::env::City* createFromRow (const synthese::env::Environment& env,
-					const synthese::db::SQLiteResult& rows, 
-					int rowIndex) const;
+    synthese::env::Address* createFromRow (const synthese::env::Environment& env,
+					   const synthese::db::SQLiteResult& rows, 
+					   int rowIndex) const;
 };
 
 

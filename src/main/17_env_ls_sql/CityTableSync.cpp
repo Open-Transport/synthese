@@ -24,7 +24,7 @@ namespace envlssql
 CityTableSync::CityTableSync (Environment::Registry& environments)
 : ComponentTableSync (CITIES_TABLE_NAME, environments)
 {
-    addTableColumn (CITIES_TABLE_COL_NAME, "VARCHAR(50)");
+    addTableColumn (CITIES_TABLE_COL_NAME, "TEXT");
 }
 
 
@@ -41,7 +41,7 @@ void
 CityTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
-    environment.getCities ().add (createFromRow (rows, rowIndex), false);
+    environment.getCities ().add (createFromRow (environment, rows, rowIndex), false);
 }
 
 
@@ -50,7 +50,7 @@ void
 CityTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 			  synthese::env::Environment& environment)
 {
-    synthese::env::City* newCity = createFromRow (rows, rowIndex);
+    synthese::env::City* newCity = createFromRow (environment, rows, rowIndex);
     
     // Overwrite the old object with new object values
     *(environment.getCities ().get (newCity->getKey ())) = *newCity;
@@ -71,7 +71,9 @@ CityTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 
 
 synthese::env::City* 
-CityTableSync::createFromRow (const synthese::db::SQLiteResult& rows, int rowIndex) const
+CityTableSync::createFromRow (const Environment& env,
+			      const synthese::db::SQLiteResult& rows, 
+			      int rowIndex) const
 {
     return new synthese::env::City (
 	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
