@@ -27,9 +27,9 @@ AddressTableSync::AddressTableSync (Environment::Registry& environments)
     addTableColumn (ADDRESSES_TABLE_COL_CONNECTIONPLACEID, "INTEGER");
     addTableColumn (ADDRESSES_TABLE_COL_RANKINCONNECTIONPLACE, "INTEGER");
     addTableColumn (ADDRESSES_TABLE_COL_ROADID, "INTEGER");
-    addTableColumn (ADDRESSES_TABLE_COL_METRICOFFSET, "REAL");
-    addTableColumn (ADDRESSES_TABLE_COL_X, "REAL");
-    addTableColumn (ADDRESSES_TABLE_COL_Y, "REAL");
+    addTableColumn (ADDRESSES_TABLE_COL_METRICOFFSET, "DOUBLE");
+    addTableColumn (ADDRESSES_TABLE_COL_X, "DOUBLE");
+    addTableColumn (ADDRESSES_TABLE_COL_Y, "DOUBLE");
 
 }
 

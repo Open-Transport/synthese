@@ -49,9 +49,7 @@ namespace synthese
 	    static const std::string AXES_TABLE_NAME ("t004_axes");
 	    static const std::string AXES_TABLE_COL_NAME ("name");
 	    static const std::string AXES_TABLE_COL_FREE ("free");
-	    static const std::string AXES_TABLE_COL_AUTHORIZED ("authorized");
-
-
+	    static const std::string AXES_TABLE_COL_ALLOWED ("allowed");
 
 	    /** Cities table :
 		- on insert : insert entry in associator
