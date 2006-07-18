@@ -3,10 +3,9 @@
 
 
 
-#include "04_time/Year.h"
 #include "04_time/Date.h"
-#include <string>
-#include <vector>
+
+#include <boost/dynamic_bitset.hpp>
 
 
 namespace synthese
@@ -19,139 +18,80 @@ namespace env
 /** Calendar.
  @ingroup m15
 
- 32 bits stored in an int. 
- The lowest bit is day one; the highest bit is day 32 (unused).
+ Holds a bitset representing year days.
+ Each year day can be marked or not.
+
+ The first bit of the internal bitset corresponds to the first
+ marked date. The last bit corresponds to the last date marked.
  */
 class Calendar 
 {
 public:
 
-    /** Type of inclusion */
-    typedef enum
-    {
-	INCLUSION_TYPE_POSITIVE = '+',
-	INCLUSION_TYPE_NEGATIVE = '-'
-    } InclusionType;
-
-    /** Mask */
-    typedef unsigned long Mask;
-
-    /** Calendar */
-    typedef std::vector<Mask> MonthesMask;
-
-    /** Category */
-    typedef unsigned char Category;
-    
-    /** Max category */
-    static const Category CATEGORY_MAX;
 
 private:
 
-    std::string _name;
+    synthese::time::Date _firstMarkedDate;
+    synthese::time::Date _lastMarkedDate;
 
-    std::vector<Mask> _yearDays; //!< Array containing masks (one per month)
-    const synthese::time::Year _firstYear;  //!< Actual year for mask first byte (included)
-    const synthese::time::Year _lastYear;  //!< Actual year for mask last byte (included)
+    boost::dynamic_bitset<> _markedDates;    
 
-    Category _category;
-	
 public:
 
-    Calendar( int firstYear, 
-	      int lastYear, 
-	      const std::string& name,
-	      const Category& category = CATEGORY_MAX);
+    Calendar();
     
     ~Calendar();
 
 
     //! @name Getters/Setters
     //@{
-    const Category& getCategory () const;
-    void setCategory (Category category);
-
-    const std::vector<Mask>& getYearDays () const;
-//    void setYearDays (const std::vector<Mask>& yearDays);  // should be removed for integrity!
-
-    void setName (const std::string& name);
+    synthese::time::Date getFirstMarkedDate () const;
+    synthese::time::Date getLastMarkedDate () const;
     //@}
 
 
     //! @name Query methods
     //@{
-    synthese::time::Date getFirstOperationDay () const;
-
-    
-/*    void setInclusionToMask ( std::vector<Mask>& calendar, 
-			      InclusionType type = INCLUSION_TYPE_POSITIVE ) const;
-
-    void setInclusionToMask ( Calendar& calendar, 
-			      InclusionType type = INCLUSION_TYPE_POSITIVE ) const;
-
-
-    bool sharesAllElements ( const Calendar& base, const std::vector<Mask>& other) const; 
-    bool sharesOneElement ( const std::vector<Mask>& other) const;
-    bool sharesOneElement ( const Calendar& other) const;
-*/
-
-    int card ( const std::vector<Mask>& ) const; 
-    int card ( const Calendar& ) const; 
-
-    /** Is a given date marked ?
-	@param date Reference day.
-    */
-    bool isMarked ( const synthese::time::Date& date) const;
-
-//    std::vector<Mask> excludedElements ( const Calendar& other ) const;
-//    std::vector<Mask> logicalAnd ( const Calendar& ) const;
-
+    int getNbMarkedDates () const;
+    bool isMarked (synthese::time::Date date) const;
     //@}
 
 
 
     //! @name Update methods
     //@{
-    void reset ( bool value = false );
-
-    /** Modification of one date status in calendar.
-	@param date Date to modify.
-	@param type Date status : running or not.
-	@return true if the given dates exists in this calendar, false otherwise.
-    */
-    bool setMark ( const synthese::time::Date& date, 
-		   InclusionType type = INCLUSION_TYPE_POSITIVE );
-    
-    /** Marks all dates between startDate (included) and endDate (included).
-    */
-    bool setMark ( const synthese::time::Date& startDate, 
-		   const synthese::time::Date& endDate, 
-		   InclusionType type = INCLUSION_TYPE_POSITIVE, 
-		   int step = 1 );
+    void mark (synthese::time::Date date, bool state = true);
 
     //@}
 
+    Calendar& operator&= (const Calendar& op);
+    Calendar& operator|= (const Calendar& op);
+
+    static void LogicalAnd (Calendar& dest, const Calendar& op1, const Calendar& op2);
+    static void LogicalOr (Calendar& dest, const Calendar& op1, const Calendar& op2);
 
 private:
 
-    void doSetMark ( const synthese::time::Date& date, 
-		     InclusionType type);
+    void pop_front (int nbBits);
+    void pop_back (int nbBits);
 
-    /** Calculates index of the bit array to read for a given date
-	@param date Any day in the month to read.
-	@return The bit array index.
-    */
-    int getMonthIndex ( const synthese::time::Date& date ) const;
+    void push_front (int nbBits, bool value = false);
+    void push_back (int nbBits, bool value = false);
 
+	void updateFirstMark ();
+	void updateLastMark ();
 
-    /** Calculates index of the bit array to read for a given date
-	@param year Year to read.
-	@param month Month to read.
-	@return The bit array index.
-    */
-    int getMonthIndex ( int year, int month ) const;
+    static synthese::time::Date DateAfter (synthese::time::Date date, unsigned int nbBits);
+    static synthese::time::Date DateBefore (synthese::time::Date date, unsigned int nbBits);
+
+    static int NbBitsBetweenDates (synthese::time::Date date1, synthese::time::Date date2);
 
 
 };
+
+
+Calendar operator& (const Calendar& op1, const Calendar& op2);
+Calendar operator| (const Calendar& op1, const Calendar& op2);
 
 
 

@@ -58,6 +58,9 @@
 				RelativePath=".\BikeCompliance.cpp">
 			</File>
 			<File
+				RelativePath=".\BikeComplyer.cpp">
+			</File>
+			<File
 				RelativePath=".\Calendar.cpp">
 			</File>
 			<File
@@ -94,6 +97,9 @@
 				RelativePath=".\HandicappedCompliance.cpp">
 			</File>
 			<File
+				RelativePath=".\HandicappedComplyer.cpp">
+			</File>
+			<File
 				RelativePath=".\IncludingPlace.cpp">
 			</File>
 			<File
@@ -110,6 +116,9 @@
 			</File>
 			<File
 				RelativePath=".\PedestrianCompliance.cpp">
+			</File>
+			<File
+				RelativePath=".\PedestrianComplyer.cpp">
 			</File>
 			<File
 				RelativePath=".\PhysicalStop.cpp">
@@ -131,6 +140,9 @@
 			</File>
 			<File
 				RelativePath=".\ReservationRule.cpp">
+			</File>
+			<File
+				RelativePath=".\ReservationRuleComplyer.cpp">
 			</File>
 			<File
 				RelativePath=".\Road.cpp">
@@ -177,6 +189,9 @@
 				RelativePath=".\BikeCompliance.h">
 			</File>
 			<File
+				RelativePath=".\BikeComplyer.h">
+			</File>
+			<File
 				RelativePath=".\Calendar.h">
 			</File>
 			<File
@@ -213,6 +228,9 @@
 				RelativePath=".\HandicappedCompliance.h">
 			</File>
 			<File
+				RelativePath=".\HandicappedComplyer.h">
+			</File>
+			<File
 				RelativePath=".\IncludingPlace.h">
 			</File>
 			<File
@@ -232,6 +250,9 @@
 			</File>
 			<File
 				RelativePath=".\PedestrianCompliance.h">
+			</File>
+			<File
+				RelativePath=".\PedestrianComplyer.h">
 			</File>
 			<File
 				RelativePath=".\PhysicalStop.h">
@@ -265,6 +286,9 @@
 			</File>
 			<File
 				RelativePath=".\ReservationRule.h">
+			</File>
+			<File
+				RelativePath=".\ReservationRuleComplyer.h">
 			</File>
 			<File
 				RelativePath=".\Road.h">

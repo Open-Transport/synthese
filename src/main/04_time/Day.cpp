@@ -11,14 +11,14 @@ namespace time
 Day::Day ( int value )
         : _value ( value )
 {
-    assert ( ( _value >= 1 ) && ( _value <= 31 ) );
+    assert (( _value == UNKNOWN_VALUE ) || ( ( _value >= 1 ) && ( _value <= 31 ) ));
 }
 
 
 Day::Day ( const Day& ref )
         : _value ( ref._value )
 {
-    assert ( ( _value >= 1 ) && ( _value <= 31 ) );
+    assert (( _value == UNKNOWN_VALUE ) || ( ( _value >= 1 ) && ( _value <= 31 ) ));
 }
 
 

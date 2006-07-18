@@ -66,6 +66,9 @@
 				RelativePath=".\ThreadGroup.cpp">
 			</File>
 			<File
+				RelativePath=".\UId.cpp">
+			</File>
+			<File
 				RelativePath=".\XmlParser.cpp">
 			</File>
 		</Filter>
@@ -123,6 +126,9 @@
 			</File>
 			<File
 				RelativePath=".\ThreadGroup.h">
+			</File>
+			<File
+				RelativePath=".\UId.h">
 			</File>
 			<File
 				RelativePath=".\XmlParser.h">

@@ -26,11 +26,16 @@ class DateTime;
 */
 class Date
 {
-        Day _day; //!< Day
-        Month _month; //!< Month
-        Year _year; //!< Year
+ private:
 
-    public:
+
+    Day _day; //!< Day
+    Month _month; //!< Month
+    Year _year; //!< Year
+    
+ public:
+
+    static const Date UNKNOWN_DATE;
 
         Date( int day = UNKNOWN_VALUE,
               int month = UNKNOWN_VALUE,
@@ -149,6 +154,7 @@ bool operator < ( const Date& op1, const Date& op2 );
 bool operator <= ( const Date& op1, const Date& op2 );
 bool operator <= ( const Date& op1, const DateTime& op2 );
 bool operator > ( const Date& op1, const Date& op2 );
+bool operator >= ( const Date& op1, const Date& op2 );
 bool operator == ( const Date& op1, const Date& op2 );
 bool operator != ( const Date& op1, const Date& op2 );
 

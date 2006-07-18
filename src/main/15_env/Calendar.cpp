@@ -1,403 +1,362 @@
 #include "Calendar.h"
 
 
+using synthese::time::Date;
+
+using boost::dynamic_bitset;
+
 
 namespace synthese
 {
-namespace env
-{
-
-const Calendar::Category Calendar::CATEGORY_MAX (255);
-
-
-
-    Calendar::Calendar(	int firstYear, 
-			int lastYear,
-			const std::string& name,
-			const Category& category)
-    : _name (name)
-    , _firstYear (firstYear)
-    , _lastYear (lastYear)
-    , _category (category)
-{
-    // initialize year days
-    for ( int i = 0; i < ( _lastYear.getValue () - _firstYear.getValue () + 1 ) * 
-	      synthese::time::MONTHS_PER_YEAR ; i++ )
+    namespace env
     {
-        _yearDays.push_back (0);
-    }
-}
+
+
+	Calendar::Calendar()
+	    : _firstMarkedDate (Date::UNKNOWN_DATE)
+	    , _lastMarkedDate (Date::UNKNOWN_DATE)
+	{
+	}
     
 
-Calendar::~Calendar()
-{
-
-}
-
-
-
-
-
-const Calendar::Category& 
-Calendar::getCategory () const
-{
-    return _category;
-}
-
-
-
-
-void 
-Calendar::setCategory (Category category)
-{
-    _category = category;
-}
-
-
-
-
-const std::vector<Calendar::Mask>& 
-Calendar::getYearDays () const
-{
-    return _yearDays;
-}
-
-
-/*
-void 
-Calendar::setYearDays ( const std::vector<Calendar::Mask>& yearDays )
-{
-    for ( int i = 0; i < ( _lastYear.getValue () - _firstYear.getValue () + 1 ) * 
-	      synthese::time::MONTHS_PER_YEAR ; i++ )
-    {
-        _yearDays[i] = yearDays[i];
-    }
-}
-*/
-
-
-
-
-void 
-Calendar::setName (const std::string& name)
-{
-    _name = name;
-}
-
-
-
-
-bool 
-Calendar::setMark ( const synthese::time::Date& date, 
-			      InclusionType type)
-{
-    if ( date.isValid () )
-    {
-        if ( date.isYearUnknown() )
-        {
-            synthese::time::Date currentDate;
-            for ( synthese::time::Year Annee = _firstYear; 
-		  Annee.getValue () <= _lastYear.getValue (); Annee++ )
-            {
-                currentDate.updateDate( date.getDay(), date.getMonth (), Annee.getValue () );
-                doSetMark ( currentDate, type );
-            }
-        }
-        else if ( date.getYear () >= _firstYear.getValue () && 
-		  date.getYear () <= _lastYear.getValue () )
+	Calendar::~Calendar()
 	{
-	    doSetMark ( date, type );
 	}
 
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
 
-
-
-void 
-Calendar::doSetMark ( const synthese::time::Date& date, 
-				InclusionType type )
-{
-    Mask mask = 1;
-    mask <<= ( date.getDay() - 1 );
-
-    if ( type == INCLUSION_TYPE_POSITIVE )
-    {
-        _yearDays[ getMonthIndex( date ) ] |= mask;
-
-    }
-    else
-    {
-        mask = ~mask;
-        _yearDays[ getMonthIndex( date ) ] &= mask;
-    }
-}
-
-
-
-bool 
-Calendar::isMarked ( const synthese::time::Date& date ) const
-{
-    if ( date.isUnknown () )
-        return false;
-    
-    Mask mask = 1;
-    mask <<= ( date.getDay() - 1 );
-
-    return ( mask & _yearDays[getMonthIndex (date)] ) != 0;
-}
-
-
-
-/*
-bool 
-Calendar::sharesAllElements ( const Calendar& base, 
-					  const std::vector<Calendar::Mask>& other) const
-{
-    for ( int y = _firstYear.getValue (); y <= _lastYear.getValue (); y++ )
-        for ( int m = 1; m <= synthese::time::MONTHS_PER_YEAR; m++ )
-            if ( ( base._yearDays[ getMonthIndex( y, m ) ] & _yearDays[ getMonthIndex( y, m ) ] ) != ( other[ getMonthIndex( y, m ) ] & _yearDays[ getMonthIndex( y, m ) ] ) )
-                return false;
-    return true;
-}
-
-
-
-
-bool 
-Calendar::sharesOneElement ( const std::vector<Calendar::Mask>& other) const
-{
-    for ( int y = _firstYear.getValue (); y <= _lastYear.getValue (); y++ )
-        for ( int m = 1; m <= synthese::time::MONTHS_PER_YEAR; m++ )
-            if ( other[ getMonthIndex( y, m ) ] & _yearDays[ getMonthIndex( y, m ) ] )
-                return true;
-    return false;
-}
-
-
-
-
-
-bool 
-Calendar::sharesOneElement ( const Calendar& other ) const
-{
-    return ( sharesOneElement ( other._yearDays ) );
-}
-
-
-
-
-std::vector<Calendar::Mask>
-Calendar::logicalAnd (const Calendar& other) const
-{
-    std::vector<Calendar::Mask> newMask;
-    for ( int y = _firstYear.getValue (); y <= _lastYear.getValue (); y++ )
-        for ( int m = 1; m <= synthese::time::MONTHS_PER_YEAR; m++ )
-            newMask[ getMonthIndex( y, m ) ] = other._yearDays[ getMonthIndex( y, m ) ] & _yearDays[ getMonthIndex( y, m ) ];
-    return ( newMask );
-}
-
-
-
-
-
-std::vector<Calendar::Mask> 
-Calendar::excludedElements ( const Calendar& other ) const
-{
-    // L'opérateur ! ne semble pas convenir: est ce du bit a bit ?
-    std::vector<Calendar::Mask> newMask;
-    for ( int y = _firstYear.getValue (); y <= _lastYear.getValue (); y++ )
-        for ( int m = 1; m <= synthese::time::MONTHS_PER_YEAR; m++ )
-            newMask[ getMonthIndex( y, m ) ] = !_yearDays[ getMonthIndex( y, m ) ] & other._yearDays[ getMonthIndex( y, m ) ];
-    return ( newMask );
-}
-
-*/
-
-
-int 
-Calendar::card ( const std::vector<Calendar::Mask>& other) const
-{
-    int t = 0;
-    Mask tmpMask;
-    Mask tmpMask2;
-    for ( int y = _firstYear.getValue (); y <= _lastYear.getValue (); y++ )
-        for ( int m = 1; m <= synthese::time::MONTHS_PER_YEAR; m++ )
-        {
-            tmpMask = 1;
-            tmpMask2 = _yearDays[ getMonthIndex( y, m ) ];
-            for ( int d = 1; d <= 31; d++ )
-            {
-                if ( tmpMask2 & tmpMask & other[ getMonthIndex( y, m ) ] ) t++;
-                tmpMask <<= 1;
-            }
-        }
-    return ( t );
-}
-
-
-
-
-int 
-Calendar::card( const Calendar& other ) const
-{
-    return ( card ( other._yearDays ) );
-}
-
-
-
-
-void 
-Calendar::reset ( bool value )
-{
-    for ( int y = _firstYear.getValue (); y <= _lastYear.getValue (); y++ )
-    {
-        for ( int m = 1; m <= synthese::time::MONTHS_PER_YEAR; m++ )
+	Date 
+	Calendar::getFirstMarkedDate () const
 	{
-            if ( value )
-            {
-                _yearDays[ getMonthIndex( y, m ) ] = 4294967295UL;
-            }
-            else
+	    return _firstMarkedDate;
+	}
+
+
+
+	Date 
+	Calendar::getLastMarkedDate () const
+	{
+	    return _lastMarkedDate;
+	}
+
+
+
+
+
+	int 
+	Calendar::getNbMarkedDates () const
+	{
+	    return (int) _markedDates.count ();
+	}
+
+
+
+	bool 
+	Calendar::isMarked (synthese::time::Date date) const
+	{
+	    if (_firstMarkedDate == Date::UNKNOWN_DATE) return false;
+	    if (date < _firstMarkedDate) return false;
+	    if (date > _lastMarkedDate) return false;
+	    return _markedDates[NbBitsBetweenDates (_firstMarkedDate, date)];
+	}
+
+
+
+	void 
+	Calendar::mark (synthese::time::Date date, bool state)
+	{
+	    if (state)
 	    {
-                _yearDays[ getMonthIndex( y, m ) ] = 0;
+		if (_firstMarkedDate == Date::UNKNOWN_DATE)
+		{
+		    _firstMarkedDate = date;
+		    _lastMarkedDate = date;
+		    _markedDates.push_back (true);
+		} 
+		else if (date < _firstMarkedDate)
+		{
+		    push_front (NbBitsBetweenDates (date, _firstMarkedDate));
+		    _markedDates[0] = true;
+		    _firstMarkedDate = date;
+		}
+		else if (date > _lastMarkedDate)
+		{
+		    push_back (NbBitsBetweenDates (_lastMarkedDate, date));
+		    _markedDates[_markedDates.size () -1] = true;
+		    _lastMarkedDate = date;
+		} 
+		else 
+		{
+		    _markedDates[NbBitsBetweenDates (_firstMarkedDate, date)] = true;
+		}
 	    }
+	    else 
+	    {
+		if (_firstMarkedDate == Date::UNKNOWN_DATE) return;
+		if (date < _firstMarkedDate) return;
+		if (date > _lastMarkedDate) return;
+
+		if (date == _firstMarkedDate)
+		{
+		    _markedDates[0] = false;
+		    updateFirstMark ();
+		}
+		else if (date == _lastMarkedDate)
+		{
+		    _markedDates[_markedDates.size ()-1] = false;
+		    updateLastMark ();
+		}
+		else 
+		{
+		    _markedDates[NbBitsBetweenDates (_firstMarkedDate, date)] = false;
+		}
+	    }
+	    // std::cerr << "*: " << _markedDates << std::endl;
+    
+	}
+
+
+
+
+
+
+
+	Date 
+	Calendar::DateAfter (Date date, unsigned int nbBits)
+	{
+	    int bits = (date.getYear () * (32*12)) + (date.getMonth () * 32) + (date.getDay ()) + nbBits;
+	    return Date (
+		(bits % 384) % 32,
+		(bits % 384) / 32,
+		bits / 384
+		);
+    
+	}
+
+
+
+	Date 
+	Calendar::DateBefore (Date date, unsigned int nbBits)
+	{
+	    int bits = (date.getYear () * (32*12)) + (date.getMonth () * 32) + (date.getDay ()) - nbBits;
+	    return Date (
+		(bits % 384) % 32,
+		(bits % 384) / 32,
+		bits / 384
+		);
+	}
+
+
+
+
+	void 
+	Calendar::pop_front (int nbBits)
+	{
+	    _markedDates >>= nbBits;
+	    _markedDates.resize (_markedDates.size () - nbBits);    
+	}
+
+
+
+	void 
+	Calendar::pop_back (int nbBits)
+	{
+	    _markedDates.resize (_markedDates.size () - nbBits);    
+	}
+
+
+
+
+
+	void 
+	Calendar::push_back (int nbBits, bool value)
+	{
+	    _markedDates.resize (_markedDates.size () + nbBits, value);
+
+	}
+
+
+
+	void 
+	Calendar::push_front (int nbBits, bool value)
+	{
+	    _markedDates.resize (_markedDates.size () + nbBits, false);
+	    _markedDates <<= nbBits;
+	    if (value) {
+		for (int i=0; i<nbBits; ++i) _markedDates[i] = value;
+	    }
+
+	}
+
+
+
+
+	int 
+	Calendar::NbBitsBetweenDates (Date date1, Date date2)
+	{
+	    return 
+		((date2.getYear () - date1.getYear ()) * (32*12)) +
+		((date2.getMonth () - date1.getMonth ()) * 32) +
+		(date2.getDay () - date1.getDay ());
+	
+	}
+
+
+
+
+
+	Calendar& 
+	Calendar::operator&= (const Calendar& op)
+	{
+	    LogicalAnd (*this, *this, op);
+	    return *this;
+	}
+
+
+
+	Calendar& 
+	Calendar::operator|= (const Calendar& op)
+	{
+	    LogicalOr (*this, *this, op);
+	    return *this;
+	}
+
+
+
+
+
+
+	void 
+	Calendar::LogicalOr (Calendar& dest, const Calendar& op1, const Calendar& op2)
+	{
+	    Calendar cop1 (op1);
+	    Calendar cop2 (op2);
+	    if (op1._firstMarkedDate >= op2._firstMarkedDate) 
+	    {
+		dest._firstMarkedDate = op2._firstMarkedDate;
+    		cop1.push_front (NbBitsBetweenDates (op2._firstMarkedDate, op1._firstMarkedDate));
+	    }
+	    else if (op1._firstMarkedDate < op2._firstMarkedDate) 
+	    {
+    		dest._firstMarkedDate = op1._firstMarkedDate;
+    		cop2.push_front (NbBitsBetweenDates (op1._firstMarkedDate, op2._firstMarkedDate));
+	    } 
+
+	    if (op1._lastMarkedDate >= op2._lastMarkedDate) 
+	    {
+    		dest._lastMarkedDate = op1._lastMarkedDate;
+    		cop2.push_back (NbBitsBetweenDates (op2._lastMarkedDate, op1._lastMarkedDate));
+	    }
+	    else if (op1._lastMarkedDate < op2._lastMarkedDate) 
+	    {
+    		dest._lastMarkedDate = op2._lastMarkedDate;
+	    	cop1.push_back (NbBitsBetweenDates (op1._lastMarkedDate, op2._lastMarkedDate));
+	    }
+    
+	    // first and last marked dates cannot change (or).
+	    dest._markedDates = cop1._markedDates | cop2._markedDates;
+	}
+
+
+
+
+
+
+	void 
+	Calendar::LogicalAnd (Calendar& dest, const Calendar& op1, const Calendar& op2)
+	{
+	    dest._firstMarkedDate = op1._firstMarkedDate;
+	    dest._lastMarkedDate = op1._lastMarkedDate;
+
+	    Calendar cop (op2);
+	    if (op1._firstMarkedDate > op2._firstMarkedDate) 
+	    {
+		cop.pop_front (NbBitsBetweenDates (op2._firstMarkedDate, op1._firstMarkedDate));
+	    }
+	    else if (op1._firstMarkedDate < op2._firstMarkedDate) 
+	    {
+		cop.push_front (NbBitsBetweenDates (op1._firstMarkedDate, op2._firstMarkedDate));
+	    }
+
+	    if (op1._lastMarkedDate > op2._lastMarkedDate) 
+	    {
+		cop.push_back (NbBitsBetweenDates (op2._lastMarkedDate, op1._lastMarkedDate));
+	    }
+	    else if (op1._lastMarkedDate < op2._lastMarkedDate) 
+	    {
+		cop.pop_back (NbBitsBetweenDates (op1._lastMarkedDate, op2._lastMarkedDate));
+	    }
+    
+	    dest._markedDates = op1._markedDates & cop._markedDates;
+
+	    dest.updateFirstMark ();
+	    dest.updateLastMark ();
+	}
+
+
+	Calendar 
+	operator& (const Calendar& op1, const Calendar& op2)
+	{
+	    Calendar dest;
+	    Calendar::LogicalAnd (dest, op1, op2);
+	    return dest;
+	}
+
+
+	Calendar 
+	operator| (const Calendar& op1, const Calendar& op2)
+	{
+	    Calendar dest;
+	    Calendar::LogicalOr (dest, op1, op2);
+	    return dest;
+	}
+
+
+
+	void 
+	Calendar::updateFirstMark ()
+	{
+	    std::size_t nbBits = _markedDates.find_first ();
+	    if (nbBits == dynamic_bitset<>::npos)
+	    {
+		_markedDates.clear ();
+		_firstMarkedDate = Date::UNKNOWN_DATE;
+		_lastMarkedDate = Date::UNKNOWN_DATE;
+	    }
+	    else
+	    {
+		pop_front (nbBits);
+		_firstMarkedDate = Calendar::DateAfter (_firstMarkedDate, nbBits);
+	    }
+
+	}
+
+
+
+	void 
+	Calendar::updateLastMark ()
+	{
+	    size_t nbBits = _markedDates.find_first ();
+	    if (nbBits == dynamic_bitset<>::npos)
+	    {
+		_markedDates.clear ();
+		_firstMarkedDate = Date::UNKNOWN_DATE;
+		_lastMarkedDate = Date::UNKNOWN_DATE;
+	    }
+	    else 
+	    {
+		int pos = (int) nbBits;
+		while (++pos < _markedDates.size ()) 
+		{
+		    if (_markedDates[pos]) nbBits = pos;
+		}
+		pop_back (_markedDates.size ()-1-nbBits);
+		_lastMarkedDate = Calendar::DateAfter (_firstMarkedDate, nbBits);
+
+	    }
+
+
+
 	}
     }
 }
-
-
-
-
-int 
-Calendar::getMonthIndex (const synthese::time::Date& date) const
-{
-    return getMonthIndex ( date.getYear (), date.getMonth () );
-}
-
-
-
-int 
-Calendar::getMonthIndex ( int year, int month ) const
-{
-    return ( year - _firstYear.getValue () ) * synthese::time::MONTHS_PER_YEAR + month - 1;
-}
-
-
-
-
-/*
-
-void 
-Calendar::setInclusionToMask ( std::vector<Calendar::Mask>& calendar, 
-				      InclusionType type ) const
-{
-    if ( type == INCLUSION_TYPE_POSITIVE )
-        for ( int y = _firstYear.getValue (); y <= _lastYear.getValue (); y++ )
-            for ( int m = 1; m <= synthese::time::MONTHS_PER_YEAR; m++ )
-                calendar[ getMonthIndex( y, m ) ] |= _yearDays[ getMonthIndex( y, m ) ];
-    else
-    {
-        Mask tempMask;
-        for ( int y = _firstYear.getValue (); y <= _lastYear.getValue (); y++ )
-            for ( int m = 1; m <= synthese::time::MONTHS_PER_YEAR; m++ )
-            {
-                tempMask = _yearDays[ getMonthIndex( y, m ) ];
-                tempMask = ~tempMask;
-                calendar[ getMonthIndex( y, m ) ] &= tempMask;
-            }
-    }
-}
-
-
-
-
-void 
-Calendar::setInclusionToMask ( Calendar& calendar, 
-				      InclusionType type ) const
-{
-    setInclusionToMask ( calendar._yearDays, type );
-}
-
-
-*/
-
-synthese::time::Date 
-Calendar::getFirstOperationDay () const
-{
-    synthese::time::Date curDate;
-    Mask tempMask;
-    Mask tempMask2;
-
-    for ( int y = _firstYear.getValue (); y <= _lastYear.getValue (); y++ )
-        for ( int m = 1; m <= synthese::time::MONTHS_PER_YEAR; m++ )
-        {
-            tempMask = 1;
-            tempMask2 = _yearDays[ getMonthIndex( y, m ) ];
-            for ( int d = 1; d <= 31; d++ )
-            {
-                if ( tempMask2 & tempMask )
-                {
-                    curDate.updateDate( d, m, y );
-                    return ( curDate );
-                }
-                tempMask <<= 1;
-            }
-        }
-    return ( curDate );
-}
-
-
-
-
-
-
-bool 
-Calendar::setMark ( const synthese::time::Date& startDate, 
-			      const synthese::time::Date& endDate, 
-			      InclusionType type, 
-			      int step )
-{
-    if ( startDate.isValid () && endDate.isValid () && step > 0 && startDate.isYearUnknown () == endDate.isYearUnknown () )
-    {
-        if ( startDate.isYearUnknown () )
-        {
-            synthese::time::Date currentDate;
-            synthese::time::Date currentEndDate = endDate;
-            for ( synthese::time::Year y = _firstYear; y <= _lastYear; y++ )
-            {
-                currentDate.updateDate( startDate.getDay(), startDate.getMonth (), y.getValue () );
-                if ( startDate <= endDate )
-                    currentEndDate.updateDate( currentEndDate.getDay(), currentEndDate.getMonth (), y.getValue () );
-                else if ( y == _lastYear )
-                    currentEndDate.updateDate( synthese::time::TIME_MAX, synthese::time::TIME_MAX, _lastYear.getValue () );
-                else
-                    currentEndDate.updateDate( currentEndDate.getDay(), currentEndDate.getMonth (), y.getValue () + 1 );
-
-                for ( ; currentDate <= currentEndDate; currentDate += step )
-                    setMark ( currentDate, type );
-            }
-        }
-        else
-            for ( synthese::time::Date currentDate = startDate; currentDate <= endDate; currentDate += step )
-                setMark ( currentDate, type );
-        return ( true );
-    }
-    else
-        return ( false );
-}
-
-
-
-
-
-
-
-}
-}
-
+    

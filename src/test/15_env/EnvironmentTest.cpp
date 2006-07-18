@@ -61,8 +61,8 @@ EnvironmentTest::testEnvironmentConstruction0 ()
     Date lastDay2006 (31, 12, 2006);
 	
     // Every day of year
-    calendar = new Calendar (2006, 2006, "calendar0");
-    calendar->setMark (firstDay2006, lastDay2006);
+    calendar = new Calendar ();
+    // calendar->setMark (firstDay2006, lastDay2006);
 
     // Lines
     {

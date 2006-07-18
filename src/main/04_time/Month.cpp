@@ -18,14 +18,14 @@ namespace time
 Month::Month ( int value )
         : _value ( value )
 {
-    assert ( ( _value >= 1 ) && ( _value <= 12 ) );
+    assert (( _value == UNKNOWN_VALUE ) || ( ( _value >= 1 ) && ( _value <= 12 ) ));
 }
 
 
 Month::Month ( const Month& ref )
         : _value ( ref._value )
 {
-    assert ( ( _value >= 1 ) && ( _value <= 12 ) );
+    assert (( _value == UNKNOWN_VALUE ) || ( ( _value >= 1 ) && ( _value <= 12 ) ));
 }
 
 

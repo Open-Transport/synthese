@@ -13,6 +13,8 @@ namespace time
 {
 
 
+const Date Date::UNKNOWN_DATE;
+
 
 
 
@@ -344,6 +346,19 @@ operator > ( const Date& op1, const Date& op2 )
            && ( op1.getMonth () > op2.getMonth ()
                 || op1.getMonth () == op2.getMonth ()
                 && op1.getDay () > op2.getDay ()
+              );
+
+}
+
+
+bool
+operator >= ( const Date& op1, const Date& op2 )
+{
+    return op1.getYear () > op2.getYear ()
+           || op1.getYear () == op2.getYear ()
+           && ( op1.getMonth () > op2.getMonth ()
+                || op1.getMonth () == op2.getMonth ()
+                && op1.getDay () >= op2.getDay ()
               );
 
 }
