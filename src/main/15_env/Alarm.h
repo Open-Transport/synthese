@@ -2,6 +2,10 @@
 #define SYNTHESE_ENV_ALARM_H
 
 #include <string>
+
+#include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
 #include "04_time/DateTime.h"
 
 
@@ -15,7 +19,7 @@ namespace env
 /** Alarm message.
  @ingroup m15
 */
-class Alarm
+class Alarm : public synthese::util::Registrable<uid,Alarm>
 {
 public:
 
@@ -38,7 +42,12 @@ private:
     
 public:
 
-    Alarm ();
+    Alarm (const uid& id,
+	   const std::string& message, 
+	   const synthese::time::DateTime& periodStart,
+	   const synthese::time::DateTime& periodEnd,
+	   const AlarmLevel& alarmLevel
+	   );
     
     //! @name Getters/Setters
     //@{

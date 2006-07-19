@@ -7,13 +7,22 @@ namespace env
 {
 
 
-Alarm::Alarm ()
-    : _level (ALARM_LEVEL_WARNING)
+Alarm::Alarm (const uid& id,
+	      const std::string& message, 
+	      const synthese::time::DateTime& periodStart,
+	      const synthese::time::DateTime& periodEnd,
+	      const AlarmLevel& level)
+    : synthese::util::Registrable<uid,Alarm> (id)
+    , _message (message)
+    , _periodStart (periodStart)
+    , _periodEnd (periodEnd)
+    , _level (level)
 {
     _periodStart.updateDateTime( synthese::time::TIME_MIN );
     _periodEnd.updateDateTime( synthese::time::TIME_MAX );
 }
     
+
 
 
 const std::string& 

@@ -73,6 +73,10 @@ class Date
         //@}
 
 
+	/** Constructs a Date from an SQL date string (AAAA-MM-JJ).
+	*/
+	static Date FromSQLDate (const std::string& sqlDate);
+
 
         //! @name Update methods
         //@{

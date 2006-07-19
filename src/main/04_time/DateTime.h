@@ -97,6 +97,11 @@ class DateTime
         */
         DateTime& operator = ( const Schedule& );
 
+	/** Constructs a DateTime from an SQL timestamp string (AAAAMMJJhhmmss);
+	    seconds are ignored.
+	*/
+	static DateTime FromSQLTimestamp (const std::string& sqlTimestamp);
+
 
 };
 

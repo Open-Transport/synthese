@@ -1,6 +1,11 @@
 #include "DateTime.h"
 #include "Schedule.h"
 
+#include "01_util/Conversion.h"
+
+using synthese::util::Conversion;
+
+
 
 namespace synthese
 {
@@ -345,6 +350,18 @@ int operator - ( const DateTime& op1, const DateTime& op2 )
   // 2: Days since departure
   result += ((op1.getDate () - op2.getDate ()) - retain) * MINUTES_PER_DAY;
   return result;
+}
+
+
+
+DateTime
+DateTime::FromSQLTimestamp (const std::string& sqlTimestamp)
+{
+    return DateTime (Conversion::ToInt (sqlTimestamp.substr (6, 2)),
+		     Conversion::ToInt (sqlTimestamp.substr (4, 2)),
+		     Conversion::ToInt (sqlTimestamp.substr (0, 4)),
+		     Conversion::ToInt (sqlTimestamp.substr (8, 2)),
+		     Conversion::ToInt (sqlTimestamp.substr (10, 2)));
 }
 
 

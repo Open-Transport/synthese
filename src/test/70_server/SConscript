@@ -6,7 +6,7 @@ excludes = []
 
 testmoduleenv.AddModuleDependency ('70_server')
 testmoduleenv.AddModuleDependency ('04_time')
-
+testmoduleenv.AddModuleDependency ('01_util')
 
 files = testmoduleenv.Glob(includes, excludes)
 

@@ -41,6 +41,15 @@ namespace synthese
 	    static const std::string ADDRESSES_TABLE_COL_Y ("y");  // U ??
 
 
+
+	    static const std::string ALARMS_TABLE_NAME ("t002_alarms");
+	    static const std::string ALARMS_TABLE_COL_MESSAGE ("message");  
+	    static const std::string ALARMS_TABLE_COL_PERIODSTART ("period_start"); 
+	    static const std::string ALARMS_TABLE_COL_PERIODEND ("period_end"); 
+	    static const std::string ALARMS_TABLE_COL_LEVEL ("level"); 
+
+
+
 	    /** Axes table :
 		- on insert : 
 		- on update : 

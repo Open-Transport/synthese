@@ -3,6 +3,7 @@
 
 
 #include "Axis.h"
+#include "Alarm.h"
 #include "Address.h"
 #include "City.h"
 #include "ConnectionPlace.h"
@@ -46,6 +47,7 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     
     Address::Registry _addresses;
+    Alarm::Registry _alarms;
     Axis::Registry _axes;
     City::Registry _cities;
     ConnectionPlace::Registry _connectionPlaces;
@@ -66,9 +68,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     
 
     // TODO : 
-    // fare alarm
-    // alarm
-
     // zone
 
  public:
@@ -82,6 +81,9 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     Address::Registry& getAddresses ();
     const Address::Registry& getAddresses () const;
+
+    Alarm::Registry& getAlarms ();
+    const Alarm::Registry& getAlarms () const;
 
     Axis::Registry& getAxes ();
     const Axis::Registry& getAxes () const;

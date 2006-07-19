@@ -1,10 +1,16 @@
 #include "Date.h"
 #include "DateTime.h"
 
+#include "01_util/Conversion.h"
+
+
 #include <sstream>
 #include <iomanip>
 #include <cmath>
 #include <ctime>
+
+
+using synthese::util::Conversion;
 
 
 namespace synthese
@@ -409,6 +415,14 @@ Date::operator - ( const Date& op2 ) const
 
 
 
+Date 
+Date::FromSQLDate (const std::string& sqlDate)
+{
+    // AAAA-MM-JJ
+    return Date (Conversion::ToInt (sqlDate.substr (8, 2)),
+		 Conversion::ToInt (sqlDate.substr (5, 2)),
+		 Conversion::ToInt (sqlDate.substr (0, 4)));
+}
 
 
 
