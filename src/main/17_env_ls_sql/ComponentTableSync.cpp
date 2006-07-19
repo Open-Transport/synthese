@@ -20,8 +20,10 @@ namespace envlssql
 
 
 ComponentTableSync::ComponentTableSync (const std::string& tableName, 
-					Environment::Registry& environments)
-: synthese::db::SQLiteTableSync (tableName)
+					Environment::Registry& environments,
+					bool allowInsert,
+					bool allowRemove)
+: synthese::db::SQLiteTableSync (tableName, allowInsert, allowRemove)
 , _environments (environments)
 {
     addTableColumn (TABLE_COL_ID, "INTEGER");

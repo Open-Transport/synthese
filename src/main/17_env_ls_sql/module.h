@@ -169,6 +169,12 @@ namespace synthese
 	    // list of chunk ids
 
 
+	    static const std::string SERVICEDATES_TABLE_NAME ("t005_service_dates");
+	    static const std::string SERVICEDATES_TABLE_COL_SERVICEID ("service_id");
+	    static const std::string SERVICEDATES_TABLE_COL_DATE("date");
+
+
+
 	    static const std::string SCHEDULEDSERVICES_TABLE_NAME ("t016_scheduled_services");
 
 

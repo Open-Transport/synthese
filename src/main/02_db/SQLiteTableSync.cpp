@@ -17,8 +17,12 @@ namespace db
 
 
 
-SQLiteTableSync::SQLiteTableSync ( const std::string& tableName)
+SQLiteTableSync::SQLiteTableSync ( const std::string& tableName,
+				   bool allowInsert, 
+				   bool allowRemove )
 : _tableName (tableName)
+, _allowInsert (allowInsert)
+, _allowRemove (allowRemove)
 {
 
 }
@@ -40,14 +44,65 @@ SQLiteTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite,
 
     // Create the table if it does not already exist.
     std::string sql = "CREATE TABLE IF NOT EXISTS " + getTableName () + " (";
-    sql.append (format[0].first).append (" ").append (format[0].second).append (" UNIQUE PRIMARY KEY");
+    sql.append (format[0].name).append (" ").append (format[0].type).append (" UNIQUE PRIMARY KEY");
     for (int i=1; i< (int) format.size (); ++i)
     {
-	sql.append (", ").append (format[i].first).append (" ").append (format[i].second);
+	sql.append (", ").append (format[i].name).append (" ").append (format[i].type);
     }
     sql.append (")");
-    sqlite->execQuery (sql);
+    sqlite->execUpdate (sql);
     
+    // Insert some triggers to prevent unallowed insert/update/remove operations
+    if (_allowInsert == false)
+    {
+	sql = "CREATE TRIGGER " ;
+	sql.append (getTableName () + "_no_insert");
+	sql.append (" BEFORE INSERT ON " + getTableName ());
+	sql.append (" BEGIN SELECT RAISE (ABORT, 'Insertion in " + getTableName () 
+		    + " is forbidden.'); END;");
+	sqlite->execUpdate (sql);
+    }
+
+    if (_allowRemove == false)
+    {
+	sql = "CREATE TRIGGER " ;
+	sql.append (getTableName () + "_no_remove");
+	sql.append (" BEFORE DELETE ON " + getTableName ());
+	sql.append (" BEGIN SELECT RAISE (ABORT, 'Deletion in " + getTableName () 
+		    + " is forbidden.'); END;");
+	sqlite->execUpdate (sql);
+    }
+
+    std::vector<std::string> nonUpdatableColumns;
+    for (SQLiteTableFormat::const_iterator it = _tableFormat.begin ();
+	 it != _tableFormat.end (); ++it)
+    {
+	SQLiteTableColumnFormat columnFormat = *it;
+	if (columnFormat.updatable == false)
+	{
+	    nonUpdatableColumns.push_back (columnFormat.name);
+	}
+    }
+
+    if (nonUpdatableColumns.empty () == false)
+    {
+	sql = "CREATE TRIGGER " ;
+	sql.append (getTableName () + "_no_update");
+	sql.append (" BEFORE UPDATE OF ");
+	std::string columnList;
+	for (int i=0; i<nonUpdatableColumns.size (); ++i)
+	{
+	    columnList.append (nonUpdatableColumns[i]);
+	    if (i != nonUpdatableColumns.size () - 1) sql.append (", ");
+	}
+	sql.append (columnList);
+	sql.append (" ON " + getTableName ());
+	sql.append (" BEGIN SELECT RAISE (ABORT, 'Update of " + columnList + " in " + getTableName () 
+		    + " is forbidden.'); END;");
+	sqlite->execUpdate (sql);
+    }
+
+
     // Callbacks according to what already exists in the table.
     SQLiteResult result = sqlite->execQuery ("SELECT * FROM " + getTableName ());
     rowsAdded (sqlite, sync, result);
@@ -92,9 +147,14 @@ SQLiteTableSync::getTableFormat () const
 
 void 
 SQLiteTableSync::addTableColumn (const std::string& columnName, 
-				 const std::string& columnType)
+				 const std::string& columnType,
+				 bool updatable)
 {
-    _tableFormat.push_back (std::make_pair (columnName, columnType));
+    SQLiteTableColumnFormat columnFormat;
+    columnFormat.name = columnName;
+    columnFormat.type = columnType;
+    columnFormat.updatable = updatable;
+    _tableFormat.push_back (columnFormat);
 }
 
 

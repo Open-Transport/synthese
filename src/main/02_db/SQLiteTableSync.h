@@ -27,18 +27,29 @@ namespace db
 @ingroup m02
 */
 
-    typedef std::vector<std::pair<std::string, std::string> > SQLiteTableFormat;
+    typedef struct {
+	std::string name;
+	std::string type;
+	bool updatable;
+    } SQLiteTableColumnFormat;
+
+    typedef std::vector<SQLiteTableColumnFormat> SQLiteTableFormat;
 
 class SQLiteTableSync
 {
  private:
+
+    const bool _allowInsert;
+    const bool _allowRemove;
 
     const std::string _tableName;
     SQLiteTableFormat _tableFormat;
 
  public:
 
-    SQLiteTableSync ( const std::string& tableName );
+    SQLiteTableSync ( const std::string& tableName, 
+		      bool allowInsert = true, 
+		      bool allowRemove = true);
 
     ~SQLiteTableSync ();
 
@@ -72,7 +83,9 @@ class SQLiteTableSync
 
  protected:
 
-    void addTableColumn (const std::string& columnName, const std::string& columnType);
+    void addTableColumn (const std::string& columnName, 
+			 const std::string& columnType, 
+			 bool updatable = true);
 
  private:
 
