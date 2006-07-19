@@ -130,8 +130,11 @@ SQLiteTableSync::getTableName () const
 int 
 SQLiteTableSync::getTableId () const
 {
-    return Conversion::ToInt (getTableName ().substr (1, 4));
+    return ParseTableId (_tableName);
 }
+
+
+
 
 
 
@@ -158,6 +161,13 @@ SQLiteTableSync::addTableColumn (const std::string& columnName,
 }
 
 
+
+
+int 
+SQLiteTableSync::ParseTableId (const std::string& tableName)
+{
+    return Conversion::ToInt (tableName.substr (1, 4));
+}
 
 
 

@@ -87,6 +87,11 @@ class SQLiteTableSync
 			 const std::string& columnType, 
 			 bool updatable = true);
 
+ protected:
+
+    static int ParseTableId (const std::string& tableName);
+
+
  private:
 
 

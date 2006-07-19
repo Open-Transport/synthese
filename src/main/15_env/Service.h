@@ -10,6 +10,7 @@
 #include "01_util/UId.h"
 
 #include "04_time/Schedule.h"
+#include "15_env/Calendar.h"
 
 
 
@@ -56,7 +57,7 @@ class Service :
 private:
     
     const std::string _serviceNumber;
-    Calendar* _calendar;  //!< Which days is this service available ?
+    Calendar _calendar;  //!< Which days is this service available ?
     const Path* _path;
 
     synthese::time::Schedule _departureSchedule; //!< Service departure schedule (from the origin).
@@ -65,7 +66,6 @@ public:
 
     Service (const std::string& serviceNumber,
 	     const Path* path,
-	     Calendar* calendar,
 	     const synthese::time::Schedule& departureSchedule);
     ~Service ();
 
@@ -74,7 +74,7 @@ public:
     //@{
     const Path* getPath () const;
     const std::string& getServiceNumber () const;
-    Calendar* getCalendar (); // MJ constness pb
+    Calendar& getCalendar (); // MJ constness pb
 
 
     /** Returns the departure schedule for this service.

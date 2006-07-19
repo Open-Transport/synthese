@@ -33,7 +33,6 @@ public:
     ScheduledService (const uid& id,
 		      const std::string& serviceNumber,
 		      const Path* path,
-		      Calendar* calendar,
 		      const synthese::time::Schedule& departureSchedule);
 
     ~ScheduledService ();

@@ -1,6 +1,5 @@
 #include "Service.h"
 
-#include "Calendar.h"
 #include "Path.h"
 
 
@@ -14,14 +13,12 @@ namespace env
     
 Service::Service (const std::string& serviceNumber,
 		  const Path* path,
-		  Calendar* calendar,
 		  const synthese::time::Schedule& departureSchedule)
     : BikeComplyer (path) 
     , HandicappedComplyer (path) 
     , PedestrianComplyer (path) 
     , _serviceNumber (serviceNumber)
     , _path (path)
-    , _calendar (calendar)
     , _departureSchedule (departureSchedule)
 {
 }
@@ -50,7 +47,7 @@ Service::getPath () const
 
 
 
-Calendar* 
+Calendar&
 Service::getCalendar ()
 {
     return _calendar;
@@ -94,10 +91,10 @@ Service::isProvided ( const synthese::time::Date& departureDate,
         synthese::time::Date _originDepartureDate;
         _originDepartureDate = departureDate;
         _originDepartureDate -= jplus;
-        return _calendar->isMarked( _originDepartureDate );
+        return _calendar.isMarked( _originDepartureDate );
     }
     else
-        return _calendar->isMarked ( departureDate );
+        return _calendar.isMarked ( departureDate );
 }
 
 

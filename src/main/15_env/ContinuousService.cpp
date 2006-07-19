@@ -12,12 +12,11 @@ namespace env
 ContinuousService::ContinuousService (const uid& id,
 				      const std::string& serviceNumber,
 				      const Path* path,
-				      Calendar* calendar,
 				      const synthese::time::Schedule& departureSchedule,
 				      int range,
 				      int maxWaitingTime)
     : synthese::util::Registrable<uid,ContinuousService> (id)
-    , Service (serviceNumber, path, calendar, departureSchedule)
+    , Service (serviceNumber, path, departureSchedule)
     , _range (range)
     , _maxWaitingTime (maxWaitingTime)
 {

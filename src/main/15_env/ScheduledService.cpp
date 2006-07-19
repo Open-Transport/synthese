@@ -15,11 +15,10 @@ namespace env
 ScheduledService::ScheduledService (const uid& id,
 				    const std::string& serviceNumber,
 				    const Path* path,
-				    Calendar* calendar,
 				    const synthese::time::Schedule& departureSchedule)
     : synthese::util::Registrable<uid,ScheduledService> (id)
     , ReservationRuleComplyer (path) 
-    , Service (serviceNumber, path, calendar, departureSchedule)
+    , Service (serviceNumber, path, departureSchedule)
 {
 
 }

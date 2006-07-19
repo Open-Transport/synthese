@@ -136,8 +136,6 @@ ComponentTableSync::rowsRemoved (const synthese::db::SQLiteThreadExec* sqlite,
 
 
 
-
-
 }
 
 }

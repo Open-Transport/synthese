@@ -55,15 +55,6 @@ EnvironmentTest::testEnvironmentConstruction0 ()
 	env.getAxes ().add (new Axis (1, "axis1")); 
     }
 
-    // Calendars
-    Calendar* calendar;
-    Date firstDay2006 (1, 1, 2006);
-    Date lastDay2006 (31, 12, 2006);
-	
-    // Every day of year
-    calendar = new Calendar ();
-    // calendar->setMark (firstDay2006, lastDay2006);
-
     // Lines
     {
 	env.getLines ().add (new Line (0, "line0", env.getAxes().get (0))); 
@@ -129,25 +120,24 @@ EnvironmentTest::testEnvironmentConstruction0 ()
     {
 	// line0
 	env.getScheduledServices ().add (new ScheduledService (0, "0700", env.getLines().get (0), 
-					     calendar, Schedule (Hour (7, 0), 0))); 
+					     Schedule (Hour (7, 0), 0))); 
 	env.getScheduledServices ().add (new ScheduledService (1, "0800", env.getLines().get (0), 
-					     calendar, Schedule (Hour (7, 0), 0))); 
+					     Schedule (Hour (7, 0), 0))); 
 	env.getScheduledServices ().add (new ScheduledService (2, "1500", env.getLines().get (0), 
-					     calendar, Schedule (Hour (7, 0), 0))); 
+					     Schedule (Hour (7, 0), 0))); 
 	
 	// line1
 	env.getScheduledServices ().add (new ScheduledService (3, "0710", env.getLines().get (0), 
-					     calendar, Schedule (Hour (7, 10), 0))); 
+					     Schedule (Hour (7, 10), 0))); 
 	env.getScheduledServices ().add (new ScheduledService (4, "0810", env.getLines().get (0), 
-					     calendar, Schedule (Hour (8, 10), 0))); 
+					     Schedule (Hour (8, 10), 0))); 
 	env.getScheduledServices ().add (new ScheduledService (5, "1510", env.getLines().get (0), 
-					     calendar, Schedule (Hour (15, 10), 0))); 
+					     Schedule (Hour (15, 10), 0))); 
 
 
 	// road0 (continuous service)
         // ...
 	env.getContinuousServices ().add (new ContinuousService (0, "0700", env.getRoads ().get (0),
-								 calendar, 
 								 Schedule (Hour (7, 0), 0), 720, 10)); 
 
 	// road1 (continuous service)
