@@ -77,6 +77,10 @@ namespace synthese
 	    static const std::string CONNECTIONPLACES_TABLE_NAME ("t007_connection_places");
 	    static const std::string CONNECTIONPLACES_TABLE_COL_NAME ("name");
 	    static const std::string CONNECTIONPLACES_TABLE_COL_CITYID ("city_id");
+	    static const std::string CONNECTIONPLACES_TABLE_COL_CONNECTIONTYPE ("connection_type");
+	    static const std::string CONNECTIONPLACES_TABLE_COL_ISCITYMAINCONNECTION ("is_city_main_connection");
+	    static const std::string CONNECTIONPLACES_TABLE_COL_DEFAULTTRANSFERDELAY ("default_transfer_delay");
+	    static const std::string CONNECTIONPLACES_TABLE_COL_TRANSFERDELAYS ("transfer_delays");
 
 	    
 	    static const std::string FARES_TABLE_NAME ("t008_fares");

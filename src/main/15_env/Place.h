@@ -47,6 +47,7 @@ public:
     /** Gets name of this place.
      */
     const std::string& getName () const;
+    void setName (const std::string& name);
 
 
     /** Gets official name of this place.

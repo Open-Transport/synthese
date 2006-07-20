@@ -50,6 +50,7 @@ private:
     std::vector<const PhysicalStop*> _physicalStops; 
 
     std::map< std::pair<int, int>, int > _transferDelays; //!< Transfer delays between vertices
+    int _defaultTransferDelay;
 
 protected:
 
@@ -59,23 +60,28 @@ public:
     ConnectionPlace (const uid& id,
 		     const std::string& name,
 		     const City* city,
-		     const ConnectionType& connectionType = CONNECTION_TYPE_FORBIDDEN);
+		     const ConnectionType& connectionType = CONNECTION_TYPE_FORBIDDEN,
+		     int defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY);
 
     ~ConnectionPlace ();
 
 
     //! @name Getters/Setters
     //@{
-    const std::vector<const PhysicalStop*>& getPhysicalStops () const;
+    int getDefaultTransferDelay () const;
+    void setDefaultTransferDelay (int defaultTransferDelay);
+
     const ConnectionType& getConnectionType () const;
     void setConnectionType (const ConnectionType& connectionType);
-    bool isConnectionAuthorized () const;
+
+    const std::vector<const PhysicalStop*>& getPhysicalStops () const;
 
     //@}
 
 
     //! @name Query methods.
     //@{
+    bool isConnectionAuthorized () const;
     int getTransferDelay (int departureRank, int arrivalRank) const;
     
     //@}
@@ -85,6 +91,7 @@ public:
     //@{
     void addPhysicalStop (const PhysicalStop* physicalStop);
     void addTransferDelay (int departureRank, int arrivalRank, int transferDelay);
+    void clearTransferDelays ();
     //@}
 
 

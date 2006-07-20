@@ -31,6 +31,12 @@ Place::getName () const
 
 
 
+void 
+Place::setName (const std::string& name)
+{
+    _name = name;
+}
+
 
 
 

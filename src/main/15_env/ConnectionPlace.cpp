@@ -17,10 +17,12 @@ const int ConnectionPlace::FORBIDDEN_TRANSFER_DELAY = std::numeric_limits<int>::
 ConnectionPlace::ConnectionPlace (const uid& id,
 				  const std::string& name,
 				  const City* city,
-				  const ConnectionType& connectionType)
+				  const ConnectionType& connectionType,
+				  int defaultTransferDelay)
     : synthese::util::Registrable<uid,ConnectionPlace> (id)
     , AddressablePlace (name, city)
     , _connectionType (connectionType)
+    , _defaultTransferDelay (defaultTransferDelay)
 {
 }
 
@@ -30,6 +32,26 @@ ConnectionPlace::ConnectionPlace (const uid& id,
 ConnectionPlace::~ConnectionPlace ()
 {
 }
+
+
+
+
+
+int 
+ConnectionPlace::getDefaultTransferDelay () const
+{
+    return _defaultTransferDelay;
+}
+
+
+
+
+void 
+ConnectionPlace::setDefaultTransferDelay (int defaultTransferDelay)
+{
+    _defaultTransferDelay = defaultTransferDelay;
+}
+
 
 
 
@@ -64,8 +86,8 @@ ConnectionPlace::getTransferDelay (int departureRank, int arrivalRank) const
     std::map< std::pair<int, int>, int >::const_iterator iter = 
 	_transferDelays.find (std::make_pair (departureRank, arrivalRank));
     
-    // If not defined in map, return unknown transfer delay constant
-    if (iter == _transferDelays.end ()) return UNKNOWN_TRANSFER_DELAY;
+    // If not defined in map, return default transfer delay
+    if (iter == _transferDelays.end ()) return _defaultTransferDelay;
     return iter->second;
 }
  
@@ -78,6 +100,15 @@ ConnectionPlace::addTransferDelay (int departureRank, int arrivalRank, int trans
 }
 
     
+
+void 
+ConnectionPlace::clearTransferDelays ()
+{
+    _transferDelays.clear ();
+}
+
+
+
 
 void 
 ConnectionPlace::addPhysicalStop (const PhysicalStop* physicalStop)

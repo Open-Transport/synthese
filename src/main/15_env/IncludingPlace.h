@@ -40,12 +40,6 @@ public:
     
     //@}
 
-protected:
-
-    IncludingPlace (const std::string& name,
-		      const City* city);
-
-
     //! @name Update methods.
     //@{
 
@@ -54,6 +48,13 @@ protected:
     void addIncludedPlace (const Place* place);
 
     //@}
+
+
+protected:
+
+    IncludingPlace (const std::string& name,
+		      const City* city);
+
 
 
 };
