@@ -167,6 +167,7 @@ namespace synthese
 	     */
 	    static const std::string ROADCHUNKS_TABLE_NAME ("t014_road_chunks");
 	    static const std::string ROADCHUNKS_TABLE_COL_FROMADDRESSID ("from_address_id");
+	    static const std::string ROADCHUNKS_TABLE_COL_RANKINPATH ("rank_in_path");
 	    static const std::string ROADCHUNKS_TABLE_COL_VIAPOINTS ("via_points");  // list of ids
 
 

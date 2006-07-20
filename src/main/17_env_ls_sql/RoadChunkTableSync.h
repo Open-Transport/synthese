@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_ENVLSSQL_CONNECTIONPLACETABLESYNC_H
-#define SYNTHESE_ENVLSSQL_CONNECTIONPLACETABLESYNC_H
+#ifndef SYNTHESE_ENVLSSQL_ROADCHUNKTABLESYNC_H
+#define SYNTHESE_ENVLSSQL_ROADCHUNKTABLESYNC_H
 
 
 #include <string>
@@ -14,7 +14,7 @@ namespace synthese
 
 namespace env
 {
-	class ConnectionPlace;
+	class RoadChunk;
 }
 
 
@@ -24,19 +24,19 @@ namespace envlssql
 
 /** 
 
-ConnectionPlace SQLite table synchronizer.
+RoadChunk SQLite table synchronizer.
 
 @ingroup m17
 */
 
-class ConnectionPlaceTableSync : public ComponentTableSync
+class RoadChunkTableSync : public ComponentTableSync
 {
  private:
 
  public:
 
-    ConnectionPlaceTableSync (synthese::env::Environment::Registry& environments);
-    ~ConnectionPlaceTableSync ();
+    RoadChunkTableSync (synthese::env::Environment::Registry& environments);
+    ~RoadChunkTableSync ();
 
  protected:
 
