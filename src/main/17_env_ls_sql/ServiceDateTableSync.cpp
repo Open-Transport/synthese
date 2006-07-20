@@ -82,11 +82,11 @@ ServiceDateTableSync::updateServiceCalendar (const synthese::db::SQLiteResult& r
     int tableId = synthese::util::decodeTableId (serviceId);
 
     Service* service = 0;
-    if (serviceId == ParseTableId (SCHEDULEDSERVICES_TABLE_NAME))
+    if (tableId == ParseTableId (SCHEDULEDSERVICES_TABLE_NAME))
     {
 	service = environment.getScheduledServices ().get (serviceId);
     }
-    else if (serviceId == ParseTableId (CONTINUOUSSERVICES_TABLE_NAME ))
+    else if (tableId == ParseTableId (CONTINUOUSSERVICES_TABLE_NAME ))
     {
 	service = environment.getContinuousServices ().get (serviceId);
     }

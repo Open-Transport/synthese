@@ -193,6 +193,40 @@ Environment::getPhysicalStops () const
 }
 
 
+PlaceAlias::Registry& 
+Environment::getPlaceAliases ()
+{
+    return _placeAliases;
+}
+
+
+
+const PlaceAlias::Registry& 
+Environment::getPlaceAliases () const
+{
+    return _placeAliases;
+}
+
+
+
+PublicPlace::Registry& 
+Environment::getPublicPlaces ()
+{
+    return _publicPlaces;
+}
+
+
+
+const PublicPlace::Registry& 
+Environment::getPublicPlaces () const
+{
+    return _publicPlaces;
+}
+
+
+
+
+
 
 RoadChunk::Registry& 
 Environment::getRoadChunks ()

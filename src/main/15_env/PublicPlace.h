@@ -28,11 +28,11 @@ private:
 
 protected:
 
+public:
+
     PublicPlace (const uid& id,
 		 const std::string& name,
 		 const City* city);
-
-public:
 
     virtual ~PublicPlace ();
 

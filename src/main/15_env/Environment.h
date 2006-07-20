@@ -106,8 +106,14 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     LineStop::Registry& getLineStops ();
     const LineStop::Registry& getLineStops () const;
 
+    PlaceAlias::Registry& getPlaceAliases ();
+    const PlaceAlias::Registry& getPlaceAliases () const;
+
     PhysicalStop::Registry& getPhysicalStops ();
     const PhysicalStop::Registry& getPhysicalStops () const;
+
+    PublicPlace::Registry& getPublicPlaces ();
+    const PublicPlace::Registry& getPublicPlaces () const;
 
     RoadChunk::Registry& getRoadChunks ();
     const RoadChunk::Registry& getRoadChunks () const;

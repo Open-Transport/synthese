@@ -150,6 +150,15 @@ namespace synthese
 	    static const std::string PHYSICALSTOPS_TABLE_COL_X ("x");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_Y ("y");
 
+	    static const std::string PLACEALIASES_TABLE_NAME ("t011_place_aliases");
+	    static const std::string PLACEALIASES_TABLE_COL_NAME ("name");
+	    static const std::string PLACEALIASES_TABLE_COL_ALIASEDPLACEID ("aliased_place_id");
+
+	    static const std::string PUBLICPLACES_TABLE_NAME ("t013_public_places");
+	    static const std::string PUBLICPLACES_TABLE_COL_NAME ("name");
+	    static const std::string PUBLICPLACES_TABLE_COL_CITYID ("city_id");
+
+
 
 	    /** Road chunks table :
 		- on insert : 
