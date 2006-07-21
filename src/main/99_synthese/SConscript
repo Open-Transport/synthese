@@ -8,6 +8,8 @@ excludes = []
 
 
 moduleenv.Append ( CPPDEFINES = ['MODULE_80'] )
+moduleenv.AppendMultithreadConf ()
+
 files = moduleenv.Glob(includes, excludes)
 
 # NOTE : Create first a static library before linking the program,
