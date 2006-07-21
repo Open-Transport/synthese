@@ -7,9 +7,8 @@ includes = 'main.cpp'
 excludes = []
 
 
+moduleenv.Append ( CPPDEFINES = ['MODULE_80'] )
 files = moduleenv.Glob(includes, excludes)
-
-moduleenv.AppendMultithreadConf ()
 
 # NOTE : Create first a static library before linking the program,
 # otherwise, very strange gnu.link_once errors on boost time
@@ -21,7 +20,6 @@ includes = ''
 excludes = []
 files = moduleenv.Glob(includes, excludes)
 
-moduleenv.Append ( CPPDEFINES = ['MODULE_80'] )
 
 # Modules libs
 moduleenv.AddModuleDependency ('99_synthese')
