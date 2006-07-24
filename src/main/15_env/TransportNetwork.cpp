@@ -21,6 +21,20 @@ TransportNetwork::~TransportNetwork()
 
 
 
+const std::string& 
+TransportNetwork::getName () const
+{
+    return _name;
+}
+
+
+
+void 
+TransportNetwork::setName( const std::string& name)
+{
+    _name = name;
+}
+
 
 
 }

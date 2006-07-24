@@ -27,6 +27,13 @@ class TransportNetwork : public synthese::util::Registrable<uid,TransportNetwork
 	      const std::string& name );
     ~TransportNetwork ();
 
+    //! @name Getters/Setters
+    //@{
+    const std::string& getName () const;
+    void setName( const std::string& name);
+    //@}
+    
+
 };
 
 

@@ -8,6 +8,7 @@
 
 #include <sqlite/sqlite3.h>
 #include <boost/logic/tribool.hpp>
+#include <assert.h>
 
 
 using boost::logic::tribool;
@@ -59,6 +60,11 @@ void
 TransportNetworkTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 			  synthese::env::Environment& environment)
 {
+    uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    synthese::env::TransportNetwork* tn = environment.getTransportNetworks ().get (id);
+    std::string name (
+	rows.getColumn (rowIndex, TRANSPORTNETWORKS_TABLE_COL_NAME));
+    tn->setName (name);
 }
 
 
@@ -67,6 +73,7 @@ void
 TransportNetworkTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
+    assert (false);
 }
 
 
