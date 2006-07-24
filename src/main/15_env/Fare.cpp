@@ -50,7 +50,7 @@ Fare::setName (const std::string& name)
 
 
 void 
-Fare::setType (const FareType& fareType)
+Fare::setType (const FareType& type)
 {
     _type = type;
 }

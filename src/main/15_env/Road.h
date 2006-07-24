@@ -48,7 +48,7 @@ public:
 
 private:
   
-  const RoadType _type;
+  RoadType _type;
 
 public:
 

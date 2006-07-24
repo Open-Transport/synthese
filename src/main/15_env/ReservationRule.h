@@ -30,10 +30,10 @@ public:
     /** Type of reservation rule */
     typedef enum
     {
-	RESERVATION_TYPE_IMPOSSIBLE = 'N', //!< Reservation is not possible, services should be taken without any announcement
-        RESERVATION_TYPE_OPTIONNAL = 'F',     //!< Reservation is possible but not compulsory, services should be taken with announcement for much security
-	RESERVATION_TYPE_COMPULSORY = 'O',     //!< Reservation is compulsory, passengers without reservation are not accepted
-	RESERVATION_TYPE_AT_LEAST_ONE_REQUIRED = 'C' //!< At least on reservation is compulsory, the service do not go if no reservations are done, but will go if at least one is done, and will bi opened for passengers without reservation
+	RESERVATION_TYPE_IMPOSSIBLE = 0, //!< Reservation is not possible, services should be taken without any announcement
+        RESERVATION_TYPE_OPTIONNAL = 1,     //!< Reservation is possible but not compulsory, services should be taken with announcement for much security
+	RESERVATION_TYPE_COMPULSORY = 2,     //!< Reservation is compulsory, passengers without reservation are not accepted
+	RESERVATION_TYPE_AT_LEAST_ONE_REQUIRED = 3 //!< At least on reservation is compulsory, the service do not go if no reservations are done, but will go if at least one is done, and will bi opened for passengers without reservation
     } ReservationType;
 
 
@@ -76,12 +76,29 @@ private:
     //! @name Getters/Setters
     //@{
     const ReservationType& getType () const;
-    const synthese::time::Hour& getHourDeadLine () const;
+    void setType (const ReservationType& type);
 
-    const std::string& getPhoneExchangeOpeningHours () const;
-    const std::string& getWebSiteUrl () const;
+    const synthese::time::Hour& getHourDeadLine () const;
+    void setHourDeadLine (const synthese::time::Hour& hourDeadLine);
 
     const std::string& getPhoneExchangeNumber () const;
+    void setPhoneExchangeNumber (const std::string& phoneExchangeNumber);
+
+    const std::string& getPhoneExchangeOpeningHours () const;
+    void setPhoneExchangeOpeningHours (const std::string& phoneExchangeOpeningHours);
+
+    const std::string& getWebSiteUrl () const;
+    void setWebSiteUrl (const std::string& webSiteUrl);
+
+    const std::string& getDescription () const;
+    void setDescription (const std::string& description);
+
+    void setMinDelayMinutes (int minDelayMinutes);
+    void setMinDelayDays (int minDelayDays);
+    void setMaxDelayDays (int maxDelayDays);
+
+    void setOnline (bool online);
+    void setOriginIsReference (bool originIsReference);
     //@}
 
 

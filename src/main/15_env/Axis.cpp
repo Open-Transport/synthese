@@ -56,7 +56,7 @@ Axis::isAllowed () const
 
 
 void 
-Aixs::setFree (bool isFree)
+Axis::setFree (bool isFree)
 {
     _free = isFree;
 }

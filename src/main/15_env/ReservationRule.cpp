@@ -55,10 +55,26 @@ ReservationRule::getType () const
 
 
 
+void
+ReservationRule::setType (const ReservationRule::ReservationType& type)
+{
+    _type = type;
+}
+
+
+
 const synthese::time::Hour& 
 ReservationRule::getHourDeadLine () const
 {
     return _hourDeadLine;
+}
+
+
+
+void
+ReservationRule::setHourDeadLine (const synthese::time::Hour& hourDeadLine)
+{
+    _hourDeadLine = hourDeadLine;
 }
 
 
@@ -72,11 +88,35 @@ ReservationRule::getPhoneExchangeOpeningHours () const
 
 
 
+void
+ReservationRule::setPhoneExchangeOpeningHours (const std::string& phoneExchangeOpeningHours)
+{
+    _phoneExchangeOpeningHours = phoneExchangeOpeningHours;
+}
+
+
+
 
 const std::string& 
 ReservationRule::getWebSiteUrl () const
 {
     return _webSiteUrl;
+}
+
+
+void
+ReservationRule::setWebSiteUrl (const std::string& webSiteUrl)
+{
+    _webSiteUrl = webSiteUrl;
+}
+
+
+
+
+void
+ReservationRule::setPhoneExchangeNumber (const std::string& phoneExchangeNumber)
+{
+    _phoneExchangeNumber = phoneExchangeNumber;
 }
 
 
@@ -87,6 +127,7 @@ ReservationRule::getPhoneExchangeNumber () const
 {
     return _phoneExchangeNumber;
 }
+
 
 
 
@@ -171,6 +212,61 @@ ReservationRule::isReservationPossible ( const Service* service,
 
 
 
+const std::string& 
+ReservationRule::getDescription () const
+{
+    return _description;
+}
+
+
+
+
+void 
+ReservationRule::setDescription (const std::string& description)
+{
+    _description = description;
+}
+
+
+
+void 
+ReservationRule::setMinDelayMinutes (int minDelayMinutes)
+{
+    _minDelayMinutes = minDelayMinutes;
+}
+
+
+
+void ReservationRule::setMinDelayDays (int minDelayDays)
+{
+    _minDelayDays = minDelayDays;
+}
+
+
+
+
+
+void ReservationRule::setMaxDelayDays (int maxDelayDays)
+{
+    _maxDelayDays = maxDelayDays;
+}
+
+
+
+
+void 
+ReservationRule::setOnline (bool online)
+{
+    _online = online;
+}
+ 
+
+
+void 
+ReservationRule::setOriginIsReference (bool originIsReference)
+{
+    _originIsReference = originIsReference;
+}
 
 
 

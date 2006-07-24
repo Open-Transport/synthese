@@ -235,6 +235,19 @@ namespace synthese
 	    static const std::string TRANSPORTNETWORKS_TABLE_NAME ("t022_transport_networks");
 	    static const std::string TRANSPORTNETWORKS_TABLE_COL_NAME ("name");
 
+	    static const std::string RESERVATIONRULES_TABLE_NAME ("t021_reservation_rules");
+	    static const std::string RESERVATIONRULES_TABLE_COL_TYPE ("reservation_type");
+	    static const std::string RESERVATIONRULES_TABLE_COL_ONLINE ("online");
+	    static const std::string RESERVATIONRULES_TABLE_COL_ORIGINISREFERENCE ("origin_is_reference");
+	    static const std::string RESERVATIONRULES_TABLE_COL_MINDELAYMINUTES ("min_delay_minutes");
+	    static const std::string RESERVATIONRULES_TABLE_COL_MINDELAYDAYS ("min_delay_days");
+	    static const std::string RESERVATIONRULES_TABLE_COL_MAXDELAYDAYS ("max_delay_days");
+	    static const std::string RESERVATIONRULES_TABLE_COL_HOURDEADLINE ("hour_deadline");
+	    static const std::string RESERVATIONRULES_TABLE_COL_PHONEEXCHANGENUMBER ("phone_exchange_number");
+	    static const std::string RESERVATIONRULES_TABLE_COL_PHONEEXCHANGEOPENINGHOURS ("phone_exchange_opening_hours");
+	    static const std::string RESERVATIONRULES_TABLE_COL_DESCRIPTION ("description");
+	    static const std::string RESERVATIONRULES_TABLE_COL_WEBSITEURL ("web_site_url");
+
 	}
 
 	/** @} */

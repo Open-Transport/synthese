@@ -56,7 +56,7 @@ class Service :
 {
 private:
     
-    const std::string _serviceNumber;
+    std::string _serviceNumber;
     Calendar _calendar;  //!< Which days is this service available ?
     const Path* _path;
 

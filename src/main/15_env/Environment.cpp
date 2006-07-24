@@ -356,20 +356,6 @@ Environment::getTransportNetworks () const
 }
 
 
-RollingStock::Registry& 
-Environment::getRollingStocks ()
-{
-    return _rollingStocks;
-}
-
-
-
-const RollingStock::Registry& 
-Environment::getRollingStocks () const
-{
-    return _rollingStocks;
-}
-
 
 
 ReservationRule::Registry& 
