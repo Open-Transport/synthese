@@ -50,6 +50,12 @@ Line::getName () const
 
 
 
+void 
+Line::setName (const std::string& name)
+{
+    _name = name;
+}
+
 
 
 bool 
