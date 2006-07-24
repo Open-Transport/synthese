@@ -9,6 +9,7 @@
 
 #include <boost/tokenizer.hpp>
 #include <sqlite/sqlite3.h>
+#include <assert.h>
 
 
 
@@ -26,11 +27,11 @@ namespace envlssql
 
 
 RoadChunkTableSync::RoadChunkTableSync (Environment::Registry& environments)
-: ComponentTableSync (ROADCHUNKS_TABLE_NAME, environments)
+: ComponentTableSync (ROADCHUNKS_TABLE_NAME, environments, true, false)
 {
-    addTableColumn (ROADCHUNKS_TABLE_COL_FROMADDRESSID, "INTEGER");
-    addTableColumn (ROADCHUNKS_TABLE_COL_RANKINPATH, "INTEGER");
-    addTableColumn (ROADCHUNKS_TABLE_COL_VIAPOINTS, "TEXT");
+    addTableColumn (ROADCHUNKS_TABLE_COL_FROMADDRESSID, "INTEGER", false);
+    addTableColumn (ROADCHUNKS_TABLE_COL_RANKINPATH, "INTEGER", false);
+    addTableColumn (ROADCHUNKS_TABLE_COL_VIAPOINTS, "TEXT", true);
 }
 
 
@@ -89,6 +90,30 @@ void
 RoadChunkTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 			  synthese::env::Environment& environment)
 {
+    uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    synthese::env::RoadChunk* rc = environment.getRoadChunks ().get (id);
+
+    std::string viaPointsStr (
+	rows.getColumn (rowIndex, ROADCHUNKS_TABLE_COL_VIAPOINTS));
+
+    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+    
+    rc->clearViaPoints ();
+
+    boost::char_separator<char> sep1 (",");
+    boost::char_separator<char> sep2 (":");
+    tokenizer viaPointsTokens (viaPointsStr, sep1);
+    for (tokenizer::iterator viaPointIter = viaPointsTokens.begin();
+	 viaPointIter != viaPointsTokens.end (); ++viaPointIter)
+    {
+	tokenizer valueTokens (*viaPointIter, sep2);
+	tokenizer::iterator valueIter = valueTokens.begin();
+
+	// X:Y
+	rc->addViaPoint (synthese::env::Point (Conversion::ToDouble (*valueIter), 
+					       Conversion::ToDouble (*(++valueIter))));
+    }
+
 }
 
 
@@ -99,6 +124,7 @@ void
 RoadChunkTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
+    assert (false);
 }
 
 
