@@ -9,6 +9,8 @@
 
 #include <boost/tokenizer.hpp>
 #include <sqlite/sqlite3.h>
+#include <assert.h>
+
 
 
 
@@ -26,13 +28,13 @@ namespace envlssql
 
 
 LineStopTableSync::LineStopTableSync (Environment::Registry& environments)
-: ComponentTableSync (LINESTOPS_TABLE_NAME, environments)
+: ComponentTableSync (LINESTOPS_TABLE_NAME, environments, true, false)
 {
-    addTableColumn (LINESTOPS_TABLE_COL_FROMPHYSICALSTOPID, "INTEGER");
-    addTableColumn (LINESTOPS_TABLE_COL_LINEID, "INTEGER");
-    addTableColumn (LINESTOPS_TABLE_COL_RANKINPATH, "INTEGER");
-    addTableColumn (LINESTOPS_TABLE_COL_METRICOFFSET, "DOUBLE");
-    addTableColumn (LINESTOPS_TABLE_COL_VIAPOINTS, "TEXT");
+    addTableColumn (LINESTOPS_TABLE_COL_FROMPHYSICALSTOPID, "INTEGER", false);
+    addTableColumn (LINESTOPS_TABLE_COL_LINEID, "INTEGER", false);
+    addTableColumn (LINESTOPS_TABLE_COL_RANKINPATH, "INTEGER", false);
+    addTableColumn (LINESTOPS_TABLE_COL_METRICOFFSET, "DOUBLE", true);
+    addTableColumn (LINESTOPS_TABLE_COL_VIAPOINTS, "TEXT", true);
 }
 
 
@@ -102,6 +104,36 @@ void
 LineStopTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 			  synthese::env::Environment& environment)
 {
+    uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    LineStop* ls = environment.getLineStops().get (id);
+
+    double metricOffset (
+	Conversion::ToDouble (rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_METRICOFFSET)));
+    
+    ls->setMetricOffset (metricOffset);
+
+    std::string viaPointsStr (
+	rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_VIAPOINTS));
+
+    ls->clearViaPoints ();
+
+    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+
+    boost::char_separator<char> sep1 (",");
+    boost::char_separator<char> sep2 (":");
+    tokenizer viaPointsTokens (viaPointsStr, sep1);
+    for (tokenizer::iterator viaPointIter = viaPointsTokens.begin();
+	 viaPointIter != viaPointsTokens.end (); ++viaPointIter)
+    {
+	tokenizer valueTokens (*viaPointIter, sep2);
+	tokenizer::iterator valueIter = valueTokens.begin();
+
+	// X:Y
+	ls->addViaPoint (synthese::env::Point (Conversion::ToDouble (*valueIter), 
+					       Conversion::ToDouble (*(++valueIter))));
+    }
+
+
 }
 
 
@@ -112,6 +144,7 @@ void
 LineStopTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
+    assert (false);
 }
 
 

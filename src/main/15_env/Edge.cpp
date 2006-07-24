@@ -168,6 +168,14 @@ Edge::addViaPoint (const Point& viaPoint)
 }
 
 
+void 
+Edge::clearViaPoints ()
+{
+    _viaPoints.clear ();
+}
+
+
+
 
 int 
 Edge::getRankInPath () const

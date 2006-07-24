@@ -133,6 +133,7 @@ public:
 
     //! @name Update methods
     //@{
+    void clearViaPoints ();
     void addViaPoint (const Point& viaPoint);
     
     //@}

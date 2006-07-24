@@ -36,7 +36,7 @@ private:
 
     const PhysicalStop*  _physicalStop;   //!< Physical stop
 
-    const double _metricOffset;      //!< Metric offset of stop on line
+    double _metricOffset;      //!< Metric offset of stop on line
 
     synthese::time::Schedule* _departureBeginSchedule;  //!< 
     synthese::time::Schedule* _departureEndSchedule;  //!< 
@@ -79,6 +79,7 @@ public:
 
     
     double getMetricOffset () const;
+    void setMetricOffset (double metricOffset);
     
 
     //@}

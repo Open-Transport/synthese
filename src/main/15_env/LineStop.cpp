@@ -599,6 +599,11 @@ LineStop::updateArrivalIndex ()
 }
 
 
+void 
+LineStop::setMetricOffset (double metricOffset)
+{
+    _metricOffset = metricOffset;
+}
 
 
 
