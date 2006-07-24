@@ -52,9 +52,6 @@ class FareTableSync : public ComponentTableSync
 
  private:
 
-    synthese::env::Fare* createFromRow (const synthese::env::Environment& env,
-					const synthese::db::SQLiteResult& rows, 
-					int rowIndex) const;
 };
 
 

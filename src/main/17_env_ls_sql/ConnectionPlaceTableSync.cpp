@@ -8,6 +8,7 @@
 
 #include <boost/tokenizer.hpp>
 #include <sqlite/sqlite3.h>
+#include <assert.h>
 
 
 
@@ -24,14 +25,14 @@ namespace envlssql
 
 
 ConnectionPlaceTableSync::ConnectionPlaceTableSync (Environment::Registry& environments)
-: ComponentTableSync (CONNECTIONPLACES_TABLE_NAME, environments)
+: ComponentTableSync (CONNECTIONPLACES_TABLE_NAME, environments, true, false)
 {
-    addTableColumn (CONNECTIONPLACES_TABLE_COL_NAME, "TEXT");
+    addTableColumn (CONNECTIONPLACES_TABLE_COL_NAME, "TEXT", true);
     addTableColumn (CONNECTIONPLACES_TABLE_COL_CITYID, "TEXT", false);
-    addTableColumn (CONNECTIONPLACES_TABLE_COL_CONNECTIONTYPE, "TEXT");
-    addTableColumn (CONNECTIONPLACES_TABLE_COL_ISCITYMAINCONNECTION, "TEXT");
-    addTableColumn (CONNECTIONPLACES_TABLE_COL_DEFAULTTRANSFERDELAY, "TEXT");
-    addTableColumn (CONNECTIONPLACES_TABLE_COL_TRANSFERDELAYS, "TEXT");
+    addTableColumn (CONNECTIONPLACES_TABLE_COL_CONNECTIONTYPE, "TEXT", true);
+    addTableColumn (CONNECTIONPLACES_TABLE_COL_ISCITYMAINCONNECTION, "TEXT", true);
+    addTableColumn (CONNECTIONPLACES_TABLE_COL_DEFAULTTRANSFERDELAY, "TEXT", true);
+    addTableColumn (CONNECTIONPLACES_TABLE_COL_TRANSFERDELAYS, "TEXT", true);
 }
 
 
@@ -153,8 +154,7 @@ void
 ConnectionPlaceTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
-    // TODO
-
+    assert (false);
 }
 
 

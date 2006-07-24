@@ -41,6 +41,19 @@ Fare::getType () const
 }
 
 
+void 
+Fare::setName (const std::string& name)
+{
+    _name = name;
+}
+
+
+
+void 
+Fare::setType (const FareType& fareType)
+{
+    _type = type;
+}
 
 
 

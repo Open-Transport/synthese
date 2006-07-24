@@ -7,7 +7,7 @@
 #include "15_env/Fare.h"
 
 #include <sqlite/sqlite3.h>
-
+#include <assert.h>
 
 
 using synthese::util::Conversion;
@@ -22,10 +22,10 @@ namespace envlssql
 
 
 FareTableSync::FareTableSync (Environment::Registry& environments)
-: ComponentTableSync (FARES_TABLE_NAME, environments)
+: ComponentTableSync (FARES_TABLE_NAME, environments, true, false)
 {
-    addTableColumn (FARES_TABLE_COL_NAME, "TEXT");
-    addTableColumn (FARES_TABLE_COL_FARETYPE, "INTEGER");
+    addTableColumn (FARES_TABLE_COL_NAME, "TEXT", true);
+    addTableColumn (FARES_TABLE_COL_FARETYPE, "INTEGER", true);
 }
 
 
@@ -42,7 +42,12 @@ void
 FareTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
-    environment.getFares ().add (createFromRow (environment, rows, rowIndex), false);
+    synthese::env::Fare* fare = new synthese::env::Fare (
+	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
+	rows.getColumn (rowIndex, FARES_TABLE_COL_NAME),
+	(synthese::env::Fare::FareType) Conversion::ToInt (rows.getColumn (rowIndex, FARES_TABLE_COL_FARETYPE))
+	);
+    environment.getFares ().add (fare, false);
 }
 
 
@@ -51,12 +56,12 @@ void
 FareTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 			  synthese::env::Environment& environment)
 {
-    synthese::env::Fare* newFare = createFromRow (environment, rows, rowIndex);
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+    synthese::env::Fare* fare = environment.getFares ().get (id);
     
-    // Overwrite the old object with new object values
-    *(environment.getFares ().get (newFare->getKey ())) = *newFare;
-
-    delete newFare;
+    fare->setName (rows.getColumn (rowIndex, FARES_TABLE_COL_NAME));
+    fare->setType ((synthese::env::Fare::FareType) Conversion::ToInt (rows.getColumn (rowIndex, FARES_TABLE_COL_FARETYPE)));
+    
 }
 
 
@@ -65,25 +70,8 @@ void
 FareTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
-    environment.getFares ().remove (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    assert (false);
 }
-
-
-
-
-synthese::env::Fare* 
-FareTableSync::createFromRow (const Environment& env,
-				 const synthese::db::SQLiteResult& rows, int rowIndex) const
-{
-    return new synthese::env::Fare (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
-	rows.getColumn (rowIndex, FARES_TABLE_COL_NAME),
-	(synthese::env::Fare::FareType) Conversion::ToInt (rows.getColumn (rowIndex, FARES_TABLE_COL_FARETYPE))
-	);
-    
-}
-
-
 
 
 

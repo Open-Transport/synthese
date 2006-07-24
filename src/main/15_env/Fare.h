@@ -42,7 +42,10 @@ class Fare : public synthese::util::Registrable<uid,Fare>
     //! @name Getters/Setters
     //@{
     const std::string& getName () const;
+    void setName (const std::string& name);
+
     const FareType& getType () const;
+    void setType (const FareType& fareType);
     //@}
 
 };
