@@ -73,7 +73,10 @@ public:
     //! @name Getters/Setters
     //@{
     const Path* getPath () const;
+
     const std::string& getServiceNumber () const;
+    void setServiceNumber (const std::string& serviceNumber);
+
     Calendar& getCalendar (); // MJ constness pb
 
 

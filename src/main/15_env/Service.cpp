@@ -39,6 +39,15 @@ Service::getServiceNumber () const
 
 
 
+void 
+Service::setServiceNumber (const std::string& serviceNumber)
+{
+    _serviceNumber = serviceNumber;
+}
+
+
+
+
 const Path* 
 Service::getPath () const
 {
