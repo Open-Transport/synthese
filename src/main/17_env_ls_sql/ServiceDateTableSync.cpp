@@ -90,7 +90,7 @@ ServiceDateTableSync::updateServiceCalendar (const synthese::db::SQLiteResult& r
     {
 	service = environment.getContinuousServices ().get (serviceId);
     }
-    if (service == 0) return;
+    assert (service != 0);
 
     // Mark the date in service calendar
     service->getCalendar ().mark (

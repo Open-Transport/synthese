@@ -196,10 +196,26 @@ namespace synthese
 
 
 	    static const std::string SCHEDULEDSERVICES_TABLE_NAME ("t016_scheduled_services");
+	    static const std::string SCHEDULEDSERVICES_TABLE_COL_SERVICENUMBER ("service_number");
+	    static const std::string SCHEDULEDSERVICES_TABLE_COL_SCHEDULES ("schedules");
+	    static const std::string SCHEDULEDSERVICES_TABLE_COL_PATHID ("path_id");
+	    static const std::string SCHEDULEDSERVICES_TABLE_COL_RANKINPATH ("rank_in_path");
+	    static const std::string SCHEDULEDSERVICES_TABLE_COL_BIKECOMPLIANCEID ("bike_compliance_id");
+	    static const std::string SCHEDULEDSERVICES_TABLE_COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
+	    static const std::string SCHEDULEDSERVICES_TABLE_COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
+	    static const std::string SCHEDULEDSERVICES_TABLE_COL_RESERVATIONRULEID ("reservation_rule_id");
 
 
 	    static const std::string CONTINUOUSSERVICES_TABLE_NAME ("t017_continuous_services");
-
+	    static const std::string CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER ("service_number");
+	    static const std::string CONTINUOUSSERVICES_TABLE_COL_SCHEDULES ("schedules");
+	    static const std::string CONTINUOUSSERVICES_TABLE_COL_PATHID ("path_id");
+	    static const std::string CONTINUOUSSERVICES_TABLE_COL_RANKINPATH ("rank_in_path");
+	    static const std::string CONTINUOUSSERVICES_TABLE_COL_RANGE ("range");
+	    static const std::string CONTINUOUSSERVICES_TABLE_COL_MAXWAITINGTIME ("max_waiting_time");
+	    static const std::string CONTINUOUSSERVICES_TABLE_COL_BIKECOMPLIANCEID ("bike_compliance_id");
+	    static const std::string CONTINUOUSSERVICES_TABLE_COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
+	    static const std::string CONTINUOUSSERVICES_TABLE_COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 	    //... 
 	    
 	    

@@ -1,11 +1,18 @@
 #include "Hour.h"
 #include "Schedule.h"
 
+#include "01_util/Conversion.h"
+
+
 #include "assert.h"
 
 #include <iomanip>
 #include <sstream>
 #include <ctime>
+
+
+using synthese::util::Conversion;
+
 
 namespace synthese
 {
@@ -283,6 +290,14 @@ Hour::updateHour ( int hours, int minutes )
         _minutes = UNKNOWN_VALUE;
     else if ( minutes != TIME_UNCHANGED && ( minutes != TIME_SAME || hours != TIME_UNCHANGED ) )
         _minutes = minutes;
+}
+
+
+Hour
+Hour::FromSQLTime (const std::string& sqlTime)
+{
+    return Hour (Conversion::ToInt (sqlTime.substr (0, 2)),
+		 Conversion::ToInt (sqlTime.substr (3, 2)));
 }
 
 

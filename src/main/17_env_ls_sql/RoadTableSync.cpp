@@ -28,8 +28,17 @@ namespace envlssql
 RoadTableSync::RoadTableSync (Environment::Registry& environments)
 : ComponentTableSync (ROADS_TABLE_NAME, environments)
 {
-    addTableColumn (ROADS_TABLE_COL_NAME, "INTEGER");
-    addTableColumn (ROADCHUNKS_TABLE_COL_RANKINPATH, "INTEGER");
+    addTableColumn (ROADS_TABLE_COL_NAME, "TEXT");
+    addTableColumn (ROADS_TABLE_COL_CITYID, "INTEGER");
+    addTableColumn (ROADS_TABLE_COL_ROADTYPE, "INTEGER");
+    addTableColumn (ROADS_TABLE_COL_FAREID, "INTEGER");
+    addTableColumn (ROADS_TABLE_COL_ALARMID, "INTEGER");
+    addTableColumn (ROADS_TABLE_COL_BIKECOMPLIANCEID, "INTEGER");
+    addTableColumn (ROADS_TABLE_COL_HANDICAPPEDCOMPLIANCEID, "INTEGER");
+    addTableColumn (ROADS_TABLE_COL_PEDESTRIANCOMPLIANCEID, "INTEGER");
+    addTableColumn (ROADS_TABLE_COL_RESERVATIONRULEID, "INTEGER");
+
+
     addTableColumn (ROADCHUNKS_TABLE_COL_VIAPOINTS, "TEXT");
 }
 
@@ -66,6 +75,9 @@ RoadTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 
     uid bikeComplianceId (
 	Conversion::ToLongLong (rows.getColumn (rowIndex, ROADS_TABLE_COL_BIKECOMPLIANCEID)));
+
+    uid handicappedComplianceId (
+	Conversion::ToLongLong (rows.getColumn (rowIndex, ROADS_TABLE_COL_HANDICAPPEDCOMPLIANCEID)));
 
     uid pedestrianComplianceId (
 	Conversion::ToLongLong (rows.getColumn (rowIndex, ROADS_TABLE_COL_PEDESTRIANCOMPLIANCEID)));

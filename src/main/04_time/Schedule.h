@@ -68,6 +68,8 @@ class Schedule
         */
         Schedule& operator += ( int op );
 
+	static Schedule Schedule::FromString (const std::string& str);
+
 };
 
 bool operator < ( const Schedule& op1, const Schedule& op2 );

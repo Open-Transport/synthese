@@ -2,6 +2,11 @@
 #include "Schedule.h"
 #include "assert.h"
 
+#include "01_util/Conversion.h"
+
+
+using synthese::util::Conversion;
+
 
 namespace synthese
 {
@@ -227,6 +232,19 @@ Schedule::operator = ( const std::string& op )
         _hour = op.substr( 1 );
     }
     return *this;
+}
+
+
+
+Schedule
+Schedule::FromString (const std::string& str)
+{
+    // DD:hh:mm
+    return Schedule (
+	Hour (Conversion::ToInt (str.substr (3, 2)),
+	      Conversion::ToInt (str.substr (5, 2))),
+	Conversion::ToInt (str.substr (0, 2))
+	);
 }
 
 
