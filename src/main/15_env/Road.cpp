@@ -53,6 +53,11 @@ Road::getType () const
 }
 
 
+void 
+Road::setType (const RoadType& type)
+{
+    _type = type;
+}
 
 
 
