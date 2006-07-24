@@ -2,9 +2,6 @@
 #define SYNTHESE_COMPLIANCE_H
 
 
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-
 #include <boost/logic/tribool.hpp>
 #include <string>
 
@@ -19,7 +16,7 @@ namespace env
 /** Compliance class.
  @ingroup m15
  */
-class Compliance : public synthese::util::Registrable<uid,Compliance>
+class Compliance 
 {
 private:
         boost::logic::tribool _compliant;
@@ -27,8 +24,7 @@ private:
 
 protected:
 
-        Compliance (const uid& id, 
-		    const boost::logic::tribool& compliant,
+        Compliance (const boost::logic::tribool& compliant,
 		    const int& capacity);
 	
 public:

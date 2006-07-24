@@ -114,11 +114,16 @@ namespace synthese
 	    static const std::string LINES_TABLE_COL_TIMETABLENAME ("timetable_name");
 	    static const std::string LINES_TABLE_COL_DIRECTION ("direction");
 	    static const std::string LINES_TABLE_COL_ISWALKINGLINE ("is_walking_line");
-	    static const std::string LINES_TABLE_COL_DEPARTUREBOARDDISPLAY ("departure_board_display");
-	    static const std::string LINES_TABLE_COL_TIMETABLEDISPLAY ("timetable_display");
-	    // list of services
-	    // list of edges
-
+	    static const std::string LINES_TABLE_COL_USEINDEPARTUREBOARDS ("use_in_departure_boards");
+	    static const std::string LINES_TABLE_COL_USEINTIMETABLES ("use_in_timetables");
+	    static const std::string LINES_TABLE_COL_USEINROUTEPLANNING ("use_in_routeplanning");
+	    static const std::string LINES_TABLE_COL_ROLLINGSTOCKID ("rolling_stock_id");
+	    static const std::string LINES_TABLE_COL_FAREID ("fare_id");
+	    static const std::string LINES_TABLE_COL_ALARMID ("alarm_id");
+	    static const std::string LINES_TABLE_COL_BIKECOMPLIANCEID ("bike_compliance_id");
+	    static const std::string LINES_TABLE_COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
+	    static const std::string LINES_TABLE_COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
+	    static const std::string LINES_TABLE_COL_RESERVATIONRULEID ("reservation_rule_id");
 	    
 
 	    /** Line stops table :
@@ -129,13 +134,10 @@ namespace synthese
 	    static const std::string LINESTOPS_TABLE_NAME ("t010_line_stops");
 	    static const std::string LINESTOPS_TABLE_COL_FROMPHYSICALSTOPID ("from_physical_stop_id");
 	    static const std::string LINESTOPS_TABLE_COL_LINEID ("line_id");
+	    static const std::string LINESTOPS_TABLE_COL_RANKINPATH ("rank_in_path");
 	    static const std::string LINESTOPS_TABLE_COL_METRICOFFSET ("metric_offset");
 	    static const std::string LINESTOPS_TABLE_COL_SCHEDULEINPUT ("schedule_input");
-	    // next in path
-	    // previsous conn departure
-	    // folloing conn ...
-	    // via points
-
+	    static const std::string LINESTOPS_TABLE_COL_VIAPOINTS ("via_points");
 
 
 	    /** Physical stops table :

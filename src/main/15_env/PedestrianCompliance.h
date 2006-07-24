@@ -4,6 +4,9 @@
 
 #include "Compliance.h"
 
+#include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
 
 #include <boost/logic/tribool.hpp>
 #include <string>
@@ -19,7 +22,9 @@ namespace env
 /** Pedestrian compliance class.
  @ingroup m15
  */
-class PedestrianCompliance : public Compliance
+class PedestrianCompliance : 
+    public synthese::util::Registrable<uid,PedestrianCompliance>,
+    public Compliance
 {
 private:
 

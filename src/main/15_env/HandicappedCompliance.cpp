@@ -12,7 +12,8 @@ namespace env
 HandicappedCompliance::HandicappedCompliance (const uid& id, 
 				const boost::logic::tribool& compliant,
 				const int& capacity)
-    : Compliance (id, compliant, capacity)
+    : synthese::util::Registrable<uid,HandicappedCompliance> (id)
+    , Compliance (compliant, capacity)
 {
     
 }

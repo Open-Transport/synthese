@@ -18,10 +18,9 @@ LineStop::LineStop (const uid& id,
 		    const Line* line,
 		    int rankInPath,
 		    double metricOffset,
-		    const EdgeType& type,
 		    const PhysicalStop* physicalStop)
     : synthese::util::Registrable<uid,LineStop> (id)
-    , Edge (type, line, rankInPath)
+    , Edge (EDGE_TYPE_PASSAGE, line, rankInPath)
     , _metricOffset (metricOffset)
     , _physicalStop (physicalStop)
 {

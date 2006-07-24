@@ -46,29 +46,6 @@ LineStopLS::Load (XMLNode& node,
     double metricOffset (su::Conversion::ToDouble (
 	node.getAttribute (LINESTOP_METRICOFFSET_ATTR.c_str())));
 
-    std::string typeStr (node.getAttribute (LINESTOP_TYPE_ATTR.c_str()));
-    boost::to_lower (typeStr);
-
-    synthese::env::LineStop::EdgeType type;
-    if (typeStr == LINESTOP_TYPE_ATTR_DEPARTURE) 
-    {
-	type = synthese::env::LineStop::EDGE_TYPE_DEPARTURE;
-    }
-    else if (typeStr == LINESTOP_TYPE_ATTR_ARRIVAL) 
-    {
-	type = synthese::env::LineStop::EDGE_TYPE_ARRIVAL;
-    }
-    else if (typeStr == LINESTOP_TYPE_ATTR_PASSAGE) 
-    {
-	type = synthese::env::LineStop::EDGE_TYPE_PASSAGE;
-    }
-    else 
-    {
-	throw Exception ("Invalid value " + 
-			 typeStr + 
-			 " for type attribute on lineStop element.");
-    }
-    
     int physicalStopId (su::Conversion::ToInt (
 	node.getAttribute (LINESTOP_PHYSICALSTOPID_ATTR.c_str())));
 
@@ -77,9 +54,9 @@ LineStopLS::Load (XMLNode& node,
 	line, 
 	rankInLine, 
 	metricOffset, 
-	type,
 	environment.getPhysicalStops (). get (physicalStopId));
 
+    
 
     // Add via points
     int nbPoints = node.nChildNode(PointLS::POINT_TAG.c_str());

@@ -54,7 +54,6 @@ public:
 	      const Line* line,
 	      int rankInPath,
 	      double metricOffset,
-	      const EdgeType& type,
 	      const PhysicalStop* physicalStop);
 
     ~LineStop();

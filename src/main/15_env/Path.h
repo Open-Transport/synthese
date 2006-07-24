@@ -87,6 +87,7 @@ public:
     void setFare (Fare* fare);
 
     const Alarm* getAlarm() const;
+    void setAlarm(Alarm* alarm);
 
     const std::vector<Edge*>& getEdges () const;
 
@@ -116,8 +117,6 @@ public:
     //@{
     void addEdge (Edge* edge);
     void addService (Service* service);
-
-    void postInit ();
 
 
     /** Updates path calendar.

@@ -12,7 +12,8 @@ namespace env
 PedestrianCompliance::PedestrianCompliance (const uid& id, 
 				const boost::logic::tribool& compliant,
 				const int& capacity)
-    : Compliance (id, compliant, capacity)
+    : synthese::util::Registrable<uid,PedestrianCompliance> (id)
+    , Compliance (compliant, capacity)
 {
 
 }

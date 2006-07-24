@@ -4,6 +4,10 @@
 
 #include "Compliance.h"
 
+#include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
+
 #include <boost/logic/tribool.hpp>
 #include <string>
 
@@ -18,7 +22,9 @@ namespace env
 /** Handicapped compliance class.
  @ingroup m15
  */
-class HandicappedCompliance : public Compliance
+class HandicappedCompliance : 
+    public synthese::util::Registrable<uid,HandicappedCompliance>,
+    public Compliance
 {
 private:
 

@@ -22,6 +22,7 @@
 #include "HandicappedCompliance.h"
 #include "BikeCompliance.h"
 #include "ScheduledService.h"
+#include "ReservationRule.h"
 #include "TransportNetwork.h"
 
 
@@ -65,6 +66,7 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     PhysicalStop::Registry _physicalStops;
     PlaceAlias::Registry _placeAliases; 
     PublicPlace::Registry _publicPlaces;
+    ReservationRule::Registry _reservationRules;
     RoadChunk::Registry _roadChunks;
     Road::Registry _roads;
     RollingStock::Registry _rollingStocks;
@@ -144,6 +146,12 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     TransportNetwork::Registry& getTransportNetworks ();
     const TransportNetwork::Registry& getTransportNetworks () const;
+
+    RollingStock::Registry& getRollingStocks ();
+    const RollingStock::Registry& getRollingStocks () const;
+
+    ReservationRule::Registry& getReservationRules ();
+    const ReservationRule::Registry& getReservationRules () const;
 
 
     // ...

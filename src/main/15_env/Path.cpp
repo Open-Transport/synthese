@@ -44,6 +44,14 @@ Path::getAlarm() const
 
 
 
+void
+Path::setAlarm (Alarm* alarm)
+{
+    _alarm = alarm;
+}
+
+
+
 const Fare* 
 Path::getFare () const
 {
@@ -224,13 +232,8 @@ Path::addEdge (Edge* edge)
             }
         }
     }
-    
-}
 
-
-void 
-Path::postInit ()
-{
+    // TODO : optimize this.
     for ( std::vector<Edge*>::const_iterator iter = _edges.begin();
 	  iter != _edges.end();
 	  ++iter )
@@ -242,7 +245,9 @@ Path::postInit ()
         if ( edge->getPreviousDeparture () == 0 )
             edge->setType ( Edge::EDGE_TYPE_DEPARTURE );
     }
+    
 }
+
 
 
 int 
