@@ -7,7 +7,7 @@
 #include "15_env/City.h"
 
 #include <sqlite/sqlite3.h>
-
+#include <assert.h>
 
 
 using synthese::util::Conversion;
@@ -22,9 +22,9 @@ namespace envlssql
 
 
 CityTableSync::CityTableSync (Environment::Registry& environments)
-: ComponentTableSync (CITIES_TABLE_NAME, environments)
+: ComponentTableSync (CITIES_TABLE_NAME, environments, true, false)
 {
-    addTableColumn (CITIES_TABLE_COL_NAME, "TEXT");
+    addTableColumn (CITIES_TABLE_COL_NAME, "TEXT", true);
 }
 
 
@@ -41,7 +41,11 @@ void
 CityTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
-    environment.getCities ().add (createFromRow (environment, rows, rowIndex), false);
+    synthese::env::City* city = new synthese::env::City (
+	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
+	rows.getColumn (rowIndex, CITIES_TABLE_COL_NAME) );
+    
+    environment.getCities ().add (city, false);
 }
 
 
@@ -50,12 +54,9 @@ void
 CityTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 			  synthese::env::Environment& environment)
 {
-    synthese::env::City* newCity = createFromRow (environment, rows, rowIndex);
-    
-    // Overwrite the old object with new object values
-    *(environment.getCities ().get (newCity->getKey ())) = *newCity;
-
-    delete newCity;
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+    synthese::env::City* city = environment.getCities ().get (id);
+    city->setName (rows.getColumn (rowIndex, CITIES_TABLE_COL_NAME));
 }
 
 
@@ -64,22 +65,12 @@ void
 CityTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
-    environment.getCities ().remove (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    assert (false);
 }
 
 
 
 
-synthese::env::City* 
-CityTableSync::createFromRow (const Environment& env,
-			      const synthese::db::SQLiteResult& rows, 
-			      int rowIndex) const
-{
-    return new synthese::env::City (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
-	rows.getColumn (rowIndex, CITIES_TABLE_COL_NAME) );
-    
-}
 
 
 

@@ -34,8 +34,13 @@ class Axis : public synthese::util::Registrable<uid,Axis>
     //! @name Getters/Setters
     //@{
     const std::string& getName () const;
+    void setName (const std::string& name);
+
     bool isFree () const;
+    void setFree (bool isFree);
+
     bool isAllowed () const;
+    void setAllowed (bool isAllowed);
     //@}
 
 

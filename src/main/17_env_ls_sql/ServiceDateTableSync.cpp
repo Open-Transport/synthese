@@ -29,7 +29,7 @@ namespace envlssql
 
 
 ServiceDateTableSync::ServiceDateTableSync (Environment::Registry& environments)
-: ComponentTableSync (SERVICEDATES_TABLE_NAME, environments)
+: ComponentTableSync (SERVICEDATES_TABLE_NAME, environments, true, true)
 {
     addTableColumn (SERVICEDATES_TABLE_COL_SERVICEID, "INTEGER", false);
     addTableColumn (SERVICEDATES_TABLE_COL_DATE , "DATE", false);

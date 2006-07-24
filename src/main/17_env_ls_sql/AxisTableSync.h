@@ -51,10 +51,6 @@ class AxisTableSync : public ComponentTableSync
 
 
  private:
-
-    synthese::env::Axis* createFromRow (const synthese::env::Environment& env,
-					const synthese::db::SQLiteResult& rows, 
-					int rowIndex) const;
 };
 
 

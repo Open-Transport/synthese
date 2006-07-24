@@ -52,9 +52,6 @@ class AlarmTableSync : public ComponentTableSync
 
  private:
 
-    synthese::env::Alarm* createFromRow (const synthese::env::Environment& env,
-					const synthese::db::SQLiteResult& rows, 
-					int rowIndex) const;
 };
 
 

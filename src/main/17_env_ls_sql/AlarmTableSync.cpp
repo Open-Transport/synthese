@@ -29,10 +29,10 @@ namespace envlssql
 AlarmTableSync::AlarmTableSync (Environment::Registry& environments)
 : ComponentTableSync (ALARMS_TABLE_NAME, environments)
 {
-    addTableColumn (ALARMS_TABLE_COL_MESSAGE, "TEXT");
-    addTableColumn (ALARMS_TABLE_COL_PERIODSTART, "TIMESTAMP");
-    addTableColumn (ALARMS_TABLE_COL_PERIODEND, "TIMESTAMP");
-    addTableColumn (ALARMS_TABLE_COL_LEVEL, "INTEGER");
+    addTableColumn (ALARMS_TABLE_COL_MESSAGE, "TEXT", true);
+    addTableColumn (ALARMS_TABLE_COL_PERIODSTART, "TIMESTAMP", true);
+    addTableColumn (ALARMS_TABLE_COL_PERIODEND, "TIMESTAMP", true);
+    addTableColumn (ALARMS_TABLE_COL_LEVEL, "INTEGER", true);
 }
 
 
@@ -49,7 +49,14 @@ void
 AlarmTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
-    environment.getAlarms ().add (createFromRow (environment, rows, rowIndex), false);
+    synthese::env::Alarm* alarm = new synthese::env::Alarm (
+	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
+	rows.getColumn (rowIndex, ALARMS_TABLE_COL_MESSAGE),
+	DateTime::FromSQLTimestamp (rows.getColumn (rowIndex, ALARMS_TABLE_COL_PERIODSTART)),
+	DateTime::FromSQLTimestamp (rows.getColumn (rowIndex, ALARMS_TABLE_COL_PERIODEND)),
+	(Alarm::AlarmLevel) Conversion::ToInt (rows.getColumn (rowIndex, ALARMS_TABLE_COL_LEVEL)) );
+    
+    environment.getAlarms ().add (alarm, false);
 }
 
 
@@ -58,12 +65,13 @@ void
 AlarmTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 			  synthese::env::Environment& environment)
 {
-    synthese::env::Alarm* newAlarm = createFromRow (environment, rows, rowIndex);
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+    synthese::env::Alarm* alarm = environment.getAlarms ().get (id);
+    alarm->setMessage (rows.getColumn (rowIndex, ALARMS_TABLE_COL_MESSAGE));
+    alarm->setPeriodStart (DateTime::FromSQLTimestamp (rows.getColumn (rowIndex, ALARMS_TABLE_COL_PERIODSTART)));
+    alarm->setPeriodEnd  (DateTime::FromSQLTimestamp (rows.getColumn (rowIndex, ALARMS_TABLE_COL_PERIODEND)));
+    alarm->setLevel ((Alarm::AlarmLevel) Conversion::ToInt (rows.getColumn (rowIndex, ALARMS_TABLE_COL_LEVEL)));
     
-    // Overwrite the old object with new object values
-    *(environment.getAlarms ().get (newAlarm->getKey ())) = *newAlarm;
-
-    delete newAlarm;
 }
 
 
@@ -72,25 +80,10 @@ void
 AlarmTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
-    environment.getAlarms ().remove (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    // void hook
 }
 
 
-
-
-synthese::env::Alarm* 
-AlarmTableSync::createFromRow (const Environment& env,
-			      const synthese::db::SQLiteResult& rows, 
-			      int rowIndex) const
-{
-    return new synthese::env::Alarm (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
-	rows.getColumn (rowIndex, ALARMS_TABLE_COL_MESSAGE),
-	DateTime::FromSQLTimestamp (rows.getColumn (rowIndex, ALARMS_TABLE_COL_PERIODSTART)),
-	DateTime::FromSQLTimestamp (rows.getColumn (rowIndex, ALARMS_TABLE_COL_PERIODEND)),
-	(Alarm::AlarmLevel) Conversion::ToInt (rows.getColumn (rowIndex, ALARMS_TABLE_COL_LEVEL)) );
-    
-}
 
 
 

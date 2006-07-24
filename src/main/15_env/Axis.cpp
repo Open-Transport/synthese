@@ -31,6 +31,15 @@ Axis::getName () const
 }
 
 
+
+void 
+Axis::setName (const std::string& name)
+{
+    _name = name;
+}
+
+
+
 bool 
 Axis::isFree () const
 {
@@ -43,6 +52,23 @@ Axis::isAllowed () const
 {
     return _allowed;
 }
+
+
+
+void 
+Aixs::setFree (bool isFree)
+{
+    _free = isFree;
+}
+
+
+
+void 
+Axis::setAllowed (bool isAllowed)
+{
+    _allowed = isAllowed;
+}
+
 
 
 }

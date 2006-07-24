@@ -27,12 +27,12 @@ namespace envlssql
 
 EnvironmentLinkTableSync::EnvironmentLinkTableSync (const synthese::db::SQLiteSync* sync,
 						    Environment::Registry& environments)
-: synthese::db::SQLiteTableSync (ENVIRONMENT_LINKS_TABLE_NAME)
+: synthese::db::SQLiteTableSync (ENVIRONMENT_LINKS_TABLE_NAME, true, true)
 , _environments (environments)
 {
-    addTableColumn (TABLE_COL_ID, "INTEGER");
-    addTableColumn (ENVIRONMENT_LINKS_TABLE_COL_ENVIRONMENTID, "INTEGER");
-    addTableColumn (ENVIRONMENT_LINKS_TABLE_COL_LINKTARGETID, "INTEGER");
+    addTableColumn (TABLE_COL_ID, "INTEGER", false);
+    addTableColumn (ENVIRONMENT_LINKS_TABLE_COL_ENVIRONMENTID, "INTEGER", false);
+    addTableColumn (ENVIRONMENT_LINKS_TABLE_COL_LINKTARGETID, "INTEGER", false);
 
     const std::map<std::string, SQLiteTableSync* >& tableSynchronizers = sync->getTableSynchronizers ();
     for (std::map<std::string, SQLiteTableSync* >::const_iterator it = tableSynchronizers.begin ();

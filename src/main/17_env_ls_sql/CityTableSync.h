@@ -52,9 +52,6 @@ class CityTableSync : public ComponentTableSync
 
  private:
 
-    synthese::env::City* createFromRow (const synthese::env::Environment& env,
-					const synthese::db::SQLiteResult& rows, 
-					int rowIndex) const;
 };
 
 

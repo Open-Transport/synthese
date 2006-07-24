@@ -52,9 +52,6 @@ class AddressTableSync : public ComponentTableSync
 
  private:
 
-    synthese::env::Address* createFromRow (const synthese::env::Environment& env,
-					   const synthese::db::SQLiteResult& rows, 
-					   int rowIndex) const;
 };
 
 

@@ -25,7 +25,7 @@ namespace envlssql
 
 
 EnvironmentTableSync::EnvironmentTableSync (synthese::env::Environment::Registry& environments)
-: synthese::db::SQLiteTableSync (ENVIRONMENTS_TABLE_NAME)
+: synthese::db::SQLiteTableSync (ENVIRONMENTS_TABLE_NAME, true, true)
   , _environments (environments)
 {
     addTableColumn (TABLE_COL_ID, "INTEGER");
