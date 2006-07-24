@@ -186,6 +186,55 @@ Environment::getPhysicalStops ()
 
 
 
+PedestrianCompliance::Registry& 
+Environment::getPedestrianCompliances ()
+{
+    return _pedestrianCompliances;
+}
+
+
+const PedestrianCompliance::Registry& 
+Environment::getPedestrianCompliances () const
+{
+    return _pedestrianCompliances;
+}
+
+
+
+HandicappedCompliance::Registry& 
+Environment::getHandicappedCompliances ()
+{
+    return _handicappedCompliances;
+}
+
+
+
+const HandicappedCompliance::Registry& 
+Environment::getHandicappedCompliances () const
+{
+    return _handicappedCompliances;
+}
+
+
+
+BikeCompliance::Registry& 
+Environment::getBikeCompliances ()
+{
+    return _bikeCompliances;
+}
+
+
+
+const BikeCompliance::Registry& 
+Environment::getBikeCompliances () const
+{
+    return _bikeCompliances;
+}
+
+
+
+
+
 const PhysicalStop::Registry&
 Environment::getPhysicalStops () const
 {

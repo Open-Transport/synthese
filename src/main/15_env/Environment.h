@@ -18,6 +18,9 @@
 #include "RoadChunk.h"
 #include "Road.h"
 #include "RollingStock.h"
+#include "PedestrianCompliance.h"
+#include "HandicappedCompliance.h"
+#include "BikeCompliance.h"
 #include "ScheduledService.h"
 #include "TransportNetwork.h"
 
@@ -56,6 +59,9 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     Fare::Registry _fares;
     Line::Registry _lines;
     LineStop::Registry _lineStops;
+    PedestrianCompliance::Registry _pedestrianCompliances;
+    HandicappedCompliance::Registry _handicappedCompliances;
+    BikeCompliance::Registry _bikeCompliances;
     PhysicalStop::Registry _physicalStops;
     PlaceAlias::Registry _placeAliases; 
     PublicPlace::Registry _publicPlaces;
@@ -105,6 +111,15 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     LineStop::Registry& getLineStops ();
     const LineStop::Registry& getLineStops () const;
+
+    PedestrianCompliance::Registry& getPedestrianCompliances ();
+    const PedestrianCompliance::Registry& getPedestrianCompliances () const;
+
+    HandicappedCompliance::Registry& getHandicappedCompliances ();
+    const HandicappedCompliance::Registry& getHandicappedCompliances () const;
+
+    BikeCompliance::Registry& getBikeCompliances ();
+    const BikeCompliance::Registry& getBikeCompliances () const;
 
     PlaceAlias::Registry& getPlaceAliases ();
     const PlaceAlias::Registry& getPlaceAliases () const;

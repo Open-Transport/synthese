@@ -24,7 +24,7 @@ private:
 
 public:
 
-    BikeCompliance (const int& id, 
+    BikeCompliance (const uid& id, 
 		    const boost::logic::tribool& compliant,
 		    const int& capacity);
 

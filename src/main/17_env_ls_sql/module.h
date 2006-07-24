@@ -218,6 +218,17 @@ namespace synthese
 	    static const std::string CONTINUOUSSERVICES_TABLE_COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 	    //... 
 	    
+	    static const std::string PEDESTRIANCOMPLIANCES_TABLE_NAME ("t018_pedestrian_compliances");
+	    static const std::string PEDESTRIANCOMPLIANCES_TABLE_COL_STATUS ("status");
+	    static const std::string PEDESTRIANCOMPLIANCES_TABLE_COL_CAPACITY ("capacity");
+	    
+	    static const std::string HANDICAPPEDCOMPLIANCES_TABLE_NAME ("t019_handicapped_compliances");
+	    static const std::string HANDICAPPEDCOMPLIANCES_TABLE_COL_STATUS ("status");
+	    static const std::string HANDICAPPEDCOMPLIANCES_TABLE_COL_CAPACITY ("capacity");
+	    
+	    static const std::string BIKECOMPLIANCES_TABLE_NAME ("t020_bike_compliances");
+	    static const std::string BIKECOMPLIANCES_TABLE_COL_STATUS ("status");
+	    static const std::string BIKECOMPLIANCES_TABLE_COL_CAPACITY ("capacity");
 	    
 
 	}

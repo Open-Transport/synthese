@@ -9,7 +9,7 @@ namespace env
 
 
 
-BikeCompliance::BikeCompliance (const int& id, 
+BikeCompliance::BikeCompliance (const uid& id, 
 				const boost::logic::tribool& compliant,
 				const int& capacity)
     : Compliance (id, compliant, capacity)

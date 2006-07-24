@@ -4,6 +4,7 @@
 
 #include "Compliance.h"
 
+
 #include <boost/logic/tribool.hpp>
 #include <string>
 
@@ -24,7 +25,7 @@ private:
 
 public:
 
-    PedestrianCompliance (const int& id, 
+    PedestrianCompliance (const uid& id, 
 		    const boost::logic::tribool& compliant,
 		    const int& capacity);
 

@@ -24,7 +24,7 @@ private:
 
 public:
 
-    HandicappedCompliance (const int& id, 
+    HandicappedCompliance (const uid& id, 
 			   const boost::logic::tribool& compliant,
 			   const int& capacity);
 

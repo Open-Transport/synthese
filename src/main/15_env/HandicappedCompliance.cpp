@@ -9,7 +9,7 @@ namespace env
 
 
 
-HandicappedCompliance::HandicappedCompliance (const int& id, 
+HandicappedCompliance::HandicappedCompliance (const uid& id, 
 				const boost::logic::tribool& compliant,
 				const int& capacity)
     : Compliance (id, compliant, capacity)
