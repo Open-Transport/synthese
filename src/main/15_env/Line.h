@@ -36,7 +36,7 @@ private:
     TransportNetwork* _network; 
     const Axis* _axis; 
     
-    RollingStock* _rollingStock;
+    uid _rollingStockId;
     
     std::string _name;  //!< Name (id)
     std::string _shortName;  //!< Name (cartouche)
@@ -106,8 +106,8 @@ public:
     const std::string& getStyle () const;
     void setStyle (const std::string& style);
     
-    const RollingStock* getRollingStock () const;
-    void setRollingStock (RollingStock* rollingStock);
+    const uid& getRollingStockId () const;
+    void setRollingStockId (const uid& id);
 
     bool getWalkingLine () const;
     void setWalkingLine (bool isWalkingLine);

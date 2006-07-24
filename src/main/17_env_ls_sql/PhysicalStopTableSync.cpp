@@ -7,6 +7,7 @@
 #include "15_env/PhysicalStop.h"
 
 #include <sqlite/sqlite3.h>
+#include <assert.h>
 
 
 
@@ -22,13 +23,13 @@ namespace envlssql
 
 
 PhysicalStopTableSync::PhysicalStopTableSync (Environment::Registry& environments)
-: ComponentTableSync (PHYSICALSTOPS_TABLE_NAME, environments)
+: ComponentTableSync (PHYSICALSTOPS_TABLE_NAME, environments, true, false)
 {
-    addTableColumn (PHYSICALSTOPS_TABLE_COL_NAME, "TEXT");
-    addTableColumn (PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID, "INTEGER");
-    addTableColumn (PHYSICALSTOPS_TABLE_COL_RANKINCONNECTIONPLACE, "INTEGER");
-    addTableColumn (PHYSICALSTOPS_TABLE_COL_X, "DOUBLE");
-    addTableColumn (PHYSICALSTOPS_TABLE_COL_Y, "DOUBLE");
+    addTableColumn (PHYSICALSTOPS_TABLE_COL_NAME, "TEXT", true);
+    addTableColumn (PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID, "INTEGER", false);
+    addTableColumn (PHYSICALSTOPS_TABLE_COL_RANKINCONNECTIONPLACE, "INTEGER", false);
+    addTableColumn (PHYSICALSTOPS_TABLE_COL_X, "DOUBLE", true);
+    addTableColumn (PHYSICALSTOPS_TABLE_COL_Y, "DOUBLE", true);
 }
 
 
@@ -45,7 +46,16 @@ void
 PhysicalStopTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
-    environment.getPhysicalStops ().add (createFromRow (environment, rows, rowIndex), false);
+    synthese::env::PhysicalStop* ps = new synthese::env::PhysicalStop (
+	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
+	rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_NAME),
+	environment.getConnectionPlaces ().get (Conversion::ToInt (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID))),
+	Conversion::ToInt (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_RANKINCONNECTIONPLACE)),
+	Conversion::ToDouble (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_X)),
+	Conversion::ToDouble (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_Y))
+	);
+
+    environment.getPhysicalStops ().add (ps, false);
 }
 
 
@@ -54,12 +64,12 @@ void
 PhysicalStopTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 			  synthese::env::Environment& environment)
 {
-    synthese::env::PhysicalStop* newPhysicalStop = createFromRow (environment, rows, rowIndex);
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+    synthese::env::PhysicalStop* ps = environment.getPhysicalStops ().get (id);
+    ps->setName (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_NAME));
+    ps->setX (Conversion::ToDouble (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_X)));
+    ps->setY (Conversion::ToDouble (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_Y)));
     
-    // Overwrite the old object with new object values
-    *(environment.getPhysicalStops ().get (newPhysicalStop->getKey ())) = *newPhysicalStop;
-
-    delete newPhysicalStop;
 }
 
 
@@ -68,26 +78,10 @@ void
 PhysicalStopTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
-    environment.getPhysicalStops ().remove (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    assert (false);
 }
 
 
-
-
-synthese::env::PhysicalStop* 
-PhysicalStopTableSync::createFromRow (const Environment& env,
-				 const synthese::db::SQLiteResult& rows, int rowIndex) const
-{
-    return new synthese::env::PhysicalStop (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
-	rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_NAME),
-	env.getConnectionPlaces ().get (Conversion::ToInt (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID))),
-	Conversion::ToInt (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_RANKINCONNECTIONPLACE)),
-	Conversion::ToDouble (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_X)),
-	Conversion::ToDouble (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_Y))
-	);
-    
-}
 
 
 

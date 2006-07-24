@@ -36,6 +36,11 @@ PhysicalStop::getName () const
 
 
 
+void 
+PhysicalStop::setName (const std::string& name)
+{
+    _name = name;
+}
 
 
 

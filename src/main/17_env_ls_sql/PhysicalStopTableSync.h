@@ -52,9 +52,6 @@ class PhysicalStopTableSync : public ComponentTableSync
 
  private:
 
-    synthese::env::PhysicalStop* createFromRow (const synthese::env::Environment& env,
-					const synthese::db::SQLiteResult& rows, 
-					int rowIndex) const;
 };
 
 

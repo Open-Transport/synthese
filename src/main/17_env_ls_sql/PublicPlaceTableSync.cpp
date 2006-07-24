@@ -7,6 +7,7 @@
 #include "15_env/PublicPlace.h"
 
 #include <sqlite/sqlite3.h>
+#include <assert.h>
 
 
 
@@ -24,10 +25,10 @@ namespace envlssql
 
 
 PublicPlaceTableSync::PublicPlaceTableSync (Environment::Registry& environments)
-: ComponentTableSync (PUBLICPLACES_TABLE_NAME, environments)
+: ComponentTableSync (PUBLICPLACES_TABLE_NAME, environments, true, false)
 {
-    addTableColumn (PUBLICPLACES_TABLE_COL_NAME, "TEXT");
-    addTableColumn (PUBLICPLACES_TABLE_COL_CITYID, "INTEGER");
+    addTableColumn (PUBLICPLACES_TABLE_COL_NAME, "TEXT", true);
+    addTableColumn (PUBLICPLACES_TABLE_COL_CITYID, "INTEGER", false);
 }
 
 
@@ -61,6 +62,11 @@ void
 PublicPlaceTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 			  synthese::env::Environment& environment)
 {
+    uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    PublicPlace* pp = environment.getPublicPlaces ().get (id);
+    std::string name (
+	rows.getColumn (rowIndex, PUBLICPLACES_TABLE_COL_NAME));
+    pp->setName (name);
 
 }
 
@@ -70,7 +76,7 @@ void
 PublicPlaceTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
-//    environment.getCities ().remove (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    assert (false);
 }
 
 

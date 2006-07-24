@@ -22,7 +22,7 @@ Line::Line (const uid& id,
     , _name (name)
     , _axis (axis)
     , _network (0)
-    , _rollingStock (0)
+    , _rollingStockId (-1)
     , _isWalkingLine (false)
     , _useInDepartureBoards (true)
     , _useInTimetables (true)
@@ -244,18 +244,18 @@ Line::setStyle (const std::string& style)
 	
 
 
-const RollingStock* 
-Line::getRollingStock () const
+const uid&
+Line::getRollingStockId () const
 {
-    return _rollingStock;
+    return _rollingStockId;
 }
 
 
 
 void 
-Line::setRollingStock (RollingStock* rollingStock)
+Line::setRollingStockId (const uid& rollingStockId)
 {
-    _rollingStock = rollingStock;
+    _rollingStockId = rollingStockId;
 }
 
 

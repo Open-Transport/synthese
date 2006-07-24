@@ -115,7 +115,7 @@ LineTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     line->setUseInDepartureBoards (useInDepartureBoards);
     line->setUseInTimetables (useInTimetables);
     line->setUseInRoutePlanning (useInRoutePlanning);
-    line->setRollingStock (environment.getRollingStocks ().get (rollingStockId));
+    line->setRollingStockId (rollingStockId);
     line->setFare (environment.getFares ().get (fareId));
     line->setAlarm (environment.getAlarms ().get (alarmId));
     line->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
@@ -177,7 +177,7 @@ LineTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
     line->setUseInDepartureBoards (useInDepartureBoards);
     line->setUseInTimetables (useInTimetables);
     line->setUseInRoutePlanning (useInRoutePlanning);
-    line->setRollingStock (environment.getRollingStocks ().get (rollingStockId));
+    line->setRollingStockId (rollingStockId);
     line->setFare (environment.getFares ().get (fareId));
     line->setAlarm (environment.getAlarms ().get (alarmId));
     line->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
