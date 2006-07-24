@@ -7,6 +7,7 @@
 #include "15_env/PlaceAlias.h"
 
 #include <sqlite/sqlite3.h>
+#include <assert.h>
 
 
 
@@ -24,10 +25,10 @@ namespace envlssql
 
 
 PlaceAliasTableSync::PlaceAliasTableSync (Environment::Registry& environments)
-: ComponentTableSync (PLACEALIASES_TABLE_NAME, environments)
+: ComponentTableSync (PLACEALIASES_TABLE_NAME, environments, true, false)
 {
-    addTableColumn (PLACEALIASES_TABLE_COL_NAME, "TEXT");
-    addTableColumn (PLACEALIASES_TABLE_COL_ALIASEDPLACEID, "INTEGER");
+    addTableColumn (PLACEALIASES_TABLE_COL_NAME, "TEXT", true);
+    addTableColumn (PLACEALIASES_TABLE_COL_ALIASEDPLACEID, "INTEGER", false);
 }
 
 
@@ -78,7 +79,9 @@ void
 PlaceAliasTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 			  synthese::env::Environment& environment)
 {
-
+    uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    PlaceAlias* pa = environment.getPlaceAliases ().get (id);
+    pa->setName (rows.getColumn (rowIndex, PLACEALIASES_TABLE_COL_NAME));
 }
 
 
@@ -87,7 +90,7 @@ void
 PlaceAliasTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
-//    environment.getCities ().remove (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    assert (false);
 }
 
 
