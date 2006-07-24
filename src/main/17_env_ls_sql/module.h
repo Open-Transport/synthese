@@ -230,6 +230,8 @@ namespace synthese
 	    static const std::string BIKECOMPLIANCES_TABLE_COL_STATUS ("status");
 	    static const std::string BIKECOMPLIANCES_TABLE_COL_CAPACITY ("capacity");
 	    
+	    static const std::string TRANSPORTNETWORKS_TABLE_NAME ("t022_transport_networks");
+	    static const std::string TRANSPORTNETWORKS_TABLE_COL_NAME ("name");
 
 	}
 

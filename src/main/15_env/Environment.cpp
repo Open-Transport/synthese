@@ -341,6 +341,22 @@ Environment::getContinuousServices () const
 }
 
 
+TransportNetwork::Registry& 
+Environment::getTransportNetworks ()
+{
+    return _transportNetworks;
+}
+
+
+
+const TransportNetwork::Registry& 
+Environment::getTransportNetworks () const
+{
+    return _transportNetworks;
+}
+
+
+
 
 
 

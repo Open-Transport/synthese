@@ -142,6 +142,10 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     ContinuousService::Registry& getContinuousServices ();
     const ContinuousService::Registry& getContinuousServices () const;
 
+    TransportNetwork::Registry& getTransportNetworks ();
+    const TransportNetwork::Registry& getTransportNetworks () const;
+
+
     // ...
     //@}
 
