@@ -42,12 +42,26 @@ ContinuousService::getMaxWaitingTime () const
 
 
 
+void 
+ContinuousService::setMaxWaitingTime (int maxWaitingTime)
+{
+    _maxWaitingTime = maxWaitingTime;
+}
+
+
+
+
 int 
 ContinuousService::getRange () const
 {
     return _range;
 }
 
+void 
+ContinuousService::setRange (int range)
+{
+    _range = range;
+}
 
 
 

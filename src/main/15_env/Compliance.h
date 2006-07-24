@@ -34,8 +34,12 @@ public:
 	//! @name Getters/Setters
 	//@{
 	int getCapacity () const;
+	void setCapacity (int capacity);
+
         boost::logic::tribool isCompliant () const;
+	void setCompliant (boost::logic::tribool status);
 	//@}
+
 
 };
 

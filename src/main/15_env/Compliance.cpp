@@ -36,6 +36,19 @@ Compliance::isCompliant () const
     return _compliant;
 }
 
+void 
+Compliance::setCapacity (int capacity)
+{
+    _capacity = capacity;
+}
+
+
+
+void 
+Compliance::setCompliant (boost::logic::tribool compliant)
+{
+    _compliant = compliant;
+}
 
 
 

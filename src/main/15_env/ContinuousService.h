@@ -45,7 +45,10 @@ public:
     //! @name Getters/Setters
     //@{
     int getMaxWaitingTime () const;
+    void setMaxWaitingTime (int maxWaitingTime);
+
     int getRange () const;
+    void setRange (int range);
     //@}
 
     //! @name Query methods
