@@ -73,7 +73,8 @@ void
 AxisTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
-    assert (false);
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+    environment.getAxes ().remove (id);
 }
 
 

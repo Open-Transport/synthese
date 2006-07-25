@@ -80,7 +80,8 @@ void
 AlarmTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
-    // void hook
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+    environment.getAlarms ().remove (id);
 }
 
 

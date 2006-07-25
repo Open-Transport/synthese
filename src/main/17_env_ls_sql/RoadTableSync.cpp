@@ -156,6 +156,9 @@ void
 RoadTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+    environment.getRoads ().remove (id);
+
 }
 
 
