@@ -8,6 +8,10 @@
 #include <string>
 
 #include "RequestDispatcher.h"
+#include "ServerConfig.h"
+
+#include "15_env/Environment.h"
+
 
 #include <boost/filesystem/path.hpp>
 
@@ -36,24 +40,18 @@ class Server
     static Server* _instance;
 
     RequestDispatcher _requestDispatcher;
-    int _port;
-    int _nbThreads;
-    boost::filesystem::path _dataDir;
-    boost::filesystem::path _tempDir;
-    boost::filesystem::path _httpTempDir;
-    std::string _httpTempUrl;
+    boost::filesystem::path _dbFile;
+    ServerConfig _config;
+
+    synthese::env::Environment::Registry _environments;
+    
 
  protected:
 
 
  public:
 
-    Server (int port, 
-	    int nbThreads,
-	    const std::string& dataDir,
-	    const std::string& tempDir,
-        const std::string& httpTempDir, 
-        const std::string& httpTempUrl);
+    Server (const boost::filesystem::path& dbFile);
 
     ~Server ();
 
@@ -61,13 +59,7 @@ class Server
     //! @name Getters/Setters
     //@{
     RequestDispatcher& getRequestDispatcher ();
-
-    int getPort () const;
-    int getNbThreads () const;
-    const boost::filesystem::path& getDataDir () const;
-    const boost::filesystem::path& getTempDir () const;
-    const boost::filesystem::path& getHttpTempDir () const;
-    const std::string& getHttpTempUrl () const;
+    ServerConfig& getConfig ();
 
     static Server* GetInstance ();
     static void SetInstance (Server* instance);
@@ -82,14 +74,14 @@ class Server
 
     //! @name Update methods
     //@{
+    void initialize ();
+
     void run ();
 
 
     //@}
 
  protected:
-
-    void initialize ();
 
 
 };

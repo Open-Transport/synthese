@@ -33,6 +33,7 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
  private:
 
     std::string _idColumnName;
+    bool _isRegistered;
 
     std::map<std::string, SQLiteTableSync* > _tableSynchronizers;
     mutable boost::recursive_mutex _tableSynchronizersMutex; 

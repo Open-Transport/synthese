@@ -19,10 +19,12 @@ namespace db
 
 SQLiteTableSync::SQLiteTableSync ( const std::string& tableName,
 				   bool allowInsert, 
-				   bool allowRemove )
+				   bool allowRemove,
+				   const std::string& triggerOverrideClause)
 : _tableName (tableName)
 , _allowInsert (allowInsert)
 , _allowRemove (allowRemove)
+, _triggerOverrideClause (triggerOverrideClause)
 {
 
 }
@@ -64,7 +66,7 @@ SQLiteTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite,
 	    sql.append (getTableName () + "_no_insert");
 	    sql.append (" BEFORE INSERT ON " + getTableName ());
 	    sql.append (" BEGIN SELECT RAISE (ABORT, 'Insertion in " + getTableName () 
-			+ " is forbidden.'); END;");
+			+ " is forbidden.') WHERE " + _triggerOverrideClause + "; END;");
 	    sqlite->execUpdate (sql);
 	}
 	
@@ -74,7 +76,7 @@ SQLiteTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite,
 	    sql.append (getTableName () + "_no_remove");
 	    sql.append (" BEFORE DELETE ON " + getTableName ());
 	    sql.append (" BEGIN SELECT RAISE (ABORT, 'Deletion in " + getTableName () 
-			+ " is forbidden.'); END;");
+			+ " is forbidden.') WHERE " + _triggerOverrideClause + "; END;");
 	    sqlite->execUpdate (sql);
 	}
 
@@ -95,7 +97,7 @@ SQLiteTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite,
 	    sql.append (getTableName () + "_no_update");
 	    sql.append (" BEFORE UPDATE OF ");
 	    std::string columnList;
-	    for (int i=0; i<nonUpdatableColumns.size (); ++i)
+	    for (int i=0; i< (int) nonUpdatableColumns.size (); ++i)
 	    {
 		columnList.append (nonUpdatableColumns[i]);
 		if (i != nonUpdatableColumns.size () - 1) columnList.append (", ");
@@ -103,7 +105,7 @@ SQLiteTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite,
 	    sql.append (columnList);
 	    sql.append (" ON " + getTableName ());
 	    sql.append (" BEGIN SELECT RAISE (ABORT, 'Update of " + columnList + " in " + getTableName () 
-			+ " is forbidden.'); END;");
+			+ " is forbidden.') WHERE " + _triggerOverrideClause + "; END;");
 	    sqlite->execUpdate (sql);
 	}
 	

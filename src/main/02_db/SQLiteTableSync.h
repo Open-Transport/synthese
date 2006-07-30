@@ -41,6 +41,7 @@ class SQLiteTableSync
 
     const bool _allowInsert;
     const bool _allowRemove;
+    const std::string _triggerOverrideClause;
 
     const std::string _tableName;
     SQLiteTableFormat _tableFormat;
@@ -49,7 +50,8 @@ class SQLiteTableSync
 
     SQLiteTableSync ( const std::string& tableName, 
 		      bool allowInsert = true, 
-		      bool allowRemove = true);
+		      bool allowRemove = true,
+		      const std::string& triggerOverrideClause = "1");
 
     ~SQLiteTableSync ();
 

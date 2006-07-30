@@ -199,6 +199,26 @@ Thread::setState (ThreadState state)
 }
 
 
+void 
+Thread::waitForReadyState () const
+{
+    waitForState (Thread::READY);
+}
+
+
+
+void 
+Thread::waitForState (const Thread::ThreadState& state) const
+{
+    while (1)
+    {
+	if (getState () == state)
+	{
+	    break;
+	}
+	Thread::Sleep (5);
+    }
+}
 
 
 

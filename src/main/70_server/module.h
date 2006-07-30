@@ -81,6 +81,19 @@ namespace synthese
 
 	    static const int UNKNOWN_PARAMETER_VALUE = -1;
 
+	    static const std::string CONFIG_TABLE_NAME ("t999_config");
+	    static const std::string CONFIG_TABLE_COL_PARAMNAME ("param_name");
+	    static const std::string CONFIG_TABLE_COL_PARAMVALUE ("param_value");
+
+	    static const std::string CONFIG_TABLE_COL_PARAMVALUE_PORT ("port");
+	    static const std::string CONFIG_TABLE_COL_PARAMVALUE_NBTHREADS ("nb_threads");
+	    static const std::string CONFIG_TABLE_COL_PARAMVALUE_LOGLEVEL ("log_level");
+	    static const std::string CONFIG_TABLE_COL_PARAMVALUE_DATADIR ("data_dir");
+	    static const std::string CONFIG_TABLE_COL_PARAMVALUE_TEMPDIR ("temp_dir");
+	    static const std::string CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPDIR ("http_temp_dir");
+	    static const std::string CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPURL ("http_temp_url");
+
+
 	}
 
 	/** @} */

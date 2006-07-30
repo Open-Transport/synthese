@@ -14,6 +14,15 @@
 #include "01_util/Log.h"
 #include "01_util/Exception.h"
 
+#include "02_db/SQLite.h"
+#include "02_db/SQLiteSync.h"
+#include "02_db/SQLiteResult.h"
+#include "02_db/SQLiteThreadExec.h"
+
+#include "ServerConfigTableSync.h"
+#include "17_env_ls_sql/CityTableSync.h"
+#include "17_env_ls_sql/EnvironmentTableSync.h"
+#include "17_env_ls_sql/EnvironmentLinkTableSync.h"
 
 
 #include <boost/filesystem/operations.hpp>
@@ -36,18 +45,8 @@ namespace server
 Server* Server::_instance = 0;
 
 
-Server::Server (int port, 
-		int nbThreads,
-		const std::string& dataDir,
-		const std::string& tempDir,
-        const std::string& httpTempDir, 
-        const std::string& httpTempUrl)
-    : _port (port)
-    , _nbThreads (nbThreads)
-	, _dataDir (dataDir, boost::filesystem::native)
-    , _tempDir (tempDir, boost::filesystem::native)
-    , _httpTempDir (httpTempDir, boost::filesystem::native)
-    , _httpTempUrl (httpTempUrl)
+Server::Server (const boost::filesystem::path& dbFile)
+    : _dbFile (dbFile)
 {
 }
 
@@ -83,17 +82,36 @@ Server::SetInstance (Server* instance)
 void 
 Server::initialize ()
 {
-    _dataDir.normalize ();
-    if (boost::filesystem::exists (_dataDir) == false)
-    {
-	throw synthese::util::Exception ("Cannot find data directory '" + _dataDir.string () + "'");
-    }
-    _tempDir.normalize ();
-    if (boost::filesystem::exists (_tempDir) == false)
-    {
-	throw synthese::util::Exception ("Cannot find temp directory '" + _tempDir.string () + "'");
-    }
+    // Register all synchronizers
+    synthese::db::SQLiteThreadExec* sqliteExec = new synthese::db::SQLiteThreadExec (_dbFile);
 
+    // Start the db sync thread right now
+    synthese::util::Thread sqliteThread (sqliteExec, "sqlite");
+    sqliteThread.start ();
+    
+    synthese::db::SQLiteSync* syncHook = new synthese::db::SQLiteSync (synthese::envlssql::TABLE_COL_ID);
+    
+    ServerConfigTableSync* configSync = new ServerConfigTableSync (_config);
+
+    synthese::envlssql::EnvironmentTableSync* envSync = new synthese::envlssql::EnvironmentTableSync (_environments);
+    synthese::envlssql::CityTableSync* citySync = new synthese::envlssql::CityTableSync (_environments);
+
+    syncHook->addTableSynchronizer (configSync);
+    syncHook->addTableSynchronizer (envSync);
+    syncHook->addTableSynchronizer (citySync);
+
+    // Create the env link synchronizer after having added the component synchronizers
+    synthese::envlssql::EnvironmentLinkTableSync* envLinkSync = new synthese::envlssql::EnvironmentLinkTableSync 
+	(syncHook, _environments);
+
+    syncHook->addTableSynchronizer (envLinkSync);
+    
+    sqliteExec->registerUpdateHook (syncHook);
+
+    
+    // Environment are populated. Server config is filled.
+    sqliteThread.waitForReadyState ();
+    
 
 }
 
@@ -107,10 +125,18 @@ Server::run ()
 
     try 
     {
-	initialize ();
+	Log::GetInstance ().info ("");
+	Log::GetInstance ().info ("Param datadir  = " + _config.getDataDir ().string ());
+	Log::GetInstance ().info ("Param tempdir  = " + _config.getTempDir ().string ());
+	Log::GetInstance ().info ("Param loglevel = " + Conversion::ToString (_config.getLogLevel ()));
+	Log::GetInstance ().info ("Param port     = " + Conversion::ToString (_config.getPort ()));
+	Log::GetInstance ().info ("Param threads  = " + Conversion::ToString (_config.getNbThreads ()));
+	Log::GetInstance ().info ("Param httptempdir  = " + _config.getHttpTempDir ().string ());
+	Log::GetInstance ().info ("Param httptempurl  = " + _config.getHttpTempUrl ());
+	Log::GetInstance ().info ("");
 
 	synthese::tcp::TcpService* service = 
-	    synthese::tcp::TcpService::openService (_port);
+	    synthese::tcp::TcpService::openService (_config.getPort ());
 	
 	ThreadGroup threadGroup;
 
@@ -118,10 +144,10 @@ Server::run ()
 
 	// Every 4 hours, old files of http temp dir are cleant 
 	time_duration checkPeriod = hours(4); 
-	cleanerExec->addTempDirectory (_httpTempDir, checkPeriod);
+	cleanerExec->addTempDirectory (_config.getHttpTempDir (), checkPeriod);
 
 	
-	if (_nbThreads == 1) 
+	if (_config.getNbThreads () == 1) 
 	{
 	    // Monothread execution ; easier for debugging
 	    // Review this to allow going through all loops of each
@@ -136,7 +162,7 @@ Server::run ()
 	else
 	{
 	    
-	    for (int i=0; i< _nbThreads; ++i) 
+	    for (int i=0; i< _config.getNbThreads (); ++i) 
 	    {
 		// ServerThreadExec could be shared by all threads (no specific state variable)
 		Thread serverThread (new ServerThreadExec (service), "tcp_" + Conversion::ToString (i), 1);
@@ -163,16 +189,7 @@ Server::run ()
     } 
 
 
-    synthese::tcp::TcpService::closeService (_port);
-}
-
-
-
-
-int 
-Server::getPort () const
-{
-    return _port;
+    synthese::tcp::TcpService::closeService (_config.getPort ());
 }
 
 
@@ -186,44 +203,11 @@ Server::getRequestDispatcher ()
 
 
 
-int 
-Server::getNbThreads () const
+ServerConfig& 
+Server::getConfig ()
 {
-    return _nbThreads;
+    return _config;
 }
-
-
-
-
-const boost::filesystem::path& 
-Server::getDataDir () const
-{
-    return _dataDir;
-}
-
-
-
-const boost::filesystem::path& 
-Server::getTempDir () const
-{
-    return _tempDir;
-}
-
-
-const boost::filesystem::path& 
-Server::getHttpTempDir () const
-{
-    return _httpTempDir;
-}
-
-
-const std::string& 
-Server::getHttpTempUrl () const
-{
-    return _httpTempUrl;
-}
-
-    
 
 
 

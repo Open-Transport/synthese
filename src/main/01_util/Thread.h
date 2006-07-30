@@ -71,6 +71,9 @@ class Thread
 
     ThreadState getState () const;
 
+    void waitForState (const Thread::ThreadState& state) const;
+    void waitForReadyState () const;
+
  private:
     
     void setState (ThreadState state);

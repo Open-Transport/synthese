@@ -142,8 +142,8 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
 
     // Create a temporary file name based on system time
     const boost::filesystem::path& tempDir = (mode == REQUEST_MODE_SOCKET) 
-            ? Server::GetInstance ()->getTempDir ()
-            : Server::GetInstance ()->getHttpTempDir ();
+            ? Server::GetInstance ()->getConfig ().getTempDir ()
+            : Server::GetInstance ()->getConfig ().getHttpTempDir ();
 
     // Generate an id for the map file based on current time
     ptime timems (boost::date_time::microsec_clock<ptime>::local_time ());
@@ -203,7 +203,7 @@ MapRequestHandler::handleRequest (const synthese::server::Request& request,
     }
     else if (mode == REQUEST_MODE_HTTP)
     {
-	std::string resultURL = Server::GetInstance ()->getHttpTempUrl () + "/" + resultFilename;
+	std::string resultURL = Server::GetInstance ()->getConfig ().getHttpTempUrl () + "/" + resultFilename;
 
         // Send the URL to the the generated local JPEG file.
         stream << resultURL << std::endl;
@@ -308,7 +308,7 @@ MapRequestHandler::renderHtmlFile (const boost::filesystem::path& tempDir,
     
     std::ofstream ofhtml (htmlFile.string ().c_str ());
     synthese::carto::HtmlMapRenderer hmRenderer (conf, environment, map.getUrlPattern (), 
-		Server::GetInstance ()->getHttpTempUrl () + "/" + jpegFilename, ofhtml);
+		Server::GetInstance ()->getConfig ().getHttpTempUrl () + "/" + jpegFilename, ofhtml);
     hmRenderer.render (map);
     ofhtml.close ();
     

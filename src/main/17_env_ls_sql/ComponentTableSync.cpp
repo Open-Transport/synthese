@@ -23,7 +23,7 @@ ComponentTableSync::ComponentTableSync (const std::string& tableName,
 					Environment::Registry& environments,
 					bool allowInsert,
 					bool allowRemove)
-: synthese::db::SQLiteTableSync (tableName, allowInsert, allowRemove)
+: synthese::db::SQLiteTableSync (tableName, allowInsert, allowRemove, "(SELECT * FROM t010_config WHERE id = 1)")
 , _environments (environments)
 {
     addTableColumn (TABLE_COL_ID, "INTEGER");

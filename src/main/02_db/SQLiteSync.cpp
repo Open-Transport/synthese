@@ -24,6 +24,7 @@ namespace db
 
 SQLiteSync::SQLiteSync (const std::string& idColumnName)
 : _idColumnName (idColumnName)
+, _isRegistered (false)
 {
 
 }
@@ -72,6 +73,8 @@ void
 SQLiteSync::registerCallback (const SQLiteThreadExec* emitter)
 {
     boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
+
+    _isRegistered = true;
 
     // Call the init sequence on all synchronizers.
     for (std::map<std::string, SQLiteTableSync*>::const_iterator it = _tableSynchronizers.begin ();
