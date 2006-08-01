@@ -34,7 +34,7 @@ int main( int argc, char **argv )
     po::options_description desc("Allowed options");
     desc.add_options()
 	("help", "produce this help message")
-	("db", po::value<std::string>(&db)->default_value ("./synthese.s3db"), "SQLite database file");
+	("db", po::value<std::string>(&db)->default_value ("./synthese.db3"), "SQLite database file");
 	
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
