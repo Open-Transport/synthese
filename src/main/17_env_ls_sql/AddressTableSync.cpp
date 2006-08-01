@@ -22,8 +22,9 @@ namespace envlssql
 
 
 
-AddressTableSync::AddressTableSync (Environment::Registry& environments)
-: ComponentTableSync (ADDRESSES_TABLE_NAME, environments, true, false)
+AddressTableSync::AddressTableSync (Environment::Registry& environments,
+				    const std::string& triggerOverrideClause)
+: ComponentTableSync (ADDRESSES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (ADDRESSES_TABLE_COL_CONNECTIONPLACEID, "INTEGER", false);
     addTableColumn (ADDRESSES_TABLE_COL_RANKINCONNECTIONPLACE, "INTEGER", false);

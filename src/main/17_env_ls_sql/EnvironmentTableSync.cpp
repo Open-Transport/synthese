@@ -24,8 +24,9 @@ namespace envlssql
 
 
 
-EnvironmentTableSync::EnvironmentTableSync (synthese::env::Environment::Registry& environments)
-: synthese::db::SQLiteTableSync (ENVIRONMENTS_TABLE_NAME, true, true)
+EnvironmentTableSync::EnvironmentTableSync (synthese::env::Environment::Registry& environments,
+					    const std::string& triggerOverrideClause)
+: synthese::db::SQLiteTableSync (ENVIRONMENTS_TABLE_NAME, true, true, triggerOverrideClause)
   , _environments (environments)
 {
     addTableColumn (TABLE_COL_ID, "INTEGER");

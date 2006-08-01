@@ -27,8 +27,9 @@ namespace envlssql
 
 
 
-LineStopTableSync::LineStopTableSync (Environment::Registry& environments)
-: ComponentTableSync (LINESTOPS_TABLE_NAME, environments, true, false)
+LineStopTableSync::LineStopTableSync (Environment::Registry& environments,
+				      const std::string& triggerOverrideClause)
+: ComponentTableSync (LINESTOPS_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (LINESTOPS_TABLE_COL_FROMPHYSICALSTOPID, "INTEGER", false);
     addTableColumn (LINESTOPS_TABLE_COL_LINEID, "INTEGER", false);

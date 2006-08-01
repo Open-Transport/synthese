@@ -24,8 +24,9 @@ namespace envlssql
 
 
 
-PlaceAliasTableSync::PlaceAliasTableSync (Environment::Registry& environments)
-: ComponentTableSync (PLACEALIASES_TABLE_NAME, environments, true, false)
+PlaceAliasTableSync::PlaceAliasTableSync (Environment::Registry& environments,
+					  const std::string& triggerOverrideClause)
+: ComponentTableSync (PLACEALIASES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (PLACEALIASES_TABLE_COL_NAME, "TEXT", true);
     addTableColumn (PLACEALIASES_TABLE_COL_ALIASEDPLACEID, "INTEGER", false);

@@ -26,8 +26,9 @@ namespace envlssql
 
 
 
-AlarmTableSync::AlarmTableSync (Environment::Registry& environments)
-: ComponentTableSync (ALARMS_TABLE_NAME, environments)
+AlarmTableSync::AlarmTableSync (Environment::Registry& environments,
+				const std::string& triggerOverrideClause)
+: ComponentTableSync (ALARMS_TABLE_NAME, environments, true, true, triggerOverrideClause)
 {
     addTableColumn (ALARMS_TABLE_COL_MESSAGE, "TEXT", true);
     addTableColumn (ALARMS_TABLE_COL_PERIODSTART, "TIMESTAMP", true);

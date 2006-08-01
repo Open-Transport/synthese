@@ -39,7 +39,8 @@ class ComponentTableSync : public synthese::db::SQLiteTableSync
     ComponentTableSync (const std::string& tableName, 
 			synthese::env::Environment::Registry& environments,
 			bool allowInsert = true,
-			bool allowRemove = true);
+			bool allowRemove = true,
+			const std::string& triggerOverrideClause = "1");
 
     ~ComponentTableSync ();
 

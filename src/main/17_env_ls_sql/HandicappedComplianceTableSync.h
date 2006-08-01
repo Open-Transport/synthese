@@ -35,7 +35,8 @@ class HandicappedComplianceTableSync : public ComponentTableSync
 
  public:
 
-    HandicappedComplianceTableSync (synthese::env::Environment::Registry& environments);
+    HandicappedComplianceTableSync (synthese::env::Environment::Registry& environments,
+				    const std::string& triggerOverrideClause = "1");
     ~HandicappedComplianceTableSync ();
 
  protected:

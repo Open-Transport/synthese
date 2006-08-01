@@ -35,7 +35,8 @@ class FareTableSync : public ComponentTableSync
 
  public:
 
-    FareTableSync (synthese::env::Environment::Registry& environments);
+    FareTableSync (synthese::env::Environment::Registry& environments,
+		   const std::string& triggerOverrideClause = "1");
     ~FareTableSync ();
 
  protected:

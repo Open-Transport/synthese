@@ -32,8 +32,9 @@ namespace envlssql
 
 
 
-ScheduledServiceTableSync::ScheduledServiceTableSync (Environment::Registry& environments)
-: ComponentTableSync (SCHEDULEDSERVICES_TABLE_NAME, environments, true, false)
+ScheduledServiceTableSync::ScheduledServiceTableSync (Environment::Registry& environments,
+						      const std::string& triggerOverrideClause)
+: ComponentTableSync (SCHEDULEDSERVICES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (SCHEDULEDSERVICES_TABLE_COL_SERVICENUMBER, "TEXT", true);
     addTableColumn (SCHEDULEDSERVICES_TABLE_COL_SCHEDULES, "TEXT", true);

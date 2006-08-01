@@ -24,8 +24,9 @@ namespace envlssql
 
 
 
-HandicappedComplianceTableSync::HandicappedComplianceTableSync (Environment::Registry& environments)
-: ComponentTableSync (HANDICAPPEDCOMPLIANCES_TABLE_NAME, environments)
+HandicappedComplianceTableSync::HandicappedComplianceTableSync (Environment::Registry& environments,
+								const std::string& triggerOverrideClause)
+: ComponentTableSync (HANDICAPPEDCOMPLIANCES_TABLE_NAME, environments, true, true, triggerOverrideClause)
 {
     addTableColumn (HANDICAPPEDCOMPLIANCES_TABLE_COL_STATUS, "INTEGER");
     addTableColumn (HANDICAPPEDCOMPLIANCES_TABLE_COL_CAPACITY, "INTEGER");

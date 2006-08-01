@@ -35,7 +35,8 @@ class RoadChunkTableSync : public ComponentTableSync
 
  public:
 
-    RoadChunkTableSync (synthese::env::Environment::Registry& environments);
+    RoadChunkTableSync (synthese::env::Environment::Registry& environments,
+			const std::string& triggerOverrideClause = "1");
     ~RoadChunkTableSync ();
 
  protected:

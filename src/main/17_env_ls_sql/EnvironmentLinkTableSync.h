@@ -45,7 +45,8 @@ class EnvironmentLinkTableSync : public synthese::db::SQLiteTableSync
  public:
 
     EnvironmentLinkTableSync (const synthese::db::SQLiteSync* sync,
-			      synthese::env::Environment::Registry& environments);
+			      synthese::env::Environment::Registry& environments,
+			      const std::string& triggerOverrideClause = "1");
 
     ~EnvironmentLinkTableSync ();
 

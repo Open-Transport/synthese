@@ -35,7 +35,8 @@ class AxisTableSync : public ComponentTableSync
 
  public:
 
-    AxisTableSync (synthese::env::Environment::Registry& environments);
+    AxisTableSync (synthese::env::Environment::Registry& environments,
+		   const std::string& triggerOverrideClause = "1");
     ~AxisTableSync ();
 
  protected:

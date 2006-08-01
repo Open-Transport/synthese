@@ -35,7 +35,8 @@ class BikeComplianceTableSync : public ComponentTableSync
 
  public:
 
-    BikeComplianceTableSync (synthese::env::Environment::Registry& environments);
+    BikeComplianceTableSync (synthese::env::Environment::Registry& environments,
+			     const std::string& triggerOverrideClause = "1");
     ~BikeComplianceTableSync ();
 
  protected:

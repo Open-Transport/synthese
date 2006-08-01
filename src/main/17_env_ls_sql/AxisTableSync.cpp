@@ -21,8 +21,9 @@ namespace envlssql
 
 
 
-AxisTableSync::AxisTableSync (Environment::Registry& environments)
-: ComponentTableSync (AXES_TABLE_NAME, environments, true, false)
+AxisTableSync::AxisTableSync (Environment::Registry& environments,
+			      const std::string& triggerOverrideClause)
+: ComponentTableSync (AXES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (AXES_TABLE_COL_NAME, "TEXT", true);
     addTableColumn (AXES_TABLE_COL_FREE, "BOOLEAN", true);

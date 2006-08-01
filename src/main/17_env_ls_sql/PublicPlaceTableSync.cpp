@@ -24,8 +24,9 @@ namespace envlssql
 
 
 
-PublicPlaceTableSync::PublicPlaceTableSync (Environment::Registry& environments)
-: ComponentTableSync (PUBLICPLACES_TABLE_NAME, environments, true, false)
+PublicPlaceTableSync::PublicPlaceTableSync (Environment::Registry& environments,
+					    const std::string& triggerOverrideClause)
+: ComponentTableSync (PUBLICPLACES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (PUBLICPLACES_TABLE_COL_NAME, "TEXT", true);
     addTableColumn (PUBLICPLACES_TABLE_COL_CITYID, "INTEGER", false);

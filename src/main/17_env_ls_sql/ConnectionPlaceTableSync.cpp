@@ -24,8 +24,9 @@ namespace envlssql
 
 
 
-ConnectionPlaceTableSync::ConnectionPlaceTableSync (Environment::Registry& environments)
-: ComponentTableSync (CONNECTIONPLACES_TABLE_NAME, environments, true, false)
+ConnectionPlaceTableSync::ConnectionPlaceTableSync (Environment::Registry& environments,
+						    const std::string& triggerOverrideClause)
+: ComponentTableSync (CONNECTIONPLACES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (CONNECTIONPLACES_TABLE_COL_NAME, "TEXT", true);
     addTableColumn (CONNECTIONPLACES_TABLE_COL_CITYID, "TEXT", false);

@@ -35,7 +35,8 @@ class ContinuousServiceTableSync : public ComponentTableSync
 
  public:
 
-    ContinuousServiceTableSync (synthese::env::Environment::Registry& environments);
+    ContinuousServiceTableSync (synthese::env::Environment::Registry& environments,
+				const std::string& triggerOverrideClause = "1");
     ~ContinuousServiceTableSync ();
 
  protected:

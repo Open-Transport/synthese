@@ -26,8 +26,9 @@ namespace envlssql
 
 
 
-RoadChunkTableSync::RoadChunkTableSync (Environment::Registry& environments)
-: ComponentTableSync (ROADCHUNKS_TABLE_NAME, environments, true, false)
+RoadChunkTableSync::RoadChunkTableSync (Environment::Registry& environments,
+					const std::string& triggerOverrideClause)
+: ComponentTableSync (ROADCHUNKS_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (ROADCHUNKS_TABLE_COL_FROMADDRESSID, "INTEGER", false);
     addTableColumn (ROADCHUNKS_TABLE_COL_RANKINPATH, "INTEGER", false);

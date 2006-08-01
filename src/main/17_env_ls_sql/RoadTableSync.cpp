@@ -25,8 +25,9 @@ namespace envlssql
 
 
 
-RoadTableSync::RoadTableSync (Environment::Registry& environments)
-: ComponentTableSync (ROADS_TABLE_NAME, environments, true, false)
+RoadTableSync::RoadTableSync (Environment::Registry& environments,
+			      const std::string& triggerOverrideClause)
+: ComponentTableSync (ROADS_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (ROADS_TABLE_COL_NAME, "TEXT", true);
     addTableColumn (ROADS_TABLE_COL_CITYID, "INTEGER", false);

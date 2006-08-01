@@ -35,7 +35,8 @@ class PlaceAliasTableSync : public ComponentTableSync
 
  public:
 
-    PlaceAliasTableSync (synthese::env::Environment::Registry& environments);
+    PlaceAliasTableSync (synthese::env::Environment::Registry& environments,
+			 const std::string& triggerOverrideClause = "1");
     ~PlaceAliasTableSync ();
 
  protected:

@@ -93,8 +93,13 @@ Server::initialize ()
     
     ServerConfigTableSync* configSync = new ServerConfigTableSync (_config);
 
-    synthese::envlssql::EnvironmentTableSync* envSync = new synthese::envlssql::EnvironmentTableSync (_environments);
-    synthese::envlssql::CityTableSync* citySync = new synthese::envlssql::CityTableSync (_environments);
+    synthese::envlssql::EnvironmentTableSync* envSync = 
+	new synthese::envlssql::EnvironmentTableSync (_environments, TRIGGERS_ENABLED_CLAUSE);
+
+    synthese::envlssql::CityTableSync* citySync = 
+	new synthese::envlssql::CityTableSync (_environments, TRIGGERS_ENABLED_CLAUSE);
+
+    // TODO : add other synchronizers here...
 
     syncHook->addTableSynchronizer (configSync);
     syncHook->addTableSynchronizer (envSync);

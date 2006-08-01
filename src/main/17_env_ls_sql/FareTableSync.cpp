@@ -21,8 +21,9 @@ namespace envlssql
 
 
 
-FareTableSync::FareTableSync (Environment::Registry& environments)
-: ComponentTableSync (FARES_TABLE_NAME, environments, true, false)
+FareTableSync::FareTableSync (Environment::Registry& environments,
+			      const std::string& triggerOverrideClause)
+: ComponentTableSync (FARES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (FARES_TABLE_COL_NAME, "TEXT", true);
     addTableColumn (FARES_TABLE_COL_FARETYPE, "INTEGER", true);

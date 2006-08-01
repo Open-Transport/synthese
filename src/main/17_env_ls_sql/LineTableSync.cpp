@@ -25,8 +25,9 @@ namespace envlssql
 
 
 
-LineTableSync::LineTableSync (Environment::Registry& environments)
-: ComponentTableSync (LINES_TABLE_NAME, environments, true, false)
+LineTableSync::LineTableSync (Environment::Registry& environments,
+			      const std::string& triggerOverrideClause)
+: ComponentTableSync (LINES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (LINES_TABLE_COL_TRANSPORTNETWORKID, "INTEGER", false);
     addTableColumn (LINES_TABLE_COL_AXISID, "INTEGER", false);

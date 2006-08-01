@@ -35,7 +35,8 @@ class PedestrianComplianceTableSync : public ComponentTableSync
 
  public:
 
-    PedestrianComplianceTableSync (synthese::env::Environment::Registry& environments);
+    PedestrianComplianceTableSync (synthese::env::Environment::Registry& environments,
+				   const std::string& triggerOverrideClause = "1");
     ~PedestrianComplianceTableSync ();
 
  protected:

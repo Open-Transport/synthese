@@ -35,7 +35,8 @@ class ReservationRuleTableSync : public ComponentTableSync
 
  public:
 
-    ReservationRuleTableSync (synthese::env::Environment::Registry& environments);
+    ReservationRuleTableSync (synthese::env::Environment::Registry& environments,
+			      const std::string& triggerOverrideClause = "1");
     ~ReservationRuleTableSync ();
 
  protected:

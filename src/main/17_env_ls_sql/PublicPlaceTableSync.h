@@ -35,7 +35,8 @@ class PublicPlaceTableSync : public ComponentTableSync
 
  public:
 
-    PublicPlaceTableSync (synthese::env::Environment::Registry& environments);
+    PublicPlaceTableSync (synthese::env::Environment::Registry& environments,
+			  const std::string& triggerOverrideClause = "1");
     ~PublicPlaceTableSync ();
 
  protected:

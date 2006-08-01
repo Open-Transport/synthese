@@ -24,8 +24,9 @@ namespace envlssql
 
 
 
-TransportNetworkTableSync::TransportNetworkTableSync (Environment::Registry& environments)
-: ComponentTableSync (TRANSPORTNETWORKS_TABLE_NAME, environments)
+TransportNetworkTableSync::TransportNetworkTableSync (Environment::Registry& environments,
+						      const std::string& triggerOverrideClause)
+: ComponentTableSync (TRANSPORTNETWORKS_TABLE_NAME, environments, true, true, triggerOverrideClause)
 {
     addTableColumn (TRANSPORTNETWORKS_TABLE_COL_NAME, "TEXT");
 }

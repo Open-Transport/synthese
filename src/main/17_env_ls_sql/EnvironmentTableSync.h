@@ -33,7 +33,8 @@ class EnvironmentTableSync : public synthese::db::SQLiteTableSync
 
  public:
 
-    EnvironmentTableSync (synthese::env::Environment::Registry& environments);
+    EnvironmentTableSync (synthese::env::Environment::Registry& environments,
+			  const std::string& triggerOverrideClause = "1");
     ~EnvironmentTableSync ();
 
     void rowsAdded (const synthese::db::SQLiteThreadExec* sqlite, 

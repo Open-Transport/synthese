@@ -22,8 +22,9 @@ namespace envlssql
 ComponentTableSync::ComponentTableSync (const std::string& tableName, 
 					Environment::Registry& environments,
 					bool allowInsert,
-					bool allowRemove)
-: synthese::db::SQLiteTableSync (tableName, allowInsert, allowRemove, "(SELECT * FROM t010_config WHERE id = 1)")
+					bool allowRemove,
+					const std::string& triggerOverrideClause)
+: synthese::db::SQLiteTableSync (tableName, allowInsert, allowRemove, triggerOverrideClause)
 , _environments (environments)
 {
     addTableColumn (TABLE_COL_ID, "INTEGER");

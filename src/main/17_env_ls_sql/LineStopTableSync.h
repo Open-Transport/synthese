@@ -35,7 +35,8 @@ class LineStopTableSync : public ComponentTableSync
 
  public:
 
-    LineStopTableSync (synthese::env::Environment::Registry& environments);
+    LineStopTableSync (synthese::env::Environment::Registry& environments,
+		       const std::string& triggerOverrideClause = "1");
     ~LineStopTableSync ();
 
  protected:

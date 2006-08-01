@@ -35,7 +35,8 @@ class CityTableSync : public ComponentTableSync
 
  public:
 
-    CityTableSync (synthese::env::Environment::Registry& environments);
+    CityTableSync (synthese::env::Environment::Registry& environments,
+		   const std::string& triggerOverrideClause = "1");
     ~CityTableSync ();
 
  protected:

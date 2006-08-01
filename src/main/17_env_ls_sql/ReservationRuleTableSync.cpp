@@ -26,8 +26,9 @@ namespace envlssql
 
 
 
-ReservationRuleTableSync::ReservationRuleTableSync (Environment::Registry& environments)
-: ComponentTableSync (RESERVATIONRULES_TABLE_NAME, environments, true, false)
+ReservationRuleTableSync::ReservationRuleTableSync (Environment::Registry& environments,
+						    const std::string& triggerOverrideClause)
+: ComponentTableSync (RESERVATIONRULES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (RESERVATIONRULES_TABLE_COL_TYPE, "INTEGER", true);
     addTableColumn (RESERVATIONRULES_TABLE_COL_ONLINE, "BOOLEAN", true);

@@ -22,8 +22,9 @@ namespace envlssql
 
 
 
-PhysicalStopTableSync::PhysicalStopTableSync (Environment::Registry& environments)
-: ComponentTableSync (PHYSICALSTOPS_TABLE_NAME, environments, true, false)
+PhysicalStopTableSync::PhysicalStopTableSync (Environment::Registry& environments,
+					      const std::string& triggerOverrideClause)
+: ComponentTableSync (PHYSICALSTOPS_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (PHYSICALSTOPS_TABLE_COL_NAME, "TEXT", true);
     addTableColumn (PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID, "INTEGER", false);

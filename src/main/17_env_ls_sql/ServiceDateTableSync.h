@@ -35,7 +35,8 @@ class ServiceDateTableSync : public ComponentTableSync
 
  public:
 
-    ServiceDateTableSync (synthese::env::Environment::Registry& environments);
+    ServiceDateTableSync (synthese::env::Environment::Registry& environments,
+			  const std::string& triggerOverrideClause = "1");
     ~ServiceDateTableSync ();
 
  protected:

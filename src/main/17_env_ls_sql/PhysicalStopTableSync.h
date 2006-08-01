@@ -35,7 +35,8 @@ class PhysicalStopTableSync : public ComponentTableSync
 
  public:
 
-    PhysicalStopTableSync (synthese::env::Environment::Registry& environments);
+    PhysicalStopTableSync (synthese::env::Environment::Registry& environments,
+			   const std::string& triggerOverrideClause = "1");
     ~PhysicalStopTableSync ();
 
  protected:

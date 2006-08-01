@@ -21,8 +21,9 @@ namespace envlssql
 
 
 
-CityTableSync::CityTableSync (Environment::Registry& environments)
-: ComponentTableSync (CITIES_TABLE_NAME, environments, true, false)
+CityTableSync::CityTableSync (Environment::Registry& environments,
+			      const std::string& triggerOverrideClause)
+: ComponentTableSync (CITIES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (CITIES_TABLE_COL_NAME, "TEXT", true);
 }

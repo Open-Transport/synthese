@@ -35,7 +35,8 @@ class ScheduledServiceTableSync : public ComponentTableSync
 
  public:
 
-    ScheduledServiceTableSync (synthese::env::Environment::Registry& environments);
+    ScheduledServiceTableSync (synthese::env::Environment::Registry& environments,
+			       const std::string& triggerOverrideClause = "1");
     ~ScheduledServiceTableSync ();
 
  protected:

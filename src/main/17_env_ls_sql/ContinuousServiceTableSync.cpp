@@ -32,8 +32,9 @@ namespace envlssql
 
 
 
-ContinuousServiceTableSync::ContinuousServiceTableSync (Environment::Registry& environments)
-: ComponentTableSync (CONTINUOUSSERVICES_TABLE_NAME, environments, true, false)
+ContinuousServiceTableSync::ContinuousServiceTableSync (Environment::Registry& environments,
+							const std::string& triggerOverrideClause)
+: ComponentTableSync (CONTINUOUSSERVICES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER, "TEXT", true);
     addTableColumn (CONTINUOUSSERVICES_TABLE_COL_SCHEDULES, "TEXT", true);

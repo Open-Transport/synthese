@@ -24,8 +24,9 @@ namespace envlssql
 
 
 
-BikeComplianceTableSync::BikeComplianceTableSync (Environment::Registry& environments)
-: ComponentTableSync (BIKECOMPLIANCES_TABLE_NAME, environments)
+BikeComplianceTableSync::BikeComplianceTableSync (Environment::Registry& environments,
+						  const std::string& triggerOverrideClause)
+: ComponentTableSync (BIKECOMPLIANCES_TABLE_NAME, environments, true, true, triggerOverrideClause)
 {
     addTableColumn (BIKECOMPLIANCES_TABLE_COL_STATUS, "INTEGER");
     addTableColumn (BIKECOMPLIANCES_TABLE_COL_CAPACITY, "INTEGER");

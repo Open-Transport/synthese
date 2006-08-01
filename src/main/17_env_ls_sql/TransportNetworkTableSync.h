@@ -35,7 +35,8 @@ class TransportNetworkTableSync : public ComponentTableSync
 
  public:
 
-    TransportNetworkTableSync (synthese::env::Environment::Registry& environments);
+    TransportNetworkTableSync (synthese::env::Environment::Registry& environments,
+			       const std::string& triggerOverrideClause = "1");
     ~TransportNetworkTableSync ();
 
  protected:

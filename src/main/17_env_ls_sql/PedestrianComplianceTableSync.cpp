@@ -25,8 +25,9 @@ namespace envlssql
 
 
 
-PedestrianComplianceTableSync::PedestrianComplianceTableSync (Environment::Registry& environments)
-: ComponentTableSync (PEDESTRIANCOMPLIANCES_TABLE_NAME, environments)
+PedestrianComplianceTableSync::PedestrianComplianceTableSync (Environment::Registry& environments,
+							      const std::string& triggerOverrideClause)
+: ComponentTableSync (PEDESTRIANCOMPLIANCES_TABLE_NAME, environments, true, true, triggerOverrideClause)
 {
     addTableColumn (PEDESTRIANCOMPLIANCES_TABLE_COL_STATUS, "INTEGER");
     addTableColumn (PEDESTRIANCOMPLIANCES_TABLE_COL_CAPACITY, "INTEGER");
