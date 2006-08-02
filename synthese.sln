@@ -11,10 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04_time", "src\main\04_time
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "07_nnmap", "src\main\07_nnmap\07_nnmap.vcproj", "{04690C23-57E1-4B85-9A23-204FA8D310B8}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "15_env", "src\main\15_env\15_env.vcproj", "{DFDC896C-0867-4704-896B-43FDE04E3AA8}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -93,10 +89,6 @@ Global
 		{BB6C0975-210C-4358-82B6-B39EC3EE1AD4}.Debug.Build.0 = Debug|Win32
 		{BB6C0975-210C-4358-82B6-B39EC3EE1AD4}.Release.ActiveCfg = Release|Win32
 		{BB6C0975-210C-4358-82B6-B39EC3EE1AD4}.Release.Build.0 = Release|Win32
-		{04690C23-57E1-4B85-9A23-204FA8D310B8}.Debug.ActiveCfg = Debug|Win32
-		{04690C23-57E1-4B85-9A23-204FA8D310B8}.Debug.Build.0 = Debug|Win32
-		{04690C23-57E1-4B85-9A23-204FA8D310B8}.Release.ActiveCfg = Release|Win32
-		{04690C23-57E1-4B85-9A23-204FA8D310B8}.Release.Build.0 = Release|Win32
 		{DFDC896C-0867-4704-896B-43FDE04E3AA8}.Debug.ActiveCfg = Debug|Win32
 		{DFDC896C-0867-4704-896B-43FDE04E3AA8}.Debug.Build.0 = Debug|Win32
 		{DFDC896C-0867-4704-896B-43FDE04E3AA8}.Release.ActiveCfg = Release|Win32

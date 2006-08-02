@@ -15,10 +15,11 @@
 #include "ThreadTest.h"
 #include "ConversionTest.h"
 #include "UIdTest.h"
+#include "LexicalMatcherTest.h"
 
 
 
-CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::HtmlFilterTest);
+/*CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::HtmlFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::LowerCaseFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::PlainCharFilterTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::SqlFilterTest);
@@ -27,6 +28,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::RegistrableTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::ThreadTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::ConversionTest);
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::UIdTest);
+*/
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::LexicalMatcherTest);
 
 
 

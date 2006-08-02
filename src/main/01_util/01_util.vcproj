@@ -86,6 +86,9 @@
 				RelativePath=".\HtmlFilter.h">
 			</File>
 			<File
+				RelativePath=".\LexicalMatcher.h">
+			</File>
+			<File
 				RelativePath=".\Log.h">
 			</File>
 			<File
