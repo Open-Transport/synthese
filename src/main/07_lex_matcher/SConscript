@@ -8,10 +8,26 @@ excludes = []
 
 moduleenv.AppendMultithreadConf ()
 
+files = moduleenv.Glob(includes, excludes)
 
+moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
+
+
+moduleenv = mainenv.ModuleEnv()
+includes = ''
+excludes = []
 files = moduleenv.Glob(includes, excludes)
 
 
-moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
+# Modules libs
+moduleenv.AddModuleDependency ('07_lex_matcher')
+moduleenv.AddModuleDependency ('01_util')
+moduleenv.AddBoostDependency ('boost_filesystem')
+moduleenv.AddBoostDependency ('boost_date_time')
+moduleenv.AddBoostDependency ('boost_program_options')
+moduleenv.AppendMultithreadConf ()
+
+moduleenv.Program ( moduleenv.DefaultModuleName(), files )
+
 
 
