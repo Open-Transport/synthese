@@ -39,7 +39,14 @@ int main( int argc, char **argv )
 
     // const boost::filesystem::path& workingDir = boost::filesystem::initial_path();
     // Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
+    boost::filesystem::path txtFile (txtfile, boost::filesystem::native);
 
+    // Parse txt file and initialize lexical matcher
+    // ...
+
+    // Wait for input...
+
+    
     try
     {
     }

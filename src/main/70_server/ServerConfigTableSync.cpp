@@ -68,15 +68,15 @@ ServerConfigTableSync::rowsAdded (const SQLiteThreadExec* sqlite,
 	}
 	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_DATADIR)
 	{
-	    _config.setDataDir (boost::filesystem::path (paramValue));
+	    _config.setDataDir (boost::filesystem::path (paramValue, boost::filesystem::native));
 	}
 	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_TEMPDIR)
 	{
-	    _config.setTempDir (boost::filesystem::path (paramValue));
+	    _config.setTempDir (boost::filesystem::path (paramValue, boost::filesystem::native));
 	}
 	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPDIR)
 	{
-	    _config.setHttpTempDir (boost::filesystem::path (paramValue));
+	    _config.setHttpTempDir (boost::filesystem::path (paramValue, boost::filesystem::native));
 	}
 	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPURL)
 	{
