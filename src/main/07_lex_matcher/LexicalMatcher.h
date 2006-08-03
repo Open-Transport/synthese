@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_UTIL_LEXICALMATCHER_H
-#define SYNTHESE_UTIL_LEXICALMATCHER_H
+#ifndef SYNTHESE_LEXMATCHER_LEXICALMATCHER_H
+#define SYNTHESE_LEXMATCHER_LEXICALMATCHER_H
 
 
 #include <iostream>
@@ -24,7 +24,7 @@
 
 namespace synthese
 {
-namespace util
+namespace lexmatcher
 {
 
 

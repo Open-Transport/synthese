@@ -1,0 +1,26 @@
+Import ('testenv')
+testmoduleenv = testenv.ModuleEnv()
+
+includes = '*.cpp'
+excludes = []
+
+
+
+testmoduleenv.AddModuleDependency ('01_util')
+testmoduleenv.AddBoostDependency ('boost_thread')
+testmoduleenv.AddBoostDependency ('boost_iostreams')
+testmoduleenv.AppendMultithreadConf ();
+
+
+#testmoduleenv.Append (CPPDEFINES = ['BOOST_DISABLE_THREADS'])
+
+
+files = testmoduleenv.Glob(includes, excludes)
+
+testmodulename = testmoduleenv.DefaultTestModuleName ()
+
+testprogram = testmoduleenv.Program(testmodulename, files)
+
+testmoduleenv.Test("test.passed", testprogram)
+
+

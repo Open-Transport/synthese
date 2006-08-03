@@ -1,6 +1,6 @@
 #include "LexicalMatcherTest.h"
 
-#include "01_util/LexicalMatcher.h"
+#include "07_lex_matcher/LexicalMatcher.h"
 
 #include <iostream>
 
@@ -8,8 +8,9 @@
 
 namespace synthese
 {
-namespace util
+namespace lexmatcher
 {
+
     std::vector<std::string> 
     LexicalMatcherTest::getTestBase1 () const
     {

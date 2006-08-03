@@ -9,8 +9,8 @@
 
 namespace synthese
 {
-namespace util
-  {
+namespace lexmatcher
+{
 
 
 class LexicalMatcherTest : public CPPUNIT_NS::TestCase
