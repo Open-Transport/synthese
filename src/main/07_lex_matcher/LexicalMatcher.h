@@ -85,7 +85,7 @@ class LexicalMatcher
     LexicalMatcher (bool ignoreCase=true,
 		    bool ignoreWordOrder=true,
 		    const std::map<std::string, std::string>& translations = std::map<std::string, std::string> (),
-		    const std::string& separatorCharacters = ",;.' &");
+		    const std::string& separatorCharacters = "-,;.' &()");
 
     ~LexicalMatcher ();
 
@@ -99,8 +99,9 @@ class LexicalMatcher
     size_t size () const;
 
     MatchHit bestMatch (const std::string& fuzzyKey) const;
+    MatchResult	bestMatches (const std::string& fuzzyKey, int nbMatches = 10) const;
     MatchResult	match (const std::string& fuzzyKey, double minScore = 0.0, int maxNbValues = -1) const;
-    //@}
+
 
     
     //! @name Update methods
@@ -129,7 +130,7 @@ template<class T>
 const double LexicalMatcher<T>::EXTRA_INPUT_WORD_PENALTY_FACTOR (1.0);
 
 template<class T>
-const double LexicalMatcher<T>::EXTRA_MATCH_WORD_PENALTY_FACTOR (0.3);
+const double LexicalMatcher<T>::EXTRA_MATCH_WORD_PENALTY_FACTOR (0.5);
 
 
 template<class T>
@@ -169,9 +170,25 @@ template<class T>
 typename LexicalMatcher<T>::MatchHit 
 LexicalMatcher<T>::bestMatch (const std::string& fuzzyKey) const
 {
+    return bestMatches (fuzzyKey).front ();
+}
+
+
+template<class T>
+typename LexicalMatcher<T>::MatchResult
+LexicalMatcher<T>::bestMatches (const std::string& fuzzyKey, int nbMatches) const
+{
     if (_map.empty ()) throw synthese::util::Exception ("No match possible (lexical matcher has no entry).");
     MatchResult result = match (fuzzyKey, 0.0);
-    return result.front ();
+    
+    if (result.size () > nbMatches)
+    {
+	// Truncate the result
+	MatchResult::iterator it = result.begin ();
+	std::advance (it, nbMatches);
+	result.erase (it, result.end ());
+    }
+    return result;
 }
 
 

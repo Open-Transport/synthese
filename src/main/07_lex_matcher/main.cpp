@@ -4,8 +4,8 @@
 #include "01_util/Exception.h"
 #include "01_util/Log.h"
 
-
 #include <iostream>
+#include <fstream>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -14,6 +14,7 @@
 
 using synthese::util::Log;
 using synthese::util::Conversion;
+using synthese::lexmatcher::LexicalMatcher;
 
 
 namespace po = boost::program_options;
@@ -37,22 +38,64 @@ int main( int argc, char **argv )
 	return 1;
     }
 
-    // const boost::filesystem::path& workingDir = boost::filesystem::initial_path();
-    // Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
     boost::filesystem::path txtFile (txtfile, boost::filesystem::native);
+    if (boost::filesystem::exists (txtFile) == false)
+    {
+	Log::GetInstance ().fatal ("Input file " + txtFile.string () + " does not exist.");
+	return 1;
+    }
+    
+    Log::GetInstance ().info ("Initializing matcher with data from " + txtFile.string ());
+
+    bool ignoreCase (true);
+    bool ignoreWordOrder (true);
+    std::map<std::string, std::string> translations;
+    std::string separatorCharacters ("-,;.' &()");
+
+    int nbMatches (10);
+
+    LexicalMatcher<int> matcher (ignoreCase, 
+				 ignoreWordOrder, 
+				 translations, 
+				 separatorCharacters);
 
     // Parse txt file and initialize lexical matcher
     // ...
-
-    // Wait for input...
-
+    // Dump the image data
+    std::ifstream ifs (txtFile.string().c_str ());
+    char buf[4096];
+    while (ifs) 
+    {
+        ifs.getline (buf, 4096);
+	matcher.add (buf, 0);
+    }
     
+    Log::GetInstance ().info ("Initialization done");
+
     try
     {
+	std::cout << "? ";
+	// Wait for input...
+	while (std::cin.getline (buf, 4096))
+	{
+	    std::string input (buf);
+	    if (input.empty ()) break;
+	    
+	    LexicalMatcher<int>::MatchResult result = matcher.bestMatches (input, nbMatches);
+	    std::cout << std::endl;
+	    for (LexicalMatcher<int>::MatchResult::iterator it = result.begin ();
+		 it != result.end (); ++it)
+	    {
+		std::cout << it->score << "\t" << it->key << std::endl;		
+	    }
+	    std::cout << std::endl;
+	    std::cout << "? ";
+	}
     }
     catch (synthese::util::Exception& ex)
     {
 	Log::GetInstance ().fatal ("Exit!", ex);
     }
+    
 }
 
