@@ -1,4 +1,4 @@
-# Doxyfile 1.4.5
+# Doxyfile 1.4.7
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -33,11 +33,11 @@ MULTILINE_CPP_IS_BRIEF = NO
 DETAILS_AT_TOP         = YES
 INHERIT_DOCS           = YES
 SEPARATE_MEMBER_PAGES  = YES
-TAB_SIZE               = 7
+TAB_SIZE               = 10
 ALIASES                = 
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
-BUILTIN_STL_SUPPORT    = NO
+BUILTIN_STL_SUPPORT    = YES
 DISTRIBUTE_GROUP_DOC   = YES
 SUBGROUPING            = YES
 #---------------------------------------------------------------------------
@@ -74,7 +74,7 @@ FILE_VERSION_FILTER    =
 #---------------------------------------------------------------------------
 QUIET                  = NO
 WARNINGS               = YES
-WARN_IF_UNDOCUMENTED   = NO
+WARN_IF_UNDOCUMENTED   = YES
 WARN_IF_DOC_ERROR      = YES
 WARN_NO_PARAMDOC       = YES
 WARN_FORMAT            = "$file($line) $text"
@@ -91,7 +91,10 @@ FILE_PATTERNS          = *.c \
                          *.doxygen \
                          *.py
 RECURSIVE              = YES
-EXCLUDE                = exemples
+EXCLUDE                = exemples \
+                         ../src/main/client_rs485 \
+                         ../src/main/cient_term \
+                         ../src/main/server
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXAMPLE_PATH           = exemples
@@ -109,6 +112,7 @@ INLINE_SOURCES         = NO
 STRIP_CODE_COMMENTS    = YES
 REFERENCED_BY_RELATION = YES
 REFERENCES_RELATION    = YES
+REFERENCES_LINK_SOURCE = YES
 USE_HTAGS              = NO
 VERBATIM_HEADERS       = YES
 #---------------------------------------------------------------------------
@@ -124,7 +128,7 @@ GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = 
 HTML_HEADER            = html/en-tete.html
-HTML_FOOTER            = 
+HTML_FOOTER            = html/footer.html
 HTML_STYLESHEET        = html/doxygen.css
 HTML_ALIGN_MEMBERS     = YES
 GENERATE_HTMLHELP      = NO
@@ -273,6 +277,7 @@ TEMPLATE_RELATIONS     = YES
 INCLUDE_GRAPH          = YES
 INCLUDED_BY_GRAPH      = YES
 CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
 GRAPHICAL_HIERARCHY    = YES
 DIRECTORY_GRAPH        = NO
 DOT_IMAGE_FORMAT       = png

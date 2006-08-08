@@ -24,6 +24,7 @@ namespace envlsxml
 
 Sample XML format :
 
+@code
 <line id="5"
       name="L5"
       axisId="A2"
@@ -40,7 +41,7 @@ Sample XML format :
              type="passage" physicalStopId="2"/>
 
 </line>
-
+@endcode
 
  @ingroup m16
 */

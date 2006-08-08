@@ -25,12 +25,14 @@ namespace envlsxml
 
 Sample XML format :
 
+@code
 <lineStop id="1" metricOffset="352.2"
 	  type="D" physicalStopId="3">
   <point x="120.5" y="4444.2"/>
   <point x="130.5" y="4434.4"/>
   <point x="140.2" y="4414.2"/>
 </lineStop>
+@endcode
 
  @ingroup m16
 */

@@ -39,10 +39,10 @@ class Month
         //@{
 
         /** Number of days in this month.
-          \param year Year for this month
+			@param year Year for this month
           \return Number of days in this month, taking into account leap years
         */
-        int getDaysCount ( const Year& ) const;
+        int getDaysCount ( const Year& year ) const;
 
         /** Number of days left til the end of this month.
           \param day Current day of this month
@@ -53,7 +53,13 @@ class Month
         int getDaysLeftToEndOfMonth ( int day, const Year& year ) const;
 
 
-        int getDaysLeftToMonth ( const Year& startYear,
+        /** Marc should comment his function.
+			@param startYear Start year
+			@param endMonth End month
+			@param endYear End year
+			@return what Marc wants to this function returns
+		*/
+		int getDaysLeftToMonth ( const Year& startYear,
                                  int endMonth,
                                  const Year& endYear ) const;
 

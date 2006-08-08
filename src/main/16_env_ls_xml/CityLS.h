@@ -24,8 +24,10 @@ namespace envlsxml
 
 Sample XML format :
 
+@code
 <city id="1"
       name="Toulouse"/>
+@endcode
 
  @ingroup m16
 */

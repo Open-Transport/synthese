@@ -103,8 +103,7 @@ Month::operator++( int )
 
 
 
-int
-Month::getDaysLeftToMonth ( const Year& startYear,
+int Month::getDaysLeftToMonth ( const Year& startYear,
                             int endMonth,
                             const Year& endYear ) const
 {

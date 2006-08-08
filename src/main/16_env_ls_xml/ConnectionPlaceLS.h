@@ -24,9 +24,11 @@ namespace envlsxml
 
 Sample XML format :
 
+@code
 <connectionPlace id="1"
              name="Central station"
 	     cityId="2"/>
+@endcode
 
  @ingroup m16
 */

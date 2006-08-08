@@ -24,12 +24,14 @@ namespace envlsxml
 
 Sample XML format :
 
+@code
 <physicalStop id="3"
               name="City Hall" 
               connectionPlaceId="2"
               rankInConnectionPlace="1"
 	      x="1334.5"
 	      y="123.2"/>
+@endcode
 
  @ingroup m16
 */

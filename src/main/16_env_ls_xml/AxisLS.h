@@ -24,10 +24,12 @@ namespace envlsxml
 
 Sample XML format :
 
+@code
 <axis id="1"
       name="A1"
       free="true"
       authorized="false"/>
+@endcode
 
  @ingroup m16
 */

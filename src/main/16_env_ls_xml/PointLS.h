@@ -23,7 +23,9 @@ namespace envlsxml
 
 Sample XML format :
 
+@code
 <point x="1334.3" y="444.3"/>
+@endcode
 
  @ingroup m16
 */

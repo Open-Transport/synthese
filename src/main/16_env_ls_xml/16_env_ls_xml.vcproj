@@ -49,6 +49,9 @@
 				RelativePath=".\CityLS.cpp">
 			</File>
 			<File
+				RelativePath=".\ConnectionPlaceLS.cpp">
+			</File>
+			<File
 				RelativePath=".\EnvironmentLS.cpp">
 			</File>
 			<File
@@ -79,6 +82,9 @@
 			</File>
 			<File
 				RelativePath=".\CityLS.h">
+			</File>
+			<File
+				RelativePath=".\ConnectionPlaceLS.h">
 			</File>
 			<File
 				RelativePath=".\EnvironmentLS.h">

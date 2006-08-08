@@ -2,9 +2,8 @@
 
 \page bibliotheque_images Bibliothèque d'images pour la documentation
 
-\image html bande_rcs.jpg
-\image html h2.gif
-\image html h3.gif
 \image html image005.gif
+@image html RCSdoc.jpg
+@image html banner.jpg
 
 */

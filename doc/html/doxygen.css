@@ -1,67 +1,24 @@
 BODY,H1,H2,H3,H4,H5,H6,P,CENTER,TD,TH,UL,DL,DIV {
-	font-family: Myriad Pro, Geneva, Arial, Helvetica, sans-serif;
+	font-family: Geneva, Arial, Helvetica, sans-serif;
 }
-body {
-	margin: 0px;
-	padding: 5px;
-	background: white;
-	color: black;
+BODY,TD {
+       font-size: 90%;
 }
-img.titre {
-	margin:-5px;
-}
-
-.logo {
-  color: white;
-  background-color: rgb(0,25,80);
-  height: 50px;
-}
-
-.banner {
-  color: white;
-  background: url(banner.jpg) repeat-x top left;
-  height: 60px;
-}
-
 H1 {
-	text-align: right;
-     font-weight: bold;
-	font-size:22pt;
-	margin:50px 0px 150px 100px;
+	text-align: center;
+       font-size: 160%;
 }
 H2 {
-       font-weight: bold;
-	  font-size: 20pt;
-	  border-style:none none solid none;
-	  border-width:1px;
-	  border-color:black;
-	  background-image:url(h2.gif);
-	  background-repeat:no-repeat;
-	  background-position:center left;
-	  padding:0px 0px 0px 25px;
-	  margin: 60px 0px 20px 5px;
+       font-size: 120%;
 }
-DIV.groupHeader, h3 {
-       margin-top: 25px;
-       margin-bottom: 6px;
-       font-weight: bold;
-	  font-size: 14pt;
-	  background-image:url(h3.gif);
-	  background-repeat:no-repeat;
-	  background-position:center left;
-	  padding:0px 0px 0px 25px;
+H3 {
+       font-size: 100%;
 }
-
-h4 {
-	font-size: 12pt;
-	font-weight:bold;
-}
-
 CAPTION { font-weight: bold }
 DIV.qindex {
 	width: 100%;
-	background-color: #eeeeff;
-	border: 1px solid #b0b0b0;
+	background-color: #e8eef2;
+	border: 1px solid #84b0c7;
 	text-align: center;
 	margin: 2px;
 	padding: 2px;
@@ -69,19 +26,28 @@ DIV.qindex {
 }
 DIV.nav {
 	width: 100%;
-	background-color: #eeeeff;
-	border: 1px solid #b0b0b0;
+	background-color: #e8eef2;
+	border: 1px solid #84b0c7;
 	text-align: center;
 	margin: 2px;
 	padding: 2px;
 	line-height: 140%;
 }
+DIV.navtab {
+       background-color: #e8eef2;
+       border: 1px solid #84b0c7;
+       text-align: center;
+       margin: 2px;
+       margin-right: 15px;
+       padding: 2px;
+}
+TD.navtab {
+       font-size: 70%;
+}
 A.qindex {
        text-decoration: none;
+       font-weight: bold;
        color: #1A419D;
-       font-family:Arial Narrow;
-       font-size:10px;
-       line-height:10px;
 }
 A.qindex:visited {
        text-decoration: none;
@@ -105,7 +71,7 @@ A.qindexHL:hover {
 	color: #ffffff;
 }
 A.qindexHL:visited { text-decoration: none; background-color: #6666cc; color: #ffffff }
-A.el { text-decoration: none; font-weight: bold; }
+A.el { text-decoration: none; font-weight: bold }
 A.elRef { font-weight: bold }
 A.code:link { text-decoration: none; font-weight: normal; color: #0000FF}
 A.code:visited { text-decoration: none; font-weight: normal; color: #0000FF}
@@ -114,7 +80,8 @@ A.codeRef:visited { font-weight: normal; color: #0000FF}
 A:hover { text-decoration: none; background-color: #f2f2ff }
 DL.el { margin-left: -1cm }
 .fragment {
-       font-family: monospace
+       font-family: monospace, fixed;
+       font-size: 95%;
 }
 PRE.fragment {
 	border: 1px solid #CCCCCC;
@@ -129,17 +96,22 @@ PRE.fragment {
 	padding-bottom: 4px;
 }
 DIV.ah { background-color: black; font-weight: bold; color: #ffffff; margin-bottom: 3px; margin-top: 3px }
-TD.md { background-color: #F4F4FB; font-weight: bold; }
-TD.mdPrefix {
-       background-color: #F4F4FB;
-       color: #606060;
-	font-size: 80%;
+
+DIV.groupHeader {
+       margin-left: 16px;
+       margin-top: 12px;
+       margin-bottom: 6px;
+       font-weight: bold;
 }
-TD.mdname1 { background-color: #F4F4FB; font-weight: bold; color: #602020; }
-TD.mdname { background-color: #F4F4FB; font-weight: bold; color: #602020; width: 600px; }
 DIV.groupText { margin-left: 16px; font-style: italic; font-size: 90% }
+BODY {
+	background: white;
+	color: black;
+	margin-right: 20px;
+	margin-left: 20px;
+}
 TD.indexkey {
-	background-color: #eeeeff;
+	background-color: #e8eef2;
 	font-weight: bold;
 	padding-right  : 10px;
 	padding-top    : 2px;
@@ -152,7 +124,7 @@ TD.indexkey {
 	border: 1px solid #CCCCCC;
 }
 TD.indexvalue {
-	background-color: #eeeeff;
+	background-color: #e8eef2;
 	font-style: italic;
 	padding-right  : 10px;
 	padding-top    : 2px;
@@ -177,13 +149,6 @@ SPAN.comment       { color: #800000 }
 SPAN.preprocessor  { color: #806020 }
 SPAN.stringliteral { color: #002080 }
 SPAN.charliteral   { color: #008080 }
-.mdTable {
-	border: 1px solid #868686;
-	background-color: #F4F4FB;
-}
-.mdRow {
-	padding: 8px 10px;
-}
 .mdescLeft {
        padding: 0px 8px 4px 8px;
 	font-size: 80%;
@@ -307,62 +272,159 @@ FORM.search {
 INPUT.search { font-size: 75%;
                color: #000080;
                font-weight: normal;
-               background-color: #eeeeff;
+               background-color: #e8eef2;
 }
 TD.tiny      { font-size: 75%;
 }
+a {
+	color: #1A41A8;
+}
 a:visited {
-	color: #3D2185;
+	color: #2A3798;
 }
 .dirtab { padding: 4px;
           border-collapse: collapse;
-          border: 1px solid #b0b0b0;
+          border: 1px solid #84b0c7;
 }
-TH.dirtab { background: #eeeeff;
+TH.dirtab { background: #e8eef2;
             font-weight: bold;
 }
 HR { height: 1px;
      border: none;
-     border-top: 1px solid white;
-	color:white;
+     border-top: 1px solid black;
 }
 
-table.tableau {
+/* Style for detailed member documentation */
+.memtemplate {
+  font-size: 80%;
+  color: #606060;
+  font-weight: normal;
+} 
+.memnav { 
+  background-color: #e8eef2;
+  border: 1px solid #84b0c7;
+  text-align: center;
+  margin: 2px;
+  margin-right: 15px;
+  padding: 2px;
+}
+.memitem {
+  padding: 4px;
+  background-color: #eef3f5;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #dedeee;
+  -moz-border-radius: 8px 8px 8px 8px;
+}
+.memname {
+  white-space: nowrap;
+  font-weight: bold;
+}
+.memdoc{
+  padding-left: 10px;
+}
+.memproto {
+  background-color: #d5e1e8;
+  width: 100%;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #84b0c7;
+  font-weight: bold;
+  -moz-border-radius: 8px 8px 8px 8px;
+}
+.paramkey {
+  text-align: right;
+}
+.paramtype {
+  white-space: nowrap;
+}
+.paramname {
+  color: #602020;
+  font-style: italic;
+}
+/* End Styling for detailed member documentation */
+
+/* for the tree view */
+.ftvtree {
+	font-family: sans-serif;
+	margin:0.5em;
+}
+.directory { font-size: 9pt; font-weight: bold; }
+.directory h3 { margin: 0px; margin-top: 1em; font-size: 11pt; }
+.directory > h3 { margin-top: 0; }
+.directory p { margin: 0px; white-space: nowrap; }
+.directory div { display: none; margin: 0px; }
+.directory img { vertical-align: -30%; }
+
+
+/********** CHARTE RCS **********/
+
+body {
+	margin: 0px;
+	padding: 0px;
+	background: white;
+	color: black;
+}
+
+div.page {
+	padding:10px;
+}
+
+table.title {
 	border-collapse:collapse;
-	border-color:black;
+	width:100%;
 }
 
-table.tableau td {
-	font-size:10pt;
-	border: 1px solid black;
+table.title td {
+	background-color:rgb(0,25,80);
 }
 
-table.tableau th {
-	background-color:#D0D0D0;
-	border: 1px solid black;
-	font-size:10pt;
+table.title td.title {
+	text-align: right;
+     font-weight: bold;
+	font-size:20pt;
+	color:gold;
+	font-family:helvetica;
 }
 
-td, th, p, body {
-	font-size:10pt;
-}
-div.navtab 
-{
-	 display:none;
-}
-
-ul
-{
-	margin: 0px 0px 0px 30px;
+table.title td.banner {
+  background: url(banner.jpg) repeat-x top left;
+  height: 42px;
+	border-style:none none solid none;
+	border-width:2px;
+	border-color:rgb(0,25,80);
+	background-color:rgb(0,25,80);
 }
 
-p.attention
-{
-	border-style:dotted;
-	border-color:Black;
-	border-width:3px;
-	background-color:#FF0080;
-	padding:5px 5px 5px 40px;
-	background-image:url(image005.gif);
-	background-repeat:no-repeat;
+table.title td.logo {
+	width:200px;
+}
+
+h1 { display:none; }
+
+H2 {
+	background-color:#A0B0EF;
+	color:white;
+       font-weight: bold;
+	  font-size: 16pt;
+		font-family:helvetica;
+	  border-style:none none none none;
+	  border-width:1px;
+	  border-color:rgb(0,25,80);
+/*	  background-image:url(h2.gif); */
+	  background-repeat:no-repeat;
+	  background-position:center left;
+	  padding:0px 5px 0px 5px;
+		margin:10px 0px 10px 0px;
+}
+DIV.groupHeader, h3 {
+		font-family:helvetica;
+	color:#A0B0EF;
+	  border-style:none none solid none;
+	  border-width:1px;
+	  border-color:#A0B0EF;
+       margin-top: 10px;
+       margin-bottom: 6px;
+       font-weight: bold;
+	  font-size: 14pt;
 }

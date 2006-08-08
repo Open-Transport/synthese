@@ -110,7 +110,7 @@ Deux cas se présentent :
  - soit plusieurs communes répondent à la demande sans possibilité de départager avec certitude, la liste est alors retournée dans l'ordre décroissant de probabilité de choix
 
 L'ambiguité et plus généralement le score de probabilité de choix sont évalués selon la formule suivante :
-@f$  @f$
+
 
 @page uc12 Recherche d'adresse (arrêt, lieu public, domicile) dans une commune spécifiée, à partir de texte
 
@@ -121,7 +121,6 @@ Deux cas se présentent :
  - soit plusieurs arrêts répondent à la demande sans possibilité de départager avec certitude, la liste est alors retournée dans l'ordre décroissant de probabilité de choix
 
 L'ambiguité et plus généralement le score de probabilité de choix sont évalués selon la formule suivante :
-@f$  @f$
 
 @page uc13 13 Recherche d'adresse (arrêt, lieu public, domicile) à partir de deux textes : un pour la commune, un pour l'arret
 

@@ -21,10 +21,11 @@ namespace envlsxml
 
 /** Environment XML loading/saving service class.
 
+@warning ordering of child elements is important!
+
 Sample XML format :
 
-Warning: ordering of child elements is important!
-
+@code
 <environment id="0">
 
  <cities>
@@ -75,7 +76,7 @@ Warning: ordering of child elements is important!
 
 
 </environment>
-
+@endcode
 
  @ingroup m16
 */

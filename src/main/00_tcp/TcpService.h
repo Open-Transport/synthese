@@ -73,7 +73,7 @@ public:
 
     
     /** Closes an existing TCP connection
-       @param The socket id.
+       @param socket The socket id.
      */
     void closeConnection (TcpServerSocket& socket) throw (SocketException);
 

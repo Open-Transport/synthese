@@ -43,16 +43,79 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\AddressTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\AlarmTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\AxisTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\BikeComplianceTableSync.cpp">
+			</File>
+			<File
 				RelativePath=".\CityTableSync.cpp">
 			</File>
 			<File
 				RelativePath=".\ComponentTableSync.cpp">
 			</File>
 			<File
+				RelativePath=".\ConnectionPlaceTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\ContinuousServiceTableSync.cpp">
+			</File>
+			<File
 				RelativePath=".\EnvironmentLinkTableSync.cpp">
 			</File>
 			<File
+				RelativePath=".\EnvironmentSyncException.cpp">
+			</File>
+			<File
 				RelativePath=".\EnvironmentTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\FareTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\HandicappedComplianceTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\LineStopTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\LineTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\PedestrianComplianceTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\PhysicalStopTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\PlaceAliasTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\PublicPlaceTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\ReservationRuleTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\RoadChunkTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\RoadTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\ScheduledServiceTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\ServiceDateTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\TransportNetworkTableSync.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -60,16 +123,82 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath=".\AddressTableSync.h">
+			</File>
+			<File
+				RelativePath=".\AlarmTableSync.h">
+			</File>
+			<File
+				RelativePath=".\AxisTableSync.h">
+			</File>
+			<File
+				RelativePath=".\BikeComplianceTableSync.h">
+			</File>
+			<File
 				RelativePath=".\CityTableSync.h">
 			</File>
 			<File
 				RelativePath=".\ComponentTableSync.h">
 			</File>
 			<File
+				RelativePath=".\ConnectionPlaceTableSync.h">
+			</File>
+			<File
+				RelativePath=".\ContinuousServiceTableSync.h">
+			</File>
+			<File
 				RelativePath=".\EnvironmentLinkTableSync.h">
 			</File>
 			<File
+				RelativePath=".\EnvironmentSyncException.h">
+			</File>
+			<File
 				RelativePath=".\EnvironmentTableSync.h">
+			</File>
+			<File
+				RelativePath=".\FareTableSync.h">
+			</File>
+			<File
+				RelativePath=".\HandicappedComplianceTableSync.h">
+			</File>
+			<File
+				RelativePath=".\LineStopTableSync.h">
+			</File>
+			<File
+				RelativePath=".\LineTableSync.h">
+			</File>
+			<File
+				RelativePath=".\module.h">
+			</File>
+			<File
+				RelativePath=".\PedestrianComplianceTableSync.h">
+			</File>
+			<File
+				RelativePath=".\PhysicalStopTableSync.h">
+			</File>
+			<File
+				RelativePath=".\PlaceAliasTableSync.h">
+			</File>
+			<File
+				RelativePath=".\PublicPlaceTableSync.h">
+			</File>
+			<File
+				RelativePath=".\ReservationRuleTableSync.h">
+			</File>
+			<File
+				RelativePath=".\RoadChunkTableSync.h">
+			</File>
+			<File
+				RelativePath=".\RoadTableSync.h">
+			</File>
+			<File
+				RelativePath=".\ScheduledServiceTableSync.h">
+			</File>
+			<File
+				RelativePath=".\ServiceDateTableSync.h">
+			</File>
+			<File
+				RelativePath=".\TransportNetworkTableSync.h">
 			</File>
 		</Filter>
 		<File
