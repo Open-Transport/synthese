@@ -2,6 +2,7 @@
 
 #include "01_util/UId.h"
 
+#include <iostream>
 
 
 namespace synthese

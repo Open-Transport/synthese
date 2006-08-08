@@ -17,7 +17,7 @@ uid
 encodeUId (int tableId, int gridId, int gridNodeId, long objectId)
 {
     uid id (objectId);
-    long long int tmp = gridNodeId;
+    uid tmp = gridNodeId;
     id |= (tmp << 32);
     tmp = gridId;
     id |= (tmp << 44);

@@ -1,7 +1,7 @@
 #ifndef SYNTHESE_UTIL_UID_H
 #define SYNTHESE_UTIL_UID_H
 
-typedef long long int uid;
+typedef unsigned long long int uid;
 
 namespace synthese
 {
