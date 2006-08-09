@@ -20,6 +20,7 @@ namespace env
 {
 
     class ConnectionPlace;
+    class PlaceAlias;
     class PublicPlace;
     class Road;
 
@@ -39,6 +40,7 @@ class City : public synthese::util::Registrable<uid, City>,
     synthese::lexmatcher::LexicalMatcher<const ConnectionPlace*> _connectionPlacesMatcher;
     synthese::lexmatcher::LexicalMatcher<const PublicPlace*> _publicPlacesMatcher;
     synthese::lexmatcher::LexicalMatcher<const Road*> _roadsMatcher;
+    synthese::lexmatcher::LexicalMatcher<const PlaceAlias*> _placeAliasesMatcher;
 
  public:
 
@@ -59,6 +61,8 @@ class City : public synthese::util::Registrable<uid, City>,
     synthese::lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher ();
     const synthese::lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher () const;
 
+    synthese::lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher ();
+    const synthese::lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher () const;
 
     //@}
 
@@ -69,8 +73,20 @@ class City : public synthese::util::Registrable<uid, City>,
 
     //! @name Query methods
     //@{
-    std::vector<const ConnectionPlace*> getMainConnectionPlaces () const;
 
+    /** Specializes parent method fo handling the case when no main connection
+     *  place was defined.
+     *
+     * @param accessDirection Is this place an origin or a destination.
+     * @param result The shortest accesses to included places physical stops, or 
+     *               one physical stop accesses of an arbitrarily chosen 
+     *		     connection place of this city.
+     */
+    void reachPhysicalStopAccesses (const AccessDirection& accessDirection,
+				    const AccessParameters& accessParameters,
+				    PhysicalStopAccessMap& result) const;
+
+    
     std::vector<const Road*> searchRoad (const std::string& fuzzyName, int nbMatches = 10) const;
 
     //@}

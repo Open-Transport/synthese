@@ -13,7 +13,7 @@ PublicPlace::PublicPlace (const uid& id,
 			  const City* city)
 
     : synthese::util::Registrable<uid,PublicPlace> (id)
-    , Place (name, city)
+    , AddressablePlace (name, city)
 {
 
 }

@@ -2,6 +2,7 @@
 #define SYNTHESE_ENV_PLACE_H
 
 
+#include <map>
 #include <string>
 
 
@@ -11,7 +12,8 @@ namespace env
 {
 
 
-class City;
+ class City;
+ class PhysicalStop;
 
 
 /** Place base class.
@@ -38,6 +40,20 @@ protected:
 
 public:
 
+    typedef struct {
+	double approachTime;
+    } PhysicalStopAccess;
+
+
+    typedef struct {
+	double maxDistance;
+    } AccessParameters;
+
+
+    typedef std::map<const PhysicalStop*, PhysicalStopAccess> PhysicalStopAccessMap;
+
+    typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
+
     virtual ~Place ();
 
 
@@ -55,6 +71,13 @@ public:
      */
     virtual const std::string& getOfficialName () const;
 
+
+    /** Collects all physical stop accesses according to the place
+     * type and the access direction.
+     */
+    virtual void reachPhysicalStopAccesses (const AccessDirection& accessDirection,
+					    const AccessParameters& accessParameters,
+					    PhysicalStopAccessMap& result) const = 0;
 
     /** Gets city where this place is located.
      */

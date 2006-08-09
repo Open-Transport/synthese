@@ -50,6 +50,26 @@ public:
     //@}
 
 
+    //! @name Query methods
+    //@{
+
+    /** Launches a full navigation of the road network from the 
+     *  set of associated addresses, 
+     *
+     * @param accessDirection Is this place an origin or a destination.
+     * @param result The shortest accesses to included places physical stops, or 
+     *               one physical stop accesses of an arbitrarily chosen 
+     *		     connection place of this city.
+     */
+    void reachPhysicalStopAccesses (const AccessDirection& accessDirection,
+				    const AccessParameters& accessParameters,
+				    PhysicalStopAccessMap& result) const;
+
+    //@}
+
+
+
+
     //! @name Update methods.
     //@{
 

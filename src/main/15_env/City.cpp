@@ -2,6 +2,12 @@
 
 #include <assert.h>
 
+#include "ConnectionPlace.h"
+#include "PlaceAlias.h"
+#include "PublicPlace.h"
+#include "Road.h"
+
+
 
 using synthese::lexmatcher::LexicalMatcher;
 
@@ -84,6 +90,22 @@ City::getRoadsMatcher () const
 
 
 
+synthese::lexmatcher::LexicalMatcher<const PlaceAlias*>& 
+City::getPlaceAliasesMatcher ()
+{
+    return _placeAliasesMatcher;
+}
+
+
+
+
+const synthese::lexmatcher::LexicalMatcher<const PlaceAlias*>& 
+City::getPlaceAliasesMatcher () const
+{
+    return _placeAliasesMatcher;
+}
+
+
 
 
 
@@ -105,31 +127,47 @@ City::searchRoad (const std::string& fuzzyName, int nbMatches) const
 
 
 
-std::vector<const ConnectionPlace*> 
-City::getMainConnectionPlaces () const
+
+void 
+City::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
+				 const AccessParameters& accessParameters,
+				 PhysicalStopAccessMap& result) const
 {
-    std::vector<const ConnectionPlace*> result;
-    const std::vector<const Place*>& includedPlaces = getIncludedPlaces ();
-    if (includedPlaces.empty ())
+    if (_includedPlaces.empty ())
     {
 	if (_connectionPlacesMatcher.size () > 0)
 	{
-	    // Return the first connection place arbitrarily
-	    result.push_back (_connectionPlacesMatcher.entries ().begin ()->second);
+	    _connectionPlacesMatcher.entries ().begin ()->second->
+		reachPhysicalStopAccesses (accessDirection, accessParameters, 
+					   result);
+	}
+	else if (_placeAliasesMatcher.size () > 0)
+	{
+	    _placeAliasesMatcher.entries ().begin ()->second->
+		reachPhysicalStopAccesses (accessDirection, accessParameters, 
+					   result);
+	}
+	else if (_publicPlacesMatcher.size () > 0)
+	{
+	    _publicPlacesMatcher.entries ().begin ()->second->
+		reachPhysicalStopAccesses (accessDirection, accessParameters, 
+					   result);
+	}
+	else if (_roadsMatcher.size () > 0)
+	{
+	    _roadsMatcher.entries ().begin ()->second->
+		reachPhysicalStopAccesses (accessDirection, accessParameters, 
+					   result);
 	}
     }
     else
     {
-	for (std::vector<const Place*>::const_iterator it = includedPlaces.begin ();
-	     it != includedPlaces.end (); ++it)
-	{
-	    result.push_back ((const ConnectionPlace*) *it);
-	}
+	IncludingPlace::reachPhysicalStopAccesses (accessDirection, accessParameters, result);
     }
-    assert (result.size () > 0);
-    return result;
-    
+
 }
+
+
 
 
 

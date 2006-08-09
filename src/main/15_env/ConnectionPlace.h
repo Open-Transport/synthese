@@ -98,6 +98,16 @@ public:
     bool isConnectionAuthorized () const;
     int getTransferDelay (int departureRank, int arrivalRank) const;
     
+    /** 
+     * 
+     * @param accessDirection Is this place an origin or a destination.
+     * @param result The shortest accesses to included places physical stops, ...
+     */
+    void reachPhysicalStopAccesses (const AccessDirection& accessDirection,
+				    const AccessParameters& accessParameters,
+				    PhysicalStopAccessMap& result) const;
+    
+
     //@}
 
 

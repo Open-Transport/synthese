@@ -1,6 +1,6 @@
 #include "AddressablePlace.h"
 
-
+#include <assert.h>
 
 namespace synthese
 {
@@ -38,6 +38,13 @@ AddressablePlace::addAddress (const Address* address)
 
 
 
+void 
+AddressablePlace::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
+					     const AccessParameters& accessParameters,
+					     PhysicalStopAccessMap& result) const
+{
+    assert (false); // TODO
+}
 
 
 

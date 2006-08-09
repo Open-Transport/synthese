@@ -32,7 +32,8 @@ public:
 
     PlaceAlias (const uid& id,
 		const std::string& name,
-		const Place* aliasedPlace);
+		const Place* aliasedPlace,
+		const City* city);
 
     virtual ~PlaceAlias ();
 

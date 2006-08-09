@@ -254,7 +254,7 @@ namespace synthese
 	    static const std::string CONNECTIONPLACES_TABLE_COL_ISCITYMAINCONNECTION ("is_city_main_connection");
 	    static const std::string CONNECTIONPLACES_TABLE_COL_DEFAULTTRANSFERDELAY ("default_transfer_delay");
 	    static const std::string CONNECTIONPLACES_TABLE_COL_TRANSFERDELAYS ("transfer_delays");
-
+	    static const std::string CONNECTIONPLACES_TABLE_COL_ALARMID ("alarm_id");
 	    
 	    static const std::string FARES_TABLE_NAME ("t008_fares");
 	    static const std::string FARES_TABLE_COL_NAME ("name");
@@ -328,6 +328,8 @@ namespace synthese
 	    static const std::string PLACEALIASES_TABLE_NAME ("t011_place_aliases");
 	    static const std::string PLACEALIASES_TABLE_COL_NAME ("name");
 	    static const std::string PLACEALIASES_TABLE_COL_ALIASEDPLACEID ("aliased_place_id");
+	    static const std::string PLACEALIASES_TABLE_COL_CITYID ("city_id");
+	    static const std::string PLACEALIASES_TABLE_COL_ISCITYMAINCONNECTION ("is_city_main_connection");
 
 	    static const std::string PUBLICPLACES_TABLE_NAME ("t013_public_places");
 	    static const std::string PUBLICPLACES_TABLE_COL_NAME ("name");

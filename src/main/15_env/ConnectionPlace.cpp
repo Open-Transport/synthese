@@ -5,6 +5,7 @@
 
 
 #include <limits>
+#include <assert.h>
 
 namespace synthese
 {
@@ -148,6 +149,16 @@ ConnectionPlace::setAlarm (const Alarm* alarm)
     _alarm = alarm;
 }
 
+
+
+void 
+ConnectionPlace::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
+					    const AccessParameters& accessParameters,
+					    PhysicalStopAccessMap& result) const
+{
+    assert (false); // TODO
+}
+    
 
 
 

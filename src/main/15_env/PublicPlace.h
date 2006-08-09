@@ -4,7 +4,7 @@
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
-#include "Place.h"
+#include "AddressablePlace.h"
 #include <string>
 
 
@@ -21,7 +21,7 @@ class City;
 
  @ingroup m15
 */
-class PublicPlace : public synthese::util::Registrable<uid, PublicPlace>, public Place
+class PublicPlace : public synthese::util::Registrable<uid, PublicPlace>, public AddressablePlace
 {
 
 private:

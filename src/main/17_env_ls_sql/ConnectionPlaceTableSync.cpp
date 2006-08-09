@@ -33,7 +33,7 @@ ConnectionPlaceTableSync::ConnectionPlaceTableSync (Environment::Registry& envir
     addTableColumn (CONNECTIONPLACES_TABLE_COL_NAME, "TEXT", true);
     addTableColumn (CONNECTIONPLACES_TABLE_COL_CITYID, "INTEGER", false);
     addTableColumn (CONNECTIONPLACES_TABLE_COL_CONNECTIONTYPE, "INTEGER", true);
-    addTableColumn (CONNECTIONPLACES_TABLE_COL_ISCITYMAINCONNECTION, "BOOLEAN", true);
+    addTableColumn (CONNECTIONPLACES_TABLE_COL_ISCITYMAINCONNECTION, "BOOLEAN", false);
     addTableColumn (CONNECTIONPLACES_TABLE_COL_DEFAULTTRANSFERDELAY, "INTEGER", true);
     addTableColumn (CONNECTIONPLACES_TABLE_COL_TRANSFERDELAYS, "TEXT", true);
     addTableColumn (CONNECTIONPLACES_TABLE_COL_ALARMID, "INTEGER", true);
@@ -98,7 +98,7 @@ ConnectionPlaceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int row
 
     if (isCityMainConnection)
     {
-	environment.getCities ().get (cityId)->addIncludedPlace (cp);
+	city->addIncludedPlace (cp);
     }
 
     cp->setAlarm (environment.getAlarms ().get (alarmId));
@@ -123,8 +123,7 @@ ConnectionPlaceTableSync::doReplace (const synthese::db::SQLiteResult& rows, int
 	Conversion::ToLongLong (rows.getColumn (rowIndex, CONNECTIONPLACES_TABLE_COL_CITYID)));
     ConnectionPlace::ConnectionType connectionType = (ConnectionPlace::ConnectionType)
 	Conversion::ToInt (rows.getColumn (rowIndex, CONNECTIONPLACES_TABLE_COL_CONNECTIONTYPE));
-    bool isCityMainConnection (
-	Conversion::ToBool (rows.getColumn (rowIndex, CONNECTIONPLACES_TABLE_COL_ISCITYMAINCONNECTION)));
+
     int defaultTransferDelay (
 	Conversion::ToInt (rows.getColumn (rowIndex, CONNECTIONPLACES_TABLE_COL_DEFAULTTRANSFERDELAY)));
 
@@ -143,7 +142,9 @@ ConnectionPlaceTableSync::doReplace (const synthese::db::SQLiteResult& rows, int
     
     cp->setName (name);
     cp->setConnectionType (connectionType);
-    
+
+    cp->clearTransferDelays ();    
+
     boost::char_separator<char> sep1 (",");
     boost::char_separator<char> sep2 (":");
     tokenizer tripletTokens (transferDelaysStr, sep1);
@@ -157,11 +158,6 @@ ConnectionPlaceTableSync::doReplace (const synthese::db::SQLiteResult& rows, int
 	cp->addTransferDelay (Conversion::ToInt (*valueIter), 
 			      Conversion::ToInt (*(++valueIter)),
 			      Conversion::ToInt (*(++valueIter)));
-    }
-
-    if (isCityMainConnection)
-    {
-	environment.getCities ().get (cityId)->addIncludedPlace (cp);
     }
 
     cp->setAlarm (environment.getAlarms ().get (alarmId));
@@ -178,6 +174,7 @@ void
 ConnectionPlaceTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
+    // TODO not finished...
     uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 
     ConnectionPlace* cp = environment.getConnectionPlaces ().get (id);
