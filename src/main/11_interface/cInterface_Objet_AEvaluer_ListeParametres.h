@@ -3,6 +3,11 @@
 #define SYNTHESE_CINTERFACEOBJETAEVALUERLISTEPARAMETRES_H
 
 
+#include "cInterface_Objet_AEvaluer.h"
+
+class cInterface_Objet_AEvaluer_ListeParametres;
+
+
 /*! \brief Objets d'interface contenant une liste d'éléments destinés à être fournis en paramètres, mais dont les éléments ne sont pas nécessairement connus
  \author Hugues Romain
  \date 2005

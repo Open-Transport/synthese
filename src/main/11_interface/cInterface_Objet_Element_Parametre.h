@@ -1,3 +1,7 @@
+#ifndef SYNTHESE_cInterface_Objet_Element_Parametre_H
+#define SYNTHESE_cInterface_Objet_Element_Parametre_H
+
+#include "cInterface_Objet_Element.h"
 
 
 
@@ -37,3 +41,4 @@ class cInterface_Objet_Element_Parametre : public cInterface_Objet_Element
 
 };
 
+#endif

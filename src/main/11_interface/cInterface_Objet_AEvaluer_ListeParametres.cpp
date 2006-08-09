@@ -1,6 +1,10 @@
 #include "cInterface_Objet_AEvaluer_ListeParametres.h"
+#include "cInterface_Objet_Element_Parametre_TexteAEvaluer.h"
+#include "cInterface_Objet_Element_Parametre_TexteConnu.h"
+#include "cInterface_Objet_Element_Parametre_DonneeEnvironnement.h"
 
 
+#include "01_util/Conversion.h"
 
 
 /*! \brief Constitution des éléments en fonction d'une ligne de commande à interpréter

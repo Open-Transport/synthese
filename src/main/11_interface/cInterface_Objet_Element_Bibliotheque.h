@@ -3,7 +3,9 @@
 #define SYNTHESE_CINTERFACE_OBJET_ELEMENT_BIBLIOTHEQUE_H
 
 #include "70_server/Request.h"
-#include "cElementInterface.h"
+#include "cInterface_Objet_Element.h"
+#include "cInterface_Objet_AEvaluer_ListeParametres.h"
+
 
 /*! \addtogroup m11
  @{
@@ -668,6 +670,22 @@
 #define EI_BIBLIOTHEQUE_Tbdep_NumeroPanneau_Format     0 
 //@}
 
+
+
+#define TEMPS_MIN_CIRCULATIONS 'r'
+#define TEMPS_MAX_CIRCULATIONS 'R' 
+
+namespace synthese
+{
+
+namespace env
+{
+	class Environment;
+}
+
+}
+
+
 /*! \brief Element d'interface de type objet dynamique : contient un objet g�n�r� par calcul en fonction des donn�es
  \author Hugues Romain
  \date 2005
@@ -680,6 +698,10 @@ class cInterface_Objet_Element_Bibliotheque : public cInterface_Objet_Element
 {
         int _Index;  //!< Index de l'objet dynamique qui sera �valu� (Voir parametres.h)
         cInterface_Objet_AEvaluer_ListeParametres _Parametres; //!< Liste des param�tres de l'�l�ment d�finis par les fichiers de donn�es
+
+	synthese::time::Date dateInterpretee( const synthese::env::Environment* env, 
+					      const std::string& Texte ) const;
+
 
     public:
         //! \name Modificateurs

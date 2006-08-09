@@ -1,3 +1,18 @@
+#include "cInterface_Objet_Element_TestConditionnel.h"
+
+#include "cInterface_Objet_Element_Parametre.h"
+#include "cInterface_Objet_Element.h"
+#include "cInterface_Objet_AEvaluer_ListeParametres.h"
+#include "cInterface_Objet_Connu_ListeParametres.h"
+#include "cInterface_Objet_Element_Parametre_TexteAEvaluer.h"
+#include "cInterface_Objet_Element_Parametre_DonneeEnvironnement.h"
+#include "cInterface_Objet_Element_Goto.h"
+#include "cInterface_Objet_Element_Ligne.h"
+#include "cInterface_Objet_Element_Bibliotheque.h"
+#include "cInterface_Objet_Element_Parametre_TexteConnu.h"
+
+
+#include "01_util/Conversion.h"
 
 
 
@@ -13,7 +28,7 @@
 Lance l'évaluation de l'élément "si vide" si l'objet à tester évalué retourne un texte vide ou bien le texte "0", l'autre élément sinon
  
 */
-inline int cInterface_Objet_Element_TestConditionnel::Evalue( std::ostream& __Flux, const cInterface_Objet_Connu_ListeParametres& __Parametres, const void* __Objet, const cSite* __Site ) const
+ int cInterface_Objet_Element_TestConditionnel::Evalue( std::ostream& __Flux, const cInterface_Objet_Connu_ListeParametres& __Parametres, const void* __Objet, const cSite* __Site ) const
 {
     const std::string & __Texte = _ObjetATester->Texte( __Parametres, __Objet );
     if ( __Texte.size () && __Texte != ( "0" ) )
@@ -30,7 +45,7 @@ inline int cInterface_Objet_Element_TestConditionnel::Evalue( std::ostream& __Fl
  \author Hugues Romain
  \date 2005
 */
-inline cInterface_Objet_Element* cInterface_Objet_Element_TestConditionnel::Copie( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres ) const
+ cInterface_Objet_Element* cInterface_Objet_Element_TestConditionnel::Copie( const cInterface_Objet_AEvaluer_ListeParametres& __Parametres ) const
 {
     cInterface_Objet_Element_TestConditionnel * __EI = new cInterface_Objet_Element_TestConditionnel();
     __EI->_ObjetATester = ( cInterface_Objet_Element_Parametre* ) _ObjetATester->Copie( __Parametres );

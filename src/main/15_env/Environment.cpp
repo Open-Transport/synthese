@@ -1,6 +1,9 @@
 #include "Environment.h"
 
 
+using synthese::lexmatcher::LexicalMatcher;
+
+
 namespace synthese
 {
 namespace env
@@ -9,6 +12,7 @@ namespace env
 
 Environment::Environment (const uid& id)
     : synthese::util::Registrable<uid,Environment> (id)
+    , _citiesMatcher ()
 {
 }
 
@@ -370,6 +374,84 @@ const ReservationRule::Registry&
 Environment::getReservationRules () const
 {
     return _reservationRules;
+}
+
+
+
+
+synthese::lexmatcher::LexicalMatcher<uid>& 
+Environment::getCitiesMatcher ()
+{
+    return _citiesMatcher;
+}
+
+
+
+const synthese::lexmatcher::LexicalMatcher<uid>& 
+Environment::getCitiesMatcher () const
+{
+    return _citiesMatcher;
+}
+
+
+
+
+
+std::vector<const City*> 
+Environment::searchCity (const std::string& fuzzyName, int nbMatches) const
+{
+    std::vector<const City*> result;
+    LexicalMatcher<uid>::MatchResult matches =  _citiesMatcher.bestMatches (fuzzyName, nbMatches);
+    for (LexicalMatcher<uid>::MatchResult::iterator it = matches.begin ();
+	 it != matches.end (); ++it)
+    {
+	uid id = it->value;
+	result.push_back (getCities ().get (id));
+    }
+    return result;
+}
+
+
+
+
+const synthese::time::Date& 
+Environment::getMinDateInUse () const
+{
+    return _minDateInUse;
+}
+
+
+const synthese::time::Date& 
+Environment::getMaxDateInUse () const
+{
+    return _maxDateInUse;
+}
+
+
+
+
+void 
+Environment::updateMinMaxDatesInUse (synthese::time::Date newDate, bool marked)
+{
+    if (marked)
+    {
+	if ( (_minDateInUse == synthese::time::Date::UNKNOWN_DATE) ||
+	     (newDate < _minDateInUse) ) 
+	{
+	    _minDateInUse = newDate;
+	}
+
+	if ( (_maxDateInUse == synthese::time::Date::UNKNOWN_DATE) ||
+	     (newDate > _maxDateInUse) ) 
+	{
+	    _maxDateInUse = newDate;
+	}
+    }
+    else
+    {
+	// TODO not written yet...
+    }
+    
 }
 
 

@@ -62,7 +62,7 @@ protected:
     std::vector<Service*> _services;
 
     Fare* _fare;
-    Alarm* _alarm;
+    const Alarm* _alarm;
 
     // TODO remonter egalement les chaninages    
 
@@ -86,8 +86,10 @@ public:
     const Fare* getFare () const;
     void setFare (Fare* fare);
 
-    const Alarm* getAlarm() const;
-    void setAlarm(Alarm* alarm);
+    bool hasApplicableAlarm (const synthese::time::DateTime& start, 
+			     const synthese::time::DateTime& end) const;
+    const Alarm* getAlarm () const;
+    void setAlarm (Alarm* alarm);
 
     const std::vector<Edge*>& getEdges () const;
 

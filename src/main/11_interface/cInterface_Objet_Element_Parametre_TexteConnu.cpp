@@ -1,24 +1,28 @@
 
+#include "cInterface_Objet_Element_Parametre_TexteConnu.h"
+#include "01_util/Conversion.h"
 
 
 
 
-        inline int cInterface_Objet_Element_Parametre_TexteConnu::Nombre( const cInterface_Objet_Connu_ListeParametres&, const void* ) const
-        {
-            return synthese::util::Conversion::ToInt (_Texte);
-        }
+int cInterface_Objet_Element_Parametre_TexteConnu::Nombre( const cInterface_Objet_Connu_ListeParametres&, const void* ) const
+{
+    return synthese::util::Conversion::ToInt (_Texte);
+}
 
-        inline const std::string& cInterface_Objet_Element_Parametre_TexteConnu::Texte( const cInterface_Objet_Connu_ListeParametres&, const void* ) const
-        {
-            return _Texte;
-        }
+
+
+const std::string& cInterface_Objet_Element_Parametre_TexteConnu::Texte( const cInterface_Objet_Connu_ListeParametres&, const void* ) const
+{
+    return _Texte;
+}
 
 
 
 /*! \brief Constructeur d'apr�s un texte
- \param Valeur Texte contenu dans l'�l�ment
- \author Hugues Romain
- \date 2000-2005
+  \param Valeur Texte contenu dans l'�l�ment
+  \author Hugues Romain
+  \date 2000-2005
 */
 cInterface_Objet_Element_Parametre_TexteConnu::cInterface_Objet_Element_Parametre_TexteConnu( const std::string& Valeur ) 
     : cInterface_Objet_Element_Parametre()
@@ -31,9 +35,9 @@ cInterface_Objet_Element_Parametre_TexteConnu::cInterface_Objet_Element_Parametr
 
 
 /*! \brief Constructeur d'apr�s un entier
- \param Valeur Nombre contenu dans l'�l�ment
- \author Hugues Romain
- \date 2005
+  \param Valeur Nombre contenu dans l'�l�ment
+  \author Hugues Romain
+  \date 2005
 */
 cInterface_Objet_Element_Parametre_TexteConnu::cInterface_Objet_Element_Parametre_TexteConnu( const int Valeur ) 
     : cInterface_Objet_Element_Parametre()
@@ -45,11 +49,11 @@ cInterface_Objet_Element_Parametre_TexteConnu::cInterface_Objet_Element_Parametr
 
 
 /*! \brief Copie d'un �l�ment statique
- \return la copie de l'objet
- \author Hugues Romain
- \date 2000-2005
+  \return la copie de l'objet
+  \author Hugues Romain
+  \date 2000-2005
  
-La copie d'un �l�ment statique consiste � cr�er un �l�ment statique contenant le m�me texte. Les param�tres sont ignor�s.
+  La copie d'un �l�ment statique consiste � cr�er un �l�ment statique contenant le m�me texte. Les param�tres sont ignor�s.
 */
 cInterface_Objet_Element* cInterface_Objet_Element_Parametre_TexteConnu::Copie( const cInterface_Objet_AEvaluer_ListeParametres& ) const
 {
@@ -59,11 +63,11 @@ cInterface_Objet_Element* cInterface_Objet_Element_Parametre_TexteConnu::Copie( 
 
 
 /*! \brief Copie d'un �l�ment statique
- \return la copie de l'objet
- \author Hugues Romain
- \date 2000-2005
+  \return la copie de l'objet
+  \author Hugues Romain
+  \date 2000-2005
  
-La copie d'un �l�ment statique consiste � cr�er un �l�ment statique contenant le m�me texte.
+  La copie d'un �l�ment statique consiste � cr�er un �l�ment statique contenant le m�me texte.
 */
 cInterface_Objet_Element* cInterface_Objet_Element_Parametre_TexteConnu::Copie() const
 {

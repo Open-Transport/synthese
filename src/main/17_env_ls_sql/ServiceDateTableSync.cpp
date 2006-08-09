@@ -94,8 +94,10 @@ ServiceDateTableSync::updateServiceCalendar (const synthese::db::SQLiteResult& r
     assert (service != 0);
 
     // Mark the date in service calendar
-    service->getCalendar ().mark (
-	Date::FromSQLDate (rows.getColumn (rowIndex, SERVICEDATES_TABLE_COL_DATE)), marked);
+    Date newDate = Date::FromSQLDate (rows.getColumn (rowIndex, SERVICEDATES_TABLE_COL_DATE));
+    service->getCalendar ().mark (newDate, marked);
+
+    environment.updateMinMaxDatesInUse (newDate, marked);
     
 }
     

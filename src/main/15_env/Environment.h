@@ -24,11 +24,15 @@
 #include "ReservationRule.h"
 #include "TransportNetwork.h"
 
+#include "07_lex_matcher/LexicalMatcher.h"
+
+#include "04_time/Date.h"
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
 
+#include <vector>
 #include <string>
 #include <iostream>
 
@@ -71,7 +75,10 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     ScheduledService::Registry _scheduledServices;
     TransportNetwork::Registry _transportNetworks;
     
-    
+    synthese::lexmatcher::LexicalMatcher<uid> _citiesMatcher;
+
+    synthese::time::Date _minDateInUse;
+    synthese::time::Date _maxDateInUse;
 
     // TODO : 
     // zone
@@ -148,12 +155,27 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     ReservationRule::Registry& getReservationRules ();
     const ReservationRule::Registry& getReservationRules () const;
 
+    synthese::lexmatcher::LexicalMatcher<uid>& getCitiesMatcher ();
+    const synthese::lexmatcher::LexicalMatcher<uid>& getCitiesMatcher () const;
+    
+    const synthese::time::Date& getMinDateInUse () const;
+    const synthese::time::Date& getMaxDateInUse () const;
 
     // ...
     //@}
 
 
+    //! @name Query methods
+    //@{
+    std::vector<const City*> searchCity (const std::string& fuzzyName, int nbMatches = 10) const;
+    //@}
 
+    //! @name Update methods
+    //@{
+    void updateMinMaxDatesInUse (synthese::time::Date newDate, bool marked);
+    //@}
+
+    
  private:
 
 

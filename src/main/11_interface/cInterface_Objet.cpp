@@ -1,4 +1,5 @@
 #include "cInterface_Objet.h"
+#include "cInterface_Objet_Element.h"
 
 #include "01_util/Conversion.h"
 

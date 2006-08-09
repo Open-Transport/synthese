@@ -11,11 +11,19 @@
 
 namespace synthese
 {
+
+namespace time
+{
+    class DateTime;
+}
+
+
 namespace env
 {
 
 
 class Address;
+class Alarm;
 class PhysicalStop;
 
 
@@ -52,6 +60,8 @@ private:
     std::map< std::pair<int, int>, int > _transferDelays; //!< Transfer delays between vertices
     int _defaultTransferDelay;
 
+    const Alarm* _alarm; //!< Current valid alarm
+
 protected:
 
 
@@ -76,6 +86,10 @@ public:
 
     const std::vector<const PhysicalStop*>& getPhysicalStops () const;
 
+    bool hasApplicableAlarm (const synthese::time::DateTime& start, 
+			     const synthese::time::DateTime& end) const;
+    const Alarm* getAlarm () const;
+    void setAlarm (const Alarm* alarm);
     //@}
 
 

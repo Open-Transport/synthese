@@ -47,6 +47,7 @@ CityTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 	rows.getColumn (rowIndex, CITIES_TABLE_COL_NAME) );
     
     environment.getCities ().add (city, false);
+    environment.getCitiesMatcher ().add (city->getName (), city->getKey ());
 }
 
 
@@ -57,7 +58,12 @@ CityTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 {
     uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
     synthese::env::City* city = environment.getCities ().get (id);
+
+    environment.getCitiesMatcher ().remove (city->getName ());
+
     city->setName (rows.getColumn (rowIndex, CITIES_TABLE_COL_NAME));
+
+    environment.getCitiesMatcher ().add (city->getName (), city->getKey ());
 }
 
 
@@ -67,6 +73,9 @@ CityTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
     uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+
+    environment.getCitiesMatcher ().remove (environment.getCities ().get (id)->getName ());
+
     environment.getCities ().remove (id);
 }
 

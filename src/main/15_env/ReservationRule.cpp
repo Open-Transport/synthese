@@ -192,7 +192,7 @@ ReservationRule::isRunPossible ( const Service* service,
 				 const synthese::time::DateTime& departureTime ) const
 {
     return _type == RESERVATION_TYPE_IMPOSSIBLE
-	|| _type == RESERVATION_TYPE_OPTIONNAL
+	|| _type == RESERVATION_TYPE_OPTIONAL
 	|| isReservationPossible ( service, reservationTime, departureTime );
 
 }

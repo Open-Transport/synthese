@@ -1,5 +1,9 @@
 #include "JourneyLeg.h"
 
+#include "15_env/ContinuousService.h"
+
+
+using synthese::env::ContinuousService;
 
 
 namespace synthese
@@ -74,6 +78,18 @@ JourneyLeg::getDestination () const
     return _destination;
 }
     
+
+
+
+int 
+JourneyLeg::getContinuousServiceRange () const
+{
+    const ContinuousService* continuousService = dynamic_cast<const ContinuousService*> (_service);
+    if (continuousService == 0) return 0;
+    return continuousService->getRange ();
+}
+
+
 
 
 }

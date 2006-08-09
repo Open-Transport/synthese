@@ -1,12 +1,13 @@
-
-
 #ifndef SYNTHESE_CINTERFACE_OBJET_AEVALUER_PAGEECRAN_H
 #define SYNTHESE_CINTERFACE_OBJET_AEVALUER_PAGEECRAN_H
 
+
+#include "cInterface_Objet.h"
+#include "cInterface_Objet_AEvaluer.h"
+
+
 class cInterface_Objet_AEvaluer_PageEcran;
-
-
-#include "cObjetInterface.h"
+class cInterface_Objet_AEvaluer_ListeParametres;
 
 
 /*! \addtogroup m11

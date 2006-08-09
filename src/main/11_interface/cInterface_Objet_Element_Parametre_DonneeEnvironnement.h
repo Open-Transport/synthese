@@ -2,13 +2,14 @@
 #ifndef SYNTHESE_cInterface_Objet_Element_Parametre_DonneeEnvironnement_H
 #define SYNTHESE_cInterface_Objet_Element_Parametre_DonneeEnvironnement_H
 
+
+
+#include "cInterface_Objet_Element.h"
+#include "cInterface_Objet_Element_Parametre.h"
+
+
 class cInterface_Objet_Element_Parametre_DonneeEnvironnement;
 
-
-#include "cElementInterface.h"
-
-
-#define EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation  0
 
 
 /*! \addtogroup m11

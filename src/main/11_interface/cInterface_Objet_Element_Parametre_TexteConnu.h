@@ -1,4 +1,8 @@
+#ifndef SYNTHESE_CINTERFACE_OBJET_ELEMENT_PARAMETRE_TEXTE_CONNU_H
+#define SYNTHESE_CINTERFACE_OBJET_ELEMENT_PARAMETRE_TEXTE_CONNU_H
 
+
+#include "cInterface_Objet_Element_Parametre.h"
 
 
 
@@ -33,3 +37,4 @@ class cInterface_Objet_Element_Parametre_TexteConnu : public cInterface_Objet_El
 
 };
 
+#endif

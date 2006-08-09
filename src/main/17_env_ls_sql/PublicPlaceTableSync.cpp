@@ -5,6 +5,7 @@
 #include "02_db/SQLiteThreadExec.h"
 
 #include "15_env/PublicPlace.h"
+#include "15_env/City.h"
 
 #include <sqlite/sqlite3.h>
 #include <assert.h>
@@ -52,7 +53,10 @@ PublicPlaceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowInde
     uid cityId (
 	Conversion::ToLongLong (rows.getColumn (rowIndex, PUBLICPLACES_TABLE_COL_CITYID)));
 
-    PublicPlace* pp = new PublicPlace (id, name, environment.getCities ().get (cityId));
+    City* city = environment.getCities ().get (cityId);
+    PublicPlace* pp = new PublicPlace (id, name, city);
+    city->getPublicPlacesMatcher ().add (pp->getName (), pp);
+
     environment.getPublicPlaces ().add (pp, false);
 
 }
@@ -65,9 +69,14 @@ PublicPlaceTableSync::doReplace (const synthese::db::SQLiteResult& rows, int row
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
     PublicPlace* pp = environment.getPublicPlaces ().get (id);
+    City* city = environment.getCities ().get (pp->getCity ()->getKey ());
+    city->getPublicPlacesMatcher ().remove (pp->getName ());
+
     std::string name (
 	rows.getColumn (rowIndex, PUBLICPLACES_TABLE_COL_NAME));
     pp->setName (name);
+
+    city->getPublicPlacesMatcher ().add (pp->getName (), pp);
 
 }
 
@@ -78,6 +87,11 @@ PublicPlaceTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowI
 			 synthese::env::Environment& environment)
 {
     uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+
+    PublicPlace* pp = environment.getPublicPlaces ().get (id);
+    City* city = environment.getCities ().get (pp->getCity ()->getKey ());
+    city->getPublicPlacesMatcher ().remove (pp->getName ());
+
     environment.getPublicPlaces ().remove (id);
 }
 

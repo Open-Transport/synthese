@@ -1,5 +1,6 @@
 #include "Path.h"
 
+#include "Alarm.h"
 #include "ConnectionPlace.h"
 #include "Edge.h"
 #include "Vertex.h"
@@ -33,6 +34,14 @@ Path::~Path ()
 }
 
 
+
+bool 
+Path::hasApplicableAlarm (const synthese::time::DateTime& start, 
+			  const synthese::time::DateTime& end) const
+{
+    if (_alarm == 0) return false;
+    return _alarm->isApplicable (start, end);
+}
 
 
 

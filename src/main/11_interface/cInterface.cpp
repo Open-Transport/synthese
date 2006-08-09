@@ -1,11 +1,5 @@
-/*! \file cInterface.cpp
-\brief Impl�mentation classe interface
-*/
-
-
-
 #include "cInterface.h"
-
+#include "cInterface_Objet_AEvaluer_PageEcran.h"
 
 const size_t cInterface::ALL_DAY_PERIOD = 0;
 

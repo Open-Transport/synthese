@@ -1,4 +1,6 @@
 
+#include "cInterface_Objet_AEvaluer.h"
+
 
 
 /*! \brief Ajout d'un élément en fin de chaîne

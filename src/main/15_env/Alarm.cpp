@@ -72,8 +72,8 @@ Alarm::setPeriodEnd ( const synthese::time::DateTime& periodEnd)
 
 
 bool 
-Alarm::isMessageShowable ( const synthese::time::DateTime& start, 
-			   const synthese::time::DateTime& end ) const
+Alarm::isApplicable ( const synthese::time::DateTime& start, 
+		      const synthese::time::DateTime& end ) const
 {
     if ( _message.empty () )
         return false;

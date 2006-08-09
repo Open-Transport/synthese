@@ -1,6 +1,6 @@
 
 #include "cInterface_Objet_AEvaluer_PageEcran.h"
-#include "cElementInterface.h"
+#include "cInterface_Objet_Element.h"
 
 
 /*! \brief Constitution d'un objet d'interface définissant tout ou partie d'une page d'écran, par inclusion d'une copie des éléments d'un autre objet de même type

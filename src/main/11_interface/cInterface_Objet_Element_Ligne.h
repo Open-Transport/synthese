@@ -2,7 +2,7 @@
 #ifndef SYNTHESE_CINTERFACE_OBJET_ELEMENT_LIGNE_H
 #define SYNTHESE_CINTERFACE_OBJET_ELEMENT_LIGNE_H
 
-#include "cElementInterface.h"
+#include "cInterface_Objet_Element.h"
 
 
 /*! \brief Objet d'interface contenant l'ordre d'avancer à la ligne portant le numéro enregistré

@@ -31,7 +31,7 @@ public:
     typedef enum
     {
 	RESERVATION_TYPE_IMPOSSIBLE = 0, //!< Reservation is not possible, services should be taken without any announcement
-        RESERVATION_TYPE_OPTIONNAL = 1,     //!< Reservation is possible but not compulsory, services should be taken with announcement for much security
+        RESERVATION_TYPE_OPTIONAL = 1,     //!< Reservation is possible but not compulsory, services should be taken with announcement for much security
 	RESERVATION_TYPE_COMPULSORY = 2,     //!< Reservation is compulsory, passengers without reservation are not accepted
 	RESERVATION_TYPE_AT_LEAST_ONE_REQUIRED = 3 //!< At least on reservation is compulsory, the service do not go if no reservations are done, but will go if at least one is done, and will bi opened for passengers without reservation
     } ReservationType;

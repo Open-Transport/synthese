@@ -1,4 +1,8 @@
 
+#include "cInterface_Objet_Element_Parametre_TexteAEvaluer.h"
+#include "cInterface_Objet_Connu_ListeParametres.h"
+#include "cInterface_Objet_AEvaluer_ListeParametres.h"
+#include "cInterface_Objet_Element_Parametre_TexteConnu.h"
 
 
 

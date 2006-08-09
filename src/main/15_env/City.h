@@ -4,6 +4,9 @@
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
+
+#include "07_lex_matcher/LexicalMatcher.h"
+
 #include "IncludingPlace.h"
 
 #include <string>
@@ -16,6 +19,9 @@ namespace synthese
 namespace env
 {
 
+    class ConnectionPlace;
+    class PublicPlace;
+    class Road;
 
 
 /** City class.
@@ -26,11 +32,13 @@ A city holds in its included places the main connection places
 @ingroup m15
 */
 class City : public synthese::util::Registrable<uid, City>, 
-	         public IncludingPlace
+    public IncludingPlace
 {
  private:
 
-    // TODO add interpretor
+    synthese::lexmatcher::LexicalMatcher<const ConnectionPlace*> _connectionPlacesMatcher;
+    synthese::lexmatcher::LexicalMatcher<const PublicPlace*> _publicPlacesMatcher;
+    synthese::lexmatcher::LexicalMatcher<const Road*> _roadsMatcher;
 
  public:
 
@@ -42,11 +50,28 @@ class City : public synthese::util::Registrable<uid, City>,
 
     //! @name Getters/Setters
     //@{
+    synthese::lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher ();
+    const synthese::lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher () const;
+
+    synthese::lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher ();
+    const synthese::lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher () const;
     
+    synthese::lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher ();
+    const synthese::lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher () const;
+
+
     //@}
 
     //! @name Update methods
     //@{
+
+    //@}
+
+    //! @name Query methods
+    //@{
+    std::vector<const ConnectionPlace*> getMainConnectionPlaces () const;
+
+    std::vector<const Road*> searchRoad (const std::string& fuzzyName, int nbMatches = 10) const;
 
     //@}
 

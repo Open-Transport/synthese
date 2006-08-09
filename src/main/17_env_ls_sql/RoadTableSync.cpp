@@ -5,6 +5,7 @@
 #include "02_db/SQLiteThreadExec.h"
 
 #include "15_env/Road.h"
+#include "15_env/City.h"
 #include "15_env/Point.h"
 
 #include <boost/tokenizer.hpp>
@@ -17,6 +18,8 @@ using synthese::db::SQLiteResult;
 using synthese::env::Environment;
 using synthese::env::Point;
 using synthese::env::Road;
+using synthese::env::City;
+
 
 namespace synthese
 {
@@ -85,8 +88,9 @@ RoadTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     uid reservationRuleId (
 	Conversion::ToLongLong (rows.getColumn (rowIndex, ROADS_TABLE_COL_RESERVATIONRULEID)));
 
+    City* city = environment.getCities ().get (cityId);
     Road* road = new synthese::env::Road (id, name, 
-					  environment.getCities ().get (cityId), 
+					  city, 
 					  roadType);
     road->setFare (environment.getFares ().get (fareId));
     road->setAlarm (environment.getAlarms ().get (alarmId));
@@ -96,6 +100,8 @@ RoadTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     road->setReservationRule (environment.getReservationRules ().get (reservationRuleId)); 
     
     environment.getRoads ().add (road, false);
+    city->getRoadsMatcher ().add (road->getName (), road);
+
 }
 
 
@@ -134,6 +140,9 @@ RoadTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
     uid reservationRuleId (
 	Conversion::ToLongLong (rows.getColumn (rowIndex, ROADS_TABLE_COL_RESERVATIONRULEID)));
 
+    City* city = environment.getCities ().get (road->getCity ()->getKey ());
+    city->getRoadsMatcher ().remove (road->getName ());
+
     road->setName (name);
     road->setType (roadType);
 
@@ -144,8 +153,7 @@ RoadTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
     road->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
     road->setReservationRule (environment.getReservationRules ().get (reservationRuleId)); 
     
-    environment.getRoads ().add (road, false);
-
+    city->getRoadsMatcher ().add (road->getName (), road);
 
 }
 
@@ -158,6 +166,11 @@ RoadTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 			 synthese::env::Environment& environment)
 {
     uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+
+    Road* road = environment.getRoads ().get (id);
+    City* city = environment.getCities ().get (road->getCity ()->getKey ());
+    city->getRoadsMatcher ().remove (road->getName ());
+
     environment.getRoads ().remove (id);
 
 }

@@ -63,6 +63,11 @@ class JourneyLeg
     //@}
 
 
+    //! @name Query methods
+    //@{
+    int getContinuousServiceRange () const;
+    //@}
+
 
     //! @name Update methods
     //@{

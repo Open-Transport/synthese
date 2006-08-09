@@ -1,7 +1,10 @@
 #ifndef SYNTHESE_CINTERFACEOBJETCONNULISTEPARAMETRES_H
 #define SYNTHESE_CINTERFACEOBJETCONNULISTEPARAMETRES_H
 
-class cSite;
+#include "cInterface_Objet.h"
+
+
+class cInterface_Objet_Element_Parametre;
 
 #include <iostream>
 

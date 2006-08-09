@@ -1,10 +1,16 @@
 #ifndef SYNTHESE_CINTERFACEOBJETELEMENT_H
 #define SYNTHESE_CINTERFACEOBJETELEMENT_H
 
+#include <iostream>
+#include <string>
+#include "Parametres.h"
 
+
+class cInterface_Objet_Element;
+class cInterface_Objet_Connu_ListeParametres;
+class cInterface_Objet_AEvaluer_ListeParametres;
 class cSite;
 
-#include <iostream>
 
 
 /** @addtogroup m11

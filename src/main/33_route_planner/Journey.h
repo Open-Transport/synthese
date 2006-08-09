@@ -58,6 +58,25 @@ class Journey
     const synthese::time::DateTime& getDepartureTime () const;
     const synthese::time::DateTime& getArrivalTime () const;
 
+    int getDuration () const;
+
+    /** Detects max alarm level in journey.
+      
+        For each journey leg, 4 cases are possible :
+	- Alert on origin
+	- Service with reservation rule
+	- Service alert
+	- Alert on destination
+      
+	@return Maximum journey alert level.
+    */
+    int getMaxAlarmLevel () const;
+
+    /** Continuous service range of this journey.
+	@return Range duration in minutes, or 0 if unique service.
+    */
+    int getContinuousServiceRange () const;
+
     //@}
 
 

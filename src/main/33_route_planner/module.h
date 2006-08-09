@@ -14,7 +14,7 @@ namespace synthese
 	*/
 
 	/** 33_route_planner */
-	namespace route_planner
+	namespace routeplanner
 	{
 
 

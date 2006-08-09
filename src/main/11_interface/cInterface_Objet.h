@@ -3,6 +3,7 @@
 
 class cInterface_Objet;
 class cInterface_Objet_Element;
+class cInterface_Objet_Connu_ListeParametres;
 
 class cSite;
 

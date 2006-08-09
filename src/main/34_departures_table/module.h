@@ -14,7 +14,7 @@ namespace synthese
 	*/
 
 	/** 34_departures_table namespace */
-	namespace departures_table
+	namespace departurestable
 	{
 
 

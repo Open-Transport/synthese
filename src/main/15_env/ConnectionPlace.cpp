@@ -1,5 +1,9 @@
 #include "ConnectionPlace.h"
 
+#include "04_time/DateTime.h"
+#include "15_env/Alarm.h"
+
+
 #include <limits>
 
 namespace synthese
@@ -23,6 +27,7 @@ ConnectionPlace::ConnectionPlace (const uid& id,
     , AddressablePlace (name, city)
     , _connectionType (connectionType)
     , _defaultTransferDelay (defaultTransferDelay)
+    , _alarm (0)
 {
 }
 
@@ -114,6 +119,33 @@ void
 ConnectionPlace::addPhysicalStop (const PhysicalStop* physicalStop)
 {
     _physicalStops.push_back (physicalStop);
+}
+
+
+
+bool 
+ConnectionPlace::hasApplicableAlarm (const synthese::time::DateTime& start, 
+				     const synthese::time::DateTime& end) const
+{
+    if (_alarm == 0) return false;
+    return _alarm->isApplicable (start, end);
+}
+
+
+
+const Alarm* 
+ConnectionPlace::getAlarm () const
+{
+    return _alarm;
+}
+
+
+
+
+void 
+ConnectionPlace::setAlarm (const Alarm* alarm)
+{
+    _alarm = alarm;
 }
 
 

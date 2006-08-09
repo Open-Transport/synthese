@@ -5,7 +5,6 @@
 #ifndef SYNTHESE_CINTERFACE_H
 #define SYNTHESE_CINTERFACE_H
 
-#include "cInterface_Objet_AEvaluer_PageEcran.h"
 #include "cTableauDynamique.h"
 
 #include "04_time/HourPeriod.h"
@@ -24,6 +23,7 @@
 #include <iostream>
 
 class cInterface;
+class cInterface_Objet_AEvaluer_PageEcran;
 
 
 

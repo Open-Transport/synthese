@@ -1,3 +1,14 @@
+#ifndef SYNTHESE_CINTERFACEOBJETELEMENTTESTCONDITIONNEL_H
+#define SYNTHESE_CINTERFACEOBJETELEMENTTESTCONDITIONNEL_H
+
+
+#include "cInterface_Objet_Element.h"
+
+
+class cInterface_Objet_Element_Parametre;
+class cInterface_Objet_Element;
+class cInterface_Objet_AEvaluer_ListeParametres;
+class cInterface_Objet_Connu_ListeParametres;
 
 
 
@@ -31,5 +42,4 @@ class cInterface_Objet_Element_TestConditionnel : public cInterface_Objet_Elemen
 };
 
 
-
-
+#endif

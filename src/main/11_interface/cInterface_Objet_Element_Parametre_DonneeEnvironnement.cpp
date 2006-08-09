@@ -1,12 +1,19 @@
 
 #include "cInterface_Objet_Element_Parametre_DonneeEnvironnement.h"
-#include "LogicalPlace.h"
-#include "cCommune.h"
-#include "cLigne.h"
+
+#include "15_env/ConnectionPlace.h"
+
+#include "15_env/City.h"
+#include "15_env/Line.h"
+#include "15_env/Place.h"
+
 #include "cTrajets.h"
-#include "cMateriel.h"
 
 #include "01_util/Conversion.h"
+
+using synthese::env::ConnectionPlace;
+using synthese::env::Line;
+using synthese::env::Place;
 
 
 /*! \brief Constructeur
@@ -56,28 +63,30 @@ const std::string& cInterface_Objet_Element_Parametre_DonneeEnvironnement::Texte
     switch ( _NumeroObjet )
     {
         case EI_ATTRIBUT_ArretLogique_Nom:
-            return ( ( const LogicalPlace* ) __Objet ) ->getName(); // getNom(__Parametres[EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation]->Nombre(__Parametres));
+            return ( ( const Place* ) __Objet ) ->getName(); 
 
         case EI_ATTRIBUT_ArretLogique_NomCommune:
-            return ( ( const LogicalPlace* ) __Objet ) ->getTown() ->getName(); // getCommune(__Parametres[EI_ATTRIBUT_ArretLogique_Parametre_IndexDesignation]->Nombre(__Parametres))->GetNom();
+            return ( ( const Place* ) __Objet ) ->getCity()->getName(); 
 
         case EI_ATTRIBUT_Ligne_LibelleSimple:
-            return ( ( const cLigne* ) __Objet ) ->getLibelleSimple();
+            return ( ( const Line* ) __Objet ) ->getShortName ();
 
         case EI_ATTRIBUT_Ligne_Image:
-            return ( ( const cLigne* ) __Objet ) ->getImage();
+            return ( ( const Line* ) __Objet ) ->getImage();
 
         case EI_ATTRIBUT_Ligne_LibelleComplet:
-            return ( ( const cLigne* ) __Objet ) ->getLibelleComplet();
+            return ( ( const Line* ) __Objet ) ->getLongName ();
 
         case EI_ATTRIBUT_Ligne_Style:
-            return ( ( const cLigne* ) __Objet ) ->getStyle();
-
+            return ( ( const Line* ) __Objet ) ->getStyle();
+	    
         case EI_ATTRIBUT_Ligne_ArticleMateriel:
-            return ( ( const cLigne* ) __Objet ) ->Materiel() ->getArticle();
+            return ( ( const Line* ) __Objet ) ->getLongName ();
+            // MJ TODO return ( ( const Line* ) __Objet ) ->Materiel() ->getArticle();
 
         case EI_ATTRIBUT_Ligne_LibelleMateriel:
-            return ( ( const cLigne* ) __Objet ) ->Materiel() ->getLibelleSimple();
+            return ( ( const Line* ) __Objet ) ->getLongName ();
+            // MJ TODO return ( ( const Line* ) __Objet ) ->Materiel() ->getLibelleSimple();
 
         case EI_ATTRIBUT_TRAJETS_TAILLE:
             return ( ( const cTrajets* ) __Objet ) ->GetTailleTexte();

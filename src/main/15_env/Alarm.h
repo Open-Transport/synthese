@@ -73,8 +73,8 @@ public:
 	@return true if the message is not empty and 
 	is valid for the whole period given as argument.
     */
-    bool isMessageShowable ( const synthese::time::DateTime& start, 
-			     const synthese::time::DateTime& end ) const;
+    bool isApplicable ( const synthese::time::DateTime& start, 
+			const synthese::time::DateTime& end ) const;
     //@}
     
 };

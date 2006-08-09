@@ -71,7 +71,8 @@ class LexicalMatcher
 	} PreprocessedKey;
 
 
-    std::map<std::string, std::pair<PreprocessedKey, T> > _map;
+    std::map<std::string, T> _map;
+    std::map<std::string, PreprocessedKey > _ppKeys;
 
     bool _ignoreCase;
     bool _ignorePunctuation;
@@ -91,6 +92,7 @@ class LexicalMatcher
 
     //! @name Getters/Setters
     //@{
+    const std::map<std::string, T >& entries () const;
     //@}
 
 
@@ -113,6 +115,7 @@ class LexicalMatcher
 
     void add (const std::string& key, T value);
     void remove (const std::string& key);
+
     //@}
     
 
@@ -181,7 +184,7 @@ LexicalMatcher<T>::bestMatches (const std::string& fuzzyKey, int nbMatches) cons
     if (_map.empty ()) throw synthese::util::Exception ("No match possible (lexical matcher has no entry).");
     MatchResult result = match (fuzzyKey, 0.0);
     
-    if (result.size () > nbMatches)
+    if (((int) result.size ()) > nbMatches)
     {
 	// Truncate the result
 	MatchResult::iterator it = result.begin ();
@@ -201,15 +204,15 @@ LexicalMatcher<T>::match (const std::string& fuzzyKey, double minScore, int maxN
     MatchResult result;
     PreprocessedKey ppkey = preprocessKey (fuzzyKey);
     // Iterate over all candidates
-    for (std::map<std::string, std::pair<PreprocessedKey, T> >::const_iterator it = _map.begin ();
-	 it != _map.end (); ++it)
+    for (std::map<std::string, PreprocessedKey >::const_iterator it = _ppKeys.begin ();
+	 it != _ppKeys.end (); ++it)
     {
 	MatchHit hit;
-	hit.score = computeScore (ppkey, it->second.first);
+	hit.score = computeScore (ppkey, it->second);
 	if (hit.score >= minScore) 
 	{
 	    hit.key = it->first;
-	    hit.value = it->second.second;
+	    hit.value = _map.find (hit.key)->second;
 	    result.push_back (hit);
 	}
 
@@ -413,6 +416,7 @@ void
 LexicalMatcher<T>::clear ()
 {
     _map.clear ();
+    _ppKeys.clear ();
 }
 
 
@@ -423,7 +427,8 @@ template<class T>
 void 
 LexicalMatcher<T>::add (const std::string& key, T ptr)
 {
-    _map.insert (std::make_pair (key, std::make_pair (preprocessKey (key), ptr)));
+    _map.insert (std::make_pair (key, ptr));
+    _ppKeys.insert (std::make_pair (key, preprocessKey (key)));
 }
 
 
@@ -435,9 +440,17 @@ void
 LexicalMatcher<T>::remove (const std::string& key)
 {
     _map.erase (key);
+    _ppKeys.erase (key);
 }
 
 
+
+template<class T>
+const std::map<std::string, T>&
+LexicalMatcher<T>::entries () const
+{
+    return _map;
+}
 
 
 
