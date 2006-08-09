@@ -43,7 +43,6 @@ DIV.navtab {
 }
 TD.navtab {
        font-size: 70%;
-       display:none;
 }
 A.qindex {
        text-decoration: none;
@@ -429,3 +428,5 @@ DIV.groupHeader, h3 {
        font-weight: bold;
 	  font-size: 14pt;
 }
+
+div.navtab {        display:none; }

@@ -1,11 +1,15 @@
 /**
 @mainpage Documentation de SYNTHESE
 
-@section sommaire Sommaire
+<h2>Index</h2>
  - @subpage metier
  - @subpage admin
  - @subpage mod
  - @subpage annexes
+
+<h2>Quick links</h2>
+ - @ref m17 "Conceptual Data Model (CDM)
+
 
 @page metier Environnement métier et spécifications
  - @subpage lexique

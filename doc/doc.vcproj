@@ -51,7 +51,16 @@
 			RelativePath=".\Doxyfile.doxyfile">
 		</File>
 		<File
+			RelativePath=".\html\doxygen.css">
+		</File>
+		<File
+			RelativePath=".\html\en-tete.html">
+		</File>
+		<File
 			RelativePath=".\pages\erreurs.doxygen">
+		</File>
+		<File
+			RelativePath=".\html\footer.html">
 		</File>
 		<File
 			RelativePath=".\pages\historique.doxygen">
