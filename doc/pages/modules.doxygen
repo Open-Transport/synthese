@@ -4,127 +4,99 @@
  - @subpage m0
  - @subpage m1
  - @subpage m3
- - @subpage m5
  - @subpage m7
 
-@page m0 0 Structure et noyau
+@page m0 0 Utilities and technical elements
 
 	- @subpage pm00
 	- @subpage pm01
 	- @subpage pm02
 	- @subpage pm03
 	- @subpage pm04
-	- @subpage pm05
-	- @subpage pm06
 	- @subpage pm07
-	- @subpage pm09
-
-@page m1 1 Entrées
+	
+@page m1 1 SYNTHESE Data
 
 	- @subpage pm11
-	- @subpage pm12
 	- @subpage pm15
-
-@page m3 3 Actions
+	- @subpage pm16
+	- @subpage pm17
+	- @subpage pm40
+	
+@page m3 3 SYNTHESE Services
 
 	- @subpage pm31
 	- @subpage pm33
 	- @subpage pm34
 	- @subpage pm35
-	- @subpage pm36
-	- @subpage pm37
-	- @subpage pm38
 	- @subpage pm39
-	- @subpage pm40
 
-@page m5 5 Sorties
-
-	- @subpage pm51
-	- @subpage pm52
-
-@page m7 7 Clients
+@page m7 7 SYNTHESE Binaries
 
 	- @subpage pm70
 	- @subpage pm71
 	- @subpage pm72
 	- @subpage pm73
 
-@page pm00 00 Architecture : serveur TCP et main
+@page pm00 00 TCP socket handler
 	@htmlonly <script>document.location.replace('group__m00.html');</script> @endhtmlonly
 
-@page pm01 01 Tableaux dynamiques
+@page pm01 01 Various utilities
 	@htmlonly <script>document.location.replace('group__m01.html');</script> @endhtmlonly
 
-@page pm02 02 Traçabilité et audit
+@page pm02 02 DAO : SQLite database access
 	@htmlonly <script>document.location.replace('group__m02.html');</script> @endhtmlonly
 
-@page pm03 03 Géographie
+@page pm03 03 Database Grid management module
 	@htmlonly <script>document.location.replace('group__m03.html');</script> @endhtmlonly
 
-@page pm04 04 Gestion du temps
+@page pm04 04 Date and time
 	@htmlonly <script>document.location.replace('group__m04.html');</script> @endhtmlonly
 
-@page pm05 05 Classes métier
-	@htmlonly <script>document.location.replace('group__m05.html');</script> @endhtmlonly
-
-@page pm06 06 Documents
-	@htmlonly <script>document.location.replace('group__m06.html');</script> @endhtmlonly
-
-@page pm07 07 Interpréteur de textes
+@page pm07 07 Lexical matcher
 	@htmlonly <script>document.location.replace('group__m07.html');</script> @endhtmlonly
 
-@page pm09 09 Documents
-	@htmlonly <script>document.location.replace('group__m09.html');</script> @endhtmlonly
-
-@page pm11 11 Lecture des fichiers de données
+@page pm11 11 Output : Interface
 	@htmlonly <script>document.location.replace('group__m11.html');</script> @endhtmlonly
 
-@page pm12 12 Traitement des requêtes
-	@htmlonly <script>document.location.replace('group__m12.html');</script> @endhtmlonly
-
-@page pm15 15 Mises à jour temps réel
+@page pm15 15 Object model : Environment
 	@htmlonly <script>document.location.replace('group__m15.html');</script> @endhtmlonly
 
-@page pm31 31 Validation d'entrées
-	@htmlonly <script>document.location.replace('group__m31.html');</script> @endhtmlonly
+@page pm16 16 Input : XML temporary environment data loader
+	@htmlonly <script>document.location.replace('group__m16.html');</script> @endhtmlonly
 
-@page pm33 33 Recherche d'itinéraires
-	@htmlonly <script>document.location.replace('group__m33.html');</script> @endhtmlonly
+@page pm17 17 Input : SQLite persistent data loader (with CDM)
+	@htmlonly <script>document.location.replace('group__m17.html');</script> @endhtmlonly
 
-@page pm34 34 Tableaux d'affichage
-	@htmlonly <script>document.location.replace('group__m34.html');</script> @endhtmlonly
-
-@page pm35 35 Indicateurs papier
-	@htmlonly <script>document.location.replace('group__m35.html');</script> @endhtmlonly
-
-@page pm36 36 Optimisations
-	@htmlonly <script>document.location.replace('group__m36.html');</script> @endhtmlonly
-
-@page pm37 37 Réservation
-	@htmlonly <script>document.location.replace('group__m37.html');</script> @endhtmlonly
-
-@page pm38 38 Fiche arrêt
-	@htmlonly <script>document.location.replace('group__m38.html');</script> @endhtmlonly
-
-@page pm39 39 Tracé de carte
-	@htmlonly <script>document.location.replace('group__m39.html');</script> @endhtmlonly
-
-@page pm40 40 Recherche d'arrêt proche
+@page pm40 40 Input : XML temporary map query loader
 	@htmlonly <script>document.location.replace('group__m40.html');</script> @endhtmlonly
 
-@page pm51 51 Module d'interface
-	@htmlonly <script>document.location.replace('group__m51.html');</script> @endhtmlonly
+@page pm31 31 Reservation
+	@htmlonly <script>document.location.replace('group__m31.html');</script> @endhtmlonly
 
-@page pm52 52 Profils utilisateurs
-	@htmlonly <script>document.location.replace('group__m52.html');</script> @endhtmlonly
+@page pm33 33 Route planner
+	@htmlonly <script>document.location.replace('group__m33.html');</script> @endhtmlonly
 
-@page pm70 70 Client terminal
+@page pm34 34 Arrival/departure tables
+	@htmlonly <script>document.location.replace('group__m34.html');</script> @endhtmlonly
+
+@page pm35 35 Timetables
+	@htmlonly <script>document.location.replace('group__m35.html');</script> @endhtmlonly
+
+@page pm39 39 Map drawing
+	@htmlonly <script>document.location.replace('group__m39.html');</script> @endhtmlonly
+
+
+@page pm70 70 Server
 	@htmlonly <script>document.location.replace('group__m70.html');</script> @endhtmlonly
 
-@page pm71 71 Client CGI
+@page pm71 71 CGI client
 	@htmlonly <script>document.location.replace('group__m71.html');</script> @endhtmlonly
 	
-@page pm72 72 Client RS485
+@page pm72 72 RS485 client
 	@htmlonly <script>document.location.replace('group__m72.html');</script> @endhtmlonly
+
+@page pm73 73 Terminal client
+	@htmlonly <script>document.location.replace('group__m73.html');</script> @endhtmlonly
 
 */

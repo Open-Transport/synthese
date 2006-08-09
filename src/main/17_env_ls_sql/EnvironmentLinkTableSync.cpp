@@ -30,10 +30,12 @@ EnvironmentLinkTableSync::EnvironmentLinkTableSync (const synthese::db::SQLiteSy
 						    const std::string& triggerOverrideClause)
 : synthese::db::SQLiteTableSync (ENVIRONMENT_LINKS_TABLE_NAME, true, true, triggerOverrideClause)
 , _environments (environments)
-{
-    addTableColumn (TABLE_COL_ID, "INTEGER", false);
-    addTableColumn (ENVIRONMENT_LINKS_TABLE_COL_ENVIRONMENTID, "INTEGER", false);
-    addTableColumn (ENVIRONMENT_LINKS_TABLE_COL_LINKTARGETID, "INTEGER", false);
+{	{
+		addTableColumn (TABLE_COL_ID, "INTEGER", false);
+		addTableColumn (ENVIRONMENT_LINKS_TABLE_COL_ENVIRONMENTID, "INTEGER", false);
+		addTableColumn (ENVIRONMENT_LINKS_TABLE_COL_LINKTARGETID, "INTEGER", false);
+	}
+	// The preceding block is used by doxygen, please do not remove
 
     const std::map<std::string, SQLiteTableSync* >& tableSynchronizers = sync->getTableSynchronizers ();
     for (std::map<std::string, SQLiteTableSync* >::const_iterator it = tableSynchronizers.begin ();

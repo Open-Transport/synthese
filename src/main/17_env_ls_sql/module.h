@@ -7,15 +7,187 @@
 namespace synthese
 {
 
-	/** @defgroup m17 17 Database wrappers
-
-
-		@{
-	*/
 
 	/** 17_env_ls_sql namespace */
 	namespace envlssql
 	{
+
+
+	/** @defgroup m17 17 Input : SQLite persistent data loader (with CDM)
+		@{
+
+
+		<h2>Conceptual data model</h2>
+
+		<h3>Cities</h3>
+
+		@copydoc CityTableSync
+		@dontinclude CityTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Continuous services</h3>
+
+		@copydoc ContinuousServiceTableSync
+		@dontinclude ContinuousServiceTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Line stops</h3>
+
+		@copydoc LineStopTableSync
+		@dontinclude LineStopTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Environments links</h3>
+
+		@copydoc EnvironmentLinkTableSync
+		@dontinclude EnvironmentLinkTableSync.cpp
+		@skip synthese::db::SQLiteTableSync
+		@until }
+
+		<h3>Environments</h3>
+
+		@copydoc EnvironmentTableSync
+		@dontinclude EnvironmentTableSync.cpp
+		@skip synthese::db::SQLiteTableSync
+		@until }
+
+		<h3>Transport network</h3>
+
+		@copydoc TransportNetworkTableSync
+		@dontinclude TransportNetworkTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Addresses</h3>
+
+		@copydoc AddressTableSync
+		@dontinclude AddressTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Alarms</h3>
+
+		@copydoc AlarmTableSync
+		@dontinclude AlarmTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Axis</h3>
+
+		@copydoc AxisTableSync
+		@dontinclude AxisTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Bike compliance</h3>
+
+		@copydoc BikeComplianceTableSync
+		@dontinclude BikeComplianceTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Handicapped compliance</h3>
+
+		@copydoc HandicappedComplianceTableSync
+		@dontinclude HandicappedComplianceTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Pedestrian compliance</h3>
+
+		@copydoc PedestrianComplianceTableSync
+		@dontinclude PedestrianComplianceTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Connection places</h3>
+
+		@copydoc ConnectionPlaceTableSync
+		@dontinclude ConnectionPlaceTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Fares</h3>
+
+		@copydoc FareTableSync
+		@dontinclude FareTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Physical stops</h3>
+
+		@copydoc PhysicalStopTableSync
+		@dontinclude PhysicalStopTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Place alias</h3>
+
+		@copydoc PlaceAliasTableSync
+		@dontinclude PlaceAliasTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Public places</h3>
+
+		@copydoc PublicPlaceTableSync
+		@dontinclude PublicPlaceTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Reservation rules</h3>
+
+		@copydoc ReservationRuleTableSync
+		@dontinclude ReservationRuleTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Road chunks</h3>
+
+		@copydoc RoadChunkTableSync
+		@dontinclude RoadChunkTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Roads</h3>
+
+		@copydoc RoadTableSync
+		@dontinclude RoadTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Scheduled Services</h3>
+
+		@copydoc ScheduledServiceTableSync
+		@dontinclude ScheduledServiceTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Service circulation dates</h3>
+
+		@copydoc ServiceDateTableSync
+		@dontinclude ServiceDateTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h3>Lines</h3>
+
+		@copydoc LineTableSync
+		@dontinclude LineTableSync.cpp
+		@skip ComponentTableSync
+		@until }
+
+		<h2>Loader internals</h2>
+
+		See :
+			- class ComponentTableSync
+			- class EnvironmentSyncException
+			- module @ref m02
+	*/
+
 
 	    static const std::string TABLE_COL_ID ("id");
 
@@ -248,9 +420,11 @@ namespace synthese
 	    static const std::string RESERVATIONRULES_TABLE_COL_DESCRIPTION ("description");
 	    static const std::string RESERVATIONRULES_TABLE_COL_WEBSITEURL ("web_site_url");
 
+
+		/** @} */
+
 	}
 
-	/** @} */
 
 	/*
 	  questions:

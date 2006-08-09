@@ -43,6 +43,7 @@ DIV.navtab {
 }
 TD.navtab {
        font-size: 70%;
+       display:none;
 }
 A.qindex {
        text-decoration: none;

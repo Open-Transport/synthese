@@ -35,6 +35,8 @@ class ContinuousServiceTableSync : public ComponentTableSync
 
  public:
 
+	 /** Continuous service SQLite table constructor.
+	 */
     ContinuousServiceTableSync (synthese::env::Environment::Registry& environments,
 				const std::string& triggerOverrideClause = "1");
     ~ContinuousServiceTableSync ();

@@ -94,11 +94,15 @@ RECURSIVE              = YES
 EXCLUDE                = exemples \
                          ../src/main/client_rs485 \
                          ../src/main/cient_term \
-                         ../src/main/server
+                         ../src/main/server \
+                         ../src/test
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
-EXAMPLE_PATH           = exemples
-EXAMPLE_PATTERNS       = *.xml
+EXAMPLE_PATH           = exemples \
+                         ../src/main \
+                         ../src/test
+EXAMPLE_PATTERNS       = *.xml \
+                         *.cpp
 EXAMPLE_RECURSIVE      = YES
 IMAGE_PATH             = images
 INPUT_FILTER           = 

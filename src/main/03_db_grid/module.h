@@ -4,7 +4,7 @@
 namespace synthese
 {
 
-	/** @defgroup m17 17 Database Grid management module.
+	/** @defgroup m03 03 Database Grid management module.
 		
 	This module is aimed at keeping in sync a grid of database nodes.
 
