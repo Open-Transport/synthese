@@ -54,6 +54,10 @@ using synthese::util::Thread;
 using synthese::util::ThreadGroup;
 using synthese::util::ThreadExec;
 
+using synthese::env::Environment;
+
+using synthese::interfaces::Interface;
+
 using namespace boost::posix_time;
 
 
@@ -98,6 +102,42 @@ Server::SetInstance (Server* instance)
 }
 
     
+
+Environment::Registry& 
+Server::getEnvironments ()
+{
+    return _environments;
+}
+
+
+
+const Environment::Registry& 
+Server::getEnvironments () const
+{
+    return _environments;
+}
+
+
+
+
+Interface::Registry& 
+Server::getInterfaces ()
+{
+    return _interfaces;
+}
+
+
+
+const Interface::Registry& 
+Server::getInterfaces () const
+{
+    return _interfaces;
+}
+
+
+
+
+
 
 
 void 

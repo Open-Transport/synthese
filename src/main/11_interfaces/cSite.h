@@ -12,6 +12,11 @@ namespace env
     {
 	class Environment;
     }
+
+namespace interfaces
+    {
+	class Interface;
+    }
 }
 
 
@@ -38,7 +43,7 @@ class cSite
         //! \name Param�tres
         //@{
         synthese::env::Environment* _Environnement;  //!< Environnement li� au site
-        const cInterface* _Interface;   //!< Interface li�e au site
+        const synthese::interfaces::Interface* _Interface;   //!< Interface li�e au site
         //@}
 
         //! \name Filtres
@@ -57,7 +62,7 @@ class cSite
         //@{
         void setIdentifiant ( const std::string& id );
         bool SetEnvironnement ( synthese::env::Environment* );
-        bool SetInterface ( const cInterface* );
+        bool SetInterface ( const synthese::interfaces::Interface* );
         void setDateDebut ( const synthese::time::Date& dateDebut );
         void setDateFin ( const synthese::time::Date& dateFin );
         bool setResaEnLigne ( const bool valeur );
@@ -70,7 +75,7 @@ class cSite
         const std::string& getClef() const;
         synthese::env::Environment* getEnvironnement() const;
         const std::string& getIdentifiant() const;
-        const cInterface* getInterface() const;
+        const synthese::interfaces::Interface* getInterface() const;
         const synthese::time::Date& getDateDebut() const;
         const synthese::time::Date& getDateFin() const;
         const std::string& getURLClient() const;

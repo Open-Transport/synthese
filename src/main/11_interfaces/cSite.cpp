@@ -1,10 +1,12 @@
 #include "cSite.h"
 #include "cInterface_Objet.h"
-#include "cInterface.h"
+
+#include "11_interfaces/Interface.h"
 
 using namespace std;
 
 using synthese::env::Environment;
+using synthese::interfaces::Interface;
 
 
 
@@ -167,7 +169,7 @@ bool cSite::SetEnvironnement( Environment* __Objet )
  \param __Objet L'interface � lier au site
  \return true si l'op�ration a �t� effectu�e avec succ�s
 */
-bool cSite::SetInterface( const cInterface* __Objet )
+bool cSite::SetInterface( const Interface* __Objet )
 {
     _Interface = __Objet;
 
@@ -190,7 +192,7 @@ Environment* cSite::getEnvironnement() const
 
 /*! \brief Accesseur Interface
 */
-const cInterface* cSite::getInterface() const
+const Interface* cSite::getInterface() const
 {
     return _Interface;
 }

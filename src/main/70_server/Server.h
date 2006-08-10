@@ -11,6 +11,7 @@
 #include "ServerConfig.h"
 
 #include "15_env/Environment.h"
+#include "11_interfaces/Interface.h"
 
 
 #include <boost/filesystem/path.hpp>
@@ -44,7 +45,7 @@ class Server
     ServerConfig _config;
 
     synthese::env::Environment::Registry _environments;
-    
+    synthese::interfaces::Interface::Registry _interfaces;
 
  protected:
 
@@ -58,6 +59,13 @@ class Server
 
     //! @name Getters/Setters
     //@{
+
+    synthese::env::Environment::Registry& getEnvironments ();
+    const synthese::env::Environment::Registry& getEnvironments () const;
+    
+    synthese::interfaces::Interface::Registry& getInterfaces ();
+    const synthese::interfaces::Interface::Registry& getInterfaces () const;
+
     RequestDispatcher& getRequestDispatcher ();
     ServerConfig& getConfig ();
 

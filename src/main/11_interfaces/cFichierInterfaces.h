@@ -4,6 +4,9 @@
 
 
 #include "cFichier.h"
+#include "Interface.h"
+
+
 
 // #include "cFichierObjetInterfaceStandard.h"
 
@@ -107,7 +110,6 @@
 class cFichierInterfaces : public cFichier
 {
 public:
-	bool Charge();
 	cFichierInterfaces(const cTexte& NomFichier, const cTexte& NomFichierFormats)
 		: cFichier(cTexte(NomFichier).Copie(INTERFACESEXTENSION), 
 			   new cFormatFichier(NomFichierFormats, 
@@ -117,6 +119,10 @@ public:
 	    { 
 		_CheminFichierFormats = NomFichierFormats; 
 	    }
+
+	bool Charge(synthese::interfaces::Interface::Registry& interfaces);
+
+
 };
 
 /** @} */

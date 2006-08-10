@@ -4,7 +4,7 @@ Import ('mainenv')
 moduleenv = mainenv.ModuleEnv()
 
 includes = '*.cpp'
-excludes = ['cFichierInterfaces.cpp', 'cFichierSites.cpp', 'cFichierTbDep.cpp', 'cFichierObjetInterfaceStandard.cpp']
+excludes = ['cFichierSites.cpp', 'cFichierTbDep.cpp']
 
 moduleenv.AppendMultithreadConf ()
 

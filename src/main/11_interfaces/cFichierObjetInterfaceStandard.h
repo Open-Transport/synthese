@@ -98,7 +98,7 @@
 //@}
 
 #include "cFichier.h"
-#include "cInterface.h"
+#include "Interface.h"
 #include "cInterface_Objet_AEvaluer_PageEcran.h"
 
 
@@ -108,22 +108,13 @@
 class cFichierObjetInterfaceStandard : public cFichier
 {
 public:
-	bool Charge(cInterface_Objet_AEvaluer_PageEcran&, const cInterface&);
+	bool Charge(cInterface_Objet_AEvaluer_PageEcran&, const synthese::interfaces::Interface&);
 	
 	cFichierObjetInterfaceStandard(const cTexte& NomFichier, const cTexte& NomFichierFormats);
 };
 /** @} */
 
 
-/** Constructeur
-	\param __NomFichier Nom du fichier sans l'extension qui est imposée et automatiquement ajoutée
-	\param __NomFichierFormats Nom du fichier contenant la description des formats de fichiers
-	\author Hugues Romain
-	\date 2005
-*/
-inline cFichierObjetInterfaceStandard::cFichierObjetInterfaceStandard(const cTexte& __NomFichier, const cTexte& __NomFichierFormats)
- : cFichier(cTexte(__NomFichier).Copie(ELEMENTSINTERFACEEXTENSION), new cFormatFichier(__NomFichierFormats, ELEMENTSINTERFACEFORMAT, ELEMENTSINTERFACEFORMATLIGNENombreFormats, ELEMENTSINTERFACEFORMATCOLONNESNombreFormats))
-{ }
 
 
 #endif

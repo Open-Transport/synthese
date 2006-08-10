@@ -5,8 +5,9 @@
 #include "cInterface_Objet_AEvaluer_PageEcran.h"
 #include "cInterface_Objet_Connu_ListeParametres.h"
 
-#include "cInterface.h"
 #include "cSite.h"
+
+#include "Interface.h"
 
 #include "34_departures_table/PassThroughDescription.h"
 #include "33_route_planner/Journey.h"
@@ -40,6 +41,9 @@ using synthese::env::City;
 using synthese::env::Road;
 using synthese::env::Line;
 using synthese::env::ReservationRule;
+
+using synthese::interfaces::Interface;
+
 using synthese::routeplanner::JourneyLeg;
 using synthese::routeplanner::Journey;
 using synthese::departurestable::PassThroughDescription;
