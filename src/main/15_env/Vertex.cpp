@@ -84,5 +84,10 @@ Vertex::addArrivalEdge ( const Edge* edge )
 
 
 
+
+
+
+
+
 }
 }

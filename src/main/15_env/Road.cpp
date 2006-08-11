@@ -1,5 +1,6 @@
 #include "Road.h"
 
+#include "Address.h"
 #include "RoadChunk.h"
 
 
@@ -60,6 +61,39 @@ Road::setType (const RoadType& type)
 }
 
 
+
+const Address* 
+Road::findClosestAddressBefore (double metricOffset) const
+{
+    const Address* address = 0;
+    for (std::vector<const Address*>::const_iterator it = getAddresses ().begin ();
+	 it != getAddresses ().end (); ++it)
+    {
+	if ( ((*it)->getMetricOffset () <= metricOffset) &&
+	     ( (address == 0) || ((*it)->getMetricOffset () > address->getMetricOffset ()) ) )
+	{
+	    address = (*it);
+	}
+    }
+    return address;
+}
+
+
+const Address* 
+Road::findClosestAddressAfter (double metricOffset) const
+{
+    const Address* address = 0;
+    for (std::vector<const Address*>::const_iterator it = getAddresses ().begin ();
+	 it != getAddresses ().end (); ++it)
+    {
+	if ( ((*it)->getMetricOffset () >= metricOffset) &&
+	     ( (address == 0) || ((*it)->getMetricOffset () < address->getMetricOffset ()) ) )
+	{
+	    address = (*it);
+	}
+    }
+    return address;
+}
 
 
 

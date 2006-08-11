@@ -41,12 +41,13 @@ IncludingPlace::addIncludedPlace (const Place* place)
 void
 IncludingPlace::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
 					   const AccessParameters& accessParameters,
-					   PhysicalStopAccessMap& result) const
+					   PhysicalStopAccessMap& result,
+					   const PhysicalStopAccess& currentAccess) const
 {
     for (std::vector<const Place*>::const_iterator it = _includedPlaces.begin ();
 	 it != _includedPlaces.end (); ++it)
     {
-	(*it)->reachPhysicalStopAccesses (accessDirection, accessParameters, result);
+	(*it)->reachPhysicalStopAccesses (accessDirection, accessParameters, result, currentAccess);
     }
 }
 

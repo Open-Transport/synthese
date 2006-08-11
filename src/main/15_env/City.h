@@ -82,9 +82,11 @@ class City : public synthese::util::Registrable<uid, City>,
      *               one physical stop accesses of an arbitrarily chosen 
      *		     connection place of this city.
      */
-    void reachPhysicalStopAccesses (const AccessDirection& accessDirection,
-				    const AccessParameters& accessParameters,
-				    PhysicalStopAccessMap& result) const;
+    virtual void reachPhysicalStopAccesses (
+	const AccessDirection& accessDirection,
+	const AccessParameters& accessParameters,
+	PhysicalStopAccessMap& result,
+	const PhysicalStopAccess& currentAccess = PhysicalStopAccess ()) const;
 
     
     std::vector<const Road*> searchRoad (const std::string& fuzzyName, int nbMatches = 10) const;

@@ -53,10 +53,11 @@ public:
      * @param accessDirection Is this place an origin or a destination.
      * @param result The shortest accesses to included places physical stops.
      */
-    virtual void reachPhysicalStopAccesses (const AccessDirection& accessDirection,
-					    const AccessParameters& accessParameters,
-					    PhysicalStopAccessMap& result) const;
-    
+    virtual void reachPhysicalStopAccesses (
+	const AccessDirection& accessDirection,
+	const AccessParameters& accessParameters,
+	PhysicalStopAccessMap& result,
+	const PhysicalStopAccess& currentAccess = PhysicalStopAccess ()) const;
     //@}
 
 

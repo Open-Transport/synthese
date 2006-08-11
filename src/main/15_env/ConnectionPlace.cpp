@@ -1,7 +1,10 @@
 #include "ConnectionPlace.h"
 
 #include "04_time/DateTime.h"
+
 #include "15_env/Alarm.h"
+#include "15_env/PhysicalStop.h"
+#include "15_env/Vertex.h"
 
 
 #include <limits>
@@ -154,11 +157,32 @@ ConnectionPlace::setAlarm (const Alarm* alarm)
 void 
 ConnectionPlace::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
 					    const AccessParameters& accessParameters,
-					    PhysicalStopAccessMap& result) const
+					    PhysicalStopAccessMap& result,
+					    const PhysicalStopAccess& currentAccess) const
 {
-    assert (false); // TODO
-}
+    AddressablePlace::reachPhysicalStopAccesses (accessDirection, accessParameters, result);
+    for (std::vector<const PhysicalStop*>::const_iterator it = _physicalStops.begin ();
+	 it != _physicalStops.end (); ++it)
+    {
+	double transferDelay = 0;
+	if (currentAccess.path.empty () == false)
+	{
+	    // TODO Access direction here ??
+	    transferDelay = getTransferDelay (
+		currentAccess.path.back ()->getRankInConnectionPlace (),
+		(*it)->getRankInConnectionPlace ());
+	}
+	    
+	if (currentAccess.approachTime + transferDelay > accessParameters.maxApproachTime) continue;
+	
+	PhysicalStopAccess currentAccessCopy = currentAccess;
+	currentAccessCopy.approachTime += transferDelay;
+	    
+	(*it)->reachPhysicalStopAccesses (accessDirection, accessParameters, result, currentAccessCopy);
+    }
     
+}
+
 
 
 

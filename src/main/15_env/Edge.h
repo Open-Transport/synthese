@@ -59,7 +59,6 @@ private:
 
     EdgeType _type;      //!< Departure, arrival or passage    
 
-    // TODO : remonter path
     const Path* _parentPath;      //!< Parent path
     int _rankInPath;  //!< Rank in path.
 
@@ -96,6 +95,11 @@ public:
 	parent path origin vertex.
     */
     virtual double getMetricOffset () const = 0;
+
+
+    /** Returns length of this edge, in meters. from
+    */
+    double getLength () const;
 
     const EdgeType& getType () const;
     void setType ( const EdgeType& type );

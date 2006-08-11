@@ -193,6 +193,12 @@ Edge::getParentPath () const
 
 
 
+double 
+Edge::getLength () const
+{
+    if (_nextInPath == 0) return 0;
+    return _nextInPath->getMetricOffset () - getMetricOffset (); 
+}
 
 
 

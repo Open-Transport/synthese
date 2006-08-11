@@ -67,6 +67,18 @@ public:
 
 
 
+    //! @name Query methods
+    //@{
+
+    virtual void reachPhysicalStopAccesses (
+	const AccessDirection& accessDirection,
+	const AccessParameters& accessParameters,
+	PhysicalStopAccessMap& result,
+	const PhysicalStopAccess& currentAccess = PhysicalStopAccess ()) const;
+
+    //@}
+
+
 
 };
 

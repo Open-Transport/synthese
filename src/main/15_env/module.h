@@ -5,6 +5,7 @@
 #ifndef SYNTHESE_ENV_MODULE_H
 #define SYNTHESE_ENV_MODULE_H
 
+
 namespace synthese
 {
 
@@ -18,6 +19,7 @@ namespace synthese
 	{
 	    static const int UNKNOWN_VALUE = -1;
 
+	    
 	}
 
 	/** @} */

@@ -131,7 +131,8 @@ City::searchRoad (const std::string& fuzzyName, int nbMatches) const
 void 
 City::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
 				 const AccessParameters& accessParameters,
-				 PhysicalStopAccessMap& result) const
+				 PhysicalStopAccessMap& result,
+				 const PhysicalStopAccess& currentAccess) const
 {
     if (_includedPlaces.empty ())
     {
@@ -139,30 +140,33 @@ City::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
 	{
 	    _connectionPlacesMatcher.entries ().begin ()->second->
 		reachPhysicalStopAccesses (accessDirection, accessParameters, 
-					   result);
+					   result, currentAccess);
 	}
 	else if (_placeAliasesMatcher.size () > 0)
 	{
 	    _placeAliasesMatcher.entries ().begin ()->second->
 		reachPhysicalStopAccesses (accessDirection, accessParameters, 
-					   result);
+					   result, currentAccess);
 	}
 	else if (_publicPlacesMatcher.size () > 0)
 	{
 	    _publicPlacesMatcher.entries ().begin ()->second->
 		reachPhysicalStopAccesses (accessDirection, accessParameters, 
-					   result);
+					   result, currentAccess);
 	}
 	else if (_roadsMatcher.size () > 0)
 	{
 	    _roadsMatcher.entries ().begin ()->second->
 		reachPhysicalStopAccesses (accessDirection, accessParameters, 
-					   result);
+					   result, currentAccess);
 	}
     }
     else
     {
-	IncludingPlace::reachPhysicalStopAccesses (accessDirection, accessParameters, result);
+	IncludingPlace::reachPhysicalStopAccesses (accessDirection, 
+						   accessParameters, 
+						   result, 
+						   currentAccess);
     }
 
 }

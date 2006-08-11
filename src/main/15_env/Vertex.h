@@ -2,7 +2,10 @@
 #define SYNTHESE_ENV_VERTEX_H
 
 #include <set>
+
+#include "Navigable.h"
 #include "Point.h"
+
 #include "module.h"
 
 
@@ -22,7 +25,7 @@ A vertex is the abstract graph node used for route planning.
 
  @ingroup m15
 */
-class Vertex : public Point
+class Vertex : public Point, public Navigable
 {
 
 private:
@@ -63,6 +66,12 @@ public:
      //@}
 
 
+    //! @name Query methods
+    //@{
+
+
+    //@}
+    
     
 };
 
