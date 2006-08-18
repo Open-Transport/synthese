@@ -25,6 +25,7 @@ files = moduleenv.Glob(includes, excludes)
 
 # Modules libs
 moduleenv.AddModuleDependency ('99_synthese')
+moduleenv.AddModuleDependency ('70_server')
 moduleenv.AddModuleDependency ('80_carto_service')
 moduleenv.AddModuleDependency ('40_carto_ls_xml')
 moduleenv.AddModuleDependency ('16_env_ls_xml')
@@ -32,8 +33,6 @@ moduleenv.AddModuleDependency ('39_carto')
 
 moduleenv.AddModuleDependency ('17_env_ls_sql')
 moduleenv.AddModuleDependency ('15_env')
-
-moduleenv.AddModuleDependency ('70_server')
 
 # Generic libs
 moduleenv.AddModuleDependency ('04_time')

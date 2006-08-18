@@ -38,7 +38,7 @@ class LexicalMatcher
 {
  public:
 
-    typedef typename
+    typedef 
 	struct 
 	{
 	    double score;
@@ -46,30 +46,32 @@ class LexicalMatcher
 	    T value;
 	} MatchHit;
     
-    typedef typename std::vector<typename MatchHit> MatchResult;
+    typedef typename std::vector<MatchHit> MatchResult;
 
  private:
 
     static const double EXTRA_INPUT_WORD_PENALTY_FACTOR;
     static const double EXTRA_MATCH_WORD_PENALTY_FACTOR;
 
-    typedef typename
+    typedef 
 	struct
 	{
-	    int operator () ( const typename MatchHit& op1, 
-			      const typename MatchHit& op2 ) const
+	    int operator () ( const MatchHit& op1, 
+			      const MatchHit& op2 ) const
 		{
 		    return op1.score >= op2.score;
 		}
 	} MatchHitSort;
     
-    typedef typename
+    typedef 
 	struct 
 	{
 	    std::vector<std::string> tokens;
 	    size_t size;
 	} PreprocessedKey;
 
+
+    typedef std::map<std::string, std::string> TranslationMap;
 
     std::map<std::string, T> _map;
     std::map<std::string, PreprocessedKey > _ppKeys;
@@ -78,14 +80,14 @@ class LexicalMatcher
     bool _ignorePunctuation;
     bool _ignoreWordOrder;
 
-    std::map<std::string, std::string> _translations;
+    TranslationMap _translations;
     std::string _separatorCharacters;
 
  public:
 
     LexicalMatcher (bool ignoreCase=true,
 		    bool ignoreWordOrder=true,
-		    const std::map<std::string, std::string>& translations = std::map<std::string, std::string> (),
+		    const TranslationMap& translations = TranslationMap (),
 		    const std::string& separatorCharacters = "-,;.' &()");
 
     ~LexicalMatcher ();
@@ -139,7 +141,7 @@ const double LexicalMatcher<T>::EXTRA_MATCH_WORD_PENALTY_FACTOR (0.5);
 template<class T>
 LexicalMatcher<T>::LexicalMatcher (bool ignoreCase,
 				   bool ignoreWordOrder,
-				   const std::map<std::string, std::string>& translations,
+				   const TranslationMap& translations,
 				   const std::string& separatorCharacters)
     : _ignoreCase (ignoreCase)
     , _ignoreWordOrder (ignoreWordOrder)
@@ -187,7 +189,7 @@ LexicalMatcher<T>::bestMatches (const std::string& fuzzyKey, int nbMatches) cons
     if (((int) result.size ()) > nbMatches)
     {
 	// Truncate the result
-	MatchResult::iterator it = result.begin ();
+	typename MatchResult::iterator it = result.begin ();
 	std::advance (it, nbMatches);
 	result.erase (it, result.end ());
     }
@@ -204,7 +206,7 @@ LexicalMatcher<T>::match (const std::string& fuzzyKey, double minScore, int maxN
     MatchResult result;
     PreprocessedKey ppkey = preprocessKey (fuzzyKey);
     // Iterate over all candidates
-    for (std::map<std::string, PreprocessedKey >::const_iterator it = _ppKeys.begin ();
+    for (typename std::map<std::string, PreprocessedKey >::const_iterator it = _ppKeys.begin ();
 	 it != _ppKeys.end (); ++it)
     {
 	MatchHit hit;
