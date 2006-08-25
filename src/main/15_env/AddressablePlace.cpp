@@ -40,18 +40,35 @@ AddressablePlace::addAddress (const Address* address)
 
 
 
-void 
-AddressablePlace::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
-					     const AccessParameters& accessParameters,
-					     PhysicalStopAccessMap& result,
-					     const PhysicalStopAccess& currentAccess) const
+
+
+
+
+
+
+
+void
+AddressablePlace::getImmediateVertices (VertexAccessMap& result, 
+					const AccessDirection& accessDirection,
+					const AccessParameters& accessParameters,
+					const Vertex* origin,
+					bool returnAddresses,
+					bool returnPhysicalStops) const
 {
-    for (std::vector<const Address*>::const_iterator itAddr = _addresses.begin (); 
-	 itAddr != _addresses.end (); ++itAddr)
+    if (returnAddresses)
     {
-	(*itAddr)->reachPhysicalStopAccesses (accessDirection, accessParameters, result, currentAccess);
+	for (std::vector<const Address*>::const_iterator it = _addresses.begin ();
+	     it != _addresses.end (); ++it)
+	{
+	    if (origin == (*it)) continue;
+	    result.insert (std::make_pair ((*it), getVertexAccess (accessDirection,
+								   accessParameters,
+								   (*it), origin)));
+	}
     }
+
 }
+
 
 
 

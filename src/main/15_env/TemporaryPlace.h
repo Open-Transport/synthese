@@ -49,11 +49,17 @@ public:
     //! @name Query methods
     //@{
 
-    virtual void reachPhysicalStopAccesses (
-	const AccessDirection& accessDirection,
-	const AccessParameters& accessParameters,
-	PhysicalStopAccessMap& result,
-	const PhysicalStopAccess& currentAccess = PhysicalStopAccess ()) const;
+    VertexAccess getVertexAccess (const AccessDirection& accessDirection,
+				  const AccessParameters& accessParameters,
+				  const Vertex* destination,
+				  const Vertex* origin = 0) const;
+    
+    void getImmediateVertices (VertexAccessMap& result, 
+			       const AccessDirection& accessDirection,
+			       const AccessParameters& accessParameters,
+			       const Vertex* origin = 0,
+			       bool returnAddresses = true,
+			       bool returnPhysicalStops = true) const;
 
     //@}
     

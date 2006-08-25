@@ -44,20 +44,13 @@ public:
     //! @name Query methods
     //@{
 
-    /** Collects all physical stop accesses according to the included
-     *  places.
-     *  This method iterates over included places, and calls recursively
-     *  this method. Child results are compiled into one result map so that
-     *  only the shortest access to a given physical stop is kept.
-     *
-     * @param accessDirection Is this place an origin or a destination.
-     * @param result The shortest accesses to included places physical stops.
-     */
-    virtual void reachPhysicalStopAccesses (
-	const AccessDirection& accessDirection,
-	const AccessParameters& accessParameters,
-	PhysicalStopAccessMap& result,
-	const PhysicalStopAccess& currentAccess = PhysicalStopAccess ()) const;
+    void getImmediateVertices (VertexAccessMap& result, 
+			       const AccessDirection& accessDirection,
+			       const AccessParameters& accessParameters,
+			       const Vertex* origin = 0,
+			       bool returnAddresses = true,
+			       bool returnPhysicalStops = true) const;
+
     //@}
 
 

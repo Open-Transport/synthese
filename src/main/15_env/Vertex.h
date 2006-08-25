@@ -3,7 +3,7 @@
 
 #include <set>
 
-#include "Navigable.h"
+
 #include "Point.h"
 
 #include "module.h"
@@ -25,7 +25,7 @@ A vertex is the abstract graph node used for route planning.
 
  @ingroup m15
 */
-class Vertex : public Point, public Navigable
+class Vertex : public Point
 {
 
 private:

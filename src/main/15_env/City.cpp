@@ -127,46 +127,47 @@ City::searchRoad (const std::string& fuzzyName, int nbMatches) const
 
 
 
-
-void 
-City::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
-				 const AccessParameters& accessParameters,
-				 PhysicalStopAccessMap& result,
-				 const PhysicalStopAccess& currentAccess) const
+void
+City::getImmediateVertices (VertexAccessMap& result, 
+			    const AccessDirection& accessDirection,
+			    const AccessParameters& accessParameters,
+			    const Vertex* origin,
+			    bool returnAddresses,
+			    bool returnPhysicalStops) const
 {
+
     if (_includedPlaces.empty ())
     {
 	if (_connectionPlacesMatcher.size () > 0)
 	{
 	    _connectionPlacesMatcher.entries ().begin ()->second->
-		reachPhysicalStopAccesses (accessDirection, accessParameters, 
-					   result, currentAccess);
+		getImmediateVertices (result, accessDirection, accessParameters, 
+				      origin, returnAddresses, returnPhysicalStops);
 	}
 	else if (_placeAliasesMatcher.size () > 0)
 	{
 	    _placeAliasesMatcher.entries ().begin ()->second->
-		reachPhysicalStopAccesses (accessDirection, accessParameters, 
-					   result, currentAccess);
+		getImmediateVertices (result, accessDirection, accessParameters, 
+				      origin, returnAddresses, returnPhysicalStops);
 	}
 	else if (_publicPlacesMatcher.size () > 0)
 	{
 	    _publicPlacesMatcher.entries ().begin ()->second->
-		reachPhysicalStopAccesses (accessDirection, accessParameters, 
-					   result, currentAccess);
+		getImmediateVertices (result, accessDirection, accessParameters, 
+				      origin, returnAddresses, returnPhysicalStops);
 	}
 	else if (_roadsMatcher.size () > 0)
 	{
 	    _roadsMatcher.entries ().begin ()->second->
-		reachPhysicalStopAccesses (accessDirection, accessParameters, 
-					   result, currentAccess);
+		getImmediateVertices (result, accessDirection, accessParameters, 
+				      origin, returnAddresses, returnPhysicalStops);
 	}
     }
     else
     {
-	IncludingPlace::reachPhysicalStopAccesses (accessDirection, 
-						   accessParameters, 
-						   result, 
-						   currentAccess);
+	IncludingPlace::getImmediateVertices (result, accessDirection, accessParameters, 
+					      origin, returnAddresses, returnPhysicalStops);
+
     }
 
 }

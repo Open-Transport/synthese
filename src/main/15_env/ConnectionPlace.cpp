@@ -154,34 +154,76 @@ ConnectionPlace::setAlarm (const Alarm* alarm)
 
 
 
-void 
-ConnectionPlace::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
-					    const AccessParameters& accessParameters,
-					    PhysicalStopAccessMap& result,
-					    const PhysicalStopAccess& currentAccess) const
+
+
+
+Place::VertexAccess 
+ConnectionPlace::getVertexAccess (const AccessDirection& accessDirection,
+				  const AccessParameters& accessParameters,
+				  const Vertex* destination,
+				  const Vertex* origin) const
 {
-    AddressablePlace::reachPhysicalStopAccesses (accessDirection, accessParameters, result);
-    for (std::vector<const PhysicalStop*>::const_iterator it = _physicalStops.begin ();
-	 it != _physicalStops.end (); ++it)
+    VertexAccess access;
+    access.path.push_back (destination);
+
+    if (origin != 0)
     {
-	double transferDelay = 0;
-	if (currentAccess.path.empty () == false)
+	if (accessDirection == FROM_ORIGIN)
 	{
-	    // TODO Access direction here ??
-	    transferDelay = getTransferDelay (
-		currentAccess.path.back ()->getRankInConnectionPlace (),
-		(*it)->getRankInConnectionPlace ());
+	    access.approachTime = getTransferDelay (
+		origin->getRankInConnectionPlace (),
+		destination->getRankInConnectionPlace ());
+	} 
+	else
+	{
+	    access.approachTime = getTransferDelay (
+		destination->getRankInConnectionPlace (),
+		origin->getRankInConnectionPlace ());
 	}
-	    
-	if (currentAccess.approachTime + transferDelay > accessParameters.maxApproachTime) continue;
-	
-	PhysicalStopAccess currentAccessCopy = currentAccess;
-	currentAccessCopy.approachTime += transferDelay;
-	    
-	(*it)->reachPhysicalStopAccesses (accessDirection, accessParameters, result, currentAccessCopy);
     }
-    
+    else
+    {
+	access.approachDistance = 0;
+	access.approachTime = 0;
+    }
+
+    return access;
 }
+    
+
+
+
+
+
+
+void
+ConnectionPlace::getImmediateVertices (VertexAccessMap& result, 
+				       const AccessDirection& accessDirection,
+				       const AccessParameters& accessParameters,
+				       const Vertex* origin,
+				       bool returnAddresses,
+				       bool returnPhysicalStops) const
+{
+    AddressablePlace::getImmediateVertices (result, accessDirection, accessParameters,
+					    origin, returnAddresses, returnPhysicalStops);
+    
+    if (returnPhysicalStops)
+    {
+	for (std::vector<const PhysicalStop*>::const_iterator it = _physicalStops.begin ();
+	     it != _physicalStops.end (); ++it)
+	{
+	    if (origin == (*it)) continue;
+	    result.insert (std::make_pair ((*it), getVertexAccess (accessDirection,
+								   accessParameters,
+								   (*it), origin)));
+	}
+    }
+}
+
+
+    
+
+
 
 
 

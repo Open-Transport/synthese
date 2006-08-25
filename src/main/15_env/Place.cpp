@@ -56,6 +56,21 @@ Place::getCity () const
     
 
     
+Place::VertexAccess
+Place::getVertexAccess (const AccessDirection& accessDirection,
+			const AccessParameters& accessParameters,
+			const Vertex* destination,
+			const Vertex* origin) const
+{
+    VertexAccess access;
+    access.approachDistance = 0;
+    access.approachTime = 0;
+    access.path.push_back (destination);
+
+    return access;
+}
+
+
 
 
 

@@ -4,11 +4,10 @@
 
 #include "module.h"
 
-#include "Navigable.h"
-
 
 #include <map>
 #include <string>
+#include <vector>
 
 
 namespace synthese
@@ -18,7 +17,7 @@ namespace env
 
 
  class City;
- class PhysicalStop;
+ class Vertex;
 
 
 /** Place base class.
@@ -30,8 +29,31 @@ a human abstraction.
 
  @ingroup m15
 */
-class Place : public Navigable
+class Place 
 {
+public:
+
+    typedef std::vector<const Vertex*> AccessPath;
+    typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
+
+
+    typedef struct {
+	double maxApproachDistance;
+	double maxApproachTime;
+	double approachSpeed;
+	
+    } AccessParameters;
+
+
+    typedef struct {
+	AccessPath path;
+	double approachTime;
+	double approachDistance;
+    } VertexAccess;
+    
+    
+    typedef std::map<const Vertex*, VertexAccess> VertexAccessMap;
+
 
 private:
 
@@ -70,6 +92,24 @@ public:
 
     //@}
 
+
+
+    //! @name Query methods
+    //@{
+
+    virtual VertexAccess getVertexAccess (const AccessDirection& accessDirection,
+					  const AccessParameters& accessParameters,
+					  const Vertex* destination,
+					  const Vertex* origin) const;
+
+
+    virtual void getImmediateVertices (VertexAccessMap& result, 
+				       const AccessDirection& accessDirection,
+				       const AccessParameters& accessParameters,
+				       const Vertex* origin = 0,
+				       bool returnAddresses = true,
+				       bool returnPhysicalStops = true) const = 0;
+    //@}
 
     
 };

@@ -74,20 +74,12 @@ class City : public synthese::util::Registrable<uid, City>,
     //! @name Query methods
     //@{
 
-    /** Specializes parent method fo handling the case when no main connection
-     *  place was defined.
-     *
-     * @param accessDirection Is this place an origin or a destination.
-     * @param result The shortest accesses to included places physical stops, or 
-     *               one physical stop accesses of an arbitrarily chosen 
-     *		     connection place of this city.
-     */
-    virtual void reachPhysicalStopAccesses (
-	const AccessDirection& accessDirection,
-	const AccessParameters& accessParameters,
-	PhysicalStopAccessMap& result,
-	const PhysicalStopAccess& currentAccess = PhysicalStopAccess ()) const;
-
+    void getImmediateVertices (VertexAccessMap& result, 
+			       const AccessDirection& accessDirection,
+			       const AccessParameters& accessParameters,
+			       const Vertex* origin = 0,
+			       bool returnAddresses = true,
+			       bool returnPhysicalStops = true) const;
     
     std::vector<const Road*> searchRoad (const std::string& fuzzyName, int nbMatches = 10) const;
 

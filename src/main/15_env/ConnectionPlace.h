@@ -97,18 +97,18 @@ public:
     //@{
     bool isConnectionAuthorized () const;
     int getTransferDelay (int departureRank, int arrivalRank) const;
+
+    VertexAccess getVertexAccess (const AccessDirection& accessDirection,
+				  const AccessParameters& accessParameters,
+				  const Vertex* destination,
+				  const Vertex* origin = 0) const;
     
-    /** 
-     * 
-     * @param accessDirection Is this place an origin or a destination.
-     * @param result The shortest accesses to included places physical stops, ...
-     */
-    virtual void reachPhysicalStopAccesses (
-	const AccessDirection& accessDirection,
-	const AccessParameters& accessParameters,
-	PhysicalStopAccessMap& result,
-	const PhysicalStopAccess& currentAccess = PhysicalStopAccess ()) const;
-    
+    void getImmediateVertices (VertexAccessMap& result, 
+			       const AccessDirection& accessDirection,
+			       const AccessParameters& accessParameters,
+			       const Vertex* origin = 0,
+			       bool returnAddresses = true,
+			       bool returnPhysicalStops = true) const;
 
     //@}
 

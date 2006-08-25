@@ -41,11 +41,36 @@ TemporaryPlace::getMetricOffset () const
 
 
 
-void 
-TemporaryPlace::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
-					   const AccessParameters& accessParameters,
-					   PhysicalStopAccessMap& result,
-					   const PhysicalStopAccess& currentAccess) const
+
+
+
+
+Place::VertexAccess 
+TemporaryPlace::getVertexAccess (const AccessDirection& accessDirection,
+				 const AccessParameters& accessParameters,
+				 const Vertex* destination,
+				 const Vertex* origin) const
+{
+    VertexAccess access;
+    access.path.push_back (destination);
+    access.approachDistance = _metricOffset - ((Address*) destination)->getMetricOffset ();
+    access.approachTime = access.approachDistance / accessParameters.approachSpeed;
+}
+    
+
+
+
+
+
+
+
+void
+TemporaryPlace::getImmediateVertices (VertexAccessMap& result, 
+				      const AccessDirection& accessDirection,
+				      const AccessParameters& accessParameters,
+				      const Vertex* origin,
+				      bool returnAddresses,
+				      bool returnPhysicalStops) const
 {
     // Find closest addresses on both sides and run search from here.
     const Address* closestBefore = _road->findClosestAddressBefore (_metricOffset);
@@ -53,33 +78,27 @@ TemporaryPlace::reachPhysicalStopAccesses (const AccessDirection& accessDirectio
 
     if (closestBefore != 0)
     {
-	PhysicalStopAccess currentAccessCopy = currentAccess;
-	double deltaDistance = _metricOffset - closestBefore->getMetricOffset ();
-	double deltaTime = deltaDistance / accessParameters.approachSpeed;
-	currentAccessCopy.approachDistance += deltaDistance;
-	currentAccessCopy.approachTime += deltaTime;
-
-	closestBefore->reachPhysicalStopAccesses (accessDirection,
-						  accessParameters, 
-						  result,
-						  currentAccessCopy);
+	VertexAccess access;
+	access.path.push_back (closestBefore);
+	access.approachDistance = _metricOffset - closestBefore->getMetricOffset ();
+	access.approachTime = access.approachDistance / accessParameters.approachSpeed;
+	
+	result.insert (std::make_pair (closestBefore, access));
     }
 
     if ( (closestAfter != 0) && (closestAfter != closestBefore) )
     {
-	PhysicalStopAccess currentAccessCopy = currentAccess;
-	double deltaDistance =  closestAfter->getMetricOffset () - _metricOffset;
-	double deltaTime = deltaDistance / accessParameters.approachSpeed;
-	currentAccessCopy.approachDistance += deltaDistance;
-	currentAccessCopy.approachTime += deltaTime;
-
-	closestAfter->reachPhysicalStopAccesses (accessDirection,
-						  accessParameters, 
-						  result,
-						  currentAccessCopy);
+	VertexAccess access;
+	access.path.push_back (closestAfter);
+	access.approachDistance = _metricOffset - closestAfter->getMetricOffset ();
+	access.approachTime = access.approachDistance / accessParameters.approachSpeed;
+	
+	result.insert (std::make_pair (closestAfter, access));
     }
-
 }
+
+
+
 
 
 

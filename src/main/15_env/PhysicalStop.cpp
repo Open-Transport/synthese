@@ -46,23 +46,6 @@ PhysicalStop::setName (const std::string& name)
 
 
 
-void 
-PhysicalStop::reachPhysicalStopAccesses (
-    const AccessDirection& accessDirection,
-    const AccessParameters& accessParameters,
-    PhysicalStopAccessMap& result,
-    const PhysicalStopAccess& currentAccess) const
-{
-    PhysicalStopAccessMap::const_iterator it = result.find (this);
-    if (it->second.approachTime <= currentAccess.approachTime) return;
-
-    PhysicalStopAccess currentAccessCopy = currentAccess;
-    currentAccessCopy.path.push_back (this);
-    result.insert (std::make_pair (this, currentAccessCopy));
-    
-}
-
-
 
 
 }

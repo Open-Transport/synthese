@@ -27,10 +27,11 @@ class AddressablePlace : public Place
 
 private:
 
-    std::vector<const Address*> _addresses; 
-
 
 protected:
+
+    std::vector<const Address*> _addresses; 
+
 
     AddressablePlace (const std::string& name,
 		      const City* city);
@@ -52,20 +53,13 @@ public:
 
     //! @name Query methods
     //@{
-
-    /** Launches a full navigation of the road network from the 
-     *  set of associated addresses.
-     *
-     * @param accessDirection Is this place an origin or a destination.
-     * @param result The shortest accesses to included places physical stops, or 
-     *               one physical stop accesses of an arbitrarily chosen 
-     *		     connection place of this city.
-     */
-    virtual void reachPhysicalStopAccesses (
-	const AccessDirection& accessDirection,
-	const AccessParameters& accessParameters,
-	PhysicalStopAccessMap& result,
-	const PhysicalStopAccess& currentAccess = PhysicalStopAccess ()) const;
+    
+    virtual void getImmediateVertices (VertexAccessMap& result, 
+				       const AccessDirection& accessDirection,
+				       const AccessParameters& accessParameters,
+				       const Vertex* origin = 0,
+				       bool returnAddresses = true,
+				       bool returnPhysicalStops = true) const;
 
     //@}
 

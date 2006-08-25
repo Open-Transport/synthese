@@ -38,18 +38,27 @@ IncludingPlace::addIncludedPlace (const Place* place)
 
 
 
+
+
 void
-IncludingPlace::reachPhysicalStopAccesses (const AccessDirection& accessDirection,
-					   const AccessParameters& accessParameters,
-					   PhysicalStopAccessMap& result,
-					   const PhysicalStopAccess& currentAccess) const
+IncludingPlace::getImmediateVertices (VertexAccessMap& result, 
+				      const AccessDirection& accessDirection,
+				      const AccessParameters& accessParameters,
+				      const Vertex* origin,
+				      bool returnAddresses,
+				      bool returnPhysicalStops) const
 {
+
     for (std::vector<const Place*>::const_iterator it = _includedPlaces.begin ();
 	 it != _includedPlaces.end (); ++it)
     {
-	(*it)->reachPhysicalStopAccesses (accessDirection, accessParameters, result, currentAccess);
+	(*it)->getImmediateVertices (result, accessDirection, accessParameters, 
+				     origin, returnAddresses, returnPhysicalStops);
     }
+
 }
+
+
 
 
 
