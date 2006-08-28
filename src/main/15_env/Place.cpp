@@ -56,7 +56,7 @@ Place::getCity () const
     
 
     
-Place::VertexAccess
+VertexAccess
 Place::getVertexAccess (const AccessDirection& accessDirection,
 			const AccessParameters& accessParameters,
 			const Vertex* destination,

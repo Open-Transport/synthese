@@ -45,7 +45,7 @@ TemporaryPlace::getMetricOffset () const
 
 
 
-Place::VertexAccess 
+VertexAccess 
 TemporaryPlace::getVertexAccess (const AccessDirection& accessDirection,
 				 const AccessParameters& accessParameters,
 				 const Vertex* destination,

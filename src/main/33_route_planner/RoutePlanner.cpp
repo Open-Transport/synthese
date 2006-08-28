@@ -1,8 +1,17 @@
 #include "RoutePlanner.h"
 
+#include "15_env/Vertex.h"
+#include "15_env/Edge.h"
+#include "15_env/Path.h"
+#include "15_env/Service.h"
 
 using synthese::time::DateTime;
+
 using synthese::env::Place;
+using synthese::env::Vertex;
+using synthese::env::Edge;
+using synthese::env::Path;
+using synthese::env::Service;
 using synthese::env::AccessParameters;
 using synthese::env::AccessDirection;
 using synthese::env::VertexAccessMap;
@@ -73,7 +82,7 @@ RoutePlanner::getDestination () const
 
 JourneyVector 
 RoutePlanner::integralSearch (const VertexAccessMap& vertices, 
-			      const DateTime& desiredTime,
+			      const DateTime& dateTime,
 			      const AccessDirection& accessDirection,
 			      Journey* currentJourney,
 			      int maxDepth,
@@ -83,26 +92,36 @@ RoutePlanner::integralSearch (const VertexAccessMap& vertices,
 {
     JourneyVector result;
 
-/*
-    for (VertexAccessMap::const_iterator it = vertices.begin ();
-	 it != vertices.end (); ++it)
+    for (VertexAccessMap::const_iterator itVertex = vertices.begin ();
+	 itVertex != vertices.end (); ++itVertex)
     {
-	const Vertex* origin = it->first;
+	const Vertex* origin = itVertex->first;
 	
 	for (std::set<const Edge*>::const_iterator itEdge = origin->getDepartureEdges ().begin ();
 	     itEdge != origin->getDepartureEdges ().end () ; ++itEdge)
 	{
 	    const Edge* edge = (*itEdge);
+	    const Path* path = edge->getParentPath ();
+	    
+	    // Check for next available service for this edge at desired time
+	    if (path->isInService (dateTime.getDate ()) == false) continue;
+	    
+	    for (std::vector<Service*>::const_iterator itService = path->getServices ().begin ();
+		 itService != path->getServices ().end (); ++itService)
+	    {
+		
+	    }
+		
 	    
 	    double edgeDistance = edge->getLength ();
 	    double edgeTime = edgeDistance / _accessParameters.approachSpeed;
 	    
-	    double totalDistance = it->second.approachDistance + edgeTime;
-	    double totalTime = it->second.approachTime + edgeTime;
+	    double totalDistance = itVertex->second.approachDistance + edgeTime;
+	    double totalTime = itVertex->second.approachTime + edgeTime;
 	    
 	    
-	    
-	    if (currentAccess.approachDistance + edgeDistance > accessParameters.maxApproachDistance) continue;
+/*	    
+	   if (currentAccess.approachDistance + edgeDistance > accessParameters.maxApproachDistance) continue;
 	    if (currentAccess.approachTime + edgeTime > accessParameters.maxApproachTime) continue;
 	    
 	    PhysicalStopAccess currentAccessCopy = currentAccess;
@@ -110,9 +129,11 @@ RoutePlanner::integralSearch (const VertexAccessMap& vertices,
 	    currentAccessCopy.approachTime += edgeTime;
 	    currentAccessCopy.path.push_back (this);
 	    
+*/
+	    
 	}
     }	
-*/
+
     return result;
     
 }

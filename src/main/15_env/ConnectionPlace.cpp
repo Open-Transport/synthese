@@ -157,7 +157,7 @@ ConnectionPlace::setAlarm (const Alarm* alarm)
 
 
 
-Place::VertexAccess 
+VertexAccess 
 ConnectionPlace::getVertexAccess (const AccessDirection& accessDirection,
 				  const AccessParameters& accessParameters,
 				  const Vertex* destination,
