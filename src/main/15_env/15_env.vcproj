@@ -46,198 +46,136 @@
 				RelativePath=".\Address.cpp">
 			</File>
 			<File
-				RelativePath=".\AddressablePlace.cpp">
-			</File>
-			<File
-				RelativePath=".\Alarm.cpp">
-			</File>
-			<File
-				RelativePath=".\Axis.cpp">
-			</File>
-			<File
-				RelativePath=".\BikeCompliance.cpp">
-			</File>
-			<File
-				RelativePath=".\BikeComplyer.cpp">
-			</File>
-			<File
-				RelativePath=".\Calendar.cpp">
-			</File>
-			<File
-				RelativePath=".\City.cpp">
-			</File>
-			<File
-				RelativePath=".\Compliance.cpp">
-			</File>
-			<File
-				RelativePath=".\ConnectionPlace.cpp">
-			</File>
-			<File
-				RelativePath=".\ContinuousService.cpp">
-			</File>
-			<File
-				RelativePath=".\Crossing.cpp">
-			</File>
-			<File
-				RelativePath=".\Document.cpp">
-			</File>
-			<File
-				RelativePath=".\Edge.cpp">
-			</File>
-			<File
-				RelativePath=".\Environment.cpp">
-			</File>
-			<File
-				RelativePath=".\Fare.cpp">
-			</File>
-			<File
-				RelativePath=".\Gateway.cpp">
-			</File>
-			<File
-				RelativePath=".\HandicappedCompliance.cpp">
-			</File>
-			<File
-				RelativePath=".\HandicappedComplyer.cpp">
-			</File>
-			<File
-				RelativePath=".\IncludingPlace.cpp">
-			</File>
-			<File
-				RelativePath=".\Line.cpp">
-			</File>
-			<File
-				RelativePath=".\LineStop.cpp">
-			</File>
-			<File
-				RelativePath=".\LogicalStop.cpp">
-			</File>
-			<File
-				RelativePath=".\Path.cpp">
-			</File>
-			<File
-				RelativePath=".\PedestrianCompliance.cpp">
-			</File>
-			<File
-				RelativePath=".\PedestrianComplyer.cpp">
-			</File>
-			<File
-				RelativePath=".\PhysicalStop.cpp">
-			</File>
-			<File
-				RelativePath=".\Place.cpp">
-			</File>
-			<File
-				RelativePath=".\PlaceAlias.cpp">
-			</File>
-			<File
-				RelativePath=".\Point.cpp">
-			</File>
-			<File
-				RelativePath=".\PublicPlace.cpp">
-			</File>
-			<File
-				RelativePath=".\Regulated.cpp">
-			</File>
-			<File
-				RelativePath=".\ReservationRule.cpp">
-			</File>
-			<File
-				RelativePath=".\ReservationRuleComplyer.cpp">
-			</File>
-			<File
-				RelativePath=".\Road.cpp">
-			</File>
-			<File
-				RelativePath=".\RoadChunk.cpp">
-			</File>
-			<File
-				RelativePath=".\RollingStock.cpp">
-			</File>
-			<File
-				RelativePath=".\ScheduledService.cpp">
-			</File>
-			<File
-				RelativePath=".\Service.cpp">
-			</File>
-			<File
-				RelativePath=".\SquareDistance.cpp">
-			</File>
-			<File
-				RelativePath=".\TransportNetwork.cpp">
-			</File>
-			<File
-				RelativePath=".\Vertex.cpp">
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
 				RelativePath=".\Address.h">
+			</File>
+			<File
+				RelativePath=".\AddressablePlace.cpp">
 			</File>
 			<File
 				RelativePath=".\AddressablePlace.h">
 			</File>
 			<File
+				RelativePath=".\Alarm.cpp">
+			</File>
+			<File
 				RelativePath=".\Alarm.h">
+			</File>
+			<File
+				RelativePath=".\Axis.cpp">
 			</File>
 			<File
 				RelativePath=".\Axis.h">
 			</File>
 			<File
+				RelativePath=".\BikeCompliance.cpp">
+			</File>
+			<File
 				RelativePath=".\BikeCompliance.h">
+			</File>
+			<File
+				RelativePath=".\BikeComplyer.cpp">
 			</File>
 			<File
 				RelativePath=".\BikeComplyer.h">
 			</File>
 			<File
+				RelativePath=".\Calendar.cpp">
+			</File>
+			<File
 				RelativePath=".\Calendar.h">
+			</File>
+			<File
+				RelativePath=".\City.cpp">
 			</File>
 			<File
 				RelativePath=".\City.h">
 			</File>
 			<File
+				RelativePath=".\Compliance.cpp">
+			</File>
+			<File
 				RelativePath=".\Compliance.h">
+			</File>
+			<File
+				RelativePath=".\ConnectionPlace.cpp">
 			</File>
 			<File
 				RelativePath=".\ConnectionPlace.h">
 			</File>
 			<File
+				RelativePath=".\ContinuousService.cpp">
+			</File>
+			<File
 				RelativePath=".\ContinuousService.h">
+			</File>
+			<File
+				RelativePath=".\Crossing.cpp">
 			</File>
 			<File
 				RelativePath=".\Crossing.h">
 			</File>
 			<File
+				RelativePath=".\Document.cpp">
+			</File>
+			<File
 				RelativePath=".\Document.h">
+			</File>
+			<File
+				RelativePath=".\Edge.cpp">
 			</File>
 			<File
 				RelativePath=".\Edge.h">
 			</File>
 			<File
+				RelativePath=".\Environment.cpp">
+			</File>
+			<File
 				RelativePath=".\Environment.h">
+			</File>
+			<File
+				RelativePath=".\Fare.cpp">
 			</File>
 			<File
 				RelativePath=".\Fare.h">
 			</File>
 			<File
+				RelativePath=".\Gateway.cpp">
+			</File>
+			<File
 				RelativePath=".\Gateway.h">
+			</File>
+			<File
+				RelativePath=".\HandicappedCompliance.cpp">
 			</File>
 			<File
 				RelativePath=".\HandicappedCompliance.h">
 			</File>
 			<File
+				RelativePath=".\HandicappedComplyer.cpp">
+			</File>
+			<File
 				RelativePath=".\HandicappedComplyer.h">
+			</File>
+			<File
+				RelativePath=".\IncludingPlace.cpp">
 			</File>
 			<File
 				RelativePath=".\IncludingPlace.h">
 			</File>
 			<File
+				RelativePath=".\Line.cpp">
+			</File>
+			<File
 				RelativePath=".\Line.h">
 			</File>
 			<File
+				RelativePath=".\LineStop.cpp">
+			</File>
+			<File
 				RelativePath=".\LineStop.h">
+			</File>
+			<File
+				RelativePath=".\LogicalStop.cpp">
 			</File>
 			<File
 				RelativePath=".\LogicalStop.h">
@@ -246,25 +184,52 @@
 				RelativePath=".\module.h">
 			</File>
 			<File
+				RelativePath=".\Navigable.h">
+			</File>
+			<File
+				RelativePath=".\Path.cpp">
+			</File>
+			<File
 				RelativePath=".\Path.h">
+			</File>
+			<File
+				RelativePath=".\PedestrianCompliance.cpp">
 			</File>
 			<File
 				RelativePath=".\PedestrianCompliance.h">
 			</File>
 			<File
+				RelativePath=".\PedestrianComplyer.cpp">
+			</File>
+			<File
 				RelativePath=".\PedestrianComplyer.h">
+			</File>
+			<File
+				RelativePath=".\PhysicalStop.cpp">
 			</File>
 			<File
 				RelativePath=".\PhysicalStop.h">
 			</File>
 			<File
+				RelativePath=".\Place.cpp">
+			</File>
+			<File
 				RelativePath=".\Place.h">
+			</File>
+			<File
+				RelativePath=".\PlaceAlias.cpp">
 			</File>
 			<File
 				RelativePath=".\PlaceAlias.h">
 			</File>
 			<File
+				RelativePath=".\Point.cpp">
+			</File>
+			<File
 				RelativePath=".\Point.h">
+			</File>
+			<File
+				RelativePath=".\PublicPlace.cpp">
 			</File>
 			<File
 				RelativePath=".\PublicPlace.h">
@@ -282,34 +247,73 @@
 				RelativePath=".\RegistryKeyException.h">
 			</File>
 			<File
+				RelativePath=".\Regulated.cpp">
+			</File>
+			<File
 				RelativePath=".\Regulated.h">
+			</File>
+			<File
+				RelativePath=".\ReservationRule.cpp">
 			</File>
 			<File
 				RelativePath=".\ReservationRule.h">
 			</File>
 			<File
+				RelativePath=".\ReservationRuleComplyer.cpp">
+			</File>
+			<File
 				RelativePath=".\ReservationRuleComplyer.h">
+			</File>
+			<File
+				RelativePath=".\Road.cpp">
 			</File>
 			<File
 				RelativePath=".\Road.h">
 			</File>
 			<File
+				RelativePath=".\RoadChunk.cpp">
+			</File>
+			<File
 				RelativePath=".\RoadChunk.h">
+			</File>
+			<File
+				RelativePath=".\RollingStock.cpp">
 			</File>
 			<File
 				RelativePath=".\RollingStock.h">
 			</File>
 			<File
+				RelativePath=".\ScheduledService.cpp">
+			</File>
+			<File
 				RelativePath=".\ScheduledService.h">
+			</File>
+			<File
+				RelativePath=".\Service.cpp">
 			</File>
 			<File
 				RelativePath=".\Service.h">
 			</File>
 			<File
+				RelativePath=".\SquareDistance.cpp">
+			</File>
+			<File
 				RelativePath=".\SquareDistance.h">
 			</File>
 			<File
+				RelativePath=".\TemporaryPlace.cpp">
+			</File>
+			<File
+				RelativePath=".\TemporaryPlace.h">
+			</File>
+			<File
+				RelativePath=".\TransportNetwork.cpp">
+			</File>
+			<File
 				RelativePath=".\TransportNetwork.h">
+			</File>
+			<File
+				RelativePath=".\Vertex.cpp">
 			</File>
 			<File
 				RelativePath=".\Vertex.h">

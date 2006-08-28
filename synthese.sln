@@ -83,6 +83,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "71_cgi_client", "src\main\7
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "32_integral_search", "src\main\32_integral_search\32_integral_search.vcproj", "{DCB40545-776B-4B6E-A050-D4A513880697}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -173,6 +177,10 @@ Global
 		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Debug.Build.0 = Debug|Win32
 		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Release.ActiveCfg = Release|Win32
 		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Release.Build.0 = Release|Win32
+		{DCB40545-776B-4B6E-A050-D4A513880697}.Debug.ActiveCfg = Debug|Win32
+		{DCB40545-776B-4B6E-A050-D4A513880697}.Debug.Build.0 = Debug|Win32
+		{DCB40545-776B-4B6E-A050-D4A513880697}.Release.ActiveCfg = Release|Win32
+		{DCB40545-776B-4B6E-A050-D4A513880697}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
 		SConstruct = SConstruct
