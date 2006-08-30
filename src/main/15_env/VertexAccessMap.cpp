@@ -20,8 +20,10 @@ namespace env
 
 
 VertexAccessMap::VertexAccessMap ()
+    : _isobarycenterUpToDate (false)
+    , _isobarycenterMaxSquareDistanceUpToDate (false)
 {
-
+    
 }
 
 
@@ -76,10 +78,60 @@ VertexAccessMap::insert (const Vertex* vertex,
 {
     _map.insert (std::make_pair (vertex, vertexAccess));
     updateNonLineConnectableVertexMap ();
-    updateIsobarycenter ();
-    updateIsobarycenterMaxDistance ();    
+    _isobarycenterUpToDate = false;
+    _isobarycenterMaxSquareDistanceUpToDate = false;
+
 }
 
+
+
+
+
+const Point& 
+VertexAccessMap::getIsobarycenter () const
+{
+    if (_isobarycenterUpToDate == false)
+    {
+	double sumx (0.0);
+	double sumy (0.0);
+	
+	for (std::map<const Vertex*, VertexAccess>::const_iterator it = _map.begin ();
+	     it != _map.end (); ++it)
+	{
+	    sumx += it->first->getX ();
+	    sumy += it->first->getY ();
+	}
+	
+	_isobarycenter.setX (sumx / ((double) _map.size ()));
+	_isobarycenter.setY (sumy / ((double) _map.size ()));
+	
+	_isobarycenterUpToDate = true;
+    }
+    return _isobarycenter;
+    
+}
+
+
+const SquareDistance&
+VertexAccessMap::getIsobarycenterMaxSquareDistance () const
+{
+    if (_isobarycenterMaxSquareDistanceUpToDate == false)
+    {
+	_isobarycenterMaxSquareDistance.setSquareDistance (0);
+	for (std::map<const Vertex*, VertexAccess>::const_iterator it = _map.begin ();
+	     it != _map.end (); ++it)
+	{
+	    SquareDistance sqd (*(it->first), _isobarycenter);
+	    if (_isobarycenterMaxSquareDistance < sqd)
+	    {
+		_isobarycenterMaxSquareDistance.setSquareDistance (sqd.getSquareDistance ());
+	    }
+	}
+	_isobarycenterMaxSquareDistanceUpToDate = true;
+    }
+    return _isobarycenterMaxSquareDistance;
+    
+}
 
 
 
@@ -87,8 +139,7 @@ VertexAccessMap::insert (const Vertex* vertex,
 void 
 VertexAccessMap::updateNonLineConnectableVertexMap ()
 {
-    // TODO : confirm that connection_roadonly means that connection contains at most
-    // one line and then only raods.
+    // TODO : make it lazy... on demand
 
     for (std::map<const Vertex*, VertexAccess>::const_iterator it = _map.begin ();
 	 it != _map.end (); ++it)
@@ -123,45 +174,6 @@ VertexAccessMap::updateNonLineConnectableVertexMap ()
 }
 
 
-
-
-
-void 
-VertexAccessMap::updateIsobarycenter ()
-{
-    double sumx (0.0);
-    double sumy (0.0);
-
-    for (std::map<const Vertex*, VertexAccess>::const_iterator it = _map.begin ();
-	 it != _map.end (); ++it)
-    {
-	sumx += it->first->getX ();
-	sumy += it->first->getY ();
-    }
-
-    _isobarycenter.setX (sumx / ((double) _map.size ()));
-    _isobarycenter.setY (sumy / ((double) _map.size ()));
-    
-
-}
-
-
-
-void 
-VertexAccessMap::updateIsobarycenterMaxDistance ()
-{
-    _isobarycenterMaxDistance = 0.0;
-    double distance (0.0);
-    for (std::map<const Vertex*, VertexAccess>::const_iterator it = _map.begin ();
-	 it != _map.end (); ++it)
-    {
-	distance = it->first->distanceTo (_isobarycenter);
-	if (distance > _isobarycenterMaxDistance)
-	{
-	    _isobarycenterMaxDistance = distance;
-	}
-    }
-}
 
 
 

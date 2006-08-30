@@ -182,17 +182,33 @@ bool cCalculateur::DestinationUtilePourArriverTot(const cGare* __PointArret, con
 
 
 bool
-RoutePlanner::isDestinationUsefulForSoonArrival (const VertexAccessMap* vam,
+RoutePlanner::isDestinationUsefulForSoonArrival (const Vertex* vertex,
 						 const DateTime& dateTime,
 						 SquareDistance& sqd) const
 {
-/*    if (sqd.getSquareDistance () == UNKNOWN_VALUE)
+    if (sqd.getSquareDistance () == UNKNOWN_VALUE)
     {
-//	sqd.setFromPoints (*vertex, );  // which vertex from the arrival vam ?
+	sqd.setFromPoints (*vertex, _destinationVam.getIsobarycenter ());  
+	sqd.setSquareDistance (sqd.getSquareDistance () - 
+			       _destinationVam.getIsobarycenterMaxSquareDistance ().getSquareDistance ());
+	
     }
-*/
     
+/*
+	//! <li>Evaluation du moment "au plus tot" où peut démarrer</li>
+	cMoment __MomentArriveeAvantInclusCorrespondance = __Moment;
+	if (!vPADeDestination->inclue(__PointArret))
+		__MomentArriveeAvantInclusCorrespondance += __PointArret->AttenteMinimale();
+
+	//! <li>Test 1 : Non dépassement du moment d'arrivée maximal</li>
+	if (__MomentArriveeAvantInclusCorrespondance > vArriveeMax)
+		return false;
+	
+	//!	\todo Remettre ici un controle par VMAX
+	
+	return true;
     // TODO...
+    */
     return true;
 
 }
@@ -234,14 +250,12 @@ RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
 				   arrivalMoment);
 
     SquareDistance sqd;
-/*    if (isDestinationUsefulForSoonArrival (arrivalEdge->getFromVertex (),
-					   arrivalMoment,
-					   sqd) == false)
+    if (isDestinationUsefulForSoonArrival (arrivalEdge->getFromVertex (),
+					   arrivalMoment, sqd) == false)
     {
 	return false;
     }
 
-*/
 
     // Continuous service breaking
     if (_previousContinuousServiceDuration)

@@ -5,6 +5,7 @@
 #include "module.h"
 
 #include "Point.h"
+#include "SquareDistance.h"
 
 
 #include <vector>
@@ -58,8 +59,11 @@ private:
     std::map<const Line*, bool> _nonLineConnectableDepartureVertex;
     std::map<const Line*, bool> _nonLineConnectableArrivalVertex;
     
-    Point _isobarycenter;   //!< Isobarycenter of all points contained in this map.
-    double _isobarycenterMaxDistance;   //!< Maximum distance of one map point with the isobarycenter.
+    mutable bool _isobarycenterUpToDate;
+    mutable bool _isobarycenterMaxSquareDistanceUpToDate;
+
+    mutable Point _isobarycenter;   //!< Isobarycenter of all points contained in this map.
+    mutable SquareDistance _isobarycenterMaxSquareDistance;   //!< Maximum square distance of one map point with the isobarycenter.
 
 
 
@@ -80,14 +84,12 @@ private:
     
     void insert (const Vertex* vertex, const VertexAccess& vertexAccess);
     
-    // TODO : rajouter a l'init le calcul de l'isobarycentre et la distance max de cet iso
-    // avec chacun des vertex.
-
+    const Point& getIsobarycenter () const;
+    const SquareDistance& getIsobarycenterMaxSquareDistance () const;
+    
  private:
 
     void updateNonLineConnectableVertexMap ();
-    void updateIsobarycenter ();
-    void updateIsobarycenterMaxDistance ();
 
 
 };

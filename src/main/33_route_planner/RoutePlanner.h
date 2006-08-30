@@ -143,7 +143,7 @@ class RoutePlanner
     bool isPathCompliant (const synthese::env::Path* path, 
 			  const Journey* journey) const;
 
-    bool isDestinationUsefulForSoonArrival (const synthese::env::VertexAccessMap* vam,
+    bool isDestinationUsefulForSoonArrival (const synthese::env::Vertex* vertex,
 					    const synthese::time::DateTime& dateTime,
 					    synthese::env::SquareDistance& sqd) const;
     
