@@ -62,6 +62,7 @@ private:
 
     std::map< std::pair<int, int>, int > _transferDelays; //!< Transfer delays between vertices
     int _defaultTransferDelay;
+    int _minTransferDelay;
 
     const Alarm* _alarm; //!< Current valid alarm
 
@@ -84,6 +85,8 @@ public:
     int getDefaultTransferDelay () const;
     void setDefaultTransferDelay (int defaultTransferDelay);
 
+    int getMinTransferDelay () const;
+
     const ConnectionType& getConnectionType () const;
     void setConnectionType (const ConnectionType& connectionType);
 
@@ -104,6 +107,7 @@ public:
 
     int getTransferDelay (int departureRank, int arrivalRank) const;
 
+
     VertexAccess getVertexAccess (const AccessDirection& accessDirection,
 				  const AccessParameters& accessParameters,
 				  const Vertex* destination,
@@ -115,7 +119,8 @@ public:
 			       const Vertex* origin = 0,
 			       bool returnAddresses = true,
 			       bool returnPhysicalStops = true) const;
-
+    
+    
     //@}
 
 

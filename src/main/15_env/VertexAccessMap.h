@@ -82,6 +82,7 @@ private:
     bool hasNonLineConnectableDepartureVertex (const Line* line) const;
     bool hasNonLineConnectableArrivalVertex (const Line* line) const;
     
+    bool contains (const Vertex* vertex) const;
     void insert (const Vertex* vertex, const VertexAccess& vertexAccess);
     
     const Point& getIsobarycenter () const;

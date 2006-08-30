@@ -4,6 +4,7 @@
 
 
 #include "15_env/Vertex.h"
+#include "15_env/ConnectionPlace.h"
 #include "15_env/Edge.h"
 #include "15_env/Line.h"
 #include "15_env/Service.h"
@@ -21,6 +22,7 @@ using synthese::env::Path;
 using synthese::env::Line;
 using synthese::env::Service;
 using synthese::env::SquareDistance;
+using synthese::env::ConnectionPlace;
 
 using synthese::env::AccessParameters;
 using synthese::env::AccessDirection;
@@ -190,27 +192,24 @@ RoutePlanner::isDestinationUsefulForSoonArrival (const Vertex* vertex,
     {
 	sqd.setFromPoints (*vertex, _destinationVam.getIsobarycenter ());  
 	sqd.setSquareDistance (sqd.getSquareDistance () - 
-			       _destinationVam.getIsobarycenterMaxSquareDistance ().getSquareDistance ());
+			       _destinationVam.getIsobarycenterMaxSquareDistance ().
+			       getSquareDistance ());
 	
     }
     
-/*
-	//! <li>Evaluation du moment "au plus tot" où peut démarrer</li>
-	cMoment __MomentArriveeAvantInclusCorrespondance = __Moment;
-	if (!vPADeDestination->inclue(__PointArret))
-		__MomentArriveeAvantInclusCorrespondance += __PointArret->AttenteMinimale();
+    // Check that the maximal arrival time is not exceeded
+    DateTime arrivalMoment (dateTime);
+    if (_destinationVam.contains (vertex))
+    {
+	arrivalMoment += vertex->getConnectionPlace ()->getMinTransferDelay ();
+    }
 
-	//! <li>Test 1 : Non dépassement du moment d'arrivée maximal</li>
-	if (__MomentArriveeAvantInclusCorrespondance > vArriveeMax)
-		return false;
-	
-	//!	\todo Remettre ici un controle par VMAX
-	
-	return true;
-    // TODO...
-    */
+    if (arrivalMoment > _journeySheetEndTime) return false;
+
+    // TODO : re-implement VMax control.
+
     return true;
-
+    
 }
 
 

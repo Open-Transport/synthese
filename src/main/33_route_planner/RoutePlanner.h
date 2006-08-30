@@ -69,8 +69,8 @@ class RoutePlanner
     
     const PlanningOrder _planningOrder;  //!< Define planning sequence.
 
-    const synthese::time::DateTime _journeySheetStartTime;  //!< Start time of schedule sheet.
-    const synthese::time::DateTime _journeySheetEndTime;    //!< End time of schedule sheet.
+    const synthese::time::DateTime _journeySheetStartTime;  //!< Start time of schedule sheet (= min departure time).
+    const synthese::time::DateTime _journeySheetEndTime;    //!< End time of schedule sheet (= max arrival time).
 
     const synthese::time::DateTime _calculationTime;    //!< Time of calculation (initialized to current time)
 

@@ -72,6 +72,15 @@ VertexAccessMap::hasNonLineConnectableArrivalVertex (const Line* line) const
 
 
 
+bool 
+VertexAccessMap::contains (const Vertex* vertex) const
+{
+    return (_map.find (vertex) != _map.end ());
+}
+
+
+
+
 void 
 VertexAccessMap::insert (const Vertex* vertex, 
 			 const VertexAccess& vertexAccess)
@@ -132,6 +141,8 @@ VertexAccessMap::getIsobarycenterMaxSquareDistance () const
     return _isobarycenterMaxSquareDistance;
     
 }
+
+
 
 
 
