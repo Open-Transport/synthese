@@ -66,8 +66,12 @@ private:
 
     const Edge* _previousDeparture;  //!< Previous departure edge along path.
     const Edge* _previousConnectionDeparture; //!< Previous connection departure edge along path.
+    const Edge* _previousLineConnectionDeparture; //!< Previous transport line connection departure edge along path.
     const Edge* _followingArrival;  //!< Next arrival edge along path.
     const Edge* _followingConnectionArrival; //!< Next connection arrival edge along path.
+    const Edge* _followingLineConnectionArrival; //!< Next transport line connection arrival edge along path.
+
+    // TODO : separate connection on transport network from connection on road network
 
     std::vector<const Point*> _viaPoints; //!< Intermediate points along the edge.
 
@@ -122,11 +126,17 @@ public:
     const Edge* getPreviousConnectionDeparture () const;
     void setPreviousConnectionDeparture( const Edge* previousConnectionDeparture);
 
+    const Edge* getPreviousLineConnectionDeparture () const;
+    void setPreviousLineConnectionDeparture( const Edge* previousConnectionDeparture);
+
     const Edge* getFollowingArrival () const;
     void setFollowingArrival ( const Edge* followingArrival);
 
     const Edge* getFollowingConnectionArrival () const;
     void setFollowingConnectionArrival( const Edge* followingConnectionArrival);
+    
+    const Edge* getFollowingLineConnectionArrival () const;
+    void setFollowingLineConnectionArrival( const Edge* followingLineConnectionArrival);
     
     /** Gets intermediate points 
      * between this line stop and the next in path.
@@ -178,6 +188,12 @@ public:
       @return true if no problem detected, false otherwise
     */
     bool checkSchedule (const Edge* edgeWithPreviousSchedule ) const;
+
+
+
+    // TODO : initialisation des filtres de compliance de la ligne pour tenir compte
+    // de ceux des services et eviter le parcour total de tous les services
+
     
     /** Provides next departure service number (method 1)
 	@param departureMoment Presence hour at departure place
@@ -203,20 +219,23 @@ public:
 	@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
 	@retval continuousServiceAmplitude Continuous service amplitude. 0 means scheduled service.
     */
-    int getNextService ( synthese::time::DateTime& departureMoment, 
+/*    int getNextService ( synthese::time::DateTime& departureMoment, 
 			 const synthese::time::DateTime& maxDepartureMoment,
 			 int& continuousServiceAmplitude, 
 			 int minNextServiceNumber,
 			 const synthese::time::DateTime& calculationMoment ) const;
+*/
  
 
     int getPreviousService ( synthese::time::DateTime& arrivalMoment, 
 			     const synthese::time::DateTime& minArrivalMoment,
-			     int continuousServiceAmplitude ) const;
+			     int maxPreviousServiceNumber = UNKNOWN_VALUE) const;
     
+/*    
     int getPreviousService ( synthese::time::DateTime& arrivalMoment, 
-			     const synthese::time::DateTime& minArrivalMoment ) const;
-    
+			     const synthese::time::DateTime& minArrivalMoment,
+			     int continuousServiceAmplitude ) const;
+*/  
 
 
     //@}

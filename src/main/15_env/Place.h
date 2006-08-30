@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+#include "VertexAccessMap.h"
+
 
 namespace synthese
 {
@@ -20,27 +22,6 @@ namespace env
  class Vertex;
 
  
- typedef std::vector<const Vertex*> AccessPath;
- typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
- 
-
- typedef struct {
-     double maxApproachDistance;
-     double maxApproachTime;
-     double approachSpeed;
-     
- } AccessParameters;
- 
- 
- typedef struct {
-     AccessPath path;
-     double approachTime;
-     double approachDistance;
- } VertexAccess;
- 
-    
- typedef std::map<const Vertex*, VertexAccess> VertexAccessMap;
-
 
 
 /** Place base class.

@@ -61,9 +61,9 @@ AddressablePlace::getImmediateVertices (VertexAccessMap& result,
 	     it != _addresses.end (); ++it)
 	{
 	    if (origin == (*it)) continue;
-	    result.insert (std::make_pair ((*it), getVertexAccess (accessDirection,
-								   accessParameters,
-								   (*it), origin)));
+	    result.insert ((*it), getVertexAccess (accessDirection,
+						   accessParameters,
+						   (*it), origin));
 	}
     }
 

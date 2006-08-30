@@ -113,11 +113,27 @@ Edge::getPreviousConnectionDeparture () const
 }
 
 
+const Edge* 
+Edge::getPreviousLineConnectionDeparture () const
+{
+    return _previousLineConnectionDeparture;
+}
+
+
+
 
 const Edge* 
 Edge::getFollowingConnectionArrival () const
 {
     return _followingConnectionArrival;
+}
+
+
+
+const Edge* 
+Edge::getFollowingLineConnectionArrival () const
+{
+    return _followingLineConnectionArrival;
 }
 
 
@@ -139,6 +155,13 @@ Edge::setPreviousConnectionDeparture( const Edge* previousConnectionDeparture)
 }
 
 
+void 
+Edge::setPreviousLineConnectionDeparture( const Edge* previousLineConnectionDeparture)
+{
+    _previousLineConnectionDeparture = previousLineConnectionDeparture;
+}
+
+
 
 
 void 
@@ -154,6 +177,15 @@ void
 Edge::setFollowingConnectionArrival( const Edge* followingConnectionArrival)
 {
     _followingConnectionArrival = followingConnectionArrival;
+}
+
+
+
+
+void 
+Edge::setFollowingLineConnectionArrival( const Edge* followingLineConnectionArrival)
+{
+    _followingLineConnectionArrival = followingLineConnectionArrival;
 }
 
 
@@ -445,38 +477,12 @@ Edge::getNextService (synthese::time::DateTime& departureMoment,
 
 
 
-int 
-Edge::getNextService ( synthese::time::DateTime& departureMoment, 
-			   const synthese::time::DateTime& maxDepartureMoment,
-			   int& continuousServiceAmplitude, 
-			   int minNextServiceNumber,
-			   const synthese::time::DateTime& calculationMoment ) const
-{
-    int next = getNextService( departureMoment, 
-			       maxDepartureMoment, 
-			       calculationMoment, 
-			       minNextServiceNumber );
-
-    if ( next != UNKNOWN_VALUE && getParentPath ()->getService ( next )->isContinuous () )
-    {
-        if ( departureMoment > _departureEndSchedule[ next ] )
-            continuousServiceAmplitude = 1440 - ( departureMoment.getHour() - _departureEndSchedule[ next ].getHour() );
-        else
-            continuousServiceAmplitude = _departureEndSchedule[ next ].getHour() - departureMoment.getHour();
-    } 
-    else
-        continuousServiceAmplitude = 0;
-
-    return next;
-}
-
-
-
 
 
 int 
 Edge::getPreviousService ( synthese::time::DateTime& arrivalMoment, 
-			       const synthese::time::DateTime& minArrivalMoment ) const
+			   const synthese::time::DateTime& minArrivalMoment,
+			   int maxPreviousServiceNumber) const
 
 {
     int previous;
@@ -537,11 +543,11 @@ Edge::getPreviousService ( synthese::time::DateTime& arrivalMoment,
 
 
 
-
+/*
 int 
 Edge::getPreviousService ( synthese::time::DateTime& arrivalMoment, 
-			       const synthese::time::DateTime& minArrivalMoment,
-			       int continuousServiceAmplitude ) const
+			   const synthese::time::DateTime& minArrivalMoment,
+			   int continuousServiceAmplitude ) const
 {
     
     int previous = getPreviousService ( arrivalMoment, minArrivalMoment );
@@ -559,7 +565,34 @@ Edge::getPreviousService ( synthese::time::DateTime& arrivalMoment,
     return previous;
 }
 
+*/
 
+/*
+int 
+Edge::getNextService ( synthese::time::DateTime& departureMoment, 
+			   const synthese::time::DateTime& maxDepartureMoment,
+			   int& continuousServiceAmplitude, 
+			   int minNextServiceNumber,
+			   const synthese::time::DateTime& calculationMoment ) const
+{
+    int next = getNextService( departureMoment, 
+			       maxDepartureMoment, 
+			       calculationMoment, 
+			       minNextServiceNumber );
+
+    if ( next != UNKNOWN_VALUE && getParentPath ()->getService ( next )->isContinuous () )
+    {
+        if ( departureMoment > _departureEndSchedule[ next ] )
+            continuousServiceAmplitude = 1440 - ( departureMoment.getHour() - _departureEndSchedule[ next ].getHour() );
+        else
+            continuousServiceAmplitude = _departureEndSchedule[ next ].getHour() - departureMoment.getHour();
+    } 
+    else
+        continuousServiceAmplitude = 0;
+
+    return next;
+}
+*/
 
 
 

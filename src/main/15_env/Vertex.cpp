@@ -1,5 +1,7 @@
 #include "Vertex.h"
 
+#include "Edge.h"
+
 
 
 
@@ -78,7 +80,6 @@ Vertex::addArrivalEdge ( const Edge* edge )
 {
     _arrivalEdges.insert (edge);    
 }
-
 
 
 

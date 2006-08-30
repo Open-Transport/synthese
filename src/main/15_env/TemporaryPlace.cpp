@@ -83,7 +83,7 @@ TemporaryPlace::getImmediateVertices (VertexAccessMap& result,
 	access.approachDistance = _metricOffset - closestBefore->getMetricOffset ();
 	access.approachTime = access.approachDistance / accessParameters.approachSpeed;
 	
-	result.insert (std::make_pair (closestBefore, access));
+	result.insert (closestBefore, access);
     }
 
     if ( (closestAfter != 0) && (closestAfter != closestBefore) )
@@ -93,7 +93,7 @@ TemporaryPlace::getImmediateVertices (VertexAccessMap& result,
 	access.approachDistance = _metricOffset - closestAfter->getMetricOffset ();
 	access.approachTime = access.approachDistance / accessParameters.approachSpeed;
 	
-	result.insert (std::make_pair (closestAfter, access));
+	result.insert (closestAfter, access);
     }
 }
 

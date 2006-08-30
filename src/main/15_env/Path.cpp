@@ -224,6 +224,14 @@ Path::addEdge (Edge* edge)
 		     ->isConnectionAuthorized () )
 		{
                     currentEdge->setFollowingConnectionArrival ( edge );
+
+		    if ( (currentEdge->getFollowingLineConnectionArrival () == 0) &&
+			 (edge->getFromVertex ()->getConnectionPlace()
+			  ->isConnectionRoadOnly () == false) )
+		    {
+			currentEdge->setFollowingLineConnectionArrival ( edge );
+		    }
+
 		} 
                 if ( currentEdge->isDeparture () && 
 		     edge->getPreviousDeparture () == 0 )
@@ -237,6 +245,13 @@ Path::addEdge (Edge* edge)
 		     ->getConnectionPlace()->isConnectionAuthorized() )
 		{
                     edge->setPreviousConnectionDeparture ( currentEdge );
+
+		    if ( (edge->getPreviousLineConnectionDeparture () == 0) &&
+			 (currentEdge->getFromVertex ()->getConnectionPlace ()
+			  ->isConnectionRoadOnly () == false) )
+		    {
+			edge->setPreviousLineConnectionDeparture (currentEdge);
+		    }
 		}
             }
         }

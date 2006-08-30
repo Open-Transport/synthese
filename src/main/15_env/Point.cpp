@@ -1,5 +1,7 @@
 #include "Point.h"
 
+#include <cmath>
+
 
 namespace synthese
 {
@@ -72,6 +74,16 @@ Point::setY( double yM )
         _yKm = ( short int ) ( yM / 1000 );
         _yM = yM;
     }
+}
+
+
+
+
+double 
+Point::distanceTo (const synthese::env::Point& p) const
+{
+    return sqrt ((p.getX() - getX()) * (p.getX() - getX()) + 
+		 (p.getY() - getY()) * (p.getY() - getY()));
 }
 
 

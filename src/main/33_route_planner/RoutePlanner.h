@@ -5,9 +5,12 @@
 #include <vector>
 #include <map>
 
+#include "04_time/DateTime.h"
 
 
 #include "15_env/Place.h"
+#include "15_env/VertexAccessMap.h"
+
 
 
 
@@ -23,7 +26,10 @@ namespace time
 
 namespace env
 {
+    class Edge;
+    class Path;
     class Vertex;
+    class SquareDistance;
 }
 
 
@@ -56,13 +62,22 @@ class RoutePlanner
     const synthese::env::Place* _origin;  //<! Origin place for route planning.
     const synthese::env::Place* _destination;  //!< Destination place for route planning.
 
+    synthese::env::VertexAccessMap _originVam;
+    synthese::env::VertexAccessMap _destinationVam;
+
     const synthese::env::AccessParameters _accessParameters;
     
     const PlanningOrder _planningOrder;  //!< Define planning sequence.
-    
-    const synthese::time::DateTime& _journeySheetStartTime;  //!< Start time of schedule sheet.
-    const synthese::time::DateTime& _journeySheetEndTime;    //!< End time of schedule sheet.
 
+    const synthese::time::DateTime _journeySheetStartTime;  //!< Start time of schedule sheet.
+    const synthese::time::DateTime _journeySheetEndTime;    //!< End time of schedule sheet.
+
+    const synthese::time::DateTime _calculationTime;    //!< Time of calculation (initialized to current time)
+
+    int _previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
+
+    synthese::time::DateTime _previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
+    
 
  public:
 
@@ -123,7 +138,24 @@ class RoutePlanner
 
     JourneyVector elaborateJourneySheet () const;
 
+ private:
 
+    bool isPathCompliant (const synthese::env::Path* path, 
+			  const Journey* journey) const;
+
+    bool isDestinationUsefulForSoonArrival (const synthese::env::VertexAccessMap* vam,
+					    const synthese::time::DateTime& dateTime,
+					    synthese::env::SquareDistance& sqd) const;
+    
+    bool evaluateArrival (const synthese::env::Edge* arrivalEdge,
+			  const synthese::time::DateTime& departureMoment,
+			  const synthese::env::Edge* departureEdge,
+			  int serviceNumber,
+			  Journey& journeyPart,
+			  const Journey& currentJourney,
+			  bool strictTime,
+			  int continuousServiceRange);
+	
     //@}
 
 

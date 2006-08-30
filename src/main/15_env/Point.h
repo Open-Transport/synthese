@@ -54,10 +54,16 @@ class Point
         void setX ( double x);
 
         /** Latitude setter.
-			@param y New longitude in meters
-		*/
+	    @param y New latitude in meters
+	*/
         void setY ( double y);
 	//@}
+
+
+	/** Calculates the euclidian distance between this point and another point.
+	 * @return The calculated distance.
+	 */
+	double distanceTo (const synthese::env::Point& p) const; 
 
 
         /** Coordinates comparison operator.

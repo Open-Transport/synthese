@@ -17,6 +17,7 @@ namespace env
 
     class ConnectionPlace;
     class Edge;
+    class Path;
 
 
 /** Vertex base class.
@@ -68,7 +69,6 @@ public:
 
     //! @name Query methods
     //@{
-
 
     //@}
     

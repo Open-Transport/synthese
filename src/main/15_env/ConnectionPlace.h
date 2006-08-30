@@ -3,6 +3,7 @@
 
 
 #include <map>
+#include <set>
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
@@ -24,6 +25,7 @@ namespace env
 
 class Address;
 class Alarm;
+class Path; 
 class PhysicalStop;
 
 
@@ -42,8 +44,9 @@ class ConnectionPlace :
 public:
 
     typedef enum { 
-	CONNECTION_TYPE_FORBIDDEN,
-	CONNECTION_TYPE_AUTHORIZED,
+	CONNECTION_TYPE_FORBIDDEN,           // forbidden connection
+	CONNECTION_TYPE_ROADONLY,            // 
+	CONNECTION_TYPE_AUTHORIZED,          // connection authorized
 	CONNECTION_TYPE_RECOMMENDED_SHORT,
 	CONNECTION_TYPE_RECOMMENDED
     } ConnectionType;
@@ -95,7 +98,10 @@ public:
 
     //! @name Query methods.
     //@{
+    
     bool isConnectionAuthorized () const;
+    bool isConnectionRoadOnly () const;
+
     int getTransferDelay (int departureRank, int arrivalRank) const;
 
     VertexAccess getVertexAccess (const AccessDirection& accessDirection,

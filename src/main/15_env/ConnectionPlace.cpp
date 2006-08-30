@@ -88,6 +88,14 @@ ConnectionPlace::isConnectionAuthorized () const
 
 
 
+bool 
+ConnectionPlace::isConnectionRoadOnly () const
+{
+    return _connectionType != CONNECTION_TYPE_ROADONLY;
+}
+
+
+
 int 
 ConnectionPlace::getTransferDelay (int departureRank, int arrivalRank) const
 {
@@ -213,12 +221,14 @@ ConnectionPlace::getImmediateVertices (VertexAccessMap& result,
 	     it != _physicalStops.end (); ++it)
 	{
 	    if (origin == (*it)) continue;
-	    result.insert (std::make_pair ((*it), getVertexAccess (accessDirection,
-								   accessParameters,
-								   (*it), origin)));
+	    result.insert ((*it), getVertexAccess (accessDirection,
+						   accessParameters,
+						   (*it), origin));
 	}
     }
 }
+
+
 
 
     
