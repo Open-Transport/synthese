@@ -63,6 +63,7 @@ private:
     std::map< std::pair<int, int>, int > _transferDelays; //!< Transfer delays between vertices
     int _defaultTransferDelay;
     int _minTransferDelay;
+    int _maxTransferDelay;
 
     const Alarm* _alarm; //!< Current valid alarm
 
@@ -86,6 +87,7 @@ public:
     void setDefaultTransferDelay (int defaultTransferDelay);
 
     int getMinTransferDelay () const;
+    int getMaxTransferDelay () const;
 
     const ConnectionType& getConnectionType () const;
     void setConnectionType (const ConnectionType& connectionType);

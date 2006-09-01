@@ -12,6 +12,7 @@ namespace synthese
 
 namespace env
 {
+    class Axis;
     class Service;
     class Vertex;
 }
@@ -59,7 +60,8 @@ class JourneyLeg
 
     const synthese::env::Vertex* getOrigin () const;
     const synthese::env::Vertex* getDestination () const;
-    
+
+    const synthese::env::Axis* getAxis () const;
     //@}
 
 

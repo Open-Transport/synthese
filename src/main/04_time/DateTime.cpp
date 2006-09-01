@@ -22,6 +22,16 @@ DateTime::DateTime ( int day, int month, int year,
 }
 
 
+
+
+DateTime::DateTime (const DateTime& ref)
+{
+    _date = ref._date;
+    _hour = ref._hour;
+}
+
+
+
 DateTime::DateTime( const Date& date )
 {
     operator= ( date );
@@ -33,6 +43,16 @@ DateTime::~DateTime()
 {
 }
 
+
+
+DateTime& 
+DateTime::operator = ( const DateTime& ref)
+{
+    if (this == &ref) return (*this);
+    _date = ref._date;
+    _hour = ref._hour;
+    return (*this);
+}
 
 
 
@@ -351,6 +371,9 @@ int operator - ( const DateTime& op1, const DateTime& op2 )
   result += ((op1.getDate () - op2.getDate ()) - retain) * MINUTES_PER_DAY;
   return result;
 }
+
+
+
 
 
 

@@ -65,6 +65,8 @@ public:
   bool hasReservationRule () const;
   const ReservationRule* getReservationRule () const;
 
+  const Axis* getAxis () const;
+
   const RoadType& getType () const;
   void setType (const RoadType& type);
   //@}

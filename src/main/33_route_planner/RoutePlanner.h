@@ -11,6 +11,7 @@
 #include "15_env/Place.h"
 #include "15_env/VertexAccessMap.h"
 
+#include "BestVertexReachesMap.h"
 
 
 
@@ -29,6 +30,7 @@ namespace env
     class Edge;
     class Path;
     class Vertex;
+    class Service;
     class SquareDistance;
 }
 
@@ -38,6 +40,7 @@ namespace routeplanner
 {
 
     class Journey;
+    class JourneyLeg;
 
     typedef std::vector<Journey*> JourneyVector;
     typedef enum {DEPARTURE_FIRST, ARRIVAL_FIRST} PlanningOrder;
@@ -55,10 +58,8 @@ class RoutePlanner
 
  private:
 
-    typedef std::map<synthese::env::Vertex*, Journey*> BestJourneyMap;
+    typedef std::map<synthese::env::Vertex*, JourneyLeg*> BestJourneyLegMap;
 
-    mutable BestJourneyMap _bestJourneys;  //!< Map storing best journey to access a vertex.
-    
     const synthese::env::Place* _origin;  //<! Origin place for route planning.
     const synthese::env::Place* _destination;  //!< Destination place for route planning.
 
@@ -77,6 +78,9 @@ class RoutePlanner
     int _previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
 
     synthese::time::DateTime _previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
+    
+    BestVertexReachesMap _bestDepartureVertexReachesMap;  //!< 
+    BestVertexReachesMap _bestArrivalVertexReachesMap;  //!< 
     
 
  public:
@@ -142,6 +146,9 @@ class RoutePlanner
 
     bool isPathCompliant (const synthese::env::Path* path, 
 			  const Journey* journey) const;
+
+    bool isServiceCompliant (const synthese::env::Service* service, 
+			     const Journey* journey) const;
 
     bool isDestinationUsefulForSoonArrival (const synthese::env::Vertex* vertex,
 					    const synthese::time::DateTime& dateTime,

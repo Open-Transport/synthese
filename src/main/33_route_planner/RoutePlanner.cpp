@@ -1,28 +1,39 @@
 #include "RoutePlanner.h"
 
 #include "Journey.h"
+#include "JourneyLeg.h"
 
 
-#include "15_env/Vertex.h"
+#include "15_env/Axis.h"
 #include "15_env/ConnectionPlace.h"
 #include "15_env/Edge.h"
 #include "15_env/Line.h"
 #include "15_env/Service.h"
 #include "15_env/SquareDistance.h"
+#include "15_env/Vertex.h"
 
 #include "15_env/VertexAccessMap.h"
+
+#include "15_env/BikeCompliance.h"
+#include "15_env/HandicappedCompliance.h"
+#include "15_env/PedestrianCompliance.h"
+#include "15_env/ReservationRule.h"
+#include "15_env/Fare.h"
 
 
 using synthese::time::DateTime;
 
-using synthese::env::Place;
-using synthese::env::Vertex;
+using synthese::env::Axis;
+using synthese::env::ConnectionPlace;
 using synthese::env::Edge;
-using synthese::env::Path;
 using synthese::env::Line;
+using synthese::env::Path;
+using synthese::env::Place;
 using synthese::env::Service;
 using synthese::env::SquareDistance;
-using synthese::env::ConnectionPlace;
+using synthese::env::Vertex;
+using synthese::env::ReservationRule;
+using synthese::env::Fare;
 
 using synthese::env::AccessParameters;
 using synthese::env::AccessDirection;
@@ -55,6 +66,8 @@ RoutePlanner::RoutePlanner (const Place* origin,
     , _planningOrder (planningOrder)
     , _journeySheetStartTime (journeySheetStartTime)
     , _journeySheetEndTime (journeySheetEndTime)
+    , _bestDepartureVertexReachesMap (FROM_ORIGIN)
+    , _bestArrivalVertexReachesMap (TO_DESTINATION)
 {
     origin->getImmediateVertices (_originVam, TO_DESTINATION, accessParameters);
     destination->getImmediateVertices (_destinationVam, FROM_ORIGIN, accessParameters);
@@ -101,83 +114,97 @@ RoutePlanner::isPathCompliant (const Path* path,
 			       const Journey* journey) const
 {
 
-
-    // TODO :
-    /*
-    // L'axe de la ligne autorise-t-il la prise des voyageurs ?
-    if (!Ligne->Axe()->Autorise())
+    // Check if axis is allowed.
+    if (path->getAxis () && (path->getAxis ()->isAllowed () == false)) 
+    {
 	return false;
-	
-    // tests sur la prise en charge des velos
-    if (vBesoinVelo == Vrai)
-    {
-	if (Ligne->getVelo()==NULL
-	    || Ligne->getVelo()->TypeVelo() == Faux)
-	    return false;
     }
-	
-    // tests sur la prise en charge des handicapés
-    if (vBesoinHandicape == Vrai)
+    
+    if (_accessParameters.bikeCompliance &&
+	path->getBikeCompliance ()->isCompliant () == false)
     {
-	if (Ligne->getHandicape()==NULL
-	    || Ligne->getHandicape()->getTypeHandicape() == Faux)
-	    return false;
+	return false;
     }
 
-    // tests sur la restriction sur les taxi bus
-    if (vBesoinTaxiBus == Vrai)
+    if (_accessParameters.handicappedCompliance &&
+	path->getHandicappedCompliance ()->isCompliant () == false)
     {
-	if (Ligne->GetResa()==NULL
-	    || Ligne->GetResa()->TypeResa() != Obligatoire)
-	    return false;
+	return false;
     }
 
-    // tests sur le choix des tarifs
-    if (vCodeTarif >-1)
+    if (_accessParameters.handicappedCompliance &&
+	path->getHandicappedCompliance ()->isCompliant () == false)
     {
-	//tarif ligne==tarif demande + tarif 0=> gratuit
-	if ((Ligne->getTarif()== NULL)
-	    || ((Ligne->getTarif()->getNumeroTarif() != vCodeTarif)
-		&& (Ligne->getTarif()->getNumeroTarif() != 0)))
-	    return false;
+	return false;
     }
-		
-    // Contrôle de l'axe vis à vis des axes déjà empruntés, effectué que si l'axe de la ligne est non libre et si un ET est fourni
-    if (!Ligne->Axe()->Libre() && __Trajet.Taille())
+
+    if (_accessParameters.pedestrianCompliance &&
+	path->getPedestrianCompliance ()->isCompliant () == false)
     {
-	for (const cElementTrajet* curET = __Trajet.PremierElement(); curET != NULL; curET = curET->Suivant())
-	    if (curET->Axe() == Ligne->Axe())
+	return false;
+    }
+
+    if (_accessParameters.withReservation &&
+	path->getReservationRule ()->getType () != ReservationRule::RESERVATION_TYPE_COMPULSORY)
+    {
+	return false;
+    }
+
+    // TODO : fare testing...
+
+    // Check axis against already followed axes
+    if ( path->getAxis () && 
+	 (path->getAxis ()->isFree () == false) &&
+	 (journey->getJourneyLegCount () > 0) )
+    {
+	for (int i=0; i<journey->getJourneyLegCount (); ++i)
+	{
+	    if (journey->getJourneyLeg (i)->getAxis () == path->getAxis ()) 
+	    {
 		return false;
+	    }
+	}
     }
-	
-    // Succès
-    */
+
     return true;
 }
 
 
 
-/*
-bool cCalculateur::DestinationUtilePourArriverTot(const cGare* __PointArret, const cMoment& __Moment, cDistanceCarree& __DistanceCarreeBut) const
+bool 
+RoutePlanner::isServiceCompliant (const Service* service, 
+				  const Journey* journey) const
 {
-	//! <li>Calcul de la distance carrée si non fournie</li>
-	if (__DistanceCarreeBut.EstInconnu())
-		__DistanceCarreeBut.setFromPoints(__PointArret->getPoint(), vPADeDestination->getPointArret()->getPoint());
 
-	//! <li>Evaluation du moment "au plus tot" où peut démarrer</li>
-	cMoment __MomentArriveeAvantInclusCorrespondance = __Moment;
-	if (!vPADeDestination->inclue(__PointArret))
-		__MomentArriveeAvantInclusCorrespondance += __PointArret->AttenteMinimale();
+    if (_accessParameters.bikeCompliance &&
+	service->getBikeCompliance ()->isCompliant () == false)
+    {
+	return false;
+    }
 
-	//! <li>Test 1 : Non dépassement du moment d'arrivée maximal</li>
-	if (__MomentArriveeAvantInclusCorrespondance > vArriveeMax)
-		return false;
-	
-	//!	\todo Remettre ici un controle par VMAX
-	
-	return true;
+    if (_accessParameters.handicappedCompliance &&
+	service->getHandicappedCompliance ()->isCompliant () == false)
+    {
+	return false;
+    }
+
+    if (_accessParameters.handicappedCompliance &&
+	service->getHandicappedCompliance ()->isCompliant () == false)
+    {
+	return false;
+    }
+
+    if (_accessParameters.pedestrianCompliance &&
+	service->getPedestrianCompliance ()->isCompliant () == false)
+    {
+	return false;
+    }
+
+    return true;
 }
-*/
+
+
+
 
 
 
@@ -199,11 +226,11 @@ RoutePlanner::isDestinationUsefulForSoonArrival (const Vertex* vertex,
     
     // Check that the maximal arrival time is not exceeded
     DateTime arrivalMoment (dateTime);
-    if (_destinationVam.contains (vertex))
+    if ((_destinationVam.contains (vertex) && (vertex->getConnectionPlace ())))
     {
 	arrivalMoment += vertex->getConnectionPlace ()->getMinTransferDelay ();
     }
-
+	
     if (arrivalMoment > _journeySheetEndTime) return false;
 
     // TODO : re-implement VMax control.
@@ -214,7 +241,7 @@ RoutePlanner::isDestinationUsefulForSoonArrival (const Vertex* vertex,
 
 
 
-    /* TODO  numerovoie ??
+/* 
 const DateTime& 
 RoutePlanner::getBestArrival (const Vertex* curPA, tNumeroVoie NumeroVoie) const
 {
@@ -224,8 +251,27 @@ RoutePlanner::getBestArrival (const Vertex* curPA, tNumeroVoie NumeroVoie) const
 	return(vMeilleurTemps[curPA->Index()]);
 
 }
-    */
+*/
 
+/*
+const cMoment& cCalculateur::GetMeilleureArrivee(const cGare* curPA, tNumeroVoie NumeroVoie) const
+{
+	if (curPA->CorrespondanceAutorisee() && NumeroVoie && vMeilleurTempsQuai[curPA->Index()][NumeroVoie] < vMeilleurTemps[curPA->Index()])
+		return(vMeilleurTempsQuai[curPA->Index()][NumeroVoie]);
+	else
+		return(vMeilleurTemps[curPA->Index()]);
+}
+*/
+
+/*
+
+ TODO remove this and include 2 bestvertexreachesmap (departure/arrival)
+const DateTime& 
+RoutePlanner::getBestArrival (const Vertex* vertex) const
+{
+    
+}
+*/
 
 
 
@@ -474,7 +520,7 @@ RoutePlanner::integralSearch (const VertexAccessMap& vertices,
 	{
 	    const Edge* edge = (*itEdge);
 
-	    // Checks for path compliancy rules and axis constraint.
+	    // Check for path compliancy rules.
 	    if (isPathCompliant (edge->getParentPath (), currentJourney) == false) continue;
 
 	    int continuousServiceAmplitude = 0;
@@ -495,8 +541,11 @@ RoutePlanner::integralSearch (const VertexAccessMap& vertices,
 		if (strictTime && departureMoment != desiredTime) continue;
 		
 		const Service* service = edge->getParentPath ()->getService (serviceNumber);
-		if ( serviceNumber != UNKNOWN_VALUE && 
-		     service->isContinuous () )
+
+		// Check for service compliancy rules.
+		if (isServiceCompliant (service, currentJourney) == false) continue;
+
+		if ( service->isContinuous () )
 		{
 		    if ( departureMoment > edge->getDepartureEndSchedule (serviceNumber) )
 		    {

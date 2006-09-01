@@ -22,15 +22,18 @@ namespace env
  class Vertex;
  class Line;
 
-
  typedef std::vector<const Vertex*> AccessPath;
  typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
- 
 
  typedef struct {
      double maxApproachDistance;
      double maxApproachTime;
      double approachSpeed;
+     
+     bool bikeCompliance;
+     bool handicappedCompliance;
+     bool pedestrianCompliance;
+     bool withReservation;
      
  } AccessParameters;
  
@@ -41,6 +44,7 @@ namespace env
      double approachDistance;
  } VertexAccess;
  
+
 
 
 /** 

@@ -23,6 +23,7 @@ namespace env
 {
 
     class Alarm;
+    class Axis;
     class Edge;
     class Fare;
     class Point;
@@ -90,6 +91,8 @@ public:
 			     const synthese::time::DateTime& end) const;
     const Alarm* getAlarm () const;
     void setAlarm (Alarm* alarm);
+
+    virtual const Axis* getAxis () const = 0;
 
     const std::vector<Edge*>& getEdges () const;
 

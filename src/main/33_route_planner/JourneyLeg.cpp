@@ -1,8 +1,11 @@
 #include "JourneyLeg.h"
 
 #include "15_env/ContinuousService.h"
+#include "15_env/Path.h"
 
 
+using synthese::env::Axis;
+using synthese::env::Path;
 using synthese::env::ContinuousService;
 
 
@@ -43,6 +46,11 @@ JourneyLeg::getService () const
 
 
 
+const Axis* 
+JourneyLeg::getAxis () const
+{
+    return _service->getPath ()->getAxis ();
+}
 
 
 

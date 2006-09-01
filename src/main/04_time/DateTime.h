@@ -36,6 +36,7 @@ class DateTime
         DateTime ( int day = TIME_CURRENT, int month = TIME_SAME, int year = TIME_SAME,
                    int hours = TIME_SAME, int minutes = TIME_SAME );
 
+        DateTime ( const DateTime& ref);
         DateTime ( const Date& date );
 
         ~DateTime();
@@ -88,6 +89,9 @@ class DateTime
 
         DateTime& operator += ( int minutesDuration );
         DateTime& operator -= ( int minutesDuration );
+
+        DateTime& operator = ( const DateTime& ref);
+
         DateTime& operator = ( const std::string& );
         DateTime& operator = ( const Date& );
         DateTime& operator = ( const Hour& );
@@ -107,6 +111,7 @@ class DateTime
 
 
 std::ostream& operator<< ( std::ostream& os, const DateTime& op );
+
 
 
 bool operator == ( const DateTime& op1, const DateTime& op2 );

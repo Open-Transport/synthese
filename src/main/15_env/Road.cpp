@@ -45,6 +45,14 @@ Road::getReservationRule () const
 
 
 
+const Axis* 
+Road::getAxis () const
+{
+    return 0;
+}
+
+
+
 
 
 const Road::RoadType& 

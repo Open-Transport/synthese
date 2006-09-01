@@ -32,6 +32,7 @@ ConnectionPlace::ConnectionPlace (const uid& id,
     , _connectionType (connectionType)
     , _defaultTransferDelay (defaultTransferDelay)
     , _minTransferDelay (std::numeric_limits<int>::max ())
+    , _maxTransferDelay (0)
     , _alarm (0)
 {
 }
@@ -61,6 +62,13 @@ int
 ConnectionPlace::getMinTransferDelay () const
 {
     return _minTransferDelay;
+}
+
+
+int 
+ConnectionPlace::getMaxTransferDelay () const
+{
+    return _maxTransferDelay;
 }
 
 
@@ -130,6 +138,10 @@ ConnectionPlace::addTransferDelay (int departureRank, int arrivalRank, int trans
     if (transferDelay < _minTransferDelay)
     {
 	_minTransferDelay = transferDelay;
+    }
+    if (transferDelay < _maxTransferDelay)
+    {
+	_maxTransferDelay = transferDelay;
     }
 }
 
