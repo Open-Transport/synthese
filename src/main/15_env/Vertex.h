@@ -23,14 +23,19 @@ namespace env
 /** Vertex base class.
 
 A vertex is the abstract graph node used for route planning.
-
+A vertex is necessarily connected to its corresponding path.
  @ingroup m15
 */
 class Vertex : public Point
 {
 
 private:
+    
+    // TODO : when needed add a _containingPlace to be able, for instance,
+    // to display the public place associated with OR change _connectionPlace into
+    // _addressablePlace and let the getConnectionPlace accesor do the dynamic_cast.
 
+    
     const ConnectionPlace* _connectionPlace;
     int _rankInConnectionPlace;
 

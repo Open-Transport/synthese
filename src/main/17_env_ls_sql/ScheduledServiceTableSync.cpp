@@ -62,8 +62,8 @@ ScheduledServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int ro
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
 
-    std::string serviceNumber (
-	rows.getColumn (rowIndex, SCHEDULEDSERVICES_TABLE_COL_SERVICENUMBER));
+    int serviceNumber (Conversion::ToInt (
+        rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER)));
 
     std::string schedules (
 	rows.getColumn (rowIndex, SCHEDULEDSERVICES_TABLE_COL_SCHEDULES));
@@ -146,8 +146,8 @@ ScheduledServiceTableSync::doReplace (const synthese::db::SQLiteResult& rows, in
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
     ScheduledService* ss = environment.getScheduledServices ().get (id);
 
-    std::string serviceNumber (
-	rows.getColumn (rowIndex, SCHEDULEDSERVICES_TABLE_COL_SERVICENUMBER));
+    int serviceNumber (Conversion::ToInt (
+			   rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER)));
 
     std::string schedules (
 	rows.getColumn (rowIndex, SCHEDULEDSERVICES_TABLE_COL_SCHEDULES));

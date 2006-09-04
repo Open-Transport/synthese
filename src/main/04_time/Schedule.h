@@ -67,7 +67,7 @@ class Schedule
         */
         Schedule& operator += ( int op );
 
-	static Schedule Schedule::FromString (const std::string& str);
+	static Schedule FromString (const std::string& str);
 
 };
 

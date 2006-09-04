@@ -11,7 +11,7 @@ namespace env
 
 
     
-Service::Service (const std::string& serviceNumber,
+Service::Service (int serviceNumber,
 		  const Path* path,
 		  const synthese::time::Schedule& departureSchedule)
     : BikeComplyer (path) 
@@ -31,7 +31,7 @@ Service::~Service ()
 
 
 
-const std::string& 
+int
 Service::getServiceNumber () const
 {
     return _serviceNumber;
@@ -40,7 +40,7 @@ Service::getServiceNumber () const
 
 
 void 
-Service::setServiceNumber (const std::string& serviceNumber)
+Service::setServiceNumber (int serviceNumber)
 {
     _serviceNumber = serviceNumber;
 }

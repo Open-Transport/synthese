@@ -210,7 +210,7 @@ Path::addEdge (Edge* edge)
 	    // Chain only relations between A and A, D and D, A and D 
 	    // if different stops, D and A if different stops
             if ( currentEdge->getFromVertex ()->getConnectionPlace() != 
-		 edge->getFromVertex ()->getConnectionPlace() || 
+		 edge->getFromVertex ()->getConnectionPlace () || 
 		 currentEdge->getType () == edge->getType () )
             {
                 // Chain following arrivals
@@ -221,16 +221,19 @@ Path::addEdge (Edge* edge)
 		}
 		if ( currentEdge->getFollowingConnectionArrival () == 0 && 
 		     edge->getFromVertex ()->getConnectionPlace()
-		     ->isConnectionAuthorized () )
+		     ->getConnectionType () >= ConnectionPlace::CONNECTION_TYPE_LINELINE )
 		{
                     currentEdge->setFollowingConnectionArrival ( edge );
 
+		    // TODO : a revoir => getPreviousDepartureForFineSteppingOnly
+                    /*
 		    if ( (currentEdge->getFollowingLineConnectionArrival () == 0) &&
 			 (edge->getFromVertex ()->getConnectionPlace()
 			  ->isConnectionRoadOnly () == false) )
 		    {
 			currentEdge->setFollowingLineConnectionArrival ( edge );
 		    }
+		    */
 
 		} 
                 if ( currentEdge->isDeparture () && 
@@ -242,16 +245,21 @@ Path::addEdge (Edge* edge)
 		if ( currentEdge->isDeparture () && 
 		     edge->getPreviousConnectionDeparture () == 0 && 
 		     currentEdge->getFromVertex ()
-		     ->getConnectionPlace()->isConnectionAuthorized() )
+		     ->getConnectionPlace()
+		     ->getConnectionType () >= ConnectionPlace::CONNECTION_TYPE_LINELINE )
 		{
                     edge->setPreviousConnectionDeparture ( currentEdge );
 
+		    // TODO : a revoir => getPreviousDepartureForFineSteppingOnly
+                    /*
 		    if ( (edge->getPreviousLineConnectionDeparture () == 0) &&
 			 (currentEdge->getFromVertex ()->getConnectionPlace ()
 			  ->isConnectionRoadOnly () == false) )
 		    {
 			edge->setPreviousLineConnectionDeparture (currentEdge);
 		    }
+                    */
+
 		}
             }
         }

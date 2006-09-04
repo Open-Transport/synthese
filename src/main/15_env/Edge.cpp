@@ -113,10 +113,11 @@ Edge::getPreviousConnectionDeparture () const
 }
 
 
+
 const Edge* 
-Edge::getPreviousLineConnectionDeparture () const
+Edge::getPreviousDepartureForFineSteppingOnly () const
 {
-    return _previousLineConnectionDeparture;
+    return _previousDepartureForFineSteppingOnly;
 }
 
 
@@ -131,9 +132,9 @@ Edge::getFollowingConnectionArrival () const
 
 
 const Edge* 
-Edge::getFollowingLineConnectionArrival () const
+Edge::getFollowingArrivalForFineSteppingOnly () const
 {
-    return _followingLineConnectionArrival;
+    return _followingArrivalForFineSteppingOnly;
 }
 
 
@@ -156,9 +157,9 @@ Edge::setPreviousConnectionDeparture( const Edge* previousConnectionDeparture)
 
 
 void 
-Edge::setPreviousLineConnectionDeparture( const Edge* previousLineConnectionDeparture)
+Edge::setPreviousDepartureForFineSteppingOnly ( const Edge* previousDeparture)
 {
-    _previousLineConnectionDeparture = previousLineConnectionDeparture;
+    _previousDepartureForFineSteppingOnly = previousDeparture;
 }
 
 
@@ -183,9 +184,9 @@ Edge::setFollowingConnectionArrival( const Edge* followingConnectionArrival)
 
 
 void 
-Edge::setFollowingLineConnectionArrival( const Edge* followingLineConnectionArrival)
+Edge::setFollowingArrivalForFineSteppingOnly ( const Edge* followingArrival)
 {
-    _followingLineConnectionArrival = followingLineConnectionArrival;
+    _followingArrivalForFineSteppingOnly = followingArrival;
 }
 
 
@@ -304,12 +305,14 @@ Edge::calculateArrival (const Edge& departureEdge,
     if ( getParentPath ()->getService (serviceNumber)->isContinuous () )
     {
         arrivalMoment = departureMoment;
-        arrivalMoment += ( _arrivalBeginSchedule[serviceNumber ] - departureEdge._departureBeginSchedule[ serviceNumber ] );
+        arrivalMoment += ( _arrivalBeginSchedule[serviceNumber ] - 
+			   departureEdge._departureBeginSchedule[ serviceNumber ] );
     } 
     else
     {
         arrivalMoment = _arrivalBeginSchedule[ serviceNumber ];
-        arrivalMoment.addDaysDuration( _arrivalBeginSchedule[ serviceNumber ].getDaysSinceDeparture () - departureEdge._departureBeginSchedule[ serviceNumber ].getDaysSinceDeparture () );
+        arrivalMoment.addDaysDuration( _arrivalBeginSchedule[ serviceNumber ].getDaysSinceDeparture () - 
+				       departureEdge._departureBeginSchedule[ serviceNumber ].getDaysSinceDeparture () );
     }
     
 }

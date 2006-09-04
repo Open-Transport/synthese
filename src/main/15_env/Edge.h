@@ -66,10 +66,11 @@ private:
 
     const Edge* _previousDeparture;  //!< Previous departure edge along path.
     const Edge* _previousConnectionDeparture; //!< Previous connection departure edge along path.
-    const Edge* _previousLineConnectionDeparture; //!< Previous transport line connection departure edge along path.
+    const Edge* _previousDepartureForFineSteppingOnly; //!< 
+
     const Edge* _followingArrival;  //!< Next arrival edge along path.
     const Edge* _followingConnectionArrival; //!< Next connection arrival edge along path.
-    const Edge* _followingLineConnectionArrival; //!< Next transport line connection arrival edge along path.
+    const Edge* _followingArrivalForFineSteppingOnly; //!< 
 
     // TODO : separate connection on transport network from connection on road network
 
@@ -126,8 +127,8 @@ public:
     const Edge* getPreviousConnectionDeparture () const;
     void setPreviousConnectionDeparture( const Edge* previousConnectionDeparture);
 
-    const Edge* getPreviousLineConnectionDeparture () const;
-    void setPreviousLineConnectionDeparture( const Edge* previousConnectionDeparture);
+    const Edge* getPreviousDepartureForFineSteppingOnly () const;
+    void setPreviousDepartureForFineSteppingOnly ( const Edge* previousDeparture);
 
     const Edge* getFollowingArrival () const;
     void setFollowingArrival ( const Edge* followingArrival);
@@ -135,8 +136,8 @@ public:
     const Edge* getFollowingConnectionArrival () const;
     void setFollowingConnectionArrival( const Edge* followingConnectionArrival);
     
-    const Edge* getFollowingLineConnectionArrival () const;
-    void setFollowingLineConnectionArrival( const Edge* followingLineConnectionArrival);
+    const Edge* getFollowingArrivalForFineSteppingOnly () const;
+    void setFollowingArrivalForFineSteppingOnly ( const Edge* followingArrival);
     
     /** Gets intermediate points 
      * between this line stop and the next in path.

@@ -23,10 +23,12 @@ namespace env
 {
 
 
-class Address;
-class Alarm;
-class Path; 
-class PhysicalStop;
+    class Address;
+    class Alarm;
+    class Edge;
+    class Path; 
+    class PhysicalStop;
+    class SquareDistance; 
 
 
 /** A connection place indicates that there are possible
@@ -43,27 +45,21 @@ class ConnectionPlace :
 {
 public:
 
-    typedef enum { 
-	CONNECTION_TYPE_FORBIDDEN,           // forbidden connection
-	CONNECTION_TYPE_ROADONLY,            // 
-	CONNECTION_TYPE_AUTHORIZED,          // connection authorized
-	CONNECTION_TYPE_RECOMMENDED_SHORT,
-	CONNECTION_TYPE_RECOMMENDED
-    } ConnectionType;
-
     static const int UNKNOWN_TRANSFER_DELAY;
     static const int FORBIDDEN_TRANSFER_DELAY;
+    static const int SQUAREDISTANCE_SHORT_LONG;
 
 
 private:
 
-    ConnectionType _connectionType;
     std::vector<const PhysicalStop*> _physicalStops; 
 
     std::map< std::pair<int, int>, int > _transferDelays; //!< Transfer delays between vertices
     int _defaultTransferDelay;
     int _minTransferDelay;
     int _maxTransferDelay;
+
+    ConnectionType _connectionType;
 
     const Alarm* _alarm; //!< Current valid alarm
 
@@ -75,7 +71,7 @@ public:
     ConnectionPlace (const uid& id,
 		     const std::string& name,
 		     const City* city,
-		     const ConnectionType& connectionType = CONNECTION_TYPE_FORBIDDEN,
+		     const ConnectionType& connectionType,
 		     int defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY);
 
     ~ConnectionPlace ();
@@ -89,25 +85,30 @@ public:
     int getMinTransferDelay () const;
     int getMaxTransferDelay () const;
 
-    const ConnectionType& getConnectionType () const;
-    void setConnectionType (const ConnectionType& connectionType);
-
     const std::vector<const PhysicalStop*>& getPhysicalStops () const;
 
     bool hasApplicableAlarm (const synthese::time::DateTime& start, 
 			     const synthese::time::DateTime& end) const;
     const Alarm* getAlarm () const;
     void setAlarm (const Alarm* alarm);
+
+    const ConnectionType getConnectionType () const;
+    void setConnectionType (const ConnectionType& connectionType);
+
     //@}
 
 
     //! @name Query methods.
     //@{
     
-    bool isConnectionAuthorized () const;
-    bool isConnectionRoadOnly () const;
+    bool isConnectionAllowed (const Edge* fromEdge, 
+			      const Edge* toEdge) const;
 
-    int getTransferDelay (int departureRank, int arrivalRank) const;
+    ConnectionType getRecommendedConnectionType (const SquareDistance& squareDistance) const;
+
+
+    int getTransferDelay (const Vertex* fromVertex, 
+			  const Vertex* toVertex) const;
 
 
     VertexAccess getVertexAccess (const AccessDirection& accessDirection,

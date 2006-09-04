@@ -19,6 +19,19 @@ namespace synthese
 	{
 	    static const int UNKNOWN_VALUE = -1;
 
+	    typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
+	    
+	    typedef struct {
+		double maxApproachDistance;
+		double maxApproachTime;
+		double approachSpeed;
+		
+		bool bikeCompliance;
+		bool handicappedCompliance;
+		bool pedestrianCompliance;
+		bool withReservation;
+		
+	    } AccessParameters;
 	    
 	}
 

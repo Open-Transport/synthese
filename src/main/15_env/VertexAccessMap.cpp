@@ -5,8 +5,9 @@
 #include "Line.h"
 #include "ConnectionPlace.h"
 
+#include <assert.h>
 #include <set>
-
+#include <limits>
 
 
 
@@ -22,6 +23,7 @@ namespace env
 VertexAccessMap::VertexAccessMap ()
     : _isobarycenterUpToDate (false)
     , _isobarycenterMaxSquareDistanceUpToDate (false)
+    , _minApproachTime (std::numeric_limits<int>::max ())
 {
     
 }
@@ -37,22 +39,25 @@ VertexAccessMap::~VertexAccessMap ()
 
 
 
-const std::map<const Vertex*, VertexAccess>& 
-VertexAccessMap::getMap () const
+const VertexAccess& 
+VertexAccessMap::getVertexAccess (const Vertex* vertex) const
 {
-    return _map;
+    assert (contains (vertex));
+    return _map.find (vertex)->second;
 }
 
 
 
 
+
+
 bool 
-VertexAccessMap::hasNonLineConnectableDepartureVertex (const Line* line) const
+VertexAccessMap::needFineSteppingForDeparture (const Path* path) const
 {
-    std::map<const Line*, bool>::const_iterator it = 
-	_nonLineConnectableDepartureVertex.find (line);
+    std::map<const Path*, bool>::const_iterator it = 
+	_fineSteppingForDeparture.find (path);
     
-    if (it == _nonLineConnectableDepartureVertex.end()) return false;
+    if (it == _fineSteppingForDeparture.end()) return false;
     return it->second;
 }
 
@@ -60,12 +65,12 @@ VertexAccessMap::hasNonLineConnectableDepartureVertex (const Line* line) const
 
 
 bool 
-VertexAccessMap::hasNonLineConnectableArrivalVertex (const Line* line) const
+VertexAccessMap::needFineSteppingForArrival (const Path* path) const
 {
-    std::map<const Line*, bool>::const_iterator it = 
-	_nonLineConnectableArrivalVertex.find (line);
+    std::map<const Path*, bool>::const_iterator it = 
+	_fineSteppingForArrival.find (path);
     
-    if (it == _nonLineConnectableArrivalVertex.end()) return false;
+    if (it == _fineSteppingForArrival.end()) return false;
     return it->second;
 }
 
@@ -86,9 +91,13 @@ VertexAccessMap::insert (const Vertex* vertex,
 			 const VertexAccess& vertexAccess)
 {
     _map.insert (std::make_pair (vertex, vertexAccess));
-    updateNonLineConnectableVertexMap ();
+    updateFineSteppingVertexMap ();
     _isobarycenterUpToDate = false;
     _isobarycenterMaxSquareDistanceUpToDate = false;
+    if (vertexAccess.approachTime < _minApproachTime)
+    {
+	_minApproachTime = vertexAccess.approachTime;
+    }
 
 }
 
@@ -148,7 +157,7 @@ VertexAccessMap::getIsobarycenterMaxSquareDistance () const
 
 
 void 
-VertexAccessMap::updateNonLineConnectableVertexMap ()
+VertexAccessMap::updateFineSteppingVertexMap ()
 {
     // TODO : make it lazy... on demand
 
@@ -161,10 +170,10 @@ VertexAccessMap::updateNonLineConnectableVertexMap ()
 	    const Line* line = dynamic_cast<const Line*> ((*itEdge)->getParentPath ());
 	    if (line != 0)
 	    {
-		_nonLineConnectableDepartureVertex[line] = 
+		_fineSteppingForDeparture[line] = 
 		    (it->first->getConnectionPlace () == 0) ||
 		    (it->first->getConnectionPlace ()->getConnectionType () == 
-		     ConnectionPlace::CONNECTION_TYPE_ROADONLY);
+		     ConnectionPlace::CONNECTION_TYPE_ROADROAD);
 	    }
 	}
 
@@ -174,10 +183,10 @@ VertexAccessMap::updateNonLineConnectableVertexMap ()
 	    const Line* line = dynamic_cast<const Line*> ((*itEdge)->getParentPath ());
 	    if (line != 0)
 	    {
-		_nonLineConnectableDepartureVertex[line] = 
+		_fineSteppingForDeparture[line] = 
 		    (it->first->getConnectionPlace () == 0) ||
 		    (it->first->getConnectionPlace ()->getConnectionType () == 
-		     ConnectionPlace::CONNECTION_TYPE_ROADONLY);
+		     ConnectionPlace::CONNECTION_TYPE_ROADROAD);
 	    }
 	}
 	
@@ -187,6 +196,20 @@ VertexAccessMap::updateNonLineConnectableVertexMap ()
 
 
 
+int 
+VertexAccessMap::getMinApproachTime () const
+{
+    return _minApproachTime;
+}
+
+
+
+
+const std::map<const Vertex*, VertexAccess>& 
+VertexAccessMap::getMap () const
+{
+    return _map;
+}
 
 
 

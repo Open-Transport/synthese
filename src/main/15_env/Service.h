@@ -56,7 +56,7 @@ class Service :
 {
 private:
     
-    std::string _serviceNumber;
+    int _serviceNumber;
     Calendar _calendar;  //!< Which days is this service available ?
     const Path* _path;
 
@@ -64,7 +64,7 @@ private:
     
 public:
 
-    Service (const std::string& serviceNumber,
+    Service (int serviceNumber,
 	     const Path* path,
 	     const synthese::time::Schedule& departureSchedule);
     ~Service ();
@@ -74,8 +74,8 @@ public:
     //@{
     const Path* getPath () const;
 
-    const std::string& getServiceNumber () const;
-    void setServiceNumber (const std::string& serviceNumber);
+    int getServiceNumber () const;
+    void setServiceNumber (int serviceNumber);
 
     Calendar& getCalendar (); // MJ constness pb
 

@@ -33,7 +33,7 @@ private:
 public:
 
     ContinuousService (const uid& id,
-		       const std::string& serviceNumber,
+		       int serviceNumber,
 		       const Path* path,
 		       const synthese::time::Schedule& departureSchedule,
 		       int range,

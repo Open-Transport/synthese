@@ -38,11 +38,13 @@ class BestVertexReachesMap
 {
  private:
 
+    typedef std::map<const synthese::env::Vertex*, JourneyLeg*> VertexMap;
+    typedef std::map<const synthese::env::ConnectionPlace*, synthese::time::DateTime> ConnectionPlaceMap;
+    
     const synthese::env::AccessDirection _accessDirection;
 
-    std::map<const synthese::env::Vertex*, const JourneyLeg*> _vertexMap;
-    std::map<const synthese::env::ConnectionPlace*, synthese::time::DateTime> _connectionPlaceMap;
-
+    VertexMap _vertexMap;
+    ConnectionPlaceMap _connectionPlaceMap;
 
  public:
 
@@ -64,14 +66,15 @@ class BestVertexReachesMap
 	getBestTime (const synthese::env::Vertex* vertex, 
 		     const synthese::time::DateTime& defaultValue) const;
 
+    JourneyLeg* getBestJourneyLeg (const synthese::env::Vertex* vertex);
+
     //@}
 
 
     //! @name Update methods
     //@{
-    void insert (synthese::env::Vertex* vertex, const JourneyLeg* journeyLeg);
+    void insert (const synthese::env::Vertex* vertex, JourneyLeg* journeyLeg);
 
-    void erase (synthese::env::Vertex* vertex);
     //@}
 
 

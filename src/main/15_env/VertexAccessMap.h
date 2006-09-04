@@ -20,27 +20,14 @@ namespace env
 
 
  class Vertex;
- class Line;
+ class Path;
 
  typedef std::vector<const Vertex*> AccessPath;
- typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
-
- typedef struct {
-     double maxApproachDistance;
-     double maxApproachTime;
-     double approachSpeed;
-     
-     bool bikeCompliance;
-     bool handicappedCompliance;
-     bool pedestrianCompliance;
-     bool withReservation;
-     
- } AccessParameters;
  
  
  typedef struct {
      AccessPath path;
-     double approachTime;
+     int approachTime;
      double approachDistance;
  } VertexAccess;
  
@@ -60,8 +47,8 @@ public:
 private:
 
     std::map<const Vertex*, VertexAccess> _map;
-    std::map<const Line*, bool> _nonLineConnectableDepartureVertex;
-    std::map<const Line*, bool> _nonLineConnectableArrivalVertex;
+    std::map<const Path*, bool> _fineSteppingForDeparture;
+    std::map<const Path*, bool> _fineSteppingForArrival;
     
     mutable bool _isobarycenterUpToDate;
     mutable bool _isobarycenterMaxSquareDistanceUpToDate;
@@ -69,6 +56,7 @@ private:
     mutable Point _isobarycenter;   //!< Isobarycenter of all points contained in this map.
     mutable SquareDistance _isobarycenterMaxSquareDistance;   //!< Maximum square distance of one map point with the isobarycenter.
 
+    int _minApproachTime;
 
 
 // une fonction qui verifie pour une ligne donnée si elle passe par l'un des vertex
@@ -83,8 +71,10 @@ private:
 
     const std::map<const Vertex*, VertexAccess>& getMap () const;
 
-    bool hasNonLineConnectableDepartureVertex (const Line* line) const;
-    bool hasNonLineConnectableArrivalVertex (const Line* line) const;
+    const VertexAccess& getVertexAccess (const Vertex* vertex) const;
+
+    bool needFineSteppingForDeparture (const Path* path) const;
+    bool needFineSteppingForArrival (const Path* path) const;
     
     bool contains (const Vertex* vertex) const;
     void insert (const Vertex* vertex, const VertexAccess& vertexAccess);
@@ -92,9 +82,11 @@ private:
     const Point& getIsobarycenter () const;
     const SquareDistance& getIsobarycenterMaxSquareDistance () const;
     
+    int getMinApproachTime () const;
+
  private:
 
-    void updateNonLineConnectableVertexMap ();
+    void updateFineSteppingVertexMap ();
 
 
 };

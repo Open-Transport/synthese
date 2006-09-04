@@ -43,6 +43,12 @@ AddressablePlace::addAddress (const Address* address)
 
 
 
+const AddressablePlace::ConnectionType 
+AddressablePlace::getConnectionType () const
+{
+    return CONNECTION_TYPE_FORBIDDEN;
+}
+
 
 
 
@@ -68,6 +74,7 @@ AddressablePlace::getImmediateVertices (VertexAccessMap& result,
     }
 
 }
+
 
 
 

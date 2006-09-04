@@ -47,21 +47,21 @@ BestVertexReachesMap::contains (const synthese::env::Vertex* vertex) const
 
 
 void 
-BestVertexReachesMap::insert (synthese::env::Vertex* vertex, const JourneyLeg* journeyLeg)
+BestVertexReachesMap::insert (const synthese::env::Vertex* vertex, JourneyLeg* journeyLeg)
 {
     // Update vertex map
+    // Implementation note : journey legs are reused and never re-allocated.
+    // Thus the insertion happens only once
     assert (contains (vertex) == false);
     _vertexMap.insert (std::make_pair (vertex, journeyLeg));
 
-    // Update connection place map
+    // Update connection place map (replacement)
     const ConnectionPlace* connectionPlace = vertex->getConnectionPlace ();
 
     if (connectionPlace == 0) return;
 
-    std::map<const synthese::env::ConnectionPlace*, synthese::time::DateTime>::iterator itc =
-	_connectionPlaceMap.find (connectionPlace);
+    ConnectionPlaceMap::iterator itc = _connectionPlaceMap.find (connectionPlace);
 
-    
     DateTime bestTime;
     if (_accessDirection == synthese::env::TO_DESTINATION)
     {
@@ -91,25 +91,6 @@ BestVertexReachesMap::insert (synthese::env::Vertex* vertex, const JourneyLeg* j
 
 
 
-void BestVertexReachesMap::erase (synthese::env::Vertex* vertex)
-{
-    // Update vertex map
-    assert (contains (vertex));
-    _vertexMap.erase (vertex);
-
-    // Update connection place map
-    const ConnectionPlace* connectionPlace = vertex->getConnectionPlace ();
-    
-    // TODO : pas forcement judicieux d'avoir pris l'approche de faire des erase dans cette
-    // map ! en fait on ne fera que des replace et la map de connection place peut
-    // etre dans un etat incoherent ... à voir
-
-
-}
-
-
-
-
 
 
 const DateTime& 
@@ -124,7 +105,7 @@ BestVertexReachesMap::getBestTime (const Vertex* vertex,
     }
     else if (vertex->getConnectionPlace ())
     {
-	std::map<const synthese::env::ConnectionPlace*, synthese::time::DateTime>::const_iterator itc =
+	ConnectionPlaceMap::const_iterator itc = 
 	    _connectionPlaceMap.find (vertex->getConnectionPlace ());
 
 	if (itc != _connectionPlaceMap.end ())
@@ -139,6 +120,12 @@ BestVertexReachesMap::getBestTime (const Vertex* vertex,
 
 
 
+JourneyLeg*
+BestVertexReachesMap::getBestJourneyLeg (const Vertex* vertex)
+{
+    if (contains (vertex) == false) return 0;
+    return _vertexMap.find (vertex)->second;
+}
 
 
 

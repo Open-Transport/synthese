@@ -2,10 +2,13 @@
 
 #include "15_env/ContinuousService.h"
 #include "15_env/Path.h"
+#include "15_env/SquareDistance.h"
 
 
 using synthese::env::Axis;
 using synthese::env::Path;
+using synthese::env::Service;
+using synthese::env::SquareDistance;
 using synthese::env::ContinuousService;
 
 
@@ -15,17 +18,15 @@ namespace routeplanner
 {
 
 
-JourneyLeg::JourneyLeg (const synthese::env::Vertex* origin,
-			const synthese::env::Vertex* destination,
-			const synthese::time::DateTime& departureTime,
-			const synthese::time::DateTime& arrivalTime,
-			const synthese::env::Service* service)
-    : _origin (origin)
-    , _destination (destination)
-    , _departureTime (departureTime)
-    , _arrivalTime (arrivalTime)
-    , _service (service)
+JourneyLeg::JourneyLeg ()
+    : _origin (0)
+    , _destination (0)
+    , _departureTime ()
+    , _arrivalTime ()
+    , _service (0)
+    , _continuousServiceRange (0)
 {
+
 }
 
 
@@ -46,6 +47,15 @@ JourneyLeg::getService () const
 
 
 
+void 
+JourneyLeg::setService (const Service* service)
+{
+    _service = service;
+}
+
+
+
+
 const Axis* 
 JourneyLeg::getAxis () const
 {
@@ -61,6 +71,12 @@ JourneyLeg::getDepartureTime () const
 }
 
 
+void 
+JourneyLeg::setDepartureTime (const synthese::time::DateTime& departureTime)
+{
+    _departureTime = departureTime;
+}
+
 
 
 const synthese::time::DateTime& 
@@ -68,6 +84,16 @@ JourneyLeg::getArrivalTime () const
 {
     return _arrivalTime;
 }
+
+
+
+void 
+JourneyLeg::setArrivalTime (const synthese::time::DateTime& arrivalTime)
+{
+    _arrivalTime = arrivalTime;
+}
+
+
 
 
 
@@ -80,6 +106,17 @@ JourneyLeg::getOrigin () const
 
 
 
+
+void 
+JourneyLeg::setOrigin (const synthese::env::Vertex* origin)
+{
+    _origin = origin;
+}
+
+
+
+
+
 const synthese::env::Vertex* 
 JourneyLeg::getDestination () const
 {
@@ -89,12 +126,66 @@ JourneyLeg::getDestination () const
 
 
 
+void 
+JourneyLeg::setDestination (const synthese::env::Vertex* destination)
+{
+    _destination = destination;
+}
+
+
+
+
+
 int 
 JourneyLeg::getContinuousServiceRange () const
 {
-    const ContinuousService* continuousService = dynamic_cast<const ContinuousService*> (_service);
-    if (continuousService == 0) return 0;
-    return continuousService->getRange ();
+    return _continuousServiceRange;
+}
+
+
+
+
+void 
+JourneyLeg::setContinuousServiceRange (int continuousServiceRange)
+{
+    _continuousServiceRange = continuousServiceRange;
+}
+
+
+
+
+
+const SquareDistance& 
+JourneyLeg::getSquareDistance () const
+{
+    return _squareDistance;
+}
+
+
+
+
+synthese::env::SquareDistance& 
+JourneyLeg::getSquareDistance ()
+{
+    return _squareDistance;
+}
+
+
+
+
+void 
+JourneyLeg::setSquareDistance (const SquareDistance& squareDistance)
+{
+    _squareDistance.setSquareDistance (squareDistance.getSquareDistance ());
+}
+
+
+
+
+int 
+JourneyLeg::getDuration () const
+{
+    return _arrivalTime - _departureTime;
 }
 
 

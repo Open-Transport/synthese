@@ -21,6 +21,10 @@
 #include "15_env/Fare.h"
 
 
+#include <algorithm>
+
+
+
 using synthese::time::DateTime;
 
 using synthese::env::Axis;
@@ -68,6 +72,9 @@ RoutePlanner::RoutePlanner (const Place* origin,
     , _journeySheetEndTime (journeySheetEndTime)
     , _bestDepartureVertexReachesMap (FROM_ORIGIN)
     , _bestArrivalVertexReachesMap (TO_DESTINATION)
+    , _journeyLegComparatorForBestArrival (TO_DESTINATION)
+    , _journeyLegComparatorForBestDeparture (FROM_ORIGIN)
+
 {
     origin->getImmediateVertices (_originVam, TO_DESTINATION, accessParameters);
     destination->getImmediateVertices (_destinationVam, FROM_ORIGIN, accessParameters);
@@ -108,18 +115,38 @@ RoutePlanner::getDestination () const
 
 
 
-
 bool 
-RoutePlanner::isPathCompliant (const Path* path, 
-			       const Journey* journey) const
+RoutePlanner::areAxisContraintsFulfilled (const synthese::env::Path* path, 
+					  const Journey* journey) const
 {
-
     // Check if axis is allowed.
     if (path->getAxis () && (path->getAxis ()->isAllowed () == false)) 
     {
 	return false;
     }
-    
+
+    // Check axis against already followed axes
+    if ( path->getAxis () && 
+	 (path->getAxis ()->isFree () == false) &&
+	 (journey->getJourneyLegCount () > 0) )
+    {
+	for (int i=0; i<journey->getJourneyLegCount (); ++i)
+	{
+	    if (journey->getJourneyLeg (i)->getAxis () == path->getAxis ()) 
+	    {
+		return false;
+	    }
+	}
+    }
+    return true;
+}
+
+
+
+bool 
+RoutePlanner::isPathCompliant (const Path* path) const
+{
+
     if (_accessParameters.bikeCompliance &&
 	path->getBikeCompliance ()->isCompliant () == false)
     {
@@ -152,19 +179,6 @@ RoutePlanner::isPathCompliant (const Path* path,
 
     // TODO : fare testing...
 
-    // Check axis against already followed axes
-    if ( path->getAxis () && 
-	 (path->getAxis ()->isFree () == false) &&
-	 (journey->getJourneyLegCount () > 0) )
-    {
-	for (int i=0; i<journey->getJourneyLegCount (); ++i)
-	{
-	    if (journey->getJourneyLeg (i)->getAxis () == path->getAxis ()) 
-	    {
-		return false;
-	    }
-	}
-    }
 
     return true;
 }
@@ -172,8 +186,7 @@ RoutePlanner::isPathCompliant (const Path* path,
 
 
 bool 
-RoutePlanner::isServiceCompliant (const Service* service, 
-				  const Journey* journey) const
+RoutePlanner::isServiceCompliant (const Service* service) const
 {
 
     if (_accessParameters.bikeCompliance &&
@@ -231,7 +244,7 @@ RoutePlanner::isDestinationUsefulForSoonArrival (const Vertex* vertex,
 	arrivalMoment += vertex->getConnectionPlace ()->getMinTransferDelay ();
     }
 	
-    if (arrivalMoment > _journeySheetEndTime) return false;
+    if (arrivalMoment > _maxArrivalTime) return false;
 
     // TODO : re-implement VMax control.
 
@@ -241,37 +254,7 @@ RoutePlanner::isDestinationUsefulForSoonArrival (const Vertex* vertex,
 
 
 
-/* 
-const DateTime& 
-RoutePlanner::getBestArrival (const Vertex* curPA, tNumeroVoie NumeroVoie) const
-{
-    if (curPA->CorrespondanceAutorisee() && NumeroVoie && vMeilleurTempsQuai[curPA->Index()][NumeroVoie] < vMeilleurTemps[curPA->Index()])
-	return(vMeilleurTempsQuai[curPA->Index()][NumeroVoie]);
-    else
-	return(vMeilleurTemps[curPA->Index()]);
 
-}
-*/
-
-/*
-const cMoment& cCalculateur::GetMeilleureArrivee(const cGare* curPA, tNumeroVoie NumeroVoie) const
-{
-	if (curPA->CorrespondanceAutorisee() && NumeroVoie && vMeilleurTempsQuai[curPA->Index()][NumeroVoie] < vMeilleurTemps[curPA->Index()])
-		return(vMeilleurTempsQuai[curPA->Index()][NumeroVoie]);
-	else
-		return(vMeilleurTemps[curPA->Index()]);
-}
-*/
-
-/*
-
- TODO remove this and include 2 bestvertexreachesmap (departure/arrival)
-const DateTime& 
-RoutePlanner::getBestArrival (const Vertex* vertex) const
-{
-    
-}
-*/
 
 
 
@@ -279,23 +262,25 @@ bool
 RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
 			       const DateTime& departureMoment,
 			       const Edge* departureEdge,
-			       int serviceNumber,
-			       Journey& journeyPart,
-			       const Journey& currentJourney,
+			       const Service* service,
+			       std::deque<JourneyLeg*>& journeyPart,
+			       const Journey* currentJourney,
 			       bool strictTime,
 			       int continuousServiceRange)
 {
     if (arrivalEdge == 0) return true;
+    const Vertex* departureVertex = departureEdge->getFromVertex ();
+    const Vertex* arrivalVertex = arrivalEdge->getFromVertex ();
     
     // Arrival moment
     DateTime arrivalMoment = departureMoment;
     arrivalEdge->calculateArrival (*departureEdge, 
-				   serviceNumber, 
+				   service->getServiceNumber (), 
 				   departureMoment, 
 				   arrivalMoment);
 
     SquareDistance sqd;
-    if (isDestinationUsefulForSoonArrival (arrivalEdge->getFromVertex (),
+    if (isDestinationUsefulForSoonArrival (arrivalVertex,
 					   arrivalMoment, sqd) == false)
     {
 	return false;
@@ -305,9 +290,9 @@ RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
     // Continuous service breaking
     if (_previousContinuousServiceDuration)
     {
-	if ( (currentJourney.getJourneyLegCount () > 0) &&
-	     (currentJourney.getDepartureTime () <= _previousContinuousServiceLastDeparture) &&
-	     (arrivalMoment - currentJourney.getDepartureTime () >= _previousContinuousServiceDuration) )
+	if ( (currentJourney->getJourneyLegCount () > 0) &&
+	     (currentJourney->getDepartureTime () <= _previousContinuousServiceLastDeparture) &&
+	     (arrivalMoment - currentJourney->getDepartureTime () >= _previousContinuousServiceDuration) )
 	{
 	    return false;
 	}
@@ -318,331 +303,187 @@ RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
 	}
     }
     
-/*
+
     // Add a journey leg if necessary
-    if ( (arrivalMoment < getBestArrival (arrivalEdge->getFromVertex ())) ||
-	 (strictTime && (arrivalMoment == getBestArrival (arrivalEdge->getFromVertex ()))) )
+    if ( (arrivalMoment < _bestArrivalVertexReachesMap.getBestTime (arrivalVertex, arrivalMoment)) ||
+	 (strictTime && 
+	  (arrivalMoment == _bestArrivalVertexReachesMap.getBestTime (arrivalVertex, arrivalMoment) )) )
     {
-	JourneyLeg journeyLeg;
+
 	
-	
-
-
-
-    
-
-    // Ecriture de l'ET si nécessaire
-    if ((__MomentArrivee < GetMeilleureArrivee(__GareLigneArr->PointArret(), __GareLigneArr->Quai()))
-	|| (__OptimisationAFaire && __MomentArrivee == GetMeilleureArrivee(__GareLigneArr->PointArret(), __GareLigneArr->Quai())))
-    {
-	cElementTrajet* __ElementTrajet;
-	// On fait mieux, donc ET doit etre gardé.
-	if (vPADeDestination->inclue(__GareLigneArr->PointArret()))
-	    __ElementTrajet = GetET(__GareLigneArr->PointArret());
-	else
-	    __ElementTrajet = GetET(__GareLigneArr->PointArret(), __GareLigneArr->Quai());
-	
-	bool __ETCree = false;
-	if (__ElementTrajet == NULL)
+	JourneyLeg* journeyLeg = 0;
+	if (_bestArrivalVertexReachesMap.contains (arrivalVertex) == false)
 	{
-	    __ElementTrajet = new cElementTrajet;								// Allocation
-	    __SuiteElementsTrajets.LieEnPremier(__ElementTrajet);			__ElementTrajet->setPointArretArrivee(__GareLigneArr->PointArret());	// Ecriture gare d'arrivée
-	    SetET(__GareLigneArr->PointArret(), __ElementTrajet, __GareLigneArr->Quai());	// Stockage dans la gare pour reutilisation eventuelle
-	    __ElementTrajet->setQuaiArrivee(__GareLigneArr->Quai());
-	    __ElementTrajet->setDistanceCarreeObjectif(__DistanceCarreeBut);
-	    __ETCree = true;
-	}
-	__ElementTrajet->setPointArretDepart(__GareLigneDep->PointArret());		// Ecriture gare de départ
-	__ElementTrajet->setAmplitudeServiceContinu(__AmplitudeServiceContinu);
-	__ElementTrajet->setQuaiDepart(__GareLigneDep->Quai());
-	__ElementTrajet->setLigne(__GareLigneDep->Ligne());						// Ecriture ligne
-	__ElementTrajet->setMomentArrivee(__MomentArrivee);						// Ecriture Moment d'arrivée
-	__ElementTrajet->setMomentDepart(__MomentDepart);						// Ecriture Moment de départ
-	__ElementTrajet->setService(__IndexService);							//Ecriture du numéro de service
-	
-	
-	if (vPADeDestination->inclue(__GareLigneArr->PointArret()))
-	{
-	    SetMeilleureArrivee(__GareLigneArr->PointArret(), __MomentArrivee);	// Enregistrement meilleure arrivée
-	    
-	    if (__OptimisationAFaire)
-		vArriveeMax = __MomentArrivee;
-	    else
-		vArriveeMax = vPADeDestination->momentArriveePrecedente(__MomentArrivee, vMomentDebut);	// Ecriture MomentMax le cas échéant
+	    journeyLeg = new JourneyLeg ();
+	    journeyLeg->setOrigin (departureVertex);
+	    journeyLeg->setDestination (arrivalVertex);
+	    journeyLeg->setDepartureTime (departureMoment);
+	    journeyLeg->setArrivalTime (arrivalMoment);
+	    journeyLeg->setService (service);
+	    journeyLeg->setContinuousServiceRange (continuousServiceRange);
+	    journeyLeg->setSquareDistance (sqd);
+
+	    journeyPart.push_front (journeyLeg);
+	    _bestArrivalVertexReachesMap.insert (arrivalVertex, journeyLeg);
 	}
 	else
-	    SetMeilleureArrivee(__GareLigneArr->PointArret(), __MomentArrivee, __GareLigneArr->Quai());	// Enregistrement meilleure arrivée
+	{
+	    journeyLeg->setOrigin (departureVertex);
+	    journeyLeg->setDepartureTime (departureMoment);
+	    journeyLeg->setArrivalTime (arrivalMoment);
+	    journeyLeg->setService (service);
+	    journeyLeg->setContinuousServiceRange (continuousServiceRange);
+	}
+
+	
+	if (_destinationVam.contains (arrivalVertex))
+	{
+	    _maxArrivalTime = arrivalMoment;
+	    _maxArrivalTime += _destinationVam.getVertexAccess (arrivalVertex).approachTime;
+	}
+	
     }
-    
-    // Retour arrêter le parcours de la ligne si la destination a été atteinte
-    return !vPADeDestination->inclue(__GareLigneArr->PointArret());
-*/
-    
-    
+    return arrivalMoment <= (_maxArrivalTime - _destinationVam.getMinApproachTime ());
 
 }
 				    
 				    
-
-
-/*
-inline bool cCalculateur::EvalueGareLigneArriveeCandidate(
-    const cGareLigne* __GareLigneArr, 
-    const cMoment& __MomentDepart, 
-    const cGareLigne* __GareLigneDep, 
-    tIndex __IndexService, 
-    cTrajet& __SuiteElementsTrajets, 
-    const cTrajet& __TrajetEffectue, 
-    bool __OptimisationAFaire, 
-    const cDureeEnMinutes& __AmplitudeServiceContinu, 
-    cLog& __LogTrace)
-{
-	if (!__GareLigneArr)
-		return true;
-		
-	// Heure d'arrivée
-	cMoment	__MomentArrivee = __MomentDepart;
-	__GareLigneArr->CalculeArrivee(*__GareLigneDep, __IndexService, __MomentDepart, __MomentArrivee);
-							
-	// Utilité de la ligne et du point d'arret
-	cDistanceCarree __DistanceCarreeBut;
-	if (!DestinationUtilePourArriverTot(__GareLigneArr->PointArret(), __MomentArrivee, __DistanceCarreeBut))
-		return false;
-							
-	// Ruptures de services continus
-	if (vDureeServiceContinuPrecedent.Valeur())
-	{
-		if (__TrajetEffectue.Taille())
-		{
-			if (__TrajetEffectue.getMomentDepart() <= vDernierDepartServiceContinuPrecedent 
-			&& __MomentArrivee - __TrajetEffectue.getMomentDepart() >= vDureeServiceContinuPrecedent)
-				return false;
-		}
-		else
-		{
-			if (__MomentDepart < vDernierDepartServiceContinuPrecedent && __MomentArrivee - __MomentDepart >= vDureeServiceContinuPrecedent)
-				return false;
-		}
-	}
-
-	// Ecriture de l'ET si nécessaire
-	if ((__MomentArrivee < GetMeilleureArrivee(__GareLigneArr->PointArret(), __GareLigneArr->Quai()))
-	|| (__OptimisationAFaire && __MomentArrivee == GetMeilleureArrivee(__GareLigneArr->PointArret(), __GareLigneArr->Quai())))
-	{
-		cElementTrajet* __ElementTrajet;
-		// On fait mieux, donc ET doit etre gardé.
-		if (vPADeDestination->inclue(__GareLigneArr->PointArret()))
-			__ElementTrajet = GetET(__GareLigneArr->PointArret());
-		else
-			__ElementTrajet = GetET(__GareLigneArr->PointArret(), __GareLigneArr->Quai());
-
-		bool __ETCree = false;
-		if (__ElementTrajet == NULL)
-		{
-			__ElementTrajet = new cElementTrajet;								// Allocation
-			__SuiteElementsTrajets.LieEnPremier(__ElementTrajet);			__ElementTrajet->setPointArretArrivee(__GareLigneArr->PointArret());	// Ecriture gare d'arrivée
-			SetET(__GareLigneArr->PointArret(), __ElementTrajet, __GareLigneArr->Quai());	// Stockage dans la gare pour reutilisation eventuelle
-			__ElementTrajet->setQuaiArrivee(__GareLigneArr->Quai());
-			__ElementTrajet->setDistanceCarreeObjectif(__DistanceCarreeBut);
-			__ETCree = true;
-		}
-		__ElementTrajet->setPointArretDepart(__GareLigneDep->PointArret());		// Ecriture gare de départ
-		__ElementTrajet->setAmplitudeServiceContinu(__AmplitudeServiceContinu);
-		__ElementTrajet->setQuaiDepart(__GareLigneDep->Quai());
-		__ElementTrajet->setLigne(__GareLigneDep->Ligne());						// Ecriture ligne
-		__ElementTrajet->setMomentArrivee(__MomentArrivee);						// Ecriture Moment d'arrivée
-		__ElementTrajet->setMomentDepart(__MomentDepart);						// Ecriture Moment de départ
-		__ElementTrajet->setService(__IndexService);							//Ecriture du numéro de service
-		
-		// Gestion de logs
-		if (Synthese.getNiveauLog() <= LogDebug)
-		{
-			cTexte __Message;
-			if (__ETCree)
-				__Message << "***CREATION***";
-			if (__MomentArrivee <= __MomentDepart)
-			{
-				// Placer un breakpoint ici pour gérer ce type d'erreur
-				__Message << "***ERREUR CHRONOLOGIE***";
-			}
-			__LogTrace.Ecrit(LogDebug, __ElementTrajet, __Message, "");
-		}
-		
-		if (vPADeDestination->inclue(__GareLigneArr->PointArret()))
-		{
-			SetMeilleureArrivee(__GareLigneArr->PointArret(), __MomentArrivee);	// Enregistrement meilleure arrivée
-
-			if (__OptimisationAFaire)
-				vArriveeMax = __MomentArrivee;
-			else
-				vArriveeMax = vPADeDestination->momentArriveePrecedente(__MomentArrivee, vMomentDebut);	// Ecriture MomentMax le cas échéant
-		}
-		else
-			SetMeilleureArrivee(__GareLigneArr->PointArret(), __MomentArrivee, __GareLigneArr->Quai());	// Enregistrement meilleure arrivée
-	}
-	
-	// Retour arrêter le parcours de la ligne si la destination a été atteinte
-	return !vPADeDestination->inclue(__GareLigneArr->PointArret());
-}
-*/
-
-
-
-
-
 
 
 
 
 JourneyVector 
-RoutePlanner::integralSearch (const VertexAccessMap& vertices, 
+RoutePlanner::integralSearch (const VertexAccessMap& vam, 
 			      const DateTime& desiredTime,
 			      const AccessDirection& accessDirection,
-			      Journey* currentJourney,
+			      const Journey* currentJourney,
 			      int maxDepth,
 			      bool searchAddresses, 
 			      bool searchPhysicalStops,
-			      bool strictTime) const
+			      bool strictTime)
 {
-    JourneyVector result;
+    std::deque<JourneyLeg*> journeyPart;
 
-    for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = vertices.getMap ().begin ();
-	 itVertex != vertices.getMap ().end (); ++itVertex)
+    // TODO : the whole other way depending on accessdirection !!
+    // What follows is in case TO_DESTINATION only
+
+    for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = vam.getMap ().begin ();
+	 itVertex != vam.getMap ().end (); ++itVertex)
     {
 	const Vertex* origin = itVertex->first;
 	
-	const std::set<const Edge*>& edges = (accessDirection == TO_DESTINATION) ?
-	    origin->getDepartureEdges () :
-	    origin->getArrivalEdges ();
+	const std::set<const Edge*>& edges = origin->getDepartureEdges ();
 
 	for (std::set<const Edge*>::const_iterator itEdge = edges.begin ();
 	     itEdge != edges.end () ; ++itEdge)
 	{
 	    const Edge* edge = (*itEdge);
 
-	    // Check for path compliancy rules.
-	    if (isPathCompliant (edge->getParentPath (), currentJourney) == false) continue;
+	    if (isPathCompliant (edge->getParentPath ()) == false) continue;
 
-	    int continuousServiceAmplitude = 0;
+	    // TODO : reintroduce optimization on following axis departure/arrival ?
+	    if (areAxisContraintsFulfilled (edge->getParentPath (), currentJourney) == false) continue;
+
+	    int continuousServiceRange = 0;
 	    int serviceNumber = 0;
 	    
-            // TODO : make symetric getPreviousService and getNextService
-	    if (accessDirection == TO_DESTINATION)
+	    DateTime departureMoment = desiredTime;
+	    departureMoment += (int) itVertex->second.approachTime;
+	    
+	    serviceNumber = edge->getNextService (departureMoment, 
+						  _maxArrivalTime,
+						  _calculationTime);
+	    
+	    if (serviceNumber == UNKNOWN_VALUE) continue;
+	    if (strictTime && departureMoment != desiredTime) continue;
+	    
+	    const Service* service = edge->getParentPath ()->getService (serviceNumber);
+	    
+	    // Check for service compliancy rules.
+	    if (isServiceCompliant (service) == false) continue;
+	    
+	    if ( service->isContinuous () )
 	    {
-
-		DateTime departureMoment = desiredTime;
-		departureMoment += (int) itVertex->second.approachTime;
-
-		serviceNumber = edge->getNextService (departureMoment, 
-						      _journeySheetEndTime,
-						      _calculationTime);
-		
-		if (serviceNumber == UNKNOWN_VALUE) continue;
-		if (strictTime && departureMoment != desiredTime) continue;
-		
-		const Service* service = edge->getParentPath ()->getService (serviceNumber);
-
-		// Check for service compliancy rules.
-		if (isServiceCompliant (service, currentJourney) == false) continue;
-
-		if ( service->isContinuous () )
+		if ( departureMoment > edge->getDepartureEndSchedule (serviceNumber) )
 		{
-		    if ( departureMoment > edge->getDepartureEndSchedule (serviceNumber) )
-		    {
-			continuousServiceAmplitude = 
-			    60*24 - ( departureMoment.getHour() - 
-				      edge->getDepartureEndSchedule (serviceNumber).getHour() );
-		    }
-		    else
-		    {
-			continuousServiceAmplitude = 
-			    edge->getDepartureEndSchedule (serviceNumber).getHour() - 
-			    departureMoment.getHour();
-		    }
+		    continuousServiceRange = 
+			60*24 - ( departureMoment.getHour() - 
+				  edge->getDepartureEndSchedule (serviceNumber).getHour() );
 		}
-
-
-		const Line* line = dynamic_cast<const Line*> (edge->getParentPath ());
-		if (line != 0) 
+		else
 		{
-		    
-		    bool walkNonLineConnectableVertices (
-			vertices.hasNonLineConnectableArrivalVertex (line));
-		    
-		    if (walkNonLineConnectableVertices)
-		    {
-			for (const Edge* curEdge = edge->getFollowingArrival ();
-			     curEdge != 0; curEdge = edge->getFollowingArrival ())
-			{
-			    /* Evaluation de la gareligne rendant vers la destination si trouvée
-			    EvalueGareLigneArriveeCandidate(CurrentGLA, MomentDepart, CurrentGLD, NumArret, __SuiteElementsTrajets, TrajetEffectue, OptimisationAFaire, AmplitudeServiceContinu, __LogTrace);
-			    
-			    if (!EvalueGareLigneArriveeCandidate(CurrentGLA, MomentDepart, CurrentGLD, NumArret, __SuiteElementsTrajets, TrajetEffectue, OptimisationAFaire, AmplitudeServiceContinu, __LogTrace))
-			    break;
-			    */
-			    
-			}
-		    }
-		    else
-		    {
-			// TODO connection for transport only !!
-			for (const Edge* curEdge = edge->getFollowingLineConnectionArrival ();
-			     curEdge != 0; curEdge = edge->getFollowingLineConnectionArrival ())
-			{
-
-			}
-		    }
+		    continuousServiceRange = 
+			edge->getDepartureEndSchedule (serviceNumber).getHour() - 
+			departureMoment.getHour();
 		}
-		
 	    }
-
-
-
-/* 
+	    
+	    
+	    const Line* line = dynamic_cast<const Line*> (edge->getParentPath ());
+	    if (line != 0) 
+	    {
+		
+		bool needFineStepping (
+		    _destinationVam.needFineSteppingForArrival (line));
+		
+		
+		PtrEdgeStep step = needFineStepping 
+		    ? (&Edge::getFollowingArrival)
+		    : (&Edge::getFollowingArrivalForFineSteppingOnly);
+		
+		for (const Edge* curEdge = (edge->*step) ();
+		     curEdge != 0; curEdge = (edge->*step) ())
+		{
+		    
+		    if (evaluateArrival (curEdge, departureMoment, edge, service, 
+					 journeyPart, currentJourney, strictTime,
+					 continuousServiceRange) == false) 
+		    {
+			break;
+		    }
+		}
+	    }
 	    else
 	    {
-		DateTime departureMoment = desiredTime - itVertex->second.approachTime;
-		serviceNumber = edge->getPreviousService (departureMoment, 
-							  _journeySheetStartTime);
+		// TODO : if path is a road...
 		
-		if (serviceNumber == UNKNOWN_VALUE) continue;
-		if (strictTime && departureMoment != desiredTime) continue;
-
-		const Service* service = getParentPath ()->getService (serviceNumber);
-		if ( serviceNumber != UNKNOWN_VALUE && 
-		     service->isContinuous() )
-		{
-		    if ( arrivalMoment > edge->getArrivalEndSchedule (serviceNumber) )
-		    {
-			continuousServiceAmplitude = 60*24 - ( 
-			    arrivalMoment.getHour() - 
-			    edge->getArrivalEndSchedule (serviceNumber).getHour () );
-		    }
-		    else
-		    {
-			continuousServiceAmplitude = 
-			    edge->getArrivalEndSchedule (
-				serviceNumber).getHour() - arrivalMoment.getHour ();
-		    }
-		}
-
-		for (const Edge* curEdge = edge->getPreviousConnectionDeparture ();
-		     curEdge != 0; 
-		     curEdge = edge->getPreviousConnectionDeparture ())
-		{
-
-		}
-
 	    }
+	} // next edge
 
-	    const Path* path = edge->getParentPath ();
-	    
-	    double edgeDistance = edge->getLength ();
-	    double edgeTime = edgeDistance / _accessParameters.approachSpeed;
-	    
-	    double totalDistance = itVertex->second.approachDistance + edgeTime;
-	    double totalTime = itVertex->second.approachTime + edgeTime;
-*/
+    } // next vertex in vam
+
+    std::deque<JourneyLeg*> result;
+    while (journeyPart.empty () == false)
+    {
+	JourneyLeg* journeyLeg = journeyPart.front ();
+	journeyPart.pop_front ();
+	
+	if (_destinationVam.contains (journeyLeg->getDestination ()) ||
+	    isDestinationUsefulForSoonArrival (journeyLeg->getDestination (),
+					       journeyLeg->getArrivalTime (), 
+					       journeyLeg->getSquareDistance ()) )
+	{
+	    result.push_back (journeyLeg);
+	}
+	else
+	{ 
+	    delete journeyLeg;
+	}
+    }
+    
+    std::sort (result.begin (), result.end (), _journeyLegComparatorForBestArrival);
+
+
+    // TODO : reflechir!
+
+
+
+}
+	
+		
+
+
+
 	    
 	    
 /*	    
@@ -654,8 +495,6 @@ RoutePlanner::integralSearch (const VertexAccessMap& vertices,
 	    currentAccessCopy.approachTime += edgeTime;
 	    currentAccessCopy.path.push_back (this);
 	    
-*/
-	    
 	}
     }	
 
@@ -663,6 +502,8 @@ RoutePlanner::integralSearch (const VertexAccessMap& vertices,
     
 }
 
+*/
+	    
 
 
 

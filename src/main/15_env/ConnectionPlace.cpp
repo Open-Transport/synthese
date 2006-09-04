@@ -4,7 +4,10 @@
 
 #include "15_env/Alarm.h"
 #include "15_env/PhysicalStop.h"
+#include "15_env/SquareDistance.h"
 #include "15_env/Vertex.h"
+#include "15_env/Edge.h"
+#include "15_env/Line.h"
 
 
 #include <limits>
@@ -18,7 +21,7 @@ namespace env
 
 const int ConnectionPlace::UNKNOWN_TRANSFER_DELAY = -1;
 const int ConnectionPlace::FORBIDDEN_TRANSFER_DELAY = std::numeric_limits<int>::max ();
-
+const int ConnectionPlace::SQUAREDISTANCE_SHORT_LONG = 625;
 
 
 
@@ -43,6 +46,17 @@ ConnectionPlace::ConnectionPlace (const uid& id,
 ConnectionPlace::~ConnectionPlace ()
 {
 }
+
+
+
+
+const AddressablePlace::ConnectionType
+ConnectionPlace::getConnectionType () const
+{
+    return _connectionType;
+}
+
+
 
 
 
@@ -85,12 +99,6 @@ ConnectionPlace::setDefaultTransferDelay (int defaultTransferDelay)
 
 
 
-const ConnectionPlace::ConnectionType& 
-ConnectionPlace::getConnectionType () const
-{
-    return _connectionType;
-}
-
 
 
 void 
@@ -101,28 +109,14 @@ ConnectionPlace::setConnectionType (const ConnectionType& connectionType)
 
 
 
-bool 
-ConnectionPlace::isConnectionAuthorized () const
-{
-    return _connectionType != CONNECTION_TYPE_FORBIDDEN;
-}
-
-
-
-bool 
-ConnectionPlace::isConnectionRoadOnly () const
-{
-    return _connectionType != CONNECTION_TYPE_ROADONLY;
-}
-
-
 
 int 
-ConnectionPlace::getTransferDelay (int departureRank, int arrivalRank) const
+ConnectionPlace::getTransferDelay (const Vertex* fromVertex, 
+				   const Vertex* toVertex) const
 {
-    if (_connectionType == CONNECTION_TYPE_FORBIDDEN) return FORBIDDEN_TRANSFER_DELAY;
     std::map< std::pair<int, int>, int >::const_iterator iter = 
-	_transferDelays.find (std::make_pair (departureRank, arrivalRank));
+	_transferDelays.find (std::make_pair (fromVertex->getRankInConnectionPlace (), 
+					      toVertex->getRankInConnectionPlace ()));
     
     // If not defined in map, return default transfer delay
     if (iter == _transferDelays.end ()) return _defaultTransferDelay;
@@ -207,15 +201,11 @@ ConnectionPlace::getVertexAccess (const AccessDirection& accessDirection,
     {
 	if (accessDirection == FROM_ORIGIN)
 	{
-	    access.approachTime = getTransferDelay (
-		origin->getRankInConnectionPlace (),
-		destination->getRankInConnectionPlace ());
+	    access.approachTime = getTransferDelay (origin, destination);
 	} 
 	else
 	{
-	    access.approachTime = getTransferDelay (
-		destination->getRankInConnectionPlace (),
-		origin->getRankInConnectionPlace ());
+	    access.approachTime = getTransferDelay (destination, origin);
 	}
     }
     else
@@ -261,6 +251,47 @@ ConnectionPlace::getImmediateVertices (VertexAccessMap& result,
 
 
     
+ConnectionPlace::ConnectionType 
+ConnectionPlace::getRecommendedConnectionType (const SquareDistance& squareDistance) const
+{
+    if (_connectionType == CONNECTION_TYPE_RECOMMENDED_SHORT)
+    {
+	return (squareDistance.getSquareDistance () > SQUAREDISTANCE_SHORT_LONG) 
+	    ? CONNECTION_TYPE_LINELINE
+	    : CONNECTION_TYPE_RECOMMENDED ;
+	
+    }
+    return _connectionType;
+
+}
+
+
+
+
+bool 
+ConnectionPlace::isConnectionAllowed (const Edge* fromEdge, 
+				      const Edge* toEdge) const
+{
+    if (_connectionType == CONNECTION_TYPE_FORBIDDEN) return false;
+    
+    bool fromEdgeOnLine (dynamic_cast<const Line*> (fromEdge->getParentPath ()));
+    bool toEdgeOnLine (dynamic_cast<const Line*> (toEdge->getParentPath ()));
+
+    if ( (_connectionType == CONNECTION_TYPE_ROADROAD) &&
+	 (fromEdgeOnLine == false) &&
+	 (toEdgeOnLine == false) ) return true;
+
+    if ( (_connectionType == CONNECTION_TYPE_ROADLINE) &&
+	 ((fromEdgeOnLine == false) || (toEdgeOnLine == false)) ) return true;
+    
+    if (_connectionType >= CONNECTION_TYPE_LINELINE) 
+    {
+	return getTransferDelay (fromEdge->getFromVertex (),
+				 toEdge->getFromVertex ()) != FORBIDDEN_TRANSFER_DELAY;
+    }
+    
+    return false;
+}
 
 
 

@@ -2,6 +2,7 @@
 #define SYNTHESE_ROUTEPLANNER_ROUTEPLANNER_H
 
 
+#include <deque>
 #include <vector>
 #include <map>
 
@@ -12,6 +13,7 @@
 #include "15_env/VertexAccessMap.h"
 
 #include "BestVertexReachesMap.h"
+#include "JourneyLegComparator.h"
 
 
 
@@ -58,7 +60,8 @@ class RoutePlanner
 
  private:
 
-    typedef std::map<synthese::env::Vertex*, JourneyLeg*> BestJourneyLegMap;
+
+    typedef const synthese::env::Edge* (synthese::env::Edge::*PtrEdgeStep) () const;
 
     const synthese::env::Place* _origin;  //<! Origin place for route planning.
     const synthese::env::Place* _destination;  //!< Destination place for route planning.
@@ -70,8 +73,12 @@ class RoutePlanner
     
     const PlanningOrder _planningOrder;  //!< Define planning sequence.
 
-    const synthese::time::DateTime _journeySheetStartTime;  //!< Start time of schedule sheet (= min departure time).
-    const synthese::time::DateTime _journeySheetEndTime;    //!< End time of schedule sheet (= max arrival time).
+
+    synthese::time::DateTime _minDepartureTime;  //!< Min departure time.
+    synthese::time::DateTime _maxArrivalTime;  //!< Max arrival time.
+
+    const synthese::time::DateTime _journeySheetStartTime;  //!< Start time of schedule sheet.
+    const synthese::time::DateTime _journeySheetEndTime;    //!< End time of schedule sheet.
 
     const synthese::time::DateTime _calculationTime;    //!< Time of calculation (initialized to current time)
 
@@ -81,6 +88,9 @@ class RoutePlanner
     
     BestVertexReachesMap _bestDepartureVertexReachesMap;  //!< 
     BestVertexReachesMap _bestArrivalVertexReachesMap;  //!< 
+
+    JourneyLegComparator _journeyLegComparatorForBestArrival;
+    JourneyLegComparator _journeyLegComparatorForBestDeparture;
     
 
  public:
@@ -123,11 +133,11 @@ class RoutePlanner
     JourneyVector integralSearch (const synthese::env::VertexAccessMap& vertices, 
 				  const synthese::time::DateTime& desiredTime,
 				  const synthese::env::AccessDirection& accessDirection,
-				  Journey* currentJourney,
+				  const Journey* currentJourney,
 				  int maxDepth,
 				  bool searchAddresses, 
 				  bool searchPhysicalStops,
-				  bool strictTime) const;
+				  bool strictTime);
 
 
     Journey* findBestJourney (const synthese::env::VertexAccessMap& vertices, 
@@ -144,11 +154,12 @@ class RoutePlanner
 
  private:
 
-    bool isPathCompliant (const synthese::env::Path* path, 
-			  const Journey* journey) const;
+    bool areAxisContraintsFulfilled (const synthese::env::Path* path, 
+				     const Journey* journey) const;
 
-    bool isServiceCompliant (const synthese::env::Service* service, 
-			     const Journey* journey) const;
+    bool isPathCompliant (const synthese::env::Path* path) const;
+
+    bool isServiceCompliant (const synthese::env::Service* service) const;
 
     bool isDestinationUsefulForSoonArrival (const synthese::env::Vertex* vertex,
 					    const synthese::time::DateTime& dateTime,
@@ -157,9 +168,9 @@ class RoutePlanner
     bool evaluateArrival (const synthese::env::Edge* arrivalEdge,
 			  const synthese::time::DateTime& departureMoment,
 			  const synthese::env::Edge* departureEdge,
-			  int serviceNumber,
-			  Journey& journeyPart,
-			  const Journey& currentJourney,
+			  const synthese::env::Service* service,
+			  std::deque<JourneyLeg*>& journeyPart,
+			  const Journey* currentJourney,
 			  bool strictTime,
 			  int continuousServiceRange);
 	

@@ -10,6 +10,8 @@
 #include "15_env/ConnectionPlace.h"
 
 
+using synthese::env::ConnectionPlace;
+
 namespace su = synthese::util;
 
 namespace synthese
@@ -37,7 +39,8 @@ ConnectionPlaceLS::Load (XMLNode& node,
 		    node.getAttribute (CONNECTIONPLACE_CITYID_ATTR.c_str())));
 
     return new synthese::env::ConnectionPlace (id, name,
-					   environment.getCities ().get (cityId));
+					       environment.getCities ().get (cityId),
+					       ConnectionPlace::CONNECTION_TYPE_FORBIDDEN);
 }
 
 

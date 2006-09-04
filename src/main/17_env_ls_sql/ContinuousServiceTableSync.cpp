@@ -63,8 +63,8 @@ ContinuousServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int r
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
 
-    std::string serviceNumber (
-	rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER));
+    int serviceNumber (Conversion::ToInt (
+        rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER)));
 
     std::string schedules (
 	rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_SCHEDULES));
@@ -148,8 +148,8 @@ ContinuousServiceTableSync::doReplace (const synthese::db::SQLiteResult& rows, i
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
     ContinuousService* cs = environment.getContinuousServices ().get (id);
 
-    std::string serviceNumber (
-	rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER));
+    int serviceNumber (Conversion::ToInt (
+        rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER)));
 
     std::string schedules (
 	rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_SCHEDULES));
