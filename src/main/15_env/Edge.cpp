@@ -570,34 +570,6 @@ Edge::getPreviousService ( synthese::time::DateTime& arrivalMoment,
 
 */
 
-/*
-int 
-Edge::getNextService ( synthese::time::DateTime& departureMoment, 
-			   const synthese::time::DateTime& maxDepartureMoment,
-			   int& continuousServiceAmplitude, 
-			   int minNextServiceNumber,
-			   const synthese::time::DateTime& calculationMoment ) const
-{
-    int next = getNextService( departureMoment, 
-			       maxDepartureMoment, 
-			       calculationMoment, 
-			       minNextServiceNumber );
-
-    if ( next != UNKNOWN_VALUE && getParentPath ()->getService ( next )->isContinuous () )
-    {
-        if ( departureMoment > _departureEndSchedule[ next ] )
-            continuousServiceAmplitude = 1440 - ( departureMoment.getHour() - _departureEndSchedule[ next ].getHour() );
-        else
-            continuousServiceAmplitude = _departureEndSchedule[ next ].getHour() - departureMoment.getHour();
-    } 
-    else
-        continuousServiceAmplitude = 0;
-
-    return next;
-}
-*/
-
-
 
 
 
@@ -668,52 +640,49 @@ Edge::allocateSchedules ()
 
 
 
-/*! \brief Ecriture des index de d�part de la gare ligne, � partir des horaires des arr�ts.
- \version 2.1
- \author Hugues Romain
- \date 2001-2004
- 
-Ecrit tous les index d'un coup (contrairement � la version 1)
-*/
 void 
 Edge::updateDepartureIndex ()
 {
-/* MJ TO BE MIGRATED !!!
-    int iNumeroHeure;
+    int numHour;
 
-    int DerniereHeure = 25; // MODIF HR
-    size_t NumeroServicePassantMinuit = 0; // MODIF HR
+    int lastHour = 25; 
+    int serviceOverMidnightNumber = 0;
+    
+    // Reset
+    for ( numHour = 0; numHour < synthese::time::HOURS_PER_DAY; numHour++ )
+        _departureIndex[ numHour ] = -1;
 
-    // RAZ
-    for ( iNumeroHeure = 0; iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
-        vIndexDepart[ iNumeroHeure ] = -1;
 
-    // Ecriture service par service
-    for ( size_t iNumeroService = 0; iNumeroService < vLigne->getServices().size(); iNumeroService++ )
+    for (int i = 0; i < _parentPath->getServices().size (); ++i)
     {
-        if ( vHoraireDepartDernier[ iNumeroService ].getHours () < DerniereHeure )
-            NumeroServicePassantMinuit = iNumeroService;
-        if ( vHoraireDepartDernier[ iNumeroService ].getHours () >= vHoraireDepartPremier[ iNumeroService ].getHours () )
+        if ( _departureEndSchedule[i].getHours () < lastHour )
+            serviceOverMidnightNumber = i;
+	
+        if ( _departureEndSchedule[i].getHours () >= _departureBeginSchedule[i].getHours () )
         {
-            for ( iNumeroHeure = 0; iNumeroHeure <= vHoraireDepartDernier[ iNumeroService ].getHours (); iNumeroHeure++ )
-                if ( vIndexDepart[ iNumeroHeure ] == -1 || vIndexDepart[ iNumeroHeure ] < NumeroServicePassantMinuit )
-                    vIndexDepart[ iNumeroHeure ] = iNumeroService;
+            for ( numHour = 0; numHour <= _departureEndSchedule[i].getHours (); ++numHour )
+	    {
+                if ( (_departureIndex[numHour] == -1) || 
+		     (_departureIndex[numHour] < serviceOverMidnightNumber) ) 
+		{
+		    _departureIndex[numHour] = i;
+		}
+	    }
         }
         else
         {
-            for ( iNumeroHeure = 0; iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
-                if ( vIndexDepart[ iNumeroHeure ] == -1 )
-                    vIndexDepart[ iNumeroHeure ] = iNumeroService;
+            for (numHour = 0; numHour < synthese::time::HOURS_PER_DAY; ++numHour)
+	    {
+                if (_departureIndex[numHour] == -1)
+		{
+                    _departureIndex[ numHour ] = i;
+		}
+	    }
         }
-        DerniereHeure = vHoraireDepartDernier[ iNumeroService ].getHours ();
+        lastHour = _departureEndSchedule[i].getHours ();
 
     }
-
-    // Ecriture du temps r�el
-    for ( iNumeroHeure = 0; iNumeroHeure < 24; iNumeroHeure++ )
-        vIndexDepartReel[ iNumeroHeure ] = vIndexDepart[ iNumeroHeure ];
-
-*/
+    
 }
 
 
@@ -723,41 +692,80 @@ Edge::updateDepartureIndex ()
 void 
 Edge::updateArrivalIndex ()
 {
-/* MJ TO BE MIRGATED !!!
-    int iNumeroHeure;
+    int numHour;
 
-    // RAZ
-    for ( iNumeroHeure = 0; iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
-        vIndexArrivee[ iNumeroHeure ] = -1;
+    int lastHour = 25; 
+    int serviceOverMidnightNumber = _parentPath->getServices ().size ();
 
-    int DerniereHeure = 25;
-    size_t NumeroServicePassantMinuit = vLigne->getServices().size();
-
-    for ( size_t iNumeroService = vLigne->getServices().size() - 1; iNumeroService >= 0; iNumeroService-- )
+    // Reset
+    for (numHour = 0; numHour < synthese::time::HOURS_PER_DAY; ++numHour)
+        _arrivalIndex[numHour] = -1;
+    
+    
+    for (int i = _parentPath->getServices().size () - 1; i >= 0; --i)
     {
-        if ( vHoraireArriveePremier[ iNumeroService ].getHours () > DerniereHeure )
-            NumeroServicePassantMinuit = iNumeroService;
-        if ( vHoraireArriveeDernier[ iNumeroService ].getHours () >= vHoraireArriveePremier[ iNumeroService ].getHours () )
+        if ( _arrivalBeginSchedule[i].getHours () > lastHour )
+            serviceOverMidnightNumber = i;
+	
+        if ( _arrivalEndSchedule[i].getHours () >= _arrivalBeginSchedule[i].getHours () )
         {
-            for ( iNumeroHeure = vHoraireArriveePremier[ iNumeroService ].getHours (); iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
-                if ( vIndexArrivee[ iNumeroHeure ] == -1 || vIndexArrivee[ iNumeroHeure ] > NumeroServicePassantMinuit )
-                    vIndexArrivee[ iNumeroHeure ] = iNumeroService;
+            for ( numHour = _arrivalBeginSchedule[i].getHours (); 
+		  numHour < synthese::time::HOURS_PER_DAY; numHour++ )
+	    {
+                if ( (_arrivalIndex[numHour] == -1) || 
+		     (_arrivalIndex[numHour] > serviceOverMidnightNumber) )
+		{
+                    _arrivalIndex[numHour] = i;
+		}
+	    }
         }
         else
         {
-            for ( iNumeroHeure = 0; iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
-                if ( vIndexArrivee[ iNumeroHeure ] == -1 )
-                    vIndexArrivee[ iNumeroHeure ] = iNumeroService;
+            for (numHour = 0; numHour < synthese::time::HOURS_PER_DAY; ++numHour)
+	    {
+                if ( _arrivalIndex[numHour] == -1 )
+		{
+                    _arrivalIndex[numHour] = i;
+		}
+	    }
         }
-        DerniereHeure = vHoraireArriveePremier[ iNumeroService ].getHours ();
+        lastHour = _arrivalBeginSchedule[i].getHours ();
     }
-
-    // Ecriture du temps r�el
-    for ( iNumeroHeure = 0; iNumeroHeure < synthese::time::HOURS_PER_DAY; iNumeroHeure++ )
-        vIndexArriveeReel[ iNumeroHeure ] = vIndexArrivee[ iNumeroHeure ];
-*/
+    
 }
 
+
+
+
+
+
+
+/*  => moved in integral search
+int 
+Edge::getNextService ( synthese::time::DateTime& departureMoment, 
+			   const synthese::time::DateTime& maxDepartureMoment,
+			   int& continuousServiceAmplitude, 
+			   int minNextServiceNumber,
+			   const synthese::time::DateTime& calculationMoment ) const
+{
+    int next = getNextService( departureMoment, 
+			       maxDepartureMoment, 
+			       calculationMoment, 
+			       minNextServiceNumber );
+
+    if ( next != UNKNOWN_VALUE && getParentPath ()->getService ( next )->isContinuous () )
+    {
+        if ( departureMoment > _departureEndSchedule[ next ] )
+            continuousServiceAmplitude = 1440 - ( departureMoment.getHour() - _departureEndSchedule[ next ].getHour() );
+        else
+            continuousServiceAmplitude = _departureEndSchedule[ next ].getHour() - departureMoment.getHour();
+    } 
+    else
+        continuousServiceAmplitude = 0;
+
+    return next;
+}
+*/
 
 
 
