@@ -105,5 +105,13 @@ Road::findClosestAddressAfter (double metricOffset) const
 
 
 
+bool 
+Road::isRoad () const
+{
+    return true;
+}
+
+
+
 }
 }

@@ -65,7 +65,6 @@ Place::getVertexAccess (const AccessDirection& accessDirection,
     VertexAccess access;
     access.approachDistance = 0;
     access.approachTime = 0;
-    access.path.push_back (destination);
 
     return access;
 }

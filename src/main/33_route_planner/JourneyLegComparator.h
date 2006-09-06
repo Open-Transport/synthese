@@ -10,7 +10,7 @@ namespace synthese
 
 namespace env
 {
-    class Vertex;
+    class Edge;
 }
 
 namespace routeplanner
@@ -28,8 +28,8 @@ class JourneyLegComparator
 {
  private:
 
-    typedef const synthese::env::Vertex* (JourneyLeg::*PtrVertexAccessor) () const;
-    PtrVertexAccessor _vertexAccessor;
+    typedef const synthese::env::Edge* (JourneyLeg::*PtrEdgeAccessor) () const;
+    PtrEdgeAccessor _edgeAccessor;
 
  public:
 

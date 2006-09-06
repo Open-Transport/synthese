@@ -2,6 +2,7 @@
 
 
 #include "JourneyLeg.h"
+#include "15_env/Edge.h"
 #include "15_env/Vertex.h"
 #include "15_env/ConnectionPlace.h"
 
@@ -21,9 +22,9 @@ namespace routeplanner
 
 
 JourneyLegComparator::JourneyLegComparator (const synthese::env::AccessDirection& accessDirection)
-    : _vertexAccessor ( (accessDirection == synthese::env::TO_DESTINATION)
-			? (&JourneyLeg::getDestination)
-			: (&JourneyLeg::getOrigin) ) 
+    : _edgeAccessor ( (accessDirection == synthese::env::TO_DESTINATION)
+		      ? (&JourneyLeg::getDestination)
+		      : (&JourneyLeg::getOrigin) ) 
 {
 
 }
@@ -46,15 +47,15 @@ JourneyLegComparator::operator () (const JourneyLeg* jl1, const JourneyLeg* jl2)
     
     if (jl1->getSquareDistance () == jl2->getSquareDistance ()) return false;
 
-    assert ((jl1->*_vertexAccessor) ()->getConnectionPlace () != 0);
-    assert ((jl2->*_vertexAccessor) ()->getConnectionPlace () != 0);
+    assert ((jl1->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
+    assert ((jl2->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
 
     ConnectionPlace::ConnectionType type1 = 
-	(jl1->*_vertexAccessor) ()->getConnectionPlace ()
+	(jl1->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace ()
 	->getRecommendedConnectionType (jl1->getSquareDistance ());
 
     ConnectionPlace::ConnectionType type2 = 
-	(jl2->*_vertexAccessor) ()->getConnectionPlace ()
+	(jl2->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace ()
 	->getRecommendedConnectionType (jl2->getSquareDistance ());
     
     if (type1 != type2)	return type2 - type1;

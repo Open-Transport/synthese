@@ -207,7 +207,6 @@ namespace synthese
 	     */
 	    static const std::string ADDRESSES_TABLE_NAME ("t002_addresses");
 	    static const std::string ADDRESSES_TABLE_COL_CONNECTIONPLACEID ("connection_place_id");  // NU
-	    static const std::string ADDRESSES_TABLE_COL_RANKINCONNECTIONPLACE ("rank_in_connection_place"); // NU
 	    static const std::string ADDRESSES_TABLE_COL_ROADID ("road_id");  // NU
 	    static const std::string ADDRESSES_TABLE_COL_METRICOFFSET ("metric_offset");  // U ??
 	    static const std::string ADDRESSES_TABLE_COL_X ("x");  // U ??
@@ -321,7 +320,6 @@ namespace synthese
 	    static const std::string PHYSICALSTOPS_TABLE_NAME ("t012_physical_stops");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_NAME ("name");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID ("connection_place_id");
-	    static const std::string PHYSICALSTOPS_TABLE_COL_RANKINCONNECTIONPLACE ("rank_in_connection_place");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_X ("x");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_Y ("y");
 

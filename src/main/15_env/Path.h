@@ -101,6 +101,8 @@ public:
     //! @name Query methods.
     //@{
 
+    virtual bool isRoad () const = 0;
+
     /** Gets all the geographical points linked by the path
         between two of its edges. If no from/to edge
 	index is provided, all the edges are considered.

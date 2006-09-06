@@ -15,7 +15,8 @@ namespace env
 {
     class Axis;
     class Service;
-    class Vertex;
+    class Edge;
+    class Path;
 }
 
 namespace routeplanner
@@ -32,8 +33,8 @@ class JourneyLeg
 {
  private:
 
-    const synthese::env::Vertex* _origin;   //!< Origin
-    const synthese::env::Vertex* _destination;  //!< Destination
+    const synthese::env::Edge* _origin;   //!< Origin
+    const synthese::env::Edge* _destination;  //!< Destination
 
     synthese::time::DateTime _departureTime; //!< Departure moment (first if continuous service)
     synthese::time::DateTime _arrivalTime;    //!< Arrival moment (first if continuous service)
@@ -52,6 +53,8 @@ class JourneyLeg
 
     //! @name Getters/Setters
     //@{
+    const synthese::env::Path* getPath () const;
+    
     const synthese::env::Service* getService () const;
     void setService (const synthese::env::Service* service);
 
@@ -61,11 +64,11 @@ class JourneyLeg
     const synthese::time::DateTime& getArrivalTime () const;
     void setArrivalTime (const synthese::time::DateTime& arrivalTime);
 
-    const synthese::env::Vertex* getOrigin () const;
-    void setOrigin (const synthese::env::Vertex* origin);
+    const synthese::env::Edge* getOrigin () const;
+    void setOrigin (const synthese::env::Edge* origin);
 
-    const synthese::env::Vertex* getDestination () const;
-    void setDestination (const synthese::env::Vertex* destination);
+    const synthese::env::Edge* getDestination () const;
+    void setDestination (const synthese::env::Edge* destination);
 
     int getContinuousServiceRange () const;
     void setContinuousServiceRange (int continuousServiceRange);
@@ -86,6 +89,7 @@ class JourneyLeg
      */
     int getDuration () const;
 
+    int getDistance () const;
     //@}
 
 

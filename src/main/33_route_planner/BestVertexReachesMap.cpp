@@ -60,8 +60,6 @@ BestVertexReachesMap::insert (const synthese::env::Vertex* vertex, JourneyLeg* j
 
     if (connectionPlace == 0) return;
 
-    ConnectionPlaceMap::iterator itc = _connectionPlaceMap.find (connectionPlace);
-
     DateTime bestTime;
     if (_accessDirection == synthese::env::TO_DESTINATION)
     {
@@ -74,20 +72,30 @@ BestVertexReachesMap::insert (const synthese::env::Vertex* vertex, JourneyLeg* j
 	bestTime -= connectionPlace->getMaxTransferDelay ();
     }
     
-    if (itc == _connectionPlaceMap.end ()) 
-    {
-	_connectionPlaceMap.insert (std::make_pair (connectionPlace, bestTime));
-    }
-    else
-    {
-	if (bestTime < itc->second)
-	{
-	    itc->second = bestTime;
-	}
-    }
+    insert (connectionPlace, bestTime);
+    
 }    
     
 
+
+void 
+BestVertexReachesMap::insert (const synthese::env::ConnectionPlace* connectionPlace, 
+			      const synthese::time::DateTime& dateTime)
+{
+    ConnectionPlaceMap::iterator itc = _connectionPlaceMap.find (connectionPlace);
+
+    if (itc == _connectionPlaceMap.end ()) 
+    {
+	_connectionPlaceMap.insert (std::make_pair (connectionPlace, dateTime));
+    }
+    else
+    {
+	if (dateTime < itc->second)
+	{
+	    itc->second = dateTime;
+	}
+    }
+}
 
 
 
@@ -125,6 +133,15 @@ BestVertexReachesMap::getBestJourneyLeg (const Vertex* vertex)
 {
     if (contains (vertex) == false) return 0;
     return _vertexMap.find (vertex)->second;
+}
+
+
+
+void 
+BestVertexReachesMap::clear ()
+{
+    _vertexMap.clear ();
+    _connectionPlaceMap.clear ();
 }
 
 

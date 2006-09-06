@@ -4,6 +4,7 @@
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteThreadExec.h"
 
+#include "15_env/Address.h"
 #include "15_env/RoadChunk.h"
 #include "15_env/Point.h"
 
@@ -17,6 +18,7 @@ using synthese::util::Conversion;
 using synthese::db::SQLiteResult;
 using synthese::env::Environment;
 using synthese::env::Point;
+using synthese::env::Address;
 using synthese::env::RoadChunk;
 
 namespace synthese
@@ -62,8 +64,9 @@ RoadChunkTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 
     typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
+    const Address* fromAddress = environment.getAddresses ().get (fromAddressId);
     RoadChunk* rc = new synthese::env::RoadChunk (
-	id, environment.getAddresses ().get (fromAddressId), rankInRoad);
+	id, fromAddress, rankInRoad);
 
     boost::char_separator<char> sep1 (",");
     boost::char_separator<char> sep2 (":");
@@ -78,7 +81,8 @@ RoadChunkTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 	rc->addViaPoint (synthese::env::Point (Conversion::ToDouble (*valueIter), 
 					       Conversion::ToDouble (*(++valueIter))));
     }
-
+    
+    environment.getRoads ().get (fromAddress->getRoad ()->getId ())->addEdge (rc);
     environment.getRoadChunks ().add (rc, false);
 }
 

@@ -43,8 +43,7 @@ private:
 public:
 
     Address (const uid& id,
-	     const ConnectionPlace* connectionPlace,
-	     int rankInConnectionPlace,
+	     const AddressablePlace* place,
 	     const Road* road, 
 	     double metricOffset,
 	     double x = UNKNOWN_VALUE,
@@ -61,6 +60,8 @@ public:
 
     //! @name Getters/Setters
     //@{
+    const uid& getId () const;
+
     const Road* getRoad() const;
     double getMetricOffset () const;
     //@}
@@ -69,7 +70,7 @@ public:
 
     //! @name Query methods
     //@{
-
+    bool isAddress () const;
     //@}
 
 

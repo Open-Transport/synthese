@@ -28,7 +28,6 @@ PhysicalStopTableSync::PhysicalStopTableSync (Environment::Registry& environment
 {
     addTableColumn (PHYSICALSTOPS_TABLE_COL_NAME, "TEXT", true);
     addTableColumn (PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID, "INTEGER", false);
-    addTableColumn (PHYSICALSTOPS_TABLE_COL_RANKINCONNECTIONPLACE, "INTEGER", false);
     addTableColumn (PHYSICALSTOPS_TABLE_COL_X, "DOUBLE", true);
     addTableColumn (PHYSICALSTOPS_TABLE_COL_Y, "DOUBLE", true);
 }
@@ -51,7 +50,6 @@ PhysicalStopTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowInd
 	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
 	rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_NAME),
 	environment.getConnectionPlaces ().get (Conversion::ToInt (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID))),
-	Conversion::ToInt (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_RANKINCONNECTIONPLACE)),
 	Conversion::ToDouble (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_X)),
 	Conversion::ToDouble (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_Y))
 	);

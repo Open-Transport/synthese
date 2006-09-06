@@ -73,7 +73,12 @@ class BestVertexReachesMap
 
     //! @name Update methods
     //@{
-    void insert (const synthese::env::Vertex* vertex, JourneyLeg* journeyLeg);
+    void clear ();
+    void insert (const synthese::env::Vertex* vertex, 
+		 JourneyLeg* journeyLeg);
+
+    void insert (const synthese::env::ConnectionPlace* connectionPlace, 
+		 const synthese::time::DateTime& dateTime);
 
     //@}
 

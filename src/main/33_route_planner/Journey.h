@@ -14,7 +14,7 @@ namespace time
 }
 namespace env
 {
-    class Vertex;
+    class Edge;
 }
 
 namespace routeplanner
@@ -32,6 +32,10 @@ class Journey
  private:
 
     std::deque<const JourneyLeg*> _journeyLegs;
+    int _continuousServiceRange;
+    int _effectiveTransportDuration;
+    int _transportConnectionCount;
+    int _distance;
 
  public:
 
@@ -52,13 +56,21 @@ class Journey
 
     //! @name Query methods
     //@{
-    const synthese::env::Vertex* getOrigin() const;
-    const synthese::env::Vertex* getDestination() const;
+    const synthese::env::Edge* getOrigin() const;
+    const synthese::env::Edge* getDestination() const;
 
     const synthese::time::DateTime& getDepartureTime () const;
     const synthese::time::DateTime& getArrivalTime () const;
 
     int getDuration () const;
+    int getDistance () const;
+
+    int getTransportConnectionCount ();
+
+    /** Returns the effective amount of time spent
+	in transport, excluding tranfer delays.
+    */
+    int getEffectiveTransportDuration () const;
 
     /** Detects max alarm level in journey.
       
@@ -72,10 +84,12 @@ class Journey
     */
     int getMaxAlarmLevel () const;
 
+
     /** Continuous service range of this journey.
 	@return Range duration in minutes, or 0 if unique service.
     */
     int getContinuousServiceRange () const;
+    void setContinuousServiceRange (int continuousServiceRange);
 
     //@}
 
@@ -84,11 +98,18 @@ class Journey
     //! @name Update methods
     //@{
     void clear ();
+
     void prepend (const JourneyLeg* leg);
+    void prepend (const Journey& journey);
+
     void append (const JourneyLeg* leg);
+    void append (const Journey& journey);
     
     //@}
 
+
+    int operator > (const Journey& op) const;
+    Journey& operator = (const Journey& ref);
 
 
 };

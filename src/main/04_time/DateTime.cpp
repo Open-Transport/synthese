@@ -63,6 +63,10 @@ DateTime::operator += ( int minutesDuration )
     return ( *this );
 }
 
+
+
+
+
 DateTime&
 DateTime::operator -= ( int minutesDuration )
 {
@@ -354,7 +358,8 @@ operator > ( const DateTime& op1, const DateTime &op2 )
 }
 
 
-int operator - ( const DateTime& op1, const DateTime& op2 )
+int 
+operator - ( const DateTime& op1, const DateTime& op2 )
 {
   int result;
   int retain = 0;
@@ -373,6 +378,23 @@ int operator - ( const DateTime& op1, const DateTime& op2 )
 }
 
 
+DateTime 
+operator + ( const DateTime& op, const int& minutesDuration )
+{
+    DateTime result (op);
+    result += minutesDuration;
+    return result;
+}
+
+
+
+DateTime 
+operator - ( const DateTime& op, const int& minutesDuration )
+{
+    DateTime result (op);
+    result -= minutesDuration;
+    return result;
+}
 
 
 

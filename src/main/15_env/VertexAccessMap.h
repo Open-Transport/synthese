@@ -22,11 +22,9 @@ namespace env
  class Vertex;
  class Path;
 
- typedef std::vector<const Vertex*> AccessPath;
  
  
  typedef struct {
-     AccessPath path;
      int approachTime;
      double approachDistance;
  } VertexAccess;

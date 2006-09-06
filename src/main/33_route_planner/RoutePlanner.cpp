@@ -117,7 +117,7 @@ RoutePlanner::getDestination () const
 
 bool 
 RoutePlanner::areAxisContraintsFulfilled (const synthese::env::Path* path, 
-					  const Journey* journey) const
+					  const Journey& journey) const
 {
     // Check if axis is allowed.
     if (path->getAxis () && (path->getAxis ()->isAllowed () == false)) 
@@ -128,11 +128,11 @@ RoutePlanner::areAxisContraintsFulfilled (const synthese::env::Path* path,
     // Check axis against already followed axes
     if ( path->getAxis () && 
 	 (path->getAxis ()->isFree () == false) &&
-	 (journey->getJourneyLegCount () > 0) )
+	 (journey.getJourneyLegCount () > 0) )
     {
-	for (int i=0; i<journey->getJourneyLegCount (); ++i)
+	for (int i=0; i<journey.getJourneyLegCount (); ++i)
 	{
-	    if (journey->getJourneyLeg (i)->getAxis () == path->getAxis ()) 
+	    if (journey.getJourneyLeg (i)->getAxis () == path->getAxis ()) 
 	    {
 		return false;
 	    }
@@ -264,14 +264,14 @@ RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
 			       const Edge* departureEdge,
 			       const Service* service,
 			       std::deque<JourneyLeg*>& journeyPart,
-			       const Journey* currentJourney,
+			       const Journey& currentJourney,
 			       bool strictTime,
 			       int continuousServiceRange)
 {
     if (arrivalEdge == 0) return true;
-    const Vertex* departureVertex = departureEdge->getFromVertex ();
-    const Vertex* arrivalVertex = arrivalEdge->getFromVertex ();
     
+    const Vertex* arrivalVertex = arrivalEdge->getFromVertex ();
+
     // Arrival moment
     DateTime arrivalMoment = departureMoment;
     arrivalEdge->calculateArrival (*departureEdge, 
@@ -290,9 +290,9 @@ RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
     // Continuous service breaking
     if (_previousContinuousServiceDuration)
     {
-	if ( (currentJourney->getJourneyLegCount () > 0) &&
-	     (currentJourney->getDepartureTime () <= _previousContinuousServiceLastDeparture) &&
-	     (arrivalMoment - currentJourney->getDepartureTime () >= _previousContinuousServiceDuration) )
+	if ( (currentJourney.getJourneyLegCount () > 0) &&
+	     (currentJourney.getDepartureTime () <= _previousContinuousServiceLastDeparture) &&
+	     (arrivalMoment - currentJourney.getDepartureTime () >= _previousContinuousServiceDuration) )
 	{
 	    return false;
 	}
@@ -315,8 +315,8 @@ RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
 	if (_bestArrivalVertexReachesMap.contains (arrivalVertex) == false)
 	{
 	    journeyLeg = new JourneyLeg ();
-	    journeyLeg->setOrigin (departureVertex);
-	    journeyLeg->setDestination (arrivalVertex);
+	    journeyLeg->setOrigin (departureEdge);
+	    journeyLeg->setDestination (arrivalEdge);
 	    journeyLeg->setDepartureTime (departureMoment);
 	    journeyLeg->setArrivalTime (arrivalMoment);
 	    journeyLeg->setService (service);
@@ -328,7 +328,7 @@ RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
 	}
 	else
 	{
-	    journeyLeg->setOrigin (departureVertex);
+	    journeyLeg->setOrigin (departureEdge);
 	    journeyLeg->setDepartureTime (departureMoment);
 	    journeyLeg->setArrivalTime (arrivalMoment);
 	    journeyLeg->setService (service);
@@ -358,8 +358,10 @@ RoutePlanner::integralSearch (const VertexAccessMap& vam,
 			      const AccessDirection& accessDirection,
 			      const Journey* currentJourney,
 			      int maxDepth,
-			      bool searchAddresses, 
-			      bool searchPhysicalStops,
+			      SearchAddresses searchAddresses, 
+			      SearchPhysicalStops searchPhysicalStops,
+			      UseRoads useRoads,
+			      UseLines useLines,
 			      bool strictTime)
 {
     std::deque<JourneyLeg*> journeyPart;
@@ -382,7 +384,7 @@ RoutePlanner::integralSearch (const VertexAccessMap& vam,
 	    if (isPathCompliant (edge->getParentPath ()) == false) continue;
 
 	    // TODO : reintroduce optimization on following axis departure/arrival ?
-	    if (areAxisContraintsFulfilled (edge->getParentPath (), currentJourney) == false) continue;
+	    if (areAxisContraintsFulfilled (edge->getParentPath (), *currentJourney) == false) continue;
 
 	    int continuousServiceRange = 0;
 	    int serviceNumber = 0;
@@ -419,51 +421,42 @@ RoutePlanner::integralSearch (const VertexAccessMap& vam,
 	    }
 	    
 	    
-	    const Line* line = dynamic_cast<const Line*> (edge->getParentPath ());
-	    if (line != 0) 
+	    bool needFineStepping (
+		_destinationVam.needFineSteppingForArrival (edge->getParentPath ()));
+	    
+	    
+	    PtrEdgeStep step = needFineStepping 
+		? (&Edge::getFollowingArrivalForFineSteppingOnly)
+		: (&Edge::getFollowingConnectionArrival);
+		
+	    for (const Edge* curEdge = (edge->*step) ();
+		 curEdge != 0; curEdge = (edge->*step) ())
 	    {
 		
-		bool needFineStepping (
-		    _destinationVam.needFineSteppingForArrival (line));
-		
-		
-		PtrEdgeStep step = needFineStepping 
-		    ? (&Edge::getFollowingArrival)
-		    : (&Edge::getFollowingArrivalForFineSteppingOnly);
-		
-		for (const Edge* curEdge = (edge->*step) ();
-		     curEdge != 0; curEdge = (edge->*step) ())
+		if (evaluateArrival (curEdge, departureMoment, edge, service, 
+				     journeyPart, *currentJourney, strictTime,
+				     continuousServiceRange) == false) 
 		{
-		    
-		    if (evaluateArrival (curEdge, departureMoment, edge, service, 
-					 journeyPart, currentJourney, strictTime,
-					 continuousServiceRange) == false) 
-		    {
-			break;
-		    }
+		    break;
 		}
 	    }
-	    else
-	    {
-		// TODO : if path is a road...
-		
-	    }
-	} // next edge
 
+	} // next edge
+	
     } // next vertex in vam
 
-    std::deque<JourneyLeg*> result;
+    std::deque<JourneyLeg*> legs;
     while (journeyPart.empty () == false)
     {
 	JourneyLeg* journeyLeg = journeyPart.front ();
 	journeyPart.pop_front ();
 	
-	if (_destinationVam.contains (journeyLeg->getDestination ()) ||
-	    isDestinationUsefulForSoonArrival (journeyLeg->getDestination (),
+	if (_destinationVam.contains (journeyLeg->getDestination ()->getFromVertex ()) ||
+	    isDestinationUsefulForSoonArrival (journeyLeg->getDestination ()->getFromVertex (),
 					       journeyLeg->getArrivalTime (), 
 					       journeyLeg->getSquareDistance ()) )
 	{
-	    result.push_back (journeyLeg);
+	    legs.push_back (journeyLeg);
 	}
 	else
 	{ 
@@ -471,8 +464,50 @@ RoutePlanner::integralSearch (const VertexAccessMap& vam,
 	}
     }
     
-    std::sort (result.begin (), result.end (), _journeyLegComparatorForBestArrival);
+    std::sort (legs.begin (), legs.end (), _journeyLegComparatorForBestArrival);
 
+    // Now iterate on each journey leg and call recursively the integral search
+    if (maxDepth > 0)
+    {
+	for (std::deque<JourneyLeg*>::const_iterator itLeg = legs.begin ();
+	     itLeg != legs.end (); ++itLeg)
+	{
+	    const Vertex* nextVertex = (*itLeg)->getDestination ()->getFromVertex ();
+	    VertexAccessMap nextVam;
+	    nextVertex->getPlace ()->getImmediateVertices (nextVam,
+							   accessDirection,
+							   _accessParameters,
+							   nextVertex,
+							   false,
+							   true);
+							   
+/*
+	    virtual void getImmediateVertices (VertexAccessMap& result, 
+				       const AccessDirection& accessDirection,
+				       const AccessParameters& accessParameters,
+				       const Vertex* origin = 0,
+				       bool searchA = true,
+				       bool returnPhysicalStops = true) const = 0;
+	    
+
+	    integralSearch ((*itLeg)->getDestination ()->getPlace ())
+
+
+RoutePlanner::integralSearch (const VertexAccessMap& vam, 
+			      const DateTime& desiredTime,
+			      const AccessDirection& accessDirection,
+			      const Journey* currentJourney,
+			      int maxDepth,
+			      bool searchAddresses, 
+			      bool searchPhysicalStops,
+			      bool strictTime)
+*/
+
+    
+	}
+
+    }
+    
 
     // TODO : reflechir!
 
@@ -504,6 +539,293 @@ RoutePlanner::integralSearch (const VertexAccessMap& vam,
 
 */
 	    
+
+
+void
+RoutePlanner::findBestJourney (Journey& result,
+			       const synthese::env::VertexAccessMap& vam, 
+			       const synthese::env::AccessDirection& accessDirection,
+			       const Journey& currentJourney,
+			       bool strictTime, 
+			       bool optim)
+{
+    Journey candidate;
+    
+    if (currentJourney.getJourneyLegCount () > 
+	_accessParameters.maxTransportConnectionCount) return;
+
+    JourneyVector journeyParts = integralSearch (vam, 
+						 _minDepartureTime,
+						 accessDirection, 
+						 &currentJourney,
+						 0, 
+						 DO_NOT_SEARCH_ADDRESSES,
+						 SEARCH_PHYSICALSTOPS,
+						 DO_NOT_USE_ROADS,
+						 USE_LINES,
+						 strictTime);
+
+    for (JourneyVector::const_iterator itj = journeyParts.begin ();
+	 itj != journeyParts.end (); ++itj)
+    {
+	
+	Journey tempJourney (currentJourney);
+	tempJourney.append (*itj);
+	
+	const Vertex* nextVertex = tempJourney.getDestination ()->getFromVertex ();
+	VertexAccessMap nextVam;
+	nextVertex->getPlace ()->getImmediateVertices (nextVam,
+						       accessDirection,
+						       _accessParameters,
+						       nextVertex,
+						       false,
+						       true);
+
+	findBestJourney (candidate, nextVam, accessDirection, tempJourney, false, optim);
+
+	if (candidate.getJourneyLegCount ())
+	{
+	    candidate.prepend (*itj);
+	}
+	
+    }
+
+
+    // If one candidate was created : election
+    if (candidate.getJourneyLegCount ())
+    {
+	if ( (result.getJourneyLegCount () == 0) ||
+	     (candidate.getArrivalTime () < result.getArrivalTime ()) ||
+	     ( (candidate.getArrivalTime () == result.getArrivalTime ()) &&
+               (candidate > result) ) )
+	{
+	    // Note : clearing journey desallocates associated journey legs
+	    // (see operator =).
+	    result = candidate;
+	}
+    }
+    
+    
+}
+
+
+
+
+
+bool
+RoutePlanner::computeRoutePlanningDepartureArrival (Journey& result,
+						    const VertexAccessMap& ovam,
+						    const VertexAccessMap& dvam)
+{
+    _bestDepartureVertexReachesMap.clear ();
+    _bestArrivalVertexReachesMap.clear ();
+
+    for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = ovam.getMap ().begin ();
+	 itVertex != ovam.getMap ().end (); ++itVertex)
+    {
+	if (itVertex->first->getConnectionPlace () == 0) continue;
+	_bestArrivalVertexReachesMap.insert (itVertex->first->getConnectionPlace (), 
+					     _maxArrivalTime - itVertex->second.approachTime);
+    }
+    for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = dvam.getMap ().begin ();
+	 itVertex != dvam.getMap ().end (); ++itVertex)
+    {
+	if (itVertex->first->getConnectionPlace () == 0) continue;
+	_bestArrivalVertexReachesMap.insert (itVertex->first->getConnectionPlace (), 
+					     _minDepartureTime + itVertex->second.approachTime);
+    }
+
+    // TODO : finish this !
+    return 0;
+
+
+
+}
+
+
+/*
+
+	// Variables locales
+	cTrajet		__TrajetEffectue;
+	
+	// Mises à zéro
+	vDepartMin = vMomentDebut;
+	vArriveeMax = vMomentFin;
+	__Resultat.Vide();
+
+	// Meilleures arrivées
+	ResetMeilleuresArrivees();
+	SetMeilleureArrivee(vPADeDestination, vArriveeMax);
+	SetMeilleureArrivee(vPADeOrigine, vMomentDebut);
+
+
+
+
+
+	
+	// Calcul de la meilleure arrivée possible
+	if (!MeilleureArrivee(__Resultat, __TrajetEffectue, false, false))
+		return false;
+
+	// Si un trajet a été trouvé, tentative d'optimisation en retardant au maximum l'heure de départ
+	if (__Resultat.Taille())
+	{
+		_LogTrace.Ecrit(LogDebug, "Recherche du meilleur départ", "");
+		
+		// Meilleurs départs
+		ResetMeilleursDeparts();
+		for (cElementTrajet* TempET = __Resultat.getPremierElement(); TempET!=NULL; TempET = TempET->getSuivant())
+			SetMeilleurDepart(TempET->getGareDepart(), TempET->MomentDepart(), TempET->VoieDepart());
+		SetMeilleurDepart(vPADeDestination, __Resultat.getMomentArrivee());
+		
+		// Bornes du calcul
+		vDepartMin = __Resultat.getMomentDepart();
+		vArriveeMax = __Resultat.getMomentArrivee();
+
+		return MeilleurDepart(__Resultat, __TrajetEffectue, true, true);
+	}
+	return true;
+
+*/
+
+
+
+
+JourneyVector 
+RoutePlanner::computeJourneySheetDepartureArrival ()
+{
+    Journey journey;
+
+    // TODO : factorize below
+
+    // Create origin vam from integral search on roads
+    JourneyVector originJourneys = integralSearch (_originVam,
+						   _journeySheetStartTime,
+						   TO_DESTINATION,
+						   0,
+						   std::numeric_limits<int>::max (),
+						   DO_NOT_SEARCH_ADDRESSES,
+						   SEARCH_PHYSICALSTOPS,
+						   USE_ROADS,
+						   DO_NOT_USE_LINES);
+
+    VertexAccessMap ovam;
+    // Include physical stops from originVam into result of integral search
+    // (cos not taken into account in returned journey vector).
+    for (std::map<const Vertex*, VertexAccess>::const_iterator itps = _originVam.getMap ().begin ();
+	 itps != _originVam.getMap ().end (); ++itps)
+    {
+	if (itps->first->isAddress () == false)
+	{
+	    // It must be a physical stop!
+	    ovam.insert (itps->first, itps->second);
+	}
+    }
+
+
+    for (JourneyVector::const_iterator itoj = originJourneys.begin ();
+	 itoj != originJourneys.end (); ++itoj)
+    {
+	const Journey& oj = (*itoj);
+	VertexAccess va;
+	va.approachTime = _originVam.getVertexAccess (
+	    oj.getOrigin ()->getFromVertex ()).approachTime + oj.getDuration ();
+
+	va.approachDistance = _originVam.getVertexAccess (
+	    oj.getOrigin ()->getFromVertex ()).approachDistance + oj.getDistance ();
+	
+	ovam.insert (oj.getDestination ()->getFromVertex (), va);
+    }
+
+
+    // Create destination vam from integral search on roads
+    JourneyVector destinationJourneys = integralSearch (_destinationVam,
+							_journeySheetEndTime,
+							FROM_ORIGIN,
+							0,
+							std::numeric_limits<int>::max (),
+							DO_NOT_SEARCH_ADDRESSES,
+							SEARCH_PHYSICALSTOPS,
+							USE_ROADS,
+							DO_NOT_USE_LINES);
+
+    VertexAccessMap dvam;
+    // Include physical stops from destinationVam into result of integral search
+    // (cos not taken into account in returned journey vector).
+    for (std::map<const Vertex*, VertexAccess>::const_iterator itps = _destinationVam.getMap ().begin ();
+	 itps != _destinationVam.getMap ().end (); ++itps)
+    {
+	if (itps->first->isAddress () == false)
+	{
+	    // It must be a physical stop!
+	    dvam.insert (itps->first, itps->second);
+	}
+    }
+    // TODO : factorize above
+
+
+    for (JourneyVector::const_iterator itdj = destinationJourneys.begin ();
+	 itdj != destinationJourneys.end (); ++itdj)
+    {
+	const Journey& dj = (*itdj);
+	VertexAccess va;
+	va.approachTime = _destinationVam.getVertexAccess (
+	    dj.getDestination ()->getFromVertex ()).approachTime + dj.getDuration ();
+	va.approachDistance = _destinationVam.getVertexAccess (
+	    dj.getDestination ()->getFromVertex ()).approachDistance + dj.getDistance ();
+	
+	dvam.insert (dj.getDestination ()->getFromVertex (), va);
+    }
+
+
+    _previousContinuousServiceDuration = 0;
+
+    JourneyVector result;
+    
+    for (_minDepartureTime = _journeySheetStartTime; 
+	 _minDepartureTime < _journeySheetEndTime; )
+    {
+
+	bool journeyFound = computeRoutePlanningDepartureArrival (journey, ovam, dvam);
+	    
+	//! <li> If no journey was found and last service is continuous, 
+        //! then repeat computation after continuous service range. </li>
+	if ( (journeyFound == false) && 
+	     (result.empty () == false) && 
+	     (result.back ().getContinuousServiceRange () > 0) )
+	{
+	    _minDepartureTime = _previousContinuousServiceLastDeparture;
+	    _minDepartureTime += 1;
+	    _previousContinuousServiceDuration = 0;
+	    journeyFound = computeRoutePlanningDepartureArrival (journey, ovam, dvam);	
+	}
+
+	if (journeyFound == false) break;
+	
+	
+	//! <li>If last continuous service was broken, update its range</li> 
+	if ( (result.empty () == false) &&
+	     (result.back ().getContinuousServiceRange () > 0) &&
+	     (journey.getDepartureTime () <= _previousContinuousServiceLastDeparture) )
+	{
+	    int duration = journey.getArrivalTime () - result.back ().getArrivalTime () - 1;
+	    result.back ().setContinuousServiceRange (duration);
+	}
+	else
+	{
+	    _previousContinuousServiceDuration = 0;
+	}
+	
+	result.push_back (journey);
+	
+	_minDepartureTime = journey.getDepartureTime ();
+	_minDepartureTime += 1;
+    }
+	
+    return result;
+	
+}
+
 
 
 

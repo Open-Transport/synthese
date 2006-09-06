@@ -123,6 +123,8 @@ public:
     //! @name Query methods
     //@{
 
+    bool isRoad () const;
+
     bool isReservable () const;
 
     //@}

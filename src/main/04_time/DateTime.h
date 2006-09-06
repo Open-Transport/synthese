@@ -125,10 +125,14 @@ bool operator >= ( const DateTime& op1, const Schedule& op2 );
 bool operator > ( const DateTime& op1, const DateTime& op2 );
 bool operator > ( const DateTime& op1, const Schedule& op2 );
 
+
 /**
  * @return The number of minutes between two DateTime objects.
  */
 int operator - ( const DateTime& op1, const DateTime& op2 );
+
+DateTime operator + ( const DateTime& op, int minutesDuration );
+DateTime operator - ( const DateTime& op, int minutesDuration );
 
 
 }

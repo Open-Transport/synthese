@@ -311,6 +311,13 @@ Line::setColor (const synthese::util::RGBColor& color)
 
 
 
+bool 
+Line::isRoad () const
+{
+    return false;
+}
+
+
 
 
 }

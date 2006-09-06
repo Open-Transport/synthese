@@ -1,6 +1,7 @@
 #include "Vertex.h"
 
 #include "Edge.h"
+#include "ConnectionPlace.h"
 
 
 
@@ -12,13 +13,11 @@ namespace env
 
 
 
-Vertex::Vertex (const ConnectionPlace* connectionPlace,
-		int rankInConnectionPlace,
+Vertex::Vertex (const AddressablePlace* place,
 		double x,
 		double y) 
     : Point (x, y) // By default geolocation is unknown.
-    , _connectionPlace (connectionPlace)
-    , _rankInConnectionPlace (rankInConnectionPlace)
+    , _addressablePlace (place)
 {
     
 }
@@ -34,17 +33,16 @@ Vertex::~Vertex ()
 const ConnectionPlace* 
 Vertex::getConnectionPlace () const
 {
-    return _connectionPlace;
+    return dynamic_cast<const ConnectionPlace*> (_addressablePlace);
 }
 
 
 
-int 
-Vertex::getRankInConnectionPlace () const
+const AddressablePlace* 
+Vertex::getPlace () const
 {
-    return _rankInConnectionPlace;
+    return _addressablePlace;
 }
-
 
 
     

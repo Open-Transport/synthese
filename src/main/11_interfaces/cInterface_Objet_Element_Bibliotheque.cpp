@@ -262,7 +262,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cI
 
 		    // Affichage
 		    __Site->Affiche( __Tampons[ __Ligne ], INTERFACEFicheHoraireColonne, __ParametresCaseDepart );
-		    for ( __Ligne++; __Trajets->getListeOrdonneePointsArret( __Ligne ) != curET->getDestination() ->getConnectionPlace(); __Ligne++ )
+		    for ( __Ligne++; __Trajets->getListeOrdonneePointsArret( __Ligne ) != curET->getDestination() ->getFromVertex ()->getConnectionPlace(); __Ligne++ )
 			__Site->Affiche( __Tampons[ __Ligne ], INTERFACEFicheHoraireColonne, __ParametresCaseVide );
 		    __Site->Affiche( __Tampons[ __Ligne ], INTERFACEFicheHoraireColonne, __ParametresCaseArrivee );
 		}
@@ -1101,7 +1101,8 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cI
 		if ( __Trajet->getContinuousServiceRange () )
 		    finPrem += __Trajet->getContinuousServiceRange ();
 
-		if ( __ET->getOrigin() ->getConnectionPlace()->hasApplicableAlarm ( debutPrem, finPrem ) )
+		if ( __ET->getOrigin()->getFromVertex ()->getConnectionPlace()
+		     ->hasApplicableAlarm ( debutPrem, finPrem ) )
 		{
 		    cInterface_Objet_Connu_ListeParametres __ParametresMontee;
 		    __ParametresMontee << 0;

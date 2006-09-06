@@ -23,7 +23,6 @@ const std::string PhysicalStopLS::PHYSICALSTOP_TAG ("physicalStop");
 const std::string PhysicalStopLS::PHYSICALSTOP_ID_ATTR ("id");
 const std::string PhysicalStopLS::PHYSICALSTOP_NAME_ATTR ("name");
 const std::string PhysicalStopLS::PHYSICALSTOP_CONNECTIONPLACEID_ATTR ("connectionPlaceId");
-const std::string PhysicalStopLS::PHYSICALSTOP_RANKINCONNECTIONPLACE_ATTR ("rankInConnectionPlace");
 
 
 synthese::env::PhysicalStop* 
@@ -37,8 +36,6 @@ PhysicalStopLS::Load (XMLNode& node,
     std::string name (node.getAttribute (PHYSICALSTOP_NAME_ATTR.c_str()));
     int connectionPlaceId (su::Conversion::ToInt (
 	      node.getAttribute (PHYSICALSTOP_CONNECTIONPLACEID_ATTR.c_str())));
-    int rankInConnectionPlace (su::Conversion::ToInt (
-	      node.getAttribute (PHYSICALSTOP_RANKINCONNECTIONPLACE_ATTR.c_str())));
 
     double x (su::Conversion::ToDouble (
 		node.getAttribute (PointLS::POINT_X_ATTR.c_str())));
@@ -49,7 +46,6 @@ PhysicalStopLS::Load (XMLNode& node,
 	id,
 	name, 
 	environment.getConnectionPlaces ().get (connectionPlaceId), 
-	rankInConnectionPlace,
 	x, y);
 }
 

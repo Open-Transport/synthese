@@ -74,6 +74,8 @@ public:
 
   //! @name Query methods.
   //@{
+
+  bool isRoad () const;
   
   /** Find closest address of this road, before a given metric offset.
       @param metricOffset The reference point.

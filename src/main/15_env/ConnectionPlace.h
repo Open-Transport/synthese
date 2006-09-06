@@ -54,7 +54,7 @@ private:
 
     std::vector<const PhysicalStop*> _physicalStops; 
 
-    std::map< std::pair<int, int>, int > _transferDelays; //!< Transfer delays between vertices
+    std::map< std::pair<uid, uid>, int > _transferDelays; //!< Transfer delays between vertices
     int _defaultTransferDelay;
     int _minTransferDelay;
     int _maxTransferDelay;
@@ -130,7 +130,7 @@ public:
     //! @name Update methods.
     //@{
     void addPhysicalStop (const PhysicalStop* physicalStop);
-    void addTransferDelay (int departureRank, int arrivalRank, int transferDelay);
+    void addTransferDelay (uid departureId, uid arrivalId, int transferDelay);
     void clearTransferDelays ();
     //@}
 

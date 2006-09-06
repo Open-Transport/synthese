@@ -4,6 +4,7 @@
 #include <set>
 
 
+#include "01_util/UId.h"
 #include "Point.h"
 
 #include "module.h"
@@ -15,6 +16,7 @@ namespace env
 {
 
 
+    class AddressablePlace;
     class ConnectionPlace;
     class Edge;
     class Path;
@@ -31,21 +33,14 @@ class Vertex : public Point
 
 private:
     
-    // TODO : when needed add a _containingPlace to be able, for instance,
-    // to display the public place associated with OR change _connectionPlace into
-    // _addressablePlace and let the getConnectionPlace accesor do the dynamic_cast.
-
-    
-    const ConnectionPlace* _connectionPlace;
-    int _rankInConnectionPlace;
+    const AddressablePlace* _addressablePlace;
 
     std::set<const Edge*> _departureEdges; //!< Departure edges from this physical stop
     std::set<const Edge*> _arrivalEdges; //!< Arrival edges to this physical stop
 
 protected:
 
-    Vertex (const ConnectionPlace* connectionPlace,
-	    int rankInConnectionPlace,
+    Vertex (const AddressablePlace* place,
 	    double x = UNKNOWN_VALUE,
 	    double y = UNKNOWN_VALUE);
 
@@ -56,11 +51,14 @@ public:
 
     //! @name Getters/Setters
     //@{
+    const AddressablePlace* getPlace () const;  
+
     const ConnectionPlace* getConnectionPlace () const;  
-    int getRankInConnectionPlace () const;
 
     const std::set<const Edge*>& getDepartureEdges () const;
     const std::set<const Edge*>& getArrivalEdges () const;
+
+    virtual const uid& getId () const = 0;
 
     //@}
 
@@ -74,7 +72,7 @@ public:
 
     //! @name Query methods
     //@{
-
+    virtual bool isAddress () const = 0;
     //@}
     
     

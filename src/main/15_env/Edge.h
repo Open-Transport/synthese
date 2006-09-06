@@ -16,6 +16,9 @@ namespace env
 
     class Path;
     class Vertex;
+    class AddressablePlace;
+    class ConnectionPlace;
+    
 
 
 /** Edge abstract base class.
@@ -64,15 +67,11 @@ private:
 
     const Edge* _nextInPath; //!< Next edge in path.
 
-    const Edge* _previousDeparture;  //!< Previous departure edge along path.
     const Edge* _previousConnectionDeparture; //!< Previous connection departure edge along path.
     const Edge* _previousDepartureForFineSteppingOnly; //!< 
 
-    const Edge* _followingArrival;  //!< Next arrival edge along path.
     const Edge* _followingConnectionArrival; //!< Next connection arrival edge along path.
     const Edge* _followingArrivalForFineSteppingOnly; //!< 
-
-    // TODO : separate connection on transport network from connection on road network
 
     std::vector<const Point*> _viaPoints; //!< Intermediate points along the edge.
 
@@ -164,6 +163,9 @@ public:
 
     //! @name Query methods
     //@{
+    const AddressablePlace* getPlace () const;
+    const ConnectionPlace* getConnectionPlace () const;
+
     int getRankInPath () const;
 
     bool isArrival () const;

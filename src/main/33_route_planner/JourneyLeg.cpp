@@ -1,11 +1,13 @@
 #include "JourneyLeg.h"
 
 #include "15_env/ContinuousService.h"
+#include "15_env/Edge.h"
 #include "15_env/Path.h"
 #include "15_env/SquareDistance.h"
 
 
 using synthese::env::Axis;
+using synthese::env::Edge;
 using synthese::env::Path;
 using synthese::env::Service;
 using synthese::env::SquareDistance;
@@ -98,7 +100,7 @@ JourneyLeg::setArrivalTime (const synthese::time::DateTime& arrivalTime)
 
 
 
-const synthese::env::Vertex* 
+const synthese::env::Edge* 
 JourneyLeg::getOrigin () const
 {
     return _origin;
@@ -108,7 +110,7 @@ JourneyLeg::getOrigin () const
 
 
 void 
-JourneyLeg::setOrigin (const synthese::env::Vertex* origin)
+JourneyLeg::setOrigin (const synthese::env::Edge* origin)
 {
     _origin = origin;
 }
@@ -117,7 +119,7 @@ JourneyLeg::setOrigin (const synthese::env::Vertex* origin)
 
 
 
-const synthese::env::Vertex* 
+const synthese::env::Edge* 
 JourneyLeg::getDestination () const
 {
     return _destination;
@@ -127,7 +129,7 @@ JourneyLeg::getDestination () const
 
 
 void 
-JourneyLeg::setDestination (const synthese::env::Vertex* destination)
+JourneyLeg::setDestination (const synthese::env::Edge* destination)
 {
     _destination = destination;
 }
@@ -188,6 +190,23 @@ JourneyLeg::getDuration () const
     return _arrivalTime - _departureTime;
 }
 
+
+
+
+int 
+JourneyLeg::getDistance () const
+{
+    return _destination->getMetricOffset () -
+	_origin->getMetricOffset ();
+}
+
+
+
+const Path* 
+JourneyLeg::getPath () const
+{
+    return _origin->getParentPath ();
+}
 
 
 

@@ -1,6 +1,7 @@
 #include "Edge.h"
 #include "Path.h"
 #include "Service.h"
+#include "Vertex.h"
 #include "ContinuousService.h"
 
 #include "04_time/Schedule.h"
@@ -91,20 +92,6 @@ Edge::setNextInPath (const Edge* nextInPath)
 
 
 
-const Edge* 
-Edge::getPreviousDeparture () const
-{
-    return _previousDeparture;
-}
-
-
-
-const Edge* 
-Edge::getFollowingArrival () const
-{
-    return _followingArrival;
-}
-
 
 const Edge* 
 Edge::getPreviousConnectionDeparture () const
@@ -140,14 +127,6 @@ Edge::getFollowingArrivalForFineSteppingOnly () const
 
 
 
-void 
-Edge::setPreviousDeparture ( const Edge* previousDeparture)
-{
-    _previousDeparture = previousDeparture;
-}
-
-
-
 
 void 
 Edge::setPreviousConnectionDeparture( const Edge* previousConnectionDeparture)
@@ -163,13 +142,6 @@ Edge::setPreviousDepartureForFineSteppingOnly ( const Edge* previousDeparture)
 }
 
 
-
-
-void 
-Edge::setFollowingArrival ( const Edge* followingArrival)
-{
-    _followingArrival = followingArrival;
-}
 
 
 
@@ -735,6 +707,21 @@ Edge::updateArrivalIndex ()
 }
 
 
+
+
+const AddressablePlace* 
+Edge::getPlace () const
+{
+    return getFromVertex ()->getPlace ();
+}
+
+
+
+const ConnectionPlace* 
+Edge::getConnectionPlace () const
+{
+    return getFromVertex ()->getConnectionPlace ();
+}
 
 
 

@@ -8,6 +8,7 @@
 #include "15_env/Vertex.h"
 #include "15_env/Edge.h"
 #include "15_env/Line.h"
+#include "15_env/Vertex.h"
 
 
 #include <limits>
@@ -114,9 +115,9 @@ int
 ConnectionPlace::getTransferDelay (const Vertex* fromVertex, 
 				   const Vertex* toVertex) const
 {
-    std::map< std::pair<int, int>, int >::const_iterator iter = 
-	_transferDelays.find (std::make_pair (fromVertex->getRankInConnectionPlace (), 
-					      toVertex->getRankInConnectionPlace ()));
+    std::map< std::pair<uid, uid>, int >::const_iterator iter = 
+	_transferDelays.find (std::make_pair (fromVertex->getId (), 
+					      toVertex->getId ()));
     
     // If not defined in map, return default transfer delay
     if (iter == _transferDelays.end ()) return _defaultTransferDelay;
@@ -126,9 +127,9 @@ ConnectionPlace::getTransferDelay (const Vertex* fromVertex,
 
 
 void 
-ConnectionPlace::addTransferDelay (int departureRank, int arrivalRank, int transferDelay)
+ConnectionPlace::addTransferDelay (uid departureId, uid arrivalId, int transferDelay)
 {
-    _transferDelays[std::make_pair (departureRank, arrivalRank)] = transferDelay;
+    _transferDelays[std::make_pair (departureId, arrivalId)] = transferDelay;
     if (transferDelay < _minTransferDelay)
     {
 	_minTransferDelay = transferDelay;
@@ -195,10 +196,10 @@ ConnectionPlace::getVertexAccess (const AccessDirection& accessDirection,
 				  const Vertex* origin) const
 {
     VertexAccess access;
-    access.path.push_back (destination);
 
     if (origin != 0)
     {
+	access.approachDistance = 0;
 	if (accessDirection == FROM_ORIGIN)
 	{
 	    access.approachTime = getTransferDelay (origin, destination);

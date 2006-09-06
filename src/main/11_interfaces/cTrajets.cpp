@@ -1,6 +1,7 @@
 #include "cTrajets.h"
 
 #include "33_route_planner/JourneyLeg.h"
+#include "15_env/Edge.h"
 #include "15_env/Vertex.h"
 
 

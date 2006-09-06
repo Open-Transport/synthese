@@ -36,8 +36,7 @@ private:
 
     PhysicalStop (const uid& id,
 		  const std::string& name, 
-		  const ConnectionPlace* connectionPlace,
-		  int rankInConnectionPlace,
+		  const AddressablePlace* place,
 		  double x = UNKNOWN_VALUE,
 		  double y = UNKNOWN_VALUE);
 
@@ -46,6 +45,8 @@ private:
 
     //! @name Getters/Setters
     //@{
+    const uid& getId () const;
+
     const std::string& getName () const;
     void setName (const std::string& name);
     //@}
@@ -53,7 +54,7 @@ private:
 
     //! @name Query methods
     //@{
-
+    bool isAddress () const;
     //@}
 
 };

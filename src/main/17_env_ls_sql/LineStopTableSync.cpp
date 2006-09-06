@@ -93,6 +93,7 @@ LineStopTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 					       Conversion::ToDouble (*(++valueIter))));
     }
 
+    environment.getLines ().get (lineId)->addEdge (ls);
     environment.getLineStops ().add (ls, false);
 }
 

@@ -25,6 +25,7 @@ namespace synthese
 		double maxApproachDistance;
 		double maxApproachTime;
 		double approachSpeed;
+		int maxTransportConnectionCount;
 		
 		bool bikeCompliance;
 		bool handicappedCompliance;

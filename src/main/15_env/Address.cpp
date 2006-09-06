@@ -12,14 +12,13 @@ namespace env
 
 
 Address::Address (const uid& id,
-		  const ConnectionPlace* connectionPlace,
-		  int rankInConnectionPlace,
+		  const AddressablePlace* place,
 		  const Road* road, 
 		  double metricOffset,
 		  double x,
 		  double y)
     : synthese::util::Registrable<uid,Address> (id)
-    , Vertex (connectionPlace, rankInConnectionPlace, x, y)
+    , Vertex (place, x, y)
     , _road (road)
     , _metricOffset (metricOffset)
 {
@@ -33,7 +32,7 @@ Address::Address (const uid& id,
 		  double x,
 		  double y)
     : synthese::util::Registrable<uid,Address> (id)
-    , Vertex (0, -1, x, y)
+    , Vertex (0, x, y)
     , _road (road)
     , _metricOffset (metricOffset)
 {
@@ -65,6 +64,19 @@ Address::getMetricOffset () const
 }
 
 
+
+bool 
+Address::isAddress () const
+{
+    return true;
+}
+
+
+const uid& 
+Address::getId () const
+{
+    return synthese::util::Registrable<uid,Address>::getId ();
+}
 
 
 
