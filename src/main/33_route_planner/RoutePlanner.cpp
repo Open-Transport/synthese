@@ -565,6 +565,8 @@ RoutePlanner::findBestJourney (Journey& result,
 						 USE_LINES,
 						 strictTime);
 
+    // TODO : opposite access direction
+
     for (JourneyVector::const_iterator itj = journeyParts.begin ();
 	 itj != journeyParts.end (); ++itj)
     {
@@ -612,81 +614,68 @@ RoutePlanner::findBestJourney (Journey& result,
 
 
 
-bool
+void
 RoutePlanner::computeRoutePlanningDepartureArrival (Journey& result,
 						    const VertexAccessMap& ovam,
 						    const VertexAccessMap& dvam)
 {
-    _bestDepartureVertexReachesMap.clear ();
     _bestArrivalVertexReachesMap.clear ();
 
-    for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = ovam.getMap ().begin ();
-	 itVertex != ovam.getMap ().end (); ++itVertex)
-    {
-	if (itVertex->first->getConnectionPlace () == 0) continue;
-	_bestArrivalVertexReachesMap.insert (itVertex->first->getConnectionPlace (), 
-					     _maxArrivalTime - itVertex->second.approachTime);
-    }
+    
     for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = dvam.getMap ().begin ();
 	 itVertex != dvam.getMap ().end (); ++itVertex)
     {
 	if (itVertex->first->getConnectionPlace () == 0) continue;
 	_bestArrivalVertexReachesMap.insert (itVertex->first->getConnectionPlace (), 
+					     _maxArrivalTime - itVertex->second.approachTime);
+    }
+    for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = ovam.getMap ().begin ();
+	 itVertex != ovam.getMap ().end (); ++itVertex)
+    {
+	if (itVertex->first->getConnectionPlace () == 0) continue;
+	_bestArrivalVertexReachesMap.insert (itVertex->first->getConnectionPlace (), 
 					     _minDepartureTime + itVertex->second.approachTime);
     }
+    
 
-    // TODO : finish this !
-    return 0;
+    Journey currentJourney;
 
+    // Look for best arrival
+    findBestJourney (result, ovam, TO_DESTINATION, currentJourney, false, false);
+    
+    if (result.getJourneyLegCount () == 0) return;
+    
+    // If a journey was found, try to optimize by delaying departure hour as much as possible.
+    _bestDepartureVertexReachesMap.clear ();
+    
+    for (int i=0; i<currentJourney.getJourneyLegCount (); ++i)
+    {
+	if (currentJourney.getJourneyLeg (i)->getOrigin ()
+	    ->getFromVertex ()->getConnectionPlace () == 0) continue;
 
+	_bestDepartureVertexReachesMap.insert (
+	    currentJourney.getJourneyLeg (i)->getOrigin ()->getFromVertex ()->getConnectionPlace (),
+	    currentJourney.getJourneyLeg (i)->getDepartureTime () );
+    }
+    
+    for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = dvam.getMap ().begin ();
+	 itVertex != dvam.getMap ().end (); ++itVertex)
+    {
+	if (itVertex->first->getConnectionPlace () == 0) continue;
+	_bestDepartureVertexReachesMap.insert (itVertex->first->getConnectionPlace (), 
+					       result.getArrivalTime () );
+    }
+    
+    // Update bounds
+    _minDepartureTime = result.getDepartureTime ();
+    _maxArrivalTime = result.getArrivalTime ();
+    
+    // Look for best departure
+    findBestJourney (result, dvam, FROM_ORIGIN, currentJourney, true, true);
 
 }
 
 
-/*
-
-	// Variables locales
-	cTrajet		__TrajetEffectue;
-	
-	// Mises à zéro
-	vDepartMin = vMomentDebut;
-	vArriveeMax = vMomentFin;
-	__Resultat.Vide();
-
-	// Meilleures arrivées
-	ResetMeilleuresArrivees();
-	SetMeilleureArrivee(vPADeDestination, vArriveeMax);
-	SetMeilleureArrivee(vPADeOrigine, vMomentDebut);
-
-
-
-
-
-	
-	// Calcul de la meilleure arrivée possible
-	if (!MeilleureArrivee(__Resultat, __TrajetEffectue, false, false))
-		return false;
-
-	// Si un trajet a été trouvé, tentative d'optimisation en retardant au maximum l'heure de départ
-	if (__Resultat.Taille())
-	{
-		_LogTrace.Ecrit(LogDebug, "Recherche du meilleur départ", "");
-		
-		// Meilleurs départs
-		ResetMeilleursDeparts();
-		for (cElementTrajet* TempET = __Resultat.getPremierElement(); TempET!=NULL; TempET = TempET->getSuivant())
-			SetMeilleurDepart(TempET->getGareDepart(), TempET->MomentDepart(), TempET->VoieDepart());
-		SetMeilleurDepart(vPADeDestination, __Resultat.getMomentArrivee());
-		
-		// Bornes du calcul
-		vDepartMin = __Resultat.getMomentDepart();
-		vArriveeMax = __Resultat.getMomentArrivee();
-
-		return MeilleurDepart(__Resultat, __TrajetEffectue, true, true);
-	}
-	return true;
-
-*/
 
 
 
@@ -761,7 +750,6 @@ RoutePlanner::computeJourneySheetDepartureArrival ()
 	    dvam.insert (itps->first, itps->second);
 	}
     }
-    // TODO : factorize above
 
 
     for (JourneyVector::const_iterator itdj = destinationJourneys.begin ();
@@ -776,6 +764,7 @@ RoutePlanner::computeJourneySheetDepartureArrival ()
 	
 	dvam.insert (dj.getDestination ()->getFromVertex (), va);
     }
+    // TODO : factorize above
 
 
     _previousContinuousServiceDuration = 0;
@@ -786,24 +775,24 @@ RoutePlanner::computeJourneySheetDepartureArrival ()
 	 _minDepartureTime < _journeySheetEndTime; )
     {
 
-	bool journeyFound = computeRoutePlanningDepartureArrival (journey, ovam, dvam);
+	computeRoutePlanningDepartureArrival (journey, ovam, dvam);
 	    
 	//! <li> If no journey was found and last service is continuous, 
         //! then repeat computation after continuous service range. </li>
-	if ( (journeyFound == false) && 
+	if ( (journey.getJourneyLegCount () == 0) &&
 	     (result.empty () == false) && 
 	     (result.back ().getContinuousServiceRange () > 0) )
 	{
 	    _minDepartureTime = _previousContinuousServiceLastDeparture;
 	    _minDepartureTime += 1;
 	    _previousContinuousServiceDuration = 0;
-	    journeyFound = computeRoutePlanningDepartureArrival (journey, ovam, dvam);	
+	    computeRoutePlanningDepartureArrival (journey, ovam, dvam);	
 	}
-
-	if (journeyFound == false) break;
+	
+	if (journey.getJourneyLegCount () == 0) break;
 	
 	
-	//! <li>If last continuous service was broken, update its range</li> 
+	//! <li>If last continuous service was broken, update its range</li>
 	if ( (result.empty () == false) &&
 	     (result.back ().getContinuousServiceRange () > 0) &&
 	     (journey.getDepartureTime () <= _previousContinuousServiceLastDeparture) )

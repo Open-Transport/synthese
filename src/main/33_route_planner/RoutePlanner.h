@@ -155,7 +155,7 @@ class RoutePlanner
 			  bool optim);
 	
 	
-    bool computeRoutePlanningDepartureArrival (Journey& result,
+    void computeRoutePlanningDepartureArrival (Journey& result,
 					       const synthese::env::VertexAccessMap& ovam,
 					       const synthese::env::VertexAccessMap& dvam);
 
