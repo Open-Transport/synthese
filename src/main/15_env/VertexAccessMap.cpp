@@ -213,5 +213,30 @@ VertexAccessMap::getMap () const
 
 
 
+void 
+VertexAccessMap::merge (const VertexAccessMap& vam,
+			MergeAddresses mergeAddresses,
+			MergePhysicalStops mergePhysicalStops)
+{
+    for (std::map<const Vertex*, VertexAccess>::const_iterator itps = vam.getMap ().begin ();
+	 itps != vam.getMap ().end (); ++itps)
+    {
+	if ( (mergeAddresses == MERGE_ADDRESSES) && 
+	     (itps->first->isAddress () == true) )
+	{
+	    insert (itps->first, itps->second);
+	}
+	if ( (mergePhysicalStops == MERGE_PHYSICALSTOPS) && 
+	     (itps->first->isAddress () == false) )
+	{
+	    insert (itps->first, itps->second);
+	}
+    }
+
+}
+
+
+
+
 }
 }

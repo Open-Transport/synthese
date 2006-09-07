@@ -701,15 +701,10 @@ RoutePlanner::computeJourneySheetDepartureArrival ()
     VertexAccessMap ovam;
     // Include physical stops from originVam into result of integral search
     // (cos not taken into account in returned journey vector).
-    for (std::map<const Vertex*, VertexAccess>::const_iterator itps = _originVam.getMap ().begin ();
-	 itps != _originVam.getMap ().end (); ++itps)
-    {
-	if (itps->first->isAddress () == false)
-	{
-	    // It must be a physical stop!
-	    ovam.insert (itps->first, itps->second);
-	}
-    }
+    ovam.merge (_originVam, 
+		VertexAccessMap::DO_NOT_MERGE_ADDRESSES,
+		VertexAccessMap::MERGE_PHYSICALSTOPS);
+
 
 
     for (JourneyVector::const_iterator itoj = originJourneys.begin ();
@@ -741,15 +736,9 @@ RoutePlanner::computeJourneySheetDepartureArrival ()
     VertexAccessMap dvam;
     // Include physical stops from destinationVam into result of integral search
     // (cos not taken into account in returned journey vector).
-    for (std::map<const Vertex*, VertexAccess>::const_iterator itps = _destinationVam.getMap ().begin ();
-	 itps != _destinationVam.getMap ().end (); ++itps)
-    {
-	if (itps->first->isAddress () == false)
-	{
-	    // It must be a physical stop!
-	    dvam.insert (itps->first, itps->second);
-	}
-    }
+    dvam.merge (_destinationVam, 
+		VertexAccessMap::DO_NOT_MERGE_ADDRESSES,
+		VertexAccessMap::MERGE_PHYSICALSTOPS);
 
 
     for (JourneyVector::const_iterator itdj = destinationJourneys.begin ();

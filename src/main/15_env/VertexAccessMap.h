@@ -40,7 +40,10 @@ namespace env
 class VertexAccessMap
 {
 public:
-
+    
+    typedef enum { MERGE_ADDRESSES, DO_NOT_MERGE_ADDRESSES } MergeAddresses;
+    typedef enum { MERGE_PHYSICALSTOPS, DO_NOT_MERGE_PHYSICALSTOPS } MergePhysicalStops;
+    
 
 private:
 
@@ -77,6 +80,10 @@ private:
     bool contains (const Vertex* vertex) const;
     void insert (const Vertex* vertex, const VertexAccess& vertexAccess);
     
+    void merge (const VertexAccessMap& vam,
+		MergeAddresses mergeAddresses = MERGE_ADDRESSES,
+		MergePhysicalStops mergePhysicalStops = MERGE_PHYSICALSTOPS);
+
     const Point& getIsobarycenter () const;
     const SquareDistance& getIsobarycenterMaxSquareDistance () const;
     
