@@ -76,6 +76,7 @@ public:
   //@{
 
   bool isRoad () const;
+  bool isLine () const;
   
   /** Find closest address of this road, before a given metric offset.
       @param metricOffset The reference point.

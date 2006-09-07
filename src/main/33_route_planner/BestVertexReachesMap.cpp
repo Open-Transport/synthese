@@ -4,14 +4,20 @@
 
 
 #include "15_env/ConnectionPlace.h"
+#include "15_env/Address.h"
+#include "15_env/PhysicalStop.h"
 #include "15_env/Vertex.h"
 
 #include <assert.h>
 
 using synthese::time::DateTime;
 using synthese::env::Vertex;
+using synthese::env::Address;
+using synthese::env::PhysicalStop;
 using synthese::env::ConnectionPlace;
 
+using synthese::env::TO_DESTINATION;
+using synthese::env::FROM_ORIGIN;
 
 
 namespace synthese
@@ -38,7 +44,7 @@ BestVertexReachesMap::~BestVertexReachesMap ()
 bool 
 BestVertexReachesMap::contains (const synthese::env::Vertex* vertex) const
 {
-    return (_vertexMap.find (vertex) != _vertexMap.end ());
+    return (_bestJourneyLegMap.find (vertex) != _bestJourneyLegMap.end ());
 }
 
 
@@ -49,52 +55,85 @@ BestVertexReachesMap::contains (const synthese::env::Vertex* vertex) const
 void 
 BestVertexReachesMap::insert (const synthese::env::Vertex* vertex, JourneyLeg* journeyLeg)
 {
-    // Update vertex map
+    // Update journey leg map
     // Implementation note : journey legs are reused and never re-allocated.
     // Thus the insertion happens only once
     assert (contains (vertex) == false);
-    _vertexMap.insert (std::make_pair (vertex, journeyLeg));
+    _bestJourneyLegMap.insert (std::make_pair (vertex, journeyLeg));
 
-    // Update connection place map (replacement)
-    const ConnectionPlace* connectionPlace = vertex->getConnectionPlace ();
-
-    if (connectionPlace == 0) return;
-
-    DateTime bestTime;
+    // Update time map (replacement)
     if (_accessDirection == synthese::env::TO_DESTINATION)
     {
-	bestTime = journeyLeg->getArrivalTime ();
-	bestTime += connectionPlace->getMaxTransferDelay ();
+	insert (vertex, journeyLeg->getArrivalTime ());
     }
     else
     {
-	bestTime = journeyLeg->getDepartureTime ();
-	bestTime -= connectionPlace->getMaxTransferDelay ();
+	insert (vertex, journeyLeg->getDepartureTime ());
     }
-    
-    insert (connectionPlace, bestTime);
     
 }    
     
 
 
 void 
-BestVertexReachesMap::insert (const synthese::env::ConnectionPlace* connectionPlace, 
-			      const synthese::time::DateTime& dateTime)
+BestVertexReachesMap::insert (const synthese::env::Vertex* vertex, 
+			      const synthese::time::DateTime& dateTime,
+			      bool propagateInConnectionPlace)
 {
-    ConnectionPlaceMap::iterator itc = _connectionPlaceMap.find (connectionPlace);
+    TimeMap::iterator itc = _bestTimeMap.find (vertex);
+    DateTime bestTime = dateTime;
 
-    if (itc == _connectionPlaceMap.end ()) 
+    if (itc == _bestTimeMap.end ()) 
     {
-	_connectionPlaceMap.insert (std::make_pair (connectionPlace, dateTime));
+	_bestTimeMap.insert (std::make_pair (vertex, bestTime));
     }
     else
     {
-	if (dateTime < itc->second)
+	// TODO : rename FROM_ORIGIN into TOWARD_ORIGIN
+	// TODO : rename TO_DESTINATION into TOWARD_DESTINATION
+	if ( (_accessDirection == TO_DESTINATION) && (bestTime < itc->second) ||
+	     (_accessDirection == FROM_ORIGIN) && (bestTime > itc->second) )
 	{
-	    itc->second = dateTime;
+	    itc->second = bestTime;
+	}
+	else
+	{
+	    bestTime = itc->second;
 	}
     }
+
+    if (propagateInConnectionPlace)
+    {
+	const ConnectionPlace* cp = vertex->getConnectionPlace ();
+	assert (cp != 0);
+
+	DateTime bestTimeUpperBound (bestTime);
+
+	// TODO : Could be more accurate (with a per vertex max transfer delay)
+	// TODO : Also check special forbidden transfer delays
+	if (_accessDirection == TO_DESTINATION)
+	{
+	    bestTimeUpperBound += cp->getMaxTransferDelay ();
+	}
+	else
+	{
+	    bestTimeUpperBound -= cp->getMaxTransferDelay ();
+	}
+
+	
+	for (std::vector<const Address*>::const_iterator ita = cp->getAddresses ().begin ();
+	     ita != cp->getAddresses ().end (); ++ita)
+	{
+	    insert (*ita, bestTimeUpperBound, false);
+	}
+	for (std::vector<const PhysicalStop*>::const_iterator itp = cp->getPhysicalStops ().begin ();
+	     itp != cp->getPhysicalStops ().end (); ++itp)
+	{
+	    insert (*itp, bestTimeUpperBound, false);
+	}
+
+    }
+
 }
 
 
@@ -105,23 +144,15 @@ const DateTime&
 BestVertexReachesMap::getBestTime (const Vertex* vertex, 
 				   const DateTime& defaultValue) const
 {
-    if (contains (vertex)) 
+    TimeMap::const_iterator itc = 
+	_bestTimeMap.find (vertex);
+    
+    if (itc != _bestTimeMap.end ())
     {
-	return (_accessDirection == synthese::env::TO_DESTINATION) ? 
-	    _vertexMap.find (vertex)->second->getArrivalTime () : 
-	    _vertexMap.find (vertex)->second->getDepartureTime ();
-    }
-    else if (vertex->getConnectionPlace ())
-    {
-	ConnectionPlaceMap::const_iterator itc = 
-	    _connectionPlaceMap.find (vertex->getConnectionPlace ());
-
-	if (itc != _connectionPlaceMap.end ())
-	{
-	    return itc->second;
-	}
+	return itc->second;
     }
 
+    
     return defaultValue;
 
 }
@@ -132,7 +163,7 @@ JourneyLeg*
 BestVertexReachesMap::getBestJourneyLeg (const Vertex* vertex)
 {
     if (contains (vertex) == false) return 0;
-    return _vertexMap.find (vertex)->second;
+    return _bestJourneyLegMap.find (vertex)->second;
 }
 
 
@@ -140,8 +171,8 @@ BestVertexReachesMap::getBestJourneyLeg (const Vertex* vertex)
 void 
 BestVertexReachesMap::clear ()
 {
-    _vertexMap.clear ();
-    _connectionPlaceMap.clear ();
+    _bestJourneyLegMap.clear ();
+    _bestTimeMap.clear ();
 }
 
 

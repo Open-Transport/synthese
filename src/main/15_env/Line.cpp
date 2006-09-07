@@ -319,6 +319,13 @@ Line::isRoad () const
 
 
 
+bool 
+Line::isLine () const
+{
+    return true;
+}
+
+
 
 }
 }

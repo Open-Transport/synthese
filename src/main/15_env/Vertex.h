@@ -73,6 +73,7 @@ public:
     //! @name Query methods
     //@{
     virtual bool isAddress () const = 0;
+    virtual bool isPhysicalStop () const = 0;
     //@}
     
     

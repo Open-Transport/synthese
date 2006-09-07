@@ -33,7 +33,7 @@ class Journey
 
     std::deque<const JourneyLeg*> _journeyLegs;
     int _continuousServiceRange;
-    int _effectiveTransportDuration;
+    int _effectiveDuration;
     int _transportConnectionCount;
     int _distance;
 
@@ -68,9 +68,9 @@ class Journey
     int getTransportConnectionCount ();
 
     /** Returns the effective amount of time spent
-	in transport, excluding tranfer delays.
+	travelling, excluding tranfer delays.
     */
-    int getEffectiveTransportDuration () const;
+    int getEffectiveDuration () const;
 
     /** Detects max alarm level in journey.
       

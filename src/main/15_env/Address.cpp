@@ -72,6 +72,17 @@ Address::isAddress () const
 }
 
 
+
+bool 
+Address::isPhysicalStop () const
+{
+    return false;
+}
+
+
+
+
+
 const uid& 
 Address::getId () const
 {

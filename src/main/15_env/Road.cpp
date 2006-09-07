@@ -113,5 +113,13 @@ Road::isRoad () const
 
 
 
+bool 
+Road::isLine () const
+{
+    return false;
+}
+
+
+
 }
 }

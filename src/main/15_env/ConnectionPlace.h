@@ -101,8 +101,8 @@ public:
     //! @name Query methods.
     //@{
     
-    bool isConnectionAllowed (const Edge* fromEdge, 
-			      const Edge* toEdge) const;
+    bool isConnectionAllowed (const Vertex* fromVertex, 
+			      const Vertex* toVertex) const;
 
     ConnectionType getRecommendedConnectionType (const SquareDistance& squareDistance) const;
 

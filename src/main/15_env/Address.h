@@ -71,6 +71,7 @@ public:
     //! @name Query methods
     //@{
     bool isAddress () const;
+    bool isPhysicalStop () const;
     //@}
 
 

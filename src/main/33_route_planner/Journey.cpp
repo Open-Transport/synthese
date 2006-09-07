@@ -34,7 +34,7 @@ namespace routeplanner
 
 Journey::Journey ()
     : _continuousServiceRange (UNKNOWN_VALUE)
-    , _effectiveTransportDuration (0)
+    , _effectiveDuration (0)
     , _transportConnectionCount (0)
     , _distance (0)
 {
@@ -121,7 +121,7 @@ void
 Journey::prepend (const JourneyLeg* leg)
 {
     _journeyLegs.push_front (leg);
-    _effectiveTransportDuration += leg->getDuration ();
+    _effectiveDuration += leg->getDuration ();
     _distance += leg->getDistance ();
 
     if (leg->getPath ()->isRoad () == false) ++_transportConnectionCount;
@@ -147,7 +147,7 @@ void
 Journey::append (const JourneyLeg* leg)
 {
     _journeyLegs.push_back (leg);
-    _effectiveTransportDuration += leg->getDuration ();
+    _effectiveDuration += leg->getDuration ();
     _distance += leg->getDistance ();
 
     if (leg->getPath ()->isRoad () == false) ++_transportConnectionCount;
@@ -304,7 +304,7 @@ void
 Journey::clear ()
 {
     _continuousServiceRange = UNKNOWN_VALUE;
-    _effectiveTransportDuration = 0;
+    _effectiveDuration = 0;
     _transportConnectionCount = 0;
     _distance = 0;
     for (std::deque<const JourneyLeg*>::const_iterator itjl = _journeyLegs.begin ();
@@ -336,8 +336,8 @@ Journey::operator > (const Journey& op) const
 	return _transportConnectionCount < op._transportConnectionCount;
     
     //! <li>Un trajet où l'on circule moins longtemps est supérieur à celui-ci (plus de marge de fiabilité pour les correspondaces)</li>
-    if (getEffectiveTransportDuration () != op.getEffectiveTransportDuration ())
-	return getEffectiveTransportDuration () < op.getEffectiveTransportDuration ();
+    if (getEffectiveDuration () != op.getEffectiveDuration ())
+	return getEffectiveDuration () < op.getEffectiveDuration ();
     
     return false;
 }
@@ -351,7 +351,7 @@ Journey::operator= (const Journey& ref)
     clear ();
     _journeyLegs = ref._journeyLegs;
     _continuousServiceRange = ref._continuousServiceRange;
-    _effectiveTransportDuration = ref._effectiveTransportDuration;
+    _effectiveDuration = ref._effectiveDuration;
     _transportConnectionCount = ref._transportConnectionCount;
     _distance = ref._distance;
     

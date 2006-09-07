@@ -102,6 +102,7 @@ public:
     //@{
 
     virtual bool isRoad () const = 0;
+    virtual bool isLine () const = 0;
 
     /** Gets all the geographical points linked by the path
         between two of its edges. If no from/to edge

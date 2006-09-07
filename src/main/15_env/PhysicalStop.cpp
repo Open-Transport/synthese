@@ -51,6 +51,13 @@ PhysicalStop::isAddress () const
 
 
 
+bool 
+PhysicalStop::isPhysicalStop () const
+{
+    return true;
+}
+
+
 
 const uid& 
 PhysicalStop::getId () const

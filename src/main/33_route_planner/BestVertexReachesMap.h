@@ -18,7 +18,6 @@ namespace synthese
 
 namespace env
 {
-    class ConnectionPlace;
     class Vertex;
 }
 
@@ -38,13 +37,13 @@ class BestVertexReachesMap
 {
  private:
 
-    typedef std::map<const synthese::env::Vertex*, JourneyLeg*> VertexMap;
-    typedef std::map<const synthese::env::ConnectionPlace*, synthese::time::DateTime> ConnectionPlaceMap;
+    typedef std::map<const synthese::env::Vertex*, JourneyLeg*> JourneyLegMap;
+    typedef std::map<const synthese::env::Vertex*, synthese::time::DateTime> TimeMap;
     
     const synthese::env::AccessDirection _accessDirection;
 
-    VertexMap _vertexMap;
-    ConnectionPlaceMap _connectionPlaceMap;
+    JourneyLegMap _bestJourneyLegMap;
+    TimeMap _bestTimeMap;
 
  public:
 
@@ -76,9 +75,10 @@ class BestVertexReachesMap
     void clear ();
     void insert (const synthese::env::Vertex* vertex, 
 		 JourneyLeg* journeyLeg);
-
-    void insert (const synthese::env::ConnectionPlace* connectionPlace, 
-		 const synthese::time::DateTime& dateTime);
+    
+    void insert (const synthese::env::Vertex* vertex, 
+		 const synthese::time::DateTime& dateTime,
+		 bool propagateInConnectionPlace = true);
 
     //@}
 

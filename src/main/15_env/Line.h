@@ -124,6 +124,7 @@ public:
     //@{
 
     bool isRoad () const;
+    bool isLine () const;
 
     bool isReservable () const;
 

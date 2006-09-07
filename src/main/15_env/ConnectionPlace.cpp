@@ -6,7 +6,6 @@
 #include "15_env/PhysicalStop.h"
 #include "15_env/SquareDistance.h"
 #include "15_env/Vertex.h"
-#include "15_env/Edge.h"
 #include "15_env/Line.h"
 #include "15_env/Vertex.h"
 
@@ -270,25 +269,25 @@ ConnectionPlace::getRecommendedConnectionType (const SquareDistance& squareDista
 
 
 bool 
-ConnectionPlace::isConnectionAllowed (const Edge* fromEdge, 
-				      const Edge* toEdge) const
+ConnectionPlace::isConnectionAllowed (const Vertex* fromVertex, 
+				      const Vertex* toVertex) const
 {
     if (_connectionType == CONNECTION_TYPE_FORBIDDEN) return false;
     
-    bool fromEdgeOnLine (dynamic_cast<const Line*> (fromEdge->getParentPath ()));
-    bool toEdgeOnLine (dynamic_cast<const Line*> (toEdge->getParentPath ()));
+    bool fromVertexOnLine (dynamic_cast<const PhysicalStop*> (fromVertex));
+    bool toVertexOnLine (dynamic_cast<const PhysicalStop*> (toVertex));
 
     if ( (_connectionType == CONNECTION_TYPE_ROADROAD) &&
-	 (fromEdgeOnLine == false) &&
-	 (toEdgeOnLine == false) ) return true;
+	 (fromVertexOnLine == false) &&
+	 (toVertexOnLine == false) ) return true;
 
     if ( (_connectionType == CONNECTION_TYPE_ROADLINE) &&
-	 ((fromEdgeOnLine == false) || (toEdgeOnLine == false)) ) return true;
+	 ((fromVertexOnLine == false) || (toVertexOnLine == false)) ) return true;
     
     if (_connectionType >= CONNECTION_TYPE_LINELINE) 
     {
-	return getTransferDelay (fromEdge->getFromVertex (),
-				 toEdge->getFromVertex ()) != FORBIDDEN_TRANSFER_DELAY;
+	return getTransferDelay (fromVertex,
+				 toVertex) != FORBIDDEN_TRANSFER_DELAY;
     }
     
     return false;
