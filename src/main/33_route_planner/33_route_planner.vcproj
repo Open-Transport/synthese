@@ -43,10 +43,19 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\BestVertexReachesMap.cpp">
+			</File>
+			<File
 				RelativePath=".\Journey.cpp">
 			</File>
 			<File
 				RelativePath=".\JourneyLeg.cpp">
+			</File>
+			<File
+				RelativePath=".\JourneyLegComparator.cpp">
+			</File>
+			<File
+				RelativePath=".\RoutePlanner.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -54,13 +63,22 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath=".\BestVertexReachesMap.h">
+			</File>
+			<File
 				RelativePath=".\Journey.h">
 			</File>
 			<File
 				RelativePath=".\JourneyLeg.h">
 			</File>
 			<File
+				RelativePath=".\JourneyLegComparator.h">
+			</File>
+			<File
 				RelativePath=".\module.h">
+			</File>
+			<File
+				RelativePath=".\RoutePlanner.h">
 			</File>
 		</Filter>
 		<File
