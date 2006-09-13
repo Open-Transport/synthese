@@ -32,15 +32,15 @@ public:
   typedef enum { 
     ROAD_TYPE_UNKNOWN, 
     ROAD_TYPE_MOTORWAY, /* autoroute */
-    ROAD_TYPE_MEDIAN_STRIPPED_ROAD,  /* route a chaussees separees (terre plein) */
-    ROAD_TYPE_PRINCIPLE_AXIS, /* axe principal (au sens rue) */
-    ROAD_TYPE_SECONDARY_AXIS, /* axe principal (au sens rue) */
+    ROAD_TYPE_MEDIANSTRIPPEDROAD,  /* route a chaussees separees (terre plein) */
+    ROAD_TYPE_PRINCIPLEAXIS, /* axe principal (au sens rue) */
+    ROAD_TYPE_SECONDARYAXIS, /* axe principal (au sens rue) */
     ROAD_TYPE_BRIDGE, /* pont */
     ROAD_TYPE_STREET, /* rue */
-    ROAD_TYPE_PEDESTRIAN_STREET, /* rue pietonne */
-    ROAD_TYPE_ACCESS_ROAD, /* bretelle */
-    ROAD_TYPE_PRIVATE_WAY, /* voie privee */
-    ROAD_TYPE_PEDESTRIAN_PATH, /* chemin pieton */
+    ROAD_TYPE_PEDESTRIANSTREET, /* rue pietonne */
+    ROAD_TYPE_ACCESSROAD, /* bretelle */
+    ROAD_TYPE_PRIVATEWAY, /* voie privee */
+    ROAD_TYPE_PEDESTRIANPATH, /* chemin pieton */
     ROAD_TYPE_TUNNEL, /* tunnel */
     ROAD_TYPE_HIGHWAY /* route secondaire */
   } RoadType;

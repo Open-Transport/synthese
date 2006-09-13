@@ -31,9 +31,11 @@ LineStopTableSync::LineStopTableSync (Environment::Registry& environments,
 				      const std::string& triggerOverrideClause)
 : ComponentTableSync (LINESTOPS_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
-    addTableColumn (LINESTOPS_TABLE_COL_FROMPHYSICALSTOPID, "INTEGER", false);
+    addTableColumn (LINESTOPS_TABLE_COL_PHYSICALSTOPID, "INTEGER", false);
     addTableColumn (LINESTOPS_TABLE_COL_LINEID, "INTEGER", false);
     addTableColumn (LINESTOPS_TABLE_COL_RANKINPATH, "INTEGER", false);
+    addTableColumn (LINESTOPS_TABLE_COL_ISDEPARTURE, "BOOLEAN", false);
+    addTableColumn (LINESTOPS_TABLE_COL_ISARRIVAL, "BOOLEAN", false);
     addTableColumn (LINESTOPS_TABLE_COL_METRICOFFSET, "DOUBLE", true);
     addTableColumn (LINESTOPS_TABLE_COL_VIAPOINTS, "TEXT", true);
 }
@@ -54,8 +56,10 @@ LineStopTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
 
+    if (environment.getLineStops ().contains (id)) return;
+
     uid fromPhysicalStopId (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_FROMPHYSICALSTOPID)));
+	Conversion::ToLongLong (rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_PHYSICALSTOPID)));
 
     uid lineId (
 	Conversion::ToLongLong (rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_LINEID)));
@@ -63,6 +67,11 @@ LineStopTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     int rankInPath (
 	Conversion::ToInt (rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_RANKINPATH)));
 
+    bool isDeparture (Conversion::ToBool (
+			  rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_ISDEPARTURE)));
+    bool isArrival (Conversion::ToBool (
+			rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_ISARRIVAL)));
+    
     double metricOffset (
 	Conversion::ToDouble (rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_METRICOFFSET)));
     
@@ -75,6 +84,8 @@ LineStopTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 	id, 
 	environment.getLines ().get (lineId),
 	rankInPath,
+	isDeparture, 
+	isArrival,
 	metricOffset,
 	environment.getPhysicalStops ().get (fromPhysicalStopId)
 	);
@@ -94,7 +105,7 @@ LineStopTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     }
 
     environment.getLines ().get (lineId)->addEdge (ls);
-    environment.getLineStops ().add (ls, false);
+    environment.getLineStops ().add (ls);
 }
 
 

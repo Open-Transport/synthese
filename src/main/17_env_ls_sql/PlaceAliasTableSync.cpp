@@ -51,6 +51,9 @@ PlaceAliasTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex
 		      synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+
+    if (environment.getPlaceAliases ().contains (id)) return;
+
     std::string name (
 	rows.getColumn (rowIndex, PLACEALIASES_TABLE_COL_NAME));
     uid aliasedPlaceId (
@@ -90,7 +93,7 @@ PlaceAliasTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex
     }
 
     city->getPlaceAliasesMatcher ().add (pa->getName (), pa);
-    environment.getPlaceAliases ().add (pa, false);
+    environment.getPlaceAliases ().add (pa);
 
 }
 

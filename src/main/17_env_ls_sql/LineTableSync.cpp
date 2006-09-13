@@ -66,7 +66,8 @@ LineTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-    
+    if (environment.getLines ().contains (id)) return;
+
     uid transportNetworkId (Conversion::ToLongLong (rows.getColumn (rowIndex, LINES_TABLE_COL_TRANSPORTNETWORKID)));
     uid axisId (Conversion::ToLongLong (rows.getColumn (rowIndex, LINES_TABLE_COL_AXISID)));
     
@@ -124,7 +125,7 @@ LineTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     line->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
     line->setReservationRule (environment.getReservationRules ().get (reservationRuleId));
 
-    environment.getLines ().add (line, false);
+    environment.getLines ().add (line);
 }
 
 

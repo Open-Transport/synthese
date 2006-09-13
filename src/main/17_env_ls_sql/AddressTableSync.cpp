@@ -26,7 +26,7 @@ AddressTableSync::AddressTableSync (Environment::Registry& environments,
 				    const std::string& triggerOverrideClause)
 : ComponentTableSync (ADDRESSES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
-    addTableColumn (ADDRESSES_TABLE_COL_CONNECTIONPLACEID, "INTEGER", false);
+    addTableColumn (ADDRESSES_TABLE_COL_PLACEID, "INTEGER", false);
     addTableColumn (ADDRESSES_TABLE_COL_ROADID, "INTEGER", false);
     addTableColumn (ADDRESSES_TABLE_COL_METRICOFFSET, "DOUBLE", false);
     addTableColumn (ADDRESSES_TABLE_COL_X, "DOUBLE", true);
@@ -49,9 +49,12 @@ AddressTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+    
+    if (environment.getAddresses ().contains (id)) return;
+
     synthese::env::Address* address = new synthese::env::Address (
 	id,
-	environment.getConnectionPlaces ().get (Conversion::ToLongLong (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_CONNECTIONPLACEID))),
+	environment.getConnectionPlaces ().get (Conversion::ToLongLong (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_PLACEID))),
 	environment.getRoads ().get (Conversion::ToLongLong (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_ROADID))),
 	Conversion::ToDouble (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_METRICOFFSET)),
 	Conversion::ToDouble (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_X)),
@@ -59,7 +62,7 @@ AddressTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 	);
     
 
-    environment.getAddresses ().add (address, false);
+    environment.getAddresses ().add (address);
 }
 
 

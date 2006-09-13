@@ -61,6 +61,8 @@ RoadTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
 
+    if (environment.getRoads ().contains (id)) return;
+
     std::string name (
 	rows.getColumn (rowIndex, ROADS_TABLE_COL_NAME));
 
@@ -99,7 +101,7 @@ RoadTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     road->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
     road->setReservationRule (environment.getReservationRules ().get (reservationRuleId)); 
     
-    environment.getRoads ().add (road, false);
+    environment.getRoads ().add (road);
     city->getRoadsMatcher ().add (road->getName (), road);
 
 }

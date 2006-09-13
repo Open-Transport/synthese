@@ -3,11 +3,12 @@
 #include <assert.h>
 
 #include "01_util/Conversion.h"
-#include "01_util/XmlParser.h"
+#include "01_util/XmlToolkit.h"
 #include "01_util/UId.h"
 
 #include "15_env/Environment.h"
 #include "15_env/LineStop.h"
+#include "15_env/Line.h"
 
 #include "PointLS.h"
 #include "Exception.h"
@@ -15,7 +16,12 @@
 #include <boost/algorithm/string.hpp>
 
 
-namespace su = synthese::util;
+
+using namespace synthese::util::XmlToolkit;
+
+using synthese::env::Line;
+using synthese::env::LineStop;
+
 
 namespace synthese
 {
@@ -24,50 +30,54 @@ namespace envlsxml
 
 const std::string LineStopLS::LINESTOP_TAG ("lineStop");
 const std::string LineStopLS::LINESTOP_ID_ATTR ("id");
+const std::string LineStopLS::LINESTOP_PHYSICALSTOPID_ATTR ("physicalStopId");
+const std::string LineStopLS::LINESTOP_LINEID_ATTR ("lineId");
+const std::string LineStopLS::LINESTOP_RANKINPATH_ATTR ("rankInPath");
+const std::string LineStopLS::LINESTOP_ISDEPARTURE_ATTR ("isDeparture");
+const std::string LineStopLS::LINESTOP_ISARRIVAL_ATTR ("isArrival");
 const std::string LineStopLS::LINESTOP_METRICOFFSET_ATTR ("metricOffset");
 
-const std::string LineStopLS::LINESTOP_TYPE_ATTR ("type");
-const std::string LineStopLS::LINESTOP_TYPE_ATTR_DEPARTURE ("departure");
-const std::string LineStopLS::LINESTOP_TYPE_ATTR_ARRIVAL ("arrival");
-const std::string LineStopLS::LINESTOP_TYPE_ATTR_PASSAGE ("passage");
-
-const std::string LineStopLS::LINESTOP_PHYSICALSTOPID_ATTR ("physicalStopId");
 
 
-synthese::env::LineStop* 
+
+void
 LineStopLS::Load (XMLNode& node,
-		  const synthese::env::Line* line, int rankInLine,
-		  const synthese::env::Environment& environment)
+		  synthese::env::Environment& environment)
 {
     // assert (LINESTOP_TAG == node.getName ());
-    uid id (su::Conversion::ToLongLong (
-		       node.getAttribute (LINESTOP_ID_ATTR.c_str())));
 
-    double metricOffset (su::Conversion::ToDouble (
-	node.getAttribute (LINESTOP_METRICOFFSET_ATTR.c_str())));
+    uid id (GetLongLongAttr (node, LINESTOP_ID_ATTR));
 
-    int physicalStopId (su::Conversion::ToInt (
-	node.getAttribute (LINESTOP_PHYSICALSTOPID_ATTR.c_str())));
+    if (environment.getLineStops ().contains (id)) return;
 
-    synthese::env::LineStop* lineStop = new synthese::env::LineStop (
+    uid physicalStopId (GetLongLongAttr (node, LINESTOP_PHYSICALSTOPID_ATTR));
+    uid lineId (GetLongLongAttr (node, LINESTOP_LINEID_ATTR));
+    int rankInPath (GetIntAttr (node, LINESTOP_RANKINPATH_ATTR));
+    bool isDeparture (GetBoolAttr (node, LINESTOP_ISDEPARTURE_ATTR));
+    bool isArrival (GetBoolAttr (node, LINESTOP_ISARRIVAL_ATTR));
+    double metricOffset (GetDoubleAttr (node, LINESTOP_METRICOFFSET_ATTR));
+
+    Line* line = environment.getLines ().get (lineId);
+    
+    LineStop* lineStop = new LineStop (
 	id,
 	line, 
-	rankInLine, 
+	rankInPath, 
+	isDeparture, isArrival,
 	metricOffset, 
 	environment.getPhysicalStops (). get (physicalStopId));
 
-    
-
     // Add via points
-    int nbPoints = node.nChildNode(PointLS::POINT_TAG.c_str());
+    int nbPoints = GetChildNodeCount(node, PointLS::POINT_TAG);
     for (int i=0; i<nbPoints; ++i) 
     {
-	XMLNode pointNode = node.getChildNode(PointLS::POINT_TAG.c_str(), i);
+	XMLNode pointNode = GetChildNode (node, PointLS::POINT_TAG, i);
 	lineStop->addViaPoint (PointLS::Load (pointNode));
     }
 
-    return lineStop;
-    
+    line->addEdge (lineStop);
+
+    environment.getLineStops ().add (lineStop);
 }
 
 

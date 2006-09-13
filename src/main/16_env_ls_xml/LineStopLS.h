@@ -40,16 +40,16 @@ class LineStopLS
 {
  public:
 
-    static const std::string LINESTOP_TAG;
-    static const std::string LINESTOP_ID_ATTR;
-    static const std::string LINESTOP_METRICOFFSET_ATTR;
 
-    static const std::string LINESTOP_TYPE_ATTR;
-    static const std::string LINESTOP_TYPE_ATTR_DEPARTURE;
-    static const std::string LINESTOP_TYPE_ATTR_ARRIVAL;
-    static const std::string LINESTOP_TYPE_ATTR_PASSAGE;
+    static const std::string LineStopLS::LINESTOP_TAG;
+    static const std::string LineStopLS::LINESTOP_ID_ATTR;
+    static const std::string LineStopLS::LINESTOP_PHYSICALSTOPID_ATTR;
+    static const std::string LineStopLS::LINESTOP_LINEID_ATTR;
+    static const std::string LineStopLS::LINESTOP_RANKINPATH_ATTR;
+    static const std::string LineStopLS::LINESTOP_ISDEPARTURE_ATTR;
+    static const std::string LineStopLS::LINESTOP_ISARRIVAL_ATTR;
+    static const std::string LineStopLS::LINESTOP_METRICOFFSET_ATTR;
 
-    static const std::string LINESTOP_PHYSICALSTOPID_ATTR;
 
  private:
 
@@ -67,10 +67,9 @@ class LineStopLS
 	Conversion from ids to pointers is done thanks to the
 	environment parameter.
      */
-    static synthese::env::LineStop* Load (
+    static void Load (
 	XMLNode& node,
-	const synthese::env::Line* line, int RankInLine,
-	const synthese::env::Environment& environment);
+	synthese::env::Environment& environment);
 
     /** @todo Not implemented.
      **/

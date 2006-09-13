@@ -50,14 +50,19 @@ void
 AlarmTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
+
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+
+    if (environment.getAlarms ().contains (id)) return;
+
     synthese::env::Alarm* alarm = new synthese::env::Alarm (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
+	id,
 	rows.getColumn (rowIndex, ALARMS_TABLE_COL_MESSAGE),
 	DateTime::FromSQLTimestamp (rows.getColumn (rowIndex, ALARMS_TABLE_COL_PERIODSTART)),
 	DateTime::FromSQLTimestamp (rows.getColumn (rowIndex, ALARMS_TABLE_COL_PERIODEND)),
 	(Alarm::AlarmLevel) Conversion::ToInt (rows.getColumn (rowIndex, ALARMS_TABLE_COL_LEVEL)) );
     
-    environment.getAlarms ().add (alarm, false);
+    environment.getAlarms ().add (alarm);
 }
 
 

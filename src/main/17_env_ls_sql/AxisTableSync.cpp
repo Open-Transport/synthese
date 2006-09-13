@@ -44,14 +44,18 @@ void
 AxisTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+
+    if (environment.getAxes ().contains (id)) return;
+
     synthese::env::Axis* axis = new synthese::env::Axis (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
+	id,
 	rows.getColumn (rowIndex, AXES_TABLE_COL_NAME),
 	Conversion::ToBool (rows.getColumn (rowIndex, AXES_TABLE_COL_FREE)),
 	Conversion::ToBool (rows.getColumn (rowIndex, AXES_TABLE_COL_ALLOWED))
 	);
     
-    environment.getAxes ().add (axis, false);
+    environment.getAxes ().add (axis);
 }
 
 

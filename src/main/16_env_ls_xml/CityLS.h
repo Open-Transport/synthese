@@ -55,9 +55,9 @@ class CityLS
 	Conversion from ids to pointers is done thanks to the
 	environment parameter.
      */
-    static synthese::env::City* Load (
+    static void Load (
 	XMLNode& node,
-	const synthese::env::Environment& environment);
+	synthese::env::Environment& environment);
 
     /** @todo Not implemented.
      **/

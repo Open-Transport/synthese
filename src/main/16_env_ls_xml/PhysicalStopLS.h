@@ -42,8 +42,9 @@ class PhysicalStopLS
     static const std::string PHYSICALSTOP_TAG;
     static const std::string PHYSICALSTOP_ID_ATTR;
     static const std::string PHYSICALSTOP_NAME_ATTR;
-    static const std::string PHYSICALSTOP_CONNECTIONPLACEID_ATTR;
-    static const std::string PHYSICALSTOP_RANKINCONNECTIONPLACE_ATTR;
+    static const std::string PHYSICALSTOP_PLACEID_ATTR;
+    static const std::string PHYSICALSTOP_X_ATTR;
+    static const std::string PHYSICALSTOP_Y_ATTR;
 
  private:
 
@@ -61,9 +62,9 @@ class PhysicalStopLS
 	Conversion from ids to pointers is done thanks to the
 	environment parameter.
      */
-    static synthese::env::PhysicalStop* Load (
+    static void Load (
 	XMLNode& node,
-	const synthese::env::Environment& environment);
+	synthese::env::Environment& environment);
 
     /** @todo Not implemented.
      **/

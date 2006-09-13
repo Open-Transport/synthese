@@ -16,11 +16,13 @@ namespace env
 {
 
 
-
-Edge::Edge (const EdgeType& type,
+    
+Edge::Edge (bool isDeparture,
+	    bool isArrival,
 	    const Path* parentPath,
 	    int rankInPath) 
-: _type (type)
+: _isDeparture (isDeparture)
+, _isArrival (isArrival)
 , _parentPath (parentPath)
 , _rankInPath (rankInPath)
 {
@@ -43,26 +45,13 @@ Edge::~Edge ()
 
 
 
-const Edge::EdgeType&
-Edge::getType () const
-{
-    return _type;
-}
-
-
-
-void 
-Edge::setType ( const EdgeType& type )
-{
-    _type = type;
-}
 
 
 
 bool 
 Edge::isArrival () const
 {
-    return ( _type == EDGE_TYPE_PASSAGE || _type == EDGE_TYPE_ARRIVAL );
+    return _isArrival;
 }
 
 
@@ -70,7 +59,7 @@ Edge::isArrival () const
 bool 
 Edge::isDeparture () const
 {
-    return ( _type == EDGE_TYPE_PASSAGE || _type == EDGE_TYPE_DEPARTURE );
+    return _isDeparture;
 }
 
 

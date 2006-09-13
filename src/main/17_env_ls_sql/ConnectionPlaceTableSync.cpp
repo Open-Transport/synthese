@@ -55,6 +55,8 @@ ConnectionPlaceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int row
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
 
+    if (environment.getConnectionPlaces ().contains (id)) return;
+
     std::string name (
 	rows.getColumn (rowIndex, CONNECTIONPLACES_TABLE_COL_NAME));
 
@@ -104,7 +106,7 @@ ConnectionPlaceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int row
     cp->setAlarm (environment.getAlarms ().get (alarmId));
 
     city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
-    environment.getConnectionPlaces ().add (cp, false);
+    environment.getConnectionPlaces ().add (cp);
 }
 
 

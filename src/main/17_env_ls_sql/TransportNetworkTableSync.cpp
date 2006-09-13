@@ -46,13 +46,15 @@ TransportNetworkTableSync::doAdd (const synthese::db::SQLiteResult& rows, int ro
 		      synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+
+    if (environment.getTransportNetworks ().contains (id)) return;
     
     std::string name (
 	rows.getColumn (rowIndex, TRANSPORTNETWORKS_TABLE_COL_NAME));
     
     synthese::env::TransportNetwork* tn = new synthese::env::TransportNetwork (id, name);
 
-    environment.getTransportNetworks ().add (tn, false);
+    environment.getTransportNetworks ().add (tn);
 }
 
 

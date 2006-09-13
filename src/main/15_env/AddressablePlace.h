@@ -28,12 +28,12 @@ class AddressablePlace : public Place
 public:
 
     typedef enum { 
-	CONNECTION_TYPE_FORBIDDEN,         //!< neither road connection nor line connection
-	CONNECTION_TYPE_ROADROAD,          //!< only road to road connection
-	CONNECTION_TYPE_ROADLINE,          //!< only road to line, or line to road, or road to road
-	CONNECTION_TYPE_LINELINE,          //!< any connection possible
-	CONNECTION_TYPE_RECOMMENDED_SHORT, //!< any connection possible, recommended if short journey
-	CONNECTION_TYPE_RECOMMENDED        //!< any connection possible, recommended for any journey
+	CONNECTION_TYPE_FORBIDDEN = 0,         //!< neither road connection nor line connection
+	CONNECTION_TYPE_ROADROAD = 1,          //!< only road to road connection
+	CONNECTION_TYPE_ROADLINE = 2,          //!< only road to line, or line to road, or road to road
+	CONNECTION_TYPE_LINELINE = 3,          //!< any connection possible
+	CONNECTION_TYPE_RECOMMENDED_SHORT = 4, //!< any connection possible, recommended if short journey
+	CONNECTION_TYPE_RECOMMENDED = 5        //!< any connection possible, recommended for any journey
     } ConnectionType;
 
 

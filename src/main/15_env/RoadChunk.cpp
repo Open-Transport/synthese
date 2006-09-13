@@ -12,9 +12,11 @@ namespace env
 
 RoadChunk::RoadChunk (const uid& id,
 		      const Address* fromAddress,
-		      int rankInRoad)
+		      int rankInRoad,
+		      bool isDeparture,
+		      bool isArrival)
     : synthese::util::Registrable<uid,RoadChunk> (id)
-    , Edge (EDGE_TYPE_PASSAGE, fromAddress->getRoad (), rankInRoad)
+    , Edge (isDeparture, isArrival, fromAddress->getRoad (), rankInRoad)
     , _fromAddress (fromAddress)
 {
 }

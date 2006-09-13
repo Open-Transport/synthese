@@ -3,7 +3,7 @@
 #include <assert.h>
 
 #include "01_util/Conversion.h"
-#include "01_util/XmlParser.h"
+#include "01_util/XmlToolkit.h"
 #include "01_util/UId.h"
 
 #include "15_env/Environment.h"
@@ -17,7 +17,9 @@
 #include "PhysicalStopLS.h"
 
 
-namespace su = synthese::util;
+using namespace synthese::util::XmlToolkit;
+
+
 
 namespace synthese
 {
@@ -29,6 +31,7 @@ const std::string EnvironmentLS::ENVIRONMENT_ID_ATTR ("id");
 const std::string EnvironmentLS::ENVIRONMENT_CITIES_TAG ("cities");
 const std::string EnvironmentLS::ENVIRONMENT_AXES_TAG ("axes");
 const std::string EnvironmentLS::ENVIRONMENT_LINES_TAG ("lines");
+const std::string EnvironmentLS::ENVIRONMENT_LINESTOPS_TAG ("lineStops");
 const std::string EnvironmentLS::ENVIRONMENT_CONNECTIONPLACES_TAG ("connectionPlaces");
 const std::string EnvironmentLS::ENVIRONMENT_PHYSICALSTOPS_TAG ("physicalStops");
 
@@ -36,72 +39,65 @@ const std::string EnvironmentLS::ENVIRONMENT_PHYSICALSTOPS_TAG ("physicalStops")
 synthese::env::Environment* 
 EnvironmentLS::Load (XMLNode& node)
 {
-    uid id (su::Conversion::ToLongLong (
-		node.getAttribute (ENVIRONMENT_ID_ATTR.c_str())));
+    uid id (GetLongLongAttr (node, ENVIRONMENT_ID_ATTR));
+
+    // TODO : le add doit etre fait au niveau de chaque loader
+    // en faisant un try catch en cas d'erreur de add dans registre
+    // ou plutot guard au debut de chaque load
+
     synthese::env::Environment* env = new synthese::env::Environment (id);
 
-    XMLNode citiesNode = node.getChildNode(ENVIRONMENT_CITIES_TAG.c_str(), 0);
-    int nbCities = citiesNode.nChildNode(CityLS::CITY_TAG.c_str());
+    XMLNode citiesNode = GetChildNode (node, ENVIRONMENT_CITIES_TAG, 0);
+    int nbCities = GetChildNodeCount (citiesNode, CityLS::CITY_TAG);
     for (int i=0; i<nbCities; ++i) 
     {
-	XMLNode cityNode = citiesNode.getChildNode (CityLS::CITY_TAG.c_str(), i);
-	env->getCities ().add (CityLS::Load (cityNode, *env));
+	XMLNode cityNode = GetChildNode (citiesNode, CityLS::CITY_TAG, i);
+	CityLS::Load (cityNode, *env);
     }
 
-    XMLNode axesNode = node.getChildNode(ENVIRONMENT_AXES_TAG.c_str(), 0);
-    int nbAxes = axesNode.nChildNode(AxisLS::AXIS_TAG.c_str());
+    XMLNode axesNode = GetChildNode (node, ENVIRONMENT_AXES_TAG, 0);
+    int nbAxes = GetChildNodeCount (axesNode, AxisLS::AXIS_TAG);
     for (int i=0; i<nbAxes; ++i) 
     {
-	XMLNode axisNode = axesNode.getChildNode (AxisLS::AXIS_TAG.c_str(), i);
-	env->getAxes ().add (AxisLS::Load (axisNode, *env));
+	XMLNode axisNode = GetChildNode (axesNode, AxisLS::AXIS_TAG, i);
+	AxisLS::Load (axisNode, *env);
     }
     
-    XMLNode connectionPlacesNode = node.getChildNode(ENVIRONMENT_CONNECTIONPLACES_TAG.c_str(), 0);
-    int nbConnectionPlaces = connectionPlacesNode.nChildNode(ConnectionPlaceLS::CONNECTIONPLACE_TAG.c_str());
+    XMLNode connectionPlacesNode = GetChildNode (node, ENVIRONMENT_CONNECTIONPLACES_TAG, 0);
+    int nbConnectionPlaces = GetChildNodeCount (connectionPlacesNode, ConnectionPlaceLS::CONNECTIONPLACE_TAG);
     for (int i=0; i<nbConnectionPlaces; ++i) 
     {
-	XMLNode connectionPlaceNode = connectionPlacesNode.getChildNode (ConnectionPlaceLS::CONNECTIONPLACE_TAG.c_str(), i);
-	env->getConnectionPlaces ().add (ConnectionPlaceLS::Load (connectionPlaceNode, *env));
+	XMLNode connectionPlaceNode = GetChildNode (connectionPlacesNode, ConnectionPlaceLS::CONNECTIONPLACE_TAG, i);
+	ConnectionPlaceLS::Load (connectionPlaceNode, *env);
     }
     
-    XMLNode physicalStopsNode = node.getChildNode(ENVIRONMENT_PHYSICALSTOPS_TAG.c_str(), 0);
-    int nbPhysicalStops = physicalStopsNode.nChildNode(PhysicalStopLS::PHYSICALSTOP_TAG.c_str());
+    XMLNode physicalStopsNode = GetChildNode (node, ENVIRONMENT_PHYSICALSTOPS_TAG, 0);
+    int nbPhysicalStops = GetChildNodeCount (physicalStopsNode, PhysicalStopLS::PHYSICALSTOP_TAG);
     for (int i=0; i<nbPhysicalStops; ++i) 
     {
-	XMLNode physicalStopNode = physicalStopsNode.getChildNode (PhysicalStopLS::PHYSICALSTOP_TAG.c_str(), i);
-	env->getPhysicalStops ().add (PhysicalStopLS::Load (physicalStopNode, *env));
+	XMLNode physicalStopNode = GetChildNode (physicalStopsNode, PhysicalStopLS::PHYSICALSTOP_TAG, i);
+	PhysicalStopLS::Load (physicalStopNode, *env);
     }
     
-    XMLNode linesNode = node.getChildNode(ENVIRONMENT_LINES_TAG.c_str(), 0);
-    int nbLines = linesNode.nChildNode(LineLS::LINE_TAG.c_str());
+    XMLNode linesNode = GetChildNode (node, ENVIRONMENT_LINES_TAG, 0);
+    int nbLines = GetChildNodeCount (linesNode, LineLS::LINE_TAG);
     for (int i=0; i<nbLines; ++i) 
     {
-		XMLNode lineNode = linesNode.getChildNode (LineLS::LINE_TAG.c_str(), i);
-		synthese::env::Line* line = LineLS::Load (lineNode, *env);
-		env->getLines ().add (line);
-
-		// Load line stops
-		int nbLineStops = lineNode.nChildNode(LineStopLS::LINESTOP_TAG.c_str());
-		for (int j=0; j<nbLineStops; ++j) 
-		{
-			XMLNode lineStopNode = lineNode.getChildNode (LineStopLS::LINESTOP_TAG.c_str(), j);
-			synthese::env::LineStop* lineStop = LineStopLS::Load (lineStopNode, line, j, *env);
-			if (env->getLineStops().contains (lineStop->getId ()) == false) 
-			{
-			    env->getLineStops().add (lineStop);
-			    line->addEdge (lineStop);
-			}
-			else
-			{
-			    synthese::env::LineStop* existingLineStop = env->getLineStops().get (lineStop->getId ());
-			    delete lineStop;
-			    line->addEdge (existingLineStop);
-			    
-			}
-		}
-
+	XMLNode lineNode = GetChildNode (linesNode, LineLS::LINE_TAG, i);
+	LineLS::Load (lineNode, *env);
     }
+
+
     
+    XMLNode lineStopsNode = GetChildNode (node, ENVIRONMENT_LINESTOPS_TAG, 0);
+    int nbLineStops = GetChildNodeCount (lineStopsNode, LineStopLS::LINESTOP_TAG);
+    for (int i=0; i<nbLineStops; ++i) 
+    {
+	XMLNode lineStopNode = GetChildNode (lineStopsNode, LineStopLS::LINESTOP_TAG, i);
+	LineStopLS::Load (lineStopNode, *env);
+    }
+
+	
 
     return env;
 }

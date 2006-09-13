@@ -24,6 +24,10 @@ public:
 
   void testEnvironmentConstruction0 ();
 
+//  static synthese::env::Environment CreateTestEnvironment0 ();
+
+
+
 protected:
 
 

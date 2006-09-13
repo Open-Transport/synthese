@@ -46,6 +46,7 @@ class Conversion
     static bool ToBool (const std::string& s);
 
     static int ToInt (const std::string& s);
+    static long ToLong (const std::string& s);
     static long long ToLongLong (const std::string& s);
 
     static double ToDouble (const std::string& s);

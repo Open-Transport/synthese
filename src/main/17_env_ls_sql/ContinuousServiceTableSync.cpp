@@ -59,9 +59,11 @@ ContinuousServiceTableSync::~ContinuousServiceTableSync ()
 
 void 
 ContinuousServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-		      synthese::env::Environment& environment)
+				   synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+
+    if (environment.getContinuousServices ().contains (id)) return;
 
     int serviceNumber (Conversion::ToInt (
         rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER)));
@@ -133,7 +135,7 @@ ContinuousServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int r
     cs->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
     cs->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
 
-    environment.getContinuousServices ().add (cs, false);
+    environment.getContinuousServices ().add (cs);
 }
 
 

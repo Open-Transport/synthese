@@ -32,8 +32,10 @@ RoadChunkTableSync::RoadChunkTableSync (Environment::Registry& environments,
 					const std::string& triggerOverrideClause)
 : ComponentTableSync (ROADCHUNKS_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
-    addTableColumn (ROADCHUNKS_TABLE_COL_FROMADDRESSID, "INTEGER", false);
+    addTableColumn (ROADCHUNKS_TABLE_COL_ADDRESSID, "INTEGER", false);
     addTableColumn (ROADCHUNKS_TABLE_COL_RANKINPATH, "INTEGER", false);
+    addTableColumn (ROADCHUNKS_TABLE_COL_ISDEPARTURE, "BOOLEAN", false);
+    addTableColumn (ROADCHUNKS_TABLE_COL_ISARRIVAL, "BOOLEAN", false);
     addTableColumn (ROADCHUNKS_TABLE_COL_VIAPOINTS, "TEXT", true);
 }
 
@@ -53,8 +55,15 @@ RoadChunkTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
 
+    if (environment.getRoadChunks ().contains (id)) return;
+
     uid fromAddressId (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, ROADCHUNKS_TABLE_COL_FROMADDRESSID)));
+	Conversion::ToLongLong (rows.getColumn (rowIndex, ROADCHUNKS_TABLE_COL_ADDRESSID)));
+
+    bool isDeparture (Conversion::ToBool (
+			  rows.getColumn (rowIndex, ROADCHUNKS_TABLE_COL_ISDEPARTURE)));
+    bool isArrival (Conversion::ToBool (
+			rows.getColumn (rowIndex, ROADCHUNKS_TABLE_COL_ISARRIVAL)));
 
     int rankInRoad (
 	Conversion::ToInt (rows.getColumn (rowIndex, ROADCHUNKS_TABLE_COL_RANKINPATH)));
@@ -65,8 +74,7 @@ RoadChunkTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
     const Address* fromAddress = environment.getAddresses ().get (fromAddressId);
-    RoadChunk* rc = new synthese::env::RoadChunk (
-	id, fromAddress, rankInRoad);
+    RoadChunk* rc = new synthese::env::RoadChunk (id, fromAddress, isDeparture, isArrival, rankInRoad);
 
     boost::char_separator<char> sep1 (",");
     boost::char_separator<char> sep2 (":");
@@ -83,7 +91,7 @@ RoadChunkTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     }
     
     environment.getRoads ().get (fromAddress->getRoad ()->getId ())->addEdge (rc);
-    environment.getRoadChunks ().add (rc, false);
+    environment.getRoadChunks ().add (rc);
 }
 
 

@@ -45,6 +45,8 @@ public:
     LineStop (const uid& id,
 	      const Line* line,
 	      int rankInPath,
+	      bool isDeparture,
+	      bool isArrival,
 	      double metricOffset,
 	      const PhysicalStop* physicalStop);
 

@@ -41,7 +41,10 @@ public:
 
   RoadChunk (const uid& id,
 	     const Address* fromAddress,
-	     int rankInRoad);
+	     int rankInRoad,
+	     bool isDeparture,
+	     bool isArrival);
+
   
   virtual ~RoadChunk ();
 

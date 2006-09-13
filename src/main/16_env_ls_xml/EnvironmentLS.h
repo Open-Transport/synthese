@@ -91,6 +91,7 @@ class EnvironmentLS
     static const std::string ENVIRONMENT_CONNECTIONPLACES_TAG;
     static const std::string ENVIRONMENT_PHYSICALSTOPS_TAG;
     static const std::string ENVIRONMENT_LINES_TAG;
+    static const std::string ENVIRONMENT_LINESTOPS_TAG;
 
  private:
 

@@ -42,11 +42,15 @@ void
 CityTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+
+    if (environment.getCities ().contains (id)) return;
+
     synthese::env::City* city = new synthese::env::City (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
+	id,
 	rows.getColumn (rowIndex, CITIES_TABLE_COL_NAME) );
     
-    environment.getCities ().add (city, false);
+    environment.getCities ().add (city);
     environment.getCitiesMatcher ().add (city->getName (), city->getKey ());
 }
 

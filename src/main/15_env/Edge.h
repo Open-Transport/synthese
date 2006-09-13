@@ -49,18 +49,12 @@ class Edge
 {
 public:
 
-    typedef enum 
-	{
-            EDGE_TYPE_DEPARTURE = 'D',
-            EDGE_TYPE_ARRIVAL = 'A',
-            EDGE_TYPE_PASSAGE = 'P'
-	} EdgeType;
-
 
 private:
 
 
-    EdgeType _type;      //!< Departure, arrival or passage    
+    bool _isDeparture;
+    bool _isArrival;
 
     const Path* _parentPath;      //!< Parent path
     int _rankInPath;  //!< Rank in path.
@@ -86,7 +80,8 @@ private:
 
 protected:
 
-    Edge (const EdgeType& type,
+    Edge (bool isDeparture,
+	  bool isArrival,
 	  const Path* parentPath,
 	  int rankInPath);
 
@@ -113,9 +108,6 @@ public:
     /** Returns length of this edge, in meters. from
     */
     double getLength () const;
-
-    const EdgeType& getType () const;
-    void setType ( const EdgeType& type );
 
     const Edge* getNextInPath () const;
     void setNextInPath (const Edge* nextInPath);

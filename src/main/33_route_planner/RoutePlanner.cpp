@@ -224,27 +224,41 @@ RoutePlanner::isServiceCompliant (const Service* service) const
 
 
 bool
-RoutePlanner::isDestinationUsefulForSoonArrival (const Vertex* vertex,
-						 const DateTime& dateTime,
-						 SquareDistance& sqd) const
+RoutePlanner::isVertexUseful (const Vertex* vertex,
+			      const DateTime& dateTime,
+			      const synthese::env::AccessDirection& accessDirection,
+			      SquareDistance& sqd) const
 {
+    // The vertex is considered useful if it allows a soon access for arrival
+    // or late access for departure.
+
+    const VertexAccessMap& vam = (accessDirection == TO_DESTINATION) 
+	? _destinationVam 
+	: _originVam ;
+    
     if (sqd.getSquareDistance () == UNKNOWN_VALUE)
     {
-	sqd.setFromPoints (*vertex, _destinationVam.getIsobarycenter ());  
+	sqd.setFromPoints (*vertex, vam.getIsobarycenter ());  
 	sqd.setSquareDistance (sqd.getSquareDistance () - 
-			       _destinationVam.getIsobarycenterMaxSquareDistance ().
-			       getSquareDistance ());
+			       vam.getIsobarycenterMaxSquareDistance ().getSquareDistance ());
 	
     }
     
-    // Check that the maximal arrival time is not exceeded
-    DateTime arrivalMoment (dateTime);
-    if ((_destinationVam.contains (vertex) && (vertex->getConnectionPlace ())))
+    // Check that the limit time (min or max) is not exceeded
+    DateTime accessMoment (dateTime);
+    
+    if ((vam.contains (vertex) && (vertex->getConnectionPlace ())))
     {
-	arrivalMoment += vertex->getConnectionPlace ()->getMinTransferDelay ();
+	accessMoment += ((accessDirection == TO_DESTINATION) ? 1 : -1) *
+	    vertex->getConnectionPlace ()->getMinTransferDelay ();
     }
 	
-    if (arrivalMoment > _maxArrivalTime) return false;
+    
+    if ( (accessDirection == FROM_ORIGIN) &&
+	 (accessMoment < _minDepartureTime) ) return false;
+
+    if ( (accessDirection == TO_DESTINATION) &&
+	 (accessMoment > _maxArrivalTime) ) return false;
 
     // TODO : re-implement VMax control.
 
@@ -272,14 +286,14 @@ RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
 
     const Vertex* arrivalVertex = arrivalEdge->getFromVertex ();
     
-    // If the arrival edge is an address, the currentJourney necessarily contains
-    // only road legs, filter on max approach distance.
+    // If the edge is an address, the currentJourney necessarily contains
+    // only road legs, filter on max approach distance (= walk distance).
     if ( (arrivalVertex->isAddress ()) &&
 	 (currentJourney.getDistance () + departureEdge->getLength () > 
 	  _accessParameters.maxApproachDistance) ) return false;
 
 
-    // If the arrival edge is an address, the currentJourney necessarily contains
+    // If the edge is an address, the currentJourney necessarily contains
     // only road legs, filter on max approach time (= walk time).
     if ( (arrivalVertex->isAddress ()) &&
 	 (currentJourney.getEffectiveDuration () + 
@@ -287,17 +301,18 @@ RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
 	  _accessParameters.maxApproachTime) ) return false;
 
 
-    // Arrival moment
     DateTime arrivalMoment = departureMoment;
     arrivalEdge->calculateArrival (*departureEdge, 
-				   service->getServiceNumber (), 
-				   departureMoment, 
-				   arrivalMoment);
+			      service->getServiceNumber (), 
+			      departureMoment, 
+			      arrivalMoment);
 
 
     SquareDistance sqd;
-    if (isDestinationUsefulForSoonArrival (arrivalVertex,
-					   arrivalMoment, sqd) == false)
+    if (isVertexUseful (arrivalVertex,
+			arrivalMoment,
+			TO_DESTINATION,
+			sqd) == false)
     {
 	return false;
     }
@@ -319,6 +334,8 @@ RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
 	}
     }
     
+
+
 
     // Add a journey leg if necessary
     if ( (arrivalMoment < _bestArrivalVertexReachesMap.getBestTime (arrivalVertex, arrivalMoment)) ||
@@ -363,9 +380,127 @@ RoutePlanner::evaluateArrival (const Edge* arrivalEdge,
 
 }
 				    
+
+
+
+
+
+/* TODO
+
+
+bool 
+RoutePlanner::evaluateDeparture (const Edge* departureEdge,
+				 const DateTime& departureMoment,
+				 const Edge* arrivalEdge,
+				 const AccessDirection& accessDirection,
+				 const Service* service,
+				 std::deque<JourneyLeg*>& journeyPart,
+				 const Journey& currentJourney,
+				 bool strictTime,
+				 int continuousServiceRange)
+{
+    if (departureEdge == 0) return true;
+
+    const Vertex* departureVertex = departureEdge->getFromVertex ();
+    
+    // If the edge is an address, the currentJourney necessarily contains
+    // only road legs, filter on max approach distance (= walk distance).
+    if ( (departureVertex->isAddress ()) &&
+	 (currentJourney.getDistance () + arrivalEdge->getLength () > 
+	  _accessParameters.maxApproachDistance) ) return false;
+
+
+    // If the edge is an address, the currentJourney necessarily contains
+    // only road legs, filter on max approach time (= walk time).
+    if ( (departureVertex->isAddress ()) &&
+	 (currentJourney.getEffectiveDuration () + 
+	  (arrivalEdge->getLength () / _accessParameters.approachSpeed) > 
+	  _accessParameters.maxApproachTime) ) return false;
+
+
+    DateTime arrivalMoment = departureMoment;
+    departureEdge->calculateArrival (*arrivalEdge, 
+			      service->getServiceNumber (), 
+			      departureMoment, 
+			      arrivalMoment);
+
+
+    SquareDistance sqd;
+    if (isVertexUseful (departureVertex,
+			arrivalMoment,
+			accessDirection, sqd) == false)
+    {
+	return false;
+    }
+
+
+
+    // Continuous service breaking
+    if (_previousContinuousServiceDuration)
+    {
+	if ( (currentJourney.getJourneyLegCount () > 0) &&
+	     (currentJourney.getDepartureTime () <= _previousContinuousServiceLastDeparture) &&
+	     (arrivalMoment - currentJourney.getDepartureTime () >= _previousContinuousServiceDuration) )
+	{
+	    return false;
+	}
+	else if ( (departureMoment < _previousContinuousServiceLastDeparture) && 
+		  (arrivalMoment - departureMoment >= _previousContinuousServiceDuration) )
+	{
+	    return false;
+	}
+    }
+    
+
+
+
+    // Add a journey leg if necessary
+    if ( (arrivalMoment < _bestArrivalVertexReachesMap.getBestTime (departureVertex, arrivalMoment)) ||
+	 (strictTime && 
+	  (arrivalMoment == _bestArrivalVertexReachesMap.getBestTime (departureVertex, arrivalMoment) )) )
+    {
+
+	
+	JourneyLeg* journeyLeg = 0;
+	if (_bestArrivalVertexReachesMap.contains (departureVertex) == false)
+	{
+	    journeyLeg = new JourneyLeg ();
+	    journeyLeg->setOrigin (arrivalEdge);
+	    journeyLeg->setDestination (departureEdge);
+	    journeyLeg->setDepartureTime (departureMoment);
+	    journeyLeg->setArrivalTime (arrivalMoment);
+	    journeyLeg->setService (service);
+	    journeyLeg->setContinuousServiceRange (continuousServiceRange);
+	    journeyLeg->setSquareDistance (sqd);
+
+	    journeyPart.push_front (journeyLeg);
+	    _bestArrivalVertexReachesMap.insert (departureVertex, journeyLeg);
+	}
+	else
+	{
+	    journeyLeg->setOrigin (arrivalEdge);
+	    journeyLeg->setDepartureTime (departureMoment);
+	    journeyLeg->setArrivalTime (arrivalMoment);
+	    journeyLeg->setService (service);
+	    journeyLeg->setContinuousServiceRange (continuousServiceRange);
+	}
+
+	
+	if (_destinationVam.contains (departureVertex))
+	{
+	    _maxArrivalTime = arrivalMoment;
+	    _maxArrivalTime += _destinationVam.getVertexAccess (departureVertex).approachTime;
+	}
+	
+    }
+    return arrivalMoment <= (_maxArrivalTime - _destinationVam.getMinApproachTime ());
+
+}
 				    
 
 
+
+*/
 
 
 JourneyVector 
@@ -468,9 +603,10 @@ RoutePlanner::integralSearch (const VertexAccessMap& vam,
 	journeyPart.pop_front ();
 	
 	if (_destinationVam.contains (journeyLeg->getDestination ()->getFromVertex ()) ||
-	    isDestinationUsefulForSoonArrival (journeyLeg->getDestination ()->getFromVertex (),
-					       journeyLeg->getArrivalTime (), 
-					       journeyLeg->getSquareDistance ()) )
+	    isVertexUseful (journeyLeg->getDestination ()->getFromVertex (),
+			    journeyLeg->getArrivalTime (), 
+			    accessDirection,
+			    journeyLeg->getSquareDistance ()) )
 	{
 	    legs.push_back (journeyLeg);
 	}

@@ -17,10 +17,12 @@ namespace env
 LineStop::LineStop (const uid& id,
 		    const Line* line,
 		    int rankInPath,
+		    bool isDeparture,
+		    bool isArrival,		
 		    double metricOffset,
 		    const PhysicalStop* physicalStop)
     : synthese::util::Registrable<uid,LineStop> (id)
-    , Edge (EDGE_TYPE_PASSAGE, line, rankInPath)
+    , Edge (isDeparture, isArrival, line, rankInPath)
     , _metricOffset (metricOffset)
     , _physicalStop (physicalStop)
 {

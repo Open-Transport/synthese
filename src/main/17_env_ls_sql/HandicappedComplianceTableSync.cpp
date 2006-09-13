@@ -47,6 +47,8 @@ HandicappedComplianceTableSync::doAdd (const synthese::db::SQLiteResult& rows, i
 		      synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+
+    if (environment.getHandicappedCompliances ().contains (id)) return;
     
     tribool status = true;
     int statusInt (
@@ -67,7 +69,7 @@ HandicappedComplianceTableSync::doAdd (const synthese::db::SQLiteResult& rows, i
 	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
 	status, capacity);
     
-    environment.getHandicappedCompliances ().add (cmp, false);
+    environment.getHandicappedCompliances ().add (cmp);
 }
 
 

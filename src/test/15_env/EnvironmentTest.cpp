@@ -38,9 +38,30 @@ EnvironmentTest::tearDown ()
 } 
 
 
+/*
+synthese::env::Environment 
+EnvironmentTest::CreateTestEnvironment0 ()
+{
+    // 
+
+}
+*/
+
+
+
+
+
+
 void 
 EnvironmentTest::testEnvironmentConstruction0 ()
 {
+    // Test environment 0 :
+    // This environement contains only roads and addresses
+    //
+    // 
+    
+
+
 /*
     Environment env (0);
 

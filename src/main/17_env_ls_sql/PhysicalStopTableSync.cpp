@@ -27,7 +27,7 @@ PhysicalStopTableSync::PhysicalStopTableSync (Environment::Registry& environment
 : ComponentTableSync (PHYSICALSTOPS_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {
     addTableColumn (PHYSICALSTOPS_TABLE_COL_NAME, "TEXT", true);
-    addTableColumn (PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID, "INTEGER", false);
+    addTableColumn (PHYSICALSTOPS_TABLE_COL_PLACEID, "INTEGER", false);
     addTableColumn (PHYSICALSTOPS_TABLE_COL_X, "DOUBLE", true);
     addTableColumn (PHYSICALSTOPS_TABLE_COL_Y, "DOUBLE", true);
 }
@@ -46,15 +46,19 @@ void
 PhysicalStopTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+
+    if (environment.getPhysicalStops ().contains (id)) return;
+    
     synthese::env::PhysicalStop* ps = new synthese::env::PhysicalStop (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
+	id,
 	rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_NAME),
-	environment.getConnectionPlaces ().get (Conversion::ToInt (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID))),
+	environment.getConnectionPlaces ().get (Conversion::ToInt (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_PLACEID))),
 	Conversion::ToDouble (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_X)),
 	Conversion::ToDouble (rows.getColumn (rowIndex, PHYSICALSTOPS_TABLE_COL_Y))
 	);
 
-    environment.getPhysicalStops ().add (ps, false);
+    environment.getPhysicalStops ().add (ps);
 }
 
 

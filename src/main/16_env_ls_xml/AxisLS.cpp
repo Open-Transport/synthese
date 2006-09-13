@@ -4,13 +4,14 @@
 
 #include "01_util/Conversion.h"
 #include "01_util/UId.h"
-#include "01_util/XmlParser.h"
+#include "01_util/XmlToolkit.h"
 
 #include "15_env/Environment.h"
 #include "15_env/Axis.h"
 
 
-namespace su = synthese::util;
+using namespace synthese::util::XmlToolkit;
+
 
 namespace synthese
 {
@@ -24,23 +25,21 @@ const std::string AxisLS::AXIS_FREE_ATTR ("free");
 const std::string AxisLS::AXIS_AUTHORIZED_ATTR ("authorized");
 
 
-synthese::env::Axis* 
+void 
 AxisLS::Load (XMLNode& node,
-	      const synthese::env::Environment& environment)
+	      synthese::env::Environment& environment)
 {
     // assert (AXIS_TAG == node.getName ());
+    uid id (GetLongLongAttr (node, AXIS_ID_ATTR));
 
-    uid id (su::Conversion::ToLongLong (
-		   node.getAttribute (AXIS_ID_ATTR.c_str())));
+    if (environment.getAxes ().contains (id)) return;
 
-    std::string name (node.getAttribute (AXIS_NAME_ATTR.c_str()));
+    std::string name (GetStringAttr (node, AXIS_NAME_ATTR));
 
-    bool free (su::Conversion::ToBool (
-		   node.getAttribute (AXIS_FREE_ATTR.c_str())));
-    bool authorized (su::Conversion::ToBool (
-		   node.getAttribute (AXIS_AUTHORIZED_ATTR.c_str())));
-
-    return new synthese::env::Axis (id,	name, free, authorized);
+    bool free (GetBoolAttr (node, AXIS_FREE_ATTR));
+    bool authorized (GetBoolAttr (node, AXIS_AUTHORIZED_ATTR));
+    
+    environment.getAxes ().add (new synthese::env::Axis (id, name, free, authorized));
 }
 
 

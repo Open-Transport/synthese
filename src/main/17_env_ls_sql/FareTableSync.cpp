@@ -43,12 +43,16 @@ void
 FareTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 		      synthese::env::Environment& environment)
 {
+    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+    
+    if (environment.getFares ().contains (id)) return;
+
     synthese::env::Fare* fare = new synthese::env::Fare (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
+	id,
 	rows.getColumn (rowIndex, FARES_TABLE_COL_NAME),
 	(synthese::env::Fare::FareType) Conversion::ToInt (rows.getColumn (rowIndex, FARES_TABLE_COL_FARETYPE))
 	);
-    environment.getFares ().add (fare, false);
+    environment.getFares ().add (fare);
 }
 
 

@@ -3,12 +3,13 @@
 #include <assert.h>
 
 #include "01_util/Conversion.h"
-#include "01_util/XmlParser.h"
+#include "01_util/XmlToolkit.h"
 
 #include "15_env/Point.h"
 
 
-namespace su = synthese::util;
+using namespace synthese::util::XmlToolkit;
+
 
 namespace synthese
 {
@@ -25,10 +26,8 @@ PointLS::Load (XMLNode& node)
 {
     // assert (POINT_TAG == node.getName ());
 
-    double x (su::Conversion::ToDouble (
-		node.getAttribute (POINT_X_ATTR.c_str())));
-    double y (su::Conversion::ToDouble (
-		node.getAttribute (POINT_Y_ATTR.c_str())));
+    double x (GetDoubleAttr (node, POINT_X_ATTR));
+    double y (GetDoubleAttr (node, POINT_Y_ATTR));
 
     return synthese::env::Point (x, y);
 }

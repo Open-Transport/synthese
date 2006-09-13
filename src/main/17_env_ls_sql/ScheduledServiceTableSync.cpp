@@ -39,7 +39,6 @@ ScheduledServiceTableSync::ScheduledServiceTableSync (Environment::Registry& env
     addTableColumn (SCHEDULEDSERVICES_TABLE_COL_SERVICENUMBER, "TEXT", true);
     addTableColumn (SCHEDULEDSERVICES_TABLE_COL_SCHEDULES, "TEXT", true);
     addTableColumn (SCHEDULEDSERVICES_TABLE_COL_PATHID, "INTEGER", false);
-    addTableColumn (SCHEDULEDSERVICES_TABLE_COL_RANKINPATH, "INTEGER", false);
     addTableColumn (SCHEDULEDSERVICES_TABLE_COL_BIKECOMPLIANCEID, "INTEGER", true);
     addTableColumn (SCHEDULEDSERVICES_TABLE_COL_HANDICAPPEDCOMPLIANCEID, "INTEGER", true);
     addTableColumn (SCHEDULEDSERVICES_TABLE_COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
@@ -61,6 +60,8 @@ ScheduledServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int ro
 		      synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+
+    if (environment.getScheduledServices ().contains (id)) return;
 
     int serviceNumber (Conversion::ToInt (
         rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER)));
@@ -105,9 +106,6 @@ ScheduledServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int ro
     }
     assert (path != 0);
 
-    int rankInPath (Conversion::ToInt (
-	rows.getColumn (rowIndex, SCHEDULEDSERVICES_TABLE_COL_RANKINPATH)));
-
     uid bikeComplianceId (
 	Conversion::ToLongLong (rows.getColumn (rowIndex, SCHEDULEDSERVICES_TABLE_COL_BIKECOMPLIANCEID)));
 
@@ -131,7 +129,7 @@ ScheduledServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int ro
 
     // TODO : update in correcponding edge
 
-    environment.getScheduledServices ().add (ss, false);
+    environment.getScheduledServices ().add (ss);
 }
 
 

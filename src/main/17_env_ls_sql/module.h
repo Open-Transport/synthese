@@ -206,7 +206,7 @@ namespace synthese
 		- on delete : X
 	     */
 	    static const std::string ADDRESSES_TABLE_NAME ("t002_addresses");
-	    static const std::string ADDRESSES_TABLE_COL_CONNECTIONPLACEID ("connection_place_id");  // NU
+	    static const std::string ADDRESSES_TABLE_COL_PLACEID ("place_id");  // NU
 	    static const std::string ADDRESSES_TABLE_COL_ROADID ("road_id");  // NU
 	    static const std::string ADDRESSES_TABLE_COL_METRICOFFSET ("metric_offset");  // U ??
 	    static const std::string ADDRESSES_TABLE_COL_X ("x");  // U ??
@@ -304,9 +304,11 @@ namespace synthese
 		- on delete : X
 	     */
 	    static const std::string LINESTOPS_TABLE_NAME ("t010_line_stops");
-	    static const std::string LINESTOPS_TABLE_COL_FROMPHYSICALSTOPID ("from_physical_stop_id");
+	    static const std::string LINESTOPS_TABLE_COL_PHYSICALSTOPID ("physical_stop_id");
 	    static const std::string LINESTOPS_TABLE_COL_LINEID ("line_id");
 	    static const std::string LINESTOPS_TABLE_COL_RANKINPATH ("rank_in_path");
+	    static const std::string LINESTOPS_TABLE_COL_ISDEPARTURE ("is_departure");
+	    static const std::string LINESTOPS_TABLE_COL_ISARRIVAL ("is_arrival");
 	    static const std::string LINESTOPS_TABLE_COL_METRICOFFSET ("metric_offset");
 	    static const std::string LINESTOPS_TABLE_COL_SCHEDULEINPUT ("schedule_input");
 	    static const std::string LINESTOPS_TABLE_COL_VIAPOINTS ("via_points");
@@ -319,7 +321,7 @@ namespace synthese
 	     */
 	    static const std::string PHYSICALSTOPS_TABLE_NAME ("t012_physical_stops");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_NAME ("name");
-	    static const std::string PHYSICALSTOPS_TABLE_COL_CONNECTIONPLACEID ("connection_place_id");
+	    static const std::string PHYSICALSTOPS_TABLE_COL_PLACEID ("place_id");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_X ("x");
 	    static const std::string PHYSICALSTOPS_TABLE_COL_Y ("y");
 
@@ -341,8 +343,10 @@ namespace synthese
 		- on delete : X
 	     */
 	    static const std::string ROADCHUNKS_TABLE_NAME ("t014_road_chunks");
-	    static const std::string ROADCHUNKS_TABLE_COL_FROMADDRESSID ("from_address_id");
+	    static const std::string ROADCHUNKS_TABLE_COL_ADDRESSID ("address_id");
 	    static const std::string ROADCHUNKS_TABLE_COL_RANKINPATH ("rank_in_path");
+	    static const std::string ROADCHUNKS_TABLE_COL_ISDEPARTURE ("is_departure");
+	    static const std::string ROADCHUNKS_TABLE_COL_ISARRIVAL ("is_arrival");
 	    static const std::string ROADCHUNKS_TABLE_COL_VIAPOINTS ("via_points");  // list of ids
 
 

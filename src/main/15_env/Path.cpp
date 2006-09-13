@@ -258,6 +258,9 @@ Path::addEdge (Edge* edge)
     }
 
     /* TODO : Check later on if the following block should be re-introduced (see above)
+     * Normaly should be completely useless given that all the D,P,A chaining is provided from
+     * db or from XML.
+
     for ( std::vector<Edge*>::const_iterator iter = _edges.begin();
 	  iter != _edges.end();
 	  ++iter )

@@ -60,6 +60,8 @@ ReservationRuleTableSync::doAdd (const synthese::db::SQLiteResult& rows, int row
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
 
+    if (environment.getReservationRules ().contains (id)) return;
+
     ReservationRule::ReservationType type = (ReservationRule::ReservationType) Conversion::ToInt (rows.getColumn (rowIndex, RESERVATIONRULES_TABLE_COL_TYPE));
 
     bool online (
@@ -91,7 +93,7 @@ ReservationRuleTableSync::doAdd (const synthese::db::SQLiteResult& rows, int row
 	hourDeadline, phoneExchangeNumber, phoneExchangeOpeningHours, description,
 	webSiteUrl);
     
-    environment.getReservationRules ().add (rr, false);
+    environment.getReservationRules ().add (rr);
 }
 
 

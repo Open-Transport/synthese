@@ -47,6 +47,8 @@ BikeComplianceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowI
 		      synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+
+    if (environment.getBikeCompliances ().contains (id)) return;
     
     tribool status = true;
     int statusInt (
@@ -67,7 +69,7 @@ BikeComplianceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowI
 	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
 	status, capacity);
     
-    environment.getBikeCompliances ().add (cmp, false);
+    environment.getBikeCompliances ().add (cmp);
 }
 
 

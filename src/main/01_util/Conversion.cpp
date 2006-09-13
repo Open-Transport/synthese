@@ -28,6 +28,13 @@ Conversion::ToInt (const std::string& s)
 }
 
 
+long 
+Conversion::ToLong (const std::string& s)
+{
+    return atol (s.c_str ());
+}
+
+
 
 long long 
 Conversion::ToLongLong (const std::string& s)

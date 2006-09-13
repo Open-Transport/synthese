@@ -48,6 +48,7 @@ EnvironmentTableSync::rowsAdded (const synthese::db::SQLiteThreadExec* sqlite,
     for (int i=0; i<rows.getNbRows (); ++i)
     {
 	uid envId = Conversion::ToLongLong (rows.getColumn (i, TABLE_COL_ID));
+	if (_environments.contains (envId)) continue;
 	synthese::env::Environment* newEnv = new synthese::env::Environment (envId);
 	_environments.add (newEnv);
     }

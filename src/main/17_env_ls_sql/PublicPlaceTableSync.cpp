@@ -48,6 +48,9 @@ PublicPlaceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowInde
 		      synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+
+    if (environment.getPublicPlaces ().contains (id)) return;
+
     std::string name (
 	rows.getColumn (rowIndex, PUBLICPLACES_TABLE_COL_NAME));
     uid cityId (
@@ -57,7 +60,7 @@ PublicPlaceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowInde
     PublicPlace* pp = new PublicPlace (id, name, city);
     city->getPublicPlacesMatcher ().add (pp->getName (), pp);
 
-    environment.getPublicPlaces ().add (pp, false);
+    environment.getPublicPlaces ().add (pp);
 
 }
 

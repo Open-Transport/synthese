@@ -170,9 +170,10 @@ class RoutePlanner
 
     bool isServiceCompliant (const synthese::env::Service* service) const;
 
-    bool isDestinationUsefulForSoonArrival (const synthese::env::Vertex* vertex,
-					    const synthese::time::DateTime& dateTime,
-					    synthese::env::SquareDistance& sqd) const;
+    bool isVertexUseful (const synthese::env::Vertex* vertex,
+			 const synthese::time::DateTime& dateTime,
+			 const synthese::env::AccessDirection& accessDirection,
+			 synthese::env::SquareDistance& sqd) const;
     
     bool evaluateArrival (const synthese::env::Edge* arrivalEdge,
 			  const synthese::time::DateTime& departureMoment,

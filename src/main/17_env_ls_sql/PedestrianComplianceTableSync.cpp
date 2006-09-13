@@ -49,6 +49,8 @@ PedestrianComplianceTableSync::doAdd (const synthese::db::SQLiteResult& rows, in
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
     
+    if (environment.getPedestrianCompliances ().contains (id)) return;
+    
     tribool status = true;
     int statusInt (
 	Conversion::ToInt (rows.getColumn (rowIndex, PEDESTRIANCOMPLIANCES_TABLE_COL_STATUS)));
@@ -68,7 +70,7 @@ PedestrianComplianceTableSync::doAdd (const synthese::db::SQLiteResult& rows, in
 	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
 	status, capacity);
     
-    environment.getPedestrianCompliances ().add (cmp, false);
+    environment.getPedestrianCompliances ().add (cmp);
 }
 
 
