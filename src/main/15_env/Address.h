@@ -49,12 +49,6 @@ public:
 	     double x = UNKNOWN_VALUE,
 	     double y = UNKNOWN_VALUE);
 
-    Address (const uid& id,
-	     const Road* road, 
-	     double metricOffset,
-	     double x = UNKNOWN_VALUE,
-	     double y = UNKNOWN_VALUE);
-
     ~Address();
 
 

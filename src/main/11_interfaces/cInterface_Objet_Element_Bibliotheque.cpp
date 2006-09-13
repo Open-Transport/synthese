@@ -745,7 +745,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cI
     {
 	const Environment* __Environnement = __Site->getEnvironnement();
 	int n = _Parametres[ ELEMENTINTERFACEListeCommunesNombre ] ->Nombre( __Parametres );
-	std::vector<const City*> tbCommunes = __Environnement->searchCity ( _Parametres[ ELEMENTINTERFACEListeCommunesEntree ] ->Texte( __Parametres ), n );
+	std::vector<const City*> tbCommunes = __Environnement->guessCity ( _Parametres[ ELEMENTINTERFACEListeCommunesEntree ] ->Texte( __Parametres ), n );
 
 
 	if ( tbCommunes[ 1 ] == NULL )

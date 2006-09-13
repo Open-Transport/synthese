@@ -167,7 +167,15 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     //! @name Query methods
     //@{
-    std::vector<const City*> searchCity (const std::string& fuzzyName, int nbMatches = 10) const;
+
+    /** Fetches a addressable place given its id.
+	All the containers storong objects typed (or subtyped) as AddressablePlace
+	are inspected.
+    */
+    const AddressablePlace* fetchAddressablePlace (const uid& id) const;
+    
+    std::vector<const City*> guessCity (const std::string& fuzzyName, int nbMatches = 10) const;
+    
     //@}
 
     //! @name Update methods

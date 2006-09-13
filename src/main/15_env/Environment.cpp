@@ -397,8 +397,21 @@ Environment::getCitiesMatcher () const
 
 
 
+const AddressablePlace* 
+Environment::fetchAddressablePlace (const uid& id) const
+{
+    if (_connectionPlaces.contains (id)) return _connectionPlaces.get (id);
+    if (_publicPlaces.contains (id)) return _publicPlaces.get (id);
+    if (_roads.contains (id)) return _roads.get (id);
+
+    return 0;
+}
+
+
+
+
 std::vector<const City*> 
-Environment::searchCity (const std::string& fuzzyName, int nbMatches) const
+Environment::guessCity (const std::string& fuzzyName, int nbMatches) const
 {
     std::vector<const City*> result;
     LexicalMatcher<uid>::MatchResult matches =  _citiesMatcher.bestMatches (fuzzyName, nbMatches);

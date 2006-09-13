@@ -15,6 +15,9 @@
 #include "LineStopLS.h"
 #include "ConnectionPlaceLS.h"
 #include "PhysicalStopLS.h"
+#include "RoadLS.h"
+#include "AddressLS.h"
+#include "RoadChunkLS.h"
 
 
 using namespace synthese::util::XmlToolkit;
@@ -34,16 +37,15 @@ const std::string EnvironmentLS::ENVIRONMENT_LINES_TAG ("lines");
 const std::string EnvironmentLS::ENVIRONMENT_LINESTOPS_TAG ("lineStops");
 const std::string EnvironmentLS::ENVIRONMENT_CONNECTIONPLACES_TAG ("connectionPlaces");
 const std::string EnvironmentLS::ENVIRONMENT_PHYSICALSTOPS_TAG ("physicalStops");
+const std::string EnvironmentLS::ENVIRONMENT_ROADS_TAG ("roads");
+const std::string EnvironmentLS::ENVIRONMENT_ADDRESSES_TAG ("addresses");
+const std::string EnvironmentLS::ENVIRONMENT_ROADCHUNKS_TAG ("roadChunks");
 
 
 synthese::env::Environment* 
 EnvironmentLS::Load (XMLNode& node)
 {
     uid id (GetLongLongAttr (node, ENVIRONMENT_ID_ATTR));
-
-    // TODO : le add doit etre fait au niveau de chaque loader
-    // en faisant un try catch en cas d'erreur de add dans registre
-    // ou plutot guard au debut de chaque load
 
     synthese::env::Environment* env = new synthese::env::Environment (id);
 
@@ -88,13 +90,38 @@ EnvironmentLS::Load (XMLNode& node)
     }
 
 
-    
     XMLNode lineStopsNode = GetChildNode (node, ENVIRONMENT_LINESTOPS_TAG, 0);
     int nbLineStops = GetChildNodeCount (lineStopsNode, LineStopLS::LINESTOP_TAG);
     for (int i=0; i<nbLineStops; ++i) 
     {
 	XMLNode lineStopNode = GetChildNode (lineStopsNode, LineStopLS::LINESTOP_TAG, i);
 	LineStopLS::Load (lineStopNode, *env);
+    }
+
+    XMLNode roadsNode = GetChildNode (node, ENVIRONMENT_ROADS_TAG, 0);
+    int nbRoads = GetChildNodeCount (roadsNode, RoadLS::ROAD_TAG);
+    for (int i=0; i<nbRoads; ++i) 
+    {
+	XMLNode roadNode = GetChildNode (roadsNode, RoadLS::ROAD_TAG, i);
+	RoadLS::Load (roadNode, *env);
+    }
+
+
+    XMLNode addressesNode = GetChildNode (node, ENVIRONMENT_ADDRESSES_TAG, 0);
+    int nbAddresses = GetChildNodeCount (addressesNode, AddressLS::ADDRESS_TAG);
+    for (int i=0; i<nbAddresses; ++i) 
+    {
+	XMLNode addressNode = GetChildNode (addressesNode, AddressLS::ADDRESS_TAG, i);
+	AddressLS::Load (addressNode, *env);
+    }
+
+
+    XMLNode roadChunksNode = GetChildNode (node, ENVIRONMENT_ROADCHUNKS_TAG, 0);
+    int nbRoadChunks = GetChildNodeCount (roadChunksNode, RoadChunkLS::ROADCHUNK_TAG);
+    for (int i=0; i<nbRoadChunks; ++i) 
+    {
+	XMLNode roadChunkNode = GetChildNode (roadChunksNode, RoadChunkLS::ROADCHUNK_TAG, i);
+	RoadChunkLS::Load (roadChunkNode, *env);
     }
 
 	
