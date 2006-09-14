@@ -83,6 +83,7 @@ class Hour
 
         Hour& operator = ( const Schedule& op );
 
+	static Hour FromString (const std::string& str);
 	static Hour FromSQLTime (const std::string& sqlTime);
 
 

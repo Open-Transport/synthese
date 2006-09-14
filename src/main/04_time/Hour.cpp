@@ -293,11 +293,22 @@ Hour::updateHour ( int hours, int minutes )
 }
 
 
+
 Hour
 Hour::FromSQLTime (const std::string& sqlTime)
 {
+    // hhmm
     return Hour (Conversion::ToInt (sqlTime.substr (0, 2)),
 		 Conversion::ToInt (sqlTime.substr (3, 2)));
+}
+
+
+Hour
+Hour::FromString (const std::string& str)
+{
+    // hh:mm
+    return Hour (Conversion::ToInt (sqlTime.substr (0, 2)),
+		 Conversion::ToInt (sqlTime.substr (4, 2)));
 }
 
 
