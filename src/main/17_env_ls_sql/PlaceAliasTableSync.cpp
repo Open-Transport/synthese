@@ -62,23 +62,8 @@ PlaceAliasTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex
 	Conversion::ToLongLong (rows.getColumn (rowIndex, PLACEALIASES_TABLE_COL_CITYID)));
     int tableId = synthese::util::decodeTableId (aliasedPlaceId);
 
-    Place* place = 0;
-    if (tableId == ParseTableId (PLACEALIASES_TABLE_NAME))
-    {
-	place = environment.getPlaceAliases ().get (aliasedPlaceId);
-    }
-    else if (tableId == ParseTableId (PUBLICPLACES_TABLE_NAME ))
-    {
-	place = environment.getPublicPlaces ().get (aliasedPlaceId);
-    }
-    else if (tableId == ParseTableId (CONNECTIONPLACES_TABLE_NAME ))
-    {
-	place = environment.getConnectionPlaces ().get (aliasedPlaceId);
-    }
-    else if (tableId == ParseTableId (ROADS_TABLE_NAME ))
-    {
-	place = environment.getRoads ().get (aliasedPlaceId);
-    }
+    Place* place = environment.fetchPlace (aliasedPlaceId);
+
     if (place == 0) return;
 
     City* city = environment.getCities ().get (cityId);

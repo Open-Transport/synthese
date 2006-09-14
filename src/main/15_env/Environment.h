@@ -173,6 +173,10 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 	are inspected.
     */
     const AddressablePlace* fetchAddressablePlace (const uid& id) const;
+
+    const AddressablePlace* fetchIncludingPlace (const uid& id) const;
+
+    const Place* fetchPlace (const uid& id) const;
     
     std::vector<const City*> guessCity (const std::string& fuzzyName, int nbMatches = 10) const;
     

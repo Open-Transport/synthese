@@ -387,12 +387,24 @@ Environment::getCitiesMatcher ()
 
 
 
+
 const synthese::lexmatcher::LexicalMatcher<uid>& 
 Environment::getCitiesMatcher () const
 {
     return _citiesMatcher;
 }
 
+
+
+
+
+const Place* 
+Environment::fetchPlace (const uid& id) const
+{
+    const Place* place = fetchAddressablePlace (id);
+    if (place == 0) place = fetchIncludingPlace (id);
+    return place;
+}
 
 
 
@@ -406,6 +418,20 @@ Environment::fetchAddressablePlace (const uid& id) const
 
     return 0;
 }
+
+
+
+
+const IncludingPlace* 
+Environment::fetchIncludingPlace (const uid& id) const
+{
+    if (_placeAliases.contains (id)) return _placeAliases.get (id);
+    if (_cities.contains (id)) return _cities.get (id);
+
+    return 0;
+}
+
+
 
 
 
