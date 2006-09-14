@@ -104,6 +104,7 @@ ConnectionPlaceLS::Load (XMLNode& node,
 			      GetIntAttr (td, TRANSFERDELAY_VALUE_ATTR));
     }
 
+    city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
     environment.getConnectionPlaces ().add (cp);
 }
 
