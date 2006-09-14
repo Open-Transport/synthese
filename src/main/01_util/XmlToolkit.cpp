@@ -109,6 +109,31 @@ XmlToolkit::GetBoolAttr (XMLNode& node,
 
 
 
+
+boost::logic::tribool 
+XmlToolkit::GetTriboolAttr (XMLNode& node, 
+			    const std::string& attrName)
+{
+    const char* attrValue = CheckForRequiredAttr (node, attrName);
+    return Conversion::ToTribool (attrValue);
+}
+    
+
+
+
+boost::logic::tribool 
+XmlToolkit::GetTriboolAttr (XMLNode& node, 
+			    const std::string& attrName,
+			    boost::logic::tribool defaultValue)
+{
+    const char* attrValue = node.getAttribute (attrName.c_str ());
+    return (attrValue == 0) 
+	? defaultValue : Conversion::ToTribool (attrValue);
+}
+ 
+
+   
+
     
 int 
 XmlToolkit::GetIntAttr (XMLNode& node,

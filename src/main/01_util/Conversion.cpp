@@ -21,6 +21,21 @@ Conversion::ToBool (const std::string& s)
 }
 
 
+    
+
+boost::logic::tribool 
+Conversion::ToTribool (const std::string& s)
+{
+    std::string str = boost::to_lower_copy (s);
+    boost::trim (str);
+    if ((str == "true") || (str == "yes") || (str == "1")) return true;
+    if ((str == "false") || (str == "no") || (str == "0")) return false;
+    return boost::logic::indeterminate;
+    
+}
+
+
+
 int 
 Conversion::ToInt (const std::string& s)
 {

@@ -7,6 +7,8 @@
 #include <string>
 #include <iostream>
 
+#include <boost/logic/tribool.hpp>
+
 #include "XmlParser.h"
 
 
@@ -49,6 +51,13 @@ namespace XmlToolkit
     bool GetBoolAttr (XMLNode& node, 
 		      const std::string& attrName,
 		      bool defaultValue);
+
+    boost::logic::tribool GetTriboolAttr (XMLNode& node, 
+					  const std::string& attrName);
+    
+    boost::logic::tribool GetTriboolAttr (XMLNode& node, 
+					  const std::string& attrName,
+					  boost::logic::tribool defaultValue);
     
     int GetIntAttr (XMLNode& node, 
 			   const std::string& attrName);

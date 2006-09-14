@@ -7,6 +7,8 @@
 #include <string>
 #include <iostream>
 
+#include <boost/logic/tribool.hpp>
+
 
 #ifdef WIN32
 #define INT64_FORMAT "%I64i"
@@ -45,6 +47,8 @@ class Conversion
      */
     static bool ToBool (const std::string& s);
 
+    static boost::logic::tribool ToTribool (const std::string& s);
+
     static int ToInt (const std::string& s);
     static long ToLong (const std::string& s);
     static long long ToLongLong (const std::string& s);
@@ -71,3 +75,4 @@ class Conversion
 
 }
 #endif
+
