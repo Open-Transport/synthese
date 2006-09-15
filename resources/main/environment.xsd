@@ -228,7 +228,14 @@
     </xs:complexType>
     
     
-    
+    <!-- 
+        publicplace
+        placealias
+        alarm
+        continuousService
+        scheduledService
+        ...
+        -->
     
     
     
