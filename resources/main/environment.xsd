@@ -37,9 +37,20 @@
     </xs:complexType>
     
     
-    <xs:complexType name="connectionPlaceType">
+    <xs:complexType name="placeType" abstract="true">
         <xs:complexContent>
             <xs:extension base="registrableType">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="cityId" type="idType" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    
+    <xs:complexType name="connectionPlaceType">
+        <xs:complexContent>
+            <xs:extension base="placeType">
                 <xs:sequence>
                     <xs:element name="transferDelay" minOccurs="0" maxOccurs="unbounded">
                         <xs:complexType>
@@ -49,8 +60,6 @@
                         </xs:complexType>                            
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute name="name" type="xs:string" use="required"/>
-                <xs:attribute name="cityId" type="idType" use="required"/>
                 <xs:attribute name="connectionType" type="connectionTypeType" use="required"/>
                 <xs:attribute name="defaultTransferDelay" type="xs:int" use="optional"/>
                 <xs:attribute name="isCityMainConnection" type="xs:boolean" use="optional"/>
@@ -59,6 +68,23 @@
         </xs:complexContent>
         
     </xs:complexType>
+    
+
+    <xs:complexType name="publicPlaceType">
+        <xs:complexContent>
+            <xs:extension base="placeType"/>
+        </xs:complexContent>
+        
+    </xs:complexType>
+    
+    <xs:complexType name="placeAliasType">
+        <xs:complexContent>
+            <xs:extension base="placeType">
+                <xs:attribute name="aliasedPlaceId" type="idType" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
     
     
     <xs:complexType name="physicalStopType">
@@ -182,10 +208,8 @@
     
     <xs:complexType name="roadType">
         <xs:complexContent>
-            <xs:extension base="registrableType">
-                <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:extension base="placeType">
                 <xs:attribute name="type" type="roadTypeType" use="required"/>
-                <xs:attribute name="cityId" type="idType" use="required"/>
                 <xs:attribute name="bikeComplianceId" type="idType" use="required"/>
                 <xs:attribute name="pedestrianComplianceId" type="idType" use="required"/>
                 <xs:attribute name="handicappedComplianceId" type="idType" use="required"/>
@@ -229,8 +253,6 @@
     
     
     <!-- 
-        publicplace
-        placealias
         alarm
         continuousService
         scheduledService
@@ -373,6 +395,24 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="roadChunk" type="roadChunkType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="publicPlaces">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="publicPlace" type="publicPlaceType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="placeAliases">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="placeAlias" type="placeAliasType" 
                                 minOccurs="0" maxOccurs="unbounded"/>
                         </xs:sequence>
                     </xs:complexType>
@@ -627,6 +667,20 @@
         <xs:keyref name="roadChunk_addressIdRef" refer="uniqueAddressId">
             <xs:selector xpath="./roadChunks/roadChunk"/>
             <xs:field xpath="@addressId"/>
+        </xs:keyref>
+        
+        <xs:keyref name="publicPlace_cityIdRef" refer="uniqueCityId">
+            <xs:selector xpath="./publicPlaces/publicPlace"/>
+            <xs:field xpath="@cityId"/>
+        </xs:keyref>
+        
+        <xs:keyref name="placeAlias_cityIdRef" refer="uniqueCityId">
+            <xs:selector xpath="./placeAliases/placeAlias"/>
+            <xs:field xpath="@cityId"/>
+        </xs:keyref>
+        <xs:keyref name="placeAlias_aliasedPlaceIdRef" refer="uniquePlaceId">
+            <xs:selector xpath="./placeAliases/placeAlias"/>
+            <xs:field xpath="@aliasedPlaceId"/>
         </xs:keyref>
         
         

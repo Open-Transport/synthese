@@ -39,7 +39,14 @@
         
     </connectionPlaces>
   
-    
+
+    <publicPlaces>
+        <publicPlace id="13000" name="PP1" cityId="6000"/>
+    </publicPlaces>
+
+    <placeAliases>
+        <placeAlias id="11000" aliasedPlaceId="7005" name="AP1" cityId="6000" />
+    </placeAliases>
     
     <physicalStops>
         <physicalStop id="12000" name="PS1"  placeId="7000" x="220" y="123"/>
