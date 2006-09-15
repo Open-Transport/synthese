@@ -137,4 +137,11 @@
         <fare id="8000" name="Normal" type="zoning"/>    
     </fares>
     
+    <continuousServices>
+        
+    </continuousServices>
+    
+    <scheduledServices>
+        
+    </scheduledServices>
 </environment>

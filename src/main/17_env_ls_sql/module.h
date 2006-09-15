@@ -389,7 +389,6 @@ namespace synthese
 	    static const std::string CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER ("service_number");
 	    static const std::string CONTINUOUSSERVICES_TABLE_COL_SCHEDULES ("schedules");
 	    static const std::string CONTINUOUSSERVICES_TABLE_COL_PATHID ("path_id");
-	    static const std::string CONTINUOUSSERVICES_TABLE_COL_RANKINPATH ("rank_in_path");
 	    static const std::string CONTINUOUSSERVICES_TABLE_COL_RANGE ("range");
 	    static const std::string CONTINUOUSSERVICES_TABLE_COL_MAXWAITINGTIME ("max_waiting_time");
 	    static const std::string CONTINUOUSSERVICES_TABLE_COL_BIKECOMPLIANCEID ("bike_compliance_id");

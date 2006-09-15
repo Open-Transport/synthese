@@ -39,7 +39,6 @@ ContinuousServiceTableSync::ContinuousServiceTableSync (Environment::Registry& e
     addTableColumn (CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER, "TEXT", true);
     addTableColumn (CONTINUOUSSERVICES_TABLE_COL_SCHEDULES, "TEXT", true);
     addTableColumn (CONTINUOUSSERVICES_TABLE_COL_PATHID, "INTEGER", false);
-    addTableColumn (CONTINUOUSSERVICES_TABLE_COL_RANKINPATH, "INTEGER", false);
     addTableColumn (CONTINUOUSSERVICES_TABLE_COL_RANGE, "INTEGER", true);
     addTableColumn (CONTINUOUSSERVICES_TABLE_COL_MAXWAITINGTIME, "INTEGER", true);
     addTableColumn (CONTINUOUSSERVICES_TABLE_COL_BIKECOMPLIANCEID, "INTEGER", true);
@@ -107,9 +106,6 @@ ContinuousServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int r
 	path = environment.getLines ().get (pathId);
     }
     assert (path != 0);
-
-    int rankInPath (Conversion::ToInt (
-	rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_RANKINPATH)));
 
     int range (Conversion::ToInt (
 		   rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_RANGE)));

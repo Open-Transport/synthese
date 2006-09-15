@@ -252,10 +252,50 @@
     </xs:complexType>
     
     
+    <xs:complexType name="serviceType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:sequence>
+                    <xs:element name="serviceDate">
+                        <xs:complexType>
+                            <xs:attribute name="date" type="xs:date" use="required"/>
+                        </xs:complexType>                            
+                    </xs:element>
+                </xs:sequence>
+                
+                <xs:attribute name="serviceNumber" type="xs:unsignedInt" use="required"/>
+                <xs:attribute name="pathId" type="idType" use="required"/>
+                <xs:attribute name="schedules" type="xs:string" use="required"/>
+                <xs:attribute name="bikeComplianceId" type="idType" use="required"/>
+                <xs:attribute name="pedestrianComplianceId" type="idType" use="required"/>
+                <xs:attribute name="handicappedComplianceId" type="idType" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="scheduledServiceType">
+        <xs:complexContent>
+            <xs:extension base="serviceType">
+                <xs:attribute name="reservationRuleId" type="idType" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="continuousServiceType">
+        <xs:complexContent>
+            <xs:extension base="serviceType">
+                <xs:attribute name="maxWaitingTime" type="xs:unsignedInt" use="required"/>
+                <xs:attribute name="range" type="xs:unsignedInt" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    
     <!-- 
         alarm
-        continuousService
-        scheduledService
         ...
         -->
     
@@ -418,6 +458,24 @@
                     </xs:complexType>
                 </xs:element>
                 
+                <xs:element name="continuousServices">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="continuousService" type="continuousServiceType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="scheduledServices">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="scheduledService" type="scheduledServiceType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
                 
             </xs:all>
            
@@ -566,6 +624,11 @@
             <xs:field xpath="@id"></xs:field>
         </xs:key>
         
+        <xs:key name="uniquePathId">
+            <xs:selector xpath="./roads/road | ./lines/line"/>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
         
         <xs:key name="uniquePlaceId">
             <xs:selector xpath="
@@ -681,6 +744,28 @@
         <xs:keyref name="placeAlias_aliasedPlaceIdRef" refer="uniquePlaceId">
             <xs:selector xpath="./placeAliases/placeAlias"/>
             <xs:field xpath="@aliasedPlaceId"/>
+        </xs:keyref>
+        
+        <xs:keyref name="service_pathIdRef" refer="uniquePathId">
+            <xs:selector xpath="./continuousServices/continuousService | ./scheduledServices/scheduleService"/>
+            <xs:field xpath="@pathId"/>
+        </xs:keyref>
+        <xs:keyref name="service_bikeComplianceIdRef" refer="uniqueBikeComplianceId">
+            <xs:selector xpath="./continuousServices/continuousService | ./scheduledServices/scheduleService"/>
+            <xs:field xpath="@bikeComplianceId"/>
+        </xs:keyref>
+        <xs:keyref name="service_handicappedComplianceIdRef" refer="uniqueHandicappedComplianceId">
+            <xs:selector xpath="./continuousServices/continuousService | ./scheduledServices/scheduleService"/>
+            <xs:field xpath="@handicappedComplianceId"/>
+        </xs:keyref>
+        <xs:keyref name="service_pedestrianComplianceIdRef" refer="uniquePedestrianComplianceId">
+            <xs:selector xpath="./continuousServices/continuousService | ./scheduledServices/scheduleService"/>
+            <xs:field xpath="@pedestrianComplianceId"/>
+        </xs:keyref>
+        
+        <xs:keyref name="scheduledService_reservationRuleIdRef" refer="uniqueReservationRuleId">
+            <xs:selector xpath="./scheduledServices/scheduleService"/>
+            <xs:field xpath="@reservationRuleId"/>
         </xs:keyref>
         
         
