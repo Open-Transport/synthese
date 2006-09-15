@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+
+     
+    <xs:complexType name="registrableType" abstract="true">
+        <xs:attribute name="id" type="idType" use="required"/>
+    </xs:complexType>
+    
+        
+    <xs:complexType name="cityType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    
+    <xs:complexType name="transportNetworkType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="axisType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="free" type="xs:boolean" use="required"/>
+                <xs:attribute name="authorized" type="xs:boolean" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="connectionPlaceType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:sequence>
+                    <xs:element name="transferDelay" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:attribute name="fromVertexId" type="idType" use="required"/>
+                            <xs:attribute name="toVertexId" type="idType" use="required"/>
+                            <xs:attribute name="value" type="xs:int" use="required"/>
+                        </xs:complexType>                            
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="cityId" type="idType" use="required"/>
+                <xs:attribute name="connectionType" type="connectionTypeType" use="required"/>
+                <xs:attribute name="defaultTransferDelay" type="xs:int" use="optional"/>
+                <xs:attribute name="isCityMainConnection" type="xs:boolean" use="optional"/>
+                <xs:attribute name="alarmId" type="idType" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+        
+    </xs:complexType>
+    
+    
+    <xs:complexType name="physicalStopType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="placeId" type="idType" use="required"/>
+                <xs:attribute name="x" type="xs:double" use="required"/>
+                <xs:attribute name="y" type="xs:double" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="lineType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:attribute name="transportNetworkId" type="idType" use="required"/>
+                <xs:attribute name="axisId" type="idType" use="required"/>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="shortName" type="xs:string" use="optional"/>
+                <xs:attribute name="longName" type="xs:string" use="optional"/>
+                <xs:attribute name="color" type="xs:string" use="required"/>
+                <xs:attribute name="style" type="xs:string" use="optional"/>
+                <xs:attribute name="image" type="xs:string" use="optional"/>
+                <xs:attribute name="timetableName" type="xs:string" use="optional"/>
+                <xs:attribute name="direction" type="xs:string" use="optional"/>
+                <xs:attribute name="isWalkingLine" type="xs:boolean" use="optional"/>
+                <xs:attribute name="useInDepartureBoards" type="xs:boolean" use="optional"/>
+                <xs:attribute name="useInTimetables" type="xs:boolean" use="optional"/>
+                <xs:attribute name="useInRoutePlanning" type="xs:boolean" use="optional"/>
+                <xs:attribute name="rollingStockId" type="idType" use="optional"/>
+                <xs:attribute name="fareId" type="idType" use="optional"/>
+                <xs:attribute name="alarmId" type="idType" use="optional"/>
+                <xs:attribute name="bikeComplianceId" type="idType" use="required"/>
+                <xs:attribute name="pedestrianComplianceId" type="idType" use="required"/>
+                <xs:attribute name="handicappedComplianceId" type="idType" use="required"/>
+                <xs:attribute name="reservationRuleId" type="idType" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="complianceType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:attribute name="status" type="xs:boolean" use="required"/>
+                <xs:attribute name="capacity" type="xs:int" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="bikeComplianceType">
+        <xs:complexContent>
+            <xs:extension base="complianceType"/>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:complexType name="handicappedComplianceType">
+        <xs:complexContent>
+            <xs:extension base="complianceType"/>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:complexType name="pedestrianComplianceType">
+        <xs:complexContent>
+            <xs:extension base="complianceType"/>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:complexType name="reservationRuleType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:attribute name="type" type="reservationRuleTypeType" use="required"/>
+                <xs:attribute name="online" type="xs:boolean" use="required"/>
+                <xs:attribute name="originIsReference" type="xs:boolean" use="required"/>
+                <xs:attribute name="minDelayMinutes" type="xs:int" use="required"/>
+                <xs:attribute name="minDelayDays" type="xs:int" use="required"/>
+                <xs:attribute name="maxDelayDays" type="xs:int" use="required"/>
+                <xs:attribute name="hourDeadline" type="xs:string" use="required"/>
+                <xs:attribute name="phoneExchangeNumber" type="xs:string" use="required"/>
+                <xs:attribute name="phoneExchangeOpeningHours" type="xs:string" use="required"/>
+                <xs:attribute name="description" type="xs:string" use="required"/>
+                <xs:attribute name="webSiteURL" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:complexType name="fareType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="type" type="fareTypeType" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="lineStopType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:sequence>
+                    <xs:element name="point" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:attribute name="x" type="xs:double" use="required"/>
+                            <xs:attribute name="y" type="xs:double" use="required"/>
+                        </xs:complexType>                            
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="physicalStopId" type="idType" use="required"/>
+                <xs:attribute name="lineId" type="idType" use="required"/>
+                <xs:attribute name="rankInPath" type="xs:unsignedInt" use="required"/>
+                <xs:attribute name="isDeparture" type="xs:boolean" use="required"/>
+                <xs:attribute name="isArrival" type="xs:boolean" use="required"/>
+                <xs:attribute name="metricOffset" type="xs:unsignedInt" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="roadType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="type" type="roadTypeType" use="required"/>
+                <xs:attribute name="cityId" type="idType" use="required"/>
+                <xs:attribute name="bikeComplianceId" type="idType" use="required"/>
+                <xs:attribute name="pedestrianComplianceId" type="idType" use="required"/>
+                <xs:attribute name="handicappedComplianceId" type="idType" use="required"/>
+                <xs:attribute name="reservationRuleId" type="idType" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="addressType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:attribute name="roadId" type="idType" use="required"/>
+                <xs:attribute name="metricOffset" type="xs:unsignedInt" use="required"/>
+                <xs:attribute name="x" type="xs:double" use="required"/>
+                <xs:attribute name="y" type="xs:double" use="required"/>
+                <xs:attribute name="placeId" type="idType" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="roadChunkType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:sequence>
+                    <xs:element name="point" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:attribute name="x" type="xs:double" use="required"/>
+                            <xs:attribute name="y" type="xs:double" use="required"/>
+                        </xs:complexType>                            
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="addressId" type="idType" use="required"/>
+                <xs:attribute name="rankInPath" type="xs:unsignedInt" use="required"/>
+                <xs:attribute name="isDeparture" type="xs:boolean" use="optional"/>
+                <xs:attribute name="isArrival" type="xs:boolean" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    
+    
+    
+    
+   <xs:complexType name="environmentType">
+       <xs:complexContent>
+           <xs:extension base="registrableType">
+               
+            <xs:all>
+                
+                <xs:element name="cities">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="city" type="cityType" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="transportNetworks">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="transportNetwork" type="transportNetworkType" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="axes">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="axis" type="axisType" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="connectionPlaces">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="connectionPlace" type="connectionPlaceType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="physicalStops">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="physicalStop" type="physicalStopType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="lines">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="line" type="lineType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="lineStops">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="lineStop" type="lineStopType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="bikeCompliances">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="bikeCompliance" type="bikeComplianceType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="pedestrianCompliances">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="pedestrianCompliance" type="pedestrianComplianceType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="handicappedCompliances">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="handicappedCompliance" type="handicappedComplianceType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="reservationRules">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="reservationRule" type="reservationRuleType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="fares">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="fare" type="fareType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                
+                <xs:element name="roads">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="road" type="roadType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="addresses">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="address" type="addressType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <xs:element name="roadChunks">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="roadChunk" type="roadChunkType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                
+            </xs:all>
+           
+           </xs:extension>
+       </xs:complexContent>
+       
+    </xs:complexType>
+
+
+    <xs:simpleType name="idType">
+        <xs:restriction base="xs:unsignedLong"/>
+    </xs:simpleType>
+
+    
+    <xs:simpleType name="connectionTypeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="forbidden"/>
+            <xs:enumeration value="road-road"/>
+            <xs:enumeration value="road-line"/>
+            <xs:enumeration value="line-line"/>
+            <xs:enumeration value="recommendedShort"/>
+            <xs:enumeration value="recommended"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+
+    <xs:simpleType name="reservationRuleTypeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="impossible"/>
+            <xs:enumeration value="optional"/>
+            <xs:enumeration value="compulsory"/>
+            <xs:enumeration value="atLeastOne"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    
+    <xs:simpleType name="fareTypeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="zoning"/>
+            <xs:enumeration value="section"/>
+            <xs:enumeration value="distance"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    
+    <xs:simpleType name="roadTypeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="unknown"/>
+            <xs:enumeration value="motorway"/>
+            <xs:enumeration value="medianStrippedRoad"/>
+            <xs:enumeration value="principleAxis"/>
+            <xs:enumeration value="secondaryAxis"/>
+            <xs:enumeration value="bridge"/>
+            <xs:enumeration value="street"/>
+            <xs:enumeration value="pedestrianStreet"/>
+            <xs:enumeration value="accessRoad"/>
+            <xs:enumeration value="privateWay"/>
+            <xs:enumeration value="pedestrianPath"/>
+            <xs:enumeration value="tunnel"/>
+            <xs:enumeration value="highway"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    
+    
+    
+    <xs:element name="environment" type="environmentType">
+        <xs:key name="uniqueId">
+            <xs:annotation>
+                <xs:documentation>
+                    id attribute must be unique in the environment,
+                    whatever concrete registrable type is used.
+                </xs:documentation>
+            </xs:annotation>
+            <xs:selector xpath="./*/*"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueTransportNetworkId">
+            <xs:selector xpath="./transportNetworks/transportNetwork"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueCityId">
+            <xs:selector xpath="./cities/city"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueAxisId">
+            <xs:selector xpath="./axes/axis"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueLineId">
+            <xs:selector xpath="./lines/line"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+
+        <xs:key name="uniquePhysicalStopId">
+            <xs:selector xpath="./physicalStops/physicalStop"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueFareId">
+            <xs:selector xpath="./fares/fare"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueRoadId">
+            <xs:selector xpath="./roads/road"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueBikeComplianceId">
+            <xs:selector xpath="./bikeCompliances/bikeCompliance"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniquePedestrianComplianceId">
+            <xs:selector xpath="./pedestrianCompliances/pedestrianCompliance"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueHandicappedComplianceId">
+            <xs:selector xpath="./handicappedCompliances/handicappedCompliance"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueReservationRuleId">
+            <xs:selector xpath="./reservationRules/reservationRule"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueVertexId">
+            <xs:selector xpath="./addresses/address | ./physicalStops/physicalStop"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueAddressId">
+            <xs:selector xpath="./addresses/address"></xs:selector>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:key name="uniqueConnectionPlaceId">
+            <xs:selector xpath="./connectionPlaces/connectionPlace"/>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        
+        <xs:key name="uniquePlaceId">
+            <xs:selector xpath="
+                ./connectionPlaces/connectionPlace | 
+                ./publicPlaces/publicPlace |
+                ./placeAliases/placeAlias |
+                ./roads/road |
+                ./cities/city"/>
+            <xs:field xpath="@id"></xs:field>
+        </xs:key>
+        
+        <xs:keyref name="connectionPlace_cityIdRef" refer="uniqueCityId">
+            <xs:selector xpath="./connectionPlaces/connectionPlace"/>
+            <xs:field xpath="@cityId"/>
+        </xs:keyref>
+        
+        <xs:keyref name="transferDelay_fromVertexIdRef" refer="uniqueVertexId">
+            <xs:selector xpath="./connectionPlaces/connectionPlace/transferDelay"/>
+            <xs:field xpath="@fromVertexId"/>
+        </xs:keyref>
+        <xs:keyref name="transferDelay_toVertexIdRef" refer="uniqueVertexId">
+            <xs:selector xpath="./connectionPlaces/connectionPlace/transferDelay"/>
+            <xs:field xpath="@toVertexId"/>
+        </xs:keyref>
+        
+        <xs:keyref name="physicalStop_placeIdRef" refer="uniqueConnectionPlaceId">
+            <xs:selector xpath="./physicalStops/physicalStop"/>
+            <xs:field xpath="@placeId"/>
+        </xs:keyref>
+        
+        <xs:keyref name="line_transportNetworkIdRef" refer="uniqueTransportNetworkId">
+            <xs:selector xpath="./lines/line"/>
+            <xs:field xpath="@transportNetworkId"/>
+        </xs:keyref>
+        <xs:keyref name="line_axisIdRef" refer="uniqueAxisId">
+            <xs:selector xpath="./lines/line"/>
+            <xs:field xpath="@axisId"/>
+        </xs:keyref>
+        <xs:keyref name="line_fareIdRef" refer="uniqueFareId">
+            <xs:selector xpath="./lines/line"/>
+            <xs:field xpath="@fareId"/>
+        </xs:keyref>
+        <xs:keyref name="line_bikeComplianceIdRef" refer="uniqueBikeComplianceId">
+            <xs:selector xpath="./lines/line"/>
+            <xs:field xpath="@bikeComplianceId"/>
+        </xs:keyref>
+        <xs:keyref name="line_pedestrianComplianceIdRef" refer="uniquePedestrianComplianceId">
+            <xs:selector xpath="./lines/line"/>
+            <xs:field xpath="@pedestrianComplianceId"/>
+        </xs:keyref>
+        <xs:keyref name="line_handicappedComplianceIdRef" refer="uniqueHandicappedComplianceId">
+            <xs:selector xpath="./lines/line"/>
+            <xs:field xpath="@handicappedComplianceId"/>
+        </xs:keyref>
+        <xs:keyref name="line_reservationRuleIdRef" refer="uniqueReservationRuleId">
+            <xs:selector xpath="./lines/line"/>
+            <xs:field xpath="@reservationRuleId"/>
+        </xs:keyref>
+        
+        <xs:keyref name="lineStop_lineIdRef" refer="uniqueLineId">
+            <xs:selector xpath="./lineStops/lineStop"/>
+            <xs:field xpath="@lineId"/>
+        </xs:keyref>
+        <xs:keyref name="lineStop_physicalStopIdRef" refer="uniquePhysicalStopId">
+            <xs:selector xpath="./lineStops/lineStop"/>
+            <xs:field xpath="@physicalStopId"/>
+        </xs:keyref>
+        
+        <xs:keyref name="road_cityIdRef" refer="uniqueCityId">
+            <xs:selector xpath="./roads/road"/>
+            <xs:field xpath="@cityId"/>
+        </xs:keyref>
+        <xs:keyref name="road_bikeComplianceIdRef" refer="uniqueBikeComplianceId">
+            <xs:selector xpath="./roads/road"/>
+            <xs:field xpath="@bikeComplianceId"/>
+        </xs:keyref>
+        <xs:keyref name="road_pedestrianComplianceIdRef" refer="uniquePedestrianComplianceId">
+            <xs:selector xpath="./roads/road"/>
+            <xs:field xpath="@pedestrianComplianceId"/>
+        </xs:keyref>
+        <xs:keyref name="road_handicappedComplianceIdRef" refer="uniqueHandicappedComplianceId">
+            <xs:selector xpath="./roads/road"/>
+            <xs:field xpath="@handicappedComplianceId"/>
+        </xs:keyref>
+        <xs:keyref name="road_reservationRuleIdRef" refer="uniqueReservationRuleId">
+            <xs:selector xpath="./roads/road"/>
+            <xs:field xpath="@reservationRuleId"/>
+        </xs:keyref>
+        
+        <xs:keyref name="address_roadIdRef" refer="uniqueRoadId">
+            <xs:selector xpath="./addresses/address"/>
+            <xs:field xpath="@roadId"/>
+        </xs:keyref>
+        <xs:keyref name="address_placeIdRef" refer="uniquePlaceId">
+            <xs:selector xpath="./addresses/address"/>
+            <xs:field xpath="@placeId"/>
+        </xs:keyref>
+        
+        <xs:keyref name="roadChunk_addressIdRef" refer="uniqueAddressId">
+            <xs:selector xpath="./roadChunks/roadChunk"/>
+            <xs:field xpath="@addressId"/>
+        </xs:keyref>
+        
+        
+        
+    </xs:element>
+    
+    
+    
+</xs:schema>
