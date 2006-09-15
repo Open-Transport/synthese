@@ -411,6 +411,20 @@ DateTime::FromSQLTimestamp (const std::string& sqlTimestamp)
 
 
 
+DateTime 
+DateTime::FromString (const std::string& str)
+{
+    // AAAA/MM/JJ hh:mm
+    return DateTime (Conversion::ToInt (str.substr (8, 2)),
+		     Conversion::ToInt (str.substr (5, 2)),
+		     Conversion::ToInt (str.substr (0, 4)),
+		     Conversion::ToInt (str.substr (11, 2)),
+		     Conversion::ToInt (str.substr (14, 2)));
+    
+}
+
+
+
 }
 }
 

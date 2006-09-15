@@ -106,6 +106,11 @@ class DateTime
 	*/
 	static DateTime FromSQLTimestamp (const std::string& sqlTimestamp);
 
+	/** Constructs a DateTime from a string AAAA/MM/JJ hh:mm:ss;
+	    seconds are ignored.
+	*/
+	static DateTime FromString (const std::string& str);
+
 
 };
 

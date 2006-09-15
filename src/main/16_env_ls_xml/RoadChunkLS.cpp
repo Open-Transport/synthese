@@ -32,7 +32,7 @@ namespace envlsxml
 
 const std::string RoadChunkLS::ROADCHUNK_TAG ("roadChunk");
 const std::string RoadChunkLS::ROADCHUNK_ID_ATTR ("id");
-const std::string RoadChunkLS::ROADCHUNK_ADDRESSID_ATTR ("physicalStopId");
+const std::string RoadChunkLS::ROADCHUNK_ADDRESSID_ATTR ("addressId");
 const std::string RoadChunkLS::ROADCHUNK_RANKINPATH_ATTR ("rankInPath");
 const std::string RoadChunkLS::ROADCHUNK_ISDEPARTURE_ATTR ("isDeparture");
 const std::string RoadChunkLS::ROADCHUNK_ISARRIVAL_ATTR ("isArrival");

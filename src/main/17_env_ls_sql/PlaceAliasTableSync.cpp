@@ -62,7 +62,7 @@ PlaceAliasTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex
 	Conversion::ToLongLong (rows.getColumn (rowIndex, PLACEALIASES_TABLE_COL_CITYID)));
     int tableId = synthese::util::decodeTableId (aliasedPlaceId);
 
-    Place* place = environment.fetchPlace (aliasedPlaceId);
+    const Place* place = environment.fetchPlace (aliasedPlaceId);
 
     if (place == 0) return;
 

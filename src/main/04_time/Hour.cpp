@@ -307,8 +307,8 @@ Hour
 Hour::FromString (const std::string& str)
 {
     // hh:mm
-    return Hour (Conversion::ToInt (sqlTime.substr (0, 2)),
-		 Conversion::ToInt (sqlTime.substr (4, 2)));
+    return Hour (Conversion::ToInt (str.substr (0, 2)),
+		 Conversion::ToInt (str.substr (4, 2)));
 }
 
 

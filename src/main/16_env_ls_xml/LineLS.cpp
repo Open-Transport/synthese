@@ -122,29 +122,17 @@ LineLS::Load (XMLNode& node,
 	line->setAlarm (environment.getAlarms ().get (alarmId));
     }
 
-    if (HasAttr (node, LINE_BIKECOMPLIANCEID_ATTR))
-    {
-	uid bikeComplianceId (GetLongLongAttr (node, LINE_BIKECOMPLIANCEID_ATTR));
-	line->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
-    }
+    uid bikeComplianceId (GetLongLongAttr (node, LINE_BIKECOMPLIANCEID_ATTR));
+    line->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
 
-    if (HasAttr (node, LINE_PEDESTRIANCOMPLIANCEID_ATTR))
-    {
-	uid pedestrianComplianceId (GetLongLongAttr (node, LINE_PEDESTRIANCOMPLIANCEID_ATTR));
-	line->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
-    }
+    uid pedestrianComplianceId (GetLongLongAttr (node, LINE_PEDESTRIANCOMPLIANCEID_ATTR));
+    line->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
 
-    if (HasAttr (node, LINE_HANDICAPPEDCOMPLIANCEID_ATTR))
-    {
-	uid handicappedComplianceId (GetLongLongAttr (node, LINE_HANDICAPPEDCOMPLIANCEID_ATTR));
-	line->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
-    }
-    
-    if (HasAttr (node, LINE_RESERVATIONRULEID_ATTR))
-    {
-	uid reservationRuleId (GetLongLongAttr (node, LINE_RESERVATIONRULEID_ATTR));
-	line->setReservationRule (environment.getReservationRules ().get (reservationRuleId));
-    }
+    uid handicappedComplianceId (GetLongLongAttr (node, LINE_HANDICAPPEDCOMPLIANCEID_ATTR));
+    line->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
+
+    uid reservationRuleId (GetLongLongAttr (node, LINE_RESERVATIONRULEID_ATTR));
+    line->setReservationRule (environment.getReservationRules ().get (reservationRuleId));
 
     environment.getLines ().add (line);
 }

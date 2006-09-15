@@ -174,7 +174,7 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     */
     const AddressablePlace* fetchAddressablePlace (const uid& id) const;
 
-    const AddressablePlace* fetchIncludingPlace (const uid& id) const;
+    const IncludingPlace* fetchIncludingPlace (const uid& id) const;
 
     const Place* fetchPlace (const uid& id) const;
     
