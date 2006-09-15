@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="environment2svg.xsl"?>
+<?xml-stylesheet type="text/xsl" href="../main/environment2svg.xsl"?>
 
 
 <environment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
