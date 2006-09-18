@@ -8,9 +8,9 @@
 	- @subpage uc7
 	- @subpage uc9
 
-@page uc0 0 Entrées de données
+@page uc0 0 Données et administration
 
-	- @subpage uc01 01 Entrées fichier
+	- @subpage uc01
 	- @subpage uc02
 	- @subpage uc03
 	
@@ -25,17 +25,17 @@
 
 @page uc1 2 Recherche d'itinéraires
 
-	- @subpage uc21 21 Fiche horaire
-	- @subpage uc22 22 Feuille de route
-	- @subpage uc23 23 Cartographie de trajet
+	- @subpage uc21
+	- @subpage uc22
+	- @subpage uc23
 	
 @page uc3 3 Information aux arrêts
 
-	- @subpage uc31 31 Tableau d'affichage pour écran
-	- @subpage uc32 32 Tableau d'affichage journée
-	- @subpage uc33 33 Tableau d'affichage miniature pour site web
-	- @subpage uc34 34 Fiche arrêt avec photos
-	- @subpage uc35 35 Cartographie de voisinage
+	- @subpage uc31
+	- @subpage uc32
+	- @subpage uc33
+	- @subpage uc34
+	- @subpage uc35
 	
 @page uc5 5 Etats et accès à la base
 
@@ -71,7 +71,44 @@
 	- @subpage uc95 95 Edition des requêtes favorites
 
 
-@page uc02 02 Entrées temps réel messages d'alerte
+
+
+
+
+
+
+
+
+
+@page uc01 01 Entrées fichier
+
+Les données peuvent être chargées par un "dump" de fichier, contenant toutes les catégories d'informations :
+	- modalités de réservation
+	- tarifications
+	- matériels roulants
+	- calendriers
+	- points d'arrêt
+	- lignes, horaires, services continus
+	- interfaces
+	- tableaux de départs/arrivées
+	- sites, environnements
+	- messages de situations perturbées
+etc.
+	
+
+
+
+@page uc02 02 Entrées temps réel
+
+Les données suivantes peuvent être modifiées en temps réel :
+	- @subpage uc021
+	- @subpage uc022
+	- @subpage uc023
+
+
+
+
+@page uc022 Saisie temps réel de messages d'alerte
 
 Ecran réservé aux utilisateur ayant le droit d'accès (voir @ref uc9), permettant l'entrée de messages d'alerte (voir @ref uc54) :
 	- sélection de la destination du message : 
@@ -87,6 +124,9 @@ Le résultat de l'entrée temps réel d'un message est le suivant :
 	- prise en compte immédiate par impact sur mémoire vive
 	- journalisation sur fichier pour conservation en cas de redémarrage du serveur
 
+
+
+
 @page uc03 03 Activation/désactivation de ligne en temps réel
 	
 	- choix de ligne
@@ -97,9 +137,8 @@ Le résultat de l'entrée temps réel d'une activation/désactivation de ligne est l
 	- prise en compte immédiate par impact sur mémoire vive
 	- journalisation sur fichier pour conservation en cas de redémarrage du serveur
 
-@page uc31 31 Tableaux de gare
 
-@image html uc36.png
+
 
 @page uc11 11 Recherche de commune à partir de texte
 
@@ -110,6 +149,8 @@ Deux cas se présentent :
  - soit plusieurs communes répondent à la demande sans possibilité de départager avec certitude, la liste est alors retournée dans l'ordre décroissant de probabilité de choix
 
 L'ambiguité et plus généralement le score de probabilité de choix sont évalués selon la formule suivante :
+
+
 
 
 @page uc12 Recherche d'adresse (arrêt, lieu public, domicile) dans une commune spécifiée, à partir de texte
@@ -130,7 +171,7 @@ La recherche se fait en deux temps :
 
 @page uc14 14 Recherche d'adresse (arrêt, lieu public, domicile) à partir d'un texte unique
 
-A REMPLIR PAR CHRISTOPHE
+(abandonné pour l'instant)
 
 @page uc15 15 Recherche d'arrêts à partir d'une adresse avec trajet routier
 
@@ -178,6 +219,23 @@ Les désignations de référence des points d'arrêts PA 1 et PA 2 n'ont pas besoin 
 @page uc16 16 Sélection d'une adresse sur carte
 
 L'adresse sélectionnée est ensuite envoyée à @ref uc15.
+
+@page uc21 21 Fiche horaire
+
+@page uc22 22 Feuille de route
+
+@page uc23 23 Cartographie de trajet
+
+@page uc31 31 Tableaux de gare
+
+@page uc32 32 Tableau d'affichage journée
+
+@page uc33 33 Tableau d'affichage miniature pour site web
+
+@page uc34 34 Fiche arrêt avec photos
+
+@page uc35 35 Cartographie de voisinage
+
 
 @page uc54 54 Messages d'alerte
 
