@@ -256,7 +256,7 @@
         <xs:complexContent>
             <xs:extension base="registrableType">
                 <xs:sequence>
-                    <xs:element name="serviceDate">
+                    <xs:element name="serviceDate" minOccurs="0" maxOccurs="unbounded">
                         <xs:complexType>
                             <xs:attribute name="date" type="xs:date" use="required"/>
                         </xs:complexType>                            

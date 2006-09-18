@@ -433,6 +433,23 @@ Environment::fetchIncludingPlace (const uid& id) const
 
 
 
+const Path* 
+Environment::fetchPath (const uid& id) const
+{
+    if (_lines.contains (id)) return _lines.get (id);
+    if (_roads.contains (id)) return _roads.get (id);
+    return 0;
+}
+
+
+
+Path* 
+Environment::fetchPath (const uid& id)
+{
+    if (_lines.contains (id)) return _lines.get (id);
+    if (_roads.contains (id)) return _roads.get (id);
+    return 0;
+}
 
 
 

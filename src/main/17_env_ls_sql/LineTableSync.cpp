@@ -104,7 +104,6 @@ LineTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     synthese::env::Line* line = new synthese::env::Line (id, name, 
 							 environment.getAxes ().get (axisId));
 
-
     line->setNetwork (environment.getTransportNetworks().get (transportNetworkId));
     line->setShortName (shortName);
     line->setLongName (longName);

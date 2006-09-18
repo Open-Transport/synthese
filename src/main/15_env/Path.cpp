@@ -6,9 +6,14 @@
 #include "Vertex.h"
 #include "Service.h"
 #include "Road.h"
+#include "Exception.h"
 
+#include "01_util/Conversion.h"
 
 #include <assert.h>
+
+using synthese::util::Conversion;
+
 
 
 namespace synthese
@@ -80,7 +85,7 @@ Path::setFare (Fare* fare)
 
 
 
-const std::vector<Service*>& 
+const Path::ServiceSet& 
 Path::getServices () const
 {
     return _services;
@@ -89,19 +94,50 @@ Path::getServices () const
 
 
 
+
+
 const Service* 
-Path::getService (int serviceNumber) const
+Path::getService (int serviceIndex) const
 {
-    return _services.at (serviceNumber);
+    ServiceSet::iterator it;
+    advance (it, serviceIndex);
+    return (*it);
 }
 
 
 
 
 void 
-Path::addService (Service* service)
+Path::addService (Service* service,
+		  const std::vector<synthese::time::Schedule>& departureSchedules,
+		  const std::vector<synthese::time::Schedule>& arrivalSchedules)
 {
-    _services.push_back (service);
+    std::pair<ServiceSet::iterator, bool> result = 
+	_services.insert (service);
+    if (result.second == false)
+    {
+	throw Exception ("Service number " + Conversion::ToString (service->getServiceNumber ())
+			     + " is already defined in path " + 
+			     Conversion::ToString (getId ()));
+    }
+    
+    // Otherwise updates each edge
+    int index = distance (_services.begin (), result.first);
+    for (int i=0; i<_edges.size (); ++i)
+    {
+	_edges[i]->insertDepartureSchedule (index, departureSchedules[i]);
+	_edges[i]->insertArrivalSchedule (index, arrivalSchedules[i]);
+    }
+
+}
+
+
+
+void 
+Path::removeService (Service* service)
+{
+    // TODO 
+
 }
 
 

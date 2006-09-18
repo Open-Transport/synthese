@@ -178,6 +178,11 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     const Place* fetchPlace (const uid& id) const;
     
+
+    const Path* fetchPath (const uid& id) const;
+    Path* fetchPath (const uid& id);
+
+    
     std::vector<const City*> guessCity (const std::string& fuzzyName, int nbMatches = 10) const;
     
     //@}

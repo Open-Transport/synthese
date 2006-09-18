@@ -206,26 +206,26 @@ Edge::getLength () const
 
 
 const synthese::time::Schedule& 
-Edge::getDepartureBeginSchedule (int serviceNumber) const
+Edge::getDepartureBeginSchedule (int serviceIndex) const
 {
-    return _departureBeginSchedule[serviceNumber];
+    return _departureBeginSchedule.at (serviceIndex);
 }
 
 
 
 
 const synthese::time::Schedule& 
-Edge::getDepartureEndSchedule (int serviceNumber) const
+Edge::getDepartureEndSchedule (int serviceIndex) const
 {
-    return _departureEndSchedule[serviceNumber];
+    return _departureEndSchedule.at (serviceIndex);
 }
 
 
 
 const synthese::time::Schedule& 
-Edge::getArrivalBeginSchedule (int serviceNumber) const
+Edge::getArrivalBeginSchedule (int serviceIndex) const
 {
-    return _arrivalBeginSchedule[serviceNumber];
+    return _arrivalBeginSchedule.at (serviceIndex);
 }
 
 
@@ -233,9 +233,9 @@ Edge::getArrivalBeginSchedule (int serviceNumber) const
 
 
 const synthese::time::Schedule& 
-Edge::getArrivalEndSchedule (int serviceNumber) const
+Edge::getArrivalEndSchedule (int serviceIndex) const
 {
-    return _arrivalEndSchedule[serviceNumber];
+    return _arrivalEndSchedule.at (serviceIndex);
 }
 
 
@@ -244,7 +244,7 @@ Edge::getArrivalEndSchedule (int serviceNumber) const
 
 bool 
 Edge::isRunning( const synthese::time::DateTime& startMoment, 
-		     const synthese::time::DateTime& endMoment ) const
+		 const synthese::time::DateTime& endMoment ) const
 {
     synthese::time::Date startDate;
     for ( startDate = startMoment; startDate <= endMoment; startDate++ )
@@ -259,21 +259,21 @@ Edge::isRunning( const synthese::time::DateTime& startMoment,
 
 void 
 Edge::calculateArrival (const Edge& departureEdge, 
-			int serviceNumber,
+			int serviceIndex,
 			const synthese::time::DateTime& departureMoment, 
 			synthese::time::DateTime& arrivalMoment ) const
 {
-    if ( getParentPath ()->getService (serviceNumber)->isContinuous () )
+    if ( getParentPath ()->getService (serviceIndex)->isContinuous () )
     {
         arrivalMoment = departureMoment;
-        arrivalMoment += ( _arrivalBeginSchedule[serviceNumber ] - 
-			   departureEdge._departureBeginSchedule[ serviceNumber ] );
+        arrivalMoment += ( _arrivalBeginSchedule[serviceIndex] - 
+			   departureEdge._departureBeginSchedule[serviceIndex] );
     } 
     else
     {
-        arrivalMoment = _arrivalBeginSchedule[ serviceNumber ];
-        arrivalMoment.addDaysDuration( _arrivalBeginSchedule[ serviceNumber ].getDaysSinceDeparture () - 
-				       departureEdge._departureBeginSchedule[ serviceNumber ].getDaysSinceDeparture () );
+        arrivalMoment = _arrivalBeginSchedule[serviceIndex];
+        arrivalMoment.addDaysDuration( _arrivalBeginSchedule[serviceIndex].getDaysSinceDeparture () - 
+				       departureEdge._departureBeginSchedule[serviceIndex].getDaysSinceDeparture () );
     }
     
 }
@@ -282,19 +282,19 @@ Edge::calculateArrival (const Edge& departureEdge,
 
 void 
 Edge::calculateDeparture (const Edge& arrivalEdge, 
-			  int serviceNumber,
+			  int serviceIndex,
 			  const synthese::time::DateTime& arrivalMoment, 
 			  synthese::time::DateTime& departureMoment ) const
 {
-    if ( getParentPath ()->getService( serviceNumber )->isContinuous() )
+    if ( getParentPath ()->getService( serviceIndex )->isContinuous() )
     {
         departureMoment = arrivalMoment;
-        departureMoment -= ( arrivalEdge._arrivalBeginSchedule[ serviceNumber ] - _departureBeginSchedule[ serviceNumber ] );
+        departureMoment -= ( arrivalEdge._arrivalBeginSchedule[ serviceIndex ] - _departureBeginSchedule[ serviceIndex ] );
     } 
     else
     {
-        departureMoment = _departureBeginSchedule[ serviceNumber ];
-        departureMoment.subDaysDuration( arrivalEdge._arrivalBeginSchedule[ serviceNumber ].getDaysSinceDeparture () - _departureBeginSchedule[ serviceNumber ].getDaysSinceDeparture () );
+        departureMoment = _departureBeginSchedule[ serviceIndex ];
+        departureMoment.subDaysDuration( arrivalEdge._arrivalBeginSchedule[ serviceIndex ].getDaysSinceDeparture () - _departureBeginSchedule[ serviceIndex ].getDaysSinceDeparture () );
     }
 }
 
@@ -355,7 +355,7 @@ int
 Edge::getNextService (synthese::time::DateTime& departureMoment, 
 			  const synthese::time::DateTime& maxDepartureMoment,
 			  const synthese::time::DateTime& calculationMoment,
-			  int minNextServiceNumber ) const
+			  int minNextServiceIndex ) const
 {
     int next;
 
@@ -364,8 +364,8 @@ Edge::getNextService (synthese::time::DateTime& departureMoment,
     if ( next == UNKNOWN_VALUE )
         next = getParentPath ()->getServices().size();
 
-    if ( minNextServiceNumber > next )
-        next = minNextServiceNumber;
+    if ( minNextServiceIndex > next )
+        next = minNextServiceIndex;
 
     while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
     {
@@ -446,7 +446,7 @@ Edge::getNextService (synthese::time::DateTime& departureMoment,
 int 
 Edge::getPreviousService ( synthese::time::DateTime& arrivalMoment, 
 			   const synthese::time::DateTime& minArrivalMoment,
-			   int maxPreviousServiceNumber) const
+			   int maxPreviousServiceIndex) const
 
 {
     int previous;
@@ -506,96 +506,55 @@ Edge::getPreviousService ( synthese::time::DateTime& arrivalMoment,
 
 
 
-
-/*
-int 
-Edge::getPreviousService ( synthese::time::DateTime& arrivalMoment, 
-			   const synthese::time::DateTime& minArrivalMoment,
-			   int continuousServiceAmplitude ) const
-{
-    
-    int previous = getPreviousService ( arrivalMoment, minArrivalMoment );
-
-    if ( previous != UNKNOWN_VALUE && 
-	 getParentPath ()->getService( previous )->isContinuous() )
-    {
-        if ( arrivalMoment > _arrivalEndSchedule[ previous ] )
-            continuousServiceAmplitude = 1440 - ( arrivalMoment.getHour() - _arrivalEndSchedule[ previous ].getHour () );
-        else
-            continuousServiceAmplitude = _arrivalEndSchedule[ previous ].getHour() - arrivalMoment.getHour ();
-    }
-    else
-        continuousServiceAmplitude = 0;
-    return previous;
-}
-
-*/
-
-
-
-
-
 void 
-Edge::setSchedules ( const std::string& buffer, 
-			 int position, 
-			 int columnWidth,
-			 bool departurePassageDifferent )
+Edge::insertDepartureSchedule (int index, const Schedule& schedule)
 {
-    for ( int s = 0; s < getParentPath ()->getServices().size(); s++ )
+    const Service* service = _parentPath->getService (index);
+
+    _departureBeginSchedule.insert (
+	_departureBeginSchedule.begin () + index,
+	schedule);
+
+    if (service->isContinuous ())
     {
-	const Service* service = getParentPath ()->getService (s);
-
-	int duration = 0;
-	int periodicity = 0;
-	
-	if (service->isContinuous ()) {
-	    const ContinuousService* continuousService = 
-		dynamic_cast<const ContinuousService*> (service);
-	    duration = continuousService->getRange ();
-	    periodicity = continuousService->getMaxWaitingTime ();
-	}
-	
-
-        _departureBeginSchedule[ s ] = buffer.substr ( position );
-        _departureEndSchedule[ s ] = _departureBeginSchedule[ s ];
-	_departureEndSchedule[ s ] += duration;
-
-
-        if ( !departurePassageDifferent )
-        {
-            _arrivalBeginSchedule[ s ] = _departureBeginSchedule[ s ];
-            _arrivalBeginSchedule[ s ] += periodicity;
-            _arrivalEndSchedule[ s ] = _departureEndSchedule[ s ];
-            _arrivalEndSchedule[ s ] += periodicity;
-        }
-
-        if (getRankInPath () == 0)
-	{
-	    // MJ constness pb
-            ((Service*) service)->setDepartureSchedule ( _departureBeginSchedule[ s ] );
-	}
-
-        position += columnWidth;
+	const ContinuousService* continuousService = dynamic_cast<const ContinuousService*> (service);
+	_departureEndSchedule.insert (
+	    _departureEndSchedule.begin () + index,
+	    _departureBeginSchedule[index] + continuousService->getRange ());
     }
-
-    updateArrivalIndex();
-    updateDepartureIndex();
-
-
+    else 
+    {
+	_departureEndSchedule.insert (
+	    _departureEndSchedule.begin () + index,
+	    _departureBeginSchedule[index]);
+    }
+    updateDepartureIndex ();
 }
 
 
 
 
 void 
-Edge::allocateSchedules ()
+Edge::insertArrivalSchedule (int index, const Schedule& schedule)
 {
-    // Passer en vecteur
-    _arrivalEndSchedule = new synthese::time::Schedule[ getParentPath ()->getServices().size() ];
-    _arrivalBeginSchedule = new synthese::time::Schedule[ getParentPath ()->getServices().size() ];
-    _departureEndSchedule = new synthese::time::Schedule[ getParentPath ()->getServices().size() ];
-    _departureBeginSchedule = new synthese::time::Schedule[ getParentPath ()->getServices().size() ];
+    const Service* service = _parentPath->getService (index);
+    _arrivalBeginSchedule.insert (
+	_arrivalBeginSchedule.begin () + index,
+	schedule);
+
+    if (service->isContinuous ())
+    {
+	const ContinuousService* continuousService = dynamic_cast<const ContinuousService*> (service);
+	_arrivalBeginSchedule[index] += continuousService->getMaxWaitingTime ();
+	_arrivalEndSchedule[index] = _arrivalBeginSchedule[index] + continuousService->getRange ();
+    }
+    else 
+    {
+	_arrivalEndSchedule[index] = schedule;
+    }
+    updateArrivalIndex ();
 }
+
 
 
 
@@ -714,34 +673,6 @@ Edge::getConnectionPlace () const
 
 
 
-
-
-/*  => moved in integral search
-int 
-Edge::getNextService ( synthese::time::DateTime& departureMoment, 
-			   const synthese::time::DateTime& maxDepartureMoment,
-			   int& continuousServiceAmplitude, 
-			   int minNextServiceNumber,
-			   const synthese::time::DateTime& calculationMoment ) const
-{
-    int next = getNextService( departureMoment, 
-			       maxDepartureMoment, 
-			       calculationMoment, 
-			       minNextServiceNumber );
-
-    if ( next != UNKNOWN_VALUE && getParentPath ()->getService ( next )->isContinuous () )
-    {
-        if ( departureMoment > _departureEndSchedule[ next ] )
-            continuousServiceAmplitude = 1440 - ( departureMoment.getHour() - _departureEndSchedule[ next ].getHour() );
-        else
-            continuousServiceAmplitude = _departureEndSchedule[ next ].getHour() - departureMoment.getHour();
-    } 
-    else
-        continuousServiceAmplitude = 0;
-
-    return next;
-}
-*/
 
 
 

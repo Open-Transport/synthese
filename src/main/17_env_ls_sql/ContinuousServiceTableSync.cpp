@@ -94,17 +94,8 @@ ContinuousServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int r
     assert (arrivalSchedules.size () > 0);
 
     uid pathId (Conversion::ToLongLong (rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_PATHID)));
-    int tableId = synthese::util::decodeTableId (pathId);
 
-    Path* path = 0;
-    if (tableId == ParseTableId (ROADS_TABLE_NAME))
-    {
-	path = environment.getRoads ().get (pathId);
-    }
-    else if (tableId == ParseTableId (LINES_TABLE_NAME ))
-    {
-	path = environment.getLines ().get (pathId);
-    }
+    Path* path = environment.fetchPath (pathId);
     assert (path != 0);
 
     int range (Conversion::ToInt (
@@ -131,6 +122,7 @@ ContinuousServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int r
     cs->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
     cs->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
 
+    path->addService (cs, departureSchedules, arrivalSchedules);
     environment.getContinuousServices ().add (cs);
 }
 
@@ -145,6 +137,10 @@ ContinuousServiceTableSync::doReplace (const synthese::db::SQLiteResult& rows, i
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
     ContinuousService* cs = environment.getContinuousServices ().get (id);
+
+    // Remove old service
+    Path* path = environment.fetchPath (cs->getPath ()->getId ());
+    path->removeService (cs);
 
     int serviceNumber (Conversion::ToInt (
         rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER)));
@@ -198,8 +194,7 @@ ContinuousServiceTableSync::doReplace (const synthese::db::SQLiteResult& rows, i
     cs->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
     cs->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
 
-    // TODO : update in correcponding edge
-
+    path->addService (cs, departureSchedules, arrivalSchedules);
 }
 
 

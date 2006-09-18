@@ -139,9 +139,27 @@
     
     <continuousServices>
         
+        <continuousService id="17000" serviceNumber="12" pathId="9000"
+            range="50" maxWaitingTime="7"
+            bikeComplianceId="20000" handicappedComplianceId="19000" pedestrianComplianceId="18000"
+            schedules="#00:07:30,00:07:38#00:07:40,00:07:48#00:07:50,00:07:58#">
+            
+            <serviceDate date="2006-10-12"/>
+            <serviceDate date="2006-10-13"/>
+            <serviceDate date="2006-10-14"/>
+        </continuousService>
+        
     </continuousServices>
     
     <scheduledServices>
+        <scheduledService id="16000" serviceNumber="12" pathId="9001" 
+            bikeComplianceId="20000" handicappedComplianceId="19000" pedestrianComplianceId="18000"
+            reservationRuleId="21000"
+            schedules="#00:07:30,00:07:38#00:07:40,00:07:48#00:07:50,00:07:58#">
+            <serviceDate date="2006-10-12"/>
+            <serviceDate date="2006-10-13"/>
+            <serviceDate date="2006-10-14"/>
+        </scheduledService>
         
     </scheduledServices>
 </environment>

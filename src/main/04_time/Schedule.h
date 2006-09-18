@@ -79,6 +79,11 @@ bool operator >= ( const Schedule& op1, const Schedule& op2 );
 bool operator >= ( const Schedule& op1, const Hour& op2 );
 bool operator > ( const Schedule& op1, const Hour& op2 );
 
+
+Schedule
+operator + ( const Schedule& op1, int op2 );
+
+
 /** Returns number of minutes elapsed between two
 schedules. If this \< op2, the returned duration is negative.
 */

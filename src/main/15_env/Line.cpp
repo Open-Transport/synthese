@@ -327,5 +327,15 @@ Line::isLine () const
 
 
 
+
+const uid& 
+Line::getId () const
+{
+    return synthese::util::Registrable<uid,Line>::getId ();
+}
+
+
+
+
 }
 }

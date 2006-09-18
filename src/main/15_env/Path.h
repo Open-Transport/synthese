@@ -7,8 +7,13 @@
 #include "PedestrianComplyer.h"
 #include "ReservationRuleComplyer.h"
 #include "Calendar.h"
+#include "Service.h"
+
+#include "04_time/Schedule.h"
+#include "01_util/UId.h"
 
 #include <vector>
+#include <set>
 
 
 namespace synthese
@@ -27,7 +32,6 @@ namespace env
     class Edge;
     class Fare;
     class Point;
-    class Service;
 
 /** Path abstract base class.
 
@@ -57,15 +61,26 @@ class Path :
 
 private:
 
+    struct cmpService
+    {
+	bool operator() (const Service* s1, 
+			 const Service* s2) const
+	{
+	    return s1->getDepartureSchedule () < s2->getDepartureSchedule ();
+	}
+    };
+
+ public:
+
+    typedef std::set<Service*, cmpService> ServiceSet;
+
 protected:
 
     std::vector<Edge*> _edges; 
-    std::vector<Service*> _services;
+    ServiceSet _services;
 
     Fare* _fare;
     const Alarm* _alarm;
-
-    // TODO remonter egalement les chaninages    
 
     Calendar _calendar; //!< Calendar indicating if there is at least one service running on each day.
 
@@ -78,11 +93,13 @@ public:
 
     //! @name Getters/Setters
     //@{
+    virtual const uid& getId () const = 0;
+
     int getEdgesCount () const;
     const Edge* getEdge (int index) const;
 
-    const std::vector<Service*>& getServices () const;
-    const Service* getService (int serviceNumber) const;
+    const ServiceSet& getServices () const;
+    const Service* getService (int serviceIndex) const;
 
     const Fare* getFare () const;
     void setFare (Fare* fare);
@@ -124,7 +141,12 @@ public:
     //! @name Update methods.
     //@{
     void addEdge (Edge* edge);
-    void addService (Service* service);
+
+    void addService (Service* service, 
+		     const std::vector<synthese::time::Schedule>& departureSchedules,
+		     const std::vector<synthese::time::Schedule>& arrivalSchedules);
+
+    void removeService (Service* service);
 
 
     /** Updates path calendar.

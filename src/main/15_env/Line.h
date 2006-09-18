@@ -68,6 +68,8 @@ public:
 
     //! @name Getters/Setters
     //@{
+    const uid& getId () const;
+
     const std::string& getName () const;
     void setName (const std::string& name);
 

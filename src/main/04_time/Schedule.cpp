@@ -116,6 +116,20 @@ Schedule::operator += ( int op )
 
 
 
+
+Schedule
+operator + ( const Schedule& op1, int op2 )
+{
+    Schedule result = op1;
+    result += op2;
+    return result;
+}
+
+
+
+
+
+
 bool
 operator < ( const Schedule& op1, const Schedule& op2 )
 {
@@ -204,7 +218,7 @@ operator - ( const Schedule& op1, const Schedule& op2 )
 
 
 std::ostream&
-operator<< ( std::ostream& os, const Schedule& op )
+operator << ( std::ostream& os, const Schedule& op )
 {
     os << op.getDaysSinceDeparture ();
     os << op.getHour ();

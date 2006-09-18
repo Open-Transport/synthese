@@ -62,6 +62,8 @@ public:
 
   //! @name Getters/Setters
   //@{
+  const uid& getId () const;
+
   bool hasReservationRule () const;
   const ReservationRule* getReservationRule () const;
 

@@ -121,5 +121,14 @@ Road::isLine () const
 
 
 
+const uid& 
+Road::getId () const
+{
+    return synthese::util::Registrable<uid,Road>::getId ();
+}
+
+
+
+
 }
 }

@@ -4,9 +4,11 @@
 
 
 #include <vector>
+
 #include "Point.h"
 
 #include "04_time/DateTime.h"
+#include "04_time/Schedule.h"
 
 
 namespace synthese
@@ -69,10 +71,10 @@ private:
 
     std::vector<const Point*> _viaPoints; //!< Intermediate points along the edge.
 
-    synthese::time::Schedule* _departureBeginSchedule;  //!< 
-    synthese::time::Schedule* _departureEndSchedule;  //!< 
-    synthese::time::Schedule* _arrivalBeginSchedule; //!< 
-    synthese::time::Schedule* _arrivalEndSchedule;  //!< 
+    std::vector<synthese::time::Schedule> _departureBeginSchedule;  //!< 
+    std::vector<synthese::time::Schedule> _departureEndSchedule;  //!< 
+    std::vector<synthese::time::Schedule> _arrivalBeginSchedule; //!< 
+    std::vector<synthese::time::Schedule> _arrivalEndSchedule;  //!< 
 
     int _departureIndex[24];     //!< First line service index by departure hour of day
     int _arrivalIndex[24];  //!< First line service index by arrival hour of day
@@ -136,16 +138,16 @@ public:
     const std::vector<const Point*>& getViaPoints () const;
 
     const synthese::time::Schedule& 
-	getDepartureBeginSchedule (int serviceNumber) const;
+	getDepartureBeginSchedule (int serviceIndex) const;
 
     const synthese::time::Schedule& 
-	getDepartureEndSchedule (int serviceNumber) const;
+	getDepartureEndSchedule (int serviceIndex) const;
 
     const synthese::time::Schedule& 
-	getArrivalBeginSchedule (int serviceNumber) const;
+	getArrivalBeginSchedule (int serviceIndex) const;
 
     const synthese::time::Schedule& 
-	getArrivalEndSchedule (int serviceNumber) const;
+	getArrivalEndSchedule (int serviceIndex) const;
 
     
 
@@ -167,12 +169,12 @@ public:
 		    const synthese::time::DateTime& endMoment ) const;
 
     void calculateArrival (const Edge& departureEdge, 
-			    int serviceNumber,
+			    int serviceIndex,
 			    const synthese::time::DateTime& departureMoment, 
 			    synthese::time::DateTime& arrivalMoment ) const;
 
     void calculateDeparture (const Edge& arrivalEdge, 
-			     int serviceNumber,
+			     int serviceIndex,
 			     const synthese::time::DateTime& arrivalMoment, 
 			     synthese::time::DateTime& departureMoment ) const;
 
@@ -201,36 +203,15 @@ public:
     int getNextService (synthese::time::DateTime& departureMoment, 
 			const synthese::time::DateTime& maxDepartureMoment,
 			const synthese::time::DateTime& calculationMoment,
-			int minNextServiceNumber = UNKNOWN_VALUE ) const;
+			int minNextServiceIndex = UNKNOWN_VALUE ) const;
 
     
-    /** Provides next departure service number (method 2)
-	@param departureMoment Presence hour at departure place
-	@param maxDepartureMoment Maximum departure hour
-	@param continuousServiceAmplitude 
-	@param minNextServiceNumber Index to start service search from
-	@param calculationMoment Calculation moment for reservation delay checking
-	@return Found service index or -1 if none was found.
-	@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
-	@retval continuousServiceAmplitude Continuous service amplitude. 0 means scheduled service.
-    */
-/*    int getNextService ( synthese::time::DateTime& departureMoment, 
-			 const synthese::time::DateTime& maxDepartureMoment,
-			 int& continuousServiceAmplitude, 
-			 int minNextServiceNumber,
-			 const synthese::time::DateTime& calculationMoment ) const;
-*/
  
 
     int getPreviousService ( synthese::time::DateTime& arrivalMoment, 
 			     const synthese::time::DateTime& minArrivalMoment,
-			     int maxPreviousServiceNumber = UNKNOWN_VALUE) const;
+			     int maxPreviousServiceIndex = UNKNOWN_VALUE) const;
     
-/*    
-    int getPreviousService ( synthese::time::DateTime& arrivalMoment, 
-			     const synthese::time::DateTime& minArrivalMoment,
-			     int continuousServiceAmplitude ) const;
-*/  
 
 
     //@}
@@ -240,29 +221,14 @@ public:
     void clearViaPoints ();
     void addViaPoint (const Point& viaPoint);
     
-    void updateDepartureIndex();
-    void updateArrivalIndex();
+    void insertDepartureSchedule (int index, const synthese::time::Schedule& schedule);
+    void insertArrivalSchedule (int index, const synthese::time::Schedule& schedule);
 
-
-    /** Fills schedules from buffer.
-      @param buffer Buffer to parse
-      @param position First character to parse from.
-      @param columnWidth Number of characters between each schedule including data
-      @param departurePassageDifferent Indicates if the function is called 
-      a second time to describe departure schedules after having described arrival schedules.
-      
-      Use of departurePassageDifferent prevents overwriting arrival schedules 
-      in case departure schedules are provided on another text line.
-    */
-    void setSchedules ( const std::string& buffer, 
-			int position, 
-			int columnWidth,
-			bool departurePassageDifferent );
+    void updateDepartureIndex ();
+    void updateArrivalIndex ();
 
 
  private:
-
-    void allocateSchedules ();
 
     //@}
 

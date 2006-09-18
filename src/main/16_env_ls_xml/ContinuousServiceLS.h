@@ -37,27 +37,16 @@ class ContinuousServiceLS
 {
  public:
 
-    addTableColumn (CONTINUOUSSERVICES_TABLE_COL_SERVICENUMBER, "TEXT", true);
-    addTableColumn (CONTINUOUSSERVICES_TABLE_COL_SCHEDULES, "TEXT", true);
-    addTableColumn (CONTINUOUSSERVICES_TABLE_COL_PATHID, "INTEGER", false);
-    addTableColumn (CONTINUOUSSERVICES_TABLE_COL_RANKINPATH, "INTEGER", false);
-    addTableColumn (CONTINUOUSSERVICES_TABLE_COL_RANGE, "INTEGER", true);
-    addTableColumn (CONTINUOUSSERVICES_TABLE_COL_MAXWAITINGTIME, "INTEGER", true);
-    addTableColumn (CONTINUOUSSERVICES_TABLE_COL_BIKECOMPLIANCEID, "INTEGER", true);
-    addTableColumn (CONTINUOUSSERVICES_TABLE_COL_HANDICAPPEDCOMPLIANCEID, "INTEGER", true);
-    addTableColumn (CONTINUOUSSERVICES_TABLE_COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
-
     static const std::string CONTINUOUSSERVICE_TAG;
     static const std::string CONTINUOUSSERVICE_ID_ATTR;
     static const std::string CONTINUOUSSERVICE_SERVICENUMBER_ATTR;
     static const std::string CONTINUOUSSERVICE_PATHID_ATTR;
-    static const std::string CONTINUOUSSERVICE_DEPARTURESCHEDULE_ATTR;
-    static const std::string CONTINUOUSSERVICE__ATTR;
-    static const std::string CONTINUOUSSERVICE__ATTR;
-    static const std::string CONTINUOUSSERVICE__ATTR;
-    static const std::string CONTINUOUSSERVICE__ATTR;
-    static const std::string CONTINUOUSSERVICE__ATTR;
-    static const std::string CONTINUOUSSERVICE__ATTR;
+    static const std::string CONTINUOUSSERVICE_RANGE_ATTR;
+    static const std::string CONTINUOUSSERVICE_MAXWAITINGTIME_ATTR;
+    static const std::string CONTINUOUSSERVICE_BIKECOMPLIANCEID_ATTR;
+    static const std::string CONTINUOUSSERVICE_HANDICAPPEDCOMPLIANCEID_ATTR;
+    static const std::string CONTINUOUSSERVICE_PEDESTRIANCOMPLIANCEID_ATTR;
+    static const std::string CONTINUOUSSERVICE_SCHEDULES_ATTR;
 
  private:
 
