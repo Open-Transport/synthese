@@ -1,6 +1,0 @@
-
-
-
-subtile RASTER/25k/ 303x303 TILES/25k_100
-rescale TILES/25k_100 0.7 TILES/25k_70
-
