@@ -294,10 +294,17 @@
     
     
     
-    <!-- 
-        alarm
-        ...
-        -->
+    <xs:complexType name="alarmType">
+        <xs:complexContent>
+            <xs:extension base="registrableType">
+                <xs:attribute name="message" type="xs:string" use="required"/>
+                <xs:attribute name="periodStart" type="xs:dateTime" use="required"/>
+                <xs:attribute name="periodEnd" type="xs:dateTime" use="required"/>
+                <xs:attribute name="alarmLevel" type="alarmLevelType" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
     
     
     
@@ -476,6 +483,15 @@
                     </xs:complexType>
                 </xs:element>
                 
+                <xs:element name="alarms">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="alarm" type="alarmType" 
+                                minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
                 
             </xs:all>
            
@@ -538,6 +554,15 @@
             <xs:enumeration value="highway"/>
         </xs:restriction>
     </xs:simpleType>
+    
+    
+    <xs:simpleType name="alarmLevelType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="info"/>
+            <xs:enumeration value="warning"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
     
     
     

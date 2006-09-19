@@ -214,7 +214,7 @@ namespace synthese
 
 
 
-	    static const std::string ALARMS_TABLE_NAME ("t002_alarms");
+	    static const std::string ALARMS_TABLE_NAME ("t003_alarms");
 	    static const std::string ALARMS_TABLE_COL_MESSAGE ("message");  
 	    static const std::string ALARMS_TABLE_COL_PERIODSTART ("period_start"); 
 	    static const std::string ALARMS_TABLE_COL_PERIODEND ("period_end"); 

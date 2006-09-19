@@ -8,6 +8,7 @@
 #include "01_util/UId.h"
 #include "01_util/XmlToolkit.h"
 
+#include "04_time/Date.h"
 #include "04_time/Schedule.h"
 
 #include "15_env/Environment.h"
@@ -20,6 +21,7 @@ using namespace synthese::util::XmlToolkit;
 using synthese::env::Path;
 using synthese::time::Schedule;
 using synthese::env::ScheduledService;
+using synthese::time::Date;
 
 
 
@@ -38,6 +40,8 @@ const std::string ScheduledServiceLS::SCHEDULEDSERVICE_PEDESTRIANCOMPLIANCEID_AT
 const std::string ScheduledServiceLS::SCHEDULEDSERVICE_RESERVATIONRULEID_ATTR ("reservationRuleId");
 const std::string ScheduledServiceLS::SCHEDULEDSERVICE_SCHEDULES_ATTR ("schedules");
 
+const std::string ScheduledServiceLS::SERVICEDATE_TAG ("serviceDate");
+const std::string ScheduledServiceLS::SERVICEDATE_DATE_ATTR ("date");
 
 
 
@@ -95,6 +99,14 @@ ScheduledServiceLS::Load (XMLNode& node,
     ss->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
     ss->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
     ss->setReservationRule (environment.getReservationRules ().get (reservationRuleId)); 
+
+    // Service dates
+    for (int i=0; i<GetChildNodeCount (node, SERVICEDATE_TAG); ++i)
+    {
+	XMLNode sd (GetChildNode (node, SERVICEDATE_TAG, i));
+	Date serviceDate = Date::FromString (GetStringAttr (sd, SERVICEDATE_DATE_ATTR));
+	ss->getCalendar ().mark (serviceDate, true);
+    }
 
     path->addService (ss, departureSchedules, arrivalSchedules);
     environment.getScheduledServices ().add (ss);

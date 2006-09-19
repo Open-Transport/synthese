@@ -162,4 +162,10 @@
         </scheduledService>
         
     </scheduledServices>
+    
+    <alarms>
+        <alarm id="3000" message="msg" 
+            periodStart="2006-10-13T13:45:00" periodEnd="2006-10-13T13:46:00" alarmLevel="info"/>
+    </alarms>
+    
 </environment>

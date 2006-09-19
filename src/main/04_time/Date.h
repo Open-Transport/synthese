@@ -77,6 +77,7 @@ class Date
 	*/
 	static Date FromSQLDate (const std::string& sqlDate);
 
+	static Date FromString (const std::string& sqlString);
 
         //! @name Update methods
         //@{

@@ -80,17 +80,8 @@ ServiceDateTableSync::updateServiceCalendar (const synthese::db::SQLiteResult& r
 {
     // Get the corresponding calendar
     uid serviceId = Conversion::ToLongLong (rows.getColumn (rowIndex, SERVICEDATES_TABLE_COL_SERVICEID));
-    int tableId = synthese::util::decodeTableId (serviceId);
 
-    Service* service = 0;
-    if (tableId == ParseTableId (SCHEDULEDSERVICES_TABLE_NAME))
-    {
-	service = environment.getScheduledServices ().get (serviceId);
-    }
-    else if (tableId == ParseTableId (CONTINUOUSSERVICES_TABLE_NAME ))
-    {
-	service = environment.getContinuousServices ().get (serviceId);
-    }
+    Service* service = environment.fetchService (serviceId);
     assert (service != 0);
 
     // Mark the date in service calendar

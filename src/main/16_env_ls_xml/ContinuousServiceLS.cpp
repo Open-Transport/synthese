@@ -9,6 +9,7 @@
 #include "01_util/XmlToolkit.h"
 
 #include "04_time/Schedule.h"
+#include "04_time/Date.h"
 
 #include "15_env/Environment.h"
 #include "15_env/Path.h"
@@ -18,6 +19,7 @@
 using namespace synthese::util::XmlToolkit;
 
 using synthese::env::Path;
+using synthese::time::Date;
 using synthese::time::Schedule;
 using synthese::env::ContinuousService;
 
@@ -39,6 +41,8 @@ const std::string ContinuousServiceLS::CONTINUOUSSERVICE_HANDICAPPEDCOMPLIANCEID
 const std::string ContinuousServiceLS::CONTINUOUSSERVICE_PEDESTRIANCOMPLIANCEID_ATTR ("pedestrianComplianceId");
 const std::string ContinuousServiceLS::CONTINUOUSSERVICE_SCHEDULES_ATTR ("schedules");
 
+const std::string ContinuousServiceLS::SERVICEDATE_TAG ("serviceDate");
+const std::string ContinuousServiceLS::SERVICEDATE_DATE_ATTR ("date");
 
 
 
@@ -89,18 +93,26 @@ ContinuousServiceLS::Load (XMLNode& node,
     assert (arrivalSchedules.size () > 0);
 
     
-    ContinuousService* ss = new synthese::env::ContinuousService (id, serviceNumber, 
+    ContinuousService* cs = new synthese::env::ContinuousService (id, serviceNumber, 
 								  path, 
 								  departureSchedules.at (0),
 								  range,
 								  maxWaitingTime);
 
-    ss->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
-    ss->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
-    ss->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
+    cs->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
+    cs->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
+    cs->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
 
-    path->addService (ss, departureSchedules, arrivalSchedules);
-    environment.getContinuousServices ().add (ss);
+    // Service dates
+    for (int i=0; i<GetChildNodeCount (node, SERVICEDATE_TAG); ++i)
+    {
+	XMLNode sd (GetChildNode (node, SERVICEDATE_TAG, i));
+	Date serviceDate = Date::FromString (GetStringAttr (sd, SERVICEDATE_DATE_ATTR));
+	cs->getCalendar ().mark (serviceDate, true);
+    }
+
+    path->addService (cs, departureSchedules, arrivalSchedules);
+    environment.getContinuousServices ().add (cs);
 }
 
 

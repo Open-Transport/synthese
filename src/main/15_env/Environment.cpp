@@ -453,6 +453,30 @@ Environment::fetchPath (const uid& id)
 
 
 
+const Service* 
+Environment::fetchService (const uid& id) const
+{
+    if (_scheduledServices.contains (id)) return _scheduledServices.get (id);
+    if (_continuousServices.contains (id)) return _continuousServices.get (id);
+    return 0;
+}
+
+
+
+Service* 
+Environment::fetchService (const uid& id)
+{
+    if (_scheduledServices.contains (id)) return _scheduledServices.get (id);
+    if (_continuousServices.contains (id)) return _continuousServices.get (id);
+    return 0;
+}
+
+
+
+
+
+
+
 std::vector<const City*> 
 Environment::guessCity (const std::string& fuzzyName, int nbMatches) const
 {

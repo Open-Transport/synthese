@@ -47,6 +47,8 @@ class ContinuousServiceLS
     static const std::string CONTINUOUSSERVICE_HANDICAPPEDCOMPLIANCEID_ATTR;
     static const std::string CONTINUOUSSERVICE_PEDESTRIANCOMPLIANCEID_ATTR;
     static const std::string CONTINUOUSSERVICE_SCHEDULES_ATTR;
+    static const std::string SERVICEDATE_TAG;
+    static const std::string SERVICEDATE_DATE_ATTR;
 
  private:
 

@@ -46,6 +46,9 @@ class ScheduledServiceLS
     static const std::string SCHEDULEDSERVICE_PEDESTRIANCOMPLIANCEID_ATTR;
     static const std::string SCHEDULEDSERVICE_RESERVATIONRULEID_ATTR;
     static const std::string SCHEDULEDSERVICE_SCHEDULES_ATTR;
+    static const std::string SERVICEDATE_TAG;
+    static const std::string SERVICEDATE_DATE_ATTR;
+
 
  private:
 

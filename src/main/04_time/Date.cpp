@@ -425,6 +425,17 @@ Date::FromSQLDate (const std::string& sqlDate)
 }
 
 
+Date 
+Date::FromString (const std::string& str)
+{
+    // AAAA-MM-JJ
+    return Date (Conversion::ToInt (str.substr (8, 2)),
+		 Conversion::ToInt (str.substr (5, 2)),
+		 Conversion::ToInt (str.substr (0, 4)));
+}
+
+
+
 
 
 }
