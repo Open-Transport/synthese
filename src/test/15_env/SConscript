@@ -1,25 +1,9 @@
 Import ('testenv')
-testmoduleenv = testenv.ModuleEnv()
-
-includes = '*.cpp'
-excludes = []
-
-# TODO : understand why link order is so important ??
-
-testmoduleenv.AddModuleDependency ('15_env')
-testmoduleenv.AddModuleDependency ('04_time')
-testmoduleenv.AddModuleDependency ('01_util')
-testmoduleenv.AddBoostDependency ('boost_thread')
-testmoduleenv.AddBoostDependency ('boost_iostreams')
-testmoduleenv.AppendMultithreadConf ();
-
-
-files = testmoduleenv.Glob(includes, excludes)
-
-testmodulename = testmoduleenv.DefaultTestModuleName ()
-
-testprogram = testmoduleenv.Program(testmodulename, files)
-
-testmoduleenv.Test("test.passed", testprogram)
+testmoduleenv = testenv.TestModuleEnv (includes='*.cpp', 
+                                       excludes=[], 
+                                       modules=['15_env', '04_time', '01_util'], 
+                                       boostlibs=['boost_thread', 'boost_iostreams'], 
+                                       withSQLite=False, 
+                                       withMultithreading=True)
 
 

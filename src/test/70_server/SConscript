@@ -1,18 +1,9 @@
 Import ('testenv')
-testmoduleenv = testenv.ModuleEnv()
+testmoduleenv = testenv.TestModuleEnv (includes='*.cpp', 
+                                       excludes=[], 
+                                       modules=['70_server', '04_time', '01_util'], 
+                                       boostlibs=[], 
+                                       withSQLite=False, 
+                                       withMultithreading=True)
 
-includes = '*.cpp'
-excludes = []
-
-testmoduleenv.AddModuleDependency ('70_server')
-testmoduleenv.AddModuleDependency ('04_time')
-testmoduleenv.AddModuleDependency ('01_util')
-
-files = testmoduleenv.Glob(includes, excludes)
-
-testmodulename = testmoduleenv.DefaultTestModuleName ()
-
-testprogram = testmoduleenv.Program(testmodulename, files)
-
-testmoduleenv.Test("test.passed", testprogram)
 

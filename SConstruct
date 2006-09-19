@@ -1,3 +1,32 @@
+# -------------------------------------------------------
+# Command line arguments
+# -------------------------------------------------------
+env = Environment()
+
+mode = ARGUMENTS.get('mode', 'release').lower()  
+platform = ARGUMENTS.get('os', str (Platform()))
+
+print "platform = ", platform
+print "mode     = ", mode
+
+env.Replace ( PLATFORM = platform )
+env.Replace ( MODE = mode )
+
+
+if (platform=='posix'):
+  env.Replace ( CXX = 'g++-3.3' )
+
+
+buildroot = 'build' + '/' + platform + '/' + mode
+buildmain = buildroot + '/main'
+buildtest = buildroot + '/test'
+
+resourcesroot = 'resources'
+resourcesmain = resourcesroot + '/main'
+resourcestest = resourcesroot + '/test'
+
+env.Replace ( BUILDROOT = '#' + buildroot )
+
 
 
 # -------------------------------------------------------
@@ -5,7 +34,7 @@
 # -------------------------------------------------------
 import os, fnmatch
 
-# Allows to glob files from the buld directory going
+# Allows to glob files from the build directory going
 # through scons nodes
 def Glob( env, pattern = '*.*', excludes = [], dir = '.' ):
     files = []
@@ -160,17 +189,52 @@ def AppendMultithreadConf (env):
         env.Append ( LIBS = ['ws2_32.lib'] )  
 
 
+
+
+
+def AddModuleDependency (env, modulename):
+    env.Append ( LIBPATH = ['../../main/' + modulename] )  
+    env.Append ( LIBS = [modulename] )  
+
+
+
+
+
+
 def ModuleEnv (env):
     moduleenv = env.Copy()
     # Add default include path for dependencies
     moduleenv.Append (CPPPATH = [Dir('../../main').srcnode().abspath] )
     return moduleenv
 
-    
 
-def AddModuleDependency (env, modulename):
-    env.Append ( LIBPATH = ['../../main/' + modulename] )  
-    env.Append ( LIBS = [modulename] )  
+
+    
+def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[], withSQLite=False, withMultithreading=True):
+    testmoduleenv = ModuleEnv (env)
+    testmodulename = testmoduleenv.DefaultTestModuleName ()
+
+    for module in modules:
+      testmoduleenv.AddModuleDependency (module)
+
+    for boostlib in boostlibs:
+      testmoduleenv.AddBoostDependency (boostlib)
+
+    if withSQLite == True:
+      testmoduleenv.AddSQLiteDependency ()
+      
+    testmoduleenv.AppendMultithreadConf ();
+
+    files = testmoduleenv.Glob (includes, excludes)
+    testprogram = testmoduleenv.Program (testmodulename, files)
+    testmoduleenv.Test("test.passed", testprogram)
+
+    testmoduleresources = testmoduleenv.Dir ('resources').abspath
+    testmoduleenv.AddPreAction ("test.passed",
+                                [Delete (testmoduleresources),
+                                 Copy (testmoduleresources, resourcestest)])
+    testmoduleenv.AlwaysBuild ("test.passed")
+
 
 
 
@@ -187,31 +251,10 @@ SConsEnvironment.DefineDefaultLinkFlags=DefineDefaultLinkFlags
 SConsEnvironment.DefineDefaultLibs=DefineDefaultLibs
 SConsEnvironment.AppendMultithreadConf=AppendMultithreadConf
 SConsEnvironment.ModuleEnv=ModuleEnv
+SConsEnvironment.TestModuleEnv=TestModuleEnv
 SConsEnvironment.AddModuleDependency=AddModuleDependency
 SConsEnvironment.AddBoostDependency=AddBoostDependency
 SConsEnvironment.AddSQLiteDependency=AddSQLiteDependency
-
-
-
-# -------------------------------------------------------
-# Command line arguments
-# -------------------------------------------------------
-#env = Environment(ENV = {'PATH' : os.environ['PATH']})
-#env = Environment(ENV = os.environ)
-env = Environment()
-
-mode = ARGUMENTS.get('mode', 'release').lower()  
-platform = ARGUMENTS.get('os', str (Platform()))
-
-print "platform = ", platform
-print "mode     = ", mode
-
-env.Replace ( PLATFORM = platform )
-env.Replace ( MODE = mode )
-
-
-if (platform=='posix'):
-  env.Replace ( CXX = 'g++-3.3' )
 
 
 
@@ -229,18 +272,16 @@ env.DefineDefaultLibs ()
 
 
 
-
-env.Replace ( BUILDROOT = '#build' + '/' + platform + '/' + mode )
-
-
 # -------------------------------------------------------
 # Custom builders
 # -------------------------------------------------------
 def builder_unit_test(target, source, env):
   app = str(source[0].abspath)
+
   # Exec in the test program dir!
   curdir = os.path.abspath (os.curdir)
   os.chdir (os.path.dirname (source[0].abspath))
+
   if os.system(app)==0:
     os.chdir (curdir)
     open(str(target[0]),'w').write("PASSED\n")
@@ -248,8 +289,22 @@ def builder_unit_test(target, source, env):
     os.chdir (curdir)
     return 1
 
+
+def builder_copy_resources (target, source, env):
+  env.Copy (target, source)
+
+
 bld = Builder(action = builder_unit_test)
 env.Append(BUILDERS = {'Test' :  bld})
+
+bld = Builder(action = builder_copy_resources)
+env.Append(BUILDERS = {'CopyResources' :  bld})
+
+
+
+
+
+
 
 
 # -------------------------------------------------------
@@ -263,10 +318,10 @@ builddir = '#build' + '/' + platform + '/' + mode
 
 
 if 'doc' in COMMAND_LINE_TARGETS:
-    env.SConscript ('doc/SConscript')
+  env.SConscript ('doc/SConscript')
 else:
-    env.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
-    env.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)
+  env.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
+  env.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)
 
 
     
