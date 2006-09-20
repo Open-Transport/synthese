@@ -13,8 +13,8 @@ env.Replace ( PLATFORM = platform )
 env.Replace ( MODE = mode )
 
 
-if (platform=='posix'):
-  env.Replace ( CXX = 'g++-3.3' )
+#if (platform=='posix'):
+#  env.Replace ( CXX = 'g++-3.3' )
 
 
 buildroot = 'build' + '/' + platform + '/' + mode
@@ -96,9 +96,9 @@ def DefineDefaultCCFlags (env):
 
     if (platform=='posix'):
         if (mode=='debug'):
-            env.Append ( CCFLAGS = ['-ggdb', '-fno-inline'] )
+            env.Append ( CCFLAGS = ['-ggdb', '-fno-inline', '-fpermissive'] )
         else:
-            env.Append ( CCFLAGS = ['-O3', '-fno-inline', '-fno-strength-reduce'] )
+            env.Append ( CCFLAGS = ['-O3', '-fno-inline', '-fpermissive'] )
 
     elif (platform=='darwin'):
         if (mode=='debug'):

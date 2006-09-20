@@ -126,7 +126,7 @@ inline int cTableauDynamiquePointeurs<C>::NombreReel() const
     int __NombreElements = 0;
 
     for ( int __i = 0; __i < this->Taille(); __i++ )
-        if ( this->_Element[ __i ] != NULL )
+        if ( this->_Element[ __i ] != 0 )
             __NombreElements++;
 
     return __NombreElements;
