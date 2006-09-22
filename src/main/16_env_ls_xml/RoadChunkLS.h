@@ -41,12 +41,12 @@ class RoadChunkLS
  public:
 
 
-    static const std::string RoadChunkLS::ROADCHUNK_TAG;
-    static const std::string RoadChunkLS::ROADCHUNK_ID_ATTR;
-    static const std::string RoadChunkLS::ROADCHUNK_ADDRESSID_ATTR;
-    static const std::string RoadChunkLS::ROADCHUNK_RANKINPATH_ATTR;
-    static const std::string RoadChunkLS::ROADCHUNK_ISDEPARTURE_ATTR;
-    static const std::string RoadChunkLS::ROADCHUNK_ISARRIVAL_ATTR;
+    static const std::string ROADCHUNK_TAG;
+    static const std::string ROADCHUNK_ID_ATTR;
+    static const std::string ROADCHUNK_ADDRESSID_ATTR;
+    static const std::string ROADCHUNK_RANKINPATH_ATTR;
+    static const std::string ROADCHUNK_ISDEPARTURE_ATTR;
+    static const std::string ROADCHUNK_ISARRIVAL_ATTR;
 
 
  private:

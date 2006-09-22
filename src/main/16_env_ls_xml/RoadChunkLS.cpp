@@ -52,8 +52,8 @@ RoadChunkLS::Load (XMLNode& node,
 
     uid addressId (GetLongLongAttr (node, ROADCHUNK_ADDRESSID_ATTR));
     int rankInPath (GetIntAttr (node, ROADCHUNK_RANKINPATH_ATTR));
-    bool isDeparture (GetBoolAttr (node, ROADCHUNK_ISDEPARTURE_ATTR));
-    bool isArrival (GetBoolAttr (node, ROADCHUNK_ISARRIVAL_ATTR));
+    bool isDeparture (GetBoolAttr (node, ROADCHUNK_ISDEPARTURE_ATTR, true));
+    bool isArrival (GetBoolAttr (node, ROADCHUNK_ISARRIVAL_ATTR, true));
 
     Address* address = environment.getAddresses ().get (addressId);
     Road* road = environment.getRoads ().get (address->getRoad ()->getKey ());

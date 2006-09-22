@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include <boost/logic/tribool.hpp>
+#include <boost/filesystem/path.hpp>
 
 #include "XmlParser.h"
 
@@ -36,6 +37,8 @@ namespace XmlToolkit
     XMLNode GetChildNode (XMLNode& node, 
 			  const std::string& nodeName,
 			  int index);
+
+    XMLNode ParseFile (const boost::filesystem::path& file, const std::string& rootNodeTag);
 
 
     std::string GetStringAttr (XMLNode& node, 

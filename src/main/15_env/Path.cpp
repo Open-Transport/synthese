@@ -99,7 +99,7 @@ Path::getServices () const
 const Service* 
 Path::getService (int serviceIndex) const
 {
-    ServiceSet::iterator it;
+    ServiceSet::iterator it (_services.begin ());
     advance (it, serviceIndex);
     return (*it);
 }
@@ -125,8 +125,8 @@ Path::addService (Service* service,
     int index = distance (_services.begin (), result.first);
     for (int i=0; i<_edges.size (); ++i)
     {
-	_edges[i]->insertDepartureSchedule (index, departureSchedules[i]);
-	_edges[i]->insertArrivalSchedule (index, arrivalSchedules[i]);
+	_edges[i]->insertDepartureSchedule (index, departureSchedules.at (i));
+	_edges[i]->insertArrivalSchedule (index, arrivalSchedules.at (i));
     }
 
 }

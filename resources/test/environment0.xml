@@ -142,7 +142,7 @@
         <continuousService id="17000" serviceNumber="12" pathId="9000"
             range="50" maxWaitingTime="7"
             bikeComplianceId="20000" handicappedComplianceId="19000" pedestrianComplianceId="18000"
-            schedules="#00:07:30,00:07:38#00:07:40,00:07:48#00:07:50,00:07:58#">
+            schedules="#00:07:30, 00:07:38#00:07:40, 00:07:48#00:07:50, 00:07:58#00:08:00, 00:08:10#00:08:12, 00:08:20#">
             
             <serviceDate date="2006-10-12"/>
             <serviceDate date="2006-10-13"/>
@@ -165,7 +165,7 @@
     
     <alarms>
         <alarm id="3000" message="msg" 
-            periodStart="2006-10-13T13:45:00" periodEnd="2006-10-13T13:46:00" alarmLevel="info"/>
+            periodStart="2006-10-13T13:45:00" periodEnd="2006-10-13T13:46:00" level="info"/>
     </alarms>
     
 </environment>

@@ -87,6 +87,7 @@ class EnvironmentLS
     static const std::string ENVIRONMENT_TAG;
     static const std::string ENVIRONMENT_ID_ATTR;
     static const std::string ENVIRONMENT_CITIES_TAG;
+    static const std::string ENVIRONMENT_TRANSPORTNETWORKS_TAG;
     static const std::string ENVIRONMENT_AXES_TAG;
     static const std::string ENVIRONMENT_CONNECTIONPLACES_TAG;
     static const std::string ENVIRONMENT_PHYSICALSTOPS_TAG;
@@ -95,6 +96,14 @@ class EnvironmentLS
     static const std::string ENVIRONMENT_ROADS_TAG;
     static const std::string ENVIRONMENT_ADDRESSES_TAG;
     static const std::string ENVIRONMENT_ROADCHUNKS_TAG;
+    static const std::string ENVIRONMENT_BIKECOMPLIANCES_TAG;
+    static const std::string ENVIRONMENT_HANDICAPPEDCOMPLIANCES_TAG;
+    static const std::string ENVIRONMENT_PEDESTRIANCOMPLIANCES_TAG;
+    static const std::string ENVIRONMENT_RESERVATIONRULES_TAG;
+    static const std::string ENVIRONMENT_FARES_TAG;
+    static const std::string ENVIRONMENT_CONTINUOUSSERVICES_TAG;
+    static const std::string ENVIRONMENT_SCHEDULEDSERVICES_TAG;
+    static const std::string ENVIRONMENT_ALARMS_TAG;
 
  private:
 

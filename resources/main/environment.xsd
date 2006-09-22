@@ -300,7 +300,7 @@
                 <xs:attribute name="message" type="xs:string" use="required"/>
                 <xs:attribute name="periodStart" type="xs:dateTime" use="required"/>
                 <xs:attribute name="periodEnd" type="xs:dateTime" use="required"/>
-                <xs:attribute name="alarmLevel" type="alarmLevelType" use="required"/>
+                <xs:attribute name="level" type="alarmLevelType" use="required"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

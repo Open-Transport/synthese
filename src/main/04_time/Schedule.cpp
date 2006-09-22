@@ -256,7 +256,7 @@ Schedule::FromString (const std::string& str)
     // DD:hh:mm
     return Schedule (
 	Hour (Conversion::ToInt (str.substr (3, 2)),
-	      Conversion::ToInt (str.substr (5, 2))),
+	      Conversion::ToInt (str.substr (6, 2))),
 	Conversion::ToInt (str.substr (0, 2))
 	);
 }

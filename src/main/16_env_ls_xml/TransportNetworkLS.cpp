@@ -18,7 +18,7 @@ namespace synthese
 namespace envlsxml
 {
 
-const std::string TransportNetworkLS::TRANSPORTNETWORK_TAG ("city");
+const std::string TransportNetworkLS::TRANSPORTNETWORK_TAG ("transportNetwork");
 const std::string TransportNetworkLS::TRANSPORTNETWORK_ID_ATTR ("id");
 const std::string TransportNetworkLS::TRANSPORTNETWORK_NAME_ATTR ("name");
 

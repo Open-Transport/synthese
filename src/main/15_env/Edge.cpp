@@ -511,22 +511,24 @@ Edge::insertDepartureSchedule (int index, const Schedule& schedule)
 {
     const Service* service = _parentPath->getService (index);
 
-    _departureBeginSchedule.insert (
-	_departureBeginSchedule.begin () + index,
-	schedule);
+    std::vector<synthese::time::Schedule>::iterator itInsertBegin = _departureBeginSchedule.begin ();
+    advance (itInsertBegin, index);
+
+    _departureBeginSchedule.insert (itInsertBegin, schedule);
+
+    std::vector<synthese::time::Schedule>::iterator itInsertEnd = _departureEndSchedule.begin ();
+    advance (itInsertEnd, index);
 
     if (service->isContinuous ())
     {
 	const ContinuousService* continuousService = dynamic_cast<const ContinuousService*> (service);
-	_departureEndSchedule.insert (
-	    _departureEndSchedule.begin () + index,
-	    _departureBeginSchedule[index] + continuousService->getRange ());
+	_departureEndSchedule.insert (itInsertEnd, 
+				      _departureBeginSchedule[index] + continuousService->getRange ());
     }
     else 
     {
-	_departureEndSchedule.insert (
-	    _departureEndSchedule.begin () + index,
-	    _departureBeginSchedule[index]);
+	_departureEndSchedule.insert (itInsertEnd,
+				      _departureBeginSchedule[index]);
     }
     updateDepartureIndex ();
 }
@@ -538,9 +540,16 @@ void
 Edge::insertArrivalSchedule (int index, const Schedule& schedule)
 {
     const Service* service = _parentPath->getService (index);
-    _arrivalBeginSchedule.insert (
-	_arrivalBeginSchedule.begin () + index,
-	schedule);
+    
+    std::vector<synthese::time::Schedule>::iterator itInsertBegin = _arrivalBeginSchedule.begin ();
+    advance (itInsertBegin, index);
+
+    _arrivalBeginSchedule.insert (itInsertBegin, schedule);
+
+    std::vector<synthese::time::Schedule>::iterator itInsertEnd = _arrivalEndSchedule.begin ();
+    advance (itInsertEnd, index);
+
+    _arrivalEndSchedule.insert (itInsertEnd, schedule);
 
     if (service->isContinuous ())
     {
@@ -548,10 +557,7 @@ Edge::insertArrivalSchedule (int index, const Schedule& schedule)
 	_arrivalBeginSchedule[index] += continuousService->getMaxWaitingTime ();
 	_arrivalEndSchedule[index] = _arrivalBeginSchedule[index] + continuousService->getRange ();
     }
-    else 
-    {
-	_arrivalEndSchedule[index] = schedule;
-    }
+
     updateArrivalIndex ();
 }
 

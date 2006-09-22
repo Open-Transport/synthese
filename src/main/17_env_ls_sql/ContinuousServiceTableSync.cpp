@@ -74,7 +74,6 @@ ContinuousServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int r
 
     // Parse all schedules arrival#departure,arrival#departure...
     boost::char_separator<char> sep1 (",");
-    boost::char_separator<char> sep2 ("#");
     tokenizer schedulesTokens (schedules, sep1);
     
     std::vector<synthese::time::Schedule> departureSchedules;
@@ -83,20 +82,43 @@ ContinuousServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int r
     for (tokenizer::iterator schedulesIter = schedulesTokens.begin();
 	 schedulesIter != schedulesTokens.end (); ++schedulesIter)
     {
-	tokenizer schedulesTokens2 (*schedulesIter, sep2);
-	tokenizer::iterator schedulesIter2 = schedulesTokens2.begin();
+	std::string arrDep (*schedulesIter);
+	size_t sepPos = arrDep.find ("#");
+	assert (sepPos != std::string::npos);
+
+	std::string departureScheduleStr (arrDep.substr (0, sepPos));
+	std::string arrivalScheduleStr (arrDep.substr (sepPos+1));
+
+	boost::trim (departureScheduleStr);
+	boost::trim (arrivalScheduleStr);
 	
-	departureSchedules.push_back (Schedule::FromString (*schedulesIter2));
-	arrivalSchedules.push_back (Schedule::FromString (*(++schedulesIter2)));
+	if (departureScheduleStr.empty ())
+	{
+	    assert (arrivalScheduleStr.empty () == false);
+	    departureScheduleStr = arrivalScheduleStr;
+	}
+	if (arrivalScheduleStr.empty ())
+	{
+	    assert (departureScheduleStr.empty () == false);
+	    arrivalScheduleStr = departureScheduleStr;
+	}
+
+	Schedule departureSchedule (Schedule::FromString (departureScheduleStr));
+	Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
+
+	departureSchedules.push_back (departureSchedule);
+	arrivalSchedules.push_back (arrivalSchedule);
     }
     
     assert (departureSchedules.size () > 0);
     assert (arrivalSchedules.size () > 0);
+    assert (departureSchedules.size () == arrivalSchedules.size ());
 
     uid pathId (Conversion::ToLongLong (rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_PATHID)));
 
     Path* path = environment.fetchPath (pathId);
     assert (path != 0);
+    assert (path->getEdges ().size () == arrivalSchedules.size ());
 
     int range (Conversion::ToInt (
 		   rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_RANGE)));
@@ -152,7 +174,6 @@ ContinuousServiceTableSync::doReplace (const synthese::db::SQLiteResult& rows, i
 
     // Parse all schedules arrival#departure,arrival#departure...
     boost::char_separator<char> sep1 (",");
-    boost::char_separator<char> sep2 ("#");
     tokenizer schedulesTokens (schedules, sep1);
     
     std::vector<synthese::time::Schedule> departureSchedules;
@@ -161,15 +182,39 @@ ContinuousServiceTableSync::doReplace (const synthese::db::SQLiteResult& rows, i
     for (tokenizer::iterator schedulesIter = schedulesTokens.begin();
 	 schedulesIter != schedulesTokens.end (); ++schedulesIter)
     {
-	tokenizer schedulesTokens2 (*schedulesIter, sep2);
-	tokenizer::iterator schedulesIter2 = schedulesTokens2.begin();
+	std::string arrDep (*schedulesIter);
+	size_t sepPos = arrDep.find ("#");
+	assert (sepPos != std::string::npos);
+
+	std::string departureScheduleStr (arrDep.substr (0, sepPos));
+	std::string arrivalScheduleStr (arrDep.substr (sepPos+1));
+
+	boost::trim (departureScheduleStr);
+	boost::trim (arrivalScheduleStr);
 	
-	departureSchedules.push_back (Schedule::FromString (*schedulesIter2));
-	arrivalSchedules.push_back (Schedule::FromString (*(++schedulesIter2)));
+	if (departureScheduleStr.empty ())
+	{
+	    assert (arrivalScheduleStr.empty () == false);
+	    departureScheduleStr = arrivalScheduleStr;
+	}
+	if (arrivalScheduleStr.empty ())
+	{
+	    assert (departureScheduleStr.empty () == false);
+	    arrivalScheduleStr = departureScheduleStr;
+	}
+
+	Schedule departureSchedule (Schedule::FromString (departureScheduleStr));
+	Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
+
+	departureSchedules.push_back (departureSchedule);
+	arrivalSchedules.push_back (arrivalSchedule);
     }
     
     assert (departureSchedules.size () > 0);
     assert (arrivalSchedules.size () > 0);
+    assert (departureSchedules.size () == arrivalSchedules.size ());
+
+    assert (cs->getPath ()->getEdges ().size () == arrivalSchedules.size ());
 
     int range (Conversion::ToInt (
 		   rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_RANGE)));

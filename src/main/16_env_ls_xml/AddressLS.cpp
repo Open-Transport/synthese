@@ -16,6 +16,8 @@ using namespace synthese::util::XmlToolkit;
 using synthese::env::Address;
 using synthese::env::AddressablePlace;
 
+using synthese::env::Road;
+
 
 
 
@@ -49,16 +51,21 @@ AddressLS::Load (XMLNode& node,
     double x (GetDoubleAttr (node, ADDRESS_X_ATTR));
     double y (GetDoubleAttr (node, ADDRESS_Y_ATTR));
 
-    const AddressablePlace* addressablePlace = 0;
+
+    const Road* road = environment.getRoads ().get (roadId);
+
+    const AddressablePlace* addressablePlace = road;
+
+    // Can be overriden with another placeid...
     if (HasAttr (node, ADDRESS_PLACEID_ATTR))
     {
 	uid placeId (GetLongLongAttr (node, ADDRESS_PLACEID_ATTR));
-	addressablePlace = environment.fetchAddressablePlace (id);
+	addressablePlace = environment.fetchAddressablePlace (placeId);
     }
 
     Address* address = new synthese::env::Address (id, 
 						   addressablePlace,
-						   environment.getRoads ().get (roadId), 
+						   road, 
 						   metricOffset,
 						   x,
 						   y);

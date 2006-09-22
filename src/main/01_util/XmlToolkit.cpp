@@ -36,6 +36,13 @@ XmlToolkit::GetChildNode (XMLNode& node,
 
 
 
+XMLNode 
+XmlToolkit::ParseFile (const boost::filesystem::path& file, 
+		       const std::string& rootNodeTag)
+{
+    return XMLNode::openFileHelper (file.string ().c_str (), rootNodeTag.c_str ());
+}
+
 
 
     
