@@ -10,23 +10,22 @@
 #include "15_env/Line.h"
 #include "15_env/PlaceAlias.h"
 #include "15_env/PublicPlace.h"
+#include "15_env/PhysicalStop.h"
 #include "15_env/TransportNetwork.h"
 
 #include "04_time/Hour.h"
 #include "04_time/Schedule.h"
 
 
+#include "01_util/RGBColor.h"
 #include "01_util/XmlToolkit.h"
 
 #include <iostream>
 
 
-using synthese::time::Date;
-using synthese::time::Hour;
-using synthese::time::Schedule;
-
 using namespace synthese::env;
 using namespace synthese::time;
+using namespace synthese::util;
 
 
 namespace synthese
@@ -141,10 +140,41 @@ EnvironmentLSTest::testLoadingEnvironment0 ()
     CPPUNIT_ASSERT_EQUAL (std::string ("AP1"), placeAlias11000->getName ());
     CPPUNIT_ASSERT_EQUAL (city6000, placeAlias11000->getCity ());
     
-    const ConnectionPlace* connectionPlace7005 = env->getConnectionPlaces ().get (7005);
-    CPPUNIT_ASSERT_EQUAL ((const Place*) connectionPlace7005, placeAlias11000->getAliasedPlace ());
+    CPPUNIT_ASSERT (env->fetchPlace (7005) == placeAlias11000->getAliasedPlace ());
     
 
+    
+    // physical stops
+    CPPUNIT_ASSERT_EQUAL (10, (int) env->getPhysicalStops ().size ());
+    CPPUNIT_ASSERT (env->getPhysicalStops ().contains (12000));
+    CPPUNIT_ASSERT (env->getPhysicalStops ().contains (12001));
+    CPPUNIT_ASSERT (env->getPhysicalStops ().contains (12002));
+    CPPUNIT_ASSERT (env->getPhysicalStops ().contains (12003));
+    CPPUNIT_ASSERT (env->getPhysicalStops ().contains (12004));
+    CPPUNIT_ASSERT (env->getPhysicalStops ().contains (12005));
+    CPPUNIT_ASSERT (env->getPhysicalStops ().contains (12006));
+    CPPUNIT_ASSERT (env->getPhysicalStops ().contains (12007));
+    CPPUNIT_ASSERT (env->getPhysicalStops ().contains (12008));
+    CPPUNIT_ASSERT (env->getPhysicalStops ().contains (12009));
+
+    const PhysicalStop* physicalStop12000 = env->getPhysicalStops ().get (12000);
+    CPPUNIT_ASSERT_EQUAL (std::string ("PS1"), physicalStop12000->getName ());
+    CPPUNIT_ASSERT_EQUAL (220.0, physicalStop12000->getX ());
+    CPPUNIT_ASSERT_EQUAL (123.0, physicalStop12000->getY ());
+    CPPUNIT_ASSERT (env->fetchPlace (7000) == physicalStop12000->getPlace ());
+    
+
+    // lines
+    CPPUNIT_ASSERT_EQUAL (2, (int) env->getLines ().size ());
+    CPPUNIT_ASSERT (env->getLines ().contains (9000));
+    CPPUNIT_ASSERT (env->getLines ().contains (9001));
+
+    const Line* line9000 = env->getLines ().get (9000);
+    const Line* line9001 = env->getLines ().get (9001);
+
+    CPPUNIT_ASSERT_EQUAL (std::string ("L1"), line9000->getName ());
+    CPPUNIT_ASSERT (RGBColor ("blue") == line9000->getColor ());
+    CPPUNIT_ASSERT (transportNetwork2200 == line9000->getNetwork ());
 
 
     delete env;
