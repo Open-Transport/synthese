@@ -2,12 +2,14 @@
 
 #include "16_env_ls_xml/EnvironmentLS.h"
 
-#include "15_env/Environment.h"
 #include "15_env/Axis.h"
+#include "15_env/Calendar.h"
 #include "15_env/City.h"
 #include "15_env/ConnectionPlace.h"
-#include "15_env/Calendar.h"
+#include "15_env/Environment.h"
 #include "15_env/Line.h"
+#include "15_env/PlaceAlias.h"
+#include "15_env/PublicPlace.h"
 #include "15_env/TransportNetwork.h"
 
 #include "04_time/Hour.h"
@@ -97,7 +99,7 @@ EnvironmentLSTest::testLoadingEnvironment0 ()
     
 
 
-    // connectionPlaces
+    // connection places
     CPPUNIT_ASSERT_EQUAL (11, (int) env->getConnectionPlaces ().size ());
     CPPUNIT_ASSERT (env->getConnectionPlaces ().contains (7000));
     CPPUNIT_ASSERT (env->getConnectionPlaces ().contains (7001));
@@ -122,7 +124,25 @@ EnvironmentLSTest::testLoadingEnvironment0 ()
 
 
 
-    // publicPlaces
+    // public places
+    CPPUNIT_ASSERT_EQUAL (1, (int) env->getPublicPlaces ().size ());
+    CPPUNIT_ASSERT (env->getPublicPlaces ().contains (13000));
+    const PublicPlace* publicPlace13000 = env->getPublicPlaces ().get (13000);
+    CPPUNIT_ASSERT_EQUAL (std::string ("PP1"), publicPlace13000->getName ());
+    CPPUNIT_ASSERT_EQUAL (city6000, publicPlace13000->getCity ());
+
+
+    
+    // place aliases
+    CPPUNIT_ASSERT_EQUAL (1, (int) env->getPlaceAliases ().size ());
+    CPPUNIT_ASSERT (env->getPlaceAliases ().contains (11000));
+
+    const PlaceAlias* placeAlias11000 = env->getPlaceAliases ().get (11000);
+    CPPUNIT_ASSERT_EQUAL (std::string ("AP1"), placeAlias11000->getName ());
+    CPPUNIT_ASSERT_EQUAL (city6000, placeAlias11000->getCity ());
+    
+    const ConnectionPlace* connectionPlace7005 = env->getConnectionPlaces ().get (7005);
+    CPPUNIT_ASSERT_EQUAL ((const Place*) connectionPlace7005, placeAlias11000->getAliasedPlace ());
     
 
 
