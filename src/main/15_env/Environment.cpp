@@ -473,6 +473,26 @@ Environment::fetchService (const uid& id)
 
 
 
+const Vertex* 
+Environment::fetchVertex (const uid& id) const
+{
+    if (_physicalStops.contains (id)) return _physicalStops.get (id);
+    if (_addresses.contains (id)) return _addresses.get (id);
+    return 0;
+}
+
+
+
+Vertex* 
+Environment::fetchVertex (const uid& id)
+{
+    if (_physicalStops.contains (id)) return _physicalStops.get (id);
+    if (_addresses.contains (id)) return _addresses.get (id);
+    return 0;
+}
+
+
+
 
 
 

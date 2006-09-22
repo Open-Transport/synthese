@@ -8,6 +8,7 @@
     
     <cities>
         <city id="6000" name="Toulouse"/>
+        <city id="6001" name="Blagnac"/>
     </cities>
     
     <transportNetworks>
@@ -31,11 +32,13 @@
             <transferDelay fromVertexId="12004" toVertexId="12008" value="7"/>            
         </connectionPlace>
         
-        <connectionPlace id="7005" name="CP6"  cityId="6000" connectionType="line-line" />
+        <connectionPlace id="7005" name="CP6"  cityId="6000" connectionType="line-line" isCityMainConnection="true"/>
         <connectionPlace id="7006" name="CP7"  cityId="6000" connectionType="line-line" />
         <connectionPlace id="7007" name="CP8"  cityId="6000" connectionType="line-line" />
-        <connectionPlace id="7008" name="CP9"  cityId="6000" connectionType="line-line" />
+        <connectionPlace id="7008" name="CP9"  cityId="6000" connectionType="line-line" isCityMainConnection="true"/>
         <connectionPlace id="7009" name="CP10" cityId="6000" connectionType="line-line"/>
+
+        <connectionPlace id="7030" name="CP30" cityId="6001" connectionType="line-line"/>
         
     </connectionPlaces>
   

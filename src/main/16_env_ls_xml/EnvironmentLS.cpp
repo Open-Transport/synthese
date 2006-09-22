@@ -27,6 +27,8 @@
 #include "ScheduledServiceLS.h"
 #include "AlarmLS.h"
 #include "TransportNetworkLS.h"
+#include "PublicPlaceLS.h"
+#include "PlaceAliasLS.h"
 
 
 using namespace synthese::util::XmlToolkit;
@@ -46,6 +48,8 @@ const std::string EnvironmentLS::ENVIRONMENT_AXES_TAG ("axes");
 const std::string EnvironmentLS::ENVIRONMENT_LINES_TAG ("lines");
 const std::string EnvironmentLS::ENVIRONMENT_LINESTOPS_TAG ("lineStops");
 const std::string EnvironmentLS::ENVIRONMENT_CONNECTIONPLACES_TAG ("connectionPlaces");
+const std::string EnvironmentLS::ENVIRONMENT_PUBLICPLACES_TAG ("publicPlaces");
+const std::string EnvironmentLS::ENVIRONMENT_PLACEALIASES_TAG ("placeAliases");
 const std::string EnvironmentLS::ENVIRONMENT_PHYSICALSTOPS_TAG ("physicalStops");
 const std::string EnvironmentLS::ENVIRONMENT_ROADS_TAG ("roads");
 const std::string EnvironmentLS::ENVIRONMENT_ADDRESSES_TAG ("addresses");
@@ -151,6 +155,24 @@ EnvironmentLS::Load (XMLNode& node)
 	ConnectionPlaceLS::Load (connectionPlaceNode, *env);
     }
     
+    XMLNode publicPlacesNode = GetChildNode (node, ENVIRONMENT_PUBLICPLACES_TAG, 0);
+    int nbPublicPlaces = GetChildNodeCount (publicPlacesNode, PublicPlaceLS::PUBLICPLACE_TAG);
+    for (int i=0; i<nbPublicPlaces; ++i) 
+    {
+	XMLNode publicPlaceNode = GetChildNode (publicPlacesNode, PublicPlaceLS::PUBLICPLACE_TAG, i);
+	PublicPlaceLS::Load (publicPlaceNode, *env);
+    }
+    
+    XMLNode placeAliasesNode = GetChildNode (node, ENVIRONMENT_PLACEALIASES_TAG, 0);
+    int nbPlaceAliases = GetChildNodeCount (placeAliasesNode, PlaceAliasLS::PLACEALIAS_TAG);
+    for (int i=0; i<nbPlaceAliases; ++i) 
+    {
+	XMLNode placeAliasNode = GetChildNode (placeAliasesNode, PlaceAliasLS::PLACEALIAS_TAG, i);
+	PlaceAliasLS::Load (placeAliasNode, *env);
+    }
+
+
+
     XMLNode physicalStopsNode = GetChildNode (node, ENVIRONMENT_PHYSICALSTOPS_TAG, 0);
     int nbPhysicalStops = GetChildNodeCount (physicalStopsNode, PhysicalStopLS::PHYSICALSTOP_TAG);
     for (int i=0; i<nbPhysicalStops; ++i) 

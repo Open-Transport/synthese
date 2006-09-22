@@ -90,6 +90,8 @@ class EnvironmentLS
     static const std::string ENVIRONMENT_TRANSPORTNETWORKS_TAG;
     static const std::string ENVIRONMENT_AXES_TAG;
     static const std::string ENVIRONMENT_CONNECTIONPLACES_TAG;
+    static const std::string ENVIRONMENT_PUBLICPLACES_TAG;
+    static const std::string ENVIRONMENT_PLACEALIASES_TAG;
     static const std::string ENVIRONMENT_PHYSICALSTOPS_TAG;
     static const std::string ENVIRONMENT_LINES_TAG;
     static const std::string ENVIRONMENT_LINESTOPS_TAG;

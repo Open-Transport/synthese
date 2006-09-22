@@ -184,6 +184,10 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     const Service* fetchService (const uid& id) const;
     Service* fetchService (const uid& id);
 
+    const Vertex* fetchVertex (const uid& id) const;
+    Vertex* fetchVertex (const uid& id);
+
+
     
     std::vector<const City*> guessCity (const std::string& fuzzyName, int nbMatches = 10) const;
     
