@@ -1,20 +1,4 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "01_util", "src\main\01_util\01_util.vcproj", "{1D55EA50-6142-4DE9-80BF-79227326344A}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "00_tcp", "src\main\00_tcp\00_tcp.vcproj", "{B611F981-1353-4B13-A6FE-695034268D72}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04_time", "src\main\04_time\04_time.vcproj", "{BB6C0975-210C-4358-82B6-B39EC3EE1AD4}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "15_env", "src\main\15_env\15_env.vcproj", "{DFDC896C-0867-4704-896B-43FDE04E3AA8}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "33_route_planner", "src\main\33_route_planner\33_route_planner.vcproj", "{DCB40545-776B-4B6E-A050-D4A513880697}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -93,22 +77,6 @@ Global
 		Release = Release
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
-		{1D55EA50-6142-4DE9-80BF-79227326344A}.Debug.ActiveCfg = Debug|Win32
-		{1D55EA50-6142-4DE9-80BF-79227326344A}.Debug.Build.0 = Debug|Win32
-		{1D55EA50-6142-4DE9-80BF-79227326344A}.Release.ActiveCfg = Release|Win32
-		{1D55EA50-6142-4DE9-80BF-79227326344A}.Release.Build.0 = Release|Win32
-		{B611F981-1353-4B13-A6FE-695034268D72}.Debug.ActiveCfg = Debug|Win32
-		{B611F981-1353-4B13-A6FE-695034268D72}.Debug.Build.0 = Debug|Win32
-		{B611F981-1353-4B13-A6FE-695034268D72}.Release.ActiveCfg = Release|Win32
-		{B611F981-1353-4B13-A6FE-695034268D72}.Release.Build.0 = Release|Win32
-		{BB6C0975-210C-4358-82B6-B39EC3EE1AD4}.Debug.ActiveCfg = Debug|Win32
-		{BB6C0975-210C-4358-82B6-B39EC3EE1AD4}.Debug.Build.0 = Debug|Win32
-		{BB6C0975-210C-4358-82B6-B39EC3EE1AD4}.Release.ActiveCfg = Release|Win32
-		{BB6C0975-210C-4358-82B6-B39EC3EE1AD4}.Release.Build.0 = Release|Win32
-		{DFDC896C-0867-4704-896B-43FDE04E3AA8}.Debug.ActiveCfg = Debug|Win32
-		{DFDC896C-0867-4704-896B-43FDE04E3AA8}.Debug.Build.0 = Debug|Win32
-		{DFDC896C-0867-4704-896B-43FDE04E3AA8}.Release.ActiveCfg = Release|Win32
-		{DFDC896C-0867-4704-896B-43FDE04E3AA8}.Release.Build.0 = Release|Win32
 		{DCB40545-776B-4B6E-A050-D4A513880697}.Debug.ActiveCfg = Debug|Win32
 		{DCB40545-776B-4B6E-A050-D4A513880697}.Debug.Build.0 = Debug|Win32
 		{DCB40545-776B-4B6E-A050-D4A513880697}.Release.ActiveCfg = Release|Win32
