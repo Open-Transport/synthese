@@ -75,11 +75,6 @@ class cInterface_Objet_Element
         //@}
 };
 
-
-
-
-
-
+/** @} */
 
 #endif
-

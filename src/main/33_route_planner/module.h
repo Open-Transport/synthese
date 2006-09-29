@@ -1,5 +1,5 @@
 /** 33_route_planner module wide definitions
-	@file module.h
+	@file 33_route_planner/module.h
 */
 
 #ifndef SYNTHESE_ROUTE_PLANNER_MODULE_H

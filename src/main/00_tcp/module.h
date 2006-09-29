@@ -1,5 +1,5 @@
 /** 00_tcp module wide definitions
-	@file module.h
+	@file 00_tcp/module.h
 */
 
 #ifndef SYNTHESE_TCP_MODULE_H

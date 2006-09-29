@@ -3,6 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="01_util"
+	ProjectGUID="{266969BE-1E07-4C1B-ABFC-5193858D0B4B}"
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
@@ -95,9 +96,6 @@
 				RelativePath=".\LowerCaseFilter.h">
 			</File>
 			<File
-				RelativePath=".\module.h">
-			</File>
-			<File
 				RelativePath=".\PlainCharFilter.h">
 			</File>
 			<File
@@ -137,6 +135,9 @@
 				RelativePath=".\XmlParser.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\module.h">
+		</File>
 		<File
 			RelativePath=".\SConscript">
 		</File>

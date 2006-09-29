@@ -1,8 +1,5 @@
 #!/usr/bin/env python2.4
 
-##
-#	@defgroup m70 70 Client terminal
-#	@{
 
 import os,sys,socket,datetime
 
@@ -124,5 +121,3 @@ while 1:
 print 'Bye'
 
 
-##
-#	@}

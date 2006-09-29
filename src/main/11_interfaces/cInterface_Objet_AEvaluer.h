@@ -52,7 +52,7 @@ class cInterface_Objet_AEvaluer : public cInterface_Objet
 };
 
 
-
+/** @} */
 
 #endif
 

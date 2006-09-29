@@ -1,5 +1,5 @@
 /** 15_env module wide definitions
-	@file module.h
+	@file 15_env/module.h
 */
 
 #ifndef SYNTHESE_ENV_MODULE_H

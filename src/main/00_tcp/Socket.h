@@ -1,4 +1,4 @@
-/** @file cSocketServer.h
+/** @file Socket.h
     \author Christophe Romain
     \date 2005
     \brief Implémentation d'un serveur sur socket tcp ou udp
@@ -31,7 +31,7 @@
 #endif
 
 
-/** @defgroup m00 00 Serveur socket tcp ou udp
+/** @addtogroup m00
     @{
 */
 
@@ -117,5 +117,8 @@ public:
 
 }
 }
+
+/** @} */
+
 
 #endif

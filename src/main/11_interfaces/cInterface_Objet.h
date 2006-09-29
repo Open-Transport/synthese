@@ -70,6 +70,7 @@ class cInterface_Objet
 };
 
 
+/** @} */
 
 #endif
 

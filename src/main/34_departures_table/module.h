@@ -1,5 +1,5 @@
 /** 34_departures_table module wide definitions
-	@file module.h
+	@file 34_departures_table/module.h
 */
 
 #ifndef SYNTHESE_DEPARTURES_TABLE_MODULE_H

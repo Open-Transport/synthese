@@ -1,5 +1,5 @@
 /** 71_cgi_client module wide definitions
-	@file module.h
+	@file 71_cgi_client/module.h
 */
 
 #ifndef SYNTHESE_CGI_CLIENT_MODULE_H

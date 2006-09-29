@@ -1,5 +1,5 @@
 /** 11_interface module wide definitions
-	@file module.h
+	@file 11_interfaces/module.h
 */
 
 #ifndef SYNTHESE_INTERFACE_MODULE_H

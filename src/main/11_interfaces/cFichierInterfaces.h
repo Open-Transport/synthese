@@ -105,8 +105,6 @@
 
 
 
-/** Fichier décrivant des interfaces
-*/
 class cFichierInterfaces : public cFichier
 {
 public:

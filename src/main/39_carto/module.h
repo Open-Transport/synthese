@@ -1,5 +1,5 @@
 /** 39_carto module wide definitions
-	@file module.h
+	@file 39_carto/module.h
 */
 
 #ifndef SYNTHESE_CARTO_MODULE_H

@@ -6,10 +6,6 @@
 #include "00_tcp/Socket.h"
 #include "module.h"
 
-/** @addtogroup m71
-	@{
-*/
-
 using std::cout;
 using std::endl;
 
@@ -20,6 +16,10 @@ namespace synthese
     {
     }
 }
+
+/** @addtogroup m71
+	@{
+*/
 
 #define MAX_QUERY_SIZE 4096
 
@@ -143,7 +143,5 @@ int main(int argc, char **argv)
     socket.closeSocket();
     exit(0);
 }
-
-
 
 /** @} */

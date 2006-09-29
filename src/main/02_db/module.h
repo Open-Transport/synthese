@@ -1,5 +1,5 @@
 /** 02_db module wide definitions
-	@file module.h
+	@file 02_db\module.h
 */
 
 #ifndef SYNTHESE_DB_MODULE_H

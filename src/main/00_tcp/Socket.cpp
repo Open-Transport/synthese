@@ -1,7 +1,6 @@
-/** @file cSocket.cpp
+/** @file Socket.cpp
     \author Christophe Romain
     \date 2005
-    \brief Impl�mentation d'un serveur sur socket tcp ou udp
 */
 
 #include "Socket.h"

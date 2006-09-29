@@ -1,5 +1,5 @@
 /** 01_util module wide definitions
-	@file module.h
+	@file 01_util/module.h
 */
 
 #ifndef SYNTHESE_UTIL_MODULE_H

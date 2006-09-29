@@ -35,8 +35,6 @@
 
 
 
-/*!	\brief Fichier décrivant des tableaux de départs
-*/
 class cFichierTbDep : public cFichier
 {
 public:

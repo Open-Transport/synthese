@@ -1,5 +1,5 @@
 /** 04_time module wide definitions
-  @file module.h
+  @file 04_time/module.h
 */
 
 #ifndef SYNTHESE_TIME_MODULE_H

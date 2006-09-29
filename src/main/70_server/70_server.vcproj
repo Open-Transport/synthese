@@ -67,9 +67,6 @@
 				RelativePath=".\ServerConfigTableSync.cpp">
 			</File>
 			<File
-				RelativePath=".\ServerThread.cpp">
-			</File>
-			<File
 				RelativePath=".\ServerThreadExec.cpp">
 			</File>
 		</Filter>

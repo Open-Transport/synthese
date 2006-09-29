@@ -1,5 +1,5 @@
 /** 31_resa module wide definitions
-	@file module.h
+	@file 31_resa/module.h
 */
 
 #ifndef SYNTHESE_RESA_MODULE_H

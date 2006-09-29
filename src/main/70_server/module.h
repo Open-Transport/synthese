@@ -1,5 +1,5 @@
 /** 70_server module wide definitions
-	@file module.h
+	@file 70_server/module.h
 */
 
 #ifndef SYNTHESE_SERVER_MODULE_H

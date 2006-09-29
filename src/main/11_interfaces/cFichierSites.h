@@ -30,9 +30,6 @@
 //@}
 
 
-
-/*!	\brief Fichier décrivant des sites clients
-*/
 class cFichierSites : public cFichier
 {
 public:

@@ -1,5 +1,5 @@
 /** 35_timetables module wide definitions
-	@file module.h
+	@file 35_timetables/module.h
 */
 
 #ifndef SYNTHESE_TIMETABLES_MODULE_H

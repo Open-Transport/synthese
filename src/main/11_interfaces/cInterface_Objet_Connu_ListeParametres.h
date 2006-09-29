@@ -41,14 +41,6 @@ class cInterface_Objet_Connu_ListeParametres : public cInterface_Objet
 
 };
 
-
-
-
-
-
-
-
-
+/** @} */
 
 #endif
-

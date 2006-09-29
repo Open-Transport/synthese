@@ -10,7 +10,7 @@
 #include "cTexte.h"
 #include <fstream>
 
-/** @defgroup m11 11 Lecture des fichiers de données
+/** @addtogroup m11
 	@{
 */
 
