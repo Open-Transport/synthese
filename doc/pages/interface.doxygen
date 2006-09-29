@@ -285,17 +285,13 @@ chaque inclusion fasse appel à un élément déjà défini. Dans le cas d’une
 tentative d’inclusion d’un élément non défini, l’inclusion est ignorée (voir
 erreur 04002)</b>
 
-<p class=MsoNormal>Pour les deux dernières fonctions, des paramètres sont
+Pour les deux dernières fonctions, des paramètres sont
 passés lors de l’inclusion pour personnaliser la sortie. Ces paramètres sont fournis en tant que chaîne de caractères, séparés par des espaces
 et sous la forme P## pour faire référence à un paramètre de l’objet demandant
 l’inclusion, ou bien {##} pour fournir directement leur contenu. Une fonction
 spéciale lit le nième paramètre depuis une telle chaîne de caractères, et
-fonctionne selon le même principe que les quatre précédentes&nbsp;:</p>
-
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>ListeParametres(char*).</p>
-
+fonctionne selon le même principe que les quatre précédentes&nbsp;:
+	- ListeParametres(char*).
 
 
 
