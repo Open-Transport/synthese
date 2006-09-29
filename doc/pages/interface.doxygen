@@ -200,173 +200,90 @@ Les descriptions des objets de sortie sont codées par listes chaînées d'éléments
 
 Les types d'éléments sont différenciés pour permettre leur conception à deux stades différents&nbsp;: les éléments statiques sont entièrement définis lors de la création de l'interface (charte graphique), alors que les éléments dynamiques dépendent de données (résultats de calculs) et sont préparés lors de la création de l'interface, pour être finalisés lors de l'exécution.
 
-<p class=MsoNormal>Les objets statiques sont codés directement dans les
-éléments d’interface, par le texte à envoyer au client. Les objets dynamiques
-sont de deux types&nbsp;:</p>
+Les objets statiques sont codés directement dans les éléments d’interface, par le texte à envoyer au client. Les objets dynamiques sont de deux types&nbsp;:
+	- Les paramètres dynamiques, fournis lors de l’exécution,
+	- Les objets dynamiques par défaut, définis dans le code source dans la fonction <b>AfficheObjetDynamique</b>.
 
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Les paramètres dynamiques, fournis lors de l’exécution,</p>
+Pour l’affichage, les objets disposent de tous les paramètres fournis, ainsi que d’un pointeur vers l’environnement, donnant par les index l’accès à tous les objets.
 
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Les objets dynamiques par défaut, définis dans le code source
-dans la fonction <b>AfficheObjetDynamique</b>.</p>
+<h2>Description des classes</h2>
 
-<p class=MsoNormal>&nbsp;</p>
+<h3>Classe cInterface</h3>
 
-<p class=MsoNormal>Pour l’affichage, les objets disposent de tous les
-paramètres fournis, ainsi que d’un pointeur vers l’environnement, donnant par
-les index l’accès à tous les objets.</p>
+La classe cInterface est donc constituée de&nbsp;:
+	- <b>ExtensionFichier&nbsp;</b>: extension du fichier de sortie (texte)
+	- <b>Elements&nbsp;</b>: Tableau des premiers éléments de la liste chaînée, de longueur égale au nombre d’éléments fixé par convention dans Parametres.h.
 
-<h2><a name="_Toc36664775"></a><a name="_Toc31714094"></a><a name="_Toc31713828"></a><a
-name="_Toc31713562"></a><a name="_Toc31713296"></a><a name="_Toc31713029"></a><a
-name="_Toc59936208"><span style='font-family:Symbol;font-weight:normal'><img
-width=13 height=13 src="interface.doxygen_fichiers/image002.gif" alt="*"><span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Description des classes</a></h2>
+Le nombre d’éléments est stocké dans la constante INTERFACESNOMBREELEMENTS à mettre à jour à chaque ajout d’élément.
 
-<h3><a name="_Toc59936209"><span style='font-family:Symbol;font-weight:normal;
-font-style:normal'><img width=15 height=15
-src="interface.doxygen_fichiers/image003.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Classe cInterface</a></h3>
+<h3>Classe cElementInterface</h3>
 
-<p class=MsoNormal>La classe cInterface est donc constituée de&nbsp;:</p>
-
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><b>ExtensionFichier&nbsp;</b>: extension du fichier de sortie
-(texte)</p>
-
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><b>Elements&nbsp;</b>: Tableau des premiers éléments de la liste
-chaînée, de longueur égale au nombre d’éléments fixé par convention dans
-Parametres.h.</p>
-
-<p class=MsoNormal>Le nombre d’éléments est stocké dans la constante INTERFACESNOMBREELEMENTS à mettre à jour à chaque ajout d’élément.</p>
-
-<h3><a name="_Toc59936210"></a><a name="_Toc36664776"></a><a name="_Toc31714095"></a><a
-name="_Toc31713829"></a><a name="_Toc31713563"></a><a name="_Toc31713297"></a><a
-name="_Toc31713030"><span style='font-family:Symbol;font-weight:normal;
-font-style:normal'><img width=15 height=15
-src="interface.doxygen_fichiers/image003.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Classe cElementInterface</a></h3>
-
-<p class=MsoNormal>Les éléments d’interface sont de plusieurs types. Un
+Les éléments d’interface sont de plusieurs types. Un
 polymorphisme permet de masquer cette diversité. La classe cElementInterface ne
 contient à la base que le pointeur <b>Suivant </b>qui permet le chaînage, et
 une méthode virtuelle <b>Affiche(Flux de sortie, Paramètres)</b> permettant
-dans tous les cas l’affichage.</p>
+dans tous les cas l’affichage.
 
-<p class=MsoNormal>La méthode ElementRang permet l’accès au nième élément d’une liste cElementInterface.</p>
+La méthode ElementRang permet l’accès au nième élément d’une liste cElementInterface.
 
-<h3><a name="_Toc59936211"></a><a name="_Toc36664777"></a><a name="_Toc31714096"></a><a
-name="_Toc31713830"></a><a name="_Toc31713564"></a><a name="_Toc31713298"></a><a
-name="_Toc31713031"><span style='font-family:Symbol;font-weight:normal;
-font-style:normal'><img width=15 height=15
-src="interface.doxygen_fichiers/image003.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Classe dérivée cElementInterfaceStatique</a></h3>
+<h3>Classe dérivée cElementInterfaceStatique</h3>
 
-<p class=MsoNormal>La classe cElementInterfaceStatique dérivée de
-cElementInterface est la plus simple&nbsp;: elle contient le texte à afficher.</p>
+La classe cElementInterfaceStatique dérivée de cElementInterface est la plus simple&nbsp;: elle contient le texte à afficher.
 
-<p class=MsoNormal>La classe cElementInterfaceStatique est donc constituée
-de&nbsp;:</p>
+La classe cElementInterfaceStatique est donc constituée de&nbsp;:
+	- Texte
 
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Texte</p>
+La méthode <b>Affiche</b> consiste en le simple envoi du
+texte au flux de sortie, indépendamment des paramètres fournis.
 
-<p class=MsoNormal>La méthode <b>Affiche</b> consiste en le simple envoi du
-texte au flux de sortie, indépendamment des paramètres fournis.</p>
-
-<h3><a name="_Toc59936212"></a><a name="_Toc36664778"></a><a name="_Toc31714097"></a><a
-name="_Toc31713831"></a><a name="_Toc31713565"></a><a name="_Toc31713299"></a><a
-name="_Toc31713032"><span style='font-family:Symbol;font-weight:normal;
-font-style:normal'><img width=15 height=15
-src="interface.doxygen_fichiers/image003.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Classe dérivée cElementInterfaceParametreDynamique</a></h3>
+<h3>Classe dérivée cElementInterfaceParametreDynamique</h3>
 
 <p class=MsoNormal>La classe cElementInterfaceParametreDynamique dérivée de
-cElementInterface contient un numéro de paramètre à lire lors de l’exécution.</p>
+cElementInterface contient un numéro de paramètre à lire lors de l’exécution.
 
-<p class=MsoNormal>La classe cElementInterfaceParametreDynamique est donc
-constituée de&nbsp;:</p>
+La classe cElementInterfaceParametreDynamique est donc constituée de&nbsp;:
+	- Code paramètre
 
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Code paramètre</p>
-
-<p class=MsoNormal>La méthode <b>Affiche</b> consiste en l’appel de cette
+La méthode <b>Affiche</b> consiste en l’appel de cette
 dernière sur le paramètre fourni en entrée de rang <b>Code paramètre</b>. Ce
-paramètre doit, lors de l’exécution, être un cElementInterfaceStatique.</p>
+paramètre doit, lors de l’exécution, être un cElementInterfaceStatique.
 
-<h3><a name="_Toc59936213"></a><a name="_Toc36664779"></a><a name="_Toc31714098"></a><a
-name="_Toc31713832"></a><a name="_Toc31713566"></a><a name="_Toc31713300"></a><a
-name="_Toc31713033"><span style='font-family:Symbol;font-weight:normal;
-font-style:normal'><img width=15 height=15
-src="interface.doxygen_fichiers/image003.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Classe dérivée cElementInterfaceObjetDynamique</a></h3>
+<h3>Classe dérivée cElementInterfaceObjetDynamique</h3>
 
-<p class=MsoNormal>La classe cElementInterfaceObjetDynamique dérivée de
+La classe cElementInterfaceObjetDynamique dérivée de
 cElementInterface contient un numéro d’objet à construire lors de l’exécution,
-à partir de paramètres statiques ou dynamiques.</p>
+à partir de paramètres statiques ou dynamiques.
 
-<p class=MsoNormal>La classe cElementInterfaceObjetDynamique est donc
-constituée de&nbsp;:</p>
-
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><b>Code objet</b> qui respecte la nomenclature fournie plus loin</p>
-
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><b>Parametres</b> qui contient la définition des paramètres
+La classe cElementInterfaceObjetDynamique est donc constituée de&nbsp;:
+	- <b>Code objet</b> qui respecte la nomenclature fournie plus loin
+	- <b>Parametres</b> qui contient la définition des paramètres
 d’entrée de l’objet, définis plus loin. Ces paramètres sont de type
 cElementInterface et peuvent être soit des éléments statiques, soit des
-paramètres dynamiques (qui seront donc lus au moment de l’exécution de la méthode Affiche)</p>
+paramètres dynamiques (qui seront donc lus au moment de l’exécution de la méthode Affiche)
 
-<h2><a name="_Toc59936214"></a><a name="_Toc36664780"></a><a name="_Toc31714099"></a><a
-name="_Toc31713833"></a><a name="_Toc31713567"></a><a name="_Toc31713301"></a><a
-name="_Toc31713034"><span style='font-family:Symbol;font-weight:normal'><img
-width=13 height=13 src="interface.doxygen_fichiers/image002.gif" alt="*"><span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Construction des objets</a></h2>
+<h2>Construction des objets</h2>
 
-<p class=MsoNormal>La construction d’une interface se fait par la juxtaposition
+La construction d’une interface se fait par la juxtaposition
 des cElementInterface au fur et à mesure de la lecture des données mémoire
 morte, à l’aide d’une fonction par type de construction, gérant le chaînage, et
-retournant un pointeur vers le dernier élément créé&nbsp;:</p>
-
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><b>Ajoute(char*)&nbsp;</b>: chargée de l’ajout d’un objet
-statique simple (texte)</p>
-
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><b>Ajoute(cElementInterface* Paramètres,
+retournant un pointeur vers le dernier élément créé&nbsp;:
+	- <b>Ajoute(char*)&nbsp;</b>: chargée de l’ajout d’un objet
+statique simple (texte)
+	- Ajoute(cElementInterface* Paramètres,
 tNumeroParametreInterface NumeroParametre)&nbsp;</b>: chargée de l’ajout d’un
 paramètre. L’élément créé est dynamique si le paramètre indiqué par
-NumeroParamètre l’est, et est statique sinon.</p>
-
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><b>AjouteObjet(Code de l’objet)&nbsp;</b>: chargée de l’ajout
+NumeroParamètre l’est, et est statique sinon.
+	- <b>AjouteObjet(Code de l’objet)&nbsp;</b>: chargée de l’ajout
 d’un objet. La création de la sortie se fait au moment de la lecture de
-l’interface et non de son chargement. </p>
+l’interface et non de son chargement.
+	- <b>AjouteAutreElement(cElementInterface*</b>)&nbsp;: chargée de
+l’inclusion d’un objet de sortie <u>déjà défini</u>.
 
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><b>AjouteAutreElement(cElementInterface*</b>)&nbsp;: chargée de
-l’inclusion d’un objet de sortie <u>déjà défini</u>.</p>
-
-<p class=MsoNormal><b>NB&nbsp;: La déclaration des éléments se fait dans un
+<b>NB&nbsp;: La déclaration des éléments se fait dans un
 ordre quelconque. De ce fait, ordonner les déclarations de manière à ce que
 chaque inclusion fasse appel à un élément déjà défini. Dans le cas d’une
 tentative d’inclusion d’un élément non défini, l’inclusion est ignorée (voir
-erreur 04002)</b></p>
+erreur 04002)</b>
 
 <p class=MsoNormal>Pour les deux dernières fonctions, des paramètres sont
 passés lors de l’inclusion pour personnaliser la sortie. Ces paramètres sont fournis en tant que chaîne de caractères, séparés par des espaces

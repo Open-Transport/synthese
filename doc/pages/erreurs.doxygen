@@ -95,10 +95,7 @@ Les tableaux reprennent l’ensemble des erreurs et alertes produits par SYNTHESE 
  </tr>
 </table>
 
-<h2><a name="_Toc36664827"><span style='font-family:Symbol;font-weight:normal'><img
-width=16 height=16 src="module.doxygen_fichiers/image002.gif" alt="*"><span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>02 Compilation du fichier des points d’arrêt</a></h2>
+<h2>02 Compilation du fichier des points d’arrêt</h2>
 
 <table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
  style='border-collapse:collapse;border:none'>
@@ -316,11 +313,7 @@ style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&
  </tr>
 </table>
 
-<h2><a name="_Toc36664828"></a><a name="_Toc31714139"></a><a name="_Toc31713873"></a><a
-name="_Toc31713607"></a><a name="_Toc31713341"></a><a name="_Toc31713074"><span
-style='font-family:Symbol;font-weight:normal'><img width=16 height=16
-src="module.doxygen_fichiers/image002.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>03 Compilation des fichiers des horaires</a></h2>
+<h2>03 Compilation des fichiers des horaires</h2>
 
 <table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
  style='border-collapse:collapse;border:none'>
@@ -580,11 +573,7 @@ src="module.doxygen_fichiers/image002.gif" alt="*"><span style='font:7.0pt "Time
  </tr>
 </table>
 
-<h2><a name="_Toc36664829"></a><a name="_Toc31714140"></a><a name="_Toc31713874"></a><a
-name="_Toc31713608"></a><a name="_Toc31713342"></a><a name="_Toc31713075"><span
-style='font-family:Symbol;font-weight:normal'><img width=16 height=16
-src="module.doxygen_fichiers/image002.gif" alt="*"><span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>04 Compilation des interfaces</a></h2>
+<h2>04 Compilation des interfaces</h2>
 
 <table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
  style='border-collapse:collapse;border:none'>
@@ -675,10 +664,7 @@ src="module.doxygen_fichiers/image002.gif" alt="*"><span style='font:7.0pt "Time
  </tr>
 </table>
 
-<h2><a name="_Toc36664830"><span style='font-family:Symbol;font-weight:normal'><img
-width=16 height=16 src="module.doxygen_fichiers/image002.gif" alt="*"><span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>05 Compilation du fichier du matériel roulant</a></h2>
+<h2>05 Compilation du fichier du matériel roulant</h2>
 
 <table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
  style='border-collapse:collapse;border:none'>
@@ -747,10 +733,7 @@ style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&
  </tr>
 </table>
 
-<h2><a name="_Toc36664831"><span style='font-family:Symbol;font-weight:normal'><img
-width=16 height=16 src="module.doxygen_fichiers/image002.gif" alt="*"><span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>06 Compilation du fichier des jours de circulation</a></h2>
+<h2>06 Compilation du fichier des jours de circulation</h2>
 
 <table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
  style='border-collapse:collapse;border:none'>
@@ -969,10 +952,7 @@ style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&
  </tr>
 </table>
 
-<h2><a name="_Toc36664832"><span style='font-family:Symbol;font-weight:normal'><img
-width=16 height=16 src="module.doxygen_fichiers/image002.gif" alt="*"><span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>07 Compilation du fichier des modalités de réservation</a></h2>
+<h2>07 Compilation du fichier des modalités de réservation</h2>
 
 <table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
  style='border-collapse:collapse;border:none'>

@@ -1,6 +1,4 @@
-/**
-
-@page data Base de données SYNTHESE
+/** @page data Base de données SYNTHESE
 
 Les données devant être entrées dans le serveur sont les suivantes :
  - fonds de carte bitmap

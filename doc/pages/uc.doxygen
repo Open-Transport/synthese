@@ -180,6 +180,7 @@ Cette fonctionnalité consiste en la détermination de l'ensemble des points d'arr
  - limites de communes : permet de déterminer la commune du point géographique, ainsi que le parcours le plus court pour pénétrer aux communes proches dans le but d'y trouver un éventuel arrêt tout lieux.
 
 @image html uc35-source.png
+@image latex uc35-source.png "" width=14cm
 
 Le processus complet est le suivant, avec application sur l'exemple ci-dessus :
 	- Etape 1 : Lecture de la commune du point géographique (module @ref m03), et extraction du « Tous lieux » de la commune s'il existe :
@@ -210,6 +211,7 @@ L'objet final construit est donc le suivant, incluant les descriptions de trajet
 	</table></center>
 
 @image html uc35-resultat.png
+@image latex uc35-resultat.png "" width=14cm
 
 Remarques :
 Le point d'arrêt PA 3 a été ignoré car il n'est pas accessible malgré sa proximité à vol d'oiseau
