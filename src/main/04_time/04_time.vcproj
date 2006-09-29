@@ -87,9 +87,6 @@
 				RelativePath=".\HourPeriod.h">
 			</File>
 			<File
-				RelativePath=".\module.h">
-			</File>
-			<File
 				RelativePath=".\Month.h">
 			</File>
 			<File
@@ -99,6 +96,9 @@
 				RelativePath=".\Year.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\module.h">
+		</File>
 		<File
 			RelativePath=".\SConscript">
 		</File>

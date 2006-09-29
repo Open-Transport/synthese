@@ -1,3 +1,7 @@
+/** CGI Client main implementation.
+	@file 71_cgi_client/main.cpp
+	@ingroup m71
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,17 +21,13 @@ namespace synthese
     }
 }
 
-/** @addtogroup m71
-	@{
-*/
-
 #define MAX_QUERY_SIZE 4096
 
 #ifdef UNIX
-int main(int argc, char **argv)
+	int main(int argc, char **argv)
 #endif
 #ifdef WIN32
-#include <io.h>
+	#include <io.h>
     int main(int argc, TCHAR* argv[], TCHAR* envp[])
 #endif
 {
@@ -143,5 +143,3 @@ int main(int argc, char **argv)
     socket.closeSocket();
     exit(0);
 }
-
-/** @} */

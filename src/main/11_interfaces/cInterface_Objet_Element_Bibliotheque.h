@@ -11,15 +11,15 @@
  @{
 */
 
-//! \name Liste des objets d'interface disponibles dans la biblioth�que (Commande O)
+//! \name Liste des objets d'interface disponibles dans la bibliothèque (Commande O)
 //@{
 
 
-/** Nom de lieu / nom d'arr�t
+/** Nom de lieu / nom d'arrêt
  @code O03 @endcode
- @param 0 Num�ro de la d�signation
- @param 1 Num�ro de l'arr�t
- @return Affichage de la d�signation sp�cidi�es
+ @param 0 Numéro de la désignation
+ @param 1 Numéro de l'arrêt
+ @return Affichage de la désignation spécifiées
 */
 #define ELEMENTINTERFACELieuArret 3
 
@@ -27,56 +27,59 @@
 /** Fiche horaire
  @code O04 @endcode
  @param Objet cTrajets * : Liste des trajets
- @return Fiche horaire repr�sentant la liste des trajets fournie
+ @return Fiche horaire représentant la liste des trajets fournie
 */
 #define ELEMENTINTERFACEFicheHoraire       4
 
 
-/** Mini tableau de d�parts
+/** Mini tableau de départs
  @code O05 @endcode
- @param Objet cDescriptionPassage * : Liste cha�n�e de d�parts ou d�arriv�es � afficher
- @return Mini tableau de d�parts
+ @param Objet cDescriptionPassage * : Liste chaînée de départs ou d'arrivées à afficher
+ @return Mini tableau de départs
  @deprecated
 */
 #define ELEMENTINTERFACEMiniTbDepGare        5
 
 
-/** Liste des lignes utilis�es pour chaque trajet d'une liste
+/** Liste des lignes utilisées pour chaque trajet d'une liste.
  @code O06 @endcode
  @param Objet cTrajets *  : Liste des trajets
- @return Liste des lignes utilis�es pour chaque trajet d'une liste
+ @return Liste des lignes utilisées pour chaque trajet d'une liste
 */
 #define EI_OBJETDYNAMIQUE_ListeLignesTrajets     6
 
 
-/** Liste des lignes utilis�es sur un trajet
+/** Liste des lignes utilisées sur un trajet.
  @code O07 @endcode
- @param Objet cTrajet * : Trajet � d�crire
- @param 0 Affichage des lignes � pied
- @param 1 HTML en d�but de ligne (conseill� tr)
- @param 2 HTML en fin de ligne (conseill� /tr)
+ @param Objet cTrajet * : Trajet à décrire
+ @param 0 Affichage des lignes à pied
+ @param 1 HTML en début de ligne (conseillé tr)
+ @param 2 HTML en fin de ligne (conseillé /tr)
  @param 3 Largeur en pixels de la case de lignes
  @param 4 Hauteur en pixels de la case de lignes
- @return Liste des lignes utilis�es sur le trajet
+ @return Liste des lignes utilisées sur le trajet
 */
 #define EI_OBJETDYNAMIQUE_ListeLignesTrajet      7
 
 
-/** Nom de p�riode de la journ�e
+/** Nom de période de la journée
  @code O09 @endcode
- @param 0 Num�ro de la p�riode � afficher
- @return Nom de la p�riode d�sign�e
+ @param 0 Numéro de la période à afficher
+ @return Nom de la période désignée
 */
 #define EI_BIBLIOTHEQUE_PERIODE         9
 
 
 /** Liens vers photos de quais
  @code O12 @endcode
- @param Objet LogicalPlace * Point d�arr�t
- @param 0 Texte du d�but du lien
- @param 1 Texte du lien si pas de nom de quai
- @param 2 Texte de fin du lien
- @return Liens vers photos de quais
+ 
+ Paramètres : 
+	- Objet LogicalPlace * Point d'arrêt
+	- 0 Texte du début du lien
+	- 1 Texte du lien si pas de nom de quai
+	- 2 Texte de fin du lien
+ Retour :
+	- Liens vers photos de quais
  @deprecated A remettre aux normes
 */
 #define ELEMENTINTERFACELienPhotosArretPhysiques 12
@@ -119,7 +122,7 @@
 
 /** Div de photos
  @code O18 @endcode
- @param Objet LogicalPlace * : Point d'arr�t
+ @param Objet LogicalPlace * : Logical Stop
  @return Div de photos
  @deprecated A remettre aux normes
 */
@@ -128,7 +131,7 @@
 
 /** Div de services
  @code O19 @endcode
- @param Objet LogicalPlace * : Point d'arr�t
+ @param Objet LogicalPlace * : Logical Stop
  @return Div de services
  @deprecated A remettre aux normes
 */
@@ -137,8 +140,8 @@
 
 /** Scripts de fiche arr�t
  @code O20 @endcode
- @param Objet LogicalPlace * : Point d'arr�t
- @return Scripts de fiche arr�t
+ @param Objet LogicalPlace * : Logical Stop
+ @return Scripts de fiche arrêt
  @deprecated A remettre aux normes
 */
 #define ELEMENTINTERFACEFicheArretScript 20
@@ -146,35 +149,35 @@
 
 /** Date
  @code O22 @endcode
- @param 0 Date � afficher
+ @param 0 Date to display
  @return Affichage de la date
 */
 #define EI_BIBLIOTHEQUE_Date         22
 
 
-/** Liste de communes
+/** List of cities.
  @code O23 @endcode
- @param 0 Message d�erreur si aucune commune trouv�e
- @param 1 Texte d�ouverture, plac� avant le lien
- @param 2 Texte de fermeture, plac� apr�s le lien
- @param 3 Nombre de communes r�pondues
- @param 4 Texte entr�
- @param 5 Texte � �crire si ligne vide
+ @param 0 Erreor message if no city founded
+ @param 1 Opening text : will be putted before the link
+ @param 2 Closing text : will be putted after the link
+ @param 3 Number of answered cities
+ @param 4 Input text
+ @param 5 Text to write if empty line
  @return Liste de communes
 */
 #define ELEMENTINTERFACEListeCommunes       23
 
 
-/** Liste d'arr�ts
+/** List of stops.
  @code 024 @endcode
- @param 0 Message d�erreur si aucun arr�t trouv�
- @param 1 Texte d�ouverture, plac� avant le lien
- @param 2 Texte de fermeture, plac� apr�s le lien
- @param 3 Nombre d�arr�ts r�pondus
- @param 4 Num�ro de la commune
- @param 5 Texte entr�
- @param 6 Texte � �crire si ligne vide
- @return Liste d'arr�ts
+ @param 0 Error message if no stop founded
+ @param 1 Opening text : will be putted before the link
+ @param 2 Closing text : will be putted after the link
+ @param 3 Number of answered stops
+ @param 4 ID of the city
+ @param 5 Input text
+ @param 6 Text to write if empty line
+ @return List of stops
 */
 #define ELEMENTINTERFACEListeArrets      24
 
@@ -206,11 +209,11 @@
 #define ELEMENTINTERFACETbDepGare 26
 
 
-/** Tableau de d�part
+/** Departure table.
  @code O27 @endcode
- @param Objet cDescriptionPassage * : Liste des d�parts
- @return Tableau de d�parts
- @deprecated Utilit� douteuse (objet 26 avec autre interface suffit)
+ @param Objet cDescriptionPassage * : Departures list
+ @return Departure table.
+ @deprecated Utilité douteuse (objet 26 avec autre interface suffit)
 */
 #define ELEMENTINTERFACETbDep 27
 

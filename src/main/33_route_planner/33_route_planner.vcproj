@@ -75,12 +75,12 @@
 				RelativePath=".\JourneyLegComparator.h">
 			</File>
 			<File
-				RelativePath=".\module.h">
-			</File>
-			<File
 				RelativePath=".\RoutePlanner.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\module.h">
+		</File>
 		<File
 			RelativePath=".\SConscript">
 		</File>

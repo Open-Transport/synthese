@@ -78,9 +78,6 @@
 				RelativePath=".\CleanerThreadExec.h">
 			</File>
 			<File
-				RelativePath=".\module.h">
-			</File>
-			<File
 				RelativePath=".\Request.h">
 			</File>
 			<File
@@ -105,6 +102,9 @@
 				RelativePath=".\ServerThreadExec.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\module.h">
+		</File>
 		<File
 			RelativePath=".\SConscript">
 		</File>

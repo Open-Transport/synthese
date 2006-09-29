@@ -201,12 +201,12 @@
 				RelativePath=".\Interface.h">
 			</File>
 			<File
-				RelativePath=".\module.h">
-			</File>
-			<File
 				RelativePath=".\Parametres.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\module.h">
+		</File>
 		<File
 			RelativePath=".\SConscript">
 		</File>

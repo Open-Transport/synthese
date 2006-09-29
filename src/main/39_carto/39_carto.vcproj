@@ -138,9 +138,6 @@
 				RelativePath=".\MapInfoRenderer.h">
 			</File>
 			<File
-				RelativePath=".\module.h">
-			</File>
-			<File
 				RelativePath=".\PostscriptCanvas.h">
 			</File>
 			<File
@@ -159,6 +156,9 @@
 				RelativePath=".\TileGrid.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\module.h">
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
