@@ -74,6 +74,13 @@
 			<File
 				RelativePath=".\pages\uc.doxygen">
 			</File>
+			<Filter
+				Name="customer_specs"
+				Filter="">
+				<File
+					RelativePath=".\customer_specs\sai_tisseo.doxygen">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="html"
