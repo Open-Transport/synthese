@@ -1,0 +1,67 @@
+/** @page customer_spec_sai_tisseo Spécification SAI SYNTHESE Tisséo
+
+	@section csst_presentation Présentation
+	
+	@subsection csst_concepts Concepts
+	
+	Voir les concepts suivants :
+		- @ref defRightsUserProfile
+		- @ref defAdminlog
+		- @ref DisplayTerminal
+	
+	
+	
+	@section csst_surveillance Surveillance des afficheurs
+	
+	@section csst_ihm Interface Homme Machine (IHM)
+	
+	L'ensemble des écrans de gestion du SAI SYNTHESE est centralisé dans une "console d'administration", qui donne accès à 5 rubriques :
+		- @ref csst_ihm_messages
+		- @ref csst_ihm_users
+		- @ref csst_ihm_places
+		- @ref csst_ihm_display
+		- @ref csst_ihm_journal
+	
+	@subsection csst_ihm_users Gestion des utilisateurs
+	
+	@subsubsection csst_ihm_users_users Liste et recherche des utilisateurs
+	
+	@subsubsection csst_ihm_users_profiles Liste et édition des profils d'habilitations
+	
+	@copydoc synthese::interfaces::ProfilesAdmin
+	
+	@subsection csst_ihm_places Gestion des emplacements
+	
+		-# Liste et recherche de lieux logiques
+			-# DisplayLocationsAdmin : Gestion des lieux d'affichage, avec lien vers les afficheurs positionnés sur ce lieu
+		
+	@subsection csst_ihm_display Gestion des afficheurs
+	
+	La gestion des afficheurs consiste en deux catégories d'action :
+		- le paramétrage du système pour prendre en charge les matériels installés
+		- la supervision des paramètres de fonctionnement :
+			- surveillance des dispositifs d'affichage
+			- surveillance des données
+	
+	La gestion des afficheurs s'opère via la console d'administration de SYNTHESE, dans la section "tableaux de départs".
+	
+	L'arborescence de la section "tableau de départs" est la suivante :
+		-# @ref csst_ihm_display_DisplayTypesAdmin
+		-# @ref csst_ihm_display_DisplaySearchAdmin : Recherche et liste d'afficheurs, permet la création d'un afficheur
+			-# DisplayAdmin : Paramétrage d'un afficheur (existant ou créé)
+			-# DisplayMaintenanceAdmin : Supervision d'un afficheur
+		-# DisplayDataControlAdmin : Supervision des données : contrôles de cohérence
+	
+	@subsubsection csst_ihm_display_DisplayTypesAdmin Gestion des types d'affichage
+
+	@copydoc DisplayTypesAdmin	
+	
+	@subsubsection csst_ihm_display_DisplaySearchAdmin Gestion du parc matériel d'afficheurs
+	
+	@copydoc DisplaySearchAdmin
+	
+	@subsection csst_ihm_messages Gestion des messages
+	
+	@subsection csst_ihm_journal Journal des événements
+
+*/

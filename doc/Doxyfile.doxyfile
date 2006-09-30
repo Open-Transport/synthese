@@ -95,10 +95,7 @@ EXCLUDE                = exemples \
                          ../src/main/client_rs485 \
                          ../src/main/cient_term \
                          ../src/main/server \
-                         ../src/test \
-                         "E:/synthese 3.0/src/main/15_env" \
-                         ../src/main/11_interfaces \
-                         ../src/main/04_time
+                         ../src/test
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXAMPLE_PATH           = exemples \
