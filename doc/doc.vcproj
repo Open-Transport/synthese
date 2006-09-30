@@ -88,6 +88,18 @@
 				RelativePath=".\html\footer.html">
 			</File>
 		</Filter>
+		<Filter
+			Name="schemas"
+			Filter="">
+			<Filter
+				Name="captures sai"
+				Filter="">
+				<File
+					RelativePath=".\admin_template.htm"
+					DeploymentContent="TRUE">
+				</File>
+			</Filter>
+		</Filter>
 		<File
 			RelativePath=".\Doxyfile.doxyfile">
 		</File>
