@@ -20,7 +20,7 @@ namespace synthese
 				- vers la page de gestion des utilisateurs
 
 			<i>Zone de contenu</i>
-
+	
 			L'écran de gestion des profils utilisateurs est constitué de trois parties :
 				-# Un formulaire de recherche comportant deux critères :
 					- Recherche sur le nom
