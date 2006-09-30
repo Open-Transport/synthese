@@ -95,7 +95,10 @@ EXCLUDE                = exemples \
                          ../src/main/client_rs485 \
                          ../src/main/cient_term \
                          ../src/main/server \
-                         ../src/test
+                         ../src/test \
+                         "E:/synthese 3.0/src/main/15_env" \
+                         ../src/main/11_interfaces \
+                         ../src/main/04_time
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXAMPLE_PATH           = exemples \
@@ -153,7 +156,7 @@ LATEX_OUTPUT           = latex
 LATEX_CMD_NAME         = latex
 MAKEINDEX_CMD_NAME     = makeindex
 COMPACT_LATEX          = YES
-PAPER_TYPE             = a4
+PAPER_TYPE             = a4wide
 EXTRA_PACKAGES         = 
 LATEX_HEADER           = 
 PDF_HYPERLINKS         = YES
