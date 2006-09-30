@@ -103,6 +103,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "35_timetables", "src\main\3
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "05_security", "src\main\05_security\05_security.vcproj", "{B611F981-1353-4B13-A6FE-695034268D72}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -213,6 +217,10 @@ Global
 		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Debug.Build.0 = Debug|Win32
 		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Release.ActiveCfg = Release|Win32
 		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Release.Build.0 = Release|Win32
+		{B611F981-1353-4B13-A6FE-695034268D72}.Debug.ActiveCfg = Debug|Win32
+		{B611F981-1353-4B13-A6FE-695034268D72}.Debug.Build.0 = Debug|Win32
+		{B611F981-1353-4B13-A6FE-695034268D72}.Release.ActiveCfg = Release|Win32
+		{B611F981-1353-4B13-A6FE-695034268D72}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
 		SConstruct = SConstruct
