@@ -22,7 +22,7 @@ namespace envlssql
 
 
 
-AddressTableSync::AddressTableSync (Environment::Registry& environments,
+	AddressTableSync::AddressTableSync (synthese::env::Environment::Registry& environments,
 				    const std::string& triggerOverrideClause)
 : ComponentTableSync (ADDRESSES_TABLE_NAME, environments, true, false, triggerOverrideClause)
 {

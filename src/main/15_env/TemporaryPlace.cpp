@@ -54,6 +54,7 @@ TemporaryPlace::getVertexAccess (const AccessDirection& accessDirection,
     VertexAccess access;
     access.approachDistance = _metricOffset - ((Address*) destination)->getMetricOffset ();
     access.approachTime = access.approachDistance / accessParameters.approachSpeed;
+	return access;
 }
     
 

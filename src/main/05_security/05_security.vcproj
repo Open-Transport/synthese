@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="01_util"
-	ProjectGUID="{266969BE-1E07-4C1B-ABFC-5193858D0B4B}"
+	Name="05_security"
+	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
@@ -42,103 +42,36 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
-			<File
-				RelativePath=".\ClassFactory.cpp">
-			</File>
-			<File
-				RelativePath=".\Conversion.cpp">
-			</File>
-			<File
-				RelativePath=".\Exception.cpp">
-			</File>
-			<File
-				RelativePath=".\Log.cpp">
-			</File>
-			<File
-				RelativePath=".\RGBColor.cpp">
-			</File>
-			<File
-				RelativePath=".\Thread.cpp">
-			</File>
-			<File
-				RelativePath=".\ThreadException.cpp">
-			</File>
-			<File
-				RelativePath=".\ThreadExec.cpp">
-			</File>
-			<File
-				RelativePath=".\ThreadGroup.cpp">
-			</File>
-			<File
-				RelativePath=".\UId.cpp">
-			</File>
-			<File
-				RelativePath=".\XmlParser.cpp">
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
+		</Filter>
+		<Filter
+			Name="AdminInterfaceElement"
+			Filter="">
 			<File
-				RelativePath=".\ClassFactory.h">
+				RelativePath=".\AdminInterfaceElement\AdminLogAdmin.h">
 			</File>
 			<File
-				RelativePath=".\Conversion.h">
+				RelativePath=".\AdminInterfaceElement\ProfileAdmin.h">
 			</File>
 			<File
-				RelativePath=".\Exception.h">
+				RelativePath=".\AdminInterfaceElement\ProfilesAdmin.h">
 			</File>
 			<File
-				RelativePath=".\HtmlFilter.h">
+				RelativePath=".\AdminInterfaceElement\UserAdmin.h">
 			</File>
 			<File
-				RelativePath=".\LexicalMatcher.h">
+				RelativePath=".\AdminInterfaceElement\UsersAdmin.h">
 			</File>
+		</Filter>
+		<Filter
+			Name="LibraryInterfaceElement"
+			Filter="">
 			<File
-				RelativePath=".\Log.h">
-			</File>
-			<File
-				RelativePath=".\LowerCaseFilter.h">
-			</File>
-			<File
-				RelativePath=".\PlainCharFilter.h">
-			</File>
-			<File
-				RelativePath=".\Registrable.h">
-			</File>
-			<File
-				RelativePath=".\Registry.h">
-			</File>
-			<File
-				RelativePath=".\RegistryException.h">
-			</File>
-			<File
-				RelativePath=".\RegistryKeyException.h">
-			</File>
-			<File
-				RelativePath=".\RGBColor.h">
-			</File>
-			<File
-				RelativePath=".\SqlFilter.h">
-			</File>
-			<File
-				RelativePath=".\Thread.h">
-			</File>
-			<File
-				RelativePath=".\ThreadException.h">
-			</File>
-			<File
-				RelativePath=".\ThreadExec.h">
-			</File>
-			<File
-				RelativePath=".\ThreadGroup.h">
-			</File>
-			<File
-				RelativePath=".\UId.h">
-			</File>
-			<File
-				RelativePath=".\XmlParser.h">
+				RelativePath=".\LibraryInterfaceElement\LoginHTMLFormInterfaceElement.h">
 			</File>
 		</Filter>
 		<File

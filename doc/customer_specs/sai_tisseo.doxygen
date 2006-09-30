@@ -13,6 +13,8 @@
 	
 	@section csst_surveillance Surveillance des afficheurs
 	
+
+
 	@section csst_ihm Interface Homme Machine (IHM)
 	
 	L'ensemble des écrans de gestion du SAI SYNTHESE est centralisé dans une "console d'administration", qui donne accès à 5 rubriques :
@@ -24,17 +26,33 @@
 	
 	@subsection csst_ihm_users Gestion des utilisateurs
 	
-	@subsubsection csst_ihm_users_users Liste et recherche des utilisateurs
-	
-	@subsubsection csst_ihm_users_profiles Liste et édition des profils d'habilitations
+	@subsubsection csst_ihm_users_profiles Liste des profils d'habilitations
 	
 	@copydoc synthese::interfaces::ProfilesAdmin
 	
+	@subsubsection csst_ihm_users_profile Edition d'un profil d'habilitations
+
+	@copydoc synthese::interfaces::ProfileAdmin
+	
+	@subsubsection csst_ihm_users_users Liste et recherche des utilisateurs
+	
+	@copydoc synthese::interfaces::UsersAdmin
+	
+	@subsubsection csst_ihm_users_user Edition d'un utilisateur
+	
+	@copydoc synthese::interfaces::UserAdmin
+
+
+
 	@subsection csst_ihm_places Gestion des emplacements
 	
 		-# Liste et recherche de lieux logiques
-			-# DisplayLocationsAdmin : Gestion des lieux d'affichage, avec lien vers les afficheurs positionnés sur ce lieu
-		
+			-# DisplayLocationsAdmin : Gestion des lieux d'affichage d'un lieu logique, avec lien vers les afficheurs positionnés sur ce lieu
+	
+	@copydoc synthese::interfaces::DisplayLocationsAdmin
+	
+	
+	
 	@subsection csst_ihm_display Gestion des afficheurs
 	
 	La gestion des afficheurs consiste en deux catégories d'action :
@@ -54,14 +72,39 @@
 	
 	@subsubsection csst_ihm_display_DisplayTypesAdmin Gestion des types d'affichage
 
-	@copydoc DisplayTypesAdmin	
+	@copydoc synthese::interfaces::DisplayTypesAdmin	
 	
 	@subsubsection csst_ihm_display_DisplaySearchAdmin Gestion du parc matériel d'afficheurs
 	
-	@copydoc DisplaySearchAdmin
+	@copydoc synthese::interfaces::DisplaySearchAdmin
+	
+	@subsubsection csst_ihm_display_DisplayAdmin Edition des paramètres d'un afficheur
+	
+	@copydoc synthese::interfaces::DisplayAdmin
+
+	@subsubsection csst_ihm_display_DisplayMaintenanceAdmin Supervision d'un afficheur
+	
+	@copydoc synthese::interfaces::DisplayMaintenanceAdmin
+
+
 	
 	@subsection csst_ihm_messages Gestion des messages
 	
+	@subsubsection csst_ihm_messages_MessagesAdmin Liste et recherche de messages
+	
+	@copydoc synthese::interfaces::MessagesAdmin
+
+	@subsubsection csst_ihm_messages_MessagesLibraryAdmin Bibliothèque de messages prédéfinis
+	
+	@copydoc synthese::interfaces::MessagesLibraryAdmin
+	
+	@subsubsection csst_ihm_messages_MessageAdmin Edition d'un message
+	
+	@copydoc synthese::interfaces::MessageAdmin
+	
+	
 	@subsection csst_ihm_journal Journal des événements
+	
+	@copydoc synthese::interfaces::AdminLogAdmin
 
 */

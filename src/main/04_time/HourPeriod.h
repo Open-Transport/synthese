@@ -48,16 +48,14 @@ class HourPeriod
     @param endTime The DateTime object to be modified.
     @param calculationTime Time of calculation.
     @param pastSolutions Past solutions filter (true = past solutions kept)
-    @return true If the applied period of time is valid (ie if the
-    required period is not anterior to current time or if the
-    pastSolutions filter is active).
+    @return true if the applied period of time is valid (ie if the required period is not anterior 
+		to current time or if the pastSolutions filter is active).
     
     This method does the following :
-    - Period validity checking
-    - Sets startTime to period start hour or to calculationTime if
-    pastSolutions filter is active.
-    - If this period end hour is inferior to this period start hour, one day is added to endTime.
-    - Sets endTime to period endHour.
+		- Period validity checking
+		- Sets startTime to period start hour or to calculationTime if pastSolutions filter is active.
+		- If this period end hour is inferior to this period start hour, one day is added to endTime.
+		- Sets endTime to period endHour.
   */
   bool applyPeriod ( DateTime& startTime, 
 		     DateTime& endTime, 

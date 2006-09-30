@@ -99,7 +99,7 @@ Path::getServices () const
 const Service* 
 Path::getService (int serviceIndex) const
 {
-    ServiceSet::iterator it (_services.begin ());
+    ServiceSet::const_iterator it(_services.begin ());
     advance (it, serviceIndex);
     return (*it);
 }

@@ -15,12 +15,11 @@ namespace env
 
 
 /** Temporary place on the road network.
-
+	@ingroup m15
+	
     Temporary means it is not a part of the graph definition and can just
     be used as an entry point on this graph.
-    
-
- @ingroup m15
+	
 */
 class TemporaryPlace : public Place
 {
@@ -43,7 +42,6 @@ public:
     //@{
     const Road* getRoad () const;
     double getMetricOffset () const;
-
     //@}
 
     //! @name Query methods

@@ -97,7 +97,7 @@ bool operator < ( const Hour& op1, const Hour& op2 );
 bool operator >= ( const Hour& op1, const Hour& op2 );
 bool operator > ( const Hour& op1, const Hour& op2 );
 
-/** Number of minutes elapsed between two hours
+/** Number of minutes elapsed between two hours.
 */
 int operator- ( const Hour& op1, const Hour& op2 );
 

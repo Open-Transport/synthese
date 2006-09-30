@@ -325,6 +325,26 @@
 				RelativePath=".\VertexAccessMap.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="LibraryInterfaceElement"
+			Filter="">
+		</Filter>
+		<Filter
+			Name="AdminInterfaceElement"
+			Filter="">
+			<File
+				RelativePath=".\AdminInterfaceElement\MessageAdmin.h">
+			</File>
+			<File
+				RelativePath=".\AdminInterfaceElement\MessagesAdmin.h">
+			</File>
+			<File
+				RelativePath=".\MessagesLibraryAdmin.h">
+			</File>
+			<File
+				RelativePath=".\AdminInterfaceElement\PlaceAdmin.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\module.h">
 		</File>

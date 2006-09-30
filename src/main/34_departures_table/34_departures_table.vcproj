@@ -38,6 +38,28 @@
 	<References>
 	</References>
 	<Files>
+		<Filter
+			Name="AdminInterfaceElement"
+			Filter="">
+			<File
+				RelativePath=".\AdminInterfaceElement\ArrvivalDepartureTableDataControlAdmin.h">
+			</File>
+			<File
+				RelativePath=".\AdminInterfaceElement\DisplayAdmin.h">
+			</File>
+			<File
+				RelativePath=".\AdminInterfaceElement\DisplayLocationsAdmin.h">
+			</File>
+			<File
+				RelativePath=".\AdminInterfaceElement\DisplayMaintenanceAdmin.h">
+			</File>
+			<File
+				RelativePath=".\AdminInterfaceElement\DisplaySearchAdmin.h">
+			</File>
+			<File
+				RelativePath=".\AdminInterfaceElement\DisplayTypesAdmin.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\module.h">
 		</File>

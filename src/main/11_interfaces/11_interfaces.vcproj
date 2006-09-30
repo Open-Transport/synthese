@@ -120,6 +120,9 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath=".\AdminInterfaceElement.h">
+			</File>
+			<File
 				RelativePath=".\cFichier.h">
 			</File>
 			<File
@@ -198,7 +201,19 @@
 				RelativePath=".\cTrajets.h">
 			</File>
 			<File
+				RelativePath=".\DisplayableElement.h">
+			</File>
+			<File
 				RelativePath=".\Interface.h">
+			</File>
+			<File
+				RelativePath=".\LibraryInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\Page.h">
+			</File>
+			<File
+				RelativePath=".\PageComponent.h">
 			</File>
 			<File
 				RelativePath=".\Parametres.h">

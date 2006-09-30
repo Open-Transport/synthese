@@ -14,8 +14,8 @@ namespace env
     class Point;
 
 
-/** Square of distance between two points, approximated to 2kms
- @ingroup m15
+/** Square of distance between two points, approximated to 2kms.
+@ingroup m15
 
 This class is used to store squre distances between point coordinates in kilometers.
 The approximation is aimed at fastening intensive calculation that is needed by recursive algorithm.
@@ -33,7 +33,7 @@ This way, a partial order is defined :
 */
 class SquareDistance
 {
-        long int _squareDistance; //!< Square of distance in km
+	long int _squareDistance; //!< Square of distance in km
 
     public:
         SquareDistance( long int value = UNKNOWN_VALUE );
@@ -43,54 +43,54 @@ class SquareDistance
 	//@{
         long int getSquareDistance () const;
         void setSquareDistance ( long int squareDistance );
-        //@}
+	//@}
 
 
 	//! @name Query methods.
 	//@{
         long int getDistance () const;
         bool isUnknown () const;
-        //@}
+	//@}
 
 	//! @name Update methods.
 	//@{
         void setDistance (long int distance);
 
 
-        /** Updates this square distance with the square distance between two points.
-	    @param point1 First point
-	    @param point2 Second point
- 
-	    If one point has unknow coordinates, the resulting square distance is
-	    unknown as well.
-	*/
-        void setFromPoints ( const Point&, const Point& );
-        //@}
+		/** Updates this square distance with the square distance between two points.
+			@param point1 First point
+			@param point2 Second point
+	 
+			If one point has unknow coordinates, the resulting square distance is
+			unknown as well.
+		*/
+        void setFromPoints ( const Point& point1, const Point& point2 );
+	//@}
 
 
 
-        /** Inferior or equal operator.
+	/** Inferior or equal operator.
 	  @param op Square distance to compare.
 	  @return true if the square distance to compare is likely to be 
 	  superior or equal to this square distance taking into account inaccuracy.
 	*/
-        int operator <= ( const SquareDistance& ) const;
+	int operator <= ( const SquareDistance& op ) const;
 
 
-        /** Strictly inferior operator.
+	/** Strictly inferior operator.
 	  @param op Square distance to compare.
 	  @return true if the square distance is guaranteed to be superior  
 	  to this square distance taking into account inaccuracy.
 	*/
-        int operator < ( const SquareDistance& ) const;
+	int operator < ( const SquareDistance& op ) const;
 
 
-        /** Equality operator.
+	/** Equality operator.
 	  @param op Square distance to compare.
 	  @return true if both square distances are likely to be equal 
 	  taking into account inaccuracy.
 	*/
-        int operator == ( const SquareDistance& ) const;
+	int operator == ( const SquareDistance& op ) const;
 };
 
 

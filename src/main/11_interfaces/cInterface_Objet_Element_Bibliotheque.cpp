@@ -102,7 +102,7 @@ cInterface_Objet_Element_Bibliotheque::cInterface_Objet_Element_Bibliotheque( in
 	- TEMPS_MAX_CIRCULATIONS ('R') : Derniï¿½re date oï¿½ circule au moins un service (voir cEnvironnement::DateMaxReelle())
          
         La relation suivante est vï¿½rifiï¿½e en fonctionnement nominal : \f$ TEMPS_{INCONNU}<=TEMPS_{MIN}<=TEMPS_{MIN ENVIRONNEMENT}<=TEMPS_{MIN CIRCULATIONS}<=TEMPS_{ACTUEL}<=TEMPS_{MAX CIRCULATIONS}<=TEMPS_{MAX ENVIRONNEMENT}<=TEMPS_{MAX} \f$.
-      */
+*/
 synthese::time::Date 
 cInterface_Objet_Element_Bibliotheque::dateInterpretee( const synthese::env::Environment* env, 
 							const std::string& Texte ) const
@@ -129,11 +129,9 @@ cInterface_Objet_Element_Bibliotheque::dateInterpretee( const synthese::env::Env
 }
 
 
-
-
-/*! \brief Evaluation d'un objet dynamique
-  \param pCtxt Le flux de sortie sur lequel ï¿½crire le rï¿½sultat de l'ï¿½valuation
-  \param __Parametres Les paramï¿½tres ï¿½ fournir ï¿½ l'ï¿½lï¿½ment d'interface pour l'ï¿½valuation
+/** Evaluation d'un objet dynamique.
+  \param pCtxt Le flux de sortie sur lequel écrire le résultat de l'évaluation
+  \param __Parametres Les paramï¿½tres ï¿½ fournir à l'ï¿½lï¿½ment d'interface pour l'ï¿½valuation
   \param __Objet Pointeur vers un objet ï¿½ fournir ï¿½ l'ï¿½lï¿½ment d'interface pour l'ï¿½valuation
   \param __Site Pointeur vers le site ayant gï¿½nï¿½rï¿½ l'ï¿½valuation
   \return Rï¿½fï¿½rence vers le flux de sortie

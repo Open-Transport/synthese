@@ -99,22 +99,21 @@ Pour chaque trajet, on procï¿½de donc par balayage dans l'ordre des gares exista
  - soit la gare nï¿½est prï¿½sente nulle part (balayage avant la position de la prï¿½cï¿½dente) auquel cas elle est crï¿½ï¿½e et rajoutï¿½e ï¿½ la position de la gare prï¿½cï¿½dente + 1
  - soit la gare est prï¿½sente avant la gare prï¿½cï¿½dente. Dans ce cas, on tente de descendre la ligne de la gare recherchï¿½e au niveau de la position de la gare prï¿½cï¿½dente + 1. On contrï¿½le sur chacun des trajets prï¿½cï¿½dents que la chronologie n'en serait pas affectï¿½e. Si elle ne l'est pas, alors la ligne est descendue. Sinon une nouvelle ligne est crï¿½ï¿½e.
  
-Contrï¿½le de l'ï¿½changeabilitï¿½ :
+Contrôle de l'échangeabilité :
  
 Soit \f$ \delta_{l,c}:(l,c)\mapsto\{{1\mbox{~si~le~trajet~}c\mbox{~dessert~la~ligne~}l\atop 0~sinon} \f$
  
-Deux lignes l et m sont ï¿½changeables si et seulement si l'ordre des lignes dont \f$ \delta_{l,c}=1 \f$ pour chaque colonne est respectï¿½.
+Deux lignes l et m sont échangeables si et seulement si l'ordre des lignes dont \f$ \delta_{l,c}=1 \f$ pour chaque colonne est respecté.
  
-Cet ordre sï¿½exprime par la propriï¿½tï¿½ suivante : Si \f$ \Phi \f$ est la permutation prï¿½vue, alors
+Cet ordre s'exprime par la propriété suivante : Si \f$ \Phi \f$ est la permutation pévue, alors
  
-<img width=283 height=27
-src="interface.doxygen_fichiers/image008.gif">
+<img width=283 height=27 src="interface.doxygen_fichiers/image008.gif">
  
-Il est donc nï¿½cessaire ï¿½ la fois de contrï¿½ler la possibilitï¿½ de permutation, et de la dï¿½terminer ï¿½ventuellement.
+Il est donc nécessaire à la fois de contrôler la possibilité de permutation, et de la déterminer éventuellement.
  
-<p class=MsoNormal>Si <sub><img width=25 height=24
+Si <sub><img width=25 height=24
 src="interface.doxygen_fichiers/image009.gif"></sub>est la ligne de la gare
-prï¿½cï¿½demment trouvï¿½e, et <sub><img width=24 height=24
+précédemment trouvée, et <sub><img width=24 height=24
 src="interface.doxygen_fichiers/image010.gif"></sub>ï¿½lï¿½emplacement de la gare
 souhaitï¿½e pour permuter, alors les permutations ï¿½ opï¿½rer ne peuvent concerner
 que des lignes comprises entre <sub><img width=24 height=24
@@ -122,52 +121,41 @@ src="interface.doxygen_fichiers/image010.gif"></sub>ï¿½et <sub><img width=25
 height=24 src="interface.doxygen_fichiers/image009.gif"></sub>. En effet, les
 autres lignes nï¿½influent pas.</p>
  
-<p class=MsoNormal>&nbsp;</p>
- 
-<p class=MsoNormal>En premier lieu il est nï¿½cessaire de dï¿½terminer lï¿½ensemble
+
+En premier lieu il est nï¿½cessaire de dï¿½terminer lï¿½ensemble
 des lignes ï¿½ permuter. Cet ensemble est construit en explorant chaque colonne.
 Si <sub><img width=16 height=24 src="interface.doxygen_fichiers/image011.gif"></sub>ï¿½est
 lï¿½ensemble des lignes ï¿½ permuter pour assurer lï¿½intï¿½gritï¿½ des colonnes <sub><img
 width=36 height=27 src="interface.doxygen_fichiers/image012.gif"></sub>, on
 peut dï¿½finir cet ensemble en fonction du prï¿½cï¿½dent <sub><img width=25
 height=24 src="interface.doxygen_fichiers/image013.gif"></sub>&nbsp;: <sub><img
-width=308 height=35 src="interface.doxygen_fichiers/image014.gif"></sub></p>
+width=308 height=35 src="interface.doxygen_fichiers/image014.gif"></sub>
  
-<p class=MsoNormal>Le but ï¿½tant de faire descendre la ligne <sub><img width=24
+Le but ï¿½tant de faire descendre la ligne <sub><img width=24
 height=24 src="interface.doxygen_fichiers/image010.gif"></sub>ï¿½vers <sub><img
 width=25 height=24 src="interface.doxygen_fichiers/image009.gif"></sub>, les
 lignes appartenant ï¿½ L doivent ï¿½tre ï¿½changeables avecï¿½ les positions <sub><img
 width=216 height=27 src="interface.doxygen_fichiers/image015.gif"></sub>.
 Lï¿½ensemble de ces tests doit ï¿½tre rï¿½alisï¿½. Au moindre ï¿½chec, lï¿½ensemble de la
-permutation est rendu impossible.</p>
+permutation est rendu impossible.
  
-<p class=MsoNormal>Lï¿½ï¿½changeabilitï¿½ binaire entre deux lignes l et m revient ï¿½
+Lï¿½ï¿½changeabilitï¿½ binaire entre deux lignes l et m revient ï¿½
 contrï¿½ler la propriï¿½tï¿½&nbsp;<sub><img width=89 height=28
-src="interface.doxygen_fichiers/image016.gif"></sub>.</p>
+src="interface.doxygen_fichiers/image016.gif"></sub>.
  
-<p class=MsoNormal>Lï¿½ï¿½changeabilitï¿½ totale sï¿½ï¿½crit donc <sub><img width=145
-height=28 src="interface.doxygen_fichiers/image017.gif"></sub></p>
+Lï¿½ï¿½changeabilitï¿½ totale sï¿½ï¿½crit donc <sub><img width=145
+height=28 src="interface.doxygen_fichiers/image017.gif"></sub>
  
-<p class=MsoNormal>Lï¿½algorithme est donc le suivant&nbsp;:</p>
+Lï¿½algorithme est donc le suivant&nbsp;:
  
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Construction de L</p>
+	- Construction de L
+	- Contrï¿½le dï¿½ï¿½changeabilitï¿½ binaire pour chaque ï¿½lï¿½ment de L avec
+sa future position
+	- Permutation
  
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Contrï¿½le dï¿½ï¿½changeabilitï¿½ binaire pour chaque ï¿½lï¿½ment de L avec
-sa future position</p>
+<b>Echange</b>&nbsp;:
  
-<p class=MsoListBullet><span style='font-size:9.0pt;font-family:Wingdings;
-color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Permutation</p>
- 
-<p class=MsoNormal><b>Echange</b>&nbsp;:</p>
- 
-<p class=MsoNormal>Exemple dï¿½ï¿½change&nbsp;:</p>
- 
-<p class=MsoNormal>&nbsp;</p>
+Exemple dï¿½ï¿½change&nbsp;:
  
 <table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=340
  style='width:254.95pt;margin-left:141.6pt;border-collapse:collapse;border:
@@ -228,7 +216,7 @@ color:red'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
  </tr>
 </table>
  
-<p class=MsoNormal><span style='position:relative;z-index:16'><span
+<span style='position:relative;z-index:16'><span
 style='left:0px;position:absolute;left:398px;top:-1px;width:67px;height:53px'><img
 width=67 height=53 src="interface.doxygen_fichiers/image018.gif"></span></span><span
 style='position:relative;z-index:13'><span style='left:0px;position:absolute;
@@ -266,9 +254,7 @@ left:193px;top:-1px;width:96px;height:52px'><img width=96 height=52
 src="interface.doxygen_fichiers/image029.gif"></span></span><span
 style='position:relative;z-index:4'><span style='left:0px;position:absolute;
 left:194px;top:-1px;width:103px;height:52px'><img width=103 height=52
-src="interface.doxygen_fichiers/image030.gif"></span></span></p>
- 
-<p class=MsoNormal>&nbsp;</p>
+src="interface.doxygen_fichiers/image030.gif"></span></span>
  
 <table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=340
  style='width:254.95pt;margin-left:141.6pt;border-collapse:collapse;border:

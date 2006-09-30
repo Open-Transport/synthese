@@ -92,6 +92,7 @@ class Interface : public synthese::util::Registrable<uid, synthese::interfaces::
          @param __Textuel true pour obtenir une date en texte, false pour l'obtenir au format num�rique (d�faut = true)
          @param __JourDeSemaine true pour afficher le jour de la semaine (d�faut = true)
          @param __Annee true pour afficher l'ann�e (d�faut = true)
+		 @param __Flux stream to write
         */
         void AfficheDate( std::ostream& __Flux, 
 			  const synthese::time::Date& __Date, 
