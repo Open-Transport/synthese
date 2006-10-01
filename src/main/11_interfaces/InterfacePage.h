@@ -18,7 +18,7 @@ namespace interfaces
 	/** Definition of a page, coming from the database. Page are elements of an interface.
 		@ingroup m11
 	*/
-	class Page : public DisplayableElement
+	class InterfacePage : public DisplayableElement
 	{
 	public:
 		typedef vector<PageComponent*> PageComponentsVector;

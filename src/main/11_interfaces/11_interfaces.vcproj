@@ -207,16 +207,23 @@
 				RelativePath=".\Interface.h">
 			</File>
 			<File
-				RelativePath=".\LibraryInterfaceElement.h">
+				RelativePath=".\InterfacePage.h">
 			</File>
 			<File
-				RelativePath=".\Page.h">
+				RelativePath=".\LibraryInterfaceElement.h">
 			</File>
 			<File
 				RelativePath=".\PageComponent.h">
 			</File>
 			<File
 				RelativePath=".\Parametres.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="AdminInterfaceElement"
+			Filter="">
+			<File
+				RelativePath=".\AdminInterfaceElement\HomeAdmin.h">
 			</File>
 		</Filter>
 		<File
