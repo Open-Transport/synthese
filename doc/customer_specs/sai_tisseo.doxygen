@@ -9,12 +9,26 @@
 	@section csst_presentation Présentation
 	
 	@subsection csst_concepts Concepts
-	
-	Voir les concepts suivants :
-		- @ref defRightsUserProfile
-		- @ref defAdminlog
-		- @ref DisplayTerminal
-	
+
+		@subsubsection defRight Habilitation
+		@copydoc synthese::security::Right
+
+		@subsubsection defUserProfile Profil utilisateur
+		@copydoc synthese::security::Profile
+
+		@subsubsection defUser Utilisateur
+		@copydoc synthese::security::User
+		
+		@subsubsection defAdmin Composants d'administration
+		@copydoc synthese::interfaces::AdminInterfaceElement
+
+		@subsubsection defLog Journaux
+		@copydoc synthese::interfaces::DBLogViewer
+
+		@subsubsection defDisplayTerminal Terminal d'affichage
+		@copydoc synthese::departurestable::DisplayScreen
+
+			
 	
 	
 	@section csst_surveillance Surveillance des afficheurs
@@ -42,7 +56,7 @@
 	@subsection csst_supervision_scenarios Scénarios
 	
 	@subsubsection csst_supervision_scenarios_normal Situation matérielle normale
-	
+	<br>
 	@image html supervision_sai_normal.png 
 	@image latex supervision_sai_normal.png "" width=14cm
 	
@@ -56,7 +70,7 @@
 		-# l'unité centrale émet via le réseau un message SYNTHESE envoyé sur le port TCP 3591 du serveur SYNTHESE, qui va stocker dans la base de données l'état normal du terminal à la date de l'envoi
 	
 	@subsubsection csst_supervision_scenarios_panne_display Panne de terminal d'affichage
-	
+	<br>
 	@image html supervision_sai_display_failure.png 
 	@image latex supervision_sai_display_failure.png "" width=14cm
 	
@@ -71,7 +85,7 @@
 		-# l'unité centrale émet parallèlement via le réseau une trame SNMP destinée à la station de supervision Openview qui déclenchera la procédure d'intervention selon les règles habituelles
 	
 	@subsubsection csst_supervision_scenarios_panne_pc Panne d'unité centrale cliente
-	
+	<br>
 	@image html supervision_sai_pc_failure.png 
 	@image latex supervision_sai_pc_failure.png "" width=14cm
 	

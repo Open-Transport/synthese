@@ -18,8 +18,8 @@ namespace synthese
 			<i>Titre de la fenêtre</i> : SYNTHESE Admin - Afficheurs - Types
 
 			<i>Barre de navigation</i> :
- 				- Lien vers synthese::interface::HomeAdmin
-				- Lien vers synthese::interface::DisplaySearchAdmin
+ 				- Lien vers @ref synthese::interface::HomeAdmin
+				- Lien vers @ref synthese::interface::DisplaySearchAdmin
 
 			<i>Zone de contenus</i> :
 				-# <b>Tableau liste des types</b> : Les colonnes suivantes sont présentes, et permettent d'éditer directement les types d'afficheurs :

@@ -36,20 +36,20 @@ namespace synthese
 					Au chargement, la page affiche l'ensemble des afficheurs pouvant être vus d'après les droits de l'utilisateur.
 				-# <b>Tableau résultat de recherche</b> : Les colonnes suivantes sont présentes :
 					- @c UID : Code SYNTHESE de l'afficheur. Un clic sur l'UID va vers la page @ref synthese::interface::DisplayAdmin.
-					- @c Emplacement : Résumé de l'emplacement de l'afficheur. Un clic sur l'emplacement va vers la page synthese::interface::DisplayLocations sur le lieu logique de l'afficheur. Le contenu est constitué par les trois champs suivants, séparés par un /.  :
+					- @c Emplacement : Résumé de l'emplacement de l'afficheur. Un clic sur l'emplacement va vers la page @ref synthese::interface::DisplayLocations sur le lieu logique de l'afficheur. Le contenu est constitué par les trois champs suivants, séparés par un /.  :
 						- Lieu logique
 						- Lieu physique (arrêt physique ou autre emplacement interne au lieu logique)
 						- Complément de précision
-					- @c Type : Type d'afficheur. Un clic sur le type va vers la page synthese::interface::DisplayTypesAdmin.
-					- @c Etat : Résumé de l'état de maintenance. Un clic sur le contenu de la colonne va vers la page synthese::interface::DisplayMaintenanceAdmin :
+					- @c Type : Type d'afficheur. Un clic sur le type va vers la page @ref synthese::interface::DisplayTypesAdmin.
+					- @c Etat : Résumé de l'état de maintenance. Un clic sur le contenu de la colonne va vers la page @ref synthese::interface::DisplayMaintenanceAdmin :
 						- Si l'afficheur est déclaré en service, deux points de couleur (vert = OK, orange = Warning, rouge = Error), faisant apparaître une infobulle précisant leur signification au contact du pointeur de souris :
 							- le premier point correspond au contrôle de cohérence de données
 							- le second point correspond à l'état du matériel
 						- Si l'afficheur est déclaré hors service, la mention HS suivie de la date de la mise hors service est présente, en couleur rouge
 					- @c Actions : Trois boutons permettent d'accéder aux fonctions suivantes :
-						- @c Modifier : Dirige vers la page synthese::interface::DisplayAdmin
+						- @c Modifier : Dirige vers la page @ref synthese::interface::DisplayAdmin
 						- @c Simuler : Ouvre une fenêtre pop-up effectuant un affichage similaire à ce qui est diffusé sur l'afficheur, pour les écrans de type HTML. Pour les écran au protocole Lumiplan, le code Lumiplan est affiché.
-						- @c Supervision : Dirige vers la page synthese::interface::DisplayMaintenanceAdmin
+						- @c Supervision : Dirige vers la page @ref synthese::interface::DisplayMaintenanceAdmin
 					- La dernière ligne du tableau comprend un lien "Créer un nouvel afficheur" et donne sur une page de paramétrage d'afficheur vide.
 					- Un clic sur le titre des colonnes du tableau effectue un tri selon la colonne (ascendant puis descendant).
 				-# <b>Lien afficheurs suivants</b> : Au maximum 50 afficheurs sont représentés sur la page. En cas de dépassement de ce nombre, ce lien apparaît et permet de se rendre aux afficheurs suivants. A partir de la seconde page, un lien <tt>Afficheurs précédents</tt> est également proposé.

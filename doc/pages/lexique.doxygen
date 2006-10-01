@@ -1,203 +1,97 @@
 /**
 
-@page lexique Lexique métier
+@page glossary Glossary
 
-	- @subpage lexiqueLignes
-	- @subpage defCirculation
-	- @subpage defMateriel
-	- @subpage defCalendrier
-	- @subpage defUserProfile
-	- @subpage defAdminlog
-	- @subpage defGeolocalisation
-	- @subpage defVitessesMax
-	- @subpage DisplayTerminal 
+@section glossarySummary Summary
 
+@subsection glossarySummaryBusiness Business glossary
 
-@page lexiqueLignes Lignes et axes
+	- @ref lexiqueLignes
+	- @ref defCirculation
+	- @ref defMateriel
+	- @ref defCalendrier
+	- @ref defUserProfile
+	- @ref defAdminlog
+	- @ref defGeolocalisation
+	- @ref defVitessesMax
+	- @ref DisplayTerminal
 
-@section defLigneCommerciale Ligne commerciale
+@subsection glossarySummaryTechnical Technical glossary
+
+	- @ref technicalGlossaryTransportNetwork
+
+@section businessGlossary Business glossary
+
+@subsection businessGlossaryTransport Transport network
+
+@subsubsection defLigneCommerciale Ligne commerciale
 
 Une ligne commerciale est un ensemble de circulations regroupées selon des critères de similitude géographique en général. La ligne commerciale porte l'identification client des services (ex : Ligne 2).
 
-@section defLigne Ligne technique
-
-Une ligne technique est un regroupement de services, constitué dans un but d’amélioration des performances de la recherche d'itinéraires. En effet, plusieurs services groupés dans une ligne ne comptent que pour un dans leur participation au temps de calcul, ce qui rend tout son intérêt au regroupement des services en lignes.
-
-Cependant, pour assurer la justesse des calculs, les regroupements en ligne doivent respecter des conditions strictes, constituant ainsi la théorie des lignes&nbsp;:
- - Les services d’une même ligne doivent desservir exactement les mêmes points d’arrêt, dans le même ordre
- - Les conditions de desserte de chaque point d’arrêt (départ/passage/arrivée et horaires saisis/non saisis) sont les mêmes pour tous les services d’une ligne
- - Les services d’une même ligne sont assurés par le même matériel roulant, observent les mêmes conditions de réservation, appartiennent au même réseau de transport, et suivent la même tarification
- - Un service d’une ligne ne doit pas desservir un point d’arrêt à la même heure qu’un autre service de la même ligne
- - Un service d’une ligne desservant un point d’arrêt avant un autre de la même ligne ne doit pas desservir un autre point d’arrêt après ce dernier&nbsp;: deux services ne doivent pas se «&nbsp;doubler&nbsp;»
-
-NB : la correspondance entre deux services d'une même ligne est interdite.
-
-Le regroupement en lignes techniques s'effectue, par convention, uniquement à l'intérieur des \ref defLigneCommerciale "lignes commerciales". Ainsi deux services pouvant être groupés selon les critères ci-dessus, mais n'appartenant pas à la même ligne commerciale, ne seront pas groupés dans une ligne technique. De ce fait, les lignes techniques sont considérés comme des subdivisions de lignes commerciales.
-
-Les lignes techniques sont implémentées par la classe cLigne.
-
-@section defAxe Axe
-
-Regroupement technique de lignes techniques, donnant lieu à l'application de propriétés aux lignes contenues, dont par défaut :
- - la correspondance entre deux services de lignes incluses dans un même axe est interdite.
-
-Le regroupement en axes s'effectue, par convention, uniquement à l'intérieur des \ref defLigneCommerciale "lignes commerciales". Ainsi deux services pouvant être groupés selon les critères ci-dessus, mais n'appartenant pas à la même ligne commerciale, ne seront pas groupés dans une ligne technique. De ce fait, les axes sont considérés comme des subdivisions de lignes commerciales.
-
-Les axes sont implémentés par la classe cAxe.
-
-@subsection defAxeLibre Axe libre
-
-Axe permettant la correspondance entre tous les services contenus, y compris entre deux services de la même ligne
-
-@subsection defAxeInterdit Axe interdit
-
-Axe contenant des lignes ne prenant pas de voyageurs (ex : trajets haut le pied)
-
-
-
-
-@page defCirculation Circulation
+@subsubsection defCirculation Circulation
 
 Les circulations sont identifiées au sein de leur @ref defLigneCommerciale par un code alphanumérique unique de 6 cractères maximum.
 
-Les circulations sont implémentées par la classe cTrain.
-
-@section defServiceContinu Service continu
-
-Service attente + temps de trajet
-
-
-
-
-@page defMateriel Matériel roulant
+@subsubsection defMateriel Matériel roulant
 
 Type de véhicules utilisés par les circulations, faisant intervenir certaines propriétés communes.
 
-Les matériels roulants sont implémentés par la classe cMateriel.
 
 
 
 
-@page defCalendrier Calendrier de circulation
 
-Les services ne circulent pas tous tous les jours. Ils suivent un calendrier de circulation, indiquant les jours où sont effectués des départs de l'origine des services qui le respectent.
+@section technicalGlossary Technical glossary
 
-@subsection defCategorieCalendrier Catégorie de calendrier
+@subsection technicalGlossaryTransportNetwork Transport network
 
-Pour choisir le calendrier le plus simple d’affichage, pour l’édition des renvois d’indicateur par exemple, les calendriers sont rangés par catégorie, selon le format binaire suivant&nbsp;:</p>
+@subsubsection defLigne Ligne technique
+@copydoc synthese::15_env::Line
+Les lignes techniques sont implémentées par la classe @ref synthese::15_env::Line.
 
-<table class="tableau">
-<tr><td colspan="2">Plage de dates</td><td></td><td></td><td>Influence période scolaire</td><td></td><td></td><td>Tout/partiel</td></tr>
-<tr><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-<tr><td>7</td><td colspan="6"></td><td>0</td></tr>
-</table>
+@subsubsection defAxe Axe
+@copydoc synthese::15_env::Axis
+Les axes sont implémentés par la classe @ref synthese::15_env::Axis.
 
-On obtient la classification de catégories suivante :
-<table class="tableau">
-<tr><th>Plage de dates</th><th>Influence période scolaire</th><th>Tout/partiel</th><th>Code binaire</th><th>Code décimal</th></tr>
-<tr><td rowspan="4">Service complet</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>00000000</td><td>0</td></tr>
-<tr><td>Restriction</td><td>00000001</td><td>1</td></tr>
-<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>00001000</td><td>0</td></tr>
-<tr><td>Restriction</td><td>00001001</td><td>1</td></tr>
-<tr><td rowspan="4">Service de transporteur (été, hiver, SNCF, etc.)</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>01000000</td><td>0</td></tr>
-<tr><td>Restriction</td><td>01000001</td><td>1</td></tr>
-<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>01001000</td><td>0</td></tr>
-<tr><td>Restriction</td><td>01001001</td><td>1</td></tr>
-<tr><td rowspan="4">Plage restreinte (ski...)</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>10000000</td><td>0</td></tr>
-<tr><td>Restriction</td><td>10000001</td><td>1</td></tr>
-<tr><td rowspan="2">Oui</td><td>Totalité de la période</td><td>10001000</td><td>0</td></tr>
-<tr><td>Restriction</td><td>10001001</td><td>1</td></tr>
-<tr><td colspan="3">Autres calendriers (défaut)</td><td>11111111</td><td>255</td></tr>
-</table>
+@subsubsection defCalendrier Calendrier de circulation
+@copydoc synthese::15_env::Calendar
+The calendars are implemented by the @ref synthese::15_env::Calendar class.
 
 
 
 
-@page defRightsUserProfile Droits, profils utilisateurs, utilisateurs
+@subsection defRightsUserProfile Droits, profils utilisateurs, utilisateurs
 
-@section defRight Habilitation
+@subsubsection defRight Habilitation
+@copydoc synthese::security::Right
+La notion d'habilitation est implémentée par la classe @ref synthese::security::Right .
 
-Une habilitation est un droit d'effectuer une ou plusieurs opération(s) sur un périmètre donné.
+@subsubsection defUserProfile Profil utilisateur
+@copydoc synthese::security::Profile
+La notion de profil utilisateur est implémentée par la classe @ref synthese::security::Profile .
 
-Une habilitation est définie par :
-	- une ou plusieurs opérations (équivalentes aux fonctions SYNTHESE)
-	- un périmètre d'application (liste d'objet(s), groupes d'objets (ex : tout), appartenance (pour fonction réservation)
-	- le droit obtenu (lecture, écriture, effacement...)
-
-La notion d'habilitation est implémentée par la classe synthese::rights::Right .
-
-@section defUserProfile Profil utilisateur
-
-Un profil utilisateur est un "modèle" de droits utilisateurs consistant en une liste d'habilitation prédéfinies.
-
-Exemples de profils utilisateurs :
-	- Anonymous : Utilisateur non identifié : peut utiliser les services grand public
-	- User : Utilisateur classique : mêmes droits qu'Anonymous, ainsi que les fonctionnalités de paramétrage utilisateur
-	- Customer : Utilisateur identifié comme client du système, d'un réseau de transport : mêmes droits qu'User, et peut de plus utiliser la fonction de réservation
-	- Driver : Conducteur de ligne de transport : même droits qu'User, et peut en outre consulter les listes de réservations
-	- Operator : Opérateur système : peut gérer les utilisateurs, prendre les réservations, consulter les listes de réservations
-	- LineChief : Responsable de ligne : peut prendre les réservations, consulter les listes de réservations, éditer des messages sur la ligne
-	- Administrator : Administrateur : tous les droits
-
-La notion de profil utilisateur est implémentée par la classe synthese::rights::Profile .
-
-@section defUser Utilisateur
-
-Un utilisateur correspond à un identifiant de connexion rattaché à une personne. Les données suivantes lui sont reliées :
-	- un nom d'utilisateur
-	- un mot de passe
-	- des coordonnées (mail, etc)
-	- un profil
-	- des paramètres de personnalisation (demandes favorites...)
-
-La notion d'utilisateur est implémentée par la classe synthese::rights::User .
+@subsubsection defUser Utilisateur
+@copydoc synthese::security::User
+La notion d'utilisateur est implémentée par la classe @ref synthese::security::User .
 
 
 
-@page defAdminlog Composants d'administration, journaux
+@subsection defAdminlog Composants d'administration, journaux
 
-@section defAdmin Composants d'administration
+@subsubsection defAdmin Composants d'administration
+@copydoc synthese::interfaces::AdminInterfaceElement
+La notion de composant d'administration est implémentée par des sous-classes de @ref synthese::interfaces::AdminInterfaceElement.
 
-Un composant d'administration est un formulaire paramétrable, destiné à effectuer une écriture en temps réel dans la base SYNTHESE.
-Une même donnée peut être mise à jour par autant de composants que nécessaire, défini avant tout sur la base d'une ergonomie de qualité.
-Chaque composant est rattaché au module correspondant aux données à modifier. 
-Le comportement des composants d'administration est défini d'après les @ref defRight "habilitations" de l'utilisateur connecté, par exemple :
-	- un utilisateur Anonymous n'a accès à aucun composant d'administration
-	- un utilisateur LineChief a accès aux composants d'édition de message sur les lignes dont il est responsable
-	- un utilisateur Administrator a accès à tous les composants d'administration.
-
-@section defLog Journaux
-
-Un journal est un compte-rendu des modifications temps réel effectuées sur la base SYNTHESE par le biais des composants d'administration.
-Les éléments de journal contiennent les données suivantes :
-	- date de la modification
-	- utilisateur ayant effectué la modification
-	- description de la modification (selon données modifiées)
+@subsubsection defLog Journaux
+@copydoc synthese::interfaces::DBLogViewer
 
 
 
-@page DisplayTerminal Terminaux d'affichage
+@subsection defDisplay Terminaux d'affichage
 
-@section defDisplayTerminal Terminal d'affichage
+@subsubsection defDisplayTerminal Terminal d'affichage
+@copydoc synthese::departurestable::DisplayScreen
 
-Un terminal d'affichage est un dispositif matériel dédié à l'affichage d'informations provenant de SYNTHESE (exemple: tableau de départs).
-Un terminal d'affichage est relié à un lieu (exemple : arrêt logique).
-On considère par hypothèse que l'arrêt logique lié correspond à la fois à l'emplacement du panneau et à la définition première de ce qui y est affiché.
-L'emplacement est précisé par un champ texte ("tableau de départ situé au-dessus de l'escalier nord") ainsi que des coordonnées géographiques permettant de le situer sur une carte (ces données sont facultatives et ne servent qu'à désigner le terminal dans le cadre d'un composant d'administration par exemple).
-A un terminal d'affichage sont reliés des clauses visant à définir le contenu qui y est diffusé ainsi que le format du contenu (protocole, charte graphique, etc...) :
-	- Nature de l'affichage (fonction SYNTHESE) :
-			- Tableau de départ chronologique
-			- Tableau de départ à destination privilégiée
-			- Tableau d'arrivée chronologique
-			- Tableau d'arrivée à provenance privilégiée
-	- Format de sortie (défini par l'interface utilisée)
-	- Paramétrage du contenu généré par la fonction : 
-			- Titre
-			- Nombre de départs ou d'arrivées
-			- Filtre de terminus (sert à n'afficher que les lignes ayant pour origine le lieu affiché)
-			- Filtre d'arrêt(s) physique(s)
-			- Liste des points de passage à afficher
-			- Autre paramètre (liste complète : voir classe .............)
 	
 
 

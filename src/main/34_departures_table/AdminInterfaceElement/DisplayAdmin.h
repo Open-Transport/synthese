@@ -18,19 +18,19 @@ namespace synthese
 			<i>Titre de la fenêtre</i> : SYNTHESE Admin - Afficheurs - [Lieu logique] - [Lieu physique] - [Complément de précision]
 
 			<i>Barre de navigation</i> :
- 				- Lien vers synthese::interface::HomeAdmin
-				- Lien vers synthese::interface::DisplaySearchAdmin
-				- Nom du lieu logique auquel appartient l'afficheur, lien vers synthese::interface::DisplayLocationsAdmin sur le lieu logique de l'afficheur
+ 				- Lien vers @ref synthese::interface::HomeAdmin
+				- Lien vers @ref synthese::interface::DisplaySearchAdmin
+				- Nom du lieu logique auquel appartient l'afficheur, lien vers @ref synthese::interface::DisplayLocationsAdmin sur le lieu logique de l'afficheur
 				- Nom du lieu physique auquel appartient l'afficheur
 				- Complément de précision sur l'emplacement de l'afficheur (non affiché si le complément est vide)
 
 			<i>Zone de contenus</i> : Un formulaire de modification constitué par les éléments suivants :
 				-# <b>Emplacement</b>
 					-# <tt>Lieu logique</tt> : Liste déroulante constituée par l'ensemble des arrêts logiques triés par ordre alphabétique de commune puis par ordre alphabérique de nom. Champ obligatoire. En cas de changement de lieu logique, la page est rafraichie pour mettre à jour la liste des lieux physiques.
-					-# <tt>Lieu physique</tt> : Liste déroulante constituée par l'ensemble des lieux physiques présents dans le lieu logique sélectionné (arrêts physiques + autres lieux d'affichages gérés par la fonction synthese::interfaces::DisplayLocationsAdmin. Ce champ est obligatoire.
+					-# <tt>Lieu physique</tt> : Liste déroulante constituée par l'ensemble des lieux physiques présents dans le lieu logique sélectionné (arrêts physiques + autres lieux d'affichages gérés par la fonction @ref synthese::interfaces::DisplayLocationsAdmin. Ce champ est obligatoire.
 					-# <tt>Complément de précision</tt> : Champ texte libre permettant de préciser l'emplacement de l'afficheur, utile s'il se trouve dans un lieu physique déjà équipé d'un autre afficheur. Ce champ est obligatoire si au moins deux afficheurs sont présents dans le même lieu physique. Il est facultatif sinon.
 				-# <b>Données techniques</b>
-					-# <tt>Type d'afficheur</tt> : Liste déroulante constituée par l'ensemble des types d'afficheur disponibles (issus de l'écran synthese::interface::DisplayTypesAdmin). Ce champ est obligatoire.
+					-# <tt>Type d'afficheur</tt> : Liste déroulante constituée par l'ensemble des types d'afficheur disponibles (issus de l'écran @ref synthese::interface::DisplayTypesAdmin). Ce champ est obligatoire.
 					-# <tt>Code de branchement</tt> : Liste déroulante consituée par les nombres de 0 à 128. Ce champ correspond au code à envoyer par l'interface pour sélectionner l'afficheur destinataire parmi un groupe branché sur le même port RS485. Ce champ est obligatoire si l'afficheur est de type Oscar. Si l'afficheur n'est pas de type Oscar, la valeur données à ce champ est ignorée.
 					-# <tt>UID</tt> : ID unique généré par le système pour désigner l'afficheur. L'UID est fourni à titre informatif mais ne peut être modifié par l'utilisateur.
 				-# <b>Apparence</b>
