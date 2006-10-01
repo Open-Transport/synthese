@@ -71,7 +71,7 @@ namespace synthese
 				- L'habilitation Lecture sur l'arrêt logique sur le module Tableaux de départs est nécessaire pour visualiser la page en consultation
 				- L'habilitation Ecriture sur l'arrêt logique sur le module Tableaux de départs est nécessaire pour effectuer des modifications
 		*/
-		class DisplayTypesAdmin : public AdminInterfaceElement
+		class DisplayAdmin : public AdminInterfaceElement
 		{
 
 		};
