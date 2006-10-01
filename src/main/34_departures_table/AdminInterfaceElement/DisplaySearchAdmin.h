@@ -34,7 +34,7 @@ namespace synthese
 				- Les afficheurs affichés sont ceux qui sont compris dans le périmètre défini par le champ d'application des habilitations sur le module "tableaux de départs"
 				- Au moins une habilitation écriture sur le module "tableaux de départs" est nécessaire pour obtenir le lien de création d'afficheur
 		*/
-		class DisplayTypesAdmin : public AdminInterfaceElement
+		class DisplaySearchAdmin : public AdminInterfaceElement
 		{
 
 		};

@@ -11,8 +11,10 @@ namespace interfaces
 {
 	/** element which can produce a single display.
 		@ingroup m11
+		
 		@todo integrate the mechanism of factorable class
 		@todo integrate static tree of admin classes
+		
 	*/
 	class AdminInterfaceElement : public LibraryInterfaceElement
 	{

@@ -88,15 +88,14 @@
 
 	@section csst_ihm Interface Homme Machine (IHM)
 	
-	@image html cap_admin_home.png
-	@image latex cap_admin_home.png "" width=14cm
-	
 	L'ensemble des écrans de gestion du SAI SYNTHESE est centralisé dans une "console d'administration", qui donne accès à 5 rubriques :
 		- @ref csst_ihm_messages
 		- @ref csst_ihm_users
 		- @ref csst_ihm_places
 		- @ref csst_ihm_display
 		- @ref csst_ihm_journal
+		
+	@copydoc synthese::interfaces::HomeAdmin
 	
 	@subsection csst_ihm_users Gestion des utilisateurs
 	
