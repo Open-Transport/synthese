@@ -13,7 +13,72 @@
 	
 	@section csst_surveillance Surveillance des afficheurs
 	
+	@subsection csst_surveillance_presentation Présentation
+	
+	@subsubsection csst_surveillance_presentation Objets de la supervision
+	
+	Quatre types de supervision sont effectuées pour le SAI SYNTHESE dans l'infrastructure de Tisséo :
+		- la supervision générale des matériels d'affichage 
+		- la supervision applicative des matériels d'affichage
+		- la supervision générale des unités centrales clientes
+		- la supervision de l'intégrité de la base de données
+	
+	@subsubsection csst_surveillance_archi Architecture
+	
+	@image html supervision_sai_vide.png
+	@image latex supervision_sai_vide.png "Diagramme du réseau de supervision" width=14cm
+	
+	L'architecture du réseau de supervision est basée sur trois classes d'unités :
+		- les unités centrales localisées dans les stations assurent l'interrogation du dispositif d'affichage par port série, et est reliée par réseau informatique aux serveurs de supervision
+		- le serveur synthese, localisé dans la salle informatique de TRU reçoit les messages OK et KO de type applicatifs : ils sont destinés à renseigner les administrateurs du SAI de l'état des matériel connectés. Ce serveur assure également en toute autonomie la partie contrôle des données.
+		- la station HP Openview, localisé également dans la salle informatique assure une supervision classique de l'unité centrale, et est prêt à recevoir d'elle des trames SNMP en cas de problèmes d'afficheurs
+	
+	@subsection csst_supervision_scenarios Scénarios
+	
+	@subsubsection csst_supervision_scenarios_normal Situation matérielle normale
+	
+	@image html supervision_sai_normal.png 
+	@image latex supervision_sai_normal.png "" width=14cm
+	
+	Le scénario est le suivant :
+		- l'unité centrale cliente fonctionne normalement
+		- les terminaux d'affichage qui y sont connectés fonctionnent normalement
 
+	Le déroulement du scénario est le suivant :
+		-# l'unité centrale émet une demande d'état au terminal	d'affichage par le port série, selon le cycle prévu
+		-# le terminal d'affichage répond des données qui sont jugées normales par l'unité centrale
+		-# l'unité centrale émet via le réseau un message SYNTHESE envoyé sur le port TCP 3591 du serveur SYNTHESE, qui va stocker dans la base de données l'état normal du terminal à la date de l'envoi
+	
+	@subsubsection csst_supervision_scenarios_panne_display Panne de terminal d'affichage
+	
+	@image html supervision_sai_display_failure.png 
+	@image latex supervision_sai_display_failure.png "" width=14cm
+	
+	Le scénario est le suivant :
+		- l'unité centrale cliente fonctionne normalement
+		- un terminal d'affichage qui y est connecté ne fonctionne pas
+	
+	Le déroulement du scénario est le suivant :
+		-# l'unité centrale émet une demande d'état au terminal	d'affichage par le port série, selon le cycle prévu
+		-# le terminal d'affichage répond des données qui sont jugées anormales par l'unité centrale, ou ne répond pas dans le délai imparti
+		-# l'unité centrale émet via le réseau un message SYNTHESE envoyé sur le port TCP 3591 du serveur SYNTHESE, qui va stocker dans la base de données l'état anormal du terminal à la date de l'envoi
+		-# l'unité centrale émet parallèlement via le réseau une trame SNMP destinée à la station de supervision Openview qui déclenchera la procédure d'intervention selon les règles habituelles
+	
+	@subsubsection csst_supervision_scenarios_panne_pc Panne d'unité centrale cliente
+	
+	@image html supervision_sai_pc_failure.png 
+	@image latex supervision_sai_pc_failure.png "" width=14cm
+	
+	Le scénario est le suivant :
+		- l'unité centrale cliente ne fonctionne pas normalement
+		- le fonctionnement des terminaux d'affichage est alors inconnu
+	
+	Le déroulement du scénario est le suivant :
+		- la supervision standard des unités centrales par Openview détecte la panne d'unité centrale (procédure TRU standard) et déclenche l'intevention
+		- l'unité centrale n'ayant pas émis de message synthese sur le port TCP 3591 du serveur SYNTHESE à l'heure prévue, elle sera alors considérée comme injoignable dans les rapports de supervision du SAI synthese.
+
+
+				
 
 	@section csst_ihm Interface Homme Machine (IHM)
 	
