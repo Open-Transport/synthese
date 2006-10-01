@@ -5,6 +5,8 @@
 		- @ref csst_presentation
 		- @ref csst_surveillance
 		- @ref csst_ihm
+		- @ref csst_security
+		- @ref csst_logs
 
 	@section csst_presentation Glossaire
 	
@@ -196,4 +198,10 @@
 	
 	@copydoc synthese::interfaces::AdminLogAdmin
 
+
+
+	@section csst_security Sécurité
+	
+	
+	@section csst_logs Journaux
 */

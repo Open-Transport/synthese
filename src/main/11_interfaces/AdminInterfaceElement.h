@@ -39,7 +39,7 @@ namespace interfaces
 			@return Name of the next line to display (empty = next line)
 		*/
 		std::string display(std::ostream& stream, const ParametersVector& parameters) = 0;
-
+		//static const Right* requiredRight();
 
 	}
 }

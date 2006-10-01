@@ -28,7 +28,7 @@ namespace synthese
 					-# <tt>Périmètre</tt> : Texte représentant le périmètre sur lequel porte l'habilitation, dont le formalisme dépend du module et de l'opération. Un caractère * signifie "peut être remplacé par tout texte".
 					-# <tt>Droit</tt> : Droit obtenu pour le module, l'opération, et le périmètre de l'habilitation
 					-# <tt>Actions</tt> : contient un bouton supprimer pour chaque habilitation, permettant de supprimer la ligne du tableau. L'appui sur le bouton entraine une confirmation par boite de dialogue standard. La suppression est ensuite définitive.
-				-# <b>Formulaire d'ajout d'habilitation :
+				-# <b>Formulaire d'ajout d'habilitation</b> :
 					-# <tt>Module</tt> : Liste de choix contenant tous les modules de SYNTHESE, plus un choix <tt>Tous</tt> placé en tête et proposé par défaut. Le changement de valeur sur la liste entraine le rafraichissement de la page pour mettre à jour la liste suivante.
 					-# <tt>Opération</tt> : Liste des opérations disponibles pour le module sélectionné, plus un choix <tt>Toutes</tt> placé en tête et proposé par défaut. Le changement de valeur sur la liste entraîne le rafraichissement de la page pour mettre à jour la liste suivante.
 					-# <tt>Périmètre</tt> : Liste des périmètres possibles pour l'opération sélectionnées, plus un choix <tt>Tout</tt> placé en tête et proposé par défaut.
