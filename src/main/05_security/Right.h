@@ -15,7 +15,7 @@ namespace synthese
 				-# un module d'application :
 					- L'un des namespace de SYNTHESE
 					- @c * = Tous les modules
-				-# une ou plusieurs opérations
+				-# une opération
 					- L'une des fonctions publiques SYNTHESE du module sélectionné
 					- @c * = Toutes les fonctions SYNTHESE du module sélectionné
 				-# un périmètre d'application qui pourra être interprété par la fonction SYNTHESE. Exemples :
