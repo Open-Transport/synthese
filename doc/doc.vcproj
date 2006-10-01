@@ -106,6 +106,10 @@
 					DeploymentContent="TRUE">
 				</File>
 				<File
+					RelativePath=".\schemas\capturesSAI\admin_displays.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
 					RelativePath=".\schemas\capturesSAI\admin_profiles.htm"
 					DeploymentContent="TRUE">
 				</File>
