@@ -33,6 +33,8 @@ namespace synthese
 				-# <b>Ligne d'ajout d'utilisateur</b> :
 					-# Champ <tt>Login</tt> : champ texte. Entrer ici le login de l'utilisateur. Celui-ci doit être unique. En cas de tentative de création d'utilisateur avec un login déjà pris, la création est abandonnée et un message d'erreur apparait :
 						@code L'utilisateur ne peut être créé car le login entré est déjà pris. Veuillez choisir un autre login @endcode
+						Ce champ est en outre obligatoire. S'il n'est pas rempli la création est abandonnée et un message d'erreur apparait :
+						@code L'utilisateur ne peut être créé car le login n'est pas renseigné. Veuillez renseigner le champ login. @endcode
 					-# Champ <tt>Nom</tt> : champ texte. Entrer ici le nom de famille de l'utilisateur. Ce champ est obligatoire. S'il n'est pas rempli la création est abandonnée et un message d'erreur apparait :
 						@code L'utilisateur ne peut être créé car le nom n'est pas renseigné. Veuillez renseigner le champ nom. @endcode
                     -# Champ <tt>Profil</tt> : liste de choix. Sélectionner ici un profil d'habilitations. Champ obligatoire.
