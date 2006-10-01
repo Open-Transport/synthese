@@ -102,6 +102,10 @@
 				Name="captures sai"
 				Filter="">
 				<File
+					RelativePath=".\schemas\capturesSAI\admin_display_types.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
 					RelativePath=".\schemas\capturesSAI\admin_profiles.htm"
 					DeploymentContent="TRUE">
 				</File>

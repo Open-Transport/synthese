@@ -1,27 +1,24 @@
-/** 00_tcp module wide definitions
-	@file 00_tcp/module.h
+/** 05_security module wide definitions
+	@file 05_security/module.h
 */
 
-#ifndef SYNTHESE_TCP_MODULE_H
-#define SYNTHESE_TCP_MODULE_H
+#ifndef SYNTHESE_SECURITY_MODULE_H
+#define SYNTHESE_SECURITY_MODULE_H
 
-#include <string>
 
 
 namespace synthese
 {
 
-	/** @defgroup m00 00 TCP socket client server implementation
+	/** @defgroup m05 05 Security
 
 		@{
 	*/
 
-	/** 00_tcp namespace */
-	namespace tcp
+	/** 05_security namespace. */
+	namespace security
 	{
 
-	    const std::string PROTOCOL_TYPE_TCP ("tcp");
-	    const std::string PROTOCOL_TYPE_UDP ("udp");
 
 
 	}

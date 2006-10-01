@@ -1,5 +1,11 @@
 /** @page customer_spec_sai_tisseo Spécification SAI SYNTHESE Tisséo
 
+	@section csst_sommaire Sommaire du document
+	
+		- @ref csst_presentation
+		- @ref csst_surveillance
+		- @ref csst_ihm
+
 	@section csst_presentation Présentation
 	
 	@subsection csst_concepts Concepts
@@ -81,6 +87,9 @@
 				
 
 	@section csst_ihm Interface Homme Machine (IHM)
+	
+	@image html cap_admin_home.png
+	@image latex cap_admin_home.png "" width=14cm
 	
 	L'ensemble des écrans de gestion du SAI SYNTHESE est centralisé dans une "console d'administration", qui donne accès à 5 rubriques :
 		- @ref csst_ihm_messages
