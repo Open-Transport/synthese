@@ -19,20 +19,18 @@ namespace synthese
 				- vers la page d'accueil du module d'administration
 				- vers la page de gestion des utilisateurs
 
-			<i>Zone de contenu</i>
-	
-			L'écran de gestion des profils utilisateurs est constitué de trois parties :
+			<i>Zone de contenu</i> : L'écran de gestion des profils utilisateurs est constitué de trois parties :
 				-# Un formulaire de recherche comportant deux critères :
-					- Recherche sur le nom
-					- Recherche sur un module d'application des habilitations
+					-# Recherche sur le nom
+					-# Recherche sur un module d'application des habilitations
 				-# Un tableau dont chaque ligne représente un profil utilisateurs, constitué des colonnes suivantes :
-					- @b Sel : Colonne de sélection : permet à l'utilisateur de sélectionner un ou plusieurs profils pour les supprimer ou pour les copier
-					- @b Nom : Nom du profil
-					- @b Résumé : Résumé des habilitations associées au profil. Ce résumé est une liste à puces de chaque habilitation décrite par :
+					-# @b Sel : Colonne de sélection : permet à l'utilisateur de sélectionner un ou plusieurs profils pour les supprimer ou pour les copier
+					-# @b Nom : Nom du profil
+					-# @b Résumé : Résumé des habilitations associées au profil. Ce résumé est une liste à puces de chaque habilitation décrite par :
 						-# le niveau de droit
 						-# le module couvert
 						-# le périmètre de l'habilitation (code SYNTHESE de réseau/ligne/parcours type/circulation, ou nom de commune ou d'arrêt)
-					- @b Actions : Boutons d'action :
+					-# @b Actions : Boutons d'action :
 						-# Bouton modifier dans les lignes de profil existant, si le profil est modifiable
 
 			Les profils affichés sont sélectionnés comme suit :
@@ -45,8 +43,6 @@ namespace synthese
 			<i>Sécurité</i>
 				- Une habilitation Lecture sur le module Sécurité est nécessaire pour afficher la page en mode consultation. Tous les boutons sont alors retirés.
 				- Une habilitation Ecriture sur le module Sécurité est nécessaire pour afficher la page en mode modification.
-
-			NB : Il n'est pas prévu de définir de périmètre restreint pour les habilitations liées à cette page d'administration : on y accède intégralement ou pas du tout.
 		*/
 		class ProfilesAdmin : public synthese::interfaces::AdminInterfaceElement
 		{

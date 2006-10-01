@@ -27,7 +27,7 @@
 		@copydoc synthese::interfaces::AdminInterfaceElement
 
 		@subsubsection defLog Journaux
-		@copydoc synthese::interfaces::DBLogViewer
+		@copydoc synthese::interfaces::DBLog
 
 		@subsubsection defDisplayTerminal Terminal d'affichage
 		@copydoc synthese::departurestable::DisplayScreen
@@ -114,25 +114,20 @@
 		- @ref csst_ihm_journal
 		
 	@copydoc synthese::interfaces::HomeAdmin
-	
+
 	@subsection csst_ihm_users Gestion des utilisateurs
 	
-	@subsubsection csst_ihm_users_profiles Liste des profils d'habilitations
-	
-	@copydoc synthese::interfaces::ProfilesAdmin
-	
-	@subsubsection csst_ihm_users_profile Edition d'un profil d'habilitations
-
-	@copydoc synthese::interfaces::ProfileAdmin
-	
-	@subsubsection csst_ihm_users_users Liste et recherche des utilisateurs
-	
-	@copydoc synthese::interfaces::UsersAdmin
-	
-	@subsubsection csst_ihm_users_user Edition d'un utilisateur
-	
-	@copydoc synthese::interfaces::UserAdmin
-
+		@subsubsection csst_ihm_users_profiles Liste des profils d'habilitations
+		@copydoc synthese::interfaces::ProfilesAdmin
+		
+		@subsubsection csst_ihm_users_profile Edition d'un profil d'habilitations
+		@copydoc synthese::interfaces::ProfileAdmin
+		
+		@subsubsection csst_ihm_users_users Liste et recherche des utilisateurs
+		@copydoc synthese::interfaces::UsersAdmin
+		
+		@subsubsection csst_ihm_users_user Edition d'un utilisateur
+		@copydoc synthese::interfaces::UserAdmin
 
 
 	@subsection csst_ihm_places Gestion des emplacements
@@ -140,68 +135,79 @@
 		-# Liste et recherche de lieux logiques
 			-# DisplayLocationsAdmin : Gestion des lieux d'affichage d'un lieu logique, avec lien vers les afficheurs positionnés sur ce lieu
 	
-	@copydoc synthese::interfaces::DisplayLocationsAdmin
+		@copydoc synthese::interfaces::DisplayLocationsAdmin
 	
 	
 	
 	@subsection csst_ihm_display Gestion des afficheurs
 	
-	La gestion des afficheurs consiste en deux catégories d'action :
-		- le paramétrage du système pour prendre en charge les matériels installés
-		- la supervision des paramètres de fonctionnement :
-			- surveillance des dispositifs d'affichage
-			- surveillance des données
-	
-	La gestion des afficheurs s'opère via la console d'administration de SYNTHESE, dans la section "tableaux de départs".
-	
-	L'arborescence de la section "tableau de départs" est la suivante :
-		-# @ref csst_ihm_display_DisplayTypesAdmin
-		-# @ref csst_ihm_display_DisplaySearchAdmin : Recherche et liste d'afficheurs, permet la création d'un afficheur
-			-# DisplayAdmin : Paramétrage d'un afficheur (existant ou créé)
-			-# DisplayMaintenanceAdmin : Supervision d'un afficheur
-		-# DisplayDataControlAdmin : Supervision des données : contrôles de cohérence
-	
-	@subsubsection csst_ihm_display_DisplayTypesAdmin Gestion des types d'affichage
+		La gestion des afficheurs consiste en deux catégories d'action :
+			- le paramétrage du système pour prendre en charge les matériels installés
+			- la supervision des paramètres de fonctionnement :
+				- surveillance des dispositifs d'affichage
+				- surveillance des données
+		
+		La gestion des afficheurs s'opère via la console d'administration de SYNTHESE, dans la section "tableaux de départs".
+		
+		L'arborescence de la section "tableau de départs" est la suivante :
+			-# @ref csst_ihm_display_DisplayTypesAdmin
+			-# @ref csst_ihm_display_DisplaySearchAdmin : Recherche et liste d'afficheurs, permet la création d'un afficheur
+				-# DisplayAdmin : Paramétrage d'un afficheur (existant ou créé)
+				-# DisplayMaintenanceAdmin : Supervision d'un afficheur
+			-# DisplayDataControlAdmin : Supervision des données : contrôles de cohérence
+		
+		@subsubsection csst_ihm_display_DisplayTypesAdmin Gestion des types d'affichage
+		@copydoc synthese::interfaces::DisplayTypesAdmin	
+		
+		@subsubsection csst_ihm_display_DisplaySearchAdmin Gestion du parc matériel d'afficheurs
+		@copydoc synthese::interfaces::DisplaySearchAdmin
+		
+		@subsubsection csst_ihm_display_DisplayAdmin Edition des paramètres d'un afficheur
+		@copydoc synthese::interfaces::DisplayAdmin
 
-	@copydoc synthese::interfaces::DisplayTypesAdmin	
-	
-	@subsubsection csst_ihm_display_DisplaySearchAdmin Gestion du parc matériel d'afficheurs
-	
-	@copydoc synthese::interfaces::DisplaySearchAdmin
-	
-	@subsubsection csst_ihm_display_DisplayAdmin Edition des paramètres d'un afficheur
-	
-	@copydoc synthese::interfaces::DisplayAdmin
-
-	@subsubsection csst_ihm_display_DisplayMaintenanceAdmin Supervision d'un afficheur
-	
-	@copydoc synthese::interfaces::DisplayMaintenanceAdmin
+		@subsubsection csst_ihm_display_DisplayMaintenanceAdmin Supervision d'un afficheur
+		@copydoc synthese::interfaces::DisplayMaintenanceAdmin
 
 
 	
 	@subsection csst_ihm_messages Gestion des messages
 	
-	@subsubsection csst_ihm_messages_MessagesAdmin Liste et recherche de messages
-	
-	@copydoc synthese::interfaces::MessagesAdmin
+		@subsubsection csst_ihm_messages_MessagesAdmin Liste et recherche de messages
+		@copydoc synthese::interfaces::MessagesAdmin
 
-	@subsubsection csst_ihm_messages_MessagesLibraryAdmin Bibliothèque de messages prédéfinis
-	
-	@copydoc synthese::interfaces::MessagesLibraryAdmin
-	
-	@subsubsection csst_ihm_messages_MessageAdmin Edition d'un message
-	
-	@copydoc synthese::interfaces::MessageAdmin
+		@subsubsection csst_ihm_messages_MessagesLibraryAdmin Bibliothèque de messages prédéfinis
+		@copydoc synthese::interfaces::MessagesLibraryAdmin
+		
+		@subsubsection csst_ihm_messages_MessageAdmin Edition d'un message
+		@copydoc synthese::interfaces::MessageAdmin
 	
 	
 	@subsection csst_ihm_journal Journal des événements
 	
-	@copydoc synthese::interfaces::AdminLogAdmin
+		@subsubsection csst_ihm_journal_liste Liste des journaux
+		@copydoc synthese::interfaces::DBLogList
 
+		@subsubsection csst_ihm_journal_viewer Visualisation d'un journal
+		@copydoc synthese::interfaces::DBLogViewer
 
 
 	@section csst_security Sécurité
 	
+		Les habilitations suivantes sont définies pour le SAI :
+			- module sécurité, toutes opérations
+			- module tableaux départs, opération admin paramètres terminaux
+			- module tableaux départs, opération maintenance terminaux et données
+			- module environnement, opération bibliothèque messages
+			- module environnement, opération envoi de messages
+			- module environnement, opération admin données réseau
 	
 	@section csst_logs Journaux
+	
+		Les journaux suivants sont alimentés pour le SAI :
+			- module sécurité, toutes opérations
+			- module tableaux départs, opération admin paramètres terminaux
+			- module tableaux départs, opération maintenance terminaux et données
+			- module environnement, opération bibliothèque messages
+			- module environnement, opération envoi de messages
+			- module environnement, opération admin données réseau
 */

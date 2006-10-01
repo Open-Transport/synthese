@@ -24,6 +24,12 @@ namespace synthese
 					-# <tt>Utilisateur</tt> : liste de choix contenant l'ensemble des utilisateurs ayant généré au moins une entrée sur le journal affiché. 
 						- si un utilisateur est sélectionné, alors seules les entrées générées par l'utilisateurs sélectionné sont affichées
 						- si aucun utilisateur n'est sélectionné, alors le filtre est désactivé.
+					-# <tt>Type</tt> : liste de choix permettant de filtrer sur le type d'entrée :
+						- <tt>Toutes</tt> : filtre désactive
+						- <tt>Info</tt>
+						- <tt>Warning</tt>
+						- <tt>Warning + Error</tt>
+						- <tt>Error</tt>
 					-# <tt>Texte</tt> : champ texte permettant de chercher dans le contenu des autres colonnes (regroupée sous le nom de <tt>Entrée</tt>).
 					-# Bouton <tt>Rechercher</tt> : lance la recherche
 				-# <b>Tableau des résultats</b> : Les entrées du journal sont affichées dans les colonnes suivantes :

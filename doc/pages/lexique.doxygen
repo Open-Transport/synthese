@@ -46,15 +46,15 @@ Type de véhicules utilisés par les circulations, faisant intervenir certaines pr
 @subsection technicalGlossaryTransportNetwork Transport network
 
 @subsubsection defLigne Ligne technique
-@copydoc synthese::15_env::Line
+@copydoc synthese::env::Line
 Les lignes techniques sont implémentées par la classe @ref synthese::15_env::Line.
 
 @subsubsection defAxe Axe
-@copydoc synthese::15_env::Axis
+@copydoc synthese::env::Axis
 Les axes sont implémentés par la classe @ref synthese::15_env::Axis.
 
 @subsubsection defCalendrier Calendrier de circulation
-@copydoc synthese::15_env::Calendar
+@copydoc synthese::env::Calendar
 The calendars are implemented by the @ref synthese::15_env::Calendar class.
 
 
