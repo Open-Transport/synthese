@@ -6,9 +6,9 @@
 		- @ref csst_surveillance
 		- @ref csst_ihm
 
-	@section csst_presentation Présentation
+	@section csst_presentation Glossaire
 	
-	@subsection csst_concepts Concepts
+	@subsection csst_securite Sécurité
 
 		@subsubsection defRight Habilitation
 		@copydoc synthese::security::Right
@@ -18,7 +18,9 @@
 
 		@subsubsection defUser Utilisateur
 		@copydoc synthese::security::User
-		
+	
+	@subsection csst_divers Divers
+	
 		@subsubsection defAdmin Composants d'administration
 		@copydoc synthese::interfaces::AdminInterfaceElement
 
@@ -56,9 +58,9 @@
 	@subsection csst_supervision_scenarios Scénarios
 	
 	@subsubsection csst_supervision_scenarios_normal Situation matérielle normale
-	<br>
+	
 	@image html supervision_sai_normal.png 
-	@image latex supervision_sai_normal.png "" width=14cm
+	@image latex supervision_sai_normal.png "Diagramme d'échanges de messages en situation normale" width=14cm
 	
 	Le scénario est le suivant :
 		- l'unité centrale cliente fonctionne normalement
@@ -72,7 +74,7 @@
 	@subsubsection csst_supervision_scenarios_panne_display Panne de terminal d'affichage
 	<br>
 	@image html supervision_sai_display_failure.png 
-	@image latex supervision_sai_display_failure.png "" width=14cm
+	@image latex supervision_sai_display_failure.png "Diagramme d'échanges de messages en cas de panne de terminal d'affichage" width=14cm
 	
 	Le scénario est le suivant :
 		- l'unité centrale cliente fonctionne normalement
@@ -87,7 +89,7 @@
 	@subsubsection csst_supervision_scenarios_panne_pc Panne d'unité centrale cliente
 	<br>
 	@image html supervision_sai_pc_failure.png 
-	@image latex supervision_sai_pc_failure.png "" width=14cm
+	@image latex supervision_sai_pc_failure.png "Diagramme d'échanges de messages en cas de panne d'unité centrale" width=14cm
 	
 	Le scénario est le suivant :
 		- l'unité centrale cliente ne fonctionne pas normalement
