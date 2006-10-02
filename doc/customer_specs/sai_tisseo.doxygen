@@ -27,7 +27,7 @@
 		@copydoc synthese::interfaces::AdminInterfaceElement
 
 		@subsubsection defLog Journaux
-		@copydoc synthese::interfaces::DBLog
+		@copydoc synthese::util::DBLog
 
 		@subsubsection defDisplayTerminal Terminal d'affichage
 		@copydoc synthese::departurestable::DisplayScreen

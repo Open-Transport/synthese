@@ -12,34 +12,36 @@ namespace synthese
 			@image html cap_admin_user.png
 			@image latex cap_admin_user.png "Maquette de l'écran d'édition d'utilisateur" width=14cm
 
+			<i>Titre de la fenêtre</i> :
+				- SYNTHESE Admin - Utilisateurs - [Prénom] [Nom]
+
 			<i>Barre de navigation</i> :
 				- Lien vers synthese::interfaces::HomeAdmin
 				- Lien vers synthese::interfaces::UsersAdmin
-				- Nom de l'utilisateur
+				- Prénom et Nom de l'utilisateur
 
-			<i>Zone de contenus</i> :
-				-# <b>Formulaire d'édition</b> :
-					-# <b>Connexion</b>
-						-# <tt>Login</tt> : Champ texte contenant le nom entré pour se connecter sur SYNTHESE. Champ obligatoire. Le login doit être unique. En cas de tentative de création d'utilisateur avec un login déjà pris, la modification est abandonnée et un message d'erreur apparait :
-							@code L'utilisateur ne peut modifié car le login entré est déjà pris. Veuillez choisir un autre login @endcode
-							Ce champ est en outre obligatoire. S'il n'est pas rempli la modification est abandonnée et un message d'erreur apparait :
-							@code L'utilisateur doit posséder un login. Veuillez renseigner le champ login. @endcode
-						-# <tt>Mot de passe</tt> et <tt>Mot de passe (vérification) : Champs texte cachés contenant le mot de passe utilisé pour se connecter sur SYNTHESE. Lors de l'affichage de la page ces champs ne sont pas remplis. Lors de la modification, trois scénarios peuvent se produire :
-							- Les champs sont laissés vides, auquel cas le mot de passe n'est pas modifié
-							- Les champs sont remplis à l'identique par un nouveau mot de passe, auquel cas le mot de passe est modifié comme spécifié
-							- Les champs sont remplis différemment, auquel cas la modification est interrompue, et un message d'erreur apparait :
-								@code Les mots de passe saisis ne sont pas identiques. Veuillez vérifier les mots de passe entrés. @endcode
-					-# <b>Coordonnées</b>
-						-# <tt>Prénom</tt> : Champ texte facultatif
-						-# <tt>Nom</tt> : Champ texte obligatoire. S'il n'est pas rempli la modification est interrompue et un message d'erreur apparait :
-							@code L'utilisateur doit avoir un nom. @endcode
-						-# <tt>Adresse</tt> : Champ texte long, facultatif
-						-# <tt>Code postal</tt> : Champ texte long, facultatif
-						-# <tt>Ville</tt> : Champ texte, facultatif
-						-# <tt>E-mail</tt> : Champ texte, facultatif
-					-# <b>Droits</b> : cette section n'est disponible que pour les utilisateurs disposant d'une habilitation sur le module sécurité en entier.
-						-# <tt>Connexion autorisée</tt> : Champ OUI/NON. Si le choix est sur NON, l'utilisateur est temporairement désactivé. Cela permet à l'administrateur de suspendre un droit d'accès sans toutefois supprimer l'utilisateur.
-						-# <tt>Profil</tt> : Liste de choix permettant de sélectionner le profil d'habilitations de l'utilisateur.
+			<i>Zone de contenus</i> : Il s'agit d'un <b>Formulaire d'édition</b>.
+				-# <b>Connexion</b>
+					-# <tt>Login</tt> : Champ texte contenant le nom entré pour se connecter sur SYNTHESE. Champ obligatoire. Le login doit être unique. En cas de tentative de création d'utilisateur avec un login déjà pris, la modification est abandonnée et un message d'erreur apparait :
+						@code L'utilisateur ne peut modifié car le login entré est déjà pris. Veuillez choisir un autre login @endcode
+						Ce champ est en outre obligatoire. S'il n'est pas rempli la modification est abandonnée et un message d'erreur apparait :
+						@code L'utilisateur doit posséder un login. Veuillez renseigner le champ login. @endcode
+					-# <tt>Mot de passe</tt> et <tt>Mot de passe (vérification)</tt> : Champs texte cachés contenant le mot de passe utilisé pour se connecter sur SYNTHESE. Lors de l'affichage de la page ces champs ne sont pas remplis. Lors de la modification, trois scénarios peuvent se produire :
+						- Les champs sont laissés vides, auquel cas le mot de passe n'est pas modifié
+						- Les champs sont remplis à l'identique par un nouveau mot de passe, auquel cas le mot de passe est modifié comme spécifié
+						- Les champs sont remplis différemment, auquel cas la modification est interrompue, et un message d'erreur apparait :
+							@code Les mots de passe saisis ne sont pas identiques. Veuillez vérifier les mots de passe entrés. @endcode
+				-# <b>Coordonnées</b>
+					-# <tt>Prénom</tt> : Champ texte facultatif
+					-# <tt>Nom</tt> : Champ texte obligatoire. S'il n'est pas rempli la modification est interrompue et un message d'erreur apparait :
+						@code L'utilisateur doit avoir un nom. @endcode
+					-# <tt>Adresse</tt> : Champ texte long, facultatif
+					-# <tt>Code postal</tt> : Champ texte long, facultatif
+					-# <tt>Ville</tt> : Champ texte, facultatif
+					-# <tt>E-mail</tt> : Champ texte, facultatif
+				-# <b>Droits</b> : cette section n'est disponible que pour les utilisateurs disposant d'une habilitation sur le module sécurité en entier.
+					-# <tt>Connexion autorisée</tt> : Champ OUI/NON. Si le choix est sur NON, l'utilisateur est temporairement désactivé. Cela permet à l'administrateur de suspendre un droit d'accès sans toutefois supprimer l'utilisateur.
+					-# <tt>Profil</tt> : Liste de choix permettant de sélectionner le profil d'habilitations de l'utilisateur.
 								
 			<i>Sécurité</i>
 				- L'affichage de la fenêtre en consultation nécessite une habilitation securité de niveau lecture, ou bien une habilitation sécurité de niveau lecture sur l'appartenance (section Droits alors désactivée)
