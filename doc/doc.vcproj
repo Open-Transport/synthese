@@ -48,9 +48,6 @@
 				RelativePath=".\pages\base.doxygen">
 			</File>
 			<File
-				RelativePath=".\pages\bugs.doxygen">
-			</File>
-			<File
 				RelativePath=".\pages\erreurs.doxygen">
 			</File>
 			<File
@@ -106,6 +103,10 @@
 					DeploymentContent="TRUE">
 				</File>
 				<File
+					RelativePath=".\schemas\capturesSAI\admin_display_maintenance.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
 					RelativePath=".\schemas\capturesSAI\admin_display_types.htm"
 					DeploymentContent="TRUE">
 				</File>
@@ -114,11 +115,51 @@
 					DeploymentContent="TRUE">
 				</File>
 				<File
+					RelativePath=".\schemas\capturesSAI\admin_log_viewer.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
+					RelativePath=".\schemas\capturesSAI\admin_logs.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
+					RelativePath=".\schemas\capturesSAI\admin_message.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
+					RelativePath=".\schemas\capturesSAI\admin_messages.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
+					RelativePath=".\schemas\capturesSAI\admin_messages_library.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
+					RelativePath=".\schemas\capturesSAI\admin_place.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
+					RelativePath=".\schemas\capturesSAI\admin_places.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
+					RelativePath=".\schemas\capturesSAI\admin_profile.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
 					RelativePath=".\schemas\capturesSAI\admin_profiles.htm"
 					DeploymentContent="TRUE">
 				</File>
 				<File
 					RelativePath=".\schemas\capturesSAI\admin_template.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
+					RelativePath=".\schemas\capturesSAI\admin_user.htm"
+					DeploymentContent="TRUE">
+				</File>
+				<File
+					RelativePath=".\schemas\capturesSAI\admin_users.htm"
 					DeploymentContent="TRUE">
 				</File>
 			</Filter>

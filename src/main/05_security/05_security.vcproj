@@ -47,13 +47,19 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath=".\Profile.h">
+			</File>
+			<File
+				RelativePath=".\Right.h">
+			</File>
+			<File
+				RelativePath=".\User.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
 			Filter="">
-			<File
-				RelativePath=".\AdminInterfaceElement\AdminLogAdmin.h">
-			</File>
 			<File
 				RelativePath=".\AdminInterfaceElement\ProfileAdmin.h">
 			</File>
@@ -72,6 +78,20 @@
 			Filter="">
 			<File
 				RelativePath=".\LibraryInterfaceElement\LoginHTMLFormInterfaceElement.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="DBLog"
+			Filter="">
+			<File
+				RelativePath=".\DBLog\SecurityLog.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Rights"
+			Filter="">
+			<File
+				RelativePath=".\Rights\SecurityAllRight.h">
 			</File>
 		</Filter>
 		<File

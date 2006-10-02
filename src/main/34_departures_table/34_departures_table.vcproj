@@ -48,9 +48,6 @@
 				RelativePath=".\AdminInterfaceElement\DisplayAdmin.h">
 			</File>
 			<File
-				RelativePath=".\AdminInterfaceElement\DisplayLocationsAdmin.h">
-			</File>
-			<File
 				RelativePath=".\AdminInterfaceElement\DisplayMaintenanceAdmin.h">
 			</File>
 			<File
@@ -60,14 +57,36 @@
 				RelativePath=".\AdminInterfaceElement\DisplayTypesAdmin.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="Source files"
+			Filter="">
+			<File
+				RelativePath=".\ArrivalDepartureTableGenerator.cpp">
+			</File>
+			<File
+				RelativePath=".\ArrivalDepartureTableGenerator.h">
+			</File>
+			<File
+				RelativePath=".\DisplayScreen.cpp">
+			</File>
+			<File
+				RelativePath=".\DisplayScreen.h">
+			</File>
+			<File
+				RelativePath=".\ForcedDestinationsArrivalDepartureTableGenerator.cpp">
+			</File>
+			<File
+				RelativePath=".\ForcedDestinationsArrivalDepartureTableGenerator.h">
+			</File>
+			<File
+				RelativePath=".\StandardArrivalDepartureTableGenerator.cpp">
+			</File>
+			<File
+				RelativePath=".\StandardArrivalDepartureTableGenerator.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\module.h">
-		</File>
-		<File
-			RelativePath=".\PassThroughDescription.cpp">
-		</File>
-		<File
-			RelativePath=".\PassThroughDescription.h">
 		</File>
 		<File
 			RelativePath=".\SConscript">

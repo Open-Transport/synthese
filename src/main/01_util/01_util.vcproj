@@ -87,6 +87,9 @@
 				RelativePath=".\Conversion.h">
 			</File>
 			<File
+				RelativePath=".\DBLog.h">
+			</File>
+			<File
 				RelativePath=".\Exception.h">
 			</File>
 			<File
@@ -139,6 +142,16 @@
 			</File>
 			<File
 				RelativePath=".\XmlParser.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="AdminInterfaceElement"
+			Filter="">
+			<File
+				RelativePath=".\AdminInterfaceElement\DBLogList.h">
+			</File>
+			<File
+				RelativePath=".\AdminInterfaceElement\DBLogViewer.h">
 			</File>
 		</Filter>
 		<File

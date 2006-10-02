@@ -9,7 +9,6 @@
 
 #include "Interface.h"
 
-#include "34_departures_table/PassThroughDescription.h"
 #include "33_route_planner/Journey.h"
 #include "33_route_planner/JourneyLeg.h"
 
@@ -46,7 +45,6 @@ using synthese::interfaces::Interface;
 
 using synthese::routeplanner::JourneyLeg;
 using synthese::routeplanner::Journey;
-using synthese::departurestable::PassThroughDescription;
 
 
 /*! \brief Copie d'un �l�ment objet dynamique, selon les param�tres fournis
@@ -803,7 +801,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cI
     // 26
     case ELEMENTINTERFACETbDepGare:
     {
-	// Lecture des parametres
+/*	// Lecture des parametres
         // mettre une assertion pour detecter qu'on a bien un vector<PassThroughDescription*>
 	const std::vector<const PassThroughDescription*>* ptds = reinterpret_cast<const std::vector<const PassThroughDescription*>*> (__Objet);
 	assert (ptds != 0);
@@ -859,7 +857,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cI
 		__Rangee += __MultiplicateurRangee;
 	    }
 	}
-    }
+ */   }
     break;
 	    
     // 27
@@ -1657,7 +1655,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cI
 
     case EI_BIBLIOTHEQUE_DescriptionPassage_Ligne:  //44
     {
-	const Line* __Ligne = dynamic_cast<const Line*> (( ( const PassThroughDescription* ) __Objet ) ->getLineStop () ->getParentPath ());
+/*	const Line* __Ligne = dynamic_cast<const Line*> (( ( const PassThroughDescription* ) __Objet ) ->getLineStop () ->getParentPath ());
 	
 	cInterface_Objet_Connu_ListeParametres __ParametresCaseLigne;
 	__ParametresCaseLigne << _Parametres[ EI_BIBLIOTHEQUE_DescriptionPassage_Ligne_HTMLDebutLigne ] ->Texte( __Parametres );
@@ -1666,7 +1664,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cI
 	__ParametresCaseLigne << _Parametres[ EI_BIBLIOTHEQUE_DescriptionPassage_Ligne_HauteurCase ] ->Texte( __Parametres );
 
 	__Site->Affiche( pCtxt, INTERFACECartoucheLigne, __ParametresCaseLigne, ( const void* ) __Ligne );
-    }
+ */   }
     break;
 
     // 45
@@ -1688,7 +1686,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cI
 
     case EI_BIBLIOTHEQUE_DescriptionPassage_Destination:  //46
     {
-	// Lecture des param�tres
+/*	// Lecture des param�tres
 	const PassThroughDescription* __DP = ( const PassThroughDescription* ) __Objet;
 	std::string __DestinationsAAfficher = _Parametres[ 0 ] ->Texte( __Parametres );
 	bool __AfficherTerminus = ( _Parametres[ 1 ] ->Nombre( __Parametres ) == 1 );
@@ -1744,9 +1742,9 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cI
 		   if ( __TypeAffichage == "char(26)" )
 		   pCtxt << __DP->getDisplayedConnectionPlaces () [__i]->getDesignation26();
 		*/
-	    }
+/*	    }
 	}
-    }
+  */  }
     break;
 
     case EI_BIBLIOTHEQUE_DescriptionPassage_ArretPhysique:  //47
@@ -1755,7 +1753,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cI
     case EI_BIBLIOTHEQUE_DescriptionPassage_Heure:  //48
     {
 	// Lecture des param�tres
-	const synthese::time::DateTime& __Moment = ( ( const PassThroughDescription* ) __Objet )->getRealMoment ();
+/*	const synthese::time::DateTime& __Moment = ( ( const PassThroughDescription* ) __Objet )->getRealMoment ();
 	std::string __Zero = _Parametres[ 0 ] ->Texte( __Parametres );
 	std::string __AvantSiImminent = _Parametres[ 1 ] ->Texte( __Parametres );
 	std::string __ApresSiImminent = _Parametres[ 2 ] ->Texte( __Parametres );
@@ -1793,7 +1791,7 @@ int cInterface_Objet_Element_Bibliotheque::Evalue( std::ostream& pCtxt, const cI
 	    __Site->Affiche( pCtxt, INTERFACECaseParticularite, __ParametresCase, NULL );
 
 	}
-    }
+*/    }
     break;
 
     case EI_BIBLIOTHEQUE_Tbdep_NumeroPanneau:  //50

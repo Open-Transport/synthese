@@ -14,7 +14,7 @@ namespace synthese
 				- un nom d'utilisateur
 				- un mot de passe
 				- des coordonnées (mail, etc)
-				- un @ref synthese::05_security::Profile "profil"
+				- un @ref synthese::security::Profile "profil"
 				- des paramètres de personnalisation (demandes favorites...)
 
 		*/

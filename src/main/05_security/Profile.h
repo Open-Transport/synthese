@@ -9,7 +9,7 @@ namespace synthese
 		/** Profil utilisateur.
 			@ingroup m05
 		
-			Un profil utilisateur est un "modèle" de droits utilisateurs consistant en une liste d'@ref synthese::05_security::Right "habilitations" prédéfinies.
+			Un profil utilisateur est un "modèle" de droits utilisateurs consistant en une liste d'@ref synthese::security::Right "habilitations" prédéfinies.
 
 			Exemples de profils utilisateurs :
 				- Utilisateur non identifié : peut utiliser les services grand public

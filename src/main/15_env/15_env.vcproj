@@ -344,6 +344,9 @@
 			<File
 				RelativePath=".\AdminInterfaceElement\PlaceAdmin.h">
 			</File>
+			<File
+				RelativePath=".\AdminInterfaceElement\PlacesAdmin.h">
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\module.h">
