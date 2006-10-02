@@ -208,6 +208,7 @@
 			- module sécurité, toutes opérations
 			- module tableaux départs, opération admin paramètres terminaux
 			- module tableaux départs, opération maintenance terminaux et données
+			- module environnement, opération emplacements
 			- module environnement, opération bibliothèque messages
 			- module environnement, opération envoi de messages
 			- module environnement, opération admin données réseau

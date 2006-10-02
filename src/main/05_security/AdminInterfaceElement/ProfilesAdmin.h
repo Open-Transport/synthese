@@ -20,18 +20,17 @@ namespace synthese
 				- vers la page de gestion des utilisateurs
 
 			<i>Zone de contenu</i> : L'écran de gestion des profils utilisateurs est constitué de trois parties :
-				-# Un formulaire de recherche comportant deux critères :
+				-# <b>formulaire de recherche</b> comportant deux critères :
 					-# Recherche sur le nom
 					-# Recherche sur un module d'application des habilitations
-				-# Un tableau dont chaque ligne représente un profil utilisateurs, constitué des colonnes suivantes :
-					-# @b Sel : Colonne de sélection : permet à l'utilisateur de sélectionner un ou plusieurs profils pour les supprimer ou pour les copier
-					-# @b Nom : Nom du profil
-					-# @b Résumé : Résumé des habilitations associées au profil. Ce résumé est une liste à puces de chaque habilitation décrite par :
+				-# <b>Tableau des résultats</b> dont chaque ligne représente un profil utilisateurs, constitué des colonnes suivantes :
+					-# <tt>Sel</tt> : Colonne de sélection : permet à l'utilisateur de sélectionner un ou plusieurs profils pour les supprimer ou pour les copier
+					-# <tt>Nom</tt> : Nom du profil
+					-# <tt>Résumé</tt> : Résumé des habilitations associées au profil. Ce résumé est une liste à puces de chaque habilitation décrite par :
 						-# le niveau de droit
 						-# le module couvert
 						-# le périmètre de l'habilitation (code SYNTHESE de réseau/ligne/parcours type/circulation, ou nom de commune ou d'arrêt)
-					-# @b Actions : Boutons d'action :
-						-# Bouton modifier dans les lignes de profil existant, si le profil est modifiable
+					-# bouton <tt>Modifier</tt> dans les lignes de profil existant, si le profil est modifiable
 
 			Les profils affichés sont sélectionnés comme suit :
 				- Lors du premier affichage de la page, tous les profils sont affichés
@@ -40,9 +39,13 @@ namespace synthese
 
 			Un tableau ne peut en aucun cas dépasser 50 profils. Si plus de 50 profils correspondent aux critères courants de recherche, alors il est proposé de passer à l'écran suivant par un lien.
 
-			<i>Sécurité</i>
+			<i>Sécurité</i> :
 				- Une habilitation Lecture sur le module Sécurité est nécessaire pour afficher la page en mode consultation. Tous les boutons sont alors retirés.
 				- Une habilitation Ecriture sur le module Sécurité est nécessaire pour afficher la page en mode modification.
+
+			<i>Journaux</i> : Les événements suivants entrainent la création d'une entrée dans le journal de sécurité :
+				- Création de profil
+				- Suppression de profil
 		*/
 		class ProfilesAdmin : public synthese::interfaces::AdminInterfaceElement
 		{
