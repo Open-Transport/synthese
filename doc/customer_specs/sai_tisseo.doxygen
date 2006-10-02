@@ -106,10 +106,10 @@
 
 	@section csst_ihm Interface Homme Machine (IHM)
 	
-		@subsubsection csst_ihm_general Ecran générique
+		<h3>Ecran générique</h3>
 		@copydoc synthese::interfaces::HomeAdmin
 
-		@subsubsection csst_ihm_liste Liste des écrans
+		<h3>Liste des écrans</h3>
 		
 		L'ensemble des écrans de gestion du SAI SYNTHESE est centralisé dans une "console d'administration", qui donne accès à 5 rubriques :
 			- @ref csst_ihm_users
