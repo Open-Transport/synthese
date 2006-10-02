@@ -31,7 +31,7 @@ namespace synthese
 						-# Bouton <tt>Renommer</tt> : Change le nom de l'emplacement par celui entré. En cas de champ nom vide, le renommage est abandonné et un message d'erreur apparait :
 							@code L'emplacement ne peut être renommé par un nom vide @code
 							En outre, le nom d'un emplacement doit être unique au sein du lieu logique, arrêts physiques inclus. En cas de renommage avec un nom existant, il est abandonné et un message d'erreur apparait :
-							@code L'emplacement ne peut être renommé par le nom spécifié car il est déjà utilisé. @code
+							@code L'emplacement ne peut être renommé par le nom spécifié car il est déjà utilisé. @endcode
 						-# Bouton <tt>Supprimer</tt> : Supprime l'emplacement, seulement si celui-ci n'est utilisé par aucun afficheur. Le bouton supprimer n'apparait pas dans un tel cas. Lors de la suppression ce critère d'intégrité est à nouveau controlé. En cas d'échec un message d'erreur apparait :
 							@code Cet emplacement ne peut être supprimé car au moins un terminal d'afficheur y est déclaré. @endcode
 						-# Bouton <tt>Ajouter</tt> : Comportement identique au bouton <tt>Renommer</tt>, mais sur un emplacement nouveau.

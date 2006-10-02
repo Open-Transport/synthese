@@ -1,5 +1,15 @@
 /** @page customer_spec_sai_tisseo Spécification SAI SYNTHESE Tisséo
 
+	Nota Bene : Ce document est un projet.
+	
+	A ce titre, il est ouvert à toute remarque, demande d'évolution, de correction, etc.
+	
+	Pour effectuer une demande de modification du présent document, veuillez utiliser RCS/projets (https://rcs-toulouse.dyndns.org/projets/)
+		- dans le sujet Infra/Tisséo/SAI pour les paragraphes relatifs à l'infrastructure (@ref csst_presentation, @ref csst_surveillance)
+		- dans le sujet Devel/SYNTHESE/SAI pour les paragraphes relatifs au développement (@ref csst_ihm, @ref csst_security, @ref csst_logs)
+		- Une catégorie "Document de spécification" est dédiée à ce document dans les deux sujets précités. Veuillez s'il vous plait placer votre demande dans cette catégorie.
+
+
 	@section csst_sommaire Sommaire du document
 	
 		- @ref csst_presentation
