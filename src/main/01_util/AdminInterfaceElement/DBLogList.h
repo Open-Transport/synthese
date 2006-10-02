@@ -32,7 +32,7 @@ namespace synthese
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
 		*/
-		class DBLogViewer : public AdminInterfaceElement
+		class DBLogList : public AdminInterfaceElement
 		{
 		};
 	}
