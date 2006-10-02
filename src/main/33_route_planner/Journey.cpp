@@ -354,7 +354,7 @@ Journey::operator= (const Journey& ref)
     _effectiveDuration = ref._effectiveDuration;
     _transportConnectionCount = ref._transportConnectionCount;
     _distance = ref._distance;
-    return &this;
+    return *this;
 }
 
 

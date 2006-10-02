@@ -3,12 +3,7 @@
 #define SYNTHESE_CTABLEAUAFFICHAGE_H
 
 
-#include "cSite.h"
-#include "Parametres.h"
-#include "cPointArret.h"
-#include "cQuai.h"
-#include "cLigne.h"
-#include "Temps.h"
+
 #include "ForcedDestinationsArrivalDepartureTableGenerator.h"
 #include "StandardArrivalDepartureTableGenerator.h"
 #include <set>
