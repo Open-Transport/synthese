@@ -179,12 +179,12 @@
 	
 	@subsection csst_ihm_messages Gestion des messages
 	
-		@subsubsection csst_ihm_messages_MessagesAdmin Liste et recherche de messages
-		@copydoc synthese::interfaces::MessagesAdmin
-
 		@subsubsection csst_ihm_messages_MessagesLibraryAdmin Bibliothèque de messages prédéfinis
 		@copydoc synthese::interfaces::MessagesLibraryAdmin
 		
+		@subsubsection csst_ihm_messages_MessagesAdmin Liste et recherche de messages
+		@copydoc synthese::interfaces::MessagesAdmin
+
 		@subsubsection csst_ihm_messages_MessageAdmin Edition d'un message
 		@copydoc synthese::interfaces::MessageAdmin
 
