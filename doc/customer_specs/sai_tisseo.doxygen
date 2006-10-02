@@ -74,7 +74,7 @@
 		-# l'unité centrale émet via le réseau un message SYNTHESE envoyé sur le port TCP 3591 du serveur SYNTHESE, qui va stocker dans la base de données l'état normal du terminal à la date de l'envoi
 	
 	@subsubsection csst_supervision_scenarios_panne_display Panne de terminal d'affichage
-	<br>
+
 	@image html supervision_sai_display_failure.png 
 	@image latex supervision_sai_display_failure.png "Diagramme d'échanges de messages en cas de panne de terminal d'affichage" width=14cm
 	
@@ -89,7 +89,7 @@
 		-# l'unité centrale émet parallèlement via le réseau une trame SNMP destinée à la station de supervision Openview qui déclenchera la procédure d'intervention selon les règles habituelles
 	
 	@subsubsection csst_supervision_scenarios_panne_pc Panne d'unité centrale cliente
-	<br>
+
 	@image html supervision_sai_pc_failure.png 
 	@image latex supervision_sai_pc_failure.png "Diagramme d'échanges de messages en cas de panne d'unité centrale" width=14cm
 	
@@ -106,14 +106,34 @@
 
 	@section csst_ihm Interface Homme Machine (IHM)
 	
-	L'ensemble des écrans de gestion du SAI SYNTHESE est centralisé dans une "console d'administration", qui donne accès à 5 rubriques :
-		- @ref csst_ihm_messages
-		- @ref csst_ihm_users
-		- @ref csst_ihm_places
-		- @ref csst_ihm_display
-		- @ref csst_ihm_journal
+		@subsubsection csst_ihm_general Ecran générique
+		@copydoc synthese::interfaces::HomeAdmin
+
+		@subsubsection csst_ihm_liste Liste des écrans
 		
-	@copydoc synthese::interfaces::HomeAdmin
+		L'ensemble des écrans de gestion du SAI SYNTHESE est centralisé dans une "console d'administration", qui donne accès à 5 rubriques :
+			- @ref csst_ihm_users
+				- @ref csst_ihm_users_profiles
+				- @ref csst_ihm_users_profile
+				- @ref csst_ihm_users_users
+				- @ref csst_ihm_users_user
+			- @ref csst_ihm_places
+				- @ref csst_ihm_places_places
+				- @ref csst_ihm_places_place
+			- @ref csst_ihm_display
+				- @ref csst_ihm_display_DisplayTypesAdmin
+				- @ref csst_ihm_display_DisplaySearchAdmin
+				- @ref csst_ihm_display_DisplayAdmin
+				- @ref csst_ihm_display_DisplayMaintenanceAdmin
+			- @ref csst_ihm_messages
+				- @ref csst_ihm_messages_MessagesAdmin
+				- @ref csst_ihm_messages_MessagesLibraryAdmin
+				- @ref csst_ihm_messages_MessageAdmin
+			- @ref csst_ihm_journal
+				- @ref csst_ihm_journal_liste
+				- @ref csst_ihm_journal_viewer
+		
+
 
 	@subsection csst_ihm_users Gestion des utilisateurs
 	
@@ -130,31 +150,18 @@
 		@copydoc synthese::interfaces::UserAdmin
 
 
+
 	@subsection csst_ihm_places Gestion des emplacements
 	
-		-# Liste et recherche de lieux logiques
-			-# DisplayLocationsAdmin : Gestion des lieux d'affichage d'un lieu logique, avec lien vers les afficheurs positionnés sur ce lieu
-	
-		@copydoc synthese::interfaces::DisplayLocationsAdmin
-	
+		@subsubsection csst_ihm_places_places Liste et recherche de lieux logiques
+		@copydoc synthese::interfaces::PlacesAdmin
+		
+		@subsubsection csst_ihm_places_place Edition de lieu logique
+		@copydoc synthese::interfaces::PlaceAdmin
+			
 	
 	
 	@subsection csst_ihm_display Gestion des afficheurs
-	
-		La gestion des afficheurs consiste en deux catégories d'action :
-			- le paramétrage du système pour prendre en charge les matériels installés
-			- la supervision des paramètres de fonctionnement :
-				- surveillance des dispositifs d'affichage
-				- surveillance des données
-		
-		La gestion des afficheurs s'opère via la console d'administration de SYNTHESE, dans la section "tableaux de départs".
-		
-		L'arborescence de la section "tableau de départs" est la suivante :
-			-# @ref csst_ihm_display_DisplayTypesAdmin
-			-# @ref csst_ihm_display_DisplaySearchAdmin : Recherche et liste d'afficheurs, permet la création d'un afficheur
-				-# DisplayAdmin : Paramétrage d'un afficheur (existant ou créé)
-				-# DisplayMaintenanceAdmin : Supervision d'un afficheur
-			-# DisplayDataControlAdmin : Supervision des données : contrôles de cohérence
 		
 		@subsubsection csst_ihm_display_DisplayTypesAdmin Gestion des types d'affichage
 		@copydoc synthese::interfaces::DisplayTypesAdmin	
@@ -180,6 +187,7 @@
 		
 		@subsubsection csst_ihm_messages_MessageAdmin Edition d'un message
 		@copydoc synthese::interfaces::MessageAdmin
+
 	
 	
 	@subsection csst_ihm_journal Journal des événements
@@ -191,9 +199,12 @@
 		@copydoc synthese::interfaces::DBLogViewer
 
 
+
+
 	@section csst_security Sécurité
 	
 		Les habilitations suivantes sont définies pour le SAI :
+			- module util, opération journal
 			- module sécurité, toutes opérations
 			- module tableaux départs, opération admin paramètres terminaux
 			- module tableaux départs, opération maintenance terminaux et données
