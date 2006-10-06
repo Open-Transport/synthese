@@ -95,11 +95,13 @@ namespace lexmatcher
 	CPPUNIT_ASSERT_EQUAL (std::string ("Peupliers, allée des"), matcher.bestMatch ("PeuPlieER").key);
 	
 	CPPUNIT_ASSERT_EQUAL (std::string ("Division Leclerc, rue de la"), matcher.bestMatch ("rue div leclerc").key);
+	CPPUNIT_ASSERT_EQUAL (std::string ("Division Leclerc, rue de la"), matcher.bestMatch ("ruedivleclerc").key);
 	CPPUNIT_ASSERT_EQUAL (std::string ("Division Leclerc, rue de la"), matcher.bestMatch ("lecler").key);
 
 	CPPUNIT_ASSERT_EQUAL (std::string ("Sophoras, allée des"), matcher.bestMatch ("soforas").key);
 
-	CPPUNIT_ASSERT_EQUAL (std::string ("Portes des Loges, chemin de la"), matcher.bestMatch ("loge chemin").key);
+
+	CPPUNIT_ASSERT_EQUAL (std::string ("Portes des Loges, chemin de la"), matcher.bestMatch ("loge porte chemin").key);
 
     }
 

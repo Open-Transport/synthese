@@ -59,7 +59,7 @@ class LexicalMatcher
 	    int operator () ( const MatchHit& op1, 
 			      const MatchHit& op2 ) const
 		{
-		    return op1.score >= op2.score;
+		    return op1.score > op2.score;
 		}
 	} MatchHitSort;
     
@@ -68,6 +68,7 @@ class LexicalMatcher
 	{
 	    std::vector<std::string> tokens;
 	    size_t size;
+	    std::string oneWord;
 	} PreprocessedKey;
 
 
@@ -79,6 +80,7 @@ class LexicalMatcher
     bool _ignoreCase;
     bool _ignorePunctuation;
     bool _ignoreWordOrder;
+    bool _ignoreWordSpacing;
 
     TranslationMap _translations;
     std::string _separatorCharacters;
@@ -87,6 +89,7 @@ class LexicalMatcher
 
     LexicalMatcher (bool ignoreCase=true,
 		    bool ignoreWordOrder=true,
+		    bool ignoreWordSpacing = true,
 		    const TranslationMap& translations = TranslationMap (),
 		    const std::string& separatorCharacters = "-,;.' &()");
 
@@ -135,16 +138,18 @@ template<class T>
 const double LexicalMatcher<T>::EXTRA_INPUT_WORD_PENALTY_FACTOR (1.0);
 
 template<class T>
-const double LexicalMatcher<T>::EXTRA_MATCH_WORD_PENALTY_FACTOR (0.5);
+const double LexicalMatcher<T>::EXTRA_MATCH_WORD_PENALTY_FACTOR (0.7);
 
 
 template<class T>
 LexicalMatcher<T>::LexicalMatcher (bool ignoreCase,
 				   bool ignoreWordOrder,
+				   bool ignoreWordSpacing,
 				   const TranslationMap& translations,
 				   const std::string& separatorCharacters)
     : _ignoreCase (ignoreCase)
     , _ignoreWordOrder (ignoreWordOrder)
+    , _ignoreWordSpacing (ignoreWordSpacing)
     , _translations (translations)
     , _separatorCharacters (separatorCharacters)
 {
@@ -271,6 +276,7 @@ LexicalMatcher<T>::preprocessKey (const std::string& key) const
 	 ++tok_iter) 
     {
 	ppkey.tokens.push_back (*tok_iter);
+	ppkey.oneWord.append (*tok_iter);
 	ppkey.size += tok_iter->size ();
     }
     return ppkey;
@@ -309,6 +315,7 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
     }
     else
     {
+
 	std::list<std::string> canWords (candidate.tokens.size ());
 	std::copy (candidate.tokens.begin (), candidate.tokens.end (), canWords.begin ());
 
@@ -360,6 +367,16 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
 	    sumLWD += EXTRA_MATCH_WORD_PENALTY_FACTOR * ((double) it->size ());
 	}
 
+    }
+
+    if (_ignoreWordSpacing)
+    {
+	// Do an extra test considering the one-word ppkey (as if there was only one token)
+	// to cover bad word spacing...
+	double oneWordLWD = computeLWD (key.oneWord, candidate.oneWord);
+	
+	// ... and keep it if better.
+	if (oneWordLWD < sumLWD) sumLWD = oneWordLWD;
     }
 
     // Given penalty heuristics, it can happen that the total distance is superior
@@ -429,6 +446,7 @@ template<class T>
 void 
 LexicalMatcher<T>::add (const std::string& key, T ptr)
 {
+    if (key.empty()) return;
     _map.insert (std::make_pair (key, ptr));
     _ppKeys.insert (std::make_pair (key, preprocessKey (key)));
 }
