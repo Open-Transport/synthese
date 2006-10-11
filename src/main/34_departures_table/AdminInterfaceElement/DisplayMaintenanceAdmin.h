@@ -31,6 +31,7 @@ namespace synthese
 					-# <tt>Afficheur déclaré en service</tt> : Choix OUI/NON permettant de déclarer l'afficheur en service ou non :
 						- OUI : l'afficheur est considéré comme théoriquement en service
 						- NON : l'afficheur est considéré comme hors service
+					-# <tt>Message de maintenance</tt> : Texte libre destiné à recevoir des compléments d'informations sur l'état de maintenance de l'afficheur (ex : nature de la panne, etc)
 				-# Zone <b>Contrôle de cohérence des données</b> : le contrôle de cohérence de données est effectué en temps réel lors de l'affichage de la page.
 					-# Etiquette colorée : Indique le résultat du dernier contrôle suivi de la durée depuis laquelle le résultat est identique :
 						- <tt>Warning</tt> (orange) si le contenu de l'afficheur est vide car aucune ligne ne fréquente l'afficheur (si l'afficheur est vide durant la totalité du délai de validité de la base SYNTHESE)
