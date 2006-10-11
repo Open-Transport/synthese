@@ -26,16 +26,22 @@ namespace synthese
 			<i>Zone de contenu</i> : <b>Formulaire d'édition</b> :
 				-# <b>Paramètres</b>
 					-# <tt>Type</tt> : Choix message complémentaire ou prioritaire. Le changement de choix lance un rafraichissement de la page pour redimensionner les zones de texte du contenu et pour charger la liste des modèles correspondants.
-					-# <tt>Date début</tt> : Champ texte obligatoire représentant la date d'envoi à la minute près. Un champ date début vide ou mal formé entraine un message d'erreur empêchant la diffusion :
+					-# <tt>Début diffusion : Date</tt> : Champ texte obligatoire représentant le jour d'envoi du message. Un champ <tt>Début de diffusion : Date</tt> vide ou mal rempli entraîne un message d'erreur empêchant la diffusion :
 						@code Le message ne peut être diffusé car la date de début est incorrecte @endcode
-						Le champ de date de début est par défaut rempli par la date et l'heure courante.
-					-# <tt>Date fin</tt> : Champ texte facultatif représentant la date de fin d'envoi à la minute près.
-						- si le champ est saisi et correctement renseigné, la diffusion est possible
-						- si le champ est saisi et mal renseigné, un message d'erreur empeche la diffusion :
+						Le champ <tt>Début diffusion : Date</tt> est par défaut rempli par la date courante.
+					-# <tt>Début diffusion : Heure</tt> : Champ texte facultatif représentant l'heure exacte d'envoi du message. En cas de non remplissage du champ, le message est envoyé dès minuit. Un champ <tt>Début de diffusion : Heure</tt> mal rempli entraîne un message d'erreur empêchant la diffusion :
+						@code Le message ne peut être diffusé car l'heure de début est incorrecte @endcode
+						Le champ <tt>Début diffusion : Heure</tt> est par défaut rempli par l'heure courante.
+					-# <tt>Fin diffusion</tt> : Champs textes facultatifs représentant la date et l'heure de fin de diffusion du message.
+						- si les champs sont saisis et correctement renseignés, la diffusion est possible
+						- si un des champs est saisi et mal renseigné, un message d'erreur empeche la diffusion :
 							@code Le message ne peut être diffusé car la date de fin est incorrecte @endcode
+							@code Le message ne peut être diffusé car l'heure de fin est incorrecte @endcode
 						- si le champ est renseigné par une date antérieure à la date de début, un message d'erreur empêche la diffusion :
 							@code Le message ne peut être diffusé car la date de fin est antérieure à la date de début. @endcode
 						- si le champ n'est pas renseigné, un message de confirmation est proposé lors de la diffusion, prévenant l'utilisateur que sans action de sa part ce message restera en vigueur indéfiniment
+						- si le seul champ <tt>Fin diffusion : Heure</tt> est seul rempli, un message d'erreur empêche la diffusion :
+							@code Le message ne peut être diffusé car la date de fin est incorrecte @endcode
 				-# <b>Contenu</b>
 					-# <tt>Modèle</tt> : Liste de choix permettant de sélectionner un modèle à recopier. Le choix du modèle n'est pas à proprement parler enregistré dans le message : seul le contenu du modèle sera éventuellement copié sans souvenance du modèle utilisé
 					-# bouton <tt>Copier contenu</tt> : effectue la copie du texte du modèle dans les champs de messages.
