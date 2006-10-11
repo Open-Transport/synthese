@@ -34,6 +34,7 @@ namespace synthese
 						- Messages en cours de diffusion
 						- Messages en cours de diffusion avec date de fin
 						- Messages en cours de diffusion sans date de fin
+						- Messages à diffuser ultérieurement
 					-# <tt>Type</tt> : Liste déroulante proposant les types de messages possibles pouvant faire l'objet d'un filtrage des résultats de recherche :
 						- Tous les types de messages
 						- Messages complémentaires
@@ -45,6 +46,7 @@ namespace synthese
 						- Message dont la diffusion est terminée : fond blanc
 						- Message en cours de diffusion avec date de fin : fond vert clair
 						- Message en cours de diffusion sans date de fin : fond rose
+						- Message à diffuser ultérieurement : fond bleu clair
 					-# <tt>Message</tt> : extrait des messages diffusés. Un clic sur l'extrait conduit à la page synthese::interfaces::MessageAdmin sur le message sélectionné
 					-# <tt>Etat</tt> : état matériel courant des afficheurs de la liste de diffusion. Une infobulle précise l'état représenté, apparaissant au contact avec le pointeur de souris
 						- Pastille verte : tous les afficheurs sont en fonctionnement normal
