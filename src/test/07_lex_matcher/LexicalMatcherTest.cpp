@@ -112,16 +112,33 @@ namespace lexmatcher
     void
     LexicalMatcherTest::testWholeWordMatchingCriterium ()
     {
-	std::vector<std::string> testBase;
-	testBase.push_back ("ANPE trucmuche");
-	testBase.push_back ("ANPE bidule");
-	testBase.push_back ("Anges");
+
+	{
+	    std::vector<std::string> testBase;
+	    testBase.push_back ("ANPE trucmuche");
+	    testBase.push_back ("ANPE bidule");
+	    testBase.push_back ("Anges");
+	    
+	    
+	    LexicalMatcher<int> matcher;
+	    for (size_t i=0; i<testBase.size (); ++i) matcher.add (testBase[i], 0);
+	    
+	    CPPUNIT_ASSERT_EQUAL (std::string ("ANPE bidule"), matcher.bestMatch ("ANPE").key);
+	}
+	{
+	    std::vector<std::string> testBase;
+	    testBase.push_back ("Rue Sainte-Marie");
+	    testBase.push_back ("Rue de Saint-Cyprien");
+	    testBase.push_back ("Rue Saint-Cyr");
+	    
+	    
+	    LexicalMatcher<int> matcher;
+	    for (size_t i=0; i<testBase.size (); ++i) matcher.add (testBase[i], 0);
+	    
+	    CPPUNIT_ASSERT_EQUAL (std::string ("Rue de Saint-Cyprien"), matcher.bestMatch ("rue saint-siprien").key);
+	}
 
 
-	LexicalMatcher<int> matcher (true, true);
-	for (size_t i=0; i<testBase.size (); ++i) matcher.add (testBase[i], 0);
-
-	CPPUNIT_ASSERT_EQUAL (std::string ("ANPE bidule"), matcher.bestMatch ("ANPE").key);
     }
 
 

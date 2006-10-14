@@ -92,6 +92,10 @@ class LexicalMatcher
 
     static const double LWD_SCORE_WEIGHT; // Word distance score weight
     static const double WWM_SCORE_WEIGHT; // Whole word matched score weight
+
+    static const int WWM_LWD_THRESHOLD[30]; // Max LWD in a word to consider it is a WWM
+    static const int WWM_BONUS[30]; // WWM bonus according to number of letters
+
     static const double WWM_SCORE_THRESHOLD; // score threshold to consider that the whole word is matched
 
 
@@ -111,6 +115,7 @@ class LexicalMatcher
 	    std::vector<std::string> tokens;
 	    size_t size;
 	    std::string oneWord;
+	    int maxWwmBonus;
 	} PreprocessedKey;
 
 
@@ -168,8 +173,9 @@ class LexicalMatcher
  private:
     
     PreprocessedKey preprocessKey (const std::string& key) const;
+    int getWwmLwdThreshold (int nbLetters) const;
+    int getWwmBonus (int wordLwd, int nbLetters) const;
     int computeLWD (const std::string& s, const std::string& t) const;
-    std::pair<double, double> computeDistanceAndScore (const std::string& s1, const std::string& s2) const;
     double computeScore (const PreprocessedKey& key, const PreprocessedKey& candidate) const;
 
 
@@ -185,17 +191,21 @@ template<class T>
 const double LexicalMatcher<T>::EXTRA_INPUT_WORD_PENALTY_FACTOR (1.0);
 
 template<class T>
-const double LexicalMatcher<T>::EXTRA_MATCH_WORD_PENALTY_FACTOR (0.7);
+const double LexicalMatcher<T>::EXTRA_MATCH_WORD_PENALTY_FACTOR (0.4);
 
 
 template<class T>
-const double LexicalMatcher<T>::LWD_SCORE_WEIGHT (0.5);
+const double LexicalMatcher<T>::LWD_SCORE_WEIGHT (0.4);
 
 template<class T>
-const double LexicalMatcher<T>::WWM_SCORE_WEIGHT (0.5);
+const double LexicalMatcher<T>::WWM_SCORE_WEIGHT (0.6);
+
 
 template<class T>
-const double LexicalMatcher<T>::WWM_SCORE_THRESHOLD (0.75);
+const int LexicalMatcher<T>::WWM_LWD_THRESHOLD[30] = {0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7 };
+
+template<class T>
+const int LexicalMatcher<T>::WWM_BONUS[30] = {0, 2, 4, 6, 6, 10, 10, 15, 15, 22, 30, 40, 40, 52, 64, 78, 92, 108, 124, 142, 160, 180, 200, 222, 244, 268, 292, 318, 344, 380 };
 
 
 
@@ -303,6 +313,7 @@ LexicalMatcher<T>::preprocessKey (const std::string& key) const
     std::string tmpkey (key);
     PreprocessedKey ppkey;
     ppkey.size = 0;
+    ppkey.maxWwmBonus = 0;
 
     // Do some filtering...
     if (_ignoreCase)
@@ -334,8 +345,6 @@ LexicalMatcher<T>::preprocessKey (const std::string& key) const
 	 ++tok_iter) 
     {
 	ppkey.tokens.push_back (*tok_iter);
-	ppkey.oneWord.append (*tok_iter);
-	ppkey.size += tok_iter->size ();
     }
 
     // Apply word translations
@@ -354,6 +363,15 @@ LexicalMatcher<T>::preprocessKey (const std::string& key) const
 	}
     }
 
+    for (tokenizer::iterator tok_iter = keyTokens.begin(); 
+	 tok_iter != keyTokens.end (); 
+	 ++tok_iter) 
+    {
+	ppkey.oneWord.append (*tok_iter);
+	ppkey.size += tok_iter->size ();
+	ppkey.maxWwmBonus += getWwmBonus (0, tok_iter->size ());
+    }
+
     return ppkey;
  
 }
@@ -361,14 +379,27 @@ LexicalMatcher<T>::preprocessKey (const std::string& key) const
 
 
 
+
 template<class T>
-std::pair<double, double>
-LexicalMatcher<T>::computeDistanceAndScore (const std::string& s1, const std::string& s2) const
+int
+LexicalMatcher<T>::getWwmLwdThreshold (int nbLetters) const
 {
-    double maxLength = (double) std::max (s1.size (), s2.size ());
-    double lwd = computeLWD (s1, s2);
-    return std::make_pair (lwd, (maxLength - lwd) / maxLength);
+    if (nbLetters > 30) return WWM_LWD_THRESHOLD[29];
+    return WWM_LWD_THRESHOLD[nbLetters];
 }
+
+
+
+template<class T>
+int
+LexicalMatcher<T>::getWwmBonus (int wordLwd, int nbLetters) const
+{
+    if (nbLetters > 30) return WWM_BONUS[29];
+    double weight = ((double) (nbLetters - wordLwd)) / ((double) nbLetters);
+    // an exact match give maximal bonus. approximate match decrease bonus very quickly (^2).
+    return (int) (WWM_BONUS[nbLetters] * weight * weight);
+}
+
 
 
 
@@ -382,7 +413,7 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
     double maxLength = (double) std::max (key.size, candidate.size);
 
     double sumLWD = 0.0;
-    int nbWWM = 0;
+    int sumWWM = 0;
 
     if (_ignoreWordOrder == false)
     {
@@ -396,11 +427,13 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
 	    } 
 	    else
 	    {
-		std::pair<double, double> distanceAndScore = computeDistanceAndScore (*it1, *it2);
-		sumLWD += distanceAndScore.first;
-		if (distanceAndScore.second >= WWM_SCORE_THRESHOLD)
+		int wordLWD = computeLWD (*it1, *it2);
+		sumLWD += wordLWD;
+		if (wordLWD <= getWwmLwdThreshold (it2->size ()))
 		{
-		    ++nbWWM;
+		    // Add the number of letters of the word
+		    // because a small WWM is less important than a big WWM.
+		    sumWWM += getWwmBonus (wordLWD, it2->size ()); 
 		}
 		++it2;
 	    }
@@ -434,12 +467,10 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
 	    std::list<std::string>::iterator bestit = canWords.end ();
 	    while (it != canWords.end ())
 	    {
-		std::pair<double, double> distanceAndScore = computeDistanceAndScore (*key_iter, *it);
-
-		if (distanceAndScore.first < minLWD) 
+		double lwd = computeLWD (*key_iter, *it);
+		if (lwd < minLWD) 
 		{
-		    minLWD = distanceAndScore.first;
-		    bestScore = distanceAndScore.second;
+		    minLWD = lwd;
 		    bestit = it;
 		    if (minLWD == 0.0) break;
 		}
@@ -448,14 +479,16 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
 		    ++it;
 		}
 	    }
+	    if (minLWD <= getWwmLwdThreshold (bestit->size ()))
+	    {
+		// Add the number of letters of the word
+		// because a small WWM is less important than a big WWM.
+		sumWWM += getWwmBonus ((int) minLWD, bestit->size ()); 
+	    }
+	    sumLWD += minLWD;
+
 	    canWords.erase (bestit);
 
-	    if (bestScore >= WWM_SCORE_THRESHOLD)
-	    {
-		++nbWWM;
-	    }
-
-	    sumLWD += minLWD;
 	    ++key_iter;
 	}
 
@@ -481,17 +514,23 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
 
     double lwdScore = (maxLength - sumLWD) / maxLength;
 
+    // Given penalty heuristics, it can happen that the total distance is superior
+    // to total length... In such a case this is really not a good match : 
     if (lwdScore < 0) lwdScore = 0;
 
     
-    double wwmScore = ((double) nbWWM) / candidate.tokens.size ();
-
-    // Given penalty heuristics, it can happen that the total distance is superior
-    // to total length... In such a case this is really not a good match : 
-    // if (sumLWD > maxLength) return 0.0;
+    double wwmScore = ((double) sumWWM) / candidate.maxWwmBonus;
 
 
-    return LWD_SCORE_WEIGHT * lwdScore + WWM_SCORE_WEIGHT * wwmScore;
+//    std::cerr << candidate.oneWord <<  "   " << "lwdScore=" << lwdScore << "  wwmScore=" << wwmScore << std::endl;
+
+    if (wwmScore > lwdScore) 
+    {
+	// Whole word match can only bring a bonus.
+	return LWD_SCORE_WEIGHT * lwdScore + WWM_SCORE_WEIGHT * wwmScore;
+    } 
+    return lwdScore;
+
 }
 
 
