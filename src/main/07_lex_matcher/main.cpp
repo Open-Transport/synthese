@@ -14,7 +14,7 @@
 
 using synthese::util::Log;
 using synthese::util::Conversion;
-using synthese::lexmatcher::LexicalMatcher;
+using namespace synthese::lexmatcher;
 
 
 namespace po = boost::program_options;
@@ -50,7 +50,7 @@ int main( int argc, char **argv )
     bool ignoreCase (true);
     bool ignoreWordOrder (true);
     bool ignoreWordSpacing (true);
-    std::map<std::string, std::string> translations;
+    TranslationMap translationMap = FrenchTranslationMap ();
     std::string separatorCharacters ("-,;.' &()");
 
     int nbMatches (10);
@@ -58,7 +58,7 @@ int main( int argc, char **argv )
     LexicalMatcher<int> matcher (ignoreCase, 
 				 ignoreWordOrder, 
 				 ignoreWordSpacing, 
-				 translations, 
+				 translationMap,
 				 separatorCharacters);
 
     // Parse txt file and initialize lexical matcher

@@ -27,6 +27,43 @@ namespace synthese
 namespace lexmatcher
 {
 
+    typedef 
+	struct 
+	{
+	    std::map<std::string, std::string> globalTranslations; 
+	    std::map<std::string, std::string> wordTranslations; 
+	} TranslationMap;
+
+
+    TranslationMap FrenchTranslationMap () 
+    {
+	TranslationMap map;
+
+	map.globalTranslations.insert (std::make_pair ("à", "a"));
+	map.globalTranslations.insert (std::make_pair ("â", "a"));
+
+	map.globalTranslations.insert (std::make_pair ("é", "e"));
+	map.globalTranslations.insert (std::make_pair ("è", "e"));
+	map.globalTranslations.insert (std::make_pair ("ê", "e"));
+	map.globalTranslations.insert (std::make_pair ("ë", "e"));
+
+	map.globalTranslations.insert (std::make_pair ("î", "i"));
+	map.globalTranslations.insert (std::make_pair ("ï", "i"));
+
+	map.globalTranslations.insert (std::make_pair ("ô", "o"));
+	map.globalTranslations.insert (std::make_pair ("ö", "o"));
+
+	map.globalTranslations.insert (std::make_pair ("ù", "u"));
+	map.globalTranslations.insert (std::make_pair ("û", "u"));
+	map.globalTranslations.insert (std::make_pair ("ü", "u"));
+
+	map.globalTranslations.insert (std::make_pair ("ç", "c"));
+	return map;
+
+    }
+
+
+
 
 /** Generic map container on string keys which can return a set of pairs <value, score>.
     The score is equal to 1 if and only if it exists an identical key in the container.
@@ -77,7 +114,6 @@ class LexicalMatcher
 	} PreprocessedKey;
 
 
-    typedef std::map<std::string, std::string> TranslationMap;
 
     std::map<std::string, T> _map;
     std::map<std::string, PreprocessedKey > _ppKeys;
@@ -95,7 +131,7 @@ class LexicalMatcher
     LexicalMatcher (bool ignoreCase=true,
 		    bool ignoreWordOrder=true,
 		    bool ignoreWordSpacing = true,
-		    const TranslationMap& translations = TranslationMap (),
+		    const TranslationMap& translations = FrenchTranslationMap (),
 		    const std::string& separatorCharacters = "-,;.' &()");
 
     ~LexicalMatcher ();
@@ -139,6 +175,11 @@ class LexicalMatcher
 
 };
 
+ 
+ 
+ 
+ 
+
 
 template<class T>
 const double LexicalMatcher<T>::EXTRA_INPUT_WORD_PENALTY_FACTOR (1.0);
@@ -155,6 +196,7 @@ const double LexicalMatcher<T>::WWM_SCORE_WEIGHT (0.5);
 
 template<class T>
 const double LexicalMatcher<T>::WWM_SCORE_THRESHOLD (0.75);
+
 
 
 template<class T>
@@ -268,9 +310,9 @@ LexicalMatcher<T>::preprocessKey (const std::string& key) const
 	boost::algorithm::to_lower (tmpkey); 
     }
 
-    // Apply translations
-    for (std::map<std::string, std::string>::const_iterator it = _translations.begin ();
-	 it != _translations.end (); ++it)
+    // Apply global translations
+    for (std::map<std::string, std::string>::const_iterator it = _translations.globalTranslations.begin ();
+	 it != _translations.globalTranslations.end (); ++it)
     {
 	std::string search = _ignoreCase ? boost::algorithm::to_lower_copy (it->first) : it->first;
 	boost::algorithm::trim (search);
@@ -282,7 +324,7 @@ LexicalMatcher<T>::preprocessKey (const std::string& key) const
     // Trim the string
     boost::algorithm::trim (tmpkey);
 
-    // Split the string
+    // Tokenize the string
     typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
     boost::char_separator<char> sep (_separatorCharacters.c_str ());
     tokenizer keyTokens (tmpkey, sep);
@@ -295,6 +337,23 @@ LexicalMatcher<T>::preprocessKey (const std::string& key) const
 	ppkey.oneWord.append (*tok_iter);
 	ppkey.size += tok_iter->size ();
     }
+
+    // Apply word translations
+    for (std::map<std::string, std::string>::const_iterator it = _translations.wordTranslations.begin ();
+	 it != _translations.wordTranslations.end (); ++it)
+    {
+	std::string search = _ignoreCase ? boost::algorithm::to_lower_copy (it->first) : it->first;
+	boost::algorithm::trim (search);
+	std::string replace = _ignoreCase ? boost::algorithm::to_lower_copy (it->second) : it->second;
+	boost::algorithm::trim (replace);
+	
+	for (std::vector<std::string>::iterator it = ppkey.tokens.begin ();
+	     it != ppkey.tokens.end (); ++it)
+	{
+	    if (*it == search) *it = replace;
+	}
+    }
+
     return ppkey;
  
 }
