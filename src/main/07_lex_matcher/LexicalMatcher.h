@@ -50,6 +50,9 @@ class LexicalMatcher
 
  private:
 
+    static const double EXTRA_INPUT_WORD_PENALTY_FACTOR;
+    static const double EXTRA_MATCH_WORD_PENALTY_FACTOR;
+
     static const double LWD_SCORE_WEIGHT; // Word distance score weight
     static const double WWM_SCORE_WEIGHT; // Whole word matched score weight
     static const double WWM_SCORE_THRESHOLD; // score threshold to consider that the whole word is matched
@@ -135,6 +138,14 @@ class LexicalMatcher
 
 
 };
+
+
+template<class T>
+const double LexicalMatcher<T>::EXTRA_INPUT_WORD_PENALTY_FACTOR (1.0);
+
+template<class T>
+const double LexicalMatcher<T>::EXTRA_MATCH_WORD_PENALTY_FACTOR (0.7);
+
 
 template<class T>
 const double LexicalMatcher<T>::LWD_SCORE_WEIGHT (0.5);
@@ -350,6 +361,8 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
 	{
 	    if (canWords.empty ()) 
 	    {
+		// Extra words in key. Normal penalty.
+		sumLWD += EXTRA_INPUT_WORD_PENALTY_FACTOR * ((double) key_iter->size ());
 		++key_iter;
 		continue;
 	    }
@@ -387,6 +400,14 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
 	    ++key_iter;
 	}
 
+	for (std::list<std::string>::iterator it = canWords.begin ();
+	     it != canWords.end (); ++it) 
+	{
+	    // Extra words in candidates. Smaller penalty. It is obvious that most
+	    // of the time, the input will contain fewer words than then best match.
+	    sumLWD += EXTRA_MATCH_WORD_PENALTY_FACTOR * ((double) it->size ());
+	}
+
     }
 
     if (_ignoreWordSpacing)
@@ -410,7 +431,6 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
     // to total length... In such a case this is really not a good match : 
     // if (sumLWD > maxLength) return 0.0;
 
-//    std::cerr << candidate.oneWord << "  " << "lwdScore = " << lwdScore << "    " << "wwmScore = " << wwmScore << std::endl;
 
     return LWD_SCORE_WEIGHT * lwdScore + WWM_SCORE_WEIGHT * wwmScore;
 }
