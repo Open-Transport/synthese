@@ -49,6 +49,7 @@ int main( int argc, char **argv )
 
     bool ignoreCase (true);
     bool ignoreWordOrder (true);
+    bool ignoreWordSpacing (true);
     std::map<std::string, std::string> translations;
     std::string separatorCharacters ("-,;.' &()");
 
@@ -56,6 +57,7 @@ int main( int argc, char **argv )
 
     LexicalMatcher<int> matcher (ignoreCase, 
 				 ignoreWordOrder, 
+				 ignoreWordSpacing, 
 				 translations, 
 				 separatorCharacters);
 

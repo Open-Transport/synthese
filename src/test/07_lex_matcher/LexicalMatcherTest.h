@@ -17,6 +17,7 @@ class LexicalMatcherTest : public CPPUNIT_NS::TestCase
 {
   CPPUNIT_TEST_SUITE(LexicalMatcherTest);
   CPPUNIT_TEST(testBasicMatches);
+  CPPUNIT_TEST(testWholeWordMatchingCriterium);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -27,6 +28,7 @@ public:
 protected:
 
   void testBasicMatches ();
+  void testWholeWordMatchingCriterium ();
 
   std::vector<std::string> getTestBase1 () const;
 

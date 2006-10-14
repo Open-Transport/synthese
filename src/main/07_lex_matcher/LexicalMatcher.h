@@ -50,8 +50,10 @@ class LexicalMatcher
 
  private:
 
-    static const double EXTRA_INPUT_WORD_PENALTY_FACTOR;
-    static const double EXTRA_MATCH_WORD_PENALTY_FACTOR;
+    static const double LWD_SCORE_WEIGHT; // Word distance score weight
+    static const double WWM_SCORE_WEIGHT; // Whole word matched score weight
+    static const double WWM_SCORE_THRESHOLD; // score threshold to consider that the whole word is matched
+
 
     typedef 
 	struct
@@ -128,17 +130,20 @@ class LexicalMatcher
     
     PreprocessedKey preprocessKey (const std::string& key) const;
     int computeLWD (const std::string& s, const std::string& t) const;
+    std::pair<double, double> computeDistanceAndScore (const std::string& s1, const std::string& s2) const;
     double computeScore (const PreprocessedKey& key, const PreprocessedKey& candidate) const;
 
 
 };
 
+template<class T>
+const double LexicalMatcher<T>::LWD_SCORE_WEIGHT (0.5);
 
 template<class T>
-const double LexicalMatcher<T>::EXTRA_INPUT_WORD_PENALTY_FACTOR (1.0);
+const double LexicalMatcher<T>::WWM_SCORE_WEIGHT (0.5);
 
 template<class T>
-const double LexicalMatcher<T>::EXTRA_MATCH_WORD_PENALTY_FACTOR (0.7);
+const double LexicalMatcher<T>::WWM_SCORE_THRESHOLD (0.75);
 
 
 template<class T>
@@ -286,6 +291,18 @@ LexicalMatcher<T>::preprocessKey (const std::string& key) const
 
 
 
+template<class T>
+std::pair<double, double>
+LexicalMatcher<T>::computeDistanceAndScore (const std::string& s1, const std::string& s2) const
+{
+    double maxLength = (double) std::max (s1.size (), s2.size ());
+    double lwd = computeLWD (s1, s2);
+    return std::make_pair (lwd, (maxLength - lwd) / maxLength);
+}
+
+
+
+
 
 
 template<class T>
@@ -295,6 +312,8 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
     double maxLength = (double) std::max (key.size, candidate.size);
 
     double sumLWD = 0.0;
+    int nbWWM = 0;
+
     if (_ignoreWordOrder == false)
     {
 	std::vector<std::string>::const_iterator it1 = key.tokens.begin ();
@@ -307,7 +326,12 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
 	    } 
 	    else
 	    {
-		sumLWD += computeLWD (*it1, *it2);
+		std::pair<double, double> distanceAndScore = computeDistanceAndScore (*it1, *it2);
+		sumLWD += distanceAndScore.first;
+		if (distanceAndScore.second >= WWM_SCORE_THRESHOLD)
+		{
+		    ++nbWWM;
+		}
 		++it2;
 	    }
 	    ++it1;
@@ -326,27 +350,24 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
 	{
 	    if (canWords.empty ()) 
 	    {
-		// Extra words in key. Normal penalty.
-		sumLWD += EXTRA_INPUT_WORD_PENALTY_FACTOR * ((double) key_iter->size ());
 		++key_iter;
 		continue;
 	    }
 	
 	    // Compute minimal LWD
 	    double minLWD = std::numeric_limits<double>::max ();
+	    double bestScore = 0.0;
+
 	    std::list<std::string>::iterator it = canWords.begin ();
 	    std::list<std::string>::iterator bestit = canWords.end ();
 	    while (it != canWords.end ())
 	    {
-            if (*it == "leclerc") 
-            {
-            int a = 5;
-            }
-		double lwd = computeLWD (*key_iter, *it);
+		std::pair<double, double> distanceAndScore = computeDistanceAndScore (*key_iter, *it);
 
-		if (lwd < minLWD) 
+		if (distanceAndScore.first < minLWD) 
 		{
-		    minLWD = lwd;
+		    minLWD = distanceAndScore.first;
+		    bestScore = distanceAndScore.second;
 		    bestit = it;
 		    if (minLWD == 0.0) break;
 		}
@@ -356,15 +377,14 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
 		}
 	    }
 	    canWords.erase (bestit);
+
+	    if (bestScore >= WWM_SCORE_THRESHOLD)
+	    {
+		++nbWWM;
+	    }
+
 	    sumLWD += minLWD;
 	    ++key_iter;
-	}
-	for (std::list<std::string>::iterator it = canWords.begin ();
-	     it != canWords.end (); ++it) 
-	{
-	    // Extra words in candidates. Smaller penalty. It is obvious that most
-	    // of the time, the input will contain fewer words than then best match.
-	    sumLWD += EXTRA_MATCH_WORD_PENALTY_FACTOR * ((double) it->size ());
 	}
 
     }
@@ -379,11 +399,20 @@ LexicalMatcher<T>::computeScore (const PreprocessedKey& key, const PreprocessedK
 	if (oneWordLWD < sumLWD) sumLWD = oneWordLWD;
     }
 
+    double lwdScore = (maxLength - sumLWD) / maxLength;
+
+    if (lwdScore < 0) lwdScore = 0;
+
+    
+    double wwmScore = ((double) nbWWM) / candidate.tokens.size ();
+
     // Given penalty heuristics, it can happen that the total distance is superior
     // to total length... In such a case this is really not a good match : 
-    if (sumLWD > maxLength) return 0.0;
+    // if (sumLWD > maxLength) return 0.0;
 
-    return (maxLength - sumLWD) / maxLength;
+//    std::cerr << candidate.oneWord << "  " << "lwdScore = " << lwdScore << "    " << "wwmScore = " << wwmScore << std::endl;
+
+    return LWD_SCORE_WEIGHT * lwdScore + WWM_SCORE_WEIGHT * wwmScore;
 }
 
 
@@ -399,7 +428,7 @@ LexicalMatcher<T>::computeLWD (const std::string& s, const std::string& t) const
 
     // Levenshtein Word Distance matrix.
     // Note that the dims are bounded to 256. It means that it is 
-    // forbidden to compare words larger then 256 characters each!
+    // forbidden to compare words larger than 256 characters each!
     int matrix[256][256];
 
     int n = (int) s.length();
