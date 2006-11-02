@@ -19,7 +19,7 @@ namespace synthese
 
 		Le schéma suivant représente l'architecture cible d'un système de téléaffichage basé sur la solution SYNTHESE :
 
-		@image latex 1195515.2.000.png "Architecture cible d'un système de téléaffichage SYNTHESE" height=10cm
+		@image latex 1195515_1_000.eps "Architecture cible d'un système de téléaffichage SYNTHESE" height=10cm
 		@image html 1195515.2.000.png
 
 		<h3>Structure des pages d'administration liées au module tableaux de départs et d'arrivée</h3>
@@ -48,9 +48,7 @@ namespace synthese
 			Bibliothèque -> "C/E/S Modèle de message prioritaire";
 			Bibliothèque -> "C/E/S Scénario";
 
-			Utilisateurs -> "Création utilisateur";
-			Utilisateurs -> "Edition utilisateur";
-			Utilisateurs -> "Suppression utilisateur";
+			Utilisateurs -> "C/E/S utilisateur";
 			
 			Profils -> "C/E/S profil";
 			
