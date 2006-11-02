@@ -1,6 +1,8 @@
 /**
 
 @page mod Documentation technique
+
+ - @subpage tech_architecture
  - @subpage m0
  - @subpage m1
  - @subpage m3

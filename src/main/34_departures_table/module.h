@@ -28,6 +28,8 @@ namespace synthese
 
 		@dot
 		digraph {
+			rankdir=LR
+			node [shape=rectangle fontname=helvetica style=filled color="red" fillcolor="gold"]
 			Login -> Accueil;
 				Accueil -> Messages;
 					Messages -> Bibliothèque;

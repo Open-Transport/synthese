@@ -13,12 +13,17 @@
 	@section csst_sommaire Sommaire du document
 	
 		- @ref csst_presentation
+		- @ref csst_glossary
 		- @ref csst_surveillance
 		- @ref csst_ihm
 		- @ref csst_security
 		- @ref csst_logs
 
-	@section csst_presentation Glossaire
+	@section csst_presentation Présentation
+	
+		@copydoc m34
+	
+	@section csst_glossary Glossaire
 	
 	@subsection csst_securite Sécurité
 
