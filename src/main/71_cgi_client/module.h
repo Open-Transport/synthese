@@ -14,7 +14,7 @@ namespace synthese
 
 		L'architecture cible de l'intégration des services SYNTHESE à un site web est résumée par le schéma suivant :
 
-		@image latex 1195561.1.000.eps "Architecture cible de l'intégration de SYNTHESE à un site web" height=10cm
+		@image latex 1195561.2.000.png "Architecture cible de l'intégration de SYNTHESE à un site web" height=10cm
 		@image html 1195561.2.000.png
 
 		@{

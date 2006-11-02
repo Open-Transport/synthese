@@ -19,7 +19,7 @@ namespace synthese
 
 		Le schéma suivant représente l'architecture cible d'un système de téléaffichage basé sur la solution SYNTHESE :
 
-		@image latex 1195515.1.000.eps "Architecture cible d'un système de téléaffichage SYNTHESE" height=10cm
+		@image latex 1195515.2.000.png "Architecture cible d'un système de téléaffichage SYNTHESE" height=10cm
 		@image html 1195515.2.000.png
 
 		<h3>Structure des pages d'administration liées au module tableaux de départs et d'arrivée</h3>
