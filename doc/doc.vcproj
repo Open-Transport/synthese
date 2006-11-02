@@ -45,6 +45,9 @@
 				RelativePath=".\pages\admin.doxygen">
 			</File>
 			<File
+				RelativePath=".\pages\architecture.doxygen">
+			</File>
+			<File
 				RelativePath=".\pages\base.doxygen">
 			</File>
 			<File
