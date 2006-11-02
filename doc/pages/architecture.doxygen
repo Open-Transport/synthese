@@ -1,0 +1,5 @@
+/** @page tech_architecture Architecture
+
+SYNTHESE est une application serveur accessible par un port TCP dédié. Une requête SYNTHESE est transmise sur le port (requête similaire à une requête HTTP), et le serveur retourne le résultat. Divers clients peuvent être développés.
+
+*/
