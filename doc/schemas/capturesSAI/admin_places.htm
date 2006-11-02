@@ -39,42 +39,39 @@ function Table2_onclick() {
 			borderColor="#000066">
 			<TR>
 				<TD width="266" bgColor="#000066" colSpan="1" height="21" rowSpan="1" style="WIDTH: 266px"><FONT face="Verdana" size="1"><FONT color="#ffffff">user@SYNTHESE 
-							Admin :</FONT> <FONT color="#ff9966"><U>Déconnecter</U></FONT></FONT></TD>
-				<TD bgColor="#000066" height="21"><FONT size="2"><FONT face="Verdana" color="gold"><U>Accueil 
-								SYNTHESE Admin</U> &gt; Emplacements</FONT></FONT></TD>
+							Admin :</FONT><U><A href="login.htm"><FONT color="#ff0066">Déconnecter</FONT></A></U></FONT></TD>
+				<TD bgColor="#000066" height="21"><FONT size="2"><FONT face="Verdana" color="gold"><U><A href="admin_template.htm"><FONT color="#ffcc00">Accueil 
+										SYNTHESE Admin</FONT></A></U> &gt; Emplacements</FONT></FONT></TD>
 			</TR>
 			<TR>
 				<TD vAlign="top" width="266" style="WIDTH: 266px">
-					<P><FONT face="Verdana" size="2">Accueil SYNTHESE Admin</FONT></P>
+					<P><FONT face="Verdana" size="2"><A href="admin_template.htm">Accueil SYNTHESE Admin</A></FONT></P>
 					<UL>
 						<LI>
-							<FONT face="Verdana" size="2">Messages </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_messages.htm">Messages</A> </FONT>
 							<UL>
 								<LI>
-									<FONT face="Verdana" size="2">Bibliothèque </FONT>
+									<FONT face="Verdana" size="2"><A href="admin_messages_library.htm">Bibliothèque</A> </FONT>
 								</LI>
 							</UL>
 						<LI>
-							<FONT face="Verdana" size="2">Utilisateurs </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_users.htm">Utilisateurs</A> </FONT>
 							<UL>
 								<LI>
-									<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000000">Profils
-										</FONT></FONT>
+									<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000000"><A href="admin_profiles.htm">
+												Profils</A> </FONT></FONT>
 								</LI>
 							</UL>
 						<LI>
 							<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #000066" color="#ffffff">Emplacements</FONT>
 							</FONT>
 						<LI>
-							<FONT face="Verdana" size="2">Afficheurs </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_displays.htm">Afficheurs</A> </FONT>
 							<UL>
-								<FONT face="Verdana" size="2">
-									<LI>
-										<FONT face="Verdana" size="2">Cohérence des données</FONT></FONT>
 								<LI>
-									<FONT face="Verdana" size="2">Types d'afficheurs</FONT></LI></UL>
+									<FONT face="Verdana" size="2"><A href="admin_display_types.htm">Types d'afficheurs</A></FONT></LI></UL>
 						<LI>
-							<FONT face="Verdana" size="2">Journal des évènements</FONT></LI></UL>
+							<FONT face="Verdana" size="2"><A href="admin_logs.htm">Journal des évènements</A></FONT></LI></UL>
 				</TD>
 				<TD vAlign="top"><FONT face="Verdana"><FONT size="2">
 							<P>Recherche de&nbsp;lieu logique&nbsp;: Commune :&nbsp;<INPUT id="Text3" style="WIDTH: 80px; HEIGHT: 22px" type="text" size="8" name="Text2">
@@ -102,7 +99,7 @@ function Table2_onclick() {
 											<P>
 												<FONT size="1" color="#000000">Matabiau</FONT></P>
 										</TD>
-										<TD><FONT size="1"><INPUT language="javascript" id="Button1" onclick="return Button1_onclick()" type="button"
+										<TD><FONT size="1"><INPUT language="javascript" id="Button1" onclick="location='admin_place.htm'" type="button"
 													value="Editer" name="Modifier"><FONT color="#000000"></FONT></FONT></TD>
 									</TR>
 									<TR>
@@ -111,7 +108,7 @@ function Table2_onclick() {
 											<P>
 												<FONT size="1" color="#000000">Izards</FONT></P>
 										</TD>
-										<TD><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button3" onclick="return Button1_onclick()" type="button"
+										<TD><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button3" onclick="location='admin_place.htm'" type="button"
 														value="Editer" name="Modifier"><FONT color="#000000"></FONT></FONT></FONT></TD>
 									</TR>
 									<TR>
@@ -120,7 +117,7 @@ function Table2_onclick() {
 											<P>
 												<FONT size="1" color="#000000">Mairie</FONT></P>
 										</TD>
-										<TD><FONT size="1"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button5" onclick="return Button1_onclick()" type="button"
+										<TD><FONT size="1"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button5" onclick="location='admin_place.htm'" type="button"
 															value="Editer" name="Modifier"><FONT color="#000000"></FONT></FONT></FONT></FONT></TD>
 									</TR>
 									<TR>
@@ -129,7 +126,7 @@ function Table2_onclick() {
 											<P>
 												<FONT size="1">Gramont</FONT></P>
 										</TD>
-										<TD><FONT size="1"><FONT size="1"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button2" onclick="return Button1_onclick()" type="button"
+										<TD><FONT size="1"><FONT size="1"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button2" onclick="location='admin_place.htm'" type="button"
 																value="Editer" name="Modifier"></FONT></FONT></FONT></FONT></TD>
 									</TR>
 								</TABLE>

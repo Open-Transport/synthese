@@ -1,0 +1,55 @@
+
+#ifndef SYNTHESE_ENV_MESSAGES_SCENARIO_ADMIN_H
+#define SYNTHESE_ENV_MESSAGES_SCENARIO_ADMIN_H
+
+#include "11_interfaces/AdminInterfaceElement.h"
+
+namespace synthese
+{
+	namespace interfaces
+	{
+
+		/** Ecran d'édition de scénario de diffusion de message.
+			@ingroup m15
+
+			@image html cap_admin_scenario.png
+			@image latex cap_admin_scenario.png "Maquette de l'écran d'édition de scénario" width=14cm
+			
+			<i>Titre de la fenêtre</i> :
+				- SYNTHESE Admin - Messages - Bibliothèque - Scénarios - Interruption métro
+
+			<i>Barre de navigation</i> :
+				- Lien vers synthese::interfaces::AdminHome
+				- Lien vers synthese::interfaces::MessagesAdmin
+				- Lien vers synthese::interfaces::MessagesLibraryAdmin
+				- Texte <tt>Scénario</tt>
+				- Texte [Nom]
+
+			<i>Zone de contenu</i> : <b>Formulaire d'édition</b> :
+				-# <b>Liste de messages du scénario</b>
+					-# <tt>Sel</tt> : Permet la sélection du message en vue d'une duplication
+					-# <tt>Message</tt> : Texte rappelant le contenu du message. Un clic sur le texte se rend sur l'écran d'édition du message.
+					-# <tt>Emplacement</tt> : Texte rappelant l'emplacement de diffusion au niveau logique. Un clic sur le texte se rend sur l'écran d'édition de l'emplacement.
+					-# Bouton <tt>Modifier</tt> : Se rend vers l'écran d'édition du message sélectionné
+					-# Bouton <tt>Supprimer</tt> : Supprime le message du scénario après une demande de confirmation
+				-# Le <b>bouton Ajouter</b> permet l'ajout d'un nouveau message au scénario :
+					- si aucun message n'est sélectionné alors un message vide est ajouté
+					- si un message existant est sélectionné alors son contenu est copié dans le nouveau
+			
+			<i>Sécurité</i>
+				- Une habilitation de niveau écriture sur le module environnement et sur l'opération messages est nécessaire pour effectuer des modifications sur le scénario.
+				- Une habilitation de niveau lecture sur le module environnement et sur l'opération messages est nécessaire pour consulter les données du scnénario.
+
+			<i>Journaux</i> : Les événements suivants entrainent la création d'une entrée dans le journal des messages de l'environnement :
+				- Ajout de message au scénario
+				- Suppression de message du scénario
+
+		*/
+		class MessagesScenarioAdmin : public AdminInterfaceElement
+		{
+
+		};
+	}
+}
+
+#endif

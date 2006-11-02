@@ -34,6 +34,10 @@ function Select4_onclick() {
 
 }
 
+function Button7_onclick() {
+
+}
+
 //-->
 		</script>
 	</HEAD>
@@ -43,43 +47,40 @@ function Select4_onclick() {
 			DESIGNTIMEDRAGDROP="504">
 			<TR>
 				<TD width="259" bgColor="#000066" colSpan="1" height="21" rowSpan="1"><FONT face="Verdana" size="1"><FONT color="#ffffff">user@SYNTHESE 
-							Admin :</FONT> <FONT color="#ff9966"><U>Déconnecter</U></FONT></FONT></TD>
-				<TD bgColor="#000066" height="21"><FONT size="2"><FONT face="Verdana" color="gold"><U>Accueil 
-								SYNTHESE Admin</U> &gt; Messages</FONT></FONT></TD>
+							Admin :</FONT><U><A href="login.htm"><FONT color="#ff0066">Déconnecter</FONT></A></U></FONT></TD>
+				<TD bgColor="#000066" height="21"><FONT size="2"><FONT face="Verdana" color="gold"><U><A href="admin_template.htm"><FONT color="#ffcc33">Accueil 
+										SYNTHESE Admin</FONT></A></U> &gt; Messages</FONT></FONT></TD>
 			</TR>
 			<TR>
 				<TD vAlign="top" width="259">
-					<P><FONT face="Verdana" size="2">Accueil SYNTHESE Admin</FONT></P>
+					<P><FONT face="Verdana" size="2"><A href="admin_template.htm">Accueil SYNTHESE Admin</A></FONT></P>
 					<UL>
 						<LI>
 							<FONT style="BACKGROUND-COLOR: #000066" face="Verdana" color="#ffffff" size="2">Messages
 							</FONT>
 							<UL>
 								<LI>
-									<FONT face="Verdana" size="2">Bibliothèque </FONT>
+									<FONT face="Verdana" size="2"><A href="admin_messages_library.htm">Bibliothèque</A> </FONT>
 								</LI>
 							</UL>
 						<LI>
-							<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000000">Utilisateurs
-								</FONT></FONT>
+							<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000000"><A href="admin_users.htm">
+										Utilisateurs</A> </FONT></FONT>
 							<UL>
 								<LI>
-									<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000000">Profils</FONT>
-									</FONT>
+									<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000000"><A href="admin_profiles.htm">
+												Profils</A></FONT> </FONT>
 								</LI>
 							</UL>
 						<LI>
-							<FONT face="Verdana" size="2">Emplacements </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_places.htm">Emplacements</A> </FONT>
 						<LI>
-							<FONT face="Verdana" size="2">Afficheurs </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_displays.htm">Afficheurs</A> </FONT>
 							<UL>
-								<FONT face="Verdana" size="2">
-									<LI>
-										<FONT face="Verdana" size="2">Cohérence des données</FONT></FONT>
 								<LI>
-									<FONT face="Verdana" size="2">Types d'afficheurs</FONT></LI></UL>
+									<FONT face="Verdana" size="2"><A href="admin_display_types.htm">Types d'afficheurs</A></FONT></LI></UL>
 						<LI>
-							<FONT face="Verdana" size="2">Journal des évènements</FONT></LI></UL>
+							<FONT face="Verdana" size="2"><A href="admin_logs.htm">Journal des évènements</A></FONT></LI></UL>
 				</TD>
 				<TD vAlign="top"><FONT face="Verdana"><FONT size="2">
 							<P>Recherche de message :&nbsp;Date début :&nbsp; <INPUT id="Text3" style="WIDTH: 120px; HEIGHT: 22px" type="text" size="14" name="Text2">,&nbsp;Date 
@@ -120,7 +121,7 @@ function Select4_onclick() {
 											<P><FONT size="1">Complémentaire</FONT></P>
 										</TD>
 										<TD style="HEIGHT: 13px" align="center" bgColor="#ff6666"><FONT face="Wingdings" color="#00cc00">l</FONT></TD>
-										<TD style="HEIGHT: 13px"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button3" onclick="return Button1_onclick()" type="button"
+										<TD style="HEIGHT: 13px"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button3" onclick="location='admin_message.htm';" type="button"
 														value="Editer" name="Modifier"></FONT></FONT></TD>
 									</TR>
 									<TR>
@@ -130,11 +131,11 @@ function Select4_onclick() {
 										<TD style="WIDTH: 164px" bgColor="#99ff66"><FONT color="#0000ff" size="1"><U>Grève sur la 
 													ligne 12...</U></FONT></TD>
 										<TD bgColor="#99ff66">
-											<P><FONT size="1">Prioritaire</FONT></P>
+											<P><FONT size="1">Scénario</FONT></P>
 										</TD>
 										<TD align="center" bgColor="#99ff66"><FONT face="Wingdings" color="#ff0000">l</FONT></TD>
-										<TD><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button4" onclick="return Button1_onclick()" type="button"
-														value="Editer" name="Modifier"></FONT></FONT></TD>
+										<TD><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button4" onclick="location='admin_messages_scenarios.htm';"
+														type="button" value="Editer" name="Modifier"></FONT></FONT></TD>
 									</TR>
 									<TR>
 										<TD style="WIDTH: 1px"><INPUT id="Radio3" type="radio" value="Radio3" name="RadioGroup"></TD>
@@ -145,11 +146,11 @@ function Select4_onclick() {
 											</P>
 										</TD>
 										<TD></TD>
-										<TD><FONT size="1"><INPUT language="javascript" id="Button1" onclick="return Button1_onclick()" type="button"
-													value="Editer" name="Modifier"></FONT></TD>
+										<TD><FONT size="1"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button1" onclick="location='admin_message.htm';" type="button"
+															value="Editer" name="Modifier"></FONT></FONT></FONT></TD>
 									</TR>
 									<TR>
-										<TD style="WIDTH: 1px" bgColor="#99ccff" colSpan="" rowSpan=""><INPUT id="Radio4" type="radio" value="Radio3" name="RadioGroup"></TD>
+										<TD style="WIDTH: 1px" bgColor="#99ccff" colSpan="1" rowSpan="1"><INPUT id="Radio4" type="radio" value="Radio3" name="RadioGroup"></TD>
 										<TD style="WIDTH: 118px" bgColor="#99ccff"><FONT color="#000000" size="1">du 1/10/2006 
 												au 12/10/2006</FONT></TD>
 										<TD style="WIDTH: 164px" bgColor="#99ccff"><FONT color="#0000ff" size="1"><U>Interruption 
@@ -158,14 +159,20 @@ function Select4_onclick() {
 											<P><FONT size="1">Complémentaire</FONT></P>
 										</TD>
 										<TD align="center" bgColor="#99ccff"><FONT face="Wingdings" color="#00cc00">l</FONT></TD>
-										<TD><FONT size="1"><INPUT language="javascript" id="Button2" onclick="return Button1_onclick()" type="button"
-													value="Editer" name="Modifier"></FONT></TD>
+										<TD><FONT size="1"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button2" onclick="location='admin_message.htm';" type="button"
+															value="Editer" name="Modifier"></FONT></FONT></FONT></TD>
 									</TR>
 									<TR>
-										<TD colSpan="5"><FONT size="1"></FONT>
+										<TD colSpan="6"><FONT size="1"></FONT>
 											<P><FONT size="1">(sélectionnez un message existant pour créer une copie)</FONT></P>
+											<P><INPUT language="javascript" id="Button7" onclick="location='admin_message.htm'" type="button"
+													value="Nouveau message" name="Button7">&nbsp;</P>
+											<P><INPUT language="javascript" id="Button5" onclick="location='admin_messages_scenario.htm'" type="button"
+													value="Nouvelle diffusion selon scénario" name="Button7"><SELECT language="javascript" id="Select2" onclick="return Select4_onclick()" name="Select1">
+													<OPTION value="" selected>
+														Interruption métro</OPTION>
+												</SELECT></P>
 										</TD>
-										<TD><INPUT id="Button7" type="button" value="Ajouter" name="Button7"></TD>
 									</TR>
 								</TABLE>
 							</P>

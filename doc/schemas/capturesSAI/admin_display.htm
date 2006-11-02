@@ -27,6 +27,10 @@ function Button1_onclick() {
 
 }
 
+function Select2_onclick() {
+
+}
+
 //-->
 		</script>
 	</HEAD>
@@ -36,35 +40,36 @@ function Button1_onclick() {
 			DESIGNTIMEDRAGDROP="504">
 			<TR>
 				<TD style="WIDTH: 244px" width="244" bgColor="#000066" colSpan="1" height="21" rowSpan="1"><FONT face="Verdana" size="1"><FONT color="#ffffff">user@SYNTHESE 
-							Admin :</FONT> <FONT color="#ff9966"><U>Déconnecter</U></FONT></FONT></TD>
-				<TD bgColor="#000066" height="21"><FONT size="2"><FONT face="Verdana" color="gold"><U>Accueil 
-								SYNTHESE Admin</U> &gt; <U>Afficheurs</U> &gt; <U>TOULOUSE Matabiau</U> &gt; 
-							Marengo quai 1</FONT></FONT></TD>
+							Admin :</FONT><U><A href="login.htm"><FONT color="#ff0066">Déconnecter</FONT></A></U></FONT></TD>
+				<TD bgColor="#000066" height="21"><FONT size="2"><FONT face="Verdana" color="gold"><U><A href="admin_template.htm"><FONT color="gold">Accueil 
+										SYNTHESE Admin</FONT></A></U> &gt; <U><A href="admin_displays.htm"><FONT color="gold">
+										Afficheurs</FONT></A></U> &gt; TOULOUSE Matabiau &gt; Marengo quai 
+							1</FONT></FONT></TD>
 			</TR>
 			<TR>
 				<TD style="WIDTH: 244px" vAlign="top" width="244">
-					<P><FONT style="BACKGROUND-COLOR: #ffffff" face="Verdana" color="#000000" size="2">Accueil 
-							SYNTHESE Admin</FONT></P>
+					<P><FONT style="BACKGROUND-COLOR: #ffffff" face="Verdana" color="#000000" size="2"><A href="admin_home.htm">Accueil 
+								SYNTHESE Admin</A></FONT></P>
 					<UL>
 						<LI>
-							<FONT face="Verdana" size="2">Messages </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_messages.htm">Messages</A> </FONT>
 							<UL>
 								<LI>
-									<FONT face="Verdana" size="2">Bibliothèque </FONT>
+									<FONT face="Verdana" size="2"><A href="admin_messages_library.htm">Bibliothèque</A> </FONT>
 								</LI>
 							</UL>
 						<LI>
-							<FONT face="Verdana" size="2">Utilisateurs </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_users.htm">Utilisateurs</A> </FONT>
 							<UL>
 								<LI>
-									<FONT face="Verdana" size="2">Profils </FONT>
+									<FONT face="Verdana" size="2"><A href="admin_profiles.htm">Profils</A> </FONT>
 								</LI>
 							</UL>
 						<LI>
-							<FONT face="Verdana" size="2">Emplacements </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_places.htm">Emplacements</A> </FONT>
 						<LI>
-							<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000033">Afficheurs
-								</FONT></FONT>
+							<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000033"><A href="admin_displays.htm">
+										Afficheurs</A> </FONT></FONT>
 							<UL>
 								<FONT face="Verdana" size="2">
 									<LI>
@@ -72,17 +77,16 @@ function Button1_onclick() {
 										<UL>
 											<LI>
 												<FONT style="BACKGROUND-COLOR: #000066" color="#ffffff">Marengo quai 1</FONT></LI></UL>
-									<LI>
-										<FONT face="Verdana" size="2">Cohérence des données</FONT></FONT>
+								</FONT>
 								<LI>
-									<FONT face="Verdana" size="2">Types d'afficheurs</FONT></LI></UL>
+									<FONT face="Verdana" size="2"><A href="admin_display_types.htm">Types d'afficheurs</A></FONT></LI></UL>
 						<LI>
-							<FONT face="Verdana" size="2">Journal des évènements</FONT></LI></UL>
+							<FONT face="Verdana" size="2"><A href="admin_logs.htm">Journal des évènements</A></FONT></LI></UL>
 				</TD>
 				<TD vAlign="top"><FONT face="Verdana"><FONT size="2"><FONT face="Verdana"><FONT size="2">
 									<P>
-										<TABLE language="javascript" id="Table2" style="WIDTH: 528px; HEIGHT: 758px" onclick="return Table2_onclick()"
-											borderColor="gainsboro" cellSpacing="0" cellPadding="0" width="528" border="1">
+										<TABLE language="javascript" id="Table2" style="WIDTH: 528px; HEIGHT: 758px" borderColor="gainsboro"
+											cellSpacing="0" cellPadding="0" width="528" border="1">
 											<TR>
 												<TD style="WIDTH: 240px" vAlign="top" bgColor="gainsboro" colSpan="2" rowSpan="1"><STRONG><FONT color="#000000" size="2">Emplacement</FONT></STRONG><STRONG><FONT color="#0000ff" size="2"><U></U></FONT></STRONG></TD>
 											</TR>
@@ -90,6 +94,9 @@ function Button1_onclick() {
 												<TD style="WIDTH: 240px; HEIGHT: 23px"><FONT color="#000000" size="1">Lieu logique</FONT></TD>
 												<TD style="HEIGHT: 23px">
 													<P><SELECT id="Select1" name="Select1">
+															<OPTION value="">BALMA Gramont</OPTION>
+															<OPTION value="">TOULOUSE Arènes</OPTION>
+															<OPTION value="">TOULOUSE Jolimont</OPTION>
 															<OPTION value="" selected>TOULOUSE Matabiau</OPTION>
 														</SELECT></P>
 												</TD>
@@ -99,6 +106,12 @@ function Button1_onclick() {
 												<TD>
 													<P><SELECT id="Select3" name="Select1">
 															<OPTION value="" selected>Marengo quai 1</OPTION>
+															<OPTION value="">Marengo quai 2</OPTION>
+															<OPTION value="">Marengo quai 3</OPTION>
+															<OPTION value="">Salle conducteurs Marengo</OPTION>
+															<OPTION value="">Salle d'attente Marengo</OPTION>
+															<OPTION value="">Matabiau SNCF arrêt 22</OPTION>
+															<OPTION value="">Salle des billets métro</OPTION>
 														</SELECT></P>
 												</TD>
 											</TR>
@@ -114,7 +127,7 @@ function Button1_onclick() {
 											<TR>
 												<TD style="WIDTH: 240px"><FONT size="1"><FONT size="1"><FONT color="#000000" size="1">Type 
 																d'afficheur</FONT></FONT></FONT></TD>
-												<TD><SELECT id="Select2" name="Select1">
+												<TD><SELECT id="Select2" name="Select1" language="javascript" onclick="return Select2_onclick()">
 														<OPTION value="" selected>Oscar</OPTION>
 														<OPTION value="">TFT 19"</OPTION>
 													</SELECT></TD>
@@ -123,7 +136,16 @@ function Button1_onclick() {
 												<TD style="WIDTH: 240px"><FONT size="1"><FONT size="1"><FONT color="#000000" size="1">Code de 
 																branchement</FONT></FONT></FONT></TD>
 												<TD><SELECT id="Select4" name="Select1">
+														<OPTION value="">0</OPTION>
+														<OPTION value="">1</OPTION>
+														<OPTION value="">2</OPTION>
 														<OPTION value="" selected>3</OPTION>
+														<OPTION value="">4</OPTION>
+														<OPTION value="">5</OPTION>
+														<OPTION value="">6</OPTION>
+														<OPTION value="">7</OPTION>
+														<OPTION value="">8</OPTION>
+														<OPTION value="">9</OPTION>
 													</SELECT></TD>
 											</TR>
 											<TR>
@@ -140,7 +162,13 @@ function Button1_onclick() {
 											<TR>
 												<TD style="WIDTH: 240px"><FONT size="1"><FONT size="1"><FONT color="#000000" size="1">Clignotement</FONT></FONT></FONT></TD>
 												<TD><SELECT id="Select8" name="Select1">
-														<OPTION value="" selected>1 minute avant jusqu'au départ</OPTION>
+														<OPTION value="">Pas de clignotement</OPTION>
+														<OPTION value="" selected>1 minute avant disparition</OPTION>
+														<OPTION value="">2 minutes avant disparition</OPTION>
+														<OPTION value="">3 minutes avant disparition</OPTION>
+														<OPTION value="">4 minutes avant disparition</OPTION>
+														<OPTION value="">5 minutes avant disparition</OPTION>
+														<OPTION value=""></OPTION>
 													</SELECT></TD>
 											</TR>
 											<TR>
@@ -168,6 +196,7 @@ function Button1_onclick() {
 																terminus</FONT></FONT></FONT></TD>
 												<TD><SELECT id="Select6" name="Origines seulement">
 														<OPTION value="" selected>Origines seulement</OPTION>
+														<OPTION value="">Origines et passages</OPTION>
 													</SELECT></TD>
 											</TR>
 											<TR>
@@ -179,7 +208,17 @@ function Button1_onclick() {
 												<TD style="WIDTH: 240px"><FONT size="1"><FONT size="1"><FONT color="#000000" size="1">Délai 
 																d'effacement</FONT></FONT></FONT></TD>
 												<TD><SELECT id="Select5" name="Origines seulement">
-														<OPTION value="" selected>Heure du départ</OPTION>
+														<OPTION value="">5 minutes avant départ</OPTION>
+														<OPTION value="">4 minutes avant départ</OPTION>
+														<OPTION value="">3 minutes avant départ</OPTION>
+														<OPTION value="">2 minutes avant départ</OPTION>
+														<OPTION value="" selected>1 minute avant départ</OPTION>
+														<OPTION value="">Heure du départ</OPTION>
+														<OPTION value="">1 minute après départ</OPTION>
+														<OPTION value="">2 minutes après départ</OPTION>
+														<OPTION value="">3 minutes après départ</OPTION>
+														<OPTION value="">4 minutes après départ</OPTION>
+														<OPTION value="">5 minutes après départ</OPTION>
 													</SELECT></TD>
 											</TR>
 											<TR>
@@ -217,17 +256,18 @@ function Button1_onclick() {
 														cellSpacing="0" cellPadding="0" width="264" border="0">
 														<TR>
 															<TD style="WIDTH: 179px"><FONT size="2">TOULOUSE Izards</FONT></TD>
-															<TD><INPUT language="javascript" id="Button1" onclick="return Button1_onclick()" type="button"
-																	value="Supprimer" name="Button1"></TD>
+															<TD><INPUT language="javascript" id="Button1" onclick="alert('Etes vous sur de vouloir supprimer l\'arrêt sélectionné ?')"
+																	type="button" value="Supprimer" name="Button1"></TD>
 														</TR>
 														<TR>
 															<TD style="WIDTH: 179px"><FONT size="2">TOULOUSE Chamois</FONT></TD>
-															<TD><INPUT language="javascript" id="Button2" onclick="return Button1_onclick()" type="button"
-																	value="Supprimer" name="Button1"></TD>
+															<TD><INPUT language="javascript" id="Button2" onclick="alert('Etes vous sur de vouloir supprimer l\'arrêt sélectionné ?')"
+																	type="button" value="Supprimer" name="Button1"></TD>
 														</TR>
 														<TR>
 															<TD style="WIDTH: 179px"><FONT size="2"><SELECT id="Select9" name="Origines seulement">
-																		<OPTION value="" selected>TOULOUSE LEP Bayard</OPTION>
+																		<OPTION value="" selected>TOULOUSE Amat Massot</OPTION>
+																		<OPTION value="">TOULOUSE LEP Bayard</OPTION>
 																	</SELECT></FONT></TD>
 															<TD><INPUT language="javascript" id="Button3" onclick="return Button1_onclick()" type="button"
 																	value="Ajouter" name="Button1"></TD>
@@ -257,8 +297,8 @@ function Button1_onclick() {
 														cellSpacing="0" cellPadding="0" width="256" border="0">
 														<TR>
 															<TD><FONT size="2">TOULOUSE Colombette</FONT></TD>
-															<TD><INPUT language="javascript" id="Button4" onclick="return Button1_onclick()" type="button"
-																	value="Supprimer" name="Button1"></TD>
+															<TD><INPUT language="javascript" id="Button4" onclick="alert('Etes vous sur de vouloir supprimer l\'arrêt sélectionné ?')"
+																	type="button" value="Supprimer" name="Button1"></TD>
 														</TR>
 														<TR>
 															<TD><FONT size="2"><SELECT id="Select10" name="Origines seulement">
@@ -272,9 +312,9 @@ function Button1_onclick() {
 												</TD>
 											</TR>
 											<TR>
-												<TD align="center" colSpan="2"><INPUT language="javascript" id="Button7" style="WIDTH: 191px; HEIGHT: 24px" onclick="return Button1_onclick()"
-														type="button" value="Simuler les paramètres" name="Button1"><INPUT language="javascript" id="Button5" style="WIDTH: 191px; HEIGHT: 24px" onclick="return Button1_onclick()"
-														type="button" value="Enregistrer les modifications" name="Button1"></TD>
+												<TD align="center" colSpan="2"><INPUT language="javascript" id="Button7" style="WIDTH: 191px; HEIGHT: 24px" onclick="location='http://www.connex.tisseo.fr/itineraires?fonction=tdg&amp;date=A&amp;tb=463427346823642'"
+														type="button" value="Simuler les paramètres" name="Button1"><INPUT language="javascript" id="Button5" style="WIDTH: 191px; HEIGHT: 24px" type="button"
+														value="Enregistrer les modifications" name="Button1"></TD>
 											</TR>
 										</TABLE>
 									</P>

@@ -32,37 +32,38 @@ function Button1_onclick() {
 		</script>
 	</HEAD>
 	<BODY ms_positioning="GridLayout">
-		<TABLE id="Table1" style="LEFT: 16px; WIDTH: 760px; POSITION: absolute; TOP: 8px; HEIGHT: 450px"
-			borderColor="#000066" height="450" cellSpacing="0" cellPadding="1" width="760" border="1"
+		<TABLE id="Table1" style="LEFT: 16px; WIDTH: 896px; POSITION: absolute; TOP: 8px; HEIGHT: 450px"
+			borderColor="#000066" height="450" cellSpacing="0" cellPadding="1" width="896" border="1"
 			DESIGNTIMEDRAGDROP="504">
 			<TR>
 				<TD style="WIDTH: 244px" width="244" bgColor="#000066" colSpan="1" height="21" rowSpan="1"><FONT face="Verdana" size="1"><FONT color="#ffffff">user@SYNTHESE 
-							Admin :</FONT> <FONT color="#ff9966"><U>Déconnecter</U></FONT></FONT></TD>
-				<TD bgColor="#000066" height="21"><FONT size="2"><FONT face="Verdana" color="gold"><U>Accueil 
-								SYNTHESE Admin</U> &gt;&nbsp;&nbsp; <U>Afficheurs</U> &gt; <U>TOULOUSE Matabiau</U>
-							&gt; <U>Marengo quai 1</U> &gt; <U>Maintenance</U></FONT></FONT></TD>
+							Admin :</FONT><U><A href="login.htm"><FONT color="#ff0066">Déconnecter</FONT></A></U></FONT></TD>
+				<TD bgColor="#000066" height="21"><FONT size="2"><FONT face="Verdana" color="gold"><U><A href="admin_template.htm"><FONT color="#ffcc00">Accueil 
+										SYNTHESE Admin</FONT></A></U> &gt;&nbsp; <U><A href="admin_displays.htm"><FONT color="#ffcc00">
+										Afficheurs</FONT></A></U> &gt; TOULOUSE Matabiau &gt; <U><A href="admin_display.htm">
+									<FONT color="#ffcc00">Marengo quai 1</FONT></A></U> &gt; Maintenance</FONT></FONT></TD>
 			</TR>
 			<TR>
 				<TD style="WIDTH: 244px" vAlign="top" width="244">
-					<P><FONT style="BACKGROUND-COLOR: #ffffff" face="Verdana" color="#000000" size="2">Accueil 
-							SYNTHESE Admin</FONT></P>
+					<P><FONT style="BACKGROUND-COLOR: #ffffff" face="Verdana" color="#000000" size="2"><A href="admin_template.htm">Accueil 
+								SYNTHESE Admin</A></FONT></P>
 					<UL>
 						<LI>
-							<FONT face="Verdana" size="2">Messages </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_messages.htm">Messages</A> </FONT>
 							<UL>
 								<LI>
-									<FONT face="Verdana" size="2">Bibliothèque </FONT>
+									<FONT face="Verdana" size="2"><A href="admin_messages_library.htm">Bibliothèque</A> </FONT>
 								</LI>
 							</UL>
 						<LI>
-							<FONT face="Verdana" size="2">Utilisateurs </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_users.htm">Utilisateurs</A> </FONT>
 							<UL>
 								<LI>
-									<FONT face="Verdana" size="2">Profils </FONT>
+									<FONT face="Verdana" size="2"><A href="admin_profiles.htm">Profils</A> </FONT>
 								</LI>
 							</UL>
 						<LI>
-							<FONT face="Verdana" size="2">Emplacements </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_places.htm">Emplacements</A> </FONT>
 							<UL>
 								<LI>
 									<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000000">TOULOUSE 
@@ -78,21 +79,18 @@ function Button1_onclick() {
 								</LI>
 							</UL>
 						<LI>
-							<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000033">Afficheurs
-								</FONT></FONT>
+							<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000033"><A href="admin_displays.htm">
+										Afficheurs</A> </FONT></FONT>
 							<UL>
-								<FONT face="Verdana" size="2">
-									<LI>
-										<FONT face="Verdana" size="2">Cohérence des données</FONT></FONT>
 								<LI>
-									<FONT face="Verdana" size="2">Types d'afficheurs</FONT></LI></UL>
+									<FONT face="Verdana" size="2"><A href="admin_display_types.htm">Types d'afficheurs</A></FONT></LI></UL>
 						<LI>
-							<FONT face="Verdana" size="2">Journal des évènements</FONT></LI></UL>
+							<FONT face="Verdana" size="2"><A href="admin_logs.htm">Journal des évènements</A></FONT></LI></UL>
 				</TD>
 				<TD vAlign="top"><FONT face="Verdana"><FONT size="2"><FONT face="Verdana"><FONT size="2">
 									<P>
-										<TABLE language="javascript" id="Table2" style="WIDTH: 504px; HEIGHT: 92px" onclick="return Table2_onclick()"
-											borderColor="gainsboro" cellSpacing="0" cellPadding="0" width="504" border="1">
+										<TABLE language="javascript" id="Table2" style="WIDTH: 632px; HEIGHT: 118px" onclick="return Table2_onclick()"
+											borderColor="gainsboro" cellSpacing="0" cellPadding="0" width="632" border="1">
 											<TR>
 												<TD style="WIDTH: 240px" vAlign="top" bgColor="gainsboro" colSpan="2" rowSpan="1"><STRONG><FONT color="#000000" size="2">Paramètres 
 															de maintenance</FONT></STRONG></TD>
@@ -120,8 +118,8 @@ function Button1_onclick() {
 												<TD><INPUT id="Text1" type="text" name="Text1"></TD>
 											</TR>
 											<TR>
-												<TD style="WIDTH: 240px" align="center" colSpan="2"><INPUT language="javascript" id="Button5" style="WIDTH: 191px; HEIGHT: 24px" onclick="return Button1_onclick()"
-														type="button" value="Enregistrer les modifications" name="Button1"></TD>
+												<TD align="center" colSpan="2"><INPUT language="javascript" id="Button5" style="WIDTH: 191px; HEIGHT: 24px" type="button"
+														value="Enregistrer les modifications" name="Button1"></TD>
 											</TR>
 										</TABLE>
 									</P>
@@ -136,7 +134,8 @@ function Button1_onclick() {
 									<P><FONT size="1">Date du dernier contrôle : 21/09/2006 16:30</FONT></P>
 									<P><FONT size="1">Date du dernier contrôle positif : 20/09/2006 15:30</FONT></P>
 									<P><FONT size="1">Motif de l'alerte : Température trop élevée, terminal éteint</FONT></P>
-									<P><U><FONT color="#0000ff">Accéder au journal de maintenance de l'afficheur</FONT></U>
+									<P><U><FONT color="#0000ff"><A href="admin_log_viewer.htm">Accéder au journal de maintenance de 
+													l'afficheur</A></FONT></U>
 								</FONT></FONT></FONT></FONT></P></TD>
 			</TR>
 		</TABLE>

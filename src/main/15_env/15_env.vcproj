@@ -342,6 +342,12 @@
 				RelativePath=".\MessagesLibraryAdmin.h">
 			</File>
 			<File
+				RelativePath=".\AdminInterfaceElement\MessagesScenarioAdmin.h">
+			</File>
+			<File
+				RelativePath=".\AdminInterfaceElement\MessagesScenarioSendAdmin.h">
+			</File>
+			<File
 				RelativePath=".\AdminInterfaceElement\PlaceAdmin.h">
 			</File>
 			<File

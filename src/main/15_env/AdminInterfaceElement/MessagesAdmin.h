@@ -39,6 +39,7 @@ namespace synthese
 						- Tous les types de messages
 						- Messages complémentaires
 						- Messages prioritaires
+						- Scénarios
 					-# Bouton <tt>Rechercher</tt> lance la recherche
 				-# <b>Tableau de messages</b> : Les messages sélectionnés sont décrits par les colonnes suivantes :
 					-# <tt>Sel</tt> : permet la sélection du message en vue d'une copie
@@ -48,6 +49,10 @@ namespace synthese
 						- Message en cours de diffusion sans date de fin : fond rose
 						- Message à diffuser ultérieurement : fond bleu clair
 					-# <tt>Message</tt> : extrait des messages diffusés. Un clic sur l'extrait conduit à la page synthese::interfaces::MessageAdmin sur le message sélectionné
+					-# <tt>Type</tt> : type de message diffusé
+						- <tt>Complémentaire</tt> : Message complémentaire
+						- <tt>Prioritaire</tt> : Message prioritaire
+						- <tt>Scénario</tt> : L'entrée du tableau correspond à l'envoi d'une série de messages selon un scénario préparé à l'avance
 					-# <tt>Etat</tt> : état matériel courant des afficheurs de la liste de diffusion. Une infobulle précise l'état représenté, apparaissant au contact avec le pointeur de souris
 						- Pastille verte : tous les afficheurs sont en fonctionnement normal
 						- Pastille orange : au moins un afficheur est en état Warning, aucun n'est en état Error

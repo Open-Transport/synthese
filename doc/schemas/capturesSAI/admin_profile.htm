@@ -11,7 +11,7 @@ function Select1_onblur() {
 }
 
 function Button1_onclick() {
-
+	
 }
 
 function Button1_onclick() {
@@ -39,47 +39,44 @@ function Table2_onclick() {
 			borderColor="#000066">
 			<TR>
 				<TD width="284" bgColor="#000066" colSpan="1" height="21" rowSpan="1" style="WIDTH: 284px"><FONT face="Verdana" size="1"><FONT color="#ffffff">user@SYNTHESE 
-							Admin :</FONT> <FONT color="#ff9966"><U>Déconnecter</U></FONT></FONT></TD>
-				<TD bgColor="#000066" height="21"><FONT size="2"><FONT face="Verdana" color="gold"><U>Accueil 
-								SYNTHESE Admin</U> &gt; <U>Utilisateurs </U>&gt; <U>Profils</U> &gt; RL 14 
-							41</FONT></FONT></TD>
+							Admin :</FONT><U><A href="login.htm"><FONT color="#ff0066">Déconnecter</FONT></A></U></FONT></TD>
+				<TD bgColor="#000066" height="21"><FONT size="2"><FONT face="Verdana" color="gold"><U><A href="admin_template.htm"><FONT color="#ffcc00">Accueil 
+										SYNTHESE Admin</FONT></A></U> &gt; <A href="admin_users.htm"><FONT color="#ffcc00">
+									Utilisateurs</FONT></A>&gt; <U><A href="admin_profiles.htm"><FONT color="#ffcc00">Profils</FONT></A></U>
+							&gt; RL 14 41</FONT></FONT></TD>
 			</TR>
 			<TR>
 				<TD vAlign="top" width="284" style="WIDTH: 284px">
-					<P><FONT face="Verdana" size="2">Accueil SYNTHESE Admin</FONT></P>
+					<P><FONT face="Verdana" size="2"><A href="admin_template.htm">Accueil SYNTHESE Admin</A></FONT></P>
 					<UL>
 						<LI>
-							<FONT face="Verdana" size="2">Messages </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_messages.htm">Messages</A> </FONT>
 							<UL>
 								<LI>
-									<FONT face="Verdana" size="2">Bibliothèque </FONT>
+									<FONT face="Verdana" size="2"><A href="admin_messages_library.htm">Bibliothèque</A> </FONT>
 								</LI>
 							</UL>
 						<LI>
-							<FONT face="Verdana" size="2">Utilisateurs </FONT>
-						</LI>
-						<UL>
-							<LI>
-								<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000000">Profils</FONT>
-								</FONT>
-							</LI>
+							<FONT face="Verdana" size="2"><A href="admin_users.htm">Utilisateurs</A> </FONT>
 							<UL>
 								<LI>
-									<FONT style="BACKGROUND-COLOR: #000066" face="Verdana" color="#ffffff" size="2">RL 
-										14 41</FONT></LI></UL>
-						</UL>
+									<FONT face="Verdana" size="2"><FONT style="BACKGROUND-COLOR: #ffffff" color="#000000"><A href="admin_profiles.htm">
+												Profils</A></FONT> </FONT>
+									<UL>
+										<LI>
+											<FONT style="BACKGROUND-COLOR: #000066" face="Verdana" color="#ffffff" size="2">RL 
+												14 41</FONT></LI></UL>
+								</LI>
+							</UL>
 						<LI>
-							<FONT face="Verdana" size="2">Emplacements </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_places.htm">Emplacements</A> </FONT>
 						<LI>
-							<FONT face="Verdana" size="2">Afficheurs </FONT>
+							<FONT face="Verdana" size="2"><A href="admin_displays.htm">Afficheurs</A> </FONT>
 							<UL>
-								<FONT face="Verdana" size="2">
-									<LI>
-										<FONT face="Verdana" size="2">Cohérence des données</FONT></FONT>
 								<LI>
-									<FONT face="Verdana" size="2">Types d'afficheurs</FONT></LI></UL>
+									<FONT face="Verdana" size="2"><A href="admin_display_types.htm">Types d'afficheurs</A></FONT></LI></UL>
 						<LI>
-							<FONT face="Verdana" size="2">Journal des évènements</FONT></LI></UL>
+							<FONT face="Verdana" size="2"><A href="admin_logs.htm">Journal des évènements</A></FONT></LI></UL>
 				</TD>
 				<TD vAlign="top"><FONT face="Verdana"><FONT size="2">
 							<P>Nom : <INPUT id="Text2" type="text" value="RL 14 41" name="Text2"><INPUT id="Button2" type="button" value="Modifier" name="Button7"></P>
@@ -99,7 +96,7 @@ function Table2_onclick() {
 										<TD style="WIDTH: 108px"><FONT color="#000000" size="1">Tout</FONT></TD>
 										<TD><FONT color="#000000" size="1">Tout</FONT></TD>
 										<TD><FONT color="#000000" size="1">Utilisation</FONT></TD>
-										<TD><FONT size="1"><INPUT language="javascript" id="Button6" onclick="return Button1_onclick()" type="button"
+										<TD><FONT size="1"><INPUT language="javascript" id="Button6" onclick="alert('Etes vous sur de vouloir supprimer l\'habilitation sélectionnées ?')" type="button"
 													value="Supprimer" name="Modifier"><FONT color="#000000"></FONT></FONT></TD>
 									</TR>
 									<TR>
@@ -114,7 +111,7 @@ function Table2_onclick() {
 										<TD>
 											<P><FONT color="#000000" size="1">Modification</FONT></P>
 										</TD>
-										<TD><FONT size="1"><INPUT language="javascript" id="Button1" onclick="return Button1_onclick()" type="button"
+										<TD><FONT size="1"><INPUT language="javascript" id="Button1" onclick="alert('Etes vous sur de vouloir supprimer l\'habilitation sélectionnées ?')" type="button"
 													value="Supprimer" name="Modifier"><FONT color="#000000"></FONT></FONT></TD>
 									</TR>
 									<TR>
@@ -129,7 +126,7 @@ function Table2_onclick() {
 										<TD>
 											<P><FONT color="#000000" size="1">Modification</FONT></P>
 										</TD>
-										<TD><FONT size="1"><INPUT language="javascript" id="Button3" onclick="return Button1_onclick()" type="button"
+										<TD><FONT size="1"><INPUT language="javascript" id="Button3" onclick="alert('Etes vous sur de vouloir supprimer l\'habilitation sélectionnées ?')" type="button"
 													value="Supprimer" name="Modifier"><FONT color="#000000"></FONT></FONT></TD>
 									</TR>
 									<TR>
@@ -144,12 +141,13 @@ function Table2_onclick() {
 										<TD>
 											<P><FONT size="1">Lecture</FONT></P>
 										</TD>
-										<TD><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button5" onclick="return Button1_onclick()" type="button"
+										<TD><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button5" onclick="alert('Etes vous sur de vouloir supprimer l\'habilitation sélectionnées ?')" type="button"
 														value="Supprimer" name="Modifier"></FONT></FONT></TD>
 									</TR>
 									<TR>
 										<TD style="WIDTH: 164px"><FONT size="1"><SELECT id="Select1" name="Select1">
 													<OPTION value="" selected>Tableaux de départs</OPTION>
+													<OPTION value="">Environnement</OPTION>
 												</SELECT></FONT></TD>
 										<TD>
 											<P><FONT size="1"><SELECT id="Select2" name="Select2">
@@ -161,6 +159,7 @@ function Table2_onclick() {
 											</SELECT></TD>
 										<TD><SELECT id="Select3" name="Select2">
 												<OPTION value="" selected>Lecture</OPTION>
+												<OPTION value="">Modification</OPTION>
 											</SELECT></TD>
 										<TD><INPUT id="Button7" type="button" value="Ajouter" name="Button7"></TD>
 									</TR>
