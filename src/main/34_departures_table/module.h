@@ -31,22 +31,27 @@ namespace synthese
 			size="6,12"
 			rankdir=LR
 			node [shape=rectangle style=filled color="red" fillcolor="gold"]
-			Login -> Accueil [URL="\ref synthese::interfaces::HomeAdmin"];
-				Accueil -> Messages;
-					Messages -> Bibliothèque;
-				Accueil -> Utilisateurs;
-					Utilisateurs -> Profils;
-				Accueil -> Emplacements;
-				Accueil -> Afficheurs;
+	
+			Login
+			Accueil [URL="\ref synthese::interfaces::HomeAdmin"]
+			Messages
+
+			Login -> Accueil
+				Accueil -> Messages
+					Messages -> Bibliotheque
+				Accueil -> Utilisateurs
+					Utilisateurs -> Profils
+				Accueil -> Emplacements
+				Accueil -> Afficheurs
 					Afficheurs -> "Types d'afficheurs";
 				Accueil -> Journal;
 
 			Messages -> "C/E/S Diffusion message";
-			Messages -> "C/E/S Diffusion scénario de message";
+			Messages -> "C/E/S Diffusion scenario de message";
 
-			Bibliothèque -> "C/E/S Modèle de message complémentaire";
-			Bibliothèque -> "C/E/S Modèle de message prioritaire";
-			Bibliothèque -> "C/E/S Scénario";
+			Bibliothèque -> "C/E/S Modele de message complementaire";
+			Bibliothèque -> "C/E/S Modele de message prioritaire";
+			Bibliothèque -> "C/E/S Scenario";
 
 			Utilisateurs -> "C/E/S utilisateur";
 			
@@ -58,12 +63,12 @@ namespace synthese
 			Afficheurs -> "Simulation afficheur";
 			Afficheurs -> "Supervision afficheur";
 
-			Journal -> "Sécurité";
-			Journal -> "Administration tableaux départs";
-			Journal -> "Supervision tableaux départs";
-			Journal -> "Administration bibliothèque messages";
+			Journal -> "Sécurite";
+			Journal -> "Administration tableaux departs";
+			Journal -> "Supervision tableaux departs";
+			Journal -> "Administration bibliotheque messages";
 			Journal -> "Diffusion de messages";
-			Journal -> "Administration données réseau";
+			Journal -> "Administration donnees reseau";
 
 
 		}
