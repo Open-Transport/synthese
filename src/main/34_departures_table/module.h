@@ -28,9 +28,9 @@ namespace synthese
 
 		@dot
 		digraph {
-			size="3,7"
+			size="6,12"
 			rankdir=LR
-			node [shape=rectangle fontname=helvetica style=filled color="red" fillcolor="gold"]
+			node [shape=rectangle style=filled color="red" fillcolor="gold"]
 			Login -> Accueil [URL="\ref synthese::interfaces::HomeAdmin"];
 				Accueil -> Messages;
 					Messages -> Bibliothèque;
