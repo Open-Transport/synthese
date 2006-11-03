@@ -28,10 +28,10 @@ namespace synthese
 
 		@dot
 		digraph {
-			size="10,6000"
+			size="3,7"
 			rankdir=LR
 			node [shape=rectangle fontname=helvetica style=filled color="red" fillcolor="gold"]
-			Login -> Accueil [href="\ref synthese::interfaces::HomeAdmin"];
+			Login -> Accueil [URL="\ref synthese::interfaces::HomeAdmin"];
 				Accueil -> Messages;
 					Messages -> Bibliothèque;
 				Accueil -> Utilisateurs;
