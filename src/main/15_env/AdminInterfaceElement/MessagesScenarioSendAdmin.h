@@ -54,12 +54,15 @@ namespace synthese
 
 			
 			<i>Sécurité</i>
-				- Une habilitation de niveau écriture sur le module environnement et sur l'opération messages est nécessaire pour éditer un message devant partir ou déjà parti.
-				- Une habilitation de niveau lecture sur le module environnement et sur l'opération messages est nécessaire pour visualiser un message.
+				- Une habilitation privée MessagesRight de niveau READ est nécessaire pour accéder à la page en consultation pour visualiser un envoi effectué par l'utilisateur courant
+				- Une habilitation publique MessagesRight de niveau READ est nécessaire pour accéder à la page en consultation pour visualiser un envoi non effectué par l'utilisateur courant
+				- Une habilitation privée MessagesRight de niveau WRITE est nécessaire pour accéder à la page pour créer une envoi et pour éditer un envoi effectué par l'utilisateur courant
+				- Une habilitation publique MessagesRight de niveau WRITE est nécessaire pour accéder à la page pour éditer un envoi non effectué par l'utilisateur courant
 
 			<i>Journaux</i> : Les événements suivants entrainent la création d'une entrée dans le journal des messages de l'environnement :
-				- Diffusion de message
-				- Modification de message en cours de diffusion
+				- INFO : Diffusion selon scénario
+				- INFO : Modification de scénario en cours de diffusion
+				- WARNING : Diffusion selon scénario sur au moins un afficheur déclaré hors service
 
 		*/
 		class MessagesScenarioSendAdmin : public AdminInterfaceElement

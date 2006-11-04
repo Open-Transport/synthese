@@ -41,13 +41,12 @@ namespace synthese
 					-# <tt>Ajouter</tt> : bouton d'ajout d'habilitation. L'ajout se fait directement sans confirmation.
 			
 			<i>Sécurité</i>
-				- L'affichage de la fenêtre en consultation nécessite une habilitation securité de niveau lecture
-				- L'affichage de la fenêtre en mode édition, suppression d'habilitations comprises, requiert une habilitation sécurité de niveau écriture
-
-			<i>Journaux</i> : Les opérations suivantes sont consignées dans le journal de sécurité :
-				- Modification du nom du profil
-				- Ajout d'habilitation au profil
-				- Suppression d'habilitation au profil
+				- Une habilitation SecurityRights de niveau public WRITE est nécessaire pour accéder à la page, pour laquelle le profil demandé est inférieur ou égal.
+				
+			<i>Journaux</i> : Les opérations suivantes sont consignées dans le journal de sécurité SecurityLog :
+				- INFO : Modification du nom du profil
+				- INFO : Ajout d'habilitation au profil
+				- INFO : Suppression d'habilitation au profil
 		*/
 		class ProfileAdmin : public AdminInterfaceElement
 		{

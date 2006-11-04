@@ -85,6 +85,26 @@
 				RelativePath=".\StandardArrivalDepartureTableGenerator.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="Rights"
+			Filter="">
+			<File
+				RelativePath=".\Rights\ArrivalDepartureTableRight.h">
+			</File>
+			<File
+				RelativePath=".\Rights\DisplayMaintenanceRight.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="DBLog"
+			Filter="">
+			<File
+				RelativePath=".\DBLog\ArrivalDepartureTableLog.h">
+			</File>
+			<File
+				RelativePath=".\DBLog\DisplayMaintenanceLog.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\module.h">
 		</File>

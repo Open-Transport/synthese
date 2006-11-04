@@ -19,10 +19,10 @@ namespace synthese
 
 			Les éléments de journal contiennent les données suivantes :
 				- date de l'événement
-				- module concerné (clé texte)
-				- rubrique concernée (clé texte selon le module)
+				- nom du journal (clé texte identique au nom d'enregistrement de la classe)
 				- utilisateur à l'origine de l'événement
-				- texte de l'entrée (formalisme selon module et rubrique, spécifié par les sous classes)
+				- niveau de l'entrée (INFO, WARNING, ERROR)
+				- texte de l'entrée (formalisme selon module et rubrique, spécifié par les sous-classes)
 
 		*/
 		class DBLog

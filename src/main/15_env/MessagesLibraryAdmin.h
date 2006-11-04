@@ -41,13 +41,13 @@ namespace synthese
 					-# bouton <tt>Ajouter</tt> : Même comportement que <tt>Modifier</tt> sur un message nouvellement créé
 
 			<i>Sécurité</i>
-				- Une habilitation de niveau lecture sur le module environnement et sur l'opération bibliothèque messages est nécessaire pour afficher la page en consultation.
-				- Une habilitation de niveau écriture sur le module environnement et sur l'opération bibliothèque messages est nécessaire pour afficher la page en modification.
+				- Une habilitation publique MessagesLibraryRight de niveau WRITE est nécessaire pour accéder à la page et y effectuer toutes les opérations disponibles à l'exception de la suppression de modèles.
+				- Une habilitation publique MessagesLibraryRight de niveau DELETE est nécessaire pour supprimer un modèle de message.
 
-			<i>Journaux</i> : Les actions suivantes génèrent des entrées dans le journal de la gestion de messages du module environnement :
-				- Création de modèle de message
-				- Modification de modèle de message
-				- Suppression de modèle de message
+			<i>Journaux</i> : Les actions suivantes génèrent des entrées dans le journal de la bibliothèque de messages MessagesLibraryLog :
+				- INFO : Création de modèle de message
+				- INFO : Modification de modèle de message
+				- INFO : Suppression de modèle de message
 
 		*/
 		class MessagesLibraryAdmin : public AdminInterfaceElement

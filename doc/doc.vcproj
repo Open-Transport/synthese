@@ -138,14 +138,6 @@
 					DeploymentContent="TRUE">
 				</File>
 				<File
-					RelativePath=".\schemas\capturesSAI\admin_messages_scenario.htm"
-					DeploymentContent="TRUE">
-				</File>
-				<File
-					RelativePath=".\schemas\capturesSAI\admin_messages_scenarios.htm"
-					DeploymentContent="TRUE">
-				</File>
-				<File
 					RelativePath=".\schemas\capturesSAI\admin_place.htm"
 					DeploymentContent="TRUE">
 				</File>

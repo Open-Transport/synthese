@@ -35,6 +35,8 @@ namespace synthese
 			- transmission des contenus au port RS485, afficheur par afficheur
 			- attente minute suivante
 
+		@image html 1195572.2.000.png
+		@image latex 1195572_1_000.eps "Schéma d'architecture cible d'une installation RS485" height=10cm
 
 		@{
 	*/

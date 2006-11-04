@@ -79,6 +79,9 @@
 				RelativePath=".\BikeComplyer.h">
 			</File>
 			<File
+				RelativePath=".\BroadcastPoint.h">
+			</File>
+			<File
 				RelativePath=".\Calendar.cpp">
 			</File>
 			<File
@@ -179,12 +182,6 @@
 			</File>
 			<File
 				RelativePath=".\LineStop.h">
-			</File>
-			<File
-				RelativePath=".\LogicalStop.cpp">
-			</File>
-			<File
-				RelativePath=".\LogicalStop.h">
 			</File>
 			<File
 				RelativePath=".\Path.cpp">
@@ -352,6 +349,19 @@
 			</File>
 			<File
 				RelativePath=".\AdminInterfaceElement\PlacesAdmin.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Rights"
+			Filter="">
+			<File
+				RelativePath=".\Rights\MessagesLibraryRight.h">
+			</File>
+			<File
+				RelativePath=".\Rights\MessagesRight.h">
+			</File>
+			<File
+				RelativePath=".\Rights\PlacesRight.h">
 			</File>
 		</Filter>
 		<File

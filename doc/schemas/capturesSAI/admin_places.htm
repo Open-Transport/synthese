@@ -76,12 +76,16 @@ function Table2_onclick() {
 				<TD vAlign="top"><FONT face="Verdana"><FONT size="2">
 							<P>Recherche de&nbsp;lieu logique&nbsp;: Commune :&nbsp;<INPUT id="Text3" style="WIDTH: 80px; HEIGHT: 22px" type="text" size="8" name="Text2">
 								, Nom :&nbsp; <INPUT id="Text2" style="WIDTH: 80px; HEIGHT: 22px" type="text" size="8" name="Text2">, 
-								Terminaux d'affichage :&nbsp;<SELECT id="Select1" style="WIDTH: 104px" name="Select1" language="javascript" onclick="return Select1_onclick()">
-									<OPTION selected value="">Au moins un</OPTION>
+								Terminaux d'affichage :&nbsp;<SELECT id="Select1" style="WIDTH: 120px" name="Select1" language="javascript" onclick="return Select1_onclick()">
+									<OPTION selected value="">(filtre désactivé)</OPTION>
+									<OPTION value="">Au moins un</OPTION>
+									<OPTION value="">Aucun</OPTION>
 								</SELECT>, Ligne :
-								<SELECT language="javascript" id="Select2" style="WIDTH: 96px" onclick="return Select1_onclick()"
+								<SELECT language="javascript" id="Select2" style="WIDTH: 120px" onclick="return Select1_onclick()"
 									name="Select1">
-									<OPTION value="" selected>MP/TLS/14</OPTION>
+									<OPTION value="" selected>(filtre désactivé)</OPTION>
+									<OPTION value="">MP/TLS/10</OPTION>
+									<OPTION value="">MP/TLS/14</OPTION>
 								</SELECT></P>
 							<P>&nbsp;<INPUT id="Button6" type="button" value="Rechercher" name="Button6"></P>
 							<P>Résultats de la recherche (tous) :</P>

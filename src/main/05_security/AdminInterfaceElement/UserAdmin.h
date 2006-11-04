@@ -44,11 +44,14 @@ namespace synthese
 					-# <tt>Profil</tt> : Liste de choix permettant de sélectionner le profil d'habilitations de l'utilisateur.
 								
 			<i>Sécurité</i>
-				- L'affichage de la fenêtre en consultation nécessite une habilitation securité de niveau lecture, ou bien une habilitation sécurité de niveau lecture sur l'appartenance (section Droits alors désactivée)
-				- L'affichage de la fenêtre en mode édition, suppression d'habilitations comprises, requiert une habilitation sécurité de niveau écriture, ou bien une habilitation sécurité de niveau écriture sur l'appartenance (section Droits alors désactivée)
+				- Une habilitation privée SecurityRight de niveau READ est nécessaire pour accéder à la page en consultation sur l'utilisateur courant. Dans ce cas la partie "droits" n'est pas affichée.
+				- Une habilitation privée SecurityRight de niveau WRITE est nécessaire pour accéder à la page en modification sur l'utilisateur courant. Dans ce cas la partie "droits" n'est pas affichée.
+				- Une habilitation publique SecurityRight de niveau READ est nécessaire pour accéder à la page en consultation sur un utilisateur quelconque. Dans ce cas la partie "droits" n'est pas affichée.
+				- Une habilitation publique SecurityRight de niveau WRITE est nécessaire pour accéder à la page en modification sur un utilisateur quelconque, à condition que le profil de l'utilisateur édité soit inférieur ou égal au profil de l'habilitation. Dans ce cas la partie "droits" est affichée et modifiable".
 
-			<i>Journaux</i> : Les opérations suivantes sont consignées dans le journal de sécurité :
-				- Chaque modification effectuée avec succès
+
+			<i>Journaux</i> : Les opérations suivantes sont consignées dans le journal de sécurité SecurityLog :
+				- INFO : Chaque modification effectuée avec succès
 
 		*/
 		class UserAdmin: public AdminInterfaceElement

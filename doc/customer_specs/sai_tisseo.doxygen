@@ -44,6 +44,9 @@
 		@subsubsection defLog Journaux
 		@copydoc synthese::util::DBLog
 
+		@subsubsection defBroadcastPoint Point de diffusion
+		@copydoc synthese::env::BroadcastPoint
+
 		@subsubsection defDisplayTerminal Terminal d'affichage
 		@copydoc synthese::departurestable::DisplayScreen
 
@@ -215,26 +218,65 @@
 
 
 
-
 	@section csst_security Sécurité
 	
-		Les habilitations suivantes sont définies pour le SAI :
-			- module util, opération journal
-			- module sécurité, toutes opérations
-			- module tableaux départs, opération admin paramètres terminaux
-			- module tableaux départs, opération maintenance terminaux et données
-			- module environnement, opération emplacements
-			- module environnement, opération bibliothèque messages
-			- module environnement, opération envoi de messages
-			- module environnement, opération admin données réseau
+		Les habilitations suivantes sont utilisées par le SAI :
+			- @ref csst_security_right
+			- @ref csst_security_messages
+			- @ref csst_security_messages_library
+			- @ref csst_security_log
+			- @ref csst_security_arrivaldeparturestables
+			- @ref csst_security_maintenance
+			- @ref csst_security_places
+		
+		Leur utilisation précise est spécifiée dans la documentation de chaque écran.
+		
+		@subsection csst_security_right Sécurité
+		@copydoc synthese::security::SecurityRight
+		
+		@subsection csst_security_messages Messages
+		@copydoc synthese::security::MessagesRight
+
+		@subsection csst_security_messages_library Bibliothèque de messages
+		@copydoc synthese::security::MessagesLibraryRight
+	
+		@subsection csst_security_log Journaux
+		@copydoc synthese::security::DBLogRight
+		
+		@subsection csst_security_arrivaldeparturestables Tableaux de départs et d'arrivée
+		@copydoc synthese::security::ArrivalDepartureTableRight
+		
+		@subsection csst_security_maintenance Maintenance des afficheurs
+		@copydoc synthese::security::DisplayMaintenanceRight
+		
+		@subsection csst_security_places Gestion des emplacements
+		@copydoc synthese::security::PlacesRight
+	
+	
 	
 	@section csst_logs Journaux
 	
 		Les journaux suivants sont alimentés pour le SAI :
-			- module sécurité, toutes opérations
-			- module tableaux départs, opération admin paramètres terminaux
-			- module tableaux départs, opération maintenance terminaux et données
-			- module environnement, opération bibliothèque messages
-			- module environnement, opération envoi de messages
+			- @ref csst_logs_security
+			- @ref csst_logs_displays
+			- @ref csst_logs_maintenance
+			- @ref csst_logs_messages_library
+			- @ref csst_logs_messages
 			- module environnement, opération admin données réseau
+		
+		@subsection csst_logs_security Sécurité
+		@copydoc synthese::util::SecurityLog
+		
+		@subsection csst_logs_messages Envois de messages
+		@copydoc synthese::util::MessagesLog
+		
+		@subsection csst_logs_messages_library Bibliothèque de messages
+		@copydoc synthese::util::MessagesLibraryLog
+		
+		@subsection csst_logs_displays Gestion des afficheurs
+		@copydoc synthese::util::ArrivalDepartureTableLog
+		
+		@subsection csst_logs_maintenance Maintenance des afficheurs
+		@copydoc synthese::util::DisplayMaintenanceLog
+		
 */

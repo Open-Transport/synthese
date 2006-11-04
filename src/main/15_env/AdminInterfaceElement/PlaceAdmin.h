@@ -38,8 +38,9 @@ namespace synthese
 						-# Bouton <tt>Ajouter</tt> : Comportement identique au bouton <tt>Renommer</tt>, mais sur un emplacement nouveau.
 			
 			<i>Sécurité</i>
-				- Une habilitation de niveau lecture sur le module environnement et sur l'opération emplacements est nécessaire pour afficher la page en consultation. Le périmètre doit spécifier soit la commune du lieu logique, soit le lieu logique lui-même, soit une ligne qui le dessert.
-				- Une habilitation de niveau écriture sur le module environnement et sur l'opération emplacements est nécessaire pour effectuer des modification. Le périmètre doit spécifier soit la commune du lieu logique, soit le lieu logique lui-même, soit une ligne qui le dessert.
+				- Une habilitation publique PlacesRight de niveau READ est nécessaire pour accéder à la page en consultation.
+				- Une habilitation publique PlacesRight de niveau WRITE sur le périmètre du lieu est nécessaire pour pouvoir renommer des emplacements d'affichage et pour pouvoir en créer
+				- Une habilitation publique PlacesRight de niveau DELETE sur le périmètre du lieu est nécessaire pour pouvoir supprimer un emplacement d'affichage
 
 			<i>Journaux</i> : Les événements suivants entrainent la création d'une entrée dans le journal de l'administration des données réseau de l'environnement :
 				- Renommage d'emplacement

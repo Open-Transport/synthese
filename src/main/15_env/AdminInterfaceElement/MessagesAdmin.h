@@ -66,9 +66,13 @@ namespace synthese
 			
 			
 			<i>Sécurité</i>
-				- Une habilitation de niveau lecture sur le module environnement et sur l'opération messages est nécessaire pour visualiser la page.
-				- Une habilitation de niveau écriture sur le module environnement et sur l'opération messages est nécessaire pour créer un message.
-
+				- Une habilitation MessagesRight de niveau READ est nécessaire pour accéder à la page.
+				- Le résultat d'une recherche dépend du périmètre des habilitations MessagesRight de l'utilisateur.
+				- Une habilitation MessagesRight de niveau WRITE_BELONG est nécessaire pour créer un nouveau message ou une nouvelle diffusion de scénario.
+				- Le contenu de la liste des scénarios dépend du périmètre des habilitations MessagesRight de l'utilisateur.
+				- Une habilitation MessagesRight de niveau WRITE_BELONG est nécessaire pour éditer un message créé par l'utilisateur.
+				- Une habilitation MessagesRight de niveau WRITE est nécessaire pour éditer un message n'appartenant pas à l'utilisateur.
+				
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
 

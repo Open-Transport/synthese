@@ -68,8 +68,11 @@ namespace synthese
 						- Une liste déroulante munie d'un bouton <tt>Ajouter</tt> permet d'ajouter un arrêt logique à présélectionner. Le contenu de la liste déroulante est l'ensemble des arrêts logiques desservis par les lignes partant de l'emplacement de l'afficheur.
 						
 			<i>Sécurité</i> :
-				- L'habilitation Lecture sur l'arrêt logique sur le module Tableaux de départs est nécessaire pour visualiser la page en consultation
-				- L'habilitation Ecriture sur l'arrêt logique sur le module Tableaux de départs est nécessaire pour effectuer des modifications
+				- Une habilitation publique ArrivalDepartureTableRight de niveau READ est nécessaire pour afficher la page en mode consultation. L'emplacement de l'afficheur doit entrer dans le périmètre de l'habilitation.
+				- Une habilitation publique ArrivalDepartureTableRight de niveau WRITE est nécessaire pour afficher la page en mode modification. L'emplacement de l'afficheur doit entrer dans le périmètre de l'habilitation. Le contenu des diverses listes déroulantes est impacté par le périmètre de l'habilitation.
+
+			<i>Journal</i> : Les actions suivantes génèrent une entrée dans le journal du téléaffichage ArrivalDepartureTableLog :
+				- INFO : Modification d'un afficheur
 		*/
 		class DisplayAdmin : public AdminInterfaceElement
 		{

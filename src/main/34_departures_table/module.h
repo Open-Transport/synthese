@@ -49,9 +49,9 @@ namespace synthese
 			Messages -> "C/E/S Diffusion message";
 			Messages -> "C/E/S Diffusion scenario de message";
 
-			Bibliothèque -> "C/E/S Modele de message complementaire";
-			Bibliothèque -> "C/E/S Modele de message prioritaire";
-			Bibliothèque -> "C/E/S Scenario";
+			Bibliotheque -> "C/E/S Modele de message complementaire";
+			Bibliotheque -> "C/E/S Modele de message prioritaire";
+			Bibliotheque -> "C/E/S Scenario";
 
 			Utilisateurs -> "C/E/S utilisateur";
 			
@@ -63,7 +63,7 @@ namespace synthese
 			Afficheurs -> "Simulation afficheur";
 			Afficheurs -> "Supervision afficheur";
 
-			Journal -> "Sécurite";
+			Journal -> "Securite";
 			Journal -> "Administration tableaux departs";
 			Journal -> "Supervision tableaux departs";
 			Journal -> "Administration bibliotheque messages";

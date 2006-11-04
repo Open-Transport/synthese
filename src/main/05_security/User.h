@@ -6,6 +6,8 @@ namespace synthese
 {
 	namespace security
 	{
+		class Profile;
+
 		/** Utilisateur.
 			@ingroup m05
 		
@@ -20,6 +22,15 @@ namespace synthese
 		*/
 		class User
 		{
+		private:
+			Profile*		_profile;
+			std::string		_login;
+			std::string		_password;
+			std::string		_name;
+			std::string		_surname;
+			
+
+		public:
 		};
 	}
 }

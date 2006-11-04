@@ -26,8 +26,8 @@ namespace synthese
 					-# Bouton <tt>Consulter</tt> : Accès au journal correspondant
 
 			<i>Sécurité</i>
-				- L'accès à la page nécessite une habilitation Util/DBLog de niveau Utilisation
-				- Les habilitations nécessaires pour visualiser chaque journal sont définies individuellement par chaque journal (voir classe correspondante). Seuls les journaux autorisés pour l'utilisateur apparaissent dans la liste
+				- Une habilitation privée ou publique DBLogRight de niveau READ est nécessaire pour accéder à la page.
+				- Les habilitations nécessaires pour visualiser chaque journal sont définies individuellement par chaque journal (voir classe correspondante). Seuls les journaux autorisés pour l'utilisateur apparaissent dans la liste.
 
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.

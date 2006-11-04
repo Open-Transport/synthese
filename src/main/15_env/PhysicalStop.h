@@ -17,6 +17,7 @@ namespace env
 
  class LineStop;
  class ConnectionPlace;
+ class BroadcastPoint;
 
 
 /** Physical stop (bus stop, etc.).
@@ -25,7 +26,8 @@ namespace env
 */
 class PhysicalStop : 
     public synthese::util::Registrable<uid,PhysicalStop>,
-    public Vertex
+    public Vertex,
+	public BroadcastPoint
 {
 
 private:

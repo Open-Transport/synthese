@@ -49,12 +49,18 @@ namespace synthese
 					-# <tt>Motif de l'alerte</tt> : Texte explicatif sur l'erreur relevée
 					
 			<i>Sécurité</i> :
-				- L'habilitation Lecture sur le module tableaux départs à la rubrique maintenance est nécessaire pour visualiser la page en consultation
-				- L'habilitation Ecriture sur le module tableaux départs à la rubrique maintenance est nécessaire pour modifier les paramètres présents sur la page
+				- Une habilitation publique DisplayMaintenanceRight de niveau READ est nécessire pour afficher la page en mode consultation. L'emplacement de l'afficheur doit entrer dans le périmètre de l'habilitation.
+				- Une habilitation publique DisplayMaintenanceRight de niveau WRITE est nécessire pour afficher la page en mode modification. L'emplacement de l'afficheur doit entrer dans le périmètre de l'habilitation. 
 
-			<i>Journal</i> : Les actions suivantes génèrent une entrée dans le journal de maintenance des afficheurs :
-				- Modification de paramètre
-				- Détection d'une erreur de cohérence de données lors de l'affichage de la page
+			<i>Journal</i> : Les actions suivantes génèrent une entrée dans le journal de maintenance des afficheurs DisplayMaintenanceLog :
+				- INFO : Modification de paramètre
+				- WARNING : Détection d'une erreur de cohérence de données lors de l'affichage de la page
+				- ERROR : Passage en hors service
+				- WARNING : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai compris entre 150% et 500% de la durée présupposée entre deux contrôles. 
+				- ERROR : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai supérieur à 500% de la durée présupposée entre deux contrôles. 
+				- NB : Ces deux entrées apparaissent à la première visualisation d'un problème de ce type dans une console d'administration, afin de suppléer à l'absence de démon de surveillance. Un passage en contrôle continu avec alerte pourrait être implémenté.
+				- NB : Des entrées INFO/WARNING/ERROR sont entrées dans le journal de maintenance directement par les clients de supervision via une requête SendLogEntry.
+			
 		*/
 		class DisplayMaintenanceAdmin : public AdminInterfaceElement
 		{

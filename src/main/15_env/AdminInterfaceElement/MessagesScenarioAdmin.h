@@ -37,12 +37,11 @@ namespace synthese
 					- si un message existant est sélectionné alors son contenu est copié dans le nouveau
 			
 			<i>Sécurité</i>
-				- Une habilitation de niveau écriture sur le module environnement et sur l'opération messages est nécessaire pour effectuer des modifications sur le scénario.
-				- Une habilitation de niveau lecture sur le module environnement et sur l'opération messages est nécessaire pour consulter les données du scnénario.
-
-			<i>Journaux</i> : Les événements suivants entrainent la création d'une entrée dans le journal des messages de l'environnement :
-				- Ajout de message au scénario
-				- Suppression de message du scénario
+				- Une habilitation publique MessagesLibraryRight de niveau WRITE est nécessaire pour accéder à la page et y effectuer toutes les opérations disponibles.
+				
+			<i>Journaux</i> : Les événements suivants entrainent la création d'une entrée dans le journal des messages MessagesLibraryLog :
+				- INFO : Ajout de message au scénario
+				- INFO : Suppression de message du scénario
 
 		*/
 		class MessagesScenarioAdmin : public AdminInterfaceElement

@@ -91,7 +91,7 @@
 			Name="Rights"
 			Filter="">
 			<File
-				RelativePath=".\Rights\SecurityAllRight.h">
+				RelativePath=".\Rights\SecurityRight.h">
 			</File>
 		</Filter>
 		<File

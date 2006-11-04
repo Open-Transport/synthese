@@ -45,12 +45,15 @@ namespace synthese
 					- l'utilisateur est désactivé si il est à l'origine d'au moins une entrée de journal, afin de permettre d'accéder à ses informations dans le cadre de la consultation ultérieure du journal. En ce cas, son login est tout de même remis à disposition.
 			
 			<i>Sécurité</i>
-				- L'affichage de la fenêtre en consultation nécessite une habilitation securité de niveau lecture
-				- L'affichage de la fenêtre en mode édition, suppression d'habilitations comprises, requiert une habilitation sécurité de niveau écriture
+				- Une habilitation publique SecurityRight de niveau READ est nécessaire pour accéder à la page en consultation. NB : Les résultats de la recherche d'utilisateur <b>ne dépendent pas</b> du périmètre de l'habilitation de l'utilisateur courant (la page accédée en lecture seule est considérée comme un annuaire)
+				- Une habilitation publique SecurityRight de niveau WRITE est nécessaire pour disposer du bouton de création d'utilisateur. La liste des profils pouvant être utilisés est la liste des profils inférieurs ou égaux à celui de l'habilitation.
+				- Une habilitation publique SecurityRight de niveau WRITE est nécessaire pour disposer du bouton d'édition d'un utilisateur différent de l'utilisateur courant : seuls les utilisateurs d'un profil inférieur ou égal à celui de l'habilitation sont éditables.
+				- Une habilitation privée SecurityRight de niveau WRITE est nécessaire pour disposer du bouton d'édition sur l'utilisateur courant.
+				- Une habilitation publique SecurityRight de niveau DELETE est nécessaire pour disposer du bouton de suppression d'utilisateur.
 
 			<i>Journaux</i> : Les opérations suivantes sont consignées dans le journal de sécurité :
-				- Création d'utilisateur
-				- Suppression d'utilisateur : le choix "suppression ou désactivation" est notifié dans l'entrée
+				- INFO : Création d'utilisateur
+				- INFO : Suppression d'utilisateur : le choix "suppression ou désactivation" est notifié dans l'entrée
 		*/
 		class UsersAdmin: public AdminInterfaceElement
 		{

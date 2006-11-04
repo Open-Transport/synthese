@@ -15,7 +15,7 @@ namespace synthese
 namespace departurestable
 {
 
-/** Tableau d'affichage.
+/** Terminal d'affichage.
 	@ingroup m34
 
 	Un terminal d'affichage est un dispositif matériel dédié à l'affichage non interactif d'informations provenant de SYNTHESE (exemple: tableau de départs).

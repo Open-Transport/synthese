@@ -44,7 +44,8 @@ namespace synthese
 				-# Un maximum de 50 entrées est affiché à l'écran. En cas de dépassement de ce nombre d'après les critères de recherche, un lien <tt>Entrées suivantes</tt> apparait et permet de visualiser les entrées suivantes. A partir de la seconde page, un lien <tt>Entrées précédentes</tt> apparait également.
 
 			<i>Sécurité</i>
-				- Les habilitations nécessaires pour visualiser le journal sont définies individuellement par chaque journal (voir classe correspondante)
+				- Une habilitation privée DBLogRight de niveau READ, ainsi qu'un contrôle positif des habilitations par le journal visualisé sont nécessaire pour accéder à la page, et y visualiser les entrées générées par l'utilisateur courant.
+				- Une habilitation publique DBLogRight de niveau READ, ainsi qu'un contrôle positif des habilitations par le journal visualisé sont nécessaire pour accéder à la page, et y visualiser toutes les entrées.
 
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.

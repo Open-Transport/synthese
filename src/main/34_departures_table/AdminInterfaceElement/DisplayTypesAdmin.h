@@ -35,8 +35,13 @@ namespace synthese
 						@code L'afficheur ne peut être créé car un ou plusieurs champs n'a pas été correctement renseigné. @endcode
 						
 			<i>Sécurité</i> :
-				- L'habilitation Lecture sur * sur le module Tableaux de départs est nécessaire pour visualiser la page en consultation
-				- L'habilitation Ecriture sur * sur le module Tableaux de départs est nécessaire pour éditer les types d'afficheurs, en créer, et en supprimer
+				- Une habilitation publique ArrivalDepartureTableRight de niveau READ sur le périmètre "tout" est nécessaire pour accéder à la page.
+				- Une habilitation publique ArrivalDepartureTableRight de niveau WRITE sur le périmètre "tout" est nécessaire pour obtenir les boutons <tt>Modifier</tt> et <tt>Ajouter</tt>.
+				
+			<i>Journal</i> : Les actions suivantes génèrent une entrée dans le journal ArrivalDepartureTableLog :
+				- INFO : Ajout de type d'afficheur
+				- INFO : Modification de type d'afficheur
+				- INFO : Suppression de type d'afficheur
 		*/
 		class DisplayTypesAdmin : public AdminInterfaceElement
 		{

@@ -42,7 +42,7 @@ namespace synthese
 						- Complément de précision
 					- @c Type : Type d'afficheur. Un clic sur le type va vers la page @ref synthese::interface::DisplayTypesAdmin.
 					- @c Etat : Résumé de l'état de maintenance. Un clic sur le contenu de la colonne va vers la page @ref synthese::interface::DisplayMaintenanceAdmin :
-						- Si l'afficheur est déclaré en service, deux points de couleur (vert = OK, orange = Warning, rouge = Error), faisant apparaître une infobulle précisant leur signification au contact du pointeur de souris :
+						- Si l'afficheur est déclaré en service, deux points de couleur (vert = OK, orange = Warning, rouge = Error), faisant apparaître une infobulle précisant leur signification au contact du pointeur de souris - voir détail sur page DisplayMaintenanceAdmin :
 							- le premier point correspond au contrôle de cohérence de données
 							- le second point correspond à l'état du matériel
 						- Si l'afficheur est déclaré hors service, la mention HS suivie de la date de la mise hors service est présente, en couleur rouge
@@ -55,9 +55,20 @@ namespace synthese
 				-# <b>Lien afficheurs suivants</b> : Au maximum 50 afficheurs sont représentés sur la page. En cas de dépassement de ce nombre, ce lien apparaît et permet de se rendre aux afficheurs suivants. A partir de la seconde page, un lien <tt>Afficheurs précédents</tt> est également proposé.
 
 			<i>Sécurité</i> :
-				- Au moins une habilitation lecture sur le module "tableaux de départs" est nécessaire pour entrer dans la page
-				- Les afficheurs affichés sont ceux qui sont compris dans le périmètre défini par le champ d'application des habilitations sur le module "tableaux de départs"
-				- Au moins une habilitation écriture sur le module "tableaux de départs" est nécessaire pour obtenir le lien de création d'afficheur
+				- Une habilitation publique ArrivalDepartureTableRight de niveau READ est nécessaire pour accéder à la page. Le résultat de la recherche dépend du périmètre de l'habilitation.
+				- Une habilitation publique ArrivalDepartureTableRight de niveau WRITE est nécessaire pour obtenir les boutons <tt>Modifier</tt> et <tt>Créer un nouvel afficheur</tt>
+				- Une habilitation publique ArrivalDepartureTableRight de niveau USE est nécessaire pour obtenir les boutons <tt>Simuler</tt>, sur les afficheurs contenus dans le périmètre de l'habilitation.
+				- Une habilitation publique DisplayMaintenanceRight de niveau READ est nécessaire pour obtenir les boutons <tt>Supervision</tt>, sur les afficheurs contenus dans le périmètre de l'habilitation.
+				- Une habilitation publique ArrivalDepartureTableRight de niveau DELETE est nécessaire pour obtenir le bouton <tt>Supprimer</tt>
+
+			<i>Journal</i> : Les actions suivants entrainent une écriture dans le journal du téléaffichage ArrivalDepartureTableLog :
+				- INFO : création d'un afficheur
+				- INFO : suppression d'un afficheur
+
+			<i>Journal</i> : Les actions suivants entraînent une écriture dans le journal de maintenance des afficheurs DisplayMaintenanceLog :
+				- WARNING : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai compris entre 150% et 500% de la durée présupposée entre deux contrôles. 
+				- ERROR : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai supérieur à 500% de la durée présupposée entre deux contrôles. 
+				- NB : Ces deux entrées apparaissent à la première visualisation d'un problème de ce type dans une console d'administration, afin de suppléer à l'absence de démon de surveillance. Un passage en contrôle continu avec alerte pourrait être implémenté.
 		*/
 		class DisplaySearchAdmin : public AdminInterfaceElement
 		{
