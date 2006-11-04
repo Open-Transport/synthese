@@ -41,12 +41,18 @@ namespace synthese
 						- si le champ n'est pas renseigné, un message de confirmation est proposé lors de la diffusion, prévenant l'utilisateur que sans action de sa part ce message restera en vigueur indéfiniment
 						- si le seul champ <tt>Fin diffusion : Heure</tt> est seul rempli, un message d'erreur empêche la diffusion :
 							@code Le message ne peut être diffusé car la date de fin est incorrecte @endcode
-				-# <b>Contenu</b> : reprend les messages préparés par le scénario (copies) avec possibilité d'édition pour personnaliser l'envoi
-					-# <tt>Modèle</tt> : Liste de choix permettant de sélectionner un modèle à recopier. Le choix du modèle n'est pas à proprement parler enregistré dans le message : seul le contenu du modèle sera éventuellement copié sans souvenance du modèle utilisé
-					-# bouton <tt>Copier contenu</tt> : effectue la copie du texte du modèle dans les champs de messages.
-					-# <tt>Message court</tt> : Zone de texte dimensionnée identiquement à l'afficheur cible, permettant de saisir le message à diffuser sur les afficheurs de petite dimension. Champ obligatoire.
-					-# <tt>Message long</tt> : Zone de texte dimensionnée identiquement à l'afficheur cible, permettant de saisir le message à diffuser sur les afficheurs de grande dimension. Champ obligatoire.
-				-# Le <b>bouton Envoyer</b> effectue l'envoi après effectuer les contrôles de validité des paramètres. Notamment :
+				-# <b>Contenu</b> : reprend les messages préparés par le scénario (il s'agit de copies) avec possibilité d'édition pour personnaliser l'envoi.	
+					-# <tt>Sel</tt> : case de sélection permettant d'effectuer une copie du message
+					-# <tt>Message</tt> : extrait des messages diffusés. Un clic sur l'extrait conduit à la page synthese::interfaces::MessageAdmin sur le message sélectionné
+					-# <tt>Emplacements</tt> : résumé des emplacements de diffusion du message sous forme de liste d'arrêts logiques
+					-# <tt>Etat</tt> : état matériel courant des afficheurs de la liste de diffusion du message. Une infobulle précise l'état représenté, apparaissant au contact avec le pointeur de souris
+						- Pastille verte : tous les afficheurs sont en fonctionnement normal
+						- Pastille orange : au moins un afficheur est en état WARNING, aucun n'est en état ERROR
+						- Pastille rouge : au moins un afficheur est en état ERROR
+					-# <tt>Modifier</tt> : conduit à la page @ref synthese::interfaces::MessageAdmin "d'édition du message" correspondant à la ligne où est présent le bouton. NB : les modifications effectuées sur ce message n'affecteront que la copie utilisée pour cet envoi et en aucun cas le sécnario sauvegardé en bibliothèque.
+					-# <tt>Supprimer</tt> : permet de retirer le message de l'envoi. NB : cela ne supprime en aucun cas le message du scénario de la bibliothèque
+					-# <tt>Ajouter</tt> : permet d'ajouter un nouveau message à l'envoi. Si un message existant est sélectionné le nouveau message correspond à une copie.
+				-# Le <b>bouton Envoyer</b> effectue l'envoi de chaque message présent sur l'écran après avoir effectué les contrôles de validité des paramètres. Notamment :
 					- au moins un afficheur doit être sélectionné.
 					- si au moins un afficheur est en état de panne, un message de confirmation apparait
 					- les controles de dates doivent être positifs

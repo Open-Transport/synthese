@@ -14,7 +14,7 @@ namespace synthese
 			Les niveaux de droit utilisés sont les suivants :
 
 			Habilitations privées :
-				- USE privé : Autorise à l'utilisateur à se connecter
+				- USE : Autorise à l'utilisateur à se connecter
 				- READ : Permet à l'utilisateur de consulter les propriétés de son compte, sauf celles de la catégorie "Droits"
 				- WRITE : Permet à l'utilisateur de consulter les propriétés de son compte, sauf celles de la catégorie "Droits"
 

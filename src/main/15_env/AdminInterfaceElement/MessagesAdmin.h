@@ -55,8 +55,8 @@ namespace synthese
 						- <tt>Scénario</tt> : L'entrée du tableau correspond à l'envoi d'une série de messages selon un scénario préparé à l'avance
 					-# <tt>Etat</tt> : état matériel courant des afficheurs de la liste de diffusion. Une infobulle précise l'état représenté, apparaissant au contact avec le pointeur de souris
 						- Pastille verte : tous les afficheurs sont en fonctionnement normal
-						- Pastille orange : au moins un afficheur est en état Warning, aucun n'est en état Error
-						- Pastille rouge : au moins un afficheur est en état Warning
+						- Pastille orange : au moins un afficheur est en état WARNING, aucun n'est en état ERROR
+						- Pastille rouge : au moins un afficheur est en état ERROR
 					-# Bouton <tt>Editer</tt> : conduit à la page synthese::interfaces::MessageAdmin sur le message correspondant à la ligne où est présent le bouton
 					-# Un clic sur les titres de colonnes effectue un tri croissant puis décroissant sur la colonne sélectionnée
 				-# Bouton <b>Ajouter</b> : ouvre la page synthese::interfaces::MessageAdmin :
