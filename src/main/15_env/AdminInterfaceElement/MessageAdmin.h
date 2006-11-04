@@ -64,7 +64,7 @@ namespace synthese
 			<i>Sécurité</i>
 				- Une habilitation MessagesRight de niveau READ est nécessaire pour visualiser les paramètres d'un message.
 				- Une habilitation MessagesRight de niveau WRITE est nécessaire pour pour éditer un message devant partir ou déjà partis.
-				- Les listes définissant les points de diffusion du message sont paramétrées par le périmètre des habilitations de niveau WRITE_BELONG et supérieurs de l'utilisateur :
+				- Les listes définissant les points de diffusion du message sont paramétrées par le périmètre des habilitations privées et publiques de niveau WRITE et supérieurs de l'utilisateur :
 					- Les arrêts logiques proposés sont les arrêts explicitement autorisés, les arrêts contenant au moins un point de diffusion explicitement autorisé, et les arrêts desservis par au moins une ligne autorisée (ou bien une ligne appartenant à un réseau autorisé)
 					- Les emplacements proposés sont les arrêts physiques explicitements autorisés, les arrêts physiques desservis par une ligne autorisée, et les points de diffusion de l'arrêt logique n'étant pas des arrêts physiques
 					- Les lignes proposées sont les lignes explicitement autorisées, ainsi que l'ensemble des lignes des réseaux explicitement autorisés.

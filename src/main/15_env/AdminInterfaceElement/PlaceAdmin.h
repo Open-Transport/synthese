@@ -42,10 +42,10 @@ namespace synthese
 				- Une habilitation publique PlacesRight de niveau WRITE sur le périmètre du lieu est nécessaire pour pouvoir renommer des emplacements d'affichage et pour pouvoir en créer
 				- Une habilitation publique PlacesRight de niveau DELETE sur le périmètre du lieu est nécessaire pour pouvoir supprimer un emplacement d'affichage
 
-			<i>Journaux</i> : Les événements suivants entrainent la création d'une entrée dans le journal de l'administration des données réseau de l'environnement :
-				- Renommage d'emplacement
-				- Suppression d'emplacement
-				- Création d'emplacement
+			<i>Journaux</i> : Les événements suivants entrainent la création d'une entrée dans le journal de l'administration des données réseau de l'environnement TransportNetworkDataLog :
+				- INFO : Renommage d'emplacement
+				- INFO : Suppression d'emplacement
+				- INFO : Création d'emplacement
 
 		*/
 		class PlaceAdmin : public AdminInterfaceElement

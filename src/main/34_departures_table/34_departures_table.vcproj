@@ -42,9 +42,6 @@
 			Name="AdminInterfaceElement"
 			Filter="">
 			<File
-				RelativePath=".\AdminInterfaceElement\ArrvivalDepartureTableDataControlAdmin.h">
-			</File>
-			<File
 				RelativePath=".\AdminInterfaceElement\DisplayAdmin.h">
 			</File>
 			<File

@@ -66,12 +66,10 @@ namespace synthese
 			
 			
 			<i>Sécurité</i>
-				- Une habilitation MessagesRight de niveau READ est nécessaire pour accéder à la page.
-				- Le résultat d'une recherche dépend du périmètre des habilitations MessagesRight de l'utilisateur.
-				- Une habilitation MessagesRight de niveau WRITE_BELONG est nécessaire pour créer un nouveau message ou une nouvelle diffusion de scénario.
-				- Le contenu de la liste des scénarios dépend du périmètre des habilitations MessagesRight de l'utilisateur.
-				- Une habilitation MessagesRight de niveau WRITE_BELONG est nécessaire pour éditer un message créé par l'utilisateur.
-				- Une habilitation MessagesRight de niveau WRITE est nécessaire pour éditer un message n'appartenant pas à l'utilisateur.
+				- Une habilitation privée ou publique MessagesRight de niveau READ est nécessaire pour accéder à la page. Le résultat d'une recherche dépend du périmètre des habilitations MessagesRight de l'utilisateur.
+				- Une habilitation privée MessagesRight de niveau WRITE est nécessaire pour créer un nouveau message ou une nouvelle diffusion de scénario. Le contenu de la liste des scénarios dépend du périmètre des habilitations MessagesRight de l'utilisateur.
+				- Une habilitation privée MessagesRight de niveau WRITE est nécessaire pour éditer un message créé par l'utilisateur courant.
+				- Une habilitation publique MessagesRight de niveau WRITE est nécessaire pour éditer un message n'appartenant pas à l'utilisateur courant.
 				
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.

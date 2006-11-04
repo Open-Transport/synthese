@@ -364,6 +364,19 @@
 				RelativePath=".\Rights\PlacesRight.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="DBLog"
+			Filter="">
+			<File
+				RelativePath=".\DBLog\MessagesLibraryLog.h">
+			</File>
+			<File
+				RelativePath=".\DBLog\MessagesLog.h">
+			</File>
+			<File
+				RelativePath=".\DBLog\TransportNetworkDataLog.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\module.h">
 		</File>

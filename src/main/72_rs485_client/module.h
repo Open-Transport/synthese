@@ -10,20 +10,7 @@ namespace synthese
 
 	/** @defgroup m72 72 RS485 Client
 
-		Le téléaffichage consiste en la diffusion de la liste des prochains départs aux arrêts, de manière dynamique.
-
-		Plusieurs dispositifs peuvent être utilisés pour le téléaffichage :
-			- ecran de type VGA connecté sur unité centrale ou terminal RDP
-			- écran de type analogique, connecté sur un générateur de caractères (Velec...)
-			- afficheurs de type LCD, pilotés par port RS485 (protocole Lumiplan)
-			- afficheurs mécaniques, pilotés par port RS485 (protocole Velec)
-			- etc.
-
-		Hormis le premier cas assimilé à une utilisation web de SYNTHESE, il est nécessaire d'implanter un client TCP sur l'ordinateur relié aux dispositifs de téléaffichage, chargé de transmettre les pages résultat au travers du port RS485.
-
-		Un "Client RS485" est donc nécessaire pour gérer l'ensemble des cas. Les différents protocoles sont implémentés sous forme d'interfaces, et la définition des contenus est faite dans des descriptions de tableaux, comme pour les interfaces HTML.
-
-		Il assure en service continu les opérations suivantes :
+		Le client RS485 assure en service continu les opérations suivantes :
 			- demande du contenu au serveur, en spécifiant la clé de l'afficheur, ce qui détermine à la fois le protocole et le contenu
 			- stockage du contenu reçu
 			- transmission du contenu au port RS485

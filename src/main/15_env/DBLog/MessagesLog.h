@@ -7,7 +7,7 @@ namespace synthese
 	{
 		/** Journal des envois de messages.
 
-			Les entrées du journal de sécurité sont :
+			Les entrées du journal de messages sont :
 				- envois de messages
 				- envois selon scénarios de diffusion
 				

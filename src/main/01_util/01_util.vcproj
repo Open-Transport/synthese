@@ -151,6 +151,13 @@
 				RelativePath=".\AdminInterfaceElement\DBLogViewer.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="Rights"
+			Filter="">
+			<File
+				RelativePath=".\Rights\DBLogRight.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\module.h">
 		</File>
