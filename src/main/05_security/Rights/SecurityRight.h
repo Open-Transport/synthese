@@ -12,8 +12,13 @@ namespace synthese
 			@ingroup m15
 
 			Les niveaux de droit utilisés sont les suivants :
-				- USE : Autorise à l'utilisateur à se connecter
-				- READ_BELONG : Permet à l'utilisateur de consulter et de modifier les propriétés de son compte, sauf celles de la catégorie "Droits"
+
+			Habilitations privées :
+				- USE privé : Autorise à l'utilisateur à se connecter
+				- READ : Permet à l'utilisateur de consulter les propriétés de son compte, sauf celles de la catégorie "Droits"
+				- WRITE : Permet à l'utilisateur de consulter les propriétés de son compte, sauf celles de la catégorie "Droits"
+
+			Habilitations publiques :
 				- READ : Permet de consulter toutes les propriétés de tous les comptes
 				- WRITE : Permet de modifier toutes les propriétés de tous les comptes, d'administrer les profils utilisateurs
 				- DELETE : Permet de supprimer un compte, un profil utilisateur

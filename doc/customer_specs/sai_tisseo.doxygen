@@ -215,20 +215,20 @@
 				User [label="C/E/S utilisateur" URL="\ref csst_ihm_users_user"]
 				Profils [URL="\ref csst_ihm_users_profiles"]
 				Profile [label="C/E/S profil" URL="\ref csst_ihm_users_profile"]
-				Emplacements [URL=\"ref csst_ihm_places_places"]
-				Afficheurs [URL=\"ref csst_ihm_display_DisplaySearchAdmin"]
+				Emplacements [URL="\ref csst_ihm_places_places"]
+				Afficheurs [URL="\ref csst_ihm_display_DisplaySearchAdmin"]
 				Display [label="C/E/S afficheur" URL="\ref csst_ihm_display_DisplayAdmin"]
-				DisplayTypes [label="Types d'afficheurs" URL=\"ref csst_ihm_display_DisplayTypesAdmin"]
-				Journal [URL=\"ref csst_ihm_journal_liste"]
+				DisplayTypes [label="Types d'afficheurs" URL="\ref csst_ihm_display_DisplayTypesAdmin"]
+				Journal [URL="\ref csst_ihm_journal_liste"]
 				Place [label="Edition emplacement" URL="\ref csst_ihm_places_place"]
-				Maintenance [label="Supervision afficheur" URL=\"ref csst_ihm_display_DisplayMaintenanceAdmin"]
+				Maintenance [label="Supervision afficheur" URL="\ref csst_ihm_display_DisplayMaintenanceAdmin"]
 			}
 			{
-				node [fillcolor="blue"]
+				node [fillcolor="lightskyblue"]
 				"Simulation afficheur"
 			}
 			{
-				node [fillcolor="green"]
+				node [fillcolor="seagreen3"]
 				"Securite" [URL="\ref csst_ihm_journal_viewer"]
 				"Administration tableaux departs" [URL="\ref csst_ihm_journal_viewer"]
 				"Supervision tableaux departs" [URL="\ref csst_ihm_journal_viewer"]
@@ -236,48 +236,47 @@
 				"Diffusion de messages" [URL="\ref csst_ihm_journal_viewer"]
 				"Administration donnees reseau" [URL="\ref csst_ihm_journal_viewer"]
 			}
-			
-			csst_ihm_journal_viewer
+			{
+				node [fillcolor="white"]
 
-			Login -> Accueil
-				Accueil -> Messages
-					Messages -> Bibliotheque
-				Accueil -> Utilisateurs
-					Utilisateurs -> Profils
-				Accueil -> Emplacements
-				Accueil -> Afficheurs
-					Afficheurs -> DisplayTypes;
-				Accueil -> Journal;
+				Login -> Accueil
+					Accueil -> Messages
+						Messages -> Bibliotheque
+					Accueil -> Utilisateurs
+						Utilisateurs -> Profils
+					Accueil -> Emplacements
+					Accueil -> Afficheurs
+						Afficheurs -> DisplayTypes;
+					Accueil -> Journal;
 
-			Messages -> Message;
-			Messages -> ScenarioSend;
+				Messages -> Message;
+				Messages -> ScenarioSend;
 
-			Bibliotheque -> "C/E/S Modele de message complementaire";
-			Bibliotheque -> "C/E/S Modele de message prioritaire";
-			Bibliotheque -> Scenario;
+				Bibliotheque -> "C/E/S Modele de message complementaire";
+				Bibliotheque -> "C/E/S Modele de message prioritaire";
+				Bibliotheque -> Scenario;
 
-			Utilisateurs -> User;
-			
-			Profils -> Profile;
-			
-			Emplacements -> Place;
+				Utilisateurs -> User;
+				
+				Profils -> Profile;
+				
+				Emplacements -> Place;
 
-			Afficheurs -> Display;
-			Afficheurs -> "Simulation afficheur";
-			Afficheurs -> Maintenance;
+				Afficheurs -> Display;
+				Afficheurs -> "Simulation afficheur";
+				Afficheurs -> Maintenance;
 
-			
-			Journal -> "Securite";
-			Journal -> "Administration tableaux departs";
-			Journal -> "Supervision tableaux departs";
-			Journal -> "Administration bibliotheque messages";
-			Journal -> "Diffusion de messages";
-			Journal -> "Administration donnees reseau";
-			
-
-
+				
+				Journal -> "Securite";
+				Journal -> "Administration tableaux departs";
+				Journal -> "Supervision tableaux departs";
+				Journal -> "Administration bibliotheque messages";
+				Journal -> "Diffusion de messages";
+				Journal -> "Administration donnees reseau";
+			}
 		}
 		@enddot
+
 
 
 	@subsection csst_ihm_users Gestion des utilisateurs
@@ -340,7 +339,7 @@
 		@copydoc synthese::interfaces::MessageAdmin
 		
 		@subsubsection csst_ihm_messages_MessagesScenarioSend Diffusion de messages selon un scénario prédéfini
-		@copydoc synthese::interfaces::MessagesScenarioSend
+		@copydoc synthese::interfaces::MessagesScenarioSendAdmin
 
 	
 	
