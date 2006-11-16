@@ -47,6 +47,15 @@
 				RelativePath=".\ConversionTest.cpp">
 			</File>
 			<File
+				RelativePath=".\FactoryTest.cpp">
+			</File>
+			<File
+				RelativePath=".\FactoryTestChild1.cpp">
+			</File>
+			<File
+				RelativePath=".\FactoryTestChild2.cpp">
+			</File>
+			<File
 				RelativePath=".\HtmlFilterTest.cpp">
 			</File>
 			<File
@@ -83,6 +92,21 @@
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath=".\ConversionTest.h">
+			</File>
+			<File
+				RelativePath=".\FactoryTest.h">
+			</File>
+			<File
+				RelativePath=".\FactoryTestBase.h">
+			</File>
+			<File
+				RelativePath=".\FactoryTestChild1.h">
+			</File>
+			<File
+				RelativePath=".\FactoryTestChild2.h">
+			</File>
+			<File
+				RelativePath=".\FactoryTestChild3.h">
 			</File>
 			<File
 				RelativePath=".\HtmlFilterTest.h">

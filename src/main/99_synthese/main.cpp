@@ -4,18 +4,12 @@
 #include "01_util/Exception.h"
 #include "01_util/Log.h"
 
+#include "39_carto/CartoModule.h"
 
 #include <iostream>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-
-
-#ifdef MODULE_80
-#include "80_carto_service/MapRequestHandler.h"
-#include "39_carto/MapBackgroundManager.h"
-#endif
-
 
 
 
@@ -31,6 +25,8 @@ int main( int argc, char **argv )
 {
     std::string db;
 
+	// temporary registry
+//	synthese::server::CartoModule* cm = new synthese::server::CartoModule;
     po::options_description desc("Allowed options");
     desc.add_options()
 	("help", "produce this help message")
@@ -54,24 +50,12 @@ int main( int argc, char **argv )
 
     try
     {
-	synthese::server::Server::GetInstance ()->initialize ();
-
-#ifdef MODULE_80
-    
-    // Initialize map background manager
-    synthese::carto::MapBackgroundManager::SetBackgroundsDir (server.getConfig ().getDataDir () / "backgrounds");
-    synthese::carto::MapBackgroundManager::Initialize ();
-
-    server.getRequestDispatcher ().
-	registerHandler (new synthese::cartoservice::MapRequestHandler ());
-#endif
-    
-
-	synthese::server::Server::GetInstance ()->run ();
+		synthese::server::Server::GetInstance ()->initialize ();
+		synthese::server::Server::GetInstance ()->run ();
     }
     catch (synthese::util::Exception& ex)
     {
-	Log::GetInstance ().fatal ("Exit!", ex);
+		Log::GetInstance ().fatal ("Exit!", ex);
     }
 }
 

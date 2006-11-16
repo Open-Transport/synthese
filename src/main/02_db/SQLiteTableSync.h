@@ -9,100 +9,94 @@
 
 #include <01_util/UId.h>
 
+#define UPDATEABLE true;
+#define NON_UPDATEABLE false;
 
 namespace synthese
 {
-namespace db
-{
+	namespace db
+	{
 
-    class SQLiteSync;
-    class SQLiteResult;
-    class SQLiteThreadExec;
+		class SQLiteSync;
+		class SQLiteResult;
+		class SQLiteThreadExec;
 
-/** 
-    Base class for an SQLite table synchronizer.
-    By convention, the table name must always start with the t letter
-    followed by a unique 3 digits integer (SQLite does not allow ids starting with number).
+		typedef struct {
+		std::string name;
+		std::string type;
+		bool updatable;
+		} SQLiteTableColumnFormat;
 
-@ingroup m02
-*/
+		typedef std::vector<SQLiteTableColumnFormat> SQLiteTableFormat;
 
-    typedef struct {
-	std::string name;
-	std::string type;
-	bool updatable;
-    } SQLiteTableColumnFormat;
+		/** Base class for an SQLite table synchronizer.
+			By convention, the table name must always start with the t letter
+			followed by a unique 3 digits integer (SQLite does not allow ids starting with number).
 
-    typedef std::vector<SQLiteTableColumnFormat> SQLiteTableFormat;
+			@ingroup m02
+		*/
+		class SQLiteTableSync
+		{
+		private:
 
-class SQLiteTableSync
-{
- private:
+			const bool _allowInsert;
+			const bool _allowRemove;
+			const std::string _triggerOverrideClause;
 
-    const bool _allowInsert;
-    const bool _allowRemove;
-    const std::string _triggerOverrideClause;
+			const std::string _tableName;
+			SQLiteTableFormat _tableFormat;
 
-    const std::string _tableName;
-    SQLiteTableFormat _tableFormat;
+		public:
 
- public:
+			SQLiteTableSync ( const std::string& tableName, 
+					bool allowInsert = true, 
+					bool allowRemove = true,
+					const std::string& triggerOverrideClause = "1");
 
-    SQLiteTableSync ( const std::string& tableName, 
-		      bool allowInsert = true, 
-		      bool allowRemove = true,
-		      const std::string& triggerOverrideClause = "1");
+			~SQLiteTableSync ();
 
-    ~SQLiteTableSync ();
+			const std::string& getTableName () const;
 
-    const std::string& getTableName () const;
+			/** Returns the unique integer identifying a table.
+			*/
+			int getTableId () const;
 
-    /** Returns the unique integer identifying a table.
-     */
-    int getTableId () const;
+			const SQLiteTableFormat& getTableFormat () const;
 
-    const SQLiteTableFormat& getTableFormat () const;
+			uid encodeUId (int gridId, int gridNodeId, long objectId);
 
-    uid encodeUId (int gridId, int gridNodeId, long objectId);
+			/** This method is called when the synchronizer is created
+			to sychronize it with pre-existing data in db.
+			*/
+			void firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+					synthese::db::SQLiteSync* sync);
 
-    /** This method is called when the synchronizer is created
-	to sychronize it with pre-existing data in db.
-    */
-    void firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
-		    synthese::db::SQLiteSync* sync);
+			virtual void rowsAdded (const SQLiteThreadExec* sqlite, 
+						SQLiteSync* sync,
+						const SQLiteResult& rows) = 0;
 
-    virtual void rowsAdded (const SQLiteThreadExec* sqlite, 
-			    SQLiteSync* sync,
-			    const SQLiteResult& rows) = 0;
+			virtual void rowsUpdated (const SQLiteThreadExec* sqlite, 
+						SQLiteSync* sync,
+						const SQLiteResult& rows) = 0;
 
-    virtual void rowsUpdated (const SQLiteThreadExec* sqlite, 
-			      SQLiteSync* sync,
-			      const SQLiteResult& rows) = 0;
+			virtual void rowsRemoved (const SQLiteThreadExec* sqlite, 
+						SQLiteSync* sync,
+						const SQLiteResult& rows) = 0;
 
-    virtual void rowsRemoved (const SQLiteThreadExec* sqlite, 
-			      SQLiteSync* sync,
-			      const SQLiteResult& rows) = 0;
+		protected:
 
- protected:
+			void addTableColumn (const std::string& columnName, 
+					const std::string& columnType, 
+					bool updatable = true);
 
-    void addTableColumn (const std::string& columnName, 
-			 const std::string& columnType, 
-			 bool updatable = true);
+		protected:
 
- protected:
-
-    static int ParseTableId (const std::string& tableName);
+			static int ParseTableId (const std::string& tableName);
 
 
- private:
+		private:
 
-
-};
-
-
-
-
-}
-
+		};
+	}
 }
 #endif

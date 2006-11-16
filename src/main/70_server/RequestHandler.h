@@ -3,6 +3,7 @@
 
 
 #include "module.h"
+#include "01_util/Factory.h"
 
 #include <iostream>
 #include <string>
@@ -11,8 +12,10 @@
 
 namespace synthese
 {
+	using synthese::util::Factory;
 namespace server
 {
+
 
 class Request;
 
@@ -20,29 +23,20 @@ class Request;
 
 Once registered into the request dispatcher singleton this class
 allows to handle a particular function.
+Use the generic factory to register.
 
 @ingroup m70
 */
 class RequestHandler
 {
- private:
-    
-    const std::string _functionCode;
-
  protected:
 
-    RequestHandler (const std::string& functionCode);
+    RequestHandler ();
     RequestHandler (const RequestHandler& ref);
 
  public:
 
     virtual ~RequestHandler ();
-
-    //! @name Getters/Setters
-    //@{
-    const std::string& getFunctionCode () const;
-    //@}
-
 
     //! @name Query methods
     //@{

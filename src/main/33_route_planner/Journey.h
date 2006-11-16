@@ -3,7 +3,7 @@
 
 
 #include <deque>
-
+#include <vector>
 
 namespace synthese
 {
@@ -115,8 +115,7 @@ class Journey
 };
 
 
-
-
+typedef std::vector<Journey> JourneyVector;
 
 }
 }

@@ -29,6 +29,8 @@ namespace synthese
 		*/
 		class SecurityRight : public Right
 		{
+		private:
+			static bool _registered;
 
 		};
 	}

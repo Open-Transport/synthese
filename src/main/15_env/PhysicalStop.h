@@ -6,6 +6,7 @@
 
 #include "Vertex.h"
 #include "module.h"
+#include "BroadcastPoint.h"
 
 #include <string>
 
@@ -17,8 +18,7 @@ namespace env
 
  class LineStop;
  class ConnectionPlace;
- class BroadcastPoint;
-
+ 
 
 /** Physical stop (bus stop, etc.).
     A physical stop is an entry point to the transport network.

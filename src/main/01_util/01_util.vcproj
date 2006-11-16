@@ -81,9 +81,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\ClassFactory.h">
-			</File>
-			<File
 				RelativePath=".\Conversion.h">
 			</File>
 			<File
@@ -91,6 +88,9 @@
 			</File>
 			<File
 				RelativePath=".\Exception.h">
+			</File>
+			<File
+				RelativePath=".\Factory.h">
 			</File>
 			<File
 				RelativePath=".\HtmlFilter.h">

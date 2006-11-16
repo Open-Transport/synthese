@@ -78,6 +78,75 @@
 				RelativePath=".\RoutePlanner.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="ValueInterfaceElement"
+			Filter="">
+			<File
+				RelativePath=".\AtLeastOneAlertInJourneyVectorValueInterfaceElement.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="LibraryInterfaceElement"
+			Filter="">
+			<File
+				RelativePath=".\JourneyBoardInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\JourneyBoardInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\JourneyLineListInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\JourneyLineListInterfaceElement.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="InterfacePage"
+			Filter="">
+			<File
+				RelativePath=".\JourneyBoardJunctionCellInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\JourneyBoardJunctionCellInterfacePage.h">
+			</File>
+			<File
+				RelativePath=".\JourneyBoardServiceCellInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\JourneyBoardServiceCellInterfacePage.h">
+			</File>
+			<File
+				RelativePath=".\JourneyBoardStopCellInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\JourneyBoardStopCellInterfacePage.h">
+			</File>
+			<File
+				RelativePath=".\RoutePlannerNoSolutionInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\RoutePlannerNoSolutionInterfacePage.h">
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetColumnInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetColumnInterfacePage.h">
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetLineInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetLineInterfacePage.h">
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\module.h">
 		</File>

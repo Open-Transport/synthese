@@ -29,7 +29,7 @@ namespace synthese
 				- DELETE : accès en écriture, effacement permis
 				- NB : Chaque niveau de droit inclut les niveaux précédents.
 
-			Chaque module contient des définitions d'habilitations (sous-classes enregistrées) qui implémentent le contrôle des droits et la génération d'une liste de paramètres possibles.
+			Chaque module contient des définitions d'habilitations (sous-classes enregistrées dans Factory<Right>) qui implémentent le contrôle des droits et la génération d'une liste de paramètres possibles.
 		*/
 		class Right
 		{

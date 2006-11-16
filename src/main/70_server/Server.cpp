@@ -13,6 +13,8 @@
 #include "01_util/ThreadGroup.h"
 #include "01_util/Log.h"
 #include "01_util/Exception.h"
+#include "01_util/Factory.h"
+#include "01_util/Exception.h"
 
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteSync.h"
@@ -20,6 +22,7 @@
 #include "02_db/SQLiteThreadExec.h"
 
 #include "ServerConfigTableSync.h"
+#include "ModuleClass.h"
 #include "17_env_ls_sql/AddressTableSync.h"
 #include "17_env_ls_sql/AlarmTableSync.h"
 #include "17_env_ls_sql/AxisTableSync.h"
@@ -45,6 +48,8 @@
 #include "17_env_ls_sql/EnvironmentTableSync.h"
 #include "17_env_ls_sql/EnvironmentLinkTableSync.h"
 
+#include "11_interfaces/InterfacePageTableSync.h"
+
 
 #include <boost/filesystem/operations.hpp>
 
@@ -53,6 +58,7 @@ using synthese::util::Log;
 using synthese::util::Thread;
 using synthese::util::ThreadGroup;
 using synthese::util::ThreadExec;
+using synthese::util::Factory;
 
 using synthese::env::Environment;
 
@@ -224,6 +230,10 @@ Server::initialize ()
 	new synthese::envlssql::LineStopTableSync (_environments, TRIGGERS_ENABLED_CLAUSE);
 
 
+
+	synthese::db::InterfacePageTableSync* interfacePageSync = 
+		new synthese::db::InterfacePageTableSync (_interfaces, TRIGGERS_ENABLED_CLAUSE);
+
     syncHook->addTableSynchronizer (configSync);
     syncHook->addTableSynchronizer (envSync);
     syncHook->addTableSynchronizer (alarmSync);
@@ -247,6 +257,7 @@ Server::initialize ()
     syncHook->addTableSynchronizer (serviceDateSync);
     syncHook->addTableSynchronizer (physicalStopSync);
     syncHook->addTableSynchronizer (lineStopSync);
+	syncHook->addTableSynchronizer (interfacePageSync);
 
     // Create the env link synchronizer after having added the component synchronizers
     synthese::envlssql::EnvironmentLinkTableSync* envLinkSync = new synthese::envlssql::EnvironmentLinkTableSync 
@@ -259,6 +270,18 @@ Server::initialize ()
     // Environment are populated. Server config is filled.
     sqliteThread.waitForReadyState ();
     
+	// Initialize modules
+	if (Factory<ModuleClass>::size() == 0)
+		throw synthese::util::Exception("No registered module !");
+
+	for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); it != Factory<ModuleClass>::end(); ++it)
+	{
+		ModuleClass* module = it.getObject();
+		module->initialize(this);
+		_modules.insert(make_pair(it.getKey(), module));
+	}
+
+	
 
 }
 
@@ -350,8 +373,8 @@ Server::getRequestDispatcher ()
 
 
 
-ServerConfig& 
-Server::getConfig ()
+const ServerConfig& 
+Server::getConfig () const
 {
     return _config;
 }
@@ -361,7 +384,3 @@ Server::getConfig ()
 
 }
 }
-
-
-
-

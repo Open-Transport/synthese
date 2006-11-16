@@ -325,56 +325,85 @@
 		<Filter
 			Name="LibraryInterfaceElement"
 			Filter="">
+			<File
+				RelativePath=".\CityListInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\CityListInterfaceElement.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
 			Filter="">
 			<File
-				RelativePath=".\AdminInterfaceElement\MessageAdmin.h">
+				RelativePath=".\MessageAdmin.h">
 			</File>
 			<File
-				RelativePath=".\AdminInterfaceElement\MessagesAdmin.h">
+				RelativePath=".\MessagesAdmin.h">
 			</File>
 			<File
-				RelativePath=".\MessagesLibraryAdmin.h">
+				RelativePath=".\MessagesScenarioAdmin.h">
 			</File>
 			<File
-				RelativePath=".\AdminInterfaceElement\MessagesScenarioAdmin.h">
+				RelativePath=".\MessagesScenarioSendAdmin.h">
 			</File>
 			<File
-				RelativePath=".\AdminInterfaceElement\MessagesScenarioSendAdmin.h">
+				RelativePath=".\PlaceAdmin.h">
 			</File>
 			<File
-				RelativePath=".\AdminInterfaceElement\PlaceAdmin.h">
-			</File>
-			<File
-				RelativePath=".\AdminInterfaceElement\PlacesAdmin.h">
+				RelativePath=".\PlacesAdmin.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="Rights"
 			Filter="">
 			<File
-				RelativePath=".\Rights\MessagesLibraryRight.h">
+				RelativePath=".\MessagesLibraryRight.h">
 			</File>
 			<File
-				RelativePath=".\Rights\MessagesRight.h">
+				RelativePath=".\MessagesRight.h">
 			</File>
 			<File
-				RelativePath=".\Rights\PlacesRight.h">
+				RelativePath=".\PlacesRight.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
 			Filter="">
 			<File
-				RelativePath=".\DBLog\MessagesLibraryLog.h">
+				RelativePath=".\MessagesLibraryLog.h">
 			</File>
 			<File
-				RelativePath=".\DBLog\MessagesLog.h">
+				RelativePath=".\MessagesLog.h">
 			</File>
 			<File
-				RelativePath=".\DBLog\TransportNetworkDataLog.h">
+				RelativePath=".\TransportNetworkDataLog.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="ValueInterfaceElement"
+			Filter="">
+			<File
+				RelativePath=".\CityNameValueInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\CityNameValueInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\LogicalStopNameValueInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\LogicalStopNameValueInterfaceElement.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="InterfacePage"
+			Filter="">
+			<File
+				RelativePath=".\LineMarkerInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\LineMarkerInterfacePage.h">
 			</File>
 		</Filter>
 		<File

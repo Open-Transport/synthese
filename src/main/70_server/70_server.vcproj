@@ -78,6 +78,9 @@
 				RelativePath=".\CleanerThreadExec.h">
 			</File>
 			<File
+				RelativePath=".\ModuleClass.h">
+			</File>
+			<File
 				RelativePath=".\Request.h">
 			</File>
 			<File

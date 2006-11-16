@@ -1,6 +1,8 @@
 #ifndef SYNTHESE_BROADCAST_POINT_H
 #define SYNTHESE_BROADCAST_POINT_H
 
+#include "Point.h"
+
 namespace synthese
 {
 	namespace env
@@ -14,7 +16,7 @@ namespace synthese
 
 			Par héritage, un @ref PhysicalStop "arrêt physique" est automatiquement un point de diffusion 
 		*/
-		class BroadcastPoint : public cPoint
+		class BroadcastPoint 
 		{
 		};
 	}

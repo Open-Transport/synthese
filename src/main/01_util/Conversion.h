@@ -66,6 +66,7 @@ class Conversion
     static std::string ToString (double d);
     static std::string ToString (const std::string& s);
 
+	static std::string ToString (boost::logic::tribool t);
 
 };
 

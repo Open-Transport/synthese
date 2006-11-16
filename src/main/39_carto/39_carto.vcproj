@@ -156,8 +156,24 @@
 				RelativePath=".\TileGrid.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="RequestHandler"
+			Filter="">
+			<File
+				RelativePath=".\MapRequestHandler.cpp">
+			</File>
+			<File
+				RelativePath=".\MapRequestHandler.h">
+			</File>
+		</Filter>
 		<File
-			RelativePath=".\module.h">
+			RelativePath=".\CartoModule.cpp">
+		</File>
+		<File
+			RelativePath=".\CartoModule.h">
+		</File>
+		<File
+			RelativePath=".\SConscript">
 		</File>
 	</Files>
 	<Globals>

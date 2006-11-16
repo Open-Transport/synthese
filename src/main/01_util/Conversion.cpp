@@ -131,7 +131,10 @@ Conversion::ToString (const std::string& s)
     return s;
 }
 
-
+std::string Conversion::ToString( boost::logic::tribool t )
+{
+	return (t == true) ? "1" : "0";
+}
 
 }
 }

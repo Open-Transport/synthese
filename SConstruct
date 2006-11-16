@@ -121,7 +121,7 @@ def DefineDefaultLinkFlags (env):
     mode = env['MODE']
 
     if (platform=='win32'):
-        env.Append ( LINKFLAGS = ['/INCREMENTAL', '/NOLOGO', '/MACHINE:X86', '/SUBSYSTEM:CONSOLE'] )
+        env.Append ( LINKFLAGS = ['/INCREMENTAL:NO', '/NOLOGO', '/MACHINE:X86', '/SUBSYSTEM:CONSOLE', '/OPT:NOREF'] )
         if (mode=='debug'):
             env.Append ( LINKFLAGS = ['/DEBUG', '/NODEFAULTLIB:msvcrt.lib'] )
         else:  

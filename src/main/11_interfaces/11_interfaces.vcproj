@@ -43,187 +43,128 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\cFichier.cpp">
+				RelativePath=".\AdminInterfaceElement.cpp">
 			</File>
-			<File
-				RelativePath=".\cFichierInterfaces.cpp">
-			</File>
-			<File
-				RelativePath=".\cFichierObjetInterfaceStandard.cpp">
-			</File>
-			<File
-				RelativePath=".\cFichierSites.cpp">
-			</File>
-			<File
-				RelativePath=".\cFichierTbDep.cpp">
-			</File>
-			<File
-				RelativePath=".\cFormatFichier.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_AEvaluer.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_AEvaluer_ListeParametres.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_AEvaluer_PageEcran.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Connu_ListeParametres.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Bibliotheque.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Goto.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Ligne.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Parametre.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Parametre_DonneeEnvironnement.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Parametre_TexteAEvaluer.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Parametre_TexteConnu.cpp">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_TestConditionnel.cpp">
-			</File>
-			<File
-				RelativePath=".\cSite.cpp">
-			</File>
-			<File
-				RelativePath=".\cTexte.cpp">
-			</File>
-			<File
-				RelativePath=".\cTrajets.cpp">
-			</File>
-			<File
-				RelativePath=".\Interface.cpp">
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath=".\AdminInterfaceElement.h">
-			</File>
-			<File
-				RelativePath=".\cFichier.h">
-			</File>
-			<File
-				RelativePath=".\cFichierInterfaces.h">
-			</File>
-			<File
-				RelativePath=".\cFichierObjetInterfaceStandard.h">
-			</File>
-			<File
-				RelativePath=".\cFichierSites.h">
-			</File>
-			<File
-				RelativePath=".\cFichiersPourSYNTHESE.h">
-			</File>
-			<File
-				RelativePath=".\cFichierTbDep.h">
-			</File>
-			<File
-				RelativePath=".\cFormatFichier.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_AEvaluer.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_AEvaluer_ListeParametres.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_AEvaluer_PageEcran.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Connu_ListeParametres.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Bibliotheque.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Goto.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Ligne.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Parametre.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Parametre_DonneeEnvironnement.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Parametre_TexteAEvaluer.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_Parametre_TexteConnu.h">
-			</File>
-			<File
-				RelativePath=".\cInterface_Objet_Element_TestConditionnel.h">
-			</File>
-			<File
-				RelativePath=".\cSite.h">
-			</File>
-			<File
-				RelativePath=".\cTableauDynamique.h">
-			</File>
-			<File
-				RelativePath=".\cTexte.h">
-			</File>
-			<File
-				RelativePath=".\cTexte.inline.h">
-			</File>
-			<File
-				RelativePath=".\cTrajets.h">
 			</File>
 			<File
 				RelativePath=".\DisplayableElement.h">
 			</File>
 			<File
+				RelativePath=".\Interface.cpp">
+			</File>
+			<File
 				RelativePath=".\Interface.h">
+			</File>
+			<File
+				RelativePath=".\InterfacePage.cpp">
 			</File>
 			<File
 				RelativePath=".\InterfacePage.h">
 			</File>
 			<File
+				RelativePath=".\LibraryInterfaceElement.cpp">
+			</File>
+			<File
 				RelativePath=".\LibraryInterfaceElement.h">
 			</File>
 			<File
-				RelativePath=".\PageComponent.h">
+				RelativePath=".\Parametres.h">
 			</File>
 			<File
-				RelativePath=".\Parametres.h">
+				RelativePath=".\Site.cpp">
+			</File>
+			<File
+				RelativePath=".\Site.h">
+			</File>
+			<File
+				RelativePath=".\ValueElementList.cpp">
+			</File>
+			<File
+				RelativePath=".\ValueElementList.h">
+			</File>
+			<File
+				RelativePath=".\ValueInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\ValueInterfaceElement.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
 			Filter="">
 			<File
-				RelativePath=".\AdminInterfaceElement\HomeAdmin.h">
+				RelativePath=".\HomeAdmin.cpp">
+			</File>
+			<File
+				RelativePath=".\HomeAdmin.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="LibraryInterfaceElement"
+			Filter="">
+			<File
+				RelativePath=".\GotoInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\GotoInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\IfThenElseInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\IfThenElseInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\IncludePageInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\IncludePageInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\LineLabelInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\LineLabelInterfaceElement.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="ValueInterfaceElement"
+			Filter="">
+			<File
+				RelativePath=".\ParameterValueInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\ParameterValueInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\StaticValueInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\StaticValueInterfaceElement.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="LS_SQL"
+			Filter="">
+			<File
+				RelativePath=".\InterfacePageTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\InterfacePageTableSync.h">
+			</File>
+			<File
+				RelativePath=".\InterfaceTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\InterfaceTableSync.h">
+			</File>
+			<File
+				RelativePath=".\SiteTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\SiteTableSync.h">
 			</File>
 		</Filter>
 		<File

@@ -7,38 +7,38 @@ includes = 'main.cpp'
 excludes = []
 
 
-moduleenv.Append ( CPPDEFINES = ['MODULE_80'] )
-moduleenv.AppendMultithreadConf ()
+#moduleenv.AppendMultithreadConf ()
 
-files = moduleenv.Glob(includes, excludes)
+#files = moduleenv.Glob(includes, excludes)
 
 # NOTE : Create first a static library before linking the program,
 # otherwise, very strange gnu.link_once errors on boost time
-moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
+#moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
 
 
-moduleenv = mainenv.ModuleEnv()
-includes = ''
-excludes = []
+#moduleenv = mainenv.ModuleEnv()
+#includes = ''
+#excludes = []
+
+
 files = moduleenv.Glob(includes, excludes)
 
-
 # Modules libs
-moduleenv.AddModuleDependency ('99_synthese')
 moduleenv.AddModuleDependency ('70_server')
-moduleenv.AddModuleDependency ('80_carto_service')
 moduleenv.AddModuleDependency ('40_carto_ls_xml')
 moduleenv.AddModuleDependency ('16_env_ls_xml')
 moduleenv.AddModuleDependency ('39_carto')
 
 moduleenv.AddModuleDependency ('17_env_ls_sql')
 moduleenv.AddModuleDependency ('15_env')
+moduleenv.AddModuleDependency ('11_interfaces')
 
 # Generic libs
 moduleenv.AddModuleDependency ('04_time')
 moduleenv.AddModuleDependency ('00_tcp')
 moduleenv.AddModuleDependency ('02_db')
 moduleenv.AddModuleDependency ('01_util')
+moduleenv.AddModuleDependency ('07_lex_matcher')
 
 
 moduleenv.AddBoostDependency ('boost_filesystem')
@@ -48,6 +48,7 @@ moduleenv.AddBoostDependency ('boost_iostreams')
 moduleenv.AddBoostDependency ('boost_program_options')
 moduleenv.AddSQLiteDependency ()
 moduleenv.AppendMultithreadConf ()
+
 
 
 moduleenv.Program ( moduleenv.DefaultModuleName(), files )

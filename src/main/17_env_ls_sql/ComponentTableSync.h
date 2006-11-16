@@ -23,7 +23,7 @@ namespace envlssql
 /** 
 
 Component SQLite table synchronizer.
-Base class for any synchronizer targetting a component which is owned by an environment.
+Base class for any synchronizer targeting a component which is owned by an environment.
 
 @ingroup m17
 */

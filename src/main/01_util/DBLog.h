@@ -24,6 +24,7 @@ namespace synthese
 				- niveau de l'entrée (INFO, WARNING, ERROR)
 				- texte de l'entrée (formalisme selon module et rubrique, spécifié par les sous-classes)
 
+			Les différents journaux sont enregistrés dans l'instance de fabrique Factory<DBLog>.
 		*/
 		class DBLog
 		{

@@ -84,14 +84,17 @@ Hour::toString () const
 std::string 
 Hour::toInternalString () const
 {
-  std::stringstream os;
+	if (isUnknown())
+		return "";
 
-  os << std::setw( 2 ) << std::setfill ( '0' )
-     << getHours ()
-     << std::setw( 2 ) << std::setfill ( '0' )
-     << getMinutes ();
+	std::stringstream os;
 
-  return os.str ();
+	os << std::setw( 2 ) << std::setfill ( '0' )
+		<< getHours ()
+		<< std::setw( 2 ) << std::setfill ( '0' )
+		<< getMinutes ();
+
+	return os.str ();
 }
 
 

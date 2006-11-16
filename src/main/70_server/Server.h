@@ -6,12 +6,14 @@
 
 #include <iostream>
 #include <string>
+#include <map>
 
 #include "RequestDispatcher.h"
 #include "ServerConfig.h"
 
 #include "15_env/Environment.h"
 #include "11_interfaces/Interface.h"
+#include "11_interfaces/Site.h"
 
 
 #include <boost/filesystem/path.hpp>
@@ -22,7 +24,7 @@ namespace synthese
 namespace server
 {
 
-
+class ModuleClass;
 
 /** Main server class.
 
@@ -44,8 +46,11 @@ class Server
     boost::filesystem::path _dbFile;
     ServerConfig _config;
 
-    synthese::env::Environment::Registry _environments;
-    synthese::interfaces::Interface::Registry _interfaces;
+    synthese::env::Environment::Registry		_environments;
+    synthese::interfaces::Interface::Registry	_interfaces;
+	synthese::interfaces::Site::Registry		_sites;
+
+	std::map<std::string, ModuleClass*> _modules;
 
  protected:
 
@@ -67,7 +72,7 @@ class Server
     const synthese::interfaces::Interface::Registry& getInterfaces () const;
 
     RequestDispatcher& getRequestDispatcher ();
-    ServerConfig& getConfig ();
+    const ServerConfig& getConfig () const;
 
     static Server* GetInstance ();
     static void SetInstance (Server* instance);

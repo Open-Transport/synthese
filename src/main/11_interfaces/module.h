@@ -14,8 +14,7 @@ namespace synthese
 			- Interface class : defines an interface entirely : each defined pages is stored in a map page => definition
 			- DisplayableElement (abstract) : specifies virtual methods for all types of output element, making up each interface page
 				- Page : definition of a page, coming from the database. Page are elements of an interface
-				- PageComponent (abstract) : element which can produce a single display
-					- LibraryInterfaceElement (abstract) : element which produce only a display (cannot be used as value producer because of the complexity of the output)
+				- LibraryInterfaceElement (abstract) : element which produce only a display (cannot be used as value producer because of the complexity of the output)
 					- ValueElement (abstract) : element which contains a string value, which can be displayed or used by another element (eg "if" element)
 						- StaticValueInterfaceElement : the value is defined at the load of the interface
 						- DynamicValueInterfaceElement (abstract) : the value is defined at the display of the containing page
@@ -24,6 +23,7 @@ namespace synthese
 					- GotoInterfaceElement : branching element : the next element in page display is changed to then specified named line
 					- PageLineName : name of a line
 					- PageInclusion : inclusion of an other customized page, with parameters
+					- ... other library elements in other modules
 				
 		Several complex LibraryElement objects follow a structured template. Subclasses of LibraryElement specify the frame of these elements :
 			- AdminInterfaceElement (abstract) : administration page, with right control of content, navigation pane at the left, and title bar with navigation positon.

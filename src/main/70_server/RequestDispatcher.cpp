@@ -55,12 +55,6 @@ RequestDispatcher::dispatchRequest (const Request& request,
 
 
 
-void 
-RequestDispatcher::registerHandler (const RequestHandler* handler)
-{
-    _handlers.insert (std::make_pair (handler->getFunctionCode (),
-				      handler));
-}
 
 
 

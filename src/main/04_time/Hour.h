@@ -41,10 +41,11 @@ class Hour
 
         //! @name Query methods
         //@{
-        bool isValid () const;
-        bool isUnknown () const;
-	std::string toString () const;
-        std::string toInternalString () const;
+			bool isValid () const;
+			bool isUnknown () const;
+			std::string toString () const;
+
+			std::string toInternalString () const;
         //@}
 
 

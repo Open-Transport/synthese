@@ -102,6 +102,14 @@
 				RelativePath=".\DBLog\DisplayMaintenanceLog.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="LibraryInterfaceElement"
+			Filter="">
+		</Filter>
+		<Filter
+			Name="InterfacePage"
+			Filter="">
+		</Filter>
 		<File
 			RelativePath=".\module.h">
 		</File>

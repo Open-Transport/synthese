@@ -14,6 +14,7 @@
 
 #include "BestVertexReachesMap.h"
 #include "JourneyLegComparator.h"
+#include "Journey.h"
 
 
 
@@ -41,10 +42,8 @@ namespace env
 namespace routeplanner
 {
 
-    class Journey;
     class JourneyLeg;
 
-    typedef std::vector<Journey> JourneyVector;
     typedef enum {DEPARTURE_FIRST, ARRIVAL_FIRST} PlanningOrder;
 
 
@@ -106,7 +105,6 @@ class RoutePlanner
     
 
  public:
-
 
     ~RoutePlanner ();
 
