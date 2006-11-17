@@ -4,12 +4,19 @@
 #include "01_util/Exception.h"
 #include "01_util/Log.h"
 
-#include "39_carto/CartoModule.h"
-
 #include <iostream>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
+
+
+
+// included static initializations
+
+#include "generated.cpp.inc"
+
+//
+
 
 
 
@@ -25,8 +32,6 @@ int main( int argc, char **argv )
 {
     std::string db;
 
-	// temporary registry
-//	synthese::server::CartoModule* cm = new synthese::server::CartoModule;
     po::options_description desc("Allowed options");
     desc.add_options()
 	("help", "produce this help message")

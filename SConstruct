@@ -193,6 +193,7 @@ def AppendMultithreadConf (env):
 
 
 def AddModuleDependency (env, modulename):
+    env.Append ( MODULES = [modulename] )  
     env.Append ( LIBPATH = ['../../main/' + modulename] )  
     env.Append ( LIBS = [modulename] )  
 

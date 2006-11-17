@@ -1,4 +1,4 @@
-import os.path
+import os.path, fnmatch
 
 Import ('mainenv')
 moduleenv = mainenv.ModuleEnv()
@@ -51,19 +51,41 @@ moduleenv.AppendMultithreadConf ()
 
 
 
+currentmodule = moduleenv.DefaultModuleName()
 
 
+def preAction (target = None, source = None, env = None):
+    # Look in all module folders for files with extension .cpp.gen
+    # and dump them inside a generated.cpp file, to be included in main.cpp
+    # Modules are traversed in reverse dependency order.
+    
+    modules = moduleenv['MODULES']
 
-def build_it(target = None, source = None, env = None):
-    print ('************ Ole!!!')
+    generated = open ('src/main/' + currentmodule + '/generated.cpp.inc', "w" )
+    for module in reversed (modules):
+      moduledir = os.path.join ('src/main', module)
+      for file in os.listdir (moduledir) :
+        if fnmatch.fnmatch (file, '*.cpp.gen') :
+            fragmentfile = os.path.join (moduledir, file);
+            # dump the file to generated output
+            fragment = open (fragmentfile, "r")
+            generated.write (fragment.read ())
+            fragment.close ()
+
+            
+    generated.close ()
+    
     return 0
  
-a = Action(build_it)
+a = Action (preAction)
 
-moduleenv.AddPreAction (moduleenv.DefaultModuleName(), a)
-moduleenv.AlwaysBuild (moduleenv.DefaultModuleName())
+
+
 
 
 moduleenv.Program ( moduleenv.DefaultModuleName(), files )
+
+moduleenv.AddPreAction ("main.o", a)
+moduleenv.AlwaysBuild ("main.o")
 
 
