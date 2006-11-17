@@ -3,7 +3,11 @@
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
+#include "01_util/Factory.h"
+
 #include "04_time/HourPeriod.h"
+
+
 
 #include <string>
 #include <vector>
@@ -62,7 +66,7 @@ namespace synthese
 					template <class T>
 					const T* getPage() const
 					{
-						std::string key = Factory<InterfacePage>::getKey<T>();
+						std::string key = synthese::util::Factory<InterfacePage>::getKey<T>();
 						return dynamic_cast<const T*>( getPage(key) );
 					}
 					const synthese::time::HourPeriod* getPeriod( size_t index = ALL_DAY_PERIOD ) const;

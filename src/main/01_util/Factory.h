@@ -80,7 +80,7 @@ namespace synthese
 
 				// Saving of the auto generated builder
 				CreatorInterface* creator = new Creator<T>;
-				_registeredCreator->insert(std::pair<Map::key_type, CreatorInterface*>(key, creator));
+				_registeredCreator->insert(std::pair<typename Map::key_type, CreatorInterface*>(key, creator));
 				return key;
 			}
 
@@ -92,7 +92,7 @@ namespace synthese
 					return "";
 
 				// Search for a creator for the T class
-				Map::const_iterator it;
+				typename Map::const_iterator it;
 				for (it = _registeredCreator->begin(); it != _registeredCreator->end(); ++it)
 					if (dynamic_cast<Creator<T>*>(it->second) != NULL)
 						return it->first;
@@ -106,7 +106,7 @@ namespace synthese
 			static bool contains( const typename Map::key_type& key )
 			{
 				// Search of the key of the wished class in the map
-				Map::iterator it = _registeredCreator->find(key);
+				typename Map::iterator it = _registeredCreator->find(key);
 
 				// The key is not found
 				return it != _registeredCreator->end();
@@ -119,7 +119,7 @@ namespace synthese
 					return NULL;
 
 				// Search of the key of the wished class in the map
-				Map::iterator it = _registeredCreator->find(key);
+				typename Map::iterator it = _registeredCreator->find(key);
 
 				// The key is not found
 				if(it == _registeredCreator->end())
@@ -137,11 +137,11 @@ namespace synthese
 			class Iterator
 			{
 			private:
-				Factory::Map::const_iterator _it;
+				typename Factory::Map::const_iterator _it;
 				RootObject* _obj;
 
 			public:
-				Iterator(const Factory::Map::const_iterator& it)
+				Iterator(const typename Factory::Map::const_iterator& it)
 					: _it(it), _obj(NULL)
 				{	}
 

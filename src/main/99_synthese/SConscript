@@ -51,6 +51,19 @@ moduleenv.AppendMultithreadConf ()
 
 
 
+
+
+
+def build_it(target = None, source = None, env = None):
+    print ('************ Ole!!!')
+    return 0
+ 
+a = Action(build_it)
+
+moduleenv.AddPreAction (moduleenv.DefaultModuleName(), a)
+moduleenv.AlwaysBuild (moduleenv.DefaultModuleName())
+
+
 moduleenv.Program ( moduleenv.DefaultModuleName(), files )
 
 

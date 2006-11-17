@@ -44,3 +44,4 @@ case EI_ATTRIBUT_Ligne_LibelleMateriel:
 return ( ( const Line* ) __Objet ) ->getLongName ();
 // MJ TODO return ( ( const Line* ) __Objet ) ->Materiel() ->getLibelleSimple();
 */
+
