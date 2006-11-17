@@ -1,4 +1,5 @@
 #include "HtmlMapRenderer.h"
+#include "JpegRenderer.h"
 
 #include "Geometry.h"
 #include "DrawableLine.h"
@@ -11,11 +12,11 @@
 #include "15_env/Environment.h"
 #include "15_env/Line.h"
 #include "15_env/LineStop.h"
-
+#include "70_server/Server.h"
 
 #include <cmath>
 #include <algorithm>
-
+#include <fstream>
 #include <boost/algorithm/string/replace.hpp>
 
 using synthese::util::RGBColor;
@@ -37,19 +38,10 @@ namespace synthese
 namespace carto
 {
 
+	const std::string HtmlMapRenderer::_factory_key = util::Factory<Renderer>::integrate<HtmlMapRenderer>("html");
 
 
-
-HtmlMapRenderer::HtmlMapRenderer(const RenderingConfig& config, 
-				 const Environment& environment,
-				 const std::string& urlPattern,
-				 const std::string& mapImgFilename,
-				 std::ostream& output)
-    : Renderer (config)
-	, _environment (environment)
-    , _urlPattern (urlPattern)
-    , _mapImgFilename (mapImgFilename)
-    , _output (output)
+HtmlMapRenderer::HtmlMapRenderer()
 {
 
 }
@@ -64,21 +56,44 @@ HtmlMapRenderer::~HtmlMapRenderer()
 
 
 
-void 
-HtmlMapRenderer::render (Map& map)
+std::string
+HtmlMapRenderer::render(const boost::filesystem::path& tempDir, 
+						const std::string& filenamePrefix,
+						const synthese::env::Environment* environment,
+						synthese::carto::Map& map,
+						const synthese::carto::RenderingConfig& config)
 {
+
+	JpegRenderer jpegRenderer;
+	jpegRenderer.render(tempDir, filenamePrefix, environment, map, config);
+
+	std::string jpegFilename = filenamePrefix + ".jpg";
+
+	std::string resultFilename (filenamePrefix + ".html");
+	const boost::filesystem::path htmlFile (tempDir / resultFilename);
+
+	std::ofstream _output (htmlFile.string ().c_str ());
+	
+	_config = config;
+	_environment = environment;
+	_urlPattern = map.getUrlPattern ();
+	
+	/// @todo Remove server dependancy here
+	_mapImgFilename = synthese::server::Server::GetInstance ()->getConfig ().getHttpTempUrl () + "/" + jpegFilename;
+	
     _output << "<html><body>";
     _output << "<map name='mapid'>" << std::endl;
 
     // Dump first physical stops cos the order of area elements in <map>
     // specifies a kind of 'layer' priority for mouse capture.
-    renderPhysicalStops (map);
-    renderLines (map);
+    renderPhysicalStops (_output, map);
+    renderLines (_output, map);
     _output << "</map>" << std::endl;
     _output << "<img src='" << _mapImgFilename << "' usemap='#mapid'/>" << std::endl;
     _output << "</body></html>" << std::endl;
 
-
+	_output.close();
+	return resultFilename;
 }
 
 
@@ -87,7 +102,7 @@ HtmlMapRenderer::render (Map& map)
 
 
 void 
-HtmlMapRenderer::renderLines (Map& map)
+HtmlMapRenderer::renderLines (std::ostream& _output, Map& map)
 {
     const std::set<DrawableLine*>& selectedLines = map.getSelectedLines ();
     
@@ -140,7 +155,7 @@ HtmlMapRenderer::renderLines (Map& map)
 	{
 		// Differentiation on line stops
 		const DrawableLine* dbl = *(selectedLines.begin ());
-		const Line* line = _environment.getLines().get (dbl->getLineId ());
+		const Line* line = _environment->getLines().get (dbl->getLineId ());
 		const std::vector<Edge*>& lineStops =  line->getEdges();
 		const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
 
@@ -177,7 +192,7 @@ HtmlMapRenderer::renderLines (Map& map)
 
 
 void 
-HtmlMapRenderer::renderPhysicalStops (Map& map)
+HtmlMapRenderer::renderPhysicalStops (std::ostream& _output, Map& map)
 {
     const std::set<DrawablePhysicalStop*>& selectedPhysicalStops = 
 	map.getSelectedPhysicalStops ();
@@ -196,11 +211,6 @@ HtmlMapRenderer::renderPhysicalStops (Map& map)
 		<< _config.getLineWidth () << "'/>" << std::endl;
     }
 }
-
-
-
-
-
 
 
 }

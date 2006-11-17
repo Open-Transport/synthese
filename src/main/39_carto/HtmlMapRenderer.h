@@ -30,8 +30,8 @@ class HtmlMapRenderer : public Renderer
 {
  private:
 
-	 const synthese::env::Environment& _environment;
-    std::ostream& _output; //!< Stream used for HTML map generation
+	 static const std::string _factory_key;
+	 const env::Environment* _environment;
     std::string _urlPattern; //!< URL pattern ($id is replaced by the proper object id)
     std::string _mapImgFilename; //!< Filename of the img used in generated HTML map
     
@@ -45,20 +45,20 @@ class HtmlMapRenderer : public Renderer
      * @param mapImgFilename Filename (without path) of the img used in generated HTML map
      * @param output Output stream
      */
-    HtmlMapRenderer (const RenderingConfig& config, 
-		const synthese::env::Environment& environment,
-			 const std::string& urlPattern,
-		     const std::string& mapImgFilename,
-		     std::ostream& output);
+    HtmlMapRenderer ();
 
     virtual ~HtmlMapRenderer ();
 
-    void render (Map& map);
-    
+	std::string render(const boost::filesystem::path& tempDir, 
+		const std::string& filenamePrefix,
+		const synthese::env::Environment* environment,
+		synthese::carto::Map& map,
+		const synthese::carto::RenderingConfig& config);
+ 
  private:
 
-    void renderLines (Map& map);
-    void renderPhysicalStops (Map& map);
+	 void renderLines (std::ostream& output, Map& map);
+    void renderPhysicalStops (std::ostream& output, Map& map);
 
  
 };

@@ -37,7 +37,6 @@ Request::Request ()
 
 Request::Request (const std::string& requestString)
 {
-    parseParameters(requestString);
 }
 
 
@@ -53,54 +52,6 @@ Request::clearParameters ()
     _parameters.clear ();
 }
 
-
-
-std::string 
-Request::truncateRequestStringIfNeeded (const std::string& requestString) const
-{
-    std::string s (requestString);
-
-    // Why do we need to filter '+' characters ?
-    boost::algorithm::replace_all (s, "+", " ");
-
-    /*
-    if (s.size () > MAX_REQUEST_SIZE) {
-	bool parameterTruncated = (s.substr (MAX_REQUEST_SIZE, 1) != PARAMETER_SEPARATOR);
-	s = s.substr (0, MAX_REQUEST_SIZE);
-
-	// Filter last parameter which if it has been truncated
-	if (parameterTruncated) 
-	{
-	    s = s.substr (0, s.rfind (PARAMETER_SEPARATOR));
-	}
-    }
-    */
-    return s;
-}
-
-
-
-void 
-Request::parseParameters (const std::string& requestString)
-{
-    std::string s (truncateRequestStringIfNeeded (requestString));
-
-    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-    boost::char_separator<char> sep(PARAMETER_SEPARATOR.c_str ());
-
-    tokenizer parametersTokens (s, sep);
-    for (tokenizer::iterator parameterToken = parametersTokens.begin();
-	 parameterToken != parametersTokens.end (); ++ parameterToken)
-    {
-	size_t pos = parameterToken->find (PARAMETER_ASSIGNMENT);
-	if (pos == string::npos) continue;
-	
-	std::string parameterName (parameterToken->substr (0, pos));
-	std::string parameterValue (parameterToken->substr (pos+1));
-
-	_parameters.insert (make_pair (parameterName, parameterValue));
-    }
-}
 
 
 
@@ -263,21 +214,6 @@ Request::addParameter (const std::string& name,
 
 
 
-std::string 
-Request::toInternalString () const
-{
-    std::stringstream ss;
-    
-    for ( map<string, string>::const_iterator iter = _parameters.begin(); 
-	  iter != _parameters.end(); 
-	  ++iter )
-    {
-	if (iter != _parameters.begin ()) ss << "&";
-	ss << iter->first << "=" << iter->second;
-    }
-
-    return truncateRequestStringIfNeeded(ss.str());
-}
 
 
 

@@ -28,6 +28,7 @@ class MapInfoRenderer : public Renderer
 {
  private:
 
+	 static const std::string _factory_key;
     static const std::string ZIP_BIN;
 
     boost::filesystem::path _zipOutput; //!< File used for MapInfo zip (containing MID/MIF) generation
@@ -39,13 +40,17 @@ class MapInfoRenderer : public Renderer
      * @param config Rendering configuration.
      * @param output Output stream
      */
-    MapInfoRenderer (const RenderingConfig& config, 
-		     const boost::filesystem::path& zipOutput);
+//    MapInfoRenderer (const RenderingConfig& config, 
+//		     const boost::filesystem::path& zipOutput);
 
     virtual ~MapInfoRenderer ();
 
-    void render (Map& map);
-    
+	std::string render(const boost::filesystem::path& tempDir, 
+		const std::string& filenamePrefix,
+		const synthese::env::Environment* environment,
+		synthese::carto::Map& map,
+		const synthese::carto::RenderingConfig& config);
+   
  
 };
 

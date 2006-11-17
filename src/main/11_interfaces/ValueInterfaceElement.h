@@ -4,10 +4,7 @@
 
 
 #include "11_interfaces/LibraryInterfaceElement.h"
-#include "01_util/Factory.h"
 #include <string>
-
-using synthese::util::Factory;
 
 namespace synthese
 {

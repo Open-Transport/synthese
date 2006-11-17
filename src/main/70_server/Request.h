@@ -103,7 +103,6 @@ class Request
     */
     synthese::time::DateTime getParameterAsDateTime (const std::string& name) const;
 
-    std::string toInternalString () const;
 
     //@}
 
@@ -119,7 +118,6 @@ class Request
 	All the parameters are cleared before.
       @param requestString The string to parse.
     */
-    void parseParameters (const std::string& requestString);
 
     void addParameter (const std::string& name, 
 		       const std::string& value);
@@ -134,10 +132,6 @@ class Request
 		       synthese::time::DateTime dateTime);
 
     //@}
-
- private:
-
-    std::string truncateRequestStringIfNeeded (const std::string& requestString) const;
 
 };
 

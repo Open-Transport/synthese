@@ -82,7 +82,7 @@ namespace synthese
 
 			//! \name Calculateurs
 			//@{
-//			bool valide() const;
+			bool dateControl() const;
 
 				/** Date interpr�t�e en fonction d'un texte descriptif et des donn�es de l'environnement.
 					@param text Texte contenant la date ou la commande

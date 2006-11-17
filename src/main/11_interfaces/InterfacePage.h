@@ -4,7 +4,7 @@
 #include "DisplayableElement.h"
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
-#include "01_util/Factory.h"
+#include "01_util/Factorable.h"
 
 #include <vector>
 #include <utility>
@@ -28,7 +28,7 @@ namespace synthese
 			@ingroup m11
 		*/
 		class InterfacePage
-			: public DisplayableElement
+			: public DisplayableElement, public util::Factorable
 		{
 		public:
 			typedef std::vector<std::pair<std::string, LibraryInterfaceElement*> > PageComponentsVector;

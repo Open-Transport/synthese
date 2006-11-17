@@ -52,6 +52,9 @@
 				RelativePath=".\Exception.cpp">
 			</File>
 			<File
+				RelativePath=".\Factorable.cpp">
+			</File>
+			<File
 				RelativePath=".\Log.cpp">
 			</File>
 			<File
@@ -59,9 +62,6 @@
 			</File>
 			<File
 				RelativePath=".\Thread.cpp">
-			</File>
-			<File
-				RelativePath=".\ThreadException.cpp">
 			</File>
 			<File
 				RelativePath=".\ThreadExec.cpp">
@@ -90,6 +90,9 @@
 				RelativePath=".\Exception.h">
 			</File>
 			<File
+				RelativePath=".\Factorable.h">
+			</File>
+			<File
 				RelativePath=".\Factory.h">
 			</File>
 			<File
@@ -111,12 +114,6 @@
 				RelativePath=".\Registry.h">
 			</File>
 			<File
-				RelativePath=".\RegistryException.h">
-			</File>
-			<File
-				RelativePath=".\RegistryKeyException.h">
-			</File>
-			<File
 				RelativePath=".\RGBColor.h">
 			</File>
 			<File
@@ -124,9 +121,6 @@
 			</File>
 			<File
 				RelativePath=".\Thread.h">
-			</File>
-			<File
-				RelativePath=".\ThreadException.h">
 			</File>
 			<File
 				RelativePath=".\ThreadExec.h">
@@ -156,6 +150,25 @@
 			Filter="">
 			<File
 				RelativePath=".\Rights\DBLogRight.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Exceptions"
+			Filter="">
+			<File
+				RelativePath=".\FactoryException.h">
+			</File>
+			<File
+				RelativePath=".\RegistryException.h">
+			</File>
+			<File
+				RelativePath=".\RegistryKeyException.h">
+			</File>
+			<File
+				RelativePath=".\ThreadException.cpp">
+			</File>
+			<File
+				RelativePath=".\ThreadException.h">
 			</File>
 		</Filter>
 		<File

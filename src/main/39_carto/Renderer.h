@@ -5,40 +5,43 @@
 #include <iostream>
 #include <string>
 #include "RenderingConfig.h"
-
+#include "01_util/Factorable.h"
+#include <boost/filesystem/path.hpp>
 
 
 namespace synthese
 {
+	namespace env
+	{
+		class Environment;
+	}
+
+	namespace carto
+	{
+		class Map;
 
 
-namespace carto
-{
-    class Map;
+		class Renderer : public util::Factorable
+		{
+		protected:
 
+			RenderingConfig _config;
 
-class Renderer
-{
- protected:
+		public:
 
-    RenderingConfig _config;
+			static const std::string GHOSTSCRIPT_BIN;
 
- public:
+			virtual ~Renderer ();
 
-    Renderer (const RenderingConfig& config);
-    virtual ~Renderer ();
+			virtual std::string render (const boost::filesystem::path& tempDir, 
+				const std::string& filenamePrefix,
+				const synthese::env::Environment* environment,
+				synthese::carto::Map& map,
+				const synthese::carto::RenderingConfig& config) = 0;
+		    
+		};
 
-    virtual void render (Map& map) = 0;
-    
-    
- private:
-    
-    Renderer (const Renderer&);
-    Renderer& operator= (const Renderer& rhs);
-
-};
-
-}
+	}
 }
 
 #endif

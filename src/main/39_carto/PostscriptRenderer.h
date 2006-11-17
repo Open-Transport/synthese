@@ -26,31 +26,36 @@ namespace carto
 class PostscriptRenderer : public Renderer
 {
  private:
+
+	 static const std::string _factory_key;
     
-    PostscriptCanvas _canvas;
-	
  public:
 
-    PostscriptRenderer (const RenderingConfig& config, std::ostream& output);
+    PostscriptRenderer ();
     virtual ~PostscriptRenderer ();
 
-    void render (Map& map);
+	std::string render(const boost::filesystem::path& tempDir, 
+		const std::string& filenamePrefix,
+		const synthese::env::Environment* environment,
+		synthese::carto::Map& map,
+		const synthese::carto::RenderingConfig& config);
+
     
  private:
 
-    void renderBackground (Map& map);
-    void renderLines (Map& map);
-    void renderPhysicalStops (Map& map);
+    void renderBackground (PostscriptCanvas& _canvas, Map& map);
+    void renderLines (PostscriptCanvas& _canvas,Map& map);
+    void renderPhysicalStops (PostscriptCanvas& _canvas,Map& map);
 
-    void doDrawCurvedLine (const DrawableLine* dbl);
+    void doDrawCurvedLine (PostscriptCanvas& _canvas,const DrawableLine* dbl);
 
-    void doDrawTriangleArrow (const synthese::env::Point& point, 
+    void doDrawTriangleArrow (PostscriptCanvas& _canvas,const synthese::env::Point& point, 
                               double angle);
     
-    void doDrawSquareStop (const synthese::env::Point& point, 
+    void doDrawSquareStop (PostscriptCanvas& _canvas,const synthese::env::Point& point, 
                            double angle);
     
-    void doDrawSquareTerminus (const synthese::env::Point& point, 
+    void doDrawSquareTerminus (PostscriptCanvas& _canvas,const synthese::env::Point& point, 
 			       double angle);
 
 };

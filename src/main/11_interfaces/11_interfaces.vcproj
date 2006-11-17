@@ -73,6 +73,12 @@
 				RelativePath=".\Parametres.h">
 			</File>
 			<File
+				RelativePath=".\Request.cpp">
+			</File>
+			<File
+				RelativePath=".\Request.h">
+			</File>
+			<File
 				RelativePath=".\Site.cpp">
 			</File>
 			<File
@@ -167,8 +173,47 @@
 				RelativePath=".\SiteTableSync.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="Requests"
+			Filter="">
+			<File
+				RelativePath=".\AdminRequest.cpp">
+			</File>
+			<File
+				RelativePath=".\AdminRequest.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Interface pages"
+			Filter="">
+			<File
+				RelativePath=".\AdminInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\AdminInterfacePage.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Exceptions"
+			Filter="">
+			<File
+				RelativePath=".\InterfacePageException.cpp">
+			</File>
+			<File
+				RelativePath=".\InterfacePageException.h">
+			</File>
+			<File
+				RelativePath=".\RequestException.cpp">
+			</File>
+			<File
+				RelativePath=".\RequestException.h">
+			</File>
+		</Filter>
 		<File
-			RelativePath=".\module.h">
+			RelativePath=".\InterfaceModule.cpp">
+		</File>
+		<File
+			RelativePath=".\InterfaceModule.h">
 		</File>
 		<File
 			RelativePath=".\SConscript">

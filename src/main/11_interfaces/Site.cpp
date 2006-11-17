@@ -1,6 +1,7 @@
 
 #include "Site.h"
 #include "15_env/Environment.h"
+#include "04_time/DateTime.h"
 
 namespace synthese
 {
@@ -54,6 +55,12 @@ namespace synthese
 			else
 				tempDate.FromString(text);
 			return tempDate;
+		}
+
+		bool Site::dateControl() const
+		{
+			DateTime tempDate;
+			return tempDate.getDate() >= _startValidityDate && tempDate.getDate() <= _endValidityDate;
 		}
 	}
 }

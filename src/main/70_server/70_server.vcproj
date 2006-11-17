@@ -49,22 +49,10 @@
 				RelativePath=".\Request.cpp">
 			</File>
 			<File
-				RelativePath=".\RequestDispatcher.cpp">
-			</File>
-			<File
-				RelativePath=".\RequestException.cpp">
-			</File>
-			<File
-				RelativePath=".\RequestHandler.cpp">
-			</File>
-			<File
 				RelativePath=".\Server.cpp">
 			</File>
 			<File
 				RelativePath=".\ServerConfig.cpp">
-			</File>
-			<File
-				RelativePath=".\ServerConfigTableSync.cpp">
 			</File>
 			<File
 				RelativePath=".\ServerThreadExec.cpp">
@@ -84,25 +72,23 @@
 				RelativePath=".\Request.h">
 			</File>
 			<File
-				RelativePath=".\RequestDispatcher.h">
-			</File>
-			<File
-				RelativePath=".\RequestException.h">
-			</File>
-			<File
-				RelativePath=".\RequestHandler.h">
-			</File>
-			<File
 				RelativePath=".\Server.h">
 			</File>
 			<File
 				RelativePath=".\ServerConfig.h">
 			</File>
 			<File
-				RelativePath=".\ServerConfigTableSync.h">
+				RelativePath=".\ServerThreadExec.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="LS_SQL"
+			Filter="">
+			<File
+				RelativePath=".\ServerConfigTableSync.cpp">
 			</File>
 			<File
-				RelativePath=".\ServerThreadExec.h">
+				RelativePath=".\ServerConfigTableSync.h">
 			</File>
 		</Filter>
 		<File

@@ -3,8 +3,7 @@
 
 #include "Server.h"
 
-#include "Request.h"
-#include "RequestDispatcher.h"
+#include "11_interfaces/Request.h"
 
 #include "00_tcp/TcpServerSocket.h"
 #include "00_tcp/TcpService.h"
@@ -17,6 +16,8 @@
 
 using synthese::util::Log;
 using synthese::util::Conversion;
+using synthese::interfaces::Request;
+using synthese::util::Factory;
 
 namespace synthese
 {
@@ -46,26 +47,24 @@ ServerThreadExec::loop ()
     
     try
     {
-	std::string requestString (buffer);
-	// tcpStream >> requestString;
-	
-	Log::GetInstance ().debug ("Received request : " + 
-				   requestString + " (" + Conversion::ToString (requestString.size ()) + 
-				   " bytes)");
-	
-	// Parse request
-	Request request (requestString);
-	
-	// Send request to proper handler through dispatcher
-	Server::GetInstance ()->getRequestDispatcher ().dispatchRequest (request, tcpStream);
+		std::string requestString (buffer);
+		// tcpStream >> requestString;
+		
+		Log::GetInstance ().debug ("Received request : " + 
+					requestString + " (" + Conversion::ToString (requestString.size ()) + 
+					" bytes)");
+		
+		// Parse request
+		Request* request = Factory<Request>::create(requestString);
+		request->run(tcpStream);
+		delete request;
 	
     }
     catch (std::exception& ex)
     {
-	Log::GetInstance ().error ("", ex);
+		Log::GetInstance ().error ("", ex);
     } 
     _tcpService->closeConnection (serverSocket);
-    
 }
 
 

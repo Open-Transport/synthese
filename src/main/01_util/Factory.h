@@ -102,7 +102,6 @@ namespace synthese
 
 			}
 
-
 			static bool contains( const typename Map::key_type& key )
 			{
 				// Search of the key of the wished class in the map
@@ -126,7 +125,9 @@ namespace synthese
 					return NULL;
 
 				// The key is found : return of an instance of the object
-				return it->second->create();
+				RootObject* object = it->second->create();
+				object->setFactoryKey(key);
+				return object;
 			}
 
 			static void destroy()

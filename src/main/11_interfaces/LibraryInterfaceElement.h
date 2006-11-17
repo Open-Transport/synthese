@@ -2,7 +2,7 @@
 #define SYNTHESE_INTERFACES_LIBRARY_INTERFACE_ELEMENT_H
 
 #include "DisplayableElement.h"
-#include "01_util/Factory.h"
+#include "01_util/Factorable.h"
 
 using synthese::util::Factory;
 
@@ -14,7 +14,7 @@ namespace synthese
 		/** element which can produce a single display.
 			@ingroup m11
 		*/
-		class LibraryInterfaceElement : public DisplayableElement
+		class LibraryInterfaceElement : public DisplayableElement, public util::Factorable
 		{
 		protected:
 

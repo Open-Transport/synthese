@@ -1,5 +1,57 @@
 
 
+#include "02_db/SQLiteTableSync.h"
+#include "11_interfaces/Interface.h"
+#include <string>
+#include <iostream>
+
+namespace synthese
+{
+	namespace db
+	{
+
+		/** InterfaceTableSync SQLite table synchronizer.
+		@ingroup m11
+		*/
+
+		class InterfaceTableSync : public SQLiteTableSync
+		{
+		private:
+			static const std::string TABLE_NAME;
+			static const std::string TABLE_COL_ID;
+			
+			synthese::interfaces::Interface::Registry& _interfaces;
+
+		public:
+
+			/** Interface page SQLite table constructor.
+			*/
+			InterfaceTableSync( synthese::interfaces::Interface::Registry& interfaces
+				, const std::string& triggerOverrideClause );
+			~InterfaceTableSync ();
+
+		protected:
+
+			void rowsAdded (const SQLiteThreadExec* sqlite, 
+				SQLiteSync* sync,
+				const SQLiteResult& rows);
+
+			void rowsUpdated (const SQLiteThreadExec* sqlite, 
+				SQLiteSync* sync,
+				const SQLiteResult& rows);
+
+			void rowsRemoved (const SQLiteThreadExec* sqlite, 
+				SQLiteSync* sync,
+				const SQLiteResult& rows);
+
+		};
+
+	}
+}
+
+
+
+
 /** Déclaration d'une interface
 @code [code @endcode
 @param code Code de l'interface (voir @ref base)

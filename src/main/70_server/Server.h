@@ -8,7 +8,6 @@
 #include <string>
 #include <map>
 
-#include "RequestDispatcher.h"
 #include "ServerConfig.h"
 
 #include "15_env/Environment.h"
@@ -42,7 +41,6 @@ class Server
 
     static Server* _instance;
 
-    RequestDispatcher _requestDispatcher;
     boost::filesystem::path _dbFile;
     ServerConfig _config;
 
@@ -71,7 +69,6 @@ class Server
     synthese::interfaces::Interface::Registry& getInterfaces ();
     const synthese::interfaces::Interface::Registry& getInterfaces () const;
 
-    RequestDispatcher& getRequestDispatcher ();
     const ServerConfig& getConfig () const;
 
     static Server* GetInstance ();

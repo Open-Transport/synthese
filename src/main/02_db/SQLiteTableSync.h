@@ -7,7 +7,8 @@
 #include <vector>
 #include <iostream>
 
-#include <01_util/UId.h>
+#include "01_util/Factorable.h"
+#include "01_util/UId.h"
 
 #define UPDATEABLE true;
 #define NON_UPDATEABLE false;
@@ -35,7 +36,7 @@ namespace synthese
 
 			@ingroup m02
 		*/
-		class SQLiteTableSync
+		class SQLiteTableSync : public util::Factorable
 		{
 		private:
 

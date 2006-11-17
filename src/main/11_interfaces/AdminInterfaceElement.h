@@ -2,7 +2,7 @@
 #define SYNTHESE_INTERFACES_ADMIN_INTERFACE_ELEMENT_H
 
 #include "DisplayableElement.h"
-#include "01_util/Factory.h"
+#include "01_util/Factorable.h"
 #include <string>
 
 using synthese::util::Factory;
@@ -24,7 +24,7 @@ namespace synthese
 				- un administrateur a accès à tous les composants d'administration.
 			
 		*/
-		class AdminInterfaceElement : public DisplayableElement
+		class AdminInterfaceElement : public DisplayableElement, public util::Factorable
 		{
 		private:
 			static const bool _registered;

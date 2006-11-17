@@ -7,10 +7,11 @@ namespace carto
 {
 
 
-Renderer::Renderer(const RenderingConfig& config)
-    : _config (config)
-{
-}
+#ifdef WIN32
+	const std::string Renderer::GHOSTSCRIPT_BIN ("gswin32");
+#else
+	const std::string Renderer::GHOSTSCRIPT_BIN ("gs");
+#endif
 
 
 Renderer::~Renderer()

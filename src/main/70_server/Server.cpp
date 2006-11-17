@@ -3,8 +3,8 @@
 #include "CleanerThreadExec.h"
 #include "ServerThreadExec.h"
 
-#include "RequestException.h"
-#include "Request.h"
+#include "11_interfaces/RequestException.h"
+#include "11_interfaces/Request.h"
 
 #include "00_tcp/TcpService.h"
 
@@ -48,6 +48,7 @@
 #include "17_env_ls_sql/EnvironmentTableSync.h"
 #include "17_env_ls_sql/EnvironmentLinkTableSync.h"
 
+#include "11_interfaces/InterfaceTableSync.h"
 #include "11_interfaces/InterfacePageTableSync.h"
 
 
@@ -230,6 +231,9 @@ Server::initialize ()
 	new synthese::envlssql::LineStopTableSync (_environments, TRIGGERS_ENABLED_CLAUSE);
 
 
+	synthese::db::InterfaceTableSync* interfaceSync = 
+		new synthese::db::InterfaceTableSync (_interfaces, TRIGGERS_ENABLED_CLAUSE);
+
 
 	synthese::db::InterfacePageTableSync* interfacePageSync = 
 		new synthese::db::InterfacePageTableSync (_interfaces, TRIGGERS_ENABLED_CLAUSE);
@@ -257,6 +261,7 @@ Server::initialize ()
     syncHook->addTableSynchronizer (serviceDateSync);
     syncHook->addTableSynchronizer (physicalStopSync);
     syncHook->addTableSynchronizer (lineStopSync);
+	syncHook->addTableSynchronizer (interfaceSync);
 	syncHook->addTableSynchronizer (interfacePageSync);
 
     // Create the env link synchronizer after having added the component synchronizers
@@ -361,16 +366,6 @@ Server::run ()
 
     synthese::tcp::TcpService::closeService (_config.getPort ());
 }
-
-
-
-
-RequestDispatcher& 
-Server::getRequestDispatcher () 
-{
-    return _requestDispatcher;
-}
-
 
 
 const ServerConfig& 

@@ -35,18 +35,9 @@ namespace carto
 {
 
 const std::string MapInfoRenderer::ZIP_BIN ("zip");
+const std::string MapInfoRenderer::_factory_key = util::Factory<Renderer>::integrate<MapInfoRenderer>("mapinfo");
 
 
-
-
-
-MapInfoRenderer::MapInfoRenderer(const RenderingConfig& config, 
-				 const boost::filesystem::path& zipOutput)
-    : Renderer (config)
-    , _zipOutput (zipOutput)
-{
-
-}
 
 
 
@@ -59,9 +50,20 @@ MapInfoRenderer::~MapInfoRenderer()
 
 
 
-void 
-MapInfoRenderer::render (Map& map)
+std::string 
+MapInfoRenderer::render(const boost::filesystem::path& tempDir, 
+										  const std::string& filenamePrefix,
+										  const synthese::env::Environment* environment,
+										  synthese::carto::Map& map,
+										  const synthese::carto::RenderingConfig& config)
 {
+	std::string resultFilename (filenamePrefix + ".zip");
+	_zipOutput = tempDir / resultFilename;
+
+	_config = config;
+
+
+
     std::string mifFilename (boost::replace_last_copy (_zipOutput.string (), 
 						  ".zip", ".mif"));
     std::string midFilename (boost::replace_last_copy (_zipOutput.string (), 
@@ -163,10 +165,8 @@ MapInfoRenderer::render (Map& map)
     }
     
 
-
+    return resultFilename;
 }
-
-
 
 
 

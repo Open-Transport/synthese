@@ -8,11 +8,11 @@ namespace synthese
 	namespace util
 	{
 
-class FactoryTestBase
-{
-public:
-	virtual int getIndex() const = 0;
-};
+		class FactoryTestBase : public Factorable
+		{
+		public:
+			virtual int getIndex() const = 0;
+		};
 
 	}
 }

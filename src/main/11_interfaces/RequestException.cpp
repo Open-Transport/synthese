@@ -3,7 +3,7 @@
 
 namespace synthese
 {
-namespace server
+namespace interfaces
 {
 
 
