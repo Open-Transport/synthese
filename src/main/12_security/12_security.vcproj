@@ -39,12 +39,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
-		</Filter>
-		<Filter
-			Name="Header Files"
+			Name="Core classes"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
@@ -61,40 +56,40 @@
 			Name="AdminInterfaceElement"
 			Filter="">
 			<File
-				RelativePath=".\AdminInterfaceElement\LoginAdmin.h">
+				RelativePath=".\LoginAdmin.h">
 			</File>
 			<File
-				RelativePath=".\AdminInterfaceElement\ProfileAdmin.h">
+				RelativePath=".\ProfileAdmin.h">
 			</File>
 			<File
-				RelativePath=".\AdminInterfaceElement\ProfilesAdmin.h">
+				RelativePath=".\ProfilesAdmin.h">
 			</File>
 			<File
-				RelativePath=".\AdminInterfaceElement\UserAdmin.h">
+				RelativePath=".\UserAdmin.h">
 			</File>
 			<File
-				RelativePath=".\AdminInterfaceElement\UsersAdmin.h">
+				RelativePath=".\UsersAdmin.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="LibraryInterfaceElement"
 			Filter="">
 			<File
-				RelativePath=".\LibraryInterfaceElement\LoginHTMLFormInterfaceElement.h">
+				RelativePath=".\LoginHTMLFormInterfaceElement.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
 			Filter="">
 			<File
-				RelativePath=".\DBLog\SecurityLog.h">
+				RelativePath=".\SecurityLog.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="Rights"
 			Filter="">
 			<File
-				RelativePath=".\Rights\SecurityRight.h">
+				RelativePath=".\SecurityRight.h">
 			</File>
 		</Filter>
 		<File
