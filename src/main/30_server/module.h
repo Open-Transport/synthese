@@ -1,5 +1,5 @@
-/** 70_server module wide definitions
-	@file 70_server/module.h
+/** 30_server module wide definitions
+	@file 30_server/module.h
 */
 
 #ifndef SYNTHESE_SERVER_MODULE_H
@@ -18,7 +18,7 @@ namespace synthese
 	@{
 	*/
 
-	/** 70_server namespace */
+	/** 30_server namespace */
 	namespace server
 	{
 

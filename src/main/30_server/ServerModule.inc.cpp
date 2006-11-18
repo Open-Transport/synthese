@@ -1,4 +1,4 @@
 
-#include "70_server/ModuleClass.h"
+#include "30_server/ModuleClass.h"
 
 using namespace synthese::server;

@@ -16,7 +16,7 @@ class TimeTables;
 #include <string>
 #include <vector>
 
-#include "70_server/Request.h"
+#include "30_server/Request.h"
 #include "cLog.h"
 
 #include <boost/logic/tribool.hpp>

@@ -2,7 +2,7 @@
 #ifndef SYNTHESE_CINTERFACE_OBJET_ELEMENT_BIBLIOTHEQUE_H
 #define SYNTHESE_CINTERFACE_OBJET_ELEMENT_BIBLIOTHEQUE_H
 
-#include "70_server/Request.h"
+#include "30_server/Request.h"
 #include "cElementInterface.h"
 
 /*! \addtogroup m11
