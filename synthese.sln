@@ -3,14 +3,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "doc", "doc\doc.vcproj", "{B
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "72 rs485_client", "src\main\72_rs485_client\72_rs485_client.vcproj", "{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "71_cgi_client", "src\main\71_cgi_client\71_cgi_client.vcproj", "{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "34_departures_table", "src\main\34_departures_table\34_departures_table.vcproj", "{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -67,10 +59,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "33_route_planner", "src\mai
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "70_server", "src\main\70_server\70_server.vcproj", "{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "99_synthese", "src\main\99_synthese\99_synthese.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -91,6 +79,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12_security", "src\main\12_
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "71_cgi_client", "src\main\91_cgi_client\91_cgi_client.vcproj", "{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "72 rs485_client", "src\main\92_rs485_client\92_rs485_client.vcproj", "{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -101,14 +97,6 @@ Global
 		{B611F981-1353-4B13-A6FE-695034268D72}.Debug.Build.0 = Debug|Win32
 		{B611F981-1353-4B13-A6FE-695034268D72}.Release.ActiveCfg = Release|Win32
 		{B611F981-1353-4B13-A6FE-695034268D72}.Release.Build.0 = Release|Win32
-		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Debug.ActiveCfg = Debug|Win32
-		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Debug.Build.0 = Debug|Win32
-		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Release.ActiveCfg = Release|Win32
-		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Release.Build.0 = Release|Win32
-		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Debug.ActiveCfg = Debug|Win32
-		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Debug.Build.0 = Debug|Win32
-		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Release.ActiveCfg = Release|Win32
-		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Release.Build.0 = Release|Win32
 		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Debug.ActiveCfg = Debug|Win32
 		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Debug.Build.0 = Debug|Win32
 		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Release.ActiveCfg = Release|Win32
@@ -165,10 +153,6 @@ Global
 		{DCB40545-776B-4B6E-A050-D4A513880697}.Debug.Build.0 = Debug|Win32
 		{DCB40545-776B-4B6E-A050-D4A513880697}.Release.ActiveCfg = Release|Win32
 		{DCB40545-776B-4B6E-A050-D4A513880697}.Release.Build.0 = Release|Win32
-		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Debug.ActiveCfg = Debug|Win32
-		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Debug.Build.0 = Debug|Win32
-		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.ActiveCfg = Release|Win32
-		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.Build.0 = Release|Win32
 		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.ActiveCfg = Debug|Win32
 		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.Build.0 = Debug|Win32
 		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.ActiveCfg = Release|Win32
@@ -189,6 +173,14 @@ Global
 		{B611F981-1353-4B13-A6FE-695034268D72}.Debug.Build.0 = Debug|Win32
 		{B611F981-1353-4B13-A6FE-695034268D72}.Release.ActiveCfg = Release|Win32
 		{B611F981-1353-4B13-A6FE-695034268D72}.Release.Build.0 = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Debug.ActiveCfg = Debug|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Debug.Build.0 = Debug|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Release.ActiveCfg = Release|Win32
+		{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}.Release.Build.0 = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Debug.ActiveCfg = Debug|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Debug.Build.0 = Debug|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Release.ActiveCfg = Release|Win32
+		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
 		SConstruct = SConstruct
