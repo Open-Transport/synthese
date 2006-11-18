@@ -1,4 +1,6 @@
 
+#include "11_interfaces/InterfaceTableSync.h"
+
 #include "11_interfaces/InterfaceModule.h"
 #include "11_interfaces/AdminInterfacePage.h"
 #include "11_interfaces/AdminRequest.h"
@@ -13,3 +15,4 @@
 #include "11_interfaces/HomeAdmin.h"
 
 using namespace synthese::interfaces;
+using namespace synthese::db;

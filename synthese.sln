@@ -79,11 +79,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12_security", "src\main\12_
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "71_cgi_client", "src\main\91_cgi_client\91_cgi_client.vcproj", "{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "91_cgi_client", "src\main\91_cgi_client\91_cgi_client.vcproj", "{31BF1D33-C513-4DCD-AFF7-1A513FE986B8}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "72 rs485_client", "src\main\92_rs485_client\92_rs485_client.vcproj", "{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "92 rs485_client", "src\main\92_rs485_client\92_rs485_client.vcproj", "{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "30_server", "src\main\30_server\30_server.vcproj", "{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -181,6 +185,10 @@ Global
 		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Debug.Build.0 = Debug|Win32
 		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Release.ActiveCfg = Release|Win32
 		{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}.Release.Build.0 = Release|Win32
+		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Debug.ActiveCfg = Debug|Win32
+		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Debug.Build.0 = Debug|Win32
+		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.ActiveCfg = Release|Win32
+		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
 		SConstruct = SConstruct

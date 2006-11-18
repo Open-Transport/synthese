@@ -30,8 +30,9 @@ moduleenv.AddModuleDependency ('16_env_ls_xml')
 moduleenv.AddModuleDependency ('39_carto')
 
 moduleenv.AddModuleDependency ('17_env_ls_sql')
-moduleenv.AddModuleDependency ('15_env')
 moduleenv.AddModuleDependency ('11_interfaces')
+moduleenv.AddModuleDependency ('12_security')
+moduleenv.AddModuleDependency ('15_env')
 
 # Generic libs
 moduleenv.AddModuleDependency ('04_time')

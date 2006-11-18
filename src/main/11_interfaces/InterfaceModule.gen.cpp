@@ -16,4 +16,4 @@ Factory<LibraryInterfaceElement>::integrate<GotoInterfaceElement>("goto");
 
 Factory<AdminInterfaceElement>::integrate<HomeAdmin>("home");
 
-Factory<SQLiteTableSync>::integrate<Interface>("16.01");
+//Factory<SQLiteTableSync>::integrate<InterfaceTableSync>("16.01");

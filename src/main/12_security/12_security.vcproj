@@ -98,6 +98,18 @@
 		<File
 			RelativePath=".\SConscript">
 		</File>
+		<File
+			RelativePath=".\SecurityModule.cpp">
+		</File>
+		<File
+			RelativePath=".\SecurityModule.gen.cpp">
+		</File>
+		<File
+			RelativePath=".\SecurityModule.h">
+		</File>
+		<File
+			RelativePath=".\SecurityModule.inc.cpp">
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
