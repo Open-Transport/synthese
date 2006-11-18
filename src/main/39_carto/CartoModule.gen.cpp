@@ -4,12 +4,12 @@
 */
 
 
-synthese::util::Factory<synthese::server::ModuleClass>::integrate<synthese::server::CartoModule> ("39_carto");
+synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::carto::CartoModule> ("39_carto");
 
-synthese::util::Factory<Renderer>::integrate<HtmlMapRenderer>("html");
-synthese::util::Factory<Renderer>::integrate<JpegRenderer>("jpeg");
-synthese::util::Factory<Renderer>::integrate<MapInfoRenderer>("mapinfo");
-synthese::util::Factory<Renderer>::integrate<PostscriptRenderer>("ps");
+synthese::util::Factory<synthese::carto::Renderer>::integrate<synthese::carto::HtmlMapRenderer>("html");
+synthese::util::Factory<synthese::carto::Renderer>::integrate<synthese::carto::JpegRenderer>("jpeg");
+synthese::util::Factory<synthese::carto::Renderer>::integrate<synthese::carto::MapInfoRenderer>("mapinfo");
+synthese::util::Factory<synthese::carto::Renderer>::integrate<synthese::carto::PostscriptRenderer>("ps");
 
-synthese::util::Factory<Request>::integrate<MapRequestHandler>("map");
+synthese::util::Factory<Request>::integrate<synthese::carto::MapRequestHandler>("map");
 

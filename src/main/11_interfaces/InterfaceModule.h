@@ -3,14 +3,12 @@
 #define SYNTHESE_InterfaceModule_H__
 
 
-#include "30_server/ModuleClass.h"
+#include "01_util/ModuleClass.h"
 
 namespace synthese
 {
-	namespace server
+	namespace interfaces
 	{
-
-		/** @defgroup m39 39 Map drawing
 
 		/** @defgroup m11 11 Interface
 
@@ -61,18 +59,13 @@ namespace synthese
 		@{
 		*/
 
-		class InterfaceModule : public ModuleClass
+		class InterfaceModule : public util::ModuleClass
 		{
 		public:
-			void initialize(const Server* server);
+			void initialize();
 		};
 		/** @} */
 	}
-
-	/** 11_interfaces namespace */
-	namespace interfaces
-	{
-
-	}
 }
+
 #endif // SYNTHESE_InterfaceModule_H__

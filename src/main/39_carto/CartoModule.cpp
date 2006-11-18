@@ -7,15 +7,15 @@
 
 namespace synthese
 {
-	using namespace carto;
+	using namespace server;
 
-	namespace server
+	namespace carto
 	{
 
-		void CartoModule::initialize( const Server* server )
+		void CartoModule::initialize()
 		{
 			// Initialize map background manager
-			MapBackgroundManager::SetBackgroundsDir (server->getConfig ().getDataDir () / "backgrounds");
+			MapBackgroundManager::SetBackgroundsDir (Server::GetInstance()->getConfig ().getDataDir () / "backgrounds");
 			MapBackgroundManager::Initialize ();
 		}
 	}

@@ -63,9 +63,6 @@
 				RelativePath=".\CleanerThreadExec.h">
 			</File>
 			<File
-				RelativePath=".\ModuleClass.h">
-			</File>
-			<File
 				RelativePath=".\Server.h">
 			</File>
 			<File

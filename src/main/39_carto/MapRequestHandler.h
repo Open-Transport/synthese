@@ -35,45 +35,40 @@ namespace synthese
 	{
 		class Map;
 		class RenderingConfig;
-	}
-
-	namespace interfaces
-	{
 
 		/** Map request handler.
+			@ingroup m39
 
-		Generates a map given all the information to be drawn.
+			Generates a map given all the information to be drawn.
 
-		Two modes are available for requesting :
+			Two modes are available for requesting :
 
-		* Mode 1 : "Socket mode"
-		Request format : mode=1&output=png&env={XML_ENV}&map={XML_MAP}
-			where XML_ENV is the XML definition of the local
-			environment used for map generation; 
-			where XML_MAP is the XML definition of the map 
-			drawing parameters.
-		Response type : PNG file sent through socket
-		Response format : |{PNGFILESIZE}|:|{PNG FILE DATA}
-		  
-		* Mode 2 : "HTTP mode"
-		Request format : mode=2&output=ps&env={XML_ENV}&map={XML_MAP}
-			where XML_ENV is the XML definition of the local
-			environment used for map generation; 
-			where XML_MAP is the XML definition of the map 
-			drawing parameters.
-		Response type : JPEG file generated locally on server side.
-		Response format : |{JPEG_URL}|
-			where PNG_URL is the url of the generated PNG file.
+			* Mode 1 : "Socket mode"
+			Request format : mode=1&output=png&env={XML_ENV}&map={XML_MAP}
+				where XML_ENV is the XML definition of the local
+				environment used for map generation; 
+				where XML_MAP is the XML definition of the map 
+				drawing parameters.
+			Response type : PNG file sent through socket
+			Response format : |{PNGFILESIZE}|:|{PNG FILE DATA}
+			  
+			* Mode 2 : "HTTP mode"
+			Request format : mode=2&output=ps&env={XML_ENV}&map={XML_MAP}
+				where XML_ENV is the XML definition of the local
+				environment used for map generation; 
+				where XML_MAP is the XML definition of the map 
+				drawing parameters.
+			Response type : JPEG file generated locally on server side.
+			Response format : |{JPEG_URL}|
+				where PNG_URL is the url of the generated PNG file.
 
-		The different output types are :
-		- ps  : PostScript
-		- jpeg : JPEG bitmap
-		- html : JPEG + HTML map (only available in http mode)
-		- mapinfo : MID/MIF files returned in a zip
-		  
-		@ingroup m80
+			The different output types are :
+			- ps  : PostScript
+			- jpeg : JPEG bitmap
+			- html : JPEG + HTML map (only available in http mode)
+			- mapinfo : MID/MIF files returned in a zip
 		*/
-		class MapRequestHandler : public Request
+		class MapRequestHandler : public interfaces::Request
 		{
 		private:
 			int _mode;

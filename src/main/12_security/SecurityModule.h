@@ -1,14 +1,14 @@
 
-#include "30_server/ModuleClass.h"
+#include "01_util/ModuleClass.h"
 
 namespace synthese
 {
 	namespace security
 	{
-		class SecurityModule : public server::ModuleClass
+		class SecurityModule : public util::ModuleClass
 		{
 		public:
-			void initialize(const server::Server* server);
+			void initialize();
 		};
 	}
 }

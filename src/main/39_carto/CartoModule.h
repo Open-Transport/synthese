@@ -1,9 +1,9 @@
 
-#include "30_server/ModuleClass.h"
+#include "01_util/ModuleClass.h"
 
 namespace synthese
 {
-	namespace server
+	namespace carto
 	{
 
 		/** @defgroup m39 39 Map drawing
@@ -37,20 +37,12 @@ namespace synthese
 			@{
 		*/
 
-		class CartoModule : public ModuleClass
+		class CartoModule : public util::ModuleClass
 		{
-			static const std::string _factory_key;
-
 		public:
-			void initialize(const Server* server);
+			void initialize();
 		};
 		/** @} */
-	}
-
-	/** 39_carto namespace */
-	namespace carto
-	{
-
 	}
 }
 

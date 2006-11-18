@@ -1,19 +1,20 @@
-Factory<ModuleClass>::integrate<InterfaceModule>("11_interfaces");
 
-Factory<InterfacePage>::integrate<AdminInterfacePage>("admin");
+synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::interfaces::InterfaceModule>("11_interfaces");
 
-Factory<Request>::integrate<AdminRequest>("admin");
+synthese::util::Factory<InterfacePage>::integrate<AdminInterfacePage>("admin");
 
-Factory<ValueInterfaceElement>::integrate<StaticValueInterfaceElement>("text");
-Factory<ValueInterfaceElement>::integrate<ParameterValueInterfaceElement>("param");
+synthese::util::Factory<Request>::integrate<AdminRequest>("admin");
 
-Factory<LibraryInterfaceElement>::integrate<StaticValueInterfaceElement>("text");
-Factory<LibraryInterfaceElement>::integrate<ParameterValueInterfaceElement>("param");
-Factory<LibraryInterfaceElement>::integrate<LineLabelInterfaceElement>("label");
-Factory<LibraryInterfaceElement>::integrate<IncludePageInterfaceElement>("include");
-Factory<LibraryInterfaceElement>::integrate<IfThenElseInterfaceElement>("if");
-Factory<LibraryInterfaceElement>::integrate<GotoInterfaceElement>("goto");
+synthese::util::Factory<ValueInterfaceElement>::integrate<StaticValueInterfaceElement>("text");
+synthese::util::Factory<ValueInterfaceElement>::integrate<ParameterValueInterfaceElement>("param");
 
-Factory<AdminInterfaceElement>::integrate<HomeAdmin>("home");
+synthese::util::Factory<LibraryInterfaceElement>::integrate<StaticValueInterfaceElement>("text");
+synthese::util::Factory<LibraryInterfaceElement>::integrate<ParameterValueInterfaceElement>("param");
+synthese::util::Factory<LibraryInterfaceElement>::integrate<LineLabelInterfaceElement>("label");
+synthese::util::Factory<LibraryInterfaceElement>::integrate<IncludePageInterfaceElement>("include");
+synthese::util::Factory<LibraryInterfaceElement>::integrate<IfThenElseInterfaceElement>("if");
+synthese::util::Factory<LibraryInterfaceElement>::integrate<GotoInterfaceElement>("goto");
 
-//Factory<SQLiteTableSync>::integrate<InterfaceTableSync>("16.01");
+synthese::util::Factory<AdminInterfaceElement>::integrate<HomeAdmin>("home");
+
+//synthese::util::Factory<SQLiteTableSync>::integrate<InterfaceTableSync>("16.01");

@@ -3,9 +3,9 @@
 
 namespace synthese
 {
-	namespace server
+	namespace interfaces
 	{
-		void InterfaceModule::initialize( const Server* server )
+		void InterfaceModule::initialize()
 		{
 
 		}

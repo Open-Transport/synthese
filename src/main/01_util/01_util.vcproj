@@ -102,6 +102,9 @@
 				RelativePath=".\LowerCaseFilter.h">
 			</File>
 			<File
+				RelativePath=".\ModuleClass.h">
+			</File>
+			<File
 				RelativePath=".\PlainCharFilter.h">
 			</File>
 			<File

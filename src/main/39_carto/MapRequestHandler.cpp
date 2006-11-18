@@ -58,9 +58,9 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace carto;
+	using namespace interfaces;
 
-	namespace interfaces
+	namespace carto
 	{
 
 		const std::string MapRequestHandler::MODE_PARAMETER ("mode");

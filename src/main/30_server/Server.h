@@ -20,89 +20,85 @@
 
 namespace synthese
 {
-namespace server
-{
+	namespace util
+	{
+		class ModuleClass;
+	}
 
-class ModuleClass;
+	namespace server
+	{
 
-/** Main server class.
+		/** Main server class.
 
-This class holds :
-- the TCP server 
-- request queue (thread-safe access)
-- the threading mechanism 
-- the request dispatcher instance
+		This class holds :
+		- the TCP server 
+		- request queue (thread-safe access)
+		- the threading mechanism 
+		- the request dispatcher instance
 
-@ingroup m70
-*/
-class Server
-{
- private:
+		@ingroup m70
+		*/
+		class Server
+		{
+		private:
 
-    static Server* _instance;
+			static Server* _instance;
 
-    boost::filesystem::path _dbFile;
-    ServerConfig _config;
+			boost::filesystem::path _dbFile;
+			ServerConfig _config;
 
-    synthese::env::Environment::Registry		_environments;
-    synthese::interfaces::Interface::Registry	_interfaces;
-	synthese::interfaces::Site::Registry		_sites;
+			synthese::env::Environment::Registry		_environments;
+			synthese::interfaces::Interface::Registry	_interfaces;
+			synthese::interfaces::Site::Registry		_sites;
 
-	std::map<std::string, ModuleClass*> _modules;
+			std::map<std::string, synthese::util::ModuleClass*> _modules;
 
- protected:
-
-
- public:
-
-    Server (const boost::filesystem::path& dbFile);
-
-    ~Server ();
+		protected:
 
 
-    //! @name Getters/Setters
-    //@{
+		public:
 
-    synthese::env::Environment::Registry& getEnvironments ();
-    const synthese::env::Environment::Registry& getEnvironments () const;
-    
-    synthese::interfaces::Interface::Registry& getInterfaces ();
-    const synthese::interfaces::Interface::Registry& getInterfaces () const;
+			Server (const boost::filesystem::path& dbFile);
 
-	synthese::interfaces::Site::Registry& getSites();
-	const synthese::interfaces::Site::Registry& getSites() const;
-
-    const ServerConfig& getConfig () const;
-
-    static Server* GetInstance ();
-    static void SetInstance (Server* instance);
-    
-    //@}
+			~Server ();
 
 
-    //! @name Query methods
-    //@{
-    //@}
+			//! @name Getters/Setters
+			//@{
+
+			synthese::env::Environment::Registry& getEnvironments ();
+			const synthese::env::Environment::Registry& getEnvironments () const;
+		    
+			synthese::interfaces::Interface::Registry& getInterfaces ();
+			const synthese::interfaces::Interface::Registry& getInterfaces () const;
+
+			synthese::interfaces::Site::Registry& getSites();
+			const synthese::interfaces::Site::Registry& getSites() const;
+
+			const ServerConfig& getConfig () const;
+
+			static Server* GetInstance ();
+			static void SetInstance (Server* instance);
+		    
+			//@}
 
 
-    //! @name Update methods
-    //@{
-    void initialize ();
-
-    void run ();
+			//! @name Query methods
+			//@{
+			//@}
 
 
-    //@}
+			//! @name Update methods
+			//@{
+			void initialize ();
 
- protected:
+			void run ();
 
 
-};
+			//@}
 
-
+		};
+	}
 }
-}
-
-
 
 #endif
