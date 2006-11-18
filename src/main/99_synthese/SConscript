@@ -60,12 +60,12 @@ def preAction (target = None, source = None, env = None):
     # Modules are traversed in reverse dependency order.
     
     modules = moduleenv['MODULES']
-
+    
     generated = open ('src/main/' + currentmodule + '/generated.cpp.inc', "w" )
     for module in reversed (modules):
       moduledir = os.path.join ('src/main', module)
       for file in os.listdir (moduledir) :
-        if fnmatch.fnmatch (file, '*.cpp.gen') :
+        if fnmatch.fnmatch (file, '*.gen.cpp') :
             fragmentfile = os.path.join (moduledir, file);
             # dump the file to generated output
             fragment = open (fragmentfile, "r")
@@ -88,4 +88,5 @@ moduleenv.Program ( moduleenv.DefaultModuleName(), files )
 moduleenv.AddPreAction ("main.o", a)
 moduleenv.AlwaysBuild ("main.o")
 
-
+moduleenv.AddPreAction ("main.obj", a)
+moduleenv.AlwaysBuild ("main.obj")

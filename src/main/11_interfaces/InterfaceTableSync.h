@@ -1,4 +1,8 @@
 
+#ifndef SYNTHESE_InterfaceTableSync_H__
+#define SYNTHESE_InterfaceTableSync_H__
+
+
 
 #include "02_db/SQLiteTableSync.h"
 #include "11_interfaces/Interface.h"
@@ -132,3 +136,4 @@ namespace synthese
 #define INTERFACESFORMATCOLONNEPrefixeAlerteTexte	10
 #define INTERFACESFORMATCOLONNESNombreFormats		11
 //@}
+#endif // SYNTHESE_InterfaceTableSync_H__

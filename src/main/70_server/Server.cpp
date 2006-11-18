@@ -50,6 +50,7 @@
 
 #include "11_interfaces/InterfaceTableSync.h"
 #include "11_interfaces/InterfacePageTableSync.h"
+#include "11_interfaces/SiteTableSync.h"
 
 
 #include <boost/filesystem/operations.hpp>
@@ -237,6 +238,9 @@ Server::initialize ()
 
 	synthese::db::InterfacePageTableSync* interfacePageSync = 
 		new synthese::db::InterfacePageTableSync (_interfaces, TRIGGERS_ENABLED_CLAUSE);
+
+	synthese::db::SiteTableSync* siteSync = 
+		new synthese::db::SiteTableSync (_sites, TRIGGERS_ENABLED_CLAUSE, _interfaces, _environments);
 
     syncHook->addTableSynchronizer (configSync);
     syncHook->addTableSynchronizer (envSync);

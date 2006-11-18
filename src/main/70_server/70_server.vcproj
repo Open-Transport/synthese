@@ -80,6 +80,9 @@
 			<File
 				RelativePath=".\ServerThreadExec.h">
 			</File>
+			<File
+				RelativePath=".\Session.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="LS_SQL"

@@ -30,7 +30,6 @@ namespace synthese
 		{
 			//! \name Properties
 			//@{
-				const std::string		_key;    //!< Key to provide to determinate used site
 				std::string				_name;  //!< Name of the site
 				synthese::time::Date	_startValidityDate;   
 				synthese::time::Date	_endValidityDate;   
@@ -52,7 +51,7 @@ namespace synthese
 		public:
 			//! \name Constructeur
 			//@{
-			Site( const uid& uid, const std::string& key );
+			Site( const uid& uid);
 			//@}
 
 			//! \name Modificateurs

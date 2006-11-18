@@ -32,8 +32,6 @@ int main( int argc, char **argv )
 {
     std::string db;
 
-	synthese::server::InterfaceModule* im = new synthese::server::InterfaceModule;
-
     po::options_description desc("Allowed options");
     desc.add_options()
 	("help", "produce this help message")

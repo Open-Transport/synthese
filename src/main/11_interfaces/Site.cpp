@@ -12,9 +12,8 @@ namespace synthese
 
 	namespace interfaces
 	{
-		Site::Site( const uid& id, const std::string& key )
-			: _key(key)
-			, Registrable<uid, Site>(id)
+		Site::Site( const uid& id)
+			: Registrable<uid, Site>(id)
 		{
 			
 		}
