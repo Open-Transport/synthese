@@ -19,7 +19,7 @@ namespace util
     Should not be used directly, use Registrable::RegistryKeyException.
 @ingroup m01
 */
-template<class K>
+template<class K, class T>
 class RegistryKeyException : public synthese::util::Exception
 {
  private:
@@ -48,8 +48,8 @@ class RegistryKeyException : public synthese::util::Exception
 };
 
 
-template<class K>
-RegistryKeyException<K>::RegistryKeyException ( const std::string& message, 
+template<class K, class T>
+RegistryKeyException<K,T>::RegistryKeyException ( const std::string& message, 
 						const K& key ) throw ()
 : synthese::util::Exception (message + " : key=" + Conversion::ToString (key))
     , _key (key)
@@ -59,15 +59,15 @@ RegistryKeyException<K>::RegistryKeyException ( const std::string& message,
 
 
 
-template<class K>
-RegistryKeyException<K>::~RegistryKeyException () throw ()
+template<class K, class T>
+RegistryKeyException<K, T>::~RegistryKeyException () throw ()
 {
 }
 
 
-template<class K>
+template<class K, class T>
 const K& 
-RegistryKeyException<K>::getKey () const
+RegistryKeyException<K, T>::getKey () const
 {
     return _key;
 }

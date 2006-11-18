@@ -34,7 +34,7 @@ class Registrable
  public:
 
     typedef typename synthese::util::Registry<K, T> Registry;
-    typedef typename synthese::util::RegistryKeyException<K> RegistryKeyException;
+    typedef typename synthese::util::RegistryKeyException<K, T> RegistryKeyException;
 
     Registrable (const K& key);
     virtual ~Registrable ();

@@ -25,10 +25,6 @@ namespace synthese
 
 		class JpegRenderer : public Renderer
 		{
-		private:
-
-			static const std::string _factory_key;
-			
 		public:
 
 			//PostscriptRenderer (const RenderingConfig& config, std::ostream& output);

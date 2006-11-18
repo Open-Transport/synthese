@@ -5,10 +5,6 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		const bool JourneyBoardServiceCellInterfacePage::_registered = Factory<InterfacePage>::integrate<JourneyBoardServiceCellInterfacePage>("journey_board_service_cell");
-
-
-
 		void JourneyBoardServiceCellInterfacePage::display( std::ostream& stream
 			, const synthese::time::Hour& firstDepartureTime , const synthese::time::Hour& lastDepartureTime
 			, const synthese::time::Hour& firstArrivalTime , const synthese::time::Hour& lastArrivalTime

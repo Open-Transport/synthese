@@ -63,8 +63,6 @@ namespace synthese
 
 		class InterfaceModule : public ModuleClass
 		{
-			static const std::string _factory_key;
-
 		public:
 			void initialize(const Server* server);
 		};

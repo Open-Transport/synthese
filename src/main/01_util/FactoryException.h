@@ -19,14 +19,15 @@ namespace synthese
 		@ingroup m01
 		*/
 
+		template<class T>
 		class FactoryException : public synthese::util::Exception
 		{
 		private:
 
 		public:
 
-			FactoryException ( const std::string& message);
-			~FactoryException () throw ();
+			FactoryException ( const std::string& message) : synthese::util::Exception(message) {}
+			~FactoryException () throw () {}
 
 		private:
 

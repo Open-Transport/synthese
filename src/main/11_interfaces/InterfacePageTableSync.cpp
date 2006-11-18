@@ -3,6 +3,7 @@
 #include "11_interfaces/InterfacePage.h"
 #include "02_db/SQLiteResult.h"
 #include "01_util/Conversion.h"
+#include "01_util/Log.h"
 
 namespace synthese
 {
@@ -12,6 +13,7 @@ namespace synthese
 	namespace db
 	{
 		const std::string InterfacePageTableSync::TABLE_NAME = "t023_interface_pages";
+		const std::string InterfacePageTableSync::TABLE_COL_ID = "id";
 		const std::string InterfacePageTableSync::TABLE_COL_INTERFACE = "interface_id";
 		const std::string InterfacePageTableSync::TABLE_COL_PAGE = "page_code";
 		const std::string InterfacePageTableSync::TABLE_COL_CONTENT = "content";
@@ -21,6 +23,7 @@ namespace synthese
 			: SQLiteTableSync ( TABLE_NAME, true, true, triggerOverrideClause )
 			, _interfaces(interfaces)
 		{
+			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_INTERFACE, "INTEGER", false);
 			addTableColumn(TABLE_COL_PAGE, "TEXT", false);
 			addTableColumn(TABLE_COL_CONTENT, "TEXT", true);
@@ -43,13 +46,33 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				InterfacePage* page = Factory<InterfacePage>::create( rows.getColumn(i,TABLE_COL_PAGE) );
-				if ( page == NULL )
+				Interface* interf;
+				InterfacePage* page;
+				
+				// Search the specified interface
+				try
+				{
+					interf = _interfaces.get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE )));
+				}
+				catch (Interface::RegistryKeyException e)
+				{
+					Log::GetInstance().warn("Corrupted data on "+ TABLE_NAME +" table : Interface not found", e);
+					continue;
+				}
+
+				try
+				{
+					// Registered interface page;
+					page = Factory<InterfacePage>::create( rows.getColumn(i,TABLE_COL_PAGE) );
+				}
+				catch (FactoryException<InterfacePage> e)
+				{
+					// Free interface page
 					page = new InterfacePage;
-				page->clear();
+				}
+
 				page->parse( rows.getColumn(i, TABLE_COL_CONTENT) );
-				_interfaces.get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE )))
-					->addPage(rows.getColumn(i, TABLE_COL_PAGE), page );
+				interf->addPage(rows.getColumn(i, TABLE_COL_PAGE), page );
 			}
 		}
 

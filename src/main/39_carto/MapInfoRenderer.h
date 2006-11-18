@@ -27,8 +27,6 @@ namespace carto
 class MapInfoRenderer : public Renderer
 {
  private:
-
-	 static const std::string _factory_key;
     static const std::string ZIP_BIN;
 
     boost::filesystem::path _zipOutput; //!< File used for MapInfo zip (containing MID/MIF) generation

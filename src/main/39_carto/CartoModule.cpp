@@ -12,8 +12,6 @@ namespace synthese
 	namespace server
 	{
 
-		const std::string CartoModule::_factory_key = Factory<ModuleClass>::integrate<CartoModule>("80_carto");
-
 		void CartoModule::initialize( const Server* server )
 		{
 			// Initialize map background manager

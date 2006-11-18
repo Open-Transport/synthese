@@ -5,8 +5,6 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		bool RoutePlannerSheetColumnInterfacePage::_registered = Factory<InterfacePage>::integrate<RoutePlannerSheetColumnInterfacePage>("schedule_sheet_column");
-
 		void RoutePlannerSheetColumnInterfacePage::display( std::ostream& stream
 			, bool isItFirstLine, bool isItLastLine, size_t columnNumber, bool isItFootLine 
 			, const synthese::time::Hour& firstDepartureTime, const synthese::time::Hour& lastDepartureTime 

@@ -38,8 +38,6 @@ namespace synthese
 namespace carto
 {
 
-	const std::string HtmlMapRenderer::_factory_key = util::Factory<Renderer>::integrate<HtmlMapRenderer>("html");
-
 
 HtmlMapRenderer::HtmlMapRenderer()
 {

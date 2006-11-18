@@ -28,7 +28,6 @@ namespace synthese
 
 	namespace carto
 	{
-		const std::string _factory_key = util::Factory<Renderer>::integrate<PostscriptRenderer>("ps");
 
 		PostscriptRenderer::PostscriptRenderer()
 		{

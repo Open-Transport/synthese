@@ -17,7 +17,7 @@ namespace util
 /** Registry related exception class
 @ingroup m01
 */
-template<class K>
+template<class K, class T>
 class RegistryException : public synthese::util::Exception
 {
  private:

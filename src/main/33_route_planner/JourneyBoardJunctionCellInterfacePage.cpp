@@ -5,9 +5,6 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		const bool JourneyBoardJunctionCellInterfacePage::_registered = Factory<InterfacePage>::integrate<JourneyBoardJunctionCellInterfacePage>("journey_board_junction_cell");
-
-
 		void JourneyBoardJunctionCellInterfacePage::display( std::ostream& stream , const synthese::env::ConnectionPlace* place
 			, const synthese::env::Alarm* alarm, bool color, const Site* site /*= NULL */ ) const
 		{

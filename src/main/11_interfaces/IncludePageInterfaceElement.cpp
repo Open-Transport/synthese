@@ -6,8 +6,6 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		const std::string IncludePageInterfaceElement::_factory_key = Factory<LibraryInterfaceElement>::integrate<IncludePageInterfaceElement>(">");
-
 		void IncludePageInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object, const Site* site ) const
 		{
 			const InterfacePage* page_to_include = Factory<InterfacePage>::create(_page_code);

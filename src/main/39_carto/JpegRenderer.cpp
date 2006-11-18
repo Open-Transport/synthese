@@ -13,7 +13,6 @@ namespace synthese
 
 	namespace carto
 	{
-		const std::string JpegRenderer::_factory_key = util::Factory<Renderer>::integrate<JpegRenderer>("jpeg");
 
 
 		std::string JpegRenderer::render(const boost::filesystem::path& tempDir,  const std::string& filenamePrefix, const synthese::env::Environment* environment, synthese::carto::Map& map, const synthese::carto::RenderingConfig& config )
@@ -45,6 +44,11 @@ namespace synthese
 			}
 
 			return resultFilename;
+
+		}
+
+		JpegRenderer::~JpegRenderer()
+		{
 
 		}
 	}

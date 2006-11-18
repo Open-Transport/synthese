@@ -13,7 +13,6 @@ namespace synthese
 
 		class AdminRequest : public Request
 		{
-			static const std::string _factory_key;
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_OBJECT_ID;
 

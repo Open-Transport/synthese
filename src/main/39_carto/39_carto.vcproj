@@ -183,7 +183,13 @@
 			RelativePath=".\CartoModule.cpp">
 		</File>
 		<File
+			RelativePath=".\CartoModule.gen.cpp">
+		</File>
+		<File
 			RelativePath=".\CartoModule.h">
+		</File>
+		<File
+			RelativePath=".\CartoModule.inc.cpp">
 		</File>
 		<File
 			RelativePath=".\SConscript">

@@ -18,9 +18,6 @@ namespace synthese
 		*/
 		class LineMarkerInterfacePage : public InterfacePage
 		{
-		private:
-			static const std::string _factory_key;
-
 		public:
 			/** Display of line of schedule sheet.
 				@param stream Stream to write on

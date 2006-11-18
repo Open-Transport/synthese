@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include "FactoryException.h"
 
 namespace synthese
 {
@@ -66,9 +67,9 @@ namespace synthese
 				@return the key if ok, empty string if the subclass is already registered
 			*/
 			template <class T>
-				static std::string integrate(const typename Map::key_type& key)
+				static void integrate(const typename Map::key_type& key)
 			{
-				std::cerr << key << "\n";
+				Log::GetInstance ().info ("Registering compound... " + key);
 
 				// The first integration allocates the static map
 				if (_registeredCreator == NULL)
@@ -76,20 +77,19 @@ namespace synthese
 
 				// If the key is already used then return false (it would be better to use exceptions)
 				if(_registeredCreator->find(key) != _registeredCreator->end())
-					return "";
+					throw FactoryException<RootObject>("Attempted to integrate a class twice");
 
 				// Saving of the auto generated builder
 				CreatorInterface* creator = new Creator<T>;
 				_registeredCreator->insert(std::pair<typename Map::key_type, CreatorInterface*>(key, creator));
-				return key;
 			}
 
 			template <class T>
 				static typename Map::key_type getKey()
 			{
-				// If no registered classes, then always return empty
+				// If no registered classes
 				if (_registeredCreator == NULL)
-					return "";
+					throw FactoryException<RootObject>("Factorable class not found (empty factory)");
 
 				// Search for a creator for the T class
 				typename Map::const_iterator it;
@@ -97,8 +97,8 @@ namespace synthese
 					if (dynamic_cast<Creator<T>*>(it->second) != NULL)
 						return it->first;
 
-				// No such creator was founded : empty return
-				return "";
+				// No such creator was founded
+				throw FactoryException<RootObject>("Factorable class not found");
 
 			}
 
@@ -115,14 +115,14 @@ namespace synthese
 			{
 				// The factory "single object" was never filled
 				if (_registeredCreator == NULL)
-					return NULL;
+					throw FactoryException<RootObject>("Unable to factor "+ key +" object (empty factory)");
 
 				// Search of the key of the wished class in the map
 				typename Map::iterator it = _registeredCreator->find(key);
 
 				// The key is not found
 				if(it == _registeredCreator->end())
-					return NULL;
+					throw FactoryException<RootObject>("Unable to factor "+ key +" object (class not found)");
 
 				// The key is found : return of an instance of the object
 				RootObject* object = it->second->create();

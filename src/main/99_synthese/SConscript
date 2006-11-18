@@ -62,6 +62,7 @@ def preAction (target = None, source = None, env = None):
     modules = moduleenv['MODULES']
     
     generated = open ('src/main/' + currentmodule + '/generated.cpp.inc', "w" )
+    generatedInclude = open ('src/main/' + currentmodule + '/includes.cpp.inc', "w" )
     for module in reversed (modules):
       moduledir = os.path.join ('src/main', module)
       for file in os.listdir (moduledir) :
@@ -71,9 +72,16 @@ def preAction (target = None, source = None, env = None):
             fragment = open (fragmentfile, "r")
             generated.write (fragment.read ())
             fragment.close ()
+        if fnmatch.fnmatch (file, '*.inc.cpp') :
+            fragmentfile = os.path.join (moduledir, file);
+            # dump the file to generated output
+            fragment = open (fragmentfile, "r")
+            generatedInclude.write (fragment.read ())
+            fragment.close ()
 
             
     generated.close ()
+    generatedInclude.close ()
     
     return 0
  

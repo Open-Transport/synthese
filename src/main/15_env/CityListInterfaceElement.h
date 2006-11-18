@@ -21,7 +21,6 @@ namespace synthese
 		class CityListInterfaceElement : public LibraryInterfaceElement
 		{
 		private:
-			static const std::string _factory_key;
 			ValueElementList _parameters;
 
 		public:

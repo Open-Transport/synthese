@@ -17,10 +17,6 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const std::string CityNameValueInterfaceElement::_value_factory_key = Factory<ValueInterfaceElement>::integrate<CityNameValueInterfaceElement>("city_name");
-		const std::string CityNameValueInterfaceElement::_library_factory_key = Factory<LibraryInterfaceElement>::integrate<CityNameValueInterfaceElement>("city_name");
-
-
 		const string& CityNameValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const Site* site) const
 		{
 			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )

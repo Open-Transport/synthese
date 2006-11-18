@@ -15,8 +15,6 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const std::string CityListInterfaceElement::_factory_key = Factory<LibraryInterfaceElement>::integrate<CityListInterfaceElement>("city_list");
-
 		void CityListInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const Site* site /*= NULL*/ ) const
 		{
 			// Parameters

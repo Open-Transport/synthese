@@ -35,10 +35,6 @@ namespace carto
 {
 
 const std::string MapInfoRenderer::ZIP_BIN ("zip");
-const std::string MapInfoRenderer::_factory_key = util::Factory<Renderer>::integrate<MapInfoRenderer>("mapinfo");
-
-
-
 
 
 

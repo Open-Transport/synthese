@@ -69,6 +69,9 @@ class Server
     synthese::interfaces::Interface::Registry& getInterfaces ();
     const synthese::interfaces::Interface::Registry& getInterfaces () const;
 
+	synthese::interfaces::Site::Registry& getSites();
+	const synthese::interfaces::Site::Registry& getSites() const;
+
     const ServerConfig& getConfig () const;
 
     static Server* GetInstance ();

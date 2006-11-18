@@ -76,8 +76,6 @@ namespace synthese
 		class MapRequestHandler : public Request
 		{
 		private:
-			static const std::string _factory_key;
-
 			int _mode;
 			std::string _output;
 			XMLNode _envNode;

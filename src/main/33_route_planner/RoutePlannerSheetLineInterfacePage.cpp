@@ -5,8 +5,6 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		const bool RoutePlannerSheetLineInterfacePage::_registered = Factory<InterfacePage>::integrate<RoutePlannerSheetLineInterfacePage>("schedule_sheet_row");
-
 		void RoutePlannerSheetLineInterfacePage::display( std::ostream& stream, const std::string& text, bool alternateColor
 			, const synthese::env::ConnectionPlace* place, const Site* site /*= NULL */ ) const
 		{

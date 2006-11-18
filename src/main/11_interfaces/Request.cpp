@@ -31,6 +31,15 @@ namespace synthese
 			// The + characters are added by the web browsers instead of spaces
 			boost::algorithm::replace_all (s, "+", " ");
 
+			// Deletes the end of line code
+			size_t pos = s.find ("\r");
+			if (pos != string::npos)
+				s = s.substr(0, pos);
+			pos = s.find ("\n");
+			if (pos != string::npos)
+				s = s.substr(0, pos);
+
+
 			/* ?? what do we do with this code ?
 			if (s.size () > MAX_REQUEST_SIZE) {
 			bool parameterTruncated = (s.substr (MAX_REQUEST_SIZE, 1) != PARAMETER_SEPARATOR);
@@ -70,8 +79,10 @@ namespace synthese
 
 			// Function name
 			ParametersMap::iterator it = map.find(PARAMETER_FUNCTION);
-			if (it == map.end() || !Factory<Request>::contains(it->second))
+			if (it == map.end())
 				throw RequestException("Function not specified");
+			if (!Factory<Request>::contains(it->second))
+				throw RequestException("Function not found");
 
 			Request* request;
 			// Request instantiation
@@ -79,7 +90,7 @@ namespace synthese
 			{
 				request = Factory<Request>::create(it->second);
 			}
-			catch (FactoryException e)
+			catch (FactoryException<Request> e)
 			{
 				throw RequestException(e.getMessage());
 			}
@@ -93,7 +104,7 @@ namespace synthese
 			{
 				request->_site = siteRegistry.get(Conversion::ToLongLong(it->second));
 			}
-			catch (RegistryKeyException<Site> e)
+			catch (Site::RegistryKeyException e)
 			{
 				throw RequestException("Site not found");
 			}

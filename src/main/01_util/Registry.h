@@ -102,7 +102,7 @@ T*
 Registry<K,T>::get (const K& key)
 {
     if (contains (key) == false) 
-	throw RegistryKeyException<K> ("No such key in registry", key);
+	throw RegistryKeyException<K,T> ("No such key in registry", key);
 
     return _registry.find (key)->second;
 }
@@ -114,7 +114,7 @@ const T*
 Registry<K,T>::get (const K& key) const
 {
     if (contains (key) == false) 
-	throw RegistryKeyException<K> ("No such key in registry", key);
+	throw RegistryKeyException<K,T> ("No such key in registry", key);
 
     return _registry.find (key)->second;
 }
@@ -151,7 +151,7 @@ void
 Registry<K,T>::add (T* ptr)
 {
     if (contains (ptr->getKey ())) 
-	throw RegistryKeyException<K> ("Duplicate key in registry", ptr->getKey ());
+	throw RegistryKeyException<K,T> ("Duplicate key in registry", ptr->getKey ());
     
     _registry.insert (std::make_pair (ptr->getKey (), ptr));
 }
@@ -172,7 +172,7 @@ void
 Registry<K,T>::remove (const K& key)
 {
     if (contains (key) == false) 
-	throw RegistryKeyException<K> ("No such key in registry", key);
+	throw RegistryKeyException<K,T> ("No such key in registry", key);
 
     delete _registry.find (key)->second;
     _registry.erase (key);

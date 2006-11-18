@@ -213,7 +213,13 @@
 			RelativePath=".\InterfaceModule.cpp">
 		</File>
 		<File
+			RelativePath=".\InterfaceModule.gen.cpp">
+		</File>
+		<File
 			RelativePath=".\InterfaceModule.h">
+		</File>
+		<File
+			RelativePath=".\InterfaceModule.inc.cpp">
 		</File>
 		<File
 			RelativePath=".\SConscript">

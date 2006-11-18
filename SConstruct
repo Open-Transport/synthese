@@ -38,6 +38,8 @@ import os, fnmatch
 # through scons nodes
 def Glob( env, pattern = '*.*', excludes = [], dir = '.' ):
     files = []
+    excludes.append( '*.gen.cpp' )
+    excludes.append( '*.inc.cpp' )
     for file in os.listdir( Dir(dir).srcnode().abspath ):
         if fnmatch.fnmatch(file, pattern) :
             excluded = False

@@ -267,6 +267,7 @@ Server::initialize ()
     syncHook->addTableSynchronizer (lineStopSync);
 	syncHook->addTableSynchronizer (interfaceSync);
 	syncHook->addTableSynchronizer (interfacePageSync);
+	syncHook->addTableSynchronizer (siteSync);
 
     // Create the env link synchronizer after having added the component synchronizers
     synthese::envlssql::EnvironmentLinkTableSync* envLinkSync = new synthese::envlssql::EnvironmentLinkTableSync 
@@ -285,6 +286,7 @@ Server::initialize ()
 
 	for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); it != Factory<ModuleClass>::end(); ++it)
 	{
+		Log::GetInstance ().info ("Loading module... " + it.getKey());
 		ModuleClass* module = it.getObject();
 		module->initialize(this);
 		_modules.insert(make_pair(it.getKey(), module));
@@ -378,7 +380,15 @@ Server::getConfig () const
     return _config;
 }
 
+synthese::interfaces::Site::Registry& Server::getSites()
+{
+	return _sites;
+}
 
+const synthese::interfaces::Site::Registry& Server::getSites() const
+{
+	return _sites;
+}
 
 
 }

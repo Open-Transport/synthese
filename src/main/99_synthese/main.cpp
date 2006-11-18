@@ -3,19 +3,16 @@
 #include "01_util/Conversion.h"
 #include "01_util/Exception.h"
 #include "01_util/Log.h"
-
+#include "01_util/Factory.h"
+#include <string>
 #include <iostream>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
 
-
-// included static initializations
-
-#include "generated.cpp.inc"
-
-//
+// included auto generated code
+#include "includes.cpp.inc"
 
 
 
@@ -23,6 +20,7 @@
 using synthese::util::Log;
 using synthese::util::Conversion;
 using synthese::server::Server;
+using synthese::util::Factory;
 
 
 namespace po = boost::program_options;
@@ -30,6 +28,10 @@ namespace po = boost::program_options;
 
 int main( int argc, char **argv )
 {
+
+	// included auto generated code
+	#include "generated.cpp.inc"
+
     std::string db;
 
     po::options_description desc("Allowed options");

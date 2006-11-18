@@ -17,9 +17,6 @@ namespace synthese
 		*/
 		class JourneyBoardJunctionCellInterfacePage : public InterfacePage
 		{
-		private:
-			static const bool _registered;
-
 		public:
 			/** Display.
 				@param place (0) Arr?t ? rejoindre ? pied</th><th>Index de l'arr?t

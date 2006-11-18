@@ -1,7 +1,7 @@
 
 namespace synthese
 {
-	namespace interface
+	namespace interfaces
 	{
 		/** @todo convert this and register it
 		case EI_ATTRIBUT_TRAJETS_TAILLE:

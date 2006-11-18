@@ -13,8 +13,6 @@ namespace synthese
 		class CityNameValueInterfaceElement : public ValueInterfaceElement
 		{
 		private:
-			static const std::string _value_factory_key;
-			static const std::string _library_factory_key;
 			ValueInterfaceElement* _uid;
 
 		public:

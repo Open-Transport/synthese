@@ -148,7 +148,13 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\module.h">
+			RelativePath=".\RoutePlannerModule.gen.cpp">
+		</File>
+		<File
+			RelativePath=".\RoutePlannerModule.h">
+		</File>
+		<File
+			RelativePath=".\RoutePlannerModule.inc.cpp">
 		</File>
 		<File
 			RelativePath=".\SConscript">

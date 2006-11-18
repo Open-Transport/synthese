@@ -27,9 +27,6 @@ namespace synthese
 		*/
 		class JourneyBoardServiceCellInterfacePage : public InterfacePage
 		{
-		private:
-			static const bool _registered;
-
 		public:
 			/** Display.
 				@param stream Stream to write on

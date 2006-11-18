@@ -407,6 +407,12 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\EnvModule.gen.cpp">
+		</File>
+		<File
+			RelativePath=".\EnvModule.inc.cpp">
+		</File>
+		<File
 			RelativePath=".\module.h">
 		</File>
 		<File

@@ -11,9 +11,6 @@ namespace synthese
 		*/
 		class RoutePlannerSheetColumnInterfacePage : public InterfacePage
 		{
-		private:
-			static bool _registered;
-
 		public:
 			/** Display of schedule sheet cell.
 				@param stream Stream to write on

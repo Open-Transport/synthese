@@ -16,9 +16,6 @@ namespace synthese
 		*/
 		class JourneyBoardStopCellInterfacePage : public InterfacePage
 		{
-		private:
-			static const bool _registered;
-
 		public:
 			/** Display.
 				@param stream Stream to write on

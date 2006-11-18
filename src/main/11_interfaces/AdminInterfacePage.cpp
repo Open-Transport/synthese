@@ -9,8 +9,6 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const std::string AdminInterfacePage::_factory_key = Factory<InterfacePage>::integrate<AdminInterfacePage>("admin");
-
 		void AdminInterfacePage::display( std::ostream& stream , const AdminInterfaceElement* page , const uid objectId , const Site* site /*= NULL */ ) const
 		{
 			ParametersVector parameters;

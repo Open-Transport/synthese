@@ -13,7 +13,6 @@ namespace synthese
 		class IfThenElseInterfaceElement : public LibraryInterfaceElement
 		{
 		private:
-			static const std::string _factory_key;
 			ValueInterfaceElement* _criteria;
 			LibraryInterfaceElement* _to_do_if_true;
 			LibraryInterfaceElement* _to_do_if_false;

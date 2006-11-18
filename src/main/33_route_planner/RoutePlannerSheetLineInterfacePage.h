@@ -19,9 +19,6 @@ namespace synthese
 		*/
 		class RoutePlannerSheetLineInterfacePage : public InterfacePage
 		{
-		private:
-			static const bool _registered;
-
 		public:
 			/** Display of line of schedule sheet.
 				@param stream Stream to write on

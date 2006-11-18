@@ -62,8 +62,6 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const std::string MapRequestHandler::_factory_key = Factory<Request>::integrate<MapRequestHandler>("map");
-
 
 		const std::string MapRequestHandler::MODE_PARAMETER ("mode");
 		const std::string MapRequestHandler::OUTPUT_PARAMETER ("output");

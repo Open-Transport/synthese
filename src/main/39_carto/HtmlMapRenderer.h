@@ -29,8 +29,6 @@ namespace carto
 class HtmlMapRenderer : public Renderer
 {
  private:
-
-	 static const std::string _factory_key;
 	 const env::Environment* _environment;
     std::string _urlPattern; //!< URL pattern ($id is replaced by the proper object id)
     std::string _mapImgFilename; //!< Filename of the img used in generated HTML map

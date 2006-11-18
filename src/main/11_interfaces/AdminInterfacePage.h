@@ -12,9 +12,6 @@ namespace synthese
 		*/
 		class AdminInterfacePage : public InterfacePage
 		{
-		private:
-			static const std::string _factory_key;
-
 		public:
 			/** Display of the admin page.
 			@param stream Stream to write on

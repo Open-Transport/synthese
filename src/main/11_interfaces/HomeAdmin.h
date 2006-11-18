@@ -28,9 +28,6 @@ namespace synthese
 		*/
 		class HomeAdmin : public AdminInterfaceElement
 		{
-		private:
-			static const std::string _factory_key;
-
 		protected:
 			static const std::string _superior;
 			static const bool _ever_displayed;

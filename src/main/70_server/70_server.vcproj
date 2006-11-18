@@ -46,9 +46,6 @@
 				RelativePath=".\CleanerThreadExec.cpp">
 			</File>
 			<File
-				RelativePath=".\Request.cpp">
-			</File>
-			<File
 				RelativePath=".\Server.cpp">
 			</File>
 			<File
@@ -67,9 +64,6 @@
 			</File>
 			<File
 				RelativePath=".\ModuleClass.h">
-			</File>
-			<File
-				RelativePath=".\Request.h">
 			</File>
 			<File
 				RelativePath=".\Server.h">
@@ -99,6 +93,9 @@
 		</File>
 		<File
 			RelativePath=".\SConscript">
+		</File>
+		<File
+			RelativePath=".\ServerModule.inc.cpp">
 		</File>
 	</Files>
 	<Globals>

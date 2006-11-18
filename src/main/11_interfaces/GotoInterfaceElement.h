@@ -12,7 +12,6 @@ namespace synthese
 		class GotoInterfaceElement : public LibraryInterfaceElement
 		{
 		private:
-			static const std::string _factory_key;
 			std::string _label;
 
 		public:

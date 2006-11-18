@@ -17,9 +17,6 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const bool JourneyLineListInterfaceElement::_registered = Factory<LibraryInterfaceElement>::integrate<JourneyLineListInterfaceElement>("journey_line_list");
-
-
 		void JourneyLineListInterfaceElement::parse( const std::string& text )
 		{
 			ValueElementList vel(text);

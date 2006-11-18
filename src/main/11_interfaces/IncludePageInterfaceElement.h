@@ -13,7 +13,6 @@ namespace synthese
 		class IncludePageInterfaceElement : public LibraryInterfaceElement
 		{
 		private:
-			static const std::string _factory_key;
 			std::string _page_code;
 			ValueElementList _parameters;
 

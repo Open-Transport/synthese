@@ -25,10 +25,6 @@ namespace carto
 
 class PostscriptRenderer : public Renderer
 {
- private:
-
-	 static const std::string _factory_key;
-    
  public:
 
     PostscriptRenderer ();

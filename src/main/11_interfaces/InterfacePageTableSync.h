@@ -20,6 +20,7 @@ namespace synthese
 		{
 		private:
 			static const std::string TABLE_NAME;
+			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_INTERFACE;
 			static const std::string TABLE_COL_PAGE;
 			static const std::string TABLE_COL_CONTENT;

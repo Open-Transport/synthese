@@ -8,10 +8,6 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const std::string LineMarkerInterfacePage::_factory_key = Factory<InterfacePage>::integrate<LineMarkerInterfacePage>("line_marker");
-
-
-
 		void LineMarkerInterfacePage::display( std::ostream& stream, const std::string& tableOpeningHTML , const std::string& tableClosingHTML , int pixelWidth , int pixelHeight , const synthese::env::Line* line , const Site* site /*= NULL */ ) const
 		{
 			ParametersVector pv;

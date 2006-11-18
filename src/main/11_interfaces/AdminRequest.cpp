@@ -13,9 +13,8 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const std::string AdminRequest::_factory_key = Factory<Request>::integrate<AdminRequest>("admin");
-		const std::string PARAMETER_PAGE = "rub";
-		const std::string PARAMETER_OBJECT_ID = "id";
+		const std::string AdminRequest::PARAMETER_PAGE = "rub";
+		const std::string AdminRequest::PARAMETER_OBJECT_ID = "id";
 
 		AdminRequest::ParametersMap AdminRequest::getParametersMap() const
 		{
@@ -37,7 +36,7 @@ namespace synthese
 			{
 				_page = Factory<AdminInterfaceElement>::create(it->second);
 			}
-			catch (FactoryException e)
+			catch (FactoryException<AdminInterfaceElement> e)
 			{
 				throw RequestException("Page not found");
 			}

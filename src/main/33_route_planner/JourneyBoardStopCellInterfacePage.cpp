@@ -5,8 +5,6 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		const bool JourneyBoardStopCellInterfacePage::_registered = Factory<InterfacePage>::integrate<JourneyBoardStopCellInterfacePage>("journey_board_stop_cell");
-
 		void JourneyBoardStopCellInterfacePage::display( std::ostream& stream, bool isItArrival, const synthese::env::Alarm* alarm
 			, bool isItTerminus, const std::string& stopName, bool color
 			, const synthese::time::Hour& firstTime, const synthese::time::Hour& lastTime, const Site* site /*= NULL */ ) const

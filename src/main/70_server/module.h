@@ -37,8 +37,6 @@ namespace synthese
 	    static const std::string FUNCTION_RESERVATION_VALIDATION ("vres");
 	    static const std::string FUNCTION_RESERVATION_CANCELLING ("ares");
 
-	    static const std::string PARAMETER_FUNCTION ("fonction");
-	    static const std::string PARAMETER_SITE ("site");
 	    static const std::string PARAMETER_SEARCH ("rec");
 	    static const std::string PARAMETER_CITY ("com");
 	    static const std::string PARAMETER_CITY_NUMBER ("ncom");

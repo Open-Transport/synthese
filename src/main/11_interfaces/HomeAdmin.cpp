@@ -5,7 +5,6 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		const std::string HomeAdmin::_factory_key = Factory<AdminInterfaceElement>::integrate<HomeAdmin>("home");
 		const std::string HomeAdmin::_superior = "";
 		const bool HomeAdmin::_ever_displayed = true;
 

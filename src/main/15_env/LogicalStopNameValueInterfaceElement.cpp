@@ -17,10 +17,6 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const std::string LogicalStopNameValueInterfaceElement::_value_factory_key = Factory<ValueInterfaceElement>::integrate<LogicalStopNameValueInterfaceElement>("stop_name");
-		const std::string LogicalStopNameValueInterfaceElement::_library_factory_key = Factory<LibraryInterfaceElement>::integrate<LogicalStopNameValueInterfaceElement>("stop_name");
-
-
 		const string& LogicalStopNameValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const Site* site) const
 		{
 			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )

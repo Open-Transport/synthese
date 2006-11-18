@@ -10,7 +10,6 @@ namespace synthese
 		class JourneyLineListInterfaceElement : public LibraryInterfaceElement
 		{
 		private:
-			static const bool _registered;
 			ValueInterfaceElement* _displayPedestrianLines;
 			ValueInterfaceElement* _rowStartHtml;
 			ValueInterfaceElement* _rowEndHtml;

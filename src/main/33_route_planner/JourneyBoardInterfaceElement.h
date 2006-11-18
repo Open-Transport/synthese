@@ -12,7 +12,6 @@ namespace synthese
 		class JourneyBoardInterfaceElement : public LibraryInterfaceElement
 		{
 		private:
-			static const bool _registered;
 			ValueInterfaceElement* _handicappedFilter;
 			ValueInterfaceElement* _bikeFilter;
 			~JourneyBoardInterfaceElement();
