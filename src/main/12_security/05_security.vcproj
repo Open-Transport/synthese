@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="05_security"
+	Name="12_security"
 	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
 	Keyword="MakeFileProj">
 	<Platforms>
