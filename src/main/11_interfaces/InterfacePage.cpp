@@ -1,9 +1,14 @@
 
-#include "InterfacePage.h"
-#include "LineLabelInterfaceElement.h"
+#include "01_util/Log.h"
+
+#include "11_interfaces/InterfacePage.h"
+#include "11_interfaces/LineLabelInterfaceElement.h"
+#include "11_interfaces/InterfacePageException.h"
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace interfaces
 	{
 
@@ -37,20 +42,26 @@ namespace synthese
 			{
 				for (end_pos = start_pos; end_pos < text.size() && text[end_pos] != '\n'; ++end_pos);
 
-				LibraryInterfaceElement* lie = LibraryInterfaceElement::create( text.substr(start_pos, end_pos - start_pos) );
-				if (lie != NULL)
+				LibraryInterfaceElement* lie;
+				try
 				{
-					LineLabelInterfaceElement* llie = dynamic_cast<LineLabelInterfaceElement*>(lie);
-					if ( llie != NULL )
-					{
-						last_label = llie->getLabel();
-						delete lie;
-					}
-					else
-					{
-						_components.push_back( make_pair( last_label, lie ));
-						last_label = "";
-					}
+					lie = LibraryInterfaceElement::create( text.substr(start_pos, end_pos - start_pos) );
+				}
+				catch (InterfacePageException e)
+				{
+					Log::GetInstance().warn("Interface page parsing error", e);
+					continue;
+				}
+				LineLabelInterfaceElement* llie = dynamic_cast<LineLabelInterfaceElement*>(lie);
+				if ( llie != NULL )
+				{
+					last_label = llie->getLabel();
+					delete lie;
+				}
+				else
+				{
+					_components.push_back( make_pair( last_label, lie ));
+					last_label = "";
 				}
 			}
 		}

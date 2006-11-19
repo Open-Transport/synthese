@@ -74,6 +74,7 @@ class Date
 
 
 	/** Constructs a Date from an SQL date string (AAAA-MM-JJ).
+		@todo Throw an exception on parsing error
 	*/
 	static Date FromSQLDate (const std::string& sqlDate);
 

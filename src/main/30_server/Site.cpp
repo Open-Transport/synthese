@@ -62,5 +62,45 @@ namespace synthese
 			DateTime tempDate;
 			return tempDate.getDate() >= _startValidityDate && tempDate.getDate() <= _endValidityDate;
 		}
+
+		void Site::setEnvironment( synthese::env::Environment* environment )
+		{
+			_env = environment;
+		}
+
+		void Site::setInterface( const synthese::interfaces::Interface* interf )
+		{
+			_interface = interf;
+		}
+
+		void Site::setStartDate( const synthese::time::Date& dateDebut )
+		{
+			_startValidityDate = dateDebut;
+		}
+
+		void Site::setEndDate( const synthese::time::Date& dateFin )
+		{
+			_endValidityDate = dateFin;
+		}
+
+		void Site::setOnlineBookingAllowed( const bool valeur )
+		{
+			_onlineBookingAllowed = valeur;
+		}
+
+		void Site::setClientURL( const std::string& clientURL )
+		{
+			_clientURL = clientURL;
+		}
+
+		void Site::setPastSolutionsDisplayed( bool pastSolutions)
+		{
+			_pastSolutionsDisplayed = pastSolutions;
+		}
+
+		void Site::setName( const std::string& name )
+		{
+			_name = name;
+		}
 	}
 }

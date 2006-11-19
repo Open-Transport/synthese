@@ -8,11 +8,15 @@
 #include <iostream>
 
 #include "00_tcp/Socket.h"
+
+#include "30_server/Request.h"
+
 #include "module.h"
 
 using std::cout;
 using std::endl;
 
+using namespace synthese::server;
 
 namespace synthese
 {
@@ -60,13 +64,14 @@ namespace synthese
 	query = getenv("QUERY_STRING");
     }
     ip = getenv("REMOTE_ADDR");
-    if(ip) addr.s_addr = inet_addr(getenv("REMOTE_ADDR"));
+    if (ip)
+		addr.s_addr = inet_addr(getenv("REMOTE_ADDR"));
 
     // Erreur si pas de requête
     if( query == NULL )
     {
-	cout << "HTTP/1.0 400 Bad Request\n\n";
-	exit(1);
+		cout << "HTTP/1.0 400 Bad Request\n\n";
+		exit(1);
     }
 
     // Formattage de la requête
@@ -75,56 +80,63 @@ namespace synthese
     qptr = query;
     while( *qptr && (qptr-query<MAX_QUERY_SIZE-1))
     {
-	// Conversion des caractères de la forme %30
-	if(*qptr == '%') 
-	{
-	    char hex[3];
-	    memcpy(hex,qptr+1,2);
-	    hex[2] = 0;
-	    buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
-	    if(buffer[bufpos] == '~') buffer[bufpos] = '\''; 
-	    bufpos++; qptr += 3;
-	}
-	// Conversion des caractères de la forme \\30
-	else if(*qptr == '\\')
-	{
-	    char hex[3];
-	    memcpy(hex,qptr+2,2);
-	    hex[2] = 0;
-	    buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
-	    bufpos++; qptr += 4;
-	}
-	// Conversion du '+' en ' ' 
-	else if(*qptr == '+') 
-	{
-	    buffer[bufpos++] = ' ';
-	    qptr++;
-	}
-	else if(*qptr)
-	{
-	    buffer[bufpos++] = *qptr;
-	    qptr++;
-	}
+		// Conversion des caractères de la forme %30
+		if(*qptr == '%') 
+		{
+			char hex[3];
+			memcpy(hex,qptr+1,2);
+			hex[2] = 0;
+			buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
+			if(buffer[bufpos] == '~') buffer[bufpos] = '\''; 
+			bufpos++; qptr += 3;
+		}
+		// Conversion des caractères de la forme \\30
+		else if(*qptr == '\\')
+		{
+			char hex[3];
+			memcpy(hex,qptr+2,2);
+			hex[2] = 0;
+			buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
+			bufpos++; qptr += 4;
+		}
+		// Conversion du '+' en ' ' 
+		else if(*qptr == '+') 
+		{
+			buffer[bufpos++] = ' ';
+			qptr++;
+		}
+		else if(*qptr)
+		{
+			buffer[bufpos++] = *qptr;
+			qptr++;
+		}
     }
+
+	// Adding of the client IP address to the request
+	strcat(buffer, Request::PARAMETER_SEPARATOR.c_str());
+	strcat(buffer, Request::PARAMETER_IP.c_str());
+	strcat(buffer, Request::PARAMETER_ASSIGNMENT.c_str());
+	strcat(buffer, ip);
+	strcat(buffer, "\r\n");
 		    
     // Initialise la connection au serveur
     try
     {
-	socket.open(server, DEF_PORT, DEF_PROTO);
-	socket.connectToServer();
+		socket.open(server, DEF_PORT, DEF_PROTO);
+		socket.connectToServer();
     }
     catch (const char *err)
     {
-	socket.closeSocket();
-	cout << "HTTP/1.0 503 Service Unavailable: " << err << "\n\n";
-	exit(2);
+		socket.closeSocket();
+		cout << "HTTP/1.0 503 Service Unavailable: " << err << "\n\n";
+		exit(2);
     }
     // Vérification de l'identité du serveur
-    try
+/*    try
     {
-	socket.read(welcome, strlen(WELCOME_MSG), 10);
-	if(strncmp(welcome, WELCOME_MSG, strlen(WELCOME_MSG)))
-	    throw "no server";
+		socket.read(welcome, strlen(WELCOME_MSG), 10);
+		if(strncmp(welcome, WELCOME_MSG, strlen(WELCOME_MSG)))
+			throw "no server";
     }
     catch (const char *err)
     {
@@ -132,7 +144,7 @@ namespace synthese
 	cout << "HTTP/1.0 500 Internal Server Error\n\n";
 	exit(3);
     }
-
+*/
     // Envoi de la requête au serveur
     socket.write(buffer, strlen(buffer), 0);
 
@@ -140,7 +152,7 @@ namespace synthese
     cout << "Cache-Control: no-cache\n";
     cout << "Content-type: text/html; charset=ISO-8859-1\n\n";
     while(socket.read(buffer, MAX_QUERY_SIZE, 10))
-	cout << buffer;
+		cout << buffer;
     /** ATTENTION
 	ici danger de fermer avant la fin
 	si read=0 alors que calcul en cours ?

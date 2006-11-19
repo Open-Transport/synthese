@@ -1,5 +1,5 @@
 
-synthese::util::Factory<synthese::admin::InterfacePage>::integrate<synthese::admin::AdminInterfacePage>("admin");
+synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::admin::AdminInterfacePage>("admin");
 
 synthese::util::Factory<synthese::interfaces::AdminInterfaceElement>::integrate<synthese::admin::HomeAdmin>("home");
 

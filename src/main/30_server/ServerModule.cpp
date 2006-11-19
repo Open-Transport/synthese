@@ -52,10 +52,6 @@ namespace synthese
 			Thread sqliteThread (sqliteExec, "sqlite");
 			sqliteThread.start ();
 			SQLiteSync* syncHook = new SQLiteSync (TABLE_COL_ID);
-			//			for (Factory<SQLiteTableSync>::Iterator it = Factory<SQLiteTableSync>::begin(); it != Factory<SQLiteTableSync>::end(); ++it)
-			//			{
-			//				syncHook->addTableSynchronizer (it.getObject());
-			//			}
 			sqliteExec->registerUpdateHook (syncHook);
 			sqliteThread.waitForReadyState ();
 

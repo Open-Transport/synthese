@@ -160,8 +160,8 @@ namespace synthese
 						request->_sessionBroken = true;
 					}
 				}
+				map.erase(it);
 			}
-			map.erase(it);
 
 			request->setFromParametersMap(map);
 

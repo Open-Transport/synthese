@@ -59,14 +59,14 @@ namespace synthese
 
 			//! \name Modificateurs
 			//@{
-//			void setIdentifiant ( const std::string& id );
-//			bool SetEnvironnement ( synthese::env::Environment* );
-//			bool SetInterface ( const synthese::interfaces::Interface* );
-//			void setDateDebut ( const synthese::time::Date& dateDebut );
-//			void setDateFin ( const synthese::time::Date& dateFin );
-//			bool setResaEnLigne ( const bool valeur );
-//			bool setURLClient ( const std::string& );
-//			bool setSolutionsPassees ( bool );
+				void setEnvironment ( synthese::env::Environment* environment);
+				void setInterface ( const synthese::interfaces::Interface* interf);
+				void setStartDate ( const synthese::time::Date& dateDebut );
+				void setEndDate ( const synthese::time::Date& dateFin );
+				void setOnlineBookingAllowed ( const bool valeur );
+				void setClientURL ( const std::string& clientURL);
+				void setPastSolutionsDisplayed ( bool );
+				void setName(const std::string& name);
 			//@}
 
 			//! \name Accesseurs
