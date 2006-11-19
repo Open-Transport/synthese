@@ -29,7 +29,6 @@ moduleenv.AddModuleDependency ('40_carto_ls_xml')
 moduleenv.AddModuleDependency ('16_env_ls_xml')
 moduleenv.AddModuleDependency ('39_carto')
 
-moduleenv.AddModuleDependency ('17_env_ls_sql')
 moduleenv.AddModuleDependency ('11_interfaces')
 moduleenv.AddModuleDependency ('12_security')
 moduleenv.AddModuleDependency ('15_env')

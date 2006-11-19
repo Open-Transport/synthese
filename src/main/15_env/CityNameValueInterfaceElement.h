@@ -2,21 +2,23 @@
 #ifndef SYNTHESE_CityNameValueInterfaceElement_H__
 #define SYNTHESE_CityNameValueInterfaceElement_H__
 
-
-#include "11_interfaces/ValueInterfaceElement.h"
 #include "01_util/UId.h"
 
 namespace synthese
 {
 	namespace interfaces
 	{
-		class CityNameValueInterfaceElement : public ValueInterfaceElement
+		class ValueInterfaceElement;
+	}
+	namespace env
+	{
+		class CityNameValueInterfaceElement : public interfaces::ValueInterfaceElement
 		{
 		private:
-			ValueInterfaceElement* _uid;
+			interfaces::ValueInterfaceElement* _uid;
 
 		public:
-			const std::string& getValue(const ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
+			const std::string& getValue(const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
 
 			/** Parser.
 				@param text Optional parameter :

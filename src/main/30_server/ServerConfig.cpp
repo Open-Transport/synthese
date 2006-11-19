@@ -1,10 +1,11 @@
-#include "ServerConfig.h"
+
+#include <boost/filesystem/operations.hpp>
 
 #include "01_util/Exception.h"
 #include "01_util/Log.h"
 
-
-#include <boost/filesystem/operations.hpp>
+#include "30_server/ServerConfigTableSync.h"
+#include "30_server/ServerConfig.h"
 
 using synthese::util::Log;
 

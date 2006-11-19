@@ -5,11 +5,11 @@
 
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
+#include "01_util/Factory.h"
 #include "01_util/FactoryException.h"
 
 #include "30_server/ServerModule.h"
 #include "30_server/RequestException.h"
-#include "30_server/Server.h"
 #include "30_server/Request.h"
 #include "30_server/ServerThreadExec.h"
 
@@ -55,7 +55,7 @@ namespace synthese
 			Request* request = NULL;
 			try
 			{
-				request = Request::createFromString(((ServerModule*) Server::GetModule<ServerModule>())->getSites(), requestString);
+				request = Request::createFromString(ServerModule::getSites(), requestString);
 				request->run(tcpStream);
 			}
 			catch (RequestException e)

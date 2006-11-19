@@ -1,19 +1,19 @@
-#include "ServerConfigTableSync.h"
-
-#include "01_util/Conversion.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteSync.h"
-#include "02_db/SQLiteThreadExec.h"
-#include "04_time/DateTime.h"
-#include "15_env/Environment.h"
-
-
-
-#include "ServerConfig.h"
 
 #include <sqlite/sqlite3.h>
 
+#include "01_util/Conversion.h"
 
+#include "02_db/SQLiteResult.h"
+#include "02_db/SQLiteSync.h"
+#include "02_db/SQLiteThreadExec.h"
+
+#include "04_time/DateTime.h"
+
+#include "15_env/Environment.h"
+
+#include "30_server/ServerConfig.h"
+#include "30_server/ServerModule.h"
+#include "30_server/ServerConfigTableSync.h"
 
 using synthese::util::Conversion;
 using synthese::db::SQLiteResult;
@@ -29,9 +29,8 @@ namespace server
 
 
 
-ServerConfigTableSync::ServerConfigTableSync (ServerConfig& config)
+ServerConfigTableSync::ServerConfigTableSync ()
 : synthese::db::SQLiteTableSync (CONFIG_TABLE_NAME, true, true)
-  , _config (config)
 {
     addTableColumn (CONFIG_TABLE_COL_PARAMNAME, "TEXT", false);
     addTableColumn (CONFIG_TABLE_COL_PARAMVALUE, "TIMESTAMP", true);
@@ -60,27 +59,27 @@ ServerConfigTableSync::rowsAdded (const SQLiteThreadExec* sqlite,
 	
 	if (paramName == CONFIG_TABLE_COL_PARAMVALUE_PORT)
 	{
-	    _config.setPort (Conversion::ToInt (paramValue));
+		ServerModule::getConfig().setPort (Conversion::ToInt (paramValue));
 	} 
 	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_NBTHREADS)
 	{
-	    _config.setNbThreads (Conversion::ToInt (paramValue));
+	    ServerModule::getConfig().setNbThreads (Conversion::ToInt (paramValue));
 	}
 	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_DATADIR)
 	{
-	    _config.setDataDir (boost::filesystem::path (paramValue, boost::filesystem::native));
+	    ServerModule::getConfig().setDataDir (boost::filesystem::path (paramValue, boost::filesystem::native));
 	}
 	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_TEMPDIR)
 	{
-	    _config.setTempDir (boost::filesystem::path (paramValue, boost::filesystem::native));
+	    ServerModule::getConfig().setTempDir (boost::filesystem::path (paramValue, boost::filesystem::native));
 	}
 	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPDIR)
 	{
-	    _config.setHttpTempDir (boost::filesystem::path (paramValue, boost::filesystem::native));
+	    ServerModule::getConfig().setHttpTempDir (boost::filesystem::path (paramValue, boost::filesystem::native));
 	}
 	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPURL)
 	{
-	    _config.setHttpTempUrl (paramValue);
+	    ServerModule::getConfig().setHttpTempUrl (paramValue);
 	}
     }
 	

@@ -7,12 +7,6 @@
 
 #include "02_db/SQLiteTableSync.h"
 
-#include "11_interfaces/Interface.h"
-
-#include "15_env/Environment.h"
-
-#include "30_server/Site.h"
-
 namespace synthese
 {
 	namespace server
@@ -36,19 +30,11 @@ namespace synthese
 			static const std::string TABLE_COL_USE_OLD_DATA;
 			static const std::string TABLE_COL_CLIENT_URL;
 
-			Site::Registry& _sites;
-			const synthese::interfaces::Interface::Registry& _interfaces;
-			const synthese::env::Environment::Registry& _environments;
-
-
 		public:
 
 			/** Site SQLite table constructor.
 			*/
-			SiteTableSync(Site::Registry& sites
-				, const std::string& triggerOverrideClause
-				, const synthese::interfaces::Interface::Registry& interfaces
-				, const synthese::env::Environment::Registry& environments);
+			SiteTableSync();
 			~SiteTableSync ();
 
 		protected:

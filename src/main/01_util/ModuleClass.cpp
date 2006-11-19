@@ -5,10 +5,9 @@ namespace synthese
 {
 	namespace util
 	{
-
+		boost::filesystem::path ModuleClass::_databasePath;
 
 		ModuleClass::ModuleClass()
-			: _databasePath("")
 		{
 
 		}

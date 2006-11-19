@@ -1,8 +1,6 @@
 #ifndef SYNTHESE_SERVER_SERVERCONFIG_H
 #define SYNTHESE_SERVER_SERVERCONFIG_H
 
-#include "module.h"
-
 #include "01_util/Log.h"
 
 #include <boost/filesystem/path.hpp>

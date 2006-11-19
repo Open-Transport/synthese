@@ -11,5 +11,5 @@ synthese::util::Factory<synthese::carto::Renderer>::integrate<synthese::carto::J
 synthese::util::Factory<synthese::carto::Renderer>::integrate<synthese::carto::MapInfoRenderer>("mapinfo");
 synthese::util::Factory<synthese::carto::Renderer>::integrate<synthese::carto::PostscriptRenderer>("ps");
 
-synthese::util::Factory<Request>::integrate<synthese::carto::MapRequestHandler>("map");
+synthese::util::Factory<synthese::server::Request>::integrate<synthese::carto::MapRequestHandler>("map");
 

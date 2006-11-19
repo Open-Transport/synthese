@@ -18,14 +18,14 @@ namespace synthese
 		class ModuleClass : public util::Factorable
 		{
 		protected:
-			boost::filesystem::path _databasePath;
+			static boost::filesystem::path _databasePath;
 
 		public:
 			ModuleClass();
 
 			virtual void initialize() = 0;
 
-			void setDatabasePath(const boost::filesystem::path& databasePath);
+			static void setDatabasePath(const boost::filesystem::path& databasePath);
 		};
 	}
 }

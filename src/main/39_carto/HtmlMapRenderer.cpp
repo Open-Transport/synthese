@@ -12,7 +12,8 @@
 #include "15_env/Environment.h"
 #include "15_env/Line.h"
 #include "15_env/LineStop.h"
-#include "30_server/Server.h"
+
+#include "30_server/ServerModule.h"
 
 #include <cmath>
 #include <algorithm>
@@ -34,6 +35,7 @@ using synthese::env::Edge;
 
 namespace synthese
 {
+	using namespace server;
 
 namespace carto
 {
@@ -77,7 +79,7 @@ HtmlMapRenderer::render(const boost::filesystem::path& tempDir,
 	_urlPattern = map.getUrlPattern ();
 	
 	/// @todo Remove server dependancy here
-	_mapImgFilename = synthese::server::Server::GetInstance ()->getConfig ().getHttpTempUrl () + "/" + jpegFilename;
+	_mapImgFilename = ServerModule::getConfig ().getHttpTempUrl () + "/" + jpegFilename;
 	
     _output << "<html><body>";
     _output << "<map name='mapid'>" << std::endl;

@@ -1,7 +1,10 @@
 
-#include "SiteTableSync.h"
-#include "02_db/SQLiteResult.h"
 #include "01_util/Conversion.h"
+
+#include "02_db/SQLiteResult.h"
+
+#include "30_server/ServerModule.h"
+#include "30_server/SiteTableSync.h"
 
 namespace synthese
 {
@@ -23,14 +26,8 @@ namespace synthese
 		const std::string SiteTableSync::TABLE_COL_CLIENT_URL = "client_url";
 
 
-		SiteTableSync::SiteTableSync(Site::Registry& sites
-			, const std::string& triggerOverrideClause 
-			, const synthese::interfaces::Interface::Registry& interfaces
-			, const synthese::env::Environment::Registry& environments)
-			: db::SQLiteTableSync ( TABLE_NAME, true, true, triggerOverrideClause )
-			, _sites(sites)
-			, _environments(environments)
-			, _interfaces(interfaces)
+		SiteTableSync::SiteTableSync()
+			: db::SQLiteTableSync ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
@@ -54,11 +51,10 @@ namespace synthese
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
 				Site* site = new Site(Conversion::ToLongLong(rows.getColumn(i,TABLE_COL_ID)));
-				_sites.add(site);
-
 				
+				/// @todo put setters
 
-	
+				ServerModule::getSites().add(site);
 			}
 		}
 

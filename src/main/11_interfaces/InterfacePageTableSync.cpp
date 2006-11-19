@@ -4,6 +4,7 @@
 
 #include "02_db/SQLiteResult.h"
 
+#include "11_interfaces/InterfaceModule.h"
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/InterfacePageTableSync.h"
 
@@ -20,10 +21,8 @@ namespace synthese
 		const std::string InterfacePageTableSync::TABLE_COL_PAGE = "page_code";
 		const std::string InterfacePageTableSync::TABLE_COL_CONTENT = "content";
 
-		InterfacePageTableSync::InterfacePageTableSync(synthese::interfaces::Interface::Registry& interfaces
-			, const std::string& triggerOverrideClause )
-			: SQLiteTableSync ( TABLE_NAME, true, true, triggerOverrideClause )
-			, _interfaces(interfaces)
+		InterfacePageTableSync::InterfacePageTableSync()
+			: SQLiteTableSync ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_INTERFACE, "INTEGER", false);
@@ -37,7 +36,7 @@ namespace synthese
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
 				InterfacePage* page = 
-					_interfaces.get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE)))
+					InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE)))
 					->getPage(rows.getColumn(i, TABLE_COL_PAGE));
 				page->parse( rows.getColumn(i, TABLE_COL_CONTENT ) );
 			}
@@ -54,7 +53,7 @@ namespace synthese
 				// Search the specified interface
 				try
 				{
-					interf = _interfaces.get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE )));
+					interf = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE )));
 				}
 				catch (Interface::RegistryKeyException e)
 				{
@@ -83,7 +82,7 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				_interfaces.get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE)))->removePage( rows.getColumn(i, TABLE_COL_PAGE) );
+				InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE)))->removePage( rows.getColumn(i, TABLE_COL_PAGE) );
 			}
 		}
 	}

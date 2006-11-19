@@ -1,7 +1,11 @@
 
 #include "02_db/DBModule.h"
 
-const std::string TRIGGERS_ENABLED_CLAUSE (
-	"(SELECT " + CONFIG_TABLE_COL_PARAMVALUE
-	+ " FROM " + CONFIG_TABLE_NAME + " WHERE " + CONFIG_TABLE_COL_PARAMNAME
-	+ "=" + CONFIG_TABLE_COL_PARAMVALUE_TRIGGERSENABLED + ")");
+namespace synthese
+{
+	namespace db
+	{
+	
+	}
+}
+

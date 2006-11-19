@@ -55,12 +55,6 @@
 				RelativePath=".\Request.h">
 			</File>
 			<File
-				RelativePath=".\Server.cpp">
-			</File>
-			<File
-				RelativePath=".\Server.h">
-			</File>
-			<File
 				RelativePath=".\ServerConfig.cpp">
 			</File>
 			<File
@@ -124,13 +118,13 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\module.h">
-		</File>
-		<File
 			RelativePath=".\SConscript">
 		</File>
 		<File
 			RelativePath=".\ServerModule.cpp">
+		</File>
+		<File
+			RelativePath=".\ServerModule.gen.cpp">
 		</File>
 		<File
 			RelativePath=".\ServerModule.h">

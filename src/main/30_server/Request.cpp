@@ -8,10 +8,10 @@
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
+#include "30_server/ServerModule.h"
 #include "30_server/RequestException.h"
 #include "30_server/Session.h"
 #include "30_server/Request.h"
-#include "30_server/Server.h"
 #include "30_server/SessionException.h"
 
 using std::string;
@@ -138,8 +138,8 @@ namespace synthese
 			}
 			else
 			{
-				Server::SessionMap::iterator sit = Server::GetInstance()->getSessions().find(it->second);
-				if (sit == Server::GetInstance()->getSessions().end())
+				ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(it->second);
+				if (sit == ServerModule::getSessions().end())
 				{
 					request->_session = NULL;
 					request->_sessionBroken = true;
@@ -155,7 +155,7 @@ namespace synthese
 					catch (SessionException e)
 					{
 						delete sit->second;
-						Server::GetInstance()->getSessions().erase(sit);
+						ServerModule::getSessions().erase(sit);
 						request->_session = NULL;
 						request->_sessionBroken = true;
 					}

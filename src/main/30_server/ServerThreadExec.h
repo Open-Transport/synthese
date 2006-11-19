@@ -1,8 +1,6 @@
 #ifndef SYNTHESE_SERVER_SERVERTHREADEXEC_H
 #define SYNTHESE_SERVER_SERVERTHREADEXEC_H
 
-#include "module.h"
-
 #include "01_util/ThreadExec.h"
 
 

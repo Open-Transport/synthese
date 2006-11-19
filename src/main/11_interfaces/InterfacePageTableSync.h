@@ -25,14 +25,12 @@ namespace synthese
 			static const std::string TABLE_COL_INTERFACE;
 			static const std::string TABLE_COL_PAGE;
 			static const std::string TABLE_COL_CONTENT;
-			
-			synthese::interfaces::Interface::Registry& _interfaces;
 
 		public:
 
 			/** Interface page SQLite table constructor.
 			*/
-			InterfacePageTableSync(Interface::Registry& interfaces, const std::string& triggerOverrideClause );
+			InterfacePageTableSync();
 			~InterfacePageTableSync ();
 
 		protected:

@@ -13,11 +13,11 @@
 
 namespace synthese
 {
-	using namespace env;
+	using namespace interfaces;
 	using namespace util;
 	using std::string;
 
-	namespace interfaces
+	namespace env
 	{
 		const string& CityNameValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
 		{

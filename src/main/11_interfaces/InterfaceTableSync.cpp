@@ -1,7 +1,10 @@
 
-#include "InterfaceTableSync.h"
-#include "02_db/SQLiteResult.h"
 #include "01_util/Conversion.h"
+
+#include "02_db/SQLiteResult.h"
+
+#include "11_interfaces/InterfaceModule.h"
+#include "11_interfaces/InterfaceTableSync.h"
 
 namespace synthese
 {
@@ -13,10 +16,8 @@ namespace synthese
 		const std::string InterfaceTableSync::TABLE_NAME = "t024_interfaces";
 		const std::string InterfaceTableSync::TABLE_COL_ID = "id";
 
-		InterfaceTableSync::InterfaceTableSync(synthese::interfaces::Interface::Registry& interfaces
-			, const std::string& triggerOverrideClause )
-			: SQLiteTableSync ( TABLE_NAME, true, true, triggerOverrideClause )
-			, _interfaces(interfaces)
+		InterfaceTableSync::InterfaceTableSync()
+			: SQLiteTableSync ( TABLE_NAME, true, true, db::TRIGGERS_ENABLED_CLAUSE )
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 		}
@@ -32,7 +33,7 @@ namespace synthese
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
 				Interface* obj = new Interface(Conversion::ToLongLong(rows.getColumn(i,TABLE_COL_ID)));
-				_interfaces.add(obj);
+				InterfaceModule::getInterfaces().add(obj);
 			}
 		}
 

@@ -23,15 +23,12 @@ namespace synthese
 		private:
 			static const std::string TABLE_NAME;
 			static const std::string TABLE_COL_ID;
-			
-			synthese::interfaces::Interface::Registry& _interfaces;
 
 		public:
 
 			/** Interface page SQLite table constructor.
 			*/
-			InterfaceTableSync( synthese::interfaces::Interface::Registry& interfaces
-				, const std::string& triggerOverrideClause );
+			InterfaceTableSync();
 			~InterfaceTableSync ();
 
 		protected:

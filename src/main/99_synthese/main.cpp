@@ -1,34 +1,29 @@
-#include "30_server/Server.h"
 
-#include "01_util/Conversion.h"
-#include "01_util/Exception.h"
-#include "01_util/Log.h"
-#include "01_util/Factory.h"
 #include <string>
 #include <iostream>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
+#include "01_util/Conversion.h"
+#include "01_util/Exception.h"
+#include "01_util/Log.h"
+#include "01_util/Factory.h"
+
+#include "30_server/ServerModule.h"
 
 // included auto generated code
 #include "includes.cpp.inc"
 
-
-
-
 using synthese::util::Log;
 using synthese::util::Conversion;
-using synthese::server::Server;
-using synthese::util::Factory;
-
+using synthese::server::ServerModule;
 
 namespace po = boost::program_options;
 
 
 int main( int argc, char **argv )
 {
-
 	// included auto generated code
 	#include "generated.cpp.inc"
 
@@ -43,22 +38,19 @@ int main( int argc, char **argv )
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);    
     
-    if (vm.count("help")) {
-	std::cout << desc << std::endl;
-	return 1;
+    if (vm.count("help"))
+	{
+		std::cout << desc << std::endl;
+		return 1;
     }
 
     const boost::filesystem::path& workingDir = boost::filesystem::initial_path();
     Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
 
-    synthese::server::Server server (db);
-    synthese::server::Server::SetInstance (&server);
-
-
     try
     {
-		synthese::server::Server::GetInstance ()->initialize ();
-		synthese::server::Server::GetInstance ()->run ();
+		ServerModule::setDatabasePath(db);
+		ServerModule::startServer();
     }
     catch (synthese::util::Exception& ex)
     {

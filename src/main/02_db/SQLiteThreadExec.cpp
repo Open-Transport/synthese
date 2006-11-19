@@ -85,9 +85,9 @@ SQLiteThreadExec::registerUpdateHook (SQLiteUpdateHook* hook)
     _hooks.push_back (hook);
     if (_db != 0)
     {
-	// database handle has been initialized
-	// call the register callback directly
-	hook->registerCallback (this);
+		// database handle has been initialized
+		// call the register callback directly
+		hook->registerCallback (this);
     }
 }
 

@@ -1,8 +1,6 @@
 #ifndef SYNTHESE_SERVER_CLEANERTHREADEXEC_H
 #define SYNTHESE_SERVER_CLEANERTHREADEXEC_H
 
-#include "module.h"
-
 #include "01_util/ThreadExec.h"
 
 

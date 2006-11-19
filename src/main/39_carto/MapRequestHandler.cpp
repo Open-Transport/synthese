@@ -20,7 +20,7 @@
 #include "15_env/Environment.h"
 #include "16_env_ls_xml/EnvironmentLS.h"
 
-#include "30_server/Server.h"
+#include "30_server/ServerModule.h"
 #include "30_server/RequestException.h"
 
 #include "40_carto_ls_xml/MapLS.h"
@@ -127,8 +127,8 @@ namespace synthese
 
 			// Create a temporary file name based on system time
 			const boost::filesystem::path& tempDir = (_mode == REQUEST_MODE_SOCKET) 
-				? Server::GetInstance ()->getConfig ().getTempDir ()
-				: Server::GetInstance ()->getConfig ().getHttpTempDir ();
+				? ServerModule::getConfig ().getTempDir ()
+				: ServerModule::getConfig ().getHttpTempDir ();
 
 
 			RenderingConfig conf;
@@ -177,7 +177,7 @@ namespace synthese
 			}
 			else if (_mode == REQUEST_MODE_HTTP)
 			{
-				std::string resultURL = Server::GetInstance ()->getConfig ().getHttpTempUrl () + "/" + resultFilename;
+				std::string resultURL = ServerModule::getConfig ().getHttpTempUrl () + "/" + resultFilename;
 
 				// Send the URL to the the generated local JPEG file.
 				stream << resultURL << std::endl;

@@ -64,13 +64,10 @@ namespace synthese
 		class InterfaceModule : public util::ModuleClass
 		{
 		private:
-			Interface::Registry	_interfaces;
+			static Interface::Registry	_interfaces;
 
 		public:
-
-			const Interface::Registry& getInterfaces () const;
-			Interface::Registry& getInterfaces ();
-			
+			static Interface::Registry& getInterfaces ();
 
 			void initialize();
 		};
