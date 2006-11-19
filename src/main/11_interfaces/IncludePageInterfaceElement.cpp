@@ -6,10 +6,10 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		void IncludePageInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object, const Site* site ) const
+		void IncludePageInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object, const server::Request* request) const
 		{
 			const InterfacePage* page_to_include = Factory<InterfacePage>::create(_page_code);
-			page_to_include->display(stream, _parameters.fillParameters( parameters ), object, site );
+			page_to_include->display(stream, _parameters.fillParameters( parameters ), object, request);
 		}
 
 

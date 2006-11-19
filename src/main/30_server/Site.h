@@ -16,10 +16,13 @@ namespace synthese
 	{
 		class Environment;
 	}
-
 	namespace interfaces
 	{
 		class Interface;
+	}
+
+	namespace server
+	{
 
 		/** Access site.
 			@ingroup m11
@@ -38,8 +41,8 @@ namespace synthese
 
 			//! \name Parameters
 			//@{
-				synthese::env::Environment*	_env;  
-				const Interface*			_interface;
+				const synthese::env::Environment*	_env;  
+				const interfaces::Interface*			_interface;
 			//@}
 
 			//! \name Filters
@@ -71,7 +74,7 @@ namespace synthese
 //			const std::string& getClef() const;
 			const synthese::env::Environment* getEnvironment() const;
 //			const std::string& getIdentifiant() const;
-			const Interface* getInterface() const;
+			const interfaces::Interface* getInterface() const;
 //			const synthese::time::Date& getDateDebut() const;
 //			const synthese::time::Date& getDateFin() const;
 //			const std::string& getURLClient() const;

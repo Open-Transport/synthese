@@ -84,6 +84,7 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     // zone
 
  public:
+	 typedef std::vector<const City*> CityList;
 
     Environment (const uid& id);
     ~Environment ();
@@ -189,7 +190,7 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
 
     
-    std::vector<const City*> guessCity (const std::string& fuzzyName, int nbMatches = 10) const;
+    CityList guessCity (const std::string& fuzzyName, int nbMatches = 10) const;
     
     //@}
 

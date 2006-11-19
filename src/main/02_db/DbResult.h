@@ -1,7 +1,6 @@
 #ifndef SYNTHESE_DB_DBRESULT_H
 #define SYNTHESE_DB_DBRESULT_H
 
-#include "module.h"
 #include <string>
 
 

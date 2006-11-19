@@ -39,40 +39,72 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
+			Name="Core classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
 				RelativePath=".\CleanerThreadExec.cpp">
 			</File>
 			<File
-				RelativePath=".\Server.cpp">
-			</File>
-			<File
-				RelativePath=".\ServerConfig.cpp">
-			</File>
-			<File
-				RelativePath=".\ServerThreadExec.cpp">
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
 				RelativePath=".\CleanerThreadExec.h">
+			</File>
+			<File
+				RelativePath=".\Request.cpp">
+			</File>
+			<File
+				RelativePath=".\Request.h">
+			</File>
+			<File
+				RelativePath=".\Server.cpp">
 			</File>
 			<File
 				RelativePath=".\Server.h">
 			</File>
 			<File
+				RelativePath=".\ServerConfig.cpp">
+			</File>
+			<File
 				RelativePath=".\ServerConfig.h">
+			</File>
+			<File
+				RelativePath=".\ServerThreadExec.cpp">
 			</File>
 			<File
 				RelativePath=".\ServerThreadExec.h">
 			</File>
 			<File
+				RelativePath=".\Session.cpp">
+			</File>
+			<File
 				RelativePath=".\Session.h">
+			</File>
+			<File
+				RelativePath=".\Site.cpp">
+			</File>
+			<File
+				RelativePath=".\Site.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Exceptions"
+			Filter="">
+			<File
+				RelativePath=".\RequestException.cpp">
+			</File>
+			<File
+				RelativePath=".\RequestException.h">
+			</File>
+			<File
+				RelativePath=".\ServerModuleException.cpp">
+			</File>
+			<File
+				RelativePath=".\ServerModuleException.h">
+			</File>
+			<File
+				RelativePath=".\SessionException.cpp">
+			</File>
+			<File
+				RelativePath=".\SessionException.h">
 			</File>
 		</Filter>
 		<Filter
@@ -84,12 +116,24 @@
 			<File
 				RelativePath=".\ServerConfigTableSync.h">
 			</File>
+			<File
+				RelativePath=".\SiteTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\SiteTableSync.h">
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\module.h">
 		</File>
 		<File
 			RelativePath=".\SConscript">
+		</File>
+		<File
+			RelativePath=".\ServerModule.cpp">
+		</File>
+		<File
+			RelativePath=".\ServerModule.h">
 		</File>
 		<File
 			RelativePath=".\ServerModule.inc.cpp">

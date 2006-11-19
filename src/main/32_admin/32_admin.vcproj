@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="7.10"
+	Name="32_admin"
+	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
+	Keyword="MakeFileProj">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
+			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
+			ConfigurationType="0">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
+			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
+			ConfigurationType="0">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="Core classes"
+			Filter="">
+		</Filter>
+		<Filter
+			Name="Interface pages"
+			Filter="">
+			<File
+				RelativePath=".\AdminInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\AdminInterfacePage.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Admin compounds"
+			Filter="">
+			<File
+				RelativePath=".\HomeAdmin.cpp">
+			</File>
+			<File
+				RelativePath=".\HomeAdmin.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Requests"
+			Filter="">
+			<File
+				RelativePath=".\AdminRequest.cpp">
+			</File>
+			<File
+				RelativePath=".\AdminRequest.h">
+			</File>
+		</Filter>
+		<File
+			RelativePath=".\AdminModule.cpp">
+		</File>
+		<File
+			RelativePath=".\AdminModule.gen.cpp">
+		</File>
+		<File
+			RelativePath=".\AdminModule.h">
+		</File>
+		<File
+			RelativePath=".\AdminModule.inc.cpp">
+		</File>
+		<File
+			RelativePath=".\SConscript">
+		</File>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

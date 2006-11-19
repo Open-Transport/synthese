@@ -92,11 +92,6 @@ namespace synthese
 	    static const std::string CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPURL ("http_temp_url");
 	    static const std::string CONFIG_TABLE_COL_PARAMVALUE_TRIGGERSENABLED ("triggers_enabled");
 
-	    static const std::string TRIGGERS_ENABLED_CLAUSE (
-		"(SELECT " + CONFIG_TABLE_COL_PARAMVALUE
-		+ " FROM " + CONFIG_TABLE_NAME + " WHERE " + CONFIG_TABLE_COL_PARAMNAME
-		+ "=" + CONFIG_TABLE_COL_PARAMVALUE_TRIGGERSENABLED + ")");
-
 	}
 
 	/** @} */

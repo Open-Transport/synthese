@@ -10,6 +10,8 @@
 #include "01_util/Factorable.h"
 #include "01_util/UId.h"
 
+#include "02_db/DBModule.h"
+
 #define UPDATEABLE true;
 #define NON_UPDATEABLE false;
 

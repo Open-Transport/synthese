@@ -2,21 +2,22 @@
 #ifndef SYNTHESE_LineMarkerInterfacePage_H__
 #define SYNTHESE_LineMarkerInterfacePage_H__
 
-
 #include "11_interfaces/InterfacePage.h"
 
 namespace synthese
 {
+	namespace server
+	{
+		class Request;
+	}
 	namespace env
 	{
 		class Line;
-	}
-	namespace interfaces
-	{
+
 		/** Line marker.
 		@code line_marker @endcode
 		*/
-		class LineMarkerInterfacePage : public InterfacePage
+		class LineMarkerInterfacePage : public interfaces::InterfacePage
 		{
 		public:
 			/** Display of line of schedule sheet.
@@ -33,7 +34,7 @@ namespace synthese
 				, int pixelWidth
 				, int pixelHeight
 				, const synthese::env::Line* line
-				, const Site* site = NULL ) const;
+				, const server::Request* request = NULL ) const;
 
 
 		};

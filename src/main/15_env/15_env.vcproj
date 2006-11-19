@@ -325,12 +325,6 @@
 		<Filter
 			Name="LibraryInterfaceElement"
 			Filter="">
-			<File
-				RelativePath=".\CityListInterfaceElement.cpp">
-			</File>
-			<File
-				RelativePath=".\CityListInterfaceElement.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
@@ -407,7 +401,13 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\EnvModule.cpp">
+		</File>
+		<File
 			RelativePath=".\EnvModule.gen.cpp">
+		</File>
+		<File
+			RelativePath=".\EnvModule.h">
 		</File>
 		<File
 			RelativePath=".\EnvModule.inc.cpp">

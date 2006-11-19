@@ -497,10 +497,9 @@ Environment::fetchVertex (const uid& id)
 
 
 
-std::vector<const City*> 
-Environment::guessCity (const std::string& fuzzyName, int nbMatches) const
+Environment::CityList Environment::guessCity (const std::string& fuzzyName, int nbMatches) const
 {
-    std::vector<const City*> result;
+    CityList result;
     LexicalMatcher<uid>::MatchResult matches =  _citiesMatcher.bestMatches (fuzzyName, nbMatches);
     for (LexicalMatcher<uid>::MatchResult::iterator it = matches.begin ();
 	 it != matches.end (); ++it)

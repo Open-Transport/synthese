@@ -3,23 +3,26 @@
 #define SYNTHESE_AdminRequest_H__
 
 
-#include "Request.h"
+#include "30_server/Request.h"
 
 namespace synthese
 {
 	namespace interfaces
 	{
 		class AdminInterfaceElement;
+	}
 
-		class AdminRequest : public Request
+	namespace admin
+	{
+		class AdminRequest : public server::Request
 		{
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_OBJECT_ID;
 
 			//! \name Page parameters
 			//@{
-				const AdminInterfaceElement*	_page;
-				uid								_object_id;
+			const interfaces::AdminInterfaceElement*	_page;
+			uid											_object_id;
 			//@}
 
 

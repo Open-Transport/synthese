@@ -15,7 +15,7 @@ namespace synthese
 			int _rank;
 
 		public:
-			const std::string& getValue( const ParametersVector&, const void* object = NULL, const Site* site = NULL ) const;
+			const std::string& getValue( const ParametersVector&, const void* object = NULL, const server::Request* request = NULL ) const;
 			void parse( const std::string& text);
 		};
 	}

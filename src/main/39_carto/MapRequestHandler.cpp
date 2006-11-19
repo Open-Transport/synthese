@@ -1,6 +1,4 @@
 
-#include "MapRequestHandler.h"
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -15,30 +13,24 @@
 
 
 #include "01_util/XmlParser.h"
-
+#include "01_util/Log.h"
 #include "01_util/PlainCharFilter.h"
 #include "01_util/Conversion.h"
-
-#include "Renderer.h"
-
-#include "30_server/Server.h"
 
 #include "15_env/Environment.h"
 #include "16_env_ls_xml/EnvironmentLS.h"
 
+#include "30_server/Server.h"
+#include "30_server/RequestException.h"
+
+#include "40_carto_ls_xml/MapLS.h"
 #include "39_carto/Map.h"
 #include "39_carto/RenderingConfig.h"
-
+#include "39_carto/Renderer.h"
 #include "39_carto/PostscriptRenderer.h"
 #include "39_carto/HtmlMapRenderer.h"
 #include "39_carto/MapInfoRenderer.h"
-
-#include "40_carto_ls_xml/MapLS.h"
-
-#include "01_util/Log.h"
-
-#include "11_interfaces/RequestException.h"
-
+#include "39_carto/MapRequestHandler.h"
 
 
 using synthese::carto::Map;
@@ -52,13 +44,13 @@ using synthese::carto::Map;
 
 using synthese::util::Conversion;
 using synthese::util::Log;
-using synthese::server::Server;
 using namespace boost::posix_time;
 
 
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace server;
 
 	namespace carto
 	{

@@ -1,8 +1,6 @@
 #ifndef SYNTHESE_DB_SQLITERESULT_H
 #define SYNTHESE_DB_SQLITERESULT_H
 
-#include "module.h"
-
 #include "DbResult.h"
 
 #include <string>

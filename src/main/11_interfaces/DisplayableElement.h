@@ -5,11 +5,13 @@
 
 namespace synthese
 {
+	namespace server
+	{
+		class Request;
+	}
 	    
 	namespace interfaces
 	{
-
-		class Site;
 		typedef std::deque<std::string> ParametersVector;
 
 
@@ -29,7 +31,7 @@ namespace synthese
 				@param stream Stream to write the output in
 				@param parameters Parameters vector
 			*/
-			virtual void display(std::ostream& stream, const ParametersVector& parameters, const void* rootObject = NULL, const Site* site = NULL) const = 0;
+			virtual void display(std::ostream& stream, const ParametersVector& parameters, const void* rootObject = NULL, const server::Request* request = NULL) const = 0;
 		};
 	}
 }

@@ -7,14 +7,14 @@ namespace synthese
 	namespace interfaces
 	{
 
-		void InterfacePage::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const Site* site /*= NULL*/ ) const
+		void InterfacePage::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request) const
 		{
 			std::string label_to_go = "";
 			for (PageComponentsVector::const_iterator it = _components.begin(); it != _components.end(); ++it)
 			{
 				if (label_to_go == "" || it->first == label_to_go)
 				{
-					it->second->display(stream, parameters, object, site);
+					it->second->display(stream, parameters, object);
 					const LineLabelInterfaceElement* llie = dynamic_cast<const LineLabelInterfaceElement*>(it->second);
 					label_to_go = (llie == NULL) ? "" : llie->getLabel();
 				}

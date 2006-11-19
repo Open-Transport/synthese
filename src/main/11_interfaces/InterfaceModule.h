@@ -5,6 +5,8 @@
 
 #include "01_util/ModuleClass.h"
 
+#include "11_interfaces/Interface.h"
+
 namespace synthese
 {
 	namespace interfaces
@@ -61,7 +63,15 @@ namespace synthese
 
 		class InterfaceModule : public util::ModuleClass
 		{
+		private:
+			Interface::Registry	_interfaces;
+
 		public:
+
+			const Interface::Registry& getInterfaces () const;
+			Interface::Registry& getInterfaces ();
+			
+
 			void initialize();
 		};
 		/** @} */

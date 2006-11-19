@@ -13,8 +13,8 @@ namespace synthese
 		class ValueInterfaceElement : public LibraryInterfaceElement
 		{
 		public:
-			virtual const std::string& getValue( const ParametersVector&, const void* object = NULL, const Site* site = NULL ) const = 0;
-			void display( std::ostream&, const ParametersVector&, const void* object = NULL, const Site* site = NULL ) const;
+			virtual const std::string& getValue( const ParametersVector&, const void* object = NULL, const server::Request* request = NULL) const = 0;
+			void display( std::ostream&, const ParametersVector&, const void* object = NULL, const server::Request* request = NULL) const;
 		};
 	}
 }

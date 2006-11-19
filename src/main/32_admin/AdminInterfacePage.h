@@ -1,16 +1,20 @@
 
-#include "InterfacePage.h"
+#include "11_interfaces/InterfacePage.h"
+
+#include "30_server/Site.h"
 
 namespace synthese
 {
 	namespace interfaces
 	{
 		class AdminInterfaceElement;
-
+	}
+	namespace admin
+	{
 		/** Admin template page.
 		@code admin @endcode
 		*/
-		class AdminInterfacePage : public InterfacePage
+		class AdminInterfacePage : public interfaces::InterfacePage
 		{
 		public:
 			/** Display of the admin page.
@@ -20,9 +24,9 @@ namespace synthese
 			@param site Displayed site
 			*/
 			void display( std::ostream& stream
-				, const AdminInterfaceElement* page
+				, const interfaces::AdminInterfaceElement* page
 				, const uid objectId
-				, const Site* site = NULL ) const;
+				, const server::Request* request = NULL ) const;
 
 		};
 	}

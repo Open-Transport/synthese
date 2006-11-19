@@ -9,8 +9,9 @@ namespace synthese
 	using namespace std;
 	using namespace util;
 	using namespace env;
+	using namespace interfaces;
 
-	namespace interfaces
+	namespace server
 	{
 		Site::Site( const uid& id)
 			: Registrable<uid, Site>(id)

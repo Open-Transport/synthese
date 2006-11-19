@@ -73,7 +73,7 @@ namespace synthese
 				, const synthese::env::Alarm* alarm
 				, bool color
 				, const synthese::env::Path* line
-				, const Site* site = NULL ) const;
+				, const server::Request* request = NULL ) const;
 
 		};
 	}

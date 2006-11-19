@@ -1,14 +1,14 @@
 #ifndef SYNTHESE_DB_SQLITE_H
 #define SYNTHESE_DB_SQLITE_H
 
-#include "module.h"
+
 #include <string>
 
 #include <boost/filesystem/path.hpp>
 #include <sqlite/sqlite3.h>
 
 #include "02_db/SQLiteResult.h"
-
+#include "02_db/DBModule.h"
 
 namespace synthese
 {

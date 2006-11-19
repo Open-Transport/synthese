@@ -1,17 +1,22 @@
 
-#include "AdminRequest.h"
 #include "01_util/Conversion.h"
-#include "RequestException.h"
-#include "AdminInterfaceElement.h"
 #include "01_util/FactoryException.h"
-#include "AdminInterfacePage.h"
-#include "Interface.h"
+
+#include "11_interfaces/AdminInterfaceElement.h"
+#include "11_interfaces/Interface.h"
+
+#include "30_server/RequestException.h"
+
+#include "32_admin/AdminInterfacePage.h"
+#include "32_admin/AdminRequest.h"
 
 namespace synthese
 {
 	using namespace util;
+	using namespace server;
+	using namespace interfaces;
 
-	namespace interfaces
+	namespace admin
 	{
 		const std::string AdminRequest::PARAMETER_PAGE = "rub";
 		const std::string AdminRequest::PARAMETER_OBJECT_ID = "id";
@@ -58,7 +63,7 @@ namespace synthese
 			{
 				throw RequestException("Admin interface page not implemented in database");
 			}
-			aip->display(stream, _page, _object_id, _site);
+			aip->display(stream, _page, _object_id, this);
 		}
 
 		AdminRequest::~AdminRequest()

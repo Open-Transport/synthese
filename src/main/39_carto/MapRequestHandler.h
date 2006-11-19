@@ -1,13 +1,6 @@
 #ifndef SYNTHESE_CARTOSERVICE_MAPREQUESTHANDLER_H
 #define SYNTHESE_CARTOSERVICE_MAPREQUESTHANDLER_H
 
-
-
-
-#include "11_interfaces/Request.h"
-
-#include <boost/filesystem/path.hpp>
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -19,13 +12,15 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
+#include <boost/filesystem/path.hpp>
+
 #include "01_util/XmlParser.h"
+
+#include "30_server/Request.h"
 
 
 namespace synthese
 {
-
-
 	namespace env
 	{
 		class Environment;
@@ -68,7 +63,7 @@ namespace synthese
 			- html : JPEG + HTML map (only available in http mode)
 			- mapinfo : MID/MIF files returned in a zip
 		*/
-		class MapRequestHandler : public interfaces::Request
+		class MapRequestHandler : public server::Request
 		{
 		private:
 			int _mode;

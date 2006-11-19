@@ -5,10 +5,10 @@
 
 namespace synthese
 {
-	using namespace interfaces;
+	using namespace db;
 	using namespace util;
 
-	namespace db
+	namespace interfaces
 	{
 		const std::string InterfaceTableSync::TABLE_NAME = "t024_interfaces";
 		const std::string InterfaceTableSync::TABLE_COL_ID = "id";

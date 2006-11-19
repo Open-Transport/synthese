@@ -2,26 +2,27 @@
 #ifndef SYNTHESE_SiteTableSync_H__
 #define SYNTHESE_SiteTableSync_H__
 
-
-
-
-#include "02_db/SQLiteTableSync.h"
-#include "11_interfaces/Site.h"
-#include "11_interfaces/Interface.h"
-#include "15_env/Environment.h"
 #include <string>
 #include <iostream>
 
+#include "02_db/SQLiteTableSync.h"
+
+#include "11_interfaces/Interface.h"
+
+#include "15_env/Environment.h"
+
+#include "30_server/Site.h"
+
 namespace synthese
 {
-	namespace db
+	namespace server
 	{
 
 		/** InterfaceTableSync SQLite table synchronizer.
 		@ingroup m11
 		*/
 
-		class SiteTableSync : public SQLiteTableSync
+		class SiteTableSync : public db::SQLiteTableSync
 		{
 		private:
 			static const std::string TABLE_NAME;
@@ -35,7 +36,7 @@ namespace synthese
 			static const std::string TABLE_COL_USE_OLD_DATA;
 			static const std::string TABLE_COL_CLIENT_URL;
 
-			synthese::interfaces::Site::Registry& _sites;
+			Site::Registry& _sites;
 			const synthese::interfaces::Interface::Registry& _interfaces;
 			const synthese::env::Environment::Registry& _environments;
 
@@ -44,7 +45,7 @@ namespace synthese
 
 			/** Site SQLite table constructor.
 			*/
-			SiteTableSync( synthese::interfaces::Site::Registry& sites
+			SiteTableSync(Site::Registry& sites
 				, const std::string& triggerOverrideClause
 				, const synthese::interfaces::Interface::Registry& interfaces
 				, const synthese::env::Environment::Registry& environments);
@@ -52,17 +53,17 @@ namespace synthese
 
 		protected:
 
-			void rowsAdded (const SQLiteThreadExec* sqlite, 
-				SQLiteSync* sync,
-				const SQLiteResult& rows);
+			void rowsAdded (const db::SQLiteThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
-			void rowsUpdated (const SQLiteThreadExec* sqlite, 
-				SQLiteSync* sync,
-				const SQLiteResult& rows);
+			void rowsUpdated (const db::SQLiteThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
-			void rowsRemoved (const SQLiteThreadExec* sqlite, 
-				SQLiteSync* sync,
-				const SQLiteResult& rows);
+			void rowsRemoved (const db::SQLiteThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
 		};
 

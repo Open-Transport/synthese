@@ -30,7 +30,7 @@ namespace synthese
 				@param site Displayed site
 			*/
 			void display( std::ostream& stream, const std::string& text, bool alternateColor, const synthese::env::ConnectionPlace* place
-				, const Site* site = NULL ) const;
+				, const server::Session* server = NULL ) const;
 
 
 		};

@@ -40,43 +40,11 @@
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx;h"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
 				RelativePath=".\Conversion.cpp">
 			</File>
-			<File
-				RelativePath=".\Exception.cpp">
-			</File>
-			<File
-				RelativePath=".\Factorable.cpp">
-			</File>
-			<File
-				RelativePath=".\Log.cpp">
-			</File>
-			<File
-				RelativePath=".\RGBColor.cpp">
-			</File>
-			<File
-				RelativePath=".\Thread.cpp">
-			</File>
-			<File
-				RelativePath=".\ThreadExec.cpp">
-			</File>
-			<File
-				RelativePath=".\ThreadGroup.cpp">
-			</File>
-			<File
-				RelativePath=".\UId.cpp">
-			</File>
-			<File
-				RelativePath=".\XmlParser.cpp">
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath=".\Conversion.h">
 			</File>
@@ -84,7 +52,13 @@
 				RelativePath=".\DBLog.h">
 			</File>
 			<File
+				RelativePath=".\Exception.cpp">
+			</File>
+			<File
 				RelativePath=".\Exception.h">
+			</File>
+			<File
+				RelativePath=".\Factorable.cpp">
 			</File>
 			<File
 				RelativePath=".\Factorable.h">
@@ -96,10 +70,16 @@
 				RelativePath=".\HtmlFilter.h">
 			</File>
 			<File
+				RelativePath=".\Log.cpp">
+			</File>
+			<File
 				RelativePath=".\Log.h">
 			</File>
 			<File
 				RelativePath=".\LowerCaseFilter.h">
+			</File>
+			<File
+				RelativePath=".\ModuleClass.cpp">
 			</File>
 			<File
 				RelativePath=".\ModuleClass.h">
@@ -114,22 +94,40 @@
 				RelativePath=".\Registry.h">
 			</File>
 			<File
+				RelativePath=".\RGBColor.cpp">
+			</File>
+			<File
 				RelativePath=".\RGBColor.h">
 			</File>
 			<File
 				RelativePath=".\SqlFilter.h">
 			</File>
 			<File
+				RelativePath=".\Thread.cpp">
+			</File>
+			<File
 				RelativePath=".\Thread.h">
+			</File>
+			<File
+				RelativePath=".\ThreadExec.cpp">
 			</File>
 			<File
 				RelativePath=".\ThreadExec.h">
 			</File>
 			<File
+				RelativePath=".\ThreadGroup.cpp">
+			</File>
+			<File
 				RelativePath=".\ThreadGroup.h">
 			</File>
 			<File
+				RelativePath=".\UId.cpp">
+			</File>
+			<File
 				RelativePath=".\UId.h">
+			</File>
+			<File
+				RelativePath=".\XmlParser.cpp">
 			</File>
 			<File
 				RelativePath=".\XmlParser.h">

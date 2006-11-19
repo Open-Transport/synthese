@@ -2,21 +2,22 @@
 #ifndef SYNTHESE_InterfacePageTableSync_H__
 #define SYNTHESE_InterfacePageTableSync_H__
 
-#include "02_db/SQLiteTableSync.h"
-#include "11_interfaces/Interface.h"
 #include <string>
 #include <iostream>
 
+#include "02_db/SQLiteTableSync.h"
+
+#include "11_interfaces/Interface.h"
+
 namespace synthese
 {
-	namespace db
+	namespace interfaces
 	{
 
 		/** InterfacePageTableSync SQLite table synchronizer.
 			@ingroup m11
 		*/
-
-		class InterfacePageTableSync : public SQLiteTableSync
+		class InterfacePageTableSync : public db::SQLiteTableSync
 		{
 		private:
 			static const std::string TABLE_NAME;
@@ -31,23 +32,22 @@ namespace synthese
 
 			/** Interface page SQLite table constructor.
 			*/
-			InterfacePageTableSync( synthese::interfaces::Interface::Registry& interfaces
-				, const std::string& triggerOverrideClause );
+			InterfacePageTableSync(Interface::Registry& interfaces, const std::string& triggerOverrideClause );
 			~InterfacePageTableSync ();
 
 		protected:
 
-			void rowsAdded (const SQLiteThreadExec* sqlite, 
-				SQLiteSync* sync,
-				const SQLiteResult& rows);
+			void rowsAdded (const db::SQLiteThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
-			void rowsUpdated (const SQLiteThreadExec* sqlite, 
-				SQLiteSync* sync,
-				const SQLiteResult& rows);
+			void rowsUpdated (const db::SQLiteThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
-			void rowsRemoved (const SQLiteThreadExec* sqlite, 
-				SQLiteSync* sync,
-				const SQLiteResult& rows);
+			void rowsRemoved (const db::SQLiteThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
 		};
 

@@ -8,12 +8,8 @@
 #include <string>
 #include <map>
 
-#include "ServerConfig.h"
-
-#include "15_env/Environment.h"
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/Site.h"
-
+#include "30_server/ServerConfig.h"
+#include "30_server/ServerModuleException.h"
 
 #include <boost/filesystem/path.hpp>
 
@@ -27,19 +23,24 @@ namespace synthese
 
 	namespace server
 	{
+		class Session;
 
 		/** Main server class.
+			@ingroup m30
 
-		This class holds :
-		- the TCP server 
-		- request queue (thread-safe access)
-		- the threading mechanism 
-		- the request dispatcher instance
+			This class holds :
+				- the TCP server 
+				- request queue (thread-safe access)
+				- the threading mechanism 
+				- the request dispatcher instance
 
-		@ingroup m70
 		*/
 		class Server
 		{
+		public:
+			typedef std::map<std::string, Session*> SessionMap;
+			typedef std::map<std::string, util::ModuleClass*> ModuleMap;
+
 		private:
 
 			static Server* _instance;
@@ -47,44 +48,41 @@ namespace synthese
 			boost::filesystem::path _dbFile;
 			ServerConfig _config;
 
-			synthese::env::Environment::Registry		_environments;
-			synthese::interfaces::Interface::Registry	_interfaces;
-			synthese::interfaces::Site::Registry		_sites;
-
-			std::map<std::string, synthese::util::ModuleClass*> _modules;
-
-		protected:
-
+			ModuleMap _modules;
+			SessionMap _sessionMap;
 
 		public:
 
 			Server (const boost::filesystem::path& dbFile);
-
 			~Server ();
 
 
 			//! @name Getters/Setters
 			//@{
 
-			synthese::env::Environment::Registry& getEnvironments ();
-			const synthese::env::Environment::Registry& getEnvironments () const;
-		    
-			synthese::interfaces::Interface::Registry& getInterfaces ();
-			const synthese::interfaces::Interface::Registry& getInterfaces () const;
+		    	const ServerConfig& getConfig () const;
+				SessionMap& getSessions();
 
-			synthese::interfaces::Site::Registry& getSites();
-			const synthese::interfaces::Site::Registry& getSites() const;
-
-			const ServerConfig& getConfig () const;
-
-			static Server* GetInstance ();
-			static void SetInstance (Server* instance);
 		    
 			//@}
 
 
 			//! @name Query methods
 			//@{
+				static Server* Server::GetInstance ();
+				static void Server::SetInstance (Server* instance);
+
+				template <class T>
+					static util::ModuleClass* GetModule()
+				{
+					std::string key = util::Factory<util::ModuleClass>::getKey<T>();
+					ModuleMap::iterator it = GetInstance()->_modules.find(key);
+					if (it != GetInstance()->_modules.end())
+						throw ServerModuleException("Module not found");
+					return it->second;
+				}
+
+
 			//@}
 
 

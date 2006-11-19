@@ -7,12 +7,12 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		void IfThenElseInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const Site* site /*= NULL*/ ) const
+		void IfThenElseInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			std::string result = _criteria->getValue( parameters );
 			return ( result.size() == 0 || result == "0" )
-				? _to_do_if_false->display( stream, parameters, object, site )
-				: _to_do_if_true->display( stream, parameters, object, site );
+				? _to_do_if_false->display( stream, parameters, object, request)
+				: _to_do_if_true->display( stream, parameters, object, request);
 		}
 
 		void IfThenElseInterfaceElement::parse( const std::string& text )

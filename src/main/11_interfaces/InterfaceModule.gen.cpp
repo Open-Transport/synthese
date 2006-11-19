@@ -1,10 +1,6 @@
 
 synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::interfaces::InterfaceModule>("11_interfaces");
 
-synthese::util::Factory<InterfacePage>::integrate<AdminInterfacePage>("admin");
-
-synthese::util::Factory<Request>::integrate<AdminRequest>("admin");
-
 synthese::util::Factory<ValueInterfaceElement>::integrate<StaticValueInterfaceElement>("text");
 synthese::util::Factory<ValueInterfaceElement>::integrate<ParameterValueInterfaceElement>("param");
 
@@ -14,7 +10,5 @@ synthese::util::Factory<LibraryInterfaceElement>::integrate<LineLabelInterfaceEl
 synthese::util::Factory<LibraryInterfaceElement>::integrate<IncludePageInterfaceElement>("include");
 synthese::util::Factory<LibraryInterfaceElement>::integrate<IfThenElseInterfaceElement>("if");
 synthese::util::Factory<LibraryInterfaceElement>::integrate<GotoInterfaceElement>("goto");
-
-synthese::util::Factory<AdminInterfaceElement>::integrate<HomeAdmin>("home");
 
 //synthese::util::Factory<SQLiteTableSync>::integrate<InterfaceTableSync>("16.01");

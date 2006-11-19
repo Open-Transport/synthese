@@ -91,7 +91,10 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\module.h">
+			RelativePath=".\DBModule.cpp">
+		</File>
+		<File
+			RelativePath=".\DBModule.h">
 		</File>
 		<File
 			RelativePath=".\SConscript">

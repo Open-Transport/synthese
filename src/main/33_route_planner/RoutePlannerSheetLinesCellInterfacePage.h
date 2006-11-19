@@ -23,7 +23,7 @@ namespace synthese
 				@param journey () The journey to describe
 				@param site Displayed site
 			*/
-			void display( std::ostream& stream, size_t columnNumber, const synthese::routeplanner::Journey* object, const Site* site = NULL ) const;
+			void display( std::ostream& stream, size_t columnNumber, const synthese::routeplanner::Journey* object, const server::Request* request= NULL ) const;
 		};
 	}
 }

@@ -5,7 +5,7 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		void LineLabelInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const Site* site /*= NULL*/ ) const
+		void LineLabelInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 		}
 

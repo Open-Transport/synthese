@@ -10,7 +10,7 @@
 
 namespace synthese
 {
-namespace interfaces
+namespace server
 {
 
 

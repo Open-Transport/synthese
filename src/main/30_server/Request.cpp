@@ -1,13 +1,18 @@
 
-#include "Request.h"
-#include "01_util/FactoryException.h"
-#include "01_util/Conversion.h"
-#include "RequestException.h"
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <string>
 
+#include "01_util/FactoryException.h"
+#include "01_util/Conversion.h"
+#include "01_util/Log.h"
+
+#include "30_server/RequestException.h"
+#include "30_server/Session.h"
+#include "30_server/Request.h"
+#include "30_server/Server.h"
+#include "30_server/SessionException.h"
 
 using std::string;
 
@@ -15,7 +20,7 @@ namespace synthese
 {
 	using namespace util;
 
-	namespace interfaces
+	namespace server
 	{
 
 		const std::string Request::PARAMETER_SEPARATOR ("&");
@@ -23,6 +28,8 @@ namespace synthese
 		const int Request::MAX_REQUEST_SIZE (4096);
 		const std::string Request::PARAMETER_FUNCTION = "fonction";
 		const std::string Request::PARAMETER_SITE = "site";
+		const std::string Request::PARAMETER_SESSION = "sid";
+		const std::string Request::PARAMETER_IP = "ipaddr";
 
 		std::string Request::truncateStringIfNeeded (const std::string& requestString)
 		{
@@ -84,8 +91,8 @@ namespace synthese
 			if (!Factory<Request>::contains(it->second))
 				throw RequestException("Function not found");
 
-			Request* request;
 			// Request instantiation
+			Request* request;
 			try
 			{
 				request = Factory<Request>::create(it->second);
@@ -108,10 +115,52 @@ namespace synthese
 			{
 				throw RequestException("Site not found");
 			}
-
 			// Site validity control
 			if (!request->_site->dateControl())
 				throw RequestException("Site is deactivated");
+			map.erase(it);
+
+			// IP
+			it = map.find(PARAMETER_IP);
+			if (it == map.end())
+			{
+				util::Log::GetInstance().warn("Query without IP : a bad client is attempting to connect, or there was an attack.");
+				throw RequestException("Client IP not found in parameters.");
+			}
+			request->_ip = it->second;
+
+			// Session
+			it = map.find(PARAMETER_SESSION);
+			if (it == map.end())
+			{
+				request->_session = NULL;
+				request->_sessionBroken = false;
+			}
+			else
+			{
+				Server::SessionMap::iterator sit = Server::GetInstance()->getSessions().find(it->second);
+				if (sit == Server::GetInstance()->getSessions().end())
+				{
+					request->_session = NULL;
+					request->_sessionBroken = true;
+				}
+				else
+				{
+					try
+					{
+						sit->second->controlAndRefresh(request->_ip);
+						request->_session = sit->second;
+						request->_sessionBroken = false;
+					}
+					catch (SessionException e)
+					{
+						delete sit->second;
+						Server::GetInstance()->getSessions().erase(sit);
+						request->_session = NULL;
+						request->_sessionBroken = true;
+					}
+				}
+			}
 			map.erase(it);
 
 			request->setFromParametersMap(map);

@@ -5,7 +5,7 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		const std::string& StaticValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const Site* site ) const
+		const std::string& StaticValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
 		{
 			return _value;
 		}

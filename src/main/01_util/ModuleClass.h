@@ -2,6 +2,7 @@
 #ifndef SYNTHESE_ModuleClass_H__
 #define SYNTHESE_ModuleClass_H__
 
+#include <boost/filesystem/path.hpp>
 
 #include "01_util/Factorable.h"
 
@@ -16,8 +17,15 @@ namespace synthese
 		*/
 		class ModuleClass : public util::Factorable
 		{
+		protected:
+			boost::filesystem::path _databasePath;
+
 		public:
+			ModuleClass();
+
 			virtual void initialize() = 0;
+
+			void setDatabasePath(const boost::filesystem::path& databasePath);
 		};
 	}
 }

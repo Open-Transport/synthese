@@ -21,11 +21,11 @@ namespace synthese
 				@param firstTime (4) Start of continuous service, Time else
 				@param lastTime (5) End of continuous service, Time else
 				@param isItContinuousService (6) Is the cell on a continuous service ?
-				@param site Displayed site
+				@param session 
 			*/
 			void display( std::ostream& stream, bool isItFirstLine, bool isItLastLine, size_t columnNumber, bool isItFootLine
 				, const synthese::time::Hour& firstTime, const synthese::time::Hour& lastTime
-				, bool isItContinuousService, const Site* site = NULL ) const;
+				, bool isItContinuousService, const server::Request* request = NULL ) const;
 		};
 	}
 }

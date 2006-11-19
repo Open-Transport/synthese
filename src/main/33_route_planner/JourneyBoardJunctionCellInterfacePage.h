@@ -27,7 +27,7 @@ namespace synthese
 				, const synthese::env::ConnectionPlace* place
 				, const synthese::env::Alarm* alarm
 				, bool color
-				, const Site* site = NULL ) const;
+				, const server::Request* request = NULL ) const;
 
 		};
 	}

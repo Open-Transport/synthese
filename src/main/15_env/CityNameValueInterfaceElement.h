@@ -16,7 +16,7 @@ namespace synthese
 			ValueInterfaceElement* _uid;
 
 		public:
-			const std::string& getValue(const ParametersVector& parameters, const void* object = NULL, const Site* site = NULL) const;
+			const std::string& getValue(const ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
 
 			/** Parser.
 				@param text Optional parameter :

@@ -54,7 +54,7 @@ namespace synthese
 				@param parameters Parameters vector
 				@return Name of the next line to display (empty = next line)
 			*/
-			void display(std::ostream& stream, const ParametersVector& parameters, const void* object = NULL, const Site* site = NULL) const;
+			void display(std::ostream& stream, const ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
 		};
 	}
 }

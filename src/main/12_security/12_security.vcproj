@@ -93,9 +93,6 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\module.h">
-		</File>
-		<File
 			RelativePath=".\SConscript">
 		</File>
 		<File

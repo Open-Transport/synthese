@@ -9,7 +9,7 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const string& ParameterValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const Site* site ) const
+		const string& ParameterValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
 		{
 			return parameters[_rank] ;
 		}

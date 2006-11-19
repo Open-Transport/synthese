@@ -1,21 +1,24 @@
 
-#include "CityListInterfaceElement.h"
-#include "15_env/Environment.h"
-#include "15_env/City.h"
-#include "01_util/Conversion.h"
-#include "11_interfaces/Site.h"
 #include <string>
 #include <vector>
+
+#include "01_util/Conversion.h"
+
+#include "15_env/Environment.h"
+#include "15_env/City.h"
+
+#include "36_places_list/CityListInterfaceElement.h"
 
 namespace synthese
 {
 	using namespace env;
 	using namespace util;
 	using namespace std;
+	using namespace interfaces;
 
-	namespace interfaces
+	namespace placeslist
 	{
-		void CityListInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const Site* site /*= NULL*/ ) const
+		void CityListInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request) const
 		{
 			// Parameters
 			ParametersVector pv = _parameters.fillParameters(parameters);
@@ -26,9 +29,7 @@ namespace synthese
 			string inputText = pv.front();
 			string emptyLineText = pv.front();
 
-			const env::Environment* __Environnement = site->getEnvironment();
-			
-			vector<const City*> tbCommunes = __Environnement->guessCity(inputText, n );
+			const Environment::CityList tbCommunes = *((const Environment::CityList*) object);
 
 
 			if ( tbCommunes[ 1 ] == NULL )

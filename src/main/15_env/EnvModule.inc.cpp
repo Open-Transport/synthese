@@ -6,6 +6,5 @@
 
 #include "15_env/LogicalStopNameValueInterfaceElement.h"
 #include "15_env/CityNameValueInterfaceElement.h"
-#include "15_env/CityListInterfaceElement.h"
 
 using namespace synthese::env;

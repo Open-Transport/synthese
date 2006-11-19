@@ -17,7 +17,7 @@ namespace synthese
 			*/
 
 			void display(std::ostream& stream
-				, const Site* site = NULL) const;
+				, const server::Request* request = NULL) const;
 		};
 	}
 }

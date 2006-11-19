@@ -10,11 +10,12 @@
 
 namespace synthese
 {
-	namespace interfaces
+	namespace server
 	{
 		using util::Factory;
 
 		class Site;
+		class Session;
 
 		/** Parsed request.
 		*/
@@ -25,13 +26,17 @@ namespace synthese
 			static const std::string PARAMETER_ASSIGNMENT;
 			static const std::string PARAMETER_FUNCTION;
 			static const std::string PARAMETER_SITE;
+			static const std::string PARAMETER_SESSION;
+			static const std::string PARAMETER_IP;
 			static const int MAX_REQUEST_SIZE;
 
 		protected:
 			typedef std::map<std::string, std::string> ParametersMap;
 
 			const Site* _site;
-			// const Session* _session;
+			const Session* _session;
+			bool _sessionBroken;
+			std::string _ip;
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -59,6 +64,9 @@ namespace synthese
 			/** Query string getter for building links.
 			*/
 			std::string getQueryString() const;
+
+			const Site* getSite() const;
+			const Session* getSession() const;
 		};
 	}
 }

@@ -2,8 +2,6 @@
 #define SYNTHESE_UTIL_SQLITETHREADEXEC_H
 
 
-#include "module.h"
-
 #include "01_util/ThreadExec.h"
 
 #include "SQLiteUpdateHook.h"

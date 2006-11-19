@@ -2,23 +2,23 @@
 #ifndef SYNTHESE_InterfaceTableSync_H__
 #define SYNTHESE_InterfaceTableSync_H__
 
-
-
-#include "02_db/SQLiteTableSync.h"
-#include "11_interfaces/Interface.h"
 #include <string>
 #include <iostream>
 
+#include "02_db/SQLiteTableSync.h"
+
+#include "11_interfaces/Interface.h"
+
 namespace synthese
 {
-	namespace db
+	namespace interfaces
 	{
 
 		/** InterfaceTableSync SQLite table synchronizer.
 		@ingroup m11
 		*/
 
-		class InterfaceTableSync : public SQLiteTableSync
+		class InterfaceTableSync : public db::SQLiteTableSync
 		{
 		private:
 			static const std::string TABLE_NAME;
@@ -36,17 +36,17 @@ namespace synthese
 
 		protected:
 
-			void rowsAdded (const SQLiteThreadExec* sqlite, 
-				SQLiteSync* sync,
-				const SQLiteResult& rows);
+			void rowsAdded (const db::SQLiteThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
-			void rowsUpdated (const SQLiteThreadExec* sqlite, 
-				SQLiteSync* sync,
-				const SQLiteResult& rows);
+			void rowsUpdated (const db::SQLiteThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
-			void rowsRemoved (const SQLiteThreadExec* sqlite, 
-				SQLiteSync* sync,
-				const SQLiteResult& rows);
+			void rowsRemoved (const db::SQLiteThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
 		};
 

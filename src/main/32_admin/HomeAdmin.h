@@ -6,7 +6,7 @@
 
 namespace synthese
 {
-	namespace interfaces
+	namespace admin
 	{
 
 		/** Page d'accueil de la console d'administration.
@@ -26,14 +26,14 @@ namespace synthese
 
 			Une page d'administration est imprimable grace à une feuille de style dédiée à l'impression : seule la zone de contenus est alors imprimée. Si une page d'administration contient des formulaires, les boutons ne sont pas imprimés.
 		*/
-		class HomeAdmin : public AdminInterfaceElement
+		class HomeAdmin : public interfaces::AdminInterfaceElement
 		{
 		protected:
 			static const std::string _superior;
 			static const bool _ever_displayed;
 
 		public:
-			void display(std::ostream& stream, const ParametersVector& parameters, const void* object = NULL, const Site* site = NULL) const;
+			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
 		};
 	}
 }

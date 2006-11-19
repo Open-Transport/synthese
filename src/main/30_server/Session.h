@@ -13,14 +13,28 @@ namespace synthese
 	{
 		class Session
 		{
+		private:
 			const std::string _key;
 			const std::string _ip;
 			synthese::security::User* _user;
 			synthese::time::DateTime _lastUse;
 
+			static const size_t KEY_LENGTH;
+			static const int MAX_MINUTES_DURATION;
+			static std::string generateKey();
+
 		public:
 			Session(const std::string& ip);
-			bool dateControl() const;
+			
+			/** Refresh the last use date after several controls.
+
+				The controls are :
+					- expiration of the session
+					- ip must not have change
+
+				If a control fails, then a SessionException is thrown
+			*/
+			void controlAndRefresh(const std::string& ip);
 		};
 	}
 }

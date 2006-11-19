@@ -1,16 +1,18 @@
 
-#include "InterfacePageTableSync.h"
-#include "11_interfaces/InterfacePage.h"
-#include "02_db/SQLiteResult.h"
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
+#include "02_db/SQLiteResult.h"
+
+#include "11_interfaces/InterfacePage.h"
+#include "11_interfaces/InterfacePageTableSync.h"
+
 namespace synthese
 {
-	using namespace interfaces;
+	using namespace db;
 	using namespace util;
 
-	namespace db
+	namespace interfaces
 	{
 		const std::string InterfacePageTableSync::TABLE_NAME = "t023_interface_pages";
 		const std::string InterfacePageTableSync::TABLE_COL_ID = "id";

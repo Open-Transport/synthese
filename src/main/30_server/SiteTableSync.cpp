@@ -7,8 +7,9 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
+	using namespace db;
 
-	namespace db
+	namespace server
 	{
 		const std::string SiteTableSync::TABLE_NAME = "t025_sites";
 		const std::string SiteTableSync::TABLE_COL_ID = "id";
@@ -22,11 +23,11 @@ namespace synthese
 		const std::string SiteTableSync::TABLE_COL_CLIENT_URL = "client_url";
 
 
-		SiteTableSync::SiteTableSync(synthese::interfaces::Site::Registry& sites
+		SiteTableSync::SiteTableSync(Site::Registry& sites
 			, const std::string& triggerOverrideClause 
 			, const synthese::interfaces::Interface::Registry& interfaces
 			, const synthese::env::Environment::Registry& environments)
-			: SQLiteTableSync ( TABLE_NAME, true, true, triggerOverrideClause )
+			: db::SQLiteTableSync ( TABLE_NAME, true, true, triggerOverrideClause )
 			, _sites(sites)
 			, _environments(environments)
 			, _interfaces(interfaces)

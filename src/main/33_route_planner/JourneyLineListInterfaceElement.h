@@ -24,7 +24,7 @@ namespace synthese
 				@param object (Journey*) Journey to display
 				@param site Site to display
 			*/
-			void display(std::ostream& stream, const ParametersVector& parameters, const void* object = NULL, const Site* site = NULL) const;
+			void display(std::ostream& stream, const ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
 
 			/** Parser.
 			@param text Text to parse : standard list of parameters :
