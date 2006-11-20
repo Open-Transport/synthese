@@ -43,10 +43,19 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath=".\Profile.cpp">
+			</File>
+			<File
 				RelativePath=".\Profile.h">
 			</File>
 			<File
+				RelativePath=".\Right.cpp">
+			</File>
+			<File
 				RelativePath=".\Right.h">
+			</File>
+			<File
+				RelativePath=".\User.cpp">
 			</File>
 			<File
 				RelativePath=".\User.h">
@@ -90,6 +99,22 @@
 			Filter="">
 			<File
 				RelativePath=".\SecurityRight.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="LS SQL"
+			Filter="">
+			<File
+				RelativePath=".\ProfileTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\ProfileTableSync.h">
+			</File>
+			<File
+				RelativePath=".\UserTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\UserTableSync.h">
 			</File>
 		</Filter>
 		<File

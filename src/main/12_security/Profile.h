@@ -3,6 +3,10 @@
 #define SYNTHESE_SECURITY_PROFILE_H
 
 #include <vector>
+#include <string>
+
+#include "01_util/Registrable.h"
+#include "01_util/Uid.h"
 
 namespace synthese
 {
@@ -11,7 +15,7 @@ namespace synthese
 		class Right;
 
 		/** Profil utilisateur.
-			@ingroup m05
+			@ingroup m12
 		
 			Un profil utilisateur est un "modèle" de droits utilisateurs consistant en une liste d'@ref synthese::security::Right "habilitations" prédéfinies.
 
@@ -27,24 +31,32 @@ namespace synthese
 				- Administrateur : tous les droits
 
 		*/
-		class Profile
+		class Profile : public util::Registrable<uid,Profile>
 		{
 		public:
-			typedef vector<Right*> RightsVector;
+			typedef std::vector<Right*> RightsVector;
 
 		private:
-			const std::string		_name;
-			const RightsVector	_rights;
-			const Profile*		_parent;
+			std::string		_name;
+			RightsVector	_rights;
+			Profile*		_parent;
 
 		public:
 			/** Comparison operator between profiles.
 				@param profile Profile to compare with
 				@return true if the compared profile permits at least one thing that the current profile can not do.
 			*/
-			int operator<=(const cProfile& profile) const;
+			int operator<=(const Profile& profile) const;
 
-			Profile(std::string name, const RightsVector& right, const Profile* parent=NULL);
+			Profile(uid id);
+			~Profile();
+
+			void setName(const std::string& name);
+			void setRights(const RightsVector& rightsvector);
+			void cleanRights();
+			void setParent(Profile* parent);
 		};
 	}
 }
+
+#endif

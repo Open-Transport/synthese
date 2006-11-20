@@ -3,13 +3,15 @@
 #define SYNTHESE_SECURITY_RIGHT_TEMPLATE_H
 
 #include <string>
+#include <map>
+#include <set>
 
 namespace synthese
 {
 	namespace security
 	{
 		/** Habilitation (abstraite).
-			@ingroup m05
+			@ingroup m12
 
 			Une habilitation est un droit d'effectuer une ou plusieurs opération(s) sur un périmètre donné.
 
@@ -38,7 +40,7 @@ namespace synthese
 				Key : heading of areas (eg: lines, stops...)
 				Value : set of allowed strings representing an area
 			*/
-			typedef map<std::string, set<std::string>> AvailableValidityAreasMap;
+			typedef std::map<std::string, std::set<std::string> > AvailableValidityAreasMap;
 
 			/** Niveaux d'habilitation. */
 			typedef enum {
@@ -61,11 +63,10 @@ namespace synthese
 			//static AvailableValidityAreasMap getAvailableValidityAreas() const = 0;
 			//static bool validateParameter(std::string parameter) const = 0;
 
-			Right(std::string parameter, Level level)
-				: _parameter(parameter), _level(level)
-			{}
+			Right(std::string parameter, Level privateLevel, Level publicLevel);
 			
-			Level getLevel() const { return _level }
 		};
 	}
 }
+
+#endif
