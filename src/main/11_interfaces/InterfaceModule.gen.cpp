@@ -1,10 +1,10 @@
 
 synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::interfaces::InterfaceModule>("11_interfaces");
 
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::StaticValueInterfaceElement>("text");
+synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::StaticValueInterfaceElement>("print");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::ParameterValueInterfaceElement>("param");
 
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::StaticValueInterfaceElement>("text");
+synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::StaticValueInterfaceElement>("print");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::ParameterValueInterfaceElement>("param");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::LineLabelInterfaceElement>("label");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::IncludePageInterfaceElement>("include");

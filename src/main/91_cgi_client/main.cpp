@@ -153,7 +153,8 @@ namespace synthese
     cout << "Content-type: text/html; charset=ISO-8859-1\n\n";
     while(socket.read(buffer, MAX_QUERY_SIZE, 10))
 		cout << buffer;
-    /** ATTENTION
+
+	/** ATTENTION
 	ici danger de fermer avant la fin
 	si read=0 alors que calcul en cours ?
 	-> ajouter une séquence de terminaison !

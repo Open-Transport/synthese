@@ -19,7 +19,7 @@ namespace synthese
 			{
 				if (label_to_go == "" || it->first == label_to_go)
 				{
-					it->second->display(stream, parameters, object);
+					it->second->display(stream, parameters, object, request);
 					const LineLabelInterfaceElement* llie = dynamic_cast<const LineLabelInterfaceElement*>(it->second);
 					label_to_go = (llie == NULL) ? "" : llie->getLabel();
 				}

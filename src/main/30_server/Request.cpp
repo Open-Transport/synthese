@@ -128,6 +128,7 @@ namespace synthese
 				throw RequestException("Client IP not found in parameters.");
 			}
 			request->_ip = it->second;
+			map.erase(it);
 
 			// Session
 			it = map.find(PARAMETER_SESSION);
@@ -160,7 +161,6 @@ namespace synthese
 						request->_sessionBroken = true;
 					}
 				}
-				map.erase(it);
 			}
 
 			request->setFromParametersMap(map);
