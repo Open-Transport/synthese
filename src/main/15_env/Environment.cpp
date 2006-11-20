@@ -6,6 +6,7 @@ using synthese::lexmatcher::LexicalMatcher;
 
 namespace synthese
 {
+	using namespace time;
 namespace env
 {
 
@@ -87,6 +88,29 @@ Environment::getAxes () const
 }
 
 
+
+Date Environment::interpretDate( const std::string& text ) const
+{
+	Date tempDate;
+	if ( !text.size () )
+		tempDate.updateDate( TIME_CURRENT );
+
+	else if ( text.size () == 1 )
+		switch ( text[ 0 ] )
+	{
+		case TEMPS_MIN_CIRCULATIONS:
+			tempDate = getMinDateInUse ();
+			break;
+		case TEMPS_MAX_CIRCULATIONS:
+			tempDate = getMaxDateInUse ();
+			break;
+		default:
+			tempDate.updateDate(text[ 0 ] );
+	}
+	else
+		tempDate.FromString(text);
+	return tempDate;
+}
 
 
 

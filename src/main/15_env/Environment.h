@@ -36,6 +36,8 @@
 #include <string>
 #include <iostream>
 
+#define TEMPS_MIN_CIRCULATIONS 'r'
+#define TEMPS_MAX_CIRCULATIONS 'R'
 
 
 namespace synthese
@@ -188,6 +190,24 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     const Vertex* fetchVertex (const uid& id) const;
     Vertex* fetchVertex (const uid& id);
 
+
+	/** Interprets date from text and environment data.
+		@param text Text to interpret
+		@return Interpreted date
+		@author Hugues Romain
+		@date 2005-2006
+		@warning The parameters are not verified
+
+		The returned date depends on the text :
+			- date au format texte interne : date transcrite (no control) (ex : 20070201 => 1/2/2007)
+			- commande de date classique (synthese::time::TIME_MIN ('m'), synthese::time::TIME_MAX ('M'), synthese::time::TIME_CURRENT ('A'), synthese::time::TIME_UNKNOWN ('?')) : la date correspondante (voir synthese::time::Date::setDate())
+			- texte vide : identical to synthese::time::TIME_CURRENT
+			- synthese::time::TIME_MIN_CIRCULATIONS ('r') : First date where at least one service runs (see Environment::getMinDateInUse())
+			- TEMPS_MAX_CIRCULATIONS ('R') : Last date where at least one service runs (see Environment::getMaxDateInUse())
+
+		The following assertion is always assumed : \f$ TEMPS_{INCONNU}<=TEMPS_{MIN}<=TEMPS_{MIN ENVIRONNEMENT}<=TEMPS_{MIN CIRCULATIONS}<=TEMPS_{ACTUEL}<=TEMPS_{MAX CIRCULATIONS}<=TEMPS_{MAX ENVIRONNEMENT}<=TEMPS_{MAX} \f$.
+	*/	
+	time::Date interpretDate( const std::string& text ) const;
 
     
     CityList guessCity (const std::string& fuzzyName, int nbMatches = 10) const;

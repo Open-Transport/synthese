@@ -1,6 +1,5 @@
 
 #include "Site.h"
-#include "15_env/Environment.h"
 #include "04_time/DateTime.h"
 
 namespace synthese
@@ -32,29 +31,6 @@ namespace synthese
 		bool Site::onlineBookingAllowed() const
 		{
 			return _onlineBookingAllowed;
-		}
-
-		Date Site::dateInterpretee( const string& text ) const
-		{
-			Date tempDate;
-			if ( !text.size () )
-				tempDate.updateDate( TIME_CURRENT );
-
-			else if ( text.size () == 1 )
-				switch ( text[ 0 ] )
-			{
-				case TEMPS_MIN_CIRCULATIONS:
-					tempDate = _env->getMinDateInUse ();
-					break;
-				case TEMPS_MAX_CIRCULATIONS:
-					tempDate = _env->getMaxDateInUse ();
-					break;
-				default:
-					tempDate.updateDate(text[ 0 ] );
-			}
-			else
-				tempDate.FromString(text);
-			return tempDate;
 		}
 
 		bool Site::dateControl() const

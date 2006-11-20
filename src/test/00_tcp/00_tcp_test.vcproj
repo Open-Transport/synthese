@@ -4,7 +4,7 @@
 	Version="7.10"
 	Name="00_tcp_test"
 	ProjectGUID="{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}"
-	RootNamespace="00_tcp_test"
+	RootNamespace="00_tcp"
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
