@@ -4,7 +4,6 @@
 #include "Socket.h"
 
 
-
 namespace synthese
 {
 namespace tcp
@@ -100,12 +99,18 @@ TcpService::closeService (int portNumber)
 TcpServerSocket&
 TcpService::acceptConnection () throw (SocketException)
 {
-    boost::mutex::scoped_lock lock (_serviceMutex);
-
     try 
     {
 	int socketId = _socket->acceptConnection ();
+
+	// Note : the lock must be done here; otherwise another take the lock, waits
+        // for client connection and no other client connection will ever be closed!
+        // This is valid because the acceptConnection method does not modify Socket object.
+
+	boost::mutex::scoped_lock lock (_serviceMutex);
+
 	TcpServerSocket* serverSocket = new TcpServerSocket (*this, socketId);
+
 	_activeConnections.insert (std::make_pair (socketId, serverSocket));
 	return *serverSocket;
     }
@@ -137,8 +142,11 @@ TcpService::closeConnection (TcpServerSocket& socket) throw (SocketException)
 
     std::map<int, TcpServerSocket*>::iterator iter = 
 	_activeConnections.find (socketId);
-    
-    if (iter == _activeConnections.end ()) return;
+
+    if (iter == _activeConnections.end ()) 
+    {
+	return;
+    }
 
     try 
     {
