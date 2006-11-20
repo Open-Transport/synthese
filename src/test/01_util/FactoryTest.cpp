@@ -1,6 +1,7 @@
 #include "FactoryTest.h"
 
 #include "FactoryTestBase.h"
+#include "01_util/FactoryException.h"
 
 #include <iostream>
 
@@ -30,8 +31,18 @@ namespace synthese
 
 			FactoryTestBase* object1 = Factory<FactoryTestBase>::create("Child1");
 			FactoryTestBase* object2 = Factory<FactoryTestBase>::create("Child2");
+
 			// The child3 registration is "forgotten"
-			FactoryTestBase* notfound = Factory<FactoryTestBase>::create("Child3");
+			FactoryTestBase* notfound = NULL;
+			try
+			{
+				notfound = Factory<FactoryTestBase>::create("Child3");
+				CPPUNIT_ASSERT(0);
+			}
+			catch (FactoryException<FactoryTestBase> e)
+			{
+				CPPUNIT_ASSERT(1);
+			}
 
 			CPPUNIT_ASSERT (object1 != NULL);
 			CPPUNIT_ASSERT_EQUAL (object1->getIndex(), 1);

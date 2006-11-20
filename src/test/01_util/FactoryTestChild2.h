@@ -12,7 +12,6 @@ namespace synthese
 
 		class FactoryTestChild2 : public FactoryTestBase
 		{
-			static const std::string _factory_key;
 
 		public:
 			int getIndex() const { return 2; }

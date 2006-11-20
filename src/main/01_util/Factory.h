@@ -5,7 +5,8 @@
 #include <map>
 #include <string>
 #include <iostream>
-#include "FactoryException.h"
+#include "01_util/FactoryException.h"
+#include "01_util/Log.h"
 
 namespace synthese
 {

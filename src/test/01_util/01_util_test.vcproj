@@ -50,12 +50,6 @@
 				RelativePath=".\FactoryTest.cpp">
 			</File>
 			<File
-				RelativePath=".\FactoryTestChild1.cpp">
-			</File>
-			<File
-				RelativePath=".\FactoryTestChild2.cpp">
-			</File>
-			<File
 				RelativePath=".\HtmlFilterTest.cpp">
 			</File>
 			<File
@@ -66,9 +60,6 @@
 			</File>
 			<File
 				RelativePath=".\LowerCaseFilterTest.cpp">
-			</File>
-			<File
-				RelativePath=".\main.cpp">
 			</File>
 			<File
 				RelativePath=".\PlainCharFilterTest.cpp">
@@ -106,9 +97,6 @@
 				RelativePath=".\FactoryTestChild2.h">
 			</File>
 			<File
-				RelativePath=".\FactoryTestChild3.h">
-			</File>
-			<File
 				RelativePath=".\HtmlFilterTest.h">
 			</File>
 			<File
@@ -136,6 +124,9 @@
 				RelativePath=".\UIdTest.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\main.cpp">
+		</File>
 		<File
 			RelativePath=".\SConscript">
 		</File>

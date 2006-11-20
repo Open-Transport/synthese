@@ -2,6 +2,7 @@
 #define SYNTHESE_UTIL_FactoryTestBase_h__
 
 #include "01_util/Factory.h"
+#include "01_util/Factorable.h"
 
 namespace synthese
 {

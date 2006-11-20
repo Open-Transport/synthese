@@ -17,6 +17,8 @@
 #include "UIdTest.h"
 #include "FactoryTest.h"
 
+#include "FactoryTestChild1.h"
+#include "FactoryTestChild2.h"
 
 
 CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::HtmlFilterTest);
@@ -34,6 +36,9 @@ CPPUNIT_TEST_SUITE_REGISTRATION(synthese::util::FactoryTest);
 
 int main( int argc, char **argv )
 {
+
+	synthese::util::Factory<synthese::util::FactoryTestBase>::integrate<synthese::util::FactoryTestChild1>("Child1");
+	synthese::util::Factory<synthese::util::FactoryTestBase>::integrate<synthese::util::FactoryTestChild2>("Child2");
 
   // Create the event manager and test controller
   CPPUNIT_NS::TestResult controller;
