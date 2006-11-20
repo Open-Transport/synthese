@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "01_util/Uid.h"
+#include "01_util/UId.h"
 
 namespace synthese
 {

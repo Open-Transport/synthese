@@ -24,12 +24,11 @@ excludes = []
 files = moduleenv.Glob(includes, excludes)
 
 
-# Generic libs
-moduleenv.AddModuleDependency ('00_tcp')
-moduleenv.AddModuleDependency ('01_util')
-moduleenv.AddModuleDependency ('02_db')
-moduleenv.AddModuleDependency ('04_time')
-moduleenv.AddModuleDependency ('07_lex_matcher')
+# Services libs
+moduleenv.AddModuleDependency ('30_server')
+moduleenv.AddModuleDependency ('32_admin')
+moduleenv.AddModuleDependency ('39_carto')
+moduleenv.AddModuleDependency ('40_carto_ls_xml')
 
 # Classes libs
 moduleenv.AddModuleDependency ('11_interfaces')
@@ -37,11 +36,13 @@ moduleenv.AddModuleDependency ('12_security')
 moduleenv.AddModuleDependency ('15_env')
 moduleenv.AddModuleDependency ('16_env_ls_xml')
 
-# Services libs
-moduleenv.AddModuleDependency ('30_server')
-moduleenv.AddModuleDependency ('32_admin')
-moduleenv.AddModuleDependency ('39_carto')
-moduleenv.AddModuleDependency ('40_carto_ls_xml')
+# Generic libs
+moduleenv.AddModuleDependency ('00_tcp')
+moduleenv.AddModuleDependency ('01_util')
+moduleenv.AddModuleDependency ('02_db')
+moduleenv.AddModuleDependency ('04_time')
+moduleenv.AddModuleDependency ('07_lex_matcher')
+
 
 moduleenv.AddBoostDependency ('boost_filesystem')
 moduleenv.AddBoostDependency ('boost_date_time')
