@@ -1,6 +1,6 @@
 
-#ifndef SYNTHESE_LogoutAction_H__
-#define SYNTHESE_LogoutAction_H__
+#ifndef SYNTHESE_LoginAction_H__
+#define SYNTHESE_LoginAction_H__
 
 #include "30_server/Action.h"
 
@@ -8,8 +8,16 @@ namespace synthese
 {
 	namespace server
 	{
-		class LogoutAction : public server::Action
+		class LoginAction : public server::Action
 		{
+		public:
+			static const std::string PARAMETER_LOGIN;
+			static const std::string PARAMETER_PASSWORD;
+
+		private:
+			std::string _login;
+			std::string _password;
+
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -29,4 +37,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_LogoutAction_H__
+#endif // SYNTHESE_LoginAction_H__

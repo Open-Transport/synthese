@@ -1,11 +1,16 @@
 
+#include <sstream>
+
 #include "01_util/Conversion.h"
 
 #include "02_db/SQLiteResult.h"
+#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteException.h"
 
 #include "12_security/SecurityModule.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/User.h"
+#include "12_security/UserTableSyncException.h"
 
 
 namespace synthese
@@ -49,28 +54,74 @@ namespace synthese
 
 		void UserTableSync::rowsRemoved( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
+			/// @todo implementation
 		}
 
-		User* UserTableSync::getUser( const db::SQLiteResult& rows )
+
+		User* UserTableSync::getUser( const db::SQLiteThreadExec* sqlite, uid id )
 		{
-			User* user = new User(Conversion::ToLongLong(rows.getColumn(1, TABLE_COL_ID)));
-			loadUser(rows, user);
-			return user;
+			std::stringstream query;
+			query
+				<< "SELECT * "
+				<< "FROM " << TABLE_NAME
+				<< "WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(id);
+			try
+			{
+				db::SQLiteResult rows = sqlite->execQuery(query.str());
+				if (rows.getNbRows() <= 0)
+					throw UserTableSyncException("User "+ Conversion::ToString(id) + " not found in database.");
+				User* user = new User;
+				loadUser(user, rows);
+				return user;
+			}
+			catch (SQLiteException e)
+			{
+				throw UserTableSyncException(e.getMessage());
+			}
 		}
 
-		void UserTableSync::loadUser( const db::SQLiteResult& rows, User* user )
+		User* UserTableSync::getUser( const db::SQLiteThreadExec* sqlite, const std::string& login )
 		{
-			user->setPassword(rows.getColumn(1, TABLE_COL_PASSWORD));
-			user->setName(rows.getColumn(1, TABLE_COL_NAME));
-			user->setSurname(rows.getColumn(1, TABLE_COL_SURNAME));
-			user->setLogin(rows.getColumn(1, TABLE_COL_LOGIN));
-			user->setProfile(SecurityModule::getProfiles().get(Conversion::ToLongLong(rows.getColumn(1, TABLE_COL_PROFILE_ID))));
+			std::stringstream query;
+			query
+				<< "SELECT * "
+				<< "FROM " << TABLE_NAME
+				<< "WHERE " << TABLE_COL_LOGIN << "=" << login;
+			try
+			{
+				db::SQLiteResult rows = sqlite->execQuery(query.str());
+				if (rows.getNbRows() <= 0)
+					throw UserTableSyncException("User "+ login + " not found in database.");
+				User* user = new User;
+				loadUser(user, rows);
+				return user;
+			}
+			catch (SQLiteException e)
+			{
+				throw UserTableSyncException(e.getMessage());
+			}
 		}
 
-		db::SQLiteResult UserTableSync::fetchUser( uid )
+		void UserTableSync::loadUser(User* user, const db::SQLiteResult& rows, int rowId)
 		{
-			db::SQLiteResult row;
-			return row;
+			user->setId(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			user->setPassword(rows.getColumn(rowId, TABLE_COL_PASSWORD));
+			user->setName(rows.getColumn(rowId, TABLE_COL_NAME));
+			user->setSurname(rows.getColumn(rowId, TABLE_COL_SURNAME));
+			user->setLogin(rows.getColumn(rowId, TABLE_COL_LOGIN));
+			user->setProfile(SecurityModule::getProfiles().get(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_PROFILE_ID))));
+		}
+
+		void UserTableSync::saveUser( const db::SQLiteThreadExec* sqlite, User* user )
+		{
+			if (user->getId() != 0)
+			{
+				// UPDATE
+			}
+			else
+			{
+				// INSERT
+			}
 		}
 	}
 }

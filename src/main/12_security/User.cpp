@@ -1,5 +1,6 @@
 
-#include "User.h"
+#include "12_security/User.h"
+#include "12_security/UserException.h"
 
 namespace synthese
 {
@@ -7,8 +8,8 @@ namespace synthese
 	{
 
 
-		User::User( uid id )
-			: _id(id)
+		User::User()
+			: _id(0)
 		{
 
 		}
@@ -36,6 +37,47 @@ namespace synthese
 		void User::setSurname( const std::string& surname )
 		{
 			_surname = surname;
+		}
+
+		void User::setId( uid id )
+		{
+			_id = id;
+		}
+
+		const Profile* User::getProfile() const
+		{
+			return _profile;
+		}
+
+		const std::string& User::getLogin() const
+		{
+			return _login;
+		}
+
+		const std::string& User::getPassword() const
+		{
+			return _password;
+		}
+
+		const std::string& User::getName() const
+		{
+			return _name;
+		}
+
+		const std::string& User::getSurname() const
+		{
+			return _surname;
+		}
+
+		uid User::getId() const
+		{
+			return _id;
+		}
+
+		void User::verifyPassword( const std::string& password ) const
+		{
+			if (_password != password)
+				throw UserException("Bad password");
 		}
 	}
 }

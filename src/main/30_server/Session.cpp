@@ -11,6 +11,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace time;
+	using namespace security;
 
 	namespace server
 	{
@@ -21,8 +22,8 @@ namespace synthese
 			: _ip(ip)
 			, _key(generateKey())
 		{
-
 		}
+
 		void Session::controlAndRefresh(const std::string& ip)
 		{
 			if (ip != _ip)
@@ -50,6 +51,11 @@ namespace synthese
 			ServerModule::SessionMap::iterator it = ServerModule::getSessions().find(_key);
 			if (it != ServerModule::getSessions().end())
 				ServerModule::getSessions().erase(it);
+		}
+
+		void Session::setUser( User* user )
+		{
+			_user = user;
 		}
 	}
 }

@@ -137,6 +137,12 @@
 			Name="Actions"
 			Filter="">
 			<File
+				RelativePath=".\LoginAction.cpp">
+			</File>
+			<File
+				RelativePath=".\LoginAction.h">
+			</File>
+			<File
 				RelativePath=".\LogoutAction.cpp">
 			</File>
 			<File

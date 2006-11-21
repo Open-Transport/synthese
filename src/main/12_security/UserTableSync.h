@@ -29,19 +29,21 @@ namespace synthese
 			static const std::string TABLE_COL_PASSWORD;
 			static const std::string TABLE_COL_PROFILE_ID;
 
+			static void loadUser(User* user, const db::SQLiteResult& rows, int rowId=0);
+
 		public:
 
 			UserTableSync();
 			~UserTableSync ();
 
-			static db::SQLiteResult fetchUser(uid);
-			static User* getUser(const db::SQLiteResult& rows);
-			static void loadUser(const db::SQLiteResult& rows, User* user);
+			static User* getUser(const db::SQLiteThreadExec* sqlite, uid id);
+			static User* getUser(const db::SQLiteThreadExec* sqlite, const std::string& login);
+			static void saveUser(const db::SQLiteThreadExec* sqlite, User* user);
 
 		protected:
 
 			/** Action to do on user creation.
-				No action because the users are not listed in ram.
+				No action because the users are not permanently loaded in ram.
 			*/
 			void rowsAdded (const db::SQLiteThreadExec* sqlite, 
 				db::SQLiteSync* sync,
@@ -54,6 +56,9 @@ namespace synthese
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 
+			/** Action to do on user deletion.
+				Closes the sessions of the deleted user.
+			*/
 			void rowsRemoved (const db::SQLiteThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);

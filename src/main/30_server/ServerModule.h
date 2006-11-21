@@ -15,6 +15,11 @@
 */
 namespace synthese
 {
+	namespace db
+	{
+		class SQLiteThreadExec;
+	}
+
 	namespace server
 	{
 		class Session;
@@ -30,6 +35,7 @@ namespace synthese
 			static Site::Registry			_sites;
 			static ServerConfig				_config;
 			static SessionMap				_sessionMap;
+			static db::SQLiteThreadExec*	_sqliteThreadExec;
 
 		public:
 			/** Standard module initializer, launched as the ones from others modules at the server opening.
@@ -39,6 +45,7 @@ namespace synthese
 			static Site::Registry& getSites();
 			static ServerConfig& getConfig();
 			static SessionMap& getSessions();
+			static db::SQLiteThreadExec* getSQLiteThread();
 
 			static void startServer();
 		};

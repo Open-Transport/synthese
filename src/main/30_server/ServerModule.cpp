@@ -33,6 +33,7 @@ namespace synthese
 		Site::Registry				ServerModule::_sites;
 		ServerConfig				ServerModule::_config;
 		ServerModule::SessionMap	ServerModule::_sessionMap;
+		db::SQLiteThreadExec*		ServerModule::_sqliteThreadExec=NULL;
 
 		void ServerModule::initialize()
 		{
@@ -48,11 +49,11 @@ namespace synthese
 		{
 			// Initialize permanent ram loaded data
 			Log::GetInstance().info("Loading live data...");
-			SQLiteThreadExec* sqliteExec = new SQLiteThreadExec (_databasePath);
-			Thread sqliteThread (sqliteExec, "sqlite");
+			_sqliteThreadExec = new SQLiteThreadExec (_databasePath);
+			Thread sqliteThread (_sqliteThreadExec, "sqlite");
 			sqliteThread.start ();
 			SQLiteSync* syncHook = new SQLiteSync (TABLE_COL_ID);
-			sqliteExec->registerUpdateHook (syncHook);
+			_sqliteThreadExec->registerUpdateHook (syncHook);
 			sqliteThread.waitForReadyState ();
 
 
@@ -147,6 +148,11 @@ namespace synthese
 		ServerModule::SessionMap& ServerModule::getSessions()
 		{
 			return _sessionMap;
+		}
+
+		SQLiteThreadExec* ServerModule::getSQLiteThread()
+		{
+			return _sqliteThreadExec;
 		}
 	}
 }

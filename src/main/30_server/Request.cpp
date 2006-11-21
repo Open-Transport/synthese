@@ -262,5 +262,15 @@ namespace synthese
 		{
 			return _clientURL;
 		}
+
+		const std::string& Request::getIP() const
+		{
+			return _ip;
+		}
+
+		void Request::setSession( Session* session )
+		{
+			_session = session;
+		}
 	}
 }

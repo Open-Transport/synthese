@@ -33,7 +33,7 @@ namespace synthese
 
 			/** Action to run, defined by each subclass.
 			*/
-			virtual void run() const = 0;
+			virtual void run() = 0;
 
 			/** Action creation from a request.
 			*/

@@ -39,6 +39,8 @@ namespace synthese
 				If a control fails, then a SessionException is thrown
 			*/
 			void controlAndRefresh(const std::string& ip);
+
+			void setUser(security::User* user);
 		};
 	}
 }

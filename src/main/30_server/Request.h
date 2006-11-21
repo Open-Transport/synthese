@@ -57,34 +57,54 @@ namespace synthese
 			static std::string truncateStringIfNeeded (const std::string& requestString);
 
 		public:
-			virtual ~Request();
+			//! \name Constructors and destructors
+			//@{
+				virtual ~Request();
+			//@}
 
-			/** Instantiates a request from a text string, using the factory to choose the right subclass.
-			@param text Text to parse.
-			*/
-			static Request* createFromString(const Site::Registry& siteRegistry, const std::string& text);
+			//! \name Getters
+			//@{
+				const Site* getSite() const;
+				const Session* getSession() const;
+				const std::string& getClientURL() const;
+				const std::string& getIP() const;
+			//@}
 
-			/** Function to display, defined by each subclass.
-			*/
-			virtual void run(std::ostream& stream) const = 0;
+			//! \name Setters
+			//@{
+				void setAction(Action* action);
+				void setSession(Session* session);
+			//@}
 
-			void runActionAndFunction(std::ostream& stream);
+			//! \name Modifiers
+			//@{
+				void deleteSession();
+				void copy(const Request* request);
+			//@}
 
-			/** Query string getter for building links.
-			*/
-			std::string getQueryString() const;
+			//! \name Services
+			//@{
+				/** Query string getter for building links.
+				*/
+				std::string getQueryString() const;
 
-			const Site* getSite() const;
-			const Session* getSession() const;
-			void deleteSession();
+				/** Function to display, defined by each subclass.
+				*/
+				virtual void run(std::ostream& stream) const = 0;
 
-			void copy(const Request* request);
+				void runActionAndFunction(std::ostream& stream);
 
-			const std::string& getClientURL() const;
+				std::string getHTMLLink(const std::string& content) const;
+			//@}
 
-			void setAction(Action* action);
+			//! \name Static services
+			//@{
+				/** Instantiates a request from a text string, using the factory to choose the right subclass.
+				@param text Text to parse.
+				*/
+				static Request* createFromString(const Site::Registry& siteRegistry, const std::string& text);
+			//@}
 
-			std::string getHTMLLink(const std::string& content) const;
 		};
 	}
 }

@@ -27,7 +27,7 @@ namespace synthese
 		class User
 		{
 		private:
-			const uid		_id;
+			uid				_id;
 			const Profile*	_profile;
 			std::string		_login;
 			std::string		_password;
@@ -35,16 +35,33 @@ namespace synthese
 			std::string		_surname;
 			
 		public:
-			User(uid id);
+			User();
 			void setProfile(const Profile* profile);
 			void setLogin(const std::string& login);
 			
 			/** Password setter.
-				@todo handle encription
+				@todo handle encryption
 			*/
 			void setPassword(const std::string& password);
 			void setName(const std::string& name);
 			void setSurname(const std::string& surname);
+			void setId(uid id);
+
+			const Profile* getProfile() const;
+			const std::string& getLogin() const;
+
+			/** Password getter.
+				@todo handle encryption (create a getEncryptedPassword instead)
+			*/
+			const std::string& getPassword() const;
+			const std::string& getName() const;
+			const std::string& getSurname() const;
+			uid getId() const;
+
+			//! \name Services
+			//@{
+				void verifyPassword(const std::string& password) const;
+			//@}
 		};
 	}
 }

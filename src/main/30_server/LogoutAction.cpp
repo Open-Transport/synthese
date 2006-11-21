@@ -16,7 +16,7 @@ namespace synthese
 
 		}
 
-		void LogoutAction::run() const
+		void LogoutAction::run()
 		{
 			_request->deleteSession();
 		}

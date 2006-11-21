@@ -134,6 +134,22 @@
 			Name="Requests"
 			Filter="">
 		</Filter>
+		<Filter
+			Name="Exceptions"
+			Filter="">
+			<File
+				RelativePath=".\UserException.cpp">
+			</File>
+			<File
+				RelativePath=".\UserException.h">
+			</File>
+			<File
+				RelativePath=".\UserTableSyncException.cpp">
+			</File>
+			<File
+				RelativePath=".\UserTableSyncException.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\SConscript">
 		</File>
