@@ -16,6 +16,7 @@ namespace synthese
 
 		class Site;
 		class Session;
+		class Action;
 
 		/** Parsed request.
 		*/
@@ -23,20 +24,24 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_SEPARATOR;
+			static const std::string PARAMETER_STARTER;
 			static const std::string PARAMETER_ASSIGNMENT;
 			static const std::string PARAMETER_FUNCTION;
 			static const std::string PARAMETER_SITE;
 			static const std::string PARAMETER_SESSION;
 			static const std::string PARAMETER_IP;
+			static const std::string PARAMETER_CLIENT_URL;
 			static const int MAX_REQUEST_SIZE;
-
-		protected:
 			typedef std::map<std::string, std::string> ParametersMap;
 
-			const Site* _site;
-			const Session* _session;
-			bool _sessionBroken;
-			std::string _ip;
+		protected:
+
+			const Site*		_site;
+			const Session*	_session;
+			bool			_sessionBroken;
+			std::string		_ip;
+			Action*			_action;
+			std::string		_clientURL;
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -52,14 +57,18 @@ namespace synthese
 			static std::string truncateStringIfNeeded (const std::string& requestString);
 
 		public:
+			virtual ~Request();
+
 			/** Instantiates a request from a text string, using the factory to choose the right subclass.
 			@param text Text to parse.
 			*/
 			static Request* createFromString(const Site::Registry& siteRegistry, const std::string& text);
 
-			/** Action to run, defined by each subclass.
+			/** Function to display, defined by each subclass.
 			*/
 			virtual void run(std::ostream& stream) const = 0;
+
+			void runActionAndFunction(std::ostream& stream);
 
 			/** Query string getter for building links.
 			*/
@@ -67,6 +76,15 @@ namespace synthese
 
 			const Site* getSite() const;
 			const Session* getSession() const;
+			void deleteSession();
+
+			void copy(const Request* request);
+
+			const std::string& getClientURL() const;
+
+			void setAction(Action* action);
+
+			std::string getHTMLLink(const std::string& content) const;
 		};
 	}
 }

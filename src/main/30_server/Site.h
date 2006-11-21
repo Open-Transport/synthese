@@ -74,7 +74,7 @@ namespace synthese
 			const interfaces::Interface* getInterface() const;
 //			const synthese::time::Date& getDateDebut() const;
 //			const synthese::time::Date& getDateFin() const;
-//			const std::string& getURLClient() const;
+			const std::string& getClientURL() const;
 			bool onlineBookingAllowed() const;
 //			bool getSolutionsPassees() const;
 			//@}

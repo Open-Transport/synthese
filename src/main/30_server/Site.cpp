@@ -78,5 +78,10 @@ namespace synthese
 		{
 			_name = name;
 		}
+
+		const std::string& Site::getClientURL() const
+		{
+			return _clientURL;
+		}
 	}
 }

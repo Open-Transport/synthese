@@ -26,6 +26,10 @@ namespace synthese
 		public:
 			Session(const std::string& ip);
 			
+			/** Unregisters the session in the global session map.
+			*/
+			~Session();
+			
 			/** Refresh the last use date after several controls.
 
 				The controls are :

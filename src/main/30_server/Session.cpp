@@ -5,6 +5,7 @@
 
 #include "30_server/Session.h"
 #include "30_server/SessionException.h"
+#include "30_server/ServerModule.h"
 
 namespace synthese
 {
@@ -42,6 +43,13 @@ namespace synthese
 				key += Conversion::ToString(rand());
 			}
 			return key;
+		}
+
+		Session::~Session()
+		{
+			ServerModule::SessionMap::iterator it = ServerModule::getSessions().find(_key);
+			if (it != ServerModule::getSessions().end())
+				ServerModule::getSessions().erase(it);
 		}
 	}
 }

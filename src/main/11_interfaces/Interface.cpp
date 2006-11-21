@@ -1,6 +1,8 @@
 
 #include "Interface.h"
 #include "InterfacePage.h"
+#include "11_interfaces/InterfacePageException.h"
+
 #include <string>
 
 namespace synthese
@@ -27,7 +29,9 @@ namespace synthese
 		InterfacePage* Interface::getPage(const std::string& index) const
 		{
 			PagesMap::const_iterator it = _pages.find(index);
-			return it == _pages.end() ? NULL : it->second;
+			if (it == _pages.end())
+				throw InterfacePageException("No such interface page " + index);
+			return it->second;
 		}
 
 

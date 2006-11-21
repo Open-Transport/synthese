@@ -43,6 +43,12 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\Action.cpp">
+			</File>
+			<File
+				RelativePath=".\Action.h">
+			</File>
+			<File
 				RelativePath=".\CleanerThreadExec.cpp">
 			</File>
 			<File
@@ -115,6 +121,42 @@
 			</File>
 			<File
 				RelativePath=".\SiteTableSync.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Interface pages"
+			Filter="">
+			<File
+				RelativePath=".\RedirectInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\RedirectInterfacePage.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Actions"
+			Filter="">
+			<File
+				RelativePath=".\LogoutAction.cpp">
+			</File>
+			<File
+				RelativePath=".\LogoutAction.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Requests"
+			Filter="">
+			<File
+				RelativePath=".\ActionOnlyRequest.cpp">
+			</File>
+			<File
+				RelativePath=".\ActionOnlyRequest.h">
+			</File>
+			<File
+				RelativePath=".\SimplePageRequest.cpp">
+			</File>
+			<File
+				RelativePath=".\SimplePageRequest.h">
 			</File>
 		</Filter>
 		<File

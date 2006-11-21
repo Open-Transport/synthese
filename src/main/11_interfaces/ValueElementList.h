@@ -44,7 +44,6 @@ namespace synthese
 			void parse( const std::string& text );
 			void copy(ValueElementList& vai);
 
-
 			ValueInterfaceElement* front();
 
 

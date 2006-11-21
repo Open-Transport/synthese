@@ -9,7 +9,6 @@ namespace synthese
 
 		void SecurityModule::initialize()
 		{
-
 		}
 
 		Profile::Registry& SecurityModule::getProfiles()

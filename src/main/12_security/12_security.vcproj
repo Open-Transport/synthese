@@ -86,6 +86,12 @@
 			<File
 				RelativePath=".\LoginHTMLFormInterfaceElement.h">
 			</File>
+			<File
+				RelativePath=".\LogoutHTMLLinkInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\LogoutHTMLLinkInterfaceElement.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
@@ -116,6 +122,17 @@
 			<File
 				RelativePath=".\UserTableSync.h">
 			</File>
+		</Filter>
+		<Filter
+			Name="Interface Pages"
+			Filter="">
+			<File
+				RelativePath=".\SimpleLoginInterfacePage.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Requests"
+			Filter="">
 		</Filter>
 		<File
 			RelativePath=".\SConscript">

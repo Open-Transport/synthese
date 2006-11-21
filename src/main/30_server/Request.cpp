@@ -8,11 +8,15 @@
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
+#include "11_interfaces/Interface.h"
+
 #include "30_server/ServerModule.h"
 #include "30_server/RequestException.h"
 #include "30_server/Session.h"
 #include "30_server/Request.h"
 #include "30_server/SessionException.h"
+#include "30_server/Action.h"
+#include "30_server/RedirectInterfacePage.h"
 
 using std::string;
 
@@ -24,12 +28,14 @@ namespace synthese
 	{
 
 		const std::string Request::PARAMETER_SEPARATOR ("&");
+		const std::string Request::PARAMETER_STARTER ("?");
 		const std::string Request::PARAMETER_ASSIGNMENT ("=");
 		const int Request::MAX_REQUEST_SIZE (4096);
 		const std::string Request::PARAMETER_FUNCTION = "fonction";
 		const std::string Request::PARAMETER_SITE = "site";
 		const std::string Request::PARAMETER_SESSION = "sid";
 		const std::string Request::PARAMETER_IP = "ipaddr";
+		const std::string Request::PARAMETER_CLIENT_URL = "clienturl";
 
 		std::string Request::truncateStringIfNeeded (const std::string& requestString)
 		{
@@ -155,15 +161,24 @@ namespace synthese
 					}
 					catch (SessionException e)
 					{
-						delete sit->second;
-						ServerModule::getSessions().erase(sit);
-						request->_session = NULL;
+						request->deleteSession();
 						request->_sessionBroken = true;
 					}
 				}
 			}
 
+			// Client URL
+			it = map.find(PARAMETER_CLIENT_URL);
+			if (it != map.end())
+			{
+				request->_clientURL = it->second;
+				map.erase(it);
+			}
+
 			request->setFromParametersMap(map);
+
+			// Action
+			request->_action = Action::create(request, map);
 
 			return request;
 		}
@@ -174,6 +189,15 @@ namespace synthese
 			ParametersMap map = getParametersMap();
 			map.insert(make_pair(PARAMETER_FUNCTION, getFactoryKey()));
 			map.insert(make_pair(PARAMETER_SITE, Conversion::ToString(_site->getId())));
+			if (_action != NULL)
+			{
+				map.insert(make_pair(Action::PARAMETER_ACTION, _action->getFactoryKey()));
+				ParametersMap actionMap = _action->getParametersMap();
+				for (ParametersMap::const_iterator it = actionMap.begin(); it != actionMap.end(); ++it)
+				{
+					map.insert(make_pair(Action::PARAMETER_PREFIX + it->first, it->second));
+				}
+			}
 
 			// Serialize the parameter lists in a synthese querystring
 			std::stringstream ss;
@@ -188,6 +212,55 @@ namespace synthese
 
 			return truncateStringIfNeeded(ss.str());
 
+		}
+
+		void Request::runActionAndFunction( std::ostream& stream )
+		{
+			if (_action != NULL)
+			{
+				_action->run();
+
+				const RedirectInterfacePage* page = _site->getInterface()->getPage<RedirectInterfacePage>();
+				page->display(stream, this);
+			}
+			else
+				run(stream);
+		}
+
+		Request::~Request()
+		{
+			delete _action;
+		}
+
+		void Request::setAction( Action* action )
+		{
+			_action = action;
+		}
+
+		void Request::deleteSession()
+		{
+			delete _session;
+			_session = NULL;
+		}
+
+		void Request::copy( const Request* request )
+		{
+			_site = request->_site;
+			_clientURL = request->_clientURL;
+			_session = request->_session;
+		}
+
+		std::string Request::getHTMLLink(const std::string& content) const
+		{
+			std::stringstream str;
+			str << "<a href=\"" << _clientURL << PARAMETER_STARTER << getQueryString() << "\">"
+				<< content << "</a>";
+			return str.str();
+		}
+
+		const std::string& Request::getClientURL() const
+		{
+			return _clientURL;
 		}
 	}
 }

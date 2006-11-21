@@ -10,6 +10,7 @@
 
 #include "30_server/ServerModule.h"
 #include "30_server/RequestException.h"
+#include "30_server/Action.h"
 #include "30_server/Request.h"
 #include "30_server/ServerThreadExec.h"
 
@@ -56,6 +57,7 @@ namespace synthese
 			try
 			{
 				request = Request::createFromString(ServerModule::getSites(), requestString);
+				
 				request->run(tcpStream);
 			}
 			catch (RequestException e)

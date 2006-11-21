@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="32_admin"
-	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
+	Name="71_vinci_bike_rental"
+	ProjectGUID="{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
@@ -39,60 +39,17 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core classes"
-			Filter="">
+			Name="Source Files"
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 		</Filter>
 		<Filter
-			Name="Interface pages"
-			Filter="">
-			<File
-				RelativePath=".\AdminInterfacePage.cpp">
-			</File>
-			<File
-				RelativePath=".\AdminInterfacePage.h">
-			</File>
-		</Filter>
-		<Filter
-			Name="Admin compounds"
-			Filter="">
-			<File
-				RelativePath=".\HomeAdmin.cpp">
-			</File>
-			<File
-				RelativePath=".\HomeAdmin.h">
-			</File>
-		</Filter>
-		<Filter
-			Name="Requests"
-			Filter="">
-			<File
-				RelativePath=".\AdminRequest.cpp">
-			</File>
-			<File
-				RelativePath=".\AdminRequest.h">
-			</File>
-		</Filter>
-		<Filter
-			Name="Interface Elements Library"
-			Filter="">
-			<File
-				RelativePath=".\AdminPagePositionInterfaceElement.h">
-			</File>
-			<File
-				RelativePath=".\AdminPagesTreeInterfaceElement.h">
-			</File>
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 		</Filter>
 		<File
-			RelativePath=".\AdminModule.cpp">
-		</File>
-		<File
-			RelativePath=".\AdminModule.gen.cpp">
-		</File>
-		<File
-			RelativePath=".\AdminModule.h">
-		</File>
-		<File
-			RelativePath=".\AdminModule.inc.cpp">
+			RelativePath=".\module.h">
 		</File>
 		<File
 			RelativePath=".\SConscript">
