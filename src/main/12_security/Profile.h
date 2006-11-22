@@ -39,7 +39,7 @@ namespace synthese
 		private:
 			std::string		_name;
 			RightsVector	_rights;
-			Profile*		_parent;
+			uid				_parentId;
 
 		public:
 			/** Comparison operator between profiles.
@@ -54,7 +54,8 @@ namespace synthese
 			void setName(const std::string& name);
 			void setRights(const RightsVector& rightsvector);
 			void cleanRights();
-			void setParent(Profile* parent);
+			void setParent(uid id);
+			void setRights(const std::string& text);
 		};
 	}
 }

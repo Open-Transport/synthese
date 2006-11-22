@@ -4,6 +4,7 @@
 #include "12_security/UserTableSync.h"
 #include "12_security/UserTableSyncException.h"
 
+#include "30_server/ActionException.h"
 #include "30_server/Session.h"
 #include "30_server/ServerModule.h"
 #include "30_server/LoginAction.h"
@@ -23,12 +24,19 @@ namespace synthese
 			return map;
 		}
 
-		void LoginAction::setFromParametersMap( server::Request::ParametersMap& map )
+		void LoginAction::setFromParametersMap(Request::ParametersMap& map )
 		{
-			Request::ParametersMap::const_iterator it = map.find(PARAMETER_LOGIN);
+			Request::ParametersMap::iterator it = map.find(Action::PARAMETER_PREFIX + PARAMETER_LOGIN);
+			if (it == map.end())
+				throw ActionException("Login field not found");
 			_login = it->second;
-			it = map.find(PARAMETER_PASSWORD);
+			map.erase(it);
+
+			it = map.find(Action::PARAMETER_PREFIX + PARAMETER_PASSWORD);
+			if (it == map.end())
+				throw ActionException("Password field not found");
 			_password = it->second;
+			map.erase(it);
 		}
 
 		void LoginAction::run()
@@ -44,11 +52,11 @@ namespace synthese
 			}
 			catch (UserTableSyncException e)
 			{
-				/// @todo See what to do here
+				throw ActionException("Bad user");
 			}
 			catch (UserException e)
 			{
-				/// @todo See what to do here
+				throw ActionException("Bad password");
 			}
 		}
 	}

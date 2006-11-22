@@ -4,12 +4,14 @@
 #include <sstream>
 #include <string>
 
+#include "01_util/Exception.h"
 #include "01_util/FactoryException.h"
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
 #include "11_interfaces/Interface.h"
 
+#include "30_server/ActionException.h"
 #include "30_server/ServerModule.h"
 #include "30_server/Session.h"
 #include "30_server/Site.h"
@@ -166,10 +168,16 @@ namespace synthese
 				map.erase(it);
 			}
 
+			try
+			{
+				// Action
+				request->_action = Action::create(request, map);
+			}
+			catch (ActionException& e)
+			{
+				throw RequestException("Action error : "+ e.getMessage());
+			}
 			request->setFromParametersMap(map);
-
-			// Action
-			request->_action = Action::create(request, map);
 
 			return request;
 		}
@@ -209,10 +217,24 @@ namespace synthese
 		{
 			if (_action != NULL)
 			{
-				_action->run();
+				try
+				{
+					_action->run();
 
-				const RedirectInterfacePage* page = _site->getInterface()->getPage<RedirectInterfacePage>();
-				page->display(stream, this);
+					const RedirectInterfacePage* page = _site->getInterface()->getPage<RedirectInterfacePage>();
+					page->display(stream, this);
+				}
+				catch (ActionException e)
+				{
+					/** @todo Create a ActionException factory, a value interface element called 
+					isactionerror actionname
+					When an action returns an exception, it must be a pointer to a registered subclass of 
+					ActionException. The isactionerror will compare the key of the exception and the actionname
+					if the coparison is ok true is returned. This statement can be included in a print or a goto
+					command as the if one.
+					**/
+					_actionException = true;
+				}
 			}
 			else
 				run(stream);

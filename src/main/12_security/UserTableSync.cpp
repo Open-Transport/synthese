@@ -36,7 +36,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_SURNAME, "TEXT", true);
 			addTableColumn(TABLE_COL_LOGIN, "TEXT", true);
 			addTableColumn(TABLE_COL_PASSWORD, "TEXT", true);
-			addTableColumn(TABLE_COL_PROFILE_ID, "INTEGER", false);
+			addTableColumn(TABLE_COL_PROFILE_ID, "INTEGER", true);
 		}
 
 
@@ -86,9 +86,9 @@ namespace synthese
 		{
 			std::stringstream query;
 			query
-				<< "SELECT * "
-				<< "FROM " << TABLE_NAME
-				<< "WHERE " << TABLE_COL_LOGIN << "=" << login;
+				<< "SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE " << TABLE_COL_LOGIN << "='" << login << "'";	/// @todo Put a string converter to escape special characters
 			try
 			{
 				db::SQLiteResult rows = sqlite->execQuery(query.str());
@@ -111,7 +111,14 @@ namespace synthese
 			user->setName(rows.getColumn(rowId, TABLE_COL_NAME));
 			user->setSurname(rows.getColumn(rowId, TABLE_COL_SURNAME));
 			user->setLogin(rows.getColumn(rowId, TABLE_COL_LOGIN));
-			user->setProfile(SecurityModule::getProfiles().get(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_PROFILE_ID))));
+			try
+			{
+				user->setProfile(SecurityModule::getProfiles().get(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_PROFILE_ID))));
+			}
+			catch (Profile::RegistryKeyException e)
+			{
+				throw UserTableSyncException("Bad profile "+ rows.getColumn(rowId, TABLE_COL_PROFILE_ID));
+			}
 		}
 
 		void UserTableSync::saveUser( const db::SQLiteThreadExec* sqlite, User* user )

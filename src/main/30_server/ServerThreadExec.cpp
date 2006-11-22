@@ -9,6 +9,7 @@
 #include "01_util/FactoryException.h"
 
 #include "30_server/ServerModule.h"
+#include "30_server/ActionException.h"
 #include "30_server/RequestException.h"
 #include "30_server/Action.h"
 #include "30_server/Request.h"
@@ -58,11 +59,19 @@ namespace synthese
 			{
 				request = Request::createFromString(requestString);
 				
-				request->run(tcpStream);
+				request->runActionAndFunction(tcpStream);
 			}
 			catch (RequestException e)
 			{
 				Log::GetInstance().debug("Request error", e);
+			}
+			catch (ActionException e)
+			{
+				Log::GetInstance().debug("Action error", e);
+			}
+			catch(util::Exception e)
+			{
+				Log::GetInstance().debug("Exception", e);
 			}
 			delete request;
 			tcpStream.flush();

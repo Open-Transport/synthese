@@ -33,15 +33,19 @@ namespace synthese
 			_rights = rightsvector;
 		}
 
+		void Profile::setRights( const std::string& text )
+		{
+			/// @todo Implement it
+		}
 		void Profile::cleanRights()
 		{
 			for (RightsVector::iterator it = _rights.begin(); it != _rights.end(); ++it)
 				delete *it;
 		}
 
-		void Profile::setParent(Profile* parent )
+		void Profile::setParent(uid id)
 		{
-			_parent = parent;
+			_parentId = id;
 		}
 	}
 }

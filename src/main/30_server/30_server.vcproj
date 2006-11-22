@@ -89,6 +89,12 @@
 			Name="Exceptions"
 			Filter="">
 			<File
+				RelativePath=".\ActionException.cpp">
+			</File>
+			<File
+				RelativePath=".\ActionException.h">
+			</File>
+			<File
 				RelativePath=".\RequestException.cpp">
 			</File>
 			<File

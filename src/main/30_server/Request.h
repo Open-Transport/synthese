@@ -41,6 +41,7 @@ namespace synthese
 			bool			_sessionBroken;
 			std::string		_ip;
 			Action*			_action;
+			bool			_actionException;
 			std::string		_clientURL;
 
 			/** Conversion from attributes to generic parameter maps.

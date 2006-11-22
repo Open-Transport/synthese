@@ -40,7 +40,7 @@ namespace synthese
 
 			/** Action creation from a request.
 			*/
-			static Action* create(const Request*request, Request::ParametersMap& params);
+			static Action* create(Request*request, Request::ParametersMap& params);
 		};
 	}
 }

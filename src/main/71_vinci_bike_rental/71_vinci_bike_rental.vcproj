@@ -48,6 +48,25 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 		</Filter>
+		<Filter
+			Name="LS SQL"
+			Filter="">
+		</Filter>
+		<Filter
+			Name="Interface pages"
+			Filter="">
+			<File
+				RelativePath=".\VinciCustomerSearchInterfacePage.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Interface elements library"
+			Filter="">
+		</Filter>
+		<Filter
+			Name="Interface value elements"
+			Filter="">
+		</Filter>
 		<File
 			RelativePath=".\module.h">
 		</File>
