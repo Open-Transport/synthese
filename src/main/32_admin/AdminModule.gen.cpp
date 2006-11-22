@@ -7,3 +7,5 @@ synthese::util::Factory<synthese::server::Request>::integrate<synthese::admin::A
 
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::admin::AdminPagesTreeInterfaceElement>("admintree");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::admin::AdminPagePositionInterfaceElement>("adminpos");
+
+synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::admin::AdminContentInterfaceElement>("admincontent");

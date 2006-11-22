@@ -82,8 +82,15 @@
 			Name="Interface Elements Library"
 			Filter="">
 			<File
+				RelativePath=".\AdminContentInterfaceElement.cpp">
+			</File>
+			<File
 				RelativePath=".\AdminContentInterfaceElement.h">
 			</File>
+		</Filter>
+		<Filter
+			Name="Admin Value Elements"
+			Filter="">
 			<File
 				RelativePath=".\AdminPagePositionInterfaceElement.cpp">
 			</File>

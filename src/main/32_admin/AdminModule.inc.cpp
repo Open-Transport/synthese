@@ -4,3 +4,4 @@
 #include "32_admin/AdminRequest.h"
 #include "32_admin/AdminPagesTreeInterfaceElement.h"
 #include "32_admin/AdminPagePositionInterfaceElement.h"
+#include "32_admin/AdminContentInterfaceElement.h"
