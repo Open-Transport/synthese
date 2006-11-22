@@ -132,6 +132,12 @@
 			<File
 				RelativePath=".\RedirectInterfacePage.h">
 			</File>
+			<File
+				RelativePath=".\SimpleLoginInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\SimpleLoginInterfacePage.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Actions"
@@ -163,6 +169,34 @@
 			</File>
 			<File
 				RelativePath=".\SimplePageRequest.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Value Interface Elements"
+			Filter="">
+			<File
+				RelativePath=".\HtmlFormInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\HtmlFormInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\LoginHtmlField.cpp">
+			</File>
+			<File
+				RelativePath=".\LoginHtmlField.h">
+			</File>
+			<File
+				RelativePath=".\LogoutHTMLLinkInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\LogoutHTMLLinkInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\PasswordHtmlField.cpp">
+			</File>
+			<File
+				RelativePath=".\PasswordHtmlField.h">
 			</File>
 		</Filter>
 		<File

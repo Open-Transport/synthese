@@ -1,6 +1,9 @@
 
-#include "ParameterValueInterfaceElement.h"
 #include "01_util/Conversion.h"
+
+#include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/InterfacePageException.h"
+#include "11_interfaces/ParameterValueInterfaceElement.h"
 
 namespace synthese
 {
@@ -9,14 +12,16 @@ namespace synthese
 
 	namespace interfaces
 	{
-		const string& ParameterValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
+		string ParameterValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
 		{
-			return parameters[_rank] ;
+			return parameters[Conversion::ToInt(_rank->getValue(parameters))] ;
 		}
 
-		void ParameterValueInterfaceElement::parse( const std::string& text )
+		void ParameterValueInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			_rank = Conversion::ToInt(text);
+			if (vel.size() != 1)
+				throw InterfacePageException("Malformed parameter interface element");
+			_rank = vel.front();
 		}
 
 	}

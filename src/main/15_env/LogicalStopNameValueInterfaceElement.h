@@ -6,10 +6,6 @@
 
 namespace synthese
 {
-	namespace server
-	{
-		class Request;
-	}
 	namespace env
 	{
 		/** Logical stop name.
@@ -21,7 +17,7 @@ namespace synthese
 			ValueInterfaceElement* _uid;
 
 		public:
-			const std::string& getValue(const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string getValue(const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
 
 			/** Parser.
 			@param text Optional parameter :
@@ -29,7 +25,7 @@ namespace synthese
 				- if empty : the name of the stop provided at runtime as current object
 			@todo Handle the designation number
 			*/
-			void parse(const std::string& text);
+			void storeParameters(interfaces::ValueElementList& vel);
 		};
 	}
 }

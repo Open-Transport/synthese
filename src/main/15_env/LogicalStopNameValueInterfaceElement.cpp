@@ -19,7 +19,7 @@ namespace synthese
 
 	namespace env
 	{
-		const string& LogicalStopNameValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
+		string LogicalStopNameValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
 		{
 /*			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )
 			{
@@ -36,10 +36,9 @@ namespace synthese
 			}
 */		}
 
-		void LogicalStopNameValueInterfaceElement::parse( const std::string& text )
+		void LogicalStopNameValueInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			ValueElementList vel(text);
-			_uid = vel.front();
+			_uid = (vel.size() >= 1) ? vel.front() : NULL;
 		}
 	}
 

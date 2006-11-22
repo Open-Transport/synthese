@@ -24,23 +24,37 @@ namespace synthese
 			static std::string generateKey();
 
 		public:
-			Session(const std::string& ip);
+			//!	\name Constructor and destructor
+			//@{
+				Session(const std::string& ip);
 			
-			/** Unregisters the session in the global session map.
-			*/
-			~Session();
-			
-			/** Refresh the last use date after several controls.
+				/** Unregisters the session in the global session map.
+				*/
+				~Session();
+			//@}
 
-				The controls are :
-					- expiration of the session
-					- ip must not have change
+			//! \name Modifiers
+			//@{
+				/** Refresh the last use date after several controls.
 
-				If a control fails, then a SessionException is thrown
-			*/
-			void controlAndRefresh(const std::string& ip);
+					The controls are :
+						- expiration of the session
+						- ip must not have change
 
-			void setUser(security::User* user);
+					If a control fails, then a SessionException is thrown
+				*/
+				void controlAndRefresh(const std::string& ip);
+			//@}
+
+			//! \name Setters
+			//@{
+				void setUser(security::User* user);
+			//@}
+
+			//! \name Getters
+			//@{
+				const std::string getKey() const;
+			//@}
 		};
 	}
 }

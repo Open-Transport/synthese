@@ -9,7 +9,7 @@ namespace synthese
 	namespace server
 	{
 		
-		const std::string PARAMETER_URL = "url";
+		const std::string ActionOnlyRequest::PARAMETER_URL = "url";
 
 
 		server::Request::ParametersMap ActionOnlyRequest::getParametersMap() const
@@ -38,6 +38,11 @@ namespace synthese
 		void ActionOnlyRequest::setURL( const std::string& url )
 		{
 			_url = url;
+		}
+
+		ActionOnlyRequest::~ActionOnlyRequest()
+		{
+
 		}
 	}
 }

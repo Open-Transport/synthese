@@ -2,14 +2,13 @@
 #ifndef SYNTHESE_LogoutHTMLLinkInterfaceElement_H__
 #define SYNTHESE_LogoutHTMLLinkInterfaceElement_H__
 
-#include "11_interfaces/LibraryInterfaceElement.h"
 #include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
-	namespace security
+	namespace server
 	{
-		class LogoutHTMLLinkInterfaceElement : public interfaces::LibraryInterfaceElement
+		class LogoutHTMLLinkInterfaceElement : public interfaces::ValueInterfaceElement
 		{
 			interfaces::ValueInterfaceElement* _redirectionURL;
 			interfaces::ValueInterfaceElement* _page_key;
@@ -22,8 +21,8 @@ namespace synthese
 					-# Page key to redirect after logout (empty if URL is filled)
 					-# Text to put in the link
 			*/
-			void parse( const std::string& text );
-			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* rootObject = NULL, const server::Request* request = NULL) const;
+			void storeParameters(interfaces::ValueElementList& vel);
+			std::string getValue(const interfaces::ParametersVector& parameters, const void* rootObject = NULL, const server::Request* request = NULL) const;
 		};
 	}
 }

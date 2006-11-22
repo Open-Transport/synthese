@@ -57,7 +57,10 @@ namespace synthese
     method = getenv("REQUEST_METHOD");
     if(method) {
 	if(*method == 'p' || *method == 'P')
-	    read(0, query, atoi(getenv("CONTENT_LENGTH")));
+	{
+		query = (char*) malloc((atoi(getenv("CONTENT_LENGTH"))+2) * sizeof(char));
+		fgets(query, atoi(getenv("CONTENT_LENGTH"))+1, stdin);
+	}
 	else
 	    query = getenv("QUERY_STRING");
     } else {

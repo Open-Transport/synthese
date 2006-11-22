@@ -1,4 +1,7 @@
 
+#ifndef SYNTHESE_Action_H__
+#define SYNTHESE_Action_H__
+
 #include "01_util/Factorable.h"
 
 #include "30_server/Request.h"
@@ -41,3 +44,5 @@ namespace synthese
 		};
 	}
 }
+
+#endif // SYNTHESE_Action_H__

@@ -1,6 +1,8 @@
 
-#include "IncludePageInterfaceElement.h"
+#include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/InterfacePage.h"
+#include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/IncludePageInterfaceElement.h"
 
 namespace synthese
 {
@@ -8,18 +10,17 @@ namespace synthese
 	{
 		void IncludePageInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object, const server::Request* request) const
 		{
-			const InterfacePage* page_to_include = Factory<InterfacePage>::create(_page_code);
+			const InterfacePage* page_to_include = Factory<InterfacePage>::create(_page_code->getValue(parameters));
 			page_to_include->display(stream, _parameters.fillParameters( parameters ), object, request);
 		}
 
-
-		void IncludePageInterfaceElement::parse( const std::string& text )
+		void IncludePageInterfaceElement::storeParameters(ValueElementList& vel )
 		{
-			ValueElementList vai( text );
-			ValueInterfaceElement* page_code_element = vai.front();
-			_page_code = page_code_element->getValue( ParametersVector() );
-			_parameters = vai;
-			delete page_code_element;
+			if (vel.isEmpty())
+				throw InterfacePageException("Included page not specified");
+
+			_page_code = vel.front();
+			vel = _parameters;
 		}
 	}
 }

@@ -11,12 +11,13 @@
 #include "11_interfaces/Interface.h"
 
 #include "30_server/ServerModule.h"
-#include "30_server/RequestException.h"
 #include "30_server/Session.h"
-#include "30_server/Request.h"
+#include "30_server/Site.h"
 #include "30_server/SessionException.h"
 #include "30_server/Action.h"
 #include "30_server/RedirectInterfacePage.h"
+#include "30_server/RequestException.h"
+#include "30_server/Request.h"
 
 using std::string;
 
@@ -36,6 +37,13 @@ namespace synthese
 		const std::string Request::PARAMETER_SESSION = "sid";
 		const std::string Request::PARAMETER_IP = "ipaddr";
 		const std::string Request::PARAMETER_CLIENT_URL = "clienturl";
+
+		Request::Request()
+			: _session(NULL)
+			, _action(NULL)
+		{
+
+		}
 
 		std::string Request::truncateStringIfNeeded (const std::string& requestString)
 		{
@@ -68,27 +76,10 @@ namespace synthese
 			return s;
 		}
 
-		Request* Request::createFromString( const Site::Registry& siteRegistry, const std::string& text )
+		Request* Request::createFromString(const std::string& text )
 		{
 			std::string s (truncateStringIfNeeded (text));
-			ParametersMap map;
-
-			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-			boost::char_separator<char> sep(PARAMETER_SEPARATOR.c_str ());
-
-			// Parsing
-			tokenizer parametersTokens (s, sep);
-			for (tokenizer::iterator parameterToken = parametersTokens.begin();
-				parameterToken != parametersTokens.end (); ++ parameterToken)
-			{
-				size_t pos = parameterToken->find (PARAMETER_ASSIGNMENT);
-				if (pos == string::npos) continue;
-
-				std::string parameterName (parameterToken->substr (0, pos));
-				std::string parameterValue (parameterToken->substr (pos+1));
-
-				map.insert (make_pair (parameterName, parameterValue));
-			}
+			ParametersMap map = parseString(s);
 
 			// Function name
 			ParametersMap::iterator it = map.find(PARAMETER_FUNCTION);
@@ -115,7 +106,7 @@ namespace synthese
 				throw RequestException("Site not specified");
 			try
 			{
-				request->_site = siteRegistry.get(Conversion::ToLongLong(it->second));
+				request->_site = ServerModule::getSites().get(Conversion::ToLongLong(it->second));
 			}
 			catch (Site::RegistryKeyException e)
 			{
@@ -271,6 +262,48 @@ namespace synthese
 		void Request::setSession( Session* session )
 		{
 			_session = session;
+		}
+
+		Request::ParametersMap Request::parseString( const std::string& text )
+		{
+			ParametersMap map;
+			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+			boost::char_separator<char> sep(PARAMETER_SEPARATOR.c_str ());
+
+			// Parsing
+			tokenizer parametersTokens (text, sep);
+			for (tokenizer::iterator parameterToken = parametersTokens.begin();
+				parameterToken != parametersTokens.end (); ++ parameterToken)
+			{
+				size_t pos = parameterToken->find (PARAMETER_ASSIGNMENT);
+				if (pos == string::npos) continue;
+
+				std::string parameterName (parameterToken->substr (0, pos));
+				std::string parameterValue (parameterToken->substr (pos+1));
+
+				map.insert (make_pair (parameterName, parameterValue));
+			}
+			return map;
+		}
+
+		std::string Request::getHTMLFormHeader(const std::string& name) const
+		{
+			std::stringstream str;
+			str	<< "<form name=\"" << name << "\" action=\"" << _clientURL << "\" method=\"post\">"
+				<< "<input type=\"hidden\" name=\"" << PARAMETER_FUNCTION << "\" value=\"" << getFactoryKey() << "\" />"
+				<< "<input type=\"hidden\" name=\"" << PARAMETER_SITE << "\" value=\"" << _site->getId() << "\" />";
+			if (_session != NULL)
+				str << "<input type=\"hidden\" name=\"" << PARAMETER_SESSION << "\" value=\"" << _session->getKey() << "\" />";
+			if (_action != NULL)
+			{
+				str << "<input type=\"hidden\" name=\"" << Action::PARAMETER_ACTION << "\" value=\"" << _action->getFactoryKey() << "\" />";
+			}
+			return str.str();
+		}
+
+		const Site* Request::getSite() const
+		{
+			return _site;
 		}
 	}
 }

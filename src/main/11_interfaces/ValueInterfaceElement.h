@@ -2,19 +2,25 @@
 #ifndef SYNTHESE_ValueInterfaceElement_H__
 #define SYNTHESE_ValueInterfaceElement_H__
 
-
-#include "11_interfaces/LibraryInterfaceElement.h"
 #include <string>
+
+#include "01_util/Factorable.h"
+
+#include "11_interfaces/DisplayableElement.h"
 
 namespace synthese
 {
 	namespace interfaces
 	{
-		class ValueInterfaceElement : public LibraryInterfaceElement
+		class ValueElementList;
+
+		/** Code defined interface element which produces a string value at runtime.
+		*/
+		class ValueInterfaceElement : public util::Factorable
 		{
 		public:
-			virtual const std::string& getValue( const ParametersVector&, const void* object = NULL, const server::Request* request = NULL) const = 0;
-			void display( std::ostream&, const ParametersVector&, const void* object = NULL, const server::Request* request = NULL) const;
+			virtual void		storeParameters(ValueElementList& vel) = 0;
+			virtual std::string	getValue( const ParametersVector&, const void* object = NULL, const server::Request* request = NULL) const = 0;
 		};
 	}
 }

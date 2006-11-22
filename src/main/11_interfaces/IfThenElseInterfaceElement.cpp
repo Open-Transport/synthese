@@ -1,61 +1,36 @@
 
-#include "IfThenElseInterfaceElement.h"
-#include "ValueElementList.h"
-#include "StaticValueInterfaceElement.h"
+#include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/StaticValueInterfaceElement.h"
+#include "11_interfaces/InterfacePageException.h"
+#include "11_interfaces/IfThenElseInterfaceElement.h"
 
 namespace synthese
 {
 	namespace interfaces
 	{
-		void IfThenElseInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		std::string IfThenElseInterfaceElement::getValue(const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			std::string result = _criteria->getValue( parameters );
 			return ( result.size() == 0 || result == "0" )
-				? _to_do_if_false->display( stream, parameters, object, request)
-				: _to_do_if_true->display( stream, parameters, object, request);
+				? _to_return_if_false->getValue(parameters, object, request)
+				: _to_return_if_true->getValue(parameters, object, request);
 		}
-
-		void IfThenElseInterfaceElement::parse( const std::string& text )
-		{
-			ValueElementList vei( text );
-
-			// Criteria
-			_criteria = vei.front();
-
-			// Keyword THEN
-			delete vei.front();
-
-			// To do if true
-			ValueInterfaceElement* vie = vei.front();
-			StaticValueInterfaceElement* svie = dynamic_cast<StaticValueInterfaceElement*>(vie);
-			if ( svie != NULL )
-			{
-				_to_do_if_true = LibraryInterfaceElement::create( svie->getValue( ParametersVector() ) );
-				delete vie;
-			}
-			else
-				_to_do_if_true = vie;
-
-			// Keyword ELSE
-			delete vei.front();
-
-			// To do if false
-			vie = vei.front();
-			svie = dynamic_cast<StaticValueInterfaceElement*>(vie);
-			if ( svie != NULL )
-			{
-				_to_do_if_false = LibraryInterfaceElement::create( svie->getValue( ParametersVector() ) );
-				delete vie;
-			}
-			else
-				_to_do_if_false = vie;
-		}
-
+		
 		IfThenElseInterfaceElement::~IfThenElseInterfaceElement()
 		{
 			delete _criteria;
-			delete _to_do_if_false;
-			delete _to_do_if_true;
+			delete _to_return_if_false;
+			delete _to_return_if_true;
+		}
+
+		void IfThenElseInterfaceElement::storeParameters(ValueElementList& vel )
+		{
+			if (vel.size() < 2)
+				throw InterfacePageException("Conditional element without value to return");
+
+			_criteria = vel.front();
+			_to_return_if_true = vel.front();
+			_to_return_if_false = vel.isEmpty() ? new StaticValueInterfaceElement("") : vel.front();
 		}
 	}
 }

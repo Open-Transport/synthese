@@ -1,5 +1,7 @@
 
-#include "GotoInterfaceElement.h"
+#include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/GotoInterfaceElement.h"
 
 namespace synthese
 {
@@ -9,14 +11,14 @@ namespace synthese
 		{
 		}
 
-		void GotoInterfaceElement::parse( const std::string& text )
+		const std::string GotoInterfaceElement::getLabel(const ParametersVector& parameters) const
 		{
-			_label = text;
+			return _label->getValue(parameters);
 		}
 
-		const std::string& GotoInterfaceElement::getLabel() const
+		void GotoInterfaceElement::storeParameters( ValueElementList& vel )
 		{
-			return _label;
+			_label = vel.front();
 		}
 	}
 }

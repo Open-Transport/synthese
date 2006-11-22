@@ -5,15 +5,19 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		const std::string& StaticValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
+		std::string StaticValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
 		{
 			return _value;
 		}
 
-		void StaticValueInterfaceElement::parse( const std::string& text )
+		void StaticValueInterfaceElement::storeParameters(ValueElementList& vel )
 		{
-			_value = text;
 		}
 
+		StaticValueInterfaceElement::StaticValueInterfaceElement( const std::string& value )
+			: _value(value)
+		{
+			
+		}
 	}
 }

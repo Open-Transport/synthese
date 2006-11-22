@@ -7,6 +7,7 @@
 
 #include "30_server/RequestException.h"
 
+#include "32_admin/HomeAdmin.h"
 #include "32_admin/AdminInterfacePage.h"
 #include "32_admin/AdminRequest.h"
 
@@ -35,11 +36,12 @@ namespace synthese
 			
 			// Page
 			it = map.find(PARAMETER_PAGE);
-			if (it == map.end())
-				throw RequestException("Page to display not specified");
 			try
 			{
-				_page = Factory<AdminInterfaceElement>::create(it->second);
+				if (it == map.end())
+					_page = new HomeAdmin;
+				else
+					_page = Factory<AdminInterfaceElement>::create(it->second);
 			}
 			catch (FactoryException<AdminInterfaceElement> e)
 			{

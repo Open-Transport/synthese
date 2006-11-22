@@ -20,12 +20,13 @@ namespace synthese
 
 	namespace security
 	{
-		static const std::string TABLE_NAME = "t026_users";
-		static const std::string TABLE_COL_ID = "id";
-		static const std::string TABLE_COL_NAME = "name";
-		static const std::string TABLE_COL_SURNAME = "surname";
-		static const std::string TABLE_COL_PASSWORD = "password";
-		static const std::string TABLE_COL_PROFILE_ID = "profile_id";
+		const std::string UserTableSync::TABLE_NAME = "t026_users";
+		const std::string UserTableSync::TABLE_COL_ID = "id";
+		const std::string UserTableSync::TABLE_COL_NAME = "name";
+		const std::string UserTableSync::TABLE_COL_SURNAME = "surname";
+		const std::string UserTableSync::TABLE_COL_LOGIN = "login";
+		const std::string UserTableSync::TABLE_COL_PASSWORD = "password";
+		const std::string UserTableSync::TABLE_COL_PROFILE_ID = "profile_id";
 
 		UserTableSync::UserTableSync()
 			: db::SQLiteTableSync ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
@@ -33,6 +34,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
 			addTableColumn(TABLE_COL_SURNAME, "TEXT", true);
+			addTableColumn(TABLE_COL_LOGIN, "TEXT", true);
 			addTableColumn(TABLE_COL_PASSWORD, "TEXT", true);
 			addTableColumn(TABLE_COL_PROFILE_ID, "INTEGER", false);
 		}

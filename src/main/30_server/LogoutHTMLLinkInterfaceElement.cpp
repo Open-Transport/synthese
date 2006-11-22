@@ -1,33 +1,37 @@
 
+#include <sstream>
+
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/Interface.h"
 
-#include "12_security/LogoutHTMLLinkInterfaceElement.h"
-
 #include "30_server/ActionOnlyRequest.h"
 #include "30_server/SimplePageRequest.h"
 #include "30_server/LogoutAction.h"
+#include "30_server/LogoutHTMLLinkInterfaceElement.h"
+
+using namespace std;
 
 namespace synthese
 {
-	using namespace server;
 	using namespace util;
 	using namespace interfaces;
 
-	namespace security
+	namespace server
 	{
-		void LogoutHTMLLinkInterfaceElement::parse( const std::string& text )
+		void LogoutHTMLLinkInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			interfaces::ValueElementList vei( text );
-			_redirectionURL = vei.front();
-			_page_key = vei.front();
-			_content = vei.front();
+			if (vel.size() < 3)
+				throw InterfacePageException("Not enough parameters for logout HTML link");
+			_redirectionURL = vel.front();
+			_page_key = vel.front();
+			_content = vel.front();
 		}
 
-		void LogoutHTMLLinkInterfaceElement::display( std::ostream& stream, const interfaces::ParametersVector& parameters, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string LogoutHTMLLinkInterfaceElement::getValue(const interfaces::ParametersVector& parameters, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
+			stringstream stream;
 			std::string url = _redirectionURL->getValue(parameters, rootObject, request);
 			std::string requestKey = _page_key->getValue(parameters, rootObject, request);
 
@@ -58,6 +62,7 @@ namespace synthese
 			stream << redirRequest->getHTMLLink(_content->getValue(parameters, NULL, request));
 
 			delete redirRequest;
+			return stream.str();
 		}
 
 	}

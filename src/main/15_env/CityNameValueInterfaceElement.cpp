@@ -19,7 +19,7 @@ namespace synthese
 
 	namespace env
 	{
-		const string& CityNameValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
+		string CityNameValueInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
 		{
 /*			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )
 			{
@@ -36,10 +36,9 @@ namespace synthese
 			}
 */		}
 
-		void CityNameValueInterfaceElement::parse( const std::string& text )
+		void CityNameValueInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			ValueElementList vel(text);
-			_uid = vel.front();
+			_uid = (vel.size() > 0) ? vel.front() : NULL;
 		}
 	}
 

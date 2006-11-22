@@ -17,7 +17,7 @@ namespace synthese
 
 		public:
 			void display(std::ostream& stream, const ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
-			void parse( const std::string& text);
+			void storeParameters(ValueElementList& vel);
 			const std::string& getLabel() const;
 		};
 

@@ -83,15 +83,6 @@
 		<Filter
 			Name="LibraryInterfaceElement"
 			Filter="">
-			<File
-				RelativePath=".\LoginHTMLFormInterfaceElement.h">
-			</File>
-			<File
-				RelativePath=".\LogoutHTMLLinkInterfaceElement.cpp">
-			</File>
-			<File
-				RelativePath=".\LogoutHTMLLinkInterfaceElement.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
@@ -126,9 +117,6 @@
 		<Filter
 			Name="Interface Pages"
 			Filter="">
-			<File
-				RelativePath=".\SimpleLoginInterfacePage.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Requests"

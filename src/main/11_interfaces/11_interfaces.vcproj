@@ -89,16 +89,16 @@
 			Name="LibraryInterfaceElement"
 			Filter="">
 			<File
+				RelativePath=".\CommentInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\CommentInterfaceElement.h">
+			</File>
+			<File
 				RelativePath=".\GotoInterfaceElement.cpp">
 			</File>
 			<File
 				RelativePath=".\GotoInterfaceElement.h">
-			</File>
-			<File
-				RelativePath=".\IfThenElseInterfaceElement.cpp">
-			</File>
-			<File
-				RelativePath=".\IfThenElseInterfaceElement.h">
 			</File>
 			<File
 				RelativePath=".\IncludePageInterfaceElement.cpp">
@@ -112,10 +112,22 @@
 			<File
 				RelativePath=".\LineLabelInterfaceElement.h">
 			</File>
+			<File
+				RelativePath=".\PrintInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\PrintInterfaceElement.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="ValueInterfaceElement"
 			Filter="">
+			<File
+				RelativePath=".\IfThenElseInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\IfThenElseInterfaceElement.h">
+			</File>
 			<File
 				RelativePath=".\ParameterValueInterfaceElement.cpp">
 			</File>

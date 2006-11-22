@@ -59,6 +59,7 @@ namespace synthese
 		public:
 			//! \name Constructors and destructors
 			//@{
+				Request();
 				virtual ~Request();
 			//@}
 
@@ -95,6 +96,7 @@ namespace synthese
 				void runActionAndFunction(std::ostream& stream);
 
 				std::string getHTMLLink(const std::string& content) const;
+				std::string getHTMLFormHeader(const std::string& name) const;
 			//@}
 
 			//! \name Static services
@@ -102,7 +104,12 @@ namespace synthese
 				/** Instantiates a request from a text string, using the factory to choose the right subclass.
 				@param text Text to parse.
 				*/
-				static Request* createFromString(const Site::Registry& siteRegistry, const std::string& text);
+				static Request* createFromString(const std::string& text);
+
+				/** Parses a query string into a key => value map.
+					@param text Text to parse
+				*/
+				static ParametersMap parseString(const std::string& text);
 			//@}
 
 		};

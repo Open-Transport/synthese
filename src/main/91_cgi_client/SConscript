@@ -13,6 +13,8 @@ moduleenv.AppendMultithreadConf ()
 #do what to be done to avoid it (probably a site module must be created)
 
 moduleenv.AddModuleDependency ('30_server')
+moduleenv.AddModuleDependency ('11_interfaces')
+
 moduleenv.AddModuleDependency ('00_tcp')
 moduleenv.AddModuleDependency ('01_util')
 moduleenv.AddModuleDependency ('02_db')

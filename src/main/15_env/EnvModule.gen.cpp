@@ -4,9 +4,6 @@ synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LogicalStopNameValueInterfaceElement>("stop_name");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::CityNameValueInterfaceElement>("city_name");
 
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::env::LogicalStopNameValueInterfaceElement>("stop_name");
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::env::CityNameValueInterfaceElement>("city_name");
-
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::EnvironmentTableSync>("15.00.00");
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::AlarmTableSync>("15.10.01");

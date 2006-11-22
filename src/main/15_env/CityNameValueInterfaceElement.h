@@ -4,11 +4,13 @@
 
 #include "01_util/UId.h"
 
+#include "11_interfaces/ValueInterfaceElement.h"
+
 namespace synthese
 {
 	namespace interfaces
 	{
-		class ValueInterfaceElement;
+		class ValueElementList;
 	}
 	namespace env
 	{
@@ -18,14 +20,14 @@ namespace synthese
 			interfaces::ValueInterfaceElement* _uid;
 
 		public:
-			const std::string& getValue(const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string getValue(const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
 
 			/** Parser.
 				@param text Optional parameter :
 					- if defined : the uid of the city to name
 					- if empty : the name of the city provided at runtime as current object
 			*/
-			void parse(const std::string& text);
+			void storeParameters(interfaces::ValueElementList& vel);
 		};
 	}
 }

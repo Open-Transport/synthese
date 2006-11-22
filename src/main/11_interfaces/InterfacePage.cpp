@@ -3,6 +3,7 @@
 
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/LineLabelInterfaceElement.h"
+#include "11_interfaces/CommentInterfaceElement.h"
 #include "11_interfaces/InterfacePageException.h"
 
 namespace synthese
@@ -42,27 +43,35 @@ namespace synthese
 			{
 				for (end_pos = start_pos; end_pos < text.size() && text[end_pos] != '\n'; ++end_pos);
 
+				std::string line = text.substr(start_pos, end_pos - start_pos);
 				LibraryInterfaceElement* lie;
 				try
 				{
-					lie = LibraryInterfaceElement::create( text.substr(start_pos, end_pos - start_pos) );
+					lie = LibraryInterfaceElement::create(line);
 				}
+				// Jump interface elements with parse errors
 				catch (InterfacePageException e)
 				{
-					Log::GetInstance().warn("Interface page parsing error", e);
+					Log::GetInstance().warn("Interface page parsing error on " + line + "\n", e);
 					continue;
 				}
+				// Handle line labels
 				LineLabelInterfaceElement* llie = dynamic_cast<LineLabelInterfaceElement*>(lie);
 				if ( llie != NULL )
 				{
 					last_label = llie->getLabel();
 					delete lie;
+					continue;
 				}
-				else
+				// Jump over a comment
+				if (dynamic_cast<CommentInterfaceElement*>(lie) != NULL)
 				{
-					_components.push_back( make_pair( last_label, lie ));
-					last_label = "";
+					delete lie;
+					continue;
 				}
+				// Store other types of interface elements
+				_components.push_back( make_pair( last_label, lie ));
+				last_label = "";
 			}
 		}
 	}

@@ -56,7 +56,7 @@ namespace synthese
 			Request* request = NULL;
 			try
 			{
-				request = Request::createFromString(ServerModule::getSites(), requestString);
+				request = Request::createFromString(requestString);
 				
 				request->run(tcpStream);
 			}
@@ -65,6 +65,7 @@ namespace synthese
 				Log::GetInstance().debug("Request error", e);
 			}
 			delete request;
+			tcpStream.flush();
 			_tcpService->closeConnection (serverSocket);
 		}
 	}

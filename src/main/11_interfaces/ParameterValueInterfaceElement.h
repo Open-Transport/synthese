@@ -12,11 +12,11 @@ namespace synthese
 		class ParameterValueInterfaceElement : public ValueInterfaceElement
 		{
 		private:
-			int _rank;
+			ValueInterfaceElement* _rank;
 
 		public:
-			const std::string& getValue( const ParametersVector&, const void* object = NULL, const server::Request* request = NULL ) const;
-			void parse( const std::string& text);
+			std::string getValue( const ParametersVector&, const void* object = NULL, const server::Request* request = NULL ) const;
+			void storeParameters(ValueElementList& vel);
 		};
 	}
 }

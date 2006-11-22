@@ -57,5 +57,10 @@ namespace synthese
 		{
 			_user = user;
 		}
+
+		const std::string Session::getKey() const
+		{
+			return _key;
+		}
 	}
 }

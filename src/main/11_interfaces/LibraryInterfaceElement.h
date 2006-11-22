@@ -8,9 +8,10 @@ using synthese::util::Factory;
 
 namespace synthese
 {
-	    
 	namespace interfaces
 	{
+		class ValueElementList;
+
 		/** element which can produce a single display.
 			@ingroup m11
 		*/
@@ -24,9 +25,11 @@ namespace synthese
 				: DisplayableElement() 
 			{ }
 
+			virtual void storeParameters(ValueElementList& vel) = 0;
+
 		public:
 
-			virtual void parse( const std::string& text ) = 0;
+			void parse( const std::string& text );
 
 			static LibraryInterfaceElement* create( const std::string & text );
 

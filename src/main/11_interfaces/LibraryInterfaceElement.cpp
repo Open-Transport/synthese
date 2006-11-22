@@ -2,6 +2,7 @@
 #include "01_util/FactoryException.h"
 
 #include "11_interfaces/LibraryInterfaceElement.h"
+#include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePageException.h"
 
 namespace synthese
@@ -33,9 +34,17 @@ namespace synthese
 			{
 				throw InterfacePageException("Specified interface function not found " + text.substr(start_pos, word_end_pos - start_pos));
 			}
-			lie->parse( text.substr(word_end_pos + 1, text.size() - word_end_pos - 1) );
+			lie->parse((text.size() > word_end_pos + 1)
+				? text.substr(word_end_pos + 1, text.size() - word_end_pos - 1) 
+				: "");
 
 			return lie;
+		}
+
+		void LibraryInterfaceElement::parse( const std::string& text )
+		{
+			ValueElementList vai(text);
+			storeParameters(vai);
 		}
 	}
 }

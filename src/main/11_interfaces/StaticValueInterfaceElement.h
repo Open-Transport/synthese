@@ -9,15 +9,19 @@ namespace synthese
 {
 	namespace interfaces
 	{
+		/** Special value interface element containing text (stops the recursion of value elements parsing).
+			As this class is child of ValueInterfaceElement, it can not be join in the factory, because of its constructor which requires an argument to run.
+			The parse method is implemented for technical reasons only, but does nothing.
+		*/
 		class StaticValueInterfaceElement : public ValueInterfaceElement
 		{
 		private:
-			std::string _value;
+			const std::string _value;
 
 		public:
-			const std::string& getValue( const ParametersVector&, const void* object = NULL, const server::Request* request = NULL ) const;
-			void parse( const std::string& text);
-
+			StaticValueInterfaceElement(const std::string& value);
+			std::string	getValue( const ParametersVector&, const void* object = NULL, const server::Request* request = NULL ) const;
+			void storeParameters(ValueElementList& vel);
 		};
 	}
 }
