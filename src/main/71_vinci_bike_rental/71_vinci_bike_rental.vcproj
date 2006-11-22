@@ -39,14 +39,15 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
+			Name="Core classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath=".\VinciBikesMoves.h">
+			</File>
+			<File
+				RelativePath=".\VinciGuarantee.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
@@ -55,6 +56,15 @@
 		<Filter
 			Name="Interface pages"
 			Filter="">
+			<File
+				RelativePath=".\VinciBikeInterfacePage.h">
+			</File>
+			<File
+				RelativePath=".\VinciBikeSearchInterfacePage.h">
+			</File>
+			<File
+				RelativePath=".\VinciCustomerInterfacePage.h">
+			</File>
 			<File
 				RelativePath=".\VinciCustomerSearchInterfacePage.h">
 			</File>
@@ -67,9 +77,6 @@
 			Name="Interface value elements"
 			Filter="">
 		</Filter>
-		<File
-			RelativePath=".\module.h">
-		</File>
 		<File
 			RelativePath=".\SConscript">
 		</File>

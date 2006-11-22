@@ -41,6 +41,12 @@
 		<Filter
 			Name="Core classes"
 			Filter="">
+			<File
+				RelativePath=".\AdminInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\AdminInterfaceElement.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Interface pages"
@@ -76,7 +82,16 @@
 			Name="Interface Elements Library"
 			Filter="">
 			<File
+				RelativePath=".\AdminContentInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\AdminPagePositionInterfaceElement.cpp">
+			</File>
+			<File
 				RelativePath=".\AdminPagePositionInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\AdminPagesTreeInterfaceElement.cpp">
 			</File>
 			<File
 				RelativePath=".\AdminPagesTreeInterfaceElement.h">

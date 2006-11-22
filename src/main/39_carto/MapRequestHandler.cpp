@@ -63,6 +63,8 @@ namespace synthese
 		const int MapRequestHandler::REQUEST_MODE_SOCKET (1);
 		const int MapRequestHandler::REQUEST_MODE_HTTP (2);
 
+		MapRequestHandler::MapRequestHandler()
+			: Request(Request::DONT_NEED_SESSION) {}
 
 
 		void MapRequestHandler::setFromParametersMap( const ParametersMap& map )

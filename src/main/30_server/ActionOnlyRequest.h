@@ -27,6 +27,7 @@ namespace synthese
 			void setFromParametersMap(const server::Request::ParametersMap& map);
 
 		public:
+			ActionOnlyRequest();
 			~ActionOnlyRequest();
 
 			/** Action to run, defined by each subclass.

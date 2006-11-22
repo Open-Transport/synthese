@@ -2,15 +2,14 @@
 #ifndef SYNTHESE_DISPLAY_HOME_ADMIN_H
 #define SYNTHESE_DISPLAY_HOME_ADMIN_H
 
-#include "11_interfaces/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
 {
 	namespace admin
 	{
-
 		/** Page d'accueil de la console d'administration.
-			@ingroup m34
+			@ingroup m32
 
 			@image html cap_admin_home.png
 			@image latex cap_admin_home.png "Accueil de la console d'administration" width=14cm
@@ -26,14 +25,14 @@ namespace synthese
 
 			Une page d'administration est imprimable grace à une feuille de style dédiée à l'impression : seule la zone de contenus est alors imprimée. Si une page d'administration contient des formulaires, les boutons ne sont pas imprimés.
 		*/
-		class HomeAdmin : public interfaces::AdminInterfaceElement
+		class HomeAdmin : public AdminInterfaceElement
 		{
-		protected:
-			static const std::string _superior;
-			static const bool _ever_displayed;
-
 		public:
+			HomeAdmin();
+
 			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
+
+			std::string getTitle() const;
 		};
 	}
 }

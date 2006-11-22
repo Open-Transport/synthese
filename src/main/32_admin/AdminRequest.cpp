@@ -2,13 +2,13 @@
 #include "01_util/Conversion.h"
 #include "01_util/FactoryException.h"
 
-#include "11_interfaces/AdminInterfaceElement.h"
 #include "11_interfaces/Interface.h"
 
 #include "30_server/RequestException.h"
 
 #include "32_admin/HomeAdmin.h"
 #include "32_admin/AdminInterfacePage.h"
+#include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminRequest.h"
 
 namespace synthese
@@ -21,6 +21,9 @@ namespace synthese
 	{
 		const std::string AdminRequest::PARAMETER_PAGE = "rub";
 		const std::string AdminRequest::PARAMETER_OBJECT_ID = "id";
+
+		AdminRequest::AdminRequest()
+			: Request(Request::NEEDS_SESSION) {}
 
 		AdminRequest::ParametersMap AdminRequest::getParametersMap() const
 		{

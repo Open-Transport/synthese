@@ -1,8 +1,7 @@
 
 #include "01_util/Conversion.h"
 
-#include "11_interfaces/AdminInterfaceElement.h"
-
+#include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminInterfacePage.h"
 
 namespace synthese
@@ -17,7 +16,7 @@ namespace synthese
 			ParametersVector parameters;
 			parameters.push_back(Conversion::ToString(objectId));
 
-			InterfacePage::display(stream, parameters, NULL, request);
+			InterfacePage::display(stream, parameters, (const void*) page, request);
 		}
 	}
 }

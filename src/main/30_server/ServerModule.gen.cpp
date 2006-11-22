@@ -6,6 +6,7 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::server::L
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::server::LogoutAction>("logout");
 
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::server::SimpleLoginInterfacePage>("simplelogin");
+synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::server::RedirectInterfacePage>("redir");
 
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::server::HtmlFormInterfaceElement>("htmlform");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::server::LogoutHTMLLinkInterfaceElement>("logouthtmllink");

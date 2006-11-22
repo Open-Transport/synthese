@@ -1,7 +1,4 @@
 
-#include <stdlib.h>
-#include <time.h>
-
 #include "00_tcp/TcpService.h"
 
 #include "01_util/Log.h"
@@ -37,7 +34,6 @@ namespace synthese
 
 		void ServerModule::initialize()
 		{
-			srand( (unsigned) std::time( NULL ) );
 		}
 
 		Site::Registry& ServerModule::getSites()

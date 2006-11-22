@@ -34,6 +34,7 @@ namespace synthese
 			void setFromParametersMap(const server::Request::ParametersMap& map);
 
 		public:
+			SimplePageRequest();
 
 			/** Action to run, defined by each subclass.
 			*/

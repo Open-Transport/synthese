@@ -120,6 +120,12 @@ namespace synthese
 	strcat(buffer, Request::PARAMETER_IP.c_str());
 	strcat(buffer, Request::PARAMETER_ASSIGNMENT.c_str());
 	strcat(buffer, ip);
+	// Adding of the client url prefix to the request
+	strcat(buffer, Request::PARAMETER_SEPARATOR.c_str());
+	strcat(buffer, Request::PARAMETER_CLIENT_URL.c_str());
+	strcat(buffer, Request::PARAMETER_ASSIGNMENT.c_str());
+	strcat(buffer, script);
+	// Adding end of line to close the request
 	strcat(buffer, "\r\n");
 		    
     // Initialise la connection au serveur

@@ -1,4 +1,7 @@
 
+#include <time.h>
+#include <stdlib.h>
+
 #include "01_util/Conversion.h"
 
 #include "04_time/DateTime.h"
@@ -22,6 +25,7 @@ namespace synthese
 			: _ip(ip)
 			, _key(generateKey())
 		{
+			ServerModule::getSessions().insert(make_pair(_key, this));
 		}
 
 		void Session::controlAndRefresh(const std::string& ip)
@@ -39,6 +43,7 @@ namespace synthese
 		std::string Session::generateKey()
 		{
 			std::string key;
+			srand( (unsigned) ::time( NULL ) );
 			for (size_t i=0; i< Session::KEY_LENGTH; ++i)
 			{
 				key += Conversion::ToString(rand());

@@ -41,9 +41,8 @@ namespace synthese
 				try
 				{
 					InterfacePage* page = request->getSite()->getInterface()->getPage(requestKey);
-					SimplePageRequest* spr = new SimplePageRequest;
-					spr->setPage(page);
-					redirRequest = (Request*) spr;
+					redirRequest = Factory<Request>::create<SimplePageRequest>();
+					((SimplePageRequest*) redirRequest)->setPage(page);
 				}
 				catch (InterfacePageException e)
 				{
@@ -52,12 +51,11 @@ namespace synthese
 			}
 			if (redirRequest == NULL)
 			{
-				ActionOnlyRequest* aor = new ActionOnlyRequest;
-				aor->setURL(url);
-				redirRequest = (Request*) aor;
+				redirRequest = Factory<Request>::create<ActionOnlyRequest>();
+				((ActionOnlyRequest*) redirRequest)->setURL(url);
 			}
 			redirRequest->copy(request);
-			redirRequest->setAction(new LogoutAction);
+			redirRequest->setAction(Factory<Action>::create<LogoutAction>());
 
 			stream << redirRequest->getHTMLLink(_content->getValue(parameters, NULL, request));
 

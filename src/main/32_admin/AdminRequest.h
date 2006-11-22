@@ -7,13 +7,10 @@
 
 namespace synthese
 {
-	namespace interfaces
-	{
-		class AdminInterfaceElement;
-	}
-
 	namespace admin
 	{
+		class AdminInterfaceElement;
+
 		class AdminRequest : public server::Request
 		{
 			static const std::string PARAMETER_PAGE;
@@ -21,8 +18,8 @@ namespace synthese
 
 			//! \name Page parameters
 			//@{
-			const interfaces::AdminInterfaceElement*	_page;
-			uid											_object_id;
+			const AdminInterfaceElement*	_page;
+			uid								_object_id;
 			//@}
 
 
@@ -35,6 +32,7 @@ namespace synthese
 			void setFromParametersMap(const ParametersMap& map);
 
 		public:
+			AdminRequest();
 			~AdminRequest();
 
 			/** Action to run, defined by each subclass.

@@ -32,17 +32,20 @@ namespace synthese
 			static const std::string PARAMETER_IP;
 			static const std::string PARAMETER_CLIENT_URL;
 			static const int MAX_REQUEST_SIZE;
+			
 			typedef std::map<std::string, std::string> ParametersMap;
+			typedef enum { NEEDS_SESSION, DONT_NEED_SESSION } IsSessionNeeded;
 
 		protected:
 
-			const Site*		_site;
-			const Session*	_session;
-			bool			_sessionBroken;
-			std::string		_ip;
-			Action*			_action;
-			bool			_actionException;
-			std::string		_clientURL;
+			const Site*				_site;
+			const Session*			_session;
+			bool					_sessionBroken;
+			std::string				_ip;
+			Action*					_action;
+			bool					_actionException;
+			std::string				_clientURL;
+			const IsSessionNeeded	_needsSession;
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -58,9 +61,9 @@ namespace synthese
 			static std::string truncateStringIfNeeded (const std::string& requestString);
 
 		public:
-			//! \name Constructors and destructors
+			//! \name Constructor and destructor
 			//@{
-				Request();
+				Request(IsSessionNeeded needsSession);
 				virtual ~Request();
 			//@}
 

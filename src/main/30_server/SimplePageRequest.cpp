@@ -15,6 +15,9 @@ namespace synthese
 	{
 		const std::string SimplePageRequest::PARAMETER_PAGE = "page";
 
+		SimplePageRequest::SimplePageRequest()
+			: Request(Request::DONT_NEED_SESSION) {}
+
 		void SimplePageRequest::run( std::ostream& stream ) const
 		{
 			ParametersVector pv;

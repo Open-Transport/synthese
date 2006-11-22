@@ -40,9 +40,10 @@ namespace synthese
 		const std::string Request::PARAMETER_IP = "ipaddr";
 		const std::string Request::PARAMETER_CLIENT_URL = "clienturl";
 
-		Request::Request()
+		Request::Request(IsSessionNeeded isSessionNeeded)
 			: _session(NULL)
 			, _action(NULL)
+			, _needsSession(isSessionNeeded)
 		{
 
 		}
@@ -197,6 +198,10 @@ namespace synthese
 					map.insert(make_pair(Action::PARAMETER_PREFIX + it->first, it->second));
 				}
 			}
+			if (_session != NULL)
+			{
+				map.insert(make_pair(PARAMETER_SESSION, _session->getKey()));
+			}
 
 			// Serialize the parameter lists in a synthese querystring
 			std::stringstream ss;
@@ -221,6 +226,8 @@ namespace synthese
 				{
 					_action->run();
 
+					// Redirection to the same request without the action
+					_action = NULL;
 					const RedirectInterfacePage* page = _site->getInterface()->getPage<RedirectInterfacePage>();
 					page->display(stream, this);
 				}
@@ -237,7 +244,11 @@ namespace synthese
 				}
 			}
 			else
+			{
+				if (_needsSession == NEEDS_SESSION && _session == NULL)
+					return;
 				run(stream);
+			}
 		}
 
 		Request::~Request()

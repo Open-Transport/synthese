@@ -11,6 +11,8 @@ namespace synthese
 		
 		const std::string ActionOnlyRequest::PARAMETER_URL = "url";
 
+		ActionOnlyRequest::ActionOnlyRequest()
+			: Request(Request::NEEDS_SESSION) {}
 
 		server::Request::ParametersMap ActionOnlyRequest::getParametersMap() const
 		{

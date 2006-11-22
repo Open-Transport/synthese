@@ -87,6 +87,7 @@ namespace synthese
 			void setFromParametersMap(const ParametersMap& map);
 
 		public:
+			MapRequestHandler();
 			void run(std::ostream& stream) const;
 
 		};

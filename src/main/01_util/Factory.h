@@ -18,6 +18,15 @@ namespace synthese
 				- Auto instantiation of the factory at the fist class registration
 				- Iterator for accessing to the registered subclasses list
 				- Creation of objects from the iterator or directly from a string key
+
+			Possible uses :
+				- Factory<FactoryClass>::create("class_key") -> Creates an object from the string key of the class
+				- Factory<FactoryClass>::create<Subclass>() -> equivalent as new Subclass but the created object knows the key of its class as if it comes from a from string creation.
+				- object->getFactoryKey() -> Answers the key corresponding to the class of the object, if the object has been created by the factory
+				- Factory<FactoryClass>::getKey<SubClass>() -> returns the key corresponding to the sub class
+				- Factory<FactoryClass>::contains("class_key") -> Answers if a class is registered with the specified key
+
+			@todo See if the getKey() method could be optimized by use of static variable (my first attempts have failed)
 		*/
 		template <class RootObject>
 		class Factory
@@ -112,6 +121,15 @@ namespace synthese
 				return it != _registeredCreator->end();
 			}
 
+			template<class T>
+			static RootObject* create()
+			{
+				CreatorInterface* creator = new Creator<T>;
+				RootObject* object = creator->create();
+				object->setFactoryKey(getKey<T>());
+				return object;
+			}
+
 			static RootObject* create(const typename Map::key_type& key)
 			{
 				// The factory "single object" was never filled
@@ -160,7 +178,10 @@ namespace synthese
 				RootObject* operator*()
 				{
 					if (_obj == NULL)
+					{
 						_obj = _it->second->create();
+						_obj->setFactoryKey(_it->first);
+					}
 					return _obj;
 				}
 
@@ -194,7 +215,9 @@ namespace synthese
 				*/
 				RootObject* getObject()
 				{
-					return _it->second->create();
+					RootObject* obj = _it->second->create();
+					obj->setFactoryKey(_it->first);
+					return obj;
 				}
 
 				/** Key getter.

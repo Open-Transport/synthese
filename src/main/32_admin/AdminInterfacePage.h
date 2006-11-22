@@ -5,18 +5,17 @@
 
 namespace synthese
 {
-	namespace interfaces
-	{
-		class AdminInterfaceElement;
-	}
 	namespace admin
 	{
+		class AdminInterfaceElement;
+
 		/** Admin template page.
 		@code admin @endcode
 		*/
 		class AdminInterfacePage : public interfaces::InterfacePage
 		{
 		public:
+
 			/** Display of the admin page.
 			@param stream Stream to write on
 			@param pageKey Key of the AdminInterfaceElement to display
@@ -24,7 +23,7 @@ namespace synthese
 			@param site Displayed site
 			*/
 			void display( std::ostream& stream
-				, const interfaces::AdminInterfaceElement* page
+				, const AdminInterfaceElement* page
 				, const uid objectId
 				, const server::Request* request = NULL ) const;
 
