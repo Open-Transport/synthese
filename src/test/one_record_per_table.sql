@@ -24,11 +24,52 @@ CREATE TABLE t020_bike_compliances (id INTEGER UNIQUE PRIMARY KEY, status INTEGE
 CREATE TABLE t021_reservation_rules (id INTEGER UNIQUE PRIMARY KEY, reservation_type INTEGER, online BOOLEAN, origin_is_reference BOOLEAN, min_delay_minutes INTEGER, min_delay_days INTEGER, max_delay_days INTEGER, hour_deadline TIME, phone_exchange_number TEXT, phone_exchange_opening_hours TEXT, description TEXT, web_site_url TEXT);
 CREATE TABLE t022_transport_networks (id INTEGER UNIQUE PRIMARY KEY, name TEXT);
 CREATE TABLE t023_interface_pages (id INTEGER UNIQUE PRIMARY KEY, interface_id INTEGER, page_code TEXT, content TEXT);
-INSERT INTO t023_interface_pages VALUES(184464073709551516,1,'admin','print toto');
+INSERT INTO t023_interface_pages VALUES(135461354,1,'simplelogin','print {Bienvenue sur l''écran de login !}
+print {{htmlform login admin rub=home login {}}}
+print {{loginhtmlfield}}
+print {{passwordhtmlfield}}
+print {<input type="submit" value="ok" />}
+print </form>
+print {Fin de page}');
+INSERT INTO t023_interface_pages VALUES(184464073709551516,1,'admin','print {<html><head><title>}
+
+print {</title></head><body>}
+print {<table cellSpacing="0" cellPadding="1" border="1" borderColor="#000066">}
+print {<TR><TD width="259" bgColor="#000066" colSpan="1" height="21" rowSpan="1"><FONT face="Verdana" size="1"><FONT color="#ffffff">}
+
+print {USERNAMESURNAME}
+
+print {</FONT>}
+
+print {{logouthtmllink {} simplelogin {D&eacute;connecter}}}
+
+print {</TD><TD bgColor="#000066" height="21"><FONT size="2"><FONT face="Verdana" color="gold">}
+
+print {{adminpos}}
+
+print {</FONT></TD>}
+print {</TR><TR><TD vAlign="top" width="259">}
+
+print {{admintree}}
+
+print {</TD><TD vAlign="top"><FONT face="Verdana"><FONT size="2">}
+
+admincontent
+
+print {</FONT></TD>}
+print {</tr></table></body></html>}
+');
+INSERT INTO t023_interface_pages VALUES(184464073709551517,1,'redir','print {<html><script type=""text/javascript"">window.location.replace(''}
+print {{param 0}}
+print {'');</script></html>}');
 CREATE TABLE t024_interfaces (id INTEGER UNIQUE PRIMARY KEY);
 INSERT INTO t024_interfaces VALUES(1);
 CREATE TABLE t025_sites (id INTEGER UNIQUE PRIMARY KEY, name TEXT, interface_id INTEGER, env_id INTEGER, start_date DATE, end_date DATE, online_booking INTEGER, use_old_data INTEGER, client_url TEXT);
 INSERT INTO t025_sites VALUES(1,'test',1,1,'2006-11-01','2007-11-01',1,0,'test');
+CREATE TABLE t026_users (id INTEGER UNIQUE PRIMARY KEY, name TEXT, surname TEXT, login TEXT, password TEXT, profile_id INTEGER);
+INSERT INTO t026_users VALUES(1,'name','surname','test','test',1);
+CREATE TABLE t027_profiles (id INTEGER UNIQUE PRIMARY KEY, name TEXT, parent INTEGER, rights TEXT);
+INSERT INTO t027_profiles VALUES(1,'admin',0,'*,*,100,100');
 CREATE TABLE t999_config (param_name TEXT UNIQUE PRIMARY KEY, param_value TIMESTAMP);
 CREATE TRIGGER t001_environment_links_no_update BEFORE UPDATE OF id, environment_id, link_target_id ON t001_environment_links BEGIN SELECT RAISE (ABORT, 'Update of id, environment_id, link_target_id in t001_environment_links is forbidden.') WHERE 1; END;
 CREATE TRIGGER t002_addresses_no_remove BEFORE DELETE ON t002_addresses BEGIN SELECT RAISE (ABORT, 'Deletion in t002_addresses is forbidden.') WHERE (SELECT param_value FROM t999_config WHERE param_name=triggers_enabled); END;
@@ -61,5 +102,7 @@ CREATE TRIGGER t021_reservation_rules_no_remove BEFORE DELETE ON t021_reservatio
 CREATE TRIGGER t023_interface_pages_no_update BEFORE UPDATE OF id, interface_id, page_code ON t023_interface_pages BEGIN SELECT RAISE (ABORT, 'Update of id, interface_id, page_code in t023_interface_pages is forbidden.') WHERE (SELECT param_value FROM t999_config WHERE param_name=triggers_enabled); END;
 CREATE TRIGGER t024_interfaces_no_update BEFORE UPDATE OF id ON t024_interfaces BEGIN SELECT RAISE (ABORT, 'Update of id in t024_interfaces is forbidden.') WHERE (SELECT param_value FROM t999_config WHERE param_name=triggers_enabled); END;
 CREATE TRIGGER t025_sites_no_update BEFORE UPDATE OF id ON t025_sites BEGIN SELECT RAISE (ABORT, 'Update of id in t025_sites is forbidden.') WHERE (SELECT param_value FROM t999_config WHERE param_name=triggers_enabled); END;
+CREATE TRIGGER t026_users_no_update BEFORE UPDATE OF id ON t026_users BEGIN SELECT RAISE (ABORT, 'Update of id in t026_users is forbidden.') WHERE (SELECT param_value FROM t999_config WHERE param_name=triggers_enabled); END;
+CREATE TRIGGER t027_profiles_no_update BEFORE UPDATE OF id ON t027_profiles BEGIN SELECT RAISE (ABORT, 'Update of id in t027_profiles is forbidden.') WHERE 1; END;
 CREATE TRIGGER t999_config_no_update BEFORE UPDATE OF param_name ON t999_config BEGIN SELECT RAISE (ABORT, 'Update of param_name in t999_config is forbidden.') WHERE 1; END;
 COMMIT;

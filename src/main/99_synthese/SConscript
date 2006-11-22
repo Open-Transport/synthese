@@ -23,12 +23,16 @@ excludes = []
 
 files = moduleenv.Glob(includes, excludes)
 
+# Third party services libs
+moduleenv.AddModuleDependency ('71_vinci_bike_rental')
 
-# Services libs
-moduleenv.AddModuleDependency ('30_server')
-moduleenv.AddModuleDependency ('32_admin')
+# Business Services libs
 moduleenv.AddModuleDependency ('39_carto')
 moduleenv.AddModuleDependency ('40_carto_ls_xml')
+
+# Core Services libs
+moduleenv.AddModuleDependency ('30_server')
+moduleenv.AddModuleDependency ('32_admin')
 
 # Classes libs
 moduleenv.AddModuleDependency ('11_interfaces')

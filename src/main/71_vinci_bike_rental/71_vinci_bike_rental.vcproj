@@ -54,19 +54,22 @@
 			Filter="">
 		</Filter>
 		<Filter
-			Name="Interface pages"
+			Name="Admin Interface elements"
 			Filter="">
 			<File
-				RelativePath=".\VinciBikeInterfacePage.h">
+				RelativePath=".\VinciBikeAdminInterfaceElement.h">
 			</File>
 			<File
-				RelativePath=".\VinciBikeSearchInterfacePage.h">
+				RelativePath=".\VinciBikeSearchAdminInterfaceElement.h">
 			</File>
 			<File
-				RelativePath=".\VinciCustomerInterfacePage.h">
+				RelativePath=".\VinciCustomerAdminInterfaceElement.h">
 			</File>
 			<File
-				RelativePath=".\VinciCustomerSearchInterfacePage.h">
+				RelativePath=".\VinciCustomerSearchAdminInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\VinciCustomerSearchAdminInterfaceElement.h">
 			</File>
 		</Filter>
 		<Filter
@@ -79,6 +82,18 @@
 		</Filter>
 		<File
 			RelativePath=".\SConscript">
+		</File>
+		<File
+			RelativePath=".\VinciBikeRentalModule.cpp">
+		</File>
+		<File
+			RelativePath=".\VinciBikeRentalModule.gen.cpp">
+		</File>
+		<File
+			RelativePath=".\VinciBikeRentalModule.h">
+		</File>
+		<File
+			RelativePath=".\VinciBikeRentalModule.inc.cpp">
 		</File>
 	</Files>
 	<Globals>
