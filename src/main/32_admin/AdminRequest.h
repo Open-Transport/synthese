@@ -35,6 +35,8 @@ namespace synthese
 			AdminRequest();
 			~AdminRequest();
 
+			void setPage(const AdminInterfaceElement* aie);
+
 			/** Action to run, defined by each subclass.
 			*/
 			void run(std::ostream& stream) const;

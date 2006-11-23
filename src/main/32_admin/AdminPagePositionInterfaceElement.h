@@ -18,7 +18,7 @@ namespace synthese
 			//interfaces::ValueInterfaceElement* _parameter1;
 			//...
 
-			static std::string getUpPages(const AdminInterfaceElement* page);
+			static std::string getUpPages(const AdminInterfaceElement* page, const server::Request* request, bool isFirst = true);
 
 		public:
 			/** Controls and store the internals parameters.

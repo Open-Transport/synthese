@@ -75,5 +75,10 @@ namespace synthese
 		{
 			delete _page;
 		}
+
+		void AdminRequest::setPage( const AdminInterfaceElement* aie )
+		{
+			_page = aie;
+		}
 	}
 }
