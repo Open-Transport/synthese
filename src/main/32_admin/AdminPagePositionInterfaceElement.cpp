@@ -32,10 +32,7 @@ namespace synthese
 			}
 			if (!isFirst)
 			{
-				Request* linkRequest = Factory<Request>::create<AdminRequest>();
-				linkRequest->copy(request);
-				((AdminRequest* ) linkRequest)->setPage(page);
-				str << linkRequest->getHTMLLink(page->getTitle());
+				str << page->getHTMLLink(request);
 			}
 			else
 			{

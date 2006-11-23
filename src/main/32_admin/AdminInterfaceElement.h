@@ -41,6 +41,8 @@ namespace synthese
 			const DisplayMode getDisplayMode() const;
 			virtual std::string getTitle() const = 0;
 
+			std::string getHTMLLink(const server::Request* request) const;
+
 			//static const Right* requiredRight();
 
 		};

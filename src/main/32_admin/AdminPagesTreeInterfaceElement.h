@@ -18,7 +18,7 @@ namespace synthese
 			//interfaces::ValueInterfaceElement* _parameter1;
 			//...
 
-			static std::string getSubPages(const std::string& page);
+			static std::string getSubPages(const std::string& page, const std::string& currentPage, const server::Request* request);
 
 		public:
 			/** Controls and store the internals parameters.
