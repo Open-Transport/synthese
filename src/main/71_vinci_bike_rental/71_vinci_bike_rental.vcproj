@@ -60,6 +60,9 @@
 				RelativePath=".\VinciBikeAdminInterfaceElement.h">
 			</File>
 			<File
+				RelativePath=".\VinciBikeSearchAdminInterfaceElement.cpp">
+			</File>
+			<File
 				RelativePath=".\VinciBikeSearchAdminInterfaceElement.h">
 			</File>
 			<File
