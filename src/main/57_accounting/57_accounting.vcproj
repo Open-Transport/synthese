@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="71_vinci_bike_rental"
+	Name="57_accounting"
 	ProjectGUID="{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
 	Keyword="MakeFileProj">
 	<Platforms>
@@ -43,13 +43,13 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\VinciFare.h">
+				RelativePath=".\Account.h">
 			</File>
 			<File
-				RelativePath=".\VinciGuarantee.h">
+				RelativePath=".\Transaction.h">
 			</File>
 			<File
-				RelativePath=".\VinciTransaction.h">
+				RelativePath=".\TransactionPart.h">
 			</File>
 		</Filter>
 		<Filter
@@ -59,24 +59,6 @@
 		<Filter
 			Name="Admin Interface elements"
 			Filter="">
-			<File
-				RelativePath=".\VinciBikeAdminInterfaceElement.h">
-			</File>
-			<File
-				RelativePath=".\VinciBikeSearchAdminInterfaceElement.cpp">
-			</File>
-			<File
-				RelativePath=".\VinciBikeSearchAdminInterfaceElement.h">
-			</File>
-			<File
-				RelativePath=".\VinciCustomerAdminInterfaceElement.h">
-			</File>
-			<File
-				RelativePath=".\VinciCustomerSearchAdminInterfaceElement.cpp">
-			</File>
-			<File
-				RelativePath=".\VinciCustomerSearchAdminInterfaceElement.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Interface elements library"
@@ -87,19 +69,19 @@
 			Filter="">
 		</Filter>
 		<File
+			RelativePath=".\AccountingModule.cpp">
+		</File>
+		<File
+			RelativePath=".\AccountingModule.gen.cpp">
+		</File>
+		<File
+			RelativePath=".\AccountingModule.h">
+		</File>
+		<File
+			RelativePath=".\AccountingModule.inc.cpp">
+		</File>
+		<File
 			RelativePath=".\SConscript">
-		</File>
-		<File
-			RelativePath=".\VinciBikeRentalModule.cpp">
-		</File>
-		<File
-			RelativePath=".\VinciBikeRentalModule.gen.cpp">
-		</File>
-		<File
-			RelativePath=".\VinciBikeRentalModule.h">
-		</File>
-		<File
-			RelativePath=".\VinciBikeRentalModule.inc.cpp">
 		</File>
 	</Files>
 	<Globals>
