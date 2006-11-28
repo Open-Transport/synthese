@@ -2,12 +2,14 @@
 #ifndef SYNTHESE_SECURITY_USERS_ADMIN_H
 #define SYNTHESE_SECURITY_USERS_ADMIN_H
 
+#include "32_admin/AdminInterfaceElement.h"
+
 namespace synthese
 {
-	namespace interfaces
+	namespace security
 	{
 		/** Ecran de recherche et liste d'utilisateurs.
-			@ingroup m05
+			@ingroup m12
 		
 			@image html cap_admin_users.png
 			@image latex cap_admin_users.png "Maquette de l'écran de recherche d'utilisateur" width=14cm
@@ -55,8 +57,23 @@ namespace synthese
 				- INFO : Création d'utilisateur
 				- INFO : Suppression d'utilisateur : le choix "suppression ou désactivation" est notifié dans l'entrée
 		*/
-		class UsersAdmin: public AdminInterfaceElement
+		class UsersAdmin: public admin::AdminInterfaceElement
 		{
+		private:
+			static const std::string PARAM_SEARCH_PROFILE_ID;
+			static const std::string PARAM_SEARCH_NAME;
+			static const std::string PARAM_SEARCH_LOGIN;
+			static const std::string PARAM_SEARCH_FIRST;
+			static const std::string PARAM_SEARCH_NUMBER;
+
+
+		public:
+			UsersAdmin();
+			std::string getTitle() const;
+			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* rootObject /* = NULL */, const server::Request* request /* = NULL */) const;
+
 		};
 	}
 }
+
+#endif

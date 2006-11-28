@@ -15,142 +15,126 @@
 #include "30_server/ServerModule.h"
 #include "30_server/ServerConfigTableSync.h"
 
-using synthese::util::Conversion;
-using synthese::db::SQLiteResult;
-using synthese::db::SQLiteSync;
-using synthese::db::SQLiteThreadExec;
-using synthese::env::Environment;
-using synthese::time::DateTime;
-
 namespace synthese
 {
-namespace server
-{
+	using namespace db;
+	using namespace util;
+	using namespace env;
+	using namespace time;
 
-
-
-ServerConfigTableSync::ServerConfigTableSync ()
-: synthese::db::SQLiteTableSync (CONFIG_TABLE_NAME, true, true)
-{
-    addTableColumn (CONFIG_TABLE_COL_PARAMNAME, "TEXT", false);
-    addTableColumn (CONFIG_TABLE_COL_PARAMVALUE, "TIMESTAMP", true);
-}
-
-
-
-ServerConfigTableSync::~ServerConfigTableSync ()
-{
-
-}
-
-    
-
-
-void 
-ServerConfigTableSync::rowsAdded (const SQLiteThreadExec* sqlite, 
-				  SQLiteSync* sync,
-				  const SQLiteResult& rows)
-{
-    for (int i=0; i<rows.getNbRows (); ++i)
-    {
-    
-	std::string paramName = rows.getColumn (i, CONFIG_TABLE_COL_PARAMNAME);
-	std::string paramValue = rows.getColumn (i, CONFIG_TABLE_COL_PARAMVALUE);
-	
-	if (paramName == CONFIG_TABLE_COL_PARAMVALUE_PORT)
+	namespace server
 	{
-		ServerModule::getConfig().setPort (Conversion::ToInt (paramValue));
-	} 
-	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_NBTHREADS)
-	{
-	    ServerModule::getConfig().setNbThreads (Conversion::ToInt (paramValue));
+
+		ServerConfigTableSync::ServerConfigTableSync ()
+		: synthese::db::SQLiteTableSync (CONFIG_TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+		{
+			addTableColumn (CONFIG_TABLE_COL_PARAMNAME, "TEXT", false);
+			addTableColumn (CONFIG_TABLE_COL_PARAMVALUE, "TIMESTAMP", true);
+		}
+
+
+
+		ServerConfigTableSync::~ServerConfigTableSync ()
+		{
+
+		}
+
+		    
+
+
+		void 
+		ServerConfigTableSync::rowsAdded (const SQLiteThreadExec* sqlite, 
+						SQLiteSync* sync,
+						const SQLiteResult& rows)
+		{
+			for (int i=0; i<rows.getNbRows (); ++i)
+			{
+		    
+			std::string paramName = rows.getColumn (i, CONFIG_TABLE_COL_PARAMNAME);
+			std::string paramValue = rows.getColumn (i, CONFIG_TABLE_COL_PARAMVALUE);
+			
+			if (paramName == CONFIG_TABLE_COL_PARAMVALUE_PORT)
+			{
+				ServerModule::getConfig().setPort (Conversion::ToInt (paramValue));
+			} 
+			else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_NBTHREADS)
+			{
+				ServerModule::getConfig().setNbThreads (Conversion::ToInt (paramValue));
+			}
+			else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_DATADIR)
+			{
+				ServerModule::getConfig().setDataDir (boost::filesystem::path (paramValue, boost::filesystem::native));
+			}
+			else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_TEMPDIR)
+			{
+				ServerModule::getConfig().setTempDir (boost::filesystem::path (paramValue, boost::filesystem::native));
+			}
+			else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPDIR)
+			{
+				ServerModule::getConfig().setHttpTempDir (boost::filesystem::path (paramValue, boost::filesystem::native));
+			}
+			else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPURL)
+			{
+				ServerModule::getConfig().setHttpTempUrl (paramValue);
+			}
+			}
+			
+			
+		}
+
+
+		void 
+		ServerConfigTableSync::rowsUpdated (const SQLiteThreadExec* sqlite, 
+							SQLiteSync* sync,
+							const SQLiteResult& rows)
+		{
+			rowsAdded (sqlite, sync, rows);
+		}
+
+
+
+		void 
+		ServerConfigTableSync::rowsRemoved (const SQLiteThreadExec* sqlite, 
+							SQLiteSync* sync,
+							const SQLiteResult& rows)
+		{
+
+		}
+
+
+
+
+
+		/*
+		void 
+		ServerConfigTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex)
+		{
+			std::string paramName = rows.getColumn (rowIndex, CONFIG_TABLE_COL_PARAMNAME);
+			std::string paramValue = rows.getColumn (rowIndex, CONFIG_TABLE_COL_PARAMVALUE);
+
+			if (paramName == "")
+			{
+			
+			}
+
+		}
+
+
+
+		void 
+		ServerConfigTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex)
+		{
+		    
+		}
+
+
+
+		void 
+		ServerConfigTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex)
+		{
+
+		}
+		*/
+
 	}
-	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_DATADIR)
-	{
-	    ServerModule::getConfig().setDataDir (boost::filesystem::path (paramValue, boost::filesystem::native));
-	}
-	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_TEMPDIR)
-	{
-	    ServerModule::getConfig().setTempDir (boost::filesystem::path (paramValue, boost::filesystem::native));
-	}
-	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPDIR)
-	{
-	    ServerModule::getConfig().setHttpTempDir (boost::filesystem::path (paramValue, boost::filesystem::native));
-	}
-	else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPURL)
-	{
-	    ServerModule::getConfig().setHttpTempUrl (paramValue);
-	}
-    }
-	
-	
-}
-
-
-void 
-ServerConfigTableSync::rowsUpdated (const SQLiteThreadExec* sqlite, 
-				    SQLiteSync* sync,
-				    const SQLiteResult& rows)
-{
-    rowsAdded (sqlite, sync, rows);
-}
-
-
-
-void 
-ServerConfigTableSync::rowsRemoved (const SQLiteThreadExec* sqlite, 
-				    SQLiteSync* sync,
-				    const SQLiteResult& rows)
-{
-
-}
-
-
-
-
-
-/*
-void 
-ServerConfigTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex)
-{
-    std::string paramName = rows.getColumn (rowIndex, CONFIG_TABLE_COL_PARAMNAME);
-    std::string paramValue = rows.getColumn (rowIndex, CONFIG_TABLE_COL_PARAMVALUE);
-
-    if (paramName == "")
-    {
-	
-    }
-
-}
-
-
-
-void 
-ServerConfigTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex)
-{
-    
-}
-
-
-
-void 
-ServerConfigTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex)
-{
-
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
 }

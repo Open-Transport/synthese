@@ -74,15 +74,17 @@
 				RelativePath=".\ProfilesAdmin.h">
 			</File>
 			<File
+				RelativePath=".\UserAdmin.cpp">
+			</File>
+			<File
 				RelativePath=".\UserAdmin.h">
+			</File>
+			<File
+				RelativePath=".\UsersAdmin.cpp">
 			</File>
 			<File
 				RelativePath=".\UsersAdmin.h">
 			</File>
-		</Filter>
-		<Filter
-			Name="LibraryInterfaceElement"
-			Filter="">
 		</Filter>
 		<Filter
 			Name="DBLog"
@@ -119,8 +121,17 @@
 			Filter="">
 		</Filter>
 		<Filter
-			Name="Requests"
+			Name="Actions"
 			Filter="">
+			<File
+				RelativePath=".\AddUserAction.cpp">
+			</File>
+			<File
+				RelativePath=".\AddUserAction.h">
+			</File>
+			<File
+				RelativePath=".\DelUserAction.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Exceptions"

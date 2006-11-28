@@ -36,6 +36,8 @@ class Registry
     Registry ();
     ~Registry ();
 
+	typedef typename std::map<K, T*>::const_iterator const_iterator;
+
     //! @name Getters/Setters
     //@{
     //@}
@@ -48,6 +50,9 @@ class Registry
     const T* get (const K& key) const;
 
     size_t size () const;
+	const_iterator begin() const;
+	const_iterator end() const;
+
     //@}
 
     
@@ -71,6 +76,18 @@ class Registry
 
 };
 
+
+template<class K, class T>
+typename Registry<K,T>::const_iterator Registry<K,T>::begin() const
+{
+	return _registry.begin();
+}
+
+template<class K, class T>
+typename Registry<K,T>::const_iterator Registry<K,T>::end() const
+{
+	return _registry.end();
+}
 
 
 

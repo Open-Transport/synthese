@@ -84,6 +84,9 @@
 				RelativePath=".\SQLiteTableSync.h">
 			</File>
 			<File
+				RelativePath=".\SQLiteTableSyncTemplate.h">
+			</File>
+			<File
 				RelativePath=".\SQLiteThreadExec.h">
 			</File>
 			<File

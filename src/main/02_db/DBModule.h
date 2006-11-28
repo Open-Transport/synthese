@@ -19,7 +19,6 @@ namespace synthese
 
 		class DBModule : public util::ModuleClass
 		{
-
 		public:
 
 			void initialize();

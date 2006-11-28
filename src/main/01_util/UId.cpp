@@ -20,7 +20,7 @@ encodeUId (int tableId, int gridId, int gridNodeId, long objectId)
     uid tmp = gridNodeId;
     id |= (tmp << 32);
     tmp = gridId;
-    id |= (tmp << 44);
+    id |= (tmp << 42);
     tmp = tableId;
     id |= (tmp << 48);
     return id;
@@ -39,14 +39,14 @@ decodeTableId (const uid& id)
 int 
 decodeGridId (const uid& id)
 {
-    return (int) ((id & 0x0000F00000000000LL) >> 44);
+    return (int) ((id & 0x0000FF0000000000LL) >> 42);
 }
 
 
 int 
 decodeGridNodeId (const uid& id)
 {
-    return (int) ((id & 0x00000FFF00000000LL) >> 32);
+    return (int) ((id & 0x000000FF00000000LL) >> 32);
 }
 
 

@@ -338,5 +338,10 @@ namespace synthese
 		{
 			return _site;
 		}
+
+		const Action* Request::getAction() const
+		{
+			return _action;
+		}
 	}
 }

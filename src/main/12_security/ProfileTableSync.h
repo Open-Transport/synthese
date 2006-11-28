@@ -42,6 +42,7 @@ namespace synthese
 
 			static void saveProfile(const db::SQLiteThreadExec* sqlite, Profile* profile);
 
+
 		protected:
 
 			/** Action to do on user creation.

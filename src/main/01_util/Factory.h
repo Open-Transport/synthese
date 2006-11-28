@@ -50,9 +50,15 @@ namespace synthese
 			class Creator : public CreatorInterface
 			{
 			private:
+				friend class Factory;
 				RootObject* create()
 				{
-					return static_cast<RootObject*>(new T);
+					return (RootObject*) createTyped();
+				}
+
+				T* createTyped()
+				{
+					return new T;
 				}
 			};
 
@@ -122,10 +128,10 @@ namespace synthese
 			}
 
 			template<class T>
-			static RootObject* create()
+			static T* create()
 			{
-				CreatorInterface* creator = new Creator<T>;
-				RootObject* object = creator->create();
+				Creator<T> creator;
+				T* object = creator.createTyped();
 				object->setFactoryKey(getKey<T>());
 				return object;
 			}

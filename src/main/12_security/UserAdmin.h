@@ -2,12 +2,14 @@
 #ifndef SYNTHESE_SECURITY_USER_ADMIN_H
 #define SYNTHESE_SECURITY_USER_ADMIN_H
 
+#include "32_admin/AdminInterfaceElement.h"
+
 namespace synthese
 {
-	namespace interfaces
+	namespace security
 	{
 		/** Ecran d'édition d'utilisateur.
-			@ingroup m05
+			@ingroup m12
 		
 			@image html cap_admin_user.png
 			@image latex cap_admin_user.png "Maquette de l'écran d'édition d'utilisateur" width=14cm
@@ -54,8 +56,14 @@ namespace synthese
 				- INFO : Chaque modification effectuée avec succès
 
 		*/
-		class UserAdmin: public AdminInterfaceElement
+		class UserAdmin: public admin::AdminInterfaceElement
 		{
+		public:
+			UserAdmin();
+			std::string getTitle() const;
+			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* rootObject /* = NULL */, const server::Request* request /* = NULL */) const;
 		};
 	}
 }
+
+#endif

@@ -22,7 +22,7 @@ namespace synthese
 		const std::string ProfileTableSync::TABLE_COL_RIGHTS_STRING = "rights";
 
 		ProfileTableSync::ProfileTableSync()
-			: SQLiteTableSync(TABLE_NAME, true, true)
+			: SQLiteTableSync(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
@@ -66,5 +66,6 @@ namespace synthese
 		{
 			/// @todo Implementation
 		}
+
 	}
 }

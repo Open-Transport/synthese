@@ -20,6 +20,7 @@ namespace synthese
 			//@{
 			const AdminInterfaceElement*	_page;
 			uid								_object_id;
+			ParametersMap					_parameters;
 			//@}
 
 
@@ -36,10 +37,17 @@ namespace synthese
 			~AdminRequest();
 
 			void setPage(const AdminInterfaceElement* aie);
+			const AdminInterfaceElement* getPage() const;
 
 			/** Action to run, defined by each subclass.
 			*/
 			void run(std::ostream& stream) const;
+
+			const std::string& getStringParameter(const std::string& name, const std::string& defaultValue);
+			long long getLongLongParameter(const std::string& name, long long defaultValue);
+			int getIntParameter(const std::string& name, int defaultValue);
+
+			std::string getHTMLFormHeader(const std::string& name) const;
 
 		};
 	}

@@ -56,6 +56,8 @@ namespace synthese
 			void cleanRights();
 			void setParent(uid id);
 			void setRights(const std::string& text);
+
+			const std::string& getName() const;
 		};
 	}
 }

@@ -73,6 +73,7 @@ namespace synthese
 				const Session* getSession() const;
 				const std::string& getClientURL() const;
 				const std::string& getIP() const;
+				const Action* getAction() const;
 			//@}
 
 			//! \name Setters

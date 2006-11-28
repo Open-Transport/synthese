@@ -67,6 +67,7 @@ SQLite::ExecUpdate (sqlite3* connection, const std::string& sql)
 			     sql.c_str (), 
 			     0, 
 			     0, &errMsg);
+//	sqlite3_finalize();
     if (retc != SQLITE_OK)
     {
 	std::string msg (errMsg);
@@ -85,16 +86,22 @@ SQLite::ExecQuery (sqlite3* connection, const std::string& sql)
     // Log::GetInstance ().debug ("Executing SQLite query " + sql);
     SQLiteResult result;
     char* errMsg = 0;
-    int retc = sqlite3_exec (connection, 
-			     sql.c_str (), 
-			     &sqlite_callback, 
-			     &result, &errMsg);
+	int retc;
+	try {
+		retc = sqlite3_exec (connection, 
+					sql.c_str (), 
+					&sqlite_callback, 
+					&result, &errMsg);
+	}
+	catch(...){
+		throw SQLiteException("Unknown problem in query "+ sql);
+	}
     if (retc != SQLITE_OK)
     {
-	std::string msg (errMsg);
-	sqlite3_free (errMsg);
-	throw SQLiteException ("Error executing query \"" + sql + " : " + 
-			       msg + "\" (error=" + Conversion::ToString (retc) + ")");
+		std::string msg (errMsg);
+		sqlite3_free (errMsg);
+		throw SQLiteException ("Error executing query \"" + sql + " : " + 
+					msg + "\" (error=" + Conversion::ToString (retc) + ")");
     }
     // Log::GetInstance ().debug ("Query successful (" + Conversion::ToString (result.getNbRows ()) + " rows).");
     return result;

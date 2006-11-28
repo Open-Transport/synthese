@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="57_accounting"
+	Name="57_accounts"
 	ProjectGUID="{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
 	Keyword="MakeFileProj">
 	<Platforms>
@@ -46,6 +46,9 @@
 				RelativePath=".\Account.h">
 			</File>
 			<File
+				RelativePath=".\Currency.h">
+			</File>
+			<File
 				RelativePath=".\Transaction.h">
 			</File>
 			<File
@@ -55,6 +58,18 @@
 		<Filter
 			Name="LS SQL"
 			Filter="">
+			<File
+				RelativePath=".\AccountTableSync.h">
+			</File>
+			<File
+				RelativePath=".\CurrencyTableSync.h">
+			</File>
+			<File
+				RelativePath=".\TransactionTableSync.h">
+			</File>
+			<File
+				RelativePath=".\TransationPartTableSync.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Admin Interface elements"

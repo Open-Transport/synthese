@@ -1,4 +1,6 @@
 
+#include <sstream>
+
 #include "01_util/Conversion.h"
 #include "01_util/FactoryException.h"
 
@@ -10,6 +12,8 @@
 #include "32_admin/AdminInterfacePage.h"
 #include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminRequest.h"
+
+using namespace std;
 
 namespace synthese
 {
@@ -23,7 +27,9 @@ namespace synthese
 		const std::string AdminRequest::PARAMETER_OBJECT_ID = "id";
 
 		AdminRequest::AdminRequest()
-			: Request(Request::NEEDS_SESSION) {}
+			: Request(Request::NEEDS_SESSION)
+			, _page(NULL)
+		{}
 
 		AdminRequest::ParametersMap AdminRequest::getParametersMap() const
 		{
@@ -54,6 +60,9 @@ namespace synthese
 			// Object ID
 			it = map.find(PARAMETER_OBJECT_ID);
 			_object_id = (it == map.end()) ? 0 : Conversion::ToLongLong(it->second);
+
+			// Parameters saving
+			_parameters = map;
 			
 		}
 
@@ -73,12 +82,42 @@ namespace synthese
 
 		AdminRequest::~AdminRequest()
 		{
-			delete _page;
 		}
 
 		void AdminRequest::setPage( const AdminInterfaceElement* aie )
 		{
 			_page = aie;
+		}
+
+		std::string AdminRequest::getHTMLFormHeader( const std::string& name ) const
+		{
+			stringstream s;
+			s << Request::getHTMLFormHeader(name);
+			s << "<input type=\"hidden\" name=\"" << PARAMETER_PAGE << "\" value=\"" << _page->getFactoryKey() << "\" />";
+			return s.str();
+		}
+
+		const std::string& AdminRequest::getStringParameter( const std::string& name, const std::string& defaultValue )
+		{
+			ParametersMap::const_iterator it = _parameters.find(name);
+			return (it == _parameters.end()) ? defaultValue : it->second;
+		}
+
+		long long AdminRequest::getLongLongParameter( const std::string& name, long long defaultValue )
+		{
+			ParametersMap::const_iterator it = _parameters.find(name);
+			return (it == _parameters.end()) ? defaultValue : Conversion::ToLongLong(it->second);
+		}
+
+		int AdminRequest::getIntParameter( const std::string& name, int defaultValue )
+		{
+			ParametersMap::const_iterator it = _parameters.find(name);
+			return (it == _parameters.end()) ? defaultValue : Conversion::ToInt(it->second);
+		}
+
+		const AdminInterfaceElement* AdminRequest::getPage() const
+		{
+			return _page;
 		}
 	}
 }

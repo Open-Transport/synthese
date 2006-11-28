@@ -2,11 +2,11 @@
 #ifndef SYNTHESE_UserTableSync_H__
 #define SYNTHESE_UserTableSync_H__
 
-
+#include <vector>
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSync.h"
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -18,10 +18,9 @@ namespace synthese
 			@ingroup m12
 		*/
 
-		class UserTableSync : public db::SQLiteTableSync
+		class UserTableSync : public db::SQLiteTableSyncTemplate<User>
 		{
 		private:
-			static const std::string TABLE_NAME;
 			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_LOGIN;
 			static const std::string TABLE_COL_NAME;
@@ -39,6 +38,20 @@ namespace synthese
 			static User* getUser(const db::SQLiteThreadExec* sqlite, uid id);
 			static User* getUser(const db::SQLiteThreadExec* sqlite, const std::string& login);
 			static void saveUser(const db::SQLiteThreadExec* sqlite, User* user);
+
+			/** User search.
+				@param sqlite SQLite thread
+				@param login login to search (empty = no search on login)
+				@param name name to search (empty = no search on name)
+				@param first First user to answer
+				@param number Number of users to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others users to show. Test it to know if the situation needs a "click for more" button.
+				@return vector<User*> Founded users. 
+				@author Hugues Romain
+				@date 2006				
+			*/
+			static std::vector<User*> searchUsers(const db::SQLiteThreadExec* sqlite
+				, const std::string& login, const std::string name, uid profileId
+				, int first = 0, int number = 0);
 
 		protected:
 

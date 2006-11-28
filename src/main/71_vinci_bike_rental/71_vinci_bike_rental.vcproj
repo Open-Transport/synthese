@@ -43,22 +43,31 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\VinciFare.h">
+				RelativePath=".\VinciBike.h">
 			</File>
 			<File
-				RelativePath=".\VinciGuarantee.h">
+				RelativePath=".\VinciContract.h">
 			</File>
 			<File
-				RelativePath=".\VinciTransaction.h">
+				RelativePath=".\VinciRate.h">
+			</File>
+			<File
+				RelativePath=".\VinciSite.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
 			Filter="">
+			<File
+				RelativePath=".\VinciContractTableSync.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Admin Interface elements"
 			Filter="">
+			<File
+				RelativePath=".\VinciBikeAdminInterfaceElement.cpp">
+			</File>
 			<File
 				RelativePath=".\VinciBikeAdminInterfaceElement.h">
 			</File>
@@ -67,6 +76,9 @@
 			</File>
 			<File
 				RelativePath=".\VinciBikeSearchAdminInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\VinciCustomerAdminInterfaceElement.cpp">
 			</File>
 			<File
 				RelativePath=".\VinciCustomerAdminInterfaceElement.h">
@@ -85,6 +97,22 @@
 		<Filter
 			Name="Interface value elements"
 			Filter="">
+		</Filter>
+		<Filter
+			Name="Actions"
+			Filter="">
+			<File
+				RelativePath=".\AddCustomerAction.h">
+			</File>
+			<File
+				RelativePath=".\AddGuaranteeAction.h">
+			</File>
+			<File
+				RelativePath=".\RentABikeAction.h">
+			</File>
+			<File
+				RelativePath=".\ReturnABikeAction.h">
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\SConscript">

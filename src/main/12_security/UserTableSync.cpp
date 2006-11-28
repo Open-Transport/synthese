@@ -12,15 +12,22 @@
 #include "12_security/User.h"
 #include "12_security/UserTableSyncException.h"
 
+using namespace std;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
+	using namespace security;
 
+	namespace db
+	{
+		const std::string SQLiteTableSyncTemplate<User>::TABLE_NAME = "t026_users";
+		const int SQLiteTableSyncTemplate<User>::TABLE_ID = 26;
+		const bool SQLiteTableSyncTemplate<User>::HAS_AUTO_INCREMENT = true;
+	}
 	namespace security
 	{
-		const std::string UserTableSync::TABLE_NAME = "t026_users";
 		const std::string UserTableSync::TABLE_COL_ID = "id";
 		const std::string UserTableSync::TABLE_COL_NAME = "name";
 		const std::string UserTableSync::TABLE_COL_SURNAME = "surname";
@@ -29,7 +36,7 @@ namespace synthese
 		const std::string UserTableSync::TABLE_COL_PROFILE_ID = "profile_id";
 
 		UserTableSync::UserTableSync()
-			: db::SQLiteTableSync ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: db::SQLiteTableSyncTemplate<User> ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
@@ -88,7 +95,7 @@ namespace synthese
 			query
 				<< "SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " << TABLE_COL_LOGIN << "='" << login << "'";	/// @todo Put a string converter to escape special characters
+				<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToSQLiteString(login);
 			try
 			{
 				db::SQLiteResult rows = sqlite->execQuery(query.str());
@@ -123,13 +130,70 @@ namespace synthese
 
 		void UserTableSync::saveUser( const db::SQLiteThreadExec* sqlite, User* user )
 		{
-			if (user->getId() != 0)
+			try
 			{
-				// UPDATE
+				if (user->getId() != 0)
+				{
+					// UPDATE
+				}
+				else // INSERT
+				{
+					/// @todo Implement control of the fields
+					user->setId(getId(1,1));	/// @todo handle grid id
+					stringstream query;
+					query
+						<< "INSERT INTO " << TABLE_NAME
+						<< " VALUES(" 
+						<< Conversion::ToString(user->getId())
+						<< "," << Conversion::ToSQLiteString(user->getName())
+						<< "," << Conversion::ToSQLiteString(user->getSurname())
+						<< "," << Conversion::ToSQLiteString(user->getLogin())
+						<< "," << Conversion::ToSQLiteString(user->getPassword())
+						<< "," << Conversion::ToString(user->getProfile()->getId())
+						<< ")";
+					sqlite->execUpdate(query.str());
+				}
 			}
-			else
+			catch (SQLiteException e)
 			{
-				// INSERT
+				throw UserTableSyncException("Insert/Update error " + e.getMessage());
+			}
+			catch (...)
+			{
+				throw UserTableSyncException("Unknown Insert/Update error");
+			}
+		}
+
+		std::vector<User*> UserTableSync::searchUsers( const db::SQLiteThreadExec* sqlite, const std::string& login, const std::string name, uid profileId, int first /*= 0*/, int number /*= 0*/ )
+		{
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE " << TABLE_COL_LOGIN << " LIKE '%" << Conversion::ToSQLiteString(login, false) << "%'"
+				<< " AND " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			if (profileId > 0)
+				query << " AND " << TABLE_COL_PROFILE_ID << "=" << Conversion::ToString(profileId);
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+			
+			try
+			{
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<User*> users;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					User* user = new User;
+					loadUser(user, result, i);
+					users.push_back(user);
+				}
+				return users;
+			}
+			catch(SQLiteException& e)
+			{
+				throw UserTableSyncException(e.getMessage());
 			}
 		}
 	}

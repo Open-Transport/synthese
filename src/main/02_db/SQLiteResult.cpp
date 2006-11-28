@@ -92,21 +92,21 @@ SQLiteResult::getColumns (int row) const
 void 
 SQLiteResult::addRow (int nbColumns, char** values, char** columns)
 {
-    ++_nbRows;
-    _nbColumns = nbColumns;
+	_nbColumns = nbColumns;
+	++_nbRows;
 
     Row row;
     if (_columnNames.size () == 0) 
     {
-	for (int j=0; j<nbColumns; ++j)
-	{
-	    _columnNames.push_back (columns[j]);
-	}
+		for (int j=0; j<nbColumns; ++j)
+		{
+			_columnNames.push_back (columns[j]);
+		}
     }
 
     for (int i=0; i<nbColumns; ++i)
     {
-	row.push_back (values[i]);
+		row.push_back ((values[i] == NULL) ? "" : values[i]);
     }
     _values.push_back (row);
 

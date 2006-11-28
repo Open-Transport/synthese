@@ -47,5 +47,10 @@ namespace synthese
 		{
 			_parentId = id;
 		}
+
+		const std::string& Profile::getName() const
+		{
+			return _name;
+		}
 	}
 }

@@ -1,12 +1,12 @@
 
-#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
+#include "57_accounting/AccountingModue.h"
 
 namespace synthese
 {
-	namespace vinci
+	namespace accounting
 	{
 
-		void VinciBikeRentalModule::initialize()
+		void AccountingModule::initialize()
 		{
 
 		}

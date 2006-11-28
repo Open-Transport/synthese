@@ -2,10 +2,11 @@
 #define SYNTHESE_DB_SQLITETABLESYNC_H
 
 
-
+#include <map>
 #include <string>
 #include <vector>
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 
 #include "01_util/Factorable.h"
 #include "01_util/UId.h"
@@ -49,6 +50,9 @@ namespace synthese
 			const std::string _tableName;
 			SQLiteTableFormat _tableFormat;
 
+		protected:
+			virtual void initAutoIncrement(const SQLiteThreadExec* sqlite);
+
 		public:
 
 			SQLiteTableSync ( const std::string& tableName, 
@@ -65,8 +69,6 @@ namespace synthese
 			int getTableId () const;
 
 			const SQLiteTableFormat& getTableFormat () const;
-
-			uid encodeUId (int gridId, int gridNodeId, long objectId);
 
 			/** This method is called when the synchronizer is created
 			to sychronize it with pre-existing data in db.

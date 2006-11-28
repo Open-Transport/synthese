@@ -136,5 +136,22 @@ std::string Conversion::ToString( boost::logic::tribool t )
 	return (t == true) ? "1" : "0";
 }
 
+std::string Conversion::ToSQLiteString( const std::string& s, bool withApostrophes)
+{
+	std::string result;
+	if (withApostrophes)
+		result.push_back('\'');
+	for (size_t i=0; i<s.size(); ++i)
+	{
+		// Escape several characters
+		if (s.at(i) == '\'' || s.at(i) == '\'')
+			result.push_back('\\');
+		
+		result.push_back(s.at(i));
+	}
+	if (withApostrophes)
+		result.push_back('\'');
+	return result;
+}
 }
 }

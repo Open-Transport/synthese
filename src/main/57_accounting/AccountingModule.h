@@ -3,15 +3,15 @@
 
 namespace synthese
 {
-	namespace vinci
+	namespace accounting
 	{
 
-		/** @defgroup m71 71 Vinci bike rental
+		/** @defgroup m57 57 Accounting
 
 		@{
 		*/
 
-		class VinciBikeRentalModule : public util::ModuleClass
+		class AccountingModule : public util::ModuleClass
 		{
 		public:
 			void initialize();
