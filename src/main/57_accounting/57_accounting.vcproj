@@ -58,6 +58,9 @@
 				RelativePath=".\Transaction.h">
 			</File>
 			<File
+				RelativePath=".\TransactionPart.cpp">
+			</File>
+			<File
 				RelativePath=".\TransactionPart.h">
 			</File>
 		</Filter>

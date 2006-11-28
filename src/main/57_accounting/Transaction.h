@@ -30,8 +30,9 @@ namespace synthese
 
 		private:
 //			Document*			_document;
+			std::string			_name;
 			time::DateTime		_dateTime;
-			security::User*		_leftUser;	// Applicable if the used accounts are template
+			uid					_leftUserId;	// Applicable if the used accounts are template
 			uid					_id;
 			uid					_placeId;
 			std::string			_comment;
