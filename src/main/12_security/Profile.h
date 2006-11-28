@@ -48,7 +48,7 @@ namespace synthese
 			*/
 			int operator<=(const Profile& profile) const;
 
-			Profile(uid id);
+			Profile(uid id=0);
 			~Profile();
 
 			void setName(const std::string& name);
@@ -58,6 +58,8 @@ namespace synthese
 			void setRights(const std::string& text);
 
 			const std::string& getName() const;
+			const uid getParentId() const;
+			const std::string getRightsString() const;
 		};
 	}
 }

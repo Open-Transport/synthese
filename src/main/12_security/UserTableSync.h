@@ -50,7 +50,7 @@ namespace synthese
 				@date 2006				
 			*/
 			static std::vector<User*> searchUsers(const db::SQLiteThreadExec* sqlite
-				, const std::string& login, const std::string name, uid profileId
+				, const std::string& login, const std::string name, uid profileId = 0
 				, int first = 0, int number = 0);
 
 		protected:

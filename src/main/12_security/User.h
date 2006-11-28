@@ -4,6 +4,7 @@
 
 #include <string>
 
+#include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
 namespace synthese
@@ -24,10 +25,9 @@ namespace synthese
 				- des paramètres de personnalisation (demandes favorites...)
 
 		*/
-		class User
+		class User : public util::Registrable<uid, User>
 		{
 		private:
-			uid				_id;
 			const Profile*	_profile;
 			std::string		_login;
 			std::string		_password;
@@ -35,7 +35,7 @@ namespace synthese
 			std::string		_surname;
 			
 		public:
-			User();
+			User(uid id=0);
 			void setProfile(const Profile* profile);
 			void setLogin(const std::string& login);
 			
@@ -45,7 +45,6 @@ namespace synthese
 			void setPassword(const std::string& password);
 			void setName(const std::string& name);
 			void setSurname(const std::string& surname);
-			void setId(uid id);
 
 			const Profile* getProfile() const;
 			const std::string& getLogin() const;
@@ -56,7 +55,6 @@ namespace synthese
 			const std::string& getPassword() const;
 			const std::string& getName() const;
 			const std::string& getSurname() const;
-			uid getId() const;
 
 			//! \name Services
 			//@{

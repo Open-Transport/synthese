@@ -1,28 +1,42 @@
 
+#include <sstream>
+
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
 #include "02_db/SQLiteResult.h"
+#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteException.h"
 
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfileTableSync.h"
+#include "12_security/UserTableSyncException.h"
 #include "12_security/Profile.h"
+
+using namespace std;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace db;
+	using namespace security;
+
+	namespace db
+	{
+		const std::string SQLiteTableSyncTemplate<Profile>::TABLE_NAME = "t027_profiles";
+		const int SQLiteTableSyncTemplate<Profile>::TABLE_ID = 27;
+		const bool SQLiteTableSyncTemplate<Profile>::HAS_AUTO_INCREMENT = true;
+	}
 
 	namespace security
 	{
-		const std::string ProfileTableSync::TABLE_NAME = "t027_profiles";
 		const std::string ProfileTableSync::TABLE_COL_ID = "id";
 		const std::string ProfileTableSync::TABLE_COL_NAME = "name";
 		const std::string ProfileTableSync::TABLE_COL_PARENT_ID = "parent";
 		const std::string ProfileTableSync::TABLE_COL_RIGHTS_STRING = "rights";
 
 		ProfileTableSync::ProfileTableSync()
-			: SQLiteTableSync(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: db::SQLiteTableSyncTemplate<Profile>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
@@ -67,5 +81,68 @@ namespace synthese
 			/// @todo Implementation
 		}
 
+		std::vector<Profile*> ProfileTableSync::searchProfiles( const db::SQLiteThreadExec* sqlite , const std::string name , int first /*= 0*/, int number /*= 0*/ )
+		{
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<Profile*> profiles;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					Profile* profile = new Profile;
+					loadProfile(profile, result, i);
+					profiles.push_back(profile);
+				}
+				return profiles;
+			}
+			catch(SQLiteException& e)
+			{
+				throw UserTableSyncException(e.getMessage());
+			}
+		}
+
+		void ProfileTableSync::saveProfile( const db::SQLiteThreadExec* sqlite, Profile* profile )
+		{
+			try
+			{
+				if (profile->getKey() != 0)
+				{
+					// UPDATE
+				}
+				else // INSERT
+				{
+					/// @todo Implement control of the fields
+					profile->setKey(getId(1,1));	/// @todo handle grid id
+					stringstream query;
+					query
+						<< "INSERT INTO " << TABLE_NAME
+						<< " VALUES(" 
+						<< Conversion::ToString(profile->getKey())
+						<< "," << Conversion::ToSQLiteString(profile->getName())
+						<< "," << Conversion::ToString(profile->getParentId())
+						<< "," << Conversion::ToSQLiteString(profile->getRightsString())
+						<< ")";
+					sqlite->execUpdate(query.str());
+				}
+			}
+			catch (SQLiteException e)
+			{
+				throw UserTableSyncException("Insert/Update error " + e.getMessage());
+			}
+			catch (...)
+			{
+				throw UserTableSyncException("Unknown Insert/Update error");
+			}
+		}
 	}
 }

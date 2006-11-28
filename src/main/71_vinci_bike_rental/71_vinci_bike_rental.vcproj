@@ -59,7 +59,16 @@
 			Name="LS SQL"
 			Filter="">
 			<File
+				RelativePath=".\VinciBikeTableSync.h">
+			</File>
+			<File
 				RelativePath=".\VinciContractTableSync.h">
+			</File>
+			<File
+				RelativePath=".\VinciRateTableSync.h">
+			</File>
+			<File
+				RelativePath=".\VinciSiteTableSync.h">
 			</File>
 		</Filter>
 		<Filter

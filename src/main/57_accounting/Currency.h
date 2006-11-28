@@ -4,6 +4,9 @@
 
 #include <string>
 
+#include "01_util/UId.h"
+#include "01_util/Registrable.h"
+
 namespace synthese
 {
 	namespace accounts
@@ -16,6 +19,15 @@ namespace synthese
 		private:
 			std::string	_symbol;
 			std::string _name;
+
+		public:
+			Currency(uid id=0);
+
+			const std::string& getSymbol() const;
+			const std::string& getName() const;
+
+			void setSymbol(const std::string& symbol);
+			void setName(const std::string& name);
 		};
 	}
 }

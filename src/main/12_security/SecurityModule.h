@@ -9,6 +9,11 @@ namespace synthese
 	{
 		class SecurityModule : public util::ModuleClass
 		{
+		public:
+			static const std::string ROOT_PROFILE;
+			static const std::string ROOT_RIGHTS;
+			static const std::string ROOT_USER;
+
 		private:
 			static Profile::Registry _profiles;
 

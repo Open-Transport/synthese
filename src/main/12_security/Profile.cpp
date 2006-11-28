@@ -12,6 +12,7 @@ namespace synthese
 
 		Profile::Profile( uid id )
 			: Registrable<uid, Profile>(id)
+			, _parentId(0)
 		{
 
 		}
@@ -51,6 +52,17 @@ namespace synthese
 		const std::string& Profile::getName() const
 		{
 			return _name;
+		}
+
+		const uid Profile::getParentId() const
+		{
+			return _parentId;
+		}
+
+		const std::string Profile::getRightsString() const
+		{
+			/// @todo Implementation
+			return "*,*,100,100";
 		}
 	}
 }

@@ -43,6 +43,7 @@ class Registrable
     //! @name Getters/Setters
     //@{
     const K& getKey () const;
+	void setKey(const K& key);
     const K& getId () const;
     //@}
 
@@ -73,6 +74,14 @@ const K&
 Registrable<K,T>::getKey () const
 {
     return _key; 
+}
+
+
+template<class K, class T>
+void
+Registrable<K,T>::setKey (const K& key)
+{
+	_key = key;
 }
 
 

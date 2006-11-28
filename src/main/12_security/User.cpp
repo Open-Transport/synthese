@@ -4,12 +4,12 @@
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace security
 	{
-
-
-		User::User()
-			: _id(0)
+		User::User(uid id)
+			: Registrable<uid, User>(id)
 		{
 
 		}
@@ -39,11 +39,6 @@ namespace synthese
 			_surname = surname;
 		}
 
-		void User::setId( uid id )
-		{
-			_id = id;
-		}
-
 		const Profile* User::getProfile() const
 		{
 			return _profile;
@@ -67,11 +62,6 @@ namespace synthese
 		const std::string& User::getSurname() const
 		{
 			return _surname;
-		}
-
-		uid User::getId() const
-		{
-			return _id;
 		}
 
 		void User::verifyPassword( const std::string& password ) const

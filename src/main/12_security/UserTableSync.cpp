@@ -113,7 +113,7 @@ namespace synthese
 
 		void UserTableSync::loadUser(User* user, const db::SQLiteResult& rows, int rowId)
 		{
-			user->setId(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			user->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			user->setPassword(rows.getColumn(rowId, TABLE_COL_PASSWORD));
 			user->setName(rows.getColumn(rowId, TABLE_COL_NAME));
 			user->setSurname(rows.getColumn(rowId, TABLE_COL_SURNAME));
@@ -132,14 +132,14 @@ namespace synthese
 		{
 			try
 			{
-				if (user->getId() != 0)
+				if (user->getKey() != 0)
 				{
 					// UPDATE
 				}
 				else // INSERT
 				{
 					/// @todo Implement control of the fields
-					user->setId(getId(1,1));	/// @todo handle grid id
+					user->setKey(getId(1,1));	/// @todo handle grid id
 					stringstream query;
 					query
 						<< "INSERT INTO " << TABLE_NAME

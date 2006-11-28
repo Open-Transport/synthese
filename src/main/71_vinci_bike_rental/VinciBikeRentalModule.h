@@ -1,4 +1,7 @@
 
+#ifndef SYNTHESE_VinciBikeRentalModule_H__
+#define SYNTHESE_VinciBikeRentalModule_H__
+
 #include "01_util/ModuleClass.h"
 
 namespace synthese
@@ -6,7 +9,7 @@ namespace synthese
 	namespace vinci
 	{
 
-		/** @defgroup m71 71 Vinci bike rental.
+		/** @defgroup m71 71 Vinci bike rent.
 			
 			Most of the events are treated as transaction parts :
 				- customer giving a guarantee :
@@ -48,7 +51,27 @@ namespace synthese
 			
 			Remarks : the "ticket uses" and the payment accounts will never go down without 
 				
-				
+			Bike rent is a special application of the accounting module. The French account numbers are used. The special accounts are :
+				- Customers :
+					- 4111 : Customer financial account (Currency = Euro or local currency)
+					- 4117 : Guarantees (Currency = Euro or local currency)
+					- 4119 : Customer tickets accounts (Currency = ticket punchings)
+				- Stocks :
+					- 371 : Bikes (Currency = bikes)
+				- Services :
+					- 7083 : Bike rent (Currency = Euro or local currency)
+					- 763 : Delayed payments (Currency = Euro or local currency)
+					- 707 : Unreturned bikes (sales) (Currency = Euro or local currency)
+				- Change :
+					- 5112 : checks (Currency = Euro or local currency)
+					- 5121 : payment card (Currency = Euro or local currency)
+					- 532 : cash (Currency = Euro or local currency)
+					- 59 : tickets punching (Currency = ticket punchings)
+
+			The module initialization consists in the creation of :
+				- 3 currencies : Euro, Tickets, and Bikes
+				- a special user "Bike Rent Accounts"
+				- all the preceding accounts, with their right user equal to the created special user
 
 		@{
 		*/
@@ -56,9 +79,30 @@ namespace synthese
 		class VinciBikeRentalModule : public util::ModuleClass
 		{
 		public:
+			static const std::string VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE;
+			static const std::string VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE;
+			static const std::string VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE;
+			static const std::string VINCI_STOCKS_BIKE_ACCOUNT_CODE;
+			static const std::string VINCI_SERVICES_BIKE_RENT_ACCOUNT_CODE;
+			static const std::string VINCI_SERVICES_DELAYED_PAYMENTS_ACCOUNT_CODE;
+			static const std::string VINCI_SERVICES_UNRETURNED_BIKE_ACCOUNT_CODE;
+			static const std::string VINCI_CHANGE_CHECKS_ACCOUNT_CODE;
+			static const std::string VINCI_CHANGE_CREDIT_CARD_ACCOUNT_CODE;
+			static const std::string VINCI_CHANGE_CASH_ACCOUNT_CODE;
+			static const std::string VINCI_CHANGE_TICKETS_PUNCHING_ACCOUNT_CODE;
+
+			static const std::string VINCI_ACCOUNTING_PROFILE;
+			static const std::string VINCI_ACCOUNTING_PROFILE_RIGHTS;
+			static const std::string VINCI_ACCOUNTING_USER;
+
+			static const std::string VINCI_CURRENCY_EURO;
+			static const std::string VINCI_CURRENCY_BIKE;
+			static const std::string VINCI_CURRENCY_TICKET_PUNCHING;
+
 			void initialize();
 		};
 		/** @} */
 	}
 }
 
+#endif // SYNTHESE_VinciBikeRentalModule_H__

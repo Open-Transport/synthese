@@ -1,20 +1,27 @@
 
 #include "01_util/ModuleClass.h"
 
+#include "57_accounting/Currency.h"
+
 namespace synthese
 {
-	namespace accounting
+	namespace accounts
 	{
 
-		/** @defgroup m57 57 Accounting
+		/** @defgroup m57 57 Accounts
 
 		@{
 		*/
 
 		class AccountingModule : public util::ModuleClass
 		{
+		private:
+			static Currency::Registry _currencies;
+
 		public:
 			void initialize();
+
+			static Currency::Registry& getCurrencies();
 		};
 		/** @} */
 	}
