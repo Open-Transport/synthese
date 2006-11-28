@@ -55,6 +55,9 @@
 				RelativePath=".\Currency.h">
 			</File>
 			<File
+				RelativePath=".\Transaction.cpp">
+			</File>
+			<File
 				RelativePath=".\Transaction.h">
 			</File>
 			<File

@@ -434,6 +434,10 @@ Date::FromString (const std::string& str)
 		 Conversion::ToInt (str.substr (0, 4)));
 }
 
+std::string Date::toSQLiteString( bool withApostrophes ) const
+{
+	return (withApostrophes ? "'" : "") + Conversion::ToString(_year.getValue()) + "/" + Conversion::ToString(_month.getValue()) +"/" + Conversion::ToString(_day.getValue()) + (withApostrophes ? "'" : "");
+}
 
 
 

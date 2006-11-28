@@ -69,6 +69,7 @@ class Date
         bool isUnknown () const;
 
         std::string toInternalString () const;
+		std::string toSQLiteString(bool withApostrophes = true) const;
 
         //@}
 

@@ -423,6 +423,10 @@ DateTime::FromString (const std::string& str)
     
 }
 
+std::string DateTime::toSQLiteString(bool withApostrophes) const
+{
+	return (withApostrophes ? "'" : "") + _date.toSQLiteString(false) + " " + _hour.toSQLiteString(false) + (withApostrophes ? "'" : "");
+}
 
 
 }

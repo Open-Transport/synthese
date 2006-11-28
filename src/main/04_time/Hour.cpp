@@ -314,6 +314,10 @@ Hour::FromString (const std::string& str)
 		 Conversion::ToInt (str.substr (4, 2)));
 }
 
+std::string Hour::toSQLiteString( bool withApostrophes /*= true*/ ) const
+{
+	return (withApostrophes ? "'" : "") + Conversion::ToString(_hours) + ":" + Conversion::ToString(_minutes) + ":00" + (withApostrophes ? "'" : "");
+}
 
 
 

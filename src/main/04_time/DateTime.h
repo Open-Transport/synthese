@@ -74,6 +74,7 @@ class DateTime
         //@{
         bool isValid () const;
         std::string toInternalString () const;
+		std::string toSQLiteString(bool withApostrophes = true) const;
         //@}
 
 

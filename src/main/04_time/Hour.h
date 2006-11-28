@@ -46,6 +46,7 @@ class Hour
 			std::string toString () const;
 
 			std::string toInternalString () const;
+			std::string toSQLiteString(bool withApostrophes = true) const;
         //@}
 
 
