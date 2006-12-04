@@ -33,6 +33,13 @@ namespace synthese
 			std::string		_password;
 			std::string		_name;
 			std::string		_surname;
+			std::string		_address;
+			std::string		_postCode;
+			std::string		_cityText;
+			uid				_cityId;
+			std::string		_country;
+			bool			_isConnectionAllowed;
+
 			
 		public:
 			User(uid id=0);

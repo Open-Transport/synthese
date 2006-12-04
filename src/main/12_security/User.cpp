@@ -10,6 +10,8 @@ namespace synthese
 	{
 		User::User(uid id)
 			: Registrable<uid, User>(id)
+			, _cityId(0)
+			, _isConnectionAllowed(true)
 		{
 
 		}

@@ -43,13 +43,25 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\VinciBike.cpp">
+			</File>
+			<File
 				RelativePath=".\VinciBike.h">
+			</File>
+			<File
+				RelativePath=".\VinciContract.cpp">
 			</File>
 			<File
 				RelativePath=".\VinciContract.h">
 			</File>
 			<File
+				RelativePath=".\VinciRate.cpp">
+			</File>
+			<File
 				RelativePath=".\VinciRate.h">
+			</File>
+			<File
+				RelativePath=".\VinciSite.cpp">
 			</File>
 			<File
 				RelativePath=".\VinciSite.h">
@@ -59,13 +71,25 @@
 			Name="LS SQL"
 			Filter="">
 			<File
+				RelativePath=".\VinciBikeTableSync.cpp">
+			</File>
+			<File
 				RelativePath=".\VinciBikeTableSync.h">
+			</File>
+			<File
+				RelativePath=".\VinciContractTableSync.cpp">
 			</File>
 			<File
 				RelativePath=".\VinciContractTableSync.h">
 			</File>
 			<File
+				RelativePath=".\VinciRateTableSync.cpp">
+			</File>
+			<File
 				RelativePath=".\VinciRateTableSync.h">
+			</File>
+			<File
+				RelativePath=".\VinciSiteTableSync.cpp">
 			</File>
 			<File
 				RelativePath=".\VinciSiteTableSync.h">

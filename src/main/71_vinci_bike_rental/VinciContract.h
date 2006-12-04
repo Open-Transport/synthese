@@ -3,19 +3,23 @@
 #define SYNTHESE_VinciContract_H__
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
 
 namespace synthese
 {
-	namespace security
-	{
-		class User;
-	}
-
 	namespace vinci
 	{
 		class VinciContract : public util::Registrable<uid, VinciContract>
 		{
-			security::User*	_user;
+		private:
+			uid	_userId;
+
+		public:
+			VinciContract(uid id=0);
+
+			void setUserId(uid id);
+
+			uid getUserId() const;
 		};
 	}
 }

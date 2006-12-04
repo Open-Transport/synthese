@@ -12,6 +12,13 @@ namespace synthese
 		{
 		private:
 			std::string _name;
+
+		public:
+			VinciSite(uid id=0);
+
+			void setName(const std::string& name);
+
+			const std::string& getName() const;
 		};
 	}
 }

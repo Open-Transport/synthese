@@ -39,46 +39,32 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
+			Name="Core Classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\SQLite.cpp">
-			</File>
-			<File
-				RelativePath=".\SQLiteException.cpp">
-			</File>
-			<File
-				RelativePath=".\SQLiteResult.cpp">
-			</File>
-			<File
-				RelativePath=".\SQLiteSync.cpp">
-			</File>
-			<File
-				RelativePath=".\SQLiteTableSync.cpp">
-			</File>
-			<File
-				RelativePath=".\SQLiteThreadExec.cpp">
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
 				RelativePath=".\DbResult.h">
+			</File>
+			<File
+				RelativePath=".\SQLite.cpp">
 			</File>
 			<File
 				RelativePath=".\SQLite.h">
 			</File>
 			<File
-				RelativePath=".\SQLiteException.h">
+				RelativePath=".\SQLiteResult.cpp">
 			</File>
 			<File
 				RelativePath=".\SQLiteResult.h">
 			</File>
 			<File
+				RelativePath=".\SQLiteSync.cpp">
+			</File>
+			<File
 				RelativePath=".\SQLiteSync.h">
+			</File>
+			<File
+				RelativePath=".\SQLiteTableSync.cpp">
 			</File>
 			<File
 				RelativePath=".\SQLiteTableSync.h">
@@ -87,10 +73,24 @@
 				RelativePath=".\SQLiteTableSyncTemplate.h">
 			</File>
 			<File
+				RelativePath=".\SQLiteThreadExec.cpp">
+			</File>
+			<File
 				RelativePath=".\SQLiteThreadExec.h">
 			</File>
 			<File
 				RelativePath=".\SQLiteUpdateHook.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Exceptions"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath=".\SQLiteException.cpp">
+			</File>
+			<File
+				RelativePath=".\SQLiteException.h">
 			</File>
 		</Filter>
 		<File

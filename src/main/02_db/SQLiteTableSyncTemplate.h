@@ -47,6 +47,12 @@ namespace synthese
 		public:
 			typedef T ObjectsClass;
 
+			static void load(T* obj, const db::SQLiteResult& rows, int rowId=0);
+			static void save(const db::SQLiteThreadExec* sqlite, T* obj);
+
+			/// @todo See if the template can be used more 
+
+
 		};
 
 		template <class T>
