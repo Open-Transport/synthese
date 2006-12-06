@@ -5,6 +5,8 @@
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
+#include "02_db/SQLiteTableSyncTemplate.h"
+
 namespace synthese
 {
 	namespace vinci
@@ -20,6 +22,8 @@ namespace synthese
 			void setUserId(uid id);
 
 			uid getUserId() const;
+
+			friend class db::SQLiteTableSyncTemplate<VinciContract>;
 		};
 	}
 }

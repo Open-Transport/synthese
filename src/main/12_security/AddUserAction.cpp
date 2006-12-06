@@ -26,7 +26,7 @@ namespace synthese
 			Request::ParametersMap map;
 			map.insert(make_pair(PARAMETER_NAME, _name));
 			map.insert(make_pair(PARAMETER_LOGIN, _login));
-			map.insert(make_pair(PARAMETER_PROFILE_ID, Conversion::ToString(_profile->getId())));
+			map.insert(make_pair(PARAMETER_PROFILE_ID, Conversion::ToString(_profile->getKey())));
 			return map;
 		}
 

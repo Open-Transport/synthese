@@ -144,12 +144,12 @@ namespace synthese
 					query
 						<< "INSERT INTO " << TABLE_NAME
 						<< " VALUES(" 
-						<< Conversion::ToString(user->getId())
+						<< Conversion::ToString(user->getKey())
 						<< "," << Conversion::ToSQLiteString(user->getName())
 						<< "," << Conversion::ToSQLiteString(user->getSurname())
 						<< "," << Conversion::ToSQLiteString(user->getLogin())
 						<< "," << Conversion::ToSQLiteString(user->getPassword())
-						<< "," << Conversion::ToString(user->getProfile()->getId())
+						<< "," << Conversion::ToString(user->getProfile()->getKey())
 						<< ")";
 					sqlite->execUpdate(query.str());
 				}

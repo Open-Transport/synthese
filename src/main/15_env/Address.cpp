@@ -74,9 +74,8 @@ Address::isPhysicalStop () const
 const uid& 
 Address::getId () const
 {
-    return synthese::util::Registrable<uid,Address>::getId ();
+    return synthese::util::Registrable<uid,Address>::getKey();
 }
-
 
 
 

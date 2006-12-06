@@ -5,7 +5,9 @@
 #include <string>
 
 #include "01_util/Registrable.h"
-#include "01_util/UId.h
+#include "01_util/UId.h"
+
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -27,6 +29,8 @@ namespace synthese
 			int			_firstPenaltyValidityDuration;
 			double		_recurringPenalty;
 			int			_recurringPenaltyPeriod;
+
+			friend class db::SQLiteTableSyncTemplate<VinciRate>;
 
 		public:
 			VinciRate(uid id=0);

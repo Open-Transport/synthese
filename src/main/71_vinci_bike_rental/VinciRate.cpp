@@ -3,9 +3,11 @@
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace vinci
 	{
-		VinciRate::VinciRate(uid id=0)
+		VinciRate::VinciRate(uid id)
 			: Registrable<uid, VinciRate>(id)
 		{}
 

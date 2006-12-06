@@ -188,7 +188,7 @@ namespace synthese
 			// Adding function name
 			ParametersMap map = getParametersMap();
 			map.insert(make_pair(PARAMETER_FUNCTION, getFactoryKey()));
-			map.insert(make_pair(PARAMETER_SITE, Conversion::ToString(_site->getId())));
+			map.insert(make_pair(PARAMETER_SITE, Conversion::ToString(_site->getKey())));
 			if (_action != NULL)
 			{
 				map.insert(make_pair(Action::PARAMETER_ACTION, _action->getFactoryKey()));
@@ -324,7 +324,7 @@ namespace synthese
 			std::stringstream str;
 			str	<< "<form name=\"" << name << "\" action=\"" << _clientURL << "\" method=\"post\">"
 				<< "<input type=\"hidden\" name=\"" << PARAMETER_FUNCTION << "\" value=\"" << getFactoryKey() << "\" />"
-				<< "<input type=\"hidden\" name=\"" << PARAMETER_SITE << "\" value=\"" << _site->getId() << "\" />";
+				<< "<input type=\"hidden\" name=\"" << PARAMETER_SITE << "\" value=\"" << _site->getKey() << "\" />";
 			if (_session != NULL)
 				str << "<input type=\"hidden\" name=\"" << PARAMETER_SESSION << "\" value=\"" << _session->getKey() << "\" />";
 			if (_action != NULL)

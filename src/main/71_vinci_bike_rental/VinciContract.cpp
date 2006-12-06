@@ -3,9 +3,11 @@
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace vinci
 	{
-		VinciContract::VinciContract(uid id=0)
+		VinciContract::VinciContract(uid id)
 			: Registrable<uid, VinciContract>(id)
 		{}
 

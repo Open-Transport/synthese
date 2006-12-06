@@ -44,7 +44,7 @@ class Registrable
     //@{
     const K& getKey () const;
 	void setKey(const K& key);
-    const K& getId () const;
+//    const K& getId () const;
     //@}
 
 
@@ -84,14 +84,14 @@ Registrable<K,T>::setKey (const K& key)
 	_key = key;
 }
 
-
+/*
 template<class K, class T>
 const K&
 Registrable<K,T>::getId () const
 {
     return _key; 
 }
-
+*/
 
 
 

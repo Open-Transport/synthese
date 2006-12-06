@@ -3,6 +3,9 @@
 #define SYNTHESE_VinciSite_H__
 
 #include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -12,6 +15,8 @@ namespace synthese
 		{
 		private:
 			std::string _name;
+
+			friend class db::SQLiteTableSyncTemplate<VinciSite>;
 
 		public:
 			VinciSite(uid id=0);

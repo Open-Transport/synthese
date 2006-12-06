@@ -171,7 +171,7 @@ HtmlMapRenderer::renderLines (std::ostream& _output, Map& map)
 		{
 		    const LineStop* ls = dynamic_cast<const LineStop*> (lineStops.at(i));
 		    std::string href (_urlPattern);
-		    boost::replace_all (href, "$id", Conversion::ToString(ls->getId ()));
+		    boost::replace_all (href, "$id", Conversion::ToString(ls->getKey()));
 		    _output << "<area href='" << href << "' shape='poly' coords='";
 		    
 		    _output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";

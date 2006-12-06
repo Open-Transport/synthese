@@ -18,8 +18,7 @@ namespace synthese
 		/** Vinci Rate SQLite table synchronizer.
 			@ingroup m71
 		*/
-
-		class VinciRateTableSync : public db::SQLiteTableSyncTemplate<VinciBike>
+		class VinciRateTableSync : public db::SQLiteTableSyncTemplate<VinciRate>
 		{
 		private:
 			static const std::string TABLE_COL_ID;
@@ -33,9 +32,10 @@ namespace synthese
 			static const std::string TABLE_COL_FIRST_PENALTY_VALIDITY_DURATION;
 			static const std::string TABLE_COL_RECURRING_PENALTY;
 			static const std::string TABLE_COL_RECURRING_PENALTY_PERIOD;
+
+			friend class db::SQLiteTableSyncTemplate<VinciRate>;
 			
 		public:
-
 			VinciRateTableSync();
 			~VinciRateTableSync ();
 

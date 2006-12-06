@@ -8,12 +8,40 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace db;
+	using namespace vinci;
 	
 	namespace db
 	{
 		const std::string SQLiteTableSyncTemplate<VinciContract>::TABLE_NAME = "t035_vinci_contract";
 		const int SQLiteTableSyncTemplate<VinciContract>::TABLE_ID = 35;
 		const bool SQLiteTableSyncTemplate<VinciContract>::HAS_AUTO_INCREMENT = true;
+
+		void SQLiteTableSyncTemplate<VinciContract>::load(VinciContract* vc, const SQLiteResult& rows, int rowId)
+		{
+			vc->setKey(Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::TABLE_COL_ID)));
+			vc->_userId = Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::TABLE_COL_USER_ID));
+		}
+
+		void SQLiteTableSyncTemplate<VinciContract>::save(const SQLiteThreadExec* sqlite, VinciContract* vc)
+		{
+			stringstream query;
+			if (vc->getKey() != 0)
+			{	// UPDATE
+				query << "UPDATE " << TABLE_NAME << " SET "
+					<< VinciContractTableSync::TABLE_COL_USER_ID << "=" << Conversion::ToString(vc->_userId)
+					<< " WHERE " << VinciContractTableSync::TABLE_COL_ID << "=" << vc->getKey();
+			}
+			else
+			{	// INSERT
+				vc->setKey(getId(0,0)); /// @todo Handle grid ID
+				query << "INSERT INTO " << TABLE_NAME << " VALUES("
+					<< vc->getKey()
+					<< "," << Conversion::ToString(vc->_userId)
+					<< ")";
+			}
+			sqlite->execUpdate(query.str());
+		}
 	}
 
 	namespace vinci
@@ -22,35 +50,25 @@ namespace synthese
 		const std::string VinciContractTableSync::TABLE_COL_USER_ID = "user_id";
 		
 		VinciContractTableSync::VinciContractTableSync()
+			: SQLiteTableSyncTemplate<VinciContract>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_USER_ID, "INTEGER", true);
 		}
 
-		SQLiteTableSyncTemplate<VinciContract>::load(VinciContract* vc, const SQLiteResult& rows, int rowId)
+		void VinciContractTableSync::rowsAdded( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
-			vc->setId(Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::TABLE_COL_ID));
-			vc->_userId = rows.getColumn(rowId, VinciContractTableSync::TABLE_COL_USER_ID);
+
 		}
 
-		SQLiteTableSyncTemplate<VinciContract>::save(SQLiteThreadExec* sqlite, VinciContract* vc)
+		void VinciContractTableSync::rowsUpdated( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
-			stringstream query;
-			if (vc->getId() != 0)
-			{	// UPDATE
-				query << "UPDATE " << TABLE_NAME << " SET "
-					<< VinciContractTableSync::TABLE_COL_USER_ID << "=" << Conversion::ToSQLiteString(vc->_userId)
-					<< " WHERE " << VinciContractTableSync::TABLE_COL_ID << "=" vc->getid();
-			}
-			else
-			{	// INSERT
-				vc->setId(getId());
-				query << "INSERT INTO " << TABLE_NAME << " VALUES("
-					vc->getId()
-					<< "," << Conversion::ToString(vc->_userId)
-					<< ")";
-			}
-			sqlite->execUpdate(query);
+
+		}
+
+		void VinciContractTableSync::rowsRemoved( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		{
+
 		}
 	}
 }

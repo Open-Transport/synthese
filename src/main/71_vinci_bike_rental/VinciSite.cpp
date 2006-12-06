@@ -1,12 +1,14 @@
 
-#include "71_vinci_bke_rental/VinciSite.h"
+#include "71_vinci_bike_rental/VinciSite.h"
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace vinci
 	{
-		VinciSite::VinciSite(uid id=0)
-			: Registrable<uid, VinciSite>(uid)
+		VinciSite::VinciSite(uid id)
+			: Registrable<uid, VinciSite>(id)
 		{ }
 
 

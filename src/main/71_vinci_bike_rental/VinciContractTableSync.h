@@ -19,13 +19,11 @@ namespace synthese
 			@ingroup m71
 		*/
 
-		class VinciContractTableSync : public db::SQLiteTableSyncTemplate<VinciBike>
+		class VinciContractTableSync : public db::SQLiteTableSyncTemplate<VinciContract>
 		{
-		private:
+		public:
 			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_USER_ID;
-			
-		public:
 
 			VinciContractTableSync();
 			~VinciContractTableSync ();

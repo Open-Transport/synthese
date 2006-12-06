@@ -5,7 +5,9 @@
 #include <string>
 
 #include "01_util/Registrable.h"
-#include "01_util/UId.h
+#include "01_util/UId.h"
+
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -20,7 +22,7 @@ namespace synthese
 		public:
 			VinciBike(uid id=0);
 
-			friend class SQLiteTableSync<VinciBike>;
+			friend class db::SQLiteTableSyncTemplate<VinciBike>;
 		};
 	}
 }

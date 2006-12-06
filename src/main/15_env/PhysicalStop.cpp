@@ -62,7 +62,7 @@ PhysicalStop::isPhysicalStop () const
 const uid& 
 PhysicalStop::getId () const
 {
-    return synthese::util::Registrable<uid,PhysicalStop>::getId ();
+    return synthese::util::Registrable<uid,PhysicalStop>::getKey();
 }
 
 
