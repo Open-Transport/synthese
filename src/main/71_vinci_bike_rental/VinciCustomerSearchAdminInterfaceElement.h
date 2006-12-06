@@ -13,6 +13,9 @@ namespace synthese
 		*/
 		class VinciCustomerSearchAdminInterfaceElement : public admin::AdminInterfaceElement
 		{
+			static const std::string PARAM_SEARCH_NAME;
+			static const std::string PARAM_SEARCH_SURNAME;
+
 		public:
 			VinciCustomerSearchAdminInterfaceElement();
 			std::string getTitle() const;

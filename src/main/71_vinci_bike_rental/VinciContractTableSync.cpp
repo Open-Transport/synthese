@@ -1,6 +1,11 @@
 
 #include <sstream>
 
+#include "02_db/SQLiteResult.h"
+
+#include "12_security/User.h"
+#include "12_security/UserTableSync.h"
+
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
 
@@ -9,6 +14,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace db;
+	using namespace security;
 	using namespace vinci;
 	
 	namespace db
@@ -69,6 +75,32 @@ namespace synthese
 		void VinciContractTableSync::rowsRemoved( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
+		}
+
+		std::vector<VinciContract*> VinciContractTableSync::searchVinciContracts( const db::SQLiteThreadExec* sqlite , std::string name /*= ""*/, std::string surname /*= "" */, int first /*= 0*/, int number /*=-1*/ )
+		{
+			stringstream query;
+			query
+				<< "SELECT *"
+				<< " FROM "
+					<< TABLE_NAME << " AS c "
+					<< " INNER JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << TABLE_COL_ID << "=u." << UserTableSync::TABLE_COL_ID
+				<< " WHERE "
+					<< "u." << UserTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '%" << Conversion::ToSQLiteString(surname, false) << "%'"
+				<< " LIMIT " << number << "," << first;
+			SQLiteResult result = sqlite->execQuery(query.str());
+			vector<VinciContract*> contracts;
+			for (int i=0; i<result.getNbRows(); ++i)
+			{
+				User* user = new User;
+				SQLiteTableSyncTemplate<User>::load(user, result, i);
+				VinciContract* contract = new VinciContract;
+				SQLiteTableSyncTemplate<VinciContract>::load(contract, result, i);
+				contract->_user = user;
+				contracts.push_back(contract);
+			}
+			return contracts;
 		}
 	}
 }

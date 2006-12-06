@@ -9,6 +9,7 @@
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
+#include "02_db/DBModule.h"
 #include "02_db/SQLiteThreadExec.h"
 #include "02_db/SQLiteException.h"
 #include "02_db/SQLiteTableSync.h"
@@ -22,8 +23,10 @@ namespace synthese
 		template <class T>
 		class SQLiteTableSyncTemplate : public SQLiteTableSync
 		{
-		protected:
+		public:
 			static const std::string TABLE_NAME;
+
+		protected:
 			static const int TABLE_ID;
 			static const bool HAS_AUTO_INCREMENT;
 			static int _autoIncrementValue;
@@ -49,11 +52,28 @@ namespace synthese
 
 			static void load(T* obj, const db::SQLiteResult& rows, int rowId=0);
 			static void save(const db::SQLiteThreadExec* sqlite, T* obj);
+			static T* get(const db::SQLiteThreadExec* sqlite, uid key);
 
 			/// @todo See if the template can be used more 
 
 
 		};
+
+		template <class T>
+			T* synthese::db::SQLiteTableSyncTemplate<T>::get( const db::SQLiteThreadExec* sqlite, uid key)
+		{
+			std::stringstream query;
+			query
+				<< "SELECT * "
+				<< "FROM " << TABLE_NAME
+				<< "WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key);
+			db::SQLiteResult rows = sqlite->execQuery(query.str());
+			if (rows.getNbRows() <= 0)
+				throw SQLiteException("Object "+ TABLE_NAME + " " + Conversion::ToString(id) + " not found in database.");
+			T* object = new T;
+			load(object, rows);
+			return object;
+		}
 
 		template <class T>
 			boost::shared_ptr<boost::mutex> SQLiteTableSyncTemplate<T>::_idMutex(new boost::mutex); 

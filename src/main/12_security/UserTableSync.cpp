@@ -25,6 +25,59 @@ namespace synthese
 		const std::string SQLiteTableSyncTemplate<User>::TABLE_NAME = "t026_users";
 		const int SQLiteTableSyncTemplate<User>::TABLE_ID = 26;
 		const bool SQLiteTableSyncTemplate<User>::HAS_AUTO_INCREMENT = true;
+
+		void SQLiteTableSyncTemplate<User>::load(User* user, const db::SQLiteResult& rows, int rowId)
+		{
+			user->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			user->setPassword(rows.getColumn(rowId, UserTableSync::TABLE_COL_PASSWORD));
+			user->setName(rows.getColumn(rowId, UserTableSync::TABLE_COL_NAME));
+			user->setSurname(rows.getColumn(rowId, UserTableSync::TABLE_COL_SURNAME));
+			user->setLogin(rows.getColumn(rowId, UserTableSync::TABLE_COL_LOGIN));
+			try
+			{
+				user->setProfile(SecurityModule::getProfiles().get(Conversion::ToLongLong(rows.getColumn(rowId, UserTableSync::TABLE_COL_PROFILE_ID))));
+			}
+			catch (Profile::RegistryKeyException e)
+			{
+				throw UserTableSyncException("Bad profile "+ rows.getColumn(rowId, UserTableSync::TABLE_COL_PROFILE_ID));
+			}
+		}
+
+		void SQLiteTableSyncTemplate<User>::save(const db::SQLiteThreadExec* sqlite, User* user )
+		{
+			try
+			{
+				if (user->getKey() != 0)
+				{
+					// UPDATE
+				}
+				else // INSERT
+				{
+					/// @todo Implement control of the fields
+					user->setKey(getId(1,1));	/// @todo handle grid id
+					stringstream query;
+					query
+						<< "INSERT INTO " << TABLE_NAME
+						<< " VALUES(" 
+						<< Conversion::ToString(user->getKey())
+						<< "," << Conversion::ToSQLiteString(user->getName())
+						<< "," << Conversion::ToSQLiteString(user->getSurname())
+						<< "," << Conversion::ToSQLiteString(user->getLogin())
+						<< "," << Conversion::ToSQLiteString(user->getPassword())
+						<< "," << Conversion::ToString(user->getProfile()->getKey())
+						<< ")";
+					sqlite->execUpdate(query.str());
+				}
+			}
+			catch (SQLiteException e)
+			{
+				throw UserTableSyncException("Insert/Update error " + e.getMessage());
+			}
+			catch (...)
+			{
+				throw UserTableSyncException("Unknown Insert/Update error");
+			}
+		}
 	}
 	namespace security
 	{
@@ -66,29 +119,6 @@ namespace synthese
 			/// @todo implementation
 		}
 
-
-		User* UserTableSync::getUser( const db::SQLiteThreadExec* sqlite, uid id )
-		{
-			std::stringstream query;
-			query
-				<< "SELECT * "
-				<< "FROM " << TABLE_NAME
-				<< "WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(id);
-			try
-			{
-				db::SQLiteResult rows = sqlite->execQuery(query.str());
-				if (rows.getNbRows() <= 0)
-					throw UserTableSyncException("User "+ Conversion::ToString(id) + " not found in database.");
-				User* user = new User;
-				loadUser(user, rows);
-				return user;
-			}
-			catch (SQLiteException e)
-			{
-				throw UserTableSyncException(e.getMessage());
-			}
-		}
-
 		User* UserTableSync::getUser( const db::SQLiteThreadExec* sqlite, const std::string& login )
 		{
 			std::stringstream query;
@@ -102,65 +132,12 @@ namespace synthese
 				if (rows.getNbRows() <= 0)
 					throw UserTableSyncException("User "+ login + " not found in database.");
 				User* user = new User;
-				loadUser(user, rows);
+				load(user, rows);
 				return user;
 			}
 			catch (SQLiteException e)
 			{
 				throw UserTableSyncException(e.getMessage());
-			}
-		}
-
-		void UserTableSync::loadUser(User* user, const db::SQLiteResult& rows, int rowId)
-		{
-			user->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			user->setPassword(rows.getColumn(rowId, TABLE_COL_PASSWORD));
-			user->setName(rows.getColumn(rowId, TABLE_COL_NAME));
-			user->setSurname(rows.getColumn(rowId, TABLE_COL_SURNAME));
-			user->setLogin(rows.getColumn(rowId, TABLE_COL_LOGIN));
-			try
-			{
-				user->setProfile(SecurityModule::getProfiles().get(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_PROFILE_ID))));
-			}
-			catch (Profile::RegistryKeyException e)
-			{
-				throw UserTableSyncException("Bad profile "+ rows.getColumn(rowId, TABLE_COL_PROFILE_ID));
-			}
-		}
-
-		void UserTableSync::saveUser( const db::SQLiteThreadExec* sqlite, User* user )
-		{
-			try
-			{
-				if (user->getKey() != 0)
-				{
-					// UPDATE
-				}
-				else // INSERT
-				{
-					/// @todo Implement control of the fields
-					user->setKey(getId(1,1));	/// @todo handle grid id
-					stringstream query;
-					query
-						<< "INSERT INTO " << TABLE_NAME
-						<< " VALUES(" 
-						<< Conversion::ToString(user->getKey())
-						<< "," << Conversion::ToSQLiteString(user->getName())
-						<< "," << Conversion::ToSQLiteString(user->getSurname())
-						<< "," << Conversion::ToSQLiteString(user->getLogin())
-						<< "," << Conversion::ToSQLiteString(user->getPassword())
-						<< "," << Conversion::ToString(user->getProfile()->getKey())
-						<< ")";
-					sqlite->execUpdate(query.str());
-				}
-			}
-			catch (SQLiteException e)
-			{
-				throw UserTableSyncException("Insert/Update error " + e.getMessage());
-			}
-			catch (...)
-			{
-				throw UserTableSyncException("Unknown Insert/Update error");
 			}
 		}
 
@@ -186,7 +163,7 @@ namespace synthese
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
 					User* user = new User;
-					loadUser(user, result, i);
+					load(user, result, i);
 					users.push_back(user);
 				}
 				return users;

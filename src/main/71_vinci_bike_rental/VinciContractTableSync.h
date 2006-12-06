@@ -29,16 +29,19 @@ namespace synthese
 			~VinciContractTableSync ();
 
 			/** VinciContract search.
-			@param sqlite SQLite thread
-			@param first First user to answer
-			@param number Number of users to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-			@return Founded rates. 
-			@author Hugues Romain
-			@date 2006	
+				@param sqlite SQLite thread
+				@param name Name to search
+				@param surname Surname to search
+				@param first First user to answer
+				@param number Number of users to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return Founded contracts. 
+				@author Hugues Romain
+				@date 2006	
+				@warning The returned pointers must be deleted after use to avoid memory leak
 			*/
 			static std::vector<VinciContract*> searchVinciContracts(const db::SQLiteThreadExec* sqlite
-
-				, int first = 0, int number = 0);
+				, std::string name = "", std::string surname = ""
+				, int first = 0, int number = -1);
 
 
 		protected:

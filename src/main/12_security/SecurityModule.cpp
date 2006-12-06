@@ -45,7 +45,7 @@ namespace synthese
 				rootUser->setLogin(ROOT_USER);
 				rootUser->setPassword(ROOT_USER);
 				rootUser->setProfile(rootProfile);
-				UserTableSync::saveUser(ServerModule::getSQLiteThread(), rootUser);
+				UserTableSync::save(ServerModule::getSQLiteThread(), rootUser);
 			}
 		}
 

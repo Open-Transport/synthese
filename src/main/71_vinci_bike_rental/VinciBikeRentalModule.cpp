@@ -65,7 +65,7 @@ namespace synthese
 				vinciUser->setName(VINCI_ACCOUNTING_USER);
 				vinciUser->setLogin(VINCI_ACCOUNTING_USER);
 				vinciUser->setProfile(vinciProfile);
-				UserTableSync::saveUser(ServerModule::getSQLiteThread(), vinciUser);
+				UserTableSync::save(ServerModule::getSQLiteThread(), vinciUser);
 			}
 			else
 			{
