@@ -27,8 +27,8 @@ function Button11_onclick() {
 		</script>
 	</HEAD>
 	<BODY ms_positioning="GridLayout">
-		<TABLE id="Table1" height="504" cellSpacing="0" cellPadding="1" width="800" border="1"
-			DESIGNTIMEDRAGDROP="504" style="LEFT: 16px; WIDTH: 800px; POSITION: absolute; TOP: 8px; HEIGHT: 504px"
+		<TABLE id="Table1" height="504" cellSpacing="0" cellPadding="1" width="856" border="1"
+			DESIGNTIMEDRAGDROP="504" style="LEFT: 16px; WIDTH: 856px; POSITION: absolute; TOP: 8px; HEIGHT: 504px"
 			borderColor="#000066">
 			<TR>
 				<TD width="244" bgColor="#000066" colSpan="1" height="21" rowSpan="1" style="WIDTH: 244px"><FONT face="Verdana" size="1"><FONT color="#ffffff">user@SYNTHESE 
@@ -67,7 +67,8 @@ function Button11_onclick() {
 							<FONT face="Verdana" size="2"><A href="admin_logs.htm">Journal des évènements</A></FONT></LI></UL>
 				</TD>
 				<TD vAlign="top"><FONT face="Verdana"><FONT size="2"><FONT face="Verdana"><FONT size="2">
-									<P>Recherche d'afficheur :&nbsp;UID <INPUT id="Text2" style="WIDTH: 80px; HEIGHT: 22px" type="text" size="8" name="Text2">,&nbsp;Emplacement
+									<P>
+										UID <INPUT id="Text2" style="WIDTH: 80px; HEIGHT: 22px" type="text" size="8" name="Text2">,&nbsp;Emplacement
 										<SELECT id="Select1" name="Select1">
 											<OPTION value="" selected>TOULOUSE Matabiau</OPTION>
 										</SELECT>, Ligne&nbsp;<SELECT id="Select4" name="Select4">
@@ -86,6 +87,12 @@ function Button11_onclick() {
 											<OPTION value="">Warning</OPTION>
 											<OPTION value="">Warning+Error</OPTION>
 											<OPTION value="">Error</OPTION>
+										</SELECT>,&nbsp;Message
+										<SELECT id="Select5" name="Message">
+											<OPTION value="" selected>(tous)</OPTION>
+											<OPTION value="">Un message</OPTION>
+											<OPTION value="">Conflit</OPTION>
+											<OPTION value="">Messages</OPTION>
 										</SELECT>&nbsp;<INPUT id="Button12" type="button" value="Rechercher" name="Button6"></P>
 									<P>
 									Résultats de la recherche (tous) :</FONT></FONT> </P>
@@ -100,6 +107,7 @@ function Button11_onclick() {
 											<TD style="WIDTH: 186px; HEIGHT: 23px" align="center"><STRONG><FONT color="#0000ff" size="2"><U><STRONG><FONT color="#0000ff" size="2"><U><STRONG><FONT color="#0000ff" size="2"><U>Emplacement</U></FONT></STRONG></U></FONT></STRONG></U></FONT></STRONG></TD>
 											<TD style="WIDTH: 54px; HEIGHT: 23px" align="center"><STRONG><FONT color="#0000ff" size="2"><U><STRONG><FONT color="#0000ff" size="2"><U><STRONG><FONT color="#0000ff" size="2"><U>Type</U></FONT></STRONG></U></FONT></STRONG></U></FONT></STRONG></TD>
 											<TD align="center" style="WIDTH: 43px; HEIGHT: 23px"><STRONG><FONT color="#0000ff" size="2"><U><STRONG><FONT color="#0000ff" size="2"><U><STRONG><FONT color="#0000ff" size="2"><U>Etat</U></FONT></STRONG></U></FONT></STRONG></U></FONT></STRONG></TD>
+											<TD style="HEIGHT: 23px" align="center"><STRONG><FONT color="#0000ff" size="2"><U><STRONG><FONT color="#0000ff" size="2"><U><STRONG><FONT color="#0000ff" size="2"><U>Msg</U></FONT></STRONG></U></FONT></STRONG></U></FONT></STRONG></TD>
 											<TD align="center" colSpan="1" rowSpan="1" style="HEIGHT: 23px"><STRONG><FONT size="2">Actions</FONT></STRONG></TD>
 										</TR>
 										<TR>
@@ -110,6 +118,7 @@ function Button11_onclick() {
 											<TD style="WIDTH: 54px"><FONT color="#0000ff" size="1"><U><A href="admin_display.htm">Oscar</A></U></FONT></TD>
 											<TD style="WIDTH: 43px"><FONT face="Wingdings" color="#00cc00">l<FONT face="Verdana"> </FONT>
 													<FONT face="Wingdings" color="#00cc00">l</FONT></FONT></TD>
+											<TD align="center"><FONT face="Wingdings" color="#00cc00">l</FONT></TD>
 											<TD><FONT size="1"><INPUT language="javascript" id="Button3" style="WIDTH: 59px; HEIGHT: 24px" onclick="return location='admin_display.htm';"
 														type="button" value="Modifier" name="Modifier"><INPUT language="javascript" id="Button6" style="WIDTH: 64px; HEIGHT: 24px" onclick="return Button1_onclick()"
 														type="button" value="Simuler" name="Modifier"><INPUT id="Button1" style="WIDTH: 80px; HEIGHT: 24px" type="button" value="Supervision"
@@ -123,6 +132,7 @@ function Button11_onclick() {
 											<TD style="WIDTH: 54px"><FONT color="#0000ff" size="1"><U><A href="admin_display.htm">TFT 21"</A></U></FONT></TD>
 											<TD style="WIDTH: 43px"><FONT face="Wingdings" color="#00cc00"><FONT color="#ff9900">l</FONT><FONT face="Verdana">
 													</FONT><FONT face="Wingdings" color="#ff0033" style="BACKGROUND-COLOR: #ffffff">l</FONT></FONT></TD>
+											<TD align="center"><FONT face="Wingdings" color="#00cc00"><FONT color="#ff9900">l</FONT></FONT></TD>
 											<TD><FONT size="1"><FONT size="1"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button8" style="WIDTH: 59px; HEIGHT: 24px" onclick="return location='admin_display.htm';"
 																	type="button" value="Modifier" name="Modifier"><INPUT language="javascript" id="Button9" style="WIDTH: 64px; HEIGHT: 24px" onclick="return Button1_onclick()"
 																	type="button" value="Simuler" name="Modifier"><INPUT language="javascript" id="Button10" style="WIDTH: 80px; HEIGHT: 24px" onclick="&#9;location='admin_display_maintenance.htm';"
@@ -136,6 +146,7 @@ function Button11_onclick() {
 											<TD style="WIDTH: 54px"><FONT color="#0000ff" size="1"><U><A href="admin_display.htm">TFT 21"</A></U></FONT></TD>
 											<TD style="WIDTH: 43px" align="center" colSpan="1" rowSpan="1"><FONT size="2"><FONT color="#ff0000">HS
 														<FONT size="1">10/9</FONT></FONT></FONT></TD>
+											<TD align="center"><FONT style="BACKGROUND-COLOR: #ffffff" face="Wingdings" color="#ff0033">l</FONT></TD>
 											<TD><FONT size="1"><FONT size="1"><FONT size="1"><FONT size="1"><FONT size="1"><FONT size="1"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button4" style="WIDTH: 59px; HEIGHT: 24px" onclick="return location='admin_display.htm';"
 																					type="button" value="Modifier" name="Modifier"><INPUT language="javascript" id="Button5" style="WIDTH: 64px; HEIGHT: 24px" onclick="return Button1_onclick()"
 																					type="button" value="Simuler" name="Modifier"><INPUT language="javascript" id="Button7" style="WIDTH: 80px; HEIGHT: 24px" onclick="&#9;location='admin_display_maintenance.htm';"
@@ -147,6 +158,7 @@ function Button11_onclick() {
 												<FONT size="1">(sélectionner un afficheur existant pour copier ses&nbsp;propriétés 
 													dans le nouvel afficheur)</FONT>
 											</TD>
+											<TD></TD>
 											<TD><FONT size="1"><INPUT language="javascript" id="Button2" style="WIDTH: 156px; HEIGHT: 24px" onclick="location='admin_display.htm';"
 														type="button" value="Créer un nouvel afficheur" name="Créer un nouvel afficheur"></FONT></TD>
 											<P></P>

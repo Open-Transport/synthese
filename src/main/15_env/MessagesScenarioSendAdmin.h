@@ -41,6 +41,13 @@ namespace synthese
 						- si le champ n'est pas renseigné, un message de confirmation est proposé lors de la diffusion, prévenant l'utilisateur que sans action de sa part ce message restera en vigueur indéfiniment
 						- si le seul champ <tt>Fin diffusion : Heure</tt> est seul rempli, un message d'erreur empêche la diffusion :
 							@code Le message ne peut être diffusé car la date de fin est incorrecte @endcode
+					-# Bouton <tt>Appliquer</tt> : Applique les dates de début et de fin à tous les messages du scénario (qui restent modifiables unitairement par la suite). Les contrôles de cohérence de dates sont effectués lors de l'activation du bouton Appliquer.
+					-# Bouton <tt>Envoyer</tt> : Diffuse l'ensemble des messages figurant dans la liste après un message de confirmation. Ce bouton n'apparaît que lorsque l'on a appliqué une fois des dates de diffusion. Les contrôles suivants sont effectués :
+						- au moins un afficheur doit être sélectionné.
+						- si au moins un afficheur est en état de panne, un message de confirmation apparait
+						- les controles de dates doivent être positifs
+						- les messages doivent être non vides
+
 				-# <b>Contenu</b> : reprend les messages préparés par le scénario (il s'agit de copies) avec possibilité d'édition pour personnaliser l'envoi.	
 					-# <tt>Sel</tt> : case de sélection permettant d'effectuer une copie du message
 					-# <tt>Message</tt> : extrait des messages diffusés. Un clic sur l'extrait conduit à la page synthese::interfaces::MessageAdmin sur le message sélectionné
@@ -49,15 +56,15 @@ namespace synthese
 						- Pastille verte : tous les afficheurs sont en fonctionnement normal
 						- Pastille orange : au moins un afficheur est en état WARNING, aucun n'est en état ERROR
 						- Pastille rouge : au moins un afficheur est en état ERROR
+					-# <tt>Conflit</tt> : indique si le message est en conflit avec un autre sur au moins un des afficheurs. Une pastille colorée donne l'information et affiche une infobulle lorsque le pointeur de souris est positionné au dessus de celle-ci :
+						- Pastille verte : le message est en confilt sur aucun afficheur
+						- Pastille orange : le message prioritaire "écrase" un message complémentaire
+						- Pastille rouge : le message entre en conflit avec un message de même niveau
 					-# <tt>Modifier</tt> : conduit à la page @ref synthese::interfaces::MessageAdmin "d'édition du message" correspondant à la ligne où est présent le bouton. NB : les modifications effectuées sur ce message n'affecteront que la copie utilisée pour cet envoi et en aucun cas le sécnario sauvegardé en bibliothèque.
 					-# <tt>Supprimer</tt> : permet de retirer le message de l'envoi. NB : cela ne supprime en aucun cas le message du scénario de la bibliothèque
 					-# <tt>Ajouter</tt> : permet d'ajouter un nouveau message à l'envoi. Si un message existant est sélectionné le nouveau message correspond à une copie.
-				-# Le <b>bouton Envoyer</b> effectue l'envoi de chaque message présent sur l'écran après avoir effectué les contrôles de validité des paramètres. Notamment :
-					- au moins un afficheur doit être sélectionné.
-					- si au moins un afficheur est en état de panne, un message de confirmation apparait
-					- les controles de dates doivent être positifs
-					- les messages doivent être non vides
-
+				-# Le <b>bouton Arrêter</b> interrompt la diffusion de tous les messages du scénario en remplaçant la date de fin des messages par la date courante, après un message de confirmation.
+				
 			
 			<i>Sécurité</i>
 				- Une habilitation privée MessagesRight de niveau READ est nécessaire pour accéder à la page en consultation pour visualiser un envoi effectué par l'utilisateur courant

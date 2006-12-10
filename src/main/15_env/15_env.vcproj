@@ -336,6 +336,9 @@
 				RelativePath=".\MessagesAdmin.h">
 			</File>
 			<File
+				RelativePath=".\MessagesLibraryAdmin.h">
+			</File>
+			<File
 				RelativePath=".\MessagesScenarioAdmin.h">
 			</File>
 			<File
