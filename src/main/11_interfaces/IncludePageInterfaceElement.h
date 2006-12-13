@@ -24,3 +24,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_IncludePageInterfaceElement_H__
+

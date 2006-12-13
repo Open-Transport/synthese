@@ -21,3 +21,4 @@ namespace synthese
 	}
 }
 #endif // SYNTHESE_ParameterValueInterfaceElement_H__
+

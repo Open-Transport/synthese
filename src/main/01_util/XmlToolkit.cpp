@@ -232,3 +232,4 @@ XmlToolkit::GetDoubleAttr (XMLNode& node,
 
 }
 }
+

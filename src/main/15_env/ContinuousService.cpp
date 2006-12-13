@@ -75,3 +75,4 @@ ContinuousService::isContinuous () const
 
 }
 }
+

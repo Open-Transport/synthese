@@ -205,3 +205,4 @@ Registry<K,T>::remove (const K& key)
 }
 #endif
 
+

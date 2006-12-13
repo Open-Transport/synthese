@@ -178,3 +178,4 @@ class SYNTHESE
 /** @} */
 
 #endif
+

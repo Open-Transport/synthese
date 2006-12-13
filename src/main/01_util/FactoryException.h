@@ -41,3 +41,4 @@ namespace synthese
 
 }
 #endif // SYNTHESE_FactoryException_H__
+

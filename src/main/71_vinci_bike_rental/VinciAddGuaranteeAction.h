@@ -44,3 +44,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_AddGuaranteeAction_H__
+

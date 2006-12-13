@@ -41,3 +41,4 @@ namespace synthese
 
 }
 #endif // SYNTHESE_InterfacePageException_H__
+

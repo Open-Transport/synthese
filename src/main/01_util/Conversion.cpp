@@ -155,3 +155,4 @@ std::string Conversion::ToSQLiteString( const std::string& s, bool withApostroph
 }
 }
 }
+

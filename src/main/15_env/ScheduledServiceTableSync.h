@@ -62,3 +62,4 @@ static const std::string SCHEDULEDSERVICES_TABLE_COL_RESERVATIONRULEID ("reserva
 
 }
 #endif
+

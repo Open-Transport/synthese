@@ -152,3 +152,4 @@ EnvironmentLinkTableSync::rowsRemoved (const synthese::db::SQLiteThreadExec* sql
 }
 
 }
+

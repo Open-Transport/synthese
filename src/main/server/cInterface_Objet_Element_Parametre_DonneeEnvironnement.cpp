@@ -89,3 +89,4 @@ const std::string& cInterface_Objet_Element_Parametre_DonneeEnvironnement::Texte
 
     return _TexteVide;
 }
+

@@ -12,6 +12,13 @@ namespace synthese
 		class ConnectionPlace;
 	}
 
+	namespace server
+	{
+		class Request;
+	}
+
+
+
 	namespace interfaces
 	{
 		/** Line of schedule sheet.
@@ -29,8 +36,11 @@ namespace synthese
 				@param place (Place* object) : Corresponding place of the line
 				@param site Displayed site
 			*/
-			void display( std::ostream& stream, const std::string& text, bool alternateColor, const synthese::env::ConnectionPlace* place
-				, const server::Session* server = NULL ) const;
+			void display( std::ostream& stream, 
+				      const std::string& text, 
+				      bool alternateColor, 
+				      const synthese::env::ConnectionPlace* place,
+				      const server::Request* request = NULL ) const;
 
 
 		};

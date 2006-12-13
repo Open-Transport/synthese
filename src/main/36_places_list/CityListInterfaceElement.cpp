@@ -41,7 +41,7 @@ namespace synthese
 					if ( tbCommunes[ i ] != NULL )
 					{
 						stream
-							<< "<script>Nom[" << i << "]=\"" << tbCommunes[ i ] ->getName() << "\";Num[" << i << "]=" << tbCommunes[ i ] ->getId() << ";</script>"
+							<< "<script>Nom[" << i << "]=\"" << tbCommunes[ i ] ->getName() << "\";Num[" << i << "]=" << tbCommunes[ i ] ->getKey() << ";</script>"
 							<< openingText
                             << "<a href=\"javascript:MAJ(" << i << ")\">" << tbCommunes[ i ] ->getName() << "</a>"
 							<< closingText;
@@ -58,3 +58,4 @@ namespace synthese
 		}
 	}
 }
+

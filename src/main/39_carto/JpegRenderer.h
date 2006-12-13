@@ -43,3 +43,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_JpegRenderer_H__
+

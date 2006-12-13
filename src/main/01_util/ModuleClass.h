@@ -30,3 +30,4 @@ namespace synthese
 	}
 }
 #endif // SYNTHESE_ModuleClass_H__
+

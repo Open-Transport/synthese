@@ -62,3 +62,4 @@ void cArretPhysique::addArrivalLineStop( cGareLigne* const curGareLigne )
     _arrivalLineStopVector.insert( curGareLigne );
 }
 
+

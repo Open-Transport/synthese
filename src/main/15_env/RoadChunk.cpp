@@ -52,3 +52,4 @@ RoadChunk::getMetricOffset () const
 
 }
 }
+

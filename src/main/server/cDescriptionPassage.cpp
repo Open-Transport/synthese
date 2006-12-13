@@ -147,3 +147,4 @@ const size_t& cDescriptionPassage::NumArret() const
 {
     return ( vNumArret );
 }
+

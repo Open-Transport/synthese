@@ -47,3 +47,4 @@ cDescriptionPassage* cTableauAffichageSelectifDestinations::Calcule( const synth
 {
     return NULL;
 }
+

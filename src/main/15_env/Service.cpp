@@ -113,3 +113,4 @@ Service::isProvided ( const synthese::time::Date& departureDate,
 
 }
 }
+

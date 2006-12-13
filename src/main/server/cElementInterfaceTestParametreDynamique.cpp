@@ -300,3 +300,4 @@ cInterface_Objet_Element_TestConditionnel::cInterface_Objet_Element_TestConditio
     if ( !__OKElse )
         _ObjetSiVide = new cInterface_Objet_Element_Parametre_TexteConnu( "" );
 }
+

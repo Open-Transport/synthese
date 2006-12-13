@@ -62,3 +62,4 @@ static const std::string CONTINUOUSSERVICES_TABLE_COL_PEDESTRIANCOMPLIANCEID ("p
 
 }
 #endif
+

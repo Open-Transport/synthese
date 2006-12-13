@@ -30,3 +30,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_LogoutAction_H__
+

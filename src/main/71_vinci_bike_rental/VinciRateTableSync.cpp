@@ -13,11 +13,11 @@ namespace synthese
 
 	namespace db
 	{
-		const std::string SQLiteTableSyncTemplate<VinciRate>::TABLE_NAME = "t033_vinci_rates";
-		const int SQLiteTableSyncTemplate<VinciRate>::TABLE_ID = 33;
-		const bool SQLiteTableSyncTemplate<VinciRate>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciRate>::TABLE_NAME = "t033_vinci_rates";
+		template<> const int SQLiteTableSyncTemplate<VinciRate>::TABLE_ID = 33;
+		template<> const bool SQLiteTableSyncTemplate<VinciRate>::HAS_AUTO_INCREMENT = true;
 		
-		void SQLiteTableSyncTemplate<VinciRate>::load(VinciRate* vr, const SQLiteResult& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<VinciRate>::load(VinciRate* vr, const SQLiteResult& rows, int rowId)
 		{
 			vr->setKey(Conversion::ToLongLong(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_ID)));
 			vr->_name = rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_NAME);
@@ -32,7 +32,7 @@ namespace synthese
 			vr->_recurringPenaltyPeriod = Conversion::ToInt(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD));
 		}
 
-		void SQLiteTableSyncTemplate<VinciRate>::save(const SQLiteThreadExec* sqlite, VinciRate* vr)
+		template<> void SQLiteTableSyncTemplate<VinciRate>::save(const SQLiteThreadExec* sqlite, VinciRate* vr)
 		{
 			stringstream query;
 			if (vr->getKey() != 0)

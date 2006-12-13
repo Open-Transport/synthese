@@ -72,3 +72,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_CurrencyTableSync_H__
+

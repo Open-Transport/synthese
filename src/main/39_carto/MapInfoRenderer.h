@@ -56,3 +56,4 @@ class MapInfoRenderer : public Renderer
 }
 
 #endif
+

@@ -40,3 +40,4 @@ namespace synthese
 
 }
 #endif // SYNTHESE_ActionException_H__
+

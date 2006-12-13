@@ -149,3 +149,4 @@ SQLiteResult::addRow (const std::vector<std::string>& values,
 }
 
 
+

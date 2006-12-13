@@ -165,3 +165,4 @@ MapBackgroundManager::SetBackgroundsDir (const boost::filesystem::path& backgrou
 
 }
 }
+

@@ -38,3 +38,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_LoginAction_H__
+

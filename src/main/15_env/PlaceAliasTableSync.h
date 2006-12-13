@@ -55,3 +55,4 @@ static const std::string PLACEALIASES_TABLE_COL_ISCITYMAINCONNECTION ("is_city_m
 
 }
 #endif
+

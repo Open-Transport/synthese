@@ -215,3 +215,4 @@ HtmlMapRenderer::renderPhysicalStops (std::ostream& _output, Map& map)
 
 }
 }
+

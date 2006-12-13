@@ -685,3 +685,4 @@ Edge::getConnectionPlace () const
 
 }
 }
+

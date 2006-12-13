@@ -63,3 +63,4 @@ static const std::string ROADCHUNKS_TABLE_COL_VIAPOINTS ("via_points");  // list
 
 }
 #endif
+

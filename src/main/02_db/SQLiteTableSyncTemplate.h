@@ -135,3 +135,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_SQLiteTableSyncTemplate_H__
+

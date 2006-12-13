@@ -28,3 +28,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_GotoInterfaceElement_H__
+

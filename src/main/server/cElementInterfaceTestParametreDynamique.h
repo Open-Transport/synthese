@@ -82,3 +82,4 @@ inline cInterface_Objet_Element* cInterface_Objet_Element_TestConditionnel::Copi
 
 #endif
 #endif
+

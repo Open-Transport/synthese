@@ -68,3 +68,4 @@ const size_t& cHandicape::getId() const
 {
     return _id;
 }
+

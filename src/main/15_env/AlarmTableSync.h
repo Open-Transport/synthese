@@ -54,3 +54,4 @@ static const std::string ALARMS_TABLE_COL_LEVEL ("level");
 
 }
 #endif
+

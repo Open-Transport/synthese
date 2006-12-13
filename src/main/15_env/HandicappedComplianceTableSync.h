@@ -57,3 +57,4 @@ static const std::string HANDICAPPEDCOMPLIANCES_TABLE_COL_CAPACITY ("capacity");
 
 }
 #endif
+

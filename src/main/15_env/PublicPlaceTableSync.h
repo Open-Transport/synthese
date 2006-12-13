@@ -60,3 +60,4 @@ static const std::string PUBLICPLACES_TABLE_COL_CITYID ("city_id");
 
 }
 #endif
+

@@ -76,3 +76,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_InterfaceModule_H__
+

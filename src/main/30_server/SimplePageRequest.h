@@ -45,3 +45,4 @@ namespace synthese
 	}
 }
 #endif // SYNTHESE_SimplePageRequest_H__
+

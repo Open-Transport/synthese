@@ -120,3 +120,4 @@ PlaceAliasTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIn
 }
 
 }
+

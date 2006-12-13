@@ -330,3 +330,4 @@ void cJC::SetInclusionToMasque( cJC &JourCirculation, InclusionType Sens ) const
     SetInclusionToMasque( JourCirculation.vJoursAnnee, Sens );
 }
 
+

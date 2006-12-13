@@ -59,3 +59,4 @@ ScheduledService::isReservationPossible ( const synthese::time::DateTime& depart
 
 }
 }
+

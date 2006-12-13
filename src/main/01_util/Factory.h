@@ -259,3 +259,4 @@ namespace synthese
 }
 
 #endif // Factory_h__
+

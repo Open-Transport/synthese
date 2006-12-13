@@ -20,17 +20,17 @@ namespace synthese
 	
 	namespace db
 	{
-		const std::string SQLiteTableSyncTemplate<VinciContract>::TABLE_NAME = "t035_vinci_contract";
-		const int SQLiteTableSyncTemplate<VinciContract>::TABLE_ID = 35;
-		const bool SQLiteTableSyncTemplate<VinciContract>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciContract>::TABLE_NAME = "t035_vinci_contract";
+		template<> const int SQLiteTableSyncTemplate<VinciContract>::TABLE_ID = 35;
+		template<> const bool SQLiteTableSyncTemplate<VinciContract>::HAS_AUTO_INCREMENT = true;
 
-		void SQLiteTableSyncTemplate<VinciContract>::load(VinciContract* vc, const SQLiteResult& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<VinciContract>::load(VinciContract* vc, const SQLiteResult& rows, int rowId)
 		{
 			vc->setKey(Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::TABLE_COL_ID)));
 			vc->_userId = Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::TABLE_COL_USER_ID));
 		}
 
-		void SQLiteTableSyncTemplate<VinciContract>::save(const SQLiteThreadExec* sqlite, VinciContract* vc)
+		template<> void SQLiteTableSyncTemplate<VinciContract>::save(const SQLiteThreadExec* sqlite, VinciContract* vc)
 		{
 			stringstream query;
 			if (vc->getKey() != 0)

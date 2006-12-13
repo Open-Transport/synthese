@@ -58,3 +58,4 @@ static const std::string SERVICEDATES_TABLE_COL_DATE("date");
 
 }
 #endif
+

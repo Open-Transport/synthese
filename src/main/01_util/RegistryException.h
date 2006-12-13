@@ -47,3 +47,4 @@ class RegistryException : public synthese::util::Exception
 
 }
 #endif
+

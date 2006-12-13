@@ -2,7 +2,6 @@
 #define SYNTHESE_ROUTEPLANNER_BESTVERTEXREACHESMAP_H
 
 
-#include "module.h"
 
 #include "04_time/DateTime.h"
 
@@ -95,4 +94,5 @@ class BestVertexReachesMap
 }
 }
 #endif
+
 

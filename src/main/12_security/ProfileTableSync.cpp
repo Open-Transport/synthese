@@ -23,11 +23,11 @@ namespace synthese
 
 	namespace db
 	{
-		const std::string SQLiteTableSyncTemplate<Profile>::TABLE_NAME = "t027_profiles";
-		const int SQLiteTableSyncTemplate<Profile>::TABLE_ID = 27;
-		const bool SQLiteTableSyncTemplate<Profile>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<Profile>::TABLE_NAME = "t027_profiles";
+		template<> const int SQLiteTableSyncTemplate<Profile>::TABLE_ID = 27;
+		template<> const bool SQLiteTableSyncTemplate<Profile>::HAS_AUTO_INCREMENT = true;
 
-		void SQLiteTableSyncTemplate<Profile>::load(Profile* profile, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Profile>::load(Profile* profile, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
 			profile->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			profile->setName(rows.getColumn(rowId, ProfileTableSync::TABLE_COL_NAME));
@@ -35,7 +35,7 @@ namespace synthese
 			profile->setRights(rows.getColumn(rowId, ProfileTableSync::TABLE_COL_RIGHTS_STRING));
 		}
 
-		void SQLiteTableSyncTemplate<Profile>::save( const db::SQLiteThreadExec* sqlite, Profile* profile )
+		template<> void SQLiteTableSyncTemplate<Profile>::save( const db::SQLiteThreadExec* sqlite, Profile* profile )
 		{
 			try
 			{
@@ -150,3 +150,4 @@ namespace synthese
 		}
 	}
 }
+

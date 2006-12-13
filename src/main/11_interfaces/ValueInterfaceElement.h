@@ -48,3 +48,4 @@ return ( ( const Line* ) __Objet ) ->getLongName ();
 // MJ TODO return ( ( const Line* ) __Objet ) ->Materiel() ->getLibelleSimple();
 */
 
+

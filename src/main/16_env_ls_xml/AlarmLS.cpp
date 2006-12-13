@@ -82,3 +82,4 @@ AlarmLS::Save (const synthese::env::Alarm* alarm)
 }
 }
 
+

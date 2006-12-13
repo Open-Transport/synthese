@@ -1,6 +1,11 @@
 
 #include "RoutePlannerSheetColumnInterfacePage.h"
 
+#include "30_server/Request.h"
+#include "30_server/Site.h"
+
+
+
 namespace synthese
 {
 	namespace interfaces
@@ -8,8 +13,10 @@ namespace synthese
 		void RoutePlannerSheetColumnInterfacePage::display( std::ostream& stream
 			, bool isItFirstLine, bool isItLastLine, size_t columnNumber, bool isItFootLine 
 			, const synthese::time::Hour& firstDepartureTime, const synthese::time::Hour& lastDepartureTime 
-			, bool isItContinuousService, const Site* site /*= NULL */ ) const
+			, bool isItContinuousService, const server::Request* request /*= NULL */ ) const
 		{
+		    const server::Site* site = request->getSite ();
+ 
 			ParametersVector pv;
 			pv.push_back( synthese::util::Conversion::ToString( isItFirstLine ) );
 			pv.push_back( synthese::util::Conversion::ToString( isItLastLine ) );
@@ -19,7 +26,7 @@ namespace synthese
 			pv.push_back( firstDepartureTime.isUnknown() ? "" : lastDepartureTime.toInternalString() );
 			pv.push_back( synthese::util::Conversion::ToString( isItContinuousService ) );
 
-			InterfacePage::display( stream, pv, NULL, site );
+			InterfacePage::display( stream, pv, NULL, request );
 			
 		}
 	}

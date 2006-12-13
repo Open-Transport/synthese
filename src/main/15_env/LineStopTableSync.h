@@ -65,3 +65,4 @@ static const std::string LINESTOPS_TABLE_COL_VIAPOINTS ("via_points");
 
 }
 #endif
+

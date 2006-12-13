@@ -30,3 +30,4 @@ const size_t& cReseau::getId() const
 {
     return _id;
 }
+

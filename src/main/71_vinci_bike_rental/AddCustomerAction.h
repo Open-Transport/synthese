@@ -39,3 +39,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_AddCustomerAction_H__
+

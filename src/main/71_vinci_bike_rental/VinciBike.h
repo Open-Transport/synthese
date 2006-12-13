@@ -34,3 +34,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_VinciBike_H__
+

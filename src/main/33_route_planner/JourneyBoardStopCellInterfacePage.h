@@ -37,3 +37,4 @@ namespace synthese
 	}
 }
 #endif // SYNTHESE_JourneyBoardStopCellInterfacePage_H__
+

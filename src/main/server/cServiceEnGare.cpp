@@ -11,3 +11,4 @@ cServiceEnGare::cServiceEnGare( char newType, cPhoto* newPhoto, const std::strin
 }
 
 #endif
+

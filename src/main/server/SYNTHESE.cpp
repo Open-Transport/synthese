@@ -1186,3 +1186,4 @@ cLog& SYNTHESE::FichierLogBoot()
     return _FichierLogBoot;
 }
 */
+

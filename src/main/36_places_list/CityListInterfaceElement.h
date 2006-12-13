@@ -37,3 +37,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_CityListInterfaceElement_H__
+

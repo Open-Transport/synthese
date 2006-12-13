@@ -68,3 +68,4 @@ IncludingPlace::getImmediateVertices (VertexAccessMap& result,
 
 }
 }
+

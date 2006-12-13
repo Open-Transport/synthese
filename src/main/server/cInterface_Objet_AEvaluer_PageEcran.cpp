@@ -27,3 +27,4 @@ bool cInterface_Objet_AEvaluer_PageEcran::InclureCopie( const cInterface_Objet_A
     return true;
 }
 
+

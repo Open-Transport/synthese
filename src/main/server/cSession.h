@@ -37,3 +37,4 @@ bool cSession::ExecuteRequete( const std::stringRequete& __Requete, tAdresseIP _
 
     _Site->ExecuteRequete( __Requete );
 }
+

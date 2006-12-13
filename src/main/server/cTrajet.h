@@ -215,3 +215,4 @@ inline int cTrajet::operator >( const cTrajet& __Trajet ) const
 #define SYNTHESE_CTRAJET
 
 #endif
+

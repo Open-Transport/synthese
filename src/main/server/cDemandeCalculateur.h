@@ -13,3 +13,4 @@ class cDemandeCalculateur
         tBool3 _FiltreHandicape;
         cTarif* _FiltreTarif;
 };
+

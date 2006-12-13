@@ -108,3 +108,4 @@ SquareDistance::isUnknown () const
 }
 }
 
+

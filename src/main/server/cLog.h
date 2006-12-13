@@ -86,3 +86,4 @@ class cLog
 #define MESSAGE_GARE_DESIGNATION_INCORRECTE  7
 
 #endif
+

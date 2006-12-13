@@ -60,3 +60,4 @@ bool operator == ( const synthese::util::RGBColor& op1, const synthese::util::RG
 	return (op1.r == op2.r) && (op1.g == op2.g) && (op1.b == op2.b);
 }
 
+

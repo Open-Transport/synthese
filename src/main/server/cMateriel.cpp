@@ -97,3 +97,4 @@ const std::string& cMateriel::getArticle() const
     return vArticle;
 }
 
+

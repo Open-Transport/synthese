@@ -69,3 +69,4 @@ class cPhoto : public cDocument
 };
 
 #endif
+

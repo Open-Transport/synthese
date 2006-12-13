@@ -100,3 +100,4 @@ ServiceDateTableSync::updateServiceCalendar (const synthese::db::SQLiteResult& r
 }
 
 }
+

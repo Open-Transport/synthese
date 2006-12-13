@@ -33,3 +33,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_Currency_H__
+

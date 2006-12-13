@@ -40,3 +40,4 @@ namespace synthese
 	}
 }
 #endif // SYNTHESE_ActionOnlyRequest_H__
+

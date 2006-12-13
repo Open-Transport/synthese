@@ -168,3 +168,4 @@ ReservationRuleTableSync::doRemove (const synthese::db::SQLiteResult& rows, int 
 }
 
 }
+

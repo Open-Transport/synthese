@@ -173,3 +173,4 @@ LineStopTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowInde
 }
 
 }
+

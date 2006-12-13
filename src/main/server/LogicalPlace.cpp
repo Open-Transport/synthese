@@ -671,3 +671,4 @@ const string& LogicalPlace::getName() const
     return _name;
 }
 
+

@@ -113,3 +113,4 @@ LineStop::setMetricOffset (double metricOffset)
 
 }
 }
+

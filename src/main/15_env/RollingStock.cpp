@@ -54,3 +54,4 @@ RollingStock::getIndicator() const
 }
 }
 
+

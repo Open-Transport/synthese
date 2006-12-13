@@ -51,3 +51,4 @@ static const std::string TRANSPORTNETWORKS_TABLE_COL_NAME ("name");
 
 }
 #endif
+

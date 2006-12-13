@@ -130,3 +130,4 @@ const std::string& cMapPhoto::URL() const
 {
     return ( vURL );
 }
+

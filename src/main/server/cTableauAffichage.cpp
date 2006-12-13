@@ -203,3 +203,4 @@ int cTableauAffichage::getNumeroPanneau() const
 {
     return _NumeroPanneau;
 }
+

@@ -77,3 +77,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_TransactionTableSync_H__
+

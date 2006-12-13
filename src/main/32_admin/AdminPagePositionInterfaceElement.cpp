@@ -27,7 +27,7 @@ namespace synthese
 			
 			if (it != Factory<AdminInterfaceElement>::end())
 			{
-				string& supStr = getUpPages(*it, request, false);
+				string supStr = getUpPages(*it, request, false);
 				str << supStr << "&nbsp;&gt;&nbsp;";
 			}
 			if (!isFirst)
@@ -58,3 +58,4 @@ namespace synthese
 		}
 	}
 }
+

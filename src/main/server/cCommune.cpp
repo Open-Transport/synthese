@@ -96,3 +96,4 @@ void cCommune::addToMainLogicalPlace( LogicalPlace* const logicalPlace )
 {
     _mainLogicalPlace.addAliasedLogicalPlace( logicalPlace );
 }
+

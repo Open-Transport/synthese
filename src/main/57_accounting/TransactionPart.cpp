@@ -1,5 +1,5 @@
 
-#include "57_accounting/Transactionpart.h"
+#include "57_accounting/TransactionPart.h"
 
 namespace synthese
 {

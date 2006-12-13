@@ -410,3 +410,4 @@ const std::string& cModaliteReservation::GetTelephone() const
     return ( vNumeroTelephone );
 }
 
+

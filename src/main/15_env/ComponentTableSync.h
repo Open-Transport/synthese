@@ -71,3 +71,4 @@ class ComponentTableSync : public synthese::db::SQLiteTableSync
 
 }
 #endif
+

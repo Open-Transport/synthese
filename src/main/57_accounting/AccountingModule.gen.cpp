@@ -6,3 +6,4 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::acco
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::accounts::TransactionTableSync>("57.20 Transaction");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::accounts::TransactionPartTableSync>("57.30 Transaction Part");
 
+

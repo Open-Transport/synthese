@@ -39,3 +39,4 @@ class SQLiteException : public synthese::util::Exception
 
 }
 #endif
+

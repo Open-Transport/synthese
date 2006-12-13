@@ -202,3 +202,4 @@ inline bool cDistanceCarree::EstInconnu() const
 }
 
 #endif
+

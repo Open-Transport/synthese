@@ -57,3 +57,4 @@ class cTrajets : public cTableauDynamiqueObjets<cTrajet>
 
 
 #endif
+

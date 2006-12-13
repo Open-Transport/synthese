@@ -76,3 +76,4 @@ Place::getVertexAccess (const AccessDirection& accessDirection,
 }
 }
 
+

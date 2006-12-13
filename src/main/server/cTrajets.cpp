@@ -567,3 +567,4 @@ const std::string& cTrajets::GetTailleTexte() const
 {
     return _txtTaille;
 }
+

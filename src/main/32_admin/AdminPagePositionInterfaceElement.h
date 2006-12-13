@@ -34,3 +34,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_AdminPagePositionInterfaceElement_H__
+

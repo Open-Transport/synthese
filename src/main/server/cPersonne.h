@@ -42,3 +42,4 @@ class cPersonne
         const std::string& GetEMail();
 };
 
+

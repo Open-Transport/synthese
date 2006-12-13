@@ -154,3 +154,4 @@ RoadChunkTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowInd
 }
 
 }
+

@@ -27,3 +27,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_AdminModule_H__
+

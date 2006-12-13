@@ -58,3 +58,4 @@ class SQLite
 
 
 #endif
+

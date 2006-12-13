@@ -20,18 +20,18 @@ namespace synthese
 
 	namespace db
 	{
-		const std::string SQLiteTableSyncTemplate<Currency>::TABLE_NAME = "t029_currencies";
-		const int SQLiteTableSyncTemplate<Currency>::TABLE_ID = 29;
-		const bool SQLiteTableSyncTemplate<Currency>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<Currency>::TABLE_NAME = "t029_currencies";
+		template<> const int SQLiteTableSyncTemplate<Currency>::TABLE_ID = 29;
+		template<> const bool SQLiteTableSyncTemplate<Currency>::HAS_AUTO_INCREMENT = true;
 
-		void SQLiteTableSyncTemplate<Currency>::load(Currency* currency, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Currency>::load(Currency* currency, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
 			currency->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			currency->setName(rows.getColumn(rowId, CurrencyTableSync::TABLE_COL_NAME));
 			currency->setSymbol(rows.getColumn(rowId, CurrencyTableSync::TABLE_COL_SYMBOL));
 		}
 
-		void SQLiteTableSyncTemplate<Currency>::save(const db::SQLiteThreadExec* sqlite, Currency* currency)
+		template<> void SQLiteTableSyncTemplate<Currency>::save(const db::SQLiteThreadExec* sqlite, Currency* currency)
 		{
 			stringstream query;
 			if (currency->getKey() > 0)

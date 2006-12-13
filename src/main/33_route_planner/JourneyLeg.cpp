@@ -212,3 +212,4 @@ JourneyLeg::getPath () const
 
 }
 }
+

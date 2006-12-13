@@ -89,3 +89,4 @@ int cPoint::operator== ( const cPoint& __Point ) const
     // Test d'égalité
     return __Point._XKM == _XKM && __Point._YKM == _YKM;
 }
+

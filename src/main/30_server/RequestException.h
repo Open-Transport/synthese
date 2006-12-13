@@ -39,3 +39,4 @@ class RequestException : public synthese::util::Exception
 
 }
 #endif
+

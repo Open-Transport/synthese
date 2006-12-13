@@ -39,3 +39,4 @@ class ThreadException : public synthese::util::Exception
 
 }
 #endif
+

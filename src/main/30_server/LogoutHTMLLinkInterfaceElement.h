@@ -28,3 +28,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_LogoutHTMLLinkInterfaceElement_H__
+

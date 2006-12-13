@@ -66,3 +66,4 @@ static const std::string RESERVATIONRULES_TABLE_COL_WEBSITEURL ("web_site_url");
 
 }
 #endif
+

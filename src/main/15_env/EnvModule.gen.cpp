@@ -36,3 +36,4 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env:
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::LineStopTableSync>("15.90.01");
 
+

@@ -84,3 +84,4 @@ HourPeriod::applyPeriod ( DateTime& startTime,
 
 }
 }
+

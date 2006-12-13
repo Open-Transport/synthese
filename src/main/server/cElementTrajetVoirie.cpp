@@ -6,3 +6,4 @@
 
 void cElementTrajetVoirie::AjoutSegment( const synmap::RoadChunk* __Segment )
 {}
+

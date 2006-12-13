@@ -76,3 +76,4 @@ Fare::setType (const FareType& type)
 
 
 
+

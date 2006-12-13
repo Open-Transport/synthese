@@ -63,3 +63,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_Transaction_H__
+

@@ -39,3 +39,4 @@ class SocketException : public synthese::util::Exception
 
 }
 #endif
+

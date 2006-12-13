@@ -46,3 +46,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_Action_H__
+

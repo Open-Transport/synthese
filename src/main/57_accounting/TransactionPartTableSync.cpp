@@ -27,11 +27,11 @@ namespace synthese
 
 	namespace db
 	{
-		const std::string SQLiteTableSyncTemplate<TransactionPart>::TABLE_NAME = "t030_transaction_parts";
-		const int SQLiteTableSyncTemplate<TransactionPart>::TABLE_ID = 30;
-		const bool SQLiteTableSyncTemplate<TransactionPart>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<TransactionPart>::TABLE_NAME = "t030_transaction_parts";
+		template<> const int SQLiteTableSyncTemplate<TransactionPart>::TABLE_ID = 30;
+		template<> const bool SQLiteTableSyncTemplate<TransactionPart>::HAS_AUTO_INCREMENT = true;
 
-		void SQLiteTableSyncTemplate<TransactionPart>::load(TransactionPart* tp, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<TransactionPart>::load(TransactionPart* tp, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
 			tp->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			tp->setTransactionId(Conversion::ToLongLong(rows.getColumn(rowId, TransactionPartTableSync::TABLE_COL_TRANSACTION_ID)));
@@ -43,7 +43,7 @@ namespace synthese
 			tp->setTradedObjectId(rows.getColumn(rowId, TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID));
 		}
 
-		void SQLiteTableSyncTemplate<TransactionPart>::save(const db::SQLiteThreadExec* sqlite, TransactionPart* tp)
+		template<> void SQLiteTableSyncTemplate<TransactionPart>::save(const db::SQLiteThreadExec* sqlite, TransactionPart* tp)
 		{
 			try
 			{

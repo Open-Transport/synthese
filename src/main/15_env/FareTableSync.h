@@ -53,3 +53,4 @@ static const std::string FARES_TABLE_COL_FARETYPE ("fare_type");
 
 }
 #endif
+

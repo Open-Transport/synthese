@@ -250,3 +250,4 @@ MapInfoRenderer::renderPhysicalStops (Map& map)
 
 }
 }
+

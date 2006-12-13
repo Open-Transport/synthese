@@ -23,3 +23,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_Factorable_H__
+

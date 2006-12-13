@@ -85,3 +85,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_TransationPartTableSync_H__
+

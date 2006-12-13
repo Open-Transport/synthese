@@ -184,3 +184,4 @@ City::getImmediateVertices (VertexAccessMap& result,
 }
 
 
+

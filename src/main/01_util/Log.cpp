@@ -225,3 +225,4 @@ Log::append (Log::Level level,
 }
 }
 
+

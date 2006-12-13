@@ -99,3 +99,4 @@ EnvironmentTableSync::rowsRemoved (const synthese::db::SQLiteThreadExec* sqlite,
 }
 
 }
+

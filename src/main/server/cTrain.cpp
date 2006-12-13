@@ -134,3 +134,4 @@ bool cTrain::Circule( const synthese::time::Date& __DateDepart, int __JPlus ) co
     else
         return vCirculation->Circule( __DateDepart );
 }
+

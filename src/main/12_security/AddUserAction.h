@@ -42,3 +42,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_AddUserAction_H__
+

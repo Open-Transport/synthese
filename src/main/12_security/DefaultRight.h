@@ -35,3 +35,4 @@ namespace synthese
 	}
 }
 #endif // SYNTHESE_DefaultRight_H__
+

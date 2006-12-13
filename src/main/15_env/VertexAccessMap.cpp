@@ -240,3 +240,4 @@ VertexAccessMap::merge (const VertexAccessMap& vam,
 
 }
 }
+

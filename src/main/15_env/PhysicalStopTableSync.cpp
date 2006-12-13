@@ -99,3 +99,4 @@ PhysicalStopTableSync::doRemove (const synthese::db::SQLiteResult& rows, int row
 }
 
 }
+

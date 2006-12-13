@@ -59,3 +59,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_VinciRate_H__
+

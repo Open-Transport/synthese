@@ -127,3 +127,4 @@ ConnectionPlaceLS::Save (const synthese::env::ConnectionPlace* connectionPlace)
 }
 }
 
+

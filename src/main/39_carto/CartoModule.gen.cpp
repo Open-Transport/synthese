@@ -13,3 +13,4 @@ synthese::util::Factory<synthese::carto::Renderer>::integrate<synthese::carto::P
 
 synthese::util::Factory<synthese::server::Request>::integrate<synthese::carto::MapRequestHandler>("map");
 
+

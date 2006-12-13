@@ -30,3 +30,4 @@ class cTranslation
 
 
 #endif /*SYNTHESE_CTRANSLATION_H_*/
+

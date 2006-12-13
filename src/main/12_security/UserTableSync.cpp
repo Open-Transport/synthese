@@ -22,11 +22,11 @@ namespace synthese
 
 	namespace db
 	{
-		const std::string SQLiteTableSyncTemplate<User>::TABLE_NAME = "t026_users";
-		const int SQLiteTableSyncTemplate<User>::TABLE_ID = 26;
-		const bool SQLiteTableSyncTemplate<User>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<User>::TABLE_NAME = "t026_users";
+		template<> const int SQLiteTableSyncTemplate<User>::TABLE_ID = 26;
+		template<> const bool SQLiteTableSyncTemplate<User>::HAS_AUTO_INCREMENT = true;
 
-		void SQLiteTableSyncTemplate<User>::load(User* user, const db::SQLiteResult& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<User>::load(User* user, const db::SQLiteResult& rows, int rowId)
 		{
 			user->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			user->setPassword(rows.getColumn(rowId, UserTableSync::TABLE_COL_PASSWORD));
@@ -50,7 +50,7 @@ namespace synthese
 			}
 		}
 
-		void SQLiteTableSyncTemplate<User>::save(const db::SQLiteThreadExec* sqlite, User* user )
+		template<> void SQLiteTableSyncTemplate<User>::save(const db::SQLiteThreadExec* sqlite, User* user )
 		{
 			try
 			{
@@ -203,5 +203,6 @@ namespace synthese
 		}
 	}
 }
+
 
 

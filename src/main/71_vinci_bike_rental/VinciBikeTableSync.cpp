@@ -16,18 +16,18 @@ namespace synthese
 
 	namespace db
 	{
-		const std::string SQLiteTableSyncTemplate<VinciBike>::TABLE_NAME = "t032_vinci_bike";
-		const int SQLiteTableSyncTemplate<VinciBike>::TABLE_ID = 32;
-		const bool SQLiteTableSyncTemplate<VinciBike>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciBike>::TABLE_NAME = "t032_vinci_bike";
+		template<> const int SQLiteTableSyncTemplate<VinciBike>::TABLE_ID = 32;
+		template<> const bool SQLiteTableSyncTemplate<VinciBike>::HAS_AUTO_INCREMENT = true;
 
-		void SQLiteTableSyncTemplate<VinciBike>::load(VinciBike* bike, const db::SQLiteResult& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<VinciBike>::load(VinciBike* bike, const db::SQLiteResult& rows, int rowId)
 		{
 			bike->setKey(Conversion::ToLongLong(rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_ID)));
 			bike->_number = rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_NUMBER);
 			bike->_markedNumber = rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_MARKED_NUMBER);
 		}
 
-		void SQLiteTableSyncTemplate<VinciBike>::save(const db::SQLiteThreadExec* sqlite, VinciBike* bike)
+		template<> void SQLiteTableSyncTemplate<VinciBike>::save(const db::SQLiteThreadExec* sqlite, VinciBike* bike)
 		{
 			stringstream query;
 			if (bike->getKey() != 0)
@@ -122,3 +122,4 @@ namespace synthese
 
 	}
 }
+

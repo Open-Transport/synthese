@@ -39,3 +39,4 @@ class XmlException : public synthese::util::Exception
 
 }
 #endif
+

@@ -47,3 +47,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_VinciContract_H__
+

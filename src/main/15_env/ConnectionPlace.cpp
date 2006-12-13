@@ -301,3 +301,4 @@ ConnectionPlace::isConnectionAllowed (const Vertex* fromVertex,
 
 }
 }
+

@@ -57,3 +57,4 @@ static const std::string CITIES_TABLE_COL_NAME ("name");
 
 }
 #endif
+

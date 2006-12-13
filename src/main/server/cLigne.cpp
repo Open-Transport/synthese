@@ -522,3 +522,4 @@ cAlerte& cLigne::getAlerteForModification()
 {
     return vAlerte;
 }
+

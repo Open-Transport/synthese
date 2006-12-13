@@ -64,3 +64,4 @@ static const std::string CONNECTIONPLACES_TABLE_COL_ALARMID ("alarm_id");
 
 }
 #endif
+

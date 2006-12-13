@@ -67,3 +67,4 @@ PublicPlaceLS::Save (const synthese::env::PublicPlace* publicPlace)
 }
 }
 
+

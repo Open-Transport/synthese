@@ -55,3 +55,4 @@ inline T& operator<<(T& __flux, const cAlternance& __Obj)
 */
 
 #endif
+

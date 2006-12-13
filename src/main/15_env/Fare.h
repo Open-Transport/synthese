@@ -55,3 +55,4 @@ class Fare : public synthese::util::Registrable<uid,Fare>
 }
 
 #endif
+

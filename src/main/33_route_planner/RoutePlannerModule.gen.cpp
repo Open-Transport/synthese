@@ -8,3 +8,4 @@ Factory<InterfacePage>::integrate<JourneyBoardJunctionCellInterfacePage>("journe
 
 Factory<LibraryInterfaceElement>::integrate<JourneyLineListInterfaceElement>("journey_line_list");
 Factory<LibraryInterfaceElement>::integrate<JourneyBoardInterfaceElement>("journey_board");
+

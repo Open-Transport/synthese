@@ -80,3 +80,4 @@ void cAlerte::setNiveau( const Level& __Niveau )
 {
     _Niveau = __Niveau;
 }
+

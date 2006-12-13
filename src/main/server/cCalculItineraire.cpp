@@ -1281,3 +1281,4 @@ const synthese::time::DateTime& cCalculateur::absoluteBestTime( bool isArrival )
     }
     return getBestTime( bestItem->first, isArrival );
 }
+

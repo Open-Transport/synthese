@@ -83,3 +83,4 @@ AddressablePlace::getImmediateVertices (VertexAccessMap& result,
 
 }
 }
+

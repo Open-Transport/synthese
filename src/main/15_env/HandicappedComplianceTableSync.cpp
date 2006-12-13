@@ -125,3 +125,4 @@ HandicappedComplianceTableSync::doRemove (const synthese::db::SQLiteResult& rows
 }
 
 }
+

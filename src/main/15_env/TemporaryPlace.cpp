@@ -105,3 +105,4 @@ TemporaryPlace::getImmediateVertices (VertexAccessMap& result,
 }
 
 
+

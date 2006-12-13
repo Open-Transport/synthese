@@ -69,3 +69,4 @@ class SQLiteResult : public DbResult
 
 
 #endif
+

@@ -445,3 +445,4 @@ std::string Date::toSQLiteString( bool withApostrophes ) const
 }
 }
 
+

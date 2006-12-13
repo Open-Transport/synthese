@@ -68,3 +68,4 @@ inline double cChronometre::GetDuree() const
 }
 
 #endif
+

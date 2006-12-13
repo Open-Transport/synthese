@@ -99,3 +99,4 @@ class City : public synthese::util::Registrable<uid, City>,
 }
 #endif
 
+

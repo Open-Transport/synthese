@@ -16,3 +16,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_DelUserAction_H__
+

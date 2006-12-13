@@ -27,3 +27,4 @@ SQLiteException::~SQLiteException () throw ()
 }
 
 
+

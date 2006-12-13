@@ -25,3 +25,4 @@ cInterface_Objet_Element_Goto::cInterface_Objet_Element_Goto( int __NumeroLigne 
     _NumeroLigne = __NumeroLigne;
 }
 
+

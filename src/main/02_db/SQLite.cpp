@@ -112,3 +112,4 @@ SQLite::ExecQuery (sqlite3* connection, const std::string& sql)
 }
 }
 
+

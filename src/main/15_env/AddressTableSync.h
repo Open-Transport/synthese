@@ -61,3 +61,4 @@ static const std::string ADDRESSES_TABLE_COL_Y ("y");  // U ??
 
 }
 #endif
+

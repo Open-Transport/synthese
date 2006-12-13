@@ -157,3 +157,4 @@ void RoutePlanningNode::addAccessPoint( const cArretPhysique* const accessPoint,
 {
     _data[ accessPoint ] = ApproachDescription( approachDuration, approachDistance );
 }
+

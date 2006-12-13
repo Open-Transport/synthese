@@ -243,3 +243,4 @@ const cInterface_Objet_Element_Parametre* cInterface_Objet_Connu_ListeParametres
 {
     return ( cInterface_Objet_Element_Parametre* ) _getElement( __Index );
 }
+

@@ -323,3 +323,4 @@ std::string Hour::toSQLiteString( bool withApostrophes /*= true*/ ) const
 
 }
 }
+

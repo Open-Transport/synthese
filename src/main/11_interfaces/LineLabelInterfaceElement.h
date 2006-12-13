@@ -25,3 +25,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_LineLabelInterfaceElement_H__
+

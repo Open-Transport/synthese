@@ -53,3 +53,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_UpdateCustomerAction_H__
+

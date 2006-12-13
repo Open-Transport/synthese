@@ -13,17 +13,17 @@ namespace synthese
 	
 	namespace db
 	{
-		const std::string SQLiteTableSyncTemplate<VinciSite>::TABLE_NAME = "t034_vinci_site";
-		const int SQLiteTableSyncTemplate<VinciSite>::TABLE_ID = 34;
-		const bool SQLiteTableSyncTemplate<VinciSite>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<VinciSite>::TABLE_NAME = "t034_vinci_site";
+		template<> const int SQLiteTableSyncTemplate<VinciSite>::TABLE_ID = 34;
+		template<> const bool SQLiteTableSyncTemplate<VinciSite>::HAS_AUTO_INCREMENT = true;
 
-		void SQLiteTableSyncTemplate<VinciSite>::load(VinciSite* vs, const SQLiteResult& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<VinciSite>::load(VinciSite* vs, const SQLiteResult& rows, int rowId)
 		{
 			vs->setKey(Conversion::ToLongLong(rows.getColumn(rowId, VinciSiteTableSync::TABLE_COL_ID)));
 			vs->_name = rows.getColumn(rowId, VinciSiteTableSync::TABLE_COL_NAME);
 		}
 
-		void SQLiteTableSyncTemplate<VinciSite>::save(const SQLiteThreadExec* sqlite, VinciSite* vs)
+		template<> void SQLiteTableSyncTemplate<VinciSite>::save(const SQLiteThreadExec* sqlite, VinciSite* vs)
 		{
 			stringstream query;
 			if (vs->getKey() != 0)

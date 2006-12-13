@@ -54,3 +54,4 @@ Compliance::setCompliant (boost::logic::tribool compliant)
 
 }
 }
+

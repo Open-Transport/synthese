@@ -23,11 +23,11 @@ namespace synthese
 
 	namespace db
 	{
-		const std::string SQLiteTableSyncTemplate<Transaction>::TABLE_NAME = "t031_transactions";
-		const int SQLiteTableSyncTemplate<Transaction>::TABLE_ID = 31;
-		const bool SQLiteTableSyncTemplate<Transaction>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<Transaction>::TABLE_NAME = "t031_transactions";
+		template<> const int SQLiteTableSyncTemplate<Transaction>::TABLE_ID = 31;
+		template<> const bool SQLiteTableSyncTemplate<Transaction>::HAS_AUTO_INCREMENT = true;
 
-		void SQLiteTableSyncTemplate<Transaction>::load(Transaction* t, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Transaction>::load(Transaction* t, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
 			t->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			t->setComment(rows.getColumn(rowId, TransactionTableSync::TABLE_COL_COMMENT));
@@ -39,7 +39,7 @@ namespace synthese
 			t->setPlaceid(Conversion::ToLongLong(rows.getColumn(rowId, TransactionTableSync::TABLE_COL_PLACE_ID)));
 		}
 
-		void SQLiteTableSyncTemplate<Transaction>::save(const db::SQLiteThreadExec* sqlite, Transaction* t)
+		template<> void SQLiteTableSyncTemplate<Transaction>::save(const db::SQLiteThreadExec* sqlite, Transaction* t)
 		{
 			try
 			{

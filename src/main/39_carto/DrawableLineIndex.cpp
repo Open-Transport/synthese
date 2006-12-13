@@ -117,3 +117,4 @@ DrawableLineIndex::getFuzzyPoint (const Point& point) const
 
 }
 }
+

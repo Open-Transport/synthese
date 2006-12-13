@@ -23,3 +23,4 @@ namespace synthese
 	}
 }
 #endif // SYNTHESE_UserTableSyncException_H__
+

@@ -1831,3 +1831,4 @@ char         XMLNode::isDeclaration(     ) { if (!d) return 0;                 r
 char         XMLNode::isEmpty      (     ) { return (d==NULL); }
 int          XMLNode::nElement     (     ) { if (!d) return 0; return d->nChild+d->nText+d->nClear+d->nAttribute; }
 
+

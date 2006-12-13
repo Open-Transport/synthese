@@ -5,9 +5,9 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		void RoutePlannerNoSolutionInterfacePage::display( std::ostream& stream , const Site* site /*= NULL*/ ) const
+		void RoutePlannerNoSolutionInterfacePage::display( std::ostream& stream , const server::Request* request /*= NULL*/ ) const
 		{
-			InterfacePage::display(stream, ParametersVector(), NULL, site);
+			InterfacePage::display(stream, ParametersVector(), NULL, request);
 		}
 	}
 }

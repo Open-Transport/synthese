@@ -186,3 +186,4 @@ MapLS::Save (const synthese::carto::Map* map)
 }
 }
 
+

@@ -362,3 +362,4 @@ Journey::operator= (const Journey& ref)
 
 }
 }
+

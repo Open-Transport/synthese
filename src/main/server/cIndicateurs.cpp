@@ -613,3 +613,4 @@ const std::string& cIndicateurs::getTitre() const
 {
     return ( vTitre );
 }
+

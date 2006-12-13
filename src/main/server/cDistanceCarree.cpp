@@ -23,3 +23,4 @@ cDistanceCarree::cDistanceCarree( const cPoint& Point1, const cPoint& Point2 )
 {
     setFromPoints( Point1, Point2 );
 }
+

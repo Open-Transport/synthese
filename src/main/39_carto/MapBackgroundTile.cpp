@@ -127,3 +127,4 @@ MapBackgroundTile::draw (Map& map, PostscriptCanvas& canvas) const
 
 }
 }
+

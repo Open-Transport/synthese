@@ -46,3 +46,4 @@ int main( int argc, char **argv )
   
   return result.wasSuccessful() ? 0 : 1;
 }
+

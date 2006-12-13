@@ -52,3 +52,4 @@ static const std::string BIKECOMPLIANCES_TABLE_COL_CAPACITY ("capacity");
 
 }
 #endif
+

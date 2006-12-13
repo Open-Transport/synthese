@@ -55,3 +55,4 @@ cTranslation::operator=( const cTranslation& rhs )
     return ( *this );
 }
 
+

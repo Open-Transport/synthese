@@ -7,7 +7,6 @@
 #include "Journey.h"
 #include "JourneyLeg.h"
 #include "01_util/Conversion.h"
-#include "11_interfaces/Site.h"
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
 #include "04_time/module.h"
@@ -17,6 +16,9 @@
 #include "15_env/Road.h"
 #include "15_env/HandicappedCompliance.h"
 #include "15_env/BikeCompliance.h"
+#include "30_server/Request.h"
+#include "30_server/Site.h"
+
 
 using namespace synthese::routeplanner;
 
@@ -25,8 +27,9 @@ namespace synthese
 	namespace interfaces
 	{
 
-		void JourneyBoardInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const Site* site /*= NULL*/ ) const
+		void JourneyBoardInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
+		    const server::Site* site = request->getSite ();
 			// Parameters
 			const Journey* __Trajet = ( const Journey* ) object;
 			int __FiltreHandicape = (synthese::util::Conversion::ToInt(_handicappedFilter->getValue(parameters)) > 1);
@@ -61,7 +64,7 @@ namespace synthese
 							, __ET->getOrigin() ->getConnectionPlace() ->getAlarm()
 							, false, __ET->getOrigin() ->getConnectionPlace() ->getName()
 							, __Couleur, unknownHour, unknownHour
-							, site );
+							, request );
 					}
 				}
 
@@ -138,7 +141,7 @@ namespace synthese
 						, __ET->getService ()->getPath ()->hasApplicableAlarm ( debutLigne, finLigne ) ? __ET->getService()->getPath ()->getAlarm() : NULL
 						, __Couleur
 						, __ET->getService ()->getPath ()
-						, site );
+						, request );
 					
 					__Couleur = !__Couleur;
 
@@ -165,7 +168,7 @@ namespace synthese
 						, __ET->getDestination()->getConnectionPlace() == __ET->getService ()->getPath ()->getEdges ().back()->getFromVertex ()->getConnectionPlace()
 						, __ET->getDestination()->getConnectionPlace()->getName()
 						, __Couleur, __ET->getArrivalTime().getHour(), tempMoment.getHour()
-						, site);
+						, request);
 
 					__Couleur = !__Couleur;
 
@@ -185,7 +188,7 @@ namespace synthese
 						, __ET->getDestination()->getConnectionPlace()
 						, __ET->getDestination()->getConnectionPlace()->hasApplicableAlarm(debutArret, finArret) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 						, __Couleur
-						, site);
+						, request);
 				
 					// 3 Couleur du fond de case
 					__Couleur = !__Couleur;

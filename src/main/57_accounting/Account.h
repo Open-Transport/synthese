@@ -68,3 +68,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_Account_H__
+

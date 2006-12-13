@@ -32,3 +32,4 @@ size_t cTarif::getNumeroTarif() const
     return _id;
 }
 
+

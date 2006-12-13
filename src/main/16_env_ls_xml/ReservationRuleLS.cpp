@@ -120,3 +120,4 @@ ReservationRuleLS::Save (const synthese::env::ReservationRule* publicPlace)
 }
 }
 
+

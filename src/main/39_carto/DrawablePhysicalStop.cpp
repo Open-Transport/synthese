@@ -66,3 +66,4 @@ DrawablePhysicalStop::prepare (Map& map)
 
 }
 }
+

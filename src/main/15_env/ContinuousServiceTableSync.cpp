@@ -267,3 +267,4 @@ ContinuousServiceTableSync::doRemove (const synthese::db::SQLiteResult& rows, in
 }
 
 }
+

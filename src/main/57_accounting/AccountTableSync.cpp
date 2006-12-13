@@ -22,11 +22,11 @@ namespace synthese
 
 	namespace db
 	{
-		const std::string SQLiteTableSyncTemplate<Account>::TABLE_NAME = "t028_account";
-		const int SQLiteTableSyncTemplate<Account>::TABLE_ID = 28;
-		const bool SQLiteTableSyncTemplate<Account>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<Account>::TABLE_NAME = "t028_account";
+		template<> const int SQLiteTableSyncTemplate<Account>::TABLE_ID = 28;
+		template<> const bool SQLiteTableSyncTemplate<Account>::HAS_AUTO_INCREMENT = true;
 
-		void SQLiteTableSyncTemplate<Account>::load(Account* account, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Account>::load(Account* account, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
 			try
 			{
@@ -46,7 +46,7 @@ namespace synthese
 			}
 		}
 
-		void SQLiteTableSyncTemplate<Account>::save(const db::SQLiteThreadExec* sqlite, Account* account)
+		template<> void SQLiteTableSyncTemplate<Account>::save(const db::SQLiteThreadExec* sqlite, Account* account)
 		{
 			stringstream query;
 			if (account->getKey() == 0)

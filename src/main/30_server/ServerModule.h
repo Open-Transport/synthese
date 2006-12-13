@@ -111,3 +111,4 @@ namespace synthese
 /** @} */
 
 #endif // SYNTHESE_ServerModule_H__
+

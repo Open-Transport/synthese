@@ -31,3 +31,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_CityListRequest_H__
+

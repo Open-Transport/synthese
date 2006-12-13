@@ -94,3 +94,4 @@ TransportNetworkTableSync::doRemove (const synthese::db::SQLiteResult& rows, int
 }
 
 }
+

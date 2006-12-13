@@ -79,3 +79,4 @@ namespace synthese
 	}
 }
 #endif // SYNTHESE_JourneyBoardServiceCellInterfacePage_H__
+

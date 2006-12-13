@@ -262,3 +262,4 @@ class cInterface_Objet_Element_Parametre_TexteConnu : public cInterface_Objet_El
 #endif
 
 #include "cElementInterfaceTestParametreDynamique.h"
+

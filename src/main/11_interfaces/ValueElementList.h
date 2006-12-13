@@ -3,6 +3,7 @@
 #define SYNTHESE_ValueElementList_H__
 
 #include <deque>
+#include <string>
 
 #include "11_interfaces/DisplayableElement.h"
 
@@ -27,7 +28,7 @@ namespace synthese
 
 			Parses the text to create the list.	
 			*/
-			ValueElementList(const std::string text = "");
+			ValueElementList(const std::string text = std::string (""));
 
 			/** Copy constructor.
 				the element list to copy will be empty after the copy
@@ -94,3 +95,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_ValueElementList_H__
+

@@ -54,3 +54,4 @@ static const std::string PEDESTRIANCOMPLIANCES_TABLE_COL_CAPACITY ("capacity");
 
 }
 #endif
+

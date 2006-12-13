@@ -37,3 +37,4 @@ bool operator == ( const synthese::util::RGBColor& op1, const synthese::util::RG
 
 
 #endif
+

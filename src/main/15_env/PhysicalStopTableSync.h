@@ -60,3 +60,4 @@ static const std::string PHYSICALSTOPS_TABLE_COL_Y ("y");
 
 }
 #endif
+

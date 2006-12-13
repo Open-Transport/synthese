@@ -77,3 +77,4 @@ RegistryKeyException<K, T>::getKey () const
 }
 }
 #endif
+

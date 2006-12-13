@@ -252,3 +252,4 @@ LPTSTR toXMLString(LPTSTR dest,LPCTSTR source);
 LPTSTR stringDup(LPCTSTR source, int cbData=0);
 
 #endif
+

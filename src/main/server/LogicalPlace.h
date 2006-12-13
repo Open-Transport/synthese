@@ -226,3 +226,4 @@ class LogicalPlace : public cPoint
 };
 
 #endif
+

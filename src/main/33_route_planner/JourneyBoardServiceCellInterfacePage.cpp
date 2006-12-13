@@ -14,7 +14,7 @@ namespace synthese
 			, bool isReservationCompulsory, bool isReservationOptional, const synthese::time::DateTime maxBookingDate
 			, const synthese::env::ReservationRule* reservationRule, const std::string& syntheseOnlineBookingURL
 			, const synthese::env::Alarm* alarm , bool color, const synthese::env::Path* line
-			, const Site* site /*= NULL */ ) const
+			, const server::Request* request /*= NULL */ ) const
 		{
 			ParametersVector pv;
 			pv.push_back( firstDepartureTime.toInternalString() );
@@ -37,7 +37,7 @@ namespace synthese
 			pv.push_back( alarm != NULL ? synthese::util::Conversion::ToString( alarm->getLevel() ) : "" );
 			pv.push_back( synthese::util::Conversion::ToString( color ) );
 
-			InterfacePage::display( stream, pv, (const void*) line, site );
+			InterfacePage::display( stream, pv, (const void*) line, request );
 		}
 	}
 }

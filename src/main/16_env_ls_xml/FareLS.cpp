@@ -78,3 +78,4 @@ FareLS::Save (const synthese::env::Fare* fare)
 }
 }
 
+

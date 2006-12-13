@@ -39,3 +39,4 @@ class Exception : public synthese::util::Exception
 
 }
 #endif
+

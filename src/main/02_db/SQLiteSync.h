@@ -67,3 +67,4 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
 
 }
 #endif
+

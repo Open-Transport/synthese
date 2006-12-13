@@ -77,3 +77,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_AccountTableSync_H__
+

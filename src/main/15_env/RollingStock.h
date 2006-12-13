@@ -49,3 +49,4 @@ class RollingStock : public synthese::util::Registrable<uid,RollingStock>
 
 
 #endif
+

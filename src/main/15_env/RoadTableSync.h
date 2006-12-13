@@ -69,3 +69,4 @@ static const std::string ROADS_TABLE_COL_RESERVATIONRULEID ("reservation_rule_id
 
 }
 #endif
+

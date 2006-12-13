@@ -60,3 +60,4 @@ class NetworkAccessPoint : public cPoint
 };
 
 #endif
+

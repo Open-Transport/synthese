@@ -75,3 +75,4 @@ static const std::string ENVIRONMENT_LINKS_TABLE_COL_LINKTARGETID ("link_target_
 
 }
 #endif
+

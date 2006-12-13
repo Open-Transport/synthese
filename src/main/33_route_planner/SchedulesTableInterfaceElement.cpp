@@ -1,6 +1,5 @@
 
 #include "SchedulesTableInterfaceElement.h"
-#include "11_interfaces/Site.h"
 #include "11_interfaces/Interface.h"
 #include "RoutePlannerNoSolutionInterfacePage.h"
 #include "RoutePlannerSheetColumnInterfacePage.h"
@@ -11,6 +10,11 @@
 #include "15_env/Road.h"
 #include "15_env/Edge.h"
 #include "15_env/Vertex.h"
+
+#include "30_server/Site.h"
+#include "30_server/Request.h"
+
+
 #include <vector>
 #include <sstream>
 
@@ -24,17 +28,19 @@ namespace synthese
 	
 	namespace interfaces
 	{
-		const bool SchedulesTableInterfaceElement::_registered = Factory<LibraryInterfaceElement>::integrate<SchedulesTableInterfaceElement>("schedules_table");
+//		const bool SchedulesTableInterfaceElement::_registered = Factory<LibraryInterfaceElement>::integrate<SchedulesTableInterfaceElement>("schedules_table");
 
 
-		void SchedulesTableInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const Site* site /*= NULL*/ ) const
+		void SchedulesTableInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
+		    const server::Site* site = request->getSite ();
+
 			const JourneyVector* jv = (const JourneyVector*) object;
 
 			if ( jv == NULL )  // No solution or type error
 			{
 				const RoutePlannerNoSolutionInterfacePage* noSolutionPage = site->getInterface()->getPage<RoutePlannerNoSolutionInterfacePage>();
-				noSolutionPage->display(stream, site);
+				noSolutionPage->display(stream, request);
 			}
 			else
 			{
@@ -66,17 +72,17 @@ namespace synthese
 						columnInterfacePage->display( *__Tampons[__Ligne]
 							, __Ligne == 0, true, i, dynamic_cast<const Road*> (curET->getService ()->getPath ()) != NULL
 							, curET->getDepartureTime().getHour(), lastDepartureDateTime.getHour(), it->getContinuousServiceRange() > 0
-							, site );
+							, request );
 						
 						for ( __Ligne++; placesList[ __Ligne ] != curET->getDestination()->getFromVertex ()->getConnectionPlace(); __Ligne++ )
 							columnInterfacePage->display( *__Tampons[ __Ligne ]
 								, true, true, i, false, unknownTime, unknownTime, false
-								, site );
+								, request );
 						
 						columnInterfacePage->display( *__Tampons[ __Ligne ] 
 							, true, l == it->getJourneyLegCount ()-1, i, dynamic_cast<const Road*> (curET->getService ()->getPath ()) != NULL
 							, curET->getArrivalTime ().getHour (), lastArrivalDateTime.getHour(), it->getContinuousServiceRange() > 0
-							, site );
+							, request );
 					}
 				}
 
@@ -84,7 +90,7 @@ namespace synthese
 				bool __Couleur = false;
 				for ( __Ligne = 0; __Ligne < placesList.size(); __Ligne++ )
 				{
-					lineInterfacePage->display( stream, __Tampons[ __Ligne ]->str(), __Couleur, placesList[ __Ligne ], site );
+					lineInterfacePage->display( stream, __Tampons[ __Ligne ]->str(), __Couleur, placesList[ __Ligne ], request );
 				}
 
 				// Cleaning the string vector

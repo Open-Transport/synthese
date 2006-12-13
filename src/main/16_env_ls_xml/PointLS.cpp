@@ -51,3 +51,4 @@ PointLS::Save (const synthese::env::Point* point)
 }
 }
 
+

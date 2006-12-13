@@ -143,3 +143,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_VinciBikeRentalModule_H__
+

@@ -13,3 +13,4 @@ cSitPert::cSitPert( const std::string& newMotif )
     : _Motif (newMotif)
 {
 }
+

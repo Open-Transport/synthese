@@ -45,3 +45,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_RedirectInterfacePage_H__
+

@@ -97,3 +97,4 @@ Alarm::isApplicable ( const synthese::time::DateTime& start,
 
 }
 }
+

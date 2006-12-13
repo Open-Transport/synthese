@@ -258,3 +258,4 @@ cCalculVmax::cCalculVmax( cEnvironnement* newEnv )
 }
 
 #endif
+

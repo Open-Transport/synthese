@@ -66,3 +66,4 @@ class cProfil : public cPersonne
 };
 
 #endif
+

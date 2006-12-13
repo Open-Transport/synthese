@@ -26,3 +26,4 @@ namespace synthese
 	}
 }
 #endif // SYNTHESE_StaticValueInterfaceElement_H__
+

@@ -348,3 +348,4 @@ const NetworkAccessPoint* cTrajet::getDestination() const
 {
     return _DernierET->getDestination();
 }
+

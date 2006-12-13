@@ -584,3 +584,4 @@ Environment::updateMinMaxDatesInUse (synthese::time::Date newDate, bool marked)
 }
 }
 
+

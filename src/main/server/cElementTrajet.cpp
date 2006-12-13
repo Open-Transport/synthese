@@ -217,3 +217,4 @@ const cElementTrajet* cElementTrajet::Precedent() const
     return _Precedent;
 }
 
+

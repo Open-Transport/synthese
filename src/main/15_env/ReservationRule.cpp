@@ -279,3 +279,4 @@ ReservationRule::setOriginIsReference (bool originIsReference)
 
 }
 }
+

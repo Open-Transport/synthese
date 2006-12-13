@@ -29,3 +29,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_VinciSite_H__
+

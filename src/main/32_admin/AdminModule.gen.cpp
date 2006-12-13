@@ -9,3 +9,4 @@ synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::admin::AdminPagePositionInterfaceElement>("adminpos");
 
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::admin::AdminContentInterfaceElement>("admincontent");
+

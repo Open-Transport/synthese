@@ -134,3 +134,4 @@ namespace synthese
 #define INTERFACESFORMATCOLONNESNombreFormats		11
 //@}
 #endif // SYNTHESE_InterfaceTableSync_H__
+

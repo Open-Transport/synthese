@@ -20,3 +20,4 @@ cAlternance::cAlternance( const std::string& __Message, char __Modulo )
     _Valeur = 1;
 }
 
+

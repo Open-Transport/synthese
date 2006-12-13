@@ -32,3 +32,4 @@ class cInterface_Objet_Element_Ligne : public cInterface_Objet_Element
 };
 
 #endif
+

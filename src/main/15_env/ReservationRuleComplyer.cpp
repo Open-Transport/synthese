@@ -45,3 +45,4 @@ ReservationRuleComplyer::setReservationRule (ReservationRule* reservationRule)
 
 }
 }
+
