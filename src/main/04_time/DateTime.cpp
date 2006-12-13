@@ -399,14 +399,14 @@ operator - ( const DateTime& op, const int& minutesDuration )
 
 
 
-DateTime
+DateTime // AAAA/MM/JJ hh:mm
 DateTime::FromSQLTimestamp (const std::string& sqlTimestamp)
 {
-    return DateTime (Conversion::ToInt (sqlTimestamp.substr (6, 2)),
-		     Conversion::ToInt (sqlTimestamp.substr (4, 2)),
+    return DateTime (Conversion::ToInt (sqlTimestamp.substr (8, 2)),
+		     Conversion::ToInt (sqlTimestamp.substr (5, 2)),
 		     Conversion::ToInt (sqlTimestamp.substr (0, 4)),
-		     Conversion::ToInt (sqlTimestamp.substr (8, 2)),
-		     Conversion::ToInt (sqlTimestamp.substr (10, 2)));
+		     Conversion::ToInt (sqlTimestamp.substr (11, 2)),
+		     Conversion::ToInt (sqlTimestamp.substr (14, 2)));
 }
 
 

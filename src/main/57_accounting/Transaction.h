@@ -32,7 +32,8 @@ namespace synthese
 		private:
 			std::string			_name;
 			uid					_documentId;
-			time::DateTime		_dateTime;
+			time::DateTime		_startDateTime;
+			time::DateTime		_endDateTime;
 			uid					_leftUserId;	// Applicable if the used accounts are template
 			uid					_placeId;
 			std::string			_comment;
@@ -41,17 +42,19 @@ namespace synthese
 		public:
 			Transaction(uid id = 0);
 
-			const std::string&			getName()		const;
-			uid							getDocumentId()	const;
-			const time::DateTime&		getDateTime()	const;
-			uid							getLeftUserId()	const;
-			uid							getPlaceId()	const;
-			const std::string&			getComment()	const;
-			const PartsVector&			getParts()		const;
+			const std::string&			getName()			const;
+			uid							getDocumentId()		const;
+			const time::DateTime&		getStartDateTime()	const;
+			const time::DateTime&		getEndDateTime()	const;
+			uid							getLeftUserId()		const;
+			uid							getPlaceId()		const;
+			const std::string&			getComment()		const;
+			const PartsVector&			getParts()			const;
 
 			void setName(const std::string& name);
 			void setDocumentId(uid id);
-			void setDateTime(const time::DateTime& dateTime);
+			void setStartDateTime(const time::DateTime& dateTime);
+			void setEndDateTime(const time::DateTime& dateTime);
 			void setLeftUserId(uid id);
 			void setPlaceid(uid id);
 			void setComment(const std::string& comment);

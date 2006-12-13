@@ -66,10 +66,10 @@ namespace synthese
 			query
 				<< "SELECT * "
 				<< "FROM " << TABLE_NAME
-				<< "WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key);
+				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key);
 			db::SQLiteResult rows = sqlite->execQuery(query.str());
 			if (rows.getNbRows() <= 0)
-				throw SQLiteException("Object "+ TABLE_NAME + " " + Conversion::ToString(id) + " not found in database.");
+				throw SQLiteException("Object "+ TABLE_NAME + " " + Conversion::ToString(key) + " not found in database.");
 			T* object = new T;
 			load(object, rows);
 			return object;

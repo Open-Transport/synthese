@@ -5,6 +5,7 @@
 
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
+#include "12_security/UserTableSyncException.h"
 
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
@@ -40,7 +41,7 @@ namespace synthese
 			}
 			else
 			{	// INSERT
-				vc->setKey(getId(0,0)); /// @todo Handle grid ID
+				vc->setKey(getId(1,1)); /// @todo Handle grid ID
 				query << "INSERT INTO " << TABLE_NAME << " VALUES("
 					<< vc->getKey()
 					<< "," << Conversion::ToString(vc->_userId)
@@ -84,21 +85,28 @@ namespace synthese
 				<< "SELECT *"
 				<< " FROM "
 					<< TABLE_NAME << " AS c "
-					<< " INNER JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << TABLE_COL_ID << "=u." << UserTableSync::TABLE_COL_ID
+					<< " INNER JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << TABLE_COL_USER_ID << "=u." << UserTableSync::TABLE_COL_ID
 				<< " WHERE "
 					<< "u." << UserTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
 					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '%" << Conversion::ToSQLiteString(surname, false) << "%'"
-				<< " LIMIT " << number << "," << first;
+				<< " LIMIT " << number << " OFFSET " << first;
 			SQLiteResult result = sqlite->execQuery(query.str());
 			vector<VinciContract*> contracts;
 			for (int i=0; i<result.getNbRows(); ++i)
 			{
 				User* user = new User;
-				SQLiteTableSyncTemplate<User>::load(user, result, i);
-				VinciContract* contract = new VinciContract;
-				SQLiteTableSyncTemplate<VinciContract>::load(contract, result, i);
-				contract->_user = user;
-				contracts.push_back(contract);
+				try
+				{
+					SQLiteTableSyncTemplate<User>::load(user, result, i);
+					VinciContract* contract = new VinciContract;
+					SQLiteTableSyncTemplate<VinciContract>::load(contract, result, i);
+					contract->_user = user;
+					contracts.push_back(contract);
+				}
+				catch (UserTableSyncException e)
+				{
+					
+				}
 			}
 			return contracts;
 		}

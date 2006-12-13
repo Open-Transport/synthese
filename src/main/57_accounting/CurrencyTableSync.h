@@ -21,20 +21,13 @@ namespace synthese
 
 		class CurrencyTableSync : public db::SQLiteTableSyncTemplate<Currency>
 		{
-		private:
+		public:
 			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_SYMBOL;
 
-			static void loadCurrency(Currency* currency, const db::SQLiteResult& rows, int rowId=0);
-
-		public:
-
 			CurrencyTableSync();
 			~CurrencyTableSync ();
-
-			static Currency* getCurrency(const db::SQLiteThreadExec* sqlite, uid id);
-			static void saveCurrency(const db::SQLiteThreadExec* sqlite, Currency* currency);
 
 
 			/** Currency search.

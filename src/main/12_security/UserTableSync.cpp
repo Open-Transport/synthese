@@ -33,6 +33,13 @@ namespace synthese
 			user->setName(rows.getColumn(rowId, UserTableSync::TABLE_COL_NAME));
 			user->setSurname(rows.getColumn(rowId, UserTableSync::TABLE_COL_SURNAME));
 			user->setLogin(rows.getColumn(rowId, UserTableSync::TABLE_COL_LOGIN));
+			user->_address = rows.getColumn(rowId, UserTableSync::TABLE_COL_ADDRESS);
+			user->_postCode = rows.getColumn(rowId, UserTableSync::TABLE_COL_POST_CODE);
+			user->_cityText = rows.getColumn(rowId, UserTableSync::TABLE_COL_CITY_TEXT);
+			user->_cityId = Conversion::ToLongLong(rows.getColumn(rowId, UserTableSync::TABLE_COL_CITY_ID));
+			user->_country = rows.getColumn(rowId, UserTableSync::TABLE_COL_COUNTRY);
+			user->_email = rows.getColumn(rowId, UserTableSync::TABLE_COL_EMAIL);
+			user->_phone = rows.getColumn(rowId, UserTableSync::TABLE_COL_PHONE);
 			try
 			{
 				user->setProfile(SecurityModule::getProfiles().get(Conversion::ToLongLong(rows.getColumn(rowId, UserTableSync::TABLE_COL_PROFILE_ID))));
@@ -65,6 +72,13 @@ namespace synthese
 						<< "," << Conversion::ToSQLiteString(user->getLogin())
 						<< "," << Conversion::ToSQLiteString(user->getPassword())
 						<< "," << Conversion::ToString(user->getProfile()->getKey())
+						<< "," << Conversion::ToSQLiteString(user->_address)
+						<< "," << Conversion::ToSQLiteString(user->_postCode)
+						<< "," << Conversion::ToSQLiteString(user->_cityText)
+						<< "," << Conversion::ToString(user->_cityId)
+						<< "," << Conversion::ToSQLiteString(user->_country)
+						<< "," << Conversion::ToSQLiteString(user->_email)
+						<< "," << Conversion::ToSQLiteString(user->_phone)
 						<< ")";
 					sqlite->execUpdate(query.str());
 				}
@@ -87,6 +101,13 @@ namespace synthese
 		const std::string UserTableSync::TABLE_COL_LOGIN = "login";
 		const std::string UserTableSync::TABLE_COL_PASSWORD = "password";
 		const std::string UserTableSync::TABLE_COL_PROFILE_ID = "profile_id";
+		const std::string UserTableSync::TABLE_COL_ADDRESS = "address";
+		const std::string UserTableSync::TABLE_COL_POST_CODE = "post_code";
+		const std::string UserTableSync::TABLE_COL_CITY_TEXT = "city_text";
+		const std::string UserTableSync::TABLE_COL_CITY_ID = "city_id";
+		const std::string UserTableSync::TABLE_COL_COUNTRY = "country";
+		const std::string UserTableSync::TABLE_COL_EMAIL = "email";
+		const std::string UserTableSync::TABLE_COL_PHONE = "phone";
 
 		UserTableSync::UserTableSync()
 			: db::SQLiteTableSyncTemplate<User> ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
@@ -97,6 +118,13 @@ namespace synthese
 			addTableColumn(TABLE_COL_LOGIN, "TEXT", true);
 			addTableColumn(TABLE_COL_PASSWORD, "TEXT", true);
 			addTableColumn(TABLE_COL_PROFILE_ID, "INTEGER", true);
+			addTableColumn(TABLE_COL_ADDRESS, "TEXT", true);
+			addTableColumn(TABLE_COL_POST_CODE, "TEXT", true);
+			addTableColumn(TABLE_COL_CITY_TEXT, "TEXT", true);
+			addTableColumn(TABLE_COL_CITY_ID, "INTEGER", true);
+			addTableColumn(TABLE_COL_COUNTRY, "TEXT", true);
+			addTableColumn(TABLE_COL_EMAIL, "TEXT", true);
+			addTableColumn(TABLE_COL_PHONE, "TEXT", true);
 		}
 
 

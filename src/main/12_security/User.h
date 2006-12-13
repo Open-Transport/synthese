@@ -7,6 +7,8 @@
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
+#include "02_db/SQLiteTableSyncTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -38,30 +40,52 @@ namespace synthese
 			std::string		_cityText;
 			uid				_cityId;
 			std::string		_country;
+			std::string		_email;
+			std::string		_phone;
 			bool			_isConnectionAllowed;
 
+			friend class db::SQLiteTableSyncTemplate<User>;
 			
 		public:
 			User(uid id=0);
-			void setProfile(const Profile* profile);
-			void setLogin(const std::string& login);
-			
-			/** Password setter.
-				@todo handle encryption
-			*/
-			void setPassword(const std::string& password);
-			void setName(const std::string& name);
-			void setSurname(const std::string& surname);
 
-			const Profile* getProfile() const;
-			const std::string& getLogin() const;
+			//! \name Setters
+			//@{
+				void setProfile(const Profile* profile);
+				void setLogin(const std::string& login);
+				
+				/** Password setter.
+					@todo handle encryption
+				*/
+				void setPassword(const std::string& password);
+				void setName(const std::string& name);
+				void setSurname(const std::string& surname);
+				void setAddress(const std::string& address);
+				void setPostCode(const std::string& code);
+				void setCityText(const std::string& city);
+				void setCountry(const std::string& country);
+				void setEMail(const std::string& email);
+				void setPhone(const std::string& phone);
+			//@}
 
-			/** Password getter.
-				@todo handle encryption (create a getEncryptedPassword instead)
-			*/
-			const std::string& getPassword() const;
-			const std::string& getName() const;
-			const std::string& getSurname() const;
+			//! \name Getters
+			//@{
+				const Profile* getProfile() const;
+				const std::string& getLogin() const;
+
+				/** Password getter.
+					@todo handle encryption (create a getEncryptedPassword instead)
+				*/
+				const std::string& getPassword() const;
+				const std::string& getName() const;
+				const std::string& getSurname() const;
+				const std::string& getAddress() const;
+				const std::string& getPostCode() const;
+				const std::string& getCityText() const;
+				const std::string& getCountry() const;
+				const std::string& getEMail() const;
+				const std::string& getPhone() const;
+			//@}
 
 			//! \name Services
 			//@{
@@ -72,3 +96,4 @@ namespace synthese
 }
 
 #endif
+

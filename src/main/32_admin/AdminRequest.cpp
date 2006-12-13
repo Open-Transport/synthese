@@ -119,5 +119,14 @@ namespace synthese
 		{
 			return _page;
 		}
+
+		void AdminRequest::setParameter( const std::string& name, const std::string value )
+		{
+			ParametersMap::iterator it = _parameters.find(name);
+			if (it == _parameters.end())
+				_parameters.insert(make_pair(name, value));
+			else
+				it->second = value;
+		}
 	}
 }

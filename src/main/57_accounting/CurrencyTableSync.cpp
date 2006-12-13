@@ -23,6 +23,34 @@ namespace synthese
 		const std::string SQLiteTableSyncTemplate<Currency>::TABLE_NAME = "t029_currencies";
 		const int SQLiteTableSyncTemplate<Currency>::TABLE_ID = 29;
 		const bool SQLiteTableSyncTemplate<Currency>::HAS_AUTO_INCREMENT = true;
+
+		void SQLiteTableSyncTemplate<Currency>::load(Currency* currency, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		{
+			currency->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			currency->setName(rows.getColumn(rowId, CurrencyTableSync::TABLE_COL_NAME));
+			currency->setSymbol(rows.getColumn(rowId, CurrencyTableSync::TABLE_COL_SYMBOL));
+		}
+
+		void SQLiteTableSyncTemplate<Currency>::save(const db::SQLiteThreadExec* sqlite, Currency* currency)
+		{
+			stringstream query;
+			if (currency->getKey() > 0)
+			{
+				// UPDATE
+			}
+			else
+			{
+				currency->setKey(getId(1,1));
+                query
+					<< " INSERT INTO " << TABLE_NAME << " VALUES("
+					<< Conversion::ToString(currency->getKey())
+					<< "," << Conversion::ToSQLiteString(currency->getName())
+					<< "," << Conversion::ToSQLiteString(currency->getSymbol())
+					<< ")";
+			}
+			sqlite->execUpdate(query.str());
+		}
+
 	}
 
 	namespace accounts
@@ -45,7 +73,7 @@ namespace synthese
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
 				Currency* currency = new Currency;
-				loadCurrency(currency, rows, i);
+				load(currency, rows, i);
 				AccountingModule::getCurrencies().add(currency);
 			}
 		}
@@ -80,7 +108,7 @@ namespace synthese
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
 					Currency* currency = new Currency;
-					loadCurrency(currency, result, i);
+					load(currency, result, i);
 					currencies.push_back(currency);
 				}
 				return currencies;
@@ -90,13 +118,6 @@ namespace synthese
 				throw Exception(e.getMessage());
 			}
 
-		}
-
-		void CurrencyTableSync::loadCurrency( Currency* currency, const db::SQLiteResult& rows, int rowId/*=0*/ )
-		{
-			currency->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			currency->setName(rows.getColumn(rowId, TABLE_COL_NAME));
-			currency->setSymbol(rows.getColumn(rowId, TABLE_COL_SYMBOL));
 		}
 	}
 }

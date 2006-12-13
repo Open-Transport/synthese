@@ -38,8 +38,8 @@ namespace synthese
 			@date 2006				
 			*/
 			static std::vector<VinciBike*> searchVinciBikes(const db::SQLiteThreadExec* sqlite
-
-				, int first = 0, int number = 0);
+				, const std::string& id, const std::string& cadre
+				, int first = 0, int number = -1);
 
 
 		protected:

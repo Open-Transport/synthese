@@ -1,6 +1,6 @@
 
-#ifndef SYNTHESE_AddCustomerAction_H__
-#define SYNTHESE_AddCustomerAction_H__
+#ifndef SYNTHESE_AddGuaranteeAction_H__
+#define SYNTHESE_AddGuaranteeAction_H__
 
 
 #include "30_server/Action.h"
@@ -9,15 +9,17 @@ namespace synthese
 {
 	namespace vinci
 	{
-		class AddCustomerAction : public server::Action
+		class VinciContract;
+
+		class VinciAddGuaranteeAction : public server::Action
 		{
 		public:
-			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_SURNAME;
+			static const std::string PARAMETER_AMOUNT;
+			static const std::string PARAMETER_CONTRACT_ID;
 
 		private:
-			std::string _name;
-			std::string _surname;
+			double	_amount;
+			VinciContract* _contract;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -34,8 +36,11 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			VinciAddGuaranteeAction();
+			~VinciAddGuaranteeAction();
 		};
 	}
 }
 
-#endif // SYNTHESE_AddCustomerAction_H__
+#endif // SYNTHESE_AddGuaranteeAction_H__

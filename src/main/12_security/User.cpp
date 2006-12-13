@@ -71,5 +71,66 @@ namespace synthese
 			if (_password != password)
 				throw UserException("Bad password");
 		}
+
+		void User::setAddress( const std::string& address )
+		{
+			_address = address;
+		}
+
+		
+		void User::setPostCode( const std::string& code )
+		{
+			_postCode = code;
+		}
+
+		void User::setCityText( const std::string& city )
+		{
+			_cityText = city;
+		}
+
+		void User::setCountry( const std::string& country )
+		{
+			_country = country;
+		}
+
+		void User::setEMail( const std::string& email )
+		{
+			_email = email;
+		}
+
+		void User::setPhone( const std::string& phone )
+		{
+			_phone = phone;
+		}
+
+		const std::string& User::getAddress() const
+		{
+			return _address;
+		}
+
+		const std::string& User::getPostCode() const
+		{
+			return _postCode;
+		}
+
+		const std::string& User::getCityText() const
+		{
+			return _cityText;
+		}
+
+		const std::string& User::getCountry() const
+		{
+			return _country;
+		}
+
+		const std::string& User::getEMail() const
+		{
+			return _email;
+		}
+
+		const std::string& User::getPhone() const
+		{
+			return _phone;
+		}
 	}
 }

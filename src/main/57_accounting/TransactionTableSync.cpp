@@ -19,12 +19,57 @@ namespace synthese
 	using namespace db;
 	using namespace accounts;
 	using namespace time;
+	using namespace accounts;
 
 	namespace db
 	{
 		const std::string SQLiteTableSyncTemplate<Transaction>::TABLE_NAME = "t031_transactions";
 		const int SQLiteTableSyncTemplate<Transaction>::TABLE_ID = 31;
 		const bool SQLiteTableSyncTemplate<Transaction>::HAS_AUTO_INCREMENT = true;
+
+		void SQLiteTableSyncTemplate<Transaction>::load(Transaction* t, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		{
+			t->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			t->setComment(rows.getColumn(rowId, TransactionTableSync::TABLE_COL_COMMENT));
+			t->setStartDateTime(DateTime::FromSQLTimestamp(rows.getColumn(rowId, TransactionTableSync::TABLE_COL_START_DATE_TIME)));
+			t->setEndDateTime(DateTime::FromSQLTimestamp(rows.getColumn(rowId, TransactionTableSync::TABLE_COL_END_DATE_TIME)));
+			t->setDocumentId(Conversion::ToLongLong(rows.getColumn(rowId, TransactionTableSync::TABLE_COL_DOCUMENT_ID)));
+			t->setLeftUserId(Conversion::ToLongLong(rows.getColumn(rowId, TransactionTableSync::TABLE_COL_LEFT_USER_ID)));
+			t->setName(rows.getColumn(rowId, TransactionTableSync::TABLE_COL_NAME));
+			t->setPlaceid(Conversion::ToLongLong(rows.getColumn(rowId, TransactionTableSync::TABLE_COL_PLACE_ID)));
+		}
+
+		void SQLiteTableSyncTemplate<Transaction>::save(const db::SQLiteThreadExec* sqlite, Transaction* t)
+		{
+			try
+			{
+				if (t->getKey() > 0)
+				{
+					/// @todo UPDATE implementation
+				}
+				else
+				{
+					t->setKey(getId(1,1));	/// @todo Handle grid
+					stringstream query;
+					query << "INSERT INTO " << TABLE_NAME << " VALUES("
+						<< Conversion::ToString(t->getKey())
+						<< "," << Conversion::ToSQLiteString(t->getName())
+						<< "," << Conversion::ToString(t->getDocumentId())
+						<< "," << t->getStartDateTime().toSQLiteString()
+						<< "," << t->getEndDateTime().toSQLiteString()
+						<< "," << Conversion::ToString(t->getLeftUserId())
+						<< "," << Conversion::ToString(t->getPlaceId())
+						<< "," << Conversion::ToSQLiteString(t->getComment())
+						<< ")";
+					sqlite->execUpdate(query.str());
+				}
+			}
+			catch (SQLiteException& e)
+			{
+
+			}
+		}
+
 	}
 
 	namespace accounts
@@ -32,7 +77,8 @@ namespace synthese
 		const std::string TransactionTableSync::TABLE_COL_ID = "id";
 		const std::string TransactionTableSync::TABLE_COL_NAME = "name";
 		const std::string TransactionTableSync::TABLE_COL_DOCUMENT_ID = "document_id";
-		const std::string TransactionTableSync::TABLE_COL_DATE_TIME = "date_time";
+		const std::string TransactionTableSync::TABLE_COL_START_DATE_TIME = "start_date_time";
+		const std::string TransactionTableSync::TABLE_COL_END_DATE_TIME = "end_date_time";
 		const std::string TransactionTableSync::TABLE_COL_LEFT_USER_ID = "left_user_id";
 		const std::string TransactionTableSync::TABLE_COL_PLACE_ID = "place_id";
 		const std::string TransactionTableSync::TABLE_COL_COMMENT = "comment";
@@ -43,7 +89,8 @@ namespace synthese
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
 			addTableColumn(TABLE_COL_DOCUMENT_ID, "INTEGER", true);
-			addTableColumn(TABLE_COL_DATE_TIME, "TIMESTAMP", true);
+			addTableColumn(TABLE_COL_START_DATE_TIME, "TIMESTAMP", true);
+			addTableColumn(TABLE_COL_END_DATE_TIME, "TIMESTAMP", true);
 			addTableColumn(TABLE_COL_LEFT_USER_ID, "INTEGER", true);
 			addTableColumn(TABLE_COL_PLACE_ID, "INTEGER", true);
 			addTableColumn(TABLE_COL_COMMENT, "TEXT", true);
@@ -62,47 +109,6 @@ namespace synthese
 		void TransactionTableSync::rowsRemoved( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
-		}
-
-		void TransactionTableSync::loadTransaction( Transaction* t, const db::SQLiteResult& rows, int rowId/*=0*/ )
-		{
-			t->setComment(rows.getColumn(rowId, TABLE_COL_COMMENT));
-			t->setDateTime(DateTime::FromSQLTimestamp(rows.getColumn(rowId, TABLE_COL_DATE_TIME)));
-			t->setDocumentId(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_DOCUMENT_ID)));
-			t->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			t->setLeftUserId(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_LEFT_USER_ID)));
-			t->setName(rows.getColumn(rowId, TABLE_NAME));
-			t->setPlaceid(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_PLACE_ID)));
-		}
-
-		void TransactionTableSync::saveTransaction( const db::SQLiteThreadExec* sqlite, Transaction* t)
-		{
-			try
-			{
-				if (t->getKey() > 0)
-				{
-					/// @todo UPDATE implementation
-				}
-				else
-				{
-					t->setKey(getId(1,1));	/// @todo Handle grid
-					stringstream query;
-					query << "INSERT INTO " << TABLE_NAME << " VALUES("
-						<< Conversion::ToString(t->getKey())
-						<< "," << Conversion::ToSQLiteString(t->getName())
-						<< "," << Conversion::ToString(t->getDocumentId())
-						<< "," << t->getDateTime().toSQLiteString()
-						<< "," << Conversion::ToString(t->getLeftUserId())
-						<< "," << Conversion::ToString(t->getPlaceId())
-						<< "," << Conversion::ToSQLiteString(t->getComment())
-						<< ")";
-					sqlite->execUpdate(query.str());
-				}
-			}
-			catch (SQLiteException& e)
-			{
-
-			}
 		}
 	}
 }

@@ -18,17 +18,64 @@ namespace synthese
 {
 	using namespace db;
 	using namespace accounts;
+	using namespace util;
 
 	namespace db
 	{
 		const std::string SQLiteTableSyncTemplate<Account>::TABLE_NAME = "t028_account";
 		const int SQLiteTableSyncTemplate<Account>::TABLE_ID = 28;
 		const bool SQLiteTableSyncTemplate<Account>::HAS_AUTO_INCREMENT = true;
+
+		void SQLiteTableSyncTemplate<Account>::load(Account* account, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		{
+			try
+			{
+				account->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+				account->setLeftClassNumber(rows.getColumn(rowId, AccountTableSync::TABLE_COL_LEFT_CLASS_NUMBER));
+				account->setLeftCurrency(AccountingModule::getCurrencies().get(Conversion::ToLongLong(rows.getColumn(rowId, AccountTableSync::TABLE_COL_LEFT_CURRENCY_ID))));
+				account->setLeftNumber(rows.getColumn(rowId, AccountTableSync::TABLE_COL_LEFT_NUMBER));
+				account->setLeftUserId(Conversion::ToLongLong(rows.getColumn(rowId, AccountTableSync::TABLE_COL_LEFT_USER_ID)));
+				account->setRightClassNumber(rows.getColumn(rowId, AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER));
+				account->setRightCurrency(AccountingModule::getCurrencies().get(Conversion::ToLongLong(rows.getColumn(rowId, AccountTableSync::TABLE_COL_RIGHT_CURRENCY_ID))));
+				account->setRightNumber(rows.getColumn(rowId, AccountTableSync::TABLE_COL_RIGHT_NUMBER));
+				account->setRightUserId(Conversion::ToLongLong(rows.getColumn(rowId, AccountTableSync::TABLE_COL_RIGHT_USER_ID)));
+				account->setName(rows.getColumn(rowId, AccountTableSync::TABLE_COL_NAME));
+			}
+			catch (Currency::RegistryKeyException& e)
+			{
+			}
+		}
+
+		void SQLiteTableSyncTemplate<Account>::save(const db::SQLiteThreadExec* sqlite, Account* account)
+		{
+			stringstream query;
+			if (account->getKey() == 0)
+			{
+				account->setKey(getId(1,1));
+				query
+					<< " INSERT INTO " << TABLE_NAME << " VALUES("
+					<< Conversion::ToString(account->getKey())
+					<< "," << Conversion::ToString(account->getLeftUserId())
+					<< "," << Conversion::ToSQLiteString(account->getName())
+					<< "," << Conversion::ToSQLiteString(account->getLeftNumber())
+					<< "," << Conversion::ToSQLiteString(account->getLeftClassNumber())
+					<< "," << Conversion::ToString(account->getLeftCurrency()->getKey())
+					<< "," << Conversion::ToString(account->getRightUserId())
+					<< "," << Conversion::ToSQLiteString(account->getRightNumber())
+					<< "," << Conversion::ToSQLiteString(account->getRightClassNumber())
+					<< "," << Conversion::ToString(account->getRightCurrency()->getKey())
+					<< ")";
+			}
+			else
+			{
+				// UPDATE
+			}
+			sqlite->execUpdate(query.str());
+		}
 	}
 
 	namespace accounts
 	{
-		const std::string AccountTableSync::TABLE_COL_ID = "id";
 		const std::string AccountTableSync::TABLE_COL_NAME = "name";
 		const std::string AccountTableSync::TABLE_COL_LEFT_USER_ID = "left_user_id";
 		const std::string AccountTableSync::TABLE_COL_LEFT_NUMBER = "left_number";
@@ -61,6 +108,7 @@ namespace synthese
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
+			addTableColumn(TABLE_COL_LEFT_USER_ID, "INTEGER", true);
 			addTableColumn(TABLE_COL_LEFT_NUMBER, "TEXT", true);
 			addTableColumn(TABLE_COL_LEFT_CLASS_NUMBER, "TEXT", true);
 			addTableColumn(TABLE_COL_LEFT_CURRENCY_ID, "INTEGER", true);
@@ -80,7 +128,7 @@ namespace synthese
 				<< " FROM " << TABLE_NAME
 				<< " WHERE " << TABLE_COL_RIGHT_USER_ID << "=" << Conversion::ToString(rightUserId)
 				<< " AND " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				<< " AND (" << TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(leftUserId) << " OR " << TABLE_COL_LEFT_USER_ID << "=0)"
+				<< " AND (" << TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(leftUserId) << " OR " << TABLE_COL_LEFT_USER_ID << "=0 OR " << TABLE_COL_LEFT_USER_ID << "=\"\")"
 				<< " AND " << TABLE_COL_LEFT_CLASS_NUMBER << " LIKE '%" << Conversion::ToSQLiteString(leftClassNumber, false) << "%'"
 				<< " AND " << TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE '%" << Conversion::ToSQLiteString(rightClassNumber, false) << "%'"
 			;
@@ -96,7 +144,7 @@ namespace synthese
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
 					Account* account = new Account;
-					loadAccount(account, result, i);
+					load(account, result, i);
 					accounts.push_back(account);
 				}
 				return accounts;
@@ -104,25 +152,6 @@ namespace synthese
 			catch(SQLiteException& e)
 			{
 				throw Exception(e.getMessage());
-			}
-		}
-
-		void AccountTableSync::loadAccount( Account* account, const db::SQLiteResult& rows, int rowId/*=0*/ )
-		{
-			try
-			{
-				account->setLeftClassNumber(rows.getColumn(rowId, TABLE_COL_LEFT_CLASS_NUMBER));
-				account->setLeftCurrency(AccountingModule::getCurrencies().get(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_LEFT_CURRENCY_ID))));
-				account->setLeftNumber(rows.getColumn(rowId, TABLE_COL_LEFT_NUMBER));
-				account->setLeftUserId(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_LEFT_USER_ID)));
-				account->setRightClassNumber(rows.getColumn(rowId, TABLE_COL_RIGHT_CLASS_NUMBER));
-				account->setRightCurrency(AccountingModule::getCurrencies().get(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_RIGHT_CURRENCY_ID))));
-				account->setRightNumber(rows.getColumn(rowId, TABLE_COL_RIGHT_NUMBER));
-				account->setRightUserId(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_RIGHT_USER_ID)));
-				account->setName(rows.getColumn(rowId, TABLE_COL_NAME));
-			}
-			catch (Currency::RegistryKeyException& e)
-			{
 			}
 		}
 	}

@@ -343,5 +343,17 @@ namespace synthese
 		{
 			return _action;
 		}
+
+
+		void Request::setObjectId( uid id )
+		{
+			_object_id = id;
+		}
+
+		uid Request::getObjectId() const
+		{
+			return _object_id;
+		}
+
 	}
 }

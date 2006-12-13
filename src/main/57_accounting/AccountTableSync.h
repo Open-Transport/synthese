@@ -20,8 +20,7 @@ namespace synthese
 
 		class AccountTableSync : public db::SQLiteTableSyncTemplate<Account>
 		{
-		private:
-			static const std::string TABLE_COL_ID;
+		public:
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_LEFT_USER_ID;
 			static const std::string TABLE_COL_LEFT_NUMBER;
@@ -31,16 +30,9 @@ namespace synthese
 			static const std::string TABLE_COL_RIGHT_NUMBER;
 			static const std::string TABLE_COL_RIGHT_CLASS_NUMBER;
 			static const std::string TABLE_COL_RIGHT_CURRENCY_ID;
-			
-			static void loadAccount(Account* account, const db::SQLiteResult& rows, int rowId=0);
-
-		public:
 
 			AccountTableSync();
 			~AccountTableSync ();
-
-			static Account* getAccount(const db::SQLiteThreadExec* sqlite, uid id);
-			static void saveAccount(const db::SQLiteThreadExec* sqlite, Account* account);
 
 			/** Account search.
 				@param sqlite SQLite thread

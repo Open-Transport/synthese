@@ -122,6 +122,12 @@
 			<File
 				RelativePath=".\VinciCustomerSearchAdminInterfaceElement.h">
 			</File>
+			<File
+				RelativePath=".\VinciReportsAdminInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\VinciReportsAdminInterfaceElement.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Interface elements library"
@@ -135,16 +141,58 @@
 			Name="Actions"
 			Filter="">
 			<File
+				RelativePath=".\AddCustomerAction.cpp">
+			</File>
+			<File
 				RelativePath=".\AddCustomerAction.h">
 			</File>
 			<File
-				RelativePath=".\AddGuaranteeAction.h">
+				RelativePath=".\RentABikeAction.cpp">
 			</File>
 			<File
 				RelativePath=".\RentABikeAction.h">
 			</File>
 			<File
+				RelativePath=".\ReturnABikeAction.cpp">
+			</File>
+			<File
 				RelativePath=".\ReturnABikeAction.h">
+			</File>
+			<File
+				RelativePath=".\VinciAddBike.cpp">
+			</File>
+			<File
+				RelativePath=".\VinciAddBike.h">
+			</File>
+			<File
+				RelativePath=".\VinciAddGuaranteeAction.cpp">
+			</File>
+			<File
+				RelativePath=".\VinciAddGuaranteeAction.h">
+			</File>
+			<File
+				RelativePath=".\VinciChangeBikeStatus.cpp">
+			</File>
+			<File
+				RelativePath=".\VinciChangeBikeStatusAction.h">
+			</File>
+			<File
+				RelativePath=".\VinciReturnGuaranteeAction.cpp">
+			</File>
+			<File
+				RelativePath=".\VinciReturnGuaranteeAction.h">
+			</File>
+			<File
+				RelativePath=".\VinciUpdateBikeAction.cpp">
+			</File>
+			<File
+				RelativePath=".\VinciUpdateBikeAction.h">
+			</File>
+			<File
+				RelativePath=".\VinciUpdateCustomerAction.cpp">
+			</File>
+			<File
+				RelativePath=".\VinciUpdateCustomerAction.h">
 			</File>
 		</Filter>
 		<File

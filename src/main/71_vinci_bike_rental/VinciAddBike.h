@@ -1,7 +1,6 @@
 
-#ifndef SYNTHESE_AddCustomerAction_H__
-#define SYNTHESE_AddCustomerAction_H__
-
+#ifndef SYNTHESE_VinciAddBike_H__
+#define SYNTHESE_VinciAddBike_H__
 
 #include "30_server/Action.h"
 
@@ -9,17 +8,16 @@ namespace synthese
 {
 	namespace vinci
 	{
-		class AddCustomerAction : public server::Action
+		class VinciAddBike : public server::Action
 		{
 		public:
-			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_SURNAME;
-
-		private:
-			std::string _name;
-			std::string _surname;
+			static const std::string PARAMETER_NUMBER;
+			static const std::string PARAMETER_MARKED_NUMBER;
 
 		protected:
+			std::string _number;
+			std::string _marked_number;
+
 			/** Conversion from attributes to generic parameter maps.
 			*/
 			server::Request::ParametersMap getParametersMap() const;
@@ -30,7 +28,6 @@ namespace synthese
 			void setFromParametersMap(server::Request::ParametersMap& map);
 
 		public:
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
@@ -38,4 +35,5 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_AddCustomerAction_H__
+#endif // SYNTHESE_VinciAddBike_H__
+ 

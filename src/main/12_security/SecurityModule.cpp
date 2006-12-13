@@ -32,7 +32,7 @@ namespace synthese
 				rootProfile = new Profile;
 				rootProfile->setName(ROOT_PROFILE);
 				rootProfile->setRights(ROOT_RIGHTS);
-				ProfileTableSync::saveProfile(ServerModule::getSQLiteThread(), rootProfile);
+				ProfileTableSync::save(ServerModule::getSQLiteThread(), rootProfile);
 			}
 			else
 				rootProfile = profiles.front();

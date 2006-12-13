@@ -19,7 +19,6 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 			const AdminInterfaceElement*	_page;
-			uid								_object_id;
 			ParametersMap					_parameters;
 			//@}
 
@@ -44,10 +43,12 @@ namespace synthese
 			void run(std::ostream& stream) const;
 
 			const std::string& getStringParameter(const std::string& name, const std::string& defaultValue);
-			long long getLongLongParameter(const std::string& name, long long defaultValue);
-			int getIntParameter(const std::string& name, int defaultValue);
+			long long getLongLongParameter(const std::string& name, long long defaultValue = 0);
+			int getIntParameter(const std::string& name, int defaultValue = 0);
 
 			std::string getHTMLFormHeader(const std::string& name) const;
+
+			void setParameter(const std::string& name, const std::string value);
 
 		};
 	}

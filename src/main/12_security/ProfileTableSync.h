@@ -24,21 +24,14 @@ namespace synthese
 		*/
 		class ProfileTableSync : public db::SQLiteTableSyncTemplate<Profile>
 		{
-		private:
+		public:
 			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_PARENT_ID;
 			static const std::string TABLE_COL_RIGHTS_STRING;
 
-			static void loadProfile(Profile* profile, const db::SQLiteResult& rows, int rowId=0);
-
-		public:
-
 			ProfileTableSync();
 			~ProfileTableSync ();
-
-			static void saveProfile(const db::SQLiteThreadExec* sqlite, Profile* profile);
-
 
 			/** Profile search.
 				@param sqlite SQLite thread

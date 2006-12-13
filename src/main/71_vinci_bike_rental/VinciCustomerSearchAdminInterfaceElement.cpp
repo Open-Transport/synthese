@@ -9,6 +9,8 @@
 
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
+#include "71_vinci_bike_rental/AddCustomerAction.h"
+#include "71_vinci_bike_rental/VinciCustomerAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciCustomerSearchAdminInterfaceElement.h"
 
 using namespace std;
@@ -35,50 +37,71 @@ namespace synthese
 
 		void VinciCustomerSearchAdminInterfaceElement::display(ostream& stream, const ParametersVector& parameters, const void* rootObject, const Request* request) const
 		{
-			AdminRequest* searchRequest = (AdminRequest*) Factory<Request>::create<AdminRequest>();
+			// Current request
+			AdminRequest* currentRequest = (AdminRequest*) request;
+
+			// Search request
+			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
 			searchRequest->copy(request);
 			searchRequest->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerSearchAdminInterfaceElement>());
 
-			AdminRequest* currentRequest = (AdminRequest*) request;
+			// Add contract request
+			AdminRequest* addContractRequest = Factory<Request>::create<AdminRequest>();
+			addContractRequest->copy(request);
+			addContractRequest->setAction(Factory<Action>::create<AddCustomerAction>());
+			addContractRequest->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
+
+			// View contract request
+			AdminRequest* contractRequest = Factory<Request>::create<AdminRequest>();
+			contractRequest->copy(request);
+			contractRequest->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
 
 			stream
 				<< searchRequest->getHTMLFormHeader("search")
 				<< "<h1>Recherche de client</h1>"
-				<< "Nom : <input name=\"" << PARAM_SEARCH_NAME << "\" /> Prénom : <input name=\"" << PARAM_SEARCH_SURNAME << "\" />";
+				<< "Nom : <input name=\"" << PARAM_SEARCH_NAME << "\" value=\"" << currentRequest->getStringParameter(PARAM_SEARCH_NAME, "") << "\" />"
+				<< "Prénom : <input name=\"" << PARAM_SEARCH_SURNAME << "\" value=\"" << currentRequest->getStringParameter(PARAM_SEARCH_SURNAME, "") << "\" />"
+				<< "<input type=\"submit\" value=\"Rechercher\" />"
+				<< "</form>"
+				;
 
 			if (currentRequest->getStringParameter(PARAM_SEARCH_NAME, "") != "" || currentRequest->getStringParameter(PARAM_SEARCH_SURNAME, "") != "")
 			{
 				vector<VinciContract*> contracts = VinciContractTableSync::searchVinciContracts(
 					ServerModule::getSQLiteThread(),
 					currentRequest->getStringParameter(PARAM_SEARCH_NAME, ""), currentRequest->getStringParameter(PARAM_SEARCH_SURNAME, "")
-					,0, 0);
+					);
 
 				stream
-					<< "<h1>Résultat de la recherche</h1>";
-
+					<< "<h1>Résultat de la recherche</h1>"
+					<< addContractRequest->getHTMLFormHeader("add")
+					<< "<table><tr><th>id</th><th>Nom</th><th>Prénom</th></tr>"
+					;
 				if (contracts.size() == 0)
-					stream << "Aucun contrat trouvé";
+					stream << "<tr><td colspan=\"2\">Aucun contrat trouvé</td></tr>";
 				else
 				{
-					stream << "<table>";
 					for (vector<VinciContract*>::const_iterator it = contracts.begin(); it !=contracts.end(); ++it)
 					{
+						contractRequest->setObjectId((*it)->getKey());
+
 						stream
 							<< "<tr>"
-							<< "<td>" << (*it)->getUser()->getName() << "</td>"
-							<< "<td>" << (*it)->getUser()->getSurname() << "</td>"
+							<< "<td>" << contractRequest->getHTMLLink(Conversion::ToString((*it)->getKey())) << "</td>"
+							<< "<td>" << contractRequest->getHTMLLink((*it)->getUser()->getName()) << "</td>"
+							<< "<td>" << contractRequest->getHTMLLink((*it)->getUser()->getSurname()) << "</td>"
 							<< "</tr>";
 						delete *it;
 					}
-					stream << "</table>";
 				}
+				stream << "<tr>"
+					<< "<td><input type=\"submit\" value=\"Nouveau\" /></td>"
+					<< "<td><input name=\"" << AddCustomerAction::PARAMETER_NAME << "\" value=\"" << currentRequest->getStringParameter(PARAM_SEARCH_NAME, "") << "\" /></td>"
+					<< "<td><input name=\"" << AddCustomerAction::PARAMETER_SURNAME << "\" value=\"" << currentRequest->getStringParameter(PARAM_SEARCH_SURNAME, "") << "\" /></td>"
+					<< "</tr>"
+					<< "</table></form>"
+					;
 			}
-			
-
-			stream
-				<< "<h1>Nouveau contrat</h1>";
-
-				
 		}
 	}
 }

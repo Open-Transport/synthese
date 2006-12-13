@@ -22,24 +22,18 @@ namespace synthese
 
 		class TransactionTableSync : public db::SQLiteTableSyncTemplate<Transaction>
 		{
-		private:
+		public:
 			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_DOCUMENT_ID;
-			static const std::string TABLE_COL_DATE_TIME;
+			static const std::string TABLE_COL_START_DATE_TIME;
+			static const std::string TABLE_COL_END_DATE_TIME;
 			static const std::string TABLE_COL_LEFT_USER_ID;
 			static const std::string TABLE_COL_PLACE_ID;
 			static const std::string TABLE_COL_COMMENT;
 
-			static void loadTransaction(Transaction* tp, const db::SQLiteResult& rows, int rowId=0);
-
-		public:
-
 			TransactionTableSync();
 			~TransactionTableSync ();
-
-			//static TransactionPart* getAccount(const db::SQLiteThreadExec* sqlite, uid id);
-			static void saveTransaction(const db::SQLiteThreadExec* sqlite, Transaction* tp);
 
 			/** TransactionPart search.
 			@param sqlite SQLite thread

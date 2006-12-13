@@ -54,7 +54,7 @@ Conversion::ToLong (const std::string& s)
 long long 
 Conversion::ToLongLong (const std::string& s)
 {
-    long long i;
+    long long i = 0;
     sscanf(s.c_str (), INT64_FORMAT, &i);
     return i;
 }

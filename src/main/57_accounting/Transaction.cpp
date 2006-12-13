@@ -27,9 +27,9 @@ namespace synthese
 			return _documentId;
 		}
 
-		const time::DateTime& Transaction::getDateTime() const
+		const time::DateTime& Transaction::getStartDateTime() const
 		{
-			return _dateTime;
+			return _startDateTime;
 		}
 
 		uid Transaction::getLeftUserId() const
@@ -62,9 +62,9 @@ namespace synthese
 			_documentId = id;
 		}
 
-		void Transaction::setDateTime( const time::DateTime& dateTime )
+		void Transaction::setStartDateTime( const time::DateTime& dateTime )
 		{
-			_dateTime = dateTime;
+			_startDateTime = dateTime;
 		}
 
 		void Transaction::setLeftUserId( uid id )
@@ -80,6 +80,16 @@ namespace synthese
 		void Transaction::setComment( const std::string& comment )
 		{
 			_comment = comment;
+		}
+
+		void Transaction::setEndDateTime( const time::DateTime& dateTime )
+		{
+			_endDateTime = dateTime;
+		}
+
+		const time::DateTime& Transaction::getEndDateTime() const
+		{
+			return _endDateTime;
 		}
 	}
 }

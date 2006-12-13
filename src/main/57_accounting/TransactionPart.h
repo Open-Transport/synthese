@@ -43,7 +43,6 @@ namespace synthese
 			void setRateId(uid id);
 			void setTradedObjectId(const std::string& id);
 			void setComment(const std::string& comment);
-
 		};
 	}
 }

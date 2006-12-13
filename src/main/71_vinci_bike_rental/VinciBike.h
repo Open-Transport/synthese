@@ -22,6 +22,12 @@ namespace synthese
 		public:
 			VinciBike(uid id=0);
 
+			const std::string& getNumber() const;
+			const std::string& getMarkedNumber() const;
+
+			void setNumber(const std::string& number);
+			void setMarkedNumber(const std::string& markedNumber);
+
 			friend class db::SQLiteTableSyncTemplate<VinciBike>;
 		};
 	}

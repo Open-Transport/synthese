@@ -1,6 +1,6 @@
 
-#ifndef SYNTHESE_AddCustomerAction_H__
-#define SYNTHESE_AddCustomerAction_H__
+#ifndef SYNTHESE_UpdateCustomerAction_H__
+#define SYNTHESE_UpdateCustomerAction_H__
 
 
 #include "30_server/Action.h"
@@ -9,15 +9,29 @@ namespace synthese
 {
 	namespace vinci
 	{
-		class AddCustomerAction : public server::Action
+		class VinciUpdateCustomerAction : public server::Action
 		{
 		public:
+			static const std::string PARAMETER_ID;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_SURNAME;
+			static const std::string PARAMETER_ADDRESS;
+			static const std::string PARAMETER_POST_CODE;
+			static const std::string PARAMETER_CITY;
+			static const std::string PARAMETER_COUNTRY;
+			static const std::string PARAMETER_EMAIL;
+			static const std::string PARAMETER_PHONE;
 
 		private:
+			uid			_id;
 			std::string _name;
 			std::string _surname;
+			std::string _address;
+			std::string _postCode;
+			std::string _city;
+			std::string _country;
+			std::string _email;
+			std::string _phone;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -38,4 +52,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_AddCustomerAction_H__
+#endif // SYNTHESE_UpdateCustomerAction_H__

@@ -9,10 +9,18 @@
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
+#include "04_time/DateTime.h"
+
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace accounts
 	{
+		class Account;
 		class TransactionPart;
 
 		/** Transaction part SQLite table synchronizer.
@@ -21,8 +29,9 @@ namespace synthese
 
 		class TransactionPartTableSync : public db::SQLiteTableSyncTemplate<TransactionPart>
 		{
-		private:
+		public:
 			static const std::string TABLE_COL_ID;
+			static const std::string TABLE_COL_TRANSACTION_ID;
 			static const std::string TABLE_COL_LEFT_CURRENCY_AMOUNT;
 			static const std::string TABLE_COL_RIGHT_CURRENCY_AMOUNT;
 			static const std::string TABLE_COL_ACCOUNT_ID;
@@ -30,15 +39,9 @@ namespace synthese
 			static const std::string TABLE_COL_TRADED_OBJECT_ID;
 			static const std::string TABLE_COL_COMMENT;
 
-			static void loadTransactionPart(TransactionPart* tp, const db::SQLiteResult& rows, int rowId=0);
-
-		public:
-
 			TransactionPartTableSync();
 			~TransactionPartTableSync ();
 
-			//static TransactionPart* getAccount(const db::SQLiteThreadExec* sqlite, uid id);
-			static void saveTransactionPart(const db::SQLiteThreadExec* sqlite, TransactionPart* tp);
 
 			/** TransactionPart search.
 				@param sqlite SQLite thread
@@ -49,8 +52,8 @@ namespace synthese
 				@date 2006				
 			*/
 			static std::vector<TransactionPart*> searchTransactionParts(const db::SQLiteThreadExec* sqlite
-				
-				, int first = 0, int number = 0);
+				, Account* account, security::User* user
+				, int first = 0, int number = -1);
 
 
 		protected:

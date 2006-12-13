@@ -27,6 +27,14 @@ namespace synthese
 			static const std::string TABLE_COL_SURNAME;
 			static const std::string TABLE_COL_PASSWORD;
 			static const std::string TABLE_COL_PROFILE_ID;
+			static const std::string TABLE_COL_ADDRESS;
+			static const std::string TABLE_COL_POST_CODE;
+			static const std::string TABLE_COL_CITY_TEXT;
+			static const std::string TABLE_COL_CITY_ID;
+			static const std::string TABLE_COL_COUNTRY;
+			static const std::string TABLE_COL_EMAIL;
+			static const std::string TABLE_COL_PHONE;
+
 
 			UserTableSync();
 			~UserTableSync ();

@@ -6,6 +6,18 @@
 
 namespace synthese
 {
+	namespace security
+	{
+		class Profile;
+		class User;
+	}
+
+	namespace accounts
+	{
+		class Account;
+		class Currency;
+	}
+
 	namespace vinci
 	{
 
@@ -59,19 +71,23 @@ namespace synthese
 				- Stocks :
 					- 371 : Bikes (Currency = bikes)
 				- Services :
-					- 7083 : Bike rent (Currency = Euro or local currency)
-					- 763 : Delayed payments (Currency = Euro or local currency)
-					- 707 : Unreturned bikes (sales) (Currency = Euro or local currency)
+					*- 70831 : Bike rent (Currency = Euro or local currency)
+					- 70832 : Bike rent (Currency = tickets punchings)
+					*- 763 : Delayed payments (Currency = Euro or local currency)
+					*- 707 : Unreturned bikes (sales) (Currency = Euro or local currency)
 				- Change :
-					- 5112 : checks (Currency = Euro or local currency)
-					- 5121 : payment card (Currency = Euro or local currency)
-					- 532 : cash (Currency = Euro or local currency)
+					- 5331 : guarantees checks (Currency = Euro or local currency)
+					- 5332 : guarantees payment card (Currency = Euro or local currency)
+					*- 5112 : checks (Currency = Euro or local currency)
+					*- 5121 : payment card (Currency = Euro or local currency)
+					*- 532 : cash (Currency = Euro or local currency)
 					- 59 : tickets punching (Currency = ticket punchings)
 
 			The module initialization consists in the creation of :
 				- 3 currencies : Euro, Tickets, and Bikes
 				- a special user "Bike Rent Accounts"
 				- all the preceding accounts, with their right user equal to the created special user
+				- a "Rental User Without Access" Profile
 
 		@{
 		*/
@@ -81,11 +97,15 @@ namespace synthese
 		public:
 			static const std::string VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE;
 			static const std::string VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE;
+			static const std::string VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE;
+			static const std::string VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE;
 			static const std::string VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE;
 			static const std::string VINCI_STOCKS_BIKE_ACCOUNT_CODE;
-			static const std::string VINCI_SERVICES_BIKE_RENT_ACCOUNT_CODE;
+			static const std::string VINCI_SERVICES_BIKE_RENT_EUROS_ACCOUNT_CODE;
+			static const std::string VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE;
 			static const std::string VINCI_SERVICES_DELAYED_PAYMENTS_ACCOUNT_CODE;
 			static const std::string VINCI_SERVICES_UNRETURNED_BIKE_ACCOUNT_CODE;
+			static const std::string VINCI_CHANGE_GUARANTEE_ACCOUNT_CODE;
 			static const std::string VINCI_CHANGE_CHECKS_ACCOUNT_CODE;
 			static const std::string VINCI_CHANGE_CREDIT_CARD_ACCOUNT_CODE;
 			static const std::string VINCI_CHANGE_CASH_ACCOUNT_CODE;
@@ -95,11 +115,28 @@ namespace synthese
 			static const std::string VINCI_ACCOUNTING_PROFILE_RIGHTS;
 			static const std::string VINCI_ACCOUNTING_USER;
 
+			static const std::string VINCI_CURRENCY_EURO_NAME;
 			static const std::string VINCI_CURRENCY_EURO;
+			static const std::string VINCI_CURRENCY_BIKE_NAME;
 			static const std::string VINCI_CURRENCY_BIKE;
+			static const std::string VINCI_CURRENCY_TICKET_PUNCHING_NAME;
 			static const std::string VINCI_CURRENCY_TICKET_PUNCHING;
 
+			static const std::string VINCI_CUSTOMER_PROFILE;
+			static const std::string VINCI_CUSTOMER_PROFILE_RIGHTS;
+
 			void initialize();
+
+
+			/** Customer profile getter.
+				@warning the returned profile must be deallocated after use to avoid memory leaks
+			*/
+			static security::Profile* getCustomerProfile();
+			static security::User* getVinciUser();
+			static accounts::Currency* getEuroCurrency();
+			static accounts::Account* getGuaranteeAccount();
+			static accounts::Account* getCheckGuaranteeAccount();
+			static accounts::Account* getCardGuaranteeAccount();
 		};
 		/** @} */
 	}

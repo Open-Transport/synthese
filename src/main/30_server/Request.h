@@ -46,6 +46,7 @@ namespace synthese
 			bool					_actionException;
 			std::string				_clientURL;
 			const IsSessionNeeded	_needsSession;
+			uid						_object_id;			//!< Object ID to display (generic parameter which can be used or not by the subclasses)
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -69,15 +70,17 @@ namespace synthese
 
 			//! \name Getters
 			//@{
-				const Site* getSite() const;
-				const Session* getSession() const;
-				const std::string& getClientURL() const;
-				const std::string& getIP() const;
-				const Action* getAction() const;
+				const Site*			getSite()		const;
+				const Session*		getSession()	const;
+				const std::string&	getClientURL()	const;
+				const std::string&	getIP()			const;
+				const Action*		getAction()		const;
+				uid					getObjectId()	const;
 			//@}
 
 			//! \name Setters
 			//@{
+				void setObjectId(uid id);
 				void setAction(Action* action);
 				void setSession(Session* session);
 			//@}

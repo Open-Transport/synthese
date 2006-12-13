@@ -26,6 +26,51 @@ namespace synthese
 		const std::string SQLiteTableSyncTemplate<Profile>::TABLE_NAME = "t027_profiles";
 		const int SQLiteTableSyncTemplate<Profile>::TABLE_ID = 27;
 		const bool SQLiteTableSyncTemplate<Profile>::HAS_AUTO_INCREMENT = true;
+
+		void SQLiteTableSyncTemplate<Profile>::load(Profile* profile, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		{
+			profile->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			profile->setName(rows.getColumn(rowId, ProfileTableSync::TABLE_COL_NAME));
+			profile->setParent(Conversion::ToLongLong(rows.getColumn(rowId, ProfileTableSync::TABLE_COL_PARENT_ID)));
+			profile->setRights(rows.getColumn(rowId, ProfileTableSync::TABLE_COL_RIGHTS_STRING));
+		}
+
+		void SQLiteTableSyncTemplate<Profile>::save( const db::SQLiteThreadExec* sqlite, Profile* profile )
+		{
+			try
+			{
+				if (profile->getKey() != 0)
+				{
+					// UPDATE
+				}
+				else // INSERT
+				{
+					/// @todo Implement control of the fields
+					profile->setKey(getId(1,1));	/// @todo handle grid id
+					stringstream query;
+					query
+						<< "INSERT INTO " << TABLE_NAME
+						<< " VALUES(" 
+						<< Conversion::ToString(profile->getKey())
+						<< "," << Conversion::ToSQLiteString(profile->getName())
+						<< "," << Conversion::ToString(profile->getParentId())
+						<< "," << Conversion::ToSQLiteString(profile->getRightsString())
+						<< ")";
+					sqlite->execUpdate(query.str());
+				}
+			}
+			catch (SQLiteException e)
+			{
+				throw UserTableSyncException("Insert/Update error " + e.getMessage());
+			}
+			catch (...)
+			{
+				throw UserTableSyncException("Unknown Insert/Update error");
+			}
+		}
+
+
+
 	}
 
 	namespace security
@@ -44,13 +89,6 @@ namespace synthese
 			addTableColumn(TABLE_COL_RIGHTS_STRING, "TEXT", true);
 		}
 
-		void ProfileTableSync::loadProfile(Profile* profile, const db::SQLiteResult& rows, int rowId/*=0*/ )
-		{
-			profile->setName(rows.getColumn(rowId, TABLE_COL_NAME));
-			profile->setParent(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_PARENT_ID)));
-			profile->setRights(rows.getColumn(rowId, TABLE_COL_RIGHTS_STRING));
-		}
-
 		void ProfileTableSync::rowsAdded( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			for (int i = 0; i < rows.getNbRows(); ++i)
@@ -59,7 +97,7 @@ namespace synthese
 				try
 				{
 					profile = new Profile(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-					loadProfile(profile, rows, i);
+					load(profile, rows, i);
 					SecurityModule::getProfiles().add(profile);					
 				}
 				catch (Exception e)
@@ -100,7 +138,7 @@ namespace synthese
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
 					Profile* profile = new Profile;
-					loadProfile(profile, result, i);
+					load(profile, result, i);
 					profiles.push_back(profile);
 				}
 				return profiles;
@@ -108,40 +146,6 @@ namespace synthese
 			catch(SQLiteException& e)
 			{
 				throw UserTableSyncException(e.getMessage());
-			}
-		}
-
-		void ProfileTableSync::saveProfile( const db::SQLiteThreadExec* sqlite, Profile* profile )
-		{
-			try
-			{
-				if (profile->getKey() != 0)
-				{
-					// UPDATE
-				}
-				else // INSERT
-				{
-					/// @todo Implement control of the fields
-					profile->setKey(getId(1,1));	/// @todo handle grid id
-					stringstream query;
-					query
-						<< "INSERT INTO " << TABLE_NAME
-						<< " VALUES(" 
-						<< Conversion::ToString(profile->getKey())
-						<< "," << Conversion::ToSQLiteString(profile->getName())
-						<< "," << Conversion::ToString(profile->getParentId())
-						<< "," << Conversion::ToSQLiteString(profile->getRightsString())
-						<< ")";
-					sqlite->execUpdate(query.str());
-				}
-			}
-			catch (SQLiteException e)
-			{
-				throw UserTableSyncException("Insert/Update error " + e.getMessage());
-			}
-			catch (...)
-			{
-				throw UserTableSyncException("Unknown Insert/Update error");
 			}
 		}
 	}

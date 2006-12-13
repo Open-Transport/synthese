@@ -1,6 +1,8 @@
 
 #include <sstream>
 
+#include "01_util/Exception.h"
+
 #include "71_vinci_bike_rental/VinciBike.h"
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
 
@@ -10,6 +12,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace vinci;
+	using namespace util;
 
 	namespace db
 	{
@@ -37,11 +40,11 @@ namespace synthese
 			}
 			else
 			{	// INSERT
-				bike->setKey(getId(0,0)); /// @todo Handle grid number
+				bike->setKey(getId(1,1)); /// @todo Handle grid number
 				query << "INSERT INTO " << TABLE_NAME << " VALUES("
 					<< Conversion::ToString(bike->getKey())
-					<< Conversion::ToSQLiteString(bike->_number)
-					<< Conversion::ToSQLiteString(bike->_markedNumber)
+					<< "," << Conversion::ToSQLiteString(bike->_number)
+					<< "," << Conversion::ToSQLiteString(bike->_markedNumber)
 					<< ")";
 			}
 			sqlite->execUpdate(query.str());
@@ -90,6 +93,32 @@ namespace synthese
 			const db::SQLiteResult& rows)
 		{}
 
+		std::vector<VinciBike*> VinciBikeTableSync::searchVinciBikes( const db::SQLiteThreadExec* sqlite , const std::string& id, const std::string& cadre , int first /*= 0*/, int number /*= 0*/ )
+		{
+			stringstream query;
+			query 
+				<< " SELECT * FROM " << TABLE_NAME
+				<< " WHERE " << TABLE_COL_NUMBER << " LIKE '%" << id << "%' "
+				<< " AND " << TABLE_COL_MARKED_NUMBER << " LIKE '%" << cadre << "%' "
+				<< " LIMIT " << number << " OFFSET " << first
+				;
+			SQLiteResult result = sqlite->execQuery(query.str());
+			vector<VinciBike*> bikes;
+			for (int i=0; i<result.getNbRows(); ++i)
+			{
+				VinciBike* bike = new VinciBike;
+				try
+				{
+					load(bike, result, i);
+					bikes.push_back(bike);
+				}
+				catch (Exception e)
+				{
+
+				}
+			}
+			return bikes;
+		}
 
 	}
 }
