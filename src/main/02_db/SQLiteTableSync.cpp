@@ -28,6 +28,7 @@ namespace synthese
 		, _allowInsert (allowInsert)
 		, _allowRemove (allowRemove)
 		, _triggerOverrideClause (triggerOverrideClause)
+		, _enableTriggers (true)
 		{ }
 
 
@@ -67,7 +68,7 @@ namespace synthese
 					sql.append (getTableName () + "_no_insert");
 					sql.append (" BEFORE INSERT ON " + getTableName ());
 					sql.append (" BEGIN SELECT RAISE (ABORT, 'Insertion in " + getTableName () 
-						+ " is forbidden.') WHERE " + _triggerOverrideClause + "; END;");
+						+ " is forbidden.') WHERE " + getTriggerOverrideClause () + "; END;");
 					sqlite->execUpdate (sql);
 				}
 				
@@ -77,7 +78,7 @@ namespace synthese
 					sql.append (getTableName () + "_no_remove");
 					sql.append (" BEFORE DELETE ON " + getTableName ());
 					sql.append (" BEGIN SELECT RAISE (ABORT, 'Deletion in " + getTableName () 
-						+ " is forbidden.') WHERE " + _triggerOverrideClause + "; END;");
+						+ " is forbidden.') WHERE " + getTriggerOverrideClause () + "; END;");
 					sqlite->execUpdate (sql);
 				}
 
@@ -106,7 +107,7 @@ namespace synthese
 					sql.append (columnList);
 					sql.append (" ON " + getTableName ());
 					sql.append (" BEGIN SELECT RAISE (ABORT, 'Update of " + columnList + " in " + getTableName () 
-						+ " is forbidden.') WHERE " + _triggerOverrideClause + "; END;");
+						+ " is forbidden.') WHERE " + getTriggerOverrideClause () + "; END;");
 					sqlite->execUpdate (sql);
 				}
 			
@@ -173,7 +174,25 @@ namespace synthese
 		{
 
 		}
-	}
 
+	    
+	    
+
+	    void 
+	    SQLiteTableSync::setEnableTriggers (bool enableTriggers)
+	    {
+		_enableTriggers = enableTriggers;
+	    }
+
+
+	    
+	    std::string 
+	    SQLiteTableSync::getTriggerOverrideClause () const
+	    {
+		return _enableTriggers ? _triggerOverrideClause : "0";
+	    }
+
+
+	}
 }
 

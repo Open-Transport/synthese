@@ -46,9 +46,20 @@ namespace synthese
 			// Initialize permanent ram loaded data
 			Log::GetInstance().info("Loading live data...");
 			_sqliteThreadExec = new SQLiteThreadExec (_databasePath);
+
 			Thread sqliteThread (_sqliteThreadExec, "sqlite");
 			sqliteThread.start ();
 			SQLiteSync* syncHook = new SQLiteSync (TABLE_COL_ID);
+
+			// Register all table syncs
+			for (Factory<SQLiteTableSync>::Iterator tableSync = 
+				 Factory<SQLiteTableSync>::begin(); 
+			     tableSync != Factory<SQLiteTableSync>::end(); 
+			     ++tableSync)
+			{
+			    syncHook->addTableSynchronizer (*tableSync);
+			}
+			
 			_sqliteThreadExec->registerUpdateHook (syncHook);
 			sqliteThread.waitForReadyState ();
 

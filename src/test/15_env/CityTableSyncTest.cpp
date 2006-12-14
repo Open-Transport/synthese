@@ -2,18 +2,20 @@
 #include "CityTableSyncTest.h"
 
 #include "01_util/Conversion.h"
+#include "01_util/UId.h"
 
+#include "02_db/DBModule.h"
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteSync.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteThreadExec.h"
 
+#include "15_env/EnvModule.h"
 #include "15_env/Environment.h"
 
-#include "17_env_ls_sql/module.h"
-#include "17_env_ls_sql/CityTableSync.h"
-#include "17_env_ls_sql/EnvironmentTableSync.h"
-#include "17_env_ls_sql/EnvironmentLinkTableSync.h"
+#include "15_env/CityTableSync.h"
+#include "15_env/EnvironmentTableSync.h"
+#include "15_env/EnvironmentLinkTableSync.h"
 
 #include <boost/filesystem/operations.hpp>
 
@@ -22,18 +24,18 @@
 #include <map>
 
 
-using synthese::db::SQLite;
-using synthese::db::SQLiteSync;
-using synthese::db::SQLiteResult;
-using synthese::db::SQLiteThreadExec;
 
-using synthese::env::Environment;
+using namespace synthese::db;
+
 using synthese::util::Conversion;
+
+
+
 
 
 namespace synthese
 {
-namespace envlssql
+namespace env
 {
 
 
@@ -56,25 +58,31 @@ namespace envlssql
   void
   CityTableSyncTest::testSingleEnvironmentSync1 ()
   {
+      Environment::Registry& environments = EnvModule::getEnvironments ();
       {
+	  environments.clear ();
+	  
 	  boost::filesystem::remove ("test_db.s3db");
-	  Environment::Registry environments;
 	  
 	  SQLiteThreadExec* sqliteExec = new SQLiteThreadExec ("test_db.s3db");
 	  SQLiteSync* syncHook = new SQLiteSync (TABLE_COL_ID);
-	  sqliteExec->registerUpdateHook (syncHook);
+
+
+
 	  
-	  EnvironmentTableSync* envSync = new EnvironmentTableSync (environments);
-	  CityTableSync* citySync = new CityTableSync (environments, "0");  // Override triggers for testing
+	  EnvironmentTableSync* envSync = new EnvironmentTableSync ();
+	  CityTableSync* citySync = new CityTableSync ();  
+          citySync->setEnableTriggers (false); // Override triggers for testing
+
 	  syncHook->addTableSynchronizer (envSync);
 	  syncHook->addTableSynchronizer (citySync);
 
 	  // Create the env link synchronizer after having added the component synchronizers
-	  EnvironmentLinkTableSync* envLinkSync = new EnvironmentLinkTableSync (syncHook,
-										environments);
+	  EnvironmentLinkTableSync* envLinkSync = new EnvironmentLinkTableSync ();
 
 	  syncHook->addTableSynchronizer (envLinkSync);
 
+	  sqliteExec->registerUpdateHook (syncHook);
 	  sqliteExec->initialize ();
       
 	  // Everything is ready for the tests
@@ -82,7 +90,7 @@ namespace envlssql
       
 	  // Add a new environment row
 	  
-	  uid environmentId = envSync->encodeUId (0, 0, 0);
+	  uid environmentId = synthese::util::encodeUId (envSync->getTableId (), 0, 0, 0);
 
 	  sqliteExec->execUpdate (
 	      "INSERT INTO " + ENVIRONMENTS_TABLE_NAME + " (" + 
@@ -95,7 +103,7 @@ namespace envlssql
       
 	  // Add a new city before linking it to environment
 	  Environment* env = environments.get (0);
-	  uid cityId0 = citySync->encodeUId (0, 0, 0);
+	  uid cityId0 = synthese::util::encodeUId (citySync->getTableId (), 0, 0, 0);
 
 	  sqliteExec->execUpdate (
 	      "INSERT INTO " + CITIES_TABLE_NAME + " (" + 
@@ -105,7 +113,7 @@ namespace envlssql
 	  sqliteExec->loop ();
 	  CPPUNIT_ASSERT_EQUAL (0, (int) env->getCities ().size ());
 	  
-	  uid environmentLinkId = envLinkSync->encodeUId (0, 0, 0);
+	  uid environmentLinkId = synthese::util::encodeUId (envLinkSync->getTableId (), 0, 0, 0);
 
 	  sqliteExec->execUpdate (
 	      "INSERT INTO " + ENVIRONMENT_LINKS_TABLE_NAME + " (" + 
@@ -125,8 +133,8 @@ namespace envlssql
 	  // Add two other city links and create the objects afterward
 	  std::string sql;
 
-	  uid cityId1 = citySync->encodeUId (0, 0, 1);
-	  uid cityId2 = citySync->encodeUId (0, 0, 2);
+	  uid cityId1 = synthese::util::encodeUId (citySync->getTableId (), 0, 0, 1);
+	  uid cityId2 = synthese::util::encodeUId (citySync->getTableId (), 0, 0, 2);
 
 	  sql.append (
 	      "INSERT INTO " + ENVIRONMENT_LINKS_TABLE_NAME + " (" + 
@@ -248,27 +256,28 @@ namespace envlssql
       {
 	  // Recreate exactly the same context except that some 
 	  // values pre exist in db!
-	  Environment::Registry environments;
+	  environments.clear ();
 	  
 	  SQLiteThreadExec* sqliteExec = new SQLiteThreadExec ("test_db.s3db");
 	  SQLiteSync* syncHook = new SQLiteSync (TABLE_COL_ID);
 	  sqliteExec->registerUpdateHook (syncHook);
 	  
-	  EnvironmentTableSync* envSync = new EnvironmentTableSync (environments);
-	  CityTableSync* citySync = new CityTableSync (environments);
+	  EnvironmentTableSync* envSync = new EnvironmentTableSync ();
+	  CityTableSync* citySync = new CityTableSync ();
+          citySync->setEnableTriggers (false); // Override triggers for testing
+
 	  syncHook->addTableSynchronizer (envSync);
 	  syncHook->addTableSynchronizer (citySync);
 
 	  // Create the env link synchronizer after having added the component synchronizers
-	  EnvironmentLinkTableSync* envLinkSync = new EnvironmentLinkTableSync (syncHook,
-										environments);
+	  EnvironmentLinkTableSync* envLinkSync = new EnvironmentLinkTableSync ();
 
 	  syncHook->addTableSynchronizer (envLinkSync);
 	  
-	  uid environmentId = envSync->encodeUId (0, 0, 0);
-	  uid cityId0 = citySync->encodeUId (0, 0, 0);
-	  uid cityId1 = citySync->encodeUId (0, 0, 1);
-
+	  uid environmentId = synthese::util::encodeUId (envSync->getTableId (), 0, 0, 0);
+	  uid cityId0 = synthese::util::encodeUId (citySync->getTableId (), 0, 0, 0);
+	  uid cityId1 = synthese::util::encodeUId (citySync->getTableId (), 0, 0, 1);
+	  
 	  sqliteExec->initialize ();
 
 	  sqliteExec->loop ();
@@ -286,6 +295,8 @@ namespace envlssql
 	  delete envSync;
 	  delete envLinkSync;
       }
+
+      environments.clear ();
 
 
   }

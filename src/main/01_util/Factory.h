@@ -1,4 +1,3 @@
-
 #ifndef SYNTHESE_util_Factory_h__
 #define SYNTHESE_util_Factory_h__
 
@@ -51,14 +50,14 @@ namespace synthese
 			{
 			private:
 				friend class Factory;
-				RootObject* create()
+				RootObject* create ()
 				{
 					return (RootObject*) createTyped();
 				}
 
-				T* createTyped()
+				T* createTyped ()
 				{
-					return new T;
+				    return new T;
 				}
 			};
 

@@ -10,11 +10,14 @@
 #include "CityTest.h"
 #include "EnvironmentTest.h"
 
+#include "CityTableSyncTest.h"
 
 
-CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::CalendarTest);
-CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::CityTest);
-CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::EnvironmentTest);
+
+// CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::CalendarTest);
+// CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::CityTest);
+// CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::EnvironmentTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(synthese::env::CityTableSyncTest);
 
 
 

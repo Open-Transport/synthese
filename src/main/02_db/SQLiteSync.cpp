@@ -3,7 +3,7 @@
 #include <assert.h>
 
 #include "01_util/Conversion.h"
-#include "01_util/Factory.h"
+// #include "01_util/Factory.h"
 
 #include "02_db/SQLiteThreadExec.h"
 #include "02_db/SQLiteTableSync.h"
@@ -34,7 +34,7 @@ namespace synthese
 		}
 
 		 
-		/*
+
 		void 
 		SQLiteSync::addTableSynchronizer (SQLiteTableSync* synchronizer)
 		{
@@ -64,7 +64,17 @@ namespace synthese
 			throw SQLiteException ("No synchronizer for table '" + tableName + "'");
 			}
 			return _tableSynchronizers.find (tableName)->second;
-		}*/
+		}
+
+	    
+	    
+	    std::map<std::string, SQLiteTableSync* >
+	    SQLiteSync::getTableSynchronizers () const
+	    {
+		boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
+		return _tableSynchronizers;
+	    }
+	    
 
 
 		void 
@@ -73,18 +83,18 @@ namespace synthese
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
 			_isRegistered = true;
-
+			
 			// Call the init sequence on all synchronizers.
-		//    for (std::map<std::string, SQLiteTableSync*>::const_iterator it = _tableSynchronizers.begin ();
-		//	 it != _tableSynchronizers.end (); ++it)
-			for (Factory<SQLiteTableSync>::Iterator it = Factory<SQLiteTableSync>::begin(); it != Factory<SQLiteTableSync>::end(); ++it)
+			for (std::map<std::string, SQLiteTableSync*>::const_iterator it = 
+				 _tableSynchronizers.begin (); 
+			     it != _tableSynchronizers.end (); ++it)
 			{
-		//		it->second->firstSync (emitter, this);
-				it->firstSync(emitter, this);
+			    it->second->firstSync (emitter, this);
 			}
 
 		}
 		 
+
 
 		   
 		void 
@@ -93,45 +103,45 @@ namespace synthese
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
-		//    for (std::map<std::string, SQLiteTableSync* >::const_iterator it = _tableSynchronizers.begin ();
-		//	 it != _tableSynchronizers.end (); ++it)
-			for(Factory<SQLiteTableSync>::Iterator tableSync = Factory<SQLiteTableSync>::begin(); tableSync != Factory<SQLiteTableSync>::end(); ++tableSync)
+			for (std::map<std::string, SQLiteTableSync* >::const_iterator it 
+				 = _tableSynchronizers.begin ();
+			     it != _tableSynchronizers.end (); ++it)
 			{
-		//		SQLiteTableSync* tableSync = it->second;
-				if (tableSync->getTableName () != event.tbName) continue;
+			    SQLiteTableSync* tableSync = it->second;
+			    if (tableSync->getTableName () != event.tbName) continue;
+			    
+			    if (event.opType == SQLITE_INSERT) 
+			    {
+				// Query for the modified row
+				SQLiteResult result = emitter->execQuery ("SELECT * FROM " + event.tbName + " WHERE " 
+									  + _idColumnName + "=" + Conversion::ToString (event.rowId));
 				
-				if (event.opType == SQLITE_INSERT) 
-				{
-					// Query for the modified row
-					SQLiteResult result = emitter->execQuery ("SELECT * FROM " + event.tbName + " WHERE " 
-										+ _idColumnName + "=" + Conversion::ToString (event.rowId));
-				    
-					tableSync->rowsAdded (emitter, this, result);
-				}
-				else if (event.opType == SQLITE_UPDATE) 
-				{
-					// Query for the modified row
-					SQLiteResult result = emitter->execQuery ("SELECT * FROM " + event.tbName + " WHERE " 
-										+ _idColumnName + "=" + Conversion::ToString (event.rowId));
-
-					tableSync->rowsUpdated (emitter, this, result);
-				}
-				else if (event.opType == SQLITE_DELETE) 
-				{
-					// Query for the modified row
-					SQLiteResult result;
-					std::vector<std::string> columns;
-					std::vector<std::string> values;
-					columns.push_back (_idColumnName);
-					values.push_back (Conversion::ToString (event.rowId));
-					result.addRow (values, columns);
-
-					tableSync->rowsRemoved (emitter, this, result);
-				}
+				tableSync->rowsAdded (emitter, this, result);
+			    }
+			    else if (event.opType == SQLITE_UPDATE) 
+			    {
+				// Query for the modified row
+				SQLiteResult result = emitter->execQuery ("SELECT * FROM " + event.tbName + " WHERE " 
+									  + _idColumnName + "=" + Conversion::ToString (event.rowId));
+				
+				tableSync->rowsUpdated (emitter, this, result);
+			    }
+			    else if (event.opType == SQLITE_DELETE) 
+			    {
+				// Query for the modified row
+				SQLiteResult result;
+				std::vector<std::string> columns;
+				std::vector<std::string> values;
+				columns.push_back (_idColumnName);
+				values.push_back (Conversion::ToString (event.rowId));
+				result.addRow (values, columns);
+				
+				tableSync->rowsRemoved (emitter, this, result);
+			    }
 			}
-		    
+			
 		}
-
+	    
 	}
 }
 

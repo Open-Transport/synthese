@@ -45,6 +45,11 @@ class EnvironmentLinkTableSync : public synthese::db::SQLiteTableSync
 
     ~EnvironmentLinkTableSync ();
 
+
+    void firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+		    synthese::db::SQLiteSync* sync);
+
+
     void rowsAdded (const synthese::db::SQLiteThreadExec* sqlite, 
 		    synthese::db::SQLiteSync* sync,
 		    const synthese::db::SQLiteResult& rows);

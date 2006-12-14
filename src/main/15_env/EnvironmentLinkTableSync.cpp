@@ -12,6 +12,7 @@
 #include "15_env/EnvModule.h"
 #include "15_env/EnvironmentSyncException.h"
 #include "15_env/EnvironmentLinkTableSync.h"
+#include "15_env/ComponentTableSync.h"
 
 
 namespace synthese
@@ -33,18 +34,6 @@ EnvironmentLinkTableSync::EnvironmentLinkTableSync ()
 	}
 	// The preceding block is used by doxygen, please do not remove
 
-//    const std::map<std::string, SQLiteTableSync* >& tableSynchronizers = sync->getTableSynchronizers ();
-//    for (std::map<std::string, SQLiteTableSync* >::const_iterator it = tableSynchronizers.begin ();
-//	 it != tableSynchronizers.end (); ++it)
-for (Factory<SQLiteTableSync>::Iterator synchronizer = Factory<SQLiteTableSync>::begin(); synchronizer != Factory<SQLiteTableSync>::end(); ++synchronizer)
-    {
-//	const SQLiteTableSync* synchronizer = it->second;
-	std::string tableName = synchronizer->getTableName ();
-	
-        // Parse table id from table name
-	int tableId (synchronizer->getTableId ());
-	_componentTableNames.insert (std::make_pair (tableId, tableName));
-    }
 }
 
 
@@ -53,6 +42,31 @@ EnvironmentLinkTableSync::~EnvironmentLinkTableSync ()
 {
 
 }
+
+
+void 
+EnvironmentLinkTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+				     synthese::db::SQLiteSync* sync)
+{
+    std::map<std::string, SQLiteTableSync* > tableSynchronizers = sync->getTableSynchronizers ();
+    for (std::map<std::string, SQLiteTableSync* >::const_iterator it = tableSynchronizers.begin ();
+	 it != tableSynchronizers.end (); ++it)
+    {
+	
+	const SQLiteTableSync* synchronizer = it->second;
+	std::string tableName = synchronizer->getTableName ();
+	
+        // Parse table id from table name
+	int tableId (synchronizer->getTableId ());
+	_componentTableNames.insert (std::make_pair (tableId, tableName));
+    }
+    SQLiteTableSync::firstSync (sqlite, sync);
+
+}
+
+
+
+
 
     
 void 
@@ -76,8 +90,7 @@ EnvironmentLinkTableSync::rowsAdded (const synthese::db::SQLiteThreadExec* sqlit
 	_cache.insert (std::make_pair (rows.getColumn (i, TABLE_COL_ID), rows.getColumns (i)));
 
 	// Check if the component has already been added in its corresponding table
-/// @todo Check if necessary
-	/*	std::string componentTableName (it->second);
+	std::string componentTableName (it->second);
 	SQLiteResult existingRow = sqlite->execQuery ("SELECT * FROM " + componentTableName + 
 						      " WHERE " + TABLE_COL_ID + "=" + linkTargetStr);
 
@@ -87,7 +100,7 @@ EnvironmentLinkTableSync::rowsAdded (const synthese::db::SQLiteThreadExec* sqlit
 		(sync->getTableSynchronizer (componentTableName));
 		componentTableSync->doAdd (existingRow, 0, *EnvModule::getEnvironments().get (envId));
 	}
-  */  }
+    }
 }
 
 
@@ -129,15 +142,13 @@ EnvironmentLinkTableSync::rowsRemoved (const synthese::db::SQLiteThreadExec* sql
 	SQLiteResult existingRow = sqlite->execQuery ("SELECT * FROM " + componentTableName + 
 						      " WHERE " + TABLE_COL_ID + "=" + linkTargetStr);
 	/// @todo Check if necessary
-	/*
-
 	if (existingRow.getNbRows () == 1) 
 	{
 	    ComponentTableSync* componentTableSync = dynamic_cast<ComponentTableSync*>
 		(sync->getTableSynchronizer (componentTableName));
 		componentTableSync->doRemove (existingRow, 0, *EnvModule::getEnvironments().get (envId));
 	}
-*/	_cache.erase (id);
+	_cache.erase (id);
     }
 
 }

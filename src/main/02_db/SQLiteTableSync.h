@@ -46,6 +46,7 @@ namespace synthese
 			const bool _allowInsert;
 			const bool _allowRemove;
 			const std::string _triggerOverrideClause;
+			bool _enableTriggers;
 
 			const std::string _tableName;
 			SQLiteTableFormat _tableFormat;
@@ -70,10 +71,13 @@ namespace synthese
 
 			const SQLiteTableFormat& getTableFormat () const;
 
+
+			void setEnableTriggers (bool enableTriggers);
+
 			/** This method is called when the synchronizer is created
 			to sychronize it with pre-existing data in db.
 			*/
-			void firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+			virtual void firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
 					synthese::db::SQLiteSync* sync);
 
 			virtual void rowsAdded (const SQLiteThreadExec* sqlite, 
@@ -100,6 +104,8 @@ namespace synthese
 
 
 		private:
+
+			std::string getTriggerOverrideClause () const;
 
 		};
 	}

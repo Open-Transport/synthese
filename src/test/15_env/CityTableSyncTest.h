@@ -9,7 +9,7 @@
 
 namespace synthese
 {
-namespace envlssql
+namespace env
 {
 
 
