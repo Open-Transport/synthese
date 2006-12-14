@@ -46,6 +46,7 @@ namespace synthese
 			const bool _allowInsert;
 			const bool _allowRemove;
 			const std::string _triggerOverrideClause;
+			bool _ignoreCallbacksOnFirstSync;
 			bool _enableTriggers;
 
 			const std::string _tableName;
@@ -57,9 +58,10 @@ namespace synthese
 		public:
 
 			SQLiteTableSync ( const std::string& tableName, 
-					bool allowInsert = true, 
-					bool allowRemove = true,
-					const std::string& triggerOverrideClause = "1");
+					  bool allowInsert = true, 
+					  bool allowRemove = true,
+					  const std::string& triggerOverrideClause = "1",
+					  bool ignoreCallbacksOnFirstSync = false);
 
 			~SQLiteTableSync ();
 
@@ -71,14 +73,30 @@ namespace synthese
 
 			const SQLiteTableFormat& getTableFormat () const;
 
+			bool getIgnoreCallbacksOnFirstSync () const;
+			void setIgnoreCallbacksOnFirstSync (bool ignoreCallbacksOnFirstSync);
 
 			void setEnableTriggers (bool enableTriggers);
 
 			/** This method is called when the synchronizer is created
-			to sychronize it with pre-existing data in db.
+			to synchronize it with pre-existing data in db.
 			*/
-			virtual void firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+			void firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
 					synthese::db::SQLiteSync* sync);
+			
+			/** This method can be overriden to invoke some code before
+			    executing firstSync body.
+			    Default implementation is doing nothing.
+			*/
+			virtual void beforeFirstSync (const SQLiteThreadExec* sqlite, 
+						      SQLiteSync* sync);
+
+			/** This method can be overriden to invoke some code after
+			    having executed firstSync body.
+			    Default implementation is doing nothing.
+			*/
+			virtual void afterFirstSync (const SQLiteThreadExec* sqlite, 
+						     SQLiteSync* sync);
 
 			virtual void rowsAdded (const SQLiteThreadExec* sqlite, 
 						SQLiteSync* sync,

@@ -45,7 +45,7 @@ EnvironmentLinkTableSync::~EnvironmentLinkTableSync ()
 
 
 void 
-EnvironmentLinkTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+EnvironmentLinkTableSync::beforeFirstSync (const synthese::db::SQLiteThreadExec* sqlite, 
 				     synthese::db::SQLiteSync* sync)
 {
     std::map<std::string, SQLiteTableSync* > tableSynchronizers = sync->getTableSynchronizers ();
@@ -60,8 +60,6 @@ EnvironmentLinkTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlit
 	int tableId (synchronizer->getTableId ());
 	_componentTableNames.insert (std::make_pair (tableId, tableName));
     }
-    SQLiteTableSync::firstSync (sqlite, sync);
-
 }
 
 

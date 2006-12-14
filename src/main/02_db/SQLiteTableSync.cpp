@@ -20,14 +20,16 @@ namespace synthese
 //		std::map<int, int> SQLiteTableSync::_autoIncrementValues;
 
 		SQLiteTableSync::SQLiteTableSync ( const std::string& tableName,
-						bool allowInsert, 
-						bool allowRemove,
-						const std::string& triggerOverrideClause
+						   bool allowInsert, 
+						   bool allowRemove,
+						   const std::string& triggerOverrideClause,
+						   bool ignoreCallbacksOnFirstSync
 						)
 		: _tableName (tableName)
 		, _allowInsert (allowInsert)
 		, _allowRemove (allowRemove)
 		, _triggerOverrideClause (triggerOverrideClause)
+		, _ignoreCallbacksOnFirstSync (ignoreCallbacksOnFirstSync)
 		, _enableTriggers (true)
 		{ }
 
@@ -44,6 +46,10 @@ namespace synthese
 		SQLiteTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
 						synthese::db::SQLiteSync* sync)
 		{
+		    // Pre-init phase
+		    beforeFirstSync (sqlite, sync);
+
+
 			const SQLiteTableFormat& format = getTableFormat ();
 
 			// Check if the table already exists
@@ -112,13 +118,34 @@ namespace synthese
 				}
 			
 			}
+			
 			// Callbacks according to what already exists in the table.
-			SQLiteResult result = sqlite->execQuery ("SELECT * FROM " + getTableName ());
-			rowsAdded (sqlite, sync, result);
-			initAutoIncrement(sqlite);
+			if (_ignoreCallbacksOnFirstSync == false)
+			{
+			    SQLiteResult result = sqlite->execQuery ("SELECT * FROM " + getTableName ());
+			    rowsAdded (sqlite, sync, result);
+			    initAutoIncrement(sqlite);
+			}
+
+			// Post-init phase
+			afterFirstSync (sqlite, sync);
+			
+
 		}
 
 		    
+
+	    void 
+	    SQLiteTableSync::beforeFirstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+					      synthese::db::SQLiteSync* sync)
+	    {
+	    }
+
+	    void 
+	    SQLiteTableSync::afterFirstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+					     synthese::db::SQLiteSync* sync)
+	    {
+	    }
 
 
 		const std::string& 
@@ -176,6 +203,22 @@ namespace synthese
 		}
 
 	    
+
+
+	    bool 
+	    SQLiteTableSync::getIgnoreCallbacksOnFirstSync () const
+	    {
+		return _ignoreCallbacksOnFirstSync;
+	    }
+		
+
+	    void 
+	    SQLiteTableSync::setIgnoreCallbacksOnFirstSync (bool ignoreCallbacksOnFirstSync)
+	    {
+		_ignoreCallbacksOnFirstSync = ignoreCallbacksOnFirstSync;
+	    }
+
+
 	    
 
 	    void 
