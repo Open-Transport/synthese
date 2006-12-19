@@ -3,8 +3,6 @@
 	@section csst_sommaire Sommaire du document
 	
 		- @ref csst_glossary
-		- @ref csst_presentation
-		- @ref csst_surveillance
 		- @ref csst_ihm
 		- @ref csst_security
 		- @ref csst_logs

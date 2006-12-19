@@ -54,15 +54,31 @@ namespace synthese
 		{
 			try
 			{
+				stringstream query;
 				if (user->getKey() != 0)
 				{
-					// UPDATE
+					query
+						<< "UPDATE " << TABLE_NAME
+						<< " SET "
+						<< UserTableSync::TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(user->getName())
+						<< "," << UserTableSync::TABLE_COL_SURNAME << "=" << Conversion::ToSQLiteString(user->getSurname())
+						<< "," << UserTableSync::TABLE_COL_LOGIN << "=" << Conversion::ToSQLiteString(user->getLogin())
+						<< "," << UserTableSync::TABLE_COL_PASSWORD << "=" << Conversion::ToSQLiteString(user->getPassword())
+						<< "," << UserTableSync::TABLE_COL_PROFILE_ID << "=" << Conversion::ToString(user->getProfile()->getKey())
+						<< "," << UserTableSync::TABLE_COL_ADDRESS << "=" << Conversion::ToSQLiteString(user->_address)
+						<< "," << UserTableSync::TABLE_COL_POST_CODE << "=" << Conversion::ToSQLiteString(user->_postCode)
+						<< "," << UserTableSync::TABLE_COL_CITY_TEXT << "=" << Conversion::ToSQLiteString(user->_cityText)
+						<< "," << UserTableSync::TABLE_COL_CITY_ID << "=" << Conversion::ToString(user->_cityId)
+						<< "," << UserTableSync::TABLE_COL_COUNTRY << "=" << Conversion::ToSQLiteString(user->_country)
+						<< "," << UserTableSync::TABLE_COL_EMAIL << "=" << Conversion::ToSQLiteString(user->_email)
+						<< "," << UserTableSync::TABLE_COL_PHONE << "=" << Conversion::ToSQLiteString(user->_phone)
+						<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(user->getKey());
+					
 				}
 				else // INSERT
 				{
 					/// @todo Implement control of the fields
 					user->setKey(getId(1,1));	/// @todo handle grid id
-					stringstream query;
 					query
 						<< "INSERT INTO " << TABLE_NAME
 						<< " VALUES(" 
@@ -80,8 +96,8 @@ namespace synthese
 						<< "," << Conversion::ToSQLiteString(user->_email)
 						<< "," << Conversion::ToSQLiteString(user->_phone)
 						<< ")";
-					sqlite->execUpdate(query.str());
 				}
+				sqlite->execUpdate(query.str());
 			}
 			catch (SQLiteException e)
 			{

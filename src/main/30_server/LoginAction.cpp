@@ -44,11 +44,14 @@ namespace synthese
 			// Fetch user
 			try
 			{
-				User* user = UserTableSync::getUser(ServerModule::getSQLiteThread(), _login);
-				user->verifyPassword(_password);
-				Session* session = new Session(_request->getIP());
-				session->setUser(user);
-				_request->setSession(session);
+				if (_login.size() > 0 && _password.size() > 0)
+				{
+					User* user = UserTableSync::getUser(ServerModule::getSQLiteThread(), _login);
+					user->verifyPassword(_password);
+					Session* session = new Session(_request->getIP());
+					session->setUser(user);
+					_request->setSession(session);
+				}
 			}
 			catch (UserTableSyncException e)
 			{

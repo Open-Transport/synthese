@@ -72,6 +72,8 @@ namespace synthese
 			stream
 				<< "<h1>Coordonnées</h1>"
 				<< updateRequest->getHTMLFormHeader("update")
+				<< "<input type=\"hidden\" name=\"" << Request::PARAMETER_OBJECT_ID << "\" value=\"" << Conversion::ToString(contract->getKey()) << "\" />"
+				<< "<input type=\"hidden\" name=\"" << VinciUpdateCustomerAction::PARAMETER_ID << "\" value=\"" << Conversion::ToString(contract->getKey()) << "\" />"
 				<< "<table>"
 				<< "<tr><td>Nom</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_NAME << "\" value=\"" << user->getName() << "\" /></td></tr>"
 				<< "<tr><td>Prénom</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_SURNAME << "\" value=\"" << user->getSurname() << "\" /></td></tr>"
@@ -91,6 +93,7 @@ namespace synthese
 			stream
 				<< "<h1>Cautions</h1>"
 				<< addGuaranteeRequest->getHTMLFormHeader("addguarantee")
+				<< "<input type=\"hidden\" name=\"" << AdminRequest::PARAMETER_OBJECT_ID << "\" value=\"" << contract->getKey() << "\" />"
 				<< "<input type=\"hidden\" name=\"" << VinciAddGuaranteeAction::PARAMETER_CONTRACT_ID << "\" value=\"" << contract->getKey() << "\" />"
 				<< "<table>"
 				<< "<tr><th>Date</th><th>Montant</th><th>Actions</th></tr>"

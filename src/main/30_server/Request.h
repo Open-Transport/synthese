@@ -31,6 +31,7 @@ namespace synthese
 			static const std::string PARAMETER_SESSION;
 			static const std::string PARAMETER_IP;
 			static const std::string PARAMETER_CLIENT_URL;
+			static const std::string PARAMETER_OBJECT_ID;
 			static const int MAX_REQUEST_SIZE;
 			
 			typedef std::map<std::string, std::string> ParametersMap;

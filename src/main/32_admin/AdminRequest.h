@@ -14,8 +14,7 @@ namespace synthese
 		class AdminRequest : public server::Request
 		{
 			static const std::string PARAMETER_PAGE;
-			static const std::string PARAMETER_OBJECT_ID;
-
+			
 			//! \name Page parameters
 			//@{
 			const AdminInterfaceElement*	_page;

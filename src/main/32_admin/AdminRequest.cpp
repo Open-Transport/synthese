@@ -24,7 +24,6 @@ namespace synthese
 	namespace admin
 	{
 		const std::string AdminRequest::PARAMETER_PAGE = "rub";
-		const std::string AdminRequest::PARAMETER_OBJECT_ID = "id";
 
 		AdminRequest::AdminRequest()
 			: Request(Request::NEEDS_SESSION)
@@ -128,5 +127,7 @@ namespace synthese
 			else
 				it->second = value;
 		}
+
+		
 	}
 }

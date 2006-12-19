@@ -39,6 +39,7 @@ namespace synthese
 		const std::string Request::PARAMETER_SESSION = "sid";
 		const std::string Request::PARAMETER_IP = "ipaddr";
 		const std::string Request::PARAMETER_CLIENT_URL = "clienturl";
+		const std::string Request::PARAMETER_OBJECT_ID = "roid";
 
 		Request::Request(IsSessionNeeded isSessionNeeded)
 			: _session(NULL)
