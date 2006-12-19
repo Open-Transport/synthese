@@ -13,229 +13,261 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace util;
+    using namespace util;
 
-	namespace db
-	{
+    namespace db
+    {
 //		std::map<int, int> SQLiteTableSync::_autoIncrementValues;
 
-		SQLiteTableSync::SQLiteTableSync ( const std::string& tableName,
-						   bool allowInsert, 
-						   bool allowRemove,
-						   const std::string& triggerOverrideClause,
-						   bool ignoreCallbacksOnFirstSync
-						)
-		: _tableName (tableName)
-		, _allowInsert (allowInsert)
-		, _allowRemove (allowRemove)
-		, _triggerOverrideClause (triggerOverrideClause)
-		, _ignoreCallbacksOnFirstSync (ignoreCallbacksOnFirstSync)
-		, _enableTriggers (true)
-		{ }
+	SQLiteTableSync::SQLiteTableSync ( const std::string& tableName,
+					   bool allowInsert, 
+					   bool allowRemove,
+					   const std::string& triggerOverrideClause,
+					   bool ignoreCallbacksOnFirstSync
+	    )
+	    : _tableName (tableName)
+	    , _allowInsert (allowInsert)
+	    , _allowRemove (allowRemove)
+	    , _triggerOverrideClause (triggerOverrideClause)
+	    , _ignoreCallbacksOnFirstSync (ignoreCallbacksOnFirstSync)
+	    , _enableTriggers (true)
+	{ }
 
 
 
-		SQLiteTableSync::~SQLiteTableSync ()
-		{
+	SQLiteTableSync::~SQLiteTableSync ()
+	{
 
-		}
-
-
-
-		void 
-		SQLiteTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
-						synthese::db::SQLiteSync* sync)
-		{
-		    // Pre-init phase
-		    beforeFirstSync (sqlite, sync);
+	}
 
 
-			const SQLiteTableFormat& format = getTableFormat ();
 
-			// Check if the table already exists
+	void 
+	SQLiteTableSync::firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+				    synthese::db::SQLiteSync* sync)
+	{
+	    // Pre-init phase
+	    beforeFirstSync (sqlite, sync);
 
-			std::string sql = "SELECT * FROM SQLITE_MASTER WHERE name='" + getTableName () + "'";
-			if (sqlite->execQuery (sql).getNbRows () == 0)
-			{
-				// Create the table if it does not already exist.
-				sql = "CREATE TABLE " + getTableName () + " (";
-				sql.append (format[0].name).append (" ").append (format[0].type).append (" UNIQUE PRIMARY KEY");
-				for (int i=1; i< (int) format.size (); ++i)
-				{
-					sql.append (", ").append (format[i].name).append (" ").append (format[i].type);
-				}
-				sql.append (")");
-				sqlite->execUpdate (sql);
-				
-				// Insert some triggers to prevent unallowed insert/update/remove operations
-				if (_allowInsert == false)
-				{
-					sql = "CREATE TRIGGER " ;
-					sql.append (getTableName () + "_no_insert");
-					sql.append (" BEFORE INSERT ON " + getTableName ());
-					sql.append (" BEGIN SELECT RAISE (ABORT, 'Insertion in " + getTableName () 
-						+ " is forbidden.') WHERE " + getTriggerOverrideClause () + "; END;");
-					sqlite->execUpdate (sql);
-				}
-				
-				if (_allowRemove == false)
-				{
-					sql = "CREATE TRIGGER " ;
-					sql.append (getTableName () + "_no_remove");
-					sql.append (" BEFORE DELETE ON " + getTableName ());
-					sql.append (" BEGIN SELECT RAISE (ABORT, 'Deletion in " + getTableName () 
-						+ " is forbidden.') WHERE " + getTriggerOverrideClause () + "; END;");
-					sqlite->execUpdate (sql);
-				}
 
-				std::vector<std::string> nonUpdatableColumns;
-				for (SQLiteTableFormat::const_iterator it = _tableFormat.begin ();
-					it != _tableFormat.end (); ++it)
-				{
-					SQLiteTableColumnFormat columnFormat = *it;
-					if (columnFormat.updatable == false)
-					{
-						nonUpdatableColumns.push_back (columnFormat.name);
-					}
-				}
-				
-				if (nonUpdatableColumns.empty () == false)
-				{
-					sql = "CREATE TRIGGER " ;
-					sql.append (getTableName () + "_no_update");
-					sql.append (" BEFORE UPDATE OF ");
-					std::string columnList;
-					for (int i=0; i< (int) nonUpdatableColumns.size (); ++i)
-					{
-					columnList.append (nonUpdatableColumns[i]);
-					if (i != nonUpdatableColumns.size () - 1) columnList.append (", ");
-					}
-					sql.append (columnList);
-					sql.append (" ON " + getTableName ());
-					sql.append (" BEGIN SELECT RAISE (ABORT, 'Update of " + columnList + " in " + getTableName () 
-						+ " is forbidden.') WHERE " + getTriggerOverrideClause () + "; END;");
-					sqlite->execUpdate (sql);
-				}
+	    // Check if the table already exists
+	    std::string sql = "SELECT * FROM SQLITE_MASTER WHERE name='" + getTableName () + "'";
+	    if (sqlite->execQuery (sql).getNbRows () == 0)
+	    {
+		// If not, create it...
+		createTable (sqlite);
+	    }
+	    else
+	    {
+		// ...otherwise, tries to adapt it.
+		alterTable (sqlite);
+	    }
 			
-			}
-			
-			// Callbacks according to what already exists in the table.
-			if (_ignoreCallbacksOnFirstSync == false)
-			{
-			    SQLiteResult result = sqlite->execQuery ("SELECT * FROM " + getTableName ());
-			    rowsAdded (sqlite, sync, result);
-			    initAutoIncrement(sqlite);
-			}
+	    // Callbacks according to what already exists in the table.
+	    if (_ignoreCallbacksOnFirstSync == false)
+	    {
+		SQLiteResult result = sqlite->execQuery ("SELECT * FROM " + getTableName ());
+		rowsAdded (sqlite, sync, result);
+	    }
 
-			// Post-init phase
-			afterFirstSync (sqlite, sync);
+	    initAutoIncrement (sqlite);
+
+	    // Post-init phase
+	    afterFirstSync (sqlite, sync);
 			
 
-		}
+	}
 
 		    
 
-	    void 
-	    SQLiteTableSync::beforeFirstSync (const synthese::db::SQLiteThreadExec* sqlite, 
-					      synthese::db::SQLiteSync* sync)
-	    {
-	    }
+	void 
+	SQLiteTableSync::beforeFirstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+					  synthese::db::SQLiteSync* sync)
+	{
+	}
 
-	    void 
-	    SQLiteTableSync::afterFirstSync (const synthese::db::SQLiteThreadExec* sqlite, 
-					     synthese::db::SQLiteSync* sync)
-	    {
-	    }
-
-
-		const std::string& 
-		SQLiteTableSync::getTableName () const
-		{
-			return _tableName;
-		}
+	void 
+	SQLiteTableSync::afterFirstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+					 synthese::db::SQLiteSync* sync)
+	{
+	}
 
 
-		int 
-		SQLiteTableSync::getTableId () const
-		{
-			return ParseTableId (_tableName);
-		}
+	const std::string& 
+	SQLiteTableSync::getTableName () const
+	{
+	    return _tableName;
+	}
 
 
-
-
-
-
-		const SQLiteTableFormat& 
-		SQLiteTableSync::getTableFormat () const
-		{
-			return _tableFormat;
-		}
+	int 
+	SQLiteTableSync::getTableId () const
+	{
+	    return ParseTableId (_tableName);
+	}
 
 
 
 
 
-		void 
-		SQLiteTableSync::addTableColumn (const std::string& columnName, 
-						const std::string& columnType,
-						bool updatable)
-		{
-			SQLiteTableColumnFormat columnFormat;
-			columnFormat.name = columnName;
-			columnFormat.type = columnType;
-			columnFormat.updatable = updatable;
-			_tableFormat.push_back (columnFormat);
-		}
+
+	const SQLiteTableFormat& 
+	SQLiteTableSync::getTableFormat () const
+	{
+	    return _tableFormat;
+	}
 
 
 
 
-		int 
-		SQLiteTableSync::ParseTableId (const std::string& tableName)
-		{
-			return Conversion::ToInt (tableName.substr (1, 4));
-		}
 
-		void SQLiteTableSync::initAutoIncrement(const SQLiteThreadExec* sqlite)
-		{
-
-		}
-
-	    
-
-
-	    bool 
-	    SQLiteTableSync::getIgnoreCallbacksOnFirstSync () const
-	    {
-		return _ignoreCallbacksOnFirstSync;
-	    }
-		
-
-	    void 
-	    SQLiteTableSync::setIgnoreCallbacksOnFirstSync (bool ignoreCallbacksOnFirstSync)
-	    {
-		_ignoreCallbacksOnFirstSync = ignoreCallbacksOnFirstSync;
-	    }
+	void 
+	SQLiteTableSync::addTableColumn (const std::string& columnName, 
+					 const std::string& columnType,
+					 bool updatable)
+	{
+	    SQLiteTableColumnFormat columnFormat;
+	    columnFormat.name = columnName;
+	    columnFormat.type = columnType;
+	    columnFormat.updatable = updatable;
+	    _tableFormat.push_back (columnFormat);
+	}
 
 
-	    
-
-	    void 
-	    SQLiteTableSync::setEnableTriggers (bool enableTriggers)
-	    {
-		_enableTriggers = enableTriggers;
-	    }
 
 
-	    
-	    std::string 
-	    SQLiteTableSync::getTriggerOverrideClause () const
-	    {
-		return _enableTriggers ? _triggerOverrideClause : "0";
-	    }
+	int 
+	SQLiteTableSync::ParseTableId (const std::string& tableName)
+	{
+	    return Conversion::ToInt (tableName.substr (1, 4));
+	}
 
+	void SQLiteTableSync::initAutoIncrement(const SQLiteThreadExec* sqlite)
+	{
 
 	}
+
+	    
+
+
+	bool 
+	SQLiteTableSync::getIgnoreCallbacksOnFirstSync () const
+	{
+	    return _ignoreCallbacksOnFirstSync;
+	}
+		
+
+	void 
+	SQLiteTableSync::setIgnoreCallbacksOnFirstSync (bool ignoreCallbacksOnFirstSync)
+	{
+	    _ignoreCallbacksOnFirstSync = ignoreCallbacksOnFirstSync;
+	}
+
+
+	    
+
+	void 
+	SQLiteTableSync::setEnableTriggers (bool enableTriggers)
+	{
+	    _enableTriggers = enableTriggers;
+	}
+
+
+	    
+	std::string 
+	SQLiteTableSync::getTriggerOverrideClause () const
+	{
+	    return _enableTriggers ? _triggerOverrideClause : "0";
+	}
+
+	
+
+	void 
+	SQLiteTableSync::createTable (const synthese::db::SQLiteThreadExec* sqlite)
+	{
+		const SQLiteTableFormat& format = getTableFormat ();
+
+		// Create the table if it does not already exist.
+		std::string sql = "CREATE TABLE " + getTableName () + " (";
+		sql.append (format[0].name).append (" ").append (format[0].type).append (" UNIQUE PRIMARY KEY");
+		for (int i=1; i< (int) format.size (); ++i)
+		{
+		    sql.append (", ").append (format[i].name).append (" ").append (format[i].type);
+		}
+		sql.append (")");
+		sqlite->execUpdate (sql);
+				
+		// Insert some triggers to prevent unallowed insert/update/remove operations
+		if (_allowInsert == false)
+		{
+		    sql = "CREATE TRIGGER " ;
+		    sql.append (getTableName () + "_no_insert");
+		    sql.append (" BEFORE INSERT ON " + getTableName ());
+		    sql.append (" BEGIN SELECT RAISE (ABORT, 'Insertion in " + getTableName () 
+				+ " is forbidden.') WHERE " + getTriggerOverrideClause () + "; END;");
+		    sqlite->execUpdate (sql);
+		}
+				
+		if (_allowRemove == false)
+		{
+		    sql = "CREATE TRIGGER " ;
+		    sql.append (getTableName () + "_no_remove");
+		    sql.append (" BEFORE DELETE ON " + getTableName ());
+		    sql.append (" BEGIN SELECT RAISE (ABORT, 'Deletion in " + getTableName () 
+				+ " is forbidden.') WHERE " + getTriggerOverrideClause () + "; END;");
+		    sqlite->execUpdate (sql);
+		}
+
+		std::vector<std::string> nonUpdatableColumns;
+		for (SQLiteTableFormat::const_iterator it = _tableFormat.begin ();
+		     it != _tableFormat.end (); ++it)
+		{
+		    SQLiteTableColumnFormat columnFormat = *it;
+		    if (columnFormat.updatable == false)
+		    {
+			nonUpdatableColumns.push_back (columnFormat.name);
+		    }
+		}
+				
+		if (nonUpdatableColumns.empty () == false)
+		{
+		    sql = "CREATE TRIGGER " ;
+		    sql.append (getTableName () + "_no_update");
+		    sql.append (" BEFORE UPDATE OF ");
+		    std::string columnList;
+		    for (int i=0; i< (int) nonUpdatableColumns.size (); ++i)
+		    {
+			columnList.append (nonUpdatableColumns[i]);
+			if (i != nonUpdatableColumns.size () - 1) columnList.append (", ");
+		    }
+		    sql.append (columnList);
+		    sql.append (" ON " + getTableName ());
+		    sql.append (" BEGIN SELECT RAISE (ABORT, 'Update of " + columnList + " in " + getTableName () 
+				+ " is forbidden.') WHERE " + getTriggerOverrideClause () + "; END;");
+		    sqlite->execUpdate (sql);
+		}
+			
+	}
+
+
+	
+	void 
+	SQLiteTableSync::alterTable (const synthese::db::SQLiteThreadExec* sqlite)
+	{
+	    // This instance table format.
+	    const SQLiteTableFormat& format = getTableFormat ();
+
+	    // The actual format in database.
+	    SQLiteTableFormat dbformat;
+	    
+	    
+
+	}
+
+
+
+
+
+    }
 }
 

@@ -125,6 +125,20 @@ namespace synthese
 
 			std::string getTriggerOverrideClause () const;
 
+			/** Creates table in SQLite db according to this class
+			 * table format.
+			 */
+			void createTable (const synthese::db::SQLiteThreadExec* sqlite);
+
+			/** Adapts table in SQLite db to conform to this class 
+			 * table format.
+			 * Right now, only new column addition/insertion is supported.
+			 * Any other change to table schema is not supported yet.
+			 */
+			void alterTable (const synthese::db::SQLiteThreadExec* sqlite);
+
+
+
 		};
 	}
 }

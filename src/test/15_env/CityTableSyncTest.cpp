@@ -74,13 +74,13 @@ namespace env
 	  CityTableSync* citySync = new CityTableSync ();  
           citySync->setEnableTriggers (false); // Override triggers for testing
 
-	  syncHook->addTableSynchronizer (envSync);
-	  syncHook->addTableSynchronizer (citySync);
+	  syncHook->addTableSynchronizer ("0", envSync);
+	  syncHook->addTableSynchronizer ("1", citySync);
 
 	  // Create the env link synchronizer after having added the component synchronizers
 	  EnvironmentLinkTableSync* envLinkSync = new EnvironmentLinkTableSync ();
 
-	  syncHook->addTableSynchronizer (envLinkSync);
+	  syncHook->addTableSynchronizer ("2", envLinkSync);
 
 	  sqliteExec->registerUpdateHook (syncHook);
 	  sqliteExec->initialize ();
@@ -266,13 +266,13 @@ namespace env
 	  CityTableSync* citySync = new CityTableSync ();
           citySync->setEnableTriggers (false); // Override triggers for testing
 
-	  syncHook->addTableSynchronizer (envSync);
-	  syncHook->addTableSynchronizer (citySync);
+	  syncHook->addTableSynchronizer ("0", envSync);
+	  syncHook->addTableSynchronizer ("1", citySync);
 
 	  // Create the env link synchronizer after having added the component synchronizers
 	  EnvironmentLinkTableSync* envLinkSync = new EnvironmentLinkTableSync ();
 
-	  syncHook->addTableSynchronizer (envLinkSync);
+	  syncHook->addTableSynchronizer ("2", envLinkSync);
 	  
 	  uid environmentId = synthese::util::encodeUId (envSync->getTableId (), 0, 0, 0);
 	  uid cityId0 = synthese::util::encodeUId (citySync->getTableId (), 0, 0, 0);

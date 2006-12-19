@@ -22,6 +22,7 @@
 
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
+#include "01_util/Thread.h"
 #include "01_util/Factory.h"
 
 #include "02_db/SQLite.h"
@@ -128,16 +129,22 @@ namespace synthese
 
 
 
-		void 
-		SQLiteThreadExec::enqueueEvent (const SQLiteEvent& event)
-		{
-			boost::recursive_mutex::scoped_lock queueLock (*_queueMutex);
-			_eventQueue.push_back (event);
-		}
+	    void 
+	    SQLiteThreadExec::enqueueEvent (const SQLiteEvent& event)
+	    {
+		boost::recursive_mutex::scoped_lock queueLock (*_queueMutex);
+		_eventQueue.push_back (event);
+	    }
+	    
+	    
 
-
-
-
+	    
+	    bool 
+	    SQLiteThreadExec::hasEnqueuedEvent () const
+	    {
+		boost::recursive_mutex::scoped_lock queueLock (*_queueMutex);
+		return _eventQueue.empty () == false;
+	    }
 
 
 
@@ -208,11 +215,20 @@ namespace synthese
 
 
 		void 
-		SQLiteThreadExec::execUpdate (const std::string& sql) const
+		SQLiteThreadExec::execUpdate (const std::string& sql, bool asynchronous) const
 		{
+		    {
 			// Only one thread can use this db at the same time.
 			boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
 			SQLite::ExecUpdate (_db, sql);
+		    }
+		    if (asynchronous == false) 
+		    {
+			while (hasEnqueuedEvent ()) 
+			{
+			    Thread::Sleep (1);			    
+			}
+		    }
 		}
 	}
 }

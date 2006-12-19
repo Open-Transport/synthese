@@ -17,9 +17,9 @@ namespace synthese
 
 	namespace security
 	{
-		const std::string AddUserAction::PARAMETER_NAME = Action::PARAMETER_PREFIX + "nm";
-		const std::string AddUserAction::PARAMETER_LOGIN = Action::PARAMETER_PREFIX + "lg";
-		const std::string AddUserAction::PARAMETER_PROFILE_ID = Action::PARAMETER_PREFIX + "pid";
+		const std::string AddUserAction::PARAMETER_NAME = "actionParamnm";
+		const std::string AddUserAction::PARAMETER_LOGIN = "actionParamlg";
+		const std::string AddUserAction::PARAMETER_PROFILE_ID = "actionParampid";
 
 		Request::ParametersMap AddUserAction::getParametersMap() const
 		{

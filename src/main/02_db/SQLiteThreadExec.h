@@ -92,6 +92,7 @@ namespace synthese
 		    
 			//! @name Query methods.
 			//@{
+			bool hasEnqueuedEvent () const;
 			//@}
 
 
@@ -110,7 +111,7 @@ namespace synthese
 			//! @name SQLite db access methods.
 			//@{
 			SQLiteResult execQuery (const std::string& sql) const;
-			void execUpdate (const std::string& sql) const;
+			void execUpdate (const std::string& sql, bool asynchronous = false) const;
 			//@}
 
 

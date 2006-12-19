@@ -65,16 +65,17 @@ namespace synthese
 			typedef std::map<std::string, CreatorInterface*> Map;
 
 			/** The registered subclasses map.
-
-			The pointer permits to avoid a preliminary instantiation of the factory before the adding of the subclasses. 
 			*/
-			static Map* _registeredCreator;
+			static Map _registeredCreator;
+
+
+
 
 		public:
 
 			static size_t size()
 			{
-				return (_registeredCreator == NULL) ? 0 : _registeredCreator->size();
+				return _registeredCreator.size();
 			}
 
 			/** Subclass registration.
@@ -86,31 +87,31 @@ namespace synthese
 			{
 				Log::GetInstance ().info ("Registering compound... " + key);
 
-				// The first integration allocates the static map
-				if (_registeredCreator == NULL)
-					_registeredCreator = new Map;
-
 				// If the key is already used then return false (it would be better to use exceptions)
-				if(_registeredCreator->find(key) != _registeredCreator->end())
+				if(_registeredCreator.find(key) != _registeredCreator.end())
 					throw FactoryException<RootObject>("Attempted to integrate a class twice");
 
 				// Saving of the auto generated builder
 				CreatorInterface* creator = new Creator<T>;
-				_registeredCreator->insert(std::pair<typename Map::key_type, CreatorInterface*>(key, creator));
+				_registeredCreator.insert(std::pair<typename Map::key_type, 
+							       CreatorInterface*>(key, creator));
 			}
 
 			template <class T>
 				static typename Map::key_type getKey()
 			{
 				// If no registered classes
-				if (_registeredCreator == NULL)
+				if (size () == 0)
 					throw FactoryException<RootObject>("Factorable class not found (empty factory)");
 
 				// Search for a creator for the T class
 				typename Map::const_iterator it;
-				for (it = _registeredCreator->begin(); it != _registeredCreator->end(); ++it)
-					if (dynamic_cast<Creator<T>*>(it->second) != NULL)
-						return it->first;
+				for (it = _registeredCreator.begin(); 
+				     it != _registeredCreator.end(); ++it)
+				{
+				    if (dynamic_cast<Creator<T>*>(it->second) != NULL)
+					return it->first;
+				}
 
 				// No such creator was founded
 				throw FactoryException<RootObject>("Factorable class not found");
@@ -120,10 +121,10 @@ namespace synthese
 			static bool contains( const typename Map::key_type& key )
 			{
 				// Search of the key of the wished class in the map
-				typename Map::iterator it = _registeredCreator->find(key);
+				typename Map::iterator it = _registeredCreator.find(key);
 
 				// The key is not found
-				return it != _registeredCreator->end();
+				return it != _registeredCreator.end();
 			}
 
 			template<class T>
@@ -138,15 +139,15 @@ namespace synthese
 			static RootObject* create(const typename Map::key_type& key)
 			{
 				// The factory "single object" was never filled
-				if (_registeredCreator == NULL)
+				if (size () == 0)
 					throw FactoryException<RootObject>("Unable to factor "+ key +" object (empty factory)");
 
 				// Search of the key of the wished class in the map
-				typename Map::iterator it = _registeredCreator->find(key);
+				typename Map::iterator it = _registeredCreator.find(key);
 
 				// The key is not found
-				if(it == _registeredCreator->end())
-					throw FactoryException<RootObject>("Unable to factor "+ key +" object (class not found)");
+				if(it == _registeredCreator.end())
+				    throw FactoryException<RootObject>("Unable to factor "+ key +" object (class not found)");
 
 				// The key is found : return of an instance of the object
 				RootObject* object = it->second->create();
@@ -156,7 +157,8 @@ namespace synthese
 
 			static void destroy()
 			{
-				delete _registeredCreator;
+			    // MJ : never called; review memory management...
+                            //delete _registeredCreator;
 			}
 
 			class Iterator
@@ -239,7 +241,7 @@ namespace synthese
 			*/
 			static Iterator begin()
 			{		
-				return Iterator( _registeredCreator->begin() );
+				return Iterator( _registeredCreator.begin() );
 			}
 
 			/** Last iterator on the subclasses.
@@ -247,12 +249,12 @@ namespace synthese
 			*/
 			static Iterator end()
 			{
-				return Iterator( _registeredCreator->end() );
+				return Iterator( _registeredCreator.end() );
 			}
 		};
 
 		template <class T>
-			typename Factory<T>::Map* Factory<T>::_registeredCreator = NULL;
+			typename Factory<T>::Map Factory<T>::_registeredCreator;
 
 	}
 }
