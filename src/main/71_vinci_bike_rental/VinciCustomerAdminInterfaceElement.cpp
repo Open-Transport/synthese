@@ -11,7 +11,10 @@
 #include "57_accounting/Transaction.h"
 #include "57_accounting/TransactionTableSync.h"
 
+#include "71_vinci_bike_rental/RentABikeAction.h"
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
+#include "71_vinci_bike_rental/VinciRate.h"
+#include "71_vinci_bike_rental/VinciRateTableSync.h"
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
 #include "71_vinci_bike_rental/VinciUpdateCustomerAction.h"
@@ -63,7 +66,7 @@ namespace synthese
 			AdminRequest* addRentRequest = Factory<Request>::create<AdminRequest>();
 			addRentRequest->copy(request);
 			addRentRequest->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
-//			addRentRequest->setAction(Factory<Action>::create<VinciAddBikeRentAction>());
+			addRentRequest->setAction(Factory<Action>::create<RentABikeAction>());
 
 			// Personal Data
 			stream
@@ -100,7 +103,15 @@ namespace synthese
 					<< "<tr>"
 					<< "<td>" << transaction->getStartDateTime().toSQLiteString(false) << "</td>"
 					<< "<td>" << Conversion::ToString((*it)->getRightCurrencyAmount()) << "</td>"
-					<< "<td>Rendre la caution</td>"
+					<< "<td>"
+					;
+				if (transaction->getEndDateTime().isUnknown())
+					stream << "Rendre la caution";
+				else
+					stream << "Caution rendue le " << transaction->getEndDateTime().toSQLiteString(false);
+
+				stream
+					<< "</td>"
 					<< "</tr>";
 
 				delete transaction;
@@ -116,15 +127,43 @@ namespace synthese
 				;
 
 			// Rents
-			vector<TransactionPart*> rents = TransactionPartTableSync::searchTransactionParts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getGuaranteeAccount(), user);
+			vector<TransactionPart*> rents = TransactionPartTableSync::searchTransactionParts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), user);
+			vector<VinciRate*> rates = VinciRateTableSync::searchVinciRates();
 			stream
 				<< "<h1>Locations</h1>"
 				<< addRentRequest->getHTMLFormHeader("addrent")
-				<< "<input type=\"hidden\" name=\"" << VinciAddGuaranteeAction::PARAMETER_CONTRACT_ID << "\" value=\"" << contract->getKey() << "\" />"
+				<< "<input type=\"hidden\" name=\"" << RentABikeAction::PARAMETER_CONTRACT_ID << "\" value=\"" << contract->getKey() << "\" />"
 				<< "<table>"
 				<< "<tr><th>Date</th><th>Vélo</th><th>Tarif</th></tr>"
 				;
+			for (vector<TransactionPart*>::iterator it = rents.begin(); it != rents.end(); ++it)
+			{
+				Transaction* transaction = TransactionTableSync::get(ServerModule::getSQLiteThread(), (*it)->getTransactionId());
+								
+				VinciRate* rate = NULL;
+				if ((*it)->getRateId() > 0)
+					rate = VinciRateTableSync::get(ServerModule::getSQLiteThread(), (*it)->getRateId());
 
+				stream
+					<< "<tr>"
+					<< "<td>" << transaction->getStartDateTime().toSQLiteString(false) << "</td>"
+					<< "<td>" << Conversion::ToString((*it)->getTradedObjectId()) << "</td>"
+					<< "<td>" << ((rate == NULL) ? "" : rate->getName())  << "</td>"
+					<< "</tr>"
+					;
+			}
+			stream
+				<< "<tr>"
+				<< "<td><input type=\"submit\" value=\"Nouvelle location\" /></td>"
+				<< "<td><input size=\"10\" name=\"" << RentABikeAction::PARAMETER_BIKE_ID << "\" /></td>"
+				<< "<td><select name=\"" << RentABikeAction::PARAMETER_RATE_ID << "\">"
+				;
+			for (vector<VinciRate*>::iterator it = rates.begin(); it != rates.end(); ++it)
+				stream << "<option value=\"" << Conversion::ToString((*it)->getKey()) << "\">" << (*it)->getName() << "</option>";
+			stream
+				<< "</select></td>"
+				<< "</tr>";
+				;
 
 
 

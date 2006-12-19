@@ -47,9 +47,8 @@ namespace synthese
 			@author Hugues Romain
 			@date 2006	
 			*/
-			static std::vector<VinciRate*> searchVinciRates(const db::SQLiteThreadExec* sqlite
-
-				, int first = 0, int number = 0);
+			static std::vector<VinciRate*> searchVinciRates(
+				int first = 0, int number = -1);
 
 
 		protected:

@@ -10,7 +10,7 @@
 #include "02_db/SQLiteException.h"
 #include "02_db/SQLiteSync.h"
 
-using synthese::util::Conversion;
+using namespace std;
 
 namespace synthese
 {
@@ -36,12 +36,13 @@ namespace synthese
 		 
 
 		void 
-		SQLiteSync::addTableSynchronizer (SQLiteTableSync* synchronizer)
+		SQLiteSync::addTableSynchronizer (const string& rank, SQLiteTableSync* synchronizer)
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
 			assert (synchronizer->getTableFormat ().empty () == false);
 			_tableSynchronizers.insert (std::make_pair (synchronizer->getTableName (), synchronizer));
+			_rankedTableSynchronizers.insert(make_pair(rank, synchronizer));
 		}
 
 
@@ -86,8 +87,8 @@ namespace synthese
 			
 			// Call the init sequence on all synchronizers.
 			for (std::map<std::string, SQLiteTableSync*>::const_iterator it = 
-				 _tableSynchronizers.begin (); 
-			     it != _tableSynchronizers.end (); ++it)
+				 _rankedTableSynchronizers.begin (); 
+			     it != _rankedTableSynchronizers.end (); ++it)
 			{
 			    it->second->firstSync (emitter, this);
 			}

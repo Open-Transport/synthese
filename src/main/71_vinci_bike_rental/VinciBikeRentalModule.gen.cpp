@@ -16,3 +16,4 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::Ad
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::VinciUpdateCustomerAction>("vinciupdatecustomer");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::VinciAddGuaranteeAction>("vinciaddguarantee");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::VinciAddBike>("vinciaddbike");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::RentABikeAction>("rentabike");

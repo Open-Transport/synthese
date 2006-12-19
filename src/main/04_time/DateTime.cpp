@@ -402,7 +402,9 @@ operator - ( const DateTime& op, const int& minutesDuration )
 DateTime // AAAA/MM/JJ hh:mm
 DateTime::FromSQLTimestamp (const std::string& sqlTimestamp)
 {
-    return DateTime (Conversion::ToInt (sqlTimestamp.substr (8, 2)),
+    return sqlTimestamp == ""
+		? DateTime(time::TIME_UNKNOWN)
+		: DateTime (Conversion::ToInt (sqlTimestamp.substr (8, 2)),
 		     Conversion::ToInt (sqlTimestamp.substr (5, 2)),
 		     Conversion::ToInt (sqlTimestamp.substr (0, 4)),
 		     Conversion::ToInt (sqlTimestamp.substr (11, 2)),
@@ -425,9 +427,15 @@ DateTime::FromString (const std::string& str)
 
 std::string DateTime::toSQLiteString(bool withApostrophes) const
 {
-	return (withApostrophes ? "'" : "") + _date.toSQLiteString(false) + " " + _hour.toSQLiteString(false) + (withApostrophes ? "'" : "");
+	return isUnknown()
+		? "NULL"
+		: ((withApostrophes ? "'" : "") + _date.toSQLiteString(false) + " " + _hour.toSQLiteString(false) + (withApostrophes ? "'" : ""));
 }
 
+bool DateTime::isUnknown() const
+{
+	return _date.isUnknown();
+}
 
 }
 }

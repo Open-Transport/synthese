@@ -299,5 +299,13 @@ namespace synthese
 			return accounts.front();
 		}
 
+		Account* VinciBikeRentalModule::getAccount(const std::string& code)
+		{
+			vector<Account*> accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), code, 0, "");
+			if (accounts.size() == 0)
+				throw Exception("Vinci bike rental module incomplete installation : the " + code + " account is missing");
+			return accounts.front();
+		}
+
 	}
 }

@@ -52,12 +52,12 @@ namespace synthese
 			SQLiteSync* syncHook = new SQLiteSync (TABLE_COL_ID);
 
 			// Register all table syncs
-			for (Factory<SQLiteTableSync>::Iterator tableSync = 
+			for (Factory<SQLiteTableSync>::Iterator it = 
 				 Factory<SQLiteTableSync>::begin(); 
-			     tableSync != Factory<SQLiteTableSync>::end(); 
-			     ++tableSync)
+			     it != Factory<SQLiteTableSync>::end(); 
+			     ++it)
 			{
-			    syncHook->addTableSynchronizer (*tableSync);
+				syncHook->addTableSynchronizer(it.getKey(), it.getObject());
 			}
 			
 			_sqliteThreadExec->registerUpdateHook (syncHook);

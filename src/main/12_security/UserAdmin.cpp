@@ -21,9 +21,9 @@ namespace synthese
 		void UserAdmin::display( std::ostream& stream, const interfaces::ParametersVector& parameters, const void* rootObject /* = NULL */, const server::Request* request /* = NULL */ ) const
 		{
 			stream
-				<< "<TABLE>"
-				<< "<TR><Th colSpan=\"2\">Connexion</Th></TR>"
-				<< "<TR><TD>Login</TD><TD><INPUT value=\"gerard\" type=\"text\" name=\"Text1\"></TD></TR>"
+				<< "<table>"
+				<< "<tr><th colSpan=\"2\">Connexion</th></tr>"
+				<< "<TR><TD>Login</TD><TD><input value=\"\" type=\"text\" name=\"Text1\"></TD></TR>"
 				<< "<TR><TD>Mot de passe</TD><TD><INPUT type=\"password\" value=\"\" name=\"Password1\"></TD></TR>"
 				<< "<TR><TD>Mot de passe (vérification)</TD><TD><INPUT type=\"password\" value=\"\" name=\"Password1\"></TD></TR>"
 				<< "<TR><th colSpan=\"2\">Coordonnées</th></TR>"

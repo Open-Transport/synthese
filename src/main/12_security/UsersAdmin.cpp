@@ -53,7 +53,7 @@ namespace synthese
 			// Request for add user action form
 			AdminRequest* addUserRequest = Factory<Request>::create<AdminRequest>();
 			addUserRequest->copy(request);
-			addUserRequest->setPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
+			addUserRequest->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
 			addUserRequest->setAction(Factory<Action>::create<AddUserAction>());
 
 			// Request for delete action form
@@ -88,8 +88,9 @@ namespace synthese
 			vector<User*> users = UserTableSync::searchUsers(ServerModule::getSQLiteThread()
 				, currentRequest->getStringParameter(PARAM_SEARCH_LOGIN, "")
 				, currentRequest->getStringParameter(PARAM_SEARCH_NAME, "")
+				, currentRequest->getLongLongParameter(PARAM_SEARCH_PROFILE_ID, 0)
 				, currentRequest->getIntParameter(PARAM_SEARCH_FIRST, 0)
-				, currentRequest->getIntParameter(PARAM_SEARCH_NUMBER, 0)
+				, currentRequest->getIntParameter(PARAM_SEARCH_NUMBER, 20)
 			);
 
 			stream << "<h1>Résultats de la recherche</h1>";
@@ -100,7 +101,7 @@ namespace synthese
 
 			stream << "<table><tr><th>Sel</th><th>Login</th><th>Nom</th><th>Profil</th><th>Action</th></tr>";
 
-			for(vector<User*>::const_iterator it = users.begin(); it != users.end(); ++it)
+			for(vector<User*>::iterator it = users.begin(); it != users.end(); ++it)
 			{
 				User* user = *it;
 
@@ -110,8 +111,10 @@ namespace synthese
 					<< "<td>" << userRequest->getHTMLLink(user->getLogin()) << "</td>"
 					<< "<td>" << userRequest->getHTMLLink(user->getName()) << "</td>"
 					<< "<td>" << user->getProfile()->getName() << "</td>"
-					<< "<td></TD>"
-					<< "</TR>";
+					<< "<td></td>"
+					<< "</tr>";
+				
+				delete *it;
 			}
 
 			stream
@@ -134,7 +137,7 @@ namespace synthese
 				<< "</TABLE>";
 
 			// If too much users
-			if (currentRequest->getIntParameter(PARAM_SEARCH_NUMBER, 0) > 0 && users.size() >= currentRequest->getIntParameter(PARAM_SEARCH_NUMBER, 0))
+			if (currentRequest->getIntParameter(PARAM_SEARCH_NUMBER, 20) > 0 && users.size() >= currentRequest->getIntParameter(PARAM_SEARCH_NUMBER, 20))
 				stream << "<p style=\"text-align:right\">Utilisateurs&nbsp;suivants</p>";
 
 			stream

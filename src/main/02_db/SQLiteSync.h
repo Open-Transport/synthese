@@ -35,7 +35,8 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
     std::string _idColumnName;
     bool _isRegistered;
 
-    std::map<std::string, SQLiteTableSync* > _tableSynchronizers;
+    std::map<std::string, SQLiteTableSync*> _tableSynchronizers;
+	std::map<std::string, SQLiteTableSync*> _rankedTableSynchronizers;
     mutable boost::recursive_mutex _tableSynchronizersMutex; 
 
  public:
@@ -50,8 +51,10 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
 
     /** Adds a new table synchronizer to this global synchronizer update hook.
 	This method is thread-safe.
+		@param rank Rank of the synchroniser in the load procedure
+		@param synchroniser The synchronizer singleton to store
     */
-    void addTableSynchronizer (SQLiteTableSync* synchronizer);
+	void addTableSynchronizer (const std::string& rank, SQLiteTableSync* synchronizer);
 
     bool hasTableSynchronizer (const std::string& tableName) const;
     SQLiteTableSync* getTableSynchronizer (const std::string& tableName) const;

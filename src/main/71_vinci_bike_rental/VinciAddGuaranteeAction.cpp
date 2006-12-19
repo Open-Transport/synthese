@@ -25,6 +25,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace accounts;
+	using namespace time;
 	
 	namespace vinci
 	{
@@ -62,11 +63,13 @@ namespace synthese
 
 		void VinciAddGuaranteeAction::run()
 		{
-			time::DateTime now;
+			DateTime now;
+			DateTime unknownDate(TIME_UNKNOWN);
 
 			// Transaction
 			Transaction* transaction = new Transaction;
 			transaction->setStartDateTime(now);
+			transaction->setEndDateTime(unknownDate);
 			transaction->setLeftUserId(_contract->getUserId());
 			TransactionTableSync::save(ServerModule::getSQLiteThread(), transaction);
 

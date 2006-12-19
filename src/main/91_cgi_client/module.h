@@ -1,4 +1,4 @@
-/** 71_cgi_client module wide definitions
+/** 91_cgi_client module wide definitions
 	@file 71_cgi_client/module.h
 */
 
@@ -8,7 +8,7 @@
 namespace synthese
 {
 
-	/** @defgroup m71 71 CGI Client
+	/** @defgroup m91 91 CGI Client
 
 		Le client CGI est destiné à l'usage de SYNTHESE dans le cadre d'un site web. Il permet au serveur web de commander à SYNTHESE des pages web contenant les résultats de requêtes. L'interface définit le langage de sortie des pages, qui est ainsi indéfini. En règle général, le client CGI est utilisé pour obtenir des pages HTML ou XML.
 
@@ -25,7 +25,7 @@ namespace synthese
 	#define WELCOME_MSG "Welcome to SYNTHESE"
 
 
-	/** 71 cgi_client namespace */
+	/** 91 cgi_client namespace */
 	namespace cgi_client
 	{
 

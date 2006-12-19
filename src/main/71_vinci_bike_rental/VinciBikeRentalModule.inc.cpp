@@ -16,3 +16,4 @@
 #include "71_vinci_bike_rental/AddCustomerAction.h"
 #include "71_vinci_bike_rental/VinciUpdateCustomerAction.h"
 #include "71_vinci_bike_rental/VinciAddGuaranteeAction.h"
+#include "71_vinci_bike_rental/RentABikeAction.h"

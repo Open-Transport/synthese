@@ -101,5 +101,14 @@ namespace synthese
 			return _recurringPenaltyPeriod;
 		}
 
+		const std::string& VinciRate::getName() const
+		{
+			return _name;
+		}
+
+		void VinciRate::setName( const std::string& name )
+		{
+			_name = name;
+		}
 	}
 }

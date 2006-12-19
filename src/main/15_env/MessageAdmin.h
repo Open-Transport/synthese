@@ -50,11 +50,8 @@ namespace synthese
 				-# <b>Diffusion</b>
 					-# <tt>Liste des afficheurs</tt> : Tableau rappelant les afficheurs qui recevront le message, désignés par leur emplacement précis. Chaque afficheur est complété par une pastille montrant son état matériel, afin d'éclairer l'utilisateur sur la réelle diffusion du messade qu'il peut attendre. Une infobulle précise la signification de la pastille, et apparait au contact du pointeur de souris.
 					-# Bouton <tt>Supprimer</tt> : permet de retirer un afficheur de la liste de diffusion
-					-# <tt>Arrêt logique</tt> : liste de choix permettant de sélectionner un arrêt logique comme source d'afficheurs destinataires. Un clic sur le bouton <tt>Ajouter</tt> correspondant ajoute à la liste de diffusion tous les afficheurs présents dans l'arrêt logique sélectionné. Le simple changement d'arrêt dans la liste entraine le rafraichissement de la page pour mettre à jour la liste des emplacements physiques.
-					-# <tt>Emplacement</tt> : liste de choix permettant de sélectionner un emplacement comme source d'afficheurs destinataires. Un clic sur le bouton <tt>Ajouter</tt> correspondant ajoute à la liste de diffusion tous les afficheurs présents au niveau de l'emplacement sélectionné. Le simple changement d'emplacement dans la liste entraine le rafraichissement de la page pour mettre à jour la liste des compléments de précision d'emplacement.
-					-# <tt>Complément</tt> : liste de choix permettant de sélectionner un afficheur unitairement comme source d'afficheurs destinataires. Un clic sur le bouton <tt>Ajouter</tt> correspondant ajoute à la liste de diffusion l'afficheur sélectionné.
-					-# <tt>Ligne</tt> : liste de choix permettant de sélectionner une ligne (toutes les lignes desservant au moins un arrêt contenant au moins un afficheur sont présentes dans la liste). Un clic sur le bouton <tt>Ajouter</tt> correspondant ajoute à la liste de diffusion tous les afficheurs desservis par la ligne
-				-# Le <b>bouton Envoyer</b> effectue l'envoi après effectuer les contrôles de validité des paramètres. Notamment :
+					-# <tt>Ajout d'afficheur</tt> : le formulaire de recherche permet de sélectionner des afficheurs pouvant être ajoutés à la liste de diffusion à l'aide du bouton <tt>Ajouter les afficheurs sélectionnés</tt>. Cette zone est identique à l'écran de gestion des afficheurs.
+				-# Le <b>bouton OK</b> effectue l'envoi après effectuer les contrôles de validité des paramètres. Notamment :
 					- au moins un afficheur doit être sélectionné.
 					- si au moins un afficheur est en état de panne, un message de confirmation apparait
 					- les controles de dates doivent être positifs

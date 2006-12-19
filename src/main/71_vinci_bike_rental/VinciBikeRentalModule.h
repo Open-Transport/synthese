@@ -137,6 +137,7 @@ namespace synthese
 			static accounts::Account* getGuaranteeAccount();
 			static accounts::Account* getCheckGuaranteeAccount();
 			static accounts::Account* getCardGuaranteeAccount();
+			static accounts::Account* getAccount(const std::string& code);
 		};
 		/** @} */
 	}

@@ -73,6 +73,7 @@ class DateTime
         //! @name Query methods
         //@{
         bool isValid () const;
+		bool isUnknown() const;
         std::string toInternalString () const;
 		std::string toSQLiteString(bool withApostrophes = true) const;
         //@}

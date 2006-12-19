@@ -35,6 +35,7 @@ namespace synthese
 		public:
 			VinciRate(uid id=0);
 
+			void setName(const std::string& name);
 			void setValidityDuration(int hours);
 			void setStartFinancialPrice(double price);
 			void setStartTicketsPrice(int price);
@@ -45,6 +46,7 @@ namespace synthese
 			void setRecurringPenalty(double price);
 			void setRecurringPenaltyPeriod(int hours);
 
+			const std::string& getName() const;
 			int getValidityDuration() const;
 			double getStartFinancialPrice() const;
 			int getStartTicketsPrice() const;

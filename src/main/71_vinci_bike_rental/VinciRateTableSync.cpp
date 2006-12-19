@@ -1,6 +1,8 @@
 
 #include <sstream>
 
+#include "30_server/ServerModule.h"
+
 #include "71_vinci_bike_rental/VinciRate.h"
 #include "71_vinci_bike_rental/VinciRateTableSync.h"
 
@@ -10,6 +12,7 @@ namespace synthese
 {
 	using namespace vinci;
 	using namespace db;
+	using namespace server;
 
 	namespace db
 	{
@@ -123,5 +126,31 @@ namespace synthese
 
 		}
 
+		std::vector<VinciRate*> VinciRateTableSync::searchVinciRates(
+				 int first, int number)
+		{
+			const db::SQLiteThreadExec* sqlite = ServerModule::getSQLiteThread();
+			stringstream query;
+			query
+				<< " SELECT * FROM " << TABLE_NAME
+				<< " ORDER BY " << TABLE_COL_NAME
+				;
+
+			SQLiteResult result = sqlite->execQuery(query.str());
+			vector<VinciRate*> rates;
+			for (int i=0; i<result.getNbRows(); ++i)
+			{
+				VinciRate* rate = new VinciRate;
+				try
+				{
+					load(rate, result, i);
+					rates.push_back(rate);
+				}
+				catch (Exception e)
+				{					
+				}
+			}
+			return rates;
+		}
 	}
 }

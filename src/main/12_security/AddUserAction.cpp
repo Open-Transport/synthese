@@ -57,6 +57,7 @@ namespace synthese
 			user->setName(_name);
 			user->setProfile(_profile);
 			UserTableSync::save(ServerModule::getSQLiteThread(), user);
+			_request->setObjectId(user->getKey());
 		}
 	}
 }
