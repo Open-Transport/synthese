@@ -92,10 +92,12 @@ namespace env
 	  
 	  uid environmentId = synthese::util::encodeUId (envSync->getTableId (), 0, 0, 0);
 
+	  // This test runs monothreaded, update must be done asynchronously
 	  sqliteExec->execUpdate (
 	      "INSERT INTO " + ENVIRONMENTS_TABLE_NAME + " (" + 
 	      TABLE_COL_ID + ") " + 
-	      "VALUES (" + Conversion::ToString (environmentId) + ")"
+	      "VALUES (" + Conversion::ToString (environmentId) + ")",
+	      true
 	      );
 	  sqliteExec->loop ();
 	  CPPUNIT_ASSERT_EQUAL (1, (int) environments.size ());
@@ -108,20 +110,24 @@ namespace env
 	  sqliteExec->execUpdate (
 	      "INSERT INTO " + CITIES_TABLE_NAME + " (" + 
 	      TABLE_COL_ID + ", " + CITIES_TABLE_COL_NAME + ") " + 
-	      "VALUES (" + Conversion::ToString (cityId0) + ", 'city_0')"
+	      "VALUES (" + Conversion::ToString (cityId0) + ", 'city_0')",
+	      true
 	      );
 	  sqliteExec->loop ();
 	  CPPUNIT_ASSERT_EQUAL (0, (int) env->getCities ().size ());
 	  
 	  uid environmentLinkId = synthese::util::encodeUId (envLinkSync->getTableId (), 0, 0, 0);
 
+	  // This test runs monothreaded, update must be done asynchronously
 	  sqliteExec->execUpdate (
 	      "INSERT INTO " + ENVIRONMENT_LINKS_TABLE_NAME + " (" + 
 	      TABLE_COL_ID + ", " + ENVIRONMENT_LINKS_TABLE_COL_ENVIRONMENTID + ", " + 
 	      ENVIRONMENT_LINKS_TABLE_COL_LINKTARGETID + 
 	      ") VALUES (" + Conversion::ToString (environmentLinkId) + ", " + 
 	      Conversion::ToString (environmentId) + ", " +
-	      Conversion::ToString (cityId0) + ")"
+	      Conversion::ToString (cityId0) + ")",
+	      true
+
 	      );
 
 	  sqliteExec->loop ();
@@ -153,7 +159,7 @@ namespace env
 	      Conversion::ToString (cityId2) + ") ;"
 	      );
 
-	  sqliteExec->execUpdate (sql);
+	  sqliteExec->execUpdate (sql, true);
 	  sqliteExec->loop ();
 	  CPPUNIT_ASSERT_EQUAL (1, (int) env->getCities ().size ());
 
@@ -168,7 +174,7 @@ namespace env
 	      TABLE_COL_ID + ", " + CITIES_TABLE_COL_NAME + ") " + 
 	      "VALUES (" + Conversion::ToString (cityId1) + ", 'city_1') ;"
 	      );
-	  sqliteExec->execUpdate (sql);
+	  sqliteExec->execUpdate (sql, true);
 	  sqliteExec->loop ();
 	  CPPUNIT_ASSERT_EQUAL (3, (int) env->getCities ().size ());
 	  CPPUNIT_ASSERT (env->getCities ().contains (cityId0));
@@ -182,7 +188,7 @@ namespace env
 	  sql = "";
 	  sql.append ("UPDATE " + CITIES_TABLE_NAME + " SET " + 
 		      CITIES_TABLE_COL_NAME + "='city_1_' WHERE " + TABLE_COL_ID + "=" + Conversion::ToString (cityId1));
-	  sqliteExec->execUpdate (sql);
+	  sqliteExec->execUpdate (sql, true);
 	  sqliteExec->loop ();
 	  CPPUNIT_ASSERT_EQUAL (3, (int) env->getCities ().size ());
 	  CPPUNIT_ASSERT_EQUAL (std::string ("city_0"), env->getCities ().get (cityId0)->getName ());
@@ -195,7 +201,7 @@ namespace env
 		      " WHERE " + TABLE_COL_ID + "=" + Conversion::ToString (cityId0) + 
 		      " OR " + TABLE_COL_ID + "=" + Conversion::ToString (cityId2));
 
-	  sqliteExec->execUpdate (sql);
+	  sqliteExec->execUpdate (sql, true);
 	  sqliteExec->loop ();
 	  CPPUNIT_ASSERT_EQUAL (1, (int) env->getCities ().size ());
 	  CPPUNIT_ASSERT_EQUAL (std::string ("city_1_"), env->getCities ().get (cityId1)->getName ());
@@ -206,7 +212,8 @@ namespace env
 	  sqliteExec->execUpdate (
 	      "INSERT INTO " + CITIES_TABLE_NAME + " (" + 
 	      TABLE_COL_ID + ", " + CITIES_TABLE_COL_NAME + ") " + 
-	      "VALUES (" + Conversion::ToString (cityId0) + ", 'city_0')"
+	      "VALUES (" + Conversion::ToString (cityId0) + ", 'city_0')",
+	      true
 	      );
 	  sqliteExec->loop ();
 	  CPPUNIT_ASSERT_EQUAL (2, (int) env->getCities ().size ());
@@ -216,7 +223,7 @@ namespace env
 	  // Break all links
 	  sql = "";
 	  sql.append ("DELETE FROM " + ENVIRONMENT_LINKS_TABLE_NAME + " WHERE 1"); // WHERE 1 cos of SQLite optim.
-	  sqliteExec->execUpdate (sql);
+	  sqliteExec->execUpdate (sql, true);
 	  sqliteExec->loop ();
 	  CPPUNIT_ASSERT_EQUAL (0, (int) env->getCities ().size ());
 
@@ -239,7 +246,7 @@ namespace env
 	      Conversion::ToString (cityId1) + ") ;"
 	      );
 
-	  sqliteExec->execUpdate (sql);
+	  sqliteExec->execUpdate (sql, true);
 	  sqliteExec->loop ();
 	  CPPUNIT_ASSERT_EQUAL (2, (int) env->getCities ().size ());
 	  CPPUNIT_ASSERT_EQUAL (std::string ("city_0"), env->getCities ().get (cityId0)->getName ());
