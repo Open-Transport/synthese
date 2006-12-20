@@ -7,10 +7,12 @@
 #include <cppunit/CompilerOutputter.h>
 
 #include "SQLiteThreadExecTest.h"
+#include "SQLiteTableSyncTest.h"
 
 
 
-CPPUNIT_TEST_SUITE_REGISTRATION(synthese::db::SQLiteThreadExecTest);
+// CPPUNIT_TEST_SUITE_REGISTRATION(synthese::db::SQLiteThreadExecTest);
+CPPUNIT_TEST_SUITE_REGISTRATION (synthese::db::SQLiteTableSyncTest);
 
 
 int main( int argc, char **argv )

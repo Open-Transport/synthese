@@ -12,6 +12,8 @@
 #include "01_util/UId.h"
 
 #include "02_db/DBModule.h"
+#include "02_db/SQLiteTableFormat.h"
+
 
 #define UPDATEABLE true;
 #define NON_UPDATEABLE false;
@@ -25,13 +27,6 @@ namespace synthese
 		class SQLiteResult;
 		class SQLiteThreadExec;
 
-		typedef struct {
-		std::string name;
-		std::string type;
-		bool updatable;
-		} SQLiteTableColumnFormat;
-
-		typedef std::vector<SQLiteTableColumnFormat> SQLiteTableFormat;
 
 		/** Base class for an SQLite table synchronizer.
 			By convention, the table name must always start with the t letter
@@ -125,17 +120,76 @@ namespace synthese
 
 			std::string getTriggerOverrideClause () const;
 
+
 			/** Creates table in SQLite db according to this class
 			 * table format.
+			 *
+			 * @param tableSchema Required table schema.
 			 */
-			void createTable (const synthese::db::SQLiteThreadExec* sqlite);
+			void createTable (const synthese::db::SQLiteThreadExec* sqlite,
+					  const std::string& tableSchema,
+					  const std::string& triggerNoInsert,
+					  const std::string& triggerNoRemove,
+					  const std::string& triggerNoUpdate);
 
 			/** Adapts table in SQLite db to conform to this class 
 			 * table format.
 			 * Right now, only new column addition/insertion is supported.
 			 * Any other change to table schema is not supported yet.
+			 *
+			 * @param tableSchema Required table schema.
+			 * @param dbSchema Actual table schema in db.
 			 */
-			void alterTable (const synthese::db::SQLiteThreadExec* sqlite);
+			void adaptTable (const synthese::db::SQLiteThreadExec* sqlite,
+					 const std::string& tableSchema,
+					 const std::string& triggerNoInsert,
+					 const std::string& triggerNoRemove,
+					 const std::string& triggerNoUpdate);
+			
+
+		public:
+
+			/** Creates the SQL statement to create a table in db
+			 * given a certain format.
+			 */
+			static std::string CreateSQLSchema (const std::string& tableName,
+							    const SQLiteTableFormat& format);
+			
+			static std::string CreateTriggerNoInsert (
+			    const std::string& tableName,
+			    const std::string& triggerOverrideClause);
+			
+			static std::string CreateTriggerNoRemove (
+			    const std::string& tableName,
+			    const std::string& triggerOverrideClause);
+			
+			static std::string CreateTriggerNoUpdate (
+			    const std::string& tableName,
+			    const SQLiteTableFormat& format,
+			    const std::string& triggerOverrideClause);
+			
+
+
+
+			static std::vector<std::string> 
+			    GetTableColumnsDb (const synthese::db::SQLiteThreadExec* sqlite,
+					       const std::string& tableName);
+
+			static std::string GetSQLSchemaDb (const synthese::db::SQLiteThreadExec* sqlite,
+							   const std::string& tableName);
+			
+			static std::string GetTriggerNoInsertDb (
+			    const synthese::db::SQLiteThreadExec* sqlite,
+			    const std::string& tableName);
+
+			static std::string GetTriggerNoRemoveDb (
+			    const synthese::db::SQLiteThreadExec* sqlite,
+			    const std::string& tableName);
+
+			static std::string GetTriggerNoUpdateDb (
+			    const synthese::db::SQLiteThreadExec* sqlite,
+			    const std::string& tableName);
+
 
 
 

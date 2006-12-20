@@ -159,6 +159,8 @@ namespace synthese
 			// No hook can be added til the thread has finished its initialization.
 			boost::mutex::scoped_lock hooksLock (*_hooksMutex);
 
+			_initThread = new boost::thread (); // current thread of execution.
+
 			// Open a persistent DB connection
 			// It is crucial that the db connection is created inside the init proc
 			// so that the connection is created in the caller thread.
@@ -196,7 +198,8 @@ namespace synthese
 		void
 		SQLiteThreadExec::finalize()
 		{
-			SQLite::CloseConnection (_db);
+		    SQLite::CloseConnection (_db);
+		    delete _initThread;
 		}
 
 
@@ -222,11 +225,23 @@ namespace synthese
 			boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
 			SQLite::ExecUpdate (_db, sql);
 		    }
+
 		    if (asynchronous == false) 
 		    {
-			while (hasEnqueuedEvent ()) 
+			boost::thread currentThread;
+			if ((*_initThread) == currentThread) 
 			{
-			    Thread::Sleep (1);			    
+			    // We are in the "looping" thread 
+			    // (because running monothreaded or in a unit test)
+			    // So, just loop once to ensure the events are consumed.
+			    ((SQLiteThreadExec*) this)->loop ();
+			}
+			else
+			{
+			    while (hasEnqueuedEvent ()) 
+			    {
+				Thread::Sleep (1);			    
+			    }
 			}
 		    }
 		}

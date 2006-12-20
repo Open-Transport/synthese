@@ -25,6 +25,7 @@ namespace db
     Manages a set of table synchronizers which synchronize 
     db data with live object model.
 
+
 @ingroup m02
 */
 
@@ -41,7 +42,7 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
 
  public:
 
-    SQLiteSync (const std::string& idColumnName);
+    SQLiteSync (const std::string& idColumnName = "rowid");
     ~SQLiteSync ();
 
     void registerCallback (const SQLiteThreadExec* emitter);

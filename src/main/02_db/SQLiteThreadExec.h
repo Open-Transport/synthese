@@ -28,6 +28,7 @@
 #include <deque>
 #include <map>
 
+#include <boost/thread/thread.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/shared_ptr.hpp>
@@ -75,6 +76,8 @@ namespace synthese
 		private:
 
 			std::deque<SQLiteEvent> _eventQueue;
+
+			boost::thread* _initThread;
 
 			const boost::filesystem::path _databaseFile;
 			sqlite3* _db;  //!< SQLite db handle (connection).

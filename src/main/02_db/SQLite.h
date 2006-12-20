@@ -45,6 +45,7 @@ class SQLite
     static void ExecUpdate (sqlite3* connection, const std::string& sql);
     static SQLiteResult ExecQuery (sqlite3* connection, const std::string& sql);
 
+
     //@}
 
 

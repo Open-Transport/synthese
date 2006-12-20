@@ -40,7 +40,7 @@ namespace synthese
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
-			assert (synchronizer->getTableFormat ().empty () == false);
+			// assert (synchronizer->getTableFormat ().empty () == false);
 			_tableSynchronizers.insert (std::make_pair (synchronizer->getTableName (), synchronizer));
 			_rankedTableSynchronizers.insert(make_pair(rank, synchronizer));
 		}
