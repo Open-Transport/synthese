@@ -215,36 +215,11 @@ namespace synthese
 		// Insert some triggers to prevent unallowed insert/update/remove operations
 		sqlite->execUpdate (triggerNoInsert);
 		sqlite->execUpdate (triggerNoRemove);
-				
-/*		
-if (_allowInsert == false)
-		{
-		    sqlite->execUpdate (triggerNoInsert);
-		}
-				
-		if (_allowRemove == false)
-		{
-		    sqlite->execUpdate (triggerNoRemove);
-		}
-*/
 		sqlite->execUpdate (triggerNoUpdate);
 			
 	}
 
 
-
-/*
-	SQLiteTableFormat 
-	SQLiteTableSync::getTableFormatInDb () const
-	{
-	    std::string sql = "SELECT * FROM " getTableName () + " LIMIT 0";
-	    SQLiteResult result = sqlite->execQuery (sql);
-	    SQLiteTableFormat format;
-	    
-	    
-	}
-
-*/
 
 
 	std::string 
