@@ -5,13 +5,8 @@
 #include "01_util/Thread.h"
 #include "01_util/ThreadGroup.h"
 
-#include "02_db/SQLiteSync.h"
-#include "02_db/SQLiteTableSync.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/DBModule.h" // To be removed...
 
-#include "11_interfaces/InterfaceModule.h"
-
-#include "15_env/EnvModule.h"
 
 #include "30_server/ServerModule.h"
 #include "30_server/CleanerThreadExec.h"
@@ -30,7 +25,6 @@ namespace synthese
 		Site::Registry				ServerModule::_sites;
 		ServerConfig				ServerModule::_config;
 		ServerModule::SessionMap	ServerModule::_sessionMap;
-		db::SQLiteThreadExec*		ServerModule::_sqliteThreadExec=NULL;
 
 		void ServerModule::initialize()
 		{
@@ -43,32 +37,12 @@ namespace synthese
 
 		void ServerModule::startServer()
 		{
-			// Initialize permanent ram loaded data
-			Log::GetInstance().info("Loading live data...");
-			_sqliteThreadExec = new SQLiteThreadExec (_databasePath);
-
-			Thread sqliteThread (_sqliteThreadExec, "sqlite");
-			sqliteThread.start ();
-			SQLiteSync* syncHook = new SQLiteSync (TABLE_COL_ID);
-
-			// Register all table syncs
-			for (Factory<SQLiteTableSync>::Iterator it = 
-				 Factory<SQLiteTableSync>::begin(); 
-			     it != Factory<SQLiteTableSync>::end(); 
-			     ++it)
-			{
-				syncHook->addTableSynchronizer(it.getKey(), it.getObject());
-			}
-			
-			_sqliteThreadExec->registerUpdateHook (syncHook);
-			sqliteThread.waitForReadyState ();
-
-
 			// Initialize modules
 			if (Factory<ModuleClass>::size() == 0)
 				throw Exception("No registered module !");
 
-			for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); it != Factory<ModuleClass>::end(); ++it)
+			for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
+			     it != Factory<ModuleClass>::end(); ++it)
 			{
 				Log::GetInstance ().info ("Initializing module " + it.getKey() + "...");
 				it->setDatabasePath(_databasePath);
@@ -159,7 +133,8 @@ namespace synthese
 
 		SQLiteThreadExec* ServerModule::getSQLiteThread()
 		{
-			return _sqliteThreadExec;
+		    // @todo REPLACE all calls to this method by the db call
+		    return synthese::db::DBModule::GetSQLite ();
 		}
 	}
 }

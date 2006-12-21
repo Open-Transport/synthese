@@ -9,6 +9,10 @@ namespace synthese
 	namespace db
 	{
 
+
+	    class SQLiteThreadExec;
+	    
+
 		/** @defgroup m02 02 SQLite database access
 
 		@{
@@ -19,9 +23,16 @@ namespace synthese
 
 		class DBModule : public util::ModuleClass
 		{
+		private:
+		    
+		    static SQLiteThreadExec* _sqliteThreadExec;
+
 		public:
 
-			void initialize();
+		    void initialize();
+
+		    static SQLiteThreadExec* GetSQLite ();
+
 		};
 		/** @} */
 

@@ -35,7 +35,6 @@ namespace synthese
 			static Site::Registry			_sites;
 			static ServerConfig				_config;
 			static SessionMap				_sessionMap;
-			static db::SQLiteThreadExec*	_sqliteThreadExec;
 
 		public:
 			/** Standard module initializer, launched as the ones from others modules at the server opening.
