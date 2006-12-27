@@ -4,7 +4,7 @@
 #include "01_util/Conversion.h"
 
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
 #include "12_security/SecurityModule.h"
@@ -50,7 +50,7 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteTableSyncTemplate<User>::save(const db::SQLiteThreadExec* sqlite, User* user )
+		template<> void SQLiteTableSyncTemplate<User>::save(const db::SQLiteQueueThreadExec* sqlite, User* user )
 		{
 			try
 			{
@@ -144,7 +144,7 @@ namespace synthese
 		}
 
 
-		void UserTableSync::rowsUpdated( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void UserTableSync::rowsUpdated( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -153,17 +153,17 @@ namespace synthese
 		}
 
 
-		void UserTableSync::rowsAdded( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void UserTableSync::rowsAdded( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 		}
 
 
-		void UserTableSync::rowsRemoved( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void UserTableSync::rowsRemoved( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 			/// @todo implementation
 		}
 
-		User* UserTableSync::getUser( const db::SQLiteThreadExec* sqlite, const std::string& login )
+		User* UserTableSync::getUser( const db::SQLiteQueueThreadExec* sqlite, const std::string& login )
 		{
 			std::stringstream query;
 			query
@@ -185,7 +185,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<User*> UserTableSync::searchUsers( const db::SQLiteThreadExec* sqlite, const std::string& login, const std::string name, uid profileId, int first /*= 0*/, int number /*= 0*/ )
+		std::vector<User*> UserTableSync::searchUsers( const db::SQLiteQueueThreadExec* sqlite, const std::string& login, const std::string name, uid profileId, int first /*= 0*/, int number /*= 0*/ )
 		{
 			stringstream query;
 			query

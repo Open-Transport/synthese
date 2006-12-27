@@ -39,15 +39,15 @@ namespace synthese
 
 		protected:
 
-			void rowsAdded (const db::SQLiteThreadExec* sqlite, 
+			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 
-			void rowsUpdated (const db::SQLiteThreadExec* sqlite, 
+			void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 
-			void rowsRemoved (const db::SQLiteThreadExec* sqlite, 
+			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 

@@ -10,7 +10,7 @@
 #include "01_util/Log.h"
 
 #include "02_db/DBModule.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 #include "02_db/SQLiteTableSync.h"
 
@@ -45,14 +45,14 @@ namespace synthese
 				const std::string& triggerOverrideClause = "1") : SQLiteTableSync(tableName, allowInsert, allowRemove, triggerOverrideClause)
 			{			}
 
-			void initAutoIncrement(const SQLiteThreadExec* sqlite);
+			void initAutoIncrement(const SQLiteQueueThreadExec* sqlite);
 
 		public:
 			typedef T ObjectsClass;
 
 			static void load(T* obj, const db::SQLiteResult& rows, int rowId=0);
-			static void save(const db::SQLiteThreadExec* sqlite, T* obj);
-			static T* get(const db::SQLiteThreadExec* sqlite, uid key);
+			static void save(const db::SQLiteQueueThreadExec* sqlite, T* obj);
+			static T* get(const db::SQLiteQueueThreadExec* sqlite, uid key);
 
 			/// @todo See if the template can be used more 
 
@@ -60,7 +60,7 @@ namespace synthese
 		};
 
 		template <class T>
-			T* synthese::db::SQLiteTableSyncTemplate<T>::get( const db::SQLiteThreadExec* sqlite, uid key)
+			T* synthese::db::SQLiteTableSyncTemplate<T>::get( const db::SQLiteQueueThreadExec* sqlite, uid key)
 		{
 			std::stringstream query;
 			query
@@ -103,7 +103,7 @@ namespace synthese
 		}
 
 		template <class T>
-			void SQLiteTableSyncTemplate<T>::initAutoIncrement(const SQLiteThreadExec* sqlite)
+			void SQLiteTableSyncTemplate<T>::initAutoIncrement(const SQLiteQueueThreadExec* sqlite)
 		{
 			if (HAS_AUTO_INCREMENT)
 			{

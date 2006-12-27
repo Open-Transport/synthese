@@ -27,7 +27,7 @@ namespace synthese
 			bike->_markedNumber = rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_MARKED_NUMBER);
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciBike>::save(const db::SQLiteThreadExec* sqlite, VinciBike* bike)
+		template<> void SQLiteTableSyncTemplate<VinciBike>::save(const db::SQLiteQueueThreadExec* sqlite, VinciBike* bike)
 		{
 			stringstream query;
 			if (bike->getKey() != 0)
@@ -72,7 +72,7 @@ namespace synthese
 		/** Action to do on user creation.
 		No action because the users are not permanently loaded in ram.
 		*/
-		void VinciBikeTableSync::rowsAdded (const db::SQLiteThreadExec* sqlite, 
+		void VinciBikeTableSync::rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{}
@@ -80,7 +80,7 @@ namespace synthese
 		/** Action to do on user creation.
 		Updates the users objects in the opened sessions.
 		*/
-		void VinciBikeTableSync::rowsUpdated (const db::SQLiteThreadExec* sqlite, 
+		void VinciBikeTableSync::rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{}
@@ -88,12 +88,12 @@ namespace synthese
 		/** Action to do on user deletion.
 		Closes the sessions of the deleted user.
 		*/
-		void VinciBikeTableSync::rowsRemoved (const db::SQLiteThreadExec* sqlite, 
+		void VinciBikeTableSync::rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{}
 
-		std::vector<VinciBike*> VinciBikeTableSync::searchVinciBikes( const db::SQLiteThreadExec* sqlite , const std::string& id, const std::string& cadre , int first /*= 0*/, int number /*= 0*/ )
+		std::vector<VinciBike*> VinciBikeTableSync::searchVinciBikes( const db::SQLiteQueueThreadExec* sqlite , const std::string& id, const std::string& cadre , int first /*= 0*/, int number /*= 0*/ )
 		{
 			stringstream query;
 			query 

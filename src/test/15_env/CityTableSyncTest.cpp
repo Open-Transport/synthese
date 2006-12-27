@@ -8,7 +8,7 @@
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteSync.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 
 #include "15_env/EnvModule.h"
 #include "15_env/Environment.h"
@@ -64,7 +64,7 @@ namespace env
 	  
 	  boost::filesystem::remove ("test_db.s3db");
 	  
-	  SQLiteThreadExec* sqliteExec = new SQLiteThreadExec ("test_db.s3db");
+	  SQLiteQueueThreadExec* sqliteExec = new SQLiteQueueThreadExec ("test_db.s3db");
 	  SQLiteSync* syncHook = new SQLiteSync (TABLE_COL_ID);
 
 
@@ -250,7 +250,7 @@ namespace env
 	  // values pre exist in db!
 	  environments.clear ();
 	  
-	  SQLiteThreadExec* sqliteExec = new SQLiteThreadExec ("test_db.s3db");
+	  SQLiteQueueThreadExec* sqliteExec = new SQLiteQueueThreadExec ("test_db.s3db");
 	  SQLiteSync* syncHook = new SQLiteSync (TABLE_COL_ID);
 	  sqliteExec->registerUpdateHook (syncHook);
 	  

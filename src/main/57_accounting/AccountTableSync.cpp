@@ -5,7 +5,7 @@
 #include "01_util/RegistryKeyException.h"
 
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
 #include "57_accounting/AccountingModule.h"
@@ -46,7 +46,7 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteTableSyncTemplate<Account>::save(const db::SQLiteThreadExec* sqlite, Account* account)
+		template<> void SQLiteTableSyncTemplate<Account>::save(const db::SQLiteQueueThreadExec* sqlite, Account* account)
 		{
 			stringstream query;
 			if (account->getKey() == 0)
@@ -88,17 +88,17 @@ namespace synthese
 
 
 
-		void AccountTableSync::rowsAdded( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void AccountTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void AccountTableSync::rowsUpdated( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void AccountTableSync::rowsUpdated( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void AccountTableSync::rowsRemoved( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void AccountTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
@@ -118,7 +118,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_RIGHT_CURRENCY_ID, "INTEGER", true);
 		}
 
-		std::vector<Account*> AccountTableSync::searchAccounts( const db::SQLiteThreadExec* sqlite , uid rightUserId
+		std::vector<Account*> AccountTableSync::searchAccounts( const db::SQLiteQueueThreadExec* sqlite , uid rightUserId
 			, const std::string& rightClassNumber, uid leftUserId, const std::string& leftClassNumber, const std::string name
 			, int first /*= 0*/, int number /*= 0*/ )
 		{

@@ -5,6 +5,8 @@
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
+#include <boost/algorithm/string/case_conv.hpp>
+
 
 using synthese::util::Conversion;
 using synthese::util::Log;
@@ -53,6 +55,30 @@ SQLite::CloseConnection (sqlite3* connection)
 	throw SQLiteException ("Cannot close SQLite connection (error=" + Conversion::ToString (retc) + ")");
     }
 }
+
+
+
+
+
+bool 
+SQLite::IsUpdateStatement (const std::string& sql)
+{
+    std::string str = boost::algorithm::to_upper_copy (sql);
+    // SQL is an update statement if it contains one of the following keywords :
+    // UPDATE, INSERT, REPLACE, CREATE, DROP, ALTER... 
+    // @todo Check missing keywords...
+ 
+    if (str.find ("UPDATE") != std::string::npos) return true;
+    if (str.find ("INSERT") != std::string::npos) return true;
+    if (str.find ("REPLACE") != std::string::npos) return true;
+    if (str.find ("CREATE") != std::string::npos) return true;
+    if (str.find ("DROP") != std::string::npos) return true;
+    if (str.find ("ALTER") != std::string::npos) return true;
+
+    return false;
+
+}
+
 
 
     

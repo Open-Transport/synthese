@@ -5,7 +5,7 @@
 #include "01_util/RegistryKeyException.h"
 
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
 #include "12_security/User.h"
@@ -43,7 +43,7 @@ namespace synthese
 			tp->setTradedObjectId(rows.getColumn(rowId, TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID));
 		}
 
-		template<> void SQLiteTableSyncTemplate<TransactionPart>::save(const db::SQLiteThreadExec* sqlite, TransactionPart* tp)
+		template<> void SQLiteTableSyncTemplate<TransactionPart>::save(const db::SQLiteQueueThreadExec* sqlite, TransactionPart* tp)
 		{
 			try
 			{
@@ -102,22 +102,22 @@ namespace synthese
 
 		}
 
-		void TransactionPartTableSync::rowsAdded( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionPartTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void TransactionPartTableSync::rowsUpdated( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionPartTableSync::rowsUpdated( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void TransactionPartTableSync::rowsRemoved( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionPartTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		vector<TransactionPart*> TransactionPartTableSync::searchTransactionParts( const db::SQLiteThreadExec* sqlite , Account* account, User* user , int first /*= 0*/, int number /*= 0*/ )
+		vector<TransactionPart*> TransactionPartTableSync::searchTransactionParts( const db::SQLiteQueueThreadExec* sqlite , Account* account, User* user , int first /*= 0*/, int number /*= 0*/ )
 		{
 			stringstream query;
 			query

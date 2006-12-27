@@ -13,9 +13,9 @@ namespace db
 {
 
 
-class SQLiteThreadExecTest : public CPPUNIT_NS::TestCase
+class SQLiteQueueThreadExecTest : public CPPUNIT_NS::TestCase
 {
-  CPPUNIT_TEST_SUITE(SQLiteThreadExecTest);
+  CPPUNIT_TEST_SUITE(SQLiteQueueThreadExecTest);
   CPPUNIT_TEST(testSingleUpdateHook1);
   CPPUNIT_TEST_SUITE_END();
 

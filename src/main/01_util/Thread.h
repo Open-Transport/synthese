@@ -21,6 +21,8 @@ namespace util
 class ThreadExec;
 
 
+
+
 /** Base class for thread creation and control.
 @ingroup m01
 */
@@ -81,6 +83,8 @@ class Thread
 
 };
 
+
+ typedef boost::shared_ptr<Thread> ThreadSPtr;
 
 
 }

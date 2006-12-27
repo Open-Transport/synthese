@@ -30,7 +30,7 @@ namespace synthese
 			vc->_userId = Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::TABLE_COL_USER_ID));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciContract>::save(const SQLiteThreadExec* sqlite, VinciContract* vc)
+		template<> void SQLiteTableSyncTemplate<VinciContract>::save(const SQLiteQueueThreadExec* sqlite, VinciContract* vc)
 		{
 			stringstream query;
 			if (vc->getKey() != 0)
@@ -63,22 +63,22 @@ namespace synthese
 			addTableColumn(TABLE_COL_USER_ID, "INTEGER", true);
 		}
 
-		void VinciContractTableSync::rowsAdded( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciContractTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void VinciContractTableSync::rowsUpdated( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciContractTableSync::rowsUpdated( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void VinciContractTableSync::rowsRemoved( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciContractTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		std::vector<VinciContract*> VinciContractTableSync::searchVinciContracts( const db::SQLiteThreadExec* sqlite , std::string name /*= ""*/, std::string surname /*= "" */, int first /*= 0*/, int number /*=-1*/ )
+		std::vector<VinciContract*> VinciContractTableSync::searchVinciContracts( const db::SQLiteQueueThreadExec* sqlite , std::string name /*= ""*/, std::string surname /*= "" */, int first /*= 0*/, int number /*=-1*/ )
 		{
 			stringstream query;
 			query

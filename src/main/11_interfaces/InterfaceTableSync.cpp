@@ -23,12 +23,12 @@ namespace synthese
 		}
 
 
-		void InterfaceTableSync::rowsUpdated( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void InterfaceTableSync::rowsUpdated( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 		}
 
 
-		void InterfaceTableSync::rowsAdded( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void InterfaceTableSync::rowsAdded( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -38,7 +38,7 @@ namespace synthese
 		}
 
 
-		void InterfaceTableSync::rowsRemoved( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void InterfaceTableSync::rowsRemoved( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 		}
 	}

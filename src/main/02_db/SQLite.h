@@ -42,8 +42,11 @@ class SQLite
     static sqlite3* OpenConnection (const boost::filesystem::path& databaseFile);
     static void CloseConnection (sqlite3* connection);
     
+    static bool IsUpdateStatement (const std::string& sql);
+
     static void ExecUpdate (sqlite3* connection, const std::string& sql);
     static SQLiteResult ExecQuery (sqlite3* connection, const std::string& sql);
+
 
 
     //@}

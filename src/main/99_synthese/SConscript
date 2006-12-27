@@ -42,11 +42,11 @@ moduleenv.AddModuleDependency ('15_env')
 moduleenv.AddModuleDependency ('16_env_ls_xml')
 
 # Generic libs (0)
-moduleenv.AddModuleDependency ('00_tcp')
-moduleenv.AddModuleDependency ('01_util')
-moduleenv.AddModuleDependency ('02_db')
-moduleenv.AddModuleDependency ('04_time')
 moduleenv.AddModuleDependency ('07_lex_matcher')
+moduleenv.AddModuleDependency ('04_time')
+moduleenv.AddModuleDependency ('02_db')
+moduleenv.AddModuleDependency ('01_util')
+moduleenv.AddModuleDependency ('00_tcp')
 
 
 moduleenv.AddBoostDependency ('boost_filesystem')

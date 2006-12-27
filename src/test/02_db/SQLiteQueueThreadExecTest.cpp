@@ -1,11 +1,11 @@
-#include "SQLiteThreadExecTest.h"
+#include "SQLiteQueueThreadExecTest.h"
 
 #include "01_util/Conversion.h"
 #include "01_util/Thread.h"
 
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteUpdateHook.h"
 
 #include <boost/filesystem/operations.hpp>
@@ -29,21 +29,21 @@ namespace db
 
 
   void 
-  SQLiteThreadExecTest::setUp () 
+  SQLiteQueueThreadExecTest::setUp () 
   {
   }
 
 
 
   void 
-  SQLiteThreadExecTest::tearDown() 
+  SQLiteQueueThreadExecTest::tearDown() 
   {
   } 
 
 
 
     void 
-    SQLiteThreadExecTest::createTestDb (const std::string& dbFile, bool prefilled)
+    SQLiteQueueThreadExecTest::createTestDb (const std::string& dbFile, bool prefilled)
     {
       boost::filesystem::path testDbPath (dbFile);
       
@@ -103,14 +103,14 @@ namespace db
 	    return _labels;
 	}
 
-	void registerCallback (const SQLiteThreadExec* emitter)
+	void registerCallback (const SQLiteQueueThreadExec* emitter)
 	{
 	    _registerCalled = true;
 	}
 	
 
 	
-	void eventCallback (const SQLiteThreadExec* emitter,
+	void eventCallback (const SQLiteQueueThreadExec* emitter,
 			    const SQLiteEvent& event)
 	{
 	    if ((event.opType == SQLITE_INSERT) 
@@ -143,13 +143,13 @@ namespace db
 
 
   void
-  SQLiteThreadExecTest::testSingleUpdateHook1 ()
+  SQLiteQueueThreadExecTest::testSingleUpdateHook1 ()
   {
       // Create empty test table
       createTestDb ("test_db.s3db", false); 
 
       TestUpdateHook* hook = new TestUpdateHook ();
-      SQLiteThreadExec* sqliteExec = new SQLiteThreadExec ("test_db.s3db");
+      SQLiteQueueThreadExec* sqliteExec = new SQLiteQueueThreadExec ("test_db.s3db");
 
       // Register hook before launching thread
       sqliteExec->registerUpdateHook (hook);

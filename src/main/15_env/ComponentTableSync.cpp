@@ -4,7 +4,7 @@
 #include "01_util/Conversion.h"
 
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 
 #include "15_env/EnvModule.h"
 #include "15_env/EnvironmentLinkTableSync.h"
@@ -37,7 +37,7 @@ namespace synthese
 
 
 		std::vector<std::string>
-		ComponentTableSync::getEnvironmentsOwning (const synthese::db::SQLiteThreadExec* sqlite, const std::string& id)
+		ComponentTableSync::getEnvironmentsOwning (const synthese::db::SQLiteQueueThreadExec* sqlite, const std::string& id)
 		{
 			std::vector<std::string> result;
 
@@ -56,7 +56,7 @@ namespace synthese
 
 
 		void 
-		ComponentTableSync::rowsAdded (const synthese::db::SQLiteThreadExec* sqlite, 
+		ComponentTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 					synthese::db::SQLiteSync* sync,
 					const synthese::db::SQLiteResult& rows)
 		{
@@ -79,7 +79,7 @@ namespace synthese
 
 
 		void 
-		ComponentTableSync::rowsUpdated (const synthese::db::SQLiteThreadExec* sqlite, 
+		ComponentTableSync::rowsUpdated (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 						synthese::db::SQLiteSync* sync,
 						const synthese::db::SQLiteResult& rows)
 		{
@@ -101,7 +101,7 @@ namespace synthese
 
 
 		void 
-		ComponentTableSync::rowsRemoved (const synthese::db::SQLiteThreadExec* sqlite, 
+		ComponentTableSync::rowsRemoved (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 						synthese::db::SQLiteSync* sync,
 						const synthese::db::SQLiteResult& rows)
 		{

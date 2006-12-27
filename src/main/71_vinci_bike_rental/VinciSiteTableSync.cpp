@@ -23,7 +23,7 @@ namespace synthese
 			vs->_name = rows.getColumn(rowId, VinciSiteTableSync::TABLE_COL_NAME);
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciSite>::save(const SQLiteThreadExec* sqlite, VinciSite* vs)
+		template<> void SQLiteTableSyncTemplate<VinciSite>::save(const SQLiteQueueThreadExec* sqlite, VinciSite* vs)
 		{
 			stringstream query;
 			if (vs->getKey() != 0)
@@ -56,17 +56,17 @@ namespace synthese
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
 		}
 
-		void VinciSiteTableSync::rowsAdded( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciSiteTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void VinciSiteTableSync::rowsUpdated( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciSiteTableSync::rowsUpdated( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void VinciSiteTableSync::rowsRemoved( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciSiteTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}

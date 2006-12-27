@@ -5,7 +5,7 @@
 
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteSync.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 
 #include "04_time/DateTime.h"
 
@@ -43,7 +43,7 @@ namespace synthese
 
 
 		void 
-		ServerConfigTableSync::rowsAdded (const SQLiteThreadExec* sqlite, 
+		ServerConfigTableSync::rowsAdded (const SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
 						const SQLiteResult& rows)
 		{
@@ -84,7 +84,7 @@ namespace synthese
 
 
 		void 
-		ServerConfigTableSync::rowsUpdated (const SQLiteThreadExec* sqlite, 
+		ServerConfigTableSync::rowsUpdated (const SQLiteQueueThreadExec* sqlite, 
 							SQLiteSync* sync,
 							const SQLiteResult& rows)
 		{
@@ -94,7 +94,7 @@ namespace synthese
 
 
 		void 
-		ServerConfigTableSync::rowsRemoved (const SQLiteThreadExec* sqlite, 
+		ServerConfigTableSync::rowsRemoved (const SQLiteQueueThreadExec* sqlite, 
 							SQLiteSync* sync,
 							const SQLiteResult& rows)
 		{

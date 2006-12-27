@@ -7,7 +7,7 @@
 #include "02_db/SQLiteException.h"
 #include "02_db/SQLiteSync.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 
 #include "15_env/EnvModule.h"
 #include "15_env/EnvironmentSyncException.h"
@@ -45,7 +45,7 @@ EnvironmentLinkTableSync::~EnvironmentLinkTableSync ()
 
 
 void 
-EnvironmentLinkTableSync::beforeFirstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+EnvironmentLinkTableSync::beforeFirstSync (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 				     synthese::db::SQLiteSync* sync)
 {
     std::map<std::string, SQLiteTableSync* > tableSynchronizers = sync->getTableSynchronizers ();
@@ -68,7 +68,7 @@ EnvironmentLinkTableSync::beforeFirstSync (const synthese::db::SQLiteThreadExec*
 
     
 void 
-EnvironmentLinkTableSync::rowsAdded (const synthese::db::SQLiteThreadExec* sqlite, 
+EnvironmentLinkTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 				     synthese::db::SQLiteSync* sync,
 				     const synthese::db::SQLiteResult& rows)
 {
@@ -104,7 +104,7 @@ EnvironmentLinkTableSync::rowsAdded (const synthese::db::SQLiteThreadExec* sqlit
 
 
 void 
-EnvironmentLinkTableSync::rowsUpdated (const synthese::db::SQLiteThreadExec* sqlite, 
+EnvironmentLinkTableSync::rowsUpdated (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 			     synthese::db::SQLiteSync* sync,
 			     const synthese::db::SQLiteResult& rows)
 {
@@ -115,7 +115,7 @@ EnvironmentLinkTableSync::rowsUpdated (const synthese::db::SQLiteThreadExec* sql
 
 
 void 
-EnvironmentLinkTableSync::rowsRemoved (const synthese::db::SQLiteThreadExec* sqlite, 
+EnvironmentLinkTableSync::rowsRemoved (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 				       synthese::db::SQLiteSync* sync,
 				       const synthese::db::SQLiteResult& rows)
 {

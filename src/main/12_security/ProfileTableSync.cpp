@@ -5,7 +5,7 @@
 #include "01_util/Log.h"
 
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
 #include "12_security/SecurityModule.h"
@@ -35,7 +35,7 @@ namespace synthese
 			profile->setRights(rows.getColumn(rowId, ProfileTableSync::TABLE_COL_RIGHTS_STRING));
 		}
 
-		template<> void SQLiteTableSyncTemplate<Profile>::save( const db::SQLiteThreadExec* sqlite, Profile* profile )
+		template<> void SQLiteTableSyncTemplate<Profile>::save( const db::SQLiteQueueThreadExec* sqlite, Profile* profile )
 		{
 			try
 			{
@@ -89,7 +89,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_RIGHTS_STRING, "TEXT", true);
 		}
 
-		void ProfileTableSync::rowsAdded( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ProfileTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			for (int i = 0; i < rows.getNbRows(); ++i)
 			{
@@ -109,17 +109,17 @@ namespace synthese
 			}
 		}
 
-		void ProfileTableSync::rowsUpdated( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ProfileTableSync::rowsUpdated( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			/// @todo Implementation
 		}
 
-		void ProfileTableSync::rowsRemoved( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ProfileTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			/// @todo Implementation
 		}
 
-		std::vector<Profile*> ProfileTableSync::searchProfiles( const db::SQLiteThreadExec* sqlite , const std::string name , int first /*= 0*/, int number /*= 0*/ )
+		std::vector<Profile*> ProfileTableSync::searchProfiles( const db::SQLiteQueueThreadExec* sqlite , const std::string name , int first /*= 0*/, int number /*= 0*/ )
 		{
 			stringstream query;
 			query

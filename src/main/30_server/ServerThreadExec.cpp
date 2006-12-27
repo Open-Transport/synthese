@@ -39,6 +39,7 @@ namespace synthese
 			synthese::tcp::TcpServerSocket& serverSocket =
 			_tcpService->acceptConnection ();
 		    
+
 			boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
 			tcpStream (serverSocket);
 		    
@@ -76,6 +77,7 @@ namespace synthese
 			delete request;
 			tcpStream.flush();
 			_tcpService->closeConnection (serverSocket);
+
 		}
 	}
 }

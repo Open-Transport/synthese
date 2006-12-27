@@ -5,7 +5,7 @@
 #include "01_util/Conversion.h"
 // #include "01_util/Factory.h"
 
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteTableSync.h"
 #include "02_db/SQLiteException.h"
 #include "02_db/SQLiteSync.h"
@@ -79,7 +79,7 @@ namespace synthese
 
 
 		void 
-		SQLiteSync::registerCallback (const SQLiteThreadExec* emitter)
+		SQLiteSync::registerCallback (const SQLiteQueueThreadExec* emitter)
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
@@ -99,7 +99,7 @@ namespace synthese
 
 		   
 		void 
-		SQLiteSync::eventCallback (const SQLiteThreadExec* emitter,
+		SQLiteSync::eventCallback (const SQLiteQueueThreadExec* emitter,
 					const SQLiteEvent& event)
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);

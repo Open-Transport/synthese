@@ -42,7 +42,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<Profile*> searchProfiles(const db::SQLiteThreadExec* sqlite
+			static std::vector<Profile*> searchProfiles(const db::SQLiteQueueThreadExec* sqlite
 				, const std::string name
 				, int first = 0, int number = 0);
 
@@ -51,21 +51,21 @@ namespace synthese
 			/** Action to do on user creation.
 			No action because the users are not permanently loaded in ram.
 			*/
-			void rowsAdded (const db::SQLiteThreadExec* sqlite, 
+			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 
 			/** Action to do on user creation.
 			Updates the users objects in the opened sessions.
 			*/
-			void rowsUpdated (const db::SQLiteThreadExec* sqlite, 
+			void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 
 			/** Action to do on user deletion.
 			Closes the sessions of the deleted user.
 			*/
-			void rowsRemoved (const db::SQLiteThreadExec* sqlite, 
+			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 

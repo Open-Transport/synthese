@@ -7,7 +7,7 @@
 #include "02_db/SQLite.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteSync.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteTableSync.h"
 
 #include <boost/filesystem/operations.hpp>
@@ -49,7 +49,7 @@ namespace db
     {
       boost::filesystem::remove ("test_db.s3db");
       
-      SQLiteThreadExec* sqlite = new SQLiteThreadExec ("test_db.s3db");
+      SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
       sqlite->initialize ();
 
       SQLiteTableFormat format;
@@ -80,7 +80,7 @@ namespace db
   {
       boost::filesystem::remove ("test_db.s3db");
       
-      SQLiteThreadExec* sqlite = new SQLiteThreadExec ("test_db.s3db");
+      SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
       sqlite->initialize ();
 
       SQLiteTableFormat format;
@@ -109,7 +109,7 @@ namespace db
   {
       boost::filesystem::remove ("test_db.s3db");
       
-      SQLiteThreadExec* sqlite = new SQLiteThreadExec ("test_db.s3db");
+      SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
       sqlite->initialize ();
 
       SQLiteTableFormat format;
@@ -137,7 +137,7 @@ namespace db
   {
       boost::filesystem::remove ("test_db.s3db");
       
-      SQLiteThreadExec* sqlite = new SQLiteThreadExec ("test_db.s3db");
+      SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
       sqlite->initialize ();
 
       SQLiteTableFormat format;
@@ -165,7 +165,7 @@ namespace db
   {
       boost::filesystem::remove ("test_db.s3db");
       
-      SQLiteThreadExec* sqlite = new SQLiteThreadExec ("test_db.s3db");
+      SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
       sqlite->initialize ();
 
       SQLiteTableFormat format;
@@ -196,15 +196,15 @@ namespace db
 	SQLiteTableSyncForTest (const std::string& tableName) 
 	    : SQLiteTableSync (tableName) {}
 
-	void rowsAdded (const SQLiteThreadExec* sqlite, 
+	void rowsAdded (const SQLiteQueueThreadExec* sqlite, 
 			SQLiteSync* sync,
 			const SQLiteResult& rows) {}
 	
-	void rowsUpdated (const SQLiteThreadExec* sqlite, 
+	void rowsUpdated (const SQLiteQueueThreadExec* sqlite, 
 			  SQLiteSync* sync,
 			  const SQLiteResult& rows) {}
 	
-	void rowsRemoved (const SQLiteThreadExec* sqlite, 
+	void rowsRemoved (const SQLiteQueueThreadExec* sqlite, 
 			  SQLiteSync* sync,
 			  const SQLiteResult& rows) {}
 	
@@ -226,7 +226,7 @@ namespace db
 
 
       {
-	  SQLiteThreadExec* sqlite = new SQLiteThreadExec ("test_db.s3db");
+	  SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
 	  SQLiteSync* syncHook = new SQLiteSync ();
 	  SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
 	  tabsync->addTableColumnForTest ("col1", "INTEGER", true);
@@ -251,7 +251,7 @@ namespace db
 
       {
 	  // Add another column 
-	  SQLiteThreadExec* sqlite = new SQLiteThreadExec ("test_db.s3db");
+	  SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
 	  SQLiteSync* syncHook = new SQLiteSync ();
 	  SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
 	  tabsync->addTableColumnForTest ("col1", "INTEGER", true);
@@ -301,7 +301,7 @@ namespace db
 
 
       {
-	  SQLiteThreadExec* sqlite = new SQLiteThreadExec ("test_db.s3db");
+	  SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
 	  SQLiteSync* syncHook = new SQLiteSync ();
 	  SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
 	  tabsync->addTableColumnForTest ("col1", "INTEGER", true);
@@ -327,7 +327,7 @@ namespace db
 
       {
 	  // Add another column 
-	  SQLiteThreadExec* sqlite = new SQLiteThreadExec ("test_db.s3db");
+	  SQLiteQueueThreadExec* sqlite = new SQLiteQueueThreadExec ("test_db.s3db");
 	  SQLiteSync* syncHook = new SQLiteSync ();
 	  SQLiteTableSyncForTest* tabsync = new SQLiteTableSyncForTest ("test_table");
 	  tabsync->addTableColumnForTest ("col1", "INTEGER", true);

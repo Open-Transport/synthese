@@ -5,7 +5,7 @@
 #include "01_util/RegistryKeyException.h"
 
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
 #include "57_accounting/AccountingModule.h"
@@ -39,7 +39,7 @@ namespace synthese
 			t->setPlaceid(Conversion::ToLongLong(rows.getColumn(rowId, TransactionTableSync::TABLE_COL_PLACE_ID)));
 		}
 
-		template<> void SQLiteTableSyncTemplate<Transaction>::save(const db::SQLiteThreadExec* sqlite, Transaction* t)
+		template<> void SQLiteTableSyncTemplate<Transaction>::save(const db::SQLiteQueueThreadExec* sqlite, Transaction* t)
 		{
 			try
 			{
@@ -96,17 +96,17 @@ namespace synthese
 			addTableColumn(TABLE_COL_COMMENT, "TEXT", true);
 		}
 
-		void TransactionTableSync::rowsAdded( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void TransactionTableSync::rowsUpdated( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionTableSync::rowsUpdated( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void TransactionTableSync::rowsRemoved( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}

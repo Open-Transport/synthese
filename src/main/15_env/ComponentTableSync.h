@@ -35,15 +35,15 @@ class ComponentTableSync : public synthese::db::SQLiteTableSync
 
 
 
-    void rowsAdded (const synthese::db::SQLiteThreadExec* sqlite, 
+    void rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 		    synthese::db::SQLiteSync* sync,
 		    const synthese::db::SQLiteResult& rows);
 
-    void rowsUpdated (const synthese::db::SQLiteThreadExec* sqlite, 
+    void rowsUpdated (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 		       synthese::db::SQLiteSync* sync,
 		       const synthese::db::SQLiteResult& rows);
 
-    void rowsRemoved (const synthese::db::SQLiteThreadExec* sqlite, 
+    void rowsRemoved (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 		      synthese::db::SQLiteSync* sync,
 		      const synthese::db::SQLiteResult& rows);
 
@@ -59,7 +59,7 @@ class ComponentTableSync : public synthese::db::SQLiteTableSync
  private:
 
     std::vector<std::string>
-	getEnvironmentsOwning (const synthese::db::SQLiteThreadExec* sqlite, 
+	getEnvironmentsOwning (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 			       const std::string& id);
 
 };

@@ -85,7 +85,7 @@ namespace synthese
 			template <class T>
 				static void integrate(const typename Map::key_type& key)
 			{
-				Log::GetInstance ().info ("Registering compound... " + key);
+				Log::GetInstance ().debug ("Registering compound... " + key);
 
 				// If the key is already used then return false (it would be better to use exceptions)
 				if(_registeredCreator.find(key) != _registeredCreator.end())

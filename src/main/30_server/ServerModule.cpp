@@ -3,7 +3,7 @@
 
 #include "01_util/Log.h"
 #include "01_util/Thread.h"
-#include "01_util/ThreadGroup.h"
+#include "01_util/ThreadManager.h"
 
 #include "02_db/DBModule.h" // To be removed...
 
@@ -28,33 +28,11 @@ namespace synthese
 
 		void ServerModule::initialize()
 		{
-		}
-
-		Site::Registry& ServerModule::getSites()
-		{
-			return _sites;
-		}
-
-		void ServerModule::startServer()
-		{
-			// Initialize modules
-			if (Factory<ModuleClass>::size() == 0)
-				throw Exception("No registered module !");
-
-			for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
-			     it != Factory<ModuleClass>::end(); ++it)
-			{
-				Log::GetInstance ().info ("Initializing module " + it.getKey() + "...");
-				it->setDatabasePath(_databasePath);
-				it->initialize();
-			}
-
-
 			Log::GetInstance ().info ("Starting server...");
 
 			try 
 			{
-				Log::GetInstance ().info ("");
+			    Log::GetInstance ().info ("");
 				Log::GetInstance ().info ("Param datadir  = " + _config.getDataDir ().string ());
 				Log::GetInstance ().info ("Param tempdir  = " + _config.getTempDir ().string ());
 				Log::GetInstance ().info ("Param loglevel = " + Conversion::ToString (_config.getLogLevel ()));
@@ -64,10 +42,10 @@ namespace synthese
 				Log::GetInstance ().info ("Param httptempurl  = " + _config.getHttpTempUrl ());
 				Log::GetInstance ().info ("");
 
+
 				synthese::tcp::TcpService* service = 
 					synthese::tcp::TcpService::openService (_config.getPort ());
 
-				ThreadGroup threadGroup;
 
 				CleanerThreadExec* cleanerExec = new CleanerThreadExec ();
 
@@ -91,24 +69,29 @@ namespace synthese
 				else
 				{
 
-					for (int i=0; i< _config.getNbThreads (); ++i) 
-					{
-						// ServerThreadExec could be shared by all threads (no specific state variable)
-						Thread serverThread (new ServerThreadExec (service), "tcp_" + Conversion::ToString (i), 1);
-						threadGroup.addThread (serverThread);
-						serverThread.start ();
-					}
+				    for (int i=0; i<_config.getNbThreads (); ++i) 
+				    {
+					// ServerThreadExec could be shared by all 
+                                        // threads (no specific state variable)
+					ThreadSPtr serverThread (
+					    new Thread (
+						new ServerThreadExec (service), 
+						"tcp_" + Conversion::ToString (i), 1));
+					ThreadManager::Instance ()->addThread (serverThread);
 
-					// Create the cleaner thread (check every 5s)
-					Thread cleanerThread (cleanerExec, "cleaner", 5000);
-					threadGroup.addThread (cleanerThread);
-					cleanerThread.start ();
-
-					threadGroup.waitForAllReady ();
-
-					Log::GetInstance ().info ("Server ready.");
-
-					threadGroup.waitForAllStopped ();
+					serverThread->start ();
+					serverThread->waitForReadyState ();
+					
+				    }
+				    
+				    // Create the cleaner thread (check every 5s)
+				    ThreadSPtr cleanerThread (new Thread (cleanerExec, "cleaner", 5000));
+				    ThreadManager::Instance ()->addThread (cleanerThread);
+				    
+				    cleanerThread->start ();
+				    cleanerThread->waitForReadyState ();
+				    
+				    Log::GetInstance ().info ("Server ready.");
 				}
 
 			}
@@ -117,9 +100,20 @@ namespace synthese
 				Log::GetInstance ().fatal ("", ex);
 			} 
 
+			// @todo : decide when to clse the service ??
+			// synthese::tcp::TcpService::closeService (_config.getPort ());
 
-			synthese::tcp::TcpService::closeService (_config.getPort ());
 		}
+
+
+
+		Site::Registry& ServerModule::getSites()
+		{
+			return _sites;
+		}
+
+
+
 
 		ServerConfig& ServerModule::getConfig()
 		{
@@ -131,7 +125,7 @@ namespace synthese
 			return _sessionMap;
 		}
 
-		SQLiteThreadExec* ServerModule::getSQLiteThread()
+		SQLiteQueueThreadExec* ServerModule::getSQLiteThread()
 		{
 		    // @todo REPLACE all calls to this method by the db call
 		    return synthese::db::DBModule::GetSQLite ();

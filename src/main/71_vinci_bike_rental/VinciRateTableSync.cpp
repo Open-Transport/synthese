@@ -35,7 +35,7 @@ namespace synthese
 			vr->_recurringPenaltyPeriod = Conversion::ToInt(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciRate>::save(const SQLiteThreadExec* sqlite, VinciRate* vr)
+		template<> void SQLiteTableSyncTemplate<VinciRate>::save(const SQLiteQueueThreadExec* sqlite, VinciRate* vr)
 		{
 			stringstream query;
 			if (vr->getKey() != 0)
@@ -104,7 +104,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_RECURRING_PENALTY_PERIOD, "REAL", true);
 		}
 
-		void VinciRateTableSync::rowsAdded (const db::SQLiteThreadExec* sqlite, 
+		void VinciRateTableSync::rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{
@@ -112,14 +112,14 @@ namespace synthese
 		}
 
 		
-		void VinciRateTableSync::rowsUpdated (const db::SQLiteThreadExec* sqlite, 
+		void VinciRateTableSync::rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{
 
 		}
 
-		void VinciRateTableSync::rowsRemoved (const db::SQLiteThreadExec* sqlite, 
+		void VinciRateTableSync::rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{
@@ -129,7 +129,7 @@ namespace synthese
 		std::vector<VinciRate*> VinciRateTableSync::searchVinciRates(
 				 int first, int number)
 		{
-			const db::SQLiteThreadExec* sqlite = ServerModule::getSQLiteThread();
+			const db::SQLiteQueueThreadExec* sqlite = ServerModule::getSQLiteThread();
 			stringstream query;
 			query
 				<< " SELECT * FROM " << TABLE_NAME

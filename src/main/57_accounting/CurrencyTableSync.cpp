@@ -4,7 +4,7 @@
 #include "01_util/Conversion.h"
 
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
 #include "57_accounting/AccountingModule.h"
@@ -31,7 +31,7 @@ namespace synthese
 			currency->setSymbol(rows.getColumn(rowId, CurrencyTableSync::TABLE_COL_SYMBOL));
 		}
 
-		template<> void SQLiteTableSyncTemplate<Currency>::save(const db::SQLiteThreadExec* sqlite, Currency* currency)
+		template<> void SQLiteTableSyncTemplate<Currency>::save(const db::SQLiteQueueThreadExec* sqlite, Currency* currency)
 		{
 			stringstream query;
 			if (currency->getKey() > 0)
@@ -68,7 +68,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_SYMBOL, "TEXT", true);
 		}
 
-		void CurrencyTableSync::rowsAdded( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void CurrencyTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -78,17 +78,17 @@ namespace synthese
 			}
 		}
 
-		void CurrencyTableSync::rowsUpdated( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void CurrencyTableSync::rowsUpdated( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void CurrencyTableSync::rowsRemoved( const db::SQLiteThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void CurrencyTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		std::vector<Currency*> CurrencyTableSync::searchCurrencies( const db::SQLiteThreadExec* sqlite , const std::string& name, const std::string& symbol , int first /*= 0*/, int number /*= 0*/ )
+		std::vector<Currency*> CurrencyTableSync::searchCurrencies( const db::SQLiteQueueThreadExec* sqlite , const std::string& name, const std::string& symbol , int first /*= 0*/, int number /*= 0*/ )
 		{
 			stringstream query;
 			query

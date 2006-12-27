@@ -17,7 +17,7 @@ namespace synthese
 {
 	namespace db
 	{
-		class SQLiteThreadExec;
+		class SQLiteQueueThreadExec;
 	}
 
 	namespace server
@@ -44,9 +44,8 @@ namespace synthese
 			static Site::Registry& getSites();
 			static ServerConfig& getConfig();
 			static SessionMap& getSessions();
-			static db::SQLiteThreadExec* getSQLiteThread();
+			static db::SQLiteQueueThreadExec* getSQLiteThread();
 
-			static void startServer();
 		};
 
 		/// @todo Move constants below in corresponding Request class

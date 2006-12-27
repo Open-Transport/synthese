@@ -50,12 +50,12 @@ namespace synthese
 		}
 
 
-		void SiteTableSync::rowsUpdated( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void SiteTableSync::rowsUpdated( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 		}
 
 
-		void SiteTableSync::rowsAdded( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void SiteTableSync::rowsAdded( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -91,7 +91,7 @@ namespace synthese
 		}
 
 
-		void SiteTableSync::rowsRemoved( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void SiteTableSync::rowsRemoved( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 		}
 	}

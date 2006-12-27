@@ -39,7 +39,7 @@ namespace synthese
 				@date 2006	
 				@warning The returned pointers must be deleted after use to avoid memory leak
 			*/
-			static std::vector<VinciContract*> searchVinciContracts(const db::SQLiteThreadExec* sqlite
+			static std::vector<VinciContract*> searchVinciContracts(const db::SQLiteQueueThreadExec* sqlite
 				, std::string name = "", std::string surname = ""
 				, int first = 0, int number = -1);
 
@@ -49,21 +49,21 @@ namespace synthese
 			/** Action to do on user creation.
 			No action because the users are not permanently loaded in ram.
 			*/
-			void rowsAdded (const db::SQLiteThreadExec* sqlite, 
+			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 
 			/** Action to do on user creation.
 			Updates the users objects in the opened sessions.
 			*/
-			void rowsUpdated (const db::SQLiteThreadExec* sqlite, 
+			void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 
 			/** Action to do on user deletion.
 			Closes the sessions of the deleted user.
 			*/
-			void rowsRemoved (const db::SQLiteThreadExec* sqlite, 
+			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 

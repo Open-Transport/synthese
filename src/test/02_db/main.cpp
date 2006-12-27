@@ -6,7 +6,7 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/CompilerOutputter.h>
 
-#include "SQLiteThreadExecTest.h"
+#include "SQLiteQueueThreadExecTest.h"
 #include "SQLiteTableSyncTest.h"
 
 

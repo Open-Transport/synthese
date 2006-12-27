@@ -10,7 +10,7 @@ namespace synthese
 	{
 
 
-	    class SQLiteThreadExec;
+	    class SQLiteQueueThreadExec;
 	    
 
 		/** @defgroup m02 02 SQLite database access
@@ -25,13 +25,13 @@ namespace synthese
 		{
 		private:
 		    
-		    static SQLiteThreadExec* _sqliteThreadExec;
+		    static SQLiteQueueThreadExec* _sqliteQueueThreadExec;
 
 		public:
 
 		    void initialize();
 
-		    static SQLiteThreadExec* GetSQLite ();
+		    static SQLiteQueueThreadExec* GetSQLite ();
 
 		};
 		/** @} */

@@ -23,7 +23,7 @@ ThreadGroup::~ThreadGroup ()
 
 
 void 
-ThreadGroup::addThread (const Thread& thread)
+ThreadGroup::addThread (const ThreadSPtr& thread)
 {
     _threads.push_back (thread);
 }
@@ -54,10 +54,10 @@ ThreadGroup::waitAllInState (const Thread::ThreadState& state) const
     while (1)
     {
 	bool allInRightState = true;
-	for (std::vector<Thread>::const_iterator it = _threads.begin ();
+	for (std::vector<ThreadSPtr>::const_iterator it = _threads.begin ();
 	     it != _threads.end (); ++it)
 	{
-	    if (it->getState () != state)
+	    if ((*it)->getState () != state)
 	    {
 		allInRightState = false;
 		break;

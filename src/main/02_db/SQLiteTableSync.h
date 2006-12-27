@@ -25,7 +25,7 @@ namespace synthese
 
 		class SQLiteSync;
 		class SQLiteResult;
-		class SQLiteThreadExec;
+		class SQLiteQueueThreadExec;
 
 
 		/** Base class for an SQLite table synchronizer.
@@ -48,7 +48,7 @@ namespace synthese
 			SQLiteTableFormat _tableFormat;
 
 		protected:
-			virtual void initAutoIncrement(const SQLiteThreadExec* sqlite);
+			virtual void initAutoIncrement(const SQLiteQueueThreadExec* sqlite);
 
 		public:
 
@@ -76,32 +76,32 @@ namespace synthese
 			/** This method is called when the synchronizer is created
 			to synchronize it with pre-existing data in db.
 			*/
-			void firstSync (const synthese::db::SQLiteThreadExec* sqlite, 
+			void firstSync (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 					synthese::db::SQLiteSync* sync);
 			
 			/** This method can be overriden to invoke some code before
 			    executing firstSync body.
 			    Default implementation is doing nothing.
 			*/
-			virtual void beforeFirstSync (const SQLiteThreadExec* sqlite, 
+			virtual void beforeFirstSync (const SQLiteQueueThreadExec* sqlite, 
 						      SQLiteSync* sync);
 
 			/** This method can be overriden to invoke some code after
 			    having executed firstSync body.
 			    Default implementation is doing nothing.
 			*/
-			virtual void afterFirstSync (const SQLiteThreadExec* sqlite, 
+			virtual void afterFirstSync (const SQLiteQueueThreadExec* sqlite, 
 						     SQLiteSync* sync);
 
-			virtual void rowsAdded (const SQLiteThreadExec* sqlite, 
+			virtual void rowsAdded (const SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
 						const SQLiteResult& rows) = 0;
 
-			virtual void rowsUpdated (const SQLiteThreadExec* sqlite, 
+			virtual void rowsUpdated (const SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
 						const SQLiteResult& rows) = 0;
 
-			virtual void rowsRemoved (const SQLiteThreadExec* sqlite, 
+			virtual void rowsRemoved (const SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
 						const SQLiteResult& rows) = 0;
 
@@ -126,7 +126,7 @@ namespace synthese
 			 *
 			 * @param tableSchema Required table schema.
 			 */
-			void createTable (const synthese::db::SQLiteThreadExec* sqlite,
+			void createTable (const synthese::db::SQLiteQueueThreadExec* sqlite,
 					  const std::string& tableSchema,
 					  const std::string& triggerNoInsert,
 					  const std::string& triggerNoRemove,
@@ -140,7 +140,7 @@ namespace synthese
 			 * @param tableSchema Required table schema.
 			 * @param dbSchema Actual table schema in db.
 			 */
-			void adaptTable (const synthese::db::SQLiteThreadExec* sqlite,
+			void adaptTable (const synthese::db::SQLiteQueueThreadExec* sqlite,
 					 const std::string& tableSchema,
 					 const std::string& triggerNoInsert,
 					 const std::string& triggerNoRemove,
@@ -172,22 +172,22 @@ namespace synthese
 
 
 			static std::vector<std::string> 
-			    GetTableColumnsDb (const synthese::db::SQLiteThreadExec* sqlite,
+			    GetTableColumnsDb (const synthese::db::SQLiteQueueThreadExec* sqlite,
 					       const std::string& tableName);
 
-			static std::string GetSQLSchemaDb (const synthese::db::SQLiteThreadExec* sqlite,
+			static std::string GetSQLSchemaDb (const synthese::db::SQLiteQueueThreadExec* sqlite,
 							   const std::string& tableName);
 			
 			static std::string GetTriggerNoInsertDb (
-			    const synthese::db::SQLiteThreadExec* sqlite,
+			    const synthese::db::SQLiteQueueThreadExec* sqlite,
 			    const std::string& tableName);
 
 			static std::string GetTriggerNoRemoveDb (
-			    const synthese::db::SQLiteThreadExec* sqlite,
+			    const synthese::db::SQLiteQueueThreadExec* sqlite,
 			    const std::string& tableName);
 
 			static std::string GetTriggerNoUpdateDb (
-			    const synthese::db::SQLiteThreadExec* sqlite,
+			    const synthese::db::SQLiteQueueThreadExec* sqlite,
 			    const std::string& tableName);
 
 

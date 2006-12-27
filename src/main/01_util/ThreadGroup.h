@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <boost/shared_ptr.hpp>
+
 
 
 #include "Thread.h"
@@ -34,7 +34,7 @@ class ThreadGroup
 
  private:
 
-    std::vector<Thread> _threads;  //!< Threads in group.
+    std::vector<ThreadSPtr> _threads;  //!< Threads in group.
 
  protected:
 
@@ -43,7 +43,7 @@ class ThreadGroup
     ThreadGroup ();
     ~ThreadGroup ();
 
-    void addThread (const Thread& thread);
+    void addThread (const ThreadSPtr& thread);
 
     void waitForAllReady () const;
     void waitForAllStopped () const;
