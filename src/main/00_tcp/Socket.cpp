@@ -212,6 +212,8 @@ Socket::write(const char* buffer, const int size, const int timeout)
 int 
 Socket::write(SOCKET socket, const char* buffer, const int size, const int timeout)
 {
+
+    // @todo timeout is not implemented for write operations !
     int bytesSent;
     bytesSent = send (socket, buffer, size, 0);
 
@@ -246,7 +248,8 @@ Socket::read(SOCKET socket, char* buffer, const int size, const int timeout)
     FD_ZERO(&fd);
     FD_SET(socket, &fd);
 
-    if(select(socket+1, &fd, 0, 0, &tv) == 0)
+    if(select(socket+1, &fd, 0, 0, (timeout > 0) ? &tv : 0) == 0)
+//    if(select(socket+1, &fd, 0, 0, NULL))
         throw "Receive timeout";
 
     int bytesReceived;

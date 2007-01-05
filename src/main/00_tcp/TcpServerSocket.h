@@ -38,7 +38,7 @@ private:
 
     TcpService& _service;
     const int _socketId;
-    const int _timeOut; //!< Time out in seconds.
+    int _timeOut; //!< Time out in seconds.
 
 
     TcpServerSocket (TcpService& service, 
@@ -54,6 +54,10 @@ public:
     std::streamsize read(char* s, std::streamsize n) throw (SocketException);
 
     std::streamsize write(const char* s, std::streamsize n) throw (SocketException);
+
+    /** If timeOut == 0, operation is blocking.
+     */
+    void setTimeOut (int timeOut);
 
     friend class TcpService;
 

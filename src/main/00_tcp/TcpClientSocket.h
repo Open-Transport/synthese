@@ -39,7 +39,7 @@ private:
     const std::string _hostName;
     const int _portNumber;
     const std::string _protocol;
-    const int _timeOut; //!< Time out in seconds.
+    int _timeOut; //!< Time out in seconds.
 
     boost::shared_ptr<Socket> _socket;
 
@@ -51,18 +51,21 @@ public:
 
 	@param hostName Host to connect
 	@param portNumber Remore port to connect.
-	@param tcpProtocol TCP if true, otherwise UDP
 	@param timeOut Time out
      */
     TcpClientSocket (const std::string& hostName,
 		     int portNumber, 
-		     bool tcpProtocol = true,
+//		     bool tcpProtocol = true,
 		     int timeOut = DEFAULT_TIME_OUT);
 
     ~TcpClientSocket ();
 
     bool isConnected () const;
     void tryToConnect () throw (SocketException);
+
+    /** If timeOut == 0, operation is blocking.
+     */
+    void setTimeOut (int timeOut);
 
     std::streamsize read(char* s, std::streamsize n) throw (SocketException);
 

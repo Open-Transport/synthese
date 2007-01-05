@@ -22,3 +22,24 @@ for f in subdirs:
 moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
 
 
+
+moduleenv = mainenv.ModuleEnv()
+includes = ''
+excludes = []
+files = moduleenv.Glob(includes, excludes)
+
+
+# Modules libs
+moduleenv.AddModuleDependency ('02_db')
+moduleenv.AddModuleDependency ('01_util')
+moduleenv.AddModuleDependency ('00_tcp')
+moduleenv.AddBoostDependency ('boost_filesystem')
+moduleenv.AddBoostDependency ('boost_date_time')
+moduleenv.AddBoostDependency ('boost_program_options')
+moduleenv.AddBoostDependency ('boost_thread')
+moduleenv.AppendMultithreadConf ()
+
+moduleenv.Program ( moduleenv.DefaultModuleName(), files )
+
+
+

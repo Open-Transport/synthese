@@ -9,15 +9,18 @@ namespace tcp
 
 TcpClientSocket::TcpClientSocket (const std::string& hostName,
 				  int portNumber, 
-				  bool tcpProtocol,
+//				  bool tcpProtocol,
 				  int timeOut) 
     : _hostName (hostName)
     , _portNumber (portNumber)
-    , _protocol (tcpProtocol ? PROTOCOL_TYPE_TCP 
+    , _protocol (/*tcpProtocol*/ true ? PROTOCOL_TYPE_TCP 
 		             : PROTOCOL_TYPE_UDP)
     , _timeOut (timeOut)
     , _socket ()
 {
+    // @todo : apprently the low level socket class doe NOT work properly with UDP!
+    // Fixed to TCP right now
+
 }
 
 
@@ -73,6 +76,15 @@ TcpClientSocket::tryToConnect () throw (SocketException)
 
 
 
+
+
+
+
+void 
+TcpClientSocket::setTimeOut (int timeOut)
+{
+    _timeOut = timeOut;
+}
 
 
 

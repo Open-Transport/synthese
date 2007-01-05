@@ -38,6 +38,15 @@ TcpServerSocket::getSocketId () const
 
 
 
+
+void 
+TcpServerSocket::setTimeOut (int timeOut)
+{
+    _timeOut = timeOut;
+}
+
+
+
 std::streamsize 
 TcpServerSocket::read(char* s, std::streamsize n) throw (SocketException)
 {

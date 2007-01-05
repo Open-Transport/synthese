@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 
 namespace synthese
@@ -28,6 +29,7 @@ class SQLiteResult : public DbResult
 
     int _nbColumns;
     int _nbRows;
+    int _maxColumnWidth;  //!< For display only
     std::vector<std::string> _columnNames;
     std::vector<Row> _values;
 
@@ -50,6 +52,8 @@ class SQLiteResult : public DbResult
     std::string getColumn (int row, const std::string& name) const;
     std::vector<std::string> getColumns (int row) const;
 
+    std::vector<int> computeMaxColWidths () const;
+
     //@}
 
     //! @name Update methods.
@@ -58,10 +62,18 @@ class SQLiteResult : public DbResult
 
     void addRow (const std::vector<std::string>& values, 
 		 const std::vector<std::string>& columns);
+
+ private:
+
     //@}
+
+    
 
 };
 
+
+
+std::ostream& operator<< ( std::ostream& os, const SQLiteResult& op );
 
 
 }

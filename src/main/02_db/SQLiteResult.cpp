@@ -2,6 +2,8 @@
 
 #include "SQLiteException.h"
 
+#include <iomanip>
+
 
 namespace synthese
 {
@@ -138,6 +140,65 @@ SQLiteResult::addRow (const std::vector<std::string>& values,
     }
     _values.push_back (row);
 
+}
+
+
+
+
+std::vector<int>
+SQLiteResult::computeMaxColWidths () const
+{
+    std::vector<int> widths;
+    for (int c=0; c<getNbColumns (); ++c) 
+    {
+	int max = 0;
+	std::string name (getColumnName (c));
+	if (name.length () > max) max = name.length ();
+
+	for (int r=0; r<getNbRows (); ++r) 
+	{
+	    std::string value (getColumn (r, c));
+	    if (value.length () > max) max = value.length ();
+	}
+	widths.push_back (max);
+    }
+    return widths;
+}
+
+
+
+
+
+std::ostream& 
+operator<< ( std::ostream& os, const SQLiteResult& op )
+{
+    std::vector<int> widths (op.computeMaxColWidths ());
+
+    for (int c=0; c<op.getNbColumns (); ++c) 
+    {
+	os << std::setw (widths.at(c)) << std::setfill (' ') << op.getColumnName (c);
+	if (c != op.getNbColumns ()-1) os << " | ";
+    }
+    os << std::endl;
+	
+    for (int r=0; r<op.getNbRows (); ++r) 
+    {
+	for (int c=0; c<op.getNbColumns (); ++c) 
+	{
+	    os << std::setw (widths.at(c)) << std::setfill (' ') << op.getColumn (r, c);
+	    if (c != op.getNbColumns ()-1) os << " | ";
+	}
+	os << std::endl;
+    }
+
+
+/*
+    os << std::setw( 2 ) << std::setfill ( '0' )
+    << op.getHours ()
+    << std::setw( 2 ) << std::setfill ( '0' )
+    << op.getMinutes ();
+*/
+    return os;
 }
 
 

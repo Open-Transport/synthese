@@ -107,7 +107,11 @@ public:
     SOCKET connectToServer();
     int write(const char* buffer, const int size, const int timeout);
     int write(SOCKET socket, const char* buffer, const int size, const int timeout);
+
+    /** If timeout (in seconds) is not strictly positive this is a blocking read operation.
+     */
     int read(char* buffer, const int size, const int timeout);
+
     int read(SOCKET socket, char* buffer, const int size, const int timeout);
 };
 

@@ -33,22 +33,30 @@ namespace synthese
 		void 
 		SQLiteThreadExec::loop ()
 		{
-			// No need to lock, TcpService methods are thread-safe.
-			synthese::tcp::TcpServerSocket& serverSocket =
+		    static const char ETB (23);
+
+		    // No need to lock, TcpService methods are thread-safe.
+		    synthese::tcp::TcpServerSocket& serverSocket =
 			_tcpService->acceptConnection ();
 		    
+		    // A client can stay connected forever...
+		    serverSocket.setTimeOut (0);
 
-			boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
+		    boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
 			tcpStream (serverSocket);
 		    
-		    
-			char buffer[1024*512]; // 512K buffer max
-			tcpStream.getline (buffer, 1024*512);
+		    // Sends welcome message
+		    tcpStream << "Welcome to SYNTHESE SQLite embedded db server!" << std::endl;
+		    tcpStream.flush ();
+
+		    char buffer[1024*512]; // 512K buffer max
+		    while (tcpStream.getline (buffer, 1024*512, ETB))
+		    {
 		    
 			std::string requestString (buffer);
-			
+			    
 			// Request string is pure SQL
-			
+			    
 			try
 			{
 			    // First determine is SQL is a query or an update
@@ -58,13 +66,11 @@ namespace synthese
 							   requestString + " (" + 
 							   Conversion::ToString (requestString.size ()) + 
 							   " bytes)");
-				
-				SQLiteResult result = DBModule::GetSQLite ()->execQuery (requestString);
-				
-				// Sends the answer with the following format :
-				// TODO implement SQLiteResult ostream << ;
-				
-				
+				    
+				DBModule::GetSQLite ()->execUpdate (requestString);
+
+				tcpStream << "00" << "Update successful." << ETB;
+				    
 			    }
 			    else
 			    {
@@ -72,17 +78,26 @@ namespace synthese
 							   requestString + " (" + 
 							   Conversion::ToString (requestString.size ()) + 
 							   " bytes)");
-				DBModule::GetSQLite ()->execUpdate (requestString);
+
+				SQLiteResult result = DBModule::GetSQLite ()->execQuery (requestString);
+				    
+				std::cout << "result is : " << result << std::endl;
+				tcpStream << "00" << result << ETB;
+				
 			    }
 			}
 			catch (util::Exception e)
 			{
 			    Log::GetInstance().debug("Exception", e);
+			    tcpStream << "01" << e.what () << ETB;
 			}
 
-			
+			    
+			    
 			tcpStream.flush();
-			_tcpService->closeConnection (serverSocket);
+		    }
+
+		    _tcpService->closeConnection (serverSocket);
 		}
 	}
 }
