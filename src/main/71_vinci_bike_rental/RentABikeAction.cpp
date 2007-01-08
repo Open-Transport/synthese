@@ -11,6 +11,8 @@
 #include "57_accounting/TransactionPart.h"
 #include "57_accounting/TransactionPartTableSync.h"
 
+#include "71_vinci_bike_rental/VinciBike.h"
+#include "71_vinci_bike_rental/VinciBikeTableSync.h"
 #include "71_vinci_bike_rental/VinciRate.h"
 #include "71_vinci_bike_rental/VinciRateTableSync.h"
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
@@ -84,6 +86,15 @@ namespace synthese
 
 			amount = rate->getStartTicketsPrice();
 
+			// Control of bike
+			vector<VinciBike*> bikes = VinciBikeTableSync::search(Conversion::ToString(_bikeId), "");
+			if (bikes.size() == 0)
+				return;
+			vector<VinciBike*>::iterator it = bikes.begin();
+			VinciBike* bike = *it;
+			
+			// Control of guarantees
+
 			// Transaction
 			Transaction* transaction = new Transaction;
 			transaction->setStartDateTime(now);
@@ -91,15 +102,17 @@ namespace synthese
 			transaction->setLeftUserId(_contract->getUserId());
 			TransactionTableSync::save(ServerModule::getSQLiteThread(), transaction);
 
-			// Part 1 : customer
+			// Part 1 : service
 			TransactionPart* transactionPart = new TransactionPart;
 			transactionPart->setTransactionId(transaction->getKey());
 			transactionPart->setAccountId(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE)->getKey());
 			transactionPart->setLeftCurrencyAmount(amount);
 			transactionPart->setRightCurrencyAmount(amount);
+			transactionPart->setRateId(_rateId);
+			transactionPart->setTradedObjectId(Conversion::ToString(bike->getKey()));
 			TransactionPartTableSync::save(ServerModule::getSQLiteThread(), transactionPart);
 
-			// Part 2 : bike rent
+			// Part 2 : customer
 			TransactionPart* changeTransactionPart = new TransactionPart;
 			changeTransactionPart->setTransactionId(transaction->getKey());
 			changeTransactionPart->setAccountId(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE)->getKey());

@@ -8,6 +8,7 @@
 #include "30_server/ServerModule.h"
 
 #include "57_accounting/Account.h"
+#include "57_accounting/AccountTableSync.h"
 #include "57_accounting/Transaction.h"
 #include "57_accounting/TransactionTableSync.h"
 #include "57_accounting/TransactionPart.h"
@@ -31,6 +32,7 @@ namespace synthese
 	{
 		const string VinciAddGuaranteeAction::PARAMETER_AMOUNT = Action::PARAMETER_PREFIX + "am";
 		const string VinciAddGuaranteeAction::PARAMETER_CONTRACT_ID = Action::PARAMETER_PREFIX + "ci";
+		const string VinciAddGuaranteeAction::PARAMETER_ACCOUNT_ID = Action::PARAMETER_PREFIX + "ac";
 
 
 		Request::ParametersMap VinciAddGuaranteeAction::getParametersMap() const
@@ -38,6 +40,7 @@ namespace synthese
 			Request::ParametersMap map;
 			map.insert(make_pair(PARAMETER_AMOUNT, Conversion::ToString(_amount)));
 			map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
+			map.insert(make_pair(PARAMETER_ACCOUNT_ID, Conversion::ToString(_account->getKey())));
 			return map;
 		}
 
@@ -49,6 +52,13 @@ namespace synthese
 			if (it != map.end())
 			{
 				_amount = Conversion::ToDouble(it->second);
+				map.erase(it);
+			}
+
+			it = map.find(PARAMETER_ACCOUNT_ID);
+			if (it != map.end())
+			{
+				_account = AccountTableSync::get(ServerModule::getSQLiteThread(), Conversion::ToLongLong(it->second));
 				map.erase(it);
 			}
 
@@ -75,29 +85,35 @@ namespace synthese
 
 			// Part 1 : customer
 			TransactionPart* transactionPart = new TransactionPart;
+			Account* account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE);
 			transactionPart->setTransactionId(transaction->getKey());
-			transactionPart->setAccountId(VinciBikeRentalModule::getGuaranteeAccount()->getKey());
+			transactionPart->setAccountId(account->getKey());
 			transactionPart->setLeftCurrencyAmount(_amount);
 			transactionPart->setRightCurrencyAmount(_amount);
 			TransactionPartTableSync::save(ServerModule::getSQLiteThread(), transactionPart);
-
+			
 			// Part 2 : 
 			TransactionPart* changeTransactionPart = new TransactionPart;
 			changeTransactionPart->setTransactionId(transaction->getKey());
-			changeTransactionPart->setAccountId(VinciBikeRentalModule::getCheckGuaranteeAccount()->getKey());
+			changeTransactionPart->setAccountId(_account->getKey());
 			changeTransactionPart->setLeftCurrencyAmount(-_amount);
 			changeTransactionPart->setRightCurrencyAmount(-_amount);
 			TransactionPartTableSync::save(ServerModule::getSQLiteThread(), changeTransactionPart);
 
+			delete account;
+			delete transactionPart;
+			delete changeTransactionPart;
+			delete transaction;
 		}
 
 		VinciAddGuaranteeAction::~VinciAddGuaranteeAction()
 		{
 			delete _contract;
+			delete _account;
 		}
 
 		VinciAddGuaranteeAction::VinciAddGuaranteeAction()
-			: _contract(NULL)
+			: _contract(NULL), _account(NULL)
 		{ }
 	}
 }

@@ -6,6 +6,8 @@
 
 #include "32_admin/AdminRequest.h"
 
+#include "57_accounting/Account.h"
+#include "57_accounting/AccountTableSync.h"
 #include "57_accounting/TransactionPart.h"
 #include "57_accounting/TransactionPartTableSync.h"
 #include "57_accounting/Transaction.h"
@@ -15,6 +17,8 @@
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 #include "71_vinci_bike_rental/VinciRate.h"
 #include "71_vinci_bike_rental/VinciRateTableSync.h"
+#include "71_vinci_bike_rental/VinciBike.h"
+#include "71_vinci_bike_rental/VinciBikeTableSync.h"
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
 #include "71_vinci_bike_rental/VinciUpdateCustomerAction.h"
@@ -88,7 +92,7 @@ namespace synthese
 				;
 
 			// Guarantees
-			vector<TransactionPart*> guarantees = TransactionPartTableSync::searchTransactionParts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getGuaranteeAccount(), user);
+			vector<TransactionPart*> guarantees = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), user);
 
 			stream
 				<< "<h1>Cautions</h1>"
@@ -96,16 +100,33 @@ namespace synthese
 				<< "<input type=\"hidden\" name=\"" << AdminRequest::PARAMETER_OBJECT_ID << "\" value=\"" << contract->getKey() << "\" />"
 				<< "<input type=\"hidden\" name=\"" << VinciAddGuaranteeAction::PARAMETER_CONTRACT_ID << "\" value=\"" << contract->getKey() << "\" />"
 				<< "<table>"
-				<< "<tr><th>Date</th><th>Montant</th><th>Actions</th></tr>"
+				<< "<tr><th>Date</th><th>Montant</th><th>Nature</th><th>Actions</th></tr>"
 				;
 			for (vector<TransactionPart*>::iterator it = guarantees.begin(); it != guarantees.end(); ++it)
 			{
 				Transaction* transaction = TransactionTableSync::get(ServerModule::getSQLiteThread(), (*it)->getTransactionId());
+				vector<TransactionPart*> payments = TransactionPartTableSync::search(transaction);
 
 				stream
 					<< "<tr>"
 					<< "<td>" << transaction->getStartDateTime().toSQLiteString(false) << "</td>"
 					<< "<td>" << Conversion::ToString((*it)->getRightCurrencyAmount()) << "</td>"
+					<< "<td>";
+				for (vector<TransactionPart*>::iterator it2 = payments.begin(); it2 != payments.end(); ++it2)
+				{
+					if ((*it2)->getKey() != (*it)->getKey())
+					{
+						Account* account = AccountTableSync::get(ServerModule::getSQLiteThread(), (*it2)->getAccountId());
+						if (account->getRightClassNumber() == VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE)
+							stream << "Chèque";
+						else
+							stream << "Carte";
+						delete account;
+					}
+					delete (*it2);
+				}
+				stream
+					<< "</td>"
 					<< "<td>"
 					;
 				if (transaction->getEndDateTime().isUnknown())
@@ -121,20 +142,26 @@ namespace synthese
 				delete *it;
 			}
 
-			
+			Account* checkAccount = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE);
+			Account* cardAccount = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE);
 			stream
-				<< "<tr><td></td>"
+				<< "<tr><td><input type=\"submit\" value=\"Nouvelle caution\" /></td>"
 				<< "<td><input name=\"" << VinciAddGuaranteeAction::PARAMETER_AMOUNT << "\" value=\"260\" /></td>"
-				<< "<td><input type=\"submit\" value=\"Ajouter\" /></td></tr>"
+				<< "<td><select name=\"" << VinciAddGuaranteeAction::PARAMETER_ACCOUNT_ID << "\">"
+				<< "<option value=\"" << checkAccount->getKey() << "\">Chèque</option>"
+				<< "<option value=\"" << cardAccount->getKey() << "\">Carte</option>"
+				<< "</select></td>"
+				<< "<td></td></tr>"
 				<< "</table></form>"
 				;
 
 			// Rents
-			vector<TransactionPart*> rents = TransactionPartTableSync::searchTransactionParts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), user);
+			vector<TransactionPart*> rents = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), user);
 			vector<VinciRate*> rates = VinciRateTableSync::searchVinciRates();
 			stream
 				<< "<h1>Locations</h1>"
 				<< addRentRequest->getHTMLFormHeader("addrent")
+				<< "<input type=\"hidden\" name=\"" << AdminRequest::PARAMETER_OBJECT_ID << "\" value=\"" << contract->getKey() << "\" />"
 				<< "<input type=\"hidden\" name=\"" << RentABikeAction::PARAMETER_CONTRACT_ID << "\" value=\"" << contract->getKey() << "\" />"
 				<< "<table>"
 				<< "<tr><th>Date</th><th>Vélo</th><th>Tarif</th></tr>"
@@ -147,13 +174,20 @@ namespace synthese
 				if ((*it)->getRateId() > 0)
 					rate = VinciRateTableSync::get(ServerModule::getSQLiteThread(), (*it)->getRateId());
 
+				VinciBike* bike = NULL;
+				if ((*it)->getTradedObjectId() != "")
+					bike = VinciBikeTableSync::get(ServerModule::getSQLiteThread(), Conversion::ToLongLong((*it)->getTradedObjectId()));
+
 				stream
 					<< "<tr>"
 					<< "<td>" << transaction->getStartDateTime().toSQLiteString(false) << "</td>"
-					<< "<td>" << Conversion::ToString((*it)->getTradedObjectId()) << "</td>"
-					<< "<td>" << ((rate == NULL) ? "" : rate->getName())  << "</td>"
+					<< "<td>" << ((bike == NULL) ? "Non renseign&eacute;" : bike->getNumber()) << "</td>"
+					<< "<td>" << ((rate == NULL) ? "Non renseign&eacute;" : rate->getName())  << "</td>"
 					<< "</tr>"
 					;
+
+				delete bike;
+				delete rate;
 			}
 			stream
 				<< "<tr>"
@@ -183,6 +217,7 @@ namespace synthese
 			// Cleaning
 			delete contract;
 			delete updateRequest;
+
 		}
 	}
 }

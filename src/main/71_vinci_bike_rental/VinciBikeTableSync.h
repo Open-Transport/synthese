@@ -37,8 +37,8 @@ namespace synthese
 			@author Hugues Romain
 			@date 2006				
 			*/
-			static std::vector<VinciBike*> searchVinciBikes(const db::SQLiteQueueThreadExec* sqlite
-				, const std::string& id, const std::string& cadre
+			static std::vector<VinciBike*> search(
+				const std::string& id, const std::string& cadre
 				, int first = 0, int number = -1);
 
 

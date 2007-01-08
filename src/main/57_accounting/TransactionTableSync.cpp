@@ -43,14 +43,22 @@ namespace synthese
 		{
 			try
 			{
+				stringstream query;
 				if (t->getKey() > 0)
 				{
-					/// @todo UPDATE implementation
+					query << "UPDATE " << TABLE_NAME << " SET "
+						<< TransactionTableSync::TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(t->getName())
+						<< "," << TransactionTableSync::TABLE_COL_DOCUMENT_ID << "=" << Conversion::ToString(t->getDocumentId())
+						<< "," << TransactionTableSync::TABLE_COL_START_DATE_TIME << "=" << t->getStartDateTime().toSQLiteString()
+						<< "," << TransactionTableSync::TABLE_COL_END_DATE_TIME << "=" << t->getEndDateTime().toSQLiteString()
+						<< "," << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(t->getLeftUserId())
+						<< "," << TransactionTableSync::TABLE_COL_PLACE_ID << "=" << Conversion::ToString(t->getPlaceId())
+						<< "," << TransactionTableSync::TABLE_COL_COMMENT << "=" << Conversion::ToSQLiteString(t->getComment())
+						<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(t->getKey());
 				}
 				else
 				{
 					t->setKey(getId(1,1));	/// @todo Handle grid
-					stringstream query;
 					query << "INSERT INTO " << TABLE_NAME << " VALUES("
 						<< Conversion::ToString(t->getKey())
 						<< "," << Conversion::ToSQLiteString(t->getName())
@@ -61,8 +69,8 @@ namespace synthese
 						<< "," << Conversion::ToString(t->getPlaceId())
 						<< "," << Conversion::ToSQLiteString(t->getComment())
 						<< ")";
-					sqlite->execUpdate(query.str());
 				}
+				sqlite->execUpdate(query.str());
 			}
 			catch (SQLiteException& e)
 			{

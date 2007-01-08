@@ -7,6 +7,11 @@
 
 namespace synthese
 {
+	namespace accounts
+	{
+		class Account;
+	}
+
 	namespace vinci
 	{
 		class VinciContract;
@@ -16,10 +21,12 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_AMOUNT;
 			static const std::string PARAMETER_CONTRACT_ID;
+			static const std::string PARAMETER_ACCOUNT_ID;
 
 		private:
 			double	_amount;
 			VinciContract* _contract;
+			accounts::Account* _account;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

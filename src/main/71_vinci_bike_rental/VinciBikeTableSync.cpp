@@ -3,6 +3,8 @@
 
 #include "01_util/Exception.h"
 
+#include "02_db/DBModule.h"
+
 #include "71_vinci_bike_rental/VinciBike.h"
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
 
@@ -93,12 +95,14 @@ namespace synthese
 			const db::SQLiteResult& rows)
 		{}
 
-		std::vector<VinciBike*> VinciBikeTableSync::searchVinciBikes( const db::SQLiteQueueThreadExec* sqlite , const std::string& id, const std::string& cadre , int first /*= 0*/, int number /*= 0*/ )
+		std::vector<VinciBike*> VinciBikeTableSync::search(const std::string& id, const std::string& cadre , int first /*= 0*/, int number /*= 0*/ )
 		{
+			const db::SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+
 			stringstream query;
 			query 
 				<< " SELECT * FROM " << TABLE_NAME
-				<< " WHERE " << TABLE_COL_NUMBER << " LIKE '%" << id << "%' "
+				<< " WHERE " << TABLE_COL_NUMBER << "='" << id << "' "
 				<< " AND " << TABLE_COL_MARKED_NUMBER << " LIKE '%" << cadre << "%' "
 				<< " LIMIT " << number << " OFFSET " << first
 				;

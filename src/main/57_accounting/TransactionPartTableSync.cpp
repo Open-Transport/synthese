@@ -4,6 +4,7 @@
 #include "01_util/Conversion.h"
 #include "01_util/RegistryKeyException.h"
 
+#include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
@@ -24,7 +25,7 @@ namespace synthese
 	using namespace db;
 	using namespace accounts;
 	using namespace security;
-
+	
 	namespace db
 	{
 		template<> const std::string SQLiteTableSyncTemplate<TransactionPart>::TABLE_NAME = "t030_transaction_parts";
@@ -117,8 +118,38 @@ namespace synthese
 
 		}
 
-		vector<TransactionPart*> TransactionPartTableSync::searchTransactionParts( const db::SQLiteQueueThreadExec* sqlite , Account* account, User* user , int first /*= 0*/, int number /*= 0*/ )
+		vector<TransactionPart*> TransactionPartTableSync::search(
+				Transaction* transaction, Account* account
+				, int first, int number)
 		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT * "
+				<< " FROM " << TABLE_NAME << " AS p "
+				<< " WHERE "
+				<< " p." << TABLE_COL_TRANSACTION_ID << "=" << Conversion::ToString(transaction->getKey());
+			if (account != NULL)
+				query << " AND p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey());
+			query << " LIMIT " << number << " OFFSET " << first;
+			
+			SQLiteResult result = sqlite->execQuery(query.str());
+			vector<TransactionPart*> tps;
+			for (int i=0; i<result.getNbRows(); ++i)
+			{
+//				try
+//				{
+					TransactionPart* tp = new TransactionPart;
+					load(tp, result, i);
+					tps.push_back(tp);
+//				}
+			}
+			return tps;
+		}
+
+		vector<TransactionPart*> TransactionPartTableSync::search(Account* account, User* user , int first /*= 0*/, int number /*= 0*/ )
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT * "

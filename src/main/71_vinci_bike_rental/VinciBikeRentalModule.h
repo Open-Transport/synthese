@@ -134,9 +134,6 @@ namespace synthese
 			static security::Profile* getCustomerProfile();
 			static security::User* getVinciUser();
 			static accounts::Currency* getEuroCurrency();
-			static accounts::Account* getGuaranteeAccount();
-			static accounts::Account* getCheckGuaranteeAccount();
-			static accounts::Account* getCardGuaranteeAccount();
 			static accounts::Account* getAccount(const std::string& code);
 		};
 		/** @} */

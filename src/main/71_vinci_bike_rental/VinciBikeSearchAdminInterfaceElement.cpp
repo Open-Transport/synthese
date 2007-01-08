@@ -60,7 +60,7 @@ namespace synthese
 				<< "<h1>Résultat de la recherche</h1>"
 				;
 
-			vector<VinciBike*> bikes = VinciBikeTableSync::searchVinciBikes(ServerModule::getSQLiteThread(), currentRequest->getStringParameter("searchnumber", ""), currentRequest->getStringParameter("searchcadre", ""));
+			vector<VinciBike*> bikes = VinciBikeTableSync::search(currentRequest->getStringParameter("searchnumber", ""), currentRequest->getStringParameter("searchcadre", ""));
 			stream
 				<< addBikeRequest->getHTMLFormHeader("create")
 				<< "<table><tr><th>Numéro</th><th>Cadre</th></tr>"

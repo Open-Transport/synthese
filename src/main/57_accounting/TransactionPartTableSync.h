@@ -22,6 +22,7 @@ namespace synthese
 	{
 		class Account;
 		class TransactionPart;
+		class Transaction;
 
 		/** Transaction part SQLite table synchronizer.
 			@ingroup m57
@@ -51,10 +52,23 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<TransactionPart*> searchTransactionParts(const db::SQLiteQueueThreadExec* sqlite
-				, Account* account, security::User* user
+			static std::vector<TransactionPart*> search(
+				Account* account, security::User* user
 				, int first = 0, int number = -1);
 
+			/** TransactionPart search.
+				@param sqlite SQLite thread
+				@param transaction Transaction which belong the part
+				@param account Account of the part (NULL = all parts)
+				@param first First user to answer
+				@param number Number of users to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return vector<Account*> Founded accounts. 
+				@author Hugues Romain
+				@date 2006				
+			*/
+			static std::vector<TransactionPart*> search(
+				Transaction* transaction, Account* account=NULL
+				, int first = 0, int number = -1);
 
 		protected:
 

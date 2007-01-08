@@ -52,6 +52,12 @@
 				RelativePath=".\SQLite.h">
 			</File>
 			<File
+				RelativePath=".\SQLiteQueueThreadExec.cpp">
+			</File>
+			<File
+				RelativePath=".\SQLiteQueueThreadExec.h">
+			</File>
+			<File
 				RelativePath=".\SQLiteResult.cpp">
 			</File>
 			<File

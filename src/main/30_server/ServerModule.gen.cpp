@@ -1,5 +1,5 @@
 
-synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::server::ServerModule>("30_server");
+synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::server::ServerModule>("999_server");
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::server::ServerConfigTableSync>("0 Config");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::server::SiteTableSync>("30.01 Site");

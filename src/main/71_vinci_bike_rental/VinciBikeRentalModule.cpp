@@ -275,30 +275,6 @@ namespace synthese
 			return currencies.front();
 		}
 
-		accounts::Account* VinciBikeRentalModule::getGuaranteeAccount()
-		{
-			vector<Account*> accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE, 0, "");
-			if (accounts.size() == 0)
-				throw Exception("Vinci bike rental module incomplete installation : the guarantee account is missing");
-			return accounts.front();
-		}
-		 
-		accounts::Account* VinciBikeRentalModule::getCheckGuaranteeAccount()
-		{
-			vector<Account*> accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE, 0, "");
-			if (accounts.size() == 0)
-				throw Exception("Vinci bike rental module incomplete installation : the check guarantee account is missing");
-			return accounts.front();
-		}
-
-		accounts::Account* VinciBikeRentalModule::getCardGuaranteeAccount()
-		{
-			vector<Account*> accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE, 0, "");
-			if (accounts.size() == 0)
-				throw Exception("Vinci bike rental module incomplete installation : the card guarantee account is missing");
-			return accounts.front();
-		}
-
 		Account* VinciBikeRentalModule::getAccount(const std::string& code)
 		{
 			vector<Account*> accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), code, 0, "");
