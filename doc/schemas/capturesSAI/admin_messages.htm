@@ -95,6 +95,9 @@ function Button7_onclick() {
 									<OPTION value="" selected>14</OPTION>
 								</SELECT>, Statut&nbsp;<SELECT language="javascript" id="Select4" onclick="return Select4_onclick()" name="Select1">
 									<OPTION value="" selected>En cours sans date de fin</OPTION>
+								</SELECT>, Conflit
+								<SELECT language="javascript" id="Select6" onclick="return Select4_onclick()" name="Select1">
+									<OPTION value="" selected>En conflit</OPTION>
 								</SELECT>, Type :
 								<SELECT language="javascript" id="Select5" onclick="return Select4_onclick()" name="Select1">
 									<OPTION value="" selected>Complémentaire</OPTION>
@@ -109,10 +112,11 @@ function Button7_onclick() {
 										<TD style="WIDTH: 164px"><STRONG><FONT size="2"><U><FONT color="#0000ff">Message</FONT></U></FONT></STRONG></TD>
 										<TD vAlign="middle" colSpan="1" rowSpan="1"><STRONG><FONT color="#0000ff" size="2"><U>Type</U></FONT></STRONG></TD>
 										<TD align="center"><STRONG><FONT color="#0000ff" size="2"><U>Etat</U></FONT></STRONG></TD>
+										<TD align="center"><STRONG><FONT color="#0000ff" size="2"><U>Confilt</U></FONT></STRONG></TD>
 										<TD align="center" colSpan="1" rowSpan="1"><STRONG><FONT size="2">Actions</FONT></STRONG></TD>
 									</TR>
 									<TR>
-										<TD style="WIDTH: 1px; HEIGHT: 13px" bgColor="#ff6666"><INPUT id="Radio1" type="radio" CHECKED value="Radio1" name="RadioGroup"></TD>
+										<TD style="WIDTH: 1px; HEIGHT: 13px" bgColor="#ff6666" colSpan="" rowSpan=""><INPUT id="Radio1" type="radio" CHECKED value="Radio1" name="RadioGroup"></TD>
 										<TD style="WIDTH: 118px; HEIGHT: 13px" bgColor="#ff6666"><FONT color="#000000" size="1">dès 
 												le 2/9/2006</FONT></TD>
 										<TD style="WIDTH: 164px; HEIGHT: 13px" bgColor="#ff6666"><FONT color="#0000ff" size="1"><U>Travaux 
@@ -120,6 +124,7 @@ function Button7_onclick() {
 										<TD style="HEIGHT: 13px" bgColor="#ff6666">
 											<P><FONT size="1">Complémentaire</FONT></P>
 										</TD>
+										<TD style="HEIGHT: 13px" align="center" bgColor="#ff6666"><FONT face="Wingdings" color="#00cc00">l</FONT></TD>
 										<TD style="HEIGHT: 13px" align="center" bgColor="#ff6666"><FONT face="Wingdings" color="#00cc00">l</FONT></TD>
 										<TD style="HEIGHT: 13px"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button3" onclick="location='admin_message.htm';" type="button"
 														value="Editer" name="Modifier"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button8" onclick="location='admin_message.htm';" type="button"
@@ -135,6 +140,7 @@ function Button7_onclick() {
 											<P><FONT size="1">Scénario</FONT></P>
 										</TD>
 										<TD align="center" bgColor="#99ff66"><FONT face="Wingdings" color="#ff0000">l</FONT></TD>
+										<TD align="center" bgColor="#99ff66"><FONT face="Wingdings" color="#00cc00">l</FONT></TD>
 										<TD><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button4" onclick="location='admin_messages_scenario_send.htm';"
 														type="button" value="Editer" name="Modifier"><INPUT language="javascript" id="Button9" onclick="location='admin_message.htm';" type="button"
 														value="Arrêter" name="Modifier"></FONT></FONT></TD>
@@ -147,6 +153,7 @@ function Button7_onclick() {
 											<P><FONT size="1">Prioritaire </FONT>
 											</P>
 										</TD>
+										<TD></TD>
 										<TD></TD>
 										<TD><FONT size="1"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button1" onclick="location='admin_message.htm';" type="button"
 															value="Editer" name="Modifier"></FONT></FONT></FONT></TD>
@@ -161,24 +168,20 @@ function Button7_onclick() {
 											<P><FONT size="1">Complémentaire</FONT></P>
 										</TD>
 										<TD align="center" bgColor="#99ccff"><FONT face="Wingdings" color="#00cc00">l</FONT></TD>
+										<TD align="center" bgColor="#99ccff" colSpan="" rowSpan=""><FONT face="Wingdings" color="#00cc00"><FONT face="Wingdings" color="#ff0000">l</FONT></FONT></TD>
 										<TD><FONT size="1"><FONT size="1"><FONT size="1"><INPUT language="javascript" id="Button2" onclick="location='admin_message.htm';" type="button"
 															value="Editer" name="Modifier"><INPUT language="javascript" id="Button10" onclick="location='admin_message.htm';" type="button"
 															value="Arrêter" name="Modifier"></FONT></FONT></FONT></TD>
 									</TR>
-									<TR>
-										<TD colSpan="6"><FONT size="1"></FONT>
-											<P><FONT size="1">(sélectionnez un message existant pour créer une copie)</FONT></P>
-											<P><INPUT language="javascript" id="Button7" onclick="location='admin_message.htm'" type="button"
-													value="Nouvelle diffusion de message" name="Button7">&nbsp;</P>
-											<P><INPUT language="javascript" id="Button5" onclick="location='admin_messages_scenario_send.htm'"
-													type="button" value="Nouvelle diffusion de scénario" name="Button7"><SELECT language="javascript" id="Select2" onclick="return Select4_onclick()" name="Select1">
-													<OPTION value="" selected>
-														Interruption métro</OPTION>
-												</SELECT></P>
-										</TD>
-									</TR>
 								</TABLE>
 							</P>
+							<P><FONT size="1">(sélectionnez un message existant pour créer une copie)</FONT></P>
+							<P><INPUT language="javascript" id="Button7" onclick="location='admin_message.htm'" type="button"
+									value="Nouvelle diffusion de message" name="Button7">&nbsp;</P>
+							<P><INPUT language="javascript" id="Button5" onclick="location='admin_messages_scenario_send.htm'"
+									type="button" value="Nouvelle diffusion de scénario" name="Button7"><SELECT language="javascript" id="Select2" onclick="return Select4_onclick()" name="Select1">
+									<OPTION value="" selected>Interruption métro</OPTION>
+								</SELECT></P>
 							<P align="right"><U><FONT color="#0000ff">Messages&nbsp;suivants</FONT></U> &gt;</P>
 							<P>Cliquer sur un titre de colonne pour trier le tableau.</P>
 						</FONT></FONT>

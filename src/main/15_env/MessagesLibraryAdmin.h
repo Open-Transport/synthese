@@ -27,7 +27,7 @@ namespace synthese
 				-# <b>Tableau des textes destinés aux messages complémentaires</b>
 					-# <tt>Nom</tt> : Nom désignant le texte dans les menus. Ce nom n'est pas affiché en dehors du module d'administration. Champ obligatoire et unique.
 					-# <tt>Message court</tt> : Champ texte de 2x20 caractères. Champ obligatoire.
-					-# <tt>Message long</tt> : Champ texte de 256 caractères. Champ obligatoire.
+					-# <tt>Message long</tt> : Champ texte de taille illimitée (pouvant par exemple recevoir du HTML). Champ obligatoire.
 					-# bouton <tt>Modifier</tt> : Enregistre les modifications effectuées dans les champs
 					-# bouton <tt>Supprimer</tt> : Supprime le modèle de texte
 					-# bouton <tt>Ajouter</tt> : Même comportement que <tt>Modifier</tt> sur un texte nouvellement créé

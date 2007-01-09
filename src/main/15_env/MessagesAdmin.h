@@ -35,6 +35,11 @@ namespace synthese
 						- Messages en cours de diffusion avec date de fin
 						- Messages en cours de diffusion sans date de fin
 						- Messages à diffuser ultérieurement
+					-# <tt>Conflit</tt> : Liste déroulante proposant les types de conflit possibles pouvant faire l'objet d'un filtrage des résultats de recherche :
+						- Toutes les situations
+						- Messages sans conflit
+						- Messages prioritaires sur complémentaires
+						- Conflits de messages de même niveaux
 					-# <tt>Type</tt> : Liste déroulante proposant les types de messages possibles pouvant faire l'objet d'un filtrage des résultats de recherche :
 						- Tous les types de messages
 						- Messages complémentaires
@@ -57,6 +62,10 @@ namespace synthese
 						- Pastille verte : tous les afficheurs sont en fonctionnement normal
 						- Pastille orange : au moins un afficheur est en état WARNING, aucun n'est en état ERROR
 						- Pastille rouge : au moins un afficheur est en état ERROR
+					-# <tt>Conflit</tt> : indique si le message est en conflit avec un autre sur au moins un des afficheurs. Une pastille colorée donne l'information et affiche une infobulle lorsque le pointeur de souris est positionné au dessus de celle-ci :
+						- Pastille verte : le message est en conflit sur aucun afficheur
+						- Pastille orange : le message prioritaire "écrase" un message complémentaire
+						- Pastille rouge : le message entre en conflit avec un message de même niveau
 					-# Bouton <tt>Editer</tt> : conduit à la page synthese::interfaces::MessageAdmin sur le message correspondant à la ligne où est présent le bouton
 					-# Bouton <tt>Arrêter</tt> : stoppe la diffusion du message sélectionné (disponible pour les messages dont la date de fin de diffusion n'est pas atteinte, ou pour les messages sans date de fin de diffusion)
 					-# Un clic sur les titres de colonnes effectue un tri croissant puis décroissant sur la colonne sélectionnée

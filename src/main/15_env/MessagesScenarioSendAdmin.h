@@ -57,7 +57,7 @@ namespace synthese
 						- Pastille orange : au moins un afficheur est en état WARNING, aucun n'est en état ERROR
 						- Pastille rouge : au moins un afficheur est en état ERROR
 					-# <tt>Conflit</tt> : indique si le message est en conflit avec un autre sur au moins un des afficheurs. Une pastille colorée donne l'information et affiche une infobulle lorsque le pointeur de souris est positionné au dessus de celle-ci :
-						- Pastille verte : le message est en confilt sur aucun afficheur
+						- Pastille verte : le message est en conflit sur aucun afficheur
 						- Pastille orange : le message prioritaire "écrase" un message complémentaire
 						- Pastille rouge : le message entre en conflit avec un message de même niveau
 					-# <tt>Modifier</tt> : conduit à la page @ref synthese::interfaces::MessageAdmin "d'édition du message" correspondant à la ligne où est présent le bouton. NB : les modifications effectuées sur ce message n'affecteront que la copie utilisée pour cet envoi et en aucun cas le sécnario sauvegardé en bibliothèque.

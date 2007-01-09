@@ -92,7 +92,9 @@
 				Message [label="C/E/S Diffusion message" URL="\ref csst_ihm_messages_MessageAdmin"]
 				Bibliotheque [URL="\ref csst_ihm_messages_MessagesLibraryAdmin"]
 				Scenario [label="C/E/S Scenario" URL="\ref csst_ihm_messages_MessagesScenarioAdmin"]
+				MessageScenario [label="C/E/S Message de scenario (bibliotheque)" URL="\ref csst_ihm_messages_MessageAdmin"]
 				ScenarioSend [label="C/E/S Diffusion scenario de message" URL="\ref csst_ihm_messages_MessagesScenarioSend"]
+				MessageScenarioSend [label="C/E/S Message de scenario (pour diffusion)" URL="\ref csst_ihm_messages_MessageAdmin"]
 				Utilisateurs [URL="\ref csst_ihm_users_users"]
 				User [label="C/E/S utilisateur" URL="\ref csst_ihm_users_user"]
 				Profils [URL="\ref csst_ihm_users_profiles"]
@@ -133,10 +135,12 @@
 
 				Messages -> Message;
 				Messages -> ScenarioSend;
+					ScenarioSend -> MessageScenarioSend;
 
 				Bibliotheque -> "C/E/S Modele de message complementaire";
 				Bibliotheque -> "C/E/S Modele de message prioritaire";
 				Bibliotheque -> Scenario;
+					Scenario -> MessageScenario;
 
 				Utilisateurs -> User;
 				
