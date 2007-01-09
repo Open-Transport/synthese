@@ -10,6 +10,9 @@
 <h2>Quick links</h2>
  - @ref m17 "Conceptual Data Model (CDM)
 
+<h2>License</h2>
+
+All SYNTHESE modules and each corresponding documentation are under the @subpage gpl .
 
 @page metier Environnement métier et spécifications
  - @subpage lexique

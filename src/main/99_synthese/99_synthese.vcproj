@@ -52,6 +52,9 @@
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 		</Filter>
 		<File
+			RelativePath=".\LICENSE.txt">
+		</File>
+		<File
 			RelativePath=".\SConscript">
 		</File>
 	</Files>

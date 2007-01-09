@@ -117,8 +117,8 @@ namespace synthese
 
 		void VinciUpdateCustomerAction::run()
 		{
-			VinciContract* contract = VinciContractTableSync::get(ServerModule::getSQLiteThread(), _id);
-			User* user = UserTableSync::get(ServerModule::getSQLiteThread(), contract->getUserId());
+			VinciContract* contract = VinciContractTableSync::get(_id);
+			User* user = UserTableSync::get(contract->getUserId());
 			user->setName(_name);
 			user->setSurname(_surname);
 			user->setAddress(_address);
@@ -127,7 +127,7 @@ namespace synthese
 			user->setCountry(_country);
 			user->setEMail(_email);
 			user->setPhone(_phone);
-			UserTableSync::save(ServerModule::getSQLiteThread(), user);
+			UserTableSync::save(user);
 		}
 	}
 }

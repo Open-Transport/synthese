@@ -1,6 +1,29 @@
 
+/** VinciContractTableSync class implementation.
+	@file VinciContractTableSync.cpp
+
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
+	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include <sstream>
 
+#include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 
 #include "12_security/User.h"
@@ -30,8 +53,9 @@ namespace synthese
 			vc->_userId = Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::TABLE_COL_USER_ID));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciContract>::save(const SQLiteQueueThreadExec* sqlite, VinciContract* vc)
+		template<> void SQLiteTableSyncTemplate<VinciContract>::save(VinciContract* vc)
 		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (vc->getKey() != 0)
 			{	// UPDATE
@@ -78,8 +102,9 @@ namespace synthese
 
 		}
 
-		std::vector<VinciContract*> VinciContractTableSync::searchVinciContracts( const db::SQLiteQueueThreadExec* sqlite , std::string name /*= ""*/, std::string surname /*= "" */, int first /*= 0*/, int number /*=-1*/ )
+		std::vector<VinciContract*> VinciContractTableSync::search(std::string name /*= ""*/, std::string surname /*= "" */, int first /*= 0*/, int number /*=-1*/ )
 		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< "SELECT *"

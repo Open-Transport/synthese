@@ -6,7 +6,7 @@
 
 namespace synthese
 {
-	namespace interfaces
+	namespace security
 	{
 
 		/** Ecran de gestion des profils utilisateurs.

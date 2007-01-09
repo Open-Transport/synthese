@@ -11,6 +11,7 @@
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/DBEmptyResultException.h"
 #include "02_db/SQLiteException.h"
 #include "02_db/SQLiteTableSync.h"
 
@@ -45,14 +46,14 @@ namespace synthese
 				const std::string& triggerOverrideClause = "1") : SQLiteTableSync(tableName, allowInsert, allowRemove, triggerOverrideClause)
 			{			}
 
-			void initAutoIncrement(const SQLiteQueueThreadExec* sqlite);
+			void initAutoIncrement();
 
 		public:
 			typedef T ObjectsClass;
 
 			static void load(T* obj, const db::SQLiteResult& rows, int rowId=0);
-			static void save(const db::SQLiteQueueThreadExec* sqlite, T* obj);
-			static T* get(const db::SQLiteQueueThreadExec* sqlite, uid key);
+			static void save(T* obj);
+			static T* get(uid key);
 
 			/// @todo See if the template can be used more 
 
@@ -60,8 +61,9 @@ namespace synthese
 		};
 
 		template <class T>
-			T* synthese::db::SQLiteTableSyncTemplate<T>::get( const db::SQLiteQueueThreadExec* sqlite, uid key)
+			T* synthese::db::SQLiteTableSyncTemplate<T>::get(uid key)
 		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
 			query
 				<< "SELECT * "
@@ -69,7 +71,7 @@ namespace synthese
 				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key);
 			db::SQLiteResult rows = sqlite->execQuery(query.str());
 			if (rows.getNbRows() <= 0)
-				throw SQLiteException("Object "+ TABLE_NAME + " " + Conversion::ToString(key) + " not found in database.");
+				throw DBEmptyResultException("Object "+ TABLE_NAME + " " + Conversion::ToString(key) + " not found in database.");
 			T* object = new T;
 			load(object, rows);
 			return object;
@@ -103,12 +105,13 @@ namespace synthese
 		}
 
 		template <class T>
-			void SQLiteTableSyncTemplate<T>::initAutoIncrement(const SQLiteQueueThreadExec* sqlite)
+			void SQLiteTableSyncTemplate<T>::initAutoIncrement()
 		{
 			if (HAS_AUTO_INCREMENT)
 			{
 				try
 				{
+					const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 					std::stringstream query;
 					query
 						<< "SELECT " << util::Conversion::ToString(0x00000000FFFFFFFFLL) << " & MAX(id) AS maxid FROM " << TABLE_NAME

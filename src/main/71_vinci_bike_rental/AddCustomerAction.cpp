@@ -3,8 +3,6 @@
 #include "12_security/UserTableSync.h"
 #include "12_security/Profile.h"
 
-#include "30_server/ServerModule.h"
-
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
@@ -58,11 +56,11 @@ namespace synthese
 			user->setName(_name);
 			user->setSurname(_surname);
 			user->setProfile(profile);
-			UserTableSync::save(ServerModule::getSQLiteThread(), user);
+			UserTableSync::save(user);
 
 			VinciContract* contract = new VinciContract;
 			contract->setUserId(user->getKey());
-			VinciContractTableSync::save(ServerModule::getSQLiteThread(), contract);
+			VinciContractTableSync::save(contract);
 
 			_request->setObjectId(contract->getKey());
 

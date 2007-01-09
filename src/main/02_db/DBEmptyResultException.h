@@ -1,6 +1,6 @@
 
-/** DBLogRight class header.
-	@file DBLogRight.h
+/** DBEmptyResultException class header.
+	@file DBEmptyResultException.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,30 +20,30 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_DB_LOG_RIGHT_H
-#define SYNTHESE_DB_LOG_RIGHT_H
+#ifndef SYNTHESE_DBEmptyResultException_H__
+#define SYNTHESE_DBEmptyResultException_H__
 
-#include "05_security/Right.h"
+#include "01_util/Exception.h"
+
+#include <string>
+#include <iostream>
 
 namespace synthese
 {
-	namespace util
+	namespace db
 	{
-		/** Habilitation portant sur la gestion des journaux.
-			@ingroup m34
+		/** Empty result in a selection db query.
+			@ingroup m02
 
-			Les niveaux de droit utilisés sont les suivants :
-				- READ : Permet de consulter un journal
-				- DELETE : Permet de purger un journal
-
-			Définition du périmètre :
-				- NB : Le périmètre n'est pas défini par l'habilitation DBLogRight qui porte sur le principe même d'accéder aux journaux. Chaque journal fait à son tour l'objet d'un contrôle de droits le plus souvent basé sur les habilitations du module auquel ils appartiennent. Voir la documentation de chaque journal.
+			This exception occurs when the execution of a selection query returns an empty result though it should not.
 		*/
-		class DBLogRight : public security::Right
+		class DBEmptyResultException : public util::Exception
 		{
-
+		public:
+			DBEmptyResultException ( const std::string& message);
+			~DBEmptyResultException () throw ();
 		};
 	}
 }
 
-#endif
+#endif // SYNTHESE_DBEmptyResultException_H__

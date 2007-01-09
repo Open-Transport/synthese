@@ -1,4 +1,26 @@
 
+/** VinciCustomerAdminInterfaceElement class implementation.
+	@file VinciCustomerAdminInterfaceElement.cpp
+
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
+	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
 
@@ -37,23 +59,18 @@ namespace synthese
 	namespace vinci
 	{
 		VinciCustomerAdminInterfaceElement::VinciCustomerAdminInterfaceElement()
-			: AdminInterfaceElement("vincicustomers", AdminInterfaceElement::DISPLAYED_IF_CURRENT) {}
+			: AdminInterfaceElement("vincicustomers", AdminInterfaceElement::DISPLAYED_IF_CURRENT) 
+			, _contract(NULL), _user(NULL)		
+		{}
 
 
 		std::string VinciCustomerAdminInterfaceElement::getTitle() const
 		{
-			return "Client";
+			return "Client " + _user->getSurname() + " " + _user->getName();
 		}
 
-		void VinciCustomerAdminInterfaceElement::display( std::ostream& stream, const interfaces::ParametersVector& parameters, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		void VinciCustomerAdminInterfaceElement::display(std::ostream& stream, const server::Request* request /*= NULL*/ ) const
 		{
-			// Current request
-			AdminRequest* currentRequest = (AdminRequest*) request;
-
-			// Current contract
-			VinciContract* contract = VinciContractTableSync::get(ServerModule::getSQLiteThread(), currentRequest->getObjectId());
-			User* user = UserTableSync::get(ServerModule::getSQLiteThread(), contract->getUserId());
-			
 			// Update user request
 			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
 			updateRequest->copy(request);
@@ -76,35 +93,35 @@ namespace synthese
 			stream
 				<< "<h1>Coordonnées</h1>"
 				<< updateRequest->getHTMLFormHeader("update")
-				<< "<input type=\"hidden\" name=\"" << Request::PARAMETER_OBJECT_ID << "\" value=\"" << Conversion::ToString(contract->getKey()) << "\" />"
-				<< "<input type=\"hidden\" name=\"" << VinciUpdateCustomerAction::PARAMETER_ID << "\" value=\"" << Conversion::ToString(contract->getKey()) << "\" />"
+				<< "<input type=\"hidden\" name=\"" << Request::PARAMETER_OBJECT_ID << "\" value=\"" << Conversion::ToString(_contract->getKey()) << "\" />"
+				<< "<input type=\"hidden\" name=\"" << VinciUpdateCustomerAction::PARAMETER_ID << "\" value=\"" << Conversion::ToString(_contract->getKey()) << "\" />"
 				<< "<table>"
-				<< "<tr><td>Nom</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_NAME << "\" value=\"" << user->getName() << "\" /></td></tr>"
-				<< "<tr><td>Prénom</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_SURNAME << "\" value=\"" << user->getSurname() << "\" /></td></tr>"
-				<< "<tr><td>Adresse</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_ADDRESS << "\" value=\"" << user->getAddress() << "\" /></td></tr>"
-				<< "<tr><td>Code postal</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_POST_CODE << "\" value=\"" << user->getPostCode() << "\" /></td></tr>"
-				<< "<tr><td>Commune</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_CITY << "\" value=\"" << user->getCityText() << "\" /></td></tr>"
-				<< "<tr><td>Pays</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_COUNTRY << "\" value=\"" << user->getCountry() << "\" /></td></tr>"
-				<< "<tr><td>E-mail</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_EMAIL << "\" value=\"" << user->getEMail() << "\" /></td></tr>"
-				<< "<tr><td>Téléphone</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_PHONE << "\" value=\"" << user->getPhone() << "\" /></td></tr>"
+				<< "<tr><td>Nom</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_NAME << "\" value=\"" << _user->getName() << "\" /></td></tr>"
+				<< "<tr><td>Prénom</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_SURNAME << "\" value=\"" << _user->getSurname() << "\" /></td></tr>"
+				<< "<tr><td>Adresse</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_ADDRESS << "\" value=\"" << _user->getAddress() << "\" /></td></tr>"
+				<< "<tr><td>Code postal</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_POST_CODE << "\" value=\"" << _user->getPostCode() << "\" /></td></tr>"
+				<< "<tr><td>Commune</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_CITY << "\" value=\"" << _user->getCityText() << "\" /></td></tr>"
+				<< "<tr><td>Pays</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_COUNTRY << "\" value=\"" << _user->getCountry() << "\" /></td></tr>"
+				<< "<tr><td>E-mail</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_EMAIL << "\" value=\"" << _user->getEMail() << "\" /></td></tr>"
+				<< "<tr><td>Téléphone</td><td><input name=\"" << VinciUpdateCustomerAction::PARAMETER_PHONE << "\" value=\"" << _user->getPhone() << "\" /></td></tr>"
 				<< "<tr><td colspan=\"2\"><input type=\"submit\" value=\"Modifier\" /></td>"
 				<< "</table></form>"
 				;
 
 			// Guarantees
-			vector<TransactionPart*> guarantees = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), user);
+			vector<TransactionPart*> guarantees = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), _user);
 
 			stream
 				<< "<h1>Cautions</h1>"
 				<< addGuaranteeRequest->getHTMLFormHeader("addguarantee")
-				<< "<input type=\"hidden\" name=\"" << AdminRequest::PARAMETER_OBJECT_ID << "\" value=\"" << contract->getKey() << "\" />"
-				<< "<input type=\"hidden\" name=\"" << VinciAddGuaranteeAction::PARAMETER_CONTRACT_ID << "\" value=\"" << contract->getKey() << "\" />"
+				<< "<input type=\"hidden\" name=\"" << AdminRequest::PARAMETER_OBJECT_ID << "\" value=\"" << _contract->getKey() << "\" />"
+				<< "<input type=\"hidden\" name=\"" << VinciAddGuaranteeAction::PARAMETER_CONTRACT_ID << "\" value=\"" << _contract->getKey() << "\" />"
 				<< "<table>"
 				<< "<tr><th>Date</th><th>Montant</th><th>Nature</th><th>Actions</th></tr>"
 				;
 			for (vector<TransactionPart*>::iterator it = guarantees.begin(); it != guarantees.end(); ++it)
 			{
-				Transaction* transaction = TransactionTableSync::get(ServerModule::getSQLiteThread(), (*it)->getTransactionId());
+				Transaction* transaction = TransactionTableSync::get((*it)->getTransactionId());
 				vector<TransactionPart*> payments = TransactionPartTableSync::search(transaction);
 
 				stream
@@ -116,7 +133,7 @@ namespace synthese
 				{
 					if ((*it2)->getKey() != (*it)->getKey())
 					{
-						Account* account = AccountTableSync::get(ServerModule::getSQLiteThread(), (*it2)->getAccountId());
+						Account* account = AccountTableSync::get((*it2)->getAccountId());
 						if (account->getRightClassNumber() == VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE)
 							stream << "Chèque";
 						else
@@ -156,27 +173,27 @@ namespace synthese
 				;
 
 			// Rents
-			vector<TransactionPart*> rents = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), user);
-			vector<VinciRate*> rates = VinciRateTableSync::searchVinciRates();
+			vector<TransactionPart*> rents = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), _user);
+			vector<VinciRate*> rates = VinciRateTableSync::search();
 			stream
 				<< "<h1>Locations</h1>"
 				<< addRentRequest->getHTMLFormHeader("addrent")
-				<< "<input type=\"hidden\" name=\"" << AdminRequest::PARAMETER_OBJECT_ID << "\" value=\"" << contract->getKey() << "\" />"
-				<< "<input type=\"hidden\" name=\"" << RentABikeAction::PARAMETER_CONTRACT_ID << "\" value=\"" << contract->getKey() << "\" />"
+				<< "<input type=\"hidden\" name=\"" << AdminRequest::PARAMETER_OBJECT_ID << "\" value=\"" << _contract->getKey() << "\" />"
+				<< "<input type=\"hidden\" name=\"" << RentABikeAction::PARAMETER_CONTRACT_ID << "\" value=\"" << _contract->getKey() << "\" />"
 				<< "<table>"
 				<< "<tr><th>Date</th><th>Vélo</th><th>Tarif</th></tr>"
 				;
 			for (vector<TransactionPart*>::iterator it = rents.begin(); it != rents.end(); ++it)
 			{
-				Transaction* transaction = TransactionTableSync::get(ServerModule::getSQLiteThread(), (*it)->getTransactionId());
+				Transaction* transaction = TransactionTableSync::get((*it)->getTransactionId());
 								
 				VinciRate* rate = NULL;
 				if ((*it)->getRateId() > 0)
-					rate = VinciRateTableSync::get(ServerModule::getSQLiteThread(), (*it)->getRateId());
+					rate = VinciRateTableSync::get((*it)->getRateId());
 
 				VinciBike* bike = NULL;
 				if ((*it)->getTradedObjectId() != "")
-					bike = VinciBikeTableSync::get(ServerModule::getSQLiteThread(), Conversion::ToLongLong((*it)->getTradedObjectId()));
+					bike = VinciBikeTableSync::get(Conversion::ToLongLong((*it)->getTradedObjectId()));
 
 				stream
 					<< "<tr>"
@@ -215,9 +232,25 @@ namespace synthese
 				;
 
 			// Cleaning
-			delete contract;
 			delete updateRequest;
 
+		}
+
+		void VinciCustomerAdminInterfaceElement::setFromParametersMap(const server::Request::ParametersMap& map)
+		{
+			// Current contract
+			const server::Request::ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
+			if (it != map.end())
+			{
+				_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
+				_user = UserTableSync::get(_contract->getUserId());
+			}
+		}
+
+		VinciCustomerAdminInterfaceElement::~VinciCustomerAdminInterfaceElement()
+		{
+			delete _contract;
+			delete _user;
 		}
 	}
 }

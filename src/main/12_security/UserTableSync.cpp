@@ -3,8 +3,9 @@
 
 #include "01_util/Conversion.h"
 
+#include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteThreadExec.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
 #include "12_security/SecurityModule.h"
@@ -50,10 +51,11 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteTableSyncTemplate<User>::save(const db::SQLiteThreadExec* sqlite, User* user )
+		template<> void SQLiteTableSyncTemplate<User>::save(User* user )
 		{
 			try
 			{
+				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 				stringstream query;
 				if (user->getKey() != 0)
 				{
@@ -144,7 +146,7 @@ namespace synthese
 		}
 
 
-		void UserTableSync::rowsUpdated( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void UserTableSync::rowsUpdated( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -153,18 +155,19 @@ namespace synthese
 		}
 
 
-		void UserTableSync::rowsAdded( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void UserTableSync::rowsAdded( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 		}
 
 
-		void UserTableSync::rowsRemoved( const SQLiteThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void UserTableSync::rowsRemoved( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 			/// @todo implementation
 		}
 
-		User* UserTableSync::getUser( const db::SQLiteThreadExec* sqlite, const std::string& login )
+		User* UserTableSync::getUserFromLogin(const std::string& login )
 		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
 			query
 				<< "SELECT *"
@@ -185,8 +188,9 @@ namespace synthese
 			}
 		}
 
-		std::vector<User*> UserTableSync::searchUsers( const db::SQLiteThreadExec* sqlite, const std::string& login, const std::string name, uid profileId, int first /*= 0*/, int number /*= 0*/ )
+		std::vector<User*> UserTableSync::search(const std::string& login, const std::string name, uid profileId, int first /*= 0*/, int number /*= 0*/ )
 		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

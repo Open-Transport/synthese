@@ -39,7 +39,7 @@ namespace synthese
 			UserTableSync();
 			~UserTableSync ();
 
-			static User* getUser(const db::SQLiteQueueThreadExec* sqlite, const std::string& login);
+			static User* getUserFromLogin(const std::string& login);
 
 			/** User search.
 				@param sqlite SQLite thread
@@ -51,8 +51,8 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<User*> searchUsers(const db::SQLiteQueueThreadExec* sqlite
-				, const std::string& login, const std::string name, uid profileId = 0
+			static std::vector<User*> search(
+				const std::string& login, const std::string name, uid profileId = 0
 				, int first = 0, int number = -1);
 
 		protected:

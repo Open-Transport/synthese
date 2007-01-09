@@ -46,7 +46,7 @@ namespace synthese
 			{
 				if (_login.size() > 0 && _password.size() > 0)
 				{
-					User* user = UserTableSync::getUser(ServerModule::getSQLiteThread(), _login);
+					User* user = UserTableSync::getUserFromLogin(_login);
 					user->verifyPassword(_password);
 					Session* session = new Session(_request->getIP());
 					session->setUser(user);

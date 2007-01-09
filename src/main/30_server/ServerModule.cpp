@@ -5,9 +5,6 @@
 #include "01_util/Thread.h"
 #include "01_util/ThreadManager.h"
 
-#include "02_db/DBModule.h" // To be removed...
-
-
 #include "30_server/ServerModule.h"
 #include "30_server/CleanerThreadExec.h"
 #include "30_server/ServerThreadExec.h"
@@ -17,7 +14,6 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace util;
-	using namespace db;
 	using namespace tcp;
 
 	namespace server
@@ -123,12 +119,6 @@ namespace synthese
 		ServerModule::SessionMap& ServerModule::getSessions()
 		{
 			return _sessionMap;
-		}
-
-		SQLiteQueueThreadExec* ServerModule::getSQLiteThread()
-		{
-		    // @todo REPLACE all calls to this method by the db call
-		    return synthese::db::DBModule::GetSQLite ();
 		}
 	}
 }

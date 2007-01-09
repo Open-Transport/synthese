@@ -3,8 +3,6 @@
 
 #include "04_time/DateTime.h"
 
-#include "30_server/ServerModule.h"
-
 #include "57_accounting/Account.h"
 #include "57_accounting/Transaction.h"
 #include "57_accounting/TransactionTableSync.h"
@@ -70,7 +68,7 @@ namespace synthese
 			it=map.find(PARAMETER_CONTRACT_ID);
 			if (it != map.end())
 			{
-				_contract = VinciContractTableSync::get(ServerModule::getSQLiteThread(), Conversion::ToLongLong(it->second));
+				_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
 				map.erase(it);
 			}
 		}
@@ -80,7 +78,7 @@ namespace synthese
 			DateTime now;
 			DateTime unknownDate(TIME_UNKNOWN);
 
-			VinciRate* rate = VinciRateTableSync::get(ServerModule::getSQLiteThread(), _rateId);
+			VinciRate* rate = VinciRateTableSync::get(_rateId);
 
 			double amount;
 
@@ -100,7 +98,7 @@ namespace synthese
 			transaction->setStartDateTime(now);
 			transaction->setEndDateTime(unknownDate);
 			transaction->setLeftUserId(_contract->getUserId());
-			TransactionTableSync::save(ServerModule::getSQLiteThread(), transaction);
+			TransactionTableSync::save(transaction);
 
 			// Part 1 : service
 			TransactionPart* transactionPart = new TransactionPart;
@@ -110,7 +108,7 @@ namespace synthese
 			transactionPart->setRightCurrencyAmount(amount);
 			transactionPart->setRateId(_rateId);
 			transactionPart->setTradedObjectId(Conversion::ToString(bike->getKey()));
-			TransactionPartTableSync::save(ServerModule::getSQLiteThread(), transactionPart);
+			TransactionPartTableSync::save(transactionPart);
 
 			// Part 2 : customer
 			TransactionPart* changeTransactionPart = new TransactionPart;
@@ -118,7 +116,7 @@ namespace synthese
 			changeTransactionPart->setAccountId(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE)->getKey());
 			changeTransactionPart->setLeftCurrencyAmount(-amount);
 			changeTransactionPart->setRightCurrencyAmount(-amount);
-			TransactionPartTableSync::save(ServerModule::getSQLiteThread(), changeTransactionPart);
+			TransactionPartTableSync::save(changeTransactionPart);
 
 			// Part 3 : bike stock lower
 

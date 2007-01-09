@@ -104,6 +104,10 @@
 				RelativePath=".\AdminPagesTreeInterfaceElement.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="Exceptions"
+			Filter="">
+		</Filter>
 		<File
 			RelativePath=".\AdminModule.cpp">
 		</File>

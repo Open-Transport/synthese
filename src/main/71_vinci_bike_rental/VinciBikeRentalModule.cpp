@@ -1,12 +1,32 @@
 
+/** VinciBikeRentalModule class implementation.
+	@file VinciBikeRentalModule.cpp
+
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
+	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include <vector>
 
 #include "12_security/UserTableSync.h"
 #include "12_security/User.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/Profile.h"
-
-#include "30_server/ServerModule.h"
 
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
@@ -20,7 +40,6 @@ using namespace std;
 namespace synthese
 {
 	using namespace security;
-	using namespace server;
 	using namespace accounts;
 
 	namespace vinci
@@ -60,13 +79,13 @@ namespace synthese
 		{
 			// Profile for virtual owner user
 			Profile* vinciProfile;
-			vector<Profile*> profiles = ProfileTableSync::searchProfiles(ServerModule::getSQLiteThread(), VINCI_ACCOUNTING_PROFILE);
+			vector<Profile*> profiles = ProfileTableSync::search(VINCI_ACCOUNTING_PROFILE);
 			if (profiles.size() == 0)
 			{
 				vinciProfile = new Profile;
 				vinciProfile->setName(VINCI_ACCOUNTING_PROFILE);
 				vinciProfile->setRights(VINCI_ACCOUNTING_PROFILE_RIGHTS);
-				ProfileTableSync::save(ServerModule::getSQLiteThread(), vinciProfile);
+				ProfileTableSync::save(vinciProfile);
 			}
 			else
 			{
@@ -75,14 +94,14 @@ namespace synthese
 
 			// Virtual owner user
 			User* vinciUser;
-			vector<User*> users = UserTableSync::searchUsers(ServerModule::getSQLiteThread(), VINCI_ACCOUNTING_USER, VINCI_ACCOUNTING_USER, vinciProfile->getKey());
+			vector<User*> users = UserTableSync::search(VINCI_ACCOUNTING_USER, VINCI_ACCOUNTING_USER, vinciProfile->getKey());
 			if (users.size() == 0)
 			{
 				vinciUser = new User;
 				vinciUser->setName(VINCI_ACCOUNTING_USER);
 				vinciUser->setLogin(VINCI_ACCOUNTING_USER);
 				vinciUser->setProfile(vinciProfile);
-				UserTableSync::save(ServerModule::getSQLiteThread(), vinciUser);
+				UserTableSync::save(vinciUser);
 			}
 			else
 			{
@@ -91,44 +110,44 @@ namespace synthese
 
 			// Required currencies
 			Currency* euroCurrency;
-			vector<Currency*> currencies = CurrencyTableSync::searchCurrencies(ServerModule::getSQLiteThread(), VINCI_CURRENCY_EURO_NAME, VINCI_CURRENCY_EURO);
+			vector<Currency*> currencies = CurrencyTableSync::search(VINCI_CURRENCY_EURO_NAME, VINCI_CURRENCY_EURO);
 			if (currencies.size() == 0)
 			{
 				euroCurrency = new Currency;
 				euroCurrency->setName(VINCI_CURRENCY_EURO_NAME);
 				euroCurrency->setSymbol(VINCI_CURRENCY_EURO);
-				CurrencyTableSync::save(ServerModule::getSQLiteThread(), euroCurrency);
+				CurrencyTableSync::save(euroCurrency);
 			}
 			else
 				euroCurrency = currencies.front();
 
 			Currency* bikeCurrency;
-			currencies = CurrencyTableSync::searchCurrencies(ServerModule::getSQLiteThread(), VINCI_CURRENCY_BIKE_NAME, VINCI_CURRENCY_BIKE);
+			currencies = CurrencyTableSync::search(VINCI_CURRENCY_BIKE_NAME, VINCI_CURRENCY_BIKE);
 			if (currencies.size() == 0)
 			{
 				bikeCurrency = new Currency;
 				bikeCurrency->setName(VINCI_CURRENCY_BIKE_NAME);
 				bikeCurrency->setSymbol(VINCI_CURRENCY_BIKE);
-				CurrencyTableSync::save(ServerModule::getSQLiteThread(), bikeCurrency);
+				CurrencyTableSync::save(bikeCurrency);
 			}
 			else
 				bikeCurrency = currencies.front();
 
 			Currency* ticketCurrency;
-			currencies = CurrencyTableSync::searchCurrencies(ServerModule::getSQLiteThread(), VINCI_CURRENCY_TICKET_PUNCHING_NAME, VINCI_CURRENCY_TICKET_PUNCHING);
+			currencies = CurrencyTableSync::search(VINCI_CURRENCY_TICKET_PUNCHING_NAME, VINCI_CURRENCY_TICKET_PUNCHING);
 			if (currencies.size() == 0)
 			{
 				ticketCurrency = new Currency;
 				ticketCurrency->setName(VINCI_CURRENCY_TICKET_PUNCHING_NAME);
 				ticketCurrency->setSymbol(VINCI_CURRENCY_TICKET_PUNCHING);
-				CurrencyTableSync::save(ServerModule::getSQLiteThread(), ticketCurrency);
+				CurrencyTableSync::save(ticketCurrency);
 			}
 			else
 				ticketCurrency = currencies.front();
 
 			// Guarantee accounts
 			Account* guaranteeAccount;
-			vector<Account*> accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE, 0, "");
+			vector<Account*> accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
 				guaranteeAccount = new Account;
@@ -136,11 +155,11 @@ namespace synthese
 				guaranteeAccount->setRightCurrency(euroCurrency);
 				guaranteeAccount->setLeftCurrency(euroCurrency);
 				guaranteeAccount->setRightUserId(vinciUser->getKey());
-				AccountTableSync::save(ServerModule::getSQLiteThread(), guaranteeAccount);
+				AccountTableSync::save(guaranteeAccount);
 			}
 
 			Account* checkGuaranteeAccount;
-			accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE, 0, "");
+			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
 				checkGuaranteeAccount = new Account;
@@ -148,11 +167,11 @@ namespace synthese
 				checkGuaranteeAccount->setRightCurrency(euroCurrency);
 				checkGuaranteeAccount->setLeftCurrency(euroCurrency);
 				checkGuaranteeAccount->setRightUserId(vinciUser->getKey());
-				AccountTableSync::save(ServerModule::getSQLiteThread(), checkGuaranteeAccount);
+				AccountTableSync::save(checkGuaranteeAccount);
 			}
 
 			Account* cardGuaranteeAccount;
-			accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE, 0, "");
+			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
 				cardGuaranteeAccount = new Account;
@@ -160,12 +179,12 @@ namespace synthese
 				cardGuaranteeAccount->setRightCurrency(euroCurrency);
 				cardGuaranteeAccount->setLeftCurrency(euroCurrency);
 				cardGuaranteeAccount->setRightUserId(vinciUser->getKey());
-				AccountTableSync::save(ServerModule::getSQLiteThread(), cardGuaranteeAccount);
+				AccountTableSync::save(cardGuaranteeAccount);
 			}
 
 			// Customer accounts
 			Account* customerTicketAccount;
-			accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE, 0, "");
+			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
 				customerTicketAccount = new Account;
@@ -173,11 +192,11 @@ namespace synthese
 				customerTicketAccount->setRightCurrency(ticketCurrency);
 				customerTicketAccount->setLeftCurrency(ticketCurrency);
 				customerTicketAccount->setRightUserId(vinciUser->getKey());
-				AccountTableSync::save(ServerModule::getSQLiteThread(), customerTicketAccount);
+				AccountTableSync::save(customerTicketAccount);
 			}
 
 			Account* customerEuroAccount;
-			accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE, 0, "");
+			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
 				customerEuroAccount = new Account;
@@ -185,12 +204,12 @@ namespace synthese
 				customerEuroAccount->setRightCurrency(ticketCurrency);
 				customerEuroAccount->setLeftCurrency(ticketCurrency);
 				customerEuroAccount->setRightUserId(vinciUser->getKey());
-				AccountTableSync::save(ServerModule::getSQLiteThread(), customerEuroAccount);
+				AccountTableSync::save(customerEuroAccount);
 			}
 
 			// Services accounts
 			Account* ticketBikeRent;
-			accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE, 0, "");
+			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
 				ticketBikeRent = new Account;
@@ -198,12 +217,12 @@ namespace synthese
 				ticketBikeRent->setRightCurrency(ticketCurrency);
 				ticketBikeRent->setLeftCurrency(ticketCurrency);
 				ticketBikeRent->setRightUserId(vinciUser->getKey());
-				AccountTableSync::save(ServerModule::getSQLiteThread(), ticketBikeRent);
+				AccountTableSync::save(ticketBikeRent);
 			}
 
 			// Payment accounts
 			Account* ticketPunchings;
-			accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_TICKETS_PUNCHING_ACCOUNT_CODE, 0, "");
+			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_TICKETS_PUNCHING_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
 				ticketPunchings= new Account;
@@ -211,12 +230,12 @@ namespace synthese
 				ticketPunchings->setRightCurrency(ticketCurrency);
 				ticketPunchings->setLeftCurrency(ticketCurrency);
 				ticketPunchings->setRightUserId(vinciUser->getKey());
-				AccountTableSync::save(ServerModule::getSQLiteThread(), ticketPunchings);
+				AccountTableSync::save(ticketPunchings);
 			}
 
 			// Stock accounts
 			Account* bikeStockAccount;
-			accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_STOCKS_BIKE_ACCOUNT_CODE, 0, "");
+			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_STOCKS_BIKE_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
 				bikeStockAccount = new Account;
@@ -224,20 +243,20 @@ namespace synthese
 				bikeStockAccount->setRightCurrency(bikeCurrency);
 				bikeStockAccount->setLeftCurrency(bikeCurrency);
 				bikeStockAccount->setRightUserId(vinciUser->getKey());
-				AccountTableSync::save(ServerModule::getSQLiteThread(), bikeStockAccount);
+				AccountTableSync::save(bikeStockAccount);
 			}
 
 
 			
 			// Special profile for customers
 			Profile* vinciCustomerProfile;
-			profiles = ProfileTableSync::searchProfiles(ServerModule::getSQLiteThread(), VINCI_CUSTOMER_PROFILE);
+			profiles = ProfileTableSync::search(VINCI_CUSTOMER_PROFILE);
 			if (profiles.size() == 0)
 			{
 				vinciCustomerProfile = new Profile;
 				vinciCustomerProfile->setName(VINCI_CUSTOMER_PROFILE);
 				vinciCustomerProfile->setRights(VINCI_CUSTOMER_PROFILE_RIGHTS);
-				ProfileTableSync::save(ServerModule::getSQLiteThread(), vinciCustomerProfile);
+				ProfileTableSync::save(vinciCustomerProfile);
 			}
 			else
 			{
@@ -249,7 +268,7 @@ namespace synthese
 
 		Profile* VinciBikeRentalModule::getCustomerProfile()
 		{
-			vector<Profile*> profiles = ProfileTableSync::searchProfiles(ServerModule::getSQLiteThread(), VINCI_CUSTOMER_PROFILE);
+			vector<Profile*> profiles = ProfileTableSync::search(VINCI_CUSTOMER_PROFILE);
 			if (profiles.size() == 0)
 				throw Exception("Vinci bike rental module incomplete installation : the customer profile is missing");
 			return profiles.front();
@@ -257,11 +276,11 @@ namespace synthese
 
 		User* VinciBikeRentalModule::getVinciUser()
 		{
-			vector<Profile*> profiles = ProfileTableSync::searchProfiles(ServerModule::getSQLiteThread(), VINCI_ACCOUNTING_PROFILE);
+			vector<Profile*> profiles = ProfileTableSync::search(VINCI_ACCOUNTING_PROFILE);
 			if (profiles.size() == 0)
 				throw Exception("Vinci bike rental module incomplete installation : the rental root user is missing");
 			Profile* vinciProfile = profiles.front();
-			vector<User*> users = UserTableSync::searchUsers(ServerModule::getSQLiteThread(), VINCI_ACCOUNTING_USER, VINCI_ACCOUNTING_USER, vinciProfile->getKey());
+			vector<User*> users = UserTableSync::search(VINCI_ACCOUNTING_USER, VINCI_ACCOUNTING_USER, vinciProfile->getKey());
 			if (users.size() == 0)
 				throw Exception("Vinci bike rental module incomplete installation : the rental root user is missing");
 			return users.front();
@@ -269,7 +288,7 @@ namespace synthese
 
 		Currency* VinciBikeRentalModule::getEuroCurrency()
 		{
-			vector<Currency*> currencies = CurrencyTableSync::searchCurrencies(ServerModule::getSQLiteThread(), VINCI_CURRENCY_EURO_NAME, VINCI_CURRENCY_EURO);
+			vector<Currency*> currencies = CurrencyTableSync::search(VINCI_CURRENCY_EURO_NAME, VINCI_CURRENCY_EURO);
 			if (currencies.size() == 0)
 				throw Exception("Vinci bike rental module incomplete installation : the euro currency is missing");
 			return currencies.front();
@@ -277,7 +296,7 @@ namespace synthese
 
 		Account* VinciBikeRentalModule::getAccount(const std::string& code)
 		{
-			vector<Account*> accounts = AccountTableSync::searchAccounts(ServerModule::getSQLiteThread(), VinciBikeRentalModule::getVinciUser()->getKey(), code, 0, "");
+			vector<Account*> accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), code, 0, "");
 			if (accounts.size() == 0)
 				throw Exception("Vinci bike rental module incomplete installation : the " + code + " account is missing");
 			return accounts.front();

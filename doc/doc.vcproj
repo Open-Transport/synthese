@@ -4,6 +4,7 @@
 	Version="7.10"
 	Name="doc"
 	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
+	RootNamespace="doc"
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
@@ -52,6 +53,9 @@
 			</File>
 			<File
 				RelativePath=".\pages\erreurs.doxygen">
+			</File>
+			<File
+				RelativePath=".\pages\gpl.doxygen">
 			</File>
 			<File
 				RelativePath=".\pages\historique.doxygen">

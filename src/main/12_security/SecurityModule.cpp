@@ -7,14 +7,10 @@
 #include "12_security/Profile.h"
 #include "12_security/SecurityModule.h"
 
-#include "30_server/ServerModule.h"
-
 using namespace std;
 
 namespace synthese
 {
-	using namespace server;
-
 	namespace security
 	{
 		const std::string SecurityModule::ROOT_PROFILE = "root";
@@ -26,18 +22,18 @@ namespace synthese
 		void SecurityModule::initialize()
 		{
 			Profile* rootProfile;
-			vector<Profile*> profiles = ProfileTableSync::searchProfiles(ServerModule::getSQLiteThread(), ROOT_PROFILE);
+			vector<Profile*> profiles = ProfileTableSync::search(ROOT_PROFILE);
 			if (profiles.size() == 0)
 			{
 				rootProfile = new Profile;
 				rootProfile->setName(ROOT_PROFILE);
 				rootProfile->setRights(ROOT_RIGHTS);
-				ProfileTableSync::save(ServerModule::getSQLiteThread(), rootProfile);
+				ProfileTableSync::save(rootProfile);
 			}
 			else
 				rootProfile = profiles.front();
 
-			vector<User*> users = UserTableSync::searchUsers(ServerModule::getSQLiteThread(), ROOT_USER, ROOT_USER, rootProfile->getKey());
+			vector<User*> users = UserTableSync::search(ROOT_USER, ROOT_USER, rootProfile->getKey());
 			if (users.size() == 0)
 			{
 				User* rootUser = new User;
@@ -45,7 +41,7 @@ namespace synthese
 				rootUser->setLogin(ROOT_USER);
 				rootUser->setPassword(ROOT_USER);
 				rootUser->setProfile(rootProfile);
-				UserTableSync::save(ServerModule::getSQLiteThread(), rootUser);
+				UserTableSync::save(rootUser);
 			}
 		}
 

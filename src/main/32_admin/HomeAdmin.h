@@ -51,8 +51,19 @@ namespace synthese
 		public:
 			HomeAdmin();
 
-			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
+			/** Initialization of the parameters from a request.
+				@param request The request to use for the initialization.
+			*/
+			void setFromParametersMap(const server::Request::ParametersMap& map);
 
+			/** Display of the content of the admin element.
+				@param stream Stream to write on.
+			*/
+			void display(std::ostream& stream, const server::Request* request) const;
+
+			/** Title of the admin compound.
+				@return The title of the admin compound, for display purposes.
+			*/
 			std::string getTitle() const;
 		};
 	}

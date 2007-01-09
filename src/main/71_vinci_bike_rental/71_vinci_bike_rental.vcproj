@@ -196,6 +196,9 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\LICENSE.txt">
+		</File>
+		<File
 			RelativePath=".\SConscript">
 		</File>
 		<File

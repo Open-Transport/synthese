@@ -8,8 +8,6 @@
 #include "12_security/UserException.h"
 #include "12_security/AddUserAction.h"
 
-#include "30_server/ServerModule.h"
-
 namespace synthese
 {
 	using namespace server;
@@ -56,7 +54,7 @@ namespace synthese
 			user->setLogin(_login);
 			user->setName(_name);
 			user->setProfile(_profile);
-			UserTableSync::save(ServerModule::getSQLiteThread(), user);
+			UserTableSync::save(user);
 			_request->setObjectId(user->getKey());
 		}
 	}

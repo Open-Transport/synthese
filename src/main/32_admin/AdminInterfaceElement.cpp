@@ -38,7 +38,6 @@ namespace synthese
 		AdminInterfaceElement::AdminInterfaceElement(const std::string& superior, AdminInterfaceElement::DisplayMode everDisplayed)
 			: _superior(superior)
 			, _everDisplayed(everDisplayed)
-			, DisplayableElement()
 		{		}
 
 		const AdminInterfaceElement::DisplayMode AdminInterfaceElement::getDisplayMode() const

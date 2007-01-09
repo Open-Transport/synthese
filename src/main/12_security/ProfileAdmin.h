@@ -4,7 +4,7 @@
 
 namespace synthese
 {
-	namespace interfaces
+	namespace security
 	{
 		/** Ecran d'édition de profil.
 			@ingroup m05

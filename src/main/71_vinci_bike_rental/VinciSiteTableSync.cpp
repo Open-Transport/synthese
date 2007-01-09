@@ -1,5 +1,29 @@
 
+/** VinciSiteTableSync class implementation.
+	@file VinciSiteTableSync.cpp
+
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
+	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include <sstream>
+
+#include "02_db/DBModule.h"
 
 #include "71_vinci_bike_rental/VinciSite.h"
 #include "71_vinci_bike_rental/VinciSiteTableSync.h"
@@ -23,8 +47,9 @@ namespace synthese
 			vs->_name = rows.getColumn(rowId, VinciSiteTableSync::TABLE_COL_NAME);
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciSite>::save(const SQLiteQueueThreadExec* sqlite, VinciSite* vs)
+		template<> void SQLiteTableSyncTemplate<VinciSite>::save(VinciSite* vs)
 		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (vs->getKey() != 0)
 			{	// UPDATE

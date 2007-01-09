@@ -40,7 +40,7 @@
 	@section csst_ihm Interface Homme Machine (IHM)
 	
 		@subsection csst_ihm_generique Ecran générique
-		@copydoc synthese::interfaces::HomeAdmin
+		@copydoc synthese::admin::HomeAdmin
 
 		@subsection csst_ihm_liste Liste des écrans
 		
@@ -168,74 +168,74 @@
 	@subsection csst_ihm_users Gestion des utilisateurs
 	
 		@subsubsection csst_ihm_users_login Ecran de connexion
-		@copydoc synthese::interfaces::LoginAdmin
+		@copydoc synthese::server::SimpleLoginInterfacePage
 	
 		@subsubsection csst_ihm_users_profiles Liste des profils d'habilitations
-		@copydoc synthese::interfaces::ProfilesAdmin
+		@copydoc synthese::security::ProfilesAdmin
 		
 		@subsubsection csst_ihm_users_profile Edition d'un profil d'habilitations
-		@copydoc synthese::interfaces::ProfileAdmin
+		@copydoc synthese::security::ProfileAdmin
 		
 		@subsubsection csst_ihm_users_users Liste et recherche des utilisateurs
-		@copydoc synthese::interfaces::UsersAdmin
+		@copydoc synthese::security::UsersAdmin
 		
 		@subsubsection csst_ihm_users_user Edition d'un utilisateur
-		@copydoc synthese::interfaces::UserAdmin
+		@copydoc synthese::security::UserAdmin
 
 
 
 	@subsection csst_ihm_places Gestion des emplacements
 	
 		@subsubsection csst_ihm_places_places Liste et recherche de lieux logiques
-		@copydoc synthese::interfaces::PlacesAdmin
+		@copydoc synthese::env::PlacesAdmin
 		
 		@subsubsection csst_ihm_places_place Edition de lieu logique
-		@copydoc synthese::interfaces::PlaceAdmin
+		@copydoc synthese::env::PlaceAdmin
 			
 	
 	
 	@subsection csst_ihm_display Gestion des afficheurs
 		
 		@subsubsection csst_ihm_display_DisplayTypesAdmin Gestion des types d'affichage
-		@copydoc synthese::interfaces::DisplayTypesAdmin	
+		@copydoc synthese::departurestable::DisplayTypesAdmin	
 		
 		@subsubsection csst_ihm_display_DisplaySearchAdmin Gestion du parc matériel d'afficheurs
-		@copydoc synthese::interfaces::DisplaySearchAdmin
+		@copydoc synthese::departurestable::DisplaySearchAdmin
 		
 		@subsubsection csst_ihm_display_DisplayAdmin Edition des paramètres d'un afficheur
-		@copydoc synthese::interfaces::DisplayAdmin
+		@copydoc synthese::departurestable::DisplayAdmin
 
 		@subsubsection csst_ihm_display_DisplayMaintenanceAdmin Supervision d'un afficheur
-		@copydoc synthese::interfaces::DisplayMaintenanceAdmin
+		@copydoc synthese::departurestable::DisplayMaintenanceAdmin
 
 
 	
 	@subsection csst_ihm_messages Gestion des messages
 	
 		@subsubsection csst_ihm_messages_MessagesLibraryAdmin Bibliothèque de messages prédéfinis
-		@copydoc synthese::interfaces::MessagesLibraryAdmin
+		@copydoc synthese::env::MessagesLibraryAdmin
 		
 		@subsubsection csst_ihm_messages_MessagesScenarioAdmin Edition de scénario de diffusion prédéfini
-		@copydoc synthese::interfaces::MessagesScenarioAdmin
+		@copydoc synthese::env::MessagesScenarioAdmin
 		
 		@subsubsection csst_ihm_messages_MessagesAdmin Liste et recherche de messages
-		@copydoc synthese::interfaces::MessagesAdmin
+		@copydoc synthese::env::MessagesAdmin
 
 		@subsubsection csst_ihm_messages_MessageAdmin Edition d'un message
-		@copydoc synthese::interfaces::MessageAdmin
+		@copydoc synthese::env::MessageAdmin
 		
 		@subsubsection csst_ihm_messages_MessagesScenarioSend Diffusion de messages selon un scénario prédéfini
-		@copydoc synthese::interfaces::MessagesScenarioSendAdmin
+		@copydoc synthese::env::MessagesScenarioSendAdmin
 
 	
 	
 	@subsection csst_ihm_journal Journal des événements
 	
 		@subsubsection csst_ihm_journal_liste Liste des journaux
-		@copydoc synthese::interfaces::DBLogList
+		@copydoc synthese::util::DBLogList
 
 		@subsubsection csst_ihm_journal_viewer Visualisation d'un journal
-		@copydoc synthese::interfaces::DBLogViewer
+		@copydoc synthese::util::DBLogViewer
 
 
 
@@ -252,26 +252,26 @@
 		
 		Leur utilisation précise est spécifiée dans la documentation de chaque écran.
 		
-		@subsection csst_security_right Sécurité (SecurtiyRight)
+		@subsection csst_security_right Sécurité (SecurityRight)
 		@copydoc synthese::security::SecurityRight
 		
 		@subsection csst_security_messages Messages (MessagesRight)
-		@copydoc synthese::security::MessagesRight
+		@copydoc synthese::env::MessagesRight
 
 		@subsection csst_security_messages_library Bibliothèque de messages (MessagesLibraryRight)
-		@copydoc synthese::security::MessagesLibraryRight
+		@copydoc synthese::env::MessagesLibraryRight
 	
 		@subsection csst_security_log Journaux (DBLogRight)
-		@copydoc synthese::security::DBLogRight
+		@copydoc synthese::util::DBLogRight
 		
 		@subsection csst_security_arrivaldeparturestables Tableaux de départs et d'arrivée (ArrivalDepartureTableRight)
-		@copydoc synthese::security::ArrivalDepartureTableRight
+		@copydoc synthese::departurestable::ArrivalDepartureTableRight
 		
 		@subsection csst_security_maintenance Maintenance des afficheurs (DisplayMaintenanceRight)
-		@copydoc synthese::security::DisplayMaintenanceRight
+		@copydoc synthese::departurestable::DisplayMaintenanceRight
 		
 		@subsection csst_security_places Gestion des emplacements (PlacesRight)
-		@copydoc synthese::security::PlacesRight
+		@copydoc synthese::env::PlacesRight
 	
 	
 	
@@ -286,21 +286,21 @@
 			- @ref csst_logs_transport
 		
 		@subsection csst_logs_security Sécurité (SecurityLog)
-		@copydoc synthese::util::SecurityLog
+		@copydoc synthese::security::SecurityLog
 		
 		@subsection csst_logs_messages Envois de messages (MessagesLog)
-		@copydoc synthese::util::MessagesLog
+		@copydoc synthese::env::MessagesLog
 		
 		@subsection csst_logs_messages_library Bibliothèque de messages (MessagesLibraryLog)
-		@copydoc synthese::util::MessagesLibraryLog
+		@copydoc synthese::env::MessagesLibraryLog
 		
 		@subsection csst_logs_displays Gestion des afficheurs (ArrivalDepartureTableLog)
-		@copydoc synthese::util::ArrivalDepartureTableLog
+		@copydoc synthese::departurestable::ArrivalDepartureTableLog
 		
 		@subsection csst_logs_maintenance Maintenance des afficheurs (DisplayMaintenanceLog)
-		@copydoc synthese::util::DisplayMaintenanceLog
+		@copydoc synthese::departurestable::DisplayMaintenanceLog
 		
 		@subsection csst_logs_transport Données réseau, emplacements (TransportNetworkDataLog)
-		@copydoc synthese::util::TransportNetworkDataLog
+		@copydoc synthese::env::TransportNetworkDataLog
 		
 */

@@ -17,7 +17,7 @@ namespace synthese
 		void AdminContentInterfaceElement::display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			const AdminInterfaceElement* aie = (const AdminInterfaceElement*) rootObject;
-			aie->display(stream, parameters, NULL, request);
+			aie->display(stream, request);
 		}
 
 		AdminContentInterfaceElement::~AdminContentInterfaceElement()

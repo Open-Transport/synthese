@@ -1,4 +1,26 @@
 
+/** VinciBikeTableSync class implementation.
+	@file VinciBikeTableSync.cpp
+
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
+	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include <sstream>
 
 #include "01_util/Exception.h"
@@ -29,8 +51,9 @@ namespace synthese
 			bike->_markedNumber = rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_MARKED_NUMBER);
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciBike>::save(const db::SQLiteQueueThreadExec* sqlite, VinciBike* bike)
+		template<> void SQLiteTableSyncTemplate<VinciBike>::save(VinciBike* bike)
 		{
+			const db::SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (bike->getKey() != 0)
 			{	//UPODATE

@@ -1,7 +1,29 @@
 
+/** VinciRateTableSync class implementation.
+	@file VinciRateTableSync.cpp
+
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
+	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include <sstream>
 
-#include "30_server/ServerModule.h"
+#include "02_db/DBModule.h"
 
 #include "71_vinci_bike_rental/VinciRate.h"
 #include "71_vinci_bike_rental/VinciRateTableSync.h"
@@ -12,7 +34,6 @@ namespace synthese
 {
 	using namespace vinci;
 	using namespace db;
-	using namespace server;
 
 	namespace db
 	{
@@ -35,8 +56,9 @@ namespace synthese
 			vr->_recurringPenaltyPeriod = Conversion::ToInt(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD));
 		}
 
-		template<> void SQLiteTableSyncTemplate<VinciRate>::save(const SQLiteQueueThreadExec* sqlite, VinciRate* vr)
+		template<> void SQLiteTableSyncTemplate<VinciRate>::save(VinciRate* vr)
 		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (vr->getKey() != 0)
 			{	// UPDATE
@@ -126,10 +148,10 @@ namespace synthese
 
 		}
 
-		std::vector<VinciRate*> VinciRateTableSync::searchVinciRates(
+		std::vector<VinciRate*> VinciRateTableSync::search(
 				 int first, int number)
 		{
-			const db::SQLiteQueueThreadExec* sqlite = ServerModule::getSQLiteThread();
+			const db::SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT * FROM " << TABLE_NAME
