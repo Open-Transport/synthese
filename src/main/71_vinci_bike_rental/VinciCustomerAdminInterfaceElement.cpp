@@ -24,8 +24,6 @@
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
 
-#include "30_server/ServerModule.h"
-
 #include "32_admin/AdminRequest.h"
 
 #include "57_accounting/Account.h"

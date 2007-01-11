@@ -92,7 +92,7 @@ namespace synthese
 		rowsAdded (sqlite, sync, result);
 	    }
 
-	    initAutoIncrement (sqlite);
+	    initAutoIncrement ();
 
 	    // Post-init phase
 	    afterFirstSync (sqlite, sync);
@@ -160,7 +160,7 @@ namespace synthese
 	    return Conversion::ToInt (tableName.substr (1, 4));
 	}
 
-	void SQLiteTableSync::initAutoIncrement(const SQLiteQueueThreadExec* sqlite)
+	void SQLiteTableSync::initAutoIncrement()
 	{
 
 	}

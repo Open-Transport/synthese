@@ -48,7 +48,7 @@ namespace synthese
 			SQLiteTableFormat _tableFormat;
 
 		protected:
-			virtual void initAutoIncrement(const SQLiteQueueThreadExec* sqlite);
+			virtual void initAutoIncrement();
 
 		public:
 

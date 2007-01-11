@@ -94,6 +94,7 @@ namespace synthese
 				<< "Profil : <SELECT name=\"" << PARAM_SEARCH_PROFILE_ID << "\">";
 
 
+			stream << "<option value=\"\">(tous les profils)</option>";
 			for (Profile::Registry::const_iterator it = SecurityModule::getProfiles().begin(); it != SecurityModule::getProfiles().end(); ++it)
 				stream << "<option value=\"" << it->first << "\"" << ((_searchProfileId == it->first) ? " selected=\"1\" " : "") << ">" << it->second->getName() << "</option>";
 
@@ -132,7 +133,6 @@ namespace synthese
 				<< "<td><input value=\"Entrez le nom ici\" name=\"" << AddUserAction::PARAMETER_NAME << "\" /></TD>"
 				<< "<td><SELECT name=\"" << AddUserAction::PARAMETER_PROFILE_ID << "\">";
 
-			stream << "<option value=\"\">(tous les profils)</option>";
 			for (Profile::Registry::const_iterator it = SecurityModule::getProfiles().begin(); it != SecurityModule::getProfiles().end(); ++it)
 				stream << "<option value=\"" << it->first << "\">" << it->second->getName() << "</option>";
 
