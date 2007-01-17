@@ -14,6 +14,7 @@ synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::server::LogoutHTMLLinkInterfaceElement>("logouthtmllink");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::server::LoginHtmlField>("loginhtmlfield");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::server::PasswordHtmlField>("passwordhtmlfield");
+synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::server::RequestErrorMessageInterfaceElement>("errormessage");
 
 synthese::util::Factory<synthese::server::Request>::integrate<synthese::server::SimplePageRequest>("page");
 synthese::util::Factory<synthese::server::Request>::integrate<synthese::server::ActionOnlyRequest>("action");

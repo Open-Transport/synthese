@@ -1,3 +1,25 @@
+
+/** Date class header.
+	@file Date.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_TIME_DATE_H
 #define SYNTHESE_TIME_DATE_H
 
@@ -16,161 +38,160 @@
 
 namespace synthese
 {
-namespace time
-{
+	namespace time
+	{
 
-class DateTime;
+		class DateTime;
 
-/** Date
-@ingroup m04
-*/
-class Date
-{
- private:
-
-
-    Day _day; //!< Day
-    Month _month; //!< Month
-    Year _year; //!< Year
-    
- public:
-
-    static const Date UNKNOWN_DATE;
-
-        Date( int day = UNKNOWN_VALUE,
-              int month = UNKNOWN_VALUE,
-              int year = UNKNOWN_VALUE );
-
-        ~Date();
-
-        //! @name Getters/Setters
-        //@{
-        int getDay() const;
-        int getMonth() const;
-        int getYear() const;
-        //@}
+		/** Date
+		@ingroup m04
+		*/
+		class Date
+		{
+		private:
 
 
-        //! @name Query methods
-        //@{
+			Day _day; //!< Day
+			Month _month; //!< Month
+			Year _year; //!< Year
+		    
+		public:
 
-        /** Gets week day of this date.
-            @return 0 = Sunday, 1 = Monday, ... , 6 = Saturday
-        */
-        int getWeekDay () const;
+			static const Date UNKNOWN_DATE;
 
-        bool isYearUnknown () const;
+				Date( int day = UNKNOWN_VALUE,
+					int month = UNKNOWN_VALUE,
+					int year = UNKNOWN_VALUE );
 
-        /** Checks this date values.
-            @return true If this date is an existing day.
-        */
-        bool isValid () const;
+				~Date();
 
-        bool isUnknown () const;
-
-        std::string toInternalString () const;
-		std::string toSQLiteString(bool withApostrophes = true) const;
-
-        //@}
-
-
-	/** Constructs a Date from an SQL date string (AAAA-MM-JJ).
-		@todo Throw an exception on parsing error
-	*/
-	static Date FromSQLDate (const std::string& sqlDate);
-
-	static Date FromString (const std::string& sqlString);
-
-        //! @name Update methods
-        //@{
-        /** Update this date given three int values, without control.
-            
-			@param day Day value
-            @param month Month value
-            @param year Year value
-
-            Allowed values for each param :
-				- int number : integral value "as is" without control
-				(31/2/1650 is acceptable).
-				- TIME_CURRENT ('A') = identical to system current time.
-				- TIME_MAX ('M') = identical to max absolute date 31/12/9999
-				- TIME_MIN ('m') = identical to min absolute date 1/1/1
-				- TIME_SAME ('I') = identical to previous special char ?
-				- TIME_UNKNOWN ('?') = unknown date (codée -1/-1/-1)
-				- TIME_UNCHANGED ('_') = no modification
-
-            Any invalid special character is taken as TIME_UNCHANGED
-
-            Main uses :
-				- use without param : current date
-				- use with special char : date set according so command 
-					character (ex : updateDate(TIME_MAX) => 31/12/9999)
-				- use with three values : fixed date (ex : updateDate(2, 10, 2006) => 2/10/2006
-
-            - use with three mixed params : special commands (ex :
-            updateDate(15, TIME_CURRENT, TIME_CURRENT) => the 15th
-            of current month)
-
-            Special command chars follows current relantionship : 
-            \f$ TIME_{UNKNOWN} \leq TIME_{MIN} \leq TIME_{CURRENT} \leq TIME_{MAX} \f$
-        */
-        void updateDate( int day = TIME_CURRENT, int month = TIME_SAME,
-                         int year = TIME_SAME );
-
-        //@}
+				//! @name Getters/Setters
+				//@{
+				int getDay() const;
+				int getMonth() const;
+				int getYear() const;
+				//@}
 
 
-        /** Adds one day to this date.
-        */
-        Date& operator ++ ( int );
+				//! @name Query methods
+				//@{
 
-        /** Subs one day to this date.
-        */
-        Date& operator -- ( int );
+				/** Gets week day of this date.
+					@return 0 = Sunday, 1 = Monday, ... , 6 = Saturday
+				*/
+				int getWeekDay () const;
 
-        /** Adds n days to this date.
-        */
-        Date& operator += ( int daysToAdd );
+				bool isYearUnknown () const;
 
-        /** Subs n days to this date.
-        */
-        Date& operator -= ( int daysToSub );
+				/** Checks this date values.
+					@return true If this date is an existing day.
+				*/
+				bool isValid () const;
 
+				bool isUnknown () const;
 
-        /** Modifies this date from parsing a string.
-            @param op String containing the new date to set
-            (internal encoding)
+				std::string toInternalString () const;
+				std::string toSQLiteString(bool withApostrophes = true) const;
+				std::string toString() const;
 
-            - if op is empty (-1/-1/-1)
-            - if op is a special char string, it is interpreted
-            (\ref Date::updateDate() )
-            - if op is an internally encoded string (8 chars) then
-              the date is modified subsequently
-        */
-        Date& operator = ( const std::string& op );
-
-        Date& operator = ( const DateTime& op );
-
-        int operator - ( const Date& op2 ) const;
+				//@}
 
 
-};
+			/** Constructs a Date from an SQL date string (AAAA-MM-JJ).
+				@todo Throw an exception on parsing error
+			*/
+			static Date FromSQLDate (const std::string& sqlDate);
+
+			static Date FromString (const std::string& sqlString);
+
+				//! @name Update methods
+				//@{
+				/** Update this date given three int values, without control.
+		            
+					@param day Day value
+					@param month Month value
+					@param year Year value
+
+					Allowed values for each param :
+						- int number : integral value "as is" without control
+						(31/2/1650 is acceptable).
+						- TIME_CURRENT ('A') = identical to system current time.
+						- TIME_MAX ('M') = identical to max absolute date 31/12/9999
+						- TIME_MIN ('m') = identical to min absolute date 1/1/1
+						- TIME_SAME ('I') = identical to previous special char ?
+						- TIME_UNKNOWN ('?') = unknown date (codée -1/-1/-1)
+						- TIME_UNCHANGED ('_') = no modification
+
+					Any invalid special character is taken as TIME_UNCHANGED
+
+					Main uses :
+						- use without param : current date
+						- use with special char : date set according so command 
+							character (ex : updateDate(TIME_MAX) => 31/12/9999)
+						- use with three values : fixed date (ex : updateDate(2, 10, 2006) => 2/10/2006
+
+					- use with three mixed params : special commands (ex :
+					updateDate(15, TIME_CURRENT, TIME_CURRENT) => the 15th
+					of current month)
+
+					Special command chars follows current relantionship : 
+					\f$ TIME_{UNKNOWN} \leq TIME_{MIN} \leq TIME_{CURRENT} \leq TIME_{MAX} \f$
+				*/
+				void updateDate( int day = TIME_CURRENT, int month = TIME_SAME,
+								int year = TIME_SAME );
+
+				//@}
 
 
-bool operator < ( const Date& op1, const Date& op2 );
-bool operator <= ( const Date& op1, const Date& op2 );
-bool operator <= ( const Date& op1, const DateTime& op2 );
-bool operator > ( const Date& op1, const Date& op2 );
-bool operator >= ( const Date& op1, const Date& op2 );
-bool operator == ( const Date& op1, const Date& op2 );
-bool operator != ( const Date& op1, const Date& op2 );
+				/** Adds one day to this date.
+				*/
+				Date& operator ++ ( int );
+
+				/** Subs one day to this date.
+				*/
+				Date& operator -- ( int );
+
+				/** Adds n days to this date.
+				*/
+				Date& operator += ( int daysToAdd );
+
+				/** Subs n days to this date.
+				*/
+				Date& operator -= ( int daysToSub );
 
 
-std::ostream& operator<< ( std::ostream& os, const Date& op );
+				/** Modifies this date from parsing a string.
+					@param op String containing the new date to set
+					(internal encoding)
+
+					- if op is empty (-1/-1/-1)
+					- if op is a special char string, it is interpreted
+					(\ref Date::updateDate() )
+					- if op is an internally encoded string (8 chars) then
+					the date is modified subsequently
+				*/
+				Date& operator = ( const std::string& op );
+
+				Date& operator = ( const DateTime& op );
+
+				int operator - ( const Date& op2 ) const;
 
 
-}
+		};
+
+
+		bool operator < ( const Date& op1, const Date& op2 );
+		bool operator <= ( const Date& op1, const Date& op2 );
+		bool operator <= ( const Date& op1, const DateTime& op2 );
+		bool operator > ( const Date& op1, const Date& op2 );
+		bool operator >= ( const Date& op1, const Date& op2 );
+		bool operator == ( const Date& op1, const Date& op2 );
+		bool operator != ( const Date& op1, const Date& op2 );
+
+
+		std::ostream& operator<< ( std::ostream& os, const Date& op );
+
+	}
 }
 
 #endif
-

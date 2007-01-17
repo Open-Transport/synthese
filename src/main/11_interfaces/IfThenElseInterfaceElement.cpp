@@ -10,7 +10,7 @@ namespace synthese
 	{
 		std::string IfThenElseInterfaceElement::getValue(const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			std::string result = _criteria->getValue( parameters );
+			std::string result = _criteria->getValue(parameters, object, request);
 			return ( result.size() == 0 || result == "0" )
 				? _to_return_if_false->getValue(parameters, object, request)
 				: _to_return_if_true->getValue(parameters, object, request);

@@ -34,11 +34,13 @@ namespace synthese
 		class AdminRequest : public server::Request
 		{
 			static const std::string PARAMETER_PAGE;
+			static const std::string PARAMETER_ACTION_FAILED_PAGE;
 			
 			//! \name Page parameters
 			//@{
 			const AdminInterfaceElement*	_page;
-			ParametersMap			_parameters;
+			const AdminInterfaceElement*	_actionFailedPage;
+			ParametersMap					_parameters;
 			//@}
 
 

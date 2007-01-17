@@ -1,4 +1,25 @@
 
+/** Request class implementation.
+	@file Request.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
@@ -10,6 +31,7 @@
 #include "01_util/Log.h"
 
 #include "11_interfaces/Interface.h"
+#include "11_interfaces/InterfacePage.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/ServerModule.h"
@@ -26,6 +48,7 @@ using std::string;
 namespace synthese
 {
 	using namespace util;
+	using namespace interfaces;
 
 	namespace server
 	{
@@ -40,13 +63,17 @@ namespace synthese
 		const std::string Request::PARAMETER_IP = "ipaddr";
 		const std::string Request::PARAMETER_CLIENT_URL = "clienturl";
 		const std::string Request::PARAMETER_OBJECT_ID = "roid";
+		const std::string Request::PARAMETER_ACTION_FAILED = "raf";
+		const std::string Request::PARAMETER_ERROR_MESSAGE = "rem";
+		const std::string Request::PARAMETER_ERROR_LEVEL = "rel";
 
 		Request::Request(IsSessionNeeded isSessionNeeded)
 			: _session(NULL)
 			, _action(NULL)
 			, _needsSession(isSessionNeeded)
+			, _actionException(false)
+			, _errorLevel(REQUEST_ERROR_NONE)
 		{
-
 		}
 
 		std::string Request::truncateStringIfNeeded (const std::string& requestString)
@@ -170,6 +197,39 @@ namespace synthese
 				map.erase(it);
 			}
 
+			// Object ID
+			it = map.find(PARAMETER_OBJECT_ID);
+			if (it != map.end())
+			{
+				request->_object_id = Conversion::ToLongLong(it->second);
+			}
+
+
+			// Last action error
+			it = map.find(PARAMETER_ACTION_FAILED);
+			if (it != map.end())
+			{
+				request->_actionException = Conversion::ToBool(it->second);
+				map.erase(it);
+			}
+
+			// Error message
+			it = map.find(PARAMETER_ERROR_MESSAGE);
+			if (it != map.end())
+			{
+				request->_errorMessage = it->second;
+				map.erase(it);
+				request->_errorLevel = REQUEST_ERROR_WARNING;	// Default error level if non empty message
+			}
+
+			// Error level
+			it = map.find(PARAMETER_ERROR_LEVEL);
+			if (it != map.end())
+			{
+				request->_errorLevel = (ErrorLevel) Conversion::ToInt(it->second);
+				map.erase(it);
+			}
+
 			try
 			{
 				// Action
@@ -177,7 +237,9 @@ namespace synthese
 			}
 			catch (ActionException& e)
 			{
-				throw RequestException("Action error : "+ e.getMessage());
+				request->_actionException = true;
+				request->_errorLevel = REQUEST_ERROR_WARNING;
+				request->_errorMessage = "Action error : "+ e.getMessage();
 			}
 			request->setFromParametersMap(map);
 
@@ -231,6 +293,7 @@ namespace synthese
 					_action = NULL;
 					const RedirectInterfacePage* page = _site->getInterface()->getPage<RedirectInterfacePage>();
 					page->display(stream, this);
+					return;
 				}
 				catch (ActionException e)
 				{
@@ -242,14 +305,26 @@ namespace synthese
 					command as the if one.
 					**/
 					_actionException = true;
+					_errorMessage = e.getMessage();
+					_errorLevel = REQUEST_ERROR_WARNING;
 				}
 			}
-			else
+			if (_needsSession == NEEDS_SESSION && _session == NULL)
 			{
-				if (_needsSession == NEEDS_SESSION && _session == NULL)
-					return;
-				run(stream);
+				_actionException = true;
+				_errorMessage = _errorMessage + "Session invalide";
+				_errorLevel = REQUEST_ERROR_FATAL;
+				if (_site->getInterface()->getNoSessionDefaultPageCode() != "")
+				{
+					const InterfacePage* page = _site->getInterface()->getPage(_site->getInterface()->getNoSessionDefaultPageCode());
+					ParametersVector pv;
+					page->display(stream, pv, NULL, this);
+				}
+				return;
 			}
+			
+			// Run the display
+			run(stream);			
 		}
 
 		Request::~Request()
@@ -356,5 +431,9 @@ namespace synthese
 			return _object_id;
 		}
 
+		const std::string& Request::getErrorMessage() const
+		{
+			return _errorMessage;
+		}
 	}
 }

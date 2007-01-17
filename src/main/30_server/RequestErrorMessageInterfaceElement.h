@@ -1,6 +1,6 @@
 
-/** PasswordHtmlField class header.
-	@file PasswordHtmlField.h
+/** RequestErrorMessageInterfaceElement class header.
+	@file RequestErrorMessageInterfaceElement.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_PasswordHtmlField_H__
-#define SYNTHESE_PasswordHtmlField_H__
+#ifndef SYNTHESE_RequestErrorMessageInterfaceElement_H__
+#define SYNTHESE_RequestErrorMessageInterfaceElement_H__
 
 #include "11_interfaces/ValueInterfaceElement.h"
 
@@ -29,14 +29,26 @@ namespace synthese
 {
 	namespace server
 	{
-		class PasswordHtmlField : public interfaces::ValueInterfaceElement
+		class ValueInterfaceElement;
+
+		class RequestErrorMessageInterfaceElement : public interfaces::ValueInterfaceElement
 		{
+
 		public:
+			/** Controls and store the internals parameters.
+				@param vel Parameters list to read
+			*/
 			void storeParameters(interfaces::ValueElementList& vel);
+			
+			/* Displays the object.
+				@param parameters Runtime parameters used in the internal parameters reading
+				@param rootObject Object to read at the display
+				@param request Source request
+			*/
 			std::string getValue(const interfaces::ParametersVector& parameters, const void* rootObject = NULL, const server::Request* request = NULL) const;
-			~PasswordHtmlField();
+			~RequestErrorMessageInterfaceElement();
 		};
 	}
 }
 
-#endif // SYNTHESE_PasswordHtmlField_H__
+#endif // SYNTHESE_RequestErrorMessageInterfaceElement_H__

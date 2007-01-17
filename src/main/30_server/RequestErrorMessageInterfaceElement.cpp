@@ -1,6 +1,6 @@
 
-/** PasswordHtmlField class implementation.
-	@file PasswordHtmlField.cpp
+/** RequestErrorMessageInterfaceElement class implementation.
+	@file RequestErrorMessageInterfaceElement.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,10 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "11_interfaces/ValueElementList.h"
 
-#include "30_server/LoginAction.h"
-#include "30_server/PasswordHtmlField.h"
+#include "30_server/RequestErrorMessageInterfaceElement.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
@@ -33,20 +33,17 @@ namespace synthese
 
 	namespace server
 	{
-		void PasswordHtmlField::storeParameters(ValueElementList& vel)
+		void RequestErrorMessageInterfaceElement::storeParameters(ValueElementList& vel)
 		{
 		}
 
-		string PasswordHtmlField::getValue(const interfaces::ParametersVector& parameters, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string RequestErrorMessageInterfaceElement::getValue(const interfaces::ParametersVector& parameters, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			stringstream stream;
-			stream << "<input type=\"password\" name=\"" << Action::PARAMETER_PREFIX << LoginAction::PARAMETER_PASSWORD << "\" />";
-			return stream.str();
+			return request->getErrorMessage();
 		}
 
-		PasswordHtmlField::~PasswordHtmlField()
+		RequestErrorMessageInterfaceElement::~RequestErrorMessageInterfaceElement()
 		{
 		}
 	}
 }
-

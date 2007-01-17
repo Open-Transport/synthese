@@ -204,6 +204,12 @@
 			<File
 				RelativePath=".\PasswordHtmlField.h">
 			</File>
+			<File
+				RelativePath=".\RequestErrorMessageInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\RequestErrorMessageInterfaceElement.h">
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\SConscript">

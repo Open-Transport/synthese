@@ -1,3 +1,25 @@
+
+/** Interface class header.
+	@file Interface.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_INTERFACES_INTERFACE_H
 #define SYNTHESE_INTERFACES_INTERFACE_H
 
@@ -55,6 +77,7 @@ namespace synthese
 				TextMap										_weekDayNames; //!< Tableau des libell?s des jours de semaine
 				TextMap										_monthNames;  //!< Tableau des libell?s des mois
 				TextMap										_alertPrefixes;      //!< Pr?fixes de messages d'alerte
+				std::string									_noSessionDefaultPageCode;
 
 
 			public:
@@ -72,6 +95,7 @@ namespace synthese
 					const synthese::time::HourPeriod* getPeriod( size_t index = ALL_DAY_PERIOD ) const;
 					const std::string& getAlertPrefix( int ) const;
 					const std::string& getWeekDayName( int ) const;
+					const std::string& getNoSessionDefaultPageCode() const;
 				//@}
 
 				//! \name Calculateurs
@@ -116,6 +140,7 @@ namespace synthese
 					bool SetLibelleJour( int, const std::string& );
 					bool SetLibelleMois( int, const std::string& );
 					void SetPrefixeAlerte( int, const std::string& );
+					void setNoSessionDefaultPageCode(const std::string&);
 				//@}
 
 				Interface( const uid& id);

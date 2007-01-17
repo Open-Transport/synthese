@@ -1,4 +1,25 @@
 
+/** AdminRequest class implementation.
+	@file AdminRequest.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include <sstream>
 
 #include "01_util/Conversion.h"
@@ -24,10 +45,11 @@ namespace synthese
 	namespace admin
 	{
 		const std::string AdminRequest::PARAMETER_PAGE = "rub";
+		const std::string AdminRequest::PARAMETER_ACTION_FAILED_PAGE = "afp";
 
 		AdminRequest::AdminRequest()
 			: Request(Request::NEEDS_SESSION)
-			, _page(NULL)
+			, _page(NULL), _actionFailedPage(NULL)
 		{}
 
 		AdminRequest::ParametersMap AdminRequest::getParametersMap() const
@@ -55,6 +77,21 @@ namespace synthese
 			catch (FactoryException<AdminInterfaceElement> e)
 			{
 				throw RequestException("Page not found");
+			}
+
+			// Action failed page
+			it = map.find(PARAMETER_ACTION_FAILED_PAGE);
+			try
+			{
+				AdminInterfaceElement* page = (it == map.end())
+					? Factory<AdminInterfaceElement>::create(_page->getFactoryKey())
+					: Factory<AdminInterfaceElement>::create(it->second);
+				page->setFromParametersMap(map);
+				_actionFailedPage = page;
+			}
+			catch (FactoryException<AdminInterfaceElement> e)
+			{
+				throw RequestException("Action failed page not found");
 			}
 
 			// Parameters saving

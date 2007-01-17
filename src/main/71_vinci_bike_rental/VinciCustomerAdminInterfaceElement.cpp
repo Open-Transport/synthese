@@ -124,7 +124,7 @@ namespace synthese
 
 				stream
 					<< "<tr>"
-					<< "<td>" << transaction->getStartDateTime().toSQLiteString(false) << "</td>"
+					<< "<td>" << transaction->getStartDateTime().toString() << "</td>"
 					<< "<td>" << Conversion::ToString((*it)->getRightCurrencyAmount()) << "</td>"
 					<< "<td>";
 				for (vector<TransactionPart*>::iterator it2 = payments.begin(); it2 != payments.end(); ++it2)
@@ -195,7 +195,7 @@ namespace synthese
 
 				stream
 					<< "<tr>"
-					<< "<td>" << transaction->getStartDateTime().toSQLiteString(false) << "</td>"
+					<< "<td>" << transaction->getStartDateTime().toString() << "</td>"
 					<< "<td>" << ((bike == NULL) ? "Non renseign&eacute;" : bike->getNumber()) << "</td>"
 					<< "<td>" << ((rate == NULL) ? "Non renseign&eacute;" : rate->getName())  << "</td>"
 					<< "</tr>"
