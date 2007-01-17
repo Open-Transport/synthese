@@ -21,6 +21,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "04_time/Date.h"
+
 #include "VinciReportsAdminInterfaceElement.h"
 
 using namespace std;
@@ -30,11 +32,15 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
+	using namespace time;
 
 	namespace vinci
 	{
 		VinciReportsAdminInterfaceElement::VinciReportsAdminInterfaceElement()
 			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) {}
+
+		const std::string VinciReportsAdminInterfaceElement::PARAM_START_DATE = "vraiepsd";
+		const std::string VinciReportsAdminInterfaceElement::PARAM_END_DATE = "vraieped";
 
 		string VinciReportsAdminInterfaceElement::getTitle() const
 		{
@@ -43,10 +49,16 @@ namespace synthese
 
 		void VinciReportsAdminInterfaceElement::display(ostream& stream, const Request* request) const
 		{
+			// Report Launch request
+			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
+			updateRequest->copy(request);
+			updateRequest->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
+			updateRequest->setAction(Factory<Action>::create<VinciUpdateCustomerAction>());
+
 			stream
 				<< "<table>"
-				<< "<tr><td>Date début</td><td><input /></td></tr>"
-				<< "<tr><td>Date fin</td><td><input /></td></tr>"
+				<< "<tr><td>Date début (AAAA/MM/JJ)</td><td><input name=\"" << PARAM_START_DATE << " /></td></tr>"
+				<< "<tr><td>Date fin (AAAA/MM/JJ)</td><td><input name=\"" <<¨PARAM_END_DATE << " /></td></tr>"
 				<< "<tr><td>Nombre de locations</td><td></td></tr>"
 				<< "<tr><td>Nombre de validations</td><td></td></tr>"
 				<< "<tr><td>Encaissements effectués</td><td></td></tr>"
@@ -55,9 +67,21 @@ namespace synthese
 				;
 		}
 
-		void VinciReportsAdminInterfaceElement::setFromParametersMap(const server::Request::ParametersMap& map)
+		void VinciReportsAdminInterfaceElement::setFromParametersMap(const Request::ParametersMap& map)
 		{
-
+			Date startDate;
+			Date endDate;
+			Request::ParametersMap::iterator it;
+			it = map.find(PARAM_START_DATE);
+			if (it != map.end())
+				startDate = Date::FromSQLDate(it->second);
+			it = map.find(PARAM_END_DATE);
+			if (it != map.end())
+				endDate = Date::FromSQLDate(it->second);
+            if (!startDate.isUnknown() && !endDate.isUnknown())
+			{
+				
+			}
 		}
 	}
 }

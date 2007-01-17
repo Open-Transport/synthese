@@ -170,7 +170,7 @@ namespace synthese
 			return tps;
 		}
 
-		vector<TransactionPart*> TransactionPartTableSync::search(Account* account, User* user , int first /*= 0*/, int number /*= 0*/ )
+		vector<TransactionPart*> TransactionPartTableSync::search(Account* account, User* user, int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -198,5 +198,36 @@ namespace synthese
 			}
 			return tps;
 		}
+
+		int TransactionPartTableSync::count(Account* account, User* user, Date startDate, Date endDate, int first, int number)
+		{
+			int transactionsNumber;
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT COUNT(" << TABLE_COL_ID << ")"
+				<< " FROM " << TABLE_NAME << " AS p "
+				<<		" INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
+				<< " WHERE "
+				<<	" p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
+				;
+			if (user != NULL)
+				query << " AND t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(user->getKey());
+			query << " LIMIT " << number << " OFFSET " << first;
+			
+			SQLiteResult result = sqlite->execQuery(query.str());
+			vector<TransactionPart*> tps;
+			for (int i=0; i<result.getNbRows(); ++i)
+			{
+//				try
+//				{
+					TransactionPart* tp = new TransactionPart;
+					load(tp, result, i);
+					tps.push_back(tp);
+//				}
+			}
+			return tps;
+		}
+
 	}
 }

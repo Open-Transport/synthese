@@ -35,6 +35,10 @@ namespace synthese
 		*/
 		class VinciReportsAdminInterfaceElement : public admin::AdminInterfaceElement
 		{
+			static const std::string PARAM_START_DATE;
+			static const std::string PARAM_END_DATE;
+
+
 		public:
 			VinciReportsAdminInterfaceElement();
 			/** Initialization of the parameters from a request.
