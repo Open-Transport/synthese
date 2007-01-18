@@ -47,6 +47,7 @@ namespace synthese
 	using namespace db;
 	using namespace accounts;
 	using namespace security;
+	using namespace time;
 	
 	namespace db
 	{
@@ -199,34 +200,34 @@ namespace synthese
 			return tps;
 		}
 
-		int TransactionPartTableSync::count(Account* account, User* user, Date startDate, Date endDate, int first, int number)
+		map<int, int> TransactionPartTableSync::count(Account* account, Date startDate, Date endDate, int first, int number)
 		{
 			int transactionsNumber;
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
-				<< " SELECT COUNT(" << TABLE_COL_ID << ")"
+				<< " SELECT strftime('%H', t.start_date_time) AS hours,"
+					<< " count(t." << TABLE_COL_ID << ") AS numbers "
 				<< " FROM " << TABLE_NAME << " AS p "
-				<<		" INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
+					<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
 				<< " WHERE "
-				<<	" p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
-				;
-			if (user != NULL)
-				query << " AND t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(user->getKey());
-			query << " LIMIT " << number << " OFFSET " << first;
+					<< " p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
+					<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << "<=" << endDate.toSQLiteString()
+					<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << ">=" << startDate.toSQLiteString()
+				<< " GROUP BY strftime('%H', t.start_date_time) "
+				<< " LIMIT " << number << " OFFSET " << first
+			;
 			
 			SQLiteResult result = sqlite->execQuery(query.str());
-			vector<TransactionPart*> tps;
+			map<int, int> mapii;
 			for (int i=0; i<result.getNbRows(); ++i)
 			{
 //				try
 //				{
-					TransactionPart* tp = new TransactionPart;
-					load(tp, result, i);
-					tps.push_back(tp);
+				mapii.insert(make_pair(Conversion::ToInt(result.getColumn(i, "hours")), Conversion::ToInt(result.getColumn(i, "numbers"))));
 //				}
 			}
-			return tps;
+			return mapii;
 		}
 
 	}

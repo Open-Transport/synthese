@@ -23,7 +23,12 @@
 
 #include "04_time/Date.h"
 
+#include "32_admin/AdminRequest.h"
+
 #include "VinciReportsAdminInterfaceElement.h"
+#include "VinciBikeRentalModule.h"
+
+#include "57_accounting/TransactionPartTableSync.h"
 
 using namespace std;
 
@@ -33,6 +38,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace time;
+	using namespace accounts;
 
 	namespace vinci
 	{
@@ -50,37 +56,48 @@ namespace synthese
 		void VinciReportsAdminInterfaceElement::display(ostream& stream, const Request* request) const
 		{
 			// Report Launch request
-			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
-			updateRequest->copy(request);
-			updateRequest->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
-			updateRequest->setAction(Factory<Action>::create<VinciUpdateCustomerAction>());
-
+			AdminRequest* reportRequest = Factory<Request>::create<AdminRequest>();
+			reportRequest->copy(request);
+			reportRequest->setPage(Factory<AdminInterfaceElement>::create<VinciReportsAdminInterfaceElement>());
+			
 			stream
+				<< reportRequest->getHTMLFormHeader("report")
 				<< "<table>"
-				<< "<tr><td>Date début (AAAA/MM/JJ)</td><td><input name=\"" << PARAM_START_DATE << " /></td></tr>"
-				<< "<tr><td>Date fin (AAAA/MM/JJ)</td><td><input name=\"" <<¨PARAM_END_DATE << " /></td></tr>"
+				<< "<tr><td>Date début (AAAA/MM/JJ)</td><td><input name=\"" << PARAM_START_DATE << "\" ";
+			if (!_startDate.isUnknown())
+				stream << " value=\"" << _startDate.toSQLiteString(false) << "\"";
+			stream << " /></td></tr>"
+				<< "<tr><td>Date fin (AAAA/MM/JJ)</td><td><input name=\"" << PARAM_END_DATE << "\" ";
+			if (!_endDate.isUnknown())
+				stream << " value=\"" << _endDate.toSQLiteString(false) << "\"";
+			stream << "	/></td></tr>"
 				<< "<tr><td>Nombre de locations</td><td></td></tr>"
 				<< "<tr><td>Nombre de validations</td><td></td></tr>"
 				<< "<tr><td>Encaissements effectués</td><td></td></tr>"
 				<< "<tr><td>tri par tarif</td><td></td></tr>"
 				<< "</table>"
+				<< "<input type=\"submit\" value=\"OK\" /></form>"
+				<< "<table>"
 				;
+			for(map<int,int>::const_iterator it = _results.begin(); it != _results.end(); ++it)
+			{
+				stream << "<tr><td>" << it->first << "</td><td>" << it->second << "</td></tr>";
+			}
+			stream << "</table>";
 		}
 
 		void VinciReportsAdminInterfaceElement::setFromParametersMap(const Request::ParametersMap& map)
 		{
-			Date startDate;
-			Date endDate;
-			Request::ParametersMap::iterator it;
+			Request::ParametersMap::const_iterator it;
 			it = map.find(PARAM_START_DATE);
 			if (it != map.end())
-				startDate = Date::FromSQLDate(it->second);
+				_startDate = Date::FromSQLiteDate(it->second);
 			it = map.find(PARAM_END_DATE);
 			if (it != map.end())
-				endDate = Date::FromSQLDate(it->second);
-            if (!startDate.isUnknown() && !endDate.isUnknown())
+				_endDate = Date::FromSQLiteDate(it->second);
+            if (!_startDate.isUnknown() && !_endDate.isUnknown())
 			{
-				
+				_results = TransactionPartTableSync::count(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), _startDate, _endDate);
 			}
 		}
 	}

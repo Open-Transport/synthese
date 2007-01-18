@@ -35,6 +35,11 @@
 
 namespace synthese
 {
+	namespace time
+	{
+		class Date;
+	}
+
 	namespace security
 	{
 		class User;
@@ -49,7 +54,6 @@ namespace synthese
 		/** Transaction part SQLite table synchronizer.
 			@ingroup m57
 		*/
-
 		class TransactionPartTableSync : public db::SQLiteTableSyncTemplate<TransactionPart>
 		{
 		public:
@@ -92,6 +96,8 @@ namespace synthese
 				Transaction* transaction, Account* account=NULL
 				, int first = 0, int number = -1);
 
+			static std::map<int, int> TransactionPartTableSync::count(Account* account, time::Date startDate, time::Date endDate, int first=0, int number=-1);
+
 		protected:
 
 			/** Action to do on user creation.
@@ -114,9 +120,8 @@ namespace synthese
 			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
-
+            
 		};
-
 	}
 }
 

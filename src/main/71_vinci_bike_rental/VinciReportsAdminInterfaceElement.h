@@ -38,6 +38,9 @@ namespace synthese
 			static const std::string PARAM_START_DATE;
 			static const std::string PARAM_END_DATE;
 
+			std::map<int, int> _results;
+			time::Date _startDate;
+			time::Date _endDate;
 
 		public:
 			VinciReportsAdminInterfaceElement();

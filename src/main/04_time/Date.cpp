@@ -438,12 +438,25 @@ Date::operator - ( const Date& op2 ) const
 
 
 Date 
-Date::FromSQLDate (const std::string& sqlDate)
+Date::FromSQLDate (const std::string& sqlTimestamp)
 {
-    // AAAA-MM-JJ
-    return Date (Conversion::ToInt (sqlDate.substr (8, 2)),
-		 Conversion::ToInt (sqlDate.substr (5, 2)),
-		 Conversion::ToInt (sqlDate.substr (0, 4)));
+	size_t firstSlash = sqlTimestamp.find('-');
+	size_t secondSlash = sqlTimestamp.find('-', firstSlash+1);
+
+	return Date(Conversion::ToInt (sqlTimestamp.substr (secondSlash+1, sqlTimestamp.length() - secondSlash)),
+		Conversion::ToInt (sqlTimestamp.substr (firstSlash+1, secondSlash - firstSlash)),
+		Conversion::ToInt (sqlTimestamp.substr (0, firstSlash+1)));
+}
+
+Date 
+Date::FromSQLiteDate (const std::string& sqlTimestamp)
+{
+	size_t firstSlash = sqlTimestamp.find('/');
+	size_t secondSlash = sqlTimestamp.find('/', firstSlash+1);
+
+	return Date(Conversion::ToInt (sqlTimestamp.substr (secondSlash+1, sqlTimestamp.length() - secondSlash)),
+		Conversion::ToInt (sqlTimestamp.substr (firstSlash+1, secondSlash - firstSlash)),
+		Conversion::ToInt (sqlTimestamp.substr (0, firstSlash+1)));
 }
 
 

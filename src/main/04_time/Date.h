@@ -101,6 +101,7 @@ namespace synthese
 				@todo Throw an exception on parsing error
 			*/
 			static Date FromSQLDate (const std::string& sqlDate);
+			static Date FromSQLiteDate (const std::string& sqlDate);
 
 			static Date FromString (const std::string& sqlString);
 
