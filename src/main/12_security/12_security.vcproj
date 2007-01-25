@@ -68,7 +68,13 @@
 				RelativePath=".\LoginAdmin.h">
 			</File>
 			<File
+				RelativePath=".\ProfileAdmin.cpp">
+			</File>
+			<File
 				RelativePath=".\ProfileAdmin.h">
+			</File>
+			<File
+				RelativePath=".\ProfilesAdmin.cpp">
 			</File>
 			<File
 				RelativePath=".\ProfilesAdmin.h">

@@ -59,6 +59,9 @@ namespace synthese
 			operator= ( date );
 		}
 
+		DateTime::DateTime( const Date& date, const Hour& hour )
+			: _date(date), _hour(hour)
+		{	}
 
 
 		DateTime::~DateTime()
@@ -427,18 +430,11 @@ namespace synthese
 			if (sqlTimestamp == "")
 				return DateTime(time::TIME_UNKNOWN);
 
-			size_t firstSlash = sqlTimestamp.find('/');
-			size_t secondSlash = sqlTimestamp.find('/', firstSlash+1);
-			size_t spaceSeparator = sqlTimestamp.find(' ');
-			size_t firstDoubleDot = sqlTimestamp.find(':');
-			size_t secondDoubleDot = sqlTimestamp.find(':', firstDoubleDot+1);
+			int spaceSeparator = (int) sqlTimestamp.find(' ');
 
-			return DateTime (Conversion::ToInt (sqlTimestamp.substr (secondSlash+1, spaceSeparator - secondSlash)),
-					Conversion::ToInt (sqlTimestamp.substr (firstSlash+1, secondSlash - firstSlash)),
-					Conversion::ToInt (sqlTimestamp.substr (0, firstSlash+1)),
-					Conversion::ToInt (sqlTimestamp.substr (spaceSeparator+1, firstDoubleDot-spaceSeparator)),
-					Conversion::ToInt (sqlTimestamp.substr (firstDoubleDot+1, secondDoubleDot-firstDoubleDot))
-					);
+			return (spaceSeparator == -1)
+				? DateTime(Date::FromSQLDate(sqlTimestamp))
+				: DateTime(Date::FromSQLDate(sqlTimestamp.substr(0, spaceSeparator)), Hour::FromSQLTime(sqlTimestamp.substr(spaceSeparator+1, sqlTimestamp.length() - spaceSeparator)));
 		}
 
 
@@ -455,11 +451,11 @@ namespace synthese
 		    
 		}
 
-		std::string DateTime::toSQLiteString(bool withApostrophes) const
+		std::string DateTime::toSQLString(bool withApostrophes) const
 		{
 			return isUnknown()
 				? "NULL"
-				: ((withApostrophes ? "'" : "") + _date.toSQLiteString(false) + " " + _hour.toSQLiteString(false) + (withApostrophes ? "'" : ""));
+				: ((withApostrophes ? "'" : "") + _date.toSQLString(false) + " " + _hour.toSQLString(false) + (withApostrophes ? "'" : ""));
 		}
 
 		bool DateTime::isUnknown() const

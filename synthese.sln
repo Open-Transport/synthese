@@ -107,7 +107,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "71_vinci_bike_rental", "src
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "57_accounting", "src\main\57_accounting\57_accounting.vcproj", "{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "57_accounts", "src\main\57_accounting\57_accounting.vcproj", "{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "98_synthese_sai", "src\main\98_synthese_sai\98_synthese_sai.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04_time_test", "src\test\04_time\04_time_test.vcproj", "{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -229,6 +237,14 @@ Global
 		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Debug.Build.0 = Debug|Win32
 		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Release.ActiveCfg = Release|Win32
 		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Release.Build.0 = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.ActiveCfg = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.Build.0 = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.ActiveCfg = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.Build.0 = Release|Win32
+		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Debug.ActiveCfg = Debug|Win32
+		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Debug.Build.0 = Debug|Win32
+		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.ActiveCfg = Release|Win32
+		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
 		SConstruct = SConstruct

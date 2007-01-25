@@ -147,7 +147,7 @@ namespace synthese
 				if (transaction->getEndDateTime().isUnknown())
 					stream << "Rendre la caution";
 				else
-					stream << "Caution rendue le " << transaction->getEndDateTime().toSQLiteString(false);
+					stream << "Caution rendue le " << transaction->getEndDateTime().toSQLString(false);
 
 				stream
 					<< "</td>"

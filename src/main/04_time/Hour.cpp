@@ -20,18 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Hour.h"
-#include "Schedule.h"
-
-#include "01_util/Conversion.h"
-
-
 #include "assert.h"
 
 #include <iomanip>
 #include <sstream>
 #include <ctime>
 
+#include "01_util/Conversion.h"
+
+#include "04_time/Hour.h"
+#include "04_time/Schedule.h"
+#include "04_time/TimeParseException.h"
 
 using synthese::util::Conversion;
 
@@ -322,9 +321,14 @@ Hour::updateHour ( int hours, int minutes )
 Hour
 Hour::FromSQLTime (const std::string& sqlTime)
 {
-    // hhmm
-    return Hour (Conversion::ToInt (sqlTime.substr (0, 2)),
-		 Conversion::ToInt (sqlTime.substr (3, 2)));
+	int dot = (int) sqlTime.find(':');
+
+	if (dot == -1)
+		throw TimeParseException("Invalid hour");
+
+	return Hour(Conversion::ToInt (sqlTime.substr (0, dot)),
+		Conversion::ToInt (sqlTime.substr (dot+1, sqlTime.length() - dot))
+	);
 }
 
 
@@ -336,7 +340,7 @@ Hour::FromString (const std::string& str)
 		 Conversion::ToInt (str.substr (4, 2)));
 }
 
-std::string Hour::toSQLiteString( bool withApostrophes /*= true*/ ) const
+std::string Hour::toSQLString( bool withApostrophes /*= true*/ ) const
 {
 	return (withApostrophes ? "'" : "") + Conversion::ToString(_hours) + ":" + Conversion::ToString(_minutes) + ":00" + (withApostrophes ? "'" : "");
 }

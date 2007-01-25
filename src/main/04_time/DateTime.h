@@ -60,6 +60,7 @@ namespace synthese
 
 				DateTime ( const DateTime& ref);
 				DateTime ( const Date& date );
+				DateTime(const Date& date, const Hour& hour);
 
 				~DateTime();
 
@@ -97,7 +98,7 @@ namespace synthese
 				bool isValid () const;
 				bool isUnknown() const;
 				std::string toInternalString () const;
-				std::string toSQLiteString(bool withApostrophes = true) const;
+				std::string toSQLString(bool withApostrophes = true) const;
 				std::string toString() const;
 				//@}
 

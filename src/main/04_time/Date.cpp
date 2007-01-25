@@ -20,20 +20,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Date.h"
-#include "DateTime.h"
-
-#include "01_util/Conversion.h"
-
-
 #include <sstream>
 #include <iomanip>
 #include <cmath>
 #include <ctime>
 
+#include "01_util/Conversion.h"
+
+#include "04_time/Date.h"
+#include "04_time/DateTime.h"
+#include "04_time/TimeParseException.h"
 
 using synthese::util::Conversion;
-
 
 namespace synthese
 {
@@ -440,19 +438,11 @@ Date::operator - ( const Date& op2 ) const
 Date 
 Date::FromSQLDate (const std::string& sqlTimestamp)
 {
-	size_t firstSlash = sqlTimestamp.find('-');
-	size_t secondSlash = sqlTimestamp.find('-', firstSlash+1);
+	int firstSlash = (int) sqlTimestamp.find('-');
+	int secondSlash = (int) sqlTimestamp.find('-', firstSlash+1);
 
-	return Date(Conversion::ToInt (sqlTimestamp.substr (secondSlash+1, sqlTimestamp.length() - secondSlash)),
-		Conversion::ToInt (sqlTimestamp.substr (firstSlash+1, secondSlash - firstSlash)),
-		Conversion::ToInt (sqlTimestamp.substr (0, firstSlash+1)));
-}
-
-Date 
-Date::FromSQLiteDate (const std::string& sqlTimestamp)
-{
-	size_t firstSlash = sqlTimestamp.find('/');
-	size_t secondSlash = sqlTimestamp.find('/', firstSlash+1);
+	if (firstSlash == -1 || secondSlash == -1)
+		throw TimeParseException("Invalid date");
 
 	return Date(Conversion::ToInt (sqlTimestamp.substr (secondSlash+1, sqlTimestamp.length() - secondSlash)),
 		Conversion::ToInt (sqlTimestamp.substr (firstSlash+1, secondSlash - firstSlash)),
@@ -469,9 +459,9 @@ Date::FromString (const std::string& str)
 		 Conversion::ToInt (str.substr (0, 4)));
 }
 
-std::string Date::toSQLiteString( bool withApostrophes ) const
+std::string Date::toSQLString( bool withApostrophes ) const
 {
-	return (withApostrophes ? "'" : "") + Conversion::ToString(_year.getValue()) + "/" + Conversion::ToString(_month.getValue()) +"/" + Conversion::ToString(_day.getValue()) + (withApostrophes ? "'" : "");
+	return (withApostrophes ? "'" : "") + Conversion::ToString(_year.getValue()) + "-" + Conversion::ToString(_month.getValue()) +"-" + Conversion::ToString(_day.getValue()) + (withApostrophes ? "'" : "");
 }
 
 std::string Date::toString() const
@@ -483,5 +473,3 @@ std::string Date::toString() const
 
 }
 }
-
-

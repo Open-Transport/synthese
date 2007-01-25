@@ -83,11 +83,16 @@ namespace synthese
 			it = map.find(PARAMETER_ACTION_FAILED_PAGE);
 			try
 			{
-				AdminInterfaceElement* page = (it == map.end())
-					? Factory<AdminInterfaceElement>::create(_page->getFactoryKey())
-					: Factory<AdminInterfaceElement>::create(it->second);
-				page->setFromParametersMap(map);
-				_actionFailedPage = page;
+				if (it == map.end())
+				{
+					_actionFailedPage = _page;
+				}
+				else
+				{
+					AdminInterfaceElement* page = Factory<AdminInterfaceElement>::create(it->second);
+					page->setFromParametersMap(map);
+					_actionFailedPage = page;
+				}				
 			}
 			catch (FactoryException<AdminInterfaceElement> e)
 			{
@@ -115,6 +120,9 @@ namespace synthese
 
 		AdminRequest::~AdminRequest()
 		{
+			if (_page != _actionFailedPage)
+				delete _actionFailedPage;
+			delete _page;
 		}
 
 		void AdminRequest::setPage( const AdminInterfaceElement* aie )

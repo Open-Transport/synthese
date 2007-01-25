@@ -91,7 +91,7 @@ namespace synthese
 				bool isUnknown () const;
 
 				std::string toInternalString () const;
-				std::string toSQLiteString(bool withApostrophes = true) const;
+				std::string toSQLString(bool withApostrophes = true) const;
 				std::string toString() const;
 
 				//@}
@@ -101,7 +101,6 @@ namespace synthese
 				@todo Throw an exception on parsing error
 			*/
 			static Date FromSQLDate (const std::string& sqlDate);
-			static Date FromSQLiteDate (const std::string& sqlDate);
 
 			static Date FromString (const std::string& sqlString);
 

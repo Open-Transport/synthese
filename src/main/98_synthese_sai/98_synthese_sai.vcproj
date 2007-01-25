@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="04_time"
-	ProjectGUID="{BB6C0975-210C-4358-82B6-B39EC3EE1AD4}"
+	Name="98_synthese_sai"
+	ProjectGUID="{0215F340-8C69-48B0-8D19-88758740BC47}"
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
@@ -20,7 +20,7 @@
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
@@ -43,71 +43,16 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\Date.cpp">
-			</File>
-			<File
-				RelativePath=".\DateTime.cpp">
-			</File>
-			<File
-				RelativePath=".\Day.cpp">
-			</File>
-			<File
-				RelativePath=".\Hour.cpp">
-			</File>
-			<File
-				RelativePath=".\HourPeriod.cpp">
-			</File>
-			<File
-				RelativePath=".\Month.cpp">
-			</File>
-			<File
-				RelativePath=".\Schedule.cpp">
-			</File>
-			<File
-				RelativePath=".\Year.cpp">
+				RelativePath=".\main.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
-				RelativePath=".\Date.h">
-			</File>
-			<File
-				RelativePath=".\DateTime.h">
-			</File>
-			<File
-				RelativePath=".\Day.h">
-			</File>
-			<File
-				RelativePath=".\Hour.h">
-			</File>
-			<File
-				RelativePath=".\HourPeriod.h">
-			</File>
-			<File
-				RelativePath=".\Month.h">
-			</File>
-			<File
-				RelativePath=".\Schedule.h">
-			</File>
-			<File
-				RelativePath=".\Year.h">
-			</File>
-		</Filter>
-		<Filter
-			Name="Exceptions"
-			Filter="">
-			<File
-				RelativePath=".\TimeParseException.cpp">
-			</File>
-			<File
-				RelativePath=".\TimeParseException.h">
-			</File>
 		</Filter>
 		<File
-			RelativePath=".\module.h">
+			RelativePath=".\LICENSE.txt">
 		</File>
 		<File
 			RelativePath=".\SConscript">
