@@ -6,7 +6,6 @@ synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::EnvironmentTableSync>("15.00.00");
 
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::AlarmTableSync>("15.10.01");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::FareTableSync>("15.10.02");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::BikeComplianceTableSync>("15.10.03");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::HandicappedComplianceTableSync>("15.10.04");

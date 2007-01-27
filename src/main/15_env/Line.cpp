@@ -334,7 +334,11 @@ Line::getId () const
     return synthese::util::Registrable<uid,Line>::getKey();
 }
 
-
+PhysicalStop* Line::getDestination() const
+{
+	Edge* edge = getLastEdge();
+	return (PhysicalStop*) edge->getFromVertex();
+}
 
 
 }

@@ -54,25 +54,6 @@ Environment::getAddresses () const
 }
 
 
-
-
-Alarm::Registry& 
-Environment::getAlarms ()
-{
-    return _alarms;
-}
-
-
-
-const Alarm::Registry& 
-Environment::getAlarms () const
-{
-    return _alarms;
-}
-
-
-
-
 Axis::Registry& 
 Environment::getAxes ()
 {

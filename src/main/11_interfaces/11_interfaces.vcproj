@@ -117,6 +117,12 @@
 			Name="ValueInterfaceElement"
 			Filter="">
 			<File
+				RelativePath=".\FormattedNumberInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\FormattedNumberInterfaceElement.h">
+			</File>
+			<File
 				RelativePath=".\IfThenElseInterfaceElement.cpp">
 			</File>
 			<File

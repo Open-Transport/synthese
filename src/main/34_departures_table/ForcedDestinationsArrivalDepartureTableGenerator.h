@@ -1,46 +1,71 @@
 
-/* THIS CODE COMES FROM SYNTHESE 2. IT MUST BE REFRESHED. */
-#ifdef RIEN
+/** ForcedDestinationsArrivalDepartureTableGenerator class header.
+	@file ForcedDestinationsArrivalDepartureTableGenerator.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
 
 #ifndef SYNTHESE_ForcedDestinationsArrivalDepartureTableGenerator_H
 #define SYNTHESE_ForcedDestinationsArrivalDepartureTableGenerator_H
 
-#include "ArrivalDepartureTableGenerator.h"
+#include "34_departures_table/ArrivalDepartureTableGenerator.h"
 
 namespace synthese
 {
-namespace departurestable
-{
+	namespace env
+	{
+		class ConnectionPlace;
+	}
 
-class ForcedDestinationsArrivalDepartureTableGenerator : public ArrivalDepartureTableGenerator
-{
-public:
-	typedef set<const cGare*> ForcedDestinationsSet;
+	namespace departurestable
+	{
 
-private:
+		class ForcedDestinationsArrivalDepartureTableGenerator : public ArrivalDepartureTableGenerator
+		{
+		public:
+			typedef std::set<const env::ConnectionPlace*> ForcedDestinationsSet;
 
-	ForcedDestinationsSet	_forcedDestinations;	//!< Destinations à afficher absolument
-	const int					_persistanceDuration;	//!< Durée pendant laquelle une destination est forcée
+		private:
 
-
-public:
-	ForcedDestinationsArrivalDepartureTableGenerator(
-		const cGare* place
-		, Direction, EndFilter
-		, const PhysicalStopFilter&, const LineFilter&
-		, const DisplayedPlacesList&, const ForbiddenPlacesList&
-		, const cMoment& startDateTime, const cMoment& endDateTime
-		, size_t maxSize, const ForcedDestinationsSet&, int persistanceDuration
-		);
+			ForcedDestinationsSet	_forcedDestinations;	//!< Destinations à afficher absolument
+			const int				_persistanceDuration;	//!< Durée pendant laquelle une destination est forcée
 
 
-	const ArrivalDepartureList& generate();
-};
+		public:
+			ForcedDestinationsArrivalDepartureTableGenerator(
+				const DeparturesTableModule::PhysicalStopsList&
+				, const DeparturesTableModule::Direction&
+				, const DeparturesTableModule::EndFilter&
+				, const DeparturesTableModule::LineFilter&
+				, const DeparturesTableModule::DisplayedPlacesList&
+				, const DeparturesTableModule::ForbiddenPlacesList&
+				, const time::DateTime& startDateTime
+				, const time::DateTime& endDateTime
+				, size_t maxSize
+				, const ForcedDestinationsSet&
+				, int persistanceDuration
+				);
 
-}
+
+			const DeparturesTableModule::ArrivalDepartureList& generate();
+		};
+
+	}
 }
 
 #endif
-
-#endif
-

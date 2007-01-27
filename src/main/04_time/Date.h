@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_TIME_DATE_H
 #define SYNTHESE_TIME_DATE_H
 
+#include "01_util/Constants.h"
 
 #include "module.h"
 
@@ -59,7 +60,7 @@ namespace synthese
 
 			static const Date UNKNOWN_DATE;
 
-				Date( int day = UNKNOWN_VALUE,
+			Date( int day = UNKNOWN_VALUE,
 					int month = UNKNOWN_VALUE,
 					int year = UNKNOWN_VALUE );
 

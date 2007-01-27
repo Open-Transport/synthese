@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_TIME_HOUR_H
 #define SYNTHESE_TIME_HOUR_H
 
+#include "01_util/Constants.h"
 
 #include "module.h"
 

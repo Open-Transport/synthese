@@ -23,12 +23,13 @@
 #ifndef SYNTHESE_DISPLAY_ADMIN_H
 #define SYNTHESE_DISPLAY_ADMIN_H
 
-#include "11_interfaces/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
 {
 	namespace departurestable
 	{
+		class DisplayScreen;
 
 		/** Ecran de paramétrage d'un afficheur.
 			@ingroup m34
@@ -95,8 +96,19 @@ namespace synthese
 			<i>Journal</i> : Les actions suivantes génèrent une entrée dans le journal du téléaffichage ArrivalDepartureTableLog :
 				- INFO : Modification d'un afficheur
 		*/
-		class DisplayAdmin : public AdminInterfaceElement
+		class DisplayAdmin : public admin::AdminInterfaceElement
 		{
+			DisplayScreen* _displayScreen;
+
+		public:
+			DisplayAdmin();
+
+			/** Initialization of the parameters from a request.
+				@param request The request to use for the initialization.
+			*/
+			void setFromParametersMap(const server::Request::ParametersMap& map);
+			std::string getTitle() const;
+			void display(std::ostream& stream, const server::Request* request = NULL) const;
 
 		};
 	}

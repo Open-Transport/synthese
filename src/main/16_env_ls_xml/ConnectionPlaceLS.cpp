@@ -92,7 +92,7 @@ ConnectionPlaceLS::Load (XMLNode& node,
     if (HasAttr (node, CONNECTIONPLACE_ALARMID_ATTR))
     {
 	uid alarmId (GetLongLongAttr (node, CONNECTIONPLACE_ALARMID_ATTR));
-	cp->setAlarm (environment.getAlarms ().get (alarmId));
+//	cp->setAlarm (environment.getAlarms ().get (alarmId));
     }
     
     // Transfer delays

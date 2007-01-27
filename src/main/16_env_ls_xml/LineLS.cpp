@@ -119,7 +119,7 @@ LineLS::Load (XMLNode& node,
     if (HasAttr (node, LINE_ALARMID_ATTR))
     {
 	uid alarmId (GetLongLongAttr (node, LINE_ALARMID_ATTR));
-	line->setAlarm (environment.getAlarms ().get (alarmId));
+//	line->setAlarm (environment.getAlarms ().get (alarmId));
     }
 
     uid bikeComplianceId (GetLongLongAttr (node, LINE_BIKECOMPLIANCEID_ATTR));

@@ -1,37 +1,57 @@
 
-/* THIS CODE COMES FROM SYNTHESE 2. IT MUST BE REFRESHED. */
-#ifdef RIEN
+/** StandardArrivalDepartureTableGenerator class header.
+	@file StandardArrivalDepartureTableGenerator.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
 
 #ifndef SYNTHESE_StandardArrivalDepartureTableGenerator_H
 #define SYNTHESE_StandardArrivalDepartureTableGenerator_H
 
-#include "ArrivalDepartureTableGenerator.h"
+#include "34_departures_table/ArrivalDepartureTableGenerator.h"
+#include "34_departures_table/DeparturesTableModule.h"
 
 namespace synthese
 {
-namespace departurestable
-{
+	namespace departurestable
+	{
 
-class StandardArrivalDepartureTableGenerator : public ArrivalDepartureTableGenerator
-{
-private:
+		class StandardArrivalDepartureTableGenerator : public ArrivalDepartureTableGenerator
+		{
+		private:
 
-public:
-	StandardArrivalDepartureTableGenerator(
-		const cGare* place
-		, Direction, EndFilter
-		, const PhysicalStopFilter&, const LineFilter&
-		, const DisplayedPlacesList&, const ForbiddenPlacesList&
-		, const cMoment& startDateTime, const cMoment& endDateTime
-		, size_t maxSize = UNLIMITED_SIZE
-		);
+		public:
+			StandardArrivalDepartureTableGenerator(
+				const DeparturesTableModule::PhysicalStopsList&
+				, const DeparturesTableModule::Direction&
+				, const DeparturesTableModule::EndFilter&
+				, const DeparturesTableModule::LineFilter&
+				, const DeparturesTableModule::DisplayedPlacesList&
+				, const DeparturesTableModule::ForbiddenPlacesList&
+				, const time::DateTime& startDateTime
+				, const time::DateTime& endDateTime
+				, size_t maxSize = UNLIMITED_SIZE
+				);
 
-	const ArrivalDepartureList& generate();
-};
+			const DeparturesTableModule::ArrivalDepartureList& generate();
+		};
 
+	}
 }
-}
-
-#endif
 
 #endif

@@ -9,20 +9,20 @@
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
-#include "Path.h"
-
+#include "15_env/Path.h"
 
 
 namespace synthese
 {
 	namespace env
 	{
-
+		class PhysicalStop;
 		class Axis;
 		class LineStop;
 		class RollingStock;
 		class Service;
 		class TransportNetwork;
+		class LineAlarmBroadcast;
 
 
 		/** Technical line.
@@ -67,6 +67,8 @@ namespace synthese
 			bool _useInDepartureBoards; 
 			bool _useInTimetables; 
 			bool _useInRoutePlanning; 
+
+			std::vector<LineAlarmBroadcast*>	_alarms;
 
 
 		public:
@@ -142,6 +144,8 @@ namespace synthese
 			bool isLine () const;
 
 			bool isReservable () const;
+
+			PhysicalStop* getDestination() const;
 
 			//@}
 		    

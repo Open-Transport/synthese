@@ -18,13 +18,16 @@ namespace time
     class DateTime;
 }
 
+namespace messages
+{
+	class Alarm;
+}
 
 namespace env
 {
 
 
     class Address;
-    class Alarm;
     class Edge;
     class Path; 
     class PhysicalStop;
@@ -61,7 +64,7 @@ private:
 
     ConnectionType _connectionType;
 
-    const Alarm* _alarm; //!< Current valid alarm
+	const messages::Alarm* _alarm; //!< Current valid alarm
 
 protected:
 
@@ -89,8 +92,8 @@ public:
 
     bool hasApplicableAlarm (const synthese::time::DateTime& start, 
 			     const synthese::time::DateTime& end) const;
-    const Alarm* getAlarm () const;
-    void setAlarm (const Alarm* alarm);
+	const messages::Alarm* getAlarm () const;
+	void setAlarm (const messages::Alarm* alarm);
 
     const ConnectionType getConnectionType () const;
     void setConnectionType (const ConnectionType& connectionType);

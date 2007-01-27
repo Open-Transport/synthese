@@ -159,6 +159,7 @@ public:
     //@{
     const AddressablePlace* getPlace () const;
     const ConnectionPlace* getConnectionPlace () const;
+	const ConnectionPlace* getToConnectionPlace() const;
 
     int getRankInPath () const;
 

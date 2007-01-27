@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="7.10"
+	Name="17_messages"
+	ProjectGUID="{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
+	Keyword="MakeFileProj">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
+			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
+			ConfigurationType="0">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
+			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
+			ConfigurationType="0">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="Classes"
+			Filter="">
+			<File
+				RelativePath=".\Alarm.cpp">
+			</File>
+			<File
+				RelativePath=".\Alarm.h">
+			</File>
+			<File
+				RelativePath=".\AlarmBroadcastList.h">
+			</File>
+			<File
+				RelativePath=".\AlarmTemplate.h">
+			</File>
+			<File
+				RelativePath=".\BroadcastPoint.cpp">
+			</File>
+			<File
+				RelativePath=".\BroadcastPoint.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="LS SQL"
+			Filter="">
+			<File
+				RelativePath=".\AlarmTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\AlarmTableSync.h">
+			</File>
+			<File
+				RelativePath=".\AlarmTemplateTableSync.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Admin Compounds"
+			Filter="">
+		</Filter>
+		<Filter
+			Name="LS XML"
+			Filter="">
+			<File
+				RelativePath=".\AlarmLS.cpp">
+			</File>
+			<File
+				RelativePath=".\AlarmLS.h">
+			</File>
+		</Filter>
+		<File
+			RelativePath=".\MessagesModule.cpp">
+		</File>
+		<File
+			RelativePath=".\MessagesModule.gen.cpp">
+		</File>
+		<File
+			RelativePath=".\MessagesModule.h">
+		</File>
+		<File
+			RelativePath=".\MessagesModule.inc.cpp">
+		</File>
+		<File
+			RelativePath=".\SConscript">
+		</File>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

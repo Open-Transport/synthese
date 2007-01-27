@@ -94,7 +94,7 @@ RoadLS::Load (XMLNode& node,
     if (HasAttr (node, ROAD_ALARMID_ATTR)) 
     {
 	uid alarmId (GetLongLongAttr (node, ROAD_ALARMID_ATTR));
-	road->setAlarm (environment.getAlarms ().get (alarmId));
+//	road->setAlarm (environment.getAlarms ().get (alarmId));
     }
 
     if (HasAttr (node, ROAD_BIKECOMPLIANCEID_ATTR)) 

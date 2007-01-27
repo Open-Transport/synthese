@@ -1,6 +1,6 @@
 
-/** BroadcastPoint class header.
-	@file BroadcastPoint.h
+/** DisplayType class header.
+	@file DisplayType.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,40 +20,43 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_BROADCAST_POINT_H
-#define SYNTHESE_BROADCAST_POINT_H
+#ifndef SYNTHESE_DisplayType_H__
+#define SYNTHESE_DisplayType_H__
 
 #include <string>
-#include <vector>
+
+#include "01_util/UId.h"
+#include "01_util/Registrable.h"
 
 namespace synthese
 {
-	namespace messages
+	namespace interfaces
 	{
-		class BroadcastPointAlarmBroadcast;
+		class Interface;
+	}
 
-		/** Point de diffusion d'informations.
-			@ingroup m15
-
-			Un point de diffusion est un lieu où peuvent être disposés des écrans de diffusion d'information (DisplayScreen).
-
-			Le point de diffusion appartient nécessairement à un lieu (Place) et chaque terminal d'affichage appartient à un point de diffusion.
-
-			Par héritage, un @ref PhysicalStop "arrêt physique" est automatiquement un point de diffusion 
-		*/
-		class BroadcastPoint : public synthese::util::Registrable<uid,BroadcastPoint>
+	namespace departurestable
+	{
+		class DisplayType : public util::Registrable<uid, DisplayType>
 		{
 		private:
-			std::string	_name;
-
-			std::vector<BroadcastPointAlarmBroadcast*>	_alarms;
+			std::string				_name;
+			const interfaces::Interface*	_interf;
+			int						_rowNumber;
 
 		public:
-			BroadcastPoint(const uid& id);
+			DisplayType(const uid&);
+
+			const std::string& getName() const;
+			const interfaces::Interface* getInterface() const;
+			int getRowNumber() const;
+
+			void setName(const std::string& name);
+			void setInterface(const interfaces::Interface* interf);
+			void setRowNumber(int number);
 
 		};
 	}
 }
 
-#endif
-
+#endif // SYNTHESE_DisplayType_H__

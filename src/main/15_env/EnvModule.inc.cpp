@@ -8,7 +8,6 @@
 #include "15_env/CityNameValueInterfaceElement.h"
 
 #include "15_env/AddressTableSync.h"
-#include "15_env/AlarmTableSync.h"
 #include "15_env/AxisTableSync.h"
 #include "15_env/BikeComplianceTableSync.h"
 #include "15_env/CityTableSync.h"

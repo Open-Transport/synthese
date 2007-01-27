@@ -25,7 +25,6 @@
 #include "FareLS.h"
 #include "ContinuousServiceLS.h"
 #include "ScheduledServiceLS.h"
-#include "AlarmLS.h"
 #include "TransportNetworkLS.h"
 #include "PublicPlaceLS.h"
 #include "PlaceAliasLS.h"
@@ -130,14 +129,14 @@ EnvironmentLS::Load (XMLNode& node)
 	FareLS::Load (fareNode, *env);
     }
 
-    XMLNode alarmsNode = GetChildNode (node, ENVIRONMENT_ALARMS_TAG, 0);
+/*    XMLNode alarmsNode = GetChildNode (node, ENVIRONMENT_ALARMS_TAG, 0);
     int nbAlarms = GetChildNodeCount (alarmsNode, AlarmLS::ALARM_TAG);
     for (int i=0; i<nbAlarms; ++i) 
     {
 	XMLNode alarmNode = GetChildNode (alarmsNode, AlarmLS::ALARM_TAG, i);
 	AlarmLS::Load (alarmNode, *env);
     }
-
+*/
 
     XMLNode axesNode = GetChildNode (node, ENVIRONMENT_AXES_TAG, 0);
     int nbAxes = GetChildNodeCount (axesNode, AxisLS::AXIS_TAG);

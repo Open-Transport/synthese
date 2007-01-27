@@ -1,9 +1,29 @@
+
+/** Environment class header.
+	@file Environment.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_ENV_ENVIRONMENT_H
 #define SYNTHESE_ENV_ENVIRONMENT_H
 
-
 #include "Axis.h"
-#include "Alarm.h"
 #include "Address.h"
 #include "City.h"
 #include "ConnectionPlace.h"
@@ -42,6 +62,7 @@
 
 namespace synthese
 {
+
 namespace env
 {
 
@@ -56,8 +77,7 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     
     Address::Registry _addresses;
-    Alarm::Registry _alarms;
-    Axis::Registry _axes;
+	Axis::Registry _axes;
     City::Registry _cities;
     ConnectionPlace::Registry _connectionPlaces;
     ContinuousService::Registry _continuousServices;
@@ -97,9 +117,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     Address::Registry& getAddresses ();
     const Address::Registry& getAddresses () const;
-
-    Alarm::Registry& getAlarms ();
-    const Alarm::Registry& getAlarms () const;
 
     Axis::Registry& getAxes ();
     const Axis::Registry& getAxes () const;

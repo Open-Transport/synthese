@@ -1,20 +1,44 @@
+
+/** ConnectionPlace class implementation.
+	@file ConnectionPlace.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "ConnectionPlace.h"
 
 #include "04_time/DateTime.h"
 
-#include "15_env/Alarm.h"
 #include "15_env/PhysicalStop.h"
 #include "15_env/SquareDistance.h"
 #include "15_env/Vertex.h"
 #include "15_env/Line.h"
 #include "15_env/Vertex.h"
 
+#include "17_messages/Alarm.h"
 
 #include <limits>
 #include <assert.h>
 
 namespace synthese
 {
+	using namespace messages;
+
 namespace env
 {
 

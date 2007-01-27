@@ -100,7 +100,7 @@ ConnectionPlaceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int row
 	city->addIncludedPlace (cp);
     }
 
-    cp->setAlarm (environment.getAlarms ().get (alarmId));
+//    cp->setAlarm (environment.getAlarms ().get (alarmId));
 
     city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
     environment.getConnectionPlaces ().add (cp);
@@ -159,7 +159,7 @@ ConnectionPlaceTableSync::doReplace (const synthese::db::SQLiteResult& rows, int
 			      Conversion::ToInt (*(++valueIter)));
     }
 
-    cp->setAlarm (environment.getAlarms ().get (alarmId));
+//    cp->setAlarm (environment.getAlarms ().get (alarmId));
 
     city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
 

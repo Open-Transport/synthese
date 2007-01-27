@@ -1,115 +1,162 @@
 
+/** DisplayScreen class header.
+	@file DisplayScreen.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_CTABLEAUAFFICHAGE_H
 #define SYNTHESE_CTABLEAUAFFICHAGE_H
 
-
-
-#include "ForcedDestinationsArrivalDepartureTableGenerator.h"
-#include "StandardArrivalDepartureTableGenerator.h"
 #include <set>
+#include <string>
 
+#include "01_util/Registrable.h"
+#include "01_util/UId.h"
+
+#include "04_time/DateTime.h"
+
+#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/ForcedDestinationsArrivalDepartureTableGenerator.h"
+#include "34_departures_table/StandardArrivalDepartureTableGenerator.h"
 
 
 namespace synthese
 {
-namespace departurestable
-{
+	namespace env
+	{
+		class PhysicalStop;
+		class ConnectionPlace;
+		class Line;
+	}
 
-/** Terminal d'affichage.
-	@ingroup m34
+	namespace departurestable
+	{
+		class BroadcastPoint;
+		class DisplayType;
 
-	Un terminal d'affichage est un dispositif matériel dédié à l'affichage non interactif d'informations provenant de SYNTHESE (exemple: tableau de départs).
-	Un terminal d'affichage est relié à un emplacement (exemple : arrêt logique).
-	On considère par hypothèse que l'arrêt logique lié correspond à la fois à l'emplacement du panneau et à la définition première de ce qui y est affiché.
-	L'emplacement est précisé par un champ texte ("tableau de départ situé au-dessus de l'escalier nord") ainsi que des coordonnées géographiques permettant de le situer sur une carte (ces données sont facultatives et ne servent qu'à désigner le terminal dans le cadre d'un composant d'administration par exemple).
-	A un terminal d'affichage sont reliés des clauses visant à définir le contenu qui y est diffusé ainsi que le format du contenu (protocole, charte graphique, etc...) :
-		- Nature de l'affichage (fonction SYNTHESE) :
-				- Tableau de départ chronologique
-				- Tableau de départ à destination privilégiée
-				- Tableau d'arrivée chronologique
-				- Tableau d'arrivée à provenance privilégiée
-		- Format de sortie (défini par l'interface utilisée)
-		- Paramétrage du contenu généré par la fonction : 
-				- Titre
-				- Nombre de départs ou d'arrivées
-				- Filtre de terminus (sert à n'afficher que les lignes ayant pour origine le lieu affiché)
-				- Filtre d'arrêt(s) physique(s)
-				- Liste des points de passage à afficher
-				- Autres paramètres (liste complète : voir IHM)
+		/** Terminal d'affichage.
+			@ingroup m34
 
-*/
-class DisplayScreen
-{
-	/* THIS CODE COMES FROM SYNTHESE 2. IT MUST BE REFRESHED.
+			Un terminal d'affichage est un dispositif matériel dédié à l'affichage non interactif d'informations provenant de SYNTHESE (exemple: tableau de départs).
+			Un terminal d'affichage est relié à un emplacement (exemple : arrêt logique).
+			On considère par hypothèse que l'arrêt logique lié correspond à la fois à l'emplacement du panneau et à la définition première de ce qui y est affiché.
+			L'emplacement est précisé par un champ texte ("tableau de départ situé au-dessus de l'escalier nord") ainsi que des coordonnées géographiques permettant de le situer sur une carte (ces données sont facultatives et ne servent qu'à désigner le terminal dans le cadre d'un composant d'administration par exemple).
+			A un terminal d'affichage sont reliés des clauses visant à définir le contenu qui y est diffusé ainsi que le format du contenu (protocole, charte graphique, etc...) :
+				- Nature de l'affichage (fonction SYNTHESE) :
+						- Tableau de départ chronologique
+						- Tableau de départ à destination privilégiée
+						- Tableau d'arrivée chronologique
+						- Tableau d'arrivée à provenance privilégiée
+				- Format de sortie (défini par l'interface utilisée)
+				- Paramétrage du contenu généré par la fonction : 
+						- Titre
+						- Nombre de départs ou d'arrivées
+						- Filtre de terminus (sert à n'afficher que les lignes ayant pour origine le lieu affiché)
+						- Filtre d'arrêt(s) physique(s)
+						- Liste des points de passage à afficher
+						- Autres paramètres (liste complète : voir IHM)
 
-class cTableauAffichage : public cSite
-	public:
-	typedef enum { STANDARD_METHOD, WITH_FORCED_DESTINATIONS_METHOD } GenerationMethod;
+		*/
+		class DisplayScreen : public util::Registrable<uid,DisplayScreen>
+		{
+			public:
+			typedef enum { STANDARD_METHOD, WITH_FORCED_DESTINATIONS_METHOD } GenerationMethod;
 
-protected:
-	//!	\name Paramètres du tableau
-	//@{
-	cTexte								_Titre;				//!< Titre pour affichage
-	tIndex								_NombreDeparts;		//!< Nombre de départs affichés
-	tIndex								_PremierDepart;		//!< Premier départ affiché
-	bool								_OriginesSeulement;	//!< Origines seulement ?
-	tIndex								_NumeroPanneau;		//!< Numéro du panneau dans la gare pour afficheur
-	int									_maxDelay;			//!< Max time length for the table
+		protected:
+			//! \name Localization
+			//@{
+				const BroadcastPoint*	_localization;		//!< Localization of the display screen (belongs to a place)
+				std::string				_localizationComment;
+			//@}
 
-	//@}
+			//! \name Technical data
+			//@{
+				const DisplayType*	_displayType;
+				int					_wiringCode;	// Display ID in a bus
+			//@}
 
-	//!	\name Données
-	//@{
-	const GenerationMethod				_generationMethod;
-	const cGare*						_PointArret;		//!< Point d'arrêt affiché
-	set<const cQuai*>					_Quais;				//!< Quai(s) affichés
-	set<const cLigne*>					_LignesInterdites;	//!< Lignes ne devant pas être affichées
-	set<const cGare*>					_displayedPlaces;
-	set<const cGare*>					_forcedDestinations;	//!< Destinations à afficher absolument
-	set<const cGare*>					_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
-	int									_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
+			//! \name Appearance
+			//@{
+				std::string			_title;				//!< Titre pour affichage
+				int					_blinkingDelay;
+				bool				_trackNumberDisplay;
+				bool				_serviceNumberDisplay;
+			//@}
 
-	//@}
+			//! \name Content
+			//@{
+				DeparturesTableModule::PhysicalStopsList	_physicalStops;				//!< Quai(s) affichés
+				DeparturesTableModule::ForbiddenPlacesList	_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
+				DeparturesTableModule::LineFilter			_forbiddenLines;
+				DeparturesTableModule::Direction			_direction;
+				DeparturesTableModule::EndFilter			_originsOnly;
+				DeparturesTableModule::DisplayedPlacesList	_displayedPlaces;
+				int											_maxDelay;			//!< Max time length for the table
+				int											_clearingDelay;
+				int											_firstRow;
+			//@}
 
-	//!	\name Méthodes protégées
-	//@{
-	cMoment	_MomentFin(const cMoment& __MomentDebut)			const;
-	//@}
+			//!	\name Preselection
+			//@{
+				const GenerationMethod					_generationMethod;
+				DeparturesTableModule::DisplayedPlacesList	_forcedDestinations;	//!< Destinations à afficher absolument
+				int										_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
+			
+			//@}
 
-public:
-	//!	\name Constructeur et destructeur
-	//@{
-		cTableauAffichage(const cTexte& __Code, GenerationMethod);
-		~cTableauAffichage(void);
-	//@}
 
-	//!	\name Modificateurs
-	//@{
-		void			SetPointArret(const cGare* __PointArret);
-		void			SetNombreDeparts(tIndex __NombreDeparts);
-		void			AddLigneInterdte(const cLigne* __Ligne);
-		void			AddQuaiAutorise(tIndex __NumeroQuai);
-		void			SetTitre(const cTexte&);
-		void			SetOriginesSeulement(bool __Valeur);
-		void			AddDestinationAffichee(const cGare* __PointArret);
-		void			SetNumeroPanneau(tIndex);
-		void			addForcedDestination(const cGare*);
-		void			setDestinationForceDelay(int);
-		void			setMaxDelay(int);
-		void			addForbiddenPlace(const cGare*);
-	//@}
+			//!	\name Méthodes protégées
+			//@{
+				time::DateTime	_MomentFin(const time::DateTime& __MomentDebut)			const;
+			//@}
 
-	//!	\name Accesseurs and computers
-	//@{
-		const cTexte&					getTitre()			const;
-		tIndex							getNumeroPanneau()	const;
-		ArrivalDepartureTableGenerator*	getGenerator(const cMoment& startTime) const;
-	//@}
-*/
+		public:
+			//!	\name Constructeur et destructeur
+			//@{
+				DisplayScreen(const uid&, GenerationMethod);
+				~DisplayScreen(void);
+			//@}
 
-};
+			//!	\name Modificateurs
+			//@{
+				void			setLocalization(const BroadcastPoint*);
+				void			AddQuaiAutorise(const env::PhysicalStop*);
+				void			SetTitre(const std::string&);
+				void			SetOriginesSeulement(const DeparturesTableModule::EndFilter& __Valeur);
+				void			AddDestinationAffichee(const env::ConnectionPlace* __PointArret);
+				void			SetNumeroPanneau(int);
+				void			addForcedDestination(const env::ConnectionPlace*);
+				void			setDestinationForceDelay(int);
+				void			setMaxDelay(int);
+				void			addForbiddenPlace(const env::ConnectionPlace*);
+			//@}
 
-}
+			//!	\name Accesseurs and computers
+			//@{
+				const std::string&				getTitre()			const;
+				int								getNumeroPanneau()	const;
+				ArrivalDepartureTableGenerator*	getGenerator(const time::DateTime& startTime) const;
+			//@}
+
+		};
+
+	}
 }
 
 #endif

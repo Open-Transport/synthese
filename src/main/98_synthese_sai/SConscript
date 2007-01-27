@@ -36,7 +36,7 @@ moduleenv.AddModuleDependency ('32_admin')
 moduleenv.AddModuleDependency ('11_interfaces')
 moduleenv.AddModuleDependency ('12_security')
 moduleenv.AddModuleDependency ('15_env')
-moduleenv.AddModuleDependency ('16_env_ls_xml')
+moduleenv.AddModuleDependency ('17_messages')
 
 # Generic libs (0)
 moduleenv.AddModuleDependency ('07_lex_matcher')

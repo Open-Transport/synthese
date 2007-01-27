@@ -1,51 +1,77 @@
 
-/* THIS CODE COMES FROM SYNTHESE 2. IT MUST BE REFRESHED. */
-#ifdef RIEN
+/** StandardArrivalDepartureTableGenerator class implementation.
+	@file StandardArrivalDepartureTableGenerator.cpp
 
-#include "StandardArrivalDepartureTableGenerator.h"
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "15_env/Edge.h"
+#include "15_env/LineStop.h"
+#include "15_env/PhysicalStop.h"
+
+#include "34_departures_table/StandardArrivalDepartureTableGenerator.h"
+
+using namespace std;
 
 namespace synthese
 {
-namespace departurestable
-{
+	using namespace env;
+	using namespace time;
 
-StandardArrivalDepartureTableGenerator::StandardArrivalDepartureTableGenerator(
-	const cGare* place
-	, Direction direction
-	, EndFilter endfilter
-	, const PhysicalStopFilter& physicalStopFilter
-	, const LineFilter& lineFilter
-	, const DisplayedPlacesList& displayedPlacesList
-	, const ForbiddenPlacesList& forbiddenPlaces
-	, const cMoment& startTime
-	, const cMoment& endDateTime
-	, size_t maxSize
-) : ArrivalDepartureTableGenerator(place, direction, endfilter, physicalStopFilter, lineFilter
-								   , displayedPlacesList, forbiddenPlaces, startTime, endDateTime, maxSize)
-{}
-
-const ArrivalDepartureTableGenerator::ArrivalDepartureList& StandardArrivalDepartureTableGenerator::generate()
-{
-	// Parcours sur toutes les lignes au départ et sur tous les services
-	for (const cGareLigne* departureLineStop = _place->PremiereGareLigneDep(); departureLineStop != NULL; departureLineStop = departureLineStop->PADepartSuivant())
+	namespace departurestable
 	{
-		if (!_allowedLineStop(departureLineStop))
-			continue;
 
-		// Loop on services
-		cMoment departureDateTime = _startDateTime;
-		int serviceNumber = -2;
-		while ((serviceNumber = departureLineStop->Prochain(departureDateTime, _endDateTime, _startDateTime, ++serviceNumber)) != INCONNU)
+		StandardArrivalDepartureTableGenerator::StandardArrivalDepartureTableGenerator(
+			const DeparturesTableModule::PhysicalStopsList& physicalStops
+			, const DeparturesTableModule::Direction& direction
+			, const DeparturesTableModule::EndFilter& endfilter
+			, const DeparturesTableModule::LineFilter& lineFilter
+			, const DeparturesTableModule::DisplayedPlacesList& displayedPlacesList
+			, const DeparturesTableModule::ForbiddenPlacesList& forbiddenPlaces
+			, const DateTime& startTime
+			, const DateTime& endDateTime
+			, size_t maxSize
+		) : ArrivalDepartureTableGenerator(physicalStops, direction, endfilter, lineFilter
+										, displayedPlacesList, forbiddenPlaces, startTime, endDateTime, maxSize)
+		{}
+
+		const DeparturesTableModule::ArrivalDepartureList& StandardArrivalDepartureTableGenerator::generate()
 		{
-			_insert(departureLineStop, serviceNumber, departureDateTime);
-		}		
+			for (DeparturesTableModule::PhysicalStopsList::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+			{
+				for (set<const Edge*>::const_iterator eit = (*it)->getDepartureEdges().begin(); eit != (*it)->getDepartureEdges().end(); ++eit)
+				{
+					const LineStop* ls = (const LineStop*) (*eit);
+
+					if (!_allowedLineStop(ls))
+						continue;
+
+					// Loop on services
+					DateTime departureDateTime = _startDateTime;
+					int serviceNumber = -2;
+					while ((serviceNumber = ls->getNextService(departureDateTime, _endDateTime, _startDateTime, ++serviceNumber)) != UNKNOWN_VALUE)
+					{
+						_insert(ls, serviceNumber, departureDateTime);
+					}		
+				}
+			}
+			return _result;
+
+		}
 	}
-	return _result;
-
 }
-
-}
-}
-
-#endif
-

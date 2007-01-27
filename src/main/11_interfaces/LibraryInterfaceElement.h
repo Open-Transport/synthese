@@ -325,65 +325,6 @@ namespace synthese
 			}
 			*/  
 
-/*		// 26
-	case ELEMENTINTERFACETbDepGare:
-			/*	// Lecture des parametres
-			// mettre une assertion pour detecter qu'on a bien un vector<PassThroughDescription*>
-			const std::vector<const PassThroughDescription*>* ptds = reinterpret_cast<const std::vector<const PassThroughDescription*>*> (__Objet);
-			assert (ptds != 0);
-
-			int __MultiplicateurRangee = _Parametres[ 0 ] ->Nombre( __Parametres ) ? 
-			_Parametres[ 0 ] ->Nombre( __Parametres ) : 1;
-
-			const std::string& __Pages = _Parametres[ 1 ] ->Texte( __Parametres );
-			const std::string& __SeparateurPage = _Parametres[ 2 ] ->Texte( __Parametres );
-
-			// Gestion des pages
-			int __NombrePages = 1;
-			if ( (__Pages == "intermediate" ) || 
-			(__Pages == "destination" ) )
-			{
-			for (int i=0; i<ptds->size (); ++i)
-			{
-			const PassThroughDescription * ___DP = (*ptds)[i];
-			if ( ___DP->getDisplayedConnectionPlaces ().size () - 2 > __NombrePages )
-			__NombrePages = ___DP->getDisplayedConnectionPlaces ().size () - 2;
-			}
-			}
-
-			if (__Pages == "destination" ) __NombrePages++;
-
-			// Boucle sur les pages
-			for ( int __NumeroPage = 1; __NumeroPage <= __NombrePages; __NumeroPage++ )
-			{
-			// Separateur de page
-			if ( __NumeroPage > 1 )
-			pCtxt << __SeparateurPage;
-
-			// Boucle sur les rang�es
-			int __Rangee = __MultiplicateurRangee;
-			for (int i=0; i<ptds->size (); ++i)
-			{
-			const PassThroughDescription * ___DP = (*ptds)[i];
-
-			// Preparation des param�tres
-			cInterface_Objet_Connu_ListeParametres __ParametresColonne;
-			__ParametresColonne << __Rangee;  // 0 : Numero de rangee
-
-			int __NombrePagesRangee = ___DP->getDisplayedConnectionPlaces ().size () - 2 + ( __Pages == "destination" ? 1 : 0 );
-			if ( !__NombrePagesRangee || __NumeroPage > __NombrePagesRangee * ( __NombrePages / __NombrePagesRangee ) )
-			__ParametresColonne << __NumeroPage;
-			else
-			__ParametresColonne << 1 + __NumeroPage % __NombrePagesRangee;     // 1 : Num�ro de page
-
-			// Lancement de l'affichage de la rangee
-			__Site->Affiche( pCtxt, INTERFACELigneTableauDepart, __ParametresColonne, ( const void* ) ___DP );
-
-			// Incrementation du num�ro de rang�e
-			__Rangee += __MultiplicateurRangee;
-			}
-			}
-			*/
 /*			// 29 A mettre dans 41
 	case ELEMENTINTERFACESelecteurVelo:
 			tBool3 VeloDefaut = ( tBool3 ) _Parametres[ ELEMENTINTERFACESelecteurVeloDefaut ] ->Nombre( __Parametres );
@@ -818,17 +759,6 @@ namespace synthese
 				__Site->Affiche( pCtxt, INTERFACENomArret, __ParametresLigne, ( const void* ) __Ligne->getEdges ().back()->getFromVertex ()->getConnectionPlace() );
 			}
 */
-/*	case EI_BIBLIOTHEQUE_DescriptionPassage_Ligne:  //44
-			/*	const Line* __Ligne = dynamic_cast<const Line*> (( ( const PassThroughDescription* ) __Objet ) ->getLineStop () ->getParentPath ());
-
-			cInterface_Objet_Connu_ListeParametres __ParametresCaseLigne;
-			__ParametresCaseLigne << _Parametres[ EI_BIBLIOTHEQUE_DescriptionPassage_Ligne_HTMLDebutLigne ] ->Texte( __Parametres );
-			__ParametresCaseLigne << _Parametres[ EI_BIBLIOTHEQUE_DescriptionPassage_Ligne_HTMLFinLigne ] ->Texte( __Parametres );
-			__ParametresCaseLigne << _Parametres[ EI_BIBLIOTHEQUE_DescriptionPassage_Ligne_LargeurCase ] ->Texte( __Parametres );
-			__ParametresCaseLigne << _Parametres[ EI_BIBLIOTHEQUE_DescriptionPassage_Ligne_HauteurCase ] ->Texte( __Parametres );
-
-			__Site->Affiche( pCtxt, INTERFACECartoucheLigne, __ParametresCaseLigne, ( const void* ) __Ligne );
-			*/
 
 			// 45
 /*	case EI_BIBLIOTHEQUE_Nombre_Formate:
@@ -846,88 +776,8 @@ namespace synthese
 			pCtxt << __Nombre;
 */
 
-/*	case EI_BIBLIOTHEQUE_DescriptionPassage_Destination:  //46
-			/*	// Lecture des param�tres
-			const PassThroughDescription* __DP = ( const PassThroughDescription* ) __Objet;
-			std::string __DestinationsAAfficher = _Parametres[ 0 ] ->Texte( __Parametres );
-			bool __AfficherTerminus = ( _Parametres[ 1 ] ->Nombre( __Parametres ) == 1 );
-			std::string __TypeAffichage = _Parametres[ 2 ] ->Texte( __Parametres );
-			std::string __SeparateurEntreArrets = _Parametres[ 3 ] ->Texte( __Parametres );
-			std::string __AvantCommune = _Parametres[ 4 ] ->Texte( __Parametres );
-			std::string __ApresCommune = _Parametres[ 5 ] ->Texte( __Parametres );
 
-			const City* __DerniereCommune = __DP->getDisplayedConnectionPlaces () [0]->getCity ();
-
-			for ( int __i = 1; __i < __DP->getDisplayedConnectionPlaces ().size (); __i++ )
-			{
-			if ( __DestinationsAAfficher == ( "all" ) && ( __i < __DP->getDisplayedConnectionPlaces ().size () - 1 || __AfficherTerminus )
-			|| __DestinationsAAfficher == ( "terminus" ) && __i == __DP->getDisplayedConnectionPlaces ().size () - 1
-			|| synthese::util::Conversion::ToInt(__DestinationsAAfficher) == __i && ( __i < __DP->getDisplayedConnectionPlaces ().size () - 1 || __AfficherTerminus )
-			)
-			{
-			if ( __i > 1 )
-			pCtxt << __SeparateurEntreArrets;
-
-			// Affichage de la commune dans les cas o� n�cessaire
-			if ( __TypeAffichage == ( "station_city" )
-			|| __TypeAffichage == ( "station_city_if_new" ) && __DP->getDisplayedConnectionPlaces ()[__i] ->getCity() != __DerniereCommune
-			)
-			{
-			std::stringstream ss;
-			boost::iostreams::filtering_ostream out;
-			out.push (synthese::util::LowerCaseFilter());
-			out.push (synthese::util::PlainCharFilter());
-			out.push (ss);
-
-			out << __DP->getDisplayedConnectionPlaces () [__i] ->getCity () ->getName();
-
-			// std::stringMinuscules __TexteMinuscule;
-			// __TexteMinuscule << __DP->GetGare( __i ) ->getTown() ->getName();
-
-			pCtxt << __AvantCommune << ss.str () << __ApresCommune;
-			__DerniereCommune = __DP->getDisplayedConnectionPlaces () [__i]->getCity();
-
-
-			}
-
-			// Affichage du nom d'arr�t dans les cas o� n�cessaire
-			if ( __TypeAffichage.substr (0, 6) == "station" )
-			pCtxt << __DP->getDisplayedConnectionPlaces () [__i] ->getName();
-
-			pCtxt << __DP->getDisplayedConnectionPlaces () [__i]->getName (); // temporary
-			/* TODO hugues // Affichage de la destination 13 caracteres dans les cas ou necessaire
-			if ( __TypeAffichage == "char(13)" )
-			pCtxt << __DP->getDisplayedConnectionPlaces () [__i]->getDesignation13();
-
-			// Affichage de la destination 26 caracteres dans les cas ou necessaire
-			if ( __TypeAffichage == "char(26)" )
-			pCtxt << __DP->getDisplayedConnectionPlaces () [__i]->getDesignation26();
-			*/
-			/*	    }
-			}
-			*/ 
-
-/*	case EI_BIBLIOTHEQUE_DescriptionPassage_Heure:  //48
-			// Lecture des param�tres
-			/*	const synthese::time::DateTime& __Moment = ( ( const PassThroughDescription* ) __Objet )->getRealMoment ();
-			std::string __Zero = _Parametres[ 0 ] ->Texte( __Parametres );
-			std::string __AvantSiImminent = _Parametres[ 1 ] ->Texte( __Parametres );
-			std::string __ApresSiImminent = _Parametres[ 2 ] ->Texte( __Parametres );
-
-			synthese::time::DateTime __Maintenant;
-			__Maintenant.updateDateTime( synthese::time::TIME_CURRENT );
-			int __Duree = __Moment - __Maintenant;
-
-			if ( __Duree <= 1 )
-			pCtxt << __AvantSiImminent;
-			if ( __Moment.getHour ().getHours() < 10 )
-			pCtxt << __Zero;
-			pCtxt << __Moment.getHour ();
-			if ( __Duree <= 1 )
-			pCtxt << __ApresSiImminent;
-			}
-			break;
-
+/*
 			case EI_BIBLIOTHEQUE_Cases_Particularites:  //49
 			{
 			const cTrajets* __Trajets = ( const cTrajets* ) __Objet;
@@ -949,18 +799,6 @@ namespace synthese
 			}
 			*/
 
-/*	case EI_BIBLIOTHEQUE_Tbdep_NumeroPanneau:  //50
-		{
-			// Lecture des param�tres
-			int __Nombre = _Parametres[ 0 ] ->Nombre( __Parametres );
-			std::string __Format = _Parametres[ 1 ] ->Texte( __Parametres );
-
-			if ( __Format == "char(2)")
-			{
-				__Nombre = __Nombre % 100;
-				pCtxt << __Nombre / 10;
-				pCtxt << __Nombre % 10;
-			} */
 
 
 

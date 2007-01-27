@@ -55,12 +55,6 @@
 				RelativePath=".\AddressablePlace.h">
 			</File>
 			<File
-				RelativePath=".\Alarm.cpp">
-			</File>
-			<File
-				RelativePath=".\Alarm.h">
-			</File>
-			<File
 				RelativePath=".\Axis.cpp">
 			</File>
 			<File
@@ -77,9 +71,6 @@
 			</File>
 			<File
 				RelativePath=".\BikeComplyer.h">
-			</File>
-			<File
-				RelativePath=".\BroadcastPoint.h">
 			</File>
 			<File
 				RelativePath=".\Calendar.cpp">
@@ -413,12 +404,6 @@
 				RelativePath=".\AddressTableSync.h">
 			</File>
 			<File
-				RelativePath=".\AlarmTableSync.cpp">
-			</File>
-			<File
-				RelativePath=".\AlarmTableSync.h">
-			</File>
-			<File
 				RelativePath=".\AxisTableSync.cpp">
 			</File>
 			<File
@@ -551,6 +536,16 @@
 				RelativePath=".\TransportNetworkTableSync.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="Alarm broacast"
+			Filter="">
+			<File
+				RelativePath=".\BroadcastPointAlarmBroadcast.h">
+			</File>
+			<File
+				RelativePath=".\LineAlarmBroadcast.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\EnvModule.cpp">
 		</File>
@@ -564,10 +559,10 @@
 			RelativePath=".\EnvModule.inc.cpp">
 		</File>
 		<File
-			RelativePath=".\module.h">
+			RelativePath=".\SConscript">
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\Types.h">
 		</File>
 	</Files>
 	<Globals>

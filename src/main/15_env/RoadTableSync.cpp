@@ -91,7 +91,7 @@ RoadTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 					  city, 
 					  roadType);
     road->setFare (environment.getFares ().get (fareId));
-    road->setAlarm (environment.getAlarms ().get (alarmId));
+//    road->setAlarm (environment.getAlarms ().get (alarmId));
     road->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
     road->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
     road->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
@@ -145,7 +145,7 @@ RoadTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
     road->setType (roadType);
 
     road->setFare (environment.getFares ().get (fareId));
-    road->setAlarm (environment.getAlarms ().get (alarmId));
+//    road->setAlarm (environment.getAlarms ().get (alarmId));
     road->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
     road->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
     road->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
