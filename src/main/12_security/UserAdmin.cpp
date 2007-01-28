@@ -20,11 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "01_util/Html.h"
+
 #include "02_db/DBEmptyResultException.h"
 
 #include "12_security/User.h"
 #include "12_security/UserAdmin.h"
 #include "12_security/UserTableSync.h"
+#include "12_security/SecurityModule.h"
 
 #include "32_admin/AdminRequest.h"
 
@@ -71,15 +74,10 @@ namespace synthese
 				<< "<TR><TD>E-mail</TD><TD><INPUT type=\"text\" name=\"Text1\"></TD></TR>"
 				<< "<TR><th colSpan=\"2\">Droits</TD></TR>"
 				<< "<TR><td>Connexion autorisée</td><TD><INPUT type=\"radio\" CHECKED value=\"Radio1\" name=\"RadioGroupc\">OUI	<INPUT type=\"radio\" value=\"Radio1\" name=\"RadioGroupc\">NON</TD></TR>"
-				<< "<TR><TD>Profil</TD><TD><SELECT name=\"Select1\">";
-			
-			// Profile list
-
-
-			stream
-				<< "</SELECT></TD></TR>"
-				<< "<TR><TD style=\"text-align:center\" colSpan=\"2\"><INPUT type=\"submit\" value=\"Enregistrer les modifications\"></TD></TR>"
-				<< "</TABLE>";
+				<< "<tr><td>Profil</td><td>" << Html::getSelectInput("", SecurityModule::getProfileLabels(), _user->getProfile()->getKey()) << "</td></tr>"
+				
+				<< "<tr><td style=\"text-align:center\" colSpan=\"2\">" << Html::getSubmitButton("Enregistrer les modifications") << "</td></tr>"
+				<< "</table>";
 		}
 
 		void UserAdmin::setFromParametersMap(const server::Request::ParametersMap& map)

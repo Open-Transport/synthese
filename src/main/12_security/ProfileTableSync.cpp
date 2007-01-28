@@ -142,13 +142,14 @@ namespace synthese
 			/// @todo Implementation
 		}
 
-		std::vector<Profile*> ProfileTableSync::search(const std::string name , int first /*= 0*/, int number /*= 0*/ )
+		std::vector<Profile*> ProfileTableSync::search(std::string name, string right, int first /*= 0*/, int number /*= 0*/ )
 		{
+			/** @todo Handle right filter */
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE_NAME					
 				<< " WHERE " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);

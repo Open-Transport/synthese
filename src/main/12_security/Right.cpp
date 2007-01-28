@@ -40,6 +40,11 @@ namespace synthese
 		{
 
 		}
+
+		Right::~Right()
+		{
+
+		}
 	}
 }
 

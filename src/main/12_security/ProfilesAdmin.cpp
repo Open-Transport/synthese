@@ -20,10 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <map>
+#include <string>
+
 #include "01_util/Html.h"
+#include "01_util/Conversion.h"
 
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfilesAdmin.h"
+#include "12_security/ProfileTableSync.h"
 
 #include "32_admin/AdminRequest.h"
 
@@ -40,13 +45,36 @@ namespace synthese
 	{
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_NAME = "pasn";
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_RIGHT = "pasr";
+		const std::string ProfilesAdmin::PARAMETER_SEARCH_FIRST = "pasf";
 
 		ProfilesAdmin::ProfilesAdmin()
 			: AdminInterfaceElement("users", AdminInterfaceElement::EVER_DISPLAYED) {}
 
 		void ProfilesAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
+			string name;
+			string right;
+			int first = 0;
+
+			Request::ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_NAME);
+			if (it != map.end())
+			{
+				name = it->second;
+			}
+
+			it = map.find(PARAMETER_SEARCH_RIGHT);
+			if (it != map.end())
+			{
+				right = it->second;
+			}
+
+			it = map.find(PARAMETER_SEARCH_FIRST);
+			if (it != map.end())
+			{
+				first = Conversion::ToInt(it->second);
+			}
+
+			_searchResult = ProfileTableSync::search(name, right, first, 50);
 		}
 
 		string ProfilesAdmin::getTitle() const
@@ -60,12 +88,15 @@ namespace synthese
 			searchRequest->copy(request);
 			searchRequest->setPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
 
+			map<string, string>& rightsMap = SecurityModule::getRightsTemplates();
+			rightsMap.insert(make_pair("", "(toutes les habilitations)"));
+
 			stream
 				<< searchRequest->getHTMLFormHeader("search")
 				<< "<table id=\"searchform\"><tr>"
 				<< "<td>Nom</td><td>" << Html::getTextInput(PARAMETER_SEARCH_NAME, "") << "</td>"
 				<< "<td>Habilitation</td>"
-				<< "<td>" << Html::getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightsTemplates(), string()) << "</td>"
+				<< "<td>" << Html::getSelectInput(PARAMETER_SEARCH_RIGHT, rightsMap, string()) << "</td>"
 				<< "<td>" << Html::getSubmitButton("Rechercher") << "</td></tr>"
 				<< "</table></form>"
 				<< Html::setFocus("search", PARAMETER_SEARCH_NAME)
@@ -74,15 +105,25 @@ namespace synthese
 				
 				<< "<table id=\"searchresult\">"
 				<< "<TR><th>Sel</th><th>Nom</th><th>Résumé</th><th>Actions</th></tr>";
-
-			// List of profiles
+			
+			// Profiles loop
+			for (vector<Profile*>::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
 			{
+				Profile* profile = *it;
 				stream
                     << "<tr>"
 					<< "<TD><INPUT type=\"checkbox\" name=\"Checkbox3\"></TD>"
-					<< "<TD>Administrateur</TD>"
-					<< "<TD><UL><LI>Suppression&nbsp;publique pour tout</LI></UL></TD>"
-					<< "<TD><INPUT type=\"button\" value=\"Modifier\" name=\"Modifier\" /></TD>"
+					<< "<td>" << profile->getName() << "</td>"
+					<< "<td><ul>";
+
+				if (profile->getParentId())
+					stream << "<li>Hérite de " << SecurityModule::getProfiles().get(profile->getParentId())->getName() << "</li>";
+
+				// Rights loop
+
+				stream
+					<< "</td>"
+					<< "<td>" << Html::getHiddenInput("", Conversion::ToString(profile->getKey())) << Html::getSubmitButton("Modifier") << "</td>"
 					<< "</tr>";
 			}
 

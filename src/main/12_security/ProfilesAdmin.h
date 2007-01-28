@@ -23,12 +23,15 @@
 #ifndef SYNTHESE_PROFILES_ADMIN_H
 #define SYNTHESE_PROFILES_ADMIN_H
 
+#include <vector>
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
 {
 	namespace security
 	{
+		class Profile;
 
 		/** Ecran de gestion des profils utilisateurs.
 			@ingroup m34
@@ -78,6 +81,9 @@ namespace synthese
 		{
 			static const std::string PARAMETER_SEARCH_NAME;
 			static const std::string PARAMETER_SEARCH_RIGHT;
+			static const std::string PARAMETER_SEARCH_FIRST;
+
+			std::vector<Profile*> _searchResult;
 
 		public:
 			ProfilesAdmin();

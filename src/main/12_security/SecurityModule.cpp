@@ -82,5 +82,13 @@ namespace synthese
 				m.insert(make_pair(it.getKey(), it.getKey()));
 			return m;
 		}
+
+		std::map<uid, std::string> SecurityModule::getProfileLabels( int first/*=0*/, int last/*=-1*/ )
+		{
+			map<uid, string> m;
+			for (Profile::Registry::const_iterator it = _profiles.begin(); it != _profiles.end(); ++it)
+				m.insert(make_pair(it->first, it->second->getName()));
+			return m;
+		}
 	}
 }

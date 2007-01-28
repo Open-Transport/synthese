@@ -20,6 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "01_util/Html.h"
+
 #include "12_security/SecurityModule.h"
 #include "12_security/UserAdmin.h"
 #include "12_security/User.h"
@@ -131,13 +133,7 @@ namespace synthese
 				<< "<td>&nbsp;</TD>"
 				<< "<td><input value=\"Entrez le login ici\" name=\"" << AddUserAction::PARAMETER_LOGIN << "\" /></TD>"
 				<< "<td><input value=\"Entrez le nom ici\" name=\"" << AddUserAction::PARAMETER_NAME << "\" /></TD>"
-				<< "<td><SELECT name=\"" << AddUserAction::PARAMETER_PROFILE_ID << "\">";
-
-			for (Profile::Registry::const_iterator it = SecurityModule::getProfiles().begin(); it != SecurityModule::getProfiles().end(); ++it)
-				stream << "<option value=\"" << it->first << "\">" << it->second->getName() << "</option>";
-
-			stream
-				<< "</SELECT></TD>"
+				<< "<td>" << Html::getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), (uid) 0) << "</td>"
 				<< "<td><input type=\"submit\" value=\"Ajouter\" /></td>"
                 << "</tr></form>";
 

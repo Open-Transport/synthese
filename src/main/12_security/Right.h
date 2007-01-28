@@ -91,6 +91,7 @@ namespace synthese
 			//static bool validateParameter(std::string parameter) const = 0;
 
 			Right(std::string parameter, Level privateLevel, Level publicLevel);
+			~Right();
 		};
 	}
 }

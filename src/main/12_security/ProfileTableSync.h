@@ -64,8 +64,9 @@ namespace synthese
 				@date 2006				
 			*/
 			static std::vector<Profile*> search(
-				const std::string name
-				, int first = 0, int number = 0);
+				std::string name=""
+				, std::string right=""
+				, int first = 0, int number = -1);
 
 		protected:
 
