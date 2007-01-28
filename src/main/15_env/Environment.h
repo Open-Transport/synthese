@@ -102,6 +102,8 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     synthese::time::Date _minDateInUse;
     synthese::time::Date _maxDateInUse;
 
+	std::string _name;
+
     // TODO : 
     // zone
 
@@ -235,10 +237,9 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     //@{
     void updateMinMaxDatesInUse (synthese::time::Date newDate, bool marked);
     //@}
-
-    
- private:
-
+	
+	const std::string& getName() const;
+	void setName(const std::string& name);
 
 };
 

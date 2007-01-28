@@ -558,7 +558,15 @@ Environment::updateMinMaxDatesInUse (synthese::time::Date newDate, bool marked)
     
 }
 
+const std::string& Environment::getName() const
+{
+	return _name;
+}
 
+void Environment::setName( const std::string& name )
+{
+	_name = name;
+}
 
 
 
