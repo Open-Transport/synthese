@@ -39,12 +39,12 @@ namespace synthese
 	{
 
 		ForcedDestinationsArrivalDepartureTableGenerator::ForcedDestinationsArrivalDepartureTableGenerator(
-			const DeparturesTableModule::PhysicalStopsList& physicalStops
-			, const DeparturesTableModule::Direction& direction
-			, const DeparturesTableModule::EndFilter& endfilter
-			, const DeparturesTableModule::LineFilter& lineFilter
-			, const DeparturesTableModule::DisplayedPlacesList& displayedPlacesList
-			, const DeparturesTableModule::ForbiddenPlacesList& forbiddenPlaces
+			const PhysicalStopsList& physicalStops
+			, const DeparturesTableDirection& direction
+			, const EndFilter& endfilter
+			, const LineFilter& lineFilter
+			, const DisplayedPlacesList& displayedPlacesList
+			, const ForbiddenPlacesList& forbiddenPlaces
 			, const DateTime& startTime
 			, const DateTime& endDateTime
 			, size_t maxSize
@@ -56,7 +56,7 @@ namespace synthese
 			, _persistanceDuration(persistanceDuration)
 		{
 			// Add terminuses to forced destinations
-			for (DeparturesTableModule::PhysicalStopsList::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+			for (PhysicalStopsList::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 			{
 				for (set<const Edge*>::const_iterator eit = (*it)->getDepartureEdges().begin(); eit != (*it)->getDepartureEdges().end(); ++eit)
 				{
@@ -74,13 +74,13 @@ namespace synthese
 
 
 
-		const DeparturesTableModule::ArrivalDepartureList& ForcedDestinationsArrivalDepartureTableGenerator::generate()
+		const ArrivalDepartureList& ForcedDestinationsArrivalDepartureTableGenerator::generate()
 		{
 			/** - Search of best departure for each forced destination */
-			typedef map<const ConnectionPlace*, DeparturesTableModule::ArrivalDepartureList::iterator> ReachedDestinationMap;
+			typedef map<const ConnectionPlace*, ArrivalDepartureList::iterator> ReachedDestinationMap;
 			ReachedDestinationMap reachedDestination;
 			
-			for (DeparturesTableModule::PhysicalStopsList::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+			for (PhysicalStopsList::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 			{
 				for (set<const Edge*>::const_iterator eit = (*it)->getDepartureEdges().begin(); eit != (*it)->getDepartureEdges().end(); ++eit)
 				{
@@ -116,7 +116,7 @@ namespace synthese
 						if (reachedDestination.find(curGLA->getConnectionPlace()) == reachedDestination.end())
 						{
 							// Allocation
-							DeparturesTableModule::ArrivalDepartureList::iterator itr = _insert(ls, serviceNumber, tempStartDateTime, FORCE_UNLIMITED_SIZE);
+							ArrivalDepartureList::iterator itr = _insert(ls, serviceNumber, tempStartDateTime, FORCE_UNLIMITED_SIZE);
 
 							// Links
 							reachedDestination[curGLA->getConnectionPlace()] = itr;
@@ -125,8 +125,8 @@ namespace synthese
 						else if (tempStartDateTime < reachedDestination[curGLA->getConnectionPlace()]->first.realDepartureTime)
 						{
 							// Allocation
-							DeparturesTableModule::ArrivalDepartureList::iterator itr = _insert(ls, serviceNumber, tempStartDateTime, FORCE_UNLIMITED_SIZE);
-							DeparturesTableModule::ArrivalDepartureList::iterator oldIt = reachedDestination[curGLA->getConnectionPlace()];
+							ArrivalDepartureList::iterator itr = _insert(ls, serviceNumber, tempStartDateTime, FORCE_UNLIMITED_SIZE);
+							ArrivalDepartureList::iterator oldIt = reachedDestination[curGLA->getConnectionPlace()];
 
 							reachedDestination[curGLA->getConnectionPlace()] = itr;
 
@@ -147,10 +147,10 @@ namespace synthese
 			if (_result.size() < _maxSize)
 			{
 				StandardArrivalDepartureTableGenerator standardTable(_physicalStops, _direction, _endFilter
-					, _lineFilter, DeparturesTableModule::DisplayedPlacesList(), _forbiddenPlaces, _startDateTime, _endDateTime, _maxSize + _result.size());
-				const DeparturesTableModule::ArrivalDepartureList& standardTableResult = standardTable.generate();
+					, _lineFilter, DisplayedPlacesList(), _forbiddenPlaces, _startDateTime, _endDateTime, _maxSize + _result.size());
+				const ArrivalDepartureList& standardTableResult = standardTable.generate();
 
-				for (DeparturesTableModule::ArrivalDepartureList::const_iterator itr = standardTableResult.begin();
+				for (ArrivalDepartureList::const_iterator itr = standardTableResult.begin();
 					_result.size() < _maxSize && itr != standardTableResult.end(); ++itr)
 				{
 					if (_result.find(itr->first) == _result.end())

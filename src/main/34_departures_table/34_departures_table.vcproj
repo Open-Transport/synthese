@@ -193,9 +193,31 @@
 				RelativePath=".\DisplayScreenTableSync.h">
 			</File>
 			<File
+				RelativePath=".\DisplayTypeTableSync.cpp">
+			</File>
+			<File
 				RelativePath=".\DisplayTypeTableSync.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="Actions"
+			Filter="">
+			<File
+				RelativePath=".\CreateDisplayTypeAction.cpp">
+			</File>
+			<File
+				RelativePath=".\CreateDisplayTypeAction.h">
+			</File>
+			<File
+				RelativePath=".\UpdateDisplayTypeAction.cpp">
+			</File>
+			<File
+				RelativePath=".\UpdateDisplayTypeAction.h">
+			</File>
+		</Filter>
+		<File
+			RelativePath=".\DeparturesTableModule.cpp">
+		</File>
 		<File
 			RelativePath=".\DeparturesTableModule.gen.cpp">
 		</File>
@@ -210,6 +232,9 @@
 		</File>
 		<File
 			RelativePath=".\SConscript">
+		</File>
+		<File
+			RelativePath=".\Types.h">
 		</File>
 	</Files>
 	<Globals>

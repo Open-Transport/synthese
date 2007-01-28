@@ -48,12 +48,12 @@ namespace synthese
 
 		public:
 			ForcedDestinationsArrivalDepartureTableGenerator(
-				const DeparturesTableModule::PhysicalStopsList&
-				, const DeparturesTableModule::Direction&
-				, const DeparturesTableModule::EndFilter&
-				, const DeparturesTableModule::LineFilter&
-				, const DeparturesTableModule::DisplayedPlacesList&
-				, const DeparturesTableModule::ForbiddenPlacesList&
+				const PhysicalStopsList&
+				, const DeparturesTableDirection&
+				, const EndFilter&
+				, const LineFilter&
+				, const DisplayedPlacesList&
+				, const ForbiddenPlacesList&
 				, const time::DateTime& startDateTime
 				, const time::DateTime& endDateTime
 				, size_t maxSize
@@ -62,7 +62,7 @@ namespace synthese
 				);
 
 
-			const DeparturesTableModule::ArrivalDepartureList& generate();
+			const ArrivalDepartureList& generate();
 		};
 
 	}

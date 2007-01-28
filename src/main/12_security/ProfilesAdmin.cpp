@@ -20,7 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "01_util/Html.h"
+
 #include "ProfilesAdmin.h"
+
+#include "32_admin/AdminRequest.h"
 
 using namespace std;
 
@@ -29,9 +33,12 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
+	using namespace util;
 
 	namespace security
 	{
+		const std::string ProfilesAdmin::PARAMETER_SEARCH_NAME = "pasn";
+
 		/// @todo Verify the parent constructor parameters
 		ProfilesAdmin::ProfilesAdmin()
 			: AdminInterfaceElement("users", AdminInterfaceElement::EVER_DISPLAYED) {}
@@ -48,9 +55,14 @@ namespace synthese
 
 		void ProfilesAdmin::display(ostream& stream, const Request* request) const
 		{
+			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
+			searchRequest->copy(request);
+			searchRequest->setPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
+
 			stream
-				<< "<table><tr>"
-				<< "<td>Nom</td><td><INPUT type=\"text\" size=\"8\" name=\"Text2\"></td>"
+				<< searchRequest->getHTMLFormHeader("search")
+				<< "<table id=\"searchform\"><tr>"
+				<< "<td>Nom</td><td>" << Html::getTextInput(PARAMETER_SEARCH_NAME, "") << "</td>"
 				<< "<td>Habilitation</td><td><SELECT name=\"Select1\">"
 				<< "<OPTION selected value=\"\">(toutes)</OPTION>";
 
@@ -59,11 +71,12 @@ namespace synthese
 			stream
 				<< "</select></td>"
 				<< "<td><INPUT type=\"button\" value=\"Rechercher\" name=\"Button6\"></td></tr>"
-				<< "</table>"
+				<< "</table></form>"
+				<< Html::setFocus("search", PARAMETER_SEARCH_NAME)
 				
 				<< "<h1>Résultats de la recherche</h1>"
 				
-				<< "<table>"
+				<< "<table id=\"searchresult\">"
 				<< "<TR><th>Sel</th><th>Nom</th><th>Résumé</th><th>Actions</th></tr>";
 
 			// List of profiles

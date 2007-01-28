@@ -35,7 +35,7 @@
 #include "30_server/Request.h"
 #include "30_server/Site.h"
 
-#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/Types.h"
 #include "34_departures_table/DeparturesTableInterfaceElement.h"
 #include "34_departures_table/DeparturesTableLineContentInterfaceElement.h"
 
@@ -77,7 +77,7 @@ namespace synthese
 
 		void DeparturesTableLineContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			const Line* line = ((const DeparturesTableModule::ArrivalDepartureRow*) object)->first.linestop->getLine();
+			const Line* line = ((const ArrivalDepartureRow*) object)->first.linestop->getLine();
 
 			const LineMarkerInterfacePage* page = request->getSite()->getInterface()->getPage<LineMarkerInterfacePage>();
 			page->display(stream

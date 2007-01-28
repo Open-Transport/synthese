@@ -32,6 +32,7 @@ namespace synthese
 			//delete _parameter1;
 		}
 
+		/** @todo Put the html code as parameters */
 		std::string AdminPagesTreeInterfaceElement::getSubPages( const std::string& page, const AdminInterfaceElement* currentPage, const Request* request)
 		{
 			stringstream str;
@@ -50,8 +51,14 @@ namespace synthese
 					{
 						str << it->getHTMLLink(request);	
 					}
-					str << "</li>"
-						<< getSubPages(it->getFactoryKey(), currentPage, request);
+					str << "</li>";
+
+					string sp = getSubPages(it->getFactoryKey(), currentPage, request);
+
+					if (sp.size() > 0)
+					{
+						str << "<ul style=\"margin:0px 0px 0px 15px\">" << sp << "</ul>";
+					}
 				}
 			}
 			return str.str();

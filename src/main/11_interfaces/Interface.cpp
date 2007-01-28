@@ -171,6 +171,16 @@ namespace synthese
 		{
 			return _noSessionDefaultPageCode;
 		}
+
+		void Interface::setName( const std::string& name )
+		{
+			_name = name;
+		}
+
+		const std::string& Interface::getName() const
+		{
+			return _name;
+		}
 	}
 }
 

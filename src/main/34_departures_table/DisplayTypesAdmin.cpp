@@ -20,7 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DisplayTypesAdmin.h"
+#include "01_util/Html.h"
+
+#include "11_interfaces/InterfaceModule.h"
+
+#include "32_admin/AdminRequest.h"
+
+#include "34_departures_table/DisplayType.h"
+#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/DisplayTypesAdmin.h"
+#include "34_departures_table/CreateDisplayTypeAction.h"
+#include "34_departures_table/UpdateDisplayTypeAction.h"
 
 using namespace std;
 
@@ -29,6 +39,7 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
+	using namespace util;
 
 	namespace departurestable
 	{
@@ -48,48 +59,46 @@ namespace synthese
 
 		void DisplayTypesAdmin::display(ostream& stream, const Request* request) const
 		{
+			AdminRequest* createRequest = Factory<Request>::create<AdminRequest>();
+			createRequest->copy(request);
+			createRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayTypesAdmin>());
+			createRequest->setAction(Factory<Action>::create<CreateDisplayTypeAction>());
+
+			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
+			updateRequest->copy(request);
+			updateRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayTypesAdmin>());
+			updateRequest->setAction(Factory<Action>::create<UpdateDisplayTypeAction>());
+
 			stream
-				<< "<P>Liste des types d'afficheurs disponibles :</P>"
-				<< "<TABLE><TR><th>Nom</th><th>Interface</th><th>Lignes</th><th>Actions</th></tr>";
+				<< "<h1>Liste des types d'afficheurs disponibles</h1>"
+				<< "<table id=\"searchresult\"><tr><th>Nom</th><th>Interface</th><th>Lignes</th><th>Actions</th></tr>";
 
-			// Display types list
+			// Display types loop
+			for (DisplayType::Registry::const_iterator it = DeparturesTableModule::getDisplayTypes().begin(); it != DeparturesTableModule::getDisplayTypes().end(); ++it)
 			{
-				stream
-					<< "<TR>"
-					<< "<TD><INPUT type=\"text\" size=\"14\" value=\"Oscar\" name=\"Text2\"></TD>"
-					<< "<TD><SELECT name=\"Select1\">";
-
-				// Interfaces list
-				
-				stream
-					<< "</SELECT></TD>"
-					<< "<TD><SELECT name=\"Select2\">"
-					<< "<OPTION value=\"\" selected> </OPTION>";
-
-				for (int i=1; i<100; ++i)
-					stream << "<option value=\"" << i << "\">" << i << "</option>";
+				DisplayType* dt = it->second;
 
 				stream
-					<< "</SELECT></TD>"
-					<< "<TD><INPUT type=\"button\" name=\"Modifier\"></TD>"
-					<< "</TR>"
+					<< updateRequest->getHTMLFormHeader("update" + Conversion::ToString(it->second->getKey()))
+					<< "<tr>"
+					<< "<td>" << Html::getTextInput(UpdateDisplayTypeAction::PARAMETER_NAME, dt->getName()) << "</td>"
+					<< "<td>" << Html::getSelectInput(UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), dt->getInterface()->getKey()) << "</td>"
+					<< "<td>" << Html::getSelectNumberInput(UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99, dt->getRowNumber()) << "</td>"
+					<< "<td>" << Html::getHiddenInput(UpdateDisplayTypeAction::PARAMETER_ID, Conversion::ToString(dt->getKey())) << Html::getSubmitButton("Modifier") << "</td>"
+					<< "</tr></form>"
 					;
 			}
 
 			// New type
 			stream
-				<< "<TR>"
-				<< "<TD><input type=\"text\" size=\"14\" value=\"(Entrez le nom ici)\" name=\"Text2\" /></TD>"
-				<< "<TD><SELECT name=\"Select2\">"
-				<< "<OPTION value=\"\" selected> </OPTION>";
-
-			for (int i=1; i<100; ++i)
-				stream << "<option value=\"" << i << "\">" << i << "</option>";
-
-			stream
-				<< "</SELECT></TD>"
-				<< "<TD><INPUT type=\"button\" name=\"Ajouter\"></TD>"
-				<< "</TR></TABLE>";
+				<< createRequest->getHTMLFormHeader("create")
+				<< "<tr>"
+				<< "<td>" << Html::getTextInput(CreateDisplayTypeAction::PARAMETER_NAME, "", "(Entrez le nom ici)") << "</td>"
+				<< "<td>" << Html::getSelectInput(CreateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), (uid) 0) << "</td>"
+				<< "<td>" << Html::getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99) << "</td>"
+				<< "<td>" << Html::getSubmitButton("Ajouter") << "</td>"
+				<< "</tr></form>"
+				<< "</table>";
 		}
 	}
 }

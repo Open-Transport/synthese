@@ -52,6 +52,11 @@ namespace synthese
 			
 		}
 
+		DisplayType::DisplayType()
+			: Registrable<uid, DisplayType>()
+		{
+
+		}
 		void DisplayType::setRowNumber( int number )
 		{
 			_rowNumber = number;

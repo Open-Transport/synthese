@@ -34,7 +34,7 @@ namespace synthese
 		DisplayScreen::DisplayScreen(const uid& id, GenerationMethod generationMethod)
 			: Registrable<uid, DisplayScreen>(id)
 			, _generationMethod(generationMethod)
-			, _originsOnly(DeparturesTableModule::WITH_PASSING)
+			, _originsOnly(WITH_PASSING)
 			, _localization(NULL)
 			, _destinationForceDelay(120)	// default = 2 hours
 			, _maxDelay(24 * 60)			// default = 24 hours
@@ -52,7 +52,7 @@ namespace synthese
 			_destinationForceDelay = delay;
 		}
 
-		void DisplayScreen::SetOriginesSeulement(const DeparturesTableModule::EndFilter& __Valeur)
+		void DisplayScreen::SetOriginesSeulement(const EndFilter& __Valeur)
 		{
 			_originsOnly = __Valeur;
 		}

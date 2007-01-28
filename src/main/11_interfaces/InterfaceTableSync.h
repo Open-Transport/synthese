@@ -43,6 +43,7 @@ namespace synthese
 		public:
 			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_NO_SESSION_DEFAULT_PAGE;
+			static const std::string TABLE_COL_NAME;
 
 
 			/** Interface page SQLite table constructor.

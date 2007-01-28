@@ -1,6 +1,6 @@
 
-/** InterfaceModule class implementation.
-	@file InterfaceModule.cpp
+/** DeparturesTableModule class implementation.
+	@file DeparturesTableModule.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,45 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <string>
-
-#include "01_util/Thread.h"
-
-#include "02_db/SQLiteQueueThreadExec.h"
-#include "02_db/SQLiteSync.h"
-
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfaceTableSync.h"
-#include "11_interfaces/InterfacePageTableSync.h"
-#include "11_interfaces/InterfaceModule.h"
-
-using namespace std;
+#include "34_departures_table/DeparturesTableModule.h"
 
 namespace synthese
 {
-	using namespace db;
-
-	namespace interfaces
+	namespace departurestable
 	{
-		Interface::Registry	InterfaceModule::_interfaces;
+		DisplayType::Registry DeparturesTableModule::_displayTypes;
 
-		void InterfaceModule::initialize()
+		DisplayType::Registry& DeparturesTableModule::getDisplayTypes()
 		{
-		}
-
-		Interface::Registry& 
-			InterfaceModule::getInterfaces ()
-		{
-			return _interfaces;
-		}
-
-		map<uid, std::string> InterfaceModule::getInterfaceLabels()
-		{
-			map<uid, string> m;
-			for (Interface::Registry::const_iterator it = _interfaces.begin(); it != _interfaces.end(); ++it)
-				m.insert(make_pair(it->first, it->second->getName()));
-			return m;
+			return _displayTypes;
 		}
 	}
 }
-

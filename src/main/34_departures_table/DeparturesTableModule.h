@@ -23,15 +23,9 @@
 #ifndef SYNTHESE_DeparturesTableModule_H__
 #define SYNTHESE_DeparturesTableModule_H__
 
-#include <functional>
-#include <utility>
-#include <vector>
-#include <map>
-#include <set>
-
 #include "01_util/ModuleClass.h"
 
-#include "04_time/DateTime.h"
+#include "34_departures_table/DisplayType.h"
 
 /** @defgroup m34 Arrival/departures tables service module.
 @{
@@ -50,27 +44,10 @@ namespace synthese
 	{
 		class DeparturesTableModule : public util::ModuleClass
 		{
+			static DisplayType::Registry _displayTypes;
+
 		public:
-			typedef std::set<const env::ConnectionPlace*> DisplayedPlacesList;
-			typedef std::set<const env::PhysicalStop*> PhysicalStopsList;
-			typedef std::set<const env::Line*> LineFilter;
-			typedef std::set<const env::ConnectionPlace*> ForbiddenPlacesList;
-			typedef enum { DISPLAY_ARRIVALS, DISPLAY_DEPARTURES } Direction;
-			typedef enum { ENDS_ONLY, WITH_PASSING } EndFilter;
-			struct Element { const env::LineStop* linestop; int serviceNumber; time::DateTime realDepartureTime; };
-			struct ElementLess : public std::binary_function<Element, Element, bool>
-			{
-				bool operator()(const Element& _Left, const Element& _Right) const
-				{
-					return (_Left.realDepartureTime < _Right.realDepartureTime
-						|| _Left.realDepartureTime == _Right.realDepartureTime 
-						&& _Left.linestop != _Right.linestop
-						);
-				}
-			};
-			typedef std::vector<const env::ConnectionPlace*> ActualDisplayedArrivalsList;
-			typedef std::pair<Element, ActualDisplayedArrivalsList> ArrivalDepartureRow;
-			typedef std::map<Element, ActualDisplayedArrivalsList, ElementLess> ArrivalDepartureList;
+			static DisplayType::Registry& getDisplayTypes();
 		};
 	}
 }

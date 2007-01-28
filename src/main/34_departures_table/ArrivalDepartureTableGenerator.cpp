@@ -37,12 +37,12 @@ namespace synthese
 	{
 
 		ArrivalDepartureTableGenerator::ArrivalDepartureTableGenerator(
-				const DeparturesTableModule::PhysicalStopsList&		physicalStops
-				, const DeparturesTableModule::Direction&			direction
-				, const DeparturesTableModule::EndFilter&			endfilter
-				, const DeparturesTableModule::LineFilter&			lineFilter
-				, const DeparturesTableModule::DisplayedPlacesList&	displayedPlacesList
-				, const DeparturesTableModule::ForbiddenPlacesList&	forbiddenPlaces
+				const PhysicalStopsList&		physicalStops
+				, const DeparturesTableDirection&			direction
+				, const EndFilter&			endfilter
+				, const LineFilter&			lineFilter
+				, const DisplayedPlacesList&	displayedPlacesList
+				, const ForbiddenPlacesList&	forbiddenPlaces
 				, const DateTime& startDateTime
 				, const DateTime& endDateTime
 				, size_t maxSize
@@ -68,24 +68,24 @@ namespace synthese
 
 			return 	linestop->getLine()->getUseInDepartureBoards()
 				&&	_lineFilter.find(linestop->getLine()) == _lineFilter.end()
-				&&	((_endFilter == DeparturesTableModule::WITH_PASSING) || (linestop->getPreviousDeparture() == NULL))
+				&&	((_endFilter == WITH_PASSING) || (linestop->getPreviousDeparture() == NULL))
 				//&&	(((linestop->getFollowingArrival() != NULL) && (linestop->getFollowingArrival()->getConnectionPlace() != _place))
 				//	|| ( linestop->getLine()->getDestination()->getConnectionPlace() != _place))
 			;
 		}
 
 
-		DeparturesTableModule::ArrivalDepartureList::iterator
+		ArrivalDepartureList::iterator
 		ArrivalDepartureTableGenerator::_insert(
 			const LineStop* linestop, int serviceNumber, const DateTime& realDepartureTime, UnlimitedSize unlimitedSize)
 		{
 			// Values
-			DeparturesTableModule::Element element;
+			DeparturesTableElement element;
 			element.linestop = linestop;
 			element.serviceNumber = serviceNumber;
 			element.realDepartureTime = realDepartureTime;
 
-			DeparturesTableModule::ActualDisplayedArrivalsList arrivals;
+			ActualDisplayedArrivalsList arrivals;
 			set<const ConnectionPlace*> encounteredPlaces;
 			const ConnectionPlace* destinationPlace = linestop->getLine()->getDestination()->getConnectionPlace();
 			for (const LineStop* curLinestop = linestop; curLinestop != NULL; curLinestop = (LineStop*) curLinestop->getFollowingArrival())
@@ -104,7 +104,7 @@ namespace synthese
 			}
 
 			/** - Insertion */
-			pair<DeparturesTableModule::ArrivalDepartureList::iterator, bool> insertResult = _result.insert(pair<DeparturesTableModule::Element, DeparturesTableModule::ActualDisplayedArrivalsList>(element, arrivals));
+			pair<ArrivalDepartureList::iterator, bool> insertResult = _result.insert(pair<DeparturesTableElement, ActualDisplayedArrivalsList>(element, arrivals));
 
 			/** - Control of size : if too long, deletion of the last element */
 			if (unlimitedSize == SIZE_AS_DEFINED && _maxSize != UNLIMITED_SIZE && _result.size() > _maxSize)

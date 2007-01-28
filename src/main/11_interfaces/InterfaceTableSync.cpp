@@ -44,6 +44,7 @@ namespace synthese
 		{
 			interf->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			interf->setNoSessionDefaultPageCode(rows.getColumn(rowId, InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE));
+			interf->setName(rows.getColumn(rowId, InterfaceTableSync::TABLE_COL_NAME));
 		}
 
 		template<> void SQLiteTableSyncTemplate<Interface>::save(Interface* interf)
@@ -56,12 +57,14 @@ namespace synthese
 	{
 		const std::string InterfaceTableSync::TABLE_COL_ID = "id";
 		const std::string InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE = "no_session_default_page";
+		const std::string InterfaceTableSync::TABLE_COL_NAME = "name";
 
 		InterfaceTableSync::InterfaceTableSync()
 			: db::SQLiteTableSyncTemplate<Interface> ( TABLE_NAME, true, true, db::TRIGGERS_ENABLED_CLAUSE )
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NO_SESSION_DEFAULT_PAGE, "TEXT", true);
+			addTableColumn(TABLE_COL_NAME, "TEXT", true);
 		}
 
 

@@ -31,7 +31,7 @@
 
 #include "04_time/DateTime.h"
 
-#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/Types.h"
 #include "34_departures_table/ForcedDestinationsArrivalDepartureTableGenerator.h"
 #include "34_departures_table/StandardArrivalDepartureTableGenerator.h"
 
@@ -101,22 +101,22 @@ namespace synthese
 
 			//! \name Content
 			//@{
-				DeparturesTableModule::PhysicalStopsList	_physicalStops;				//!< Quai(s) affichés
-				DeparturesTableModule::ForbiddenPlacesList	_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
-				DeparturesTableModule::LineFilter			_forbiddenLines;
-				DeparturesTableModule::Direction			_direction;
-				DeparturesTableModule::EndFilter			_originsOnly;
-				DeparturesTableModule::DisplayedPlacesList	_displayedPlaces;
-				int											_maxDelay;			//!< Max time length for the table
-				int											_clearingDelay;
-				int											_firstRow;
+				PhysicalStopsList			_physicalStops;				//!< Quai(s) affichés
+				ForbiddenPlacesList			_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
+				LineFilter					_forbiddenLines;
+				DeparturesTableDirection	_direction;
+				EndFilter					_originsOnly;
+				DisplayedPlacesList			_displayedPlaces;
+				int							_maxDelay;			//!< Max time length for the table
+				int							_clearingDelay;
+				int							_firstRow;
 			//@}
 
 			//!	\name Preselection
 			//@{
-				const GenerationMethod					_generationMethod;
-				DeparturesTableModule::DisplayedPlacesList	_forcedDestinations;	//!< Destinations à afficher absolument
-				int										_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
+				const GenerationMethod		_generationMethod;
+				DisplayedPlacesList			_forcedDestinations;	//!< Destinations à afficher absolument
+				int							_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
 			
 			//@}
 
@@ -138,7 +138,7 @@ namespace synthese
 				void			setLocalization(const BroadcastPoint*);
 				void			AddQuaiAutorise(const env::PhysicalStop*);
 				void			SetTitre(const std::string&);
-				void			SetOriginesSeulement(const DeparturesTableModule::EndFilter& __Valeur);
+				void			SetOriginesSeulement(const EndFilter& __Valeur);
 				void			AddDestinationAffichee(const env::ConnectionPlace* __PointArret);
 				void			SetNumeroPanneau(int);
 				void			addForcedDestination(const env::ConnectionPlace*);

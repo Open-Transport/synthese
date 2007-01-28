@@ -37,12 +37,12 @@ namespace synthese
 	{
 
 		StandardArrivalDepartureTableGenerator::StandardArrivalDepartureTableGenerator(
-			const DeparturesTableModule::PhysicalStopsList& physicalStops
-			, const DeparturesTableModule::Direction& direction
-			, const DeparturesTableModule::EndFilter& endfilter
-			, const DeparturesTableModule::LineFilter& lineFilter
-			, const DeparturesTableModule::DisplayedPlacesList& displayedPlacesList
-			, const DeparturesTableModule::ForbiddenPlacesList& forbiddenPlaces
+			const PhysicalStopsList& physicalStops
+			, const DeparturesTableDirection& direction
+			, const EndFilter& endfilter
+			, const LineFilter& lineFilter
+			, const DisplayedPlacesList& displayedPlacesList
+			, const ForbiddenPlacesList& forbiddenPlaces
 			, const DateTime& startTime
 			, const DateTime& endDateTime
 			, size_t maxSize
@@ -50,9 +50,9 @@ namespace synthese
 										, displayedPlacesList, forbiddenPlaces, startTime, endDateTime, maxSize)
 		{}
 
-		const DeparturesTableModule::ArrivalDepartureList& StandardArrivalDepartureTableGenerator::generate()
+		const ArrivalDepartureList& StandardArrivalDepartureTableGenerator::generate()
 		{
-			for (DeparturesTableModule::PhysicalStopsList::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+			for (PhysicalStopsList::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 			{
 				for (set<const Edge*>::const_iterator eit = (*it)->getDepartureEdges().begin(); eit != (*it)->getDepartureEdges().end(); ++eit)
 				{

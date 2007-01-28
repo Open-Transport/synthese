@@ -24,7 +24,7 @@
 #define SYNTHESE_StandardArrivalDepartureTableGenerator_H
 
 #include "34_departures_table/ArrivalDepartureTableGenerator.h"
-#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/Types.h"
 
 namespace synthese
 {
@@ -37,18 +37,18 @@ namespace synthese
 
 		public:
 			StandardArrivalDepartureTableGenerator(
-				const DeparturesTableModule::PhysicalStopsList&
-				, const DeparturesTableModule::Direction&
-				, const DeparturesTableModule::EndFilter&
-				, const DeparturesTableModule::LineFilter&
-				, const DeparturesTableModule::DisplayedPlacesList&
-				, const DeparturesTableModule::ForbiddenPlacesList&
+				const PhysicalStopsList&
+				, const DeparturesTableDirection&
+				, const EndFilter&
+				, const LineFilter&
+				, const DisplayedPlacesList&
+				, const ForbiddenPlacesList&
 				, const time::DateTime& startDateTime
 				, const time::DateTime& endDateTime
 				, size_t maxSize = UNLIMITED_SIZE
 				);
 
-			const DeparturesTableModule::ArrivalDepartureList& generate();
+			const ArrivalDepartureList& generate();
 		};
 
 	}

@@ -24,7 +24,7 @@
 
 #include "30_server/Site.h"
 
-#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/Types.h"
 
 namespace synthese
 {
@@ -42,7 +42,7 @@ namespace synthese
 			void display( std::ostream& stream
 				, int rowId
 				, int pageNumber
-				, const DeparturesTableModule::ArrivalDepartureRow*
+				, const ArrivalDepartureRow*
 				, const server::Request* request = NULL ) const;
 
 		};

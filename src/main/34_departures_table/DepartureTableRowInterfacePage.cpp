@@ -34,7 +34,7 @@ namespace synthese
 		void DepartureTableRowInterfacePage::display(std::ostream& stream
 				, int rowId
 				, int pageNumber
-				, const DeparturesTableModule::ArrivalDepartureRow* ptd
+				, const ArrivalDepartureRow* ptd
 				, const server::Request* request) const
 		{
 			ParametersVector parameters;

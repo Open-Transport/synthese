@@ -32,7 +32,7 @@
 #include "30_server/Request.h"
 #include "30_server/Site.h"
 
-#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/Types.h"
 #include "34_departures_table/DeparturesTableInterfaceElement.h"
 #include "34_departures_table/DepartureTableRowInterfacePage.h"
 
@@ -72,7 +72,7 @@ namespace synthese
 
 		void DeparturesTableInterfaceElement::display(ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			const DeparturesTableModule::ArrivalDepartureList* ptds = (DeparturesTableModule::ArrivalDepartureList*) object;
+			const ArrivalDepartureList* ptds = (ArrivalDepartureList*) object;
 			
 			int __MultiplicateurRangee = _multiplicateurRangeeVIE->isZero(parameters, object, request) ? 1 : Conversion::ToInt(_multiplicateurRangeeVIE->getValue(parameters, object, request));
 			const std::string& __Pages = _pagesVIE->getValue(parameters, object, request);
@@ -83,9 +83,9 @@ namespace synthese
 			if ( (__Pages == "intermediate" ) || 
 			(__Pages == "destination" ) )
 			{
-				for (DeparturesTableModule::ArrivalDepartureList::const_iterator it = ptds->begin(); it != ptds->end(); ++it)
+				for (ArrivalDepartureList::const_iterator it = ptds->begin(); it != ptds->end(); ++it)
 				{
-					const DeparturesTableModule::ActualDisplayedArrivalsList& displayedList = it->second;
+					const ActualDisplayedArrivalsList& displayedList = it->second;
 					if (displayedList.size () - 2 > __NombrePages )
 						__NombrePages = displayedList.size () - 2;
 				}
@@ -103,9 +103,9 @@ namespace synthese
 
 				// Boucle sur les rangees
 				int __Rangee = __MultiplicateurRangee;
-				for (DeparturesTableModule::ArrivalDepartureList::const_iterator it = ptds->begin(); it != ptds->end(); ++it)
+				for (ArrivalDepartureList::const_iterator it = ptds->begin(); it != ptds->end(); ++it)
 				{
-					const DeparturesTableModule::ArrivalDepartureRow& ___DP = *it;
+					const ArrivalDepartureRow& ___DP = *it;
 
 					int __NombrePagesRangee = ___DP.second.size () - 2 + ( __Pages == "destination" ? 1 : 0 );
 					int pageNumber = ( !__NombrePagesRangee || __NumeroPage > __NombrePagesRangee * ( __NombrePages / __NombrePagesRangee ) )

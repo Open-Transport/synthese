@@ -72,6 +72,7 @@ namespace synthese
 				typedef std::map<std::string, InterfacePage*> PagesMap;
 				typedef std::map<int, std::string> TextMap;
 
+				std::string									_name;
 				PagesMap									_pages;
 				std::vector<synthese::time::HourPeriod*>	_hourPeriods;        //!< Tableau des p?riodes de la journ?e
 				TextMap										_weekDayNames; //!< Tableau des libell?s des jours de semaine
@@ -96,6 +97,7 @@ namespace synthese
 					const std::string& getAlertPrefix( int ) const;
 					const std::string& getWeekDayName( int ) const;
 					const std::string& getNoSessionDefaultPageCode() const;
+					const std::string& getName() const;
 				//@}
 
 				//! \name Calculateurs
@@ -141,6 +143,7 @@ namespace synthese
 					bool SetLibelleMois( int, const std::string& );
 					void SetPrefixeAlerte( int, const std::string& );
 					void setNoSessionDefaultPageCode(const std::string&);
+					void setName(const std::string& name);
 				//@}
 
 				Interface( const uid& id);

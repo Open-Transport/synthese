@@ -35,7 +35,7 @@
 #include "15_env/City.h"
 #include "15_env/ConnectionPlace.h"
 
-#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/Types.h"
 #include "34_departures_table/DeparturesTableDestinationContentInterfaceElement.h"
 #include "34_departures_table/DepartureTableRowInterfacePage.h"
 
@@ -94,7 +94,7 @@ namespace synthese
 
 		void DeparturesTableDestinationContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			const DeparturesTableModule::ArrivalDepartureRow* __DP = ( const DeparturesTableModule::ArrivalDepartureRow* ) object;
+			const ArrivalDepartureRow* __DP = ( const ArrivalDepartureRow* ) object;
 
 			std::string __DestinationsAAfficher = _destinationsToDisplayVIE->getValue(parameters, object, request);
 			bool __AfficherTerminus = !_displayTerminusVIE->isZero(parameters, object, request);

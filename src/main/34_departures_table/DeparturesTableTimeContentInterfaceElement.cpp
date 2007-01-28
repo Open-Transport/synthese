@@ -30,7 +30,7 @@
 
 #include "15_env/LineMarkerInterfacePage.h"
 
-#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/Types.h"
 #include "34_departures_table/DeparturesTableTimeContentInterfaceElement.h"
 #include "34_departures_table/DepartureTableRowInterfacePage.h"
 
@@ -71,7 +71,7 @@ namespace synthese
 
 		void DeparturesTableTimeContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			const synthese::time::DateTime& __Moment = ((const DeparturesTableModule::ArrivalDepartureRow*) object)->first.realDepartureTime;
+			const synthese::time::DateTime& __Moment = ((const ArrivalDepartureRow*) object)->first.realDepartureTime;
 			std::string __Zero = _zeroVIE->getValue(parameters, object, request);
 			std::string __AvantSiImminent = _beforeIfNext->getValue(parameters, object, request);
 			std::string __ApresSiImminent = _afterIfNext->getValue(parameters, object, request);

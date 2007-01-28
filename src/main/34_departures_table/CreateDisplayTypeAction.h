@@ -1,6 +1,6 @@
 
-/** DisplayType class header.
-	@file DisplayType.h
+/** CreateDisplayTypeAction class header.
+	@file CreateDisplayTypeAction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,13 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_DisplayType_H__
-#define SYNTHESE_DisplayType_H__
-
-#include <string>
+#ifndef SYNTHESE_CreateDisplayTypeAction_H__
+#define SYNTHESE_CreateDisplayTypeAction_H__
 
 #include "01_util/UId.h"
-#include "01_util/Registrable.h"
+
+#include "30_server/Action.h"
 
 namespace synthese
 {
@@ -37,27 +36,39 @@ namespace synthese
 
 	namespace departurestable
 	{
-		class DisplayType : public util::Registrable<uid, DisplayType>
+		/** CreateDisplayTypeAction action class.
+			@ingroup m34
+		*/
+		class CreateDisplayTypeAction : public server::Action
 		{
+		public:
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_INTERFACE_ID;
+			static const std::string PARAMETER_ROWS_NUMBER;
+
 		private:
-			std::string						_name;
-			const interfaces::Interface*	_interf;
-			int								_rowNumber;
+			std::string _name;
+			interfaces::Interface*	_interface;
+			int	_rows_number;
+
+		protected:
+			/** Conversion from attributes to generic parameter maps.
+			*/
+			server::Request::ParametersMap getParametersMap() const;
+
+			/** Conversion from generic parameters map to attributes.
+			Removes the used parameters from the map.
+			*/
+			void setFromParametersMap(server::Request::ParametersMap& map);
 
 		public:
-			DisplayType();
-			DisplayType(const uid&);
 
-			const std::string& getName() const;
-			const interfaces::Interface* getInterface() const;
-			int getRowNumber() const;
-
-			void setName(const std::string& name);
-			void setInterface(const interfaces::Interface* interf);
-			void setRowNumber(int number);
-
+			/** Action to run, defined by each subclass.
+			*/
+			void run();
 		};
 	}
 }
 
-#endif // SYNTHESE_DisplayType_H__
+#endif // SYNTHESE_CreateDisplayTypeAction_H__
+ 

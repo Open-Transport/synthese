@@ -1,0 +1,74 @@
+
+/** Html class implementation.
+	@file Html.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "01_util/Html.h"
+
+using namespace std;
+
+namespace synthese
+{
+	namespace util
+	{
+
+
+		std::string Html::getSelectNumberInput(const std::string& name, int mini, int maxi, int value/*=UNKNOWN_VALUE*/ )
+		{
+			std::map<int,int> m;
+			for (int i=mini; i<=maxi; ++i)
+				m.insert(std::make_pair(i,i));
+			return getSelectInput(name, m, value);
+		}
+
+		std::string Html::getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping/*=""*/)
+		{
+			stringstream s;
+			s << "<input type=\"text\" name=\"" << name << "\" value=\"";
+			if (value == "" && displayTextBeforeTyping != "")
+				s << displayTextBeforeTyping << "\" onfocus=\"if(this.value == '" << displayTextBeforeTyping << "') this.value='';\"";
+			else
+				s << value << "\"";
+			s << " />";
+			return s.str();
+		}
+
+		std::string Html::getHiddenInput( const std::string& name, const std::string& value )
+		{
+			stringstream s;
+			s << "<input type=\"hidden\" name=\"" << name << "\" value=\"" << value << "\" />";
+			return s.str();
+		}
+
+		std::string Html::getSubmitButton( const std::string& caption )
+		{
+			stringstream s;
+			s << "<input type=\"submit\" value=\"" << caption << "\" />";
+			return s.str();
+		}
+
+		std::string Html::setFocus( const std::string& formName, const std::string& fieldName )
+		{
+			stringstream s;
+			s << "<script type=\"text/javascript\">document." << formName << "." << fieldName << ".focus();</script>";
+			return s.str();
+		}
+	}
+}

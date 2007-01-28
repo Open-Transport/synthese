@@ -25,7 +25,7 @@
 
 #include <set>
 
-#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/Types.h"
 
 namespace synthese
 {
@@ -54,24 +54,24 @@ namespace synthese
 		private:
 
 		protected:
-			DeparturesTableModule::DisplayedPlacesList _displayedPlaces;	//!< Places to be displayed according to the demand rules
+			DisplayedPlacesList _displayedPlaces;	//!< Places to be displayed according to the demand rules
 
 			//! \name Parameters
 			//@{
-				const DeparturesTableModule::PhysicalStopsList		_physicalStops;
-				const DeparturesTableModule::Direction				_direction;
-				const DeparturesTableModule::EndFilter				_endFilter;
-				const DeparturesTableModule::LineFilter				_lineFilter;
-				const DeparturesTableModule::ForbiddenPlacesList	_forbiddenPlaces;
-				const time::DateTime								_startDateTime;
-				const time::DateTime								_endDateTime;
-				const size_t										_maxSize;	//!< Maximal size of the departure table according to the demand rules.
+				const PhysicalStopsList			_physicalStops;
+				const DeparturesTableDirection	_direction;
+				const EndFilter					_endFilter;
+				const LineFilter				_lineFilter;
+				const ForbiddenPlacesList		_forbiddenPlaces;
+				const time::DateTime			_startDateTime;
+				const time::DateTime			_endDateTime;
+				const size_t					_maxSize;	//!< Maximal size of the departure table according to the demand rules.
 
 			//@}
 
 			//!	\name Results
 			//@{
-				DeparturesTableModule::ArrivalDepartureList _result; //!< The result
+				ArrivalDepartureList _result; //!< The result
 			//@}
 
 			
@@ -83,18 +83,18 @@ namespace synthese
 			/** Insertion.
 				@return iterator on the element.
 			*/
-				DeparturesTableModule::ArrivalDepartureList::iterator _insert(const env::LineStop* linestop, int serviceNumber,	const time::DateTime& realDepartureTime, UnlimitedSize unlimitedSize=SIZE_AS_DEFINED);
+				ArrivalDepartureList::iterator _insert(const env::LineStop* linestop, int serviceNumber, const time::DateTime& realDepartureTime, UnlimitedSize unlimitedSize=SIZE_AS_DEFINED);
 
 			/** Constructor.
 				@param maxSize Maximal size of the departure table (default = unlimited).
 			*/
 			ArrivalDepartureTableGenerator(
-				const DeparturesTableModule::PhysicalStopsList&
-				, const DeparturesTableModule::Direction&
-				, const DeparturesTableModule::EndFilter&
-				, const DeparturesTableModule::LineFilter&
-				, const DeparturesTableModule::DisplayedPlacesList&
-				, const DeparturesTableModule::ForbiddenPlacesList&
+				const PhysicalStopsList&
+				, const DeparturesTableDirection&
+				, const EndFilter&
+				, const LineFilter&
+				, const DisplayedPlacesList&
+				, const ForbiddenPlacesList&
 				, const time::DateTime& startDateTime
 				, const time::DateTime& endDateTime
 				, size_t maxSize = UNLIMITED_SIZE
@@ -103,7 +103,7 @@ namespace synthese
 
 		public:
 			
-			virtual const DeparturesTableModule::ArrivalDepartureList& generate() = 0;
+			virtual const ArrivalDepartureList& generate() = 0;
 
 		};
 
