@@ -43,13 +43,53 @@ namespace synthese
 
 		string ProfilesAdmin::getTitle() const
 		{
-			/// @todo Change the title of the page
-			return "title";
+			return "Profils";
 		}
 
 		void ProfilesAdmin::display(ostream& stream, const Request* request) const
 		{
-			/// @todo Implement the display by streaming the output to the stream variable
+			stream
+				<< "<table><tr>"
+				<< "<td>Nom</td><td><INPUT type=\"text\" size=\"8\" name=\"Text2\"></td>"
+				<< "<td>Habilitation</td><td><SELECT name=\"Select1\">"
+				<< "<OPTION selected value=\"\">(toutes)</OPTION>";
+
+			// List of habilitations
+
+			stream
+				<< "</select></td>"
+				<< "<td><INPUT type=\"button\" value=\"Rechercher\" name=\"Button6\"></td></tr>"
+				<< "</table>"
+				
+				<< "<h1>Résultats de la recherche</h1>"
+				
+				<< "<table>"
+				<< "<TR><th>Sel</th><th>Nom</th><th>Résumé</th><th>Actions</th></tr>";
+
+			// List of profiles
+			{
+				stream
+                    << "<tr>"
+					<< "<TD><INPUT type=\"checkbox\" name=\"Checkbox3\"></TD>"
+					<< "<TD>Administrateur</TD>"
+					<< "<TD><UL><LI>Suppression&nbsp;publique pour tout</LI></UL></TD>"
+					<< "<TD><INPUT type=\"button\" value=\"Modifier\" name=\"Modifier\" /></TD>"
+					<< "</tr>";
+			}
+
+			stream
+				<< "<TR>"
+				<< "<TD>&nbsp;</TD>"
+				<< "<TD><INPUT type=\"text\" name=\"Text1\" value=\"Entrez le nom du profil ici\" size=\"21\"></TD>"
+				<< "<TD>(sélectionner un profil existant pour copier ses habilitations dans le nouveau profil)</P></TD>"
+				<< "<TD><INPUT type=\"button\" value=\"Ajouter\" name=\"Button7\"></TD>"
+				<< "</TR>"
+
+				<< "</TABLE>"
+
+				<< "<P align=\"right\">Profils suivants &gt;</P>"
+				<< "<P>Sélection : <INPUT type=\"button\" value=\"Supprimer\" name=\"Button4\" onclick=\"alert('Etes vous sur(e) de vouloir supprimer le profil sélectionné ?')\"></P>"
+				<< "<P>Cliquer sur un titre de colonne pour trier le tableau.</P>";
 		}
 	}
 }

@@ -98,7 +98,7 @@ namespace synthese
 			// Messages list
 			{
 				stream
-					<< "<tr><TD><INPUT type=\"radio\" value=\"Radio1\" name=\"RadioGroup\"></TD>"
+					<< "<tr><td><INPUT type=\"radio\" value=\"Radio1\" name=\"RadioGroup\"></td>"
 					<< "<td>dès le 2/9/2006</td>"
 					<< "<td>Travaux à Esquriol...</td>"
 					<< "<td>Complémentaire</td>"
@@ -114,12 +114,12 @@ namespace synthese
 				<< "<P>(sélectionnez un message existant pour créer une copie)</P>"
 				<< "<P><INPUT type=\"button\" value=\"Nouvelle diffusion de message\" name=\"Button7\"></P>"
 				<< "<P><INPUT type=\"button\" value=\"Nouvelle diffusion de scénario\" name=\"Button7\">"
-				<< "<SELECT name=\"Select1\">";
+				<< "<select name=\"Select1\">";
 
 			// List of scenarios
 
 			stream
-				<< "</SELECT></P>"
+				<< "</select></p>"
 				<< "<P align=\"right\">Messages&nbsp;suivants &gt;</P>"
 				<< "<P>Cliquer sur un titre de colonne pour trier le tableau.</P>";
 		}
