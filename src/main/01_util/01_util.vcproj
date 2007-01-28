@@ -52,9 +52,6 @@
 				RelativePath=".\Conversion.h">
 			</File>
 			<File
-				RelativePath=".\DBLog.h">
-			</File>
-			<File
 				RelativePath=".\Exception.cpp">
 			</File>
 			<File
@@ -145,19 +142,10 @@
 		<Filter
 			Name="AdminInterfaceElement"
 			Filter="">
-			<File
-				RelativePath=".\AdminInterfaceElement\DBLogList.h">
-			</File>
-			<File
-				RelativePath=".\AdminInterfaceElement\DBLogViewer.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Rights"
 			Filter="">
-			<File
-				RelativePath=".\Rights\DBLogRight.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Exceptions"

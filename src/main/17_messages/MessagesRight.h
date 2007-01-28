@@ -23,14 +23,14 @@
 #ifndef SYNTHESE_MESSAGES_RIGHT_H
 #define SYNTHESE_MESSAGES_RIGHT_H
 
-#include "05_security/Right.h"
+#include "12_security/Right.h"
 
 namespace synthese
 {
-	namespace env
+	namespace messages
 	{
 		/** Habilitation portant sur la gestion de messages.
-			@ingroup m15
+			@ingroup m17
 
 			Les niveaux de droit privés utilisés sont les suivants :
 				- READ : Utilisation de la console d'administration des messages en mode lecture, recherche possible. Seuls les messages créés par l'utilisateur sont affichés
@@ -58,6 +58,8 @@ namespace synthese
 		*/
 		class MessagesRight : public security::Right
 		{
+		public:
+			MessagesRight();
 
 		};
 	}

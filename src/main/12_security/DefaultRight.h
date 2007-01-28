@@ -2,7 +2,7 @@
 #ifndef SYNTHESE_DefaultRight_H__
 #define SYNTHESE_DefaultRight_H__
 
-#include "05_security/Right.h"
+#include "12_security/Right.h"
 
 namespace synthese
 {

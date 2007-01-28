@@ -23,14 +23,14 @@
 #ifndef SYNTHESE_SECURITY_RIGHT_H
 #define SYNTHESE_SECURITY_RIGHT_H
 
-#include "05_security/Right.h"
+#include "12_security/Right.h"
 
 namespace synthese
 {
 	namespace security
 	{
 		/** Habilitation portant sur la gestion de la sécurité.
-			@ingroup m15
+			@ingroup m12
 
 			Les niveaux de droit utilisés sont les suivants :
 
@@ -50,7 +50,8 @@ namespace synthese
 		*/
 		class SecurityRight : public Right
 		{
-
+		public:
+			SecurityRight();
 		};
 	}
 }

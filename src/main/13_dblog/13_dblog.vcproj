@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="12_security"
+	Name="13_dblog"
 	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
 	Keyword="MakeFileProj">
 	<Platforms>
@@ -43,84 +43,42 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\Profile.cpp">
-			</File>
-			<File
-				RelativePath=".\Profile.h">
-			</File>
-			<File
-				RelativePath=".\Right.cpp">
-			</File>
-			<File
-				RelativePath=".\Right.h">
-			</File>
-			<File
-				RelativePath=".\User.cpp">
-			</File>
-			<File
-				RelativePath=".\User.h">
+				RelativePath=".\DBLog.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
 			Filter="">
 			<File
-				RelativePath=".\ProfileAdmin.cpp">
+				RelativePath=".\DBLogList.cpp">
 			</File>
 			<File
-				RelativePath=".\ProfileAdmin.h">
+				RelativePath=".\DBLogList.h">
 			</File>
 			<File
-				RelativePath=".\ProfilesAdmin.cpp">
+				RelativePath=".\DBLogViewer.cpp">
 			</File>
 			<File
-				RelativePath=".\ProfilesAdmin.h">
-			</File>
-			<File
-				RelativePath=".\UserAdmin.cpp">
-			</File>
-			<File
-				RelativePath=".\UserAdmin.h">
-			</File>
-			<File
-				RelativePath=".\UsersAdmin.cpp">
-			</File>
-			<File
-				RelativePath=".\UsersAdmin.h">
+				RelativePath=".\DBLogViewer.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
 			Filter="">
-			<File
-				RelativePath=".\SecurityLog.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Rights"
 			Filter="">
 			<File
-				RelativePath=".\SecurityRight.cpp">
+				RelativePath=".\DBLogRight.cpp">
 			</File>
 			<File
-				RelativePath=".\SecurityRight.h">
+				RelativePath=".\DBLogRight.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
 			Filter="">
-			<File
-				RelativePath=".\ProfileTableSync.cpp">
-			</File>
-			<File
-				RelativePath=".\ProfileTableSync.h">
-			</File>
-			<File
-				RelativePath=".\UserTableSync.cpp">
-			</File>
-			<File
-				RelativePath=".\UserTableSync.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Interface Pages"
@@ -129,46 +87,25 @@
 		<Filter
 			Name="Actions"
 			Filter="">
-			<File
-				RelativePath=".\AddUserAction.cpp">
-			</File>
-			<File
-				RelativePath=".\AddUserAction.h">
-			</File>
-			<File
-				RelativePath=".\DelUserAction.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Exceptions"
 			Filter="">
-			<File
-				RelativePath=".\UserException.cpp">
-			</File>
-			<File
-				RelativePath=".\UserException.h">
-			</File>
-			<File
-				RelativePath=".\UserTableSyncException.cpp">
-			</File>
-			<File
-				RelativePath=".\UserTableSyncException.h">
-			</File>
 		</Filter>
 		<File
+			RelativePath=".\DBLogModule.cpp">
+		</File>
+		<File
+			RelativePath=".\DBLogModule.gen.cpp">
+		</File>
+		<File
+			RelativePath=".\DBLogModule.h">
+		</File>
+		<File
+			RelativePath=".\DBLogModule.inc.cpp">
+		</File>
+		<File
 			RelativePath=".\SConscript">
-		</File>
-		<File
-			RelativePath=".\SecurityModule.cpp">
-		</File>
-		<File
-			RelativePath=".\SecurityModule.gen.cpp">
-		</File>
-		<File
-			RelativePath=".\SecurityModule.h">
-		</File>
-		<File
-			RelativePath=".\SecurityModule.inc.cpp">
 		</File>
 	</Files>
 	<Globals>

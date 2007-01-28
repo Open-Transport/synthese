@@ -1,6 +1,6 @@
 
-/** MessagesLibraryRight class header.
-	@file MessagesLibraryRight.h
+/** MessagesRight class implementation.
+	@file MessagesRight.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,34 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_MESSAGES_LIBRARY_RIGHT_H
-#define SYNTHESE_MESSAGES_LIBRARY_RIGHT_H
-
-#include "12_security/Right.h"
+#include "MessagesRight.h"
 
 namespace synthese
 {
+	using namespace security;
+
 	namespace messages
 	{
-		/** Habilitation portant sur la bibliothèque de messages et de scénarios de diffusion.
-			@ingroup m17
 
-			Les niveaux de droit public utilisés sont les suivants :
-				- WRITE : Permet de créer, modifier des modèles de messages et des scénarios de diffusion
-				- DELETE : Permet de supprimer des modèles de messages et des scénarios de diffusion
-			
-			Aucun niveau de droit privé n'est utilisé pour cette habilitation.
 
-			Cette habilitation ne peut être paramétrée
-
-		*/
-		class MessagesLibraryRight : public security::Right
+		MessagesRight::MessagesRight()
+			: Right()
 		{
-		public:
-			MessagesLibraryRight();
 
-		};
+		}
 	}
 }
-
-#endif

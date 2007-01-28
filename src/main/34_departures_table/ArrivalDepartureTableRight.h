@@ -1,6 +1,6 @@
 
-/** DisplayMaintenanceRight class header.
-	@file DisplayMaintenanceRight.h
+/** ArrivalDepartureTableRight class header.
+	@file ArrivalDepartureTableRight.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,21 +20,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_DISPLAY_MAINTENANCE_RIGHT_H
-#define SYNTHESE_DISPLAY_MAINTENANCE_RIGHT_H
+#ifndef SYNTHESE_ARRIVAL_DEPARTURE_TABLE_RIGHT_H
+#define SYNTHESE_ARRIVAL_DEPARTURE_TABLE_RIGHT_H
 
-#include "05_security/Right.h"
+#include "12_security/Right.h"
 
 namespace synthese
 {
 	namespace departurestable
 	{
-		/** Habilitation portant sur la maintenance des afficheurs.
+		/** Habilitation portant sur le téléaffichage.
 			@ingroup m34
 
 			Les niveaux de droit utilisés sont les suivants :
-				- READ : Permet de consulter les états de maintenance des afficheurs
-				- WRITE : Permet de modifier les états de maintenance des afficheurs
+				- USE : Parmet de visualiser un tableau de départ ou d'arrivée
+				- READ : Permet de consulter les propriétés des objets relatifs au téléaffichage
+				- WRITE : Permet de modifier les propriétés des objets relatifs au téléaffichage
+				- DELETE : Permet de supprimer des objets relatifs au téléaffichage
 
 			Définition du périmètre :
 				- TransportNetwork : Autorisation portant sur les afficheurs situés sur un point de diffusion desservi par une ligne du réseau spécifié
@@ -45,8 +47,10 @@ namespace synthese
 					- si le point de diffusion est un arrêt physique, alors il doit être desservi par la ligne
 					- si le point de diffusion n'est pas un arrêt physique, alors au moins un arrêt physique du lieu auquel appartient le point de diffusion doit être desservi par la ligne
 		*/
-		class DisplayMaintenanceRight : public security::Right
+		class ArrivalDepartureTableRight : public security::Right
 		{
+		public:
+			ArrivalDepartureTableRight();
 
 		};
 	}

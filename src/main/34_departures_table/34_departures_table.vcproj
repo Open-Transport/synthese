@@ -122,26 +122,35 @@
 			Name="Rights"
 			Filter="">
 			<File
-				RelativePath=".\Rights\ArrivalDepartureTableRight.h">
+				RelativePath=".\ArrivalDepartureTableRight.cpp">
+			</File>
+			<File
+				RelativePath=".\ArrivalDepartureTableRight.h">
+			</File>
+			<File
+				RelativePath=".\BroadcastPointsRight.cpp">
 			</File>
 			<File
 				RelativePath=".\BroadcastPointsRight.h">
 			</File>
 			<File
-				RelativePath=".\Rights\DisplayMaintenanceRight.h">
+				RelativePath=".\DisplayMaintenanceRight.cpp">
+			</File>
+			<File
+				RelativePath=".\DisplayMaintenanceRight.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
 			Filter="">
 			<File
-				RelativePath=".\DBLog\ArrivalDepartureTableLog.h">
+				RelativePath=".\ArrivalDepartureTableLog.h">
 			</File>
 			<File
 				RelativePath=".\BroadcastPointsDataLog.h">
 			</File>
 			<File
-				RelativePath=".\DBLog\DisplayMaintenanceLog.h">
+				RelativePath=".\DisplayMaintenanceLog.h">
 			</File>
 		</Filter>
 		<Filter

@@ -23,14 +23,14 @@
 #ifndef SYNTHESE_PLACES_RIGHT_H
 #define SYNTHESE_PLACES_RIGHT_H
 
-#include "05_security/Right.h"
+#include "12_security/Right.h"
 
 namespace synthese
 {
-	namespace env
+	namespace departurestable
 	{
 		/** Habilitation portant sur la gestion de lieux.
-			@ingroup m15
+			@ingroup m34
 
 			Les niveaux de droit public utilisés sont les suivants :
 				- READ : Permet de consulter la liste des lieux et d'en visualiser les détails
@@ -45,8 +45,10 @@ namespace synthese
 				- City : Autorisation portant sur les lieux appartenant à la commune spécifiée
 				- Place : Autorisation portant sur le lieu spécifié
 		*/
-		class PlacesRight : public security::Right
+		class BroadcastPointsRight : public security::Right
 		{
+		public:
+			BroadcastPointsRight();
 
 		};
 	}

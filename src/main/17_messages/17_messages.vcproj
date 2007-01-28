@@ -115,7 +115,13 @@
 			Name="Rights"
 			Filter="">
 			<File
+				RelativePath=".\MessagesLibraryRight.cpp">
+			</File>
+			<File
 				RelativePath=".\MessagesLibraryRight.h">
+			</File>
+			<File
+				RelativePath=".\MessagesRight.cpp">
 			</File>
 			<File
 				RelativePath=".\MessagesRight.h">

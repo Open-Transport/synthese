@@ -77,6 +77,7 @@ namespace synthese
 		class ProfilesAdmin : public admin::AdminInterfaceElement
 		{
 			static const std::string PARAMETER_SEARCH_NAME;
+			static const std::string PARAMETER_SEARCH_RIGHT;
 
 		public:
 			ProfilesAdmin();

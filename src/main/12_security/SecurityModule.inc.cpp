@@ -7,3 +7,5 @@
 #include "12_security/UserAdmin.h"
 #include "12_security/AddUserAction.h"
 
+#include "12_security/SecurityRight.h"
+

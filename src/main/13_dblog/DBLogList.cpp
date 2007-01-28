@@ -1,6 +1,6 @@
 
-/** MessagesLibraryRight class header.
-	@file MessagesLibraryRight.h
+/** DBLogList class implementation.
+	@file DBLogList.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,34 +20,34 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_MESSAGES_LIBRARY_RIGHT_H
-#define SYNTHESE_MESSAGES_LIBRARY_RIGHT_H
+#include "DBLogList.h"
 
-#include "12_security/Right.h"
+using namespace std;
 
 namespace synthese
 {
-	namespace messages
+	using namespace admin;
+	using namespace interfaces;
+	using namespace server;
+
+	namespace dblog
 	{
-		/** Habilitation portant sur la bibliothèque de messages et de scénarios de diffusion.
-			@ingroup m17
+		DBLogList::DBLogList()
+			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) {}
 
-			Les niveaux de droit public utilisés sont les suivants :
-				- WRITE : Permet de créer, modifier des modèles de messages et des scénarios de diffusion
-				- DELETE : Permet de supprimer des modèles de messages et des scénarios de diffusion
-			
-			Aucun niveau de droit privé n'est utilisé pour cette habilitation.
-
-			Cette habilitation ne peut être paramétrée
-
-		*/
-		class MessagesLibraryRight : public security::Right
+		void DBLogList::setFromParametersMap(const server::Request::ParametersMap& map)
 		{
-		public:
-			MessagesLibraryRight();
+			/// @todo Initialize internal attributes from the map
+		}
 
-		};
+		string DBLogList::getTitle() const
+		{
+			return "Journaux";
+		}
+
+		void DBLogList::display(ostream& stream, const Request* request) const
+		{
+			/// @todo Implement the display by streaming the output to the stream variable
+		}
 	}
 }
-
-#endif

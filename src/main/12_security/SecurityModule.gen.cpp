@@ -9,3 +9,5 @@ synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synth
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::security::ProfilesAdmin>("profiles");
 
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::AddUserAction>("sau");
+
+synthese::util::Factory<synthese::security::Right>::integrate<synthese::security::SecurityRight>("Security");

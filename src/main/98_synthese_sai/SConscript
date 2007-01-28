@@ -35,6 +35,7 @@ moduleenv.AddModuleDependency ('32_admin')
 # Classes libs (1)
 moduleenv.AddModuleDependency ('11_interfaces')
 moduleenv.AddModuleDependency ('12_security')
+moduleenv.AddModuleDependency ('13_dblog')
 moduleenv.AddModuleDependency ('15_env')
 moduleenv.AddModuleDependency ('17_messages')
 

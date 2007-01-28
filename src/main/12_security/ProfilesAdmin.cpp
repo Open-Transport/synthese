@@ -22,7 +22,8 @@
 
 #include "01_util/Html.h"
 
-#include "ProfilesAdmin.h"
+#include "12_security/SecurityModule.h"
+#include "12_security/ProfilesAdmin.h"
 
 #include "32_admin/AdminRequest.h"
 
@@ -38,8 +39,8 @@ namespace synthese
 	namespace security
 	{
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_NAME = "pasn";
+		const std::string ProfilesAdmin::PARAMETER_SEARCH_RIGHT = "pasr";
 
-		/// @todo Verify the parent constructor parameters
 		ProfilesAdmin::ProfilesAdmin()
 			: AdminInterfaceElement("users", AdminInterfaceElement::EVER_DISPLAYED) {}
 
@@ -63,14 +64,9 @@ namespace synthese
 				<< searchRequest->getHTMLFormHeader("search")
 				<< "<table id=\"searchform\"><tr>"
 				<< "<td>Nom</td><td>" << Html::getTextInput(PARAMETER_SEARCH_NAME, "") << "</td>"
-				<< "<td>Habilitation</td><td><SELECT name=\"Select1\">"
-				<< "<OPTION selected value=\"\">(toutes)</OPTION>";
-
-			// List of habilitations
-
-			stream
-				<< "</select></td>"
-				<< "<td><INPUT type=\"button\" value=\"Rechercher\" name=\"Button6\"></td></tr>"
+				<< "<td>Habilitation</td>"
+				<< "<td>" << Html::getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightsTemplates(), string()) << "</td>"
+				<< "<td>" << Html::getSubmitButton("Rechercher") << "</td></tr>"
 				<< "</table></form>"
 				<< Html::setFocus("search", PARAMETER_SEARCH_NAME)
 				

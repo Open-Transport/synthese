@@ -7,3 +7,6 @@
 #include "34_departures_table/DisplayTypeTableSync.h"
 #include "34_departures_table/CreateDisplayTypeAction.h"
 #include "34_departures_table/UpdateDisplayTypeAction.h"
+#include "34_departures_table/ArrivalDepartureTableRight.h"
+#include "34_departures_table/DisplayMaintenanceRight.h"
+#include "34_departures_table/BroadcastPointsRight.h"

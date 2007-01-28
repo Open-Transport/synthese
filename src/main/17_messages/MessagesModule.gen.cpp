@@ -3,3 +3,6 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::mess
 
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessagesAdmin>("messages");
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessagesLibraryAdmin>("messageslibrary");
+
+synthese::util::Factory<synthese::security::Right>::integrate<synthese::messages::MessagesRight>("Messages");
+synthese::util::Factory<synthese::security::Right>::integrate<synthese::messages::MessagesLibraryRight>("MessagesLibrary");

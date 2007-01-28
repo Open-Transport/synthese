@@ -1,6 +1,6 @@
 
-/** MessagesLibraryRight class header.
-	@file MessagesLibraryRight.h
+/** DBLogRight class header.
+	@file DBLogRight.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,31 +20,29 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_MESSAGES_LIBRARY_RIGHT_H
-#define SYNTHESE_MESSAGES_LIBRARY_RIGHT_H
+#ifndef SYNTHESE_DB_LOG_RIGHT_H
+#define SYNTHESE_DB_LOG_RIGHT_H
 
 #include "12_security/Right.h"
 
 namespace synthese
 {
-	namespace messages
+	namespace dblog
 	{
-		/** Habilitation portant sur la bibliothèque de messages et de scénarios de diffusion.
-			@ingroup m17
+		/** Habilitation portant sur la gestion des journaux.
+			@ingroup m13
 
-			Les niveaux de droit public utilisés sont les suivants :
-				- WRITE : Permet de créer, modifier des modèles de messages et des scénarios de diffusion
-				- DELETE : Permet de supprimer des modèles de messages et des scénarios de diffusion
-			
-			Aucun niveau de droit privé n'est utilisé pour cette habilitation.
+			Les niveaux de droit utilisés sont les suivants :
+				- READ : Permet de consulter un journal
+				- DELETE : Permet de purger un journal
 
-			Cette habilitation ne peut être paramétrée
-
+			Définition du périmètre :
+				- NB : Le périmètre n'est pas défini par l'habilitation DBLogRight qui porte sur le principe même d'accéder aux journaux. Chaque journal fait à son tour l'objet d'un contrôle de droits le plus souvent basé sur les habilitations du module auquel ils appartiennent. Voir la documentation de chaque journal.
 		*/
-		class MessagesLibraryRight : public security::Right
+		class DBLogRight : public security::Right
 		{
 		public:
-			MessagesLibraryRight();
+			DBLogRight();
 
 		};
 	}

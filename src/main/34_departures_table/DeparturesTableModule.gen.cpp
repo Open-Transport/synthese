@@ -11,3 +11,7 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::depa
 
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateDisplayTypeAction>("createdisplaytype");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayTypeAction>("updatedisplaytype");
+
+synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::ArrivalDepartureTableRight>("ArrivalDepartureTable");
+synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::DisplayMaintenanceRight>("DisplayMaintenance");
+synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::BroadcastPointsRight>("BroadcastPoints");
