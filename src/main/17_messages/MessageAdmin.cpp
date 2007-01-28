@@ -1,6 +1,6 @@
 
-/** TransportNetworkDataLog class header.
-	@file TransportNetworkDataLog.h
+/** MessageAdmin class implementation.
+	@file MessageAdmin.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,31 +20,36 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_TRANSPORT_NETWORK_DATA_LOG
-#define SYNTHESE_TRANSPORT_NETWORK_DATA_LOG
+#include "MessageAdmin.h"
 
-#include "01_util/DBLog.h"
+using namespace std;
 
 namespace synthese
 {
-	namespace env
+	using namespace admin;
+	using namespace interfaces;
+	using namespace server;
+
+	namespace messages
 	{
-		/** Journal des modifications de la base transport.
+		/// @todo Verify the parent constructor parameters
+		MessageAdmin::MessageAdmin()
+			: AdminInterfaceElement("messages", AdminInterfaceElement::DISPLAYED_IF_CURRENT) {}
 
-			Les entrées du journal de modification de la base transport sont toutes les modifications effectuées à chaud sur les objets de description du réseau (places, lines, etc.)
-				
-			Les colonnes additionnelles du journal de sécurité sont :
-				- Action : décrit l'action effectuée (ex : création de profil)
-				- UID objet concerné
-				- Classe objet concerné
-				- Description de l'action
-
-		*/
-		class TransportNetworkDataLog : public util::DBLog
+		string MessageAdmin::getTitle() const
 		{
+			/// @todo Change the title of the page
+			return "title";
+		}
+
+		void MessageAdmin::display(ostream& stream, const Request* request) const
+		{
+			/// @todo Implement the display by streaming the output to the stream variable
+		}
+
+		void MessageAdmin::setFromParametersMap( const server::Request::ParametersMap& map )
+		{
+			/// @todo Initialize internal attributes from the map
 		}
 	}
 }
-
-#endif
-

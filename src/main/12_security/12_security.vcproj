@@ -65,9 +65,6 @@
 			Name="AdminInterfaceElement"
 			Filter="">
 			<File
-				RelativePath=".\LoginAdmin.h">
-			</File>
-			<File
 				RelativePath=".\ProfileAdmin.cpp">
 			</File>
 			<File

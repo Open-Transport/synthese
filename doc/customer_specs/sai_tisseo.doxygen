@@ -187,10 +187,10 @@
 	@subsection csst_ihm_places Gestion des emplacements
 	
 		@subsubsection csst_ihm_places_places Liste et recherche de lieux logiques
-		@copydoc synthese::env::PlacesAdmin
+		@copydoc synthese::departurestable::BroadcastPointsAdmin
 		
 		@subsubsection csst_ihm_places_place Edition de lieu logique
-		@copydoc synthese::env::PlaceAdmin
+		@copydoc synthese::departurestable::BroadcastPointAdmin
 			
 	
 	
@@ -213,19 +213,19 @@
 	@subsection csst_ihm_messages Gestion des messages
 	
 		@subsubsection csst_ihm_messages_MessagesLibraryAdmin Bibliothèque de messages prédéfinis
-		@copydoc synthese::env::MessagesLibraryAdmin
+		@copydoc synthese::messages::MessagesLibraryAdmin
 		
 		@subsubsection csst_ihm_messages_MessagesScenarioAdmin Edition de scénario de diffusion prédéfini
-		@copydoc synthese::env::MessagesScenarioAdmin
+		@copydoc synthese::messages::MessagesScenarioAdmin
 		
 		@subsubsection csst_ihm_messages_MessagesAdmin Liste et recherche de messages
-		@copydoc synthese::env::MessagesAdmin
+		@copydoc synthese::messages::MessagesAdmin
 
 		@subsubsection csst_ihm_messages_MessageAdmin Edition d'un message
-		@copydoc synthese::env::MessageAdmin
+		@copydoc synthese::messages::MessageAdmin
 		
 		@subsubsection csst_ihm_messages_MessagesScenarioSend Diffusion de messages selon un scénario prédéfini
-		@copydoc synthese::env::MessagesScenarioSendAdmin
+		@copydoc synthese::messages::MessagesScenarioSendAdmin
 
 	
 	
@@ -256,10 +256,10 @@
 		@copydoc synthese::security::SecurityRight
 		
 		@subsection csst_security_messages Messages (MessagesRight)
-		@copydoc synthese::env::MessagesRight
+		@copydoc synthese::messages::MessagesRight
 
 		@subsection csst_security_messages_library Bibliothèque de messages (MessagesLibraryRight)
-		@copydoc synthese::env::MessagesLibraryRight
+		@copydoc synthese::messages::MessagesLibraryRight
 	
 		@subsection csst_security_log Journaux (DBLogRight)
 		@copydoc synthese::util::DBLogRight
@@ -271,7 +271,7 @@
 		@copydoc synthese::departurestable::DisplayMaintenanceRight
 		
 		@subsection csst_security_places Gestion des emplacements (PlacesRight)
-		@copydoc synthese::env::PlacesRight
+		@copydoc synthese::departurestable::BroadcastPointsRight
 	
 	
 	
@@ -289,10 +289,10 @@
 		@copydoc synthese::security::SecurityLog
 		
 		@subsection csst_logs_messages Envois de messages (MessagesLog)
-		@copydoc synthese::env::MessagesLog
+		@copydoc synthese::messages::MessagesLog
 		
 		@subsection csst_logs_messages_library Bibliothèque de messages (MessagesLibraryLog)
-		@copydoc synthese::env::MessagesLibraryLog
+		@copydoc synthese::messages::MessagesLibraryLog
 		
 		@subsection csst_logs_displays Gestion des afficheurs (ArrivalDepartureTableLog)
 		@copydoc synthese::departurestable::ArrivalDepartureTableLog
@@ -301,6 +301,6 @@
 		@copydoc synthese::departurestable::DisplayMaintenanceLog
 		
 		@subsection csst_logs_transport Données réseau, emplacements (TransportNetworkDataLog)
-		@copydoc synthese::env::TransportNetworkDataLog
+		@copydoc synthese::departurestable::BroadcastPointsDataLog
 		
 */

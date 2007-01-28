@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_DISPLAY_MAINTENANCE_ADMIN_H
 #define SYNTHESE_DISPLAY_MAINTENANCE_ADMIN_H
 
-#include "11_interfaces/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
 {

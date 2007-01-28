@@ -42,16 +42,37 @@
 			Name="AdminInterfaceElement"
 			Filter="">
 			<File
+				RelativePath=".\BroadcastPointAdmin.cpp">
+			</File>
+			<File
+				RelativePath=".\BroadcastPointAdmin.h">
+			</File>
+			<File
+				RelativePath=".\BroadcastPointsAdmin.cpp">
+			</File>
+			<File
+				RelativePath=".\BroadcastPointsAdmin.h">
+			</File>
+			<File
 				RelativePath=".\DisplayAdmin.cpp">
 			</File>
 			<File
 				RelativePath=".\DisplayAdmin.h">
 			</File>
 			<File
+				RelativePath=".\DisplayMaintenanceAdmin.cpp">
+			</File>
+			<File
 				RelativePath=".\DisplayMaintenanceAdmin.h">
 			</File>
 			<File
+				RelativePath=".\DisplaySearchAdmin.cpp">
+			</File>
+			<File
 				RelativePath=".\DisplaySearchAdmin.h">
+			</File>
+			<File
+				RelativePath=".\DisplayTypesAdmin.cpp">
 			</File>
 			<File
 				RelativePath=".\DisplayTypesAdmin.h">
@@ -104,6 +125,9 @@
 				RelativePath=".\Rights\ArrivalDepartureTableRight.h">
 			</File>
 			<File
+				RelativePath=".\BroadcastPointsRight.h">
+			</File>
+			<File
 				RelativePath=".\Rights\DisplayMaintenanceRight.h">
 			</File>
 		</Filter>
@@ -112,6 +136,9 @@
 			Filter="">
 			<File
 				RelativePath=".\DBLog\ArrivalDepartureTableLog.h">
+			</File>
+			<File
+				RelativePath=".\BroadcastPointsDataLog.h">
 			</File>
 			<File
 				RelativePath=".\DBLog\DisplayMaintenanceLog.h">

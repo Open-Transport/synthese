@@ -1,6 +1,6 @@
 
-/** ProfilesAdmin class implementation.
-	@file ProfilesAdmin.cpp
+/** MessagesScenarioSendAdmin class implementation.
+	@file MessagesScenarioSendAdmin.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ProfilesAdmin.h"
+#include "MessagesScenarioSendAdmin.h"
 
 using namespace std;
 
@@ -30,24 +30,24 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 
-	namespace security
+	namespace messages
 	{
 		/// @todo Verify the parent constructor parameters
-		ProfilesAdmin::ProfilesAdmin()
-			: AdminInterfaceElement("users", AdminInterfaceElement::EVER_DISPLAYED) {}
+		MessagesScenarioSendAdmin::MessagesScenarioSendAdmin()
+			: AdminInterfaceElement("superior", AdminInterfaceElement::EVER_DISPLAYED) {}
 
-		void ProfilesAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void MessagesScenarioSendAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
 		{
 			/// @todo Initialize internal attributes from the map
 		}
 
-		string ProfilesAdmin::getTitle() const
+		string MessagesScenarioSendAdmin::getTitle() const
 		{
 			/// @todo Change the title of the page
 			return "title";
 		}
 
-		void ProfilesAdmin::display(ostream& stream, const Request* request) const
+		void MessagesScenarioSendAdmin::display(ostream& stream, const Request* request) const
 		{
 			/// @todo Implement the display by streaming the output to the stream variable
 		}

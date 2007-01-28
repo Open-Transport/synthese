@@ -320,53 +320,14 @@
 		<Filter
 			Name="AdminInterfaceElement"
 			Filter="">
-			<File
-				RelativePath=".\MessageAdmin.h">
-			</File>
-			<File
-				RelativePath=".\MessagesAdmin.h">
-			</File>
-			<File
-				RelativePath=".\MessagesLibraryAdmin.h">
-			</File>
-			<File
-				RelativePath=".\MessagesScenarioAdmin.h">
-			</File>
-			<File
-				RelativePath=".\MessagesScenarioSendAdmin.h">
-			</File>
-			<File
-				RelativePath=".\PlaceAdmin.h">
-			</File>
-			<File
-				RelativePath=".\PlacesAdmin.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Rights"
 			Filter="">
-			<File
-				RelativePath=".\MessagesLibraryRight.h">
-			</File>
-			<File
-				RelativePath=".\MessagesRight.h">
-			</File>
-			<File
-				RelativePath=".\PlacesRight.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
 			Filter="">
-			<File
-				RelativePath=".\MessagesLibraryLog.h">
-			</File>
-			<File
-				RelativePath=".\MessagesLog.h">
-			</File>
-			<File
-				RelativePath=".\TransportNetworkDataLog.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="ValueInterfaceElement"

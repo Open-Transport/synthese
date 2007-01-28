@@ -20,18 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ENV_MESSAGES_LIBRARY_ADMIN_H
-#define SYNTHESE_ENV_MESSAGES_LIBRARY_ADMIN_H
+#ifndef SYNTHESE_MessagesLibraryAdmin_H__
+#define SYNTHESE_MessagesLibraryAdmin_H__
 
-#include "11_interfaces/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
 {
-	namespace env
+	namespace messages
 	{
-
 		/** Ecran d'édition des modèles de texte destinés aux messages.
-			@ingroup m15
+			@ingroup m17
 
 			@image html cap_admin_messages_library.png
 			@image latex cap_admin_messages_library.png "Maquette de l'écran d'édition des modèles de message" width=14cm
@@ -71,11 +70,27 @@ namespace synthese
 				- INFO : Suppression de modèle de texte
 
 		*/
-		class MessagesLibraryAdmin : public AdminInterfaceElement
+		class MessagesLibraryAdmin : public admin::AdminInterfaceElement
 		{
+		public:
+			MessagesLibraryAdmin();
+			
+			/** Initialization of the parameters from a request.
+				@param request The request to use for the initialization.
+			*/
+			void setFromParametersMap(const server::Request::ParametersMap& map);
 
+			/** Display of the content of the admin element.
+				@param stream Stream to write on.
+			*/
+			void display(std::ostream& stream, const server::Request* request=NULL) const;
+
+			/** Title of the admin compound.
+				@return The title of the admin compound, for display purposes.
+			*/
+			std::string getTitle() const;
 		};
 	}
 }
 
-#endif
+#endif // SYNTHESE_MessagesLibraryAdmin_H__

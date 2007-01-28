@@ -1,6 +1,6 @@
 
-/** PlacesAdmin class header.
-	@file PlacesAdmin.h
+/** BroadcastPointsAdmin class header.
+	@file BroadcastPointsAdmin.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,18 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ENV_PLACES_ADMIN_H
-#define SYNTHESE_ENV_PLACES_ADMIN_H
+#ifndef SYNTHESE_BroadcastPointsAdmin_H__
+#define SYNTHESE_BroadcastPointsAdmin_H__
 
-#include "11_interfaces/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
 {
-	namespace env
+	namespace departurestable
 	{
-
-		/** Ecran de recherche de lieux pour administration.
-			@ingroup m15
+		/** Ecran de recherche de lieux pour administration des points de diffusion.
+			@ingroup m34
 
 			@image html cap_admin_places.png
 			@image latex cap_admin_places.png "Maquette de l'écran de recherche de lieux" width=14cm
@@ -64,11 +63,27 @@ namespace synthese
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
 
 		*/
-		class PlacesAdmin : public AdminInterfaceElement
+		class BroadcastPointsAdmin : public admin::AdminInterfaceElement
 		{
+		public:
+			BroadcastPointsAdmin();
+			
+			/** Initialization of the parameters from a request.
+				@param request The request to use for the initialization.
+			*/
+			void setFromParametersMap(const server::Request::ParametersMap& map);
 
+			/** Display of the content of the admin element.
+				@param stream Stream to write on.
+			*/
+			void display(std::ostream& stream, const server::Request* request=NULL) const;
+
+			/** Title of the admin compound.
+				@return The title of the admin compound, for display purposes.
+			*/
+			std::string getTitle() const;
 		};
 	}
 }
 
-#endif
+#endif // SYNTHESE_BroadcastPointsAdmin_H__

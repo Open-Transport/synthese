@@ -53,12 +53,6 @@
 			<File
 				RelativePath=".\AlarmTemplate.h">
 			</File>
-			<File
-				RelativePath=".\BroadcastPoint.cpp">
-			</File>
-			<File
-				RelativePath=".\BroadcastPoint.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
@@ -76,6 +70,36 @@
 		<Filter
 			Name="Admin Compounds"
 			Filter="">
+			<File
+				RelativePath=".\MessageAdmin.cpp">
+			</File>
+			<File
+				RelativePath=".\MessageAdmin.h">
+			</File>
+			<File
+				RelativePath=".\MessagesAdmin.cpp">
+			</File>
+			<File
+				RelativePath=".\MessagesAdmin.h">
+			</File>
+			<File
+				RelativePath=".\MessagesLibraryAdmin.cpp">
+			</File>
+			<File
+				RelativePath=".\MessagesLibraryAdmin.h">
+			</File>
+			<File
+				RelativePath=".\MessagesScenarioAdmin.cpp">
+			</File>
+			<File
+				RelativePath=".\MessagesScenarioAdmin.h">
+			</File>
+			<File
+				RelativePath=".\MessagesScenarioSendAdmin.cpp">
+			</File>
+			<File
+				RelativePath=".\MessagesScenarioSendAdmin.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="LS XML"
@@ -85,6 +109,26 @@
 			</File>
 			<File
 				RelativePath=".\AlarmLS.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Rights"
+			Filter="">
+			<File
+				RelativePath=".\MessagesLibraryRight.h">
+			</File>
+			<File
+				RelativePath=".\MessagesRight.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="DBLog"
+			Filter="">
+			<File
+				RelativePath=".\MessagesLibraryLog.h">
+			</File>
+			<File
+				RelativePath=".\MessagesLog.h">
 			</File>
 		</Filter>
 		<File

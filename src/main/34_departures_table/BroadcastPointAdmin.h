@@ -27,10 +27,10 @@
 
 namespace synthese
 {
-	namespace messages
+	namespace departurestable
 	{
 		/** Ecran d'édition de points de diffusion de zone d'arrêt.
-			@ingroup m17
+			@ingroup m34
 
 			@image html cap_admin_place.png
 			@image latex cap_admin_place.png "Maquette de l'écran de recherche de lieux" width=14cm

@@ -27,9 +27,10 @@
 
 namespace synthese
 {
-	namespace env
+	namespace departurestable
 	{
 		/** Journal des modifications de la base transport.
+			@ingroup m34
 
 			Les entrées du journal de modification de la base transport sont toutes les modifications effectuées à chaud sur les objets de description du réseau (places, lines, etc.)
 				
@@ -40,7 +41,7 @@ namespace synthese
 				- Description de l'action
 
 		*/
-		class TransportNetworkDataLog : public util::DBLog
+		class BroadcastPointsDataLog : public util::DBLog
 		{
 		}
 	}
