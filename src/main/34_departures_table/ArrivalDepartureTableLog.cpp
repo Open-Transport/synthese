@@ -1,6 +1,6 @@
 
-/** MessagesLibraryLog class header.
-	@file MessagesLibraryLog.h
+/** ArrivalDepartureTableLog class implementation.
+	@file ArrivalDepartureTableLog.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,28 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_MESSAGES_LIBRARY_LOG
-#define SYNTHESE_MESSAGES_LIBRARY_LOG
-
-#include "13_dblog/DBLog.h"
+#include "ArrivalDepartureTableLog.h"
 
 namespace synthese
 {
-	namespace messages
-	{
-		/** Journal concernant la bibliothèque de messages.
+	using namespace dblog;
 
-			Les colonnes additionnelles du journal de sécurité sont :
-				- Action : décrit l'action effectuée (ex : création de modèle de message prioritaire)
-				- UID objet concerné : lien vers le message
-		*/
-		class MessagesLibraryLog : public dblog::DBLog
+	namespace departurestable
+	{
+
+
+		ArrivalDepartureTableLog::ArrivalDepartureTableLog()
+			: DBLog("Administration des terminaux d'affichage (tableaux de départs)")
 		{
-		public:
-			MessagesLibraryLog();
-		};
+		
+		}
 	}
 }
-
-#endif
-

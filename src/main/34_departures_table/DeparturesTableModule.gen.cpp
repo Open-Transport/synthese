@@ -15,3 +15,7 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::departure
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::ArrivalDepartureTableRight>("ArrivalDepartureTable");
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::DisplayMaintenanceRight>("DisplayMaintenance");
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::BroadcastPointsRight>("BroadcastPoints");
+
+synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::departurestable::ArrivalDepartureTableLog>("departurestable");
+synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::departurestable::BroadcastPointsDataLog>("broadcastpoints");
+synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::departurestable::DisplayMaintenanceLog>("displaymaintenance");

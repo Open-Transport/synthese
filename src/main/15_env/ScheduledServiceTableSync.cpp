@@ -1,3 +1,25 @@
+
+/** ScheduledServiceTableSync class implementation.
+	@file ScheduledServiceTableSync.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "ScheduledServiceTableSync.h"
 
 #include "01_util/Conversion.h"
@@ -78,32 +100,32 @@ ScheduledServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int ro
     for (tokenizer::iterator schedulesIter = schedulesTokens.begin();
 	 schedulesIter != schedulesTokens.end (); ++schedulesIter)
     {
-	std::string arrDep (*schedulesIter);
-	size_t sepPos = arrDep.find ("#");
-	assert (sepPos != std::string::npos);
+		std::string arrDep (*schedulesIter);
+		size_t sepPos = arrDep.find ("#");
+		assert (sepPos != std::string::npos);
 
-	std::string departureScheduleStr (arrDep.substr (0, sepPos));
-	std::string arrivalScheduleStr (arrDep.substr (sepPos+1));
+		std::string departureScheduleStr (arrDep.substr (0, sepPos));
+		std::string arrivalScheduleStr (arrDep.substr (sepPos+1));
 
-	boost::trim (departureScheduleStr);
-	boost::trim (arrivalScheduleStr);
-	
-	if (departureScheduleStr.empty ())
-	{
-	    assert (arrivalScheduleStr.empty () == false);
-	    departureScheduleStr = arrivalScheduleStr;
-	}
-	if (arrivalScheduleStr.empty ())
-	{
-	    assert (departureScheduleStr.empty () == false);
-	    arrivalScheduleStr = departureScheduleStr;
-	}
+		boost::trim (departureScheduleStr);
+		boost::trim (arrivalScheduleStr);
+		
+		if (departureScheduleStr.empty ())
+		{
+			assert (arrivalScheduleStr.empty () == false);
+			departureScheduleStr = arrivalScheduleStr;
+		}
+		if (arrivalScheduleStr.empty ())
+		{
+			assert (departureScheduleStr.empty () == false);
+			arrivalScheduleStr = departureScheduleStr;
+		}
 
-	Schedule departureSchedule (Schedule::FromString (departureScheduleStr));
-	Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
+		Schedule departureSchedule (Schedule::FromString (departureScheduleStr));
+		Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
 
-	departureSchedules.push_back (departureSchedule);
-	arrivalSchedules.push_back (arrivalSchedule);
+		departureSchedules.push_back (departureSchedule);
+		arrivalSchedules.push_back (arrivalSchedule);
     }
     
     assert (departureSchedules.size () > 0);

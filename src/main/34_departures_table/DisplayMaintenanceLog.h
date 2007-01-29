@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_DISPLAY_MAINTENANCE_LOG
 #define SYNTHESE_DISPLAY_MAINTENANCE_LOG
 
-#include "01_util/DBLog.h"
+#include "13_dblog/DBLog.h"
 
 namespace synthese
 {
@@ -46,8 +46,10 @@ namespace synthese
 				- Description de l'entrée
 				
 		*/
-		class DisplayMaintenanceLog : public util::DBLog
+		class DisplayMaintenanceLog : public dblog::DBLog
 		{
+		public:
+			DisplayMaintenanceLog();
 		};
 	}
 }

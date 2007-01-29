@@ -28,10 +28,10 @@
 		@copydoc synthese::interfaces::AdminInterfaceElement
 
 		@subsubsection defLog Journaux
-		@copydoc synthese::util::DBLog
+		@copydoc synthese::dblog::DBLog
 
 		@subsubsection defBroadcastPoint Point de diffusion
-		@copydoc synthese::env::BroadcastPoint
+		@copydoc synthese::departurestable::BroadcastPoint
 
 		@subsubsection defDisplayTerminal Terminal d'affichage
 		@copydoc synthese::departurestable::DisplayScreen
@@ -232,10 +232,10 @@
 	@subsection csst_ihm_journal Journal des événements
 	
 		@subsubsection csst_ihm_journal_liste Liste des journaux
-		@copydoc synthese::util::DBLogList
+		@copydoc synthese::dblog::DBLogList
 
 		@subsubsection csst_ihm_journal_viewer Visualisation d'un journal
-		@copydoc synthese::util::DBLogViewer
+		@copydoc synthese::dblog::DBLogViewer
 
 
 
@@ -262,7 +262,7 @@
 		@copydoc synthese::messages::MessagesLibraryRight
 	
 		@subsection csst_security_log Journaux (DBLogRight)
-		@copydoc synthese::util::DBLogRight
+		@copydoc synthese::dblog::DBLogRight
 		
 		@subsection csst_security_arrivaldeparturestables Tableaux de départs et d'arrivée (ArrivalDepartureTableRight)
 		@copydoc synthese::departurestable::ArrivalDepartureTableRight

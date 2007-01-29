@@ -6,3 +6,6 @@ synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synth
 
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::messages::MessagesRight>("Messages");
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::messages::MessagesLibraryRight>("MessagesLibrary");
+
+synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::messages::MessagesLog>("messages");
+synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::messages::MessagesLibraryLog>("messageslibrary");

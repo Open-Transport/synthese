@@ -144,10 +144,19 @@
 			Name="DBLog"
 			Filter="">
 			<File
+				RelativePath=".\ArrivalDepartureTableLog.cpp">
+			</File>
+			<File
 				RelativePath=".\ArrivalDepartureTableLog.h">
 			</File>
 			<File
+				RelativePath=".\BroadcastPointsDataLog.cpp">
+			</File>
+			<File
 				RelativePath=".\BroadcastPointsDataLog.h">
+			</File>
+			<File
+				RelativePath=".\DisplayMaintenanceLog.cpp">
 			</File>
 			<File
 				RelativePath=".\DisplayMaintenanceLog.h">

@@ -1,6 +1,6 @@
 
-/** MessagesLibraryLog class header.
-	@file MessagesLibraryLog.h
+/** DBLog class implementation.
+	@file DBLog.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,28 +20,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_MESSAGES_LIBRARY_LOG
-#define SYNTHESE_MESSAGES_LIBRARY_LOG
-
-#include "13_dblog/DBLog.h"
+#include "DBLog.h"
 
 namespace synthese
 {
-	namespace messages
-	{
-		/** Journal concernant la bibliothèque de messages.
+	using namespace util;
 
-			Les colonnes additionnelles du journal de sécurité sont :
-				- Action : décrit l'action effectuée (ex : création de modèle de message prioritaire)
-				- UID objet concerné : lien vers le message
-		*/
-		class MessagesLibraryLog : public dblog::DBLog
+	namespace dblog
+	{
+
+
+		DBLog::DBLog( const std::string& name )
+			: Factorable(), _name(name)
 		{
-		public:
-			MessagesLibraryLog();
-		};
+
+		}
+
+		const std::string& DBLog::getName()
+		{
+			return _name;
+		}
 	}
 }
-
-#endif
-

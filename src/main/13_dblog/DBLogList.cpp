@@ -20,7 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DBLogList.h"
+#include "01_util/Html.h"
+
+#include "13_dblog/DBLog.h"
+#include "13_dblog/DBLogList.h"
+#include "13_dblog/DBLogViewer.h"
+
+#include "30_server/Request.h"
+
+#include "32_admin/AdminRequest.h"
 
 using namespace std;
 
@@ -29,6 +37,7 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
+	using namespace util;
 
 	namespace dblog
 	{
@@ -37,7 +46,6 @@ namespace synthese
 
 		void DBLogList::setFromParametersMap(const server::Request::ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
 		}
 
 		string DBLogList::getTitle() const
@@ -47,7 +55,27 @@ namespace synthese
 
 		void DBLogList::display(ostream& stream, const Request* request) const
 		{
-			/// @todo Implement the display by streaming the output to the stream variable
+			AdminRequest* goRequest = Factory<Request>::create<AdminRequest>();
+			goRequest->copy(request);
+			goRequest->setPage(Factory<AdminInterfaceElement>::create<DBLogViewer>());
+
+			stream
+				<< "<h1>Liste des journaux</h1>"
+				<< "<table>";
+
+			for (Factory<DBLog>::Iterator it = Factory<DBLog>::begin(); it != Factory<DBLog>::end(); ++it)
+			{
+				stream
+					<< "<tr>"
+					<< "<td>" << it->getName() << "</td>"
+					<< "<td>" << goRequest->getHTMLFormHeader(it.getKey())
+					<< Html::getHiddenInput(DBLogViewer::PARAMETER_LOG_KEY, it.getKey())
+					<< Html::getSubmitButton("Consulter") << "</form></td>"
+					<< "</tr>";
+			}
+			stream << "</table>";
+
+			delete goRequest;
 		}
 	}
 }

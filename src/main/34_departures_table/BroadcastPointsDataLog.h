@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_TRANSPORT_NETWORK_DATA_LOG
 #define SYNTHESE_TRANSPORT_NETWORK_DATA_LOG
 
-#include "01_util/DBLog.h"
+#include "13_dblog/DBLog.h"
 
 namespace synthese
 {
@@ -41,9 +41,11 @@ namespace synthese
 				- Description de l'action
 
 		*/
-		class BroadcastPointsDataLog : public util::DBLog
+		class BroadcastPointsDataLog : public dblog::DBLog
 		{
-		}
+		public:
+			BroadcastPointsDataLog();
+		};
 	}
 }
 

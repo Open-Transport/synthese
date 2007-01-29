@@ -24,6 +24,9 @@
 #define SYNTHESE_UTIL_DBLOG_H
 
 #include <string>
+#include <vector>
+
+#include "01_util/Factorable.h"
 
 namespace synthese
 {
@@ -47,17 +50,21 @@ namespace synthese
 
 			Les différents journaux sont enregistrés dans l'instance de fabrique Factory<DBLog>.
 		*/
-		class DBLog
+		class DBLog : public util::Factorable
 		{
 		public:
-			typedef vector<std::string> ColumnsNameVector;
+			typedef std::vector<std::string> ColumnsNameVector;
+
+			const std::string _name;
 				
-
-
 		public:
+			DBLog(const std::string& name);
+
 			//static std::string getModuleName() = 0;
-			//static std::string getName() = 0;
+			const std::string& getName();
 			//static ColumnsNameVector& getColumnNames() = 0;
 		};
 	}
 }
+
+#endif

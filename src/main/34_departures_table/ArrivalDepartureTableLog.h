@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ARRIVAL_DEPARTURE_TABLE_LOG
 #define SYNTHESE_ARRIVAL_DEPARTURE_TABLE_LOG
 
-#include "01_util/DBLog.h"
+#include "13_dblog/DBLog.h"
 
 namespace synthese
 {
@@ -35,8 +35,10 @@ namespace synthese
 				- UID objet modifié
 				- Action effectuée				
 		*/
-		class ArrivalDepartureTableLog : public util::DBLog
+		class ArrivalDepartureTableLog : public dblog::DBLog
 		{
+		public:
+			ArrivalDepartureTableLog();
 		};
 	}
 }

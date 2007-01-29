@@ -10,3 +10,6 @@
 #include "34_departures_table/ArrivalDepartureTableRight.h"
 #include "34_departures_table/DisplayMaintenanceRight.h"
 #include "34_departures_table/BroadcastPointsRight.h"
+#include "34_departures_table/ArrivalDepartureTableLog.h"
+#include "34_departures_table/BroadcastPointsDataLog.h"
+#include "34_departures_table/DisplayMaintenanceLog.h"

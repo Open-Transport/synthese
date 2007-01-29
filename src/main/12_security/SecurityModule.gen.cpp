@@ -11,3 +11,5 @@ synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synth
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::AddUserAction>("sau");
 
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::security::SecurityRight>("Security");
+
+synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::security::SecurityLog>("security");

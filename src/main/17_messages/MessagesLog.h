@@ -23,11 +23,11 @@
 #ifndef SYNTHESE_MESSAGES_LOG
 #define SYNTHESE_MESSAGES_LOG
 
-#include "01_util/DBLog.h"
+#include "13_dblog/DBLog.h"
 
 namespace synthese
 {
-	namespace env
+	namespace messages
 	{
 		/** Journal des envois de messages.
 
@@ -42,9 +42,11 @@ namespace synthese
 					- lien vers le scénario si envoi selon un scénario de diffusion
 
 		*/
-		class MessagesLog : public util::DBLog
+		class MessagesLog : public dblog::DBLog
 		{
-		}
+		public:
+			MessagesLog();
+		};
 	}
 }
 

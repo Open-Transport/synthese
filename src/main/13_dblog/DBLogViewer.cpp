@@ -32,6 +32,8 @@ namespace synthese
 
 	namespace dblog
 	{
+		const string DBLogViewer::PARAMETER_LOG_KEY = "dlvk";
+
 		DBLogViewer::DBLogViewer()
 			: AdminInterfaceElement("dblogs", AdminInterfaceElement::DISPLAYED_IF_CURRENT) {}
 

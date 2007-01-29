@@ -76,6 +76,8 @@ namespace synthese
 		class DBLogViewer : public admin::AdminInterfaceElement
 		{
 		public:
+			static const std::string PARAMETER_LOG_KEY;
+
 			DBLogViewer();
 			
 			/** Initialization of the parameters from a request.

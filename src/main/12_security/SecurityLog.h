@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_SECURITY_LOG
 #define SYNTHESE_SECURITY_LOG
 
+#include "13_dblog/DBLog.h"
+
 namespace synthese
 {
 	namespace security
@@ -44,9 +46,11 @@ namespace synthese
 					- rien pour les entrées concernant les connexions d'utilisateurs
 
 		*/
-		class SecurityLog : public util::DBLog
+		class SecurityLog : public dblog::DBLog
 		{
-		}
+		public:
+			SecurityLog();
+		};
 	}
 }
 

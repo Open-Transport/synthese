@@ -4,3 +4,5 @@
 #include "17_messages/MessagesLibraryAdmin.h"
 #include "17_messages/MessagesRight.h"
 #include "17_messages/MessagesLibraryRight.h"
+#include "17_messages/MessagesLog.h"
+#include "17_messages/MessagesLibraryLog.h"

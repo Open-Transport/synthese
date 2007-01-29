@@ -9,3 +9,5 @@
 
 #include "12_security/SecurityRight.h"
 
+#include "12_security/SecurityLog.h"
+

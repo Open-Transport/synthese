@@ -27,6 +27,8 @@
 #include <map>
 #include <set>
 
+#include "01_util/Factorable.h"
+
 namespace synthese
 {
 	namespace security
@@ -54,7 +56,7 @@ namespace synthese
 
 			Chaque module contient des définitions d'habilitations (sous-classes enregistrées dans Factory<Right>) qui implémentent le contrôle des droits et la génération d'une liste de paramètres possibles.
 		*/
-		class Right
+		class Right : public util::Factorable
 		{
 		public:
 			/** Available vality areas map.

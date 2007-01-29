@@ -131,7 +131,13 @@
 			Name="DBLog"
 			Filter="">
 			<File
+				RelativePath=".\MessagesLibraryLog.cpp">
+			</File>
+			<File
 				RelativePath=".\MessagesLibraryLog.h">
+			</File>
+			<File
+				RelativePath=".\MessagesLog.cpp">
 			</File>
 			<File
 				RelativePath=".\MessagesLog.h">

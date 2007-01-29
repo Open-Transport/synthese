@@ -26,6 +26,8 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace security
 	{
 
@@ -36,7 +38,7 @@ namespace synthese
 		}
 
 		Right::Right()
-			: _parameter(""), _privateRightLevel(FORBIDDEN), _publicRightLevel(FORBIDDEN)
+			: Factorable(), _parameter(""), _privateRightLevel(FORBIDDEN), _publicRightLevel(FORBIDDEN)			
 		{
 
 		}

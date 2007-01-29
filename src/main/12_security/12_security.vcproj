@@ -93,6 +93,9 @@
 			Name="DBLog"
 			Filter="">
 			<File
+				RelativePath=".\SecurityLog.cpp">
+			</File>
+			<File
 				RelativePath=".\SecurityLog.h">
 			</File>
 		</Filter>
