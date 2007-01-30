@@ -32,7 +32,6 @@
 #include "Fare.h"
 #include "Line.h"
 #include "LineStop.h"
-#include "PhysicalStop.h"
 #include "PlaceAlias.h"
 #include "PublicPlace.h"
 #include "RoadChunk.h"
@@ -88,7 +87,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     PedestrianCompliance::Registry _pedestrianCompliances;
     HandicappedCompliance::Registry _handicappedCompliances;
     BikeCompliance::Registry _bikeCompliances;
-    PhysicalStop::Registry _physicalStops;
     PlaceAlias::Registry _placeAliases; 
     PublicPlace::Registry _publicPlaces;
     ReservationRule::Registry _reservationRules;
@@ -153,9 +151,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     PlaceAlias::Registry& getPlaceAliases ();
     const PlaceAlias::Registry& getPlaceAliases () const;
 
-    PhysicalStop::Registry& getPhysicalStops ();
-    const PhysicalStop::Registry& getPhysicalStops () const;
-
     PublicPlace::Registry& getPublicPlaces ();
     const PublicPlace::Registry& getPublicPlaces () const;
 
@@ -206,6 +201,7 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     const Service* fetchService (const uid& id) const;
     Service* fetchService (const uid& id);
 
+	/** To be moved in EnvModule */
     const Vertex* fetchVertex (const uid& id) const;
     Vertex* fetchVertex (const uid& id);
 

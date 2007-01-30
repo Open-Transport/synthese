@@ -1,10 +1,34 @@
+
+/** CityTableSync class implementation.
+	@file CityTableSync.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "CityTableSync.h"
 
 #include "01_util/Conversion.h"
+
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 
 #include "15_env/City.h"
+#include "15_env/EnvModule.h"
 
 #include <sqlite/sqlite3.h>
 #include <assert.h>
@@ -16,86 +40,124 @@ using synthese::db::SQLiteResult;
 namespace synthese
 {
 	using namespace db;
-namespace env
-{
+	using namespace env;
+
+	namespace db
+	{
+		template<> const std::string SQLiteTableSyncTemplate<City>::TABLE_NAME = "t006_cities";
+		template<> const int SQLiteTableSyncTemplate<City>::TABLE_ID = 6;
+		template<> const bool SQLiteTableSyncTemplate<City>::HAS_AUTO_INCREMENT = true;
+
+		template<> void SQLiteTableSyncTemplate<City>::load(City* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		{
+			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			object->setName(rows.getColumn(rowId, CityTableSync::TABLE_COL_NAME));
+		}
+
+		template<> void SQLiteTableSyncTemplate<City>::save(City* object)
+		{
+			/// @todo Implement
+			/*			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			if (object->getKey() > 0)
+			{
+			query
+			<< "UPDATE " << TABLE_NAME << " SET "
+			<< DisplayTypeTableSync::TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(object->getName())
+			<< "," << DisplayTypeTableSync::TABLE_COL_INTERFACE_ID << "="  << Conversion::ToString(object->getInterface()->getKey())
+			<< "," << DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER << "="  << Conversion::ToString(object->getRowNumber())
+			<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
+			}
+			else
+			{
+			object->setKey(getId(1,1));
+			query
+			<< " INSERT INTO " << TABLE_NAME << " VALUES("
+			<< Conversion::ToString(object->getKey())
+			<< "," << Conversion::ToSQLiteString(object->getName())
+			<< "," << Conversion::ToString(object->getInterface()->getKey())
+			<< "," << Conversion::ToString(object->getRowNumber())
+			<< ")";
+			}
+			sqlite->execUpdate(query.str());
+			*/		
+		}
+	}
+
+	namespace env
+	{
+		const std::string CityTableSync::TABLE_COL_NAME = "name";
+		
+		CityTableSync::CityTableSync ()
+			: SQLiteTableSyncTemplate<City> (TABLE_NAME, true, false, db::TRIGGERS_ENABLED_CLAUSE)
+		{
+			addTableColumn (TABLE_COL_ID, "INTEGER");
+			addTableColumn (TABLE_COL_NAME, "TEXT");
+		}
 
 
-CityTableSync::CityTableSync ()
-: ComponentTableSync (CITIES_TABLE_NAME, true, false, db::TRIGGERS_ENABLED_CLAUSE)
-{
-    addTableColumn (CITIES_TABLE_COL_NAME, "TEXT", true);
+		CityTableSync::~CityTableSync ()
+		{
+
+		}
+
+		    
+		void 
+			CityTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			synthese::db::SQLiteSync* sync,
+			const synthese::db::SQLiteResult& rows)
+		{
+			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
+			{
+				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+
+				if (EnvModule::getCities ().contains (id)) return;
+
+				synthese::env::City* city = new synthese::env::City (
+					id,
+					rows.getColumn (rowIndex, TABLE_COL_NAME) );
+
+				EnvModule::getCities ().add (city);
+				//environment.getCitiesMatcher ().add (city->getName (), city->getKey ());
+				/// @todo put the matcher update in the update line method
+			}
+		}
+
+
+		void 
+			CityTableSync::rowsUpdated (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			synthese::db::SQLiteSync* sync,
+			const synthese::db::SQLiteResult& rows)
+		{
+			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
+			{
+				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+				synthese::env::City* city = EnvModule::getCities ().get (id);
+
+				// environment.getCitiesMatcher ().remove (city->getName ());
+
+				load(city, rows, rowIndex);
+
+				// environment.getCitiesMatcher ().add (city->getName (), city->getKey ());
+			}
+		}
+
+
+
+		void 
+			CityTableSync::rowsRemoved (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			synthese::db::SQLiteSync* sync,
+			const synthese::db::SQLiteResult& rows)
+		{
+			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
+			{
+				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+
+				//environment.getCitiesMatcher ().remove (environment.getCities ().get (id)->getName ());
+
+				EnvModule::getCities ().remove (id);
+			}
+		}
+
+	}
 }
-
-
-
-CityTableSync::~CityTableSync ()
-{
-
-}
-
-    
-
-
-void 
-CityTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-		      synthese::env::Environment& environment)
-{
-    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-
-    if (environment.getCities ().contains (id)) return;
-
-    synthese::env::City* city = new synthese::env::City (
-	id,
-	rows.getColumn (rowIndex, CITIES_TABLE_COL_NAME) );
-    
-    environment.getCities ().add (city);
-    environment.getCitiesMatcher ().add (city->getName (), city->getKey ());
-}
-
-
-
-void 
-CityTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
-			  synthese::env::Environment& environment)
-{
-    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-    synthese::env::City* city = environment.getCities ().get (id);
-
-    environment.getCitiesMatcher ().remove (city->getName ());
-
-    city->setName (rows.getColumn (rowIndex, CITIES_TABLE_COL_NAME));
-
-    environment.getCitiesMatcher ().add (city->getName (), city->getKey ());
-}
-
-
-
-void 
-CityTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
-			 synthese::env::Environment& environment)
-{
-    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-
-    environment.getCitiesMatcher ().remove (environment.getCities ().get (id)->getName ());
-
-    environment.getCities ().remove (id);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-}
-

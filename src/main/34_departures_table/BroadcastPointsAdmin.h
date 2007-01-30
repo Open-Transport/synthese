@@ -23,10 +23,19 @@
 #ifndef SYNTHESE_BroadcastPointsAdmin_H__
 #define SYNTHESE_BroadcastPointsAdmin_H__
 
+#include <vector>
+
 #include "32_admin/AdminInterfaceElement.h"
+
+#include "34_departures_table/AdvancedSelectTableSync.h"
 
 namespace synthese
 {
+	namespace env
+	{
+		class ConnectionPlace;
+	}
+
 	namespace departurestable
 	{
 		/** Ecran de recherche de lieux pour administration des points de diffusion.
@@ -65,8 +74,25 @@ namespace synthese
 		*/
 		class BroadcastPointsAdmin : public admin::AdminInterfaceElement
 		{
+			std::string _cityName;
+			std::string _placeName;
+			uid			_lineUid;
+			int			_displayNumber;
+			int			_number;
+			int			_first;
+
+			std::vector<ConnectionPlaceWithBroadcastPoint> _searchResult;
+
 		public:
+			static const std::string PARAMETER_CITY_NAME;
+			static const std::string PARAMETER_PLACE_NAME;
+			static const std::string PARAMETER_LINE_ID;
+			static const std::string PARAMETER_DISPLAY_NUMBER;
+			static const std::string PARAMETER_NUMBER;
+			static const std::string PARAMETER_FIRST;
+
 			BroadcastPointsAdmin();
+			~BroadcastPointsAdmin();
 			
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.

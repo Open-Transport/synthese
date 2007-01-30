@@ -76,7 +76,8 @@ std::string
 SQLiteResult::getColumn (int row, const std::string& name) const
 {
     int index = getColumnIndex (name);
-    if (index == -1) throw SQLiteException ("No such column " + name);
+    if (index == -1)
+		throw SQLiteException ("No such column " + name);
     return getColumn (row, index);
 }
 

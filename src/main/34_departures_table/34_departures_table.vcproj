@@ -208,6 +208,18 @@
 			Name="LS SQL"
 			Filter="">
 			<File
+				RelativePath=".\AdvancedSelectTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\AdvancedSelectTableSync.h">
+			</File>
+			<File
+				RelativePath=".\BroadcastPointTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\BroadcastPointTableSync.h">
+			</File>
+			<File
 				RelativePath=".\DisplayScreenTableSync.h">
 			</File>
 			<File

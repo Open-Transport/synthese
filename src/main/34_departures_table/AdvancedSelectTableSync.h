@@ -1,6 +1,6 @@
 
-/** BroadcastPoint class implementation.
-	@file BroadcastPoint.cpp
+/** AdvancedSelectTableSync class header.
+	@file AdvancedSelectTableSync.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,49 +20,28 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "34_departures_table/BroadcastPoint.h"
+#ifndef SYNTHESE_AdvancedSelectTableSync_H__
+#define SYNTHESE_AdvancedSelectTableSync_H__
+
+#include <vector>
+#include <string>
 
 namespace synthese
 {
-	using namespace util;
-	using namespace env;
+	namespace env
+	{
+		class ConnectionPlace;
+	}
 
 	namespace departurestable
 	{
-		BroadcastPoint::BroadcastPoint()
-			: Registrable<uid, BroadcastPoint>()
-		{
+		typedef struct { env::ConnectionPlace* place; int broadCastPointsNumber; } ConnectionPlaceWithBroadcastPoint;
 
-		}
-
-		void BroadcastPoint::setName( const std::string& name )
-		{
-			_name = name;
-		}
-
-		void BroadcastPoint::setConnectionPlace( ConnectionPlace* place )
-		{
-			_place = place;
-		}
-
-		void BroadcastPoint::setPhysicalStop( PhysicalStop* physicalStop )
-		{
-			_physicalStop = physicalStop;
-		}
-
-		const std::string BroadcastPoint::getName() const
-		{
-			return _name;
-		}
-
-		ConnectionPlace* BroadcastPoint::getConnectionPlace() const
-		{
-			return _place;
-		}
-
-		PhysicalStop* BroadcastPoint::getPhysicalStop() const
-		{
-			return _physicalStop;
-		}
+		/** Connection place searcher.
+			@result vector of the founded searched connection places from the live data objects (do not delete the objects after use). 
+		*/
+		std::vector<ConnectionPlaceWithBroadcastPoint> searchConnectionPlacesWithBroadcastPoints(std::string cityName = "", std::string placeName = "", int _bpNumbers = UNKNOWN_VALUE, uid lineId = UNKNOWN_VALUE, int number=UNKNOWN_VALUE, int first=0);
 	}
 }
+
+#endif // SYNTHESE_AdvancedSelectTableSync_H__

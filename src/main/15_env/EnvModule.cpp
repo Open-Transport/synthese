@@ -26,7 +26,10 @@ namespace synthese
 {
 	namespace env
 	{
-		Environment::Registry EnvModule::_environments;
+		Environment::Registry		EnvModule::_environments;
+		City::Registry				EnvModule::_cities;
+		ConnectionPlace::Registry	EnvModule::_connectionPlaces;
+		PhysicalStop::Registry		EnvModule::_physicalStops;
 
 		void EnvModule::initialize()
 		{
@@ -37,6 +40,28 @@ namespace synthese
 			EnvModule::getEnvironments ()
 		{
 			return _environments;
+		}
+
+		City::Registry& EnvModule::getCities()
+		{
+			return _cities;
+		}
+
+		ConnectionPlace::Registry& EnvModule::getConnectionPlaces()
+		{
+			return _connectionPlaces;
+		}
+
+		PhysicalStop::Registry& EnvModule::getPhysicalStops()
+		{
+			return _physicalStops;
+		}
+
+		EnvModule::~EnvModule()
+		{
+			_physicalStops.clear ();
+			_cities.clear ();
+			_connectionPlaces.clear ();
 		}
 	}
 }

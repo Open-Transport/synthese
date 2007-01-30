@@ -31,6 +31,12 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class ConnectionPlace	;
+		class PhysicalStop;
+	}
+
 	namespace departurestable
 	{
 		class BroadcastPointAlarmBroadcast;
@@ -48,11 +54,21 @@ namespace synthese
 		{
 		private:
 			std::string	_name;
+			env::ConnectionPlace*	_place;
+			env::PhysicalStop*	_physicalStop;	//!< Indicates that the broadcastpoint corresponds to a real physical stop
 
 			std::vector<BroadcastPointAlarmBroadcast*>	_alarms;
 
 		public:
-			BroadcastPoint(const uid& id);
+			BroadcastPoint();
+
+			void setName(const std::string& name);
+			void setConnectionPlace(env::ConnectionPlace* place);
+			void setPhysicalStop(env::PhysicalStop* physicalStop);
+
+			const std::string getName() const;
+			env::ConnectionPlace* getConnectionPlace() const;
+			env::PhysicalStop* getPhysicalStop() const;
 
 		};
 	}

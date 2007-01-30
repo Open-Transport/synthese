@@ -26,6 +26,9 @@
 #include "01_util/ModuleClass.h"
 
 #include "15_env/Environment.h"
+#include "15_env/City.h"
+#include "15_env/PhysicalStop.h"
+#include "15_env/ConnectionPlace.h"
 
 /** @defgroup m15 15 Environment.
 @{
@@ -231,20 +234,27 @@ namespace synthese
 {
 	namespace env
 	{
-		class Line;
-
 		class EnvModule : public util::ModuleClass
 		{
 		private:
 
 			static Environment::Registry		_environments;
+			static City::Registry				_cities;
+			static ConnectionPlace::Registry	_connectionPlaces;
+			static PhysicalStop::Registry		_physicalStops;
 
 
 		public:
+			~EnvModule();
 			
 			void initialize();
 			
 			static Environment::Registry& getEnvironments ();
+
+			static City::Registry&				getCities();
+			static ConnectionPlace::Registry&	getConnectionPlaces();
+			static PhysicalStop::Registry&		getPhysicalStops();
+
 		};
 	}
 }
@@ -252,4 +262,3 @@ namespace synthese
 /** @} */
 
 #endif // SYNTHESE_EnvModule_H__
-
