@@ -76,7 +76,7 @@ namespace synthese
 		class DisplayScreen : public util::Registrable<uid,DisplayScreen>
 		{
 			public:
-			typedef enum { STANDARD_METHOD, WITH_FORCED_DESTINATIONS_METHOD } GenerationMethod;
+			typedef enum { STANDARD_METHOD = 0, WITH_FORCED_DESTINATIONS_METHOD = 1 } GenerationMethod;
 
 		protected:
 			//! \name Localization
@@ -114,10 +114,17 @@ namespace synthese
 
 			//!	\name Preselection
 			//@{
-				const GenerationMethod		_generationMethod;
-				DisplayedPlacesList			_forcedDestinations;	//!< Destinations à afficher absolument
-				int							_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
+				GenerationMethod		_generationMethod;
+				DisplayedPlacesList		_forcedDestinations;	//!< Destinations à afficher absolument
+				int						_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
 			
+			//@}
+
+			//! \name Maintenance
+			//@{
+				int							_maintenanceChecksPerDay;
+				bool						_maintenanceIsOnline;
+				std::string					_maintenanceMessage;
 			//@}
 
 
@@ -127,30 +134,49 @@ namespace synthese
 			//@}
 
 		public:
-			//!	\name Constructeur et destructeur
+			//!	\name Constructors/Destructors
 			//@{
-				DisplayScreen(const uid&, GenerationMethod);
+				DisplayScreen();
 				~DisplayScreen(void);
 			//@}
 
-			//!	\name Modificateurs
+			//!	\name Setters
 			//@{
-				void			setLocalization(const BroadcastPoint*);
-				void			AddQuaiAutorise(const env::PhysicalStop*);
-				void			SetTitre(const std::string&);
-				void			SetOriginesSeulement(const EndFilter& __Valeur);
-				void			AddDestinationAffichee(const env::ConnectionPlace* __PointArret);
-				void			SetNumeroPanneau(int);
-				void			addForcedDestination(const env::ConnectionPlace*);
-				void			setDestinationForceDelay(int);
-				void			setMaxDelay(int);
-				void			addForbiddenPlace(const env::ConnectionPlace*);
+				void	setLocalization(const BroadcastPoint*);
+				void	setLocalizationComment(const std::string&);
+				void	setType(const DisplayType*);
+				void	setWiringCode(int);
+				void	setTitle(const std::string&);
+				void	setBlinkingDelay(int);
+				void	setTrackNumberDisplay(bool value);
+				void	setServiceNumberDisplay(bool value);
+				void	addPhysicalStop(const env::PhysicalStop*);
+				void	addForbiddenPlace(const env::ConnectionPlace*);
+				void	setDirection(DeparturesTableDirection direction);
+				void	setOriginsOnly(EndFilter);
+				void	addDisplayedPlace(const env::ConnectionPlace*);
+				void	setMaxDelay(int);
+				void	setClearingDelay(int delay);
+				void	setFirstRow(int row);
+				void	setGenerationMethod(GenerationMethod method);
+				void	addForcedDestination(const env::ConnectionPlace*);
+				void	setDestinationForceDelay(int);
+				void	setMaintenanceChecksPerDay(int number);
+				void	setMaintenanceIsOnline(bool value);
+				void	setMaintenanceMessage(const std::string& message);
 			//@}
 
-			//!	\name Accesseurs and computers
+			//!	\name Getters
 			//@{
-				const std::string&				getTitre()			const;
-				int								getNumeroPanneau()	const;
+				const BroadcastPoint*			getLocalization()	const;
+				const std::string&				getLocalizationComment()	const;
+				
+				const std::string&				getTitle()			const;
+				
+			//@}
+
+			//! \name Queries
+			//@{
 				ArrivalDepartureTableGenerator*	getGenerator(const time::DateTime& startTime) const;
 			//@}
 

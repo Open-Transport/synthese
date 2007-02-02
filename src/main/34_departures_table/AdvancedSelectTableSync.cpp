@@ -27,9 +27,11 @@
 
 #include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/CityTableSync.h"
+#include "15_env/PhysicalStopTableSync.h"
 #include "15_env/EnvModule.h"
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
+#include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/BroadcastPointTableSync.h"
 
 using namespace std;
@@ -80,6 +82,85 @@ namespace synthese
 					ConnectionPlaceWithBroadcastPoint object;
 					object.broadCastPointsNumber = Conversion::ToInt(result.getColumn(i, "bc"));
 					object.place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(result.getColumn(i, "p." + TABLE_COL_ID)));
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
+
+		vector<PhysicalStopAndBroadcastPoint> getConnectionPlacePhysicalStopsAndBroadcastPoints( uid placeId, int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
+		{
+			stringstream query;
+			query << " SELECT "
+				<< "p." << TABLE_COL_ID << " AS pid"
+				<< ",b." << TABLE_COL_ID << " AS bid"
+				<< " FROM " << PhysicalStopTableSync::TABLE_NAME << " AS p"
+				<< " LEFT JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << BroadcastPointTableSync::TABLE_COL_PHYSICAL_STOP_ID << "=p." << TABLE_COL_ID
+				<< " WHERE "
+				<< "p." << PhysicalStopTableSync::COL_PLACEID << "=" << Conversion::ToString(placeId);
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<PhysicalStopAndBroadcastPoint> objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					PhysicalStopAndBroadcastPoint object;
+					object.stop = EnvModule::getPhysicalStops().get(Conversion::ToLongLong(result.getColumn(i, "pid")));
+					object.bp = (result.getColumn(i, "bid") != "")
+						? BroadcastPointTableSync::get(Conversion::ToLongLong(result.getColumn(i, "bid")))
+						: NULL;
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+
+		}
+
+		std::vector<PhysicalStopAndBroadcastPoint> getConnectionPlaceBroadcastPointsAndPhysicalStops( uid placeId, boost::logic::tribool withPhysical, int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
+		{
+			stringstream query;
+			query << " SELECT "
+				<< "p." << TABLE_COL_ID
+				<< ",b." << TABLE_COL_ID
+				<< " FROM " << BroadcastPointTableSync::TABLE_NAME << " AS b"
+				<< " LEFT JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON b." << BroadcastPointTableSync::TABLE_COL_PHYSICAL_STOP_ID << "=p." << TABLE_COL_ID
+				<< " WHERE "
+				<< "b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=" << Conversion::ToString(placeId);
+			if (withPhysical == true)
+				query << " AND p." << TABLE_COL_ID << " IS NOT NULL";
+			if (withPhysical == false)
+				query << " AND p." << TABLE_COL_ID << " IS NULL";
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<PhysicalStopAndBroadcastPoint> objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					PhysicalStopAndBroadcastPoint object;
+					object.stop = (result.getColumn(i, "p." + TABLE_COL_ID) != "")
+						? EnvModule::getPhysicalStops().get(Conversion::ToLongLong(result.getColumn(i, "p." + TABLE_COL_ID)))
+						: NULL;
+					object.bp = BroadcastPointTableSync::get(Conversion::ToLongLong(result.getColumn(i, "b." + TABLE_COL_ID)));
 					objects.push_back(object);
 				}
 				return objects;

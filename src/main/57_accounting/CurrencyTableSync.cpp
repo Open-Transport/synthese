@@ -78,7 +78,6 @@ namespace synthese
 
 	namespace accounts
 	{
-		const std::string CurrencyTableSync::TABLE_COL_ID = "id";
 		const std::string CurrencyTableSync::TABLE_COL_NAME = "name";
 		const std::string CurrencyTableSync::TABLE_COL_SYMBOL = "symbol";
 

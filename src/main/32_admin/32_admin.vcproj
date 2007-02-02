@@ -107,6 +107,12 @@
 		<Filter
 			Name="Exceptions"
 			Filter="">
+			<File
+				RelativePath=".\AdminParametersException.cpp">
+			</File>
+			<File
+				RelativePath=".\AdminParametersException.h">
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\AdminModule.cpp">

@@ -23,6 +23,8 @@
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayType.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace util;
@@ -31,9 +33,8 @@ namespace synthese
 
 	namespace departurestable
 	{
-		DisplayScreen::DisplayScreen(const uid& id, GenerationMethod generationMethod)
-			: Registrable<uid, DisplayScreen>(id)
-			, _generationMethod(generationMethod)
+		DisplayScreen::DisplayScreen()
+			: Registrable<uid, DisplayScreen>()
 			, _originsOnly(WITH_PASSING)
 			, _localization(NULL)
 			, _destinationForceDelay(120)	// default = 2 hours
@@ -50,11 +51,6 @@ namespace synthese
 		void DisplayScreen::setDestinationForceDelay(int delay)
 		{
 			_destinationForceDelay = delay;
-		}
-
-		void DisplayScreen::SetOriginesSeulement(const EndFilter& __Valeur)
-		{
-			_originsOnly = __Valeur;
 		}
 
 		void DisplayScreen::setMaxDelay(int maxDelay)
@@ -76,56 +72,18 @@ namespace synthese
 		}
 
 
-
-		/** Ajout de quai à afficher. 
-
-			Si aucun quai ajouté alors tous les quais du point d'arrêt sont affichés.
-		*/
-		void DisplayScreen::AddQuaiAutorise(const PhysicalStop* physicalStop)
-		{
-			_physicalStops.insert(physicalStop);
-		}
-
-
-		void DisplayScreen::SetTitre(const std::string&__Titre)
-		{
-			_title = __Titre;
-		}
-
-		void DisplayScreen::AddDestinationAffichee(const ConnectionPlace* __PointArret)
+		void DisplayScreen::addDisplayedPlace(const ConnectionPlace* __PointArret)
 		{
 			_displayedPlaces.insert(__PointArret);
 		}
 
-		const std::string& DisplayScreen::getTitre() const
-		{
-			return _title;
-		}
-
-
-
-		/** Modificateur numéro du panneau.
-			@param __NumeroPanneau Numéro du panneau devant afficher les résultats
-		*/
-		void DisplayScreen::SetNumeroPanneau(int __NumeroPanneau)
-		{
-			_wiringCode = __NumeroPanneau;
-		}
-
+		
 
 		void DisplayScreen::addForcedDestination(const ConnectionPlace* place)
 		{
 			_forcedDestinations.insert(place);
 		}
 
-
-		/** Accesseur numéro du panneau.
-			@return Numéro du panneau
-		*/
-		int DisplayScreen::getNumeroPanneau() const
-		{
-			return _wiringCode;
-		}
 
 
 		ArrivalDepartureTableGenerator* DisplayScreen::getGenerator(const DateTime& startDateTime) const
@@ -165,6 +123,101 @@ namespace synthese
 					, _destinationForceDelay
 				);
 			}
+		}
+
+		const BroadcastPoint* DisplayScreen::getLocalization() const
+		{
+			return _localization;
+		}
+
+		const string& DisplayScreen::getLocalizationComment() const
+		{
+			return _localizationComment;
+		}
+
+		void DisplayScreen::setLocalizationComment( const std::string& text)
+		{
+			_localizationComment = text;
+		}
+
+		void DisplayScreen::setType( const DisplayType* displayType)
+		{
+			_displayType = displayType;
+		}
+
+		void DisplayScreen::setWiringCode( int code)
+		{
+			_wiringCode = code;
+		}
+
+		void DisplayScreen::setTitle( const std::string& title)
+		{
+			_title = title;
+		}
+
+		const std::string& DisplayScreen::getTitle() const
+		{
+			return _title;
+		}
+
+		void DisplayScreen::setBlinkingDelay( int delay)
+		{
+			_blinkingDelay = delay;
+		}
+
+		void DisplayScreen::setTrackNumberDisplay( bool value )
+		{
+			_trackNumberDisplay = value;
+		}
+
+		void DisplayScreen::setServiceNumberDisplay( bool value )
+		{
+			_serviceNumberDisplay = value;
+		}
+
+		void DisplayScreen::addPhysicalStop( const env::PhysicalStop* physicalStop)
+		{
+			_physicalStops.insert(physicalStop);
+		}
+
+		void DisplayScreen::setDirection( DeparturesTableDirection direction )
+		{
+			_direction = direction;
+		}
+
+		void DisplayScreen::setOriginsOnly( EndFilter value)
+		{
+			_originsOnly = value;
+		}
+
+		void DisplayScreen::setClearingDelay( int delay )
+		{
+			_clearingDelay = delay;
+		}
+
+		void DisplayScreen::setFirstRow( int row )
+		{
+			_firstRow = row;
+		}
+
+		void DisplayScreen::setGenerationMethod( GenerationMethod method )
+		{
+			_generationMethod = method;
+		}
+
+		void DisplayScreen::setMaintenanceChecksPerDay( int number )
+		{
+			_maintenanceChecksPerDay = number;
+		}
+
+		void DisplayScreen::setMaintenanceIsOnline( bool value )
+		{
+			_maintenanceIsOnline = value;
+		}
+
+		void DisplayScreen::setMaintenanceMessage( const std::string& message )
+		{
+			_maintenanceMessage = message;
 		}
 
 	}

@@ -1,6 +1,6 @@
 
-/** DeparturesTableModule class implementation.
-	@file DeparturesTableModule.cpp
+/** AlarmObjectLink class header.
+	@file AlarmObjectLink.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,29 +20,42 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "34_departures_table/DeparturesTableModule.h"
+#ifndef SYNTHESE_AlarmObjectLink_h__
+#define SYNTHESE_AlarmObjectLink_h__
+
+#include <string>
+
+#include "01_util/Registrable.h"
 
 namespace synthese
 {
-	namespace departurestable
+	namespace messages
 	{
-		DisplayType::Registry DeparturesTableModule::_displayTypes;
-		BroadcastPoint::Registry	DeparturesTableModule::_broadcastPoints;
-		DisplayScreen::Registry	DeparturesTableModule::_displayScreens;
+		class Alarm;
 
-		DisplayType::Registry& DeparturesTableModule::getDisplayTypes()
+		/** AlarmObjectLink class.
+			@ingroup m17
+		*/
+		template <class T>
+		class AlarmObjectLink : public util::Registrable<uid, AlarmObjectLink<T> >
 		{
-			return _displayTypes;
-		}
+			std::string		_recipientKey;
+			T*				_object; 
+			const Alarm*	_alarm;
 
-		BroadcastPoint::Registry& DeparturesTableModule::getBroadcastPoints()
-		{
-			return _broadcastPoints;
-		}
+		public:
+			AlarmObjectLink() {}
 
-		DisplayScreen::Registry& DeparturesTableModule::getDisplayScreens()
-		{
-			return _displayScreens;
-		}
+			const std::string&	getRecipientKey() const { return _recipientKey; }
+			T*					getObject() const { return _object; }
+			const Alarm*		getAlarm() const { return _alarm; }
+
+			void setRecipientKey(const std::string& key) { _key = key; }
+			void setObject(T* object) { _object = object; }
+			void setAlarm(const Alarm* alarm) { _alarm = alarm; }
+
+		};
 	}
 }
+
+#endif // SYNTHESE_AlarmObjectLink_h__

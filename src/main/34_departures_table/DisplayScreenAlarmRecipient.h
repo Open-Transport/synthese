@@ -1,6 +1,6 @@
 
-/** DeparturesTableModule class implementation.
-	@file DeparturesTableModule.cpp
+/** DisplayScreenAlarmRecipient class header.
+	@file DisplayScreenAlarmRecipient.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,29 +20,28 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "34_departures_table/DeparturesTableModule.h"
+#ifndef SYNTHESE_DisplayScreenAlarmRecipient_h__
+#define SYNTHESE_DisplayScreenAlarmRecipient_h__
+
+#include "17_messages/AlarmRecipientTemplate.h"
 
 namespace synthese
 {
 	namespace departurestable
 	{
-		DisplayType::Registry DeparturesTableModule::_displayTypes;
-		BroadcastPoint::Registry	DeparturesTableModule::_broadcastPoints;
-		DisplayScreen::Registry	DeparturesTableModule::_displayScreens;
+		class DisplayScreen;
 
-		DisplayType::Registry& DeparturesTableModule::getDisplayTypes()
+		/** DisplayScreenAlarmRecipient class.
+			@ingroup m34
+		*/
+		class DisplayScreenAlarmRecipient : public messages::AlarmRecipientTemplate<DisplayScreen>
 		{
-			return _displayTypes;
-		}
+		public:
+			DisplayScreenAlarmRecipient();
 
-		BroadcastPoint::Registry& DeparturesTableModule::getBroadcastPoints()
-		{
-			return _broadcastPoints;
-		}
-
-		DisplayScreen::Registry& DeparturesTableModule::getDisplayScreens()
-		{
-			return _displayScreens;
-		}
+			void displayBroadcastListEditor(std::ostream& stream, const messages::Alarm* alarm, const server::Request* request);
+		};
 	}
 }
+
+#endif // SYNTHESE_DisplayScreenAlarmRecipient_h__

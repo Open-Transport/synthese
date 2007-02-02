@@ -33,6 +33,7 @@
 #include "32_admin/AdminInterfacePage.h"
 #include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminRequest.h"
+#include "32_admin/AdminParametersException.h"
 
 using namespace std;
 
@@ -76,7 +77,11 @@ namespace synthese
 			}
 			catch (FactoryException<AdminInterfaceElement> e)
 			{
-				throw RequestException("Page not found");
+				throw RequestException("Admin page " + it->second + " not found");
+			}
+			catch (AdminParametersException e)
+			{
+				throw RequestException("Admin page parameters error : " + e.getMessage());
 			}
 
 			// Action failed page
@@ -96,7 +101,11 @@ namespace synthese
 			}
 			catch (FactoryException<AdminInterfaceElement> e)
 			{
-				throw RequestException("Action failed page not found");
+				throw RequestException("Admin page " + it->second + " not found");
+			}
+			catch (AdminParametersException e)
+			{
+				throw RequestException("Admin page parameters error : " + e.getMessage());
 			}
 
 			// Parameters saving

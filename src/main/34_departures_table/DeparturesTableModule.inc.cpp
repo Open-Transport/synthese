@@ -7,6 +7,7 @@
 #include "34_departures_table/BroadcastPointAdmin.h"
 #include "34_departures_table/BroadcastPointTableSync.h"
 #include "34_departures_table/DisplayTypeTableSync.h"
+#include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/CreateDisplayTypeAction.h"
 #include "34_departures_table/UpdateDisplayTypeAction.h"
 #include "34_departures_table/ArrivalDepartureTableRight.h"
@@ -15,3 +16,4 @@
 #include "34_departures_table/ArrivalDepartureTableLog.h"
 #include "34_departures_table/BroadcastPointsDataLog.h"
 #include "34_departures_table/DisplayMaintenanceLog.h"
+#include "34_departures_table/DisplayScreenAlarmRecipient.h"

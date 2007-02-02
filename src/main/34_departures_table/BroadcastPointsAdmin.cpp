@@ -124,7 +124,7 @@ namespace synthese
 					<< "<td>" << it->broadCastPointsNumber << "</td>"
 					<< "<td>" << goRequest->getHTMLFormHeader(Conversion::ToString(it->place->getKey()))
 					<< Html::getHiddenInput(Request::PARAMETER_OBJECT_ID, Conversion::ToString(it->place->getKey()))
-					<< Html::getSubmitButton("Editer") << "</td>"
+					<< Html::getSubmitButton("Editer") << "</form></td>"
 					<< "</tr>";
 			}
 			stream

@@ -1,3 +1,25 @@
+
+/** ConnectionPlace class header.
+	@file ConnectionPlace.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_ENV_CONNECTIONPLACE_H
 #define SYNTHESE_ENV_CONNECTIONPLACE_H
 
@@ -12,136 +34,131 @@
 
 namespace synthese
 {
+	namespace time
+	{
+		class DateTime;
+	}
 
-namespace time
-{
-    class DateTime;
-}
+	namespace messages
+	{
+		class Alarm;
+	}
 
-namespace messages
-{
-	class Alarm;
-}
-
-namespace env
-{
-
-
-    class Address;
-    class Edge;
-    class Path; 
-    class PhysicalStop;
-    class SquareDistance; 
+	namespace env
+	{
 
 
-/** A connection place indicates that there are possible
-connections between different network vertices.
-
-Each connection is associated with a type (authorized, 
-forbidden, recommended...) and a transfer delay.
-
- @ingroup m15
-*/
-class ConnectionPlace : 
-    public synthese::util::Registrable<uid,ConnectionPlace>, 
-    public AddressablePlace
-{
-public:
-
-    static const int UNKNOWN_TRANSFER_DELAY;
-    static const int FORBIDDEN_TRANSFER_DELAY;
-    static const int SQUAREDISTANCE_SHORT_LONG;
+		class Address;
+		class Edge;
+		class Path; 
+		class PhysicalStop;
+		class SquareDistance; 
 
 
-private:
+		/** A connection place indicates that there are possible
+		connections between different network vertices.
 
-    std::vector<const PhysicalStop*> _physicalStops; 
+		Each connection is associated with a type (authorized, 
+		forbidden, recommended...) and a transfer delay.
 
-    std::map< std::pair<uid, uid>, int > _transferDelays; //!< Transfer delays between vertices
-    int _defaultTransferDelay;
-    int _minTransferDelay;
-    int _maxTransferDelay;
+		@ingroup m15
+		*/
+		class ConnectionPlace : 
+			public synthese::util::Registrable<uid,ConnectionPlace>, 
+			public AddressablePlace
+		{
+		public:
 
-    ConnectionType _connectionType;
-
-	const messages::Alarm* _alarm; //!< Current valid alarm
-
-protected:
-
-
-public:
-
-    ConnectionPlace (const uid& id,
-		     const std::string& name,
-		     const City* city,
-		     const ConnectionType& connectionType,
-		     int defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY);
-
-    ~ConnectionPlace ();
+			static const int UNKNOWN_TRANSFER_DELAY;
+			static const int FORBIDDEN_TRANSFER_DELAY;
+			static const int SQUAREDISTANCE_SHORT_LONG;
 
 
-    //! @name Getters/Setters
-    //@{
-    int getDefaultTransferDelay () const;
-    void setDefaultTransferDelay (int defaultTransferDelay);
+		private:
 
-    int getMinTransferDelay () const;
-    int getMaxTransferDelay () const;
+			std::vector<const PhysicalStop*> _physicalStops; 
 
-    const std::vector<const PhysicalStop*>& getPhysicalStops () const;
+			std::map< std::pair<uid, uid>, int > _transferDelays; //!< Transfer delays between vertices
+			int _defaultTransferDelay;
+			int _minTransferDelay;
+			int _maxTransferDelay;
 
-    bool hasApplicableAlarm (const synthese::time::DateTime& start, 
-			     const synthese::time::DateTime& end) const;
-	const messages::Alarm* getAlarm () const;
-	void setAlarm (const messages::Alarm* alarm);
+			ConnectionType _connectionType;
 
-    const ConnectionType getConnectionType () const;
-    void setConnectionType (const ConnectionType& connectionType);
-
-    //@}
+		protected:
 
 
-    //! @name Query methods.
-    //@{
-    
-    bool isConnectionAllowed (const Vertex* fromVertex, 
-			      const Vertex* toVertex) const;
+		public:
 
-    ConnectionType getRecommendedConnectionType (const SquareDistance& squareDistance) const;
+			ConnectionPlace (const uid& id,
+					const std::string& name,
+					const City* city,
+					const ConnectionType& connectionType,
+					int defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY);
 
-
-    int getTransferDelay (const Vertex* fromVertex, 
-			  const Vertex* toVertex) const;
+			~ConnectionPlace ();
 
 
-    VertexAccess getVertexAccess (const AccessDirection& accessDirection,
-				  const AccessParameters& accessParameters,
-				  const Vertex* destination,
-				  const Vertex* origin = 0) const;
-    
-    void getImmediateVertices (VertexAccessMap& result, 
-			       const AccessDirection& accessDirection,
-			       const AccessParameters& accessParameters,
-			       const Vertex* origin = 0,
-			       bool returnAddresses = true,
-			       bool returnPhysicalStops = true) const;
-    
-    
-    //@}
+			//! @name Getters/Setters
+			//@{
+			int getDefaultTransferDelay () const;
+			void setDefaultTransferDelay (int defaultTransferDelay);
+
+			int getMinTransferDelay () const;
+			int getMaxTransferDelay () const;
+
+			const std::vector<const PhysicalStop*>& getPhysicalStops () const;
+
+			const ConnectionType getConnectionType () const;
+			void setConnectionType (const ConnectionType& connectionType);
+
+			//@}
 
 
-    //! @name Update methods.
-    //@{
-    void addPhysicalStop (const PhysicalStop* physicalStop);
-    void addTransferDelay (uid departureId, uid arrivalId, int transferDelay);
-    void clearTransferDelays ();
-    //@}
+			//! @name Query methods.
+			//@{
+		    
+			messages::Alarm* hasApplicableAlarm (const synthese::time::DateTime& start, 
+				const synthese::time::DateTime& end) const;
+
+			bool isConnectionAllowed (const Vertex* fromVertex, 
+						const Vertex* toVertex) const;
+
+			ConnectionType getRecommendedConnectionType (const SquareDistance& squareDistance) const;
 
 
-};
+			int getTransferDelay (const Vertex* fromVertex, 
+					const Vertex* toVertex) const;
 
 
-}
+			VertexAccess getVertexAccess (const AccessDirection& accessDirection,
+						const AccessParameters& accessParameters,
+						const Vertex* destination,
+						const Vertex* origin = 0) const;
+		    
+			void getImmediateVertices (VertexAccessMap& result, 
+						const AccessDirection& accessDirection,
+						const AccessParameters& accessParameters,
+						const Vertex* origin = 0,
+						bool returnAddresses = true,
+						bool returnPhysicalStops = true) const;
+		    
+		    
+			//@}
+
+
+			//! @name Update methods.
+			//@{
+			void addPhysicalStop (const PhysicalStop* physicalStop);
+			void addTransferDelay (uid departureId, uid arrivalId, int transferDelay);
+			void clearTransferDelays ();
+			//@}
+
+
+		};
+
+
+	}
 }
 
 #endif 	    

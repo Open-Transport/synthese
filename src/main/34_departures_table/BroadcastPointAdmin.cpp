@@ -21,8 +21,17 @@
 */
 
 #include "01_util/Html.h"
+#include "01_util/Conversion.h"
 
-#include "BroadcastPointAdmin.h"
+#include "15_env/EnvModule.h"
+#include "15_env/ConnectionPlace.h"
+#include "15_env/City.h"
+
+#include "32_admin/AdminParametersException.h"
+
+#include "34_departures_table/AdvancedSelectTableSync.h"
+#include "34_departures_table/BroadcastPointAdmin.h"
+#include "34_departures_table/BroadcastPoint.h"
 
 using namespace std;
 
@@ -32,21 +41,33 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
+	using namespace env;
 
 	namespace departurestable
 	{
 		BroadcastPointAdmin::BroadcastPointAdmin()
-			: AdminInterfaceElement("broadcastpoints", AdminInterfaceElement::DISPLAYED_IF_CURRENT) {}
+			: AdminInterfaceElement("broadcastpoints", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
+			, _place(NULL)
+		{}
+
 
 		void BroadcastPointAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
+			// Place ID
+			Request::ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
+			uid placeId = Conversion::ToLongLong(it->second);
+			if (it == map.end())
+				throw AdminParametersException("Connection place not specified");
+
+			if (!EnvModule::getConnectionPlaces().contains(placeId))
+				throw AdminParametersException("Connection place not found");
+
+			_place = EnvModule::getConnectionPlaces().get(placeId);
 		}
 
 		string BroadcastPointAdmin::getTitle() const
 		{
-			/// @todo Change the title of the page
-			return "title";
+			return _place->getCity()->getName() + " " + _place->getName();
 		}
 
 		void BroadcastPointAdmin::display(ostream& stream, const Request* request) const
@@ -55,21 +76,34 @@ namespace synthese
 				<< "<h1>Emplacements d'affichage de la zone d'arrêt</h1>"
 				<< "<table>";
 
-			// Physical stop list
-
+			// Physical stop loop
+			vector<PhysicalStopAndBroadcastPoint> m = getConnectionPlacePhysicalStopsAndBroadcastPoints(_place->getKey());
+			for (vector<PhysicalStopAndBroadcastPoint>::iterator it = m.begin(); it != m.end(); ++it)
 			{
 				stream
-					<< "<tr><td>Arrêt physique " << "</td>"
-					<< "<td>" << Html::getSubmitButton("Activer") << "</td>"
+					<< "<tr><td>Arrêt physique " << it->stop->getName() << "</td>"
+					<< "<td>";
+				if (it->bp == NULL)
+					stream
+						<< Html::getSubmitButton("Activer") ;
+				else
+					stream
+						<< "Arrêt physique actif en tant que point de diffusion" << Html::getSubmitButton("Supprimer") ;
+				stream	
+					<< "</td>"
 					<< "</tr>";
+				delete it->bp;
 			}
 
-			// Other broadcastpoints list
+			vector<PhysicalStopAndBroadcastPoint> b = getConnectionPlaceBroadcastPointsAndPhysicalStops(_place->getKey(), false);
+			for (vector<PhysicalStopAndBroadcastPoint>::iterator bit = b.begin(); it != b.end(); ++it)
 			{
 				stream
-					<< "<tr><td>" << Html::getTextInput("", "") << "</td>"
+					<< "<tr><td>" << Html::getTextInput("", bit->bp->getName()) << "</td>"
 					<< "<td>" << Html::getSubmitButton("Renommer") << "</td>"
+					<< "<td>" << Html::getSubmitButton("Supprimer") << "</td>"
 					<< "</tr>";
+				delete bit->bp;
 			}
 
 			stream

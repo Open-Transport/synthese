@@ -70,5 +70,13 @@ namespace synthese
 			s << "<script type=\"text/javascript\">document." << formName << "." << fieldName << ".focus();</script>";
 			return s.str();
 		}
+
+		std::string Html::getTextAreaInput( const std::string& name, const std::string& value, int rows, int cols )
+		{
+			stringstream s;
+			s << "<textarea name=\"" << name << "\" rows=\"" << rows << "\" cols=\"" << cols << "\">" 
+				<< value << "</textarea>";
+			return s.str();
+		}
 	}
 }

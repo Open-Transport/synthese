@@ -29,6 +29,7 @@
 #include "17_messages/Alarm.h"
 #include "17_messages/AlarmLS.h"
 #include "17_messages/MessagesModule.h"
+#include "17_messages/Types.h"
 
 #include "04_time/DateTime.h"
 
@@ -66,15 +67,20 @@ namespace synthese
 			DateTime periodEnd (DateTime::FromString (GetStringAttr (node, ALARM_PERIODEND_ATTR)));
 
 			std::string levelStr (GetStringAttr (node, ALARM_LEVEL_ATTR));
-			Alarm::AlarmLevel level (Alarm::ALARM_LEVEL_INFO);
-			if (levelStr == ALARM_LEVEL_ATTR_INFO) level = Alarm::ALARM_LEVEL_INFO;
-			else if (levelStr == ALARM_LEVEL_ATTR_WARNING) level = Alarm::ALARM_LEVEL_WARNING;
-		    
-			MessagesModule::getAlarms ().add (new Alarm (id, 
-										message, 
-										periodStart,
-										periodEnd,
-										level));
+			AlarmLevel level (ALARM_LEVEL_INFO);
+			if (levelStr == ALARM_LEVEL_ATTR_INFO) level = ALARM_LEVEL_INFO;
+			else if (levelStr == ALARM_LEVEL_ATTR_WARNING) level = ALARM_LEVEL_WARNING;
+
+			Alarm* alarm = new Alarm;
+			alarm->setKey(id);
+			alarm->setShortMessage(message);
+			alarm->setLongMessage(message);
+			alarm->setPeriodStart(periodStart);
+			alarm->setPeriodEnd(periodEnd);
+			alarm->setLevel(level);
+
+
+			MessagesModule::getAlarms ().add (alarm);
 		    
 		}
 

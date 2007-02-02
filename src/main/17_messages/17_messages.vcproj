@@ -51,12 +51,39 @@
 				RelativePath=".\AlarmBroadcastList.h">
 			</File>
 			<File
-				RelativePath=".\AlarmTemplate.h">
+				RelativePath=".\AlarmObjectLink.h">
+			</File>
+			<File
+				RelativePath=".\AlarmRecipient.cpp">
+			</File>
+			<File
+				RelativePath=".\AlarmRecipient.h">
+			</File>
+			<File
+				RelativePath=".\AlarmRecipientTemplate.h">
+			</File>
+			<File
+				RelativePath=".\Scenario.cpp">
+			</File>
+			<File
+				RelativePath=".\Scenario.h">
+			</File>
+			<File
+				RelativePath=".\TextTemplate.cpp">
+			</File>
+			<File
+				RelativePath=".\TextTemplate.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
 			Filter="">
+			<File
+				RelativePath=".\AlarmObjectLinkTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\AlarmObjectLinkTableSync.h">
+			</File>
 			<File
 				RelativePath=".\AlarmTableSync.cpp">
 			</File>
@@ -64,7 +91,16 @@
 				RelativePath=".\AlarmTableSync.h">
 			</File>
 			<File
-				RelativePath=".\AlarmTemplateTableSync.h">
+				RelativePath=".\ScenarioTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\ScenarioTableSync.h">
+			</File>
+			<File
+				RelativePath=".\TextTemplateTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\TextTemplateTableSync.h">
 			</File>
 		</Filter>
 		<Filter
@@ -157,6 +193,9 @@
 		</File>
 		<File
 			RelativePath=".\SConscript">
+		</File>
+		<File
+			RelativePath=".\Types.h">
 		</File>
 	</Files>
 	<Globals>

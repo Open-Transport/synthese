@@ -26,21 +26,39 @@
 #include <vector>
 #include <string>
 
+#include <boost/logic/tribool.hpp>
+
 namespace synthese
 {
 	namespace env
 	{
 		class ConnectionPlace;
+		class PhysicalStop;
 	}
 
 	namespace departurestable
 	{
-		typedef struct { env::ConnectionPlace* place; int broadCastPointsNumber; } ConnectionPlaceWithBroadcastPoint;
+		class BroadcastPoint;
+
+		typedef struct { const env::ConnectionPlace* place; int broadCastPointsNumber; } ConnectionPlaceWithBroadcastPoint;
 
 		/** Connection place searcher.
 			@result vector of the founded searched connection places from the live data objects (do not delete the objects after use). 
 		*/
 		std::vector<ConnectionPlaceWithBroadcastPoint> searchConnectionPlacesWithBroadcastPoints(std::string cityName = "", std::string placeName = "", int _bpNumbers = UNKNOWN_VALUE, uid lineId = UNKNOWN_VALUE, int number=UNKNOWN_VALUE, int first=0);
+
+		typedef struct { const env::PhysicalStop* stop; BroadcastPoint* bp; } PhysicalStopAndBroadcastPoint;
+
+		/** Physical stops searcher.
+			@result map founded searched physical stops from the live data objects with the corresponding broadcast point if exists (NULL else) The broadcast points are temporary object and must be deleted after use. 
+		*/
+		std::vector<PhysicalStopAndBroadcastPoint> getConnectionPlacePhysicalStopsAndBroadcastPoints (uid placeId, int number=UNKNOWN_VALUE, int first=0);
+
+		/** Broadcast point searcher.
+			@result map founded searched physical stops from the live data objects with the corresponding broadcast point if exists (NULL else) The broadcast points are temporary object and must be deleted after use. 
+		*/
+		std::vector<PhysicalStopAndBroadcastPoint> getConnectionPlaceBroadcastPointsAndPhysicalStops(uid placeId, boost::logic::tribool withPhysical=boost::logic::indeterminate , int number=UNKNOWN_VALUE, int first=0);
+
 	}
 }
 

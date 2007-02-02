@@ -43,11 +43,14 @@ namespace synthese
 		{
 
 		public:
-			static const std::string TABLE_COL_MESSAGE;
-			static const std::string TABLE_COL_PERIODSTART;
-			static const std::string TABLE_COL_PERIODEND;
-			static const std::string TABLE_COL_LEVEL;
-
+			static const std::string COL_LEVEL;
+			static const std::string COL_IS_TEMPLATE;
+			static const std::string COL_SHORT_MESSAGE;
+			static const std::string COL_LONG_MESSAGE;
+			static const std::string COL_PERIODSTART;
+			static const std::string COL_PERIODEND;
+			static const std::string COL_SCENARIO_ID;
+			
 			AlarmTableSync ();
 			~AlarmTableSync ();
 

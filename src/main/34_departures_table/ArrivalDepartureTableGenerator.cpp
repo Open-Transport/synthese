@@ -62,13 +62,13 @@ namespace synthese
 		{
 			/** - If a forbidden place is served, the the line is not allowed */
 			if (!_forbiddenPlaces.empty())
-				for (const LineStop* curLinestop = linestop; curLinestop != NULL; curLinestop = (LineStop*) curLinestop->getFollowingArrival())
+				for (const LineStop* curLinestop = linestop; curLinestop != NULL; curLinestop = (LineStop*) curLinestop->getFollowingArrivalForFineSteppingOnly())
 					if (_forbiddenPlaces.find(curLinestop->getConnectionPlace()) != _forbiddenPlaces.end())
 						return false;
 
 			return 	linestop->getLine()->getUseInDepartureBoards()
 				&&	_lineFilter.find(linestop->getLine()) == _lineFilter.end()
-				&&	((_endFilter == WITH_PASSING) || (linestop->getPreviousDeparture() == NULL))
+				&&	((_endFilter == WITH_PASSING) || (linestop->getPreviousDepartureForFineSteppingOnly() == NULL))
 				//&&	(((linestop->getFollowingArrival() != NULL) && (linestop->getFollowingArrival()->getConnectionPlace() != _place))
 				//	|| ( linestop->getLine()->getDestination()->getConnectionPlace() != _place))
 			;
@@ -88,14 +88,14 @@ namespace synthese
 			ActualDisplayedArrivalsList arrivals;
 			set<const ConnectionPlace*> encounteredPlaces;
 			const ConnectionPlace* destinationPlace = linestop->getLine()->getDestination()->getConnectionPlace();
-			for (const LineStop* curLinestop = linestop; curLinestop != NULL; curLinestop = (LineStop*) curLinestop->getFollowingArrival())
+			for (const LineStop* curLinestop = linestop; curLinestop != NULL; curLinestop = (LineStop*) curLinestop->getFollowingArrivalForFineSteppingOnly())
 			{
 				const ConnectionPlace* place = curLinestop->getPhysicalStop()->getConnectionPlace();
 				
 				if (	_displayedPlaces.find(place) != _displayedPlaces.end()
 							&& encounteredPlaces.find(place) == encounteredPlaces.end()	// If the place must be displayed according to the display rules (only once per place)
 							&& place != destinationPlace
-						|| curLinestop->getFollowingArrival() == NULL		// or if the place is the terminus
+						|| curLinestop->getFollowingArrivalForFineSteppingOnly() == NULL		// or if the place is the terminus
 						|| curLinestop == linestop			// or if the place is the origin
 				){
 					arrivals.push_back(place);

@@ -38,12 +38,17 @@ namespace synthese
 		public:
 			template<class K, class T>
 			static std::string getSelectInput(const std::string& name, const std::map<K, T>& choices, const K& value);
-			
+
+			template<class K, class T>
+			static std::string getRadioInput(const std::string& name, const std::map<K, T>& choices, const K& value);
+
 			static std::string getSelectNumberInput(const std::string& name, int mini, int maxi, int value=UNKNOWN_VALUE);
 
 			static std::string getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping="");
 
 			static std::string getHiddenInput(const std::string& name, const std::string& value);
+
+			static std::string getTextAreaInput(const std::string& name, const std::string& value, int rows, int cols);
 
 			static std::string getSubmitButton(const std::string& caption);
 
@@ -66,6 +71,21 @@ namespace synthese
 			s << "</select>";
 			return s.str();
 		}
+
+		template<class K, class T>
+		static std::string Html::getRadioInput(const std::string& name, const std::map<K, T>& choices, const K& value)
+		{
+			std::stringstream s;
+			for (std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
+			{
+				s << "<input type=\"radio\" value=\"" << it->first << "\"";
+				if (it->first == value)
+					s << " checked=\"1\"";
+				s << " />" << it->second;
+			}
+			return s.str();
+		}
+
 	}
 }
 

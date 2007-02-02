@@ -48,8 +48,8 @@ namespace synthese
 	typedef std::set<const env::PhysicalStop*> PhysicalStopsList;
 	typedef std::set<const env::Line*> LineFilter;
 	typedef std::set<const env::ConnectionPlace*> ForbiddenPlacesList;
-	typedef enum { DISPLAY_ARRIVALS, DISPLAY_DEPARTURES } DeparturesTableDirection;
-	typedef enum { ENDS_ONLY, WITH_PASSING } EndFilter;
+	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
+	typedef enum { ENDS_ONLY = 0, WITH_PASSING = 1 } EndFilter;
 	struct DeparturesTableElement { const env::LineStop* linestop; int serviceNumber; time::DateTime realDepartureTime; };
 	struct DeparturesTableElementLess : public std::binary_function<DeparturesTableElement, DeparturesTableElement, bool>
 	{

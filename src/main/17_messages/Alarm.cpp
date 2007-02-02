@@ -30,46 +30,14 @@ namespace synthese
 	namespace messages
 	{
 
-		Alarm::Alarm(const uid& id)
-			: Registrable<uid,Alarm>(id)
+		Alarm::Alarm()
+			: Registrable<uid,Alarm>()
 		{
 
 		}
 
-		Alarm::Alarm (const uid& id,
-				const std::string& message, 
-				const synthese::time::DateTime& periodStart,
-				const synthese::time::DateTime& periodEnd,
-				const AlarmLevel& level)
-			: synthese::util::Registrable<uid,Alarm> (id)
-			, _message (message)
-			, _periodStart (periodStart)
-			, _periodEnd (periodEnd)
-			, _level (level)
-		{
-			_periodStart.updateDateTime( synthese::time::TIME_MIN );
-			_periodEnd.updateDateTime( synthese::time::TIME_MAX );
-		}
-		    
 
-
-
-		const std::string& 
-		Alarm::getMessage () const
-		{
-			return _message;
-		}
-
-
-		void 
-		Alarm::setMessage( const std::string& message)
-		{
-			_message = message;
-		}
-
-
-
-		const Alarm::AlarmLevel& 
+		const AlarmLevel& 
 		Alarm::getLevel () const
 		{
 			return _level;
@@ -104,14 +72,61 @@ namespace synthese
 		Alarm::isApplicable ( const synthese::time::DateTime& start, 
 					const synthese::time::DateTime& end ) const
 		{
-			if ( _message.empty () )
-				return false;
-
 			if ( ( start < _periodStart ) || 
 			( end > _periodEnd ) )
 				return false;
 		    
 			return true;
+		}
+
+		const time::DateTime& Alarm::getPeriodStart() const
+		{
+			return _periodStart;
+		}
+
+		const time::DateTime& Alarm::getPeriodEnd() const
+		{
+			return _periodEnd;
+		}
+
+		bool Alarm::getIsATemplate() const
+		{
+			return _isATemplate;
+		}
+
+		void Alarm::setIsATemplate( bool value )
+		{
+			_isATemplate = value;
+		}
+
+		void Alarm::setLongMessage( const std::string& message )
+		{
+			_longMessage = message;
+		}
+
+		void Alarm::setShortMessage( const std::string& message )
+		{
+			_shortMessage = message;
+		}
+
+		const std::string& Alarm::getLongMessage() const
+		{
+			return _longMessage;
+		}
+
+		const std::string& Alarm::getShortMessage() const
+		{
+			return _shortMessage;
+		}
+
+		void Alarm::setScenarioId(uid scenario )
+		{
+			_scenarioId = scenario;
+		}
+
+		uid Alarm::getScenarioId() const
+		{
+			return _scenarioId;
 		}
 	}
 }

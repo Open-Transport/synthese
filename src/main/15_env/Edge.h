@@ -123,9 +123,6 @@ public:
     const Edge* getPreviousDepartureForFineSteppingOnly () const;
     void setPreviousDepartureForFineSteppingOnly ( const Edge* previousDeparture);
 
-    const Edge* getFollowingArrival () const;
-    void setFollowingArrival ( const Edge* followingArrival);
-
     const Edge* getFollowingConnectionArrival () const;
     void setFollowingConnectionArrival( const Edge* followingConnectionArrival);
     

@@ -43,7 +43,6 @@ namespace synthese
 		class CurrencyTableSync : public db::SQLiteTableSyncTemplate<Currency>
 		{
 		public:
-			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_SYMBOL;
 

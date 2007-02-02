@@ -106,7 +106,7 @@ namespace synthese
 					bool insertionIsDone = false;
 
 					// Exploration of the line
-					for (const LineStop* curGLA = (const LineStop*) ls->getFollowingArrival(); curGLA != NULL; curGLA = (const LineStop*) curGLA->getFollowingArrival())
+					for (const LineStop* curGLA = (const LineStop*) ls->getFollowingArrivalForFineSteppingOnly(); curGLA != NULL; curGLA = (const LineStop*) curGLA->getFollowingArrivalForFineSteppingOnly())
 					{
 						// Attempting to select the destination
 						if (_forcedDestinations.find(curGLA->getConnectionPlace()) == _forcedDestinations.end())

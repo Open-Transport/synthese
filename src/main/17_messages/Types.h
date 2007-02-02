@@ -1,6 +1,6 @@
 
-/** DeparturesTableModule class implementation.
-	@file DeparturesTableModule.cpp
+/** Types class header.
+	@file Types.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,29 +20,26 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "34_departures_table/DeparturesTableModule.h"
+#ifndef SYNTHESE_Types_H__
+#define SYNTHESE_Types_H__
+
+#include <string>
 
 namespace synthese
 {
-	namespace departurestable
+	namespace messages
 	{
-		DisplayType::Registry DeparturesTableModule::_displayTypes;
-		BroadcastPoint::Registry	DeparturesTableModule::_broadcastPoints;
-		DisplayScreen::Registry	DeparturesTableModule::_displayScreens;
+		/** Alarm level.
 
-		DisplayType::Registry& DeparturesTableModule::getDisplayTypes()
-		{
-			return _displayTypes;
-		}
+		- INFO : the solution is available, but some information is 
+		provided for better comfort
 
-		BroadcastPoint::Registry& DeparturesTableModule::getBroadcastPoints()
-		{
-			return _broadcastPoints;
-		}
+		- WARNING : the solution could not be available, or requires action 
+		from the passenger (reservation...)
+		*/
+		typedef enum { ALARM_LEVEL_INFO = 10, ALARM_LEVEL_WARNING = 50, ALARM_LEVEL_ERROR = 99 } AlarmLevel;
 
-		DisplayScreen::Registry& DeparturesTableModule::getDisplayScreens()
-		{
-			return _displayScreens;
-		}
 	}
 }
+
+#endif // SYNTHESE_Types_H__

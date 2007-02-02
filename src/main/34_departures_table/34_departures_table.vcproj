@@ -220,6 +220,9 @@
 				RelativePath=".\BroadcastPointTableSync.h">
 			</File>
 			<File
+				RelativePath=".\DisplayScreenTableSync.cpp">
+			</File>
+			<File
 				RelativePath=".\DisplayScreenTableSync.h">
 			</File>
 			<File
@@ -243,6 +246,16 @@
 			</File>
 			<File
 				RelativePath=".\UpdateDisplayTypeAction.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Alarm recipient"
+			Filter="">
+			<File
+				RelativePath=".\DisplayScreenAlarmRecipient.cpp">
+			</File>
+			<File
+				RelativePath=".\DisplayScreenAlarmRecipient.h">
 			</File>
 		</Filter>
 		<File

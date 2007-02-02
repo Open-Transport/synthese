@@ -30,56 +30,59 @@
 
 #include "04_time/DateTime.h"
 
+#include "17_messages/Types.h"
 
 namespace synthese
 {
 	namespace messages
 	{
+		class Scenario;
+
 		/** Alarm message.
 			@ingroup m17
+
+			An alarm message is intended to be broadcasted at a time period into several destinations :
+				- display screens
+				- route planner results
+				- etc.
+
+			An alarm can be sent individually (single alarm) or in a group builded from a scenario (grouped alarm)
+			The _scenarioGroup attribute points to the group if applicable.
 		*/
 		class Alarm : public synthese::util::Registrable<uid,Alarm>
 		{
-		public:
-
-			/** Alarm level.
-
-			- INFO : the solution is available, but some information is 
-			provided for better comfort
-
-			- WARNING : the solution could not be available, or requires action 
-			from the passenger (reservation...)
-			*/
-			typedef enum { ALARM_LEVEL_INFO, ALARM_LEVEL_WARNING, ALARM_LEVEL_ERROR } AlarmLevel; 
-
 		private:
+			AlarmLevel					_level;
+			bool						_isATemplate;
+			std::string					_shortMessage;  //!< Alarm message
+			std::string					_longMessage;  //!< Alarm message
+			synthese::time::DateTime	_periodStart; //!< Alarm applicability period start
+			synthese::time::DateTime	_periodEnd;   //!< Alarm applicability period end
+			uid							_scenarioId;	//!< Group of alarms which this one belongs. Can be null = single alarm.
 
-			std::string _message;  //!< Alarm message
-			synthese::time::DateTime _periodStart; //!< Alarm applicability period start
-			synthese::time::DateTime _periodEnd;   //!< Alarm applicability period end
-			AlarmLevel _level; 
 		    
 		public:
 
-			Alarm(const uid& id);
-			Alarm (const uid& id,
-			const std::string& message, 
-			const synthese::time::DateTime& periodStart,
-			const synthese::time::DateTime& periodEnd,
-			const AlarmLevel& alarmLevel
-			);
-		    
+			Alarm();
+			
 			//! @name Getters/Setters
 			//@{
 
-			const std::string& getMessage () const;
-			void setMessage( const std::string& message);
+				const std::string&		getShortMessage() const;
+				const std::string&		getLongMessage() const;
+				const AlarmLevel&		getLevel() const;
+				const time::DateTime&	getPeriodStart() const;
+				const time::DateTime&	getPeriodEnd() const;
+				bool					getIsATemplate() const;
+				uid						getScenarioId()	const;
 
-			const AlarmLevel& getLevel () const;
-			void setLevel (const AlarmLevel& level);
-
-			void setPeriodStart ( const synthese::time::DateTime& periodStart);
-			void setPeriodEnd ( const synthese::time::DateTime& periodEnd);
+				void setLevel (const AlarmLevel& level);
+				void setShortMessage( const std::string& message);
+				void setLongMessage( const std::string& message);
+				void setPeriodStart ( const synthese::time::DateTime& periodStart);
+				void setPeriodEnd ( const synthese::time::DateTime& periodEnd);
+				void setIsATemplate(bool value);
+				void setScenarioId(uid id);
 
 			//@}
 		    

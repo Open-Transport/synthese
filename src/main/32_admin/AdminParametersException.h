@@ -1,6 +1,6 @@
 
-/** DeparturesTableModule class implementation.
-	@file DeparturesTableModule.cpp
+/** AdminParametersException class header.
+	@file AdminParametersException.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,29 +20,31 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "34_departures_table/DeparturesTableModule.h"
+
+#ifndef SYNTHESE_AdminParametersException_H__
+#define SYNTHESE_AdminParametersException_H__
+
+
+#include "01_util/Exception.h"
+
+#include <string>
+#include <iostream>
 
 namespace synthese
 {
-	namespace departurestable
+	namespace admin
 	{
-		DisplayType::Registry DeparturesTableModule::_displayTypes;
-		BroadcastPoint::Registry	DeparturesTableModule::_broadcastPoints;
-		DisplayScreen::Registry	DeparturesTableModule::_displayScreens;
+		/** ADmin page parameters load error.
+			@ingroup m32
 
-		DisplayType::Registry& DeparturesTableModule::getDisplayTypes()
+		*/
+		class AdminParametersException : public util::Exception
 		{
-			return _displayTypes;
-		}
-
-		BroadcastPoint::Registry& DeparturesTableModule::getBroadcastPoints()
-		{
-			return _broadcastPoints;
-		}
-
-		DisplayScreen::Registry& DeparturesTableModule::getDisplayScreens()
-		{
-			return _displayScreens;
-		}
+		public:
+			AdminParametersException( const std::string& message);
+			~AdminParametersException() throw ();
+		};
 	}
 }
+
+#endif // SYNTHESE_AdminParametersException_H__

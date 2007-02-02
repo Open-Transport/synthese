@@ -60,7 +60,6 @@ ConnectionPlace::ConnectionPlace (const uid& id,
     , _defaultTransferDelay (defaultTransferDelay)
     , _minTransferDelay (std::numeric_limits<int>::max ())
     , _maxTransferDelay (0)
-    , _alarm (0)
 {
 }
 
@@ -182,33 +181,13 @@ ConnectionPlace::addPhysicalStop (const PhysicalStop* physicalStop)
 
 
 
-bool 
+messages::Alarm*
 ConnectionPlace::hasApplicableAlarm (const synthese::time::DateTime& start, 
 				     const synthese::time::DateTime& end) const
 {
-    if (_alarm == 0) return false;
-    return _alarm->isApplicable (start, end);
+	/// @todo Implementation
+	return NULL;
 }
-
-
-
-const Alarm* 
-ConnectionPlace::getAlarm () const
-{
-    return _alarm;
-}
-
-
-
-
-void 
-ConnectionPlace::setAlarm (const Alarm* alarm)
-{
-    _alarm = alarm;
-}
-
-
-
 
 
 

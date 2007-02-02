@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Place.h"
+#include "15_env/Place.h"
+#include "15_env/City.h"
 
 
 namespace synthese
@@ -107,6 +108,10 @@ const std::string& Place::getName26() const
 	return _name26;
 }
 
+const std::string& Place::getFullName() const
+{
+	return ((_city != NULL) ? (_city->getName() + " ") : "") + getName();
+}
 
 
 }

@@ -29,6 +29,8 @@ namespace synthese
 {
 	namespace messages
 	{
+		class Alarm;
+
 		/** Ecran d'édition de message.
 			@ingroup m17
 
@@ -94,6 +96,9 @@ namespace synthese
 		*/
 		class MessageAdmin : public admin::AdminInterfaceElement
 		{
+		private:
+			const Alarm*	_alarm;
+
 		public:
 			MessageAdmin();
 			

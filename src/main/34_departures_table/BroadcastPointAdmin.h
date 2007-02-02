@@ -27,6 +27,11 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class ConnectionPlace;
+	}
+
 	namespace departurestable
 	{
 		/** Ecran d'édition de points de diffusion de zone d'arrêt.
@@ -70,6 +75,8 @@ namespace synthese
 		*/
 		class BroadcastPointAdmin : public admin::AdminInterfaceElement
 		{
+			env::ConnectionPlace* _place;
+
 		public:
 			BroadcastPointAdmin();
 			

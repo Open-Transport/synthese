@@ -20,7 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "MessagesLibraryAdmin.h"
+#include "01_util/Html.h"
+
+#include "17_messages/MessagesLibraryAdmin.h"
+#include "17_messages/TextTemplate.h"
+#include "17_messages/TextTemplateTableSync.h"
 
 using namespace std;
 
@@ -29,6 +33,7 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
+	using namespace util;
 
 	namespace messages
 	{
@@ -53,15 +58,19 @@ namespace synthese
 				<< "<table>"
 				<< "<tr><th>Nom</th><th>Texte&nbsp;court</th><th>Texte&nbsp;long</th><th>Actions</th></tr>";
 
-			// List of text templates
+			vector<TextTemplate*> tw = TextTemplateTableSync::search(ALARM_LEVEL_WARNING);
+			for (vector<TextTemplate*>::iterator itw = tw.begin(); itw != tw.end(); ++itw)
 			{
+				TextTemplate* t = *itw;
 				stream
-					<< "<TR>"
-					<< "<TD><INPUT type=\"text\" size=\"13\" value=\"Travaux Esquirol\" name=\"Text1\" /></TD>"
-					<< "<TD><INPUT type=\"text\" size=\"13\" value=\"Ligne déviée Esquirol\" name=\"Text1\"></TD>"
-					<< "<TD><INPUT type=\"text\" size=\"25\" value=\"La ligne 14 est déviée à Esquirol\" name=\"Text1\"></td>"
-					<< "<td><INPUT type=\"button\" value=\"Modifier\" name=\"Modifier\"><INPUT type=\"button\" value=\"Supprimer\" name=\"Modifier\"></TD>"
+					<< "<tr>"
+					<< "<td>" << Html::getTextInput("", t->getName()) << "</td>"
+					<< "<td>" << Html::getTextInput("", t->getShortMessage()) << "</td>"
+					<< "<td>" << Html::getTextInput("", t->getLongMessage()) << "</td>"
+					<< "<td>" << Html::getSubmitButton("Modifier") << "</td>"
+					<< "<td><INPUT type=\"button\" value=\"Supprimer\" name=\"Modifier\"></TD>"
 					<< "</tr>";
+				delete *itw;
 			}
 
 			stream
@@ -79,17 +88,21 @@ namespace synthese
 				<< "<table>"
 				<< "<tr><th>Nom</th><th>Texte&nbsp;court</th><th>Texte&nbsp;long</th><th>Actions</th></tr>";
 
-			// List of text templates
+			vector<TextTemplate*> te = TextTemplateTableSync::search(ALARM_LEVEL_ERROR);
+			for (vector<TextTemplate*>::iterator ite = te.begin(); ite != te.end(); ++ite)
 			{
+				/// @todo See if we use textarea
+				TextTemplate* t = *ite;
 				stream
-					<< "<TR>"
-					<< "<td><INPUT type=\"text\" size=\"13\" value=\"Grève générale\" name=\"Text1\"></TD>"
-					<< "<td><TEXTAREA name=\"Textarea1\" rows=\"2\" cols=\"11\">Aucune circulation&lt;br /&gt;Réseau en grève</TEXTAREA></TD>"
-					<< "<TD><TEXTAREA name=\"Textarea2\" rows=\"2\" cols=\"20\">Aucun service ne circule Le réseau est en grève</TEXTAREA></TD>"
-					<< "<TD><INPUT value=\"Modifier\" name=\"Modifier\"><INPUT onclick=\"alert('Etes vous sur de vouloir supprimer le modèle sélectionné ?')\" type=\"button\" value=\"Supprimer\" name=\"Modifier\"></td>"
+					<< "<tr>"
+					<< "<td>" << Html::getTextInput("", t->getName()) << "</td>"
+					<< "<td>" << Html::getTextInput("", t->getShortMessage()) << "</td>"
+					<< "<td>" << Html::getTextInput("", t->getLongMessage()) << "</td>"
+					<< "<td>" << Html::getSubmitButton("Modifier") << "</td>"
+					<< "<td><INPUT type=\"button\" value=\"Supprimer\" name=\"Modifier\"></TD>"
 					<< "</tr>";
+				delete *ite;
 			}
-
 			stream
 				<< "<TR>"
 				<< "<TD><INPUT type=\"text\" size=\"13\" name=\"Text1\"></td>"
