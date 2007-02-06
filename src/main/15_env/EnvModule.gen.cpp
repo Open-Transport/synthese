@@ -16,6 +16,8 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env:
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::TransportNetworkTableSync>("15.20.02");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::AxisTableSync>("15.20.03");
 
+synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::CommercialLineTableSync>("15.25.01");
+
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::LineTableSync>("15.30.01");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::RoadTableSync>("15.30.02");
 

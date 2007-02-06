@@ -39,6 +39,11 @@ ReservationRule::ReservationRule ( const uid& id,
 
 }
 
+ReservationRule::ReservationRule()
+: synthese::util::Registrable<uid,ReservationRule> ()
+{
+
+}
 
 ReservationRule::~ReservationRule()
 {

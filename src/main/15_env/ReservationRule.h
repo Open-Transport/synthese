@@ -69,7 +69,7 @@ private:
 		      const std::string& phoneExchangeOpeningHours,
 		      const std::string& description,
 		      const std::string& webSiteUrl );
-
+	ReservationRule();
 
     virtual ~ReservationRule();
 

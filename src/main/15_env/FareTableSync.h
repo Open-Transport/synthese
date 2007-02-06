@@ -1,56 +1,94 @@
-#ifndef SYNTHESE_ENVLSSQL_FARETABLESYNC_H
-#define SYNTHESE_ENVLSSQL_FARETABLESYNC_H
+
+/** FareTableSync class header.
+	@file FareTableSync.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#ifndef SYNTHESE_FareTableSync_H__
+#define SYNTHESE_FareTableSync_H__
 
 
+#include <vector>
 #include <string>
 #include <iostream>
 
-#include "15_env/ComponentTableSync.h"
-
-
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
+	namespace env
+	{
+		class Fare;
 
-namespace env
-{
-	class Fare;
+		/** Fare table synchronizer.
+			@ingroup m15
+		*/
+		class FareTableSync : public db::SQLiteTableSyncTemplate<Fare>
+		{
+		public:
+			static const std::string COL_NAME;
+			static const std::string COL_FARETYPE;
 
-/** Fare SQLite table synchronizer.
-	@ingroup m15
-*/
-class FareTableSync : public ComponentTableSync
-{
- public:
-
-    FareTableSync ();
-    ~FareTableSync ();
-
- protected:
-
-    void doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-		synthese::env::Environment& target);
-
-    void doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
-		    synthese::env::Environment& target);
-
-    void doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
-		   synthese::env::Environment& target);
+			FareTableSync();
+			~FareTableSync();
 
 
- private:
+			/** Fare search.
+				(other search parameters)
+				@param first First Fare object to answer
+				@param number Number of Fare objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return vector<Fare*> Founded Fare objects.
+				@author Hugues Romain
+				@date 2006
+			*/
+			static std::vector<Fare*> search(
+				// other search parameters ,
+				int first = 0, int number = 0);
 
-};
 
+		protected:
 
+			/** Action to do on Fare creation.
+				This method loads a new object in ram.
+			*/
+			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
-static const std::string FARES_TABLE_NAME ("t008_fares");
-static const std::string FARES_TABLE_COL_NAME ("name");
-static const std::string FARES_TABLE_COL_FARETYPE ("fare_type");
+			/** Action to do on Fare creation.
+				This method updates the corresponding object in ram.
+			*/
+			void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
+			/** Action to do on Fare deletion.
+				This method deletes the corresponding object in ram and runs 
+				all necessary cleaning actions.
+			*/
+			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
+		};
+	}
 }
 
-}
-#endif
+#endif // SYNTHESE_FareTableSync_H__
 

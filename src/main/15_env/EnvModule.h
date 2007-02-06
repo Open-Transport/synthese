@@ -29,6 +29,13 @@
 #include "15_env/City.h"
 #include "15_env/PhysicalStop.h"
 #include "15_env/ConnectionPlace.h"
+#include "15_env/CommercialLine.h"
+#include "15_env/Line.h"
+#include "15_env/Axis.h"
+#include "15_env/Fare.h"
+#include "15_env/BikeCompliance.h"
+#include "15_env/HandicappedCompliance.h"
+#include "15_env/PedestrianCompliance.h"
 
 /** @defgroup m15 15 Environment.
 @{
@@ -234,14 +241,25 @@ namespace synthese
 {
 	namespace env
 	{
+		class Path;
+
 		class EnvModule : public util::ModuleClass
 		{
 		private:
 
-			static Environment::Registry		_environments;
-			static City::Registry				_cities;
-			static ConnectionPlace::Registry	_connectionPlaces;
-			static PhysicalStop::Registry		_physicalStops;
+			static Environment::Registry			_environments;
+			static City::Registry					_cities;
+			static ConnectionPlace::Registry		_connectionPlaces;
+			static PhysicalStop::Registry			_physicalStops;
+			static CommercialLine::Registry			_commercialLines;
+			static Line::Registry					_lines;
+			static Axis::Registry					_axes;
+			static Fare::Registry					_fares;
+			static BikeCompliance::Registry			_bikeCompliances;
+			static HandicappedCompliance::Registry	_handicappedCompliances;
+			static PedestrianCompliance::Registry	_pedestrianCompliances;
+			static ReservationRule::Registry		_reservationRules;
+
 
 
 		public:
@@ -249,11 +267,21 @@ namespace synthese
 			
 			void initialize();
 			
-			static Environment::Registry& getEnvironments ();
+			static Environment::Registry&			getEnvironments();
+			static City::Registry&					getCities();
+			static ConnectionPlace::Registry&		getConnectionPlaces();
+			static PhysicalStop::Registry&			getPhysicalStops();
+			static CommercialLine::Registry&		getCommercialLines();
+			static Line::Registry&					getLines();
+			static Axis::Registry&					getAxes();
+			static Fare::Registry&					getFares();
+			static BikeCompliance::Registry&		getBikeCompliances();
+			static HandicappedCompliance::Registry&	getHandicappedCompliances();
+			static PedestrianCompliance::Registry&	getPedestrianCompliances();
+			static ReservationRule::Registry&		getReservationRules();
 
-			static City::Registry&				getCities();
-			static ConnectionPlace::Registry&	getConnectionPlaces();
-			static PhysicalStop::Registry&		getPhysicalStops();
+			static Path* fetchPath (const uid& id);
+
 
 		};
 	}

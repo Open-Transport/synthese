@@ -45,7 +45,6 @@ Environment::~Environment ()
 {
     // Delete all objects registered in this environment.
     _addresses.clear ();
-    _axes.clear ();
     _documents.clear ();
     _lines.clear ();
     _lineStops.clear ();
@@ -70,21 +69,6 @@ const Address::Registry&
 Environment::getAddresses () const
 {
     return _addresses;
-}
-
-
-Axis::Registry& 
-Environment::getAxes ()
-{
-    return _axes;
-}
-
-
-
-const Axis::Registry& 
-Environment::getAxes () const
-{
-    return _axes;
 }
 
 
@@ -146,34 +130,6 @@ Environment::getDocuments () const
 
 
 
-Fare::Registry&
-Environment::getFares ()
-{
-    return _fares;
-}
-
-
-const Fare::Registry&
-Environment::getFares () const
-{
-    return _fares;
-}
-
-
-
-Line::Registry&
-Environment::getLines ()
-{
-    return _lines;
-}
-
-
-const Line::Registry&
-Environment::getLines () const
-{
-    return _lines;
-}
-
 
 LineStop::Registry&
 Environment::getLineStops ()
@@ -202,53 +158,6 @@ const ConnectionPlace::Registry&
 Environment::getConnectionPlaces () const
 {
     return _connectionPlaces;
-}
-
-
-
-PedestrianCompliance::Registry& 
-Environment::getPedestrianCompliances ()
-{
-    return _pedestrianCompliances;
-}
-
-
-const PedestrianCompliance::Registry& 
-Environment::getPedestrianCompliances () const
-{
-    return _pedestrianCompliances;
-}
-
-
-
-HandicappedCompliance::Registry& 
-Environment::getHandicappedCompliances ()
-{
-    return _handicappedCompliances;
-}
-
-
-
-const HandicappedCompliance::Registry& 
-Environment::getHandicappedCompliances () const
-{
-    return _handicappedCompliances;
-}
-
-
-
-BikeCompliance::Registry& 
-Environment::getBikeCompliances ()
-{
-    return _bikeCompliances;
-}
-
-
-
-const BikeCompliance::Registry& 
-Environment::getBikeCompliances () const
-{
-    return _bikeCompliances;
 }
 
 
@@ -369,24 +278,6 @@ Environment::getTransportNetworks () const
 
 
 
-
-ReservationRule::Registry& 
-Environment::getReservationRules ()
-{
-    return _reservationRules;
-}
-
-
-
-const ReservationRule::Registry& 
-Environment::getReservationRules () const
-{
-    return _reservationRules;
-}
-
-
-
-
 synthese::lexmatcher::LexicalMatcher<uid>& 
 Environment::getCitiesMatcher ()
 {
@@ -440,24 +331,6 @@ Environment::fetchIncludingPlace (const uid& id) const
 }
 
 
-
-const Path* 
-Environment::fetchPath (const uid& id) const
-{
-    if (_lines.contains (id)) return _lines.get (id);
-    if (_roads.contains (id)) return _roads.get (id);
-    return 0;
-}
-
-
-
-Path* 
-Environment::fetchPath (const uid& id)
-{
-    if (_lines.contains (id)) return _lines.get (id);
-    if (_roads.contains (id)) return _roads.get (id);
-    return 0;
-}
 
 
 

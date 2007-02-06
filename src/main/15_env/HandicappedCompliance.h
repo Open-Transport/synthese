@@ -33,6 +33,7 @@ public:
     HandicappedCompliance (const uid& id, 
 			   const boost::logic::tribool& compliant,
 			   const int& capacity);
+	HandicappedCompliance();
 
     ~HandicappedCompliance();
 

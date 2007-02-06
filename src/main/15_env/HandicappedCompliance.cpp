@@ -18,6 +18,12 @@ HandicappedCompliance::HandicappedCompliance (const uid& id,
     
 }
 
+HandicappedCompliance::HandicappedCompliance()
+: synthese::util::Registrable<uid,HandicappedCompliance> ()
+, Compliance ()
+{
+
+}
 
 HandicappedCompliance::~HandicappedCompliance()
 {

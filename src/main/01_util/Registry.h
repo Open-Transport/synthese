@@ -118,8 +118,10 @@ template<class K, class T>
 T* 
 Registry<K,T>::get (const K& key)
 {
+	if (key == 0)
+		return NULL;
     if (contains (key) == false) 
-	throw RegistryKeyException<K,T> ("No such key in registry", key);
+		throw RegistryKeyException<K,T> ("No such key in registry", key);
 
     return _registry.find (key)->second;
 }
@@ -130,8 +132,10 @@ template<class K, class T>
 const T* 
 Registry<K,T>::get (const K& key) const
 {
+	if (key == 0)
+		return NULL;
     if (contains (key) == false) 
-	throw RegistryKeyException<K,T> ("No such key in registry", key);
+		throw RegistryKeyException<K,T> ("No such key in registry", key);
 
     return _registry.find (key)->second;
 }
@@ -156,7 +160,7 @@ Registry<K,T>::clear ()
     for (typename std::map<K,T*>::iterator iter = _registry.begin ();
 	 iter != _registry.end (); ++iter)
     {
-	delete iter->second;
+		delete iter->second;
     }
     _registry.clear ();
 }
@@ -168,7 +172,7 @@ void
 Registry<K,T>::add (T* ptr)
 {
     if (contains (ptr->getKey ())) 
-	throw RegistryKeyException<K,T> ("Duplicate key in registry", ptr->getKey ());
+		throw RegistryKeyException<K,T> ("Duplicate key in registry", ptr->getKey ());
     
     _registry.insert (std::make_pair (ptr->getKey (), ptr));
 }
@@ -189,7 +193,7 @@ void
 Registry<K,T>::remove (const K& key)
 {
     if (contains (key) == false) 
-	throw RegistryKeyException<K,T> ("No such key in registry", key);
+		throw RegistryKeyException<K,T> ("No such key in registry", key);
 
     delete _registry.find (key)->second;
     _registry.erase (key);

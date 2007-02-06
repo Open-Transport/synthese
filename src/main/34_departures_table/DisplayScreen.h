@@ -25,6 +25,7 @@
 
 #include <set>
 #include <string>
+#include <ostream>
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
@@ -178,6 +179,7 @@ namespace synthese
 			//! \name Queries
 			//@{
 				ArrivalDepartureTableGenerator*	getGenerator(const time::DateTime& startTime) const;
+				void							display(std::ostream& stream) const;
 			//@}
 
 		};

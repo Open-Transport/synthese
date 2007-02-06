@@ -99,7 +99,7 @@ LineStopTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 
     LineStop* ls = new synthese::env::LineStop (
 	id, 
-	environment.getLines ().get (lineId),
+	EnvModule::getLines ().get (lineId),
 	rankInPath,
 	isDeparture, 
 	isArrival,
@@ -121,7 +121,7 @@ LineStopTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 					       Conversion::ToDouble (*(++valueIter))));
     }
 
-    environment.getLines ().get (lineId)->addEdge (ls);
+	EnvModule::getLines ().get (lineId)->addEdge (ls);
     environment.getLineStops ().add (ls);
 }
 

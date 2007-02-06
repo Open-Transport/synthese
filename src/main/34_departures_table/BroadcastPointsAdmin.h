@@ -28,6 +28,7 @@
 #include "32_admin/AdminInterfaceElement.h"
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
+#include "34_departures_table/Types.h"
 
 namespace synthese
 {
@@ -74,12 +75,12 @@ namespace synthese
 		*/
 		class BroadcastPointsAdmin : public admin::AdminInterfaceElement
 		{
-			std::string _cityName;
-			std::string _placeName;
-			uid			_lineUid;
-			int			_displayNumber;
-			int			_number;
-			int			_first;
+			std::string				_cityName;
+			std::string				_placeName;
+			uid						_lineUid;
+			BroadcastPointsPresence	_displayNumber;
+			int						_number;
+			int						_first;
 
 			std::vector<ConnectionPlaceWithBroadcastPoint> _searchResult;
 

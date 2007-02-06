@@ -1,3 +1,25 @@
+
+/** ContinuousServiceTableSync class implementation.
+	@file ContinuousServiceTableSync.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "ContinuousServiceTableSync.h"
 
 #include "01_util/Conversion.h"
@@ -9,6 +31,7 @@
 #include "15_env/ContinuousService.h"
 #include "15_env/Path.h"
 #include "15_env/Point.h"
+#include "15_env/EnvModule.h"
 
 #include <boost/tokenizer.hpp>
 #include <sqlite/sqlite3.h>
@@ -112,7 +135,7 @@ ContinuousServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int r
 
     uid pathId (Conversion::ToLongLong (rows.getColumn (rowIndex, CONTINUOUSSERVICES_TABLE_COL_PATHID)));
 
-    Path* path = environment.fetchPath (pathId);
+	Path* path = EnvModule::fetchPath (pathId);
     assert (path != 0);
     assert (path->getEdges ().size () == arrivalSchedules.size ());
 
@@ -136,9 +159,9 @@ ContinuousServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int r
 								  departureSchedules.at (0),
 								  range, maxWaitingTime);
 
-    cs->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
-    cs->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
-    cs->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
+	cs->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
+	cs->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
+	cs->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
 
     path->addService (cs, departureSchedules, arrivalSchedules);
     environment.getContinuousServices ().add (cs);
@@ -157,7 +180,7 @@ ContinuousServiceTableSync::doReplace (const synthese::db::SQLiteResult& rows, i
     ContinuousService* cs = environment.getContinuousServices ().get (id);
 
     // Remove old service
-    Path* path = environment.fetchPath (cs->getPath ()->getId ());
+	Path* path = EnvModule::fetchPath (cs->getPath ()->getId ());
     path->removeService (cs);
 
     int serviceNumber (Conversion::ToInt (
@@ -231,9 +254,9 @@ ContinuousServiceTableSync::doReplace (const synthese::db::SQLiteResult& rows, i
     cs->setDepartureSchedule (departureSchedules.at (0));
     cs->setRange (range);
     cs->setMaxWaitingTime (range);
-    cs->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
-    cs->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
-    cs->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
+	cs->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
+	cs->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
+	cs->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
 
     path->addService (cs, departureSchedules, arrivalSchedules);
 }

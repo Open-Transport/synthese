@@ -130,15 +130,15 @@ namespace synthese
 			stream
 				<< "<TR>"
 				<< "<TD>&nbsp;</TD>"
-				<< "<TD><INPUT type=\"text\" name=\"Text1\" value=\"Entrez le nom du profil ici\" size=\"21\"></TD>"
-				<< "<TD>(sélectionner un profil existant pour copier ses habilitations dans le nouveau profil)</P></TD>"
-				<< "<TD><INPUT type=\"button\" value=\"Ajouter\" name=\"Button7\"></TD>"
+				<< "<td>" << Html::getTextInput("", "", "Entrez le nom du profil ici") << "</td>"
+				<< "<TD>(sélectionner un profil existant pour copier ses habilitations dans le nouveau profil)</TD>"
+				<< "<td>" << Html::getSubmitButton("Ajouter") << "</td>"
 				<< "</TR>"
 
 				<< "</TABLE>"
 
 				<< "<P align=\"right\">Profils suivants &gt;</P>"
-				<< "<P>Sélection : <INPUT type=\"button\" value=\"Supprimer\" name=\"Button4\" onclick=\"alert('Etes vous sur(e) de vouloir supprimer le profil sélectionné ?')\"></P>"
+				<< "<p>Sélection : " << Html::getSubmitButton("Supprimer") << "</p>"
 				<< "<P>Cliquer sur un titre de colonne pour trier le tableau.</P>";
 		}
 	}

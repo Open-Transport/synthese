@@ -78,7 +78,7 @@ namespace synthese
 				<< "<TD><INPUT type=\"text\" size=\"13\" name=\"Text1\"></TD>"
 				<< "<TD><INPUT type=\"text\" size=\"13\" name=\"Text1\"></TD>"
 				<< "<TD><INPUT type=\"text\" size=\"25\" name=\"Text1\"></TD>"
-				<< "<TD><INPUT type=\"button\" value=\"Ajouter\" name=\"Button7\"></TD>"
+				<< "<TD>" << Html::getSubmitButton("Ajouter") << "</TD>"
 				<< "</TR>"
 
 				<< "</TABLE>"
@@ -108,7 +108,7 @@ namespace synthese
 				<< "<TD><INPUT type=\"text\" size=\"13\" name=\"Text1\"></td>"
 				<< "<TD><TEXTAREA name=\"Textarea1\" rows=\"2\" cols=\"11\"></TEXTAREA></TD>"
 				<< "<TD><TEXTAREA name=\"Textarea2\" rows=\"2\" cols=\"20\"></TEXTAREA></TD>"
-				<< "<TD><INPUT type=\"button\" value=\"Ajouter\" name=\"Button7\"></TD>"
+				<< "<TD>" << Html::getSubmitButton("Ajouter") << "</TD>"
 				<< "</TR></TABLE>"
 
 				<< "<h1>Scénarios</h1>"
@@ -121,14 +121,14 @@ namespace synthese
 					<< "<TR>"
 					<< "<TD><INPUT type=\"radio\" value=\"Radio2\" name=\"RadioGroup\"></TD>"
 					<< "<TD>Interruption totale métro</TD>"
-					<< "<TD><INPUT type=\"button\" value=\"Editer\" name=\"Modifier\" /><INPUT onclick=\"alert('Etes-vous sûr de vouloir supprimer le scénario sélectionné ?');\" type=\"button\" value=\"Supprimer\" name=\"Modifier\" /></TD>"
+					<< "<TD>" << Html::getSubmitButton("Modifier") << Html::getSubmitButton("Supprimer") << "</TD>"
 					<< "</tr>";
 			}
 
 			stream
 				<< "<TR>"
 				<< "<TD colSpan=\"2\">(sélectionnez un&nbsp;scénario existant pour créer une copie)</td>"
-				<< "<TD><INPUT type=\"button\" value=\"Ajouter\" name=\"Button7\" language=\"javascript\" onclick=\"location='admin_messages_scenarios.htm';\"></TD>"
+				<< "<TD>" << Html::getSubmitButton("Ajouter") << "</TD>"
 				<< "</TR></TABLE>";
 		}
 	}

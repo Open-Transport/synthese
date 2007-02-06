@@ -36,6 +36,7 @@ class Fare : public synthese::util::Registrable<uid,Fare>
     Fare (const uid& id, 
 	  const std::string& name,
 	  const FareType& type);
+	Fare();
     ~Fare ();
     
     

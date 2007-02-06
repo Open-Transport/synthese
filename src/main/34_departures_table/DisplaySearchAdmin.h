@@ -104,7 +104,13 @@ namespace synthese
 		*/
 		class DisplaySearchAdmin : public admin::AdminInterfaceElement
 		{
+			std::string _searchUid;
+			std::string _searchLocalizationUid;
+
 		public:
+			static const std::string PARAMETER_SEARCH_UID;
+			static const std::string PARAMETER_SEARCH_LOCALIZATION;
+
 			DisplaySearchAdmin();
 			
 			/** Initialization of the parameters from a request.

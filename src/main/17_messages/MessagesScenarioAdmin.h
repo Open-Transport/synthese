@@ -29,6 +29,8 @@ namespace synthese
 {
 	namespace messages
 	{
+		class Scenario;
+
 		/** Ecran d'édition de scénario de diffusion de message.
 			@ingroup m17
 
@@ -69,6 +71,9 @@ namespace synthese
 		*/
 		class MessagesScenarioAdmin : public admin::AdminInterfaceElement
 		{
+		private:
+			Scenario* _scenario;
+
 		public:
 			MessagesScenarioAdmin();
 			

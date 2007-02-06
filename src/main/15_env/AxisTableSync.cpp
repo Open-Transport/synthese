@@ -1,101 +1,169 @@
-#include "AxisTableSync.h"
+
+/** AxisTableSync class implementation.
+	@file AxisTableSync.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include <sstream>
 
 #include "01_util/Conversion.h"
+
+#include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLiteException.h"
 
 #include "15_env/Axis.h"
+#include "15_env/AxisTableSync.h"
+#include "15_env/EnvModule.h"
 
-#include <sqlite/sqlite3.h>
-#include <assert.h>
-
-
-using synthese::util::Conversion;
-using synthese::db::SQLiteResult;
+using namespace std;
 
 namespace synthese
 {
 	using namespace db;
+	using namespace util;
+	using namespace env;
 
-namespace env
-{
+	namespace db
+	{
+		template<> const std::string SQLiteTableSyncTemplate<Axis>::TABLE_NAME = "t004_axes";
+		template<> const int SQLiteTableSyncTemplate<Axis>::TABLE_ID = 4;
+		template<> const bool SQLiteTableSyncTemplate<Axis>::HAS_AUTO_INCREMENT = true;
 
+		template<> void SQLiteTableSyncTemplate<Axis>::load(Axis* axis, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		{
+			axis->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
+			axis->setName (rows.getColumn (rowIndex, AxisTableSync::COL_NAME));
+			axis->setFree (Conversion::ToBool (rows.getColumn (rowIndex, AxisTableSync::COL_FREE)));
+			axis->setAllowed (Conversion::ToBool (rows.getColumn (rowIndex, AxisTableSync::COL_ALLOWED)));
+		}
 
+		template<> void SQLiteTableSyncTemplate<Axis>::save(Axis* object)
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			if (object->getKey() > 0)
+			{
+				query
+					<< "UPDATE " << TABLE_NAME << " SET "
+					/// @todo fill fields [,]FIELD=VALUE
+					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
+			}
+			else
+			{
+				object->setKey(getId(1,1));
+                query
+					<< " INSERT INTO " << TABLE_NAME << " VALUES("
+					<< Conversion::ToString(object->getKey())
+					/// @todo fill other fields separated by ,
+					<< ")";
+			}
+			sqlite->execUpdate(query.str());
+		}
 
-AxisTableSync::AxisTableSync ()
-: ComponentTableSync (AXES_TABLE_NAME, true, false, db::TRIGGERS_ENABLED_CLAUSE)
-{
-    addTableColumn (AXES_TABLE_COL_NAME, "TEXT", true);
-    addTableColumn (AXES_TABLE_COL_FREE, "BOOLEAN", true);
-    addTableColumn (AXES_TABLE_COL_ALLOWED, "BOOLEAN", true);
-}
+	}
 
-
-
-AxisTableSync::~AxisTableSync ()
-{
-
-}
-
-    
-
-
-void 
-AxisTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-		      synthese::env::Environment& environment)
-{
-    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-
-    if (environment.getAxes ().contains (id)) return;
-
-    synthese::env::Axis* axis = new synthese::env::Axis (
-	id,
-	rows.getColumn (rowIndex, AXES_TABLE_COL_NAME),
-	Conversion::ToBool (rows.getColumn (rowIndex, AXES_TABLE_COL_FREE)),
-	Conversion::ToBool (rows.getColumn (rowIndex, AXES_TABLE_COL_ALLOWED))
-	);
-    
-    environment.getAxes ().add (axis);
-}
-
-
-
-void 
-AxisTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
-			  synthese::env::Environment& environment)
-{
-    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-    synthese::env::Axis* axis = environment.getAxes ().get (id);
-    axis->setName (rows.getColumn (rowIndex, AXES_TABLE_COL_NAME));
-    axis->setFree (Conversion::ToBool (rows.getColumn (rowIndex, AXES_TABLE_COL_FREE)));
-    axis->setAllowed (Conversion::ToBool (rows.getColumn (rowIndex, AXES_TABLE_COL_ALLOWED)));
-
-}
+	namespace env
+	{
+		const std::string AxisTableSync::COL_NAME ("name");
+		const std::string AxisTableSync::COL_FREE ("free");
+		const std::string AxisTableSync::COL_ALLOWED ("allowed");
 
 
+		AxisTableSync::AxisTableSync()
+			: SQLiteTableSyncTemplate<Axis>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+		{
+			addTableColumn(TABLE_COL_ID, "INTEGER", false);
+			addTableColumn (COL_NAME, "TEXT", true);
+			addTableColumn (COL_FREE, "BOOLEAN", true);
+			addTableColumn (COL_ALLOWED, "BOOLEAN", true);
+		}
 
-void 
-AxisTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
-			 synthese::env::Environment& environment)
-{
-    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-    environment.getAxes ().remove (id);
-}
+		void AxisTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				Axis* object = new Axis();
+				load(object, rows, i);
+				EnvModule::getAxes().add(object);
+			}
+		}
 
+		void AxisTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid lineId = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (EnvModule::getAxes().contains(lineId))
+				{
+					Axis* object = EnvModule::getAxes().get(lineId);
+					load(object, rows, i);
+				}
+			}
+		}
 
+		void AxisTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid lineId = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (EnvModule::getAxes().contains(lineId))
+				{
+					EnvModule::getAxes().remove(lineId);
+				}
+			}
+		}
 
+		std::vector<Axis*> AxisTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE " 
+				/// @todo Fill Where criteria
+				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+				;
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
 
-
-
-
-
-
-
-
-
-
-
-}
-
+			try
+			{
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<Axis*> objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					Axis* object = new Axis();
+					load(object, result, i);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
+	}
 }
 

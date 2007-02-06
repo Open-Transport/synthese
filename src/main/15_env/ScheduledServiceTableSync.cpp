@@ -28,6 +28,7 @@
 
 #include "04_time/Schedule.h"
 
+#include "15_env/EnvModule.h"
 #include "15_env/ScheduledService.h"
 #include "15_env/Path.h"
 #include "15_env/Point.h"
@@ -134,7 +135,7 @@ ScheduledServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int ro
 
     uid pathId (Conversion::ToLongLong (rows.getColumn (rowIndex, SCHEDULEDSERVICES_TABLE_COL_PATHID)));
 
-    Path* path = environment.fetchPath (pathId);
+	Path* path = EnvModule::fetchPath (pathId);
     assert (path != 0);
     assert (path->getEdges ().size () == arrivalSchedules.size ());
 
@@ -154,10 +155,10 @@ ScheduledServiceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int ro
 								path, 
 								departureSchedules.at (0));
 
-    ss->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
-    ss->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
-    ss->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
-    ss->setReservationRule (environment.getReservationRules ().get (reservationRuleId)); 
+	ss->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
+	ss->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
+	ss->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
+	ss->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId)); 
 
     path->addService (ss, departureSchedules, arrivalSchedules);
     environment.getScheduledServices ().add (ss);
@@ -176,7 +177,7 @@ ScheduledServiceTableSync::doReplace (const synthese::db::SQLiteResult& rows, in
     ScheduledService* ss = environment.getScheduledServices ().get (id);
 
     // Remove old service
-    Path* path = environment.fetchPath (ss->getPath ()->getId ());
+	Path* path = EnvModule::fetchPath (ss->getPath ()->getId ());
     path->removeService (ss);
 
     int serviceNumber (Conversion::ToInt (
@@ -245,10 +246,10 @@ ScheduledServiceTableSync::doReplace (const synthese::db::SQLiteResult& rows, in
 
     ss->setServiceNumber (serviceNumber);
     ss->setDepartureSchedule (departureSchedules.at (0));
-    ss->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
-    ss->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
-    ss->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
-    ss->setReservationRule (environment.getReservationRules ().get (reservationRuleId)); 
+    ss->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
+    ss->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
+    ss->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
+    ss->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId)); 
     
     path->addService (ss, departureSchedules, arrivalSchedules);
     

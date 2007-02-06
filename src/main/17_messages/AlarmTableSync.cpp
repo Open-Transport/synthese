@@ -104,7 +104,7 @@ namespace synthese
 		const std::string AlarmTableSync::COL_IS_TEMPLATE = "is_template";
 		const std::string AlarmTableSync::COL_LEVEL = "level";
 		const std::string AlarmTableSync::COL_SHORT_MESSAGE = "short_message"; 
-		const std::string AlarmTableSync::COL_LONG_MESSAGE = "short_message"; 
+		const std::string AlarmTableSync::COL_LONG_MESSAGE = "long_message";
 		const std::string AlarmTableSync::COL_PERIODSTART = "period_start";
 		const std::string AlarmTableSync::COL_PERIODEND = "period_end"; 
 		const std::string AlarmTableSync::COL_SCENARIO_ID = "scenario_id"; 

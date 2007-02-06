@@ -85,6 +85,12 @@
 				RelativePath=".\City.h">
 			</File>
 			<File
+				RelativePath=".\CommercialLine.cpp">
+			</File>
+			<File
+				RelativePath=".\CommercialLine.h">
+			</File>
+			<File
 				RelativePath=".\Compliance.cpp">
 			</File>
 			<File
@@ -381,6 +387,12 @@
 			</File>
 			<File
 				RelativePath=".\CityTableSync.h">
+			</File>
+			<File
+				RelativePath=".\CommercialLineTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\CommercialLineTableSync.h">
 			</File>
 			<File
 				RelativePath=".\ComponentTableSync.cpp">

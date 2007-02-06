@@ -5,7 +5,6 @@
 #include <vector>
 #include <string>
 
-#include "01_util/RGBColor.h"
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
@@ -21,8 +20,9 @@ namespace synthese
 		class LineStop;
 		class RollingStock;
 		class Service;
-		class TransportNetwork;
 		class LineAlarmBroadcast;
+		class CommercialLine;
+		class TransportNetwork;
 
 
 		/** Technical line.
@@ -46,21 +46,14 @@ namespace synthese
 			public Path
 		{
 		private:
-			TransportNetwork* _network; 
-			const Axis* _axis; 
+			const Axis*				_axis;
+			const CommercialLine*	_commercialLine;
 		    
 			uid _rollingStockId;
-		    
-			std::string _name;  //!< Name (id)
-			std::string _shortName;  //!< Name (cartouche)
-			std::string _longName; //!< Name for schedule card
 
-			synthese::util::RGBColor _color;  //!< Line color
-			std::string _style;    //!< CSS style (cartouche)
-			std::string _image;    //!< Display image (cartouche)
-
+			std::string _name;			//!< Name (code)
 			std::string _timetableName; //!< Name for timetable
-			std::string _direction;   //!< Direction (shown on vehicles)
+			std::string _direction;		//!< Direction (shown on vehicles)
 
 			bool _isWalkingLine;
 		    
@@ -68,15 +61,13 @@ namespace synthese
 			bool _useInTimetables; 
 			bool _useInRoutePlanning; 
 
-			std::vector<LineAlarmBroadcast*>	_alarms;
-
-
 		public:
 
 			Line (const uid& id,
 			const std::string& name, 
 			const Axis* axis);
 
+			Line();
 			virtual ~Line();
 
 
@@ -98,31 +89,16 @@ namespace synthese
 			void setUseInRoutePlanning (bool useInRoutePlanning);
 
 			const Axis* getAxis () const;
-
-			const synthese::util::RGBColor& getColor () const;
-			void setColor (const synthese::util::RGBColor& color);
+			void setAxis(const Axis* axis);
 
 			const std::string& getDirection () const;
 			void setDirection (const std::string& direction);
-
-			const std::string& getImage () const;
-			void setImage (const std::string& image);
-
-			const std::string& getShortName () const;
-			void setShortName (const std::string& shortName);
-
-			const std::string& getLongName () const;
-			void setLongName (const std::string& longName);
 
 			const std::string& getTimetableName () const;
 			void setTimetableName (const std::string& timetableName);
 
 			const TransportNetwork* getNetwork () const;
-			void setNetwork (TransportNetwork* network);
-		    
-			const std::string& getStyle () const;
-			void setStyle (const std::string& style);
-		    
+			
 			const uid& getRollingStockId () const;
 			void setRollingStockId (const uid& id);
 

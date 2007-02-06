@@ -203,6 +203,24 @@
 		<Filter
 			Name="Requests"
 			Filter="">
+			<File
+				RelativePath=".\DisplayScreenContentRequest.cpp">
+			</File>
+			<File
+				RelativePath=".\DisplayScreenContentRequest.h">
+			</File>
+			<File
+				RelativePath=".\DisplayScreenSupervisionInitRequest.cpp">
+			</File>
+			<File
+				RelativePath=".\DisplayScreenSupervisionInitRequest.h">
+			</File>
+			<File
+				RelativePath=".\DisplayScreenSupervisionRequest.cpp">
+			</File>
+			<File
+				RelativePath=".\DisplayScreenSupervisionRequest.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"

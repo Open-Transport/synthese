@@ -45,7 +45,7 @@ namespace synthese
 	{
 
 		std::vector<ConnectionPlaceWithBroadcastPoint> searchConnectionPlacesWithBroadcastPoints( 
-			std::string cityName /*= ""*/, std::string placeName /*= ""*/, int bpNumbers /*= UNKNOWN_VALUE*/
+			std::string cityName /*= ""*/, std::string placeName /*= ""*/, BroadcastPointsPresence bpPresence /*= UNKNOWN_VALUE*/
 			, uid lineId /*= UNKNOWN_VALUE*/, int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
 		{
 			stringstream query;
@@ -58,15 +58,16 @@ namespace synthese
 				<< " WHERE "
 				<< "c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'"
 				<< " AND p." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(placeName, false) << "%'";
-			if (bpNumbers != UNKNOWN_VALUE)
+			query << " GROUP BY p." << TABLE_COL_ID;
+			if (bpPresence != WITH_OR_WITHOU_ANY_BROADCASTPOINT)
 			{
-				query << " AND COUNT(b." << TABLE_COL_ID << ")";
-				if (bpNumbers == 1)
+				query << " HAVING COUNT(b." << TABLE_COL_ID << ")";
+				if (bpPresence == AT_LEAST_ONE_BROADCASTPOINT)
 					query << ">0";
-				if (bpNumbers == 0)
+				if (bpPresence == NO_BROADCASTPOINT)
 					query << "=0";
 			}
-			query << " GROUP BY p." << TABLE_COL_ID;
+
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

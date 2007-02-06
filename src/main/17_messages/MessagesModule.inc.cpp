@@ -1,5 +1,8 @@
 
 #include "17_messages/AlarmTableSync.h"
+#include "17_messages/TextTemplateTableSync.h"
+#include "17_messages/ScenarioTableSync.h"
+#include "17_messages/AlarmObjectLinkTableSync.h"
 #include "17_messages/MessagesAdmin.h"
 #include "17_messages/MessagesLibraryAdmin.h"
 #include "17_messages/MessagesRight.h"

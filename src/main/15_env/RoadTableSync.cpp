@@ -4,6 +4,7 @@
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 
+#include "15_env/EnvModule.h"
 #include "15_env/Road.h"
 #include "15_env/City.h"
 #include "15_env/Point.h"
@@ -90,12 +91,12 @@ RoadTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     Road* road = new synthese::env::Road (id, name, 
 					  city, 
 					  roadType);
-    road->setFare (environment.getFares ().get (fareId));
+	road->setFare (EnvModule::getFares ().get (fareId));
 //    road->setAlarm (environment.getAlarms ().get (alarmId));
-    road->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
-    road->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
-    road->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
-    road->setReservationRule (environment.getReservationRules ().get (reservationRuleId)); 
+	road->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
+	road->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
+	road->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
+	road->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId)); 
     
     environment.getRoads ().add (road);
     city->getRoadsMatcher ().add (road->getName (), road);
@@ -144,12 +145,12 @@ RoadTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
     road->setName (name);
     road->setType (roadType);
 
-    road->setFare (environment.getFares ().get (fareId));
+	road->setFare (EnvModule::getFares ().get (fareId));
 //    road->setAlarm (environment.getAlarms ().get (alarmId));
-    road->setBikeCompliance (environment.getBikeCompliances ().get (bikeComplianceId));
-    road->setHandicappedCompliance (environment.getHandicappedCompliances ().get (handicappedComplianceId));
-    road->setPedestrianCompliance (environment.getPedestrianCompliances ().get (pedestrianComplianceId));
-    road->setReservationRule (environment.getReservationRules ().get (reservationRuleId)); 
+	road->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
+	road->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
+	road->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
+	road->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId)); 
     
     city->getRoadsMatcher ().add (road->getName (), road);
 

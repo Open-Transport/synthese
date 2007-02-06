@@ -18,6 +18,12 @@ PedestrianCompliance::PedestrianCompliance (const uid& id,
 
 }
 
+PedestrianCompliance::PedestrianCompliance()
+: synthese::util::Registrable<uid,PedestrianCompliance> ()
+, Compliance ()
+{
+
+}
 
 PedestrianCompliance::~PedestrianCompliance()
 {

@@ -20,7 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DisplaySearchAdmin.h"
+#include "01_util/Html.h"
+
+#include "15_env/ConnectionPlace.h"
+
+#include "34_departures_table/DisplaySearchAdmin.h"
+#include "34_departures_table/AdvancedSelectTableSync.h"
 
 using namespace std;
 
@@ -29,16 +34,25 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
+	using namespace util;
 
 	namespace departurestable
 	{
-		/// @todo Verify the parent constructor parameters
+		const string DisplaySearchAdmin::PARAMETER_SEARCH_UID = "dsasuid";
+		const string DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION = "dsasloc";
+
 		DisplaySearchAdmin::DisplaySearchAdmin()
 			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) {}
 
 		void DisplaySearchAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
+			Request::ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_UID);
+			if (it != map.end())
+				_searchUid = it->second;
+
+			it = map.find(PARAMETER_SEARCH_LOCALIZATION);
+			if (it != map.end())
+				_searchLocalizationUid = it->second;
 		}
 
 		string DisplaySearchAdmin::getTitle() const
@@ -48,15 +62,18 @@ namespace synthese
 
 		void DisplaySearchAdmin::display(ostream& stream, const Request* request) const
 		{
-			stream
-				<< "<table><tr><td>UID</td><td><input type=\"text\" size=\"8\" name=\"Text2\" /></td>"
-				<< "<td>Emplacement</td><td><select name=\"Select1\">"
-				<< "<option value=\"\">(tous)</option>";
+			map<string, string> localizations;
+			localizations.insert(make_pair("", "(tous)"));
+			std::vector<ConnectionPlaceWithBroadcastPoint> bpv = searchConnectionPlacesWithBroadcastPoints("", "", AT_LEAST_ONE_BROADCASTPOINT);
+			for (vector<ConnectionPlaceWithBroadcastPoint>::const_iterator it = bpv.begin(); it != bpv.end(); ++it)
+				localizations.insert(make_pair(Conversion::ToString(it->place->getKey()), it->place->getFullName()));
+			
 
-			// List of places with broadcast points
-
 			stream
-				<< "</select></td><td>Ligne</td><td><select name=\"Select4\">"
+				<< "<table>"
+				<< "<tr><td>UID</td><td>" << Html::getTextInput(PARAMETER_SEARCH_UID, _searchUid) << "</td>"
+				<< "<td>Emplacement</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_LOCALIZATION, localizations, _searchLocalizationUid) << "</td>"
+				<< "<td>Ligne</td><td><select name=\"Select4\">"
 				<< "<option value=\"\">(toutes)</option>";
 
 			// List of lines

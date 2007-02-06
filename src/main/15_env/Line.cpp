@@ -1,9 +1,31 @@
+
+/** Line class implementation.
+	@file Line.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "Line.h"
 
 #include "Service.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
-
+#include "15_env/CommercialLine.h"
 
 namespace synthese
 {
@@ -21,17 +43,28 @@ Line::Line (const uid& id,
     , Path ()
     , _name (name)
     , _axis (axis)
-    , _network (0)
     , _rollingStockId (-1)
     , _isWalkingLine (false)
     , _useInDepartureBoards (true)
     , _useInTimetables (true)
     , _useInRoutePlanning (true)
-    , _color (0, 0, 0)
+	, _commercialLine(NULL)
 {
 
 }
 
+Line::Line()
+: synthese::util::Registrable<uid,Line>()
+, Path ()
+, _rollingStockId (-1)
+, _isWalkingLine (false)
+, _useInDepartureBoards (true)
+, _useInTimetables (true)
+, _useInRoutePlanning (true)
+, _commercialLine(NULL)
+{
+
+}
 
 
 
@@ -138,58 +171,6 @@ Line::setDirection (const std::string& direction)
 
 
 
-
-const std::string& 
-Line::getImage () const
-{
-    return _image;
-}
-
-
-
-void 
-Line::setImage (const std::string& image)
-{
-    _image = image;
-}
-
-
-
-
-const std::string& 
-Line::getShortName () const
-{
-    return _shortName;
-}
-
-
-
-void 
-Line::setShortName (const std::string& shortName)
-{
-    _shortName = shortName;
-}
-
-
-
-	
-const std::string& 
-Line::getLongName () const
-{
-    return _longName;
-}
-
-
-
-void 
-Line::setLongName (const std::string& longName)
-{
-    _longName = longName;
-}
-
-
-
-
 const std::string& 
 Line::getTimetableName () const
 {
@@ -211,37 +192,9 @@ Line::setTimetableName (const std::string& timetableName)
 const TransportNetwork* 
 Line::getNetwork () const
 {
-    return _network;
+    return _commercialLine->getNetwork();
 }
 
-
-
-void 
-Line::setNetwork (TransportNetwork* network)
-{
-    _network = network;
-}
-
-
-
-    
-const std::string& 
-Line::getStyle () const
-{
-    return _style;
-}
-
-
-
-void 
-Line::setStyle (const std::string& style)
-{
-    _style = style;
-}
-
-
-
-	
 
 
 const uid&
@@ -264,16 +217,6 @@ Line::setRollingStockId (const uid& rollingStockId)
 
 
 
-
-
-
-
-
-
-
-
-
-
 void
 Line::setWalkingLine (bool isWalkingLine)
 {
@@ -287,28 +230,6 @@ Line::getWalkingLine () const
 {
     return _isWalkingLine;
 }
-
-
-
-
-
-
-
-
-const synthese::util::RGBColor& 
-Line::getColor () const
-{
-    return _color;
-}
-
-
-
-void 
-Line::setColor (const synthese::util::RGBColor& color)
-{
-    _color = color;
-}
-
 
 
 bool 
@@ -340,6 +261,10 @@ PhysicalStop* Line::getDestination() const
 	return (PhysicalStop*) edge->getFromVertex();
 }
 
+void Line::setAxis( const Axis* axis )
+{
+	_axis = axis;
+}
 
 }
 }

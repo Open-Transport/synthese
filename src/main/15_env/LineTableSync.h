@@ -1,82 +1,112 @@
-#ifndef SYNTHESE_ENVLSSQL_LINETABLESYNC_H
-#define SYNTHESE_ENVLSSQL_LINETABLESYNC_H
+
+/** LineTableSync class header.
+	@file LineTableSync.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#ifndef SYNTHESE_LineTableSync_H__
+#define SYNTHESE_LineTableSync_H__
 
 
+#include <vector>
 #include <string>
 #include <iostream>
 
-#include "ComponentTableSync.h"
-
-
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
+	namespace env
+	{
+		class Line;
 
-namespace env
-{
-    class LineTableSync;
+		/** Line table synchronizer.
+			@ingroup m15
 
-/** Line SQLite table synchronizer.
-	@ingroup m15
-*/
-class LineTableSync : public ComponentTableSync
-{
- public:
+		Lines table :
+			- on insert : 
+			- on update : 
+			- on delete : X
+		*/
+		class LineTableSync : public db::SQLiteTableSyncTemplate<Line>
+		{
+		public:
+			static const std::string COL_AXISID;
+			static const std::string COL_COMMERCIAL_LINE_ID;
+			static const std::string COL_NAME;
+			static const std::string COL_TIMETABLENAME;
+			static const std::string COL_DIRECTION;
+			static const std::string COL_ISWALKINGLINE;
+			static const std::string COL_USEINDEPARTUREBOARDS;
+			static const std::string COL_USEINTIMETABLES;
+			static const std::string COL_USEINROUTEPLANNING;
+			static const std::string COL_ROLLINGSTOCKID;
+			static const std::string COL_FAREID;
+			static const std::string COL_ALARMID;
+			static const std::string COL_BIKECOMPLIANCEID;
+			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
+			static const std::string COL_PEDESTRIANCOMPLIANCEID;
+			static const std::string COL_RESERVATIONRULEID;
 
-    LineTableSync ();
-    ~LineTableSync ();
-
- protected:
-
-    void doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-		synthese::env::Environment& target);
-
-    void doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
-		    synthese::env::Environment& target);
-
-    void doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
-		   synthese::env::Environment& target);
-
-
- private:
-
-};
-
-
-/** Lines table :
-- on insert : 
-- on update : 
-- on delete : X
-*/
-static const std::string LINES_TABLE_NAME ("t009_lines");
-static const std::string LINES_TABLE_COL_TRANSPORTNETWORKID ("transport_network_id");
-static const std::string LINES_TABLE_COL_AXISID ("axis_id");
-// 	    static const std::string LINES_TABLE_COL_CALENDARID ("calendar_id");   // Non car calculé
-static const std::string LINES_TABLE_COL_NAME ("name");
-static const std::string LINES_TABLE_COL_SHORTNAME ("short_name");
-static const std::string LINES_TABLE_COL_LONGNAME ("long_name");
-static const std::string LINES_TABLE_COL_COLOR ("color");
-static const std::string LINES_TABLE_COL_STYLE ("style");
-static const std::string LINES_TABLE_COL_IMAGE ("image");
-static const std::string LINES_TABLE_COL_TIMETABLENAME ("timetable_name");
-static const std::string LINES_TABLE_COL_DIRECTION ("direction");
-static const std::string LINES_TABLE_COL_ISWALKINGLINE ("is_walking_line");
-static const std::string LINES_TABLE_COL_USEINDEPARTUREBOARDS ("use_in_departure_boards");
-static const std::string LINES_TABLE_COL_USEINTIMETABLES ("use_in_timetables");
-static const std::string LINES_TABLE_COL_USEINROUTEPLANNING ("use_in_routeplanning");
-static const std::string LINES_TABLE_COL_ROLLINGSTOCKID ("rolling_stock_id");
-static const std::string LINES_TABLE_COL_FAREID ("fare_id");
-static const std::string LINES_TABLE_COL_ALARMID ("alarm_id");
-static const std::string LINES_TABLE_COL_BIKECOMPLIANCEID ("bike_compliance_id");
-static const std::string LINES_TABLE_COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-static const std::string LINES_TABLE_COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-static const std::string LINES_TABLE_COL_RESERVATIONRULEID ("reservation_rule_id");
+			LineTableSync();
+			~LineTableSync();
 
 
+			/** Line search.
+				(other search parameters)
+				@param first First Line object to answer
+				@param number Number of Line objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return vector<Line*> Founded Line objects.
+				@author Hugues Romain
+				@date 2006
+			*/
+			static std::vector<Line*> search(
+				// other search parameters ,
+				int first = 0, int number = 0);
 
 
+		protected:
+
+			/** Action to do on Line creation.
+				This method loads a new object in ram.
+			*/
+			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
+
+			/** Action to do on Line creation.
+				This method updates the corresponding object in ram.
+			*/
+			void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
+
+			/** Action to do on Line deletion.
+				This method deletes the corresponding object in ram and runs 
+				all necessary cleaning actions.
+			*/
+			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
+
+		};
+	}
 }
 
-}
-#endif
-
+#endif // SYNTHESE_LineTableSync_H__

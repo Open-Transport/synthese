@@ -20,6 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "01_util/Html.h"
+
 #include "02_db/DBEmptyResultException.h"
 
 #include "12_security/Profile.h"
@@ -35,6 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace admin;
 	using namespace db;
+	using namespace util;
 
 	namespace security
 	{
@@ -56,8 +59,8 @@ namespace synthese
 
 		void ProfileAdmin::display(std::ostream& stream, const Request* request) const
 		{
-/*			stream
-				<< "<P>Nom : <INPUT id="Text2" type="text" value="RL 14 41" name="Text2"><INPUT id="Button2" type="button" value="Modifier" name="Button7"></P>"
+			stream	// UpdateProfile
+				<< "<p>Nom : " << Html::getTextInput("", "") << Html::getSubmitButton("Modifier") << "</p>"
 				<< "<P>Habilitations du profil&nbsp;:</P>"
 				<< "<P>"
 				<< "<TABLE><TR>"
@@ -67,7 +70,7 @@ namespace synthese
 				<< "<TD align=\"center\" style=\"WIDTH: 94px\"><STRONG><FONT color=\"#000000\" size=\"2\">Droit</FONT></STRONG></TD>"
 				<< "<TD align=\"center\" colSpan=\"1\" rowSpan=\"1\"><STRONG><FONT size=\"2\" color=\"#000000\">Actions</FONT></STRONG></TD>"
 				<< "</TR>";
-*/
+
 			// Habilitations list
 /*				<< "<tr><TD style=\"WIDTH: 140px\"><FONT color=\"#000000\" size=\"1\">Tout</FONT></TD>"
 				<< "<TD style=\"WIDTH: 82px\"><FONT color=\"#000000\" size=\"1\">Tout</FONT></TD>"

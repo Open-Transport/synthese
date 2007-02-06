@@ -53,7 +53,7 @@ namespace synthese
 
 		BroadcastPointsAdmin::BroadcastPointsAdmin()
 			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) 
-			, _displayNumber(-1), _number(50), _first(0)
+			, _displayNumber(WITH_OR_WITHOU_ANY_BROADCASTPOINT), _number(50), _first(0)
 		{}
 
 		void BroadcastPointsAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
@@ -68,7 +68,7 @@ namespace synthese
 
 			it = map.find(PARAMETER_DISPLAY_NUMBER);
 			if (it != map.end())
-				_displayNumber = Conversion::ToInt(it->second);
+				_displayNumber = (BroadcastPointsPresence) Conversion::ToInt(it->second);
 
 			it = map.find(PARAMETER_LINE_ID);
 			if (it != map.end())
@@ -98,15 +98,15 @@ namespace synthese
 			goRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
 
 			map<int, string> m;
-			m.insert(make_pair(-1, "(filtre désactivé)"));
-			m.insert(make_pair(1, "Au moins un"));
-			m.insert(make_pair(0, "Aucun"));
+			m.insert(make_pair((int) WITH_OR_WITHOU_ANY_BROADCASTPOINT, "(filtre désactivé)"));
+			m.insert(make_pair((int) AT_LEAST_ONE_BROADCASTPOINT, "Au moins un"));
+			m.insert(make_pair((int) NO_BROADCASTPOINT, "Aucun"));
 
 			stream
 				<< "<table>"
 				<< "<tr><td>Commune</td><td>" << Html::getTextInput(PARAMETER_CITY_NAME, _cityName) << "</td>"
 				<< "<td>Nom</td><td>" << Html::getTextInput(PARAMETER_PLACE_NAME, _placeName) << "</td>"
-				<< "<td>Terminaux d'affichage</td><td>" << Html::getSelectInput(PARAMETER_DISPLAY_NUMBER, m, _displayNumber) << "</td></tr>"
+				<< "<td>Terminaux d'affichage</td><td>" << Html::getSelectInput(PARAMETER_DISPLAY_NUMBER, m, (int) _displayNumber) << "</td></tr>"
 				<< "<tr><td>Ligne</td><td></td>"	// Lines list
 				<< "<td colspan=\"4\">" << Html::getSubmitButton("Rechercher") << "</td></tr>"
 				<< "</table>"

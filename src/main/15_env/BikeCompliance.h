@@ -32,6 +32,7 @@ public:
     BikeCompliance (const uid& id, 
 		    const boost::logic::tribool& compliant,
 		    const int& capacity);
+	BikeCompliance();
 
     ~BikeCompliance();
 

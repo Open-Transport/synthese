@@ -20,7 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "MessagesScenarioAdmin.h"
+#include "01_util/Html.h"
+
+#include "17_messages/MessagesScenarioAdmin.h"
+#include "17_messages/Scenario.h"
 
 using namespace std;
 
@@ -29,6 +32,7 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
+	using namespace util;
 
 	namespace messages
 	{
@@ -49,7 +53,30 @@ namespace synthese
 
 		void MessagesScenarioAdmin::display(ostream& stream, const Request* request) const
 		{
-			/// @todo Implement the display by streaming the output to the stream variable
+			stream
+				<< "<P>Nom : " << Html::getTextInput("", _scenario->getName()) << Html::getSubmitButton("Modifier") << "</P>"
+				<< "<h1>Messages</h1>"
+				<< "<table>"
+				<< "<tr><th>Sel</th><th>Message</th><th>Emplacement</th>Actions</th></tr>";
+
+			// Messages loop
+			{
+				stream
+					<< "<TR>"
+					<< "<TD><INPUT id=\"Radio2\" type=\"radio\" value=\"Radio2\" name=\"RadioGroup\"></TD>"
+					<< "<TD>Le métro est interrompu...</TD>"
+					<< "<TD>TOULOUSE Matabiau</TD>"
+					<< "<td>" << Html::getSubmitButton("Modifier") << Html::getSubmitButton("Supprimer") << "</td>"
+					<< "</TR>";
+			}
+
+			stream
+				<< "<TR>"
+				<< "<TD colSpan=\"3\">(sélectionnez un&nbsp;message existant pour créer une copie)</TD>"
+				<< "<TD>" << Html::getSubmitButton("Ajouter") << "</TD>"
+				<< "</tr>"
+				<< "</TABLE>";
+
 		}
 	}
 }

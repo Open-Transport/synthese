@@ -2,6 +2,7 @@
 
 namespace synthese
 {
+	using namespace util;
 namespace env
 {
 
@@ -16,6 +17,11 @@ Fare::Fare (const uid& id,
 {
 }
 
+Fare::Fare()
+: Registrable<uid, Fare>()
+{
+
+}
 
 
 Fare::~Fare ()

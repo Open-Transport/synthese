@@ -220,5 +220,10 @@ namespace synthese
 			_maintenanceMessage = message;
 		}
 
+		void DisplayScreen::display( std::ostream& stream ) const
+		{
+			
+		}
+
 	}
 }

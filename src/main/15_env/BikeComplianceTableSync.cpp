@@ -1,129 +1,182 @@
-#include "BikeComplianceTableSync.h"
+
+/** BikeComplianceTableSync class implementation.
+	@file BikeComplianceTableSync.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include <sstream>
 
 #include "01_util/Conversion.h"
+
+#include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLiteException.h"
 
 #include "15_env/BikeCompliance.h"
+#include "15_env/BikeComplianceTableSync.h"
+#include "15_env/EnvModule.h"
 
-#include <sqlite/sqlite3.h>
-#include <boost/logic/tribool.hpp>
-#include <assert.h>
-
-
+using namespace std;
 using boost::logic::tribool;
-
-using synthese::util::Conversion;
-using synthese::db::SQLiteResult;
 
 namespace synthese
 {
 	using namespace db;
+	using namespace util;
+	using namespace env;
 
-namespace env
-{
+	namespace db
+	{
+		template<> const std::string SQLiteTableSyncTemplate<BikeCompliance>::TABLE_NAME = "t020_bike_compliances";
+		template<> const int SQLiteTableSyncTemplate<BikeCompliance>::TABLE_ID = 20;
+		template<> const bool SQLiteTableSyncTemplate<BikeCompliance>::HAS_AUTO_INCREMENT = true;
 
+		template<> void SQLiteTableSyncTemplate<BikeCompliance>::load(BikeCompliance* cmp, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		{
+			cmp->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
 
+			tribool status = true;
+			int statusInt (
+				Conversion::ToInt (rows.getColumn (rowIndex, BikeComplianceTableSync::COL_STATUS)));
+			if (statusInt < 0)
+			{
+				status = boost::logic::indeterminate;
+			}
+			else if (statusInt == 0)
+			{
+				status = false;
+			}
 
-BikeComplianceTableSync::BikeComplianceTableSync ()
-: ComponentTableSync (BIKECOMPLIANCES_TABLE_NAME, true, true, db::TRIGGERS_ENABLED_CLAUSE)
-{
-    addTableColumn (BIKECOMPLIANCES_TABLE_COL_STATUS, "INTEGER");
-    addTableColumn (BIKECOMPLIANCES_TABLE_COL_CAPACITY, "INTEGER");
-}
+			int capacity (
+				Conversion::ToInt (rows.getColumn (rowIndex, BikeComplianceTableSync::COL_CAPACITY)));
 
+			cmp->setCompliant (status);
+			cmp->setCapacity (capacity);
+		}
 
+		template<> void SQLiteTableSyncTemplate<BikeCompliance>::save(BikeCompliance* object)
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			if (object->getKey() > 0)
+			{
+				query
+					<< "UPDATE " << TABLE_NAME << " SET "
+					/// @todo fill fields [,]FIELD=VALUE
+					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
+			}
+			else
+			{
+				object->setKey(getId(1,1));
+                query
+					<< " INSERT INTO " << TABLE_NAME << " VALUES("
+					<< Conversion::ToString(object->getKey())
+					/// @todo fill other fields separated by ,
+					<< ")";
+			}
+			sqlite->execUpdate(query.str());
+		}
 
-BikeComplianceTableSync::~BikeComplianceTableSync ()
-{
+	}
 
-}
+	namespace env
+	{
+		const std::string BikeComplianceTableSync::COL_STATUS ("status");
+		const std::string BikeComplianceTableSync::COL_CAPACITY ("capacity");
 
-    
+		BikeComplianceTableSync::BikeComplianceTableSync()
+			: SQLiteTableSyncTemplate<BikeCompliance>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+		{
+			addTableColumn(TABLE_COL_ID, "INTEGER", false);
+			addTableColumn (COL_STATUS, "INTEGER");
+			addTableColumn (COL_CAPACITY, "INTEGER");
+		}
 
+		void BikeComplianceTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				BikeCompliance* object = new BikeCompliance();
+				load(object, rows, i);
+				EnvModule::getBikeCompliances().add(object);
+			}
+		}
 
-void 
-BikeComplianceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-		      synthese::env::Environment& environment)
-{
-    uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+		void BikeComplianceTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (EnvModule::getBikeCompliances().contains(id))
+				{
+					BikeCompliance* object = EnvModule::getBikeCompliances().get(id);
+					load(object, rows, i);
+				}
+			}
+		}
 
-    if (environment.getBikeCompliances ().contains (id)) return;
-    
-    tribool status = true;
-    int statusInt (
-	Conversion::ToInt (rows.getColumn (rowIndex, BIKECOMPLIANCES_TABLE_COL_STATUS)));
-    if (statusInt < 0)
-    {
-	status = boost::logic::indeterminate;
-    }
-    else if (statusInt == 0)
-    {
-	status = false;
-    }
-    
-    int capacity (
-	Conversion::ToInt (rows.getColumn (rowIndex, BIKECOMPLIANCES_TABLE_COL_CAPACITY)));
-    
-    synthese::env::BikeCompliance* cmp = new synthese::env::BikeCompliance (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)),
-	status, capacity);
-    
-    environment.getBikeCompliances ().add (cmp);
-}
+		void BikeComplianceTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (EnvModule::getBikeCompliances().contains(id))
+				{
+					EnvModule::getBikeCompliances().remove(id);
+				}
+			}
+		}
 
+		std::vector<BikeCompliance*> BikeComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE " 
+				/// @todo Fill Where criteria
+				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+				;
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
 
-
-void 
-BikeComplianceTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
-			  synthese::env::Environment& environment)
-{
-    uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-    synthese::env::BikeCompliance* cmp = 
-	environment.getBikeCompliances ().get (id);
-
-    tribool status = true;
-    int statusInt (
-	Conversion::ToInt (rows.getColumn (rowIndex, BIKECOMPLIANCES_TABLE_COL_STATUS)));
-    if (statusInt < 0)
-    {
-	status = boost::logic::indeterminate;
-    }
-    else if (statusInt == 0)
-    {
-	status = false;
-    }
-    
-    int capacity (
-	Conversion::ToInt (rows.getColumn (rowIndex, BIKECOMPLIANCES_TABLE_COL_CAPACITY)));
-    
-    cmp->setCompliant (status);
-    cmp->setCapacity (capacity);
-}
-
-
-
-void 
-BikeComplianceTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
-			 synthese::env::Environment& environment)
-{
-    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-    environment.getBikeCompliances ().remove (id);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
+			try
+			{
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<BikeCompliance*> objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					BikeCompliance* object = new BikeCompliance();
+					load(object, result, i);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
+	}
 }
 

@@ -25,12 +25,10 @@
 
 #include "01_util/Conversion.h"
 
-using synthese::util::Conversion;
-
-
-
 namespace synthese
 {
+	using namespace util;
+
 	namespace time
 	{
 
@@ -468,6 +466,15 @@ namespace synthese
 			return _date.toString() + " " + _hour.toString();
 		}
 
+		DateTime DateTime::FromInternalString( const std::string& str )
+		{
+			return DateTime (Conversion::ToInt (str.substr (6, 2)),
+				Conversion::ToInt (str.substr (4, 2)),
+				Conversion::ToInt (str.substr (0, 4)),
+				Conversion::ToInt (str.substr (8, 2)),
+				Conversion::ToInt (str.substr (10, 2)));
+
+		}
 	}
 }
 

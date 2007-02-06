@@ -41,11 +41,13 @@ namespace synthese
 		class BroadcastPoint;
 
 		typedef struct { const env::ConnectionPlace* place; int broadCastPointsNumber; } ConnectionPlaceWithBroadcastPoint;
+		typedef enum { AT_LEAST_ONE_BROADCASTPOINT, NO_BROADCASTPOINT, WITH_OR_WITHOU_ANY_BROADCASTPOINT } BroadcastPointsPresence;
 
 		/** Connection place searcher.
+			@param _bpNumbers Filter on broadcast points number : 0 = no broadcast points, 1 = at least one broadcast point
 			@result vector of the founded searched connection places from the live data objects (do not delete the objects after use). 
 		*/
-		std::vector<ConnectionPlaceWithBroadcastPoint> searchConnectionPlacesWithBroadcastPoints(std::string cityName = "", std::string placeName = "", int _bpNumbers = UNKNOWN_VALUE, uid lineId = UNKNOWN_VALUE, int number=UNKNOWN_VALUE, int first=0);
+		std::vector<ConnectionPlaceWithBroadcastPoint> searchConnectionPlacesWithBroadcastPoints(std::string cityName = "", std::string placeName = "", BroadcastPointsPresence bpPresence = WITH_OR_WITHOU_ANY_BROADCASTPOINT, uid lineId = UNKNOWN_VALUE, int number=UNKNOWN_VALUE, int first=0);
 
 		typedef struct { const env::PhysicalStop* stop; BroadcastPoint* bp; } PhysicalStopAndBroadcastPoint;
 

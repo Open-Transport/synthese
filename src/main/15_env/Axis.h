@@ -37,6 +37,7 @@ namespace synthese
 			Axis (const uid& id,
 			const std::string& name,
 			bool free = true, bool allowed = false);
+			Axis();
 			~Axis ();
 
 			//! @name Getters/Setters
