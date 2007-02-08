@@ -24,8 +24,13 @@
 
 #include "15_env/ConnectionPlace.h"
 
+#include "32_admin/AdminRequest.h"
+
 #include "34_departures_table/DisplaySearchAdmin.h"
 #include "34_departures_table/AdvancedSelectTableSync.h"
+#include "34_departures_table/CreateDisplayScreenAction.h"
+#include "34_departures_table/DisplayAdmin.h"
+
 
 using namespace std;
 
@@ -62,6 +67,13 @@ namespace synthese
 
 		void DisplaySearchAdmin::display(ostream& stream, const Request* request) const
 		{
+			AdminRequest* createDisplayRequest = Factory<Request>::create<AdminRequest>();
+			createDisplayRequest->copy(request);
+			createDisplayRequest->setAction(Factory<Action>::create<CreateDisplayScreenAction>());
+			createDisplayRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			createDisplayRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<DisplaySearchAdmin>());
+
+
 			map<string, string> localizations;
 			localizations.insert(make_pair("", "(tous)"));
 			std::vector<ConnectionPlaceWithBroadcastPoint> bpv = searchConnectionPlacesWithBroadcastPoints("", "", AT_LEAST_ONE_BROADCASTPOINT);
@@ -124,8 +136,12 @@ namespace synthese
 			stream
 				<< "<TR><TD>&nbsp;</TD><TD colSpan=\"4\">"
 				<< "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel afficheur)"
-				<< "</TD><TD></TD><TD>"
-				<< "<INPUT type=\"button\" value=\"Créer un nouvel afficheur\" name=\"Créer un nouvel afficheur\"></TD>";
+				<< "</TD><TD></TD>"
+				<< "<td>" << createDisplayRequest->getHTMLFormHeader("add")
+				<< Html::getSubmitButton("Créer un nouvel afficheur")
+				<< "</form></td>";
+
+			delete createDisplayRequest;
 		}
 	}
 }

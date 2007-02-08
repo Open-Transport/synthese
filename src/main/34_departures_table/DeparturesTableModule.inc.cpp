@@ -17,3 +17,5 @@
 #include "34_departures_table/BroadcastPointsDataLog.h"
 #include "34_departures_table/DisplayMaintenanceLog.h"
 #include "34_departures_table/DisplayScreenAlarmRecipient.h"
+#include "34_departures_table/CreateDisplayScreenAction.h"
+#include "34_departures_table/DisplayAdmin.h"

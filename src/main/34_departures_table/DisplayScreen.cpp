@@ -35,11 +35,18 @@ namespace synthese
 	{
 		DisplayScreen::DisplayScreen()
 			: Registrable<uid, DisplayScreen>()
+			, _direction(DISPLAY_DEPARTURES)
+			, _generationMethod(STANDARD_METHOD)
 			, _originsOnly(WITH_PASSING)
 			, _localization(NULL)
 			, _destinationForceDelay(120)	// default = 2 hours
 			, _maxDelay(24 * 60)			// default = 24 hours
 			, _displayType(NULL)
+			, _wiringCode(0)
+			, _blinkingDelay(1)
+			, _clearingDelay(0)
+			, _firstRow(0)
+			, _maintenanceChecksPerDay(24 * 60)		// default = 1 check per minute
 		{
 		}
 
@@ -223,6 +230,106 @@ namespace synthese
 		void DisplayScreen::display( std::ostream& stream ) const
 		{
 			
+		}
+
+		int DisplayScreen::getWiringCode() const
+		{
+			return _wiringCode;
+		}
+
+		int DisplayScreen::getClearingDelay() const
+		{
+			return _clearingDelay;
+		}
+
+		bool DisplayScreen::getServiceNumberDisplay() const
+		{
+			return _serviceNumberDisplay;
+		}
+
+		bool DisplayScreen::getTrackNumberDisplay() const
+		{
+			return _trackNumberDisplay;
+		}
+
+		synthese::DeparturesTableDirection DisplayScreen::getDirection() const
+		{
+			return _direction;
+		}
+
+		synthese::EndFilter DisplayScreen::getEndFilter() const
+		{
+			return _originsOnly;
+		}
+
+		int DisplayScreen::getMaxDelay() const
+		{
+			return _maxDelay;
+		}
+
+		int DisplayScreen::getBlinkingDelay() const
+		{
+			return _blinkingDelay;
+		}
+
+		const PhysicalStopsList& DisplayScreen::getPhysicalStops() const
+		{
+			return _physicalStops;
+		}
+
+		const ForbiddenPlacesList& DisplayScreen::getForbiddenPlaces() const
+		{
+			return _forbiddenArrivalPlaces;
+		}
+
+		const LineFilter& DisplayScreen::getForbiddenLines() const
+		{
+			return _forbiddenLines;
+		}
+
+		const DisplayedPlacesList& DisplayScreen::getDisplayedPlaces() const
+		{
+			return _displayedPlaces;
+		}
+
+		int DisplayScreen::getFirstRow() const
+		{
+			return _firstRow;
+		}
+
+		DisplayScreen::GenerationMethod DisplayScreen::getGenerationMethod() const
+		{
+			return _generationMethod;
+		}
+
+		const DisplayedPlacesList& DisplayScreen::getForcedDestinations() const
+		{
+			return _forcedDestinations;
+		}
+
+		int DisplayScreen::getForceDestinationDelay() const
+		{
+			return _destinationForceDelay;
+		}
+
+		int DisplayScreen::getMaintenananceChecksPerDay() const
+		{
+			return _maintenanceChecksPerDay;
+		}
+
+		bool DisplayScreen::getIsOnline() const
+		{
+			return _maintenanceIsOnline;
+		}
+
+		const std::string& DisplayScreen::getMaintenanceMessage() const
+		{
+			return _maintenanceMessage;
+		}
+
+		const DisplayType* DisplayScreen::getType() const
+		{
+			return _displayType;
 		}
 
 	}

@@ -57,6 +57,7 @@ namespace synthese
 			~AdminRequest();
 
 			void setPage(const AdminInterfaceElement* aie);
+			void setActionFailedPage(const AdminInterfaceElement* aie);
 			const AdminInterfaceElement* getPage() const;
 
 			/** Action to run, defined by each subclass.

@@ -58,6 +58,8 @@ namespace synthese
 			ParametersMap map;
 			map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
 			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_object_id)));
+			if (_actionFailedPage != NULL)
+				map.insert(make_pair(PARAMETER_ACTION_FAILED_PAGE, _actionFailedPage->getFactoryKey()));
 			return map;
 		}
 
@@ -139,6 +141,8 @@ namespace synthese
 			_page = aie;
 		}
 
+		
+
 		std::string AdminRequest::getHTMLFormHeader( const std::string& name ) const
 		{
 			stringstream s;
@@ -161,6 +165,10 @@ namespace synthese
 				it->second = value;
 		}
 
+		void AdminRequest::setActionFailedPage( const AdminInterfaceElement* aie )
+		{
+			_actionFailedPage = aie;
+		}
 		
 	}
 }

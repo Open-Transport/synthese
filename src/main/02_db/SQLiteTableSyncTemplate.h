@@ -75,11 +75,20 @@ namespace synthese
 			static void load(T* obj, const db::SQLiteResult& rows, int rowId=0);
 			static void save(T* obj);
 			static T* get(uid key);
+			static T* createEmpty();
 
 			/// @todo See if the template can be used more 
 
 
 		};
+
+		template <class T>
+			T* synthese::db::SQLiteTableSyncTemplate<T>::createEmpty()
+		{
+			T* object = new T;
+			save(object);
+			return object;
+		}
 
 		template <class T>
 			T* synthese::db::SQLiteTableSyncTemplate<T>::get(uid key)

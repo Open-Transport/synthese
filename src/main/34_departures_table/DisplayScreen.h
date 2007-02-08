@@ -169,10 +169,29 @@ namespace synthese
 
 			//!	\name Getters
 			//@{
-				const BroadcastPoint*			getLocalization()	const;
-				const std::string&				getLocalizationComment()	const;
-				
-				const std::string&				getTitle()			const;
+				const BroadcastPoint*			getLocalization()				const;
+				const std::string&				getLocalizationComment()		const;
+				const DisplayType*				getType()						const;				
+				int								getWiringCode()					const;
+				const std::string&				getTitle()						const;
+				int								getBlinkingDelay()				const;
+				bool							getTrackNumberDisplay()			const;
+				bool							getServiceNumberDisplay()		const;
+				const PhysicalStopsList&		getPhysicalStops()				const;
+				const ForbiddenPlacesList&		getForbiddenPlaces()			const;
+				const LineFilter&				getForbiddenLines()				const;
+				DeparturesTableDirection		getDirection()					const;
+				EndFilter						getEndFilter()					const;
+				const DisplayedPlacesList&		getDisplayedPlaces()			const;
+				int								getMaxDelay()					const;
+				int								getClearingDelay()				const;
+				int								getFirstRow()					const;
+				GenerationMethod				getGenerationMethod()			const;
+				const DisplayedPlacesList&		getForcedDestinations()			const;
+				int								getForceDestinationDelay()		const;
+				int								getMaintenananceChecksPerDay()	const;
+				bool							getIsOnline()					const;
+				const std::string&				getMaintenanceMessage()			const;
 				
 			//@}
 

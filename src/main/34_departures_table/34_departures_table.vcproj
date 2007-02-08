@@ -254,10 +254,40 @@
 			Name="Actions"
 			Filter="">
 			<File
+				RelativePath=".\CreateBroadcastPointAction.cpp">
+			</File>
+			<File
+				RelativePath=".\CreateBroadcastPointAction.h">
+			</File>
+			<File
+				RelativePath=".\CreateDisplayScreenAction.cpp">
+			</File>
+			<File
+				RelativePath=".\CreateDisplayScreenAction.h">
+			</File>
+			<File
 				RelativePath=".\CreateDisplayTypeAction.cpp">
 			</File>
 			<File
 				RelativePath=".\CreateDisplayTypeAction.h">
+			</File>
+			<File
+				RelativePath=".\DeleteBroadcastPointAction.cpp">
+			</File>
+			<File
+				RelativePath=".\DeleteBroadcastPointAction.h">
+			</File>
+			<File
+				RelativePath=".\RenameBroadcastPointAction.cpp">
+			</File>
+			<File
+				RelativePath=".\RenameBroadcastPointAction.h">
+			</File>
+			<File
+				RelativePath=".\UpdateDisplayScreenAction.cpp">
+			</File>
+			<File
+				RelativePath=".\UpdateDisplayScreenAction.h">
 			</File>
 			<File
 				RelativePath=".\UpdateDisplayTypeAction.cpp">

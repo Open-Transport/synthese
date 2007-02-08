@@ -7,6 +7,7 @@ synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synth
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::departurestable::DisplayTypesAdmin>("displaytypes");
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::departurestable::BroadcastPointsAdmin>("broadcastpoints");
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::departurestable::BroadcastPointAdmin>("broadcastpoint");
+synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::departurestable::DisplayAdmin>("display");
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::departurestable::DisplayTypeTableSync>("34.00 Display Types");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::departurestable::BroadcastPointTableSync>("34.10 Broadcast points");
@@ -15,6 +16,7 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::depa
 
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateDisplayTypeAction>("createdisplaytype");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayTypeAction>("updatedisplaytype");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateDisplayScreenAction>("createdisplayscreen");
 
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::ArrivalDepartureTableRight>("ArrivalDepartureTable");
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::DisplayMaintenanceRight>("DisplayMaintenance");

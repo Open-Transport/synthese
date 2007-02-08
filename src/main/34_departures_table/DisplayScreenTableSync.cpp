@@ -98,22 +98,80 @@ namespace synthese
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE_NAME << " SET "
-					/// @todo fill fields [,]FIELD=VALUE
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
+			if (object->getKey() == 0)
 				object->setKey(getId(1,1));
-                query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					/// @todo fill other fields separated by ,
-					<< ")";
+
+            query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->getKey())
+				<< "," << (object->getLocalization() ? Conversion::ToString(object->getLocalization()->getKey()) : "0")
+				<< "," << Conversion::ToSQLiteString(object->getLocalizationComment())
+				<< "," << (object->getType() ? Conversion::ToString(object->getType()->getKey()) : "0")
+				<< "," << Conversion::ToString(object->getWiringCode())
+				<< "," << Conversion::ToSQLiteString(object->getTitle())
+				<< "," << Conversion::ToString(object->getBlinkingDelay())
+				<< "," << Conversion::ToString(object->getTrackNumberDisplay())
+				<< "," << Conversion::ToString(object->getServiceNumberDisplay())
+				<< ",'";
+
+			for (PhysicalStopsList::const_iterator itp = object->getPhysicalStops().begin(); itp != object->getPhysicalStops().end(); ++itp)
+			{
+				if (itp != object->getPhysicalStops().begin())
+					query << ",";
+				query << Conversion::ToString((*itp)->getKey());
 			}
+
+			query << "','";
+
+			for (ForbiddenPlacesList::const_iterator itf = object->getForbiddenPlaces().begin(); itf != object->getForbiddenPlaces().end(); ++itf)
+			{
+				if (itf != object->getForbiddenPlaces().begin())
+					query << ",";
+				query << Conversion::ToString((*itf)->getKey());
+			}
+
+			query << "','";
+
+			for (LineFilter::const_iterator itl = object->getForbiddenLines().begin(); itl != object->getForbiddenLines().end(); ++itl)
+			{
+				if (itl != object->getForbiddenLines().begin())
+					query << ",";
+				query << Conversion::ToString((*itl)->getKey());
+			}
+
+			query
+				<< "'," << Conversion::ToString((int) object->getDirection())
+				<< "," << Conversion::ToString((int) object->getEndFilter())
+				<< ",'";
+
+			for (DisplayedPlacesList::const_iterator itd = object->getDisplayedPlaces().begin(); itd != object->getDisplayedPlaces().end(); ++itd)
+			{
+				if (itd != object->getDisplayedPlaces().begin())
+					query << ",";
+				query << Conversion::ToString((*itd)->getKey());
+			}
+
+			query
+				<< "'," << Conversion::ToString(object->getMaxDelay())
+				<< "," << Conversion::ToString(object->getClearingDelay())
+				<< "," << Conversion::ToString(object->getFirstRow())
+				<< "," << Conversion::ToString((int) object->getGenerationMethod())
+				<< ",'";
+
+			for (itd = object->getForcedDestinations().begin(); itd != object->getForcedDestinations().end(); ++itd)
+			{
+				if (itd != object->getDisplayedPlaces().begin())
+					query << ",";
+				query << Conversion::ToString((*itd)->getKey());
+			}
+
+			query
+				<< "'," << Conversion::ToString(object->getForceDestinationDelay())
+				<< "," << Conversion::ToString(object->getMaintenananceChecksPerDay())
+				<< "," << Conversion::ToString(object->getIsOnline())
+				<< "," << Conversion::ToSQLiteString(object->getMaintenanceMessage())
+				<< ")";
+			
 			sqlite->execUpdate(query.str());
 		}
 
