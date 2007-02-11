@@ -35,5 +35,13 @@ namespace synthese
 		{
 		
 		}
+
+		DBLog::ColumnsNameVector ArrivalDepartureTableLog::getColumnNames() const
+		{
+			DBLog::ColumnsNameVector v;
+			v.push_back("Afficheur");
+			v.push_back("Action");
+			return v;
+		}
 	}
 }

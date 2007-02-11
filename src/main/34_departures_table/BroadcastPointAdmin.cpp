@@ -96,7 +96,7 @@ namespace synthese
 			}
 
 			vector<PhysicalStopAndBroadcastPoint> b = getConnectionPlaceBroadcastPointsAndPhysicalStops(_place->getKey(), false);
-			for (vector<PhysicalStopAndBroadcastPoint>::iterator bit = b.begin(); it != b.end(); ++it)
+			for (vector<PhysicalStopAndBroadcastPoint>::iterator bit = b.begin(); bit != b.end(); ++bit)
 			{
 				stream
 					<< "<tr><td>" << Html::getTextInput("", bit->bp->getName()) << "</td>"

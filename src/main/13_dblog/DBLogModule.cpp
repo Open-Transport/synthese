@@ -20,12 +20,28 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "01_util/Constants.h"
+
+#include "13_dblog/DBLogEntry.h"
 #include "DBLogModule.h"
+
+using namespace std;
 
 namespace synthese
 {
 	namespace dblog
 	{
 
+
+		map<int, std::string> DBLogModule::getEntryLevelLabels( bool withAll/*=false*/ )
+		{
+			map<int, std::string> m;
+			if (withAll)
+				m.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
+			m.insert(make_pair((int) DBLogEntry::DB_LOG_INFO, "Information"));
+			m.insert(make_pair((int) DBLogEntry::DB_LOG_WARNING, "Alerte"));
+			m.insert(make_pair((int) DBLogEntry::DB_LOG_ERROR, "Erreur"));
+			return m;
+		}
 	}
 }

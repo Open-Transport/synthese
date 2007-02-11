@@ -20,6 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "01_util/Conversion.h"
+
 #include "UpdateDisplayScreenAction.h"
 
 using namespace std;
@@ -27,6 +29,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
 	
 	namespace departurestable
 	{
@@ -55,15 +58,22 @@ namespace synthese
 
 		void UpdateDisplayScreenAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
-
-			// it = map.find(PARAMETER_xxx);
-			// if (it != map.end())
-			// {
-			//	_xxx = it->second;
-			//	map.erase(it);
-			// }
-
+			Request::ParametersMap::iterator it = map.find(PARAMETER_LOCALIZATION_COMMENT);
+			if (it != map.end())
+				_localizationComment = it->second;
+			it = map.find(PARAMETER_WIRING_CODE);
+			if (it != map.end())
+				_wiringCode = Conversion::ToInt(it->second);
+	/*		int							_wiringCode;
+			int							_blinkingDelay;
+			bool						_displayPlatform;
+			bool						_displayServiceNumber;
+			DeparturesTableDirection	_direction;
+			EndFilter					_endFilter;
+			int							_maxDelay;
+			bool						_activatePreselection;
+			int							_preselectionDelay;
+*/
 		}
 
 		void UpdateDisplayScreenAction::run()

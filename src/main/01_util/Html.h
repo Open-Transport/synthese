@@ -36,21 +36,35 @@ namespace synthese
 		class Html
 		{
 		public:
-			template<class K, class T>
-			static std::string getSelectInput(const std::string& name, const std::map<K, T>& choices, const K& value);
+			//! \name Basis Input fields
+			//@{
+				template<class K, class T>
+				static std::string getSelectInput(const std::string& name, const std::map<K, T>& choices, const K& value);
 
-			template<class K, class T>
-			static std::string getRadioInput(const std::string& name, const std::map<K, T>& choices, const K& value);
+				template<class K, class T>
+				static std::string getRadioInput(const std::string& name, const std::map<K, T>& choices, const K& value);
 
-			static std::string getSelectNumberInput(const std::string& name, int mini, int maxi, int value=UNKNOWN_VALUE);
+				static std::string getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping="");
 
-			static std::string getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping="");
+				static std::string getHiddenInput(const std::string& name, const std::string& value);
 
-			static std::string getHiddenInput(const std::string& name, const std::string& value);
+				static std::string getTextAreaInput(const std::string& name, const std::string& value, int rows, int cols);
 
-			static std::string getTextAreaInput(const std::string& name, const std::string& value, int rows, int cols);
+				static std::string getSubmitButton(const std::string& caption);
+			//@}
 
-			static std::string getSubmitButton(const std::string& caption);
+			//! \name Advanced Input fields
+			//@{
+				static std::string getSelectNumberInput(const std::string& name, int mini, int maxi, int value=UNKNOWN_VALUE, int step=1);
+
+				/** Oui Non radio input.
+					@param name Name of the field
+					@param value Value of the field
+					@return HTML input command
+					@todo integrate language parameter to internationalize the labels
+				*/
+				static std::string getOuiNonRadioInput(const std::string& name, bool value);
+			//@}
 
 			static std::string setFocus(const std::string& formName, const std::string& fieldName);
 

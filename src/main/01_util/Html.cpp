@@ -30,10 +30,10 @@ namespace synthese
 	{
 
 
-		std::string Html::getSelectNumberInput(const std::string& name, int mini, int maxi, int value/*=UNKNOWN_VALUE*/ )
+		std::string Html::getSelectNumberInput(const std::string& name, int mini, int maxi, int value/*=UNKNOWN_VALUE*/, int step )
 		{
 			std::map<int,int> m;
-			for (int i=mini; i<=maxi; ++i)
+			for (int i=mini; i<=maxi; i += step)
 				m.insert(std::make_pair(i,i));
 			return getSelectInput(name, m, value);
 		}
@@ -77,6 +77,14 @@ namespace synthese
 			s << "<textarea name=\"" << name << "\" rows=\"" << rows << "\" cols=\"" << cols << "\">" 
 				<< value << "</textarea>";
 			return s.str();
+		}
+
+		std::string Html::getOuiNonRadioInput( const std::string& name, bool value )
+		{
+			map<int, string> m;
+			m.insert(make_pair(0, "NON"));
+			m.insert(make_pair(1, "OUI"));
+			return getRadioInput(name, m, value ? 1 : 0);
 		}
 	}
 }

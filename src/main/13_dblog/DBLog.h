@@ -28,8 +28,15 @@
 
 #include "01_util/Factorable.h"
 
+#include "13_dblog/DBLogEntry.h"
+
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace dblog
 	{
 		/** Journal d'événements stocké en base de données (abstraite).
@@ -54,15 +61,20 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<std::string> ColumnsNameVector;
+			
 
+		protected:
+			void	write(DBLogEntry::Level level, const DBLogEntry::Content& content, security::User* user = NULL);
+
+		private:
 			const std::string _name;
 				
 		public:
 			DBLog(const std::string& name);
 
 			//static std::string getModuleName() = 0;
-			const std::string& getName();
-			//static ColumnsNameVector& getColumnNames() = 0;
+			const std::string& getName() const;
+			virtual ColumnsNameVector getColumnNames() const = 0;
 		};
 	}
 }

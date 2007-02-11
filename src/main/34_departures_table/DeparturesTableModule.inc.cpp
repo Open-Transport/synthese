@@ -19,3 +19,4 @@
 #include "34_departures_table/DisplayScreenAlarmRecipient.h"
 #include "34_departures_table/CreateDisplayScreenAction.h"
 #include "34_departures_table/DisplayAdmin.h"
+#include "34_departures_table/UpdateDisplayScreenAction.h"

@@ -39,6 +39,7 @@ namespace synthese
 		{
 		public:
 			MessagesLibraryLog();
+			DBLog::ColumnsNameVector getColumnNames() const;
 		};
 	}
 }

@@ -52,7 +52,9 @@ namespace synthese
 		std::string DisplayAdmin::getTitle() const
 		{
 			stringstream s;
-			s << "Afficheur " << _displayScreen->getLocalization()->getConnectionPlace()->getFullName() << "/" << _displayScreen->getLocalization()->getName();
+			s << "Afficheur ";
+			if (_displayScreen->getLocalization() != NULL)
+				s << _displayScreen->getLocalization()->getConnectionPlace()->getFullName() << "/" << _displayScreen->getLocalization()->getName();
 			if (_displayScreen->getLocalizationComment().size() > 0)
 				s << "/" << _displayScreen->getLocalizationComment();
 			return s.str();
@@ -208,7 +210,7 @@ namespace synthese
 
 		void DisplayAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
+			Request::ParametersMap::const_iterator it = map .find(Request::PARAMETER_OBJECT_ID);
 			if (it != map.end())
 				_displayScreen = DisplayScreenTableSync::get(Conversion::ToLongLong(it->second));
 		}

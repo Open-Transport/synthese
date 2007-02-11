@@ -24,7 +24,8 @@
 
 #include "30_server/RequestException.h"
 
-#include "DisplayScreenSupervisionRequest.h"
+#include "34_departures_table/DisplayScreenSupervisionRequest.h"
+#include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
 
@@ -35,19 +36,19 @@ namespace synthese
 
 	namespace departurestable
 	{
-		/// @todo Parameter names declarations
-		// eg const std::string AdminRequest::PARAMETER_PAGE = "rub";
+		const std::string DisplayScreenSupervisionRequest::PARAMETER_DISPLAY_SCREEN_ID = "tb";
+		const std::string DisplayScreenSupervisionRequest::PARAMETER_SUPERVISION_VALUES = "sv";
 		
-		/// @todo build of the attributes
 		DisplayScreenSupervisionRequest::DisplayScreenSupervisionRequest()
 			: Request(Request::NEEDS_SESSION)
+			, _displayScreen(NULL)
 		{}
 
 		Request::ParametersMap DisplayScreenSupervisionRequest::getParametersMap() const
 		{
 			Request::ParametersMap map;
-			/// @todo Map filling
-			// eg : map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
+			map.insert(make_pair(PARAMETER_DISPLAY_SCREEN_ID, Conversion::ToString(_displayScreen->getKey())));
+			map.insert(make_pair(PARAMETER_SUPERVISION_VALUES, _supervisionValue));
 			return map;
 		}
 
@@ -55,37 +56,32 @@ namespace synthese
 		{
 			Request::ParametersMap::const_iterator it;
 
-			/// @todo Parameters parsing
-			// eg
-			// it = map.find(PARAMETER_PAGE);
-			//try
-			//{
-			//	AdminInterfaceElement* page = (it == map.end())
-			//		? Factory<AdminInterfaceElement>::create<HomeAdmin>()
-			//		: Factory<AdminInterfaceElement>::create(it->second);
-			//	page->setFromParametersMap(map);
-			//	_page = page;
-			//}
-			//catch (FactoryException<AdminInterfaceElement> e)
-			//{
-			//	throw RequestException("Admin page " + it->second + " not found");
-			//}
+			it = map.find(PARAMETER_DISPLAY_SCREEN_ID);
+			if (it == map.end())
+				throw RequestException("Display screen not specified");
+			try
+			{
+				_displayScreen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
+			}
+			catch (FactoryException<DisplayScreen> e)
+			{
+				throw RequestException("Display screen " + it->second + " not found");
+			}
 
+			it = map.find(PARAMETER_SUPERVISION_VALUES);
+			if (it != map.end())
+				_supervisionValue = it->second;
 
-			// Parameters saving
-			//_parameters = map;
-			
 		}
 
 		void DisplayScreenSupervisionRequest::run( std::ostream& stream ) const
 		{
-			/// @todo Fill it
+			if (_displayScreen != NULL)
+				_displayScreen->recordSupervision(_supervisionValue);
 		}
 
 		DisplayScreenSupervisionRequest::~DisplayScreenSupervisionRequest()
 		{
-			/// @todo parsed parameters deletion
-			// eg : delete _page;
 		}
 	}
 }

@@ -50,6 +50,7 @@ namespace synthese
 		{
 		public:
 			DisplayMaintenanceLog();
+			DBLog::ColumnsNameVector getColumnNames() const;
 		};
 	}
 }

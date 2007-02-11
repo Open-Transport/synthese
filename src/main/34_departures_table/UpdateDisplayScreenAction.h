@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "34_departures_table/Types.h"
+
 namespace synthese
 {
 	namespace departurestable
@@ -48,7 +50,17 @@ namespace synthese
 			static const std::string PARAMETER_PRESELECTION_DELAY;
 
 		private:
-			/// @todo Attributes list
+			std::string					_localizationComment;
+			int							_wiringCode;
+			int							_blinkingDelay;
+			bool						_displayPlatform;
+			bool						_displayServiceNumber;
+			DeparturesTableDirection	_direction;
+			EndFilter					_endFilter;
+			int							_maxDelay;
+			bool						_activatePreselection;
+			int							_preselectionDelay;
+			
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

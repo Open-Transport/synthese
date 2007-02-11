@@ -22,6 +22,8 @@
 
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayType.h"
+#include "34_departures_table/DisplayMaintenanceLog.h"
+
 
 using namespace std;
 
@@ -30,6 +32,7 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace time;
+	using namespace dblog;
 
 	namespace departurestable
 	{
@@ -330,6 +333,12 @@ namespace synthese
 		const DisplayType* DisplayScreen::getType() const
 		{
 			return _displayType;
+		}
+
+		void DisplayScreen::recordSupervision( const std::string& supervisionValue ) const
+		{
+			DisplayMaintenanceLog* log = (DisplayMaintenanceLog*) Factory<DBLog>::create<DisplayMaintenanceLog>();
+			/// @todo implementation
 		}
 
 	}

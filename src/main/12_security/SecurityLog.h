@@ -50,6 +50,7 @@ namespace synthese
 		{
 		public:
 			SecurityLog();
+			DBLog::ColumnsNameVector getColumnNames() const;
 		};
 	}
 }

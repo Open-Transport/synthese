@@ -29,19 +29,20 @@ namespace synthese
 {
 	namespace departurestable
 	{
+		class DisplayScreen;
+
 		/** DisplayScreenSupervisionRequest class.
 			@ingroup m34
 		*/
 		class DisplayScreenSupervisionRequest : public server::Request
 		{
-			/// @todo request parameter names declaration
-			// eg : static const std::string PARAMETER_xxx;
+			static const std::string PARAMETER_DISPLAY_SCREEN_ID;
+			static const std::string PARAMETER_SUPERVISION_VALUES;
 			
 			//! \name Page parameters
 			//@{
-				/// @todo Parsed parameters declaration
-				// eg : const void*	_object;
-				// eg : ParametersMap			_parameters;
+				const DisplayScreen*	_displayScreen;
+				std::string				_supervisionValue;
 			//@}
 
 

@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_DBLogModule_H__
 #define SYNTHESE_DBLogModule_H__
 
+#include <map>
+
 #include "01_util/ModuleClass.h"
 
 namespace synthese
@@ -31,7 +33,8 @@ namespace synthese
 	{
 		class DBLogModule : public util::ModuleClass
 		{
-
+		public:
+			static std::map<int, std::string> getEntryLevelLabels(bool withAll=false);
 		};
 	}
 }

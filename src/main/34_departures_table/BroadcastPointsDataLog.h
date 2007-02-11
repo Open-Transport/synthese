@@ -45,6 +45,7 @@ namespace synthese
 		{
 		public:
 			BroadcastPointsDataLog();
+			DBLog::ColumnsNameVector getColumnNames() const;
 		};
 	}
 }

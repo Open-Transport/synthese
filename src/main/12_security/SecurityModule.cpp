@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "01_util/Factory.h"
+#include "01_util/Constants.h"
 
 #include "12_security/ProfileTableSync.h"
 #include "12_security/UserTableSync.h"
@@ -83,11 +84,27 @@ namespace synthese
 			return m;
 		}
 
-		std::map<uid, std::string> SecurityModule::getProfileLabels( int first/*=0*/, int last/*=-1*/ )
+		std::map<uid, std::string> SecurityModule::getProfileLabels(bool withAll, int first/*=0*/, int last/*=-1*/ )
 		{
 			map<uid, string> m;
+			if (withAll)
+				m.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
 			for (Profile::Registry::const_iterator it = _profiles.begin(); it != _profiles.end(); ++it)
 				m.insert(make_pair(it->first, it->second->getName()));
+			return m;
+		}
+
+		std::map<uid, std::string> SecurityModule::getUserLabels(bool withAll, int first/*=0*/, int last/*=-1*/ )
+		{
+			map<uid, string> m;
+			if (withAll)
+				m.insert(make_pair(uid(UNKNOWN_VALUE), "(tous)"));
+			vector<User*> users = UserTableSync::search("","");
+			for (vector<User*>::iterator it = users.begin(); it != users.end(); ++it)
+			{
+				m.insert(make_pair((*it)->getKey(), (*it)->getSurname() + " " + (*it)->getName()));
+				delete *it;
+			}
 			return m;
 		}
 	}

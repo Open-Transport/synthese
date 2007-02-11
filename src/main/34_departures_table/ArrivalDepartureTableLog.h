@@ -39,6 +39,7 @@ namespace synthese
 		{
 		public:
 			ArrivalDepartureTableLog();
+			DBLog::ColumnsNameVector getColumnNames() const;
 		};
 	}
 }

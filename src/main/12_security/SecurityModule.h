@@ -53,7 +53,8 @@ namespace synthese
 			static Profile::Registry& getProfiles();
 
 			static std::map<std::string, std::string> getRightsTemplates();
-			static std::map<uid, std::string> getProfileLabels(int first=0, int last=-1);
+			static std::map<uid, std::string> getProfileLabels(bool withAll=false, int first=0, int last=-1);
+			static std::map<uid, std::string> getUserLabels(bool withAll=false, int first=0, int last=-1);
 		};
 	}
 }

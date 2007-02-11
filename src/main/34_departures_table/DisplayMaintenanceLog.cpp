@@ -35,5 +35,14 @@ namespace synthese
 		{
 		
 		}
+
+		DBLog::ColumnsNameVector DisplayMaintenanceLog::getColumnNames() const
+		{
+			DBLog::ColumnsNameVector v;
+			v.push_back("Afficheur");
+			v.push_back("Type");
+			v.push_back("Description");
+			return v;
+		}
 	}
 }

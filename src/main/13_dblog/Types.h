@@ -1,6 +1,6 @@
 
-/** BroadcastPointsDataLog class implementation.
-	@file BroadcastPointsDataLog.cpp
+/** Types class header.
+	@file Types.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,28 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "BroadcastPointsDataLog.h"
-
 namespace synthese
 {
-	using namespace dblog;
-
-	namespace departurestable
+	namespace dblog
 	{
-
-
-		BroadcastPointsDataLog::BroadcastPointsDataLog()
-			: DBLog("Administration des emplacements d'affichage (tableaux de départs)")
-		{
-	
-		}
-
-		DBLog::ColumnsNameVector BroadcastPointsDataLog::getColumnNames() const
-		{
-			DBLog::ColumnsNameVector v;
-			v.push_back("Point de diffusion");
-			v.push_back("Action");
-			return v;
-		}
 	}
 }

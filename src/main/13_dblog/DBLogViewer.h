@@ -23,12 +23,16 @@
 #ifndef SYNTHESE_DBLogViewer_H__
 #define SYNTHESE_DBLogViewer_H__
 
+#include <string>
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
 {
 	namespace dblog
 	{
+		class DBLog;
+
 		/** Visualisation de journal d'événements.
 			@ingroup m13
 		
@@ -75,8 +79,22 @@ namespace synthese
 		*/
 		class DBLogViewer : public admin::AdminInterfaceElement
 		{
+			//! \name Stored parameters
+			//@{
+				std::string			_logKey;
+				uid					_searchUser;
+				int					_searchType;
+			//@}
+
+			//! \name Stored values
+			//@{
+			const DBLog*	_dbLog;
+			//@}
+
 		public:
 			static const std::string PARAMETER_LOG_KEY;
+			static const std::string PARAMETER_SEARCH_USER;
+			static const std::string PARAMETER_SEARCH_TYPE;
 
 			DBLogViewer();
 			

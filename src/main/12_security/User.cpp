@@ -12,6 +12,7 @@ namespace synthese
 			: Registrable<uid, User>(id)
 			, _cityId(0)
 			, _isConnectionAllowed(true)
+			, _profile(NULL)
 		{
 
 		}

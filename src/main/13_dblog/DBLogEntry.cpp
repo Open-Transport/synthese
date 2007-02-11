@@ -1,6 +1,6 @@
 
-/** DBLog class implementation.
-	@file DBLog.cpp
+/** DBLogEntry class implementation.
+	@file DBLogEntry.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,36 +20,67 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "13_dblog/DBLog.h"
-#include "13_dblog/DBLogEntryTableSync.h"
+#include "DBLogEntry.h"
 
 namespace synthese
 {
-	using namespace util;
-
 	namespace dblog
 	{
 
 
-		DBLog::DBLog( const std::string& name )
-			: Factorable(), _name(name)
+		DBLogEntry::DBLogEntry()
+			: _user(NULL)
 		{
 
 		}
 
-		const std::string& DBLog::getName() const
+		void DBLogEntry::setDate( const time::DateTime& date )
 		{
-			return _name;
+			_date = date;
 		}
 
-		void DBLog::write( DBLogEntry::Level level, const DBLogEntry::Content& content, security::User* user /*= NULL*/ )
+		void DBLogEntry::setUser(security::User* user )
 		{
-			DBLogEntry* e = new DBLogEntry;
-			e->setLevel(level);
-			e->setUser(user);
-			e->setLogKey(getFactoryKey());
-			e->setContent(content);
-			DBLogEntryTableSync::save(e);
+			_user = user;
+		}
+
+		void DBLogEntry::setLogKey( const std::string& key )
+		{
+			_logKey = key;
+		}
+		void DBLogEntry::setContent( const Content& content )
+		{
+			_content = content;
+		}
+
+		time::DateTime DBLogEntry::getDate() const
+		{
+			return _date;
+		}
+
+		security::User* DBLogEntry::getUser() const
+		{
+			return _user;
+		}
+
+		const DBLogEntry::Content& DBLogEntry::getContent() const
+		{
+			return _content;
+		}
+
+		const std::string& DBLogEntry::getLogKey() const
+		{
+			return _logKey;
+		}
+
+		DBLogEntry::Level DBLogEntry::getLevel() const
+		{
+			return _level;
+		}
+
+		void DBLogEntry::setLevel( Level level )
+		{
+			_level = level;
 		}
 	}
 }
