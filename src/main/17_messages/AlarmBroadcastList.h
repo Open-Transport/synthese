@@ -35,7 +35,7 @@ namespace synthese
 		class AlarmBroadcastList
 		{
 		private:
-			Alarm			_alarm;
+			Alarm*			_alarm;
 			std::vector<T*>	_broadcastList;
 
 		public:
