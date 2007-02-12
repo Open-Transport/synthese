@@ -75,7 +75,7 @@ namespace synthese
 		{
 			std::stringstream s;
 			s << "<select name=\"" << name << "\">";
-			for (std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
+			for (typename std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
 				s << "<option value=\"" << it->first << "\"";
 				if (it->first == value)
@@ -90,7 +90,7 @@ namespace synthese
 		std::string Html::getRadioInput(const std::string& name, const std::map<K, T>& choices, const K& value)
 		{
 			std::stringstream s;
-			for (std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
+			for (typename std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
 				s << "<input type=\"radio\" value=\"" << it->first << "\"";
 				if (it->first == value)
