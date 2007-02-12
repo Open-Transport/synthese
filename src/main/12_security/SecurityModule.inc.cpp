@@ -12,6 +12,7 @@
 #include "12_security/AddProfileAction.h"
 #include "12_security/DeleteRightAction.h"
 #include "12_security/AddRightAction.h"
+#include "12_security/UpdateRightAction.h"
 
 #include "12_security/SecurityRight.h"
 
