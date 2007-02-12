@@ -55,7 +55,7 @@ namespace synthese
 		{
 			stream << "<table><tr><th>Emplacement</th><th>Etat</th><th>Actions</th></tr>";
 
-			vector<AlarmObjectLink<DisplayScreen> >& dsv = AlarmObjectLinkTableSync::search<DisplayScreen> (alarm, this->getFactoryKey());
+			vector<AlarmObjectLink<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreen> (alarm, this->getFactoryKey());
 			for (vector<AlarmObjectLink<DisplayScreen> >::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
 			{
 				DisplayScreen* ds = dsit->getObject();

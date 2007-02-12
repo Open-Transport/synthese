@@ -60,4 +60,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_AddRightAction_H__
- 

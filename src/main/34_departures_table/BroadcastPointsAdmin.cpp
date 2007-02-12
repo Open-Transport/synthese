@@ -118,13 +118,15 @@ namespace synthese
 
 			for (vector<ConnectionPlaceWithBroadcastPoint>::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
 			{
+				goRequest->setObjectId(it->place->getKey());
 				stream
 					<< "<tr><td>" << it->place->getCity()->getName() << "</td>"
 					<< "<td>" << it->place->getName() << "</td>"
 					<< "<td>" << it->broadCastPointsNumber << "</td>"
-					<< "<td>" << goRequest->getHTMLFormHeader(Conversion::ToString(it->place->getKey()))
-					<< Html::getHiddenInput(Request::PARAMETER_OBJECT_ID, Conversion::ToString(it->place->getKey()))
-					<< Html::getSubmitButton("Editer") << "</form></td>"
+					<< "<td>"
+					<< goRequest->getHTMLFormHeader(Conversion::ToString(it->place->getKey()))
+					<< Html::getSubmitButton("Editer") 
+					<< "</form></td>"
 					<< "</tr>";
 			}
 			stream

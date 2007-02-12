@@ -65,4 +65,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_AddProfileAction_H__
- 

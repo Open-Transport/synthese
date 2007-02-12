@@ -64,4 +64,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_UpdateProfileAction_H__
- 

@@ -62,4 +62,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_DeleteProfileAction_H__
- 
