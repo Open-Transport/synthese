@@ -71,12 +71,11 @@ namespace synthese
 		};
 
 		template<class K, class T>
-			static std::string Html::getSelectInput(const std::string& name, const std::map<K, T>& choices, const K& value)
+		std::string Html::getSelectInput(const std::string& name, const std::map<K, T>& choices, const K& value)
 		{
 			std::stringstream s;
 			s << "<select name=\"" << name << "\">";
-			std::map<K, T>::const_iterator it;
-			for (it = choices.begin(); it != choices.end(); ++it)
+			for (std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
 				s << "<option value=\"" << it->first << "\"";
 				if (it->first == value)
@@ -88,11 +87,10 @@ namespace synthese
 		}
 
 		template<class K, class T>
-		static std::string Html::getRadioInput(const std::string& name, const std::map<K, T>& choices, const K& value)
+		std::string Html::getRadioInput(const std::string& name, const std::map<K, T>& choices, const K& value)
 		{
 			std::stringstream s;
-			std::map<K, T>::const_iterator it;
-			for (it = choices.begin(); it != choices.end(); ++it)
+			for (std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
 				s << "<input type=\"radio\" value=\"" << it->first << "\"";
 				if (it->first == value)
