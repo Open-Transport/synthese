@@ -33,6 +33,7 @@
 
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
+#include "34_departures_table/BroadcastPointTableSync.h"
 #include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
@@ -47,7 +48,7 @@ namespace synthese
 	namespace db
 	{
 		template<> const std::string SQLiteTableSyncTemplate<DisplayScreen>::TABLE_NAME = "t041_display_screens";
-		template<> const int SQLiteTableSyncTemplate<DisplayScreen>::TABLE_ID = 041;
+		template<> const int SQLiteTableSyncTemplate<DisplayScreen>::TABLE_ID = 41;
 		template<> const bool SQLiteTableSyncTemplate<DisplayScreen>::HAS_AUTO_INCREMENT = true;
 
 		template<> void SQLiteTableSyncTemplate<DisplayScreen>::load(DisplayScreen* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
@@ -63,8 +64,10 @@ namespace synthese
 			object->setServiceNumberDisplay(Conversion::ToBool(rows.getColumn(rowId, DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY)));
 
 			vector<string> stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
+			object->clearPhysicalStops();
 			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
 				object->addPhysicalStop(EnvModule::getPhysicalStops().get(Conversion::ToLongLong(*it)));
+			object->setAllPhysicalStopsDisplayed(Conversion::ToBool(rows.getColumn(rowId, DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED)));
 			
 			stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS));
 			for (it = stops.begin(); it != stops.end(); ++it)
@@ -121,7 +124,9 @@ namespace synthese
 				query << Conversion::ToString((*itp)->getKey());
 			}
 
-			query << "','";
+			query
+				<< "'," << Conversion::ToString(object->getAllPhysicalStopsDisplayed())
+				<< ",'";
 
 			for (ForbiddenPlacesList::const_iterator itf = object->getForbiddenPlaces().begin(); itf != object->getForbiddenPlaces().end(); ++itf)
 			{
@@ -188,6 +193,7 @@ namespace synthese
 		const std::string DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY = "track_number_display";
 		const std::string DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY = "service_number_display";
 		const std::string DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS = "physical_stops_ids";	// List of physical stops uids, separated by comas
+		const std::string DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED = "all_physicals";
 		const std::string DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS = "forbidden_arrival_places_ids";	// List of forbidden connection places uids, separated by comas
 		const std::string DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS = "forbidden_lines_ids";	// List of forbidden lines uids, separated by comas
 		const std::string DisplayScreenTableSync::COL_DIRECTION = "direction";
@@ -216,6 +222,7 @@ namespace synthese
 			addTableColumn(COL_TRACK_NUMBER_DISPLAY, "INTEGER");
 			addTableColumn(COL_SERVICE_NUMBER_DISPLAY, "INTEGER");
 			addTableColumn(COL_PHYSICAL_STOPS_IDS, "TEXT");
+			addTableColumn(COL_ALL_PHYSICAL_DISPLAYED, "INTEGER");
 			addTableColumn(COL_FORBIDDEN_ARRIVAL_PLACES_IDS, "TEXT");
 			addTableColumn(COL_FORBIDDEN_LINES_IDS, "TEXT");
 			addTableColumn(COL_DIRECTION, "INTEGER");
@@ -259,17 +266,27 @@ namespace synthese
 			}
 		}
 
-		std::vector<DisplayScreen*> DisplayScreenTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<DisplayScreen*> DisplayScreenTableSync::search(
+			std::string duid
+			, uid localizationid
+			, uid lineid
+			, uid typeuid
+			, int state 
+			, int message 
+			, int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
+				<< " FROM " << TABLE_NAME << " AS d"
+				<< " LEFT JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID
 				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				;
+				<< "d." << TABLE_COL_ID << " LIKE '%" << Conversion::ToSQLiteString(duid, false) << "%'";
+			if (localizationid != UNKNOWN_VALUE)
+				query << " AND b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=" << localizationid;
+			if (typeuid != UNKNOWN_VALUE)
+				query << " AND d." << COL_TYPE_ID << "=" << typeuid;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

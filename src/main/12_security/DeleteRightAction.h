@@ -66,4 +66,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_DeleteRightAction_H__
- 

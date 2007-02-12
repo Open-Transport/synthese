@@ -51,6 +51,8 @@ namespace synthese
 				static std::string getTextAreaInput(const std::string& name, const std::string& value, int rows, int cols);
 
 				static std::string getSubmitButton(const std::string& caption);
+
+				static std::string getCheckBox(const std::string& name, const std::string& value, bool checked);
 			//@}
 
 			//! \name Advanced Input fields

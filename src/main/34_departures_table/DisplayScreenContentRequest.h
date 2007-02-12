@@ -60,7 +60,8 @@ namespace synthese
 			DisplayScreenContentRequest();
 			~DisplayScreenContentRequest();
 
-			/// @todo Getters/Setters for parsed parameters
+			void	setDisplayScreen(const DisplayScreen* screen);
+			
 
 			/** Action to run, defined by each subclass.
 			*/

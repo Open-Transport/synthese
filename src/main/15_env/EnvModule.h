@@ -282,6 +282,7 @@ namespace synthese
 
 			static Path* fetchPath (const uid& id);
 
+			static std::map<uid, std::string>		getCommercialLineLabels(bool withAll=false);
 
 		};
 	}

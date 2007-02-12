@@ -23,20 +23,31 @@
 #ifndef SYNTHESE_UpdateDisplayScreenAction_H__
 #define SYNTHESE_UpdateDisplayScreenAction_H__
 
+#include <map>
+
 #include "30_server/Action.h"
 
 #include "34_departures_table/Types.h"
 
 namespace synthese
 {
+	namespace env
+	{
+		class PhysicalStop;
+	}
+
 	namespace departurestable
 	{
+		class BroadcastPoint;
+		class DisplayScreen;
+		
 		/** UpdateDisplayScreenAction action class.
 			@ingroup m34
 		*/
 		class UpdateDisplayScreenAction : public server::Action
 		{
 		public:
+			static const std::string PARAMETER_LOCALIZATION_ID;
 			static const std::string PARAMETER_LOCALIZATION_COMMENT;
 			static const std::string PARAMETER_WIRING_CODE;
 			static const std::string PARAMETER_BLINKING_DELAY;
@@ -48,18 +59,26 @@ namespace synthese
 			static const std::string PARAMETER_DISPLAY_MAX_DELAY;
 			static const std::string PARAMETER_ACTIVATE_PRESELECTION;
 			static const std::string PARAMETER_PRESELECTION_DELAY;
+			static const std::string PARAMETER_TYPE;
+			static const std::string PARAMETER_PHYSICAL;
+			static const std::string PARAMETER_ALL_PHYSICALS;
 
 		private:
-			std::string					_localizationComment;
-			int							_wiringCode;
-			int							_blinkingDelay;
-			bool						_displayPlatform;
-			bool						_displayServiceNumber;
-			DeparturesTableDirection	_direction;
-			EndFilter					_endFilter;
-			int							_maxDelay;
-			bool						_activatePreselection;
-			int							_preselectionDelay;
+			DisplayScreen*								_screen;
+			BroadcastPoint*								_localization;
+			std::string									_localizationComment;
+			int											_wiringCode;
+			int											_blinkingDelay;
+			bool										_displayPlatform;
+			bool										_displayServiceNumber;
+			DeparturesTableDirection					_direction;
+			EndFilter									_endFilter;
+			int											_maxDelay;
+			bool										_activatePreselection;
+			int											_preselectionDelay;
+			uid											_type;
+			std::map<const env::PhysicalStop*, bool>	_physicalStopServe;
+			bool										_allPhysicals;
 			
 
 		protected:
@@ -73,6 +92,7 @@ namespace synthese
 			void setFromParametersMap(server::Request::ParametersMap& map);
 
 		public:
+			UpdateDisplayScreenAction();
 
 			/** Action to run, defined by each subclass.
 			*/

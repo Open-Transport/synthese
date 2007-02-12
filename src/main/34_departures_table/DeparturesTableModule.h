@@ -23,6 +23,9 @@
 #ifndef SYNTHESE_DeparturesTableModule_H__
 #define SYNTHESE_DeparturesTableModule_H__
 
+#include <map>
+#include <string>
+
 #include "01_util/ModuleClass.h"
 
 #include "34_departures_table/DisplayType.h"
@@ -52,14 +55,18 @@ namespace synthese
 	{
 		class DeparturesTableModule : public util::ModuleClass
 		{
-			static DisplayType::Registry	_displayTypes;
-			static BroadcastPoint::Registry	_broadcastPoints;
-			static DisplayScreen::Registry	_displayScreens;
+			static DisplayType::Registry		_displayTypes;
+			static BroadcastPoint::Registry		_broadcastPoints;
+			static DisplayScreen::Registry		_displayScreens;
 
 		public:
-			static DisplayType::Registry& getDisplayTypes();
-			static BroadcastPoint::Registry& getBroadcastPoints();
-			static DisplayScreen::Registry& getDisplayScreens();
+			static DisplayType::Registry&		getDisplayTypes();
+			static BroadcastPoint::Registry&	getBroadcastPoints();
+			static DisplayScreen::Registry&		getDisplayScreens();
+
+			static std::map<uid, std::string>	getDisplayTypeLabels(bool withAll = false);
+			static std::map<uid, std::string>	getPlacesWithBroadcastPointsLabels(bool withAll = false);
+			static std::map<uid, std::string>	getBroadcastPointLabels(const env::ConnectionPlace* place, bool withAll = false);
 		};
 	}
 }

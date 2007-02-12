@@ -28,6 +28,8 @@
 #include <string>
 #include <iostream>
 
+#include "01_util/UId.h"
+
 #include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
@@ -53,6 +55,7 @@ namespace synthese
 			static const std::string COL_TRACK_NUMBER_DISPLAY;
 			static const std::string COL_SERVICE_NUMBER_DISPLAY;
 			static const std::string COL_PHYSICAL_STOPS_IDS;	//!< List of physical stops uids, separated by comas
+			static const std::string COL_ALL_PHYSICAL_DISPLAYED;
 			static const std::string COL_FORBIDDEN_ARRIVAL_PLACES_IDS;	//!< List of forbidden connection places uids, separated by comas
 			static const std::string COL_FORBIDDEN_LINES_IDS;	//!< List of forbidden lines uids, separated by comas
 			static const std::string COL_DIRECTION;
@@ -84,8 +87,13 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<DisplayScreen*> search(
-				// other search parameters ,
-				int first = 0, int number = 0);
+				std::string duid=""
+				, uid localizationid = UNKNOWN_VALUE
+				, uid lineid = UNKNOWN_VALUE
+				, uid typeuid = UNKNOWN_VALUE
+				, int state = UNKNOWN_VALUE
+				, int message = UNKNOWN_VALUE
+				, int first = 0, int number = 0);
 
 
 		protected:

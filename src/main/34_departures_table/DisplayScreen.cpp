@@ -50,6 +50,7 @@ namespace synthese
 			, _clearingDelay(0)
 			, _firstRow(0)
 			, _maintenanceChecksPerDay(24 * 60)		// default = 1 check per minute
+			, _allPhysicalStopsDisplayed(false)
 		{
 		}
 
@@ -339,6 +340,21 @@ namespace synthese
 		{
 			DisplayMaintenanceLog* log = (DisplayMaintenanceLog*) Factory<DBLog>::create<DisplayMaintenanceLog>();
 			/// @todo implementation
+		}
+
+		void DisplayScreen::setAllPhysicalStopsDisplayed( bool value )
+		{
+			_allPhysicalStopsDisplayed = value;
+		}
+
+		bool DisplayScreen::getAllPhysicalStopsDisplayed() const
+		{
+			return _allPhysicalStopsDisplayed;
+		}
+
+		void DisplayScreen::clearPhysicalStops()
+		{
+			_physicalStops.clear();
 		}
 
 	}

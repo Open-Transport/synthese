@@ -23,12 +23,15 @@
 #ifndef SYNTHESE_DISPLAY_SEARCH_ADMIN_H
 #define SYNTHESE_DISPLAY_SEARCH_ADMIN_H
 
+#include <vector>
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
 {
 	namespace departurestable
 	{
+		class DisplayScreen;
 
 		/** Ecran de gestion du parc matériel d'afficheurs.
 			@ingroup m34
@@ -105,11 +108,21 @@ namespace synthese
 		class DisplaySearchAdmin : public admin::AdminInterfaceElement
 		{
 			std::string _searchUId;
-			std::string _searchLocalizationUId;
+			uid			_searchLocalizationUId;
+			uid			_searchLineId;
+			uid			_searchTypeId;
+			int			_searchState;
+			int			_searchMessage;
+
+			std::vector<DisplayScreen*>	_result;
 
 		public:
 			static const std::string PARAMETER_SEARCH_UID;
 			static const std::string PARAMETER_SEARCH_LOCALIZATION;
+			static const std::string PARAMETER_SEARCH_LINE_ID;
+			static const std::string PARAMETER_SEARCH_TYPE_ID;
+			static const std::string PARAMETER_SEARCH_STATE;
+			static const std::string PARAMETER_SEARCH_MESSAGE;
 
 			DisplaySearchAdmin();
 			

@@ -103,6 +103,7 @@ namespace synthese
 			//! \name Content
 			//@{
 				PhysicalStopsList			_physicalStops;				//!< Quai(s) affichés
+				bool						_allPhysicalStopsDisplayed;
 				ForbiddenPlacesList			_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
 				LineFilter					_forbiddenLines;
 				DeparturesTableDirection	_direction;
@@ -151,7 +152,9 @@ namespace synthese
 				void	setBlinkingDelay(int);
 				void	setTrackNumberDisplay(bool value);
 				void	setServiceNumberDisplay(bool value);
+				void	clearPhysicalStops();
 				void	addPhysicalStop(const env::PhysicalStop*);
+				void	setAllPhysicalStopsDisplayed(bool value);
 				void	addForbiddenPlace(const env::ConnectionPlace*);
 				void	setDirection(DeparturesTableDirection direction);
 				void	setOriginsOnly(EndFilter);
@@ -178,6 +181,7 @@ namespace synthese
 				bool							getTrackNumberDisplay()			const;
 				bool							getServiceNumberDisplay()		const;
 				const PhysicalStopsList&		getPhysicalStops()				const;
+				bool							getAllPhysicalStopsDisplayed()	const;
 				const ForbiddenPlacesList&		getForbiddenPlaces()			const;
 				const LineFilter&				getForbiddenLines()				const;
 				DeparturesTableDirection		getDirection()					const;

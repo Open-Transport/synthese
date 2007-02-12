@@ -86,5 +86,12 @@ namespace synthese
 			m.insert(make_pair(1, "OUI"));
 			return getRadioInput(name, m, value ? 1 : 0);
 		}
+
+		std::string Html::getCheckBox( const std::string& name, const std::string& value, bool checked )
+		{
+			stringstream s;
+			s << "<input type=\"checkbox\" name=\"" << name << value << "\" " << (checked ? " checked=\"true\"" : "") << " />";
+			return s.str();
+		}
 	}
 }

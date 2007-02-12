@@ -27,6 +27,11 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class ConnectionPlace;
+	}
+
 	namespace departurestable
 	{
 		class DisplayScreen;
@@ -98,9 +103,12 @@ namespace synthese
 		*/
 		class DisplayAdmin : public admin::AdminInterfaceElement
 		{
-			DisplayScreen* _displayScreen;
+			DisplayScreen*			_displayScreen;
+			env::ConnectionPlace*	_place;
 
 		public:
+			static const std::string PARAMETER_PLACE;
+
 			DisplayAdmin();
 
 			/** Initialization of the parameters from a request.

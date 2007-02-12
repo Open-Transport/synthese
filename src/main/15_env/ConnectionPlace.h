@@ -26,10 +26,12 @@
 
 #include <map>
 #include <set>
+#include <string>
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
-#include "AddressablePlace.h"
+
+#include "15_env/AddressablePlace.h"
 
 
 namespace synthese
@@ -108,6 +110,7 @@ namespace synthese
 			int getMaxTransferDelay () const;
 
 			const std::vector<const PhysicalStop*>& getPhysicalStops () const;
+			std::map<uid, std::string> getPhysicalStopLabels(bool withAll = false) const;
 
 			const ConnectionType getConnectionType () const;
 			void setConnectionType (const ConnectionType& connectionType);

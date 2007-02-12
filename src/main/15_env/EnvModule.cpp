@@ -20,7 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "01_util/Constants.h"
+#include "01_util/UId.h"
+
 #include "15_env/EnvModule.h"
+
+using namespace std;
 
 namespace synthese
 {
@@ -122,5 +127,14 @@ namespace synthese
 			return 0;
 		}
 
+		std::map<uid, std::string> EnvModule::getCommercialLineLabels(bool withAll)
+		{
+			map<uid,string> m;
+			if (withAll)
+				m.insert(make_pair(UNKNOWN_VALUE, "(toutes)"));
+			for(CommercialLine::Registry::const_iterator it = _commercialLines.begin(); it != _commercialLines.end(); ++it)
+				m.insert(make_pair(it->first, it->second->getShortName()));
+			return m;
+		}
 	}
 }

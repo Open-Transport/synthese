@@ -24,12 +24,17 @@
 #include <sstream>
 
 #include "01_util/Html.h"
+#include "01_util/Constants.h"
 
 #include "15_env/ConnectionPlace.h"
+#include "15_env/PhysicalStop.h"
+#include "15_env/EnvModule.h"
 
 #include "32_admin/AdminRequest.h"
+#include "32_admin/AdminParametersException.h"
 
 #include "34_departures_table/DisplayAdmin.h"
+#include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/UpdateDisplayScreenAction.h"
@@ -42,11 +47,16 @@ namespace synthese
 	using namespace server;
 	using namespace admin;
 	using namespace util;
+	using namespace env;
 
 	namespace departurestable
 	{
+		const std::string DisplayAdmin::PARAMETER_PLACE = "pp";
+
 		DisplayAdmin::DisplayAdmin()
-			: AdminInterfaceElement("displays", AdminInterfaceElement::DISPLAYED_IF_CURRENT) {}
+			: AdminInterfaceElement("displays", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
+			, _place(NULL)
+		{}
 
 
 		std::string DisplayAdmin::getTitle() const
@@ -87,7 +97,7 @@ namespace synthese
 			endFilterMap.insert(make_pair(WITH_PASSING, "Origines/Terminus et passages"));
 
 			map<int, string> clearDelayMap;
-			for (i=5; i>1; --i)
+			for (i=-5; i<-1; ++i)
 				clearDelayMap.insert(make_pair(i, Conversion::ToString(-i) + " minutes avant le départ"));
 			clearDelayMap.insert(make_pair(-1, "1 minute avant le départ"));
 			clearDelayMap.insert(make_pair(0, "heure du départ"));
@@ -99,19 +109,19 @@ namespace synthese
 			stream
 				<< "<h1>Emplacement</h1>"
 				<< "<table><tr><td>Lieu logique</td>"
-				<< "<td><select name=\"\">"; // Script on update reload the page
-
-			// Logical stops list
-
-			stream
-				<< "</select></td></tr>"
+				<< "<td>" 
+				<< Html::getSelectInput(PARAMETER_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(), _place->getKey())
+				<< "</td></tr>"
 				<< "<tr><td>Lieu physique</td>"
-				<< "<td><select name=\"\">";
-
-			// Broadcast points list
-
+				<< "<td>";
+			
+			if (_place == NULL)
+				stream << "(Sélectionnez un lieu logique en premier)";
+			else
+				stream << Html::getSelectInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_ID, DeparturesTableModule::getBroadcastPointLabels(_place, false), _displayScreen->getLocalization()->getKey());
+			
 			stream
-				<< "</select></td></tr>"
+				<< "</td></tr>"
 				<< "<tr><td>Complément de précision</td>"
 				<< "<td>" << Html::getTextInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_COMMENT, _displayScreen->getLocalizationComment()) << "</td></tr>"
 				<< "</table>"
@@ -120,12 +130,7 @@ namespace synthese
 				<< updateDisplayRequest->getHTMLFormHeader("updateprops")
 				<< "<table>"
 				<< "<tr><td>Type d'afficheur</td>"
-				<< "<td><select name=\"\">";
-
-			// Display types list
-
-			stream
-				<< "</select></td></tr>"
+				<< "<td>" << Html::getSelectInput(UpdateDisplayScreenAction::PARAMETER_TYPE, DeparturesTableModule::getDisplayTypeLabels(), _displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE) << "</td></tr>"
 				<< "<tr><td>Code de branchement</td>"
 				<< "<td>" << Html::getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode()) << "</td></tr>"
 				<< "<tr><td>UID</td><td>" << _displayScreen->getKey() << "</td></tr>"
@@ -144,21 +149,34 @@ namespace synthese
 				<< "<tr><td>Sélection</td><td>" << Html::getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER, endFilterMap, _displayScreen->getEndFilter()) << "</td></tr>"
 				<< "<tr><td>Délai maximum d'affichage</td><td>" << Html::getTextInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) << " minutes</td></tr>"
 				<< "<tr><td>Délai d'effacement</td><td>" << Html::getSelectInput(UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY, clearDelayMap, _displayScreen->getClearingDelay()) << "</td></tr>"
-				<< "<tr><td>Sélection sur arrêt physique</td><td><table>"
+				<< "<tr><td>Sélection sur arrêt physique</td><td>"
 ;
-			// Physical stops loop
+			if (_displayScreen->getLocalization() == NULL)
 			{
+				stream << "(sélectionnez une localisation)";
+			}
+			else
+			{
+				stream << "<table>";
+				for (vector<const PhysicalStop*>::const_iterator it = _displayScreen->getLocalization()->getConnectionPlace()->getPhysicalStops().begin(); it != _displayScreen->getLocalization()->getConnectionPlace()->getPhysicalStops().end(); ++it)
+				{
+					const PhysicalStop* ps = *it;
+					stream
+						<< "<tr>"
+						<< "<td>"
+						<< Html::getCheckBox(UpdateDisplayScreenAction::PARAMETER_PHYSICAL, Conversion::ToString(ps->getKey()), _displayScreen->getPhysicalStops().find(ps) != _displayScreen->getPhysicalStops().end())
+						<< "</td>"
+						<< "<td>" << ps->getName() << "</td>"
+						<< "</tr>";
+				}
 				stream
 					<< "<tr>"
-					<< "<td><INPUT id=\"Checkbox1\" type=\"checkbox\" CHECKED name=\"Checkbox1\"></TD>"
-					<< "<TD><FONT size=\"2\">Marengo quai 1</FONT></TD>"
-					<< "</tr>";
+					<< "<td>" << Html::getCheckBox(UpdateDisplayScreenAction::PARAMETER_ALL_PHYSICALS, "", _displayScreen->getAllPhysicalStopsDisplayed()) << "</td>"
+					<< "<td>Tous (y compris nouveaux)</td>"
+					<< "</tr></table>";
 			}
 			stream
-				<< "<tr>"
-				<< "<td><INPUT id=\"Checkbox4\" type=\"checkbox\" name=\"Checkbox1\"></td>"
-				<< "<td>Tous (y compris nouveaux)</td>"
-				<< "</tr></table></td></tr>"
+				<< "</td></tr>"
 				<< "<tr><td>Sélection sur arrêt logique à ne pas desservir</td>"
 				<< "<td><table>";
 
@@ -211,8 +229,35 @@ namespace synthese
 		void DisplayAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
 		{
 			Request::ParametersMap::const_iterator it = map .find(Request::PARAMETER_OBJECT_ID);
-			if (it != map.end())
-				_displayScreen = DisplayScreenTableSync::get(Conversion::ToLongLong(it->second));
+			if (it == map.end())
+				throw AdminParametersException("Display screen not specified");
+			try
+			{
+				_displayScreen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
+				if (_displayScreen->getLocalization())
+					_place = _displayScreen->getLocalization()->getConnectionPlace();
+			}
+			catch (DisplayScreen::RegistryKeyException e)
+			{
+				throw AdminParametersException("Display screen not found");
+			}
+
+			if (_place == NULL)
+			{
+				it = map.find(PARAMETER_PLACE);
+				if (it != map.end())
+				{
+					try
+					{
+						_place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(it->second));
+					}
+					catch (ConnectionPlace::RegistryKeyException e)
+					{
+						throw AdminParametersException("Place not found");
+					}
+				}
+			}
+			
 		}
 	}
 }

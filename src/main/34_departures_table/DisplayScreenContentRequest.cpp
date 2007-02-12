@@ -82,5 +82,11 @@ namespace synthese
 		DisplayScreenContentRequest::~DisplayScreenContentRequest()
 		{
 		}
+
+		void DisplayScreenContentRequest::setDisplayScreen( const DisplayScreen* screen )
+		{
+			_screen = screen;
+		}
+
 	}
 }
