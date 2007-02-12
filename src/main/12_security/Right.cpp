@@ -47,6 +47,29 @@ namespace synthese
 		{
 
 		}
+
+		Right::Level Right::getPrivateRightLevel() const
+		{
+			return _privateRightLevel;
+		}
+
+		Right::Level Right::getPublicRightLevel() const
+		{
+			return _publicRightLevel;
+		}
+
+		std::string Right::getLevelLabel(Level level)
+		{
+			switch (level)
+			{
+			case FORBIDDEN: return "Interdit";
+			case USE: return "Utilisation";
+			case READ: return "Lecture";
+			case WRITE: return "Lecture/Ecriture";
+			case DELETE: return "Contrôle total";
+			}
+			return "";
+		}
 	}
 }
 

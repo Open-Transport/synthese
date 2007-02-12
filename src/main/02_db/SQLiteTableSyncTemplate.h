@@ -76,11 +76,23 @@ namespace synthese
 			static void save(T* obj);
 			static T* get(uid key);
 			static T* createEmpty();
+			static void remove(uid key);
 
 			/// @todo See if the template can be used more 
 
 
 		};
+
+		template <class T>
+			void synthese::db::SQLiteTableSyncTemplate<T>::remove(uid key)
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			std::stringstream query;
+			query
+				<< "DELETE FROM " << TABLE_NAME
+				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key);
+			sqlite->execUpdate(query.str());
+		}
 
 		template <class T>
 			T* synthese::db::SQLiteTableSyncTemplate<T>::createEmpty()

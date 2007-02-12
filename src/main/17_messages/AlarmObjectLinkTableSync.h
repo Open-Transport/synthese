@@ -105,7 +105,7 @@ namespace synthese
 			std::vector< AlarmObjectLink<T> > AlarmObjectLinkTableSync::search(const Alarm* alarm, const std::string& recipientKey, int first /*= 0*/, int number /*= 0*/ )
 		{
 			const db::SQLiteQueueThreadExec* sqlite = db::DBModule::GetSQLite();
-			stringstream query;
+			std::stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME

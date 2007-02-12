@@ -25,10 +25,14 @@
 
 #include "01_util/Html.h"
 #include "01_util/Conversion.h"
+#include "01_util/Constants.h"
 
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfilesAdmin.h"
+#include "12_security/ProfileAdmin.h"
 #include "12_security/ProfileTableSync.h"
+#include "12_security/AddProfileAction.h"
+#include "12_security/DeleteProfileAction.h"
 
 #include "32_admin/AdminRequest.h"
 
@@ -88,6 +92,22 @@ namespace synthese
 			searchRequest->copy(request);
 			searchRequest->setPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
 
+			AdminRequest* profileRequest = Factory<Request>::create<AdminRequest>();
+			profileRequest->copy(request);
+			profileRequest->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+
+			AdminRequest* deleteProfileRequest = Factory<Request>::create<AdminRequest>();
+			deleteProfileRequest->copy(request);
+			deleteProfileRequest->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			deleteProfileRequest->setAction(Factory<Action>::create<DeleteProfileAction>());
+
+			AdminRequest* addProfileRequest = Factory<Request>::create<AdminRequest>();
+			addProfileRequest->copy(request);
+			addProfileRequest->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			addProfileRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
+			addProfileRequest->setAction(Factory<Action>::create<AddProfileAction>());
+
+
 			map<string, string>& rightsMap = SecurityModule::getRightsTemplates();
 			rightsMap.insert(make_pair("", "(toutes les habilitations)"));
 
@@ -104,15 +124,19 @@ namespace synthese
 				<< "<h1>Résultats de la recherche</h1>"
 				
 				<< "<table id=\"searchresult\">"
-				<< "<TR><th>Sel</th><th>Nom</th><th>Résumé</th><th>Actions</th></tr>";
+				<< "<tr><th>Sel</th><th>Nom</th><th>Résumé</th><th>Actions</th></tr>";
 			
 			// Profiles loop
 			for (vector<Profile*>::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
 			{
 				Profile* profile = *it;
+
+				profileRequest->setObjectId(profile->getKey());
+				deleteProfileRequest->setObjectId(profile->getKey());
+
 				stream
                     << "<tr>"
-					<< "<TD><INPUT type=\"checkbox\" name=\"Checkbox3\"></TD>"
+					<< "<TD><input name=\"tpl\" type=\"radio\" /></TD>"
 					<< "<td>" << profile->getName() << "</td>"
 					<< "<td><ul>";
 
@@ -123,23 +147,34 @@ namespace synthese
 
 				stream
 					<< "</td>"
-					<< "<td>" << Html::getHiddenInput("", Conversion::ToString(profile->getKey())) << Html::getSubmitButton("Modifier") << "</td>"
+					<< "<td>"
+					<< profileRequest->getHTMLFormHeader("u" + Conversion::ToString(profile->getKey()))
+					<< Html::getSubmitButton("Modifier")
+					<< "</form>"
+					<< deleteProfileRequest->getHTMLFormHeader("d" + Conversion::ToString(profile->getKey()))
+					<< Html::getSubmitButton("Supprimer")
+					<< "</form>"
+					<< "</td>"
 					<< "</tr>";
 			}
 
 			stream
-				<< "<TR>"
+				<< "<tr>"
+				<< addProfileRequest->getHTMLFormHeader("add")
 				<< "<TD>&nbsp;</TD>"
-				<< "<td>" << Html::getTextInput("", "", "Entrez le nom du profil ici") << "</td>"
-				<< "<TD>(sélectionner un profil existant pour copier ses habilitations dans le nouveau profil)</TD>"
-				<< "<td>" << Html::getSubmitButton("Ajouter") << "</td>"
-				<< "</TR>"
+				<< "<td>" << Html::getTextInput(AddProfileAction::PARAMETER_NAME, "", "Entrez le nom du profil ici") << "</td>"
+				<< "<td>(sélectionner un profil existant pour copier ses habilitations dans le nouveau profil)</td>"
+				<< "<td>" 
+				<< Html::getHiddenInput(AddProfileAction::PARAMETER_TEMPLATE_ID, Conversion::ToString(UNKNOWN_VALUE))
+				<< Html::getSubmitButton("Ajouter") << "</td>"
+				<< "</form></tr>"
 
-				<< "</TABLE>"
+				<< "</table>";
 
-				<< "<P align=\"right\">Profils suivants &gt;</P>"
-				<< "<p>Sélection : " << Html::getSubmitButton("Supprimer") << "</p>"
-				<< "<P>Cliquer sur un titre de colonne pour trier le tableau.</P>";
+			delete profileRequest;
+			delete searchRequest;
+			delete addProfileRequest;
+			delete deleteProfileRequest;
 		}
 	}
 }

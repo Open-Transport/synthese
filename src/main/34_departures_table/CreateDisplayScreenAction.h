@@ -61,4 +61,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_CreateDisplayScreenAction_H__
- 

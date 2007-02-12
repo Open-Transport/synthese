@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_DB_LOG_RIGHT_H
 #define SYNTHESE_DB_LOG_RIGHT_H
 
+#include <string>
+
 #include "12_security/Right.h"
 
 namespace synthese
@@ -43,6 +45,7 @@ namespace synthese
 		{
 		public:
 			DBLogRight();
+			std::string displayParameter() const;
 
 		};
 	}

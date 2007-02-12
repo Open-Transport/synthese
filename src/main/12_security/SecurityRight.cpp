@@ -31,5 +31,10 @@ namespace synthese
 		{
 
 		}
+
+		std::string SecurityRight::displayParameter() const
+		{
+			return _parameter;
+		}
 	}
 }

@@ -77,7 +77,7 @@ namespace synthese
 		{
 			std::string				_cityName;
 			std::string				_placeName;
-			uid						_lineUid;
+			uid						_lineUId;
 			BroadcastPointsPresence	_displayNumber;
 			int						_number;
 			int						_first;

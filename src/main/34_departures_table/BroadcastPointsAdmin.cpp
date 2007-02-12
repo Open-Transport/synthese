@@ -72,7 +72,7 @@ namespace synthese
 
 			it = map.find(PARAMETER_LINE_ID);
 			if (it != map.end())
-				_lineUid = Conversion::ToLongLong(it->second);
+				_lineUId = Conversion::ToLongLong(it->second);
 
 			it = map.find(PARAMETER_NUMBER);
 			if (it != map.end())
@@ -82,7 +82,7 @@ namespace synthese
 			if (it != map.end())
 				_first = Conversion::ToInt(it->second);
 
-			_searchResult = searchConnectionPlacesWithBroadcastPoints(_cityName, _placeName, _displayNumber, _lineUid, _number, _first);
+			_searchResult = searchConnectionPlacesWithBroadcastPoints(_cityName, _placeName, _displayNumber, _lineUId, _number, _first);
 
 		}
 

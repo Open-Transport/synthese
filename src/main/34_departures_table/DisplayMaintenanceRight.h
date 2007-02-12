@@ -49,7 +49,7 @@ namespace synthese
 		{
 		public:
 			DisplayMaintenanceRight();
-
+			std::string displayParameter() const;
 		};
 	}
 }

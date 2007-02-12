@@ -1,6 +1,7 @@
 
-/** DeleteRightAction class implementation.
-	@file DeleteRightAction.cpp
+
+/** DeleteProfileAction class implementation.
+	@file DeleteProfileAction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,12 +21,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "12_security/DeleteRightAction.h"
-#include "12_security/Profile.h"
+#include <vector>
+
+#include "01_util/Conversion.h"
+
+#include "12_security/DeleteProfileAction.h"
 #include "12_security/SecurityModule.h"
+#include "12_security/User.h"
+#include "12_security/UserTableSync.h"
+#include "12_security/Profile.h"
 #include "12_security/ProfileTableSync.h"
 
 #include "30_server/ActionException.h"
+
 
 using namespace std;
 
@@ -35,25 +43,19 @@ namespace synthese
 	
 	namespace security
 	{
-		const string DeleteRightAction::PARAMETER_RIGHT = Action::PARAMETER_PREFIX + "right";
+		DeleteProfileAction::DeleteProfileAction()
+			: Action()
+			, _profile(NULL)
+		{}
 
-
-		Request::ParametersMap DeleteRightAction::getParametersMap() const
+		Request::ParametersMap DeleteProfileAction::getParametersMap() const
 		{
 			Request::ParametersMap map;
-			map.insert(make_pair(PARAMETER_RIGHT, _right));
 			return map;
 		}
 
-		void DeleteRightAction::setFromParametersMap(Request::ParametersMap& map)
+		void DeleteProfileAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
-
-			it = map.find(PARAMETER_RIGHT);
-			if (it == map.end())
-				throw ActionException("Right not specified");
-			_right = it->second;
-
 			try
 			{
 				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
@@ -62,22 +64,16 @@ namespace synthese
 			{
 				throw ActionException("Profile not found");
 			}
+
+			vector<User*> users = UserTableSync::search("","",_profile->getKey(),0, 1);
+			if (users.size() > 0)
+				throw ActionException("At least one user belongs to the specified profile. The deletion is forbidden.");
 		}
 
-		void DeleteRightAction::run()
+		void DeleteProfileAction::run()
 		{
 			if (_profile != NULL)
-			{
-				_profile->removeRight(_right);
-				ProfileTableSync::save(_profile);
-			}
-		}
-
-		DeleteRightAction::DeleteRightAction()
-			: Action()
-			, _profile(NULL)
-		{
-	
+				ProfileTableSync::remove(_profile->getKey());
 		}
 	}
 }

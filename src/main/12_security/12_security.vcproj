@@ -133,13 +133,52 @@
 			Name="Actions"
 			Filter="">
 			<File
+				RelativePath=".\AddProfileAction.cpp">
+			</File>
+			<File
+				RelativePath=".\AddProfileAction.h">
+			</File>
+			<File
+				RelativePath=".\AddRightAction.cpp">
+			</File>
+			<File
+				RelativePath=".\AddRightAction.h">
+			</File>
+			<File
 				RelativePath=".\AddUserAction.cpp">
 			</File>
 			<File
 				RelativePath=".\AddUserAction.h">
 			</File>
 			<File
+				RelativePath=".\DeleteProfileAction.cpp">
+			</File>
+			<File
+				RelativePath=".\DeleteProfileAction.h">
+			</File>
+			<File
+				RelativePath=".\DeleteRightAction.cpp">
+			</File>
+			<File
+				RelativePath=".\DeleteRightAction.h">
+			</File>
+			<File
+				RelativePath=".\DelUserAction.cpp">
+			</File>
+			<File
 				RelativePath=".\DelUserAction.h">
+			</File>
+			<File
+				RelativePath=".\UpdateProfileAction.cpp">
+			</File>
+			<File
+				RelativePath=".\UpdateProfileAction.h">
+			</File>
+			<File
+				RelativePath=".\UpdateRightAction.cpp">
+			</File>
+			<File
+				RelativePath=".\UpdateRightAction.h">
 			</File>
 		</Filter>
 		<Filter

@@ -49,6 +49,7 @@ namespace synthese
 		{
 		public:
 			BroadcastPointsRight();
+			std::string displayParameter() const;
 
 		};
 	}

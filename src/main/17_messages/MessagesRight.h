@@ -60,7 +60,7 @@ namespace synthese
 		{
 		public:
 			MessagesRight();
-
+			std::string displayParameter() const;
 		};
 	}
 }

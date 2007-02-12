@@ -35,5 +35,10 @@ namespace synthese
 		{
 
 		}
+
+		std::string BroadcastPointsRight::displayParameter() const
+		{
+			return _parameter;
+		}
 	}
 }

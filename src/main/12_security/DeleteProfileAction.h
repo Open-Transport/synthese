@@ -1,6 +1,6 @@
 
-/** ArrivalDepartureTableRight class implementation.
-	@file ArrivalDepartureTableRight.cpp
+/** DeleteProfileAction class header.
+	@file DeleteProfileAction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,25 +20,46 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ArrivalDepartureTableRight.h"
+#ifndef SYNTHESE_DeleteProfileAction_H__
+#define SYNTHESE_DeleteProfileAction_H__
+
+#include "30_server/Action.h"
 
 namespace synthese
 {
-	using namespace security;
-
-	namespace departurestable
+	namespace security
 	{
+		class Profile;
 
-
-		ArrivalDepartureTableRight::ArrivalDepartureTableRight()
-			: Right()
+		/** DeleteProfileAction action class.
+			@ingroup m12
+		*/
+		class DeleteProfileAction : public server::Action
 		{
+		public:
 
-		}
+		private:
+			Profile*	_profile;
 
-		std::string ArrivalDepartureTableRight::displayParameter() const
-		{
-			return _parameter;
-		}
+		protected:
+			/** Conversion from attributes to generic parameter maps.
+			*/
+			server::Request::ParametersMap getParametersMap() const;
+
+			/** Conversion from generic parameters map to attributes.
+			Removes the used parameters from the map.
+			*/
+			void setFromParametersMap(server::Request::ParametersMap& map);
+
+		public:
+			DeleteProfileAction();
+
+			/** Action to run, defined by each subclass.
+			*/
+			void run();
+		};
 	}
 }
+
+#endif // SYNTHESE_DeleteProfileAction_H__
+ 

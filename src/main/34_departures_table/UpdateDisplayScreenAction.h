@@ -82,4 +82,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_UpdateDisplayScreenAction_H__
- 

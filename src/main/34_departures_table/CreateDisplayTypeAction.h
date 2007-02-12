@@ -71,4 +71,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_CreateDisplayTypeAction_H__
- 

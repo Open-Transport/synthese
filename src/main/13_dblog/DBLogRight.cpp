@@ -22,6 +22,8 @@
 
 #include "DBLogRight.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace security;
@@ -35,6 +37,11 @@ namespace synthese
 			: Right()
 		{
 
+		}
+
+		std::string DBLogRight::displayParameter() const
+		{
+			return string();
 		}
 	}
 }

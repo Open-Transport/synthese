@@ -107,5 +107,13 @@ namespace synthese
 			}
 			return m;
 		}
+
+		std::map<std::string, std::string> SecurityModule::getRightLabels( bool withAll/*=false*/ )
+		{
+			map<string, string> m;
+			for (Factory<Right>::Iterator it = Factory<Right>::begin(); it != Factory<Right>::end(); ++it)
+				m.insert(make_pair(it.getKey(), it.getKey()));
+			return m;
+		}
 	}
 }

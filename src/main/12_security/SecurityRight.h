@@ -52,6 +52,8 @@ namespace synthese
 		{
 		public:
 			SecurityRight();
+			std::string	displayParameter()	const;
+
 		};
 	}
 }

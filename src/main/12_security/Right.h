@@ -75,11 +75,12 @@ namespace synthese
 			} Level;
 
 		private:
-			const std::string _parameter;
 			const Level _privateRightLevel;
 			const Level _publicRightLevel;
 
 		protected:
+			const std::string _parameter;
+
 			/** Constructor without parameters.
 				Used to build temporary right objects for factory iteration purposes.
 			*/
@@ -94,6 +95,12 @@ namespace synthese
 
 			Right(std::string parameter, Level privateLevel, Level publicLevel);
 			~Right();
+
+			virtual std::string displayParameter() const = 0;
+			Level				getPrivateRightLevel()	const;
+			Level				getPublicRightLevel()	const;
+
+			static std::string getLevelLabel(Level level);
 		};
 	}
 }

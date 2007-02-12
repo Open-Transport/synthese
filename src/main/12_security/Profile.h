@@ -57,9 +57,13 @@ namespace synthese
 			void setParent(uid id);
 			void setRights(const std::string& text);
 
-			const std::string& getName() const;
-			const uid getParentId() const;
-			const std::string getRightsString() const;
+			const std::string&	getName() const;
+			const uid			getParentId() const;
+			const std::string	getRightsString() const;
+			const RightsVector&	getRights()	const;
+
+			Right*				getRight(const std::string& key);
+			void				removeRight(const std::string& key);
 		};
 	}
 }

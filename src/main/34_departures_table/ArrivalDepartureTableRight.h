@@ -51,7 +51,7 @@ namespace synthese
 		{
 		public:
 			ArrivalDepartureTableRight();
-
+			std::string displayParameter() const;
 		};
 	}
 }

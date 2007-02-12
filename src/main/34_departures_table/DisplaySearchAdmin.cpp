@@ -53,11 +53,11 @@ namespace synthese
 		{
 			Request::ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_UID);
 			if (it != map.end())
-				_searchUid = it->second;
+				_searchUId = it->second;
 
 			it = map.find(PARAMETER_SEARCH_LOCALIZATION);
 			if (it != map.end())
-				_searchLocalizationUid = it->second;
+				_searchLocalizationUId = it->second;
 		}
 
 		string DisplaySearchAdmin::getTitle() const
@@ -83,8 +83,8 @@ namespace synthese
 
 			stream
 				<< "<table>"
-				<< "<tr><td>UID</td><td>" << Html::getTextInput(PARAMETER_SEARCH_UID, _searchUid) << "</td>"
-				<< "<td>Emplacement</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_LOCALIZATION, localizations, _searchLocalizationUid) << "</td>"
+				<< "<tr><td>UID</td><td>" << Html::getTextInput(PARAMETER_SEARCH_UID, _searchUId) << "</td>"
+				<< "<td>Emplacement</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_LOCALIZATION, localizations, _searchLocalizationUId) << "</td>"
 				<< "<td>Ligne</td><td><select name=\"Select4\">"
 				<< "<option value=\"\">(toutes)</option>";
 

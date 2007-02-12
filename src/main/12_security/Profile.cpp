@@ -1,4 +1,6 @@
 
+#include "01_util/Exception.h"
+
 #include "12_security/Profile.h"
 #include "12_security/Right.h"
 
@@ -63,6 +65,30 @@ namespace synthese
 		{
 			/// @todo Implementation
 			return "*,*,100,100";
+		}
+
+		void Profile::removeRight( const std::string& key )
+		{
+			for (Profile::RightsVector::iterator it = _rights.begin(); it != _rights.end(); ++it)
+				if ((*it)->getFactoryKey() == key)
+				{
+					_rights.erase(it);
+					return;
+				}
+			throw Exception("Right not found");
+		}
+
+		Right* Profile::getRight( const std::string& key )
+		{
+			for (Profile::RightsVector::iterator it = _rights.begin(); it != _rights.end(); ++it)
+				if ((*it)->getFactoryKey() == key)
+					return *it;
+			throw Exception("Right not found");
+		}
+
+		const Profile::RightsVector& Profile::getRights() const
+		{
+			return _rights;
 		}
 	}
 }

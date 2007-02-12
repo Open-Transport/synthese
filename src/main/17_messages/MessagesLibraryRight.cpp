@@ -35,5 +35,10 @@ namespace synthese
 		{
 	
 		}
+
+		std::string MessagesLibraryRight::displayParameter() const
+		{
+			return _parameter;
+		}
 	}
 }

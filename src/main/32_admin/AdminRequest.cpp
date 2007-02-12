@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "01_util/Conversion.h"
+#include "01_util/Html.h"
 #include "01_util/FactoryException.h"
 
 #include "11_interfaces/Interface.h"
@@ -147,7 +148,9 @@ namespace synthese
 		{
 			stringstream s;
 			s << Request::getHTMLFormHeader(name);
-			s << "<input type=\"hidden\" name=\"" << PARAMETER_PAGE << "\" value=\"" << _page->getFactoryKey() << "\" />";
+			s << Html::getHiddenInput(PARAMETER_PAGE, _page->getFactoryKey());
+			if (_object_id > 0)
+				s << Html::getHiddenInput(PARAMETER_OBJECT_ID, Conversion::ToString(_object_id));
 			return s.str();
 		}
 

@@ -45,7 +45,7 @@ namespace synthese
 		{
 		public:
 			MessagesLibraryRight();
-
+			std::string displayParameter() const;
 		};
 	}
 }

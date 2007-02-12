@@ -27,8 +27,14 @@
 #include "12_security/Profile.h"
 #include "12_security/ProfileAdmin.h"
 #include "12_security/ProfileTableSync.h"
+#include "12_security/UpdateProfileAction.h"
+#include "12_security/UpdateRightAction.h"
+#include "12_security/Right.h"
+#include "12_security/AddRightAction.h"
+#include "12_security/DeleteRightAction.h"
 
 #include "32_admin/AdminRequest.h"
+#include "32_admin/AdminParametersException.h"
 
 using namespace std;
 
@@ -59,30 +65,69 @@ namespace synthese
 
 		void ProfileAdmin::display(std::ostream& stream, const Request* request) const
 		{
+			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
+			updateRequest->copy(request);
+			updateRequest->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			updateRequest->setObjectId(_profile->getKey());
+			updateRequest->setAction(Factory<Action>::create<UpdateProfileAction>());
+
+			AdminRequest* updateRightRequest = Factory<Request>::create<AdminRequest>();
+			updateRightRequest->copy(request);
+			updateRightRequest->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			updateRightRequest->setObjectId(_profile->getKey());
+			updateRightRequest->setAction(Factory<Action>::create<UpdateRightAction>());
+
+			AdminRequest* deleteRightRequest = Factory<Request>::create<AdminRequest>();
+			deleteRightRequest->copy(request);
+			deleteRightRequest->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			deleteRightRequest->setObjectId(_profile->getKey());
+			deleteRightRequest->setAction(Factory<Action>::create<DeleteRightAction>());
+
+			AdminRequest* addRightRequest = Factory<Request>::create<AdminRequest>();
+			addRightRequest->copy(request);
+			addRightRequest->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			addRightRequest->setObjectId(_profile->getKey());
+			addRightRequest->setAction(Factory<Action>::create<AddRightAction>());
+
+
 			stream	// UpdateProfile
-				<< "<p>Nom : " << Html::getTextInput("", "") << Html::getSubmitButton("Modifier") << "</p>"
-				<< "<P>Habilitations du profil&nbsp;:</P>"
-				<< "<P>"
-				<< "<TABLE><TR>"
-				<< "<TD style=\"WIDTH: 140px\"><STRONG><FONT size=\"2\" color=\"#000000\">Nature</FONT></STRONG></TD>"
-				<< "<TD align=\"center\" style=\"WIDTH: 82px\"><STRONG><FONT color=\"#000000\" size=\"2\">Périmètre</FONT></STRONG></TD>"
-				<< "<TD style=\"WIDTH: 56px\" align=\"center\"><STRONG><FONT color=\"#000000\" size=\"2\">Type</FONT></STRONG></TD>"
-				<< "<TD align=\"center\" style=\"WIDTH: 94px\"><STRONG><FONT color=\"#000000\" size=\"2\">Droit</FONT></STRONG></TD>"
-				<< "<TD align=\"center\" colSpan=\"1\" rowSpan=\"1\"><STRONG><FONT size=\"2\" color=\"#000000\">Actions</FONT></STRONG></TD>"
-				<< "</TR>";
+				<< "<h1>Propriétés</h1>"
+				<< updateRequest->getHTMLFormHeader("update")
+				<< "<table>"
+				<< "<tr><td>Nom</td><td>" << Html::getTextInput(UpdateProfileAction::PARAMETER_NAME, _profile->getName()) << "</td>"
+				<< "<td>" << Html::getSubmitButton("Modifier") << "</td></tr>"
+				<< "</table></form>"
+
+				<< "<h1>Habilitations du profil&nbsp;:</h1>"
+				<< "<table>"
+				<< "<tr><th>Nature</th><th>Périmètre</th><th>Droit public</th><th>Droit privé</th><th colspan=\"2\">Actions</th></tr>";
 
 			// Habilitations list
-/*				<< "<tr><TD style=\"WIDTH: 140px\"><FONT color=\"#000000\" size=\"1\">Tout</FONT></TD>"
-				<< "<TD style=\"WIDTH: 82px\"><FONT color=\"#000000\" size=\"1\">Tout</FONT></TD>"
-				<< "<TD style=\"WIDTH: 56px\"><FONT color=\"#000000\" size=\"1\">Public</FONT></TD>"
-				<< "<TD style=\"WIDTH: 94px\"><FONT color=\"#000000\" size=\"1\">Utilisation</FONT></TD>"
-				<TD><FONT size=\"1\"><INPUT language=\"javascript\" id=\"Button6\" onclick=\"alert('Etes vous sur de vouloir supprimer l\'habilitation sélectionnées ?')\"
-				type=\"button\" value=\"Supprimer\" name=\"Modifier\"><FONT color=\"#000000\"></FONT></FONT></TD>
-				</TR>
-*/				
-/*			stream
-				<< "<TR>"
-				<< "<TD style=\"WIDTH: 140px\"><FONT size=\"1\"><SELECT id=\"Select1\" name=\"Select1\">"
+			for (Profile::RightsVector::const_iterator it = _profile->getRights().begin(); it != _profile->getRights().end(); ++it)
+			{
+				Right* right = *it;
+				stream
+					<< "<tr>"
+					<< updateRightRequest->getHTMLFormHeader("u" + right->getFactoryKey())
+					<< "<td>" << right->getFactoryKey() << "</td>"
+					<< "<td>" << right->displayParameter() << "</td>"
+					<< "<td>" << Right::getLevelLabel(right->getPublicRightLevel()) << "</td>"
+					<< "<td>" << Right::getLevelLabel(right->getPrivateRightLevel()) << "</td>"
+					<< "<td>"
+					<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT, right->getFactoryKey())
+					<< Html::getSubmitButton("Modifier")
+					<< "</td></form>"
+					<< "<td>" 
+					<< deleteRightRequest->getHTMLFormHeader("d" + right->getFactoryKey())
+					<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT, right->getFactoryKey())
+					<< Html::getSubmitButton("Supprimer")
+					<< "</form></td>"
+					<< "</tr>";
+			}
+			stream
+				<< "<tr>"
+				<< addRightRequest->getHTMLFormHeader("add")
+				<< "<td>" << "</td>"	// Rights list
 				<< "<OPTION value=\"\" selected>Tableaux de départs</OPTION>"
 				<< "<OPTION value=\"\">Environnement</OPTION>"
 				<< "</SELECT></FONT></TD>"
@@ -106,7 +151,7 @@ namespace synthese
 				<< "<TD><INPUT id=\"Button7\" type=\"button\" value=\"Ajouter\" name=\"Button7\"></TD>"
 				<< "</TR></TABLE>"
 				;
-*/		}
+		}
 
 		void ProfileAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
 		{
@@ -118,7 +163,7 @@ namespace synthese
 			}
 			catch (DBEmptyResultException& e)
 			{
-				// throw AdminElementInitializationException("Bad user");
+				throw AdminParametersException("Bad profile");
 			}
 		}
 

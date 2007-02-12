@@ -35,5 +35,10 @@ namespace synthese
 		{
 		
 		}
+
+		std::string DisplayMaintenanceRight::displayParameter() const
+		{
+			return _parameter;
+		}
 	}
 }

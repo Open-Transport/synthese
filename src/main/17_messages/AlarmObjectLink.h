@@ -50,7 +50,7 @@ namespace synthese
 			T*					getObject() const { return _object; }
 			const Alarm*		getAlarm() const { return _alarm; }
 
-			void setRecipientKey(const std::string& key) { _key = key; }
+			void setRecipientKey(const std::string& key) { _recipientKey = key; }
 			void setObject(T* object) { _object = object; }
 			void setAlarm(const Alarm* alarm) { _alarm = alarm; }
 
