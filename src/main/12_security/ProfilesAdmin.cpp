@@ -107,16 +107,14 @@ namespace synthese
 			addProfileRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
 			addProfileRequest->setAction(Factory<Action>::create<AddProfileAction>());
 
-
-			map<string, string>& rightsMap = SecurityModule::getRightsTemplates();
-			rightsMap.insert(make_pair("", "(toutes les habilitations)"));
-
 			stream
 				<< searchRequest->getHTMLFormHeader("search")
 				<< "<table id=\"searchform\"><tr>"
 				<< "<td>Nom</td><td>" << Html::getTextInput(PARAMETER_SEARCH_NAME, "") << "</td>"
 				<< "<td>Habilitation</td>"
-				<< "<td>" << Html::getSelectInput(PARAMETER_SEARCH_RIGHT, rightsMap, string()) << "</td>"
+				<< "<td>"
+				<< Html::getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightLabels(true), string())
+				<< "</td>"
 				<< "<td>" << Html::getSubmitButton("Rechercher") << "</td></tr>"
 				<< "</table></form>"
 				<< Html::setFocus("search", PARAMETER_SEARCH_NAME)

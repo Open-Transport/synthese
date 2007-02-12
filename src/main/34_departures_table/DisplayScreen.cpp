@@ -51,6 +51,8 @@ namespace synthese
 			, _firstRow(0)
 			, _maintenanceChecksPerDay(24 * 60)		// default = 1 check per minute
 			, _allPhysicalStopsDisplayed(false)
+			, _trackNumberDisplay(false)
+			, _serviceNumberDisplay(false)
 		{
 		}
 
