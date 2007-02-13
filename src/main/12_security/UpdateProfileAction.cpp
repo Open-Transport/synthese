@@ -36,7 +36,7 @@ namespace synthese
 	
 	namespace security
 	{
-		const string UpdateProfileAction::PARAMETER_NAME = Action::PARAMETER_PREFIX + "name";
+		const string UpdateProfileAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
 
 
 		Request::ParametersMap UpdateProfileAction::getParametersMap() const

@@ -41,21 +41,21 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		const std::string UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_ID = Action::PARAMETER_PREFIX + "li";
-		const std::string UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_COMMENT = Action::PARAMETER_PREFIX + "lc";
-		const std::string UpdateDisplayScreenAction::PARAMETER_WIRING_CODE = Action::PARAMETER_PREFIX + "wc";
-		const std::string UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY = Action::PARAMETER_PREFIX + "bd";
-		const std::string UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY = Action::PARAMETER_PREFIX + "cd";
-		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_PLATFORM = Action::PARAMETER_PREFIX + "dp";
-		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_SERVICE_NUMBER = Action::PARAMETER_PREFIX + "ds";
-		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_DEPARTURE_ARRIVAL = Action::PARAMETER_PREFIX + "da";
-		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER = Action::PARAMETER_PREFIX + "ef";
-		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY = Action::PARAMETER_PREFIX + "md";
-		const std::string UpdateDisplayScreenAction::PARAMETER_ACTIVATE_PRESELECTION = Action::PARAMETER_PREFIX + "ap";
-		const std::string UpdateDisplayScreenAction::PARAMETER_PRESELECTION_DELAY = Action::PARAMETER_PREFIX + "pd";
-		const std::string UpdateDisplayScreenAction::PARAMETER_TYPE = Action::PARAMETER_PREFIX + "ty";
-		const std::string UpdateDisplayScreenAction::PARAMETER_PHYSICAL = Action::PARAMETER_PREFIX + "ph";
-		const std::string UpdateDisplayScreenAction::PARAMETER_ALL_PHYSICALS = Action::PARAMETER_PREFIX + "ah";
+		const std::string UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_ID = Action_PARAMETER_PREFIX + "li";
+		const std::string UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_COMMENT = Action_PARAMETER_PREFIX + "lc";
+		const std::string UpdateDisplayScreenAction::PARAMETER_WIRING_CODE = Action_PARAMETER_PREFIX + "wc";
+		const std::string UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY = Action_PARAMETER_PREFIX + "bd";
+		const std::string UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY = Action_PARAMETER_PREFIX + "cd";
+		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_PLATFORM = Action_PARAMETER_PREFIX + "dp";
+		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_SERVICE_NUMBER = Action_PARAMETER_PREFIX + "ds";
+		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_DEPARTURE_ARRIVAL = Action_PARAMETER_PREFIX + "da";
+		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER = Action_PARAMETER_PREFIX + "ef";
+		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY = Action_PARAMETER_PREFIX + "md";
+		const std::string UpdateDisplayScreenAction::PARAMETER_ACTIVATE_PRESELECTION = Action_PARAMETER_PREFIX + "ap";
+		const std::string UpdateDisplayScreenAction::PARAMETER_PRESELECTION_DELAY = Action_PARAMETER_PREFIX + "pd";
+		const std::string UpdateDisplayScreenAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
+		const std::string UpdateDisplayScreenAction::PARAMETER_PHYSICAL = Action_PARAMETER_PREFIX + "ph";
+		const std::string UpdateDisplayScreenAction::PARAMETER_ALL_PHYSICALS = Action_PARAMETER_PREFIX + "ah";
 
 
 

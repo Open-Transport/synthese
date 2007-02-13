@@ -38,8 +38,8 @@ namespace synthese
 	
 	namespace security
 	{
-		const string AddProfileAction::PARAMETER_NAME = Action::PARAMETER_PREFIX + "apan";
-		const string AddProfileAction::PARAMETER_TEMPLATE_ID = Action::PARAMETER_PREFIX + "apat";
+		const string AddProfileAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "apan";
+		const string AddProfileAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "apat";
 
 
 		Request::ParametersMap AddProfileAction::getParametersMap() const

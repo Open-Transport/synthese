@@ -33,8 +33,8 @@ namespace synthese
 	
 	namespace vinci
 	{
-		const string VinciAddBike::PARAMETER_NUMBER = Action::PARAMETER_PREFIX + "nu";
-		const string VinciAddBike::PARAMETER_MARKED_NUMBER = Action::PARAMETER_PREFIX + "mn";
+		const string VinciAddBike::PARAMETER_NUMBER = Action_PARAMETER_PREFIX + "nu";
+		const string VinciAddBike::PARAMETER_MARKED_NUMBER = Action_PARAMETER_PREFIX + "mn";
 
 
 		Request::ParametersMap VinciAddBike::getParametersMap() const

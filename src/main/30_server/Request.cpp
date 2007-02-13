@@ -258,7 +258,7 @@ namespace synthese
 				ParametersMap actionMap = _action->getParametersMap();
 				for (ParametersMap::const_iterator it = actionMap.begin(); it != actionMap.end(); ++it)
 				{
-					map.insert(make_pair(Action::PARAMETER_PREFIX + it->first, it->second));
+					map.insert(make_pair(Action_PARAMETER_PREFIX + it->first, it->second));
 				}
 			}
 			if (_session != NULL)

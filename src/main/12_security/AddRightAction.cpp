@@ -30,7 +30,7 @@ namespace synthese
 	
 	namespace security
 	{
-		const string AddRightAction::PARAMETER_RIGHT = Action::PARAMETER_PREFIX + "right";
+		const string AddRightAction::PARAMETER_RIGHT = Action_PARAMETER_PREFIX + "right";
 
 
 		Request::ParametersMap AddRightAction::getParametersMap() const

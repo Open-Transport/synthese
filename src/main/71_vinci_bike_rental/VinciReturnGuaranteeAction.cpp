@@ -50,7 +50,7 @@ namespace synthese
 	
 	namespace vinci
 	{
-		const string VinciReturnGuaranteeAction::PARAMETER_GUARANTEE_ID = Action::PARAMETER_PREFIX + "gu";
+		const string VinciReturnGuaranteeAction::PARAMETER_GUARANTEE_ID = Action_PARAMETER_PREFIX + "gu";
 
 
 		Request::ParametersMap VinciReturnGuaranteeAction::getParametersMap() const

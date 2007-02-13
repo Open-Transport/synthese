@@ -40,7 +40,7 @@ namespace synthese
 		string PasswordHtmlField::getValue(const interfaces::ParametersVector& parameters, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			stringstream stream;
-			stream << "<input type=\"password\" name=\"" << Action::PARAMETER_PREFIX << LoginAction::PARAMETER_PASSWORD << "\" />";
+			stream << "<input type=\"password\" name=\"" << Action_PARAMETER_PREFIX << LoginAction::PARAMETER_PASSWORD << "\" />";
 			return stream.str();
 		}
 

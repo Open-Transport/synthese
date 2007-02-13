@@ -39,9 +39,9 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		const string CreateBroadcastPointAction::PARAMETER_NAME = Action::PARAMETER_PREFIX + "nam";
-		const string CreateBroadcastPointAction::PARAMETER_PHYSICAL_ID = Action::PARAMETER_PREFIX + "pid";
-		const string CreateBroadcastPointAction::PARAMETER_PLACE_ID = Action::PARAMETER_PREFIX + "lid";
+		const string CreateBroadcastPointAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
+		const string CreateBroadcastPointAction::PARAMETER_PHYSICAL_ID = Action_PARAMETER_PREFIX + "pid";
+		const string CreateBroadcastPointAction::PARAMETER_PLACE_ID = Action_PARAMETER_PREFIX + "lid";
 
 
 		Request::ParametersMap CreateBroadcastPointAction::getParametersMap() const

@@ -35,7 +35,7 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		const string DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID = Action::PARAMETER_PREFIX + "bid";
+		const string DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID = Action_PARAMETER_PREFIX + "bid";
 
 
 		Request::ParametersMap DeleteBroadcastPointAction::getParametersMap() const

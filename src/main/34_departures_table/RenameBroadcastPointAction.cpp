@@ -35,8 +35,8 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		const string RenameBroadcastPointAction::PARAMETER_NAME = Action::PARAMETER_PREFIX + "nam";
-		const string RenameBroadcastPointAction::PARAMETER_BROADCAST_ID = Action::PARAMETER_PREFIX + "bid";
+		const string RenameBroadcastPointAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
+		const string RenameBroadcastPointAction::PARAMETER_BROADCAST_ID = Action_PARAMETER_PREFIX + "bid";
 
 
 		Request::ParametersMap RenameBroadcastPointAction::getParametersMap() const

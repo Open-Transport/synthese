@@ -17,8 +17,8 @@ namespace synthese
 
 	namespace vinci
 	{
-		const string AddCustomerAction::PARAMETER_NAME = Action::PARAMETER_PREFIX + "name";
-		const string AddCustomerAction::PARAMETER_SURNAME = Action::PARAMETER_PREFIX + "surname";
+		const string AddCustomerAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
+		const string AddCustomerAction::PARAMETER_SURNAME = Action_PARAMETER_PREFIX + "surname";
 
 
 		Request::ParametersMap AddCustomerAction::getParametersMap() const

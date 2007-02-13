@@ -20,15 +20,15 @@ namespace synthese
 	
 	namespace vinci
 	{
-		const string VinciUpdateCustomerAction::PARAMETER_NAME = Action::PARAMETER_PREFIX + "na";
-		const string VinciUpdateCustomerAction::PARAMETER_SURNAME = Action::PARAMETER_PREFIX + "sn";
-		const string VinciUpdateCustomerAction::PARAMETER_ADDRESS = Action::PARAMETER_PREFIX + "ad";
-		const string VinciUpdateCustomerAction::PARAMETER_POST_CODE = Action::PARAMETER_PREFIX + "pc";
-		const string VinciUpdateCustomerAction::PARAMETER_CITY = Action::PARAMETER_PREFIX + "ci";
-		const string VinciUpdateCustomerAction::PARAMETER_COUNTRY = Action::PARAMETER_PREFIX + "co";
-		const string VinciUpdateCustomerAction::PARAMETER_EMAIL = Action::PARAMETER_PREFIX + "em";
-		const string VinciUpdateCustomerAction::PARAMETER_PHONE = Action::PARAMETER_PREFIX + "ph";
-		const string VinciUpdateCustomerAction::PARAMETER_ID = Action::PARAMETER_PREFIX + "id";
+		const string VinciUpdateCustomerAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string VinciUpdateCustomerAction::PARAMETER_SURNAME = Action_PARAMETER_PREFIX + "sn";
+		const string VinciUpdateCustomerAction::PARAMETER_ADDRESS = Action_PARAMETER_PREFIX + "ad";
+		const string VinciUpdateCustomerAction::PARAMETER_POST_CODE = Action_PARAMETER_PREFIX + "pc";
+		const string VinciUpdateCustomerAction::PARAMETER_CITY = Action_PARAMETER_PREFIX + "ci";
+		const string VinciUpdateCustomerAction::PARAMETER_COUNTRY = Action_PARAMETER_PREFIX + "co";
+		const string VinciUpdateCustomerAction::PARAMETER_EMAIL = Action_PARAMETER_PREFIX + "em";
+		const string VinciUpdateCustomerAction::PARAMETER_PHONE = Action_PARAMETER_PREFIX + "ph";
+		const string VinciUpdateCustomerAction::PARAMETER_ID = Action_PARAMETER_PREFIX + "id";
 
 
 		Request::ParametersMap VinciUpdateCustomerAction::getParametersMap() const

@@ -40,9 +40,9 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		const string CreateDisplayTypeAction::PARAMETER_NAME = Action::PARAMETER_PREFIX + "dtc_name";
-		const string CreateDisplayTypeAction::PARAMETER_INTERFACE_ID = Action::PARAMETER_PREFIX + "dtc_interf";
-		const string CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action::PARAMETER_PREFIX + "dtc_rows";
+		const string CreateDisplayTypeAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "dtc_name";
+		const string CreateDisplayTypeAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "dtc_interf";
+		const string CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "dtc_rows";
 
 
 		Request::ParametersMap CreateDisplayTypeAction::getParametersMap() const

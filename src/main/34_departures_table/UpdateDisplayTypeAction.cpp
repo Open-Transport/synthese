@@ -43,10 +43,10 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const string UpdateDisplayTypeAction::PARAMETER_ID = Action::PARAMETER_PREFIX + "dtu_id";
-		const string UpdateDisplayTypeAction::PARAMETER_NAME = Action::PARAMETER_PREFIX + "dtu_name";
-		const string UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID = Action::PARAMETER_PREFIX + "dtu_interf";
-		const string UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action::PARAMETER_PREFIX + "dtu_rows";
+		const string UpdateDisplayTypeAction::PARAMETER_ID = Action_PARAMETER_PREFIX + "dtu_id";
+		const string UpdateDisplayTypeAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "dtu_name";
+		const string UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "dtu_interf";
+		const string UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "dtu_rows";
 
 
 		Request::ParametersMap UpdateDisplayTypeAction::getParametersMap() const

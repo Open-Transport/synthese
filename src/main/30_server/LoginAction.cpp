@@ -47,13 +47,13 @@ namespace synthese
 
 		void LoginAction::setFromParametersMap(Request::ParametersMap& map )
 		{
-			Request::ParametersMap::iterator it = map.find(Action::PARAMETER_PREFIX + PARAMETER_LOGIN);
+			Request::ParametersMap::iterator it = map.find(Action_PARAMETER_PREFIX + PARAMETER_LOGIN);
 			if (it == map.end())
 				throw ActionException("Login field not found");
 			_login = it->second;
 			map.erase(it);
 
-			it = map.find(Action::PARAMETER_PREFIX + PARAMETER_PASSWORD);
+			it = map.find(Action_PARAMETER_PREFIX + PARAMETER_PASSWORD);
 			if (it == map.end())
 				throw ActionException("Password field not found");
 			_password = it->second;

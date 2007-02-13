@@ -54,9 +54,9 @@ namespace synthese
 
 	namespace vinci
 	{
-		const std::string RentABikeAction::PARAMETER_RATE_ID = Action::PARAMETER_PREFIX + "ri";
-		const std::string RentABikeAction::PARAMETER_BIKE_ID = Action::PARAMETER_PREFIX + "bi";
-		const std::string RentABikeAction::PARAMETER_CONTRACT_ID = Action::PARAMETER_PREFIX + "ci";
+		const std::string RentABikeAction::PARAMETER_RATE_ID = Action_PARAMETER_PREFIX + "ri";
+		const std::string RentABikeAction::PARAMETER_BIKE_ID = Action_PARAMETER_PREFIX + "bi";
+		const std::string RentABikeAction::PARAMETER_CONTRACT_ID = Action_PARAMETER_PREFIX + "ci";
 
 		/** Conversion from attributes to generic parameter maps.
 		*/

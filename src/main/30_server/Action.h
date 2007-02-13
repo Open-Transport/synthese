@@ -27,6 +27,9 @@
 
 #include "30_server/Request.h"
 
+#define Action_PARAMETER_PREFIX std::string("actionParam")
+
+
 namespace synthese
 {
 	namespace server
@@ -40,8 +43,7 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_ACTION;
-			static const std::string PARAMETER_PREFIX;
-
+			
 		protected:
 			Request* _request;
 

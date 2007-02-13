@@ -35,7 +35,7 @@ namespace synthese
 	
 	namespace security
 	{
-		const string DeleteRightAction::PARAMETER_RIGHT = Action::PARAMETER_PREFIX + "right";
+		const string DeleteRightAction::PARAMETER_RIGHT = Action_PARAMETER_PREFIX + "right";
 
 
 		Request::ParametersMap DeleteRightAction::getParametersMap() const

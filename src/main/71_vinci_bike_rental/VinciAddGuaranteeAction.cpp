@@ -50,9 +50,9 @@ namespace synthese
 	
 	namespace vinci
 	{
-		const string VinciAddGuaranteeAction::PARAMETER_AMOUNT = Action::PARAMETER_PREFIX + "am";
-		const string VinciAddGuaranteeAction::PARAMETER_CONTRACT_ID = Action::PARAMETER_PREFIX + "ci";
-		const string VinciAddGuaranteeAction::PARAMETER_ACCOUNT_ID = Action::PARAMETER_PREFIX + "ac";
+		const string VinciAddGuaranteeAction::PARAMETER_AMOUNT = Action_PARAMETER_PREFIX + "am";
+		const string VinciAddGuaranteeAction::PARAMETER_CONTRACT_ID = Action_PARAMETER_PREFIX + "ci";
+		const string VinciAddGuaranteeAction::PARAMETER_ACCOUNT_ID = Action_PARAMETER_PREFIX + "ac";
 
 
 		Request::ParametersMap VinciAddGuaranteeAction::getParametersMap() const
