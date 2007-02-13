@@ -26,6 +26,7 @@
 
 #include "15_env/ConnectionPlace.h"
 #include "15_env/City.h"
+#include "15_env/EnvModule.h"
 
 #include "32_admin/AdminRequest.h"
 
@@ -97,19 +98,26 @@ namespace synthese
 			goRequest->copy(request);
 			goRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
 
+			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
+			searchRequest->copy(request);
+			searchRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointsAdmin>());
+
 			map<int, string> m;
 			m.insert(make_pair((int) WITH_OR_WITHOU_ANY_BROADCASTPOINT, "(filtre désactivé)"));
 			m.insert(make_pair((int) AT_LEAST_ONE_BROADCASTPOINT, "Au moins un"));
 			m.insert(make_pair((int) NO_BROADCASTPOINT, "Aucun"));
 
 			stream
+				<< "<h1>Recherche</h1>"
+				<< searchRequest->getHTMLFormHeader("search")
 				<< "<table>"
 				<< "<tr><td>Commune</td><td>" << Html::getTextInput(PARAMETER_CITY_NAME, _cityName) << "</td>"
 				<< "<td>Nom</td><td>" << Html::getTextInput(PARAMETER_PLACE_NAME, _placeName) << "</td>"
 				<< "<td>Terminaux d'affichage</td><td>" << Html::getSelectInput(PARAMETER_DISPLAY_NUMBER, m, (int) _displayNumber) << "</td></tr>"
-				<< "<tr><td>Ligne</td><td></td>"	// Lines list
+				<< "<tr><td>Ligne</td><td>" 
+				<< Html::getSelectInput(PARAMETER_LINE_ID, EnvModule::getCommercialLineLabels(true), _lineUId) << "</td>"	// Lines list
 				<< "<td colspan=\"4\">" << Html::getSubmitButton("Rechercher") << "</td></tr>"
-				<< "</table>"
+				<< "</table></form>"
 
 				<< "<h1>Résultats de la recherche</h1>"
 				<< "<table>"
@@ -131,7 +139,22 @@ namespace synthese
 			}
 			stream
 				<< "</table>"
-				<< "<p align=\"right\">Emplacements&nbsp;suivants &gt;</p>";
+				<< "<table style=\"border:none\"><tr><td>";
+			if (_first > 0)
+			{
+				searchRequest->setParameter(PARAMETER_FIRST, Conversion::ToString((_first > _number) ? _first - _number : 0));
+				stream << searchRequest->getHTMLLink("Emplacements précédents");
+			}
+			stream << "</td><td style=\"text-align:right\">";
+			if (_searchResult.size() >= _number)
+			{
+				searchRequest->setParameter(PARAMETER_FIRST, Conversion::ToString(_first + _number));
+				stream << searchRequest->getHTMLLink("Emplacements suivants");
+			}
+			stream << "</td></tr></table>";
+
+			delete goRequest;
+			delete searchRequest;
 		}
 
 		BroadcastPointsAdmin::~BroadcastPointsAdmin()

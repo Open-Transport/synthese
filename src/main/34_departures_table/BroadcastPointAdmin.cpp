@@ -28,10 +28,14 @@
 #include "15_env/City.h"
 
 #include "32_admin/AdminParametersException.h"
+#include "32_admin/AdminRequest.h"
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
 #include "34_departures_table/BroadcastPointAdmin.h"
 #include "34_departures_table/BroadcastPoint.h"
+#include "34_departures_table/CreateBroadcastPointAction.h"
+#include "34_departures_table/RenameBroadcastPointAction.h"
+#include "34_departures_table/DeleteBroadcastPointAction.h"
 
 using namespace std;
 
@@ -72,6 +76,21 @@ namespace synthese
 
 		void BroadcastPointAdmin::display(ostream& stream, const Request* request) const
 		{
+			AdminRequest* createRequest = Factory<Request>::create<AdminRequest>();
+			createRequest->copy(request);
+			createRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
+			createRequest->setAction(Factory<Action>::create<CreateBroadcastPointAction>());
+
+			AdminRequest* deleteRequest = Factory<Request>::create<AdminRequest>();
+			deleteRequest->copy(request);
+			deleteRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
+			deleteRequest->setAction(Factory<Action>::create<DeleteBroadcastPointAction>());
+
+			AdminRequest* renameRequest = Factory<Request>::create<AdminRequest>();
+			renameRequest->copy(request);
+			renameRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
+			renameRequest->setAction(Factory<Action>::create<RenameBroadcastPointAction>());
+
 			stream
 				<< "<h1>Emplacements d'affichage de la zone d'arrêt</h1>"
 				<< "<table>";
@@ -80,15 +99,28 @@ namespace synthese
 			vector<PhysicalStopAndBroadcastPoint> m = getConnectionPlacePhysicalStopsAndBroadcastPoints(_place->getKey());
 			for (vector<PhysicalStopAndBroadcastPoint>::iterator it = m.begin(); it != m.end(); ++it)
 			{
+
 				stream
 					<< "<tr><td>Arrêt physique " << it->stop->getName() << "</td>"
 					<< "<td>";
 				if (it->bp == NULL)
+				{
 					stream
-						<< Html::getSubmitButton("Activer") ;
+						<< createRequest->getHTMLFormHeader("create" + Conversion::ToString(it->stop->getKey()))
+						<< Html::getHiddenInput(CreateBroadcastPointAction::PARAMETER_PHYSICAL_ID, Conversion::ToString(it->stop->getKey()))
+						<< Html::getHiddenInput(CreateBroadcastPointAction::PARAMETER_PLACE_ID, Conversion::ToString(_place->getKey()))
+						<< Html::getSubmitButton("Activer")
+						<< "</form>";
+				}
 				else
+				{
 					stream
-						<< "Arrêt physique actif en tant que point de diffusion" << Html::getSubmitButton("Supprimer") ;
+						<< deleteRequest->getHTMLFormHeader("delete" + Conversion::ToString(it->bp->getKey()))
+						<< Html::getHiddenInput(DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(it->bp->getKey()))
+						<< "Arrêt physique actif en tant que point de diffusion" 
+						<< Html::getSubmitButton("Supprimer")
+						<< "</form>";
+				}
 				stream	
 					<< "</td>"
 					<< "</tr>";
@@ -99,17 +131,29 @@ namespace synthese
 			for (vector<PhysicalStopAndBroadcastPoint>::iterator bit = b.begin(); bit != b.end(); ++bit)
 			{
 				stream
-					<< "<tr><td>" << Html::getTextInput("", bit->bp->getName()) << "</td>"
-					<< "<td>" << Html::getSubmitButton("Renommer") << "</td>"
-					<< "<td>" << Html::getSubmitButton("Supprimer") << "</td>"
+					<< "<tr><td>" << renameRequest->getHTMLFormHeader("rename" + Conversion::ToString(bit->bp->getKey()))
+					<< Html::getHiddenInput(RenameBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(bit->bp->getKey()))
+					<< Html::getTextInput(RenameBroadcastPointAction::PARAMETER_NAME, bit->bp->getName())
+					<< Html::getSubmitButton("Renommer")
+					<< "</form></td>"
+					<< "<td>" << deleteRequest->getHTMLFormHeader("delete" + Conversion::ToString(bit->bp->getKey()))
+					<< Html::getHiddenInput(DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(bit->bp->getKey()))
+					<< Html::getSubmitButton("Supprimer")
+					<< "</form></td>"
 					<< "</tr>";
 				delete bit->bp;
 			}
 
 			stream
-				<< "<tr><td>" << Html::getTextInput("", "", "(entrez le nom ici)") << "</td>"
+				<< createRequest->getHTMLFormHeader("createbp")
+				<< Html::getHiddenInput(CreateBroadcastPointAction::PARAMETER_PLACE_ID, Conversion::ToString(_place->getKey()))
+				<< "<tr><td>" << Html::getTextInput(CreateBroadcastPointAction::PARAMETER_NAME, "", "(entrez le nom ici)") << "</td>"
 				<< "<td>" << Html::getSubmitButton("Ajouter") << "</td>"
-				<< "</tr>";
+				<< "</tr></form>";
+
+			delete createRequest;
+			delete deleteRequest;
+			delete renameRequest;
 		}
 	}
 }
