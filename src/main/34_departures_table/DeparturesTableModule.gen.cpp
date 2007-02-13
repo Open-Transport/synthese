@@ -20,6 +20,9 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::departure
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayTypeAction>("updatedisplaytype");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateDisplayScreenAction>("createdisplayscreen");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayScreenAction>("updatedisplayscreen");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateBroadcastPointAction>("crebp");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::RenameBroadcastPointAction>("renbp");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DeleteBroadcastPointAction>("delbp");
 
 synthese::util::Factory<synthese::server::Request>::integrate<synthese::departurestable::DisplayScreenContentRequest>("tdg");
 

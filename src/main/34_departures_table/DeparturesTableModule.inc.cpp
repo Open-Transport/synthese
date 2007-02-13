@@ -22,3 +22,6 @@
 #include "34_departures_table/UpdateDisplayScreenAction.h"
 #include "34_departures_table/DisplayScreenContentRequest.h"
 #include "34_departures_table/DisplayMaintenanceAdmin.h"
+#include "34_departures_table/CreateBroadcastPointAction.h"
+#include "34_departures_table/RenameBroadcastPointAction.h"
+#include "34_departures_table/DeleteBroadcastPointAction.h"
