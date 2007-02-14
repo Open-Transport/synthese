@@ -172,5 +172,39 @@ namespace synthese
 			}
 		}
 
+		std::vector<Alarm*> AlarmTableSync::search(time::DateTime startDate, time::DateTime endDate , env::ConnectionPlace* place, env::CommercialLine* line , int first /*= 0*/, int number /*= 0*/)
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT a.*"
+				<< " FROM " << TABLE_NAME << " AS a "
+				<< " WHERE 1 ";
+			if (!startDate.isUnknown())
+				query << COL_PERIODSTART << "<=" << startDate.toSQLString();
+			if (!endDate.isUnknown())
+				query << " AND " << COL_PERIODEND << ">=" << endDate.toSQLString();
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<Alarm*> objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					Alarm* object =  new Alarm();
+					load(object, result, i);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
 	}
 }

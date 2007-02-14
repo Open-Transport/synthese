@@ -28,6 +28,7 @@
 #include <string>
 #include <iostream>
 
+#include "01_util/Constants.h"
 #include "01_util/UId.h"
 
 #include "02_db/SQLiteTableSyncTemplate.h"

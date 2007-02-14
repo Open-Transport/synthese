@@ -66,4 +66,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_DeleteBroadcastPointAction_H__
- 

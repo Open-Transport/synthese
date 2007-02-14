@@ -40,7 +40,7 @@ namespace synthese
 		const std::string DisplayScreenSupervisionRequest::PARAMETER_SUPERVISION_VALUES = "sv";
 		
 		DisplayScreenSupervisionRequest::DisplayScreenSupervisionRequest()
-			: Request(Request::NEEDS_SESSION)
+			: Request()
 			, _displayScreen(NULL)
 		{}
 

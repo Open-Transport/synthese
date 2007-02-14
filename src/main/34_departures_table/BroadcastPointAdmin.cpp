@@ -28,7 +28,6 @@
 #include "15_env/City.h"
 
 #include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
 #include "34_departures_table/BroadcastPointAdmin.h"
@@ -42,7 +41,6 @@ using namespace std;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace env;
@@ -55,7 +53,7 @@ namespace synthese
 		{}
 
 
-		void BroadcastPointAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void BroadcastPointAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			// Place ID
 			Request::ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
@@ -74,7 +72,7 @@ namespace synthese
 			return _place->getCity()->getName() + " " + _place->getName();
 		}
 
-		void BroadcastPointAdmin::display(ostream& stream, const Request* request) const
+		void BroadcastPointAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
 			AdminRequest* createRequest = Factory<Request>::create<AdminRequest>();
 			createRequest->copy(request);

@@ -24,8 +24,6 @@
 
 #include "11_interfaces/InterfaceModule.h"
 
-#include "32_admin/AdminRequest.h"
-
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplayTypesAdmin.h"
@@ -47,7 +45,7 @@ namespace synthese
 		DisplayTypesAdmin::DisplayTypesAdmin()
 			: AdminInterfaceElement("displays", AdminInterfaceElement::EVER_DISPLAYED) {}
 
-		void DisplayTypesAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void DisplayTypesAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			/// @todo Initialize internal attributes from the map
 		}
@@ -57,7 +55,7 @@ namespace synthese
 			return "Types d'afficheurs";
 		}
 
-		void DisplayTypesAdmin::display(ostream& stream, const Request* request) const
+		void DisplayTypesAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
 			AdminRequest* createRequest = Factory<Request>::create<AdminRequest>();
 			createRequest->copy(request);

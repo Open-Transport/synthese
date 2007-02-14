@@ -27,6 +27,7 @@
 #include "01_util/FactoryException.h"
 
 #include "11_interfaces/Interface.h"
+#include "11_interfaces/InterfacePage.h"
 
 #include "30_server/RequestException.h"
 
@@ -48,15 +49,15 @@ namespace synthese
 	{
 		const std::string AdminRequest::PARAMETER_PAGE = "rub";
 		const std::string AdminRequest::PARAMETER_ACTION_FAILED_PAGE = "afp";
-
+		
 		AdminRequest::AdminRequest()
-			: Request(Request::NEEDS_SESSION)
+			: RequestWithInterfaceAndRequiredSession()
 			, _page(NULL), _actionFailedPage(NULL)
 		{}
 
 		AdminRequest::ParametersMap AdminRequest::getParametersMap() const
 		{
-			ParametersMap map;
+			ParametersMap map(RequestWithInterfaceAndRequiredSession::getParametersMap());
 			map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
 			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_object_id)));
 			if (_actionFailedPage != NULL)
@@ -66,31 +67,22 @@ namespace synthese
 
 		void AdminRequest::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
+			RequestWithInterfaceAndRequiredSession::setFromParametersMap(map);
 
-			// Page
-			it = map.find(PARAMETER_PAGE);
 			try
 			{
+				// Page
+				ParametersMap::const_iterator it;
+
+				it = map.find(PARAMETER_PAGE);
 				AdminInterfaceElement* page = (it == map.end())
 					? Factory<AdminInterfaceElement>::create<HomeAdmin>()
 					: Factory<AdminInterfaceElement>::create(it->second);
 				page->setFromParametersMap(map);
 				_page = page;
-			}
-			catch (FactoryException<AdminInterfaceElement> e)
-			{
-				throw RequestException("Admin page " + it->second + " not found");
-			}
-			catch (AdminParametersException e)
-			{
-				throw RequestException("Admin page parameters error : " + e.getMessage());
-			}
 
-			// Action failed page
-			it = map.find(PARAMETER_ACTION_FAILED_PAGE);
-			try
-			{
+				// Action failed page
+				it = map.find(PARAMETER_ACTION_FAILED_PAGE);
 				if (it == map.end())
 				{
 					_actionFailedPage = _page;
@@ -100,34 +92,40 @@ namespace synthese
 					AdminInterfaceElement* page = Factory<AdminInterfaceElement>::create(it->second);
 					page->setFromParametersMap(map);
 					_actionFailedPage = page;
-				}				
+				}
+
+				// Parameters saving
+				_parameters = map;
 			}
 			catch (FactoryException<AdminInterfaceElement> e)
 			{
-				throw RequestException("Admin page " + it->second + " not found");
+				throw RequestException("Admin page not found");
 			}
 			catch (AdminParametersException e)
 			{
 				throw RequestException("Admin page parameters error : " + e.getMessage());
 			}
-
-			// Parameters saving
-			_parameters = map;
-			
 		}
 
 		void AdminRequest::run( std::ostream& stream ) const
 		{
-			const AdminInterfacePage* aip;
 			try
 			{
-				aip = _site->getInterface()->getPage<AdminInterfacePage>();
+				if (_interface != NULL)
+				{
+					const AdminInterfacePage* aip;
+					aip = _interface->getPage<AdminInterfacePage>();
+					aip->display(stream, _page, _object_id, this);
+				}
+				else
+				{
+					_page->display(stream, this);
+				}
 			}
 			catch (Exception e)
 			{
 				throw RequestException("Admin interface page not implemented in database");
 			}
-			aip->display(stream, _page, _object_id, this);
 		}
 
 		AdminRequest::~AdminRequest()
@@ -147,8 +145,9 @@ namespace synthese
 		std::string AdminRequest::getHTMLFormHeader( const std::string& name ) const
 		{
 			stringstream s;
-			s << Request::getHTMLFormHeader(name);
-			s << Html::getHiddenInput(PARAMETER_PAGE, _page->getFactoryKey());
+			s << RequestWithInterfaceAndRequiredSession::getHTMLFormHeader(name);
+			if (_page != NULL)
+				s << Html::getHiddenInput(PARAMETER_PAGE, _page->getFactoryKey());
 			if (_object_id > 0)
 				s << Html::getHiddenInput(PARAMETER_OBJECT_ID, Conversion::ToString(_object_id));
 			return s.str();
@@ -172,6 +171,5 @@ namespace synthese
 		{
 			_actionFailedPage = aie;
 		}
-		
 	}
 }

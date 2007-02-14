@@ -32,8 +32,6 @@
 
 #include "30_server/ServerModule.h"
 
-#include "32_admin/AdminRequest.h"
-
 using namespace std;
 
 namespace synthese
@@ -63,7 +61,7 @@ namespace synthese
 			return "Utilisateurs";
 		}
 
-		void UsersAdmin::display( std::ostream& stream, const Request* request) const
+		void UsersAdmin::display( std::ostream& stream, const AdminRequest* request) const
 		{
 			// Request for search form
 			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
@@ -153,7 +151,7 @@ namespace synthese
 			delete searchRequest;
 		}
 
-		void UsersAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void UsersAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			Request::ParametersMap::const_iterator it;
 

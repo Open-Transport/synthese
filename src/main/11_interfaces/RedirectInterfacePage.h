@@ -32,7 +32,7 @@ namespace synthese
 		class Request;
 	}
 
-	namespace server
+	namespace interfaces
 	{
 		/** Redirection interface page.
 			
@@ -66,4 +66,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_RedirectInterfacePage_H__
-

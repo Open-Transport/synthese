@@ -30,25 +30,19 @@
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfacePage.h"
-
 #include "30_server/ActionException.h"
 #include "30_server/ServerModule.h"
 #include "30_server/Session.h"
-#include "30_server/Site.h"
 #include "30_server/SessionException.h"
 #include "30_server/Action.h"
-#include "30_server/RedirectInterfacePage.h"
 #include "30_server/RequestException.h"
 #include "30_server/Request.h"
 
-using std::string;
+using namespace std;
 
 namespace synthese
 {
 	using namespace util;
-	using namespace interfaces;
 
 	namespace server
 	{
@@ -58,7 +52,6 @@ namespace synthese
 		const std::string Request::PARAMETER_ASSIGNMENT ("=");
 		const int Request::MAX_REQUEST_SIZE (4096);
 		const std::string Request::PARAMETER_FUNCTION = "fonction";
-		const std::string Request::PARAMETER_SITE = "site";
 		const std::string Request::PARAMETER_SESSION = "sid";
 		const std::string Request::PARAMETER_IP = "ipaddr";
 		const std::string Request::PARAMETER_CLIENT_URL = "clienturl";
@@ -67,10 +60,9 @@ namespace synthese
 		const std::string Request::PARAMETER_ERROR_MESSAGE = "rem";
 		const std::string Request::PARAMETER_ERROR_LEVEL = "rel";
 
-		Request::Request(IsSessionNeeded isSessionNeeded)
+		Request::Request()
 			: _session(NULL)
 			, _action(NULL)
-			, _needsSession(isSessionNeeded)
 			, _actionException(false)
 			, _errorLevel(REQUEST_ERROR_NONE)
 		{
@@ -131,23 +123,6 @@ namespace synthese
 			}
 			map.erase(it);
 			
-			// Used site
-			it = map.find(PARAMETER_SITE);
-			if (it == map.end())
-				throw RequestException("Site not specified");
-			try
-			{
-				request->_site = ServerModule::getSites().get(Conversion::ToLongLong(it->second));
-			}
-			catch (Site::RegistryKeyException e)
-			{
-				throw RequestException("Site not found");
-			}
-			// Site validity control
-			if (!request->_site->dateControl())
-				throw RequestException("Site is deactivated");
-			map.erase(it);
-
 			// IP
 			it = map.find(PARAMETER_IP);
 			if (it == map.end())
@@ -204,7 +179,6 @@ namespace synthese
 				request->_object_id = Conversion::ToLongLong(it->second);
 			}
 
-
 			// Last action error
 			it = map.find(PARAMETER_ACTION_FAILED);
 			if (it != map.end())
@@ -235,7 +209,7 @@ namespace synthese
 				// Action
 				request->_action = Action::create(request, map);
 			}
-			catch (ActionException& e)
+			catch (ActionException& e)	// Action parameters error
 			{
 				request->_actionException = true;
 				request->_errorLevel = REQUEST_ERROR_WARNING;
@@ -251,7 +225,6 @@ namespace synthese
 			// Adding function name
 			ParametersMap map = getParametersMap();
 			map.insert(make_pair(PARAMETER_FUNCTION, getFactoryKey()));
-			map.insert(make_pair(PARAMETER_SITE, Conversion::ToString(_site->getKey())));
 			if (_action != NULL)
 			{
 				map.insert(make_pair(Action::PARAMETER_ACTION, _action->getFactoryKey()));
@@ -283,45 +256,29 @@ namespace synthese
 
 		void Request::runActionAndFunction( std::ostream& stream )
 		{
+			// Handle of the action
 			if (_action != NULL)
 			{
 				try
 				{
+					// Run of the action
 					_action->run();
-
-					// Redirection to the same request without the action
-					_action = NULL;
-					const RedirectInterfacePage* page = _site->getInterface()->getPage<RedirectInterfacePage>();
-					page->display(stream, this);
-					return;
+					
+					// Run after the action
+					if (runAfterAction(stream))	// Overloaded method
+						return;
 				}
-				catch (ActionException e)
+				catch (ActionException e)	// Action run error
 				{
-					/** @todo Create a ActionException factory, a value interface element called 
-					isactionerror actionname
-					When an action returns an exception, it must be a pointer to a registered subclass of 
-					ActionException. The isactionerror will compare the key of the exception and the actionname
-					if the coparison is ok true is returned. This statement can be included in a print or a goto
-					command as the if one.
-					**/
 					_actionException = true;
 					_errorMessage = e.getMessage();
 					_errorLevel = REQUEST_ERROR_WARNING;
 				}
 			}
-			if (_needsSession == NEEDS_SESSION && _session == NULL)
-			{
-				_actionException = true;
-				_errorMessage = _errorMessage + "Session invalide";
-				_errorLevel = REQUEST_ERROR_FATAL;
-				if (_site->getInterface()->getNoSessionDefaultPageCode() != "")
-				{
-					const InterfacePage* page = _site->getInterface()->getPage(_site->getInterface()->getNoSessionDefaultPageCode());
-					ParametersVector pv;
-					page->display(stream, pv, NULL, this);
-				}
+
+			// No session is active.
+			if ((_session == NULL) && runBeforeDisplayIfNoSession(stream))
 				return;
-			}
 			
 			// Run the display
 			run(stream);			
@@ -345,7 +302,6 @@ namespace synthese
 
 		void Request::copy( const Request* request )
 		{
-			_site = request->_site;
 			_clientURL = request->_clientURL;
 			_session = request->_session;
 		}
@@ -399,8 +355,7 @@ namespace synthese
 		{
 			std::stringstream str;
 			str	<< "<form name=\"" << name << "\" action=\"" << _clientURL << "\" method=\"post\">"
-				<< "<input type=\"hidden\" name=\"" << PARAMETER_FUNCTION << "\" value=\"" << getFactoryKey() << "\" />"
-				<< "<input type=\"hidden\" name=\"" << PARAMETER_SITE << "\" value=\"" << _site->getKey() << "\" />";
+				<< "<input type=\"hidden\" name=\"" << PARAMETER_FUNCTION << "\" value=\"" << getFactoryKey() << "\" />";
 			if (_session != NULL)
 				str << "<input type=\"hidden\" name=\"" << PARAMETER_SESSION << "\" value=\"" << _session->getKey() << "\" />";
 			if (_action != NULL)
@@ -408,11 +363,6 @@ namespace synthese
 				str << "<input type=\"hidden\" name=\"" << Action::PARAMETER_ACTION << "\" value=\"" << _action->getFactoryKey() << "\" />";
 			}
 			return str.str();
-		}
-
-		const Site* Request::getSite() const
-		{
-			return _site;
 		}
 
 		const Action* Request::getAction() const
@@ -434,6 +384,16 @@ namespace synthese
 		const std::string& Request::getErrorMessage() const
 		{
 			return _errorMessage;
+		}
+
+		bool Request::runAfterAction(ostream& stream)
+		{
+			return false;
+		}
+
+		bool Request::runBeforeDisplayIfNoSession( std::ostream& stream )
+		{
+			return false;
 		}
 	}
 }

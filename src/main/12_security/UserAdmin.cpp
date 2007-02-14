@@ -29,8 +29,6 @@
 #include "12_security/UserTableSync.h"
 #include "12_security/SecurityModule.h"
 
-#include "32_admin/AdminRequest.h"
-
 using namespace std;
 
 namespace synthese
@@ -57,7 +55,7 @@ namespace synthese
 				: "";
 		}
 
-		void UserAdmin::display(std::ostream& stream, const Request* request) const
+		void UserAdmin::display(std::ostream& stream, const AdminRequest* request) const
 		{
 			stream
 				<< "<table>"
@@ -80,7 +78,7 @@ namespace synthese
 				<< "</table>";
 		}
 
-		void UserAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void UserAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			try
 			{

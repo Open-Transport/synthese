@@ -33,7 +33,6 @@
 #include "15_env/LineStop.h"
 
 #include "30_server/Request.h"
-#include "30_server/Site.h"
 
 #include "34_departures_table/Types.h"
 #include "34_departures_table/DeparturesTableInterfaceElement.h"
@@ -79,7 +78,7 @@ namespace synthese
 		{
 			const Line* line = ((const ArrivalDepartureRow*) object)->first.linestop->getLine();
 
-			const LineMarkerInterfacePage* page = request->getSite()->getInterface()->getPage<LineMarkerInterfacePage>();
+			const LineMarkerInterfacePage* page = _page->getInterface()->getPage<LineMarkerInterfacePage>();
 			page->display(stream
 				, _htmlStartLine->getValue(parameters, object, request)
 				, _htmlEndLine->getValue(parameters, object, request)

@@ -36,7 +36,7 @@ namespace synthese
 		MessagesScenarioSendAdmin::MessagesScenarioSendAdmin()
 			: AdminInterfaceElement("superior", AdminInterfaceElement::EVER_DISPLAYED) {}
 
-		void MessagesScenarioSendAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void MessagesScenarioSendAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			/// @todo Initialize internal attributes from the map
 		}
@@ -47,7 +47,7 @@ namespace synthese
 			return "title";
 		}
 
-		void MessagesScenarioSendAdmin::display(ostream& stream, const Request* request) const
+		void MessagesScenarioSendAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
 			/// @todo Implement the display by streaming the output to the stream variable
 		}

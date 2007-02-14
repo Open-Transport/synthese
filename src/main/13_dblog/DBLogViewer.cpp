@@ -32,7 +32,6 @@
 #include "13_dblog/DBLogModule.h"
 
 #include "32_admin/AdminParametersException.h"
-#include "32_admin/AdminRequest.h"
 
 using namespace std;
 
@@ -57,7 +56,7 @@ namespace synthese
 			, _searchType(UNKNOWN_VALUE)
 		{}
 
-		void DBLogViewer::setFromParametersMap(const server::Request::ParametersMap& map)
+		void DBLogViewer::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			Request::ParametersMap::const_iterator it = map.find(PARAMETER_LOG_KEY);
 			if (it == map.end())
@@ -85,7 +84,7 @@ namespace synthese
 			return (_dbLog != NULL) ? _dbLog->getName() : "(pas de journal)";
 		}
 
-		void DBLogViewer::display(ostream& stream, const Request* request) const
+		void DBLogViewer::display(ostream& stream, const AdminRequest* request) const
 		{
 			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
 			searchRequest->copy(request);

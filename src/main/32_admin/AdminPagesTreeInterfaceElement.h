@@ -30,12 +30,14 @@ namespace synthese
 {
 	namespace admin
 	{
+		class AdminRequest;
+
 		/** Tree of admin pages links.
 			@ingroup m32
 		*/
 		class AdminPagesTreeInterfaceElement : public interfaces::ValueInterfaceElement
 		{
-			static std::string getSubPages(const std::string& page, const AdminInterfaceElement* currentPage, const server::Request* request);
+			static std::string getSubPages(const std::string& page, const AdminInterfaceElement* currentPage, const AdminRequest* request);
 
 		public:
 			/** Controls and store the internals parameters.

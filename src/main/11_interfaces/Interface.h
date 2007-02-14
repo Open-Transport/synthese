@@ -85,8 +85,16 @@ namespace synthese
 
 				//! \name Accesseurs
 				//@{
-					InterfacePage* getPage( const std::string& ) const;
+					/** Builds a new page from the class factory key.
+						@param key Key of the wanted class
+						@return A pointer to the existing wanted page in the interface definition (do not delete the pointer)
+						@exception InterfacePageException The code is not available in the factory
+					*/
+					InterfacePage* getPage( const std::string& key) const;
 
+					/** Builds a new page from the class name.
+						@exception Factory<InterfacePage> The page is not implemented or declared in the factory init. (should not occur in production environment)
+					*/
 					template <class T>
 					const T* getPage() const
 					{

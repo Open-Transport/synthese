@@ -204,6 +204,7 @@ namespace synthese
 				ArrivalDepartureTableGenerator*	getGenerator(const time::DateTime& startTime) const;
 				void							display(std::ostream& stream) const;
 				void							recordSupervision(const std::string& supervisionValue) const;
+				std::string						getFullName()	const;
 			//@}
 
 		};

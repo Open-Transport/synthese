@@ -70,6 +70,7 @@ namespace synthese
 			env::ConnectionPlace* getConnectionPlace() const;
 			env::PhysicalStop* getPhysicalStop() const;
 
+			std::string	getFullName()	const;
 		};
 	}
 }

@@ -67,6 +67,18 @@
 				RelativePath=".\Parametres.h">
 			</File>
 			<File
+				RelativePath=".\RequestWithInterface.cpp">
+			</File>
+			<File
+				RelativePath=".\RequestWithInterface.h">
+			</File>
+			<File
+				RelativePath=".\RequestWithInterfaceAndRequiredSession.cpp">
+			</File>
+			<File
+				RelativePath=".\RequestWithInterfaceAndRequiredSession.h">
+			</File>
+			<File
 				RelativePath=".\ValueElementList.cpp">
 			</File>
 			<File
@@ -167,6 +179,32 @@
 				RelativePath=".\InterfacePageException.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="Requests"
+			Filter="">
+			<File
+				RelativePath=".\RedirRequest.cpp">
+			</File>
+			<File
+				RelativePath=".\RedirRequest.h">
+			</File>
+			<File
+				RelativePath=".\SimplePageRequest.cpp">
+			</File>
+			<File
+				RelativePath=".\SimplePageRequest.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Interface Pages"
+			Filter="">
+			<File
+				RelativePath=".\RedirectInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\RedirectInterfacePage.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\InterfaceModule.cpp">
 		</File>
@@ -181,6 +219,9 @@
 		</File>
 		<File
 			RelativePath=".\SConscript">
+		</File>
+		<File
+			RelativePath=".\Types.h">
 		</File>
 	</Files>
 	<Globals>

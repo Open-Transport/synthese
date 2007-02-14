@@ -33,7 +33,6 @@
 #include "12_security/AddRightAction.h"
 #include "12_security/DeleteRightAction.h"
 
-#include "32_admin/AdminRequest.h"
 #include "32_admin/AdminParametersException.h"
 
 using namespace std;
@@ -63,7 +62,7 @@ namespace synthese
 				: "";
 		}
 
-		void ProfileAdmin::display(std::ostream& stream, const Request* request) const
+		void ProfileAdmin::display(std::ostream& stream, const AdminRequest* request) const
 		{
 			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
 			updateRequest->copy(request);
@@ -153,7 +152,7 @@ namespace synthese
 				;
 		}
 
-		void ProfileAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void ProfileAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			try
 			{

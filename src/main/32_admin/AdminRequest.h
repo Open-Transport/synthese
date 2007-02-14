@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_AdminRequest_H__
 #define SYNTHESE_AdminRequest_H__
 
-#include "30_server/Request.h"
+#include "11_interfaces/RequestWithInterfaceAndRequiredSession.h"
 
 namespace synthese
 {
@@ -31,16 +31,16 @@ namespace synthese
 	{
 		class AdminInterfaceElement;
 
-		class AdminRequest : public server::Request
+		class AdminRequest : public interfaces::RequestWithInterfaceAndRequiredSession
 		{
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_ACTION_FAILED_PAGE;
 			
 			//! \name Page parameters
 			//@{
-			const AdminInterfaceElement*	_page;
-			const AdminInterfaceElement*	_actionFailedPage;
-			ParametersMap					_parameters;
+				const AdminInterfaceElement*	_page;
+				const AdminInterfaceElement*	_actionFailedPage;
+				ParametersMap					_parameters;
 			//@}
 
 
@@ -67,7 +67,6 @@ namespace synthese
 			std::string getHTMLFormHeader(const std::string& name) const;
 
 			void setParameter(const std::string& name, const std::string value);
-
 		};
 	}
 }

@@ -21,13 +21,12 @@ namespace synthese
 		void CityListInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request) const
 		{
 			// Parameters
-			ParametersVector pv = _parameters.fillParameters(parameters);
-			string errorMessage = pv.front();
-			string openingText = pv.front();
-			string closingText = pv.front();
-			int n = Conversion::ToInt(pv.front());
-			string inputText = pv.front();
-			string emptyLineText = pv.front();
+			string errorMessage = _errorMessage->getValue(parameters, object, request);
+			string openingText = _openingText->getValue(parameters, object, request);
+			string closingText = _closingText->getValue(parameters, object, request);
+			int n = Conversion::ToInt(_n->getValue(parameters, object, request));
+			string inputText = _inputText->getValue(parameters, object, request);
+			string emptyLineText = _emptyLineText->getValue(parameters, object, request);
 
 			const Environment::CityList tbCommunes = *((const Environment::CityList*) object);
 
@@ -52,9 +51,14 @@ namespace synthese
 
 		}
 
-		void CityListInterfaceElement::parse(const std::string& text )
+		void CityListInterfaceElement::storeParameters( interfaces::ValueElementList& pv)
 		{
-			_parameters.parse(text);
+			_errorMessage = pv.front();
+			_openingText = pv.front();
+			_closingText = pv.front();
+			_n = pv.front();
+			_inputText = pv.front();
+			_emptyLineText = pv.front();
 		}
 	}
 }

@@ -10,6 +10,7 @@ namespace synthese
 {
 	namespace interfaces
 	{
+		class InterfacePage;
 		class ValueElementList;
 
 		/** element which can produce a single display.
@@ -18,6 +19,7 @@ namespace synthese
 		class LibraryInterfaceElement : public DisplayableElement, public util::Factorable
 		{
 		protected:
+			const InterfacePage*	_page;
 
 			/** Constructor.
 			*/
@@ -31,14 +33,13 @@ namespace synthese
 
 			void parse( const std::string& text );
 
-			static LibraryInterfaceElement* create( const std::string & text );
+			static LibraryInterfaceElement* create( const std::string & text, const InterfacePage* page );
 
 			template<class T>
 			LibraryInterfaceElement* copy( const ParametersVector& parameters )
 			{
 				return new T(*((T*) this));
 			}
-
 		};
 	}
 }

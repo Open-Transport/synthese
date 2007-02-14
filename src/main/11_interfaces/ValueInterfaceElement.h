@@ -34,12 +34,17 @@ namespace synthese
 	namespace interfaces
 	{
 		class ValueElementList;
+		class InterfacePage;
 
 		/** Code defined interface element which produces a string value at runtime.
 		*/
 		class ValueInterfaceElement : public util::Factorable
 		{
+		protected:
+			const InterfacePage*	_page;
+
 		public:
+			void				setPage(const InterfacePage* page);
 			virtual void		storeParameters(ValueElementList& vel) = 0;
 			virtual std::string	getValue(const ParametersVector&, const void* object = NULL, const server::Request* request = NULL) const = 0;
 			bool				isZero(const ParametersVector&, const void* object = NULL, const server::Request* request = NULL) const;

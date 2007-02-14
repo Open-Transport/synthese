@@ -5,9 +5,9 @@
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/Interface.h"
+#include "11_interfaces/RedirRequest.h"
+#include "11_interfaces/SimplePageRequest.h"
 
-#include "30_server/ActionOnlyRequest.h"
-#include "30_server/SimplePageRequest.h"
 #include "30_server/LogoutAction.h"
 #include "30_server/LogoutHTMLLinkInterfaceElement.h"
 
@@ -35,31 +35,31 @@ namespace synthese
 			std::string url = _redirectionURL->getValue(parameters, rootObject, request);
 			std::string requestKey = _page_key->getValue(parameters, rootObject, request);
 
-			Request* redirRequest = NULL;
 			if (requestKey != "")
 			{
 				try
 				{
-					InterfacePage* page = request->getSite()->getInterface()->getPage(requestKey);
-					redirRequest = Factory<Request>::create<SimplePageRequest>();
-					((SimplePageRequest*) redirRequest)->setPage(page);
+					SimplePageRequest* redirRequest = Factory<Request>::create<SimplePageRequest>();
+					redirRequest->copy(request);
+					redirRequest->setPage(_page->getInterface()->getPage(requestKey));
+					redirRequest->setAction(Factory<Action>::create<LogoutAction>());
+					stream << redirRequest->getHTMLLink(_content->getValue(parameters, NULL, request));
+					delete redirRequest;
 				}
 				catch (InterfacePageException e)
 				{
 					Log::GetInstance().debug("No such interface page "+ requestKey);
 				}
 			}
-			if (redirRequest == NULL)
+			if (url.size())
 			{
-				redirRequest = Factory<Request>::create<ActionOnlyRequest>();
-				((ActionOnlyRequest*) redirRequest)->setURL(url);
+				RedirRequest* redirRequest = Factory<Request>::create<RedirRequest>();
+				redirRequest->copy(request);
+				redirRequest->setUrl(url);
+				redirRequest->setAction(Factory<Action>::create<LogoutAction>());
+				stream << redirRequest->getHTMLLink(_content->getValue(parameters, NULL, request));
+				delete redirRequest;
 			}
-			redirRequest->copy(request);
-			redirRequest->setAction(Factory<Action>::create<LogoutAction>());
-
-			stream << redirRequest->getHTMLLink(_content->getValue(parameters, NULL, request));
-
-			delete redirRequest;
 			return stream.str();
 		}
 

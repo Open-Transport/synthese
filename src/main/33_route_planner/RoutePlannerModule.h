@@ -25,6 +25,8 @@
 
 #include "01_util/ModuleClass.h"
 
+#include "33_route_planner/Site.h"
+
 /** @defgroup m33 Route planner service module.
 @{
 */
@@ -33,7 +35,13 @@ namespace synthese
 {
 	class RoutePlannerModule : public util::ModuleClass
 	{
+	private:
+		static Site::Registry			_sites;
+
 	public:
+
+		static Site::Registry& getSites();
+
 
 	};
 }

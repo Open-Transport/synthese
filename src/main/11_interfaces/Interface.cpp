@@ -148,6 +148,7 @@ namespace synthese
 
 		void Interface::addPage(const string& code, InterfacePage* page )
 		{
+			page->setInterface(this);
 			_pages.insert(make_pair( code, page ));
 		}
 

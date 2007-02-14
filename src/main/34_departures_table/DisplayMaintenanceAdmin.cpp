@@ -22,7 +22,11 @@
 
 #include "01_util/Html.h"
 
-#include "DisplayMaintenanceAdmin.h"
+#include "32_admin/AdminParametersException.h"
+
+#include "34_departures_table/DisplayMaintenanceAdmin.h"
+#include "34_departures_table/DisplayScreen.h"
+#include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
 
@@ -37,27 +41,39 @@ namespace synthese
 	{
 		/// @todo Verify the parent constructor parameters
 		DisplayMaintenanceAdmin::DisplayMaintenanceAdmin()
-			: AdminInterfaceElement("superior", AdminInterfaceElement::EVER_DISPLAYED) {}
+			: AdminInterfaceElement("superior", AdminInterfaceElement::EVER_DISPLAYED)
+			, _displayScreen(NULL)
+		{}
 
-		void DisplayMaintenanceAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void DisplayMaintenanceAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
+			try
+			{
+				AdminRequest::ParametersMap::const_iterator it = map.find(AdminRequest::PARAMETER_OBJECT_ID);
+				if (it == map.end())
+					throw AdminParametersException("Screen not specified");
+
+				_displayScreen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
+			}
+			catch (DisplayScreen::RegistryKeyException e)
+			{
+				throw AdminParametersException("Specified display screen not found (" + Conversion::ToString(e.getKey()) +")");
+			}
 		}
 
 		string DisplayMaintenanceAdmin::getTitle() const
 		{
-			/// @todo Change the title of the page
-			return "title";
+			return "Supervision " + _displayScreen->getFullName();
 		}
 
-		void DisplayMaintenanceAdmin::display(ostream& stream, const Request* request) const
+		void DisplayMaintenanceAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
 			stream
 				<< "<h1>Paramètres de maintenance</h1>"
 				<< "<table>"
-				<< "<tr><td>Nombre de contrôles par jour</td><td>" << Html::getSelectNumberInput("", 0, 1440, 0, 10) << "</td></tr>"
-				<< "<tr><td>Afficheur déclaré en service</td><td>" << Html::getOuiNonRadioInput("", true) << "</td></tr>"
-				<< "<tr><td>Message de maintenance</td><td>" << Html::getTextAreaInput("", "", 30, 3) << "</td></tr>"
+				<< "<tr><td>Nombre de contrôles par jour</td><td>" << Html::getSelectNumberInput("", 0, 1440, _displayScreen->getMaintenananceChecksPerDay(), 10) << "</td></tr>"
+				<< "<tr><td>Afficheur déclaré en service</td><td>" << Html::getOuiNonRadioInput("", _displayScreen->getIsOnline()) << "</td></tr>"
+				<< "<tr><td>Message de maintenance</td><td>" << Html::getTextAreaInput("", _displayScreen->getMaintenanceMessage(), 30, 3) << "</td></tr>"
 				<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregistrer les modifications") << "</td></tr>"
 				<< "</table></form>"
 				<< "<h1>Contrôle de cohérence des données</h1>"

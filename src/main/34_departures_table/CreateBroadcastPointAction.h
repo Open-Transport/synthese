@@ -73,4 +73,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_CreateBroadcastPointAction_H__
- 

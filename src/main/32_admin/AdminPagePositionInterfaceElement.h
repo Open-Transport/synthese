@@ -3,12 +3,15 @@
 #define SYNTHESE_AdminPagePositionInterfaceElement_H__
 
 #include <string>
+
 #include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
 	namespace admin
 	{
+		class AdminRequest;
+
 		/** Position of current admin page in the tree.
 			@ingroup m32
 		*/
@@ -18,7 +21,7 @@ namespace synthese
 			//interfaces::ValueInterfaceElement* _parameter1;
 			//...
 
-			static std::string getUpPages(const AdminInterfaceElement* page, const server::Request* request, bool isFirst = true);
+			static std::string getUpPages(const AdminInterfaceElement* page, const AdminRequest* request, bool isFirst = true);
 
 		public:
 			/** Controls and store the internals parameters.

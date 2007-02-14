@@ -27,14 +27,12 @@
 
 #include "01_util/Factorable.h"
 
-#include "30_server/Request.h"
+#include "32_admin/AdminRequest.h"
 
 namespace synthese
 {
 	namespace admin
 	{
-		class AdminRequest;
-
 		/** Composant d'administration.
 			@ingroup m32
 			
@@ -64,14 +62,14 @@ namespace synthese
 			const std::string& getSuperior() const;
 			const DisplayMode getDisplayMode() const;
 
-			std::string getHTMLLink(const server::Request* request) const;
+			std::string getHTMLLink(const AdminRequest* request) const;
 
 			//! \name Virtual initialization method
 			//@{
 				/** Initialization of the parameters from a request.
 					@param request The request to use for the initialization.
 				*/
-				virtual void setFromParametersMap(const server::Request::ParametersMap& map) = 0;
+				virtual void setFromParametersMap(const AdminRequest::ParametersMap& map) = 0;
 			//@}
 
 			//! \name Virtual output methods
@@ -79,7 +77,7 @@ namespace synthese
 				/** Display of the content of the admin element.
 					@param stream Stream to write on.
 				*/
-				virtual void display(std::ostream& stream, const server::Request* request=NULL) const = 0;
+				virtual void display(std::ostream& stream, const AdminRequest* request=NULL) const = 0;
 
 				/** Title of the admin compound.
 					@return The title of the admin compound, for display purposes.

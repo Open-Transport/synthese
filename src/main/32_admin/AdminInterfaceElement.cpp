@@ -22,8 +22,6 @@
 
 #include <sstream>
 
-#include "30_server/Request.h"
-
 #include "32_admin/AdminRequest.h"
 #include "32_admin/AdminInterfaceElement.h"
 
@@ -50,14 +48,14 @@ namespace synthese
 			return _superior;
 		}
 
-		std::string AdminInterfaceElement::getHTMLLink(const Request* request) const
+		std::string AdminInterfaceElement::getHTMLLink(const AdminRequest* request) const
 		{
 			stringstream str;
-			Request* linkRequest = Factory<Request>::create<AdminRequest>();
+			AdminRequest* linkRequest = Factory<Request>::create<AdminRequest>();
 			linkRequest->copy(request);
-			((AdminRequest* ) linkRequest)->setPage(this);
+			linkRequest->setPage(this);
 			str << linkRequest->getHTMLLink(getTitle());
-			((AdminRequest* ) linkRequest)->setPage(NULL); // To avoid the deletion of the page which can be used later
+			linkRequest->setPage(NULL); // To avoid the deletion of the page which can be used later
 			delete linkRequest;
 			return str.str();
 		}

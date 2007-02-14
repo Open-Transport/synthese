@@ -42,7 +42,7 @@ namespace synthese
 		const std::string DisplayScreenContentRequest::PARAMETER_DATE = "date";
 
 		DisplayScreenContentRequest::DisplayScreenContentRequest()
-			: Request(Request::NEEDS_SESSION)
+			: Request()
 			, _screen(NULL)
 		{}
 

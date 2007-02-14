@@ -463,7 +463,9 @@ namespace synthese
 
 		std::string DateTime::toString() const
 		{
-			return _date.toString() + " " + _hour.toString();
+			return isUnknown()
+				? ""
+				: (_date.toString() + " " + _hour.toString());
 		}
 
 		DateTime DateTime::FromInternalString( const std::string& str )

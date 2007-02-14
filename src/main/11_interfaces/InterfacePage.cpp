@@ -47,7 +47,7 @@ namespace synthese
 				LibraryInterfaceElement* lie;
 				try
 				{
-					lie = LibraryInterfaceElement::create(line);
+					lie = LibraryInterfaceElement::create(line, this);
 				}
 				// Jump interface elements with parse errors
 				catch (InterfacePageException e)
@@ -73,6 +73,16 @@ namespace synthese
 				_components.push_back( make_pair( last_label, lie ));
 				last_label = "";
 			}
+		}
+
+		void InterfacePage::setInterface( const Interface* value )
+		{
+			_interface = value;
+		}
+
+		const Interface* InterfacePage::getInterface() const
+		{
+			return _interface;
 		}
 	}
 }

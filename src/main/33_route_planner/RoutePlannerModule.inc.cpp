@@ -1,4 +1,5 @@
 
+#include "33_route_planner/SiteTableSync.h"
 #include "33_route_planner/RoutePlannerSheetLinesCellInterfacePage.h"
 #include "33_route_planner/RoutePlannerSheetLineInterfacePage.h"
 #include "33_route_planner/RoutePlannerSheetColumnInterfacePage.h"
@@ -8,5 +9,3 @@
 #include "33_route_planner/JourneyBoardJunctionCellInterfacePage.h"
 #include "33_route_planner/JourneyLineListInterfaceElement.h"
 #include "33_route_planner/JourneyBoardInterfaceElement.h"
-
-using namespace synthese::routeplanner;

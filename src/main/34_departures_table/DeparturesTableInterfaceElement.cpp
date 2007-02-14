@@ -30,7 +30,6 @@
 #include "11_interfaces/InterfacePageException.h"
 
 #include "30_server/Request.h"
-#include "30_server/Site.h"
 
 #include "34_departures_table/Types.h"
 #include "34_departures_table/DeparturesTableInterfaceElement.h"
@@ -113,7 +112,7 @@ namespace synthese
 						: (1 + __NumeroPage % __NombrePagesRangee);     // 1 : Numero de page
 
 					// Lancement de l'affichage de la rangee
-					const DepartureTableRowInterfacePage* page = request->getSite()->getInterface()->getPage<DepartureTableRowInterfacePage>();
+					const DepartureTableRowInterfacePage* page = _page->getInterface()->getPage<DepartureTableRowInterfacePage>();
 					page->display(stream, __Rangee, pageNumber, &___DP, request);
 					delete page;
 

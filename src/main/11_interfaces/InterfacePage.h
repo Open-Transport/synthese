@@ -17,7 +17,7 @@ namespace synthese
 	   
 	namespace interfaces
 	{
-
+		class Interface;
 		class LibraryInterfaceElement;
 
 		/** Definition of a page, coming from the database. Page are elements of an interface.
@@ -34,7 +34,8 @@ namespace synthese
 			typedef std::vector<std::pair<std::string, LibraryInterfaceElement*> > PageComponentsVector;
 
 		private:
-			PageComponentsVector _components;
+			const Interface*		_interface;
+			PageComponentsVector	_components;
 
 		public:
 
@@ -55,6 +56,9 @@ namespace synthese
 				@return Name of the next line to display (empty = next line)
 			*/
 			void display(std::ostream& stream, const ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
+
+			void	setInterface(const Interface*);
+			const Interface*	getInterface()	const;
 		};
 	}
 }

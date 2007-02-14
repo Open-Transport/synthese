@@ -40,7 +40,7 @@ namespace synthese
 		
 		/// @todo build of the attributes
 		DisplayScreenSupervisionInitRequest::DisplayScreenSupervisionInitRequest()
-			: Request(Request::NEEDS_SESSION)
+			: Request()
 		{}
 
 		Request::ParametersMap DisplayScreenSupervisionInitRequest::getParametersMap() const

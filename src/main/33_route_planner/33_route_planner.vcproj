@@ -46,36 +46,50 @@
 				RelativePath=".\BestVertexReachesMap.cpp">
 			</File>
 			<File
-				RelativePath=".\Journey.cpp">
-			</File>
-			<File
-				RelativePath=".\JourneyLeg.cpp">
-			</File>
-			<File
-				RelativePath=".\JourneyLegComparator.cpp">
-			</File>
-			<File
-				RelativePath=".\RoutePlanner.cpp">
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
 				RelativePath=".\BestVertexReachesMap.h">
+			</File>
+			<File
+				RelativePath=".\Journey.cpp">
 			</File>
 			<File
 				RelativePath=".\Journey.h">
 			</File>
 			<File
+				RelativePath=".\JourneyLeg.cpp">
+			</File>
+			<File
 				RelativePath=".\JourneyLeg.h">
+			</File>
+			<File
+				RelativePath=".\JourneyLegComparator.cpp">
 			</File>
 			<File
 				RelativePath=".\JourneyLegComparator.h">
 			</File>
 			<File
+				RelativePath=".\RoutePlanner.cpp">
+			</File>
+			<File
 				RelativePath=".\RoutePlanner.h">
+			</File>
+			<File
+				RelativePath=".\RoutePlannerModule.cpp">
+			</File>
+			<File
+				RelativePath=".\Site.cpp">
+			</File>
+			<File
+				RelativePath=".\Site.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="LS SQL"
+			Filter="">
+			<File
+				RelativePath=".\SiteTableSync.cpp">
+			</File>
+			<File
+				RelativePath=".\SiteTableSync.h">
 			</File>
 		</Filter>
 		<Filter

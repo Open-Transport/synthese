@@ -179,6 +179,40 @@
 				RelativePath=".\MessagesLog.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="Actions"
+			Filter="">
+			<File
+				RelativePath=".\AddScenarioAction.cpp">
+			</File>
+			<File
+				RelativePath=".\AddScenarioAction.h">
+			</File>
+			<File
+				RelativePath=".\DeleteScenarioAction.cpp">
+			</File>
+			<File
+				RelativePath=".\DeleteScenarioAction.h">
+			</File>
+			<File
+				RelativePath=".\DeleteTextTemplateAction.cpp">
+			</File>
+			<File
+				RelativePath=".\DeleteTextTemplateAction.h">
+			</File>
+			<File
+				RelativePath=".\UpdateAlarmAction.cpp">
+			</File>
+			<File
+				RelativePath=".\UpdateAlarmAction.h">
+			</File>
+			<File
+				RelativePath=".\UpdateTextTemplateAction.cpp">
+			</File>
+			<File
+				RelativePath=".\UpdateTextTemplateAction.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\MessagesModule.cpp">
 		</File>

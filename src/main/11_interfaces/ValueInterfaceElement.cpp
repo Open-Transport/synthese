@@ -39,6 +39,11 @@ namespace synthese
 				value.size() == 0
 				|| Conversion::ToLongLong(value) == 0;
 		}
+
+		void ValueInterfaceElement::setPage( const InterfacePage* page )
+		{
+			_page = page;
+		}
 	}
 }
 

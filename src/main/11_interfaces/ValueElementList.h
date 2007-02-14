@@ -1,48 +1,47 @@
 
+/** ValueElementList class header.
+	@file ValueElementList.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_ValueElementList_H__
 #define SYNTHESE_ValueElementList_H__
 
-#include <deque>
-#include <string>
-
-#include "11_interfaces/DisplayableElement.h"
+#include "11_interfaces/Types.h"
 
 namespace synthese
 {
 	namespace interfaces
 	{
 		class ValueInterfaceElement;
+		class InterfacePage;
 
 		class ValueElementList
 		{
+		private:
 			typedef std::deque<ValueInterfaceElement*> ElementsList;
 
 			ElementsList _elements;	//!< The list
 
+			void parse(const std::string& text, const InterfacePage* page);
+
 		public:
-
-			/** ValueElementList Constructor.
-			@param text Text to parse
-			@author Hugues Romain
-			@date 2006
-
-			Parses the text to create the list.	
-			*/
-			ValueElementList(const std::string text = std::string (""));
-
-			/** Copy constructor.
-				the element list to copy will be empty after the copy
-			*/
-			ValueElementList(ValueElementList& vai);
-
-			/** Destructor.
-			@author Hugues
-			@date 2006
-
-			Deletes all the elements linked by the vector.
-			*/
-			~ValueElementList();
-
 
 			/** Parsing a string for building the element list.
 				@param text Text to parse. Must be on one line without the <tt>\n</tt> character.
@@ -78,12 +77,31 @@ namespace synthese
 						- <tt>{{stop 12 {{param:4}} text {long text}}}</tt>
 						- <tt>{{field hidden name {{cityname {{param 6}} {{param 2}}}} {style="visibility:hidden"}}}</tt>
 			*/
-			void parse( const std::string& text );
+			ValueElementList(const std::string& text, const InterfacePage* page);
+
+			/** Empty constructor.
+			*/
+			ValueElementList();
+
+			/** Destructor.
+			@author Hugues
+			@date 2006
+
+			Deletes all the elements linked by the vector.
+			*/
+			~ValueElementList();
+
+
 			
 			ValueInterfaceElement* front();
 			bool isEmpty() const;
 			size_t size() const;
 
+			/** Moves the elements from the provided Value Element List object to the current one.
+				@param vel Object to read
+				@param page Interface page of the elements of the current object
+			*/
+			void	takeFrom(ValueElementList& vel, const InterfacePage* page);
 
 			/** Builds a parameters vector from the value element list.
 				@param parameters Parameters to use when filling undefined parameter elements

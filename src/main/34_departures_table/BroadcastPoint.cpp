@@ -20,7 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <sstream>
+
+#include "15_env/ConnectionPlace.h"
+#include "15_env/PhysicalStop.h"
+
 #include "34_departures_table/BroadcastPoint.h"
+
+using namespace std;
 
 namespace synthese
 {
@@ -63,6 +70,24 @@ namespace synthese
 		PhysicalStop* BroadcastPoint::getPhysicalStop() const
 		{
 			return _physicalStop;
+		}
+
+		std::string BroadcastPoint::getFullName() const
+		{
+			if (_place == NULL)
+				return "(not localized)";
+			
+			stringstream s;
+			s << _place->getFullName() << "/";
+
+			if ((_physicalStop != NULL) && _physicalStop->getName().size())
+				s << _physicalStop->getName();
+			else if (_name.size())
+				s << _name;
+			else
+				s << "(unnamed)";
+
+			return s.str(); 
 		}
 	}
 }

@@ -26,6 +26,7 @@
 #include "17_messages/MessagesModule.h"
 #include "17_messages/Types.h"
 #include "17_messages/AlarmRecipient.h"
+#include "17_messages/UpdateAlarmAction.h"
 
 #include "32_admin/AdminParametersException.h"
 
@@ -49,7 +50,7 @@ namespace synthese
 			return _alarm->getShortMessage();
 		}
 
-		void MessageAdmin::setFromParametersMap( const server::Request::ParametersMap& map )
+		void MessageAdmin::setFromParametersMap( const AdminRequest::ParametersMap& map )
 		{
 			Request::ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
 			if (it == map.end())
@@ -61,8 +62,13 @@ namespace synthese
 			_alarm = MessagesModule::getAlarms().get(Conversion::ToLongLong(it->second));
 		}
 
-		void MessageAdmin::display(ostream& stream, const Request* request) const
+		void MessageAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
+			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
+			updateRequest->copy(request);
+			updateRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+			updateRequest->setAction(Factory<Action>::create<UpdateAlarmAction>());
+
 			// Alarm level map
 			map<int, string> lmap;
 			lmap.insert(make_pair((int) ALARM_LEVEL_WARNING, "Complémentaire"));
@@ -72,20 +78,21 @@ namespace synthese
 			map<int, string> tmap;
 
 			stream
+				<< "<h1>Paramètres</h1>"
 				<< "<table>"
-				<< "<tr><th bgColor=\"#dcdcdc\" colSpan=\"2\">Paramètres</th></tr>"
 				<< "<tr><td>Type</td><td>" << Html::getRadioInput("", lmap, (int) _alarm->getLevel()) << "</td></tr>"
 				<< "<tr><td>Début diffusion</td><td>Date " << Html::getTextInput("", _alarm->getPeriodStart().getDate().toSQLString(false)) 
 				<< " Heure " << Html::getTextInput("", _alarm->getPeriodStart().getHour().toSQLString(false)) << "</td></tr>"
 				<< "<tr><td>Fin diffusion</td><td>Date " << Html::getTextInput("", _alarm->getPeriodStart().getDate().toSQLString(false)) 
 				<< " Heure " << Html::getTextInput("", _alarm->getPeriodStart().getHour().toSQLString(false)) << "</td></tr>"
 				<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregistrer") << "</td></tr>"
+				<< "</table>"
 
-				<< "<tr><th bgColor=\"#dcdcdc\" colSpan=\"2\">Contenu</th></tr>"
+				<< "<h1>Contenu</h1>"
+				<< "<table>"
 				<< "<tr><td>Modèle</td><td>" << Html::getSelectInput("", tmap, 0) << Html::getSubmitButton("Copier contenu") << "</td></tr>"
 				<< "<tr><td>Message court</td><td>" << Html::getTextAreaInput("", _alarm->getShortMessage(), 2, 20) << "</td></tr>"
 				<< "<tr><td>Message long</td><td>" << Html::getTextAreaInput("", _alarm->getLongMessage(), 4, 30) << "</td></tr>"
-
 				<< "</table>";
 
 			// Alarm messages destinations loop

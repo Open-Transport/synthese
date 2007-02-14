@@ -3,7 +3,7 @@
 #include <assert.h>
 
 #include "01_util/Conversion.h"
-// #include "01_util/Factory.h"
+#include "01_util/Log.h"
 
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteTableSync.h"
@@ -90,6 +90,7 @@ namespace synthese
 				 _rankedTableSynchronizers.begin (); 
 			     it != _rankedTableSynchronizers.end (); ++it)
 			{
+				Log::GetInstance().info("Loading table " + it->first);
 			    it->second->firstSync (emitter, this);
 			}
 

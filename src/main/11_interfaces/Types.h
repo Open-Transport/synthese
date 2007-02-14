@@ -1,6 +1,6 @@
 
-/** SimpleLoginInterfacePage class implementation.
-	@file SimpleLoginInterfacePage.cpp
+/** Types class header.
+	@file Types.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,23 +20,24 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "SimpleLoginInterfacePage.h"
+#ifndef SYNTHESE_Types_h__
+#define SYNTHESE_Types_h__
+
+#include <string>
+#include <deque>
 
 namespace synthese
 {
-	using namespace interfaces;
-
-	namespace server
+	namespace interfaces
 	{
+		/**
+			@addtogroup m11
+			@{
+			*/
+		typedef std::deque<std::string> ParametersVector;
 
-		void SimpleLoginInterfacePage::display(std::ostream& stream, const void* object /*= NULL*/, const server::Request* request /*= NULL*/) const
-		{
-			ParametersVector pv;
-
-			/// @todo Implement the building of the parameter vector with parameters of the function
-
-			InterfacePage::display(stream, pv, object, request);
-		}
+		/** @} */
 	}
 }
- 
+
+#endif // SYNTHESE_Types_h__

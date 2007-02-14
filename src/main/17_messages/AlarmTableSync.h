@@ -25,6 +25,8 @@
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
+#include "04_time/DateTime.h"
+
 #include "17_messages/Alarm.h"
 
 #include <string>
@@ -32,6 +34,12 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class CommercialLine;
+		class ConnectionPlace;
+	}
+
 	namespace messages
 	{
 		class Alarm;
@@ -56,6 +64,7 @@ namespace synthese
 
 		protected:
 
+
 			/** Action to do on alarm creation.
 				
 			*/
@@ -77,7 +86,13 @@ namespace synthese
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 
-		private:
+		public:
+			/** The returned alarms must be deleted */
+			static std::vector<Alarm*> search(
+				time::DateTime startDate, time::DateTime endDate
+				, env::ConnectionPlace*	place, env::CommercialLine* line
+				, int first = 0, int number = 0);
+
 
 		};
 

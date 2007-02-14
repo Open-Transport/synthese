@@ -1,4 +1,26 @@
 
+/** JourneyBoardInterfaceElement class implementation.
+	@file JourneyBoardInterfaceElement.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+
 #include "JourneyBoardInterfaceElement.h"
 
 #include "JourneyBoardStopCellInterfacePage.h"
@@ -19,12 +41,11 @@
 #include "30_server/Request.h"
 #include "30_server/Site.h"
 
-
-using namespace synthese::routeplanner;
-
 namespace synthese
 {
-	namespace interfaces
+	using namespace interfaces;
+
+	namespace routeplanner
 	{
 
 		void JourneyBoardInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
@@ -197,18 +218,16 @@ namespace synthese
 
 		}
 
-		void JourneyBoardInterfaceElement::parse( const std::string& text )
-		{
-			ValueElementList vel(text);
-			_handicappedFilter = vel.front();
-			_bikeFilter = vel.front();
-
-		}
-
 		JourneyBoardInterfaceElement::~JourneyBoardInterfaceElement()
 		{
 			delete _handicappedFilter;
 			delete _bikeFilter;
+		}
+
+		void JourneyBoardInterfaceElement::storeParameters( interfaces::ValueElementList& vel )
+		{
+			_handicappedFilter = vel.front();
+			_bikeFilter = vel.front();
 		}
 	}
 }

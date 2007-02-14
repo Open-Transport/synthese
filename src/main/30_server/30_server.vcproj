@@ -78,12 +78,6 @@
 			<File
 				RelativePath=".\Session.h">
 			</File>
-			<File
-				RelativePath=".\Site.cpp">
-			</File>
-			<File
-				RelativePath=".\Site.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Exceptions"
@@ -122,28 +116,6 @@
 			<File
 				RelativePath=".\ServerConfigTableSync.h">
 			</File>
-			<File
-				RelativePath=".\SiteTableSync.cpp">
-			</File>
-			<File
-				RelativePath=".\SiteTableSync.h">
-			</File>
-		</Filter>
-		<Filter
-			Name="Interface pages"
-			Filter="">
-			<File
-				RelativePath=".\RedirectInterfacePage.cpp">
-			</File>
-			<File
-				RelativePath=".\RedirectInterfacePage.h">
-			</File>
-			<File
-				RelativePath=".\SimpleLoginInterfacePage.cpp">
-			</File>
-			<File
-				RelativePath=".\SimpleLoginInterfacePage.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Actions"
@@ -159,22 +131,6 @@
 			</File>
 			<File
 				RelativePath=".\LogoutAction.h">
-			</File>
-		</Filter>
-		<Filter
-			Name="Requests"
-			Filter="">
-			<File
-				RelativePath=".\ActionOnlyRequest.cpp">
-			</File>
-			<File
-				RelativePath=".\ActionOnlyRequest.h">
-			</File>
-			<File
-				RelativePath=".\SimplePageRequest.cpp">
-			</File>
-			<File
-				RelativePath=".\SimplePageRequest.h">
 			</File>
 		</Filter>
 		<Filter

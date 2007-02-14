@@ -26,10 +26,6 @@
 #include "13_dblog/DBLogList.h"
 #include "13_dblog/DBLogViewer.h"
 
-#include "30_server/Request.h"
-
-#include "32_admin/AdminRequest.h"
-
 using namespace std;
 
 namespace synthese
@@ -44,7 +40,7 @@ namespace synthese
 		DBLogList::DBLogList()
 			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) {}
 
-		void DBLogList::setFromParametersMap(const server::Request::ParametersMap& map)
+		void DBLogList::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 		}
 
@@ -53,7 +49,7 @@ namespace synthese
 			return "Journaux";
 		}
 
-		void DBLogList::display(ostream& stream, const Request* request) const
+		void DBLogList::display(ostream& stream, const AdminRequest* request) const
 		{
 			AdminRequest* goRequest = Factory<Request>::create<AdminRequest>();
 			goRequest->copy(request);

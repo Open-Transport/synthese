@@ -1,4 +1,25 @@
 
+/** ValueElementList class implementation.
+	@file ValueElementList.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include <vector>
 
 #include "01_util/Conversion.h"
@@ -16,17 +37,14 @@ namespace synthese
 
 	namespace interfaces
 	{
-		/** Empty constructor.		
-		*/
-		ValueElementList::ValueElementList(const std::string text)
+		ValueElementList::ValueElementList(const std::string& text, const InterfacePage* page)
 		{
-			parse(text);
+			parse(text, page);
 		}
 
-		ValueElementList::ValueElementList( ValueElementList& vai )
+
+		ValueElementList::ValueElementList()
 		{
-			for (; vai._elements.size() > 0; vai._elements.pop_back())
-				_elements.push_front(vai._elements.back());
 		}
 
 		const ParametersVector ValueElementList::fillParameters( const ParametersVector& parameters ) const
@@ -56,7 +74,27 @@ namespace synthese
 			return _elements.size();
 		}
 
-		void ValueElementList::parse( const std::string& text )
+		ValueElementList::~ValueElementList()
+		{
+			for (ElementsList::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
+				delete *it;
+		}
+
+		bool ValueElementList::isEmpty() const
+		{
+			return _elements.size() == 0;
+		}
+
+		void ValueElementList::takeFrom(ValueElementList& vel, const InterfacePage* page )
+		{
+			for (; vel._elements.size() > 0; vel._elements.pop_back())
+			{
+				_elements.push_front(vel._elements.back());
+				_elements.front()->setPage(page);
+			}
+		}
+
+		void ValueElementList::parse(const std::string& text, const InterfacePage* page)
 		{
 			size_t position = 0;
 			std::vector<std::string> elements;
@@ -95,7 +133,7 @@ namespace synthese
 			// Registering each word as ValueInterfaceElement
 			for (vector<string>::const_iterator it = elements.begin(); it != elements.end(); ++it)
 			{
-				ValueInterfaceElement* vie = NULL;
+				ValueInterfaceElement* vie;
 				const std::string& str = *it;
 
 				// Case 1 : single word
@@ -103,7 +141,7 @@ namespace synthese
 				{
 					vie = new StaticValueInterfaceElement(str);
 				} 
-				
+
 				// Case 2 : multiple word
 				else if(str.size() > 1 && str.at(0) == '{' && str.at(1) != '{')
 				{
@@ -121,7 +159,7 @@ namespace synthese
 						vie = Factory<ValueInterfaceElement>::create(str.substr(2, position - 2));
 						ValueElementList vel;
 						if (position < str.size() - 3)
-							vel.parse(str.substr(position + 1, str.size() - position - 3));
+							vel.parse(str.substr(position + 1, str.size() - position - 3), page);
 						vie->storeParameters(vel);
 					}
 					catch(Exception e)
@@ -132,19 +170,10 @@ namespace synthese
 				else
 					throw InterfacePageException("Unspecified parse error in "+ text);
 
+				vie->setPage(page);
 				_elements.push_back(vie);
 			}
-		}
 
-		ValueElementList::~ValueElementList()
-		{
-			for (ElementsList::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
-				delete *it;
-		}
-
-		bool ValueElementList::isEmpty() const
-		{
-			return _elements.size() == 0;
 		}
 	}
 }

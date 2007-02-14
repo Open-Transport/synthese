@@ -6,7 +6,6 @@
 
 #include "01_util/ModuleClass.h"
 
-#include "30_server/Site.h"
 #include "30_server/ServerConfig.h"
 
 /** @defgroup m30 Server
@@ -27,7 +26,6 @@ namespace synthese
 			typedef std::map<std::string, Session*> SessionMap;
 
 		private:
-			static Site::Registry			_sites;
 			static ServerConfig				_config;
 			static SessionMap				_sessionMap;
 
@@ -36,7 +34,6 @@ namespace synthese
 			*/
 			void initialize();
 
-			static Site::Registry& getSites();
 			static ServerConfig& getConfig();
 			static SessionMap& getSessions();
 		};
@@ -95,11 +92,8 @@ namespace synthese
 
 		static const std::string PARAMETER_RESERVATION_COUNT ("NbPlaces");
 		static const std::string PARAMETER_DEPARTURE_TABLE_CODE ("tb");
-
-		static const int UNKNOWN_PARAMETER_VALUE = -1;
 	}
 }
 /** @} */
 
 #endif // SYNTHESE_ServerModule_H__
-

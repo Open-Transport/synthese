@@ -20,9 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "11_interfaces/InterfacePage.h"
+#ifndef SYNTHESE_DepartureTableRowInterfacePage_H__
+#define SYNTHESE_DepartureTableRowInterfacePage_H__
 
-#include "30_server/Site.h"
+#include "11_interfaces/InterfacePage.h"
 
 #include "34_departures_table/Types.h"
 
@@ -49,3 +50,4 @@ namespace synthese
 	}
 }
 
+#endif // SYNTHESE_DepartureTableRowInterfacePage_H__

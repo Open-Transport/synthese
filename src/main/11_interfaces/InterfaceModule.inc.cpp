@@ -12,4 +12,7 @@
 #include "11_interfaces/PrintInterfaceElement.h"
 #include "11_interfaces/CommentInterfaceElement.h"
 #include "11_interfaces/FormattedNumberInterfaceElement.h"
+#include "11_interfaces/RedirectInterfacePage.h"
+#include "11_interfaces/SimplePageRequest.h"
+
 

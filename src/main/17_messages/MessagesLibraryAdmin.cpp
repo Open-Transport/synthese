@@ -41,7 +41,7 @@ namespace synthese
 		MessagesLibraryAdmin::MessagesLibraryAdmin()
 			: AdminInterfaceElement("messages", AdminInterfaceElement::EVER_DISPLAYED) {}
 
-		void MessagesLibraryAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void MessagesLibraryAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			/// @todo Initialize internal attributes from the map
 		}
@@ -51,8 +51,13 @@ namespace synthese
 			return "Bibliothèque";
 		}
 
-		void MessagesLibraryAdmin::display(ostream& stream, const Request* request) const
+		void MessagesLibraryAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
+			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
+			updateRequest->copy(request);
+			updateRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesLibraryAdmin>());
+//			updateRequest->setAction(Factory<Action>::create<UpdateTextTemplate>());
+
 			stream
 				<< "<h1>Modèles de textes destinés aux messages complémentaires</h1>"
 				<< "<table>"
@@ -68,7 +73,7 @@ namespace synthese
 					<< "<td>" << Html::getTextInput("", t->getShortMessage()) << "</td>"
 					<< "<td>" << Html::getTextInput("", t->getLongMessage()) << "</td>"
 					<< "<td>" << Html::getSubmitButton("Modifier") << "</td>"
-					<< "<td><INPUT type=\"button\" value=\"Supprimer\" name=\"Modifier\"></TD>"
+					<< "<td>" << Html::getSubmitButton("Supprimer") << "</td>"
 					<< "</tr>";
 				delete *itw;
 			}

@@ -20,10 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <sstream>
+
+#include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DisplayMaintenanceLog.h"
-
 
 using namespace std;
 
@@ -357,6 +359,20 @@ namespace synthese
 		void DisplayScreen::clearPhysicalStops()
 		{
 			_physicalStops.clear();
+		}
+
+		std::string DisplayScreen::getFullName() const
+		{
+			if (_localization == NULL)
+				return "(not localized)";
+			else
+			{
+				stringstream s;
+				s << _localization->getFullName();
+				if (_localizationComment.size())
+					s << "/" << _localizationComment;
+				return s.str();
+			}
 		}
 
 	}

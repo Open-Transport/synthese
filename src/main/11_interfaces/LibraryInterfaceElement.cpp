@@ -11,7 +11,7 @@ namespace synthese
 
 	namespace interfaces
 	{
-		LibraryInterfaceElement* LibraryInterfaceElement::create( const std::string & text )
+		LibraryInterfaceElement* LibraryInterfaceElement::create( const std::string & text, const InterfacePage* page )
 		{
 			// Trim the left spaces
 			size_t start_pos;
@@ -34,6 +34,7 @@ namespace synthese
 			{
 				throw InterfacePageException("Specified interface function not found " + text.substr(start_pos, word_end_pos - start_pos));
 			}
+			lie->_page = page;
 			lie->parse((text.size() > word_end_pos + 1)
 				? text.substr(word_end_pos + 1, text.size() - word_end_pos - 1) 
 				: "");
@@ -43,7 +44,7 @@ namespace synthese
 
 		void LibraryInterfaceElement::parse( const std::string& text )
 		{
-			ValueElementList vai(text);
+			ValueElementList vai(text, _page);
 			storeParameters(vai);
 		}
 	}

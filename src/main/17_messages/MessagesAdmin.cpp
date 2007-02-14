@@ -20,7 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "MessagesAdmin.h"
+#include "01_util/Html.h"
+
+#include "15_env/ConnectionPlace.h"
+#include "15_env/CommercialLine.h"
+#include "15_env/EnvModule.h"
+
+#include "17_messages/Alarm.h"
+#include "17_messages/MessagesAdmin.h"
+#include "17_messages/AlarmTableSync.h"
+
+#include "32_admin/AdminRequest.h"
+#include "32_admin/AdminParametersException.h"
+
+#include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
 
@@ -29,16 +42,63 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
+	using namespace util;
+	using namespace departurestable;
+	using namespace time;
+	using namespace env;
 
 	namespace messages
 	{
-		/// @todo Verify the parent constructor parameters
-		MessagesAdmin::MessagesAdmin()
-			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) {}
+		const std::string MessagesAdmin::PARAMETER_SEARCH_START = "mass";
+		const std::string MessagesAdmin::PARAMETER_SEARCH_END = "mase";
+		const std::string MessagesAdmin::PARAMETER_SEARCH_PLACE = "masp";
+		const std::string MessagesAdmin::PARAMETER_SEARCH_LINE = "masl";
 
-		void MessagesAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		MessagesAdmin::MessagesAdmin()
+			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED)
+			, _place(NULL), _line(NULL)
+			, _startDate(TIME_UNKNOWN), _endDate(TIME_UNKNOWN)
+		{}
+
+		void MessagesAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
+			try
+			{
+				AdminRequest::ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_START);
+				if (it != map.end())
+				{
+					_startDate.FromString(it->second);
+				}
+
+				it = map.find(PARAMETER_SEARCH_END);
+				if (it != map.end())
+				{
+					_endDate.FromString(it->second);
+				}
+
+				it = map.find(PARAMETER_SEARCH_PLACE);
+				if (it != map.end())
+				{
+					_place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(it->second));
+				}
+
+				it = map.find(PARAMETER_SEARCH_LINE);
+				if (it != map.end())
+				{
+					_line = EnvModule::getCommercialLines().get(Conversion::ToLongLong(it->second));
+				}
+
+				_result = AlarmTableSync::search(_startDate, _endDate, _place, _line);
+			}
+			catch (ConnectionPlace::RegistryKeyException e)
+			{
+				throw AdminParametersException("Specified place not found ");
+			}
+			catch (CommercialLine::RegistryKeyException e)
+			{
+				throw AdminParametersException("Specified line not found ");
+			}
+
 		}
 
 		string MessagesAdmin::getTitle() const
@@ -46,25 +106,22 @@ namespace synthese
 			return "Messages";
 		}
 
-		void MessagesAdmin::display(ostream& stream, const Request* request) const
+		void MessagesAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
-			stream
-				<< "<table><tr><td>Date début :</td><td><INPUT type=\"text\" size=\"14\" name=\"Text2\" /></td>"
-				<< "<td>Date fin</td><td><INPUT type=\"text\" size=\"14\" name=\"Text2\" /></td>"
-				<< "<td>Zone d'arrêt</td><td><SELECT name=\"Select1\">"
-				<< "<option value=\"\">(tous les arrêts)</option>";
-
-			// List of stop zones
+			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
+			searchRequest->copy(request);
+			searchRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
 
 			stream
-				<< "</SELECT></td></tr>"
-				<< "<tr><td>Ligne</td><td><SELECT name=\"Select1\">"
-				<< "<option value=\"\">(toutes les lignes)</option>";
-
-			// List of lines
-
-			stream
-				<< "</SELECT></td><td>Statut</td><td><SELECT name=\"Select1\">"
+				<< "<h1>Recherche</h1>"
+				<< searchRequest->getHTMLFormHeader("search")
+				<< "<table>"
+				<< "<tr><td>Date début</td><td>" << Html::getTextInput(PARAMETER_SEARCH_START, _startDate.toString()) << "</td>"
+				<< "<td>Date fin</td><td>" << Html::getTextInput(PARAMETER_SEARCH_END, _endDate.toString()) << "</td>"
+				<< "<td>Zone d'arrêt</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), _place ? _place->getKey() : UNKNOWN_VALUE)	/// @todo put it in a factory to avoid dependency and to permit evolutivity
+				<< "</td></tr>"
+				<< "<tr><td>Ligne</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_LINE, EnvModule::getCommercialLineLabels(true), _line ? _line->getKey() : UNKNOWN_VALUE) << "</td>"
+				<< "<td>Statut</td><td><SELECT name=\"Select1\">"
 				<< "<OPTION value=\"\">(tous les états)</OPTION>"
 				<< "<OPTION value=\"\">Diffusion terminée</OPTION>"
 				<< "<OPTION value=\"\">En cours de diffusion</OPTION>"
@@ -86,31 +143,32 @@ namespace synthese
 				<< "<OPTION value=\"\">Complémentaire</OPTION>"
 				<< "</SELECT></td></tr>"
 
-				<< "<tr><td colspan=\"6\"><INPUT type=\"button\" value=\"Rechercher\" name=\"Button6\"></td></tr>"
+				<< "<tr><td colspan=\"6\">" << Html::getSubmitButton("Rechercher") << "</td></tr>"
 
 				<< "</table>"
 
-				<< "<P>Résultats de la recherche (tous) :</P>"
+				<< "<h1>Résultats de la recherche (tous) :</h1>"
 				
 				<< "<table>"
-				<< "<TR><th>Sel</th><th>Dates</th><th>Message</th><th>Type</th><th>Etat</th><th>Confilt</th><th>Actions</th></tr>";
+				<< "<tr><th>Sel</th><th>Dates</th><th>Message</th><th>Type</th><th>Etat</th><th>Confilt</th><th>Actions</th></tr>";
 
-			// Messages list
+			for (vector<Alarm*>::const_iterator it= _result.begin(); it != _result.end(); ++it)
 			{
+				Alarm* alarm = *it;
 				stream
 					<< "<tr><td><INPUT type=\"radio\" value=\"Radio1\" name=\"RadioGroup\"></td>"
 					<< "<td>dès le 2/9/2006</td>"
-					<< "<td>Travaux à Esquriol...</td>"
+					<< "<td>" << alarm->getShortMessage() << "</td>"
 					<< "<td>Complémentaire</td>"
 					<< "<td></td>" // Bullet
 					<< "<td></td>" // Bullet
-					<< "<td><INPUT type=\"button\" value=\"Editer\" name=\"Modifier\">"
-					<< "<INPUT type=\"button\" value=\"Arrêter\" name=\"Modifier\"></TD>"
-					<< "</TR>";
+					<< "<td>" << Html::getSubmitButton("Modifier")
+					<< Html::getSubmitButton("Arrêter") << "</td>"
+					<< "</tr>";
 			}
 
 			stream
-				<< "</TABLE>"
+				<< "</table>"
 				<< "<P>(sélectionnez un message existant pour créer une copie)</P>"
 				<< "<P><INPUT type=\"button\" value=\"Nouvelle diffusion de message\" name=\"Button7\"></P>"
 				<< "<P><INPUT type=\"button\" value=\"Nouvelle diffusion de scénario\" name=\"Button7\">"
@@ -122,6 +180,8 @@ namespace synthese
 				<< "</select></p>"
 				<< "<P align=\"right\">Messages&nbsp;suivants &gt;</P>"
 				<< "<P>Cliquer sur un titre de colonne pour trier le tableau.</P>";
+
+			delete searchRequest;
 		}
 	}
 }

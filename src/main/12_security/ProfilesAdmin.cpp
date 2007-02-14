@@ -34,8 +34,6 @@
 #include "12_security/AddProfileAction.h"
 #include "12_security/DeleteProfileAction.h"
 
-#include "32_admin/AdminRequest.h"
-
 using namespace std;
 
 namespace synthese
@@ -54,7 +52,7 @@ namespace synthese
 		ProfilesAdmin::ProfilesAdmin()
 			: AdminInterfaceElement("users", AdminInterfaceElement::EVER_DISPLAYED) {}
 
-		void ProfilesAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void ProfilesAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			string name;
 			string right;
@@ -86,7 +84,7 @@ namespace synthese
 			return "Profils";
 		}
 
-		void ProfilesAdmin::display(ostream& stream, const Request* request) const
+		void ProfilesAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
 			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
 			searchRequest->copy(request);

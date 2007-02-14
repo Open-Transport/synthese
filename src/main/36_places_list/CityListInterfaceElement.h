@@ -26,11 +26,16 @@ namespace synthese
 		class CityListInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 		private:
-			interfaces::ValueElementList _parameters;
+			interfaces::ValueInterfaceElement* _errorMessage;
+			interfaces::ValueInterfaceElement* _openingText;
+			interfaces::ValueInterfaceElement* _closingText;
+			interfaces::ValueInterfaceElement* _n;
+			interfaces::ValueInterfaceElement* _inputText;
+			interfaces::ValueInterfaceElement* _emptyLineText;
 
 		public:
 			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
-			void parse(const std::string& text);
+			void storeParameters(interfaces::ValueElementList& vel);
 		};
 
 	}

@@ -40,7 +40,7 @@ namespace synthese
 		MessagesScenarioAdmin::MessagesScenarioAdmin()
 			: AdminInterfaceElement("messageslibrary", AdminInterfaceElement::EVER_DISPLAYED) {}
 
-		void MessagesScenarioAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void MessagesScenarioAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			/// @todo Initialize internal attributes from the map
 		}
@@ -51,7 +51,7 @@ namespace synthese
 			return "title";
 		}
 
-		void MessagesScenarioAdmin::display(ostream& stream, const Request* request) const
+		void MessagesScenarioAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
 			stream
 				<< "<P>Nom : " << Html::getTextInput("", _scenario->getName()) << Html::getSubmitButton("Modifier") << "</P>"

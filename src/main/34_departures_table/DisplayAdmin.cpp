@@ -30,7 +30,6 @@
 #include "15_env/PhysicalStop.h"
 #include "15_env/EnvModule.h"
 
-#include "32_admin/AdminRequest.h"
 #include "32_admin/AdminParametersException.h"
 
 #include "34_departures_table/DisplayAdmin.h"
@@ -70,7 +69,7 @@ namespace synthese
 			return s.str();
 		}
 
-		void DisplayAdmin::display(std::ostream& stream, const server::Request* request /*= NULL*/ ) const
+		void DisplayAdmin::display(std::ostream& stream, const AdminRequest* request /*= NULL*/ ) const
 		{
 			// Update request
 			AdminRequest* updateDisplayRequest = Factory<Request>::create<AdminRequest>();
@@ -226,7 +225,7 @@ namespace synthese
 			delete updateDisplayRequest;
 		}
 
-		void DisplayAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void DisplayAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			Request::ParametersMap::const_iterator it = map .find(Request::PARAMETER_OBJECT_ID);
 			if (it == map.end())

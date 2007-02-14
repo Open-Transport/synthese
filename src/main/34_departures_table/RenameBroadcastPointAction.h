@@ -68,4 +68,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_RenameBroadcastPointAction_H__
- 

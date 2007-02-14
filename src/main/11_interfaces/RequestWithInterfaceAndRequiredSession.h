@@ -1,6 +1,6 @@
 
-/** RedirectInterfacePage class implementation.
-	@file RedirectInterfacePage.cpp
+/** RequestWithInterfaceAndRequiredSession class header.
+	@file RequestWithInterfaceAndRequiredSession.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,31 +20,29 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#ifndef SYNTHESE_RequestWithInterfaceAndRequiredSession_h__
+#define SYNTHESE_RequestWithInterfaceAndRequiredSession_h__
 
-#include "30_server/Request.h"
-#include "30_server/RedirectInterfacePage.h"
+#include "11_interfaces/RequestWithInterface.h"
 
 namespace synthese
 {
-	using namespace interfaces;
-
-	namespace server
+	namespace interfaces
 	{
-		void RedirectInterfacePage::display( std::ostream& stream, const std::string& url, const server::Request* request /*= NULL*/ ) const
+		/** RequestWithInterfaceAndRequiredSession class.
+			@ingroup m11
+		*/
+		class RequestWithInterfaceAndRequiredSession : public RequestWithInterface
 		{
-			ParametersVector pv;
-			pv.push_back(url);
+		public:
+			RequestWithInterfaceAndRequiredSession();
 
-			InterfacePage::display(stream, pv, NULL, request);
-		}
-
-		void RedirectInterfacePage::display( std::ostream& stream, const server::Request* request /*= NULL*/ ) const
-		{
-			std::stringstream url;
-			url << request->getClientURL() << Request::PARAMETER_STARTER << request->getQueryString();
-			display(stream, url.str(), request);
-		}
+			/** Return to a defined login page or stops the execution.
+				@return true : interrupts the current execution.
+			*/
+			virtual bool	runBeforeDisplayIfNoSession(std::ostream& stream);
+		};
 	}
 }
 
+#endif // SYNTHESE_RequestWithInterfaceAndRequiredSession_h__

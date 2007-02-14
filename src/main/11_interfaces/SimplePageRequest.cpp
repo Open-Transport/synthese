@@ -1,22 +1,44 @@
 
+/** SimplePageRequest class implementation.
+	@file SimplePageRequest.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/DisplayableElement.h"
 #include "11_interfaces/InterfacePageException.h"
+#include "11_interfaces/SimplePageRequest.h"
 
 #include "30_server/RequestException.h"
-#include "30_server/SimplePageRequest.h"
 
 namespace synthese
 {
-	using namespace interfaces;
+	using namespace server;
 
-	namespace server
+	namespace interfaces
 	{
 		const std::string SimplePageRequest::PARAMETER_PAGE = "page";
 
 		SimplePageRequest::SimplePageRequest()
-			: Request(Request::DONT_NEED_SESSION) {}
+			: RequestWithInterface()
+		{}
 
 		void SimplePageRequest::run( std::ostream& stream ) const
 		{
@@ -26,7 +48,7 @@ namespace synthese
 			_page->display(stream, pv, NULL, this);
 		}
 
-		void SimplePageRequest::setFromParametersMap( const server::Request::ParametersMap& map )
+		void SimplePageRequest::setFromParametersMap(const Request::ParametersMap& map )
 		{
 			_parameters = map;
 
@@ -35,7 +57,7 @@ namespace synthese
 				throw RequestException("Page parameter not found in simple page query");
 			try
 			{
-				_page = _site->getInterface()->getPage(it->second);
+				_page = _interface->getPage(it->second);
 				_parameters.erase(it);
 			}
 			catch (InterfacePageException e)

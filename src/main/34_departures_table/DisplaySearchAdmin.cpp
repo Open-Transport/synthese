@@ -26,8 +26,6 @@
 #include "15_env/ConnectionPlace.h"
 #include "15_env/EnvModule.h"
 
-#include "32_admin/AdminRequest.h"
-
 #include "34_departures_table/DisplaySearchAdmin.h"
 #include "34_departures_table/AdvancedSelectTableSync.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
@@ -66,7 +64,7 @@ namespace synthese
 			, _searchMessage(UNKNOWN_VALUE)
 		{}
 
-		void DisplaySearchAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void DisplaySearchAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			Request::ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_UID);
 			if (it != map.end())
@@ -100,7 +98,7 @@ namespace synthese
 			return "Afficheurs";
 		}
 
-		void DisplaySearchAdmin::display(ostream& stream, const Request* request) const
+		void DisplaySearchAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
 			AdminRequest* createDisplayRequest = Factory<Request>::create<AdminRequest>();
 			createDisplayRequest->copy(request);

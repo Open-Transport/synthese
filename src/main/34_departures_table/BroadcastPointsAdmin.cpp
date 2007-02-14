@@ -28,8 +28,6 @@
 #include "15_env/City.h"
 #include "15_env/EnvModule.h"
 
-#include "32_admin/AdminRequest.h"
-
 #include "34_departures_table/BroadcastPointsAdmin.h"
 #include "34_departures_table/BroadcastPointAdmin.h"
 
@@ -38,7 +36,6 @@ using namespace std;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace env;
@@ -57,7 +54,7 @@ namespace synthese
 			, _displayNumber(WITH_OR_WITHOU_ANY_BROADCASTPOINT), _number(50), _first(0)
 		{}
 
-		void BroadcastPointsAdmin::setFromParametersMap(const server::Request::ParametersMap& map)
+		void BroadcastPointsAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			Request::ParametersMap::const_iterator it = map.find(PARAMETER_CITY_NAME);
 			if (it != map.end())
@@ -92,7 +89,7 @@ namespace synthese
 			return "Points de diffusion";
 		}
 
-		void BroadcastPointsAdmin::display(ostream& stream, const Request* request) const
+		void BroadcastPointsAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
 			AdminRequest* goRequest = Factory<Request>::create<AdminRequest>();
 			goRequest->copy(request);
