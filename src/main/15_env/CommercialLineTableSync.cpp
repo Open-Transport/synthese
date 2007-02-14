@@ -29,8 +29,9 @@
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
-#include "CommercialLine.h"
-#include "CommercialLineTableSync.h"
+#include "15_env/CommercialLine.h"
+#include "15_env/CommercialLineTableSync.h"
+#include "15_env/EnvModule.h"
 
 using namespace std;
 
@@ -111,8 +112,7 @@ namespace synthese
 			{
 				CommercialLine* object = new CommercialLine();
 				load(object, rows, i);
-				/// @todo Add the object to the corresponding register
-				// Eg : Module::getObjects().add(object);
+				EnvModule::getCommercialLines().add(object);
 			}
 		}
 
@@ -120,7 +120,8 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				/// @todo search and update corresponding objects
+				CommercialLine* object=EnvModule::getCommercialLines().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+				load(object, rows, i);
 			}
 		}
 
@@ -128,7 +129,7 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				/// @todo search and destroy corresponding objects
+				EnvModule::getCommercialLines().remove(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
 			}
 		}
 
