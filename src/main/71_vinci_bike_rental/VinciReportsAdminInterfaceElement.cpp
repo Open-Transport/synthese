@@ -53,7 +53,7 @@ namespace synthese
 			return "Etats journaliers";
 		}
 
-		void VinciReportsAdminInterfaceElement::display(ostream& stream, const Request* request) const
+		void VinciReportsAdminInterfaceElement::display(ostream& stream, const AdminRequest* request) const
 		{
 			// Report Launch request
 			AdminRequest* reportRequest = Factory<Request>::create<AdminRequest>();
@@ -86,7 +86,7 @@ namespace synthese
 			stream << "</table>";
 		}
 
-		void VinciReportsAdminInterfaceElement::setFromParametersMap(const Request::ParametersMap& map)
+		void VinciReportsAdminInterfaceElement::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			Request::ParametersMap::const_iterator it;
 			it = map.find(PARAM_START_DATE);

@@ -67,7 +67,7 @@ namespace synthese
 			return "Client " + _user->getSurname() + " " + _user->getName();
 		}
 
-		void VinciCustomerAdminInterfaceElement::display(std::ostream& stream, const server::Request* request /*= NULL*/ ) const
+		void VinciCustomerAdminInterfaceElement::display(std::ostream& stream, const AdminRequest* request /*= NULL*/ ) const
 		{
 			// Update user request
 			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
@@ -234,7 +234,7 @@ namespace synthese
 
 		}
 
-		void VinciCustomerAdminInterfaceElement::setFromParametersMap(const server::Request::ParametersMap& map)
+		void VinciCustomerAdminInterfaceElement::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			// Current contract
 			const server::Request::ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);

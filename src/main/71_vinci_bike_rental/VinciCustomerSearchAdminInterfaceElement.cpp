@@ -53,7 +53,7 @@ namespace synthese
 			return "Clients";
 		}
 
-		void VinciCustomerSearchAdminInterfaceElement::display(ostream& stream, const Request* request) const
+		void VinciCustomerSearchAdminInterfaceElement::display(ostream& stream, const AdminRequest* request) const
 		{
 			// Search request
 			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
@@ -112,7 +112,7 @@ namespace synthese
 			}
 		}
 
-		void VinciCustomerSearchAdminInterfaceElement::setFromParametersMap(const server::Request::ParametersMap& map)
+		void VinciCustomerSearchAdminInterfaceElement::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			server::Request::ParametersMap::const_iterator it = map.find(PARAM_SEARCH_SURNAME);
 			if (it != map.end())

@@ -50,7 +50,7 @@ namespace synthese
 			return "Parc de vélos";
 		}
 
-		void VinciBikeSearchAdminInterfaceElement::display(ostream& stream, const Request* request) const
+		void VinciBikeSearchAdminInterfaceElement::display(ostream& stream, const AdminRequest* request) const
 		{
 			// AddStatus
 			AdminRequest* addStatusRequest = Factory<Request>::create<AdminRequest>();
@@ -106,7 +106,7 @@ namespace synthese
 			delete addStatusRequest;
 		}
 
-		void VinciBikeSearchAdminInterfaceElement::setFromParametersMap(const server::Request::ParametersMap& map)
+		void VinciBikeSearchAdminInterfaceElement::setFromParametersMap(const admin::AdminRequest::ParametersMap& map)
 		{
 			server::Request::ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_NUMBER);
 			if (it != map.end())

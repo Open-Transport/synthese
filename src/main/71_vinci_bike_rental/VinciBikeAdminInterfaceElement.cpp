@@ -43,7 +43,7 @@ namespace synthese
 			return "Vélo " + _bike->getNumber();
 		}
 
-		void VinciBikeAdminInterfaceElement::display(std::ostream& stream, const server::Request* request /*= NULL*/ ) const
+		void VinciBikeAdminInterfaceElement::display(std::ostream& stream, const AdminRequest* request /*= NULL*/ ) const
 		{
 			// Update bike request
 			AdminRequest* updateBikeRequest = Factory<Request>::create<AdminRequest>();
@@ -69,7 +69,7 @@ namespace synthese
 			delete updateBikeRequest;
 		}
 
-		void VinciBikeAdminInterfaceElement::setFromParametersMap(const server::Request::ParametersMap& map)
+		void VinciBikeAdminInterfaceElement::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
 			Request::ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
 			if (it != map.end())
