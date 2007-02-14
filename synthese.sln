@@ -55,7 +55,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "33_route_planner", "src\mai
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "99_synthese", "src\main\99_synthese\99_synthese.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "99_synthese_vinci", "src\main\99_synthese_vinci\99_synthese_vinci.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
