@@ -284,6 +284,12 @@
 				RelativePath=".\RenameBroadcastPointAction.h">
 			</File>
 			<File
+				RelativePath=".\UpdateDisplayMaintenanceAction.cpp">
+			</File>
+			<File
+				RelativePath=".\UpdateDisplayMaintenanceAction.h">
+			</File>
+			<File
 				RelativePath=".\UpdateDisplayScreenAction.cpp">
 			</File>
 			<File
