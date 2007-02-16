@@ -78,7 +78,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     ContinuousService::Registry _continuousServices;
     Document::Registry _documents;
     CommercialLine::Registry _lines;
-    LineStop::Registry _lineStops;
     PlaceAlias::Registry _placeAliases; 
     PublicPlace::Registry _publicPlaces;
     RoadChunk::Registry _roadChunks;
@@ -121,8 +120,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     CommercialLine::Registry& getCommercialLines ();
     const CommercialLine::Registry& getCommercialLines () const;
 
-    LineStop::Registry& getLineStops ();
-    const LineStop::Registry& getLineStops () const;
 
     PlaceAlias::Registry& getPlaceAliases ();
     const PlaceAlias::Registry& getPlaceAliases () const;

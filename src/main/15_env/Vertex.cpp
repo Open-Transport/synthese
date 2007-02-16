@@ -79,6 +79,10 @@ Vertex::addArrivalEdge ( const Edge* edge )
     _arrivalEdges.insert (edge);    
 }
 
+void Vertex::setPlace( const AddressablePlace* place )
+{
+	_addressablePlace = place;
+}
 
 
 

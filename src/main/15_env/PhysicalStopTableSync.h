@@ -41,6 +41,8 @@ namespace synthese
 				- on insert : 
 				- on update : 
 				- on delete : X
+
+				@todo Use load / get / replace 
 		*/
 		class PhysicalStopTableSync : public db::SQLiteTableSyncTemplate<PhysicalStop>
 		{

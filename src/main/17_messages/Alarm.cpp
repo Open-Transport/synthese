@@ -21,17 +21,22 @@
 */
 
 #include "17_messages/Alarm.h"
-
+#include "17_messages/Scenario.h"
 
 namespace synthese
 {
 	using namespace util;
+	using namespace time;
 
 	namespace messages
 	{
 
 		Alarm::Alarm()
 			: Registrable<uid,Alarm>()
+			, _enabled(false)
+			, _periodStart(TIME_UNKNOWN)
+			, _periodEnd(TIME_UNKNOWN)
+			, _scenario(NULL)
 		{
 
 		}
@@ -72,8 +77,7 @@ namespace synthese
 		Alarm::isApplicable ( const synthese::time::DateTime& start, 
 					const synthese::time::DateTime& end ) const
 		{
-			if ( ( start < _periodStart ) || 
-			( end > _periodEnd ) )
+			if ( ( start < _periodStart ) || ( end > _periodEnd ) || !_enabled )
 				return false;
 		    
 			return true;
@@ -119,14 +123,43 @@ namespace synthese
 			return _shortMessage;
 		}
 
-		void Alarm::setScenarioId(uid scenario )
+		void Alarm::setScenario(Scenario* scenario)
 		{
-			_scenarioId = scenario;
+			_scenario = scenario;
+			if (_scenario != NULL)
+			{
+				setPeriodStart(_scenario->getPeriodStart());
+				setPeriodEnd(_scenario->getPeriodEnd());
+			}
 		}
 
-		uid Alarm::getScenarioId() const
+		Scenario* Alarm::getScenario() const
 		{
-			return _scenarioId;
+			return _scenario;
+		}
+
+		bool Alarm::getIsEnabled() const
+		{
+			return _enabled;
+		}
+
+		void Alarm::setIsEnabled( bool value )
+		{
+			_enabled = value;
+		}
+
+		Alarm* Alarm::createCopy(Scenario* scenario) const
+		{
+			Alarm* alarm = new Alarm;
+			alarm->setIsATemplate(false);
+			alarm->setLevel(getLevel());
+			alarm->setScenario(scenario);
+			alarm->setShortMessage(getShortMessage());
+			alarm->setLongMessage(getLongMessage());
+			
+			/// @todo Broadcast list copy
+
+			return alarm;
 		}
 	}
 }

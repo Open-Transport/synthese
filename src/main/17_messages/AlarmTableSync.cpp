@@ -58,41 +58,30 @@ namespace synthese
 			alarm->setLongMessage(rows.getColumn (rowId, AlarmTableSync::COL_LONG_MESSAGE));
 			alarm->setPeriodStart(DateTime::FromSQLTimestamp (rows.getColumn (rowId, AlarmTableSync::COL_PERIODSTART)));
 			alarm->setPeriodEnd(DateTime::FromSQLTimestamp (rows.getColumn (rowId, AlarmTableSync::COL_PERIODEND)));
-			alarm->setScenarioId(Conversion::ToLongLong(rows.getColumn (rowId, AlarmTableSync::COL_SCENARIO_ID)));
+			alarm->setScenario(MessagesModule::getScenarii().get(Conversion::ToLongLong(rows.getColumn (rowId, AlarmTableSync::COL_SCENARIO_ID))));
+			alarm->setIsEnabled(Conversion::ToBool(rows.getColumn(rowId, AlarmTableSync::COL_ENABLED)));
 		}
 
 		template<> void SQLiteTableSyncTemplate<Alarm>::save(Alarm* object)
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE_NAME << " SET "
-					<< AlarmTableSync::COL_IS_TEMPLATE << "=" << Conversion::ToString(object->getIsATemplate())
-					<< "," << AlarmTableSync::COL_LEVEL << "=" << Conversion::ToString((int) object->getLevel())
-					<< "," << AlarmTableSync::COL_SHORT_MESSAGE << "=" << Conversion::ToSQLiteString(object->getShortMessage())
-					<< "," << AlarmTableSync::COL_LONG_MESSAGE << "=" << Conversion::ToSQLiteString(object->getLongMessage())
-					<< "," << AlarmTableSync::COL_PERIODSTART << "=" << object->getPeriodStart().toSQLString()
-					<< "," << AlarmTableSync::COL_PERIODEND << "=" << object->getPeriodEnd().toSQLString()
-					<< "," << AlarmTableSync::COL_SCENARIO_ID << "=" << Conversion::ToString(object->getScenarioId())
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
+			if (object->getKey() == 0)
 				object->setKey(getId(1,1));
-				query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					<< "," << Conversion::ToString(object->getIsATemplate())
-					<< "," << Conversion::ToString((int) object->getLevel())
-					<< "," << Conversion::ToSQLiteString(object->getShortMessage())
-					<< "," << Conversion::ToSQLiteString(object->getLongMessage())
-					<< "," << object->getPeriodStart().toSQLString()
-					<< "," << object->getPeriodEnd().toSQLString()
-					<< "," << Conversion::ToString(object->getScenarioId())
-					<< ")";
-			}
+			
+			query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->getKey())
+				<< "," << Conversion::ToString(object->getIsATemplate())
+				<< "," << Conversion::ToString(object->getIsEnabled())
+				<< "," << Conversion::ToString((int) object->getLevel())
+				<< "," << Conversion::ToSQLiteString(object->getShortMessage())
+				<< "," << Conversion::ToSQLiteString(object->getLongMessage())
+				<< "," << object->getPeriodStart().toSQLString()
+				<< "," << object->getPeriodEnd().toSQLString()
+				<< "," << Conversion::ToString(object->getScenario()->getKey())
+				<< ")";
+			
 			sqlite->execUpdate(query.str());
 		}
 
@@ -102,6 +91,7 @@ namespace synthese
 	namespace messages
 	{
 		const std::string AlarmTableSync::COL_IS_TEMPLATE = "is_template";
+		const std::string AlarmTableSync::COL_ENABLED = "is_enabled";
 		const std::string AlarmTableSync::COL_LEVEL = "level";
 		const std::string AlarmTableSync::COL_SHORT_MESSAGE = "short_message"; 
 		const std::string AlarmTableSync::COL_LONG_MESSAGE = "long_message";
@@ -113,7 +103,8 @@ namespace synthese
 		: SQLiteTableSyncTemplate<Alarm>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn (COL_IS_TEMPLATE, "INTEGER", true);
+			addTableColumn(COL_IS_TEMPLATE, "INTEGER", true);
+			addTableColumn(COL_ENABLED, "INTEGER");
 			addTableColumn (COL_LEVEL, "INTEGER", true);
 			addTableColumn (COL_SHORT_MESSAGE, "TEXT", true);
 			addTableColumn (COL_LONG_MESSAGE, "TEXT", true);
@@ -135,16 +126,21 @@ namespace synthese
 		{
 			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
 			{
+				Alarm* alarm;
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-				if (MessagesModule::getAlarms ().contains (id)) continue;
-
-				Alarm* alarm = new Alarm;
-
+				if (MessagesModule::getAlarms ().contains (id))
+				{
+					alarm = MessagesModule::getAlarms().get(id);
+				}
+				else
+				{
+					alarm = new Alarm;
+					MessagesModule::getAlarms().add (alarm);
+				}
 				load(alarm, rows, rowIndex);
-
-				MessagesModule::getAlarms().add (alarm);
+				if (alarm->getScenario())
+					alarm->getScenario()->addAlarm(alarm);
 			}
-
 		}
 
 
@@ -168,7 +164,11 @@ namespace synthese
 			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
 			{
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-				MessagesModule::getAlarms ().remove (id);	/// @todo Not so simple.
+				if (MessagesModule::getAlarms().contains(id))
+				{
+					MessagesModule::getAlarms().get(id)->getScenario()->removeAlarm(MessagesModule::getAlarms().get(id));
+					MessagesModule::getAlarms ().remove (id);
+				}
 			}
 		}
 

@@ -27,6 +27,7 @@
 #include "17_messages/Types.h"
 #include "17_messages/AlarmRecipient.h"
 #include "17_messages/UpdateAlarmAction.h"
+#include "17_messages/UpdateAlarmMessagesFromTemplateAction.h"
 
 #include "32_admin/AdminParametersException.h"
 
@@ -68,6 +69,14 @@ namespace synthese
 			updateRequest->copy(request);
 			updateRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
 			updateRequest->setAction(Factory<Action>::create<UpdateAlarmAction>());
+			updateRequest->setObjectId(request->getObjectId());
+
+			AdminRequest* templateRequest = Factory<Request>::create<AdminRequest>();
+			templateRequest->copy(request);
+			templateRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+			templateRequest->setAction(Factory<Action>::create<UpdateAlarmMessagesFromTemplateAction>());
+			templateRequest->setObjectId(request->getObjectId());
+
 
 			// Alarm level map
 			map<int, string> lmap;
@@ -79,18 +88,24 @@ namespace synthese
 
 			stream
 				<< "<h1>Paramètres</h1>"
+				<< updateRequest->getHTMLFormHeader("update")
 				<< "<table>"
-				<< "<tr><td>Type</td><td>" << Html::getRadioInput("", lmap, (int) _alarm->getLevel()) << "</td></tr>"
-				<< "<tr><td>Début diffusion</td><td>Date " << Html::getTextInput("", _alarm->getPeriodStart().getDate().toSQLString(false)) 
-				<< " Heure " << Html::getTextInput("", _alarm->getPeriodStart().getHour().toSQLString(false)) << "</td></tr>"
-				<< "<tr><td>Fin diffusion</td><td>Date " << Html::getTextInput("", _alarm->getPeriodStart().getDate().toSQLString(false)) 
-				<< " Heure " << Html::getTextInput("", _alarm->getPeriodStart().getHour().toSQLString(false)) << "</td></tr>"
+				<< "<tr><td>Type</td><td>" << Html::getRadioInput(UpdateAlarmAction::PARAMETER_TYPE, lmap, (int) _alarm->getLevel()) << "</td></tr>"
+				<< "<tr><td>Début diffusion</td><td>Date " << Html::getTextInput(UpdateAlarmAction::PARAMETER_START_DATE, _alarm->getPeriodStart().getDate().toSQLString(false)) 
+				<< " Heure " << Html::getTextInput(UpdateAlarmAction::PARAMETER_START_HOUR, _alarm->getPeriodStart().getHour().toSQLString(false)) << "</td></tr>"
+				<< "<tr><td>Fin diffusion</td><td>Date " << Html::getTextInput(UpdateAlarmAction::PARAMETER_END_DATE, _alarm->getPeriodStart().getDate().toSQLString(false)) 
+				<< " Heure " << Html::getTextInput(UpdateAlarmAction::PARAMETER_END_HOUR, _alarm->getPeriodStart().getHour().toSQLString(false)) << "</td></tr>"
 				<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregistrer") << "</td></tr>"
-				<< "</table>"
+				<< "</table></form>"
 
 				<< "<h1>Contenu</h1>"
 				<< "<table>"
-				<< "<tr><td>Modèle</td><td>" << Html::getSelectInput("", tmap, 0) << Html::getSubmitButton("Copier contenu") << "</td></tr>"
+				<< "<tr><td>Modèle</td><td>" 
+				<< templateRequest->getHTMLFormHeader("template")
+				<< Html::getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, tmap, 0) 
+				<< Html::getSubmitButton("Copier contenu")
+                << "</form></td></tr>"
+				
 				<< "<tr><td>Message court</td><td>" << Html::getTextAreaInput("", _alarm->getShortMessage(), 2, 20) << "</td></tr>"
 				<< "<tr><td>Message long</td><td>" << Html::getTextAreaInput("", _alarm->getLongMessage(), 4, 30) << "</td></tr>"
 				<< "</table>";
@@ -101,7 +116,10 @@ namespace synthese
 				stream << "<h1>Diffusion sur " << arit->getTitle() << "</h1>";
 
 				arit->displayBroadcastListEditor(stream, _alarm, request);
-			}				
+			}
+
+			delete updateRequest;
+			delete templateRequest;
 		}
 	}
 }

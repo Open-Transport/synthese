@@ -32,115 +32,104 @@
 
 namespace synthese
 {
-namespace env
-{
+	namespace env
+	{
+
+		LineStop::LineStop (const uid id,
+					const Line* line,
+					int rankInPath,
+					bool isDeparture,
+					bool isArrival,		
+					double metricOffset)
+			: synthese::util::Registrable<uid,LineStop> (id)
+			, Edge (isDeparture, isArrival, line, rankInPath)
+			, _metricOffset (metricOffset)
+		{
+		}
 
 
-LineStop::LineStop (const uid& id,
-		    const Line* line,
-		    int rankInPath,
-		    bool isDeparture,
-		    bool isArrival,		
-		    double metricOffset,
-		    const PhysicalStop* physicalStop)
-    : synthese::util::Registrable<uid,LineStop> (id)
-    , Edge (isDeparture, isArrival, line, rankInPath)
-    , _metricOffset (metricOffset)
-    , _physicalStop (physicalStop)
-{
 
+		LineStop::~LineStop()
+		{
+		}
+
+
+
+		const Vertex* 
+		LineStop::getFromVertex () const
+		{
+			return _physicalStop;
+		}
+
+
+
+
+
+		double
+		LineStop::getMetricOffset () const
+		{
+			return _metricOffset;
+		}
+
+
+		bool 
+		LineStop::seemsGeographicallyConsistent (const LineStop& other) const
+		{
+			double deltaMO; // meters
+			if ( getMetricOffset () > other.getMetricOffset () )
+				deltaMO = ( getMetricOffset () - other.getMetricOffset () ) / 1000;
+			else
+				deltaMO = ( other.getMetricOffset () - getMetricOffset () ) / 1000;
+
+			int deltaGPS = SquareDistance ( 
+			*getFromVertex (), 
+			*other.getFromVertex () ).getDistance(); // kilometers
+
+			if ( deltaMO > 10 * deltaGPS && deltaMO - deltaGPS > 1 )
+			{
+				return false;
+			}
+			if ( deltaMO < deltaGPS && deltaGPS - deltaMO > 1 )
+			{
+				return false;
+			}
+
+			return true;
+		    
+		}
+
+
+		void 
+		LineStop::setMetricOffset (double metricOffset)
+		{
+			_metricOffset = metricOffset;
+		}
+
+		Line* LineStop::getLine() const
+		{
+			return (Line*) getParentPath();
+		}
+
+		const PhysicalStop* LineStop::getPhysicalStop() const
+		{
+			return (const PhysicalStop*) _physicalStop;
+		}
+
+		void LineStop::setLine( const Line* line )
+		{
+			setParentPath((Path*) line);
+		}
+
+		void LineStop::setPhysicalStop(PhysicalStop* stop )
+		{
+			// Saving of the attribute
+			_physicalStop = stop;
+
+			// Links from stop to the linestop
+			if (isArrival())
+				stop->addArrivalEdge((Edge*) this);
+			if (isDeparture())
+				stop->addDepartureEdge((Edge*) this);
+		}
+	}
 }
-
-
-
-
-
-
-LineStop::~LineStop()
-{
-
-}
-
-
-
-
-
-
-const Vertex* 
-LineStop::getFromVertex () const
-{
-    return _physicalStop;
-}
-
-
-
-
-
-double
-LineStop::getMetricOffset () const
-{
-    return _metricOffset;
-}
-
-
-
-    
-
-
-
-
-
-
-
-
-bool 
-LineStop::seemsGeographicallyConsistent (const LineStop& other) const
-{
-    double deltaMO; // meters
-    if ( getMetricOffset () > other.getMetricOffset () )
-        deltaMO = ( getMetricOffset () - other.getMetricOffset () ) / 1000;
-    else
-        deltaMO = ( other.getMetricOffset () - getMetricOffset () ) / 1000;
-
-    int deltaGPS = SquareDistance ( 
-	*getFromVertex (), 
-	*other.getFromVertex () ).getDistance(); // kilometers
-
-    if ( deltaMO > 10 * deltaGPS && deltaMO - deltaGPS > 1 )
-    {
-        return false;
-    }
-    if ( deltaMO < deltaGPS && deltaGPS - deltaMO > 1 )
-    {
-        return false;
-    }
-
-    return true;
-    
-}
-
-
-
-
-
-
-void 
-LineStop::setMetricOffset (double metricOffset)
-{
-    _metricOffset = metricOffset;
-}
-
-Line* LineStop::getLine() const
-{
-	return (Line*) getParentPath();
-}
-
-const PhysicalStop* LineStop::getPhysicalStop() const
-{
-	return (const PhysicalStop*) _physicalStop;
-}
-
-
-}
-}
-

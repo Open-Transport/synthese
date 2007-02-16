@@ -23,23 +23,35 @@
 #ifndef SYNTHESE_UpdateAlarmAction_H__
 #define SYNTHESE_UpdateAlarmAction_H__
 
+#include "04_time/DateTime.h"
+
+#include "17_messages/Types.h"
+
 #include "30_server/Action.h"
 
 namespace synthese
 {
 	namespace messages
 	{
+		class Alarm;
+
 		/** UpdateAlarmAction action class.
 			@ingroup m17
 		*/
 		class UpdateAlarmAction : public server::Action
 		{
 		public:
-			/// @todo Parameters list
-			// static const std::string PARAMETER_xxx;
+			static const std::string PARAMETER_TYPE;
+			static const std::string PARAMETER_START_DATE;
+			static const std::string PARAMETER_START_HOUR;
+			static const std::string PARAMETER_END_DATE;
+			static const std::string PARAMETER_END_HOUR;
 
 		private:
-			/// @todo Attributes list
+			AlarmLevel		_type;
+			time::DateTime	_startDate;
+			time::DateTime	_endDate;
+			Alarm*			_alarm;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

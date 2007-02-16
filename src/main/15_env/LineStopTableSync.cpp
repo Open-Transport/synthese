@@ -1,4 +1,5 @@
 
+
 /** LineStopTableSync class implementation.
 	@file LineStopTableSync.cpp
 
@@ -20,179 +21,202 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <boost/tokenizer.hpp>
-#include <sqlite/sqlite3.h>
-#include <assert.h>
+#include <sstream>
 
 #include "01_util/Conversion.h"
+
+#include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLiteException.h"
 
-#include "15_env/LineStop.h"
-#include "15_env/Point.h"
-#include "15_env/RoadChunkTableSync.h"
-#include "15_env/LineStopTableSync.h"
+#include "LineStop.h"
+#include "LineStopTableSync.h"
 #include "15_env/EnvModule.h"
 
-using synthese::util::Conversion;
+using namespace std;
 
 namespace synthese
 {
 	using namespace db;
+	using namespace util;
+	using namespace env;
 
-namespace env
-{
+	namespace db
+	{
+		template<> const std::string SQLiteTableSyncTemplate<LineStop>::TABLE_NAME = "t010_line_stops";
+		template<> const int SQLiteTableSyncTemplate<LineStop>::TABLE_ID = 10;
+		template<> const bool SQLiteTableSyncTemplate<LineStop>::HAS_AUTO_INCREMENT = true;
 
+		template<> void SQLiteTableSyncTemplate<LineStop>::load(LineStop* ls, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		{
 
+			uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
 
-LineStopTableSync::LineStopTableSync ()
-: ComponentTableSync (LINESTOPS_TABLE_NAME, true, false, db::TRIGGERS_ENABLED_CLAUSE)
-{
-    addTableColumn (LINESTOPS_TABLE_COL_PHYSICALSTOPID, "INTEGER", false);
-    addTableColumn (LINESTOPS_TABLE_COL_LINEID, "INTEGER", false);
-    addTableColumn (LINESTOPS_TABLE_COL_RANKINPATH, "INTEGER", false);
-    addTableColumn (LINESTOPS_TABLE_COL_ISDEPARTURE, "BOOLEAN", false);
-    addTableColumn (LINESTOPS_TABLE_COL_ISARRIVAL, "BOOLEAN", false);
-    addTableColumn (LINESTOPS_TABLE_COL_METRICOFFSET, "DOUBLE", true);
-    addTableColumn (LINESTOPS_TABLE_COL_VIAPOINTS, "TEXT", true);
+			uid fromPhysicalStopId (
+				Conversion::ToLongLong (rows.getColumn (rowIndex, LineStopTableSync::COL_PHYSICALSTOPID)));
+
+			uid lineId (
+				Conversion::ToLongLong (rows.getColumn (rowIndex, LineStopTableSync::COL_LINEID)));
+
+			int rankInPath (
+				Conversion::ToInt (rows.getColumn (rowIndex, LineStopTableSync::COL_RANKINPATH)));
+
+			bool isDeparture (Conversion::ToBool (
+				rows.getColumn (rowIndex, LineStopTableSync::COL_ISDEPARTURE)));
+			bool isArrival (Conversion::ToBool (
+				rows.getColumn (rowIndex, LineStopTableSync::COL_ISARRIVAL)));
+
+			double metricOffset (
+				Conversion::ToDouble (rows.getColumn (rowIndex, LineStopTableSync::COL_METRICOFFSET)));
+
+			std::string viaPointsStr (
+				rows.getColumn (rowIndex, LineStopTableSync::COL_VIAPOINTS));
+
+			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+			ls->clearViaPoints ();
+
+			boost::char_separator<char> sep1 (",");
+			boost::char_separator<char> sep2 (":");
+			tokenizer viaPointsTokens (viaPointsStr, sep1);
+			for (tokenizer::iterator viaPointIter = viaPointsTokens.begin();
+				viaPointIter != viaPointsTokens.end (); ++viaPointIter)
+			{
+				tokenizer valueTokens (*viaPointIter, sep2);
+				tokenizer::iterator valueIter = valueTokens.begin();
+
+				// X:Y
+				ls->addViaPoint (synthese::env::Point (Conversion::ToDouble (*valueIter), 
+					Conversion::ToDouble (*(++valueIter))));
+			}
+
+			ls->setKey(id);
+			ls->setMetricOffset(metricOffset);
+			ls->setPhysicalStop(EnvModule::getPhysicalStops ().get (fromPhysicalStopId));
+			ls->setLine(EnvModule::getLines ().get (lineId));
+			ls->setIsArrival(isArrival);
+			ls->setIsDeparture(isDeparture);
+			ls->setRankInPath(rankInPath);
+
+			EnvModule::getLines ().get (lineId)->addEdge(ls);
+			
+		}
+
+		template<> void SQLiteTableSyncTemplate<LineStop>::save(LineStop* object)
+		{
+/*			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			if (object->getKey() <= 0)
+				object->setKey(getId(1,1));	/// @todo Use grid ID
+               
+			 query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->getKey())
+				/// @todo fill other fields separated by ,
+				<< ")";
+			sqlite->execUpdate(query.str());
+*/		}
+
+	}
+
+	namespace env
+	{
+		const std::string LineStopTableSync::COL_PHYSICALSTOPID ("physical_stop_id");
+		const std::string LineStopTableSync::COL_LINEID ("line_id");
+		const std::string LineStopTableSync::COL_RANKINPATH ("rank_in_path");
+		const std::string LineStopTableSync::COL_ISDEPARTURE ("is_departure");
+		const std::string LineStopTableSync::COL_ISARRIVAL ("is_arrival");
+		const std::string LineStopTableSync::COL_METRICOFFSET ("metric_offset");
+		const std::string LineStopTableSync::COL_SCHEDULEINPUT ("schedule_input");
+		const std::string LineStopTableSync::COL_VIAPOINTS ("via_points");
+
+		LineStopTableSync::LineStopTableSync()
+			: SQLiteTableSyncTemplate<LineStop>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+		{
+			addTableColumn(TABLE_COL_ID, "INTEGER", false);
+			addTableColumn (COL_PHYSICALSTOPID, "INTEGER", false);
+			addTableColumn (COL_LINEID, "INTEGER", false);
+			addTableColumn (COL_RANKINPATH, "INTEGER", false);
+			addTableColumn (COL_ISDEPARTURE, "BOOLEAN", false);
+			addTableColumn (COL_ISARRIVAL, "BOOLEAN", false);
+			addTableColumn (COL_METRICOFFSET, "DOUBLE", true);
+			addTableColumn (COL_VIAPOINTS, "TEXT", true);
+		}
+
+		void LineStopTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				if (EnvModule::getLineStops().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				{
+					load(EnvModule::getLineStops().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))), rows, i);
+				}
+				else
+				{
+					LineStop* object = new LineStop;
+					load(object, rows, i);
+					EnvModule::getLineStops().add(object);
+				}
+			}
+		}
+		
+		void LineStopTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (EnvModule::getLineStops().contains(id))
+				{
+					LineStop* object = EnvModule::getLineStops().get(id);
+					load(object, rows, i);
+				}
+			}
+		}
+
+		void LineStopTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (EnvModule::getLineStops().contains(id))
+				{
+					EnvModule::getLineStops().remove(id);
+				}
+			}
+		}
+
+		std::vector<LineStop*> LineStopTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE " 
+				/// @todo Fill Where criteria
+				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+				;
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<LineStop*> objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					LineStop* object = new LineStop();
+					load(object, result, i);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
+	}
 }
-
-
-
-LineStopTableSync::~LineStopTableSync ()
-{
-
-}
-
-    
-
-
-void 
-LineStopTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-			   synthese::env::Environment& environment)
-{
-    uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-
-    if (environment.getLineStops ().contains (id)) return;
-
-    uid fromPhysicalStopId (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_PHYSICALSTOPID)));
-
-    uid lineId (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_LINEID)));
-
-    int rankInPath (
-	Conversion::ToInt (rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_RANKINPATH)));
-
-    bool isDeparture (Conversion::ToBool (
-			  rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_ISDEPARTURE)));
-    bool isArrival (Conversion::ToBool (
-			rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_ISARRIVAL)));
-    
-    double metricOffset (
-	Conversion::ToDouble (rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_METRICOFFSET)));
-    
-    std::string viaPointsStr (
-	rows.getColumn (rowIndex, ROADCHUNKS_TABLE_COL_VIAPOINTS));
-
-    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-
-    LineStop* ls = new synthese::env::LineStop (
-	id, 
-	EnvModule::getLines ().get (lineId),
-	rankInPath,
-	isDeparture, 
-	isArrival,
-	metricOffset,
-	EnvModule::getPhysicalStops ().get (fromPhysicalStopId)
-	);
-
-    boost::char_separator<char> sep1 (",");
-    boost::char_separator<char> sep2 (":");
-    tokenizer viaPointsTokens (viaPointsStr, sep1);
-    for (tokenizer::iterator viaPointIter = viaPointsTokens.begin();
-	 viaPointIter != viaPointsTokens.end (); ++viaPointIter)
-    {
-	tokenizer valueTokens (*viaPointIter, sep2);
-	tokenizer::iterator valueIter = valueTokens.begin();
-
-	// X:Y
-	ls->addViaPoint (synthese::env::Point (Conversion::ToDouble (*valueIter), 
-					       Conversion::ToDouble (*(++valueIter))));
-    }
-
-	EnvModule::getLines ().get (lineId)->addEdge (ls);
-    environment.getLineStops ().add (ls);
-}
-
-
-
-
-
-
-void 
-LineStopTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
-			  synthese::env::Environment& environment)
-{
-    uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-    LineStop* ls = environment.getLineStops().get (id);
-
-    double metricOffset (
-	Conversion::ToDouble (rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_METRICOFFSET)));
-    
-    ls->setMetricOffset (metricOffset);
-
-    std::string viaPointsStr (
-	rows.getColumn (rowIndex, LINESTOPS_TABLE_COL_VIAPOINTS));
-
-    ls->clearViaPoints ();
-
-    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-
-    boost::char_separator<char> sep1 (",");
-    boost::char_separator<char> sep2 (":");
-    tokenizer viaPointsTokens (viaPointsStr, sep1);
-    for (tokenizer::iterator viaPointIter = viaPointsTokens.begin();
-	 viaPointIter != viaPointsTokens.end (); ++viaPointIter)
-    {
-	tokenizer valueTokens (*viaPointIter, sep2);
-	tokenizer::iterator valueIter = valueTokens.begin();
-
-	// X:Y
-	ls->addViaPoint (synthese::env::Point (Conversion::ToDouble (*valueIter), 
-					       Conversion::ToDouble (*(++valueIter))));
-    }
-
-
-}
-
-
-
-
-
-void 
-LineStopTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
-			 synthese::env::Environment& environment)
-{
-    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-    environment.getLineStops ().remove (id);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-}
-

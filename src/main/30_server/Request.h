@@ -136,7 +136,7 @@ namespace synthese
 			//@{
 				/** Query string getter for building links.
 				*/
-				std::string getQueryString() const;
+				virtual std::string getQueryString() const;
 
 				/** Function to display, defined by each subclass.
 				*/

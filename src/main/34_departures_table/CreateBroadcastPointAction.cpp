@@ -76,7 +76,7 @@ namespace synthese
 					map.erase(it);
 				}
 
-				if ((_name.size() == 0) && (_physicalStop == NULL))
+				if (!_name.size() && (_physicalStop == NULL))
 					throw ActionException("Physical stop or broadcast point name not specified");
 
 			}

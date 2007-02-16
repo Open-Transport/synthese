@@ -23,12 +23,21 @@
 #ifndef SYNTHESE_Env_Types_H__
 #define SYNTHESE_Env_Types_H__
 
+#include <set>
+
 /** @addtogroup m15
 @{
 */
 
 namespace synthese
 {
+	namespace env
+	{
+		class PhysicalStop;
+
+		typedef std::set<const PhysicalStop*> PhysicalStopsSet;
+	}
+
 	typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
 
 	typedef struct {

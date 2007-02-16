@@ -105,5 +105,14 @@ namespace synthese
 				s << Html::getHiddenInput(PARAMETER_INTERFACE, Conversion::ToString(_interface->getKey()));
 			return s.str();
 		}
+
+		std::string RequestWithInterface::getQueryString() const
+		{
+			stringstream s;
+			s << Request::getQueryString();
+			if (_interface != NULL)
+				s << PARAMETER_SEPARATOR << PARAMETER_INTERFACE << PARAMETER_ASSIGNMENT << _interface->getKey();
+			return s.str();
+		}
 	}
 }

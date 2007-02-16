@@ -108,7 +108,7 @@ const std::string& Place::getName26() const
 	return _name26;
 }
 
-const std::string& Place::getFullName() const
+const std::string Place::getFullName() const
 {
 	return ((_city != NULL) ? (_city->getName() + " ") : "") + getName();
 }

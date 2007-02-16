@@ -24,11 +24,10 @@
 
 #include "17_messages/AlarmBroadcastList.h"
 #include "17_messages/Alarm.h"
+#include "17_messages/Scenario.h"
 
 /** @defgroup m17 17 Messages
-@{
-
-*/
+@{	*/
 namespace synthese
 {
 	namespace messages
@@ -41,10 +40,12 @@ namespace synthese
 //			typedef messages::AlarmBroadcastList<departurestable::BroadcastPoint>	BroadcastPointBroadcastList;
 
 		private:
-			static Alarm::Registry _alarms;
+			static Alarm::Registry		_alarms;
+			static Scenario::Registry	_scenarii;
 
 		public:
-			static Alarm::Registry& getAlarms ();
+			static Alarm::Registry&		getAlarms();
+			static Scenario::Registry&	getScenarii();
 			
 			void initialize();
 			

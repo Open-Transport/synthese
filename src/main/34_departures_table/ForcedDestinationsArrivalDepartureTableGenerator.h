@@ -48,7 +48,7 @@ namespace synthese
 
 		public:
 			ForcedDestinationsArrivalDepartureTableGenerator(
-				const PhysicalStopsList&
+				const env::PhysicalStopsSet&
 				, const DeparturesTableDirection&
 				, const EndFilter&
 				, const LineFilter&

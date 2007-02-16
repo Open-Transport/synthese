@@ -43,6 +43,7 @@ namespace synthese
 		HandicappedCompliance::Registry	EnvModule::_handicappedCompliances;
 		PedestrianCompliance::Registry	EnvModule::_pedestrianCompliances;
 		ReservationRule::Registry		EnvModule::_reservationRules;
+		LineStop::Registry				EnvModule::_lineStops;
 
 		void EnvModule::initialize()
 		{
@@ -76,6 +77,8 @@ namespace synthese
 			_connectionPlaces.clear ();
 			_cities.clear ();
 			_commercialLines.clear();
+			_lineStops.clear ();
+
 		}
 
 		CommercialLine::Registry& EnvModule::getCommercialLines()
@@ -131,10 +134,15 @@ namespace synthese
 		{
 			map<uid,string> m;
 			if (withAll)
-				m.insert(make_pair(UNKNOWN_VALUE, "(toutes)"));
+				m.insert(make_pair(0, "(toutes)"));
 			for(CommercialLine::Registry::const_iterator it = _commercialLines.begin(); it != _commercialLines.end(); ++it)
 				m.insert(make_pair(it->first, it->second->getShortName()));
 			return m;
+		}
+
+		LineStop::Registry& EnvModule::getLineStops()
+		{
+			return _lineStops;
 		}
 	}
 }

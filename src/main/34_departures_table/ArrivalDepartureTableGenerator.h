@@ -25,6 +25,8 @@
 
 #include <set>
 
+#include "15_env/Types.h"
+
 #include "34_departures_table/Types.h"
 
 namespace synthese
@@ -34,7 +36,6 @@ namespace synthese
 		class ConnectionPlace;
 		class Line;
 		class LineStop;
-		class PhysicalStop;
 	}
 
 	namespace departurestable
@@ -58,7 +59,7 @@ namespace synthese
 
 			//! \name Parameters
 			//@{
-				const PhysicalStopsList			_physicalStops;
+				const env::PhysicalStopsSet		_physicalStops;
 				const DeparturesTableDirection	_direction;
 				const EndFilter					_endFilter;
 				const LineFilter				_lineFilter;
@@ -89,7 +90,7 @@ namespace synthese
 				@param maxSize Maximal size of the departure table (default = unlimited).
 			*/
 			ArrivalDepartureTableGenerator(
-				const PhysicalStopsList&
+				const env::PhysicalStopsSet&
 				, const DeparturesTableDirection&
 				, const EndFilter&
 				, const LineFilter&
@@ -99,11 +100,11 @@ namespace synthese
 				, const time::DateTime& endDateTime
 				, size_t maxSize = UNLIMITED_SIZE
 			);
-			virtual ~ArrivalDepartureTableGenerator() {}
 
 		public:
 			
 			virtual const ArrivalDepartureList& generate() = 0;
+			virtual ~ArrivalDepartureTableGenerator() {}
 
 		};
 

@@ -26,6 +26,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <utility>
 
 #include "01_util/Constants.h"
 
@@ -38,6 +39,19 @@ namespace synthese
 		public:
 			//! \name Basis Input fields
 			//@{
+				
+				
+				/** External sorted selection list HTML input field (template)
+					@param name Name of the field
+					@param choices List of choices : a map sorted by elements of S (the sort value is not read), giving pairs "value => text"
+					@param value Default selected value
+					@return Selection list HTML input field
+					@author Hugues Romain
+					@date 2007					
+				*/
+				template<class S, class K, class T>
+					static std::string getSortedSelectInput(const std::string& name, const std::map<S, std::pair<K, T> >& choices, const K& value);
+
 				template<class K, class T>
 				static std::string getSelectInput(const std::string& name, const std::map<K, T>& choices, const K& value);
 
@@ -72,6 +86,22 @@ namespace synthese
 
 		};
 
+		template<class S, class K, class T>
+		std::string Html::getSortedSelectInput( const std::string& name, const std::map<S, std::pair<K, T> >& choices, const K& value )
+		{
+			std::stringstream s;
+			s << "<select name=\"" << name << "\">";
+			for (typename std::map<S, std::pair<K, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
+			{
+				s << "<option value=\"" << it->second.first << "\"";
+				if (it->second.first == value)
+					s << " selected=\"1\"";
+				s << ">" << it->second.second << "</option>";
+			}
+			s << "</select>";
+			return s.str();
+		}
+
 		template<class K, class T>
 		std::string Html::getSelectInput(const std::string& name, const std::map<K, T>& choices, const K& value)
 		{
@@ -94,7 +124,7 @@ namespace synthese
 			std::stringstream s;
 			for (typename std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
-				s << "<input type=\"radio\" value=\"" << it->first << "\"";
+				s << "<input name=\"" << name << "\" type=\"radio\" value=\"" << it->first << "\"";
 				if (it->first == value)
 					s << " checked=\"1\"";
 				s << " />" << it->second;

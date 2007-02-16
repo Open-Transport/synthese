@@ -53,12 +53,13 @@ namespace synthese
 		{
 		private:
 			AlarmLevel					_level;
+			bool						_enabled;
 			bool						_isATemplate;
 			std::string					_shortMessage;  //!< Alarm message
 			std::string					_longMessage;  //!< Alarm message
 			synthese::time::DateTime	_periodStart; //!< Alarm applicability period start
 			synthese::time::DateTime	_periodEnd;   //!< Alarm applicability period end
-			uid							_scenarioId;	//!< Group of alarms which this one belongs. Can be null = single alarm.
+			Scenario*					_scenario;	//!< Group of alarms which this one belongs. Can be null = single alarm.
 
 		    
 		public:
@@ -67,14 +68,14 @@ namespace synthese
 			
 			//! @name Getters/Setters
 			//@{
-
-				const std::string&		getShortMessage() const;
-				const std::string&		getLongMessage() const;
-				const AlarmLevel&		getLevel() const;
-				const time::DateTime&	getPeriodStart() const;
-				const time::DateTime&	getPeriodEnd() const;
-				bool					getIsATemplate() const;
-				uid						getScenarioId()	const;
+				bool					getIsEnabled()		const;
+				const std::string&		getShortMessage()	const;
+				const std::string&		getLongMessage()	const;
+				const AlarmLevel&		getLevel()			const;
+				const time::DateTime&	getPeriodStart()	const;
+				const time::DateTime&	getPeriodEnd()		const;
+				bool					getIsATemplate()	const;
+				Scenario*				getScenario()		const;
 
 				void setLevel (const AlarmLevel& level);
 				void setShortMessage( const std::string& message);
@@ -82,7 +83,13 @@ namespace synthese
 				void setPeriodStart ( const synthese::time::DateTime& periodStart);
 				void setPeriodEnd ( const synthese::time::DateTime& periodEnd);
 				void setIsATemplate(bool value);
-				void setScenarioId(uid id);
+
+				/** Scenario setter.
+					Updates the dates of the alarm with the ones of the scenario.
+					@param scenario Scenario to link with
+				*/
+				void setScenario(Scenario* scenario);
+				void setIsEnabled(bool value);
 
 			//@}
 		    
@@ -90,14 +97,20 @@ namespace synthese
 			//! \name Calculateurs
 			//@{
 
-			/** Applicability test.
-			@param start Start of applicability period
-			@param end End of applicability period
-			@return true if the message is not empty and 
-			is valid for the whole period given as argument.
-			*/
-			bool isApplicable ( const synthese::time::DateTime& start, 
-					const synthese::time::DateTime& end ) const;
+				/** Applicability test.
+				@param start Start of applicability period
+				@param end End of applicability period
+				@return true if the message is not empty and 
+				is valid for the whole period given as argument.
+				*/
+				bool isApplicable ( const synthese::time::DateTime& start, 
+						const synthese::time::DateTime& end ) const;
+
+				/** Copy of alarm template.
+					@param scenario Scenario the new alarm belongs to.
+					@return The new alarm created upon the one
+				*/
+				Alarm*	createCopy(Scenario* scenario)	const;
 			//@}
 		    
 		};

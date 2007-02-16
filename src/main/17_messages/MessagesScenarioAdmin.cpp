@@ -24,6 +24,11 @@
 
 #include "17_messages/MessagesScenarioAdmin.h"
 #include "17_messages/Scenario.h"
+#include "17_messages/MessagesModule.h"
+#include "17_messages/ScenarioNameUpdateAction.h"
+
+#include "32_admin/AdminParametersException.h"
+#include "32_admin/AdminRequest.h"
 
 using namespace std;
 
@@ -36,38 +41,61 @@ namespace synthese
 
 	namespace messages
 	{
-		/// @todo Verify the parent constructor parameters
 		MessagesScenarioAdmin::MessagesScenarioAdmin()
-			: AdminInterfaceElement("messageslibrary", AdminInterfaceElement::EVER_DISPLAYED) {}
+			: AdminInterfaceElement("messageslibrary", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
+			, _scenario(NULL)
+		{}
+
 
 		void MessagesScenarioAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
+			try
+			{
+				AdminRequest::ParametersMap::const_iterator it;
+
+				it = map.find(AdminRequest::PARAMETER_OBJECT_ID);
+				if (it == map.end())
+					throw AdminParametersException("Scenario not specified");
+				_scenario = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
+			}
+			catch (Scenario::RegistryKeyException e)
+			{
+				throw AdminParametersException("Specified scenario not found");
+			}
 		}
 
 		string MessagesScenarioAdmin::getTitle() const
 		{
-			/// @todo Change the title of the page
-			return "title";
+			return _scenario->getName();
 		}
 
 		void MessagesScenarioAdmin::display(ostream& stream, const AdminRequest* request) const
 		{
+			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
+			updateRequest->copy(request);
+			updateRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
+			updateRequest->setAction(Factory<Action>::create<ScenarioNameUpdateAction>());
+
 			stream
-				<< "<P>Nom : " << Html::getTextInput("", _scenario->getName()) << Html::getSubmitButton("Modifier") << "</P>"
+				<< "<h1>Propriété</h1>"
+				<< updateRequest->getHTMLFormHeader("update")
+				<< "<P>Nom : " << Html::getTextInput(ScenarioNameUpdateAction::PARAMETER_NAME, _scenario->getName()) << Html::getSubmitButton("Modifier") << "</P>"
+				<< "</form>"
+
 				<< "<h1>Messages</h1>"
 				<< "<table>"
 				<< "<tr><th>Sel</th><th>Message</th><th>Emplacement</th>Actions</th></tr>";
 
-			// Messages loop
+			for(Scenario::AlarmsSet::const_iterator it = _scenario->getAlarms().begin(); it != _scenario->getAlarms().end(); ++it)
 			{
+				Alarm* alarm = *it;
 				stream
-					<< "<TR>"
-					<< "<TD><INPUT id=\"Radio2\" type=\"radio\" value=\"Radio2\" name=\"RadioGroup\"></TD>"
-					<< "<TD>Le métro est interrompu...</TD>"
-					<< "<TD>TOULOUSE Matabiau</TD>"
+					<< "<tr>"
+					<< "<td>" << "<INPUT id=\"Radio2\" type=\"radio\" value=\"Radio2\" name=\"RadioGroup\">" << "</td>"
+					<< "<td>" << alarm->getShortMessage() << "</td>"
+					<< "<td>TOULOUSE Matabiau</td>"
 					<< "<td>" << Html::getSubmitButton("Modifier") << Html::getSubmitButton("Supprimer") << "</td>"
-					<< "</TR>";
+					<< "</tr>";
 			}
 
 			stream
@@ -77,6 +105,7 @@ namespace synthese
 				<< "</tr>"
 				<< "</TABLE>";
 
+			delete updateRequest;
 		}
 	}
 }

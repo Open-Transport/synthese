@@ -59,7 +59,14 @@ namespace synthese
 
 		const std::string BroadcastPoint::getName() const
 		{
-			return _name;
+			stringstream s;
+			if ((_physicalStop != NULL) && _physicalStop->getName().size())
+				s << _physicalStop->getName();
+			else if (_name.size())
+				s << _name;
+			else
+				s << "(unnamed)";
+			return s.str();
 		}
 
 		ConnectionPlace* BroadcastPoint::getConnectionPlace() const
@@ -78,14 +85,7 @@ namespace synthese
 				return "(not localized)";
 			
 			stringstream s;
-			s << _place->getFullName() << "/";
-
-			if ((_physicalStop != NULL) && _physicalStop->getName().size())
-				s << _physicalStop->getName();
-			else if (_name.size())
-				s << _name;
-			else
-				s << "(unnamed)";
+			s << _place->getFullName() << "/" << getName();
 
 			return s.str(); 
 		}

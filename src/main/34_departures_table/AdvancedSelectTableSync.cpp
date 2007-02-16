@@ -135,8 +135,8 @@ namespace synthese
 		{
 			stringstream query;
 			query << " SELECT "
-				<< "p." << TABLE_COL_ID
-				<< ",b." << TABLE_COL_ID
+				<< "p." << TABLE_COL_ID << " AS pid"
+				<< ",b." << TABLE_COL_ID << " AS bid"
 				<< " FROM " << BroadcastPointTableSync::TABLE_NAME << " AS b"
 				<< " LEFT JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON b." << BroadcastPointTableSync::TABLE_COL_PHYSICAL_STOP_ID << "=p." << TABLE_COL_ID
 				<< " WHERE "
@@ -158,10 +158,10 @@ namespace synthese
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
 					PhysicalStopAndBroadcastPoint object;
-					object.stop = (result.getColumn(i, "p." + TABLE_COL_ID) != "")
-						? EnvModule::getPhysicalStops().get(Conversion::ToLongLong(result.getColumn(i, "p." + TABLE_COL_ID)))
+					object.stop = (result.getColumn(i, "pid") != "")
+						? EnvModule::getPhysicalStops().get(Conversion::ToLongLong(result.getColumn(i, "pid")))
 						: NULL;
-					object.bp = BroadcastPointTableSync::get(Conversion::ToLongLong(result.getColumn(i, "b." + TABLE_COL_ID)));
+					object.bp = BroadcastPointTableSync::get(Conversion::ToLongLong(result.getColumn(i, "bid")));
 					objects.push_back(object);
 				}
 				return objects;

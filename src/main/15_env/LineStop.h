@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_ENV_LINESTOP_H
 #define SYNTHESE_ENV_LINESTOP_H
 
-
 #include <string>
 
 #include "01_util/Registrable.h"
@@ -37,24 +36,19 @@
 namespace synthese
 {
 	namespace env
-
 	{
-
 		class PhysicalStop;
 		class Line;
 
-
-
 		/** Association class between line and physical stop.
-		@ingroup m15
+			The linestop is the implementation of the edge of a transport line.
+
+			@ingroup m15
 		*/
 		class LineStop : 
 			public synthese::util::Registrable<uid,LineStop>, public Edge
 		{
-		public:
-		    
 		private:
-
 			const PhysicalStop*  _physicalStop;   //!< Physical stop
 
 			double _metricOffset;      //!< Metric offset of stop on line
@@ -62,33 +56,44 @@ namespace synthese
 
 		public:
 
-
-			LineStop (const uid& id,
-				const Line* line,
-				int rankInPath,
-				bool isDeparture,
-				bool isArrival,
-				double metricOffset,
-				const PhysicalStop* physicalStop);
-
+			LineStop (const uid id = 0,
+				const Line* line = NULL,
+				int rankInPath = UNKNOWN_VALUE,
+				bool isDeparture = true,
+				bool isArrival = true,
+				double metricOffset = UNKNOWN_VALUE);
+			
 			~LineStop();
 
 
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
-				const Vertex* getFromVertex () const;
-
-
-				double getMetricOffset () const;
-				void setMetricOffset (double metricOffset);
-
-				Line*			getLine() const;
 				const PhysicalStop*	getPhysicalStop() const;
+				double				getMetricOffset () const;
+				Line*				getLine() const;
+			//@}
+				
+			//!	@name Setters
+			//@{
+				/** Physical stop setter.
+					@param stop the physical stop supporting the linestop
+
+					The physical stop setter builds the links from the physical stop to the linestop.
+
+					@warning the isArrival and the isDeparture attributes must be up to date to avoid false links in the physical stop.
+				*/
+				void				setPhysicalStop(PhysicalStop* stop);
+
+
+				void				setMetricOffset (double metricOffset);
+				void				setLine(const Line* line);
 			//@}
 
 
 			//! @name Query methods
 			//@{
+
+				const Vertex*		getFromVertex () const;
 
 				/*! Estimates consistency of line stops sequence according to 
 					metric offsets and physical stops coordinates.

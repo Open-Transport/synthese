@@ -63,33 +63,68 @@ namespace synthese
 			object->setTrackNumberDisplay(Conversion::ToBool(rows.getColumn(rowId, DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY)));
 			object->setServiceNumberDisplay(Conversion::ToBool(rows.getColumn(rowId, DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY)));
 
+			// Physical stops
 			vector<string> stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
 			object->clearPhysicalStops();
 			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-				object->addPhysicalStop(EnvModule::getPhysicalStops().get(Conversion::ToLongLong(*it)));
+				try
+				{
+					object->addPhysicalStop(EnvModule::getPhysicalStops().get(Conversion::ToLongLong(*it)));
+				}
+				catch (PhysicalStop::RegistryKeyException e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, e);
+				}
 			object->setAllPhysicalStopsDisplayed(Conversion::ToBool(rows.getColumn(rowId, DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED)));
-			
+
+			// Forbidden places
+			object->clearForbiddenPlaces();
 			stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS));
 			for (it = stops.begin(); it != stops.end(); ++it)
-				object->addForbiddenPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
+				try
+				{
+					object->addForbiddenPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
+				}
+				catch (ConnectionPlace::RegistryKeyException e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
+				}
 
 			// DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS // List of forbidden lines uids, separated by comas
 
 			object->setDirection((DeparturesTableDirection) Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_DIRECTION)));
 			object->setOriginsOnly((EndFilter) Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_ORIGINS_ONLY)));
 
+			// Displayed places
 			stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS));
+			object->clearDisplayedPlaces();
 			for (it = stops.begin(); it != stops.end(); ++it)
-				object->addDisplayedPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
+				try
+				{
+					object->addDisplayedPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
+				}
+				catch (ConnectionPlace::RegistryKeyException e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
+				}
 
 			object->setMaxDelay(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_MAX_DELAY)));
 			object->setClearingDelay(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_CLEARING_DELAY)));
 			object->setFirstRow(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_FIRST_ROW)));
 			object->setGenerationMethod((DisplayScreen::GenerationMethod) Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_GENERATION_METHOD)));
 
+			// Forced destinations
 			stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS));
+			object->clearForcedDestinations();
 			for (it = stops.begin(); it != stops.end(); ++it)
-				object->addForcedDestination(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
+				try
+				{
+					object->addForcedDestination(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
+				}
+				catch (ConnectionPlace::RegistryKeyException e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+				}
 
 			object->setDestinationForceDelay(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY)));
 			object->setMaintenanceChecksPerDay(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY)));
@@ -117,9 +152,12 @@ namespace synthese
 				<< "," << Conversion::ToString(object->getServiceNumberDisplay())
 				<< ",'";
 
-			for (PhysicalStopsList::const_iterator itp = object->getPhysicalStops().begin(); itp != object->getPhysicalStops().end(); ++itp)
+			int count=0;
+			for (PhysicalStopsSet::const_iterator itp = object->getPhysicalStops(false).begin(); itp != object->getPhysicalStops().end(); ++itp)
 			{
-				if (itp != object->getPhysicalStops().begin())
+				if (!(*itp)->getKey())
+					continue;
+				if (count++)
 					query << ",";
 				query << Conversion::ToString((*itp)->getKey());
 			}
@@ -128,18 +166,24 @@ namespace synthese
 				<< "'," << Conversion::ToString(object->getAllPhysicalStopsDisplayed())
 				<< ",'";
 
+			count = 0;
 			for (ForbiddenPlacesList::const_iterator itf = object->getForbiddenPlaces().begin(); itf != object->getForbiddenPlaces().end(); ++itf)
 			{
-				if (itf != object->getForbiddenPlaces().begin())
+				if (!(*itf)->getKey())
+					continue;
+				if (count++)
 					query << ",";
 				query << Conversion::ToString((*itf)->getKey());
 			}
 
 			query << "','";
 
+			count = 0;
 			for (LineFilter::const_iterator itl = object->getForbiddenLines().begin(); itl != object->getForbiddenLines().end(); ++itl)
 			{
-				if (itl != object->getForbiddenLines().begin())
+				if (!(*itl)->getKey())
+					continue;
+				if (count++)
 					query << ",";
 				query << Conversion::ToString((*itl)->getKey());
 			}
@@ -149,9 +193,12 @@ namespace synthese
 				<< "," << Conversion::ToString((int) object->getEndFilter())
 				<< ",'";
 
+			count = 0;
 			for (DisplayedPlacesList::const_iterator itd = object->getDisplayedPlaces().begin(); itd != object->getDisplayedPlaces().end(); ++itd)
 			{
-				if (itd != object->getDisplayedPlaces().begin())
+				if (!(*itd)->getKey())
+					continue;
+				if (count++)
 					query << ",";
 				query << Conversion::ToString((*itd)->getKey());
 			}
@@ -163,9 +210,12 @@ namespace synthese
 				<< "," << Conversion::ToString((int) object->getGenerationMethod())
 				<< ",'";
 
+			count = 0;
 			for (itd = object->getForcedDestinations().begin(); itd != object->getForcedDestinations().end(); ++itd)
 			{
-				if (itd != object->getDisplayedPlaces().begin())
+				if (!(*itd)->getKey())
+					continue;
+				if (count++)
 					query << ",";
 				query << Conversion::ToString((*itd)->getKey());
 			}
@@ -243,9 +293,16 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				DisplayScreen* object = new DisplayScreen;
-				load(object, rows, i);
-				DeparturesTableModule::getDisplayScreens().add(object);
+				if (DeparturesTableModule::getDisplayScreens().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				{
+					load(DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))), rows, i);
+				}
+				else
+				{
+					DisplayScreen* object = new DisplayScreen;
+					load(object, rows, i);
+					DeparturesTableModule::getDisplayScreens().add(object);
+				}
 			}
 		}
 
@@ -283,9 +340,9 @@ namespace synthese
 				<< " LEFT JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID
 				<< " WHERE " 
 				<< "d." << TABLE_COL_ID << " LIKE '%" << Conversion::ToSQLiteString(duid, false) << "%'";
-			if (localizationid != UNKNOWN_VALUE)
+			if (localizationid > 0)
 				query << " AND b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=" << localizationid;
-			if (typeuid != UNKNOWN_VALUE)
+			if (typeuid > 0)
 				query << " AND d." << COL_TYPE_ID << "=" << typeuid;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);

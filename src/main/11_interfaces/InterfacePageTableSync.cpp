@@ -47,33 +47,26 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				Interface* interf;
-				InterfacePage* page;
-				
 				// Search the specified interface
 				try
 				{
+					Interface* interf;
+					InterfacePage* page;
+
 					interf = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE )));
+
+					// Registered interface page;
+					page = Factory<InterfacePage>::contains(rows.getColumn(i,TABLE_COL_PAGE))
+						? Factory<InterfacePage>::create( rows.getColumn(i,TABLE_COL_PAGE) )
+						: new InterfacePage;
+
+					page->parse( rows.getColumn(i, TABLE_COL_CONTENT) );
+					interf->addPage(rows.getColumn(i, TABLE_COL_PAGE), page );
 				}
 				catch (Interface::RegistryKeyException e)
 				{
 					Log::GetInstance().warn("Corrupted data on "+ TABLE_NAME +" table : Interface not found", e);
-					continue;
 				}
-
-				try
-				{
-					// Registered interface page;
-					page = Factory<InterfacePage>::create( rows.getColumn(i,TABLE_COL_PAGE) );
-				}
-				catch (FactoryException<InterfacePage> e)
-				{
-					// Free interface page
-					page = new InterfacePage;
-				}
-
-				page->parse( rows.getColumn(i, TABLE_COL_CONTENT) );
-				interf->addPage(rows.getColumn(i, TABLE_COL_PAGE), page );
 			}
 		}
 

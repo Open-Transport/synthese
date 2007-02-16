@@ -34,8 +34,6 @@
 #include "15_env/Line.h"
 #include "15_env/Vertex.h"
 
-#include "17_messages/Alarm.h"
-
 using namespace std;
 
 namespace synthese
@@ -177,17 +175,7 @@ namespace synthese
 		void 
 		ConnectionPlace::addPhysicalStop (const PhysicalStop* physicalStop)
 		{
-			_physicalStops.push_back (physicalStop);
-		}
-
-
-
-		messages::Alarm*
-		ConnectionPlace::hasApplicableAlarm (const synthese::time::DateTime& start, 
-							const synthese::time::DateTime& end) const
-		{
-			/// @todo Implementation
-			return NULL;
+			_physicalStops.insert(physicalStop);
 		}
 
 
@@ -240,7 +228,7 @@ namespace synthese
 		    
 			if (returnPhysicalStops)
 			{
-			for (std::vector<const PhysicalStop*>::const_iterator it = _physicalStops.begin ();
+			for (PhysicalStopsSet::const_iterator it = _physicalStops.begin ();
 				it != _physicalStops.end (); ++it)
 			{
 				if (origin == (*it)) continue;
@@ -301,13 +289,22 @@ namespace synthese
 		{
 			map<uid, string> m;
 			if (withAll)
-				m.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
-			for (vector<const PhysicalStop*>::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+				m.insert(make_pair(0, "(tous)"));
+			for (PhysicalStopsSet::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 				m.insert(make_pair((*it)->getKey(), (*it)->getName()));
 			return m;
 		}
 
-		const std::vector<const PhysicalStop*>& ConnectionPlace::getPhysicalStops() const
+		std::map<uid, std::string> ConnectionPlace::getPhysicalStopLabels( const PhysicalStopsSet& noDisplay ) const
+		{
+			map<uid, string> m;
+			for (PhysicalStopsSet::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+				if (noDisplay.find(*it) == noDisplay.end())
+					m.insert(make_pair((*it)->getKey(), (*it)->getName()));
+			return m;
+		}
+
+		const PhysicalStopsSet& ConnectionPlace::getPhysicalStops() const
 		{
 			return _physicalStops;
 		}

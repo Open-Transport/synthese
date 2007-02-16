@@ -88,7 +88,7 @@ namespace synthese
 				*/
 				virtual const std::string& getOfficialName () const;
 
-				const std::string& getFullName() const;
+				const std::string getFullName() const;
 
 
 				/** Gets city where this place is located.

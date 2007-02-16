@@ -38,7 +38,6 @@ namespace synthese
 		*/
 		class DisplayScreenContentRequest : public server::Request
 		{
-			static const std::string PARAMETER_DISPLAY_SCREEN;
 			static const std::string PARAMETER_DATE;
 			
 			//! \name Page parameters
@@ -59,9 +58,6 @@ namespace synthese
 		public:
 			DisplayScreenContentRequest();
 			~DisplayScreenContentRequest();
-
-			void	setDisplayScreen(const DisplayScreen* screen);
-			
 
 			/** Action to run, defined by each subclass.
 			*/

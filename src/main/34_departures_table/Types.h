@@ -41,11 +41,9 @@ namespace synthese
 		class ConnectionPlace;
 		class Line;
 		class LineStop;
-		class PhysicalStop;
 	}
 
 	typedef std::set<const env::ConnectionPlace*> DisplayedPlacesList;
-	typedef std::set<const env::PhysicalStop*> PhysicalStopsList;
 	typedef std::set<const env::Line*> LineFilter;
 	typedef std::set<const env::ConnectionPlace*> ForbiddenPlacesList;
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;

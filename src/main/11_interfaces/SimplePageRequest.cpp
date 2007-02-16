@@ -50,11 +50,15 @@ namespace synthese
 
 		void SimplePageRequest::setFromParametersMap(const Request::ParametersMap& map )
 		{
+			RequestWithInterface::setFromParametersMap(map);
+
 			_parameters = map;
 
 			Request::ParametersMap::iterator it = _parameters.find(PARAMETER_PAGE);
 			if (it == _parameters.end())
 				throw RequestException("Page parameter not found in simple page query");
+			if (_interface == NULL)
+				throw RequestException("Interface was not defined");
 			try
 			{
 				_page = _interface->getPage(it->second);

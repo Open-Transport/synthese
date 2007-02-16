@@ -24,7 +24,7 @@
 #define SYNTHESE_Scenario_h__
 
 #include <string>
-#include <vector>
+#include <set>
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
@@ -44,28 +44,51 @@ namespace synthese
 		*/
 		class Scenario : public util::Registrable<uid, Scenario>
 		{
+		public:
+			typedef std::set<Alarm*>	AlarmsSet;
+
 		private:
 			bool						_isATemplate;
+			bool						_isEnabled;
 			std::string					_name;
 			synthese::time::DateTime	_periodStart; //!< Alarm applicability period start
 			synthese::time::DateTime	_periodEnd;   //!< Alarm applicability period end
-			std::vector<Alarm*>			_alarms;
+			AlarmsSet					_alarms;
 
 		public:
 			Scenario();
 
-			const std::string&		getName() const;
-			bool					getIsATemplate() const;
-			const time::DateTime&	getPeriodStart() const;
-			const time::DateTime&	getPeriodEnd() const;
+			/** Destructor.
+				Deletes all contained alarms.
+			*/
+			~Scenario();
 
-			std::vector<Alarm*>&	getAlarms();
+			const std::string&		getName()			const;
+			bool					getIsATemplate()	const;
+			const time::DateTime&	getPeriodStart()	const;
+			const time::DateTime&	getPeriodEnd()		const;
+			bool					getIsEnabled()		const;
+			const AlarmsSet&		getAlarms()			const;
 
 			void setName(const std::string& name);
+
+			/** Start broadcast date setter.
+				Updates the alarms too.
+				@param periodStart Start broadcast date
+			*/
 			void setPeriodStart ( const synthese::time::DateTime& periodStart);
+			
+			/** End broadcast date setter.
+				Updates the alarms too.
+				@param periodEnd End broadcast date
+			*/
 			void setPeriodEnd ( const synthese::time::DateTime& periodEnd);
 			void setIsATemplate(bool isATemplate);
+			void setIsEnabled(bool value);
+			void addAlarm(Alarm* alarm);
+			void removeAlarm(Alarm* alarm);
 
+			Scenario*	createCopy()	const;
 		};
 	}
 }

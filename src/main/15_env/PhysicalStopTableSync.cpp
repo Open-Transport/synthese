@@ -98,14 +98,18 @@ namespace synthese
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 
 				if (EnvModule::getPhysicalStops ().contains (id)) return;
+
+				ConnectionPlace* place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(rows.getColumn(rowIndex, COL_PLACEID)));
 			    
 				synthese::env::PhysicalStop* ps = new synthese::env::PhysicalStop (
 					id,
 					rows.getColumn (rowIndex, COL_NAME),
-					EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(rows.getColumn(rowIndex, COL_PLACEID))),
+					place,
 					Conversion::ToDouble (rows.getColumn (rowIndex, COL_X)),
 					Conversion::ToDouble (rows.getColumn (rowIndex, COL_Y))
 				);
+
+				place->addPhysicalStop(ps);
 
 				EnvModule::getPhysicalStops ().add (ps);
 			}
@@ -131,6 +135,7 @@ namespace synthese
 			{
 				uid id = Conversion::ToLongLong (rows.getColumn (i, TABLE_COL_ID));
 				EnvModule::getPhysicalStops ().remove (id);
+				/// @todo Handle the link between place and stop
 			}
 		}
 	}

@@ -1,68 +1,99 @@
-#ifndef SYNTHESE_ENVLSSQL_LINESTOPTABLESYNC_H
-#define SYNTHESE_ENVLSSQL_LINESTOPTABLESYNC_H
+
+/** LineStopTableSync class header.
+	@file LineStopTableSync.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#ifndef SYNTHESE_LineStopTableSync_H__
+#define SYNTHESE_LineStopTableSync_H__
 
 
+#include <vector>
 #include <string>
 #include <iostream>
 
-#include "ComponentTableSync.h"
-
-
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
+	namespace env
+	{
+		class LineStop;
 
-namespace env
-{
-	class LineStop;
-
-/** LineStop SQLite table synchronizer.
-	@ingroup m15
-*/
-class LineStopTableSync : public ComponentTableSync
-{
- public:
-
-    LineStopTableSync ();
-    ~LineStopTableSync ();
-
- protected:
-
-    void doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-		synthese::env::Environment& target);
-
-    void doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
-		    synthese::env::Environment& target);
-
-    void doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
-		   synthese::env::Environment& target);
+		/** LineStop table synchronizer.
+			@ingroup m15
+		*/
+		class LineStopTableSync : public db::SQLiteTableSyncTemplate<LineStop>
+		{
+		public:
+			static const std::string COL_PHYSICALSTOPID;
+			static const std::string COL_LINEID;
+			static const std::string COL_RANKINPATH;
+			static const std::string COL_ISDEPARTURE;
+			static const std::string COL_ISARRIVAL;
+			static const std::string COL_METRICOFFSET;
+			static const std::string COL_SCHEDULEINPUT;
+			static const std::string COL_VIAPOINTS;
+			
+			LineStopTableSync();
+			~LineStopTableSync();
 
 
- private:
-
-};
-
-
-/** Line stops table :
-- on insert : 
-- on update : 
-- on delete : X
-*/
-static const std::string LINESTOPS_TABLE_NAME ("t010_line_stops");
-static const std::string LINESTOPS_TABLE_COL_PHYSICALSTOPID ("physical_stop_id");
-static const std::string LINESTOPS_TABLE_COL_LINEID ("line_id");
-static const std::string LINESTOPS_TABLE_COL_RANKINPATH ("rank_in_path");
-static const std::string LINESTOPS_TABLE_COL_ISDEPARTURE ("is_departure");
-static const std::string LINESTOPS_TABLE_COL_ISARRIVAL ("is_arrival");
-static const std::string LINESTOPS_TABLE_COL_METRICOFFSET ("metric_offset");
-static const std::string LINESTOPS_TABLE_COL_SCHEDULEINPUT ("schedule_input");
-static const std::string LINESTOPS_TABLE_COL_VIAPOINTS ("via_points");
+			/** LineStop search.
+				(other search parameters)
+				@param first First LineStop object to answer
+				@param number Number of LineStop objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return vector<LineStop*> Founded LineStop objects.
+				@author Hugues Romain
+				@date 2006
+			*/
+			static std::vector<LineStop*> search(
+				// other search parameters ,
+				int first = 0, int number = 0);
 
 
+		protected:
 
+			/** Action to do on LineStop creation.
+				This method loads a new object in ram.
+			*/
+			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
+			/** Action to do on LineStop creation.
+				This method updates the corresponding object in ram.
+			*/
+			void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
+
+			/** Action to do on LineStop deletion.
+				This method deletes the corresponding object in ram and runs 
+				all necessary cleaning actions.
+			*/
+			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
+
+		};
+	}
 }
 
-}
-#endif
-
+#endif // SYNTHESE_LineStopTableSync_H__

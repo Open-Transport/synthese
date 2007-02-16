@@ -82,12 +82,6 @@
 			Name="Source files"
 			Filter="">
 			<File
-				RelativePath=".\ArrivalDepartureTableGenerator.cpp">
-			</File>
-			<File
-				RelativePath=".\ArrivalDepartureTableGenerator.h">
-			</File>
-			<File
 				RelativePath=".\BroadcastPoint.cpp">
 			</File>
 			<File
@@ -105,18 +99,28 @@
 			<File
 				RelativePath=".\DisplayType.h">
 			</File>
-			<File
-				RelativePath=".\ForcedDestinationsArrivalDepartureTableGenerator.cpp">
-			</File>
-			<File
-				RelativePath=".\ForcedDestinationsArrivalDepartureTableGenerator.h">
-			</File>
-			<File
-				RelativePath=".\StandardArrivalDepartureTableGenerator.cpp">
-			</File>
-			<File
-				RelativePath=".\StandardArrivalDepartureTableGenerator.h">
-			</File>
+			<Filter
+				Name="Generators"
+				Filter="">
+				<File
+					RelativePath=".\ArrivalDepartureTableGenerator.cpp">
+				</File>
+				<File
+					RelativePath=".\ArrivalDepartureTableGenerator.h">
+				</File>
+				<File
+					RelativePath=".\ForcedDestinationsArrivalDepartureTableGenerator.cpp">
+				</File>
+				<File
+					RelativePath=".\ForcedDestinationsArrivalDepartureTableGenerator.h">
+				</File>
+				<File
+					RelativePath=".\StandardArrivalDepartureTableGenerator.cpp">
+				</File>
+				<File
+					RelativePath=".\StandardArrivalDepartureTableGenerator.h">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Rights"
@@ -194,6 +198,12 @@
 			Name="InterfacePage"
 			Filter="">
 			<File
+				RelativePath=".\DeparturesTableInterfacePage.cpp">
+			</File>
+			<File
+				RelativePath=".\DeparturesTableInterfacePage.h">
+			</File>
+			<File
 				RelativePath=".\DepartureTableRowInterfacePage.cpp">
 			</File>
 			<File
@@ -253,54 +263,108 @@
 		<Filter
 			Name="Actions"
 			Filter="">
-			<File
-				RelativePath=".\CreateBroadcastPointAction.cpp">
-			</File>
-			<File
-				RelativePath=".\CreateBroadcastPointAction.h">
-			</File>
-			<File
-				RelativePath=".\CreateDisplayScreenAction.cpp">
-			</File>
-			<File
-				RelativePath=".\CreateDisplayScreenAction.h">
-			</File>
-			<File
-				RelativePath=".\CreateDisplayTypeAction.cpp">
-			</File>
-			<File
-				RelativePath=".\CreateDisplayTypeAction.h">
-			</File>
-			<File
-				RelativePath=".\DeleteBroadcastPointAction.cpp">
-			</File>
-			<File
-				RelativePath=".\DeleteBroadcastPointAction.h">
-			</File>
-			<File
-				RelativePath=".\RenameBroadcastPointAction.cpp">
-			</File>
-			<File
-				RelativePath=".\RenameBroadcastPointAction.h">
-			</File>
-			<File
-				RelativePath=".\UpdateDisplayMaintenanceAction.cpp">
-			</File>
-			<File
-				RelativePath=".\UpdateDisplayMaintenanceAction.h">
-			</File>
-			<File
-				RelativePath=".\UpdateDisplayScreenAction.cpp">
-			</File>
-			<File
-				RelativePath=".\UpdateDisplayScreenAction.h">
-			</File>
-			<File
-				RelativePath=".\UpdateDisplayTypeAction.cpp">
-			</File>
-			<File
-				RelativePath=".\UpdateDisplayTypeAction.h">
-			</File>
+			<Filter
+				Name="Display screen"
+				Filter="">
+				<File
+					RelativePath=".\AddDepartureStopToDisplayScreenAction.cpp">
+				</File>
+				<File
+					RelativePath=".\AddDepartureStopToDisplayScreenAction.h">
+				</File>
+				<File
+					RelativePath=".\AddForbiddenPlaceToDisplayScreen.cpp">
+				</File>
+				<File
+					RelativePath=".\AddForbiddenPlaceToDisplayScreen.h">
+				</File>
+				<File
+					RelativePath=".\AddPreselectionPlaceToDisplayScreen.cpp">
+				</File>
+				<File
+					RelativePath=".\AddPreselectionPlaceToDisplayScreen.h">
+				</File>
+				<File
+					RelativePath=".\CreateDisplayScreenAction.cpp">
+				</File>
+				<File
+					RelativePath=".\CreateDisplayScreenAction.h">
+				</File>
+				<File
+					RelativePath=".\DisplayScreenAddDisplayedPlace.cpp">
+				</File>
+				<File
+					RelativePath=".\DisplayScreenAddDisplayedPlace.h">
+				</File>
+				<File
+					RelativePath=".\RemovePreselectionPlaceFromDisplayScreenAction.cpp">
+				</File>
+				<File
+					RelativePath=".\RemovePreselectionPlaceFromDisplayScreenAction.h">
+				</File>
+				<File
+					RelativePath=".\UpdateAllStopsDisplayScreenAction.cpp">
+				</File>
+				<File
+					RelativePath=".\UpdateAllStopsDisplayScreenAction.h">
+				</File>
+				<File
+					RelativePath=".\UpdateDisplayMaintenanceAction.cpp">
+				</File>
+				<File
+					RelativePath=".\UpdateDisplayMaintenanceAction.h">
+				</File>
+				<File
+					RelativePath=".\UpdateDisplayPreselectionParametersAction.cpp">
+				</File>
+				<File
+					RelativePath=".\UpdateDisplayPreselectionParametersAction.h">
+				</File>
+				<File
+					RelativePath=".\UpdateDisplayScreenAction.cpp">
+				</File>
+				<File
+					RelativePath=".\UpdateDisplayScreenAction.h">
+				</File>
+			</Filter>
+			<Filter
+				Name="Display Type"
+				Filter="">
+				<File
+					RelativePath=".\CreateDisplayTypeAction.cpp">
+				</File>
+				<File
+					RelativePath=".\CreateDisplayTypeAction.h">
+				</File>
+				<File
+					RelativePath=".\UpdateDisplayTypeAction.cpp">
+				</File>
+				<File
+					RelativePath=".\UpdateDisplayTypeAction.h">
+				</File>
+			</Filter>
+			<Filter
+				Name="Broadcast point"
+				Filter="">
+				<File
+					RelativePath=".\CreateBroadcastPointAction.cpp">
+				</File>
+				<File
+					RelativePath=".\CreateBroadcastPointAction.h">
+				</File>
+				<File
+					RelativePath=".\DeleteBroadcastPointAction.cpp">
+				</File>
+				<File
+					RelativePath=".\DeleteBroadcastPointAction.h">
+				</File>
+				<File
+					RelativePath=".\RenameBroadcastPointAction.cpp">
+				</File>
+				<File
+					RelativePath=".\RenameBroadcastPointAction.h">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Alarm recipient"
@@ -323,9 +387,6 @@
 		</File>
 		<File
 			RelativePath=".\DeparturesTableModule.inc.cpp">
-		</File>
-		<File
-			RelativePath=".\module.h">
 		</File>
 		<File
 			RelativePath=".\SConscript">

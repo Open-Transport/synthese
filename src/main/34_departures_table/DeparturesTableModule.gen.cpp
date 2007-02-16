@@ -23,6 +23,14 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::departure
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateBroadcastPointAction>("crebp");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::RenameBroadcastPointAction>("renbp");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DeleteBroadcastPointAction>("delbp");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::AddPreselectionPlaceToDisplayScreen>("apptds");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::RemovePreselectionPlaceFromDisplayScreenAction>("rmpsfds");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateAllStopsDisplayScreenAction>("uasdsa");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::AddDepartureStopToDisplayScreenAction>("adstdsa");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::AddForbiddenPlaceToDisplayScreen>("afptdsa");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayPreselectionParametersAction>("udpp");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenAddDisplayedPlace>("dsadp");
+
 
 synthese::util::Factory<synthese::server::Request>::integrate<synthese::departurestable::DisplayScreenContentRequest>("tdg");
 

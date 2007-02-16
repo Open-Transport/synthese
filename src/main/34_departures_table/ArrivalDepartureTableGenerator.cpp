@@ -37,7 +37,7 @@ namespace synthese
 	{
 
 		ArrivalDepartureTableGenerator::ArrivalDepartureTableGenerator(
-				const PhysicalStopsList&		physicalStops
+				const PhysicalStopsSet&		physicalStops
 				, const DeparturesTableDirection&			direction
 				, const EndFilter&			endfilter
 				, const LineFilter&			lineFilter

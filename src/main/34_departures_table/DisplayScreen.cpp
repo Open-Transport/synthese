@@ -22,10 +22,18 @@
 
 #include <sstream>
 
+#include "11_interfaces/Interface.h"
+#include "11_interfaces/InterfacePageException.h"
+
+#include "15_env/ConnectionPlace.h"
+#include "15_env/PhysicalStop.h"
+#include "15_env/Edge.h"
+
 #include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DisplayMaintenanceLog.h"
+#include "34_departures_table/DeparturesTableInterfacePage.h"
 
 using namespace std;
 
@@ -35,6 +43,7 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace dblog;
+	using namespace interfaces;
 
 	namespace departurestable
 	{
@@ -235,9 +244,22 @@ namespace synthese
 			_maintenanceMessage = message;
 		}
 
-		void DisplayScreen::display( std::ostream& stream ) const
+		void DisplayScreen::display( std::ostream& stream, const DateTime& date ) const
 		{
-			
+			if (!_displayType || !_displayType->getInterface())
+				return;
+
+			try
+			{
+				ArrivalDepartureTableGenerator* generator = getGenerator(date);
+				const ArrivalDepartureList& result = generator->generate();
+				const DeparturesTableInterfacePage* page = _displayType->getInterface()->getPage<DeparturesTableInterfacePage>();
+				page->display(stream, getTitle(), result);
+				delete generator;
+			}
+			catch (InterfacePageException e)
+			{
+			}
 		}
 
 		int DisplayScreen::getWiringCode() const
@@ -280,9 +302,11 @@ namespace synthese
 			return _blinkingDelay;
 		}
 
-		const PhysicalStopsList& DisplayScreen::getPhysicalStops() const
+		const PhysicalStopsSet& DisplayScreen::getPhysicalStops(bool result) const
 		{
-			return _physicalStops;
+			return (_allPhysicalStopsDisplayed && _localization && result)
+				? _localization->getConnectionPlace()->getPhysicalStops()
+				: _physicalStops;
 		}
 
 		const ForbiddenPlacesList& DisplayScreen::getForbiddenPlaces() const
@@ -373,6 +397,44 @@ namespace synthese
 					s << "/" << _localizationComment;
 				return s.str();
 			}
+		}
+
+		std::map<std::string, std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(const std::set<const ConnectionPlace*>& placesToAvoid) const
+		{
+			map<std::string, std::pair<uid, string> > m;
+			for (PhysicalStopsSet::const_iterator it = getPhysicalStops().begin(); it != getPhysicalStops().end(); ++it)
+			{
+				const PhysicalStop* p = *it;
+				const std::set<const Edge*>& edges = p->getDepartureEdges();
+				for (std::set<const Edge*>::const_iterator ite = edges.begin(); ite != edges.end(); ++ite)
+				{
+					for (const Edge* edge= (*ite)->getFollowingArrivalForFineSteppingOnly(); edge != NULL; edge = edge->getFollowingArrivalForFineSteppingOnly())
+						m.insert(make_pair(edge->getConnectionPlace()->getFullName(), make_pair(edge->getConnectionPlace()->getKey(), edge->getConnectionPlace()->getFullName())));
+				}
+			}
+			return m;
+		}
+
+		void DisplayScreen::removeForcedDestination( const env::ConnectionPlace* place)
+		{
+			DisplayedPlacesList::iterator it = _forcedDestinations.find(place);
+			if (it != _forcedDestinations.end())
+				_forcedDestinations.erase(it);
+		}
+
+		void DisplayScreen::clearForbiddenPlaces()
+		{
+			_forbiddenArrivalPlaces.clear();
+		}
+
+		void DisplayScreen::clearDisplayedPlaces()
+		{
+			_displayedPlaces.clear();
+		}
+
+		void DisplayScreen::clearForcedDestinations()
+		{
+			_forcedDestinations.clear();
 		}
 
 	}

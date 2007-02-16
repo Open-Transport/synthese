@@ -47,7 +47,6 @@ Environment::~Environment ()
     _addresses.clear ();
     _documents.clear ();
     _lines.clear ();
-    _lineStops.clear ();
     _roadChunks.clear ();
     _roads.clear ();
     _continuousServices.clear ();
@@ -128,21 +127,6 @@ Environment::getDocuments () const
     return _documents;
 }
 
-
-
-
-LineStop::Registry&
-Environment::getLineStops ()
-{
-    return _lineStops;
-}
-
-
-const LineStop::Registry&
-Environment::getLineStops () const
-{
-    return _lineStops;
-}
 
 
 

@@ -33,8 +33,9 @@
 #include "15_env/PhysicalStop.h"
 #include "15_env/EnvModule.h"
 
-#include "BroadcastPoint.h"
-#include "BroadcastPointTableSync.h"
+#include "34_departures_table/BroadcastPoint.h"
+#include "34_departures_table/BroadcastPointTableSync.h"
+#include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
 
@@ -63,26 +64,17 @@ namespace synthese
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE_NAME << " SET "
-					<< BroadcastPointTableSync::TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(object->getName())
-					<< "," << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=" << Conversion::ToString(object->getConnectionPlace()->getKey())
-					<< "," << BroadcastPointTableSync::TABLE_COL_PHYSICAL_STOP_ID << "=" << Conversion::ToString(object->getPhysicalStop()->getKey())
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
+			if (object->getKey() <= 0)
 				object->setKey(getId(1,1));
-                query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					<< "," << Conversion::ToSQLiteString(object->getName())
-					<< "," << Conversion::ToString(object->getConnectionPlace()->getKey())
-					<< "," << Conversion::ToString(object->getPhysicalStop()->getKey())
-					<< ")";
-			}
+
+			query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->getKey())
+				<< "," << Conversion::ToSQLiteString(object->getName())
+				<< "," << Conversion::ToString(object->getConnectionPlace() ? object->getConnectionPlace()->getKey() : 0)
+				<< "," << Conversion::ToString(object->getPhysicalStop() ? object->getPhysicalStop()->getKey() : 0)
+				<< ")";
+
 			sqlite->execUpdate(query.str());
 		}
 
@@ -106,30 +98,44 @@ namespace synthese
 
 		void BroadcastPointTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
 		{
-/*			for (int i=0; i<rows.getNbRows(); ++i)
+			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				BroadcastPoint* object = new BroadcastPoint();
-				load(object, rows, i);
-				/// @todo Add the object to the corresponding register
-				// Eg : Module::getObjects().add(object);
+				if (DeparturesTableModule::getBroadcastPoints().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				{
+					load(DeparturesTableModule::getBroadcastPoints().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))), rows, i);
+				}
+				else
+				{
+					BroadcastPoint* object = new BroadcastPoint();
+					load(object, rows, i);
+					DeparturesTableModule::getBroadcastPoints().add(object);
+				}
 			}
-*/		}
+		}
 
 		void BroadcastPointTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
 		{
-/*			for (int i=0; i<rows.getNbRows(); ++i)
+			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				/// @todo search and update corresponding objects
+				try
+				{
+					BroadcastPoint* object = DeparturesTableModule::getBroadcastPoints().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+					load(object, rows, i);
+				}
+				catch (Exception e)
+				{
+					
+				}
 			}
-*/		}
+		}
 
 		void BroadcastPointTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
-/*			for (int i=0; i<rows.getNbRows(); ++i)
+			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				/// @todo search and destroy corresponding objects
+				DeparturesTableModule::getBroadcastPoints().remove(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
 			}
-*/		}
+		}
 
 		std::vector<BroadcastPoint*> BroadcastPointTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{

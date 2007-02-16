@@ -38,7 +38,6 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const std::string DisplayScreenContentRequest::PARAMETER_DISPLAY_SCREEN = "tb";
 		const std::string DisplayScreenContentRequest::PARAMETER_DATE = "date";
 
 		DisplayScreenContentRequest::DisplayScreenContentRequest()
@@ -49,44 +48,36 @@ namespace synthese
 		Request::ParametersMap DisplayScreenContentRequest::getParametersMap() const
 		{
 			Request::ParametersMap map;
-			map.insert(make_pair(PARAMETER_DISPLAY_SCREEN, Conversion::ToString(_screen->getKey())));
 			map.insert(make_pair(PARAMETER_DATE, _date.toInternalString()));
 			return map;
 		}
 
 		void DisplayScreenContentRequest::setFromParametersMap(const Request::ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it = map.find(PARAMETER_DISPLAY_SCREEN);
-			if (it == map.end())
-				throw RequestException("Display Screen not specified");
 			try
 			{
-				_screen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
+				// Screen
+				_screen = DeparturesTableModule::getDisplayScreens().get(getObjectId());
+
+				// Date
+				Request::ParametersMap::const_iterator it;
+				it = map.find(PARAMETER_DATE);
+				if (it != map.end())
+					_date = DateTime::FromInternalString(it->second);
 			}
 			catch (DisplayScreen::RegistryKeyException e)
 			{
-				throw RequestException("Display screen " + Conversion::ToString(it->second) + " not found");
+				throw RequestException("Display screen " + Conversion::ToString(getObjectId()) + " not found");
 			}
-
-			// Date
-			it = map.find(PARAMETER_DATE);
-			if (it != map.end())
-				_date = DateTime::FromInternalString(it->second);
 		}
 
 		void DisplayScreenContentRequest::run( std::ostream& stream ) const
 		{
-			_screen->display(stream);
+			_screen->display(stream, _date);
 		}
 
 		DisplayScreenContentRequest::~DisplayScreenContentRequest()
 		{
 		}
-
-		void DisplayScreenContentRequest::setDisplayScreen( const DisplayScreen* screen )
-		{
-			_screen = screen;
-		}
-
 	}
 }

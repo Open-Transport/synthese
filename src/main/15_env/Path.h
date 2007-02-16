@@ -23,181 +23,178 @@
 #ifndef SYNTHESE_ENV_PATH_H
 #define SYNTHESE_ENV_PATH_H
 
-
-#include "BikeComplyer.h"
-#include "HandicappedComplyer.h"
-#include "PedestrianComplyer.h"
-#include "ReservationRuleComplyer.h"
-#include "Calendar.h"
-#include "Service.h"
-
-#include "04_time/Schedule.h"
-#include "01_util/UId.h"
-
 #include <vector>
 #include <set>
 
+#include "01_util/UId.h"
+
+#include "04_time/Schedule.h"
+
+#include "15_env/BikeComplyer.h"
+#include "15_env/HandicappedComplyer.h"
+#include "15_env/PedestrianComplyer.h"
+#include "15_env/ReservationRuleComplyer.h"
+#include "15_env/Calendar.h"
+#include "15_env/Service.h"
 
 namespace synthese
 {
 
-namespace time
-{
-    class DateTime;
-}
-
-namespace messages
-{
-	class Alarm;
-}
-
-namespace env
-{
-
-    class Axis;
-    class Edge;
-    class Fare;
-    class Point;
-
-/** Path abstract base class.
-
-A path is a sequence of edges.
-
-A path is associated with a set of services allowing
-to follow this path at certain dates and times.
-
-It is associated as well with a set of compliances, defining
-which types of entities are able to move along this path. For instance : 
-- a bus line is compliant with pedestrians, may be compliant with bikes
-  and wheelchairs
-- a road may be compliant only with cars, or only for pedestrians and bikes,
-  or for all
-- a ferry line is compliant with cars, bikes, pedestrian
-- ...
-
- @ingroup m15
-*/
-class Path : 
-    public BikeComplyer,
-    public HandicappedComplyer,
-    public PedestrianComplyer,
-    public ReservationRuleComplyer
-    
-{
-
-private:
-
-    struct cmpService
-    {
-	bool operator() (const Service* s1, 
-			 const Service* s2) const
+	namespace time
 	{
-	    return s1->getDepartureSchedule () < s2->getDepartureSchedule ();
+		class DateTime;
 	}
-    };
 
- public:
+	namespace messages
+	{
+		class Alarm;
+	}
 
-    typedef std::set<Service*, cmpService> ServiceSet;
+	namespace env
+	{
 
-protected:
+		class Axis;
+		class Edge;
+		class Fare;
+		class Point;
 
-    std::vector<Edge*> _edges; 
-    ServiceSet _services;
+		/** Path abstract base class.
 
-    Fare* _fare;
-	const messages::Alarm* _alarm;
+			A path is a sequence of edges.
 
-    Calendar _calendar; //!< Calendar indicating if there is at least one service running on each day.
+			A path is associated with a set of services allowing
+			to follow this path at certain dates and times.
 
-    Path ();
+			It is associated as well with a set of compliances, defining
+			which types of entities are able to move along this path. For instance : 
+				- a bus line is compliant with pedestrians, may be compliant with bikes
+				and wheelchairs
+				- a road may be compliant only with cars, or only for pedestrians and bikes,
+				or for all
+				- a ferry line is compliant with cars, bikes, pedestrian
+				- ...
 
-public:
+			@ingroup m15
+		*/
+		class Path : 
+			public BikeComplyer,
+			public HandicappedComplyer,
+			public PedestrianComplyer,
+			public ReservationRuleComplyer
+		    
+		{
 
-    virtual ~Path ();
+		private:
 
+			struct cmpService
+			{
+				bool operator() (const Service* s1, const Service* s2) const
+				{
+					return s1->getDepartureSchedule () < s2->getDepartureSchedule ();
+				}
+			};
 
-    //! @name Getters/Setters
-    //@{
-    virtual const uid& getId () const = 0;
+		public:
 
-    int getEdgesCount () const;
-    const Edge* getEdge (int index) const;
+			typedef std::set<Service*, cmpService> ServiceSet;
 
-    const ServiceSet& getServices () const;
-    const Service* getService (int serviceIndex) const;
+		protected:
 
-    const Fare* getFare () const;
-    void setFare (Fare* fare);
+			std::vector<Edge*> _edges; 
+			ServiceSet _services;
 
-    bool hasApplicableAlarm (const synthese::time::DateTime& start, 
-			     const synthese::time::DateTime& end) const;
-	const messages::Alarm* getAlarm () const;
-	void setAlarm (messages::Alarm* alarm);
+			Fare* _fare;
+			const messages::Alarm* _alarm;
 
-    virtual const Axis* getAxis () const = 0;
+			Calendar _calendar; //!< Calendar indicating if there is at least one service running on each day.
 
-    const std::vector<Edge*>& getEdges () const;
+			Path ();
 
-    //@}
+		public:
 
-    //! @name Query methods.
-    //@{
-
-    virtual bool isRoad () const = 0;
-    virtual bool isLine () const = 0;
-
-    /** Gets all the geographical points linked by the path
-        between two of its edges. If no from/to edge
-	index is provided, all the edges are considered.
-	@param fromEdgeIndex 
-	@param toEdgeIndex 
-
-	This includes :
-	- vertices (address/physical stops)
-	- via points
-    */
-    std::vector<const Point*> getPoints (int fromEdgeIndex = 0,
-					 int toEdgeIndex = -1) const;
-
-    bool isInService (const synthese::time::Date& date) const;
-
-	Edge*	getLastEdge()	const;
-
-    //@}
-    
-    //! @name Update methods.
-    //@{
-    void addEdge (Edge* edge);
-
-    void addService (Service* service, 
-		     const std::vector<synthese::time::Schedule>& departureSchedules,
-		     const std::vector<synthese::time::Schedule>& arrivalSchedules);
-
-    void removeService (Service* service);
+			virtual ~Path ();
 
 
-    /** Updates path calendar.
+			//! @name Getters/Setters
+			//@{
+				virtual const uid& getId () const = 0;
 
-    The generated calendar indicates whether or not a day contains at least one service.
-    It takes into account services running after midnight : if at least one minute
-    of a day is concerned by a service, then the whole day is selected.
+				int getEdgesCount () const;
+				const Edge* getEdge (int index) const;
 
-    Thus, if a calculation request is done on a deselected calendar day, the path 
-    can safely be filtered.
-    */
-    void updateCalendar ();
-    //@}
+				const ServiceSet& getServices () const;
+				const Service* getService (int serviceIndex) const;
+
+				const Fare* getFare () const;
+				void setFare (Fare* fare);
+
+				bool hasApplicableAlarm (const synthese::time::DateTime& start, 
+							const synthese::time::DateTime& end) const;
+				const messages::Alarm* getAlarm () const;
+				void setAlarm (messages::Alarm* alarm);
+
+				virtual const Axis* getAxis () const = 0;
+
+				const std::vector<Edge*>& getEdges () const;
+			//@}
+
+			//! @name Query methods.
+			//@{
+
+				virtual bool isRoad () const = 0;
+				virtual bool isLine () const = 0;
+
+				/** Gets all the geographical points linked by the path
+					between two of its edges. If no from/to edge
+					index is provided, all the edges are considered.
+					@param fromEdgeIndex 
+					@param toEdgeIndex 
+
+					This includes :
+					- vertices (address/physical stops)
+					- via points
+				*/
+				std::vector<const Point*> getPoints (int fromEdgeIndex = 0,
+								int toEdgeIndex = -1) const;
+
+				bool isInService (const synthese::time::Date& date) const;
+
+				Edge*	getLastEdge()	const;
+
+			//@}
+		    
+			//! @name Update methods.
+			//@{
+
+				/** Adds edge at the end of the path.
+					@param edge The edge to add
+
+					All the pointer links necessary to the graph exploration are created :
+						- the links between edges (describing the path)
+				*/
+				void addEdge (Edge* edge);
+
+				void addService (Service* service, 
+						const std::vector<synthese::time::Schedule>& departureSchedules,
+						const std::vector<synthese::time::Schedule>& arrivalSchedules);
+
+				void removeService (Service* service);
 
 
-    //@}
-    
-    
-};
+				/** Updates path calendar.
 
+				The generated calendar indicates whether or not a day contains at least one service.
+				It takes into account services running after midnight : if at least one minute
+				of a day is concerned by a service, then the whole day is selected.
 
-}
+				Thus, if a calculation request is done on a deselected calendar day, the path 
+				can safely be filtered.
+				*/
+				void updateCalendar ();
+			//@}
+		    
+		};
+	}
 }
 
 #endif 	    
-

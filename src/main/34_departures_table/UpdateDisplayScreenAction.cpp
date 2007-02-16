@@ -22,6 +22,8 @@
 
 #include "01_util/Conversion.h"
 
+#include "02_db/DBEmptyResultException.h"
+
 #include "15_env/ConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
 
@@ -38,6 +40,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace env;
+	using namespace db;
 	
 	namespace departurestable
 	{
@@ -51,11 +54,8 @@ namespace synthese
 		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_DEPARTURE_ARRIVAL = Action_PARAMETER_PREFIX + "da";
 		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER = Action_PARAMETER_PREFIX + "ef";
 		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY = Action_PARAMETER_PREFIX + "md";
-		const std::string UpdateDisplayScreenAction::PARAMETER_ACTIVATE_PRESELECTION = Action_PARAMETER_PREFIX + "ap";
-		const std::string UpdateDisplayScreenAction::PARAMETER_PRESELECTION_DELAY = Action_PARAMETER_PREFIX + "pd";
 		const std::string UpdateDisplayScreenAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
-		const std::string UpdateDisplayScreenAction::PARAMETER_PHYSICAL = Action_PARAMETER_PREFIX + "ph";
-		const std::string UpdateDisplayScreenAction::PARAMETER_ALL_PHYSICALS = Action_PARAMETER_PREFIX + "ah";
+		const std::string UpdateDisplayScreenAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "tt";
 
 
 
@@ -70,36 +70,62 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DeparturesTableModule::getDisplayScreens().get(_request->getObjectId());
+				_screen = DisplayScreenTableSync::get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it = map.find(PARAMETER_LOCALIZATION_COMMENT);
-				if (it != map.end())
-					_localizationComment = it->second;
+				Request::ParametersMap::iterator it;
+				
+				it= map.find(PARAMETER_LOCALIZATION_COMMENT);
+				if (it == map.end())
+					throw ActionException("Localization comment not specified");
+				_localizationComment = it->second;
+
+				it= map.find(PARAMETER_TITLE);
+				if (it == map.end())
+					throw ActionException("Title not specified");
+				_title = it->second;
 
 				it = map.find(PARAMETER_WIRING_CODE);
 				if (it != map.end())
 					_wiringCode = Conversion::ToInt(it->second);
 
+				it = map.find(PARAMETER_BLINKING_DELAY);
+				if (it != map.end())
+					_blinkingDelay = Conversion::ToInt(it->second);
+
+				it = map.find(PARAMETER_CLEANING_DELAY);
+				if (it != map.end())
+					_cleaningDelay = Conversion::ToInt(it->second);
+
+				it = map.find(PARAMETER_DISPLAY_MAX_DELAY);
+				if (it != map.end())
+					_maxDelay = Conversion::ToInt(it->second);
+
+				it = map.find(PARAMETER_DISPLAY_PLATFORM);
+				if (it != map.end())
+					_displayPlatform = Conversion::ToBool(it->second);
+
+				it = map.find(PARAMETER_DISPLAY_SERVICE_NUMBER);
+				if (it != map.end())
+					_displayServiceNumber = Conversion::ToBool(it->second);
+
+				it = map.find(PARAMETER_DISPLAY_DEPARTURE_ARRIVAL);
+				if (it != map.end())
+					_direction = (DeparturesTableDirection) Conversion::ToInt(it->second);
+
+				it = map.find(PARAMETER_DISPLAY_END_FILTER);
+				if (it != map.end())
+					_endFilter = (EndFilter) Conversion::ToInt(it->second);
+
 				it = map.find(PARAMETER_LOCALIZATION_ID);
 				if (it != map.end())
 					_localization = DeparturesTableModule::getBroadcastPoints().get(Conversion::ToLongLong(it->second));
 
-				if (_localization != NULL)
-				{
-					for (vector<const PhysicalStop*>::const_iterator itp = _localization->getConnectionPlace()->getPhysicalStops().begin(); itp != _localization->getConnectionPlace()->getPhysicalStops().end(); ++itp)
-					{
-						it = map.find(PARAMETER_PHYSICAL + Conversion::ToString((*itp)->getKey()));
-						if (it != map.end())
-							_physicalStopServe.insert(make_pair(*itp, it->second.size() > 0));
-					}
-				}
-
-				it = map.find(PARAMETER_ALL_PHYSICALS);
+				it = map.find(PARAMETER_TYPE);
 				if (it != map.end())
-					_allPhysicals = (it->second.size() > 0);
+					_type = DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(it->second));
 
 			}
-			catch (DisplayScreen::RegistryKeyException e)
+			catch (DBEmptyResultException e)
 			{
 				throw ActionException("Display screen not specified or specified display screen not found");
 			}
@@ -107,18 +133,10 @@ namespace synthese
 			{
 				throw ActionException("Specified localization not found");
 			}
-
-			
-
-	/*		int							_blinkingDelay;
-			bool						_displayPlatform;
-			bool						_displayServiceNumber;
-			DeparturesTableDirection	_direction;
-			EndFilter					_endFilter;
-			int							_maxDelay;
-			bool						_activatePreselection;
-			int							_preselectionDelay;
-*/
+			catch (DisplayType::RegistryKeyException e)
+			{
+				throw ActionException("Specified display type not found");
+			}
 		}
 
 		void UpdateDisplayScreenAction::run()
@@ -127,11 +145,15 @@ namespace synthese
 			_screen->setWiringCode(_wiringCode);
 			if (_localization != NULL)
 				_screen->setLocalization(_localization);
-			_screen->setAllPhysicalStopsDisplayed(_allPhysicals);
-			_screen->clearPhysicalStops();
-			for (map<const PhysicalStop*, bool>::const_iterator it = _physicalStopServe.begin(); it != _physicalStopServe.end(); ++it)
-				if (it->second)
-					_screen->addPhysicalStop(it->first);
+			_screen->setBlinkingDelay(_blinkingDelay);
+			_screen->setTrackNumberDisplay(_displayPlatform);
+			_screen->setServiceNumberDisplay(_displayServiceNumber);
+			_screen->setDirection(_direction);
+			_screen->setOriginsOnly(_endFilter);
+			_screen->setClearingDelay(_cleaningDelay);
+			_screen->setMaxDelay(_maxDelay);
+			_screen->setType(_type);
+			_screen->setTitle(_title);
 
 			DisplayScreenTableSync::save(_screen);
 		}
@@ -142,6 +164,11 @@ namespace synthese
 			, _screen(NULL)
 		{
 
+		}
+
+		UpdateDisplayScreenAction::~UpdateDisplayScreenAction()
+		{
+			delete _screen;
 		}
 	}
 }

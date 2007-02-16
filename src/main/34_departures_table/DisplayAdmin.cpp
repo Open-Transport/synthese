@@ -38,6 +38,13 @@
 #include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/UpdateDisplayScreenAction.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
+#include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"
+#include "34_departures_table/AddPreselectionPlaceToDisplayScreen.h"
+#include "34_departures_table/RemovePreselectionPlaceFromDisplayScreenAction.h"
+#include "34_departures_table/UpdateAllStopsDisplayScreenAction.h"
+#include "34_departures_table/AddDepartureStopToDisplayScreenAction.h"
+#include "34_departures_table/AddForbiddenPlaceToDisplayScreen.h"
+#include "34_departures_table/DisplayScreenAddDisplayedPlace.h"
 
 using namespace std;
 
@@ -60,13 +67,7 @@ namespace synthese
 
 		std::string DisplayAdmin::getTitle() const
 		{
-			stringstream s;
-			s << "Afficheur ";
-			if (_displayScreen->getLocalization() != NULL)
-				s << _displayScreen->getLocalization()->getConnectionPlace()->getFullName() << "/" << _displayScreen->getLocalization()->getName();
-			if (_displayScreen->getLocalizationComment().size() > 0)
-				s << "/" << _displayScreen->getLocalizationComment();
-			return s.str();
+			return _displayScreen->getFullName();
 		}
 
 		void DisplayAdmin::display(std::ostream& stream, const AdminRequest* request /*= NULL*/ ) const
@@ -76,6 +77,56 @@ namespace synthese
 			updateDisplayRequest->copy(request);
 			updateDisplayRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
 			updateDisplayRequest->setAction(Factory<Action>::create<UpdateDisplayScreenAction>());
+			updateDisplayRequest->setObjectId(request->getObjectId());
+
+			// Update request
+			AdminRequest* updateAllDisplayRequest = Factory<Request>::create<AdminRequest>();
+			updateAllDisplayRequest->copy(request);
+			updateAllDisplayRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			updateAllDisplayRequest->setAction(Factory<Action>::create<UpdateAllStopsDisplayScreenAction>());
+			updateAllDisplayRequest->setObjectId(request->getObjectId());
+
+			// Add physical request
+			AdminRequest* addPhysicalRequest = Factory<Request>::create<AdminRequest>();
+			addPhysicalRequest->copy(request);
+			addPhysicalRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addPhysicalRequest->setAction(Factory<Action>::create<AddDepartureStopToDisplayScreenAction>());
+			addPhysicalRequest->setObjectId(request->getObjectId());
+
+			// Add preselection request
+			AdminRequest* addPreselRequest = Factory<Request>::create<AdminRequest>();
+			addPreselRequest->copy(request);
+			addPreselRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addPreselRequest->setAction(Factory<Action>::create<AddPreselectionPlaceToDisplayScreen>());
+			addPreselRequest->setObjectId(request->getObjectId());
+
+			// Add display request
+			AdminRequest* addDisplayRequest = Factory<Request>::create<AdminRequest>();
+			addDisplayRequest->copy(request);
+			addDisplayRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addDisplayRequest->setAction(Factory<Action>::create<DisplayScreenAddDisplayedPlace>());
+			addDisplayRequest->setObjectId(request->getObjectId());
+
+			// Add not to serve request
+			AdminRequest* addNSRequest = Factory<Request>::create<AdminRequest>();
+			addNSRequest->copy(request);
+			addNSRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addNSRequest->setAction(Factory<Action>::create<AddForbiddenPlaceToDisplayScreen>());
+			addNSRequest->setObjectId(request->getObjectId());
+
+			// Update preselection request
+			AdminRequest* updPreselRequest = Factory<Request>::create<AdminRequest>();
+			updPreselRequest->copy(request);
+			updPreselRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			updPreselRequest->setAction(Factory<Action>::create<UpdateDisplayPreselectionParametersAction>());
+			updPreselRequest->setObjectId(request->getObjectId());
+
+			// Remove preselection stop request
+			AdminRequest* rmPreselRequest = Factory<Request>::create<AdminRequest>();
+			rmPreselRequest->copy(request);
+			rmPreselRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			rmPreselRequest->setAction(Factory<Action>::create<RemovePreselectionPlaceFromDisplayScreenAction>());
+			rmPreselRequest->setObjectId(request->getObjectId());
 
 			map<int, string> blinkingDelaysMap;
 			blinkingDelaysMap.insert(make_pair(0, "Pas de clignotement"));
@@ -106,10 +157,11 @@ namespace synthese
 
 
 			stream
+				<< updateDisplayRequest->getHTMLFormHeader("update")
 				<< "<h1>Emplacement</h1>"
 				<< "<table><tr><td>Lieu logique</td>"
 				<< "<td>" 
-				<< Html::getSelectInput(PARAMETER_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(), _place->getKey())
+				<< Html::getSelectInput(PARAMETER_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(), _place ? _place->getKey() : 0)
 				<< "</td></tr>"
 				<< "<tr><td>Lieu physique</td>"
 				<< "<td>";
@@ -117,7 +169,7 @@ namespace synthese
 			if (_place == NULL)
 				stream << "(Sélectionnez un lieu logique en premier)";
 			else
-				stream << Html::getSelectInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_ID, DeparturesTableModule::getBroadcastPointLabels(_place, false), _displayScreen->getLocalization()->getKey());
+				stream << Html::getSelectInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_ID, DeparturesTableModule::getBroadcastPointLabels(_place, false), _displayScreen->getLocalization() ? _displayScreen->getLocalization()->getKey() : 0);
 			
 			stream
 				<< "</td></tr>"
@@ -136,7 +188,7 @@ namespace synthese
 				<< "</table>"
 
 				<< "<h1>Apparence</h1>"
-				<< "<table><tr><td>Titre</td><td><input type=\"text\" name=\"\" value=\"\" /></td></tr>"
+				<< "<table><tr><td>Titre</td><td>" << Html::getTextInput(UpdateDisplayScreenAction::PARAMETER_TITLE, _displayScreen->getTitle()) << "</td></tr>"
 				<< "<tr><td>Clignotement</td><td>" << Html::getSelectInput(UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY, blinkingDelaysMap, _displayScreen->getBlinkingDelay()) << "</td></tr>"
 				<< "<tr><td>Affichage numéro de quai</td><td>" << Html::getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_PLATFORM, boolMap, _displayScreen->getTrackNumberDisplay()) << "</td></tr>"
 				<< "<tr><td>Affichage numéro de service</td><td>" << Html::getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_SERVICE_NUMBER, boolMap, _displayScreen->getServiceNumberDisplay()) << "</td></tr>"
@@ -148,86 +200,129 @@ namespace synthese
 				<< "<tr><td>Sélection</td><td>" << Html::getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER, endFilterMap, _displayScreen->getEndFilter()) << "</td></tr>"
 				<< "<tr><td>Délai maximum d'affichage</td><td>" << Html::getTextInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) << " minutes</td></tr>"
 				<< "<tr><td>Délai d'effacement</td><td>" << Html::getSelectInput(UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY, clearDelayMap, _displayScreen->getClearingDelay()) << "</td></tr>"
-				<< "<tr><td>Sélection sur arrêt physique</td><td>"
-;
-			if (_displayScreen->getLocalization() == NULL)
+				<< "</table>"
+				<< Html::getSubmitButton("Enregistrer les modifications des propriétés")
+				<< "</form>";
+
+			if (_displayScreen->getLocalization())
 			{
-				stream << "(sélectionnez une localisation)";
-			}
-			else
-			{
-				stream << "<table>";
-				for (vector<const PhysicalStop*>::const_iterator it = _displayScreen->getLocalization()->getConnectionPlace()->getPhysicalStops().begin(); it != _displayScreen->getLocalization()->getConnectionPlace()->getPhysicalStops().end(); ++it)
+				stream
+					<< "<h1>Arrêts de desserte</h1>"
+					<< "<table>"
+					<< "<tr><td>Mode : "
+					<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts")
+					<< "</td><td>"
+					<< updateAllDisplayRequest->getHTMLFormHeader("updaall")
+					<< Html::getHiddenInput(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, Conversion::ToString(!_displayScreen->getAllPhysicalStopsDisplayed()))
+					<< Html::getSubmitButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"))
+					<< "</form></td></tr>";
+
+				if (!_displayScreen->getAllPhysicalStopsDisplayed())
 				{
-					const PhysicalStop* ps = *it;
+					stream << "<tr><th>Arrêt</th><th>Action</th></tr>";
+					for (PhysicalStopsSet::const_iterator it = _displayScreen->getPhysicalStops().begin(); it != _displayScreen->getPhysicalStops().end(); ++it)
+					{
+						const PhysicalStop* ps = *it;
+						stream
+							<< "<tr>"
+							<< "<td>" << ps->getName() << "</td>"
+							<< "<td>"
+							<< Html::getSubmitButton("Supprimer")
+							<< "</form></td></tr>";
+					}
+					if (_displayScreen->getPhysicalStops().size() != _displayScreen->getLocalization()->getConnectionPlace()->getPhysicalStops().size())
+					{
+						stream
+							<< addPhysicalRequest->getHTMLFormHeader("addphy")
+							<< "<tr><td>"
+							<< Html::getSelectInput(AddDepartureStopToDisplayScreenAction::PARAMETER_STOP, _displayScreen->getLocalization()->getConnectionPlace()->getPhysicalStopLabels(_displayScreen->getPhysicalStops()) , uid(0))
+							<< "</td><td>"
+							<< Html::getSubmitButton("Ajouter")
+							<< "</td></tr></form>";	
+					}									
+				}
+				stream << "</table>"
+
+					<< "<h1>Arrêts intermédiaires à afficher</h1>"
+					<< "<table>"
+					<< "<tr><th>Arrêt</th><th>Action</th></tr>";
+
+				for (DisplayedPlacesList::const_iterator it = _displayScreen->getDisplayedPlaces().begin(); it != _displayScreen->getDisplayedPlaces().end(); ++it)
+				{
 					stream
-						<< "<tr>"
-						<< "<td>"
-						<< Html::getCheckBox(UpdateDisplayScreenAction::PARAMETER_PHYSICAL, Conversion::ToString(ps->getKey()), _displayScreen->getPhysicalStops().find(ps) != _displayScreen->getPhysicalStops().end())
-						<< "</td>"
-						<< "<td>" << ps->getName() << "</td>"
-						<< "</tr>";
+						<< "<tr><td>" << (*it)->getFullName() << "</td><td>" << Html::getSubmitButton("Supprimer") << "</td></tr>";
+				}
+
+				stream
+					<< addDisplayRequest->getHTMLFormHeader("adddispl")
+					<< "<tr><td>" << Html::getSortedSelectInput(DisplayScreenAddDisplayedPlace::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()), uid(0))
+					<< "</td><td>" << Html::getSubmitButton("Ajouter") << "</td></tr></form>"
+					<< "</table>"
+			
+					<< "<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>"
+					<< "<table>"
+					<< "<tr><th>Arrêt</th><th>Action</th></tr>";
+
+				for (DisplayedPlacesList::const_iterator it = _displayScreen->getForbiddenPlaces().begin(); it != _displayScreen->getForbiddenPlaces().end(); ++it)
+				{
+					stream
+						<< "<tr><td>" << (*it)->getFullName() << "</td><td>" << Html::getSubmitButton("Supprimer") << "</td></tr>";
 				}
 				stream
-					<< "<tr>"
-					<< "<td>" << Html::getCheckBox(UpdateDisplayScreenAction::PARAMETER_ALL_PHYSICALS, "", _displayScreen->getAllPhysicalStopsDisplayed()) << "</td>"
-					<< "<td>Tous (y compris nouveaux)</td>"
-					<< "</tr></table>";
-			}
-			stream
-				<< "</td></tr>"
-				<< "<tr><td>Sélection sur arrêt logique à ne pas desservir</td>"
-				<< "<td><table>";
+					<< addNSRequest->getHTMLFormHeader("addforb")
+					<< "<tr><td>" << Html::getSortedSelectInput(AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForbiddenPlaces()), uid(0))
+					<< "</td><td>" << Html::getSubmitButton("Ajouter") << "</td></tr></form>"
+					<< "</table>"
 
-			// loop
-			{
+
+					<< "<h1>Présélection</h1>"
+
+					<< updPreselRequest->getHTMLFormHeader("updpresel")
+					<< "<table>"
+					<< "<tr><td>Activer</td>"
+					<< "<td>" << Html::getRadioInput(UpdateDisplayPreselectionParametersAction::PARAMETER_ACTIVATE_PRESELECTION, boolMap, _displayScreen->getGenerationMethod() == DisplayScreen::STANDARD_METHOD) << "</td></tr>"
+					<< "<tr><td>Délai maximum présélection</td><td>" << Html::getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY, Conversion::ToString(_displayScreen->getForceDestinationDelay())) << "</td></tr>"
+					<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregister les paramètres de présélection") << "</td></tr>"
+					<< "</table></form>"
+
+					<< "<h1>Arrêts de présélection (les terminus de lignes sont automatiquement présélectionnés)</h1>"
+					
+					<< "<table>"
+					<< "<tr><th>Arrêt</th><th>Action</th></tr>";
+				
+				for (DisplayedPlacesList::const_iterator it = _displayScreen->getForcedDestinations().begin(); it != _displayScreen->getForcedDestinations().end(); ++it)
+				{
+					stream
+						<< "<tr><td>" << (*it)->getFullName() << "</td><td>" 
+						<< rmPreselRequest->getHTMLFormHeader("rmpres" + Conversion::ToString((*it)->getKey()))
+						<< Html::getHiddenInput(RemovePreselectionPlaceFromDisplayScreenAction::PARAMETER_PLACE, Conversion::ToString((*it)->getKey()))
+						<< Html::getSubmitButton("Supprimer") 
+						<< "</form></td></tr>";
+				}
+
 				stream
-					<< "<tr><td>TOULOUSE Izards</td><td>" << Html::getSubmitButton("Supprimer") << "</td></tr>";
-			}
-			stream
-				<< "<tr><td>" /* <SELECT id=\"Select9\" name=\"Origines seulement\">
-														<OPTION value=\"\" selected>TOULOUSE Amat Massot</OPTION>
-														<OPTION value=\"\">TOULOUSE LEP Bayard</OPTION>
-													</SELECT> */
-				<< "</td><td>" << Html::getSubmitButton("Ajouter") << "</td></tr>"
-				<< "</table></td></tr></table>"
-
-				<< "<h1>Présélection</h1>"
-
-				<< "<table>"
-				<< "<tr><td>Activer</td>"
-				<< "<td>" << Html::getRadioInput(UpdateDisplayScreenAction::PARAMETER_ACTIVATE_PRESELECTION, boolMap, _displayScreen->getGenerationMethod() == DisplayScreen::STANDARD_METHOD) << "</td></tr>"
-				<< "<tr><td>Délai maximum présélection</td><td>" << Html::getTextInput(UpdateDisplayScreenAction::PARAMETER_PRESELECTION_DELAY, Conversion::ToString(_displayScreen->getForceDestinationDelay())) << "</td></tr>"
-				<< "<tr><td>Arrêts de desserte intermédiaire supplémentaires (les terminus des lignes sont automatiquement présélectionnés)</td>"
-				<< "<td><table>";
-
-			{
-				stream
-					<< "<tr><td>TOULOUSE Colombette</td><td>" << Html::getSubmitButton("Supprimer") << "</td></tr>";
+					<< addPreselRequest->getHTMLFormHeader("addpresel")
+					<< "<tr><td>" << Html::getSortedSelectInput(AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForcedDestinations()), uid(0))
+					<< "</td><td>" << Html::getSubmitButton("Ajouter") << "</td></tr></form>"
+					<< "</table>";
 			}
 
 			stream
-				<< "<tr><td>"
-				/*	<SELECT id=\"Select10\" name=\"Origines seulement\">
-														<OPTION value=\"\" selected>TOULOUSE Guilhemery</OPTION>
-														<OPTION value=\"\">TOULOUSE LEP Bayard</OPTION>
-													</SELECT> */
-				<< "</td><td>" << Html::getSubmitButton("Ajouter") << "</td></tr>"
-				<< "</table></td></tr>"
-
-				<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregistrer les modifications") << "</td></tr>"
-				<< "</table>"
-
-				<< "<p>NB : Certains types d'afficheurs ne prennent pas en charge toutes les fonctionnalités proposées. Selon le type de l'afficheur, certains champs peuvent donc être sans effet sur l'affichage.</p>"
-				;
+				<< "<p>NB : Certains types d'afficheurs ne prennent pas en charge toutes les fonctionnalités proposées. Selon le type de l'afficheur, certains champs peuvent donc être sans effet sur l'affichage.</p>";
 
 			// Cleaning
 			delete updateDisplayRequest;
+			delete addPreselRequest;
+			delete addNSRequest;
+			delete updPreselRequest;
+			delete updateAllDisplayRequest;
+			delete rmPreselRequest;
+			delete addDisplayRequest;
 		}
 
 		void DisplayAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it = map .find(Request::PARAMETER_OBJECT_ID);
+			Request::ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
 			if (it == map.end())
 				throw AdminParametersException("Display screen not specified");
 			try
@@ -256,7 +351,6 @@ namespace synthese
 					}
 				}
 			}
-			
 		}
 	}
 }

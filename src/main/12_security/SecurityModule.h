@@ -30,7 +30,7 @@
 
 #include "12_security/Profile.h"
 
-/** @defgroup m12 Security
+/** @defgroup m12 12 Security
 @{
 */
 namespace synthese

@@ -26,11 +26,14 @@
 #include <set>
 #include <string>
 #include <ostream>
+#include <map>
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
 #include "04_time/DateTime.h"
+
+#include "15_env/Types.h"
 
 #include "34_departures_table/Types.h"
 #include "34_departures_table/ForcedDestinationsArrivalDepartureTableGenerator.h"
@@ -41,7 +44,6 @@ namespace synthese
 {
 	namespace env
 	{
-		class PhysicalStop;
 		class ConnectionPlace;
 		class Line;
 	}
@@ -102,7 +104,7 @@ namespace synthese
 
 			//! \name Content
 			//@{
-				PhysicalStopsList			_physicalStops;				//!< Quai(s) affichés
+				env::PhysicalStopsSet		_physicalStops;				//!< Quai(s) affichés
 				bool						_allPhysicalStopsDisplayed;
 				ForbiddenPlacesList			_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
 				LineFilter					_forbiddenLines;
@@ -116,9 +118,9 @@ namespace synthese
 
 			//!	\name Preselection
 			//@{
-				GenerationMethod		_generationMethod;
-				DisplayedPlacesList		_forcedDestinations;	//!< Destinations à afficher absolument
-				int						_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
+				GenerationMethod			_generationMethod;
+				DisplayedPlacesList			_forcedDestinations;	//!< Destinations à afficher absolument
+				int							_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
 			
 			//@}
 
@@ -155,15 +157,19 @@ namespace synthese
 				void	clearPhysicalStops();
 				void	addPhysicalStop(const env::PhysicalStop*);
 				void	setAllPhysicalStopsDisplayed(bool value);
+				void	clearForbiddenPlaces();
 				void	addForbiddenPlace(const env::ConnectionPlace*);
 				void	setDirection(DeparturesTableDirection direction);
 				void	setOriginsOnly(EndFilter);
+				void	clearDisplayedPlaces();
 				void	addDisplayedPlace(const env::ConnectionPlace*);
 				void	setMaxDelay(int);
 				void	setClearingDelay(int delay);
 				void	setFirstRow(int row);
 				void	setGenerationMethod(GenerationMethod method);
+				void	clearForcedDestinations();
 				void	addForcedDestination(const env::ConnectionPlace*);
+				void	removeForcedDestination(const env::ConnectionPlace*);
 				void	setDestinationForceDelay(int);
 				void	setMaintenanceChecksPerDay(int number);
 				void	setMaintenanceIsOnline(bool value);
@@ -180,7 +186,6 @@ namespace synthese
 				int								getBlinkingDelay()				const;
 				bool							getTrackNumberDisplay()			const;
 				bool							getServiceNumberDisplay()		const;
-				const PhysicalStopsList&		getPhysicalStops()				const;
 				bool							getAllPhysicalStopsDisplayed()	const;
 				const ForbiddenPlacesList&		getForbiddenPlaces()			const;
 				const LineFilter&				getForbiddenLines()				const;
@@ -202,9 +207,14 @@ namespace synthese
 			//! \name Queries
 			//@{
 				ArrivalDepartureTableGenerator*	getGenerator(const time::DateTime& startTime) const;
-				void							display(std::ostream& stream) const;
+				void							display(std::ostream& stream, const time::DateTime& date) const;
 				void							recordSupervision(const std::string& supervisionValue) const;
 				std::string						getFullName()	const;
+				const env::PhysicalStopsSet&	getPhysicalStops(bool result=true)				const;
+
+				std::map<std::string, std::pair<uid, std::string> > 
+					getSortedAvaliableDestinationsLabels(const std::set<const env::ConnectionPlace*>& placesToAvoid) const;
+
 			//@}
 
 		};

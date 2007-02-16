@@ -22,7 +22,9 @@
 
 #include "30_server/ActionException.h"
 
-#include "UpdateAlarmAction.h"
+#include "17_messages/UpdateAlarmAction.h"
+#include "17_messages/Alarm.h"
+#include "17_messages/AlarmTableSync.h"
 
 using namespace std;
 
@@ -32,9 +34,12 @@ namespace synthese
 	
 	namespace messages
 	{
-		/// @todo Parameters constants definition
-		// const string UpdateAlarmAction::PARAMETER_xxx = Action::PARAMETER_PREFIX + "xxx";
-
+		const string UpdateAlarmAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "typ";
+		const string UpdateAlarmAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sda";
+		const string UpdateAlarmAction::PARAMETER_START_HOUR = Action_PARAMETER_PREFIX + "sho";
+		const string UpdateAlarmAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "eda";
+		const string UpdateAlarmAction::PARAMETER_END_HOUR = Action_PARAMETER_PREFIX + "eho";
+		
 
 		Request::ParametersMap UpdateAlarmAction::getParametersMap() const
 		{
@@ -47,10 +52,10 @@ namespace synthese
 		{
 			Request::ParametersMap::iterator it;
 
-			// it = map.find(PARAMETER_xxx);
-			// if (it == map.end())
-			//	throw ActionException("Parameter xxx not found");
-			//
+			it = map.find(PARAMETER_TYPE);
+			if (it == map.end())
+				throw ActionException("Type not specified");
+			
 			// _xxx = it->second;
 			// map.erase(it);
 			// if (_xxx <= 0)
@@ -60,11 +65,15 @@ namespace synthese
 
 		UpdateAlarmAction::UpdateAlarmAction()
 			: Action()
-			/// @todo Put here other parameters initialization
+			, _alarm(NULL)
 		{}
 
 		void UpdateAlarmAction::run()
 		{
+			_alarm->setLevel(_type);
+			_alarm->setPeriodStart(_startDate);
+			_alarm->setPeriodEnd(_endDate);
+			AlarmTableSync::save(_alarm);
 		}
 	}
 }

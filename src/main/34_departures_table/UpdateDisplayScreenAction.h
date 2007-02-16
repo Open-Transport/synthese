@@ -40,6 +40,7 @@ namespace synthese
 	{
 		class BroadcastPoint;
 		class DisplayScreen;
+		class DisplayType;
 		
 		/** UpdateDisplayScreenAction action class.
 			@ingroup m34
@@ -57,29 +58,24 @@ namespace synthese
 			static const std::string PARAMETER_DISPLAY_DEPARTURE_ARRIVAL;
 			static const std::string PARAMETER_DISPLAY_END_FILTER;
 			static const std::string PARAMETER_DISPLAY_MAX_DELAY;
-			static const std::string PARAMETER_ACTIVATE_PRESELECTION;
-			static const std::string PARAMETER_PRESELECTION_DELAY;
 			static const std::string PARAMETER_TYPE;
-			static const std::string PARAMETER_PHYSICAL;
-			static const std::string PARAMETER_ALL_PHYSICALS;
+			static const std::string PARAMETER_TITLE;
 
 		private:
 			DisplayScreen*								_screen;
 			BroadcastPoint*								_localization;
 			std::string									_localizationComment;
+			std::string									_title;
 			int											_wiringCode;
 			int											_blinkingDelay;
+			int											_cleaningDelay;
 			bool										_displayPlatform;
 			bool										_displayServiceNumber;
 			DeparturesTableDirection					_direction;
 			EndFilter									_endFilter;
 			int											_maxDelay;
-			bool										_activatePreselection;
-			int											_preselectionDelay;
-			uid											_type;
+			DisplayType*								_type;
 			std::map<const env::PhysicalStop*, bool>	_physicalStopServe;
-			bool										_allPhysicals;
-			
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -93,6 +89,7 @@ namespace synthese
 
 		public:
 			UpdateDisplayScreenAction();
+			~UpdateDisplayScreenAction();
 
 			/** Action to run, defined by each subclass.
 			*/

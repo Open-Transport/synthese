@@ -30,6 +30,7 @@
 #include "11_interfaces/InterfacePage.h"
 
 #include "30_server/RequestException.h"
+#include "30_server/Action.h"
 
 #include "32_admin/HomeAdmin.h"
 #include "32_admin/AdminInterfacePage.h"
@@ -62,6 +63,9 @@ namespace synthese
 			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_object_id)));
 			if (_actionFailedPage != NULL)
 				map.insert(make_pair(PARAMETER_ACTION_FAILED_PAGE, _actionFailedPage->getFactoryKey()));
+			for (ParametersMap::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
+				if ((_action != NULL) || (it->first.compare(0, Action_PARAMETER_PREFIX.size(), Action_PARAMETER_PREFIX) != 0))
+					map.insert(make_pair(it->first, it->second));
 			return map;
 		}
 

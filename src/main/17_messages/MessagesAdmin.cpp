@@ -29,6 +29,10 @@
 #include "17_messages/Alarm.h"
 #include "17_messages/MessagesAdmin.h"
 #include "17_messages/AlarmTableSync.h"
+#include "17_messages/MessageAdmin.h"
+#include "17_messages/NewMessageAction.h"
+#include "17_messages/NewScenarioSendAction.h"
+#include "17_messages/MessagesScenarioSendAdmin.h"
 
 #include "32_admin/AdminRequest.h"
 #include "32_admin/AdminParametersException.h"
@@ -112,6 +116,18 @@ namespace synthese
 			searchRequest->copy(request);
 			searchRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
 
+			AdminRequest* newMessageRequest = Factory<Request>::create<AdminRequest>();
+			newMessageRequest->copy(request);
+			newMessageRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+			newMessageRequest->setAction(Factory<AdminInterfaceElement>::create<NewMessageAction>());
+			newMessageRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
+
+			AdminRequest* newScenarioRequest = Factory<Request>::create<AdminRequest>();
+			newScenarioRequest->copy(request);
+			newScenarioRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioSendAdmin>());
+			newScenarioRequest->setAction(Factory<AdminInterfaceElement>::create<NewScenarioSendAction>());
+			newScenarioRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
+
 			stream
 				<< "<h1>Recherche</h1>"
 				<< searchRequest->getHTMLFormHeader("search")
@@ -141,13 +157,13 @@ namespace synthese
 				<< "<OPTION value=\"\">(tous les types)</OPTION>"
 				<< "<OPTION value=\"\">Prioritaire</OPTION>"
 				<< "<OPTION value=\"\">Complémentaire</OPTION>"
-				<< "</SELECT></td></tr>"
+				<< "</SELECT></td>"
 
-				<< "<tr><td colspan=\"6\">" << Html::getSubmitButton("Rechercher") << "</td></tr>"
+				<< "<td colspan=\"4\">" << Html::getSubmitButton("Rechercher") << "</td></tr>"
 
-				<< "</table>"
+				<< "</table></form>"
 
-				<< "<h1>Résultats de la recherche (tous) :</h1>"
+				<< "<h1>Résultats de la recherche</h1>"
 				
 				<< "<table>"
 				<< "<tr><th>Sel</th><th>Dates</th><th>Message</th><th>Type</th><th>Etat</th><th>Confilt</th><th>Actions</th></tr>";
@@ -170,7 +186,12 @@ namespace synthese
 			stream
 				<< "</table>"
 				<< "<P>(sélectionnez un message existant pour créer une copie)</P>"
-				<< "<P><INPUT type=\"button\" value=\"Nouvelle diffusion de message\" name=\"Button7\"></P>"
+				
+				<< "<h1>Nouvelle diffusion</h1>"
+				<< newMessageRequest->getHTMLFormHeader("newmess")
+				<< "<p>" << Html::getSubmitButton("Nouvelle diffusion de message") << "</p>"
+				<< "</form>"
+
 				<< "<P><INPUT type=\"button\" value=\"Nouvelle diffusion de scénario\" name=\"Button7\">"
 				<< "<select name=\"Select1\">";
 
@@ -182,6 +203,7 @@ namespace synthese
 				<< "<P>Cliquer sur un titre de colonne pour trier le tableau.</P>";
 
 			delete searchRequest;
+			delete newMessageRequest;
 		}
 	}
 }

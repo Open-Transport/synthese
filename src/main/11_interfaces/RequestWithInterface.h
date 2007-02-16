@@ -59,6 +59,7 @@ namespace synthese
 
 			virtual std::string getHTMLFormHeader(const std::string& name) const;
 
+			virtual std::string getQueryString() const;
 		public:
 			virtual void copy(const Request* request);
 

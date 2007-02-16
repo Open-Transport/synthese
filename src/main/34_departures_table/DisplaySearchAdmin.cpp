@@ -57,9 +57,9 @@ namespace synthese
 
 		DisplaySearchAdmin::DisplaySearchAdmin()
 			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED)
-			, _searchLocalizationUId(UNKNOWN_VALUE)
-			, _searchLineId(UNKNOWN_VALUE)
-			, _searchTypeId(UNKNOWN_VALUE)
+			, _searchLocalizationUId(0)
+			, _searchLineId(0)
+			, _searchTypeId(0)
 			, _searchState(UNKNOWN_VALUE)
 			, _searchMessage(UNKNOWN_VALUE)
 		{}
@@ -156,12 +156,12 @@ namespace synthese
 			{
 				DisplayScreen* screen = *it;
 				updateRequest->setObjectId(screen->getKey());
-				viewRequest->setDisplayScreen(screen);
+				viewRequest->setObjectId(screen->getKey());
 				maintRequest->setObjectId(screen->getKey());
 				stream
 					<< "<tr><td><INPUT type=\"checkbox\" name=\"Checkbox3\"></td>"
 					<< "<td>" << screen->getKey() << "</td>"
-					<< "<td>" << (screen->getLocalization() ? screen->getLocalization()->getName() : "(indéterminé)") << "</td>"
+					<< "<td>" << (screen->getLocalization() ? screen->getLocalization()->getFullName() : "(indéterminé)") << "</td>"
 					<< "<td>" << (screen->getType() ? screen->getType()->getName() : "(indéterminé)") << "</td>"
 					<< "<td></td>" // Bullets showing the states of the display
 					<< "<td></td>" // Bullet showing the message status

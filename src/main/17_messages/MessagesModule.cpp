@@ -27,6 +27,7 @@ namespace synthese
 	namespace messages
 	{
 		Alarm::Registry MessagesModule::_alarms;
+		Scenario::Registry MessagesModule::_scenarii;
 
 		Alarm::Registry& 
 			MessagesModule::getAlarms ()
@@ -34,6 +35,10 @@ namespace synthese
 			return _alarms;
 		}
 
+		Scenario::Registry& MessagesModule::getScenarii()
+		{
+			return _scenarii;
+		}
 		void initialize()
 		{
 

@@ -20,11 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Scenario.h"
+#include "17_messages/Scenario.h"
+#include "17_messages/Alarm.h"
 
 namespace synthese
 {
 	using namespace util;
+	using namespace time;
 
 	namespace messages
 	{
@@ -32,6 +34,9 @@ namespace synthese
 
 		Scenario::Scenario()
 			: Registrable<uid, Scenario>()
+			, _isEnabled(false)
+			, _periodStart(TIME_UNKNOWN)
+			, _periodEnd(TIME_UNKNOWN)
 		{
 
 		}
@@ -41,7 +46,7 @@ namespace synthese
 			_name = name;
 		}
 
-		std::vector<Alarm*>& Scenario::getAlarms()
+		const Scenario::AlarmsSet& Scenario::getAlarms() const
 		{
 			return _alarms;
 		}
@@ -54,11 +59,15 @@ namespace synthese
 		void Scenario::setPeriodStart( const synthese::time::DateTime& periodStart )
 		{
 			_periodStart = periodStart;
+			for (AlarmsSet::const_iterator it = getAlarms().begin(); it != getAlarms().end(); ++it)
+				(*it)->setPeriodStart(_periodStart);
 		}
 
 		void Scenario::setPeriodEnd( const synthese::time::DateTime& periodEnd )
 		{
 			_periodEnd = periodEnd;
+			for (AlarmsSet::const_iterator it = getAlarms().begin(); it != getAlarms().end(); ++it)
+				(*it)->setPeriodEnd(_periodEnd);
 		}
 
 		void Scenario::setIsATemplate( bool isATemplate )
@@ -79,6 +88,46 @@ namespace synthese
 		const time::DateTime& Scenario::getPeriodEnd() const
 		{
 			return _periodEnd;
+		}
+
+		void Scenario::setIsEnabled( bool value )
+		{
+			_isEnabled = value;
+		}
+
+		bool Scenario::getIsEnabled() const
+		{
+			return _isEnabled;
+		}
+
+		Scenario* Scenario::createCopy() const
+		{
+			Scenario* scenario = new Scenario;
+			scenario->setIsATemplate(false);
+			scenario->setName(getName());
+			
+			for (AlarmsSet::const_iterator it = getAlarms().begin(); it != getAlarms().end(); ++it)
+				scenario->addAlarm((*it)->createCopy(scenario));
+
+			return scenario;
+		}
+
+		Scenario::~Scenario()
+		{
+			for (AlarmsSet::const_iterator it = getAlarms().begin(); it != getAlarms().end(); ++it)
+				delete *it;
+		}
+
+		void Scenario::addAlarm( Alarm* alarm )
+		{
+			_alarms.insert(alarm);
+		}
+
+		void Scenario::removeAlarm( Alarm* alarm )
+		{
+			AlarmsSet::iterator it = _alarms.find(alarm);
+			if (it != _alarms.end())
+				_alarms.erase(it);
 		}
 	}
 }

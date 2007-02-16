@@ -78,16 +78,19 @@ namespace synthese
 			createRequest->copy(request);
 			createRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
 			createRequest->setAction(Factory<Action>::create<CreateBroadcastPointAction>());
+			createRequest->setObjectId(request->getObjectId());
 
 			AdminRequest* deleteRequest = Factory<Request>::create<AdminRequest>();
 			deleteRequest->copy(request);
 			deleteRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
 			deleteRequest->setAction(Factory<Action>::create<DeleteBroadcastPointAction>());
+			deleteRequest->setObjectId(request->getObjectId());
 
 			AdminRequest* renameRequest = Factory<Request>::create<AdminRequest>();
 			renameRequest->copy(request);
 			renameRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
 			renameRequest->setAction(Factory<Action>::create<RenameBroadcastPointAction>());
+			renameRequest->setObjectId(request->getObjectId());
 
 			stream
 				<< "<h1>Emplacements d'affichage de la zone d'arrêt</h1>"

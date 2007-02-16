@@ -43,6 +43,7 @@ namespace synthese
 		{
 		public:
 			static const std::string COL_IS_TEMPLATE;
+			static const std::string COL_ENABLED;
 			static const std::string COL_NAME;
 			static const std::string COL_PERIODSTART;
 			static const std::string COL_PERIODEND;

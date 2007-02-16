@@ -31,6 +31,7 @@
 #include "15_env/ConnectionPlace.h"
 #include "15_env/CommercialLine.h"
 #include "15_env/Line.h"
+#include "15_env/LineStop.h"
 #include "15_env/Axis.h"
 #include "15_env/Fare.h"
 #include "15_env/BikeCompliance.h"
@@ -259,7 +260,7 @@ namespace synthese
 			static HandicappedCompliance::Registry	_handicappedCompliances;
 			static PedestrianCompliance::Registry	_pedestrianCompliances;
 			static ReservationRule::Registry		_reservationRules;
-
+			static LineStop::Registry				_lineStops;
 
 
 		public:
@@ -279,6 +280,8 @@ namespace synthese
 			static HandicappedCompliance::Registry&	getHandicappedCompliances();
 			static PedestrianCompliance::Registry&	getPedestrianCompliances();
 			static ReservationRule::Registry&		getReservationRules();
+			static LineStop::Registry&				getLineStops();
+
 
 			static Path* fetchPath (const uid& id);
 

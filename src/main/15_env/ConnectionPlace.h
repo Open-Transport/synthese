@@ -32,6 +32,7 @@
 #include "01_util/UId.h"
 
 #include "15_env/AddressablePlace.h"
+#include "15_env/Types.h"
 
 
 namespace synthese
@@ -41,29 +42,21 @@ namespace synthese
 		class DateTime;
 	}
 
-	namespace messages
-	{
-		class Alarm;
-	}
-
 	namespace env
 	{
-
-
 		class Address;
 		class Edge;
-		class Path; 
-		class PhysicalStop;
+		class Path;
 		class SquareDistance; 
 
 
 		/** A connection place indicates that there are possible
-		connections between different network vertices.
+			connections between different network vertices.
 
-		Each connection is associated with a type (authorized, 
-		forbidden, recommended...) and a transfer delay.
+			Each connection is associated with a type (authorized, 
+			forbidden, recommended...) and a transfer delay.
 
-		@ingroup m15
+			@ingroup m15
 		*/
 		class ConnectionPlace : 
 			public synthese::util::Registrable<uid,ConnectionPlace>, 
@@ -75,10 +68,9 @@ namespace synthese
 			static const int FORBIDDEN_TRANSFER_DELAY;
 			static const int SQUAREDISTANCE_SHORT_LONG;
 
-
 		private:
 
-			std::vector<const PhysicalStop*> _physicalStops; 
+			PhysicalStopsSet _physicalStops; 
 
 			std::map< std::pair<uid, uid>, int > _transferDelays; //!< Transfer delays between vertices
 			int _defaultTransferDelay;
@@ -103,66 +95,64 @@ namespace synthese
 
 			//! @name Getters/Setters
 			//@{
-			int getDefaultTransferDelay () const;
-			void setDefaultTransferDelay (int defaultTransferDelay);
+				int							getDefaultTransferDelay () const;
+				void						setDefaultTransferDelay (int defaultTransferDelay);
 
-			int getMinTransferDelay () const;
-			int getMaxTransferDelay () const;
+				int							getMinTransferDelay () const;
+				int							getMaxTransferDelay () const;
 
-			const std::vector<const PhysicalStop*>& getPhysicalStops () const;
-			std::map<uid, std::string> getPhysicalStopLabels(bool withAll = false) const;
+				const PhysicalStopsSet&		getPhysicalStops () const;
 
-			const ConnectionType getConnectionType () const;
-			void setConnectionType (const ConnectionType& connectionType);
+				const ConnectionType		getConnectionType () const;
+				void						setConnectionType (const ConnectionType& connectionType);
 
 			//@}
 
 
 			//! @name Query methods.
 			//@{
-		    
-			messages::Alarm* hasApplicableAlarm (const synthese::time::DateTime& start, 
-				const synthese::time::DateTime& end) const;
+				bool isConnectionAllowed (const Vertex* fromVertex, 
+							const Vertex* toVertex) const;
 
-			bool isConnectionAllowed (const Vertex* fromVertex, 
+				ConnectionType getRecommendedConnectionType (const SquareDistance& squareDistance) const;
+
+
+				int getTransferDelay (const Vertex* fromVertex, 
 						const Vertex* toVertex) const;
 
-			ConnectionType getRecommendedConnectionType (const SquareDistance& squareDistance) const;
 
+				VertexAccess getVertexAccess (const AccessDirection& accessDirection,
+							const AccessParameters& accessParameters,
+							const Vertex* destination,
+							const Vertex* origin = 0) const;
+			    
+				void getImmediateVertices (VertexAccessMap& result, 
+							const AccessDirection& accessDirection,
+							const AccessParameters& accessParameters,
+							const Vertex* origin = 0,
+							bool returnAddresses = true,
+							bool returnPhysicalStops = true) const;
 
-			int getTransferDelay (const Vertex* fromVertex, 
-					const Vertex* toVertex) const;
-
-
-			VertexAccess getVertexAccess (const AccessDirection& accessDirection,
-						const AccessParameters& accessParameters,
-						const Vertex* destination,
-						const Vertex* origin = 0) const;
-		    
-			void getImmediateVertices (VertexAccessMap& result, 
-						const AccessDirection& accessDirection,
-						const AccessParameters& accessParameters,
-						const Vertex* origin = 0,
-						bool returnAddresses = true,
-						bool returnPhysicalStops = true) const;
-		    
-		    
+				std::map<uid, std::string>	getPhysicalStopLabels(bool withAll = false) const;
+				/** Labels list for select field containing physical stops, with exclusion list.
+					@param noDisplay Physical stops to exclude
+					@return Labels list for select field containing physical stops
+					@author Hugues Romain
+					@date 2007
+				*/
+				std::map<uid, std::string>	getPhysicalStopLabels(const PhysicalStopsSet& noDisplay) const;
 			//@}
 
 
 			//! @name Update methods.
 			//@{
-			void addPhysicalStop (const PhysicalStop* physicalStop);
-			void addTransferDelay (uid departureId, uid arrivalId, int transferDelay);
-			void clearTransferDelays ();
+				void addPhysicalStop (const PhysicalStop* physicalStop);
+				void addTransferDelay (uid departureId, uid arrivalId, int transferDelay);
+				void clearTransferDelays ();
 			//@}
 
-
 		};
-
-
 	}
 }
 
 #endif 	    
-
