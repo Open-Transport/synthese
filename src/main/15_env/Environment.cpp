@@ -49,8 +49,6 @@ Environment::~Environment ()
     _lines.clear ();
     _roadChunks.clear ();
     _roads.clear ();
-    _continuousServices.clear ();
-    _scheduledServices.clear ();
 }
 
 
@@ -215,37 +213,6 @@ Environment::getRoads () const
 
 
 
-ScheduledService::Registry& 
-Environment::getScheduledServices ()
-{
-    return _scheduledServices;
-}
-
-
-
-const ScheduledService::Registry& 
-Environment::getScheduledServices () const
-{
-    return _scheduledServices;
-}
-
-
-
-ContinuousService::Registry& 
-Environment::getContinuousServices ()
-{
-    return _continuousServices;
-}
-
-
-
-const ContinuousService::Registry& 
-Environment::getContinuousServices () const
-{
-    return _continuousServices;
-}
-
-
 TransportNetwork::Registry& 
 Environment::getTransportNetworks ()
 {
@@ -317,24 +284,6 @@ Environment::fetchIncludingPlace (const uid& id) const
 
 
 
-
-const Service* 
-Environment::fetchService (const uid& id) const
-{
-    if (_scheduledServices.contains (id)) return _scheduledServices.get (id);
-    if (_continuousServices.contains (id)) return _continuousServices.get (id);
-    return 0;
-}
-
-
-
-Service* 
-Environment::fetchService (const uid& id)
-{
-    if (_scheduledServices.contains (id)) return _scheduledServices.get (id);
-    if (_continuousServices.contains (id)) return _continuousServices.get (id);
-    return 0;
-}
 
 
 

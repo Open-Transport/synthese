@@ -111,17 +111,25 @@ namespace synthese
 					break;
 
 				numberOfOpenedBraces = 0;
+				char delimiter = 0;
 
 				for (wordEndPos = position;
 					wordEndPos < text.size() && (numberOfOpenedBraces != 0 || text[wordEndPos] != ' ');
 					++wordEndPos)
 				{
-					if (text[wordEndPos] == '{')
-						++numberOfOpenedBraces;
-					if (text[wordEndPos] == '}')
-						--numberOfOpenedBraces;
-					if (numberOfOpenedBraces < 0)
-						throw InterfacePageException("Parse error : too much closing braces at "+ Conversion::ToString(wordEndPos) +" in "+ text);
+					// Choosing the delimiter character
+					if (numberOfOpenedBraces == 0 && (text[wordEndPos] == '{' || text[wordEndPos] == '['))
+						delimiter = text[wordEndPos];
+
+					if (delimiter)
+					{
+						if (text[wordEndPos] == delimiter)
+							++numberOfOpenedBraces;
+						if ((delimiter == '{' && text[wordEndPos] == '}') || (delimiter == '[' && text[wordEndPos] == ']'))
+							--numberOfOpenedBraces;
+						if (numberOfOpenedBraces < 0)
+							throw InterfacePageException("Parse error : too much closing braces at "+ Conversion::ToString(wordEndPos) +" in "+ text);
+					}
 				}
 
 				elements.push_back(text.substr(position, wordEndPos - position));
@@ -137,13 +145,13 @@ namespace synthese
 				const std::string& str = *it;
 
 				// Case 1 : single word
-				if (str.at(0) != '{')
+				if (str.at(0) != '{' && str.at(0) != '[')
 				{
 					vie = new StaticValueInterfaceElement(str);
 				} 
 
 				// Case 2 : multiple word
-				else if(str.size() > 1 && str.at(0) == '{' && str.at(1) != '{')
+				else if(str.size() > 1 && (str.at(0) == '{' && str.at(1) != '{' || str.at(0) == '['))
 				{
 					vie = new StaticValueInterfaceElement(str.substr(1, str.size() - 2));
 				}

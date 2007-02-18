@@ -33,3 +33,12 @@
 #include "34_departures_table/AddForbiddenPlaceToDisplayScreen.h"
 #include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"
 #include "34_departures_table/DisplayScreenAddDisplayedPlace.h"
+#include "34_departures_table/DeparturesTableInterfacePage.h"
+#include "34_departures_table/DeparturesTableTimeContentInterfaceElement.h"
+#include "34_departures_table/DeparturesTableLineContentInterfaceElement.h"
+#include "34_departures_table/DeparturesTableDestinationContentInterfaceElement.h"
+#include "34_departures_table/DisplayScreenRemovePhysicalStopAction.h"
+#include "34_departures_table/DisplayScreenRemoveDisplayedPlaceAction.h"
+#include "34_departures_table/DisplayScreenRemoveForbiddenPlaceAction.h"
+#include "34_departures_table/UpdateDisplayMaintenanceAction.h"
+

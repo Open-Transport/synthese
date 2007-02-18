@@ -33,6 +33,14 @@ namespace synthese
 
 			void parse( const std::string& text );
 
+			/** Library page element creation.
+				@param text Text to parse
+				@param page Page to link
+				@return Pointer to the created element. If the line is empty, then a null pointer is returned.
+				@exception InterfacePageException if the specified key was not found in the library
+				@author Hugues Romain
+				@date 2007
+			*/
 			static LibraryInterfaceElement* create( const std::string & text, const InterfacePage* page );
 
 			template<class T>

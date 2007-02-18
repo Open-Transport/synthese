@@ -85,6 +85,7 @@ namespace synthese
 			line->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
 			line->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
 			line->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
+			line->setCommercialLine(EnvModule::getCommercialLines().get(Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_COMMERCIAL_LINE_ID))));
 //			line->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId));
 		}
 

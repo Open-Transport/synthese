@@ -96,7 +96,8 @@ namespace synthese
 
 		public:
 
-			typedef std::set<Service*, cmpService> ServiceSet;
+//			typedef std::set<Service*, cmpService> ServiceSet;
+			typedef std::set<Service*> ServiceSet;
 
 		protected:
 

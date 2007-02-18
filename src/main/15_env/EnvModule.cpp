@@ -44,6 +44,8 @@ namespace synthese
 		PedestrianCompliance::Registry	EnvModule::_pedestrianCompliances;
 		ReservationRule::Registry		EnvModule::_reservationRules;
 		LineStop::Registry				EnvModule::_lineStops;
+		ScheduledService::Registry		EnvModule::_scheduledServices;
+		ContinuousService::Registry		EnvModule::_continuousServices;
 
 		void EnvModule::initialize()
 		{
@@ -78,7 +80,8 @@ namespace synthese
 			_cities.clear ();
 			_commercialLines.clear();
 			_lineStops.clear ();
-
+			_scheduledServices.clear ();
+			_continuousServices.clear ();
 		}
 
 		CommercialLine::Registry& EnvModule::getCommercialLines()
@@ -144,5 +147,24 @@ namespace synthese
 		{
 			return _lineStops;
 		}
+
+		ScheduledService::Registry& EnvModule::getScheduledServices()
+		{
+			return _scheduledServices;
+		}
+
+
+		Service* EnvModule::fetchService (const uid& id)
+		{
+			if (_scheduledServices.contains (id)) return _scheduledServices.get (id);
+			if (_continuousServices.contains (id)) return _continuousServices.get (id);
+			return 0;
+		}
+
+		ContinuousService::Registry& EnvModule::getContinuousServices()
+		{
+			return _continuousServices;
+		}
+
 	}
 }

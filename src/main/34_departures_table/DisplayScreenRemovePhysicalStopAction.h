@@ -1,6 +1,6 @@
 
-/** SimplePageRequest class header.
-	@file SimplePageRequest.h
+/** DisplayScreenRemovePhysicalStopAction class header.
+	@file DisplayScreenRemovePhysicalStopAction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,52 +20,55 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_SimplePageRequest_H__
-#define SYNTHESE_SimplePageRequest_H__
+#ifndef SYNTHESE_DisplayScreenRemovePhysicalStopAction_H__
+#define SYNTHESE_DisplayScreenRemovePhysicalStopAction_H__
 
-#include "11_interfaces/RequestWithInterface.h"
+#include "30_server/Action.h"
 
 namespace synthese
 {
-	namespace interfaces
+	namespace env
 	{
-		class InterfacePage;
+		class PhysicalStop;
+	}
 
-		/** Request for direct displaying an interface page.
-			@ingroup m11
+	namespace departurestable
+	{
+		class DisplayScreen;
 
-			Arguments :
-				- page : page to display (empty or not provided = no display, action only)
+		/** DisplayScreenRemovePhysicalStopAction action class.
+			@ingroup m34
 		*/
-		class SimplePageRequest : public RequestWithInterface
+		class DisplayScreenRemovePhysicalStopAction : public server::Action
 		{
-			static const std::string PARAMETER_PAGE;
+		public:
+			static const std::string PARAMETER_PHYSICAL;
 
-			//! \name Request parameters
-			//@{
-			const interfaces::InterfacePage* _page;
-			Request::ParametersMap _parameters;
-			//@}
+		private:
+			DisplayScreen*		_screen;
+			env::PhysicalStop*	_stop;
 
-
+		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
 			server::Request::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
+				Removes the used parameters from the map.
+				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
-			void setFromParametersMap(const server::Request::ParametersMap& map);
+			void setFromParametersMap(server::Request::ParametersMap& map);
 
 		public:
-			SimplePageRequest();
+			/** Constructor.
+			*/
+			DisplayScreenRemovePhysicalStopAction();
 
 			/** Action to run, defined by each subclass.
 			*/
-			void run(std::ostream& stream) const;
-
-			void setPage(const interfaces::InterfacePage* page);
+			void run();
 		};
 	}
 }
 
-#endif // SYNTHESE_SimplePageRequest_H__
+#endif // SYNTHESE_DisplayScreenRemovePhysicalStopAction_H__

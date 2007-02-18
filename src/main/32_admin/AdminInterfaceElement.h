@@ -51,16 +51,23 @@ namespace synthese
 			typedef enum { EVER_DISPLAYED, DISPLAYED_IF_CURRENT, NEVER_DISPLAYED } DisplayMode;
 
 		private:
-			const std::string _superior;
-			const DisplayMode _everDisplayed;
+			std::string			_superior;
+			const DisplayMode	_everDisplayed;
+
+		protected:
+			void setSuperior(const std::string& superior);
 
 		public:
 			/** Constructor.
 			*/
 			AdminInterfaceElement(const std::string& superior, DisplayMode everDisplayed);
 
-			const std::string& getSuperior() const;
-			const DisplayMode getDisplayMode() const;
+			//!	@name Getters
+			//@{
+				const std::string& getSuperior() const;
+				const DisplayMode getDisplayMode() const;
+			//@}
+
 
 			std::string getHTMLLink(const AdminRequest* request) const;
 

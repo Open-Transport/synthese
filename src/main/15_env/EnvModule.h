@@ -37,6 +37,8 @@
 #include "15_env/BikeCompliance.h"
 #include "15_env/HandicappedCompliance.h"
 #include "15_env/PedestrianCompliance.h"
+#include "15_env/ScheduledService.h"
+#include "15_env/ContinuousService.h"
 
 /** @defgroup m15 15 Environment.
 @{
@@ -261,6 +263,8 @@ namespace synthese
 			static PedestrianCompliance::Registry	_pedestrianCompliances;
 			static ReservationRule::Registry		_reservationRules;
 			static LineStop::Registry				_lineStops;
+			static ScheduledService::Registry		_scheduledServices;
+			static ContinuousService::Registry		_continuousServices;
 
 
 		public:
@@ -281,9 +285,12 @@ namespace synthese
 			static PedestrianCompliance::Registry&	getPedestrianCompliances();
 			static ReservationRule::Registry&		getReservationRules();
 			static LineStop::Registry&				getLineStops();
+			static ScheduledService::Registry&		getScheduledServices();
+			static ContinuousService::Registry&		getContinuousServices();
 
 
 			static Path* fetchPath (const uid& id);
+			static Service* fetchService (const uid& id);
 
 			static std::map<uid, std::string>		getCommercialLineLabels(bool withAll=false);
 

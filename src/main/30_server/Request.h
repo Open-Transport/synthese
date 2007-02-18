@@ -57,6 +57,7 @@ namespace synthese
 			static const std::string PARAMETER_ERROR_MESSAGE;
 			static const std::string PARAMETER_ERROR_LEVEL;
 			static const int MAX_REQUEST_SIZE;
+			static const uid UID_WILL_BE_GENERATED_BY_THE_ACTION;
 			
 			typedef std::map<std::string, std::string> ParametersMap;
 			typedef enum { REQUEST_ERROR_NONE, REQUEST_ERROR_INFO, REQUEST_ERROR_WARNING, REQUEST_ERROR_FATAL } ErrorLevel;

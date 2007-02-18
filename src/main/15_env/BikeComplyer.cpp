@@ -40,6 +40,10 @@ BikeComplyer::setBikeCompliance (BikeCompliance* bikeCompliance)
     _bikeCompliance = bikeCompliance;
 }
 
+void BikeComplyer::setParent( BikeComplyer* parent )
+{
+	_parent = parent;
+}
 
 
 

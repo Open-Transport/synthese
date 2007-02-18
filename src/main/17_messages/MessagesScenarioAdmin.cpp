@@ -23,6 +23,7 @@
 #include "01_util/Html.h"
 
 #include "17_messages/MessagesScenarioAdmin.h"
+#include "17_messages/MessageAdmin.h"
 #include "17_messages/Scenario.h"
 #include "17_messages/MessagesModule.h"
 #include "17_messages/ScenarioNameUpdateAction.h"
@@ -57,6 +58,9 @@ namespace synthese
 				if (it == map.end())
 					throw AdminParametersException("Scenario not specified");
 				_scenario = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
+
+				if (!_scenario->getIsATemplate())
+					setSuperior("messages");
 			}
 			catch (Scenario::RegistryKeyException e)
 			{
@@ -76,6 +80,10 @@ namespace synthese
 			updateRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
 			updateRequest->setAction(Factory<Action>::create<ScenarioNameUpdateAction>());
 
+			AdminRequest* messRequest = Factory<Request>::create<AdminRequest>();
+			messRequest->copy(request);
+			messRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+
 			stream
 				<< "<h1>Propriété</h1>"
 				<< updateRequest->getHTMLFormHeader("update")
@@ -84,17 +92,22 @@ namespace synthese
 
 				<< "<h1>Messages</h1>"
 				<< "<table>"
-				<< "<tr><th>Sel</th><th>Message</th><th>Emplacement</th>Actions</th></tr>";
+				<< "<tr><th>Sel</th><th>Message</th><th>Emplacement</th><th colspan=\"2\">Actions</th></tr>";
 
 			for(Scenario::AlarmsSet::const_iterator it = _scenario->getAlarms().begin(); it != _scenario->getAlarms().end(); ++it)
 			{
 				Alarm* alarm = *it;
+				messRequest->setObjectId(alarm->getKey());
 				stream
 					<< "<tr>"
 					<< "<td>" << "<INPUT id=\"Radio2\" type=\"radio\" value=\"Radio2\" name=\"RadioGroup\">" << "</td>"
 					<< "<td>" << alarm->getShortMessage() << "</td>"
 					<< "<td>TOULOUSE Matabiau</td>"
-					<< "<td>" << Html::getSubmitButton("Modifier") << Html::getSubmitButton("Supprimer") << "</td>"
+					<< "<td>" 
+					<< messRequest->getHTMLFormHeader("enter" + Conversion::ToString(alarm->getKey()))
+					<< Html::getSubmitButton("Modifier")
+					<< "</form></td><td>"
+					<< Html::getSubmitButton("Supprimer") << "</td>"
 					<< "</tr>";
 			}
 
@@ -106,6 +119,7 @@ namespace synthese
 				<< "</TABLE>";
 
 			delete updateRequest;
+			delete messRequest;
 		}
 	}
 }

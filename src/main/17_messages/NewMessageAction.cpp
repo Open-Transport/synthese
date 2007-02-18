@@ -57,6 +57,7 @@ namespace synthese
 			// if (_xxx <= 0)
 			//	throw ActionException("Bad value for xxx parameter ");	
 			// 
+			map.insert(make_pair(Request::PARAMETER_OBJECT_ID, Conversion::ToString(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)));
 		}
 
 		NewMessageAction::NewMessageAction()

@@ -297,6 +297,24 @@
 					RelativePath=".\DisplayScreenAddDisplayedPlace.h">
 				</File>
 				<File
+					RelativePath=".\DisplayScreenRemoveDisplayedPlaceAction.cpp">
+				</File>
+				<File
+					RelativePath=".\DisplayScreenRemoveDisplayedPlaceAction.h">
+				</File>
+				<File
+					RelativePath=".\DisplayScreenRemoveForbiddenPlaceAction.cpp">
+				</File>
+				<File
+					RelativePath=".\DisplayScreenRemoveForbiddenPlaceAction.h">
+				</File>
+				<File
+					RelativePath=".\DisplayScreenRemovePhysicalStopAction.cpp">
+				</File>
+				<File
+					RelativePath=".\DisplayScreenRemovePhysicalStopAction.h">
+				</File>
+				<File
 					RelativePath=".\RemovePreselectionPlaceFromDisplayScreenAction.cpp">
 				</File>
 				<File

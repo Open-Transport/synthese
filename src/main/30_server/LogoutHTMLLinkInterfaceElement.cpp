@@ -35,7 +35,7 @@ namespace synthese
 			std::string url = _redirectionURL->getValue(parameters, rootObject, request);
 			std::string requestKey = _page_key->getValue(parameters, rootObject, request);
 
-			if (requestKey != "")
+			if (!requestKey.empty())
 			{
 				try
 				{

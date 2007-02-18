@@ -1,6 +1,6 @@
 
-/** CreateDisplayScreenAction class implementation.
-	@file CreateDisplayScreenAction.cpp
+/** ServiceDate class header.
+	@file ServiceDate.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,35 +20,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "34_departures_table/CreateDisplayScreenAction.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/DisplayScreen.h"
+#ifndef SYNTHESE_ServiceDate_h__
+#define SYNTHESE_ServiceDate_h__
 
-using namespace std;
+#include "01_util/UId.h"
+
+#include "04_time/Date.h"
 
 namespace synthese
 {
-	using namespace server;
-	
-	namespace departurestable
+	namespace env
 	{
-		Request::ParametersMap CreateDisplayScreenAction::getParametersMap() const
-		{
-			Request::ParametersMap map;
-			return map;
-		}
+		class Service;
 
-		void CreateDisplayScreenAction::setFromParametersMap(Request::ParametersMap& map)
+		/** ServiceDate class.
+			This class is available for the template instanciation of the ServiceDateTableSync.
+			It can be used as a simple structure.
+			@ingroup m15
+		*/
+		class ServiceDate
 		{
-			Request::ParametersMap::iterator it;
-
-			map.insert(make_pair(Request::PARAMETER_OBJECT_ID, Conversion::ToString(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)));
-		}
-
-		void CreateDisplayScreenAction::run()
-		{
-			DisplayScreen* screen = DisplayScreenTableSync::createEmpty();
-			_request->setObjectId(screen->getKey());
-		}
+		public:
+			uid			key;
+			Service*	service;
+			time::Date	date;
+		};
 	}
 }
+
+#endif // SYNTHESE_ServiceDate_h__

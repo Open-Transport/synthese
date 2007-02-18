@@ -44,7 +44,7 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<HandicappedCompliance>::TABLE_NAME = "t019_handicappedCompliances";
+		template<> const std::string SQLiteTableSyncTemplate<HandicappedCompliance>::TABLE_NAME = "t019_handicapped_compliances";
 		template<> const int SQLiteTableSyncTemplate<HandicappedCompliance>::TABLE_ID = 19;
 		template<> const bool SQLiteTableSyncTemplate<HandicappedCompliance>::HAS_AUTO_INCREMENT = true;
 

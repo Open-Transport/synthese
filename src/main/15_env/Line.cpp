@@ -29,243 +29,246 @@
 
 namespace synthese
 {
-namespace env
-{
+	namespace env
+	{
+		Line::Line (const uid& id,
+				const std::string& name, 
+				const Axis* axis)
+			: synthese::util::Registrable<uid,Line> (id)
+			, Path ()
+			, _name (name)
+			, _axis (axis)
+			, _rollingStockId (-1)
+			, _isWalkingLine (false)
+			, _useInDepartureBoards (true)
+			, _useInTimetables (true)
+			, _useInRoutePlanning (true)
+			, _commercialLine(NULL)
+		{
+
+		}
+
+		Line::Line()
+		: synthese::util::Registrable<uid,Line>()
+		, Path ()
+		, _rollingStockId (-1)
+		, _isWalkingLine (false)
+		, _useInDepartureBoards (true)
+		, _useInTimetables (true)
+		, _useInRoutePlanning (true)
+		, _commercialLine(NULL)
+		{
+
+		}
+
+
+
+
+		Line::~Line ()
+		{
+		}
+
+
+
+		const std::string& 
+		Line::getName () const
+		{
+			return _name;
+		}
+
+
+
+		void 
+		Line::setName (const std::string& name)
+		{
+			_name = name;
+		}
+
+
+
+		bool 
+		Line::getUseInDepartureBoards () const
+		{
+			return _useInDepartureBoards;
+		}
+
+
+
+		void 
+		Line::setUseInDepartureBoards (bool useInDepartureBoards)
+		{
+			_useInDepartureBoards = useInDepartureBoards;
+		}
+
+
+
+
+		bool 
+		Line::getUseInTimetables () const
+		{
+			return _useInTimetables;
+		}
+
+
+
+		void 
+		Line::setUseInTimetables (bool useInTimetables)
+		{
+			_useInTimetables = useInTimetables;
+		}
+
+
+
+
+		bool 
+		Line::getUseInRoutePlanning () const
+		{
+			return _useInRoutePlanning;
+		}
+
+
+
+
+		void 
+		Line::setUseInRoutePlanning (bool useInRoutePlanning)
+		{
+			_useInRoutePlanning = useInRoutePlanning;
+		}
 
 
 
 
 
-Line::Line (const uid& id,
-	    const std::string& name, 
-	    const Axis* axis)
-    : synthese::util::Registrable<uid,Line> (id)
-    , Path ()
-    , _name (name)
-    , _axis (axis)
-    , _rollingStockId (-1)
-    , _isWalkingLine (false)
-    , _useInDepartureBoards (true)
-    , _useInTimetables (true)
-    , _useInRoutePlanning (true)
-	, _commercialLine(NULL)
-{
+		const Axis* 
+		Line::getAxis () const
+		{
+			return _axis;
+		}
 
+
+
+
+
+
+		const std::string& 
+		Line::getDirection () const
+		{
+			return _direction;
+		}
+
+
+
+		void 
+		Line::setDirection (const std::string& direction)
+		{
+			_direction = direction;
+		}
+
+
+
+		const std::string& 
+		Line::getTimetableName () const
+		{
+			return _timetableName;
+		}
+
+
+
+		void 
+		Line::setTimetableName (const std::string& timetableName)
+		{
+			_timetableName = timetableName;
+		}
+
+
+
+
+
+		const TransportNetwork* 
+		Line::getNetwork () const
+		{
+			return _commercialLine->getNetwork();
+		}
+
+
+
+		const uid&
+		Line::getRollingStockId () const
+		{
+			return _rollingStockId;
+		}
+
+
+
+		void 
+		Line::setRollingStockId (const uid& rollingStockId)
+		{
+			_rollingStockId = rollingStockId;
+		}
+
+
+
+
+
+
+
+		void
+		Line::setWalkingLine (bool isWalkingLine)
+		{
+			_isWalkingLine = isWalkingLine;
+		}
+
+
+
+		bool 
+		Line::getWalkingLine () const
+		{
+			return _isWalkingLine;
+		}
+
+
+		bool 
+		Line::isRoad () const
+		{
+			return false;
+		}
+
+
+
+		bool 
+		Line::isLine () const
+		{
+			return true;
+		}
+
+
+
+
+		const uid& 
+		Line::getId () const
+		{
+			return synthese::util::Registrable<uid,Line>::getKey();
+		}
+
+		PhysicalStop* Line::getDestination() const
+		{
+			Edge* edge = getLastEdge();
+			return (PhysicalStop*) edge->getFromVertex();
+		}
+
+		void Line::setAxis( const Axis* axis )
+		{
+			_axis = axis;
+		}
+
+		void Line::setCommercialLine( const CommercialLine* commercialLine )
+		{
+			_commercialLine = commercialLine;
+		}
+
+		const CommercialLine* Line::getCommercialLine() const
+		{
+			return _commercialLine;
+		}
+	}
 }
-
-Line::Line()
-: synthese::util::Registrable<uid,Line>()
-, Path ()
-, _rollingStockId (-1)
-, _isWalkingLine (false)
-, _useInDepartureBoards (true)
-, _useInTimetables (true)
-, _useInRoutePlanning (true)
-, _commercialLine(NULL)
-{
-
-}
-
-
-
-
-Line::~Line ()
-{
-}
-
-
-
-const std::string& 
-Line::getName () const
-{
-    return _name;
-}
-
-
-
-void 
-Line::setName (const std::string& name)
-{
-    _name = name;
-}
-
-
-
-bool 
-Line::getUseInDepartureBoards () const
-{
-    return _useInDepartureBoards;
-}
-
-
-
-void 
-Line::setUseInDepartureBoards (bool useInDepartureBoards)
-{
-    _useInDepartureBoards = useInDepartureBoards;
-}
-
-
-
-
-bool 
-Line::getUseInTimetables () const
-{
-    return _useInTimetables;
-}
-
-
-
-void 
-Line::setUseInTimetables (bool useInTimetables)
-{
-    _useInTimetables = useInTimetables;
-}
-
-
-
-
-bool 
-Line::getUseInRoutePlanning () const
-{
-    return _useInRoutePlanning;
-}
-
-
-
-
-void 
-Line::setUseInRoutePlanning (bool useInRoutePlanning)
-{
-    _useInRoutePlanning = useInRoutePlanning;
-}
-
-
-
-
-
-const Axis* 
-Line::getAxis () const
-{
-    return _axis;
-}
-
-
-
-
-
-
-const std::string& 
-Line::getDirection () const
-{
-    return _direction;
-}
-
-
-
-void 
-Line::setDirection (const std::string& direction)
-{
-    _direction = direction;
-}
-
-
-
-const std::string& 
-Line::getTimetableName () const
-{
-    return _timetableName;
-}
-
-
-
-void 
-Line::setTimetableName (const std::string& timetableName)
-{
-    _timetableName = timetableName;
-}
-
-
-
-
-
-const TransportNetwork* 
-Line::getNetwork () const
-{
-    return _commercialLine->getNetwork();
-}
-
-
-
-const uid&
-Line::getRollingStockId () const
-{
-    return _rollingStockId;
-}
-
-
-
-void 
-Line::setRollingStockId (const uid& rollingStockId)
-{
-    _rollingStockId = rollingStockId;
-}
-
-
-
-
-
-
-
-void
-Line::setWalkingLine (bool isWalkingLine)
-{
-    _isWalkingLine = isWalkingLine;
-}
-
-
-
-bool 
-Line::getWalkingLine () const
-{
-    return _isWalkingLine;
-}
-
-
-bool 
-Line::isRoad () const
-{
-    return false;
-}
-
-
-
-bool 
-Line::isLine () const
-{
-    return true;
-}
-
-
-
-
-const uid& 
-Line::getId () const
-{
-    return synthese::util::Registrable<uid,Line>::getKey();
-}
-
-PhysicalStop* Line::getDestination() const
-{
-	Edge* edge = getLastEdge();
-	return (PhysicalStop*) edge->getFromVertex();
-}
-
-void Line::setAxis( const Axis* axis )
-{
-	_axis = axis;
-}
-
-}
-}
-

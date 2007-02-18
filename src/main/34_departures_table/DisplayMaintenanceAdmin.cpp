@@ -40,9 +40,8 @@ namespace synthese
 
 	namespace departurestable
 	{
-		/// @todo Verify the parent constructor parameters
 		DisplayMaintenanceAdmin::DisplayMaintenanceAdmin()
-			: AdminInterfaceElement("superior", AdminInterfaceElement::EVER_DISPLAYED)
+			: AdminInterfaceElement("displays", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
 			, _displayScreen(NULL)
 		{}
 
@@ -64,7 +63,7 @@ namespace synthese
 
 		string DisplayMaintenanceAdmin::getTitle() const
 		{
-			return "Supervision " + _displayScreen->getFullName();
+			return "Supervision de " + _displayScreen->getFullName();
 		}
 
 		void DisplayMaintenanceAdmin::display(ostream& stream, const AdminRequest* request) const

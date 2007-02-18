@@ -26,14 +26,12 @@
 
 #include "Address.h"
 #include "ConnectionPlace.h"
-#include "ContinuousService.h"
 #include "Document.h"
 #include "LineStop.h"
 #include "PlaceAlias.h"
 #include "PublicPlace.h"
 #include "RoadChunk.h"
 #include "Road.h"
-#include "ScheduledService.h"
 #include "ReservationRule.h"
 #include "TransportNetwork.h"
 
@@ -75,14 +73,12 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     Address::Registry _addresses;
     City::Registry _cities;
     ConnectionPlace::Registry _connectionPlaces;
-    ContinuousService::Registry _continuousServices;
     Document::Registry _documents;
     CommercialLine::Registry _lines;
     PlaceAlias::Registry _placeAliases; 
     PublicPlace::Registry _publicPlaces;
     RoadChunk::Registry _roadChunks;
     Road::Registry _roads;
-    ScheduledService::Registry _scheduledServices;
     TransportNetwork::Registry _transportNetworks;
     
     synthese::lexmatcher::LexicalMatcher<uid> _citiesMatcher;
@@ -133,12 +129,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     Road::Registry& getRoads ();
     const Road::Registry& getRoads () const;
 
-    ScheduledService::Registry& getScheduledServices ();
-    const ScheduledService::Registry& getScheduledServices () const;
-
-    ContinuousService::Registry& getContinuousServices ();
-    const ContinuousService::Registry& getContinuousServices () const;
-
     TransportNetwork::Registry& getTransportNetworks ();
     const TransportNetwork::Registry& getTransportNetworks () const;
 
@@ -165,8 +155,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     const Place* fetchPlace (const uid& id) const;
     
-    const Service* fetchService (const uid& id) const;
-    Service* fetchService (const uid& id);
 
 	/** To be moved in EnvModule */
     const Vertex* fetchVertex (const uid& id) const;

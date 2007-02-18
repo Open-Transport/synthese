@@ -39,6 +39,10 @@ ReservationRuleComplyer::setReservationRule (ReservationRule* reservationRule)
     _reservationRule = reservationRule;
 }
 
+void ReservationRuleComplyer::setParent( const ReservationRuleComplyer* parent )
+{
+	_parent = parent;
+}
 
 
 

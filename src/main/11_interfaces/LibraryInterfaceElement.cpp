@@ -18,8 +18,9 @@ namespace synthese
 
 			for (start_pos = 0; start_pos < text.size() && text[start_pos] == ' '; ++start_pos);
 
+			// Empty line : return null
 			if (start_pos >= text.size())
-				throw InterfacePageException("Parse error : empty line");
+				return NULL;
 
 			// Search for the end of the keyword
 			size_t word_end_pos = start_pos;

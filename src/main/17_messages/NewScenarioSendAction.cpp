@@ -59,6 +59,7 @@ namespace synthese
 
 				_template = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
 				
+				map.insert(make_pair(Request::PARAMETER_OBJECT_ID, Conversion::ToString(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)));
 			}
 			catch (Scenario::RegistryKeyException e)
 			{

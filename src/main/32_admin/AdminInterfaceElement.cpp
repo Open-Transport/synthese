@@ -59,6 +59,11 @@ namespace synthese
 			delete linkRequest;
 			return str.str();
 		}
+
+		void AdminInterfaceElement::setSuperior( const std::string& superior )
+		{
+			_superior = superior;
+		}
 	}
 }
 

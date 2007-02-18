@@ -44,6 +44,7 @@ public:
     //@{
     const PedestrianCompliance* getPedestrianCompliance () const;
     void setPedestrianCompliance (PedestrianCompliance* pedestrianCompliance);
+	void	setParent(PedestrianComplyer* parent);
     //@}
 
     //! @name Query methods.

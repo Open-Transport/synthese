@@ -1,6 +1,27 @@
+
+/** Line class header.
+	@file Line.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_ENV_LINE_H
 #define SYNTHESE_ENV_LINE_H
-
 
 #include <vector>
 #include <string>
@@ -9,7 +30,6 @@
 #include "01_util/UId.h"
 
 #include "15_env/Path.h"
-
 
 namespace synthese
 {
@@ -72,66 +92,55 @@ namespace synthese
 
 
 
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
-			const uid& getId () const;
-
-			const std::string& getName () const;
-			void setName (const std::string& name);
-
-			bool getUseInDepartureBoards () const;
-			void setUseInDepartureBoards (bool useInDepartureBoards);
-
-			bool getUseInTimetables () const;
-			void setUseInTimetables (bool useInTimetables);
-
-			bool getUseInRoutePlanning () const;
-			void setUseInRoutePlanning (bool useInRoutePlanning);
-
-			const Axis* getAxis () const;
-			void setAxis(const Axis* axis);
-
-			const std::string& getDirection () const;
-			void setDirection (const std::string& direction);
-
-			const std::string& getTimetableName () const;
-			void setTimetableName (const std::string& timetableName);
-
-			const TransportNetwork* getNetwork () const;
-			
-			const uid& getRollingStockId () const;
-			void setRollingStockId (const uid& id);
-
-			bool getWalkingLine () const;
-			void setWalkingLine (bool isWalkingLine);
-		    
+				const uid&				getId ()					const;
+				const std::string&		getName ()					const;
+				bool					getUseInDepartureBoards ()	const;
+				bool					getUseInTimetables ()		const;
+				bool					getUseInRoutePlanning ()	const;
+				const Axis*				getAxis ()					const;
+				const std::string&		getDirection ()				const;
+				const std::string&		getTimetableName ()			const;
+				const TransportNetwork* getNetwork ()				const;
+				const uid&				getRollingStockId ()		const;
+				bool					getWalkingLine ()			const;
+				const CommercialLine*	getCommercialLine()			const;
 			//@}
 
+
+			//! @name Setters
+			//@{
+				void setUseInDepartureBoards (bool useInDepartureBoards);
+				void setName (const std::string& name);
+				void setWalkingLine (bool isWalkingLine);
+				void setRollingStockId (const uid& id);
+				void setTimetableName (const std::string& timetableName);
+				void setDirection (const std::string& direction);
+				void setAxis(const Axis* axis);
+				void setUseInRoutePlanning (bool useInRoutePlanning);
+				void setUseInTimetables (bool useInTimetables);
+				void setCommercialLine(const CommercialLine* commercialLine);
+			//@}
 
 
 
 			//! @name Update methods
 			//@{
+			//@}
 		    
 			//! @name Query methods
 			//@{
+				bool isRoad () const;
+				bool isLine () const;
 
-			bool isRoad () const;
-			bool isLine () const;
+				bool isReservable () const;
 
-			bool isReservable () const;
-
-			PhysicalStop* getDestination() const;
-
+				PhysicalStop* getDestination() const;
 			//@}
 		    
-		    
 		};
-
-
 	}
 }
 
-
 #endif
-

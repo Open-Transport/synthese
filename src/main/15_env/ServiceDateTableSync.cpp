@@ -1,103 +1,128 @@
-#include "ServiceDateTableSync.h"
+
+/** ServiceDateTableSync class implementation.
+	@file ServiceDateTableSync.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include <sstream>
 
 #include "01_util/Conversion.h"
-#include "01_util/UId.h"
+
+#include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLiteException.h"
+
 #include "04_time/Date.h"
 
-#include "15_env/Service.h"
+#include "15_env/ServiceDate.h"
+#include "15_env/ServiceDateTableSync.h"
+#include "15_env/EnvModule.h"
 
-#include <sqlite/sqlite3.h>
-
-#include "assert.h"
-
-
-
-using synthese::util::Conversion;
-using synthese::db::SQLiteResult;
-using synthese::time::Date;
+using namespace std;
 
 namespace synthese
 {
-namespace env
-{
+	using namespace db;
+	using namespace util;
+	using namespace env;
+	using namespace time;
+
+	namespace db
+	{
+		template<> const std::string SQLiteTableSyncTemplate<ServiceDate>::TABLE_NAME = "t005_service_dates";
+		template<> const int SQLiteTableSyncTemplate<ServiceDate>::TABLE_ID = 5;
+		template<> const bool SQLiteTableSyncTemplate<ServiceDate>::HAS_AUTO_INCREMENT = true;
+
+		template<> void SQLiteTableSyncTemplate<ServiceDate>::load(ServiceDate* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		{
+			object->key = Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID));
+			object->service = EnvModule::fetchService(Conversion::ToLongLong(rows.getColumn(rowId, ServiceDateTableSync::COL_SERVICEID)));
+			object->date = Date::FromSQLDate(rows.getColumn(rowId, ServiceDateTableSync::COL_DATE));
+		}
+
+		template<> void SQLiteTableSyncTemplate<ServiceDate>::save(ServiceDate* object)
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			if (object->key <= 0)
+				object->key = getId(1,1);	/// @todo Use grid ID
+               
+			 query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->key)
+				<< "," << Conversion::ToString(object->service->getId())
+				<< "," << object->date.toSQLString()
+				<< ")";
+			sqlite->execUpdate(query.str());
+		}
+
+	}
+
+	namespace env
+	{
+		const std::string ServiceDateTableSync::COL_SERVICEID ("service_id");
+		const std::string ServiceDateTableSync::COL_DATE("date");
+
+		ServiceDateTableSync::ServiceDateTableSync()
+			: SQLiteTableSyncTemplate<ServiceDate>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+		{
+			addTableColumn(TABLE_COL_ID, "INTEGER", false);
+			addTableColumn (COL_SERVICEID, "INTEGER", false);
+			addTableColumn (COL_DATE , "DATE", false);
+		}
+
+		void ServiceDateTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				_updateServiceCalendar (rows, i, true);
+			}
+		}
+		
+		void ServiceDateTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		{
+		}
+
+		void ServiceDateTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				_updateServiceCalendar (rows, i, false);
+			}
+		}
 
 
+		void ServiceDateTableSync::_updateServiceCalendar (const SQLiteResult& rows, int rowIndex, bool marked) 
+		{
+			// Get the corresponding calendar
+			uid serviceId = Conversion::ToLongLong (rows.getColumn (rowIndex, COL_SERVICEID));
 
-ServiceDateTableSync::ServiceDateTableSync ()
-: ComponentTableSync (SERVICEDATES_TABLE_NAME, true, true, db::TRIGGERS_ENABLED_CLAUSE)
-{
-    addTableColumn (SERVICEDATES_TABLE_COL_SERVICEID, "INTEGER", false);
-    addTableColumn (SERVICEDATES_TABLE_COL_DATE , "DATE", false);
+			Service* service = EnvModule::fetchService (serviceId);
+			assert (service != 0);
+
+			// Mark the date in service calendar
+			Date newDate = Date::FromSQLDate (rows.getColumn (rowIndex, COL_DATE));
+			service->getCalendar ().mark (newDate, marked);
+
+			//environment.updateMinMaxDatesInUse (newDate, marked);
+
+		}
+	}
 }
-
-
-
-ServiceDateTableSync::~ServiceDateTableSync ()
-{
-
-}
-
-
-
-
-void 
-ServiceDateTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-			     synthese::env::Environment& environment)
-{
-    updateServiceCalendar (rows, rowIndex, environment, true);
-}
-
-
-
-void 
-ServiceDateTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
-			  synthese::env::Environment& environment)
-{
-    // Cannot happen (trigger).
-    assert (false);
-}
-
-
-
-void 
-ServiceDateTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
-			 synthese::env::Environment& environment)
-{
-    updateServiceCalendar (rows, rowIndex, environment, false);
-}
-
-
-void 
-ServiceDateTableSync::updateServiceCalendar (const synthese::db::SQLiteResult& rows, int rowIndex,
-					     synthese::env::Environment& environment,
-					     bool marked) 
-{
-    // Get the corresponding calendar
-    uid serviceId = Conversion::ToLongLong (rows.getColumn (rowIndex, SERVICEDATES_TABLE_COL_SERVICEID));
-
-    Service* service = environment.fetchService (serviceId);
-    assert (service != 0);
-
-    // Mark the date in service calendar
-    Date newDate = Date::FromSQLDate (rows.getColumn (rowIndex, SERVICEDATES_TABLE_COL_DATE));
-    service->getCalendar ().mark (newDate, marked);
-
-    environment.updateMinMaxDatesInUse (newDate, marked);
-    
-}
-    
-
-
-
-
-
-
-
-
-
-}
-
-}
-

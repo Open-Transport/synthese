@@ -57,6 +57,9 @@ namespace synthese
 			if (it == map.end())
 				throw AdminParametersException("Missing message ID");
 
+			if (Conversion::ToLongLong(it->second) == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				return;
+
 			if (!MessagesModule::getAlarms().contains(Conversion::ToLongLong(it->second)))
 				throw AdminParametersException("Invalid message ID");
 			

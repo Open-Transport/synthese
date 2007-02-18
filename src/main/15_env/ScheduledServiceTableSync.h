@@ -1,65 +1,99 @@
-#ifndef SYNTHESE_ENVLSSQL_SCHEDULEDSERVICETABLESYNC_H
-#define SYNTHESE_ENVLSSQL_SCHEDULEDSERVICETABLESYNC_H
+
+/** ScheduledServiceTableSync class header.
+	@file ScheduledServiceTableSync.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#ifndef SYNTHESE_ScheduledServiceTableSync_H__
+#define SYNTHESE_ScheduledServiceTableSync_H__
 
 
+#include <vector>
 #include <string>
 #include <iostream>
 
-#include "ComponentTableSync.h"
-
-
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
+	namespace env
+	{
+		class ScheduledService;
 
-namespace env
-{
-	class ScheduledService;
-
-/** ScheduledService SQLite table synchronizer.
-	@ingroup m15
-*/
-class ScheduledServiceTableSync : public ComponentTableSync
-{
- public:
-
-    ScheduledServiceTableSync ();
-    ~ScheduledServiceTableSync ();
-
- protected:
-
-    void doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-		synthese::env::Environment& target);
-
-    void doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
-		    synthese::env::Environment& target);
-
-    void doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
-		   synthese::env::Environment& target);
+		/** ScheduledService table synchronizer.
+			@ingroup m15
+		*/
+		class ScheduledServiceTableSync : public db::SQLiteTableSyncTemplate<ScheduledService>
+		{
+		public:
+			static const std::string COL_SERVICENUMBER;
+			static const std::string COL_SCHEDULES;
+			static const std::string COL_PATHID;
+			static const std::string COL_RANKINPATH;
+			static const std::string COL_BIKECOMPLIANCEID;
+			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
+			static const std::string COL_PEDESTRIANCOMPLIANCEID;
+			static const std::string COL_RESERVATIONRULEID;
+			
+			ScheduledServiceTableSync();
+			~ScheduledServiceTableSync();
 
 
- private:
-
-};
-
-
-
-
-static const std::string SCHEDULEDSERVICES_TABLE_NAME ("t016_scheduled_services");
-static const std::string SCHEDULEDSERVICES_TABLE_COL_SERVICENUMBER ("service_number");
-static const std::string SCHEDULEDSERVICES_TABLE_COL_SCHEDULES ("schedules");
-static const std::string SCHEDULEDSERVICES_TABLE_COL_PATHID ("path_id");
-static const std::string SCHEDULEDSERVICES_TABLE_COL_RANKINPATH ("rank_in_path");
-static const std::string SCHEDULEDSERVICES_TABLE_COL_BIKECOMPLIANCEID ("bike_compliance_id");
-static const std::string SCHEDULEDSERVICES_TABLE_COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-static const std::string SCHEDULEDSERVICES_TABLE_COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-static const std::string SCHEDULEDSERVICES_TABLE_COL_RESERVATIONRULEID ("reservation_rule_id");
+			/** ScheduledService search.
+				(other search parameters)
+				@param first First ScheduledService object to answer
+				@param number Number of ScheduledService objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return vector<ScheduledService*> Founded ScheduledService objects.
+				@author Hugues Romain
+				@date 2006
+			*/
+			static std::vector<ScheduledService*> search(
+				// other search parameters ,
+				int first = 0, int number = 0);
 
 
+		protected:
 
+			/** Action to do on ScheduledService creation.
+				This method loads a new object in ram.
+			*/
+			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
 
+			/** Action to do on ScheduledService creation.
+				This method updates the corresponding object in ram.
+			*/
+			void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
+
+			/** Action to do on ScheduledService deletion.
+				This method deletes the corresponding object in ram and runs 
+				all necessary cleaning actions.
+			*/
+			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync,
+				const db::SQLiteResult& rows);
+
+		};
+	}
 }
 
-}
-#endif
-
+#endif // SYNTHESE_ScheduledServiceTableSync_H__

@@ -44,6 +44,7 @@ public:
     //@{
     const HandicappedCompliance* getHandicappedCompliance () const;
     void setHandicappedCompliance (HandicappedCompliance* handicappedCompliance);
+	void	setParent(HandicappedComplyer*	parent);
     //@}
 
     //! @name Query methods.

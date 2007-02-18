@@ -119,13 +119,13 @@ namespace synthese
 			AdminRequest* newMessageRequest = Factory<Request>::create<AdminRequest>();
 			newMessageRequest->copy(request);
 			newMessageRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
-			newMessageRequest->setAction(Factory<AdminInterfaceElement>::create<NewMessageAction>());
+			newMessageRequest->setAction(Factory<Action>::create<NewMessageAction>());
 			newMessageRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
 
 			AdminRequest* newScenarioRequest = Factory<Request>::create<AdminRequest>();
 			newScenarioRequest->copy(request);
 			newScenarioRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioSendAdmin>());
-			newScenarioRequest->setAction(Factory<AdminInterfaceElement>::create<NewScenarioSendAction>());
+			newScenarioRequest->setAction(Factory<Action>::create<NewScenarioSendAction>());
 			newScenarioRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
 
 			stream

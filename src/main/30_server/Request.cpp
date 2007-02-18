@@ -29,6 +29,7 @@
 #include "01_util/FactoryException.h"
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
+#include "01_util/Html.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/ServerModule.h"
@@ -59,12 +60,14 @@ namespace synthese
 		const std::string Request::PARAMETER_ACTION_FAILED = "raf";
 		const std::string Request::PARAMETER_ERROR_MESSAGE = "rem";
 		const std::string Request::PARAMETER_ERROR_LEVEL = "rel";
+		const uid Request::UID_WILL_BE_GENERATED_BY_THE_ACTION = -2;
 
 		Request::Request()
 			: _session(NULL)
 			, _action(NULL)
 			, _actionException(false)
 			, _errorLevel(REQUEST_ERROR_NONE)
+			, _object_id(0)
 		{
 		}
 
@@ -355,13 +358,11 @@ namespace synthese
 		{
 			std::stringstream str;
 			str	<< "<form name=\"" << name << "\" action=\"" << _clientURL << "\" method=\"post\">"
-				<< "<input type=\"hidden\" name=\"" << PARAMETER_FUNCTION << "\" value=\"" << getFactoryKey() << "\" />";
+				<< Html::getHiddenInput(PARAMETER_FUNCTION, getFactoryKey());
 			if (_session != NULL)
-				str << "<input type=\"hidden\" name=\"" << PARAMETER_SESSION << "\" value=\"" << _session->getKey() << "\" />";
+				str << Html::getHiddenInput(PARAMETER_SESSION, Conversion::ToString(_session->getKey()));
 			if (_action != NULL)
-			{
-				str << "<input type=\"hidden\" name=\"" << Action::PARAMETER_ACTION << "\" value=\"" << _action->getFactoryKey() << "\" />";
-			}
+				str << Html::getHiddenInput(Action::PARAMETER_ACTION, _action->getFactoryKey());
 			return str.str();
 		}
 

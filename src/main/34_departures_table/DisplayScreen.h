@@ -156,13 +156,16 @@ namespace synthese
 				void	setServiceNumberDisplay(bool value);
 				void	clearPhysicalStops();
 				void	addPhysicalStop(const env::PhysicalStop*);
+				void	removePhysicalStop(const env::PhysicalStop*);
 				void	setAllPhysicalStopsDisplayed(bool value);
 				void	clearForbiddenPlaces();
 				void	addForbiddenPlace(const env::ConnectionPlace*);
+				void	removeForbiddenPlace(const env::ConnectionPlace*);
 				void	setDirection(DeparturesTableDirection direction);
 				void	setOriginsOnly(EndFilter);
 				void	clearDisplayedPlaces();
 				void	addDisplayedPlace(const env::ConnectionPlace*);
+				void	removeDisplayedPlace(const env::ConnectionPlace*);
 				void	setMaxDelay(int);
 				void	setClearingDelay(int delay);
 				void	setFirstRow(int row);

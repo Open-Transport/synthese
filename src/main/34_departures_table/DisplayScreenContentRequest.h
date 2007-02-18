@@ -59,6 +59,8 @@ namespace synthese
 			DisplayScreenContentRequest();
 			~DisplayScreenContentRequest();
 
+			std::string getHTMLFormHeader(const std::string& name) const;
+
 			/** Action to run, defined by each subclass.
 			*/
 			void run(std::ostream& stream) const;

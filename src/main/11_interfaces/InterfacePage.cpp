@@ -48,6 +48,8 @@ namespace synthese
 				try
 				{
 					lie = LibraryInterfaceElement::create(line, this);
+					if (lie == NULL)
+						continue;
 				}
 				// Jump interface elements with parse errors
 				catch (InterfacePageException e)

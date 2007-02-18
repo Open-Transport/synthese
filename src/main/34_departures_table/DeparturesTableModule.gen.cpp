@@ -1,6 +1,10 @@
 
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableInterfaceElement>("departurestable");
+synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableTimeContentInterfaceElement>("departurestabletimecell");
+synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableLineContentInterfaceElement>("departurestablelinecell");
+synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableDestinationContentInterfaceElement>("departurestabledestinationcell");
 
+synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::departurestable::DeparturesTableInterfacePage>("departurestable");
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::departurestable::DepartureTableRowInterfacePage>("departurestablerow");
 
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::departurestable::DisplaySearchAdmin>("displays");
@@ -30,6 +34,10 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::departure
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::AddForbiddenPlaceToDisplayScreen>("afptdsa");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayPreselectionParametersAction>("udpp");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenAddDisplayedPlace>("dsadp");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenRemovePhysicalStopAction>("dsrps");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenRemoveDisplayedPlaceAction>("dsrdp");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenRemoveForbiddenPlaceAction>("dsrfp");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayMaintenanceAction>("udm");
 
 
 synthese::util::Factory<synthese::server::Request>::integrate<synthese::departurestable::DisplayScreenContentRequest>("tdg");

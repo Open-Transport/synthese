@@ -50,6 +50,8 @@ namespace synthese
 			, PedestrianComplyer (0) // No parent complyer right now
 			, ReservationRuleComplyer (0) // No parent complyer right now
 			, _calendar ()
+			, _fare(NULL)
+			, _alarm(NULL)
 		{
 		}
 		    
@@ -131,23 +133,23 @@ namespace synthese
 				const std::vector<synthese::time::Schedule>& departureSchedules,
 				const std::vector<synthese::time::Schedule>& arrivalSchedules)
 		{
-			std::pair<ServiceSet::iterator, bool> result = 
-			_services.insert (service);
+			if (_services.find(service) != _services.end())
+				throw Exception("toto");
+
+			std::pair<ServiceSet::iterator, bool> result = _services.insert (service);
 			if (result.second == false)
 			{
-			throw Exception ("Service number " + Conversion::ToString (service->getServiceNumber ())
-						+ " is already defined in path " + 
-						Conversion::ToString (getId ()));
+				throw Exception ("Service number " + Conversion::ToString (service->getServiceNumber ())
+						+ " is already defined in path " + Conversion::ToString (getId ()));
 			}
-		    
+			
 			// Otherwise updates each edge
 			int index = distance (_services.begin (), result.first);
 			for (int i=0; i<_edges.size (); ++i)
 			{
-			_edges[i]->insertDepartureSchedule (index, departureSchedules.at (i));
-			_edges[i]->insertArrivalSchedule (index, arrivalSchedules.at (i));
+				_edges[i]->insertDepartureSchedule (index, departureSchedules.at (i));
+				_edges[i]->insertArrivalSchedule (index, arrivalSchedules.at (i));
 			}
-
 		}
 
 

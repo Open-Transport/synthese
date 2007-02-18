@@ -103,12 +103,6 @@
 				RelativePath=".\ConnectionPlace.h">
 			</File>
 			<File
-				RelativePath=".\ContinuousService.cpp">
-			</File>
-			<File
-				RelativePath=".\ContinuousService.h">
-			</File>
-			<File
 				RelativePath=".\Crossing.cpp">
 			</File>
 			<File
@@ -277,18 +271,6 @@
 				RelativePath=".\RollingStock.h">
 			</File>
 			<File
-				RelativePath=".\ScheduledService.cpp">
-			</File>
-			<File
-				RelativePath=".\ScheduledService.h">
-			</File>
-			<File
-				RelativePath=".\Service.cpp">
-			</File>
-			<File
-				RelativePath=".\Service.h">
-			</File>
-			<File
 				RelativePath=".\SquareDistance.cpp">
 			</File>
 			<File
@@ -318,6 +300,31 @@
 			<File
 				RelativePath=".\VertexAccessMap.h">
 			</File>
+			<Filter
+				Name="Service"
+				Filter="">
+				<File
+					RelativePath=".\ContinuousService.cpp">
+				</File>
+				<File
+					RelativePath=".\ContinuousService.h">
+				</File>
+				<File
+					RelativePath=".\ScheduledService.cpp">
+				</File>
+				<File
+					RelativePath=".\ScheduledService.h">
+				</File>
+				<File
+					RelativePath=".\Service.cpp">
+				</File>
+				<File
+					RelativePath=".\Service.h">
+				</File>
+				<File
+					RelativePath=".\ServiceDate.h">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="LibraryInterfaceElement"

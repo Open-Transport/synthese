@@ -121,7 +121,7 @@ namespace synthese
 			{
 			case STANDARD_METHOD:
 				return (ArrivalDepartureTableGenerator*) new StandardArrivalDepartureTableGenerator(
-					_physicalStops
+					getPhysicalStops()
 					, _direction
 					, _originsOnly
 					, _forbiddenLines
@@ -134,7 +134,7 @@ namespace synthese
 
 			case WITH_FORCED_DESTINATIONS_METHOD:
 				return (ArrivalDepartureTableGenerator*) new ForcedDestinationsArrivalDepartureTableGenerator(
-					_physicalStops
+					getPhysicalStops()
 					, _direction
 					, _originsOnly
 					, _forbiddenLines
@@ -435,6 +435,27 @@ namespace synthese
 		void DisplayScreen::clearForcedDestinations()
 		{
 			_forcedDestinations.clear();
+		}
+
+		void DisplayScreen::removePhysicalStop( const env::PhysicalStop* stop)
+		{
+			PhysicalStopsSet::iterator it = _physicalStops.find(stop);
+			if (it != _physicalStops.end())
+				_physicalStops.erase(it);
+		}
+
+		void DisplayScreen::removeDisplayedPlace( const env::ConnectionPlace* place)
+		{
+			DisplayedPlacesList::iterator it = _displayedPlaces.find(place);
+			if (it != _displayedPlaces.end())
+				_displayedPlaces.erase(it);
+		}
+
+		void DisplayScreen::removeForbiddenPlace( const env::ConnectionPlace* place)
+		{
+			DisplayedPlacesList::iterator it = _forbiddenArrivalPlaces.find(place);
+			if (it != _forbiddenArrivalPlaces.end())
+				_forbiddenArrivalPlaces.erase(it);
 		}
 
 	}

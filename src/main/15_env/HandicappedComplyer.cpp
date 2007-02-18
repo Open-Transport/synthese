@@ -40,6 +40,10 @@ HandicappedComplyer::setHandicappedCompliance (HandicappedCompliance* handicappe
     _handicappedCompliance = handicappedCompliance;
 }
 
+void HandicappedComplyer::setParent( HandicappedComplyer* parent )
+{
+	_parent = parent;
+}
 
 
 

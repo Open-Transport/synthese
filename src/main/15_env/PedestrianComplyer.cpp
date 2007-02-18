@@ -40,6 +40,10 @@ PedestrianComplyer::setPedestrianCompliance (PedestrianCompliance* pedestrianCom
     _pedestrianCompliance = pedestrianCompliance;
 }
 
+void PedestrianComplyer::setParent( PedestrianComplyer* parent )
+{
+	_parent = parent;
+}
 
 
 

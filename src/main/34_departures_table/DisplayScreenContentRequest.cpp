@@ -20,7 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <sstream>
+
 #include "01_util/Conversion.h"
+#include "01_util/Html.h"
 
 #include "30_server/RequestException.h"
 
@@ -48,6 +51,7 @@ namespace synthese
 		Request::ParametersMap DisplayScreenContentRequest::getParametersMap() const
 		{
 			Request::ParametersMap map;
+			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_screen->getKey())));
 			map.insert(make_pair(PARAMETER_DATE, _date.toInternalString()));
 			return map;
 		}
@@ -78,6 +82,15 @@ namespace synthese
 
 		DisplayScreenContentRequest::~DisplayScreenContentRequest()
 		{
+		}
+
+		std::string DisplayScreenContentRequest::getHTMLFormHeader( const std::string& name ) const
+		{
+			stringstream s;
+			s << Request::getHTMLFormHeader(name);
+			if (getObjectId())
+				s << Html::getHiddenInput(PARAMETER_OBJECT_ID, Conversion::ToString(getObjectId()));
+			return s.str();
 		}
 	}
 }

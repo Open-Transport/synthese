@@ -51,6 +51,7 @@ namespace synthese
 		}
 
 
+		/** @todo to be moved elsewhere because the interface is not necessarily an html interface */
 		bool RequestWithInterface::runAfterAction(ostream& stream)
 		{
 			_action = NULL;
