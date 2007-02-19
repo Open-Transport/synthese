@@ -45,6 +45,7 @@ namespace synthese
 			InterfacePage()
 				: DisplayableElement() 
 			{ }
+			virtual ~InterfacePage();
 
 			void parse( const std::string& text );
 

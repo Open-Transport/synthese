@@ -133,14 +133,13 @@ namespace synthese
 
 			ss->setPath(path);
 			ss->setDepartureSchedule(departureSchedules.at (0));
+			ss->setArrivalSchedule(arrivalSchedules.at(arrivalSchedules.size()-1));
 			ss->setServiceNumber(serviceNumber);
 			ss->setKey(id);
 			ss->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
 			ss->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
 			ss->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
 			ss->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId)); 
-if (((Line*) ss->getPath())->getName() == "MP/TLS/014/27")
-	ss->setKey(id);
 			ss->getPath()->addService(ss, departureSchedules, arrivalSchedules);
 		}
 

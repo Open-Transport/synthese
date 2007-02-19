@@ -261,6 +261,12 @@ Schedule::FromString (const std::string& str)
 	);
 }
 
+bool operator==( const Schedule& op1, const Schedule& op2 )
+{
+	return
+		op1.getDaysSinceDeparture() == op2.getDaysSinceDeparture()
+		&& op1.getHour() == op2.getHour();
+}
 
 
 

@@ -90,13 +90,13 @@ namespace synthese
 						@return A pointer to the existing wanted page in the interface definition (do not delete the pointer)
 						@exception InterfacePageException The code is not available in the factory
 					*/
-					InterfacePage* getPage( const std::string& key) const;
+					InterfacePage* const getPage( const std::string& key) const;
 
 					/** Builds a new page from the class name.
 						@exception Factory<InterfacePage> The page is not implemented or declared in the factory init. (should not occur in production environment)
 					*/
 					template <class T>
-					const T* getPage() const
+					const T* const getPage() const
 					{
 						std::string key = synthese::util::Factory<InterfacePage>::getKey<T>();
 						return dynamic_cast<const T*>( getPage(key) );

@@ -112,9 +112,8 @@ namespace synthese
 						: (1 + __NumeroPage % __NombrePagesRangee);     // 1 : Numero de page
 
 					// Lancement de l'affichage de la rangee
-					const DepartureTableRowInterfacePage* page = _page->getInterface()->getPage<DepartureTableRowInterfacePage>();
+					const DepartureTableRowInterfacePage* const page = _page->getInterface()->getPage<DepartureTableRowInterfacePage>();
 					page->display(stream, __Rangee, pageNumber, &___DP, request);
-					delete page;
 
 					// Incrementation du numero de rangee
 					__Rangee += __MultiplicateurRangee;

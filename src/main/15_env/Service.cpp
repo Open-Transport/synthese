@@ -143,7 +143,12 @@ namespace synthese
 
 		const Schedule& Service::getLastArrivalSchedule() const
 		{
-			return getPath()->getLastEdge()->getArrivalEndSchedule(_serviceNumber);
+			return _arrivalSchedule;
+		}
+
+		void Service::setArrivalSchedule( const synthese::time::Schedule& schedule )
+		{
+			_arrivalSchedule = schedule;
 		}
 	}
 }

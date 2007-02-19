@@ -352,6 +352,24 @@
 				RelativePath=".\CityNameValueInterfaceElement.h">
 			</File>
 			<File
+				RelativePath=".\LineImageURLInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\LineImageURLInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\LineShortNameInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\LineShortNameInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\LineStyleInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\LineStyleInterfaceElement.h">
+			</File>
+			<File
 				RelativePath=".\LogicalStopNameValueInterfaceElement.cpp">
 			</File>
 			<File

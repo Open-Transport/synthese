@@ -50,7 +50,7 @@ namespace synthese
 			// Collecte des param�tres
 			const Journey* __Trajet = ( const Journey* ) object;
 			bool __AfficherLignesPied = Conversion::ToBool(_displayPedestrianLines->getValue(parameters));
-			const LineMarkerInterfacePage* lineMarkerInterfacePage = site->getInterface()->getPage<LineMarkerInterfacePage>();
+			const LineMarkerInterfacePage* const lineMarkerInterfacePage = site->getInterface()->getPage<LineMarkerInterfacePage>();
 
 			// Fabrication de l'affichage
 			for (int l=0; l<__Trajet->getJourneyLegCount (); ++l)

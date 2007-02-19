@@ -117,8 +117,7 @@ namespace synthese
 			{
 				if (_interface != NULL)
 				{
-					const AdminInterfacePage* aip;
-					aip = _interface->getPage<AdminInterfacePage>();
+					const AdminInterfacePage* const aip = _interface->getPage<AdminInterfacePage>();
 					aip->display(stream, _page, _object_id, this);
 				}
 				else

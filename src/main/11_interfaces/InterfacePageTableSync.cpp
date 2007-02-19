@@ -35,7 +35,7 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				InterfacePage* page = 
+				InterfacePage* const page = 
 					InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE)))
 					->getPage(rows.getColumn(i, TABLE_COL_PAGE));
 				page->parse( rows.getColumn(i, TABLE_COL_CONTENT ) );

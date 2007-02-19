@@ -84,7 +84,7 @@ namespace synthese
 				stream << __AvantSiImminent;
 			if ( __Moment.getHour ().getHours() < 10 )
 				stream << __Zero;
-			stream << __Moment.getHour ();
+			stream << __Moment.getHour ().toString();
 			if ( __Duree <= 1 )
 				stream << __ApresSiImminent;
 		}

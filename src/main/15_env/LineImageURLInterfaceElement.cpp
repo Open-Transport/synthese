@@ -1,6 +1,6 @@
 
-/** DepartureTableRowInterfacePage class implementation.
-	@file DepartureTableRowInterfacePage.cpp
+/** LineImageURLInterfaceElement class implementation.
+	@file LineImageURLInterfaceElement.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,33 +20,34 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <string>
+
+#include "01_util/UId.h"
 #include "01_util/Conversion.h"
 
-#include "DepartureTableRowInterfacePage.h"
+#include "11_interfaces/Interface.h"
+#include "11_interfaces/ValueElementList.h"
+
+#include "15_env/Line.h"
+#include "15_env/CommercialLine.h"
+#include "15_env/LineImageURLInterfaceElement.h"
 
 namespace synthese
 {
-	using util::Conversion;
 	using namespace interfaces;
+	using namespace util;
+	using std::string;
 
-	namespace departurestable
+	namespace env
 	{
-		void DepartureTableRowInterfacePage::display(std::ostream& stream
-				, int rowId
-				, int pageNumber
-				, const ArrivalDepartureRow* ptd
-				, const server::Request* request) const
+		string LineImageURLInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
 		{
-			ParametersVector parameters;
-			parameters.push_back(Conversion::ToString(rowId));
-			parameters.push_back(Conversion::ToString(pageNumber));
-
-			InterfacePage::display(stream, parameters, (const void*) ptd, request);
+			return (object != NULL) ? ((Line*) object)->getCommercialLine()->getImage() : "";
 		}
 
-		DepartureTableRowInterfacePage::~DepartureTableRowInterfacePage()
+		void LineImageURLInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-		
 		}
 	}
+
 }

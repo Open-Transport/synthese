@@ -3,6 +3,9 @@ synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese
 
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LogicalStopNameValueInterfaceElement>("stop_name");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::CityNameValueInterfaceElement>("city_name");
+synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LineStyleInterfaceElement>("line_style");
+synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LineShortNameInterfaceElement>("line_short_name");
+synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LineImageURLInterfaceElement>("line_image");
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::EnvironmentTableSync>("15.00.00 Environments");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::EnvironmentLinkTableSync>("15.00.01 Environments Links");

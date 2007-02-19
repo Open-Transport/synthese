@@ -79,6 +79,7 @@ namespace synthese
 			Calendar		_calendar;  //!< Which days is this service available ?
 			Path*			_path;
 			time::Schedule	_departureSchedule; //!< Service departure schedule (from the origin).
+			time::Schedule	_arrivalSchedule;
 		    
 		public:
 
@@ -102,6 +103,11 @@ namespace synthese
 						departure schedule.
 				*/
 				const time::Schedule& getDepartureSchedule () const;
+
+				/** Latest schedule of the service : the last arrival at the last vertex.
+					@return The latest schedule of the service
+				*/
+				const time::Schedule& getLastArrivalSchedule() const;
 			//@}
 
 			//! @name Setters
@@ -109,6 +115,7 @@ namespace synthese
 				void setPath(Path* path);
 				void setServiceNumber (int serviceNumber);
 				void setDepartureSchedule (const synthese::time::Schedule& departureSchedule);
+				void setArrivalSchedule (const synthese::time::Schedule&);
 			//@}
 
 
@@ -140,11 +147,6 @@ namespace synthese
 				*/
 				bool isProvided(const synthese::time::Date& departureDate, int jplus ) const;
 
-
-				/** Latest schedule of the service : the last arrival at the last vertex.
-					@return The latest schedule of the service
-				*/
-				const time::Schedule& getLastArrivalSchedule() const;
 			//@}
 		};
 	}

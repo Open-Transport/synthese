@@ -47,7 +47,7 @@ namespace synthese
 		}
 
 
-		InterfacePage* Interface::getPage(const std::string& index) const
+		InterfacePage* const Interface::getPage(const std::string& index) const
 		{
 			PagesMap::const_iterator it = _pages.find(index);
 			if (it == _pages.end())

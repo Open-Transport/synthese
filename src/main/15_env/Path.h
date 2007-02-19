@@ -90,14 +90,17 @@ namespace synthese
 			{
 				bool operator() (const Service* s1, const Service* s2) const
 				{
-					return s1->getDepartureSchedule () < s2->getDepartureSchedule ();
+					return (s1->getDepartureSchedule () < s2->getDepartureSchedule ())
+						|| (s1->getDepartureSchedule () == s2->getDepartureSchedule ()
+						&& s1 != s2)						
+						;
 				}
 			};
 
 		public:
 
-//			typedef std::set<Service*, cmpService> ServiceSet;
-			typedef std::set<Service*> ServiceSet;
+			typedef std::set<Service*, cmpService> ServiceSet;
+//			typedef std::set<Service*> ServiceSet;
 
 		protected:
 

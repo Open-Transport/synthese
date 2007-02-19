@@ -78,7 +78,7 @@ namespace synthese
 		{
 			const Line* line = ((const ArrivalDepartureRow*) object)->first.linestop->getLine();
 
-			const LineMarkerInterfacePage* page = _page->getInterface()->getPage<LineMarkerInterfacePage>();
+			const LineMarkerInterfacePage* const page = _page->getInterface()->getPage<LineMarkerInterfacePage>();
 			page->display(stream
 				, _htmlStartLine->getValue(parameters, object, request)
 				, _htmlEndLine->getValue(parameters, object, request)
@@ -86,7 +86,6 @@ namespace synthese
 				, Conversion::ToInt(_cellHeight->getValue(parameters, object,request))
 				, line, request
 				);
-			delete page;
 		}
 	}
 }

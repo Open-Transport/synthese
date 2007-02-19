@@ -133,6 +133,7 @@ namespace synthese
 			cs->setServiceNumber(serviceNumber);
 			cs->setPath(path);
 			cs->setDepartureSchedule(departureSchedules.at(0));
+			cs->setArrivalSchedule(arrivalSchedules.at(arrivalSchedules.size()-1));
 			cs->setRange(range);
 			cs->setMaxWaitingTime(maxWaitingTime);
 			cs->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));

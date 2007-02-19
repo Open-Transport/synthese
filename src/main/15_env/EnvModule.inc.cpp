@@ -3,6 +3,9 @@
 
 #include "15_env/LogicalStopNameValueInterfaceElement.h"
 #include "15_env/CityNameValueInterfaceElement.h"
+#include "15_env/LineStyleInterfaceElement.h"
+#include "15_env/LineShortNameInterfaceElement.h"
+#include "15_env/LineImageURLInterfaceElement.h"
 
 #include "15_env/LogicalStopNameValueInterfaceElement.h"
 #include "15_env/CityNameValueInterfaceElement.h"

@@ -253,7 +253,7 @@ namespace synthese
 			{
 				ArrivalDepartureTableGenerator* generator = getGenerator(date);
 				const ArrivalDepartureList& result = generator->generate();
-				const DeparturesTableInterfacePage* page = _displayType->getInterface()->getPage<DeparturesTableInterfacePage>();
+				const DeparturesTableInterfacePage* const page = _displayType->getInterface()->getPage<DeparturesTableInterfacePage>();
 				page->display(stream, getTitle(), result);
 				delete generator;
 			}

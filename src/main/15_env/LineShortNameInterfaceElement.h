@@ -1,6 +1,6 @@
 
-/** DepartureTableRowInterfacePage class implementation.
-	@file DepartureTableRowInterfacePage.cpp
+/** LineShortNameInterfaceElement class header.
+	@file LineShortNameInterfaceElement.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,33 +20,38 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#ifndef SYNTHESE_LineShortNameInterfaceElement_H__
+#define SYNTHESE_LineShortNameInterfaceElement_H__
 
-#include "DepartureTableRowInterfacePage.h"
+#include "01_util/UId.h"
+
+#include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
-	using util::Conversion;
-	using namespace interfaces;
-
-	namespace departurestable
+	namespace interfaces
 	{
-		void DepartureTableRowInterfacePage::display(std::ostream& stream
-				, int rowId
-				, int pageNumber
-				, const ArrivalDepartureRow* ptd
-				, const server::Request* request) const
+		class ValueElementList;
+	}
+	namespace env
+	{
+		/** LineShortNameInterfaceElement class.
+			@ingroup 15
+		*/
+		class LineShortNameInterfaceElement : public interfaces::ValueInterfaceElement
 		{
-			ParametersVector parameters;
-			parameters.push_back(Conversion::ToString(rowId));
-			parameters.push_back(Conversion::ToString(pageNumber));
+		private:
+			// Attributes
+			// interfaces::ValueInterfaceElement* _xxx;
 
-			InterfacePage::display(stream, parameters, (const void*) ptd, request);
-		}
+		public:
+			std::string getValue(const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
 
-		DepartureTableRowInterfacePage::~DepartureTableRowInterfacePage()
-		{
-		
-		}
+			/** Parser.
+			@param text Optional parameter
+			*/
+			void storeParameters(interfaces::ValueElementList& vel);
+		};
 	}
 }
+#endif // SYNTHESE_CityNameValueInterfaceElement_H__

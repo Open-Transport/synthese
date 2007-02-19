@@ -57,9 +57,9 @@ namespace synthese
 			int __FiltreVelo = ( synthese::util::Conversion::ToInt(_bikeFilter->getValue(parameters)) > 1 );
 
 			// Resources
-			const JourneyBoardStopCellInterfacePage* stopCellInterfacePage = site->getInterface()->getPage<JourneyBoardStopCellInterfacePage>();
-			const JourneyBoardServiceCellInterfacePage* serviceCellInterfacePage = site->getInterface()->getPage<JourneyBoardServiceCellInterfacePage>();
-			const JourneyBoardJunctionCellInterfacePage* junctionCellInterfacePage = site->getInterface()->getPage<JourneyBoardJunctionCellInterfacePage>();
+			const JourneyBoardStopCellInterfacePage* const stopCellInterfacePage = site->getInterface()->getPage<JourneyBoardStopCellInterfacePage>();
+			const JourneyBoardServiceCellInterfacePage* const serviceCellInterfacePage = site->getInterface()->getPage<JourneyBoardServiceCellInterfacePage>();
+			const JourneyBoardJunctionCellInterfacePage* const junctionCellInterfacePage = site->getInterface()->getPage<JourneyBoardJunctionCellInterfacePage>();
 			const synthese::time::Hour unknownHour( synthese::time::TIME_UNKNOWN );
 			const synthese::time::DateTime unknownDateTime( synthese::time::TIME_UNKNOWN );
 

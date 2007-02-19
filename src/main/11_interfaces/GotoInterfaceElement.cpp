@@ -11,9 +11,9 @@ namespace synthese
 		{
 		}
 
-		const std::string GotoInterfaceElement::getLabel(const ParametersVector& parameters) const
+		const std::string GotoInterfaceElement::getLabel(const ParametersVector& parameters, const void* object, const server::Request* request) const
 		{
-			return _label->getValue(parameters);
+			return _label->getValue(parameters, object, request);
 		}
 
 		void GotoInterfaceElement::storeParameters( ValueElementList& vel )

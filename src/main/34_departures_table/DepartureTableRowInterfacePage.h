@@ -38,6 +38,8 @@ namespace synthese
 		{
 		public:
 
+			~DepartureTableRowInterfacePage();
+
 			/** Display of the admin page.
 			*/
 			void display( std::ostream& stream
