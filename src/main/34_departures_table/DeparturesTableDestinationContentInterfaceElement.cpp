@@ -136,7 +136,7 @@ namespace synthese
 					}
 
 					// Affichage du nom d'arret dans les cas ou necessaire
-					if ( __TypeAffichage.substr (0, 6) == TYPE_STATION)
+					if ( __TypeAffichage.substr (0, 7) == TYPE_STATION)
 						stream << __DP->second.at(__i)->getName();
 
 					// Affichage de la destination 13 caracteres dans les cas ou necessaire
