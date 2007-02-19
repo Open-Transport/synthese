@@ -45,10 +45,11 @@ namespace synthese
 				, const ForbiddenPlacesList&	forbiddenPlaces
 				, const DateTime& startDateTime
 				, const DateTime& endDateTime
+				, int blinkingDelay
 				, size_t maxSize
 		) : _physicalStops(physicalStops), _direction(direction), _endFilter(endfilter)
 		, _lineFilter(lineFilter), _displayedPlaces(displayedPlacesList), _forbiddenPlaces(forbiddenPlaces), _startDateTime(startDateTime)
-			, _endDateTime(endDateTime), _maxSize(maxSize)
+			, _endDateTime(endDateTime), _maxSize(maxSize), _blinkingDelay(blinkingDelay)
 		{}
 
 
@@ -84,6 +85,7 @@ namespace synthese
 			element.linestop = linestop;
 			element.serviceNumber = serviceNumber;
 			element.realDepartureTime = realDepartureTime;
+			element.blinking = ((realDepartureTime - _startDateTime) <= _blinkingDelay);
 
 			ActualDisplayedArrivalsList arrivals;
 			set<const ConnectionPlace*> encounteredPlaces;

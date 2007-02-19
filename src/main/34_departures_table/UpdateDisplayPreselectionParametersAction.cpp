@@ -52,7 +52,7 @@ namespace synthese
 			{
 				Request::ParametersMap::iterator it;
 
-				_screen = DeparturesTableModule::getDisplayScreens().get(_request->getObjectId()));
+				_screen = DeparturesTableModule::getDisplayScreens().get(_request->getObjectId());
 
 				it = map.find(PARAMETER_ACTIVATE_PRESELECTION);
 				if (it == map.end())

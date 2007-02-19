@@ -71,21 +71,19 @@ namespace synthese
 
 		void DeparturesTableTimeContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			const synthese::time::DateTime& __Moment = ((const ArrivalDepartureRow*) object)->first.realDepartureTime;
-			std::string __Zero = _zeroVIE->getValue(parameters, object, request);
-			std::string __AvantSiImminent = _beforeIfNext->getValue(parameters, object, request);
-			std::string __ApresSiImminent = _afterIfNext->getValue(parameters, object, request);
+			const ArrivalDepartureRow*	row = (const ArrivalDepartureRow*) object;
+			const DateTime&				__Moment = row->first.realDepartureTime;
+			bool						blinking = row->first.blinking;
+			string						__Zero = _zeroVIE->getValue(parameters, object, request);
+			string						__AvantSiImminent = _beforeIfNext->getValue(parameters, object, request);
+			string						__ApresSiImminent = _afterIfNext->getValue(parameters, object, request);
 
-			synthese::time::DateTime __Maintenant;
-			__Maintenant.updateDateTime( synthese::time::TIME_CURRENT );
-			int __Duree = __Moment - __Maintenant;
-
-			if ( __Duree <= 1 )
+			if (blinking)
 				stream << __AvantSiImminent;
 			if ( __Moment.getHour ().getHours() < 10 )
 				stream << __Zero;
 			stream << __Moment.getHour ().toString();
-			if ( __Duree <= 1 )
+			if (blinking)
 				stream << __ApresSiImminent;
 		}
 	}
