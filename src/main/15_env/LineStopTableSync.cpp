@@ -92,10 +92,10 @@ namespace synthese
 
 			ls->setKey(id);
 			ls->setMetricOffset(metricOffset);
-			ls->setPhysicalStop(EnvModule::getPhysicalStops ().get (fromPhysicalStopId));
-			ls->setLine(EnvModule::getLines ().get (lineId));
 			ls->setIsArrival(isArrival);
 			ls->setIsDeparture(isDeparture);
+			ls->setPhysicalStop(EnvModule::getPhysicalStops ().get (fromPhysicalStopId));
+			ls->setLine(EnvModule::getLines ().get (lineId));
 			ls->setRankInPath(rankInPath);
 
 			EnvModule::getLines ().get (lineId)->addEdge(ls);

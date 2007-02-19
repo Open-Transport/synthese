@@ -139,6 +139,12 @@ namespace synthese
 					and departure date of the path service origin.
 				*/
 				bool isProvided(const synthese::time::Date& departureDate, int jplus ) const;
+
+
+				/** Latest schedule of the service : the last arrival at the last vertex.
+					@return The latest schedule of the service
+				*/
+				const time::Schedule& getLastArrivalSchedule() const;
 			//@}
 		};
 	}

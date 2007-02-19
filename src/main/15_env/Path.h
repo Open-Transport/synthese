@@ -137,6 +137,7 @@ namespace synthese
 				virtual const Axis* getAxis () const = 0;
 
 				const std::vector<Edge*>& getEdges () const;
+				Calendar&	getCalendar();
 			//@}
 
 			//! @name Query methods.

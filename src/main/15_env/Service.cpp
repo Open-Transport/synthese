@@ -20,12 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Service.h"
-
-#include "Path.h"
+#include "15_env/Service.h"
+#include "15_env/Path.h"
+#include "15_env/Edge.h"
 
 namespace synthese
 {
+	using namespace time;
+
 	namespace env
 	{
 		Service::Service (int serviceNumber,
@@ -137,6 +139,11 @@ namespace synthese
 			BikeComplyer::setParent(path);
 			HandicappedComplyer::setParent(path);
 			PedestrianComplyer::setParent(path);
+		}
+
+		const Schedule& Service::getLastArrivalSchedule() const
+		{
+			return getPath()->getLastEdge()->getArrivalEndSchedule(_serviceNumber);
 		}
 	}
 }

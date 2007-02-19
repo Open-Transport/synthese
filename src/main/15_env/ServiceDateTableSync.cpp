@@ -121,6 +121,19 @@ namespace synthese
 			Date newDate = Date::FromSQLDate (rows.getColumn (rowIndex, COL_DATE));
 			service->getCalendar ().mark (newDate, marked);
 
+			if (marked)
+			{
+				for (int i = service->getDepartureSchedule().getDaysSinceDeparture(); i<= service->getLastArrivalSchedule().getDaysSinceDeparture(); ++i)
+				{
+					service->getPath()->getCalendar().mark(newDate, marked);
+					newDate++;
+				}
+			}
+			else
+			{
+				/// @todo Implement it : see in each date if there is at least an other service which runs. If not unmark the date and see the following one.
+			}
+
 			//environment.updateMinMaxDatesInUse (newDate, marked);
 
 		}

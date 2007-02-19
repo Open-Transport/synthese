@@ -78,7 +78,7 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-			bool isContinuous () const;
+				bool isContinuous () const;
 			//@}
 
 		};

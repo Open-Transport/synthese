@@ -66,20 +66,20 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-			bool isContinuous () const;
+				bool isContinuous () const;
 
-			/** Is this service reservable ?
-			@param departureMoment Desired departure moment
-			@param calculationMoment Calculation moment taken as reference 
-			for reservation delay calculation
-			@return true if service can be reserved, false otherwise.
-			
-			A service can be reserved if :
-			- the path does not have any reservation rule
-			- the reservation rule accepts condition
-			*/
-			bool isReservationPossible ( const synthese::time::DateTime& departureMoment, 
-						const synthese::time::DateTime& calculationMoment ) const;
+				/** Is this service reservable ?
+				@param departureMoment Desired departure moment
+				@param calculationMoment Calculation moment taken as reference 
+				for reservation delay calculation
+				@return true if service can be reserved, false otherwise.
+				
+				A service can be reserved if :
+				- the path does not have any reservation rule
+				- the reservation rule accepts condition
+				*/
+				bool isReservationPossible ( const synthese::time::DateTime& departureMoment, 
+							const synthese::time::DateTime& calculationMoment ) const;
 			//@}
 
 		};

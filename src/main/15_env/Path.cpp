@@ -342,6 +342,10 @@ namespace synthese
 			return (it != _edges.end()) ? *it : NULL;
 		}
 
+		Calendar& Path::getCalendar()
+		{
+			return _calendar;
+		}
 
 	}
 }

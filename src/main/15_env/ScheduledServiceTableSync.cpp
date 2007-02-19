@@ -85,8 +85,8 @@ namespace synthese
 				size_t sepPos = arrDep.find ("#");
 				assert (sepPos != std::string::npos);
 
-				std::string departureScheduleStr (arrDep.substr (0, sepPos));
-				std::string arrivalScheduleStr (arrDep.substr (sepPos+1));
+				std::string arrivalScheduleStr (arrDep.substr (0, sepPos));
+				std::string departureScheduleStr (arrDep.substr (sepPos+1));
 
 				boost::trim (departureScheduleStr);
 				boost::trim (arrivalScheduleStr);
@@ -139,7 +139,8 @@ namespace synthese
 			ss->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
 			ss->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
 			ss->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId)); 
-
+if (((Line*) ss->getPath())->getName() == "MP/TLS/014/27")
+	ss->setKey(id);
 			ss->getPath()->addService(ss, departureSchedules, arrivalSchedules);
 		}
 

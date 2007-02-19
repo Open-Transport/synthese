@@ -539,14 +539,12 @@ namespace synthese
 
 			if (service->isContinuous ())
 			{
-			const ContinuousService* continuousService = dynamic_cast<const ContinuousService*> (service);
-			_departureEndSchedule.insert (itInsertEnd, 
-							_departureBeginSchedule[index] + continuousService->getRange ());
+				const ContinuousService* continuousService = dynamic_cast<const ContinuousService*> (service);
+				_departureEndSchedule.insert (itInsertEnd, _departureBeginSchedule[index] + continuousService->getRange ());
 			}
 			else 
 			{
-			_departureEndSchedule.insert (itInsertEnd,
-							_departureBeginSchedule[index]);
+				_departureEndSchedule.insert (itInsertEnd, _departureBeginSchedule[index]);
 			}
 			updateDepartureIndex ();
 		}
@@ -571,9 +569,9 @@ namespace synthese
 
 			if (service->isContinuous ())
 			{
-			const ContinuousService* continuousService = dynamic_cast<const ContinuousService*> (service);
-			_arrivalBeginSchedule[index] += continuousService->getMaxWaitingTime ();
-			_arrivalEndSchedule[index] = _arrivalBeginSchedule[index] + continuousService->getRange ();
+				const ContinuousService* continuousService = dynamic_cast<const ContinuousService*> (service);
+				_arrivalBeginSchedule[index] += continuousService->getMaxWaitingTime ();
+				_arrivalEndSchedule[index] = _arrivalBeginSchedule[index] + continuousService->getRange ();
 			}
 
 			updateArrivalIndex ();
@@ -605,28 +603,26 @@ namespace synthese
 				if ( _departureEndSchedule[i].getHours () >= _departureBeginSchedule[i].getHours () )
 				{
 					for ( numHour = 0; numHour <= _departureEndSchedule[i].getHours (); ++numHour )
-				{
+					{
 						if ( (_departureIndex[numHour] == -1) || 
-					(_departureIndex[numHour] < serviceOverMidnightNumber) ) 
-				{
-					_departureIndex[numHour] = i;
-				}
-				}
+							(_departureIndex[numHour] < serviceOverMidnightNumber) ) 
+						{
+							_departureIndex[numHour] = i;
+						}
+					}
 				}
 				else
 				{
 					for (numHour = 0; numHour < synthese::time::HOURS_PER_DAY; ++numHour)
-				{
+					{
 						if (_departureIndex[numHour] == -1)
-				{
+						{
 							_departureIndex[ numHour ] = i;
-				}
-				}
+						}
+					}
 				}
 				lastHour = _departureEndSchedule[i].getHours ();
-
-			}
-		    
+			}		    
 		}
 
 
