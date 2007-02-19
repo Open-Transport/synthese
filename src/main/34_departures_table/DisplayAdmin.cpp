@@ -292,6 +292,7 @@ namespace synthese
 					<< "</td><td>" << Html::getSubmitButton("Ajouter") << "</td></tr></form>"
 					<< "</table>"
 			
+					// Forbidden places
 					<< "<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>"
 					<< "<table>"
 					<< "<tr><th>Arrêt</th><th>Action</th></tr>";
@@ -307,7 +308,7 @@ namespace synthese
 				}
 				stream
 					<< addNSRequest->getHTMLFormHeader("addforb")
-					<< "<tr><td>" << Html::getSortedSelectInput(AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForbiddenPlaces()), uid(0))
+					<< "<tr><td>" << Html::getSortedSelectInput(AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForbiddenPlaces()), uid(0))
 					<< "</td><td>" << Html::getSubmitButton("Ajouter") << "</td></tr></form>"
 					<< "</table>"
 

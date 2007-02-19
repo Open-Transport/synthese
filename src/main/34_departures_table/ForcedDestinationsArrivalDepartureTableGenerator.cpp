@@ -50,8 +50,9 @@ namespace synthese
 			, size_t maxSize
 			, const ForcedDestinationsSet& forcedDestinations
 			, int persistanceDuration
+			, int blinkinkDelay
 		) : ArrivalDepartureTableGenerator(physicalStops, direction, endfilter, lineFilter
-										, displayedPlacesList, forbiddenPlaces, startTime, endDateTime, maxSize)
+										, displayedPlacesList, forbiddenPlaces, startTime, endDateTime, blinkingDelay, maxSize)
 			, _forcedDestinations(forcedDestinations)
 			, _persistanceDuration(persistanceDuration)
 		{

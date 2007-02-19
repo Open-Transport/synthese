@@ -72,4 +72,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_DisplayScreenRemoveDisplayedPlaceAction_H__
- 

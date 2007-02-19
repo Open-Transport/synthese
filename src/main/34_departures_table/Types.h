@@ -48,7 +48,7 @@ namespace synthese
 	typedef std::set<const env::ConnectionPlace*> ForbiddenPlacesList;
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
 	typedef enum { ENDS_ONLY = 0, WITH_PASSING = 1 } EndFilter;
-	struct DeparturesTableElement { const env::LineStop* linestop; int serviceNumber; time::DateTime realDepartureTime; };
+	struct DeparturesTableElement { const env::LineStop* linestop; int serviceNumber; time::DateTime realDepartureTime; bool blinking; };
 	struct DeparturesTableElementLess : public std::binary_function<DeparturesTableElement, DeparturesTableElement, bool>
 	{
 		bool operator()(const DeparturesTableElement& _Left, const DeparturesTableElement& _Right) const

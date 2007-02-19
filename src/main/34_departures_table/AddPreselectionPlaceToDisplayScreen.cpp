@@ -39,7 +39,7 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		const string AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pl";
+		const string AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pla";
 
 
 		Request::ParametersMap AddPreselectionPlaceToDisplayScreen::getParametersMap() const

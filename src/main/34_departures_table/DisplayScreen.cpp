@@ -129,6 +129,7 @@ namespace synthese
 					, _forbiddenArrivalPlaces
 					, startDateTime
 					, endDateTime
+					, _blinkingDelay
 					, _displayType->getRowNumber()
 				);
 
@@ -144,6 +145,7 @@ namespace synthese
 					, endDateTime
 					, _displayType->getRowNumber()
 					, _forcedDestinations
+					, _blinkingDelay
 					, _destinationForceDelay
 				);
 			}
