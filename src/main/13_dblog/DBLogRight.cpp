@@ -43,5 +43,12 @@ namespace synthese
 		{
 			return string();
 		}
+
+		std::map<std::string, std::string> DBLogRight::getParametersLabels() const
+		{
+			map<string, string> m;
+			m.insert(make_pair("*","(tous les journaux)"));
+			return m;
+		}
 	}
 }

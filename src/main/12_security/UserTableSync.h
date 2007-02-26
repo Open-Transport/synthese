@@ -55,12 +55,14 @@ namespace synthese
 			static const std::string TABLE_COL_COUNTRY;
 			static const std::string TABLE_COL_EMAIL;
 			static const std::string TABLE_COL_PHONE;
+			static const std::string COL_LOGIN_AUTHORIZED;
 
 
 			UserTableSync();
 			~UserTableSync ();
 
 			static User* getUserFromLogin(const std::string& login);
+			static bool loginExists(const std::string& login);
 
 			/** User search.
 				@param sqlite SQLite thread

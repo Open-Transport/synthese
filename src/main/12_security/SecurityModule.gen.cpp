@@ -17,6 +17,8 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::security:
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::DeleteRightAction>("dra");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UpdateRightAction>("ura");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UpdateProfileAction>("upa");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UserUpdateAction>("uua");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UserPasswordUpdateAction>("upua");
 
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::security::SecurityRight>("Security");
 

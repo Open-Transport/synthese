@@ -70,7 +70,6 @@ namespace synthese
 				}
 				catch (Profile::RegistryKeyException e)
 				{
-					throw ActionException("Template profile not found");
 				}
 				map.erase(it);
 			}
@@ -83,9 +82,10 @@ namespace synthese
 			if (_templateProfile)
 			{
 				profile->setParent(_templateProfile->getKey());
-				profile->setRights(_templateProfile->getRightsString());
+				profile->setRights(_templateProfile->getRights());
 			}
 			ProfileTableSync::save(profile);
+			_request->setObjectId(profile->getKey());
 			delete profile;
 		}
 

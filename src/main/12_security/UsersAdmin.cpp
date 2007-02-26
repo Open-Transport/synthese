@@ -129,14 +129,12 @@ namespace synthese
 				<< addUserRequest->getHTMLFormHeader("adduser")
 				<< "<tr>"
 				<< "<td>&nbsp;</TD>"
-				<< "<td><input value=\"Entrez le login ici\" name=\"" << AddUserAction::PARAMETER_LOGIN << "\" /></TD>"
-				<< "<td><input value=\"Entrez le nom ici\" name=\"" << AddUserAction::PARAMETER_NAME << "\" /></TD>"
+				<< "<td>" << Html::getTextInput(AddUserAction::PARAMETER_LOGIN, "", "Entrez le login ici") << "</td>"
+				<< "<td>" << Html::getTextInput(AddUserAction::PARAMETER_NAME, "", "Entrez le nom ici") << "</td>"
 				<< "<td>" << Html::getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), (uid) 0) << "</td>"
-				<< "<td><input type=\"submit\" value=\"Ajouter\" /></td>"
-                << "</tr></form>";
-
-			stream
-				<< "</TABLE>";
+				<< "<td>" << Html::getSubmitButton("Ajouter") << "</td>"
+                << "</tr></form>"
+				<< "</table>";
 
 			// If too much users
 			if (_nextButton)

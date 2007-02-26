@@ -66,6 +66,7 @@ namespace synthese
 				void setCountry(const std::string& country);
 				void setEMail(const std::string& email);
 				void setPhone(const std::string& phone);
+				void setConnectionAllowed(bool value);
 			//@}
 
 			//! \name Getters
@@ -76,15 +77,16 @@ namespace synthese
 				/** Password getter.
 					@todo handle encryption (create a getEncryptedPassword instead)
 				*/
-				const std::string& getPassword() const;
-				const std::string& getName() const;
-				const std::string& getSurname() const;
-				const std::string& getAddress() const;
-				const std::string& getPostCode() const;
-				const std::string& getCityText() const;
-				const std::string& getCountry() const;
-				const std::string& getEMail() const;
-				const std::string& getPhone() const;
+				const std::string&	getPassword() const;
+				const std::string&	getName() const;
+				const std::string&	getSurname() const;
+				const std::string&	getAddress() const;
+				const std::string&	getPostCode() const;
+				const std::string&	getCityText() const;
+				const std::string&	getCountry() const;
+				const std::string&	getEMail() const;
+				const std::string&	getPhone() const;
+				bool				getConnectionAllowed() const;
 			//@}
 
 			//! \name Services

@@ -23,12 +23,16 @@
 #ifndef SYNTHESE_AddRightAction_H__
 #define SYNTHESE_AddRightAction_H__
 
+#include "12_security/Right.h"
+
 #include "30_server/Action.h"
 
 namespace synthese
 {
 	namespace security
 	{
+		class Profile;
+		
 		/** AddRightAction action class.
 			@ingroup m12
 		*/
@@ -36,9 +40,16 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_RIGHT;
+			static const std::string PARAMETER_PUBLIC_LEVEL;
+			static const std::string PARAMETER_PRIVATE_LEVEL;
+			static const std::string PARAMETER_PARAMETER;
 
 		private:
-			/// @todo Attributes list
+			Profile*		_profile;
+			std::string		_rightName;
+			std::string		_parameter;
+			Right::Level	_privateLevel;
+			Right::Level	_publicLevel;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -51,7 +62,8 @@ namespace synthese
 			void setFromParametersMap(server::Request::ParametersMap& map);
 
 		public:
-
+			AddRightAction();
+			
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

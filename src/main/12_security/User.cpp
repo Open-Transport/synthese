@@ -133,5 +133,15 @@ namespace synthese
 		{
 			return _phone;
 		}
+
+		void User::setConnectionAllowed( bool value )
+		{
+			_isConnectionAllowed = value;
+		}
+
+		bool User::getConnectionAllowed() const
+		{
+			return _isConnectionAllowed;
+		}
 	}
 }

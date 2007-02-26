@@ -28,6 +28,8 @@
 #include "12_security/UserAdmin.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/SecurityModule.h"
+#include "12_security/UserUpdateAction.h"
+#include "12_security/UserPasswordUpdateAction.h"
 
 using namespace std;
 
@@ -57,25 +59,49 @@ namespace synthese
 
 		void UserAdmin::display(std::ostream& stream, const AdminRequest* request) const
 		{
+			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
+			updateRequest->copy(request);
+			updateRequest->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
+			updateRequest->setAction(Factory<Action>::create<UserUpdateAction>());
+			updateRequest->setObjectId(request->getObjectId());
+
+			AdminRequest* userPasswordUpdateRequest = Factory<Request>::create<AdminRequest>();
+			userPasswordUpdateRequest->copy(request);
+			userPasswordUpdateRequest->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
+			userPasswordUpdateRequest->setAction(Factory<Action>::create<UserPasswordUpdateAction>());
+			userPasswordUpdateRequest->setObjectId(request->getObjectId());
+
 			stream
+				<< "<h1>Coordonnées</h1>"
+				<< updateRequest->getHTMLFormHeader("update")
 				<< "<table>"
-				<< "<tr><th colSpan=\"2\">Connexion</th></tr>"
-				<< "<TR><TD>Login</TD><TD><input value=\"" << _user->getLogin() << "\" type=\"text\" name=\"Text1\"></TD></TR>"
-				<< "<TR><TD>Mot de passe</TD><TD><INPUT type=\"password\" value=\"\" name=\"Password1\"></TD></TR>"
-				<< "<TR><TD>Mot de passe (vérification)</TD><TD><INPUT type=\"password\" value=\"\" name=\"Password1\"></TD></TR>"
-				<< "<TR><th colSpan=\"2\">Coordonnées</th></TR>"
-				<< "<TR><TD>Prénom</TD><TD><INPUT type=\"text\" value=\"" << _user->getSurname() << "\" name=\"Text1\"></TD></TR>"
-				<< "<TR><TD>Nom</TD><TD><INPUT type=\"text\" value=\"" << _user->getName() << "\" name=\"Text1\"></TD></TR>"
-				<< "<TR><TD>Adresse</TD><TD><TEXTAREA name=\"Textarea1\" rows=\"2\" cols=\"20\">" << _user->getAddress() << "</TEXTAREA></TD></TR>"
-				<< "<TR><TD>Code postal</TD><TD><INPUT type=\"text\" name=\"Text1\"></TD></TR>"
-				<< "<TR><TD>Ville</TD><TD><INPUT type=\"text\" name=\"Text1\"></TD></TR>"
-				<< "<TR><TD>E-mail</TD><TD><INPUT type=\"text\" name=\"Text1\"></TD></TR>"
-				<< "<TR><th colSpan=\"2\">Droits</TD></TR>"
-				<< "<TR><td>Connexion autorisée</td><TD><INPUT type=\"radio\" CHECKED value=\"Radio1\" name=\"RadioGroupc\">OUI	<INPUT type=\"radio\" value=\"Radio1\" name=\"RadioGroupc\">NON</TD></TR>"
-				<< "<tr><td>Profil</td><td>" << Html::getSelectInput("", SecurityModule::getProfileLabels(), _user->getProfile()->getKey()) << "</td></tr>"
-				
+				<< "<tr><th colspan=\"2\">Connexion</th></tr>"
+				<< "<tr><td>Login</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin()) << "</td></tr>"
+				<< "<tr><th colspan=\"2\">Coordonnées</th></tr>"
+				<< "<tr><td>Prénom</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname()) << "</td></tr>"
+				<< "<tr><td>Nom</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName()) << "</td></tr>"
+				<< "<tr><td>Adresse</td><td>" << Html::getTextAreaInput(UserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50) << "</td></tr>"
+				<< "<tr><td>Code postal</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode()) << "</td></tr>"
+				<< "<tr><td>Ville</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_CITY, _user->getCityText()) << "</td></tr>"
+				<< "<tr><td>Téléphone</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone()) << "</td></tr>"
+				<< "<tr><td>E-mail</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail()) << "</td></tr>"
+				<< "<tr><th colSpan=\"2\">Droits</td></tr>"
+				<< "<tr><td>Connexion autorisée</td><td>" << Html::getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()) << "</td></tr>"
+				<< "<tr><td>Profil</td><td>" << Html::getSelectInput(UserUpdateAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), _user->getProfile()->getKey()) << "</td></tr>"
 				<< "<tr><td style=\"text-align:center\" colSpan=\"2\">" << Html::getSubmitButton("Enregistrer les modifications") << "</td></tr>"
-				<< "</table>";
+				<< "</table>"
+				<< "</form>"
+
+				<< "<h1>Changement de mot de passe</h1>"
+				<< userPasswordUpdateRequest->getHTMLFormHeader("pass")
+				<< "<table>"
+				<< "<tr><td>Mot de passe</td><td>" << Html::getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS1, "") << "</td></tr>"
+				<< "<tr><td>Mot de passe (vérification)</td><td>" << Html::getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS2, "") << "</td></tr>"
+				<< "<tr><td style=\"text-align:center\" colSpan=\"2\">" << Html::getSubmitButton("Changer le mot de passe") << "</td></tr>"
+				<< "</table></form>";
+
+			delete updateRequest;
+			delete userPasswordUpdateRequest;
 		}
 
 		void UserAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)

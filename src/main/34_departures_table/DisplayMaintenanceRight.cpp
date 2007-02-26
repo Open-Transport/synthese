@@ -22,6 +22,8 @@
 
 #include "DisplayMaintenanceRight.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace security;
@@ -39,6 +41,13 @@ namespace synthese
 		std::string DisplayMaintenanceRight::displayParameter() const
 		{
 			return _parameter;
+		}
+
+		std::map<std::string, std::string> DisplayMaintenanceRight::getParametersLabels() const
+		{
+			map<string, string> m;
+			m.insert(make_pair("*","(tous les afficheurs)"));
+			return m;
 		}
 	}
 }

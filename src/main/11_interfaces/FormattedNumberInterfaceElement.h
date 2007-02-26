@@ -43,6 +43,7 @@ namespace synthese
 		private:
 			interfaces::ValueInterfaceElement* _numberVIE;
 			interfaces::ValueInterfaceElement* _formatVIE;
+			interfaces::ValueInterfaceElement* _numberToAdd;
 
 		public:
 			FormattedNumberInterfaceElement();

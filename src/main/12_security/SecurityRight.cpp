@@ -22,6 +22,8 @@
 
 #include "SecurityRight.h"
 
+using namespace std;
+
 namespace synthese
 {
 	namespace security
@@ -35,6 +37,13 @@ namespace synthese
 		std::string SecurityRight::displayParameter() const
 		{
 			return _parameter;
+		}
+
+		std::map<std::string, std::string> SecurityRight::getParametersLabels() const
+		{
+			map<string, string> m;
+			m.insert(make_pair("*", "(toutes opérations)"));
+			return m;
 		}
 	}
 }

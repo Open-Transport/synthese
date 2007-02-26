@@ -22,6 +22,8 @@
 
 #include "MessagesLibraryRight.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace security;
@@ -39,6 +41,13 @@ namespace synthese
 		std::string MessagesLibraryRight::displayParameter() const
 		{
 			return _parameter;
+		}
+
+		std::map<std::string, std::string> MessagesLibraryRight::getParametersLabels() const
+		{
+			map<string, string> m;
+			m.insert(make_pair("*", "(tous les modèles)"));
+			return m;
 		}
 	}
 }

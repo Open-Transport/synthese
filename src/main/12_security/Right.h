@@ -67,19 +67,19 @@ namespace synthese
 
 			/** Niveaux d'habilitation. */
 			typedef enum {
-				FORBIDDEN		//!< Interdiction
-				, USE				//!< Utilisation de fonction autorisée
-				, READ			//!< Lecture directe de données autorisée
-				, WRITE			//!< Ecriture directe de donnée autorisée
-				, DELETE		//!< Suppression de donnée autorisée
+				FORBIDDEN	= 0		//!< Interdiction
+				, USE		= 20	//!< Utilisation de fonction autorisée
+				, READ		= 40	//!< Lecture directe de données autorisée
+				, WRITE		= 60	//!< Ecriture directe de donnée autorisée
+				, DELETE	= 80	//!< Suppression de donnée autorisée
 			} Level;
 
 		private:
-			const Level _privateRightLevel;
-			const Level _publicRightLevel;
+			Level _privateRightLevel;
+			Level _publicRightLevel;
 
 		protected:
-			const std::string _parameter;
+			std::string _parameter;
 
 			/** Constructor without parameters.
 				Used to build temporary right objects for factory iteration purposes.
@@ -96,11 +96,19 @@ namespace synthese
 			Right(std::string parameter, Level privateLevel, Level publicLevel);
 			~Right();
 
-			virtual std::string displayParameter() const = 0;
-			Level				getPrivateRightLevel()	const;
-			Level				getPublicRightLevel()	const;
+			virtual std::string							displayParameter()		const = 0;
+			virtual std::map<std::string, std::string>	getParametersLabels()	const = 0;
+			Level										getPrivateRightLevel()	const;
+			Level										getPublicRightLevel()	const;
 
 			static std::string getLevelLabel(Level level);
+
+			void	setPrivateLevel(const Level& level);
+			void	setPublicLevel(const Level& level);
+			void	setParameter(const std::string& parameter);
+
+			std::string getParameter() const;
+			
 		};
 	}
 }

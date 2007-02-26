@@ -50,14 +50,14 @@ namespace synthese
 			Profile* rootProfile;
 			vector<Profile*> profiles = ProfileTableSync::search(ROOT_PROFILE);
 			if (profiles.size() == 0)
-			{
 				rootProfile = new Profile;
-				rootProfile->setName(ROOT_PROFILE);
-				rootProfile->setRights(ROOT_RIGHTS);
-				ProfileTableSync::save(rootProfile);
-			}
 			else
 				rootProfile = profiles.front();
+	
+			rootProfile->setName(ROOT_PROFILE);
+			rootProfile->setPublicRight(Right::DELETE);
+			rootProfile->setPrivateRight(Right::DELETE);
+			ProfileTableSync::save(rootProfile);
 
 			vector<User*> users = UserTableSync::search(ROOT_USER, ROOT_USER, rootProfile->getKey());
 			if (users.size() == 0)
@@ -67,6 +67,7 @@ namespace synthese
 				rootUser->setLogin(ROOT_USER);
 				rootUser->setPassword(ROOT_USER);
 				rootUser->setProfile(rootProfile);
+				rootUser->setConnectionAllowed(true);
 				UserTableSync::save(rootUser);
 			}
 		}

@@ -1,6 +1,6 @@
 
-/** DeleteRightAction class header.
-	@file DeleteRightAction.h
+/** UserPasswordUpdateAction class header.
+	@file UserPasswordUpdateAction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,10 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_DeleteRightAction_H__
-#define SYNTHESE_DeleteRightAction_H__
-
-#include <string>
+#ifndef SYNTHESE_UserPasswordUpdateAction_H__
+#define SYNTHESE_UserPasswordUpdateAction_H__
 
 #include "30_server/Action.h"
 
@@ -31,21 +29,20 @@ namespace synthese
 {
 	namespace security
 	{
-		class Profile;
+		class User;
 
-		/** DeleteRightAction action class.
+		/** UserPasswordUpdateAction action class.
 			@ingroup m12
 		*/
-		class DeleteRightAction : public server::Action
+		class UserPasswordUpdateAction : public server::Action
 		{
 		public:
-			static const std::string PARAMETER_RIGHT;
-			static const std::string PARAMETER_PARAMETER;
+			static const std::string PARAMETER_PASS1;
+			static const std::string PARAMETER_PASS2;
 
 		private:
-			Profile*	_profile;
-			std::string _right;
-			std::string	_parameter;
+			User*		_user;
+			std::string _password;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -53,12 +50,16 @@ namespace synthese
 			server::Request::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
-			Removes the used parameters from the map.
+				Removes the used parameters from the map.
+				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
 			void setFromParametersMap(server::Request::ParametersMap& map);
 
 		public:
-			DeleteRightAction();
+			/** Constructor.
+			*/
+			UserPasswordUpdateAction();
+			~UserPasswordUpdateAction();
 
 			/** Action to run, defined by each subclass.
 			*/
@@ -67,4 +68,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_DeleteRightAction_H__
+#endif // SYNTHESE_UserPasswordUpdateAction_H__

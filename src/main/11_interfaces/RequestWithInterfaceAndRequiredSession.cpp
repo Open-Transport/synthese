@@ -41,7 +41,7 @@ namespace synthese
 		{
 			_actionException = true;
 			if (_errorMessage.size())
-				_errorMessage = _errorMessage + " Invalid session.";
+				_errorMessage = "Session invalide : " + _errorMessage + ".";
 			_errorLevel = REQUEST_ERROR_FATAL;
 			if (_interface && _interface->getNoSessionDefaultPageCode().size())
 			{

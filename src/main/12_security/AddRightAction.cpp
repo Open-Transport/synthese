@@ -20,17 +20,26 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "AddRightAction.h"
+#include "01_util/Conversion.h"
+
+#include "12_security/AddRightAction.h"
+#include "12_security/SecurityModule.h"
+
+#include "30_server/ActionException.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
 	
 	namespace security
 	{
 		const string AddRightAction::PARAMETER_RIGHT = Action_PARAMETER_PREFIX + "right";
+		const string AddRightAction::PARAMETER_PUBLIC_LEVEL = Action_PARAMETER_PREFIX + "pulev";
+		const string AddRightAction::PARAMETER_PRIVATE_LEVEL = Action_PARAMETER_PREFIX + "prlev";
+		const string AddRightAction::PARAMETER_PARAMETER = Action_PARAMETER_PREFIX + "param";
 
 
 		Request::ParametersMap AddRightAction::getParametersMap() const
@@ -42,19 +51,58 @@ namespace synthese
 
 		void AddRightAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			try
+			{
+				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
 
-			// it = map.find(PARAMETER_xxx);
-			// if (it != map.end())
-			// {
-			//	_xxx = it->second;
-			//	map.erase(it);
-			// }
+				Request::ParametersMap::iterator it;
 
+				it = map.find(PARAMETER_RIGHT);
+				if (it == map.end())
+					throw ActionException("Right class not specified");
+				_rightName = it->second;
+				if (!Factory<Right>::contains(_rightName))
+					throw ActionException("Specified right class not found");
+				map.erase(it);
+				
+				it = map.find(PARAMETER_PARAMETER);
+				if (it == map.end())
+					throw ActionException("Parameter not specified");
+				_parameter = it->second;
+				map.erase(it);
+
+				it = map.find(PARAMETER_PUBLIC_LEVEL);
+				if (it == map.end())
+					throw ActionException("Public level not specified");
+				_publicLevel = (Right::Level) Conversion::ToInt(it->second);
+				map.erase(it);
+
+				it = map.find(PARAMETER_PRIVATE_LEVEL);
+				if (it == map.end())
+					throw ActionException("Private level not specified");
+				_privateLevel = (Right::Level) Conversion::ToInt(it->second);
+				map.erase(it);
+			}
+			catch(Profile::RegistryKeyException e)
+			{
+				throw ActionException("Profil introuvable");
+			}
 		}
 
 		void AddRightAction::run()
 		{
+			Right* right = Factory<Right>::create(_rightName);
+			right->setParameter(_parameter);
+			right->setPrivateLevel(_privateLevel);
+			right->setPublicLevel(_publicLevel);
+			_profile->addRight(right);
+		}
+
+		AddRightAction::AddRightAction()
+			: Action()
+			, _profile(NULL)
+		{
+			
 		}
 	}
 }

@@ -43,42 +43,44 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<VinciSite>::load(VinciSite* vs, const SQLiteResult& rows, int rowId)
 		{
-			vs->setKey(Conversion::ToLongLong(rows.getColumn(rowId, VinciSiteTableSync::TABLE_COL_ID)));
-			vs->_name = rows.getColumn(rowId, VinciSiteTableSync::TABLE_COL_NAME);
+			vs->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			vs->setName(rows.getColumn(rowId, VinciSiteTableSync::COL_NAME));
+			vs->setAddress(rows.getColumn(rowId, VinciSiteTableSync::COL_ADDRESS));
+			vs->setPhone(rows.getColumn(rowId, VinciSiteTableSync::COL_PHONE));
 		}
 
 		template<> void SQLiteTableSyncTemplate<VinciSite>::save(VinciSite* vs)
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (vs->getKey() != 0)
-			{	// UPDATE
-				query << "UPDATE " << TABLE_NAME << " SET "
-					<< VinciSiteTableSync::TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(vs->_name)
-					<< " WHERE " << VinciSiteTableSync::TABLE_COL_ID << "=" << vs->getKey();
-			}
-			else
-			{	// INSERT
+			if (vs->getKey() == 0)
 				vs->setKey(getId(0,0)); /// @todo Handle grid id
-				query << "INSERT INTO " << TABLE_NAME << " VALUES("
-					<< vs->getKey()
-					<< "," << Conversion::ToSQLiteString(vs->_name)
-					<< ")";
-			}
+
+			// INSERT
+			query << "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< vs->getKey()
+				<< "," << Conversion::ToSQLiteString(vs->getName())
+				<< "," << Conversion::ToSQLiteString(vs->getAddress())
+				<< "," << Conversion::ToSQLiteString(vs->getPhone())
+				<< ")";
+			
 			sqlite->execUpdate(query.str());
 		}
 	}
 
 	namespace vinci
 	{
-		const std::string VinciSiteTableSync::TABLE_COL_ID = "id";
-		const std::string VinciSiteTableSync::TABLE_COL_NAME = "name";
-		
+		const std::string VinciSiteTableSync::COL_NAME = "name";
+		const std::string VinciSiteTableSync::COL_ADDRESS = "address";
+		const std::string VinciSiteTableSync::COL_PHONE = "phone";
+
 		VinciSiteTableSync::VinciSiteTableSync()
 			: SQLiteTableSyncTemplate<VinciSite>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(TABLE_COL_NAME, "TEXT", true);
+			addTableColumn(COL_NAME, "TEXT", true);
+			addTableColumn(COL_ADDRESS, "TEXT", true);
+			addTableColumn(COL_PHONE, "TEXT", true);
 		}
 
 		void VinciSiteTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )

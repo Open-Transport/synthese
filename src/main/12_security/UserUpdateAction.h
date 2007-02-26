@@ -1,6 +1,6 @@
 
-/** DeleteRightAction class header.
-	@file DeleteRightAction.h
+/** UserUpdateAction class header.
+	@file UserUpdateAction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,10 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_DeleteRightAction_H__
-#define SYNTHESE_DeleteRightAction_H__
-
-#include <string>
+#ifndef SYNTHESE_UserUpdateAction_H__
+#define SYNTHESE_UserUpdateAction_H__
 
 #include "30_server/Action.h"
 
@@ -32,20 +30,37 @@ namespace synthese
 	namespace security
 	{
 		class Profile;
+		class User;
 
-		/** DeleteRightAction action class.
+		/** UserUpdateAction action class.
 			@ingroup m12
 		*/
-		class DeleteRightAction : public server::Action
+		class UserUpdateAction : public server::Action
 		{
 		public:
-			static const std::string PARAMETER_RIGHT;
-			static const std::string PARAMETER_PARAMETER;
+			static const std::string PARAMETER_LOGIN;
+			static const std::string PARAMETER_SURNAME;
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_ADDRESS;
+			static const std::string PARAMETER_POSTAL_CODE;
+			static const std::string PARAMETER_CITY;
+			static const std::string PARAMETER_PHONE;
+			static const std::string PARAMETER_EMAIL;
+			static const std::string PARAMETER_AUTHORIZED_LOGIN;
+			static const std::string PARAMETER_PROFILE_ID;
 
 		private:
+			User*		_user;
+			std::string _login;
+			std::string _surname;
+			std::string _name;
+			std::string _address;
+			std::string _postalCode;
+			std::string _city;
+			std::string _phone;
+			std::string _email;
+			bool		_authorizedLogin;
 			Profile*	_profile;
-			std::string _right;
-			std::string	_parameter;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -53,12 +68,16 @@ namespace synthese
 			server::Request::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
-			Removes the used parameters from the map.
+				Removes the used parameters from the map.
+				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
 			void setFromParametersMap(server::Request::ParametersMap& map);
 
 		public:
-			DeleteRightAction();
+			/** Constructor.
+			*/
+			UserUpdateAction();
+			~UserUpdateAction();
 
 			/** Action to run, defined by each subclass.
 			*/
@@ -67,4 +86,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_DeleteRightAction_H__
+#endif // SYNTHESE_UserUpdateAction_H__

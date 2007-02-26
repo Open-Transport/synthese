@@ -70,6 +70,26 @@ namespace synthese
 			}
 			return "";
 		}
+
+		void Right::setPrivateLevel( const Level& level )
+		{
+			_privateRightLevel = level;
+		}
+
+		void Right::setPublicLevel( const Level& level )
+		{
+			_publicRightLevel = level;
+		}
+
+		void Right::setParameter( const std::string& parameter )
+		{
+			_parameter = parameter;
+		}
+
+		std::string Right::getParameter() const
+		{
+			return _parameter;
+		}
 	}
 }
 

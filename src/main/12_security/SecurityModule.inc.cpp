@@ -14,6 +14,8 @@
 #include "12_security/AddRightAction.h"
 #include "12_security/UpdateRightAction.h"
 #include "12_security/UpdateProfileAction.h"
+#include "12_security/UserUpdateAction.h"
+#include "12_security/UserPasswordUpdateAction.h"
 
 #include "12_security/SecurityRight.h"
 

@@ -61,6 +61,7 @@ namespace synthese
 		public:
 			MessagesRight();
 			std::string displayParameter() const;
+			std::map<std::string, std::string>	getParametersLabels()	const;
 		};
 	}
 }

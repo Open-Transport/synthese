@@ -50,8 +50,11 @@ namespace synthese
 		public:
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
+
+				@param title Title to display in the generated code
+				@param wiring code Wiring code to display in the generated code
 			*/
-			void display(std::ostream& stream, const std::string& title, const ArrivalDepartureList& rows, const server::Request* request = NULL) const;
+			void display(std::ostream& stream, const std::string& title, int wiringCode, const ArrivalDepartureList& rows, const server::Request* request = NULL) const;
 		};
 	}
 }

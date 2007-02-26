@@ -180,6 +180,18 @@
 			<File
 				RelativePath=".\UpdateRightAction.h">
 			</File>
+			<File
+				RelativePath=".\UserPasswordUpdateAction.cpp">
+			</File>
+			<File
+				RelativePath=".\UserPasswordUpdateAction.h">
+			</File>
+			<File
+				RelativePath=".\UserUpdateAction.cpp">
+			</File>
+			<File
+				RelativePath=".\UserUpdateAction.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Exceptions"

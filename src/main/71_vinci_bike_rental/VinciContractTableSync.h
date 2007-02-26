@@ -44,8 +44,9 @@ namespace synthese
 		class VinciContractTableSync : public db::SQLiteTableSyncTemplate<VinciContract>
 		{
 		public:
-			static const std::string TABLE_COL_ID;
-			static const std::string TABLE_COL_USER_ID;
+			static const std::string COL_USER_ID;
+			static const std::string COL_SITE_ID;
+			static const std::string COL_DATE;
 
 			VinciContractTableSync();
 			~VinciContractTableSync ();

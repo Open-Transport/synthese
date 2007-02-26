@@ -42,6 +42,7 @@ namespace synthese
 	namespace departurestable
 	{
 		const std::string DisplayScreenContentRequest::PARAMETER_DATE = "date";
+		const std::string DisplayScreenContentRequest::PARAMETER_TB = "tb";
 
 		DisplayScreenContentRequest::DisplayScreenContentRequest()
 			: Request()
@@ -58,20 +59,31 @@ namespace synthese
 
 		void DisplayScreenContentRequest::setFromParametersMap(const Request::ParametersMap& map)
 		{
+			uid screenId = 0;
 			try
 			{
+				Request::ParametersMap::const_iterator it;
+				
 				// Screen
-				_screen = DeparturesTableModule::getDisplayScreens().get(getObjectId());
+				if (getObjectId())
+					screenId = getObjectId();
+				else
+				{
+					it = map.find(PARAMETER_TB);
+					if (it == map.end())
+						throw RequestException("Display screen not specified");
+					screenId = Conversion::ToLongLong(it->second);
+				}
+				_screen = DeparturesTableModule::getDisplayScreens().get(screenId);
 
 				// Date
-				Request::ParametersMap::const_iterator it;
 				it = map.find(PARAMETER_DATE);
 				if (it != map.end())
 					_date = DateTime::FromInternalString(it->second);
 			}
 			catch (DisplayScreen::RegistryKeyException e)
 			{
-				throw RequestException("Display screen " + Conversion::ToString(getObjectId()) + " not found");
+				throw RequestException("Display screen " + Conversion::ToString(screenId) + " not found");
 			}
 		}
 

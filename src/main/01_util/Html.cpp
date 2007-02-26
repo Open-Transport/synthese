@@ -93,5 +93,12 @@ namespace synthese
 			s << "<input type=\"checkbox\" name=\"" << name << value << "\" " << (checked ? " checked=\"true\"" : "") << " />";
 			return s.str();
 		}
+
+		std::string Html::getPasswordInput( const std::string& name, const std::string& value )
+		{
+			stringstream s;
+			s << "<input type=\"password\" name=\"" << name << "\" value=\"" << value << "\"" << " />";
+			return s.str();
+		}
 	}
 }

@@ -22,6 +22,8 @@
 
 #include <sstream>
 
+#include <boost/tokenizer.hpp>
+
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
@@ -33,6 +35,7 @@
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/UserTableSyncException.h"
+#include "12_security/Right.h"
 #include "12_security/Profile.h"
 
 using namespace std;
@@ -54,7 +57,7 @@ namespace synthese
 			profile->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			profile->setName(rows.getColumn(rowId, ProfileTableSync::TABLE_COL_NAME));
 			profile->setParent(Conversion::ToLongLong(rows.getColumn(rowId, ProfileTableSync::TABLE_COL_PARENT_ID)));
-			profile->setRights(rows.getColumn(rowId, ProfileTableSync::TABLE_COL_RIGHTS_STRING));
+			ProfileTableSync::setRightsFromString(profile, rows.getColumn(rowId, ProfileTableSync::TABLE_COL_RIGHTS_STRING));
 		}
 
 		template<> void SQLiteTableSyncTemplate<Profile>::save(Profile* profile )
@@ -62,25 +65,19 @@ namespace synthese
 			try
 			{
 				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
-				if (profile->getKey() != 0)
-				{
-					// UPDATE
-				}
-				else // INSERT
-				{
-					/// @todo Implement control of the fields
+				if (profile->getKey() == 0)
 					profile->setKey(getId(1,1));	/// @todo handle grid id
-					stringstream query;
-					query
-						<< "INSERT INTO " << TABLE_NAME
-						<< " VALUES(" 
-						<< Conversion::ToString(profile->getKey())
-						<< "," << Conversion::ToSQLiteString(profile->getName())
-						<< "," << Conversion::ToString(profile->getParentId())
-						<< "," << Conversion::ToSQLiteString(profile->getRightsString())
-						<< ")";
-					sqlite->execUpdate(query.str());
-				}
+				
+				stringstream query;
+				query
+					<< "REPLACE INTO " << TABLE_NAME
+					<< " VALUES(" 
+					<< Conversion::ToString(profile->getKey())
+					<< "," << Conversion::ToSQLiteString(profile->getName())
+					<< "," << Conversion::ToString(profile->getParentId())
+					<< "," << Conversion::ToSQLiteString(ProfileTableSync::getRightsString(profile))
+					<< ")";
+				sqlite->execUpdate(query.str());
 			}
 			catch (SQLiteException e)
 			{
@@ -98,6 +95,9 @@ namespace synthese
 
 	namespace security
 	{
+		const std::string ProfileTableSync::RIGHT_SEPARATOR = "|";
+		const std::string ProfileTableSync::RIGHT_VALUE_SEPARATOR = ",";
+
 		const std::string ProfileTableSync::TABLE_COL_ID = "id";
 		const std::string ProfileTableSync::TABLE_COL_NAME = "name";
 		const std::string ProfileTableSync::TABLE_COL_PARENT_ID = "parent";
@@ -116,18 +116,15 @@ namespace synthese
 		{
 			for (int i = 0; i < rows.getNbRows(); ++i)
 			{
-				Profile* profile = NULL;
-				try
+				if (SecurityModule::getProfiles().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
 				{
-					profile = new Profile(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-					load(profile, rows, i);
-					SecurityModule::getProfiles().add(profile);					
+					load(SecurityModule::getProfiles().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))), rows, i);
 				}
-				catch (Exception e)
+				else
 				{
-					delete profile;
-					Log::GetInstance().warn("Profile load exception", e);
-					continue;
+					Profile* profile = new Profile(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+					load(profile, rows, i);
+					SecurityModule::getProfiles().add(profile);
 				}
 			}
 		}
@@ -173,6 +170,69 @@ namespace synthese
 				throw UserTableSyncException(e.getMessage());
 			}
 		}
+
+		std::string ProfileTableSync::getRightsString( const Profile* p)
+		{
+			stringstream s;
+			s << "*,*," << ((int) p->getPrivateRight()) << "," << ((int) p->getPublicRight());
+
+			for (Profile::RightsVector::const_iterator it = p->getRights().begin(); it != p->getRights().end(); ++it)
+			{
+				Right* right = it->second;
+				s	<< RIGHT_SEPARATOR
+					<< right->getFactoryKey() 
+					<< RIGHT_VALUE_SEPARATOR << right->getParameter()
+					<< RIGHT_VALUE_SEPARATOR << ((int) right->getPrivateRightLevel())
+					<< RIGHT_VALUE_SEPARATOR << ((int) right->getPublicRightLevel())
+					;
+			}
+			return s.str();
+		}
+
+		void ProfileTableSync::setRightsFromString(Profile* profile, const std::string& text )
+		{
+			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+			boost::char_separator<char> sep(RIGHT_SEPARATOR.c_str ());
+
+			// Parsing
+			tokenizer parametersTokens (text, sep);
+			for (tokenizer::iterator parameterToken = parametersTokens.begin();
+				parameterToken != parametersTokens.end (); ++ parameterToken)
+			{
+				tokenizer valuesToken(*parameterToken, boost::char_separator<char>(RIGHT_VALUE_SEPARATOR.c_str()));
+				tokenizer::iterator it = valuesToken.begin();
+
+				if (*it == "*")
+				{
+					++it;
+					++it;
+					profile->setPrivateRight((Right::Level) Conversion::ToInt(*it));
+					++it;
+					profile->setPublicRight((Right::Level) Conversion::ToInt(*it));
+				}
+				else
+				{
+					try
+					{
+						Right* right = Factory<Right>::create(*it);
+
+						++it;
+						right->setParameter(*it);
+
+						++it;
+						right->setPrivateLevel((Right::Level) Conversion::ToInt(*it));
+
+						++it;
+						right->setPublicLevel((Right::Level) Conversion::ToInt(*it));
+
+						profile->addRight(right);
+					}
+					catch (FactoryException<Right> e)
+					{
+						continue;
+					}
+				}
+			}
+		}
 	}
 }
-

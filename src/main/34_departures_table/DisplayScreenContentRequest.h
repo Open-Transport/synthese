@@ -39,6 +39,7 @@ namespace synthese
 		class DisplayScreenContentRequest : public server::Request
 		{
 			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_TB;
 			
 			//! \name Page parameters
 			//@{

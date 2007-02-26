@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include <sstream>
+#include <complex>
 
 #include "01_util/Conversion.h"
 
@@ -44,6 +45,7 @@ namespace synthese
 		FormattedNumberInterfaceElement::FormattedNumberInterfaceElement()
 			: _numberVIE(NULL)
 			, _formatVIE(NULL)
+			, _numberToAdd(NULL)
 		{
 
 		}
@@ -52,6 +54,7 @@ namespace synthese
 		{
 			delete _numberVIE;
 			delete _formatVIE;
+			delete _numberToAdd;
 		}
 
 		void FormattedNumberInterfaceElement::storeParameters(ValueElementList& vel)
@@ -65,13 +68,34 @@ namespace synthese
 				_formatVIE = vel.front();
 			else
 				_formatVIE = new StaticValueInterfaceElement(TYPE_IDENTICAL);
+
+			if (vel.size() >= 3)
+			{
+				_numberToAdd = vel.front();
+			}
 		}
 
 		std::string FormattedNumberInterfaceElement::getValue(const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			int __Nombre = Conversion::ToInt(_numberVIE->getValue(parameters, object, request));
+			if (_numberToAdd != NULL)
+			{
+				__Nombre += Conversion::ToInt(_numberToAdd->getValue(parameters, object, request));
+			}
 			std::string __Format = _formatVIE->getValue(parameters, object, request);
 			stringstream s;
+
+			int numbers = Conversion::ToInt(__Format);
+			if (numbers > 0)
+			{
+				for (; numbers; numbers--)
+				{
+					if (__Nombre < pow(10.0, numbers - 1))
+						s << "0";
+				}
+				s << __Nombre;
+				return s.str();
+			}
 
 			if (__Format == TYPE_CHAR_2)
 			{

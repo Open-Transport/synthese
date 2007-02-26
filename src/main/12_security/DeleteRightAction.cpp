@@ -36,27 +36,38 @@ namespace synthese
 	namespace security
 	{
 		const string DeleteRightAction::PARAMETER_RIGHT = Action_PARAMETER_PREFIX + "right";
-
+		const string DeleteRightAction::PARAMETER_PARAMETER = Action_PARAMETER_PREFIX + "param";
 
 		Request::ParametersMap DeleteRightAction::getParametersMap() const
 		{
 			Request::ParametersMap map;
 			map.insert(make_pair(PARAMETER_RIGHT, _right));
+			map.insert(make_pair(PARAMETER_PARAMETER, _parameter));
 			return map;
 		}
 
 		void DeleteRightAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
-
-			it = map.find(PARAMETER_RIGHT);
-			if (it == map.end())
-				throw ActionException("Right not specified");
-			_right = it->second;
-
 			try
 			{
+				Request::ParametersMap::iterator it;
+
+				it = map.find(PARAMETER_RIGHT);
+				if (it == map.end())
+					throw ActionException("Right not specified");
+				_right = it->second;
+				map.erase(it);
+
+				it = map.find(PARAMETER_PARAMETER);
+				if (it == map.end())
+					throw ActionException("Parameter not specified");
+				_parameter = it->second;
+				map.erase(it);
+
 				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
+
+				if (_profile->getRights().find(make_pair(_right, _parameter)) == _profile->getRights().end())
+					throw ActionException("Specified right not found");
 			}
 			catch (Profile::RegistryKeyException e)
 			{
@@ -68,7 +79,7 @@ namespace synthese
 		{
 			if (_profile != NULL)
 			{
-				_profile->removeRight(_right);
+				_profile->removeRight(_right, _parameter);
 				ProfileTableSync::save(_profile);
 			}
 		}

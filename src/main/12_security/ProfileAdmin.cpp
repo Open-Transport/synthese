@@ -88,6 +88,14 @@ namespace synthese
 			addRightRequest->setObjectId(_profile->getKey());
 			addRightRequest->setAction(Factory<Action>::create<AddRightAction>());
 
+			map<int, std::string> privatePublicMap;
+			privatePublicMap.insert(make_pair((int) Right::FORBIDDEN, "Interdit"));
+			privatePublicMap.insert(make_pair((int) Right::USE, "Utilisation"));
+			privatePublicMap.insert(make_pair((int) Right::READ, "Lecture"));
+			privatePublicMap.insert(make_pair((int) Right::WRITE, "Ecriture"));
+			privatePublicMap.insert(make_pair((int) Right::DELETE, "Contrôle total"));
+			
+
 
 			stream	// UpdateProfile
 				<< "<h1>Propriétés</h1>"
@@ -97,59 +105,67 @@ namespace synthese
 				<< "<td>" << Html::getSubmitButton("Modifier") << "</td></tr>"
 				<< "</table></form>"
 
-				<< "<h1>Habilitations du profil&nbsp;:</h1>"
-				<< "<table>"
-				<< "<tr><th>Nature</th><th>Périmètre</th><th>Droit public</th><th>Droit privé</th><th colspan=\"2\">Actions</th></tr>";
+				<< "<h1>Habilitations du profil</h1>";
 
-			// Habilitations list
-			for (Profile::RightsVector::const_iterator it = _profile->getRights().begin(); it != _profile->getRights().end(); ++it)
+			if (_profile->getRights().empty())
+				stream << "Aucune habilitation";
+			else
 			{
-				Right* right = *it;
+				stream
+					<< "<table>"
+					<< "<tr><th>Nature</th><th>Périmètre</th><th>Droit public</th><th>Droit privé</th><th colspan=\"2\">Actions</th></tr>";
+
+				// Habilitations list
+				for (Profile::RightsVector::const_iterator it = _profile->getRights().begin(); it != _profile->getRights().end(); ++it)
+				{
+					Right* right = it->second;
+					stream
+						<< "<tr>"
+						<< updateRightRequest->getHTMLFormHeader("u" + right->getFactoryKey())
+						<< "<td>" << right->getFactoryKey() << "</td>"
+						<< "<td>" << right->displayParameter() << "</td>"
+						<< "<td>" << Right::getLevelLabel(right->getPublicRightLevel()) << "</td>"
+						<< "<td>" << Right::getLevelLabel(right->getPrivateRightLevel()) << "</td>"
+						<< "<td>"
+						<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT, right->getFactoryKey())
+						<< Html::getSubmitButton("Modifier")
+						<< "</td></form>"
+						<< "<td>" 
+						<< deleteRightRequest->getHTMLFormHeader("d" + right->getFactoryKey())
+						<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT, right->getFactoryKey())
+						<< Html::getSubmitButton("Supprimer")
+						<< "</form></td>"
+						<< "</tr>";
+				}
+				stream
+					<< "</table>";
+			}
+
+			stream				
+				<< "<h1>Ajout d'habilitation au profil</h1>"
+				<< "<table>"
+				<< "<tr><th>Nature</th><th>Périmètre</th><th>Droit public</th><th>Droit privé</th><th colspan=\"2\">Action</th></tr>";
+
+			for (Factory<Right>::Iterator it = Factory<Right>::begin(); it != Factory<Right>::end(); ++it)
+			{
 				stream
 					<< "<tr>"
-					<< updateRightRequest->getHTMLFormHeader("u" + right->getFactoryKey())
-					<< "<td>" << right->getFactoryKey() << "</td>"
-					<< "<td>" << right->displayParameter() << "</td>"
-					<< "<td>" << Right::getLevelLabel(right->getPublicRightLevel()) << "</td>"
-					<< "<td>" << Right::getLevelLabel(right->getPrivateRightLevel()) << "</td>"
-					<< "<td>"
-					<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT, right->getFactoryKey())
-					<< Html::getSubmitButton("Modifier")
-					<< "</td></form>"
+					<< addRightRequest->getHTMLFormHeader("add" + it.getKey())
+					<< "<td>" << it.getKey() << "</td>"
+					<< "<td>" << Html::getSelectInput(AddRightAction::PARAMETER_PARAMETER, it->getParametersLabels(), string("")) << "</td>"
+					<< "<td>" << Html::getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, (int) Right::Level(Right::USE)) << "</td>"
+					<< "<td>" << Html::getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, (int) Right::Level(Right::USE)) << "</td>"
 					<< "<td>" 
-					<< deleteRightRequest->getHTMLFormHeader("d" + right->getFactoryKey())
-					<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT, right->getFactoryKey())
-					<< Html::getSubmitButton("Supprimer")
-					<< "</form></td>"
-					<< "</tr>";
+					<< Html::getHiddenInput(AddRightAction::PARAMETER_RIGHT, it.getKey())
+					<< Html::getSubmitButton("Ajouter") << "</td>"
+					<< "</form></tr>";
 			}
-			stream
-				<< "<tr>"
-				<< addRightRequest->getHTMLFormHeader("add")
-				<< "<td>" << "</td>"	// Rights list
-				<< "<OPTION value=\"\" selected>Tableaux de départs</OPTION>"
-				<< "<OPTION value=\"\">Environnement</OPTION>"
-				<< "</SELECT></FONT></TD>"
-				<< "<TD style=\"WIDTH: 82px\"><SELECT id=\"Select4\" name=\"Select4\">";
+			stream << "</table>";
 
-			// numéro lignes
-
-			stream
-				<< "</SELECT></TD>"
-
-				<< "<TD style=\"WIDTH: 56px\"><SELECT id=\"Select5\" name=\"Select2\">"
-				<< "<OPTION value=\"\" selected>Public</OPTION>"
-				<< "<OPTION value=\"\">Privé</OPTION>"
-				<< "</SELECT></TD>"
-				<< "<TD style=\"WIDTH: 94px\"><SELECT id=\"Select3\" name=\"Select2\">"
-				<< "<OPTION value=\"\" selected>Utilisation</OPTION>"
-				<< "<OPTION value=\"\">Lecture</OPTION>"
-				<< "<OPTION value=\"\">Modification</OPTION>"
-				<< "<OPTION value=\"\">Suppression</OPTION>"
-				<< "</SELECT></TD>"
-				<< "<TD><INPUT id=\"Button7\" type=\"button\" value=\"Ajouter\" name=\"Button7\"></TD>"
-				<< "</TR></TABLE>"
-				;
+			delete updateRightRequest;
+			delete updateRequest;
+			delete addRightRequest;
+			delete deleteRightRequest;
 		}
 
 		void ProfileAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)

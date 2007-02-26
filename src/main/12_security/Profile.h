@@ -1,4 +1,25 @@
 
+/** Profile class header.
+	@file Profile.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_SECURITY_PROFILE_H
 #define SYNTHESE_SECURITY_PROFILE_H
 
@@ -8,12 +29,12 @@
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
+#include "12_security/Right.h"
+
 namespace synthese
 {
 	namespace security
 	{
-		class Right;
-
 		/** Profil utilisateur.
 			@ingroup m12
 		
@@ -34,12 +55,14 @@ namespace synthese
 		class Profile : public util::Registrable<uid,Profile>
 		{
 		public:
-			typedef std::vector<Right*> RightsVector;
+			typedef std::map<std::pair<std::string, std::string>, Right*> RightsVector;
 
 		private:
 			std::string		_name;
 			RightsVector	_rights;
 			uid				_parentId;
+			Right::Level	_privateGeneralLevel;
+			Right::Level	_publicGeneralLevel;
 
 		public:
 			/** Comparison operator between profiles.
@@ -51,22 +74,30 @@ namespace synthese
 			Profile(uid id=0);
 			~Profile();
 
-			void setName(const std::string& name);
-			void setRights(const RightsVector& rightsvector);
-			void cleanRights();
-			void setParent(uid id);
-			void setRights(const std::string& text);
+			//!	\name Getters
+			//@{
+				const std::string&	getName()														const;
+				const uid			getParentId()													const;
+				const RightsVector&	getRights()														const;
+				Right*				getRight(const std::string& key, const std::string& parameter)	const;
+				const Right::Level&	getPrivateRight()												const;
+				const Right::Level&	getPublicRight()												const;
+			//@}
 
-			const std::string&	getName() const;
-			const uid			getParentId() const;
-			const std::string	getRightsString() const;
-			const RightsVector&	getRights()	const;
 
-			Right*				getRight(const std::string& key);
-			void				removeRight(const std::string& key);
+			//!	\name Setters
+			//@{
+				void setName(const std::string& name);
+				void setRights(const RightsVector& rightsvector);
+				void cleanRights();
+				void removeRight(const std::string& key, const std::string& parameter);
+				void addRight(Right* right);
+				void setParent(uid id);
+				void setPrivateRight(const Right::Level& level);
+				void setPublicRight(const Right::Level& level);
+			//@}
 		};
 	}
 }
 
 #endif
-

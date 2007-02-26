@@ -22,18 +22,23 @@
 
 #include "DeparturesTableInterfacePage.h"
 
+#include "01_util/Conversion.h"
+
 namespace synthese
 {
+	using namespace util;
 	using namespace interfaces;
 
 	namespace departurestable
 	{
 		void DeparturesTableInterfacePage::display( std::ostream& stream
 			, const std::string& title
+			, int wiringCode
 			, const ArrivalDepartureList& rows, const server::Request* request /*= NULL*/ ) const
 		{
 			ParametersVector pv;
 			pv.push_back(title);
+			pv.push_back(Conversion::ToString(wiringCode));
 			InterfacePage::display(stream, pv, &rows, request);
 		}
 	}

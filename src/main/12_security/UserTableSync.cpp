@@ -50,20 +50,21 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<User>::load(User* user, const db::SQLiteResult& rows, int rowId)
 		{
-			user->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			user->setPassword(rows.getColumn(rowId, UserTableSync::TABLE_COL_PASSWORD));
-			user->setName(rows.getColumn(rowId, UserTableSync::TABLE_COL_NAME));
-			user->setSurname(rows.getColumn(rowId, UserTableSync::TABLE_COL_SURNAME));
-			user->setLogin(rows.getColumn(rowId, UserTableSync::TABLE_COL_LOGIN));
-			user->_address = rows.getColumn(rowId, UserTableSync::TABLE_COL_ADDRESS);
-			user->_postCode = rows.getColumn(rowId, UserTableSync::TABLE_COL_POST_CODE);
-			user->_cityText = rows.getColumn(rowId, UserTableSync::TABLE_COL_CITY_TEXT);
-			user->_cityId = Conversion::ToLongLong(rows.getColumn(rowId, UserTableSync::TABLE_COL_CITY_ID));
-			user->_country = rows.getColumn(rowId, UserTableSync::TABLE_COL_COUNTRY);
-			user->_email = rows.getColumn(rowId, UserTableSync::TABLE_COL_EMAIL);
-			user->_phone = rows.getColumn(rowId, UserTableSync::TABLE_COL_PHONE);
 			try
 			{
+				user->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+				user->setPassword(rows.getColumn(rowId, UserTableSync::TABLE_COL_PASSWORD));
+				user->setName(rows.getColumn(rowId, UserTableSync::TABLE_COL_NAME));
+				user->setSurname(rows.getColumn(rowId, UserTableSync::TABLE_COL_SURNAME));
+				user->setLogin(rows.getColumn(rowId, UserTableSync::TABLE_COL_LOGIN));
+				user->_address = rows.getColumn(rowId, UserTableSync::TABLE_COL_ADDRESS);
+				user->_postCode = rows.getColumn(rowId, UserTableSync::TABLE_COL_POST_CODE);
+				user->_cityText = rows.getColumn(rowId, UserTableSync::TABLE_COL_CITY_TEXT);
+				user->_cityId = Conversion::ToLongLong(rows.getColumn(rowId, UserTableSync::TABLE_COL_CITY_ID));
+				user->_country = rows.getColumn(rowId, UserTableSync::TABLE_COL_COUNTRY);
+				user->_email = rows.getColumn(rowId, UserTableSync::TABLE_COL_EMAIL);
+				user->_phone = rows.getColumn(rowId, UserTableSync::TABLE_COL_PHONE);
+				user->setConnectionAllowed(Conversion::ToBool(rows.getColumn(rowId, UserTableSync::COL_LOGIN_AUTHORIZED)));
 				user->setProfile(SecurityModule::getProfiles().get(Conversion::ToLongLong(rows.getColumn(rowId, UserTableSync::TABLE_COL_PROFILE_ID))));
 			}
 			catch (Profile::RegistryKeyException e)
@@ -78,48 +79,26 @@ namespace synthese
 			{
 				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 				stringstream query;
-				if (user->getKey() != 0)
-				{
-					query
-						<< "UPDATE " << TABLE_NAME
-						<< " SET "
-						<< UserTableSync::TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(user->getName())
-						<< "," << UserTableSync::TABLE_COL_SURNAME << "=" << Conversion::ToSQLiteString(user->getSurname())
-						<< "," << UserTableSync::TABLE_COL_LOGIN << "=" << Conversion::ToSQLiteString(user->getLogin())
-						<< "," << UserTableSync::TABLE_COL_PASSWORD << "=" << Conversion::ToSQLiteString(user->getPassword())
-						<< "," << UserTableSync::TABLE_COL_PROFILE_ID << "=" << Conversion::ToString(user->getProfile()->getKey())
-						<< "," << UserTableSync::TABLE_COL_ADDRESS << "=" << Conversion::ToSQLiteString(user->_address)
-						<< "," << UserTableSync::TABLE_COL_POST_CODE << "=" << Conversion::ToSQLiteString(user->_postCode)
-						<< "," << UserTableSync::TABLE_COL_CITY_TEXT << "=" << Conversion::ToSQLiteString(user->_cityText)
-						<< "," << UserTableSync::TABLE_COL_CITY_ID << "=" << Conversion::ToString(user->_cityId)
-						<< "," << UserTableSync::TABLE_COL_COUNTRY << "=" << Conversion::ToSQLiteString(user->_country)
-						<< "," << UserTableSync::TABLE_COL_EMAIL << "=" << Conversion::ToSQLiteString(user->_email)
-						<< "," << UserTableSync::TABLE_COL_PHONE << "=" << Conversion::ToSQLiteString(user->_phone)
-						<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(user->getKey());
-					
-				}
-				else // INSERT
-				{
-					/// @todo Implement control of the fields
+				if (user->getKey() == 0)
 					user->setKey(getId(1,1));	/// @todo handle grid id
-					query
-						<< "INSERT INTO " << TABLE_NAME
-						<< " VALUES(" 
-						<< Conversion::ToString(user->getKey())
-						<< "," << Conversion::ToSQLiteString(user->getName())
-						<< "," << Conversion::ToSQLiteString(user->getSurname())
-						<< "," << Conversion::ToSQLiteString(user->getLogin())
-						<< "," << Conversion::ToSQLiteString(user->getPassword())
-						<< "," << Conversion::ToString(user->getProfile()->getKey())
-						<< "," << Conversion::ToSQLiteString(user->_address)
-						<< "," << Conversion::ToSQLiteString(user->_postCode)
-						<< "," << Conversion::ToSQLiteString(user->_cityText)
-						<< "," << Conversion::ToString(user->_cityId)
-						<< "," << Conversion::ToSQLiteString(user->_country)
-						<< "," << Conversion::ToSQLiteString(user->_email)
-						<< "," << Conversion::ToSQLiteString(user->_phone)
-						<< ")";
-				}
+				query
+					<< "REPLACE INTO " << TABLE_NAME
+					<< " VALUES(" 
+					<< Conversion::ToString(user->getKey())
+					<< "," << Conversion::ToSQLiteString(user->getName())
+					<< "," << Conversion::ToSQLiteString(user->getSurname())
+					<< "," << Conversion::ToSQLiteString(user->getLogin())
+					<< "," << Conversion::ToSQLiteString(user->getPassword())
+					<< "," << Conversion::ToString(user->getProfile()->getKey())
+					<< "," << Conversion::ToSQLiteString(user->_address)
+					<< "," << Conversion::ToSQLiteString(user->_postCode)
+					<< "," << Conversion::ToSQLiteString(user->_cityText)
+					<< "," << Conversion::ToString(user->_cityId)
+					<< "," << Conversion::ToSQLiteString(user->_country)
+					<< "," << Conversion::ToSQLiteString(user->_email)
+					<< "," << Conversion::ToSQLiteString(user->_phone)
+					<< "," << Conversion::ToString(user->getConnectionAllowed())
+					<< ")";
 				sqlite->execUpdate(query.str());
 			}
 			catch (SQLiteException e)
@@ -147,6 +126,7 @@ namespace synthese
 		const std::string UserTableSync::TABLE_COL_COUNTRY = "country";
 		const std::string UserTableSync::TABLE_COL_EMAIL = "email";
 		const std::string UserTableSync::TABLE_COL_PHONE = "phone";
+		const std::string UserTableSync::COL_LOGIN_AUTHORIZED = "auth";
 
 		UserTableSync::UserTableSync()
 			: db::SQLiteTableSyncTemplate<User> ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
@@ -164,15 +144,12 @@ namespace synthese
 			addTableColumn(TABLE_COL_COUNTRY, "TEXT", true);
 			addTableColumn(TABLE_COL_EMAIL, "TEXT", true);
 			addTableColumn(TABLE_COL_PHONE, "TEXT", true);
+			addTableColumn(COL_LOGIN_AUTHORIZED, "INTEGER");
 		}
 
 
 		void UserTableSync::rowsUpdated( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-				/// @todo implementation
-			}
 		}
 
 
@@ -183,7 +160,6 @@ namespace synthese
 
 		void UserTableSync::rowsRemoved( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
-			/// @todo implementation
 		}
 
 		User* UserTableSync::getUserFromLogin(const std::string& login )
@@ -242,8 +218,26 @@ namespace synthese
 				throw UserTableSyncException(e.getMessage());
 			}
 		}
+
+		bool UserTableSync::loginExists( const std::string& login )
+		{
+			try
+			{
+				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+				std::stringstream query;
+				query
+					<< "SELECT " << TABLE_COL_ID
+					<< " FROM " << TABLE_NAME
+					<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToSQLiteString(login)
+					<< " LIMIT 1 ";
+				
+				db::SQLiteResult rows = sqlite->execQuery(query.str());
+				return (rows.getNbRows() > 0);
+			}
+			catch (SQLiteException e)
+			{
+				throw UserTableSyncException(e.getMessage());
+			}
+		}
 	}
 }
-
-
-

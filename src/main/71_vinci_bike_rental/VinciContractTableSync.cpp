@@ -49,8 +49,9 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<VinciContract>::load(VinciContract* vc, const SQLiteResult& rows, int rowId)
 		{
-			vc->setKey(Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::TABLE_COL_ID)));
-			vc->_userId = Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::TABLE_COL_USER_ID));
+			vc->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			vc->setUserId(Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::COL_USER_ID)));
+			vc->setSiteId(Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::COL_SITE_ID)));
 		}
 
 		template<> void SQLiteTableSyncTemplate<VinciContract>::save(VinciContract* vc)
@@ -58,33 +59,29 @@ namespace synthese
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (vc->getKey() != 0)
-			{	// UPDATE
-				query << "UPDATE " << TABLE_NAME << " SET "
-					<< VinciContractTableSync::TABLE_COL_USER_ID << "=" << Conversion::ToString(vc->_userId)
-					<< " WHERE " << VinciContractTableSync::TABLE_COL_ID << "=" << vc->getKey();
-			}
-			else
-			{	// INSERT
 				vc->setKey(getId(1,1)); /// @todo Handle grid ID
-				query << "INSERT INTO " << TABLE_NAME << " VALUES("
+			
+			// INSERT
+			query << "REPLACE INTO " << TABLE_NAME << " VALUES("
 					<< vc->getKey()
-					<< "," << Conversion::ToString(vc->_userId)
+					<< "," << Conversion::ToString(vc->getUserId())
+					<< "," << Conversion::ToString(vc->getSiteId())
 					<< ")";
-			}
 			sqlite->execUpdate(query.str());
 		}
 	}
 
 	namespace vinci
 	{
-		const std::string VinciContractTableSync::TABLE_COL_ID = "id";
-		const std::string VinciContractTableSync::TABLE_COL_USER_ID = "user_id";
-		
+		const std::string VinciContractTableSync::COL_USER_ID = "user_id";
+		const std::string VinciContractTableSync::COL_SITE_ID = "site_id";
+
 		VinciContractTableSync::VinciContractTableSync()
 			: SQLiteTableSyncTemplate<VinciContract>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(TABLE_COL_USER_ID, "INTEGER", true);
+			addTableColumn(COL_USER_ID, "INTEGER", true);
+			addTableColumn(COL_SITE_ID, "INTEGER", true);
 		}
 
 		void VinciContractTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )

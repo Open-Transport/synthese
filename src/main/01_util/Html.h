@@ -60,6 +60,8 @@ namespace synthese
 
 				static std::string getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping="");
 
+				static std::string getPasswordInput(const std::string& name, const std::string& value);
+
 				static std::string getHiddenInput(const std::string& name, const std::string& value);
 
 				static std::string getTextAreaInput(const std::string& name, const std::string& value, int rows, int cols);

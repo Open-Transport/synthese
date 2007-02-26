@@ -65,24 +65,26 @@ namespace synthese
 			// Fetch user
 			try
 			{
-				if (_login.size() > 0 && _password.size() > 0)
-				{
-					User* user = UserTableSync::getUserFromLogin(_login);
-					user->verifyPassword(_password);
-					Session* session = new Session(_request->getIP());
-					session->setUser(user);
-					_request->setSession(session);
-				}
-				else
-					throw ActionException("Empty login");
+				if (_login.empty() || _password.empty())
+					throw ActionException("Champ utilisateur ou mot de passe vide");
+				
+				User* user = UserTableSync::getUserFromLogin(_login);
+				user->verifyPassword(_password);
+				
+				if (!user->getConnectionAllowed())
+					throw ActionException("Connexion impossible");
+
+				Session* session = new Session(_request->getIP());
+				session->setUser(user);
+				_request->setSession(session);					
 			}
 			catch (UserTableSyncException e)
 			{
-				throw ActionException("Bad user");
+				throw ActionException("Utilisateur introuvable");
 			}
 			catch (UserException e)
 			{
-				throw ActionException("Bad password");
+				throw ActionException("Mot de passe erroné");
 			}
 		}
 	}
