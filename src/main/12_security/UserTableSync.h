@@ -56,6 +56,7 @@ namespace synthese
 			static const std::string TABLE_COL_EMAIL;
 			static const std::string TABLE_COL_PHONE;
 			static const std::string COL_LOGIN_AUTHORIZED;
+			static const std::string COL_BIRTH_DATE;
 
 
 			UserTableSync();

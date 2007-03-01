@@ -94,7 +94,16 @@ namespace synthese
 
 		class VinciBikeRentalModule : public util::ModuleClass
 		{
+		private:
+			static accounts::Account*	_freeLockRent;
+
+			static const std::string VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE;
+
+
 		public:
+			VinciBikeRentalModule();
+			~VinciBikeRentalModule();
+
 			static const std::string VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE;
 			static const std::string VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE;
 			static const std::string VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE;
@@ -135,6 +144,8 @@ namespace synthese
 			static security::User* getVinciUser();
 			static accounts::Currency* getEuroCurrency();
 			static accounts::Account* getAccount(const std::string& code);
+
+			static accounts::Account*	getFreeLockRentServiceAccount();
 		};
 		/** @} */
 	}

@@ -93,7 +93,7 @@ namespace synthese
 				@date 2006				
 			*/
 			static std::vector<TransactionPart*> search(
-				Transaction* transaction, Account* account=NULL
+				const Transaction* transaction, const Account* account=NULL
 				, int first = 0, int number = -1);
 
 			static std::map<int, int> TransactionPartTableSync::count(Account* account, time::Date startDate, time::Date endDate, int first=0, int number=-1);
@@ -126,4 +126,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_TransationPartTableSync_H__
-

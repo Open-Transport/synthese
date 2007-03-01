@@ -1,10 +1,9 @@
 
-/** VinciSite class header.
-	@file VinciSite.h
+/** VinciAntivol class header.
+	@file VinciAntivol.h
 
-	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
-	Copyright (C) 2006 Vinci Park 
-	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -21,38 +20,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_VinciSite_H__
-#define SYNTHESE_VinciSite_H__
+#ifndef SYNTHESE_VinciAntivol_h__
+#define SYNTHESE_VinciAntivol_h__
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
-
-#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace vinci
 	{
-		class VinciSite : public util::Registrable<uid, VinciSite>
+		/** VinciAntivol class.
+			@ingroup m71
+		*/
+		class VinciAntivol : public util::Registrable<uid, VinciAntivol>
 		{
 		private:
-			std::string _name;
-			std::string _address;
-			std::string _phone;
+			std::string _markedNumber;
 
 		public:
-			VinciSite();
+			VinciAntivol();
 
-			void setName(const std::string& name);
-			void setAddress(const std::string& address);
-			void setPhone(const std::string& phone);
+			std::string getMarkedNumber()	const;
 
-			const std::string& getName() const;
-			const std::string& getAddress() const;
-			const std::string& getPhone() const;
+			void	setMarkedNumber(const std::string& number);
 		};
 	}
 }
 
-#endif // SYNTHESE_VinciSite_H__
-
+#endif // SYNTHESE_VinciAntivol_h__

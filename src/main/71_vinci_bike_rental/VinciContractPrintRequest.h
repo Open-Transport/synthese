@@ -1,6 +1,6 @@
 
-/** ReturnABikeAction class header.
-	@file ReturnABikeAction.h
+/** VinciContractPrintRequest class header.
+	@file VinciContractPrintRequest.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,54 +20,50 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ReturnABikeAction_H__
-#define SYNTHESE_ReturnABikeAction_H__
+#ifndef SYNTHESE_VinciContractPrintRequest_H__
+#define SYNTHESE_VinciContractPrintRequest_H__
 
-#include "30_server/Action.h"
+#include "11_interfaces/RequestWithInterfaceAndRequiredSession.h"
 
 namespace synthese
 {
-	namespace accounts
-	{
-		class TransactionPart;
-	}
-
 	namespace vinci
 	{
-		/** ReturnABikeAction action class.
+		class VinciContract;
+
+		/** VinciContractPrintRequest class.
 			@ingroup m71
 		*/
-		class ReturnABikeAction : public server::Action
+		class VinciContractPrintRequest : public interfaces::RequestWithInterfaceAndRequiredSession
 		{
 		public:
-			static const std::string PARAMETER_TRANSACTION_PART_ID;
-
-		private:
-			accounts::TransactionPart*	_transactionPart;
+			static const std::string PARAMETER_CONTRACT_ID;
 			
-		protected:
+		private:
+			//! \name Page parameters
+			//@{
+				const VinciContract*	_contract;
+			//@}
+
+
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			server::Request::ParametersMap getParametersMap() const;
+			Request::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
-				Removes the used parameters from the map.
-				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
-			void setFromParametersMap(server::Request::ParametersMap& map);
+			void setFromParametersMap(const Request::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			ReturnABikeAction();
-			~ReturnABikeAction();
+			VinciContractPrintRequest();
+			~VinciContractPrintRequest();
+
+			void setContract(const VinciContract* contract);
 
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(std::ostream& stream) const;
 		};
 	}
 }
-
-#endif // SYNTHESE_ReturnABikeAction_H__
-
+#endif // SYNTHESE_VinciContractPrintRequest_H__

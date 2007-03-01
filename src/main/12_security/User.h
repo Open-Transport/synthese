@@ -9,6 +9,8 @@
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
+#include "04_time/Date.h"
+
 namespace synthese
 {
 	namespace security
@@ -43,6 +45,7 @@ namespace synthese
 			std::string		_email;
 			std::string		_phone;
 			bool			_isConnectionAllowed;
+			time::Date		_birthDate;
 
 			friend class db::SQLiteTableSyncTemplate<User>;
 			
@@ -67,6 +70,7 @@ namespace synthese
 				void setEMail(const std::string& email);
 				void setPhone(const std::string& phone);
 				void setConnectionAllowed(bool value);
+				void setBirthDate(const time::Date& date);
 			//@}
 
 			//! \name Getters
@@ -77,16 +81,17 @@ namespace synthese
 				/** Password getter.
 					@todo handle encryption (create a getEncryptedPassword instead)
 				*/
-				const std::string&	getPassword() const;
-				const std::string&	getName() const;
-				const std::string&	getSurname() const;
-				const std::string&	getAddress() const;
-				const std::string&	getPostCode() const;
-				const std::string&	getCityText() const;
-				const std::string&	getCountry() const;
-				const std::string&	getEMail() const;
-				const std::string&	getPhone() const;
-				bool				getConnectionAllowed() const;
+				const std::string&	getPassword()			const;
+				const std::string&	getName()				const;
+				const std::string&	getSurname()			const;
+				const std::string&	getAddress()			const;
+				const std::string&	getPostCode()			const;
+				const std::string&	getCityText()			const;
+				const std::string&	getCountry()			const;
+				const std::string&	getEMail()				const;
+				const std::string&	getPhone()				const;
+				bool				getConnectionAllowed()	const;
+				const time::Date&	getBirthDate()			const;
 			//@}
 
 			//! \name Services

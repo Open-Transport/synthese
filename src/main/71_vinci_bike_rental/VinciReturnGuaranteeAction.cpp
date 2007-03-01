@@ -27,6 +27,8 @@
 
 #include "12_security/User.h"
 
+#include "30_server/ActionException.h"
+
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
 #include "57_accounting/Transaction.h"
@@ -47,6 +49,7 @@ namespace synthese
 	using namespace util;
 	using namespace accounts;
 	using namespace time;
+	using namespace db;
 	
 	namespace vinci
 	{
@@ -62,57 +65,28 @@ namespace synthese
 
 		void VinciReturnGuaranteeAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
-
-			it = map.find(PARAMETER_GUARANTEE_ID);
-			if (it != map.end())
+			try
 			{
+				Request::ParametersMap::iterator it;
+
+				it = map.find(PARAMETER_GUARANTEE_ID);
+				if (it == map.end())
+					throw ActionException("Guarantee not specified");
 				_guarantee = TransactionTableSync::get(Conversion::ToLongLong(it->second));
 				map.erase(it);
+			}
+			catch(DBEmptyResultException e)
+			{
+				throw ActionException("Specified guarantee not found");
 			}
 		}
 
 		void VinciReturnGuaranteeAction::run()
 		{
-	/*		DateTime now;
-			Account* account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE);
-			
-			// Transaction
+			DateTime now;
 			_guarantee->setEndDateTime(now);
-			TransactionTableSync::save(transaction);
-
-			// Old amount
-			vector<TransactionPart*> tps = TransactionPartTableSync::search(_guarantee);
-			TransactionPart* tp = *(tps.begin());
-
-			// Transaction
-			Transaction* transaction = new Transaction;
-			transaction->setStartDateTime(now);
-			transaction->setEndDateTime(unknownDate);
-			transaction->setLeftUserId(_contract->getUserId());
-			TransactionTableSync::save(transaction);
-
-			// Part 1 : customer
-			TransactionPart* transactionPart = new TransactionPart;
-			transactionPart->setTransactionId(transaction->getKey());
-			transactionPart->setAccountId(account->getKey());
-			transactionPart->setLeftCurrencyAmount(-tp->getAmount());
-			transactionPart->setRightCurrencyAmount(-tp->getAmount());
-			TransactionPartTableSync::save(transactionPart);
-			
-			// Part 2 : 
-			TransactionPart* changeTransactionPart = new TransactionPart;
-			changeTransactionPart->setTransactionId(transaction->getKey());
-			changeTransactionPart->setAccountId(_account->getKey());
-			changeTransactionPart->setLeftCurrencyAmount(tp->getAmount());
-			changeTransactionPart->setRightCurrencyAmount(tp->getAmount());
-			TransactionPartTableSync::save(changeTransactionPart);
-
-			delete account;
-			delete transactionPart;
-			delete changeTransactionPart;
-			delete transaction;
-*/		}
+			TransactionTableSync::save(_guarantee);
+		}
 
 		VinciReturnGuaranteeAction::~VinciReturnGuaranteeAction()
 		{

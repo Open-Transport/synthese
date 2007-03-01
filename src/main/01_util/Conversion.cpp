@@ -168,7 +168,7 @@ namespace synthese
 			{
 				// Escape several characters
 				if (s.at(i) == '\'' || s.at(i) == '\'')
-					result.push_back('\\');
+					result.push_back('\'');
 				
 				result.push_back(s.at(i));
 			}

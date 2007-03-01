@@ -57,11 +57,11 @@ namespace synthese
 			*/
 			bool	runAfterAction(std::ostream& stream);
 
-			virtual std::string getHTMLFormHeader(const std::string& name) const;
-
 			virtual std::string getQueryString() const;
 		public:
 			virtual void copy(const Request* request);
+
+			virtual std::string getHTMLFormHeader(const std::string& name) const;
 
 		};
 	}

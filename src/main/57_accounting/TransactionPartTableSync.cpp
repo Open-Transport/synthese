@@ -143,7 +143,7 @@ namespace synthese
 		}
 
 		vector<TransactionPart*> TransactionPartTableSync::search(
-				Transaction* transaction, Account* account
+				const Transaction* transaction, const Account* account
 				, int first, int number)
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
@@ -184,7 +184,10 @@ namespace synthese
 				;
 			if (user != NULL)
 				query << " AND t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(user->getKey());
-			query << " LIMIT " << number << " OFFSET " << first;
+			query << " ORDER BY " << TransactionTableSync::TABLE_COL_START_DATE_TIME;
+			if (first < 0)
+				query << " DESC ";
+			query << " LIMIT " << number << " OFFSET " << ((first > 0) ? first : -first);
 			
 			SQLiteResult result = sqlite->execQuery(query.str());
 			vector<TransactionPart*> tps;

@@ -335,9 +335,14 @@ Hour::FromSQLTime (const std::string& sqlTime)
 Hour
 Hour::FromString (const std::string& str)
 {
-    // hh:mm
-    return Hour (Conversion::ToInt (str.substr (0, 2)),
-		 Conversion::ToInt (str.substr (4, 2)));
+	int dot = (int) str.find(':');
+
+	if (dot == -1)
+		throw TimeParseException("Invalid hour");
+
+	return Hour(Conversion::ToInt (str.substr (0, dot)),
+		Conversion::ToInt (str.substr (dot+1, str.length() - dot))
+	);
 }
 
 std::string Hour::toSQLString( bool withApostrophes /*= true*/ ) const

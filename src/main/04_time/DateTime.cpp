@@ -440,13 +440,14 @@ namespace synthese
 		DateTime 
 		DateTime::FromString (const std::string& str)
 		{
-			// AAAA/MM/JJ hh:mm
-			return DateTime (Conversion::ToInt (str.substr (8, 2)),
-					Conversion::ToInt (str.substr (5, 2)),
-					Conversion::ToInt (str.substr (0, 4)),
-					Conversion::ToInt (str.substr (11, 2)),
-					Conversion::ToInt (str.substr (14, 2)));
-		    
+			if (str.empty())
+				return DateTime(time::TIME_UNKNOWN);
+
+			int spaceSeparator = (int) str.find(' ');
+
+			return (spaceSeparator == -1)
+				? DateTime(Date::FromString(str))
+				: DateTime(Date::FromString(str.substr(0, spaceSeparator)), Hour::FromSQLTime(str.substr(spaceSeparator+1, str.length() - spaceSeparator)));
 		}
 
 		std::string DateTime::toSQLString(bool withApostrophes) const

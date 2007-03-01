@@ -41,6 +41,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace security;
+	using namespace time;
 
 	namespace db
 	{
@@ -66,6 +67,7 @@ namespace synthese
 				user->_phone = rows.getColumn(rowId, UserTableSync::TABLE_COL_PHONE);
 				user->setConnectionAllowed(Conversion::ToBool(rows.getColumn(rowId, UserTableSync::COL_LOGIN_AUTHORIZED)));
 				user->setProfile(SecurityModule::getProfiles().get(Conversion::ToLongLong(rows.getColumn(rowId, UserTableSync::TABLE_COL_PROFILE_ID))));
+				user->setBirthDate(Date::FromSQLDate(rows.getColumn(rowId, UserTableSync::COL_BIRTH_DATE)));
 			}
 			catch (Profile::RegistryKeyException e)
 			{
@@ -98,6 +100,7 @@ namespace synthese
 					<< "," << Conversion::ToSQLiteString(user->_email)
 					<< "," << Conversion::ToSQLiteString(user->_phone)
 					<< "," << Conversion::ToString(user->getConnectionAllowed())
+					<< "," << user->getBirthDate().toSQLString()
 					<< ")";
 				sqlite->execUpdate(query.str());
 			}
@@ -127,6 +130,7 @@ namespace synthese
 		const std::string UserTableSync::TABLE_COL_EMAIL = "email";
 		const std::string UserTableSync::TABLE_COL_PHONE = "phone";
 		const std::string UserTableSync::COL_LOGIN_AUTHORIZED = "auth";
+		const std::string UserTableSync::COL_BIRTH_DATE = "birth_date";
 
 		UserTableSync::UserTableSync()
 			: db::SQLiteTableSyncTemplate<User> ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
@@ -145,6 +149,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_EMAIL, "TEXT", true);
 			addTableColumn(TABLE_COL_PHONE, "TEXT", true);
 			addTableColumn(COL_LOGIN_AUTHORIZED, "INTEGER");
+			addTableColumn(COL_BIRTH_DATE, "TIMESTAMP");
 		}
 
 

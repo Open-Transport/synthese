@@ -21,11 +21,28 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <vector>
+
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
 
+#include "57_accounting/TransactionPart.h"
+#include "57_accounting/TransactionPartTableSync.h"
+#include "57_accounting/TransactionTableSync.h"
+#include "57_accounting/Transaction.h"
+
 #include "71_vinci_bike_rental/VinciContract.h"
+#include "71_vinci_bike_rental/VinciSite.h"
+#include "71_vinci_bike_rental/VinciBike.h"
 #include "71_vinci_bike_rental/VinciSiteTableSync.h"
+#include "71_vinci_bike_rental/VinciRate.h"
+#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
+#include "71_vinci_bike_rental/VinciRateTableSync.h"
+#include "71_vinci_bike_rental/VinciBikeTableSync.h"
+#include "71_vinci_bike_rental/VinciAntivolTableSync.h"
+#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
+
+using namespace std;
 
 namespace synthese
 {
@@ -33,6 +50,7 @@ namespace synthese
 	using namespace security;
 	using namespace db;
 	using namespace time;
+	using namespace accounts;
 
 	namespace vinci
 	{
@@ -55,7 +73,7 @@ namespace synthese
 			return _userId;
 		}
 
-		User* VinciContract::getUser() const
+		User* VinciContract::getUser()
 		{
 			if (_user == NULL)
 				_user = UserTableSync::get(_userId);
@@ -71,9 +89,6 @@ namespace synthese
 		void VinciContract::setSiteId( uid id )
 		{
 			_siteId = id;
-			if (_site == NULL)
-				_site = VinciSiteTableSync::get(_siteId);
-			return _site;
 		}
 
 		void VinciContract::setDate( const time::DateTime& date )
@@ -84,6 +99,66 @@ namespace synthese
 		const time::DateTime& VinciContract::getDate() const
 		{
 			return _date;
+		}
+
+		VinciSite* VinciContract::getSite()
+		{
+			if (_site == NULL)
+				_site = VinciSiteTableSync::get(_siteId);
+			return _site;
+		}
+
+		const std::string& VinciContract::getPassport() const
+		{
+			return _passport;
+		}
+
+		void VinciContract::setPassport( const std::string& text )
+		{
+			_passport = text;
+		}
+
+		VinciBike* VinciContract::getCurrentBike() const
+		{
+			TransactionPart* tp = getCurrentRentTransactionPart();
+			if (tp == NULL)
+				return NULL;
+			VinciBike* bike = NULL;
+			if (tp->getTradedObjectId() != "")
+				bike = VinciBikeTableSync::get(Conversion::ToLongLong(tp->getTradedObjectId()));
+			delete tp;
+			return bike;
+		}
+
+		uid VinciContract::getSiteId() const
+		{
+			return _siteId;
+		}
+
+		TransactionPart* VinciContract::getCurrentRentTransactionPart() const
+		{
+			vector<TransactionPart*> rents = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), UserTableSync::get(_userId), -1, 1);
+			return rents.empty() ? NULL : rents.front();
+		}
+
+		VinciAntivol* VinciContract::getCurrentLock() const
+		{
+			TransactionPart* tp = getCurrentRentTransactionPart();
+			if (tp == NULL)
+				return NULL;
+			Transaction* t = TransactionTableSync::get(tp->getTransactionId());
+			delete tp;
+			tp = t->getPart(VinciBikeRentalModule::getFreeLockRentServiceAccount());
+			delete t;
+			VinciAntivol* lock = VinciAntivolTableSync::get(Conversion::ToLongLong(tp->getTradedObjectId()));
+			delete tp;
+			return lock;
+		}
+
+		accounts::TransactionPart* VinciContract::getCurrentGuaranteeTransactionPart() const
+		{
+			vector<TransactionPart*> gua = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), UserTableSync::get(_userId), -1, 1);
+			return gua.empty() ? NULL : gua.front();
 		}
 	}
 }

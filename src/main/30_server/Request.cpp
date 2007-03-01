@@ -284,7 +284,7 @@ namespace synthese
 				return;
 			
 			// Run the display
-			run(stream);			
+			run(stream);
 		}
 
 		Request::~Request()

@@ -29,8 +29,8 @@ namespace synthese
 
 	namespace vinci
 	{
-		VinciSite::VinciSite(uid id)
-			: Registrable<uid, VinciSite>(id)
+		VinciSite::VinciSite()
+			: Registrable<uid, VinciSite>()
 		{ }
 
 

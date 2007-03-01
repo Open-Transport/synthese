@@ -58,7 +58,7 @@ namespace synthese
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (vc->getKey() != 0)
+			if (vc->getKey() == 0)
 				vc->setKey(getId(1,1)); /// @todo Handle grid ID
 			
 			// INSERT
@@ -66,6 +66,8 @@ namespace synthese
 					<< vc->getKey()
 					<< "," << Conversion::ToString(vc->getUserId())
 					<< "," << Conversion::ToString(vc->getSiteId())
+					<< "," << vc->getDate().toSQLString()
+					<< "," << Conversion::ToSQLiteString(vc->getPassport())
 					<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -75,6 +77,8 @@ namespace synthese
 	{
 		const std::string VinciContractTableSync::COL_USER_ID = "user_id";
 		const std::string VinciContractTableSync::COL_SITE_ID = "site_id";
+		const std::string VinciContractTableSync::COL_DATE = "date";
+		const std::string VinciContractTableSync::COL_PASSPORT = "passport";
 
 		VinciContractTableSync::VinciContractTableSync()
 			: SQLiteTableSyncTemplate<VinciContract>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
@@ -82,6 +86,8 @@ namespace synthese
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_USER_ID, "INTEGER", true);
 			addTableColumn(COL_SITE_ID, "INTEGER", true);
+			addTableColumn(COL_DATE, "TIMESTAMP", true);
+			addTableColumn(COL_PASSPORT, "TEXT", true);
 		}
 
 		void VinciContractTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
@@ -107,7 +113,7 @@ namespace synthese
 				<< "SELECT *"
 				<< " FROM "
 					<< TABLE_NAME << " AS c "
-					<< " INNER JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << TABLE_COL_USER_ID << "=u." << UserTableSync::TABLE_COL_ID
+					<< " INNER JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << COL_USER_ID << "=u." << UserTableSync::TABLE_COL_ID
 				<< " WHERE "
 					<< "u." << UserTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
 					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '%" << Conversion::ToSQLiteString(surname, false) << "%'"
@@ -116,13 +122,11 @@ namespace synthese
 			vector<VinciContract*> contracts;
 			for (int i=0; i<result.getNbRows(); ++i)
 			{
-				User* user = new User;
 				try
 				{
-					SQLiteTableSyncTemplate<User>::load(user, result, i);
 					VinciContract* contract = new VinciContract;
 					SQLiteTableSyncTemplate<VinciContract>::load(contract, result, i);
-					contract->_user = user;
+					contract->getUser();
 					contracts.push_back(contract);
 				}
 				catch (UserTableSyncException e)

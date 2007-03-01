@@ -1,6 +1,6 @@
 
-/** VinciPrintedContractInterfacePage class header.
-	@file VinciPrintedContractInterfacePage.h
+/** VinciAntivol class implementation.
+	@file VinciAntivol.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,38 +20,29 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_VinciPrintedContractInterfacePage_H__
-#define SYNTHESE_VinciPrintedContractInterfacePage_H__
-
-#include <string>
-
-#include "11_interfaces/InterfacePage.h"
+#include "VinciAntivol.h"
 
 namespace synthese
 {
-	namespace server
-	{
-		class Request;
-	}
+	using namespace util;
 
 	namespace vinci
 	{
-		class VinciContract;
 
-		/** Vinci printed contract.
-			@ingroup m71
-		*/
-		class VinciPrintedContractInterfacePage : public interfaces::InterfacePage
+		std::string VinciAntivol::getMarkedNumber() const
 		{
-		public:
-			/** Overloaded display method for specific parameter conversion.
-				This function converts the parameters into a single ParametersVector object.
-			*/
-			void display(std::ostream& stream
-				, const VinciContract* contract
-				, const server::Request* request = NULL) const;
-		};
+			return _markedNumber;
+		}
+
+		void VinciAntivol::setMarkedNumber( const std::string& number )
+		{
+			_markedNumber = number;
+		}
+
+		VinciAntivol::VinciAntivol()
+			: Registrable<uid, VinciAntivol>()
+		{
+
+		}
 	}
 }
-
-#endif // SYNTHESE_VinciPrintedContractInterfacePage_H__

@@ -41,15 +41,19 @@ namespace synthese
 {
 	using namespace security;
 	using namespace accounts;
+	using namespace util;
 
 	namespace vinci
 	{
+		Account*	VinciBikeRentalModule::_freeLockRent = NULL;
+
 		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE = "4111";
 		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE = "4117";
 		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE = "4119";
 		const std::string VinciBikeRentalModule::VINCI_STOCKS_BIKE_ACCOUNT_CODE = "371";
 		const std::string VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_EUROS_ACCOUNT_CODE = "70831";
 		const std::string VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE = "70832";
+		const std::string VinciBikeRentalModule::VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE = "70833";
 		const std::string VinciBikeRentalModule::VINCI_SERVICES_DELAYED_PAYMENTS_ACCOUNT_CODE = "763";
 		const std::string VinciBikeRentalModule::VINCI_SERVICES_UNRETURNED_BIKE_ACCOUNT_CODE = "707";
 		const std::string VinciBikeRentalModule::VINCI_CHANGE_CHECKS_ACCOUNT_CODE = "5112";
@@ -61,8 +65,7 @@ namespace synthese
 
 		const std::string VinciBikeRentalModule::VINCI_ACCOUNTING_USER = "Vinci";
 		const std::string VinciBikeRentalModule::VINCI_ACCOUNTING_PROFILE = "VinciAccounts";
-		const std::string VinciBikeRentalModule::VINCI_ACCOUNTING_PROFILE_RIGHTS = "*,*,0,0";
-
+		
 		// Currencies
 		const std::string VinciBikeRentalModule::VINCI_CURRENCY_EURO_NAME = "Euro";
 		const std::string VinciBikeRentalModule::VINCI_CURRENCY_EURO = "EUR";
@@ -73,25 +76,21 @@ namespace synthese
 
 		// Rights
 		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_PROFILE = "VinciCustomerWithoutAccess";
-		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_PROFILE_RIGHTS = "*,*,0,0";
-
+		
 		void VinciBikeRentalModule::initialize()
 		{
 			// Profile for virtual owner user
 			Profile* vinciProfile;
 			vector<Profile*> profiles = ProfileTableSync::search(VINCI_ACCOUNTING_PROFILE);
 			if (profiles.size() == 0)
-			{
 				vinciProfile = new Profile;
-				vinciProfile->setName(VINCI_ACCOUNTING_PROFILE);
-				vinciProfile->setRights(VINCI_ACCOUNTING_PROFILE_RIGHTS);
-				ProfileTableSync::save(vinciProfile);
-			}
 			else
-			{
 				vinciProfile = profiles.front();
-			}
-
+			vinciProfile->setName(VINCI_ACCOUNTING_PROFILE);
+			vinciProfile->setPrivateRight(Right::FORBIDDEN);
+			vinciProfile->setPublicRight(Right::FORBIDDEN);
+			ProfileTableSync::save(vinciProfile);
+		
 			// Virtual owner user
 			User* vinciUser;
 			vector<User*> users = UserTableSync::search(VINCI_ACCOUNTING_USER, VINCI_ACCOUNTING_USER, vinciProfile->getKey());
@@ -209,16 +208,29 @@ namespace synthese
 
 			// Services accounts
 			Account* ticketBikeRent;
-			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE, 0, "");
-			if (accounts.size() == 0)
-			{
+			accounts = AccountTableSync::search(getVinciUser()->getKey(), VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE, 0, "");
+			if (accounts.empty())
 				ticketBikeRent = new Account;
-				ticketBikeRent->setRightClassNumber(VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
-				ticketBikeRent->setRightCurrency(ticketCurrency);
-				ticketBikeRent->setLeftCurrency(ticketCurrency);
-				ticketBikeRent->setRightUserId(vinciUser->getKey());
-				AccountTableSync::save(ticketBikeRent);
-			}
+			else
+				ticketBikeRent = accounts.front();
+			ticketBikeRent->setRightClassNumber(VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
+			ticketBikeRent->setRightCurrency(ticketCurrency);
+			ticketBikeRent->setLeftCurrency(ticketCurrency);
+			ticketBikeRent->setRightUserId(vinciUser->getKey());
+			AccountTableSync::save(ticketBikeRent);
+			delete ticketBikeRent;
+		
+			accounts = AccountTableSync::search(getVinciUser()->getKey(), VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE, 0, "");
+			if (accounts.empty())
+				_freeLockRent = new Account;
+			else
+				_freeLockRent = accounts.front();
+			_freeLockRent->setRightClassNumber(VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE);
+			_freeLockRent->setRightCurrency(euroCurrency);
+			_freeLockRent->setLeftCurrency(euroCurrency);
+			_freeLockRent->setRightUserId(vinciUser->getKey());
+			AccountTableSync::save(_freeLockRent);
+			
 
 			// Payment accounts
 			Account* ticketPunchings;
@@ -252,18 +264,13 @@ namespace synthese
 			Profile* vinciCustomerProfile;
 			profiles = ProfileTableSync::search(VINCI_CUSTOMER_PROFILE);
 			if (profiles.size() == 0)
-			{
 				vinciCustomerProfile = new Profile;
-				vinciCustomerProfile->setName(VINCI_CUSTOMER_PROFILE);
-				vinciCustomerProfile->setRights(VINCI_CUSTOMER_PROFILE_RIGHTS);
-				ProfileTableSync::save(vinciCustomerProfile);
-			}
 			else
-			{
 				vinciCustomerProfile = profiles.front();
-			}
-
-
+			vinciCustomerProfile->setName(VINCI_CUSTOMER_PROFILE);
+			vinciCustomerProfile->setPrivateRight(Right::FORBIDDEN);
+			vinciCustomerProfile->setPublicRight(Right::FORBIDDEN);
+			ProfileTableSync::save(vinciCustomerProfile);
 		}
 
 		Profile* VinciBikeRentalModule::getCustomerProfile()
@@ -302,5 +309,20 @@ namespace synthese
 			return accounts.front();
 		}
 
+		accounts::Account* VinciBikeRentalModule::getFreeLockRentServiceAccount()
+		{
+			return _freeLockRent;
+		}
+
+		VinciBikeRentalModule::~VinciBikeRentalModule()
+		{
+			delete _freeLockRent;
+		}
+
+		VinciBikeRentalModule::VinciBikeRentalModule()
+			: ModuleClass()
+		{
+
+		}
 	}
 }

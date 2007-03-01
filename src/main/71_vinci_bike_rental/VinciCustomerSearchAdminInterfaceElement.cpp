@@ -21,6 +21,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "01_util/Html.h"
+
 #include "12_security/User.h"
 
 #include "32_admin/AdminRequest.h"
@@ -74,9 +76,9 @@ namespace synthese
 			stream
 				<< searchRequest->getHTMLFormHeader("search")
 				<< "<h1>Recherche de client</h1>"
-				<< "Nom : <input name=\"" << PARAM_SEARCH_NAME << "\" value=\"" << _searchName << "\" />"
-				<< "Prénom : <input name=\"" << PARAM_SEARCH_SURNAME << "\" value=\"" << _searchSurname << "\" />"
-				<< "<input type=\"submit\" value=\"Rechercher\" />"
+				<< "Nom : " << Html::getTextInput(PARAM_SEARCH_NAME, _searchName)
+				<< "Prénom : " << Html::getTextInput(PARAM_SEARCH_SURNAME, _searchSurname)
+				<< Html::getSubmitButton("Rechercher")
 				<< "</form>"
 				;
 
@@ -103,9 +105,9 @@ namespace synthese
 					}
 				}
 				stream << "<tr>"
-					<< "<td><input type=\"submit\" value=\"Nouveau\" /></td>"
-					<< "<td><input name=\"" << AddCustomerAction::PARAMETER_NAME << "\" value=\"" << _searchName << "\" /></td>"
-					<< "<td><input name=\"" << AddCustomerAction::PARAMETER_SURNAME << "\" value=\"" << _searchSurname << "\" /></td>"
+					<< "<td>" << Html::getSubmitButton("Nouveau") << "</td>"
+					<< "<td>" << Html::getTextInput(AddCustomerAction::PARAMETER_NAME, _searchName) << "</td>"
+					<< "<td>" << Html::getTextInput(AddCustomerAction::PARAMETER_SURNAME, _searchSurname) << "</td>"
 					<< "</tr>"
 					<< "</table></form>"
 					;

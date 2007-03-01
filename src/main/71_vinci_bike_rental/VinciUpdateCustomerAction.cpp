@@ -1,10 +1,35 @@
 
+/** VinciUpdateCustomerAction class implementation.
+	@file VinciUpdateCustomerAction.cpp
+
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
+	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "01_util/Conversion.h"
+
+#include "02_db/DBEmptyResultException.h"
 
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
 
 #include "30_server/ServerModule.h"
+#include "30_server/ActionException.h"
 
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
@@ -17,6 +42,8 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace security;
+	using namespace time;
+	using namespace db;
 	
 	namespace vinci
 	{
@@ -28,8 +55,8 @@ namespace synthese
 		const string VinciUpdateCustomerAction::PARAMETER_COUNTRY = Action_PARAMETER_PREFIX + "co";
 		const string VinciUpdateCustomerAction::PARAMETER_EMAIL = Action_PARAMETER_PREFIX + "em";
 		const string VinciUpdateCustomerAction::PARAMETER_PHONE = Action_PARAMETER_PREFIX + "ph";
-		const string VinciUpdateCustomerAction::PARAMETER_ID = Action_PARAMETER_PREFIX + "id";
-
+		const string VinciUpdateCustomerAction::PARAMETER_BIRTH_DATE = Action_PARAMETER_PREFIX + "bd";
+		const string VinciUpdateCustomerAction::PARAMETER_PASSPORT = Action_PARAMETER_PREFIX + "pp";
 
 		Request::ParametersMap VinciUpdateCustomerAction::getParametersMap() const
 		{
@@ -42,92 +69,117 @@ namespace synthese
 			map.insert(make_pair(PARAMETER_COUNTRY, _country));
 			map.insert(make_pair(PARAMETER_EMAIL, _email));
 			map.insert(make_pair(PARAMETER_PHONE, _phone));
-			map.insert(make_pair(PARAMETER_ID, Conversion::ToString(_id)));
+			map.insert(make_pair(PARAMETER_BIRTH_DATE, _birthDate.toString()));
 			return map;
 		}
 
 		void VinciUpdateCustomerAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
-
-			it = map.find(PARAMETER_NAME);
-			if (it != map.end())
+			try
 			{
-				_name = it->second;
-				map.erase(it);
+				_contract = VinciContractTableSync::get(_request->getObjectId());
+				_user = UserTableSync::get(_contract->getUserId());
+
+				Request::ParametersMap::iterator it;
+
+				it = map.find(PARAMETER_NAME);
+				if (it != map.end())
+				{
+					_name = it->second;
+					map.erase(it);
+				}
+				if (_name.empty())
+					throw ActionException("Le nom ne peut être vide");
+
+				it = map.find(PARAMETER_SURNAME);
+				if (it != map.end())
+				{
+					_surname = it->second;
+					map.erase(it);
+				}
+
+				it = map.find(PARAMETER_ADDRESS);
+				if (it != map.end())
+				{
+					_address = it->second;
+					map.erase(it);
+				}
+
+				it = map.find(PARAMETER_POST_CODE);
+				if (it != map.end())
+				{
+					_postCode = it->second;
+					map.erase(it);
+				}
+
+				it = map.find(PARAMETER_CITY);
+				if (it != map.end())
+				{
+					_city = it->second;
+					map.erase(it);
+				}
+
+				it = map.find(PARAMETER_COUNTRY);
+				if (it != map.end())
+				{
+					_country = it->second;
+					map.erase(it);
+				}
+
+				it = map.find(PARAMETER_EMAIL);
+				if (it != map.end())
+				{
+					_email = it->second;
+					map.erase(it);
+				}
+
+				it = map.find(PARAMETER_PHONE);
+				if (it != map.end())
+				{
+					_phone = it->second;
+					map.erase(it);
+				}
+
+				it = map.find(PARAMETER_BIRTH_DATE);
+				if (it != map.end())
+				{
+					_birthDate = Date::FromString(it->second);
+					map.erase(it);
+				}
+
+				it = map.find(PARAMETER_PASSPORT);
+				if (it != map.end())
+				{
+					_passport = it->second;
+					map.erase(it);
+				}
+
 			}
-
-			it = map.find(PARAMETER_SURNAME);
-			if (it != map.end())
+			catch (DBEmptyResultException e)
 			{
-				_surname = it->second;
-				map.erase(it);
+				throw ActionException("Contract not found");
 			}
-
-			it = map.find(PARAMETER_ADDRESS);
-			if (it != map.end())
+			catch (User::RegistryKeyException e)
 			{
-				_address = it->second;
-				map.erase(it);
-			}
-
-			it = map.find(PARAMETER_POST_CODE);
-			if (it != map.end())
-			{
-				_postCode = it->second;
-				map.erase(it);
-			}
-
-			it = map.find(PARAMETER_CITY);
-			if (it != map.end())
-			{
-				_city = it->second;
-				map.erase(it);
-			}
-
-			it = map.find(PARAMETER_COUNTRY);
-			if (it != map.end())
-			{
-				_country = it->second;
-				map.erase(it);
-			}
-
-			it = map.find(PARAMETER_EMAIL);
-			if (it != map.end())
-			{
-				_email = it->second;
-				map.erase(it);
-			}
-
-			it = map.find(PARAMETER_PHONE);
-			if (it != map.end())
-			{
-				_phone = it->second;
-				map.erase(it);
-			}
-
-			it = map.find(PARAMETER_ID);
-			if (it != map.end())
-			{
-				_id = Conversion::ToLongLong(it->second);
-				map.erase(it);
+				throw ActionException("Contract without corresponding user");
 			}
 
 		}
 
 		void VinciUpdateCustomerAction::run()
 		{
-			VinciContract* contract = VinciContractTableSync::get(_id);
-			User* user = UserTableSync::get(contract->getUserId());
-			user->setName(_name);
-			user->setSurname(_surname);
-			user->setAddress(_address);
-			user->setPostCode(_postCode);
-			user->setCityText(_city);
-			user->setCountry(_country);
-			user->setEMail(_email);
-			user->setPhone(_phone);
-			UserTableSync::save(user);
+			_user->setName(_name);
+			_user->setSurname(_surname);
+			_user->setAddress(_address);
+			_user->setPostCode(_postCode);
+			_user->setCityText(_city);
+			_user->setCountry(_country);
+			_user->setEMail(_email);
+			_user->setPhone(_phone);
+			_user->setBirthDate(_birthDate);
+			UserTableSync::save(_user);
+			_contract->setPassport(_passport);
+			VinciContractTableSync::save(_contract);
 		}
 	}
 }

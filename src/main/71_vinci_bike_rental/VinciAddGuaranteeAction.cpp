@@ -24,8 +24,11 @@
 #include "01_util/Conversion.h"
 
 #include "04_time/DateTime.h"
+#include "04_time/TimeParseException.h"
 
 #include "12_security/User.h"
+
+#include "30_server/ActionException.h"
 
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
@@ -53,6 +56,7 @@ namespace synthese
 		const string VinciAddGuaranteeAction::PARAMETER_AMOUNT = Action_PARAMETER_PREFIX + "am";
 		const string VinciAddGuaranteeAction::PARAMETER_CONTRACT_ID = Action_PARAMETER_PREFIX + "ci";
 		const string VinciAddGuaranteeAction::PARAMETER_ACCOUNT_ID = Action_PARAMETER_PREFIX + "ac";
+		const string VinciAddGuaranteeAction::PARAMETER_DATE = Action_PARAMETER_PREFIX + "da";
 
 
 		Request::ParametersMap VinciAddGuaranteeAction::getParametersMap() const
@@ -61,44 +65,57 @@ namespace synthese
 			map.insert(make_pair(PARAMETER_AMOUNT, Conversion::ToString(_amount)));
 			map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
 			map.insert(make_pair(PARAMETER_ACCOUNT_ID, Conversion::ToString(_account->getKey())));
+			map.insert(make_pair(PARAMETER_DATE, Conversion::ToString(_date.toString())));
 			return map;
 		}
 
 		void VinciAddGuaranteeAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
-
-			it = map.find(PARAMETER_AMOUNT);
-			if (it != map.end())
+			try
 			{
-				_amount = Conversion::ToDouble(it->second);
-				map.erase(it);
-			}
+				Request::ParametersMap::iterator it;
 
-			it = map.find(PARAMETER_ACCOUNT_ID);
-			if (it != map.end())
+				it = map.find(PARAMETER_AMOUNT);
+				if (it != map.end())
+				{
+					_amount = Conversion::ToDouble(it->second);
+					map.erase(it);
+				}
+
+				it = map.find(PARAMETER_ACCOUNT_ID);
+				if (it != map.end())
+				{
+					_account = AccountTableSync::get(Conversion::ToLongLong(it->second));
+					map.erase(it);
+				}
+
+				it = map.find(PARAMETER_CONTRACT_ID);
+				if (it != map.end())
+				{
+					_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
+					map.erase(it);
+				}
+
+				it = map.find(PARAMETER_DATE);
+				if (it != map.end())
+				{
+					_date = DateTime::FromString(it->second);
+					map.erase(it);
+				}
+			}
+			catch (TimeParseException e)
 			{
-				_account = AccountTableSync::get(Conversion::ToLongLong(it->second));
-				map.erase(it);
+				throw ActionException("La date saisie n'est pas correcte");
 			}
-
-			it = map.find(PARAMETER_CONTRACT_ID);
-			if (it != map.end())
-			{
-				_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
-				map.erase(it);
-			}
-
 		}
 
 		void VinciAddGuaranteeAction::run()
 		{
-			DateTime now;
 			DateTime unknownDate(TIME_UNKNOWN);
 
 			// Transaction
 			Transaction* transaction = new Transaction;
-			transaction->setStartDateTime(now);
+			transaction->setStartDateTime(_date);
 			transaction->setEndDateTime(unknownDate);
 			transaction->setLeftUserId(_contract->getUserId());
 			TransactionTableSync::save(transaction);

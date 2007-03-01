@@ -24,7 +24,10 @@
 
 #include "01_util/Conversion.h"
 
+#include "02_db/DBEmptyResultException.h"
+
 #include "04_time/DateTime.h"
+#include "04_time/TimeParseException.h"
 
 #include "30_server/ActionException.h"
 
@@ -37,6 +40,8 @@
 #include "71_vinci_bike_rental/VinciBike.h"
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
 #include "71_vinci_bike_rental/VinciRate.h"
+#include "71_vinci_bike_rental/VinciAntivol.h"
+#include "71_vinci_bike_rental/VinciAntivolTableSync.h"
 #include "71_vinci_bike_rental/VinciRateTableSync.h"
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 #include "71_vinci_bike_rental/RentABikeAction.h"
@@ -51,21 +56,25 @@ namespace synthese
 	using namespace util;
 	using namespace time;
 	using namespace accounts;
+	using namespace db;
 
 	namespace vinci
 	{
 		const std::string RentABikeAction::PARAMETER_RATE_ID = Action_PARAMETER_PREFIX + "ri";
 		const std::string RentABikeAction::PARAMETER_BIKE_ID = Action_PARAMETER_PREFIX + "bi";
 		const std::string RentABikeAction::PARAMETER_CONTRACT_ID = Action_PARAMETER_PREFIX + "ci";
+		const std::string RentABikeAction::PARAMETER_LOCK_ID = Action_PARAMETER_PREFIX + "li";
+		const std::string RentABikeAction::PARAMETER_DATE = Action_PARAMETER_PREFIX + "da";
 
 		/** Conversion from attributes to generic parameter maps.
 		*/
 		Request::ParametersMap RentABikeAction::getParametersMap() const
 		{
 			Request::ParametersMap map;
-			map.insert(make_pair(PARAMETER_RATE_ID, Conversion::ToString(_rateId)));
+			map.insert(make_pair(PARAMETER_RATE_ID, Conversion::ToString(_rate->getKey())));
 			map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
-			map.insert(make_pair(PARAMETER_BIKE_ID, Conversion::ToString(_bikeId)));
+			map.insert(make_pair(PARAMETER_BIKE_ID, Conversion::ToString(_bike->getKey())));
+			map.insert(make_pair(PARAMETER_LOCK_ID, _lock ? Conversion::ToString(_lock->getKey()) : ""));
 			return map;
 		}
 
@@ -74,53 +83,98 @@ namespace synthese
 		*/
 		void RentABikeAction::setFromParametersMap(server::Request::ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
-			
-			it=map.find(PARAMETER_RATE_ID);
-			if (it != map.end())
+			try
 			{
-				_rateId = Conversion::ToLongLong(it->second);
-				map.erase(it);
-			}
+				Request::ParametersMap::iterator it;
 
-			it=map.find(PARAMETER_BIKE_ID);
-			if (it != map.end())
-			{
-				_bikeId = Conversion::ToLongLong(it->second);
-				map.erase(it);
-			}
+				// Rate
+				it=map.find(PARAMETER_RATE_ID);
+				if (it == map.end())
+					throw ActionException("Rate not specified");
+				try
+				{
+					_rate = VinciRateTableSync::get(Conversion::ToLongLong(it->second));
+				}
+				catch (DBEmptyResultException	e)
+				{
+					throw ActionException("Specified rate not found");
+				}
 
-			it=map.find(PARAMETER_CONTRACT_ID);
-			if (it != map.end())
-			{
-				_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
+				// Bike
+				it=map.find(PARAMETER_BIKE_ID);
+				if (it == map.end())
+					throw ActionException("Bike not specified");
+				vector<VinciBike*> bikes = VinciBikeTableSync::search(it->second, "");
+				if (bikes.empty())
+					throw ActionException("Vélo introuvable");
+				vector<VinciBike*>::iterator itb = bikes.begin();
+				_bike = *itb;
 				map.erase(it);
+
+				// Contract
+				it=map.find(PARAMETER_CONTRACT_ID);
+				if (it == map.end())
+					throw ActionException("Contract not specified");
+				try
+				{
+					_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
+				}
+				catch(DBEmptyResultException e)
+				{
+					throw ActionException("Specified contract not found");
+				}
+				map.erase(it);
+
+				// Lock
+				it = map.find(PARAMETER_LOCK_ID);
+				if (it == map.end())
+					throw ActionException("Lock not specified");
+				if (it->second.empty())
+					throw ActionException("L'antivol doit être saisi.");
+				if (!it->second.empty())
+				{
+					_lockMarkedNumber = it->second;
+					vector<VinciAntivol*> locks = VinciAntivolTableSync::search(_lockMarkedNumber);
+					if (!locks.empty())
+					{
+						vector<VinciAntivol*>::iterator itl = locks.begin();
+						_lock = *itl;
+					}
+				}
+				map.erase(it);
+
+				// Date
+				it = map.find(PARAMETER_DATE);
+				if (it != map.end())
+				{
+					_date = DateTime::FromString(it->second);
+				}
+
+				// TODO Control of guarantees
+
+				_amount = _rate->getStartTicketsPrice();
+			}
+			catch (TimeParseException e)
+			{
+				throw ActionException("La date saisie n'est pas correcte");
 			}
 		}
 
 		void RentABikeAction::run()
 		{
-			DateTime now;
 			DateTime unknownDate(TIME_UNKNOWN);
 
-			VinciRate* rate = VinciRateTableSync::get(_rateId);
-
-			double amount;
-
-			amount = rate->getStartTicketsPrice();
-
-			// Control of bike
-			vector<VinciBike*> bikes = VinciBikeTableSync::search(Conversion::ToString(_bikeId), "");
-			if (bikes.size() == 0)
-				throw ActionException("Vélo introuvable");
-			vector<VinciBike*>::iterator it = bikes.begin();
-			VinciBike* bike = *it;
-			
-			// Control of guarantees
+			// Lock creation if necessary
+			if (_lock == NULL)
+			{
+				_lock = new VinciAntivol;
+				_lock->setMarkedNumber(_lockMarkedNumber);
+				VinciAntivolTableSync::save(_lock);
+			}
 
 			// Transaction
 			Transaction* transaction = new Transaction;
-			transaction->setStartDateTime(now);
+			transaction->setStartDateTime(_date);
 			transaction->setEndDateTime(unknownDate);
 			transaction->setLeftUserId(_contract->getUserId());
 			TransactionTableSync::save(transaction);
@@ -129,24 +183,49 @@ namespace synthese
 			TransactionPart* transactionPart = new TransactionPart;
 			transactionPart->setTransactionId(transaction->getKey());
 			transactionPart->setAccountId(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE)->getKey());
-			transactionPart->setLeftCurrencyAmount(amount);
-			transactionPart->setRightCurrencyAmount(amount);
-			transactionPart->setRateId(_rateId);
-			transactionPart->setTradedObjectId(Conversion::ToString(bike->getKey()));
+			transactionPart->setLeftCurrencyAmount(_amount);
+			transactionPart->setRightCurrencyAmount(_amount);
+			transactionPart->setRateId(_rate->getKey());
+			transactionPart->setTradedObjectId(Conversion::ToString(_bike->getKey()));
 			TransactionPartTableSync::save(transactionPart);
 
 			// Part 2 : customer
 			TransactionPart* changeTransactionPart = new TransactionPart;
 			changeTransactionPart->setTransactionId(transaction->getKey());
 			changeTransactionPart->setAccountId(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE)->getKey());
-			changeTransactionPart->setLeftCurrencyAmount(-amount);
-			changeTransactionPart->setRightCurrencyAmount(-amount);
+			changeTransactionPart->setLeftCurrencyAmount(-_amount);
+			changeTransactionPart->setRightCurrencyAmount(-_amount);
 			TransactionPartTableSync::save(changeTransactionPart);
 
 			// Part 3 : bike stock lower
 
 			// Part 4 : rented bike higher
 
+			// Part 5 : Lock rent
+			TransactionPart* lockTransactionPart = new TransactionPart;
+			lockTransactionPart->setTransactionId(transaction->getKey());
+			lockTransactionPart->setAccountId(VinciBikeRentalModule::getFreeLockRentServiceAccount()->getKey());
+			lockTransactionPart->setLeftCurrencyAmount(0);
+			lockTransactionPart->setRightCurrencyAmount(0);
+			lockTransactionPart->setTradedObjectId(Conversion::ToString(_lock->getKey()));
+			TransactionPartTableSync::save(lockTransactionPart);
+		}
+
+		RentABikeAction::RentABikeAction()
+			: _rate(NULL)
+			, _bike(NULL)
+			, _contract(NULL)
+			, _lock(NULL)
+		{
+			
+		}
+
+		RentABikeAction::~RentABikeAction()
+		{
+			delete _rate;
+			delete _bike;
+			delete _contract;
+			delete _lock;
 		}
 	}
 }

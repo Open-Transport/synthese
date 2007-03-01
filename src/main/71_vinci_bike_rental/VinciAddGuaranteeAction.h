@@ -2,6 +2,7 @@
 #ifndef SYNTHESE_AddGuaranteeAction_H__
 #define SYNTHESE_AddGuaranteeAction_H__
 
+#include "04_time/DateTime.h"
 
 #include "30_server/Action.h"
 
@@ -20,13 +21,15 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_AMOUNT;
+			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_CONTRACT_ID;
 			static const std::string PARAMETER_ACCOUNT_ID;
 
 		private:
-			double	_amount;
-			VinciContract* _contract;
-			accounts::Account* _account;
+			double				_amount;
+			VinciContract*		_contract;
+			accounts::Account*	_account;
+			time::DateTime		_date;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

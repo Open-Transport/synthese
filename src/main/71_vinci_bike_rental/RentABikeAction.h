@@ -24,6 +24,7 @@
 #ifndef SYNTHESE_RentABikeAction_H__
 #define SYNTHESE_RentABikeAction_H__
 
+#include "04_time/DateTime.h"
 
 #include "30_server/Action.h"
 
@@ -31,19 +32,31 @@ namespace synthese
 {
 	namespace vinci
 	{
+		class VinciRate;
+		class VinciBike;
 		class VinciContract;
+		class VinciAntivol;
 
+		/** Starting a bike rent.
+			@ingroup m71
+		*/
 		class RentABikeAction : public server::Action
 		{
 		public:
 			static const std::string PARAMETER_RATE_ID;
 			static const std::string PARAMETER_BIKE_ID;
 			static const std::string PARAMETER_CONTRACT_ID;
+			static const std::string PARAMETER_LOCK_ID;
+			static const std::string PARAMETER_DATE;
 
 		private:
-			uid				_rateId;
-			uid				_bikeId;
+			time::DateTime	_date;
+			VinciRate*		_rate;
+			VinciBike*		_bike;
 			VinciContract*	_contract;
+			VinciAntivol*	_lock;
+			std::string		_lockMarkedNumber;
+			double			_amount;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -56,15 +69,15 @@ namespace synthese
 			void setFromParametersMap(server::Request::ParametersMap& map);
 
 		public:
+			RentABikeAction();
+			~RentABikeAction();
 
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
-
 			
 		};
 	}
 }
 
 #endif 
-

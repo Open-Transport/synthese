@@ -43,9 +43,16 @@ namespace synthese
 		class User;
 	}
 
+	namespace accounts
+	{
+		class TransactionPart;
+	}
+
 	namespace vinci
 	{
 		class VinciSite;
+		class VinciBike;
+		class VinciAntivol;
 		
 		/** Vinci bike rent contract.
 
@@ -58,6 +65,7 @@ namespace synthese
 			uid				_userId;
 			uid				_siteId;
 			time::DateTime	_date;
+			std::string		_passport;
 
 			security::User*	_user;
 			VinciSite*		_site;
@@ -66,19 +74,37 @@ namespace synthese
 			VinciContract(uid id=0);
 			~VinciContract();
 
-			void setUserId(uid id);
-			void setSiteId(uid id);
-			void setDate(const time::DateTime& date);
+			//!	\name Setters
+			//@{
+				void setUserId(uid id);
+				void setSiteId(uid id);
+				void setDate(const time::DateTime& date);
+				void setPassport(const std::string& text);
+			//@}
 
-			uid						getUserId() const;
-			uid						getSiteId() const;
-			const time::DateTime&	getDate()	const;
-			
-			security::User*			getUser() const;
-			VinciSite*				getSite() const;
+			//! \name Getters
+			//@{
+				uid						getUserId()		const;
+				uid						getSiteId()		const;
+				const time::DateTime&	getDate()		const;
+				const std::string&		getPassport()	const;
+			//@}
+
+			//! \name Queries with cache
+			//@{
+				security::User*			getUser();
+				VinciSite*				getSite();
+			//@}
+
+			//! \name Queries
+			//@{
+				VinciBike*					getCurrentBike()						const;
+				accounts::TransactionPart*	getCurrentRentTransactionPart()			const;
+				VinciAntivol*				getCurrentLock()						const;
+				accounts::TransactionPart*	getCurrentGuaranteeTransactionPart()	const;
+			//@}
 		};
 	}
 }
 
 #endif // SYNTHESE_VinciContract_H__
-

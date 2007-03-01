@@ -47,6 +47,7 @@ namespace synthese
 			static const std::string COL_USER_ID;
 			static const std::string COL_SITE_ID;
 			static const std::string COL_DATE;
+			static const std::string COL_PASSPORT;
 
 			VinciContractTableSync();
 			~VinciContractTableSync ();
