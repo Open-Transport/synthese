@@ -49,14 +49,14 @@ namespace synthese
 
 			<i>Zone de contenu</i> : <b>Formulaire d'édition</b> :
 				-# <b>Edition du nom</b>
-				-# <tt>Nom</tt> : Champ texte permettant la saisie du nom du scénario
-				-# Bouton <tt>Modifier</tt> : Enregistre le changement du nom du scénario après avoir contrôlé que le nom proposé n'est pas déjà pris par un autre scénario. En ce cas, une boîte de dialogue apparaît indiquant "Le nom entré est déjà utilisé. Veuillez utiliser un autre nom".
+					-# <tt>Nom</tt> : Champ texte permettant la saisie du nom du scénario
+					-# Bouton <tt>Modifier</tt> : Enregistre le changement du nom du scénario après avoir contrôlé que le nom proposé n'est pas déjà pris par un autre scénario. En ce cas, une boîte de dialogue apparaît indiquant "Le nom entré est déjà utilisé. Veuillez utiliser un autre nom".
 				-# <b>Liste de messages du scénario</b>
-				-# <tt>Sel</tt> : Permet la sélection du message en vue d'une duplication
-				-# <tt>Message</tt> : Texte rappelant le contenu du message. Un clic sur le texte se rend sur l'écran d'édition du message.
-				-# <tt>Emplacement</tt> : Texte rappelant l'emplacement de diffusion au niveau logique. Un clic sur le texte se rend sur l'écran d'édition de l'emplacement.
-				-# Bouton <tt>Modifier</tt> : Se rend vers l'écran d'édition du message sélectionné
-				-# Bouton <tt>Supprimer</tt> : Supprime le message du scénario après une demande de confirmation
+					-# <tt>Sel</tt> : Permet la sélection du message en vue d'une duplication
+					-# <tt>Message</tt> : Texte rappelant le contenu du message. Un clic sur le texte se rend sur l'écran d'édition du message.
+					-# <tt>Emplacement</tt> : Texte rappelant l'emplacement de diffusion au niveau logique. Un clic sur le texte se rend sur l'écran d'édition de l'emplacement.
+					-# Bouton <tt>Modifier</tt> : Se rend vers l'écran d'édition du message sélectionné
+					-# Bouton <tt>Supprimer</tt> : Supprime le message du scénario après une demande de confirmation
 				-# Le <b>bouton Ajouter</b> permet l'ajout d'un nouveau message au scénario :
 					- si aucun message n'est sélectionné alors un message vide est ajouté
 					- si un message existant est sélectionné alors son contenu est copié dans le nouveau
