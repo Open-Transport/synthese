@@ -27,5 +27,7 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages:
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::NewMessageAction>("nmes");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::NewScenarioSendAction>("nssa");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::ScenarioNameUpdateAction>("snu");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::DeleteTextTemplateAction>("dtta");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::UpdateTextTemplateAction>("utta");
 
 

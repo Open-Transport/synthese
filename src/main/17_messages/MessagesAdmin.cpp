@@ -192,18 +192,21 @@ namespace synthese
 				<< "<p>" << Html::getSubmitButton("Nouvelle diffusion de message") << "</p>"
 				<< "</form>"
 
-				<< "<P><INPUT type=\"button\" value=\"Nouvelle diffusion de scénario\" name=\"Button7\">"
+				<< newScenarioRequest->getHTMLFormHeader("newsec")
+				<< "<p>" << Html::getSubmitButton("Nouvelle diffusion de scénario") << "</p>"
 				<< "<select name=\"Select1\">";
 
 			// List of scenarios
 
 			stream
 				<< "</select></p>"
+				<< "</form>"
 				<< "<P align=\"right\">Messages&nbsp;suivants &gt;</P>"
 				<< "<P>Cliquer sur un titre de colonne pour trier le tableau.</P>";
 
 			delete searchRequest;
 			delete newMessageRequest;
+			delete newScenarioRequest;
 		}
 	}
 }

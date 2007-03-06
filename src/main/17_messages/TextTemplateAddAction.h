@@ -1,6 +1,6 @@
 
-/** UpdateTextTemplateAction class header.
-	@file UpdateTextTemplateAction.h
+/** TextTemplateAddAction class header.
+	@file TextTemplateAddAction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,33 +20,34 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_UpdateTextTemplateAction_H__
-#define SYNTHESE_UpdateTextTemplateAction_H__
+#ifndef SYNTHESE_TextTemplateAddAction_H__
+#define SYNTHESE_TextTemplateAddAction_H__
 
 #include "30_server/Action.h"
+
+#include "17_messages/Types.h"
 
 namespace synthese
 {
 	namespace messages
 	{
-		class TextTemplate;
-
-		/** UpdateTextTemplateAction action class.
+		/** TextTemplateAddAction action class.
 			@ingroup m17
 		*/
-		class UpdateTextTemplateAction : public server::Action
+		class TextTemplateAddAction : public server::Action
 		{
 		public:
-			static const std::string PARAMETER_TEXT_ID;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_SHORT_MESSAGE;
 			static const std::string PARAMETER_LONG_MESSAGE;
+			static const std::string PARAMETER_TYPE;
 
 		private:
-			TextTemplate*	_text;
 			std::string		_name;
 			std::string		_shortMessage;
 			std::string		_longMessage;
+			AlarmLevel		_level;
+
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -62,8 +63,7 @@ namespace synthese
 		public:
 			/** Constructor.
 			*/
-			UpdateTextTemplateAction();
-			~UpdateTextTemplateAction();
+			TextTemplateAddAction();
 
 			/** Action to run, defined by each subclass.
 			*/
@@ -72,4 +72,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_UpdateTextTemplateAction_H__
+#endif // SYNTHESE_TextTemplateAddAction_H__

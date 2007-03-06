@@ -19,3 +19,5 @@
 #include "17_messages/NewMessageAction.h"
 #include "17_messages/NewScenarioSendAction.h"
 #include "17_messages/ScenarioNameUpdateAction.h"
+#include "17_messages/DeleteTextTemplateAction.h"
+#include "17_messages/UpdateTextTemplateAction.h"

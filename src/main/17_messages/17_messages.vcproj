@@ -260,6 +260,12 @@
 					RelativePath=".\DeleteTextTemplateAction.h">
 				</File>
 				<File
+					RelativePath=".\TextTemplateAddAction.cpp">
+				</File>
+				<File
+					RelativePath=".\TextTemplateAddAction.h">
+				</File>
+				<File
 					RelativePath=".\UpdateTextTemplateAction.cpp">
 				</File>
 				<File

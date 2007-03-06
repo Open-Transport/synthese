@@ -25,6 +25,8 @@
 #include "17_messages/MessagesLibraryAdmin.h"
 #include "17_messages/TextTemplate.h"
 #include "17_messages/TextTemplateTableSync.h"
+#include "17_messages/UpdateTextTemplateAction.h"
+#include "17_messages/DeleteTextTemplateAction.h"
 
 using namespace std;
 
@@ -56,7 +58,12 @@ namespace synthese
 			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
 			updateRequest->copy(request);
 			updateRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesLibraryAdmin>());
-//			updateRequest->setAction(Factory<Action>::create<UpdateTextTemplate>());
+			updateRequest->setAction(Factory<Action>::create<UpdateTextTemplateAction>());
+
+			AdminRequest* deleteRequest = Factory<Request>::create<AdminRequest>();
+			updateRequest->copy(request);
+			updateRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesLibraryAdmin>());
+			updateRequest->setAction(Factory<Action>::create<DeleteTextTemplateAction>());
 
 			stream
 				<< "<h1>Modèles de textes destinés aux messages complémentaires</h1>"
@@ -69,11 +76,19 @@ namespace synthese
 				TextTemplate* t = *itw;
 				stream
 					<< "<tr>"
+					<< updateRequest->getHTMLFormHeader("upd" + Conversion::ToString(t->getKey()))
 					<< "<td>" << Html::getTextInput("", t->getName()) << "</td>"
 					<< "<td>" << Html::getTextInput("", t->getShortMessage()) << "</td>"
 					<< "<td>" << Html::getTextInput("", t->getLongMessage()) << "</td>"
-					<< "<td>" << Html::getSubmitButton("Modifier") << "</td>"
-					<< "<td>" << Html::getSubmitButton("Supprimer") << "</td>"
+					<< "<td>"
+					<< Html::getHiddenInput(UpdateTextTemplateAction::PARAMETER_TEXT_ID, Conversion::ToString(t->getKey()))
+					<< Html::getSubmitButton("Modifier") << "</td>"
+					<< "</form>"
+					<< "<td>" 
+					<< deleteRequest->getHTMLFormHeader("del" + Conversion::ToString(t->getKey()))
+					<< Html::getHiddenInput(DeleteTextTemplateAction::PARAMETER_TEXT_ID, Conversion::ToString(t->getKey()))
+					<< Html::getSubmitButton("Supprimer") 
+					<< "</form></td>"
 					<< "</tr>";
 				delete *itw;
 			}
@@ -100,11 +115,18 @@ namespace synthese
 				TextTemplate* t = *ite;
 				stream
 					<< "<tr>"
+					<< updateRequest->getHTMLFormHeader("upd" + Conversion::ToString(t->getKey()))
 					<< "<td>" << Html::getTextInput("", t->getName()) << "</td>"
 					<< "<td>" << Html::getTextInput("", t->getShortMessage()) << "</td>"
 					<< "<td>" << Html::getTextInput("", t->getLongMessage()) << "</td>"
-					<< "<td>" << Html::getSubmitButton("Modifier") << "</td>"
-					<< "<td><INPUT type=\"button\" value=\"Supprimer\" name=\"Modifier\"></TD>"
+					<< "<td>" 
+					<< Html::getHiddenInput(UpdateTextTemplateAction::PARAMETER_TEXT_ID, Conversion::ToString(t->getKey()))
+					<< Html::getSubmitButton("Modifier") << "</td></form>"
+					<< "<td>"
+					<< deleteRequest->getHTMLFormHeader("del" + Conversion::ToString(t->getKey()))
+					<< Html::getHiddenInput(UpdateTextTemplateAction::PARAMETER_TEXT_ID, Conversion::ToString(t->getKey()))
+					<< Html::getSubmitButton("Supprimer") 
+					<< "</form></td>"
 					<< "</tr>";
 				delete *ite;
 			}

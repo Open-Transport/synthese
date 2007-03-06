@@ -1,6 +1,6 @@
 
-/** DeleteTextTemplateAction class implementation.
-	@file DeleteTextTemplateAction.cpp
+/** TextTemplateAddAction class implementation.
+	@file TextTemplateAddAction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,11 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "02_db/DBEmptyResultException.h"
-
 #include "30_server/ActionException.h"
 
-#include "DeleteTextTemplateAction.h"
+#include "TextTemplateAddAction.h"
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
 
@@ -33,51 +31,47 @@ using namespace std;
 namespace synthese
 {
 	using namespace server;
-	using namespace db;
 	
 	namespace messages
 	{
-		const string DeleteTextTemplateAction::PARAMETER_TEXT_ID = Action_PARAMETER_PREFIX + "tt";
+		/// @todo Parameters constants definition
+		// const string TextTemplateAddAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
 
 
-		Request::ParametersMap DeleteTextTemplateAction::getParametersMap() const
+		Request::ParametersMap TextTemplateAddAction::getParametersMap() const
 		{
 			Request::ParametersMap map;
-			map.insert(make_pair(PARAMETER_TEXT_ID, Conversion::ToString(_text->getKey())));
+			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void DeleteTextTemplateAction::setFromParametersMap(Request::ParametersMap& map)
+		void TextTemplateAddAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			try
-			{
-				Request::ParametersMap::iterator it;
+			Request::ParametersMap::iterator it;
 
-				it = map.find(PARAMETER_TEXT_ID);
-				if (it == map.end())
-					throw ActionException("Text template not specified");
-
-				_text = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
-			}
-			catch (DBEmptyResultException e)
-			{
-				throw ActionException("Specified text template not found");
-			}
+			// it = map.find(PARAMETER_xxx);
+			// if (it == map.end())
+			//	throw ActionException("Parameter xxx not found");
+			//
+			// _xxx = it->second;
+			// map.erase(it);
+			// if (_xxx <= 0)
+			//	throw ActionException("Bad value for xxx parameter ");	
+			// 
 		}
 
-		DeleteTextTemplateAction::DeleteTextTemplateAction()
+		TextTemplateAddAction::TextTemplateAddAction()
 			: Action()
-			, _text(NULL)
 		{}
 
-		void DeleteTextTemplateAction::run()
+		void TextTemplateAddAction::run()
 		{
-			TextTemplateTableSync::remove(_text->getKey());
-		}
-
-		DeleteTextTemplateAction::~DeleteTextTemplateAction()
-		{
-			delete _text;
+			TextTemplate* tt = new TextTemplate;
+			tt->setAlarmLevel(_level);
+			tt->setLongMessage(_longMessage);
+			tt->setShortMessage(_shortMessage);
+			tt->setName(_name);
+			TextTemplateTableSync::save(tt);
 		}
 	}
 }

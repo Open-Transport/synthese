@@ -20,20 +20,27 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "02_db/DBEmptyResultException.h"
+
 #include "30_server/ActionException.h"
 
 #include "UpdateTextTemplateAction.h"
+#include "TextTemplate.h"
+#include "TextTemplateTableSync.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace db;
 	
 	namespace messages
 	{
-		/// @todo Parameters constants definition
-		// const string UpdateTextTemplateAction::PARAMETER_xxx = Action::PARAMETER_PREFIX + "xxx";
+		const string UpdateTextTemplateAction::PARAMETER_TEXT_ID = Action_PARAMETER_PREFIX + "tid";
+		const string UpdateTextTemplateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "n";
+		const string UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE = Action_PARAMETER_PREFIX + "sm";
+		const string UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE = Action_PARAMETER_PREFIX + "lm";
 
 
 		Request::ParametersMap UpdateTextTemplateAction::getParametersMap() const
@@ -45,26 +52,60 @@ namespace synthese
 
 		void UpdateTextTemplateAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			try
+			{
+				Request::ParametersMap::iterator it;
 
-			// it = map.find(PARAMETER_xxx);
-			// if (it == map.end())
-			//	throw ActionException("Parameter xxx not found");
-			//
-			// _xxx = it->second;
-			// map.erase(it);
-			// if (_xxx <= 0)
-			//	throw ActionException("Bad value for xxx parameter ");	
-			// 
+				it = map.find(PARAMETER_TEXT_ID);
+				if (it == map.end())
+					throw ActionException("Text template not specified");
+
+				_text = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
+				map.erase(it);
+
+				it = map.find(PARAMETER_NAME);
+				if (it == map.end())
+					throw ActionException("Name not specified");
+				_name = it->second;
+				if (_name.empty())
+					throw ActionException("Le nom ne peut être vide");
+				map.erase(it);
+
+				it = map.find(PARAMETER_SHORT_MESSAGE);
+				if (it == map.end())
+					throw ActionException("Short message not specified");
+				_shortMessage = it->second;
+				map.erase(it);
+
+				it = map.find(PARAMETER_LONG_MESSAGE);
+				if (it == map.end())
+					throw ActionException("Long message not specified");
+				_longMessage = it->second;
+				map.erase(it);
+
+			}
+			catch (DBEmptyResultException e)
+			{
+				throw ActionException("Specified text template not found");
+			}
 		}
 
 		UpdateTextTemplateAction::UpdateTextTemplateAction()
 			: Action()
-			/// @todo Put here other parameters initialization
+			, _text(NULL)
 		{}
 
 		void UpdateTextTemplateAction::run()
 		{
+			_text->setName(_name);
+			_text->setShortMessage(_shortMessage);
+			_text->setLongMessage(_longMessage);
+			TextTemplateTableSync::save(_text);
+		}
+
+		UpdateTextTemplateAction::~UpdateTextTemplateAction()
+		{
+			delete _text;
 		}
 	}
 }
