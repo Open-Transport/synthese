@@ -80,6 +80,7 @@ namespace synthese
 			*/
 			static std::vector<TransactionPart*> search(
 				Account* account, security::User* user
+				, bool order=false
 				, int first = 0, int number = -1);
 
 			/** TransactionPart search.

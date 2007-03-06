@@ -137,7 +137,7 @@ namespace synthese
 
 		TransactionPart* VinciContract::getCurrentRentTransactionPart() const
 		{
-			vector<TransactionPart*> rents = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), UserTableSync::get(_userId), -1, 1);
+			vector<TransactionPart*> rents = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), UserTableSync::get(_userId), false, 0, 1);
 			return rents.empty() ? NULL : rents.front();
 		}
 
