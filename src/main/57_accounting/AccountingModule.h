@@ -1,3 +1,6 @@
+#ifndef SYNTHESE_AccountingModule_H__
+#define SYNTHESE_AccountingModule_H__
+
 
 #include "01_util/ModuleClass.h"
 
@@ -28,3 +31,4 @@ namespace synthese
 }
 
 
+#endif 

@@ -2,9 +2,9 @@ import os
 import os.path
 
 
-Import ('env')
+Import ('rootenv')
 
-mainenv = env.Copy()
+mainenv = rootenv.Copy()
 
 # Add specific configuration for building main modules
 # ...

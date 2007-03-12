@@ -32,6 +32,7 @@
 #include "01_util/Factory.h"
 #include "01_util/ModuleClass.h"
 #include "01_util/Thread.h"
+#include "01_util/ThreadManager.h"
 
 #include "30_server/ServerModule.h"
 
@@ -72,7 +73,8 @@ int main( int argc, char **argv )
 
     try
     {
-	ServerModule::setDatabasePath(db);
+		boost::filesystem::path dbpath (db, boost::filesystem::native);
+	ServerModule::setDatabasePath(dbpath);
 
 	// Initialize modules
 	if (Factory<ModuleClass>::size() == 0)
@@ -82,16 +84,12 @@ int main( int argc, char **argv )
 	     it != Factory<ModuleClass>::end(); ++it)
 	{
 	    Log::GetInstance ().info ("Initializing module " + it.getKey() + "...");
-	    it->setDatabasePath(db);
+	    it->setDatabasePath(dbpath);
 	    it->initialize();
 	}
 
 
-	// Infinite loop... to be replaced by some control on the thread manager.
-	while (true) 
-	{
-	    Thread::Sleep (2000);
-	}
+	ThreadManager::Instance ()->run ();
 
     }
     catch (synthese::util::Exception& ex)

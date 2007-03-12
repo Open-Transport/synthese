@@ -34,6 +34,7 @@ class SQLiteThreadExec : public synthese::util::ThreadExec
 
     SQLiteThreadExec (synthese::tcp::TcpService* tcpService);
 
+
     /** Execution body.
      */
     void loop ();

@@ -1,106 +1,11 @@
-import os.path, fnmatch
 
 Import ('mainenv')
-moduleenv = mainenv.ModuleEnv()
 
-includes = 'main.cpp'
-excludes = []
+modules = ['34_departures_table', '30_server', '32_admin', '11_interfaces', '12_security', '13_dblog', '15_env', '17_messages', '07_lex_matcher', '04_time', '02_db', '01_util', '00_tcp'];
 
 
-#moduleenv.AppendMultithreadConf ()
+syntheseenv = mainenv.SyntheseEnv (modules)
 
-#files = moduleenv.Glob(includes, excludes)
-
-# NOTE : Create first a static library before linking the program,
-# otherwise, very strange gnu.link_once errors on boost time
-#moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
+syntheseenv.SyntheseBuild (syntheseenv.DefaultModuleName ())
 
 
-#moduleenv = mainenv.ModuleEnv()
-#includes = ''
-#excludes = []
-
-
-files = moduleenv.Glob(includes, excludes)
-
-# Third party services libs (7)
-
-# Business Services libs (5)
-
-# Core Services libs (3)
-moduleenv.AddModuleDependency ('34_departures_table')
-moduleenv.AddModuleDependency ('30_server')
-moduleenv.AddModuleDependency ('32_admin')
-
-# Classes libs (1)
-moduleenv.AddModuleDependency ('11_interfaces')
-moduleenv.AddModuleDependency ('12_security')
-moduleenv.AddModuleDependency ('13_dblog')
-moduleenv.AddModuleDependency ('15_env')
-moduleenv.AddModuleDependency ('17_messages')
-
-# Generic libs (0)
-moduleenv.AddModuleDependency ('07_lex_matcher')
-moduleenv.AddModuleDependency ('04_time')
-moduleenv.AddModuleDependency ('02_db')
-moduleenv.AddModuleDependency ('01_util')
-moduleenv.AddModuleDependency ('00_tcp')
-
-
-moduleenv.AddBoostDependency ('boost_filesystem')
-moduleenv.AddBoostDependency ('boost_date_time')
-moduleenv.AddBoostDependency ('boost_thread')
-moduleenv.AddBoostDependency ('boost_iostreams')
-moduleenv.AddBoostDependency ('boost_program_options')
-moduleenv.AddSQLiteDependency ()
-moduleenv.AppendMultithreadConf ()
-
-
-
-currentmodule = moduleenv.DefaultModuleName()
-
-
-def preAction (target = None, source = None, env = None):
-    # Look in all module folders for files with extension .cpp.gen
-    # and dump them inside a generated.cpp file, to be included in main.cpp
-    # Modules are traversed in reverse dependency order.
-    
-    modules = moduleenv['MODULES']
-    
-    generated = open ('src/main/' + currentmodule + '/generated.cpp.inc', "w" )
-    generatedInclude = open ('src/main/' + currentmodule + '/includes.cpp.inc', "w" )
-    for module in reversed (modules):
-      moduledir = os.path.join ('src/main', module)
-      for file in os.listdir (moduledir) :
-        if fnmatch.fnmatch (file, '*.gen.cpp') :
-            fragmentfile = os.path.join (moduledir, file);
-            # dump the file to generated output
-            fragment = open (fragmentfile, "r")
-            generated.write (fragment.read ())
-            fragment.close ()
-        if fnmatch.fnmatch (file, '*.inc.cpp') :
-            fragmentfile = os.path.join (moduledir, file);
-            # dump the file to generated output
-            fragment = open (fragmentfile, "r")
-            generatedInclude.write (fragment.read ())
-            fragment.close ()
-
-            
-    generated.close ()
-    generatedInclude.close ()
-    
-    return 0
- 
-a = Action (preAction)
-
-
-
-
-
-moduleenv.Program ( moduleenv.DefaultModuleName(), files )
-
-moduleenv.AddPreAction ("main.o", a)
-moduleenv.AlwaysBuild ("main.o")
-
-moduleenv.AddPreAction ("main.obj", a)
-moduleenv.AlwaysBuild ("main.obj")

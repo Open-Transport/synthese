@@ -12,6 +12,8 @@
 #include <Ws2tcpip.h>
 #endif
 
+// #include <WinIoCtl.h>
+
 /** ATTENTION
   Pour compiler sous MacOS X, il faut définir UNIX comme sous Linux.
   __APPLE_CC__ est défini implicitement.
@@ -23,11 +25,13 @@
 
 #ifdef UNIX
 #include <sys/select.h>
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <errno.h>
 #endif
 
 
@@ -86,6 +90,7 @@ socket.write(Client,Buffer,Size,Timeout);
 class Socket
 {
 private:
+    bool _nonBlocking;
     sockaddr_in _sockAddr;
     SOCKET _socket;
 
@@ -94,8 +99,8 @@ protected:
     void initializeSocket(const char* protoName);
     
 public:
-    Socket();
-    ~Socket();
+    Socket (bool nonBlocking = true);
+    ~Socket ();
     void closeSocket();
     void closeSocket (SOCKET socket);
     void open(const char* hostName, 

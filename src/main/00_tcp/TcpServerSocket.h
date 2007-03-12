@@ -40,7 +40,7 @@ private:
     const int _socketId;
     int _timeOut; //!< Time out in seconds.
 
-
+    
     TcpServerSocket (TcpService& service, 
 		     int socketId, 
 		     int timeOut = DEFAULT_TIME_OUT);

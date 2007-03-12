@@ -16,10 +16,12 @@ std::map<int, TcpService*> TcpService::_activeServices;
 
 
 TcpService::TcpService (int portNumber,
-			bool tcpProtocol)
+			bool tcpProtocol,
+			bool nonBlocking)
     : _portNumber (portNumber)
     , _protocol (tcpProtocol ? PROTOCOL_TYPE_TCP 
                   : PROTOCOL_TYPE_UDP )
+    , _nonBlocking (nonBlocking)
     , _socket (0)
 {
     initialize ();
@@ -32,7 +34,7 @@ TcpService::~TcpService ()
     // Close all active connections
     while (_activeConnections.size () > 0)
     {
-	closeConnection (*(_activeConnections.begin ()->second));
+	closeConnection (_activeConnections.begin ()->second);
     }
 
     // Clean up is done in _socket destructor.
@@ -45,7 +47,7 @@ TcpService::~TcpService ()
 void 
 TcpService::initialize () throw (SocketException)
 {
-    Socket* socket = new Socket;
+    Socket* socket = new Socket (_nonBlocking);
     try 
     {
 	socket->open ("*",
@@ -96,12 +98,13 @@ TcpService::closeService (int portNumber)
 
 
 
-TcpServerSocket&
+TcpServerSocket*
 TcpService::acceptConnection () throw (SocketException)
 {
     try 
     {
 	int socketId = _socket->acceptConnection ();
+	if (socketId == INVALID_SOCKET) return 0;
 
 	// Note : the lock must be done here; otherwise another take the lock, waits
         // for client connection and no other client connection will ever be closed!
@@ -112,7 +115,7 @@ TcpService::acceptConnection () throw (SocketException)
 	TcpServerSocket* serverSocket = new TcpServerSocket (*this, socketId);
 
 	_activeConnections.insert (std::make_pair (socketId, serverSocket));
-	return *serverSocket;
+	return serverSocket;
     }
     catch (const char* msg)
     {
@@ -134,11 +137,11 @@ TcpService::getConnectionCount () const
 
 
 void 
-TcpService::closeConnection (TcpServerSocket& socket) throw (SocketException)
+TcpService::closeConnection (TcpServerSocket* socket) throw (SocketException)
 {
     boost::mutex::scoped_lock lock (_serviceMutex);
 
-    int socketId = socket.getSocketId ();
+    int socketId = socket->getSocketId ();
 
     std::map<int, TcpServerSocket*>::iterator iter = 
 	_activeConnections.find (socketId);

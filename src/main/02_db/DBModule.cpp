@@ -29,8 +29,8 @@
 #include "02_db/SQLiteThreadExec.h"
 
 #include "01_util/Log.h"
-#include "01_util/Thread.h"
-#include "01_util/ThreadManager.h"
+#include "01_util/ManagedThread.h"
+
 
 #include <iostream>
 
@@ -47,13 +47,12 @@ namespace synthese
 			int sqliteServicePort = 3592;
 
 			// Initialize permanent ram loaded data
-			Log::GetInstance().info("Loading live data...");
 			_sqliteQueueThreadExec = new SQLiteQueueThreadExec (_databasePath);
 
-			ThreadSPtr sqliteQueueThread (new Thread (_sqliteQueueThreadExec, "sqlite_queue"));
-			ThreadManager::Instance ()->addThread (sqliteQueueThread);
+			ManagedThread* sqliteQueueThread = 
+			    new ManagedThread (_sqliteQueueThreadExec, "sqlite_queue", 1);
 
-			sqliteQueueThread->start ();
+			// sqliteQueueThread->start ();
 
 			SQLiteSync* syncHook = new SQLiteSync ();
 
@@ -67,21 +66,20 @@ namespace synthese
 			}
 				
 			_sqliteQueueThreadExec->registerUpdateHook (syncHook);
-			sqliteQueueThread->waitForReadyState ();
+			// sqliteQueueThread->waitForReadyState ();
 
 			synthese::tcp::TcpService* service = 
 				synthese::tcp::TcpService::openService (sqliteServicePort);
 
 			// Just one thread
-			SQLiteThreadExec* sqliteThreadExec = 
-				new SQLiteThreadExec (service);
+			SQLiteThreadExec* sqliteThreadExec = new SQLiteThreadExec (service);
 			
-			ThreadSPtr sqliteThread (new Thread (sqliteThreadExec, "sqlite_tcp"));
-			ThreadManager::Instance ()->addThread (sqliteThread);
+			ManagedThread* sqliteThread = 
+			    new ManagedThread (sqliteThreadExec, "sqlite_tcp");
 			
-			sqliteThread->start ();
+			// sqliteThread->start ();
 
-			sqliteThread->waitForReadyState ();
+			// sqliteThread->waitForReadyState ();
 		
 	    }
 

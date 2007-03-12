@@ -28,7 +28,7 @@ namespace synthese
 		{
 		}
 
-
+	    
 			
 		void 
 		SQLiteThreadExec::loop ()
@@ -36,14 +36,17 @@ namespace synthese
 		    static const char ETB (23);
 
 		    // No need to lock, TcpService methods are thread-safe.
-		    synthese::tcp::TcpServerSocket& serverSocket =
+		    synthese::tcp::TcpServerSocket* serverSocket =
 			_tcpService->acceptConnection ();
 		    
+		    // Non-blocking mode (default)
+		    if (serverSocket == 0) return;
+
 		    // A client can stay connected forever...
-		    serverSocket.setTimeOut (0);
+		    serverSocket->setTimeOut (0);
 
 		    boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
-			tcpStream (serverSocket);
+			tcpStream (*serverSocket);
 		    
 		    // Sends welcome message
 		    tcpStream << "Welcome to SYNTHESE SQLite embedded db server!" << std::endl;

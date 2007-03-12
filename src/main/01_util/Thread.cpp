@@ -7,6 +7,7 @@
 #include <boost/thread/xtime.hpp>
 
 
+
 using synthese::util::Log;
 using synthese::util::Conversion;
 
@@ -25,10 +26,12 @@ namespace util
 Thread::Thread (ThreadExec* exec, const std::string& name, int loopDelay)
 : _name ((name == "") ? DEFAULT_NAME_PREFIX + Conversion::ToString (_NbThreads++) : name)
 , _exec (exec)
-, _thread (0)
 , _loopDelay (loopDelay)
 , _state (new ThreadState (NOT_STARTED))
+, _nbLoops (new unsigned long (0))
 , _stateMutex (new boost::mutex ())
+, _nbLoopsMutex (new boost::mutex ())
+, _execMutex (new boost::mutex ())
 {
     // Implementation note : _state and _stateMutex are shared pointers because
     // when the thread will be spawned, this object will be first copied
@@ -42,11 +45,11 @@ Thread::Thread (ThreadExec* exec, const std::string& name, int loopDelay)
     // derived classes is left to user responsability.
 
 }
- 
+
+
 
 Thread::~Thread ()
 {
-    delete _thread;
 }
 
 
@@ -59,15 +62,19 @@ Thread::getName () const
 
 
 
+
+
+
 void 
 Thread::start ()
 {
     if (getState () != NOT_STARTED) throw ThreadException ("Thread was already started.");
-    _thread = new boost::thread (*this);
+    boost::thread* thread = new boost::thread (*this);
 
-    // Now that ThreadExec pointer has been copied, reset this shared_ptr on thread exec
-    // so that this object does not prevent destruction of ThreadExec.
-    _exec.reset ();
+    // The thread is started immediately, we detach it (by deleting it).
+    delete thread;
+    
+
 }
 
 
@@ -98,22 +105,7 @@ Thread::resume ()
 }
 
 
-/*
-Thread&
-Thread::operator=(const Thread& ref)
-{
-    if (&ref == this) return (*this);
-    _name = ref._name;
-    _exec = ref._exec;
-    _thread = 0; // ?
-    _loopDelay = ref._loopDelay;
-    _state = ref._state;
-    _stateMutex = ref._stateMutex;
 
-    return (*this);
-}
-
-*/
 
 
 void 
@@ -121,16 +113,13 @@ Thread::operator()()
 {
     try
     {
-	setState (INIT);
-	Log::GetInstance ().info ("Initializing thread " + _name +  "...");
-	_exec->initialize ();
-	setState (READY);
-	Log::GetInstance ().info ("Thread " + _name +  " is ready.");
-	
+	execInitialize ();
+
 	ThreadState state = getState ();
 	while (state != STOPPED) 
 	{
-	    if (state != PAUSED) _exec->loop ();
+	    execLoop ();
+
 	    Sleep (_loopDelay);
 	    state = getState ();
 	}
@@ -143,7 +132,9 @@ Thread::operator()()
 
     // Finalization is done in ANY case even after a crash
     Log::GetInstance ().info ("Finalizing thread " + _name + "...");
+    
     _exec->finalize ();
+    
     Log::GetInstance ().info ("Finalization done. " + _name + " is dead.");
 
 }
@@ -197,6 +188,44 @@ Thread::setState (ThreadState state)
     boost::mutex::scoped_lock lock (*_stateMutex);
     *_state = state;
 }
+
+
+
+unsigned long
+Thread::getNbLoops () const 
+{
+    boost::mutex::scoped_lock lock (*_nbLoopsMutex);
+    return *_nbLoops;
+}
+
+
+
+
+void 
+Thread::execInitialize ()
+{
+    setState (INIT);
+    Log::GetInstance ().info ("Initializing thread " + _name +  "...");
+    
+    _exec->initialize ();
+    setState (READY);
+    
+    Log::GetInstance ().info ("Thread " + _name +  " is ready.");
+}
+
+
+
+
+void 
+Thread::execLoop ()
+{
+    boost::mutex::scoped_lock lock (*_nbLoopsMutex);
+    if (getState () != PAUSED) _exec->loop ();
+    *_nbLoops = *_nbLoops + 1;    
+}
+
+
+
 
 
 void 

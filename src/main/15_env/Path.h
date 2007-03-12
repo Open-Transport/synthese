@@ -92,7 +92,7 @@ namespace synthese
 				{
 					return (s1->getDepartureSchedule () < s2->getDepartureSchedule ())
 						|| (s1->getDepartureSchedule () == s2->getDepartureSchedule ()
-						&& s1 != s2)						
+						&& s1 < s2)						
 						;
 				}
 			};

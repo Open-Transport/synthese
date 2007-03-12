@@ -4,7 +4,8 @@
 */
 
 #include "Socket.h"
-#include <string.h>
+#include <string>
+#include <iostream>
 
 
 
@@ -19,7 +20,8 @@ namespace tcp
     \author Christophe Romain
     \date 2005
 */
-Socket::Socket()
+Socket::Socket (bool nonBlocking)
+    : _nonBlocking (nonBlocking)
 {
 #ifdef WIN32
     WSADATA wsaData;
@@ -139,9 +141,30 @@ void
 Socket::server()
 {
     int result = 1;
+    int rc = 1;
 
     // Bind la socket avec le nom du service
     setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, (const char*) &result, sizeof(result));
+
+    if (_nonBlocking)
+    {
+	// Set socket to non-blocking mode; we want a non-blocking accept
+	// behaviour
+	// ...
+
+#ifdef UNIX
+	rc = ioctl (_socket, FIONBIO, (const char*) &result);
+#endif
+#ifdef WIN32
+	rc = ioctlsocket (_socket, FIONBIO, (unsigned long*) &result);
+#endif
+
+	if (rc < 0)
+	{
+	    throw "ioctl";
+	}
+    }
+
 
     result = bind(_socket, (const sockaddr*)& _sockAddr, sizeof(sockaddr));
     if(result == SOCKET_ERROR)
@@ -166,12 +189,17 @@ Socket::acceptConnection()
     sockaddr_in clientAddr;
     socklen_t addrSize = sizeof(sockaddr);
     client = accept(_socket, (sockaddr*) &clientAddr, &addrSize);
-    if(client == INVALID_SOCKET)
+    
+    if (client == INVALID_SOCKET)
     {
-#ifdef WIN32
+	/* if (errno == EWOULDBLOCK)
+	{
+	    std::cerr << "Non-Blocking mode!" << std::endl;
+	} */
+/* #ifdef WIN32
         if(WSAGetLastError() != WSAEINTR) 
             throw "Accept";
-#endif
+#endif */
     }
     return client;
 }

@@ -25,25 +25,27 @@ namespace synthese
 	namespace server
 	{
 
-		ServerThreadExec::ServerThreadExec (synthese::tcp::TcpService* tcpService) 
-			: _tcpService (tcpService)
-		{
-		}
+	    ServerThreadExec::ServerThreadExec (synthese::tcp::TcpService* tcpService) 
+		: _tcpService (tcpService)
+	    {
+	    }
+	    
 
 
-			
-		void 
-		ServerThreadExec::loop ()
-		{
-			// No need to lock, TcpService methods are thread-safe.
-			synthese::tcp::TcpServerSocket& serverSocket =
-			_tcpService->acceptConnection ();
-		    
-
-			boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
-			tcpStream (serverSocket);
-		    
-		    
+	    void 
+	    ServerThreadExec::loop ()
+	    {
+		// No need to lock, TcpService methods are thread-safe.
+		synthese::tcp::TcpServerSocket* serverSocket =
+		    _tcpService->acceptConnection ();
+		
+		// Non-blocking mode (default)
+		if (serverSocket == 0) return;
+		
+		boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
+		    tcpStream (*serverSocket);
+		
+		
 			char buffer[1024*512]; // 512K buffer max
 			tcpStream.getline (buffer, 1024*512);
 		    
@@ -77,6 +79,7 @@ namespace synthese
 			delete request;
 			tcpStream.flush();
 			_tcpService->closeConnection (serverSocket);
+
 
 		}
 	}

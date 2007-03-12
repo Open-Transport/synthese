@@ -5,13 +5,11 @@
 
 #include "module.h"
 
-#include <string>
 #include <vector>
+#include <string>
+#include <map>
 #include <iostream>
 
-
-
-#include "Thread.h"
 
 
 
@@ -21,6 +19,7 @@ namespace util
 {
 
 
+    class ManagedThread;
 
 
 /** Thread manager.
@@ -35,9 +34,19 @@ class ThreadManager
 
  private:
 
-    std::vector<ThreadSPtr> _threads;  //!< Threads in group.
+    static bool _MonothreadEmulation;
 
-    ThreadManager ();
+    typedef struct {
+	ManagedThread* thread;
+	unsigned long nbLoopsPrev;
+	unsigned long nbLoopsPrevPrev;
+    } ManagedThreadEntry;
+
+    std::vector<std::string> _names;  //!< Thread names ordered by registration.
+    std::map<std::string, ManagedThreadEntry> _threads;  //!< Managed threads.
+    
+
+    ThreadManager (bool monothreadEmulation = true);
 
  protected:
 
@@ -47,9 +56,19 @@ class ThreadManager
 
     static ThreadManager* Instance ();
 
-    void addThread (const ThreadSPtr& thread);
+    void run ();
+
+    static bool GetMonothreadEmulation ();
+    static void SetMonothreadEmulation (bool monothreadEmulation);
 
  private:
+
+    void checkForDeadThreads ();
+
+    void add (ManagedThread* thread, bool autoRespawn = false);
+    void remove (ManagedThread* thread);
+
+    friend class ManagedThread;
 
     
 };

@@ -24,8 +24,7 @@
 #include "00_tcp/TcpService.h"
 
 #include "01_util/Log.h"
-#include "01_util/Thread.h"
-#include "01_util/ThreadManager.h"
+#include "01_util/ManagedThread.h"
 #include "01_util/Conversion.h"
 
 #include "30_server/ServerModule.h"
@@ -71,43 +70,47 @@ namespace synthese
 				time_duration checkPeriod = hours(4); 
 				cleanerExec->addTempDirectory (_config.getHttpTempDir (), checkPeriod);
 
+				
 
 				if (_config.getNbThreads () == 1) 
 				{
-					// Monothread execution ; easier for debugging
-					// Review this to allow going through all loops of each
-					// ThreadExec in the same while loop !
+				    ServerThreadExec serverThreadExec (service);
+				    // Monothread execution ; easier for debugging
+				    // Review this to allow going through all loops of each
+				    // ThreadExec in the same while loop !
 					Log::GetInstance ().info ("Server ready.");
-					ServerThreadExec serverThreadExec (service);
 					while (1)
 					{
-						serverThreadExec.loop ();
+					    serverThreadExec.loop ();
 					}
 				}
 				else
 				{
+				    // Can be shared between threads because no state variables
+				    ServerThreadExec* serverThreadExec = 
+					new ServerThreadExec (service);
 
 				    for (int i=0; i<_config.getNbThreads (); ++i) 
 				    {
-					// ServerThreadExec could be shared by all 
-                                        // threads (no specific state variable)
-					ThreadSPtr serverThread (
-					    new Thread (
-						new ServerThreadExec (service), 
-						"tcp_" + Conversion::ToString (i), 1));
-					ThreadManager::Instance ()->addThread (serverThread);
+					ManagedThread* serverThread = 
+					    new ManagedThread (serverThreadExec,
+							       "tcp_" + Conversion::ToString (i), 
+							       1, true);
 
-					serverThread->start ();
-					serverThread->waitForReadyState ();
+					// serverThread->start ();
+					// serverThread->waitForReadyState ();
 					
 				    }
 				    
 				    // Create the cleaner thread (check every 5s)
-				    ThreadSPtr cleanerThread (new Thread (cleanerExec, "cleaner", 5000));
-				    ThreadManager::Instance ()->addThread (cleanerThread);
-				    
-				    cleanerThread->start ();
-				    cleanerThread->waitForReadyState ();
+				    /* buggé !! ManagedThread* cleanerThread = 
+					new ManagedThread (cleanerExec,
+							   "cleaner",
+							   5000, true);
+				    */
+
+				    // cleanerThread->start ();
+				    // cleanerThread->waitForReadyState ();
 				    
 				    Log::GetInstance ().info ("Server ready.");
 				}

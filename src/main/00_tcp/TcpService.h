@@ -40,13 +40,15 @@ private:
 
     const int _portNumber;
     const std::string _protocol;
+    const bool _nonBlocking;
 
     Socket* _socket;
 
 private:
 
     TcpService (int portNumber,
-		bool tcpProtocol = true);
+		bool tcpProtocol = true,
+		bool nonBlocking = true);
 
     ~TcpService ();
 
@@ -66,16 +68,16 @@ public:
     static void closeService (int portNumber);
 
 
-    /** Waits for incoming TCP connection (blocking).
-	@return The TCP server socket.
+    /** Waits for incoming TCP connection (non-blocking).
+	@return The TCP server socket, or 0 if connection failed.
      */
-    TcpServerSocket& acceptConnection () throw (SocketException);
+    TcpServerSocket* acceptConnection () throw (SocketException);
 
     
     /** Closes an existing TCP connection
        @param socket The socket id.
      */
-    void closeConnection (TcpServerSocket& socket) throw (SocketException);
+    void closeConnection (TcpServerSocket* socket) throw (SocketException);
 
 
     /** Gets active connection count on this service.

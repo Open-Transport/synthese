@@ -1,4 +1,7 @@
 
+REM for vc8 call "C:\Program Files\Microsoft Platform SDK for Windows XP SP2\SetEnv.Bat"
+REM for vc8 call vcvars32.bat
+
 echo %PATH%
 
 SET PATH=%PATH%;C:\Python24
@@ -36,7 +39,7 @@ GOTO END
 
 :BUILD
 echo scons %2 %3 %4 %5 %6 %7 %8 %9
-CALL scons %2 %3 %4 %5 %6 %7 %8 %9
+CALL scons -j %NUMBER_OF_PROCESSORS% %2 %3 %4 %5 %6 %7 %8 %9
 GOTO END
 
 

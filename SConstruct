@@ -1,16 +1,19 @@
+import os
+
 # -------------------------------------------------------
 # Command line arguments
 # -------------------------------------------------------
-env = Environment()
+rootenv = Environment(ENV = os.environ)
 
 mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
 
+
 print "platform = ", platform
 print "mode     = ", mode
 
-env.Replace ( PLATFORM = platform )
-env.Replace ( MODE = mode )
+rootenv.Replace ( PLATFORM = platform )
+rootenv.Replace ( MODE = mode )
 
 
 #if (platform=='posix'):
@@ -25,7 +28,7 @@ resourcesroot = 'resources'
 resourcesmain = resourcesroot + '/main'
 resourcestest = resourcesroot + '/test'
 
-env.Replace ( BUILDROOT = '#' + buildroot )
+rootenv.Replace ( BUILDROOT = '#' + buildroot )
 
 
 
@@ -212,6 +215,96 @@ def ModuleEnv (env):
 
 
 
+
+def SyntheseEnv (env, modules):
+    syntheseenv = env.ModuleEnv ()
+    includes = 'main.cpp'
+    excludes = []
+
+    files = syntheseenv.Glob(includes, excludes)
+
+    for module in modules:
+        syntheseenv.AddModuleDependency (module)
+
+    # Some hard-coded dependencies
+    syntheseenv.AddBoostDependency ('boost_filesystem')
+    syntheseenv.AddBoostDependency ('boost_date_time')
+    syntheseenv.AddBoostDependency ('boost_thread')
+    syntheseenv.AddBoostDependency ('boost_iostreams')
+    syntheseenv.AddBoostDependency ('boost_program_options')
+    syntheseenv.AddSQLiteDependency ()
+    syntheseenv.AppendMultithreadConf ()
+
+    return syntheseenv
+
+
+
+
+
+
+
+def SynthesePreBuild (target = None, source = None, env = None):
+
+    # source is expected to be main.cpp file
+    # parse this path to get right synthese module name
+    currentmodule = os.path.basename (source[0].abspath.replace (os.sep + 'main.cpp', ''));
+    
+    # Look in all module folders for files with extension .cpp.gen
+    # and dump them inside a generated.cpp file, to be included in main.cpp
+    # Modules are traversed in reverse dependency order.
+    
+    modules = env['MODULES']
+    
+    generated = open ('src/main/' + currentmodule + '/generated.cpp.inc', "w" )
+    generatedInclude = open ('src/main/' + currentmodule + '/includes.cpp.inc', "w" )
+    for module in reversed (modules):
+      moduledir = os.path.join ('src/main', module)
+      for file in os.listdir (moduledir) :
+        if fnmatch.fnmatch (file, '*.gen.cpp') :
+            fragmentfile = os.path.join (moduledir, file);
+            # dump the file to generated output
+            fragment = open (fragmentfile, "r")
+            generated.write (fragment.read ())
+            fragment.close ()
+        if fnmatch.fnmatch (file, '*.inc.cpp') :
+            fragmentfile = os.path.join (moduledir, file);
+            # dump the file to generated output
+            fragment = open (fragmentfile, "r")
+            generatedInclude.write (fragment.read ())
+            fragment.close ()
+
+            
+    generated.close ()
+    generatedInclude.close ()
+
+    return 0
+
+
+
+
+
+def SyntheseBuild (env, binname):
+    # Copy main.cpp from template.
+    maintemplate = env.File ('../100_synthese_template/main.cpp').srcnode ().abspath;
+    maincopy = env.File ('main.cpp').srcnode ().abspath;
+    Execute (Copy (maincopy, maintemplate));
+    
+    files = env.Glob('main.cpp', [])
+    
+    preaction = Action (SynthesePreBuild)
+
+    env.Program ( binname, files )
+
+    env.AddPreAction ("main.o", preaction)
+    env.AlwaysBuild ("main.o")
+    
+    env.AddPreAction ("main.obj", preaction)
+    env.AlwaysBuild ("main.obj")
+
+
+
+
+
     
 def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[], withSQLite=False, withMultithreading=True):
     testmoduleenv = ModuleEnv (env)
@@ -255,6 +348,11 @@ SConsEnvironment.DefineDefaultLibs=DefineDefaultLibs
 SConsEnvironment.AppendMultithreadConf=AppendMultithreadConf
 SConsEnvironment.ModuleEnv=ModuleEnv
 SConsEnvironment.TestModuleEnv=TestModuleEnv
+SConsEnvironment.SyntheseEnv=SyntheseEnv
+
+
+SConsEnvironment.SyntheseBuild=SyntheseBuild
+
 SConsEnvironment.AddModuleDependency=AddModuleDependency
 SConsEnvironment.AddBoostDependency=AddBoostDependency
 SConsEnvironment.AddSQLiteDependency=AddSQLiteDependency
@@ -267,11 +365,11 @@ SConsEnvironment.AddSQLiteDependency=AddSQLiteDependency
 # Common build configuration
 # -------------------------------------------------------
 
-env.DefineDefaultLibPath ()
-env.DefineDefaultCPPDefines ()
-env.DefineDefaultCCFlags ()
-env.DefineDefaultLinkFlags ()
-env.DefineDefaultLibs ()
+rootenv.DefineDefaultLibPath ()
+rootenv.DefineDefaultCPPDefines ()
+rootenv.DefineDefaultCCFlags ()
+rootenv.DefineDefaultLinkFlags ()
+rootenv.DefineDefaultLibs ()
 
 
 
@@ -298,10 +396,10 @@ def builder_copy_resources (target, source, env):
 
 
 bld = Builder(action = builder_unit_test)
-env.Append(BUILDERS = {'Test' :  bld})
+rootenv.Append(BUILDERS = {'Test' :  bld})
 
 bld = Builder(action = builder_copy_resources)
-env.Append(BUILDERS = {'CopyResources' :  bld})
+rootenv.Append(BUILDERS = {'CopyResources' :  bld})
 
 
 
@@ -314,17 +412,17 @@ env.Append(BUILDERS = {'CopyResources' :  bld})
 # Build process
 # -------------------------------------------------------
 
-Export('env')
+Export('rootenv')
 
 builddir = '#build' + '/' + platform + '/' + mode
 
 
 
 if 'doc' in COMMAND_LINE_TARGETS:
-  env.SConscript ('doc/SConscript')
+  rootenv.SConscript ('doc/SConscript')
 else:
-  env.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
-  env.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)
+  rootenv.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
+  rootenv.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)
 
 
     

@@ -39,7 +39,13 @@ class ThreadExec
     ThreadExec ();
     ~ThreadExec ();
 
+
     virtual void initialize ();
+
+    /** Thread execution loop.
+	It is assumed that one execution loop is "short" enough and non-blocking
+	so that thread life can be monitored properly.
+    */
     virtual void loop () = 0;
     virtual void finalize ();
 

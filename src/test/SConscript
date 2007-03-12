@@ -2,9 +2,9 @@ import os
 import os.path
 
 
-Import ('env')
+Import ('rootenv')
 
-testenv = env.Copy()
+testenv = rootenv.Copy()
 
 # Add specific configuration for building test modules
 # ...

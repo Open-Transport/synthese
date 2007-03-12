@@ -36,6 +36,7 @@ class ServerThreadExec : public synthese::util::ThreadExec
 
     ServerThreadExec (synthese::tcp::TcpService* tcpService);
 
+
     /** Execution body.
      */
     void loop ();
