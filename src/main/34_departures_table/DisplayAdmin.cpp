@@ -168,12 +168,12 @@ namespace synthese
 			endFilterMap.insert(make_pair(WITH_PASSING, "Origines/Terminus et passages"));
 
 			map<int, string> clearDelayMap;
-			for (i=-5; i<-1; ++i)
+			for (int i=-5; i<-1; ++i)
 				clearDelayMap.insert(make_pair(i, Conversion::ToString(-i) + " minutes avant le départ"));
 			clearDelayMap.insert(make_pair(-1, "1 minute avant le départ"));
 			clearDelayMap.insert(make_pair(0, "heure du départ"));
 			clearDelayMap.insert(make_pair(1, "1 minute après le départ"));
-			for (i=2; i<6; ++i)
+			for (int i=2; i<6; ++i)
 				clearDelayMap.insert(make_pair(i, Conversion::ToString(i) + " minutes après le départ"));
 
 			// Filling of the stream

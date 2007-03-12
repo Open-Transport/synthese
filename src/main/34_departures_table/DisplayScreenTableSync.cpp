@@ -80,7 +80,7 @@ namespace synthese
 			// Forbidden places
 			object->clearForbiddenPlaces();
 			stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS));
-			for (it = stops.begin(); it != stops.end(); ++it)
+			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
 				try
 				{
 					object->addForbiddenPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
@@ -98,7 +98,7 @@ namespace synthese
 			// Displayed places
 			stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS));
 			object->clearDisplayedPlaces();
-			for (it = stops.begin(); it != stops.end(); ++it)
+			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
 				try
 				{
 					object->addDisplayedPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
@@ -116,7 +116,7 @@ namespace synthese
 			// Forced destinations
 			stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS));
 			object->clearForcedDestinations();
-			for (it = stops.begin(); it != stops.end(); ++it)
+			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
 				try
 				{
 					object->addForcedDestination(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
@@ -212,7 +212,7 @@ namespace synthese
 				<< ",'";
 
 			count = 0;
-			for (itd = object->getForcedDestinations().begin(); itd != object->getForcedDestinations().end(); ++itd)
+			for (DisplayedPlacesList::const_iterator itd = object->getForcedDestinations().begin(); itd != object->getForcedDestinations().end(); ++itd)
 			{
 				if (!(*itd)->getKey())
 					continue;
