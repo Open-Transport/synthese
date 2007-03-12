@@ -22,6 +22,8 @@
 
 #include "17_messages/MessagesModule.h"
 
+using namespace std;
+
 namespace synthese
 {
 	namespace messages
@@ -39,6 +41,18 @@ namespace synthese
 		{
 			return _scenarii;
 		}
+
+		std::map<uid, std::string> MessagesModule::getScenariiLabels( bool withAll /*= false*/ )
+		{
+			map<uid,string> m;
+			if (withAll)
+				m.insert(make_pair(0, "(tous)"));
+			for(Scenario::Registry::const_iterator it = _scenarii.begin(); it != _scenarii.end(); ++it)
+				m.insert(make_pair(it->first, it->second->getName()));
+			return m;
+
+		}
+
 		void initialize()
 		{
 

@@ -100,5 +100,20 @@ namespace synthese
 			s << "<input type=\"password\" name=\"" << name << "\" value=\"" << value << "\"" << " />";
 			return s.str();
 		}
+
+		std::string Html::getLinkButton( const std::string& url, const std::string& caption )
+		{
+			stringstream s;
+			s	<< "<table class=\"linkbutton\"><tr>"
+				<< "<td class=\"linkbutton\" "
+				<< "onmouseover=\"this.className='activatedlinkbutton';\" "
+				<< "onmouseout=\"this.className='linkbutton';\" "
+				<< "onmousedown=\"this.className='clickedlinkbutton';\" "
+				<< "onmouseup=\"this.className='activatedlinkbutton';\" "
+				<< "onclick=\"window.location='" << url << "';\" "
+				<< ">"
+				<< "<a href=\"" << url << "\">" << caption << "</a></td></tr></table>";
+			return s.str();
+		}
 	}
 }

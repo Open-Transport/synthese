@@ -48,7 +48,9 @@ namespace synthese
 			static Scenario::Registry&	getScenarii();
 			
 			void initialize();
-			
+
+			static std::map<uid, std::string>	getScenariiLabels(bool withAll = false);
+
 		};
 	}
 }

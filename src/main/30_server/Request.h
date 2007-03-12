@@ -145,6 +145,8 @@ namespace synthese
 
 				void runActionAndFunction(std::ostream& stream);
 
+				std::string getURL()	const;
+
 				std::string getHTMLLink(const std::string& content) const;
 				virtual std::string getHTMLFormHeader(const std::string& name) const;
 			//@}

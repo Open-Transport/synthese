@@ -61,7 +61,7 @@ namespace synthese
 					throw ActionException("Name not specified");
 				_name = it->second;
 				if (_name.empty())
-					throw ActionException("Le nom de l'utilisateur ne peut être vide");
+					throw ActionException("L'utilisateur ne peut être créé car le nom n'est pas renseigné. Veuillez renseigner le champ nom.");
 				map.erase(it);
 
 				it = map.find(PARAMETER_LOGIN);
@@ -69,9 +69,9 @@ namespace synthese
 					throw ActionException("Login not specified");
                 _login = it->second;
 				if (_login.empty())
-					throw ActionException("Le login ne peut être vide");
+					throw ActionException("L'utilisateur ne peut être créé car le login n'est pas renseigné. Veuillez renseigner le champ login.");
 				if (UserTableSync::loginExists(_login))
-					throw ActionException("Le login demandé est déjà utilisé");
+					throw ActionException("L'utilisateur ne peut être créé car le login entré est déjà utilisé. Veuillez choisir un autre login.");
 				map.erase(it);
 
 				it = map.find(PARAMETER_PROFILE_ID);

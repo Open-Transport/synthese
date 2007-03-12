@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_UserTableSync_H__
 #define SYNTHESE_UserTableSync_H__
 
+#include <boost/logic/tribool.hpp>
+
 #include <vector>
 #include <string>
 #include <iostream>
@@ -77,6 +79,7 @@ namespace synthese
 			*/
 			static std::vector<User*> search(
 				const std::string& login, const std::string name, uid profileId = 0
+				, boost::logic::tribool emptyLogin = boost::logic::indeterminate
 				, int first = 0, int number = -1);
 
 		protected:

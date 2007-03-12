@@ -312,11 +312,17 @@ namespace synthese
 		std::string Request::getHTMLLink(const std::string& content) const
 		{
 			std::stringstream str;
-			str << "<a href=\"" << _clientURL << PARAMETER_STARTER << getQueryString() << "\">"
+			str << "<a href=\"" << getURL() << "\">"
 				<< content << "</a>";
 			return str.str();
 		}
 
+		std::string Request::getURL() const
+		{
+			stringstream str;
+			str << _clientURL << PARAMETER_STARTER << getQueryString();
+			return str.str();
+		}
 		const std::string& Request::getClientURL() const
 		{
 			return _clientURL;

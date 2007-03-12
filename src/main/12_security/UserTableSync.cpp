@@ -35,6 +35,7 @@
 #include "12_security/UserTableSyncException.h"
 
 using namespace std;
+using namespace boost::logic;
 
 namespace synthese
 {
@@ -190,7 +191,9 @@ namespace synthese
 			}
 		}
 
-		std::vector<User*> UserTableSync::search(const std::string& login, const std::string name, uid profileId, int first /*= 0*/, int number /*= 0*/ )
+		std::vector<User*> UserTableSync::search(const std::string& login, const std::string name, uid profileId
+			, tribool emptyLogin
+			, int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -201,6 +204,8 @@ namespace synthese
 				<< " AND " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
 			if (profileId > 0)
 				query << " AND " << TABLE_COL_PROFILE_ID << "=" << Conversion::ToString(profileId);
+			if (emptyLogin != tribool::indeterminate_value)
+				query << " AND " << TABLE_COL_LOGIN << (emptyLogin ? "=''" : "!=''");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

@@ -107,7 +107,7 @@ namespace synthese
 
 			stream
 				<< searchRequest->getHTMLFormHeader("search")
-				<< "<table id=\"searchform\"><tr>"
+				<< "<table class=\"searchform\"><tr>"
 				<< "<td>Nom</td><td>" << Html::getTextInput(PARAMETER_SEARCH_NAME, "") << "</td>"
 				<< "<td>Habilitation</td>"
 				<< "<td>"

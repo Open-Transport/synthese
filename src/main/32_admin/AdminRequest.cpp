@@ -118,7 +118,7 @@ namespace synthese
 				if (_interface != NULL)
 				{
 					const AdminInterfacePage* const aip = _interface->getPage<AdminInterfacePage>();
-					aip->display(stream, _page, _object_id, this);
+					aip->display(stream, _actionException ? _actionFailedPage : _page, _object_id, this);
 				}
 				else
 				{
@@ -153,6 +153,8 @@ namespace synthese
 				s << Html::getHiddenInput(PARAMETER_PAGE, _page->getFactoryKey());
 			if (_object_id > 0)
 				s << Html::getHiddenInput(PARAMETER_OBJECT_ID, Conversion::ToString(_object_id));
+			if (_actionFailedPage != NULL)
+				s << Html::getHiddenInput(PARAMETER_ACTION_FAILED_PAGE, _actionFailedPage->getFactoryKey());
 			return s.str();
 		}
 

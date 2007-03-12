@@ -68,6 +68,8 @@ namespace synthese
 
 				static std::string getSubmitButton(const std::string& caption);
 
+				static std::string getLinkButton(const std::string& url, const std::string& caption);
+
 				static std::string getCheckBox(const std::string& name, const std::string& value, bool checked);
 			//@}
 

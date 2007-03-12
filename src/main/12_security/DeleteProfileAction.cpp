@@ -65,7 +65,7 @@ namespace synthese
 				throw ActionException("Profile not found");
 			}
 
-			vector<User*> users = UserTableSync::search("","",_profile->getKey(),0, 1);
+			vector<User*> users = UserTableSync::search("","",_profile->getKey(), boost::logic::indeterminate, 0, 1);
 			if (users.size() > 0)
 				throw ActionException("At least one user belongs to the specified profile. The deletion is forbidden.");
 		}

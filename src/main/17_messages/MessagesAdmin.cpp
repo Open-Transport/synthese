@@ -30,6 +30,7 @@
 #include "17_messages/MessagesAdmin.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessageAdmin.h"
+#include "17_messages/MessagesModule.h"
 #include "17_messages/NewMessageAction.h"
 #include "17_messages/NewScenarioSendAction.h"
 #include "17_messages/MessagesScenarioSendAdmin.h"
@@ -193,16 +194,13 @@ namespace synthese
 				<< "</form>"
 
 				<< newScenarioRequest->getHTMLFormHeader("newsec")
-				<< "<p>" << Html::getSubmitButton("Nouvelle diffusion de scénario") << "</p>"
-				<< "<select name=\"Select1\">";
-
-			// List of scenarios
-
-			stream
-				<< "</select></p>"
+				<< "<p>"
+				<< Html::getSelectInput(NewScenarioSendAction::PARAMETER_TEMPLATE, MessagesModule::getScenariiLabels(), uid(0))
+				<< Html::getSubmitButton("Nouvelle diffusion de scénario") << "&nbsp;"
+				<< "</p>"
 				<< "</form>"
-				<< "<P align=\"right\">Messages&nbsp;suivants &gt;</P>"
-				<< "<P>Cliquer sur un titre de colonne pour trier le tableau.</P>";
+				<< "<p align=\"right\">Messages&nbsp;suivants &gt;</p>"
+				;
 
 			delete searchRequest;
 			delete newMessageRequest;

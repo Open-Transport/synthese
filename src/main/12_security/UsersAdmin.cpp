@@ -26,6 +26,7 @@
 #include "12_security/UserAdmin.h"
 #include "12_security/User.h"
 #include "12_security/AddUserAction.h"
+#include "12_security/DelUserAction.h"
 #include "12_security/Profile.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/UsersAdmin.h"
@@ -72,13 +73,14 @@ namespace synthese
 			AdminRequest* addUserRequest = Factory<Request>::create<AdminRequest>();
 			addUserRequest->copy(request);
 			addUserRequest->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
+			addUserRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
 			addUserRequest->setAction(Factory<Action>::create<AddUserAction>());
 
 			// Request for delete action form
-//			AdminRequest* deleteUserRequest = Factory<Request>::create<AdminRequest>();
-//			deleteUserRequest->copy(request);
-//			deleteUserRequest->setPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
-//			deleteUserRequest->setAction(Factory<Action>::create<DelUserAction>());
+			AdminRequest* deleteUserRequest = Factory<Request>::create<AdminRequest>();
+			deleteUserRequest->copy(request);
+			deleteUserRequest->setPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
+			deleteUserRequest->setAction(Factory<Action>::create<DelUserAction>());
 
 			// Request for user link
 			AdminRequest* userRequest = Factory<Request>::create<AdminRequest>();
@@ -87,21 +89,18 @@ namespace synthese
 
 			// Search form
 			stream
-				<< searchRequest->getHTMLFormHeader("search")
 				<< "<h1>Recherche d'utilisateur</h1>"
-				<< "Login <input name=\"" << PARAM_SEARCH_LOGIN << "\" value=\"" << _searchLogin << "\" />, "
-				<< "Nom :<input name=\"" << PARAM_SEARCH_NAME << "\" value=\"" << _searchName << "\" />, "
-				<< "Profil : <SELECT name=\"" << PARAM_SEARCH_PROFILE_ID << "\">";
-
-
-			stream << "<option value=\"\">(tous les profils)</option>";
-			for (Profile::Registry::const_iterator it = SecurityModule::getProfiles().begin(); it != SecurityModule::getProfiles().end(); ++it)
-				stream << "<option value=\"" << it->first << "\"" << ((_searchProfileId == it->first) ? " selected=\"1\" " : "") << ">" << it->second->getName() << "</option>";
-
-			stream
-				<< "</SELECT>&nbsp;&nbsp;"
-				<< "<input type=\"submit\" value=\"Rechercher\">"
-				<< "</form>";
+				<< searchRequest->getHTMLFormHeader("search")
+				<< "<table class=\"searchform\"><tr><td>Login</td><td>"
+				<< Html::getTextInput(PARAM_SEARCH_LOGIN, _searchLogin)
+				<< "</td><td>Nom</td><td>"
+				<< Html::getTextInput(PARAM_SEARCH_NAME, _searchName)
+				<< "</td><td>Profil</td><td>"
+				<< Html::getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(true), _searchProfileId)
+				<< "</td></tr>"
+				<< "<tr><td colspan=\"6\" class=\"submitcell\">"
+				<< Html::getSubmitButton("Rechercher")
+				<< "</td></tr></table></form>";
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
@@ -109,26 +108,29 @@ namespace synthese
 				stream << "Aucun utilisateur trouvé";
 
 
-			stream << "<table><tr><th>Sel</th><th>Login</th><th>Nom</th><th>Profil</th><th>Action</th></tr>";
+			stream << "<table><tr><th>Login</th><th>Nom</th><th>Profil</th><th>Actions</th></tr>";
 
 			for(vector<User*>::const_iterator it = _users.begin(); it != _users.end(); ++it)
 			{
 				User* user = *it;
 				userRequest->setObjectId(user->getKey());
+				deleteUserRequest->setObjectId(user->getKey());
 				stream
 					<< "<tr>"
-					<< "<td><input type=\"checkbox\" name=\"selection\"></TD>"
 					<< "<td>" << userRequest->getHTMLLink(user->getLogin()) << "</td>"
 					<< "<td>" << userRequest->getHTMLLink(user->getName()) << "</td>"
 					<< "<td>" << user->getProfile()->getName() << "</td>"
-					<< "<td></td>"
+					<< "<td>" 
+					<< Html::getLinkButton(userRequest->getURL(), "Editer") 
+					<< Html::getLinkButton(deleteUserRequest->getURL(), "Supprimer") 
+					<< "</td>"
 					<< "</tr>";
 			}
 
 			stream
 				<< addUserRequest->getHTMLFormHeader("adduser")
 				<< "<tr>"
-				<< "<td>&nbsp;</TD>"
+				<< "<td>&nbsp;</td>"
 				<< "<td>" << Html::getTextInput(AddUserAction::PARAMETER_LOGIN, "", "Entrez le login ici") << "</td>"
 				<< "<td>" << Html::getTextInput(AddUserAction::PARAMETER_NAME, "", "Entrez le nom ici") << "</td>"
 				<< "<td>" << Html::getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), (uid) 0) << "</td>"
@@ -141,12 +143,11 @@ namespace synthese
 				stream << "<p style=\"text-align:right\">Utilisateurs&nbsp;suivants</p>";
 
 			stream
-//				<< "<p>Sélection : <input type=\"submit\" value=\"Supprimer\" name=\"" << actionRequest->getAction()->getFactoryKey() << "\" /></p>"
 				<< "<p>Cliquer sur un titre de colonne pour trier le tableau.</p>";
-//				<< "</form>";
 
 			delete addUserRequest;
 			delete searchRequest;
+			delete deleteUserRequest;
 		}
 
 		void UsersAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
@@ -189,6 +190,7 @@ namespace synthese
 				_searchLogin
 				, _searchName
 				, _searchProfileId
+				, false
 				, _first
 				, _number + 1
 				);
