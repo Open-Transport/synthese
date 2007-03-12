@@ -39,7 +39,8 @@ GOTO END
 
 :BUILD
 echo scons %2 %3 %4 %5 %6 %7 %8 %9
-CALL scons -j %NUMBER_OF_PROCESSORS% %2 %3 %4 %5 %6 %7 %8 %9
+rem CALL scons -j %NUMBER_OF_PROCESSORS% %2 %3 %4 %5 %6 %7 %8 %9
+CALL scons %2 %3 %4 %5 %6 %7 %8 %9
 GOTO END
 
 
