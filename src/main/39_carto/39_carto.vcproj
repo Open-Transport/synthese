@@ -179,6 +179,16 @@
 				RelativePath=".\PostscriptRenderer.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="Requests"
+			Filter="">
+			<File
+				RelativePath=".\MapRequest.cpp">
+			</File>
+			<File
+				RelativePath=".\MapRequest.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\CartoModule.cpp">
 		</File>
