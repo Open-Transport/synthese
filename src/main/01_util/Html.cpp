@@ -101,16 +101,19 @@ namespace synthese
 			return s.str();
 		}
 
-		std::string Html::getLinkButton( const std::string& url, const std::string& caption )
+		std::string Html::getLinkButton( const std::string& url, const std::string& caption, const string confirm)
 		{
 			stringstream s;
 			s	<< "<a class=\"linkbutton\" "
 				<< "onmouseover=\"this.className='activatedlinkbutton';\" "
 				<< "onmouseout=\"this.className='linkbutton';\" "
 				<< "onmousedown=\"this.className='clickedlinkbutton';\" "
-				<< "onmouseup=\"this.className='activatedlinkbutton';\" "
-				<< "onclick=\"window.location='" << url << "';\" "
-				<< "href=\"" << url << "\">" << caption << "</a>";
+				<< "onmouseup=\"this.className='activatedlinkbutton';\" ";
+			if (confirm.empty())
+				s << "href=\"" << url << "\"";
+			else
+				s << "onclick=\"if (window.confirm('" << confirm << "')) window.location='" << url << "';\"";
+			s	<< ">" << caption << "</a>";
 			return s.str();
 		}
 	}

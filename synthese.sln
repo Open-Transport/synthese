@@ -58,8 +58,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "99_synthese_vinci", "src\main\99_synthese_vinci\99_synthese_vinci.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "39_carto", "src\main\39_carto\39_carto.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -130,6 +128,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "13_dblog", "src\main\13_dbl
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "15_env_test", "src\test\15_env\15_env_test.vcproj", "{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "100_synthese_template", "src\main\100_synthese_template\100_synthese_template.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -271,9 +273,12 @@ Global
 		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Debug.Build.0 = Debug|Win32
 		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.ActiveCfg = Release|Win32
 		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.Build.0 = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.ActiveCfg = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.Build.0 = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.ActiveCfg = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
-		src\main\13_dblog\13_dblog.vcproj = src\main\13_dblog\13_dblog.vcproj
 		SConstruct = SConstruct
 		vsscons.bat = vsscons.bat
 	EndGlobalSection

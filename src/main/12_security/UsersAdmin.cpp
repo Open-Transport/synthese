@@ -121,8 +121,8 @@ namespace synthese
 					<< "<td>" << userRequest->getHTMLLink(user->getName()) << "</td>"
 					<< "<td>" << user->getProfile()->getName() << "</td>"
 					<< "<td>" 
-					<< Html::getLinkButton(userRequest->getURL(), "Editer") 
-					<< Html::getLinkButton(deleteUserRequest->getURL(), "Supprimer") 
+					<< Html::getLinkButton(userRequest->getURL(), "Editer") << "&nbsp;"
+					<< Html::getLinkButton(deleteUserRequest->getURL(), "Supprimer", "Etes-vous sûr(e) de vouloir supprimer l\\'utilisateur " + user->getLogin() + " ?")
 					<< "</td>"
 					<< "</tr>";
 			}
@@ -130,7 +130,6 @@ namespace synthese
 			stream
 				<< addUserRequest->getHTMLFormHeader("adduser")
 				<< "<tr>"
-				<< "<td>&nbsp;</td>"
 				<< "<td>" << Html::getTextInput(AddUserAction::PARAMETER_LOGIN, "", "Entrez le login ici") << "</td>"
 				<< "<td>" << Html::getTextInput(AddUserAction::PARAMETER_NAME, "", "Entrez le nom ici") << "</td>"
 				<< "<td>" << Html::getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), (uid) 0) << "</td>"

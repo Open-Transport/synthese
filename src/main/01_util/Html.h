@@ -68,7 +68,35 @@ namespace synthese
 
 				static std::string getSubmitButton(const std::string& caption);
 
-				static std::string getLinkButton(const std::string& url, const std::string& caption);
+				/** Link displayed as a button.
+					@param url URL to go on click on the link
+					@param caption Caption on the link
+					@param confirm Confirmation message : if empty, the link goes directly to the url. If non empty, then a confirm popup asks the user to validate the click after reading the provided message. Warning : the confirm message must not contain any " or ' character. Use &quot; and &#39; or \' instead
+					@return HTML code of the link
+
+					To use the button displayed link in an HTML page, be aware to define 3 css styles :
+						- a.linkbutton : the normal appearance of the button
+						- a.activatedlinkbutton : the appearance of the button when the pointer is on it
+						- a.clickedlinkbutton : the apperance of the button while the user clicks on it
+
+					The relief is drawed by the styles. Without them the link will display normally.
+
+					Example of css :
+					@code
+					a.linkbutton { display:inline-block; padding:2px 4px 2px 4px; text-decoration:none; color:black; background-color:#C0C0C0; border-style:solid; border-width:1px 2px 2px 1px; border-color:#000060; }
+					a.activatedlinkbutton { display:inline-block; padding:2px 4px 2px 4px; border-style:solid; text-decoration:none; color:black; background-color:#0080E0; border-width:1px 2px 2px 1px; } 
+					a.clickedlinkbutton { display:inline-block; padding:2px 4px 2px 4px; border-style:solid; color:black; text-decoration:none; background-color:#0080E0; border-width:2px 1px 1px 2px; }
+					@endcode
+
+					It is recommended to design the real form buttons with a similar style.
+
+					Example of corresponding css :
+					@code
+					input[type=submit] {background-color:#C0C0C0; font-family:verdana,helvetica; border-width:1px 2px 2px 1px; padding:0px; border-color:#000066; cursor:hand; }
+					input[type=submit]:hover {background-color:#0080E0;}
+					@endcode
+				*/
+				static std::string getLinkButton(const std::string& url, const std::string& caption, const std::string confirm="");
 
 				static std::string getCheckBox(const std::string& name, const std::string& value, bool checked);
 			//@}
