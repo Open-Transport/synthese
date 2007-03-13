@@ -57,11 +57,13 @@ namespace synthese
 		public:
 
 			LineStop (const uid id = 0,
-				const Line* line = NULL,
-				int rankInPath = UNKNOWN_VALUE,
-				bool isDeparture = true,
-				bool isArrival = true,
-				double metricOffset = UNKNOWN_VALUE);
+				  const Line* line = NULL,
+				  int rankInPath = UNKNOWN_VALUE,
+				  bool isDeparture = true,
+				  bool isArrival = true,
+				  double metricOffset = UNKNOWN_VALUE,
+				  const PhysicalStop* physicalStop = 0);
+			    
 			
 			~LineStop();
 

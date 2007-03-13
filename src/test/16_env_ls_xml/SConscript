@@ -1,9 +1,0 @@
-Import ('testenv')
-testmoduleenv = testenv.TestModuleEnv (includes='*.cpp', 
-                                       excludes=[], 
-                                       modules=['16_env_ls_xml', '15_env', '07_lex_matcher', '04_time', '01_util'], 
-                                       boostlibs=['boost_filesystem', 'boost_thread', 'boost_iostreams'], 
-                                       withSQLite=False, 
-                                       withMultithreading=True)
-
-

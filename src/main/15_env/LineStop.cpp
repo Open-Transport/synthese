@@ -36,13 +36,15 @@ namespace synthese
 	{
 
 		LineStop::LineStop (const uid id,
-					const Line* line,
-					int rankInPath,
-					bool isDeparture,
-					bool isArrival,		
-					double metricOffset)
+				    const Line* line,
+				    int rankInPath,
+				    bool isDeparture,
+				    bool isArrival,		
+				    double metricOffset,
+				    const PhysicalStop* physicalStop)
 			: synthese::util::Registrable<uid,LineStop> (id)
 			, Edge (isDeparture, isArrival, line, rankInPath)
+			, _physicalStop (physicalStop)
 			, _metricOffset (metricOffset)
 		{
 		}

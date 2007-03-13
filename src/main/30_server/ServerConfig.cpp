@@ -22,8 +22,8 @@ ServerConfig::ServerConfig ()
     , _nbThreads (5)
     , _dataDir (".")
     , _tempDir (".")
-    , _httpTempDir (".")
-    , _httpTempUrl ("http://")
+    , _httpTempDir ("/var/www/tmp")
+    , _httpTempUrl ("http://localhost/tmp")
 {
     
 }
