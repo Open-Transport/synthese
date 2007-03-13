@@ -285,7 +285,7 @@ def SynthesePreBuild (target = None, source = None, env = None):
 
 def SyntheseBuild (env, binname):
     # Copy main.cpp from template.
-    maintemplate = env.File ('../100_synthese_template/main.cpp').srcnode ().abspath;
+    maintemplate = env.File ('../synthese_template/main.cpp').srcnode ().abspath;
     maincopy = env.File ('main.cpp').srcnode ().abspath;
     Execute (Copy (maincopy, maintemplate));
     
