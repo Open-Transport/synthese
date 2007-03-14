@@ -169,7 +169,10 @@ HtmlMapRenderer::renderLines (std::ostream& _output, const synthese::env::Line::
 		{
 		    const LineStop* ls = dynamic_cast<const LineStop*> (lineStops.at(i));
 		    std::string href (_urlPattern);
-		    boost::replace_all (href, "$id", Conversion::ToString(ls->getKey()));
+
+		    // HACK : there is no interpoint concept in synthese. so refres gives interpoint id
+		    // in metric offset...
+		    boost::replace_all (href, "$id", Conversion::ToString(ls->getMetricOffset()));
 		    _output << "<area href='" << href << "' shape='poly' coords='";
 		    
 		    _output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";
