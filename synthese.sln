@@ -63,14 +63,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "39_map", "src\main\39_map\3
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "16_env_ls_xml", "src\main\16_env_ls_xml\16_env_ls_xml.vcproj", "{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "40_carto_ls_xml", "src\main\40_carto_ls_xml\40_carto_ls_xml.vcproj", "{4E31B684-7499-4688-A0A1-199CCAFBAB94}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12_security", "src\main\12_security\12_security.vcproj", "{B611F981-1353-4B13-A6FE-695034268D72}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -132,6 +124,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "15_env_test", "src\test\15_
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "synthese_template", "src\main\synthese_template\synthese_template.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "97_synthese_refres", "src\main\97_synthese_refres\97_synthese_refres.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -205,14 +201,6 @@ Global
 		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.Build.0 = Debug|Win32
 		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.ActiveCfg = Release|Win32
 		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.Build.0 = Release|Win32
-		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Debug.ActiveCfg = Debug|Win32
-		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Debug.Build.0 = Debug|Win32
-		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Release.ActiveCfg = Release|Win32
-		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Release.Build.0 = Release|Win32
-		{4E31B684-7499-4688-A0A1-199CCAFBAB94}.Debug.ActiveCfg = Debug|Win32
-		{4E31B684-7499-4688-A0A1-199CCAFBAB94}.Debug.Build.0 = Debug|Win32
-		{4E31B684-7499-4688-A0A1-199CCAFBAB94}.Release.ActiveCfg = Release|Win32
-		{4E31B684-7499-4688-A0A1-199CCAFBAB94}.Release.Build.0 = Release|Win32
 		{B611F981-1353-4B13-A6FE-695034268D72}.Debug.ActiveCfg = Debug|Win32
 		{B611F981-1353-4B13-A6FE-695034268D72}.Debug.Build.0 = Debug|Win32
 		{B611F981-1353-4B13-A6FE-695034268D72}.Release.ActiveCfg = Release|Win32
@@ -273,6 +261,10 @@ Global
 		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Debug.Build.0 = Debug|Win32
 		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.ActiveCfg = Release|Win32
 		{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}.Release.Build.0 = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.ActiveCfg = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.Build.0 = Debug|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.ActiveCfg = Release|Win32
+		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.Build.0 = Release|Win32
 		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.ActiveCfg = Debug|Win32
 		{0215F340-8C69-48B0-8D19-88758740BC47}.Debug.Build.0 = Debug|Win32
 		{0215F340-8C69-48B0-8D19-88758740BC47}.Release.ActiveCfg = Release|Win32
