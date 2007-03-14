@@ -64,7 +64,7 @@ ServerConfig::getLogLevel () const
 void 
 ServerConfig::setLogLevel (const synthese::util::Log::Level& level) const
 {
-    return synthese::util::Log::GetInstance ().setLevel (level);
+    synthese::util::Log::GetInstance ().setLevel (level);
 }
 
 

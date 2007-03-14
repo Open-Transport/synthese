@@ -61,6 +61,10 @@ namespace synthese
 			{
 				ServerModule::getConfig().setNbThreads (Conversion::ToInt (paramValue));
 			}
+			else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_LOGLEVEL)
+			{
+				ServerModule::getConfig().setLogLevel (Conversion::ToInt (paramValue));
+			}
 			else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_DATADIR)
 			{
 				ServerModule::getConfig().setDataDir (boost::filesystem::path (paramValue, boost::filesystem::native));
