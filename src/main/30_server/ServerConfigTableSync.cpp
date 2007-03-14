@@ -63,7 +63,7 @@ namespace synthese
 			}
 			else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_LOGLEVEL)
 			{
-				ServerModule::getConfig().setLogLevel (Conversion::ToInt (paramValue));
+				ServerModule::getConfig().setLogLevel ((Log::Level) Conversion::ToInt (paramValue));
 			}
 			else if (paramName == CONFIG_TABLE_COL_PARAMVALUE_DATADIR)
 			{

@@ -135,7 +135,8 @@ namespace synthese
 				<< "<table>"
 				<< "<tr><td>Date début</td><td>" << Html::getTextInput(PARAMETER_SEARCH_START, _startDate.toString()) << "</td>"
 				<< "<td>Date fin</td><td>" << Html::getTextInput(PARAMETER_SEARCH_END, _endDate.toString()) << "</td>"
-				<< "<td>Zone d'arrêt</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), _place ? _place->getKey() : UNKNOWN_VALUE)	/// @todo put it in a factory to avoid dependency and to permit evolutivity
+				// Replace this by a virtual "search fields" method of each member of the factory alarm broadcast points
+				//<< "<td>Zone d'arrêt</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), _place ? _place->getKey() : UNKNOWN_VALUE)	/// @todo put it in a factory to avoid dependency and to permit evolutivity
 				<< "</td></tr>"
 				<< "<tr><td>Ligne</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_LINE, EnvModule::getCommercialLineLabels(true), _line ? _line->getKey() : UNKNOWN_VALUE) << "</td>"
 				<< "<td>Statut</td><td><SELECT name=\"Select1\">"

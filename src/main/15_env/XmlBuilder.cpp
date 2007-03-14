@@ -140,7 +140,7 @@ XmlBuilder::CreateLine (XMLNode& node,
 
 LineStop* 
 XmlBuilder::CreateLineStop (XMLNode& node, 
-			    const Line::Registry& lines,
+			    Line::Registry& lines,
 			    const PhysicalStop::Registry& physicalStops)
 {
     // assert ("lineStop" == node.getName ());

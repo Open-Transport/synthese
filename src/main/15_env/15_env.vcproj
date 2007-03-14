@@ -300,6 +300,12 @@
 			<File
 				RelativePath=".\VertexAccessMap.h">
 			</File>
+			<File
+				RelativePath=".\XmlBuilder.cpp">
+			</File>
+			<File
+				RelativePath=".\XmlBuilder.h">
+			</File>
 			<Filter
 				Name="Service"
 				Filter="">

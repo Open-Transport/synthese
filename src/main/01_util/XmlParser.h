@@ -36,22 +36,23 @@
 
 // Some common types for char set portable code
 #ifdef _UNICODE
-    #ifndef LPCTSTR
-        #define LPCTSTR const unsigned short *
-    #endif /* LPCTSTR */
-    #ifndef LPTSTR
-        #define LPTSTR unsigned short*
-    #endif /* LPTSTR */
+// Define commented because of conflict with WinNT.h (used as typedef in this file : not detected by ifndef)
+//    #ifndef LPCTSTR
+        typedef const unsigned short * LPCTSTR ;
+//    #endif /* LPCTSTR */
+//    #ifndef LPTSTR
+        typedef unsigned short* LPTSTR;
+//    #endif /* LPTSTR */
     #ifndef TCHAR
         #define TCHAR unsigned short
     #endif /* TCHAR */
 #else
-    #ifndef LPCTSTR
-        #define LPCTSTR const char *
-    #endif /* LPCTSTR */
-    #ifndef LPTSTR
-        #define LPTSTR char *
-    #endif /* LPTSTR */
+//    #ifndef LPCTSTR
+        typedef const char * LPCTSTR ;
+//    #endif /* LPCTSTR */
+//    #ifndef LPTSTR
+        typedef char * LPTSTR ;
+//    #endif /* LPTSTR */
     #ifndef TCHAR
         #define TCHAR char
     #endif /* TCHAR */

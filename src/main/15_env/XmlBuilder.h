@@ -115,7 +115,7 @@ class XmlBuilder
 			     const CommercialLine::Registry& commercialLines);
 
     static LineStop* CreateLineStop (XMLNode& node, 
-				     const Line::Registry& lines,
+				     Line::Registry& lines,
 				     const PhysicalStop::Registry& physicalStops);
 
     static PhysicalStop* CreatePhysicalStop (XMLNode& node, 
