@@ -33,6 +33,8 @@
 
 #include "30_server/ServerModule.h"
 
+#include "32_admin/SearchFormHTMLTable.h"
+
 using namespace std;
 
 namespace synthese
@@ -68,6 +70,7 @@ namespace synthese
 			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
 			searchRequest->copy(request);
 			searchRequest->setPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
+			SearchFormHTMLTable searchTable(searchRequest);
 			
 			// Request for add user action form
 			AdminRequest* addUserRequest = Factory<Request>::create<AdminRequest>();
@@ -88,19 +91,13 @@ namespace synthese
 			userRequest->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
 
 			// Search form
-			stream
-				<< "<h1>Recherche d'utilisateur</h1>"
-				<< searchRequest->getHTMLFormHeader("search")
-				<< "<table class=\"searchform\"><tr><td>Login</td><td>"
-				<< Html::getTextInput(PARAM_SEARCH_LOGIN, _searchLogin)
-				<< "</td><td>Nom</td><td>"
-				<< Html::getTextInput(PARAM_SEARCH_NAME, _searchName)
-				<< "</td><td>Profil</td><td>"
-				<< Html::getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(true), _searchProfileId)
-				<< "</td></tr>"
-				<< "<tr><td colspan=\"6\" class=\"submitcell\">"
-				<< Html::getSubmitButton("Rechercher")
-				<< "</td></tr></table></form>";
+			stream << "<h1>Recherche d'utilisateur</h1>";
+				
+			stream << searchTable.open();
+			stream << searchTable.cell("Login", Html::getTextInput(PARAM_SEARCH_LOGIN, _searchLogin));
+			stream << searchTable.cell("Nom", Html::getTextInput(PARAM_SEARCH_NAME, _searchName));
+			stream << searchTable.cell("Profil", Html::getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(true), _searchProfileId));
+			stream << searchTable.close();
 
 			stream << "<h1>Résultats de la recherche</h1>";
 

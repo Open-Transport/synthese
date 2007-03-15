@@ -114,6 +114,22 @@
 				RelativePath=".\AdminParametersException.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="HTML"
+			Filter="">
+			<File
+				RelativePath=".\ResultHTMLTable.cpp">
+			</File>
+			<File
+				RelativePath=".\ResultHTMLTable.h">
+			</File>
+			<File
+				RelativePath=".\SearchFormHTMLTable.cpp">
+			</File>
+			<File
+				RelativePath=".\SearchFormHTMLTable.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\AdminModule.cpp">
 		</File>

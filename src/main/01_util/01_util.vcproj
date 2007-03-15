@@ -76,6 +76,12 @@
 				RelativePath=".\HtmlFilter.h">
 			</File>
 			<File
+				RelativePath=".\HtmlTable.cpp">
+			</File>
+			<File
+				RelativePath=".\HtmlTable.h">
+			</File>
+			<File
 				RelativePath=".\Log.cpp">
 			</File>
 			<File
