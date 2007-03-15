@@ -29,10 +29,10 @@
 #include "30_server/ServerConfig.h"
 
 #ifdef UNIX
-	#define DEFAULT_TEMP_DIR "/var/www/tmp"
+	#define DEFAULT_TEMP_DIR "/tmp"
 #endif
 #ifdef WIN32
-#define DEFAULT_TEMP_DIR getenv("TEMP"), boost::filesystem::native
+#define DEFAULT_TEMP_DIR getenv("TEMP") ? getenv("TEMP") : ".", boost::filesystem::native
 #endif
 
 
