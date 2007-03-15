@@ -7,6 +7,7 @@ rootenv = Environment(ENV = os.environ)
 
 mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
+librepo = ARGUMENTS.get('libs_repo_home', os.environ['LIBS_REPO_HOME'])   
 
 
 print "platform = ", platform
@@ -15,18 +16,19 @@ print "mode     = ", mode
 rootenv.Replace ( PLATFORM = platform )
 rootenv.Replace ( MODE = mode )
 
-
-#if (platform=='posix'):
-#  env.Replace ( CXX = 'g++-3.3' )
-
-
 buildroot = 'build' + '/' + platform + '/' + mode
 buildmain = buildroot + '/main'
 buildtest = buildroot + '/test'
 
 resourcesroot = 'resources'
-resourcesmain = resourcesroot + '/main'
-resourcestest = resourcesroot + '/test'
+resourcesmain = 'resources' + '/main'
+resourcestest = 'resources' + '/test'
+resourcesdist = 'resources' + '/dist'
+
+
+distroot = 'dist' + '/' + platform + '/' + mode
+
+
 
 rootenv.Replace ( BUILDROOT = '#' + buildroot )
 
@@ -39,7 +41,7 @@ import os, fnmatch
 
 # Allows to glob files from the build directory going
 # through scons nodes
-def Glob( env, pattern = '*.*', excludes = [], dir = '.' ):
+def Glob( env, pattern = '*', excludes = [], dir = '.' ):
     files = []
     excludes.append( '*.gen.cpp' )
     excludes.append( '*.inc.cpp' )
@@ -56,6 +58,17 @@ def Glob( env, pattern = '*.*', excludes = [], dir = '.' ):
     return files
 
 
+def CopyFiles (env, dest, files, recursive = False):
+    for file in files:
+        filename = os.path.basename (file)
+    	if recursive and os.path.isdir (file) :
+           newdest = dest + '/' + filename
+	   Execute (Mkdir (newdest))
+	   CopyFiles (env, newdest, Glob (env, dir = file), recursive)
+	elif os.path.isdir (file) == False:
+           Execute (Copy (os.path.join (dest, filename), file))
+
+
 def DefaultModuleName ( env, dir = '.' ):
     return os.path.basename (os.path.abspath (dir))
 
@@ -65,7 +78,6 @@ def DefaultTestModuleName ( env, dir = '.' ):
 
 def DefineDefaultLibPath (env):
     platform = env['PLATFORM']
-    librepo = ARGUMENTS.get('libs_repo_home', os.environ['LIBS_REPO_HOME'])   
 
     if (platform=='win32'):
         env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
@@ -153,6 +165,7 @@ def DefineDefaultLibs (env):
 
 
 def AddBoostDependency (env, libname):
+    boostversion = '1_33_1'
     platform = env['PLATFORM']
     mode = env['MODE']
 
@@ -161,19 +174,26 @@ def AddBoostDependency (env, libname):
         return
 
     boostlib = libname + '-gcc'
+    
     # always multithreaded by now
     boostlib = boostlib + "-mt"
     if (mode == 'debug'):
         boostlib = boostlib + "-d"
+    boostlib = boostlib + "-" + boostversion
 
     env.Append (LIBS = [boostlib] )
+    distlib = env['LIBPREFIX'] + boostlib + env['SHLIBSUFFIX']
+    env.Append (DISTLIBS = [librepo + '/lib/' + distlib + '.' + boostversion.replace ('_', '.')])
     
+
 
 def AddSQLiteDependency (env):
     platform = env['PLATFORM']
     mode = env['MODE']
 
     env.Append (LIBS = ['sqlite3'] )
+    distlib = env['LIBPREFIX'] + 'sqlite3' + env['SHLIBSUFFIX']
+    env.Append (DISTLIBS = [librepo + '/lib/' + distlib])
 
     
 
@@ -281,6 +301,30 @@ def SynthesePreBuild (target = None, source = None, env = None):
 
 
 
+def SyntheseDist (target = None, source = None, env = None):
+    distname = os.path.basename (target[0].abspath)
+    distdir = os.path.join (distroot, distname)
+
+    Execute (Delete (distdir))
+    Execute (Mkdir (distdir))
+    Execute (Mkdir (distdir + '/libs'))
+
+    # Executable file
+    Execute (Copy (os.path.join (distdir, os.path.basename (target[0].abspath)), target[0].abspath))
+    
+    # Copy libs
+    env.CopyFiles (distdir + '/libs/', env['DISTLIBS'])
+
+    # Copy resources
+    if (os.path.exists (resourcesdist + '/' + distname)):
+       env.CopyFiles (distdir, env.Glob (dir = resourcesdist + '/' + distname), False)
+    if (os.path.exists (resourcesdist + '/' + distname + '/' + platform)):
+       env.CopyFiles (distdir, env.Glob (dir = resourcesdist + '/' + distname + '/' + platform), False)
+    if (os.path.exists (resourcesdist + '/' + distname + '/' + platform + '/' + mode)):
+       env.CopyFiles (distdir, env.Glob (dir = resourcesdist + '/' + distname + '/' + platform + '/' + mode), False)
+
+
+
 
 
 def SyntheseBuild (env, binname):
@@ -295,17 +339,18 @@ def SyntheseBuild (env, binname):
 
     env.Program ( binname, files )
 
-    env.AddPreAction ("main.o", preaction)
-    env.AlwaysBuild ("main.o")
+    mainobj = "main" + env['OBJSUFFIX']
+    env.AddPreAction (mainobj, preaction)
+    env.AlwaysBuild (mainobj)
     
-    env.AddPreAction ("main.obj", preaction)
-    env.AlwaysBuild ("main.obj")
+    if 'dist' in COMMAND_LINE_TARGETS:  
+        if platform == 'posix':
+            # Copy dynamic libraries
+	    postaction = Action (SyntheseDist)
+    	    env.AddPostAction (binname, postaction)
 
 
-
-
-
-    
+			       
 def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[], withSQLite=False, withMultithreading=True):
     testmoduleenv = ModuleEnv (env)
     testmodulename = testmoduleenv.DefaultTestModuleName ()
@@ -326,9 +371,10 @@ def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[],
     testmoduleenv.Test("test.passed", testprogram)
 
     testmoduleresources = testmoduleenv.Dir ('resources').abspath
-    testmoduleenv.AddPreAction ("test.passed",
-                                [Delete (testmoduleresources),
-                                 Copy (testmoduleresources, resourcestest)])
+    # to be reviewed with new resources dir structure
+    #testmoduleenv.AddPreAction ("test.passed",
+    #                            [Delete (testmoduleresources),
+    #                             Copy (testmoduleresources, resourcestest)])
     testmoduleenv.AlwaysBuild ("test.passed")
 
 
@@ -338,6 +384,7 @@ def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[],
 # Declare common methods
 from SCons.Script.SConscript import SConsEnvironment
 SConsEnvironment.Glob=Glob
+SConsEnvironment.CopyFiles=CopyFiles
 SConsEnvironment.DefaultModuleName=DefaultModuleName
 SConsEnvironment.DefaultTestModuleName=DefaultTestModuleName
 SConsEnvironment.DefineDefaultLibPath=DefineDefaultLibPath
