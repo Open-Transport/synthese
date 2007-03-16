@@ -8,6 +8,7 @@ rootenv = Environment(ENV = os.environ)
 mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
 librepo = ARGUMENTS.get('libs_repo_home', os.environ['LIBS_REPO_HOME'])   
+goal = ARGUMENTS.get('goal', 'build').lower()  
 
 
 print "platform = ", platform
@@ -304,7 +305,7 @@ def SynthesePreBuild (target = None, source = None, env = None):
 def SyntheseDist (target = None, source = None, env = None):
     distname = os.path.basename (target[0].abspath)
     distdir = os.path.join (distroot, distname)
-    distdir = distdir + '/' + platform + '/' + mode
+    distdir = distdir + '_' + platform + '_' + mode
 
     Execute (Delete (distdir))
     Execute (Mkdir (distdir))
@@ -314,7 +315,8 @@ def SyntheseDist (target = None, source = None, env = None):
     Execute (Copy (os.path.join (distdir, os.path.basename (target[0].abspath)), target[0].abspath))
     
     # Copy libs
-    env.CopyFiles (distdir + '/libs/', env['DISTLIBS'])
+    if platform == 'posix':
+        env.CopyFiles (distdir + '/libs/', env['DISTLIBS'])
 
     # Copy resources
     if (os.path.exists (resourcesdist + '/' + distname)):
@@ -344,12 +346,11 @@ def SyntheseBuild (env, binname):
     env.AddPreAction (mainobj, preaction)
     env.AlwaysBuild (mainobj)
     
-    if 'dist' in COMMAND_LINE_TARGETS:  
-        if platform == 'posix':
-            # Copy dynamic libraries
-	    postaction = Action (SyntheseDist)
-    	    env.AddPostAction (binname, postaction)
-
+    if goal == 'dist':
+        # Copy dynamic libraries
+        postaction = Action (SyntheseDist)
+    	env.AddPostAction (binname, postaction)
+	env.AlwaysBuild (binname)
 
 			       
 def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[], withSQLite=False, withMultithreading=True):
