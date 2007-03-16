@@ -55,8 +55,11 @@ namespace synthese
 				template<class K, class T>
 				static std::string getSelectInput(const std::string& name, const std::map<K, T>& choices, const K& value);
 
-				template<class K, class T>
-				static std::string getRadioInput(const std::string& name, const std::map<K, T>& choices, const K& value);
+				template<class K>
+					static std::string getRadioInput(const std::string& name, const K& valueIfSelected, const K& valueToSelect, const std::string label="");
+
+				template<class K>
+					static std::string getRadioInput(const std::string& name, const std::map<K, std::string>& choices, const K& value);
 
 				static std::string getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping="");
 
@@ -150,16 +153,24 @@ namespace synthese
 			return s.str();
 		}
 
-		template<class K, class T>
-		std::string Html::getRadioInput(const std::string& name, const std::map<K, T>& choices, const K& value)
+		template<class K>
+		std::string Html::getRadioInput(const std::string& name, const K& valueIfSelected, const K& valueToSelect, const std::string label)
 		{
 			std::stringstream s;
-			for (typename std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
+			s << "<input name=\"" << name << "\" type=\"radio\" value=\"" << valueIfSelected << "\"";
+			if (valueIfSelected == valueToSelect)
+				s << " checked=\"1\"";
+			s << " />" << label;
+			return s.str();
+		}
+
+		template<class K>
+		std::string Html::getRadioInput(const std::string& name, const std::map<K, std::string>& choices, const K& value)
+		{
+			std::stringstream s;
+			for (typename std::map<K, std::string>::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
-				s << "<input name=\"" << name << "\" type=\"radio\" value=\"" << it->first << "\"";
-				if (it->first == value)
-					s << " checked=\"1\"";
-				s << " />" << it->second;
+				s << getRadioInput(name, it->first, value, it->second);
 			}
 			return s.str();
 		}

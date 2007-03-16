@@ -34,6 +34,9 @@
 #include "12_security/AddProfileAction.h"
 #include "12_security/DeleteProfileAction.h"
 
+#include "32_admin/ResultHTMLTable.h"
+#include "32_admin/SearchFormHTMLTable.h"
+
 using namespace std;
 
 namespace synthese
@@ -105,22 +108,22 @@ namespace synthese
 			addProfileRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
 			addProfileRequest->setAction(Factory<Action>::create<AddProfileAction>());
 
-			stream
-				<< searchRequest->getHTMLFormHeader("search")
-				<< "<table class=\"searchform\"><tr>"
-				<< "<td>Nom</td><td>" << Html::getTextInput(PARAMETER_SEARCH_NAME, "") << "</td>"
-				<< "<td>Habilitation</td>"
-				<< "<td>"
-				<< Html::getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightLabels(true), string())
-				<< "</td>"
-				<< "<td>" << Html::getSubmitButton("Rechercher") << "</td></tr>"
-				<< "</table></form>"
-				<< Html::setFocus("search", PARAMETER_SEARCH_NAME)
+			SearchFormHTMLTable s(searchRequest);
+			stream << s.open();
+			stream << s.cell("Nom", Html::getTextInput(PARAMETER_SEARCH_NAME, ""));
+			stream << s.cell("Habilitation", Html::getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightLabels(true), string()));
+			stream << s.close();
+			stream << Html::setFocus("search", PARAMETER_SEARCH_NAME);
 				
-				<< "<h1>Résultats de la recherche</h1>"
-				
-				<< "<table id=\"searchresult\">"
-				<< "<tr><th>Sel</th><th>Nom</th><th>Résumé</th><th>Actions</th></tr>";
+			stream << "<h1>Résultats de la recherche</h1>";
+
+			ResultHTMLTable::HeaderVector v;
+			v.push_back(make_pair(PARAMETER_SEARCH_NAME, string("Nom")));
+			v.push_back(make_pair(string(), string("Résumé")));
+			v.push_back(make_pair(string(), string("Actions")));
+			ResultHTMLTable t(v, searchRequest, "", true, addProfileRequest, AddProfileAction::PARAMETER_TEMPLATE_ID);
+
+			stream << t.open();
 			
 			// Profiles loop
 			for (vector<Profile*>::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
@@ -130,11 +133,9 @@ namespace synthese
 				profileRequest->setObjectId(profile->getKey());
 				deleteProfileRequest->setObjectId(profile->getKey());
 
-				stream
-                    << "<tr>"
-					<< "<TD><input name=\"tpl\" type=\"radio\" /></TD>"
-					<< "<td>" << profile->getName() << "</td>"
-					<< "<td><ul>";
+				stream << t.row(Conversion::ToString(profile->getKey()));
+				stream << t.col() << profile->getName();
+				stream << t.col() << "<ul>";
 
 				if (profile->getParentId())
 					stream << "<li>Hérite de " << SecurityModule::getProfiles().get(profile->getParentId())->getName() << "</li>";
@@ -142,30 +143,19 @@ namespace synthese
 				// Rights loop
 
 				stream
-					<< "</td>"
-					<< "<td>"
-					<< profileRequest->getHTMLFormHeader("u" + Conversion::ToString(profile->getKey()))
-					<< Html::getSubmitButton("Modifier")
-					<< "</form>"
-					<< deleteProfileRequest->getHTMLFormHeader("d" + Conversion::ToString(profile->getKey()))
-					<< Html::getSubmitButton("Supprimer")
-					<< "</form>"
-					<< "</td>"
-					<< "</tr>";
+					<< t.col()
+					<< Html::getLinkButton(profileRequest->getURL(), "Modifier")
+					<< "&nbsp;"
+					<< Html::getLinkButton(deleteProfileRequest->getURL(), "Supprimer");
 			}
 
-			stream
-				<< "<tr>"
-				<< addProfileRequest->getHTMLFormHeader("add")
-				<< "<TD>&nbsp;</TD>"
-				<< "<td>" << Html::getTextInput(AddProfileAction::PARAMETER_NAME, "", "Entrez le nom du profil ici") << "</td>"
-				<< "<td>(sélectionner un profil existant pour copier ses habilitations dans le nouveau profil)</td>"
-				<< "<td>" 
+			stream << t.row();
+			stream << t.col() << Html::getTextInput(AddProfileAction::PARAMETER_NAME, "", "Entrez le nom du profil ici");
+			stream << t.col() << "(sélectionner un profil existant pour copier ses habilitations dans le nouveau profil)";
+			stream << t.col()
 				<< Html::getHiddenInput(AddProfileAction::PARAMETER_TEMPLATE_ID, Conversion::ToString(UNKNOWN_VALUE))
-				<< Html::getSubmitButton("Ajouter") << "</td>"
-				<< "</form></tr>"
-
-				<< "</table>";
+				<< Html::getSubmitButton("Ajouter");
+			stream << t.close();
 
 			delete profileRequest;
 			delete searchRequest;

@@ -22,6 +22,8 @@
 
 #include <sstream>
 
+#include "01_util/Html.h"
+
 #include "32_admin/ResultHTMLTable.h"
 #include "32_admin/AdminRequest.h"
 
@@ -29,6 +31,8 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace admin
 	{
 
@@ -39,10 +43,11 @@ namespace synthese
 			: HtmlTable(header.size(), "adminresults")
 			, _actionRequest(actionRequest)
 			, _searchRequest(searchRequest)
+			, _selectName(selectName)
 		{
 			stringstream s;
 			s << "<tr>";
-			if (!selectName.empty())
+			if (!_selectName.empty())
 				s << "<th>Sel</th>";
 			for (HeaderVector::const_iterator it = header.begin(); it != header.end(); ++it)
 			{
@@ -72,5 +77,24 @@ namespace synthese
 				s << "</form>";
 			return s.str();
 		}
+
+		std::string ResultHTMLTable::row(std::string value, std::string className )
+		{
+			stringstream s;
+			s << HtmlTable::row(className);
+			if (!_selectName.empty())
+			{
+				s << col();
+				if (!value.empty())
+					s << Html::getRadioInput(_selectName, value, string(), string());
+			}
+			return s.str();
+		}
+
+		std::string ResultHTMLTable::row(std::string value)
+		{
+			return row(value, string());
+		}
+
 	}
 }

@@ -39,8 +39,9 @@ namespace synthese
 		class ResultHTMLTable : public util::HtmlTable
 		{
 		private:
-			AdminRequest* _actionRequest;
-			AdminRequest* _searchRequest;
+			AdminRequest*	_actionRequest;
+			AdminRequest*	_searchRequest;
+			std::string		_selectName;
 
 		public:
 			typedef std::vector<std::pair<std::string, std::string> > HeaderVector;
@@ -60,6 +61,8 @@ namespace synthese
 
 			std::string open();
 			std::string close();
+			std::string row(std::string value, std::string className);
+			std::string row(std::string value="");
 		};
 	}
 }

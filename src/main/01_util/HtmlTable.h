@@ -88,7 +88,7 @@ namespace synthese
 			/** Adds a row to the table.
 				@param className CSS class name
 			*/
-			std::string row(std::string className="");
+			virtual std::string row(std::string className="");
 
 			/** Adds a cell at the specified column.
 				If the current col is before the specified one, then additional cols are added, else a new row is created (without any CSS)
