@@ -38,12 +38,15 @@ namespace synthese
 		*/
 		class HtmlTable
 		{
+		protected:
+			std::string			_headers;
+
+		private:
 			int					_cols;
 			int					_curCol;
 			int					_curRow;
 			const std::string	_className;
-			std::string			_headers;
-
+			
 			std::string			_closeRow();
 
 		public:

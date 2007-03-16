@@ -34,6 +34,7 @@
 #include "30_server/ServerModule.h"
 
 #include "32_admin/SearchFormHTMLTable.h"
+#include "32_admin/ResultHTMLTable.h"
 
 using namespace std;
 
@@ -105,7 +106,14 @@ namespace synthese
 				stream << "Aucun utilisateur trouvé";
 
 
-			stream << "<table><tr><th>Login</th><th>Nom</th><th>Profil</th><th>Actions</th></tr>";
+			ResultHTMLTable::HeaderVector v;
+			v.push_back(make_pair(PARAM_SEARCH_LOGIN, "Login"));
+			v.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
+			v.push_back(make_pair(PARAM_SEARCH_PROFILE_ID, "Profil"));
+			v.push_back(make_pair("", "Actions"));
+			ResultHTMLTable t(v, searchRequest, "", true, addUserRequest);
+
+			stream << t.open();
 
 			for(vector<User*>::const_iterator it = _users.begin(); it != _users.end(); ++it)
 			{
@@ -125,14 +133,13 @@ namespace synthese
 			}
 
 			stream
-				<< addUserRequest->getHTMLFormHeader("adduser")
 				<< "<tr>"
 				<< "<td>" << Html::getTextInput(AddUserAction::PARAMETER_LOGIN, "", "Entrez le login ici") << "</td>"
 				<< "<td>" << Html::getTextInput(AddUserAction::PARAMETER_NAME, "", "Entrez le nom ici") << "</td>"
 				<< "<td>" << Html::getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), (uid) 0) << "</td>"
 				<< "<td>" << Html::getSubmitButton("Ajouter") << "</td>"
-                << "</tr></form>"
-				<< "</table>";
+                << "</tr>"
+				<< t.close();
 
 			// If too much users
 			if (_nextButton)

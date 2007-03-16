@@ -101,7 +101,7 @@ namespace synthese
 			return s.str();
 		}
 
-		std::string Html::getLinkButton( const std::string& url, const std::string& caption, const string confirm)
+		std::string Html::getLinkButton( const std::string& url, const std::string& caption, const string confirm, const string icon)
 		{
 			stringstream s;
 			s	<< "<a class=\"linkbutton\" "
@@ -113,7 +113,10 @@ namespace synthese
 				s << "href=\"" << url << "\"";
 			else
 				s << "onclick=\"if (window.confirm('" << confirm << "')) window.location='" << url << "';\"";
-			s	<< ">" << caption << "</a>";
+			s	<< ">";
+			if (!icon.empty())
+				s << "<img src=\"" << icon << "\" alt=\"" << caption << "\" />&nbsp;";
+			s << caption << "</a>";
 			return s.str();
 		}
 	}

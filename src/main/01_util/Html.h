@@ -96,7 +96,7 @@ namespace synthese
 					input[type=submit]:hover {background-color:#0080E0;}
 					@endcode
 				*/
-				static std::string getLinkButton(const std::string& url, const std::string& caption, const std::string confirm="");
+				static std::string getLinkButton(const std::string& url, const std::string& caption, const std::string confirm="", const std::string icon="");
 
 				static std::string getCheckBox(const std::string& name, const std::string& value, bool checked);
 			//@}
