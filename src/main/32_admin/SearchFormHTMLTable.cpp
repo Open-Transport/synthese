@@ -54,10 +54,8 @@ namespace synthese
 		std::string SearchFormHTMLTable::close()
 		{
 			stringstream s;
-			s	<< goCol(4, 2, "submitcell")
-				<< Html::getSubmitButton("Rechercher")
-				<< HtmlTable::close()
-				<< "</form>";
+			s	<< goCol(4, 2, "submitcell") << Html::getSubmitButton("Rechercher");
+			s	<< HtmlTable::close() << "</form>";
 			return s.str();
 		}
 
