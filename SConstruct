@@ -26,7 +26,7 @@ resourcestest = 'resources' + '/test'
 resourcesdist = 'resources' + '/dist'
 
 
-distroot = 'dist' + '/' + platform + '/' + mode
+distroot = 'dist'
 
 
 
@@ -304,6 +304,7 @@ def SynthesePreBuild (target = None, source = None, env = None):
 def SyntheseDist (target = None, source = None, env = None):
     distname = os.path.basename (target[0].abspath)
     distdir = os.path.join (distroot, distname)
+    distdir = distdir + '/' + platform + '/' + mode
 
     Execute (Delete (distdir))
     Execute (Mkdir (distdir))
