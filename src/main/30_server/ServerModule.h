@@ -6,7 +6,6 @@
 
 #include "02_db/DbModuleClass.h"
 
-#include "30_server/ServerConfig.h"
 
 /** @defgroup m30 Server
 	
