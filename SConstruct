@@ -33,8 +33,8 @@ distroot = 'dist'
 
 rootenv.Replace ( BUILDROOT = '#' + buildroot )
 
-if platform == 'posix':
-  rootenv.Replace ( CXX = 'g++-3.3')
+#if platform == 'posix':
+#  rootenv.Replace ( CXX = 'g++-3.3')
 
 
 
@@ -148,9 +148,9 @@ def DefineDefaultLinkFlags (env):
         else:  
             env.Append ( LINKFLAGS = ['/NODEFAULTLIB:msvcrtd.lib'] )
     
-    if (platform=='posix'):
-        env.Append ( LINKFLAGS = ['-static'] )
-        env.Append ( LINKFLAGS = ['-static-libgcc'] )
+    #if (platform=='posix'):
+    #    env.Append ( LINKFLAGS = ['-static'] )
+    #    env.Append ( LINKFLAGS = ['-static-libgcc'] )
 
 
 def DefineDefaultLibs (env):
@@ -160,8 +160,8 @@ def DefineDefaultLibs (env):
     if (platform=='posix'):
         # By default, everything has to be linked dynamically on posix
         # Too many problems with static links!
-        #env.Append ( LIBS = ['dl'] )
-        env.Append ( LIBS = ['stdc++'] )
+        env.Append ( LIBS = ['dl'] )
+        #env.Append ( LIBS = ['stdc++'] )
 
     if (platform=='win32'):
         env.Append ( LIBS = ['advapi32.lib'] )  
