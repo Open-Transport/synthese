@@ -4,7 +4,7 @@
 
 #include <boost/filesystem/path.hpp>
 
-#include "01_util/ModuleClass.h"
+#include "02_db/DbModuleClass.h"
 
 #include "30_server/ServerConfig.h"
 
@@ -20,22 +20,30 @@ namespace synthese
 
 		/** SYNTHESE Server module.
 		*/
-		class ServerModule : public util::ModuleClass
+		class ServerModule : public db::DbModuleClass
 		{
 		public:
 			typedef std::map<std::string, Session*> SessionMap;
 
 		private:
-			static ServerConfig				_config;
+
 			static SessionMap				_sessionMap;
 
 		public:
+
+			void preInit ();
+
 			/** Standard module initializer, launched as the ones from others modules at the server opening.
 			*/
-			void initialize();
+			void initialize ();
 
-			static ServerConfig& getConfig();
 			static SessionMap& getSessions();
+
+			/** Called whenever a parameter registered by this module is changed
+			 */
+			static void ParameterCallback (const std::string& name, 
+						       const std::string& value);
+
 		};
 
 		/// @todo Move constants below in corresponding Request class

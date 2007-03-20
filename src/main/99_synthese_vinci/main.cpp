@@ -1,4 +1,5 @@
 
+
 /** main implementation.
 	@file main.cpp
 
@@ -21,6 +22,7 @@
 */
 
 #include <string>
+#include <map>
 #include <iostream>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -34,12 +36,15 @@
 #include "01_util/Thread.h"
 #include "01_util/ThreadManager.h"
 
+#include "02_db/DbModuleClass.h"
+
 #include "30_server/ServerModule.h"
 
 // included auto generated code
 #include "includes.cpp.inc"
 
 using namespace synthese::util;
+using namespace synthese::db;
 
 using synthese::server::ServerModule;
 
@@ -52,50 +57,67 @@ int main( int argc, char **argv )
 	#include "generated.cpp.inc"
 
     std::string db;
+    std::vector<std::string> params;
 
     po::options_description desc("Allowed options");
     desc.add_options()
 	("help", "produce this help message")
-	("db", po::value<std::string>(&db)->default_value ("./synthese.db3"), "SQLite database file");
-	
+	("db", po::value<std::string>(&db)->default_value ("./synthese.db3"), "SQLite database file")
+	("params", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
+    
+    
+	 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
+    
     po::notify(vm);    
     
     if (vm.count("help"))
-	{
-		std::cout << desc << std::endl;
-		return 1;
+    {
+	std::cout << desc << std::endl;
+	return 1;
+    }
+    
+    DbModuleClass::Parameters defaultParams;
+    for (std::vector<std::string>::const_iterator it = params.begin (); 
+	 it != params.end (); ++it)
+    {
+	int index = it->find ("=");
+	
+	std::string paramName (it->substr (0, index));
+	std::string paramValue (it->substr (index+1));
+
+	defaultParams.insert (std::make_pair (paramName, paramValue));
     }
 
     const boost::filesystem::path& workingDir = boost::filesystem::initial_path();
     Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
 
-    try
+    boost::filesystem::path dbpath (db, boost::filesystem::native);
+    DbModuleClass::SetDefaultParameters (defaultParams);
+    DbModuleClass::SetDatabasePath (dbpath);
+    
+    // Initialize modules
+    if (Factory<ModuleClass>::size() == 0)
+	throw Exception("No registered module !");
+    
+
+    for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
+	 it != Factory<ModuleClass>::end(); ++it)
     {
-		boost::filesystem::path dbpath (db, boost::filesystem::native);
-	ServerModule::setDatabasePath(dbpath);
-
-	// Initialize modules
-	if (Factory<ModuleClass>::size() == 0)
-	    throw Exception("No registered module !");
-	
-	for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
-	     it != Factory<ModuleClass>::end(); ++it)
-	{
-	    Log::GetInstance ().info ("Initializing module " + it.getKey() + "...");
-	    it->setDatabasePath(dbpath);
-	    it->initialize();
-	}
-
-
-	ThreadManager::Instance ()->run ();
-
+	Log::GetInstance ().info ("Pre-initializing module " + it.getKey() + "...");
+	it->preInit();
     }
-    catch (synthese::util::Exception& ex)
+    
+    for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
+	 it != Factory<ModuleClass>::end(); ++it)
     {
-		Log::GetInstance ().fatal ("Exit!", ex);
+	Log::GetInstance ().info ("Initializing module " + it.getKey() + "...");
+	it->initialize();
     }
+    
+    ThreadManager::Instance ()->run ();
+    
 }
 
 

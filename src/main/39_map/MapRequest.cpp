@@ -25,9 +25,9 @@
 #include "01_util/XmlToolkit.h"
 #include "15_env/XmlBuilder.h"
 
-#include "30_server/ServerModule.h" // to be removed!
 #include "30_server/RequestException.h"
 
+#include "39_map/MapModule.h"
 #include "39_map/XmlBuilder.h"
 #include "39_map/Map.h"
 #include "39_map/RenderingConfig.h"
@@ -184,7 +184,7 @@ namespace synthese
 			_map->prepare ();
 
 			// Create a temporary file name based on system time
-			const boost::filesystem::path& tempDir = ServerModule::getConfig ().getHttpTempDir ();
+			const boost::filesystem::path& tempDir = MapModule::GetParameter (MapModule::PARAM_HTTP_TEMP_DIR);
 
 			RenderingConfig conf;
 
@@ -198,7 +198,8 @@ namespace synthese
 			std::string resultFilename = renderer->render (tempDir, filePrefix, _lines, *_map, conf);
 
 			// Broadcast of the result
-			std::string resultURL = ServerModule::getConfig ().getHttpTempUrl () + "/" + resultFilename;
+			std::string resultURL = MapModule::GetParameter (MapModule::PARAM_HTTP_TEMP_URL) 
+			    + "/" + resultFilename;
 			
 			// Send the URL to the the generated local JPEG file.
 			stream << resultURL << std::endl;

@@ -40,55 +40,51 @@ namespace synthese
 {
 	namespace db
 	{
+
 	    SQLiteQueueThreadExec* DBModule::_sqliteQueueThreadExec = 0;
+
+
 
 	    void DBModule::initialize()
 	    {
-			int sqliteServicePort = 3592;
-
-			// Initialize permanent ram loaded data
-			_sqliteQueueThreadExec = new SQLiteQueueThreadExec (_databasePath);
-
-			ManagedThread* sqliteQueueThread = 
-			    new ManagedThread (_sqliteQueueThreadExec, "sqlite_queue", 1);
-
-			// sqliteQueueThread->start ();
-
-			SQLiteSync* syncHook = new SQLiteSync ();
-
-			// Register all table syncs
-			for (Factory<SQLiteTableSync>::Iterator it = 
-				Factory<SQLiteTableSync>::begin(); 
-				it != Factory<SQLiteTableSync>::end(); 
-				++it)
-			{
-				syncHook->addTableSynchronizer(it.getKey(), it.getObject());
-			}
-				
-			_sqliteQueueThreadExec->registerUpdateHook (syncHook);
-			// sqliteQueueThread->waitForReadyState ();
-
-			synthese::tcp::TcpService* service = 
-				synthese::tcp::TcpService::openService (sqliteServicePort);
-
-			// Just one thread
-			SQLiteThreadExec* sqliteThreadExec = new SQLiteThreadExec (service);
-			
-			ManagedThread* sqliteThread = 
-			    new ManagedThread (sqliteThreadExec, "sqlite_tcp");
-			
-			// sqliteThread->start ();
-
-			// sqliteThread->waitForReadyState ();
+		
+		int sqliteServicePort = 3592;
+		
+		_sqliteQueueThreadExec = new SQLiteQueueThreadExec (GetDatabasePath ());
+		
+		ManagedThread* sqliteQueueThread = 
+		    new ManagedThread (_sqliteQueueThreadExec, "sqlite_queue", 1);
+		
+		SQLiteSync* syncHook = new SQLiteSync ();
+		
+		// Register all table syncs
+		for (Factory<SQLiteTableSync>::Iterator it = 
+			 Factory<SQLiteTableSync>::begin(); 
+		     it != Factory<SQLiteTableSync>::end(); 
+		     ++it)
+		{
+		    syncHook->addTableSynchronizer(it.getKey(), it.getObject());
+		}
+		
+		_sqliteQueueThreadExec->registerUpdateHook (syncHook);
+		
+		synthese::tcp::TcpService* service = 
+		    synthese::tcp::TcpService::openService (sqliteServicePort);
+		
+		// Just one thread
+		SQLiteThreadExec* sqliteThreadExec = new SQLiteThreadExec (service);
+		
+		ManagedThread* sqliteThread = 
+		    new ManagedThread (sqliteThreadExec, "sqlite_tcp");
 		
 	    }
-
-
+	    
+	    
 
 	    SQLiteQueueThreadExec*
 	    DBModule::GetSQLite ()
 	    {
-			return _sqliteQueueThreadExec;
+		return _sqliteQueueThreadExec;
 	    }
 
 	}

@@ -24,9 +24,10 @@
 #ifndef SYNTHESE_DBModule_H__
 #define SYNTHESE_DBModule_H__
 
-#include "01_util/ModuleClass.h"
+#include "02_db/DbModuleClass.h"
 
 #include "02_db/Constants.h"
+
 
 namespace synthese
 {
@@ -44,7 +45,7 @@ namespace synthese
 
 //		static const std::string TRIGGERS_ENABLED_CLAUSE;
 
-		class DBModule : public util::ModuleClass
+		class DBModule : public DbModuleClass
 		{
 		private:
 		    
@@ -61,16 +62,10 @@ namespace synthese
 
 	// TEMPORARY
 		/// @todo Handle better TRIGGER and co...
+
 		static const std::string CONFIG_TABLE_NAME ("t999_config");
 		static const std::string CONFIG_TABLE_COL_PARAMNAME ("param_name");
 		static const std::string CONFIG_TABLE_COL_PARAMVALUE ("param_value");
-		static const std::string CONFIG_TABLE_COL_PARAMVALUE_PORT ("port");
-		static const std::string CONFIG_TABLE_COL_PARAMVALUE_NBTHREADS ("nb_threads");
-		static const std::string CONFIG_TABLE_COL_PARAMVALUE_LOGLEVEL ("log_level");
-		static const std::string CONFIG_TABLE_COL_PARAMVALUE_DATADIR ("data_dir");
-		static const std::string CONFIG_TABLE_COL_PARAMVALUE_TEMPDIR ("temp_dir");
-		static const std::string CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPDIR ("http_temp_dir");
-		static const std::string CONFIG_TABLE_COL_PARAMVALUE_HTTPTEMPURL ("http_temp_url");
 		static const std::string CONFIG_TABLE_COL_PARAMVALUE_TRIGGERSENABLED ("triggers_enabled");
 		static const std::string TRIGGERS_ENABLED_CLAUSE (
 			"(SELECT " + CONFIG_TABLE_COL_PARAMVALUE

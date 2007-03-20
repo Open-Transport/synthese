@@ -40,17 +40,15 @@ public:
 
     const MapBackground* getBestScalingBackground (double mapScaleX, 
                                                    double mapScaleY) const;
-
-    static void Initialize ();
-
+    
     static const MapBackgroundManager* GetMapBackgroundManager (const std::string& id);
+    
+    static void Initialize (const boost::filesystem::path& backgroundsDir);
 
-    static const boost::filesystem::path& GetBackgroundsDir ();
-    static void SetBackgroundsDir (const boost::filesystem::path& backgroundsDir);
 
 private:
-
     
+    void clearBackgrounds ();
 };
 
 }

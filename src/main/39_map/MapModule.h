@@ -1,4 +1,5 @@
-#include "01_util/ModuleClass.h"
+#include "02_db/DbModuleClass.h"
+
 
 namespace synthese
 {
@@ -36,12 +37,25 @@ namespace synthese
 			@{
 		*/
 
-		class MapModule : public util::ModuleClass
+		class MapModule : public db::DbModuleClass
 		{
 		public:
-			void initialize();
+
+		    static const std::string PARAM_HTTP_TEMP_DIR;
+		    static const std::string PARAM_HTTP_TEMP_URL;
+		    static const std::string PARAM_BACKGROUNDS_DIR;
+		    
+
+		    void preInit ();
+		    
+		    
+		    /** Called whenever a parameter registered by this module is changed
+		     */
+		    static void ParameterCallback (const std::string& name, 
+						   const std::string& value);		
+		    
 		};
-		/** @} */
+	    /** @} */
 	}
 }
 

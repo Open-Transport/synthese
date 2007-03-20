@@ -1,7 +1,6 @@
 
 synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::server::ServerModule>("999_server");
 
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::server::ServerConfigTableSync>("0 Config");
 
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::server::LoginAction>("login");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::server::LogoutAction>("logout");

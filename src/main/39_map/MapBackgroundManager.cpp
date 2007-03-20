@@ -30,13 +30,12 @@ namespace map
 {
 
 
-boost::filesystem::path MapBackgroundManager::_backgroundsDir;
 std::map<std::string, MapBackgroundManager*> MapBackgroundManager::_managers;
+
 
 
 MapBackgroundManager::MapBackgroundManager(const boost::filesystem::path& backgroundDir)
 {
-
     Log::GetInstance ().debug ("Initializing backgrounds in " + backgroundDir.string ());
 
     // Go through each scale directory
@@ -56,6 +55,15 @@ MapBackgroundManager::MapBackgroundManager(const boost::filesystem::path& backgr
 
 
 MapBackgroundManager::~MapBackgroundManager()
+{
+    clearBackgrounds ();
+}
+
+
+
+
+void 
+MapBackgroundManager::clearBackgrounds ()
 {
     for (std::vector<const MapBackground*>::const_iterator iter = _backgrounds.begin (); 
          iter < _backgrounds.end (); 
@@ -103,29 +111,36 @@ MapBackgroundManager::getBestScalingBackground (double mapScaleX,
 
 
 void 
-MapBackgroundManager::Initialize ()
+MapBackgroundManager::Initialize (const boost::filesystem::path& backgroundsDir)
 {
-	if (fs::exists (_backgroundsDir) == false)
-	{
-		Log::GetInstance ().warn ("Map backgrounds dir does not exist : " + _backgroundsDir.string ());
-		return;
-	}
-
-	// Create all managers
-	boost::filesystem::path backgroundDir (_backgroundsDir);
-    fs::directory_iterator end_iter;
-   for ( fs::directory_iterator dir_itr( _backgroundsDir );
-          dir_itr != end_iter;
-          ++dir_itr )
+    for (std::map<std::string, MapBackgroundManager*>::const_iterator iter = _managers.begin (); 
+         iter != _managers.end (); 
+         ++iter)
     {
-        std::string dirpath = dir_itr->leaf();
+        delete iter->second;   
+    }
+    _managers.clear ();
 
-    	MapBackgroundManager* manager = new MapBackgroundManager (_backgroundsDir / dirpath);
-	    _managers.insert (std::make_pair (dirpath, manager));
+    if (fs::exists (backgroundsDir) == false)
+    {
+	Log::GetInstance ().warn ("Map backgrounds dir does not exist : " + backgroundsDir.string ());
+	return;
+    }
+    
+    // Create all managers
+    fs::directory_iterator end_iter;
+    for ( fs::directory_iterator dir_itr( backgroundsDir );
+	  dir_itr != end_iter;
+	  ++dir_itr )
+    {
+	std::string dirpath = dir_itr->leaf();
+	
+	MapBackgroundManager* manager = new MapBackgroundManager (backgroundsDir / dirpath);
+	_managers.insert (std::make_pair (dirpath, manager));
     }
     
 }
-
+    
 
 
 
@@ -143,21 +158,6 @@ MapBackgroundManager::GetMapBackgroundManager (const std::string& id)
 
 
 
-
-
-const boost::filesystem::path& 
-MapBackgroundManager::GetBackgroundsDir ()
-{
-    return _backgroundsDir;
-}
-
-
-
-void 
-MapBackgroundManager::SetBackgroundsDir (const boost::filesystem::path& backgroundsDir)
-{
-    _backgroundsDir = backgroundsDir;
-}
 
 
 
