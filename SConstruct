@@ -33,6 +33,8 @@ distroot = 'dist'
 
 rootenv.Replace ( BUILDROOT = '#' + buildroot )
 
+
+
 #if platform == 'posix':
 #  rootenv.Replace ( CXX = 'g++-3.3')
 
@@ -81,8 +83,6 @@ def DefaultTestModuleName ( env, dir = '.' ):
 
 
 def DefineDefaultLibPath (env):
-    platform = env['PLATFORM']
-
     if (platform=='win32'):
         env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
         env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
@@ -95,8 +95,6 @@ def DefineDefaultLibPath (env):
 
     
 def DefineDefaultCPPDefines (env):
-    platform = env['PLATFORM']
-    mode = env['MODE']
 
     if (platform=='posix') or (platform=='darwin'):
         env.Append ( CPPDEFINES = ['UNIX'] )
@@ -112,8 +110,6 @@ def DefineDefaultCPPDefines (env):
 
 
 def DefineDefaultCCFlags (env):
-    platform = env['PLATFORM']
-    mode = env['MODE']
 
     if (platform=='posix'):
         if (mode=='debug'):
@@ -138,8 +134,6 @@ def DefineDefaultCCFlags (env):
     
   
 def DefineDefaultLinkFlags (env):
-    platform = env['PLATFORM']
-    mode = env['MODE']
 
     if (platform=='win32'):
         env.Append ( LINKFLAGS = ['/INCREMENTAL:NO', '/NOLOGO', '/MACHINE:X86', '/SUBSYSTEM:CONSOLE', '/OPT:NOREF'] )
@@ -154,8 +148,6 @@ def DefineDefaultLinkFlags (env):
 
 
 def DefineDefaultLibs (env):
-    platform = env['PLATFORM']
-    mode = env['MODE']
 
     if (platform=='posix'):
         # By default, everything has to be linked dynamically on posix
@@ -172,44 +164,30 @@ def DefineDefaultLibs (env):
 
 
 
+def AddDependency (env, libname, libversion, multithreaded):
+    deplib = libname
+    if multithreaded:
+      deplib = deplib + "-mt"
+    if mode == 'debug':
+      deplib = deplib + "-d"
+    deplib = deplib + "-" + libversion
+    env.Append (LIBS = [deplib] )
+    distlib = env['LIBPREFIX'] + deplib + env['SHLIBSUFFIX']
+    env.Append (DISTLIBS = [librepo + '/lib/' + distlib])
+
+
+
 def AddBoostDependency (env, libname):
-    boostversion = '1_33_1'
-    platform = env['PLATFORM']
-    mode = env['MODE']
-
-    if platform == 'win32':
-        # automatic link, no need to add libs
-        return
-
-    boostlib = libname + '-gcc'
-    
-    # always multithreaded by now
-    boostlib = boostlib + "-mt"
-    if (mode == 'debug'):
-        boostlib = boostlib + "-d"
-    boostlib = boostlib + "-" + boostversion
-
-    env.Append (LIBS = [boostlib] )
-    distlib = env['LIBPREFIX'] + boostlib + env['SHLIBSUFFIX']
-    env.Append (DISTLIBS = [librepo + '/lib/' + distlib + '.' + boostversion.replace ('_', '.')])
+  AddDependency (env, libname, '1_33_1', True)
     
 
 
 def AddSQLiteDependency (env):
-    platform = env['PLATFORM']
-    mode = env['MODE']
-
-    env.Append (LIBS = ['sqlite3'] )
-    distlib = env['LIBPREFIX'] + 'sqlite3' + env['SHLIBSUFFIX']
-    env.Append (DISTLIBS = [librepo + '/lib/' + distlib])
-
+  AddDependency (env, "sqlite", '3_3_13', True)
     
 
 
 def AppendMultithreadConf (env):
-    platform = env['PLATFORM']
-    mode = env['MODE']
-
     if (platform == 'posix'):
         env.Append (CCFLAGS= '-pthread' )
         env.Append (LIBS= ['pthread'] ) 
@@ -275,7 +253,7 @@ def SynthesePreBuild (target = None, source = None, env = None):
 
     # source is expected to be main.cpp file
     # parse this path to get right synthese module name
-    currentmodule = os.path.basename (source[0].abspath.replace (os.sep + 'main.cpp', ''));
+    currentmodule = os.path.basename (source[0].abspath.replace (os.sep + 'main.cpp', ''))
     
     # Look in all module folders for files with extension .cpp.gen
     # and dump them inside a generated.cpp file, to be included in main.cpp
@@ -289,13 +267,13 @@ def SynthesePreBuild (target = None, source = None, env = None):
       moduledir = os.path.join ('src/main', module)
       for file in os.listdir (moduledir) :
         if fnmatch.fnmatch (file, '*.gen.cpp') :
-            fragmentfile = os.path.join (moduledir, file);
+            fragmentfile = os.path.join (moduledir, file)
             # dump the file to generated output
             fragment = open (fragmentfile, "r")
             generated.write (fragment.read ())
             fragment.close ()
         if fnmatch.fnmatch (file, '*.inc.cpp') :
-            fragmentfile = os.path.join (moduledir, file);
+            fragmentfile = os.path.join (moduledir, file)
             # dump the file to generated output
             fragment = open (fragmentfile, "r")
             generatedInclude.write (fragment.read ())
@@ -339,9 +317,9 @@ def SyntheseDist (target = None, source = None, env = None):
 
 def SyntheseBuild (env, binname):
     # Copy main.cpp from template.
-    maintemplate = env.File ('../synthese_template/main.cpp').srcnode ().abspath;
-    maincopy = env.File ('main.cpp').srcnode ().abspath;
-    Execute (Copy (maincopy, maintemplate));
+    maintemplate = env.File ('../synthese_template/main.cpp').srcnode ().abspath
+    maincopy = env.File ('main.cpp').srcnode ().abspath
+    Execute (Copy (maincopy, maintemplate))
     
     files = env.Glob('main.cpp', [])
     
@@ -373,7 +351,7 @@ def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[],
     if withSQLite == True:
       testmoduleenv.AddSQLiteDependency ()
       
-    testmoduleenv.AppendMultithreadConf ();
+    testmoduleenv.AppendMultithreadConf ()
 
     files = testmoduleenv.Glob (includes, excludes)
     testprogram = testmoduleenv.Program (testmodulename, files)
@@ -409,6 +387,7 @@ SConsEnvironment.SyntheseEnv=SyntheseEnv
 
 SConsEnvironment.SyntheseBuild=SyntheseBuild
 
+SConsEnvironment.AddDependency=AddDependency
 SConsEnvironment.AddModuleDependency=AddModuleDependency
 SConsEnvironment.AddBoostDependency=AddBoostDependency
 SConsEnvironment.AddSQLiteDependency=AddSQLiteDependency

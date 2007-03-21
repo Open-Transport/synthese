@@ -2,21 +2,13 @@
 
 <project name="synthese" default="deploy" basedir=".">
 
-  <!-- command line properties -->
-  <!-- mode : compile mode = debug/release -->
-  <!-- toolset : g++-4.1, vc-8.0 ... -->
-  <!-- target : 98_synthese_sai ... -->
 
-    <description>
-    </description>
+  <typedef file="../cpp.xml"/>
 
-  <!-- set global properties for this build -->
+  <property file="../cpp.properties"/>
 
-  <property name="repository.local.home" location="${user.home}/Repository"/>
-
-  <property name="src.home" location="src"/>
-  <property name="build.home" location="build"/>
-  <property name="tmp.home"  location="tmp"/>
+  <property name="version" value="3.0"/>
+  <property name="lang" value="c++"/>
 
   <condition property="platform" value="posix">
     <or>
@@ -29,66 +21,29 @@
       <os family="windows"/>
     </or>
   </condition>
-  <echo message="${platform}"/>
-
-  <target name="init">
-    <!-- Create the time stamp -->
-    <tstamp/>
-  </target>
-
-  <property name="dist.home"  location="dist"/>
 
 
-  <target name="build" depends="init"
-        description="build using Scons" >
+  <target name="all">
 
-    <!-- on posix systems -->
-    <exec executable="scons" failonerror="true">
-      <arg value="mode=${mode}"/>
-      <arg value="goal=dist"/>
-      <arg value="${target}"/>
-    </exec>
+    <property name="goal" value="dist"/>
+    
+    <clean/>
+    <sconsbuild/>
 
-  </target>
+<!--     <deploy/> -->
 
-
-  <target name="dist" depends="build"
-        description="create a distribution" >
    <basename property="distname" file="${target}"/>
+
    <property name="distdir"
    value="${dist.home}/${distname}_${platform}_${mode}"/>
    <tar destfile="${dist.home}/${distname}_${platform}_${mode}.tar.gz"
       basedir="${distdir}" compression="gzip"/> 
-
+    
   </target>
 
 
 
 
-
-  <target name="clean"
-        description="clean up" >
-
-    <delete dir="${build.home}"/>
-    <delete dir="${dist.home}"/>
-
-  </target>
-
-
-  <target name="deep-clean"
-        description="deep clean up; state should be the same than
-        after a fresh checkout" depends="clean">
-
-    <delete dir="${tmp.home}"/>
-
-    <delete>
-      <fileset dir="${basedir}">
-	<include name="**/.sconsign*"/>
-	<include name="**/.semantic.cache"/>
-      </fileset>
-    </delete>
-
-  </target>
 
 
 
