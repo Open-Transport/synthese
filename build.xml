@@ -34,8 +34,8 @@
 
     <property name="goal" value="dist"/>
     
-    <clean/>
-    <sconsbuild/>
+<!--     <clean/> -->
+<!--     <sconsbuild/> -->
 <!--     <deploy/> -->
 
    <basename property="distname" file="${target}"/>
@@ -43,11 +43,22 @@
    <property name="distdir"
    value="${dist.home}/${distname}_${platform}_${mode}"/>
 
-   <echo message="${distname}_${platform}_${mode}/${distname}"/>
-
+   <if>
+     <and>
+       <equals arg1="${platform}" arg2="posix"/>
+       <equals arg1="${mode}" arg2="release"/>
+     </and>
+     <then>
+       <echo message="Stripping ${distdir}/${distname}"/>
+       <exec executable="strip" failonerror="true" 
+	    resolveexecutable="true" searchpath="true">
+	<arg value="${distdir}/${distname}"/>
+      </exec>       
+     </then>
+   </if>
    
-   <delete file="${dist.home}/${distname}_${platform}_${mode}.zip"/> 
-   <zip destfile="${dist.home}/${distname}_${platform}_${mode}.zip"> 
+   <delete file="${distdir}.zip"/> 
+   <zip destfile="${distdir}.zip"> 
 
      <zipfileset filemode="755" dir="${dist.home}" 
 		 includes="${distname}_${platform}_${mode}/${distname},
