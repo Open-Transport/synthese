@@ -1,14 +1,16 @@
+<project name="synthese" default="all" basedir=".">
 
 
-<project name="synthese" default="deploy" basedir=".">
+  <typedef file="../buildlib.xml"/>
 
 
-  <typedef file="../cpp.xml"/>
-
-  <property file="../cpp.properties"/>
+  <property file="../version.properties"/>
 
   <property name="version" value="3.0"/>
   <property name="lang" value="c++"/>
+
+  <property file="../build.properties"/>
+
 
   <condition property="platform" value="posix">
     <or>
@@ -23,22 +25,41 @@
   </condition>
 
 
+  <target name="clean">
+    <clean/>
+  </target>
+
+
   <target name="all">
 
     <property name="goal" value="dist"/>
     
     <clean/>
     <sconsbuild/>
-
 <!--     <deploy/> -->
 
    <basename property="distname" file="${target}"/>
 
    <property name="distdir"
    value="${dist.home}/${distname}_${platform}_${mode}"/>
-   <tar destfile="${dist.home}/${distname}_${platform}_${mode}.tar.gz"
-      basedir="${distdir}" compression="gzip"/> 
-    
+
+   <echo message="${distname}_${platform}_${mode}/${distname}"/>
+
+   
+   <delete file="${dist.home}/${distname}_${platform}_${mode}.zip"/> 
+   <zip destfile="${dist.home}/${distname}_${platform}_${mode}.zip"> 
+
+     <zipfileset filemode="755" dir="${dist.home}" 
+		 includes="${distname}_${platform}_${mode}/${distname},
+		           ${distname}_${platform}_${mode}/**/*.sh"/>
+
+     <zipfileset dir="${dist.home}"
+		 includes="${distname}_${platform}_${mode}/**"
+		 excludes="${distname}_${platform}_${mode}/${distname},
+		           ${distname}_${platform}_${mode}/**/*.sh"/>
+
+   </zip>
+
   </target>
 
 

@@ -3,11 +3,17 @@ import os
 # -------------------------------------------------------
 # Command line arguments
 # -------------------------------------------------------
-rootenv = Environment(ENV = os.environ)
+opts = Options('custom.py')
+opts.Add('CC', 'The C compiler.')
+opts.Add('CXX', 'The C++ compiler.')
+
+rootenv = Environment(ENV = os.environ, options=opts)
+
+Help(opts.GenerateHelpText(rootenv))
 
 mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
-librepo = ARGUMENTS.get('libs_repo_home', os.environ['LIBS_REPO_HOME'])   
+librepo = ARGUMENTS.get('libsrepo', os.environ['LIBS_REPO_HOME'])   
 goal = ARGUMENTS.get('goal', 'build').lower()  
 
 
@@ -32,11 +38,6 @@ distroot = 'dist'
 
 
 rootenv.Replace ( BUILDROOT = '#' + buildroot )
-
-
-
-#if platform == 'posix':
-#  rootenv.Replace ( CXX = 'g++-3.3')
 
 
 
