@@ -43,7 +43,7 @@ namespace synthese
 			return "Vélo " + _bike->getNumber();
 		}
 
-		void VinciBikeAdminInterfaceElement::display(std::ostream& stream, const AdminRequest* request /*= NULL*/ ) const
+		void VinciBikeAdminInterfaceElement::display(std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request /*= NULL*/ ) const
 		{
 			// Update bike request
 			AdminRequest* updateBikeRequest = Factory<Request>::create<AdminRequest>();

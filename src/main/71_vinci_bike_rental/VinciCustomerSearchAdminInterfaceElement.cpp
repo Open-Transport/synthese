@@ -55,7 +55,7 @@ namespace synthese
 			return "Clients";
 		}
 
-		void VinciCustomerSearchAdminInterfaceElement::display(ostream& stream, const AdminRequest* request) const
+		void VinciCustomerSearchAdminInterfaceElement::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			// Search request
 			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();

@@ -1,6 +1,6 @@
 
-/** DepartureTableRowInterfacePage class header.
-	@file DepartureTableRowInterfacePage.h
+/** GlobalRight class implementation.
+	@file GlobalRight.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,37 +20,33 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_DepartureTableRowInterfacePage_H__
-#define SYNTHESE_DepartureTableRowInterfacePage_H__
+#include "GlobalRight.h"
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "34_departures_table/Types.h"
+using namespace std;
 
 namespace synthese
 {
-	namespace departurestable
+	namespace security
 	{
-		/** Admin template page.
-		@code admin @endcode
-		*/
-		class DepartureTableRowInterfacePage : public interfaces::InterfacePage
+
+
+		GlobalRight::GlobalRight()
+			: Right()
 		{
-		public:
+			setParameter("*");
+		}
 
-			~DepartureTableRowInterfacePage();
+		std::string GlobalRight::displayParameter() const
+		{
+			return "par défaut";
+		}
 
-			/** Display of the admin page.
-			*/
-			void display( std::ostream& stream
-				, interfaces::VariablesMap& vars
-				, int rowId
-				, int pageNumber
-				, const ArrivalDepartureRow*
-				, const server::Request* request = NULL ) const;
+		std::map<std::string, std::string> GlobalRight::getParametersLabels() const
+		{
 
-		};
+			map<string,string> m;
+			m.insert(make_pair("*", "par défaut"));
+			return m;
+		}
 	}
 }
-
-#endif // SYNTHESE_DepartureTableRowInterfacePage_H__

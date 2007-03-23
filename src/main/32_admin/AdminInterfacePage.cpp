@@ -27,7 +27,7 @@
 
 namespace synthese
 {
-	using util::Conversion;
+	using namespace util;
 	using namespace interfaces;
 
 	namespace admin
@@ -36,8 +36,9 @@ namespace synthese
 		{
 			ParametersVector parameters;
 			parameters.push_back(Conversion::ToString(objectId));
+			VariablesMap vars;
 
-			InterfacePage::display(stream, parameters, (const void*) page, request);
+			InterfacePage::display(stream, parameters, vars, (const void*) page, request);
 		}
 	}
 }

@@ -29,10 +29,11 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		void IncludePageInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object, const server::Request* request) const
+		std::string IncludePageInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object, const server::Request* request) const
 		{
-			const InterfacePage* page_to_include = Factory<InterfacePage>::create(_page_code->getValue(parameters));
-			page_to_include->display(stream, _parameters.fillParameters( parameters ), object, request);
+			const InterfacePage* page_to_include = Factory<InterfacePage>::create(_page_code->getValue(parameters, variables, object, request));
+			page_to_include->display(stream, _parameters.fillParameters( parameters, variables, object, request ), variables, object, request);
+			return "";
 		}
 
 		void IncludePageInterfaceElement::storeParameters(ValueElementList& vel )
@@ -45,4 +46,3 @@ namespace synthese
 		}
 	}
 }
-

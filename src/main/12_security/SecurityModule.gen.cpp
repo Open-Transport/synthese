@@ -21,5 +21,6 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::security:
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UserPasswordUpdateAction>("upua");
 
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::security::SecurityRight>("Security");
+synthese::util::Factory<synthese::security::Right>::integrate<synthese::security::GlobalRight>("*");
 
 synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::security::SecurityLog>("security");

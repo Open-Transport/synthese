@@ -27,6 +27,8 @@
 
 #include "01_util/Factorable.h"
 
+#include "11_interfaces/Types.h"
+
 #include "32_admin/AdminRequest.h"
 
 namespace synthese
@@ -53,7 +55,7 @@ namespace synthese
 		private:
 			std::string			_superior;
 			const DisplayMode	_everDisplayed;
-
+			
 		protected:
 			void setSuperior(const std::string& superior);
 
@@ -67,7 +69,6 @@ namespace synthese
 				const std::string& getSuperior() const;
 				const DisplayMode getDisplayMode() const;
 			//@}
-
 
 			std::string getHTMLLink(const AdminRequest* request) const;
 
@@ -84,7 +85,7 @@ namespace synthese
 				/** Display of the content of the admin element.
 					@param stream Stream to write on.
 				*/
-				virtual void display(std::ostream& stream, const AdminRequest* request=NULL) const = 0;
+				virtual void display(std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request=NULL) const = 0;
 
 				/** Title of the admin compound.
 					@return The title of the admin compound, for display purposes.

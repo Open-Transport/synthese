@@ -32,6 +32,7 @@ namespace synthese
 	namespace departurestable
 	{
 		void DepartureTableRowInterfacePage::display(std::ostream& stream
+				, VariablesMap& vars
 				, int rowId
 				, int pageNumber
 				, const ArrivalDepartureRow* ptd
@@ -40,8 +41,8 @@ namespace synthese
 			ParametersVector parameters;
 			parameters.push_back(Conversion::ToString(rowId));
 			parameters.push_back(Conversion::ToString(pageNumber));
-
-			InterfacePage::display(stream, parameters, (const void*) ptd, request);
+			
+			InterfacePage::display(stream, parameters, vars, (const void*) ptd, request);
 		}
 
 		DepartureTableRowInterfacePage::~DepartureTableRowInterfacePage()

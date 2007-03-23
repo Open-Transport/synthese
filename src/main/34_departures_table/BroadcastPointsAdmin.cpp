@@ -89,7 +89,7 @@ namespace synthese
 			return "Points de diffusion";
 		}
 
-		void BroadcastPointsAdmin::display(ostream& stream, const AdminRequest* request) const
+		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* goRequest = Factory<Request>::create<AdminRequest>();
 			goRequest->copy(request);

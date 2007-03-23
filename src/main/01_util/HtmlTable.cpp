@@ -47,17 +47,20 @@ namespace synthese
 			s << "<tr>";
 			for (vector<string>::const_iterator it = header.begin(); it != header.end(); ++it)
 			{
-				if (!lastHeader.empty() && *it == lastHeader)
-					++colspan;
-				else
+				if (!lastHeader.empty())
 				{
-					s << "<th";
-					if (colspan > 1)
-						s << " colspan=\"" << colspan << "\"";
-					s << ">" << lastHeader << "</th>";
-					lastHeader = *it;
-					++_cols;
+					if (*it == lastHeader)
+						++colspan;
+					else
+					{
+						s << "<th";
+						if (colspan > 1)
+							s << " colspan=\"" << colspan << "\"";
+						s << ">" << lastHeader << "</th>";
+						++_cols;
+					}
 				}
+				lastHeader = *it;
 			}
 			++_cols;
 			s << "<th";
@@ -101,7 +104,7 @@ namespace synthese
 				return "";
 
 			stringstream s;
-			for (; _curCol < _cols; ++_curCol)
+			for (; _curCol < _cols-1; ++_curCol)
 				s << col() << "&nbsp;";
 			s << "</td></tr>";
 			return s.str();

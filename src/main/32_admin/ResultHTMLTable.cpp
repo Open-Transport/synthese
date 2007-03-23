@@ -39,7 +39,7 @@ namespace synthese
 
 		ResultHTMLTable::ResultHTMLTable(const ResultHTMLTable::HeaderVector& header, AdminRequest* searchRequest
 			, string currentOrderField, bool raisingOrder
-			, AdminRequest* actionRequest, std::string selectName/*=""*/ )
+			, AdminRequest* actionRequest, std::string selectName/*=""*/, std::string iconPath )
 			: HtmlTable(header.size(), "adminresults")
 			, _actionRequest(actionRequest)
 			, _searchRequest(searchRequest)
@@ -53,7 +53,7 @@ namespace synthese
 			{
 				s << "<th>" << it->second;
 				if (!it->first.empty())
-					s << "&nbsp;<img src=\"down.png\" alt=\"Trier par ordre décroissant\" />&nbsp;<img src=\"up.png\" alt=\"Trier par ordre croissant\" />";
+					s << "&nbsp;<img src=\"" << iconPath << "/down.png\" alt=\"Trier par ordre décroissant\" />&nbsp;<img src=\"" << iconPath << "/up.png\" alt=\"Trier par ordre croissant\" />";
 				s << "</th>";
 			}
 			s << "</tr>";

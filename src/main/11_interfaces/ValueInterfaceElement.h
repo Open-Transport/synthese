@@ -27,10 +27,15 @@
 
 #include "01_util/Factorable.h"
 
-#include "11_interfaces/DisplayableElement.h"
+#include "11_interfaces/Types.h"
 
 namespace synthese
 {
+	namespace server
+	{
+		class Request;
+	}
+
 	namespace interfaces
 	{
 		class ValueElementList;
@@ -44,10 +49,17 @@ namespace synthese
 			const InterfacePage*	_page;
 
 		public:
-			void				setPage(const InterfacePage* page);
-			virtual void		storeParameters(ValueElementList& vel) = 0;
-			virtual std::string	getValue(const ParametersVector&, const void* object = NULL, const server::Request* request = NULL) const = 0;
-			bool				isZero(const ParametersVector&, const void* object = NULL, const server::Request* request = NULL) const;
+			//! \name Setters and modifiers
+			//@{
+				void				setPage(const InterfacePage* page);
+				virtual void		storeParameters(ValueElementList& vel) = 0;
+			//@}
+
+			//! \name Evaluation methods
+			//@{
+				virtual std::string	getValue(const ParametersVector&, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const = 0;
+				bool				isZero(const ParametersVector&, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			//@}
 		};
 	}
 }

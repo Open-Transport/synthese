@@ -27,6 +27,7 @@
 #include "12_security/User.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/Profile.h"
+#include "12_security/GlobalRight.h"
 
 #include "57_accounting/Account.h"
 #include "57_accounting/AccountTableSync.h"
@@ -87,8 +88,11 @@ namespace synthese
 			else
 				vinciProfile = profiles.front();
 			vinciProfile->setName(VINCI_ACCOUNTING_PROFILE);
-			vinciProfile->setPrivateRight(Right::FORBIDDEN);
-			vinciProfile->setPublicRight(Right::FORBIDDEN);
+			Right* r = Factory<Right>::create<GlobalRight>();
+			r->setPrivateLevel(Right::FORBIDDEN);
+			r->setPublicLevel(Right::FORBIDDEN);
+			vinciProfile->cleanRights();
+			vinciProfile->addRight(r);
 			ProfileTableSync::save(vinciProfile);
 		
 			// Virtual owner user
@@ -268,8 +272,11 @@ namespace synthese
 			else
 				vinciCustomerProfile = profiles.front();
 			vinciCustomerProfile->setName(VINCI_CUSTOMER_PROFILE);
-			vinciCustomerProfile->setPrivateRight(Right::FORBIDDEN);
-			vinciCustomerProfile->setPublicRight(Right::FORBIDDEN);
+			r = Factory<Right>::create<GlobalRight>();
+			r->setPrivateLevel(Right::FORBIDDEN);
+			r->setPublicLevel(Right::FORBIDDEN);
+			vinciCustomerProfile->cleanRights();
+			vinciCustomerProfile->addRight(r);
 			ProfileTableSync::save(vinciCustomerProfile);
 		}
 

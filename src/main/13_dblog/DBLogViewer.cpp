@@ -84,7 +84,7 @@ namespace synthese
 			return (_dbLog != NULL) ? _dbLog->getName() : "(pas de journal)";
 		}
 
-		void DBLogViewer::display(ostream& stream, const AdminRequest* request) const
+		void DBLogViewer::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
 			searchRequest->copy(request);

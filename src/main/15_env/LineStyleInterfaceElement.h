@@ -40,7 +40,7 @@ namespace synthese
 		{
 
 		public:
-			std::string getValue(const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
 
 			/** Parser.
 			@param text Optional parameter :

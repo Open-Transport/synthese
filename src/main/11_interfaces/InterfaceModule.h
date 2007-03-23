@@ -28,6 +28,7 @@
 #include "01_util/ModuleClass.h"
 
 #include "11_interfaces/Interface.h"
+#include "11_interfaces/Types.h"
 
 namespace synthese
 {
@@ -93,6 +94,8 @@ namespace synthese
 			static std::map<uid, std::string> getInterfaceLabels();
 
 			void initialize();
+
+			static std::string getVariableFromMap(const VariablesMap& variables, const std::string& varName);
 		};
 		/** @} */
 	}

@@ -92,16 +92,16 @@ namespace synthese
 			_afterCityVIE = vel.front();
 		}
 
-		void DeparturesTableDestinationContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string DeparturesTableDestinationContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			const ArrivalDepartureRow* __DP = ( const ArrivalDepartureRow* ) object;
 
-			std::string __DestinationsAAfficher = _destinationsToDisplayVIE->getValue(parameters, object, request);
-			bool __AfficherTerminus = !_displayTerminusVIE->isZero(parameters, object, request);
-			std::string __TypeAffichage = _displayTypeVIE->getValue(parameters, object, request);
-			std::string __SeparateurEntreArrets = _stopsSeparatorVIE->getValue(parameters, object, request);
-			std::string __AvantCommune = _beforeCityVIE->getValue(parameters, object, request);
-			std::string __ApresCommune = _afterCityVIE->getValue(parameters, object, request);
+			std::string __DestinationsAAfficher = _destinationsToDisplayVIE->getValue(parameters, variables, object, request);
+			bool __AfficherTerminus = !_displayTerminusVIE->isZero(parameters, variables, object, request);
+			std::string __TypeAffichage = _displayTypeVIE->getValue(parameters, variables, object, request);
+			std::string __SeparateurEntreArrets = _stopsSeparatorVIE->getValue(parameters, variables, object, request);
+			std::string __AvantCommune = _beforeCityVIE->getValue(parameters, variables, object, request);
+			std::string __ApresCommune = _afterCityVIE->getValue(parameters, variables, object, request);
 
 			const City* __DerniereCommune = __DP->second.at(0)->getCity();
 
@@ -148,6 +148,7 @@ namespace synthese
 						stream << __DP->second.at(__i)->getName26();
 			    }
 			}
+			return "";
 		}
 	}
 }

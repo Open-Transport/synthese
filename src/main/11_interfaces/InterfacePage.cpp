@@ -28,6 +28,8 @@
 #include "11_interfaces/CommentInterfaceElement.h"
 #include "11_interfaces/InterfacePageException.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace util;
@@ -35,16 +37,14 @@ namespace synthese
 	namespace interfaces
 	{
 
-		void InterfacePage::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request) const
+		void InterfacePage::display( std::ostream& stream, const ParametersVector& parameters, VariablesMap& vars, const void* object /*= NULL*/, const server::Request* request) const
 		{
-			std::string label_to_go = "";
+			string label_to_go;
 			for (PageComponentsVector::const_iterator it = _components.begin(); it != _components.end(); ++it)
 			{
-				if (label_to_go == "" || it->first == label_to_go)
+				if (label_to_go.empty() || it->first == label_to_go)
 				{
-					it->second->display(stream, parameters, object, request);
-					const GotoInterfaceElement* llie = dynamic_cast<const GotoInterfaceElement*>(it->second);
-					label_to_go = (llie == NULL) ? "" : llie->getLabel(parameters, object, request);
+					label_to_go = it->second->display(stream, parameters, vars, object, request);
 				}
 			}
 		}

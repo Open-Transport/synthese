@@ -22,6 +22,8 @@
 
 #include "01_util/Html.h"
 
+#include "11_interfaces/InterfaceModule.h"
+
 #include "12_security/SecurityModule.h"
 #include "12_security/UserAdmin.h"
 #include "12_security/User.h"
@@ -35,6 +37,7 @@
 
 #include "32_admin/SearchFormHTMLTable.h"
 #include "32_admin/ResultHTMLTable.h"
+#include "32_admin/AdminModule.h"
 
 using namespace std;
 
@@ -65,7 +68,7 @@ namespace synthese
 			return "Utilisateurs";
 		}
 
-		void UsersAdmin::display( std::ostream& stream, const AdminRequest* request) const
+		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			// Request for search form
 			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
@@ -111,7 +114,7 @@ namespace synthese
 			v.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			v.push_back(make_pair(PARAM_SEARCH_PROFILE_ID, "Profil"));
 			v.push_back(make_pair("", "Actions"));
-			ResultHTMLTable t(v, searchRequest, "", true, addUserRequest);
+			ResultHTMLTable t(v, searchRequest, "", true, addUserRequest,"", InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 

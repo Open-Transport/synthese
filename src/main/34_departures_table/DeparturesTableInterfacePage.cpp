@@ -32,6 +32,7 @@ namespace synthese
 	namespace departurestable
 	{
 		void DeparturesTableInterfacePage::display( std::ostream& stream
+			, VariablesMap& vars
 			, const std::string& title
 			, int wiringCode
 			, const ArrivalDepartureList& rows, const server::Request* request /*= NULL*/ ) const
@@ -39,7 +40,8 @@ namespace synthese
 			ParametersVector pv;
 			pv.push_back(title);
 			pv.push_back(Conversion::ToString(wiringCode));
-			InterfacePage::display(stream, pv, &rows, request);
+			
+			InterfacePage::display(stream, pv, vars, &rows, request);
 		}
 	}
 }

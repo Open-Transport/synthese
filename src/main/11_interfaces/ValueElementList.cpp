@@ -47,12 +47,12 @@ namespace synthese
 		{
 		}
 
-		const ParametersVector ValueElementList::fillParameters( const ParametersVector& parameters ) const
+		const ParametersVector ValueElementList::fillParameters( const ParametersVector& parameters, VariablesMap& vars, const void* object, const server::Request* request ) const
 		{
 			ParametersVector pv;
 			for (ElementsList::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
 			{
-				pv.push_back((*it)->getValue(parameters));
+				pv.push_back((*it)->getValue(parameters, vars, object, request));
 			}
 			return pv;
 		}

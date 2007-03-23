@@ -32,9 +32,9 @@ namespace synthese
 
 	namespace interfaces
 	{
-		bool ValueInterfaceElement::isZero(const ParametersVector& pv, const void* object, const server::Request* request) const
+		bool ValueInterfaceElement::isZero(const ParametersVector& pv, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
-			string value = getValue(pv, object, request);
+			string value = getValue(pv, variables, object, request);
 			return
 				value.size() == 0
 				|| Conversion::ToLongLong(value) == 0;

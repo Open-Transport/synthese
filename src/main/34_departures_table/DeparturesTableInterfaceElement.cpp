@@ -69,13 +69,13 @@ namespace synthese
 			_pageSeparator = vel.front();
 		}
 
-		void DeparturesTableInterfaceElement::display(ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string DeparturesTableInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			const ArrivalDepartureList* ptds = (ArrivalDepartureList*) object;
 			
-			int __MultiplicateurRangee = _multiplicateurRangeeVIE->isZero(parameters, object, request) ? 1 : Conversion::ToInt(_multiplicateurRangeeVIE->getValue(parameters, object, request));
-			const std::string& __Pages = _pagesVIE->getValue(parameters, object, request);
-			const std::string& __SeparateurPage = _pageSeparator->getValue(parameters, object, request);
+			int __MultiplicateurRangee = _multiplicateurRangeeVIE->isZero(parameters, variables, object, request) ? 1 : Conversion::ToInt(_multiplicateurRangeeVIE->getValue(parameters, variables, object, request));
+			const std::string& __Pages = _pagesVIE->getValue(parameters, variables, object, request);
+			const std::string& __SeparateurPage = _pageSeparator->getValue(parameters, variables, object, request);
 
 			// Gestion des pages
 			int __NombrePages = 1;
@@ -113,12 +113,13 @@ namespace synthese
 
 					// Lancement de l'affichage de la rangee
 					const DepartureTableRowInterfacePage* const page = _page->getInterface()->getPage<DepartureTableRowInterfacePage>();
-					page->display(stream, __Rangee, pageNumber, &___DP, request);
+					page->display(stream, variables, __Rangee, pageNumber, &___DP, request);
 
 					// Incrementation du numero de rangee
 					__Rangee += __MultiplicateurRangee;
 				}
 			}
+			return "";
 		}
 	}
 }

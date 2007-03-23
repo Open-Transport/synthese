@@ -40,7 +40,7 @@ namespace synthese
 
 	namespace env
 	{
-		string LineStyleInterfaceElement::getValue( const ParametersVector& parameters, const void* object, const server::Request* request) const
+		string LineStyleInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
 			return (object != NULL) ? ((Line*) object)->getCommercialLine()->getStyle() : "";
 		}

@@ -53,7 +53,7 @@ namespace synthese
 			return "Etats journaliers";
 		}
 
-		void VinciReportsAdminInterfaceElement::display(ostream& stream, const AdminRequest* request) const
+		void VinciReportsAdminInterfaceElement::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			// Report Launch request
 			AdminRequest* reportRequest = Factory<Request>::create<AdminRequest>();

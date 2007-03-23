@@ -20,8 +20,7 @@ namespace synthese
 
 		public:
 			void storeParameters(ValueElementList& vel);
-			void display(std::ostream& stream, const ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
-			const std::string getLabel(const ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
 		};
 
 	}

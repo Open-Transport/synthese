@@ -56,16 +56,14 @@ namespace synthese
 		void Profile::setRights( const RightsVector& rightsvector )
 		{
 			cleanRights();
-			_rights = rightsvector;
+			_rights = rightsvector; /// TODO copy of the rights
 		}
 
 		void Profile::cleanRights()
 		{
 			for (RightsVector::iterator it = _rights.begin(); it != _rights.end(); ++it)
-			{
 				delete it->second;
-				_rights.erase(it);
-			}
+			_rights.clear();
 		}
 
 		void Profile::setParent(uid id)
@@ -108,26 +106,6 @@ namespace synthese
 		void Profile::addRight( Right* right )
 		{
 			_rights.insert(make_pair(make_pair(right->getFactoryKey(), right->getParameter()), right));
-		}
-
-		void Profile::setPrivateRight( const Right::Level& level )
-		{
-			_privateGeneralLevel = level;
-		}
-
-		void Profile::setPublicRight( const Right::Level& level )
-		{
-			_publicGeneralLevel = level;
-		}
-
-		const Right::Level& Profile::getPrivateRight() const
-		{
-			return _privateGeneralLevel;
-		}
-
-		const Right::Level& Profile::getPublicRight() const
-		{
-			return _privateGeneralLevel;
 		}
 	}
 }

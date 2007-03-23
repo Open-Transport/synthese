@@ -53,7 +53,7 @@ namespace synthese
 			return "Bibliothèque";
 		}
 
-		void MessagesLibraryAdmin::display(ostream& stream, const AdminRequest* request) const
+		void MessagesLibraryAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
 			updateRequest->copy(request);

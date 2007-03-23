@@ -1,6 +1,6 @@
 
-/** CityNameValueInterfaceElement class header.
-	@file CityNameValueInterfaceElement.h
+/** SetInterfaceElement class header.
+	@file SetInterfaceElement.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,37 +20,38 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_CityNameValueInterfaceElement_H__
-#define SYNTHESE_CityNameValueInterfaceElement_H__
+#ifndef SYNTHESE_SetInterfaceElement_H__
+#define SYNTHESE_SetInterfaceElement_H__
 
-#include "01_util/UId.h"
-
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
 
 namespace synthese
 {
 	namespace interfaces
 	{
-		class ValueElementList;
-	}
-	namespace env
-	{
-		class CityNameValueInterfaceElement : public interfaces::ValueInterfaceElement
+		class ValueInterfaceElement;
+
+		class SetInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
-		private:
-			interfaces::ValueInterfaceElement* _uid;
+			interfaces::ValueInterfaceElement* _varName;
+			interfaces::ValueInterfaceElement* _varValue;
 
 		public:
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
-
-			/** Parser.
-				@param text Optional parameter :
-					- if defined : the uid of the city to name
-					- if empty : the name of the city provided at runtime as current object
+			/** Controls and store the internals parameters.
+				@param vel Parameters list to read
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
+			
+			/* Displays the object.
+				@param stream Stream to write on
+				@param parameters Runtime parameters used in the internal parameters reading
+				@param rootObject Object to read at the display
+				@param request Source request
+			*/
+			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			~SetInterfaceElement();
 		};
 	}
 }
-#endif // SYNTHESE_CityNameValueInterfaceElement_H__
 
+#endif // SYNTHESE_SetInterfaceElement_H__

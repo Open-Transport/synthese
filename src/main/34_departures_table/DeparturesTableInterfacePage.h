@@ -20,7 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
 #ifndef SYNTHESE_DeparturesTableInterfacePage_H__
 #define SYNTHESE_DeparturesTableInterfacePage_H__
 
@@ -32,11 +31,6 @@
 
 namespace synthese
 {
-	namespace server
-	{
-		class Request;
-	}
-
 	namespace departurestable
 	{
 		/** Departures table.
@@ -54,10 +48,9 @@ namespace synthese
 				@param title Title to display in the generated code
 				@param wiring code Wiring code to display in the generated code
 			*/
-			void display(std::ostream& stream, const std::string& title, int wiringCode, const ArrivalDepartureList& rows, const server::Request* request = NULL) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& vars, const std::string& title, int wiringCode, const ArrivalDepartureList& rows, const server::Request* request = NULL) const;
 		};
 	}
 }
 
 #endif // SYNTHESE_DeparturesTableInterfacePage_H__
- 

@@ -122,7 +122,8 @@ namespace synthese
 				}
 				else
 				{
-					_page->display(stream, this);
+					VariablesMap variables;
+					_page->display(stream, variables, this);
 				}
 			}
 			catch (Exception e)

@@ -90,7 +90,7 @@ namespace synthese
 			void setFromParametersMap(const admin::AdminRequest::ParametersMap& map);
 
 			std::string getTitle() const;
-			void display(std::ostream& stream, const admin::AdminRequest* request) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables, const admin::AdminRequest* request) const;
 
 		};
 	}

@@ -111,7 +111,7 @@ namespace synthese
 			return "Messages";
 		}
 
-		void MessagesAdmin::display(ostream& stream, const AdminRequest* request) const
+		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
 			searchRequest->copy(request);

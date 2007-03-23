@@ -73,7 +73,7 @@ namespace synthese
 			return _displayScreen->getFullName();
 		}
 
-		void DisplayAdmin::display(std::ostream& stream, const AdminRequest* request /*= NULL*/ ) const
+		void DisplayAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request /*= NULL*/ ) const
 		{
 			// Update request
 			AdminRequest* updateDisplayRequest = Factory<Request>::create<AdminRequest>();

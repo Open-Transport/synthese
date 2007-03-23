@@ -27,6 +27,11 @@
 
 namespace synthese
 {
+	namespace server
+	{
+		class Request;
+	}
+
 	namespace interfaces
 	{
 		class ValueInterfaceElement;
@@ -107,10 +112,9 @@ namespace synthese
 				@param parameters Parameters to use when filling undefined parameter elements
 				@return Totally defined parameters.
 			*/
-			const ParametersVector fillParameters( const ParametersVector& parameters ) const;
+			const ParametersVector fillParameters( const ParametersVector& parameters, VariablesMap& vars, const void* object=NULL, const server::Request* request=NULL ) const;
 		};
 	}
 }
 
 #endif // SYNTHESE_ValueElementList_H__
-

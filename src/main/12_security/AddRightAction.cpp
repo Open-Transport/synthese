@@ -24,6 +24,7 @@
 
 #include "12_security/AddRightAction.h"
 #include "12_security/SecurityModule.h"
+#include "12_security/ProfileTableSync.h"
 
 #include "30_server/ActionException.h"
 
@@ -96,6 +97,7 @@ namespace synthese
 			right->setPrivateLevel(_privateLevel);
 			right->setPublicLevel(_publicLevel);
 			_profile->addRight(right);
+			ProfileTableSync::save(_profile);
 		}
 
 		AddRightAction::AddRightAction()

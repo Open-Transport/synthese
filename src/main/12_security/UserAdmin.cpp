@@ -57,7 +57,7 @@ namespace synthese
 				: "";
 		}
 
-		void UserAdmin::display(std::ostream& stream, const AdminRequest* request) const
+		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
 			updateRequest->copy(request);

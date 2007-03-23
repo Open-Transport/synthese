@@ -1,13 +1,39 @@
+
+/** LibraryInterfaceElement class header.
+	@file LibraryInterfaceElement.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_INTERFACES_LIBRARY_INTERFACE_ELEMENT_H
 #define SYNTHESE_INTERFACES_LIBRARY_INTERFACE_ELEMENT_H
 
-#include "DisplayableElement.h"
 #include "01_util/Factorable.h"
 
-using synthese::util::Factory;
+#include "11_interfaces/Types.h"
 
 namespace synthese
 {
+	namespace server
+	{
+		class Request;
+	}
+
 	namespace interfaces
 	{
 		class InterfacePage;
@@ -16,16 +42,10 @@ namespace synthese
 		/** element which can produce a single display.
 			@ingroup m11
 		*/
-		class LibraryInterfaceElement : public DisplayableElement, public util::Factorable
+		class LibraryInterfaceElement : public util::Factorable
 		{
 		protected:
 			const InterfacePage*	_page;
-
-			/** Constructor.
-			*/
-			LibraryInterfaceElement()
-				: DisplayableElement() 
-			{ }
 
 			virtual void storeParameters(ValueElementList& vel) = 0;
 
@@ -48,6 +68,22 @@ namespace synthese
 			{
 				return new T(*((T*) this));
 			}
+
+
+			/** Virtual display method.
+				This method must be implemented in each subclass. It defines the behavior of the interface library element in three ways :
+					- it can write outputs on the stream : parameter stream
+					- it can write (and read) local variables : parameter variables
+					- it can return a label to go after the display
+				
+				@param stream Stream to write the output on
+				@param parameters Execution parameters
+				@param variables Execution variables
+				@param object Object pointer to read
+				@param request The source request (read only)
+				@return Label to go after the display
+			*/
+			virtual std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const = 0;
 		};
 	}
 }

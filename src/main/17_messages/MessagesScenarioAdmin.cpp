@@ -73,7 +73,7 @@ namespace synthese
 			return _scenario->getName();
 		}
 
-		void MessagesScenarioAdmin::display(ostream& stream, const AdminRequest* request) const
+		void MessagesScenarioAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
 			updateRequest->copy(request);

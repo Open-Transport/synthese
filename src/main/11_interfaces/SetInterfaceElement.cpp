@@ -1,6 +1,6 @@
 
-/** RequestErrorMessageInterfaceElement class implementation.
-	@file RequestErrorMessageInterfaceElement.cpp
+/** SetInterfaceElement class implementation.
+	@file SetInterfaceElement.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -22,28 +22,36 @@
 
 #include "11_interfaces/ValueElementList.h"
 
-#include "30_server/RequestErrorMessageInterfaceElement.h"
-#include "30_server/Request.h"
-
-using namespace std;
+#include "SetInterfaceElement.h"
+#include "InterfacePageException.h"
+#include "ValueInterfaceElement.h"
 
 namespace synthese
 {
 	using namespace interfaces;
 
-	namespace server
+	namespace interfaces
 	{
-		void RequestErrorMessageInterfaceElement::storeParameters(ValueElementList& vel)
+		void SetInterfaceElement::storeParameters(ValueElementList& vel)
 		{
+			if (vel.size() != 2)
+				throw InterfacePageException("Bad parameters for variable setting element");
+
+			_varName = vel.front();
+			_varValue = vel.front();
 		}
 
-		string RequestErrorMessageInterfaceElement::getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		std::string SetInterfaceElement::display( std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			return request->getErrorMessage();
+			if (!_varName->getValue(parameters, variables, object, request).empty())
+				variables[_varName->getValue(parameters, variables, object, request)] = _varValue->getValue(parameters, variables, object, request);
+			return "";
 		}
 
-		RequestErrorMessageInterfaceElement::~RequestErrorMessageInterfaceElement()
+		SetInterfaceElement::~SetInterfaceElement()
 		{
+			delete _varName;
+			delete _varValue;
 		}
 	}
 }

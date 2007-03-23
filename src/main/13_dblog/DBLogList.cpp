@@ -49,7 +49,7 @@ namespace synthese
 			return "Journaux";
 		}
 
-		void DBLogList::display(ostream& stream, const AdminRequest* request) const
+		void DBLogList::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* goRequest = Factory<Request>::create<AdminRequest>();
 			goRequest->copy(request);

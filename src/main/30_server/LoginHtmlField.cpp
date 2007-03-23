@@ -37,7 +37,7 @@ namespace synthese
 		{
 		}
 
-		string LoginHtmlField::getValue(const interfaces::ParametersVector& parameters, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string LoginHtmlField::getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			stringstream stream;
 			stream << "<input type=\"text\" name=\"" << Action_PARAMETER_PREFIX << LoginAction::PARAMETER_LOGIN << "\" />";

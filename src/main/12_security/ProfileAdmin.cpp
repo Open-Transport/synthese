@@ -21,10 +21,10 @@
 */
 
 #include "01_util/Html.h"
-
-#include "02_db/DBEmptyResultException.h"
+#include "01_util/HtmlTable.h"
 
 #include "12_security/Profile.h"
+#include "12_security/SecurityModule.h"
 #include "12_security/ProfileAdmin.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/UpdateProfileAction.h"
@@ -62,7 +62,7 @@ namespace synthese
 				: "";
 		}
 
-		void ProfileAdmin::display(std::ostream& stream, const AdminRequest* request) const
+		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
 			updateRequest->copy(request);
@@ -111,40 +111,48 @@ namespace synthese
 				stream << "Aucune habilitation";
 			else
 			{
-				stream
-					<< "<table>"
-					<< "<tr><th>Nature</th><th>Périmètre</th><th>Droit public</th><th>Droit privé</th><th colspan=\"2\">Actions</th></tr>";
+				vector<string> v;
+				v.push_back("Nature");
+				v.push_back("Périmètre");
+				v.push_back("Droits");
+				v.push_back("Actions");
+				HtmlTable t(v);
+				stream << t.open();
 
 				// Habilitations list
 				for (Profile::RightsVector::const_iterator it = _profile->getRights().begin(); it != _profile->getRights().end(); ++it)
 				{
 					Right* right = it->second;
-					stream
-						<< "<tr>"
+					stream << t.row();
+					stream << t.col() << right->getFactoryKey();
+					stream << t.col() << right->displayParameter();
+					stream << t.col()
 						<< updateRightRequest->getHTMLFormHeader("u" + right->getFactoryKey())
-						<< "<td>" << right->getFactoryKey() << "</td>"
-						<< "<td>" << right->displayParameter() << "</td>"
-						<< "<td>" << Right::getLevelLabel(right->getPublicRightLevel()) << "</td>"
-						<< "<td>" << Right::getLevelLabel(right->getPrivateRightLevel()) << "</td>"
-						<< "<td>"
+						<< "Public : " << Html::getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, (int) right->getPublicRightLevel())
+						<< " Privé : " << Html::getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, (int) right->getPrivateRightLevel())
 						<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT, right->getFactoryKey())
 						<< Html::getSubmitButton("Modifier")
-						<< "</td></form>"
-						<< "<td>" 
+						<< "</form>";
+					stream << t.col()
 						<< deleteRightRequest->getHTMLFormHeader("d" + right->getFactoryKey())
 						<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT, right->getFactoryKey())
 						<< Html::getSubmitButton("Supprimer")
-						<< "</form></td>"
-						<< "</tr>";
+						<< "</form>";
 				}
-				stream
-					<< "</table>";
+				stream << t.close();
 			}
 
-			stream				
-				<< "<h1>Ajout d'habilitation au profil</h1>"
-				<< "<table>"
-				<< "<tr><th>Nature</th><th>Périmètre</th><th>Droit public</th><th>Droit privé</th><th colspan=\"2\">Action</th></tr>";
+			stream << "<h1>Ajout d'habilitation au profil</h1>";
+
+			vector<string> v;
+			v.push_back("Nature");
+			v.push_back("Périmètre");
+			v.push_back("Droit public");
+			v.push_back("Droit privé");
+			v.push_back("Action");
+			HtmlTable t(v);
+
+			stream << t.open();
 
 			for (Factory<Right>::Iterator it = Factory<Right>::begin(); it != Factory<Right>::end(); ++it)
 			{
@@ -173,10 +181,11 @@ namespace synthese
 			try
 			{
 				Request::ParametersMap::const_iterator it = map.find(AdminRequest::PARAMETER_OBJECT_ID);
-				if (it != map.end())
-					_profile = ProfileTableSync::get(Conversion::ToLongLong(it->second));
+				if (it == map.end())
+					throw AdminParametersException("Profile not specified");
+				_profile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
 			}
-			catch (DBEmptyResultException& e)
+			catch (Profile::RegistryKeyException e)
 			{
 				throw AdminParametersException("Bad profile");
 			}

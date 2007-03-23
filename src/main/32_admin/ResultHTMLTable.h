@@ -57,7 +57,8 @@ namespace synthese
 				, std::string currentOrderField
 				, bool RaisingOrder
 				, AdminRequest* actionRequest=NULL
-				, std::string selectName="");
+				, std::string selectName=""
+				, std::string iconPath="");
 
 			std::string open();
 			std::string close();

@@ -65,7 +65,7 @@ namespace synthese
 			try
 			{
 				const RedirectInterfacePage* page = _interface->getPage<RedirectInterfacePage>();
-				page->display(stream, _url, this);
+				page->display(stream, VariablesMap(), _url, this);
 			}
 			catch (Exception e)
 			{

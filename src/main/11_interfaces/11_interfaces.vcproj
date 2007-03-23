@@ -124,6 +124,12 @@
 			<File
 				RelativePath=".\PrintInterfaceElement.h">
 			</File>
+			<File
+				RelativePath=".\SetInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\SetInterfaceElement.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="ValueInterfaceElement"

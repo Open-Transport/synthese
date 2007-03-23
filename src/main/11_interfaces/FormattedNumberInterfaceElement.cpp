@@ -75,14 +75,14 @@ namespace synthese
 			}
 		}
 
-		std::string FormattedNumberInterfaceElement::getValue(const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		std::string FormattedNumberInterfaceElement::getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			int __Nombre = Conversion::ToInt(_numberVIE->getValue(parameters, object, request));
+			int __Nombre = Conversion::ToInt(_numberVIE->getValue(parameters, variables, object, request));
 			if (_numberToAdd != NULL)
 			{
-				__Nombre += Conversion::ToInt(_numberToAdd->getValue(parameters, object, request));
+				__Nombre += Conversion::ToInt(_numberToAdd->getValue(parameters, variables, object, request));
 			}
-			std::string __Format = _formatVIE->getValue(parameters, object, request);
+			std::string __Format = _formatVIE->getValue(parameters, variables, object, request);
 			stringstream s;
 
 			int numbers = Conversion::ToInt(__Format);

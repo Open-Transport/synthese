@@ -98,7 +98,7 @@ namespace synthese
 			return "Afficheurs";
 		}
 
-		void DisplaySearchAdmin::display(ostream& stream, const AdminRequest* request) const
+		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* createDisplayRequest = Factory<Request>::create<AdminRequest>();
 			createDisplayRequest->copy(request);

@@ -25,6 +25,7 @@
 
 #include <string>
 #include <deque>
+#include <map>
 
 namespace synthese
 {
@@ -35,6 +36,7 @@ namespace synthese
 			@{
 			*/
 		typedef std::deque<std::string> ParametersVector;
+		typedef std::map<std::string, std::string> VariablesMap;
 
 		/** @} */
 	}

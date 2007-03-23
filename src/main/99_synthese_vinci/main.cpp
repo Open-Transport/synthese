@@ -59,13 +59,13 @@ int main( int argc, char **argv )
     std::string db;
     std::vector<std::string> params;
 
+    // To define several params on the command line, the syntax is --param name1=val1 --param name2=val2 ....
+
     po::options_description desc("Allowed options");
     desc.add_options()
 	("help", "produce this help message")
 	("db", po::value<std::string>(&db)->default_value ("./synthese.db3"), "SQLite database file")
-	("params", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
-    
-    
+	("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
 	 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);

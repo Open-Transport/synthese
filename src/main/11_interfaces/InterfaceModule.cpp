@@ -59,6 +59,14 @@ namespace synthese
 				m.insert(make_pair(it->first, it->second->getName()));
 			return m;
 		}
+
+		std::string InterfaceModule::getVariableFromMap(const VariablesMap& variables, const std::string& varName )
+		{
+			VariablesMap::const_iterator it = variables.find(varName);
+			if (it == variables.end())
+				return "";
+			return it->second;
+		}
 	}
 }
 

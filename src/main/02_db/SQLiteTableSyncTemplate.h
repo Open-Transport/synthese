@@ -64,7 +64,9 @@ namespace synthese
 			SQLiteTableSyncTemplate( const std::string& tableName, 
 				bool allowInsert = true, 
 				bool allowRemove = true,
-				const std::string& triggerOverrideClause = "1") : SQLiteTableSync(tableName, allowInsert, allowRemove, triggerOverrideClause)
+				const std::string& triggerOverrideClause = "1",
+				bool ignoreCallbacksOnFirstSync = false)
+				: SQLiteTableSync(tableName, allowInsert, allowRemove, triggerOverrideClause, ignoreCallbacksOnFirstSync)
 			{			}
 
 			void initAutoIncrement();

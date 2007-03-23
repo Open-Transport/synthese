@@ -48,6 +48,7 @@ namespace synthese
 				This function converts the parameters into a single ParametersVector object.
 			*/
 			void display(std::ostream& stream
+				, interfaces::VariablesMap& vars
 				, const VinciContract* contract
 				, const server::Request* request = NULL) const;
 		};

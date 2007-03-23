@@ -56,7 +56,7 @@ namespace synthese
 
 			std::string getTitle() const;
 
-			void display(std::ostream& stream, const admin::AdminRequest* request = NULL) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables, const admin::AdminRequest* request = NULL) const;
 		};
 	}
 }

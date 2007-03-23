@@ -33,7 +33,7 @@ namespace synthese
 		{
 		}
 
-		void HomeAdmin::display( std::ostream& stream, const AdminRequest* request) const
+		void HomeAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			stream << "Bienvenue sur le module d'interfaces";
 		}

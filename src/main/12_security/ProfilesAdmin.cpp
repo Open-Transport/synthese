@@ -27,15 +27,19 @@
 #include "01_util/Conversion.h"
 #include "01_util/Constants.h"
 
+#include "11_interfaces/InterfaceModule.h"
+
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfilesAdmin.h"
 #include "12_security/ProfileAdmin.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/AddProfileAction.h"
 #include "12_security/DeleteProfileAction.h"
+#include "12_security/Right.h"
 
 #include "32_admin/ResultHTMLTable.h"
 #include "32_admin/SearchFormHTMLTable.h"
+#include "32_admin/AdminModule.h"
 
 using namespace std;
 
@@ -87,7 +91,7 @@ namespace synthese
 			return "Profils";
 		}
 
-		void ProfilesAdmin::display(ostream& stream, const AdminRequest* request) const
+		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
 			searchRequest->copy(request);
@@ -121,7 +125,7 @@ namespace synthese
 			v.push_back(make_pair(PARAMETER_SEARCH_NAME, string("Nom")));
 			v.push_back(make_pair(string(), string("Résumé")));
 			v.push_back(make_pair(string(), string("Actions")));
-			ResultHTMLTable t(v, searchRequest, "", true, addProfileRequest, AddProfileAction::PARAMETER_TEMPLATE_ID);
+			ResultHTMLTable t(v, searchRequest, "", true, addProfileRequest, AddProfileAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 			
@@ -139,8 +143,14 @@ namespace synthese
 
 				if (profile->getParentId())
 					stream << "<li>Hérite de " << SecurityModule::getProfiles().get(profile->getParentId())->getName() << "</li>";
-
-				// Rights loop
+				for (Profile::RightsVector::const_iterator it = profile->getRights().begin(); it != profile->getRights().end(); ++it)
+				{
+					const Right* r = it->second;
+					stream << "<li>Accès " << Right::getLevelLabel(r->getPublicRightLevel()) << " public et " << Right::getLevelLabel(r->getPrivateRightLevel()) << " privé pour " << r->getFactoryKey();
+					if (r->getParameter() != "*")
+						stream << "/" << r->displayParameter();
+					stream << "</li>";
+				}
 
 				stream
 					<< t.col()

@@ -75,7 +75,7 @@ namespace synthese
 			return "Client " + _user->getSurname() + " " + _user->getName();
 		}
 
-		void VinciCustomerAdminInterfaceElement::display(std::ostream& stream, const AdminRequest* request /*= NULL*/ ) const
+		void VinciCustomerAdminInterfaceElement::display(std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request /*= NULL*/ ) const
 		{
 			// Update user request
 			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();

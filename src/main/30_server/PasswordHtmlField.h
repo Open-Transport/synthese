@@ -33,7 +33,7 @@ namespace synthese
 		{
 		public:
 			void storeParameters(interfaces::ValueElementList& vel);
-			std::string getValue(const interfaces::ParametersVector& parameters, const void* rootObject = NULL, const server::Request* request = NULL) const;
+			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject = NULL, const server::Request* request = NULL) const;
 			~PasswordHtmlField();
 		};
 	}

@@ -50,7 +50,7 @@ namespace synthese
 			return "Parc de vélos";
 		}
 
-		void VinciBikeSearchAdminInterfaceElement::display(ostream& stream, const AdminRequest* request) const
+		void VinciBikeSearchAdminInterfaceElement::display(ostream& stream, VariablesMap& vars, const AdminRequest* request) const
 		{
 			// AddStatus
 			AdminRequest* addStatusRequest = Factory<Request>::create<AdminRequest>();

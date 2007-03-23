@@ -26,6 +26,7 @@
 #include "12_security/ProfileTableSync.h"
 #include "12_security/AddProfileAction.h"
 #include "12_security/SecurityModule.h"
+#include "12_security/GlobalRight.h"
 
 #include "30_server/ActionException.h"
 
@@ -53,25 +54,28 @@ namespace synthese
 
 		void AddProfileAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
-
-			it = map.find(PARAMETER_NAME);
-			if (it == map.end())
-				throw ActionException("Name not specified");
-			_name = it->second;
-			map.erase(it);
-
-			it = map.find(PARAMETER_TEMPLATE_ID);
-			if (it != map.end())
+			try
 			{
-				try
+				Request::ParametersMap::iterator it;
+
+				it = map.find(PARAMETER_NAME);
+				if (it == map.end())
+					throw ActionException("Name not specified");
+				_name = it->second;
+				map.erase(it);
+
+				// Add a unicity test
+
+				it = map.find(PARAMETER_TEMPLATE_ID);
+				if (it != map.end())
 				{
 					_templateProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
+					map.erase(it);
 				}
-				catch (Profile::RegistryKeyException e)
-				{
-				}
-				map.erase(it);
+			}
+			catch (Profile::RegistryKeyException e)
+			{
+				throw ActionException("Specified template profile not found.");
 			}
 		}
 
@@ -79,10 +83,14 @@ namespace synthese
 		{
 			Profile* profile = new Profile;
 			profile->setName(_name);
-			if (_templateProfile)
-			{
+			if (_templateProfile != NULL)
 				profile->setParent(_templateProfile->getKey());
-				profile->setRights(_templateProfile->getRights());
+			else
+			{
+				Right* r = Factory<Right>::create<GlobalRight>();
+				r->setPrivateLevel(Right::FORBIDDEN);
+				r->setPublicLevel(Right::FORBIDDEN);
+				profile->addRight(r);
 			}
 			ProfileTableSync::save(profile);
 			_request->setObjectId(profile->getKey());

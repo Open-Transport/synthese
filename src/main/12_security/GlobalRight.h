@@ -1,6 +1,6 @@
 
-/** DisplayableElement class header.
-	@file DisplayableElement.h
+/** GlobalRight class header.
+	@file GlobalRight.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,40 +20,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_INTERFACES_DISPLAYABLE_ELEMENT_H
-#define SYNTHESE_INTERFACES_DISPLAYABLE_ELEMENT_H
+#ifndef SYNTHESE_GLOBAL_RIGHT_H
+#define SYNTHESE_GLOBAL_RIGHT_H
 
-#include "11_interfaces/Types.h"
+#include "12_security/Right.h"
 
 namespace synthese
 {
-	namespace server
+	namespace security
 	{
-		class Request;
-	}
-	    
-	namespace interfaces
-	{
-		class Interface;
+		/** Global right.
+			@ingroup m12
 
-
-		/** Abstract class specifying virtual methods for all types of output element, making up each interface page.
-			@ingroup m11
 		*/
-		class DisplayableElement
+		class GlobalRight : public Right
 		{
-		protected:
-			/** Constructor (do nothing).
-			*/
-			DisplayableElement() { }
-
 		public:
-
-			/** Generic display method.
-				@param stream Stream to write the output in
-				@param parameters Parameters vector
-			*/
-			virtual void display(std::ostream& stream, const ParametersVector& parameters, const void* rootObject = NULL, const server::Request* request = NULL) const = 0;
+			GlobalRight();
+			std::string	displayParameter()	const;
+			std::map<std::string, std::string>	getParametersLabels()	const;
 		};
 	}
 }

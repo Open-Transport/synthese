@@ -103,6 +103,12 @@
 			Name="Rights"
 			Filter="">
 			<File
+				RelativePath=".\GlobalRight.cpp">
+			</File>
+			<File
+				RelativePath=".\GlobalRight.h">
+			</File>
+			<File
 				RelativePath=".\SecurityRight.cpp">
 			</File>
 			<File

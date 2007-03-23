@@ -69,14 +69,14 @@ namespace synthese
 			_afterIfNext = vel.front();
 		}
 
-		void DeparturesTableTimeContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string DeparturesTableTimeContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			const ArrivalDepartureRow*	row = (const ArrivalDepartureRow*) object;
 			const DateTime&				__Moment = row->first.realDepartureTime;
 			bool						blinking = row->first.blinking;
-			string						__Zero = _zeroVIE->getValue(parameters, object, request);
-			string						__AvantSiImminent = _beforeIfNext->getValue(parameters, object, request);
-			string						__ApresSiImminent = _afterIfNext->getValue(parameters, object, request);
+			string						__Zero = _zeroVIE->getValue(parameters, variables, object, request);
+			string						__AvantSiImminent = _beforeIfNext->getValue(parameters, variables, object, request);
+			string						__ApresSiImminent = _afterIfNext->getValue(parameters, variables, object, request);
 
 			if (blinking)
 				stream << __AvantSiImminent;
@@ -85,6 +85,7 @@ namespace synthese
 			stream << __Moment.getHour ().toString();
 			if (blinking)
 				stream << __ApresSiImminent;
+			return "";
 		}
 	}
 }

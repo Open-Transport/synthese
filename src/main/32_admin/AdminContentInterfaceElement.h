@@ -27,13 +27,23 @@
 
 namespace synthese
 {
-	namespace admin
+	namespace interfaces
 	{
 		class ValueInterfaceElement;
+	}
 
+	namespace admin
+	{
+		/** Displays the content of the current admin page.
+			
+			@code
+			admincontent
+			@endcode
+
+
+		*/
 		class AdminContentInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
-
 		public:
 			/** Controls and store the internals parameters.
 				@param vel Parameters list to read
@@ -46,7 +56,8 @@ namespace synthese
 				@param rootObject Object to read at the display
 				@param request Source request
 			*/
-			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* rootObject = NULL, const server::Request* request = NULL) const;
+			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject = NULL, const server::Request* request = NULL) const;
+			AdminContentInterfaceElement();
 			~AdminContentInterfaceElement();
 		};
 	}

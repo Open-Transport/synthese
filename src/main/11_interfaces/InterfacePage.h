@@ -1,10 +1,33 @@
+
+/** InterfacePage class header.
+	@file InterfacePage.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_INTERFACES_PAGE_H
 #define SYNTHESE_INTERFACES_PAGE_H
 
-#include "DisplayableElement.h"
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 #include "01_util/Factorable.h"
+
+#include "11_interfaces/Types.h"
 
 #include <vector>
 #include <utility>
@@ -14,6 +37,10 @@ using synthese::util::Factory;
 
 namespace synthese
 {
+	namespace server
+	{
+		class Request;
+	}
 	   
 	namespace interfaces
 	{
@@ -27,24 +54,17 @@ namespace synthese
 				- additional pages : the page is not registerd in the Factory<InterfacePage>. It is saved directly as a InterfacePage object.
 			@ingroup m11
 		*/
-		class InterfacePage
-			: public DisplayableElement, public util::Factorable
+		class InterfacePage : public util::Factorable
 		{
 		public:
 			typedef std::vector<std::pair<std::string, LibraryInterfaceElement*> > PageComponentsVector;
-
+			
 		private:
 			const Interface*		_interface;
 			PageComponentsVector	_components;
 
 		public:
 
-			/** Constructor.
-				@param components Components of the page.
-			*/
-			InterfacePage()
-				: DisplayableElement() 
-			{ }
 			virtual ~InterfacePage();
 
 			void parse( const std::string& text );
@@ -56,9 +76,9 @@ namespace synthese
 				@param parameters Parameters vector
 				@return Name of the next line to display (empty = next line)
 			*/
-			void display(std::ostream& stream, const ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
+			void display(std::ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
 
-			void	setInterface(const Interface*);
+			void				setInterface(const Interface*);
 			const Interface*	getInterface()	const;
 		};
 	}

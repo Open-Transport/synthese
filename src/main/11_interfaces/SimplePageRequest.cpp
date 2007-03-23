@@ -22,7 +22,6 @@
 
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/InterfacePage.h"
-#include "11_interfaces/DisplayableElement.h"
 #include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/SimplePageRequest.h"
 
@@ -49,7 +48,7 @@ namespace synthese
 			ParametersVector pv;
 			for (Request::ParametersMap::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
 				pv.push_back(it->second);
-			_page->display(stream, pv, NULL, this);
+			_page->display(stream, pv, VariablesMap(), NULL, this);
 		}
 
 		void SimplePageRequest::setFromParametersMap(const Request::ParametersMap& map )

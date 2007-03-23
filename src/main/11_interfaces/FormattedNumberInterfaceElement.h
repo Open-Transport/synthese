@@ -49,7 +49,7 @@ namespace synthese
 			FormattedNumberInterfaceElement();
 			~FormattedNumberInterfaceElement();
 
-			std::string	getValue( const ParametersVector&, const void* object = NULL, const server::Request* request = NULL ) const;
+			std::string	getValue( const ParametersVector&, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL ) const;
 			void storeParameters(ValueElementList& vel);
 		};
 

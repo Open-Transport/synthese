@@ -55,7 +55,7 @@ namespace synthese
 			return "Types d'afficheurs";
 		}
 
-		void DisplayTypesAdmin::display(ostream& stream, const AdminRequest* request) const
+		void DisplayTypesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* createRequest = Factory<Request>::create<AdminRequest>();
 			createRequest->copy(request);

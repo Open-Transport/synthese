@@ -18,6 +18,7 @@
 #include "12_security/UserPasswordUpdateAction.h"
 
 #include "12_security/SecurityRight.h"
+#include "12_security/GlobalRight.h"
 
 #include "12_security/SecurityLog.h"
 

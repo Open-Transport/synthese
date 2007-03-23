@@ -114,7 +114,7 @@ namespace synthese
 		const std::string TransactionPartTableSync::TABLE_COL_COMMENT = "comment";
 
 		TransactionPartTableSync::TransactionPartTableSync()
-			: SQLiteTableSyncTemplate<TransactionPart>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<TransactionPart>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_TRANSACTION_ID, "INTEGER", true);

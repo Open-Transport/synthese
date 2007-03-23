@@ -56,6 +56,7 @@ namespace synthese
 	{
 
 		void VinciPrintedContractInterfacePage::display(std::ostream& stream
+			, VariablesMap& vars
 			, const VinciContract* contract
 			, const server::Request* request /*= NULL*/) const
 		{
@@ -113,7 +114,7 @@ namespace synthese
 			pv.push_back(guarantee ? Conversion::ToString(guarantee->getLeftCurrencyAmount()) : "");
 			pv.push_back(guaranteeAccount ? guaranteeAccount->getName() : "");
 
-			InterfacePage::display(stream, pv, NULL, request);
+			InterfacePage::display(stream, pv, vars, NULL, request);
 		}
 	}
 }

@@ -84,7 +84,7 @@ namespace synthese
 		void VinciContractPrintRequest::run( std::ostream& stream ) const
 		{
 			const VinciPrintedContractInterfacePage* page = _interface->getPage<VinciPrintedContractInterfacePage>();
-			page->display(stream, _contract, this);
+			page->display(stream, VariablesMap(), _contract, this);
 		}
 
 		VinciContractPrintRequest::~VinciContractPrintRequest()

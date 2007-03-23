@@ -74,18 +74,20 @@ namespace synthese
 			_cellHeight = vel.front();
 		}
 
-		void DeparturesTableLineContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string DeparturesTableLineContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			const Line* line = ((const ArrivalDepartureRow*) object)->first.linestop->getLine();
 
 			const LineMarkerInterfacePage* const page = _page->getInterface()->getPage<LineMarkerInterfacePage>();
 			page->display(stream
-				, _htmlStartLine->getValue(parameters, object, request)
-				, _htmlEndLine->getValue(parameters, object, request)
-				, Conversion::ToInt(_cellWidth->getValue(parameters, object, request))
-				, Conversion::ToInt(_cellHeight->getValue(parameters, object,request))
+				, variables
+				, _htmlStartLine->getValue(parameters, variables, object, request)
+				, _htmlEndLine->getValue(parameters, variables, object, request)
+				, Conversion::ToInt(_cellWidth->getValue(parameters, variables, object, request))
+				, Conversion::ToInt(_cellHeight->getValue(parameters, variables, object,request))
 				, line, request
 				);
+			return "";
 		}
 	}
 }

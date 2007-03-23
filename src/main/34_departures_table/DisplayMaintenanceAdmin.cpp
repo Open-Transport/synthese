@@ -66,7 +66,7 @@ namespace synthese
 			return "Supervision de " + _displayScreen->getFullName();
 		}
 
-		void DisplayMaintenanceAdmin::display(ostream& stream, const AdminRequest* request) const
+		void DisplayMaintenanceAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
 			updateRequest->copy(request);

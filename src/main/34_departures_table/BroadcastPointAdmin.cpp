@@ -72,7 +72,7 @@ namespace synthese
 			return _place->getCity()->getName() + " " + _place->getName();
 		}
 
-		void BroadcastPointAdmin::display(ostream& stream, const AdminRequest* request) const
+		void BroadcastPointAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
 		{
 			AdminRequest* createRequest = Factory<Request>::create<AdminRequest>();
 			createRequest->copy(request);

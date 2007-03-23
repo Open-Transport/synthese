@@ -50,13 +50,19 @@ namespace synthese
 			_redirectionURL = vel.front();
 			_page_key = vel.front();
 			_content = vel.front();
+			if (!vel.isEmpty())
+				_icon = vel.front();
 		}
 
-		string LogoutHTMLLinkInterfaceElement::getValue(const interfaces::ParametersVector& parameters, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string LogoutHTMLLinkInterfaceElement::getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			stringstream stream;
-			std::string url = _redirectionURL->getValue(parameters, rootObject, request);
-			std::string requestKey = _page_key->getValue(parameters, rootObject, request);
+			std::string url = _redirectionURL->getValue(parameters, variables, rootObject, request);
+			std::string requestKey = _page_key->getValue(parameters, variables, rootObject, request);
+			std::string content = _content->getValue(parameters, variables, NULL, request);
+			std::string icon;
+			if (_icon != NULL)
+				icon = _icon->getValue(parameters, variables, NULL, request);
 
 			if (!requestKey.empty())
 			{
@@ -66,7 +72,7 @@ namespace synthese
 					redirRequest->copy(request);
 					redirRequest->setPage(_page->getInterface()->getPage(requestKey));
 					redirRequest->setAction(Factory<Action>::create<LogoutAction>());
-					stream << Html::getLinkButton(redirRequest->getURL(), _content->getValue(parameters, NULL, request), "", "disconnect.png");
+					stream << Html::getLinkButton(redirRequest->getURL(), content, "", icon);
 					delete redirRequest;
 				}
 				catch (InterfacePageException e)
@@ -80,11 +86,28 @@ namespace synthese
 				redirRequest->copy(request);
 				redirRequest->setUrl(url);
 				redirRequest->setAction(Factory<Action>::create<LogoutAction>());
-				stream << Html::getLinkButton(redirRequest->getURL(), _content->getValue(parameters, NULL, request), "", "disconnect.png");
+				stream << Html::getLinkButton(redirRequest->getURL(), content, "", icon);
 				delete redirRequest;
 			}
 			return stream.str();
 		}
 
+		LogoutHTMLLinkInterfaceElement::~LogoutHTMLLinkInterfaceElement()
+		{
+			delete _redirectionURL;
+			delete _page_key;
+			delete _content;
+			delete _icon;
+		}
+
+		LogoutHTMLLinkInterfaceElement::LogoutHTMLLinkInterfaceElement()
+			: ValueInterfaceElement()
+			, _redirectionURL(NULL)
+			, _page_key(NULL)
+			, _content(NULL)
+			, _icon(NULL)
+		{
+
+		}
 	}
 }

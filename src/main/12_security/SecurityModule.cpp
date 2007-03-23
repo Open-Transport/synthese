@@ -30,6 +30,7 @@
 #include "12_security/User.h"
 #include "12_security/Profile.h"
 #include "12_security/SecurityModule.h"
+#include "12_security/GlobalRight.h"
 
 using namespace std;
 
@@ -55,21 +56,26 @@ namespace synthese
 				rootProfile = profiles.front();
 	
 			rootProfile->setName(ROOT_PROFILE);
-			rootProfile->setPublicRight(Right::DELETE);
-			rootProfile->setPrivateRight(Right::DELETE);
+			Right* r = Factory<Right>::create<GlobalRight>();
+			r->setPublicLevel(Right::DELETE);
+			r->setPrivateLevel(Right::DELETE);
+			rootProfile->cleanRights();
+			rootProfile->addRight(r);
 			ProfileTableSync::save(rootProfile);
 
 			vector<User*> users = UserTableSync::search(ROOT_USER, ROOT_USER, rootProfile->getKey());
+			User* rootUser;
 			if (users.size() == 0)
-			{
-				User* rootUser = new User;
-				rootUser->setName(ROOT_USER);
-				rootUser->setLogin(ROOT_USER);
-				rootUser->setPassword(ROOT_USER);
-				rootUser->setProfile(rootProfile);
-				rootUser->setConnectionAllowed(true);
-				UserTableSync::save(rootUser);
-			}
+				rootUser = new User;
+			else
+				rootUser = users.front();
+			rootUser->setName(ROOT_USER);
+			rootUser->setLogin(ROOT_USER);
+			rootUser->setPassword(ROOT_USER);
+			rootUser->setProfile(rootProfile);
+			rootUser->setConnectionAllowed(true);
+			UserTableSync::save(rootUser);
+			delete rootUser;
 		}
 
 		Profile::Registry& SecurityModule::getProfiles()

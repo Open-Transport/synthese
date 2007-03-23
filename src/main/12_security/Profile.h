@@ -29,12 +29,12 @@
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
-#include "12_security/Right.h"
-
 namespace synthese
 {
 	namespace security
 	{
+		class Right;
+
 		/** Profil utilisateur.
 			@ingroup m12
 		
@@ -61,8 +61,6 @@ namespace synthese
 			std::string		_name;
 			RightsVector	_rights;
 			uid				_parentId;
-			Right::Level	_privateGeneralLevel;
-			Right::Level	_publicGeneralLevel;
 
 		public:
 			/** Comparison operator between profiles.
@@ -80,8 +78,6 @@ namespace synthese
 				const uid			getParentId()													const;
 				const RightsVector&	getRights()														const;
 				Right*				getRight(const std::string& key, const std::string& parameter)	const;
-				const Right::Level&	getPrivateRight()												const;
-				const Right::Level&	getPublicRight()												const;
 			//@}
 
 
@@ -93,8 +89,6 @@ namespace synthese
 				void removeRight(const std::string& key, const std::string& parameter);
 				void addRight(Right* right);
 				void setParent(uid id);
-				void setPrivateRight(const Right::Level& level);
-				void setPublicRight(const Right::Level& level);
 			//@}
 		};
 	}

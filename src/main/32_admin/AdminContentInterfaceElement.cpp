@@ -21,10 +21,13 @@
 */
 
 #include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/ValueInterfaceElement.h"
 
 #include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminRequest.h"
 #include "32_admin/AdminContentInterfaceElement.h"
+
+using namespace std;
 
 namespace synthese
 {
@@ -36,13 +39,18 @@ namespace synthese
 		{
 		}
 
-		void AdminContentInterfaceElement::display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string AdminContentInterfaceElement::display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			const AdminInterfaceElement* aie = (const AdminInterfaceElement*) rootObject;
-			aie->display(stream, (const AdminRequest*) request);
+			aie->display(stream, variables, (const AdminRequest*) request);
+			return "";
 		}
 
 		AdminContentInterfaceElement::~AdminContentInterfaceElement()
+		{
+		}
+
+		AdminContentInterfaceElement::AdminContentInterfaceElement()
 		{
 		}
 	}

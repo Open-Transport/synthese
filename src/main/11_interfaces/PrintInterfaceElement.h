@@ -40,7 +40,7 @@ namespace synthese
 				The parser copies the ValueElementList as is.
 			*/
 			void storeParameters(ValueElementList& vel);
-			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* rootObject = NULL, const server::Request* request = NULL) const;
+			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
 			~PrintInterfaceElement();
 		};
 	}

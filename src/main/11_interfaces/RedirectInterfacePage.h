@@ -50,7 +50,7 @@ namespace synthese
 
 				The redirection is made for launching the specified request
 			*/
-			void display(std::ostream& stream, const server::Request* request = NULL) const;
+			void display(std::ostream& stream, VariablesMap& vars, const server::Request* request = NULL) const;
 
 
 			/** Overloaded display method for specific parameter conversion.
@@ -60,7 +60,7 @@ namespace synthese
 				@param url URL to redirect after the action
 				@param request Source request
 			*/
-			void display(std::ostream& stream, const std::string& url, const server::Request* request = NULL) const;
+			void display(std::ostream& stream, VariablesMap& vars, const std::string& url, const server::Request* request = NULL) const;
 		};
 	}
 }

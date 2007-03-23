@@ -174,13 +174,13 @@ namespace synthese
 		std::string ProfileTableSync::getRightsString( const Profile* p)
 		{
 			stringstream s;
-			s << "*,*," << ((int) p->getPrivateRight()) << "," << ((int) p->getPublicRight());
-
+			
 			for (Profile::RightsVector::const_iterator it = p->getRights().begin(); it != p->getRights().end(); ++it)
 			{
 				Right* right = it->second;
-				s	<< RIGHT_SEPARATOR
-					<< right->getFactoryKey() 
+				if (it != p->getRights().begin())
+					s	<< RIGHT_SEPARATOR;
+				s	<< right->getFactoryKey() 
 					<< RIGHT_VALUE_SEPARATOR << right->getParameter()
 					<< RIGHT_VALUE_SEPARATOR << ((int) right->getPrivateRightLevel())
 					<< RIGHT_VALUE_SEPARATOR << ((int) right->getPublicRightLevel())
@@ -194,6 +194,9 @@ namespace synthese
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 			boost::char_separator<char> sep(RIGHT_SEPARATOR.c_str ());
 
+			// CLeaning the profile
+			profile->cleanRights();
+
 			// Parsing
 			tokenizer parametersTokens (text, sep);
 			for (tokenizer::iterator parameterToken = parametersTokens.begin();
@@ -202,35 +205,24 @@ namespace synthese
 				tokenizer valuesToken(*parameterToken, boost::char_separator<char>(RIGHT_VALUE_SEPARATOR.c_str()));
 				tokenizer::iterator it = valuesToken.begin();
 
-				if (*it == "*")
+				try
 				{
+					Right* right = Factory<Right>::create(*it);
+
 					++it;
+					right->setParameter(*it);
+
 					++it;
-					profile->setPrivateRight((Right::Level) Conversion::ToInt(*it));
+					right->setPrivateLevel((Right::Level) Conversion::ToInt(*it));
+
 					++it;
-					profile->setPublicRight((Right::Level) Conversion::ToInt(*it));
+					right->setPublicLevel((Right::Level) Conversion::ToInt(*it));
+
+					profile->addRight(right);
 				}
-				else
+				catch (FactoryException<Right> e)
 				{
-					try
-					{
-						Right* right = Factory<Right>::create(*it);
-
-						++it;
-						right->setParameter(*it);
-
-						++it;
-						right->setPrivateLevel((Right::Level) Conversion::ToInt(*it));
-
-						++it;
-						right->setPublicLevel((Right::Level) Conversion::ToInt(*it));
-
-						profile->addRight(right);
-					}
-					catch (FactoryException<Right> e)
-					{
-						continue;
-					}
+					continue;
 				}
 			}
 		}
