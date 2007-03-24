@@ -113,6 +113,21 @@ namespace synthese
 		{
 
 		}
+
+		void InterfacePage::setCode( const std::string& code )
+		{
+			_code = code;
+		}
+
+		const std::string& InterfacePage::getCode() const
+		{
+			return _code;
+		}
+
+		InterfacePage::InterfacePage()
+		{
+
+		}
 	}
 }
 

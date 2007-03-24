@@ -78,7 +78,7 @@ namespace synthese
 		{
 			Request::ParametersMap map;
 			if (_page != NULL)
-				map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
+				map.insert(make_pair(PARAMETER_PAGE, _page->getCode()));
 			return map;
 		}
 

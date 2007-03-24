@@ -62,9 +62,11 @@ namespace synthese
 		private:
 			const Interface*		_interface;
 			PageComponentsVector	_components;
+			std::string				_code;
 
 		public:
 
+			InterfacePage();
 			virtual ~InterfacePage();
 
 			void parse( const std::string& text );
@@ -80,6 +82,9 @@ namespace synthese
 
 			void				setInterface(const Interface*);
 			const Interface*	getInterface()	const;
+
+			void				setCode(const std::string& code);
+			const std::string&	getCode()							const;
 		};
 	}
 }
