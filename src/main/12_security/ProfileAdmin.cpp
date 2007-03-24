@@ -127,15 +127,17 @@ namespace synthese
 					stream << t.col() << right->getFactoryKey();
 					stream << t.col() << right->displayParameter();
 					stream << t.col()
-						<< updateRightRequest->getHTMLFormHeader("u" + right->getFactoryKey())
-						<< "Public : " << Html::getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, (int) right->getPublicRightLevel())
-						<< " Privé : " << Html::getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, (int) right->getPrivateRightLevel())
-						<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT, right->getFactoryKey())
+						<< updateRightRequest->getHTMLFormHeader("u" + right->getFactoryKey() + right->getParameter())
+						<< "Public : " << Html::getSelectInput(UpdateRightAction::PARAMETER_PUBLIC_VALUE, privatePublicMap, (int) right->getPublicRightLevel())
+						<< " Privé : " << Html::getSelectInput(UpdateRightAction::PARAMETER_PRIVATE_VALUE, privatePublicMap, (int) right->getPrivateRightLevel())
+						<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT_CODE, right->getFactoryKey())
+						<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT_PARAMETER, right->getParameter())
 						<< Html::getSubmitButton("Modifier")
 						<< "</form>";
 					stream << t.col()
-						<< deleteRightRequest->getHTMLFormHeader("d" + right->getFactoryKey())
-						<< Html::getHiddenInput(UpdateRightAction::PARAMETER_RIGHT, right->getFactoryKey())
+						<< deleteRightRequest->getHTMLFormHeader("d" + right->getFactoryKey() + right->getParameter())
+						<< Html::getHiddenInput(DeleteRightAction::PARAMETER_RIGHT, right->getFactoryKey())
+						<< Html::getHiddenInput(DeleteRightAction::PARAMETER_PARAMETER, right->getParameter())
 						<< Html::getSubmitButton("Supprimer")
 						<< "</form>";
 				}

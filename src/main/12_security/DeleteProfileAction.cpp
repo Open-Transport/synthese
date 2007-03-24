@@ -65,9 +65,21 @@ namespace synthese
 				throw ActionException("Profile not found");
 			}
 
+			// Search of child profiles
+			vector<Profile*> profiles = ProfileTableSync::search(_profile, 0, 1);
+			if (!profiles.empty())
+			{
+				delete profiles.front();
+				throw ActionException("Au moins un profil hérite du profil spécifié. La suppression est impossible.");
+			}
+
+			// Search of users
 			vector<User*> users = UserTableSync::search("","",_profile->getKey(), boost::logic::indeterminate, 0, 1);
-			if (users.size() > 0)
-				throw ActionException("At least one user belongs to the specified profile. The deletion is forbidden.");
+			if (!users.empty())
+			{
+				delete users.front();
+				throw ActionException("Au moins un utilisateur appartient au profil spécifié. La suppression est impossible.");
+			}
 		}
 
 		void DeleteProfileAction::run()

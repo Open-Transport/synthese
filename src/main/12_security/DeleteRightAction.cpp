@@ -22,6 +22,7 @@
 
 #include "12_security/DeleteRightAction.h"
 #include "12_security/Profile.h"
+#include "12_security/Right.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfileTableSync.h"
 
@@ -41,8 +42,8 @@ namespace synthese
 		Request::ParametersMap DeleteRightAction::getParametersMap() const
 		{
 			Request::ParametersMap map;
-			map.insert(make_pair(PARAMETER_RIGHT, _right));
-			map.insert(make_pair(PARAMETER_PARAMETER, _parameter));
+			map.insert(make_pair(PARAMETER_RIGHT, _right->getFactoryKey()));
+			map.insert(make_pair(PARAMETER_PARAMETER, _right->getParameter()));
 			return map;
 		}
 
@@ -52,26 +53,29 @@ namespace synthese
 			{
 				Request::ParametersMap::iterator it;
 
+				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
+
+				string rightCode;
 				it = map.find(PARAMETER_RIGHT);
 				if (it == map.end())
 					throw ActionException("Right not specified");
-				_right = it->second;
+				rightCode = it->second;
 				map.erase(it);
 
 				it = map.find(PARAMETER_PARAMETER);
 				if (it == map.end())
 					throw ActionException("Parameter not specified");
-				_parameter = it->second;
+				
+				_right = _profile->getRight(rightCode, it->second);
 				map.erase(it);
-
-				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
-
-				if (_profile->getRights().find(make_pair(_right, _parameter)) == _profile->getRights().end())
-					throw ActionException("Specified right not found");
 			}
 			catch (Profile::RegistryKeyException e)
 			{
 				throw ActionException("Profile not found");
+			}
+			catch(...)
+			{
+				throw ActionException("Specified right not found");
 			}
 		}
 
@@ -79,7 +83,7 @@ namespace synthese
 		{
 			if (_profile != NULL)
 			{
-				_profile->removeRight(_right, _parameter);
+				_profile->removeRight(_right->getFactoryKey(), _right->getParameter());
 				ProfileTableSync::save(_profile);
 			}
 		}

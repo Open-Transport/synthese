@@ -41,7 +41,7 @@ namespace synthese
 
 		std::string DBLogRight::displayParameter() const
 		{
-			return string();
+			return _parameter;
 		}
 
 		std::map<std::string, std::string> DBLogRight::getParametersLabels() const

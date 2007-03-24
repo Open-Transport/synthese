@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_UpdateRightAction_H__
 #define SYNTHESE_UpdateRightAction_H__
 
+#include "12_security/Right.h"
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -31,17 +33,22 @@ namespace synthese
 	{
 		class Profile;
 
-		/** UpdateRightAction action class.
+		/** Right update action class.
 			@ingroup m12
 		*/
 		class UpdateRightAction : public server::Action
 		{
 		public:
-			static const std::string PARAMETER_RIGHT;
+			static const std::string PARAMETER_RIGHT_CODE;
+			static const std::string PARAMETER_RIGHT_PARAMETER;
+			static const std::string PARAMETER_PUBLIC_VALUE;
+			static const std::string PARAMETER_PRIVATE_VALUE;
 
 		private:
-			Profile*	_profile;
-			std::string	_right;
+			Profile*		_profile;
+			Right*			_right;
+			Right::Level	_publicLevel;
+			Right::Level	_privateLevel;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

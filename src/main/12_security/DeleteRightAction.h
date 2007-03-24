@@ -32,6 +32,7 @@ namespace synthese
 	namespace security
 	{
 		class Profile;
+		class Right;
 
 		/** DeleteRightAction action class.
 			@ingroup m12
@@ -44,9 +45,8 @@ namespace synthese
 
 		private:
 			Profile*	_profile;
-			std::string _right;
-			std::string	_parameter;
-
+			Right*		_right;
+			
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/

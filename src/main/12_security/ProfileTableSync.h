@@ -75,6 +75,12 @@ namespace synthese
 				, std::string right=""
 				, int first = 0, int number = -1);
 
+			/** Profile search by parent.
+			*/
+			static std::vector<Profile*> search(
+				Profile* parent
+				, int first = 0, int number = -1);
+
 		protected:
 
 			/** Action to do on user creation.

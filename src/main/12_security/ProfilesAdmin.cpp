@@ -103,7 +103,7 @@ namespace synthese
 
 			AdminRequest* deleteProfileRequest = Factory<Request>::create<AdminRequest>();
 			deleteProfileRequest->copy(request);
-			deleteProfileRequest->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			deleteProfileRequest->setPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
 			deleteProfileRequest->setAction(Factory<Action>::create<DeleteProfileAction>());
 
 			AdminRequest* addProfileRequest = Factory<Request>::create<AdminRequest>();
@@ -156,12 +156,12 @@ namespace synthese
 					<< t.col()
 					<< Html::getLinkButton(profileRequest->getURL(), "Modifier")
 					<< "&nbsp;"
-					<< Html::getLinkButton(deleteProfileRequest->getURL(), "Supprimer");
+					<< Html::getLinkButton(deleteProfileRequest->getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?");
 			}
 
 			stream << t.row();
 			stream << t.col() << Html::getTextInput(AddProfileAction::PARAMETER_NAME, "", "Entrez le nom du profil ici");
-			stream << t.col() << "(sélectionner un profil existant pour copier ses habilitations dans le nouveau profil)";
+			stream << t.col() << "(sélectionner un profil existant duquel héritera le nouveau profil)";
 			stream << t.col()
 				<< Html::getHiddenInput(AddProfileAction::PARAMETER_TEMPLATE_ID, Conversion::ToString(UNKNOWN_VALUE))
 				<< Html::getSubmitButton("Ajouter");

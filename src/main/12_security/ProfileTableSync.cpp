@@ -171,6 +171,39 @@ namespace synthese
 			}
 		}
 
+		std::vector<Profile*> ProfileTableSync::search( Profile* parent , int first /*= 0*/, int number /*= -1*/ )
+		{
+			if (parent == NULL)
+				throw DBEmptyResultException("Null parent");
+
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME					
+				<< " WHERE " << TABLE_COL_PARENT_ID << "=" << Conversion::ToString(parent->getKey());
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<Profile*> profiles;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					Profile* profile = new Profile;
+					load(profile, result, i);
+					profiles.push_back(profile);
+				}
+				return profiles;
+			}
+			catch(SQLiteException& e)
+			{
+				throw UserTableSyncException(e.getMessage());
+			}
+		}
 		std::string ProfileTableSync::getRightsString( const Profile* p)
 		{
 			stringstream s;
