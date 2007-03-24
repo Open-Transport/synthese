@@ -181,9 +181,8 @@ namespace synthese
 			try
 			{
 				Request::ParametersMap::const_iterator it = map.find(AdminRequest::PARAMETER_OBJECT_ID);
-				if (it == map.end())
-					throw AdminParametersException("Profile not specified");
-				_profile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
+				if (it != map.end())
+					_profile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
 			}
 			catch (Profile::RegistryKeyException e)
 			{
