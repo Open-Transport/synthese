@@ -78,26 +78,28 @@ namespace synthese
 				// Page
 				ParametersMap::const_iterator it;
 
-				it = map.find(PARAMETER_PAGE);
+				if (_actionException)
+				{	// Prepare the KO page
+					it = map.find(PARAMETER_ACTION_FAILED_PAGE);
+					if (it == map.end())
+						it = map.find(PARAMETER_PAGE);
+				}
+				else
+				{	// Prepare the OK page
+
+					// Saving of the action failed page for url output purposes
+					it = map.find(PARAMETER_ACTION_FAILED_PAGE);
+					if (it != map.end())
+						_actionFailedPage = Factory<AdminInterfaceElement>::create(it->second);
+
+					it = map.find(PARAMETER_PAGE);
+				}
 				AdminInterfaceElement* page = (it == map.end())
 					? Factory<AdminInterfaceElement>::create<HomeAdmin>()
 					: Factory<AdminInterfaceElement>::create(it->second);
 				page->setFromParametersMap(map);
 				_page = page;
-
-				// Action failed page
-				it = map.find(PARAMETER_ACTION_FAILED_PAGE);
-				if (it == map.end())
-				{
-					_actionFailedPage = _page;
-				}
-				else
-				{
-					AdminInterfaceElement* page = Factory<AdminInterfaceElement>::create(it->second);
-					page->setFromParametersMap(map);
-					_actionFailedPage = page;
-				}
-
+				
 				// Parameters saving
 				_parameters = map;
 			}
@@ -118,7 +120,7 @@ namespace synthese
 				if (_interface != NULL)
 				{
 					const AdminInterfacePage* const aip = _interface->getPage<AdminInterfacePage>();
-					aip->display(stream, _actionException ? _actionFailedPage : _page, _object_id, this);
+					aip->display(stream, _page, _object_id, this);
 				}
 				else
 				{
