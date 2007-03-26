@@ -115,7 +115,7 @@ namespace synthese
 		{
 		}
 
-		std::vector<TextTemplate*> TextTemplateTableSync::search(AlarmLevel level, int first /*= 0*/, int number /*= 0*/ )
+		std::vector<TextTemplate*> TextTemplateTableSync::search(AlarmLevel level, string name, int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -125,6 +125,8 @@ namespace synthese
 				<< " WHERE " 
 				<< COL_LEVEL << "=" << Conversion::ToString((int) level)
 				;
+			if (!name.empty())
+				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

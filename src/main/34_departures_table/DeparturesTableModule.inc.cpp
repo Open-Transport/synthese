@@ -41,4 +41,5 @@
 #include "34_departures_table/DisplayScreenRemoveDisplayedPlaceAction.h"
 #include "34_departures_table/DisplayScreenRemoveForbiddenPlaceAction.h"
 #include "34_departures_table/UpdateDisplayMaintenanceAction.h"
-
+#include "34_departures_table/DisplayScreenHasAlarmValueInterfaceElement.h"
+#include "34_departures_table/DisplayScreenAlarmContentValueInterfaceElement.h"

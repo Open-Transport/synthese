@@ -65,6 +65,13 @@ namespace synthese
 			if (it == map.end())
 				throw ActionException("Name not specified");
 			_name = it->second;
+			map.erase(it);
+
+			// Name unicity
+			vector<Profile*> existingProfiles = ProfileTableSync::search(_name,"",0,1);
+			if (!existingProfiles.empty())
+				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
+
 		}
 
 		void UpdateProfileAction::run()

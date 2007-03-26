@@ -27,6 +27,8 @@
 
 #include "01_util/ModuleClass.h"
 
+#include "13_dblog/DBLogEntry.h"
+
 namespace synthese
 {
 	namespace dblog
@@ -34,7 +36,8 @@ namespace synthese
 		class DBLogModule : public util::ModuleClass
 		{
 		public:
-			static std::map<int, std::string> getEntryLevelLabels(bool withAll=false);
+			static std::map<int, std::string>	getEntryLevelLabels(bool withAll=false);
+			static std::string					getEntryLevelLabel(const DBLogEntry::Level& level);
 		};
 	}
 }

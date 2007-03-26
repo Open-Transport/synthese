@@ -122,7 +122,7 @@ namespace synthese
 
 			//! \name Setters
 			//@{
-				void setObjectId(uid id);
+				virtual void setObjectId(uid id);
 				void setAction(Action* action);
 				void setSession(Session* session);
 			//@}

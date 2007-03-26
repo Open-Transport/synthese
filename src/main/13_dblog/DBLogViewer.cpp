@@ -25,13 +25,18 @@
 #include "01_util/Html.h"
 #include "01_util/Constants.h"
 
+#include "11_interfaces/InterfaceModule.h"
+
 #include "12_security/SecurityModule.h"
+#include "12_security/User.h"
 
 #include "13_dblog/DBLog.h"
 #include "13_dblog/DBLogViewer.h"
 #include "13_dblog/DBLogModule.h"
 
 #include "32_admin/AdminParametersException.h"
+#include "32_admin/AdminModule.h"
+#include "32_admin/ResultHTMLTable.h"
 
 using namespace std;
 
@@ -90,8 +95,9 @@ namespace synthese
 			searchRequest->copy(request);
 			searchRequest->setPage(Factory<AdminInterfaceElement>::create<DBLogViewer>());
 
+			stream << "<h1>Recherche d'entrées</h1>";
+
 			stream
-				<< "<h1>Recherche d'entrées</h1>"
 				<< searchRequest->getHTMLFormHeader("search")
 				<< Html::getHiddenInput(PARAMETER_LOG_KEY, _logKey)
 				<< "<table>"
@@ -103,35 +109,36 @@ namespace synthese
 				<< "<td coslpan=\"2\">" << Html::getSubmitButton("Rechercher") << "</td></tr>"
 				<< "</table></form>"
 
-				<< "<h1>Résultat de la recherche</h1>"
-				<< "<table>"
-				<< "<tr><th rowspan=\"2\">Type</th><th rowspan=\"2\">Date</th><th rowspan=\"2\">Utilisateur</th><th colspan=\"" << 2 /* number of columns of the log */ << "\">Entrée</th></tr>"
-				<< "<tr>";
+				<< "<h1>Résultat de la recherche</h1>";
 
-			// Columns loop
-			{
-				stream << "<th></th>";	// Column name
-			}
-			stream << "</tr>";
-			
-			// Entries Loop
-			{
-				stream
-					<< "<tr><td>Info</td>"
-					<< "<td>21/10/2006 13:30</td>"
-					<< "<td>Administrateur</td>";
+			ResultHTMLTable::HeaderVector v;
+			v.push_back(make_pair(PARAMETER_SEARCH_TYPE, "Type"));
+			v.push_back(make_pair(string(), "Date"));
+			v.push_back(make_pair(PARAMETER_SEARCH_USER, "Utilisateur"));
+			DBLog::ColumnsVector customCols = _dbLog->getColumnNames();
+			for (DBLog::ColumnsVector::const_iterator it = customCols.begin(); it != customCols.end(); ++it)
+				v.push_back(make_pair(string(), *it));
 
-				// Columns content loop
-				{
-					stream
-						<< "<td>Création</td>";
-				}
-				stream << "</tr>";
+			ResultHTMLTable t(v, searchRequest, string(), true, NULL, string(), InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+
+			stream << t.open();
+			
+			for (vector<DBLogEntry*>::const_iterator it = _result.begin(); it != _result.end(); ++it)
+			{
+				DBLogEntry* dbe = *it;
+				stream << t.row();
+				stream << t.col() << DBLogModule::getEntryLevelLabel(dbe->getLevel());
+				stream << t.col() << dbe->getDate().toString();
+				stream << t.col() << dbe->getUser() ? dbe->getUser()->getLogin() : "";
+
+				DBLog::ColumnsVector cols = _dbLog->parse(dbe->getContent());
+				for (DBLog::ColumnsVector::const_iterator it = cols.begin(); it != cols.end(); ++it)
+					stream << t.col() << *it;
+				
+				delete dbe;
 			}
 			
-			stream
-				<< "</table>"
-				<< "<p align=\"right\">Entrées&nbsp;suivantes &gt;</p>";
+			stream << t.close();
 		}
 	}
 }

@@ -62,8 +62,8 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<TextTemplate*> search(
-				AlarmLevel level
-				, int first = 0, int number = 0);
+				AlarmLevel level, std::string name=""
+				, int first = 0, int number = -1);
 
 
 		protected:

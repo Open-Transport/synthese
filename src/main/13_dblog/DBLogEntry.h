@@ -50,24 +50,24 @@ namespace synthese
 			typedef std::vector<std::string>											Content;
 
 		private:
-			std::string		_logKey;
-			time::DateTime	_date;
-			security::User*	_user;
-			Content			_content;
-			Level			_level;
+			std::string				_logKey;
+			time::DateTime			_date;
+			const security::User*	_user;
+			Content					_content;
+			Level					_level;
 
 		public:
 			DBLogEntry();
-			void				setLogKey(const std::string& key);
-			void				setDate(const time::DateTime& date);
-			void				setUser(security::User* user);
-			void				setContent(const Content& content);
-			void				setLevel(Level level);
-			const std::string&	getLogKey()		const;
-			time::DateTime		getDate()		const;
-			security::User*		getUser()		const;
-			const Content&		getContent()	const;
-			Level				getLevel()		const;
+			void					setLogKey(const std::string& key);
+			void					setDate(const time::DateTime& date);
+			void					setUser(const security::User* user);
+			void					setContent(const Content& content);
+			void					setLevel(Level level);
+			const std::string&		getLogKey()		const;
+			time::DateTime			getDate()		const;
+			const security::User*	getUser()		const;
+			const Content&			getContent()	const;
+			Level					getLevel()		const;
 		};
 	}
 }

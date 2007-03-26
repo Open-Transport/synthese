@@ -34,9 +34,9 @@ namespace synthese
 
 		}
 
-		DBLog::ColumnsNameVector MessagesLibraryLog::getColumnNames() const
+		DBLog::ColumnsVector MessagesLibraryLog::getColumnNames() const
 		{
-			DBLog::ColumnsNameVector v;
+			DBLog::ColumnsVector v;
 			v.push_back("Action");
 			v.push_back("Texte");
 			return v;

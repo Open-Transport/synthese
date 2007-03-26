@@ -57,10 +57,13 @@ namespace synthese
 				it = map.find(AdminRequest::PARAMETER_OBJECT_ID);
 				if (it == map.end())
 					throw AdminParametersException("Scenario not specified");
-				_scenario = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
+				if (Conversion::ToLongLong(it->second) != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				{
+					_scenario = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
 
-				if (!_scenario->getIsATemplate())
-					setSuperior("messages");
+					if (!_scenario->getIsATemplate())
+						setSuperior("messages");
+				}
 			}
 			catch (Scenario::RegistryKeyException e)
 			{

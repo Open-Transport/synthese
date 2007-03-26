@@ -124,6 +124,9 @@ namespace synthese
 			static const std::string VINCI_ACCOUNTING_PROFILE_RIGHTS;
 			static const std::string VINCI_ACCOUNTING_USER;
 
+			static const std::string VINCI_ADMIN_PROFILE;
+			static const std::string VINCI_OPERATOR_PROFILE;
+
 			static const std::string VINCI_CURRENCY_EURO_NAME;
 			static const std::string VINCI_CURRENCY_EURO;
 			static const std::string VINCI_CURRENCY_BIKE_NAME;

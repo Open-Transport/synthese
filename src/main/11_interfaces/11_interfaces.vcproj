@@ -135,6 +135,12 @@
 			Name="ValueInterfaceElement"
 			Filter="">
 			<File
+				RelativePath=".\EqualsValueInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\EqualsValueInterfaceElement.h">
+			</File>
+			<File
 				RelativePath=".\FormattedNumberInterfaceElement.cpp">
 			</File>
 			<File

@@ -28,6 +28,9 @@
 #include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/CityTableSync.h"
 #include "15_env/PhysicalStopTableSync.h"
+#include "15_env/CommercialLineTableSync.h"
+#include "15_env/LineStopTableSync.h"
+#include "15_env/LineTableSync.h"
 #include "15_env/EnvModule.h"
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
@@ -163,6 +166,40 @@ namespace synthese
 						: NULL;
 					object.bp = BroadcastPointTableSync::get(Conversion::ToLongLong(result.getColumn(i, "bid")));
 					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
+
+		std::vector<const CommercialLine*> getCommercialLineWithBroadcastPoints( int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
+		{
+			stringstream query;
+			query << " SELECT "
+				<< "c." << TABLE_COL_ID << " AS " << TABLE_COL_ID
+				<< " FROM " << CommercialLineTableSync::TABLE_NAME << " AS c "
+				<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS l ON l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=c." << TABLE_COL_ID
+				<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS s ON s." << LineStopTableSync::COL_LINEID << "=l." << TABLE_COL_ID
+				<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineStopTableSync::COL_PHYSICALSTOPID
+				<< " INNER JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=p." << PhysicalStopTableSync::COL_PLACEID
+				<< " GROUP BY c." << TABLE_COL_ID
+				<< " ORDER BY c." << CommercialLineTableSync::COL_SHORT_NAME;
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<const CommercialLine*> objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					objects.push_back(EnvModule::getCommercialLines().get(Conversion::ToLongLong(result.getColumn(i, TABLE_COL_ID))));
 				}
 				return objects;
 			}

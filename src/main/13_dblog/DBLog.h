@@ -60,11 +60,10 @@ namespace synthese
 		class DBLog : public util::Factorable
 		{
 		public:
-			typedef std::vector<std::string> ColumnsNameVector;
+			typedef std::vector<std::string> ColumnsVector;
 			
-
 		protected:
-			void	write(DBLogEntry::Level level, const DBLogEntry::Content& content, security::User* user = NULL);
+			void addEntry(DBLogEntry::Level level, const DBLogEntry::Content& content, const security::User* user = NULL);
 
 		private:
 			const std::string _name;
@@ -74,7 +73,9 @@ namespace synthese
 
 			//static std::string getModuleName() = 0;
 			const std::string& getName() const;
-			virtual ColumnsNameVector getColumnNames() const = 0;
+			
+			virtual ColumnsVector getColumnNames() const = 0;
+			virtual ColumnsVector parse(const DBLogEntry::Content& cols) const;
 		};
 	}
 }

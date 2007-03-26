@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace admin
+	{
+		class AdminRequest;
+	}
+
 	namespace departurestable
 	{
 		class DisplayScreen;
@@ -107,7 +112,7 @@ namespace synthese
 		*/
 		class DisplaySearchAdmin : public admin::AdminInterfaceElement
 		{
-			std::string _searchUId;
+			uid			_searchUId;
 			uid			_searchLocalizationUId;
 			uid			_searchLineId;
 			uid			_searchTypeId;
@@ -140,6 +145,8 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
+
+			static std::string DisplaySearchAdmin::getHtmlSearchForm(admin::AdminRequest* request, uid screenUid, uid placeUid, uid lineUid, uid typeUid, int state, int message );
 		};
 	}
 }

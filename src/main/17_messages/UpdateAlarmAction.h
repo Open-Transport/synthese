@@ -46,12 +46,14 @@ namespace synthese
 			static const std::string PARAMETER_START_HOUR;
 			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_END_HOUR;
+			static const std::string PARAMETER_ENABLED;
 
 		private:
 			AlarmLevel		_type;
 			time::DateTime	_startDate;
 			time::DateTime	_endDate;
 			Alarm*			_alarm;
+			bool			_enabled;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

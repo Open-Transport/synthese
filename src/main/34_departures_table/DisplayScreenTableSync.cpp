@@ -325,7 +325,7 @@ namespace synthese
 		}
 
 		std::vector<DisplayScreen*> DisplayScreenTableSync::search(
-			std::string duid
+			uid duid
 			, uid localizationid
 			, uid lineid
 			, uid typeuid
@@ -340,7 +340,7 @@ namespace synthese
 				<< " FROM " << TABLE_NAME << " AS d"
 				<< " LEFT JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID
 				<< " WHERE " 
-				<< "d." << TABLE_COL_ID << " LIKE '%" << Conversion::ToSQLiteString(duid, false) << "%'";
+				<< "d." << TABLE_COL_ID << " LIKE '%" << (duid ? Conversion::ToString(duid) : "") << "%'";
 			if (localizationid > 0)
 				query << " AND b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=" << localizationid;
 			if (typeuid > 0)

@@ -79,7 +79,7 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(object->getLongMessage())
 				<< "," << object->getPeriodStart().toSQLString()
 				<< "," << object->getPeriodEnd().toSQLString()
-				<< "," << Conversion::ToString(object->getScenario()->getKey())
+				<< "," << (object->getScenario() ? Conversion::ToString(object->getScenario()->getKey()) : "0")
 				<< ")";
 			
 			sqlite->execUpdate(query.str());
@@ -131,13 +131,14 @@ namespace synthese
 				if (MessagesModule::getAlarms ().contains (id))
 				{
 					alarm = MessagesModule::getAlarms().get(id);
+					load(alarm, rows, rowIndex);
 				}
 				else
 				{
 					alarm = new Alarm;
+					load(alarm, rows, rowIndex);
 					MessagesModule::getAlarms().add (alarm);
 				}
-				load(alarm, rows, rowIndex);
 				if (alarm->getScenario())
 					alarm->getScenario()->addAlarm(alarm);
 			}
@@ -172,7 +173,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<Alarm*> AlarmTableSync::search(time::DateTime startDate, time::DateTime endDate , env::ConnectionPlace* place, env::CommercialLine* line , int first /*= 0*/, int number /*= 0*/)
+		std::vector<Alarm*> AlarmTableSync::search(time::DateTime startDate, time::DateTime endDate, int first /*= 0*/, int number /*= 0*/)
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;

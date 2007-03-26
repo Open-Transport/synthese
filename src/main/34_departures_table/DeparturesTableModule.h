@@ -76,6 +76,7 @@ namespace synthese
 			static std::map<uid, std::string>	getDisplayTypeLabels(bool withAll = false);
 			static std::map<uid, std::string>	getPlacesWithBroadcastPointsLabels(bool withAll = false);
 			static std::map<uid, std::string>	getBroadcastPointLabels(const env::ConnectionPlace* place, bool withAll = false);
+			static std::map<uid, std::string>	getCommercialLineWithBroadcastLabels(bool withAll = false);
 		};
 	}
 }

@@ -34,6 +34,7 @@ namespace synthese
 	{
 		class ConnectionPlace;
 		class PhysicalStop;
+		class CommercialLine;
 	}
 
 	namespace departurestable
@@ -61,6 +62,10 @@ namespace synthese
 		*/
 		std::vector<PhysicalStopAndBroadcastPoint> getConnectionPlaceBroadcastPointsAndPhysicalStops(uid placeId, boost::logic::tribool withPhysical=boost::logic::indeterminate , int number=UNKNOWN_VALUE, int first=0);
 
+		/** Line searcher.
+			@result map founded searched physical stops from the live data objects with the corresponding broadcast point if exists (NULL else) The broadcast points are temporary object and must be deleted after use. 
+		*/
+		std::vector<const env::CommercialLine*> getCommercialLineWithBroadcastPoints(int number=UNKNOWN_VALUE, int first=0);
 	}
 }
 

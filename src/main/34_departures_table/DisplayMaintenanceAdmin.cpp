@@ -81,7 +81,7 @@ namespace synthese
 				<< "<table>"
 				<< "<tr><td>Nombre de contrôles par jour</td><td>" << Html::getSelectNumberInput(UpdateDisplayMaintenanceAction::PARAMETER_CONTROLS, 0, 1440, _displayScreen->getMaintenananceChecksPerDay(), 10) << "</td></tr>"
 				<< "<tr><td>Afficheur déclaré en service</td><td>" << Html::getOuiNonRadioInput(UpdateDisplayMaintenanceAction::PARAMETER_ONLINE, _displayScreen->getIsOnline()) << "</td></tr>"
-				<< "<tr><td>Message de maintenance</td><td>" << Html::getTextAreaInput(UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE, _displayScreen->getMaintenanceMessage(), 30, 3) << "</td></tr>"
+				<< "<tr><td>Message de maintenance</td><td>" << Html::getTextAreaInput(UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE, _displayScreen->getMaintenanceMessage(), 3, 30) << "</td></tr>"
 				<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregistrer les modifications") << "</td></tr>"
 				<< "</table></form>"
 

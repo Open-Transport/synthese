@@ -20,17 +20,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "04_time/TimeParseException.h"
+#include "04_time/DateTime.h"
+
 #include "30_server/ActionException.h"
 
 #include "17_messages/UpdateAlarmAction.h"
 #include "17_messages/Alarm.h"
 #include "17_messages/AlarmTableSync.h"
+#include "17_messages/MessagesModule.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace time;
 	
 	namespace messages
 	{
@@ -39,7 +44,8 @@ namespace synthese
 		const string UpdateAlarmAction::PARAMETER_START_HOUR = Action_PARAMETER_PREFIX + "sho";
 		const string UpdateAlarmAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "eda";
 		const string UpdateAlarmAction::PARAMETER_END_HOUR = Action_PARAMETER_PREFIX + "eho";
-		
+		const string UpdateAlarmAction::PARAMETER_ENABLED = Action_PARAMETER_PREFIX + "ena";
+
 
 		Request::ParametersMap UpdateAlarmAction::getParametersMap() const
 		{
@@ -50,22 +56,77 @@ namespace synthese
 
 		void UpdateAlarmAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			try
+			{
+				Request::ParametersMap::iterator it;
 
-			it = map.find(PARAMETER_TYPE);
-			if (it == map.end())
-				throw ActionException("Type not specified");
-			
-			// _xxx = it->second;
-			// map.erase(it);
-			// if (_xxx <= 0)
-			//	throw ActionException("Bad value for xxx parameter ");	
-			// 
+				_alarm = MessagesModule::getAlarms().get(_request->getObjectId());
+
+				it = map.find(PARAMETER_TYPE);
+				if (it == map.end())
+					throw ActionException("Type not specified");
+				_type = (AlarmLevel) Conversion::ToInt(it->second);
+
+				string date;
+				it = map.find(PARAMETER_START_DATE);
+				if (it == map.end())
+					throw ActionException("Start date not specified");
+				if (!it->second.empty())
+				{
+					date = it->second;
+					map.erase(it);
+
+					it = map.find(PARAMETER_START_HOUR);
+					if (it == map.end())
+						throw ActionException("Start hour not specified");
+					_startDate = it->second.empty()
+						? DateTime::FromString(date + " 0:0")
+						: DateTime::FromString(date + " " + it->second);
+				}
+				map.erase(it);
+
+				it = map.find(PARAMETER_END_DATE);
+				if (it == map.end())
+					throw ActionException("End date not specified");
+				if (!it->second.empty())
+				{
+					date = it->second;
+					map.erase(it);
+
+					it = map.find(PARAMETER_END_HOUR);
+					if (it == map.end())
+						throw ActionException("End hour not specified");
+					_endDate = it->second.empty()
+						? DateTime::FromString(date + " 23:59")
+						: DateTime::FromString(date + " " + it->second);
+				}
+				map.erase(it);
+
+				// Enabled status
+				it = map.find(PARAMETER_ENABLED);
+				if (it == map.end())
+					throw ActionException("Enabled status not specified");
+				_enabled = Conversion::ToBool(it->second);
+				map.erase(it);
+			}
+			catch (Alarm::RegistryKeyException e)
+			{
+				throw ActionException("Specified alarm not found");
+			}
+			catch(TimeParseException e)
+			{
+				throw ActionException("Une date ou une heure est mal formée");
+			}
+			catch(...)
+			{
+				throw ActionException("Unknown error");
+			}
 		}
 
 		UpdateAlarmAction::UpdateAlarmAction()
 			: Action()
 			, _alarm(NULL)
+			, _startDate(TIME_UNKNOWN), _endDate(TIME_UNKNOWN)
 		{}
 
 		void UpdateAlarmAction::run()
@@ -73,6 +134,7 @@ namespace synthese
 			_alarm->setLevel(_type);
 			_alarm->setPeriodStart(_startDate);
 			_alarm->setPeriodEnd(_endDate);
+			_alarm->setIsEnabled(_enabled);
 			AlarmTableSync::save(_alarm);
 		}
 	}

@@ -1,6 +1,6 @@
 
-/** DisplayScreenSupervisionInitRequest class header.
-	@file DisplayScreenSupervisionInitRequest.h
+/** AlarmStopAction class header.
+	@file AlarmStopAction.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,49 +20,48 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_DisplayScreenSupervisionInitRequest_H__
-#define SYNTHESE_DisplayScreenSupervisionInitRequest_H__
+#ifndef SYNTHESE_AlarmStopAction_H__
+#define SYNTHESE_AlarmStopAction_H__
 
-#include "30_server/Request.h"
+#include "30_server/Action.h"
 
 namespace synthese
 {
-	namespace departurestable
+	namespace messages
 	{
-		/** DisplayScreenSupervisionInitRequest class.
-			@ingroup m34
+		/** AlarmStopAction action class.
+			@ingroup m17
 		*/
-		class DisplayScreenSupervisionInitRequest : public server::Request
+		class AlarmStopAction : public server::Action
 		{
-			/// @todo request parameter names declaration
-			// eg : static const std::string PARAMETER_xxx;
-			
-			//! \name Page parameters
-			//@{
-				/// @todo Parsed parameters declaration
-				// eg : const void*	_object;
-				// eg : ParametersMap			_parameters;
-			//@}
+		public:
+			/// @todo Parameters list
+			// static const std::string PARAMETER_xxx;
 
+		private:
+			/// @todo Attributes list
 
+		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			Request::ParametersMap getParametersMap() const;
+			server::Request::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
+				Removes the used parameters from the map.
+				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
-			void setFromParametersMap(const Request::ParametersMap& map);
+			void setFromParametersMap(server::Request::ParametersMap& map);
 
 		public:
-			DisplayScreenSupervisionInitRequest();
-			~DisplayScreenSupervisionInitRequest();
-
-			/// @todo Getters/Setters for parsed parameters
+			/** Constructor.
+			*/
+			AlarmStopAction();
 
 			/** Action to run, defined by each subclass.
 			*/
-			void run(std::ostream& stream) const;
+			void run();
 		};
 	}
 }
-#endif // SYNTHESE_DisplayScreenSupervisionInitRequest_H__
+
+#endif // SYNTHESE_AlarmStopAction_H__

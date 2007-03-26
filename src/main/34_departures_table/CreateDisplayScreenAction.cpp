@@ -20,9 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "30_server/ActionException.h"
+
 #include "34_departures_table/CreateDisplayScreenAction.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/DisplayScreen.h"
+#include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
 
@@ -32,9 +35,12 @@ namespace synthese
 	
 	namespace departurestable
 	{
+		const std::string CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "pti";
+
 		Request::ParametersMap CreateDisplayScreenAction::getParametersMap() const
 		{
 			Request::ParametersMap map;
+			map.insert(make_pair(PARAMETER_TEMPLATE_ID, _template ? Conversion::ToString(_template->getKey()) : "0"));
 			return map;
 		}
 
@@ -42,13 +48,34 @@ namespace synthese
 		{
 			Request::ParametersMap::iterator it;
 
+			it = map.find(PARAMETER_TEMPLATE_ID);
+			if (it != map.end())
+			{
+				if (!DeparturesTableModule::getDisplayScreens().contains(Conversion::ToLongLong(it->second)))
+					throw ActionException("Specified template not found");
+				_template = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
+			}
+
 			map.insert(make_pair(Request::PARAMETER_OBJECT_ID, Conversion::ToString(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)));
 		}
 
 		void CreateDisplayScreenAction::run()
 		{
-			DisplayScreen* screen = DisplayScreenTableSync::createEmpty();
+			DisplayScreen* screen = new DisplayScreen;
+			if (_template)
+				screen->copy(_template);
+			DisplayScreenTableSync::save(screen);
+
 			_request->setObjectId(screen->getKey());
+
+			delete screen;
+		}
+
+		CreateDisplayScreenAction::CreateDisplayScreenAction()
+			: Action()
+			, _template(NULL)
+		{
+
 		}
 	}
 }

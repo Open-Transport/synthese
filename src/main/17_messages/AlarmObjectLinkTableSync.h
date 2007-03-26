@@ -30,6 +30,7 @@
 #include <sstream>
 
 #include "01_util/Conversion.h"
+#include "01_util/Registrable.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -49,7 +50,7 @@ namespace synthese
 		/**  table synchronizer.
 			@ingroup m17
 		*/
-		class AlarmObjectLinkTableSync : public db::SQLiteTableSyncTemplate<AlarmObjectLink<void> >
+		class AlarmObjectLinkTableSync : public db::SQLiteTableSyncTemplate<AlarmObjectLink<Registrable<uid, void> > >
 		{
 		public:
 			static const std::string COL_RECIPIENT_KEY;

@@ -22,7 +22,10 @@
 
 #include "30_server/ActionException.h"
 
-#include "UpdateAlarmMessagesAction.h"
+#include "17_messages/UpdateAlarmMessagesAction.h"
+#include "17_messages/MessagesModule.h"
+#include "17_messages/Alarm.h"
+#include "17_messages/AlarmTableSync.h"
 
 using namespace std;
 
@@ -47,24 +50,32 @@ namespace synthese
 		{
 			Request::ParametersMap::iterator it;
 
-			// it = map.find(PARAMETER_xxx);
-			// if (it == map.end())
-			//	throw ActionException("Parameter xxx not found");
-			//
-			// _xxx = it->second;
-			// map.erase(it);
-			// if (_xxx <= 0)
-			//	throw ActionException("Bad value for xxx parameter ");	
-			// 
+			if (!MessagesModule::getAlarms().contains(_request->getObjectId()))
+				throw ActionException("Specified alarm not found");
+			_alarm = MessagesModule::getAlarms().get(_request->getObjectId());
+			
+			it = map.find(PARAMETER_SHORT_MESSAGE);
+			if (it == map.end())
+				throw ActionException("Short message not specified");
+			_shortMessage = it->second;
+			map.erase(it);
+			
+			it = map.find(PARAMETER_LONG_MESSAGE);
+			if (it == map.end())
+				throw ActionException("Long message not specified");
+			_longMessage = it->second;
+			map.erase(it);
 		}
 
 		UpdateAlarmMessagesAction::UpdateAlarmMessagesAction()
 			: Action()
-			/// @todo Put here other parameters initialization
 		{}
 
 		void UpdateAlarmMessagesAction::run()
 		{
+			_alarm->setShortMessage(_shortMessage);
+			_alarm->setLongMessage(_longMessage);
+			AlarmTableSync::save(_alarm);
 		}
 	}
 }

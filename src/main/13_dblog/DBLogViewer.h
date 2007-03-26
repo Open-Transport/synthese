@@ -24,6 +24,7 @@
 #define SYNTHESE_DBLogViewer_H__
 
 #include <string>
+#include <vector>
 
 #include "32_admin/AdminInterfaceElement.h"
 
@@ -88,8 +89,10 @@ namespace synthese
 
 			//! \name Stored values
 			//@{
-			const DBLog*	_dbLog;
+				const DBLog*	_dbLog;
 			//@}
+
+				std::vector<DBLogEntry*>	_result;
 
 		public:
 			static const std::string PARAMETER_LOG_KEY;

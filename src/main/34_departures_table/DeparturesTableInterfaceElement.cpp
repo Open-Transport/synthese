@@ -44,10 +44,15 @@ namespace synthese
 
 	namespace departurestable
 	{
+		const string DeparturesTableInterfaceElement::VALUE_DESTINATION = "destination";
+		const string DeparturesTableInterfaceElement::VALUE_INTERMEDIATE = "intermediate";
+		const string DeparturesTableInterfaceElement::VALUE_NORMAL = "normal";
+
 		DeparturesTableInterfaceElement::DeparturesTableInterfaceElement()
 			: _multiplicateurRangeeVIE(NULL)
 			, _pageSeparator(NULL)
 			, _pagesVIE(NULL)
+			, _departuresToHide(NULL)
 		{
 
 		}
@@ -57,6 +62,7 @@ namespace synthese
 			delete _multiplicateurRangeeVIE;
 			delete _pageSeparator;
 			delete _pagesVIE;
+			delete _departuresToHide;
 		}
 
 		void DeparturesTableInterfaceElement::storeParameters( ValueElementList& vel )
@@ -67,6 +73,9 @@ namespace synthese
 			_multiplicateurRangeeVIE = vel.front();
 			_pagesVIE = vel.front();
 			_pageSeparator = vel.front();
+
+			if (!vel.isEmpty())
+				_departuresToHide = vel.front();
 		}
 
 		string DeparturesTableInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
@@ -76,13 +85,14 @@ namespace synthese
 			int __MultiplicateurRangee = _multiplicateurRangeeVIE->isZero(parameters, variables, object, request) ? 1 : Conversion::ToInt(_multiplicateurRangeeVIE->getValue(parameters, variables, object, request));
 			const std::string& __Pages = _pagesVIE->getValue(parameters, variables, object, request);
 			const std::string& __SeparateurPage = _pageSeparator->getValue(parameters, variables, object, request);
+			int departuresToHide = _departuresToHide ? Conversion::ToInt(_departuresToHide->getValue(parameters, variables, object, request)) : 0;
 
 			// Gestion des pages
 			int __NombrePages = 1;
-			if ( (__Pages == "intermediate" ) || 
-			(__Pages == "destination" ) )
+			if ((__Pages == VALUE_INTERMEDIATE) || (__Pages == VALUE_DESTINATION))
 			{
-				for (ArrivalDepartureList::const_iterator it = ptds->begin(); it != ptds->end(); ++it)
+				int departuresNumber = ptds->size() - departuresToHide;
+				for (ArrivalDepartureList::const_iterator it = ptds->begin(); departuresNumber && (it != ptds->end()); ++it, --departuresNumber)
 				{
 					const ActualDisplayedArrivalsList& displayedList = it->second;
 					if (displayedList.size () - 2 > __NombrePages )
@@ -90,7 +100,7 @@ namespace synthese
 				}
 			}
 
-			if (__Pages == "destination" )
+			if (__Pages == VALUE_DESTINATION)
 				__NombrePages++;
 
 			// Boucle sur les pages
@@ -102,11 +112,12 @@ namespace synthese
 
 				// Boucle sur les rangees
 				int __Rangee = __MultiplicateurRangee;
-				for (ArrivalDepartureList::const_iterator it = ptds->begin(); it != ptds->end(); ++it)
+				int departuresNumber = ptds->size() - departuresToHide;
+				for (ArrivalDepartureList::const_iterator it = ptds->begin(); departuresNumber && (it != ptds->end()); ++it, --departuresNumber)
 				{
 					const ArrivalDepartureRow& ___DP = *it;
 
-					int __NombrePagesRangee = ___DP.second.size () - 2 + ( __Pages == "destination" ? 1 : 0 );
+					int __NombrePagesRangee = ___DP.second.size () - 2 + ( __Pages == VALUE_DESTINATION ? 1 : 0 );
 					int pageNumber = ( !__NombrePagesRangee || __NumeroPage > __NombrePagesRangee * ( __NombrePages / __NombrePagesRangee ) )
 						? __NumeroPage
 						: (1 + __NumeroPage % __NombrePagesRangee);     // 1 : Numero de page

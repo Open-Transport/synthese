@@ -35,6 +35,7 @@ namespace synthese
 		class NewMessageAction : public server::Action
 		{
 		public:
+			static const std::string PARAMETER_TEMPLATE_ID;
 
 		private:
 
@@ -62,4 +63,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_NewMessageAction_H__
- 

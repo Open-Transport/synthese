@@ -34,14 +34,19 @@ namespace synthese
 	
 	namespace messages
 	{
-		/// @todo Parameters constants definition
-		// const string TextTemplateAddAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
+		const string TextTemplateAddAction::PARAMETER_LONG_MESSAGE = Action_PARAMETER_PREFIX + "lm";
+		const string TextTemplateAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string TextTemplateAddAction::PARAMETER_SHORT_MESSAGE = Action_PARAMETER_PREFIX + "sm";
+		const string TextTemplateAddAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
 
 
 		Request::ParametersMap TextTemplateAddAction::getParametersMap() const
 		{
 			Request::ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			map.insert(make_pair(PARAMETER_LONG_MESSAGE, _longMessage));
+			map.insert(make_pair(PARAMETER_NAME, _name));
+			map.insert(make_pair(PARAMETER_SHORT_MESSAGE, _shortMessage));
+			map.insert(make_pair(PARAMETER_TYPE, Conversion::ToString((int) _level)));
 			return map;
 		}
 
@@ -49,15 +54,39 @@ namespace synthese
 		{
 			Request::ParametersMap::iterator it;
 
-			// it = map.find(PARAMETER_xxx);
-			// if (it == map.end())
-			//	throw ActionException("Parameter xxx not found");
-			//
-			// _xxx = it->second;
-			// map.erase(it);
-			// if (_xxx <= 0)
-			//	throw ActionException("Bad value for xxx parameter ");	
-			// 
+			it = map.find(PARAMETER_NAME);
+			if (it == map.end())
+				throw ActionException("Name not found");
+			_name = it->second;
+			map.erase(it);
+
+			it = map.find(PARAMETER_TYPE);
+			if (it == map.end())
+				throw ActionException("Level not found");
+			_level = (AlarmLevel) Conversion::ToInt(it->second);
+			map.erase(it);
+			if (_level == ALARM_LEVEL_UNKNOWN)
+				throw ActionException("Bad value for level");
+			
+			vector<TextTemplate*> v = TextTemplateTableSync::search(_level, _name, 0, 1);
+			if (!v.empty())
+			{
+				delete v.front();
+				throw ActionException("Un texte portant ce nom existe déjà.");
+			}
+
+			it = map.find(PARAMETER_LONG_MESSAGE);
+			if (it == map.end())
+				throw ActionException("Long message not found");
+			_longMessage = it->second;
+			 map.erase(it);
+			
+			 it = map.find(PARAMETER_SHORT_MESSAGE);
+			 if (it == map.end())
+				 throw ActionException("Short message not found");
+			 _shortMessage = it->second;
+			 map.erase(it);
+
 		}
 
 		TextTemplateAddAction::TextTemplateAddAction()
@@ -72,6 +101,7 @@ namespace synthese
 			tt->setShortMessage(_shortMessage);
 			tt->setName(_name);
 			TextTemplateTableSync::save(tt);
+			delete tt;
 		}
 	}
 }

@@ -91,7 +91,6 @@ namespace synthese
 			/** The returned alarms must be deleted */
 			static std::vector<Alarm*> search(
 				time::DateTime startDate, time::DateTime endDate
-				, env::ConnectionPlace*	place, env::CommercialLine* line
 				, int first = 0, int number = 0);
 
 

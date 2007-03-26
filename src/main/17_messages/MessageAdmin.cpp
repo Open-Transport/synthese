@@ -28,6 +28,9 @@
 #include "17_messages/AlarmRecipient.h"
 #include "17_messages/UpdateAlarmAction.h"
 #include "17_messages/UpdateAlarmMessagesFromTemplateAction.h"
+#include "17_messages/UpdateAlarmMessagesAction.h"
+#include "17_messages/AlarmAddLinkAction.h"
+#include "17_messages/AlarmRemoveLinkAction.h"
 
 #include "32_admin/AdminParametersException.h"
 
@@ -74,55 +77,87 @@ namespace synthese
 			updateRequest->setAction(Factory<Action>::create<UpdateAlarmAction>());
 			updateRequest->setObjectId(request->getObjectId());
 
-			AdminRequest* templateRequest = Factory<Request>::create<AdminRequest>();
-			templateRequest->copy(request);
-			templateRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
-			templateRequest->setAction(Factory<Action>::create<UpdateAlarmMessagesFromTemplateAction>());
-			templateRequest->setObjectId(request->getObjectId());
-
-
-			// Alarm level map
-			map<int, string> lmap;
-			lmap.insert(make_pair((int) ALARM_LEVEL_WARNING, "Complémentaire"));
-			lmap.insert(make_pair((int) ALARM_LEVEL_ERROR, "Prioritaire"));
-
-			// Templates map
-			map<int, string> tmap;
-
 			stream
 				<< "<h1>Paramètres</h1>"
 				<< updateRequest->getHTMLFormHeader("update")
 				<< "<table>"
-				<< "<tr><td>Type</td><td>" << Html::getRadioInput(UpdateAlarmAction::PARAMETER_TYPE, lmap, (int) _alarm->getLevel()) << "</td></tr>"
-				<< "<tr><td>Début diffusion</td><td>Date " << Html::getTextInput(UpdateAlarmAction::PARAMETER_START_DATE, _alarm->getPeriodStart().getDate().toSQLString(false)) 
-				<< " Heure " << Html::getTextInput(UpdateAlarmAction::PARAMETER_START_HOUR, _alarm->getPeriodStart().getHour().toSQLString(false)) << "</td></tr>"
-				<< "<tr><td>Fin diffusion</td><td>Date " << Html::getTextInput(UpdateAlarmAction::PARAMETER_END_DATE, _alarm->getPeriodStart().getDate().toSQLString(false)) 
-				<< " Heure " << Html::getTextInput(UpdateAlarmAction::PARAMETER_END_HOUR, _alarm->getPeriodStart().getHour().toSQLString(false)) << "</td></tr>"
+				<< "<tr><td>Type</td><td>" << Html::getRadioInput(UpdateAlarmAction::PARAMETER_TYPE, MessagesModule::getLevelLabels(), _alarm->getLevel()) << "</td></tr>"
+				<< "<tr><td>Début diffusion</td><td>Date " << Html::getTextInput(UpdateAlarmAction::PARAMETER_START_DATE, _alarm->getPeriodStart().getDate().toString()) 
+				<< " Heure " << Html::getTextInput(UpdateAlarmAction::PARAMETER_START_HOUR, _alarm->getPeriodStart().getHour().toString()) << "</td></tr>"
+				<< "<tr><td>Fin diffusion</td><td>Date " << Html::getTextInput(UpdateAlarmAction::PARAMETER_END_DATE, _alarm->getPeriodEnd().getDate().toString()) 
+				<< " Heure " << Html::getTextInput(UpdateAlarmAction::PARAMETER_END_HOUR, _alarm->getPeriodEnd().getHour().toString()) << "</td></tr>"
+				<< "<tr><td>Actif</td><td>" << Html::getOuiNonRadioInput(UpdateAlarmAction::PARAMETER_ENABLED, _alarm->getIsEnabled()) << "</td></tr>"
 				<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregistrer") << "</td></tr>"
-				<< "</table></form>"
-
-				<< "<h1>Contenu</h1>"
-				<< "<table>"
-				<< "<tr><td>Modèle</td><td>" 
-				<< templateRequest->getHTMLFormHeader("template")
-				<< Html::getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, tmap, 0) 
-				<< Html::getSubmitButton("Copier contenu")
-                << "</form></td></tr>"
-				
-				<< "<tr><td>Message court</td><td>" << Html::getTextAreaInput("", _alarm->getShortMessage(), 2, 20) << "</td></tr>"
-				<< "<tr><td>Message long</td><td>" << Html::getTextAreaInput("", _alarm->getLongMessage(), 4, 30) << "</td></tr>"
-				<< "</table>";
-
-			// Alarm messages destinations loop
-			for (Factory<AlarmRecipient>::Iterator arit = Factory<AlarmRecipient>::begin(); arit != Factory<AlarmRecipient>::end(); ++arit)
-			{
-				stream << "<h1>Diffusion sur " << arit->getTitle() << "</h1>";
-
-				arit->displayBroadcastListEditor(stream, _alarm, request);
-			}
+				<< "</table></form>";
 
 			delete updateRequest;
-			delete templateRequest;
+
+			if (_alarm->getLevel() != ALARM_LEVEL_UNKNOWN)
+			{
+				AdminRequest* templateRequest = Factory<Request>::create<AdminRequest>();
+				templateRequest->copy(request);
+				templateRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+				templateRequest->setAction(Factory<Action>::create<UpdateAlarmMessagesFromTemplateAction>());
+				templateRequest->setObjectId(request->getObjectId());
+
+				stream
+					<< "<h1>Contenu</h1>"
+					<< "<table>"
+					<< "<tr><td>Modèle</td><td>" 
+					<< templateRequest->getHTMLFormHeader("template")
+					<< Html::getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, MessagesModule::getTextTemplateLabels(_alarm->getLevel()), uid()) 
+					<< Html::getSubmitButton("Copier contenu")
+					<< "</form></td></tr>";
+
+				delete templateRequest;
+
+				AdminRequest* updateMessagesRequest = Factory<Request>::create<AdminRequest>();
+				updateMessagesRequest->copy(request);
+				updateMessagesRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+				updateMessagesRequest->setAction(Factory<Action>::create<UpdateAlarmMessagesAction>());
+				updateMessagesRequest->setObjectId(request->getObjectId());
+
+				stream					
+					<< updateMessagesRequest->getHTMLFormHeader("messages")
+					<< "<tr><td>Message court</td><td>" << Html::getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage(), 2, 20) << "</td></tr>"
+					<< "<tr><td>Message long</td><td>" << Html::getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 4, 30) << "</td></tr>"
+					<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregistrer") << "</td></tr>"
+					<< "</table>";
+
+				delete updateMessagesRequest;
+
+				AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
+				searchRequest->copy(request);
+				searchRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+				searchRequest->setObjectId(request->getObjectId());
+
+				AdminRequest* addRequest = Factory<Request>::create<AdminRequest>();
+				addRequest->copy(request);
+				addRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+				addRequest->setAction(Factory<Action>::create<AlarmAddLinkAction>());
+				addRequest->setObjectId(request->getObjectId());
+				addRequest->setParameter(AlarmAddLinkAction::PARAMETER_ALARM_ID, Conversion::ToString(_alarm->getKey()));
+
+				AdminRequest* removeRequest = Factory<Request>::create<AdminRequest>();
+				removeRequest->copy(request);
+				removeRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+				removeRequest->setAction(Factory<Action>::create<AlarmRemoveLinkAction>());
+				removeRequest->setObjectId(request->getObjectId());
+				
+				// Alarm messages destinations loop
+				for (Factory<AlarmRecipient>::Iterator arit = Factory<AlarmRecipient>::begin(); arit != Factory<AlarmRecipient>::end(); ++arit)
+				{
+					addRequest->setParameter(AlarmAddLinkAction::PARAMETER_RECIPIENT_KEY, arit->getFactoryKey());
+				
+					stream << "<h1>Diffusion sur " << arit->getTitle() << "</h1>";
+
+					arit->displayBroadcastListEditor(stream, _alarm, request->getParametersMap(), searchRequest, addRequest, removeRequest);
+				}
+				
+				delete searchRequest;
+				delete addRequest;
+				delete removeRequest;
+			}
 		}
 	}
 }

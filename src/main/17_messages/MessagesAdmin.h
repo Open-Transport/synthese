@@ -116,17 +116,26 @@ namespace synthese
 		*/
 		class MessagesAdmin : public admin::AdminInterfaceElement
 		{
-			time::DateTime	_startDate;
-			time::DateTime	_endDate;
-			env::ConnectionPlace*	_place;
-			env::CommercialLine*	_line;
+			typedef enum { ALL_STATUS, BROADCAST_OVER, BROADCAST_RUNNING, BROADCAST_RUNNING_WITH_END, BROADCAST_RUNNING_WITHOUT_END, FUTURE_BROADCAST } StatusSearch;
+
+			time::DateTime			_startDate;
+			time::DateTime			_endDate;
+			StatusSearch			_searchStatus;
+			AlarmLevel				_searchLevel;
+			AlarmConflict			_searchConflict;
+
+			server::Request::ParametersMap _parametersMap;
+			
 			std::vector<Alarm*>		_result;
+			std::vector<Scenario*>	_scenarioResult;
+
 			
 		public:
 			static const std::string PARAMETER_SEARCH_START;
 			static const std::string PARAMETER_SEARCH_END;
-			static const std::string PARAMETER_SEARCH_PLACE;
-			static const std::string PARAMETER_SEARCH_LINE;
+			static const std::string PARAMETER_SEARCH_LEVEL;
+			static const std::string PARAMETER_SEARCH_STATUS;
+			static const std::string PARAMETER_SEARCH_CONFLICT;
 
 			MessagesAdmin();
 			

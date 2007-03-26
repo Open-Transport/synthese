@@ -4,7 +4,7 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::mess
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::messages::AlarmTableSync>("17.10.01 Alarms");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::messages::TextTemplateTableSync>("17.10.10 Text templates");
 
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::messages::AlarmObjectLinkTableSync>("17.20.01 Alarm links");
+synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::messages::AlarmObjectLinkTableSync>("99.00.01 Alarm links");
 
 
 
@@ -12,7 +12,6 @@ synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synth
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessageAdmin>("message");
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessagesLibraryAdmin>("messageslibrary");
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessagesScenarioAdmin>("messagesscenario");
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessagesScenarioSendAdmin>("messagesscenariosend");
 
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::messages::MessagesRight>("Messages");
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::messages::MessagesLibraryRight>("MessagesLibrary");
@@ -29,5 +28,11 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages:
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::ScenarioNameUpdateAction>("snu");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::DeleteTextTemplateAction>("dtta");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::UpdateTextTemplateAction>("utta");
-
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::AlarmStopAction>("masa");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::ScenarioStopAction>("mssa");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::AddScenarioAction>("masca");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::DeleteScenarioAction>("mdsca");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::TextTemplateAddAction>("mttaa");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::UpdateAlarmMessagesAction>("muama");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::AlarmRemoveLinkAction>("marla");
 

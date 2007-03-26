@@ -24,11 +24,19 @@
 #define SYNTHESE_DISPLAY_MAINTENANCE_LOG
 
 #include "13_dblog/DBLog.h"
+#include "13_dblog/DBLogEntry.h"
 
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace departurestable
 	{
+		class DisplayScreen;
+		
 		/** Journal relatif à la maintenance des afficheurs.
 
 			Ce journal contient deux types d'entrée :
@@ -49,8 +57,14 @@ namespace synthese
 		class DisplayMaintenanceLog : public dblog::DBLog
 		{
 		public:
+			typedef enum { DISPLAY_MAINTENANCE_DISPLAY_CONTROL = 10, DISPLAY_MAINTENANCE_DATA_CONTROL = 15, DISPLAY_MAINTENANCE_ADMIN = 20, DISPLAY_MAINTENANCE_STATUS = 30 } EntryType;
 			DisplayMaintenanceLog();
-			DBLog::ColumnsNameVector getColumnNames() const;
+			DBLog::ColumnsVector getColumnNames() const;
+			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
+			void	addControlEntry(const DisplayScreen* screen, const dblog::DBLogEntry::Level& level, const std::string& text);
+			void	addDataControlEntry(const DisplayScreen* screen, bool ok, const std::string& text);
+			void	addAdminEntry(const DisplayScreen* screen, const dblog::DBLogEntry::Level& level, const security::User* user, const std::string& field, const std::string& oldValue, const std::string& newValue);
+			void	addStatusEntry(const DisplayScreen* screen, bool status);
 		};
 	}
 }

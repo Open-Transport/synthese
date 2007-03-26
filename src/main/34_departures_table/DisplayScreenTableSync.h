@@ -88,7 +88,7 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<DisplayScreen*> search(
-				std::string duid=""
+				uid duid=0
 				, uid localizationid = UNKNOWN_VALUE
 				, uid lineid = UNKNOWN_VALUE
 				, uid typeuid = UNKNOWN_VALUE

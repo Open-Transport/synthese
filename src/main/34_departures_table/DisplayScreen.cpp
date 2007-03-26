@@ -28,6 +28,7 @@
 #include "15_env/ConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
 #include "15_env/Edge.h"
+#include "15_env/Types.h"
 
 #include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/DisplayScreen.h"
@@ -367,10 +368,11 @@ namespace synthese
 			return _displayType;
 		}
 
-		void DisplayScreen::recordSupervision( const std::string& supervisionValue ) const
+		void DisplayScreen::recordSupervision( const dblog::DBLogEntry::Level& level, const std::string& text ) const
 		{
-			DisplayMaintenanceLog* log = (DisplayMaintenanceLog*) Factory<DBLog>::create<DisplayMaintenanceLog>();
-			/// @todo implementation
+			DisplayMaintenanceLog* dblog = Factory<DBLog>::create<DisplayMaintenanceLog>();
+			dblog->addControlEntry(this, level, text);
+			delete dblog;
 		}
 
 		void DisplayScreen::setAllPhysicalStopsDisplayed( bool value )
@@ -459,6 +461,49 @@ namespace synthese
 			DisplayedPlacesList::iterator it = _forbiddenArrivalPlaces.find(place);
 			if (it != _forbiddenArrivalPlaces.end())
 				_forbiddenArrivalPlaces.erase(it);
+		}
+
+		void DisplayScreen::copy( const DisplayScreen* other )
+		{
+			setAllPhysicalStopsDisplayed(other->getAllPhysicalStopsDisplayed());
+			setBlinkingDelay(other->getBlinkingDelay());
+			setClearingDelay(other->getClearingDelay());
+			setDestinationForceDelay(other->getForceDestinationDelay());
+			setDirection(other->getDirection());
+			setFirstRow(other->getFirstRow());
+			setGenerationMethod(other->getGenerationMethod());
+			setLocalization(other->getLocalization());
+			setMaintenanceChecksPerDay(other->getMaintenananceChecksPerDay());
+			setMaxDelay(other->getMaxDelay());
+			setOriginsOnly(other->getEndFilter());
+			setServiceNumberDisplay(other->getServiceNumberDisplay());
+			setTitle(other->getTitle());
+			setTrackNumberDisplay(other->getTrackNumberDisplay());
+			setType(other->getType());
+			setWiringCode(other->getWiringCode());
+			for (DisplayedPlacesList::const_iterator it = other->getDisplayedPlaces().begin(); it != other->getDisplayedPlaces().end(); ++it)
+				addDisplayedPlace(*it);
+			for (DisplayedPlacesList::const_iterator it = other->getForcedDestinations().begin(); it != other->getForcedDestinations().end(); ++it)
+				addForcedDestination(*it);
+			for (ForbiddenPlacesList::const_iterator it = other->getForbiddenPlaces().begin(); it != other->getForbiddenPlaces().end(); ++it)
+				addForbiddenPlace(*it);
+			for (PhysicalStopsSet::const_iterator it = other->getPhysicalStops(false).begin(); it != other->getPhysicalStops(false).end(); ++it)
+				addPhysicalStop(*it);
+		}
+
+		bool DisplayScreen::getDataControl() const
+		{
+			bool value = true;
+
+			// Put controls here
+
+
+			// Gets last log entry
+
+			// Write log entry if status changed
+
+			
+			return value;
 		}
 
 	}

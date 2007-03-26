@@ -3,18 +3,11 @@ import os
 # -------------------------------------------------------
 # Command line arguments
 # -------------------------------------------------------
-opts = Options('custom.py')
-opts.Add('CC', 'The C compiler.')
-opts.Add('CXX', 'The C++ compiler.')
-
-rootenv = Environment(ENV = os.environ, options=opts)
-
-Help(opts.GenerateHelpText(rootenv))
+rootenv = Environment(ENV = os.environ)
 
 mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
-librepo = ARGUMENTS.get('libsrepo', os.environ['LIBS_REPO_HOME'])   
-goal = ARGUMENTS.get('goal', 'build').lower()  
+librepo = ARGUMENTS.get('libs_repo_home', os.environ['LIBS_REPO_HOME'])   
 
 
 print "platform = ", platform
@@ -84,6 +77,8 @@ def DefaultTestModuleName ( env, dir = '.' ):
 
 
 def DefineDefaultLibPath (env):
+    platform = env['PLATFORM']
+
     if (platform=='win32'):
         env.Prepend ( CPPPATH = [librepo + '/' + 'include'] )
         env.Prepend ( LIBPATH = [librepo + '/' + 'lib'] )
@@ -96,6 +91,8 @@ def DefineDefaultLibPath (env):
 
     
 def DefineDefaultCPPDefines (env):
+    platform = env['PLATFORM']
+    mode = env['MODE']
 
     if (platform=='posix') or (platform=='darwin'):
         env.Append ( CPPDEFINES = ['UNIX'] )
@@ -111,6 +108,8 @@ def DefineDefaultCPPDefines (env):
 
 
 def DefineDefaultCCFlags (env):
+    platform = env['PLATFORM']
+    mode = env['MODE']
 
     if (platform=='posix'):
         if (mode=='debug'):
@@ -135,6 +134,8 @@ def DefineDefaultCCFlags (env):
     
   
 def DefineDefaultLinkFlags (env):
+    platform = env['PLATFORM']
+    mode = env['MODE']
 
     if (platform=='win32'):
         env.Append ( LINKFLAGS = ['/INCREMENTAL:NO', '/NOLOGO', '/MACHINE:X86', '/SUBSYSTEM:CONSOLE', '/OPT:NOREF'] )
@@ -142,19 +143,17 @@ def DefineDefaultLinkFlags (env):
             env.Append ( LINKFLAGS = ['/DEBUG', '/NODEFAULTLIB:msvcrt.lib'] )
         else:  
             env.Append ( LINKFLAGS = ['/NODEFAULTLIB:msvcrtd.lib'] )
-    
-    #if (platform=='posix'):
-    #    env.Append ( LINKFLAGS = ['-static'] )
-    #    env.Append ( LINKFLAGS = ['-static-libgcc'] )
+
 
 
 def DefineDefaultLibs (env):
+    platform = env['PLATFORM']
+    mode = env['MODE']
 
     if (platform=='posix'):
         # By default, everything has to be linked dynamically on posix
         # Too many problems with static links!
         env.Append ( LIBS = ['dl'] )
-        #env.Append ( LIBS = ['stdc++'] )
 
     if (platform=='win32'):
         env.Append ( LIBS = ['advapi32.lib'] )  
@@ -165,30 +164,44 @@ def DefineDefaultLibs (env):
 
 
 
-def AddDependency (env, libname, libversion, multithreaded):
-    deplib = libname
-    if multithreaded:
-      deplib = deplib + "-mt"
-    if mode == 'debug':
-      deplib = deplib + "-d"
-    deplib = deplib + "-" + libversion
-    env.Append (LIBS = [deplib] )
-    distlib = env['LIBPREFIX'] + deplib + env['SHLIBSUFFIX']
-    env.Append (DISTLIBS = [librepo + '/lib/' + distlib])
-
-
-
 def AddBoostDependency (env, libname):
-  AddDependency (env, libname, '1_33_1', True)
+    boostversion = '1_33_1'
+    platform = env['PLATFORM']
+    mode = env['MODE']
+
+    if platform == 'win32':
+        # automatic link, no need to add libs
+        return
+
+    boostlib = libname + '-gcc'
+    
+    # always multithreaded by now
+    boostlib = boostlib + "-mt"
+    if (mode == 'debug'):
+        boostlib = boostlib + "-d"
+    boostlib = boostlib + "-" + boostversion
+
+    env.Append (LIBS = [boostlib] )
+    distlib = env['LIBPREFIX'] + boostlib + env['SHLIBSUFFIX']
+    env.Append (DISTLIBS = [librepo + '/lib/' + distlib + '.' + boostversion.replace ('_', '.')])
     
 
 
 def AddSQLiteDependency (env):
-  AddDependency (env, "sqlite", '3_3_13', True)
+    platform = env['PLATFORM']
+    mode = env['MODE']
+
+    env.Append (LIBS = ['sqlite3'] )
+    distlib = env['LIBPREFIX'] + 'sqlite3' + env['SHLIBSUFFIX']
+    env.Append (DISTLIBS = [librepo + '/lib/' + distlib])
+
     
 
 
 def AppendMultithreadConf (env):
+    platform = env['PLATFORM']
+    mode = env['MODE']
+
     if (platform == 'posix'):
         env.Append (CCFLAGS= '-pthread' )
         env.Append (LIBS= ['pthread'] ) 
@@ -254,7 +267,7 @@ def SynthesePreBuild (target = None, source = None, env = None):
 
     # source is expected to be main.cpp file
     # parse this path to get right synthese module name
-    currentmodule = os.path.basename (source[0].abspath.replace (os.sep + 'main.cpp', ''))
+    currentmodule = os.path.basename (source[0].abspath.replace (os.sep + 'main.cpp', ''));
     
     # Look in all module folders for files with extension .cpp.gen
     # and dump them inside a generated.cpp file, to be included in main.cpp
@@ -268,13 +281,13 @@ def SynthesePreBuild (target = None, source = None, env = None):
       moduledir = os.path.join ('src/main', module)
       for file in os.listdir (moduledir) :
         if fnmatch.fnmatch (file, '*.gen.cpp') :
-            fragmentfile = os.path.join (moduledir, file)
+            fragmentfile = os.path.join (moduledir, file);
             # dump the file to generated output
             fragment = open (fragmentfile, "r")
             generated.write (fragment.read ())
             fragment.close ()
         if fnmatch.fnmatch (file, '*.inc.cpp') :
-            fragmentfile = os.path.join (moduledir, file)
+            fragmentfile = os.path.join (moduledir, file);
             # dump the file to generated output
             fragment = open (fragmentfile, "r")
             generatedInclude.write (fragment.read ())
@@ -291,7 +304,7 @@ def SynthesePreBuild (target = None, source = None, env = None):
 def SyntheseDist (target = None, source = None, env = None):
     distname = os.path.basename (target[0].abspath)
     distdir = os.path.join (distroot, distname)
-    distdir = distdir + '_' + platform + '_' + mode
+    distdir = distdir + '/' + platform + '/' + mode
 
     Execute (Delete (distdir))
     Execute (Mkdir (distdir))
@@ -301,8 +314,7 @@ def SyntheseDist (target = None, source = None, env = None):
     Execute (Copy (os.path.join (distdir, os.path.basename (target[0].abspath)), target[0].abspath))
     
     # Copy libs
-    if platform == 'posix':
-        env.CopyFiles (distdir + '/libs/', env['DISTLIBS'])
+    env.CopyFiles (distdir + '/libs/', env['DISTLIBS'])
 
     # Copy resources
     if (os.path.exists (resourcesdist + '/' + distname)):
@@ -318,9 +330,9 @@ def SyntheseDist (target = None, source = None, env = None):
 
 def SyntheseBuild (env, binname):
     # Copy main.cpp from template.
-    maintemplate = env.File ('../synthese_template/main.cpp').srcnode ().abspath
-    maincopy = env.File ('main.cpp').srcnode ().abspath
-    Execute (Copy (maincopy, maintemplate))
+    maintemplate = env.File ('../synthese_template/main.cpp').srcnode ().abspath;
+    maincopy = env.File ('main.cpp').srcnode ().abspath;
+    Execute (Copy (maincopy, maintemplate));
     
     files = env.Glob('main.cpp', [])
     
@@ -332,11 +344,12 @@ def SyntheseBuild (env, binname):
     env.AddPreAction (mainobj, preaction)
     env.AlwaysBuild (mainobj)
     
-    if goal == 'dist':
-        # Copy dynamic libraries
-        postaction = Action (SyntheseDist)
-    	env.AddPostAction (binname, postaction)
-	env.AlwaysBuild (binname)
+    if 'dist' in COMMAND_LINE_TARGETS:  
+        if platform == 'posix':
+            # Copy dynamic libraries
+	    postaction = Action (SyntheseDist)
+    	    env.AddPostAction (binname, postaction)
+
 
 			       
 def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[], withSQLite=False, withMultithreading=True):
@@ -352,7 +365,7 @@ def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[],
     if withSQLite == True:
       testmoduleenv.AddSQLiteDependency ()
       
-    testmoduleenv.AppendMultithreadConf ()
+    testmoduleenv.AppendMultithreadConf ();
 
     files = testmoduleenv.Glob (includes, excludes)
     testprogram = testmoduleenv.Program (testmodulename, files)
@@ -388,7 +401,6 @@ SConsEnvironment.SyntheseEnv=SyntheseEnv
 
 SConsEnvironment.SyntheseBuild=SyntheseBuild
 
-SConsEnvironment.AddDependency=AddDependency
 SConsEnvironment.AddModuleDependency=AddModuleDependency
 SConsEnvironment.AddBoostDependency=AddBoostDependency
 SConsEnvironment.AddSQLiteDependency=AddSQLiteDependency

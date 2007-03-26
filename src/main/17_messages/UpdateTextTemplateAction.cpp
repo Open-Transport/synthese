@@ -56,27 +56,36 @@ namespace synthese
 			{
 				Request::ParametersMap::iterator it;
 
+				// Text ID
 				it = map.find(PARAMETER_TEXT_ID);
 				if (it == map.end())
 					throw ActionException("Text template not specified");
-
 				_text = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
 				map.erase(it);
 
+				// Name
 				it = map.find(PARAMETER_NAME);
 				if (it == map.end())
 					throw ActionException("Name not specified");
 				_name = it->second;
+				map.erase(it);
 				if (_name.empty())
 					throw ActionException("Le nom ne peut être vide");
-				map.erase(it);
+				vector<TextTemplate*> v = TextTemplateTableSync::search(_text->getAlarmLevel(), _name, 0, 1);
+				if (!v.empty())
+				{
+					delete v.front();
+					throw ActionException("Un texte portant ce nom existe déjà.");
+				}
 
+				// Short message
 				it = map.find(PARAMETER_SHORT_MESSAGE);
 				if (it == map.end())
 					throw ActionException("Short message not specified");
 				_shortMessage = it->second;
 				map.erase(it);
 
+				// Long message
 				it = map.find(PARAMETER_LONG_MESSAGE);
 				if (it == map.end())
 					throw ActionException("Long message not specified");

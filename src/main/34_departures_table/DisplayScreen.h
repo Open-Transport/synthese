@@ -33,6 +33,8 @@
 
 #include "04_time/DateTime.h"
 
+#include "13_dblog/DBLog.h"
+
 #include "15_env/Types.h"
 
 #include "34_departures_table/Types.h"
@@ -146,37 +148,42 @@ namespace synthese
 
 			//!	\name Setters
 			//@{
-				void	setLocalization(const BroadcastPoint*);
-				void	setLocalizationComment(const std::string&);
-				void	setType(const DisplayType*);
-				void	setWiringCode(int);
-				void	setTitle(const std::string&);
-				void	setBlinkingDelay(int);
-				void	setTrackNumberDisplay(bool value);
-				void	setServiceNumberDisplay(bool value);
-				void	clearPhysicalStops();
-				void	addPhysicalStop(const env::PhysicalStop*);
-				void	removePhysicalStop(const env::PhysicalStop*);
 				void	setAllPhysicalStopsDisplayed(bool value);
-				void	clearForbiddenPlaces();
-				void	addForbiddenPlace(const env::ConnectionPlace*);
-				void	removeForbiddenPlace(const env::ConnectionPlace*);
-				void	setDirection(DeparturesTableDirection direction);
-				void	setOriginsOnly(EndFilter);
-				void	clearDisplayedPlaces();
-				void	addDisplayedPlace(const env::ConnectionPlace*);
-				void	removeDisplayedPlace(const env::ConnectionPlace*);
-				void	setMaxDelay(int);
+				void	setBlinkingDelay(int);
 				void	setClearingDelay(int delay);
+				void	setDestinationForceDelay(int);
+				void	setDirection(DeparturesTableDirection direction);
 				void	setFirstRow(int row);
 				void	setGenerationMethod(GenerationMethod method);
-				void	clearForcedDestinations();
-				void	addForcedDestination(const env::ConnectionPlace*);
-				void	removeForcedDestination(const env::ConnectionPlace*);
-				void	setDestinationForceDelay(int);
+				void	setLocalization(const BroadcastPoint*);
+				void	setLocalizationComment(const std::string&);
 				void	setMaintenanceChecksPerDay(int number);
 				void	setMaintenanceIsOnline(bool value);
 				void	setMaintenanceMessage(const std::string& message);
+				void	setMaxDelay(int);
+				void	setOriginsOnly(EndFilter);
+				void	setServiceNumberDisplay(bool value);
+				void	setTitle(const std::string&);
+				void	setTrackNumberDisplay(bool value);
+				void	setType(const DisplayType*);
+				void	setWiringCode(int);				
+			//@}
+
+			//! \name Modifiers
+			//@{
+				void	addDisplayedPlace(const env::ConnectionPlace*);
+				void	addForbiddenPlace(const env::ConnectionPlace*);
+				void	addForcedDestination(const env::ConnectionPlace*);
+				void	addPhysicalStop(const env::PhysicalStop*);
+				void	clearDisplayedPlaces();
+				void	clearForbiddenPlaces();
+				void	clearForcedDestinations();
+				void	clearPhysicalStops();
+				void	copy(const DisplayScreen*);
+				void	removeDisplayedPlace(const env::ConnectionPlace*);
+				void	removeForbiddenPlace(const env::ConnectionPlace*);
+				void	removeForcedDestination(const env::ConnectionPlace*);
+				void	removePhysicalStop(const env::PhysicalStop*);
 			//@}
 
 			//!	\name Getters
@@ -209,14 +216,16 @@ namespace synthese
 
 			//! \name Queries
 			//@{
-				ArrivalDepartureTableGenerator*	getGenerator(const time::DateTime& startTime) const;
-				void							display(std::ostream& stream, const time::DateTime& date) const;
-				void							recordSupervision(const std::string& supervisionValue) const;
-				std::string						getFullName()	const;
-				const env::PhysicalStopsSet&	getPhysicalStops(bool result=true)				const;
+				ArrivalDepartureTableGenerator*	getGenerator(const time::DateTime& startTime)							const;
+				void							display(std::ostream& stream, const time::DateTime& date)				const;
+				void							recordSupervision(const dblog::DBLogEntry::Level&, const std::string&)	const;
+				std::string						getFullName()															const;
+				const env::PhysicalStopsSet&	getPhysicalStops(bool result=true)										const;
 
 				std::map<std::string, std::pair<uid, std::string> > 
-					getSortedAvaliableDestinationsLabels(const std::set<const env::ConnectionPlace*>& placesToAvoid) const;
+					getSortedAvaliableDestinationsLabels(const std::set<const env::ConnectionPlace*>& placesToAvoid)	const;
+
+				bool							getDataControl()														const;
 
 			//@}
 

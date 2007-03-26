@@ -139,7 +139,9 @@ namespace synthese
 			}
 		}
 
-		std::vector<Scenario*> ScenarioTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<Scenario*> ScenarioTableSync::search(
+			const std::string& name, bool isATemplate
+			, int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -147,8 +149,8 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
 				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+				<< COL_NAME << "=" << Conversion::ToSQLiteString(name)
+				<< " AND " << COL_IS_TEMPLATE << "=" << Conversion::ToString(isATemplate)
 				;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);

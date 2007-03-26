@@ -34,8 +34,7 @@ namespace synthese
 	
 	namespace messages
 	{
-		// const string NewMessageAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
-
+		const string NewMessageAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "tpl";
 
 		Request::ParametersMap NewMessageAction::getParametersMap() const
 		{

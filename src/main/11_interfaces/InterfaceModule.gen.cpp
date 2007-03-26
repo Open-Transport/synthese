@@ -4,6 +4,7 @@ synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::interf
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::ParameterValueInterfaceElement>("param");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::IfThenElseInterfaceElement>("if");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::FormattedNumberInterfaceElement>("format");
+synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::EqualsValueInterfaceElement>("=");
 
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::CommentInterfaceElement>("//");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::PrintInterfaceElement>("print");

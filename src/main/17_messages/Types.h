@@ -24,6 +24,7 @@
 #define SYNTHESE_Types_H__
 
 #include <string>
+#include <map>
 
 namespace synthese
 {
@@ -37,7 +38,14 @@ namespace synthese
 		- WARNING : the solution could not be available, or requires action 
 		from the passenger (reservation...)
 		*/
-		typedef enum { ALARM_LEVEL_INFO = 10, ALARM_LEVEL_WARNING = 50, ALARM_LEVEL_ERROR = 99 } AlarmLevel;
+		typedef enum { ALARM_LEVEL_NO_ALARM = 0, ALARM_LEVEL_UNKNOWN = 1, ALARM_LEVEL_INFO = 10, ALARM_LEVEL_WARNING = 50 } AlarmLevel;
+
+		typedef enum { ALARM_CONFLICT_UNKNOWN = 0, ALARM_NO_CONFLICT = 10, ALARM_WARNING_ON_INFO = 50, ALARM_CONFLICT = 100 } AlarmConflict;
+
+		typedef struct { std::string label; std::string htmlField; std::string query; } AlarmRecipientFilter;
+
+		typedef std::map<std::string, AlarmRecipientFilter> AlarmRecipientSearchFieldsMap;
+
 
 	}
 }

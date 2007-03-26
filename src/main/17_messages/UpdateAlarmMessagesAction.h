@@ -29,6 +29,8 @@ namespace synthese
 {
 	namespace messages
 	{
+		class Alarm;
+
 		/** UpdateAlarmMessagesAction action class.
 			@ingroup m17
 		*/
@@ -39,7 +41,9 @@ namespace synthese
 			static const std::string PARAMETER_LONG_MESSAGE;
 
 		private:
-			/// @todo Attributes list
+			std::string _shortMessage;
+			std::string _longMessage;
+			Alarm*		_alarm;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

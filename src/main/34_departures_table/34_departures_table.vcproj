@@ -220,12 +220,6 @@
 				RelativePath=".\DisplayScreenContentRequest.h">
 			</File>
 			<File
-				RelativePath=".\DisplayScreenSupervisionInitRequest.cpp">
-			</File>
-			<File
-				RelativePath=".\DisplayScreenSupervisionInitRequest.h">
-			</File>
-			<File
 				RelativePath=".\DisplayScreenSupervisionRequest.cpp">
 			</File>
 			<File
@@ -392,6 +386,22 @@
 			</File>
 			<File
 				RelativePath=".\DisplayScreenAlarmRecipient.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Value Interface Elements"
+			Filter="">
+			<File
+				RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.h">
+			</File>
+			<File
+				RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.cpp">
+			</File>
+			<File
+				RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.h">
 			</File>
 		</Filter>
 		<File

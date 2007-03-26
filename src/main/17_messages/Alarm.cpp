@@ -37,6 +37,7 @@ namespace synthese
 			, _periodStart(TIME_UNKNOWN)
 			, _periodEnd(TIME_UNKNOWN)
 			, _scenario(NULL)
+			, _level(ALARM_LEVEL_UNKNOWN)
 		{
 
 		}
@@ -77,9 +78,35 @@ namespace synthese
 		Alarm::isApplicable ( const synthese::time::DateTime& start, 
 					const synthese::time::DateTime& end ) const
 		{
-			if ( ( start < _periodStart ) || ( end > _periodEnd ) || !_enabled )
+			// Disabled alarm is never applicable
+			if (!_enabled)
 				return false;
-		    
+
+			// Start date control
+			if (!_periodStart.isUnknown() && end < _periodStart)
+				return false;
+
+			// End date control
+			if (!_periodEnd.isUnknown() && start >= _periodEnd)
+				return false;
+
+			return true;
+		}
+
+		bool Alarm::isApplicable( const time::DateTime& date ) const
+		{
+			// Disabled alarm is never applicable
+			if (!_enabled)
+				return false;
+
+			// Start date control
+			if (!_periodStart.isUnknown() && date < _periodStart)
+				return false;
+
+			// End date control
+			if (!_periodEnd.isUnknown() && date >= _periodEnd)
+				return false;
+
 			return true;
 		}
 

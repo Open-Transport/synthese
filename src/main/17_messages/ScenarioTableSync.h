@@ -61,8 +61,8 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<Scenario*> search(
-				// other search parameters ,
-				int first = 0, int number = 0);
+				const std::string& name, bool isATemplate
+				, int first = 0, int number = -1);
 
 
 		protected:

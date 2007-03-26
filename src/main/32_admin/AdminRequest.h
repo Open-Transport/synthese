@@ -44,15 +44,15 @@ namespace synthese
 			//@}
 
 
-			/** Conversion from attributes to generic parameter maps.
-			*/
-			ParametersMap getParametersMap() const;
-
 			/** Conversion from generic parameters map to attributes.
 			*/
 			void setFromParametersMap(const ParametersMap& map);
 
 		public:
+			/** Conversion from attributes to generic parameter maps.
+			*/
+			ParametersMap getParametersMap() const;
+
 			AdminRequest();
 			~AdminRequest();
 
@@ -67,6 +67,8 @@ namespace synthese
 			std::string getHTMLFormHeader(const std::string& name) const;
 
 			void setParameter(const std::string& name, const std::string value);
+
+			void setObjectId(uid id);
 		};
 	}
 }

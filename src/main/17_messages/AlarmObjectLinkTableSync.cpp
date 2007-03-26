@@ -21,6 +21,8 @@
 */
 
 #include "17_messages/AlarmObjectLinkTableSync.h"
+#include "17_messages/MessagesModule.h"
+#include "17_messages/AlarmRecipient.h"
 
 using namespace std;
 
@@ -32,39 +34,27 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate< AlarmObjectLink<void> >::TABLE_NAME = "t040_alarm_object_links";
-		template<> const int SQLiteTableSyncTemplate< AlarmObjectLink<void> >::TABLE_ID = 040;
-		template<> const bool SQLiteTableSyncTemplate< AlarmObjectLink<void> >::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate< AlarmObjectLink<Registrable<uid, void> > >::TABLE_NAME = "t040_alarm_object_links";
+		template<> const int SQLiteTableSyncTemplate< AlarmObjectLink<Registrable<uid, void> > >::TABLE_ID = 040;
+		template<> const bool SQLiteTableSyncTemplate< AlarmObjectLink<Registrable<uid, void> > >::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate< AlarmObjectLink<void> >::load(AlarmObjectLink<void>* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate< AlarmObjectLink<Registrable<uid, void> > >::load(AlarmObjectLink<Registrable<uid, void> >* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
 		}
 
-		template<> void SQLiteTableSyncTemplate< AlarmObjectLink<void> >::save(AlarmObjectLink<void>* object)
+		template<> void SQLiteTableSyncTemplate< AlarmObjectLink<Registrable<uid, void> > >::save(AlarmObjectLink<Registrable<uid, void> >* object)
 		{
-			Registrable<uid, void>* obj = (Registrable<uid, void>*) object->getObject();
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE_NAME << " SET "
-					<< AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << Conversion::ToSQLiteString(object->getRecipientKey())
-					<< "," << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << Conversion::ToString(obj->getKey())
-					<< "," << AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << Conversion::ToString(object->getAlarm()->getKey())
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
+			if (object->getKey() <= 0)
 				object->setKey(getId(1,1));
-                query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					<< "," << Conversion::ToSQLiteString(object->getRecipientKey())
-					<< "," << Conversion::ToString(obj->getKey())
-					<< "," << Conversion::ToString(object->getAlarm()->getKey())
-					<< ")";
-			}
+            query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->getKey())
+				<< "," << Conversion::ToSQLiteString(object->getRecipientKey())
+				<< "," << Conversion::ToString(object->getObjectId())
+				<< "," << Conversion::ToString(object->getAlarm()->getKey())
+				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 
@@ -78,7 +68,7 @@ namespace synthese
 
 
 		AlarmObjectLinkTableSync::AlarmObjectLinkTableSync()
-			: SQLiteTableSyncTemplate<AlarmObjectLink<void> >(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<AlarmObjectLink<Registrable<uid, void> > >(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_RECIPIENT_KEY, "TEXT");
@@ -88,31 +78,27 @@ namespace synthese
 
 		void AlarmObjectLinkTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
 		{
-			/// @todo Implementation
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-//				AlarmObjectLink<void>* object = new AlarmObjectLink<void>();
-//				load(object, rows, i);
-				/// @todo Add the object to the corresponding register
-				// Eg : Module::getObjects().add(object);
+				AlarmRecipient* ar = Factory<AlarmRecipient>::create(rows.getColumn(i, COL_RECIPIENT_KEY));
+				Alarm* alarm = MessagesModule::getAlarms().get(Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID)));
+				ar->addObject(alarm, Conversion::ToLongLong(rows.getColumn(i, COL_OBJECT_ID)));
 			}
 		}
 
 		void AlarmObjectLinkTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
 		{
-//			for (int i=0; i<rows.getNbRows(); ++i)
-//			{
-				/// @todo search and update corresponding objects
-//			}
+			rowsAdded(sqlite, sync, rows);
 		}
 
 		void AlarmObjectLinkTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
-//			for (int i=0; i<rows.getNbRows(); ++i)
-//			{
-				/// @todo search and destroy corresponding objects
-//			}
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				AlarmRecipient* ar = Factory<AlarmRecipient>::create(rows.getColumn(i, COL_RECIPIENT_KEY));
+				Alarm* alarm = MessagesModule::getAlarms().get(Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID)));
+				ar->removeObject(alarm, Conversion::ToLongLong(rows.getColumn(i, COL_OBJECT_ID)));
+			}
 		}
-
 	}
 }

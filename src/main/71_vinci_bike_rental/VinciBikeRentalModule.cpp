@@ -66,7 +66,10 @@ namespace synthese
 
 		const std::string VinciBikeRentalModule::VINCI_ACCOUNTING_USER = "Vinci";
 		const std::string VinciBikeRentalModule::VINCI_ACCOUNTING_PROFILE = "VinciAccounts";
-		
+
+		const std::string VinciBikeRentalModule::VINCI_ADMIN_PROFILE = "VinciAdministrator";
+		const std::string VinciBikeRentalModule::VINCI_OPERATOR_PROFILE = "VinciOperator";
+
 		// Currencies
 		const std::string VinciBikeRentalModule::VINCI_CURRENCY_EURO_NAME = "Euro";
 		const std::string VinciBikeRentalModule::VINCI_CURRENCY_EURO = "EUR";
@@ -80,6 +83,36 @@ namespace synthese
 		
 		void VinciBikeRentalModule::initialize()
 		{
+			// Profile for bike rental administrator user
+			Profile* adminProfile;
+			vector<Profile*> profiles = ProfileTableSync::search(VINCI_ADMIN_PROFILE);
+			if (profiles.size() == 0)
+				adminProfile = new Profile;
+			else
+				adminProfile = profiles.front();
+			adminProfile->setName(VINCI_ADMIN_PROFILE);
+			Right* r = Factory<Right>::create<GlobalRight>();
+			r->setPrivateLevel(Right::DELETE);
+			r->setPublicLevel(Right::DELETE);
+			adminProfile->cleanRights();
+			adminProfile->addRight(r);
+			ProfileTableSync::save(adminProfile);
+
+			// Profile for bike rental operator user
+			Profile* operatorProfile;
+			vector<Profile*> profiles = ProfileTableSync::search(VINCI_OPERATOR_PROFILE);
+			if (profiles.size() == 0)
+				operatorProfile = new Profile;
+			else
+				operatorProfile = profiles.front();
+			operatorProfile->setName(VINCI_OPERATOR_PROFILE);
+			Right* r = Factory<Right>::create<GlobalRight>();
+			r->setPrivateLevel(Right::USE);
+			r->setPublicLevel(Right::USE);
+			operatorProfile->cleanRights();
+			operatorProfile->addRight(r);
+			ProfileTableSync::save(operatorProfile);
+
 			// Profile for virtual owner user
 			Profile* vinciProfile;
 			vector<Profile*> profiles = ProfileTableSync::search(VINCI_ACCOUNTING_PROFILE);

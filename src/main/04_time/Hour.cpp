@@ -90,15 +90,17 @@ Hour::isUnknown () const
 }
 
 
-std::string 
-Hour::toString () const
+std::string Hour::toString () const
 {
-  std::stringstream os;
-  os << std::setw( 2 ) << std::setfill ( '0' )
-     << getHours () << ":" 
-     << std::setw( 2 ) << std::setfill ( '0' )
-     << getMinutes ();
-  return os.str ();
+	if (isUnknown())
+		return "";
+
+	std::stringstream os;
+	os << std::setw( 2 ) << std::setfill ( '0' )
+		<< getHours () << ":" 
+		<< std::setw( 2 ) << std::setfill ( '0' )
+		<< getMinutes ();
+	return os.str ();
 }
 
 

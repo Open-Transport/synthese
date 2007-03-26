@@ -89,6 +89,8 @@ namespace synthese
 			void removeAlarm(Alarm* alarm);
 
 			Scenario*	createCopy()	const;
+
+			void	stop(const time::DateTime& now);
 		};
 	}
 }

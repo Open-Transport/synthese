@@ -22,8 +22,7 @@
 
 #include "01_util/Constants.h"
 
-#include "13_dblog/DBLogEntry.h"
-#include "DBLogModule.h"
+#include "13_dblog/DBLogModule.h"
 
 using namespace std;
 
@@ -38,10 +37,20 @@ namespace synthese
 			map<int, std::string> m;
 			if (withAll)
 				m.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
-			m.insert(make_pair((int) DBLogEntry::DB_LOG_INFO, "Information"));
-			m.insert(make_pair((int) DBLogEntry::DB_LOG_WARNING, "Alerte"));
-			m.insert(make_pair((int) DBLogEntry::DB_LOG_ERROR, "Erreur"));
+			m.insert(make_pair((int) DBLogEntry::DB_LOG_INFO, getEntryLevelLabel(DBLogEntry::DB_LOG_INFO)));
+			m.insert(make_pair((int) DBLogEntry::DB_LOG_WARNING, getEntryLevelLabel(DBLogEntry::DB_LOG_WARNING)));
+			m.insert(make_pair((int) DBLogEntry::DB_LOG_ERROR, getEntryLevelLabel(DBLogEntry::DB_LOG_ERROR)));
 			return m;
+		}
+
+		std::string DBLogModule::getEntryLevelLabel( const DBLogEntry::Level& level )
+		{
+			switch (level)
+			{
+			case DBLogEntry::DB_LOG_INFO : return "Information";
+			case DBLogEntry::DB_LOG_WARNING : return "Alerte";
+			case DBLogEntry::DB_LOG_ERROR : return "Erreur";
+			}
 		}
 	}
 }

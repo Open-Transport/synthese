@@ -52,7 +52,7 @@ namespace synthese
 		Request::ParametersMap DisplayScreenContentRequest::getParametersMap() const
 		{
 			Request::ParametersMap map;
-			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_screen->getKey())));
+			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_screen ? _screen->getKey() : getObjectId())));
 			map.insert(make_pair(PARAMETER_DATE, _date.toInternalString()));
 			return map;
 		}

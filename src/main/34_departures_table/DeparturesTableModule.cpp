@@ -23,6 +23,7 @@
 #include "01_util/UId.h"
 
 #include "15_env/ConnectionPlace.h"
+#include "15_env/CommercialLine.h"
 
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/AdvancedSelectTableSync.h"
@@ -83,6 +84,17 @@ namespace synthese
 			vector<PhysicalStopAndBroadcastPoint> b = getConnectionPlaceBroadcastPointsAndPhysicalStops(place->getKey());
 			for (vector<PhysicalStopAndBroadcastPoint>::const_iterator it = b.begin(); it != b.end(); ++it)
 				m.insert(make_pair(it->bp->getKey(), it->bp->getName()));
+			return m;
+		}
+
+		std::map<uid, std::string> DeparturesTableModule::getCommercialLineWithBroadcastLabels( bool withAll /*= false*/ )
+		{
+			map<uid, string> m;
+			if (withAll)
+				m.insert(make_pair(0, "(toutes)"));
+			vector<const CommercialLine*> c = getCommercialLineWithBroadcastPoints();
+			for (vector<const CommercialLine*>::const_iterator it = c.begin(); it != c.end(); ++it)
+				m.insert(make_pair((*it)->getKey(), (*it)->getShortName()));
 			return m;
 		}
 	}

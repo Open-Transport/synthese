@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_DisplayScreenSupervisionRequest_H__
 #define SYNTHESE_DisplayScreenSupervisionRequest_H__
 
+#include "13_dblog/DBLogEntry.h"
+
 #include "30_server/Request.h"
 
 namespace synthese
@@ -37,12 +39,14 @@ namespace synthese
 		class DisplayScreenSupervisionRequest : public server::Request
 		{
 			static const std::string PARAMETER_DISPLAY_SCREEN_ID;
-			static const std::string PARAMETER_SUPERVISION_VALUES;
+			static const std::string PARAMETER_LEVEL;
+			static const std::string PARAMETER_TEXT;
 			
 			//! \name Page parameters
 			//@{
-				const DisplayScreen*	_displayScreen;
-				std::string				_supervisionValue;
+				const DisplayScreen*		_displayScreen;
+				dblog::DBLogEntry::Level	_level;
+				std::string					_text;
 			//@}
 
 
@@ -57,8 +61,6 @@ namespace synthese
 		public:
 			DisplayScreenSupervisionRequest();
 			~DisplayScreenSupervisionRequest();
-
-			/// @todo Getters/Setters for parsed parameters
 
 			/** Action to run, defined by each subclass.
 			*/

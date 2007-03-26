@@ -29,8 +29,6 @@ namespace synthese
 
 	namespace dblog
 	{
-
-
 		DBLog::DBLog( const std::string& name )
 			: Factorable(), _name(name)
 		{
@@ -42,7 +40,7 @@ namespace synthese
 			return _name;
 		}
 
-		void DBLog::write( DBLogEntry::Level level, const DBLogEntry::Content& content, security::User* user /*= NULL*/ )
+		void DBLog::addEntry( DBLogEntry::Level level, const DBLogEntry::Content& content, const security::User* user /*= NULL*/ )
 		{
 			DBLogEntry* e = new DBLogEntry;
 			e->setLevel(level);
@@ -50,6 +48,11 @@ namespace synthese
 			e->setLogKey(getFactoryKey());
 			e->setContent(content);
 			DBLogEntryTableSync::save(e);
+		}
+
+		DBLog::ColumnsVector DBLog::parse( const DBLogEntry::Content& cols ) const
+		{
+			return (ColumnsVector) cols;
 		}
 	}
 }

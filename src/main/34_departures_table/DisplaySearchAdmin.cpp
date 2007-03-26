@@ -23,8 +23,14 @@
 #include "01_util/Html.h"
 #include "01_util/Conversion.h"
 
+#include "11_interfaces/InterfaceModule.h"
+
 #include "15_env/ConnectionPlace.h"
 #include "15_env/EnvModule.h"
+
+#include "32_admin/ResultHTMLTable.h"
+#include "32_admin/SearchFormHTMLTable.h"
+#include "32_admin/AdminModule.h"
 
 #include "34_departures_table/DisplaySearchAdmin.h"
 #include "34_departures_table/AdvancedSelectTableSync.h"
@@ -57,6 +63,7 @@ namespace synthese
 
 		DisplaySearchAdmin::DisplaySearchAdmin()
 			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED)
+			, _searchUId(0)
 			, _searchLocalizationUId(0)
 			, _searchLineId(0)
 			, _searchTypeId(0)
@@ -68,7 +75,7 @@ namespace synthese
 		{
 			Request::ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_UID);
 			if (it != map.end())
-				_searchUId = it->second;
+				_searchUId = Conversion::ToLongLong(it->second);
 
 			it = map.find(PARAMETER_SEARCH_LOCALIZATION);
 			if (it != map.end())
@@ -121,36 +128,25 @@ namespace synthese
 			maintRequest->copy(request);
 			maintRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayMaintenanceAdmin>());
 
+			stream << "<h1>Recherche</h1>";
 
-			map<int, string> states;
-			states.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
-			states.insert(make_pair(UNKNOWN_VALUE, "OK"));
-			states.insert(make_pair(UNKNOWN_VALUE, "Warning"));
-			states.insert(make_pair(UNKNOWN_VALUE, "Warning+Error"));
-			states.insert(make_pair(UNKNOWN_VALUE, "Error"));
+			stream << getHtmlSearchForm(searchRequest, _searchUId, _searchLocalizationUId, _searchLineId, _searchTypeId, _searchState, _searchMessage);
 
-			map<int, string> messages;
-			messages.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
-			messages.insert(make_pair(UNKNOWN_VALUE, "Un message"));
-			messages.insert(make_pair(UNKNOWN_VALUE, "Conflit"));
-			messages.insert(make_pair(UNKNOWN_VALUE, "Messages"));
+			stream << "<h1>Résultats de la recherche</h1>";
 
-			stream
-				<< "<h1>Recherche</h1>"
-				<< searchRequest->getHTMLFormHeader("search")
-				<< "<table>"
-				<< "<tr><td>UID</td><td>" << Html::getTextInput(PARAMETER_SEARCH_UID, _searchUId) << "</td>"
-				<< "<td>Emplacement</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_LOCALIZATION, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), _searchLocalizationUId) << "</td>"
-				<< "<td>Ligne</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_LINE_ID, EnvModule::getCommercialLineLabels(true), _searchLineId) << "</td></tr>"
-				<< "<tr><td>Type</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_TYPE_ID, DeparturesTableModule::getDisplayTypeLabels(true), _searchTypeId) << "</td>"
-				<< "<td>Etat</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_TYPE_ID, states, _searchState) << "</td>"
-				<< "<td>Message</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_MESSAGE, messages, _searchMessage) << "</td></tr>"
-				<< "<tr><td colspan=\"6\">" << Html::getSubmitButton("Rechercher") << "</td></tr>"
-				<< "</table></form>"
-				
-				<< "<h1>Résultats de la recherche</h1>"
-				<< "<table>"
-				<< "<tr><th>Sel</th><th>UID</th><th>Emplacement</th><th>Type</th><th>Etat</th><th>Msg</th><th colspan=\"3\">Actions</th></tr>";
+			ResultHTMLTable::HeaderVector v;
+			v.push_back(make_pair(PARAMETER_SEARCH_UID, "UID"));
+			v.push_back(make_pair(PARAMETER_SEARCH_LOCALIZATION, "Emplacement"));
+			v.push_back(make_pair(PARAMETER_SEARCH_TYPE_ID, "Type"));
+			v.push_back(make_pair(PARAMETER_SEARCH_STATE, "Etat"));
+			v.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Msg"));
+			v.push_back(make_pair(string(), "Actions"));
+			v.push_back(make_pair(string(), "Actions"));
+			v.push_back(make_pair(string(), "Actions"));
+
+			ResultHTMLTable t(v, searchRequest, string(), true, createDisplayRequest, CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+
+			stream << t.open();
 
 			for (vector<DisplayScreen*>::const_iterator it = _result.begin(); it != _result.end(); ++it)
 			{
@@ -158,34 +154,58 @@ namespace synthese
 				updateRequest->setObjectId(screen->getKey());
 				viewRequest->setObjectId(screen->getKey());
 				maintRequest->setObjectId(screen->getKey());
-				stream
-					<< "<tr><td><INPUT type=\"checkbox\" name=\"Checkbox3\"></td>"
-					<< "<td>" << screen->getKey() << "</td>"
-					<< "<td>" << (screen->getLocalization() ? screen->getLocalization()->getFullName() : "(indéterminé)") << "</td>"
-					<< "<td>" << (screen->getType() ? screen->getType()->getName() : "(indéterminé)") << "</td>"
-					<< "<td></td>" // Bullets showing the states of the display
-					<< "<td></td>" // Bullet showing the message status
-					<< "<td>" << updateRequest->getHTMLFormHeader("update" + Conversion::ToString(screen->getKey()))
-					<< Html::getSubmitButton("Modifier") << "</form></td>"
-					<< "<td>" << viewRequest->getHTMLFormHeader("view" + Conversion::ToString(screen->getKey()))
-					<< Html::getSubmitButton("Simuler") << "</form></td>"
-					<< "<td>" << maintRequest->getHTMLFormHeader("maint" + Conversion::ToString(screen->getKey()))
-					<< Html::getSubmitButton("Supervision") << "</form></td>"
-					<< "</tr>";
+
+				stream << t.row(Conversion::ToString(screen->getKey()));
+				stream << t.col() << screen->getKey();
+				stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getFullName() : "(indéterminé)");
+				stream << t.col() << (screen->getType() ? screen->getType()->getName() : "(indéterminé)");
+				stream << t.col(); // Bullets showing the states of the display
+				stream << t.col(); // Bullet showing the message status
+				stream << t.col() << Html::getLinkButton(updateRequest->getURL(), "Modifier");
+				stream << t.col() << Html::getLinkButton(viewRequest->getURL(), "Simuler");
+				stream << t.col() << Html::getLinkButton(maintRequest->getURL(), "Supervision");
 			}
 
-			stream
-				<< "<tr>"
-				<< "<td colspan=\"6\">(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel afficheur)</td>"
-				<< "<td colspan=\"3\">" << createDisplayRequest->getHTMLFormHeader("add")
-				<< Html::getSubmitButton("Créer un nouvel afficheur")
-				<< "</form></td>";
+			stream << t.row();
+			stream << t.col(5) << "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel afficheur)";
+			stream << t.col(3) << Html::getSubmitButton("Créer un nouvel afficheur");
+
+			stream << t.close();
 
 			delete createDisplayRequest;
 			delete searchRequest;
 			delete updateRequest;
 			delete viewRequest;
 			delete maintRequest;
+		}
+
+		std::string DisplaySearchAdmin::getHtmlSearchForm(AdminRequest* request, uid screenUid, uid placeUid, uid lineUid, uid typeUid, int state, int message )
+		{
+			map<int, string> states;
+			states.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
+			states.insert(make_pair(1, "OK"));
+			states.insert(make_pair(2, "Warning"));
+			states.insert(make_pair(3, "Warning+Error"));
+			states.insert(make_pair(4, "Error"));
+
+			map<int, string> messages;
+			messages.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
+			messages.insert(make_pair(1, "Un message"));
+			messages.insert(make_pair(2, "Conflit"));
+			messages.insert(make_pair(3, "Messages"));
+
+			stringstream stream;
+			SearchFormHTMLTable s(request);
+			stream << s.open();
+			stream << s.cell("UID", Html::getTextInput(PARAMETER_SEARCH_UID, screenUid ? Conversion::ToString(screenUid) : string()));
+			stream << s.cell("Emplacement", Html::getSelectInput(PARAMETER_SEARCH_LOCALIZATION, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), placeUid));
+			stream << s.cell("Ligne", Html::getSelectInput(PARAMETER_SEARCH_LINE_ID, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), lineUid));
+			stream << s.cell("Type", Html::getSelectInput(PARAMETER_SEARCH_TYPE_ID, DeparturesTableModule::getDisplayTypeLabels(true), typeUid));
+			stream << s.cell("Etat", Html::getSelectInput(PARAMETER_SEARCH_TYPE_ID, states, state));
+			stream << s.cell("Message", Html::getSelectInput(PARAMETER_SEARCH_MESSAGE, messages, message));
+			stream << s.close();
+
+			return stream.str();
 		}
 	}
 }

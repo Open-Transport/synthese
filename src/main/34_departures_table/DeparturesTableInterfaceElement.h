@@ -33,14 +33,32 @@ namespace synthese
 	{
 		class ValueInterfaceElement;
 
-		/** 
+		/** Departure table based on a display screen definition.
+			@ingroup m34
+			@todo Verify the documentation
+
+			Displays : The defined departure table.
+			Parameters :
+				-# Row multiplier (???)
+				-# Displayed pages : {intermediate|destination|normal} :
+					- intermediate : Show one intermediate stop per page
+					- destination : Show one page with the destination
+					- normal : Don't handle pages
+				-# Separator between pages
+				-# Number of departures to hide (default = 0)
 		*/
 		class DeparturesTableInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
+		public:
+			static const std::string VALUE_NORMAL;
+			static const std::string VALUE_INTERMEDIATE;
+			static const std::string VALUE_DESTINATION;
+
 		private:
 			interfaces::ValueInterfaceElement* _multiplicateurRangeeVIE;
 			interfaces::ValueInterfaceElement* _pagesVIE;
 			interfaces::ValueInterfaceElement* _pageSeparator;
+			interfaces::ValueInterfaceElement* _departuresToHide;
 
 		public:
 			DeparturesTableInterfaceElement();

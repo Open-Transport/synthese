@@ -43,6 +43,9 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\DbModuleClass.cpp">
+			</File>
+			<File
 				RelativePath=".\DbResult.h">
 			</File>
 			<File
@@ -100,6 +103,9 @@
 			</File>
 			<File
 				RelativePath=".\DBEmptyResultException.h">
+			</File>
+			<File
+				RelativePath=".\DbModuleClass.h">
 			</File>
 			<File
 				RelativePath=".\SQLiteException.cpp">

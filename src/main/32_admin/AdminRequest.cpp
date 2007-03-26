@@ -179,5 +179,11 @@ namespace synthese
 		{
 			_actionFailedPage = aie;
 		}
+
+		void AdminRequest::setObjectId( uid id )
+		{
+			Request::setObjectId(id);
+			_parameters[PARAMETER_OBJECT_ID] = Conversion::ToString(id);
+		}
 	}
 }

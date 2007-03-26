@@ -47,7 +47,7 @@ namespace synthese
 				- etc.
 
 			An alarm can be sent individually (single alarm) or in a group builded from a scenario (grouped alarm)
-			The _scenarioGroup attribute points to the group if applicable.
+			The _scenario attribute points to the group if applicable.
 		*/
 		class Alarm : public synthese::util::Registrable<uid,Alarm>
 		{
@@ -80,8 +80,8 @@ namespace synthese
 				void setLevel (const AlarmLevel& level);
 				void setShortMessage( const std::string& message);
 				void setLongMessage( const std::string& message);
-				void setPeriodStart ( const synthese::time::DateTime& periodStart);
-				void setPeriodEnd ( const synthese::time::DateTime& periodEnd);
+				void setPeriodStart ( const time::DateTime& periodStart);
+				void setPeriodEnd ( const time::DateTime& periodEnd);
 				void setIsATemplate(bool value);
 
 				/** Scenario setter.
@@ -98,13 +98,13 @@ namespace synthese
 			//@{
 
 				/** Applicability test.
-				@param start Start of applicability period
-				@param end End of applicability period
-				@return true if the message is not empty and 
-				is valid for the whole period given as argument.
+					@param start Start of applicability period
+					@param end End of applicability period
+					@return true if the message is not empty and is valid for the whole period given as argument.
 				*/
-				bool isApplicable ( const synthese::time::DateTime& start, 
-						const synthese::time::DateTime& end ) const;
+				bool isApplicable ( const time::DateTime& start, const time::DateTime& end ) const;
+
+				bool isApplicable(const time::DateTime& date) const;
 
 				/** Copy of alarm template.
 					@param scenario Scenario the new alarm belongs to.

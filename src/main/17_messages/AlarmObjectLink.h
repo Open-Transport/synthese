@@ -42,16 +42,19 @@ namespace synthese
 			std::string		_recipientKey;
 			T*				_object; 
 			const Alarm*	_alarm;
+			uid				_objectId;
 
 		public:
-			AlarmObjectLink() {}
+			AlarmObjectLink() : _object(NULL) {}
 
 			const std::string&	getRecipientKey() const { return _recipientKey; }
 			T*					getObject() const { return _object; }
+			uid					getObjectId() const { return _object ? _object->getKey() : _objectId; }
 			const Alarm*		getAlarm() const { return _alarm; }
 
 			void setRecipientKey(const std::string& key) { _recipientKey = key; }
 			void setObject(T* object) { _object = object; }
+			void setObjectId(uid id) { _objectId = id; }
 			void setAlarm(const Alarm* alarm) { _alarm = alarm; }
 
 		};

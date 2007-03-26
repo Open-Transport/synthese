@@ -27,6 +27,11 @@
 
 namespace synthese
 {
+	namespace messages
+	{
+		class Alarm;
+	}
+
 	namespace departurestable
 	{
 		class DisplayScreen;
@@ -37,9 +42,21 @@ namespace synthese
 		class DisplayScreenAlarmRecipient : public messages::AlarmRecipientTemplate<DisplayScreen>
 		{
 		public:
+			static const std::string PARAMETER_SEARCH_UID;
+			static const std::string PARAMETER_SEARCH_PLACE;
+			static const std::string PARAMETER_SEARCH_LINE;
+			static const std::string PARAMETER_SEARCH_TYPE;
+			static const std::string PARAMETER_SEARCH_STATUS;
+			static const std::string PARAMETER_SEARCH_MESSAGE;
+
 			DisplayScreenAlarmRecipient();
 
-			void displayBroadcastListEditor(std::ostream& stream, const messages::Alarm* alarm, const server::Request* request);
+			void displayBroadcastListEditor(std::ostream& stream, const messages::Alarm* alarm, const admin::AdminRequest::ParametersMap& parameters, admin::AdminRequest* searchRequest, admin::AdminRequest* addRequest, admin::AdminRequest* removeRequest);
+
+			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(const server::Request::ParametersMap& parameters) const;
+
+			void addObject(const messages::Alarm* alarm, uid objectId);
+			void removeObject(const messages::Alarm* alarm, uid objectId);
 		};
 	}
 }

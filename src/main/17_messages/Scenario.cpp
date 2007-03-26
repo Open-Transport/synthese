@@ -129,5 +129,12 @@ namespace synthese
 			if (it != _alarms.end())
 				_alarms.erase(it);
 		}
+
+		void Scenario::stop( const time::DateTime& now )
+		{
+			_periodEnd = now;
+			for (AlarmsSet::const_iterator it = getAlarms().begin(); it != getAlarms().end(); ++it)
+				(*it)->setPeriodEnd(now);
+		}
 	}
 }

@@ -27,7 +27,11 @@
 
 #include "01_util/Factorable.h"
 
+#include "17_messages/Types.h"
+
 #include "30_server/Request.h"
+
+#include "32_admin/AdminRequest.h"
 
 namespace synthese
 {
@@ -49,7 +53,12 @@ namespace synthese
 
 			const std::string& getTitle();
 
-			virtual void displayBroadcastListEditor(std::ostream& stream, const messages::Alarm* alarm, const server::Request* request) = 0;
+			virtual void displayBroadcastListEditor(std::ostream& stream, const messages::Alarm* alarm, const admin::AdminRequest::ParametersMap& parameters, admin::AdminRequest* searchRequest, admin::AdminRequest* addRequest, admin::AdminRequest* removeRequest) = 0;
+
+			virtual AlarmRecipientSearchFieldsMap getSearchFields(const server::Request::ParametersMap& parameters) const = 0;
+
+			virtual void addObject(const Alarm* alarm, uid objectId) = 0;
+			virtual void removeObject(const Alarm* alarm, uid objectId) = 0;
 
 		};
 	}

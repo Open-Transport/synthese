@@ -210,6 +210,12 @@
 					RelativePath=".\ScenarioNameUpdateAction.h">
 				</File>
 				<File
+					RelativePath=".\ScenarioStopAction.cpp">
+				</File>
+				<File
+					RelativePath=".\ScenarioStopAction.h">
+				</File>
+				<File
 					RelativePath=".\ScenarioUpdateDatesAction.cpp">
 				</File>
 				<File
@@ -219,6 +225,24 @@
 			<Filter
 				Name="Alarm"
 				Filter="">
+				<File
+					RelativePath=".\AlarmAddLinkAction.cpp">
+				</File>
+				<File
+					RelativePath=".\AlarmAddLinkAction.h">
+				</File>
+				<File
+					RelativePath=".\AlarmRemoveLinkAction.cpp">
+				</File>
+				<File
+					RelativePath=".\AlarmRemoveLinkAction.h">
+				</File>
+				<File
+					RelativePath=".\AlarmStopAction.cpp">
+				</File>
+				<File
+					RelativePath=".\AlarmStopAction.h">
+				</File>
 				<File
 					RelativePath=".\DeleteAlarmAction.cpp">
 				</File>

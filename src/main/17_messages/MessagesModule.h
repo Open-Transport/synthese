@@ -20,10 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef SYNTHESE_MessagesModule_H__
+#define SYNTHESE_MessagesModule_H__
+
 #include "01_util/ModuleClass.h"
 
 #include "17_messages/AlarmBroadcastList.h"
 #include "17_messages/Alarm.h"
+#include "17_messages/Types.h"
 #include "17_messages/Scenario.h"
 
 /** @defgroup m17 17 Messages
@@ -49,10 +53,16 @@ namespace synthese
 			
 			void initialize();
 
-			static std::map<uid, std::string>	getScenariiLabels(bool withAll = false);
+			static std::map<uid, std::string>			getScenariiLabels(bool withAll = false);
+			static std::map<AlarmLevel, std::string>	getLevelLabels(bool withAll = false);
+			static std::map<AlarmConflict, std::string>	getConflictLabels(bool withAll = false);
+			static std::map<uid, std::string>			getTextTemplateLabels(const AlarmLevel& level);
 
+			static std::string							getLevelLabel(const AlarmLevel& level);
 		};
 	}
 }
 
 /** @} */
+
+#endif // SYNTHESE_MessagesModule_H__

@@ -36,9 +36,9 @@ namespace synthese
 	
 		}
 
-		DBLog::ColumnsNameVector BroadcastPointsDataLog::getColumnNames() const
+		DBLog::ColumnsVector BroadcastPointsDataLog::getColumnNames() const
 		{
-			DBLog::ColumnsNameVector v;
+			DBLog::ColumnsVector v;
 			v.push_back("Point de diffusion");
 			v.push_back("Action");
 			return v;

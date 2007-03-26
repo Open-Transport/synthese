@@ -29,17 +29,18 @@ namespace synthese
 {
 	namespace departurestable
 	{
-		/** CreateDisplayScreenAction action class.
+		class DisplayScreen;
+
+		/** Display screen creation action class.
 			@ingroup m34
 		*/
 		class CreateDisplayScreenAction : public server::Action
 		{
 		public:
-			/// @todo Parameters list
-			// static const std::string PARAMETER_xxx;
+			static const std::string PARAMETER_TEMPLATE_ID;
 
 		private:
-			/// @todo Attributes list
+			const DisplayScreen*	_template;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -52,6 +53,7 @@ namespace synthese
 			void setFromParametersMap(server::Request::ParametersMap& map);
 
 		public:
+			CreateDisplayScreenAction();
 
 			/** Action to run, defined by each subclass.
 			*/

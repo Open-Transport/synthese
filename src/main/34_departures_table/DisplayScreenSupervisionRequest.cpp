@@ -33,11 +33,13 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
+	using namespace dblog;
 
 	namespace departurestable
 	{
 		const std::string DisplayScreenSupervisionRequest::PARAMETER_DISPLAY_SCREEN_ID = "tb";
-		const std::string DisplayScreenSupervisionRequest::PARAMETER_SUPERVISION_VALUES = "sv";
+		const std::string DisplayScreenSupervisionRequest::PARAMETER_TEXT = "sv";
+		const std::string DisplayScreenSupervisionRequest::PARAMETER_LEVEL = "ss";
 		
 		DisplayScreenSupervisionRequest::DisplayScreenSupervisionRequest()
 			: Request()
@@ -48,36 +50,44 @@ namespace synthese
 		{
 			Request::ParametersMap map;
 			map.insert(make_pair(PARAMETER_DISPLAY_SCREEN_ID, Conversion::ToString(_displayScreen->getKey())));
-			map.insert(make_pair(PARAMETER_SUPERVISION_VALUES, _supervisionValue));
+			map.insert(make_pair(PARAMETER_TEXT, _text));
+			map.insert(make_pair(PARAMETER_LEVEL, Conversion::ToString((int) _level)));
 			return map;
 		}
 
 		void DisplayScreenSupervisionRequest::setFromParametersMap(const Request::ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it;
-
-			it = map.find(PARAMETER_DISPLAY_SCREEN_ID);
-			if (it == map.end())
-				throw RequestException("Display screen not specified");
 			try
 			{
+				Request::ParametersMap::const_iterator it;
+
+				it = map.find(PARAMETER_DISPLAY_SCREEN_ID);
+				if (it == map.end())
+					throw RequestException("Display screen not specified");
+				if (!DeparturesTableModule::getDisplayScreens().contains(Conversion::ToLongLong(it->second)))
+					throw RequestException("Display screen " + it->second + " not found");
 				_displayScreen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
+			
+				it = map.find(PARAMETER_TEXT);
+				if (it == map.end())
+					throw RequestException("Log text not specified");
+				_text = it->second;
+
+				it = map.find(PARAMETER_LEVEL);
+				if (it == map.end())
+					throw RequestException("Log level not specified");
+				_level = (DBLogEntry::Level) Conversion::ToInt(it->second);
 			}
-			catch (FactoryException<DisplayScreen> e)
+			catch (...)
 			{
-				throw RequestException("Display screen " + it->second + " not found");
+				throw RequestException("Unknown error");
 			}
-
-			it = map.find(PARAMETER_SUPERVISION_VALUES);
-			if (it != map.end())
-				_supervisionValue = it->second;
-
 		}
 
 		void DisplayScreenSupervisionRequest::run( std::ostream& stream ) const
 		{
 			if (_displayScreen != NULL)
-				_displayScreen->recordSupervision(_supervisionValue);
+				_displayScreen->recordSupervision(_level, _text);
 		}
 
 		DisplayScreenSupervisionRequest::~DisplayScreenSupervisionRequest()

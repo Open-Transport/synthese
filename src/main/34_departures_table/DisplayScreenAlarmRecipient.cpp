@@ -23,16 +23,28 @@
 #include <vector>
 
 #include "01_util/Html.h"
+#include "01_util/HtmlTable.h"
+
+#include "11_interfaces/InterfaceModule.h"
 
 #include "15_env/ConnectionPlace.h"
+#include "15_env/Line.h"
+#include "15_env/EnvModule.h"
 
 #include "17_messages/Alarm.h"
 #include "17_messages/AlarmObjectLink.h"
 #include "17_messages/AlarmObjectLinkTableSync.h"
+#include "17_messages/AlarmRemoveLinkAction.h"
+#include "17_messages/AlarmAddLinkAction.h"
+
+#include "32_admin/ResultHTMLTable.h"
+#include "32_admin/AdminModule.h"
 
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/DisplayScreenAlarmRecipient.h"
+#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/DisplaySearchAdmin.h"
 
 using namespace std;
 
@@ -40,10 +52,26 @@ namespace synthese
 {
 	using namespace messages;
 	using namespace util;
+	using namespace departurestable;
+	using namespace server;
+	using namespace env;
+	using namespace admin;
+	using namespace interfaces;
+
+	namespace messages
+	{
+		AlarmRecipientTemplate<DisplayScreen>::LinksSetAlarm AlarmRecipientTemplate<DisplayScreen>::_linksAlarm;
+		AlarmRecipientTemplate<DisplayScreen>::LinksSetObject AlarmRecipientTemplate<DisplayScreen>::_linksObject;
+	}
 
 	namespace departurestable
 	{
-
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_UID = "dsarsu";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_PLACE = "dsarsp";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_LINE = "dsarsl";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_TYPE = "dsarst";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_STATUS = "dsarss";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_MESSAGE = "dsarsm";
 
 		DisplayScreenAlarmRecipient::DisplayScreenAlarmRecipient()
 			: AlarmRecipientTemplate<DisplayScreen>("Afficheurs")
@@ -51,124 +79,117 @@ namespace synthese
 
 		}
 
-		void DisplayScreenAlarmRecipient::displayBroadcastListEditor( std::ostream& stream, const messages::Alarm* alarm, const server::Request* request )
+		void DisplayScreenAlarmRecipient::displayBroadcastListEditor(ostream& stream, const Alarm* alarm, const AdminRequest::ParametersMap& parameters, AdminRequest* searchRequest, AdminRequest* addRequest, AdminRequest* removeRequest )
 		{
-			stream << "<table><tr><th>Emplacement</th><th>Etat</th><th>Actions</th></tr>";
+			vector<string> v;
+			v.push_back("Emplacement");
+			v.push_back("Etat");
+			v.push_back("Actions");
+			HtmlTable t(v);
+
+			stream << t.open();
 
 			vector<AlarmObjectLink<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreen> (alarm, this->getFactoryKey());
 			for (vector<AlarmObjectLink<DisplayScreen> >::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
 			{
 				DisplayScreen* ds = dsit->getObject();
-
-				stream << "<tr><td>" << ds->getLocalization()->getConnectionPlace()->getFullName() << "/" << ds->getLocalization()->getName();
-
+				removeRequest->setParameter(AlarmRemoveLinkAction::PARAMETER_LINK_ID, Conversion::ToString(dsit->getKey()));
+				
+				stream << t.row();
+				stream << t.col() << ds->getLocalization()->getConnectionPlace()->getFullName() << "/" << ds->getLocalization()->getName();
 				if (ds->getLocalizationComment() != "")
 					stream << "/" << ds->getLocalizationComment();
 
-				stream
-					<< "</td><td><FONT face=\"Wingdings\" color=\"#00cc00\">l</FONT></td>"
-					<< "<td>" << Html::getSubmitButton("Supprimer") << "</td></tr>";
+				stream << t.col() << "<FONT face=\"Wingdings\" color=\"#00cc00\">l</FONT>"; // Bullet
+				stream << t.col() << Html::getLinkButton(removeRequest->getURL(), "Supprimer", "Etes-vous sûr de vouloir retirer l'afficheur des destinataires du message ?");
 
 				delete ds->getLocalization();
 				delete ds;
 			}
 
-			stream
-				<< "</table>";
+			stream << t.close();
 
-/*				<TR>
-				<TD style=\"WIDTH: 162px; HEIGHT: 371px\"><FONT size=\"1\"><FONT size=\"1\"><FONT color=\"#000000\" size=\"1\">Ajout 
-				d'afficheur</FONT></FONT></FONT></TD>
-				<TD style=\"HEIGHT: 371px\"><FONT face=\"Verdana\"><FONT size=\"2\"><FONT face=\"Verdana\"><FONT size=\"2\">
-				<P>UID <INPUT id=\"Text5\" style=\"WIDTH: 80px; HEIGHT: 22px\" type=\"text\" size=\"8\" name=\"Text2\">,&nbsp;Emplacement
-				<SELECT id=\"Select6\" name=\"Select1\">
-				<OPTION value=\"\" selected>TOULOUSE Matabiau</OPTION>
-				</SELECT>, Ligne&nbsp;<SELECT id=\"Select7\" name=\"Select4\">
-				<OPTION value=\"\" selected>(toutes)</OPTION>
-				<OPTION value=\"\">MP/TLS/41</OPTION>
-				</SELECT>
-				,Type
-				<SELECT language=\"javascript\" id=\"Select8\" onclick=\"return Select2_onclick()\" name=\"Select2\">
-				<OPTION value=\"\" selected>(tous)</OPTION>
-				<OPTION value=\"\">Oscar</OPTION>
-				<OPTION value=\"\">TFT 21\"</OPTION>
-				</SELECT>, Etat
-				<SELECT id=\"Select9\" name=\"Select3\">
-				<OPTION value=\"\" selected>(tous)</OPTION>
-				<OPTION value=\"\">OK</OPTION>
-				<OPTION value=\"\">Warning</OPTION>
-				<OPTION value=\"\">Warning+Error</OPTION>
-				<OPTION value=\"\">Error</OPTION>
-				</SELECT>,&nbsp;Message
-				<SELECT id=\"Select10\" name=\"Message\">
-				<OPTION value=\"\" selected>(tous)</OPTION>
-				<OPTION value=\"\">Un message</OPTION>
-				<OPTION value=\"\">Conflit</OPTION>
-				<OPTION value=\"\">Messages</OPTION>
-				</SELECT>&nbsp;<INPUT id=\"Button12\" type=\"button\" value=\"Rechercher\" name=\"Button6\"></P>
-				<P>
-				Résultats de la recherche (tous) :</FONT></FONT>
-				</P>
-				<P>
-				<TABLE language=\"javascript\" id=\"Table4\" style=\"WIDTH: 432px; HEIGHT: 240px\" cellSpacing=\"0\"
-				cellPadding=\"1\" width=\"432\" border=\"1\">
-				<TBODY>
-				<TR>
-				<TD style=\"WIDTH: 19px; HEIGHT: 23px\"><STRONG><FONT size=\"2\">Sel</FONT></STRONG></TD>
-				<TD style=\"WIDTH: 120px; HEIGHT: 23px\"><STRONG><FONT size=\"2\"><STRONG><FONT size=\"2\"><FONT color=\"#0000ff\"><U>UID
-				</U></FONT><FONT color=\"#000000\">(<FONT face=\"Wingdings 3\">r</FONT>)</FONT></FONT></STRONG></FONT></STRONG></TD>
-				<TD style=\"WIDTH: 186px; HEIGHT: 23px\" align=\"center\"><STRONG><FONT color=\"#0000ff\" size=\"2\"><U><STRONG><FONT color=\"#0000ff\" size=\"2\"><U><STRONG><FONT color=\"#0000ff\" size=\"2\"><U>Emplacement</U></FONT></STRONG></U></FONT></STRONG></U></FONT></STRONG></TD>
-				<TD style=\"WIDTH: 54px; HEIGHT: 23px\" align=\"center\"><STRONG><FONT color=\"#0000ff\" size=\"2\"><U><STRONG><FONT color=\"#0000ff\" size=\"2\"><U><STRONG><FONT color=\"#0000ff\" size=\"2\"><U>Type</U></FONT></STRONG></U></FONT></STRONG></U></FONT></STRONG></TD>
-				<TD style=\"WIDTH: 43px; HEIGHT: 23px\" align=\"center\"><STRONG><FONT color=\"#0000ff\" size=\"2\"><U><STRONG><FONT color=\"#0000ff\" size=\"2\"><U><STRONG><FONT color=\"#0000ff\" size=\"2\"><U>Etat</U></FONT></STRONG></U></FONT></STRONG></U></FONT></STRONG></TD>
-				<TD style=\"HEIGHT: 23px\" align=\"center\"><STRONG><FONT color=\"#0000ff\" size=\"2\"><U><STRONG><FONT color=\"#0000ff\" size=\"2\"><U><STRONG><FONT color=\"#0000ff\" size=\"2\"><U>Msg</U></FONT></STRONG></U></FONT></STRONG></U></FONT></STRONG></TD>
-				</TR>
-				<TR>
-				<TD style=\"WIDTH: 19px\"><FONT size=\"1\"><INPUT id=\"Checkbox1\" type=\"checkbox\" name=\"Checkbox3\"></FONT></TD>
-				<TD style=\"WIDTH: 120px\"><FONT color=\"#0000ff\" size=\"1\"><U><A href=\"admin_display.htm\">5896215762324576</A></U></FONT></TD>
-				<TD style=\"WIDTH: 186px\"><FONT color=\"#0000ff\" size=\"1\"><U><A href=\"admin_display.htm\">TOULOUSE 
-				Matabiau/Marengo quai 1</A></U></FONT></TD>
-				<TD style=\"WIDTH: 54px\"><FONT color=\"#0000ff\" size=\"1\"><U><A href=\"admin_display.htm\">Oscar</A></U></FONT></TD>
-				<TD style=\"WIDTH: 43px\"><FONT face=\"Wingdings\" color=\"#00cc00\">l<FONT face=\"Verdana\"> </FONT>
-				<FONT face=\"Wingdings\" color=\"#00cc00\">l</FONT></FONT></TD>
-				<TD align=\"center\"><FONT face=\"Wingdings\" color=\"#00cc00\">l</FONT></TD>
-				</TR>
-				<TR>
-				<TD style=\"WIDTH: 19px\"><FONT size=\"1\"><INPUT id=\"Checkbox2\" type=\"checkbox\" name=\"Checkbox3\"></FONT></TD>
-				<TD style=\"WIDTH: 120px\"><FONT color=\"#0000ff\" size=\"1\"><U><FONT color=\"#0000ff\" size=\"1\"><U><A href=\"admin_display.htm\">6174821345698741</A></U></FONT></U></FONT></TD>
-				<TD style=\"WIDTH: 186px\"><FONT color=\"#0000ff\" size=\"1\"><U><A href=\"admin_display.htm\">TOULOUSE 
-				Matabiau/Salle d'attente Marengo/Dessus porte</A></U></FONT></TD>
-				<TD style=\"WIDTH: 54px\"><FONT color=\"#0000ff\" size=\"1\"><U><A href=\"admin_display.htm\">TFT 21\"</A></U></FONT></TD>
-				<TD style=\"WIDTH: 43px\"><FONT face=\"Wingdings\" color=\"#00cc00\"><FONT color=\"#ff9900\">l</FONT><FONT face=\"Verdana\">
-				</FONT><FONT style=\"BACKGROUND-COLOR: #ffffff\" face=\"Wingdings\" color=\"#ff0033\">l</FONT></FONT></TD>
-				<TD align=\"center\"><FONT face=\"Wingdings\" color=\"#00cc00\"><FONT color=\"#ff9900\">l</FONT></FONT></TD>
-				</TR>
-				<TR>
-				<TD style=\"WIDTH: 19px\"><FONT size=\"1\"><INPUT id=\"Checkbox3\" type=\"checkbox\" name=\"Checkbox3\"></FONT></TD>
-				<TD style=\"WIDTH: 120px\"><FONT color=\"#0000ff\" size=\"1\"><U><FONT color=\"#0000ff\" size=\"1\"><U><FONT color=\"#0000ff\" size=\"1\"><U><FONT color=\"#0000ff\" size=\"1\"><U><FONT color=\"#0000ff\" size=\"1\"><U><A href=\"admin_display.htm\">6548746213210254</A></U></FONT></U></FONT></U></FONT></U></FONT></U></FONT></TD>
-				<TD style=\"WIDTH: 186px\"><FONT color=\"#0000ff\" size=\"1\"><U><A href=\"admin_display.htm\">TOULOUSE 
-				Matabiau/Salle d'attente Marengo/Fond de salle</A></U></FONT></TD>
-				<TD style=\"WIDTH: 54px\"><FONT color=\"#0000ff\" size=\"1\"><U><A href=\"admin_display.htm\">TFT 21\"</A></U></FONT></TD>
-				<TD style=\"WIDTH: 43px\" align=\"center\" colSpan=\"1\" rowSpan=\"1\"><FONT size=\"2\"><FONT color=\"#ff0000\">HS
-				<FONT size=\"1\">10/9</FONT></FONT></FONT></TD>
-				<TD align=\"center\"><FONT style=\"BACKGROUND-COLOR: #ffffff\" face=\"Wingdings\" color=\"#ff0033\">l</FONT></TD>
-				</TR>
-				<TR>
-				<TD style=\"WIDTH: 19px\">&nbsp;</TD>
-				<TD style=\"WIDTH: 315px\" colSpan=\"5\"><INPUT language=\"javascript\" id=\"Button19\" style=\"WIDTH: 328px; HEIGHT: 24px\" onclick=\"location='admin_display.htm';\"
-				type=\"button\" value=\"Ajouter les afficheurs sélectionnés\" name=\"btn12\">
-				</TD>
-				<P></P>
-				</FONT></FONT>
-				</TD>
-				</TR>
-				</TABLE>
-				</P></TD></TR>
-				<TR>
-				<TD align=\"center\" colSpan=\"2\"><INPUT language=\"javascript\" id=\"Button5\" style=\"WIDTH: 191px; HEIGHT: 24px\" onclick=\"return Button1_onclick()\"
-				type=\"button\" value=\"OK\" name=\"Button1\"></TD>
-				</TR>
-*/
+			stream << "<p>Ajout d'afficheur</p>";
 
+			Request::ParametersMap::const_iterator it;
+			it = parameters.find(PARAMETER_SEARCH_UID);
+			uid searchUid = (it == parameters.end()) ? 0 : Conversion::ToLongLong(it->second);
+			uid searchPlace;
+			uid searchLine;
+			uid searchType;
+			int searchState;
+			int searchMessage;
+
+			set<const DisplayScreen*> result = DisplayScreenAlarmRecipient::getLinkedObjects(alarm);
+
+			stream << DisplaySearchAdmin::getHtmlSearchForm(searchRequest, searchUid, searchPlace, searchLine, searchType, searchState, searchMessage);
+
+			ResultHTMLTable::HeaderVector v1;
+			v1.push_back(make_pair(PARAMETER_SEARCH_PLACE, "Emplacement"));
+			v1.push_back(make_pair(PARAMETER_SEARCH_TYPE, "Type"));
+			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, "Etat"));
+			v1.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Msg"));
+			v1.push_back(make_pair(string(), "Add"));
+			ResultHTMLTable t1(v1,searchRequest, string(), true, NULL, string(), string());
+
+			stream << "<p>Résultats de la recherche :</p>";
+
+			stream << t1.open();
+
+			for (set<const DisplayScreen*>::const_iterator it = result.begin(); it != result.end(); ++it)
+			{
+				const DisplayScreen* screen = *it;
+				addRequest->setParameter(AlarmAddLinkAction::PARAMETER_OBJECT_ID, Conversion::ToString(screen->getKey()));
+
+				stream << t1.row(Conversion::ToString(screen->getKey()));
+				stream << t1.col() << screen->getFullName();
+				stream << t1.col() << (screen->getType() ? screen->getType()->getName() : "inconnu");
+				stream << t1.col();
+				stream << t1.col();
+				stream << t1.col() << Html::getLinkButton(addRequest->getURL(), "Ajouter");
+			}
+
+			stream << t1.close();
+		}
+
+		AlarmRecipientSearchFieldsMap DisplayScreenAlarmRecipient::getSearchFields(const Request::ParametersMap& parameters) const
+		{
+			Request::ParametersMap::const_iterator it;
+
+			ConnectionPlace* place = NULL;
+			it = parameters.find(PARAMETER_SEARCH_PLACE);
+			if (it != parameters.end() && EnvModule::getConnectionPlaces().contains(Conversion::ToLongLong(it->second)))
+				place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(it->second));
+
+			Line* line = NULL;
+			it = parameters.find(PARAMETER_SEARCH_LINE);
+			if (it != parameters.end() && EnvModule::getLines().contains(Conversion::ToLongLong(it->second)))
+				line  = EnvModule::getLines().get(Conversion::ToLongLong(it->second));
+
+			AlarmRecipientSearchFieldsMap map;
+			AlarmRecipientFilter arf;
+
+			arf.label = "Arrêt";
+			arf.htmlField = Html::getSelectInput(PARAMETER_SEARCH_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), place ? place->getKey() : UNKNOWN_VALUE);
+			arf.query = "";
+			map.insert(make_pair(PARAMETER_SEARCH_PLACE, arf));
+
+			arf.label = "Ligne";
+			arf.htmlField = Html::getSelectInput(PARAMETER_SEARCH_LINE, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), line ? line->getKey() : UNKNOWN_VALUE);
+			arf.query = "";
+			map.insert(make_pair(PARAMETER_SEARCH_LINE, arf));
+
+			return map;
+		}
+
+		void DisplayScreenAlarmRecipient::addObject(const Alarm* alarm, uid objectId )
+		{
+			add(DeparturesTableModule::getDisplayScreens().get(objectId), alarm);
+		}
+
+		void DisplayScreenAlarmRecipient::removeObject(const Alarm* alarm, uid objectId )
+		{
+			remove(DeparturesTableModule::getDisplayScreens().get(objectId), alarm);
 		}
 	}
 }
