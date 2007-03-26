@@ -51,7 +51,6 @@
 #include "32_admin/SearchFormHTMLTable.h"
 #include "32_admin/ResultHTMLTable.h"
 
-#include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
 
@@ -61,7 +60,6 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
-	using namespace departurestable;
 	using namespace time;
 	using namespace env;
 

@@ -33,6 +33,7 @@ namespace synthese
 	namespace dblog
 	{
 		class DBLog;
+		class DBLogEntry;
 
 		/** Visualisation de journal d'événements.
 			@ingroup m13

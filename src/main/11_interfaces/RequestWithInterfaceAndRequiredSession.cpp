@@ -48,7 +48,9 @@ namespace synthese
 				try
 				{
 					const InterfacePage* page = _interface->getPage(_interface->getNoSessionDefaultPageCode());
-					page->display(stream, ParametersVector(), VariablesMap(), NULL, this);
+					ParametersVector pv;
+					VariablesMap vm;
+					page->display(stream, pv, vm, NULL, this);
 				}
 				catch (InterfacePageException e)
 				{

@@ -20,6 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "34_departures_table/DisplayScreenAlarmRecipient.h"
+
 #include <vector>
 
 #include "01_util/Html.h"
@@ -40,9 +42,7 @@
 #include "32_admin/ResultHTMLTable.h"
 #include "32_admin/AdminModule.h"
 
-#include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/BroadcastPoint.h"
-#include "34_departures_table/DisplayScreenAlarmRecipient.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
 
@@ -50,6 +50,8 @@ using namespace std;
 
 namespace synthese
 {
+
+
 	using namespace messages;
 	using namespace util;
 	using namespace departurestable;
@@ -60,9 +62,21 @@ namespace synthese
 
 	namespace messages
 	{
-		AlarmRecipientTemplate<DisplayScreen>::LinksSetAlarm AlarmRecipientTemplate<DisplayScreen>::_linksAlarm;
-		AlarmRecipientTemplate<DisplayScreen>::LinksSetObject AlarmRecipientTemplate<DisplayScreen>::_linksObject;
+	    /* IMPORTANT : for some reason, probably a gcc bug, is was necessary to 
+	       explicitly call constructor with () in order to avoid undefined references.
+	       This should be investigate further.
+	    */
+
+	    template<> AlarmRecipientTemplate<DisplayScreen>::LinksSetAlarm
+	    AlarmRecipientTemplate<DisplayScreen>::_linksAlarm = 
+		std::map<const Alarm*, std::set<const DisplayScreen*> > ();
+
+	    template<> AlarmRecipientTemplate<DisplayScreen>::LinksSetObject
+	      AlarmRecipientTemplate<DisplayScreen>::_linksObject = 
+		std::map<const DisplayScreen*, std::set<const Alarm*> > () ;
+
 	}
+
 
 	namespace departurestable
 	{
@@ -154,6 +168,7 @@ namespace synthese
 
 		AlarmRecipientSearchFieldsMap DisplayScreenAlarmRecipient::getSearchFields(const Request::ParametersMap& parameters) const
 		{
+
 			Request::ParametersMap::const_iterator it;
 
 			ConnectionPlace* place = NULL;

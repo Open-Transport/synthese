@@ -48,7 +48,11 @@ namespace synthese
 			ParametersVector pv;
 			for (Request::ParametersMap::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
 				pv.push_back(it->second);
-			_page->display(stream, pv, VariablesMap(), NULL, this);
+			    
+
+			VariablesMap vm;
+
+			_page->display(stream, pv, vm, NULL, this);
 		}
 
 		void SimplePageRequest::setFromParametersMap(const Request::ParametersMap& map )

@@ -24,17 +24,13 @@
 #define SYNTHESE_DisplayScreenAlarmRecipient_h__
 
 #include "17_messages/AlarmRecipientTemplate.h"
+#include "DisplayScreen.h"
 
 namespace synthese
 {
-	namespace messages
-	{
-		class Alarm;
-	}
 
 	namespace departurestable
 	{
-		class DisplayScreen;
 
 		/** DisplayScreenAlarmRecipient class.
 			@ingroup m34

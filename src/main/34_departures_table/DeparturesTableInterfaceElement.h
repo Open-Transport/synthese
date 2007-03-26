@@ -29,9 +29,15 @@
 
 namespace synthese
 {
+    namespace interfaces
+    {
+	class ValueInterfaceElement;
+	
+    }
+
+
 	namespace departurestable
 	{
-		class ValueInterfaceElement;
 
 		/** Departure table based on a display screen definition.
 			@ingroup m34

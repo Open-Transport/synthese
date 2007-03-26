@@ -59,7 +59,9 @@ namespace synthese
 			if (_interface != NULL)
 			{
 				const RedirectInterfacePage* page = _interface->getPage<RedirectInterfacePage>();
-				page->display(stream, VariablesMap(), this);
+
+				VariablesMap vm;
+				page->display(stream, vm, this);
 			}
 
 			return true;
