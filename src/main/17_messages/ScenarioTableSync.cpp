@@ -71,6 +71,7 @@ namespace synthese
 				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToString(object->getIsATemplate())
+				<< "," << Conversion::ToString(object->getIsEnabled())
 				<< "," << Conversion::ToSQLiteString(object->getName())
 				<< "," << object->getPeriodStart().toSQLString()
 				<< "," << object->getPeriodEnd().toSQLString()
@@ -110,13 +111,14 @@ namespace synthese
 				if (MessagesModule::getScenarii().contains (id))
 				{
 					scenario = MessagesModule::getScenarii().get(id);
+					load(scenario, rows, rowIndex);
 				}
 				else
 				{
 					scenario = new Scenario;
+					load(scenario, rows, rowIndex);
 					MessagesModule::getScenarii().add (scenario);
 				}
-				load(scenario, rows, rowIndex);
 			}
 		}
 
