@@ -10,23 +10,13 @@ moduleenv.AppendMultithreadConf ()
 
 files = moduleenv.Glob(includes, excludes)
 
-srcpath = Dir('.').srcnode().abspath
-subdirs = os.listdir( srcpath )
-
-
-# Build the list of modules to be processed
-for f in subdirs:
-	if not os.path.isdir (os.path.join (srcpath, f)): continue
-	files.append (moduleenv.Glob (includes, excludes, os.path.join (srcpath, f)))
 
 moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
 
 
 
 moduleenv = mainenv.ModuleEnv()
-includes = ''
-excludes = []
-files = moduleenv.Glob(includes, excludes)
+
 
 
 # Modules libs
@@ -38,9 +28,10 @@ moduleenv.AddBoostDependency ('boost_date_time')
 moduleenv.AddBoostDependency ('boost_program_options')
 moduleenv.AddBoostDependency ('boost_thread')
 moduleenv.AddBoostDependency ('boost_iostreams')
+moduleenv.AddSQLiteDependency ()
 moduleenv.AppendMultithreadConf ()
 
-moduleenv.Program ( moduleenv.DefaultModuleName(), files )
+moduleenv.Program ( "zob", files )
 
 
 

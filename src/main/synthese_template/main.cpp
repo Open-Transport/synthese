@@ -64,7 +64,7 @@ int main( int argc, char **argv )
     po::options_description desc("Allowed options");
     desc.add_options()
 	("help", "produce this help message")
-	("db", po::value<std::string>(&db)->default_value ("./synthese.db3"), "SQLite database file")
+	("db", po::value<std::string>(&db)->default_value (std::string ("./synthese.db3")), "SQLite database file")
 	("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
 	 
     po::variables_map vm;

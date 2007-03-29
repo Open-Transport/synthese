@@ -3,20 +3,34 @@ import os
 # -------------------------------------------------------
 # Command line arguments
 # -------------------------------------------------------
+opts = Options('custom.py')
+opts.Add('CC', 'The C compiler.')
+opts.Add('CXX', 'The C++ compiler.')
+
 rootenv = Environment(ENV = os.environ)
+
+Help(opts.GenerateHelpText(rootenv))
 
 mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
-librepo = ARGUMENTS.get('libs_repo_home', os.environ['LIBS_REPO_HOME'])   
+librepo = ARGUMENTS.get('librepo', os.environ['LIBS_REPO_HOME'])   
+goal = ARGUMENTS.get('goal').lower()  
+toolset = ARGUMENTS.get('toolset').lower()  
+version = ARGUMENTS.get('version').lower()  
+boostversion = ARGUMENTS.get('boostversion').lower()  
+sqliteversion = ARGUMENTS.get('sqliteversion').lower()  
 
 
 print "platform = ", platform
 print "mode     = ", mode
+print "goal     = ", goal
+print "toolset  = ", toolset
+
 
 rootenv.Replace ( PLATFORM = platform )
 rootenv.Replace ( MODE = mode )
 
-buildroot = 'build' + '/' + platform + '/' + mode
+buildroot = 'build' + '/' + platform + '/' +'/' + mode
 buildmain = buildroot + '/main'
 buildtest = buildroot + '/test'
 
@@ -100,7 +114,7 @@ def DefineDefaultCPPDefines (env):
             env.Append ( CPPDEFINES = ['DEBUG'] )
     
     elif (platform=='win32'):
-        env.Append ( CPPDEFINES = ['_MBCS', '_CONSOLE', '_USE_MATH_DEFINES', '__WIN32__', 'WIN32', '_AFXDLL' ] )
+        env.Append ( CPPDEFINES = ['_MBCS', '_USE_MATH_DEFINES', '__WIN32__', 'WIN32'] )
         if (mode=='debug'):
             env.Append ( CPPDEFINES = ['DEBUG', '_DEBUG'] )
         else:  
@@ -125,12 +139,13 @@ def DefineDefaultCCFlags (env):
 
 
     elif (platform=='win32'):
-        env.Append ( CCFLAGS = ['/EHsc', '/GR', '/GS', '/W3', '/nologo', '/c', '/Wp64', '/TP'] )
+        env.Append ( CCFLAGS = ['/EHsc', '/GR', '/GS', '/W3', '/nologo', '/c', '/Wp64'] )
+        env.Append ( CCFLAGS = ['/wd4005', '/wd4996'])
 
         if (mode=='debug'):
-            env.Append ( CCFLAGS = ['/Od', '/MDd', '/Gm', '/RTC1', '/ZI'] )
+            env.Append ( CCFLAGS = ['/Od', '/MTd', '/Gm', '/RTC1', '/ZI'] )
         else:  
-            env.Append ( CCFLAGS = ['/Ox', '/FD', '/MD', '/Zi'] )
+            env.Append ( CCFLAGS = ['/Ox', '/FD', '/MT', '/Zi'] )
     
   
 def DefineDefaultLinkFlags (env):
@@ -138,11 +153,8 @@ def DefineDefaultLinkFlags (env):
     mode = env['MODE']
 
     if (platform=='win32'):
-        env.Append ( LINKFLAGS = ['/INCREMENTAL:NO', '/NOLOGO', '/MACHINE:X86', '/SUBSYSTEM:CONSOLE', '/OPT:NOREF'] )
-        if (mode=='debug'):
-            env.Append ( LINKFLAGS = ['/DEBUG', '/NODEFAULTLIB:msvcrt.lib'] )
-        else:  
-            env.Append ( LINKFLAGS = ['/NODEFAULTLIB:msvcrtd.lib'] )
+        env.Append ( LINKFLAGS = ['/INCREMENTAL:NO', '/NOLOGO', '/MACHINE:X86', '/OPT:NOREF'] )
+
 
 
 
@@ -157,51 +169,47 @@ def DefineDefaultLibs (env):
 
     if (platform=='win32'):
         env.Append ( LIBS = ['advapi32.lib'] )  
-        if (mode=='debug'):
-            env.Append ( LIBS = ['msvcrtd.lib'] )  
-        else:  
-            env.Append ( LIBS = ['msvcrt.lib'] )  
+
+
+
+
+
+def AddDependency (env, libname, libversion, multithreaded):
+    deplib = libname
+
+    if multithreaded:
+      deplib = deplib + "-mt"
+    
+    if platform == 'posix':
+      # ALWAYS DYNAMIC LINK !
+      if mode == 'debug':
+        deplib = deplib + "-d"
+      
+      
+    if platform == 'win32':
+      # ALWAYS STATIC LINK !
+      deplib = 'lib' + deplib + "-s"
+      if mode == 'debug':
+        deplib = deplib + "gd"
+        
+    deplib = deplib + "-" + libversion
+    env.Append (LIBS = [deplib] )
+    distlib = env['LIBPREFIX'] + deplib + env['SHLIBSUFFIX']
+    env.Append (DISTLIBS = [librepo + '/lib/' + distlib])
 
 
 
 def AddBoostDependency (env, libname):
-    boostversion = '1_33_1'
-    platform = env['PLATFORM']
-    mode = env['MODE']
-
-    if platform == 'win32':
-        # automatic link, no need to add libs
-        return
-
-    boostlib = libname + '-gcc'
-    
-    # always multithreaded by now
-    boostlib = boostlib + "-mt"
-    if (mode == 'debug'):
-        boostlib = boostlib + "-d"
-    boostlib = boostlib + "-" + boostversion
-
-    env.Append (LIBS = [boostlib] )
-    distlib = env['LIBPREFIX'] + boostlib + env['SHLIBSUFFIX']
-    env.Append (DISTLIBS = [librepo + '/lib/' + distlib + '.' + boostversion.replace ('_', '.')])
+  AddDependency (env, libname, boostversion, True)
     
 
 
 def AddSQLiteDependency (env):
-    platform = env['PLATFORM']
-    mode = env['MODE']
-
-    env.Append (LIBS = ['sqlite3'] )
-    distlib = env['LIBPREFIX'] + 'sqlite3' + env['SHLIBSUFFIX']
-    env.Append (DISTLIBS = [librepo + '/lib/' + distlib])
-
+  AddDependency (env, "sqlite", sqliteversion, True)
     
 
 
 def AppendMultithreadConf (env):
-    platform = env['PLATFORM']
-    mode = env['MODE']
-
     if (platform == 'posix'):
         env.Append (CCFLAGS= '-pthread' )
         env.Append (LIBS= ['pthread'] ) 
@@ -247,11 +255,11 @@ def SyntheseEnv (env, modules):
         syntheseenv.AddModuleDependency (module)
 
     # Some hard-coded dependencies
+    syntheseenv.AddBoostDependency ('boost_program_options')
     syntheseenv.AddBoostDependency ('boost_filesystem')
     syntheseenv.AddBoostDependency ('boost_date_time')
     syntheseenv.AddBoostDependency ('boost_thread')
     syntheseenv.AddBoostDependency ('boost_iostreams')
-    syntheseenv.AddBoostDependency ('boost_program_options')
     syntheseenv.AddSQLiteDependency ()
     syntheseenv.AppendMultithreadConf ()
 
@@ -302,9 +310,9 @@ def SynthesePreBuild (target = None, source = None, env = None):
 
 
 def SyntheseDist (target = None, source = None, env = None):
-    distname = os.path.basename (target[0].abspath)
+    distname = os.path.basename (target[0].abspath).replace ('.exe', '')
     distdir = os.path.join (distroot, distname)
-    distdir = distdir + '/' + platform + '/' + mode
+    distdir = distdir + '_' + platform + '_' + mode
 
     Execute (Delete (distdir))
     Execute (Mkdir (distdir))
@@ -313,8 +321,9 @@ def SyntheseDist (target = None, source = None, env = None):
     # Executable file
     Execute (Copy (os.path.join (distdir, os.path.basename (target[0].abspath)), target[0].abspath))
     
-    # Copy libs
-    env.CopyFiles (distdir + '/libs/', env['DISTLIBS'])
+    # Copy libs under posix (on windows exe is standalone)
+    if platform == 'posix':
+      env.CopyFiles (distdir + '/libs/', env['DISTLIBS'])
 
     # Copy resources
     if (os.path.exists (resourcesdist + '/' + distname)):
@@ -338,17 +347,17 @@ def SyntheseBuild (env, binname):
     
     preaction = Action (SynthesePreBuild)
 
-    env.Program ( binname, files )
-
+    exename = env.Program ( binname, files )
+    exename = os.path.basename (exename[0].path)
+    
     mainobj = "main" + env['OBJSUFFIX']
     env.AddPreAction (mainobj, preaction)
     env.AlwaysBuild (mainobj)
     
-    if 'dist' in COMMAND_LINE_TARGETS:  
-        if platform == 'posix':
-            # Copy dynamic libraries
-	    postaction = Action (SyntheseDist)
-    	    env.AddPostAction (binname, postaction)
+    if goal == 'dist':
+        # Copy dynamic libraries
+        postaction = Action (SyntheseDist)
+        env.AddPostAction (exename, postaction)
 
 
 			       

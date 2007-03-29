@@ -48,7 +48,7 @@ TcpServerSocket::setTimeOut (int timeOut)
 
 
 std::streamsize 
-TcpServerSocket::read(char* s, std::streamsize n) throw (SocketException)
+TcpServerSocket::read(char* s, std::streamsize n)
 {
     try 
     {
@@ -64,7 +64,7 @@ TcpServerSocket::read(char* s, std::streamsize n) throw (SocketException)
 
 
 std::streamsize 
-TcpServerSocket::write(const char* s, std::streamsize n) throw (SocketException)
+TcpServerSocket::write(const char* s, std::streamsize n)
 {
     try 
     {

@@ -45,7 +45,7 @@ TcpService::~TcpService ()
 
 
 void 
-TcpService::initialize () throw (SocketException)
+TcpService::initialize () 
 {
     Socket* socket = new Socket (_nonBlocking);
     try 
@@ -99,7 +99,7 @@ TcpService::closeService (int portNumber)
 
 
 TcpServerSocket*
-TcpService::acceptConnection () throw (SocketException)
+TcpService::acceptConnection () 
 {
     try 
     {
@@ -137,7 +137,7 @@ TcpService::getConnectionCount () const
 
 
 void 
-TcpService::closeConnection (TcpServerSocket* socket) throw (SocketException)
+TcpService::closeConnection (TcpServerSocket* socket) 
 {
     boost::mutex::scoped_lock lock (_serviceMutex);
 

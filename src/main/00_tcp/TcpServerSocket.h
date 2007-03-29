@@ -51,9 +51,9 @@ public:
 
     int getSocketId () const;
 
-    std::streamsize read(char* s, std::streamsize n) throw (SocketException);
+    std::streamsize read(char* s, std::streamsize n);
 
-    std::streamsize write(const char* s, std::streamsize n) throw (SocketException);
+    std::streamsize write(const char* s, std::streamsize n);
 
     /** If timeOut == 0, operation is blocking.
      */

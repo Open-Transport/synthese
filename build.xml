@@ -1,42 +1,26 @@
 <project name="synthese" default="all" basedir=".">
 
+  <import file="../common.xml"/>
 
-  <typedef file="../buildlib.xml"/>
-
-
-  <property file="../version.properties"/>
-
-  <property name="version" value="3.0"/>
+  <property name="version" value="3_0"/>
   <property name="lang" value="c++"/>
-
-  <property file="../build.properties"/>
-
-
-  <condition property="platform" value="posix">
-    <or>
-      <os family="unix"/>
-      <os family="mac"/>
-    </or>
-  </condition>
-  <condition property="platform" value="win32">
-    <or>
-      <os family="windows"/>
-    </or>
-  </condition>
+  
+  <property name="include.home" value="${src.home}"/>
+  <property name="deploy.local.lib.regexp.from" value="(.*)"/>
+  <property name="deploy.local.lib.regexp.to" value="\1"/>
 
 
-  <target name="clean">
-    <clean/>
-  </target>
+
+  <target name="deploy"/>
 
 
-  <target name="all">
 
-    <property name="goal" value="dist"/>
-    
-<!--     <clean/> -->
-<!--     <sconsbuild/> -->
-<!--     <deploy/> -->
+  <target name="build">
+
+    <antcall target="sconsbuild">
+      <param name="goal" value="dist"/>
+      <param name="target" value="${target}"/>
+    </antcall>
 
    <basename property="distname" file="${target}"/>
 

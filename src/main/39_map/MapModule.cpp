@@ -13,7 +13,7 @@ using synthese::util::Log;
   #define DEFAULT_TEMP_DIR "/tmp"
 #endif
 #ifdef WIN32
-  #define DEFAULT_TEMP_DIR getenv("TEMP") ? getenv("TEMP") : ".", boost::filesystem::native
+  #define DEFAULT_TEMP_DIR "c:/temp"
 #endif
 
 

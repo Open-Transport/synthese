@@ -46,7 +46,7 @@ TcpClientSocket::isConnected () const
 
 
 void 
-TcpClientSocket::tryToConnect () throw (SocketException)
+TcpClientSocket::tryToConnect ()
 {
 	Socket* socket = new Socket ();
     try 
@@ -90,7 +90,7 @@ TcpClientSocket::setTimeOut (int timeOut)
 
 
 std::streamsize 
-TcpClientSocket::read(char* s, std::streamsize n) throw (SocketException)
+TcpClientSocket::read(char* s, std::streamsize n) 
 {
     try 
     {
@@ -108,7 +108,7 @@ TcpClientSocket::read(char* s, std::streamsize n) throw (SocketException)
 
 
 std::streamsize 
-TcpClientSocket::write(const char* s, std::streamsize n) throw (SocketException)
+TcpClientSocket::write(const char* s, std::streamsize n)
 {
     try 
     {

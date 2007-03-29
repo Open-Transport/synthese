@@ -9,16 +9,17 @@
 #include "01_util/Log.h"
 #include "01_util/Thread.h"
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-
 #include <boost/iostreams/stream.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 using namespace synthese::util;
 using namespace synthese::tcp;
@@ -33,13 +34,13 @@ int main( int argc, char **argv )
 {
     std::string host;
     int port;
-
     po::options_description desc("Allowed options");
+
     desc.add_options()
 	("help", "produce this help message")
 	("host", po::value<std::string>(&host)->default_value ("localhost"), "SQLite db server host")
-	("port", po::value<int>(&port)->default_value (3592), "SQLite db server port");
-	
+	("port", po::value<int>(&port)->default_value (3592), "SQLite db server port"); 
+
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);    
@@ -116,39 +117,7 @@ int main( int argc, char **argv )
 	    input = "";
 	    std::cout << "? ";
 	} 
-/*
-	while (std::cin.getline (buf, 4096))
-	{
-	    std::string part (buf);
-	    // input += boost::algorithm::to_lower_copy (part);
-	    input += part;
-	    boost::algorithm::trim (part);
 
-	    if ((part.length () > 0) && (part[part.length () - 1] == ';'))
-	    {
-		std::cout << "Sending input : " << input << std::endl;
-		cliSocketStream << input << eot;
-		cliSocketStream.flush ();
-
-		// Wait for reply
-		cliSocketStream.getline (buf, 4096, eot);
-
-		std::string answer (buf);
-		std::cout << "Answer received : " << answer << std::endl;
-		
-		input = "";
-		std::cout << "? ";
-	    } 
-	    else 
-	    {
-		std::cout << "  ";
-		input += " ";
-	    }
-	    
-	    // if (input == "quit") break;
-	    
-	}
-*/
     }
     catch (synthese::util::Exception& ex)
     {

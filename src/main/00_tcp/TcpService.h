@@ -71,13 +71,13 @@ public:
     /** Waits for incoming TCP connection (non-blocking).
 	@return The TCP server socket, or 0 if connection failed.
      */
-    TcpServerSocket* acceptConnection () throw (SocketException);
+    TcpServerSocket* acceptConnection () ;
 
     
     /** Closes an existing TCP connection
        @param socket The socket id.
      */
-    void closeConnection (TcpServerSocket* socket) throw (SocketException);
+    void closeConnection (TcpServerSocket* socket);
 
 
     /** Gets active connection count on this service.
@@ -87,7 +87,7 @@ public:
 
 private:
 
-    void initialize () throw (SocketException);
+    void initialize () ;
 
 
     friend class TcpServerSocket;
