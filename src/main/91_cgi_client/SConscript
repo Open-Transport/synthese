@@ -15,10 +15,10 @@ moduleenv.AppendMultithreadConf ()
 moduleenv.AddModuleDependency ('30_server')
 moduleenv.AddModuleDependency ('11_interfaces')
 
-moduleenv.AddModuleDependency ('00_tcp')
-moduleenv.AddModuleDependency ('01_util')
-moduleenv.AddModuleDependency ('02_db')
 moduleenv.AddModuleDependency ('04_time')
+moduleenv.AddModuleDependency ('02_db')
+moduleenv.AddModuleDependency ('01_util')
+moduleenv.AddModuleDependency ('00_tcp')
 
 moduleenv.AddBoostDependency ('boost_filesystem')
 moduleenv.AddBoostDependency ('boost_date_time')
