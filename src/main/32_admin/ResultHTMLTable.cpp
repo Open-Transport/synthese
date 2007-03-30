@@ -52,8 +52,8 @@ namespace synthese
 			for (HeaderVector::const_iterator it = header.begin(); it != header.end(); ++it)
 			{
 				s << "<th>" << it->second;
-				if (!it->first.empty())
-					s << "&nbsp;<img src=\"" << iconPath << "/down.png\" alt=\"Trier par ordre décroissant\" />&nbsp;<img src=\"" << iconPath << "/up.png\" alt=\"Trier par ordre croissant\" />";
+				if (!it->first.empty() && !iconPath.empty())
+					s << "&nbsp;<img src=\"" << iconPath << "down.png\" alt=\"Trier par ordre décroissant\" />&nbsp;<img src=\"" << iconPath << "up.png\" alt=\"Trier par ordre croissant\" />";
 				s << "</th>";
 			}
 			s << "</tr>";

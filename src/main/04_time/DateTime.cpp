@@ -471,6 +471,9 @@ namespace synthese
 
 		DateTime DateTime::FromInternalString( const std::string& str )
 		{
+			if (str == "A")
+				return DateTime();
+
 			return DateTime (Conversion::ToInt (str.substr (6, 2)),
 				Conversion::ToInt (str.substr (4, 2)),
 				Conversion::ToInt (str.substr (0, 4)),

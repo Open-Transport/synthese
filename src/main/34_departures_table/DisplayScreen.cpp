@@ -35,6 +35,7 @@
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DisplayMaintenanceLog.h"
 #include "34_departures_table/DeparturesTableInterfacePage.h"
+#include "34_departures_table/DisplayScreenAlarmRecipient.h"
 
 using namespace std;
 
@@ -255,10 +256,12 @@ namespace synthese
 			try
 			{
 				ArrivalDepartureTableGenerator* generator = getGenerator(date);
-				const ArrivalDepartureList& result = generator->generate();
+				ArrivalDepartureListWithAlarm displayedObject;
+				displayedObject.map = generator->generate();
+				displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this);
 				const DeparturesTableInterfacePage* const page = _displayType->getInterface()->getPage<DeparturesTableInterfacePage>();
 				VariablesMap variables;
-				page->display(stream, variables, getTitle(), getWiringCode(), result);
+				page->display(stream, variables, getTitle(), getWiringCode(), displayedObject);
 				delete generator;
 			}
 			catch (InterfacePageException e)

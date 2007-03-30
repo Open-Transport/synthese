@@ -43,6 +43,7 @@ namespace synthese
 	namespace messages
 	{
 		class Alarm;
+		class Scenario;
 
 		/** Alarm SQLite table synchronizer.
 			@ingroup m17
@@ -90,7 +91,8 @@ namespace synthese
 		public:
 			/** The returned alarms must be deleted */
 			static std::vector<Alarm*> search(
-				time::DateTime startDate, time::DateTime endDate
+				Scenario* scenario
+				, time::DateTime startDate, time::DateTime endDate
 				, int first = 0, int number = 0);
 
 

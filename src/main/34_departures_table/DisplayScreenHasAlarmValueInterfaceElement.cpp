@@ -33,6 +33,7 @@
 
 #include "34_departures_table/DisplayScreenHasAlarmValueInterfaceElement.h"
 #include "34_departures_table/DisplayScreenAlarmRecipient.h"
+#include "34_departures_table/Types.h"
 
 using namespace std;
 
@@ -46,7 +47,7 @@ namespace synthese
 	{
 		string DisplayScreenHasAlarmValueInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
-			const Alarm* alarm = DisplayScreenAlarmRecipient::getAlarm((const DisplayScreen*) object);
+			const Alarm* alarm = ((const ArrivalDepartureListWithAlarm*) object)->alarm;
 			
 			// No alarm
 			if (alarm == NULL)

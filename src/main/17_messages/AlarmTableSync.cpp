@@ -28,6 +28,7 @@
 #include "04_time/DateTime.h"
 
 #include "17_messages/Alarm.h"
+#include "17_messages/Scenario.h"
 #include "17_messages/Types.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesModule.h"
@@ -173,16 +174,17 @@ namespace synthese
 			}
 		}
 
-		std::vector<Alarm*> AlarmTableSync::search(time::DateTime startDate, time::DateTime endDate, int first /*= 0*/, int number /*= 0*/)
+		std::vector<Alarm*> AlarmTableSync::search(Scenario* scenario, time::DateTime startDate, time::DateTime endDate, int first /*= 0*/, int number /*= 0*/)
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT a.*"
 				<< " FROM " << TABLE_NAME << " AS a "
-				<< " WHERE 1 ";
+				<< " WHERE "
+				<< COL_SCENARIO_ID << "=" << ((scenario == NULL) ? "0" : Conversion::ToString(scenario->getKey()));
 			if (!startDate.isUnknown())
-				query << COL_PERIODSTART << "<=" << startDate.toSQLString();
+				query << " AND " << COL_PERIODSTART << "<=" << startDate.toSQLString();
 			if (!endDate.isUnknown())
 				query << " AND " << COL_PERIODEND << ">=" << endDate.toSQLString();
 			if (number > 0)

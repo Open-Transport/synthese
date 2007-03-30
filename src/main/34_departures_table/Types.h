@@ -43,6 +43,11 @@ namespace synthese
 		class LineStop;
 	}
 
+	namespace messages
+	{
+		class Alarm;
+	}
+
 	typedef std::set<const env::ConnectionPlace*> DisplayedPlacesList;
 	typedef std::set<const env::Line*> LineFilter;
 	typedef std::set<const env::ConnectionPlace*> ForbiddenPlacesList;
@@ -62,6 +67,7 @@ namespace synthese
 	typedef std::vector<const env::ConnectionPlace*> ActualDisplayedArrivalsList;
 	typedef std::pair<DeparturesTableElement, ActualDisplayedArrivalsList> ArrivalDepartureRow;
 	typedef std::map<DeparturesTableElement, ActualDisplayedArrivalsList, DeparturesTableElementLess> ArrivalDepartureList;
+	struct ArrivalDepartureListWithAlarm { ArrivalDepartureList map; const messages::Alarm* alarm; };
 }
 
 /** @} */

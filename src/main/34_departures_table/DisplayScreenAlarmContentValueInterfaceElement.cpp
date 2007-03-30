@@ -53,7 +53,7 @@ namespace synthese
 
 		string DisplayScreenAlarmContentValueInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
-			const Alarm* alarm = DisplayScreenAlarmRecipient::getAlarm((const DisplayScreen*) object);
+			const Alarm* alarm = ((const ArrivalDepartureListWithAlarm*) object)->alarm;
 			
 			if (alarm == NULL)
 				return "";

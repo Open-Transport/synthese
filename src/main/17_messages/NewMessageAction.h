@@ -29,15 +29,20 @@ namespace synthese
 {
 	namespace messages
 	{
-		/** NewMessageAction action class.
+		class Scenario;
+
+		/** Alarm creation action class.
 			@ingroup m17
 		*/
 		class NewMessageAction : public server::Action
 		{
 		public:
-			static const std::string PARAMETER_TEMPLATE_ID;
+			static const std::string PARAMETER_IS_TEMPLATE;
+			static const std::string PARAMETER_SCENARIO_ID;
 
 		private:
+			Scenario*	_scenario;
+			bool		_isTemplate;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -54,6 +59,7 @@ namespace synthese
 			/** Constructor.
 			*/
 			NewMessageAction();
+			~NewMessageAction();
 
 			/** Action to run, defined by each subclass.
 			*/

@@ -67,47 +67,50 @@ namespace synthese
 					throw ActionException("Type not specified");
 				_type = (AlarmLevel) Conversion::ToInt(it->second);
 
-				string date;
-				it = map.find(PARAMETER_START_DATE);
-				if (it == map.end())
-					throw ActionException("Start date not specified");
-				if (!it->second.empty())
+				if (_alarm->getScenario() == NULL)
 				{
-					date = it->second;
+					string date;
+					it = map.find(PARAMETER_START_DATE);
+					if (it == map.end())
+						throw ActionException("Start date not specified");
+					if (!it->second.empty())
+					{
+						date = it->second;
+						map.erase(it);
+
+						it = map.find(PARAMETER_START_HOUR);
+						if (it == map.end())
+							throw ActionException("Start hour not specified");
+						_startDate = it->second.empty()
+							? DateTime::FromString(date + " 0:0")
+							: DateTime::FromString(date + " " + it->second);
+					}
 					map.erase(it);
 
-					it = map.find(PARAMETER_START_HOUR);
+					it = map.find(PARAMETER_END_DATE);
 					if (it == map.end())
-						throw ActionException("Start hour not specified");
-					_startDate = it->second.empty()
-						? DateTime::FromString(date + " 0:0")
-						: DateTime::FromString(date + " " + it->second);
-				}
-				map.erase(it);
+						throw ActionException("End date not specified");
+					if (!it->second.empty())
+					{
+						date = it->second;
+						map.erase(it);
 
-				it = map.find(PARAMETER_END_DATE);
-				if (it == map.end())
-					throw ActionException("End date not specified");
-				if (!it->second.empty())
-				{
-					date = it->second;
+						it = map.find(PARAMETER_END_HOUR);
+						if (it == map.end())
+							throw ActionException("End hour not specified");
+						_endDate = it->second.empty()
+							? DateTime::FromString(date + " 23:59")
+							: DateTime::FromString(date + " " + it->second);
+					}
 					map.erase(it);
 
-					it = map.find(PARAMETER_END_HOUR);
+					// Enabled status
+					it = map.find(PARAMETER_ENABLED);
 					if (it == map.end())
-						throw ActionException("End hour not specified");
-					_endDate = it->second.empty()
-						? DateTime::FromString(date + " 23:59")
-						: DateTime::FromString(date + " " + it->second);
+						throw ActionException("Enabled status not specified");
+					_enabled = Conversion::ToBool(it->second);
+					map.erase(it);
 				}
-				map.erase(it);
-
-				// Enabled status
-				it = map.find(PARAMETER_ENABLED);
-				if (it == map.end())
-					throw ActionException("Enabled status not specified");
-				_enabled = Conversion::ToBool(it->second);
-				map.erase(it);
 			}
 			catch (Alarm::RegistryKeyException e)
 			{
@@ -132,9 +135,12 @@ namespace synthese
 		void UpdateAlarmAction::run()
 		{
 			_alarm->setLevel(_type);
-			_alarm->setPeriodStart(_startDate);
-			_alarm->setPeriodEnd(_endDate);
-			_alarm->setIsEnabled(_enabled);
+			if (_alarm->getScenario() == NULL)
+			{
+				_alarm->setPeriodStart(_startDate);
+				_alarm->setPeriodEnd(_endDate);
+				_alarm->setIsEnabled(_enabled);
+			}
 			AlarmTableSync::save(_alarm);
 		}
 	}

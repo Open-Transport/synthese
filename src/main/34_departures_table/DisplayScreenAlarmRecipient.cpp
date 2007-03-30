@@ -45,6 +45,7 @@
 #include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
+#include "34_departures_table/DisplayScreenTableSync.h"
 
 using namespace std;
 
@@ -95,48 +96,55 @@ namespace synthese
 
 		void DisplayScreenAlarmRecipient::displayBroadcastListEditor(ostream& stream, const Alarm* alarm, const AdminRequest::ParametersMap& parameters, AdminRequest* searchRequest, AdminRequest* addRequest, AdminRequest* removeRequest )
 		{
-			vector<string> v;
-			v.push_back("Emplacement");
-			v.push_back("Etat");
-			v.push_back("Actions");
-			HtmlTable t(v);
-
-			stream << t.open();
-
 			vector<AlarmObjectLink<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreen> (alarm, this->getFactoryKey());
-			for (vector<AlarmObjectLink<DisplayScreen> >::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
+			set<uid> usedDisplayScreens;
+
+			if (!dsv.empty())
 			{
-				DisplayScreen* ds = dsit->getObject();
-				removeRequest->setParameter(AlarmRemoveLinkAction::PARAMETER_LINK_ID, Conversion::ToString(dsit->getKey()));
-				
-				stream << t.row();
-				stream << t.col() << ds->getLocalization()->getConnectionPlace()->getFullName() << "/" << ds->getLocalization()->getName();
-				if (ds->getLocalizationComment() != "")
-					stream << "/" << ds->getLocalizationComment();
+				vector<string> v;
+				v.push_back("Emplacement");
+				v.push_back("Etat");
+				v.push_back("Actions");
+				HtmlTable t(v);
 
-				stream << t.col() << "<FONT face=\"Wingdings\" color=\"#00cc00\">l</FONT>"; // Bullet
-				stream << t.col() << Html::getLinkButton(removeRequest->getURL(), "Supprimer", "Etes-vous sûr de vouloir retirer l'afficheur des destinataires du message ?");
+				stream << t.open();
 
-				delete ds->getLocalization();
-				delete ds;
+				for (vector<AlarmObjectLink<DisplayScreen> >::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
+				{
+					DisplayScreen* ds = dsit->getObject();
+					usedDisplayScreens.insert(ds->getKey());
+					removeRequest->setParameter(AlarmRemoveLinkAction::PARAMETER_LINK_ID, Conversion::ToString(dsit->getKey()));
+					
+					stream << t.row();
+					stream << t.col() << ds->getLocalization()->getConnectionPlace()->getFullName() << "/" << ds->getLocalization()->getName();
+					if (ds->getLocalizationComment() != "")
+						stream << "/" << ds->getLocalizationComment();
+
+					stream << t.col() << "<FONT face=\"Wingdings\" color=\"#00cc00\">l</FONT>"; // Bullet
+					stream << t.col() << Html::getLinkButton(removeRequest->getURL(), "Supprimer", "Etes-vous sûr de vouloir retirer l'afficheur des destinataires du message ?");
+
+					delete ds;
+				}
+
+				stream << t.close();
 			}
-
-			stream << t.close();
 
 			stream << "<p>Ajout d'afficheur</p>";
 
 			Request::ParametersMap::const_iterator it;
 			it = parameters.find(PARAMETER_SEARCH_UID);
 			uid searchUid = (it == parameters.end()) ? 0 : Conversion::ToLongLong(it->second);
-			uid searchPlace;
-			uid searchLine;
-			uid searchType;
-			int searchState;
-			int searchMessage;
+			it = parameters.find(PARAMETER_SEARCH_PLACE);
+			uid searchPlace = (it == parameters.end()) ? 0 : Conversion::ToLongLong(it->second);
+			uid searchLine = 0;
+			uid searchType = 0;
+			int searchState = 0;
+			int searchMessage = 0;
 
 			set<const DisplayScreen*> result = DisplayScreenAlarmRecipient::getLinkedObjects(alarm);
 
 			stream << DisplaySearchAdmin::getHtmlSearchForm(searchRequest, searchUid, searchPlace, searchLine, searchType, searchState, searchMessage);
+
 
 			ResultHTMLTable::HeaderVector v1;
 			v1.push_back(make_pair(PARAMETER_SEARCH_PLACE, "Emplacement"));
@@ -150,9 +158,16 @@ namespace synthese
 
 			stream << t1.open();
 
-			for (set<const DisplayScreen*>::const_iterator it = result.begin(); it != result.end(); ++it)
+			vector<DisplayScreen*> result2 = DisplayScreenTableSync::search(searchUid, searchPlace, searchLine, searchType, searchState, searchMessage);
+
+			for (vector<DisplayScreen*>::const_iterator it = result2.begin(); it != result2.end(); ++it)
 			{
 				const DisplayScreen* screen = *it;
+				if (screen->getLocalization() == NULL)
+					continue;
+				if (usedDisplayScreens.find(screen->getKey()) != usedDisplayScreens.end())
+					continue;
+
 				addRequest->setParameter(AlarmAddLinkAction::PARAMETER_OBJECT_ID, Conversion::ToString(screen->getKey()));
 
 				stream << t1.row(Conversion::ToString(screen->getKey()));

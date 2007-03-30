@@ -67,18 +67,6 @@
 				RelativePath=".\Parametres.h">
 			</File>
 			<File
-				RelativePath=".\RequestWithInterface.cpp">
-			</File>
-			<File
-				RelativePath=".\RequestWithInterface.h">
-			</File>
-			<File
-				RelativePath=".\RequestWithInterfaceAndRequiredSession.cpp">
-			</File>
-			<File
-				RelativePath=".\RequestWithInterfaceAndRequiredSession.h">
-			</File>
-			<File
 				RelativePath=".\ValueElementList.cpp">
 			</File>
 			<File
@@ -199,6 +187,18 @@
 			</File>
 			<File
 				RelativePath=".\RedirRequest.h">
+			</File>
+			<File
+				RelativePath=".\RequestWithInterface.cpp">
+			</File>
+			<File
+				RelativePath=".\RequestWithInterface.h">
+			</File>
+			<File
+				RelativePath=".\RequestWithInterfaceAndRequiredSession.cpp">
+			</File>
+			<File
+				RelativePath=".\RequestWithInterfaceAndRequiredSession.h">
 			</File>
 			<File
 				RelativePath=".\SimplePageRequest.cpp">

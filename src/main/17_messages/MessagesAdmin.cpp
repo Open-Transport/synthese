@@ -108,8 +108,8 @@ namespace synthese
 				if (it != map.end())
 					_searchLevel = (AlarmLevel) Conversion::ToInt(it->second);
 
-				_result = AlarmTableSync::search(_startDate, _endDate);
-//				_scenarioResult = ScenarioTableSync::search();
+				_result = AlarmTableSync::search(NULL, _startDate, _endDate);
+				_scenarioResult = ScenarioTableSync::search(false);
 			}
 			catch (ConnectionPlace::RegistryKeyException e)
 			{
@@ -235,7 +235,7 @@ namespace synthese
 			v.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
 			v.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v.push_back(make_pair(string(), string("Actions")));
-			ResultHTMLTable t(v, searchRequest, "", true, newMessageRequest, NewMessageAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ResultHTMLTable t(v, searchRequest, "", true, newMessageRequest, NewMessageAction::PARAMETER_IS_TEMPLATE, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 

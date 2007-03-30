@@ -48,7 +48,7 @@ namespace synthese
 				@param title Title to display in the generated code
 				@param wiring code Wiring code to display in the generated code
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& vars, const std::string& title, int wiringCode, const ArrivalDepartureList& rows, const server::Request* request = NULL) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& vars, const std::string& title, int wiringCode, const ArrivalDepartureListWithAlarm& rows, const server::Request* request = NULL) const;
 		};
 	}
 }

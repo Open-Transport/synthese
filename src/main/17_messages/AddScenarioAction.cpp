@@ -74,7 +74,7 @@ namespace synthese
 					map.erase(it);
 					if(_name.empty())
 						throw ActionException("Le scénario doit avoir un nom.");
-					vector<Scenario*> v = ScenarioTableSync::search(_name, _isTemplate, 0, 1);
+					vector<Scenario*> v = ScenarioTableSync::search(_isTemplate, _name, 0, 1);
 					if (!v.empty())
 					{
 						delete v.front();

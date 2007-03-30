@@ -80,7 +80,7 @@ namespace synthese
 
 		string DeparturesTableInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			const ArrivalDepartureList* ptds = (ArrivalDepartureList*) object;
+			const ArrivalDepartureList& ptds = ((const ArrivalDepartureListWithAlarm*) object)->map;
 			
 			int __MultiplicateurRangee = _multiplicateurRangeeVIE->isZero(parameters, variables, object, request) ? 1 : Conversion::ToInt(_multiplicateurRangeeVIE->getValue(parameters, variables, object, request));
 			const std::string& __Pages = _pagesVIE->getValue(parameters, variables, object, request);
@@ -91,8 +91,8 @@ namespace synthese
 			int __NombrePages = 1;
 			if ((__Pages == VALUE_INTERMEDIATE) || (__Pages == VALUE_DESTINATION))
 			{
-				int departuresNumber = ptds->size() - departuresToHide;
-				for (ArrivalDepartureList::const_iterator it = ptds->begin(); departuresNumber && (it != ptds->end()); ++it, --departuresNumber)
+				int departuresNumber = ptds.size() - departuresToHide;
+				for (ArrivalDepartureList::const_iterator it = ptds.begin(); departuresNumber && (it != ptds.end()); ++it, --departuresNumber)
 				{
 					const ActualDisplayedArrivalsList& displayedList = it->second;
 					if (displayedList.size () - 2 > __NombrePages )
@@ -112,8 +112,8 @@ namespace synthese
 
 				// Boucle sur les rangees
 				int __Rangee = __MultiplicateurRangee;
-				int departuresNumber = ptds->size() - departuresToHide;
-				for (ArrivalDepartureList::const_iterator it = ptds->begin(); departuresNumber && (it != ptds->end()); ++it, --departuresNumber)
+				int departuresNumber = ptds.size() - departuresToHide;
+				for (ArrivalDepartureList::const_iterator it = ptds.begin(); departuresNumber && (it != ptds.end()); ++it, --departuresNumber)
 				{
 					const ArrivalDepartureRow& ___DP = *it;
 

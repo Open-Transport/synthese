@@ -35,4 +35,4 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages:
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::TextTemplateAddAction>("mttaa");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::UpdateAlarmMessagesAction>("muama");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::AlarmRemoveLinkAction>("marla");
-
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::AlarmAddLinkAction>("maala");

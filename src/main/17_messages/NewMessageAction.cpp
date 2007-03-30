@@ -25,6 +25,7 @@
 #include "17_messages/NewMessageAction.h"
 #include "17_messages/Alarm.h"
 #include "17_messages/AlarmTableSync.h"
+#include "17_messages/MessagesModule.h"
 
 using namespace std;
 
@@ -34,7 +35,8 @@ namespace synthese
 	
 	namespace messages
 	{
-		const string NewMessageAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "tpl";
+		const string NewMessageAction::PARAMETER_IS_TEMPLATE = Action_PARAMETER_PREFIX + "tpl";
+		const string NewMessageAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "tps";
 
 		Request::ParametersMap NewMessageAction::getParametersMap() const
 		{
@@ -45,32 +47,46 @@ namespace synthese
 
 		void NewMessageAction::setFromParametersMap(Request::ParametersMap& map)
 		{
-			//Request::ParametersMap::iterator it;
+			Request::ParametersMap::iterator it;
 
-			// it = map.find(PARAMETER_xxx);
-			// if (it == map.end())
-			//	throw ActionException("Parameter xxx not found");
-			//
-			// _xxx = it->second;
-			// map.erase(it);
-			// if (_xxx <= 0)
-			//	throw ActionException("Bad value for xxx parameter ");	
-			// 
+			it = map.find(PARAMETER_SCENARIO_ID);
+			if (it != map.end())
+			{
+				if (!MessagesModule::getScenarii().contains(Conversion::ToLongLong(it->second)))
+					throw ActionException("Specified scenario not found");
+				_scenario = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
+                map.erase(it);
+			} 
+
+			it = map.find(PARAMETER_IS_TEMPLATE);
+			if (it != map.end())
+			{
+				_isTemplate = Conversion::ToBool(it->second);
+				map.erase(it);
+			} 
+
 			map.insert(make_pair(Request::PARAMETER_OBJECT_ID, Conversion::ToString(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)));
 		}
 
 		NewMessageAction::NewMessageAction()
 			: Action()
-			
+			, _scenario(NULL)
+			, _isTemplate(false)
 		{}
 
 		void NewMessageAction::run()
 		{
 			Alarm* alarm = new Alarm;
-			alarm->setIsATemplate(false);
+			alarm->setIsATemplate(_isTemplate);
+			alarm->setScenario(_scenario);
 			AlarmTableSync::save(alarm);
 			_request->setObjectId(alarm->getKey());
 			delete alarm;
+		}
+
+		NewMessageAction::~NewMessageAction()
+		{
+			delete _scenario;
 		}
 	}
 }

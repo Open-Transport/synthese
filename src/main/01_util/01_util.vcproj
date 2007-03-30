@@ -91,6 +91,12 @@
 				RelativePath=".\LowerCaseFilter.h">
 			</File>
 			<File
+				RelativePath=".\ManagedThread.cpp">
+			</File>
+			<File
+				RelativePath=".\ManagedThread.h">
+			</File>
+			<File
 				RelativePath=".\ModuleClass.cpp">
 			</File>
 			<File
@@ -133,16 +139,34 @@
 				RelativePath=".\ThreadGroup.h">
 			</File>
 			<File
+				RelativePath=".\ThreadManager.cpp">
+			</File>
+			<File
+				RelativePath=".\ThreadManager.h">
+			</File>
+			<File
 				RelativePath=".\UId.cpp">
 			</File>
 			<File
 				RelativePath=".\UId.h">
 			</File>
 			<File
+				RelativePath=".\XmlException.cpp">
+			</File>
+			<File
+				RelativePath=".\XmlException.h">
+			</File>
+			<File
 				RelativePath=".\XmlParser.cpp">
 			</File>
 			<File
 				RelativePath=".\XmlParser.h">
+			</File>
+			<File
+				RelativePath=".\XmlToolkit.cpp">
+			</File>
+			<File
+				RelativePath=".\XmlToolkit.h">
 			</File>
 		</Filter>
 		<Filter

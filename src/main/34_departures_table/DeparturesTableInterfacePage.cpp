@@ -35,7 +35,7 @@ namespace synthese
 			, VariablesMap& vars
 			, const std::string& title
 			, int wiringCode
-			, const ArrivalDepartureList& rows, const server::Request* request /*= NULL*/ ) const
+			, const ArrivalDepartureListWithAlarm& rows, const server::Request* request /*= NULL*/ ) const
 		{
 			ParametersVector pv;
 			pv.push_back(title);

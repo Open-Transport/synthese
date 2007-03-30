@@ -81,12 +81,17 @@ namespace synthese
 				<< "<h1>Paramètres</h1>"
 				<< updateRequest->getHTMLFormHeader("update")
 				<< "<table>"
-				<< "<tr><td>Type</td><td>" << Html::getRadioInput(UpdateAlarmAction::PARAMETER_TYPE, MessagesModule::getLevelLabels(), _alarm->getLevel()) << "</td></tr>"
-				<< "<tr><td>Début diffusion</td><td>Date " << Html::getTextInput(UpdateAlarmAction::PARAMETER_START_DATE, _alarm->getPeriodStart().getDate().toString()) 
-				<< " Heure " << Html::getTextInput(UpdateAlarmAction::PARAMETER_START_HOUR, _alarm->getPeriodStart().getHour().toString()) << "</td></tr>"
-				<< "<tr><td>Fin diffusion</td><td>Date " << Html::getTextInput(UpdateAlarmAction::PARAMETER_END_DATE, _alarm->getPeriodEnd().getDate().toString()) 
-				<< " Heure " << Html::getTextInput(UpdateAlarmAction::PARAMETER_END_HOUR, _alarm->getPeriodEnd().getHour().toString()) << "</td></tr>"
-				<< "<tr><td>Actif</td><td>" << Html::getOuiNonRadioInput(UpdateAlarmAction::PARAMETER_ENABLED, _alarm->getIsEnabled()) << "</td></tr>"
+				<< "<tr><td>Type</td><td>" << Html::getRadioInput(UpdateAlarmAction::PARAMETER_TYPE, MessagesModule::getLevelLabels(), _alarm->getLevel()) << "</td></tr>";
+			if (_alarm->getScenario() == NULL)
+			{
+				stream
+					<< "<tr><td>Début diffusion</td><td>Date " << Html::getTextInput(UpdateAlarmAction::PARAMETER_START_DATE, _alarm->getPeriodStart().getDate().toString()) 
+					<< " Heure " << Html::getTextInput(UpdateAlarmAction::PARAMETER_START_HOUR, _alarm->getPeriodStart().getHour().toString()) << "</td></tr>"
+					<< "<tr><td>Fin diffusion</td><td>Date " << Html::getTextInput(UpdateAlarmAction::PARAMETER_END_DATE, _alarm->getPeriodEnd().getDate().toString()) 
+					<< " Heure " << Html::getTextInput(UpdateAlarmAction::PARAMETER_END_HOUR, _alarm->getPeriodEnd().getHour().toString()) << "</td></tr>"
+					<< "<tr><td>Actif</td><td>" << Html::getOuiNonRadioInput(UpdateAlarmAction::PARAMETER_ENABLED, _alarm->getIsEnabled()) << "</td></tr>";
+			}
+			stream
 				<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregistrer") << "</td></tr>"
 				<< "</table></form>";
 
@@ -122,7 +127,7 @@ namespace synthese
 					<< "<tr><td>Message court</td><td>" << Html::getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage(), 2, 20) << "</td></tr>"
 					<< "<tr><td>Message long</td><td>" << Html::getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 4, 30) << "</td></tr>"
 					<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregistrer") << "</td></tr>"
-					<< "</table>";
+					<< "</form></table>";
 
 				delete updateMessagesRequest;
 

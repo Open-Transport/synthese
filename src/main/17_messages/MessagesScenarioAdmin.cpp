@@ -27,9 +27,12 @@
 #include "17_messages/Scenario.h"
 #include "17_messages/MessagesModule.h"
 #include "17_messages/ScenarioNameUpdateAction.h"
+#include "17_messages/DeleteAlarmAction.h"
+#include "17_messages/NewMessageAction.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminRequest.h"
+#include "32_admin/ResultHTMLTable.h"
 
 using namespace std;
 
@@ -50,24 +53,19 @@ namespace synthese
 
 		void MessagesScenarioAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
 		{
-			try
+			AdminRequest::ParametersMap::const_iterator it;
+			it = map.find(AdminRequest::PARAMETER_OBJECT_ID);
+			if (it == map.end())
+				throw AdminParametersException("Scenario not specified");
+			if (Conversion::ToLongLong(it->second) != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 			{
-				AdminRequest::ParametersMap::const_iterator it;
+				if (!MessagesModule::getScenarii().contains(Conversion::ToLongLong(it->second)))
+					throw AdminParametersException("Specified scenario not found");
 
-				it = map.find(AdminRequest::PARAMETER_OBJECT_ID);
-				if (it == map.end())
-					throw AdminParametersException("Scenario not specified");
-				if (Conversion::ToLongLong(it->second) != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-				{
-					_scenario = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
+				_scenario = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
 
-					if (!_scenario->getIsATemplate())
-						setSuperior("messages");
-				}
-			}
-			catch (Scenario::RegistryKeyException e)
-			{
-				throw AdminParametersException("Specified scenario not found");
+				if (!_scenario->getIsATemplate())
+					setSuperior("messages");
 			}
 		}
 
@@ -82,10 +80,24 @@ namespace synthese
 			updateRequest->copy(request);
 			updateRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
 			updateRequest->setAction(Factory<Action>::create<ScenarioNameUpdateAction>());
+			updateRequest->setObjectId(_scenario->getKey());
 
 			AdminRequest* messRequest = Factory<Request>::create<AdminRequest>();
 			messRequest->copy(request);
 			messRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+
+			AdminRequest* deleteRequest = Factory<Request>::create<AdminRequest>();
+			deleteRequest->copy(request);
+			deleteRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
+			deleteRequest->setAction(Factory<Action>::create<DeleteAlarmAction>());
+			deleteRequest->setObjectId(_scenario->getKey());
+
+			AdminRequest* addRequest = Factory<Request>::create<AdminRequest>();
+			addRequest->copy(request);
+			addRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+			addRequest->setAction(Factory<Action>::create<NewMessageAction>());
+			addRequest->setParameter(NewMessageAction::PARAMETER_SCENARIO_ID, Conversion::ToString(_scenario->getKey()));
+			addRequest->setParameter(NewMessageAction::PARAMETER_IS_TEMPLATE, Conversion::ToString(_scenario->getKey()));
 
 			stream
 				<< "<h1>Propriété</h1>"
@@ -93,36 +105,37 @@ namespace synthese
 				<< "<P>Nom : " << Html::getTextInput(ScenarioNameUpdateAction::PARAMETER_NAME, _scenario->getName()) << Html::getSubmitButton("Modifier") << "</P>"
 				<< "</form>"
 
-				<< "<h1>Messages</h1>"
-				<< "<table>"
-				<< "<tr><th>Sel</th><th>Message</th><th>Emplacement</th><th colspan=\"2\">Actions</th></tr>";
+				<< "<h1>Messages</h1>";
+
+			ResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(string(), "Message"));
+			h.push_back(make_pair(string(), "Emplacement"));
+			h.push_back(make_pair(string(), "Actions"));
+			ResultHTMLTable t(h, NULL, string(), true, addRequest, NewMessageAction::PARAMETER_IS_TEMPLATE);
+
+			stream << t.open();
 
 			for(Scenario::AlarmsSet::const_iterator it = _scenario->getAlarms().begin(); it != _scenario->getAlarms().end(); ++it)
 			{
 				Alarm* alarm = *it;
 				messRequest->setObjectId(alarm->getKey());
-				stream
-					<< "<tr>"
-					<< "<td>" << "<INPUT id=\"Radio2\" type=\"radio\" value=\"Radio2\" name=\"RadioGroup\">" << "</td>"
-					<< "<td>" << alarm->getShortMessage() << "</td>"
-					<< "<td>TOULOUSE Matabiau</td>"
-					<< "<td>" 
-					<< messRequest->getHTMLFormHeader("enter" + Conversion::ToString(alarm->getKey()))
-					<< Html::getSubmitButton("Modifier")
-					<< "</form></td><td>"
-					<< Html::getSubmitButton("Supprimer") << "</td>"
-					<< "</tr>";
+				deleteRequest->setParameter(DeleteAlarmAction::PARAMETER_ALARM, Conversion::ToString(alarm->getKey()));
+				stream << t.row();
+				stream << t.col() << alarm->getShortMessage();
+				stream << t.col() << ""; // Emplacement
+				stream << t.col() << Html::getLinkButton(messRequest->getURL(), "Modifier")
+					<< "&nbsp;" << Html::getLinkButton(deleteRequest->getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le message du scénario ?");
 			}
 
-			stream
-				<< "<TR>"
-				<< "<TD colSpan=\"3\">(sélectionnez un&nbsp;message existant pour créer une copie)</TD>"
-				<< "<TD>" << Html::getSubmitButton("Ajouter") << "</TD>"
-				<< "</tr>"
-				<< "</TABLE>";
+			stream << t.row();
+			stream << t.col(3) << "(sélectionnez un&nbsp;message existant pour créer une copie)";
+			stream << t.col() << Html::getSubmitButton("Ajouter");
+			stream << t.close();
 
 			delete updateRequest;
 			delete messRequest;
+			delete deleteRequest;
+			delete addRequest;
 		}
 	}
 }
