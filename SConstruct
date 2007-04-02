@@ -7,7 +7,7 @@ opts = Options('custom.py')
 opts.Add('CC', 'The C compiler.')
 opts.Add('CXX', 'The C++ compiler.')
 
-rootenv = Environment(ENV = os.environ)
+rootenv = Environment(ENV = os.environ, options=opts)
 
 Help(opts.GenerateHelpText(rootenv))
 
@@ -25,6 +25,8 @@ print "platform = ", platform
 print "mode     = ", mode
 print "goal     = ", goal
 print "toolset  = ", toolset
+print "cc  = ", rootenv['CC']
+print "cxx  = ", rootenv['CXX']
 
 
 rootenv.Replace ( PLATFORM = platform )
@@ -337,11 +339,13 @@ def SyntheseDist (target = None, source = None, env = None):
 
 
 
-def SyntheseBuild (env, binname):
-    # Copy main.cpp from template.
-    maintemplate = env.File ('../synthese_template/main.cpp').srcnode ().abspath;
-    maincopy = env.File ('main.cpp').srcnode ().abspath;
-    Execute (Copy (maincopy, maintemplate));
+def SyntheseBuild (env, binname, generatemain = True):
+
+    if generatemain:
+      # Copy main.cpp from template.
+      maintemplate = env.File ('../synthese_template/main.cpp').srcnode ().abspath;
+      maincopy = env.File ('main.cpp').srcnode ().abspath;
+      Execute (Copy (maincopy, maintemplate));
     
     files = env.Glob('main.cpp', [])
     

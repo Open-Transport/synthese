@@ -1,36 +1,11 @@
-import os.path
+
 
 Import ('mainenv')
-moduleenv = mainenv.ModuleEnv()
 
-includes = '*.cpp'
-excludes = []
+modules = ['30_server', '04_time', '02_db', '01_util', '00_tcp'];
 
 
-moduleenv.AppendMultithreadConf ()
-
-#included modules because of abnormal dependencies
-#do what to be done to avoid it (probably a site module must be created)
-
-moduleenv.AddModuleDependency ('30_server')
-moduleenv.AddModuleDependency ('11_interfaces')
-
-moduleenv.AddModuleDependency ('04_time')
-moduleenv.AddModuleDependency ('02_db')
-moduleenv.AddModuleDependency ('01_util')
-moduleenv.AddModuleDependency ('00_tcp')
-
-moduleenv.AddBoostDependency ('boost_filesystem')
-moduleenv.AddBoostDependency ('boost_date_time')
-moduleenv.AddBoostDependency ('boost_thread')
-moduleenv.AddBoostDependency ('boost_iostreams')
-
-moduleenv.AddSQLiteDependency ()
+syntheseenv = mainenv.SyntheseEnv (modules)
 
 
-
-files = moduleenv.Glob(includes, excludes)
-
-
-
-moduleenv.Program(moduleenv.DefaultModuleName (), files)
+syntheseenv.SyntheseBuild (syntheseenv.DefaultModuleName (), False)
