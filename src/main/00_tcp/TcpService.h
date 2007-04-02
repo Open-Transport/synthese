@@ -60,7 +60,9 @@ public:
 	it is returned.
 	@return A service listening on the given port.
      */
-    static TcpService* openService (int portNumber);
+    static TcpService* openService (int portNumber,
+	                            bool tcpProtocol = true,
+				    bool nonBlocking = true);
     
     /** Closes the TCP service listening on the given port.
      * All the active connection to this service are closed.

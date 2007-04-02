@@ -67,14 +67,16 @@ TcpService::initialize ()
 
 
 TcpService* 
-TcpService::openService (int portNumber)
+TcpService::openService (int portNumber, 
+			 bool tcpProtocol,
+			 bool nonBlocking)
 {
     std::map<int, TcpService*>::iterator it = 
 	_activeServices.find (portNumber);
     
     if (it != _activeServices.end ()) return it->second;
 
-    TcpService* newService = new TcpService (portNumber);
+    TcpService* newService = new TcpService (portNumber, tcpProtocol, nonBlocking);
     _activeServices.insert (std::make_pair (portNumber, newService));
     return newService;
 }

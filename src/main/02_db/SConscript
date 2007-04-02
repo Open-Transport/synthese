@@ -31,7 +31,7 @@ moduleenv.AddBoostDependency ('boost_iostreams')
 moduleenv.AddSQLiteDependency ()
 moduleenv.AppendMultithreadConf ()
 
-moduleenv.Program ( "zob", files )
+moduleenv.Program ( moduleenv.DefaultModuleName (), files )
 
 
 
