@@ -42,7 +42,12 @@ namespace synthese
     {
       server = argv[1];
     }
-
+  int port = DEF_PORT;
+  if (argc > 2) 
+  {
+      port = atoi (argv[2]);
+  }
+  
     char *path, *soft, *method, *script, *ip, *qptr, *query = NULL;
     struct in_addr addr;
     static char buffer[MAX_QUERY_SIZE+16]; /* query + ip */
@@ -131,7 +136,7 @@ namespace synthese
     // Initialise la connection au serveur
     try
     {
-		socket.open(server, DEF_PORT, DEF_PROTO);
+		socket.open(server, port, DEF_PROTO);
 		socket.connectToServer();
     }
     catch (const char *err)

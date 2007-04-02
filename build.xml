@@ -9,6 +9,13 @@
   <property name="deploy.local.lib.regexp.from" value="(.*)"/>
   <property name="deploy.local.lib.regexp.to" value="\1"/>
 
+   <basename property="distname" file="${target}"/>
+
+   <property name="distdir"
+   value="${dist.home}/${distname}_${platform}_${mode}"/>
+
+
+
 
 
   <target name="deploy"/>
@@ -21,11 +28,6 @@
       <param name="goal" value="dist"/>
       <param name="target" value="${target}"/>
     </antcall>
-
-   <basename property="distname" file="${target}"/>
-
-   <property name="distdir"
-   value="${dist.home}/${distname}_${platform}_${mode}"/>
 
    <if>
      <and>
