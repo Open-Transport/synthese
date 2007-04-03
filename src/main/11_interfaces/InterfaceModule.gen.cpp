@@ -5,6 +5,7 @@ synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::IfThenElseInterfaceElement>("if");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::FormattedNumberInterfaceElement>("format");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::EqualsValueInterfaceElement>("=");
+synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::ChrInterfaceElement>("chr");
 
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::CommentInterfaceElement>("//");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::PrintInterfaceElement>("print");

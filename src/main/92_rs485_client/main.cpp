@@ -277,7 +277,7 @@ int main(int argc, char* argv[])
     if (hCom == INVALID_HANDLE_VALUE) 
     {
 	Log::GetInstance ().fatal ("Error while creating comm file " + Conversion::ToString (GetLastError()));
-	// exit(1);
+	exit(1);
     }
     
     // Build on the current configuration, and skip setting the size
@@ -287,7 +287,7 @@ int main(int argc, char* argv[])
     {
 	// Handle the error.
 	Log::GetInstance ().fatal ("Error while getting comm state " + Conversion::ToString (GetLastError()));
-	// exit(2);
+	exit(2);
     }
     
     // Fill in DCB: 57,600 bps, 8 data bits, no parity, and 1 stop bit.
@@ -300,9 +300,11 @@ int main(int argc, char* argv[])
     {
 	// Handle the error.
 	Log::GetInstance ().fatal ("SetCommState failed with error " + Conversion::ToString (GetLastError()));
-	// exit(3);
+	exit(3);
     }
-    
+ 
+    Log::GetInstance ().info ("Serial port " + std::string (comm) + " successfully reconfigured.");
+  
     // printf("Serial port %s successfully reconfigured.\n", comm);
     // printf("Starting probing for %d clients...\n", nbclients);
 
@@ -347,7 +349,7 @@ int main(int argc, char* argv[])
 			
 			// Create commodity stream:
 			boost::iostreams::stream<TcpClientSocket> cliSocketStream;
-		    cliSocketStream.open (clientSock);
+		        cliSocketStream.open (clientSock);
 
 			cliSocketStream << "fonction=tdg&date=A&tb=" << codes[client] << "&ipaddr=127.0.0.1" << std::endl;
 			cliSocketStream.flush ();
@@ -356,16 +358,36 @@ int main(int argc, char* argv[])
 			
 			Log::GetInstance ().info ("Received message : " + std::string (buf));
 			
+                        time(&now);
+                        hms = localtime(&now);
+                      			
 			for (char* bufptr=buf ; *bufptr ; bufptr++)
 			{
-				TransmitCommChar (hCom, *bufptr);
+                            std::cerr << *bufptr;
+                            fSuccess = TransmitCommChar (hCom, *bufptr);
+                            if (!fSuccess) 
+                            {
+                             std::cerr << "ERRORORO " << GetLastError() << std::endl;
+                            }
+
 			}
-			
+			std::cerr << std::endl;
+                            
 			outdate[client] = hms->tm_min;
 			
+                      /*
+                        char* buf = (char*) malloc(17);
+			    DWORD readComm = 0;
+			    ReadFile(hCom,buf,17,&readComm,NULL); // read is updated with the number of bytes read
+
+			    free(buf);
+                      */
+                      
 			// Read is updated with the number of bytes read
-			ReadFile (hCom, buf, sizeof (buf), &readComm, NULL); 
-			
+			ReadFile (hCom, buf, 17, &readComm, NULL); 
+
+                        // std::cerr << "read done." << std::endl;
+                      
 			// We do nothing with response right now...
 			} 
 			catch (std::exception e) 

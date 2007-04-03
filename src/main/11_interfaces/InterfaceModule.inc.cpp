@@ -16,3 +16,4 @@
 #include "11_interfaces/SimplePageRequest.h"
 #include "11_interfaces/SetInterfaceElement.h"
 #include "11_interfaces/EqualsValueInterfaceElement.h"
+#include "11_interfaces/ChrInterfaceElement.h"

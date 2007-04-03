@@ -65,9 +65,13 @@ namespace synthese
 			_numberVIE = vel.front();
 
 			if (vel.size() >= 2)
+                        {
 				_formatVIE = vel.front();
+                        }
 			else
+                        {
 				_formatVIE = new StaticValueInterfaceElement(TYPE_IDENTICAL);
+                        }
 
 			if (vel.size() >= 3)
 			{
