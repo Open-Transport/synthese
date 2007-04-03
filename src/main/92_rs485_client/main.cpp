@@ -1,215 +1,4 @@
 
-/*
-#ifdef WIN32
-
-#include <winsock2.h>
-#include <Ws2tcpip.h>
-#include <io.h>
-#include <windows.h>
-
-#endif
-
-#include <time.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <stdarg.h>
-#include <ctype.h>
-#include <fcntl.h>
-#include <time.h>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
-
-using std::endl;
-
-
-
-static SOCKET sock;
-
-#ifndef INADDR_NONE
-#define INADDR_NONE 0xFFFFFFFF
-#endif
-
-
-// Taille maximale d'une requête ou d'un résultat de synthese 
-#define MAX_QUERY_SIZE 4096
-
-// Nombre maximal de postes clients 
-#define MAX_CLIENTS 128
-
-// Requete de base pour synthese 
-#define QUERY_BASE "fonction=tdg&date=A&tb="
-
-
-
-
-int main(int argc, char* argv[])
-{
-    static char buffer[MAX_QUERY_SIZE];
-    char *codes[MAX_CLIENTS], *server, *port, *comm;
-    int outdate[MAX_CLIENTS];
-    int nbclients;
-    DCB dcb;
-    HANDLE hCom;
-    BOOL fSuccess;
-
-    // get parameters 
-    if(argc > MAX_CLIENTS+4 || argc < 4) exit(-1);
-    server = argv[1];
-    port = argv[2];
-    comm = argv[3];
-
-    std::stringstream fileName;
-    fileName << "CLIENT_RS485_" << comm << ".LOG";
-    std::ofstream fichier(fileName.str().c_str(), std::ios_base::app);
-
-
-    memset(codes, MAX_CLIENTS, sizeof(char*));
-    for(nbclients=0; nbclients<argc-4; nbclients++) {
-	codes[nbclients] = argv[nbclients+4];
-	outdate[nbclients] = 0;
-    }
-
-    hCom = CreateFile( comm,
-		       GENERIC_READ | GENERIC_WRITE,
-		       0,    // must be opened with exclusive-access
-		       NULL, // no security attributes
-		       OPEN_EXISTING, // must use OPEN_EXISTING
-		       0,    // not overlapped I/O
-		       NULL  // hTemplate must be NULL for comm devices
-	);
-    
-    if (hCom == INVALID_HANDLE_VALUE) 
-    {
-	fprintf(stderr, "CreateFile failed with error %d.\n", GetLastError());
-	exit(1);
-    }
-    
-    // Build on the current configuration, and skip setting the size
-    // of the input and output buffers with SetupComm.
-    fSuccess = GetCommState(hCom, &dcb);
-    if (!fSuccess) 
-    {
-	// Handle the error.
-	fprintf(stderr, "GetCommState failed with error %d.\n", GetLastError());
-	exit(2);
-    }
-    
-    // Fill in DCB: 57,600 bps, 8 data bits, no parity, and 1 stop bit.
-    dcb.BaudRate = CBR_9600;      // set the baud rate
-    dcb.ByteSize = 8;             // data size, xmit, and rcv
-    dcb.Parity = NOPARITY;      // parity bit
-    dcb.StopBits = ONESTOPBIT;    // one stop bit
-    fSuccess = SetCommState(hCom, &dcb);
-    if (!fSuccess) 
-    {
-	// Handle the error.
-	fprintf(stderr, "SetCommState failed with error %d.\n", GetLastError());
-	exit(3);
-    }
-    
-    printf("Serial port %s successfully reconfigured.\n", comm);
-
-    
-    printf("Starting probing for %d clients...\n", nbclients);
-    while(1)
-    {
-        time_t now;
-        struct tm *hms;
-        int stamp;
-        time(&now);
-        hms = localtime(&now);
-        stamp = hms->tm_min;
-        for(int client=0; client<nbclients; client++)
-        {
-            if(outdate[client] != stamp)
-            {
-                //if(!SetCommState(hCom, &dcb))
-                //    fichier << "erreur reinit port com" << endl;
-
-                if(server_connect(server, port)>0)
-                {
-                    int pos = 0;
-                    fd_set infd;
-                    struct timeval timeout; 
-                    FD_ZERO(&infd); // Winsock2.h. Link to Ws2_32.lib.
-                    FD_SET(sock,&infd);
-                    timeout.tv_sec = 2;
-                    timeout.tv_usec = 0;
-                    fichier << "server connection OK" << endl;
-		    
-		    
-		    int read = 0;
-		    sprintf(buffer, "%s%s%s\n", QUERY_BASE, codes[client], "&ipaddr=127.0.0.1");
-		    send(sock, buffer, strlen(buffer), 0);
-		    pos = 0;
-		    memset(buffer, 0, sizeof(buffer));
-		    FD_ZERO(&infd);
-		    FD_SET(sock,&infd);
-		    timeout.tv_sec = 2;
-		    timeout.tv_usec = 0;
-
-		    if(select(sock+1,&infd,NULL,NULL,&timeout)>0)
-		    {
-			do {
-			    read = recv(sock, buffer+pos, sizeof(buffer)-pos, 0);
-			    if (read > 0) pos += read;
-			} while((read > 0) && (read != SOCKET_ERROR));
-			
-			if(read != SOCKET_ERROR)
-			{
-			    time(&now);
-			    hms = localtime(&now);
-			    fichier << "Date: " << asctime(hms) << "Message: " << buffer << endl;
-
-			    for(char *bufptr = buffer; *bufptr; bufptr++)
-			    {
-				TransmitCommChar(hCom, *bufptr);
-			    }
-
-			    outdate[client] = hms->tm_min;
-			    
-			    char* buf = (char*) malloc(17);
-			    DWORD readComm = 0;
-			    ReadFile(hCom,buf,17,&readComm,NULL); // read is updated with the number of bytes read
-
-			    free(buf);
-			}
-			
-			
-			fichier << "emission OK" << endl;
-		    } 
-		    else 
-		    {
-			fichier << "answer read error" << endl;
-		    }
-		} 
-		else 
-		{
-		    fichier << "answer timeout" << endl;
-		}
-		
-		server_disconnect();
-	    } 
-	    else 
-	    {
-		fichier << "can not connect to synthese" << endl;
-	    }
-	} 
-	Sleep(100);
-    }
-
-    Sleep(1000);
-}
-
-
-
-*/
-
-
 #include "00_tcp/TcpService.h"
 #include "00_tcp/TcpServerSocket.h"
 #include "00_tcp/TcpClientSocket.h"
@@ -230,6 +19,7 @@ int main(int argc, char* argv[])
 
 #define MAX_QUERY_SIZE 4096
 #define MAX_CLIENTS 128
+#define STATUS_MESSAGE_SIZE 17
 
 
 using namespace synthese::util;
@@ -304,13 +94,12 @@ int main(int argc, char* argv[])
     }
  
     Log::GetInstance ().info ("Serial port " + std::string (comm) + " successfully reconfigured.");
-  
-    // printf("Serial port %s successfully reconfigured.\n", comm);
-    // printf("Starting probing for %d clients...\n", nbclients);
 
-    char buf[4096];
+
+    char buf[MAX_QUERY_SIZE];
     DWORD readComm = 0;
 
+    std::string previousStatus ("");
     while (true)
     {
         time_t now;
@@ -323,82 +112,77 @@ int main(int argc, char* argv[])
 
         for(int client=0; client<nbclients; client++)
         {
-			try 
-			{
+              try 
+              {
 
-			if(outdate[client] == stamp) continue;
-			
-			//if(!SetCommState(hCom, &dcb))
-			//    fichier << "erreur reinit port com" << endl;
-			
-			Log::GetInstance ().info ("Connecting " + std::string (server) 
-								+ std::string (":") + Conversion::ToString (port));
-			
-			// No timeout !
-			int timeout = 2; // 2 seconds timeout
-			TcpClientSocket clientSock (server, port, timeout);
-			
-			while (clientSock.isConnected () == false)
-			{
-				clientSock.tryToConnect ();
-				Thread::Sleep (500);
-			}
-			
-			// The client is connected.
-			Log::GetInstance ().info ("Connected.");
-			
-			// Create commodity stream:
-			boost::iostreams::stream<TcpClientSocket> cliSocketStream;
-		        cliSocketStream.open (clientSock);
+                  if(outdate[client] == stamp) continue;
+                  
+                  //if(!SetCommState(hCom, &dcb))
+                  //    fichier << "erreur reinit port com" << endl;
+                  
+                  Log::GetInstance ().info ("Connecting " + std::string (server) 
+                                                          + std::string (":") + Conversion::ToString (port));
+                  
+                  // No timeout !
+                  int timeout = 2; // 2 seconds timeout
+                  TcpClientSocket clientSock (server, port, timeout);
+                  
+                  while (clientSock.isConnected () == false)
+                  {
+                          clientSock.tryToConnect ();
+                          Thread::Sleep (500);
+                  }
+                  
+                  // The client is connected.
+                  Log::GetInstance ().info ("Connected.");
+                  
+                  // Create commodity stream:
+                  boost::iostreams::stream<TcpClientSocket> cliSocketStream;
+                  cliSocketStream.open (clientSock);
 
-			cliSocketStream << "fonction=tdg&date=A&tb=" << codes[client] << "&ipaddr=127.0.0.1" << std::endl;
-			cliSocketStream.flush ();
+                  cliSocketStream << "fonction=tdg&date=A&tb=" << codes[client] 
+                                  << "&prvstatus=" << previousStatus << "&ipaddr=127.0.0.1" << std::endl;
+                
+                  cliSocketStream.flush ();
 
-			cliSocketStream.getline (buf, sizeof (buf), (char) 0);
-			
-			Log::GetInstance ().info ("Received message : " + std::string (buf));
-			
-                        time(&now);
-                        hms = localtime(&now);
-                      			
-			for (char* bufptr=buf ; *bufptr ; bufptr++)
-			{
-                            std::cerr << *bufptr;
-                            fSuccess = TransmitCommChar (hCom, *bufptr);
-                            if (!fSuccess) 
-                            {
-                             std::cerr << "ERRORORO " << GetLastError() << std::endl;
-                            }
-
-			}
-			std::cerr << std::endl;
-                            
-			outdate[client] = hms->tm_min;
-			
-                      /*
-                        char* buf = (char*) malloc(17);
-			    DWORD readComm = 0;
-			    ReadFile(hCom,buf,17,&readComm,NULL); // read is updated with the number of bytes read
-
-			    free(buf);
-                      */
+                  cliSocketStream.getline (buf, sizeof (buf), (char) 0);
+                  
+                  Log::GetInstance ().info ("Received command : " + std::string (buf));
+                  
+                  time(&now);
+                  hms = localtime(&now);
+                                  
+                  for (char* bufptr=buf ; *bufptr ; bufptr++)
+                  {
+                      fSuccess = TransmitCommChar (hCom, *bufptr);
+                  }
                       
-			// Read is updated with the number of bytes read
-			ReadFile (hCom, buf, 17, &readComm, NULL); 
+                  outdate[client] = hms->tm_min;
+                
+                  // Read is updated with the number of bytes read
+                  ReadFile (hCom, buf, STATUS_MESSAGE_SIZE, &readComm, NULL); 
 
-                        // std::cerr << "read done." << std::endl;
-                      
-			// We do nothing with response right now...
-			} 
-			catch (std::exception e) 
-			{
-				Log::GetInstance ().error ("Error while updating client " + Conversion::ToString (client) + e.what ());
-			}
-			catch (...) 
-			{
-				Log::GetInstance ().error ("Unexpected error !");
-			}
-	    
+                  // Create status message to be sent back to server. 
+                  // It will be sent the next time that the client will ask for update.
+                  std::stringstream status;
+                  for (int i=0; i<STATUS_MESSAGE_SIZE; ++i)
+                  {
+                      status << std::hex << std::setw (2) << std::setfill ('0') << ((int) buf[i]);
+                  }
+                  previousStatus = status.str ();
+
+                  Log::GetInstance ().info ("Status : " + status.str ());
+
+              } 
+              catch (std::exception e) 
+              {
+                      Log::GetInstance ().error ("Error while updating client " + Conversion::ToString (client) + e.what ());
+              }
+              catch (...) 
+              {
+                      Log::GetInstance ().error ("Unexpected error !");
+              }
+    
 		}
 	    Thread::Sleep (100);
 	}
