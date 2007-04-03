@@ -215,8 +215,9 @@ int main(int argc, char* argv[])
 #include "00_tcp/TcpClientSocket.h"
 #include "00_tcp/SocketException.h"
 
-#include "01_util/Thread.h"
+#include "01_util/Conversion.h"
 #include "01_util/Log.h"
+#include "01_util/Thread.h"
 
 
 #include <iostream>
@@ -240,7 +241,7 @@ using namespace synthese::tcp;
 int main(int argc, char* argv[])
 {
 
-    char *codes[MAX_CLIENTS], *server, *port, *comm;
+    char *codes[MAX_CLIENTS], *server, *comm;
     int outdate[MAX_CLIENTS];
     int nbclients;
     DCB dcb;
@@ -248,9 +249,14 @@ int main(int argc, char* argv[])
     BOOL fSuccess;
 
     // get parameters 
-    if(argc > MAX_CLIENTS+4 || argc < 4) exit(-1);
+    if(argc > MAX_CLIENTS+4 || argc < 4) 
+	{
+		Log::GetInstance ().fatal ("Invalid number of arguments");
+		exit(-1);
+	}
+
     server = argv[1];
-    port = argv[2];
+    int port = atoi (argv[2]);
     comm = argv[3];
 
     memset(codes, MAX_CLIENTS, sizeof(char*));
@@ -271,7 +277,7 @@ int main(int argc, char* argv[])
     if (hCom == INVALID_HANDLE_VALUE) 
     {
 	Log::GetInstance ().fatal ("Error while creating comm file " + Conversion::ToString (GetLastError()));
-	exit(1);
+	// exit(1);
     }
     
     // Build on the current configuration, and skip setting the size
@@ -281,7 +287,7 @@ int main(int argc, char* argv[])
     {
 	// Handle the error.
 	Log::GetInstance ().fatal ("Error while getting comm state " + Conversion::ToString (GetLastError()));
-	exit(2);
+	// exit(2);
     }
     
     // Fill in DCB: 57,600 bps, 8 data bits, no parity, and 1 stop bit.
@@ -294,7 +300,7 @@ int main(int argc, char* argv[])
     {
 	// Handle the error.
 	Log::GetInstance ().fatal ("SetCommState failed with error " + Conversion::ToString (GetLastError()));
-	exit(3);
+	// exit(3);
     }
     
     // printf("Serial port %s successfully reconfigured.\n", comm);
@@ -315,63 +321,68 @@ int main(int argc, char* argv[])
 
         for(int client=0; client<nbclients; client++)
         {
-	    try 
-	    {
+			try 
+			{
 
-		if(outdate[client] == stamp) continue;
-		
-		//if(!SetCommState(hCom, &dcb))
-		//    fichier << "erreur reinit port com" << endl;
-		
-		Log::GetInstance ().info ("Connecting " + server + ":" + Conversion::ToString (port));
-		
-		// No timeout !
-		int timeout = 2; // 2 seconds timeout
-		TcpClientSocket clientSock (host, port, timeout);
-		
-		while (clientSock.isConnected () == false)
-		{
-		    clientSock.tryToConnect ();
-		    Thread::Sleep (500);
-		}
-		
-		// The client is connected.
-		Log::GetInstance ().info ("Connected.");
-		
-		
-		clientSock << "fonction=tdg&date=A&tb=" << codes[client] << "&ipaddr=127.0.0.1" << std::endl;
-		clientSock.flush ();
-		
-		clientSock.read (buf, sizeof (buf), (char) 0);
-		
-		Log::GetInstance ().info ("Received message : " + buf);
-		
-		for (char* bufptr=buf ; *bufptr ; bufptr++)
-		{
-		    TransmitCommChar (hCom, *bufptr);
-		}
-		
-		outdate[client] = hms->tm_min;
-		
-		// Read is updated with the number of bytes read
-		ReadFile (hCom, buf, sizeof (buf), &readComm, NULL); 
-		
-		// We do nothing with response right now...
-	    } 
-	    catch (std::exception e) 
-	    {
-		Log::GetInstance ().error ("Error while updating client " + Conversion.ToString (client) + e.what ());
-	    }
-	    catch (...) 
-	    {
-		Log::GetInstance ().error ("Unexpected error  : " + e.what ());
-	    }
+			if(outdate[client] == stamp) continue;
+			
+			//if(!SetCommState(hCom, &dcb))
+			//    fichier << "erreur reinit port com" << endl;
+			
+			Log::GetInstance ().info ("Connecting " + std::string (server) 
+								+ std::string (":") + Conversion::ToString (port));
+			
+			// No timeout !
+			int timeout = 2; // 2 seconds timeout
+			TcpClientSocket clientSock (server, port, timeout);
+			
+			while (clientSock.isConnected () == false)
+			{
+				clientSock.tryToConnect ();
+				Thread::Sleep (500);
+			}
+			
+			// The client is connected.
+			Log::GetInstance ().info ("Connected.");
+			
+			// Create commodity stream:
+			boost::iostreams::stream<TcpClientSocket> cliSocketStream;
+		    cliSocketStream.open (clientSock);
+
+			cliSocketStream << "fonction=tdg&date=A&tb=" << codes[client] << "&ipaddr=127.0.0.1" << std::endl;
+			cliSocketStream.flush ();
+
+			cliSocketStream.getline (buf, sizeof (buf), (char) 0);
+			
+			Log::GetInstance ().info ("Received message : " + std::string (buf));
+			
+			for (char* bufptr=buf ; *bufptr ; bufptr++)
+			{
+				TransmitCommChar (hCom, *bufptr);
+			}
+			
+			outdate[client] = hms->tm_min;
+			
+			// Read is updated with the number of bytes read
+			ReadFile (hCom, buf, sizeof (buf), &readComm, NULL); 
+			
+			// We do nothing with response right now...
+			} 
+			catch (std::exception e) 
+			{
+				Log::GetInstance ().error ("Error while updating client " + Conversion::ToString (client) + e.what ());
+			}
+			catch (...) 
+			{
+				Log::GetInstance ().error ("Unexpected error !");
+			}
 	    
+		}
 	    Thread::Sleep (100);
 	}
 	
 	Thread::Sleep (1000);
-	
+}
 
 
 /*
@@ -469,7 +480,6 @@ int main(int argc, char* argv[])
 
 
       // TcpService::closeService (8899);
-      */
+
   } 
-
-
+      */
