@@ -68,7 +68,7 @@ namespace synthese
 				<< "p." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
 				<< " GROUP BY "
 				<< "strftime('%Y-%m-%d', " << TransactionTableSync::TABLE_COL_START_DATE_TIME << ")"
-				<< ",t." << TABLE_COL_ID;
+				;
 
 			try
 			{

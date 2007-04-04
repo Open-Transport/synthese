@@ -116,6 +116,7 @@ namespace synthese
 		TransactionPartTableSync::TransactionPartTableSync()
 			: SQLiteTableSyncTemplate<TransactionPart>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
+			// Columns
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_TRANSACTION_ID, "INTEGER", true);
 			addTableColumn(TABLE_COL_LEFT_CURRENCY_AMOUNT, "REAL", true);
@@ -125,6 +126,10 @@ namespace synthese
 			addTableColumn(TABLE_COL_TRADED_OBJECT_ID, "TEXT", true);
 			addTableColumn(TABLE_COL_COMMENT, "TEXT", true);
 
+			// Indexes
+			addTableIndex(TABLE_COL_TRANSACTION_ID);
+			addTableIndex(TABLE_COL_ACCOUNT_ID);
+			addTableIndex(TABLE_COL_TRADED_OBJECT_ID);
 		}
 
 		void TransactionPartTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )

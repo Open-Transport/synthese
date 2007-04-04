@@ -157,7 +157,7 @@ namespace synthese
 
 		accounts::TransactionPart* VinciContract::getCurrentGuaranteeTransactionPart() const
 		{
-			vector<TransactionPart*> gua = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), UserTableSync::get(_userId), -1, 1);
+			vector<TransactionPart*> gua = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), UserTableSync::get(_userId), false, -1, 1);
 			return gua.empty() ? NULL : gua.front();
 		}
 	}

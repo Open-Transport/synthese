@@ -1,6 +1,27 @@
+
+/** SQLiteTableSync class header.
+	@file SQLiteTableSync.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_DB_SQLITETABLESYNC_H
 #define SYNTHESE_DB_SQLITETABLESYNC_H
-
 
 #include <map>
 #include <string>
@@ -73,8 +94,13 @@ namespace synthese
 
 			void setEnableTriggers (bool enableTriggers);
 
-			/** This method is called when the synchronizer is created
-			to synchronize it with pre-existing data in db.
+			/** First synchronisation.
+				This method is called when the synchronizer is created
+				to synchronize it with pre-existing data in db.
+
+				It creates ou updates all the needed tables and indexes.
+
+				Note : It does not delete any useless table present in the database.
 			*/
 			void firstSync (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 					synthese::db::SQLiteSync* sync);
@@ -110,6 +136,18 @@ namespace synthese
 			void addTableColumn (const std::string& columnName, 
 					const std::string& columnType, 
 					bool updatable = true);
+
+			/** Adds a multi-column index in the table description.
+				@param columns Vector of column names
+				@param name Name of the index. Optional : if not specified or empty, the name is the concatenation of the columns names
+			*/
+			void addTableIndex(const std::vector<std::string>& columns, std::string name = "");
+
+			/** Adds a single column index in the table description.
+				@param indexed column name
+				@param name Name of the index. Optional : if not specified or empty, the name is identical to the column name.
+			*/
+			void addTableIndex(const std::string& column, std::string name = "");
 
 		protected:
 
@@ -154,6 +192,18 @@ namespace synthese
 			 */
 			static std::string CreateSQLSchema (const std::string& tableName,
 							    const SQLiteTableFormat& format);
+
+			/** Creates the SQL statement to crate an index in the database given a certain format.
+				@param tableName The table name
+				@param format The format of the table containing the indexes description
+				@param indexName The index name to create
+				@return std::string The SQL statement
+				@author Hugues Romain
+				@date 2007
+
+				Note : the real index name in the database is the concatenation of the table name and the name specified in the table format separated by a _ character.
+			*/
+			static std::string CreateIndexSQLSchema(const std::string& tableName, const SQLiteTableIndexFormat& format);
 			
 			static std::string CreateTriggerNoInsert (
 			    const std::string& tableName,
@@ -190,11 +240,17 @@ namespace synthese
 			    const synthese::db::SQLiteQueueThreadExec* sqlite,
 			    const std::string& tableName);
 
-
-
-
+			/** Builds the name of the index in the sqlite master table.
+				@param tableName Name of the table which belongs the index
+				@param name Name of the index within the table
+				@return the full name
+				@author Hugues Romain
+				@date 2007
+				
+			*/
+			static std::string getIndexDBName(const std::string& tableName, const std::string& name);
 		};
 	}
 }
-#endif
 
+#endif
