@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="12_security"
-	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
-	Keyword="MakeFileProj">
+	ProjectGUID="{EE44C3FB-356B-4319-8226-F628696152EA}"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,194 +63,248 @@
 		<Filter
 			Name="Core classes"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
+			>
 			<File
-				RelativePath=".\Profile.cpp">
+				RelativePath=".\Profile.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Profile.h">
+				RelativePath=".\Profile.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Right.cpp">
+				RelativePath=".\Right.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Right.h">
+				RelativePath=".\Right.h"
+				>
 			</File>
 			<File
-				RelativePath=".\User.cpp">
+				RelativePath=".\User.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\User.h">
+				RelativePath=".\User.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
-			Filter="">
+			>
 			<File
-				RelativePath=".\ProfileAdmin.cpp">
+				RelativePath=".\ProfileAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ProfileAdmin.h">
+				RelativePath=".\ProfileAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ProfilesAdmin.cpp">
+				RelativePath=".\ProfilesAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ProfilesAdmin.h">
+				RelativePath=".\ProfilesAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\UserAdmin.cpp">
+				RelativePath=".\UserAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\UserAdmin.h">
+				RelativePath=".\UserAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\UsersAdmin.cpp">
+				RelativePath=".\UsersAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\UsersAdmin.h">
+				RelativePath=".\UsersAdmin.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
-			Filter="">
+			>
 			<File
-				RelativePath=".\SecurityLog.cpp">
+				RelativePath=".\SecurityLog.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SecurityLog.h">
+				RelativePath=".\SecurityLog.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Rights"
-			Filter="">
+			>
 			<File
-				RelativePath=".\GlobalRight.cpp">
+				RelativePath=".\GlobalRight.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\GlobalRight.h">
+				RelativePath=".\GlobalRight.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SecurityRight.cpp">
+				RelativePath=".\SecurityRight.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SecurityRight.h">
+				RelativePath=".\SecurityRight.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
-			Filter="">
+			>
 			<File
-				RelativePath=".\ProfileTableSync.cpp">
+				RelativePath=".\ProfileTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ProfileTableSync.h">
+				RelativePath=".\ProfileTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\UserTableSync.cpp">
+				RelativePath=".\UserTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\UserTableSync.h">
+				RelativePath=".\UserTableSync.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Interface Pages"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Actions"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AddProfileAction.cpp">
+				RelativePath=".\AddProfileAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AddProfileAction.h">
+				RelativePath=".\AddProfileAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\AddRightAction.cpp">
+				RelativePath=".\AddRightAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AddRightAction.h">
+				RelativePath=".\AddRightAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\AddUserAction.cpp">
+				RelativePath=".\AddUserAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AddUserAction.h">
+				RelativePath=".\AddUserAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DeleteProfileAction.cpp">
+				RelativePath=".\DeleteProfileAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DeleteProfileAction.h">
+				RelativePath=".\DeleteProfileAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DeleteRightAction.cpp">
+				RelativePath=".\DeleteRightAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DeleteRightAction.h">
+				RelativePath=".\DeleteRightAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DelUserAction.cpp">
+				RelativePath=".\DelUserAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DelUserAction.h">
+				RelativePath=".\DelUserAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\UpdateProfileAction.cpp">
+				RelativePath=".\UpdateProfileAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\UpdateProfileAction.h">
+				RelativePath=".\UpdateProfileAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\UpdateRightAction.cpp">
+				RelativePath=".\UpdateRightAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\UpdateRightAction.h">
+				RelativePath=".\UpdateRightAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\UserPasswordUpdateAction.cpp">
+				RelativePath=".\UserPasswordUpdateAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\UserPasswordUpdateAction.h">
+				RelativePath=".\UserPasswordUpdateAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\UserUpdateAction.cpp">
+				RelativePath=".\UserUpdateAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\UserUpdateAction.h">
+				RelativePath=".\UserUpdateAction.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Exceptions"
-			Filter="">
+			>
 			<File
-				RelativePath=".\UserException.cpp">
+				RelativePath=".\UserException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\UserException.h">
+				RelativePath=".\UserException.h"
+				>
 			</File>
 			<File
-				RelativePath=".\UserTableSyncException.cpp">
+				RelativePath=".\UserTableSyncException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\UserTableSyncException.h">
+				RelativePath=".\UserTableSyncException.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 		<File
-			RelativePath=".\SecurityModule.cpp">
+			RelativePath=".\SecurityModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SecurityModule.gen.cpp">
+			RelativePath=".\SecurityModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SecurityModule.h">
+			RelativePath=".\SecurityModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\SecurityModule.inc.cpp">
+			RelativePath=".\SecurityModule.inc.cpp"
+			>
 		</File>
 	</Files>
 	<Globals>

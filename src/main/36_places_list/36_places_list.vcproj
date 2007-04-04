@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="36_places_list"
-	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
-	Keyword="MakeFileProj">
+	ProjectGUID="{388CA45F-FEBF-4160-AAB7-39B11FA1E28C}"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,54 +63,64 @@
 		<Filter
 			Name="Core classes"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
+			>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="LibraryInterfaceElement"
-			Filter="">
+			>
 			<File
-				RelativePath=".\CityListInterfaceElement.cpp">
+				RelativePath=".\CityListInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\CityListInterfaceElement.h">
+				RelativePath=".\CityListInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Rights"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Requests"
-			Filter="">
+			>
 			<File
-				RelativePath=".\CityListRequest.cpp">
+				RelativePath=".\CityListRequest.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\CityListRequest.h">
+				RelativePath=".\CityListRequest.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\PlacesListModule.cpp">
+			RelativePath=".\PlacesListModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\PlacesListModule.gen.cpp">
+			RelativePath=".\PlacesListModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\PlacesListModule.h">
+			RelativePath=".\PlacesListModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\PlacesListModule.inc.cpp">
+			RelativePath=".\PlacesListModule.inc.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 	</Files>
 	<Globals>

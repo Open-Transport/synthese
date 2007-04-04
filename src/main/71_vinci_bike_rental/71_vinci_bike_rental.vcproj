@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="71_vinci_bike_rental"
-	ProjectGUID="{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
-	Keyword="MakeFileProj">
+	ProjectGUID="{D7FE3343-BC3C-4561-988A-C192B3F4CCA7}"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,209 +63,276 @@
 		<Filter
 			Name="Core classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\VinciAntivol.cpp">
+				RelativePath=".\VinciAntivol.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciAntivol.h">
+				RelativePath=".\VinciAntivol.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciBike.cpp">
+				RelativePath=".\VinciBike.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciBike.h">
+				RelativePath=".\VinciBike.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciContract.cpp">
+				RelativePath=".\VinciContract.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciContract.h">
+				RelativePath=".\VinciContract.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciRate.cpp">
+				RelativePath=".\VinciRate.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciRate.h">
+				RelativePath=".\VinciRate.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciSite.cpp">
+				RelativePath=".\VinciSite.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciSite.h">
+				RelativePath=".\VinciSite.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
-			Filter="">
+			>
 			<File
-				RelativePath=".\VinciAntivolTableSync.cpp">
+				RelativePath=".\AdvancedSelectTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciAntivolTableSync.h">
+				RelativePath=".\AdvancedSelectTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciBikeTableSync.cpp">
+				RelativePath=".\VinciAntivolTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciBikeTableSync.h">
+				RelativePath=".\VinciAntivolTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciContractTableSync.cpp">
+				RelativePath=".\VinciBikeTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciContractTableSync.h">
+				RelativePath=".\VinciBikeTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciRateTableSync.cpp">
+				RelativePath=".\VinciContractTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciRateTableSync.h">
+				RelativePath=".\VinciContractTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciSiteTableSync.cpp">
+				RelativePath=".\VinciRateTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciSiteTableSync.h">
+				RelativePath=".\VinciRateTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciSiteTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciSiteTableSync.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Admin Interface elements"
-			Filter="">
+			>
 			<File
-				RelativePath=".\VinciBikeAdminInterfaceElement.cpp">
+				RelativePath=".\VinciBikeAdminInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciBikeAdminInterfaceElement.h">
+				RelativePath=".\VinciBikeAdminInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciBikeSearchAdminInterfaceElement.cpp">
+				RelativePath=".\VinciBikeSearchAdminInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciBikeSearchAdminInterfaceElement.h">
+				RelativePath=".\VinciBikeSearchAdminInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciCustomerAdminInterfaceElement.cpp">
+				RelativePath=".\VinciCustomerAdminInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciCustomerAdminInterfaceElement.h">
+				RelativePath=".\VinciCustomerAdminInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciCustomerSearchAdminInterfaceElement.cpp">
+				RelativePath=".\VinciCustomerSearchAdminInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciCustomerSearchAdminInterfaceElement.h">
+				RelativePath=".\VinciCustomerSearchAdminInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciReportsAdminInterfaceElement.cpp">
+				RelativePath=".\VinciReportsAdminInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciReportsAdminInterfaceElement.h">
+				RelativePath=".\VinciReportsAdminInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Interface elements library"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Interface value elements"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Actions"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AddCustomerAction.cpp">
+				RelativePath=".\AddCustomerAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AddCustomerAction.h">
+				RelativePath=".\AddCustomerAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RentABikeAction.cpp">
+				RelativePath=".\RentABikeAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RentABikeAction.h">
+				RelativePath=".\RentABikeAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ReturnABikeAction.cpp">
+				RelativePath=".\ReturnABikeAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ReturnABikeAction.h">
+				RelativePath=".\ReturnABikeAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciAddBike.cpp">
+				RelativePath=".\VinciAddBike.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciAddBike.h">
+				RelativePath=".\VinciAddBike.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciAddGuaranteeAction.cpp">
+				RelativePath=".\VinciAddGuaranteeAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciAddGuaranteeAction.h">
+				RelativePath=".\VinciAddGuaranteeAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciChangeBikeStatus.cpp">
+				RelativePath=".\VinciChangeBikeStatus.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciChangeBikeStatusAction.h">
+				RelativePath=".\VinciChangeBikeStatusAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciReturnGuaranteeAction.cpp">
+				RelativePath=".\VinciReturnGuaranteeAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciReturnGuaranteeAction.h">
+				RelativePath=".\VinciReturnGuaranteeAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciUpdateBikeAction.cpp">
+				RelativePath=".\VinciUpdateBikeAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciUpdateBikeAction.h">
+				RelativePath=".\VinciUpdateBikeAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciUpdateCustomerAction.cpp">
+				RelativePath=".\VinciUpdateCustomerAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciUpdateCustomerAction.h">
+				RelativePath=".\VinciUpdateCustomerAction.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Interface pages"
-			Filter="">
+			>
 			<File
-				RelativePath=".\VinciPrintedContractInterfacePage.cpp">
+				RelativePath=".\VinciPrintedContractInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciPrintedContractInterfacePage.h">
+				RelativePath=".\VinciPrintedContractInterfacePage.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Requests"
-			Filter="">
+			>
 			<File
-				RelativePath=".\VinciContractPrintRequest.cpp">
+				RelativePath=".\VinciContractPrintRequest.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VinciContractPrintRequest.h">
+				RelativePath=".\VinciContractPrintRequest.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\LICENSE.txt">
+			RelativePath=".\LICENSE.txt"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 		<File
-			RelativePath=".\VinciBikeRentalModule.cpp">
+			RelativePath=".\VinciBikeRentalModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\VinciBikeRentalModule.gen.cpp">
+			RelativePath=".\VinciBikeRentalModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\VinciBikeRentalModule.h">
+			RelativePath=".\VinciBikeRentalModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\VinciBikeRentalModule.inc.cpp">
+			RelativePath=".\VinciBikeRentalModule.inc.cpp"
+			>
 		</File>
 	</Files>
 	<Globals>

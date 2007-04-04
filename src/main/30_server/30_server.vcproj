@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="30_server"
-	ProjectGUID="{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}"
-	Keyword="MakeFileProj">
+	ProjectGUID="{01E44092-75D3-433D-988C-8B0BB7612AB8}"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,146 +63,188 @@
 		<Filter
 			Name="Core classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\Action.cpp">
+				RelativePath=".\Action.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Action.h">
+				RelativePath=".\Action.h"
+				>
 			</File>
 			<File
-				RelativePath=".\CleanerThreadExec.cpp">
+				RelativePath=".\CleanerThreadExec.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\CleanerThreadExec.h">
+				RelativePath=".\CleanerThreadExec.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Request.cpp">
+				RelativePath=".\Request.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Request.h">
+				RelativePath=".\Request.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ServerConfig.cpp">
+				RelativePath=".\ServerConfig.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ServerConfig.h">
+				RelativePath=".\ServerConfig.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ServerThreadExec.cpp">
+				RelativePath=".\ServerThreadExec.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ServerThreadExec.h">
+				RelativePath=".\ServerThreadExec.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Session.cpp">
+				RelativePath=".\Session.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Session.h">
+				RelativePath=".\Session.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Exceptions"
-			Filter="">
+			>
 			<File
-				RelativePath=".\ActionException.cpp">
+				RelativePath=".\ActionException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ActionException.h">
+				RelativePath=".\ActionException.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RequestException.cpp">
+				RelativePath=".\RequestException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RequestException.h">
+				RelativePath=".\RequestException.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ServerModuleException.cpp">
+				RelativePath=".\ServerModuleException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ServerModuleException.h">
+				RelativePath=".\ServerModuleException.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SessionException.cpp">
+				RelativePath=".\SessionException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SessionException.h">
+				RelativePath=".\SessionException.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LS_SQL"
-			Filter="">
+			>
 			<File
-				RelativePath=".\ServerConfigTableSync.cpp">
+				RelativePath=".\ServerConfigTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ServerConfigTableSync.h">
+				RelativePath=".\ServerConfigTableSync.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Actions"
-			Filter="">
+			>
 			<File
-				RelativePath=".\LoginAction.cpp">
+				RelativePath=".\LoginAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LoginAction.h">
+				RelativePath=".\LoginAction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LogoutAction.cpp">
+				RelativePath=".\LogoutAction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LogoutAction.h">
+				RelativePath=".\LogoutAction.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Value Interface Elements"
-			Filter="">
+			>
 			<File
-				RelativePath=".\HtmlFormInterfaceElement.cpp">
+				RelativePath=".\HtmlFormInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\HtmlFormInterfaceElement.h">
+				RelativePath=".\HtmlFormInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LoginHtmlField.cpp">
+				RelativePath=".\LoginHtmlField.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LoginHtmlField.h">
+				RelativePath=".\LoginHtmlField.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LogoutHTMLLinkInterfaceElement.cpp">
+				RelativePath=".\LogoutHTMLLinkInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LogoutHTMLLinkInterfaceElement.h">
+				RelativePath=".\LogoutHTMLLinkInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PasswordHtmlField.cpp">
+				RelativePath=".\PasswordHtmlField.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PasswordHtmlField.h">
+				RelativePath=".\PasswordHtmlField.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RequestErrorMessageInterfaceElement.cpp">
+				RelativePath=".\RequestErrorMessageInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RequestErrorMessageInterfaceElement.h">
+				RelativePath=".\RequestErrorMessageInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 		<File
-			RelativePath=".\ServerModule.cpp">
+			RelativePath=".\ServerModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\ServerModule.gen.cpp">
+			RelativePath=".\ServerModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\ServerModule.h">
+			RelativePath=".\ServerModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\ServerModule.inc.cpp">
+			RelativePath=".\ServerModule.inc.cpp"
+			>
 		</File>
 	</Files>
 	<Globals>

@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="34_departures_table"
 	ProjectGUID="{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
-	Keyword="MakeFileProj">
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -40,387 +62,495 @@
 	<Files>
 		<Filter
 			Name="AdminInterfaceElement"
-			Filter="">
+			>
 			<File
-				RelativePath=".\BroadcastPointAdmin.cpp">
+				RelativePath=".\BroadcastPointAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\BroadcastPointAdmin.h">
+				RelativePath=".\BroadcastPointAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\BroadcastPointsAdmin.cpp">
+				RelativePath=".\BroadcastPointsAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\BroadcastPointsAdmin.h">
+				RelativePath=".\BroadcastPointsAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayAdmin.cpp">
+				RelativePath=".\DisplayAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayAdmin.h">
+				RelativePath=".\DisplayAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayMaintenanceAdmin.cpp">
+				RelativePath=".\DisplayMaintenanceAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayMaintenanceAdmin.h">
+				RelativePath=".\DisplayMaintenanceAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplaySearchAdmin.cpp">
+				RelativePath=".\DisplaySearchAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplaySearchAdmin.h">
+				RelativePath=".\DisplaySearchAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayTypesAdmin.cpp">
+				RelativePath=".\DisplayTypesAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayTypesAdmin.h">
+				RelativePath=".\DisplayTypesAdmin.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Source files"
-			Filter="">
+			>
 			<File
-				RelativePath=".\BroadcastPoint.cpp">
+				RelativePath=".\BroadcastPoint.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\BroadcastPoint.h">
+				RelativePath=".\BroadcastPoint.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayScreen.cpp">
+				RelativePath=".\DisplayScreen.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayScreen.h">
+				RelativePath=".\DisplayScreen.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayType.cpp">
+				RelativePath=".\DisplayType.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayType.h">
+				RelativePath=".\DisplayType.h"
+				>
 			</File>
 			<Filter
 				Name="Generators"
-				Filter="">
+				>
 				<File
-					RelativePath=".\ArrivalDepartureTableGenerator.cpp">
+					RelativePath=".\ArrivalDepartureTableGenerator.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\ArrivalDepartureTableGenerator.h">
+					RelativePath=".\ArrivalDepartureTableGenerator.h"
+					>
 				</File>
 				<File
-					RelativePath=".\ForcedDestinationsArrivalDepartureTableGenerator.cpp">
+					RelativePath=".\ForcedDestinationsArrivalDepartureTableGenerator.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\ForcedDestinationsArrivalDepartureTableGenerator.h">
+					RelativePath=".\ForcedDestinationsArrivalDepartureTableGenerator.h"
+					>
 				</File>
 				<File
-					RelativePath=".\StandardArrivalDepartureTableGenerator.cpp">
+					RelativePath=".\StandardArrivalDepartureTableGenerator.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\StandardArrivalDepartureTableGenerator.h">
+					RelativePath=".\StandardArrivalDepartureTableGenerator.h"
+					>
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
 			Name="Rights"
-			Filter="">
+			>
 			<File
-				RelativePath=".\ArrivalDepartureTableRight.cpp">
+				RelativePath=".\ArrivalDepartureTableRight.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ArrivalDepartureTableRight.h">
+				RelativePath=".\ArrivalDepartureTableRight.h"
+				>
 			</File>
 			<File
-				RelativePath=".\BroadcastPointsRight.cpp">
+				RelativePath=".\BroadcastPointsRight.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\BroadcastPointsRight.h">
+				RelativePath=".\BroadcastPointsRight.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayMaintenanceRight.cpp">
+				RelativePath=".\DisplayMaintenanceRight.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayMaintenanceRight.h">
+				RelativePath=".\DisplayMaintenanceRight.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
-			Filter="">
+			>
 			<File
-				RelativePath=".\ArrivalDepartureTableLog.cpp">
+				RelativePath=".\ArrivalDepartureTableLog.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ArrivalDepartureTableLog.h">
+				RelativePath=".\ArrivalDepartureTableLog.h"
+				>
 			</File>
 			<File
-				RelativePath=".\BroadcastPointsDataLog.cpp">
+				RelativePath=".\BroadcastPointsDataLog.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\BroadcastPointsDataLog.h">
+				RelativePath=".\BroadcastPointsDataLog.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayMaintenanceLog.cpp">
+				RelativePath=".\DisplayMaintenanceLog.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayMaintenanceLog.h">
+				RelativePath=".\DisplayMaintenanceLog.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LibraryInterfaceElement"
-			Filter="">
+			>
 			<File
-				RelativePath=".\DeparturesTableDestinationContentInterfaceElement.cpp">
+				RelativePath=".\DeparturesTableDestinationContentInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DeparturesTableDestinationContentInterfaceElement.h">
+				RelativePath=".\DeparturesTableDestinationContentInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DeparturesTableInterfaceElement.cpp">
+				RelativePath=".\DeparturesTableInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DeparturesTableInterfaceElement.h">
+				RelativePath=".\DeparturesTableInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DeparturesTableLineContentInterfaceElement.cpp">
+				RelativePath=".\DeparturesTableLineContentInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DeparturesTableLineContentInterfaceElement.h">
+				RelativePath=".\DeparturesTableLineContentInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DeparturesTableTimeContentInterfaceElement.cpp">
+				RelativePath=".\DeparturesTableTimeContentInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DeparturesTableTimeContentInterfaceElement.h">
+				RelativePath=".\DeparturesTableTimeContentInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="InterfacePage"
-			Filter="">
+			>
 			<File
-				RelativePath=".\DeparturesTableInterfacePage.cpp">
+				RelativePath=".\DeparturesTableInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DeparturesTableInterfacePage.h">
+				RelativePath=".\DeparturesTableInterfacePage.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DepartureTableRowInterfacePage.cpp">
+				RelativePath=".\DepartureTableRowInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DepartureTableRowInterfacePage.h">
+				RelativePath=".\DepartureTableRowInterfacePage.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Requests"
-			Filter="">
+			>
 			<File
-				RelativePath=".\DisplayScreenContentRequest.cpp">
+				RelativePath=".\DisplayScreenContentRequest.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayScreenContentRequest.h">
+				RelativePath=".\DisplayScreenContentRequest.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayScreenSupervisionRequest.cpp">
+				RelativePath=".\DisplayScreenSupervisionRequest.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayScreenSupervisionRequest.h">
+				RelativePath=".\DisplayScreenSupervisionRequest.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AdvancedSelectTableSync.cpp">
+				RelativePath=".\AdvancedSelectTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AdvancedSelectTableSync.h">
+				RelativePath=".\AdvancedSelectTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\BroadcastPointTableSync.cpp">
+				RelativePath=".\BroadcastPointTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\BroadcastPointTableSync.h">
+				RelativePath=".\BroadcastPointTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayScreenTableSync.cpp">
+				RelativePath=".\DisplayScreenTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayScreenTableSync.h">
+				RelativePath=".\DisplayScreenTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayTypeTableSync.cpp">
+				RelativePath=".\DisplayTypeTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayTypeTableSync.h">
+				RelativePath=".\DisplayTypeTableSync.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Actions"
-			Filter="">
+			>
 			<Filter
 				Name="Display screen"
-				Filter="">
+				>
 				<File
-					RelativePath=".\AddDepartureStopToDisplayScreenAction.cpp">
+					RelativePath=".\AddDepartureStopToDisplayScreenAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\AddDepartureStopToDisplayScreenAction.h">
+					RelativePath=".\AddDepartureStopToDisplayScreenAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\AddForbiddenPlaceToDisplayScreen.cpp">
+					RelativePath=".\AddForbiddenPlaceToDisplayScreen.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\AddForbiddenPlaceToDisplayScreen.h">
+					RelativePath=".\AddForbiddenPlaceToDisplayScreen.h"
+					>
 				</File>
 				<File
-					RelativePath=".\AddPreselectionPlaceToDisplayScreen.cpp">
+					RelativePath=".\AddPreselectionPlaceToDisplayScreen.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\AddPreselectionPlaceToDisplayScreen.h">
+					RelativePath=".\AddPreselectionPlaceToDisplayScreen.h"
+					>
 				</File>
 				<File
-					RelativePath=".\CreateDisplayScreenAction.cpp">
+					RelativePath=".\CreateDisplayScreenAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\CreateDisplayScreenAction.h">
+					RelativePath=".\CreateDisplayScreenAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\DisplayScreenAddDisplayedPlace.cpp">
+					RelativePath=".\DisplayScreenAddDisplayedPlace.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\DisplayScreenAddDisplayedPlace.h">
+					RelativePath=".\DisplayScreenAddDisplayedPlace.h"
+					>
 				</File>
 				<File
-					RelativePath=".\DisplayScreenRemoveDisplayedPlaceAction.cpp">
+					RelativePath=".\DisplayScreenRemoveDisplayedPlaceAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\DisplayScreenRemoveDisplayedPlaceAction.h">
+					RelativePath=".\DisplayScreenRemoveDisplayedPlaceAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\DisplayScreenRemoveForbiddenPlaceAction.cpp">
+					RelativePath=".\DisplayScreenRemoveForbiddenPlaceAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\DisplayScreenRemoveForbiddenPlaceAction.h">
+					RelativePath=".\DisplayScreenRemoveForbiddenPlaceAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\DisplayScreenRemovePhysicalStopAction.cpp">
+					RelativePath=".\DisplayScreenRemovePhysicalStopAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\DisplayScreenRemovePhysicalStopAction.h">
+					RelativePath=".\DisplayScreenRemovePhysicalStopAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\RemovePreselectionPlaceFromDisplayScreenAction.cpp">
+					RelativePath=".\RemovePreselectionPlaceFromDisplayScreenAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\RemovePreselectionPlaceFromDisplayScreenAction.h">
+					RelativePath=".\RemovePreselectionPlaceFromDisplayScreenAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateAllStopsDisplayScreenAction.cpp">
+					RelativePath=".\UpdateAllStopsDisplayScreenAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateAllStopsDisplayScreenAction.h">
+					RelativePath=".\UpdateAllStopsDisplayScreenAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateDisplayMaintenanceAction.cpp">
+					RelativePath=".\UpdateDisplayMaintenanceAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateDisplayMaintenanceAction.h">
+					RelativePath=".\UpdateDisplayMaintenanceAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateDisplayPreselectionParametersAction.cpp">
+					RelativePath=".\UpdateDisplayPreselectionParametersAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateDisplayPreselectionParametersAction.h">
+					RelativePath=".\UpdateDisplayPreselectionParametersAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateDisplayScreenAction.cpp">
+					RelativePath=".\UpdateDisplayScreenAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateDisplayScreenAction.h">
+					RelativePath=".\UpdateDisplayScreenAction.h"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="Display Type"
-				Filter="">
+				>
 				<File
-					RelativePath=".\CreateDisplayTypeAction.cpp">
+					RelativePath=".\CreateDisplayTypeAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\CreateDisplayTypeAction.h">
+					RelativePath=".\CreateDisplayTypeAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateDisplayTypeAction.cpp">
+					RelativePath=".\UpdateDisplayTypeAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateDisplayTypeAction.h">
+					RelativePath=".\UpdateDisplayTypeAction.h"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="Broadcast point"
-				Filter="">
+				>
 				<File
-					RelativePath=".\CreateBroadcastPointAction.cpp">
+					RelativePath=".\CreateBroadcastPointAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\CreateBroadcastPointAction.h">
+					RelativePath=".\CreateBroadcastPointAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\DeleteBroadcastPointAction.cpp">
+					RelativePath=".\DeleteBroadcastPointAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\DeleteBroadcastPointAction.h">
+					RelativePath=".\DeleteBroadcastPointAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\RenameBroadcastPointAction.cpp">
+					RelativePath=".\RenameBroadcastPointAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\RenameBroadcastPointAction.h">
+					RelativePath=".\RenameBroadcastPointAction.h"
+					>
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
 			Name="Alarm recipient"
-			Filter="">
+			>
 			<File
-				RelativePath=".\DisplayScreenAlarmRecipient.cpp">
+				RelativePath=".\DisplayScreenAlarmRecipient.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayScreenAlarmRecipient.h">
+				RelativePath=".\DisplayScreenAlarmRecipient.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Value Interface Elements"
-			Filter="">
+			>
 			<File
-				RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.cpp">
+				RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.h">
+				RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.cpp">
+				RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.h">
+				RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\DeparturesTableModule.cpp">
+			RelativePath=".\DeparturesTableModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\DeparturesTableModule.gen.cpp">
+			RelativePath=".\DeparturesTableModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\DeparturesTableModule.h">
+			RelativePath=".\DeparturesTableModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\DeparturesTableModule.inc.cpp">
+			RelativePath=".\DeparturesTableModule.inc.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 		<File
-			RelativePath=".\Types.h">
+			RelativePath=".\Types.h"
+			>
 		</File>
 	</Files>
 	<Globals>

@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="39_map"
-	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
-	Keyword="MakeFileProj">
+	ProjectGUID="{C96EECCD-579E-41C2-ABB8-82E4CBF84290}"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,171 +63,220 @@
 		<Filter
 			Name="Core classes"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
+			>
 			<File
-				RelativePath=".\Drawable.cpp">
+				RelativePath=".\Drawable.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Drawable.h">
+				RelativePath=".\Drawable.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DrawableLine.cpp">
+				RelativePath=".\DrawableLine.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DrawableLine.h">
+				RelativePath=".\DrawableLine.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DrawableLineComparator.cpp">
+				RelativePath=".\DrawableLineComparator.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DrawableLineComparator.h">
+				RelativePath=".\DrawableLineComparator.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DrawableLineIndex.cpp">
+				RelativePath=".\DrawableLineIndex.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DrawableLineIndex.h">
+				RelativePath=".\DrawableLineIndex.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DrawablePhysicalStop.cpp">
+				RelativePath=".\DrawablePhysicalStop.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DrawablePhysicalStop.h">
+				RelativePath=".\DrawablePhysicalStop.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Geometry.cpp">
+				RelativePath=".\Geometry.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Geometry.h">
+				RelativePath=".\Geometry.h"
+				>
 			</File>
 			<File
-				RelativePath=".\HtmlMapRenderer.cpp">
+				RelativePath=".\HtmlMapRenderer.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\HtmlMapRenderer.h">
+				RelativePath=".\HtmlMapRenderer.h"
+				>
 			</File>
 			<File
-				RelativePath=".\JpegRenderer.cpp">
+				RelativePath=".\JpegRenderer.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\JpegRenderer.h">
+				RelativePath=".\JpegRenderer.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Map.cpp">
+				RelativePath=".\Map.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Map.h">
+				RelativePath=".\Map.h"
+				>
 			</File>
 			<File
-				RelativePath=".\MapBackground.cpp">
+				RelativePath=".\MapBackground.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MapBackground.h">
+				RelativePath=".\MapBackground.h"
+				>
 			</File>
 			<File
-				RelativePath=".\MapBackgroundManager.cpp">
+				RelativePath=".\MapBackgroundManager.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MapBackgroundManager.h">
+				RelativePath=".\MapBackgroundManager.h"
+				>
 			</File>
 			<File
-				RelativePath=".\MapBackgroundTile.cpp">
+				RelativePath=".\MapBackgroundTile.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MapBackgroundTile.h">
+				RelativePath=".\MapBackgroundTile.h"
+				>
 			</File>
 			<File
-				RelativePath=".\MapInfoRenderer.cpp">
+				RelativePath=".\MapInfoRenderer.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MapInfoRenderer.h">
+				RelativePath=".\MapInfoRenderer.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PostscriptCanvas.cpp">
+				RelativePath=".\PostscriptCanvas.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PostscriptCanvas.h">
+				RelativePath=".\PostscriptCanvas.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PostscriptRenderer.cpp">
+				RelativePath=".\PostscriptRenderer.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PostscriptRenderer.h">
+				RelativePath=".\PostscriptRenderer.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Rectangle.cpp">
+				RelativePath=".\Rectangle.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Rectangle.h">
+				RelativePath=".\Rectangle.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Renderer.cpp">
+				RelativePath=".\Renderer.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Renderer.h">
+				RelativePath=".\Renderer.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RenderingConfig.cpp">
+				RelativePath=".\RenderingConfig.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RenderingConfig.h">
+				RelativePath=".\RenderingConfig.h"
+				>
 			</File>
 			<File
-				RelativePath=".\TileGrid.cpp">
+				RelativePath=".\TileGrid.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\TileGrid.h">
+				RelativePath=".\TileGrid.h"
+				>
 			</File>
 			<File
-				RelativePath=".\XmlBuilder.cpp">
+				RelativePath=".\XmlBuilder.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\XmlBuilder.h">
+				RelativePath=".\XmlBuilder.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="LibraryInterfaceElement"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="DBLog"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Rights"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Requests"
-			Filter="">
+			>
 			<File
-				RelativePath=".\MapRequest.cpp">
+				RelativePath=".\MapRequest.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MapRequest.h">
+				RelativePath=".\MapRequest.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\LICENSE.txt">
+			RelativePath=".\LICENSE.txt"
+			>
 		</File>
 		<File
-			RelativePath=".\MapModule.cpp">
+			RelativePath=".\MapModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\MapModule.gen.cpp">
+			RelativePath=".\MapModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\MapModule.h">
+			RelativePath=".\MapModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\MapModule.inc.cpp">
+			RelativePath=".\MapModule.inc.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 	</Files>
 	<Globals>

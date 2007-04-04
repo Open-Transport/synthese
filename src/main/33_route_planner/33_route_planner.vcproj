@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="33_route_planner"
 	ProjectGUID="{DCB40545-776B-4B6E-A050-D4A513880697}"
-	Keyword="MakeFileProj">
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,137 +63,176 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\BestVertexReachesMap.cpp">
+				RelativePath=".\BestVertexReachesMap.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\BestVertexReachesMap.h">
+				RelativePath=".\BestVertexReachesMap.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Journey.cpp">
+				RelativePath=".\Journey.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Journey.h">
+				RelativePath=".\Journey.h"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyLeg.cpp">
+				RelativePath=".\JourneyLeg.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyLeg.h">
+				RelativePath=".\JourneyLeg.h"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyLegComparator.cpp">
+				RelativePath=".\JourneyLegComparator.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyLegComparator.h">
+				RelativePath=".\JourneyLegComparator.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RoutePlanner.cpp">
+				RelativePath=".\RoutePlanner.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RoutePlanner.h">
+				RelativePath=".\RoutePlanner.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RoutePlannerModule.cpp">
+				RelativePath=".\RoutePlannerModule.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Site.cpp">
+				RelativePath=".\Site.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Site.h">
+				RelativePath=".\Site.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
-			Filter="">
+			>
 			<File
-				RelativePath=".\SiteTableSync.cpp">
+				RelativePath=".\SiteTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SiteTableSync.h">
+				RelativePath=".\SiteTableSync.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="ValueInterfaceElement"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AtLeastOneAlertInJourneyVectorValueInterfaceElement.h">
+				RelativePath=".\AtLeastOneAlertInJourneyVectorValueInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LibraryInterfaceElement"
-			Filter="">
+			>
 			<File
-				RelativePath=".\JourneyBoardInterfaceElement.cpp">
+				RelativePath=".\JourneyBoardInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyBoardInterfaceElement.h">
+				RelativePath=".\JourneyBoardInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyLineListInterfaceElement.cpp">
+				RelativePath=".\JourneyLineListInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyLineListInterfaceElement.h">
+				RelativePath=".\JourneyLineListInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="InterfacePage"
-			Filter="">
+			>
 			<File
-				RelativePath=".\JourneyBoardJunctionCellInterfacePage.cpp">
+				RelativePath=".\JourneyBoardJunctionCellInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyBoardJunctionCellInterfacePage.h">
+				RelativePath=".\JourneyBoardJunctionCellInterfacePage.h"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyBoardServiceCellInterfacePage.cpp">
+				RelativePath=".\JourneyBoardServiceCellInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyBoardServiceCellInterfacePage.h">
+				RelativePath=".\JourneyBoardServiceCellInterfacePage.h"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyBoardStopCellInterfacePage.cpp">
+				RelativePath=".\JourneyBoardStopCellInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\JourneyBoardStopCellInterfacePage.h">
+				RelativePath=".\JourneyBoardStopCellInterfacePage.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RoutePlannerNoSolutionInterfacePage.cpp">
+				RelativePath=".\RoutePlannerNoSolutionInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RoutePlannerNoSolutionInterfacePage.h">
+				RelativePath=".\RoutePlannerNoSolutionInterfacePage.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RoutePlannerSheetColumnInterfacePage.cpp">
+				RelativePath=".\RoutePlannerSheetColumnInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RoutePlannerSheetColumnInterfacePage.h">
+				RelativePath=".\RoutePlannerSheetColumnInterfacePage.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RoutePlannerSheetLineInterfacePage.cpp">
+				RelativePath=".\RoutePlannerSheetLineInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RoutePlannerSheetLineInterfacePage.h">
+				RelativePath=".\RoutePlannerSheetLineInterfacePage.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.cpp">
+				RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.h">
+				RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\RoutePlannerModule.gen.cpp">
+			RelativePath=".\RoutePlannerModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\RoutePlannerModule.h">
+			RelativePath=".\RoutePlannerModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\RoutePlannerModule.inc.cpp">
+			RelativePath=".\RoutePlannerModule.inc.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 	</Files>
 	<Globals>

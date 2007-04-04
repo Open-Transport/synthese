@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="02_db"
-	ProjectGUID="{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
-	Keyword="MakeFileProj">
+	ProjectGUID="{F0BEDE6D-51E1-4226-9F5E-3D4A72BFE6F4}"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,87 +63,114 @@
 		<Filter
 			Name="Core Classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\DbModuleClass.cpp">
+				RelativePath=".\DbModuleClass.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DbResult.h">
+				RelativePath=".\DbResult.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLite.cpp">
+				RelativePath=".\SQLite.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLite.h">
+				RelativePath=".\SQLite.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteQueueThreadExec.cpp">
+				RelativePath=".\SQLiteQueueThreadExec.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteQueueThreadExec.h">
+				RelativePath=".\SQLiteQueueThreadExec.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteResult.cpp">
+				RelativePath=".\SQLiteResult.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteResult.h">
+				RelativePath=".\SQLiteResult.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteSync.cpp">
+				RelativePath=".\SQLiteSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteSync.h">
+				RelativePath=".\SQLiteSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteTableSync.cpp">
+				RelativePath=".\SQLiteTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteTableSync.h">
+				RelativePath=".\SQLiteTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteTableSyncTemplate.h">
+				RelativePath=".\SQLiteTableSyncTemplate.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteThreadExec.cpp">
+				RelativePath=".\SQLiteThreadExec.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteThreadExec.h">
+				RelativePath=".\SQLiteThreadExec.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteUpdateHook.h">
+				RelativePath=".\SQLiteUpdateHook.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Exceptions"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
+			>
 			<File
-				RelativePath=".\Constants.h">
+				RelativePath=".\Constants.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DBEmptyResultException.cpp">
+				RelativePath=".\DBEmptyResultException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DBEmptyResultException.h">
+				RelativePath=".\DBEmptyResultException.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DbModuleClass.h">
+				RelativePath=".\DbModuleClass.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteException.cpp">
+				RelativePath=".\SQLiteException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SQLiteException.h">
+				RelativePath=".\SQLiteException.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\DBModule.cpp">
+			RelativePath=".\DBModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\DBModule.h">
+			RelativePath=".\DBModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 	</Files>
 	<Globals>

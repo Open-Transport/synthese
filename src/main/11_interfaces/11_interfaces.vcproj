@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="11_interfaces"
-	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
-	Keyword="MakeFileProj">
+	ProjectGUID="{066BE750-8DB3-4384-AC65-1F1C20F567F0}"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,199 +63,256 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\DisplayableElement.h">
+				RelativePath=".\DisplayableElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Interface.cpp">
+				RelativePath=".\Interface.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Interface.h">
+				RelativePath=".\Interface.h"
+				>
 			</File>
 			<File
-				RelativePath=".\InterfacePage.cpp">
+				RelativePath=".\InterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\InterfacePage.h">
+				RelativePath=".\InterfacePage.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LibraryInterfaceElement.cpp">
+				RelativePath=".\LibraryInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LibraryInterfaceElement.h">
+				RelativePath=".\LibraryInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Parametres.h">
+				RelativePath=".\Parametres.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ValueElementList.cpp">
+				RelativePath=".\ValueElementList.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ValueElementList.h">
+				RelativePath=".\ValueElementList.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ValueInterfaceElement.cpp">
+				RelativePath=".\ValueInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ValueInterfaceElement.h">
+				RelativePath=".\ValueInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LibraryInterfaceElement"
-			Filter="">
+			>
 			<File
-				RelativePath=".\CommentInterfaceElement.cpp">
+				RelativePath=".\CommentInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\CommentInterfaceElement.h">
+				RelativePath=".\CommentInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\GotoInterfaceElement.cpp">
+				RelativePath=".\GotoInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\GotoInterfaceElement.h">
+				RelativePath=".\GotoInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\IncludePageInterfaceElement.cpp">
+				RelativePath=".\IncludePageInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\IncludePageInterfaceElement.h">
+				RelativePath=".\IncludePageInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LineLabelInterfaceElement.cpp">
+				RelativePath=".\LineLabelInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LineLabelInterfaceElement.h">
+				RelativePath=".\LineLabelInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PrintInterfaceElement.cpp">
+				RelativePath=".\PrintInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PrintInterfaceElement.h">
+				RelativePath=".\PrintInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SetInterfaceElement.cpp">
+				RelativePath=".\SetInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SetInterfaceElement.h">
+				RelativePath=".\SetInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="ValueInterfaceElement"
-			Filter="">
+			>
 			<File
-				RelativePath=".\EqualsValueInterfaceElement.cpp">
+				RelativePath=".\EqualsValueInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\EqualsValueInterfaceElement.h">
+				RelativePath=".\EqualsValueInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\FormattedNumberInterfaceElement.cpp">
+				RelativePath=".\FormattedNumberInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\FormattedNumberInterfaceElement.h">
+				RelativePath=".\FormattedNumberInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\IfThenElseInterfaceElement.cpp">
+				RelativePath=".\IfThenElseInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\IfThenElseInterfaceElement.h">
+				RelativePath=".\IfThenElseInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ParameterValueInterfaceElement.cpp">
+				RelativePath=".\ParameterValueInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ParameterValueInterfaceElement.h">
+				RelativePath=".\ParameterValueInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\StaticValueInterfaceElement.cpp">
+				RelativePath=".\StaticValueInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\StaticValueInterfaceElement.h">
+				RelativePath=".\StaticValueInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LS_SQL"
-			Filter="">
+			>
 			<File
-				RelativePath=".\InterfacePageTableSync.cpp">
+				RelativePath=".\InterfacePageTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\InterfacePageTableSync.h">
+				RelativePath=".\InterfacePageTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\InterfaceTableSync.cpp">
+				RelativePath=".\InterfaceTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\InterfaceTableSync.h">
+				RelativePath=".\InterfaceTableSync.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Exceptions"
-			Filter="">
+			>
 			<File
-				RelativePath=".\InterfacePageException.cpp">
+				RelativePath=".\InterfacePageException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\InterfacePageException.h">
+				RelativePath=".\InterfacePageException.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Requests"
-			Filter="">
+			>
 			<File
-				RelativePath=".\RedirRequest.cpp">
+				RelativePath=".\RedirRequest.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RedirRequest.h">
+				RelativePath=".\RedirRequest.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RequestWithInterface.cpp">
+				RelativePath=".\RequestWithInterface.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RequestWithInterface.h">
+				RelativePath=".\RequestWithInterface.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RequestWithInterfaceAndRequiredSession.cpp">
+				RelativePath=".\RequestWithInterfaceAndRequiredSession.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RequestWithInterfaceAndRequiredSession.h">
+				RelativePath=".\RequestWithInterfaceAndRequiredSession.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SimplePageRequest.cpp">
+				RelativePath=".\SimplePageRequest.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SimplePageRequest.h">
+				RelativePath=".\SimplePageRequest.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Interface Pages"
-			Filter="">
+			>
 			<File
-				RelativePath=".\RedirectInterfacePage.cpp">
+				RelativePath=".\RedirectInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RedirectInterfacePage.h">
+				RelativePath=".\RedirectInterfacePage.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\InterfaceModule.cpp">
+			RelativePath=".\InterfaceModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\InterfaceModule.gen.cpp">
+			RelativePath=".\InterfaceModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\InterfaceModule.h">
+			RelativePath=".\InterfaceModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\InterfaceModule.inc.cpp">
+			RelativePath=".\InterfaceModule.inc.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 		<File
-			RelativePath=".\Types.h">
+			RelativePath=".\Types.h"
+			>
 		</File>
 	</Files>
 	<Globals>

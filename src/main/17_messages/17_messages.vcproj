@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="17_messages"
-	ProjectGUID="{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
-	Keyword="MakeFileProj">
+	ProjectGUID="{956A4D91-FF39-422F-B767-2F9E425D0183}"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -40,280 +62,359 @@
 	<Files>
 		<Filter
 			Name="Classes"
-			Filter="">
+			>
 			<File
-				RelativePath=".\Alarm.cpp">
+				RelativePath=".\Alarm.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Alarm.h">
+				RelativePath=".\Alarm.h"
+				>
 			</File>
 			<File
-				RelativePath=".\AlarmBroadcastList.h">
+				RelativePath=".\AlarmBroadcastList.h"
+				>
 			</File>
 			<File
-				RelativePath=".\AlarmObjectLink.h">
+				RelativePath=".\AlarmObjectLink.h"
+				>
 			</File>
 			<File
-				RelativePath=".\AlarmRecipient.cpp">
+				RelativePath=".\AlarmRecipient.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AlarmRecipient.h">
+				RelativePath=".\AlarmRecipient.h"
+				>
 			</File>
 			<File
-				RelativePath=".\AlarmRecipientTemplate.h">
+				RelativePath=".\AlarmRecipientTemplate.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Scenario.cpp">
+				RelativePath=".\Scenario.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Scenario.h">
+				RelativePath=".\Scenario.h"
+				>
 			</File>
 			<File
-				RelativePath=".\TextTemplate.cpp">
+				RelativePath=".\TextTemplate.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\TextTemplate.h">
+				RelativePath=".\TextTemplate.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AlarmObjectLinkTableSync.cpp">
+				RelativePath=".\AlarmObjectLinkTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AlarmObjectLinkTableSync.h">
+				RelativePath=".\AlarmObjectLinkTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\AlarmTableSync.cpp">
+				RelativePath=".\AlarmTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AlarmTableSync.h">
+				RelativePath=".\AlarmTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ScenarioTableSync.cpp">
+				RelativePath=".\ScenarioTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ScenarioTableSync.h">
+				RelativePath=".\ScenarioTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\TextTemplateTableSync.cpp">
+				RelativePath=".\TextTemplateTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\TextTemplateTableSync.h">
+				RelativePath=".\TextTemplateTableSync.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Admin Compounds"
-			Filter="">
+			>
 			<File
-				RelativePath=".\MessageAdmin.cpp">
+				RelativePath=".\MessageAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MessageAdmin.h">
+				RelativePath=".\MessageAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesAdmin.cpp">
+				RelativePath=".\MessagesAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesAdmin.h">
+				RelativePath=".\MessagesAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesLibraryAdmin.cpp">
+				RelativePath=".\MessagesLibraryAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesLibraryAdmin.h">
+				RelativePath=".\MessagesLibraryAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesScenarioAdmin.cpp">
+				RelativePath=".\MessagesScenarioAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesScenarioAdmin.h">
+				RelativePath=".\MessagesScenarioAdmin.h"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesScenarioSendAdmin.cpp">
+				RelativePath=".\MessagesScenarioSendAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesScenarioSendAdmin.h">
+				RelativePath=".\MessagesScenarioSendAdmin.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LS XML"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AlarmLS.cpp">
+				RelativePath=".\AlarmLS.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AlarmLS.h">
+				RelativePath=".\AlarmLS.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Rights"
-			Filter="">
+			>
 			<File
-				RelativePath=".\MessagesLibraryRight.cpp">
+				RelativePath=".\MessagesLibraryRight.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesLibraryRight.h">
+				RelativePath=".\MessagesLibraryRight.h"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesRight.cpp">
+				RelativePath=".\MessagesRight.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesRight.h">
+				RelativePath=".\MessagesRight.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
-			Filter="">
+			>
 			<File
-				RelativePath=".\MessagesLibraryLog.cpp">
+				RelativePath=".\MessagesLibraryLog.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesLibraryLog.h">
+				RelativePath=".\MessagesLibraryLog.h"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesLog.cpp">
+				RelativePath=".\MessagesLog.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\MessagesLog.h">
+				RelativePath=".\MessagesLog.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Actions"
-			Filter="">
+			>
 			<Filter
 				Name="Scenario"
-				Filter="">
+				>
 				<File
-					RelativePath=".\AddScenarioAction.cpp">
+					RelativePath=".\AddScenarioAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\AddScenarioAction.h">
+					RelativePath=".\AddScenarioAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\DeleteScenarioAction.cpp">
+					RelativePath=".\DeleteScenarioAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\DeleteScenarioAction.h">
+					RelativePath=".\DeleteScenarioAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\NewScenarioSendAction.cpp">
+					RelativePath=".\NewScenarioSendAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\NewScenarioSendAction.h">
+					RelativePath=".\NewScenarioSendAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\ScenarioNameUpdateAction.cpp">
+					RelativePath=".\ScenarioNameUpdateAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\ScenarioNameUpdateAction.h">
+					RelativePath=".\ScenarioNameUpdateAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\ScenarioStopAction.cpp">
+					RelativePath=".\ScenarioStopAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\ScenarioStopAction.h">
+					RelativePath=".\ScenarioStopAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\ScenarioUpdateDatesAction.cpp">
+					RelativePath=".\ScenarioUpdateDatesAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\ScenarioUpdateDatesAction.h">
+					RelativePath=".\ScenarioUpdateDatesAction.h"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="Alarm"
-				Filter="">
+				>
 				<File
-					RelativePath=".\AlarmAddLinkAction.cpp">
+					RelativePath=".\AlarmAddLinkAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\AlarmAddLinkAction.h">
+					RelativePath=".\AlarmAddLinkAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\AlarmRemoveLinkAction.cpp">
+					RelativePath=".\AlarmRemoveLinkAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\AlarmRemoveLinkAction.h">
+					RelativePath=".\AlarmRemoveLinkAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\AlarmStopAction.cpp">
+					RelativePath=".\AlarmStopAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\AlarmStopAction.h">
+					RelativePath=".\AlarmStopAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\DeleteAlarmAction.cpp">
+					RelativePath=".\DeleteAlarmAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\DeleteAlarmAction.h">
+					RelativePath=".\DeleteAlarmAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\NewMessageAction.cpp">
+					RelativePath=".\NewMessageAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\NewMessageAction.h">
+					RelativePath=".\NewMessageAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateAlarmAction.cpp">
+					RelativePath=".\UpdateAlarmAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateAlarmAction.h">
+					RelativePath=".\UpdateAlarmAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateAlarmMessagesAction.cpp">
+					RelativePath=".\UpdateAlarmMessagesAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateAlarmMessagesAction.h">
+					RelativePath=".\UpdateAlarmMessagesAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateAlarmMessagesFromTemplateAction.cpp">
+					RelativePath=".\UpdateAlarmMessagesFromTemplateAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateAlarmMessagesFromTemplateAction.h">
+					RelativePath=".\UpdateAlarmMessagesFromTemplateAction.h"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="Text template"
-				Filter="">
+				>
 				<File
-					RelativePath=".\DeleteTextTemplateAction.cpp">
+					RelativePath=".\DeleteTextTemplateAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\DeleteTextTemplateAction.h">
+					RelativePath=".\DeleteTextTemplateAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\TextTemplateAddAction.cpp">
+					RelativePath=".\TextTemplateAddAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\TextTemplateAddAction.h">
+					RelativePath=".\TextTemplateAddAction.h"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateTextTemplateAction.cpp">
+					RelativePath=".\UpdateTextTemplateAction.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\UpdateTextTemplateAction.h">
+					RelativePath=".\UpdateTextTemplateAction.h"
+					>
 				</File>
 			</Filter>
 		</Filter>
 		<File
-			RelativePath=".\MessagesModule.cpp">
+			RelativePath=".\MessagesModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\MessagesModule.gen.cpp">
+			RelativePath=".\MessagesModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\MessagesModule.h">
+			RelativePath=".\MessagesModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\MessagesModule.inc.cpp">
+			RelativePath=".\MessagesModule.inc.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 		<File
-			RelativePath=".\Types.h">
+			RelativePath=".\Types.h"
+			>
 		</File>
 	</Files>
 	<Globals>

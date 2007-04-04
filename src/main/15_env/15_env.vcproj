@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="15_env"
 	ProjectGUID="{DFDC896C-0867-4704-896B-43FDE04E3AA8}"
-	Keyword="MakeFileProj">
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,532 +63,696 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\Address.cpp">
+				RelativePath=".\Address.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Address.h">
+				RelativePath=".\Address.h"
+				>
 			</File>
 			<File
-				RelativePath=".\AddressablePlace.cpp">
+				RelativePath=".\AddressablePlace.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AddressablePlace.h">
+				RelativePath=".\AddressablePlace.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Axis.cpp">
+				RelativePath=".\Axis.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Axis.h">
+				RelativePath=".\Axis.h"
+				>
 			</File>
 			<File
-				RelativePath=".\BikeCompliance.cpp">
+				RelativePath=".\BikeCompliance.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\BikeCompliance.h">
+				RelativePath=".\BikeCompliance.h"
+				>
 			</File>
 			<File
-				RelativePath=".\BikeComplyer.cpp">
+				RelativePath=".\BikeComplyer.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\BikeComplyer.h">
+				RelativePath=".\BikeComplyer.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Calendar.cpp">
+				RelativePath=".\Calendar.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Calendar.h">
+				RelativePath=".\Calendar.h"
+				>
 			</File>
 			<File
-				RelativePath=".\City.cpp">
+				RelativePath=".\City.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\City.h">
+				RelativePath=".\City.h"
+				>
 			</File>
 			<File
-				RelativePath=".\CommercialLine.cpp">
+				RelativePath=".\CommercialLine.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\CommercialLine.h">
+				RelativePath=".\CommercialLine.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Compliance.cpp">
+				RelativePath=".\Compliance.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Compliance.h">
+				RelativePath=".\Compliance.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ConnectionPlace.cpp">
+				RelativePath=".\ConnectionPlace.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ConnectionPlace.h">
+				RelativePath=".\ConnectionPlace.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Crossing.cpp">
+				RelativePath=".\Crossing.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Crossing.h">
+				RelativePath=".\Crossing.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Document.cpp">
+				RelativePath=".\Document.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Document.h">
+				RelativePath=".\Document.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Edge.cpp">
+				RelativePath=".\Edge.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Edge.h">
+				RelativePath=".\Edge.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Environment.cpp">
+				RelativePath=".\Environment.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Environment.h">
+				RelativePath=".\Environment.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Exception.cpp">
+				RelativePath=".\Exception.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Exception.h">
+				RelativePath=".\Exception.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Fare.cpp">
+				RelativePath=".\Fare.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Fare.h">
+				RelativePath=".\Fare.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Gateway.cpp">
+				RelativePath=".\Gateway.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Gateway.h">
+				RelativePath=".\Gateway.h"
+				>
 			</File>
 			<File
-				RelativePath=".\HandicappedCompliance.cpp">
+				RelativePath=".\HandicappedCompliance.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\HandicappedCompliance.h">
+				RelativePath=".\HandicappedCompliance.h"
+				>
 			</File>
 			<File
-				RelativePath=".\HandicappedComplyer.cpp">
+				RelativePath=".\HandicappedComplyer.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\HandicappedComplyer.h">
+				RelativePath=".\HandicappedComplyer.h"
+				>
 			</File>
 			<File
-				RelativePath=".\IncludingPlace.cpp">
+				RelativePath=".\IncludingPlace.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\IncludingPlace.h">
+				RelativePath=".\IncludingPlace.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Line.cpp">
+				RelativePath=".\Line.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Line.h">
+				RelativePath=".\Line.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LineStop.cpp">
+				RelativePath=".\LineStop.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LineStop.h">
+				RelativePath=".\LineStop.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Path.cpp">
+				RelativePath=".\Path.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Path.h">
+				RelativePath=".\Path.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PedestrianCompliance.cpp">
+				RelativePath=".\PedestrianCompliance.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PedestrianCompliance.h">
+				RelativePath=".\PedestrianCompliance.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PedestrianComplyer.cpp">
+				RelativePath=".\PedestrianComplyer.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PedestrianComplyer.h">
+				RelativePath=".\PedestrianComplyer.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PhysicalStop.cpp">
+				RelativePath=".\PhysicalStop.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PhysicalStop.h">
+				RelativePath=".\PhysicalStop.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Place.cpp">
+				RelativePath=".\Place.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Place.h">
+				RelativePath=".\Place.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PlaceAlias.cpp">
+				RelativePath=".\PlaceAlias.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PlaceAlias.h">
+				RelativePath=".\PlaceAlias.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Point.cpp">
+				RelativePath=".\Point.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Point.h">
+				RelativePath=".\Point.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PublicPlace.cpp">
+				RelativePath=".\PublicPlace.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PublicPlace.h">
+				RelativePath=".\PublicPlace.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Registrable.h">
+				RelativePath=".\Registrable.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Registry.h">
+				RelativePath=".\Registry.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RegistryException.h">
+				RelativePath=".\RegistryException.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RegistryKeyException.h">
+				RelativePath=".\RegistryKeyException.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Regulated.cpp">
+				RelativePath=".\Regulated.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Regulated.h">
+				RelativePath=".\Regulated.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ReservationRule.cpp">
+				RelativePath=".\ReservationRule.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ReservationRule.h">
+				RelativePath=".\ReservationRule.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ReservationRuleComplyer.cpp">
+				RelativePath=".\ReservationRuleComplyer.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ReservationRuleComplyer.h">
+				RelativePath=".\ReservationRuleComplyer.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Road.cpp">
+				RelativePath=".\Road.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Road.h">
+				RelativePath=".\Road.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RoadChunk.cpp">
+				RelativePath=".\RoadChunk.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RoadChunk.h">
+				RelativePath=".\RoadChunk.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RollingStock.cpp">
+				RelativePath=".\RollingStock.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RollingStock.h">
+				RelativePath=".\RollingStock.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SquareDistance.cpp">
+				RelativePath=".\SquareDistance.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SquareDistance.h">
+				RelativePath=".\SquareDistance.h"
+				>
 			</File>
 			<File
-				RelativePath=".\TemporaryPlace.cpp">
+				RelativePath=".\TemporaryPlace.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\TemporaryPlace.h">
+				RelativePath=".\TemporaryPlace.h"
+				>
 			</File>
 			<File
-				RelativePath=".\TransportNetwork.cpp">
+				RelativePath=".\TransportNetwork.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\TransportNetwork.h">
+				RelativePath=".\TransportNetwork.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Vertex.cpp">
+				RelativePath=".\Vertex.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Vertex.h">
+				RelativePath=".\Vertex.h"
+				>
 			</File>
 			<File
-				RelativePath=".\VertexAccessMap.cpp">
+				RelativePath=".\VertexAccessMap.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\VertexAccessMap.h">
+				RelativePath=".\VertexAccessMap.h"
+				>
 			</File>
 			<File
-				RelativePath=".\XmlBuilder.cpp">
+				RelativePath=".\XmlBuilder.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\XmlBuilder.h">
+				RelativePath=".\XmlBuilder.h"
+				>
 			</File>
 			<Filter
 				Name="Service"
-				Filter="">
+				>
 				<File
-					RelativePath=".\ContinuousService.cpp">
+					RelativePath=".\ContinuousService.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\ContinuousService.h">
+					RelativePath=".\ContinuousService.h"
+					>
 				</File>
 				<File
-					RelativePath=".\ScheduledService.cpp">
+					RelativePath=".\ScheduledService.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\ScheduledService.h">
+					RelativePath=".\ScheduledService.h"
+					>
 				</File>
 				<File
-					RelativePath=".\Service.cpp">
+					RelativePath=".\Service.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\Service.h">
+					RelativePath=".\Service.h"
+					>
 				</File>
 				<File
-					RelativePath=".\ServiceDate.h">
+					RelativePath=".\ServiceDate.h"
+					>
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
 			Name="LibraryInterfaceElement"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Rights"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="DBLog"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="ValueInterfaceElement"
-			Filter="">
+			>
 			<File
-				RelativePath=".\CityNameValueInterfaceElement.cpp">
+				RelativePath=".\CityNameValueInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\CityNameValueInterfaceElement.h">
+				RelativePath=".\CityNameValueInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LineImageURLInterfaceElement.cpp">
+				RelativePath=".\LineImageURLInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LineImageURLInterfaceElement.h">
+				RelativePath=".\LineImageURLInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LineShortNameInterfaceElement.cpp">
+				RelativePath=".\LineShortNameInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LineShortNameInterfaceElement.h">
+				RelativePath=".\LineShortNameInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LineStyleInterfaceElement.cpp">
+				RelativePath=".\LineStyleInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LineStyleInterfaceElement.h">
+				RelativePath=".\LineStyleInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LogicalStopNameValueInterfaceElement.cpp">
+				RelativePath=".\LogicalStopNameValueInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LogicalStopNameValueInterfaceElement.h">
+				RelativePath=".\LogicalStopNameValueInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="InterfacePage"
-			Filter="">
+			>
 			<File
-				RelativePath=".\LineMarkerInterfacePage.cpp">
+				RelativePath=".\LineMarkerInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LineMarkerInterfacePage.h">
+				RelativePath=".\LineMarkerInterfacePage.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AddressTableSync.cpp">
+				RelativePath=".\AddressTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AddressTableSync.h">
+				RelativePath=".\AddressTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\AxisTableSync.cpp">
+				RelativePath=".\AxisTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AxisTableSync.h">
+				RelativePath=".\AxisTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\BikeComplianceTableSync.cpp">
+				RelativePath=".\BikeComplianceTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\BikeComplianceTableSync.h">
+				RelativePath=".\BikeComplianceTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\CityTableSync.cpp">
+				RelativePath=".\CityTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\CityTableSync.h">
+				RelativePath=".\CityTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\CommercialLineTableSync.cpp">
+				RelativePath=".\CommercialLineTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\CommercialLineTableSync.h">
+				RelativePath=".\CommercialLineTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ComponentTableSync.cpp">
+				RelativePath=".\ComponentTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ComponentTableSync.h">
+				RelativePath=".\ComponentTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ConnectionPlaceTableSync.cpp">
+				RelativePath=".\ConnectionPlaceTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ConnectionPlaceTableSync.h">
+				RelativePath=".\ConnectionPlaceTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ContinuousServiceTableSync.cpp">
+				RelativePath=".\ContinuousServiceTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ContinuousServiceTableSync.h">
+				RelativePath=".\ContinuousServiceTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\EnvironmentLinkTableSync.cpp">
+				RelativePath=".\EnvironmentLinkTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\EnvironmentLinkTableSync.h">
+				RelativePath=".\EnvironmentLinkTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\EnvironmentTableSync.cpp">
+				RelativePath=".\EnvironmentTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\EnvironmentTableSync.h">
+				RelativePath=".\EnvironmentTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\FareTableSync.cpp">
+				RelativePath=".\FareTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\FareTableSync.h">
+				RelativePath=".\FareTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\HandicappedComplianceTableSync.cpp">
+				RelativePath=".\HandicappedComplianceTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\HandicappedComplianceTableSync.h">
+				RelativePath=".\HandicappedComplianceTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LineStopTableSync.cpp">
+				RelativePath=".\LineStopTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LineStopTableSync.h">
+				RelativePath=".\LineStopTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LineTableSync.cpp">
+				RelativePath=".\LineTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\LineTableSync.h">
+				RelativePath=".\LineTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PedestrianComplianceTableSync.cpp">
+				RelativePath=".\PedestrianComplianceTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PedestrianComplianceTableSync.h">
+				RelativePath=".\PedestrianComplianceTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PhysicalStopTableSync.cpp">
+				RelativePath=".\PhysicalStopTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PhysicalStopTableSync.h">
+				RelativePath=".\PhysicalStopTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PlaceAliasTableSync.cpp">
+				RelativePath=".\PlaceAliasTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PlaceAliasTableSync.h">
+				RelativePath=".\PlaceAliasTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PublicPlaceTableSync.cpp">
+				RelativePath=".\PublicPlaceTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\PublicPlaceTableSync.h">
+				RelativePath=".\PublicPlaceTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ReservationRuleTableSync.cpp">
+				RelativePath=".\ReservationRuleTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ReservationRuleTableSync.h">
+				RelativePath=".\ReservationRuleTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RoadChunkTableSync.cpp">
+				RelativePath=".\RoadChunkTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RoadChunkTableSync.h">
+				RelativePath=".\RoadChunkTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RoadTableSync.cpp">
+				RelativePath=".\RoadTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RoadTableSync.h">
+				RelativePath=".\RoadTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ScheduledServiceTableSync.cpp">
+				RelativePath=".\ScheduledServiceTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ScheduledServiceTableSync.h">
+				RelativePath=".\ScheduledServiceTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ServiceDateTableSync.cpp">
+				RelativePath=".\ServiceDateTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ServiceDateTableSync.h">
+				RelativePath=".\ServiceDateTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\TransportNetworkTableSync.cpp">
+				RelativePath=".\TransportNetworkTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\TransportNetworkTableSync.h">
+				RelativePath=".\TransportNetworkTableSync.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Alarm broacast"
-			Filter="">
+			>
 			<File
-				RelativePath=".\BroadcastPointAlarmBroadcast.h">
+				RelativePath=".\BroadcastPointAlarmBroadcast.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LineAlarmBroadcast.h">
+				RelativePath=".\LineAlarmBroadcast.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\EnvModule.cpp">
+			RelativePath=".\EnvModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\EnvModule.gen.cpp">
+			RelativePath=".\EnvModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\EnvModule.h">
+			RelativePath=".\EnvModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\EnvModule.inc.cpp">
+			RelativePath=".\EnvModule.inc.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 		<File
-			RelativePath=".\Types.h">
+			RelativePath=".\Types.h"
+			>
 		</File>
 	</Files>
 	<Globals>

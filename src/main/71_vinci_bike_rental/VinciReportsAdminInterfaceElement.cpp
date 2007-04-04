@@ -65,11 +65,11 @@ namespace synthese
 				<< "<table>"
 				<< "<tr><td>Date début (AAAA/MM/JJ)</td><td><input name=\"" << PARAM_START_DATE << "\" ";
 			if (!_startDate.isUnknown())
-				stream << " value=\"" << _startDate.toSQLString(false) << "\"";
+				stream << " value=\"" << _startDate.toString() << "\"";
 			stream << " /></td></tr>"
 				<< "<tr><td>Date fin (AAAA/MM/JJ)</td><td><input name=\"" << PARAM_END_DATE << "\" ";
 			if (!_endDate.isUnknown())
-				stream << " value=\"" << _endDate.toSQLString(false) << "\"";
+				stream << " value=\"" << _endDate.toString() << "\"";
 			stream << "	/></td></tr>"
 				<< "<tr><td>Nombre de locations</td><td></td></tr>"
 				<< "<tr><td>Nombre de validations</td><td></td></tr>"
@@ -79,9 +79,10 @@ namespace synthese
 				<< "<input type=\"submit\" value=\"OK\" /></form>"
 				<< "<table>"
 				;
-			for(map<int,int>::const_iterator it = _results.begin(); it != _results.end(); ++it)
+			for(std::map<time::Date, RentReportResult>::const_iterator it = _resultsPerDay.begin();
+				it != _resultsPerDay.end(); ++it)
 			{
-				stream << "<tr><td>" << it->first << "</td><td>" << it->second << "</td></tr>";
+				stream << "<tr><td>" << it->first.toString() << "</td><td>" << it->second.starts << "</td></tr>";
 			}
 			stream << "</table>";
 		}
@@ -91,13 +92,14 @@ namespace synthese
 			Request::ParametersMap::const_iterator it;
 			it = map.find(PARAM_START_DATE);
 			if (it != map.end())
-				_startDate = Date::FromSQLDate(it->second);
+				_startDate = Date::FromString(it->second);
 			it = map.find(PARAM_END_DATE);
 			if (it != map.end())
-				_endDate = Date::FromSQLDate(it->second);
+				_endDate = Date::FromString(it->second);
             if (!_startDate.isUnknown() && !_endDate.isUnknown())
 			{
 				_results = TransactionPartTableSync::count(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), _startDate, _endDate);
+				_resultsPerDay = getRentsPerDay(_startDate, _endDate);
 			}
 		}
 	}

@@ -100,13 +100,13 @@ namespace synthese
 
 			// Profile for bike rental operator user
 			Profile* operatorProfile;
-			vector<Profile*> profiles = ProfileTableSync::search(VINCI_OPERATOR_PROFILE);
+			profiles = ProfileTableSync::search(VINCI_OPERATOR_PROFILE);
 			if (profiles.size() == 0)
 				operatorProfile = new Profile;
 			else
 				operatorProfile = profiles.front();
 			operatorProfile->setName(VINCI_OPERATOR_PROFILE);
-			Right* r = Factory<Right>::create<GlobalRight>();
+			r = Factory<Right>::create<GlobalRight>();
 			r->setPrivateLevel(Right::USE);
 			r->setPublicLevel(Right::USE);
 			operatorProfile->cleanRights();
@@ -115,13 +115,13 @@ namespace synthese
 
 			// Profile for virtual owner user
 			Profile* vinciProfile;
-			vector<Profile*> profiles = ProfileTableSync::search(VINCI_ACCOUNTING_PROFILE);
+			profiles = ProfileTableSync::search(VINCI_ACCOUNTING_PROFILE);
 			if (profiles.size() == 0)
 				vinciProfile = new Profile;
 			else
 				vinciProfile = profiles.front();
 			vinciProfile->setName(VINCI_ACCOUNTING_PROFILE);
-			Right* r = Factory<Right>::create<GlobalRight>();
+			r = Factory<Right>::create<GlobalRight>();
 			r->setPrivateLevel(Right::FORBIDDEN);
 			r->setPublicLevel(Right::FORBIDDEN);
 			vinciProfile->cleanRights();

@@ -475,7 +475,15 @@ namespace synthese
 			if (withApostrophes)
 				s << "'";
 			if (!isUnknown())
-				s << Conversion::ToString(_year.getValue()) << "-" << Conversion::ToString(_month.getValue()) << "-" << Conversion::ToString(_day.getValue());
+			{
+				s	<< setw( 4 ) << setfill ( '0' )
+					<< getYear () << "-"
+					<< setw( 2 ) << setfill ( '0' )
+					<< getMonth () << "-"
+					<< setw( 2 ) << setfill ( '0' )
+					<< getDay ();
+
+			}
 			if (withApostrophes)
 				s << "'";
 			return s.str();

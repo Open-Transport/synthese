@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="57_accounts"
-	ProjectGUID="{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
-	Keyword="MakeFileProj">
+	ProjectGUID="{2482F13A-2891-4A54-B969-BCE410593E00}"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,86 +63,108 @@
 		<Filter
 			Name="Core classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\Account.cpp">
+				RelativePath=".\Account.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Account.h">
+				RelativePath=".\Account.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Currency.cpp">
+				RelativePath=".\Currency.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Currency.h">
+				RelativePath=".\Currency.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Transaction.cpp">
+				RelativePath=".\Transaction.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Transaction.h">
+				RelativePath=".\Transaction.h"
+				>
 			</File>
 			<File
-				RelativePath=".\TransactionPart.cpp">
+				RelativePath=".\TransactionPart.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\TransactionPart.h">
+				RelativePath=".\TransactionPart.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AccountTableSync.cpp">
+				RelativePath=".\AccountTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AccountTableSync.h">
+				RelativePath=".\AccountTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\CurrencyTableSync.cpp">
+				RelativePath=".\CurrencyTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\CurrencyTableSync.h">
+				RelativePath=".\CurrencyTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\TransactionPartTableSync.cpp">
+				RelativePath=".\TransactionPartTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\TransactionPartTableSync.h">
+				RelativePath=".\TransactionPartTableSync.h"
+				>
 			</File>
 			<File
-				RelativePath=".\TransactionTableSync.cpp">
+				RelativePath=".\TransactionTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\TransactionTableSync.h">
+				RelativePath=".\TransactionTableSync.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Admin Interface elements"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Interface elements library"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Interface value elements"
-			Filter="">
+			>
 		</Filter>
 		<File
-			RelativePath=".\AccountingModule.cpp">
+			RelativePath=".\AccountingModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\AccountingModule.gen.cpp">
+			RelativePath=".\AccountingModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\AccountingModule.h">
+			RelativePath=".\AccountingModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\AccountingModule.inc.cpp">
+			RelativePath=".\AccountingModule.inc.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 	</Files>
 	<Globals>

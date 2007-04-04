@@ -349,7 +349,24 @@ Hour::FromString (const std::string& str)
 
 std::string Hour::toSQLString( bool withApostrophes /*= true*/ ) const
 {
-	return (withApostrophes ? "'" : "") + Conversion::ToString(_hours) + ":" + Conversion::ToString(_minutes) + ":00" + (withApostrophes ? "'" : "");
+		
+	if (isUnknown())
+		return "";
+
+	std::stringstream os;
+
+	if (withApostrophes)
+		os << "'"; 
+
+	os << std::setw( 2 ) << std::setfill ( '0' )
+		<< getHours () << ":"
+		<< std::setw( 2 ) << std::setfill ( '0' )
+		<< getMinutes () << ":00";
+
+	if (withApostrophes)
+		os << "'"; 
+
+	return os.str ();
 }
 
 

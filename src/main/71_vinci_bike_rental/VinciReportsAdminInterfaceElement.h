@@ -26,6 +26,8 @@
 
 #include "32_admin/AdminInterfaceElement.h"
 
+#include "71_vinci_bike_rental/AdvancedSelectTableSync.h"
+
 namespace synthese
 {
 	namespace vinci
@@ -38,6 +40,11 @@ namespace synthese
 			static const std::string PARAM_START_DATE;
 			static const std::string PARAM_END_DATE;
 
+			std::map<time::Date, RentReportResult> _resultsPerDay;
+			std::map<int, int> _rentsByDay;
+			std::map<int, int> _returnsByDay;
+			std::map<int, int> _renewByDay;
+			std::map<int, int> _rentsByFareDay;
 			std::map<int, int> _results;
 			time::Date _startDate;
 			time::Date _endDate;

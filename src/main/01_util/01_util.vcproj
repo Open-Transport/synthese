@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="01_util"
 	ProjectGUID="{266969BE-1E07-4C1B-ABFC-5193858D0B4B}"
-	Keyword="MakeFileProj">
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,166 +63,216 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx;h"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\Constants.h">
+				RelativePath=".\Constants.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Conversion.cpp">
+				RelativePath=".\Conversion.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Conversion.h">
+				RelativePath=".\Conversion.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Exception.cpp">
+				RelativePath=".\Exception.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Exception.h">
+				RelativePath=".\Exception.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Factorable.cpp">
+				RelativePath=".\Factorable.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Factorable.h">
+				RelativePath=".\Factorable.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Factory.h">
+				RelativePath=".\Factory.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Html.cpp">
+				RelativePath=".\Html.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Html.h">
+				RelativePath=".\Html.h"
+				>
 			</File>
 			<File
-				RelativePath=".\HtmlFilter.h">
+				RelativePath=".\HtmlFilter.h"
+				>
 			</File>
 			<File
-				RelativePath=".\HtmlTable.cpp">
+				RelativePath=".\HtmlTable.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\HtmlTable.h">
+				RelativePath=".\HtmlTable.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Log.cpp">
+				RelativePath=".\Log.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Log.h">
+				RelativePath=".\Log.h"
+				>
 			</File>
 			<File
-				RelativePath=".\LowerCaseFilter.h">
+				RelativePath=".\LowerCaseFilter.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ManagedThread.cpp">
+				RelativePath=".\ManagedThread.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ManagedThread.h">
+				RelativePath=".\ManagedThread.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ModuleClass.cpp">
+				RelativePath=".\ModuleClass.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ModuleClass.h">
+				RelativePath=".\ModuleClass.h"
+				>
 			</File>
 			<File
-				RelativePath=".\PlainCharFilter.h">
+				RelativePath=".\PlainCharFilter.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Registrable.h">
+				RelativePath=".\Registrable.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Registry.h">
+				RelativePath=".\Registry.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RGBColor.cpp">
+				RelativePath=".\RGBColor.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\RGBColor.h">
+				RelativePath=".\RGBColor.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SqlFilter.h">
+				RelativePath=".\SqlFilter.h"
+				>
 			</File>
 			<File
-				RelativePath=".\Thread.cpp">
+				RelativePath=".\Thread.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\Thread.h">
+				RelativePath=".\Thread.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ThreadExec.cpp">
+				RelativePath=".\ThreadExec.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ThreadExec.h">
+				RelativePath=".\ThreadExec.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ThreadGroup.cpp">
+				RelativePath=".\ThreadGroup.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ThreadGroup.h">
+				RelativePath=".\ThreadGroup.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ThreadManager.cpp">
+				RelativePath=".\ThreadManager.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ThreadManager.h">
+				RelativePath=".\ThreadManager.h"
+				>
 			</File>
 			<File
-				RelativePath=".\UId.cpp">
+				RelativePath=".\UId.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\UId.h">
+				RelativePath=".\UId.h"
+				>
 			</File>
 			<File
-				RelativePath=".\XmlException.cpp">
+				RelativePath=".\XmlException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\XmlException.h">
+				RelativePath=".\XmlException.h"
+				>
 			</File>
 			<File
-				RelativePath=".\XmlParser.cpp">
+				RelativePath=".\XmlParser.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\XmlParser.h">
+				RelativePath=".\XmlParser.h"
+				>
 			</File>
 			<File
-				RelativePath=".\XmlToolkit.cpp">
+				RelativePath=".\XmlToolkit.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\XmlToolkit.h">
+				RelativePath=".\XmlToolkit.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Rights"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Exceptions"
-			Filter="">
+			>
 			<File
-				RelativePath=".\FactoryException.h">
+				RelativePath=".\FactoryException.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RegistryException.h">
+				RelativePath=".\RegistryException.h"
+				>
 			</File>
 			<File
-				RelativePath=".\RegistryKeyException.h">
+				RelativePath=".\RegistryKeyException.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ThreadException.cpp">
+				RelativePath=".\ThreadException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ThreadException.h">
+				RelativePath=".\ThreadException.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\module.h">
+			RelativePath=".\module.h"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 	</Files>
 	<Globals>

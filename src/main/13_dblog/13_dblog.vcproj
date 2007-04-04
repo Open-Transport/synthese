@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="13_dblog"
-	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
-	Keyword="MakeFileProj">
+	ProjectGUID="{875EB4D5-0C80-48B7-B5BA-15FC8C226AC2}"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -41,89 +63,108 @@
 		<Filter
 			Name="Core classes"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}">
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
+			>
 			<File
-				RelativePath=".\DBLog.cpp">
+				RelativePath=".\DBLog.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DBLog.h">
+				RelativePath=".\DBLog.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DBLogEntry.cpp">
+				RelativePath=".\DBLogEntry.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DBLogEntry.h">
+				RelativePath=".\DBLogEntry.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
-			Filter="">
+			>
 			<File
-				RelativePath=".\DBLogList.cpp">
+				RelativePath=".\DBLogList.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DBLogList.h">
+				RelativePath=".\DBLogList.h"
+				>
 			</File>
 			<File
-				RelativePath=".\DBLogViewer.cpp">
+				RelativePath=".\DBLogViewer.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DBLogViewer.h">
+				RelativePath=".\DBLogViewer.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Rights"
-			Filter="">
+			>
 			<File
-				RelativePath=".\DBLogRight.cpp">
+				RelativePath=".\DBLogRight.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DBLogRight.h">
+				RelativePath=".\DBLogRight.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
-			Filter="">
+			>
 			<File
-				RelativePath=".\DBLogEntryTableSync.cpp">
+				RelativePath=".\DBLogEntryTableSync.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\DBLogEntryTableSync.h">
+				RelativePath=".\DBLogEntryTableSync.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Interface Pages"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Actions"
-			Filter="">
+			>
 		</Filter>
 		<Filter
 			Name="Exceptions"
-			Filter="">
+			>
 		</Filter>
 		<File
-			RelativePath=".\DBLogModule.cpp">
+			RelativePath=".\DBLogModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\DBLogModule.gen.cpp">
+			RelativePath=".\DBLogModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\DBLogModule.h">
+			RelativePath=".\DBLogModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\DBLogModule.inc.cpp">
+			RelativePath=".\DBLogModule.inc.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 		<File
-			RelativePath=".\Types.h">
+			RelativePath=".\Types.h"
+			>
 		</File>
 	</Files>
 	<Globals>

@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="32_admin"
-	ProjectGUID="{B611F981-1353-4B13-A6FE-695034268D72}"
-	Keyword="MakeFileProj">
+	ProjectGUID="{299F3C8E-6980-42CD-93F3-675F76241B30}"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
 			IntermediateDirectory="../../../build/win32/$(ConfigurationName)/main/$(InputName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"/>
+				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -40,110 +62,135 @@
 	<Files>
 		<Filter
 			Name="Core classes"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AdminInterfaceElement.cpp">
+				RelativePath=".\AdminInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AdminInterfaceElement.h">
+				RelativePath=".\AdminInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Interface pages"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AdminInterfacePage.cpp">
+				RelativePath=".\AdminInterfacePage.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AdminInterfacePage.h">
+				RelativePath=".\AdminInterfacePage.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Admin compounds"
-			Filter="">
+			>
 			<File
-				RelativePath=".\HomeAdmin.cpp">
+				RelativePath=".\HomeAdmin.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\HomeAdmin.h">
+				RelativePath=".\HomeAdmin.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Requests"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AdminRequest.cpp">
+				RelativePath=".\AdminRequest.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AdminRequest.h">
+				RelativePath=".\AdminRequest.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Interface Elements Library"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AdminContentInterfaceElement.cpp">
+				RelativePath=".\AdminContentInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AdminContentInterfaceElement.h">
+				RelativePath=".\AdminContentInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Admin Value Elements"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AdminPagePositionInterfaceElement.cpp">
+				RelativePath=".\AdminPagePositionInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AdminPagePositionInterfaceElement.h">
+				RelativePath=".\AdminPagePositionInterfaceElement.h"
+				>
 			</File>
 			<File
-				RelativePath=".\AdminPagesTreeInterfaceElement.cpp">
+				RelativePath=".\AdminPagesTreeInterfaceElement.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AdminPagesTreeInterfaceElement.h">
+				RelativePath=".\AdminPagesTreeInterfaceElement.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Exceptions"
-			Filter="">
+			>
 			<File
-				RelativePath=".\AdminParametersException.cpp">
+				RelativePath=".\AdminParametersException.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\AdminParametersException.h">
+				RelativePath=".\AdminParametersException.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="HTML"
-			Filter="">
+			>
 			<File
-				RelativePath=".\ResultHTMLTable.cpp">
+				RelativePath=".\ResultHTMLTable.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ResultHTMLTable.h">
+				RelativePath=".\ResultHTMLTable.h"
+				>
 			</File>
 			<File
-				RelativePath=".\SearchFormHTMLTable.cpp">
+				RelativePath=".\SearchFormHTMLTable.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\SearchFormHTMLTable.h">
+				RelativePath=".\SearchFormHTMLTable.h"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\AdminModule.cpp">
+			RelativePath=".\AdminModule.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\AdminModule.gen.cpp">
+			RelativePath=".\AdminModule.gen.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\AdminModule.h">
+			RelativePath=".\AdminModule.h"
+			>
 		</File>
 		<File
-			RelativePath=".\AdminModule.inc.cpp">
+			RelativePath=".\AdminModule.inc.cpp"
+			>
 		</File>
 		<File
-			RelativePath=".\SConscript">
+			RelativePath=".\SConscript"
+			>
 		</File>
 	</Files>
 	<Globals>
