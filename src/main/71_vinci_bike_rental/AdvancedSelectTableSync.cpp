@@ -24,10 +24,13 @@
 #include <sstream>
 
 #include "02_db/DBModule.h"
+#include "02_db/SQLiteResult.h"
 
 #include "04_time/Date.h"
 
 #include "57_accounting/Account.h"
+#include "57_accounting/TransactionTableSync.h"
+#include "57_accounting/TransactionPartTableSync.h"
 
 #include "71_vinci_bike_rental/AdvancedSelectTableSync.h"
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
@@ -46,6 +49,9 @@ namespace synthese
 
 		std::map<time::Date, RentReportResult> getRentsPerDay( const time::Date& start, const time::Date& end )
 		{
+			static const string COL_NUMBER("number");
+			static const string COL_DAY("day");
+
 			map<Date, RentReportResult> m;
 			Account* account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
 			if (account == NULL)
@@ -53,8 +59,8 @@ namespace synthese
 			stringstream query;
 			query
 				<< "SELECT "
-					<< "strftime('%Y-%m-%d', " << TransactionTableSync::TABLE_COL_START_DATE_TIME << ") AS day"
-					<< ",COUNT(t." << TABLE_COL_ID << ") AS number"
+					<< "strftime('%Y-%m-%d', " << TransactionTableSync::TABLE_COL_START_DATE_TIME << ") AS " << COL_DAY
+					<< ",COUNT(t." << TABLE_COL_ID << ") AS " << COL_NUMBER
 				<< " FROM "
 					<< TransactionTableSync::TABLE_NAME << " t"
 					<< " INNER JOIN " << TransactionPartTableSync::TABLE_NAME << " p ON p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID << "=t." << TABLE_COL_ID
@@ -71,8 +77,8 @@ namespace synthese
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
 					RentReportResult r;
-					r.starts = result->getColumn(i, "number");
-					m.insert(make_pair(Date::FromSQLString(result->getColumn(i, "day")), r));
+					r.starts = Conversion::ToInt(result.getColumn(i, COL_NUMBER));
+					m.insert(make_pair(Date::FromSQLDate(result.getColumn(i, COL_DAY)), r));
 				}
 				return m;
 			}

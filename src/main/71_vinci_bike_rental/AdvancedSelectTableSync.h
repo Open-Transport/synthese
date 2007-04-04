@@ -26,11 +26,18 @@
 
 namespace synthese
 {
+	namespace time
+	{
+		class Date;
+	}
+
 	namespace vinci
 	{
-		struct RentReportResult { int starts, int ends, int renewals } ;
-		static std::map<time::Date, RentReportResult> getRentsPerDay(const time::Date& start, const time::Date& end);
-		static std::map<std::pair<time::Date, const VinciRate*>, RentReportResult> > getRentsPerRatePerDay(const time::Date& start, const time::Date& end);
-		static std::map<const VinciRate*, RentReportResult> getRentsPerRate(const time::Date& start, const time::Date& end);
+		class VinciRate;
+
+		struct RentReportResult { int starts; int ends; int renewals; } ;
+		std::map<time::Date, RentReportResult> getRentsPerDay(const time::Date& start, const time::Date& end);
+		std::map<std::pair<time::Date, const VinciRate*>, RentReportResult> getRentsPerRatePerDay(const time::Date& start, const time::Date& end);
+		std::map<const VinciRate*, RentReportResult> getRentsPerRate(const time::Date& start, const time::Date& end);
 	}
 }
