@@ -99,7 +99,6 @@ int main(int argc, char* argv[])
     char buf[MAX_QUERY_SIZE];
     DWORD readComm = 0;
 
-    std::string previousStatus ("");
     while (true)
     {
         time_t now;
@@ -123,30 +122,32 @@ int main(int argc, char* argv[])
                   Log::GetInstance ().info ("Connecting " + std::string (server) 
                                                           + std::string (":") + Conversion::ToString (port));
                   
-                  // No timeout !
                   int timeout = 2; // 2 seconds timeout
-                  TcpClientSocket clientSock (server, port, timeout);
-                  
-                  while (clientSock.isConnected () == false)
-                  {
+		  {
+		      TcpClientSocket clientSock (server, port, timeout);
+		      
+		      while (clientSock.isConnected () == false)
+		      {
                           clientSock.tryToConnect ();
                           Thread::Sleep (500);
-                  }
-                  
-                  // The client is connected.
-                  Log::GetInstance ().info ("Connected.");
-                  
-                  // Create commodity stream:
-                  boost::iostreams::stream<TcpClientSocket> cliSocketStream;
-                  cliSocketStream.open (clientSock);
-
-                  cliSocketStream << "fonction=tdg&date=A&tb=" << codes[client] 
-                                  << "&prvstatus=" << previousStatus << "&ipaddr=127.0.0.1" << std::endl;
-                
-                  cliSocketStream.flush ();
-
-                  cliSocketStream.getline (buf, sizeof (buf), (char) 0);
-                  
+		      }
+		      
+		      // The client is connected.
+		      Log::GetInstance ().info ("Connected.");
+		      
+		      // Create commodity stream:
+		      boost::iostreams::stream<TcpClientSocket> cliSocketStream;
+		      cliSocketStream.open (clientSock);
+		      
+		      cliSocketStream << "fonction=tdg&date=A&tb=" << codes[client] 
+				      << "&ipaddr=127.0.0.1" << std::endl;
+			  
+		      cliSocketStream.flush ();
+			  
+		      cliSocketStream.getline (buf, sizeof (buf), (char) 0);
+		      cliSocketStream.close ();
+		  }
+			  
                   Log::GetInstance ().info ("Received command : " + std::string (buf));
                   
                   time(&now);
@@ -169,8 +170,33 @@ int main(int argc, char* argv[])
                   {
                       status << std::hex << std::setw (2) << std::setfill ('0') << ((int) buf[i]);
                   }
-                  previousStatus = status.str ();
 
+
+		  {
+		      TcpClientSocket clientSock (server, port, timeout);
+		      
+		      while (clientSock.isConnected () == false)
+		      {
+                          clientSock.tryToConnect ();
+                          Thread::Sleep (500);
+		      }
+		      
+		      // The client is connected.
+		      Log::GetInstance ().info ("Connected.");
+		      
+		      // Create commodity stream:
+		      boost::iostreams::stream<TcpClientSocket> cliSocketStream;
+		      cliSocketStream.open (clientSock);
+		      
+		      cliSocketStream << "fonction=tds&date=A&tb=" << codes[client] 
+				      << "&status=" << status.str () << "&ipaddr=127.0.0.1" << std::endl;
+			  
+		      cliSocketStream.flush ();
+			  
+		      cliSocketStream.getline (buf, sizeof (buf), (char) 0);
+		      cliSocketStream.close ();
+		  }
+		  
                   Log::GetInstance ().info ("Status : " + status.str ());
 
               } 
@@ -191,101 +217,3 @@ int main(int argc, char* argv[])
 }
 
 
-/*
-
-
-   struct TcpClientThread
-    {
-	std::string _replyToSend;
-
-	TcpClientThread (const std::string& replyToSend) 
-	    : _replyToSend (replyToSend)
-	    {
-	    }
-	
-	void operator()()
-	    {
-		TcpClientSocket clientSock ("localhost", 8899);
-		
-		while (clientSock.isConnected () == false)
-		{
-		    clientSock.tryToConnect ();
-		    boost::thread::yield ();
-		}
-		// CPPUNIT_ASSERT (clientSock.isConnected ());
-		
-		// The client is connected.
-
-		// Create commodity stream:
-		boost::iostreams::stream<TcpClientSocket> cliSocketStream;
-		cliSocketStream.open (clientSock);
-
-		// Wait for a message...
-		for (int i=0; i<256; ++i) std::cerr << cliSocketStream.get () << " ";
-		std::cerr << std::endl;
-		
-		// std::string message;
-		// cliSocketStream >> message;
-
-		std::string expectedMessage ("MessageToClient");
-		// CPPUNIT_ASSERT_EQUAL (expectedMessage, message);
-
-		// Send a reply
-		cliSocketStream << _replyToSend << std::endl;
-		
-		cliSocketStream.close ();
-	    }
-    };
-    
-
-
-    
-    TcpClientThread clientThread ("MessageToServerFromClient0");
-    boost::thread client (clientThread);
-    
-    TcpService* service = TcpService::openService (8899, true, false);
-    
-    try 
-    {
-	// Wait for client connection...
-	  TcpServerSocket& socket = *service->acceptConnection ();
-
-	  // CPPUNIT_ASSERT_EQUAL (1, service->getConnectionCount ());
-	  
-	  // Create commodity stream:
-	  boost::iostreams::stream<TcpServerSocket> srvSocketStream (socket);
-
-	  char buf[256];
-	  for (int i=1; i<=255; ++i) buf[i] = (char) i;
-	  std::string s (buf);
-
-	  // Send a message to client:
-	  for (int i=0; i<=255; ++i) srvSocketStream.write (s.c_str (), 256);
-	  
-
-	  // Wait for a reply:
-	  std::string reply;
-	  srvSocketStream >> reply;
-
-	  std::string expectedReply ("MessageToServerFromClient0");
-	  // CPPUNIT_ASSERT_EQUAL (expectedReply, reply);
-
-	  
-	  srvSocketStream.close ();
-
-	  service->closeConnection (&socket);
-	  // CPPUNIT_ASSERT_EQUAL (0, service->getConnectionCount ());
-      } 
-      catch (SocketException& se)
-      {
-	  // std::cerr << se.what () << std::endl;
-	  // CPPUNIT_ASSERT (false);
-      }
-      
-      client.join ();
-
-
-      // TcpService::closeService (8899);
-
-  } 
-      */
