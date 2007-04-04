@@ -98,18 +98,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Html.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Html.h"
-				>
-			</File>
-			<File
-				RelativePath=".\HtmlFilter.h"
-				>
-			</File>
-			<File
 				RelativePath=".\HtmlTable.cpp"
 				>
 			</File>
