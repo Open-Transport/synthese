@@ -74,8 +74,9 @@ namespace synthese
 		// Just one thread
 		SQLiteThreadExec* sqliteThreadExec = new SQLiteThreadExec (service);
 		
+		bool autorespawn (true);
 		ManagedThread* sqliteThread = 
-		    new ManagedThread (sqliteThreadExec, "sqlite_tcp");
+		    new ManagedThread (sqliteThreadExec, "sqlite_tcp", 1, autorespawn);
 		
 	    }
 	    
