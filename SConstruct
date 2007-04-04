@@ -355,8 +355,10 @@ def SyntheseBuild (env, binname, generatemain = True):
     exename = os.path.basename (exename[0].path)
     
     mainobj = "main" + env['OBJSUFFIX']
-    env.AddPreAction (mainobj, preaction)
-    env.AlwaysBuild (mainobj)
+
+    if generatemain:
+      env.AddPreAction (mainobj, preaction)
+      env.AlwaysBuild (mainobj)
     
     if goal == 'dist':
         # Copy dynamic libraries
