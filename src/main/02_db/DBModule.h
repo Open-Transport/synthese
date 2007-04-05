@@ -53,9 +53,15 @@ namespace synthese
 
 		public:
 
+		    void preInit ();
 		    void initialize();
 
 		    static SQLiteQueueThreadExec* GetSQLite ();
+
+		    /** Called whenever a parameter registered by this module is changed
+		     */
+		    static void ParameterCallback (const std::string& name, 
+						   const std::string& value);
 
 		};
 		/** @} */

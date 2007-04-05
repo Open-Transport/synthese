@@ -84,7 +84,6 @@ namespace synthese
 
 				SQLiteResult result = DBModule::GetSQLite ()->execQuery (requestString);
 				    
-				std::cout << "result is : " << result << std::endl;
 				tcpStream << "00" << result << ETB;
 				
 			    }

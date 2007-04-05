@@ -28,6 +28,7 @@
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteThreadExec.h"
 
+#include "01_util/Conversion.h"
 #include "01_util/Log.h"
 #include "01_util/ManagedThread.h"
 
@@ -44,11 +45,17 @@ namespace synthese
 	    SQLiteQueueThreadExec* DBModule::_sqliteQueueThreadExec = 0;
 
 
+	    void DBModule::preInit ()
+	    {
+		RegisterParameter ("db_port", "3592", &ParameterCallback);
+	    }
+
+
 
 	    void DBModule::initialize()
 	    {
 		
-		int sqliteServicePort = 3592;
+		int sqliteServicePort = Conversion::ToInt (GetParameter ("db_port"));
 		
 		_sqliteQueueThreadExec = new SQLiteQueueThreadExec (GetDatabasePath ());
 		
@@ -86,6 +93,18 @@ namespace synthese
 	    DBModule::GetSQLite ()
 	    {
 		return _sqliteQueueThreadExec;
+	    }
+
+
+	    void 
+		DBModule::ParameterCallback (const std::string& name, 
+						 const std::string& value)
+	    {
+		if (name == "db_port") 
+		{
+		    // TODO : close and reopen service on the new port
+		}
+
 	    }
 
 	}

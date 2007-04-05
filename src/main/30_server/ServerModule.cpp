@@ -120,6 +120,10 @@ namespace synthese
 		ServerModule::ParameterCallback (const std::string& name, 
 						 const std::string& value)
 	    {
+		if (name == "port") 
+		{
+		    // TODO : close and reopen service on the new port
+		}
 		if (name == "log_level") 
 		{
 		    synthese::util::Log::GetInstance ().setLevel ((Log::Level) Conversion::ToInt (value));
