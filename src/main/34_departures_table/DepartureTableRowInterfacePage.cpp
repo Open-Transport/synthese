@@ -35,12 +35,14 @@ namespace synthese
 				, VariablesMap& vars
 				, int rowId
 				, int pageNumber
+                                , const std::string& message
 				, const ArrivalDepartureRow* ptd
 				, const server::Request* request) const
 		{
 			ParametersVector parameters;
-			parameters.push_back(Conversion::ToString(rowId));
-			parameters.push_back(Conversion::ToString(pageNumber));
+			parameters.push_back(Conversion::ToString (rowId));
+			parameters.push_back(Conversion::ToString (pageNumber));
+			if (message.empty () == false) parameters.push_back(message);
 			
 			InterfacePage::display(stream, parameters, vars, (const void*) ptd, request);
 		}

@@ -64,7 +64,7 @@ namespace synthese
 
 			_numberVIE = vel.front();
 
-			if (vel.size() >= 2)
+			if (vel.size ())
                         {
 				_formatVIE = vel.front();
                         }
@@ -73,7 +73,7 @@ namespace synthese
 				_formatVIE = new StaticValueInterfaceElement(TYPE_IDENTICAL);
                         }
 
-			if (vel.size() >= 3)
+			if (vel.size ())
 			{
 				_numberToAdd = vel.front();
 			}

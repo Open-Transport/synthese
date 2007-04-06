@@ -46,6 +46,7 @@ namespace synthese
 				, interfaces::VariablesMap& vars
 				, int rowId
 				, int pageNumber
+                                , const std::string& message
 				, const ArrivalDepartureRow*
 				, const server::Request* request = NULL ) const;
 

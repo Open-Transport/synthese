@@ -65,6 +65,7 @@ namespace synthese
 			interfaces::ValueInterfaceElement* _pagesVIE;
 			interfaces::ValueInterfaceElement* _pageSeparator;
 			interfaces::ValueInterfaceElement* _departuresToHide;
+			interfaces::ValueInterfaceElement* _message;
 
 		public:
 			DeparturesTableInterfaceElement();
