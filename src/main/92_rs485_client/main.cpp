@@ -79,7 +79,16 @@ int main(int argc, char* argv[])
 	Log::GetInstance ().fatal ("Error while getting comm state " + Conversion::ToString (GetLastError()));
 	exit(2);
     }
-    
+  
+	COMMTIMEOUTS lpct;
+	lpct.ReadIntervalTimeout = 200;
+	lpct.ReadTotalTimeoutMultiplier = 200;
+	lpct.ReadTotalTimeoutConstant = 0;
+	lpct.WriteTotalTimeoutMultiplier = 200;
+	lpct.WriteTotalTimeoutConstant = 0;
+
+    fSuccess = SetCommTimeouts (hCom, &lpct);
+
     // Fill in DCB: 57,600 bps, 8 data bits, no parity, and 1 stop bit.
     dcb.BaudRate = CBR_9600;      // set the baud rate
     dcb.ByteSize = 8;             // data size, xmit, and rcv
@@ -140,65 +149,78 @@ int main(int argc, char* argv[])
 		      cliSocketStream.open (clientSock);
 		      
 		      cliSocketStream << "fonction=tdg&date=A&tb=" << codes[client] 
-				      << "&ipaddr=127.0.0.1" << std::endl;
+				      << "&ipaddr=0.0.0.0" << std::endl;
 			  
 		      cliSocketStream.flush ();
-			  
+			  memset (buf, 0, sizeof (buf));
 		      cliSocketStream.getline (buf, sizeof (buf), (char) 0);
 		      cliSocketStream.close ();
 		  }
-			  
-                  Log::GetInstance ().info ("Received command : " + std::string (buf));
-                  
-                  time(&now);
-                  hms = localtime(&now);
-                                  
-                  for (char* bufptr=buf ; *bufptr ; bufptr++)
-                  {
-                      fSuccess = TransmitCommChar (hCom, *bufptr);
-                  }
-                      
-                  outdate[client] = hms->tm_min;
-                
-                  // Read is updated with the number of bytes read
-                  ReadFile (hCom, buf, STATUS_MESSAGE_SIZE, &readComm, NULL); 
+		  std::string received (buf);  
 
-                  // Create status message to be sent back to server. 
-                  // It will be sent the next time that the client will ask for update.
-                  std::stringstream status;
-                  for (int i=0; i<STATUS_MESSAGE_SIZE; ++i)
-                  {
-                      status << std::hex << std::setw (2) << std::setfill ('0') << ((int) buf[i]);
-                  }
-
-
+		  if (received.empty ())
 		  {
-		      TcpClientSocket clientSock (server, port, timeout);
-		      
-		      while (clientSock.isConnected () == false)
-		      {
-                          clientSock.tryToConnect ();
-                          Thread::Sleep (500);
-		      }
-		      
-		      // The client is connected.
-		      Log::GetInstance ().info ("Connected.");
-		      
-		      // Create commodity stream:
-		      boost::iostreams::stream<TcpClientSocket> cliSocketStream;
-		      cliSocketStream.open (clientSock);
-		      
-		      cliSocketStream << "fonction=tds&date=A&tb=" << codes[client] 
-				      << "&status=" << status.str () << "&ipaddr=127.0.0.1" << std::endl;
-			  
-		      cliSocketStream.flush ();
-			  
-		      cliSocketStream.getline (buf, sizeof (buf), (char) 0);
-		      cliSocketStream.close ();
-		  }
-		  
-                  Log::GetInstance ().info ("Status : " + status.str ());
+			  Log::GetInstance ().warn ("Received empty command ! Maybe a server crash ?");
+              outdate[client] = hms->tm_min;
+		  } 
+		  else
+		  {
+          Log::GetInstance ().info ("Received command : " + received);
 
+			  time(&now);
+			  hms = localtime(&now);
+	                          
+			  for (char* bufptr=buf ; *bufptr ; bufptr++)
+			  {
+				  fSuccess = TransmitCommChar (hCom, *bufptr);
+			  }
+	              
+			  outdate[client] = hms->tm_min;
+	       
+			  // Read is updated with the number of bytes read
+			  fSuccess = ReadFile (hCom, buf, STATUS_MESSAGE_SIZE, &readComm, NULL); 
+			  if (!fSuccess)
+			  {
+					Log::GetInstance ().error ("Error while reading status ! Returned status message will be empty or incomplete."); 
+			  }
+
+			  // Create status message to be sent back to server. 
+			  // It will be sent the next time that the client will ask for update.
+			  std::stringstream status;
+			  for (int i=0; i<STATUS_MESSAGE_SIZE; ++i)
+			  {
+				  status << std::hex << std::setw (2) << std::setfill ('0') << ((int) buf[i]);
+			  }
+
+			  {
+				  Log::GetInstance ().info ("Connecting " + std::string (server) 
+														  + std::string (":") + Conversion::ToString (port));
+				  TcpClientSocket clientSock (server, port, timeout);
+			      
+				  while (clientSock.isConnected () == false)
+				  {
+							  clientSock.tryToConnect ();
+							  Thread::Sleep (500);
+				  }
+			      
+				  // The client is connected.
+				  Log::GetInstance ().info ("Connected.");
+			      
+				  // Create commodity stream:
+				  boost::iostreams::stream<TcpClientSocket> cliSocketStream;
+				  cliSocketStream.open (clientSock);
+			      
+				  cliSocketStream << "fonction=tds&tb=" << codes[client] 
+						  << "&status=" << status.str () << "&ipaddr=0.0.0.0" << std::endl;
+				  
+				  cliSocketStream.flush ();
+				  memset (buf, 0, sizeof (buf));
+				  cliSocketStream.getline (buf, sizeof (buf), (char) 0);
+				  cliSocketStream.close ();
+				  Log::GetInstance ().info ("Status : " + status.str ());
+			  }
+			  
+		  }
               } 
               catch (std::exception e) 
               {
