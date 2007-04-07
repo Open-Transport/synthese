@@ -106,7 +106,7 @@ namespace synthese
 			pv.push_back(site ? site->getPhone() : "");
 			pv.push_back(user->getPhone());
 			pv.push_back(contract->getPassport());
-			pv.push_back(bike ? bike->getMarkedNumber() : "");	//10
+			pv.push_back(bike ? bike->getNumber() : "");	//10
 			pv.push_back(t ? t->getStartDateTime().toString() : "");
 			pv.push_back(antivol ? antivol->getMarkedNumber() : "");
 			pv.push_back(endDate.isUnknown() ? "" : endDate.toString());

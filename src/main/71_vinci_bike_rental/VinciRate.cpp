@@ -137,7 +137,7 @@ namespace synthese
 		time::DateTime VinciRate::getEndDate( const time::DateTime& startDate ) const
 		{
 			DateTime endDate = startDate;
-			endDate += _validityDuration;
+			endDate += _validityDuration * 60;
 			return endDate;
 		}
 	}
