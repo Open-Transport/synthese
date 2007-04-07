@@ -1,6 +1,6 @@
 
-/** HtmlTable class header.
-	@file HtmlTable.h
+/** HTMLTable class header.
+	@file HTMLTable.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -28,18 +28,21 @@
 
 namespace synthese
 {
-	namespace util
+	namespace html
 	{
 		/** HTML Table drawer class.
 
 			@warning The order of the method calls is important to handle the closing tags. Do not use more than one call to a methode in a stream writing.
 
-			@ingroup m01
+			@ingroup m05
 		*/
-		class HtmlTable
+		class HTMLTable
 		{
+		public:
+			typedef std::vector<std::string> ColsVector;
+
 		protected:
-			std::string			_headers;
+			std::string			_headers;	//<! Line of th columns. Will be displayed between tr tags
 
 		private:
 			int					_cols;
@@ -57,7 +60,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			HtmlTable(int cols=0, std::string className = "");
+			HTMLTable(int cols=0, std::string className = "");
 
 
 			/** Constructor with vector of header contents.
@@ -67,7 +70,7 @@ namespace synthese
 				
 				A colspan header is available : put the same column name twice (or more) in two following cells.
 			*/
-			HtmlTable(const std::vector<std::string>& header, std::string className = "");
+			HTMLTable(const ColsVector& header, std::string className = "");
 
 			/** Opens the table.
 				If defined, the headers are outputed.

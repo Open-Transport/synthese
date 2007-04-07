@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8,00"
 	Name="05_html"
-	ProjectGUID="{266969BE-1E07-4C1B-ABFC-5193858D0B4B}"
+	ProjectGUID="{9AB2D3DE-F6FE-4856-97E2-5268D3D5FF12}"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -60,6 +60,62 @@
 	<References>
 	</References>
 	<Files>
+		<Filter
+			Name="Core classes"
+			>
+			<File
+				RelativePath=".\ActionResultHTMLTable.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ActionResultHTMLTable.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HTMLFilter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HTMLForm.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HTMLForm.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HTMLTable.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HTMLTable.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ResultHTMLTable.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ResultHTMLTable.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SearchFormHTMLTable.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SearchFormHTMLTable.h"
+				>
+			</File>
+		</Filter>
+		<File
+			RelativePath=".\HTMLModule.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\HTMLModule.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

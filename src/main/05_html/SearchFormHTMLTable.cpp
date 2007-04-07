@@ -1,6 +1,6 @@
 
-/** HTMLModule class implementation.
-	@file HTMLModule.cpp
+/** SearchFormHTMLTable class implementation.
+	@file SearchFormHTMLTable.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -22,7 +22,7 @@
 
 #include <sstream>
 
-#include "05_html/HTMLModule.h"
+#include "SearchFormHTMLTable.h"
 
 using namespace std;
 
@@ -31,32 +31,46 @@ namespace synthese
 	namespace html
 	{
 
-		std::string HTMLModule::getLinkButton( const std::string& url, const std::string& caption, const string confirm, const string icon)
+		SearchFormHTMLTable::SearchFormHTMLTable(const HTMLForm& form)
+			: HTMLTable(6, "searchform")
+			, _form(form)
+		{
+		}
+
+		std::string SearchFormHTMLTable::open()
 		{
 			stringstream s;
-			s	<< "<a class=\"linkbutton\" "
-				<< "onmouseover=\"this.className='activatedlinkbutton';\" "
-				<< "onmouseout=\"this.className='linkbutton';\" "
-				<< "onmousedown=\"this.className='clickedlinkbutton';\" "
-				<< "onmouseup=\"this.className='activatedlinkbutton';\" ";
-			if (confirm.empty())
-				s << "href=\"" << url << "\"";
-			else
-				s << "onclick=\"if (window.confirm('" << confirm << "')) window.location='" << url << "';\"";
-			s	<< ">";
-			if (!icon.empty())
-				s << "<img src=\"" << icon << "\" alt=\"" << caption << "\" />&nbsp;";
-			s << caption << "</a>";
+			s	<< _form.open()
+				<< HTMLTable::open();
 			return s.str();
 		}
 
-		std::string HTMLModule::getHTMLLink(const string& url, const std::string& content )
+		std::string SearchFormHTMLTable::close()
 		{
-			std::stringstream str;
-			str << "<a href=\"" << url << "\">"
-				<< content << "</a>";
-			return str.str();
+			stringstream s;
+			s	<< goCol(4, 2, "submitcell") << _form.getSubmitButton("Rechercher");
+			s	<< HTMLTable::close();
+			s	<< _form.close();
+			return s.str();
 		}
 
+		std::string SearchFormHTMLTable::cell( const std::string& label, const std::string& content, std::string id/*=""*/ )
+		{
+			stringstream s;
+			s	<< col();
+			if (!id.empty())
+				s << "<label for=\"" << id << "\">";
+			s	<< label;
+			if (!id.empty())
+				s << "</label>";
+			s	<< col()
+				<< content;
+			return s.str();
+		}
+
+		HTMLForm& SearchFormHTMLTable::getForm()
+		{
+			return _form;
+		}
 	}
 }

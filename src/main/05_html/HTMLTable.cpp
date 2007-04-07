@@ -1,6 +1,6 @@
 
-/** HtmlTable class implementation.
-	@file HtmlTable.cpp
+/** HTMLTable class implementation.
+	@file HTMLTable.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -22,17 +22,17 @@
 
 #include <sstream>
 
-#include "HtmlTable.h"
+#include "05_html/HTMLTable.h"
 
 using namespace std;
 
 namespace synthese
 {
-	namespace util
+	namespace html
 	{
 
 
-		HtmlTable::HtmlTable(const std::vector<std::string>& header, std::string className /*= ""*/ )
+		HTMLTable::HTMLTable(const HTMLTable::ColsVector& header, std::string className /*= ""*/ )
 			: _cols(0)
 			, _className(className)
 			, _curCol(-1)
@@ -44,8 +44,7 @@ namespace synthese
 			string lastHeader;
 			stringstream s;
 			int colspan = 1;
-			s << "<tr>";
-			for (vector<string>::const_iterator it = header.begin(); it != header.end(); ++it)
+			for (ColsVector::const_iterator it = header.begin(); it != header.end(); ++it)
 			{
 				if (!lastHeader.empty())
 				{
@@ -66,11 +65,11 @@ namespace synthese
 			s << "<th";
 			if (colspan > 1)
 				s << " colspan=\"" << colspan << "\"";
-			s << ">" << lastHeader << "</th></tr>";
+			s << ">" << lastHeader << "</th>";
 			_headers = s.str();			
 		}
 
-		HtmlTable::HtmlTable(int cols/*=0*/, std::string className /*= ""*/ )
+		HTMLTable::HTMLTable(int cols/*=0*/, std::string className /*= ""*/ )
 			: _cols(cols)
 			, _className(className)
 			, _curCol(-1)
@@ -79,17 +78,19 @@ namespace synthese
 
 		}
 
-		std::string HtmlTable::open()
+		std::string HTMLTable::open()
 		{
 			stringstream s;
 			s << "<table";
 			if (!_className.empty())
 				s << " class=\"" << _className << "\"";
-			s << ">" << _headers;
+			s << ">";
+			if (!_headers.empty())
+				s << "<tr>" << _headers << "</tr>";
 			return s.str();
 		}
 
-		std::string HtmlTable::close()
+		std::string HTMLTable::close()
 		{
 			stringstream s;
 			if (_curRow > -1)
@@ -98,7 +99,7 @@ namespace synthese
 			return s.str();
 		}
 
-		std::string HtmlTable::_closeRow()
+		std::string HTMLTable::_closeRow()
 		{
 			if (_curCol == -1)
 				return "";
@@ -110,10 +111,10 @@ namespace synthese
 			return s.str();
 		}
 
-		std::string HtmlTable::col( int colSpan/*=1*/, string className )
+		std::string HTMLTable::col( int colSpan/*=1*/, string className )
 		{
 			stringstream s;
-			if (_curCol > _cols || _curRow == -1)
+			if (_cols && (_curCol > _cols) || _curRow == -1)
 				s << row();
 			else if (_curCol != -1)
 				s << "</td>";
@@ -127,7 +128,7 @@ namespace synthese
 			return s.str();
 		}
 
-		std::string HtmlTable::row(string className)
+		std::string HTMLTable::row(string className)
 		{
 			stringstream s;
 			if (_curRow > -1)
@@ -141,7 +142,7 @@ namespace synthese
 			return s.str();
 		}
 
-		std::string HtmlTable::goCol( int colNumber, int colSpan /*=1*/, std::string className/*=""*/ )
+		std::string HTMLTable::goCol( int colNumber, int colSpan /*=1*/, std::string className/*=""*/ )
 		{
 			stringstream s;
 			if (_curCol >= colNumber)
