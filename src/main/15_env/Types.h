@@ -25,19 +25,24 @@
 
 #include <set>
 
-/** @addtogroup m15
-@{
-*/
-
 namespace synthese
 {
 	namespace env
 	{
 		class PhysicalStop;
 
+		/** @addtogroup m15
+		@{
+		*/
+
 		typedef std::set<const PhysicalStop*> PhysicalStopsSet;
+
+		/** @} */
 	}
 
+	/** @addtogroup m15
+		@{
+	*/
 	typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
 
 	typedef struct {
@@ -53,8 +58,8 @@ namespace synthese
 
 	} AccessParameters;
 
-}
+	/** @} */
 
-/** @} */
+}
 
 #endif // SYNTHESE_Env_Types_H__
