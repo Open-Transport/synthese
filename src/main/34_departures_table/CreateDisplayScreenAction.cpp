@@ -21,6 +21,7 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "34_departures_table/CreateDisplayScreenAction.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
@@ -37,16 +38,16 @@ namespace synthese
 	{
 		const std::string CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "pti";
 
-		Request::ParametersMap CreateDisplayScreenAction::getParametersMap() const
+		ParametersMap CreateDisplayScreenAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_TEMPLATE_ID, _template ? Conversion::ToString(_template->getKey()) : "0"));
 			return map;
 		}
 
-		void CreateDisplayScreenAction::setFromParametersMap(Request::ParametersMap& map)
+		void CreateDisplayScreenAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			it = map.find(PARAMETER_TEMPLATE_ID);
 			if (it != map.end())
@@ -56,7 +57,7 @@ namespace synthese
 				_template = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
 			}
 
-			map.insert(make_pair(Request::PARAMETER_OBJECT_ID, Conversion::ToString(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)));
+			_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void CreateDisplayScreenAction::run()

@@ -113,7 +113,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Source files"
+			Name="Core classes"
 			>
 			<File
 				RelativePath=".\BroadcastPoint.cpp"
@@ -281,7 +281,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Requests"
+			Name="Functions"
 			>
 			<File
 				RelativePath=".\DisplayScreenContentRequest.cpp"

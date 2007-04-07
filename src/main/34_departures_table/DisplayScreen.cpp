@@ -371,12 +371,13 @@ namespace synthese
 			return _displayType;
 		}
 
-		void DisplayScreen::recordSupervision( const dblog::DBLogEntry::Level& level, const std::string& text ) const
+		void DisplayScreen::recordSupervision(const std::string& text ) const
 		{
-			DisplayMaintenanceLog* dblog = Factory<DBLog>::create<DisplayMaintenanceLog>();
+			// TODO INTERPRET THE TEXT DEPENDING THE TYPE OF DISPLAY SCREEN
+/*			DisplayMaintenanceLog* dblog = Factory<DBLog>::create<DisplayMaintenanceLog>();
 			dblog->addControlEntry(this, level, text);
 			delete dblog;
-		}
+*/		}
 
 		void DisplayScreen::setAllPhysicalStopsDisplayed( bool value )
 		{

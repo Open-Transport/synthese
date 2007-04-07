@@ -136,6 +136,7 @@ namespace synthese
 		UserTableSync::UserTableSync()
 			: db::SQLiteTableSyncTemplate<User> ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
+			// Columns
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
 			addTableColumn(TABLE_COL_SURNAME, "TEXT", true);
@@ -151,6 +152,11 @@ namespace synthese
 			addTableColumn(TABLE_COL_PHONE, "TEXT", true);
 			addTableColumn(COL_LOGIN_AUTHORIZED, "INTEGER");
 			addTableColumn(COL_BIRTH_DATE, "TIMESTAMP");
+
+			// Indexes
+			addTableIndex(TABLE_COL_NAME);
+			addTableIndex(TABLE_COL_LOGIN);
+			addTableIndex(TABLE_COL_PROFILE_ID);
 		}
 
 

@@ -40,9 +40,9 @@ namespace synthese
 		const string TextTemplateAddAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
 
 
-		Request::ParametersMap TextTemplateAddAction::getParametersMap() const
+		ParametersMap TextTemplateAddAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_LONG_MESSAGE, _longMessage));
 			map.insert(make_pair(PARAMETER_NAME, _name));
 			map.insert(make_pair(PARAMETER_SHORT_MESSAGE, _shortMessage));
@@ -50,21 +50,19 @@ namespace synthese
 			return map;
 		}
 
-		void TextTemplateAddAction::setFromParametersMap(Request::ParametersMap& map)
+		void TextTemplateAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			it = map.find(PARAMETER_NAME);
 			if (it == map.end())
 				throw ActionException("Name not found");
 			_name = it->second;
-			map.erase(it);
 
 			it = map.find(PARAMETER_TYPE);
 			if (it == map.end())
 				throw ActionException("Level not found");
 			_level = (AlarmLevel) Conversion::ToInt(it->second);
-			map.erase(it);
 			if (_level == ALARM_LEVEL_UNKNOWN)
 				throw ActionException("Bad value for level");
 			
@@ -79,14 +77,11 @@ namespace synthese
 			if (it == map.end())
 				throw ActionException("Long message not found");
 			_longMessage = it->second;
-			 map.erase(it);
 			
 			 it = map.find(PARAMETER_SHORT_MESSAGE);
 			 if (it == map.end())
 				 throw ActionException("Short message not found");
 			 _shortMessage = it->second;
-			 map.erase(it);
-
 		}
 
 		TextTemplateAddAction::TextTemplateAddAction()

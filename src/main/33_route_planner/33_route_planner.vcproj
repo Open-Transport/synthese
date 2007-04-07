@@ -106,10 +106,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\RoutePlannerModule.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Site.cpp"
 				>
 			</File>
@@ -218,6 +214,22 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Functions"
+			>
+			<File
+				RelativePath=".\RoutePlannerFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlannerFunction.h"
+				>
+			</File>
+		</Filter>
+		<File
+			RelativePath=".\RoutePlannerModule.cpp"
+			>
+		</File>
 		<File
 			RelativePath=".\RoutePlannerModule.gen.cpp"
 			>

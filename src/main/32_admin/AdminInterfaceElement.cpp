@@ -22,14 +22,20 @@
 
 #include <sstream>
 
+#include "05_html/HTMLModule.h"
+
+#include "30_server/FunctionRequest.h"
+
 #include "32_admin/AdminRequest.h"
 #include "32_admin/AdminInterfaceElement.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace html;
 
 	namespace admin
 	{
@@ -48,15 +54,13 @@ namespace synthese
 			return _superior;
 		}
 
-		std::string AdminInterfaceElement::getHTMLLink(const AdminRequest* request) const
+		std::string AdminInterfaceElement::getHTMLLink(const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			stringstream str;
-			AdminRequest* linkRequest = Factory<Request>::create<AdminRequest>();
-			linkRequest->copy(request);
-			linkRequest->setPage(this);
-			str << linkRequest->getHTMLLink(getTitle());
-			linkRequest->setPage(NULL); // To avoid the deletion of the page which can be used later
-			delete linkRequest;
+			FunctionRequest<AdminRequest> linkRequest(request);
+			linkRequest.getFunction()->setPage(this);
+			str << HTMLModule::getHTMLLink(linkRequest.getURL(), getTitle());
+			linkRequest.getFunction()->setPage(NULL); // To avoid the deletion of the page which can be used later
 			return str.str();
 		}
 

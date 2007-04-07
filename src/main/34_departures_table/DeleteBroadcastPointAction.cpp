@@ -38,18 +38,19 @@ namespace synthese
 		const string DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID = Action_PARAMETER_PREFIX + "bid";
 
 
-		Request::ParametersMap DeleteBroadcastPointAction::getParametersMap() const
+		ParametersMap DeleteBroadcastPointAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			ParametersMap map;
+			if (_broadcastPoint)
+				map.insert(make_pair(PARAMETER_BROADCAST_ID, Conversion::ToString(_broadcastPoint->getKey())));
 			return map;
 		}
 
-		void DeleteBroadcastPointAction::setFromParametersMap(Request::ParametersMap& map)
+		void DeleteBroadcastPointAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_BROADCAST_ID);
 				if (it == map.end())

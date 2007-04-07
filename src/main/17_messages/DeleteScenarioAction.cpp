@@ -36,23 +36,22 @@ namespace synthese
 		// const string DeleteScenarioAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
 
 
-		Request::ParametersMap DeleteScenarioAction::getParametersMap() const
+		ParametersMap DeleteScenarioAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void DeleteScenarioAction::setFromParametersMap(Request::ParametersMap& map)
+		void DeleteScenarioAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			// it = map.find(PARAMETER_xxx);
 			// if (it == map.end())
 			//	throw ActionException("Parameter xxx not found");
 			//
 			// _xxx = it->second;
-			// map.erase(it);
 			// if (_xxx <= 0)
 			//	throw ActionException("Bad value for xxx parameter ");	
 			// 

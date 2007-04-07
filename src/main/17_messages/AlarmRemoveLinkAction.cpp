@@ -39,16 +39,16 @@ namespace synthese
 		const string AlarmRemoveLinkAction::PARAMETER_LINK_ID = Action_PARAMETER_PREFIX + "araid";
 		
 
-		Request::ParametersMap AlarmRemoveLinkAction::getParametersMap() const
+		ParametersMap AlarmRemoveLinkAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_LINK_ID, Conversion::ToString(_id)));
 			return map;
 		}
 
-		void AlarmRemoveLinkAction::setFromParametersMap(Request::ParametersMap& map)
+		void AlarmRemoveLinkAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			it = map.find(PARAMETER_LINK_ID);
 			if (it == map.end())

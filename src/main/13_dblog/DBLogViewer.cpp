@@ -22,8 +22,12 @@
 
 #include <sstream>
 
-#include "01_util/Html.h"
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/Constants.h"
+
+#include "05_html/ResultHTMLTable.h"
+#include "05_html/SearchFormHTMLTable.h"
 
 #include "11_interfaces/InterfaceModule.h"
 
@@ -36,9 +40,9 @@
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminModule.h"
-#include "32_admin/ResultHTMLTable.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -47,12 +51,16 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace security;
+	using namespace html;
+	using namespace time;
 
 	namespace dblog
 	{
 		const string DBLogViewer::PARAMETER_LOG_KEY = "dlvk";
 		const string DBLogViewer::PARAMETER_SEARCH_USER = "dlvsu";
 		const string DBLogViewer::PARAMETER_SEARCH_TYPE = "dlvst";
+		const string DBLogViewer::PARAMETER_START_DATE = "dlvsd";
+		const string DBLogViewer::PARAMETER_END_DATE = "dlved";
 
 		DBLogViewer::DBLogViewer()
 			: AdminInterfaceElement("dblogs", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
@@ -61,9 +69,9 @@ namespace synthese
 			, _searchType(UNKNOWN_VALUE)
 		{}
 
-		void DBLogViewer::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void DBLogViewer::setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it = map.find(PARAMETER_LOG_KEY);
+			ParametersMap::const_iterator it = map.find(PARAMETER_LOG_KEY);
 			if (it == map.end())
 				throw AdminParametersException("Log key not specified");
 			try
@@ -89,27 +97,24 @@ namespace synthese
 			return (_dbLog != NULL) ? _dbLog->getName() : "(pas de journal)";
 		}
 
-		void DBLogViewer::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void DBLogViewer::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
-			searchRequest->copy(request);
-			searchRequest->setPage(Factory<AdminInterfaceElement>::create<DBLogViewer>());
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DBLogViewer>());
 
 			stream << "<h1>Recherche d'entrées</h1>";
 
-			stream
-				<< searchRequest->getHTMLFormHeader("search")
-				<< Html::getHiddenInput(PARAMETER_LOG_KEY, _logKey)
-				<< "<table>"
-				<< "<tr><td>Date début</td><td>" << Html::getTextInput("", "") << "</td>"
-				<< "<td>Date fin</td><td>" <<  Html::getTextInput("", "") << "</td>"
-				<< "<td>Utilisateur</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_USER, SecurityModule::getUserLabels(true), _searchUser) << "</td></tr>" // Users list
-				<< "<tr><td>Type</td><td>" << Html::getSelectInput(PARAMETER_SEARCH_TYPE, DBLogModule::getEntryLevelLabels(true), _searchType) << "</td>" // Types list 
-				<< "<td>Texte</td><td>" << Html::getTextInput("", "") << "</td>"
-				<< "<td coslpan=\"2\">" << Html::getSubmitButton("Rechercher") << "</td></tr>"
-				<< "</table></form>"
-
-				<< "<h1>Résultat de la recherche</h1>";
+			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
+			st.getForm().addHiddenField(PARAMETER_LOG_KEY, _logKey);
+			stream << st.open();
+			stream << st.cell("Date début", st.getForm().getCalendarInput(PARAMETER_START_DATE, Date()));
+			stream << st.cell("Date fin", st.getForm().getCalendarInput(PARAMETER_END_DATE, Date()));
+			stream << st.cell("Utilisateur", st.getForm().getSelectInput(PARAMETER_SEARCH_USER, SecurityModule::getUserLabels(true), _searchUser));
+			stream << st.cell("Type", st.getForm().getSelectInput(PARAMETER_SEARCH_TYPE, DBLogModule::getEntryLevelLabels(true), _searchType));
+			stream << st.cell("Texte", st.getForm().getTextInput("", ""));
+			stream << st.close();
+			
+			stream << "<h1>Résultat de la recherche</h1>";
 
 			ResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAMETER_SEARCH_TYPE, "Type"));
@@ -119,7 +124,7 @@ namespace synthese
 			for (DBLog::ColumnsVector::const_iterator it = customCols.begin(); it != customCols.end(); ++it)
 				v.push_back(make_pair(string(), *it));
 
-			ResultHTMLTable t(v, searchRequest, string(), true, NULL, string(), InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ResultHTMLTable t(v, st.getForm(), string(), true, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 			

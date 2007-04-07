@@ -33,6 +33,7 @@
 #include "12_security/ProfileTableSync.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 
 using namespace std;
@@ -48,13 +49,13 @@ namespace synthese
 			, _profile(NULL)
 		{}
 
-		Request::ParametersMap DeleteProfileAction::getParametersMap() const
+		ParametersMap DeleteProfileAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			return map;
 		}
 
-		void DeleteProfileAction::setFromParametersMap(Request::ParametersMap& map)
+		void DeleteProfileAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{

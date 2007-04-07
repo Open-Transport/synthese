@@ -49,9 +49,9 @@ namespace synthese
 		const string UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "dtu_rows";
 
 
-		Request::ParametersMap UpdateDisplayTypeAction::getParametersMap() const
+		ParametersMap UpdateDisplayTypeAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_ID, Conversion::ToString(_dt->getKey())));
 			map.insert(make_pair(PARAMETER_NAME, _name));
 			map.insert(make_pair(PARAMETER_INTERFACE_ID, Conversion::ToString(_interface->getKey())));
@@ -59,9 +59,9 @@ namespace synthese
 			return map;
 		}
 
-		void UpdateDisplayTypeAction::setFromParametersMap(Request::ParametersMap& map)
+		void UpdateDisplayTypeAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			it = map.find(PARAMETER_ID);
 			if (it != map.end())
@@ -72,24 +72,20 @@ namespace synthese
 				}
 				catch (DBEmptyResultException e)
 				{
-					map.erase(it);
 					throw ActionException("Display Type not found");
 				}
-				map.erase(it);
 			}
 
 			it = map.find(PARAMETER_NAME);
 			if (it != map.end())
 			{
 				_name = it->second;
-				map.erase(it);
 			}
 
 			it = map.find(PARAMETER_ROWS_NUMBER);
 			if (it != map.end())
 			{
 				_rows_number = Conversion::ToInt(it->second);
-				map.erase(it);
 			}
 
 			it = map.find(PARAMETER_INTERFACE_ID);
@@ -98,11 +94,9 @@ namespace synthese
 				if (InterfaceModule::getInterfaces().contains(Conversion::ToLongLong(it->second)))
 				{
 					_interface = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(it->second));
-					map.erase(it);
 				}
 				else
 				{
-					map.erase(it);
 					throw ActionException("Interface not found");
 				}
 			}

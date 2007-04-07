@@ -134,19 +134,19 @@ namespace synthese
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
-			void setFromParametersMap(const admin::AdminRequest::ParametersMap& map);
+			void setFromParametersMap(const server::ParametersMap& map);
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const admin::AdminRequest* request=NULL) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
 
 			/** Title of the admin compound.
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
 
-			static std::string DisplaySearchAdmin::getHtmlSearchForm(admin::AdminRequest* request, uid screenUid, uid placeUid, uid lineUid, uid typeUid, int state, int message );
+			static std::string DisplaySearchAdmin::getHtmlSearchForm(const html::HTMLForm& form, uid screenUid, uid placeUid, uid lineUid, uid typeUid, int state, int message );
 		};
 	}
 }

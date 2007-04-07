@@ -1,7 +1,31 @@
 
+/** AddCustomerAction class implementation.
+	@file AddCustomerAction.cpp
+
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
+	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/Profile.h"
+
+#include "30_server/Request.h"
 
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
@@ -21,30 +45,28 @@ namespace synthese
 		const string AddCustomerAction::PARAMETER_SURNAME = Action_PARAMETER_PREFIX + "surname";
 
 
-		Request::ParametersMap AddCustomerAction::getParametersMap() const
+		ParametersMap AddCustomerAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_NAME, _name));
 			map.insert(make_pair(PARAMETER_SURNAME, _surname));
 			return map;
 		}
 
-		void AddCustomerAction::setFromParametersMap( server::Request::ParametersMap& map )
+		void AddCustomerAction::_setFromParametersMap(const ParametersMap& map )
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			it = map.find(PARAMETER_NAME);
 			if (it != map.end())
 			{
 				_name = it->second;
-				map.erase(it);
 			}
 
 			it = map.find(PARAMETER_SURNAME);
 			if (it != map.end())
 			{
 				_surname = it->second;
-				map.erase(it);
 			}
 		}
 

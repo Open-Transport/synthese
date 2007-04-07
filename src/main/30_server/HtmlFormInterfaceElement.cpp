@@ -22,20 +22,29 @@
 
 #include <sstream>
 
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/FactoryException.h"
+
+#include "05_html/HTMLForm.h"
 
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePageException.h"
+#include "11_interfaces/RequestWithInterface.h"
+#include "11_interfaces/InterfacePage.h"
+#include "11_interfaces/Interface.h"
 
 #include "30_server/Request.h"
 #include "30_server/Action.h"
 #include "30_server/HtmlFormInterfaceElement.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace html;
 	using namespace util;
 
 	namespace server
@@ -63,23 +72,42 @@ namespace synthese
 		string HtmlFormInterfaceElement::getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			stringstream stream;
-			Request* targetRequest;
 			try
 			{
-				targetRequest = Factory<Request>::create(_function_key->getValue(parameters, variables, object, request));
-				targetRequest->copy(request);
-				if (_with_action)
+				string actionKey;
+				if (_action_key)
+					actionKey = _action_key->getValue(parameters, variables, object, request);
+				string actionParameters;
+				if (_action_parameters)
+					actionParameters = _action_parameters->getValue(parameters, variables, object, request);
+				string functionParameters;
+				if (_function_parameters)
+					functionParameters = _function_parameters->getValue(parameters, variables, object, request);
+				
+				stringstream s;
+				s	<< Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT << _function_key->getValue(parameters, variables, object, request)
+					<< Request::PARAMETER_SEPARATOR << Request::PARAMETER_IP << Request::PARAMETER_ASSIGNMENT
+					<< Request::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << Request::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
+					;
+					
+
+				if (!functionParameters.empty())
+					s << Request::PARAMETER_SEPARATOR << functionParameters;
+				if (!actionKey.empty())
 				{
-					Action* action = Factory<Action>::create(_action_key->getValue(parameters, variables, object, request));
-					targetRequest->setAction(action);
+					s << Request::PARAMETER_SEPARATOR << Request::PARAMETER_ACTION << Request::PARAMETER_ASSIGNMENT << actionKey;
+					if (!actionParameters.empty())
+						s << Request::PARAMETER_SEPARATOR << actionParameters;
 				}
-				stream << targetRequest->getHTMLFormHeader(_name->getValue(parameters, variables, object, request));
-				Request::ParametersMap map = Request::parseString(_function_parameters->getValue(parameters, variables, object, request));
-				for (Request::ParametersMap::const_iterator it = map.begin(); it != map.end(); ++it)
-					stream << "<input type=\"hidden\" name=\"" << it->first << "\" value=\"" << it->second << "\" />";
-				map = Request::parseString(_action_parameters->getValue(parameters, variables, object, request));
-				for (Request::ParametersMap::const_iterator it = map.begin(); it != map.end(); ++it)
-					stream << "<input type=\"hidden\" name=\"" << it->first << "\" value=\"" << it->second << "\" />";
+
+				Request r(s.str());
+				r.setClientURL(request->getClientURL());
+				
+				
+				HTMLForm f(r.getHTMLForm(_name->getValue(parameters, variables, object, request)));
+				stream << f.open();
+				stream << f.getHiddenFields();
+				
 				return stream.str();
 			}
 			catch(FactoryException<Request> e)

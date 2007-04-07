@@ -44,17 +44,17 @@ namespace synthese
 		const string CreateBroadcastPointAction::PARAMETER_PLACE_ID = Action_PARAMETER_PREFIX + "lid";
 
 
-		Request::ParametersMap CreateBroadcastPointAction::getParametersMap() const
+		ParametersMap CreateBroadcastPointAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			return map;
 		}
 
-		void CreateBroadcastPointAction::setFromParametersMap(Request::ParametersMap& map)
+		void CreateBroadcastPointAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_PLACE_ID);
 				if (it == map.end())
@@ -73,7 +73,6 @@ namespace synthese
 				if (it != map.end())
 				{
 					_name = it->second;
-					map.erase(it);
 				}
 
 				if (!_name.size() && (_physicalStop == NULL))

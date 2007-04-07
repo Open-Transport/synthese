@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_AlarmAddLinkAction_H__
 #define SYNTHESE_AlarmAddLinkAction_H__
 
+#include "01_util/UId.h"
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -49,13 +51,13 @@ namespace synthese
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			server::Request::ParametersMap getParametersMap() const;
+			server::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 				Removes the used parameters from the map.
 				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
-			void setFromParametersMap(server::Request::ParametersMap& map);
+			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
 			/** Constructor.

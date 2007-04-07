@@ -36,16 +36,16 @@ namespace synthese
 		// const string AlarmStopAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
 
 
-		Request::ParametersMap AlarmStopAction::getParametersMap() const
+		ParametersMap AlarmStopAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void AlarmStopAction::setFromParametersMap(Request::ParametersMap& map)
+		void AlarmStopAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			// it = map.find(PARAMETER_xxx);
 			// if (it == map.end())

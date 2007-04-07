@@ -3,5 +3,5 @@ synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::places
 
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::placeslist::CityListInterfaceElement>("city_list");
 
-synthese::util::Factory<synthese::server::Request>::integrate<synthese::placeslist::CityListRequest>("lc");
+synthese::util::Factory<synthese::server::Function>::integrate<synthese::placeslist::CityListRequest>("lc");
 

@@ -37,7 +37,7 @@ namespace synthese
 		*/
 		class AdminPagesTreeInterfaceElement : public interfaces::ValueInterfaceElement
 		{
-			static std::string getSubPages(const std::string& page, const AdminInterfaceElement* currentPage, const AdminRequest* request);
+			static std::string getSubPages(const std::string& page, const AdminInterfaceElement* currentPage, const server::FunctionRequest<admin::AdminRequest>* request);
 
 		public:
 			/** Controls and store the internals parameters.

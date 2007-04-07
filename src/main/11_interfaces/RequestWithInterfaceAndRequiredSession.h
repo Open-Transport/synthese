@@ -34,13 +34,14 @@ namespace synthese
 		*/
 		class RequestWithInterfaceAndRequiredSession : public RequestWithInterface
 		{
+		protected:
+			/** Return to a defined login page or stops the execution.
+			@return true : interrupts the current execution.
+			*/
+			virtual bool	_runBeforeDisplayIfNoSession(std::ostream& stream);
+
 		public:
 			RequestWithInterfaceAndRequiredSession();
-
-			/** Return to a defined login page or stops the execution.
-				@return true : interrupts the current execution.
-			*/
-			virtual bool	runBeforeDisplayIfNoSession(std::ostream& stream);
 		};
 	}
 }

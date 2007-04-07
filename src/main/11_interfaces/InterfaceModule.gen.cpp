@@ -19,5 +19,5 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::inte
 
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::interfaces::RedirectInterfacePage>("redir");
 
-synthese::util::Factory<synthese::server::Request>::integrate<synthese::interfaces::SimplePageRequest>("page");
+synthese::util::Factory<synthese::server::Function>::integrate<synthese::interfaces::SimplePageRequest>("page");
 

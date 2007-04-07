@@ -57,12 +57,10 @@ namespace synthese
 						" bytes)");
 			
 			// Parse request
-			Request* request = NULL;
 			try
 			{
-				request = Request::createFromString(requestString);
-				
-				request->runActionAndFunction(tcpStream);
+				Request request(requestString);
+				request.run(tcpStream);
 			}
 			catch (RequestException e)
 			{
@@ -76,11 +74,8 @@ namespace synthese
 			{
 				Log::GetInstance().debug("Exception", e);
 			}
-			delete request;
 			tcpStream.flush();
 			_tcpService->closeConnection (serverSocket);
-
-
 		}
 	}
 }

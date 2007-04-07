@@ -25,8 +25,12 @@
 #include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/RequestWithInterfaceAndRequiredSession.h"
 
+#include "30_server/Request.h"
+
 namespace synthese
 {
+	using namespace server;
+
 	namespace interfaces
 	{
 
@@ -37,20 +41,20 @@ namespace synthese
 
 		}
 
-		bool RequestWithInterfaceAndRequiredSession::runBeforeDisplayIfNoSession( std::ostream& stream )
+		bool RequestWithInterfaceAndRequiredSession::_runBeforeDisplayIfNoSession( std::ostream& stream )
 		{
-			_actionException = true;
-			if (_errorMessage.size())
-				_errorMessage = "Session invalide : " + _errorMessage + ".";
-			_errorLevel = REQUEST_ERROR_FATAL;
-			if (_interface && _interface->getNoSessionDefaultPageCode().size())
+			_request->_setActionException(true);
+			if (!_request->getErrorMessage().empty())
+				_request->_setErrorMessage("Session invalide : " + _request->getErrorMessage() + ".");
+			_request->_setErrorLevel(Request::REQUEST_ERROR_FATAL);
+			if (_interface && !_interface->getNoSessionDefaultPageCode().empty())
 			{
 				try
 				{
 					const InterfacePage* page = _interface->getPage(_interface->getNoSessionDefaultPageCode());
 					ParametersVector pv;
 					VariablesMap vm;
-					page->display(stream, pv, vm, NULL, this);
+					page->display(stream, pv, vm, NULL, _request);
 				}
 				catch (InterfacePageException e)
 				{

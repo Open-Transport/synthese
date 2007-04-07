@@ -19,7 +19,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-#include "MapRequest.h"
+#include "39_map/MapRequest.h"
 
 #include "01_util/Conversion.h"
 #include "01_util/XmlToolkit.h"
@@ -72,9 +72,9 @@ namespace synthese
 		MapRequest::MapRequest()
 		{}
 
-		Request::ParametersMap MapRequest::getParametersMap() const
+		ParametersMap MapRequest::_getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			/// @todo Map filling
 			// eg : map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
 			return map;
@@ -82,9 +82,9 @@ namespace synthese
 
 
 
-		void MapRequest::setFromParametersMap(const Request::ParametersMap& map)
+		void MapRequest::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it;
+			ParametersMap::const_iterator it;
 
 			// Output
 			it = map.find(OUTPUT_PARAMETER);
@@ -178,7 +178,7 @@ namespace synthese
 
 
 
-		void MapRequest::run( std::ostream& stream ) const
+		void MapRequest::_run( std::ostream& stream ) const
 		{
 			// Prepare the map (once for all renderings!)
 			_map->prepare ();

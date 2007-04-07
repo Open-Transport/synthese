@@ -20,6 +20,7 @@
 #include "71_vinci_bike_rental/RentABikeAction.h"
 #include "71_vinci_bike_rental/VinciReturnGuaranteeAction.h"
 #include "71_vinci_bike_rental/ReturnABikeAction.h"
+#include "71_vinci_bike_rental/VinciUpdateBikeAction.h"
 
 #include "71_vinci_bike_rental/VinciContractPrintRequest.h"
 

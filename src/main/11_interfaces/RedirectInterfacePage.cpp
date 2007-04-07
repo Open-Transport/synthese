@@ -42,9 +42,7 @@ namespace synthese
 
 		void RedirectInterfacePage::display( std::ostream& stream, VariablesMap& vars, const server::Request* request /*= NULL*/ ) const
 		{
-			std::stringstream url;
-			url << request->getClientURL() << Request::PARAMETER_STARTER << request->getQueryString();
-			display(stream, vars, url.str(), request);
+			display(stream, vars, request->getURL(), request);
 		}
 	}
 }

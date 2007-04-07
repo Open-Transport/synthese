@@ -114,9 +114,9 @@ namespace synthese
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
-			void setFromParametersMap(const admin::AdminRequest::ParametersMap& map);
+			void setFromParametersMap(const server::ParametersMap& map);
 			std::string getTitle() const;
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const admin::AdminRequest* request = NULL) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request = NULL) const;
 		};
 	}
 }

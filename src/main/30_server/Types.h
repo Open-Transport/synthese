@@ -1,6 +1,6 @@
 
-/** Action class implementation.
-	@file Action.cpp
+/** Types class header.
+	@file Types.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,27 +20,24 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Action.h"
+#ifndef SYNTHESE_Server_Types_h__
+#define SYNTHESE_Server_Types_h__
+
+#include <map>
+#include <string>
 
 namespace synthese
 {
 	namespace server
 	{
-		const std::string Action::PARAMETER_ACTION = "a";
+		/** @addtogroup m30
+			@{
+		*/
 
-		Action* Action::create(Request*request, Request::ParametersMap& params )
-		{
-			Request::ParametersMap::iterator it = params.find(PARAMETER_ACTION);
-			if (it == params.end())
-				return NULL;
+		typedef std::map<std::string, std::string> ParametersMap;
 
-			Action* action = Factory<Action>::create(it->second);
-			params.erase(it);
-
-			action->_request = request;
-			action->setFromParametersMap(params);
-
-			return action;		
-		}
+		/** @} */
 	}
 }
+
+#endif // SYNTHESE_Server_Types_h__

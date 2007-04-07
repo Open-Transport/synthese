@@ -42,6 +42,7 @@ namespace synthese
 		class InterfacePage;
 
 		/** Code defined interface element which produces a string value at runtime.
+			@ingroup m11
 		*/
 		class ValueInterfaceElement : public util::Factorable
 		{

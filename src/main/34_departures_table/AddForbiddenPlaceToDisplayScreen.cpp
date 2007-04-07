@@ -24,6 +24,7 @@
 #include "15_env/ConnectionPlace.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "34_departures_table/AddForbiddenPlaceToDisplayScreen.h"
 #include "34_departures_table/DeparturesTableModule.h"
@@ -42,20 +43,20 @@ namespace synthese
 		const string AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pla";
 
 
-		Request::ParametersMap AddForbiddenPlaceToDisplayScreen::getParametersMap() const
+		ParametersMap AddForbiddenPlaceToDisplayScreen::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_PLACE, _xxx));
 			return map;
 		}
 
-		void AddForbiddenPlaceToDisplayScreen::setFromParametersMap(Request::ParametersMap& map)
+		void AddForbiddenPlaceToDisplayScreen::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_screen = DeparturesTableModule::getDisplayScreens().get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_PLACE);
 				if (it == map.end())

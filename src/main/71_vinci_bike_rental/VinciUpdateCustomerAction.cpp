@@ -29,6 +29,7 @@
 #include "12_security/UserTableSync.h"
 
 #include "30_server/ServerModule.h"
+#include "30_server/Request.h"
 #include "30_server/ActionException.h"
 
 #include "71_vinci_bike_rental/VinciContract.h"
@@ -58,9 +59,9 @@ namespace synthese
 		const string VinciUpdateCustomerAction::PARAMETER_BIRTH_DATE = Action_PARAMETER_PREFIX + "bd";
 		const string VinciUpdateCustomerAction::PARAMETER_PASSPORT = Action_PARAMETER_PREFIX + "pp";
 
-		Request::ParametersMap VinciUpdateCustomerAction::getParametersMap() const
+		ParametersMap VinciUpdateCustomerAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_NAME, _name));
 			map.insert(make_pair(PARAMETER_SURNAME, _surname));
 			map.insert(make_pair(PARAMETER_ADDRESS, _address));
@@ -73,20 +74,19 @@ namespace synthese
 			return map;
 		}
 
-		void VinciUpdateCustomerAction::setFromParametersMap(Request::ParametersMap& map)
+		void VinciUpdateCustomerAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_contract = VinciContractTableSync::get(_request->getObjectId());
 				_user = UserTableSync::get(_contract->getUserId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_NAME);
 				if (it != map.end())
 				{
 					_name = it->second;
-					map.erase(it);
 				}
 				if (_name.empty())
 					throw ActionException("Le nom ne peut être vide");
@@ -95,63 +95,54 @@ namespace synthese
 				if (it != map.end())
 				{
 					_surname = it->second;
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_ADDRESS);
 				if (it != map.end())
 				{
 					_address = it->second;
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_POST_CODE);
 				if (it != map.end())
 				{
 					_postCode = it->second;
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_CITY);
 				if (it != map.end())
 				{
 					_city = it->second;
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_COUNTRY);
 				if (it != map.end())
 				{
 					_country = it->second;
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_EMAIL);
 				if (it != map.end())
 				{
 					_email = it->second;
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_PHONE);
 				if (it != map.end())
 				{
 					_phone = it->second;
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_BIRTH_DATE);
 				if (it != map.end())
 				{
 					_birthDate = Date::FromString(it->second);
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_PASSPORT);
 				if (it != map.end())
 				{
 					_passport = it->second;
-					map.erase(it);
 				}
 
 			}

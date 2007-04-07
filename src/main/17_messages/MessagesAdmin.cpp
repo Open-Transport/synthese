@@ -20,16 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Html.h"
 
 #include "04_time/TimeParseException.h"
 #include "04_time/DateTime.h"
+
+#include "05_html/SearchFormHTMLTable.h"
+#include "05_html/ActionResultHTMLTable.h"
 
 #include "11_interfaces/InterfaceModule.h"
 
 #include "15_env/ConnectionPlace.h"
 #include "15_env/CommercialLine.h"
 #include "15_env/EnvModule.h"
+
+#include "30_server/ActionFunctionRequest.h"
 
 #include "17_messages/Alarm.h"
 #include "17_messages/Scenario.h"
@@ -48,8 +52,6 @@
 #include "32_admin/AdminRequest.h"
 #include "32_admin/AdminModule.h"
 #include "32_admin/AdminParametersException.h"
-#include "32_admin/SearchFormHTMLTable.h"
-#include "32_admin/ResultHTMLTable.h"
 
 
 using namespace std;
@@ -62,6 +64,7 @@ namespace synthese
 	using namespace util;
 	using namespace time;
 	using namespace env;
+	using namespace html;
 
 	namespace messages
 	{
@@ -78,13 +81,13 @@ namespace synthese
 			, _searchConflict(ALARM_CONFLICT_UNKNOWN)
 		{}
 
-		void MessagesAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void MessagesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_parametersMap = map;
 
-				AdminRequest::ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_START);
+				ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_START);
 				if (it != map.end() && !it->second.empty())
 				{
 					_startDate.FromString(it->second);
@@ -131,42 +134,31 @@ namespace synthese
 			return "Messages";
 		}
 
-		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
-			searchRequest->copy(request);
-			searchRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
 
-			AdminRequest* newMessageRequest = Factory<Request>::create<AdminRequest>();
-			newMessageRequest->copy(request);
-			newMessageRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
-			newMessageRequest->setAction(Factory<Action>::create<NewMessageAction>());
-			newMessageRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
+			ActionFunctionRequest<NewMessageAction,AdminRequest> newMessageRequest(request);
+			newMessageRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+			newMessageRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
 
-			AdminRequest* newScenarioRequest = Factory<Request>::create<AdminRequest>();
-			newScenarioRequest->copy(request);
-			newScenarioRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
-			newScenarioRequest->setAction(Factory<Action>::create<NewScenarioSendAction>());
-			newScenarioRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
+			ActionFunctionRequest<NewScenarioSendAction,AdminRequest> newScenarioRequest(request);
+			newScenarioRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
+			newScenarioRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
 
-			AdminRequest* alarmRequest = Factory<Request>::create<AdminRequest>();
-			alarmRequest->copy(request);
-			alarmRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+			FunctionRequest<AdminRequest> alarmRequest(request);
+			alarmRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
 
-			AdminRequest* scenarioRequest = Factory<Request>::create<AdminRequest>();
-			scenarioRequest->copy(request);
-			scenarioRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
+			FunctionRequest<AdminRequest> scenarioRequest(request);
+			scenarioRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
 
-			AdminRequest* stopRequest = Factory<Request>::create<AdminRequest>();
-			stopRequest->copy(request);
-			stopRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
-			stopRequest->setAction(Factory<Action>::create<AlarmStopAction>());
-
-			AdminRequest* scenarioStopRequest = Factory<Request>::create<AdminRequest>();
-			scenarioStopRequest->copy(request);
-			scenarioStopRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
-			scenarioStopRequest->setAction(Factory<Action>::create<ScenarioStopAction>());
-
+			ActionFunctionRequest<AlarmStopAction,AdminRequest> stopRequest(request);
+			stopRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
+			
+			ActionFunctionRequest<ScenarioStopAction,AdminRequest> scenarioStopRequest(request);
+			scenarioStopRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
+			
 			map<StatusSearch, string> statusMap;
 			statusMap.insert(make_pair(ALL_STATUS, "(tous les états)"));
 			statusMap.insert(make_pair(BROADCAST_OVER, "Diffusion terminée"));
@@ -177,72 +169,72 @@ namespace synthese
 
 			stream << "<h1>Recherche</h1>";
 
-			SearchFormHTMLTable s(searchRequest);
+			SearchFormHTMLTable s(searchRequest.getHTMLForm());
 			stream << s.open();
-			stream << s.cell("Date début", Html::getTextInput(PARAMETER_SEARCH_START, _startDate.toString()));
-			stream << s.cell("Date fin", Html::getTextInput(PARAMETER_SEARCH_END, _endDate.toString()));
+			stream << s.cell("Date début", s.getForm().getTextInput(PARAMETER_SEARCH_START, _startDate.toString()));
+			stream << s.cell("Date fin", s.getForm().getTextInput(PARAMETER_SEARCH_END, _endDate.toString()));
 
 			for (Factory<AlarmRecipient>::Iterator it = Factory<AlarmRecipient>::begin(); it != Factory<AlarmRecipient>::end(); ++it)
 			{
-				AlarmRecipientSearchFieldsMap m = it->getSearchFields(_parametersMap);
+				AlarmRecipientSearchFieldsMap m = it->getSearchFields(s.getForm(), _parametersMap);
 				for (AlarmRecipientSearchFieldsMap::iterator itm = m.begin(); itm != m.end(); ++itm)
                     stream << s.cell(itm->second.label, itm->second.htmlField);
 			}
 
-			stream << s.cell("Statut", Html::getSelectInput(PARAMETER_SEARCH_STATUS, statusMap, _searchStatus));
-			stream << s.cell("Conflit", Html::getSelectInput(PARAMETER_SEARCH_CONFLICT, MessagesModule::getConflictLabels(true), _searchConflict));
-			stream << s.cell("Type", Html::getSelectInput(PARAMETER_SEARCH_LEVEL, MessagesModule::getLevelLabels(true), _searchLevel));
+			stream << s.cell("Statut", s.getForm().getSelectInput(PARAMETER_SEARCH_STATUS, statusMap, _searchStatus));
+			stream << s.cell("Conflit", s.getForm().getSelectInput(PARAMETER_SEARCH_CONFLICT, MessagesModule::getConflictLabels(true), _searchConflict));
+			stream << s.cell("Type", s.getForm().getSelectInput(PARAMETER_SEARCH_LEVEL, MessagesModule::getLevelLabels(true), _searchLevel));
 
 			stream << s.close();
 
 			stream << "<h1>Résultats de la recherche : messages selon scénario</h1>";
 
-			ResultHTMLTable::HeaderVector v1;
+			ActionResultHTMLTable::HeaderVector v1;
 			v1.push_back(make_pair(PARAMETER_SEARCH_START, string("Dates")));
 			v1.push_back(make_pair(string(), string("Scénario")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v1.push_back(make_pair(string(), string("Actions")));
-			ResultHTMLTable t1(v1, searchRequest, "", true, newScenarioRequest, string(), InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t1(v1, searchRequest.getHTMLForm(), "", true, newScenarioRequest.getHTMLForm("newscen"), string(), InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 			
 			stream << t1.open();
 
 			for (vector<Scenario*>::const_iterator it = _scenarioResult.begin(); it != _scenarioResult.end(); ++it)
 			{
 				Scenario* scenario = *it;
-				scenarioRequest->setObjectId(scenario->getKey());
+				scenarioRequest.setObjectId(scenario->getKey());
 				stream << t1.row();
 				stream << t1.col() << scenario->getPeriodStart().toString();
 				stream << t1.col() << scenario->getName();
 				stream << t1.col(); // Bullet
 				stream << t1.col(); // Bullet
-				stream << t1.col() << Html::getLinkButton(scenarioRequest->getURL(), "Modifier");
-				stream << t1.col() << Html::getLinkButton(scenarioStopRequest->getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?");
+				stream << t1.col() << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Modifier");
+				stream << t1.col() << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?");
 			}
 			stream << t1.row();
-			stream << t1.col(4) << Html::getSelectInput(NewScenarioSendAction::PARAMETER_TEMPLATE, MessagesModule::getScenariiLabels(), uid(0));
-			stream << t1.col() << Html::getSubmitButton("Nouvelle diffusion de scénario");
+			stream << t1.col(4) << t1.getActionForm().getSelectInput(NewScenarioSendAction::PARAMETER_TEMPLATE, MessagesModule::getScenariiLabels(), uid(0));
+			stream << t1.col() << t1.getActionForm().getSubmitButton("Nouvelle diffusion de scénario");
 
 			stream << t1.close();
 
 			
 			stream << "<h1>Résultats de la recherche : messages seuls</h1>";
 
-			ResultHTMLTable::HeaderVector v;
+			ActionResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAMETER_SEARCH_START, string("Dates")));
 			v.push_back(make_pair(string(), string("Message")));
 			v.push_back(make_pair(PARAMETER_SEARCH_LEVEL, string("Type")));
 			v.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
 			v.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v.push_back(make_pair(string(), string("Actions")));
-			ResultHTMLTable t(v, searchRequest, "", true, newMessageRequest, NewMessageAction::PARAMETER_IS_TEMPLATE, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, searchRequest.getHTMLForm(), "", true, newMessageRequest.getHTMLForm("newmess"), NewMessageAction::PARAMETER_IS_TEMPLATE, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 
 			for (vector<Alarm*>::const_iterator it= _result.begin(); it != _result.end(); ++it)
 			{
 				Alarm* alarm = *it;
-				alarmRequest->setObjectId(alarm->getKey());
+				alarmRequest.setObjectId(alarm->getKey());
 				stream << t.row(Conversion::ToString(alarm->getKey()));
 				stream << t.col();
 				if (!alarm->getIsEnabled())
@@ -262,23 +254,15 @@ namespace synthese
 				stream << t.col() << MessagesModule::getLevelLabel(alarm->getLevel());
 				stream << t.col(); // Bullet
 				stream << t.col(); // Bullet
-				stream << t.col() << Html::getLinkButton(alarmRequest->getURL(), "Modifier");
+				stream << t.col() << HTMLModule::getLinkButton(alarmRequest.getURL(), "Modifier");
 				if (alarm->isApplicable(DateTime()))
-					stream << "&nbsp;" << Html::getLinkButton(stopRequest->getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion du message ?");
+					stream << "&nbsp;" << HTMLModule::getLinkButton(stopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion du message ?");
 			}
 			stream << t.row();
 			stream << t.col(5) << "(Sélectionnez un message pour le copier)";
-			stream << t.col() << Html::getSubmitButton("Nouvelle diffusion de message");
+			stream << t.col() << t.getActionForm().getSubmitButton("Nouvelle diffusion de message");
 
 			stream << t.close();
-
-			delete alarmRequest;
-			delete scenarioRequest;
-			delete stopRequest;
-			delete scenarioStopRequest;
-			delete searchRequest;
-			delete newMessageRequest;
-			delete newScenarioRequest;
 		}
 	}
 }

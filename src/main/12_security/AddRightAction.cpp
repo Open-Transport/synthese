@@ -27,6 +27,7 @@
 #include "12_security/ProfileTableSync.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
@@ -43,20 +44,20 @@ namespace synthese
 		const string AddRightAction::PARAMETER_PARAMETER = Action_PARAMETER_PREFIX + "param";
 
 
-		Request::ParametersMap AddRightAction::getParametersMap() const
+		ParametersMap AddRightAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void AddRightAction::setFromParametersMap(Request::ParametersMap& map)
+		void AddRightAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_RIGHT);
 				if (it == map.end())
@@ -64,25 +65,21 @@ namespace synthese
 				_rightName = it->second;
 				if (!Factory<Right>::contains(_rightName))
 					throw ActionException("Specified right class not found");
-				map.erase(it);
 				
 				it = map.find(PARAMETER_PARAMETER);
 				if (it == map.end())
 					throw ActionException("Parameter not specified");
 				_parameter = it->second;
-				map.erase(it);
 
 				it = map.find(PARAMETER_PUBLIC_LEVEL);
 				if (it == map.end())
 					throw ActionException("Public level not specified");
 				_publicLevel = (Right::Level) Conversion::ToInt(it->second);
-				map.erase(it);
 
 				it = map.find(PARAMETER_PRIVATE_LEVEL);
 				if (it == map.end())
 					throw ActionException("Private level not specified");
 				_privateLevel = (Right::Level) Conversion::ToInt(it->second);
-				map.erase(it);
 			}
 			catch(Profile::RegistryKeyException e)
 			{

@@ -48,26 +48,27 @@ namespace synthese
 	{
 		const std::string VinciContractPrintRequest::PARAMETER_CONTRACT_ID = "ctr";
 		
-		/// @todo build of the attributes
 		VinciContractPrintRequest::VinciContractPrintRequest()
 			: RequestWithInterfaceAndRequiredSession()
 			, _contract(NULL)
 		{}
 
-		Request::ParametersMap VinciContractPrintRequest::getParametersMap() const
+		ParametersMap VinciContractPrintRequest::_getParametersMap() const
 		{
-			Request::ParametersMap map;
-			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_contract->getKey())));
+			ParametersMap map(RequestWithInterfaceAndRequiredSession::_getParametersMap());
+
+			map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
+			
 			return map;
 		}
 
-		void VinciContractPrintRequest::setFromParametersMap(const Request::ParametersMap& map)
+		void VinciContractPrintRequest::_setFromParametersMap(const ParametersMap& map)
 		{
-			RequestWithInterfaceAndRequiredSession::setFromParametersMap(map);
+			RequestWithInterfaceAndRequiredSession::_setFromParametersMap(map);
 
 			try
 			{
-				Request::ParametersMap::const_iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_CONTRACT_ID);
 				if (it == map.end())
@@ -81,10 +82,10 @@ namespace synthese
 			}
 		}
 
-		void VinciContractPrintRequest::run( std::ostream& stream ) const
+		void VinciContractPrintRequest::_run( std::ostream& stream ) const
 		{
 			const VinciPrintedContractInterfacePage* page = _interface->getPage<VinciPrintedContractInterfacePage>();
-			page->display(stream, VariablesMap(), _contract, this);
+			page->display(stream, VariablesMap(), _contract, _request);
 		}
 
 		VinciContractPrintRequest::~VinciContractPrintRequest()

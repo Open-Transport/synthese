@@ -23,12 +23,16 @@
 #include <map>
 #include <sstream>
 
-#include "01_util/Html.h"
 #include "01_util/Constants.h"
+
+#include "05_html/HTMLForm.h"
+#include "05_html/HTMLTable.h"
 
 #include "15_env/ConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
 #include "15_env/EnvModule.h"
+
+#include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminParametersException.h"
 
@@ -57,6 +61,7 @@ namespace synthese
 	using namespace admin;
 	using namespace util;
 	using namespace env;
+	using namespace html;
 
 	namespace departurestable
 	{
@@ -73,84 +78,62 @@ namespace synthese
 			return _displayScreen->getFullName();
 		}
 
-		void DisplayAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request /*= NULL*/ ) const
+		void DisplayAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request /*= NULL*/ ) const
 		{
 			// Update request
-			AdminRequest* updateDisplayRequest = Factory<Request>::create<AdminRequest>();
-			updateDisplayRequest->copy(request);
-			updateDisplayRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			updateDisplayRequest->setAction(Factory<Action>::create<UpdateDisplayScreenAction>());
-			updateDisplayRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<UpdateDisplayScreenAction,AdminRequest> updateDisplayRequest(request);
+			updateDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			updateDisplayRequest.setObjectId(request->getObjectId());
 
 			// Update request
-			AdminRequest* updateAllDisplayRequest = Factory<Request>::create<AdminRequest>();
-			updateAllDisplayRequest->copy(request);
-			updateAllDisplayRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			updateAllDisplayRequest->setAction(Factory<Action>::create<UpdateAllStopsDisplayScreenAction>());
-			updateAllDisplayRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<UpdateAllStopsDisplayScreenAction,AdminRequest> updateAllDisplayRequest(request);
+			updateAllDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			updateAllDisplayRequest.setObjectId(request->getObjectId());
 
 			// Add physical request
-			AdminRequest* addPhysicalRequest = Factory<Request>::create<AdminRequest>();
-			addPhysicalRequest->copy(request);
-			addPhysicalRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			addPhysicalRequest->setAction(Factory<Action>::create<AddDepartureStopToDisplayScreenAction>());
-			addPhysicalRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<AddDepartureStopToDisplayScreenAction,AdminRequest> addPhysicalRequest(request);
+			addPhysicalRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addPhysicalRequest.setObjectId(request->getObjectId());
 
 			// Add preselection request
-			AdminRequest* addPreselRequest = Factory<Request>::create<AdminRequest>();
-			addPreselRequest->copy(request);
-			addPreselRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			addPreselRequest->setAction(Factory<Action>::create<AddPreselectionPlaceToDisplayScreen>());
-			addPreselRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<AddPreselectionPlaceToDisplayScreen,AdminRequest> addPreselRequest(request);
+			addPreselRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addPreselRequest.setObjectId(request->getObjectId());
 
 			// Add display request
-			AdminRequest* addDisplayRequest = Factory<Request>::create<AdminRequest>();
-			addDisplayRequest->copy(request);
-			addDisplayRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			addDisplayRequest->setAction(Factory<Action>::create<DisplayScreenAddDisplayedPlace>());
-			addDisplayRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<DisplayScreenAddDisplayedPlace,AdminRequest> addDisplayRequest(request);
+			addDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addDisplayRequest.setObjectId(request->getObjectId());
 
 			// Add not to serve request
-			AdminRequest* addNSRequest = Factory<Request>::create<AdminRequest>();
-			addNSRequest->copy(request);
-			addNSRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			addNSRequest->setAction(Factory<Action>::create<AddForbiddenPlaceToDisplayScreen>());
-			addNSRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<AddForbiddenPlaceToDisplayScreen,AdminRequest> addNSRequest(request);
+			addNSRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addNSRequest.setObjectId(request->getObjectId());
 
 			// Update preselection request
-			AdminRequest* updPreselRequest = Factory<Request>::create<AdminRequest>();
-			updPreselRequest->copy(request);
-			updPreselRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			updPreselRequest->setAction(Factory<Action>::create<UpdateDisplayPreselectionParametersAction>());
-			updPreselRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<UpdateDisplayPreselectionParametersAction,AdminRequest> updPreselRequest(request);
+			updPreselRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			updPreselRequest.setObjectId(request->getObjectId());
 
 			// Remove preselection stop request
-			AdminRequest* rmPreselRequest = Factory<Request>::create<AdminRequest>();
-			rmPreselRequest->copy(request);
-			rmPreselRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			rmPreselRequest->setAction(Factory<Action>::create<RemovePreselectionPlaceFromDisplayScreenAction>());
-			rmPreselRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<RemovePreselectionPlaceFromDisplayScreenAction,AdminRequest> rmPreselRequest(request);
+			rmPreselRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			rmPreselRequest.setObjectId(request->getObjectId());
 
 			// Remove physical stop request
-			AdminRequest* rmPhysicalRequest = Factory<Request>::create<AdminRequest>();
-			rmPhysicalRequest->copy(request);
-			rmPhysicalRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			rmPhysicalRequest->setAction(Factory<Action>::create<DisplayScreenRemovePhysicalStopAction>());
-			rmPhysicalRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<DisplayScreenRemovePhysicalStopAction,AdminRequest> rmPhysicalRequest(request);
+			rmPhysicalRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			rmPhysicalRequest.setObjectId(request->getObjectId());
 
 			// Remove displayed place request
-			AdminRequest* rmDisplayedRequest = Factory<Request>::create<AdminRequest>();
-			rmDisplayedRequest->copy(request);
-			rmDisplayedRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			rmDisplayedRequest->setAction(Factory<Action>::create<DisplayScreenRemoveDisplayedPlaceAction>());
-			rmDisplayedRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,AdminRequest> rmDisplayedRequest(request);
+			rmDisplayedRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			rmDisplayedRequest.setObjectId(request->getObjectId());
 
 			// Remove Forbidden place request
-			AdminRequest* rmForbiddenRequest = Factory<Request>::create<AdminRequest>();
-			rmForbiddenRequest->copy(request);
-			rmForbiddenRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			rmForbiddenRequest->setAction(Factory<Action>::create<DisplayScreenRemoveForbiddenPlaceAction>());
-			rmForbiddenRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<DisplayScreenRemoveForbiddenPlaceAction,AdminRequest> rmForbiddenRequest(request);
+			rmForbiddenRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			rmForbiddenRequest.setObjectId(request->getObjectId());
 
 			// Maps for particular select fields
 			map<int, string> blinkingDelaysMap;
@@ -177,193 +160,259 @@ namespace synthese
 				clearDelayMap.insert(make_pair(i, Conversion::ToString(i) + " minutes après le départ"));
 
 			// Filling of the stream
-			stream
-				<< updateDisplayRequest->getHTMLFormHeader("update")
-				<< "<h1>Emplacement</h1>"
-				<< "<table><tr><td>Lieu logique</td>"
-				<< "<td>" 
-				<< Html::getSelectInput(PARAMETER_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(), _place ? _place->getKey() : 0)
-				<< "</td></tr>"
-				<< "<tr><td>Lieu physique</td>"
-				<< "<td>";
+			stream << "<h1>Emplacement</h1>";
+
+			HTMLForm uf(updateDisplayRequest.getHTMLForm("update"));
+			HTMLTable t;
 			
+			stream << uf.open() << t.open();
+			stream << t.row();
+			stream << t.col() << "Lieu logique";
+			stream << t.col() << uf.getSelectInput(PARAMETER_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(), _place ? _place->getKey() : 0);
+
+			stream << t.row();
+			stream << t.col() << "Lieu physique";
+			stream << t.col();
 			if (_place == NULL)
 				stream << "(Sélectionnez un lieu logique en premier)";
 			else
-				stream << Html::getSelectInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_ID, DeparturesTableModule::getBroadcastPointLabels(_place, false), _displayScreen->getLocalization() ? _displayScreen->getLocalization()->getKey() : 0);
+				stream << uf.getSelectInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_ID, DeparturesTableModule::getBroadcastPointLabels(_place, false), _displayScreen->getLocalization() ? _displayScreen->getLocalization()->getKey() : 0);
 			
-			stream
-				<< "</td></tr>"
-				<< "<tr><td>Complément de précision</td>"
-				<< "<td>" << Html::getTextInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_COMMENT, _displayScreen->getLocalizationComment()) << "</td></tr>"
-				<< "</table>"
+			stream << t.row();
+			stream << t.col() << "Complément de précision";
+			stream << t.col() << uf.getTextInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_COMMENT, _displayScreen->getLocalizationComment());
 
-				// Technical data
-				<< "<h1>Données techniques</h1>"
-				<< updateDisplayRequest->getHTMLFormHeader("updateprops")
-				<< "<table>"
-				<< "<tr><td>Type d'afficheur</td>"
-				<< "<td>" << Html::getSelectInput(UpdateDisplayScreenAction::PARAMETER_TYPE, DeparturesTableModule::getDisplayTypeLabels(), _displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE) << "</td></tr>"
-				<< "<tr><td>Code de branchement</td>"
-				<< "<td>" << Html::getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode()) << "</td></tr>"
-				<< "<tr><td>UID</td><td>" << _displayScreen->getKey() << "</td></tr>"
-				<< "</table>"
+			stream << t.row();
+			stream << t.col(2) << uf.getSubmitButton("Enregistrer");
 
-				// Appearance
-				<< "<h1>Apparence</h1>"
-				<< "<table><tr><td>Titre</td><td>" << Html::getTextInput(UpdateDisplayScreenAction::PARAMETER_TITLE, _displayScreen->getTitle()) << "</td></tr>"
-				<< "<tr><td>Clignotement</td><td>" << Html::getSelectInput(UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY, blinkingDelaysMap, _displayScreen->getBlinkingDelay()) << "</td></tr>"
-				<< "<tr><td>Affichage numéro de quai</td><td>" << Html::getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->getTrackNumberDisplay()) << "</td></tr>"
-				<< "<tr><td>Affichage numéro de service</td><td>" << Html::getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay()) << "</td></tr>"
-				<< "</table>"
+			stream << t.close() << uf.close();
 
-				// Content
-				<< "<h1>Contenu</h1>"
-				<< "<table>"
-				<< "<tr><td>Horaires</td><td>" << Html::getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_DEPARTURE_ARRIVAL, directionMap, _displayScreen->getDirection()) << "</td></tr>"
-				<< "<tr><td>Sélection</td><td>" << Html::getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER, endFilterMap, _displayScreen->getEndFilter()) << "</td></tr>"
-				<< "<tr><td>Délai maximum d'affichage</td><td>" << Html::getTextInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) << " minutes</td></tr>"
-				<< "<tr><td>Délai d'effacement</td><td>" << Html::getSelectInput(UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY, clearDelayMap, _displayScreen->getClearingDelay()) << "</td></tr>"
-				<< "</table>"
-				<< Html::getSubmitButton("Enregistrer les modifications des propriétés")
-				<< "</form>";
+			// Technical data
+			stream << "<h1>Données techniques</h1>";
+
+			HTMLForm pf(updateDisplayRequest.getHTMLForm("updateprops"));
+			HTMLTable pt;
+
+			stream << pf.open() << pt.open();
+
+			stream << pt.row();
+			stream << pt.col() << "Type d'afficheur";
+			stream << pt.col() << pf.getSelectInput(UpdateDisplayScreenAction::PARAMETER_TYPE, DeparturesTableModule::getDisplayTypeLabels(), _displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE);
+
+			stream << pt.row();
+			stream << pt.col() << "Code de branchement";
+			stream << pt.col() << pf.getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode());
+			
+			stream << pt.row();
+			stream << pt.col() << "UID";
+			stream << pt.col() << _displayScreen->getKey();
+
+			stream << pt.close();
+
+			// Appearance
+			stream << "<h1>Apparence</h1>";
+
+			HTMLTable dt;
+			stream << dt.open();
+
+			stream << dt.row();
+			stream << dt.col() << "Titre";
+			stream << dt.col() << pf.getTextInput(UpdateDisplayScreenAction::PARAMETER_TITLE, _displayScreen->getTitle());
+
+			stream << dt.row();
+			stream << dt.col() << "Clignotement";
+			stream << dt.col() << pf.getSelectInput(UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY, blinkingDelaysMap, _displayScreen->getBlinkingDelay());
+
+			stream << dt.row();
+			stream << dt.col() << "Affichage numéro de quai";
+			stream << dt.col() << pf.getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->getTrackNumberDisplay());
+			
+			stream << dt.row();
+			stream << dt.col() << "Affichage numéro de service";
+			stream << dt.col() << pf.getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay());
+
+			stream << dt.close();
+
+			// Content
+			stream << "<h1>Contenu</h1>";
+
+			HTMLTable ct;
+			stream << ct.open();
+
+			stream << ct.row();
+			stream << ct.col() << "Horaires";
+			stream << ct.col() << pf.getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_DEPARTURE_ARRIVAL, directionMap, _displayScreen->getDirection());
+
+			stream << ct.row();
+			stream << ct.col() << "Sélection";
+			stream << ct.col() << pf.getRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER, endFilterMap, _displayScreen->getEndFilter());
+
+			stream << ct.row();
+			stream << ct.col() << "Délai maximum d'affichage";
+			stream << ct.col() << pf.getTextInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) << " minutes";
+
+			stream << ct.row();
+			stream << ct.col() << "Délai d'effacement";
+			stream << ct.col() << pf.getSelectInput(UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY, clearDelayMap, _displayScreen->getClearingDelay());
+
+			stream << ct.close();
+
+			stream << pf.getSubmitButton("Enregistrer les modifications des propriétés");
+			stream << pf.close();
 
 			if (_displayScreen->getLocalization())
 			{
-				stream
-					// Used physical stops
-					<< "<h1>Arrêts de desserte</h1>"
-					<< "<table>"
-					<< "<tr><td>Mode : "
-					<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts")
-					<< "</td><td>"
-					<< updateAllDisplayRequest->getHTMLFormHeader("updaall")
-					<< Html::getHiddenInput(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, Conversion::ToString(!_displayScreen->getAllPhysicalStopsDisplayed()))
-					<< Html::getSubmitButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"))
-					<< "</form></td></tr>";
-
+				// Used physical stops
+				stream << "<h1>Arrêts de desserte</h1>";
+				
+				HTMLTable st;
+				stream << st.open();
+				
+				HTMLForm uaf(updateAllDisplayRequest.getHTMLForm("updaall"));
+				uaf.addHiddenField(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, Conversion::ToString(!_displayScreen->getAllPhysicalStopsDisplayed()));
+				stream << st.row();
+				stream << st.col() << "Mode : "	<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts");
+				stream << st.col() << uaf.getLinkButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"));
+				
 				if (!_displayScreen->getAllPhysicalStopsDisplayed())
 				{
-					stream << "<tr><th>Arrêt</th><th>Action</th></tr>";
+					stream << st.row();
+					stream << st.col() << "Arrêt";
+					stream << st.col() << "Action";
+
 					for (PhysicalStopsSet::const_iterator it = _displayScreen->getPhysicalStops().begin(); it != _displayScreen->getPhysicalStops().end(); ++it)
 					{
 						const PhysicalStop* ps = *it;
-						stream
-							<< "<tr>"
-							<< "<td>" << ps->getName() << "</td>"
-							<< "<td>"
-							<< rmPhysicalRequest->getHTMLFormHeader("rm" + Conversion::ToString(ps->getKey()))
-							<< Html::getHiddenInput(DisplayScreenRemovePhysicalStopAction::PARAMETER_PHYSICAL, Conversion::ToString(ps->getKey()))
-							<< Html::getSubmitButton("Supprimer")
-							<< "</form></td></tr>";
+						HTMLForm rs(rmPhysicalRequest.getHTMLForm("rm" + Conversion::ToString(ps->getKey())));
+						rs.addHiddenField(DisplayScreenRemovePhysicalStopAction::PARAMETER_PHYSICAL, Conversion::ToString(ps->getKey()));
+
+						stream << st.row();
+						stream << st.col() << ps->getName();
+						stream << st.col() << rs.getLinkButton("Supprimer");
 					}
 					if (_displayScreen->getPhysicalStops().size() != _displayScreen->getLocalization()->getConnectionPlace()->getPhysicalStops().size())
 					{
-						stream
-							<< addPhysicalRequest->getHTMLFormHeader("addphy")
-							<< "<tr><td>"
-							<< Html::getSelectInput(AddDepartureStopToDisplayScreenAction::PARAMETER_STOP, _displayScreen->getLocalization()->getConnectionPlace()->getPhysicalStopLabels(_displayScreen->getPhysicalStops()) , uid(0))
-							<< "</td><td>"
-							<< Html::getSubmitButton("Ajouter")
-							<< "</td></tr></form>";	
+						HTMLForm ap(addPhysicalRequest.getHTMLForm("addphy"));
+						stream << st.row();
+						stream << st.col(2) << ap.open();
+						stream << ap.getSelectInput(AddDepartureStopToDisplayScreenAction::PARAMETER_STOP, _displayScreen->getLocalization()->getConnectionPlace()->getPhysicalStopLabels(_displayScreen->getPhysicalStops()) , uid(0));
+						stream << ap.getSubmitButton("Ajouter");
+						stream << ap.close();
 					}									
 				}
-				stream << "</table>"
+				stream << st.close();
 
-					// Intermediate stops to display
-					<< "<h1>Arrêts intermédiaires à afficher</h1>"
-					<< "<table>"
-					<< "<tr><th>Arrêt</th><th>Action</th></tr>";
+				// Intermediate stops to display
+				stream << "<h1>Arrêts intermédiaires à afficher</h1>";
 
+				HTMLTable::ColsVector mtv;
+				mtv.push_back("Arrêt");
+				mtv.push_back("Action");
+				HTMLTable mt(mtv);;
+				stream << mt.open();
+				
 				for (DisplayedPlacesList::const_iterator it = _displayScreen->getDisplayedPlaces().begin(); it != _displayScreen->getDisplayedPlaces().end(); ++it)
 				{
-					stream
-						<< "<tr><td>" << (*it)->getFullName() << "</td>"
-						<< "<td>"
-						<< rmDisplayedRequest->getHTMLFormHeader("rmdp" + Conversion::ToString((*it)->getKey()))
-						<< Html::getHiddenInput(DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_PLACE, Conversion::ToString((*it)->getKey()))
-						<< Html::getSubmitButton("Supprimer")
-						<< "</form></td></tr>";
+					HTMLForm mf(rmDisplayedRequest.getHTMLForm("rmdp" + Conversion::ToString((*it)->getKey())));
+					mf.addHiddenField(DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_PLACE, Conversion::ToString((*it)->getKey()));
+
+					stream << mt.row();
+					stream << mt.col() << (*it)->getFullName();
+					stream << mt.col() << mf.getLinkButton("Supprimer");
 				}
 
-				stream
-					<< addDisplayRequest->getHTMLFormHeader("adddispl")
-					<< "<tr><td>" << Html::getSortedSelectInput(DisplayScreenAddDisplayedPlace::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()), uid(0))
-					<< "</td><td>" << Html::getSubmitButton("Ajouter") << "</td></tr></form>"
-					<< "</table>"
+				HTMLForm amf(addDisplayRequest.getHTMLForm("adddispl"));
+				stream << mt.row();
+				stream << mt.col(2) << amf.open();
+				stream << amf.getSortedSelectInput(DisplayScreenAddDisplayedPlace::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()), uid(0));
+				stream << amf.getSubmitButton("Ajouter");
+				stream << amf.close();
+
+				stream << mt.close();
 			
-					// Forbidden places
-					<< "<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>"
-					<< "<table>"
-					<< "<tr><th>Arrêt</th><th>Action</th></tr>";
+				// Forbidden places
+				stream << "<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>";
+				HTMLTable::ColsVector ntv;
+				ntv.push_back("Arrêt");
+				ntv.push_back("Action");
+				HTMLTable nt(ntv);
+				stream << nt.open();
 
 				for (DisplayedPlacesList::const_iterator it = _displayScreen->getForbiddenPlaces().begin(); it != _displayScreen->getForbiddenPlaces().end(); ++it)
 				{
-					stream
-						<< "<tr><td>" << (*it)->getFullName() << "</td><td>"
-						<< rmForbiddenRequest->getHTMLFormHeader("rmfp"+ Conversion::ToString((*it)->getKey()))
-						<< Html::getHiddenInput(DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE, Conversion::ToString((*it)->getKey()))
-						<< Html::getSubmitButton("Supprimer")
-						<< "</form></td></tr>";
+					HTMLForm ntu(rmForbiddenRequest.getHTMLForm("rmfp"+ Conversion::ToString((*it)->getKey())));
+					ntu.addHiddenField(DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE, Conversion::ToString((*it)->getKey()));
+					stream << nt.row();
+					stream << nt.col() << (*it)->getFullName();
+					stream << nt.col() << ntu.getLinkButton("Supprimer");
 				}
-				stream
-					<< addNSRequest->getHTMLFormHeader("addforb")
-					<< "<tr><td>" << Html::getSortedSelectInput(AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForbiddenPlaces()), uid(0))
-					<< "</td><td>" << Html::getSubmitButton("Ajouter") << "</td></tr></form>"
-					<< "</table>"
-
-
-					// Preselection
-					<< "<h1>Présélection</h1>"
-
-					<< updPreselRequest->getHTMLFormHeader("updpresel")
-					<< "<table>"
-					<< "<tr><td>Activer</td>"
-					<< "<td>" << Html::getOuiNonRadioInput(UpdateDisplayPreselectionParametersAction::PARAMETER_ACTIVATE_PRESELECTION, _displayScreen->getGenerationMethod() == DisplayScreen::STANDARD_METHOD) << "</td></tr>"
-					<< "<tr><td>Délai maximum présélection</td><td>" << Html::getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY, Conversion::ToString(_displayScreen->getForceDestinationDelay())) << "</td></tr>"
-					<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregister les paramètres de présélection") << "</td></tr>"
-					<< "</table></form>"
-
-					// Additional preselection stops
-					<< "<h1>Arrêts de présélection (les terminus de lignes sont automatiquement présélectionnés)</h1>"
-					
-					<< "<table>"
-					<< "<tr><th>Arrêt</th><th>Action</th></tr>";
+				HTMLForm ant(addNSRequest.getHTMLForm("addforb"));
+				stream << nt.row();
+				stream << nt.col(2) << ant.open();
+				stream << ant.getSortedSelectInput(AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForbiddenPlaces()), uid(0));
+				stream << ant.getSubmitButton("Ajouter");
+				stream << ant.close();
 				
-				for (DisplayedPlacesList::const_iterator it = _displayScreen->getForcedDestinations().begin(); it != _displayScreen->getForcedDestinations().end(); ++it)
-				{
-					stream
-						<< "<tr><td>" << (*it)->getFullName() << "</td><td>" 
-						<< rmPreselRequest->getHTMLFormHeader("rmpres" + Conversion::ToString((*it)->getKey()))
-						<< Html::getHiddenInput(RemovePreselectionPlaceFromDisplayScreenAction::PARAMETER_PLACE, Conversion::ToString((*it)->getKey()))
-						<< Html::getSubmitButton("Supprimer") 
-						<< "</form></td></tr>";
-				}
+				stream << nt.close();
+				
+				// Preselection
+				stream << "<h1>Présélection</h1>";
 
-				stream
-					<< addPreselRequest->getHTMLFormHeader("addpresel")
-					<< "<tr><td>" << Html::getSortedSelectInput(AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForcedDestinations()), uid(0))
-					<< "</td><td>" << Html::getSubmitButton("Ajouter") << "</td></tr></form>"
-					<< "</table>";
+				HTMLForm tf(updPreselRequest.getHTMLForm("updpresel"));
+				HTMLTable tt;
+				stream << tf.open() << tt.open();
+				
+				stream << tt.row();
+				stream << tt.col() << "Activer";
+				stream << tt.col() << tf.getOuiNonRadioInput(UpdateDisplayPreselectionParametersAction::PARAMETER_ACTIVATE_PRESELECTION, _displayScreen->getGenerationMethod() == DisplayScreen::STANDARD_METHOD);
+				
+				stream << tt.row();
+				stream << tt.col() << "Délai maximum présélection";
+				stream << tt.col() << tf.getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY, Conversion::ToString(_displayScreen->getForceDestinationDelay()));
+
+				stream << tt.row();
+				stream << tt.col(2) << tf.getSubmitButton("Enregister les paramètres de présélection");
+
+				stream << tt.close() << tf.close();
+
+				if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
+				{
+					// Additional preselection stops
+					stream << "<h1>Arrêts de présélection (les terminus de lignes sont automatiquement présélectionnés)</h1>";
+
+					HTMLTable::ColsVector pstv;
+					pstv.push_back("Arrêt");
+					pstv.push_back("Action");
+					HTMLTable pst(pstv);
+					stream << pst.open();
+
+					for (DisplayedPlacesList::const_iterator it = _displayScreen->getForcedDestinations().begin(); it != _displayScreen->getForcedDestinations().end(); ++it)
+					{
+						HTMLForm psdf(rmPreselRequest.getHTMLForm("rmpres" + Conversion::ToString((*it)->getKey())));
+						psdf.addHiddenField(RemovePreselectionPlaceFromDisplayScreenAction::PARAMETER_PLACE, Conversion::ToString((*it)->getKey()));
+						stream << pst.row();
+						stream << pst.col() << (*it)->getFullName();
+						stream << pst.col() << psdf.getLinkButton("Supprimer");
+					}
+
+					HTMLForm psaf(addPreselRequest.getHTMLForm("addpresel"));
+					stream << pst.row();
+					stream << pst.col(2) << psaf.open();
+					stream << psaf.getSortedSelectInput(AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForcedDestinations()), uid(0));
+					stream << psaf.getSubmitButton("Ajouter");
+					stream << psaf.close();
+
+					stream << pst.close();
+				}
 			}
 
 			stream
 				<< "<p>NB : Certains types d'afficheurs ne prennent pas en charge toutes les fonctionnalités proposées. Selon le type de l'afficheur, certains champs peuvent donc être sans effet sur l'affichage.</p>";
-
-			// Cleaning
-			delete updateDisplayRequest;
-			delete addPreselRequest;
-			delete addNSRequest;
-			delete updPreselRequest;
-			delete updateAllDisplayRequest;
-			delete rmPreselRequest;
-			delete addDisplayRequest;
-			delete rmPhysicalRequest;
 		}
 
-		void DisplayAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void DisplayAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
+			ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
 			if (it == map.end())
 				throw AdminParametersException("Display screen not specified");
 			

@@ -22,11 +22,14 @@
 
 #include <map>
 
-#include "01_util/Html.h"
+#include "05_html/SearchFormHTMLTable.h"
+#include "05_html/ResultHTMLTable.h"
 
 #include "15_env/ConnectionPlace.h"
 #include "15_env/City.h"
 #include "15_env/EnvModule.h"
+
+#include "30_server/FunctionRequest.h"
 
 #include "34_departures_table/BroadcastPointsAdmin.h"
 #include "34_departures_table/BroadcastPointAdmin.h"
@@ -39,6 +42,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace env;
+	using namespace html;
 
 	namespace departurestable
 	{
@@ -54,9 +58,9 @@ namespace synthese
 			, _displayNumber(WITH_OR_WITHOU_ANY_BROADCASTPOINT), _number(50), _first(0)
 		{}
 
-		void BroadcastPointsAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void BroadcastPointsAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it = map.find(PARAMETER_CITY_NAME);
+			ParametersMap::const_iterator it = map.find(PARAMETER_CITY_NAME);
 			if (it != map.end())
 				_cityName = it->second;
 
@@ -89,69 +93,53 @@ namespace synthese
 			return "Points de diffusion";
 		}
 
-		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			AdminRequest* goRequest = Factory<Request>::create<AdminRequest>();
-			goRequest->copy(request);
-			goRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
+			FunctionRequest<AdminRequest> goRequest(request);
+			goRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
 
-			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
-			searchRequest->copy(request);
-			searchRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointsAdmin>());
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointsAdmin>());
 
 			map<int, string> m;
 			m.insert(make_pair((int) WITH_OR_WITHOU_ANY_BROADCASTPOINT, "(filtre désactivé)"));
 			m.insert(make_pair((int) AT_LEAST_ONE_BROADCASTPOINT, "Au moins un"));
 			m.insert(make_pair((int) NO_BROADCASTPOINT, "Aucun"));
 
-			stream
-				<< "<h1>Recherche</h1>"
-				<< searchRequest->getHTMLFormHeader("search")
-				<< "<table>"
-				<< "<tr><td>Commune</td><td>" << Html::getTextInput(PARAMETER_CITY_NAME, _cityName) << "</td>"
-				<< "<td>Nom</td><td>" << Html::getTextInput(PARAMETER_PLACE_NAME, _placeName) << "</td>"
-				<< "<td>Terminaux d'affichage</td><td>" << Html::getSelectInput(PARAMETER_DISPLAY_NUMBER, m, (int) _displayNumber) << "</td></tr>"
-				<< "<tr><td>Ligne</td><td>" 
-				<< Html::getSelectInput(PARAMETER_LINE_ID, EnvModule::getCommercialLineLabels(true), _lineUId) << "</td>"	// Lines list
-				<< "<td colspan=\"4\">" << Html::getSubmitButton("Rechercher") << "</td></tr>"
-				<< "</table></form>"
+			stream << "<h1>Recherche</h1>";
 
-				<< "<h1>Résultats de la recherche</h1>"
-				<< "<table>"
-				<< "<tr><th>Commune</th><th>Nom zone d'arrêt</th><th>Afficheurs</th><th>Actions</th></tr>";
+			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
+			stream << st.open();
+			stream << st.cell("Commune", st.getForm().getTextInput(PARAMETER_CITY_NAME, _cityName));
+			stream << st.cell("Nom", st.getForm().getTextInput(PARAMETER_PLACE_NAME, _placeName));
+			stream << st.cell("Terminaux d'affichage", st.getForm().getSelectInput(PARAMETER_DISPLAY_NUMBER, m, (int) _displayNumber));
+			stream << st.cell("Ligne", st.getForm().getSelectInput(PARAMETER_LINE_ID, EnvModule::getCommercialLineLabels(true), _lineUId));
+			stream << st.close();
+
+			stream << "<h1>Résultats de la recherche</h1>";
+
+			ResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(PARAMETER_CITY_NAME, "Commune"));
+			h.push_back(make_pair(PARAMETER_PLACE_NAME, "Nom zone d'arrêt"));
+			h.push_back(make_pair(PARAMETER_DISPLAY_NUMBER, "Afficheurs"));
+			h.push_back(make_pair(string(), "Actions"));
+			ResultHTMLTable t(h,searchRequest.getHTMLForm(),string(),false);
+
+			stream << t.open();
 
 
 			for (vector<ConnectionPlaceWithBroadcastPoint>::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
 			{
-				goRequest->setObjectId(it->place->getKey());
-				stream
-					<< "<tr><td>" << it->place->getCity()->getName() << "</td>"
-					<< "<td>" << it->place->getName() << "</td>"
-					<< "<td>" << it->broadCastPointsNumber << "</td>"
-					<< "<td>"
-					<< goRequest->getHTMLFormHeader(Conversion::ToString(it->place->getKey()))
-					<< Html::getSubmitButton("Editer") 
-					<< "</form></td>"
-					<< "</tr>";
+				goRequest.setObjectId(it->place->getKey());
+				stream << t.row();
+				stream << t.col() << it->place->getCity()->getName();
+				stream << t.col() << it->place->getName();
+				stream << t.col() << it->broadCastPointsNumber;
+				
+				HTMLForm gf(goRequest.getHTMLForm());
+				stream << t.col() << gf.getLinkButton("Editer");
 			}
-			stream
-				<< "</table>"
-				<< "<table style=\"border:none\"><tr><td>";
-			if (_first > 0)
-			{
-				searchRequest->setParameter(PARAMETER_FIRST, Conversion::ToString((_first > _number) ? _first - _number : 0));
-				stream << searchRequest->getHTMLLink("Emplacements précédents");
-			}
-			stream << "</td><td style=\"text-align:right\">";
-			if (_searchResult.size() >= _number)
-			{
-				searchRequest->setParameter(PARAMETER_FIRST, Conversion::ToString(_first + _number));
-				stream << searchRequest->getHTMLLink("Emplacements suivants");
-			}
-			stream << "</td></tr></table>";
-
-			delete goRequest;
-			delete searchRequest;
+			stream << t.close();
 		}
 
 		BroadcastPointsAdmin::~BroadcastPointsAdmin()

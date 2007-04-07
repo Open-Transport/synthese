@@ -20,17 +20,24 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#include "05_html/HTMLTable.h"
+#include "05_html/HTMLForm.h"
+
+#include "30_server/ActionFunctionRequest.h"
+
 #include "32_admin/AdminRequest.h"
 
 #include "71_vinci_bike_rental/VinciBike.h"
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
 #include "71_vinci_bike_rental/VinciBikeAdminInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciUpdateBikeAction.h"
 
 namespace synthese
 {
 	using namespace server;
 	using namespace admin;
 	using namespace util;
+	using namespace html;
 
 	namespace vinci
 	{
@@ -43,35 +50,37 @@ namespace synthese
 			return "Vélo " + _bike->getNumber();
 		}
 
-		void VinciBikeAdminInterfaceElement::display(std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request /*= NULL*/ ) const
+		void VinciBikeAdminInterfaceElement::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request /*= NULL*/ ) const
 		{
 			// Update bike request
-			AdminRequest* updateBikeRequest = Factory<Request>::create<AdminRequest>();
-			updateBikeRequest->copy(request);
-			updateBikeRequest->setPage(Factory<AdminInterfaceElement>::create<VinciBikeAdminInterfaceElement>());
-
+			ActionFunctionRequest<VinciUpdateBikeAction, AdminRequest> updateBikeRequest(request);
+			updateBikeRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciBikeAdminInterfaceElement>());
+			
 			// Display of data board
-			stream
-				<< "<h1>Données</h1>"
-				<< updateBikeRequest->getHTMLFormHeader("update")
-				<< "<table>"
-				<< "<tr><td>Numéro :</td><td><input value=\"" << _bike->getNumber() << "\" /></td></tr>"
-				<< "<tr><td>Cadre :</td><td><input value=\"" << _bike->getMarkedNumber() << "\" /></td></tr>"
-				<< "</table></form>"
-				;
+			stream << "<h1>Données</h1>";
+			HTMLForm form(updateBikeRequest.getHTMLForm("update"));
+			form.addHiddenField(VinciUpdateBikeAction::PARAMETER_BIKE_ID, Conversion::ToString(_bike->getKey()));
+			stream << form.open();
+			HTMLTable t;
+			stream << t.open();
+			stream << t.row();
+			stream << t.col() << "Numéro";
+			stream << t.col() << form.getTextInput(VinciUpdateBikeAction::PARAMETER_NUMBER, _bike->getNumber());
+			stream << t.row();
+			stream << t.col() << "Cadre";
+			stream << t.col() << form.getTextInput(VinciUpdateBikeAction::PARAMETER_MARKED_NUMBER, _bike->getMarkedNumber());
+			stream << t.row();
+			stream << t.col(2) << form.getSubmitButton("Enregistrer");
+			stream << t.close();
+			stream << form.close();
 
 			// Display of history
-			stream
-				<< "<h1>Historique</h1>"
-				;
-
-			// Cleaning
-			delete updateBikeRequest;
+			stream << "<h1>Historique</h1>";
 		}
 
-		void VinciBikeAdminInterfaceElement::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void VinciBikeAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
+			ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
 			if (it != map.end())
 				_bike = VinciBikeTableSync::get(Conversion::ToLongLong(it->second));
 		}

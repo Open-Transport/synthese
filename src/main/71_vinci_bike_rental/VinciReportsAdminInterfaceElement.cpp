@@ -21,12 +21,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "05_html/SearchFormHTMLTable.h"
+#include "05_html/ResultHTMLTable.h"
+
 #include "04_time/Date.h"
 
 #include "32_admin/AdminRequest.h"
 
-#include "VinciReportsAdminInterfaceElement.h"
-#include "VinciBikeRentalModule.h"
+#include "71_vinci_bike_rental/VinciReportsAdminInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
+#include "71_vinci_bike_rental/VinciRate.h"
+#include "71_vinci_bike_rental/VinciRateTableSync.h"
 
 #include "57_accounting/TransactionPartTableSync.h"
 
@@ -39,6 +44,7 @@ namespace synthese
 	using namespace server;
 	using namespace time;
 	using namespace accounts;
+	using namespace html;
 
 	namespace vinci
 	{
@@ -53,43 +59,78 @@ namespace synthese
 			return "Etats journaliers";
 		}
 
-		void VinciReportsAdminInterfaceElement::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void VinciReportsAdminInterfaceElement::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			// Report Launch request
-			AdminRequest* reportRequest = Factory<Request>::create<AdminRequest>();
-			reportRequest->copy(request);
-			reportRequest->setPage(Factory<AdminInterfaceElement>::create<VinciReportsAdminInterfaceElement>());
-			
-			stream
-				<< reportRequest->getHTMLFormHeader("report")
-				<< "<table>"
-				<< "<tr><td>Date début (AAAA/MM/JJ)</td><td><input name=\"" << PARAM_START_DATE << "\" ";
-			if (!_startDate.isUnknown())
-				stream << " value=\"" << _startDate.toString() << "\"";
-			stream << " /></td></tr>"
-				<< "<tr><td>Date fin (AAAA/MM/JJ)</td><td><input name=\"" << PARAM_END_DATE << "\" ";
-			if (!_endDate.isUnknown())
-				stream << " value=\"" << _endDate.toString() << "\"";
-			stream << "	/></td></tr>"
-				<< "<tr><td>Nombre de locations</td><td></td></tr>"
-				<< "<tr><td>Nombre de validations</td><td></td></tr>"
-				<< "<tr><td>Encaissements effectués</td><td></td></tr>"
-				<< "<tr><td>tri par tarif</td><td></td></tr>"
-				<< "</table>"
-				<< "<input type=\"submit\" value=\"OK\" /></form>"
-				<< "<table>"
-				;
-			for(std::map<time::Date, RentReportResult>::const_iterator it = _resultsPerDay.begin();
-				it != _resultsPerDay.end(); ++it)
+			FunctionRequest<AdminRequest> reportRequest(request);
+			reportRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciReportsAdminInterfaceElement>());
+		
+			// Search form
+			stream << "<h1>Dates de l'état journalier</h1>";
+			SearchFormHTMLTable t(reportRequest.getHTMLForm("search"));
+			stream << t.open();
+			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAM_START_DATE, _startDate));
+			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAM_END_DATE, _endDate));
+			stream << t.close();
+
+			// Rents per day
+			if (!_resultsPerDay.empty())
 			{
-				stream << "<tr><td>" << it->first.toString() << "</td><td>" << it->second.starts << "</td></tr>";
+				stream << "<h1>Trafic journalier</h1>";
+				ResultHTMLTable::HeaderVector h1;
+				h1.push_back(make_pair(string(), "Date"));
+				h1.push_back(make_pair(string(), "Départs"));
+				h1.push_back(make_pair(string(), "Retours"));
+				ResultHTMLTable v1(h1, t.getForm(), string(), false);
+				stream << v1.open();
+
+				for(std::map<time::Date, RentReportResult>::const_iterator it = _resultsPerDay.begin();
+					it != _resultsPerDay.end(); ++it)
+				{
+					stream << v1.row();
+					stream << v1.col() << it->first.toString();
+					stream << v1.col() << it->second.starts;
+					stream << v1.col() << it->second.ends;
+				}
+				stream << v1.close();
 			}
-			stream << "</table>";
+
+			// Rents par rate
+			if (!_resultsPerRate.empty())
+			{
+				stream << "<h1>Trafic par tarif</h1>";
+				ResultHTMLTable::HeaderVector h2;
+				h2.push_back(make_pair(string(), "Tarif"));
+				h2.push_back(make_pair(string(), "Départs"));
+				h2.push_back(make_pair(string(), "Retours"));
+				ResultHTMLTable v2(h2, t.getForm(), string(), false);
+				stream << v2.open();
+
+				for(std::map<uid, RentReportResult>::const_iterator it2 = _resultsPerRate.begin();
+					it2 != _resultsPerRate.end(); ++it2)
+				{
+					VinciRate* rate = NULL;
+					try
+					{
+						rate = VinciRateTableSync::get(it2->first);
+					}
+					catch (...)
+					{
+						rate=NULL;
+					}
+
+					stream << v2.row();
+					stream << v2.col() << (rate ? rate->getName() : "inconnu");
+					stream << v2.col() << it2->second.starts;
+					stream << v2.col() << it2->second.ends;
+				}
+				stream << v2.close();
+			}
 		}
 
-		void VinciReportsAdminInterfaceElement::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void VinciReportsAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it;
+			ParametersMap::const_iterator it;
 			it = map.find(PARAM_START_DATE);
 			if (it != map.end())
 				_startDate = Date::FromString(it->second);
@@ -98,8 +139,8 @@ namespace synthese
 				_endDate = Date::FromString(it->second);
             if (!_startDate.isUnknown() && !_endDate.isUnknown())
 			{
-				_results = TransactionPartTableSync::count(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), _startDate, _endDate);
 				_resultsPerDay = getRentsPerDay(_startDate, _endDate);
+				_resultsPerRate = getRentsPerRate(_startDate, _endDate);
 			}
 		}
 	}

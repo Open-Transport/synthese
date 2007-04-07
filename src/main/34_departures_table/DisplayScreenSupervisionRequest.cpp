@@ -38,28 +38,26 @@ namespace synthese
 	namespace departurestable
 	{
 		const std::string DisplayScreenSupervisionRequest::PARAMETER_DISPLAY_SCREEN_ID = "tb";
-		const std::string DisplayScreenSupervisionRequest::PARAMETER_TEXT = "sv";
-		const std::string DisplayScreenSupervisionRequest::PARAMETER_LEVEL = "ss";
+		const std::string DisplayScreenSupervisionRequest::PARAMETER_STATUS = "status";
 		
 		DisplayScreenSupervisionRequest::DisplayScreenSupervisionRequest()
-			: Request()
+			: Function()
 			, _displayScreen(NULL)
 		{}
 
-		Request::ParametersMap DisplayScreenSupervisionRequest::getParametersMap() const
+		ParametersMap DisplayScreenSupervisionRequest::_getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_DISPLAY_SCREEN_ID, Conversion::ToString(_displayScreen->getKey())));
-			map.insert(make_pair(PARAMETER_TEXT, _text));
-			map.insert(make_pair(PARAMETER_LEVEL, Conversion::ToString((int) _level)));
+			map.insert(make_pair(PARAMETER_STATUS, _text));
 			return map;
 		}
 
-		void DisplayScreenSupervisionRequest::setFromParametersMap(const Request::ParametersMap& map)
+		void DisplayScreenSupervisionRequest::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::const_iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_DISPLAY_SCREEN_ID);
 				if (it == map.end())
@@ -68,15 +66,10 @@ namespace synthese
 					throw RequestException("Display screen " + it->second + " not found");
 				_displayScreen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
 			
-				it = map.find(PARAMETER_TEXT);
+				it = map.find(PARAMETER_STATUS);
 				if (it == map.end())
 					throw RequestException("Log text not specified");
 				_text = it->second;
-
-				it = map.find(PARAMETER_LEVEL);
-				if (it == map.end())
-					throw RequestException("Log level not specified");
-				_level = (DBLogEntry::Level) Conversion::ToInt(it->second);
 			}
 			catch (...)
 			{
@@ -84,10 +77,10 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenSupervisionRequest::run( std::ostream& stream ) const
+		void DisplayScreenSupervisionRequest::_run( std::ostream& stream ) const
 		{
 			if (_displayScreen != NULL)
-				_displayScreen->recordSupervision(_level, _text);
+				_displayScreen->recordSupervision(_text);
 		}
 
 		DisplayScreenSupervisionRequest::~DisplayScreenSupervisionRequest()

@@ -21,6 +21,7 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "12_security/UserUpdateAction.h"
 #include "12_security/UserTableSync.h"
@@ -51,20 +52,20 @@ namespace synthese
 		const std::string UserUpdateAction::PARAMETER_PROFILE_ID = Action_PARAMETER_PREFIX + "prof";
 
 
-		Request::ParametersMap UserUpdateAction::getParametersMap() const
+		ParametersMap UserUpdateAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void UserUpdateAction::setFromParametersMap(Request::ParametersMap& map)
+		void UserUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_user = UserTableSync::get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_LOGIN);
 				if (it == map.end())
@@ -73,13 +74,11 @@ namespace synthese
 				if (_login.empty())
 					throw ActionException("Le login ne peut être vide");
 				// Put a control of unicity
-				map.erase(it);
 
 				it = map.find(PARAMETER_SURNAME);
 				if (it == map.end())
 					throw ActionException("Prénom non spécifié");
 				_surname = it->second;
-				map.erase(it);
 
 				it = map.find(PARAMETER_NAME);
 				if (it == map.end())
@@ -87,49 +86,41 @@ namespace synthese
 				_name = it->second;
 				if (_name == "")
 					throw ActionException("Le nom de l'utilisateur ne peut être vide");
-				map.erase(it);
 
 				it = map.find(PARAMETER_ADDRESS);
 				if (it == map.end())
 					throw ActionException("Adress not specified");
 				_address = it->second;
-				map.erase(it);
 
 				it = map.find(PARAMETER_POSTAL_CODE);
 				if (it == map.end())
 					throw ActionException("Post code not specified");
 				_postalCode = it->second;
-				map.erase(it);
 
 				it = map.find(PARAMETER_PHONE);
 				if (it == map.end())
 					throw ActionException("Phone not specified");
 				_phone = it->second;
-				map.erase(it);
 
 				it = map.find(PARAMETER_CITY);
 				if (it == map.end())
 					throw ActionException("City not specified");
 				_city = it->second;
-				map.erase(it);
 
 				it = map.find(PARAMETER_EMAIL);
 				if (it == map.end())
 					throw ActionException("E-Mail not specified");
 				_email = it->second;
-				map.erase(it);
 
 				it = map.find(PARAMETER_AUTHORIZED_LOGIN);
 				if (it == map.end())
 					throw ActionException("Authorized login not specified");
 				_authorizedLogin = Conversion::ToBool(it->second);
-				map.erase(it);
 
 				it = map.find(PARAMETER_PROFILE_ID);
 				if (it == map.end())
 					throw ActionException("Profile not specified");
 				_profile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
-				map.erase(it);
 			}
 			catch (Profile::RegistryKeyException e)
 			{

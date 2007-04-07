@@ -24,6 +24,7 @@
 #include "15_env/PhysicalStop.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "34_departures_table/DisplayScreenRemovePhysicalStopAction.h"
 #include "34_departures_table/DisplayScreen.h"
@@ -43,20 +44,20 @@ namespace synthese
 		const string DisplayScreenRemovePhysicalStopAction::PARAMETER_PHYSICAL = Action_PARAMETER_PREFIX + "phy";
 
 
-		Request::ParametersMap DisplayScreenRemovePhysicalStopAction::getParametersMap() const
+		ParametersMap DisplayScreenRemovePhysicalStopAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void DisplayScreenRemovePhysicalStopAction::setFromParametersMap(Request::ParametersMap& map)
+		void DisplayScreenRemovePhysicalStopAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_screen = DeparturesTableModule::getDisplayScreens().get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_PHYSICAL);
 				if (it == map.end())

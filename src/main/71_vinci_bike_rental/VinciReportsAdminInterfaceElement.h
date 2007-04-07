@@ -41,11 +41,7 @@ namespace synthese
 			static const std::string PARAM_END_DATE;
 
 			std::map<time::Date, RentReportResult> _resultsPerDay;
-			std::map<int, int> _rentsByDay;
-			std::map<int, int> _returnsByDay;
-			std::map<int, int> _renewByDay;
-			std::map<int, int> _rentsByFareDay;
-			std::map<int, int> _results;
+			std::map<uid, RentReportResult> _resultsPerRate;
 			time::Date _startDate;
 			time::Date _endDate;
 
@@ -54,9 +50,9 @@ namespace synthese
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
-			void setFromParametersMap(const admin::AdminRequest::ParametersMap& map);
+			void setFromParametersMap(const server::ParametersMap& map);
 			std::string getTitle() const;
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const admin::AdminRequest* request = NULL) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request = NULL) const;
 		};
 	}
 }

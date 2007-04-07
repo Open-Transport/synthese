@@ -27,6 +27,7 @@
 
 #include "30_server/ActionException.h"
 #include "30_server/Session.h"
+#include "30_server/Request.h"
 #include "30_server/ServerModule.h"
 #include "30_server/LoginAction.h"
 
@@ -36,28 +37,26 @@ namespace synthese
 
 	namespace server
 	{
-		const std::string LoginAction::PARAMETER_LOGIN = "login";
-		const std::string LoginAction::PARAMETER_PASSWORD = "pwd";
+		const std::string LoginAction::PARAMETER_LOGIN = Action_PARAMETER_PREFIX + "login";
+		const std::string LoginAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "pwd";
 
-		server::Request::ParametersMap LoginAction::getParametersMap() const
+		ParametersMap LoginAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			return map;
 		}
 
-		void LoginAction::setFromParametersMap(Request::ParametersMap& map )
+		void LoginAction::_setFromParametersMap(const ParametersMap& map )
 		{
-			Request::ParametersMap::iterator it = map.find(Action_PARAMETER_PREFIX + PARAMETER_LOGIN);
+			ParametersMap::const_iterator it = map.find(PARAMETER_LOGIN);
 			if (it == map.end())
 				throw ActionException("Login field not found");
 			_login = it->second;
-			map.erase(it);
 
-			it = map.find(Action_PARAMETER_PREFIX + PARAMETER_PASSWORD);
+			it = map.find(PARAMETER_PASSWORD);
 			if (it == map.end())
 				throw ActionException("Password field not found");
 			_password = it->second;
-			map.erase(it);
 		}
 
 		void LoginAction::run()
@@ -86,6 +85,11 @@ namespace synthese
 			{
 				throw ActionException("Mot de passe erroné");
 			}
+		}
+
+		bool LoginAction::_beforeSessionControl() const
+		{
+			return true;
 		}
 	}
 }

@@ -21,6 +21,7 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "17_messages/NewScenarioSendAction.h"
 #include "17_messages/Scenario.h"
@@ -40,18 +41,18 @@ namespace synthese
 		const string NewScenarioSendAction::PARAMETER_TEMPLATE = Action_PARAMETER_PREFIX + "tpl";
 
 
-		Request::ParametersMap NewScenarioSendAction::getParametersMap() const
+		ParametersMap NewScenarioSendAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void NewScenarioSendAction::setFromParametersMap(Request::ParametersMap& map)
+		void NewScenarioSendAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_TEMPLATE);
 				if (it == map.end())
@@ -59,7 +60,7 @@ namespace synthese
 
 				_template = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
 				
-				map.insert(make_pair(Request::PARAMETER_OBJECT_ID, Conversion::ToString(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)));
+				_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 			}
 			catch (Scenario::RegistryKeyException e)
 			{

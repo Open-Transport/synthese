@@ -44,12 +44,12 @@ namespace synthese
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			server::Request::ParametersMap getParametersMap() const;
+			server::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 			Removes the used parameters from the map.
 			*/
-			void setFromParametersMap(server::Request::ParametersMap& map);
+			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
 			DelUserAction();

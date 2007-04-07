@@ -20,19 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "LogoutAction.h"
+#include "30_server/LogoutAction.h"
+#include "30_server/Request.h"
 
 namespace synthese
 {
 	namespace server
 	{
-		server::Request::ParametersMap LogoutAction::getParametersMap() const
+		ParametersMap LogoutAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			return map;
 		}
 
-		void LogoutAction::setFromParametersMap( server::Request::ParametersMap& map )
+		void LogoutAction::_setFromParametersMap(const ParametersMap& map )
 		{
 
 		}
@@ -40,6 +41,11 @@ namespace synthese
 		void LogoutAction::run()
 		{
 			_request->deleteSession();
+		}
+
+		bool LogoutAction::_beforeSessionControl() const
+		{
+			return true;
 		}
 	}
 }

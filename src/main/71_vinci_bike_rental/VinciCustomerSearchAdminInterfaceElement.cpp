@@ -21,9 +21,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Html.h"
+#include "05_html/SearchFormHTMLTable.h"
+#include "05_html/ActionResultHTMLTable.h"
 
 #include "12_security/User.h"
+
+#include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminRequest.h"
 
@@ -34,6 +37,7 @@
 #include "71_vinci_bike_rental/VinciCustomerSearchAdminInterfaceElement.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -41,6 +45,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
+	using namespace html;
 
 	namespace vinci
 	{
@@ -55,68 +60,64 @@ namespace synthese
 			return "Clients";
 		}
 
-		void VinciCustomerSearchAdminInterfaceElement::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void VinciCustomerSearchAdminInterfaceElement::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			// Search request
-			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
-			searchRequest->copy(request);
-			searchRequest->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerSearchAdminInterfaceElement>());
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerSearchAdminInterfaceElement>());
 
 			// Add contract request
-			AdminRequest* addContractRequest = Factory<Request>::create<AdminRequest>();
-			addContractRequest->copy(request);
-			addContractRequest->setAction(Factory<Action>::create<AddCustomerAction>());
-			addContractRequest->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
+			ActionFunctionRequest<AddCustomerAction,AdminRequest> addContractRequest(request);
+			addContractRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
 
 			// View contract request
-			AdminRequest* contractRequest = Factory<Request>::create<AdminRequest>();
-			contractRequest->copy(request);
-			contractRequest->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
+			FunctionRequest<AdminRequest> contractRequest(request);
+			contractRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
 
-			stream
-				<< searchRequest->getHTMLFormHeader("search")
-				<< "<h1>Recherche de client</h1>"
-				<< "Nom : " << Html::getTextInput(PARAM_SEARCH_NAME, _searchName)
-				<< "Prénom : " << Html::getTextInput(PARAM_SEARCH_SURNAME, _searchSurname)
-				<< Html::getSubmitButton("Rechercher")
-				<< "</form>"
-				;
+			stream << "<h1>Recherche de client</h1>";
+			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
+			stream << st.open();
+			stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
+			stream << st.cell("Prénom", st.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname));
+			stream << st.close();
 
 			if (_activeSearch)
 			{
-				stream
-					<< "<h1>Résultat de la recherche</h1>"
-					<< addContractRequest->getHTMLFormHeader("add")
-					<< "<table><tr><th>id</th><th>Nom</th><th>Prénom</th></tr>"
-					;
+				stream << "<h1>Résultat de la recherche</h1>";
+
+				ActionResultHTMLTable::HeaderVector h;
+				h.push_back(make_pair(string(), "ID"));
+				h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
+				h.push_back(make_pair(PARAM_SEARCH_SURNAME, "Prénom"));
+				ActionResultHTMLTable t(h, st.getForm(), string(), true, addContractRequest.getHTMLForm("add"));
+				stream << t.open();
 				if (_contracts.size() == 0)
-					stream << "<tr><td colspan=\"2\">Aucun contrat trouvé</td></tr>";
+				{
+					stream << t.row();
+					stream << t.col(3) << "Aucun contrat trouvé";
+				}
 				else
 				{
 					for (vector<VinciContract*>::const_iterator it = _contracts.begin(); it != _contracts.end(); ++it)
 					{
-						contractRequest->setObjectId((*it)->getKey());
-						stream
-							<< "<tr>"
-							<< "<td>" << contractRequest->getHTMLLink(Conversion::ToString((*it)->getKey())) << "</td>"
-							<< "<td>" << contractRequest->getHTMLLink((*it)->getUser()->getName()) << "</td>"
-							<< "<td>" << contractRequest->getHTMLLink((*it)->getUser()->getSurname()) << "</td>"
-							<< "</tr>";
+						contractRequest.setObjectId((*it)->getKey());
+						stream << t.row();
+						stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), Conversion::ToString((*it)->getKey()));
+						stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), (*it)->getUser()->getName());
+						stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), (*it)->getUser()->getSurname());
 					}
 				}
-				stream << "<tr>"
-					<< "<td>" << Html::getSubmitButton("Nouveau") << "</td>"
-					<< "<td>" << Html::getTextInput(AddCustomerAction::PARAMETER_NAME, _searchName) << "</td>"
-					<< "<td>" << Html::getTextInput(AddCustomerAction::PARAMETER_SURNAME, _searchSurname) << "</td>"
-					<< "</tr>"
-					<< "</table></form>"
-					;
+				stream << t.row();
+				stream << t.col() << t.getActionForm().getSubmitButton("Nouveau");
+				stream << t.col() << t.getActionForm().getTextInput(AddCustomerAction::PARAMETER_NAME, _searchName);
+				stream << t.col() << t.getActionForm().getTextInput(AddCustomerAction::PARAMETER_SURNAME, _searchSurname);
+				stream << t.close();
 			}
 		}
 
-		void VinciCustomerSearchAdminInterfaceElement::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void VinciCustomerSearchAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
-			server::Request::ParametersMap::const_iterator it = map.find(PARAM_SEARCH_SURNAME);
+			ParametersMap::const_iterator it = map.find(PARAM_SEARCH_SURNAME);
 			if (it != map.end())
 				_searchSurname = it->second;
 
@@ -124,8 +125,10 @@ namespace synthese
 			if (it != map.end())
 				_searchName = it->second;
 
-			_contracts = VinciContractTableSync::search(_searchName, _searchSurname);
 			_activeSearch = (_searchSurname != "" || _searchName != "");
+
+			if (_activeSearch)
+				_contracts = VinciContractTableSync::search(_searchName, _searchSurname);
 		}
 
 		VinciCustomerSearchAdminInterfaceElement::~VinciCustomerSearchAdminInterfaceElement()

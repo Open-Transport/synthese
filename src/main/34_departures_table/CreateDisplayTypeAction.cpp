@@ -45,24 +45,23 @@ namespace synthese
 		const string CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "dtc_rows";
 
 
-		Request::ParametersMap CreateDisplayTypeAction::getParametersMap() const
+		ParametersMap CreateDisplayTypeAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_NAME, _name));
 			map.insert(make_pair(PARAMETER_INTERFACE_ID, Conversion::ToString(_interface->getKey())));
 			map.insert(make_pair(PARAMETER_ROWS_NUMBER, Conversion::ToString(_rows_number)));
 			return map;
 		}
 
-		void CreateDisplayTypeAction::setFromParametersMap(Request::ParametersMap& map)
+		void CreateDisplayTypeAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			it = map.find(PARAMETER_NAME);
 			if (it != map.end())
 			{
 				_name = it->second;
-				map.erase(it);
 				if (_name == "")
 					throw ActionException("Name must be non empty");
 			}
@@ -71,7 +70,6 @@ namespace synthese
 			if (it != map.end())
 			{
 				_rows_number = Conversion::ToInt(it->second);
-				map.erase(it);
 			}
 
 			it = map.find(PARAMETER_INTERFACE_ID);
@@ -80,11 +78,9 @@ namespace synthese
 				if (InterfaceModule::getInterfaces().contains(Conversion::ToLongLong(it->second)))
 				{
 					_interface = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(it->second));
-					map.erase(it);
 				}
 				else
 				{
-					map.erase(it);
 					throw ActionException("Interface not found");
 				}
 			}

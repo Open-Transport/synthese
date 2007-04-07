@@ -38,18 +38,18 @@ namespace synthese
 		const string DeleteAlarmAction::PARAMETER_ALARM = Action_PARAMETER_PREFIX + "ala";
 
 
-		Request::ParametersMap DeleteAlarmAction::getParametersMap() const
+		ParametersMap DeleteAlarmAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_ALARM, Conversion::ToString(_alarm->getKey())));
 			return map;
 		}
 
-		void DeleteAlarmAction::setFromParametersMap(Request::ParametersMap& map)
+		void DeleteAlarmAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_ALARM);
 				if (it == map.end())

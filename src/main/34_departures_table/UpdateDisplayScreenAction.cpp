@@ -28,6 +28,7 @@
 #include "15_env/PhysicalStop.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "34_departures_table/UpdateDisplayScreenAction.h"
 #include "34_departures_table/DeparturesTableModule.h"
@@ -59,20 +60,20 @@ namespace synthese
 
 
 
-		Request::ParametersMap UpdateDisplayScreenAction::getParametersMap() const
+		ParametersMap UpdateDisplayScreenAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void UpdateDisplayScreenAction::setFromParametersMap(Request::ParametersMap& map)
+		void UpdateDisplayScreenAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_screen = DisplayScreenTableSync::get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 				
 				it= map.find(PARAMETER_LOCALIZATION_COMMENT);
 				if (it == map.end())

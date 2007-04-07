@@ -45,18 +45,17 @@ namespace synthese
 		const string AlarmAddLinkAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "o";
 
 
-		Request::ParametersMap AlarmAddLinkAction::getParametersMap() const
+		ParametersMap AlarmAddLinkAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_ALARM_ID, _alarm ? Conversion::ToString(_alarm->getKey()) : "0"));
-			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_objectId)));
 			map.insert(make_pair(PARAMETER_RECIPIENT_KEY, _recipientKey));
 			return map;
 		}
 
-		void AlarmAddLinkAction::setFromParametersMap(Request::ParametersMap& map)
+		void AlarmAddLinkAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			// Recipient key
 			it = map.find(PARAMETER_RECIPIENT_KEY);
@@ -65,7 +64,6 @@ namespace synthese
 			if (!Factory<AlarmRecipient>::contains(it->second))
 				throw ActionException("Specified recipient not found");
 			_recipientKey = it->second;
-			map.erase(it);
 
 			// Alarm ID
 			it = map.find(PARAMETER_ALARM_ID);
@@ -74,15 +72,12 @@ namespace synthese
 			if (!MessagesModule::getAlarms().contains(Conversion::ToLongLong(it->second)))
 				throw ActionException("Specified alarm not found");
 			_alarm = MessagesModule::getAlarms().get(Conversion::ToLongLong(it->second));
-			map.erase(it);
 			
 			// Object ID
 			it = map.find(PARAMETER_OBJECT_ID);
 			if (it == map.end())
 				throw ActionException("Object to link not specified");
 			_objectId = Conversion::ToLongLong(it->second);
-			map.erase(it);
-
 		}
 
 		AlarmAddLinkAction::AlarmAddLinkAction()

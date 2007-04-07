@@ -21,6 +21,7 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "17_messages/AddScenarioAction.h"
 #include "17_messages/MessagesModule.h"
@@ -39,39 +40,36 @@ namespace synthese
 		const string AddScenarioAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "n";
 
 
-		Request::ParametersMap AddScenarioAction::getParametersMap() const
+		ParametersMap AddScenarioAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void AddScenarioAction::setFromParametersMap(Request::ParametersMap& map)
+		void AddScenarioAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_TEMPLATE_ID);
 				if (it != map.end())
 				{
 					_template = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_IS_TEMPLATE);
 				if (it == map.end())
 					throw ActionException("Scenario is template not found");
 				_isTemplate = Conversion::ToBool(it->second);
-				map.erase(it);
-
+				
 				if (_isTemplate)
 				{
 					it = map.find(PARAMETER_NAME);
 					if (it == map.end())
 						throw ActionException("Name not found");
 					_name = it->second;
-					map.erase(it);
 					if(_name.empty())
 						throw ActionException("Le scénario doit avoir un nom.");
 					vector<Scenario*> v = ScenarioTableSync::search(_isTemplate, _name, 0, 1);
@@ -85,7 +83,7 @@ namespace synthese
 					throw ActionException("A template must be specified");
 
 				if (map.find(Request::PARAMETER_OBJECT_ID) == map.end())
-					map.insert(make_pair(Request::PARAMETER_OBJECT_ID, Conversion::ToString(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)));
+					_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 			}
 			catch (Scenario::RegistryKeyException e)
 			{

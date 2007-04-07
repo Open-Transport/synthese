@@ -24,6 +24,8 @@
 
 #include "11_interfaces/ValueElementList.h"
 
+#include "30_server/FunctionRequest.h"
+
 #include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminPagesTreeInterfaceElement.h"
 
@@ -44,7 +46,7 @@ namespace synthese
 
 		std::string AdminPagesTreeInterfaceElement::getValue( const ParametersVector&, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
 		{
-			return getSubPages("", (const AdminInterfaceElement*) object, (const AdminRequest*) request);
+			return getSubPages("", (const AdminInterfaceElement*) object, (const server::FunctionRequest<admin::AdminRequest>*) request);
 		}
 
 		AdminPagesTreeInterfaceElement::~AdminPagesTreeInterfaceElement()
@@ -54,7 +56,7 @@ namespace synthese
 		}
 
 		/** @todo Put the html code as parameters */
-		std::string AdminPagesTreeInterfaceElement::getSubPages( const std::string& page, const AdminInterfaceElement* currentPage, const AdminRequest* request)
+		std::string AdminPagesTreeInterfaceElement::getSubPages( const std::string& page, const AdminInterfaceElement* currentPage, const server::FunctionRequest<admin::AdminRequest>* request)
 		{
 			stringstream str;
 			for (Factory<AdminInterfaceElement>::Iterator it = Factory<AdminInterfaceElement>::begin(); it != Factory<AdminInterfaceElement>::end(); ++it)

@@ -25,45 +25,60 @@
 
 #include "01_util/Factorable.h"
 
-#include "30_server/Request.h"
+#include "30_server/Types.h"
 
 #define Action_PARAMETER_PREFIX std::string("actionParam")
-
 
 namespace synthese
 {
 	namespace server
 	{
-		/** Action to run before the display of a function result.
+		class Request;
+
+		/** Action abstract class to run before the display of a function result.
 
 			A factory of actions is handled by 30_server module.
 
+			@ingroup m30
 		*/
 		class Action : public util::Factorable
 		{
-		public:
-			static const std::string PARAMETER_ACTION;
-			
 		protected:
 			Request* _request;
 
-			/** Conversion from generic parameters map to attributes.
-				Removes the used parameters from the map.
-			*/
-			virtual void setFromParametersMap(Request::ParametersMap& map) = 0;
+		private:
 
-		public:
+			/** Indicates if the action must be launched before the session control.
+				@return True if the action must be launched before the session control	
+				@author Hugues Romain
+				@date 2007
+				
+			*/
+			virtual bool _beforeSessionControl() const { return false; }
+
+
+			/** Function to run before the action launch if no session is registered.
+				@return True if the process must be interrupted
+				@author Hugues Romain
+				@date 2007
+				
+			*/
+			virtual bool _runBeforeActionIfNoSession() { return true; }
+
+			/** Conversion from generic parameters map to attributes.
+				@param map Map to analyse
+			*/
+			virtual void _setFromParametersMap(const ParametersMap& map) = 0;
+
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			virtual Request::ParametersMap getParametersMap() const = 0;
+			virtual ParametersMap getParametersMap() const = 0;
 
 			/** Action to run, defined by each subclass.
 			*/
 			virtual void run() = 0;
 
-			/** Action creation from a request.
-			*/
-			static Action* create(Request*request, Request::ParametersMap& params);
+			friend class Request;
 		};
 	}
 }

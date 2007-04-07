@@ -20,7 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Html.h"
+#include "05_html/HTMLForm.h"
+#include "05_html/HTMLTable.h"
+
+#include "13_dblog/DBLogViewer.h"
+
+#include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminParametersException.h"
 
@@ -37,6 +42,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
+	using namespace html;
+	using namespace dblog;
 
 	namespace departurestable
 	{
@@ -45,11 +52,11 @@ namespace synthese
 			, _displayScreen(NULL)
 		{}
 
-		void DisplayMaintenanceAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void DisplayMaintenanceAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				AdminRequest::ParametersMap::const_iterator it = map.find(AdminRequest::PARAMETER_OBJECT_ID);
+				ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
 				if (it == map.end())
 					throw AdminParametersException("Screen not specified");
 
@@ -66,42 +73,88 @@ namespace synthese
 			return "Supervision de " + _displayScreen->getFullName();
 		}
 
-		void DisplayMaintenanceAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void DisplayMaintenanceAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
-			updateRequest->copy(request);
-			updateRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayMaintenanceAdmin>());
-			updateRequest->setAction(Factory<Action>::create<UpdateDisplayMaintenanceAction>());
-			updateRequest->setObjectId(_displayScreen->getKey());
+			ActionFunctionRequest<UpdateDisplayMaintenanceAction,AdminRequest> updateRequest(request);
+			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayMaintenanceAdmin>());
+			updateRequest.setObjectId(_displayScreen->getKey());
 
-			stream
-				<< "<h1>Paramètres de maintenance</h1>"
-				
-				<< updateRequest->getHTMLFormHeader("update")
-				<< "<table>"
-				<< "<tr><td>Nombre de contrôles par jour</td><td>" << Html::getSelectNumberInput(UpdateDisplayMaintenanceAction::PARAMETER_CONTROLS, 0, 1440, _displayScreen->getMaintenananceChecksPerDay(), 10) << "</td></tr>"
-				<< "<tr><td>Afficheur déclaré en service</td><td>" << Html::getOuiNonRadioInput(UpdateDisplayMaintenanceAction::PARAMETER_ONLINE, _displayScreen->getIsOnline()) << "</td></tr>"
-				<< "<tr><td>Message de maintenance</td><td>" << Html::getTextAreaInput(UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE, _displayScreen->getMaintenanceMessage(), 3, 30) << "</td></tr>"
-				<< "<tr><td colspan=\"2\">" << Html::getSubmitButton("Enregistrer les modifications") << "</td></tr>"
-				<< "</table></form>"
+			FunctionRequest<AdminRequest> goToLogRequest(request);
+			goToLogRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DBLogViewer>());
+			goToLogRequest.getFunction()->setParameter(DBLogViewer::PARAMETER_LOG_KEY, "displaymaintenance");
+			goToLogRequest.setObjectId(request->getObjectId());
 
-				<< "<h1>Contrôle de cohérence des données</h1>"
-				<< "<table>"
-				<< "<tr><td>Etat</td><td>" /*pastille* <FONT face=\"Wingdings\" color=\"#00cc00\">
+			stream << "<h1>Paramètres de maintenance</h1>";
+
+			HTMLForm f(updateRequest.getHTMLForm("update"));
+			HTMLTable t;
+			
+			stream << f.open() << t.open();
+
+			stream << t.row();
+			stream << t.col() << "Nombre de contrôles par jour";
+			stream << t.col() << f.getSelectNumberInput(UpdateDisplayMaintenanceAction::PARAMETER_CONTROLS, 0, 1440, _displayScreen->getMaintenananceChecksPerDay(), 10);
+
+			stream << t.row();
+			stream << t.col() << "Afficheur déclaré en service";
+			stream << t.col() << f.getOuiNonRadioInput(UpdateDisplayMaintenanceAction::PARAMETER_ONLINE, _displayScreen->getIsOnline());
+
+			stream << t.row();
+			stream << t.col() << "Message de maintenance";
+			stream << t.col() << f.getTextAreaInput(UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE, _displayScreen->getMaintenanceMessage(), 3, 30);
+
+			stream << t.row();
+			stream << t.col(2) << f.getSubmitButton("Enregistrer les modifications");
+
+			stream << t.close() << f.close();
+
+			stream << "<h1>Contrôle de cohérence des données</h1>";
+			
+			HTMLTable ct;
+			stream << ct.open();
+
+			stream << ct.row();
+			stream << ct.col() << "Etat";
+			stream << ct.col() /* << pastille* <FONT face=\"Wingdings\" color=\"#00cc00\">
 				<FONT color=\"#ff9900\">l<FONT face=\"Verdana\"> <STRONG>Warning </STRONG><EM>(depuis 4j 22h 
-				35min)</EM></FONT></FONT></FONT></P>" */ << "</td></tr>"
-				<< "<tr><td>Motif de l'alerte</td><td>Aucune ligne ne dessert l'afficheur</td></tr>"
-				<< "<tr><td>Date du dernier contrôle positif</td><td>13/9/2006 8:30</td></tr>"
-				<< "</table>"
-				<< "<h1>Contrôle du matériel d'affichage</h1>"
-				<< "<table>"
-				<< "<tr><td>Etat</td><td>" /*^pastille <FONT face=\"Wingdings\"><FONT color=\"#ff0000\">l<FONT face=\"Verdana\">
-				<STRONG>Error </STRONG><EM>(depuis 1j 12h 23min)</EM></FONT></FONT></FONT></P> */ << "</td><tr>"
-				<< "<tr><td>Date du dernier contrôle</td><td>21/09/2006 16:30</td></tr>"
-				<< "<tr><td>Date du dernier contrôle positif : 20/09/2006 15:30</td></tr>"
-				<< "<tr><td>Motif de l'alerte</td><td>Température trop élevée, terminal éteint</td></tr>"
-				<< "<tr><td colspan=\"2\"><a href=\"admin_log_viewer.htm\">Accéder au journal de maintenance de l'afficheur</a></td></tr>"
-				<< "</table>";
+				35min)</EM></FONT></FONT></FONT></P>" */;
+
+			stream << ct.row();
+			stream << ct.col() << "Motif de l'alerte";
+			stream << ct.col() << "Aucune ligne ne dessert l'afficheur";
+
+			stream << ct.row();
+			stream << ct.col() << "Date du dernier contrôle positif";
+			stream << ct.col() << "13/9/2006 8:30";
+
+			stream << ct.close();
+
+			stream << "<h1>Contrôle du matériel d'affichage</h1>";
+
+			HTMLTable mt;
+			stream << mt.open();
+
+			stream << mt.row();
+			stream << mt.col() << "Etat";
+			stream << mt.col() /*<< ^pastille <FONT face=\"Wingdings\"><FONT color=\"#ff0000\">l<FONT face=\"Verdana\">
+				<STRONG>Error </STRONG><EM>(depuis 1j 12h 23min)</EM></FONT></FONT></FONT></P> */;
+
+			stream << mt.row();
+			stream << mt.col() << "Date du dernier contrôle";
+			stream << mt.col() << "21/09/2006 16:30";
+
+			stream << mt.row();
+			stream << mt.col() << "Date du dernier contrôle positif";
+			stream << mt.col() << "20/09/2006 15:30";
+
+			stream << mt.row();
+			stream << mt.col() << "Motif de l'alerte";
+			stream << mt.col() << "Température trop élevée, terminal éteint";
+
+			stream << mt.row();
+			stream << mt.col(2) << HTMLModule::getLinkButton(goToLogRequest.getURL(), "Accéder au journal de maintenance de l'afficheur");
+
+			stream << mt.close();
 		}
 	}
 }

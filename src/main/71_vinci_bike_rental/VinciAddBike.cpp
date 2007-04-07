@@ -21,6 +21,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "30_server/Request.h"
+
 #include "71_vinci_bike_rental/VinciBike.h"
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
 #include "71_vinci_bike_rental/VinciAddBike.h"
@@ -37,30 +39,28 @@ namespace synthese
 		const string VinciAddBike::PARAMETER_MARKED_NUMBER = Action_PARAMETER_PREFIX + "mn";
 
 
-		Request::ParametersMap VinciAddBike::getParametersMap() const
+		ParametersMap VinciAddBike::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_NUMBER, _number));
 			map.insert(make_pair(PARAMETER_MARKED_NUMBER, _marked_number));
 			return map;
 		}
 
-		void VinciAddBike::setFromParametersMap(Request::ParametersMap& map)
+		void VinciAddBike::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			it = map.find(PARAMETER_NUMBER);
 			if (it != map.end())
 			{
 				_number = it->second;
-				map.erase(it);
 			}
 
 			it = map.find(PARAMETER_MARKED_NUMBER);
 			if (it != map.end())
 			{
 				_marked_number = it->second;
-				map.erase(it);
 			}
 		}
 

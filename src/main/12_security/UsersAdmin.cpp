@@ -20,7 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Html.h"
+#include "05_html/SearchFormHTMLTable.h"
+#include "05_html/ActionResultHTMLTable.h"
+#include "05_html/HTMLModule.h"
 
 #include "11_interfaces/InterfaceModule.h"
 
@@ -34,12 +36,12 @@
 #include "12_security/UsersAdmin.h"
 
 #include "30_server/ServerModule.h"
+#include "30_server/ActionFunctionRequest.h"
 
-#include "32_admin/SearchFormHTMLTable.h"
-#include "32_admin/ResultHTMLTable.h"
 #include "32_admin/AdminModule.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -47,6 +49,7 @@ namespace synthese
 	using namespace server;
 	using namespace interfaces;
 	using namespace admin;
+	using namespace html;
 
 	namespace security
 	{
@@ -68,39 +71,33 @@ namespace synthese
 			return "Utilisateurs";
 		}
 
-		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			// Request for search form
-			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
-			searchRequest->copy(request);
-			searchRequest->setPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
-			SearchFormHTMLTable searchTable(searchRequest);
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
+			SearchFormHTMLTable searchTable(searchRequest.getHTMLForm("search"));
 			
 			// Request for add user action form
-			AdminRequest* addUserRequest = Factory<Request>::create<AdminRequest>();
-			addUserRequest->copy(request);
-			addUserRequest->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
-			addUserRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
-			addUserRequest->setAction(Factory<Action>::create<AddUserAction>());
-
+			ActionFunctionRequest<AddUserAction, AdminRequest> addUserRequest(request);
+			addUserRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
+			addUserRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
+			
 			// Request for delete action form
-			AdminRequest* deleteUserRequest = Factory<Request>::create<AdminRequest>();
-			deleteUserRequest->copy(request);
-			deleteUserRequest->setPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
-			deleteUserRequest->setAction(Factory<Action>::create<DelUserAction>());
-
+			ActionFunctionRequest<DelUserAction, AdminRequest> deleteUserRequest(request);
+			deleteUserRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
+			
 			// Request for user link
-			AdminRequest* userRequest = Factory<Request>::create<AdminRequest>();
-			userRequest->copy(request);
-			userRequest->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
+			FunctionRequest<AdminRequest> userRequest(request);
+			userRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
 
 			// Search form
 			stream << "<h1>Recherche d'utilisateur</h1>";
 				
 			stream << searchTable.open();
-			stream << searchTable.cell("Login", Html::getTextInput(PARAM_SEARCH_LOGIN, _searchLogin));
-			stream << searchTable.cell("Nom", Html::getTextInput(PARAM_SEARCH_NAME, _searchName));
-			stream << searchTable.cell("Profil", Html::getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(true), _searchProfileId));
+			stream << searchTable.cell("Login", searchTable.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin));
+			stream << searchTable.cell("Nom", searchTable.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
+			stream << searchTable.cell("Profil", searchTable.getForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(true), _searchProfileId));
 			stream << searchTable.close();
 
 			stream << "<h1>Résultats de la recherche</h1>";
@@ -109,56 +106,39 @@ namespace synthese
 				stream << "Aucun utilisateur trouvé";
 
 
-			ResultHTMLTable::HeaderVector v;
+			ActionResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAM_SEARCH_LOGIN, "Login"));
 			v.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			v.push_back(make_pair(PARAM_SEARCH_PROFILE_ID, "Profil"));
 			v.push_back(make_pair("", "Actions"));
-			ResultHTMLTable t(v, searchRequest, "", true, addUserRequest,"", InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, searchTable.getForm(), "", true, addUserRequest.getHTMLForm("add"),"", InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 
 			for(vector<User*>::const_iterator it = _users.begin(); it != _users.end(); ++it)
 			{
 				User* user = *it;
-				userRequest->setObjectId(user->getKey());
-				deleteUserRequest->setObjectId(user->getKey());
-				stream
-					<< "<tr>"
-					<< "<td>" << userRequest->getHTMLLink(user->getLogin()) << "</td>"
-					<< "<td>" << userRequest->getHTMLLink(user->getName()) << "</td>"
-					<< "<td>" << user->getProfile()->getName() << "</td>"
-					<< "<td>" 
-					<< Html::getLinkButton(userRequest->getURL(), "Editer") << "&nbsp;"
-					<< Html::getLinkButton(deleteUserRequest->getURL(), "Supprimer", "Etes-vous sûr(e) de vouloir supprimer l\\'utilisateur " + user->getLogin() + " ?")
-					<< "</td>"
-					<< "</tr>";
+				userRequest.setObjectId(user->getKey());
+				deleteUserRequest.setObjectId(user->getKey());
+				stream << t.row();
+				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getLogin());
+				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getName());
+				stream << t.col() << user->getProfile()->getName();
+				stream << t.col() << userRequest.getHTMLForm().getLinkButton("Editer") << "&nbsp;"
+					<< deleteUserRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr(e) de vouloir supprimer l\\'utilisateur " + user->getLogin() + " ?");
 			}
 
-			stream
-				<< "<tr>"
-				<< "<td>" << Html::getTextInput(AddUserAction::PARAMETER_LOGIN, "", "Entrez le login ici") << "</td>"
-				<< "<td>" << Html::getTextInput(AddUserAction::PARAMETER_NAME, "", "Entrez le nom ici") << "</td>"
-				<< "<td>" << Html::getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), (uid) 0) << "</td>"
-				<< "<td>" << Html::getSubmitButton("Ajouter") << "</td>"
-                << "</tr>"
-				<< t.close();
-
-			// If too much users
-			if (_nextButton)
-				stream << "<p style=\"text-align:right\">Utilisateurs&nbsp;suivants</p>";
-
-			stream
-				<< "<p>Cliquer sur un titre de colonne pour trier le tableau.</p>";
-
-			delete addUserRequest;
-			delete searchRequest;
-			delete deleteUserRequest;
+			stream << t.row();
+			stream << t.col() << t.getActionForm().getTextInput(AddUserAction::PARAMETER_LOGIN, "", "Entrez le login ici");
+			stream << t.col() << t.getActionForm().getTextInput(AddUserAction::PARAMETER_NAME, "", "Entrez le nom ici");
+			stream << t.col() << t.getActionForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), (uid) 0);
+			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
+			stream << t.close();
 		}
 
-		void UsersAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void UsersAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it;
+			ParametersMap::const_iterator it;
 
 			// Searched login
 			it = map.find(PARAM_SEARCH_LOGIN);

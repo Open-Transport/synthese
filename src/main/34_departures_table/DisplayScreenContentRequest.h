@@ -25,7 +25,7 @@
 
 #include "04_time/DateTime.h"
 
-#include "30_server/Request.h"
+#include "30_server/Function.h"
 
 namespace synthese
 {
@@ -36,7 +36,7 @@ namespace synthese
 		/** DisplayScreenContentRequest class.
 			@ingroup m34
 		*/
-		class DisplayScreenContentRequest : public server::Request
+		class DisplayScreenContentRequest : public server::Function
 		{
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_TB;
@@ -50,21 +50,19 @@ namespace synthese
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			Request::ParametersMap getParametersMap() const;
+			server::ParametersMap _getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 			*/
-			void setFromParametersMap(const Request::ParametersMap& map);
+			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
 			DisplayScreenContentRequest();
 			~DisplayScreenContentRequest();
 
-			std::string getHTMLFormHeader(const std::string& name) const;
-
 			/** Action to run, defined by each subclass.
 			*/
-			void run(std::ostream& stream) const;
+			void _run(std::ostream& stream) const;
 		};
 	}
 }

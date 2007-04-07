@@ -33,7 +33,7 @@ namespace synthese
 		{
 		}
 
-		void HomeAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void HomeAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			stream << "Bienvenue sur le module d'interfaces";
 		}
@@ -43,7 +43,7 @@ namespace synthese
 			return "Accueil";
 		}
 
-		void HomeAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void HomeAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 
 		}

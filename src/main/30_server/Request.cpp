@@ -29,25 +29,30 @@
 #include "01_util/FactoryException.h"
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
-#include "01_util/Html.h"
+
+#include "05_html/HTMLForm.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/ServerModule.h"
 #include "30_server/Session.h"
 #include "30_server/SessionException.h"
 #include "30_server/Action.h"
+#include "30_server/Function.h"
 #include "30_server/RequestException.h"
 #include "30_server/Request.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
 	using namespace util;
+	using namespace html;
 
 	namespace server
 	{
 
+		const std::string Request::PARAMETER_ACTION ("a");
 		const std::string Request::PARAMETER_SEPARATOR ("&");
 		const std::string Request::PARAMETER_STARTER ("?");
 		const std::string Request::PARAMETER_ASSIGNMENT ("=");
@@ -62,30 +67,39 @@ namespace synthese
 		const std::string Request::PARAMETER_ERROR_LEVEL = "rel";
 		const uid Request::UID_WILL_BE_GENERATED_BY_THE_ACTION = -2;
 
-		Request::Request()
+		Request::Request( const Request* request/*=NULL*/, Function* function, Action* action )
 			: _session(NULL)
-			, _action(NULL)
 			, _actionException(false)
 			, _errorLevel(REQUEST_ERROR_NONE)
 			, _object_id(0)
 		{
+			if (action)
+				_setAction(action);
+			if (function)
+				_setFunction(function);
+			if (request)
+			{
+				_clientURL = request->_clientURL;
+				_session = request->_session;
+				if (_function.get())
+					_function->_copy(request->_function.get());
+			}
 		}
 
-		std::string Request::truncateStringIfNeeded (const std::string& requestString)
+		std::string Request::_normalizeQueryString(const std::string& requestString)
 		{
+			if (requestString.empty())
+				return string();
+
 			std::string s (requestString);
 
 			// The + characters are added by the web browsers instead of spaces
 			boost::algorithm::replace_all (s, "+", " ");
 
 			// Deletes the end of line code
-			size_t pos = s.find ("\r");
-			if (pos != string::npos)
-				s = s.substr(0, pos);
-			pos = s.find ("\n");
-			if (pos != string::npos)
-				s = s.substr(0, pos);
-
+			size_t pos(s.size() - 1);
+			for (; pos && (s.substr(pos, 1) == "\r" || s.substr(pos, 1) == "\n"); --pos);
+			s = s.substr(0, pos+1);
 
 			/* ?? what do we do with this code ?
 			if (s.size () > MAX_REQUEST_SIZE) {
@@ -102,149 +116,12 @@ namespace synthese
 			return s;
 		}
 
-		Request* Request::createFromString(const std::string& text )
-		{
-			std::string s (truncateStringIfNeeded (text));
-			ParametersMap map = parseString(s);
-
-			// Function name
-			ParametersMap::iterator it = map.find(PARAMETER_FUNCTION);
-			if (it == map.end())
-				throw RequestException("Function not specified");
-			if (!Factory<Request>::contains(it->second))
-				throw RequestException("Function not found");
-
-			// Request instantiation
-			Request* request;
-			try
-			{
-				request = Factory<Request>::create(it->second);
-			}
-			catch (FactoryException<Request> e)
-			{
-				throw RequestException(e.getMessage());
-			}
-			map.erase(it);
-			
-			// IP
-			it = map.find(PARAMETER_IP);
-			if (it == map.end())
-			{
-				util::Log::GetInstance().warn("Query without IP : a bad client is attempting to connect, or there was an attack.");
-				throw RequestException("Client IP not found in parameters.");
-			}
-			request->_ip = it->second;
-			map.erase(it);
-
-			// Session
-			it = map.find(PARAMETER_SESSION);
-			if (it == map.end())
-			{
-				request->_session = NULL;
-				request->_sessionBroken = false;
-			}
-			else
-			{
-				ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(it->second);
-				if (sit == ServerModule::getSessions().end())
-				{
-					request->_session = NULL;
-					request->_sessionBroken = true;
-				}
-				else
-				{
-					try
-					{
-						sit->second->controlAndRefresh(request->_ip);
-						request->_session = sit->second;
-						request->_sessionBroken = false;
-					}
-					catch (SessionException e)
-					{
-						request->deleteSession();
-						request->_sessionBroken = true;
-					}
-				}
-			}
-
-			// Client URL
-			it = map.find(PARAMETER_CLIENT_URL);
-			if (it != map.end())
-			{
-				request->_clientURL = it->second;
-				map.erase(it);
-			}
-
-			// Object ID
-			it = map.find(PARAMETER_OBJECT_ID);
-			if (it != map.end())
-			{
-				request->_object_id = Conversion::ToLongLong(it->second);
-			}
-
-			// Last action error
-			it = map.find(PARAMETER_ACTION_FAILED);
-			if (it != map.end())
-			{
-				request->_actionException = Conversion::ToBool(it->second);
-				map.erase(it);
-			}
-
-			// Error message
-			it = map.find(PARAMETER_ERROR_MESSAGE);
-			if (it != map.end())
-			{
-				request->_errorMessage = it->second;
-				map.erase(it);
-				request->_errorLevel = REQUEST_ERROR_WARNING;	// Default error level if non empty message
-			}
-
-			// Error level
-			it = map.find(PARAMETER_ERROR_LEVEL);
-			if (it != map.end())
-			{
-				request->_errorLevel = (ErrorLevel) Conversion::ToInt(it->second);
-				map.erase(it);
-			}
-
-			try
-			{
-				// Action
-				request->_action = Action::create(request, map);
-			}
-			catch (ActionException& e)	// Action parameters error
-			{
-				request->_actionException = true;
-				request->_errorLevel = REQUEST_ERROR_WARNING;
-				request->_errorMessage = "Action error : "+ e.getMessage();
-			}
-			request->setFromParametersMap(map);
-
-			return request;
-		}
-
 		std::string Request::getQueryString() const
 		{
-			// Adding function name
-			ParametersMap map = getParametersMap();
-			map.insert(make_pair(PARAMETER_FUNCTION, getFactoryKey()));
-			if (_action != NULL)
-			{
-				map.insert(make_pair(Action::PARAMETER_ACTION, _action->getFactoryKey()));
-				ParametersMap actionMap = _action->getParametersMap();
-				for (ParametersMap::const_iterator it = actionMap.begin(); it != actionMap.end(); ++it)
-				{
-					map.insert(make_pair(Action_PARAMETER_PREFIX + it->first, it->second));
-				}
-			}
-			if (_session != NULL)
-			{
-				map.insert(make_pair(PARAMETER_SESSION, _session->getKey()));
-			}
-
 			// Serialize the parameter lists in a synthese querystring
 			std::stringstream ss;
 
+			ParametersMap map = _getParametersMap();
 			for (ParametersMap::const_iterator iter = map.begin(); 
 				iter != map.end(); 
 				++iter )
@@ -253,22 +130,26 @@ namespace synthese
 				ss << iter->first << PARAMETER_ASSIGNMENT << iter->second;
 			}
 
-			return truncateStringIfNeeded(ss.str());
+			return _normalizeQueryString(ss.str());
 
 		}
 
-		void Request::runActionAndFunction( std::ostream& stream )
+		void Request::run( std::ostream& stream )
 		{
 			// Handle of the action
-			if (_action != NULL)
+			if (_action.get())
 			{
+				if (!_action->_beforeSessionControl()
+					&& _session == NULL && _action->_runBeforeActionIfNoSession())
+						return;
+
 				try
 				{
 					// Run of the action
 					_action->run();
 					
 					// Run after the action
-					if (runAfterAction(stream))	// Overloaded method
+					if (_function->_runAfterSucceededAction(stream))	// Overloaded method
 						return;
 				}
 				catch (ActionException e)	// Action run error
@@ -280,21 +161,17 @@ namespace synthese
 			}
 
 			// No session is active.
-			if ((_session == NULL) && runBeforeDisplayIfNoSession(stream))
+			if (_session == NULL && _function->_runBeforeDisplayIfNoSession(stream))
 				return;
 			
 			// Run the display
-			run(stream);
+			_function->_run(stream);
 		}
 
-		Request::~Request()
+		void Request::_setAction( Action* action )
 		{
-			delete _action;
-		}
-
-		void Request::setAction( Action* action )
-		{
-			_action = action;
+			_action.reset(action);
+			action->_request = this;
 		}
 
 		void Request::deleteSession()
@@ -303,19 +180,6 @@ namespace synthese
 			_session = NULL;
 		}
 
-		void Request::copy( const Request* request )
-		{
-			_clientURL = request->_clientURL;
-			_session = request->_session;
-		}
-
-		std::string Request::getHTMLLink(const std::string& content) const
-		{
-			std::stringstream str;
-			str << "<a href=\"" << getURL() << "\">"
-				<< content << "</a>";
-			return str.str();
-		}
 
 		std::string Request::getURL() const
 		{
@@ -338,7 +202,7 @@ namespace synthese
 			_session = session;
 		}
 
-		Request::ParametersMap Request::parseString( const std::string& text )
+		ParametersMap Request::_parseString( const std::string& text )
 		{
 			ParametersMap map;
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
@@ -360,21 +224,18 @@ namespace synthese
 			return map;
 		}
 
-		std::string Request::getHTMLFormHeader(const std::string& name) const
+		HTMLForm Request::getHTMLForm(std::string name) const
 		{
-			std::stringstream str;
-			str	<< "<form name=\"" << name << "\" action=\"" << _clientURL << "\" method=\"post\">"
-				<< Html::getHiddenInput(PARAMETER_FUNCTION, getFactoryKey());
-			if (_session != NULL)
-				str << Html::getHiddenInput(PARAMETER_SESSION, Conversion::ToString(_session->getKey()));
-			if (_action != NULL)
-				str << Html::getHiddenInput(Action::PARAMETER_ACTION, _action->getFactoryKey());
-			return str.str();
+			HTMLForm form(name, _clientURL);
+			ParametersMap map = _getParametersMap();
+			for (ParametersMap::const_iterator it = map.begin(); it != map.end(); ++it)
+				form.addHiddenField(it->first, it->second);
+			return form;
 		}
 
-		const Action* Request::getAction() const
+		const Action* Request::_getAction() const
 		{
-			return _action;
+			return _action.get();
 		}
 
 
@@ -393,14 +254,196 @@ namespace synthese
 			return _errorMessage;
 		}
 
-		bool Request::runAfterAction(ostream& stream)
+		ParametersMap Request::_getParametersMap() const
 		{
-			return false;
+			ParametersMap map;
+			
+			// Function
+			if (_function.get())
+			{
+				map.insert(make_pair(PARAMETER_FUNCTION, _function->getFactoryKey()));
+				ParametersMap functionMap = _function->_getParametersMap();
+				for (ParametersMap::const_iterator it = functionMap.begin(); it != functionMap.end(); ++it)
+					map.insert(make_pair(it->first, it->second));
+			}
+			
+			// Action name and parameters
+			if (_action != NULL)
+			{
+				map.insert(make_pair(PARAMETER_ACTION, _action->getFactoryKey()));
+				ParametersMap actionMap = _action->getParametersMap();
+				for (ParametersMap::const_iterator it = actionMap.begin(); it != actionMap.end(); ++it)
+					map.insert(make_pair(it->first, it->second));
+			}
+
+			// Session
+			if (_session != NULL)
+				map.insert(make_pair(PARAMETER_SESSION, _session->getKey()));
+
+			// Object ID
+			if (_object_id)
+				map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_object_id)));
+
+			return map;
 		}
 
-		bool Request::runBeforeDisplayIfNoSession( std::ostream& stream )
+		Request::Request(const std::string& text )
+			: _session(NULL)
+			, _actionException(false)
+			, _errorLevel(REQUEST_ERROR_NONE)
+			, _object_id(0)
 		{
-			return false;
+			std::string s (_normalizeQueryString(text));
+			ParametersMap map = _parseString(s);
+
+			// Function name
+			ParametersMap::iterator it = map.find(PARAMETER_FUNCTION);
+			if (it == map.end())
+				throw RequestException("Function not specified");
+			if (!Factory<Function>::contains(it->second))
+				throw RequestException("Function not found");
+			_setFunction(Factory<Function>::create(it->second));
+			
+			// Action name
+			it = map.find(PARAMETER_ACTION);
+			if (it != map.end())
+			{
+				if (!Factory<Action>::contains(it->second))
+					throw RequestException("Action not found");
+				_setAction(Factory<Action>::create(it->second));
+
+				// Action parameters
+				try
+				{
+					_action->_setFromParametersMap(map);
+				}
+				catch (ActionException& e)	// Action parameters error
+				{
+					_actionException = true;
+					_errorLevel = REQUEST_ERROR_WARNING;
+					_errorMessage = "Action error : "+ e.getMessage();
+				}
+			}
+			// IP
+			it = map.find(PARAMETER_IP);
+			if (it == map.end())
+			{
+				util::Log::GetInstance().warn("Query without IP : a bad client is attempting to connect, or there was an attack.");
+				throw RequestException("Client IP not found in parameters.");
+			}
+			_ip = it->second;
+
+			// Session
+			it = map.find(PARAMETER_SESSION);
+			if (it == map.end())
+			{
+				_session = NULL;
+				_sessionBroken = false;
+			}
+			else
+			{
+				ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(it->second);
+				if (sit == ServerModule::getSessions().end())
+				{
+					_session = NULL;
+					_sessionBroken = true;
+				}
+				else
+				{
+					try
+					{
+						sit->second->controlAndRefresh(_ip);
+						_session = sit->second;
+						_sessionBroken = false;
+					}
+					catch (SessionException e)
+					{
+						deleteSession();
+						_sessionBroken = true;
+					}
+				}
+			}
+
+			// Client URL
+			it = map.find(PARAMETER_CLIENT_URL);
+			if (it != map.end())
+			{
+				_clientURL = it->second;
+			}
+
+			// Object ID
+			it = map.find(PARAMETER_OBJECT_ID);
+			if (it != map.end())
+			{
+				_object_id = Conversion::ToLongLong(it->second);
+			}
+
+			// Last action error
+			it = map.find(PARAMETER_ACTION_FAILED);
+			if (it != map.end())
+			{
+				_actionException = Conversion::ToBool(it->second);
+			}
+
+			// Error message
+			it = map.find(PARAMETER_ERROR_MESSAGE);
+			if (it != map.end())
+			{
+				_errorMessage = it->second;
+				_errorLevel = REQUEST_ERROR_WARNING;	// Default error level if non empty message
+			}
+
+			// Error level
+			it = map.find(PARAMETER_ERROR_LEVEL);
+			if (it != map.end())
+			{
+				_errorLevel = (ErrorLevel) Conversion::ToInt(it->second);
+			}
+
+			// Function parameters
+			_function->_setFromParametersMap(map);
+
+		}
+
+		bool Request::getActionException() const
+		{
+			return _actionException;
+		}
+
+		void Request::_setErrorMessage( const std::string& message )
+		{
+			_errorMessage = message;
+		}
+
+		void Request::_setActionException( bool value )
+		{
+			_actionException = value;
+		}
+
+		void Request::_setErrorLevel( const ErrorLevel& level )
+		{
+			_errorLevel = level;
+		}
+
+		void Request::_setFunction( Function* function )
+		{
+			_function.reset(function);
+			function->_request = this;
+		}
+
+		void Request::setClientURL( const std::string& url )
+		{
+			_clientURL = url;
+		}
+
+		Function* Request::_getFunction()
+		{
+			return _function.get();
+		}
+
+		void Request::deleteAction()
+		{
+			_action.reset();
 		}
 	}
 }

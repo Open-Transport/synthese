@@ -23,9 +23,9 @@
 #include <sstream>
 
 #include "01_util/Conversion.h"
-#include "01_util/Html.h"
 
 #include "30_server/RequestException.h"
+#include "30_server/Request.h"
 
 #include "34_departures_table/DisplayScreenContentRequest.h"
 #include "34_departures_table/DisplayScreen.h"
@@ -45,28 +45,27 @@ namespace synthese
 		const std::string DisplayScreenContentRequest::PARAMETER_TB = "tb";
 
 		DisplayScreenContentRequest::DisplayScreenContentRequest()
-			: Request()
+			: Function()
 			, _screen(NULL)
 		{}
 
-		Request::ParametersMap DisplayScreenContentRequest::getParametersMap() const
+		ParametersMap DisplayScreenContentRequest::_getParametersMap() const
 		{
-			Request::ParametersMap map;
-			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_screen ? _screen->getKey() : getObjectId())));
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_DATE, _date.toInternalString()));
 			return map;
 		}
 
-		void DisplayScreenContentRequest::setFromParametersMap(const Request::ParametersMap& map)
+		void DisplayScreenContentRequest::_setFromParametersMap(const ParametersMap& map)
 		{
 			uid screenId = 0;
 			try
 			{
-				Request::ParametersMap::const_iterator it;
+				ParametersMap::const_iterator it;
 				
 				// Screen
-				if (getObjectId())
-					screenId = getObjectId();
+				if (_request->getObjectId())
+					screenId = _request->getObjectId();
 				else
 				{
 					it = map.find(PARAMETER_TB);
@@ -87,22 +86,13 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenContentRequest::run( std::ostream& stream ) const
+		void DisplayScreenContentRequest::_run( std::ostream& stream ) const
 		{
 			_screen->display(stream, _date);
 		}
 
 		DisplayScreenContentRequest::~DisplayScreenContentRequest()
 		{
-		}
-
-		std::string DisplayScreenContentRequest::getHTMLFormHeader( const std::string& name ) const
-		{
-			stringstream s;
-			s << Request::getHTMLFormHeader(name);
-			if (getObjectId())
-				s << Html::getHiddenInput(PARAMETER_OBJECT_ID, Conversion::ToString(getObjectId()));
-			return s.str();
 		}
 	}
 }

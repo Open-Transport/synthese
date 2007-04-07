@@ -43,32 +43,30 @@ namespace synthese
 		const string UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE = Action_PARAMETER_PREFIX + "lm";
 
 
-		Request::ParametersMap UpdateTextTemplateAction::getParametersMap() const
+		ParametersMap UpdateTextTemplateAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void UpdateTextTemplateAction::setFromParametersMap(Request::ParametersMap& map)
+		void UpdateTextTemplateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				// Text ID
 				it = map.find(PARAMETER_TEXT_ID);
 				if (it == map.end())
 					throw ActionException("Text template not specified");
 				_text = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
-				map.erase(it);
-
+				
 				// Name
 				it = map.find(PARAMETER_NAME);
 				if (it == map.end())
 					throw ActionException("Name not specified");
 				_name = it->second;
-				map.erase(it);
 				if (_name.empty())
 					throw ActionException("Le nom ne peut être vide");
 				vector<TextTemplate*> v = TextTemplateTableSync::search(_text->getAlarmLevel(), _name, 0, 1);
@@ -83,15 +81,12 @@ namespace synthese
 				if (it == map.end())
 					throw ActionException("Short message not specified");
 				_shortMessage = it->second;
-				map.erase(it);
-
+				
 				// Long message
 				it = map.find(PARAMETER_LONG_MESSAGE);
 				if (it == map.end())
 					throw ActionException("Long message not specified");
 				_longMessage = it->second;
-				map.erase(it);
-
 			}
 			catch (DBEmptyResultException e)
 			{

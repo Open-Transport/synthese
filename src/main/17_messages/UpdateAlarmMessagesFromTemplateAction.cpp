@@ -28,6 +28,7 @@
 #include "17_messages/MessagesModule.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
@@ -41,9 +42,9 @@ namespace synthese
 		const string UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "tid";
 
 
-		Request::ParametersMap UpdateAlarmMessagesFromTemplateAction::getParametersMap() const
+		ParametersMap UpdateAlarmMessagesFromTemplateAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
@@ -53,20 +54,19 @@ namespace synthese
 			delete _template;
 		}
 
-		void UpdateAlarmMessagesFromTemplateAction::setFromParametersMap(Request::ParametersMap& map)
+		void UpdateAlarmMessagesFromTemplateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_message = MessagesModule::getAlarms().get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_TEMPLATE_ID);
 				if (it == map.end())
 					throw ActionException("Template not specified");
 
 				_template = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
-				map.erase(it);
 			}
 			catch (Alarm::RegistryKeyException e)
 			{

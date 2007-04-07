@@ -59,48 +59,46 @@ namespace synthese
 		const string VinciAddGuaranteeAction::PARAMETER_DATE = Action_PARAMETER_PREFIX + "da";
 
 
-		Request::ParametersMap VinciAddGuaranteeAction::getParametersMap() const
+		ParametersMap VinciAddGuaranteeAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_AMOUNT, Conversion::ToString(_amount)));
-			map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
-			map.insert(make_pair(PARAMETER_ACCOUNT_ID, Conversion::ToString(_account->getKey())));
+			if (_contract)
+				map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
+			if (_account)
+				map.insert(make_pair(PARAMETER_ACCOUNT_ID, Conversion::ToString(_account->getKey())));
 			map.insert(make_pair(PARAMETER_DATE, Conversion::ToString(_date.toString())));
 			return map;
 		}
 
-		void VinciAddGuaranteeAction::setFromParametersMap(Request::ParametersMap& map)
+		void VinciAddGuaranteeAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_AMOUNT);
 				if (it != map.end())
 				{
 					_amount = Conversion::ToDouble(it->second);
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_ACCOUNT_ID);
 				if (it != map.end())
 				{
 					_account = AccountTableSync::get(Conversion::ToLongLong(it->second));
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_CONTRACT_ID);
 				if (it != map.end())
 				{
 					_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
-					map.erase(it);
 				}
 
 				it = map.find(PARAMETER_DATE);
 				if (it != map.end())
 				{
 					_date = DateTime::FromString(it->second);
-					map.erase(it);
 				}
 			}
 			catch (TimeParseException e)

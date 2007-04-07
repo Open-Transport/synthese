@@ -20,9 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Html.h"
+#include "05_html/HTMLForm.h"
 
 #include "11_interfaces/InterfaceModule.h"
+
+#include "30_server/ActionFunctionRequest.h"
 
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DeparturesTableModule.h"
@@ -38,6 +40,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
+	using namespace html;
 
 	namespace departurestable
 	{
@@ -45,7 +48,7 @@ namespace synthese
 		DisplayTypesAdmin::DisplayTypesAdmin()
 			: AdminInterfaceElement("displays", AdminInterfaceElement::EVER_DISPLAYED) {}
 
-		void DisplayTypesAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void DisplayTypesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			/// @todo Initialize internal attributes from the map
 		}
@@ -55,18 +58,14 @@ namespace synthese
 			return "Types d'afficheurs";
 		}
 
-		void DisplayTypesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void DisplayTypesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			AdminRequest* createRequest = Factory<Request>::create<AdminRequest>();
-			createRequest->copy(request);
-			createRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayTypesAdmin>());
-			createRequest->setAction(Factory<Action>::create<CreateDisplayTypeAction>());
-
-			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
-			updateRequest->copy(request);
-			updateRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayTypesAdmin>());
-			updateRequest->setAction(Factory<Action>::create<UpdateDisplayTypeAction>());
-
+			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(request);
+			createRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayTypesAdmin>());
+			
+			ActionFunctionRequest<UpdateDisplayTypeAction,AdminRequest> updateRequest(request);
+			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayTypesAdmin>());
+			
 			stream
 				<< "<h1>Liste des types d'afficheurs disponibles</h1>"
 				<< "<table id=\"searchresult\"><tr><th>Nom</th><th>Interface</th><th>Lignes</th><th>Actions</th></tr>";
@@ -76,27 +75,32 @@ namespace synthese
 			{
 				DisplayType* dt = it->second;
 
+				HTMLForm uf(updateRequest.getHTMLForm("update" + Conversion::ToString(it->second->getKey())));
+				uf.addHiddenField(UpdateDisplayTypeAction::PARAMETER_ID, Conversion::ToString(dt->getKey()));
+				stream << uf.open();
 				stream
-					<< updateRequest->getHTMLFormHeader("update" + Conversion::ToString(it->second->getKey()))
 					<< "<tr>"
-					<< "<td>" << Html::getTextInput(UpdateDisplayTypeAction::PARAMETER_NAME, dt->getName()) << "</td>"
-					<< "<td>" << Html::getSelectInput(UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), dt->getInterface()->getKey()) << "</td>"
-					<< "<td>" << Html::getSelectNumberInput(UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99, dt->getRowNumber()) << "</td>"
-					<< "<td>" << Html::getHiddenInput(UpdateDisplayTypeAction::PARAMETER_ID, Conversion::ToString(dt->getKey())) << Html::getSubmitButton("Modifier") << "</td>"
-					<< "</tr></form>"
+					<< "<td>" << uf.getTextInput(UpdateDisplayTypeAction::PARAMETER_NAME, dt->getName()) << "</td>"
+					<< "<td>" << uf.getSelectInput(UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), dt->getInterface()->getKey()) << "</td>"
+					<< "<td>" << uf.getSelectNumberInput(UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99, dt->getRowNumber()) << "</td>"
+					<< "<td>" << uf.getSubmitButton("Modifier") << "</td>"
+					<< "</tr>"
 					;
+				stream << uf.close();
 			}
 
 			// New type
+			HTMLForm cf(createRequest.getHTMLForm("create"));
+			stream << cf.open();
 			stream
-				<< createRequest->getHTMLFormHeader("create")
 				<< "<tr>"
-				<< "<td>" << Html::getTextInput(CreateDisplayTypeAction::PARAMETER_NAME, "", "(Entrez le nom ici)") << "</td>"
-				<< "<td>" << Html::getSelectInput(CreateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), (uid) 0) << "</td>"
-				<< "<td>" << Html::getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99) << "</td>"
-				<< "<td>" << Html::getSubmitButton("Ajouter") << "</td>"
-				<< "</tr></form>"
-				<< "</table>";
+				<< "<td>" << cf.getTextInput(CreateDisplayTypeAction::PARAMETER_NAME, "", "(Entrez le nom ici)") << "</td>"
+				<< "<td>" << cf.getSelectInput(CreateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), (uid) 0) << "</td>"
+				<< "<td>" << cf.getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99) << "</td>"
+				<< "<td>" << cf.getSubmitButton("Ajouter") << "</td>"
+				<< "</tr>";
+			stream << cf.close();
+			stream << "</table>";
 		}
 	}
 }

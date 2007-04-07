@@ -21,6 +21,7 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "34_departures_table/UpdateDisplayMaintenanceAction.h"
 #include "34_departures_table/DisplayScreen.h"
@@ -39,18 +40,18 @@ namespace synthese
 		const string UpdateDisplayMaintenanceAction::PARAMETER_ONLINE = Action_PARAMETER_PREFIX + "oli";
 		const string UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE = Action_PARAMETER_PREFIX + "mes";
 
-		Request::ParametersMap UpdateDisplayMaintenanceAction::getParametersMap() const
+		ParametersMap UpdateDisplayMaintenanceAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void UpdateDisplayMaintenanceAction::setFromParametersMap(Request::ParametersMap& map)
+		void UpdateDisplayMaintenanceAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(Request::PARAMETER_OBJECT_ID);
 				if (it == map.end())
@@ -71,8 +72,6 @@ namespace synthese
 				if (it == map.end())
 					throw ActionException("Maintenance message not specified");
 				_message = it->second;
-
-
 			}
 			catch (DisplayScreen::RegistryKeyException e)
 			{

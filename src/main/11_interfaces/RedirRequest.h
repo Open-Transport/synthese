@@ -29,8 +29,10 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		/** RedirRequest class.
+		/** Redirection interface page class.
 			@ingroup m11
+
+			The redirection avoids to run an action.
 		*/
 		class RedirRequest : public RequestWithInterface
 		{
@@ -44,22 +46,22 @@ namespace synthese
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			Request::ParametersMap getParametersMap() const;
+			server::ParametersMap _getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 			*/
-			void setFromParametersMap(const Request::ParametersMap& map);
+			void _setFromParametersMap(const server::ParametersMap& map);
+
+			/** Action to run, defined by each subclass.
+			*/
+			void _run(std::ostream& stream) const;
 
 		public:
 			RedirRequest();
 			~RedirRequest();
 
-			void				setUrl(const std::string& url);
-			const std::string&	getURL()	const;
-
-			/** Action to run, defined by each subclass.
-			*/
-			void run(std::ostream& stream) const;
+			void				setRedirURL(const std::string& url);
+			const std::string&	getRedirURL()	const;
 		};
 	}
 }

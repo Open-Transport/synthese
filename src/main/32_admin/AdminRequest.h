@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_AdminRequest_H__
 #define SYNTHESE_AdminRequest_H__
 
+#include "01_util/UId.h"
+
 #include "11_interfaces/RequestWithInterfaceAndRequiredSession.h"
 
 namespace synthese
@@ -40,18 +42,23 @@ namespace synthese
 			//@{
 				const AdminInterfaceElement*	_page;
 				const AdminInterfaceElement*	_actionFailedPage;
-				ParametersMap					_parameters;
+				server::ParametersMap			_parameters;
 			//@}
 
 
 			/** Conversion from generic parameters map to attributes.
 			*/
-			void setFromParametersMap(const ParametersMap& map);
+			void _setFromParametersMap(const server::ParametersMap& map);
 
-		public:
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			ParametersMap getParametersMap() const;
+			server::ParametersMap _getParametersMap() const;
+
+			/** Action to run, defined by each subclass.
+			*/
+			void _run(std::ostream& stream) const;
+
+		public:
 
 			AdminRequest();
 			~AdminRequest();
@@ -60,15 +67,7 @@ namespace synthese
 			void setActionFailedPage(const AdminInterfaceElement* aie);
 			const AdminInterfaceElement* getPage() const;
 
-			/** Action to run, defined by each subclass.
-			*/
-			void run(std::ostream& stream) const;
-
-			std::string getHTMLFormHeader(const std::string& name) const;
-
 			void setParameter(const std::string& name, const std::string value);
-
-			void setObjectId(uid id);
 		};
 	}
 }

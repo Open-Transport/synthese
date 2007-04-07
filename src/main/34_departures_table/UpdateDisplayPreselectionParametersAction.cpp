@@ -21,6 +21,7 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"
 #include "34_departures_table/DisplayScreen.h"
@@ -39,18 +40,18 @@ namespace synthese
 		const std::string UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY = Action_PARAMETER_PREFIX + "pd";
 
 
-		Request::ParametersMap UpdateDisplayPreselectionParametersAction::getParametersMap() const
+		ParametersMap UpdateDisplayPreselectionParametersAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void UpdateDisplayPreselectionParametersAction::setFromParametersMap(Request::ParametersMap& map)
+		void UpdateDisplayPreselectionParametersAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				_screen = DeparturesTableModule::getDisplayScreens().get(_request->getObjectId());
 

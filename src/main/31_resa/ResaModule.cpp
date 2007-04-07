@@ -1,6 +1,6 @@
 
-/** SearchFormHTMLTable class header.
-	@file SearchFormHTMLTable.h
+/** ResaModule class implementation.
+	@file ResaModule.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,32 +20,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_SearchFormHTMLTable_h__
-#define SYNTHESE_SearchFormHTMLTable_h__
-
-#include "01_util/HtmlTable.h"
+#include "ResaModule.h"
 
 namespace synthese
 {
-	namespace admin
+	namespace resa
 	{
-		class AdminRequest;
+		OnlineReservationRule::Registry _onlineReservationRules;
 
-		/** SearchFormHTMLTable class.
-			@ingroup m32
-		*/
-		class SearchFormHTMLTable : public util::HtmlTable
+
+		OnlineReservationRule::Registry& ResaModule::getOnlineReservationRules()
 		{
-			const AdminRequest* const _request;
-		public:
-			SearchFormHTMLTable(const AdminRequest* request);
-
-			std::string open();
-			std::string close();
-
-			std::string cell(const std::string& label, const std::string& content, std::string id="");
-		};
+			return _onlineReservationRules;
+		}
 	}
 }
-
-#endif // SYNTHESE_SearchFormHTMLTable_h__

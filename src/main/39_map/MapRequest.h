@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_MapRequest_H__
 #define SYNTHESE_MapRequest_H__
 
-#include "30_server/Request.h"
+#include "30_server/Function.h"
 
 #include "15_env/Axis.h"
 #include "15_env/City.h"
@@ -43,7 +43,7 @@ namespace synthese
 	    /** MapRequest class.
 		@ingroup m39
 	    */
-	    class MapRequest : public server::Request
+	    class MapRequest : public server::Function
 	    {
 		
 	    private:
@@ -64,11 +64,11 @@ namespace synthese
 		    
 		/** Conversion from attributes to generic parameter maps.
 		 */
-		Request::ParametersMap getParametersMap() const;
+		server::ParametersMap _getParametersMap() const;
 		
 		/** Conversion from generic parameters map to attributes.
 		 */
-		void setFromParametersMap(const Request::ParametersMap& map);
+		void _setFromParametersMap(const server::ParametersMap& map);
 
 	    public:
 			
@@ -83,7 +83,7 @@ namespace synthese
 		
 		/** Action to run, defined by each subclass.
 		 */
-		void run(std::ostream& stream) const;
+		void _run(std::ostream& stream) const;
 	    };
 	}
 }

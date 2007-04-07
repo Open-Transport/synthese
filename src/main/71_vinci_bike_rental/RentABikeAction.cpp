@@ -68,12 +68,15 @@ namespace synthese
 
 		/** Conversion from attributes to generic parameter maps.
 		*/
-		Request::ParametersMap RentABikeAction::getParametersMap() const
+		ParametersMap RentABikeAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
-			map.insert(make_pair(PARAMETER_RATE_ID, Conversion::ToString(_rate->getKey())));
-			map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
-			map.insert(make_pair(PARAMETER_BIKE_ID, Conversion::ToString(_bike->getKey())));
+			ParametersMap map;
+			if (_rate)
+				map.insert(make_pair(PARAMETER_RATE_ID, Conversion::ToString(_rate->getKey())));
+			if (_contract)
+				map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
+			if (_bike)
+				map.insert(make_pair(PARAMETER_BIKE_ID, Conversion::ToString(_bike->getKey())));
 			map.insert(make_pair(PARAMETER_LOCK_ID, _lock ? Conversion::ToString(_lock->getKey()) : ""));
 			return map;
 		}
@@ -81,11 +84,11 @@ namespace synthese
 		/** Conversion from generic parameters map to attributes.
 		Removes the used parameters from the map.
 		*/
-		void RentABikeAction::setFromParametersMap(server::Request::ParametersMap& map)
+		void RentABikeAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				// Rate
 				it=map.find(PARAMETER_RATE_ID);
@@ -109,7 +112,6 @@ namespace synthese
 					throw ActionException("Vélo introuvable");
 				vector<VinciBike*>::iterator itb = bikes.begin();
 				_bike = *itb;
-				map.erase(it);
 
 				// Contract
 				it=map.find(PARAMETER_CONTRACT_ID);
@@ -123,7 +125,6 @@ namespace synthese
 				{
 					throw ActionException("Specified contract not found");
 				}
-				map.erase(it);
 
 				// Lock
 				it = map.find(PARAMETER_LOCK_ID);
@@ -141,7 +142,6 @@ namespace synthese
 						_lock = *itl;
 					}
 				}
-				map.erase(it);
 
 				// Date
 				it = map.find(PARAMETER_DATE);

@@ -26,25 +26,22 @@
 #include "04_time/Date.h"
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
-#include <iostream>
+
 #include <string>
+#include <set>
 
 namespace synthese
 {
-	namespace env
+	namespace environment
 	{
-		class Environment;
-	}
-	namespace interfaces
-	{
-		class Interface;
+		class CommercialLine;
 	}
 
 	namespace routeplanner
 	{
 
-		/** Access site.
-			@ingroup m11
+		/** Route planning workspace.
+			@ingroup m33
 			@author Hugues Romain
 			@date 2005-2006
 		*/
@@ -55,13 +52,11 @@ namespace synthese
 				std::string				_name;  //!< Name of the site
 				synthese::time::Date	_startValidityDate;   
 				synthese::time::Date	_endValidityDate;   
-				std::string				_clientURL;   //!< URL du binaire client (pour fabrication de liens) : see if it cannot be provided by the client itself
 			//@}
 
-			//! \name Parameters
+			//! \name Environment
 			//@{
-				const synthese::env::Environment*	_env;  
-				const interfaces::Interface*			_interface;
+				std::set<env::CommercialLine*>	_lines;
 			//@}
 
 			//! \name Filters
@@ -78,12 +73,10 @@ namespace synthese
 
 			//! \name Modificateurs
 			//@{
-				void setEnvironment ( synthese::env::Environment* environment);
 				void setInterface ( const synthese::interfaces::Interface* interf);
 				void setStartDate ( const synthese::time::Date& dateDebut );
 				void setEndDate ( const synthese::time::Date& dateFin );
 				void setOnlineBookingAllowed ( const bool valeur );
-				void setClientURL ( const std::string& clientURL);
 				void setPastSolutionsDisplayed ( bool );
 				void setName(const std::string& name);
 			//@}

@@ -40,18 +40,19 @@ namespace synthese
 		const string DeleteTextTemplateAction::PARAMETER_TEXT_ID = Action_PARAMETER_PREFIX + "tt";
 
 
-		Request::ParametersMap DeleteTextTemplateAction::getParametersMap() const
+		ParametersMap DeleteTextTemplateAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
-			map.insert(make_pair(PARAMETER_TEXT_ID, Conversion::ToString(_text->getKey())));
+			ParametersMap map;
+			if (_text)
+				map.insert(make_pair(PARAMETER_TEXT_ID, Conversion::ToString(_text->getKey())));
 			return map;
 		}
 
-		void DeleteTextTemplateAction::setFromParametersMap(Request::ParametersMap& map)
+		void DeleteTextTemplateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_TEXT_ID);
 				if (it == map.end())

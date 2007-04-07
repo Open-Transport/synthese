@@ -21,6 +21,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "05_html/SearchFormHTMLTable.h"
+#include "05_html/ActionResultHTMLTable.h"
+#include "05_html/HTMLModule.h"
+
+#include "30_server/ActionFunctionRequest.h"
+
 #include "32_admin/AdminRequest.h"
 
 #include "71_vinci_bike_rental/VinciAddBike.h"
@@ -36,6 +42,7 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
+	using namespace html;
 
 	namespace vinci
 	{
@@ -50,65 +57,56 @@ namespace synthese
 			return "Parc de vélos";
 		}
 
-		void VinciBikeSearchAdminInterfaceElement::display(ostream& stream, VariablesMap& vars, const AdminRequest* request) const
+		void VinciBikeSearchAdminInterfaceElement::display(ostream& stream, VariablesMap& vars, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			// AddStatus
-			AdminRequest* addStatusRequest = Factory<Request>::create<AdminRequest>();
-			addStatusRequest->copy(request);
-			addStatusRequest->setPage(Factory<AdminInterfaceElement>::create<VinciBikeSearchAdminInterfaceElement>());
+			FunctionRequest<AdminRequest> addStatusRequest(request);
+			addStatusRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciBikeSearchAdminInterfaceElement>());
 
 			// AddBike
-			AdminRequest* addBikeRequest = Factory<Request>::create<AdminRequest>();
-			addBikeRequest->copy(request);
-			addBikeRequest->setPage(Factory<AdminInterfaceElement>::create<VinciBikeAdminInterfaceElement>());
-			addBikeRequest->setAction(Factory<Action>::create<VinciAddBike>());
-
+			ActionFunctionRequest<VinciAddBike,AdminRequest> addBikeRequest(request);
+			addBikeRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciBikeAdminInterfaceElement>());
+			
 			// Open a bike
-			AdminRequest* viewBikeRequest = Factory<Request>::create<AdminRequest>();
-			viewBikeRequest->copy(request);
-			viewBikeRequest->setPage(Factory<AdminInterfaceElement>::create<VinciBikeAdminInterfaceElement>());
+			FunctionRequest<AdminRequest> viewBikeRequest(request);
+			viewBikeRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciBikeAdminInterfaceElement>());
 
-			stream
-				<< addStatusRequest->getHTMLFormHeader("search")
-				<< "<h1>Recherche de vélo</h1>"
-				<< "Numéro : <input name=\"" << PARAMETER_SEARCH_NUMBER << "\" /> "
-				<< "Cadre : <input name=\"" << PARAMETER_SEARCH_CADRE << "\" /> "
-				<< "<input type=\"submit\" value=\"Rechercher\" />"
-				<< "</form>"
-				<< "<h1>Résultat de la recherche</h1>"
-				;
+			stream << "<h1>Recherche de vélo</h1>";
 
-			stream
-				<< addBikeRequest->getHTMLFormHeader("create")
-				<< "<table><tr><th>Numéro</th><th>Cadre</th></tr>"
-				;
+			SearchFormHTMLTable st(addStatusRequest.getHTMLForm("search"));
+			stream << st.open();
+			stream << st.cell("Numéro", st.getForm().getTextInput(PARAMETER_SEARCH_NUMBER, _bikeNumber));
+			stream << st.cell("Cadre", st.getForm().getTextInput(PARAMETER_SEARCH_CADRE, _cadreNumber));
+			stream << st.close();
+
+			stream << "<h1>Résultat de la recherche</h1>";
+
+			ActionResultHTMLTable::HeaderVector rh;
+			rh.push_back(make_pair(PARAMETER_SEARCH_NUMBER, "Numéro"));
+			rh.push_back(make_pair(PARAMETER_SEARCH_CADRE, "Cadre"));
+			ActionResultHTMLTable rt(rh, st.getForm(), string(), false, addBikeRequest.getHTMLForm("create"));
+				
+			stream << rt.open();
 			for (vector<VinciBike*>::const_iterator it = _bikes.begin(); it != _bikes.end(); ++it)
 			{
-				viewBikeRequest->setObjectId((*it)->getKey());
-				stream
-					<< "<tr>"
-					<< "<td>" << viewBikeRequest->getHTMLLink((*it)->getNumber()) << "</td>"
-					<< "<td>" << viewBikeRequest->getHTMLLink((*it)->getMarkedNumber()) << "</td>"
-					<< "</tr>";
+				viewBikeRequest.setObjectId((*it)->getKey());
+				stream << rt.row();
+				stream << rt.col() << HTMLModule::getHTMLLink(viewBikeRequest.getURL(), (*it)->getNumber());
+				stream << rt.col() << HTMLModule::getHTMLLink(viewBikeRequest.getURL(), (*it)->getMarkedNumber());
 			}
 			if (_activeSearch)
 			{
-				stream
-					<< "<tr>"
-					<< "<td><input name=\"" << VinciAddBike::PARAMETER_NUMBER << "\" value=\"" << _bikeNumber << "\" /></td>"
-					<< "<td><input name=\"" << VinciAddBike::PARAMETER_MARKED_NUMBER << "\" value=\"" << _cadreNumber << "\" /></td>"
-					<< "<td><input type=\"submit\" value=\"Créer\" /></td>"
-					<< "</tr>"
-					;
+				stream << rt.row();
+				stream << rt.col() << rt.getActionForm().getTextInput(VinciAddBike::PARAMETER_NUMBER, _bikeNumber);
+				stream << rt.col() << rt.getActionForm().getTextInput(VinciAddBike::PARAMETER_MARKED_NUMBER, _cadreNumber);
+				stream << rt.col() << rt.getActionForm().getSubmitButton("Créer");
 			}
-			stream << "</table></form>";
-
-			delete addStatusRequest;
+			stream << rt.close();
 		}
 
-		void VinciBikeSearchAdminInterfaceElement::setFromParametersMap(const admin::AdminRequest::ParametersMap& map)
+		void VinciBikeSearchAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
-			server::Request::ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_NUMBER);
+			ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_NUMBER);
 			if (it != map.end())
 				_bikeNumber = it->second;
 

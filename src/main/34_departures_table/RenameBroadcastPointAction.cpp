@@ -39,18 +39,18 @@ namespace synthese
 		const string RenameBroadcastPointAction::PARAMETER_BROADCAST_ID = Action_PARAMETER_PREFIX + "bid";
 
 
-		Request::ParametersMap RenameBroadcastPointAction::getParametersMap() const
+		ParametersMap RenameBroadcastPointAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void RenameBroadcastPointAction::setFromParametersMap(Request::ParametersMap& map)
+		void RenameBroadcastPointAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_BROADCAST_ID);
 				if (it == map.end())

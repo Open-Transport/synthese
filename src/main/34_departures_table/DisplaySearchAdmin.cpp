@@ -20,7 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Html.h"
 #include "01_util/Conversion.h"
 
 #include "11_interfaces/InterfaceModule.h"
@@ -28,8 +27,11 @@
 #include "15_env/ConnectionPlace.h"
 #include "15_env/EnvModule.h"
 
-#include "32_admin/ResultHTMLTable.h"
-#include "32_admin/SearchFormHTMLTable.h"
+#include "05_html/ActionResultHTMLTable.h"
+#include "05_html/SearchFormHTMLTable.h"
+
+#include "30_server/ActionFunctionRequest.h"
+
 #include "32_admin/AdminModule.h"
 
 #include "34_departures_table/DisplaySearchAdmin.h"
@@ -51,6 +53,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace env;
+	using namespace html;
 
 	namespace departurestable
 	{
@@ -71,9 +74,9 @@ namespace synthese
 			, _searchMessage(UNKNOWN_VALUE)
 		{}
 
-		void DisplaySearchAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void DisplaySearchAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_UID);
+			ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_UID);
 			if (it != map.end())
 				_searchUId = Conversion::ToLongLong(it->second);
 
@@ -105,36 +108,30 @@ namespace synthese
 			return "Afficheurs";
 		}
 
-		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			AdminRequest* createDisplayRequest = Factory<Request>::create<AdminRequest>();
-			createDisplayRequest->copy(request);
-			createDisplayRequest->setAction(Factory<Action>::create<CreateDisplayScreenAction>());
-			createDisplayRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			createDisplayRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<DisplaySearchAdmin>());
+			ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(request);
+			createDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			createDisplayRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<DisplaySearchAdmin>());
 
-			AdminRequest* searchRequest =  Factory<Request>::create<AdminRequest>();
-			searchRequest->copy(request);
-			searchRequest->setPage(Factory<AdminInterfaceElement>::create<DisplaySearchAdmin>());
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplaySearchAdmin>());
 
-			AdminRequest* updateRequest =  Factory<Request>::create<AdminRequest>();
-			updateRequest->copy(request);
-			updateRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			FunctionRequest<AdminRequest> updateRequest(request);
+			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
 
-			DisplayScreenContentRequest* viewRequest =  Factory<Request>::create<DisplayScreenContentRequest>();
-			viewRequest->copy(request);
+			FunctionRequest<DisplayScreenContentRequest> viewRequest(request);
 
-			AdminRequest* maintRequest =  Factory<Request>::create<AdminRequest>();
-			maintRequest->copy(request);
-			maintRequest->setPage(Factory<AdminInterfaceElement>::create<DisplayMaintenanceAdmin>());
+			FunctionRequest<AdminRequest> maintRequest(request);
+			maintRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayMaintenanceAdmin>());
 
 			stream << "<h1>Recherche</h1>";
 
-			stream << getHtmlSearchForm(searchRequest, _searchUId, _searchLocalizationUId, _searchLineId, _searchTypeId, _searchState, _searchMessage);
+			stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchUId, _searchLocalizationUId, _searchLineId, _searchTypeId, _searchState, _searchMessage);
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
-			ResultHTMLTable::HeaderVector v;
+			ActionResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAMETER_SEARCH_UID, "UID"));
 			v.push_back(make_pair(PARAMETER_SEARCH_LOCALIZATION, "Emplacement"));
 			v.push_back(make_pair(PARAMETER_SEARCH_TYPE_ID, "Type"));
@@ -144,16 +141,16 @@ namespace synthese
 			v.push_back(make_pair(string(), "Actions"));
 			v.push_back(make_pair(string(), "Actions"));
 
-			ResultHTMLTable t(v, searchRequest, string(), true, createDisplayRequest, CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, searchRequest.getHTMLForm("search"), string(), true, createDisplayRequest.getHTMLForm("create"), CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 
 			for (vector<DisplayScreen*>::const_iterator it = _result.begin(); it != _result.end(); ++it)
 			{
 				DisplayScreen* screen = *it;
-				updateRequest->setObjectId(screen->getKey());
-				viewRequest->setObjectId(screen->getKey());
-				maintRequest->setObjectId(screen->getKey());
+				updateRequest.setObjectId(screen->getKey());
+				viewRequest.setObjectId(screen->getKey());
+				maintRequest.setObjectId(screen->getKey());
 
 				stream << t.row(Conversion::ToString(screen->getKey()));
 				stream << t.col() << screen->getKey();
@@ -161,25 +158,19 @@ namespace synthese
 				stream << t.col() << (screen->getType() ? screen->getType()->getName() : "(indéterminé)");
 				stream << t.col(); // Bullets showing the states of the display
 				stream << t.col(); // Bullet showing the message status
-				stream << t.col() << Html::getLinkButton(updateRequest->getURL(), "Modifier");
-				stream << t.col() << Html::getLinkButton(viewRequest->getURL(), "Simuler");
-				stream << t.col() << Html::getLinkButton(maintRequest->getURL(), "Supervision");
+				stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Modifier");
+				stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler");
+				stream << t.col() << HTMLModule::getLinkButton(maintRequest.getURL(), "Supervision");
 			}
 
 			stream << t.row();
 			stream << t.col(5) << "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel afficheur)";
-			stream << t.col(3) << Html::getSubmitButton("Créer un nouvel afficheur");
+			stream << t.col(3) << t.getActionForm().getSubmitButton("Créer un nouvel afficheur");
 
 			stream << t.close();
-
-			delete createDisplayRequest;
-			delete searchRequest;
-			delete updateRequest;
-			delete viewRequest;
-			delete maintRequest;
 		}
 
-		std::string DisplaySearchAdmin::getHtmlSearchForm(AdminRequest* request, uid screenUid, uid placeUid, uid lineUid, uid typeUid, int state, int message )
+		std::string DisplaySearchAdmin::getHtmlSearchForm(const HTMLForm& form, uid screenUid, uid placeUid, uid lineUid, uid typeUid, int state, int message )
 		{
 			map<int, string> states;
 			states.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
@@ -195,14 +186,14 @@ namespace synthese
 			messages.insert(make_pair(3, "Messages"));
 
 			stringstream stream;
-			SearchFormHTMLTable s(request);
+			SearchFormHTMLTable s(form);
 			stream << s.open();
-			stream << s.cell("UID", Html::getTextInput(PARAMETER_SEARCH_UID, screenUid ? Conversion::ToString(screenUid) : string()));
-			stream << s.cell("Emplacement", Html::getSelectInput(PARAMETER_SEARCH_LOCALIZATION, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), placeUid));
-			stream << s.cell("Ligne", Html::getSelectInput(PARAMETER_SEARCH_LINE_ID, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), lineUid));
-			stream << s.cell("Type", Html::getSelectInput(PARAMETER_SEARCH_TYPE_ID, DeparturesTableModule::getDisplayTypeLabels(true), typeUid));
-			stream << s.cell("Etat", Html::getSelectInput(PARAMETER_SEARCH_TYPE_ID, states, state));
-			stream << s.cell("Message", Html::getSelectInput(PARAMETER_SEARCH_MESSAGE, messages, message));
+			stream << s.cell("UID", s.getForm().getTextInput(PARAMETER_SEARCH_UID, screenUid ? Conversion::ToString(screenUid) : string()));
+			stream << s.cell("Emplacement", s.getForm().getSelectInput(PARAMETER_SEARCH_LOCALIZATION, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), placeUid));
+			stream << s.cell("Ligne", s.getForm().getSelectInput(PARAMETER_SEARCH_LINE_ID, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), lineUid));
+			stream << s.cell("Type", s.getForm().getSelectInput(PARAMETER_SEARCH_TYPE_ID, DeparturesTableModule::getDisplayTypeLabels(true), typeUid));
+			stream << s.cell("Etat", s.getForm().getSelectInput(PARAMETER_SEARCH_TYPE_ID, states, state));
+			stream << s.cell("Message", s.getForm().getSelectInput(PARAMETER_SEARCH_MESSAGE, messages, message));
 			stream << s.close();
 
 			return stream.str();

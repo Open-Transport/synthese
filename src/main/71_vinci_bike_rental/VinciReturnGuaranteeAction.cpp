@@ -56,24 +56,23 @@ namespace synthese
 		const string VinciReturnGuaranteeAction::PARAMETER_GUARANTEE_ID = Action_PARAMETER_PREFIX + "gu";
 
 
-		Request::ParametersMap VinciReturnGuaranteeAction::getParametersMap() const
+		ParametersMap VinciReturnGuaranteeAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_GUARANTEE_ID, Conversion::ToString(_guarantee->getKey())));
 			return map;
 		}
 
-		void VinciReturnGuaranteeAction::setFromParametersMap(Request::ParametersMap& map)
+		void VinciReturnGuaranteeAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_GUARANTEE_ID);
 				if (it == map.end())
 					throw ActionException("Guarantee not specified");
 				_guarantee = TransactionTableSync::get(Conversion::ToLongLong(it->second));
-				map.erase(it);
 			}
 			catch(DBEmptyResultException e)
 			{

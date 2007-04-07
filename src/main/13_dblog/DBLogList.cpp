@@ -20,13 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Html.h"
+#include <boost/shared_ptr.hpp>
+
+#include "05_html/HTMLTable.h"
+#include "05_html/HTMLForm.h"
 
 #include "13_dblog/DBLog.h"
 #include "13_dblog/DBLogList.h"
 #include "13_dblog/DBLogViewer.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -34,13 +38,14 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
+	using namespace html;
 
 	namespace dblog
 	{
 		DBLogList::DBLogList()
 			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) {}
 
-		void DBLogList::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void DBLogList::setFromParametersMap(const ParametersMap& map)
 		{
 		}
 
@@ -49,29 +54,25 @@ namespace synthese
 			return "Journaux";
 		}
 
-		void DBLogList::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void DBLogList::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			AdminRequest* goRequest = Factory<Request>::create<AdminRequest>();
-			goRequest->copy(request);
-			goRequest->setPage(Factory<AdminInterfaceElement>::create<DBLogViewer>());
+			FunctionRequest<AdminRequest> goRequest(request);
+			goRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DBLogViewer>());
 
-			stream
-				<< "<h1>Liste des journaux</h1>"
-				<< "<table>";
+			stream << "<h1>Liste des journaux</h1>";
+
+			HTMLTable t;
+			stream << t.open();
+			HTMLForm form(goRequest.getHTMLForm());
 
 			for (Factory<DBLog>::Iterator it = Factory<DBLog>::begin(); it != Factory<DBLog>::end(); ++it)
 			{
-				stream
-					<< "<tr>"
-					<< "<td>" << it->getName() << "</td>"
-					<< "<td>" << goRequest->getHTMLFormHeader(it.getKey())
-					<< Html::getHiddenInput(DBLogViewer::PARAMETER_LOG_KEY, it.getKey())
-					<< Html::getSubmitButton("Consulter") << "</form></td>"
-					<< "</tr>";
+				form.addHiddenField(DBLogViewer::PARAMETER_LOG_KEY, it.getKey());
+				stream << t.row();
+				stream << t.col() << it->getName();
+				stream << t.col() << form.getLinkButton("Consulter");
 			}
-			stream << "</table>";
-
-			delete goRequest;
+			stream << t.close();
 		}
 	}
 }

@@ -23,8 +23,9 @@
 #include <sstream>
 
 #include "01_util/Conversion.h"
-#include "01_util/Html.h"
 #include "01_util/FactoryException.h"
+
+#include "05_html/HTMLForm.h"
 
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/InterfacePage.h"
@@ -43,6 +44,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+	using namespace html;
 	using namespace server;
 	using namespace interfaces;
 
@@ -56,29 +58,29 @@ namespace synthese
 			, _page(NULL), _actionFailedPage(NULL)
 		{}
 
-		AdminRequest::ParametersMap AdminRequest::getParametersMap() const
+		ParametersMap AdminRequest::_getParametersMap() const
 		{
-			ParametersMap map(RequestWithInterfaceAndRequiredSession::getParametersMap());
+			ParametersMap map(RequestWithInterfaceAndRequiredSession::_getParametersMap());
+
 			map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
-			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_object_id)));
 			if (_actionFailedPage != NULL)
 				map.insert(make_pair(PARAMETER_ACTION_FAILED_PAGE, _actionFailedPage->getFactoryKey()));
-			for (ParametersMap::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
-				if ((_action != NULL) || (it->first.compare(0, Action_PARAMETER_PREFIX.size(), Action_PARAMETER_PREFIX) != 0))
-					map.insert(make_pair(it->first, it->second));
+//			for (ParametersMap::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
+//				if ((_action != NULL) || (it->first.compare(0, Action_PARAMETER_PREFIX.size(), Action_PARAMETER_PREFIX) != 0))
+//					map.insert(make_pair(it->first, it->second));
 			return map;
 		}
 
-		void AdminRequest::setFromParametersMap(const ParametersMap& map)
+		void AdminRequest::_setFromParametersMap(const ParametersMap& map)
 		{
-			RequestWithInterfaceAndRequiredSession::setFromParametersMap(map);
+			RequestWithInterfaceAndRequiredSession::_setFromParametersMap(map);
 
 			try
 			{
 				// Page
 				ParametersMap::const_iterator it;
 
-				if (_actionException)
+				if (_request->getActionException())
 				{	// Prepare the KO page
 					it = map.find(PARAMETER_ACTION_FAILED_PAGE);
 					if (it == map.end())
@@ -113,19 +115,19 @@ namespace synthese
 			}
 		}
 
-		void AdminRequest::run( std::ostream& stream ) const
+		void AdminRequest::_run( std::ostream& stream ) const
 		{
 			try
 			{
 				if (_interface != NULL)
 				{
 					const AdminInterfacePage* const aip = _interface->getPage<AdminInterfacePage>();
-					aip->display(stream, _page, _object_id, this);
+					aip->display(stream, _page, _request->getObjectId(), (const FunctionRequest<AdminRequest>*) _request);
 				}
 				else
 				{
 					VariablesMap variables;
-					_page->display(stream, variables, this);
+					_page->display(stream, variables, (const FunctionRequest<AdminRequest>*) _request);
 				}
 			}
 			catch (Exception e)
@@ -147,20 +149,6 @@ namespace synthese
 		}
 
 		
-
-		std::string AdminRequest::getHTMLFormHeader( const std::string& name ) const
-		{
-			stringstream s;
-			s << RequestWithInterfaceAndRequiredSession::getHTMLFormHeader(name);
-			if (_page != NULL)
-				s << Html::getHiddenInput(PARAMETER_PAGE, _page->getFactoryKey());
-			if (_object_id > 0)
-				s << Html::getHiddenInput(PARAMETER_OBJECT_ID, Conversion::ToString(_object_id));
-			if (_actionFailedPage != NULL)
-				s << Html::getHiddenInput(PARAMETER_ACTION_FAILED_PAGE, _actionFailedPage->getFactoryKey());
-			return s.str();
-		}
-
 		const AdminInterfaceElement* AdminRequest::getPage() const
 		{
 			return _page;
@@ -178,12 +166,6 @@ namespace synthese
 		void AdminRequest::setActionFailedPage( const AdminInterfaceElement* aie )
 		{
 			_actionFailedPage = aie;
-		}
-
-		void AdminRequest::setObjectId( uid id )
-		{
-			Request::setObjectId(id);
-			_parameters[PARAMETER_OBJECT_ID] = Conversion::ToString(id);
 		}
 	}
 }

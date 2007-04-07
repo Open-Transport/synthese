@@ -66,11 +66,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Action.cpp"
+				RelativePath=".\Action.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Action.h"
+				RelativePath=".\ActionFunctionRequest.h"
 				>
 			</File>
 			<File
@@ -79,6 +79,14 @@
 			</File>
 			<File
 				RelativePath=".\CleanerThreadExec.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Function.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FunctionRequest.h"
 				>
 			</File>
 			<File
@@ -244,6 +252,10 @@
 		</File>
 		<File
 			RelativePath=".\ServerModule.inc.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Types.h"
 			>
 		</File>
 	</Files>

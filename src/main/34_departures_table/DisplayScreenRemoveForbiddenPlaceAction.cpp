@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "15_env/ConnectionPlace.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "34_departures_table/DisplayScreenRemoveForbiddenPlaceAction.h"
 #include "34_departures_table/DisplayScreen.h"
@@ -42,20 +43,20 @@ namespace synthese
 		const string DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pla";
 
 
-		Request::ParametersMap DisplayScreenRemoveForbiddenPlaceAction::getParametersMap() const
+		ParametersMap DisplayScreenRemoveForbiddenPlaceAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void DisplayScreenRemoveForbiddenPlaceAction::setFromParametersMap(Request::ParametersMap& map)
+		void DisplayScreenRemoveForbiddenPlaceAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_screen = DeparturesTableModule::getDisplayScreens().get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_PLACE);
 				if (it == map.end())

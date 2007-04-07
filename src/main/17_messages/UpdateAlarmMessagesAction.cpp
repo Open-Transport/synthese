@@ -21,6 +21,7 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "17_messages/UpdateAlarmMessagesAction.h"
 #include "17_messages/MessagesModule.h"
@@ -39,16 +40,16 @@ namespace synthese
 		const string UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE = Action_PARAMETER_PREFIX + "lme";
 
 
-		Request::ParametersMap UpdateAlarmMessagesAction::getParametersMap() const
+		ParametersMap UpdateAlarmMessagesAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void UpdateAlarmMessagesAction::setFromParametersMap(Request::ParametersMap& map)
+		void UpdateAlarmMessagesAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			if (!MessagesModule::getAlarms().contains(_request->getObjectId()))
 				throw ActionException("Specified alarm not found");
@@ -58,13 +59,11 @@ namespace synthese
 			if (it == map.end())
 				throw ActionException("Short message not specified");
 			_shortMessage = it->second;
-			map.erase(it);
 			
 			it = map.find(PARAMETER_LONG_MESSAGE);
 			if (it == map.end())
 				throw ActionException("Long message not specified");
 			_longMessage = it->second;
-			map.erase(it);
 		}
 
 		UpdateAlarmMessagesAction::UpdateAlarmMessagesAction()

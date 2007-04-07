@@ -23,6 +23,7 @@
 #include "02_db/DBEmptyResultException.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "12_security/UserPasswordUpdateAction.h"
 #include "12_security/User.h"
@@ -42,31 +43,29 @@ namespace synthese
 		const std::string UserPasswordUpdateAction::PARAMETER_PASS2 = Action_PARAMETER_PREFIX + "pass2";
 
 
-		Request::ParametersMap UserPasswordUpdateAction::getParametersMap() const
+		ParametersMap UserPasswordUpdateAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void UserPasswordUpdateAction::setFromParametersMap(Request::ParametersMap& map)
+		void UserPasswordUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_user = UserTableSync::get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_PASS1);
 				if (it == map.end())
 					throw ActionException("Mot de passe non spécifié");
 				_password = it->second;
-				map.erase(it);
 
 				it = map.find(PARAMETER_PASS2);
 				if (it == map.end() || it->second != _password)
 					throw ActionException("Les mots de passe entrés ne sont pas identiques");
-				map.erase(it);
 			}
 			catch (DBEmptyResultException e)
 			{

@@ -49,25 +49,24 @@ namespace synthese
 		const string ReturnABikeAction::PARAMETER_TRANSACTION_PART_ID = Action_PARAMETER_PREFIX + "tpi";
 
 
-		Request::ParametersMap ReturnABikeAction::getParametersMap() const
+		ParametersMap ReturnABikeAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_TRANSACTION_PART_ID, _transactionPart ? Conversion::ToString(_transactionPart->getKey()) : ""));
 			return map;
 		}
 
-		void ReturnABikeAction::setFromParametersMap(Request::ParametersMap& map)
+		void ReturnABikeAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_TRANSACTION_PART_ID);
 				if (it == map.end())
 					throw ActionException("Transaction not specified");
 
 				_transactionPart = TransactionPartTableSync::get(Conversion::ToLongLong(it->second));
-				map.erase(it);
 			}
 			catch (DBEmptyResultException e)
 			{

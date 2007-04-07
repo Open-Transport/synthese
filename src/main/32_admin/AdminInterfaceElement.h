@@ -29,6 +29,8 @@
 
 #include "11_interfaces/Types.h"
 
+#include "30_server/FunctionRequest.h"
+
 #include "32_admin/AdminRequest.h"
 
 namespace synthese
@@ -70,14 +72,14 @@ namespace synthese
 				const DisplayMode getDisplayMode() const;
 			//@}
 
-			std::string getHTMLLink(const AdminRequest* request) const;
+			std::string getHTMLLink(const server::FunctionRequest<admin::AdminRequest>* request) const;
 
 			//! \name Virtual initialization method
 			//@{
 				/** Initialization of the parameters from a request.
 					@param request The request to use for the initialization.
 				*/
-				virtual void setFromParametersMap(const AdminRequest::ParametersMap& map) = 0;
+				virtual void setFromParametersMap(const server::ParametersMap& map) = 0;
 			//@}
 
 			//! \name Virtual output methods
@@ -85,7 +87,7 @@ namespace synthese
 				/** Display of the content of the admin element.
 					@param stream Stream to write on.
 				*/
-				virtual void display(std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request=NULL) const = 0;
+				virtual void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<AdminRequest>* request=NULL) const = 0;
 
 				/** Title of the admin compound.
 					@return The title of the admin compound, for display purposes.

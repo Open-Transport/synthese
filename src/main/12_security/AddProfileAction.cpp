@@ -29,6 +29,7 @@
 #include "12_security/GlobalRight.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
@@ -43,34 +44,32 @@ namespace synthese
 		const string AddProfileAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "apat";
 
 
-		Request::ParametersMap AddProfileAction::getParametersMap() const
+		ParametersMap AddProfileAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_NAME, _name));
 			if (_templateProfile != NULL)
 				map.insert(make_pair(PARAMETER_TEMPLATE_ID, Conversion::ToString(_templateProfile->getKey())));
 			return map;
 		}
 
-		void AddProfileAction::setFromParametersMap(Request::ParametersMap& map)
+		void AddProfileAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				// Name
 				it = map.find(PARAMETER_NAME);
 				if (it == map.end())
 					throw ActionException("Name not specified");
 				_name = it->second;
-				map.erase(it);
 
 				// Template
 				it = map.find(PARAMETER_TEMPLATE_ID);
 				if (it != map.end())
 				{
 					_templateProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
-					map.erase(it);
 				}
 
 				// Name unicity

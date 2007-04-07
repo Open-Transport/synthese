@@ -20,7 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Html.h"
 
 #include "17_messages/MessagesScenarioSendAdmin.h"
 #include "17_messages/Scenario.h"
@@ -35,7 +34,7 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace admin;
+/*	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
@@ -141,11 +140,6 @@ namespace synthese
 			){
 				stream << Html::getSubmitButton("Envoyer");
 			}
-				
-
-			delete updateRequest;
-			delete alarmRequest;
-			delete deleteRequest;
 		}
-	}
+	}*/
 }

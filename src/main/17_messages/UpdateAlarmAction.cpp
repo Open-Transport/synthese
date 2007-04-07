@@ -24,6 +24,7 @@
 #include "04_time/DateTime.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "17_messages/UpdateAlarmAction.h"
 #include "17_messages/Alarm.h"
@@ -47,18 +48,18 @@ namespace synthese
 		const string UpdateAlarmAction::PARAMETER_ENABLED = Action_PARAMETER_PREFIX + "ena";
 
 
-		Request::ParametersMap UpdateAlarmAction::getParametersMap() const
+		ParametersMap UpdateAlarmAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void UpdateAlarmAction::setFromParametersMap(Request::ParametersMap& map)
+		void UpdateAlarmAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				_alarm = MessagesModule::getAlarms().get(_request->getObjectId());
 
@@ -76,8 +77,7 @@ namespace synthese
 					if (!it->second.empty())
 					{
 						date = it->second;
-						map.erase(it);
-
+				
 						it = map.find(PARAMETER_START_HOUR);
 						if (it == map.end())
 							throw ActionException("Start hour not specified");
@@ -85,16 +85,14 @@ namespace synthese
 							? DateTime::FromString(date + " 0:0")
 							: DateTime::FromString(date + " " + it->second);
 					}
-					map.erase(it);
-
+				
 					it = map.find(PARAMETER_END_DATE);
 					if (it == map.end())
 						throw ActionException("End date not specified");
 					if (!it->second.empty())
 					{
 						date = it->second;
-						map.erase(it);
-
+				
 						it = map.find(PARAMETER_END_HOUR);
 						if (it == map.end())
 							throw ActionException("End hour not specified");
@@ -102,14 +100,12 @@ namespace synthese
 							? DateTime::FromString(date + " 23:59")
 							: DateTime::FromString(date + " " + it->second);
 					}
-					map.erase(it);
-
+				
 					// Enabled status
 					it = map.find(PARAMETER_ENABLED);
 					if (it == map.end())
 						throw ActionException("Enabled status not specified");
 					_enabled = Conversion::ToBool(it->second);
-					map.erase(it);
 				}
 			}
 			catch (Alarm::RegistryKeyException e)

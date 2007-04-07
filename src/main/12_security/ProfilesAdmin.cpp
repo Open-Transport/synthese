@@ -23,9 +23,11 @@
 #include <map>
 #include <string>
 
-#include "01_util/Html.h"
 #include "01_util/Conversion.h"
 #include "01_util/Constants.h"
+
+#include "05_html/ActionResultHTMLTable.h"
+#include "05_html/SearchFormHTMLTable.h"
 
 #include "11_interfaces/InterfaceModule.h"
 
@@ -37,8 +39,8 @@
 #include "12_security/DeleteProfileAction.h"
 #include "12_security/Right.h"
 
-#include "32_admin/ResultHTMLTable.h"
-#include "32_admin/SearchFormHTMLTable.h"
+#include "30_server/ActionFunctionRequest.h"
+
 #include "32_admin/AdminModule.h"
 
 using namespace std;
@@ -49,6 +51,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
+	using namespace html;
 
 	namespace security
 	{
@@ -59,13 +62,13 @@ namespace synthese
 		ProfilesAdmin::ProfilesAdmin()
 			: AdminInterfaceElement("users", AdminInterfaceElement::EVER_DISPLAYED) {}
 
-		void ProfilesAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void ProfilesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			string name;
 			string right;
 			int first = 0;
 
-			Request::ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_NAME);
+			ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_NAME);
 			if (it != map.end())
 			{
 				name = it->second;
@@ -91,41 +94,36 @@ namespace synthese
 			return "Profils";
 		}
 
-		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			AdminRequest* searchRequest = Factory<Request>::create<AdminRequest>();
-			searchRequest->copy(request);
-			searchRequest->setPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
 
-			AdminRequest* profileRequest = Factory<Request>::create<AdminRequest>();
-			profileRequest->copy(request);
-			profileRequest->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			FunctionRequest<AdminRequest> profileRequest(request);
+			profileRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
 
-			AdminRequest* deleteProfileRequest = Factory<Request>::create<AdminRequest>();
-			deleteProfileRequest->copy(request);
-			deleteProfileRequest->setPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
-			deleteProfileRequest->setAction(Factory<Action>::create<DeleteProfileAction>());
-
-			AdminRequest* addProfileRequest = Factory<Request>::create<AdminRequest>();
-			addProfileRequest->copy(request);
-			addProfileRequest->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
-			addProfileRequest->setActionFailedPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
-			addProfileRequest->setAction(Factory<Action>::create<AddProfileAction>());
-
-			SearchFormHTMLTable s(searchRequest);
+			ActionFunctionRequest<DeleteProfileAction, AdminRequest> deleteProfileRequest(request);
+			deleteProfileRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
+			
+			ActionFunctionRequest<AddProfileAction, AdminRequest> addProfileRequest(request);
+			addProfileRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			addProfileRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
+			
+			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 			stream << s.open();
-			stream << s.cell("Nom", Html::getTextInput(PARAMETER_SEARCH_NAME, ""));
-			stream << s.cell("Habilitation", Html::getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightLabels(true), string()));
+			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, ""));
+			stream << s.cell("Habilitation", s.getForm().getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightLabels(true), string()));
 			stream << s.close();
-			stream << Html::setFocus("search", PARAMETER_SEARCH_NAME);
+			stream << s.getForm().setFocus(PARAMETER_SEARCH_NAME);
 				
 			stream << "<h1>Résultats de la recherche</h1>";
 
-			ResultHTMLTable::HeaderVector v;
+			ActionResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAMETER_SEARCH_NAME, string("Nom")));
 			v.push_back(make_pair(string(), string("Résumé")));
 			v.push_back(make_pair(string(), string("Actions")));
-			ResultHTMLTable t(v, searchRequest, "", true, addProfileRequest, AddProfileAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, s.getForm(), "", true, addProfileRequest.getHTMLForm("add"), AddProfileAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			t.getActionForm().addHiddenField(AddProfileAction::PARAMETER_TEMPLATE_ID, Conversion::ToString(UNKNOWN_VALUE));
 
 			stream << t.open();
 			
@@ -134,8 +132,8 @@ namespace synthese
 			{
 				Profile* profile = *it;
 
-				profileRequest->setObjectId(profile->getKey());
-				deleteProfileRequest->setObjectId(profile->getKey());
+				profileRequest.setObjectId(profile->getKey());
+				deleteProfileRequest.setObjectId(profile->getKey());
 
 				stream << t.row(Conversion::ToString(profile->getKey()));
 				stream << t.col() << profile->getName();
@@ -154,23 +152,16 @@ namespace synthese
 
 				stream
 					<< t.col()
-					<< Html::getLinkButton(profileRequest->getURL(), "Modifier")
+					<< profileRequest.getHTMLForm().getLinkButton("Modifier")
 					<< "&nbsp;"
-					<< Html::getLinkButton(deleteProfileRequest->getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?");
+					<< deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?");
 			}
 
 			stream << t.row();
-			stream << t.col() << Html::getTextInput(AddProfileAction::PARAMETER_NAME, "", "Entrez le nom du profil ici");
+			stream << t.col() << t.getActionForm().getTextInput(AddProfileAction::PARAMETER_NAME, "", "Entrez le nom du profil ici");
 			stream << t.col() << "(sélectionner un profil existant duquel héritera le nouveau profil)";
-			stream << t.col()
-				<< Html::getHiddenInput(AddProfileAction::PARAMETER_TEMPLATE_ID, Conversion::ToString(UNKNOWN_VALUE))
-				<< Html::getSubmitButton("Ajouter");
+			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
-
-			delete profileRequest;
-			delete searchRequest;
-			delete addProfileRequest;
-			delete deleteProfileRequest;
 		}
 	}
 }

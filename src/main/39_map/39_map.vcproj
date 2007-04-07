@@ -243,14 +243,10 @@
 			>
 		</Filter>
 		<Filter
-			Name="Requests"
+			Name="Functions"
 			>
 			<File
 				RelativePath=".\MapRequest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MapRequest.h"
 				>
 			</File>
 		</Filter>

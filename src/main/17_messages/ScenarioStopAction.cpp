@@ -21,6 +21,7 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "17_messages/ScenarioStopAction.h"
 #include "17_messages/ScenarioTableSync.h"
@@ -39,17 +40,15 @@ namespace synthese
 		// const string ScenarioStopAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
 
 
-		Request::ParametersMap ScenarioStopAction::getParametersMap() const
+		ParametersMap ScenarioStopAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void ScenarioStopAction::setFromParametersMap(Request::ParametersMap& map)
+		void ScenarioStopAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
-
 			try
 			{
 				_scenario = MessagesModule::getScenarii().get(_request->getObjectId());

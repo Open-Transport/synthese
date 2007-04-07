@@ -27,6 +27,7 @@
 
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
@@ -39,16 +40,16 @@ namespace synthese
 		const string UpdateProfileAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
 
 
-		Request::ParametersMap UpdateProfileAction::getParametersMap() const
+		ParametersMap UpdateProfileAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_NAME, _name));
 			return map;
 		}
 
-		void UpdateProfileAction::setFromParametersMap(Request::ParametersMap& map)
+		void UpdateProfileAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::iterator it;
+			ParametersMap::const_iterator it;
 
 			// Profile
 			try
@@ -65,7 +66,6 @@ namespace synthese
 			if (it == map.end())
 				throw ActionException("Name not specified");
 			_name = it->second;
-			map.erase(it);
 
 			// Name unicity
 			vector<Profile*> existingProfiles = ProfileTableSync::search(_name,"",0,1);

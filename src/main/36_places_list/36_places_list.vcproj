@@ -65,6 +65,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\39_map\MapRequest.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"
@@ -91,7 +95,7 @@
 			>
 		</Filter>
 		<Filter
-			Name="Requests"
+			Name="Functions"
 			>
 			<File
 				RelativePath=".\CityListRequest.cpp"

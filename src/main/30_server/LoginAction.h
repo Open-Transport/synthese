@@ -42,12 +42,19 @@ namespace synthese
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			server::Request::ParametersMap getParametersMap() const;
+			server::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 			Removes the used parameters from the map.
 			*/
-			void setFromParametersMap(server::Request::ParametersMap& map);
+			void _setFromParametersMap(const server::ParametersMap& map);
+
+			/** Activates the action before the session control.
+				@return TRUE
+				@author Hugues Romain
+				@date 2007				
+			*/
+			bool _beforeSessionControl() const;
 
 		public:
 

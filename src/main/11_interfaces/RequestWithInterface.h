@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_RequestWithInterface_h__
 #define SYNTHESE_RequestWithInterface_h__
 
-#include "30_server/Request.h"
+#include "30_server/Function.h"
 
 namespace synthese
 {
@@ -34,34 +34,31 @@ namespace synthese
 		/** RequestWithInterface class.
 			@ingroup m11
 		*/
-		class RequestWithInterface : public server::Request
+		class RequestWithInterface : public server::Function
 		{
-		protected:
+		public:
 			static const std::string PARAMETER_INTERFACE;
 
+		protected:
 			const Interface*	_interface;
 
 			RequestWithInterface();
 
 			/** Conversion from generic parameters map to attributes.
 			*/
-			virtual void setFromParametersMap(const ParametersMap& map);
+			virtual void _setFromParametersMap(const server::ParametersMap& map);
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			virtual ParametersMap getParametersMap() const;
+			virtual server::ParametersMap _getParametersMap() const;
 
 
 			/** Redirection to the same request without the action.
 			@return true : interrupts the display of the request with the action.
 			*/
-			bool	runAfterAction(std::ostream& stream);
+			virtual bool _runAfterSucceededAction(std::ostream& stream);
 
-			virtual std::string getQueryString() const;
-		public:
-			virtual void copy(const Request* request);
-
-			virtual std::string getHTMLFormHeader(const std::string& name) const;
+			virtual void _copy(const Function* function);
 
 		};
 	}

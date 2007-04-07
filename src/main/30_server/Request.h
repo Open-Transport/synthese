@@ -24,25 +24,73 @@
 #define SYNTHESE_Request_H__
 
 #include "01_util/UId.h"
-#include "01_util/Factorable.h"
+
+#include "30_server/Types.h"
+
+#include <boost/shared_ptr.hpp>
 
 #include <ostream>
 #include <map>
 
 namespace synthese
 {
+	namespace html
+	{
+		class HTMLForm;
+	}
+
 	namespace server
 	{
-		using util::Factory;
-
-		class Site;
 		class Session;
 		class Action;
+		class Function;
 
 		/** Parsed request.
-			@todo Remove the site pointer. Replace it by a Interface pointer.
+			@ingroup m30
+
+			A request object determinates a couple of services to run, and can be used to launch it or to describe it (build of links, etc.)
+
+			The two services are :
+				- an action  (execution without display, see server::Action)
+				- a fonction (build of a display)
+
+			The request class can be used in several ways. The life cycle of the request object is divided in two steps :
+				- the build
+				- the output
+			
+			The build and the output follow much different ways. The request acts as a wrapper between the build and the output methods.
+
+			The available build processes are :
+				- build by a query string parse (static method createFromString)
+				- build by classic object construction
+				- build by copy followed by completion with the classic object construction methods
+
+			The available output methods are  :
+				- execution of the action and/or the display from the specified parameters
+				- build of a query string (method getQueryString)
+				- build of an URL (method getURL)
+				- build of an HTML form (method getHTMLForm, build of a class html::HTMLForm object)
+
+			When the request is used to run the services, a session control is handled.
+
+			The full sequence of the control is as following :
+				- generic parsing of the string by the _parseString method
+				- build of an empty Request by the Factory from the key read by the parsing process
+				- build of an empty Action by the Factory from the key read by the parsing process
+				- interpretation of the fields by the Action::_setFromParametersMap method
+				- if a field is intended to be filled by the action run, then it is marked by the Action::_setFromParametersMap method
+				- interpretation of the fields by the _setFromParametersMap method
+				- if the action has to run before the session control (Action::beforeSessionControl method), run of the Action::run method
+				- control of the session
+				- interruption of the process if the  action needs a valid session (Action::_needsSession method)
+				- if the action has to run after the session control (Action::beforeSessionControl method), run of the Action::run method
+				- run of the _runAfterAction method
+				- run of the _runBeforeDisplayIfNoSession method if no session is validated
+				- interruption of the process if the function needs a valid session (return of the preceding method)
+				- display with the _run method
+				
 		*/
-		class Request : public util::Factorable
+		class Request
 		{
 		public:
 			static const std::string PARAMETER_SEPARATOR;
@@ -53,69 +101,114 @@ namespace synthese
 			static const std::string PARAMETER_IP;
 			static const std::string PARAMETER_CLIENT_URL;
 			static const std::string PARAMETER_OBJECT_ID;
+			static const std::string PARAMETER_ACTION;
 			static const std::string PARAMETER_ACTION_FAILED;
 			static const std::string PARAMETER_ERROR_MESSAGE;
 			static const std::string PARAMETER_ERROR_LEVEL;
 			static const int MAX_REQUEST_SIZE;
 			static const uid UID_WILL_BE_GENERATED_BY_THE_ACTION;
 			
-			typedef std::map<std::string, std::string> ParametersMap;
 			typedef enum { REQUEST_ERROR_NONE, REQUEST_ERROR_INFO, REQUEST_ERROR_WARNING, REQUEST_ERROR_FATAL } ErrorLevel;
+
+		private:
+
+			boost::shared_ptr<Action>	_action;
+			boost::shared_ptr<Function>	_function;
+			const Session*				_session;
+			bool						_sessionBroken;
+			std::string					_ip;
+			std::string					_clientURL;
+			bool						_actionException;
+			std::string					_errorMessage;
+			ErrorLevel					_errorLevel;
+			uid							_object_id;			//!< Object ID to display (generic parameter which can be used or not by the subclasses)
+
+			//! \name Static internal services
+			//@{
+				/** Parses a query string into a key => value map.
+					@param text Text to parse
+				*/
+				static ParametersMap _parseString(const std::string& text);
+
+				/** Normalize a query string.
+				@param requestString request to normalize
+				*/
+				static std::string _normalizeQueryString(const std::string& requestString);
+
+				ParametersMap _getParametersMap() const;
+			//@}
 
 		protected:
 
-			const Session*			_session;
-			bool					_sessionBroken;
-			std::string				_ip;
-			Action*					_action;
-			bool					_actionException;
-			std::string				_errorMessage;
-			ErrorLevel				_errorLevel;
-			std::string				_clientURL;
-			uid						_object_id;			//!< Object ID to display (generic parameter which can be used or not by the subclasses)
+			//! \name Protected getters
+			//@{
 
-			/** Conversion from attributes to generic parameter maps.
-			*/
-			virtual ParametersMap getParametersMap() const = 0;
+				Function* _getFunction();
+				/** Action getter.
+					@return const Action* The action of the request
+					@author Hugues Romain
+					@date 2007					
+				*/
+				const Action* _getAction() const;
+			//@}
 
-			/** Conversion from generic parameters map to attributes.
-			*/
-			virtual void setFromParametersMap(const ParametersMap& map) = 0;
+			//! \name Protected setters
+			//@{
+				/** Action setter.
+					@param action Action to set
+					@author Hugues Romain
+					@date 2007
+				*/
+				void _setAction(Action* action);
 
-			/** Method to run after action execution.
-				@return true if the current execution must be stopped
+				/** Function setter.
+					@param function
+					@return void
+					@author Hugues Romain
+					@date 2007					
+				*/
+				void _setFunction(Function* function);
+			//@}
 
-				This method has to be overloaded.
-				The default behaviour is to do nothing and continue the execution after the action run.
-			*/
-			virtual bool	runAfterAction(std::ostream& stream);
-
-			/** Method to run before display when no session is detected.
-				@return true if the current execution must be stopped
-
-				This method has to be overloaded.
-				The default behaviour is to do nothing and continue the execution without any session.
-			*/
-			virtual bool	runBeforeDisplayIfNoSession(std::ostream& stream);
-
-			/** Normalize a query string.
-				@param requestString request to normalize
-			*/
-			static std::string truncateStringIfNeeded (const std::string& requestString);
-
+				/** Construction of an empty request from an other one.
+					@param request Request to copy (default/NULL = no copy)
+					@param function Function to link with
+					@param action Action to link with
+					@author Hugues Romain
+					@date 2007
+					Use the public setters to fill the request.					
+				*/
+				Request(const Request* request=NULL, Function* function=NULL, Action* action=NULL);
+				
 		public:
+			void _setErrorMessage(const std::string& message);
+			void _setActionException(bool value);
+			void _setErrorLevel(const ErrorLevel& level);
 			//! \name Constructor and destructor
 			//@{
-				Request();
-				virtual ~Request();
+				
+				/** Construction from a query string to parse, using the factory to choose the right subclass.
+					@param querystring The query string to parse
+					@throw RequestException if the string is incomplete or contains refused values according to the parameters validators
+					@author Hugues Romain
+					@date 2007					
+				*/
+				Request(const std::string& querystring);
 			//@}
 
 			//! \name Getters
 			//@{
+				/** Action exception getter for subclasses only.
+				@return bool If an action exception has occured
+				@author Hugues Romain
+				@date 2007
+
+				*/
+				bool getActionException() const;
+
 				const Session*		getSession()		const;
 				const std::string&	getClientURL()		const;
 				const std::string&	getIP()				const;
-				const Action*		getAction()			const;
 				uid					getObjectId()		const;
 				const std::string&	getErrorMessage()	const;
 			//@}
@@ -123,47 +216,59 @@ namespace synthese
 			//! \name Setters
 			//@{
 				virtual void setObjectId(uid id);
-				void setAction(Action* action);
 				void setSession(Session* session);
+
+				/** Client URL setter.
+					@param url URL to store.
+					@author Hugues Romain
+					@date 2007
+				*/
+				void setClientURL(const std::string& url);
 			//@}
 
 			//! \name Modifiers
 			//@{
 				void deleteSession();
-				virtual void copy(const Request* request);
+
+				/** Deletes the action contained in the request.
+					@author Hugues Romain
+					@date 2007					
+				*/
+				void deleteAction();
 			//@}
 
-			//! \name Services
+			//! \name Service
 			//@{
-				/** Query string getter for building links.
+				/** Run of the services.
+					@param stream Stream to write the output on
+					@author Hugues Romain
+					@date 2007
 				*/
-				virtual std::string getQueryString() const;
+				void run(std::ostream& stream);
+			//@}
 
-				/** Function to display, defined by each subclass.
+			//! \name Output methods
+			//@{
+				/** URL generator.
+					@return std::string The URL corresponding to the request (= client URL + query string)
+					@author Hugues Romain
+					@date 2007
 				*/
-				virtual void run(std::ostream& stream) const = 0;
-
-				void runActionAndFunction(std::ostream& stream);
-
 				std::string getURL()	const;
 
-				std::string getHTMLLink(const std::string& content) const;
-				virtual std::string getHTMLFormHeader(const std::string& name) const;
-			//@}
-
-			//! \name Static services
-			//@{
-				/** Instantiates a request from a text string, using the factory to choose the right subclass.
-				@param text Text to parse.
+				/** HTML Form generator.
+					@param name Name of the form (default = no name, sufficient for link generation)
+					@return boost::shared_ptr<html::HTMLForm> The created form.
+					@author Hugues Romain
+					@date 2007					
 				*/
-				static Request* createFromString(const std::string& text);
+				html::HTMLForm getHTMLForm(std::string name=std::string()) const;
 
-				/** Parses a query string into a key => value map.
-					@param text Text to parse
+				/** Query string getter for building links.
+					@return The query string corresponding to the request.
 				*/
-				static ParametersMap parseString(const std::string& text);
+				std::string getQueryString() const;
 			//@}
-
 		};
 	}
 }

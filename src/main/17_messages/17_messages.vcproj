@@ -61,7 +61,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Classes"
+			Name="Core Classes"
 			>
 			<File
 				RelativePath=".\Alarm.cpp"

@@ -29,6 +29,7 @@
 #include "12_security/AddUserAction.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 namespace synthese
 {
@@ -41,20 +42,21 @@ namespace synthese
 		const std::string AddUserAction::PARAMETER_LOGIN = "actionParamlg";
 		const std::string AddUserAction::PARAMETER_PROFILE_ID = "actionParampid";
 
-		Request::ParametersMap AddUserAction::getParametersMap() const
+		ParametersMap AddUserAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_NAME, _name));
 			map.insert(make_pair(PARAMETER_LOGIN, _login));
-			map.insert(make_pair(PARAMETER_PROFILE_ID, Conversion::ToString(_profile->getKey())));
+			if (_profile)
+				map.insert(make_pair(PARAMETER_PROFILE_ID, Conversion::ToString(_profile->getKey())));
 			return map;
 		}
 
-		void AddUserAction::setFromParametersMap(Request::ParametersMap& map )
+		void AddUserAction::_setFromParametersMap(const ParametersMap& map )
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 				
 				it = map.find(PARAMETER_NAME);
 				if (it == map.end())
@@ -62,8 +64,7 @@ namespace synthese
 				_name = it->second;
 				if (_name.empty())
 					throw ActionException("L'utilisateur ne peut être créé car le nom n'est pas renseigné. Veuillez renseigner le champ nom.");
-				map.erase(it);
-
+				
 				it = map.find(PARAMETER_LOGIN);
 				if (it == map.end())
 					throw ActionException("Login not specified");
@@ -72,13 +73,13 @@ namespace synthese
 					throw ActionException("L'utilisateur ne peut être créé car le login n'est pas renseigné. Veuillez renseigner le champ login.");
 				if (UserTableSync::loginExists(_login))
 					throw ActionException("L'utilisateur ne peut être créé car le login entré est déjà utilisé. Veuillez choisir un autre login.");
-				map.erase(it);
-
+				
 				it = map.find(PARAMETER_PROFILE_ID);
 				if (it == map.end())
 					throw ActionException("Profile not specified");
 				_profile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
-				map.erase(it);
+
+				_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 			}
 			catch (Profile::RegistryKeyException e)
 			{
@@ -96,6 +97,12 @@ namespace synthese
 			UserTableSync::save(user);
 			_request->setObjectId(user->getKey());
 			delete user;
+		}
+
+		AddUserAction::AddUserAction()
+			: Action(), _profile(NULL)
+		{
+			
 		}
 	}
 }

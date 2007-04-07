@@ -24,6 +24,7 @@
 #include "15_env/ConnectionPlace.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "34_departures_table/AddPreselectionPlaceToDisplayScreen.h"
 #include "34_departures_table/DisplayScreen.h"
@@ -42,20 +43,20 @@ namespace synthese
 		const string AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pla";
 
 
-		Request::ParametersMap AddPreselectionPlaceToDisplayScreen::getParametersMap() const
+		ParametersMap AddPreselectionPlaceToDisplayScreen::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void AddPreselectionPlaceToDisplayScreen::setFromParametersMap(Request::ParametersMap& map)
+		void AddPreselectionPlaceToDisplayScreen::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_screen = DeparturesTableModule::getDisplayScreens().get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_PLACE);
 				if (it == map.end())

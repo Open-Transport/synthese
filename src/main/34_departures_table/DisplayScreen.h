@@ -218,7 +218,7 @@ namespace synthese
 			//@{
 				ArrivalDepartureTableGenerator*	getGenerator(const time::DateTime& startTime)							const;
 				void							display(std::ostream& stream, const time::DateTime& date)				const;
-				void							recordSupervision(const dblog::DBLogEntry::Level&, const std::string&)	const;
+				void							recordSupervision(const std::string&)	const;
 				std::string						getFullName()															const;
 				const env::PhysicalStopsSet&	getPhysicalStops(bool result=true)										const;
 

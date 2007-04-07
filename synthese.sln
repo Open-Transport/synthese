@@ -73,6 +73,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		vsscons.bat = vsscons.bat
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "05_html", "src\main\05_html\05_html.vcproj", "{9AB2D3DE-F6FE-4856-97E2-5268D3D5FF12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -165,6 +167,10 @@ Global
 		{46231469-A01B-45F6-A3FC-7E92114C69C2}.Release|Win32.ActiveCfg = Release|Win32
 		{1BA34523-B095-4F19-AE8C-CB44423F34EF}.Debug|Win32.ActiveCfg = Debug|Win32
 		{1BA34523-B095-4F19-AE8C-CB44423F34EF}.Release|Win32.ActiveCfg = Release|Win32
+		{9AB2D3DE-F6FE-4856-97E2-5268D3D5FF12}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9AB2D3DE-F6FE-4856-97E2-5268D3D5FF12}.Debug|Win32.Build.0 = Debug|Win32
+		{9AB2D3DE-F6FE-4856-97E2-5268D3D5FF12}.Release|Win32.ActiveCfg = Release|Win32
+		{9AB2D3DE-F6FE-4856-97E2-5268D3D5FF12}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

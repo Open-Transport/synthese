@@ -24,8 +24,7 @@
 
 #include <vector>
 
-#include "01_util/Html.h"
-#include "01_util/HtmlTable.h"
+#include "05_html/ResultHTMLTable.h"
 
 #include "11_interfaces/InterfaceModule.h"
 
@@ -39,7 +38,6 @@
 #include "17_messages/AlarmRemoveLinkAction.h"
 #include "17_messages/AlarmAddLinkAction.h"
 
-#include "32_admin/ResultHTMLTable.h"
 #include "32_admin/AdminModule.h"
 
 #include "34_departures_table/BroadcastPoint.h"
@@ -60,6 +58,7 @@ namespace synthese
 	using namespace env;
 	using namespace admin;
 	using namespace interfaces;
+	using namespace html;
 
 	namespace messages
 	{
@@ -94,7 +93,7 @@ namespace synthese
 
 		}
 
-		void DisplayScreenAlarmRecipient::displayBroadcastListEditor(ostream& stream, const Alarm* alarm, const AdminRequest::ParametersMap& parameters, AdminRequest* searchRequest, AdminRequest* addRequest, AdminRequest* removeRequest )
+		void DisplayScreenAlarmRecipient::displayBroadcastListEditor(std::ostream& stream, const messages::Alarm* alarm, const server::ParametersMap& parameters, server::FunctionRequest<admin::AdminRequest>& searchRequest, server::FunctionRequest<admin::AdminRequest>& addRequest, server::FunctionRequest<admin::AdminRequest>& removeRequest)
 		{
 			vector<AlarmObjectLink<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreen> (alarm, this->getFactoryKey());
 			set<uid> usedDisplayScreens;
@@ -105,7 +104,7 @@ namespace synthese
 				v.push_back("Emplacement");
 				v.push_back("Etat");
 				v.push_back("Actions");
-				HtmlTable t(v);
+				HTMLTable t(v);
 
 				stream << t.open();
 
@@ -113,7 +112,7 @@ namespace synthese
 				{
 					DisplayScreen* ds = dsit->getObject();
 					usedDisplayScreens.insert(ds->getKey());
-					removeRequest->setParameter(AlarmRemoveLinkAction::PARAMETER_LINK_ID, Conversion::ToString(dsit->getKey()));
+					removeRequest.getFunction()->setParameter(AlarmRemoveLinkAction::PARAMETER_LINK_ID, Conversion::ToString(dsit->getKey()));
 					
 					stream << t.row();
 					stream << t.col() << ds->getLocalization()->getConnectionPlace()->getFullName() << "/" << ds->getLocalization()->getName();
@@ -121,7 +120,7 @@ namespace synthese
 						stream << "/" << ds->getLocalizationComment();
 
 					stream << t.col() << "<FONT face=\"Wingdings\" color=\"#00cc00\">l</FONT>"; // Bullet
-					stream << t.col() << Html::getLinkButton(removeRequest->getURL(), "Supprimer", "Etes-vous sûr de vouloir retirer l'afficheur des destinataires du message ?");
+					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir retirer l'afficheur des destinataires du message ?");
 
 					delete ds;
 				}
@@ -131,7 +130,7 @@ namespace synthese
 
 			stream << "<p>Ajout d'afficheur</p>";
 
-			Request::ParametersMap::const_iterator it;
+			ParametersMap::const_iterator it;
 			it = parameters.find(PARAMETER_SEARCH_UID);
 			uid searchUid = (it == parameters.end()) ? 0 : Conversion::ToLongLong(it->second);
 			it = parameters.find(PARAMETER_SEARCH_PLACE);
@@ -143,7 +142,7 @@ namespace synthese
 
 			set<const DisplayScreen*> result = DisplayScreenAlarmRecipient::getLinkedObjects(alarm);
 
-			stream << DisplaySearchAdmin::getHtmlSearchForm(searchRequest, searchUid, searchPlace, searchLine, searchType, searchState, searchMessage);
+			stream << DisplaySearchAdmin::getHtmlSearchForm(searchRequest.getHTMLForm(), searchUid, searchPlace, searchLine, searchType, searchState, searchMessage);
 
 
 			ResultHTMLTable::HeaderVector v1;
@@ -152,7 +151,7 @@ namespace synthese
 			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, "Etat"));
 			v1.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Msg"));
 			v1.push_back(make_pair(string(), "Add"));
-			ResultHTMLTable t1(v1,searchRequest, string(), true, NULL, string(), string());
+			ResultHTMLTable t1(v1,searchRequest.getHTMLForm(), string(), true);
 
 			stream << "<p>Résultats de la recherche :</p>";
 
@@ -168,23 +167,23 @@ namespace synthese
 				if (usedDisplayScreens.find(screen->getKey()) != usedDisplayScreens.end())
 					continue;
 
-				addRequest->setParameter(AlarmAddLinkAction::PARAMETER_OBJECT_ID, Conversion::ToString(screen->getKey()));
+				addRequest.getFunction()->setParameter(AlarmAddLinkAction::PARAMETER_OBJECT_ID, Conversion::ToString(screen->getKey()));
 
 				stream << t1.row(Conversion::ToString(screen->getKey()));
 				stream << t1.col() << screen->getFullName();
 				stream << t1.col() << (screen->getType() ? screen->getType()->getName() : "inconnu");
 				stream << t1.col();
 				stream << t1.col();
-				stream << t1.col() << Html::getLinkButton(addRequest->getURL(), "Ajouter");
+				stream << t1.col() << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
 			}
 
 			stream << t1.close();
 		}
 
-		AlarmRecipientSearchFieldsMap DisplayScreenAlarmRecipient::getSearchFields(const Request::ParametersMap& parameters) const
+		AlarmRecipientSearchFieldsMap DisplayScreenAlarmRecipient::getSearchFields(HTMLForm& form, const ParametersMap& parameters) const
 		{
 
-			Request::ParametersMap::const_iterator it;
+			ParametersMap::const_iterator it;
 
 			ConnectionPlace* place = NULL;
 			it = parameters.find(PARAMETER_SEARCH_PLACE);
@@ -200,12 +199,12 @@ namespace synthese
 			AlarmRecipientFilter arf;
 
 			arf.label = "Arrêt";
-			arf.htmlField = Html::getSelectInput(PARAMETER_SEARCH_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), place ? place->getKey() : UNKNOWN_VALUE);
+			arf.htmlField = form.getSelectInput(PARAMETER_SEARCH_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), place ? place->getKey() : UNKNOWN_VALUE);
 			arf.query = "";
 			map.insert(make_pair(PARAMETER_SEARCH_PLACE, arf));
 
 			arf.label = "Ligne";
-			arf.htmlField = Html::getSelectInput(PARAMETER_SEARCH_LINE, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), line ? line->getKey() : UNKNOWN_VALUE);
+			arf.htmlField = form.getSelectInput(PARAMETER_SEARCH_LINE, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), line ? line->getKey() : UNKNOWN_VALUE);
 			arf.query = "";
 			map.insert(make_pair(PARAMETER_SEARCH_LINE, arf));
 

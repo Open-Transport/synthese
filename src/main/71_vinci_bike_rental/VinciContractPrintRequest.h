@@ -39,7 +39,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_CONTRACT_ID;
 			
-		private:
+		protected:
 			//! \name Page parameters
 			//@{
 				const VinciContract*	_contract;
@@ -48,21 +48,21 @@ namespace synthese
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			Request::ParametersMap getParametersMap() const;
+			server::ParametersMap _getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 			*/
-			void setFromParametersMap(const Request::ParametersMap& map);
+			void _setFromParametersMap(const server::ParametersMap& map);
+
+			/** Action to run, defined by each subclass.
+			*/
+			void _run(std::ostream& stream) const;
 
 		public:
 			VinciContractPrintRequest();
 			~VinciContractPrintRequest();
 
 			void setContract(const VinciContract* contract);
-
-			/** Action to run, defined by each subclass.
-			*/
-			void run(std::ostream& stream) const;
 		};
 	}
 }

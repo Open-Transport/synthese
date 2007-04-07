@@ -21,6 +21,7 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "17_messages/ScenarioUpdateDatesAction.h"
 #include "17_messages/MessagesModule.h"
@@ -45,21 +46,21 @@ namespace synthese
 		const string ScenarioUpdateDatesAction::PARAMETER_END_HOUR = Action_PARAMETER_PREFIX + "eho";
 
 
-		Request::ParametersMap ScenarioUpdateDatesAction::getParametersMap() const
+		ParametersMap ScenarioUpdateDatesAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_NAME, _name));
 			/// @todo Finish the implementation
 			return map;
 		}
 
-		void ScenarioUpdateDatesAction::setFromParametersMap(Request::ParametersMap& map)
+		void ScenarioUpdateDatesAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_scenario = MessagesModule::getScenarii().get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_NAME);
 				if (it == map.end())

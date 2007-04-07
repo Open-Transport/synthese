@@ -24,10 +24,9 @@
 
 #include "11_interfaces/RedirectInterfacePage.h"
 #include "11_interfaces/Interface.h"
+#include "11_interfaces/RedirRequest.h"
 
 #include "30_server/RequestException.h"
-
-#include "RedirRequest.h"
 
 using namespace std;
 
@@ -44,29 +43,32 @@ namespace synthese
 			: RequestWithInterface()
 		{}
 
-		Request::ParametersMap RedirRequest::getParametersMap() const
+		ParametersMap RedirRequest::_getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map(RequestWithInterface::_getParametersMap());
+
 			map.insert(make_pair(PARAMETER_URL, _url));
 			return map;
 		}
 
-		void RedirRequest::setFromParametersMap(const Request::ParametersMap& map)
+		void RedirRequest::_setFromParametersMap(const ParametersMap& map)
 		{
-			Request::ParametersMap::const_iterator it;
+			RequestWithInterface::_setFromParametersMap(map);
+
+			ParametersMap::const_iterator it;
 
 			it = map.find(PARAMETER_URL);
 			if (it == map.end())
 				throw RequestException("URL to redirect not specified");
 		}
 
-		void RedirRequest::run( std::ostream& stream ) const
+		void RedirRequest::_run( std::ostream& stream ) const
 		{
 			try
 			{
 				const RedirectInterfacePage* page = _interface->getPage<RedirectInterfacePage>();
 				VariablesMap vm;
-				page->display(stream, vm, _url, this);
+				page->display(stream, vm, _url, _request);
 			}
 			catch (Exception e)
 			{
@@ -78,12 +80,12 @@ namespace synthese
 		{
 		}
 
-		void RedirRequest::setUrl( const std::string& url )
+		void RedirRequest::setRedirURL( const std::string& url )
 		{
 			_url = url;
 		}
 
-		const std::string& RedirRequest::getURL() const
+		const std::string& RedirRequest::getRedirURL() const
 		{
 			return _url;
 		}

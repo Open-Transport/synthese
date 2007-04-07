@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Html.h"
+#include "05_html/HTMLTable.h"
+#include "05_html/HTMLForm.h"
 
 #include "02_db/DBEmptyResultException.h"
 
@@ -31,6 +32,8 @@
 #include "12_security/UserUpdateAction.h"
 #include "12_security/UserPasswordUpdateAction.h"
 
+#include "30_server/ActionFunctionRequest.h"
+
 using namespace std;
 
 namespace synthese
@@ -38,6 +41,7 @@ namespace synthese
 	using namespace server;
 	using namespace admin;
 	using namespace db;
+	using namespace html;
 
 	namespace security
 	{
@@ -57,58 +61,87 @@ namespace synthese
 				: "";
 		}
 
-		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
-			updateRequest->copy(request);
-			updateRequest->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
-			updateRequest->setAction(Factory<Action>::create<UserUpdateAction>());
-			updateRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<UserUpdateAction, AdminRequest> updateRequest(request);
+			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
+			updateRequest.setObjectId(request->getObjectId());
 
-			AdminRequest* userPasswordUpdateRequest = Factory<Request>::create<AdminRequest>();
-			userPasswordUpdateRequest->copy(request);
-			userPasswordUpdateRequest->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
-			userPasswordUpdateRequest->setAction(Factory<Action>::create<UserPasswordUpdateAction>());
-			userPasswordUpdateRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<UserPasswordUpdateAction, AdminRequest> userPasswordUpdateRequest(request);
+			userPasswordUpdateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
+			userPasswordUpdateRequest.setObjectId(request->getObjectId());
 
-			stream
-				<< "<h1>Coordonnées</h1>"
-				<< updateRequest->getHTMLFormHeader("update")
-				<< "<table>"
-				<< "<tr><th colspan=\"2\">Connexion</th></tr>"
-				<< "<tr><td>Login</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin()) << "</td></tr>"
-				<< "<tr><th colspan=\"2\">Coordonnées</th></tr>"
-				<< "<tr><td>Prénom</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname()) << "</td></tr>"
-				<< "<tr><td>Nom</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName()) << "</td></tr>"
-				<< "<tr><td>Adresse</td><td>" << Html::getTextAreaInput(UserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50) << "</td></tr>"
-				<< "<tr><td>Code postal</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode()) << "</td></tr>"
-				<< "<tr><td>Ville</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_CITY, _user->getCityText()) << "</td></tr>"
-				<< "<tr><td>Téléphone</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone()) << "</td></tr>"
-				<< "<tr><td>E-mail</td><td>" << Html::getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail()) << "</td></tr>"
-				<< "<tr><th colSpan=\"2\">Droits</td></tr>"
-				<< "<tr><td>Connexion autorisée</td><td>" << Html::getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()) << "</td></tr>"
-				<< "<tr><td>Profil</td><td>" << Html::getSelectInput(UserUpdateAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), _user->getProfile()->getKey()) << "</td></tr>"
-				<< "<tr><td style=\"text-align:center\" colSpan=\"2\">" << Html::getSubmitButton("Enregistrer les modifications") << "</td></tr>"
-				<< "</table>"
-				<< "</form>"
+			{
+				stream << "<h1>Coordonnées</h1>";
+				HTMLForm form(updateRequest.getHTMLForm("update"));
+				stream << form.open();
+				HTMLTable t;
+				stream << t.open();
+				stream << t.row();
+				stream << t.col(2) << "Connexion";
+				stream << t.row();
+				stream << t.col() << "Login";
+				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin());
+				stream << t.row();
+				stream << t.col(2) << "Coordonnées";
+				stream << t.row();
+				stream << t.col() << "Prénom";
+				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname());
+				stream << t.row();
+				stream << t.col() << "Nom" << form.getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName());
+				stream << t.row();
+				stream << t.col() << "Adresse";
+				stream << t.col() << form.getTextAreaInput(UserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50);
+				stream << t.row();
+				stream << t.col() << "Code postal";
+				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode());
+				stream << t.row();
+				stream << t.col() << "Ville";
+				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_CITY, _user->getCityText());
+				stream << t.row();
+				stream << t.col() << "Téléphone";
+				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone());
+				stream << t.row();
+				stream << t.col() << "E-mail";
+				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail());
+				stream << t.row();
+				stream << t.col(2) << "Droits";
+				stream << t.row();
+				stream << t.col() << "Connexion autorisée";
+				stream << t.col() << form.getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed());
+				stream << t.row();
+				stream << t.col() << "Profil";
+				stream << t.col() << form.getSelectInput(UserUpdateAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), _user->getProfile()->getKey());
+				stream << t.row();
+				stream << t.col(2) << form.getSubmitButton("Enregistrer les modifications");
+				stream << t.close();
+				stream << form.close();
+			}
 
-				<< "<h1>Changement de mot de passe</h1>"
-				<< userPasswordUpdateRequest->getHTMLFormHeader("pass")
-				<< "<table>"
-				<< "<tr><td>Mot de passe</td><td>" << Html::getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS1, "") << "</td></tr>"
-				<< "<tr><td>Mot de passe (vérification)</td><td>" << Html::getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS2, "") << "</td></tr>"
-				<< "<tr><td style=\"text-align:center\" colSpan=\"2\">" << Html::getSubmitButton("Changer le mot de passe") << "</td></tr>"
-				<< "</table></form>";
-
-			delete updateRequest;
-			delete userPasswordUpdateRequest;
+			stream << "<h1>Changement de mot de passe</h1>";
+			{
+				HTMLForm form(userPasswordUpdateRequest.getHTMLForm("pass"));
+				stream << form.open();
+				HTMLTable t;
+				stream << t.open();
+				stream << t.row();
+				stream << t.col() << "Mot de passe";
+				stream << t.col() << form.getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS1, "");
+				stream << t.row();
+				stream << t.col() << "Mot de passe (vérification)";
+				stream << t.col() << form.getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS2, "");
+				stream << t.row();
+				stream << t.col(2) << form.getSubmitButton("Changer le mot de passe");
+				stream << t.close();
+				stream << form.close();
+			}
 		}
 
-		void UserAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void UserAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::const_iterator it = map.find(AdminRequest::PARAMETER_OBJECT_ID);
+				ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
 				if (it != map.end())
 					_user = UserTableSync::get(Conversion::ToLongLong(it->second));
 			}

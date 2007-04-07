@@ -24,6 +24,8 @@
 
 #include "11_interfaces/ValueElementList.h"
 
+#include "30_server/FunctionRequest.h"
+
 #include "32_admin/AdminRequest.h"
 #include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminPagePositionInterfaceElement.h"
@@ -37,7 +39,7 @@ namespace synthese
 
 	namespace admin
 	{
-		std::string AdminPagePositionInterfaceElement::getUpPages(const AdminInterfaceElement* page, const AdminRequest* request, bool isFirst)
+		std::string AdminPagePositionInterfaceElement::getUpPages(const AdminInterfaceElement* page, const server::FunctionRequest<admin::AdminRequest>* request, bool isFirst)
 		{
 			stringstream str;
 			Factory<AdminInterfaceElement>::Iterator it = Factory<AdminInterfaceElement>::begin(); 
@@ -73,7 +75,7 @@ namespace synthese
 		std::string AdminPagePositionInterfaceElement::getValue( const ParametersVector&, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
 		{
 			const AdminInterfaceElement* aie = (const AdminInterfaceElement*) object;
-			return getUpPages(aie, (AdminRequest*) request);
+			return getUpPages(aie, (const server::FunctionRequest<admin::AdminRequest>*) request);
 		}
 	}
 }

@@ -23,13 +23,15 @@
 #include <sstream>
 
 #include "01_util/Conversion.h"
-#include "01_util/Html.h"
+
+#include "05_html/HTMLForm.h"
 
 #include "11_interfaces/RequestWithInterface.h"
 #include "11_interfaces/InterfaceModule.h"
 #include "11_interfaces/RedirectInterfacePage.h"
 
 #include "30_server/RequestException.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
@@ -37,6 +39,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace html;
 
 	namespace interfaces
 	{
@@ -44,7 +47,7 @@ namespace synthese
 		const std::string RequestWithInterface::PARAMETER_INTERFACE = "i";
 
 		RequestWithInterface::RequestWithInterface()
-			: Request()
+			: Function()
 			, _interface(NULL)
 		{
 
@@ -52,22 +55,20 @@ namespace synthese
 
 
 		/** @todo to be moved elsewhere because the interface is not necessarily an html interface */
-		bool RequestWithInterface::runAfterAction(ostream& stream)
+		bool RequestWithInterface::_runAfterSucceededAction(ostream& stream)
 		{
-			_action = NULL;
-
 			if (_interface != NULL)
 			{
 				const RedirectInterfacePage* page = _interface->getPage<RedirectInterfacePage>();
-
+				_request->deleteAction();
 				VariablesMap vm;
-				page->display(stream, vm, this);
+				page->display(stream, vm, _request);
 			}
 
 			return true;
 		}
 
-		void RequestWithInterface::setFromParametersMap( const ParametersMap& map )
+		void RequestWithInterface::_setFromParametersMap( const ParametersMap& map )
 		{
 			try
 			{
@@ -84,38 +85,19 @@ namespace synthese
 			}
 		}
 
-		RequestWithInterface::ParametersMap RequestWithInterface::getParametersMap() const
+		ParametersMap RequestWithInterface::_getParametersMap() const
 		{
 			ParametersMap map;
 			if (_interface != NULL)
 				map.insert(make_pair(PARAMETER_INTERFACE, Conversion::ToString(_interface->getKey())));
+			
 			return map;
 		}
 
-		void RequestWithInterface::copy( const Request* request )
+		void RequestWithInterface::_copy( const Function* function)
 		{
-			Request::copy(request);
-			const RequestWithInterface* requestWithInterface;
-			if (requestWithInterface = dynamic_cast<const RequestWithInterface*>(request))
-				_interface = requestWithInterface->_interface;
-		}
-
-		std::string RequestWithInterface::getHTMLFormHeader( const std::string& name ) const
-		{
-			stringstream s;
-			s << Request::getHTMLFormHeader(name);
-			if (_interface != NULL)
-				s << Html::getHiddenInput(PARAMETER_INTERFACE, Conversion::ToString(_interface->getKey()));
-			return s.str();
-		}
-
-		std::string RequestWithInterface::getQueryString() const
-		{
-			stringstream s;
-			s << Request::getQueryString();
-			if (_interface != NULL)
-				s << PARAMETER_SEPARATOR << PARAMETER_INTERFACE << PARAMETER_ASSIGNMENT << _interface->getKey();
-			return s.str();
+			const RequestWithInterface* rwi = dynamic_cast<const RequestWithInterface*>(function);
+			_interface = rwi->_interface;
 		}
 	}
 }

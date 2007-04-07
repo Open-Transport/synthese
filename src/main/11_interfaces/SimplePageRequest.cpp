@@ -40,33 +40,38 @@ namespace synthese
 			, _page(NULL)
 		{}
 
-		void SimplePageRequest::run( std::ostream& stream ) const
+		void SimplePageRequest::_run( std::ostream& stream ) const
 		{
 			if (_page == NULL)
 				return;
 
 			ParametersVector pv;
-			for (Request::ParametersMap::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
+			for (ParametersMap::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
 				pv.push_back(it->second);
 			    
 
 			VariablesMap vm;
 
-			_page->display(stream, pv, vm, NULL, this);
+			_page->display(stream, pv, vm, NULL, _request);
 		}
 
-		void SimplePageRequest::setFromParametersMap(const Request::ParametersMap& map )
+		void SimplePageRequest::_setFromParametersMap(const ParametersMap& map )
 		{
-			RequestWithInterface::setFromParametersMap(map);
+			RequestWithInterface::_setFromParametersMap(map);
 
 			_parameters = map;
 
-			Request::ParametersMap::iterator it = _parameters.find(PARAMETER_PAGE);
+			ParametersMap::iterator it = _parameters.find(PARAMETER_PAGE);
 			if (it == _parameters.end() || it->second.empty())
 				return;
 
 			if (_interface == NULL)
 				throw RequestException("Interface was not defined");
+
+			// Drop registered pages
+			if (Factory<InterfacePage>::contains(it->second))
+				throw RequestException("Forbidden interface page");
+
 			try
 			{
 				_page = _interface->getPage(it->second);
@@ -78,17 +83,24 @@ namespace synthese
 			}
 		}
 
-		server::Request::ParametersMap SimplePageRequest::getParametersMap() const
+		ParametersMap SimplePageRequest::_getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map(RequestWithInterface::_getParametersMap());
+
 			if (_page != NULL)
 				map.insert(make_pair(PARAMETER_PAGE, _page->getCode()));
+			
 			return map;
 		}
 
 		void SimplePageRequest::setPage( const interfaces::InterfacePage* page )
 		{
 			_page = page;
+		}
+
+		bool SimplePageRequest::_runBeforeDisplayIfNoSession( std::ostream& stream )
+		{
+			return false;
 		}
 	}
 }

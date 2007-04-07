@@ -20,12 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Html.h"
 #include "01_util/Conversion.h"
+
+#include "05_html/HTMLForm.h"
+#include "05_html/HTMLTable.h"
 
 #include "15_env/EnvModule.h"
 #include "15_env/ConnectionPlace.h"
 #include "15_env/City.h"
+
+#include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminParametersException.h"
 
@@ -44,6 +48,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace env;
+	using namespace html;
 
 	namespace departurestable
 	{
@@ -53,10 +58,10 @@ namespace synthese
 		{}
 
 
-		void BroadcastPointAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void BroadcastPointAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			// Place ID
-			Request::ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
+			ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
 			uid placeId = Conversion::ToLongLong(it->second);
 			if (it == map.end())
 				throw AdminParametersException("Connection place not specified");
@@ -72,89 +77,81 @@ namespace synthese
 			return _place->getCity()->getName() + " " + _place->getName();
 		}
 
-		void BroadcastPointAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void BroadcastPointAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			AdminRequest* createRequest = Factory<Request>::create<AdminRequest>();
-			createRequest->copy(request);
-			createRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
-			createRequest->setAction(Factory<Action>::create<CreateBroadcastPointAction>());
-			createRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<CreateBroadcastPointAction,AdminRequest> createRequest(request);
+			createRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
+			createRequest.setObjectId(request->getObjectId());
 
-			AdminRequest* deleteRequest = Factory<Request>::create<AdminRequest>();
-			deleteRequest->copy(request);
-			deleteRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
-			deleteRequest->setAction(Factory<Action>::create<DeleteBroadcastPointAction>());
-			deleteRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<DeleteBroadcastPointAction,AdminRequest> deleteRequest(request);
+			deleteRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
+			deleteRequest.setObjectId(request->getObjectId());
 
-			AdminRequest* renameRequest = Factory<Request>::create<AdminRequest>();
-			renameRequest->copy(request);
-			renameRequest->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
-			renameRequest->setAction(Factory<Action>::create<RenameBroadcastPointAction>());
-			renameRequest->setObjectId(request->getObjectId());
+			ActionFunctionRequest<RenameBroadcastPointAction,AdminRequest> renameRequest(request);
+			renameRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
+			renameRequest.setObjectId(request->getObjectId());
 
-			stream
-				<< "<h1>Emplacements d'affichage de la zone d'arrêt</h1>"
-				<< "<table>";
+			stream << "<h1>Emplacements d'affichage de la zone d'arrêt</h1>";
+
+			HTMLTable t;
+			stream << t.open();
 
 			// Physical stop loop
 			vector<PhysicalStopAndBroadcastPoint> m = getConnectionPlacePhysicalStopsAndBroadcastPoints(_place->getKey());
 			for (vector<PhysicalStopAndBroadcastPoint>::iterator it = m.begin(); it != m.end(); ++it)
 			{
 
-				stream
-					<< "<tr><td>Arrêt physique " << it->stop->getName() << "</td>"
-					<< "<td>";
+				stream << t.row();
+				stream << t.col() << "Arrêt physique " << it->stop->getName();
+				stream << t.col();
 				if (it->bp == NULL)
 				{
-					stream
-						<< createRequest->getHTMLFormHeader("create" + Conversion::ToString(it->stop->getKey()))
-						<< Html::getHiddenInput(CreateBroadcastPointAction::PARAMETER_PHYSICAL_ID, Conversion::ToString(it->stop->getKey()))
-						<< Html::getHiddenInput(CreateBroadcastPointAction::PARAMETER_PLACE_ID, Conversion::ToString(_place->getKey()))
-						<< Html::getSubmitButton("Activer")
-						<< "</form>";
+					HTMLForm f(createRequest.getHTMLForm("create" + Conversion::ToString(it->stop->getKey())));
+					f.addHiddenField(CreateBroadcastPointAction::PARAMETER_PHYSICAL_ID, Conversion::ToString(it->stop->getKey()));
+					f.addHiddenField(CreateBroadcastPointAction::PARAMETER_PLACE_ID, Conversion::ToString(_place->getKey()));
+					stream << f.getLinkButton("Activer");
 				}
 				else
 				{
+					HTMLForm f(deleteRequest.getHTMLForm("delete" + Conversion::ToString(it->bp->getKey())));
+					f.addHiddenField(DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(it->bp->getKey()));
 					stream
-						<< deleteRequest->getHTMLFormHeader("delete" + Conversion::ToString(it->bp->getKey()))
-						<< Html::getHiddenInput(DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(it->bp->getKey()))
-						<< "Arrêt physique actif en tant que point de diffusion" 
-						<< Html::getSubmitButton("Supprimer")
-						<< "</form>";
+						<< "Arrêt physique actif en tant que point de diffusion "
+						<< f.getLinkButton("Supprimer", "Etes-vous sûr(e) de vouloir supprimer le point de diffusion ?");
 				}
-				stream	
-					<< "</td>"
-					<< "</tr>";
 				delete it->bp;
 			}
 
 			vector<PhysicalStopAndBroadcastPoint> b = getConnectionPlaceBroadcastPointsAndPhysicalStops(_place->getKey(), false);
 			for (vector<PhysicalStopAndBroadcastPoint>::iterator bit = b.begin(); bit != b.end(); ++bit)
 			{
-				stream
-					<< "<tr><td>" << renameRequest->getHTMLFormHeader("rename" + Conversion::ToString(bit->bp->getKey()))
-					<< Html::getHiddenInput(RenameBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(bit->bp->getKey()))
-					<< Html::getTextInput(RenameBroadcastPointAction::PARAMETER_NAME, bit->bp->getName())
-					<< Html::getSubmitButton("Renommer")
-					<< "</form></td>"
-					<< "<td>" << deleteRequest->getHTMLFormHeader("delete" + Conversion::ToString(bit->bp->getKey()))
-					<< Html::getHiddenInput(DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(bit->bp->getKey()))
-					<< Html::getSubmitButton("Supprimer")
-					<< "</form></td>"
-					<< "</tr>";
+				stream << t.row();
+				
+				HTMLForm rf(renameRequest.getHTMLForm("rename" + Conversion::ToString(bit->bp->getKey())));
+				rf.addHiddenField(RenameBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(bit->bp->getKey()));
+
+				stream << t.col() << rf.open();
+				stream << rf.getTextInput(RenameBroadcastPointAction::PARAMETER_NAME, bit->bp->getName());
+				stream << rf.getSubmitButton("Renommer");
+				stream << rf.close();
+
+				HTMLForm df(deleteRequest.getHTMLForm("delete" + Conversion::ToString(bit->bp->getKey())));
+				df.addHiddenField(DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(bit->bp->getKey()));
+
+				stream << t.col() << rf.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer le point de diffusion ?");
+
 				delete bit->bp;
 			}
 
-			stream
-				<< createRequest->getHTMLFormHeader("createbp")
-				<< Html::getHiddenInput(CreateBroadcastPointAction::PARAMETER_PLACE_ID, Conversion::ToString(_place->getKey()))
-				<< "<tr><td>" << Html::getTextInput(CreateBroadcastPointAction::PARAMETER_NAME, "", "(entrez le nom ici)") << "</td>"
-				<< "<td>" << Html::getSubmitButton("Ajouter") << "</td>"
-				<< "</tr></form>";
+			HTMLForm cf(createRequest.getHTMLForm("createbp"));
+			cf.addHiddenField(CreateBroadcastPointAction::PARAMETER_PLACE_ID, Conversion::ToString(_place->getKey()));
+			stream << t.row();
+			stream << t.col(2) << cf.open();
+			stream << cf.getTextInput(CreateBroadcastPointAction::PARAMETER_NAME, "", "(entrez le nom ici)");
+			stream << cf.getSubmitButton("Ajouter");
+			stream << cf.close();
 
-			delete createRequest;
-			delete deleteRequest;
-			delete renameRequest;
+			stream << t.close();
 		}
 	}
 }

@@ -25,6 +25,7 @@
 #include "12_security/SecurityModule.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
@@ -39,9 +40,9 @@ namespace synthese
 		const string UpdateRightAction::PARAMETER_PUBLIC_VALUE = Action_PARAMETER_PREFIX + "uv";
 		const string UpdateRightAction::PARAMETER_PRIVATE_VALUE = Action_PARAMETER_PREFIX + "rv";
 		
-		Request::ParametersMap UpdateRightAction::getParametersMap() const
+		ParametersMap UpdateRightAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_RIGHT_CODE, _right->getFactoryKey()));
 			map.insert(make_pair(PARAMETER_RIGHT_PARAMETER, _right->getParameter()));
 			map.insert(make_pair(PARAMETER_PUBLIC_VALUE, Conversion::ToString((int) _right->getPublicRightLevel())));
@@ -49,11 +50,11 @@ namespace synthese
 			return map;
 		}
 
-		void UpdateRightAction::setFromParametersMap(Request::ParametersMap& map)
+		void UpdateRightAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				// Profile
 				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
@@ -64,7 +65,6 @@ namespace synthese
 				if (it == map.end())
 					throw ActionException("Right code not specified");
 				rightCode = it->second;
-				map.erase(it);
 
 				// Right parameter
 				it = map.find(PARAMETER_RIGHT_PARAMETER);
@@ -72,21 +72,18 @@ namespace synthese
 					throw ActionException("Right parameter not specified");
 
 				_right = _profile->getRight(rightCode, it->second);
-				map.erase(it);
 
 				// Public level
 				it = map.find(PARAMETER_PUBLIC_VALUE);
 				if (it == map.end())
 					throw ActionException("Public level not specified");
 				_publicLevel = (Right::Level) Conversion::ToInt(it->second);
-				map.erase(it);
 
 				// Private level
 				it = map.find(PARAMETER_PRIVATE_VALUE);
 				if (it == map.end())
 					throw ActionException("Private level not specified");
 				_privateLevel = (Right::Level) Conversion::ToInt(it->second);
-				map.erase(it);
 			}
 			catch (Profile::RegistryKeyException e)
 			{

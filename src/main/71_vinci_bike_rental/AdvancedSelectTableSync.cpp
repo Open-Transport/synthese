@@ -56,30 +56,72 @@ namespace synthese
 			Account* account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
 			if (account == NULL)
 				return m;
-			stringstream query;
-			query
-				<< "SELECT "
-					<< "strftime('%Y-%m-%d', " << TransactionTableSync::TABLE_COL_START_DATE_TIME << ") AS " << COL_DAY
-					<< ",COUNT(t." << TABLE_COL_ID << ") AS " << COL_NUMBER
-				<< " FROM "
-					<< TransactionTableSync::TABLE_NAME << " t"
-					<< " INNER JOIN " << TransactionPartTableSync::TABLE_NAME << " p ON p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID << "=t." << TABLE_COL_ID
-				<< " WHERE "
-				<< "p." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
-				<< " GROUP BY "
-				<< "strftime('%Y-%m-%d', " << TransactionTableSync::TABLE_COL_START_DATE_TIME << ")"
-				;
 
 			try
 			{
 				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+
+				// Rent Starts
+				stringstream query;
+				query
+					<< "SELECT "
+						<< "strftime('%Y-%m-%d', " << TransactionTableSync::TABLE_COL_START_DATE_TIME << ") AS " << COL_DAY
+						<< ",COUNT(t." << TABLE_COL_ID << ") AS " << COL_NUMBER
+					<< " FROM "
+						<< TransactionTableSync::TABLE_NAME << " t"
+						<< " INNER JOIN " << TransactionPartTableSync::TABLE_NAME << " p ON p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID << "=t." << TABLE_COL_ID
+					<< " WHERE "
+						<< "p." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
+						<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << ">=" << start.toSQLString()
+						<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << "<=" << end.toSQLString()
+					<< " GROUP BY "
+						<< "strftime('%Y-%m-%d', " << TransactionTableSync::TABLE_COL_START_DATE_TIME << ")"
+					;
+
 				SQLiteResult result = sqlite->execQuery(query.str());
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
 					RentReportResult r;
 					r.starts = Conversion::ToInt(result.getColumn(i, COL_NUMBER));
+					r.ends = 0;
 					m.insert(make_pair(Date::FromSQLDate(result.getColumn(i, COL_DAY)), r));
 				}
+	
+				// Rent ends
+				stringstream endQuery;
+				endQuery
+					<< "SELECT "
+						<< "strftime('%Y-%m-%d', " << TransactionTableSync::TABLE_COL_END_DATE_TIME << ") AS " << COL_DAY
+						<< ",COUNT(t." << TABLE_COL_ID << ") AS " << COL_NUMBER
+					<< " FROM "
+						<< TransactionTableSync::TABLE_NAME << " t"
+						<< " INNER JOIN " << TransactionPartTableSync::TABLE_NAME << " p ON p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID << "=t." << TABLE_COL_ID
+					<< " WHERE "
+						<< "p." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
+						<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << ">=" << start.toSQLString()
+						<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << "<=" << end.toSQLString()
+					<< " GROUP BY "
+						<< "strftime('%Y-%m-%d', " << TransactionTableSync::TABLE_COL_END_DATE_TIME << ")"
+					;
+
+				result = sqlite->execQuery(endQuery.str());
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					Date date = Date::FromSQLDate(result.getColumn(i, COL_DAY));
+					map<Date, RentReportResult>::iterator it = m.find(date);
+					if (it == m.end())
+					{
+						RentReportResult r;
+						r.starts = 0;
+						r.ends = Conversion::ToInt(result.getColumn(i, COL_NUMBER));
+						m.insert(make_pair(date, r));
+					}
+					else
+					{
+						it->second.ends = Conversion::ToInt(result.getColumn(i, COL_NUMBER));
+					}
+				}
+
 				return m;
 			}
 			catch(SQLiteException& e)
@@ -87,6 +129,82 @@ namespace synthese
 				throw Exception(e.getMessage());
 			}
 	
+		}
+
+		std::map<uid, RentReportResult> getRentsPerRate( const time::Date& start, const time::Date& end )
+		{
+			map<uid, RentReportResult> m;
+			Account* account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
+			if (account == NULL)
+				return m;
+
+			static const string COL_NUMBER("number");
+			static const string COL_RATE("rate");
+
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+
+			// Rent Starts
+			stringstream query;
+			query
+				<< "SELECT "
+					<< "p." << TransactionPartTableSync::TABLE_COL_RATE_ID << " AS " << COL_RATE
+					<< ",COUNT(t." << TABLE_COL_ID << ") AS " << COL_NUMBER
+				<< " FROM "
+					<< TransactionTableSync::TABLE_NAME << " t"
+					<< " INNER JOIN " << TransactionPartTableSync::TABLE_NAME << " p ON p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID << "=t." << TABLE_COL_ID
+				<< " WHERE "
+					<< "p." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
+					<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << ">=" << start.toSQLString()
+					<< " AND t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << "<=" << end.toSQLString()
+				<< " GROUP BY "
+					<< "p." << TransactionPartTableSync::TABLE_COL_RATE_ID
+				;
+
+			SQLiteResult result = sqlite->execQuery(query.str());
+			for (int i = 0; i < result.getNbRows(); ++i)
+			{
+				RentReportResult r;
+				r.starts = Conversion::ToInt(result.getColumn(i, COL_NUMBER));
+				r.ends = 0;
+				m.insert(make_pair(Conversion::ToLongLong(result.getColumn(i, COL_RATE)), r));
+			}
+
+			// Rent ends
+			stringstream endQuery;
+			endQuery
+				<< "SELECT "
+				<< "p." << TransactionPartTableSync::TABLE_COL_RATE_ID << " AS " << COL_RATE
+					<< ",COUNT(t." << TABLE_COL_ID << ") AS " << COL_NUMBER
+				<< " FROM "
+					<< TransactionTableSync::TABLE_NAME << " t"
+					<< " INNER JOIN " << TransactionPartTableSync::TABLE_NAME << " p ON p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID << "=t." << TABLE_COL_ID
+				<< " WHERE "
+					<< "p." << TransactionPartTableSync::TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey())
+					<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << ">=" << start.toSQLString()
+					<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << "<=" << end.toSQLString()
+				<< " GROUP BY "
+					<< "p." << TransactionPartTableSync::TABLE_COL_RATE_ID
+				;
+
+			result = sqlite->execQuery(endQuery.str());
+			for (int i = 0; i < result.getNbRows(); ++i)
+			{
+				uid rateId = Conversion::ToLongLong(result.getColumn(i, COL_RATE));
+				map<uid, RentReportResult>::iterator it2 = m.find(rateId);
+				if (it2 == m.end())
+				{
+					RentReportResult r;
+					r.starts = 0;
+					r.ends = Conversion::ToInt(result.getColumn(i, COL_NUMBER));;
+					m.insert(make_pair(rateId, r));
+				}
+				else
+				{
+					it2->second.ends = Conversion::ToInt(result.getColumn(i, COL_NUMBER));
+				}
+			}
+
+			return m;
 		}
 	}
 }

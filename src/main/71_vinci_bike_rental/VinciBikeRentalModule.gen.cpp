@@ -20,7 +20,8 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::Vi
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::VinciAddBike>("vinciaddbike");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::RentABikeAction>("rentabike");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::ReturnABikeAction>("vincireturnbike");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::VinciUpdateBikeAction>("vinciupdatebike");
 
-synthese::util::Factory<synthese::server::Request>::integrate<synthese::vinci::VinciContractPrintRequest>("vinciprintcontract");
+synthese::util::Factory<synthese::server::Function>::integrate<synthese::vinci::VinciContractPrintRequest>("vinciprintcontract");
 
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::vinci::VinciPrintedContractInterfacePage>("vincicontractprint");

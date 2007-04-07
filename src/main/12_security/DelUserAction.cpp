@@ -25,6 +25,7 @@
 #include "12_security/DelUserAction.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
@@ -34,13 +35,13 @@ namespace synthese
 	
 	namespace security
 	{
-		Request::ParametersMap DelUserAction::getParametersMap() const
+		ParametersMap DelUserAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			return map;
 		}
 
-		void DelUserAction::setFromParametersMap(Request::ParametersMap& map)
+		void DelUserAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{

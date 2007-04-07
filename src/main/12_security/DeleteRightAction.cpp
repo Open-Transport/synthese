@@ -27,6 +27,7 @@
 #include "12_security/ProfileTableSync.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
@@ -39,19 +40,19 @@ namespace synthese
 		const string DeleteRightAction::PARAMETER_RIGHT = Action_PARAMETER_PREFIX + "right";
 		const string DeleteRightAction::PARAMETER_PARAMETER = Action_PARAMETER_PREFIX + "param";
 
-		Request::ParametersMap DeleteRightAction::getParametersMap() const
+		ParametersMap DeleteRightAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			map.insert(make_pair(PARAMETER_RIGHT, _right->getFactoryKey()));
 			map.insert(make_pair(PARAMETER_PARAMETER, _right->getParameter()));
 			return map;
 		}
 
-		void DeleteRightAction::setFromParametersMap(Request::ParametersMap& map)
+		void DeleteRightAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
 
@@ -60,14 +61,12 @@ namespace synthese
 				if (it == map.end())
 					throw ActionException("Right not specified");
 				rightCode = it->second;
-				map.erase(it);
 
 				it = map.find(PARAMETER_PARAMETER);
 				if (it == map.end())
 					throw ActionException("Parameter not specified");
 				
 				_right = _profile->getRight(rightCode, it->second);
-				map.erase(it);
 			}
 			catch (Profile::RegistryKeyException e)
 			{

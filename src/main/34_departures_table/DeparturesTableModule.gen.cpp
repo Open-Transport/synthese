@@ -43,7 +43,8 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::departure
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayMaintenanceAction>("udm");
 
 
-synthese::util::Factory<synthese::server::Request>::integrate<synthese::departurestable::DisplayScreenContentRequest>("tdg");
+synthese::util::Factory<synthese::server::Function>::integrate<synthese::departurestable::DisplayScreenContentRequest>("tdg");
+synthese::util::Factory<synthese::server::Function>::integrate<synthese::departurestable::DisplayScreenSupervisionRequest>("tds");
 
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::ArrivalDepartureTableRight>("ArrivalDepartureTable");
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::DisplayMaintenanceRight>("DisplayMaintenance");

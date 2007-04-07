@@ -36,6 +36,8 @@ namespace synthese
 
 			Arguments :
 				- page : page to display (empty or not provided = no display, action only)
+
+			NB : Only non registered pages can be displayed. To display a registered page, call a proper function directly.
 		*/
 		class SimplePageRequest : public RequestWithInterface
 		{
@@ -43,25 +45,30 @@ namespace synthese
 
 			//! \name Request parameters
 			//@{
-			const interfaces::InterfacePage* _page;
-			Request::ParametersMap _parameters;
+			const interfaces::InterfacePage*	_page;
+			server::ParametersMap				_parameters;
 			//@}
 
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			server::Request::ParametersMap getParametersMap() const;
+			server::ParametersMap _getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 			*/
-			void setFromParametersMap(const server::Request::ParametersMap& map);
-
-		public:
-			SimplePageRequest();
+			void _setFromParametersMap(const server::ParametersMap& map);
 
 			/** Action to run, defined by each subclass.
 			*/
-			void run(std::ostream& stream) const;
+			void _run(std::ostream& stream) const;
+
+			/** This function can be used without any session.
+				@return false
+			*/
+			virtual bool _runBeforeDisplayIfNoSession(std::ostream& stream);
+
+		public:
+			SimplePageRequest();
 
 			void setPage(const interfaces::InterfacePage* page);
 		};

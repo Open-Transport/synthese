@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Html.h"
+#include "05_html/ActionResultHTMLTable.h"
+#include "05_html/HTMLForm.h"
 
 #include "17_messages/MessagesScenarioAdmin.h"
 #include "17_messages/MessageAdmin.h"
@@ -30,9 +31,10 @@
 #include "17_messages/DeleteAlarmAction.h"
 #include "17_messages/NewMessageAction.h"
 
+#include "30_server/ActionFunctionRequest.h"
+
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminRequest.h"
-#include "32_admin/ResultHTMLTable.h"
 
 using namespace std;
 
@@ -42,6 +44,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
+	using namespace html;
 
 	namespace messages
 	{
@@ -51,10 +54,10 @@ namespace synthese
 		{}
 
 
-		void MessagesScenarioAdmin::setFromParametersMap(const AdminRequest::ParametersMap& map)
+		void MessagesScenarioAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			AdminRequest::ParametersMap::const_iterator it;
-			it = map.find(AdminRequest::PARAMETER_OBJECT_ID);
+			ParametersMap::const_iterator it;
+			it = map.find(Request::PARAMETER_OBJECT_ID);
 			if (it == map.end())
 				throw AdminParametersException("Scenario not specified");
 			if (Conversion::ToLongLong(it->second) != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
@@ -74,68 +77,56 @@ namespace synthese
 			return _scenario->getName();
 		}
 
-		void MessagesScenarioAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const AdminRequest* request) const
+		void MessagesScenarioAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			AdminRequest* updateRequest = Factory<Request>::create<AdminRequest>();
-			updateRequest->copy(request);
-			updateRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
-			updateRequest->setAction(Factory<Action>::create<ScenarioNameUpdateAction>());
-			updateRequest->setObjectId(_scenario->getKey());
+			ActionFunctionRequest<ScenarioNameUpdateAction,AdminRequest> updateRequest(request);
+			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
+			updateRequest.setObjectId(_scenario->getKey());
 
-			AdminRequest* messRequest = Factory<Request>::create<AdminRequest>();
-			messRequest->copy(request);
-			messRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+			FunctionRequest<AdminRequest> messRequest(request);
+			messRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
 
-			AdminRequest* deleteRequest = Factory<Request>::create<AdminRequest>();
-			deleteRequest->copy(request);
-			deleteRequest->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
-			deleteRequest->setAction(Factory<Action>::create<DeleteAlarmAction>());
-			deleteRequest->setObjectId(_scenario->getKey());
+			ActionFunctionRequest<DeleteAlarmAction,AdminRequest> deleteRequest(request);
+			deleteRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
+			deleteRequest.setObjectId(_scenario->getKey());
 
-			AdminRequest* addRequest = Factory<Request>::create<AdminRequest>();
-			addRequest->copy(request);
-			addRequest->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
-			addRequest->setAction(Factory<Action>::create<NewMessageAction>());
-			addRequest->setParameter(NewMessageAction::PARAMETER_SCENARIO_ID, Conversion::ToString(_scenario->getKey()));
-			addRequest->setParameter(NewMessageAction::PARAMETER_IS_TEMPLATE, Conversion::ToString(_scenario->getKey()));
+			ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(request);
+			addRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+			addRequest.getFunction()->setParameter(NewMessageAction::PARAMETER_SCENARIO_ID, Conversion::ToString(_scenario->getKey()));
+			addRequest.getFunction()->setParameter(NewMessageAction::PARAMETER_IS_TEMPLATE, Conversion::ToString(_scenario->getKey()));
 
-			stream
-				<< "<h1>Propriété</h1>"
-				<< updateRequest->getHTMLFormHeader("update")
-				<< "<P>Nom : " << Html::getTextInput(ScenarioNameUpdateAction::PARAMETER_NAME, _scenario->getName()) << Html::getSubmitButton("Modifier") << "</P>"
-				<< "</form>"
+			stream << "<h1>Propriété</h1>";
+			HTMLForm uf(updateRequest.getHTMLForm("update"));
+			stream << uf.open();
+			stream << "<p>Nom : " << uf.getTextInput(ScenarioNameUpdateAction::PARAMETER_NAME, _scenario->getName()) << uf.getSubmitButton("Modifier") << "</p>";
+			stream << uf.close();
 
-				<< "<h1>Messages</h1>";
+			stream << "<h1>Messages</h1>";
 
-			ResultHTMLTable::HeaderVector h;
+			ActionResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(string(), "Message"));
 			h.push_back(make_pair(string(), "Emplacement"));
 			h.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t(h, NULL, string(), true, addRequest, NewMessageAction::PARAMETER_IS_TEMPLATE);
+			ActionResultHTMLTable t(h, HTMLForm(string(), string()), string(), true, addRequest.getHTMLForm("add"), NewMessageAction::PARAMETER_IS_TEMPLATE);
 
 			stream << t.open();
 
 			for(Scenario::AlarmsSet::const_iterator it = _scenario->getAlarms().begin(); it != _scenario->getAlarms().end(); ++it)
 			{
 				Alarm* alarm = *it;
-				messRequest->setObjectId(alarm->getKey());
-				deleteRequest->setParameter(DeleteAlarmAction::PARAMETER_ALARM, Conversion::ToString(alarm->getKey()));
-				stream << t.row();
+				messRequest.setObjectId(alarm->getKey());
+				deleteRequest.getFunction()->setParameter(DeleteAlarmAction::PARAMETER_ALARM, Conversion::ToString(alarm->getKey()));
+				stream << t.row(Conversion::ToString(alarm->getKey()));
 				stream << t.col() << alarm->getShortMessage();
 				stream << t.col() << ""; // Emplacement
-				stream << t.col() << Html::getLinkButton(messRequest->getURL(), "Modifier")
-					<< "&nbsp;" << Html::getLinkButton(deleteRequest->getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le message du scénario ?");
+				stream << t.col() << HTMLModule::getLinkButton(messRequest.getURL(), "Modifier")
+					<< "&nbsp;" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le message du scénario ?");
 			}
 
 			stream << t.row();
 			stream << t.col(3) << "(sélectionnez un&nbsp;message existant pour créer une copie)";
-			stream << t.col() << Html::getSubmitButton("Ajouter");
+			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
-
-			delete updateRequest;
-			delete messRequest;
-			delete deleteRequest;
-			delete addRequest;
 		}
 	}
 }

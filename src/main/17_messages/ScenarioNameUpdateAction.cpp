@@ -26,6 +26,7 @@
 #include "17_messages/ScenarioTableSync.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 using namespace std;
 
@@ -38,20 +39,20 @@ namespace synthese
 		const string ScenarioNameUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
 
 
-		Request::ParametersMap ScenarioNameUpdateAction::getParametersMap() const
+		ParametersMap ScenarioNameUpdateAction::getParametersMap() const
 		{
-			Request::ParametersMap map;
+			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
-		void ScenarioNameUpdateAction::setFromParametersMap(Request::ParametersMap& map)
+		void ScenarioNameUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
 				_scenario = MessagesModule::getScenarii().get(_request->getObjectId());
 
-				Request::ParametersMap::iterator it;
+				ParametersMap::const_iterator it;
 
 				it = map.find(PARAMETER_NAME);
 				if (it == map.end())

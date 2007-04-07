@@ -34,22 +34,18 @@ namespace synthese
 	{
 
 		/** InterfaceTableSync SQLite table synchronizer.
-		@ingroup m11
+			@ingroup m33
 		*/
 
-		class SiteTableSync : public db::SQLiteTableSync
+		class SiteTableSync : public db::SQLiteTableSyncTemplate<Site>
 		{
 		private:
-			static const std::string TABLE_NAME;
 			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_NAME;
-			static const std::string TABLE_COL_INTERFACE_ID;
-			static const std::string TABLE_COL_ENVIRONMENT_ID;
 			static const std::string TABLE_COL_START_DATE;
 			static const std::string TABLE_COL_END_DATE;
 			static const std::string TABLE_COL_ONLINE_BOOKING;
 			static const std::string TABLE_COL_USE_OLD_DATA;
-			static const std::string TABLE_COL_CLIENT_URL;
 
 		public:
 

@@ -61,19 +61,188 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			Name="Core Classes"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath=".\OnlineReservationRule.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OnlineReservationRule.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Reservation.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Reservation.h"
+				>
+			</File>
 		</Filter>
 		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
+			Name="Actions"
 			>
+			<File
+				RelativePath=".\BookReservationAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BookReservationAction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CancelReservationAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CancelReservationAction.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Functions"
+			>
+			<File
+				RelativePath=".\BookingScreenFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BookingScreenFunction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\BoolingConfirmationFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BoolingConfirmationFunction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ServiceReservationsRoadMapFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ServiceReservationsRoadMapFunction.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Admin Pages"
+			>
+			<File
+				RelativePath=".\CommercialLineReservationsAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CommercialLinesReservationAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservableCommercialLinesAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservableCommercialLinesAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationCancellationAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationCancellationAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UserReservationsAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UserReservationsAdmin.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="LS SQL"
+			>
+			<File
+				RelativePath=".\AdvancedSelectTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AdvancedSelectTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OnlineReservationRuleTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OnlineReservationRuleTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationTableSync.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Interface pages"
+			>
+			<File
+				RelativePath=".\BookingConfirmationInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BookingConfirmationInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\BookingScreenInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BookingScreenInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ServiceReservationsRoadMapInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ServiceReservationsRoadMapInterfacePage.h"
+				>
+			</File>
 		</Filter>
 		<File
+			RelativePath="..\71_vinci_bike_rental\LICENSE.txt"
+			>
+		</File>
+		<File
 			RelativePath=".\module.h"
+			>
+		</File>
+		<File
+			RelativePath=".\ResaModule.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ResaModule.gen.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ResaModule.h"
+			>
+		</File>
+		<File
+			RelativePath=".\ResaModule.inc.cpp"
 			>
 		</File>
 		<File

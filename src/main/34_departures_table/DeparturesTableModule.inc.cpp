@@ -43,3 +43,4 @@
 #include "34_departures_table/UpdateDisplayMaintenanceAction.h"
 #include "34_departures_table/DisplayScreenHasAlarmValueInterfaceElement.h"
 #include "34_departures_table/DisplayScreenAlarmContentValueInterfaceElement.h"
+#include "34_departures_table/DisplayScreenSupervisionRequest.h"
