@@ -31,17 +31,19 @@
 
 namespace synthese
 {
+	/** @defgroup m02 02 SQLite database access
+
+	@{
+	*/
+
+	/** 02 SQLite database access module namespace.
+	*/
 	namespace db
 	{
 
 
 	    class SQLiteQueueThreadExec;
 	    
-
-		/** @defgroup m02 02 SQLite database access
-
-		@{
-		*/
 
 //		static const std::string TRIGGERS_ENABLED_CLAUSE;
 
@@ -64,8 +66,7 @@ namespace synthese
 						   const std::string& value);
 
 		};
-		/** @} */
-
+		
 	// TEMPORARY
 		/// @todo Handle better TRIGGER and co...
 
@@ -79,6 +80,9 @@ namespace synthese
 			+ "='" + CONFIG_TABLE_COL_PARAMVALUE_TRIGGERSENABLED + "')");
 
 	}
+
+	/** @} */
+
 }
 #endif // SYNTHESE_DBModule_H__
 
