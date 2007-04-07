@@ -303,7 +303,14 @@ namespace synthese
 			if (!Factory<Function>::contains(it->second))
 				throw RequestException("Function not found");
 			_setFunction(Factory<Function>::create(it->second));
-			
+
+			// Object ID
+			it = map.find(PARAMETER_OBJECT_ID);
+			if (it != map.end())
+			{
+				_object_id = Conversion::ToLongLong(it->second);
+			}
+
 			// Action name
 			it = map.find(PARAMETER_ACTION);
 			if (it != map.end())
@@ -369,13 +376,6 @@ namespace synthese
 			if (it != map.end())
 			{
 				_clientURL = it->second;
-			}
-
-			// Object ID
-			it = map.find(PARAMETER_OBJECT_ID);
-			if (it != map.end())
-			{
-				_object_id = Conversion::ToLongLong(it->second);
 			}
 
 			// Last action error
