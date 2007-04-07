@@ -88,7 +88,8 @@ namespace synthese
 				stream << t.col() << "Prénom";
 				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname());
 				stream << t.row();
-				stream << t.col() << "Nom" << form.getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName());
+				stream << t.col() << "Nom";
+				stream << t.col() << form.getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName());
 				stream << t.row();
 				stream << t.col() << "Adresse";
 				stream << t.col() << form.getTextAreaInput(UserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50);

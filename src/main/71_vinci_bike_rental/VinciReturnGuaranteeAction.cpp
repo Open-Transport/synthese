@@ -59,7 +59,8 @@ namespace synthese
 		ParametersMap VinciReturnGuaranteeAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_GUARANTEE_ID, Conversion::ToString(_guarantee->getKey())));
+			if (_guarantee)
+				map.insert(make_pair(PARAMETER_GUARANTEE_ID, Conversion::ToString(_guarantee->getKey())));
 			return map;
 		}
 

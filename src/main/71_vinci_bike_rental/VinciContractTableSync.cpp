@@ -52,6 +52,7 @@ namespace synthese
 			vc->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			vc->setUserId(Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::COL_USER_ID)));
 			vc->setSiteId(Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::COL_SITE_ID)));
+			vc->setPassport(rows.getColumn(rowId, VinciContractTableSync::COL_PASSPORT));
 		}
 
 		template<> void SQLiteTableSyncTemplate<VinciContract>::save(VinciContract* vc)
