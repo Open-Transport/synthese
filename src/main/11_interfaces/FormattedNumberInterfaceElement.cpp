@@ -65,13 +65,13 @@ namespace synthese
 			_numberVIE = vel.front();
 
 			if (vel.size ())
-                        {
+			{
 				_formatVIE = vel.front();
-                        }
+			}
 			else
-                        {
+            {
 				_formatVIE = new StaticValueInterfaceElement(TYPE_IDENTICAL);
-                        }
+            }
 
 			if (vel.size ())
 			{
@@ -109,11 +109,8 @@ namespace synthese
 				return s.str();
 			}
 
-			if (__Format == TYPE_IDENTICAL)
-			{
-				s << __Nombre;
-				return s.str();
-			}
+			s << __Nombre;
+			return s.str();
 		}
 	}
 }
