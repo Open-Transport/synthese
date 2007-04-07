@@ -61,16 +61,30 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
+			Name="Exceptions"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
+			<File
+				RelativePath=".\SocketException.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SocketException.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Core classes"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
 				RelativePath=".\Socket.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\SocketException.cpp"
+				RelativePath=".\Socket.h"
 				>
 			</File>
 			<File
@@ -78,33 +92,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\TcpServerSocket.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TcpService.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath=".\Socket.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SocketException.h"
-				>
-			</File>
-			<File
 				RelativePath=".\TcpClientSocket.h"
 				>
 			</File>
 			<File
+				RelativePath=".\TcpServerSocket.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TcpServerSocket.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TcpService.cpp"
 				>
 			</File>
 			<File
