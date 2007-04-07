@@ -30,6 +30,10 @@ namespace synthese
 {
 	namespace messages
 	{
+		/** @addtogroup m17
+			@{
+		*/
+
 		/** Alarm level.
 
 		- INFO : the solution is available, but some information is 
@@ -46,7 +50,7 @@ namespace synthese
 
 		typedef std::map<std::string, AlarmRecipientFilter> AlarmRecipientSearchFieldsMap;
 
-
+		/** @} */
 	}
 }
 

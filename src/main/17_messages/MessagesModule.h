@@ -30,13 +30,17 @@
 #include "17_messages/Types.h"
 #include "17_messages/Scenario.h"
 
-/** @defgroup m17 17 Messages
-@{	*/
 namespace synthese
 {
+	/** @defgroup m17 17 Messages
+	@{	*/
+
+	/** 17 Messages module namespace.
+	*/
 	namespace messages
 	{
-		
+		/** 17 Messages module class.
+		*/
 		class MessagesModule : public util::ModuleClass
 		{
 		public:
@@ -61,8 +65,7 @@ namespace synthese
 			static std::string							getLevelLabel(const AlarmLevel& level);
 		};
 	}
+	/** @} */
 }
-
-/** @} */
 
 #endif // SYNTHESE_MessagesModule_H__
