@@ -29,6 +29,9 @@ namespace synthese
 {
 	namespace server
 	{
+		/** HTML Form generator Value Interface Element Class.
+			@ingroup m30
+		*/
 		class HtmlFormInterfaceElement : public interfaces::ValueInterfaceElement
 		{
 			// List of parameters to store

@@ -32,7 +32,14 @@
 
 namespace synthese
 {
-	/** @defgroup m17 17 Messages
+	/** @defgroup m17Actions Actions
+		@ingroup m17
+
+		@defgroup refAlarmrecipients Alarm recipients.
+		@ingroup ref
+		@copydoc AlarmRecipient
+
+		@defgroup m17 17 Messages
 	@{	*/
 
 	/** 17 Messages module namespace.

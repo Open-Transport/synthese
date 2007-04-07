@@ -39,7 +39,7 @@ namespace synthese
 
 			A factory of actions is handled by 30_server module.
 
-			@ingroup m30
+			@ingroup m30/Core
 		*/
 		class Action : public util::Factorable
 		{

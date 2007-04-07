@@ -35,6 +35,10 @@
 
 using synthese::util::Factory;
 
+/** @defgroup refPages Interface Pages
+	@ingroup refInt
+*/
+
 namespace synthese
 {
 	namespace server

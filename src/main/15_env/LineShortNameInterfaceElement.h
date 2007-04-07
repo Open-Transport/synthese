@@ -36,13 +36,11 @@ namespace synthese
 	namespace env
 	{
 		/** LineShortNameInterfaceElement class.
-			@ingroup 15
+			@ingroup m15
 		*/
 		class LineShortNameInterfaceElement : public interfaces::ValueInterfaceElement
 		{
 		private:
-			// Attributes
-			// interfaces::ValueInterfaceElement* _xxx;
 
 		public:
 			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;

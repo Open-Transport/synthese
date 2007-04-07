@@ -1,6 +1,6 @@
 
-/** LoginHtmlField class header.
-	@file LoginHtmlField.h
+/** SuperiorValueInterfaceElement class header.
+	@file SuperiorValueInterfaceElement.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,26 +20,38 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_LoginHtmlField_H__
-#define SYNTHESE_LoginHtmlField_H__
+#ifndef SYNTHESE_SuperiorValueInterfaceElement_H__
+#define SYNTHESE_SuperiorValueInterfaceElement_H__
+
+#include <boost/shared_ptr.hpp>
 
 #include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
-	namespace server
+	namespace interfaces
 	{
-		/** Login HTML Field Value InterfaceElement Class.
-			@ingroup m30
+		class ValueElementList;
+	}
+	namespace interfaces
+	{
+		/** Superior operator value interface element class.
+			@ingroup m11
+
+			The comparison is numerical only.
 		*/
-		class LoginHtmlField : public interfaces::ValueInterfaceElement
+		class SuperiorValueInterfaceElement : public interfaces::ValueInterfaceElement
 		{
+		private:
+			boost::shared_ptr<ValueInterfaceElement> _left;
+			boost::shared_ptr<ValueInterfaceElement> _right;
 
 		public:
+		
+			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			
 			void storeParameters(interfaces::ValueElementList& vel);
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject = NULL, const server::Request* request = NULL) const;
 		};
 	}
 }
-
-#endif // SYNTHESE_LoginHtmlField_H__
+#endif // SYNTHESE_SuperiorValueInterfaceElement_H__

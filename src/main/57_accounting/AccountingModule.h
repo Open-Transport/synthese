@@ -8,14 +8,16 @@
 
 namespace synthese
 {
+	/** @defgroup m57 57 Accounting
+
+	@{
+	*/
+
+	/** 57 Accounting module namespace. */
 	namespace accounts
 	{
 
-		/** @defgroup m57 57 Accounts
-
-		@{
-		*/
-
+		/** 57 Accounting module class. */
 		class AccountingModule : public util::ModuleClass
 		{
 		private:
@@ -26,8 +28,8 @@ namespace synthese
 
 			static Currency::Registry& getCurrencies();
 		};
-		/** @} */
 	}
+	/** @} */
 }
 
 

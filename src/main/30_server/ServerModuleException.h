@@ -12,7 +12,7 @@ namespace synthese
 
 
 		/** Module related exception class
-		@ingroup m70
+		@ingroup m30
 		*/
 
 		class ServerModuleException : public synthese::util::Exception

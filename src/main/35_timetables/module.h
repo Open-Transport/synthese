@@ -8,7 +8,7 @@
 namespace synthese
 {
 
-	/** @defgroup m35 35 Map drawing
+	/** @defgroup m35 35 Time tables Generation.
 		
 		@{
 	*/

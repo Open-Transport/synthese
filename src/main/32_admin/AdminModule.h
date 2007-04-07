@@ -27,13 +27,16 @@
 
 namespace synthese
 {
+	/** @defgroup m32 32 Generic administration console
+	@{
+	*/
+
+	/** 32 Generic administration console module namespace.
+	*/
 	namespace admin
 	{
-
-		/** @defgroup m32 32 Generic administration console
-		@{
+		/** 32 Generic administration console module class.
 		*/
-
 		class AdminModule : public util::ModuleClass
 		{
 		private:
@@ -44,8 +47,8 @@ namespace synthese
 
 			void initialize();
 		};
-		/** @} */
 	}
+	/** @} */
 }
 
 #endif // SYNTHESE_AdminModule_H__

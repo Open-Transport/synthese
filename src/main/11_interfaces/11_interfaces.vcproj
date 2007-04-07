@@ -66,10 +66,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\DisplayableElement.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Interface.cpp"
 				>
 			</File>
@@ -209,6 +205,14 @@
 				RelativePath=".\StaticValueInterfaceElement.h"
 				>
 			</File>
+			<File
+				RelativePath=".\SuperiorValueInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SuperiorValueInterfaceElement.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="LS_SQL"
@@ -281,6 +285,14 @@
 		<Filter
 			Name="Interface Pages"
 			>
+			<File
+				RelativePath=".\DurationInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DurationInterfacePage.h"
+				>
+			</File>
 			<File
 				RelativePath=".\RedirectInterfacePage.cpp"
 				>

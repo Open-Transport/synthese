@@ -25,7 +25,7 @@ As soon a client has connected, another thread is ready
 to accept another client connection.
 
 
-@ingroup m70
+@ingroup m30
 */
 class ServerThreadExec : public synthese::util::ThreadExec
 {

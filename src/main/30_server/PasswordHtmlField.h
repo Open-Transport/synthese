@@ -29,6 +29,9 @@ namespace synthese
 {
 	namespace server
 	{
+		/** Password HTML Input field Value Interface Element Class.
+			@ingroup m30
+		*/
 		class PasswordHtmlField : public interfaces::ValueInterfaceElement
 		{
 		public:

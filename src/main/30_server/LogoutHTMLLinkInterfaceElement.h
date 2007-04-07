@@ -29,6 +29,9 @@ namespace synthese
 {
 	namespace server
 	{
+		/** Logout link Value Interface Element Class.
+			@ingroup m30
+		*/
 		class LogoutHTMLLinkInterfaceElement : public interfaces::ValueInterfaceElement
 		{
 			interfaces::ValueInterfaceElement* _redirectionURL;

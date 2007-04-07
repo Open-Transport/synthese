@@ -18,10 +18,7 @@ namespace synthese
 		class Currency;
 	}
 
-	namespace vinci
-	{
-
-		/** @defgroup m71 71 Vinci bike rent.
+		/** @defgroup m71 71 Vinci bike rental
 			
 			Most of the events are treated as transaction parts :
 				- customer giving a guarantee :
@@ -92,6 +89,11 @@ namespace synthese
 		@{
 		*/
 
+	/** 71 Vinci Bike Rental Module namespace. */
+	namespace vinci
+	{
+
+		/** 71 Vinci Bike Rental Module class. */
 		class VinciBikeRentalModule : public util::ModuleClass
 		{
 		private:
@@ -150,8 +152,8 @@ namespace synthese
 
 			static accounts::Account*	getFreeLockRentServiceAccount();
 		};
-		/** @} */
 	}
+	/** @} */
 }
 
 #endif // SYNTHESE_VinciBikeRentalModule_H__

@@ -226,10 +226,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\module.h"
-			>
-		</File>
-		<File
 			RelativePath=".\ResaModule.cpp"
 			>
 		</File>

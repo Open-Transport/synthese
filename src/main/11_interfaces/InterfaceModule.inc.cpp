@@ -17,3 +17,4 @@
 #include "11_interfaces/SetInterfaceElement.h"
 #include "11_interfaces/EqualsValueInterfaceElement.h"
 #include "11_interfaces/ChrInterfaceElement.h"
+#include "11_interfaces/DurationInterfacePage.h"

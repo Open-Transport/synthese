@@ -29,8 +29,11 @@
 
 namespace synthese
 {
-	/** @defgroup m05 HTML Library
+	/** @defgroup m05 05 HTML Library
 		@{
+	*/
+
+	/** 05 HTML Library module namespace.
 	*/
 	namespace html
 	{
@@ -55,17 +58,17 @@ namespace synthese
 
 				Example of css :
 				@code
-				a.linkbutton { display:inline-block; padding:2px 4px 2px 4px; text-decoration:none; color:black; background-color:#C0C0C0; border-style:solid; border-width:1px 2px 2px 1px; border-color:#000060; cursor:auto; }
-				a.activatedlinkbutton { display:inline-block; padding:2px 4px 2px 4px; border-style:solid; text-decoration:none; color:black; background-color:#0080E0; border-width:1px 2px 2px 1px; cursor:hand; } 
-				a.clickedlinkbutton { display:inline-block; padding:2px 4px 2px 4px; border-style:solid; color:black; text-decoration:none; background-color:#0080E0; border-width:2px 1px 1px 2px; cursor:hand; }
+a.linkbutton { display:inline-block; padding:2px 4px 2px 4px; text-decoration:none; color:black; background-color:#C0C0C0; border-style:solid; border-width:1px 2px 2px 1px; border-color:#000060; cursor:auto; }
+a.activatedlinkbutton { display:inline-block; padding:2px 4px 2px 4px; border-style:solid; text-decoration:none; color:black; background-color:#0080E0; border-width:1px 2px 2px 1px; cursor:hand; } 
+a.clickedlinkbutton { display:inline-block; padding:2px 4px 2px 4px; border-style:solid; color:black; text-decoration:none; background-color:#0080E0; border-width:2px 1px 1px 2px; cursor:hand; }
 				@endcode
 
 				It is recommended to design the real form buttons with a similar style.
 
 				Example of corresponding css :
 				@code
-				input[type=submit] {background-color:#C0C0C0; font-family:verdana,helvetica; border-width:1px 2px 2px 1px; padding:0px; border-color:#000066; cursor:hand; }
-				input[type=submit]:hover {background-color:#0080E0;}
+input[type=submit] {background-color:#C0C0C0; font-family:verdana,helvetica; border-width:1px 2px 2px 1px; padding:0px; border-color:#000066; cursor:hand; }
+input[type=submit]:hover {background-color:#0080E0;}
 				@endcode
 			*/
 			static std::string getLinkButton(const std::string& url, const std::string& caption, const std::string confirm="", const std::string icon="");

@@ -109,6 +109,10 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\Constants.h"
+			>
+		</File>
+		<File
 			RelativePath=".\HTMLModule.cpp"
 			>
 		</File>

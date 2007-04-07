@@ -249,6 +249,10 @@
 				RelativePath=".\MapRequest.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\MapRequest.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\LICENSE.txt"

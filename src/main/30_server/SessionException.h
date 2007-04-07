@@ -11,8 +11,8 @@ namespace synthese
 	{
 
 
-		/** Request related exception class
-		@ingroup m70
+		/** Session related exception class
+		@ingroup m30
 		*/
 
 		class SessionException : public synthese::util::Exception

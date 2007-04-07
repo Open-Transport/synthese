@@ -29,6 +29,9 @@ namespace synthese
 {
 	namespace server
 	{
+		/** Logout Action Class
+			@ingroup m30Action refActions
+		*/
 		class LogoutAction : public server::Action
 		{
 		protected:

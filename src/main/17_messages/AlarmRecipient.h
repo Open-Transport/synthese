@@ -47,8 +47,10 @@ namespace synthese
 	{
 		class Alarm;
 
-		/** AlarmRecipient class.
+		/** Alarm recipient class.
 			@ingroup m17
+
+			All the available alarm recipients are listed in the @ref refAlarmrecipients page.
 		*/
 		class AlarmRecipient : public util::Factorable
 		{

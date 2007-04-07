@@ -98,14 +98,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ServerConfig.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ServerConfig.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ServerThreadExec.cpp"
 				>
 			</File>
@@ -161,14 +153,6 @@
 		<Filter
 			Name="LS_SQL"
 			>
-			<File
-				RelativePath=".\ServerConfigTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ServerConfigTableSync.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Actions"

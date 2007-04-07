@@ -32,7 +32,7 @@ namespace synthese
 		class Interface;
 
 		/** RequestWithInterface class.
-			@ingroup m11
+			@ingroup m11-functions
 		*/
 		class RequestWithInterface : public server::Function
 		{

@@ -32,7 +32,7 @@ namespace synthese
 		class InterfacePage;
 
 		/** Request for direct displaying an interface page.
-			@ingroup m11
+			@ingroup m11Functions refFunctions
 
 			Arguments :
 				- page : page to display (empty or not provided = no display, action only)

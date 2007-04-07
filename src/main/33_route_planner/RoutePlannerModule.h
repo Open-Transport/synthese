@@ -27,23 +27,35 @@
 
 #include "33_route_planner/Site.h"
 
-/** @defgroup m33 Route planner service module.
-@{
-*/
-
 namespace synthese
 {
-	class RoutePlannerModule : public util::ModuleClass
+	/** @defgroup m33 33 Route planner service module.
+	@{
+	*/
+
+	/** 33 Route planner service module namespace.
+	*/
+	namespace routeplanner
 	{
-	private:
-		static Site::Registry			_sites;
+		/** Route planner module class.
+		*/
+		class RoutePlannerModule : public util::ModuleClass
+		{
+		private:
+			static Site::Registry			_sites;	//!< Sites Registry
 
-	public:
+		public:
 
-		static Site::Registry& getSites();
+			/** Sites registry getter.
+				@return Site::Registry& The sites registry
+				@author Hugues Romain
+				@date 2007
+			*/
+			static Site::Registry& getSites();
 
 
-	};
+		};
+	}
 }
 
 /** @} */

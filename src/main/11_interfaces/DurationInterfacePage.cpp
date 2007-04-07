@@ -1,6 +1,6 @@
 
-/** LoginHtmlField class header.
-	@file LoginHtmlField.h
+/** DurationInterfacePage class implementation.
+	@file DurationInterfacePage.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,26 +20,24 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_LoginHtmlField_H__
-#define SYNTHESE_LoginHtmlField_H__
-
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "DurationInterfacePage.h"
 
 namespace synthese
 {
-	namespace server
-	{
-		/** Login HTML Field Value InterfaceElement Class.
-			@ingroup m30
-		*/
-		class LoginHtmlField : public interfaces::ValueInterfaceElement
-		{
+	using namespace interfaces;
+	using namespace util;
 
-		public:
-			void storeParameters(interfaces::ValueElementList& vel);
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject = NULL, const server::Request* request = NULL) const;
-		};
+	namespace interfaces
+	{
+
+		void DurationInterfacePage::display(std::ostream& stream, int duration, VariablesMap& variables, void* object /*= NULL*/, const server::Request* request /*= NULL*/) const
+		{
+			ParametersVector pv;
+			pv.push_back(Conversion::ToString(duration));
+			pv.push_back(Conversion::ToString(duration / 60));
+			pv.push_back(Conversion::ToString(duration % 60));
+
+			InterfacePage::display(stream, pv, variables, object, request);
+		}
 	}
 }
-
-#endif // SYNTHESE_LoginHtmlField_H__

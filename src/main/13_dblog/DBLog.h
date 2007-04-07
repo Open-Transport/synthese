@@ -40,7 +40,7 @@ namespace synthese
 	namespace dblog
 	{
 		/** Journal d'événements stocké en base de données (abstraite).
-			@ingroup m01
+			@ingroup m13
 		
 			Un journal est un compte-rendu d'activité de SYNTHESE. 
 			Plusieurs entrées sont consignées dans la base de données sous formes d'entrées de journal. 

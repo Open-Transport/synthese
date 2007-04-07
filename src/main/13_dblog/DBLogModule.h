@@ -31,8 +31,16 @@
 
 namespace synthese
 {
+	/** @defgroup m13 13 Database stored applicative log.
+		@{
+	*/
+
+	/** 13 database stored applicative log namespace.
+	*/
 	namespace dblog
 	{
+		/** Database stored applicative log module class.
+		*/
 		class DBLogModule : public util::ModuleClass
 		{
 		public:
@@ -40,6 +48,8 @@ namespace synthese
 			static std::string					getEntryLevelLabel(const DBLogEntry::Level& level);
 		};
 	}
+
+	/** @} */
 }
 
 #endif // SYNTHESE_DBLogModule_H__

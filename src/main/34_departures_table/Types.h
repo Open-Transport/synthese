@@ -31,9 +31,6 @@
 
 #include "04_time/DateTime.h"
 
-/** @addtogroup m34
-@{
-*/
 namespace synthese
 {
 	namespace env
@@ -47,6 +44,10 @@ namespace synthese
 	{
 		class Alarm;
 	}
+
+	/** @addtogroup m34
+	@{
+	*/
 
 	typedef std::set<const env::ConnectionPlace*> DisplayedPlacesList;
 	typedef std::set<const env::Line*> LineFilter;
@@ -68,8 +69,8 @@ namespace synthese
 	typedef std::pair<DeparturesTableElement, ActualDisplayedArrivalsList> ArrivalDepartureRow;
 	typedef std::map<DeparturesTableElement, ActualDisplayedArrivalsList, DeparturesTableElementLess> ArrivalDepartureList;
 	struct ArrivalDepartureListWithAlarm { ArrivalDepartureList map; const messages::Alarm* alarm; };
-}
 
-/** @} */
+	/** @} */
+}
 
 #endif // SYNTHESE_Types_H__

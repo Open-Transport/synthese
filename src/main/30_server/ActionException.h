@@ -16,7 +16,7 @@ namespace synthese
 
 
 		/** Action related exception class
-		@ingroup m30
+		@ingroup m30/exception
 		*/
 
 		class ActionException : public synthese::util::Exception

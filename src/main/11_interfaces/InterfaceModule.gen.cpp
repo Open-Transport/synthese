@@ -18,6 +18,7 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::inte
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::interfaces::InterfacePageTableSync>("16.02 Interface Pages");
 
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::interfaces::RedirectInterfacePage>("redir");
+synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::interfaces::DurationInterfacePage>("duration");
 
 synthese::util::Factory<synthese::server::Function>::integrate<synthese::interfaces::SimplePageRequest>("page");
 

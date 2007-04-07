@@ -45,13 +45,13 @@ namespace synthese
 		{
 		private:
 			std::string _name;
-			int			_validityDuration;
+			double		_validityDuration;
 			double		_startFinancialPrice;
 			int			_startTicketsPrice;
 			double		_endFinancialPrice;
 			int			_endTicketsPrice;
 			double		_firstPenalty;
-			int			_firstPenaltyValidityDuration;
+			double		_firstPenaltyValidityDuration;
 			double		_recurringPenalty;
 			int			_recurringPenaltyPeriod;
 
@@ -61,28 +61,30 @@ namespace synthese
 			VinciRate(uid id=0);
 
 			void setName(const std::string& name);
-			void setValidityDuration(int hours);
+			void setValidityDuration(double hours);
 			void setStartFinancialPrice(double price);
 			void setStartTicketsPrice(int price);
 			void setEndFinancialPrice(double price);
 			void setEndTicketsPrice(int price);
 			void setFirstPenalty(double price);
-			void setFirstPenaltyValidityDuration(int hours);
+			void setFirstPenaltyValidityDuration(double hours);
 			void setRecurringPenalty(double price);
 			void setRecurringPenaltyPeriod(int hours);
 
 			const std::string& getName() const;
-			int getValidityDuration() const;
+			double getValidityDuration() const;
 			double getStartFinancialPrice() const;
 			int getStartTicketsPrice() const;
 			double getEndFinancialPrice() const;
 			int getEndTicketsPrice() const;
 			double getFirstPenalty() const;
-			int getFirstPenaltyValidityDuration() const;
+			double getFirstPenaltyValidityDuration() const;
 			double getRecurringPenalty() const;
 			int getRecurringPenaltyPeriod() const;
 
 			time::DateTime	getEndDate(const time::DateTime& startDate)	const;
+			time::DateTime	getFirstPenaltyEndDate(const time::DateTime& startDate)	const;
+			double getAmountToPay(const time::DateTime& startDate) const;
 		};
 	}
 }

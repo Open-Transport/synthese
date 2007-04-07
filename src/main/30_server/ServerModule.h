@@ -7,17 +7,32 @@
 #include "02_db/DbModuleClass.h"
 
 
-/** @defgroup m30 Server
-	
-	@{
-*/
 namespace synthese
 {
+	/** @defgroup refActions Actions
+		@ingroup ref
+
+		@defgroup refFunctions Functions
+		@ingroup ref
+
+		@defgroup m30Actions Actions
+		@ingroup m30
+		
+		@defgroup m30Exceptions Exceptions
+		@ingroup m30
+	
+		@defgroup m30 30 Server
+
+	@{
+	*/
+
+	/** 30 Server module namespace.
+	*/
 	namespace server
 	{
 		class Session;
 
-		/** SYNTHESE Server module.
+		/** Server module class.
 		*/
 		class ServerModule : public db::DbModuleClass
 		{
@@ -100,7 +115,7 @@ namespace synthese
 		static const std::string PARAMETER_RESERVATION_COUNT ("NbPlaces");
 		static const std::string PARAMETER_DEPARTURE_TABLE_CODE ("tb");
 	}
+	/** @} */
 }
-/** @} */
 
 #endif // SYNTHESE_ServerModule_H__

@@ -161,7 +161,7 @@ namespace synthese
 		 
 		 
 		 
-		 
+	/** @} */		 
 
 
 		template<class T>

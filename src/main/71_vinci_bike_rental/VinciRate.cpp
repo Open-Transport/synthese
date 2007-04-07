@@ -21,6 +21,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <math.h>
+
 #include "71_vinci_bike_rental/VinciRate.h"
 
 namespace synthese
@@ -34,7 +36,7 @@ namespace synthese
 			: Registrable<uid, VinciRate>(id)
 		{}
 
-		void VinciRate::setValidityDuration(int hours)
+		void VinciRate::setValidityDuration(double hours)
 		{
 			_validityDuration = hours;
 		}
@@ -64,7 +66,7 @@ namespace synthese
 			_firstPenalty = price;
 		}
 
-		void VinciRate::setFirstPenaltyValidityDuration(int hours)
+		void VinciRate::setFirstPenaltyValidityDuration(double hours)
 		{
 			_firstPenaltyValidityDuration = hours;
 		}
@@ -79,7 +81,7 @@ namespace synthese
 			_recurringPenaltyPeriod = hours;
 		}
 
-		int VinciRate::getValidityDuration() const
+		double VinciRate::getValidityDuration() const
 		{
 			return _validityDuration;
 		}
@@ -109,7 +111,7 @@ namespace synthese
 			return _firstPenalty;
 		}
 
-		int VinciRate::getFirstPenaltyValidityDuration() const
+		double VinciRate::getFirstPenaltyValidityDuration() const
 		{
 			return _firstPenaltyValidityDuration;
 		}
@@ -137,7 +139,28 @@ namespace synthese
 		time::DateTime VinciRate::getEndDate( const time::DateTime& startDate ) const
 		{
 			DateTime endDate = startDate;
-			endDate += _validityDuration * 60;
+			endDate += (int) (_validityDuration * 60);
+			return endDate;
+		}
+
+		double VinciRate::getAmountToPay(const time::DateTime& startDate) const
+		{
+			DateTime now;
+			if (now <= getEndDate(startDate))
+				return 0;
+
+			if (now <= getFirstPenaltyEndDate(startDate))
+				return _firstPenalty;
+
+			double penalties = floor((double) ((now - getFirstPenaltyEndDate(startDate)) / (_recurringPenaltyPeriod * 60)));
+				return _recurringPenalty * penalties;
+
+		}
+
+		time::DateTime VinciRate::getFirstPenaltyEndDate( const time::DateTime& startDate ) const
+		{
+			DateTime endDate = getEndDate(startDate);
+			endDate += (int) (_firstPenaltyValidityDuration * 60);
 			return endDate;
 		}
 	}

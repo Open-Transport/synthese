@@ -34,7 +34,7 @@ namespace synthese
 		class Alarm;
 
 		/** AlarmAddLinkAction action class.
-			@ingroup m17
+			@ingroup m17Actions refActions
 		*/
 		class AlarmAddLinkAction : public server::Action
 		{

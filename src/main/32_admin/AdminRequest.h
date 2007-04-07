@@ -33,6 +33,9 @@ namespace synthese
 	{
 		class AdminInterfaceElement;
 
+		/** Administration console Function Class.
+			@ingroup m32
+		*/
 		class AdminRequest : public interfaces::RequestWithInterfaceAndRequiredSession
 		{
 			static const std::string PARAMETER_PAGE;

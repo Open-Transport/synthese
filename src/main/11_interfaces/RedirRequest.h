@@ -30,7 +30,7 @@ namespace synthese
 	namespace interfaces
 	{
 		/** Redirection interface page class.
-			@ingroup m11
+			@ingroup m11Functions refFunctions
 
 			The redirection avoids to run an action.
 		*/

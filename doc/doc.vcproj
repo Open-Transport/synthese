@@ -245,6 +245,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\groups.doxygen"
+			>
+		</File>
+		<File
 			RelativePath=".\SConscript"
 			>
 		</File>

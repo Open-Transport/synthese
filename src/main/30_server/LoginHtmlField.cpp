@@ -43,10 +43,6 @@ namespace synthese
 			stream << "<input type=\"text\" name=\"" << LoginAction::PARAMETER_LOGIN << "\" />";
 			return stream.str();
 		}
-
-		LoginHtmlField::~LoginHtmlField()
-		{
-		}
 	}
 }
 

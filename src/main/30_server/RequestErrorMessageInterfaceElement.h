@@ -31,6 +31,9 @@ namespace synthese
 	{
 		class ValueInterfaceElement;
 
+		/** Request error message Value Interface Element Class.
+			@ingroup m30
+		*/
 		class RequestErrorMessageInterfaceElement : public interfaces::ValueInterfaceElement
 		{
 

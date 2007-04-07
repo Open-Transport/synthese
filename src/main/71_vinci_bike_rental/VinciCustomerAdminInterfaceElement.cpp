@@ -115,10 +115,9 @@ namespace synthese
 			stream << "<h1>Coordonnées</h1>";
 
 			HTMLForm form(updateRequest.getHTMLForm("update"));
-			stream << form.open();
-			
 			HTMLTable t;
-			stream << t.open();
+			
+			stream << form.open() << t.open();
 			stream << t.row();
 			stream << t.col() << "Nom";
 			stream << t.col() << form.getTextInput(VinciUpdateCustomerAction::PARAMETER_NAME, _user->getName());
@@ -148,8 +147,7 @@ namespace synthese
 			stream << t.row();
 			stream << t.col(2) << form.getSubmitButton("Enregistrer");
 			stream << t.col(2) << printRequest.getHTMLForm().getLinkButton("Imprimer");
-			stream << t.close();
-			stream << form.close();			
+			stream << t.close() << form.close();			
 
 			// Guarantees
 			stream << "<h1>Cautions</h1>";
@@ -162,14 +160,15 @@ namespace synthese
 			vector<TransactionPart*> guarantees = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), _user);
 			HTMLForm addGuaranteeForm(addGuaranteeRequest.getHTMLForm("addguarantee"));
 			addGuaranteeForm.addHiddenField(VinciAddGuaranteeAction::PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey()));
-			stream << addGuaranteeForm.open();
+			
 			HTMLTable::ColsVector cv;
 			cv.push_back("Date");
 			cv.push_back("Montant");
 			cv.push_back("Nature");
 			cv.push_back("Actions");
 			HTMLTable ct(cv);
-			stream << ct.open();
+			
+			stream << addGuaranteeForm.open() << ct.open();
 
 			stream << ct.row();
 			stream << ct.col() << addGuaranteeForm.getCalendarInput(VinciAddGuaranteeAction::PARAMETER_DATE, DateTime());
@@ -213,8 +212,7 @@ namespace synthese
 				delete *it;
 			}
 
-			stream << ct.close();
-			stream << addGuaranteeForm.close();
+			stream << ct.close() << addGuaranteeForm.close();
 
 			// Rents
 			stream << "<h1>Locations</h1>";
@@ -230,7 +228,7 @@ namespace synthese
 			rv.push_back("Tarif");
 			rv.push_back("Actions");
 			HTMLTable rt(rv);
-			stream << rt.open();
+			stream << addRentForm.open() << rt.open();
 
 			stream << rt.row();
 			stream << rt.col() << addRentForm.getCalendarInput(RentABikeAction::PARAMETER_DATE, DateTime());
@@ -272,6 +270,10 @@ namespace synthese
 				stream << rt.col();
 				if (transaction->getEndDateTime().isUnknown())
 				{
+					DateTime now;
+					if (now > rate->getEndDate(transaction->getStartDateTime()))
+						stream << "Retard : " << (now - rate->getEndDate(transaction->getStartDateTime())) << " h - "
+							<< rate->getAmountToPay(transaction->getStartDateTime()) << " EUR";
 					HTMLForm returnForm(returnRentRequest.getHTMLForm("return" + Conversion::ToString((*it)->getKey())));
 					returnForm.addHiddenField(ReturnABikeAction::PARAMETER_TRANSACTION_PART_ID, Conversion::ToString((*it)->getKey()));
 					stream << returnForm.getLinkButton("Retour du vélo");

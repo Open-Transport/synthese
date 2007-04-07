@@ -29,6 +29,9 @@ namespace synthese
 {
 	namespace server
 	{
+		/** Login Action Class.
+			@ingroup m30Actions refActions
+		*/
 		class LoginAction : public server::Action
 		{
 		public:

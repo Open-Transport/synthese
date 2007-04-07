@@ -33,6 +33,9 @@ namespace synthese
 
 	namespace server
 	{
+		/** User session class.
+			@ingroup m30
+		*/
 		class Session
 		{
 		private:

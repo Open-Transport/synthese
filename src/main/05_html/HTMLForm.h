@@ -166,10 +166,10 @@ namespace synthese
 
 				In order to use the calendar field, you must include the following lines int the header of the page :
 				@code
-				<style type="text/css">@import url(calendar-win2k-1.css);</style>
-				<script type="text/javascript" src="calendar.js"></script>
-				<script type="text/javascript" src="lang/calendar-en.js"></script>
-				<script type="text/javascript" src="calendar-setup.js"></script>
+<style type="text/css">@import url(calendar-win2k-1.css);</style>
+<script type="text/javascript" src="calendar.js"></script>
+<script type="text/javascript" src="lang/calendar-en.js"></script>
+<script type="text/javascript" src="calendar-setup.js"></script>
 				@endcode
 			*/
 			std::string getCalendarInput(const std::string& name, const time::DateTime& value);
@@ -183,10 +183,10 @@ namespace synthese
 
 				In order to use the calendar field, you must include the following lines int the header of the page :
 				@code
-				<style type="text/css">@import url(calendar-win2k-1.css);</style>
-				<script type="text/javascript" src="calendar.js"></script>
-				<script type="text/javascript" src="lang/calendar-en.js"></script>
-				<script type="text/javascript" src="calendar-setup.js"></script>
+<style type="text/css">@import url(calendar-win2k-1.css);</style>
+<script type="text/javascript" src="calendar.js"></script>
+<script type="text/javascript" src="lang/calendar-en.js"></script>
+<script type="text/javascript" src="calendar-setup.js"></script>
 				@endcode
 			*/
 			std::string getCalendarInput(const std::string& name, const time::Date& value);

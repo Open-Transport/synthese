@@ -30,7 +30,7 @@ namespace map
     class MapBackgroundManager;
     class PostscriptCanvas;
 
-
+/** @ingroup m39 */
 class Map
 {
 public:
