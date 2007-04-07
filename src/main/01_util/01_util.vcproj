@@ -61,7 +61,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
+			Name="Core classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx;h"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
@@ -95,14 +95,6 @@
 			</File>
 			<File
 				RelativePath=".\Factory.h"
-				>
-			</File>
-			<File
-				RelativePath=".\HtmlTable.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\HtmlTable.h"
 				>
 			</File>
 			<File
