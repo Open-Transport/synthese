@@ -32,7 +32,7 @@ namespace synthese
 		class Profile;
 
 		/** Ecran d'édition de profil.
-			@ingroup m05
+			@ingroup m12
 		
 			@image html cap_admin_profile.png
 			@image latex cap_admin_profile.png "Maquette d'écran d'édition de profil" width=14cm

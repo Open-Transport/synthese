@@ -34,7 +34,7 @@ namespace synthese
 		class Profile;
 
 		/** Ecran de gestion des profils utilisateurs.
-			@ingroup m34
+			@ingroup m12
 
 			@image html cap_admin_users_profiles.png
 			@image latex cap_admin_users_profiles.png "Maquette de l'écran d'administration des profils utilisateurs" width=14cm

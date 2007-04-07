@@ -30,13 +30,18 @@
 
 #include "12_security/Profile.h"
 
-/** @defgroup m12 12 Security
-@{
-*/
 namespace synthese
 {
+	/** @defgroup m12 12 Security
+	@{
+	*/
+
+	/** 12 Security module namespace.
+	*/
 	namespace security
 	{
+		/** 12 Security module class.
+		*/
 		class SecurityModule : public util::ModuleClass
 		{
 		public:
@@ -58,9 +63,7 @@ namespace synthese
 			static std::map<std::string, std::string> getRightLabels(bool withAll=false);
 		};
 	}
+	/** @} */
 }
 
-/** @} */
-
 #endif // SYNTHESE_SecurityModule_H__
-
