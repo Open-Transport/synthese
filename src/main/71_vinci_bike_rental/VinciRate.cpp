@@ -143,7 +143,7 @@ namespace synthese
 			return endDate;
 		}
 
-		double VinciRate::getAmountToPay(const time::DateTime& startDate) const
+		double VinciRate::getAdditionalAmountToPay(const time::DateTime& startDate) const
 		{
 			DateTime now;
 			if (now <= getEndDate(startDate))
@@ -153,7 +153,7 @@ namespace synthese
 				return _firstPenalty;
 
 			double penalties = floor((double) ((now - getFirstPenaltyEndDate(startDate)) / (_recurringPenaltyPeriod * 60)));
-				return _recurringPenalty * penalties;
+				return _recurringPenalty * penalties + _firstPenalty;
 
 		}
 

@@ -101,10 +101,10 @@ namespace synthese
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointsAdmin>());
 
-			map<int, string> m;
-			m.insert(make_pair((int) WITH_OR_WITHOU_ANY_BROADCASTPOINT, "(filtre désactivé)"));
-			m.insert(make_pair((int) AT_LEAST_ONE_BROADCASTPOINT, "Au moins un"));
-			m.insert(make_pair((int) NO_BROADCASTPOINT, "Aucun"));
+			vector<pair<int, string> > m;
+			m.push_back(make_pair((int) WITH_OR_WITHOU_ANY_BROADCASTPOINT, "(filtre désactivé)"));
+			m.push_back(make_pair((int) AT_LEAST_ONE_BROADCASTPOINT, "Au moins un"));
+			m.push_back(make_pair((int) NO_BROADCASTPOINT, "Aucun"));
 
 			stream << "<h1>Recherche</h1>";
 
@@ -144,6 +144,11 @@ namespace synthese
 
 		BroadcastPointsAdmin::~BroadcastPointsAdmin()
 		{
+		}
+
+		bool BroadcastPointsAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return true;
 		}
 	}
 }

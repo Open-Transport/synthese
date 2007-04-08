@@ -38,6 +38,8 @@ namespace synthese
 			
 			Parameters :
 				-# HTTP url to redirect
+
+			@ingroup m11Pages refPages
 		*/
 		class RedirectInterfacePage : public interfaces::InterfacePage
 		{

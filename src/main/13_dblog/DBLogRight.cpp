@@ -20,13 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DBLogRight.h"
+#include "12_security/Constants.h"
+
+#include "13_dblog/DBLog.h"
+#include "13_dblog/DBLogRight.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace security;
+	using namespace util;
 
 	namespace dblog
 	{
@@ -44,11 +48,21 @@ namespace synthese
 			return _parameter;
 		}
 
-		std::map<std::string, std::string> DBLogRight::getParametersLabels() const
+		DBLogRight::ParameterLabelsVector DBLogRight::getParametersLabels() const
 		{
-			map<string, string> m;
-			m.insert(make_pair("*","(tous les journaux)"));
+			ParameterLabelsVector m;
+			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les journaux)"));
+			for (Factory<DBLog>::Iterator it = Factory<DBLog>::begin(); it != Factory<DBLog>::end(); ++it)
+				m.push_back(make_pair(it.getKey(), it->getName()));
 			return m;
+		}
+
+		bool DBLogRight::perimeterIncludes( const std::string& perimeter ) const
+		{
+			if (_parameter == GLOBAL_PERIMETER)
+				return true;
+
+			return _parameter == perimeter;
 		}
 	}
 }

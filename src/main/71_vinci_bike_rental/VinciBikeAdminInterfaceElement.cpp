@@ -84,5 +84,10 @@ namespace synthese
 			if (it != map.end())
 				_bike = VinciBikeTableSync::get(Conversion::ToLongLong(it->second));
 		}
+
+		bool VinciBikeAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }

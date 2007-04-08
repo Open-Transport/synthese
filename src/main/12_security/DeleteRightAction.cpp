@@ -43,39 +43,35 @@ namespace synthese
 		ParametersMap DeleteRightAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_RIGHT, _right->getFactoryKey()));
-			map.insert(make_pair(PARAMETER_PARAMETER, _right->getParameter()));
+			if (_right.get())
+			{
+				map.insert(make_pair(PARAMETER_RIGHT, _right->getFactoryKey()));
+				map.insert(make_pair(PARAMETER_PARAMETER, _right->getParameter()));
+			}
 			return map;
 		}
 
 		void DeleteRightAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				ParametersMap::const_iterator it;
+			ParametersMap::const_iterator it;
 
-				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
-
-				string rightCode;
-				it = map.find(PARAMETER_RIGHT);
-				if (it == map.end())
-					throw ActionException("Right not specified");
-				rightCode = it->second;
-
-				it = map.find(PARAMETER_PARAMETER);
-				if (it == map.end())
-					throw ActionException("Parameter not specified");
-				
-				_right = _profile->getRight(rightCode, it->second);
-			}
-			catch (Profile::RegistryKeyException e)
-			{
+			if (!SecurityModule::getProfiles().contains(_request->getObjectId()))
 				throw ActionException("Profile not found");
-			}
-			catch(...)
-			{
+			_profile = SecurityModule::getProfiles().get(_request->getObjectId());
+
+			string rightCode;
+			it = map.find(PARAMETER_RIGHT);
+			if (it == map.end())
+				throw ActionException("Right not specified");
+			rightCode = it->second;
+
+			it = map.find(PARAMETER_PARAMETER);
+			if (it == map.end())
+				throw ActionException("Parameter not specified");
+			
+			_right.reset(_profile->getRight(rightCode, it->second));
+			if (!_right.get())
 				throw ActionException("Specified right not found");
-			}
 		}
 
 		void DeleteRightAction::run()

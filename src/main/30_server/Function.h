@@ -71,6 +71,13 @@ namespace synthese
 			virtual bool _runBeforeDisplayIfNoSession(std::ostream& stream) { return true; }
 
 
+			/** Authorization control.
+				@return True if the action run is authorized
+				@author Hugues Romain
+				@date 2007
+			*/
+			virtual bool _isAuthorized() const { return true; }
+
 			/** Copy of the function parameters.
 				@param function
 				@return void

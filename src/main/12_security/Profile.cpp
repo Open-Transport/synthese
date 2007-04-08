@@ -90,12 +90,10 @@ namespace synthese
 			_rights.erase(it);
 		}
 
-		Right* Profile::getRight( const std::string& key, const std::string& parameter) const
+		Right* Profile::getRight( const std::string key, const std::string parameter) const
 		{
 			RightsVector::const_iterator it = _rights.find(make_pair(key, parameter));
-			if (it == _rights.end())
-				throw Exception("Right not found");
-			return it->second;
+			return (it == _rights.end()) ? NULL : it->second;
 		}
 
 		const Profile::RightsVector& Profile::getRights() const
@@ -107,5 +105,53 @@ namespace synthese
 		{
 			_rights.insert(make_pair(make_pair(right->getFactoryKey(), right->getParameter()), right));
 		}
+
+		bool Profile::isAuthorized( const Right* right ) const
+		{
+			// 0 Default values : forbidden
+			bool privateAuthorization = false;
+			bool publicAuthorization = false;
+
+			// 1 Reading of the global right
+			Right* sright = getRight();
+			if (sright != NULL)
+			{
+				privateAuthorization = (sright->getPrivateRightLevel() >= right->getPrivateRightLevel());
+				publicAuthorization = (sright->getPublicRightLevel() >= right->getPublicRightLevel());
+			}
+
+			// 1 Attempting to find same right with global perimeter
+			sright = getRight(right->getFactoryKey());
+			if (sright != NULL)
+			{
+				privateAuthorization = (sright->getPrivateRightLevel() >= right->getPrivateRightLevel());
+				publicAuthorization = (sright->getPublicRightLevel() >= right->getPublicRightLevel());
+			}
+			
+			// 2 Attempting to find same right with compatible perimeter : the more favorable is selected
+			RightsOfSameClassMap m = _getRights(right->getFactoryKey());
+			for (RightsOfSameClassMap::const_iterator it = m.begin(); it != m.end(); ++it)
+			{
+				if (it->second->perimeterIncludes(right->getParameter()))
+				{
+					if (it->second->getPrivateRightLevel() >= right->getPrivateRightLevel())
+						privateAuthorization = true;
+					if (it->second->getPublicRightLevel() >= right->getPublicRightLevel())
+						publicAuthorization = true;
+				}
+			}
+
+			return privateAuthorization && publicAuthorization;
+		}
+
+		Profile::RightsOfSameClassMap Profile::_getRights( const std::string& key ) const
+		{
+			RightsOfSameClassMap m;
+			for (RightsVector::const_iterator it = _rights.begin(); it != _rights.end(); ++it)
+				if (it->first.first == key)
+					m.insert(make_pair(it->first.second, it->second));
+			return m;			
+		}
+
 	}
 }

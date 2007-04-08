@@ -45,7 +45,7 @@ SUBGROUPING            = YES
 # Build related configuration options
 #---------------------------------------------------------------------------
 EXTRACT_ALL            = YES
-EXTRACT_PRIVATE        = NO
+EXTRACT_PRIVATE        = YES
 EXTRACT_STATIC         = YES
 EXTRACT_LOCAL_CLASSES  = YES
 EXTRACT_LOCAL_METHODS  = NO
@@ -99,7 +99,8 @@ EXCLUDE                = exemples \
                          ../src/main/server \
                          ../src/test
 EXCLUDE_SYMLINKS       = NO
-EXCLUDE_PATTERNS       = 
+EXCLUDE_PATTERNS       = *.inc.cpp \
+                         *.gen.cpp
 EXCLUDE_SYMBOLS        = 
 EXAMPLE_PATH           = exemples \
                          ../src/main \
@@ -274,7 +275,7 @@ PERL_PATH              =
 # Configuration options related to the dot tool   
 #---------------------------------------------------------------------------
 CLASS_DIAGRAMS         = YES
-MSCGEN_PATH            = 
+MSCGEN_PATH            = "C:\Program Files\MSCGen"
 HIDE_UNDOC_RELATIONS   = NO
 HAVE_DOT               = YES
 CLASS_GRAPH            = NO

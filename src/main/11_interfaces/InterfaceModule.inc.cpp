@@ -18,3 +18,5 @@
 #include "11_interfaces/EqualsValueInterfaceElement.h"
 #include "11_interfaces/ChrInterfaceElement.h"
 #include "11_interfaces/DurationInterfacePage.h"
+#include "11_interfaces/ConcatenateValueInterfaceElement.h"
+#include "11_interfaces/SuperiorValueInterfaceElement.h"

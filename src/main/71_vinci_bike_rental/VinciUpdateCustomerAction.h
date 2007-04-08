@@ -38,7 +38,7 @@ namespace synthese
 	namespace vinci
 	{
 		/** Update of the contract with the customer.
-			@ingroup m71
+			@ingroup m71Actions refActions
 		*/
 		class VinciUpdateCustomerAction : public server::Action
 		{

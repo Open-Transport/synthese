@@ -38,7 +38,7 @@ namespace synthese
 		class VinciContract;
 
 		/** Vinci Contract SQLite table synchronizer.
-			@ingroup m71
+			@ingroup m71LS refLS
 		*/
 
 		class VinciContractTableSync : public db::SQLiteTableSyncTemplate<VinciContract>

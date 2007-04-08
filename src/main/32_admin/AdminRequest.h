@@ -61,6 +61,8 @@ namespace synthese
 			*/
 			void _run(std::ostream& stream) const;
 
+			bool _isAuthorized() const;
+
 		public:
 
 			AdminRequest();

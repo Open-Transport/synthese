@@ -43,11 +43,16 @@ namespace synthese
 			return _parameter;
 		}
 
-		std::map<std::string, std::string> BroadcastPointsRight::getParametersLabels() const
+		BroadcastPointsRight::ParameterLabelsVector BroadcastPointsRight::getParametersLabels() const
 		{
-			map<string, string> m;
-			m.insert(make_pair("*","(tous les points de diffusion)"));
+			ParameterLabelsVector m;
+			m.push_back(make_pair("*","(tous les points de diffusion)"));
 			return m;
+		}
+
+		bool BroadcastPointsRight::perimeterIncludes( const std::string& perimeter ) const
+		{
+			 return true;
 		}
 	}
 }

@@ -30,6 +30,13 @@ namespace synthese
 {
 	namespace interfaces
 	{
+		/** Execution parameter reading Value Interface Element class.
+			
+			Usage :
+			@code {{param <rank>}} @endcode
+
+			@ingroup m11Values refValues
+		*/
 		class ParameterValueInterfaceElement : public ValueInterfaceElement
 		{
 		private:

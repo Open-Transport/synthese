@@ -33,6 +33,26 @@ namespace synthese
 		/** Special value interface element containing text (stops the recursion of value elements parsing).
 			As this class is child of ValueInterfaceElement, it can not be join in the factory, because of its constructor which requires an argument to run.
 			The parse method is implemented for technical reasons only, but does nothing.
+
+			To create a static value interface element, just put the text if it does not contain any space, or put { } or [ ] around it.
+
+			Examples :
+
+			@code
+element
+this_is_also_an_element
+{element with spaces}
+[element with spaces]
+{element with spaces containing a [ or a ] character}
+[element with spaces containing a { or a } character]
+			@endcode
+
+			@note If a value element contains both { and [ elements, then separate it into smaller elements, and join it with the concatenation element :
+			@code {{¤ {element with spaces and [ character} [ element with space and { character ] OK !}} @endcode
+			will output
+			@code element with spaces and [ character element with space and { character OK! @endcode
+
+			@ingroup m11Values refValues
 		*/
 		class StaticValueInterfaceElement : public ValueInterfaceElement
 		{

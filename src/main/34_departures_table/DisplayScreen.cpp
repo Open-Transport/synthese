@@ -408,7 +408,7 @@ namespace synthese
 			}
 		}
 
-		std::map<std::string, std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(const std::set<const ConnectionPlace*>& placesToAvoid) const
+		std::vector<std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(const std::set<const ConnectionPlace*>& placesToAvoid) const
 		{
 			map<std::string, std::pair<uid, string> > m;
 			for (PhysicalStopsSet::const_iterator it = getPhysicalStops().begin(); it != getPhysicalStops().end(); ++it)
@@ -421,7 +421,10 @@ namespace synthese
 						m.insert(make_pair(edge->getConnectionPlace()->getFullName(), make_pair(edge->getConnectionPlace()->getKey(), edge->getConnectionPlace()->getFullName())));
 				}
 			}
-			return m;
+			vector<pair<uid, string> > v;
+			for (map<string, pair<uid, string> >::const_iterator it = m.begin(); it != m.end(); ++it)
+				v.push_back(it->second);
+			return v;
 		}
 
 		void DisplayScreen::removeForcedDestination( const env::ConnectionPlace* place)

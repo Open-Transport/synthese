@@ -33,7 +33,7 @@ namespace synthese
 	namespace vinci
 	{
 		/** VinciReportsAdminInterfaceElement Class.
-			@ingroup m71
+			@ingroup m71Admin refAdmin
 		*/
 		class VinciReportsAdminInterfaceElement : public admin::AdminInterfaceElement
 		{
@@ -47,12 +47,14 @@ namespace synthese
 
 		public:
 			VinciReportsAdminInterfaceElement();
-			/** Initialization of the parameters from a request.
-				@param request The request to use for the initialization.
+			
+			/** Initialization of the parameters from a parameters map.
+				@param map The parameters map to use for the initialization.
 			*/
 			void setFromParametersMap(const server::ParametersMap& map);
 			std::string getTitle() const;
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request = NULL) const;
+			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}
 }

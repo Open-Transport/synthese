@@ -8,6 +8,9 @@ namespace synthese
 {
 	namespace vinci
 	{
+		/** Bike creation Action Class.
+			@ingroup m71Actions refActions
+		*/
 		class VinciAddBike : public server::Action
 		{
 		public:

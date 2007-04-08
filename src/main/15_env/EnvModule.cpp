@@ -133,13 +133,13 @@ namespace synthese
 			return 0;
 		}
 
-		std::map<uid, std::string> EnvModule::getCommercialLineLabels(bool withAll)
+		std::vector<pair<uid, std::string> > EnvModule::getCommercialLineLabels(bool withAll)
 		{
-			map<uid,string> m;
+			vector<pair<uid,string> > m;
 			if (withAll)
-				m.insert(make_pair(0, "(toutes)"));
+				m.push_back(make_pair(0, "(toutes)"));
 			for(CommercialLine::Registry::const_iterator it = _commercialLines.begin(); it != _commercialLines.end(); ++it)
-				m.insert(make_pair(it->first, it->second->getShortName()));
+				m.push_back(make_pair(it->first, it->second->getShortName()));
 			return m;
 		}
 

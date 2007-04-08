@@ -24,6 +24,8 @@
 #define SYNTHESE_HTMLForm_h__
 
 #include <map>
+#include <vector>
+#include <utility>
 #include <string>
 #include <sstream>
 
@@ -133,17 +135,14 @@ namespace synthese
 			@author Hugues Romain
 			@date 2007					
 			*/
-			template<class S, class K, class T>
-			std::string getSortedSelectInput(const std::string& name, const std::map<S, std::pair<K, T> >& choices, const K& value);
-
 			template<class K, class T>
-			std::string getSelectInput(const std::string& name, const std::map<K, T>& choices, const K& value);
+			std::string getSelectInput(const std::string& name, const std::vector<std::pair<K, T> >& choices, const K& value);
 
 			template<class K>
 			std::string getRadioInput(const std::string& name, const K& valueIfSelected, const K& valueToSelect, const std::string label="");
 
 			template<class K>
-			std::string getRadioInput(const std::string& name, const std::map<K, std::string>& choices, const K& value);
+			std::string getRadioInput(const std::string& name, const std::vector<std::pair<K, std::string> >& choices, const K& value);
 
 			/** Simple text HTML input generator.
 				@param name Name of the input in the form
@@ -220,28 +219,12 @@ namespace synthese
 		};
 
 
-		template<class S, class K, class T>
-		std::string HTMLForm::getSortedSelectInput( const std::string& name, const std::map<S, std::pair<K, T> >& choices, const K& value )
-		{
-			std::stringstream s;
-			s << "<select name=\"" << name << "\">";
-			for (typename std::map<S, std::pair<K, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
-			{
-				s << "<option value=\"" << it->second.first << "\"";
-				if (it->second.first == value)
-					s << " selected=\"1\"";
-				s << ">" << it->second.second << "</option>";
-			}
-			s << "</select>";
-			return s.str();
-		}
-
 		template<class K, class T>
-		std::string HTMLForm::getSelectInput(const std::string& name, const std::map<K, T>& choices, const K& value)
+		std::string HTMLForm::getSelectInput( const std::string& name, const std::vector<std::pair<K, T> >& choices, const K& value )
 		{
 			std::stringstream s;
 			s << "<select name=\"" << name << "\">";
-			for (typename std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
+			for (typename std::vector<std::pair<K, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
 				s << "<option value=\"" << it->first << "\"";
 				if (it->first == value)
@@ -264,10 +247,10 @@ namespace synthese
 		}
 
 		template<class K>
-		std::string HTMLForm::getRadioInput(const std::string& name, const std::map<K, std::string>& choices, const K& value)
+		std::string HTMLForm::getRadioInput(const std::string& name, const std::vector<std::pair<K, std::string> >& choices, const K& value)
 		{
 			std::stringstream s;
-			for (typename std::map<K, std::string>::const_iterator it = choices.begin(); it != choices.end(); ++it)
+			for (typename std::vector<std::pair<K, std::string> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
 				s << getRadioInput(name, it->first, value, it->second);
 			}

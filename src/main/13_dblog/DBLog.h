@@ -63,7 +63,7 @@ namespace synthese
 			typedef std::vector<std::string> ColumnsVector;
 			
 		protected:
-			void addEntry(DBLogEntry::Level level, const DBLogEntry::Content& content, const security::User* user = NULL);
+			void _addEntry(DBLogEntry::Level level, const DBLogEntry::Content& content, const security::User* user = NULL);
 
 		private:
 			const std::string _name;

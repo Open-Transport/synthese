@@ -17,6 +17,9 @@ namespace synthese
 	{
 		class VinciContract;
 
+		/** Guarantee recording Action Class.
+			@ingroup m71Actions refActions
+		*/
 		class VinciAddGuaranteeAction : public server::Action
 		{
 		public:

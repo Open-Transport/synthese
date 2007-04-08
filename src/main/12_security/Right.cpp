@@ -30,15 +30,14 @@ namespace synthese
 
 	namespace security
 	{
-
-		Right::Right( std::string parameter, Level privateLevel, Level publicLevel)
+/*		Right::Right( std::string parameter, Level privateLevel, Level publicLevel)
 			: _parameter(parameter), _privateRightLevel(privateLevel), _publicRightLevel(publicLevel)
 		{
 
 		}
-
+*/
 		Right::Right()
-			: Factorable(), _parameter(""), _privateRightLevel(FORBIDDEN), _publicRightLevel(FORBIDDEN)			
+			: Factorable(), _parameter(""), _privateRightLevel(FORBIDDEN), _publicRightLevel(FORBIDDEN)
 		{
 
 		}
@@ -86,7 +85,7 @@ namespace synthese
 			_parameter = parameter;
 		}
 
-		std::string Right::getParameter() const
+		const std::string& Right::getParameter() const
 		{
 			return _parameter;
 		}

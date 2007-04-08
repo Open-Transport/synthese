@@ -51,7 +51,6 @@ namespace synthese
 			: AdminInterfaceElement("users", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
 			, _user(NULL), _userError(false)
 		{
-			
 		}
 
 		std::string UserAdmin::getTitle() const
@@ -146,7 +145,7 @@ namespace synthese
 				if (it != map.end())
 					_user = UserTableSync::get(Conversion::ToLongLong(it->second));
 			}
-			catch (DBEmptyResultException& e)
+			catch (DBEmptyResultException)
 			{
 				// throw AdminElementInitializationException("Bad user");
 			}
@@ -155,6 +154,11 @@ namespace synthese
 		UserAdmin::~UserAdmin()
 		{
 			delete _user;
+		}
+
+		bool UserAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
 		}
 	}
 }

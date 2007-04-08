@@ -29,6 +29,8 @@
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
+#include "12_security/Constants.h"
+
 namespace synthese
 {
 	namespace security
@@ -56,11 +58,20 @@ namespace synthese
 		{
 		public:
 			typedef std::map<std::pair<std::string, std::string>, Right*> RightsVector;
+			typedef std::map<std::string, Right*> RightsOfSameClassMap;
 
 		private:
 			std::string		_name;
 			RightsVector	_rights;
 			uid				_parentId;
+
+			/** Extractor of the rights corresponding to a class key.
+				@param key The class key to search
+				@return RightsOfSameClassMap Rights of the specified class
+				@author Hugues Romain
+				@date 2007				
+			*/
+			RightsOfSameClassMap	_getRights(const std::string& key) const;
 
 		public:
 			/** Comparison operator between profiles.
@@ -77,7 +88,6 @@ namespace synthese
 				const std::string&	getName()														const;
 				const uid			getParentId()													const;
 				const RightsVector&	getRights()														const;
-				Right*				getRight(const std::string& key, const std::string& parameter)	const;
 			//@}
 
 
@@ -89,6 +99,31 @@ namespace synthese
 				void removeRight(const std::string& key, const std::string& parameter);
 				void addRight(Right* right);
 				void setParent(uid id);
+			//@}
+
+			//! \name Calculators
+			//@{
+				/** Control of authorization.
+					@param right Right to compare with
+					@return bool True if the needed right is respected :
+						- If the profile contains a global right with a sufficient level in public and private domains
+						- Or If the profile contains a right of the same class with a global perimeter, and with a sufficient level in public and private domains
+						- Or if the profile contains a right of the same class with a sufficient perimeter, and with a sufficient level in public and private domains
+					@author Hugues Romain
+					@date 2007
+					
+				*/
+				bool isAuthorized(const Right* right) const;
+
+				/** Search of a contained right in the right vector, from the class key and the perimeter string.
+					@param key Class key to search (default : the global right)
+					@param parameter Perimeter string to search (default : global perimeter)
+					@return Right* The specified right if exists, NULL else
+					@author Hugues Romain
+					@date 2007					
+				*/
+				Right* getRight(const std::string key = GLOBAL_PERIMETER, const std::string parameter = GLOBAL_PERIMETER)	const;
+
 			//@}
 		};
 	}

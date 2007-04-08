@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_UpdateTextTemplateAction_H__
 #define SYNTHESE_UpdateTextTemplateAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -43,10 +45,10 @@ namespace synthese
 			static const std::string PARAMETER_LONG_MESSAGE;
 
 		private:
-			TextTemplate*	_text;
-			std::string		_name;
-			std::string		_shortMessage;
-			std::string		_longMessage;
+			boost::shared_ptr<TextTemplate>	_text;
+			std::string						_name;
+			std::string						_shortMessage;
+			std::string						_longMessage;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -60,10 +62,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			UpdateTextTemplateAction();
-			~UpdateTextTemplateAction();
 
 			/** Action to run, defined by each subclass.
 			*/

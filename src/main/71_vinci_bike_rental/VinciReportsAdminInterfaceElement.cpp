@@ -143,6 +143,11 @@ namespace synthese
 				_resultsPerRate = getRentsPerRate(_startDate, _endDate);
 			}
 		}
+
+		bool VinciReportsAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }
 

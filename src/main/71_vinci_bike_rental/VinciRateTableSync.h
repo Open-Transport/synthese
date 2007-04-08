@@ -16,7 +16,7 @@ namespace synthese
 		class VinciRate;
 
 		/** Vinci Rate SQLite table synchronizer.
-			@ingroup m71
+			@ingroup m71LS refLS
 		*/
 		class VinciRateTableSync : public db::SQLiteTableSyncTemplate<VinciRate>
 		{

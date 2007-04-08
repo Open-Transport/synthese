@@ -40,7 +40,7 @@ namespace synthese
 			return _name;
 		}
 
-		void DBLog::addEntry( DBLogEntry::Level level, const DBLogEntry::Content& content, const security::User* user /*= NULL*/ )
+		void DBLog::_addEntry( DBLogEntry::Level level, const DBLogEntry::Content& content, const security::User* user /*= NULL*/ )
 		{
 			DBLogEntry* e = new DBLogEntry;
 			e->setLevel(level);

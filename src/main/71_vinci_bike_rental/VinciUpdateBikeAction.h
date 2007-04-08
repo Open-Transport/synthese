@@ -32,7 +32,7 @@ namespace synthese
 		class VinciBike;
 
 		/** VinciUpdateBikeAction action class.
-			@ingroup m71
+			@ingroup m71Action refAction
 		*/
 		class VinciUpdateBikeAction : public server::Action
 		{

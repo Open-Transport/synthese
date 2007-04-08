@@ -43,11 +43,16 @@ namespace synthese
 			return _parameter;
 		}
 
-		std::map<std::string, std::string> DisplayMaintenanceRight::getParametersLabels() const
+		DisplayMaintenanceRight::ParameterLabelsVector DisplayMaintenanceRight::getParametersLabels() const
 		{
-			map<string, string> m;
-			m.insert(make_pair("*","(tous les afficheurs)"));
+			ParameterLabelsVector m;
+			m.push_back(make_pair("*","(tous les afficheurs)"));
 			return m;
+		}
+
+		bool DisplayMaintenanceRight::perimeterIncludes( const std::string& perimeter ) const
+		{
+			return true;
 		}
 	}
 }

@@ -1,9 +1,5 @@
 
-
-/** main implementation.
-	@file main.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
+/*	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
 
 	This program is free software; you can redistribute it and/or

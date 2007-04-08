@@ -35,6 +35,9 @@ namespace synthese
 {
 	namespace vinci
 	{
+		/** Bike to rent.
+			@ingroup m71
+		*/
 		class VinciBike : public util::Registrable<uid, VinciBike>
 		{
 		private:

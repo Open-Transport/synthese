@@ -34,7 +34,9 @@
 #include "12_security/Profile.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/UsersAdmin.h"
+#include "12_security/SecurityRight.h"
 
+#include "30_server/Session.h"
 #include "30_server/ServerModule.h"
 #include "30_server/ActionFunctionRequest.h"
 
@@ -63,7 +65,6 @@ namespace synthese
 		UsersAdmin::UsersAdmin()
 			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED)
 		{
-
 		}
 
 		std::string UsersAdmin::getTitle() const
@@ -195,6 +196,11 @@ namespace synthese
 		{
 			for(vector<User*>::iterator it = _users.begin(); it != _users.end(); ++it)
 				delete *it;
+		}
+
+		bool UsersAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return request->isAuthorized<SecurityRight>(Right::READ);
 		}
 	}
 }

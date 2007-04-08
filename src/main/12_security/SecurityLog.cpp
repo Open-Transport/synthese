@@ -20,11 +20,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "SecurityLog.h"
+#include <boost/shared_ptr.hpp>
+
+#include "01_util/Conversion.h"
+
+#include "12_security/SecurityLog.h"
+#include "12_security/User.h"
+#include "12_security/Profile.h"
+#include "12_security/UserTableSync.h"
+#include "12_security/ProfileTableSync.h"
+
+#include "13_dblog/DBLogEntry.h"
+
+using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
 	using namespace dblog;
+	using namespace util;
 
 	namespace security
 	{
@@ -37,8 +51,95 @@ namespace synthese
 		DBLog::ColumnsVector SecurityLog::getColumnNames() const
 		{
 			ColumnsVector v;
-			v.push_back("Action");
 			v.push_back("Objet");
+			v.push_back("Type");
+			v.push_back("Action");
+			return v;
+		}
+
+		void SecurityLog::addUserLogin( const User* user )
+		{
+			DBLogEntry::Content c;
+			c.push_back(Conversion::ToString(LOGIN_ENTRY));
+			c.push_back(Conversion::ToString(user->getKey()));
+			c.push_back("Login succeeded");
+			_addEntry(DBLogEntry::DB_LOG_INFO, c, user);
+		}
+
+		void SecurityLog::addUserAdmin( const User* user, const User* subject, const string& text)
+		{
+			DBLogEntry::Content c;
+			c.push_back(Conversion::ToString(USER_ADMIN_ENTRY));
+			c.push_back(Conversion::ToString(subject->getKey()));
+			c.push_back(text);
+			_addEntry(DBLogEntry::DB_LOG_INFO, c, user);
+		}
+
+		void SecurityLog::addProfileAdmin( const User* user, const Profile* subject, const std::string& text )
+		{
+			DBLogEntry::Content c;
+			c.push_back(Conversion::ToString(PROFILE_ADMIN_ENTRY));
+			c.push_back(Conversion::ToString(subject->getKey()));
+			c.push_back(text);
+			_addEntry(DBLogEntry::DB_LOG_INFO, c, user);
+		}
+
+		DBLog::ColumnsVector SecurityLog::parse( const dblog::DBLogEntry::Content& cols ) const
+		{
+			DBLog::ColumnsVector v;
+
+			switch ((_EntryType) Conversion::ToInt(cols.front()))
+			{
+			case LOGIN_ENTRY:
+				try
+				{
+					shared_ptr<User> user(UserTableSync::get(Conversion::ToLongLong(cols.front())));
+					v.push_back(user->getLogin());
+				}
+				catch(...)
+				{
+					v.push_back("unknown");
+				}
+				v.push_back("Login");
+				v.push_back(cols.front());
+				break;
+
+			case USER_ADMIN_ENTRY:
+				try
+				{
+					shared_ptr<User> user(UserTableSync::get(Conversion::ToLongLong(cols.front())));
+					v.push_back(user->getLogin());
+				}
+				catch(...)
+				{
+					v.push_back("unknown");
+				}
+				v.push_back("User Admin");
+				v.push_back(cols.front());
+				break;
+
+			case PROFILE_ADMIN_ENTRY:
+				try
+				{
+					shared_ptr<Profile> profile(ProfileTableSync::get(Conversion::ToLongLong(cols.front())));
+					v.push_back(profile->getName());
+				}
+				catch(...)
+				{
+					v.push_back("unknown");
+				}
+				v.push_back("Profile Admin");
+				v.push_back(cols.front());
+				break;
+
+			default:
+				cols.front();
+				cols.front();
+				v.push_back("unknown");
+				v.push_back("unknown");
+				v.push_back(cols.front());
+			}
+
 			return v;
 		}
 	}

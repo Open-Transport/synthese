@@ -63,7 +63,8 @@ namespace synthese
 			{
 				if (it->getSuperior() == page 
 					&& ((it->getDisplayMode() == AdminInterfaceElement::EVER_DISPLAYED)
-					|| (it->getDisplayMode() == AdminInterfaceElement::DISPLAYED_IF_CURRENT && it.getKey() == currentPage->getFactoryKey()))
+						|| (it->getDisplayMode() == AdminInterfaceElement::DISPLAYED_IF_CURRENT && it.getKey() == currentPage->getFactoryKey()))
+					&& it->isAuthorized(request)
 				){
 					str << "<li>";
 					if (it.getKey() == currentPage->getFactoryKey())

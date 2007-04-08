@@ -36,6 +36,9 @@ namespace synthese
 
 	namespace vinci
 	{
+		/** Guarantee return Action Class.
+			@ingroup m71Actions refActions
+		*/
 		class VinciReturnGuaranteeAction : public server::Action
 		{
 		public:

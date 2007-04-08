@@ -54,7 +54,7 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::get(_request->getObjectId());
+				_user.reset(UserTableSync::get(_request->getObjectId()));
 
 				ParametersMap::const_iterator it;
 
@@ -73,20 +73,10 @@ namespace synthese
 			}
 		}
 
-		UserPasswordUpdateAction::UserPasswordUpdateAction()
-			: Action()
-			, _user(NULL)
-		{}
-
 		void UserPasswordUpdateAction::run()
 		{
 			_user->setPassword(_password);
-			UserTableSync::save(_user);
-		}
-
-		UserPasswordUpdateAction::~UserPasswordUpdateAction()
-		{
-			delete _user;
+			UserTableSync::save(_user.get());
 		}
 	}
 }

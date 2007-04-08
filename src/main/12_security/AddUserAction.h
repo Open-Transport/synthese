@@ -55,7 +55,7 @@ namespace synthese
 
 		public:
 			AddUserAction();
-			
+
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

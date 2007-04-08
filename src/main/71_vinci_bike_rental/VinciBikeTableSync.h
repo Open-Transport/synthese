@@ -38,7 +38,7 @@ namespace synthese
 		class VinciBike;
 
 		/** Vinci Bike SQLite table synchronizer.
-			@ingroup m71
+			@ingroup m71LS refLS
 		*/
 
 		class VinciBikeTableSync : public db::SQLiteTableSyncTemplate<VinciBike>

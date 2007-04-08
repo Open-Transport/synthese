@@ -57,7 +57,7 @@ namespace synthese
 			c.push_back(Conversion::ToString(screen->getKey()));
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_DATA_CONTROL));
 			c.push_back(text);
-			DBLog::addEntry(level, c, NULL);
+			DBLog::_addEntry(level, c, NULL);
 		}
 
 		void DisplayMaintenanceLog::addAdminEntry( const DisplayScreen* screen, const DBLogEntry::Level& level, const security::User* user, const std::string& field, const std::string& oldValue, const std::string& newValue )
@@ -66,7 +66,7 @@ namespace synthese
 			c.push_back(Conversion::ToString(screen->getKey()));
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_ADMIN));
 			c.push_back(field + " : " + oldValue + " => " + newValue);
-			DBLog::addEntry(DBLogEntry::DB_LOG_INFO, c, user);
+			DBLog::_addEntry(DBLogEntry::DB_LOG_INFO, c, user);
 		}
 
 		void DisplayMaintenanceLog::addStatusEntry( const DisplayScreen* screen, bool status )
@@ -75,7 +75,7 @@ namespace synthese
 			c.push_back(Conversion::ToString(screen->getKey()));
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_STATUS));
 			c.push_back(Conversion::ToString(status));
-			DBLog::addEntry(status ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_ERROR, c, NULL);
+			DBLog::_addEntry(status ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_ERROR, c, NULL);
 		}
 
 		void DisplayMaintenanceLog::addDataControlEntry( const DisplayScreen* screen, bool ok, const std::string& text )
@@ -84,7 +84,7 @@ namespace synthese
 			c.push_back(Conversion::ToString(screen->getKey()));
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_DATA_CONTROL));
 			c.push_back(text);
-			DBLog::addEntry(ok ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_WARNING, c, NULL);
+			DBLog::_addEntry(ok ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_WARNING, c, NULL);
 		}
 
 		DBLog::ColumnsVector DisplayMaintenanceLog::parse( const DBLogEntry::Content& cols ) const

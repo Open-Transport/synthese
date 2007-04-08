@@ -20,6 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef SYNTHESE_Session_H__
+#define SYNTHESE_Session_H__
+
 #include <string>
 
 #include "04_time/DateTime.h"
@@ -79,7 +82,10 @@ namespace synthese
 			//! \name Getters
 			//@{
 				const std::string getKey() const;
+				const security::User* getUser() const;
 			//@}
 		};
 	}
 }
+
+#endif // SYNTHESE_Session_H__

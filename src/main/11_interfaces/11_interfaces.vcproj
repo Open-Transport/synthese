@@ -109,6 +109,26 @@
 				RelativePath=".\ValueInterfaceElement.h"
 				>
 			</File>
+			<Filter
+				Name="Functions"
+				>
+				<File
+					RelativePath=".\RequestWithInterface.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\RequestWithInterface.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RequestWithInterfaceAndRequiredSession.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\RequestWithInterfaceAndRequiredSession.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="LibraryInterfaceElement"
@@ -165,6 +185,22 @@
 		<Filter
 			Name="ValueInterfaceElement"
 			>
+			<File
+				RelativePath=".\ChrInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ChrInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ConcatenateValueInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ConcatenateValueInterfaceElement.h"
+				>
+			</File>
 			<File
 				RelativePath=".\EqualsValueInterfaceElement.cpp"
 				>
@@ -255,22 +291,6 @@
 			</File>
 			<File
 				RelativePath=".\RedirRequest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RequestWithInterface.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RequestWithInterface.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RequestWithInterfaceAndRequiredSession.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RequestWithInterfaceAndRequiredSession.h"
 				>
 			</File>
 			<File

@@ -32,7 +32,7 @@ namespace synthese
 		class VinciContract;
 
 		/** VinciContractPrintRequest class.
-			@ingroup m71
+			@ingroup m71Functions refFunctions
 		*/
 		class VinciContractPrintRequest : public interfaces::RequestWithInterfaceAndRequiredSession
 		{

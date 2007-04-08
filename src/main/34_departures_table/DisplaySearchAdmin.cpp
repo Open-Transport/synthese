@@ -172,18 +172,18 @@ namespace synthese
 
 		std::string DisplaySearchAdmin::getHtmlSearchForm(const HTMLForm& form, uid screenUid, uid placeUid, uid lineUid, uid typeUid, int state, int message )
 		{
-			map<int, string> states;
-			states.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
-			states.insert(make_pair(1, "OK"));
-			states.insert(make_pair(2, "Warning"));
-			states.insert(make_pair(3, "Warning+Error"));
-			states.insert(make_pair(4, "Error"));
+			vector<pair<int, string> > states;
+			states.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
+			states.push_back(make_pair(1, "OK"));
+			states.push_back(make_pair(2, "Warning"));
+			states.push_back(make_pair(3, "Warning+Error"));
+			states.push_back(make_pair(4, "Error"));
 
-			map<int, string> messages;
-			messages.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
-			messages.insert(make_pair(1, "Un message"));
-			messages.insert(make_pair(2, "Conflit"));
-			messages.insert(make_pair(3, "Messages"));
+			vector<pair<int, string> > messages;
+			messages.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
+			messages.push_back(make_pair(1, "Un message"));
+			messages.push_back(make_pair(2, "Conflit"));
+			messages.push_back(make_pair(3, "Messages"));
 
 			stringstream stream;
 			SearchFormHTMLTable s(form);
@@ -197,6 +197,11 @@ namespace synthese
 			stream << s.close();
 
 			return stream.str();
+		}
+
+		bool DisplaySearchAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
 		}
 	}
 }

@@ -20,30 +20,71 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "SecurityRight.h"
+#include "01_util/Conversion.h"
+
+#include "12_security/SecurityRight.h"
+#include "12_security/SecurityModule.h"
+#include "12_security/Constants.h"
+#include "12_security/Profile.h"
 
 using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace security
 	{
-		SecurityRight::SecurityRight()
-			: Right()
-		{
-
-		}
 
 		std::string SecurityRight::displayParameter() const
 		{
-			return _parameter;
+			if (_parameter == GLOBAL_PERIMETER)
+				return "(tous profils)";
+
+			return (SecurityModule::getProfiles().contains(Conversion::ToLongLong(_parameter)))
+				? SecurityModule::getProfiles().get(Conversion::ToLongLong(_parameter))->getName()
+				: "(invalide)";
 		}
 
-		std::map<std::string, std::string> SecurityRight::getParametersLabels() const
+		Right::ParameterLabelsVector SecurityRight::getParametersLabels() const
 		{
-			map<string, string> m;
-			m.insert(make_pair("*", "(toutes opérations)"));
+			ParameterLabelsVector m;
+			m.push_back(make_pair(GLOBAL_PERIMETER, "(tous profils)"));
+			_addSubProfilesLabel(m, NULL, string());
 			return m;
+		}
+
+		bool SecurityRight::perimeterIncludes( const std::string& perimeter ) const
+		{
+			if (_parameter == GLOBAL_PERIMETER)
+				return true;
+			if (perimeter == UNKNOWN_PERIMETER)
+				return true;
+
+			if (SecurityModule::getProfiles().contains(Conversion::ToLongLong(_parameter))
+				&& SecurityModule::getProfiles().contains(Conversion::ToLongLong(perimeter)))
+			{
+				Profile* includedProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(perimeter));
+				Profile* currentProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(_parameter));
+
+				for (;includedProfile != NULL; includedProfile = SecurityModule::getProfiles().get(includedProfile->getParentId()))
+					if (currentProfile == includedProfile)
+						return true;
+			}
+
+			return false;
+		}
+
+		void SecurityRight::_addSubProfilesLabel( ParameterLabelsVector& plv, Profile* parent, std::string prefix)
+		{
+			vector<Profile*> p = SecurityModule::getSubProfiles(parent);
+
+			for (vector<Profile*>::const_iterator it = p.begin(); it != p.end(); ++it)
+			{
+				plv.push_back(make_pair(Conversion::ToString((*it)->getKey()), prefix + (*it)->getName()));
+
+				_addSubProfilesLabel(plv, *it, "&nbsp;&nbsp;" + prefix);
+			}
 		}
 	}
 }

@@ -35,7 +35,7 @@ namespace synthese
 	namespace interfaces
 	{
 		/** Duration interface page.
-			@ingroup m11-pages ref-pages
+			@ingroup m11Pages refPages
 
 			The duration interface page takes the following arguments :
 				-# Duration in minutes

@@ -55,46 +55,46 @@ namespace synthese
 			return _displayScreens;
 		}
 
-		std::map<uid, std::string> DeparturesTableModule::getDisplayTypeLabels( bool withAll /*= false*/ )
+		std::vector<pair<uid, std::string> > DeparturesTableModule::getDisplayTypeLabels( bool withAll /*= false*/ )
 		{
-			map<uid,string> m;
+			vector<pair<uid, string> > m;
 			if (withAll)
-				m.insert(make_pair(0, "(tous)"));
+				m.push_back(make_pair(0, "(tous)"));
 			for(DisplayType::Registry::const_iterator it = _displayTypes.begin(); it != _displayTypes.end(); ++it)
-				m.insert(make_pair(it->first, it->second->getName()));
+				m.push_back(make_pair(it->first, it->second->getName()));
 			return m;
 		}
 
-		std::map<uid, std::string> DeparturesTableModule::getPlacesWithBroadcastPointsLabels( bool withAll /*= false*/ )
+		std::vector<pair<uid, std::string> > DeparturesTableModule::getPlacesWithBroadcastPointsLabels( bool withAll /*= false*/ )
 		{
-			map<uid, string> localizations;
+			vector<pair<uid, string> > localizations;
 			if (withAll)
-				localizations.insert(make_pair(0, "(tous)"));
+				localizations.push_back(make_pair(0, "(tous)"));
 			std::vector<ConnectionPlaceWithBroadcastPoint> bpv = searchConnectionPlacesWithBroadcastPoints("", "", AT_LEAST_ONE_BROADCASTPOINT);
 			for (vector<ConnectionPlaceWithBroadcastPoint>::const_iterator it = bpv.begin(); it != bpv.end(); ++it)
-				localizations.insert(make_pair(it->place->getKey(), it->place->getFullName()));
+				localizations.push_back(make_pair(it->place->getKey(), it->place->getFullName()));
 			return localizations;
 		}
 
-		std::map<uid, std::string> DeparturesTableModule::getBroadcastPointLabels( const ConnectionPlace* place, bool withAll /*= false*/ )
+		std::vector<pair<uid, std::string> > DeparturesTableModule::getBroadcastPointLabels( const ConnectionPlace* place, bool withAll /*= false*/ )
 		{
-			map<uid, string> m;
+			vector<pair<uid, string> > m;
 			if (withAll)
-				m.insert(make_pair(0, "(tous)"));
+				m.push_back(make_pair(0, "(tous)"));
 			vector<PhysicalStopAndBroadcastPoint> b = getConnectionPlaceBroadcastPointsAndPhysicalStops(place->getKey());
 			for (vector<PhysicalStopAndBroadcastPoint>::const_iterator it = b.begin(); it != b.end(); ++it)
-				m.insert(make_pair(it->bp->getKey(), it->bp->getName()));
+				m.push_back(make_pair(it->bp->getKey(), it->bp->getName()));
 			return m;
 		}
 
-		std::map<uid, std::string> DeparturesTableModule::getCommercialLineWithBroadcastLabels( bool withAll /*= false*/ )
+		std::vector<pair<uid, std::string> > DeparturesTableModule::getCommercialLineWithBroadcastLabels( bool withAll /*= false*/ )
 		{
-			map<uid, string> m;
+			vector<pair<uid, string> > m;
 			if (withAll)
-				m.insert(make_pair(0, "(toutes)"));
+				m.push_back(make_pair(0, "(toutes)"));
 			vector<const CommercialLine*> c = getCommercialLineWithBroadcastPoints();
 			for (vector<const CommercialLine*>::const_iterator it = c.begin(); it != c.end(); ++it)
-				m.insert(make_pair((*it)->getKey(), (*it)->getShortName()));
+				m.push_back(make_pair((*it)->getKey(), (*it)->getShortName()));
 			return m;
 		}
 	}

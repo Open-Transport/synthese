@@ -1,6 +1,6 @@
 
-/** main class implementation.
-	@file main.cpp
+/** 92 RS485 client main file.
+	@file 92_rs485_client/main.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>

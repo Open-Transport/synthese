@@ -51,8 +51,8 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<DBLogEntry>::TABLE_NAME = "t043_log_entries";
-		template<> const int SQLiteTableSyncTemplate<DBLogEntry>::TABLE_ID = 43;
+		template<> const std::string SQLiteTableSyncTemplate<DBLogEntry>::TABLE_NAME = "t045_log_entries";
+		template<> const int SQLiteTableSyncTemplate<DBLogEntry>::TABLE_ID = 45;
 		template<> const bool SQLiteTableSyncTemplate<DBLogEntry>::HAS_AUTO_INCREMENT = true;
 
 		template<> void SQLiteTableSyncTemplate<DBLogEntry>::load(DBLogEntry* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
@@ -102,8 +102,13 @@ namespace synthese
 				<< "," << Conversion::ToString((int) object->getLevel())
 				<< ",'";
 
-			for (DBLogEntry::Content::const_iterator it = object->getContent().begin(); it != object->getContent().end(); ++it)
+			DBLogEntry::Content c = object->getContent();
+			for (DBLogEntry::Content::const_iterator it = c.begin(); it != c.end(); ++it)
+			{
+				if (it != c.begin())
+					query << DBLogEntryTableSync::CONTENT_SEPARATOR;
 				query << Conversion::ToSQLiteString(*it, false);
+			}
 
 			query
 				<< "'"

@@ -145,6 +145,12 @@ namespace synthese
 
 				try
 				{
+					if (!_action->_isAuthorized())
+					{
+						stream << "Forbidden";
+						return;
+					}
+
 					// Run of the action
 					_action->run();
 					
@@ -164,6 +170,12 @@ namespace synthese
 			if (_session == NULL && _function->_runBeforeDisplayIfNoSession(stream))
 				return;
 			
+			if (!_function->_isAuthorized())
+			{
+				stream << "Forbidden";
+				return;
+			}
+
 			// Run the display
 			_function->_run(stream);
 		}
@@ -437,6 +449,11 @@ namespace synthese
 		}
 
 		Function* Request::_getFunction()
+		{
+			return _function.get();
+		}
+
+		const Function* Request::_getFunction() const
 		{
 			return _function.get();
 		}

@@ -35,9 +35,15 @@ namespace synthese
 	{
 		class VinciRate;
 
+		/** @addtogroup m71LS
+			@{
+		*/
+
 		struct RentReportResult { int starts; int ends; int renewals; } ;
 		std::map<time::Date, RentReportResult> getRentsPerDay(const time::Date& start, const time::Date& end);
 		std::map<std::pair<time::Date, const VinciRate*>, RentReportResult> getRentsPerRatePerDay(const time::Date& start, const time::Date& end);
 		std::map<uid, RentReportResult> getRentsPerRate(const time::Date& start, const time::Date& end);
+
+		/** @} */
 	}
 }

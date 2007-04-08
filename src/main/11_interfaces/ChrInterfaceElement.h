@@ -30,6 +30,22 @@ namespace synthese
 	namespace interfaces
 	{
 
+		/** ASCII character Value Interface Element Class.
+			@ingroup m11Values refValues
+
+			Usage :
+			@code {{chr <number>}} @endcode
+
+			The parameters are :
+				-# number : Decimal number of the character to output
+
+			The output is the character corresponding to the specified number in the ASCII table.
+
+			Example :
+			@code {{chr 77}} @endcode
+			will output
+			@code M @endcode
+		*/
 		class ChrInterfaceElement : public interfaces::ValueInterfaceElement
 		{
 			ValueInterfaceElement* _asciiCode;

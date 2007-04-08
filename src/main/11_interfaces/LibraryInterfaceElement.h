@@ -39,6 +39,10 @@ namespace synthese
 		class InterfacePage;
 		class ValueElementList;
 
+		/** @defgroup refLibrary Library Interface Elements.
+			@ingroup refInt
+		*/
+
 		/** element which can produce a single display.
 			@ingroup m11
 		*/

@@ -48,6 +48,9 @@ namespace synthese
 		class SQLiteResult;
 		class SQLiteQueueThreadExec;
 
+		/** @defgroup refLS Table synchronizers.
+			@ingroup ref
+		*/
 
 		/** Base class for an SQLite table synchronizer.
 			By convention, the table name must always start with the t letter
@@ -84,6 +87,7 @@ namespace synthese
 			const std::string& getTableName () const;
 
 			/** Returns the unique integer identifying a table.
+				@return The unique integer identifying a table
 			*/
 			int getTableId () const;
 
@@ -144,7 +148,7 @@ namespace synthese
 			void addTableIndex(const std::vector<std::string>& columns, std::string name = "");
 
 			/** Adds a single column index in the table description.
-				@param indexed column name
+				@param column column name
 				@param name Name of the index. Optional : if not specified or empty, the name is identical to the column name.
 			*/
 			void addTableIndex(const std::string& column, std::string name = "");
@@ -196,7 +200,6 @@ namespace synthese
 			/** Creates the SQL statement to crate an index in the database given a certain format.
 				@param tableName The table name
 				@param format The format of the table containing the indexes description
-				@param indexName The index name to create
 				@return std::string The SQL statement
 				@author Hugues Romain
 				@date 2007

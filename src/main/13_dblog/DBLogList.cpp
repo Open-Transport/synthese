@@ -74,5 +74,10 @@ namespace synthese
 			}
 			stream << t.close();
 		}
+
+		bool DBLogList::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }

@@ -209,5 +209,10 @@ namespace synthese
 			stream << t3.col() << t3.getActionForm().getSubmitButton("Ajouter");
 			stream << t3.close();
 		}
+
+		bool MessagesLibraryAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }

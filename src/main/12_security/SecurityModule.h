@@ -23,8 +23,9 @@
 #ifndef SYNTHESE_SecurityModule_H__
 #define SYNTHESE_SecurityModule_H__
 
-#include <map>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "01_util/ModuleClass.h"
 
@@ -32,8 +33,32 @@
 
 namespace synthese
 {
-	/** @defgroup m12 12 Security
-	@{
+	/**	@defgroup m12Actions 12 Actions
+		@ingroup m12
+
+		@defgroup m12Pages 12 Pages
+		@ingroup m12
+
+		@defgroup m12Values 12 Values
+		@ingroup m12
+
+		@defgroup m12Functions 12 Functions
+		@ingroup m12
+
+		@defgroup m12LS 12 Table synchronizers
+		@ingroup m12
+
+		@defgroup m12Admin 12 Administration pages
+		@ingroup m12
+
+		@defgroup m12Rights 12 Rights
+		@ingroup m12
+
+		@defgroup m12Logs 12 DB Logs
+		@ingroup m12
+
+		@defgroup m12 12 Security
+		@{
 	*/
 
 	/** 12 Security module namespace.
@@ -57,10 +82,17 @@ namespace synthese
 
 			static Profile::Registry& getProfiles();
 
-			static std::map<std::string, std::string> getRightsTemplates();
-			static std::map<uid, std::string> getProfileLabels(bool withAll=false, int first=0, int last=-1);
-			static std::map<uid, std::string> getUserLabels(bool withAll=false, int first=0, int last=-1);
-			static std::map<std::string, std::string> getRightLabels(bool withAll=false);
+			static std::vector<std::pair<std::string, std::string> > getRightsTemplates();
+			static std::vector<std::pair<uid, std::string> > getProfileLabels(bool withAll=false, int first=0, int last=-1);
+			static std::vector<std::pair<uid, std::string> > getUserLabels(bool withAll=false, int first=0, int last=-1);
+			static std::vector<std::pair<std::string, std::string> > getRightLabels(bool withAll=false);
+
+			/** List of the sub profiles of the current one.
+					@return std::vector<Profile*> List of the sub profiles of the current one.
+					@author Hugues Romain
+					@date 2007					
+			*/
+			static std::vector<Profile*> getSubProfiles(const Profile* profile);
 		};
 	}
 	/** @} */

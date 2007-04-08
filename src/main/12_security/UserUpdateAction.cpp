@@ -63,7 +63,7 @@ namespace synthese
 		{
 			try
 			{
-				_user = UserTableSync::get(_request->getObjectId());
+				_user.reset(UserTableSync::get(_request->getObjectId()));
 
 				ParametersMap::const_iterator it;
 
@@ -132,11 +132,6 @@ namespace synthese
 			}
 		}
 
-		UserUpdateAction::UserUpdateAction()
-			: Action()
-			, _profile(NULL)
-		{}
-
 		void UserUpdateAction::run()
 		{
 			_user->setLogin(_login);
@@ -149,13 +144,7 @@ namespace synthese
 			_user->setConnectionAllowed(_authorizedLogin);
 			_user->setName(_name);
 			_user->setSurname(_surname);
-			UserTableSync::save(_user);
-		}
-
-		UserUpdateAction::~UserUpdateAction()
-		{
-			delete _user;
-			delete _profile;
+			UserTableSync::save(_user.get());
 		}
 	}
 }

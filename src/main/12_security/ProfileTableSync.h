@@ -41,7 +41,7 @@ namespace synthese
 				- parameters of rights separated by ,
 			Eg: *,*,10,10|env,*,40,40
 
-			@ingroup m12
+			@ingroup m12LS refLS
 		*/
 		class ProfileTableSync : public db::SQLiteTableSyncTemplate<Profile>
 		{
@@ -62,8 +62,8 @@ namespace synthese
 			~ProfileTableSync ();
 
 			/** Profile search.
-				@param sqlite SQLite thread
 				@param name name to search (empty = no search on name)
+				@param right right to search
 				@param first First user to answer
 				@param number Number of users to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others users to show. Test it to know if the situation needs a "click for more" button.
 				@return vector<Profile*> Founded users. 

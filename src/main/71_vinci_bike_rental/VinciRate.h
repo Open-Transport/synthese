@@ -84,7 +84,7 @@ namespace synthese
 
 			time::DateTime	getEndDate(const time::DateTime& startDate)	const;
 			time::DateTime	getFirstPenaltyEndDate(const time::DateTime& startDate)	const;
-			double getAmountToPay(const time::DateTime& startDate) const;
+			double getAdditionalAmountToPay(const time::DateTime& startDate) const;
 		};
 	}
 }

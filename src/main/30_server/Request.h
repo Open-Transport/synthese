@@ -25,7 +25,13 @@
 
 #include "01_util/UId.h"
 
+#include "12_security/User.h"
+#include "12_security/Profile.h"
+#include "12_security/Right.h"
+#include "12_security/Constants.h"
+
 #include "30_server/Types.h"
+#include "30_server/Session.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -41,7 +47,6 @@ namespace synthese
 
 	namespace server
 	{
-		class Session;
 		class Action;
 		class Function;
 
@@ -143,7 +148,9 @@ namespace synthese
 			//! \name Protected getters
 			//@{
 
-				Function* _getFunction();
+			Function* _getFunction();
+			const Function* _getFunction() const;
+
 				/** Action getter.
 					@return const Action* The action of the request
 					@author Hugues Romain
@@ -206,7 +213,6 @@ namespace synthese
 				*/
 				bool getActionException() const;
 
-				const Session*		getSession()		const;
 				const std::string&	getClientURL()		const;
 				const std::string&	getIP()				const;
 				uid					getObjectId()		const;
@@ -245,6 +251,9 @@ namespace synthese
 					@date 2007
 				*/
 				void run(std::ostream& stream);
+
+				template<class R>
+				bool isAuthorized(security::Right::Level publicr = security::Right::FORBIDDEN, security::Right::Level privater = security::Right::FORBIDDEN, std::string parameter = security::UNKNOWN_PERIMETER) const;
 			//@}
 
 			//! \name Output methods
@@ -270,6 +279,21 @@ namespace synthese
 				std::string getQueryString() const;
 			//@}
 		};
+
+		template<class R>
+		bool Request::isAuthorized(security::Right::Level publicr, security::Right::Level privater, std::string parameter /*= security::GLOBAL_PERIMETER*/ ) const
+		{
+			if (_session == NULL)
+				return false;
+
+			const security::Profile* profile = _session->getUser()->getProfile();
+			boost::shared_ptr<security::Right> neededRight(util::Factory<security::Right>::create<R>());
+			neededRight->setPublicLevel(publicr);
+			neededRight->setPrivateLevel(privater);
+			neededRight->setParameter(parameter);
+			return profile->isAuthorized(neededRight.get());
+
+		}
 	}
 }
 #endif // SYNTHESE_Request_H__

@@ -23,12 +23,17 @@
 #ifndef SYNTHESE_SECURITY_LOG
 #define SYNTHESE_SECURITY_LOG
 
+#include <string>
+
 #include "13_dblog/DBLog.h"
 
 namespace synthese
 {
 	namespace security
 	{
+		class User;
+		class Profile;
+
 		/** Journal de sécurité.
 
 			Enregistre tous les événements liés à la sécurité et à l'administration des utilisateurs.
@@ -48,9 +53,15 @@ namespace synthese
 		*/
 		class SecurityLog : public dblog::DBLog
 		{
+			typedef enum { LOGIN_ENTRY = 10, USER_ADMIN_ENTRY = 20, PROFILE_ADMIN_ENTRY = 30 } _EntryType;
+
 		public:
 			SecurityLog();
 			DBLog::ColumnsVector getColumnNames() const;
+			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
+			void addUserLogin(const User* user);
+			void addUserAdmin(const User* user, const User* subject, const std::string& text);
+			void addProfileAdmin(const User* user, const Profile* subject, const std::string& text);
 		};
 	}
 }

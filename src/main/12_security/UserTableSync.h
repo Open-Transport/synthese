@@ -38,7 +38,7 @@ namespace synthese
 		class User;
 
 		/** User SQLite table synchronizer.
-			@ingroup m12
+			@ingroup m12LS refLS
 		*/
 
 		class UserTableSync : public db::SQLiteTableSyncTemplate<User>

@@ -1,6 +1,6 @@
 /** CGI Client main implementation.
-	@file 71_cgi_client/main.cpp
-	@ingroup m71
+	@file 91_cgi_client/main.cpp
+	@ingroup m91
 */
 
 #include <stdio.h>

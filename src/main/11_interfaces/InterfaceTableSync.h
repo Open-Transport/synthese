@@ -35,9 +35,8 @@ namespace synthese
 		class Interface;
 
 		/** InterfaceTableSync SQLite table synchronizer.
-		@ingroup m11
+			@ingroup m11LS refLS
 		*/
-
 		class InterfaceTableSync : public db::SQLiteTableSyncTemplate<Interface>
 		{
 		public:

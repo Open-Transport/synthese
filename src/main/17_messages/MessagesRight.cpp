@@ -20,7 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "MessagesRight.h"
+#include "12_security/Constants.h"
+
+#include "17_messages/MessagesRight.h"
 
 using namespace std;
 
@@ -43,11 +45,16 @@ namespace synthese
 			return _parameter;
 		}
 
-		std::map<std::string, std::string> MessagesRight::getParametersLabels() const
+		MessagesRight::ParameterLabelsVector MessagesRight::getParametersLabels() const
 		{
-			map<string,string> m;
-			m.insert(make_pair("*","(tous les messages)"));
+			ParameterLabelsVector m;
+			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les messages)"));
 			return m;
+		}
+
+		bool MessagesRight::perimeterIncludes( const std::string& perimeter ) const
+		{
+			return true;
 		}
 	}
 }

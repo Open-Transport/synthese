@@ -102,7 +102,7 @@ namespace synthese
 		AddUserAction::AddUserAction()
 			: Action(), _profile(NULL)
 		{
-			
+
 		}
 	}
 }

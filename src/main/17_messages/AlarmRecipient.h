@@ -74,4 +74,9 @@ namespace synthese
 	}
 }
 
+/** @defgroup refAlarmrecipients Alarm recipients.
+	@ingroup ref
+	@copydoc AlarmRecipient
+*/
+
 #endif // SYNTHESE_AlarmRecipient_h__

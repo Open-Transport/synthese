@@ -35,10 +35,6 @@ namespace synthese
 	/** @defgroup m17Actions Actions
 		@ingroup m17
 
-		@defgroup refAlarmrecipients Alarm recipients.
-		@ingroup ref
-		@copydoc AlarmRecipient
-
 		@defgroup m17 17 Messages
 	@{	*/
 
@@ -64,10 +60,10 @@ namespace synthese
 			
 			void initialize();
 
-			static std::map<uid, std::string>			getScenariiLabels(bool withAll = false);
-			static std::map<AlarmLevel, std::string>	getLevelLabels(bool withAll = false);
-			static std::map<AlarmConflict, std::string>	getConflictLabels(bool withAll = false);
-			static std::map<uid, std::string>			getTextTemplateLabels(const AlarmLevel& level);
+			static std::vector<std::pair<uid, std::string> >			getScenariiLabels(bool withAll = false);
+			static std::vector<std::pair<AlarmLevel, std::string> >		getLevelLabels(bool withAll = false);
+			static std::vector<std::pair<AlarmConflict, std::string> >	getConflictLabels(bool withAll = false);
+			static std::vector<std::pair<uid, std::string> >			getTextTemplateLabels(const AlarmLevel& level);
 
 			static std::string							getLevelLabel(const AlarmLevel& level);
 		};

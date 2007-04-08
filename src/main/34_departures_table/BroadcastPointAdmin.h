@@ -94,6 +94,8 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
+
+			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}
 }

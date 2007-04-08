@@ -65,6 +65,13 @@ namespace synthese
 			*/
 			virtual bool _runBeforeActionIfNoSession() { return true; }
 
+			/** Authorization control.
+				@return True if the action run is authorized
+				@author Hugues Romain
+				@date 2007
+			*/
+			virtual bool _isAuthorized() const { return true; }
+
 			/** Conversion from generic parameters map to attributes.
 				@param map Map to analyse
 			*/

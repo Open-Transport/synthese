@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "GlobalRight.h"
+#include "12_security/GlobalRight.h"
+#include "12_security/Constants.h"
 
 using namespace std;
 
@@ -41,12 +42,16 @@ namespace synthese
 			return "par défaut";
 		}
 
-		std::map<std::string, std::string> GlobalRight::getParametersLabels() const
+		GlobalRight::ParameterLabelsVector GlobalRight::getParametersLabels() const
 		{
-
-			map<string,string> m;
-			m.insert(make_pair("*", "par défaut"));
+			ParameterLabelsVector m;
+			m.push_back(make_pair(GLOBAL_PERIMETER, "(tout)"));
 			return m;
+		}
+
+		bool GlobalRight::perimeterIncludes( const std::string& perimeter ) const
+		{
+			return true;
 		}
 	}
 }

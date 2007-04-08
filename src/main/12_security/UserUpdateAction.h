@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_UserUpdateAction_H__
 #define SYNTHESE_UserUpdateAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -50,17 +52,17 @@ namespace synthese
 			static const std::string PARAMETER_PROFILE_ID;
 
 		private:
-			User*		_user;
-			std::string _login;
-			std::string _surname;
-			std::string _name;
-			std::string _address;
-			std::string _postalCode;
-			std::string _city;
-			std::string _phone;
-			std::string _email;
-			bool		_authorizedLogin;
-			Profile*	_profile;
+			boost::shared_ptr<User>	_user;
+			std::string				_login;
+			std::string				_surname;
+			std::string				_name;
+			std::string				_address;
+			std::string				_postalCode;
+			std::string				_city;
+			std::string				_phone;
+			std::string				_email;
+			bool					_authorizedLogin;
+			Profile*				_profile;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -74,11 +76,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			UserUpdateAction();
-			~UserUpdateAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

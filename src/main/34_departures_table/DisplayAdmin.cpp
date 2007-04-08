@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <map>
+#include <vector>
+#include <utility>
 #include <sstream>
 
 #include "01_util/Constants.h"
@@ -136,28 +137,28 @@ namespace synthese
 			rmForbiddenRequest.setObjectId(request->getObjectId());
 
 			// Maps for particular select fields
-			map<int, string> blinkingDelaysMap;
-			blinkingDelaysMap.insert(make_pair(0, "Pas de clignotement"));
-			blinkingDelaysMap.insert(make_pair(1, "1 minute avant disparition"));
+			vector<pair<int, string> > blinkingDelaysMap;
+			blinkingDelaysMap.push_back(make_pair(0, "Pas de clignotement"));
+			blinkingDelaysMap.push_back(make_pair(1, "1 minute avant disparition"));
 			for (int i=2; i<6; ++i)
-				blinkingDelaysMap.insert(make_pair(i, Conversion::ToString(i) + " minutes avant disparition"));
+				blinkingDelaysMap.push_back(make_pair(i, Conversion::ToString(i) + " minutes avant disparition"));
 
-			map<DeparturesTableDirection, string> directionMap;
-			directionMap.insert(make_pair(DISPLAY_ARRIVALS, "Arrivées"));
-			directionMap.insert(make_pair(DISPLAY_DEPARTURES, "Départs"));
+			vector<pair<DeparturesTableDirection, string> > directionMap;
+			directionMap.push_back(make_pair(DISPLAY_ARRIVALS, "Arrivées"));
+			directionMap.push_back(make_pair(DISPLAY_DEPARTURES, "Départs"));
 
-			map<EndFilter, string> endFilterMap;
-			endFilterMap.insert(make_pair(ENDS_ONLY, "Origines/Terminus seulement"));
-			endFilterMap.insert(make_pair(WITH_PASSING, "Origines/Terminus et passages"));
+			vector<pair<EndFilter, string> > endFilterMap;
+			endFilterMap.push_back(make_pair(ENDS_ONLY, "Origines/Terminus seulement"));
+			endFilterMap.push_back(make_pair(WITH_PASSING, "Origines/Terminus et passages"));
 
-			map<int, string> clearDelayMap;
+			vector<pair<int, string> > clearDelayMap;
 			for (int i=-5; i<-1; ++i)
-				clearDelayMap.insert(make_pair(i, Conversion::ToString(-i) + " minutes avant le départ"));
-			clearDelayMap.insert(make_pair(-1, "1 minute avant le départ"));
-			clearDelayMap.insert(make_pair(0, "heure du départ"));
-			clearDelayMap.insert(make_pair(1, "1 minute après le départ"));
+				clearDelayMap.push_back(make_pair(i, Conversion::ToString(-i) + " minutes avant le départ"));
+			clearDelayMap.push_back(make_pair(-1, "1 minute avant le départ"));
+			clearDelayMap.push_back(make_pair(0, "heure du départ"));
+			clearDelayMap.push_back(make_pair(1, "1 minute après le départ"));
 			for (int i=2; i<6; ++i)
-				clearDelayMap.insert(make_pair(i, Conversion::ToString(i) + " minutes après le départ"));
+				clearDelayMap.push_back(make_pair(i, Conversion::ToString(i) + " minutes après le départ"));
 
 			// Filling of the stream
 			stream << "<h1>Emplacement</h1>";
@@ -324,7 +325,7 @@ namespace synthese
 				HTMLForm amf(addDisplayRequest.getHTMLForm("adddispl"));
 				stream << mt.row();
 				stream << mt.col(2) << amf.open();
-				stream << amf.getSortedSelectInput(DisplayScreenAddDisplayedPlace::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()), uid(0));
+				stream << amf.getSelectInput(DisplayScreenAddDisplayedPlace::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()), uid(0));
 				stream << amf.getSubmitButton("Ajouter");
 				stream << amf.close();
 
@@ -349,7 +350,7 @@ namespace synthese
 				HTMLForm ant(addNSRequest.getHTMLForm("addforb"));
 				stream << nt.row();
 				stream << nt.col(2) << ant.open();
-				stream << ant.getSortedSelectInput(AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForbiddenPlaces()), uid(0));
+				stream << ant.getSelectInput(AddForbiddenPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForbiddenPlaces()), uid(0));
 				stream << ant.getSubmitButton("Ajouter");
 				stream << ant.close();
 				
@@ -398,7 +399,7 @@ namespace synthese
 					HTMLForm psaf(addPreselRequest.getHTMLForm("addpresel"));
 					stream << pst.row();
 					stream << pst.col(2) << psaf.open();
-					stream << psaf.getSortedSelectInput(AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForcedDestinations()), uid(0));
+					stream << psaf.getSelectInput(AddPreselectionPlaceToDisplayScreen::PARAMETER_PLACE, _displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getForcedDestinations()), uid(0));
 					stream << psaf.getSubmitButton("Ajouter");
 					stream << psaf.close();
 
@@ -445,6 +446,11 @@ namespace synthese
 					}
 				}
 			}
+		}
+
+		bool DisplayAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
 		}
 	}
 }

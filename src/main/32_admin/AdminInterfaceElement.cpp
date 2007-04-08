@@ -64,7 +64,7 @@ namespace synthese
 			return str.str();
 		}
 
-		void AdminInterfaceElement::setSuperior( const std::string& superior )
+		void AdminInterfaceElement::_setSuperior( const std::string& superior )
 		{
 			_superior = superior;
 		}

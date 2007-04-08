@@ -46,7 +46,9 @@ namespace synthese
 
 	namespace vinci
 	{
-		Account*	VinciBikeRentalModule::_freeLockRent = NULL;
+		boost::shared_ptr<Account> VinciBikeRentalModule::_freeLockRent;
+
+		const string VinciBikeRentalModule::CSS_LIMITED_HEIGHT = "limitedheight";
 
 		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE = "4111";
 		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE = "4117";
@@ -259,14 +261,14 @@ namespace synthese
 		
 			accounts = AccountTableSync::search(getVinciUser()->getKey(), VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE, 0, "");
 			if (accounts.empty())
-				_freeLockRent = new Account;
+				_freeLockRent.reset(new Account);
 			else
-				_freeLockRent = accounts.front();
+				_freeLockRent.reset(accounts.front());
 			_freeLockRent->setRightClassNumber(VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE);
 			_freeLockRent->setRightCurrency(euroCurrency);
 			_freeLockRent->setLeftCurrency(euroCurrency);
 			_freeLockRent->setRightUserId(vinciUser->getKey());
-			AccountTableSync::save(_freeLockRent);
+			AccountTableSync::save(_freeLockRent.get());
 			
 
 			// Payment accounts
@@ -351,18 +353,7 @@ namespace synthese
 
 		accounts::Account* VinciBikeRentalModule::getFreeLockRentServiceAccount()
 		{
-			return _freeLockRent;
-		}
-
-		VinciBikeRentalModule::~VinciBikeRentalModule()
-		{
-			delete _freeLockRent;
-		}
-
-		VinciBikeRentalModule::VinciBikeRentalModule()
-			: ModuleClass()
-		{
-
+			return _freeLockRent.get();
 		}
 	}
 }

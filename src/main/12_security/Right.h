@@ -1,4 +1,4 @@
-
+ï»¿
 /** Right class header.
 	@file Right.h
 
@@ -26,6 +26,8 @@
 #include <string>
 #include <map>
 #include <set>
+#include <utility>
+#include <vector>
 
 #include "01_util/Factorable.h"
 
@@ -36,25 +38,25 @@ namespace synthese
 		/** Habilitation (abstraite).
 			@ingroup m12
 
-			Une habilitation est un droit d'effectuer une ou plusieurs opération(s) sur un périmètre donné.
+			Une habilitation est un droit d'effectuer une ou plusieurs opÃ©ration(s) sur un pÃ©rimÃ¨tre donnÃ©.
 
-			Une habilitation est définie par :
-				-# un périmètre d'application dont l'usage est précisé par les sous classes. Exemple d'utilisations possibles :
+			Une habilitation est dÃ©finie par :
+				-# un pÃ©rimÃ¨tre d'application dont l'usage est prÃ©cisÃ© par les sous classes. Exemple d'utilisations possibles :
 					- Masque de code SYNTHESE d'objet (MP/TLS/*, MP/TLS/14/*...)
 					- Liste d'objet(s) (MP/TLS/14;MP/TLS/41)
-					- @c * = Pas de restriction de périmètre
-				-# un niveau de droit sur les objets appartenant à l'utilisateur (droits privés)
-				-# un niveau de droit sur les objets n'appartenant pas à l'utilisateur (droits publics)
+					- @c * = Pas de restriction de pÃ©rimÃ¨tre
+				-# un niveau de droit sur les objets appartenant Ã  l'utilisateur (droits privÃ©s)
+				-# un niveau de droit sur les objets n'appartenant pas Ã  l'utilisateur (droits publics)
 
 			Les niveaux de droits sont les suivants :
-				- FORBIDDEN : interdiction (utile pour annuler une habilitation héritée)
+				- FORBIDDEN : interdiction (utile pour annuler une habilitation hÃ©ritÃ©e)
 				- USE : droit d'utiliser une fonction
-				- READ : accès en lecture
-				- WRITE : accès en écriture, effacement non permis
-				- DELETE : accès en écriture, effacement permis
-				- NB : Chaque niveau de droit inclut les niveaux précédents.
+				- READ : accÃ¨s en lecture
+				- WRITE : accÃ¨s en Ã©criture, effacement non permis
+				- DELETE : accÃ¨s en Ã©criture, effacement permis
+				- NB : Chaque niveau de droit inclut les niveaux prÃ©cÃ©dents.
 
-			Chaque module contient des définitions d'habilitations (sous-classes enregistrées dans Factory<Right>) qui implémentent le contrôle des droits et la génération d'une liste de paramètres possibles.
+			Chaque module contient des dÃ©finitions d'habilitations (sous-classes enregistrÃ©es dans Factory<Right>) qui implÃ©mentent le contrÃ´le des droits et la gÃ©nÃ©ration d'une liste de paramÃ¨tres possibles.
 		*/
 		class Right : public util::Factorable
 		{
@@ -68,11 +70,13 @@ namespace synthese
 			/** Niveaux d'habilitation. */
 			typedef enum {
 				FORBIDDEN	= 0		//!< Interdiction
-				, USE		= 20	//!< Utilisation de fonction autorisée
-				, READ		= 40	//!< Lecture directe de données autorisée
-				, WRITE		= 60	//!< Ecriture directe de donnée autorisée
-				, DELETE	= 80	//!< Suppression de donnée autorisée
+				, USE		= 20	//!< Utilisation de fonction autorisÃ©e
+				, READ		= 40	//!< Lecture directe de donnÃ©es autorisÃ©e
+				, WRITE		= 60	//!< Ecriture directe de donnÃ©e autorisÃ©e
+				, DELETE	= 80	//!< Suppression de donnÃ©e autorisÃ©e
 			} Level;
+
+			typedef std::vector<std::pair<std::string, std::string> > ParameterLabelsVector;
 
 		private:
 			Level _privateRightLevel;
@@ -87,28 +91,43 @@ namespace synthese
 			Right();
 
 		public:
-			// Can be private with friend factory class. To see later...
-			//static std::string getModuleName() = 0;
-			//static std::string getOperationName() = 0;
-			//static AvailableValidityAreasMap getAvailableValidityAreas() const = 0;
-			//static bool validateParameter(std::string parameter) const = 0;
-
-			Right(std::string parameter, Level privateLevel, Level publicLevel);
+			// Will be activated when factory key will be static
+			//Right(std::string parameter, Level privateLevel, Level publicLevel);
 			~Right();
 
-			virtual std::string							displayParameter()		const = 0;
-			virtual std::map<std::string, std::string>	getParametersLabels()	const = 0;
-			Level										getPrivateRightLevel()	const;
-			Level										getPublicRightLevel()	const;
+
+			//! \name Right definition
+			//@{
+				virtual std::string			displayParameter()		const = 0;
+				virtual ParameterLabelsVector	getParametersLabels()	const = 0;
+				
+				
+				/** Perimeter inclusion test.
+					@param perimeter Perimeter to include
+					@return bool True if the current perimeter includes the compared one
+					@author Hugues Romain
+					@date 2007				
+				*/
+				virtual bool perimeterIncludes(const std::string& perimeter) const = 0;
+			//@}
+
+			//! \name Getters
+			//@{
+				Level				getPrivateRightLevel()	const;
+				Level				getPublicRightLevel()	const;
+				const std::string&	getParameter() const;
+			//@}
+
+			//! \name Setters
+			//@{
+				void	setPrivateLevel(const Level& level);
+				void	setPublicLevel(const Level& level);
+				void	setParameter(const std::string& parameter);
+			//@}
+
 
 			static std::string getLevelLabel(Level level);
 
-			void	setPrivateLevel(const Level& level);
-			void	setPublicLevel(const Level& level);
-			void	setParameter(const std::string& parameter);
-
-			std::string getParameter() const;
-			
 		};
 	}
 }

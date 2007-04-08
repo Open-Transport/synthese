@@ -9,6 +9,9 @@ namespace synthese
 {
 	namespace vinci
 	{
+		/** Customer creation Action Class.
+			@ingroup m71Actions refActions
+		*/
 		class AddCustomerAction : public server::Action
 		{
 		public:

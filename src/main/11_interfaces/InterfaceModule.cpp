@@ -52,11 +52,11 @@ namespace synthese
 			return _interfaces;
 		}
 
-		map<uid, std::string> InterfaceModule::getInterfaceLabels()
+		vector<pair<uid, std::string> > InterfaceModule::getInterfaceLabels()
 		{
-			map<uid, string> m;
+			vector<pair<uid, string> > m;
 			for (Interface::Registry::const_iterator it = _interfaces.begin(); it != _interfaces.end(); ++it)
-				m.insert(make_pair(it->first, it->second->getName()));
+				m.push_back(make_pair(it->first, it->second->getName()));
 			return m;
 		}
 

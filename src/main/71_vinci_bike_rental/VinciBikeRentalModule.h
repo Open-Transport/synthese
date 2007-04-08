@@ -1,6 +1,30 @@
 
+/** VinciBikeRentalModule class header.
+	@file VinciBikeRentalModule.h
+
+	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
+	Copyright (C) 2006 Vinci Park 
+	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_VinciBikeRentalModule_H__
 #define SYNTHESE_VinciBikeRentalModule_H__
+
+#include <boost/shared_ptr.hpp>
 
 #include "01_util/ModuleClass.h"
 
@@ -18,16 +42,94 @@ namespace synthese
 		class Currency;
 	}
 
-		/** @defgroup m71 71 Vinci bike rental
+		/**	@defgroup m71Actions 71 Actions
+			@ingroup m71
+
+			@defgroup m71Pages 71 Pages
+			@ingroup m71
+
+			@defgroup m71Values 71 Values
+			@ingroup m71
+
+			@defgroup m71Functions 71 Functions
+			@ingroup m71
+
+			@defgroup m71LS 71 Table synchronizers
+			@ingroup m71
+
+			@defgroup m71Admin 71 Administration pages
+			@ingroup m71
+
+			@defgroup m71Rights 71 Rights
+			@ingroup m71
+
+			@defgroup m71Logs 71 DB Logs
+			@ingroup m71
+
+			@defgroup m71 71 Vinci bike rental
+						
+			Most of the events are treated as transaction parts between accounts.
+
+			@section vinciAccounts Accounts
+
+			Remarks : the "ticket uses" and the payment accounts will never go down without 
 			
-			Most of the events are treated as transaction parts :
+			Bike rent is a special application of the accounting module. The French account numbers are used. The special accounts are :
+				- Customers :
+					- 4111 : Customer financial account (Currency = Euro or local currency)
+					- 4117 : Guarantees (Currency = Euro or local currency)
+					- 4119 : Customer tickets accounts (Currency = ticket punchings)
+				- Stocks :
+					- 371 : Bikes (Currency = bikes)
+				- Services :
+					- *70831 : Bike rent (Currency = Euro or local currency)
+					- 70832 : Bike rent (Currency = tickets punchings)
+					- *763 : Delayed payments (Currency = Euro or local currency)
+					- *707 : Unreturned bikes (sales) (Currency = Euro or local currency)
+				- Change :
+					- 5331 : guarantees checks (Currency = Euro or local currency)
+					- 5332 : guarantees payment card (Currency = Euro or local currency)
+					- *5112 : checks (Currency = Euro or local currency)
+					- *5121 : payment card (Currency = Euro or local currency)
+					- *532 : cash (Currency = Euro or local currency)
+					- 59 : tickets punching (Currency = ticket punchings)
+
+			@section vinciGuarantees Guarantees
 				- customer giving a guarantee :
 					- positive amount on the template guarantee account, tagged with the corresponding user
 					- negative amount on the financial account used for payment (warning : the financial accounts for guarantee should be separated for the ones corresponding to the standard payments in several organizations)
 				- destroying of a customer guarantee :
 					- negative amount on the template guarantee account, tagged with the corresponding user
 					- positive amount on the financial account used for the payment
-				- starting a bike rental :
+
+			@section vinciRent Bike rent
+
+			@msc
+				"371|Start pl.","371|Return pl." , "371|Outgoing", 4111, "4 VAT", "51*", 59, 70831, 70832, 763, "7 discount";
+				--- [label="Start of the rent"];
+				"371|Start pl." -> "371|Outgoing" [label = "1 bike"];
+				4111 -> "4 VAT" [label = "VAT initial amount"];
+				4111 -> 70831 [label = "rent initial amount"];
+				59 -> 70832 [label = "1 ticket"];
+				--- [label="Payment"];
+				"51*" -> 4111 [label = "due amount"];
+				...;
+				--- [label="Return of the bike"];
+				"371|Outgoing" -> "371|Return pl." [label = "1 bike"];
+				4111 -> "4 VAT" [label = "VAT return amount"];
+				4111 -> 70831 [label = "rent return amount"];
+				59 -> 70832 [label = "1 ticket"];
+				--- [label="If return on late"];
+				4111 -> "4 VAT" [label = "VAT penalty amount"];
+				4111 -> 763 [label = "penalty amount"];
+				--- [label="If discount"];
+				"4 VAT" -> 4111 [label = "VAT discount amount"];
+				"7 discount" -> 4111 [label = "discount amount"];
+				--- [label="Payment"];
+				"51*" -> 4111 [label = "due amount"];
+			@endmsc
+
+			- starting a bike rental :
 					- +1 on the bike stock of the used station, tagged with the number of the corresponding bike in the tradedObjectId field
 					- -1 on the template outgoing bikes account, tagged :
 						- with the corresponding user
@@ -58,34 +160,6 @@ namespace synthese
 					- positive amount on the template customer tickets account, tagged with the corresponding user
 					- negative amount on the "ticket uses" account
 			
-			Remarks : the "ticket uses" and the payment accounts will never go down without 
-				
-			Bike rent is a special application of the accounting module. The French account numbers are used. The special accounts are :
-				- Customers :
-					- 4111 : Customer financial account (Currency = Euro or local currency)
-					- 4117 : Guarantees (Currency = Euro or local currency)
-					- 4119 : Customer tickets accounts (Currency = ticket punchings)
-				- Stocks :
-					- 371 : Bikes (Currency = bikes)
-				- Services :
-					*- 70831 : Bike rent (Currency = Euro or local currency)
-					- 70832 : Bike rent (Currency = tickets punchings)
-					*- 763 : Delayed payments (Currency = Euro or local currency)
-					*- 707 : Unreturned bikes (sales) (Currency = Euro or local currency)
-				- Change :
-					- 5331 : guarantees checks (Currency = Euro or local currency)
-					- 5332 : guarantees payment card (Currency = Euro or local currency)
-					*- 5112 : checks (Currency = Euro or local currency)
-					*- 5121 : payment card (Currency = Euro or local currency)
-					*- 532 : cash (Currency = Euro or local currency)
-					- 59 : tickets punching (Currency = ticket punchings)
-
-			The module initialization consists in the creation of :
-				- 3 currencies : Euro, Tickets, and Bikes
-				- a special user "Bike Rent Accounts"
-				- all the preceding accounts, with their right user equal to the created special user
-				- a "Rental User Without Access" Profile
-
 		@{
 		*/
 
@@ -97,14 +171,16 @@ namespace synthese
 		class VinciBikeRentalModule : public util::ModuleClass
 		{
 		private:
-			static accounts::Account*	_freeLockRent;
+			static boost::shared_ptr<accounts::Account>	_freeLockRent;
 
 			static const std::string VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE;
 
 
 		public:
-			VinciBikeRentalModule();
-			~VinciBikeRentalModule();
+			//! \name CSS Styles
+			//@{
+				static const std::string CSS_LIMITED_HEIGHT;
+			//@}
 
 			static const std::string VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE;
 			static const std::string VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE;
@@ -139,18 +215,30 @@ namespace synthese
 			static const std::string VINCI_CUSTOMER_PROFILE;
 			static const std::string VINCI_CUSTOMER_PROFILE_RIGHTS;
 
+			/** Initialization of the module after the automatic database loads.
+				@author Hugues Romain
+				@date 2007
+				
+				The module initialization consists in the creation of :
+				- 3 currencies : Euro, Tickets, and Bikes
+					- a special user "Bike Rent Accounts"
+					- all the preceding accounts, with their right user equal to the created special user
+					- a "Rental User Without Access" Profile
+			*/			
 			void initialize();
 
+			//! \name Account getters
+			//@{
+				/** Customer profile getter.
+					@warning the returned profile must be deallocated after use to avoid memory leaks
+				*/
+				static security::Profile* getCustomerProfile();
+				static security::User* getVinciUser();
+				static accounts::Currency* getEuroCurrency();
+				static accounts::Account* getAccount(const std::string& code);
 
-			/** Customer profile getter.
-				@warning the returned profile must be deallocated after use to avoid memory leaks
-			*/
-			static security::Profile* getCustomerProfile();
-			static security::User* getVinciUser();
-			static accounts::Currency* getEuroCurrency();
-			static accounts::Account* getAccount(const std::string& code);
-
-			static accounts::Account*	getFreeLockRentServiceAccount();
+				static accounts::Account*	getFreeLockRentServiceAccount();
+			//@}
 		};
 	}
 	/** @} */

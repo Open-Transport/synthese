@@ -37,15 +37,14 @@ namespace synthese
 	{
 		ParametersMap DelUserAction::getParametersMap() const
 		{
-			ParametersMap map;
-			return map;
+			return ParametersMap();
 		}
 
 		void DelUserAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				_user = UserTableSync::get(_request->getObjectId());
+				_user.reset(UserTableSync::get(_request->getObjectId()));
 			}
 			catch (User::RegistryKeyException e)
 			{
@@ -56,14 +55,7 @@ namespace synthese
 
 		void DelUserAction::run()
 		{
-			if (_user != NULL)
-				UserTableSync::remove(_user->getKey());
-		}
-
-		DelUserAction::DelUserAction()
-			: _user(NULL)
-		{
-	
+			UserTableSync::remove(_user->getKey());
 		}
 	}
 }

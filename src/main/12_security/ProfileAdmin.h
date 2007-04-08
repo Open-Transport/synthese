@@ -91,7 +91,7 @@ namespace synthese
 
 			std::string getTitle() const;
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const;
-
+			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}
 }

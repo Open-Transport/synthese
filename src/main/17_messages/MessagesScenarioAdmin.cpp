@@ -68,7 +68,7 @@ namespace synthese
 				_scenario = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
 
 				if (!_scenario->getIsATemplate())
-					setSuperior("messages");
+					_setSuperior("messages");
 			}
 		}
 
@@ -127,6 +127,11 @@ namespace synthese
 			stream << t.col(3) << "(sélectionnez un&nbsp;message existant pour créer une copie)";
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
+		}
+
+		bool MessagesScenarioAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
 		}
 	}
 }

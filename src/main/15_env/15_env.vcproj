@@ -146,14 +146,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Crossing.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Crossing.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Document.cpp"
 				>
 			</File>
@@ -191,14 +183,6 @@
 			</File>
 			<File
 				RelativePath=".\Fare.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Gateway.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Gateway.h"
 				>
 			</File>
 			<File
@@ -303,30 +287,6 @@
 			</File>
 			<File
 				RelativePath=".\PublicPlace.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Registrable.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Registry.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RegistryException.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RegistryKeyException.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Regulated.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Regulated.h"
 				>
 			</File>
 			<File

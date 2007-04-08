@@ -67,5 +67,10 @@ namespace synthese
 		{
 			return _key;
 		}
+
+		const security::User* Session::getUser() const
+		{
+			return _user;
+		}
 	}
 }

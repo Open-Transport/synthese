@@ -23,6 +23,9 @@
 #ifndef SYNTHESE_EnvModule_H__
 #define SYNTHESE_EnvModule_H__
 
+#include <vector>
+#include <utility>
+
 #include "01_util/ModuleClass.h"
 
 #include "15_env/Environment.h"
@@ -298,7 +301,7 @@ namespace synthese
 			static Path* fetchPath (const uid& id);
 			static Service* fetchService (const uid& id);
 
-			static std::map<uid, std::string>		getCommercialLineLabels(bool withAll=false);
+			static std::vector<std::pair<uid, std::string> >	getCommercialLineLabels(bool withAll=false);
 
 		};
 	}

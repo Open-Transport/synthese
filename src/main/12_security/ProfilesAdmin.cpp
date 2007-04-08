@@ -163,5 +163,10 @@ namespace synthese
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
 		}
+
+		bool ProfilesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }

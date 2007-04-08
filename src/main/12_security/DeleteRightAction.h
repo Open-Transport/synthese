@@ -25,6 +25,8 @@
 
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -44,8 +46,8 @@ namespace synthese
 			static const std::string PARAMETER_PARAMETER;
 
 		private:
-			Profile*	_profile;
-			Right*		_right;
+			Profile*					_profile;
+			boost::shared_ptr<Right>	_right;
 			
 		protected:
 			/** Conversion from attributes to generic parameter maps.

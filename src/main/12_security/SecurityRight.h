@@ -23,12 +23,16 @@
 #ifndef SYNTHESE_SECURITY_RIGHT_H
 #define SYNTHESE_SECURITY_RIGHT_H
 
+#include <string>
+
 #include "12_security/Right.h"
 
 namespace synthese
 {
 	namespace security
 	{
+		class Profile;
+
 		/** Habilitation portant sur la gestion de la sécurité.
 			@ingroup m12
 
@@ -50,10 +54,13 @@ namespace synthese
 		*/
 		class SecurityRight : public Right
 		{
+		private:
+			static void _addSubProfilesLabel(ParameterLabelsVector& map, Profile* parent, std::string label);
+
 		public:
-			SecurityRight();
 			std::string	displayParameter()	const;
-			std::map<std::string, std::string>	getParametersLabels()	const;
+			ParameterLabelsVector	getParametersLabels()	const;
+			bool perimeterIncludes(const std::string& perimeter) const;
 		};
 	}
 }

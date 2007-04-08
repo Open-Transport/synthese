@@ -16,10 +16,9 @@ namespace synthese
 	{
 
 
-		/** Request related exception class
-		@ingroup m70
+		/** Interface page parameters count related exception class
+			@ingroup m11Exceptions
 		*/
-
 		class InterfacePageException : public synthese::util::Exception
 		{
 		private:

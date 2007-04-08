@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_UserPasswordUpdateAction_H__
 #define SYNTHESE_UserPasswordUpdateAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -41,8 +43,8 @@ namespace synthese
 			static const std::string PARAMETER_PASS2;
 
 		private:
-			User*		_user;
-			std::string _password;
+			boost::shared_ptr<User>	_user;
+			std::string				_password;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -56,11 +58,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			UserPasswordUpdateAction();
-			~UserPasswordUpdateAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

@@ -34,8 +34,8 @@ namespace synthese
 
 	namespace vinci
 	{
-		/** ReturnABikeAction action class.
-			@ingroup m71
+		/** Bike return action class.
+			@ingroup m71Actions refActions
 		*/
 		class ReturnABikeAction : public server::Action
 		{

@@ -23,7 +23,8 @@
 #ifndef SYNTHESE_DeparturesTableModule_H__
 #define SYNTHESE_DeparturesTableModule_H__
 
-#include <map>
+#include <vector>
+#include <utility>
 #include <string>
 
 #include "01_util/ModuleClass.h"
@@ -76,10 +77,10 @@ namespace synthese
 			static BroadcastPoint::Registry&	getBroadcastPoints();
 			static DisplayScreen::Registry&		getDisplayScreens();
 
-			static std::map<uid, std::string>	getDisplayTypeLabels(bool withAll = false);
-			static std::map<uid, std::string>	getPlacesWithBroadcastPointsLabels(bool withAll = false);
-			static std::map<uid, std::string>	getBroadcastPointLabels(const env::ConnectionPlace* place, bool withAll = false);
-			static std::map<uid, std::string>	getCommercialLineWithBroadcastLabels(bool withAll = false);
+			static std::vector<std::pair<uid, std::string> >	getDisplayTypeLabels(bool withAll = false);
+			static std::vector<std::pair<uid, std::string> >	getPlacesWithBroadcastPointsLabels(bool withAll = false);
+			static std::vector<std::pair<uid, std::string> >	getBroadcastPointLabels(const env::ConnectionPlace* place, bool withAll = false);
+			static std::vector<std::pair<uid, std::string> >	getCommercialLineWithBroadcastLabels(bool withAll = false);
 		};
 	}
 

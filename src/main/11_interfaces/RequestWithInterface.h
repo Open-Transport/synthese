@@ -60,6 +60,13 @@ namespace synthese
 
 			virtual void _copy(const Function* function);
 
+		public:
+			/** Interface getter.
+				@return Requested interface (can be NULL)
+				@author Hugues Romain
+				@date 2007				
+			*/
+			const Interface* getInterface() const;
 		};
 	}
 }

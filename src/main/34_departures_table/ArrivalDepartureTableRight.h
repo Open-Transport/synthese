@@ -52,7 +52,8 @@ namespace synthese
 		public:
 			ArrivalDepartureTableRight();
 			std::string displayParameter() const;
-			std::map<std::string, std::string>	getParametersLabels()	const;
+			ParameterLabelsVector	getParametersLabels()	const;
+			bool perimeterIncludes(const std::string& perimeter) const;
 		};
 	}
 }

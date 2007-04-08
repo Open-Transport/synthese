@@ -30,15 +30,15 @@ namespace synthese
 	namespace security
 	{
 		/** Global right.
-			@ingroup m12
-
+			@ingroup m12Rights refRights
 		*/
 		class GlobalRight : public Right
 		{
 		public:
 			GlobalRight();
 			std::string	displayParameter()	const;
-			std::map<std::string, std::string>	getParametersLabels()	const;
+			ParameterLabelsVector	getParametersLabels()	const;
+			bool perimeterIncludes(const std::string& perimeter) const;
 		};
 	}
 }

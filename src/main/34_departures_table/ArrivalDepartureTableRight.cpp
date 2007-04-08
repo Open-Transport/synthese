@@ -43,11 +43,16 @@ namespace synthese
 			return _parameter;
 		}
 
-		std::map<std::string, std::string> ArrivalDepartureTableRight::getParametersLabels() const
+		ArrivalDepartureTableRight::ParameterLabelsVector ArrivalDepartureTableRight::getParametersLabels() const
 		{
-			map<string, string> m;
-			m.insert(make_pair("*","(tous les afficheurs)"));
+			ParameterLabelsVector m;
+			m.push_back(make_pair("*","(tous les afficheurs)"));
 			return m;
+		}
+
+		bool ArrivalDepartureTableRight::perimeterIncludes( const std::string& perimeter ) const
+		{
+			return true;
 		}
 	}
 }

@@ -33,6 +33,9 @@ namespace synthese
 {
 	namespace vinci
 	{
+		/** Exploitation site.
+			@ingroup m71
+		*/
 		class VinciSite : public util::Registrable<uid, VinciSite>
 		{
 		private:

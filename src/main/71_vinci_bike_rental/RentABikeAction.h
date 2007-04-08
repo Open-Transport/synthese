@@ -37,8 +37,8 @@ namespace synthese
 		class VinciContract;
 		class VinciAntivol;
 
-		/** Starting a bike rent.
-			@ingroup m71
+		/** Starting a bike rent Action Class.
+			@ingroup m71Actions refActions
 		*/
 		class RentABikeAction : public server::Action
 		{
@@ -72,7 +72,7 @@ namespace synthese
 			RentABikeAction();
 			~RentABikeAction();
 
-			/** Action to run, defined by each subclass.
+			/** Action execution.
 			*/
 			void run();
 			

@@ -34,7 +34,8 @@ GOTO END
 
 
 :CLEAN
-CALL scons -c %2 %3 %4 %5 %6 %7 %8 %9
+rem CALL scons -c %2 %3 %4 %5 %6 %7 %8 %9
+CALL ant %2 %3 %4 %5 %6 %7 %8 %9 clean
 GOTO END
 
 :BUILD
@@ -45,7 +46,8 @@ GOTO END
 
 
 :REBUILD
-CALL scons -c %2 %3 %4 %5 %6 %7 %8 %9
+CALL ant %2 %3 %4 %5 %6 %7 %8 %9 clean
+rem CALL scons -c %2 %3 %4 %5 %6 %7 %8 %9
 GOTO BUILD
 
 

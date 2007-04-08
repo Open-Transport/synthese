@@ -24,6 +24,9 @@
 #include "05_html/HTMLForm.h"
 #include "05_html/HTMLTable.h"
 
+#include "11_interfaces/DurationInterfacePage.h"
+#include "11_interfaces/Interface.h"
+
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
 
@@ -66,6 +69,7 @@ namespace synthese
 	using namespace accounts;
 	using namespace time;
 	using namespace html;
+	using namespace interfaces;
 
 	namespace vinci
 	{
@@ -153,9 +157,9 @@ namespace synthese
 			stream << "<h1>Cautions</h1>";
 			Account* checkAccount = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE);
 			Account* cardAccount = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE);
-			map<uid, string> paymentModesMap;
-			paymentModesMap.insert(make_pair(checkAccount->getKey(), "Chèque"));
-			paymentModesMap.insert(make_pair(cardAccount->getKey(), "Carte"));
+			vector<pair<uid, string> > paymentModesMap;
+			paymentModesMap.push_back(make_pair(checkAccount->getKey(), "Chèque"));
+			paymentModesMap.push_back(make_pair(cardAccount->getKey(), "Carte"));
 
 			vector<TransactionPart*> guarantees = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), _user);
 			HTMLForm addGuaranteeForm(addGuaranteeRequest.getHTMLForm("addguarantee"));
@@ -168,7 +172,9 @@ namespace synthese
 			cv.push_back("Actions");
 			HTMLTable ct(cv);
 			
-			stream << addGuaranteeForm.open() << ct.open();
+			stream
+				<< "<div class=\"" << VinciBikeRentalModule::CSS_LIMITED_HEIGHT << "\">"
+				<< addGuaranteeForm.open() << ct.open();
 
 			stream << ct.row();
 			stream << ct.col() << addGuaranteeForm.getCalendarInput(VinciAddGuaranteeAction::PARAMETER_DATE, DateTime());
@@ -212,7 +218,7 @@ namespace synthese
 				delete *it;
 			}
 
-			stream << ct.close() << addGuaranteeForm.close();
+			stream << ct.close() << addGuaranteeForm.close() << "</div>";
 
 			// Rents
 			stream << "<h1>Locations</h1>";
@@ -228,7 +234,9 @@ namespace synthese
 			rv.push_back("Tarif");
 			rv.push_back("Actions");
 			HTMLTable rt(rv);
-			stream << addRentForm.open() << rt.open();
+			stream
+				<< "<div class=\"" << VinciBikeRentalModule::CSS_LIMITED_HEIGHT << "\">"
+				<< addRentForm.open() << rt.open();
 
 			stream << rt.row();
 			stream << rt.col() << addRentForm.getCalendarInput(RentABikeAction::PARAMETER_DATE, DateTime());
@@ -272,8 +280,12 @@ namespace synthese
 				{
 					DateTime now;
 					if (now > rate->getEndDate(transaction->getStartDateTime()))
-						stream << "Retard : " << (now - rate->getEndDate(transaction->getStartDateTime())) << " h - "
-							<< rate->getAmountToPay(transaction->getStartDateTime()) << " EUR";
+					{
+						stream << "Retard : ";
+						const DurationInterfacePage* page = request->getFunction()->getInterface()->getPage<DurationInterfacePage>();
+						page->display(stream, now - rate->getEndDate(transaction->getStartDateTime()), variables, NULL, request);
+						stream << " - " << rate->getAdditionalAmountToPay(transaction->getStartDateTime()) << " EUR<br />";
+					}
 					HTMLForm returnForm(returnRentRequest.getHTMLForm("return" + Conversion::ToString((*it)->getKey())));
 					returnForm.addHiddenField(ReturnABikeAction::PARAMETER_TRANSACTION_PART_ID, Conversion::ToString((*it)->getKey()));
 					stream << returnForm.getLinkButton("Retour du vélo");
@@ -289,8 +301,7 @@ namespace synthese
 				delete lock;
 			}
 
-			stream << rt.close();
-			stream << addRentForm.close();
+			stream << rt.close() << addRentForm.close() << "</div>";
 
 
 			// Change
@@ -312,6 +323,11 @@ namespace synthese
 		{
 			delete _contract;
 			delete _user;
+		}
+
+		bool VinciCustomerAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return true;
 		}
 	}
 }

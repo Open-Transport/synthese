@@ -83,46 +83,65 @@ namespace synthese
 			return _profiles;
 		}
 
-		map<string, string> SecurityModule::getRightsTemplates()
+		std::vector<pair<string, string> > SecurityModule::getRightsTemplates()
 		{
-			map<string, string> m;
+			vector<pair<string, string> > m;
 			for (Factory<Right>::Iterator it = Factory<Right>::begin(); it != Factory<Right>::end(); ++it)
-				m.insert(make_pair(it.getKey(), it.getKey()));
+				m.push_back(make_pair(it.getKey(), it.getKey()));
 			return m;
 		}
 
-		std::map<uid, std::string> SecurityModule::getProfileLabels(bool withAll, int first/*=0*/, int last/*=-1*/ )
+		std::vector<pair<uid, std::string> > SecurityModule::getProfileLabels(bool withAll, int first/*=0*/, int last/*=-1*/ )
 		{
-			map<uid, string> m;
+			vector<pair<uid, string> > m;
 			if (withAll)
-				m.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
+				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
 			for (Profile::Registry::const_iterator it = _profiles.begin(); it != _profiles.end(); ++it)
-				m.insert(make_pair(it->first, it->second->getName()));
+				m.push_back(make_pair(it->first, it->second->getName()));
 			return m;
 		}
 
-		std::map<uid, std::string> SecurityModule::getUserLabels(bool withAll, int first/*=0*/, int last/*=-1*/ )
+		std::vector<pair<uid, std::string> > SecurityModule::getUserLabels(bool withAll, int first/*=0*/, int last/*=-1*/ )
 		{
-			map<uid, string> m;
+			vector<pair<uid, string> > m;
 			if (withAll)
-				m.insert(make_pair(uid(UNKNOWN_VALUE), "(tous)"));
+				m.push_back(make_pair(uid(UNKNOWN_VALUE), "(tous)"));
 			vector<User*> users = UserTableSync::search("","");
 			for (vector<User*>::iterator it = users.begin(); it != users.end(); ++it)
 			{
-				m.insert(make_pair((*it)->getKey(), (*it)->getSurname() + " " + (*it)->getName()));
+				m.push_back(make_pair((*it)->getKey(), (*it)->getSurname() + " " + (*it)->getName()));
 				delete *it;
 			}
 			return m;
 		}
 
-		std::map<std::string, std::string> SecurityModule::getRightLabels( bool withAll/*=false*/ )
+		std::vector<std::pair<std::string, std::string> > SecurityModule::getRightLabels( bool withAll/*=false*/ )
 		{
-			map<string, string> m;
+			vector<pair<string, string> > m;
 			if (withAll)
-				m.insert(make_pair("", "(toutes)"));
+				m.push_back(make_pair("", "(toutes)"));
 			for (Factory<Right>::Iterator it = Factory<Right>::begin(); it != Factory<Right>::end(); ++it)
-				m.insert(make_pair(it.getKey(), it.getKey()));
+				m.push_back(make_pair(it.getKey(), it.getKey()));
 			return m;
+		}
+
+		std::vector<Profile*> SecurityModule::getSubProfiles( const Profile* profile )
+		{
+			vector<Profile*> v;
+			for (Profile::Registry::const_iterator it = _profiles.begin(); it != _profiles.end(); ++it)
+			{
+				if (profile == NULL)
+				{
+					if (!it->second->getParentId())
+						v.push_back(it->second);
+				}
+				else
+				{
+					 if (it->second->getParentId() == profile->getKey())
+						v.push_back(it->second);
+				}
+			}
+			return v;
 		}
 	}
 }

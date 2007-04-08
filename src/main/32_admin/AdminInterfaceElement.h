@@ -35,6 +35,11 @@
 
 namespace synthese
 {
+	namespace security
+	{
+		class Right;
+	}
+
 	namespace admin
 	{
 		/** Composant d'administration.
@@ -55,14 +60,17 @@ namespace synthese
 			typedef enum { EVER_DISPLAYED, DISPLAYED_IF_CURRENT, NEVER_DISPLAYED } DisplayMode;
 
 		private:
-			std::string			_superior;
-			const DisplayMode	_everDisplayed;
+			std::string							_superior;
+			const DisplayMode					_everDisplayed;
 			
 		protected:
-			void setSuperior(const std::string& superior);
-
+			void								_setSuperior(const std::string& superior);
+			
 		public:
 			/** Constructor.
+				@param superior Key of the superior admin interface element class in the tree
+				@param everDisplayed Indicates when the admin interface element is displayed in the tree
+				@param needeRight Right object describing minimum right to have in order to be able to see the admin interface element
 			*/
 			AdminInterfaceElement(const std::string& superior, DisplayMode everDisplayed);
 
@@ -84,8 +92,18 @@ namespace synthese
 
 			//! \name Virtual output methods
 			//@{
+				/** Authorization control.
+					@param request The current request
+					@return bool True if the displayed page can be displayed
+					@author Hugues Romain
+					@date 2007					
+				*/
+				virtual bool isAuthorized(const server::FunctionRequest<AdminRequest>* request) const = 0;
+
 				/** Display of the content of the admin element.
 					@param stream Stream to write on.
+					@param variables Execution variables
+					@param request Current request
 				*/
 				virtual void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<AdminRequest>* request=NULL) const = 0;
 
@@ -94,9 +112,6 @@ namespace synthese
 				*/
 				virtual std::string getTitle() const = 0;
 			//@}
-
-			//static const Right* requiredRight();
-
 		};
 	}
 }

@@ -133,14 +133,14 @@ namespace synthese
 							bool returnAddresses = true,
 							bool returnPhysicalStops = true) const;
 
-				std::map<uid, std::string>	getPhysicalStopLabels(bool withAll = false) const;
+				std::vector<std::pair<uid, std::string> >	getPhysicalStopLabels(bool withAll = false) const;
 				/** Labels list for select field containing physical stops, with exclusion list.
 					@param noDisplay Physical stops to exclude
 					@return Labels list for select field containing physical stops
 					@author Hugues Romain
 					@date 2007
 				*/
-				std::map<uid, std::string>	getPhysicalStopLabels(const PhysicalStopsSet& noDisplay) const;
+				std::vector<std::pair<uid, std::string> >	getPhysicalStopLabels(const PhysicalStopsSet& noDisplay) const;
 			//@}
 
 

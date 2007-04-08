@@ -285,22 +285,22 @@ namespace synthese
 			return false;
 		}
 
-		std::map<uid, std::string> ConnectionPlace::getPhysicalStopLabels( bool withAll /*= false*/ ) const
+		std::vector<std::pair<uid, std::string> > ConnectionPlace::getPhysicalStopLabels( bool withAll /*= false*/ ) const
 		{
-			map<uid, string> m;
+			vector<pair<uid, string> > m;
 			if (withAll)
-				m.insert(make_pair(0, "(tous)"));
+				m.push_back(make_pair(0, "(tous)"));
 			for (PhysicalStopsSet::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
-				m.insert(make_pair((*it)->getKey(), (*it)->getName()));
+				m.push_back(make_pair((*it)->getKey(), (*it)->getName()));
 			return m;
 		}
 
-		std::map<uid, std::string> ConnectionPlace::getPhysicalStopLabels( const PhysicalStopsSet& noDisplay ) const
+		std::vector<std::pair<uid, std::string> > ConnectionPlace::getPhysicalStopLabels( const PhysicalStopsSet& noDisplay ) const
 		{
-			map<uid, string> m;
+			vector<pair<uid, string> > m;
 			for (PhysicalStopsSet::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 				if (noDisplay.find(*it) == noDisplay.end())
-					m.insert(make_pair((*it)->getKey(), (*it)->getName()));
+					m.push_back(make_pair((*it)->getKey(), (*it)->getName()));
 			return m;
 		}
 

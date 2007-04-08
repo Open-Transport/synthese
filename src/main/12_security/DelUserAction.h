@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_DelUserAction_H__
 #define SYNTHESE_DelUserAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -36,10 +38,8 @@ namespace synthese
 		*/
 		class DelUserAction : public server::Action
 		{
-		public:
-
 		private:
-			User*	_user;
+			boost::shared_ptr<User>	_user;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -52,7 +52,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			DelUserAction();
 
 			/** Action to run, defined by each subclass.
 			*/

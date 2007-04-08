@@ -47,5 +47,10 @@ namespace synthese
 		{
 
 		}
+
+		bool HomeAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }

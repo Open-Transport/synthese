@@ -102,5 +102,10 @@ namespace synthese
 			stream << cf.close();
 			stream << "</table>";
 		}
+
+		bool DisplayTypesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }

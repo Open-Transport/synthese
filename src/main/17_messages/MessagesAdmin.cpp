@@ -159,13 +159,13 @@ namespace synthese
 			ActionFunctionRequest<ScenarioStopAction,AdminRequest> scenarioStopRequest(request);
 			scenarioStopRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
 			
-			map<StatusSearch, string> statusMap;
-			statusMap.insert(make_pair(ALL_STATUS, "(tous les états)"));
-			statusMap.insert(make_pair(BROADCAST_OVER, "Diffusion terminée"));
-			statusMap.insert(make_pair(BROADCAST_RUNNING, "En cours de diffusion"));
-			statusMap.insert(make_pair(BROADCAST_RUNNING_WITH_END, "En cours avec date de fin"));
-			statusMap.insert(make_pair(BROADCAST_RUNNING_WITHOUT_END, "En cours sans date de fin"));
-			statusMap.insert(make_pair(FUTURE_BROADCAST, "Diffusion ultérieure"));
+			vector<pair<StatusSearch, string> > statusMap;
+			statusMap.push_back(make_pair(ALL_STATUS, "(tous les états)"));
+			statusMap.push_back(make_pair(BROADCAST_OVER, "Diffusion terminée"));
+			statusMap.push_back(make_pair(BROADCAST_RUNNING, "En cours de diffusion"));
+			statusMap.push_back(make_pair(BROADCAST_RUNNING_WITH_END, "En cours avec date de fin"));
+			statusMap.push_back(make_pair(BROADCAST_RUNNING_WITHOUT_END, "En cours sans date de fin"));
+			statusMap.push_back(make_pair(FUTURE_BROADCAST, "Diffusion ultérieure"));
 
 			stream << "<h1>Recherche</h1>";
 
@@ -263,6 +263,11 @@ namespace synthese
 			stream << t.col() << t.getActionForm().getSubmitButton("Nouvelle diffusion de message");
 
 			stream << t.close();
+		}
+
+		bool MessagesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
 		}
 	}
 }

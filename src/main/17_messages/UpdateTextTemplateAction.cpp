@@ -60,7 +60,7 @@ namespace synthese
 				it = map.find(PARAMETER_TEXT_ID);
 				if (it == map.end())
 					throw ActionException("Text template not specified");
-				_text = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
+				_text.reset(TextTemplateTableSync::get(Conversion::ToLongLong(it->second)));
 				
 				// Name
 				it = map.find(PARAMETER_NAME);
@@ -94,22 +94,12 @@ namespace synthese
 			}
 		}
 
-		UpdateTextTemplateAction::UpdateTextTemplateAction()
-			: Action()
-			, _text(NULL)
-		{}
-
 		void UpdateTextTemplateAction::run()
 		{
 			_text->setName(_name);
 			_text->setShortMessage(_shortMessage);
 			_text->setLongMessage(_longMessage);
-			TextTemplateTableSync::save(_text);
-		}
-
-		UpdateTextTemplateAction::~UpdateTextTemplateAction()
-		{
-			delete _text;
+			TextTemplateTableSync::save(_text.get());
 		}
 	}
 }

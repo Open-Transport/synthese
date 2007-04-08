@@ -35,8 +35,8 @@ namespace synthese
 	}
 	namespace interfaces
 	{
-		/** EqualsValueInterfaceElement class.
-			@ingroup m11
+		/** Equality test Value Interface Element class.
+			@ingroup m11Values refValues
 		*/
 		class EqualsValueInterfaceElement : public interfaces::ValueInterfaceElement
 		{

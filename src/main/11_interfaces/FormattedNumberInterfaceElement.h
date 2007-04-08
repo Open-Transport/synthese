@@ -33,6 +33,7 @@ namespace synthese
 		class ValueInterfaceElement;
 
 		/** Formatted number interface element.
+			@ingroup m11Values refValues
 		*/
 		class FormattedNumberInterfaceElement : public ValueInterfaceElement
 		{

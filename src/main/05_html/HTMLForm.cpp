@@ -55,9 +55,9 @@ namespace synthese
 
 		std::string HTMLForm::getSelectNumberInput(const std::string& name, int mini, int maxi, int value/*=UNKNOWN_VALUE*/, int step )
 		{
-			std::map<int,int> m;
+			std::vector<pair<int,int> > m;
 			for (int i=mini; i<=maxi; i += step)
-				m.insert(std::make_pair(i,i));
+				m.push_back(std::make_pair(i,i));
 			return getSelectInput(name, m, value);
 		}
 
@@ -114,9 +114,9 @@ namespace synthese
 
 		std::string HTMLForm::getOuiNonRadioInput( const std::string& name, bool value )
 		{
-			map<int, string> m;
-			m.insert(make_pair(0, "NON"));
-			m.insert(make_pair(1, "OUI"));
+			vector<pair<int, string> > m;
+			m.push_back(make_pair(0, "NON"));
+			m.push_back(make_pair(1, "OUI"));
 			return getRadioInput(name, m, value ? 1 : 0);
 		}
 

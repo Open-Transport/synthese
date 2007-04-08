@@ -1,6 +1,6 @@
 
 /** Exception class implementation.
-	@file Exception.cpp
+	@file 01_util/Exception.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>

@@ -1,5 +1,5 @@
-/** 72_rs485_client module wide definitions
-	@file 72_rs485_client/module.h
+/** 92_rs485_client module wide definitions
+	@file 92_rs485_client/module.h
 */
 
 #ifndef SYNTHESE_RS485_CLIENT_MODULE_H

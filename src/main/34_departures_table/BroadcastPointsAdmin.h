@@ -109,6 +109,15 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
+
+			/** isAuthorized.
+				@param request
+				@return bool
+				@author Hugues Romain
+				@date 2007
+				
+			*/
+			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}
 }

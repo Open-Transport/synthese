@@ -39,7 +39,7 @@ namespace synthese
 		class VinciContract;
 
 		/** Vinci printed contract.
-			@ingroup m71
+			@ingroup m71Pages refPages
 		*/
 		class VinciPrintedContractInterfacePage : public interfaces::InterfacePage
 		{

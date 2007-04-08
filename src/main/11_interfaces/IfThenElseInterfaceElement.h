@@ -30,23 +30,29 @@ namespace synthese
 	namespace interfaces
 	{
 		/** Conditional value.
-			@code if,<condition>,<to_return_if_condition_is_true>,<to_return_if_condition_is_false (default=0)> @endcode
 
+			Usage :
+			@code if <condition> <to_return_if_condition_is_true> <to_return_if_condition_is_false (default=0)> @endcode
+
+			Examples :
 			The conditional value can be used for differencing the output according to a condition :
-			@code print if,{{param:2}},{the param 2 is ok},{the param 2 is ko} @endcode
+			@code print {{if {{param 2}} {the param 2 is ok} {the param 2 is ko}}} @endcode
 
 			It can be used for branching purposes. In this case, do not forget to jump over the "else" bloc after the "then" one :
-			@code goto if,{{param:2}},bloc1,bloc2
-			
-			line bloc1
-			...
-			goto end_of_bloc
-			
-			line bloc2
-			...
+			@code
+goto {{if {{param 2}} bloc1 bloc2}}
 
-			line end_of_bloc
+label bloc1
+...
+goto end_of_bloc
+
+label bloc2
+...
+
+label end_of_bloc
 			@endcode
+
+			@ingroup m11Values refValues
 		*/
 		class IfThenElseInterfaceElement : public ValueInterfaceElement
 		{

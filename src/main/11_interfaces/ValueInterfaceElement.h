@@ -41,6 +41,10 @@ namespace synthese
 		class ValueElementList;
 		class InterfacePage;
 
+		/** @defgroup refValues Returned value Interface Elements.
+			@ingroup refInt
+		*/
+
 		/** Code defined interface element which produces a string value at runtime.
 			@ingroup m11
 		*/

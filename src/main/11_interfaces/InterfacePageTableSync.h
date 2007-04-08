@@ -15,7 +15,7 @@ namespace synthese
 	{
 
 		/** InterfacePageTableSync SQLite table synchronizer.
-			@ingroup m11
+			@ingroup m11LS refLS
 		*/
 		class InterfacePageTableSync : public db::SQLiteTableSync
 		{

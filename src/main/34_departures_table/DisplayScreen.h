@@ -222,7 +222,7 @@ namespace synthese
 				std::string						getFullName()															const;
 				const env::PhysicalStopsSet&	getPhysicalStops(bool result=true)										const;
 
-				std::map<std::string, std::pair<uid, std::string> > 
+				std::vector<std::pair<uid, std::string> > 
 					getSortedAvaliableDestinationsLabels(const std::set<const env::ConnectionPlace*>& placesToAvoid)	const;
 
 				bool							getDataControl()														const;

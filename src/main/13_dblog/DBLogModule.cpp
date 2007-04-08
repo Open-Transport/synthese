@@ -32,14 +32,14 @@ namespace synthese
 	{
 
 
-		map<int, std::string> DBLogModule::getEntryLevelLabels( bool withAll/*=false*/ )
+		vector<pair<int, std::string> > DBLogModule::getEntryLevelLabels( bool withAll/*=false*/ )
 		{
-			map<int, std::string> m;
+			vector<pair<int, std::string> > m;
 			if (withAll)
-				m.insert(make_pair(UNKNOWN_VALUE, "(tous)"));
-			m.insert(make_pair((int) DBLogEntry::DB_LOG_INFO, getEntryLevelLabel(DBLogEntry::DB_LOG_INFO)));
-			m.insert(make_pair((int) DBLogEntry::DB_LOG_WARNING, getEntryLevelLabel(DBLogEntry::DB_LOG_WARNING)));
-			m.insert(make_pair((int) DBLogEntry::DB_LOG_ERROR, getEntryLevelLabel(DBLogEntry::DB_LOG_ERROR)));
+				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
+			m.push_back(make_pair((int) DBLogEntry::DB_LOG_INFO, getEntryLevelLabel(DBLogEntry::DB_LOG_INFO)));
+			m.push_back(make_pair((int) DBLogEntry::DB_LOG_WARNING, getEntryLevelLabel(DBLogEntry::DB_LOG_WARNING)));
+			m.push_back(make_pair((int) DBLogEntry::DB_LOG_ERROR, getEntryLevelLabel(DBLogEntry::DB_LOG_ERROR)));
 			return m;
 		}
 

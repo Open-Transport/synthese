@@ -41,6 +41,7 @@ namespace synthese
 			FunctionRequest(const Request* request=NULL);
 
 			F* getFunction();
+			const F* getFunction() const;
 		};
 
 		template<class F>
@@ -51,6 +52,12 @@ namespace synthese
 
 		template<class F>
 		F* FunctionRequest<F>::getFunction()
+		{
+			return (F*) _getFunction();
+		}
+
+		template<class F>
+		const F* FunctionRequest<F>::getFunction() const
 		{
 			return (F*) _getFunction();
 		}

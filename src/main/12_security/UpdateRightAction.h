@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_UpdateRightAction_H__
 #define SYNTHESE_UpdateRightAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "12_security/Right.h"
 
 #include "30_server/Action.h"
@@ -45,10 +47,10 @@ namespace synthese
 			static const std::string PARAMETER_PRIVATE_VALUE;
 
 		private:
-			Profile*		_profile;
-			Right*			_right;
-			Right::Level	_publicLevel;
-			Right::Level	_privateLevel;
+			Profile*					_profile;
+			boost::shared_ptr<Right>	_right;
+			Right::Level				_publicLevel;
+			Right::Level				_privateLevel;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

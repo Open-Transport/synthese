@@ -43,56 +43,52 @@ namespace synthese
 		ParametersMap UpdateRightAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_RIGHT_CODE, _right->getFactoryKey()));
-			map.insert(make_pair(PARAMETER_RIGHT_PARAMETER, _right->getParameter()));
-			map.insert(make_pair(PARAMETER_PUBLIC_VALUE, Conversion::ToString((int) _right->getPublicRightLevel())));
-			map.insert(make_pair(PARAMETER_PRIVATE_VALUE, Conversion::ToString((int) _right->getPrivateRightLevel())));
+			if (_right.get())
+			{
+				map.insert(make_pair(PARAMETER_RIGHT_CODE, _right->getFactoryKey()));
+				map.insert(make_pair(PARAMETER_RIGHT_PARAMETER, _right->getParameter()));
+				map.insert(make_pair(PARAMETER_PUBLIC_VALUE, Conversion::ToString((int) _right->getPublicRightLevel())));
+				map.insert(make_pair(PARAMETER_PRIVATE_VALUE, Conversion::ToString((int) _right->getPrivateRightLevel())));
+			}
 			return map;
 		}
 
 		void UpdateRightAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				ParametersMap::const_iterator it;
+			ParametersMap::const_iterator it;
 
-				// Profile
-				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
-
-				// Right code
-				string rightCode;
-				it = map.find(PARAMETER_RIGHT_CODE);
-				if (it == map.end())
-					throw ActionException("Right code not specified");
-				rightCode = it->second;
-
-				// Right parameter
-				it = map.find(PARAMETER_RIGHT_PARAMETER);
-				if (it == map.end())
-					throw ActionException("Right parameter not specified");
-
-				_right = _profile->getRight(rightCode, it->second);
-
-				// Public level
-				it = map.find(PARAMETER_PUBLIC_VALUE);
-				if (it == map.end())
-					throw ActionException("Public level not specified");
-				_publicLevel = (Right::Level) Conversion::ToInt(it->second);
-
-				// Private level
-				it = map.find(PARAMETER_PRIVATE_VALUE);
-				if (it == map.end())
-					throw ActionException("Private level not specified");
-				_privateLevel = (Right::Level) Conversion::ToInt(it->second);
-			}
-			catch (Profile::RegistryKeyException e)
-			{
+			// Profile
+			if (!SecurityModule::getProfiles().contains(_request->getObjectId()))
 				throw ActionException("Profile not found");
-			}
-			catch (...)
-			{
+			_profile = SecurityModule::getProfiles().get(_request->getObjectId());
+
+			// Right code
+			string rightCode;
+			it = map.find(PARAMETER_RIGHT_CODE);
+			if (it == map.end())
+				throw ActionException("Right code not specified");
+			rightCode = it->second;
+
+			// Right parameter
+			it = map.find(PARAMETER_RIGHT_PARAMETER);
+			if (it == map.end())
+				throw ActionException("Right parameter not specified");
+
+			_right.reset(_profile->getRight(rightCode, it->second));
+			if (!_right.get())
 				throw ActionException("Specified right not found on profile");
-			}
+
+			// Public level
+			it = map.find(PARAMETER_PUBLIC_VALUE);
+			if (it == map.end())
+				throw ActionException("Public level not specified");
+			_publicLevel = (Right::Level) Conversion::ToInt(it->second);
+
+			// Private level
+			it = map.find(PARAMETER_PRIVATE_VALUE);
+			if (it == map.end())
+				throw ActionException("Private level not specified");
+			_privateLevel = (Right::Level) Conversion::ToInt(it->second);
 		}
 
 		void UpdateRightAction::run()

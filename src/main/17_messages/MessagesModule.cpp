@@ -44,45 +44,45 @@ namespace synthese
 			return _scenarii;
 		}
 
-		std::map<uid, std::string> MessagesModule::getScenariiLabels( bool withAll /*= false*/ )
+		std::vector<pair<uid, std::string> > MessagesModule::getScenariiLabels( bool withAll /*= false*/ )
 		{
-			map<uid,string> m;
+			vector<pair<uid,string> > m;
 			if (withAll)
-				m.insert(make_pair(0, "(tous)"));
+				m.push_back(make_pair(0, "(tous)"));
 			for(Scenario::Registry::const_iterator it = _scenarii.begin(); it != _scenarii.end(); ++it)
-				m.insert(make_pair(it->first, it->second->getName()));
+				m.push_back(make_pair(it->first, it->second->getName()));
 			return m;
 
 		}
 
-		std::map<AlarmLevel, std::string> MessagesModule::getLevelLabels( bool withAll /*= false*/ )
+		std::vector<pair<AlarmLevel, std::string> > MessagesModule::getLevelLabels( bool withAll /*= false*/ )
 		{
-			map<AlarmLevel, string> m;
+			vector<pair<AlarmLevel, string> > m;
 			if (withAll)
-				m.insert(make_pair(ALARM_LEVEL_UNKNOWN, "(tous)"));
-			m.insert(make_pair(ALARM_LEVEL_INFO, getLevelLabel(ALARM_LEVEL_INFO)));
-			m.insert(make_pair(ALARM_LEVEL_WARNING, getLevelLabel(ALARM_LEVEL_WARNING)));
+				m.push_back(make_pair(ALARM_LEVEL_UNKNOWN, "(tous)"));
+			m.push_back(make_pair(ALARM_LEVEL_INFO, getLevelLabel(ALARM_LEVEL_INFO)));
+			m.push_back(make_pair(ALARM_LEVEL_WARNING, getLevelLabel(ALARM_LEVEL_WARNING)));
 			return m;
 		}
 
-		std::map<AlarmConflict, std::string> MessagesModule::getConflictLabels( bool withAll /*= false*/ )
+		std::vector<pair<AlarmConflict, std::string> > MessagesModule::getConflictLabels( bool withAll /*= false*/ )
 		{
-			map<AlarmConflict, string> m;
+			vector<pair<AlarmConflict, string> > m;
 			if (withAll)
-				m.insert(make_pair(ALARM_CONFLICT_UNKNOWN, "(tous)"));
-			m.insert(make_pair(ALARM_NO_CONFLICT, "Sans conflit"));
-			m.insert(make_pair(ALARM_WARNING_ON_INFO, "Prioritaire sur complémentaire"));
-			m.insert(make_pair(ALARM_CONFLICT, "En conflit"));
+				m.push_back(make_pair(ALARM_CONFLICT_UNKNOWN, "(tous)"));
+			m.push_back(make_pair(ALARM_NO_CONFLICT, "Sans conflit"));
+			m.push_back(make_pair(ALARM_WARNING_ON_INFO, "Prioritaire sur complémentaire"));
+			m.push_back(make_pair(ALARM_CONFLICT, "En conflit"));
 			return m;
 		}
 
-		std::map<uid, std::string> MessagesModule::getTextTemplateLabels(const AlarmLevel& level)
+		std::vector<pair<uid, std::string> > MessagesModule::getTextTemplateLabels(const AlarmLevel& level)
 		{
-			map<uid, string> m;
+			vector<pair<uid, string> > m;
 			vector<TextTemplate*> v = TextTemplateTableSync::search(level);
 			for (vector<TextTemplate*>::iterator it = v.begin(); it != v.end(); ++it)
 			{
-				m.insert(make_pair((*it)->getKey(), (*it)->getName()));
+				m.push_back(make_pair((*it)->getKey(), (*it)->getName()));
 				delete *it;
 			}
 			return m;

@@ -156,5 +156,10 @@ namespace synthese
 
 			stream << mt.close();
 		}
+
+		bool DisplayMaintenanceAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }

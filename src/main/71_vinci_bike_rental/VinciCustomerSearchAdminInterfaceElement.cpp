@@ -136,6 +136,11 @@ namespace synthese
 			for (vector<VinciContract*>::iterator it = _contracts.begin(); it != _contracts.end(); ++it)
 				delete *it;
 		}
+
+		bool VinciCustomerSearchAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }
 

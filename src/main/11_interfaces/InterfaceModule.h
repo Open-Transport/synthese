@@ -23,29 +23,38 @@
 #ifndef SYNTHESE_InterfaceModule_H__
 #define SYNTHESE_InterfaceModule_H__
 
-#include <map>
+#include <vector>
+#include <utility>
 
 #include "01_util/ModuleClass.h"
 
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/Types.h"
 
-/** @defgroup refInt Interface Reference
-	@ingroup ref
-*/
-
-/** @defgroup m11Pages Interface Pages
-	@ingroup m11
-*/
-
-/** @defgroup m11Functions Functions
-	@ingroup m11
-*/
-
-
 namespace synthese
 {
-		/** @defgroup m11 11 Interface
+	/** @defgroup refInt Interface Reference
+		@ingroup ref
+
+		@defgroup m11Pages Interface Pages
+		@ingroup m11
+
+		@defgroup m11Library Interface Library
+		@ingroup m11
+
+		@defgroup m11Values Interface Values
+		@ingroup m11
+
+		@defgroup m11LS Table sync
+		@ingroup m11
+
+		@defgroup m11Functions Functions
+		@ingroup m11
+
+		@defgroup m11Exceptions Exceptions
+		@ingroup m11
+		
+		@defgroup m11 11 Interface
 
 		Classes of the interface module :
 			- Interface class : defines an interface entirely : each defined pages is stored in a map page => definition
@@ -108,7 +117,7 @@ namespace synthese
 
 		public:
 			static Interface::Registry& getInterfaces ();
-			static std::map<uid, std::string> getInterfaceLabels();
+			static std::vector<std::pair<uid, std::string> > getInterfaceLabels();
 
 			void initialize();
 

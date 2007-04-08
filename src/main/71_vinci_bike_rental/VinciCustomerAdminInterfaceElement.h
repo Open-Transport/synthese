@@ -38,7 +38,7 @@ namespace synthese
 		class VinciContract;
 
 		/** VinciCustomerAdminInterfaceElement Class.
-		@ingroup m71
+			@ingroup m71Admin refAdmin
 		*/
 		class VinciCustomerAdminInterfaceElement : public admin::AdminInterfaceElement
 		{
@@ -57,6 +57,8 @@ namespace synthese
 			std::string getTitle() const;
 
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request = NULL) const;
+
+			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}
 }

@@ -31,6 +31,9 @@ namespace synthese
 	{
 		class ValueInterfaceElement;
 
+		/** Comment library interface element class.
+			@ingroup m11Library refLibrary
+		*/
 		class CommentInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 		public:

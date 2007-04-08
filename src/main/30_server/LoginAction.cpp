@@ -20,16 +20,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <boost/shared_ptr.hpp>
+
 #include "12_security/User.h"
 #include "12_security/UserException.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/UserTableSyncException.h"
+#include "12_security/SecurityLog.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Session.h"
 #include "30_server/Request.h"
 #include "30_server/ServerModule.h"
 #include "30_server/LoginAction.h"
+
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -75,7 +80,10 @@ namespace synthese
 
 				Session* session = new Session(_request->getIP());
 				session->setUser(user);
-				_request->setSession(session);					
+				_request->setSession(session);
+
+				shared_ptr<SecurityLog> sl(Factory<dblog::DBLog>::create<SecurityLog>());
+				sl->addUserLogin(user);
 			}
 			catch (UserTableSyncException e)
 			{

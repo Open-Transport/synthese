@@ -83,12 +83,12 @@ namespace synthese
 			addRightRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
 			addRightRequest.setObjectId(_profile->getKey());
 			
-			map<int, std::string> privatePublicMap;
-			privatePublicMap.insert(make_pair((int) Right::FORBIDDEN, "Interdit"));
-			privatePublicMap.insert(make_pair((int) Right::USE, "Utilisation"));
-			privatePublicMap.insert(make_pair((int) Right::READ, "Lecture"));
-			privatePublicMap.insert(make_pair((int) Right::WRITE, "Ecriture"));
-			privatePublicMap.insert(make_pair((int) Right::DELETE, "Contrôle total"));
+			vector<pair<int, string> > privatePublicMap;
+			privatePublicMap.push_back(make_pair((int) Right::FORBIDDEN, "Interdit"));
+			privatePublicMap.push_back(make_pair((int) Right::USE, "Utilisation"));
+			privatePublicMap.push_back(make_pair((int) Right::READ, "Lecture"));
+			privatePublicMap.push_back(make_pair((int) Right::WRITE, "Ecriture"));
+			privatePublicMap.push_back(make_pair((int) Right::DELETE, "Contrôle total"));
 			
 
 			stream	<< "<h1>Propriétés</h1>";
@@ -144,8 +144,7 @@ namespace synthese
 						HTMLForm form(deleteRightRequest.getHTMLForm("d" + right->getFactoryKey() + right->getParameter()));
 						form.addHiddenField(DeleteRightAction::PARAMETER_RIGHT, right->getFactoryKey());
 						form.addHiddenField(DeleteRightAction::PARAMETER_PARAMETER, right->getParameter());
-						stream << form.getSubmitButton("Supprimer");
-						stream << form.close();
+						stream << form.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer l'habilitation sélectionnée ?");
 					}
 				}
 				stream << t.close();
@@ -199,6 +198,11 @@ namespace synthese
 		ProfileAdmin::~ProfileAdmin()
 		{
 			delete _profile;
+		}
+
+		bool ProfileAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
 		}
 	}
 }

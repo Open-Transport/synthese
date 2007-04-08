@@ -123,6 +123,11 @@ namespace synthese
 			for (vector<VinciBike*>::iterator it = _bikes.begin(); it != _bikes.end(); ++it)
 				delete *it;
 		}
+
+		bool VinciBikeSearchAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }
 

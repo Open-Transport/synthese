@@ -153,5 +153,10 @@ namespace synthese
 
 			stream << t.close();
 		}
+
+		bool BroadcastPointAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }

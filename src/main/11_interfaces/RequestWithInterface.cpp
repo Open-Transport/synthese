@@ -99,5 +99,10 @@ namespace synthese
 			const RequestWithInterface* rwi = dynamic_cast<const RequestWithInterface*>(function);
 			_interface = rwi->_interface;
 		}
+
+		const Interface* RequestWithInterface::getInterface() const
+		{
+			return _interface;
+		}
 	}
 }

@@ -37,7 +37,7 @@ namespace synthese
 	namespace vinci
 	{
 		/** VinciAntivol table synchronizer.
-			@ingroup m71
+			@ingroup m71LS refLS
 		*/
 		class VinciAntivolTableSync : public db::SQLiteTableSyncTemplate<VinciAntivol>
 		{

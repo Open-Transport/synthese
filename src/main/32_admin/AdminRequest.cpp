@@ -30,6 +30,8 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/InterfacePage.h"
 
+#include "12_security/GlobalRight.h"
+
 #include "30_server/RequestException.h"
 #include "30_server/Action.h"
 
@@ -47,6 +49,7 @@ namespace synthese
 	using namespace html;
 	using namespace server;
 	using namespace interfaces;
+	using namespace security;
 
 	namespace admin
 	{
@@ -166,6 +169,13 @@ namespace synthese
 		void AdminRequest::setActionFailedPage( const AdminInterfaceElement* aie )
 		{
 			_actionFailedPage = aie;
+		}
+
+		bool AdminRequest::_isAuthorized() const
+		{
+			return 
+				_request->isAuthorized<GlobalRight>(Right::USE, Right::USE)
+				&& _page->isAuthorized((const FunctionRequest<AdminRequest>*) _request);
 		}
 	}
 }

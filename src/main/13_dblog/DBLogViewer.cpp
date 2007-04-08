@@ -145,5 +145,10 @@ namespace synthese
 			
 			stream << t.close();
 		}
+
+		bool DBLogViewer::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
+		{
+			return true;
+		}
 	}
 }

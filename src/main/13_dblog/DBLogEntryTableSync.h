@@ -36,8 +36,8 @@ namespace synthese
 	{
 		class DBLog;
 
-		/** DBLog table synchronizer.
-			@ingroup m13
+		/** 45 DBLog table synchronizer.
+			@ingroup m13LS refLS
 		*/
 		class DBLogEntryTableSync : public db::SQLiteTableSyncTemplate<DBLogEntry>
 		{
