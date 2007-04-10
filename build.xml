@@ -27,6 +27,7 @@
     <antcall target="sconsbuild">
       <param name="goal" value="dist"/>
       <param name="target" value="${target}"/>
+      <param name="profile" value="false"/>
     </antcall>
 
    <if>

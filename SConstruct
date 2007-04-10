@@ -1,4 +1,5 @@
-import os
+import os, filecmp, tempfile
+import os, fnmatch
 
 # -------------------------------------------------------
 # Command line arguments
@@ -19,6 +20,7 @@ toolset = ARGUMENTS.get('toolset').lower()
 version = ARGUMENTS.get('version').lower()  
 boostversion = ARGUMENTS.get('boostversion').lower()  
 sqliteversion = ARGUMENTS.get('sqliteversion').lower()  
+
 
 
 print "platform = ", platform
@@ -50,10 +52,23 @@ rootenv.Replace ( BUILDROOT = '#' + buildroot )
 
 
 
+
+
+def IsDebug (env):
+  return env['MODE'] == 'debug' or env['MODE'] == 'debug'
+
+
+def IsRelease (env):
+  return env['MODE'] == 'release'
+
+def IsProfile (env):
+  return env['MODE'] == 'debug'
+
+
+
 # -------------------------------------------------------
 # Common methods
 # -------------------------------------------------------
-import os, fnmatch
 
 # Allows to glob files from the build directory going
 # through scons nodes
@@ -74,7 +89,12 @@ def Glob( env, pattern = '*', excludes = [], dir = '.' ):
     return files
 
 
-def CopyFiles (env, dest, files, recursive = False):
+def CopyFile (env, dest, src, onlyIfDifferent = True):
+  if (os.path.exists (dest) == False) or (filecmp.cmp (dest, src, shallow = False) == False):
+    Execute (Copy (dest, src))
+
+
+def CopyFiles (env, dest, files, recursive = False, onlyIfDifferent = True):
     for file in files:
         filename = os.path.basename (file)
     	if recursive and os.path.isdir (file) :
@@ -82,7 +102,8 @@ def CopyFiles (env, dest, files, recursive = False):
 	   Execute (Mkdir (newdest))
 	   CopyFiles (env, newdest, Glob (env, dir = file), recursive)
 	elif os.path.isdir (file) == False:
-           Execute (Copy (os.path.join (dest, filename), file))
+	   destfile = os.path.join (dest, filename)
+           CopyFile (env, destfile, file)
 
 
 def DefaultModuleName ( env, dir = '.' ):
@@ -112,12 +133,12 @@ def DefineDefaultCPPDefines (env):
 
     if (platform=='posix') or (platform=='darwin'):
         env.Append ( CPPDEFINES = ['UNIX'] )
-        if (mode=='debug'):
+        if (env.IsDebug ()):
             env.Append ( CPPDEFINES = ['DEBUG'] )
     
     elif (platform=='win32'):
         env.Append ( CPPDEFINES = ['_MBCS', '_USE_MATH_DEFINES', '__WIN32__', 'WIN32'] )
-        if (mode=='debug'):
+        if (env.IsDebug ()):
             env.Append ( CPPDEFINES = ['DEBUG', '_DEBUG'] )
         else:  
             env.Append ( CPPDEFINES = ['NDEBUG'] )
@@ -128,13 +149,16 @@ def DefineDefaultCCFlags (env):
     mode = env['MODE']
 
     if (platform=='posix'):
-        if (mode=='debug'):
+        if (env.IsDebug ()):
             env.Append ( CCFLAGS = ['-ggdb', '-fno-inline', '-fpermissive'] )
         else:
             env.Append ( CCFLAGS = ['-O3', '-fno-inline', '-fpermissive'] )
+        if env.IsProfile ():
+            env.Append ( CCFLAGS = ['-pg'] )
+            
 
     elif (platform=='darwin'):
-        if (mode=='debug'):
+        if (env.IsDebug ()):
             env.Append ( CCFLAGS = ['-ggdb', '-fno-inline'] )
         else:
             env.Append ( CCFLAGS = ['-O3', '-fno-inline', '-fno-strength-reduce'] )
@@ -144,7 +168,7 @@ def DefineDefaultCCFlags (env):
         env.Append ( CCFLAGS = ['/EHsc', '/GR', '/GS', '/W3', '/nologo', '/c', '/Wp64'] )
         env.Append ( CCFLAGS = ['/wd4005', '/wd4996'])
 
-        if (mode=='debug'):
+        if (env.IsDebug ()):
             env.Append ( CCFLAGS = ['/Od', '/MTd', '/Gm', '/RTC1', '/ZI'] )
         else:  
             env.Append ( CCFLAGS = ['/Ox', '/FD', '/MT', '/Zi'] )
@@ -156,8 +180,12 @@ def DefineDefaultLinkFlags (env):
 
     if (platform=='win32'):
         env.Append ( LINKFLAGS = ['/INCREMENTAL:NO', '/NOLOGO', '/MACHINE:X86', '/OPT:NOREF'] )
-    if (mode=='debug'):
-        env.Append ( LINKFLAGS = ['/DEBUG'] )
+        if (env.IsDebug ()):
+          env.Append ( LINKFLAGS = ['/DEBUG'] )
+    
+    if platform == 'posix':
+      if env.IsProfile:
+        env.Append ( LINKFLAGS = ['-pg'] )
 
 
 
@@ -186,14 +214,14 @@ def AddDependency (env, libname, libversion, multithreaded):
     
     if platform == 'posix':
       # ALWAYS DYNAMIC LINK !
-      if mode == 'debug':
+      if env.IsDebug () :
         deplib = deplib + "-d"
       
       
     if platform == 'win32':
       # ALWAYS STATIC LINK !
       deplib = 'lib' + deplib + "-s"
-      if mode == 'debug':
+      if env.IsDebug () :
         deplib = deplib + "gd"
         
     deplib = deplib + "-" + libversion
@@ -273,46 +301,6 @@ def SyntheseEnv (env, modules):
 
 
 
-
-
-def SynthesePreBuild (target = None, source = None, env = None):
-
-    # source is expected to be main.cpp file
-    # parse this path to get right synthese module name
-    currentmodule = os.path.basename (source[0].abspath.replace (os.sep + 'main.cpp', ''));
-    
-    # Look in all module folders for files with extension .cpp.gen
-    # and dump them inside a generated.cpp file, to be included in main.cpp
-    # Modules are traversed in reverse dependency order.
-    
-    modules = env['MODULES']
-    
-    generated = open ('src/main/' + currentmodule + '/generated.cpp.inc', "w" )
-    generatedInclude = open ('src/main/' + currentmodule + '/includes.cpp.inc', "w" )
-    for module in reversed (modules):
-      moduledir = os.path.join ('src/main', module)
-      for file in os.listdir (moduledir) :
-        if fnmatch.fnmatch (file, '*.gen.cpp') :
-            fragmentfile = os.path.join (moduledir, file);
-            # dump the file to generated output
-            fragment = open (fragmentfile, "r")
-            generated.write (fragment.read ())
-            fragment.close ()
-        if fnmatch.fnmatch (file, '*.inc.cpp') :
-            fragmentfile = os.path.join (moduledir, file);
-            # dump the file to generated output
-            fragment = open (fragmentfile, "r")
-            generatedInclude.write (fragment.read ())
-            fragment.close ()
-
-            
-    generated.close ()
-    generatedInclude.close ()
-
-    return 0
-
-
-
 def SyntheseDist (target = None, source = None, env = None):
     distname = os.path.basename (target[0].abspath).replace ('.exe', '')
     distdir = os.path.join (distroot, distname)
@@ -347,20 +335,52 @@ def SyntheseBuild (env, binname, generatemain = True):
       # Copy main.cpp from template.
       maintemplate = env.File ('../synthese_template/main.cpp').srcnode ().abspath;
       maincopy = env.File ('main.cpp').srcnode ().abspath;
-      Execute (Copy (maincopy, maintemplate));
+      env.CopyFile (maincopy, maintemplate);
     
     files = env.Glob('main.cpp', [])
     
-    preaction = Action (SynthesePreBuild)
+    if generatemain:
+      # source is expected to be main.cpp file
+      # parse this path to get right synthese module name
+      currentmodule = os.path.basename (env.Dir ('.').abspath);
+    
+      # Look in all module folders for files with extension .cpp.gen
+      # and dump them inside a generated.cpp file, to be included in main.cpp
+      # Modules are traversed in reverse dependency order.
+    
+      modules = env['MODULES']
+    
+      # Create a temporary file
+      tmpgen = open (tempfile.gettempdir () + '/generated.cpp.inc', "w" )
+      tmpinc = open (tempfile.gettempdir () + '/includes.cpp.inc', "w" )
+
+      for module in reversed (modules):
+        moduledir = os.path.join (env.Dir ('..').srcnode ().abspath, module)
+        for file in os.listdir (moduledir) :
+          if fnmatch.fnmatch (file, '*.gen.cpp') :
+            fragmentfile = os.path.join (moduledir, file)
+            # dump the file to generated output
+            fragment = open (fragmentfile, "r")
+            tmpgen.write (fragment.read ())
+            fragment.close ()
+          if fnmatch.fnmatch (file, '*.inc.cpp') :
+            fragmentfile = os.path.join (moduledir, file)
+            # dump the file to generated output
+            fragment = open (fragmentfile, "r")
+            tmpinc.write (fragment.read ())
+            fragment.close ()
+    
+      tmpgen.close ()
+      tmpinc.close ()
+
+      env.CopyFile (env.Dir ('#src/main').abspath + '/' + currentmodule + '/generated.cpp.inc', tmpgen.name)
+      env.CopyFile (env.Dir ('#src/main').abspath + '/' + currentmodule + '/includes.cpp.inc', tmpinc.name)
+
 
     exename = env.Program ( binname, files )
     exename = os.path.basename (exename[0].path)
     
     mainobj = "main" + env['OBJSUFFIX']
-
-    if generatemain:
-      env.AddPreAction (mainobj, preaction)
-      env.AlwaysBuild (mainobj)
     
     if goal == 'dist':
         # Copy dynamic libraries
@@ -402,6 +422,7 @@ def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[],
 # Declare common methods
 from SCons.Script.SConscript import SConsEnvironment
 SConsEnvironment.Glob=Glob
+SConsEnvironment.CopyFile=CopyFile
 SConsEnvironment.CopyFiles=CopyFiles
 SConsEnvironment.DefaultModuleName=DefaultModuleName
 SConsEnvironment.DefaultTestModuleName=DefaultTestModuleName
@@ -414,7 +435,9 @@ SConsEnvironment.AppendMultithreadConf=AppendMultithreadConf
 SConsEnvironment.ModuleEnv=ModuleEnv
 SConsEnvironment.TestModuleEnv=TestModuleEnv
 SConsEnvironment.SyntheseEnv=SyntheseEnv
-
+SConsEnvironment.IsDebug=IsDebug
+SConsEnvironment.IsRelease=IsRelease
+SConsEnvironment.IsProfile=IsProfile
 
 SConsEnvironment.SyntheseBuild=SyntheseBuild
 
