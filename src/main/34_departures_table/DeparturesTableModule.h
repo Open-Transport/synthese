@@ -1,4 +1,3 @@
-﻿
 /** DeparturesTableModule class header.
 	@file DeparturesTableModule.h
 

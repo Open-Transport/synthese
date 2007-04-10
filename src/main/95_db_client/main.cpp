@@ -15,6 +15,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
+#include <csignal>
 
 #include <iostream>
 #include <fstream>
@@ -28,10 +29,22 @@ using namespace synthese::tcp;
 namespace po = boost::program_options;
 
 
+void sigint_handler(int sig)
+{
+    
+    std::cerr << "handling signal no. " << sig << "\n";
+    exit (0);
+}
+
+
+
+
 const char ETB (23);
 
 int main( int argc, char **argv )
 {
+    std::signal(SIGINT, sigint_handler);
+
     std::string host;
     int port;
     po::options_description desc("Allowed options");

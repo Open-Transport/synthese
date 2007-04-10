@@ -1,4 +1,3 @@
-﻿
 /** Right class header.
 	@file Right.h
 
