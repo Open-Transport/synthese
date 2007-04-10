@@ -62,6 +62,7 @@ def IsRelease (env):
   return env['MODE'] == 'release'
 
 def IsProfile (env):
+  #return False
   return env['MODE'] == 'debug'
 
 

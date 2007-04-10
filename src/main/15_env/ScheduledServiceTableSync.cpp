@@ -88,8 +88,8 @@ namespace synthese
 				std::string arrivalScheduleStr (arrDep.substr (0, sepPos));
 				std::string departureScheduleStr (arrDep.substr (sepPos+1));
 
-				boost::trim (departureScheduleStr);
-				boost::trim (arrivalScheduleStr);
+				// unnecessary : boost::trim (departureScheduleStr);
+				// unnecessary : boost::trim (arrivalScheduleStr);
 
 				if (departureScheduleStr.empty ())
 				{
