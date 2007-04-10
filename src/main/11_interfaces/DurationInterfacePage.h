@@ -52,7 +52,9 @@ namespace synthese
 
 				@param duration Duration to display
 			*/
-			void display(std::ostream& stream, int duration, interfaces::VariablesMap& variables, void* object = NULL, const server::Request* request = NULL) const;
+			void display(std::ostream& stream, int duration, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 		};
 	}
 }

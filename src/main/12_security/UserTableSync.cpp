@@ -31,11 +31,13 @@
 
 #include "12_security/SecurityModule.h"
 #include "12_security/UserTableSync.h"
+#include "12_security/ProfileTableSync.h"
 #include "12_security/User.h"
 #include "12_security/UserTableSyncException.h"
 
 using namespace std;
 using namespace boost::logic;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -165,7 +167,7 @@ namespace synthese
 		}
 
 
-		void UserTableSync::rowsAdded( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void UserTableSync::rowsAdded( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows, bool isFirstSync)
 		{
 		}
 
@@ -174,7 +176,7 @@ namespace synthese
 		{
 		}
 
-		User* UserTableSync::getUserFromLogin(const std::string& login )
+		shared_ptr<User> UserTableSync::getUserFromLogin(const std::string& login )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
@@ -187,8 +189,8 @@ namespace synthese
 				db::SQLiteResult rows = sqlite->execQuery(query.str());
 				if (rows.getNbRows() <= 0)
 					throw UserTableSyncException("User "+ login + " not found in database.");
-				User* user = new User;
-				load(user, rows);
+				shared_ptr<User> user (new User);
+				load(user.get(), rows);
 				return user;
 			}
 			catch (SQLiteException e)
@@ -197,21 +199,39 @@ namespace synthese
 			}
 		}
 
-		std::vector<User*> UserTableSync::search(const std::string& login, const std::string name, uid profileId
+		std::vector<shared_ptr<User> > UserTableSync::search(
+			const std::string& login
+			, const std::string name
+			, shared_ptr<const Profile> profile
 			, tribool emptyLogin
-			, int first /*= 0*/, int number /*= 0*/ )
-		{
+			, int first /*= 0*/, int number /*= 0*/
+			, bool orderByLogin
+			, bool orderByName
+			, bool orderByProfileName
+			, bool raisingOrder
+		){
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
-				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
-				<< " WHERE " << TABLE_COL_LOGIN << " LIKE '%" << Conversion::ToSQLiteString(login, false) << "%'"
-				<< " AND " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-			if (profileId > 0)
-				query << " AND " << TABLE_COL_PROFILE_ID << "=" << Conversion::ToString(profileId);
+				<< " SELECT "
+				<< "t.*"
+				<< " FROM " << TABLE_NAME << " AS t";
+			if (orderByProfileName)
+				query << " INNER JOIN " << ProfileTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=t." << TABLE_COL_PROFILE_ID;
+			query
+				<< " WHERE " 
+				<< " t." << TABLE_COL_LOGIN << " LIKE '%" << Conversion::ToSQLiteString(login, false) << "%'"
+				<< " AND t." << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			if (profile.get())
+				query << " AND " << TABLE_COL_PROFILE_ID << "=" << Conversion::ToString(profile->getKey());
 			if (emptyLogin != tribool::indeterminate_value)
 				query << " AND " << TABLE_COL_LOGIN << (emptyLogin ? "=''" : "!=''");
+			if (orderByProfileName)
+				query << " ORDER BY p." << ProfileTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (orderByLogin)
+				query << " ORDER BY t." << TABLE_COL_LOGIN << (raisingOrder ? " ASC" : " DESC");
+			if (orderByName)
+				query << " ORDER BY t." << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",t." << TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -220,11 +240,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<User*> users;
+				vector<shared_ptr<User> > users;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					User* user = new User;
-					load(user, result, i);
+					shared_ptr<User> user(new User);
+					load(user.get(), result, i);
 					users.push_back(user);
 				}
 				return users;

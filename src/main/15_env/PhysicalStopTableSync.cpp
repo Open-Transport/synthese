@@ -33,6 +33,7 @@
 #include <assert.h>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -90,7 +91,7 @@ namespace synthese
 		    
 
 
-		void PhysicalStopTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void PhysicalStopTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
 			{
@@ -99,17 +100,19 @@ namespace synthese
 
 				if (EnvModule::getPhysicalStops ().contains (id)) return;
 
-				ConnectionPlace* place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(rows.getColumn(rowIndex, COL_PLACEID)));
+				shared_ptr<ConnectionPlace> place = EnvModule::getConnectionPlaces().getUpdateable(Conversion::ToLongLong(rows.getColumn(rowIndex, COL_PLACEID)));
 			    
-				synthese::env::PhysicalStop* ps = new synthese::env::PhysicalStop (
-					id,
-					rows.getColumn (rowIndex, COL_NAME),
-					place,
-					Conversion::ToDouble (rows.getColumn (rowIndex, COL_X)),
-					Conversion::ToDouble (rows.getColumn (rowIndex, COL_Y))
-				);
+				shared_ptr<PhysicalStop> ps(
+						new PhysicalStop (
+									id,
+									rows.getColumn (rowIndex, COL_NAME),
+									place.get(),
+									Conversion::ToDouble (rows.getColumn (rowIndex, COL_X)),
+									Conversion::ToDouble (rows.getColumn (rowIndex, COL_Y))
+								))
+				;
 
-				place->addPhysicalStop(ps);
+				place->addPhysicalStop(ps.get());
 
 				EnvModule::getPhysicalStops ().add (ps);
 			}
@@ -122,8 +125,8 @@ namespace synthese
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
 				uid id = Conversion::ToLongLong (rows.getColumn (i, TABLE_COL_ID));
-				synthese::env::PhysicalStop* ps = EnvModule::getPhysicalStops ().get (id);
-				load(ps, rows, i);
+				shared_ptr<PhysicalStop> ps = EnvModule::getPhysicalStops ().getUpdateable(id);
+				load(ps.get(), rows, i);
 			}
 		}
 

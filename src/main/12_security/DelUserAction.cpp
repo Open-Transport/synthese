@@ -44,7 +44,7 @@ namespace synthese
 		{
 			try
 			{
-				_user.reset(UserTableSync::get(_request->getObjectId()));
+				_user = UserTableSync::get(_request->getObjectId());
 			}
 			catch (User::RegistryKeyException e)
 			{

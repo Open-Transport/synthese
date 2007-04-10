@@ -29,6 +29,8 @@
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/InterfacePageTableSync.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace db;
@@ -56,34 +58,33 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				InterfacePage* const page = 
-					InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE)))
-					->getPage(rows.getColumn(i, TABLE_COL_PAGE));
+				shared_ptr<InterfacePage> page = InterfaceModule::getInterfacePages().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
 				page->parse( rows.getColumn(i, TABLE_COL_CONTENT ) );
 			}
 		}
 
 
-		void InterfacePageTableSync::rowsAdded( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void InterfacePageTableSync::rowsAdded( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
 				// Search the specified interface
 				try
 				{
-					Interface* interf;
-					InterfacePage* page;
 
-					interf = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE )));
-
-					// Registered interface page;
-					page = Factory<InterfacePage>::contains(rows.getColumn(i,TABLE_COL_PAGE))
-						? Factory<InterfacePage>::create( rows.getColumn(i,TABLE_COL_PAGE) )
-						: new InterfacePage;
-					
+					shared_ptr<InterfacePage> page;
+					if (Factory<InterfacePage>::contains(rows.getColumn(i,TABLE_COL_PAGE)))
+						page = Factory<InterfacePage>::create( rows.getColumn(i,TABLE_COL_PAGE) );
+					else
+						page.reset(new InterfacePage);
+					page->setKey(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
 					page->setCode(rows.getColumn(i,TABLE_COL_PAGE));
-					page->parse( rows.getColumn(i, TABLE_COL_CONTENT) );
 
+					InterfaceModule::getInterfacePages().add(page);
+
+					page->parse( rows.getColumn(i, TABLE_COL_CONTENT) );	// Needs the page to be already registered
+
+					shared_ptr<Interface> interf = InterfaceModule::getInterfaces().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE )));
 					interf->addPage(rows.getColumn(i, TABLE_COL_PAGE), page );
 				}
 				catch (Interface::RegistryKeyException e)
@@ -98,7 +99,7 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE)))->removePage( rows.getColumn(i, TABLE_COL_PAGE) );
+				InterfaceModule::getInterfaces().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE)))->removePage( rows.getColumn(i, TABLE_COL_PAGE) );
 			}
 		}
 	}

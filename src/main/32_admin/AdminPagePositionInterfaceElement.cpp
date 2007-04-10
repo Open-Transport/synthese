@@ -22,6 +22,8 @@
 
 #include <sstream>
 
+#include "05_html/HTMLModule.h"
+
 #include "11_interfaces/ValueElementList.h"
 
 #include "30_server/FunctionRequest.h"
@@ -30,30 +32,34 @@
 #include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminPagePositionInterfaceElement.h"
 
+using namespace boost;
+using namespace std;
+
 namespace synthese
 {
-	using namespace std;
 	using namespace interfaces;
 	using namespace util;
 	using namespace server;
+	using namespace html;
 
 	namespace admin
 	{
-		std::string AdminPagePositionInterfaceElement::getUpPages(const AdminInterfaceElement* page, const server::FunctionRequest<admin::AdminRequest>* request, bool isFirst)
+		std::string AdminPagePositionInterfaceElement::getUpPages(shared_ptr<const AdminInterfaceElement> page, const server::FunctionRequest<admin::AdminRequest>* request, bool isFirst)
 		{
 			stringstream str;
 			Factory<AdminInterfaceElement>::Iterator it = Factory<AdminInterfaceElement>::begin(); 
-			for (; it != Factory<AdminInterfaceElement>::end() && it->getFactoryKey() != page->getSuperior();
-				++it);
+			for (; it != Factory<AdminInterfaceElement>::end() && it->getFactoryKey() != page->getSuperior(); ++it);
 			
 			if (it != Factory<AdminInterfaceElement>::end())
 			{
-				string supStr = getUpPages(*it, request, false);
-				str << supStr << "&nbsp;&gt;&nbsp;";
+				str << getUpPages(*it, request, false);
+				str << "&nbsp;&gt;&nbsp;";
 			}
 			if (!isFirst)
 			{
-				str << page->getHTMLLink(request);
+				FunctionRequest<AdminRequest> r(request);
+				r.getFunction()->setPage(page);
+				str << HTMLModule::getHTMLLink(r.getURL(), page->getTitle());
 			}
 			else
 			{
@@ -67,15 +73,15 @@ namespace synthese
 
 		}
 
-		AdminPagePositionInterfaceElement::~AdminPagePositionInterfaceElement()
+		std::string AdminPagePositionInterfaceElement::getValue(
+			const ParametersVector&
+			, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
 		{
-
-		}
-
-		std::string AdminPagePositionInterfaceElement::getValue( const ParametersVector&, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
-		{
-			const AdminInterfaceElement* aie = (const AdminInterfaceElement*) object;
-			return getUpPages(aie, (const server::FunctionRequest<admin::AdminRequest>*) request);
+			const shared_ptr<const AdminInterfaceElement>* page = (const shared_ptr<const AdminInterfaceElement>*) object;
+			return getUpPages(
+				*page
+				, (const server::FunctionRequest<admin::AdminRequest>*) request
+			);
 		}
 	}
 }

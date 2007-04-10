@@ -30,8 +30,8 @@ namespace synthese
 {
 	namespace html
 	{
-		ActionResultHTMLTable::ActionResultHTMLTable( const HeaderVector& header , const HTMLForm& searchForm , std::string currentOrderField , bool raisingOrder , const HTMLForm& actionForm, std::string selectName/*="" */, std::string iconPath/*=""*/ )
-			: ResultHTMLTable(header, searchForm, currentOrderField, raisingOrder, iconPath), _actionForm(actionForm), _selectName(selectName)
+		ActionResultHTMLTable::ActionResultHTMLTable( const HeaderVector& header , const HTMLForm& searchForm, RequestParameters requestParameters, ResultParameters resultParameters, const HTMLForm& actionForm, std::string selectName/*="" */, std::string iconPath/*=""*/ )
+			: ResultHTMLTable(header, searchForm, requestParameters, resultParameters, iconPath), _actionForm(actionForm), _selectName(selectName)
 		{
 			stringstream s;
 			if (!_selectName.empty())

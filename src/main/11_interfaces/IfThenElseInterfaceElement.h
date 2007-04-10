@@ -57,13 +57,13 @@ label end_of_bloc
 		class IfThenElseInterfaceElement : public ValueInterfaceElement
 		{
 		private:
-			ValueInterfaceElement* _criteria;
-			ValueInterfaceElement* _to_return_if_true;
-			ValueInterfaceElement* _to_return_if_false;
+			boost::shared_ptr<ValueInterfaceElement> _criteria;
+			boost::shared_ptr<ValueInterfaceElement> _to_return_if_true;
+			boost::shared_ptr<ValueInterfaceElement> _to_return_if_false;
 
 		public:
-			~IfThenElseInterfaceElement();
-			std::string getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables
+				, const void* object = NULL, const server::Request* request = NULL) const;
 			void storeParameters(ValueElementList& vel);
 		};
 

@@ -32,7 +32,7 @@ namespace synthese
 		class Alarm;
 
 		/** UpdateAlarmMessagesAction action class.
-			@ingroup m17
+			@ingroup m17Actions refActions
 		*/
 		class UpdateAlarmMessagesAction : public server::Action
 		{
@@ -43,7 +43,7 @@ namespace synthese
 		private:
 			std::string _shortMessage;
 			std::string _longMessage;
-			Alarm*		_alarm;
+			boost::shared_ptr<Alarm>		_alarm;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -57,10 +57,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			UpdateAlarmMessagesAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

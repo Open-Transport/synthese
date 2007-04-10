@@ -48,7 +48,6 @@ namespace synthese
 			static const std::string TABLE_COL_PHYSICAL_STOP_ID;
 
 			BroadcastPointTableSync();
-			~BroadcastPointTableSync();
 
 
 			/** BroadcastPoint search.
@@ -59,7 +58,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<BroadcastPoint*> search(
+			static std::vector<boost::shared_ptr<BroadcastPoint> > search(
 				// other search parameters
 				int first = 0, int number = 0);
 
@@ -71,7 +70,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on BroadcastPoint creation.
 				This method updates the corresponding object in ram.

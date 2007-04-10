@@ -34,6 +34,8 @@
 
 #include "30_server/ActionFunctionRequest.h"
 
+#include "32_admin/AdminParametersException.h"
+
 using namespace std;
 
 namespace synthese
@@ -49,13 +51,13 @@ namespace synthese
 
 		UserAdmin::UserAdmin()
 			: AdminInterfaceElement("users", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
-			, _user(NULL), _userError(false)
+			, _userError(false)
 		{
 		}
 
 		std::string UserAdmin::getTitle() const
 		{
-			return (_user != NULL)
+			return (_user.get())
 				? _user->getSurname() + " " + _user->getName()
 				: "";
 		}
@@ -145,15 +147,10 @@ namespace synthese
 				if (it != map.end())
 					_user = UserTableSync::get(Conversion::ToLongLong(it->second));
 			}
-			catch (DBEmptyResultException)
+			catch (...)
 			{
-				// throw AdminElementInitializationException("Bad user");
+				throw AdminParametersException("Bad user");
 			}
-		}
-
-		UserAdmin::~UserAdmin()
-		{
-			delete _user;
 		}
 
 		bool UserAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const

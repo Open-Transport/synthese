@@ -28,6 +28,7 @@
 #include <sstream>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -40,17 +41,12 @@ namespace synthese
                                               const void* rootObject, 
                                               const server::Request* request ) const
 		{
-                        stringstream s;
+			stringstream s;
 			s << ((char) atoi (_asciiCode->getValue (parameters, vars, rootObject, request).c_str ()));
-                        return s.str ();
+            return s.str ();
 		}
 
               
-		ChrInterfaceElement::~ChrInterfaceElement()
-		{
-			delete _asciiCode;
-		}
-
               
 		void ChrInterfaceElement::storeParameters(ValueElementList& vel )
 		{

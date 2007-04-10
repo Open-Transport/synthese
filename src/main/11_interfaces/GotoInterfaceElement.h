@@ -12,15 +12,21 @@ namespace synthese
 		class ValueInterfaceElement;
 
 		/** Goto interface element.
+			@ingroup m11Library refLibrary
 		*/
 		class GotoInterfaceElement : public LibraryInterfaceElement
 		{
 		private:
-			ValueInterfaceElement* _label;
+			boost::shared_ptr<ValueInterfaceElement> _label;
 
 		public:
 			void storeParameters(ValueElementList& vel);
-			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 		};
 
 	}

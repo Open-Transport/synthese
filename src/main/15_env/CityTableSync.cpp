@@ -36,6 +36,7 @@
 
 using synthese::util::Conversion;
 using synthese::db::SQLiteResult;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -105,7 +106,7 @@ namespace synthese
 		void 
 			CityTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResult& rows)
+			const synthese::db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
 			{
@@ -113,9 +114,9 @@ namespace synthese
 
 				if (EnvModule::getCities ().contains (id)) return;
 
-				synthese::env::City* city = new synthese::env::City (
+				shared_ptr<City> city(new City (
 					id,
-					rows.getColumn (rowIndex, TABLE_COL_NAME) );
+					rows.getColumn (rowIndex, TABLE_COL_NAME) ));
 
 				EnvModule::getCities ().add (city);
 				//environment.getCitiesMatcher ().add (city->getName (), city->getKey ());
@@ -132,11 +133,11 @@ namespace synthese
 			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
 			{
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-				synthese::env::City* city = EnvModule::getCities ().get (id);
+				shared_ptr<City> city = EnvModule::getCities ().getUpdateable (id);
 
 				// environment.getCitiesMatcher ().remove (city->getName ());
 
-				load(city, rows, rowIndex);
+				load(city.get(), rows, rowIndex);
 
 				// environment.getCitiesMatcher ().add (city->getName (), city->getKey ());
 			}

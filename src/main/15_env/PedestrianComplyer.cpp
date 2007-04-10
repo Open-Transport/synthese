@@ -10,7 +10,7 @@ namespace env
 
 
 PedestrianComplyer::PedestrianComplyer (const PedestrianComplyer* parent, 
-			    PedestrianCompliance* pedestrianCompliance)
+			    const PedestrianCompliance* pedestrianCompliance)
     : _parent (parent)
     , _pedestrianCompliance (pedestrianCompliance)
 {
@@ -35,7 +35,7 @@ PedestrianComplyer::getPedestrianCompliance () const
 
 
 void 
-PedestrianComplyer::setPedestrianCompliance (PedestrianCompliance* pedestrianCompliance)
+PedestrianComplyer::setPedestrianCompliance (const PedestrianCompliance* pedestrianCompliance)
 {
     _pedestrianCompliance = pedestrianCompliance;
 }

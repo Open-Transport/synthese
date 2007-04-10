@@ -31,15 +31,23 @@ namespace synthese
 {
 	namespace interfaces
 	{
+		/** Line lablizer virtual library interface element
+			usage :
+			@code label <label> @endcode
+			@ingroup m11Library refLibrary
+		*/
 		class LineLabelInterfaceElement : public LibraryInterfaceElement
 		{
 		private:
 			std::string _label;
 
 		public:
-			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 			void storeParameters(ValueElementList& vel);
-			const std::string& getLabel() const;
+			std::string getLabel() const;
 		};
 
 	}

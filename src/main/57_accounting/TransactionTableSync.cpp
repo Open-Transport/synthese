@@ -36,6 +36,7 @@
 #include "57_accounting/TransactionTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -128,7 +129,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_COMMENT, "TEXT", true);
 		}
 
-		void TransactionTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 
 		}

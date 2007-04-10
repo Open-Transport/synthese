@@ -25,6 +25,7 @@
 #include "17_messages/AlarmRecipient.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -76,13 +77,13 @@ namespace synthese
 			addTableColumn(COL_ALARM_ID, "INTEGER");			
 		}
 
-		void AlarmObjectLinkTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void AlarmObjectLinkTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				AlarmRecipient* ar = Factory<AlarmRecipient>::create(rows.getColumn(i, COL_RECIPIENT_KEY));
-				Alarm* alarm = MessagesModule::getAlarms().get(Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID)));
-				ar->addObject(alarm, Conversion::ToLongLong(rows.getColumn(i, COL_OBJECT_ID)));
+				shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::create(rows.getColumn(i, COL_RECIPIENT_KEY));
+				shared_ptr<Alarm> alarm = MessagesModule::getAlarms().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID)));
+				ar->addObject(alarm.get(), Conversion::ToLongLong(rows.getColumn(i, COL_OBJECT_ID)));
 			}
 		}
 
@@ -95,9 +96,9 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				AlarmRecipient* ar = Factory<AlarmRecipient>::create(rows.getColumn(i, COL_RECIPIENT_KEY));
-				Alarm* alarm = MessagesModule::getAlarms().get(Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID)));
-				ar->removeObject(alarm, Conversion::ToLongLong(rows.getColumn(i, COL_OBJECT_ID)));
+				shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::create(rows.getColumn(i, COL_RECIPIENT_KEY));
+				shared_ptr<Alarm> alarm = MessagesModule::getAlarms().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID)));
+				ar->removeObject(alarm.get(), Conversion::ToLongLong(rows.getColumn(i, COL_OBJECT_ID)));
 			}
 		}
 	}

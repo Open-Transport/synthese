@@ -65,7 +65,6 @@ namespace synthese
 			static const std::string COL_RESERVATIONRULEID;
 
 			LineTableSync();
-			~LineTableSync();
 
 
 			/** Line search.
@@ -76,7 +75,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<Line*> search(
+			static std::vector<boost::shared_ptr<Line> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
 
@@ -88,7 +87,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on Line creation.
 				This method updates the corresponding object in ram.

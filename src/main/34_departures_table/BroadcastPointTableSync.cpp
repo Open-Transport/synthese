@@ -38,6 +38,7 @@
 #include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -96,18 +97,18 @@ namespace synthese
 			addTableColumn(TABLE_COL_PHYSICAL_STOP_ID, "INTEGER", true);
 		}
 
-		void BroadcastPointTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void BroadcastPointTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
 				if (DeparturesTableModule::getBroadcastPoints().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
 				{
-					load(DeparturesTableModule::getBroadcastPoints().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))), rows, i);
+					load(DeparturesTableModule::getBroadcastPoints().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
 				}
 				else
 				{
-					BroadcastPoint* object = new BroadcastPoint();
-					load(object, rows, i);
+					shared_ptr<BroadcastPoint> object(new BroadcastPoint());
+					load(object.get(), rows, i);
 					DeparturesTableModule::getBroadcastPoints().add(object);
 				}
 			}
@@ -119,8 +120,8 @@ namespace synthese
 			{
 				try
 				{
-					BroadcastPoint* object = DeparturesTableModule::getBroadcastPoints().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-					load(object, rows, i);
+					shared_ptr<BroadcastPoint> object = DeparturesTableModule::getBroadcastPoints().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+					load(object.get(), rows, i);
 				}
 				catch (Exception e)
 				{
@@ -137,7 +138,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<BroadcastPoint*> BroadcastPointTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<BroadcastPoint> > BroadcastPointTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -155,11 +156,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<BroadcastPoint*> objects;
+				vector<shared_ptr<BroadcastPoint> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					BroadcastPoint* object = new BroadcastPoint();
-					load(object, result, i);
+					shared_ptr<BroadcastPoint> object(new BroadcastPoint());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

@@ -29,6 +29,7 @@
 #include "71_vinci_bike_rental/VinciSiteTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -83,7 +84,7 @@ namespace synthese
 			addTableColumn(COL_PHONE, "TEXT", true);
 		}
 
-		void VinciSiteTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciSiteTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 
 		}

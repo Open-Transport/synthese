@@ -45,7 +45,10 @@ namespace synthese
 
 	namespace departurestable
 	{
-		string DisplayScreenHasAlarmValueInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string DisplayScreenHasAlarmValueInterfaceElement::getValue(
+			const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object, const server::Request* request) const
 		{
 			const Alarm* alarm = ((const ArrivalDepartureListWithAlarm*) object)->alarm;
 			

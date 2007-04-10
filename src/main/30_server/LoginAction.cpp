@@ -72,7 +72,7 @@ namespace synthese
 				if (_login.empty() || _password.empty())
 					throw ActionException("Champ utilisateur ou mot de passe vide");
 				
-				User* user = UserTableSync::getUserFromLogin(_login);
+				shared_ptr<User> user = UserTableSync::getUserFromLogin(_login);
 				user->verifyPassword(_password);
 				
 				if (!user->getConnectionAllowed())

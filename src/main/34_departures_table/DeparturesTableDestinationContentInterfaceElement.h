@@ -34,7 +34,8 @@ namespace synthese
 	{
 		class interfaces::ValueInterfaceElement;
 
-		/** Goto interface element.
+		/** Departure Table Destination Content Interface Element Class.
+			@ingroup m34Library refLibrary
 		*/
 		class DeparturesTableDestinationContentInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
@@ -49,21 +50,21 @@ namespace synthese
 			
 
 		private:
-			interfaces::ValueInterfaceElement* _destinationsToDisplayVIE;
-			interfaces::ValueInterfaceElement* _displayTerminusVIE;
-			interfaces::ValueInterfaceElement* _displayTypeVIE;
-			interfaces::ValueInterfaceElement* _stopsSeparatorVIE;
-			interfaces::ValueInterfaceElement* _beforeCityVIE;
-			interfaces::ValueInterfaceElement* _afterCityVIE;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _destinationsToDisplayVIE;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _displayTerminusVIE;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _displayTypeVIE;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _stopsSeparatorVIE;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _beforeCityVIE;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _afterCityVIE;
 
 			void displayDestination(std::ostream& stream, bool displayCity) const;
 
 		public:
-			DeparturesTableDestinationContentInterfaceElement();
-			~DeparturesTableDestinationContentInterfaceElement();
-
 			void storeParameters(interfaces::ValueElementList& vel);
-			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
 			const std::string getLabel(const interfaces::ParametersVector& parameters) const;
 		};
 

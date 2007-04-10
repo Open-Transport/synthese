@@ -148,15 +148,15 @@ namespace synthese
 			//! \name Protected getters
 			//@{
 
-			Function* _getFunction();
-			const Function* _getFunction() const;
+			boost::shared_ptr<Function> _getFunction();
+			boost::shared_ptr<const Function> _getFunction() const;
 
 				/** Action getter.
 					@return const Action* The action of the request
 					@author Hugues Romain
 					@date 2007					
 				*/
-				const Action* _getAction() const;
+			boost::shared_ptr<const Action> _getAction() const;
 			//@}
 
 			//! \name Protected setters
@@ -166,7 +166,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 				*/
-				void _setAction(Action* action);
+			void _setAction(boost::shared_ptr<Action> action);
 
 				/** Function setter.
 					@param function
@@ -174,7 +174,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007					
 				*/
-				void _setFunction(Function* function);
+			void _setFunction(boost::shared_ptr<Function> function);
 			//@}
 
 				/** Construction of an empty request from an other one.
@@ -185,7 +185,11 @@ namespace synthese
 					@date 2007
 					Use the public setters to fill the request.					
 				*/
-				Request(const Request* request=NULL, Function* function=NULL, Action* action=NULL);
+			Request(
+				const Request* request=NULL
+				, boost::shared_ptr<Function> function=boost::shared_ptr<Function>()
+				, boost::shared_ptr<Action> action=boost::shared_ptr<Action>()
+				);
 				
 		public:
 			void _setErrorMessage(const std::string& message);
@@ -286,12 +290,12 @@ namespace synthese
 			if (_session == NULL)
 				return false;
 
-			const security::Profile* profile = _session->getUser()->getProfile();
+			boost::shared_ptr<const security::Profile> profile = _session->getUser()->getProfile();
 			boost::shared_ptr<security::Right> neededRight(util::Factory<security::Right>::create<R>());
 			neededRight->setPublicLevel(publicr);
 			neededRight->setPrivateLevel(privater);
 			neededRight->setParameter(parameter);
-			return profile->isAuthorized(neededRight.get());
+			return profile->isAuthorized(neededRight);
 
 		}
 	}

@@ -25,6 +25,7 @@
 #include "11_interfaces/ValueInterfaceElement.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -40,7 +41,7 @@ namespace synthese
 				|| Conversion::ToLongLong(value) == 0;
 		}
 
-		void ValueInterfaceElement::setPage( const InterfacePage* page )
+		void ValueInterfaceElement::setPage(shared_ptr<const InterfacePage> page )
 		{
 			_page = page;
 		}

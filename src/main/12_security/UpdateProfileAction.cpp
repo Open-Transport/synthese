@@ -30,10 +30,12 @@
 #include "30_server/Request.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace db;
 	
 	namespace security
 	{
@@ -54,9 +56,9 @@ namespace synthese
 			// Profile
 			try
 			{
-				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
+				_profile = ProfileTableSync::get(_request->getObjectId());
 			}
-			catch (Profile::RegistryKeyException e)
+			catch (DBEmptyResultException<Profile>)
 			{
 				throw ActionException("Profile not found");
 			}
@@ -68,23 +70,15 @@ namespace synthese
 			_name = it->second;
 
 			// Name unicity
-			vector<Profile*> existingProfiles = ProfileTableSync::search(_name,"",0,1);
+			vector<shared_ptr<Profile> > existingProfiles = ProfileTableSync::search(_name,"",0,1);
 			if (!existingProfiles.empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
-
 		}
 
 		void UpdateProfileAction::run()
 		{
 			_profile->setName(_name);
-			ProfileTableSync::save(_profile);
-		}
-
-		UpdateProfileAction::UpdateProfileAction()
-			: Action()
-			, _profile(NULL)
-		{
-	
+			ProfileTableSync::save(_profile.get());
 		}
 	}
 }

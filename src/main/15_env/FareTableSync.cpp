@@ -34,6 +34,7 @@
 #include "15_env/EnvModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -92,12 +93,12 @@ namespace synthese
 			addTableColumn (COL_FARETYPE, "INTEGER", true);
 		}
 
-		void FareTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void FareTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				Fare* object = new Fare();
-				load(object, rows, i);
+				shared_ptr<Fare> object(new Fare());
+				load(object.get(), rows, i);
 				EnvModule::getFares().add(object);
 			}
 		}
@@ -109,8 +110,8 @@ namespace synthese
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
 				if (EnvModule::getFares().contains(id))
 				{
-					Fare* object = EnvModule::getFares().get(id);
-					load(object, rows, i);
+					shared_ptr<Fare> object = EnvModule::getFares().getUpdateable(id);
+					load(object.get(), rows, i);
 				}
 			}
 		}
@@ -127,7 +128,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<Fare*> FareTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<Fare> > FareTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -146,11 +147,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<Fare*> objects;
+				vector<shared_ptr<Fare> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					Fare* object = new Fare();
-					load(object, result, i);
+					shared_ptr<Fare> object(new Fare());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

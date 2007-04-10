@@ -100,25 +100,25 @@ class XmlBuilder
  public:
 
 
-    static Axis* CreateAxis (XMLNode& node);
+	 static boost::shared_ptr<Axis> CreateAxis (XMLNode& node);
 
-    static City* CreateCity (XMLNode& node);
+	 static boost::shared_ptr<City> CreateCity (XMLNode& node);
 
     
-    static ConnectionPlace* CreateConnectionPlace (XMLNode& node, 
+	 static boost::shared_ptr<ConnectionPlace> CreateConnectionPlace (XMLNode& node, 
 						   const City::Registry& cities);
 
-    static CommercialLine* CreateCommercialLine (XMLNode& node);
+	 static boost::shared_ptr<CommercialLine> CreateCommercialLine (XMLNode& node);
 
-    static Line* CreateLine (XMLNode& node, 
+	 static boost::shared_ptr<Line> CreateLine (XMLNode& node, 
 			     const Axis::Registry& axes,
 			     const CommercialLine::Registry& commercialLines);
 
-    static LineStop* CreateLineStop (XMLNode& node, 
+	 static boost::shared_ptr<LineStop> CreateLineStop (XMLNode& node, 
 				     Line::Registry& lines,
 				     const PhysicalStop::Registry& physicalStops);
 
-    static PhysicalStop* CreatePhysicalStop (XMLNode& node, 
+	 static boost::shared_ptr<PhysicalStop> CreatePhysicalStop (XMLNode& node, 
 					     const ConnectionPlace::Registry& connectionPlaces);
     
     static Point CreatePoint (XMLNode& node);

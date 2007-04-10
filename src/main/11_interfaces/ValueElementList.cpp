@@ -30,6 +30,8 @@
 #include "11_interfaces/StaticValueInterfaceElement.h"
 #include "11_interfaces/InterfacePageException.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace std;
@@ -37,7 +39,7 @@ namespace synthese
 
 	namespace interfaces
 	{
-		ValueElementList::ValueElementList(const std::string& text, const InterfacePage* page)
+		ValueElementList::ValueElementList(const std::string& text, shared_ptr<const InterfacePage> page)
 		{
 			parse(text, page);
 		}
@@ -47,7 +49,10 @@ namespace synthese
 		{
 		}
 
-		const ParametersVector ValueElementList::fillParameters( const ParametersVector& parameters, VariablesMap& vars, const void* object, const server::Request* request ) const
+		const ParametersVector ValueElementList::fillParameters(
+			const ParametersVector& parameters
+			, VariablesMap& vars
+			, const void* object, const server::Request* request ) const
 		{
 			ParametersVector pv;
 			for (ElementsList::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
@@ -57,16 +62,16 @@ namespace synthese
 			return pv;
 		}
 
-		ValueInterfaceElement* ValueElementList::front()
+		shared_ptr<ValueInterfaceElement> ValueElementList::front()
 		{
 			if (_elements.size() > 0)
 			{
-				ValueInterfaceElement* vie = _elements.front();
+				shared_ptr<ValueInterfaceElement> vie = _elements.front();
 				_elements.pop_front();
 				return vie;
 			}
 			else
-				return NULL;
+				return shared_ptr<ValueInterfaceElement>();
 		}
 
 		size_t ValueElementList::size() const
@@ -74,18 +79,12 @@ namespace synthese
 			return _elements.size();
 		}
 
-		ValueElementList::~ValueElementList()
-		{
-			for (ElementsList::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
-				delete *it;
-		}
-
 		bool ValueElementList::isEmpty() const
 		{
 			return _elements.size() == 0;
 		}
 
-		void ValueElementList::takeFrom(ValueElementList& vel, const InterfacePage* page )
+		void ValueElementList::takeFrom(ValueElementList& vel, shared_ptr<const InterfacePage> page )
 		{
 			for (; vel._elements.size() > 0; vel._elements.pop_back())
 			{
@@ -94,7 +93,7 @@ namespace synthese
 			}
 		}
 
-		void ValueElementList::parse(const std::string& text, const InterfacePage* page)
+		void ValueElementList::parse(const std::string& text, shared_ptr<const InterfacePage> page)
 		{
 			size_t position = 0;
 			std::vector<std::string> elements;
@@ -141,19 +140,19 @@ namespace synthese
 			// Registering each word as ValueInterfaceElement
 			for (vector<string>::const_iterator it = elements.begin(); it != elements.end(); ++it)
 			{
-				ValueInterfaceElement* vie;
+				shared_ptr<ValueInterfaceElement> vie;
 				const std::string& str = *it;
 
 				// Case 1 : single word
 				if (str.at(0) != '{' && str.at(0) != '[')
 				{
-					vie = new StaticValueInterfaceElement(str);
+					vie.reset(new StaticValueInterfaceElement(str));
 				} 
 
 				// Case 2 : multiple word
 				else if(str.size() > 1 && (str.at(0) == '{' && str.at(1) != '{' || str.at(0) == '['))
 				{
-					vie = new StaticValueInterfaceElement(str.substr(1, str.size() - 2));
+					vie.reset(new StaticValueInterfaceElement(str.substr(1, str.size() - 2)));
 				}
 
 				// Case 3 : recursive call
@@ -185,5 +184,3 @@ namespace synthese
 		}
 	}
 }
-
-

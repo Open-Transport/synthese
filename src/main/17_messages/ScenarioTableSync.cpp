@@ -33,9 +33,11 @@
 
 #include "17_messages/Scenario.h"
 #include "17_messages/ScenarioTableSync.h"
+#include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -102,21 +104,21 @@ namespace synthese
 			addTableColumn (COL_PERIODEND, "TIMESTAMP", true);
 		}
 
-		void ScenarioTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ScenarioTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
 			{
-				Scenario* scenario;
+				shared_ptr<Scenario> scenario;
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 				if (MessagesModule::getScenarii().contains (id))
 				{
-					scenario = MessagesModule::getScenarii().get(id);
-					load(scenario, rows, rowIndex);
+					scenario = MessagesModule::getScenarii().getUpdateable(id);
+					load(scenario.get(), rows, rowIndex);
 				}
 				else
 				{
-					scenario = new Scenario;
-					load(scenario, rows, rowIndex);
+					scenario.reset(new Scenario);
+					load(scenario.get(), rows, rowIndex);
 					MessagesModule::getScenarii().add (scenario);
 				}
 			}
@@ -127,8 +129,8 @@ namespace synthese
 			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
 			{
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-				Scenario* alarm = MessagesModule::getScenarii().get (id);
-				load(alarm, rows, rowIndex);
+				shared_ptr<Scenario> alarm = MessagesModule::getScenarii().getUpdateable(id);
+				load(alarm.get(), rows, rowIndex);
 			}
 		}
 
@@ -141,7 +143,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<Scenario*> ScenarioTableSync::search(
+		std::vector<shared_ptr<Scenario> > ScenarioTableSync::search(
 			bool isATemplate, const std::string name
 			, int first /*= 0*/, int number /*= 0*/ )
 		{
@@ -162,10 +164,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<Scenario*> objects;
+				vector<shared_ptr<Scenario> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					Scenario* object = MessagesModule::getScenarii().get(Conversion::ToLongLong(result.getColumn(i, TABLE_COL_ID)));
+					shared_ptr<Scenario> object(new Scenario);
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;
@@ -173,6 +176,18 @@ namespace synthese
 			catch(SQLiteException& e)
 			{
 				throw Exception(e.getMessage());
+			}
+		}
+
+		void ScenarioTableSync::saveWithAlarms( Scenario* object )
+		{
+			save(object);
+			const Scenario::AlarmsSet& alarms = object->getAlarms();
+			for (Scenario::AlarmsSet::const_iterator it = alarms.begin(); it != alarms.end(); ++it)
+			{
+				AlarmTableSync::save(*it);
+
+				/// @todo Saving of the broadcast list
 			}
 		}
 	}

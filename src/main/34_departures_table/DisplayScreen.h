@@ -86,7 +86,7 @@ namespace synthese
 		protected:
 			//! \name Localization
 			//@{
-				const BroadcastPoint*	_localization;		//!< Localization of the display screen (belongs to a place)
+			boost::shared_ptr<const BroadcastPoint>	_localization;		//!< Localization of the display screen (belongs to a place)
 				std::string				_localizationComment;
 			//@}
 
@@ -143,7 +143,6 @@ namespace synthese
 			//!	\name Constructors/Destructors
 			//@{
 				DisplayScreen();
-				~DisplayScreen(void);
 			//@}
 
 			//!	\name Setters
@@ -155,7 +154,7 @@ namespace synthese
 				void	setDirection(DeparturesTableDirection direction);
 				void	setFirstRow(int row);
 				void	setGenerationMethod(GenerationMethod method);
-				void	setLocalization(const BroadcastPoint*);
+				void	setLocalization(boost::shared_ptr<const BroadcastPoint>);
 				void	setLocalizationComment(const std::string&);
 				void	setMaintenanceChecksPerDay(int number);
 				void	setMaintenanceIsOnline(bool value);
@@ -179,16 +178,16 @@ namespace synthese
 				void	clearForbiddenPlaces();
 				void	clearForcedDestinations();
 				void	clearPhysicalStops();
-				void	copy(const DisplayScreen*);
-				void	removeDisplayedPlace(const env::ConnectionPlace*);
-				void	removeForbiddenPlace(const env::ConnectionPlace*);
-				void	removeForcedDestination(const env::ConnectionPlace*);
-				void	removePhysicalStop(const env::PhysicalStop*);
+				void	copy(boost::shared_ptr<const DisplayScreen>);
+				void	removeDisplayedPlace(boost::shared_ptr<const env::ConnectionPlace>);
+				void	removeForbiddenPlace(boost::shared_ptr<const env::ConnectionPlace>);
+				void	removeForcedDestination(boost::shared_ptr<const env::ConnectionPlace>);
+				void	removePhysicalStop(boost::shared_ptr<const env::PhysicalStop>);
 			//@}
 
 			//!	\name Getters
 			//@{
-				const BroadcastPoint*			getLocalization()				const;
+				boost::shared_ptr<const BroadcastPoint>	getLocalization()				const;
 				const std::string&				getLocalizationComment()		const;
 				const DisplayType*				getType()						const;				
 				int								getWiringCode()					const;
@@ -216,7 +215,7 @@ namespace synthese
 
 			//! \name Queries
 			//@{
-				ArrivalDepartureTableGenerator*	getGenerator(const time::DateTime& startTime)							const;
+				boost::shared_ptr<ArrivalDepartureTableGenerator>	getGenerator(const time::DateTime& startTime)		const;
 				void							display(std::ostream& stream, const time::DateTime& date)				const;
 				void							recordSupervision(const std::string&)	const;
 				std::string						getFullName()															const;

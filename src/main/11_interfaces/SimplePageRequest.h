@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_SimplePageRequest_H__
 #define SYNTHESE_SimplePageRequest_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "11_interfaces/RequestWithInterface.h"
 
 namespace synthese
@@ -45,7 +47,7 @@ namespace synthese
 
 			//! \name Request parameters
 			//@{
-			const interfaces::InterfacePage*	_page;
+			boost::shared_ptr<const interfaces::InterfacePage>	_page;
 			server::ParametersMap				_parameters;
 			//@}
 
@@ -68,9 +70,7 @@ namespace synthese
 			virtual bool _runBeforeDisplayIfNoSession(std::ostream& stream);
 
 		public:
-			SimplePageRequest();
-
-			void setPage(const interfaces::InterfacePage* page);
+			void setPage(const boost::shared_ptr<const interfaces::InterfacePage> page);
 		};
 	}
 }

@@ -30,14 +30,14 @@ namespace synthese
 	namespace server
 	{
 		/** Logout link Value Interface Element Class.
-			@ingroup m30
+			@ingroup m30Values refValues
 		*/
 		class LogoutHTMLLinkInterfaceElement : public interfaces::ValueInterfaceElement
 		{
-			interfaces::ValueInterfaceElement* _redirectionURL;
-			interfaces::ValueInterfaceElement* _page_key;
-			interfaces::ValueInterfaceElement* _content;
-			interfaces::ValueInterfaceElement* _icon;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _redirectionURL;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _page_key;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _content;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _icon;
 
 		public:
 			/** Parameters parser.
@@ -47,9 +47,11 @@ namespace synthese
 					-# Text to put in the link
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject = NULL, const server::Request* request = NULL) const;
-			LogoutHTMLLinkInterfaceElement();
-			~LogoutHTMLLinkInterfaceElement();
+			std::string getValue(
+				const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 		};
 	}
 }

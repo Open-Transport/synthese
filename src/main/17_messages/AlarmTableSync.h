@@ -72,7 +72,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on alarm update.
 			
@@ -90,7 +90,7 @@ namespace synthese
 
 		public:
 			/** The returned alarms must be deleted */
-			static std::vector<Alarm*> search(
+			static std::vector<boost::shared_ptr<Alarm> > search(
 				Scenario* scenario
 				, time::DateTime startDate, time::DateTime endDate
 				, int first = 0, int number = 0);

@@ -25,6 +25,7 @@
 #include "57_accounting/TransactionPartTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -117,12 +118,10 @@ namespace synthese
 			return _endDateTime;
 		}
 
-		TransactionPart* Transaction::getPart( const Account* account )
+		shared_ptr<TransactionPart> Transaction::getPart(shared_ptr<const Account> account ) const
 		{
-			vector<TransactionPart*> vtp = TransactionPartTableSync::search(this, account, 0, 1);
-			if (vtp.empty())
-				return NULL;
-			return vtp.front();
+			vector<shared_ptr<TransactionPart> > vtp = TransactionPartTableSync::search(shared_ptr<const Transaction>(this), account, 0, 1);
+			return vtp.empty() ? shared_ptr<TransactionPart>() : vtp.front();
 		}
 	}
 }

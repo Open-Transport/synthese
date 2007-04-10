@@ -211,14 +211,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="AdminInterfaceElement"
-			>
-		</Filter>
-		<Filter
-			Name="Rights"
-			>
-		</Filter>
-		<Filter
 			Name="Exceptions"
 			>
 			<File

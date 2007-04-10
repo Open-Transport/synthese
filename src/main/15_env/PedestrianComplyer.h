@@ -28,12 +28,12 @@ private:
 
     const PedestrianComplyer* _parent;
 
-    PedestrianCompliance* _pedestrianCompliance;
+    const PedestrianCompliance* _pedestrianCompliance;
 
 protected:
 
     PedestrianComplyer (const PedestrianComplyer* parent, 
-		  PedestrianCompliance* pedestrianCompliance = 0);
+		  const PedestrianCompliance* pedestrianCompliance = 0);
 
 public:
 
@@ -43,7 +43,7 @@ public:
     //! @name Getters/Setters
     //@{
     const PedestrianCompliance* getPedestrianCompliance () const;
-    void setPedestrianCompliance (PedestrianCompliance* pedestrianCompliance);
+    void setPedestrianCompliance (const PedestrianCompliance* pedestrianCompliance);
 	void	setParent(PedestrianComplyer* parent);
     //@}
 

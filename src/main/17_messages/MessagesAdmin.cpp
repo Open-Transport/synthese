@@ -53,7 +53,7 @@
 #include "32_admin/AdminModule.h"
 #include "32_admin/AdminParametersException.h"
 
-
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -137,11 +137,11 @@ namespace synthese
 		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
+			searchRequest.getFunction()->setPage<MessagesAdmin>();
 
 			ActionFunctionRequest<NewMessageAction,AdminRequest> newMessageRequest(request);
-			newMessageRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
-			newMessageRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<MessagesAdmin>());
+			newMessageRequest.getFunction()->setPage<MessageAdmin>();
+			newMessageRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
 
 			ActionFunctionRequest<NewScenarioSendAction,AdminRequest> newScenarioRequest(request);
 			newScenarioRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
@@ -195,13 +195,13 @@ namespace synthese
 			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v1.push_back(make_pair(string(), string("Actions")));
-			ActionResultHTMLTable t1(v1, searchRequest.getHTMLForm(), "", true, newScenarioRequest.getHTMLForm("newscen"), string(), InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t1(v1, searchRequest.getHTMLForm(), _requestParameters, _resultParameters, newScenarioRequest.getHTMLForm("newscen"), string(), InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 			
 			stream << t1.open();
 
-			for (vector<Scenario*>::const_iterator it = _scenarioResult.begin(); it != _scenarioResult.end(); ++it)
+			for (vector<shared_ptr<Scenario> >::const_iterator it = _scenarioResult.begin(); it != _scenarioResult.end(); ++it)
 			{
-				Scenario* scenario = *it;
+				shared_ptr<Scenario> scenario = *it;
 				scenarioRequest.setObjectId(scenario->getKey());
 				stream << t1.row();
 				stream << t1.col() << scenario->getPeriodStart().toString();
@@ -227,13 +227,13 @@ namespace synthese
 			v.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
 			v.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v.push_back(make_pair(string(), string("Actions")));
-			ActionResultHTMLTable t(v, searchRequest.getHTMLForm(), "", true, newMessageRequest.getHTMLForm("newmess"), NewMessageAction::PARAMETER_IS_TEMPLATE, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, searchRequest.getHTMLForm(), _requestParameters, _resultParameters, newMessageRequest.getHTMLForm("newmess"), NewMessageAction::PARAMETER_IS_TEMPLATE, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 
-			for (vector<Alarm*>::const_iterator it= _result.begin(); it != _result.end(); ++it)
+			for (vector<shared_ptr<Alarm> >::const_iterator it= _result.begin(); it != _result.end(); ++it)
 			{
-				Alarm* alarm = *it;
+				shared_ptr<Alarm> alarm = *it;
 				alarmRequest.setObjectId(alarm->getKey());
 				stream << t.row(Conversion::ToString(alarm->getKey()));
 				stream << t.col();

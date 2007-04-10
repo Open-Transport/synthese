@@ -26,6 +26,10 @@
 
 #include "30_server/Types.h"
 
+/** @defgroup refFunctions Functions
+	@ingroup ref
+*/
+
 namespace synthese
 {
 	namespace server
@@ -83,7 +87,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			virtual void _copy(const Function* function) {}
+			virtual void _copy(boost::shared_ptr<const Function> function) {}
 
 			/** Function to display, defined by each subclass.
 			@param stream Stream to write the output on.

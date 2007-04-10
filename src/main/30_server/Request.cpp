@@ -67,22 +67,23 @@ namespace synthese
 		const std::string Request::PARAMETER_ERROR_LEVEL = "rel";
 		const uid Request::UID_WILL_BE_GENERATED_BY_THE_ACTION = -2;
 
-		Request::Request( const Request* request/*=NULL*/, Function* function, Action* action )
+		Request::Request( const Request* request/*=NULL*/
+			, shared_ptr<Function> function, shared_ptr<Action> action )
 			: _session(NULL)
 			, _actionException(false)
 			, _errorLevel(REQUEST_ERROR_NONE)
 			, _object_id(0)
 		{
-			if (action)
+			if (action.get())
 				_setAction(action);
-			if (function)
+			if (function.get())
 				_setFunction(function);
 			if (request)
 			{
 				_clientURL = request->_clientURL;
 				_session = request->_session;
 				if (_function.get())
-					_function->_copy(request->_function.get());
+					_function->_copy(request->_function);
 			}
 		}
 
@@ -180,9 +181,9 @@ namespace synthese
 			_function->_run(stream);
 		}
 
-		void Request::_setAction( Action* action )
+		void Request::_setAction(shared_ptr<Action> action )
 		{
-			_action.reset(action);
+			_action = action;
 			action->_request = this;
 		}
 
@@ -245,9 +246,9 @@ namespace synthese
 			return form;
 		}
 
-		const Action* Request::_getAction() const
+		shared_ptr<const Action> Request::_getAction() const
 		{
-			return _action.get();
+			return _action;
 		}
 
 
@@ -437,9 +438,9 @@ namespace synthese
 			_errorLevel = level;
 		}
 
-		void Request::_setFunction( Function* function )
+		void Request::_setFunction(shared_ptr<Function> function )
 		{
-			_function.reset(function);
+			_function = function;
 			function->_request = this;
 		}
 
@@ -448,14 +449,14 @@ namespace synthese
 			_clientURL = url;
 		}
 
-		Function* Request::_getFunction()
+		shared_ptr<Function> Request::_getFunction()
 		{
-			return _function.get();
+			return _function;
 		}
 
-		const Function* Request::_getFunction() const
+		shared_ptr<const Function> Request::_getFunction() const
 		{
-			return _function.get();
+			return _function;
 		}
 
 		void Request::deleteAction()

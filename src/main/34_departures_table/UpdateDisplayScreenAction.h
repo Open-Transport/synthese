@@ -62,8 +62,8 @@ namespace synthese
 			static const std::string PARAMETER_TITLE;
 
 		private:
-			DisplayScreen*								_screen;
-			BroadcastPoint*								_localization;
+			boost::shared_ptr<DisplayScreen>			_screen;
+			boost::shared_ptr<const BroadcastPoint>		_localization;
 			std::string									_localizationComment;
 			std::string									_title;
 			int											_wiringCode;
@@ -74,8 +74,8 @@ namespace synthese
 			DeparturesTableDirection					_direction;
 			EndFilter									_endFilter;
 			int											_maxDelay;
-			DisplayType*								_type;
-			std::map<const env::PhysicalStop*, bool>	_physicalStopServe;
+			boost::shared_ptr<const DisplayType>		_type;
+			std::map<boost::shared_ptr<const env::PhysicalStop>, bool>	_physicalStopServe;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -88,9 +88,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			UpdateDisplayScreenAction();
-			~UpdateDisplayScreenAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

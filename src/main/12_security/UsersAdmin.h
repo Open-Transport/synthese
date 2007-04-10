@@ -25,6 +25,10 @@
 
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
+#include "05_html/ActionResultHTMLTable.h"
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
@@ -84,24 +88,21 @@ namespace synthese
 		*/
 		class UsersAdmin: public admin::AdminInterfaceElement
 		{
-		private:
+		public:
 			static const std::string PARAM_SEARCH_PROFILE_ID;
 			static const std::string PARAM_SEARCH_NAME;
 			static const std::string PARAM_SEARCH_LOGIN;
-			static const std::string PARAM_SEARCH_FIRST;
-			static const std::string PARAM_SEARCH_NUMBER;
 
-			std::vector<User*> _users;
-			bool _nextButton;
-			std::string _searchLogin;
-			std::string _searchName;
-			uid _searchProfileId;
-			int _first;
-			int _number;
-
+		private:
+			std::vector<boost::shared_ptr<User> >			_users;
+			std::string										_searchLogin;
+			std::string										_searchName;
+			boost::shared_ptr<const Profile>				_searchProfile;
+			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
+			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
+			
 		public:
 			UsersAdmin();
-			~UsersAdmin();
 
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.

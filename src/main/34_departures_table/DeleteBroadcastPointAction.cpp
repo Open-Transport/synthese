@@ -28,6 +28,7 @@
 #include "34_departures_table/BroadcastPointTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -65,11 +66,6 @@ namespace synthese
 				throw ActionException("Specified broadcast point not found");
 			}
 		}
-
-		DeleteBroadcastPointAction::DeleteBroadcastPointAction()
-			: Action()
-			, _broadcastPoint(NULL)
-		{}
 
 		void DeleteBroadcastPointAction::run()
 		{

@@ -24,6 +24,8 @@
 #ifndef SYNTHESE_VinciCustomerAdminInterfaceElement_H__
 #define SYNTHESE_VinciCustomerAdminInterfaceElement_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
@@ -42,13 +44,12 @@ namespace synthese
 		*/
 		class VinciCustomerAdminInterfaceElement : public admin::AdminInterfaceElement
 		{
-			VinciContract* _contract;
-			security::User* _user;
+			boost::shared_ptr<VinciContract>	_contract;
+			boost::shared_ptr<security::User>	_user;
 
 		public:
 			VinciCustomerAdminInterfaceElement();
-			~VinciCustomerAdminInterfaceElement();
-
+			
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/

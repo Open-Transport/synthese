@@ -26,6 +26,8 @@
 
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
@@ -42,15 +44,14 @@ namespace synthese
 			static const std::string PARAM_SEARCH_NAME;
 			static const std::string PARAM_SEARCH_SURNAME;
 
-			std::vector<VinciContract*> _contracts;
+			std::vector<boost::shared_ptr<VinciContract> > _contracts;
 			std::string _searchName;
 			std::string _searchSurname;
 			bool _activeSearch;
 
 		public:
 			VinciCustomerSearchAdminInterfaceElement();
-			~VinciCustomerSearchAdminInterfaceElement();
-
+			
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/

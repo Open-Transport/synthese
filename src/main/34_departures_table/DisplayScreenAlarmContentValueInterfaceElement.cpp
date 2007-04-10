@@ -36,6 +36,7 @@
 #include "34_departures_table/DisplayScreen.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -43,21 +44,21 @@ namespace synthese
 	using namespace util;
 	using namespace messages;
 
-
-
-
 	namespace departurestable
 	{
 		const string DisplayScreenAlarmContentValueInterfaceElement::VALUE_BIG = "big";
 		const string DisplayScreenAlarmContentValueInterfaceElement::VALUE_SMALL = "small";
 
-		string DisplayScreenAlarmContentValueInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string DisplayScreenAlarmContentValueInterfaceElement::getValue(
+			const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object, const server::Request* request) const
 		{
-			const Alarm* alarm = ((const ArrivalDepartureListWithAlarm*) object)->alarm;
-			
-			if (alarm == NULL)
+			if (object == NULL)
 				return "";
 
+			const Alarm* alarm = ((const ArrivalDepartureListWithAlarm*) object)->alarm;
+			
 			if (_messageSize->getValue(parameters, variables, object, request) == VALUE_BIG)
 				return alarm->getLongMessage();
 
@@ -69,18 +70,6 @@ namespace synthese
 			if (vel.size() < 1)
 				throw InterfacePageException("The alarm text size must be specified");
 			_messageSize = vel.front();
-		}
-
-		DisplayScreenAlarmContentValueInterfaceElement::DisplayScreenAlarmContentValueInterfaceElement()
-			: ValueInterfaceElement()
-			, _messageSize(NULL)
-		{
-		
-		}
-
-		DisplayScreenAlarmContentValueInterfaceElement::~DisplayScreenAlarmContentValueInterfaceElement()
-		{
-			delete _messageSize;
 		}
 	}
 }

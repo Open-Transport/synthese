@@ -29,6 +29,7 @@
 #include "71_vinci_bike_rental/VinciRateTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -128,7 +129,7 @@ namespace synthese
 
 		void VinciRateTableSync::rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
-			const db::SQLiteResult& rows)
+			const db::SQLiteResult& rows, bool isFirstSync)
 		{
 
 		}
@@ -148,7 +149,7 @@ namespace synthese
 
 		}
 
-		std::vector<VinciRate*> VinciRateTableSync::search(
+		std::vector<shared_ptr<VinciRate> > VinciRateTableSync::search(
 				 int first, int number)
 		{
 			const db::SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
@@ -159,10 +160,10 @@ namespace synthese
 				;
 
 			SQLiteResult result = sqlite->execQuery(query.str());
-			vector<VinciRate*> rates;
+			vector<shared_ptr<VinciRate> > rates;
 			for (int i=0; i<result.getNbRows(); ++i)
 			{
-				VinciRate* rate = new VinciRate;
+				shared_ptr<VinciRate> rate(new VinciRate);
 				try
 				{
 					load(rate, result, i);

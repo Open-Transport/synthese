@@ -27,10 +27,12 @@
 #include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace dblog;
+	using namespace security;
     
 	namespace departurestable
 	{
@@ -51,16 +53,16 @@ namespace synthese
 			return v;
 		}
 
-		void DisplayMaintenanceLog::addControlEntry( const DisplayScreen* screen, const DBLogEntry::Level& level, const std::string& text )
+		void DisplayMaintenanceLog::addControlEntry( boost::shared_ptr<const DisplayScreen> screen, const DBLogEntry::Level& level, const std::string& text )
 		{
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(screen->getKey()));
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_DATA_CONTROL));
 			c.push_back(text);
-			DBLog::_addEntry(level, c, NULL);
+			DBLog::_addEntry(level, c, boost::shared_ptr<const User>());
 		}
 
-		void DisplayMaintenanceLog::addAdminEntry( const DisplayScreen* screen, const DBLogEntry::Level& level, const security::User* user, const std::string& field, const std::string& oldValue, const std::string& newValue )
+		void DisplayMaintenanceLog::addAdminEntry(boost::shared_ptr<const DisplayScreen> screen, const DBLogEntry::Level& level, boost::shared_ptr<const security::User> user, const std::string& field, const std::string& oldValue, const std::string& newValue )
 		{
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(screen->getKey()));
@@ -69,22 +71,22 @@ namespace synthese
 			DBLog::_addEntry(DBLogEntry::DB_LOG_INFO, c, user);
 		}
 
-		void DisplayMaintenanceLog::addStatusEntry( const DisplayScreen* screen, bool status )
+		void DisplayMaintenanceLog::addStatusEntry( boost::shared_ptr<const DisplayScreen> screen, bool status )
 		{
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(screen->getKey()));
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_STATUS));
 			c.push_back(Conversion::ToString(status));
-			DBLog::_addEntry(status ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_ERROR, c, NULL);
+			DBLog::_addEntry(status ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_ERROR, c, boost::shared_ptr<const User>());
 		}
 
-		void DisplayMaintenanceLog::addDataControlEntry( const DisplayScreen* screen, bool ok, const std::string& text )
+		void DisplayMaintenanceLog::addDataControlEntry( boost::shared_ptr<const DisplayScreen> screen, bool ok, const std::string& text )
 		{
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(screen->getKey()));
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_DATA_CONTROL));
 			c.push_back(text);
-			DBLog::_addEntry(ok ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_WARNING, c, NULL);
+			DBLog::_addEntry(ok ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_WARNING, c, boost::shared_ptr<const User>());
 		}
 
 		DBLog::ColumnsVector DisplayMaintenanceLog::parse( const DBLogEntry::Content& cols ) const
@@ -94,7 +96,7 @@ namespace synthese
 			// Screen
 			try
 			{
-				DisplayScreen* screen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(cols.front()));
+				shared_ptr<const DisplayScreen> screen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(cols.front()));
 				v.push_back(screen->getFullName());
 			}
 			catch (...)

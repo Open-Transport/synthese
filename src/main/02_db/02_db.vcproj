@@ -159,10 +159,6 @@
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\DBEmptyResultException.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\DBEmptyResultException.h"
 				>
 			</File>

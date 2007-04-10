@@ -29,6 +29,7 @@
 #include "30_server/RequestException.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -39,10 +40,6 @@ namespace synthese
 	{
 		const std::string RedirRequest::PARAMETER_URL = "url";
 		
-		RedirRequest::RedirRequest()
-			: RequestWithInterface()
-		{}
-
 		ParametersMap RedirRequest::_getParametersMap() const
 		{
 			ParametersMap map(RequestWithInterface::_getParametersMap());
@@ -66,7 +63,7 @@ namespace synthese
 		{
 			try
 			{
-				const RedirectInterfacePage* page = _interface->getPage<RedirectInterfacePage>();
+				shared_ptr<const RedirectInterfacePage> page = _interface->getPage<RedirectInterfacePage>();
 				VariablesMap vm;
 				page->display(stream, vm, _url, _request);
 			}
@@ -74,10 +71,6 @@ namespace synthese
 			{
 				
 			}
-		}
-
-		RedirRequest::~RedirRequest()
-		{
 		}
 
 		void RedirRequest::setRedirURL( const std::string& url )

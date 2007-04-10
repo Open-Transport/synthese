@@ -34,6 +34,7 @@
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -91,7 +92,7 @@ namespace synthese
 			addTableColumn(COL_PASSPORT, "TEXT", true);
 		}
 
-		void VinciContractTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciContractTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 
 		}
@@ -106,7 +107,7 @@ namespace synthese
 
 		}
 
-		std::vector<VinciContract*> VinciContractTableSync::search(std::string name /*= ""*/, std::string surname /*= "" */, int first /*= 0*/, int number /*=-1*/ )
+		std::vector<shared_ptr<VinciContract> > VinciContractTableSync::search(std::string name /*= ""*/, std::string surname /*= "" */, int first /*= 0*/, int number /*=-1*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -120,12 +121,12 @@ namespace synthese
 					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '%" << Conversion::ToSQLiteString(surname, false) << "%'"
 				<< " LIMIT " << number << " OFFSET " << first;
 			SQLiteResult result = sqlite->execQuery(query.str());
-			vector<VinciContract*> contracts;
+			vector<shared_ptr<VinciContract> > contracts;
 			for (int i=0; i<result.getNbRows(); ++i)
 			{
 				try
 				{
-					VinciContract* contract = new VinciContract;
+					shared_ptr<VinciContract> contract(new VinciContract);
 					SQLiteTableSyncTemplate<VinciContract>::load(contract, result, i);
 					contract->getUser();
 					contracts.push_back(contract);

@@ -40,9 +40,13 @@ namespace synthese
 
 	namespace env
 	{
-		string LineImageURLInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string LineImageURLInterfaceElement::getValue(
+			const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object
+			, const server::Request* request) const
 		{
-			return (object != NULL) ? ((Line*) object)->getCommercialLine()->getImage() : "";
+			return (object != NULL) ? ((const Line*) object)->getCommercialLine()->getImage() : "";
 		}
 
 		void LineImageURLInterfaceElement::storeParameters(ValueElementList& vel)

@@ -38,6 +38,7 @@
 #include "32_admin/AdminParametersException.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -53,34 +54,32 @@ namespace synthese
 
 		ProfileAdmin::ProfileAdmin()
 			: AdminInterfaceElement("profiles", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
-			, _profile(NULL), _profileError(false)
+			, _profileError(false)
 		{
 
 		}
 
 		std::string ProfileAdmin::getTitle() const
 		{
-			return (_profile != NULL)
-				? _profile->getName()
-				: "";
+			return _profile.get() ? _profile->getName()	: string();
 		}
 
 		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			ActionFunctionRequest<UpdateProfileAction, AdminRequest> updateRequest(request);
-			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			updateRequest.getFunction()->setPage<ProfileAdmin>();
 			updateRequest.setObjectId(_profile->getKey());
 
 			ActionFunctionRequest<UpdateRightAction, AdminRequest> updateRightRequest(request);
-			updateRightRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			updateRightRequest.getFunction()->setPage<ProfileAdmin>();
 			updateRightRequest.setObjectId(_profile->getKey());
 			
 			ActionFunctionRequest<DeleteRightAction,AdminRequest> deleteRightRequest(request);
-			deleteRightRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			deleteRightRequest.getFunction()->setPage<ProfileAdmin>();
 			deleteRightRequest.setObjectId(_profile->getKey());
 			
 			ActionFunctionRequest<AddRightAction,AdminRequest> addRightRequest(request);
-			addRightRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			addRightRequest.getFunction()->setPage<ProfileAdmin>();
 			addRightRequest.setObjectId(_profile->getKey());
 			
 			vector<pair<int, string> > privatePublicMap;
@@ -124,7 +123,7 @@ namespace synthese
 				// Habilitations list
 				for (Profile::RightsVector::const_iterator it = _profile->getRights().begin(); it != _profile->getRights().end(); ++it)
 				{
-					Right* right = it->second;
+					shared_ptr<const Right> right = it->second;
 					stream << t.row();
 					stream << t.col() << right->getFactoryKey();
 					stream << t.col() << right->displayParameter();
@@ -193,11 +192,6 @@ namespace synthese
 			{
 				throw AdminParametersException("Bad profile");
 			}
-		}
-
-		ProfileAdmin::~ProfileAdmin()
-		{
-			delete _profile;
 		}
 
 		bool ProfileAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const

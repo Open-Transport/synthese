@@ -42,15 +42,16 @@ namespace synthese
 			static const std::string TYPE_IDENTICAL;
 
 		private:
-			interfaces::ValueInterfaceElement* _numberVIE;
-			interfaces::ValueInterfaceElement* _formatVIE;
-			interfaces::ValueInterfaceElement* _numberToAdd;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _numberVIE;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _formatVIE;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _numberToAdd;
 
 		public:
-			FormattedNumberInterfaceElement();
-			~FormattedNumberInterfaceElement();
-
-			std::string	getValue( const ParametersVector&, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL ) const;
+			std::string	getValue(
+				const ParametersVector&
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL ) const;
 			void storeParameters(ValueElementList& vel);
 		};
 

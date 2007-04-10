@@ -40,7 +40,7 @@ namespace synthese
 			static const std::string PARAMETER_VALUE;
 
 		private:
-			DisplayScreen*	_screen;
+			boost::shared_ptr<DisplayScreen>	_screen;
 			bool			_value;
 
 		protected:
@@ -55,10 +55,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			UpdateAllStopsDisplayScreenAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

@@ -59,9 +59,9 @@ namespace synthese
 			SecurityLog();
 			DBLog::ColumnsVector getColumnNames() const;
 			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
-			void addUserLogin(const User* user);
-			void addUserAdmin(const User* user, const User* subject, const std::string& text);
-			void addProfileAdmin(const User* user, const Profile* subject, const std::string& text);
+			void addUserLogin(boost::shared_ptr<const User> user);
+			void addUserAdmin(boost::shared_ptr<const User> user, boost::shared_ptr<const User> subject, const std::string& text);
+			void addProfileAdmin(boost::shared_ptr<const User> user, boost::shared_ptr<const Profile> subject, const std::string& text);
 		};
 	}
 }

@@ -36,7 +36,7 @@ namespace synthese
 		{
 			vector<pair<int, std::string> > m;
 			if (withAll)
-				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
+				m.push_back(make_pair((int) DBLogEntry::DB_LOG_UNKNOWN, "(tous)"));
 			m.push_back(make_pair((int) DBLogEntry::DB_LOG_INFO, getEntryLevelLabel(DBLogEntry::DB_LOG_INFO)));
 			m.push_back(make_pair((int) DBLogEntry::DB_LOG_WARNING, getEntryLevelLabel(DBLogEntry::DB_LOG_WARNING)));
 			m.push_back(make_pair((int) DBLogEntry::DB_LOG_ERROR, getEntryLevelLabel(DBLogEntry::DB_LOG_ERROR)));
@@ -47,6 +47,7 @@ namespace synthese
 		{
 			switch (level)
 			{
+			case DBLogEntry::DB_LOG_UNKNOWN : return "(inconnu)";
 			case DBLogEntry::DB_LOG_INFO : return "Information";
 			case DBLogEntry::DB_LOG_WARNING : return "Alerte";
 			case DBLogEntry::DB_LOG_ERROR : return "Erreur";

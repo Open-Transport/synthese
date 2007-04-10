@@ -40,10 +40,15 @@ namespace synthese
 		class ParameterValueInterfaceElement : public ValueInterfaceElement
 		{
 		private:
-			ValueInterfaceElement* _rank;
+			boost::shared_ptr<ValueInterfaceElement> _rank;
 
 		public:
-			std::string getValue( const ParametersVector&, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL ) const;
+			std::string getValue(
+				const ParametersVector&
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL
+				) const;
 			void storeParameters(ValueElementList& vel);
 		};
 	}

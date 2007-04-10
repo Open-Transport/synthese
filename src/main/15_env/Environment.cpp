@@ -262,9 +262,9 @@ Environment::fetchPlace (const uid& id) const
 const AddressablePlace* 
 Environment::fetchAddressablePlace (const uid& id) const
 {
-    if (_connectionPlaces.contains (id)) return _connectionPlaces.get (id);
-    if (_publicPlaces.contains (id)) return _publicPlaces.get (id);
-    if (_roads.contains (id)) return _roads.get (id);
+    if (_connectionPlaces.contains (id)) return _connectionPlaces.get (id).get();
+    if (_publicPlaces.contains (id)) return _publicPlaces.get (id).get();
+    if (_roads.contains (id)) return _roads.get (id).get();
 
     return 0;
 }
@@ -275,8 +275,8 @@ Environment::fetchAddressablePlace (const uid& id) const
 const IncludingPlace* 
 Environment::fetchIncludingPlace (const uid& id) const
 {
-    if (_placeAliases.contains (id)) return _placeAliases.get (id);
-    if (_cities.contains (id)) return _cities.get (id);
+    if (_placeAliases.contains (id)) return _placeAliases.get (id).get();
+    if (_cities.contains (id)) return _cities.get (id).get();
 
     return 0;
 }
@@ -290,8 +290,8 @@ Environment::fetchIncludingPlace (const uid& id) const
 const Vertex* 
 Environment::fetchVertex (const uid& id) const
 {
-	if (EnvModule::getPhysicalStops().contains (id)) return EnvModule::getPhysicalStops().get (id);
-    if (_addresses.contains (id)) return _addresses.get (id);
+	if (EnvModule::getPhysicalStops().contains (id)) return EnvModule::getPhysicalStops().get (id).get();
+    if (_addresses.contains (id)) return _addresses.get (id).get();
     return 0;
 }
 
@@ -300,8 +300,8 @@ Environment::fetchVertex (const uid& id) const
 Vertex* 
 Environment::fetchVertex (const uid& id)
 {
-    if (EnvModule::getPhysicalStops().contains (id)) return EnvModule::getPhysicalStops().get (id);
-    if (_addresses.contains (id)) return _addresses.get (id);
+    if (EnvModule::getPhysicalStops().contains (id)) return EnvModule::getPhysicalStops().getUpdateable (id).get();
+    if (_addresses.contains (id)) return _addresses.getUpdateable(id).get();
     return 0;
 }
 
@@ -319,7 +319,7 @@ Environment::CityList Environment::guessCity (const std::string& fuzzyName, int 
 	 it != matches.end (); ++it)
     {
 	uid id = it->value;
-	result.push_back (getCities ().get (id));
+	result.push_back (getCities ().get (id).get());
     }
     return result;
 }

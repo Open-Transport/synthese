@@ -33,6 +33,7 @@ namespace synthese
 
 		/** Admin template page.
 		@code admin @endcode
+			@ingroup m32Pages refPages
 		*/
 		class AdminInterfacePage : public interfaces::InterfacePage
 		{
@@ -45,7 +46,7 @@ namespace synthese
 			@param site Displayed site
 			*/
 			void display( std::ostream& stream
-				, const AdminInterfaceElement* page
+				, const boost::shared_ptr<const AdminInterfaceElement>* page
 				, const uid objectId
 				, const server::Request* request = NULL ) const;
 

@@ -58,7 +58,7 @@ namespace synthese
 		void 
 		ComponentTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 					synthese::db::SQLiteSync* sync,
-					const synthese::db::SQLiteResult& rows)
+					const synthese::db::SQLiteResult& rows, bool isFirstSync)
 		{
 			// Look in environment link tables for each row id
 			for (int i=0; i<rows.getNbRows (); ++i)
@@ -70,7 +70,7 @@ namespace synthese
 				int envId = Conversion::ToInt (*it);
 				if (EnvModule::getEnvironments().contains (envId))
 				{
-					doAdd (rows, i, * EnvModule::getEnvironments().get (envId));
+					doAdd (rows, i, * EnvModule::getEnvironments().getUpdateable (envId).get());
 				}
 			}
 			}
@@ -93,7 +93,7 @@ namespace synthese
 					int envId = Conversion::ToInt (*it);
 					if (EnvModule::getEnvironments().contains (envId))
 					{
-						doReplace (rows, i, *EnvModule::getEnvironments().get (envId));
+						doReplace (rows, i, *EnvModule::getEnvironments().getUpdateable(envId).get());
 					}
 				}
 			}
@@ -115,7 +115,7 @@ namespace synthese
 				int envId = Conversion::ToInt (*it);
 				if (EnvModule::getEnvironments().contains (envId))
 				{
-					doRemove (rows, i, *EnvModule::getEnvironments().get (envId));
+					doRemove (rows, i, *EnvModule::getEnvironments().getUpdateable(envId).get());
 				}
 			}
 			}

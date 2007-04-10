@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_RoutePlannerFunction_H__
 #define SYNTHESE_RoutePlannerFunction_H__
 
-#include "30_server/Function.h"
+#include "11_interfaces/RequestWithInterface.h"
 
 namespace synthese
 {
@@ -32,14 +32,15 @@ namespace synthese
 		/** RoutePlannerFunction class.
 			@ingroup m33
 		*/
-		class RoutePlannerFunction : public server::Function
+		class RoutePlannerFunction : public interfaces::RequestWithInterface
 		{
 			static const std::string PARAMETER_SITE;
+			static const std::string PARAMETER_PAGE;
 			
 			//! \name Parameters
 			//@{
-				Site*			_site;
-				InterfacePage*	_page;
+//				Site*			_site;
+				boost::shared_ptr<const InterfacePage>	_page;
 			//@}
 
 
@@ -54,9 +55,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			RoutePlannerFunction();
-			~RoutePlannerFunction();
-
 			/// @todo Getters/Setters for parsed parameters
 
 			/** Action to run, defined by each subclass.

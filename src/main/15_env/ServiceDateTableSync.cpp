@@ -36,6 +36,7 @@
 #include "15_env/EnvModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -53,7 +54,7 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<ServiceDate>::load(ServiceDate* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
 			object->key = Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID));
-			object->service = EnvModule::fetchService(Conversion::ToLongLong(rows.getColumn(rowId, ServiceDateTableSync::COL_SERVICEID)));
+			object->service = EnvModule::fetchService(Conversion::ToLongLong(rows.getColumn(rowId, ServiceDateTableSync::COL_SERVICEID))).get();
 			object->date = Date::FromSQLDate(rows.getColumn(rowId, ServiceDateTableSync::COL_DATE));
 		}
 
@@ -88,7 +89,7 @@ namespace synthese
 			addTableColumn (COL_DATE , "DATE", false);
 		}
 
-		void ServiceDateTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ServiceDateTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -114,7 +115,7 @@ namespace synthese
 			// Get the corresponding calendar
 			uid serviceId = Conversion::ToLongLong (rows.getColumn (rowIndex, COL_SERVICEID));
 
-			Service* service = EnvModule::fetchService (serviceId);
+			shared_ptr<Service> service = EnvModule::fetchService (serviceId);
 			assert (service != 0);
 
 			// Mark the date in service calendar

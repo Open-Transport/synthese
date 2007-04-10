@@ -36,16 +36,20 @@ namespace synthese
 	namespace env
 	{
 		/** LineImageURLInterfaceElement class.
-			@ingroup m15
+			@ingroup m15Values refValues
 		*/
 		class LineImageURLInterfaceElement : public interfaces::ValueInterfaceElement
 		{
 		private:
 			// Attributes
-			// interfaces::ValueInterfaceElement* _xxx;
+			// boost::shared_ptr<interfaces::ValueInterfaceElement> _xxx;
 
 		public:
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string getValue(
+				const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 
 			/** Parser.
 			@param text Optional parameter

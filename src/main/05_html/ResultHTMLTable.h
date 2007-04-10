@@ -24,6 +24,9 @@
 #define SYNTHESE_ResultHTMLTable_h__
 
 #include <utility>
+#include <vector>
+
+#include <boost/shared_ptr.hpp>
 
 #include "05_html/HTMLTable.h"
 #include "05_html/HTMLForm.h"
@@ -37,12 +40,40 @@ namespace synthese
 		*/
 		class ResultHTMLTable : public HTMLTable
 		{
-		protected:
-			HTMLForm	_searchForm;
+		private:
+			static const std::string _PARAMETER_FIRST;
+			static const std::string _PARAMETER_ORDER_FIELD;
+			static const std::string _PARAMETER_RAISING_ORDER;
+			static const std::string _PARAMETER_MAX_SIZE;
 
+			const int			_maxSize;
+			const int			_first;
+			const std::string	_orderField;
+			const bool			_raisingOrder;
+			const bool			_next;
+			const int			_size;
+			
 		public:
 			typedef std::vector<std::pair<std::string, std::string> > HeaderVector;
 
+			struct RequestParameters
+			{
+				int					maxSize;
+				int					first;
+				std::string			orderField;
+				bool				raisingOrder;
+			};
+
+			struct ResultParameters
+			{
+				bool				next;
+				int					size;
+			};
+
+		protected:
+			HTMLForm		_searchForm;
+			
+		public:
 			/** Constructor.
 				@param header : vector of pairs field code / col caption. If field code is non empty then the searchRequest can be reloaded with an ordering by the column.
 				@param searchRequest The request to use to fill a similar table with other parameters
@@ -51,11 +82,29 @@ namespace synthese
 			*/
 			ResultHTMLTable(const HeaderVector& header
 				, const HTMLForm& searchForm
-				, std::string currentOrderField
-				, bool RaisingOrder
+				, const RequestParameters& requestParameters
+				, const ResultParameters& resultParameters
 				, std::string iconPath="");
 
+			virtual std::string close();
+
+			static RequestParameters getParameters(const std::map<std::string, std::string>& map, const std::string& defaultOrderField, int defaultMaxSize);
+			
+			template <class T>
+			static ResultParameters getParameters(const RequestParameters& requestParameters, std::vector<boost::shared_ptr<T> >& result);
+			
 		};
+
+		template <class T>
+		ResultHTMLTable::ResultParameters ResultHTMLTable::getParameters( const RequestParameters& requestParameters, std::vector<boost::shared_ptr<T> >& result )
+		{
+			ResultParameters p;
+			p.next = result.size() > requestParameters.maxSize;
+			if (p.next)
+				result.pop_back();
+			p.size = result.size();
+			return p;
+		}
 	}
 }
 

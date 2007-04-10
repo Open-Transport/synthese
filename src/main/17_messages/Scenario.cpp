@@ -23,6 +23,8 @@
 #include "17_messages/Scenario.h"
 #include "17_messages/Alarm.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace util;
@@ -100,30 +102,24 @@ namespace synthese
 			return _isEnabled;
 		}
 
-		Scenario* Scenario::createCopy() const
+		shared_ptr<Scenario> Scenario::createCopy() const
 		{
-			Scenario* scenario = new Scenario;
+			shared_ptr<Scenario> scenario(new Scenario);
 			scenario->setIsATemplate(false);
 			scenario->setName(getName());
 			
 			for (AlarmsSet::const_iterator it = getAlarms().begin(); it != getAlarms().end(); ++it)
-				scenario->addAlarm((*it)->createCopy(scenario));
+				scenario->addAlarm((*it)->createCopy(scenario.get()).get());
 
 			return scenario;
 		}
 
-		Scenario::~Scenario()
-		{
-			for (AlarmsSet::const_iterator it = getAlarms().begin(); it != getAlarms().end(); ++it)
-				delete *it;
-		}
-
-		void Scenario::addAlarm( Alarm* alarm )
+		void Scenario::addAlarm(Alarm* alarm )
 		{
 			_alarms.insert(alarm);
 		}
 
-		void Scenario::removeAlarm( Alarm* alarm )
+		void Scenario::removeAlarm(Alarm* alarm )
 		{
 			AlarmsSet::iterator it = _alarms.find(alarm);
 			if (it != _alarms.end())

@@ -50,7 +50,6 @@ namespace synthese
 			static const std::string COL_LEVEL;
 
 			TextTemplateTableSync();
-			~TextTemplateTableSync();
 
 
 			/** TextTemplate search.
@@ -61,7 +60,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<TextTemplate*> search(
+			static std::vector<boost::shared_ptr<TextTemplate> > search(
 				AlarmLevel level, std::string name=""
 				, int first = 0, int number = -1);
 
@@ -73,7 +72,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on TextTemplate creation.
 				This method updates the corresponding object in ram.

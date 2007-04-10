@@ -69,7 +69,10 @@ namespace synthese
 			}
 		}
 
-		string HtmlFormInterfaceElement::getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string HtmlFormInterfaceElement::getValue(
+			const interfaces::ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			stringstream stream;
 			try
@@ -119,15 +122,6 @@ namespace synthese
 				return "";
 			}
 
-		}
-
-		HtmlFormInterfaceElement::~HtmlFormInterfaceElement()
-		{
-			delete _name;
-			delete _function_parameters;
-			delete _function_key;
-			delete _action_key;
-			delete _action_parameters;
 		}
 	}
 }

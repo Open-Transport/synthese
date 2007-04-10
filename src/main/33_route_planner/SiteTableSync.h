@@ -58,7 +58,7 @@ namespace synthese
 
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,

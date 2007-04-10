@@ -13,7 +13,7 @@
 #include <assert.h>
 
 
-
+using namespace boost;
 using synthese::util::Conversion;
 
 namespace synthese
@@ -69,8 +69,8 @@ RoadChunkTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
 
     typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
-    const Address* fromAddress = environment.getAddresses ().get (fromAddressId);
-    RoadChunk* rc = new synthese::env::RoadChunk (id, fromAddress, isDeparture, isArrival, rankInRoad);
+    shared_ptr<const Address> fromAddress = environment.getAddresses ().get (fromAddressId);
+    shared_ptr<RoadChunk> rc(new RoadChunk (id, fromAddress.get(), isDeparture, isArrival, rankInRoad));
 
     boost::char_separator<char> sep1 (",");
     boost::char_separator<char> sep2 (":");
@@ -78,15 +78,15 @@ RoadChunkTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     for (tokenizer::iterator viaPointIter = viaPointsTokens.begin();
 	 viaPointIter != viaPointsTokens.end (); ++viaPointIter)
     {
-	tokenizer valueTokens (*viaPointIter, sep2);
-	tokenizer::iterator valueIter = valueTokens.begin();
+		tokenizer valueTokens (*viaPointIter, sep2);
+		tokenizer::iterator valueIter = valueTokens.begin();
 
-	// X:Y
-	rc->addViaPoint (synthese::env::Point (Conversion::ToDouble (*valueIter), 
-					       Conversion::ToDouble (*(++valueIter))));
+		// X:Y
+		rc->addViaPoint (synthese::env::Point (Conversion::ToDouble (*valueIter), 
+							   Conversion::ToDouble (*(++valueIter))));
     }
     
-    environment.getRoads ().get (fromAddress->getRoad ()->getId ())->addEdge (rc);
+    environment.getRoads ().getUpdateable(fromAddress->getRoad ()->getId ())->addEdge (rc.get());
     environment.getRoadChunks ().add (rc);
 }
 
@@ -100,7 +100,7 @@ RoadChunkTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIn
 			  synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-    synthese::env::RoadChunk* rc = environment.getRoadChunks ().get (id);
+    shared_ptr<RoadChunk> rc = environment.getRoadChunks ().getUpdateable (id);
 
     std::string viaPointsStr (
 	rows.getColumn (rowIndex, ROADCHUNKS_TABLE_COL_VIAPOINTS));
@@ -115,12 +115,12 @@ RoadChunkTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIn
     for (tokenizer::iterator viaPointIter = viaPointsTokens.begin();
 	 viaPointIter != viaPointsTokens.end (); ++viaPointIter)
     {
-	tokenizer valueTokens (*viaPointIter, sep2);
-	tokenizer::iterator valueIter = valueTokens.begin();
+		tokenizer valueTokens (*viaPointIter, sep2);
+		tokenizer::iterator valueIter = valueTokens.begin();
 
-	// X:Y
-	rc->addViaPoint (synthese::env::Point (Conversion::ToDouble (*valueIter), 
-					       Conversion::ToDouble (*(++valueIter))));
+		// X:Y
+		rc->addViaPoint (synthese::env::Point (Conversion::ToDouble (*valueIter), 
+							   Conversion::ToDouble (*(++valueIter))));
     }
 
 }

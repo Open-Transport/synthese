@@ -27,6 +27,8 @@
 #include <string>
 #include <iostream>
 
+#include <boost/shared_ptr.hpp>
+
 #include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
@@ -53,7 +55,6 @@ namespace synthese
 			static const std::string TABLE_COL_RIGHT_CURRENCY_ID;
 
 			AccountTableSync();
-			~AccountTableSync ();
 
 			/** Account search.
 				@param sqlite SQLite thread
@@ -63,7 +64,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<Account*> search(
+			static std::vector<boost::shared_ptr<Account> > search(
 				uid rightUserId, const std::string& rightClassNumber, uid leftUserId, const std::string& leftClassNumber
 				, const std::string name=""
 				, int first = 0, int number = 0);
@@ -76,7 +77,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on user creation.
 			Updates the users objects in the opened sessions.

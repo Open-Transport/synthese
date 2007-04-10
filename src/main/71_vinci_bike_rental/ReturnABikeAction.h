@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_ReturnABikeAction_H__
 #define SYNTHESE_ReturnABikeAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -43,7 +45,7 @@ namespace synthese
 			static const std::string PARAMETER_TRANSACTION_PART_ID;
 
 		private:
-			accounts::TransactionPart*	_transactionPart;
+			boost::shared_ptr<accounts::TransactionPart>	_transactionPart;
 			
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -57,11 +59,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			ReturnABikeAction();
-			~ReturnABikeAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

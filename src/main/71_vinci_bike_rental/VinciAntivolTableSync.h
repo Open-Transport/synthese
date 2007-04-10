@@ -23,10 +23,11 @@
 #ifndef SYNTHESE_VinciAntivolTableSync_H__
 #define SYNTHESE_VinciAntivolTableSync_H__
 
-
 #include <vector>
 #include <string>
 #include <iostream>
+
+#include <boost/shared_ptr.hpp>
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
@@ -45,7 +46,6 @@ namespace synthese
 			static const std::string COL_MARKED_NUMBER;
 			
 			VinciAntivolTableSync();
-			~VinciAntivolTableSync();
 
 
 			/** VinciAntivol search.
@@ -56,7 +56,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<VinciAntivol*> search(
+			static std::vector<boost::shared_ptr<VinciAntivol> > search(
 				std::string markedNumber = ""
 				, int first = 0, int number = 0);
 
@@ -68,7 +68,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on VinciAntivol creation.
 				This method updates the corresponding object in ram.

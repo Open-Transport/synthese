@@ -80,7 +80,7 @@ namespace synthese
 				const DisplayMode getDisplayMode() const;
 			//@}
 
-			std::string getHTMLLink(const server::FunctionRequest<admin::AdminRequest>* request) const;
+//			std::string getHTMLLink(const server::FunctionRequest<admin::AdminRequest>* request) const;
 
 			//! \name Virtual initialization method
 			//@{

@@ -54,7 +54,7 @@ namespace synthese
 		{
 			try
 			{
-				_user.reset(UserTableSync::get(_request->getObjectId()));
+				_user = UserTableSync::get(_request->getObjectId());
 
 				ParametersMap::const_iterator it;
 
@@ -67,7 +67,7 @@ namespace synthese
 				if (it == map.end() || it->second != _password)
 					throw ActionException("Les mots de passe entrés ne sont pas identiques");
 			}
-			catch (DBEmptyResultException e)
+			catch (DBEmptyResultException<User>)
 			{
 				throw ActionException("Utilisateur introuvable");
 			}

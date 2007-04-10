@@ -27,10 +27,9 @@
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteSync.h"
 
-#include "11_interfaces/Interface.h"
+#include "11_interfaces/InterfaceModule.h"
 #include "11_interfaces/InterfaceTableSync.h"
 #include "11_interfaces/InterfacePageTableSync.h"
-#include "11_interfaces/InterfaceModule.h"
 
 using namespace std;
 
@@ -40,7 +39,8 @@ namespace synthese
 
 	namespace interfaces
 	{
-		Interface::Registry	InterfaceModule::_interfaces;
+		Interface::Registry		InterfaceModule::_interfaces;
+		InterfacePage::Registry	InterfaceModule::_interfacePages;
 
 		void InterfaceModule::initialize()
 		{
@@ -66,6 +66,11 @@ namespace synthese
 			if (it == variables.end())
 				return "";
 			return it->second;
+		}
+
+		InterfacePage::Registry& InterfaceModule::getInterfacePages()
+		{
+			return _interfacePages;
 		}
 	}
 }

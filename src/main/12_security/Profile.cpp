@@ -27,6 +27,8 @@
 #include "12_security/Profile.h"
 #include "12_security/Right.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace util;
@@ -40,11 +42,6 @@ namespace synthese
 			, _parentId(0)
 		{
 
-		}
-
-		Profile::~Profile()
-		{
-			cleanRights();
 		}
 
 		void Profile::setName( const std::string& name )
@@ -61,8 +58,6 @@ namespace synthese
 
 		void Profile::cleanRights()
 		{
-			for (RightsVector::iterator it = _rights.begin(); it != _rights.end(); ++it)
-				delete it->second;
 			_rights.clear();
 		}
 
@@ -86,14 +81,19 @@ namespace synthese
 			RightsVector::iterator it = _rights.find(make_pair(key, parameter));
 			if (it == _rights.end())
 				throw Exception("Right not found");
-			delete it->second;
 			_rights.erase(it);
 		}
 
-		Right* Profile::getRight( const std::string key, const std::string parameter) const
+		shared_ptr<Right> Profile::getRight( const std::string key, const std::string parameter)
 		{
 			RightsVector::const_iterator it = _rights.find(make_pair(key, parameter));
-			return (it == _rights.end()) ? NULL : it->second;
+			return (it == _rights.end()) ? shared_ptr<Right>() : it->second;
+		}
+
+		shared_ptr<const Right> Profile::getRight( const std::string key, const std::string parameter) const
+		{
+			RightsVector::const_iterator it = _rights.find(make_pair(key, parameter));
+			return (it == _rights.end()) ? shared_ptr<Right>() : it->second;
 		}
 
 		const Profile::RightsVector& Profile::getRights() const
@@ -101,19 +101,19 @@ namespace synthese
 			return _rights;
 		}
 
-		void Profile::addRight( Right* right )
+		void Profile::addRight(shared_ptr<Right> right )
 		{
 			_rights.insert(make_pair(make_pair(right->getFactoryKey(), right->getParameter()), right));
 		}
 
-		bool Profile::isAuthorized( const Right* right ) const
+		bool Profile::isAuthorized(shared_ptr<const Right> right ) const
 		{
 			// 0 Default values : forbidden
 			bool privateAuthorization = false;
 			bool publicAuthorization = false;
 
 			// 1 Reading of the global right
-			Right* sright = getRight();
+			shared_ptr<const Right> sright = getRight();
 			if (sright != NULL)
 			{
 				privateAuthorization = (sright->getPrivateRightLevel() >= right->getPrivateRightLevel());

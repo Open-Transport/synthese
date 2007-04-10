@@ -27,6 +27,8 @@
 
 #include "30_server/RequestException.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace server;
@@ -34,11 +36,6 @@ namespace synthese
 	namespace interfaces
 	{
 		const std::string SimplePageRequest::PARAMETER_PAGE = "page";
-
-		SimplePageRequest::SimplePageRequest()
-			: RequestWithInterface()
-			, _page(NULL)
-		{}
 
 		void SimplePageRequest::_run( std::ostream& stream ) const
 		{
@@ -65,7 +62,7 @@ namespace synthese
 			if (it == _parameters.end() || it->second.empty())
 				return;
 
-			if (_interface == NULL)
+			if (!_interface.get())
 				throw RequestException("Interface was not defined");
 
 			// Drop registered pages
@@ -93,7 +90,7 @@ namespace synthese
 			return map;
 		}
 
-		void SimplePageRequest::setPage( const interfaces::InterfacePage* page )
+		void SimplePageRequest::setPage(shared_ptr<const InterfacePage> page )
 		{
 			_page = page;
 		}

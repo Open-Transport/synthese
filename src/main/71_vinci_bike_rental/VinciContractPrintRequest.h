@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_VinciContractPrintRequest_H__
 #define SYNTHESE_VinciContractPrintRequest_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "11_interfaces/RequestWithInterfaceAndRequiredSession.h"
 
 namespace synthese
@@ -42,7 +44,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				const VinciContract*	_contract;
+			boost::shared_ptr<const VinciContract>	_contract;
 			//@}
 
 
@@ -59,10 +61,7 @@ namespace synthese
 			void _run(std::ostream& stream) const;
 
 		public:
-			VinciContractPrintRequest();
-			~VinciContractPrintRequest();
-
-			void setContract(const VinciContract* contract);
+			void setContract(boost::shared_ptr<const VinciContract> contract);
 		};
 	}
 }

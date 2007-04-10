@@ -35,11 +35,13 @@
 
 #include "15_env/ContinuousService.h"
 #include "15_env/Path.h"
+#include "15_env/Line.h"
 #include "15_env/Point.h"
 #include "15_env/EnvModule.h"
 #include "15_env/ContinuousServiceTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -110,8 +112,8 @@ namespace synthese
 
 			uid pathId (Conversion::ToLongLong (rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_PATHID)));
 
-			Path* path = EnvModule::fetchPath (pathId);
-			assert (path != 0);
+			shared_ptr<Path> path = EnvModule::fetchPath (pathId);
+			assert (path.get());
 			assert (path->getEdges ().size () == arrivalSchedules.size ());
 
 			int range (Conversion::ToInt (
@@ -131,14 +133,14 @@ namespace synthese
 
 			cs->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
 			cs->setServiceNumber(serviceNumber);
-			cs->setPath(path);
+			cs->setPath(path.get());
 			cs->setDepartureSchedule(departureSchedules.at(0));
 			cs->setArrivalSchedule(arrivalSchedules.at(arrivalSchedules.size()-1));
 			cs->setRange(range);
 			cs->setMaxWaitingTime(maxWaitingTime);
-			cs->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
-			cs->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
-			cs->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
+			cs->setBikeCompliance (EnvModule::getBikeCompliances ().get(bikeComplianceId).get());
+			cs->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
+			cs->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
 
 			path->addService (cs, departureSchedules, arrivalSchedules);
 		}
@@ -185,23 +187,39 @@ namespace synthese
 			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
 		}
 
-		void ContinuousServiceTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ContinuousServiceTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
+
+			Path* lastPath(NULL);
+
+			// Loop on each added row
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
+				boost::shared_ptr<ContinuousService> service;
 				if (EnvModule::getContinuousServices().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
 				{
-					ContinuousService* object = EnvModule::getContinuousServices().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-					object->getPath()->removeService(object);
-					load(object, rows, i);
+					service = EnvModule::getContinuousServices().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+					service->getPath()->removeService(service.get());
+					load(service.get(), rows, i);
 				}
 				else
 				{
-					ContinuousService* object = new ContinuousService;
-					load(object, rows, i);
-					EnvModule::getContinuousServices().add(object);
+					service.reset(new ContinuousService);
+					load(service.get(), rows, i);
+					EnvModule::getContinuousServices().add(service);
+				}
+
+				/* At the execution syncs, update the schedules indexes at each path change */
+				if (!isFirstSync && service.get() && service->getPath() != lastPath)
+				{
+					lastPath->updateScheduleIndexes();
+					lastPath = service->getPath();
 				}
 			}
+
+			if (!isFirstSync && lastPath)
+				lastPath->updateScheduleIndexes();
+
 		}
 		
 		void ContinuousServiceTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
@@ -211,9 +229,9 @@ namespace synthese
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
 				if (EnvModule::getContinuousServices().contains(id))
 				{
-					ContinuousService* object = EnvModule::getContinuousServices().get(id);
-					object->getPath()->removeService(object);
-					load(object, rows, i);
+					shared_ptr<ContinuousService> object = EnvModule::getContinuousServices().getUpdateable(id);
+					object->getPath()->removeService(object.get());
+					load(object.get(), rows, i);
 				}
 			}
 		}
@@ -225,14 +243,14 @@ namespace synthese
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
 				if (EnvModule::getContinuousServices().contains(id))
 				{
-					ContinuousService* object = EnvModule::getContinuousServices().get(id);
-					object->getPath()->removeService(object);
+					shared_ptr<ContinuousService> object = EnvModule::getContinuousServices().getUpdateable(id);
+					object->getPath()->removeService(object.get());
 					EnvModule::getContinuousServices().remove(id);
 				}
 			}
 		}
 
-		std::vector<ContinuousService*> ContinuousServiceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<ContinuousService> > ContinuousServiceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -251,11 +269,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<ContinuousService*> objects;
+				vector<shared_ptr<ContinuousService> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					ContinuousService* object = new ContinuousService();
-					load(object, result, i);
+					shared_ptr<ContinuousService> object(new ContinuousService());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;
@@ -264,6 +282,23 @@ namespace synthese
 			{
 				throw Exception(e.getMessage());
 			}
+		}
+
+		void ContinuousServiceTableSync::afterFirstSync( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync )
+		{
+			// Lines
+			for (Line::Registry::const_iterator it = EnvModule::getLines().begin(); it != EnvModule::getLines().end(); it++)
+			{
+				shared_ptr<Line> line = EnvModule::getLines().getUpdateable(it->first);
+				line ->updateScheduleIndexes();
+			}
+
+			// Roads
+/*			for (Road::Registry::const_iterator it = EnvModule::getRoads().begin(); it != EnvModule::getLines().end(); it++)
+			{
+				(*it)->updateSchedulesIndexes();
+			}
+*/
 		}
 	}
 }

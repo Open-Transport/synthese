@@ -73,18 +73,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Interface pages"
-			>
-			<File
-				RelativePath=".\AdminInterfacePage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AdminInterfacePage.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Admin compounds"
 			>
 			<File
@@ -97,7 +85,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Requests"
+			Name="Functions"
 			>
 			<File
 				RelativePath=".\AdminRequest.cpp"
@@ -105,38 +93,6 @@
 			</File>
 			<File
 				RelativePath=".\AdminRequest.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Interface Elements Library"
-			>
-			<File
-				RelativePath=".\AdminContentInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AdminContentInterfaceElement.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Admin Value Elements"
-			>
-			<File
-				RelativePath=".\AdminPagePositionInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AdminPagePositionInterfaceElement.h"
-				>
-			</File>
-			<File
-				RelativePath=".\AdminPagesTreeInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AdminPagesTreeInterfaceElement.h"
 				>
 			</File>
 		</Filter>
@@ -155,6 +111,54 @@
 		<Filter
 			Name="HTML"
 			>
+		</Filter>
+		<Filter
+			Name="Interface"
+			>
+			<Filter
+				Name="Interface pages"
+				>
+				<File
+					RelativePath=".\AdminInterfacePage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\AdminInterfacePage.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Interface Elements Library"
+				>
+				<File
+					RelativePath=".\AdminContentInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\AdminContentInterfaceElement.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Interface Value Elements"
+				>
+				<File
+					RelativePath=".\AdminPagePositionInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\AdminPagePositionInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\AdminPagesTreeInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\AdminPagesTreeInterfaceElement.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\AdminModule.cpp"

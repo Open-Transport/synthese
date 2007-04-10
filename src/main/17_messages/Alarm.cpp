@@ -23,6 +23,8 @@
 #include "17_messages/Alarm.h"
 #include "17_messages/Scenario.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace util;
@@ -36,8 +38,8 @@ namespace synthese
 			, _enabled(false)
 			, _periodStart(TIME_UNKNOWN)
 			, _periodEnd(TIME_UNKNOWN)
-			, _scenario(NULL)
 			, _level(ALARM_LEVEL_UNKNOWN)
+			, _scenario(NULL)
 		{
 
 		}
@@ -153,14 +155,19 @@ namespace synthese
 		void Alarm::setScenario(Scenario* scenario)
 		{
 			_scenario = scenario;
-			if (_scenario != NULL)
+			if (_scenario)
 			{
 				setPeriodStart(_scenario->getPeriodStart());
 				setPeriodEnd(_scenario->getPeriodEnd());
 			}
 		}
 
-		Scenario* Alarm::getScenario() const
+		const Scenario* Alarm::getScenario() const
+		{
+			return _scenario;
+		}
+
+		Scenario* Alarm::getScenario()
 		{
 			return _scenario;
 		}
@@ -175,9 +182,9 @@ namespace synthese
 			_enabled = value;
 		}
 
-		Alarm* Alarm::createCopy(Scenario* scenario) const
+		shared_ptr<Alarm> Alarm::createCopy(Scenario* scenario) const
 		{
-			Alarm* alarm = new Alarm;
+			shared_ptr<Alarm> alarm(new Alarm);
 			alarm->setIsATemplate(false);
 			alarm->setLevel(getLevel());
 			alarm->setScenario(scenario);

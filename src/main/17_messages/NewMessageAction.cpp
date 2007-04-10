@@ -26,9 +26,11 @@
 #include "17_messages/NewMessageAction.h"
 #include "17_messages/Alarm.h"
 #include "17_messages/AlarmTableSync.h"
+#include "17_messages/ScenarioTableSync.h"
 #include "17_messages/MessagesModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -53,9 +55,14 @@ namespace synthese
 			it = map.find(PARAMETER_SCENARIO_ID);
 			if (it != map.end())
 			{
-				if (!MessagesModule::getScenarii().contains(Conversion::ToLongLong(it->second)))
+				try
+				{
+					_scenario = ScenarioTableSync::get(Conversion::ToLongLong(it->second));
+				}
+				catch (...)
+				{
 					throw ActionException("Specified scenario not found");
-				_scenario = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
+				}
 			} 
 
 			it = map.find(PARAMETER_IS_TEMPLATE);
@@ -67,25 +74,13 @@ namespace synthese
 			_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
-		NewMessageAction::NewMessageAction()
-			: Action()
-			, _scenario(NULL)
-			, _isTemplate(false)
-		{}
-
 		void NewMessageAction::run()
 		{
-			Alarm* alarm = new Alarm;
+			shared_ptr<Alarm> alarm(new Alarm);
 			alarm->setIsATemplate(_isTemplate);
-			alarm->setScenario(_scenario);
-			AlarmTableSync::save(alarm);
+			alarm->setScenario(_scenario.get());
+			AlarmTableSync::save(alarm.get());
 			_request->setObjectId(alarm->getKey());
-			delete alarm;
-		}
-
-		NewMessageAction::~NewMessageAction()
-		{
-			delete _scenario;
 		}
 	}
 }

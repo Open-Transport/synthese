@@ -44,21 +44,6 @@ namespace synthese
 
 	namespace departurestable
 	{
-		DeparturesTableTimeContentInterfaceElement::DeparturesTableTimeContentInterfaceElement()
-			: _zeroVIE(NULL)
-			, _beforeIfNext(NULL)
-			, _afterIfNext(NULL)
-		{
-			
-		}
-
-		DeparturesTableTimeContentInterfaceElement::~DeparturesTableTimeContentInterfaceElement()
-		{
-			delete _zeroVIE;
-			delete _beforeIfNext;
-			delete _afterIfNext;
-		}
-
 		void DeparturesTableTimeContentInterfaceElement::storeParameters(ValueElementList& vel)
 		{
 			if (vel.size() < 3)
@@ -69,7 +54,12 @@ namespace synthese
 			_afterIfNext = vel.front();
 		}
 
-		string DeparturesTableTimeContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string DeparturesTableTimeContentInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
+			, VariablesMap& variables
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			const ArrivalDepartureRow*	row = (const ArrivalDepartureRow*) object;
 			const DateTime&				__Moment = row->first.realDepartureTime;

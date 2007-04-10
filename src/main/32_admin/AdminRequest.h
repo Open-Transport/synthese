@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_AdminRequest_H__
 #define SYNTHESE_AdminRequest_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/UId.h"
 
 #include "11_interfaces/RequestWithInterfaceAndRequiredSession.h"
@@ -34,7 +36,7 @@ namespace synthese
 		class AdminInterfaceElement;
 
 		/** Administration console Function Class.
-			@ingroup m32
+			@ingroup m32Functions refFunctions
 		*/
 		class AdminRequest : public interfaces::RequestWithInterfaceAndRequiredSession
 		{
@@ -43,9 +45,9 @@ namespace synthese
 			
 			//! \name Page parameters
 			//@{
-				const AdminInterfaceElement*	_page;
-				const AdminInterfaceElement*	_actionFailedPage;
-				server::ParametersMap			_parameters;
+				boost::shared_ptr<const AdminInterfaceElement>	_page;
+				boost::shared_ptr<const AdminInterfaceElement>	_actionFailedPage;
+				server::ParametersMap							_parameters;
 			//@}
 
 
@@ -64,16 +66,32 @@ namespace synthese
 			bool _isAuthorized() const;
 
 		public:
+			void setPage(boost::shared_ptr<const AdminInterfaceElement> aie);
 
-			AdminRequest();
-			~AdminRequest();
+			template<class T>
+			void setPage();
 
-			void setPage(const AdminInterfaceElement* aie);
-			void setActionFailedPage(const AdminInterfaceElement* aie);
-			const AdminInterfaceElement* getPage() const;
+			void setActionFailedPage(boost::shared_ptr<const AdminInterfaceElement> aie);
+
+			template<class T>
+			void setActionFailedPage();
+
+			boost::shared_ptr<const AdminInterfaceElement> getPage() const;
 
 			void setParameter(const std::string& name, const std::string value);
 		};
+
+		template<class T>
+		void AdminRequest::setActionFailedPage()
+		{
+			_actionFailedPage = Factory<AdminInterfaceElement>::create<T>();
+		}
+
+		template<class T>
+		void AdminRequest::setPage()
+		{
+			_page = Factory<AdminInterfaceElement>::create<T>();
+		}
 	}
 }
 #endif // SYNTHESE_AdminRequest_H__

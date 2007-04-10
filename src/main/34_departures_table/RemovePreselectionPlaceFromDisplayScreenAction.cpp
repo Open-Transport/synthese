@@ -31,11 +31,12 @@
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/DeparturesTableModule.h"
 
-
+using namespace boost;
 using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace server;
 	using namespace env;
 	
@@ -55,7 +56,7 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DeparturesTableModule::getDisplayScreens().get(_request->getObjectId());
+				_screen = DisplayScreenTableSync::get(_request->getObjectId());
 
 				ParametersMap::const_iterator it;
 
@@ -65,26 +66,20 @@ namespace synthese
 				_place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(it->second));
 
 			}
-			catch (DisplayScreen::RegistryKeyException e)
+			catch (DBEmptyResultException<DisplayScreen>)
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch (ConnectionPlace::RegistryKeyException e)
+			catch (ConnectionPlace::RegistryKeyException)
 			{
 				throw ActionException("Specified place not found");
 			}
 		}
 
-		RemovePreselectionPlaceFromDisplayScreenAction::RemovePreselectionPlaceFromDisplayScreenAction()
-			: Action()
-			, _screen(NULL)
-			, _place(NULL)
-		{}
-
 		void RemovePreselectionPlaceFromDisplayScreenAction::run()
 		{
 			_screen->removeForcedDestination(_place);
-			DisplayScreenTableSync::save(_screen);
+			DisplayScreenTableSync::save(_screen.get());
 		}
 	}
 }

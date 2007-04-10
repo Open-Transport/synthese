@@ -43,7 +43,7 @@ namespace synthese
 		private:
 			bool			_activatePreselection;
 			int				_preselectionDelay;
-			DisplayScreen*	_screen;
+			boost::shared_ptr<DisplayScreen>	_screen;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -57,10 +57,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			UpdateDisplayPreselectionParametersAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

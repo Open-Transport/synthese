@@ -55,9 +55,14 @@ namespace synthese
 		{
 			ParametersMap::const_iterator it;
 
-			if (!SecurityModule::getProfiles().contains(_request->getObjectId()))
+			try
+			{
+				_profile = ProfileTableSync::get(_request->getObjectId());
+			}
+			catch(...)
+			{
 				throw ActionException("Profile not found");
-			_profile = SecurityModule::getProfiles().get(_request->getObjectId());
+			}
 
 			string rightCode;
 			it = map.find(PARAMETER_RIGHT);
@@ -69,7 +74,7 @@ namespace synthese
 			if (it == map.end())
 				throw ActionException("Parameter not specified");
 			
-			_right.reset(_profile->getRight(rightCode, it->second));
+			_right = _profile->getRight(rightCode, it->second);
 			if (!_right.get())
 				throw ActionException("Specified right not found");
 		}
@@ -79,15 +84,8 @@ namespace synthese
 			if (_profile != NULL)
 			{
 				_profile->removeRight(_right->getFactoryKey(), _right->getParameter());
-				ProfileTableSync::save(_profile);
+				ProfileTableSync::save(_profile.get());
 			}
-		}
-
-		DeleteRightAction::DeleteRightAction()
-			: Action()
-			, _profile(NULL)
-		{
-	
 		}
 	}
 }

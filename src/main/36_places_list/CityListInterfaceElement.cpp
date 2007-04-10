@@ -18,7 +18,7 @@ namespace synthese
 
 	namespace placeslist
 	{
-		void CityListInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request) const
+		void CityListInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, boost::shared_ptr<const void> object /*= NULL*/, const server::Request* request) const
 		{
 			// Parameters
 			string errorMessage = _errorMessage->getValue(parameters, object, request);

@@ -54,7 +54,6 @@ namespace synthese
 	{
 		BroadcastPointAdmin::BroadcastPointAdmin()
 			: AdminInterfaceElement("broadcastpoints", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
-			, _place(NULL)
 		{}
 
 
@@ -119,7 +118,6 @@ namespace synthese
 						<< "Arrêt physique actif en tant que point de diffusion "
 						<< f.getLinkButton("Supprimer", "Etes-vous sûr(e) de vouloir supprimer le point de diffusion ?");
 				}
-				delete it->bp;
 			}
 
 			vector<PhysicalStopAndBroadcastPoint> b = getConnectionPlaceBroadcastPointsAndPhysicalStops(_place->getKey(), false);
@@ -139,8 +137,6 @@ namespace synthese
 				df.addHiddenField(DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(bit->bp->getKey()));
 
 				stream << t.col() << rf.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer le point de diffusion ?");
-
-				delete bit->bp;
 			}
 
 			HTMLForm cf(createRequest.getHTMLForm("createbp"));

@@ -83,12 +83,11 @@ namespace synthese
 		{
 			static const std::string PARAM_USER_ID;
 
-			const User* _user;
+			boost::shared_ptr<const User> _user;
 			bool _userError;
 
 		public:
 			UserAdmin();
-			~UserAdmin();
 
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.

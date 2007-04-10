@@ -57,7 +57,7 @@ namespace synthese
 			return v;
 		}
 
-		void SecurityLog::addUserLogin( const User* user )
+		void SecurityLog::addUserLogin( shared_ptr<const User> user )
 		{
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(LOGIN_ENTRY));
@@ -66,7 +66,7 @@ namespace synthese
 			_addEntry(DBLogEntry::DB_LOG_INFO, c, user);
 		}
 
-		void SecurityLog::addUserAdmin( const User* user, const User* subject, const string& text)
+		void SecurityLog::addUserAdmin(shared_ptr<const User> user, shared_ptr<const User> subject, const string& text)
 		{
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(USER_ADMIN_ENTRY));
@@ -75,7 +75,7 @@ namespace synthese
 			_addEntry(DBLogEntry::DB_LOG_INFO, c, user);
 		}
 
-		void SecurityLog::addProfileAdmin( const User* user, const Profile* subject, const std::string& text )
+		void SecurityLog::addProfileAdmin( shared_ptr<const User> user, shared_ptr<const Profile> subject, const std::string& text )
 		{
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString(PROFILE_ADMIN_ENTRY));
@@ -88,12 +88,12 @@ namespace synthese
 		{
 			DBLog::ColumnsVector v;
 
-			switch ((_EntryType) Conversion::ToInt(cols.front()))
+			switch ((_EntryType) Conversion::ToInt(cols[0]))
 			{
 			case LOGIN_ENTRY:
 				try
 				{
-					shared_ptr<User> user(UserTableSync::get(Conversion::ToLongLong(cols.front())));
+					shared_ptr<User> user(UserTableSync::get(Conversion::ToLongLong(cols[1])));
 					v.push_back(user->getLogin());
 				}
 				catch(...)
@@ -101,13 +101,13 @@ namespace synthese
 					v.push_back("unknown");
 				}
 				v.push_back("Login");
-				v.push_back(cols.front());
+				v.push_back(cols[2]);
 				break;
 
 			case USER_ADMIN_ENTRY:
 				try
 				{
-					shared_ptr<User> user(UserTableSync::get(Conversion::ToLongLong(cols.front())));
+					shared_ptr<User> user(UserTableSync::get(Conversion::ToLongLong(cols[1])));
 					v.push_back(user->getLogin());
 				}
 				catch(...)
@@ -115,13 +115,13 @@ namespace synthese
 					v.push_back("unknown");
 				}
 				v.push_back("User Admin");
-				v.push_back(cols.front());
+				v.push_back(cols[2]);
 				break;
 
 			case PROFILE_ADMIN_ENTRY:
 				try
 				{
-					shared_ptr<Profile> profile(ProfileTableSync::get(Conversion::ToLongLong(cols.front())));
+					shared_ptr<Profile> profile(ProfileTableSync::get(Conversion::ToLongLong(cols[1])));
 					v.push_back(profile->getName());
 				}
 				catch(...)
@@ -129,15 +129,13 @@ namespace synthese
 					v.push_back("unknown");
 				}
 				v.push_back("Profile Admin");
-				v.push_back(cols.front());
+				v.push_back(cols[2]);
 				break;
 
 			default:
-				cols.front();
-				cols.front();
 				v.push_back("unknown");
 				v.push_back("unknown");
-				v.push_back(cols.front());
+				v.push_back(cols[2]);
 			}
 
 			return v;

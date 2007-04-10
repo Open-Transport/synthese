@@ -40,22 +40,20 @@ namespace synthese
 		class AlarmObjectLink : public util::Registrable<uid, AlarmObjectLink<T> >
 		{
 			std::string		_recipientKey;
-			T*				_object; 
-			const Alarm*	_alarm;
+			boost::shared_ptr<T>	_object; 
+			boost::shared_ptr<const Alarm>	_alarm;
 			uid				_objectId;
 
 		public:
-			AlarmObjectLink() : _object(NULL) {}
-
 			const std::string&	getRecipientKey() const { return _recipientKey; }
-			T*					getObject() const { return _object; }
-			uid					getObjectId() const { return _object ? _object->getKey() : _objectId; }
-			const Alarm*		getAlarm() const { return _alarm; }
+			boost::shared_ptr<T>		getObject() const { return _object; }
+			uid					getObjectId() const { return _object.get() ? _object->getKey() : _objectId; }
+			boost::shared_ptr<const Alarm>		getAlarm() const { return _alarm; }
 
 			void setRecipientKey(const std::string& key) { _recipientKey = key; }
-			void setObject(T* object) { _object = object; }
+			void setObject(boost::shared_ptr<T> object) { _object = object; }
 			void setObjectId(uid id) { _objectId = id; }
-			void setAlarm(const Alarm* alarm) { _alarm = alarm; }
+			void setAlarm(boost::shared_ptr<const Alarm> alarm) { _alarm = alarm; }
 
 		};
 	}

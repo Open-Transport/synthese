@@ -47,7 +47,7 @@ namespace synthese
 			static const std::string PARAMETER_PRIVATE_VALUE;
 
 		private:
-			Profile*					_profile;
+			boost::shared_ptr<Profile>	_profile;
 			boost::shared_ptr<Right>	_right;
 			Right::Level				_publicLevel;
 			Right::Level				_privateLevel;

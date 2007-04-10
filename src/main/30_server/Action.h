@@ -29,6 +29,10 @@
 
 #define Action_PARAMETER_PREFIX std::string("actionParam")
 
+/** @defgroup refActions Actions
+	@ingroup ref
+*/
+
 namespace synthese
 {
 	namespace server
@@ -39,7 +43,7 @@ namespace synthese
 
 			A factory of actions is handled by 30_server module.
 
-			@ingroup m30/Core
+			@ingroup m30
 		*/
 		class Action : public util::Factorable
 		{

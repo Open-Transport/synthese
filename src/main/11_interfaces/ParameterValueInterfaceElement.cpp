@@ -26,6 +26,8 @@
 #include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/ParameterValueInterfaceElement.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace std;
@@ -33,7 +35,9 @@ namespace synthese
 
 	namespace interfaces
 	{
-		string ParameterValueInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string ParameterValueInterfaceElement::getValue( const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object, const server::Request* request) const
 		{
 			return parameters[Conversion::ToInt(_rank->getValue(parameters, variables, object, request))] ;
 		}

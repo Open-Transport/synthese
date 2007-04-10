@@ -33,6 +33,7 @@
 #include "12_security/GlobalRight.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -45,37 +46,38 @@ namespace synthese
 		const std::string SecurityModule::ROOT_USER = "root";
 
 		Profile::Registry SecurityModule::_profiles;
+		shared_ptr<User> SecurityModule::_rootUser;
+		shared_ptr<Profile> SecurityModule::_rootProfile;
+
+		shared_ptr<Profile>	_rootProfile;
 
 		void SecurityModule::initialize()
 		{
-			Profile* rootProfile;
-			vector<Profile*> profiles = ProfileTableSync::search(ROOT_PROFILE);
+			vector<shared_ptr<Profile> > profiles = ProfileTableSync::search(ROOT_PROFILE);
 			if (profiles.size() == 0)
-				rootProfile = new Profile;
+				_rootProfile.reset(new Profile);
 			else
-				rootProfile = profiles.front();
+				_rootProfile = profiles.front();
 	
-			rootProfile->setName(ROOT_PROFILE);
-			Right* r = Factory<Right>::create<GlobalRight>();
+			_rootProfile->setName(ROOT_PROFILE);
+			shared_ptr<Right> r = Factory<Right>::create<GlobalRight>();
 			r->setPublicLevel(Right::DELETE);
 			r->setPrivateLevel(Right::DELETE);
-			rootProfile->cleanRights();
-			rootProfile->addRight(r);
-			ProfileTableSync::save(rootProfile);
+			_rootProfile->cleanRights();
+			_rootProfile->addRight(r);
+			ProfileTableSync::save(_rootProfile.get());
 
-			vector<User*> users = UserTableSync::search(ROOT_USER, ROOT_USER, rootProfile->getKey());
-			User* rootUser;
+			vector<shared_ptr<User> > users = UserTableSync::search(ROOT_USER, ROOT_USER, _rootProfile);
 			if (users.size() == 0)
-				rootUser = new User;
+				_rootUser.reset(new User);
 			else
-				rootUser = users.front();
-			rootUser->setName(ROOT_USER);
-			rootUser->setLogin(ROOT_USER);
-			rootUser->setPassword(ROOT_USER);
-			rootUser->setProfile(rootProfile);
-			rootUser->setConnectionAllowed(true);
-			UserTableSync::save(rootUser);
-			delete rootUser;
+				_rootUser = users.front();
+			_rootUser->setName(ROOT_USER);
+			_rootUser->setLogin(ROOT_USER);
+			_rootUser->setPassword(ROOT_USER);
+			_rootUser->setProfile(_rootProfile);
+			_rootUser->setConnectionAllowed(true);
+			UserTableSync::save(_rootUser.get());
 		}
 
 		Profile::Registry& SecurityModule::getProfiles()
@@ -95,7 +97,7 @@ namespace synthese
 		{
 			vector<pair<uid, string> > m;
 			if (withAll)
-				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
+				m.push_back(make_pair(0, "(tous)"));
 			for (Profile::Registry::const_iterator it = _profiles.begin(); it != _profiles.end(); ++it)
 				m.push_back(make_pair(it->first, it->second->getName()));
 			return m;
@@ -105,13 +107,10 @@ namespace synthese
 		{
 			vector<pair<uid, string> > m;
 			if (withAll)
-				m.push_back(make_pair(uid(UNKNOWN_VALUE), "(tous)"));
-			vector<User*> users = UserTableSync::search("","");
-			for (vector<User*>::iterator it = users.begin(); it != users.end(); ++it)
-			{
+				m.push_back(make_pair(uid(0), "(tous)"));
+			vector<shared_ptr<User> > users = UserTableSync::search("","", shared_ptr<const Profile>(), false);
+			for (vector<shared_ptr<User> >::iterator it = users.begin(); it != users.end(); ++it)
 				m.push_back(make_pair((*it)->getKey(), (*it)->getSurname() + " " + (*it)->getName()));
-				delete *it;
-			}
 			return m;
 		}
 
@@ -125,12 +124,12 @@ namespace synthese
 			return m;
 		}
 
-		std::vector<Profile*> SecurityModule::getSubProfiles( const Profile* profile )
+		std::vector<shared_ptr<const Profile> > SecurityModule::getSubProfiles(shared_ptr<const Profile> profile )
 		{
-			vector<Profile*> v;
+			vector<shared_ptr<const Profile> > v;
 			for (Profile::Registry::const_iterator it = _profiles.begin(); it != _profiles.end(); ++it)
 			{
-				if (profile == NULL)
+				if (!profile.get())
 				{
 					if (!it->second->getParentId())
 						v.push_back(it->second);

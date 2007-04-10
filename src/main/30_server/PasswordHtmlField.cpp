@@ -37,15 +37,15 @@ namespace synthese
 		{
 		}
 
-		string PasswordHtmlField::getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string PasswordHtmlField::getValue(
+			const interfaces::ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* rootObject /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			stringstream stream;
 			stream << "<input type=\"password\" name=\"" << LoginAction::PARAMETER_PASSWORD << "\" />";
 			return stream.str();
-		}
-
-		PasswordHtmlField::~PasswordHtmlField()
-		{
 		}
 	}
 }

@@ -24,6 +24,8 @@
 #ifndef SYNTHESE_UpdateCustomerAction_H__
 #define SYNTHESE_UpdateCustomerAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "04_time/Date.h"
 
 #include "30_server/Action.h"
@@ -55,8 +57,8 @@ namespace synthese
 			static const std::string PARAMETER_PASSPORT;
 
 		private:
-			VinciContract*	_contract;
-			security::User*	_user;
+			boost::shared_ptr<VinciContract>	_contract;
+			boost::shared_ptr<security::User>	_user;
 			std::string		_name;
 			std::string		_surname;
 			std::string		_address;

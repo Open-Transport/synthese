@@ -24,10 +24,11 @@
 #ifndef SYNTHESE_VinciBikeTableSync_H__
 #define SYNTHESE_VinciBikeTableSync_H__
 
-
 #include <vector>
 #include <string>
 #include <iostream>
+
+#include <boost/shared_ptr.hpp>
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
@@ -49,7 +50,6 @@ namespace synthese
 			static const std::string TABLE_COL_MARKED_NUMBER;
 
 			VinciBikeTableSync();
-			~VinciBikeTableSync ();
 
 			/** VinciBike search.
 				@param sqlite SQLite thread
@@ -59,9 +59,13 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<VinciBike*> search(
+			static std::vector<boost::shared_ptr<VinciBike> > search(
 				const std::string& id, const std::string& cadre
-				, int first = 0, int number = -1);
+				, int first = 0, int number = -1
+				, bool orderByNumber = true
+				, bool orderByCadre = false
+				, bool raisingOrder = true
+				);
 
 
 		protected:
@@ -71,7 +75,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on user creation.
 			Updates the users objects in the opened sessions.

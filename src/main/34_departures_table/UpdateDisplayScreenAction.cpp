@@ -35,6 +35,7 @@
 #include "34_departures_table/DisplayScreenTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -126,15 +127,15 @@ namespace synthese
 					_type = DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(it->second));
 
 			}
-			catch (DBEmptyResultException e)
+			catch (DBEmptyResultException<DisplayScreen>)
 			{
 				throw ActionException("Display screen not specified or specified display screen not found");
 			}
-			catch (BroadcastPoint::RegistryKeyException e)
+			catch (BroadcastPoint::RegistryKeyException)
 			{
 				throw ActionException("Specified localization not found");
 			}
-			catch (DisplayType::RegistryKeyException e)
+			catch (DisplayType::RegistryKeyException)
 			{
 				throw ActionException("Specified display type not found");
 			}
@@ -144,7 +145,7 @@ namespace synthese
 		{
 			_screen->setLocalizationComment(_localizationComment);
 			_screen->setWiringCode(_wiringCode);
-			if (_localization != NULL)
+			if (_localization.get())
 				_screen->setLocalization(_localization);
 			_screen->setBlinkingDelay(_blinkingDelay);
 			_screen->setTrackNumberDisplay(_displayPlatform);
@@ -153,23 +154,10 @@ namespace synthese
 			_screen->setOriginsOnly(_endFilter);
 			_screen->setClearingDelay(_cleaningDelay);
 			_screen->setMaxDelay(_maxDelay);
-			_screen->setType(_type);
+			_screen->setType(_type.get());
 			_screen->setTitle(_title);
 
-			DisplayScreenTableSync::save(_screen);
-		}
-
-		UpdateDisplayScreenAction::UpdateDisplayScreenAction()
-			: Action()
-			, _localization(NULL)
-			, _screen(NULL)
-		{
-
-		}
-
-		UpdateDisplayScreenAction::~UpdateDisplayScreenAction()
-		{
-			delete _screen;
+			DisplayScreenTableSync::save(_screen.get());
 		}
 	}
 }

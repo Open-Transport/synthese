@@ -35,6 +35,7 @@
 #include "57_accounting/AccountTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -111,7 +112,7 @@ namespace synthese
 
 
 
-		void AccountTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void AccountTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 
 		}
@@ -141,7 +142,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_RIGHT_CURRENCY_ID, "INTEGER", true);
 		}
 
-		std::vector<Account*> AccountTableSync::search(uid rightUserId
+		std::vector<shared_ptr<Account> > AccountTableSync::search(uid rightUserId
 			, const std::string& rightClassNumber, uid leftUserId, const std::string& leftClassNumber, const std::string name
 			, int first /*= 0*/, int number /*= 0*/ )
 		{
@@ -164,11 +165,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<Account*> accounts;
+				vector<shared_ptr<Account> > accounts;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					Account* account = new Account;
-					load(account, result, i);
+					shared_ptr<Account> account(new Account);
+					load(account.get(), result, i);
 					accounts.push_back(account);
 				}
 				return accounts;

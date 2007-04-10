@@ -34,6 +34,7 @@
 #include "15_env/EnvModule.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -96,12 +97,12 @@ namespace synthese
 			addTableColumn (COL_ALLOWED, "BOOLEAN", true);
 		}
 
-		void AxisTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void AxisTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				Axis* object = new Axis();
-				load(object, rows, i);
+				shared_ptr<Axis> object(new Axis());
+				load(object.get(), rows, i);
 				EnvModule::getAxes().add(object);
 			}
 		}
@@ -113,8 +114,8 @@ namespace synthese
 				uid lineId = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
 				if (EnvModule::getAxes().contains(lineId))
 				{
-					Axis* object = EnvModule::getAxes().get(lineId);
-					load(object, rows, i);
+					shared_ptr<Axis> object = EnvModule::getAxes().getUpdateable(lineId);
+					load(object.get(), rows, i);
 				}
 			}
 		}
@@ -131,7 +132,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<Axis*> AxisTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<Axis> > AxisTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -150,11 +151,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<Axis*> objects;
+				vector<shared_ptr<Axis> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					Axis* object = new Axis();
-					load(object, result, i);
+					shared_ptr<Axis> object(new Axis());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

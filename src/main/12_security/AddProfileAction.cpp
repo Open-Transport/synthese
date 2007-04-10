@@ -32,6 +32,7 @@
 #include "30_server/Request.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -48,64 +49,51 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(make_pair(PARAMETER_NAME, _name));
-			if (_templateProfile != NULL)
+			if (_templateProfile.get())
 				map.insert(make_pair(PARAMETER_TEMPLATE_ID, Conversion::ToString(_templateProfile->getKey())));
 			return map;
 		}
 
 		void AddProfileAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
+			ParametersMap::const_iterator it;
+
+			// Name
+			it = map.find(PARAMETER_NAME);
+			if (it == map.end())
+				throw ActionException("Name not specified");
+			_name = it->second;
+
+			// Template
+			it = map.find(PARAMETER_TEMPLATE_ID);
+			if (it != map.end())
 			{
-				ParametersMap::const_iterator it;
-
-				// Name
-				it = map.find(PARAMETER_NAME);
-				if (it == map.end())
-					throw ActionException("Name not specified");
-				_name = it->second;
-
-				// Template
-				it = map.find(PARAMETER_TEMPLATE_ID);
-				if (it != map.end())
-				{
-					_templateProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
-				}
-
-				// Name unicity
-				vector<Profile*> existingProfiles = ProfileTableSync::search(_name,"",0,1);
-				if (!existingProfiles.empty())
-					throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
-
+				if (!SecurityModule::getProfiles().contains(Conversion::ToLongLong(it->second)))
+					throw ActionException("Specified root profile not found.");
+				_templateProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
 			}
-			catch (Profile::RegistryKeyException e)
-			{
-				throw ActionException("Un profil père doit être sélectionné.");
-			}
+
+			// Name unicity
+			vector<shared_ptr<Profile> > existingProfiles = ProfileTableSync::search(_name,"",0,1);
+			if (!existingProfiles.empty())
+				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
 		}
 
 		void AddProfileAction::run()
 		{
-			Profile* profile = new Profile;
+			shared_ptr<Profile> profile(new Profile);
 			profile->setName(_name);
 			if (_templateProfile != NULL)
 				profile->setParent(_templateProfile->getKey());
 			else
 			{
-				Right* r = Factory<Right>::create<GlobalRight>();
+				shared_ptr<Right> r = Factory<Right>::create<GlobalRight>();
 				r->setPrivateLevel(Right::FORBIDDEN);
 				r->setPublicLevel(Right::FORBIDDEN);
 				profile->addRight(r);
 			}
-			ProfileTableSync::save(profile);
+			ProfileTableSync::save(profile.get());
 			_request->setObjectId(profile->getKey());
-			delete profile;
-		}
-
-		AddProfileAction::AddProfileAction()
-			: Action()
-			, _templateProfile(NULL)
-		{
 		}
 	}
 }

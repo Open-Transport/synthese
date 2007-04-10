@@ -35,7 +35,7 @@ namespace synthese
 		void 
 		DbModuleConfigTableSync::rowsAdded (const SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
-						const SQLiteResult& rows)
+						const SQLiteResult& rows, bool isFirstSync)
 		{
 		    for (int i=0; i<rows.getNbRows (); ++i)
 		    {

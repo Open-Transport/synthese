@@ -36,6 +36,7 @@
 #include "71_vinci_bike_rental/VinciBikeSearchAdminInterfaceElement.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -57,19 +58,54 @@ namespace synthese
 			return "Parc de vélos";
 		}
 
+
+		void VinciBikeSearchAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
+		{
+			ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_NUMBER);
+			if (it != map.end())
+				_bikeNumber = it->second;
+
+			it  = map.find(PARAMETER_SEARCH_CADRE);
+			if (it != map.end())
+				_cadreNumber = it->second;
+
+			_resultRequestParameters = ResultHTMLTable::getParameters(map, PARAMETER_SEARCH_NUMBER, 30);
+
+			_bikes = VinciBikeTableSync::search(
+				_bikeNumber
+				, _cadreNumber
+				, _resultRequestParameters.first
+				, _resultRequestParameters.maxSize
+				, _resultRequestParameters.orderField == PARAMETER_SEARCH_NUMBER
+				, _resultRequestParameters.orderField == PARAMETER_SEARCH_CADRE
+				, _resultRequestParameters.raisingOrder
+				);
+
+			_resultResultParameters.next = (_bikes.size() == _resultRequestParameters.maxSize + 1);
+			if (_resultResultParameters.next)
+				_bikes.pop_back();
+			_resultResultParameters.size = _bikes.size();
+
+		}
+
+		bool VinciBikeSearchAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return true;
+		}
+
 		void VinciBikeSearchAdminInterfaceElement::display(ostream& stream, VariablesMap& vars, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			// AddStatus
 			FunctionRequest<AdminRequest> addStatusRequest(request);
-			addStatusRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciBikeSearchAdminInterfaceElement>());
+			addStatusRequest.getFunction()->setPage<VinciBikeSearchAdminInterfaceElement>();
 
 			// AddBike
 			ActionFunctionRequest<VinciAddBike,AdminRequest> addBikeRequest(request);
-			addBikeRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciBikeAdminInterfaceElement>());
+			addBikeRequest.getFunction()->setPage<VinciBikeAdminInterfaceElement>();
 			
 			// Open a bike
 			FunctionRequest<AdminRequest> viewBikeRequest(request);
-			viewBikeRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciBikeAdminInterfaceElement>());
+			viewBikeRequest.getFunction()->setPage<VinciBikeAdminInterfaceElement>();
 
 			stream << "<h1>Recherche de vélo</h1>";
 
@@ -84,49 +120,21 @@ namespace synthese
 			ActionResultHTMLTable::HeaderVector rh;
 			rh.push_back(make_pair(PARAMETER_SEARCH_NUMBER, "Numéro"));
 			rh.push_back(make_pair(PARAMETER_SEARCH_CADRE, "Cadre"));
-			ActionResultHTMLTable rt(rh, st.getForm(), string(), false, addBikeRequest.getHTMLForm("create"));
+			ActionResultHTMLTable rt(rh, st.getForm(), _resultRequestParameters, _resultResultParameters, addBikeRequest.getHTMLForm("create"));
 				
 			stream << rt.open();
-			for (vector<VinciBike*>::const_iterator it = _bikes.begin(); it != _bikes.end(); ++it)
+			for (vector<shared_ptr<VinciBike> >::const_iterator it = _bikes.begin(); it != _bikes.end(); ++it)
 			{
 				viewBikeRequest.setObjectId((*it)->getKey());
 				stream << rt.row();
 				stream << rt.col() << HTMLModule::getHTMLLink(viewBikeRequest.getURL(), (*it)->getNumber());
 				stream << rt.col() << HTMLModule::getHTMLLink(viewBikeRequest.getURL(), (*it)->getMarkedNumber());
 			}
-			if (_activeSearch)
-			{
-				stream << rt.row();
-				stream << rt.col() << rt.getActionForm().getTextInput(VinciAddBike::PARAMETER_NUMBER, _bikeNumber);
-				stream << rt.col() << rt.getActionForm().getTextInput(VinciAddBike::PARAMETER_MARKED_NUMBER, _cadreNumber);
-				stream << rt.col() << rt.getActionForm().getSubmitButton("Créer");
-			}
+			stream << rt.row();
+			stream << rt.col() << rt.getActionForm().getTextInput(VinciAddBike::PARAMETER_NUMBER, _bikeNumber);
+			stream << rt.col() << rt.getActionForm().getTextInput(VinciAddBike::PARAMETER_MARKED_NUMBER, _cadreNumber);
+			stream << rt.col() << rt.getActionForm().getSubmitButton("Créer");
 			stream << rt.close();
-		}
-
-		void VinciBikeSearchAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
-		{
-			ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_NUMBER);
-			if (it != map.end())
-				_bikeNumber = it->second;
-
-			it  = map.find(PARAMETER_SEARCH_CADRE);
-			if (it != map.end())
-                _cadreNumber = it->second;
-			
-			_bikes = VinciBikeTableSync::search(_bikeNumber, _cadreNumber);
-			_activeSearch = (_cadreNumber != "" || _bikeNumber != "");
-		}
-
-		VinciBikeSearchAdminInterfaceElement::~VinciBikeSearchAdminInterfaceElement()
-		{
-			for (vector<VinciBike*>::iterator it = _bikes.begin(); it != _bikes.end(); ++it)
-				delete *it;
-		}
-
-		bool VinciBikeSearchAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
-		{
-			return true;
 		}
 	}
 }

@@ -38,6 +38,7 @@
 #include "34_departures_table/BroadcastPointTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -47,7 +48,7 @@ namespace synthese
 	namespace departurestable
 	{
 
-		std::vector<ConnectionPlaceWithBroadcastPoint> searchConnectionPlacesWithBroadcastPoints( 
+		std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints( 
 			std::string cityName /*= ""*/, std::string placeName /*= ""*/, BroadcastPointsPresence bpPresence /*= UNKNOWN_VALUE*/
 			, uid lineId /*= UNKNOWN_VALUE*/, int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
 		{
@@ -80,12 +81,12 @@ namespace synthese
 			{
 				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<ConnectionPlaceWithBroadcastPoint> objects;
+				vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					ConnectionPlaceWithBroadcastPoint object;
-					object.broadCastPointsNumber = Conversion::ToInt(result.getColumn(i, "bc"));
-					object.place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(result.getColumn(i, "p." + TABLE_COL_ID)));
+					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
+					object->broadCastPointsNumber = Conversion::ToInt(result.getColumn(i, "bc"));
+					object->place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(result.getColumn(i, "p." + TABLE_COL_ID)));
 					objects.push_back(object);
 				}
 				return objects;
@@ -122,7 +123,7 @@ namespace synthese
 					object.stop = EnvModule::getPhysicalStops().get(Conversion::ToLongLong(result.getColumn(i, "pid")));
 					object.bp = (result.getColumn(i, "bid") != "")
 						? BroadcastPointTableSync::get(Conversion::ToLongLong(result.getColumn(i, "bid")))
-						: NULL;
+						: shared_ptr<BroadcastPoint>();
 					objects.push_back(object);
 				}
 				return objects;
@@ -163,7 +164,7 @@ namespace synthese
 					PhysicalStopAndBroadcastPoint object;
 					object.stop = (result.getColumn(i, "pid") != "")
 						? EnvModule::getPhysicalStops().get(Conversion::ToLongLong(result.getColumn(i, "pid")))
-						: NULL;
+						: boost::shared_ptr<const PhysicalStop>();
 					object.bp = BroadcastPointTableSync::get(Conversion::ToLongLong(result.getColumn(i, "bid")));
 					objects.push_back(object);
 				}
@@ -175,7 +176,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<const CommercialLine*> getCommercialLineWithBroadcastPoints( int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
+		std::vector<shared_ptr<const CommercialLine> > getCommercialLineWithBroadcastPoints( int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
 		{
 			stringstream query;
 			query << " SELECT "
@@ -196,7 +197,7 @@ namespace synthese
 			{
 				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<const CommercialLine*> objects;
+				vector<shared_ptr<const CommercialLine> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
 					objects.push_back(EnvModule::getCommercialLines().get(Conversion::ToLongLong(result.getColumn(i, TABLE_COL_ID))));

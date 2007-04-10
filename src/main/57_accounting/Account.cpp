@@ -1,5 +1,28 @@
 
+/** Account class implementation.
+	@file Account.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "57_accounting/Account.h"
+
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -9,9 +32,7 @@ namespace synthese
 	{
 		Account::Account(uid id)
 			: Registrable<uid, Account>(id)
-			, _leftCurrency(NULL)
 			, _leftUserId(0)
-			, _rightCurrency(NULL)
 			, _rightUserId(0)
 		{
 
@@ -27,7 +48,7 @@ namespace synthese
 			return _leftClassNumber;
 		}
 
-		const Currency* Account::getLeftCurrency() const
+		shared_ptr<const Currency> Account::getLeftCurrency() const
 		{
 			return _leftCurrency;
 		}
@@ -42,7 +63,7 @@ namespace synthese
 			return _rightClassNumber;
 		}
 
-		const Currency* Account::getRightCurrency() const
+		shared_ptr<const Currency> Account::getRightCurrency() const
 		{
 			return _rightCurrency;
 		}
@@ -62,7 +83,7 @@ namespace synthese
 			_leftClassNumber = classNumber;
 		}
 
-		void Account::setLeftCurrency( Currency* currency )
+		void Account::setLeftCurrency(boost::shared_ptr<const Currency> currency )
 		{
 			_leftCurrency = currency;
 		}
@@ -82,7 +103,7 @@ namespace synthese
 			_rightClassNumber = classNumber;
 		}
 
-		void Account::setRightCurrency( Currency* currency )
+		void Account::setRightCurrency(shared_ptr<const Currency> currency )
 		{
 			_rightCurrency = currency;
 		}

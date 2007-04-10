@@ -26,6 +26,7 @@
 #include "30_server/LoginHtmlField.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -37,7 +38,10 @@ namespace synthese
 		{
 		}
 
-		string LoginHtmlField::getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string LoginHtmlField::getValue(const interfaces::ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* rootObject /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			stringstream stream;
 			stream << "<input type=\"text\" name=\"" << LoginAction::PARAMETER_LOGIN << "\" />";

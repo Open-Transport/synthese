@@ -31,10 +31,17 @@ namespace synthese
 	{
 		class ValueInterfaceElement;
 
+		/** Execution variable library interface element.
+			
+			Usage :
+			@code set <variable_name> <value> @endcode
+
+			@ingroup m11Library refLibrary
+		*/
 		class SetInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
-			interfaces::ValueInterfaceElement* _varName;
-			interfaces::ValueInterfaceElement* _varValue;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _varName;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _varValue;
 
 		public:
 			/** Controls and store the internals parameters.
@@ -48,8 +55,12 @@ namespace synthese
 				@param rootObject Object to read at the display
 				@param request Source request
 			*/
-			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
-			~SetInterfaceElement();
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 		};
 	}
 }

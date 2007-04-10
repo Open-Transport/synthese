@@ -9,7 +9,7 @@
 
 
 using namespace synthese::util::XmlToolkit;
-
+using namespace boost;
 
 
 namespace synthese
@@ -18,20 +18,20 @@ namespace env
 {
 
 
-City* 
+shared_ptr<City> 
 XmlBuilder::CreateCity (XMLNode& node)
 {
     uid id (GetLongLongAttr (node, "id"));
 
     std::string name (GetStringAttr (node, "name"));
     
-    return new City (id, name);
+    return shared_ptr<City>(new City (id, name));
 }
 
 
 
 
- Axis* 
+ shared_ptr<Axis>
  XmlBuilder::CreateAxis (XMLNode& node)
  {
     uid id (GetLongLongAttr (node, "id"));
@@ -41,13 +41,13 @@ XmlBuilder::CreateCity (XMLNode& node)
     bool free (GetBoolAttr (node, "free"));
     bool authorized (GetBoolAttr (node, "authorized"));
     
-    return new synthese::env::Axis (id, name, free, authorized);
+    return shared_ptr<Axis>(new synthese::env::Axis (id, name, free, authorized));
  }
 
 
 
     
-ConnectionPlace* 
+shared_ptr<ConnectionPlace>
 XmlBuilder::CreateConnectionPlace (XMLNode& node, 
 				   const City::Registry& cities)
 {
@@ -77,21 +77,23 @@ XmlBuilder::CreateConnectionPlace (XMLNode& node,
 					  "defaultTransferDelay", 
 					  ConnectionPlace::FORBIDDEN_TRANSFER_DELAY));
 
-    const City* city = cities.get (cityId);
+    shared_ptr<const City> city = cities.get (cityId);
 
-    return new ConnectionPlace (id, name, city,
-				type, defaultTransferDelay);
+    return shared_ptr<ConnectionPlace>(
+				new ConnectionPlace (id, name, city.get(),
+								type, defaultTransferDelay))
+				;
     
 
 }
 
 
-CommercialLine* 
+shared_ptr<CommercialLine> 
 XmlBuilder::CreateCommercialLine (XMLNode& node)
 {
     uid id (GetLongLongAttr (node, "id"));
 
-    CommercialLine* commercialLine = new CommercialLine ();
+    shared_ptr<CommercialLine> commercialLine (new CommercialLine ());
 
     commercialLine->setKey (id);
 
@@ -113,7 +115,7 @@ XmlBuilder::CreateCommercialLine (XMLNode& node)
 
 
 
-Line* 
+shared_ptr<Line> 
 XmlBuilder::CreateLine (XMLNode& node, 
 			const Axis::Registry& axes,
 			const CommercialLine::Registry& commercialLines)
@@ -123,11 +125,13 @@ XmlBuilder::CreateLine (XMLNode& node,
     std::string name (GetStringAttr (node, "name"));
     uid axisId (GetLongLongAttr (node, "axisId"));
 
-    synthese::env::Line* line = new synthese::env::Line (id, name, 
-							 axes.get (axisId));
+    shared_ptr<Line> line (
+							 new synthese::env::Line (id, name, 
+							 							 axes.get (axisId).get()))
+							 ;
 
     uid commercialLineId (GetLongLongAttr (node, "commercialLineId"));
-    line->setCommercialLine (commercialLines.get (commercialLineId));
+    line->setCommercialLine (commercialLines.get (commercialLineId).get());
  
     std::string direction (GetStringAttr (node, "direction"));
     line->setDirection (direction);
@@ -138,7 +142,7 @@ XmlBuilder::CreateLine (XMLNode& node,
 
 
 
-LineStop* 
+shared_ptr<LineStop> 
 XmlBuilder::CreateLineStop (XMLNode& node, 
 			    Line::Registry& lines,
 			    const PhysicalStop::Registry& physicalStops)
@@ -154,25 +158,28 @@ XmlBuilder::CreateLineStop (XMLNode& node,
     bool isArrival (GetBoolAttr (node, "isArrival"));
     double metricOffset (GetDoubleAttr (node, "metricOffset"));
    
-    Line* line = lines.get (lineId);
+    shared_ptr<Line> line = lines.getUpdateable (lineId);
 
-    LineStop* lineStop = new LineStop (
-	id,
-	line, 
-	rankInPath, 
-	isDeparture, isArrival,
-	metricOffset, 
-	physicalStops. get (physicalStopId));
+    shared_ptr<LineStop> lineStop (
+	new LineStop (
+		id,
+		line.get(), 
+		rankInPath, 
+		isDeparture, isArrival,
+		metricOffset, 
+		physicalStops.get(physicalStopId).get()))
+	;
 
     // Add via points
     int nbPoints = GetChildNodeCount(node, "point");
     for (int i=0; i<nbPoints; ++i) 
     {
-	XMLNode pointNode = GetChildNode (node, "point", i);
-	lineStop->addViaPoint (CreatePoint (pointNode));
+		XMLNode pointNode = GetChildNode (node, "point", i);
+		lineStop->addViaPoint (CreatePoint (pointNode));
     }
 
-    line->addEdge (lineStop);
+    line->addEdge (lineStop.get());
+
 
     return lineStop;
 
@@ -182,7 +189,7 @@ XmlBuilder::CreateLineStop (XMLNode& node,
 
 
 
-PhysicalStop* 
+shared_ptr<PhysicalStop> 
 XmlBuilder::CreatePhysicalStop (XMLNode& node, const ConnectionPlace::Registry& connectionPlaces)
 {
     // assert ("physicalStop" == node.getName ());
@@ -192,11 +199,13 @@ XmlBuilder::CreatePhysicalStop (XMLNode& node, const ConnectionPlace::Registry& 
     double x (GetDoubleAttr (node, "x"));
     double y (GetDoubleAttr (node, "y"));
 
-    return new synthese::env::PhysicalStop (
-	id,
-	name, 
-	connectionPlaces.get (placeId), 
-	x, y);
+    return shared_ptr<PhysicalStop>(
+	new synthese::env::PhysicalStop (
+		id,
+		name, 
+		connectionPlaces.get (placeId).get(), 
+		x, y))
+	;
 
 }
 

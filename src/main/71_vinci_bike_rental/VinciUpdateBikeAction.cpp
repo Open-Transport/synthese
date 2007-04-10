@@ -29,6 +29,7 @@
 #include "02_db/DBEmptyResultException.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -45,7 +46,7 @@ namespace synthese
 		ParametersMap VinciUpdateBikeAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_BIKE_ID, Conversion::ToString(_bike ? _bike->getKey() : uid())));
+			map.insert(make_pair(PARAMETER_BIKE_ID, Conversion::ToString(_bike.get() ? _bike->getKey() : uid())));
 			map.insert(make_pair(PARAMETER_NUMBER, _number));
 			map.insert(make_pair(PARAMETER_MARKED_NUMBER, _markedNumber));
 			return map;
@@ -72,26 +73,17 @@ namespace synthese
 					throw ActionException("Parameter number not found");
 				_markedNumber = it->second;
 			}
-			catch(DBEmptyResultException e)
+			catch(DBEmptyResultException<VinciBike> e)
 			{
 				throw ActionException("Le vélo spécifié est introuvable");
 			}
 		}
 
-		VinciUpdateBikeAction::VinciUpdateBikeAction()
-			: Action(), _bike(NULL)
-		{}
-
 		void VinciUpdateBikeAction::run()
 		{
 			_bike->setNumber(_number);
 			_bike->setMarkedNumber(_markedNumber);
-			VinciBikeTableSync::save(_bike);
-		}
-
-		VinciUpdateBikeAction::~VinciUpdateBikeAction()
-		{
-			delete _bike;
+			VinciBikeTableSync::save(_bike.get());
 		}
 	}
 }

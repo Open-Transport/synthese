@@ -33,11 +33,15 @@ namespace synthese
 		class AdminRequest;
 
 		/** Tree of admin pages links.
-			@ingroup m32
+			@ingroup m32Values refValues
 		*/
 		class AdminPagesTreeInterfaceElement : public interfaces::ValueInterfaceElement
 		{
-			static std::string getSubPages(const std::string& page, const AdminInterfaceElement* currentPage, const server::FunctionRequest<admin::AdminRequest>* request);
+			static std::string getSubPages(
+				const std::string& page
+				, boost::shared_ptr<const AdminInterfaceElement> currentPage
+				, const server::FunctionRequest<admin::AdminRequest>* request
+			);
 
 		public:
 			/** Controls and store the internals parameters.
@@ -45,9 +49,12 @@ namespace synthese
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
 
-			std::string getValue(const interfaces::ParametersVector&, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
-			
-			~AdminPagesTreeInterfaceElement();
+			std::string getValue(
+				const interfaces::ParametersVector&
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL
+			) const;
 		};
 	}
 }

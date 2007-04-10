@@ -44,6 +44,7 @@
 #include "32_admin/AdminModule.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -122,15 +123,15 @@ namespace synthese
 			v.push_back(make_pair(PARAMETER_SEARCH_NAME, string("Nom")));
 			v.push_back(make_pair(string(), string("Résumé")));
 			v.push_back(make_pair(string(), string("Actions")));
-			ActionResultHTMLTable t(v, s.getForm(), "", true, addProfileRequest.getHTMLForm("add"), AddProfileAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, s.getForm(), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addProfileRequest.getHTMLForm("add"), AddProfileAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 			t.getActionForm().addHiddenField(AddProfileAction::PARAMETER_TEMPLATE_ID, Conversion::ToString(UNKNOWN_VALUE));
 
 			stream << t.open();
 			
 			// Profiles loop
-			for (vector<Profile*>::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
+			for (vector<shared_ptr<Profile> >::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
 			{
-				Profile* profile = *it;
+				shared_ptr<Profile> profile = *it;
 
 				profileRequest.setObjectId(profile->getKey());
 				deleteProfileRequest.setObjectId(profile->getKey());
@@ -143,7 +144,7 @@ namespace synthese
 					stream << "<li>Hérite de " << SecurityModule::getProfiles().get(profile->getParentId())->getName() << "</li>";
 				for (Profile::RightsVector::const_iterator it = profile->getRights().begin(); it != profile->getRights().end(); ++it)
 				{
-					const Right* r = it->second;
+					shared_ptr<const Right> r = it->second;
 					stream << "<li>Accès " << Right::getLevelLabel(r->getPublicRightLevel()) << " public et " << Right::getLevelLabel(r->getPrivateRightLevel()) << " privé pour " << r->getFactoryKey();
 					if (r->getParameter() != "*")
 						stream << "/" << r->displayParameter();

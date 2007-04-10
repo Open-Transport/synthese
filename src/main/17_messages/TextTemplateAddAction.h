@@ -32,7 +32,7 @@ namespace synthese
 	namespace messages
 	{
 		/** TextTemplateAddAction action class.
-			@ingroup m17
+			@ingroup m17Actions refActions
 		*/
 		class TextTemplateAddAction : public server::Action
 		{
@@ -61,10 +61,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			TextTemplateAddAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

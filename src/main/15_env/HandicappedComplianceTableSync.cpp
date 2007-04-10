@@ -34,6 +34,7 @@
 #include "HandicappedComplianceTableSync.h"
 
 using namespace std;
+using namespace boost;
 using boost::logic::tribool;
 
 namespace synthese
@@ -109,12 +110,12 @@ namespace synthese
 			addTableColumn (COL_CAPACITY, "INTEGER");
 		}
 
-		void HandicappedComplianceTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void HandicappedComplianceTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				HandicappedCompliance* object = new HandicappedCompliance();
-				load(object, rows, i);
+				shared_ptr<HandicappedCompliance> object(new HandicappedCompliance());
+				load(object.get(), rows, i);
 				EnvModule::getHandicappedCompliances().add(object);
 			}
 		}
@@ -126,8 +127,8 @@ namespace synthese
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
 				if (EnvModule::getHandicappedCompliances().contains(id))
 				{
-					HandicappedCompliance* object = EnvModule::getHandicappedCompliances().get(id);
-					load(object, rows, i);
+					shared_ptr<HandicappedCompliance> object = EnvModule::getHandicappedCompliances().getUpdateable(id);
+					load(object.get(), rows, i);
 				}
 			}
 		}
@@ -144,7 +145,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<HandicappedCompliance*> HandicappedComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<HandicappedCompliance> > HandicappedComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -163,11 +164,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<HandicappedCompliance*> objects;
+				vector<shared_ptr<HandicappedCompliance> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					HandicappedCompliance* object = new HandicappedCompliance();
-					load(object, result, i);
+					shared_ptr<HandicappedCompliance> object(new HandicappedCompliance());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

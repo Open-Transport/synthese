@@ -26,13 +26,15 @@
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePageException.h"
 
+using boost::shared_ptr;
+
 namespace synthese
 {
 	using namespace util;
 
 	namespace interfaces
 	{
-		LibraryInterfaceElement* LibraryInterfaceElement::create( const std::string & text, const InterfacePage* page )
+		shared_ptr<LibraryInterfaceElement> LibraryInterfaceElement::create( const std::string & text, shared_ptr<const InterfacePage> page )
 		{
 			// Trim the left spaces
 			size_t start_pos;
@@ -41,13 +43,13 @@ namespace synthese
 
 			// Empty line : return null
 			if (start_pos >= text.size())
-				return NULL;
+				return shared_ptr<LibraryInterfaceElement>();
 
 			// Search for the end of the keyword
 			size_t word_end_pos = start_pos;
 			for (; word_end_pos < text.size() && text[word_end_pos] != ' '; ++word_end_pos);
 
-			LibraryInterfaceElement* lie = NULL;
+			shared_ptr<LibraryInterfaceElement> lie;
 			try
 			{
 				lie = Factory<LibraryInterfaceElement>::create(text.substr(start_pos, word_end_pos - start_pos));

@@ -28,6 +28,7 @@
 #include "17_messages/ScenarioTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -72,10 +73,9 @@ namespace synthese
 					_name = it->second;
 					if(_name.empty())
 						throw ActionException("Le scénario doit avoir un nom.");
-					vector<Scenario*> v = ScenarioTableSync::search(_isTemplate, _name, 0, 1);
+					vector<shared_ptr<Scenario> > v = ScenarioTableSync::search(_isTemplate, _name, 0, 1);
 					if (!v.empty())
 					{
-						delete v.front();
 						throw ActionException("Un scénario de même nom existe déjà");
 					}
 				}
@@ -91,22 +91,19 @@ namespace synthese
 			}
 		}
 
-		AddScenarioAction::AddScenarioAction()
-			: Action()
-			, _template(NULL)
-		{}
-
 		void AddScenarioAction::run()
 		{
-			Scenario* scenario = _template ? _template->createCopy() : new Scenario;
+			shared_ptr<Scenario> scenario;
+			if (_template.get())
+				scenario = _template->createCopy();
+			else
+				scenario.reset(new Scenario);
 			scenario->setIsATemplate(_isTemplate);
 			if (_isTemplate)
 				scenario->setName(_name);
-			ScenarioTableSync::save(scenario);
+			ScenarioTableSync::save(scenario.get());
 
 			_request->setObjectId(scenario->getKey());
-
-			delete scenario;
 		}
 	}
 }

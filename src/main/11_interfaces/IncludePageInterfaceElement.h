@@ -34,11 +34,14 @@ namespace synthese
 		class IncludePageInterfaceElement : public LibraryInterfaceElement
 		{
 		private:
-			ValueInterfaceElement*	_page_code;
-			ValueElementList		_parameters;
+			boost::shared_ptr<ValueInterfaceElement>	_page_code;
+			ValueElementList							_parameters;
 
 		public:
-			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 			void storeParameters(ValueElementList& vel);
 		};
 	}

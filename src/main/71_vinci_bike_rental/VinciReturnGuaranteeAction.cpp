@@ -59,7 +59,7 @@ namespace synthese
 		ParametersMap VinciReturnGuaranteeAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if (_guarantee)
+			if (_guarantee.get())
 				map.insert(make_pair(PARAMETER_GUARANTEE_ID, Conversion::ToString(_guarantee->getKey())));
 			return map;
 		}
@@ -75,7 +75,7 @@ namespace synthese
 					throw ActionException("Guarantee not specified");
 				_guarantee = TransactionTableSync::get(Conversion::ToLongLong(it->second));
 			}
-			catch(DBEmptyResultException e)
+			catch(DBEmptyResultException<Transaction>)
 			{
 				throw ActionException("Specified guarantee not found");
 			}
@@ -85,16 +85,7 @@ namespace synthese
 		{
 			DateTime now;
 			_guarantee->setEndDateTime(now);
-			TransactionTableSync::save(_guarantee);
+			TransactionTableSync::save(_guarantee.get());
 		}
-
-		VinciReturnGuaranteeAction::~VinciReturnGuaranteeAction()
-		{
-			delete _guarantee;
-		}
-
-		VinciReturnGuaranteeAction::VinciReturnGuaranteeAction()
-			: _guarantee(NULL)
-		{ }
 	}
 }

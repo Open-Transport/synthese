@@ -35,6 +35,7 @@
 #include "15_env/EnvironmentTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -106,14 +107,14 @@ namespace synthese
 		void 
 		EnvironmentTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 						synthese::db::SQLiteSync* sync,
-						const synthese::db::SQLiteResult& rows)
+						const synthese::db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows (); ++i)
 			{
 				uid envId = Conversion::ToLongLong (rows.getColumn (i, TABLE_COL_ID));
 				if (EnvModule::getEnvironments().contains (envId)) continue;
-				Environment* newEnv = new Environment (envId);
-				load(newEnv, rows, i);
+				shared_ptr<Environment> newEnv(new Environment (envId));
+				load(newEnv.get(), rows, i);
 				EnvModule::getEnvironments().add (newEnv);
 			}
 		}

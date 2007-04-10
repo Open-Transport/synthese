@@ -14,6 +14,7 @@
 #include "15_env/EnvironmentLinkTableSync.h"
 #include "15_env/ComponentTableSync.h"
 
+using namespace boost;
 
 namespace synthese
 {
@@ -48,12 +49,12 @@ void
 EnvironmentLinkTableSync::beforeFirstSync (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 				     synthese::db::SQLiteSync* sync)
 {
-    std::map<std::string, SQLiteTableSync* > tableSynchronizers = sync->getTableSynchronizers ();
-    for (std::map<std::string, SQLiteTableSync* >::const_iterator it = tableSynchronizers.begin ();
+    std::map<std::string, shared_ptr<SQLiteTableSync> > tableSynchronizers = sync->getTableSynchronizers ();
+    for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it = tableSynchronizers.begin ();
 	 it != tableSynchronizers.end (); ++it)
     {
 	
-	const SQLiteTableSync* synchronizer = it->second;
+	const SQLiteTableSync* synchronizer = it->second.get();
 	std::string tableName = synchronizer->getTableName ();
 	
         // Parse table id from table name
@@ -70,7 +71,7 @@ EnvironmentLinkTableSync::beforeFirstSync (const synthese::db::SQLiteQueueThread
 void 
 EnvironmentLinkTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 				     synthese::db::SQLiteSync* sync,
-				     const synthese::db::SQLiteResult& rows)
+				     const synthese::db::SQLiteResult& rows, bool isFirstSync)
 {
     for (int i=0; i<rows.getNbRows (); ++i)
     {
@@ -94,9 +95,9 @@ EnvironmentLinkTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* 
 
 	if (existingRow.getNbRows () == 1) 
 	{
-	    ComponentTableSync* componentTableSync = dynamic_cast<ComponentTableSync*>
+	    shared_ptr<ComponentTableSync> componentTableSync = dynamic_pointer_cast<ComponentTableSync, SQLiteTableSync>
 		(sync->getTableSynchronizer (componentTableName));
-		componentTableSync->doAdd (existingRow, 0, *EnvModule::getEnvironments().get (envId));
+		componentTableSync->doAdd (existingRow, 0, *EnvModule::getEnvironments().getUpdateable(envId));
 	}
     }
 }
@@ -142,9 +143,9 @@ EnvironmentLinkTableSync::rowsRemoved (const synthese::db::SQLiteQueueThreadExec
 	/// @todo Check if necessary
 	if (existingRow.getNbRows () == 1) 
 	{
-	    ComponentTableSync* componentTableSync = dynamic_cast<ComponentTableSync*>
+	    shared_ptr<ComponentTableSync> componentTableSync = dynamic_pointer_cast<ComponentTableSync, SQLiteTableSync>
 		(sync->getTableSynchronizer (componentTableName));
-		componentTableSync->doRemove (existingRow, 0, *EnvModule::getEnvironments().get (envId));
+		componentTableSync->doRemove (existingRow, 0, *EnvModule::getEnvironments().getUpdateable (envId).get());
 	}
 	_cache.erase (id);
     }

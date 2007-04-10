@@ -33,6 +33,7 @@
 #include "34_departures_table/UpdateDisplayTypeAction.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -73,7 +74,7 @@ namespace synthese
 			// Display types loop
 			for (DisplayType::Registry::const_iterator it = DeparturesTableModule::getDisplayTypes().begin(); it != DeparturesTableModule::getDisplayTypes().end(); ++it)
 			{
-				DisplayType* dt = it->second;
+				shared_ptr<const DisplayType> dt = it->second;
 
 				HTMLForm uf(updateRequest.getHTMLForm("update" + Conversion::ToString(it->second->getKey())));
 				uf.addHiddenField(UpdateDisplayTypeAction::PARAMETER_ID, Conversion::ToString(dt->getKey()));

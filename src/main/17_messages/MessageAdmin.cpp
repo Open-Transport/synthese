@@ -77,7 +77,7 @@ namespace synthese
 		void MessageAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			ActionFunctionRequest<UpdateAlarmAction,AdminRequest> updateRequest(request);
-			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+			updateRequest.getFunction()->setPage<MessageAdmin>();
 			updateRequest.setObjectId(request->getObjectId());
 
 			stream << "<h1>Paramètres</h1>";
@@ -159,7 +159,7 @@ namespace synthese
 				
 					stream << "<h1>Diffusion sur " << arit->getTitle() << "</h1>";
 
-					arit->displayBroadcastListEditor(stream, _alarm, _parameters, searchRequest, addRequest, removeRequest);
+					arit->displayBroadcastListEditor(stream, _alarm.get(), _parameters, searchRequest, addRequest, removeRequest);
 				}
 			}
 		}

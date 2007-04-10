@@ -203,14 +203,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Interface elements library"
-			>
-		</Filter>
-		<Filter
-			Name="Interface value elements"
-			>
-		</Filter>
-		<Filter
 			Name="Actions"
 			>
 			<Filter
@@ -303,18 +295,6 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Interface pages"
-			>
-			<File
-				RelativePath=".\VinciPrintedContractInterfacePage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\VinciPrintedContractInterfacePage.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Requests"
 			>
 			<File
@@ -325,6 +305,30 @@
 				RelativePath=".\VinciContractPrintRequest.h"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Interface"
+			>
+			<Filter
+				Name="Interface value elements"
+				>
+			</Filter>
+			<Filter
+				Name="Interface elements library"
+				>
+			</Filter>
+			<Filter
+				Name="Interface pages"
+				>
+				<File
+					RelativePath=".\VinciPrintedContractInterfacePage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\VinciPrintedContractInterfacePage.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\LICENSE.txt"

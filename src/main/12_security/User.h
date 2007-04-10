@@ -25,6 +25,8 @@
 
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
@@ -53,9 +55,9 @@ namespace synthese
 		class User : public util::Registrable<uid, User>
 		{
 		private:
-			const Profile*	_profile;
-			std::string		_login;
-			std::string		_password;
+			boost::shared_ptr<const Profile>	_profile;
+			std::string							_login;
+			std::string							_password;
 			std::string		_name;
 			std::string		_surname;
 			std::string		_address;
@@ -75,7 +77,7 @@ namespace synthese
 
 			//! \name Setters
 			//@{
-				void setProfile(const Profile* profile);
+				void setProfile(boost::shared_ptr<const Profile> profile);
 				void setLogin(const std::string& login);
 				
 				/** Password setter.
@@ -96,8 +98,8 @@ namespace synthese
 
 			//! \name Getters
 			//@{
-				const Profile* getProfile() const;
-				const std::string& getLogin() const;
+				boost::shared_ptr<const Profile>	getProfile() const;
+				const std::string&					getLogin() const;
 
 				/** Password getter.
 					@todo handle encryption (create a getEncryptedPassword instead)

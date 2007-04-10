@@ -30,6 +30,8 @@
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	namespace env
@@ -47,7 +49,6 @@ namespace synthese
 			static const std::string COL_ALLOWED;
 
 			AxisTableSync();
-			~AxisTableSync();
 
 
 			/** Axis search.
@@ -58,7 +59,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<Axis*> search(
+			static std::vector<shared_ptr<Axis> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
 
@@ -70,7 +71,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on Axis creation.
 				This method updates the corresponding object in ram.

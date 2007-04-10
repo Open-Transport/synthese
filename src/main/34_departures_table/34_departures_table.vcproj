@@ -225,62 +225,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="LibraryInterfaceElement"
-			>
-			<File
-				RelativePath=".\DeparturesTableDestinationContentInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DeparturesTableDestinationContentInterfaceElement.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DeparturesTableInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DeparturesTableInterfaceElement.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DeparturesTableLineContentInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DeparturesTableLineContentInterfaceElement.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DeparturesTableTimeContentInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DeparturesTableTimeContentInterfaceElement.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="InterfacePage"
-			>
-			<File
-				RelativePath=".\DeparturesTableInterfacePage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DeparturesTableInterfacePage.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DepartureTableRowInterfacePage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DepartureTableRowInterfacePage.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Functions"
 			>
 			<File
@@ -509,24 +453,84 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Value Interface Elements"
+			Name="Interface"
 			>
-			<File
-				RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.cpp"
+			<Filter
+				Name="LibraryInterfaceElement"
 				>
-			</File>
-			<File
-				RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.h"
+				<File
+					RelativePath=".\DeparturesTableDestinationContentInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DeparturesTableDestinationContentInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DeparturesTableInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DeparturesTableInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DeparturesTableLineContentInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DeparturesTableLineContentInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DeparturesTableTimeContentInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DeparturesTableTimeContentInterfaceElement.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="InterfacePage"
 				>
-			</File>
-			<File
-				RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.cpp"
+				<File
+					RelativePath=".\DeparturesTableInterfacePage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DeparturesTableInterfacePage.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DepartureTableRowInterfacePage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DepartureTableRowInterfacePage.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Value Interface Elements"
 				>
-			</File>
-			<File
-				RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.h"
-				>
-			</File>
+				<File
+					RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\DeparturesTableModule.cpp"

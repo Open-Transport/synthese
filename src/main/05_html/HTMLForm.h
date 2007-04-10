@@ -48,9 +48,11 @@ namespace synthese
 		*/
 		class HTMLForm
 		{
+		public:
+			typedef std::map<std::string, std::string> HiddenFieldsMap;
+
 		protected:
 			typedef std::map<std::string, int> IDCounterMap;
-			typedef std::map<std::string, std::string> HiddenFieldsMap;
 			
 			const std::string	_name;
 			const std::string	_action;
@@ -123,17 +125,26 @@ namespace synthese
 			/** HTML Link button generator.
 				@return std::string The generated HTML Code
 				@author Hugues Romain
+				@date 2007
+				@note To override some field values, use HTMLModule::getLinkButon(getURL(HiddenFieldsMap), ...) instead.
+			*/
+			std::string getLinkButton(const std::string& caption, const std::string confirm="", const std::string icon="") const;
+
+			/** URL Generator.
+				@param overridingFields Fields value to output instead of the registered ones.
+				@return std::string The URL launching the form (GET action)
+				@author Hugues Romain
 				@date 2007				
 			*/
-			std::string getLinkButton(const std::string& caption, const std::string confirm="", const std::string icon="");
+			std::string getURL(HiddenFieldsMap overridingFields = HiddenFieldsMap()) const;
 
 			/** External sorted selection list HTML input field (template)
-			@param name Name of the field
-			@param choices List of choices : a map sorted by elements of S (the sort value is not read), giving pairs "value => text"
-			@param value Default selected value
-			@return Selection list HTML input field
-			@author Hugues Romain
-			@date 2007					
+				@param name Name of the field
+				@param choices List of choices : a map sorted by elements of S (the sort value is not read), giving pairs "value => text"
+				@param value Default selected value
+				@return Selection list HTML input field
+				@author Hugues Romain
+				@date 2007					
 			*/
 			template<class K, class T>
 			std::string getSelectInput(const std::string& name, const std::vector<std::pair<K, T> >& choices, const K& value);

@@ -14,7 +14,7 @@
 #include <sqlite/sqlite3.h>
 
 
-
+using namespace boost;
 using synthese::util::Conversion;
 
 namespace synthese
@@ -87,19 +87,21 @@ RoadTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
     uid reservationRuleId (
 	Conversion::ToLongLong (rows.getColumn (rowIndex, ROADS_TABLE_COL_RESERVATIONRULEID)));
 
-    City* city = environment.getCities ().get (cityId);
-    Road* road = new synthese::env::Road (id, name, 
-					  city, 
-					  roadType);
-	road->setFare (EnvModule::getFares ().get (fareId));
+    shared_ptr<City> city = environment.getCities ().getUpdateable (cityId);
+    shared_ptr<Road> road (
+					  new synthese::env::Road (id, name, 
+					  					  city.get(), 
+					  					  roadType))
+					  ;
+	road->setFare (EnvModule::getFares ().get (fareId).get());
 //    road->setAlarm (environment.getAlarms ().get (alarmId));
-	road->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
-	road->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
-	road->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
-	road->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId)); 
+	road->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId).get());
+	road->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
+	road->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
+	road->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId).get()); 
     
     environment.getRoads ().add (road);
-    city->getRoadsMatcher ().add (road->getName (), road);
+    city->getRoadsMatcher ().add (road->getName (), road.get());
 
 }
 
@@ -113,7 +115,7 @@ RoadTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
 			  synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-    Road* road = environment.getRoads ().get (id);
+    shared_ptr<Road> road = environment.getRoads ().getUpdateable(id);
 
     std::string name (
 	rows.getColumn (rowIndex, ROADS_TABLE_COL_NAME));
@@ -139,20 +141,20 @@ RoadTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
     uid reservationRuleId (
 	Conversion::ToLongLong (rows.getColumn (rowIndex, ROADS_TABLE_COL_RESERVATIONRULEID)));
 
-    City* city = environment.getCities ().get (road->getCity ()->getKey ());
+    shared_ptr<City> city = environment.getCities ().getUpdateable (road->getCity ()->getKey ());
     city->getRoadsMatcher ().remove (road->getName ());
 
     road->setName (name);
     road->setType (roadType);
 
-	road->setFare (EnvModule::getFares ().get (fareId));
+	road->setFare (EnvModule::getFares ().get (fareId).get());
 //    road->setAlarm (environment.getAlarms ().get (alarmId));
-	road->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
-	road->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
-	road->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
-	road->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId)); 
+	road->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId).get());
+	road->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
+	road->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
+	road->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId).get()); 
     
-    city->getRoadsMatcher ().add (road->getName (), road);
+    city->getRoadsMatcher ().add (road->getName (), road.get());
 
 }
 
@@ -166,8 +168,8 @@ RoadTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
 {
     uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 
-    Road* road = environment.getRoads ().get (id);
-    City* city = environment.getCities ().get (road->getCity ()->getKey ());
+    shared_ptr<Road> road = environment.getRoads ().getUpdateable(id);
+    shared_ptr<City> city = environment.getCities ().getUpdateable (road->getCity ()->getKey ());
     city->getRoadsMatcher ().remove (road->getName ());
 
     environment.getRoads ().remove (id);

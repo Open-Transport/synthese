@@ -41,6 +41,7 @@
 #include "57_accounting/TransactionPartTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -72,26 +73,20 @@ namespace synthese
 			try
 			{
 				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
-				if (tp->getKey() > 0)
-				{
-					/// @todo UPDATE implementation
-				}
-				else
-				{
+				if (!tp->getKey())
 					tp->setKey(getId(1,1)); /// @todo Handle grid
-					stringstream query;
-					query << "INSERT INTO " << TABLE_NAME << " VALUES("
-						<< Conversion::ToString(tp->getKey())
-						<< "," << Conversion::ToString(tp->getTransactionId())
-						<< "," << Conversion::ToString(tp->getLeftCurrencyAmount())
-						<< "," << Conversion::ToString(tp->getRightCurrencyAmount())
-						<< "," << Conversion::ToString(tp->getAccountId())
-						<< "," << Conversion::ToString(tp->getRateId())
-						<< "," << Conversion::ToSQLiteString(tp->getTradedObjectId())
-						<< "," << Conversion::ToSQLiteString(tp->getComment())
-						<< ')';
-					sqlite->execUpdate(query.str());
-				}
+				stringstream query;
+				query << "REPLACE INTO " << TABLE_NAME << " VALUES("
+					<< Conversion::ToString(tp->getKey())
+					<< "," << Conversion::ToString(tp->getTransactionId())
+					<< "," << Conversion::ToString(tp->getLeftCurrencyAmount())
+					<< "," << Conversion::ToString(tp->getRightCurrencyAmount())
+					<< "," << Conversion::ToString(tp->getAccountId())
+					<< "," << Conversion::ToString(tp->getRateId())
+					<< "," << Conversion::ToSQLiteString(tp->getTradedObjectId())
+					<< "," << Conversion::ToSQLiteString(tp->getComment())
+					<< ')';
+				sqlite->execUpdate(query.str());
 			}
 			catch (SQLiteException& e)
 			{
@@ -132,7 +127,7 @@ namespace synthese
 			addTableIndex(TABLE_COL_TRADED_OBJECT_ID);
 		}
 
-		void TransactionPartTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionPartTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync = false)
 		{
 
 		}
@@ -147,8 +142,8 @@ namespace synthese
 
 		}
 
-		vector<TransactionPart*> TransactionPartTableSync::search(
-				const Transaction* transaction, const Account* account
+		vector<shared_ptr<TransactionPart> > TransactionPartTableSync::search(
+				shared_ptr<const Transaction> transaction, shared_ptr<const Account> account
 				, int first, int number)
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
@@ -163,21 +158,21 @@ namespace synthese
 			query << " LIMIT " << number << " OFFSET " << first;
 			
 			SQLiteResult result = sqlite->execQuery(query.str());
-			vector<TransactionPart*> tps;
+			vector<shared_ptr<TransactionPart> > tps;
 			for (int i=0; i<result.getNbRows(); ++i)
 			{
-//				try
-//				{
-					TransactionPart* tp = new TransactionPart;
-					load(tp, result, i);
-					tps.push_back(tp);
-//				}
+				shared_ptr<TransactionPart> tp(new TransactionPart);
+				load(tp.get(), result, i);
+				tps.push_back(tp);
 			}
 			return tps;
 		}
 
-		vector<TransactionPart*> TransactionPartTableSync::search(Account* account, User* user, bool order, int first /*= 0*/, int number /*= 0*/ )
-		{
+		vector<shared_ptr<TransactionPart> > TransactionPartTableSync::search(
+			shared_ptr<const Account> account
+			, shared_ptr<const User> user
+			, bool order, int first /*= 0*/, int number /*= 0*/
+		){
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
@@ -195,21 +190,19 @@ namespace synthese
 			query << " LIMIT " << number << " OFFSET " << first;
 			
 			SQLiteResult result = sqlite->execQuery(query.str());
-			vector<TransactionPart*> tps;
+			vector<shared_ptr<TransactionPart> > tps;
 			for (int i=0; i<result.getNbRows(); ++i)
 			{
-//				try
-//				{
-					TransactionPart* tp = new TransactionPart;
-					load(tp, result, i);
-					tps.push_back(tp);
-//				}
+				shared_ptr<TransactionPart> tp(new TransactionPart);
+				load(tp, result, i);
+				tps.push_back(tp);
 			}
 			return tps;
 		}
 
-		map<int, int> TransactionPartTableSync::count(Account* account, Date startDate, Date endDate, int first, int number)
-		{
+		map<int, int> TransactionPartTableSync::count(
+			shared_ptr<const Account> account, Date startDate, Date endDate, int first, int number
+		){
 			int transactionsNumber;
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -230,10 +223,7 @@ namespace synthese
 			map<int, int> mapii;
 			for (int i=0; i<result.getNbRows(); ++i)
 			{
-//				try
-//				{
 				mapii.insert(make_pair(Conversion::ToInt(result.getColumn(i, "hours")), Conversion::ToInt(result.getColumn(i, "numbers"))));
-//				}
 			}
 			return mapii;
 		}

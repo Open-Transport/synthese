@@ -46,7 +46,6 @@ namespace synthese
 			static const std::string COL_CAPACITY;
 
 			PedestrianComplianceTableSync();
-			~PedestrianComplianceTableSync();
 
 
 			/** PedestrianCompliances search.
@@ -57,7 +56,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<PedestrianCompliance*> search(
+			static std::vector<boost::shared_ptr<PedestrianCompliance> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
 
@@ -69,7 +68,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on PedestrianCompliances creation.
 				This method updates the corresponding object in ram.

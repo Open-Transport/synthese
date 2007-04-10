@@ -35,14 +35,14 @@ namespace synthese
 		class AlarmBroadcastList
 		{
 		private:
-			Alarm*			_alarm;
-			std::vector<T*>	_broadcastList;
+			boost::shared_ptr<Alarm>			_alarm;
+			std::vector<boost::shared_ptr<T> >	_broadcastList;
 
 		public:
 			AlarmBroadcastList();
 			~AlarmBroadcastList();
 
-			const std::vector<T*>& getList();
+			const std::vector<boost::shared_ptr<T> >& getList();
 		};
 	}
 }

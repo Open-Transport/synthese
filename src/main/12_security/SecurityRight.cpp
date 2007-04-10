@@ -28,6 +28,7 @@
 #include "12_security/Profile.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -50,7 +51,7 @@ namespace synthese
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER, "(tous profils)"));
-			_addSubProfilesLabel(m, NULL, string());
+			_addSubProfilesLabel(m, shared_ptr<const Profile>(), string());
 			return m;
 		}
 
@@ -64,10 +65,10 @@ namespace synthese
 			if (SecurityModule::getProfiles().contains(Conversion::ToLongLong(_parameter))
 				&& SecurityModule::getProfiles().contains(Conversion::ToLongLong(perimeter)))
 			{
-				Profile* includedProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(perimeter));
-				Profile* currentProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(_parameter));
+				shared_ptr<const Profile> includedProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(perimeter));
+				shared_ptr<const Profile> currentProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(_parameter));
 
-				for (;includedProfile != NULL; includedProfile = SecurityModule::getProfiles().get(includedProfile->getParentId()))
+				for (;includedProfile.get(); includedProfile = SecurityModule::getProfiles().get(includedProfile->getParentId()))
 					if (currentProfile == includedProfile)
 						return true;
 			}
@@ -75,11 +76,11 @@ namespace synthese
 			return false;
 		}
 
-		void SecurityRight::_addSubProfilesLabel( ParameterLabelsVector& plv, Profile* parent, std::string prefix)
+		void SecurityRight::_addSubProfilesLabel( ParameterLabelsVector& plv, shared_ptr<const Profile> parent, std::string prefix)
 		{
-			vector<Profile*> p = SecurityModule::getSubProfiles(parent);
+			vector<shared_ptr<const Profile> > p = SecurityModule::getSubProfiles(parent);
 
-			for (vector<Profile*>::const_iterator it = p.begin(); it != p.end(); ++it)
+			for (vector<shared_ptr<const Profile> >::const_iterator it = p.begin(); it != p.end(); ++it)
 			{
 				plv.push_back(make_pair(Conversion::ToString((*it)->getKey()), prefix + (*it)->getName()));
 

@@ -32,6 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "11_interfaces/StaticValueInterfaceElement.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -41,21 +42,6 @@ namespace synthese
 	{
 		const std::string FormattedNumberInterfaceElement::TYPE_CHAR_2 = "char(2)";
 		const std::string FormattedNumberInterfaceElement::TYPE_IDENTICAL = "identical";
-
-		FormattedNumberInterfaceElement::FormattedNumberInterfaceElement()
-			: _numberVIE(NULL)
-			, _formatVIE(NULL)
-			, _numberToAdd(NULL)
-		{
-
-		}
-
-		FormattedNumberInterfaceElement::~FormattedNumberInterfaceElement()
-		{
-			delete _numberVIE;
-			delete _formatVIE;
-			delete _numberToAdd;
-		}
 
 		void FormattedNumberInterfaceElement::storeParameters(ValueElementList& vel)
 		{
@@ -70,7 +56,7 @@ namespace synthese
 			}
 			else
             {
-				_formatVIE = new StaticValueInterfaceElement(TYPE_IDENTICAL);
+				_formatVIE.reset(new StaticValueInterfaceElement(TYPE_IDENTICAL));
             }
 
 			if (vel.size ())
@@ -79,7 +65,10 @@ namespace synthese
 			}
 		}
 
-		std::string FormattedNumberInterfaceElement::getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string FormattedNumberInterfaceElement::getValue(
+			const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			int __Nombre = Conversion::ToInt(_numberVIE->getValue(parameters, variables, object, request));
 			if (_numberToAdd != NULL)

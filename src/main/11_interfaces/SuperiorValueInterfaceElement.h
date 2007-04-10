@@ -31,12 +31,8 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		class ValueElementList;
-	}
-	namespace interfaces
-	{
 		/** Superior operator value interface element class.
-			@ingroup m11
+			@ingroup m11Values refValues
 
 			The comparison is numerical only.
 		*/
@@ -48,10 +44,14 @@ namespace synthese
 
 		public:
 		
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string getValue(const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 			
 			void storeParameters(interfaces::ValueElementList& vel);
 		};
 	}
 }
+
 #endif // SYNTHESE_SuperiorValueInterfaceElement_H__

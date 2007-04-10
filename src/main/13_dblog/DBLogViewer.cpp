@@ -33,10 +33,12 @@
 
 #include "12_security/SecurityModule.h"
 #include "12_security/User.h"
+#include "12_security/UserTableSync.h"
 
 #include "13_dblog/DBLog.h"
 #include "13_dblog/DBLogViewer.h"
 #include "13_dblog/DBLogModule.h"
+#include "13_dblog/DBLogEntryTableSync.h"
 
 #include "32_admin/AdminParametersException.h"
 #include "32_admin/AdminModule.h"
@@ -61,35 +63,74 @@ namespace synthese
 		const string DBLogViewer::PARAMETER_SEARCH_TYPE = "dlvst";
 		const string DBLogViewer::PARAMETER_START_DATE = "dlvsd";
 		const string DBLogViewer::PARAMETER_END_DATE = "dlved";
+		const string DBLogViewer::PARAMETER_SEARCH_TEXT = "dlvsx";
 
 		DBLogViewer::DBLogViewer()
 			: AdminInterfaceElement("dblogs", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
-			, _dbLog(NULL)
-			, _searchUser(UNKNOWN_VALUE)
-			, _searchType(UNKNOWN_VALUE)
+			, _searchLevel(DBLogEntry::DB_LOG_UNKNOWN), _searchStartDate(TIME_UNKNOWN)
+			, _searchEndDate(TIME_UNKNOWN)
 		{}
 
 		void DBLogViewer::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it = map.find(PARAMETER_LOG_KEY);
+			ParametersMap::const_iterator it;
+
+			// Log key
+			it = map.find(PARAMETER_LOG_KEY);
 			if (it == map.end())
 				throw AdminParametersException("Log key not specified");
-			try
-			{
-				_dbLog = Factory<DBLog>::create(it->second);
-			}
-			catch (FactoryException<DBLog> e)
-			{
+			if (!Factory<DBLog>::contains(it->second))
 				throw AdminParametersException("Invalid log key : " + it->second);
-			}
+			_dbLog = Factory<DBLog>::create(it->second);
 
-			it = map.find(PARAMETER_SEARCH_USER);
+			// Start Date
+			it = map.find(PARAMETER_START_DATE);
 			if (it != map.end())
-				_searchUser = Conversion::ToLongLong(it->second);
+				_searchStartDate = DateTime::FromString(it->second);
 
+			// End Date
+			it = map.find(PARAMETER_END_DATE);
+			if (it != map.end())
+				_searchEndDate = DateTime::FromString(it->second);
+
+			// User
+			it = map.find(PARAMETER_SEARCH_USER);
+			if (it != map.end() && Conversion::ToLongLong(it->second) > 0)
+				_searchUser = UserTableSync::get(Conversion::ToLongLong(it->second));
+
+			// Level
 			it = map.find(PARAMETER_SEARCH_TYPE);
 			if (it != map.end())
-				_searchType = Conversion::ToInt(it->second);
+				_searchLevel = (DBLogEntry::Level) Conversion::ToInt(it->second);
+
+			// Text
+			it = map.find(PARAMETER_SEARCH_TEXT);
+			if (it != map.end())
+				_searchText = it->second;
+
+			// table parameters
+			_resultTableRequestParameters = ResultHTMLTable::getParameters(map, PARAMETER_START_DATE, 30);
+
+			// Launch the search
+			_result = DBLogEntryTableSync::search(
+				_dbLog->getFactoryKey()
+				, _searchStartDate
+				, _searchEndDate
+				, _searchUser
+				, _searchLevel
+				, _searchText
+				, _resultTableRequestParameters.first
+				, _resultTableRequestParameters.maxSize
+				, _resultTableRequestParameters.orderField == PARAMETER_START_DATE
+				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_USER
+				, _resultTableRequestParameters.orderField == PARAMETER_SEARCH_TYPE
+				, _resultTableRequestParameters.raisingOrder
+				);
+
+			_resultTableResultParameters.next = _result.size() == _resultTableRequestParameters.maxSize + 1;
+			_resultTableResultParameters.size = _result.size();
+			if (_resultTableResultParameters.next)
+				_result.pop_back();
 		}
 
 		string DBLogViewer::getTitle() const
@@ -105,42 +146,40 @@ namespace synthese
 			stream << "<h1>Recherche d'entrées</h1>";
 
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
-			st.getForm().addHiddenField(PARAMETER_LOG_KEY, _logKey);
+			st.getForm().addHiddenField(PARAMETER_LOG_KEY, _dbLog->getFactoryKey());
 			stream << st.open();
-			stream << st.cell("Date début", st.getForm().getCalendarInput(PARAMETER_START_DATE, Date()));
-			stream << st.cell("Date fin", st.getForm().getCalendarInput(PARAMETER_END_DATE, Date()));
-			stream << st.cell("Utilisateur", st.getForm().getSelectInput(PARAMETER_SEARCH_USER, SecurityModule::getUserLabels(true), _searchUser));
-			stream << st.cell("Type", st.getForm().getSelectInput(PARAMETER_SEARCH_TYPE, DBLogModule::getEntryLevelLabels(true), _searchType));
-			stream << st.cell("Texte", st.getForm().getTextInput("", ""));
+			stream << st.cell("Date début", st.getForm().getCalendarInput(PARAMETER_START_DATE, _searchStartDate));
+			stream << st.cell("Date fin", st.getForm().getCalendarInput(PARAMETER_END_DATE, _searchEndDate));
+			stream << st.cell("Utilisateur", st.getForm().getSelectInput(PARAMETER_SEARCH_USER, SecurityModule::getUserLabels(true), _searchUser ? _searchUser->getKey() : 0));
+			stream << st.cell("Type", st.getForm().getSelectInput(PARAMETER_SEARCH_TYPE, DBLogModule::getEntryLevelLabels(true), (int) _searchLevel));
+			stream << st.cell("Texte", st.getForm().getTextInput(PARAMETER_SEARCH_TEXT, _searchText));
 			stream << st.close();
 			
 			stream << "<h1>Résultat de la recherche</h1>";
 
 			ResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAMETER_SEARCH_TYPE, "Type"));
-			v.push_back(make_pair(string(), "Date"));
+			v.push_back(make_pair(PARAMETER_START_DATE, "Date"));
 			v.push_back(make_pair(PARAMETER_SEARCH_USER, "Utilisateur"));
 			DBLog::ColumnsVector customCols = _dbLog->getColumnNames();
 			for (DBLog::ColumnsVector::const_iterator it = customCols.begin(); it != customCols.end(); ++it)
 				v.push_back(make_pair(string(), *it));
 
-			ResultHTMLTable t(v, st.getForm(), string(), true, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ResultHTMLTable t(v, st.getForm(), _resultTableRequestParameters, _resultTableResultParameters, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 			
-			for (vector<DBLogEntry*>::const_iterator it = _result.begin(); it != _result.end(); ++it)
+			for (vector<shared_ptr<DBLogEntry> >::const_iterator it = _result.begin(); it != _result.end(); ++it)
 			{
-				DBLogEntry* dbe = *it;
+				shared_ptr<DBLogEntry> dbe = *it;
 				stream << t.row();
 				stream << t.col() << DBLogModule::getEntryLevelLabel(dbe->getLevel());
 				stream << t.col() << dbe->getDate().toString();
-				stream << t.col() << dbe->getUser() ? dbe->getUser()->getLogin() : "";
+				stream << t.col() << (dbe->getUser() ? dbe->getUser()->getLogin() : "");
 
 				DBLog::ColumnsVector cols = _dbLog->parse(dbe->getContent());
 				for (DBLog::ColumnsVector::const_iterator it = cols.begin(); it != cols.end(); ++it)
 					stream << t.col() << *it;
-				
-				delete dbe;
 			}
 			
 			stream << t.close();

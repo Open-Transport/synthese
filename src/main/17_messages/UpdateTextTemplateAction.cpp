@@ -29,6 +29,7 @@
 #include "TextTemplateTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -60,7 +61,7 @@ namespace synthese
 				it = map.find(PARAMETER_TEXT_ID);
 				if (it == map.end())
 					throw ActionException("Text template not specified");
-				_text.reset(TextTemplateTableSync::get(Conversion::ToLongLong(it->second)));
+				_text = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
 				
 				// Name
 				it = map.find(PARAMETER_NAME);
@@ -69,12 +70,9 @@ namespace synthese
 				_name = it->second;
 				if (_name.empty())
 					throw ActionException("Le nom ne peut être vide");
-				vector<TextTemplate*> v = TextTemplateTableSync::search(_text->getAlarmLevel(), _name, 0, 1);
+				vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::search(_text->getAlarmLevel(), _name, 0, 1);
 				if (!v.empty())
-				{
-					delete v.front();
 					throw ActionException("Un texte portant ce nom existe déjà.");
-				}
 
 				// Short message
 				it = map.find(PARAMETER_SHORT_MESSAGE);
@@ -88,7 +86,7 @@ namespace synthese
 					throw ActionException("Long message not specified");
 				_longMessage = it->second;
 			}
-			catch (DBEmptyResultException e)
+			catch (DBEmptyResultException<TextTemplate>)
 			{
 				throw ActionException("Specified text template not found");
 			}

@@ -75,7 +75,6 @@ namespace synthese
 	{
 		VinciCustomerAdminInterfaceElement::VinciCustomerAdminInterfaceElement()
 			: AdminInterfaceElement("vincicustomers", AdminInterfaceElement::DISPLAYED_IF_CURRENT) 
-			, _contract(NULL), _user(NULL)		
 		{}
 
 
@@ -88,27 +87,27 @@ namespace synthese
 		{
 			// Update user request
 			ActionFunctionRequest<VinciUpdateCustomerAction,AdminRequest> updateRequest(request);
-			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
+			updateRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 			updateRequest.setObjectId(request->getObjectId());
 
 			// Add guarantee request
 			ActionFunctionRequest<VinciAddGuaranteeAction,AdminRequest> addGuaranteeRequest(request);
-			addGuaranteeRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
+			addGuaranteeRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 			addGuaranteeRequest.setObjectId(request->getObjectId());
 
 			// Return guarantee request
 			ActionFunctionRequest<VinciReturnGuaranteeAction, AdminRequest> returnGuaranteeRequest(request);
-			returnGuaranteeRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
+			returnGuaranteeRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 			returnGuaranteeRequest.setObjectId(request->getObjectId());
 
 			// Add Rent request
 			ActionFunctionRequest<RentABikeAction, AdminRequest> addRentRequest(request);
-			addRentRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
+			addRentRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 			addRentRequest.setObjectId(request->getObjectId());
 
 			// Return Rent request
 			ActionFunctionRequest<ReturnABikeAction,AdminRequest> returnRentRequest(request);
-			returnRentRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
+			returnRentRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 			returnRentRequest.setObjectId(request->getObjectId());
 
 			// Print request
@@ -155,13 +154,13 @@ namespace synthese
 
 			// Guarantees
 			stream << "<h1>Cautions</h1>";
-			Account* checkAccount = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE);
-			Account* cardAccount = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE);
+			shared_ptr<Account> checkAccount = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE);
+			shared_ptr<Account> cardAccount = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE);
 			vector<pair<uid, string> > paymentModesMap;
 			paymentModesMap.push_back(make_pair(checkAccount->getKey(), "Chèque"));
 			paymentModesMap.push_back(make_pair(cardAccount->getKey(), "Carte"));
 
-			vector<TransactionPart*> guarantees = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), _user);
+			vector<shared_ptr<TransactionPart> > guarantees = TransactionPartTableSync::search((shared_ptr<const Account>) VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE), _user);
 			HTMLForm addGuaranteeForm(addGuaranteeRequest.getHTMLForm("addguarantee"));
 			addGuaranteeForm.addHiddenField(VinciAddGuaranteeAction::PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey()));
 			
@@ -182,27 +181,25 @@ namespace synthese
 			stream << ct.col() << addGuaranteeForm.getSelectInput(VinciAddGuaranteeAction::PARAMETER_ACCOUNT_ID, paymentModesMap, uid());
 			stream << ct.col() << addGuaranteeForm.getSubmitButton("Nouvelle caution");
 
-			for (vector<TransactionPart*>::iterator it = guarantees.begin(); it != guarantees.end(); ++it)
+			for (vector<shared_ptr<TransactionPart> >::iterator it = guarantees.begin(); it != guarantees.end(); ++it)
 			{
-				Transaction* transaction = TransactionTableSync::get((*it)->getTransactionId());
-				vector<TransactionPart*> payments = TransactionPartTableSync::search(transaction);
+				shared_ptr<Transaction> transaction = TransactionTableSync::get((*it)->getTransactionId());
+				vector<shared_ptr<TransactionPart> > payments = TransactionPartTableSync::search(transaction);
 
 				stream << ct.row();
 				stream << ct.col() << transaction->getStartDateTime().toString();
 				stream << ct.col() << Conversion::ToString((*it)->getRightCurrencyAmount());
 				stream << ct.col();
-				for (vector<TransactionPart*>::iterator it2 = payments.begin(); it2 != payments.end(); ++it2)
+				for (vector<shared_ptr<TransactionPart> >::iterator it2 = payments.begin(); it2 != payments.end(); ++it2)
 				{
 					if ((*it2)->getKey() != (*it)->getKey())
 					{
-						Account* account = AccountTableSync::get((*it2)->getAccountId());
+						shared_ptr<Account> account = AccountTableSync::get((*it2)->getAccountId());
 						if (account->getRightClassNumber() == VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE)
 							stream << "Chèque";
 						else
 							stream << "Carte";
-						delete account;
 					}
-					delete (*it2);
 				}
 				stream << ct.col();
 				if (transaction->getEndDateTime().isUnknown())
@@ -213,17 +210,14 @@ namespace synthese
 				}
 				else
 					stream << "Caution rendue le " << transaction->getEndDateTime().toString();
-
-				delete transaction;
-				delete *it;
 			}
 
 			stream << ct.close() << addGuaranteeForm.close() << "</div>";
 
 			// Rents
 			stream << "<h1>Locations</h1>";
-			vector<TransactionPart*> rents = TransactionPartTableSync::search(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), _user);
-			vector<VinciRate*> rates = VinciRateTableSync::search();
+			vector<shared_ptr<TransactionPart> > rents = TransactionPartTableSync::search((shared_ptr<const Account>) VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE), _user);
+			vector<shared_ptr<VinciRate> > rates = VinciRateTableSync::search();
 			HTMLForm addRentForm(addRentRequest.getHTMLForm("addrent"));
 			addRentForm.addHiddenField(RentABikeAction::PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey()));
 
@@ -244,37 +238,36 @@ namespace synthese
 			stream << rt.col() << addRentForm.getTextInput(RentABikeAction::PARAMETER_LOCK_ID, "");
 			stream << rt.col() << "<select name=\"" << RentABikeAction::PARAMETER_RATE_ID << "\">";
 			
-			for (vector<VinciRate*>::iterator it = rates.begin(); it != rates.end(); ++it)
+			for (vector<shared_ptr<VinciRate> >::iterator it = rates.begin(); it != rates.end(); ++it)
 				stream << "<option value=\"" << Conversion::ToString((*it)->getKey()) << "\">" << (*it)->getName() << "</option>";
 			stream << "</select>";
 			stream << rt.col() << addRentForm.getSubmitButton("Nouvelle location");
 
-			for (vector<TransactionPart*>::iterator it = rents.begin(); it != rents.end(); ++it)
+			for (vector<shared_ptr<TransactionPart> >::iterator it = rents.begin(); it != rents.end(); ++it)
 			{
-				Transaction* transaction = TransactionTableSync::get((*it)->getTransactionId());
+				shared_ptr<Transaction> transaction = TransactionTableSync::get((*it)->getTransactionId());
 								
-				VinciRate* rate = NULL;
+				shared_ptr<VinciRate> rate;
 				if ((*it)->getRateId() > 0)
 					rate = VinciRateTableSync::get((*it)->getRateId());
 
-				VinciBike* bike = NULL;
+				shared_ptr<VinciBike> bike;
 				if ((*it)->getTradedObjectId() != "")
 					bike = VinciBikeTableSync::get(Conversion::ToLongLong((*it)->getTradedObjectId()));
 
-				VinciAntivol* lock = NULL;
-				vector<TransactionPart*> vtp = TransactionPartTableSync::search(transaction, VinciBikeRentalModule::getFreeLockRentServiceAccount(), 0, 1);
+				shared_ptr<VinciAntivol> lock;
+				vector<shared_ptr<TransactionPart> > vtp = TransactionPartTableSync::search(transaction, VinciBikeRentalModule::getFreeLockRentServiceAccount(), 0, 1);
 				if (!vtp.empty())
 				{
-					TransactionPart* tp = vtp.front();
+					shared_ptr<TransactionPart> tp = vtp.front();
 					lock = VinciAntivolTableSync::get(Conversion::ToLongLong(tp->getTradedObjectId()));
-					delete tp;
 				}
 
 				stream << rt.row();
 				stream << rt.col() << transaction->getStartDateTime().toString();
-				stream << rt.col() << ((bike == NULL) ? "Non renseign&eacute;" : bike->getNumber());
-				stream << rt.col() << (lock ? lock->getMarkedNumber() : "Non renseign&eacute;");
-				stream << rt.col() << ((rate == NULL) ? "Non renseign&eacute;" : rate->getName());
+				stream << rt.col() << (bike.get() ? bike->getNumber() : "Non renseign&eacute;");
+				stream << rt.col() << (lock.get() ? lock->getMarkedNumber() : "Non renseign&eacute;");
+				stream << rt.col() << (rate.get() ? rate->getName() : "Non renseign&eacute;");
 				stream << rt.col();
 				if (transaction->getEndDateTime().isUnknown())
 				{
@@ -282,8 +275,12 @@ namespace synthese
 					if (now > rate->getEndDate(transaction->getStartDateTime()))
 					{
 						stream << "Retard : ";
-						const DurationInterfacePage* page = request->getFunction()->getInterface()->getPage<DurationInterfacePage>();
-						page->display(stream, now - rate->getEndDate(transaction->getStartDateTime()), variables, NULL, request);
+						shared_ptr<const DurationInterfacePage> page = request->getFunction()->getInterface()->getPage<DurationInterfacePage>();
+						page->display(
+							stream
+							, now - rate->getEndDate(transaction->getStartDateTime())
+							, variables
+							, NULL, request);
 						stream << " - " << rate->getAdditionalAmountToPay(transaction->getStartDateTime()) << " EUR<br />";
 					}
 					HTMLForm returnForm(returnRentRequest.getHTMLForm("return" + Conversion::ToString((*it)->getKey())));
@@ -295,10 +292,6 @@ namespace synthese
 					stream
 						<< "Retour le " << transaction->getEndDateTime().toString();
 				}
-
-				delete bike;
-				delete rate;
-				delete lock;
 			}
 
 			stream << rt.close() << addRentForm.close() << "</div>";
@@ -317,12 +310,6 @@ namespace synthese
 				_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
 				_user = UserTableSync::get(_contract->getUserId());
 			}
-		}
-
-		VinciCustomerAdminInterfaceElement::~VinciCustomerAdminInterfaceElement()
-		{
-			delete _contract;
-			delete _user;
 		}
 
 		bool VinciCustomerAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const

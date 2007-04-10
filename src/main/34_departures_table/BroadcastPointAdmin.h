@@ -75,7 +75,7 @@ namespace synthese
 		*/
 		class BroadcastPointAdmin : public admin::AdminInterfaceElement
 		{
-			env::ConnectionPlace* _place;
+			boost::shared_ptr<const env::ConnectionPlace> _place;
 
 		public:
 			BroadcastPointAdmin();

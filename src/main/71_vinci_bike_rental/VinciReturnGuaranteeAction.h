@@ -24,6 +24,7 @@
 #ifndef SYNTHESE_ReturnGuaranteeAction_H__
 #define SYNTHESE_ReturnGuaranteeAction_H__
 
+#include <boost/shared_ptr.hpp>
 
 #include "30_server/Action.h"
 
@@ -45,7 +46,7 @@ namespace synthese
 			static const std::string PARAMETER_GUARANTEE_ID;
 
 		private:
-			accounts::Transaction* _guarantee;
+			boost::shared_ptr<accounts::Transaction> _guarantee;
 			
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -62,9 +63,6 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
-
-			VinciReturnGuaranteeAction();
-			~VinciReturnGuaranteeAction();
 		};
 	}
 }

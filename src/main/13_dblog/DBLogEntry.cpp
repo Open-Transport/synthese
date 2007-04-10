@@ -22,24 +22,18 @@
 
 #include "DBLogEntry.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	namespace dblog
 	{
-
-
-		DBLogEntry::DBLogEntry()
-			: _user(NULL)
-		{
-
-		}
-
 		void DBLogEntry::setDate( const time::DateTime& date )
 		{
 			_date = date;
 		}
 
-		void DBLogEntry::setUser(const security::User* user )
+		void DBLogEntry::setUser(shared_ptr<const security::User> user )
 		{
 			_user = user;
 		}
@@ -58,7 +52,7 @@ namespace synthese
 			return _date;
 		}
 
-		const security::User* DBLogEntry::getUser() const
+		shared_ptr<const security::User> DBLogEntry::getUser() const
 		{
 			return _user;
 		}

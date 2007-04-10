@@ -48,25 +48,20 @@ namespace synthese
 		*/
 		class ChrInterfaceElement : public interfaces::ValueInterfaceElement
 		{
-			ValueInterfaceElement* _asciiCode;
+			boost::shared_ptr<ValueInterfaceElement> _asciiCode;
 
 		public:
 			/** Parameters parser.
 				The parser copies the ValueElementList as is.
 			*/
 			void storeParameters (ValueElementList& vel);
-			std::string getValue (const ParametersVector&, 
-                                              interfaces::VariablesMap& variables, 
-                                              const void* object = NULL, 
-                                              const server::Request* request = NULL ) const;
+			std::string getValue (
+				const ParametersVector&, 
+				interfaces::VariablesMap& variables, 
+				const void* object = NULL,
+				const server::Request* request = NULL
+				) const;
                 
-                /* std::string display (std::ostream& stream, 
-                                             const interfaces::ParametersVector& parameters, 
-                                             interfaces::VariablesMap& variables, 
-                                             const void* object = NULL, 
-                                             const server::Request* request = NULL) const; */
-                
-			~ChrInterfaceElement();
 		};
 	}
 }

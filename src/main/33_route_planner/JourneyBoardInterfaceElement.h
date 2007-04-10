@@ -40,14 +40,14 @@ namespace synthese
 		class JourneyBoardInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 		private:
-			interfaces::ValueInterfaceElement* _handicappedFilter;
-			interfaces::ValueInterfaceElement* _bikeFilter;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _handicappedFilter;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _bikeFilter;
 			~JourneyBoardInterfaceElement();
 
 		public:
 			void display(std::ostream& stream, 
 				interfaces::ParametersVector& parameters, 
-				     const void* object = NULL, 
+				     boost::shared_ptr<const void> object = boost::shared_ptr<const void>(), 
 				     const server::Request* request = NULL) const;
 			
 			/** Parser.

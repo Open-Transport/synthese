@@ -11,7 +11,7 @@
 #include <assert.h>
 
 
-
+using namespace boost;
 using synthese::util::Conversion;
 
 namespace synthese
@@ -61,18 +61,18 @@ PlaceAliasTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex
 
     if (place == 0) return;
 
-    City* city = environment.getCities ().get (cityId);
-    PlaceAlias* pa = new PlaceAlias (id, name, place, city);
+    City* city = environment.getCities ().getUpdateable (cityId).get();
+    shared_ptr<PlaceAlias> pa(new PlaceAlias (id, name, place, city));
 
     bool isCityMainConnection (
 	Conversion::ToBool (rows.getColumn (rowIndex, PLACEALIASES_TABLE_COL_ISCITYMAINCONNECTION)));
 
     if (isCityMainConnection)
     {
-	city->addIncludedPlace (pa);
+		city->addIncludedPlace (pa.get());
     }
 
-    city->getPlaceAliasesMatcher ().add (pa->getName (), pa);
+    city->getPlaceAliasesMatcher ().add (pa->getName (), pa.get() );
     environment.getPlaceAliases ().add (pa);
 
 }
@@ -84,8 +84,8 @@ PlaceAliasTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowI
 			  synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-    PlaceAlias* pa = environment.getPlaceAliases ().get (id);
-    City* city = environment.getCities ().get (pa->getCity ()->getKey ());
+    PlaceAlias* pa = environment.getPlaceAliases ().getUpdateable(id).get();
+    City* city = environment.getCities ().getUpdateable (pa->getCity ()->getKey ()).get();
     pa->setName (rows.getColumn (rowIndex, PLACEALIASES_TABLE_COL_NAME));
     city->getPlaceAliasesMatcher ().add (pa->getName (), pa);
 
@@ -99,8 +99,8 @@ PlaceAliasTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIn
 {
     // TODO not finished
     uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-    PlaceAlias* pa = environment.getPlaceAliases ().get (id);
-    City* city = environment.getCities ().get (pa->getCity ()->getKey ());
+    shared_ptr<const PlaceAlias> pa = environment.getPlaceAliases ().get(id);
+    shared_ptr<City> city = environment.getCities ().getUpdateable (pa->getCity ()->getKey ());
     city->getPlaceAliasesMatcher ().remove (pa->getName ());
     environment.getPlaceAliases ().remove (id);
 }

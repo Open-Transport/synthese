@@ -35,8 +35,8 @@
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 
-
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -44,11 +44,6 @@ namespace synthese
 	
 	namespace security
 	{
-		DeleteProfileAction::DeleteProfileAction()
-			: Action()
-			, _profile(NULL)
-		{}
-
 		ParametersMap DeleteProfileAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -57,36 +52,24 @@ namespace synthese
 
 		void DeleteProfileAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
-			}
-			catch (Profile::RegistryKeyException e)
-			{
-				throw ActionException("Profile not found");
-			}
+			if (!SecurityModule::getProfiles().contains(_request->getObjectId()))
+				throw ActionException("Specified Profile not found");
+			_profile = SecurityModule::getProfiles().get(_request->getObjectId());
 
 			// Search of child profiles
-			vector<Profile*> profiles = ProfileTableSync::search(_profile, 0, 1);
+			vector<shared_ptr<Profile> > profiles = ProfileTableSync::search(_profile, 0, 1);
 			if (!profiles.empty())
-			{
-				delete profiles.front();
 				throw ActionException("Au moins un profil hérite du profil spécifié. La suppression est impossible.");
-			}
 
 			// Search of users
-			vector<User*> users = UserTableSync::search("","",_profile->getKey(), boost::logic::indeterminate, 0, 1);
+			vector<shared_ptr<User> > users = UserTableSync::search("","", _profile, boost::logic::indeterminate, 0, 1);
 			if (!users.empty())
-			{
-				delete users.front();
 				throw ActionException("Au moins un utilisateur appartient au profil spécifié. La suppression est impossible.");
-			}
 		}
 
 		void DeleteProfileAction::run()
 		{
-			if (_profile != NULL)
-				ProfileTableSync::remove(_profile->getKey());
+			ProfileTableSync::remove(_profile->getKey());
 		}
 	}
 }

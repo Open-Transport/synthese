@@ -26,6 +26,8 @@
 #include <sstream>
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/UId.h"
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
@@ -75,13 +77,28 @@ namespace synthese
 			typedef T ObjectsClass;
 
 			static void load(T* obj, const db::SQLiteResult& rows, int rowId=0);
+			
+			
+			/** Saving of the object in database.
+				@param obj Object to save
+				@author Hugues Romain
+				@date 2007
+				
+				The object is recognized by its key :
+					- if the object has already a key, then the corresponding record is replaced
+					- if the object does not have any kay, then the autoincrement function generates one for it.
+			*/
 			static void save(T* obj);
-			static T* get(uid key);
-			static T* createEmpty();
+
+			/** Object fetcher.
+				@param key UID of the object
+				@return Pointer to a new C++ object corresponding to the fetched record
+				@throw DBEmptyResultException<T> if the object was not found
+			*/
+			static boost::shared_ptr<T> get(uid key);
+
+			static boost::shared_ptr<T> createEmpty();
 			static void remove(uid key);
-
-			/// @todo See if the template can be used more 
-
 
 		};
 
@@ -97,27 +114,28 @@ namespace synthese
 		}
 
 		template <class T>
-			T* synthese::db::SQLiteTableSyncTemplate<T>::createEmpty()
+		boost::shared_ptr<T> synthese::db::SQLiteTableSyncTemplate<T>::createEmpty()
 		{
-			T* object = new T;
-			save(object);
+			boost::shared_ptr<T> object(new T);
+			save(object.get());
 			return object;
 		}
 
 		template <class T>
-			T* synthese::db::SQLiteTableSyncTemplate<T>::get(uid key)
+		boost::shared_ptr<T> synthese::db::SQLiteTableSyncTemplate<T>::get(uid key)
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
 			query
 				<< "SELECT * "
 				<< "FROM " << TABLE_NAME
-				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key);
+				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key)
+				<< " LIMIT 1";
 			db::SQLiteResult rows = sqlite->execQuery(query.str());
 			if (rows.getNbRows() <= 0)
-				throw DBEmptyResultException("Object "+ TABLE_NAME + " " + Conversion::ToString(key) + " not found in database.");
-			T* object = new T;
-			load(object, rows);
+				throw DBEmptyResultException<T>(key, "ID not found in database.");
+			boost::shared_ptr<T> object(new T);
+			load(object.get(), rows);
 			return object;
 		}
 

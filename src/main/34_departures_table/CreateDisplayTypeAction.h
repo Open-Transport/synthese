@@ -48,7 +48,7 @@ namespace synthese
 
 		private:
 			std::string _name;
-			interfaces::Interface*	_interface;
+			boost::shared_ptr<const interfaces::Interface>	_interface;
 			int	_rows_number;
 
 		protected:

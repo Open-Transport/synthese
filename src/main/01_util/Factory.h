@@ -1,9 +1,34 @@
+
+/** Factory class header.
+	@file Factory.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_util_Factory_h__
 #define SYNTHESE_util_Factory_h__
 
 #include <map>
 #include <string>
 #include <iostream>
+
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/FactoryException.h"
 #include "01_util/Log.h"
 
@@ -39,7 +64,7 @@ namespace synthese
 			class CreatorInterface
 			{
 			private:
-				virtual RootObject* create() = 0;
+				virtual boost::shared_ptr<RootObject> create() = 0;
 				friend class Factory;
 				friend class Factory::Iterator;
 			};
@@ -50,14 +75,16 @@ namespace synthese
 			{
 			private:
 				friend class Factory;
-				RootObject* create ()
+				boost::shared_ptr<RootObject> create ()
 				{
-					return (RootObject*) createTyped();
+					return boost::static_pointer_cast<RootObject, T>(createTyped());
 				}
 
-				T* createTyped ()
+				boost::shared_ptr<T> createTyped ()
 				{
-				    return new T;
+					boost::shared_ptr<T> obj(new T);
+					obj->setFactoryKey(getKey<T>());
+					return obj;
 				}
 			};
 
@@ -128,15 +155,13 @@ namespace synthese
 			}
 
 			template<class T>
-			static T* create()
+			static boost::shared_ptr<T> create()
 			{
 				Creator<T> creator;
-				T* object = creator.createTyped();
-				object->setFactoryKey(getKey<T>());
-				return object;
+				return creator.createTyped();
 			}
 
-			static RootObject* create(const typename Map::key_type& key)
+			static boost::shared_ptr<RootObject> create(const typename Map::key_type& key)
 			{
 				// The factory "single object" was never filled
 				if (size () == 0)
@@ -150,9 +175,7 @@ namespace synthese
 				    throw FactoryException<RootObject>("Unable to factor "+ key +" object (class not found)");
 
 				// The key is found : return of an instance of the object
-				RootObject* object = it->second->create();
-				object->setFactoryKey(key);
-				return object;
+				return it->second->create();
 			}
 
 			static void destroy()
@@ -165,34 +188,21 @@ namespace synthese
 			{
 			private:
 				typename Factory::Map::const_iterator _it;
-				RootObject* _obj;
-
+				
 			public:
 				Iterator(const typename Factory::Map::const_iterator& it)
-					: _it(it), _obj(NULL)
+					: _it(it)
 				{	}
 
-				~Iterator()
-				{
-					delete _obj;
-				}
-
-				/** Temporary object creator.
-				Use it to run static members of the subclasses without having to handle instanciation.
-				@return Pointer to a temporary object of the current subclass, which will be deleted at the next iteration.
-				@warning Do not use the pointer after an iteration. If you want a persistent object, use getObject method instead.
+				/** Object creator.
+					@return Shared Pointer to a temporary object of the current subclass, which will be deleted when unused.
 				*/
-				RootObject* operator*()
+				boost::shared_ptr<RootObject> operator*()
 				{
-					if (_obj == NULL)
-					{
-						_obj = _it->second->create();
-						_obj->setFactoryKey(_it->first);
-					}
-					return _obj;
+					return _it->second->create();
 				}
 
-				RootObject* operator->()
+				boost::shared_ptr<RootObject> operator->()
 				{
 					return operator*();
 				}
@@ -201,9 +211,7 @@ namespace synthese
 				*/
 				void operator++()
 				{
-					delete _obj;
 					++_it;
-					_obj = NULL;
 				}
 
 				bool operator==(const Iterator& obj)
@@ -216,19 +224,8 @@ namespace synthese
 					return obj._it != _it;
 				}
 
-				/** Persistent object creator.
-				@return Pointer to an object of the current subclass.
-				@warning To avoid memory leaks, do not forget to delete the returned object.
-				*/
-				RootObject* getObject()
-				{
-					RootObject* obj = _it->second->create();
-					obj->setFactoryKey(_it->first);
-					return obj;
-				}
-
 				/** Key getter.
-				@return The key of the current subclass.
+					@return The key of the current subclass.
 				*/
 				const typename Factory::Map::key_type& getKey()
 				{
@@ -260,4 +257,3 @@ namespace synthese
 }
 
 #endif // Factory_h__
-

@@ -79,7 +79,7 @@ namespace synthese
 			try
 			{
 				_contract = VinciContractTableSync::get(_request->getObjectId());
-				_user = UserTableSync::get(_contract->getUserId());
+				_user = _contract->getUser();
 
 				ParametersMap::const_iterator it;
 
@@ -146,11 +146,11 @@ namespace synthese
 				}
 
 			}
-			catch (DBEmptyResultException e)
+			catch (DBEmptyResultException<VinciContract>)
 			{
 				throw ActionException("Contract not found");
 			}
-			catch (User::RegistryKeyException e)
+			catch (DBEmptyResultException<User>)
 			{
 				throw ActionException("Contract without corresponding user");
 			}
@@ -168,9 +168,9 @@ namespace synthese
 			_user->setEMail(_email);
 			_user->setPhone(_phone);
 			_user->setBirthDate(_birthDate);
-			UserTableSync::save(_user);
+			UserTableSync::save(_use.get());
 			_contract->setPassport(_passport);
-			VinciContractTableSync::save(_contract);
+			VinciContractTableSync::save(_contract.get());
 		}
 	}
 }

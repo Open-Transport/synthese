@@ -66,13 +66,9 @@ namespace synthese
 			uid				_siteId;
 			time::DateTime	_date;
 			std::string		_passport;
-
-			security::User*	_user;
-			VinciSite*		_site;
 			
 		public:
 			VinciContract(uid id=0);
-			~VinciContract();
 
 			//!	\name Setters
 			//@{
@@ -90,18 +86,14 @@ namespace synthese
 				const std::string&		getPassport()	const;
 			//@}
 
-			//! \name Queries with cache
-			//@{
-				security::User*			getUser();
-				VinciSite*				getSite();
-			//@}
-
 			//! \name Queries
 			//@{
-				VinciBike*					getCurrentBike()						const;
-				accounts::TransactionPart*	getCurrentRentTransactionPart()			const;
-				VinciAntivol*				getCurrentLock()						const;
-				accounts::TransactionPart*	getCurrentGuaranteeTransactionPart()	const;
+				boost::shared_ptr<security::User>				getUser()								const;
+				boost::shared_ptr<VinciSite>					getSite()								const;
+				boost::shared_ptr<VinciBike>					getCurrentBike()						const;
+				boost::shared_ptr<accounts::TransactionPart>	getCurrentRentTransactionPart()			const;
+				boost::shared_ptr<VinciAntivol>					getCurrentLock()						const;
+				boost::shared_ptr<accounts::TransactionPart>	getCurrentGuaranteeTransactionPart()	const;
 			//@}
 		};
 	}

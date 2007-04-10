@@ -26,15 +26,15 @@ namespace synthese
 		class CityListInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 		private:
-			interfaces::ValueInterfaceElement* _errorMessage;
-			interfaces::ValueInterfaceElement* _openingText;
-			interfaces::ValueInterfaceElement* _closingText;
-			interfaces::ValueInterfaceElement* _n;
-			interfaces::ValueInterfaceElement* _inputText;
-			interfaces::ValueInterfaceElement* _emptyLineText;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _errorMessage;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _openingText;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _closingText;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _n;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _inputText;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _emptyLineText;
 
 		public:
-			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
+			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, boost::shared_ptr<const void> object = boost::shared_ptr<const void>(), const server::Request* request = NULL) const;
 			void storeParameters(interfaces::ValueElementList& vel);
 		};
 

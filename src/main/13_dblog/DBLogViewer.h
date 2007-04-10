@@ -26,10 +26,23 @@
 #include <string>
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
+#include "04_time/DateTime.h"
+
+#include "05_html/ResultHTMLTable.h"
+
+#include "13_dblog/DBLogEntry.h"
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace dblog
 	{
 		class DBLog;
@@ -83,17 +96,20 @@ namespace synthese
 		{
 			//! \name Stored parameters
 			//@{
-				std::string			_logKey;
-				uid					_searchUser;
-				int					_searchType;
+				time::DateTime						_searchStartDate;
+				time::DateTime						_searchEndDate;
+				DBLogEntry::Level					_searchLevel;
+				boost::shared_ptr<const security::User>	_searchUser;
+				std::string							_searchText;
+				boost::shared_ptr<DBLog>			_dbLog;
 			//@}
 
-			//! \name Stored values
+			//! \name Stored search result
 			//@{
-				const DBLog*	_dbLog;
+				html::ResultHTMLTable::RequestParameters	_resultTableRequestParameters;
+				html::ResultHTMLTable::ResultParameters		_resultTableResultParameters;
+				std::vector<boost::shared_ptr<DBLogEntry> >	_result;
 			//@}
-
-				std::vector<DBLogEntry*>	_result;
 
 		public:
 			static const std::string PARAMETER_LOG_KEY;
@@ -101,6 +117,7 @@ namespace synthese
 			static const std::string PARAMETER_SEARCH_TYPE;
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
+			static const std::string PARAMETER_SEARCH_TEXT;
 
 			DBLogViewer();
 			

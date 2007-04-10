@@ -25,6 +25,10 @@
 
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
+#include "05_html/ActionResultHTMLTable.h"
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
@@ -83,11 +87,12 @@ namespace synthese
 			static const std::string PARAMETER_SEARCH_RIGHT;
 			static const std::string PARAMETER_SEARCH_FIRST;
 
-			std::vector<Profile*> _searchResult;
+			std::vector<boost::shared_ptr<Profile> >		_searchResult;
+			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
+			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
 
 		public:
 			ProfilesAdmin();
-			~ProfilesAdmin();
 
 			void setFromParametersMap(const server::ParametersMap& map);
 			std::string getTitle() const;

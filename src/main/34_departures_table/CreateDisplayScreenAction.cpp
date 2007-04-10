@@ -29,6 +29,7 @@
 #include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -62,21 +63,12 @@ namespace synthese
 
 		void CreateDisplayScreenAction::run()
 		{
-			DisplayScreen* screen = new DisplayScreen;
+			shared_ptr<DisplayScreen> screen(new DisplayScreen);
 			if (_template)
 				screen->copy(_template);
-			DisplayScreenTableSync::save(screen);
+			DisplayScreenTableSync::save(screen.get());
 
 			_request->setObjectId(screen->getKey());
-
-			delete screen;
-		}
-
-		CreateDisplayScreenAction::CreateDisplayScreenAction()
-			: Action()
-			, _template(NULL)
-		{
-
 		}
 	}
 }

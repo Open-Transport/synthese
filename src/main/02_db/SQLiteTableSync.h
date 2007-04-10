@@ -125,7 +125,7 @@ namespace synthese
 
 			virtual void rowsAdded (const SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
-						const SQLiteResult& rows) = 0;
+						const SQLiteResult& rows, bool isFirstSync = false) = 0;
 
 			virtual void rowsUpdated (const SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,

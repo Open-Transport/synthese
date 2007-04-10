@@ -97,8 +97,8 @@ namespace synthese
 		class MessageAdmin : public admin::AdminInterfaceElement
 		{
 		private:
-			const Alarm*			_alarm;
-			server::ParametersMap	_parameters;
+			boost::shared_ptr<const Alarm>	_alarm;
+			server::ParametersMap			_parameters;
 
 		public:
 			MessageAdmin();

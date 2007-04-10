@@ -70,7 +70,7 @@ namespace synthese
 		     it != Factory<SQLiteTableSync>::end(); 
 		     ++it)
 		{
-		    syncHook->addTableSynchronizer(it.getKey(), it.getObject());
+		    syncHook->addTableSynchronizer(it.getKey(), *it);
 		}
 		
 		_sqliteQueueThreadExec->registerUpdateHook (syncHook);

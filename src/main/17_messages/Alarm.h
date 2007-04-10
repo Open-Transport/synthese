@@ -75,7 +75,8 @@ namespace synthese
 				const time::DateTime&	getPeriodStart()	const;
 				const time::DateTime&	getPeriodEnd()		const;
 				bool					getIsATemplate()	const;
-				Scenario*				getScenario()		const;
+				const Scenario*			getScenario()		const;
+				Scenario*				getScenario();
 
 				void setLevel (const AlarmLevel& level);
 				void setShortMessage( const std::string& message);
@@ -110,7 +111,7 @@ namespace synthese
 					@param scenario Scenario the new alarm belongs to.
 					@return The new alarm created upon the one
 				*/
-				Alarm*	createCopy(Scenario* scenario)	const;
+				boost::shared_ptr<Alarm>	createCopy(Scenario* scenario)	const;
 			//@}
 		    
 		};

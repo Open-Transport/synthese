@@ -28,7 +28,10 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		std::string GotoInterfaceElement::display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		std::string GotoInterfaceElement::display(
+			std::ostream& stream, const interfaces::ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			return _label->getValue(parameters, variables, object, request);
 		}

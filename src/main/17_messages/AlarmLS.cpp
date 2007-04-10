@@ -33,6 +33,8 @@
 
 #include "04_time/DateTime.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace util::XmlToolkit;
@@ -71,7 +73,7 @@ namespace synthese
 			if (levelStr == ALARM_LEVEL_ATTR_INFO) level = ALARM_LEVEL_INFO;
 			else if (levelStr == ALARM_LEVEL_ATTR_WARNING) level = ALARM_LEVEL_WARNING;
 
-			Alarm* alarm = new Alarm;
+			shared_ptr<Alarm> alarm(new Alarm);
 			alarm->setKey(id);
 			alarm->setShortMessage(message);
 			alarm->setLongMessage(message);

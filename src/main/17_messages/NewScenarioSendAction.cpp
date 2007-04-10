@@ -31,6 +31,7 @@
 #include "17_messages/MessagesModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -68,22 +69,10 @@ namespace synthese
 			}
 		}
 
-		NewScenarioSendAction::NewScenarioSendAction()
-			: Action()
-			, _template(NULL)
-		{}
-
 		void NewScenarioSendAction::run()
 		{
-			Scenario* scenario = _template->createCopy();
-			ScenarioTableSync::save(scenario);
-			for (Scenario::AlarmsSet::const_iterator it = scenario->getAlarms().begin(); it != scenario->getAlarms().end(); ++it)
-			{
-				AlarmTableSync::save(*it);
-
-				/// @todo Saving of the broadcast list
-			}
-			delete scenario;
+			shared_ptr<Scenario> scenario = _template->createCopy();
+			ScenarioTableSync::saveWithAlarms(scenario.get());
 		}
 	}
 }

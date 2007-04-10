@@ -32,6 +32,7 @@
 #include "17_messages/AlarmObjectLinkTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -80,19 +81,13 @@ namespace synthese
 			_objectId = Conversion::ToLongLong(it->second);
 		}
 
-		AlarmAddLinkAction::AlarmAddLinkAction()
-			: Action()
-			, _alarm(NULL)
-		{}
-
 		void AlarmAddLinkAction::run()
 		{
-			AlarmObjectLink<Registrable<uid, void> >* aol = new AlarmObjectLink<Registrable<uid, void> >;
+			shared_ptr<AlarmObjectLink<Registrable<uid, void> > > aol(new AlarmObjectLink<Registrable<uid, void> >);
 			aol->setRecipientKey(_recipientKey);
 			aol->setAlarm(_alarm);
 			aol->setObjectId(_objectId);
-			AlarmObjectLinkTableSync::save(aol);
-			delete aol;
+			AlarmObjectLinkTableSync::save(aol.get());
 		}
 	}
 }

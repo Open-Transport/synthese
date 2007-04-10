@@ -25,11 +25,18 @@
 #include "11_interfaces/StaticValueInterfaceElement.h"
 #include "11_interfaces/LineLabelInterfaceElement.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	namespace interfaces
 	{
-		std::string LineLabelInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, VariablesMap& vars, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		std::string LineLabelInterfaceElement::display(
+			std::ostream& stream
+			, const ParametersVector& parameters
+			, VariablesMap& vars
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			return "";
 		}
@@ -38,14 +45,14 @@ namespace synthese
 		{
 			if (vel.size() != 1)
 				throw InterfacePageException("Malformed line label declaration");
-			ValueInterfaceElement* vie = vel.front();
-            if (dynamic_cast<StaticValueInterfaceElement*>(vie) == NULL)
+			shared_ptr<ValueInterfaceElement> vie = vel.front();
+            if (!dynamic_pointer_cast<StaticValueInterfaceElement, ValueInterfaceElement>(vie).get())
 				throw InterfacePageException("Line label must be statically defined");
 			ParametersVector pv;
 			VariablesMap vars;
 			_label = vie->getValue(pv, vars);
 		}
-		const std::string& synthese::interfaces::LineLabelInterfaceElement::getLabel() const
+		std::string LineLabelInterfaceElement::getLabel() const
 		{
 			return _label;
 		}

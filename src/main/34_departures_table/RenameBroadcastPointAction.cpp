@@ -28,10 +28,12 @@
 #include "34_departures_table/BroadcastPoint.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace db;
 	
 	namespace departurestable
 	{
@@ -56,7 +58,7 @@ namespace synthese
 				if (it == map.end())
 					throw ActionException("Broadcast point not specified");
 
-				_broadcastPoint = DeparturesTableModule::getBroadcastPoints().get(Conversion::ToLongLong(it->second));
+				_broadcastPoint = BroadcastPointTableSync::get(Conversion::ToLongLong(it->second));
 
 				it = map.find(PARAMETER_NAME);
 				if (it == map.end())
@@ -67,21 +69,16 @@ namespace synthese
 				if (_name.size() == 0)
 					throw ActionException("Name must be non empty");
 			}
-			catch (BroadcastPoint::RegistryKeyException e)
+			catch (DBEmptyResultException<BroadcastPoint>)
 			{
 				throw ActionException("Specified broadcast point not found");
 			}
 		}
 
-		RenameBroadcastPointAction::RenameBroadcastPointAction()
-			: Action()
-			, _broadcastPoint(NULL)
-		{}
-
 		void RenameBroadcastPointAction::run()
 		{
 			_broadcastPoint->setName(_name);
-			BroadcastPointTableSync::save(_broadcastPoint);
+			BroadcastPointTableSync::save(_broadcastPoint.get());
 		}
 	}
 }

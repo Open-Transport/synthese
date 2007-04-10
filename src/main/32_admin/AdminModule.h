@@ -27,7 +27,31 @@
 
 namespace synthese
 {
-	/** @defgroup m32 32 Generic administration console
+/**	@defgroup m32Actions 32 Actions
+		@ingroup m32
+
+		@defgroup m32Pages 32 Pages
+		@ingroup m32
+
+		@defgroup m32Values 32 Values
+		@ingroup m32
+
+		@defgroup m32Functions 32 Functions
+		@ingroup m32
+
+		@defgroup m32LS 32 Table synchronizers
+		@ingroup m32
+
+		@defgroup m32Admin 32 Administration pages
+		@ingroup m32
+
+		@defgroup m32Rights 32 Rights
+		@ingroup m32
+
+		@defgroup m32Logs 32 DB Logs
+		@ingroup m32
+
+		@defgroup m32 32 Generic administration console
 	@{
 	*/
 

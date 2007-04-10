@@ -35,6 +35,7 @@
 #include "ReservationRuleTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -146,12 +147,12 @@ namespace synthese
 			addTableColumn (COL_WEBSITEURL, "TEXT", true);
 		}
 
-		void ReservationRuleTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ReservationRuleTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				ReservationRule* object = new ReservationRule();
-				load(object, rows, i);
+				shared_ptr<ReservationRule> object(new ReservationRule());
+				load(object.get(), rows, i);
 				EnvModule::getReservationRules().add(object);
 			}
 		}
@@ -163,8 +164,8 @@ namespace synthese
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
 				if (EnvModule::getReservationRules().contains(id))
 				{
-					ReservationRule* object = EnvModule::getReservationRules().get(id);
-					load(object, rows, i);
+					shared_ptr<ReservationRule> object = EnvModule::getReservationRules().getUpdateable(id);
+					load(object.get(), rows, i);
 				}
 			}
 		}

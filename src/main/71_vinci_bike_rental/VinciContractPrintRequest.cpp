@@ -36,6 +36,7 @@
 #include "VinciContractTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -47,17 +48,13 @@ namespace synthese
 	namespace vinci
 	{
 		const std::string VinciContractPrintRequest::PARAMETER_CONTRACT_ID = "ctr";
-		
-		VinciContractPrintRequest::VinciContractPrintRequest()
-			: RequestWithInterfaceAndRequiredSession()
-			, _contract(NULL)
-		{}
 
 		ParametersMap VinciContractPrintRequest::_getParametersMap() const
 		{
 			ParametersMap map(RequestWithInterfaceAndRequiredSession::_getParametersMap());
 
-			map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
+			if (_contract.get())
+				map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
 			
 			return map;
 		}
@@ -76,7 +73,7 @@ namespace synthese
 
 				_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
 			}
-			catch (DBEmptyResultException e)
+			catch (DBEmptyResultException<VinciContract>)
 			{
 				throw RequestException("Specified contract not found");
 			}
@@ -84,16 +81,11 @@ namespace synthese
 
 		void VinciContractPrintRequest::_run( std::ostream& stream ) const
 		{
-			const VinciPrintedContractInterfacePage* page = _interface->getPage<VinciPrintedContractInterfacePage>();
+			shared_ptr<const VinciPrintedContractInterfacePage> page = _interface->getPage<VinciPrintedContractInterfacePage>();
 			page->display(stream, VariablesMap(), _contract, _request);
 		}
 
-		VinciContractPrintRequest::~VinciContractPrintRequest()
-		{
-			delete _contract;
-		}
-
-		void VinciContractPrintRequest::setContract(const VinciContract* contract )
+		void VinciContractPrintRequest::setContract(shared_ptr<const VinciContract> contract )
 		{
 			_contract = contract;
 		}

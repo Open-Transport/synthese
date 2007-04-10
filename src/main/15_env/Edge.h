@@ -93,8 +93,8 @@ namespace synthese
 			int _departureIndex[24];	//!< First line service index by departure hour of day
 			int _arrivalIndex[24];		//!< First line service index by arrival hour of day
 
-			mutable bool _departureIndexUpdateNeeded;
-			mutable bool _arrivalIndexUpdateNeeded;
+//			mutable bool _departureIndexUpdateNeeded;
+//			mutable bool _arrivalIndexUpdateNeeded;
 
 		protected:
 			Edge (bool isDeparture = true, bool isArrival = true,
@@ -104,14 +104,23 @@ namespace synthese
 			virtual ~Edge ();
 
 
-			//! @name Getters/Setters
+			//! @name Setters
 			//@{
 				void	setIsArrival(bool value);
 				void	setIsDeparture(bool value);
 				void	setRankInPath(int value);
+				void	setParentPath(const Path* path);
+				void	setNextInPath (const Edge* nextInPath);
+				void	setPreviousDeparture ( const Edge* previousDeparture);
+				void	setPreviousConnectionDeparture( const Edge* previousConnectionDeparture);
+				void	setPreviousDepartureForFineSteppingOnly ( const Edge* previousDeparture);
+				void	setFollowingConnectionArrival( const Edge* followingConnectionArrival);
+				void	setFollowingArrivalForFineSteppingOnly ( const Edge* followingArrival);
+			//@}
 
+			//! @name Getters
+			//@{
 				const Path* getParentPath () const;
-				void		setParentPath(const Path* path);
 
 				/** Returns this edge origin vertex.
 				*/
@@ -128,22 +137,16 @@ namespace synthese
 				double getLength () const;
 
 				const Edge* getNextInPath () const;
-				void setNextInPath (const Edge* nextInPath);
 
 				const Edge* getPreviousDeparture () const;
-				void setPreviousDeparture ( const Edge* previousDeparture);
 
 				const Edge* getPreviousConnectionDeparture () const;
-				void setPreviousConnectionDeparture( const Edge* previousConnectionDeparture);
 
 				const Edge* getPreviousDepartureForFineSteppingOnly () const;
-				void setPreviousDepartureForFineSteppingOnly ( const Edge* previousDeparture);
 
 				const Edge* getFollowingConnectionArrival () const;
-				void setFollowingConnectionArrival( const Edge* followingConnectionArrival);
 			    
 				const Edge* getFollowingArrivalForFineSteppingOnly () const;
-				void setFollowingArrivalForFineSteppingOnly ( const Edge* followingArrival);
 			    
 				/** Gets intermediate points 
 				* between this line stop and the next in path.
@@ -161,6 +164,9 @@ namespace synthese
 
 				const synthese::time::Schedule& 
 				getArrivalEndSchedule (int serviceIndex) const;
+
+				int getDepartureFromIndex (int hour) const;
+				int getArrivalFromIndex (int hour) const;
 			//@}
 
 
@@ -231,11 +237,6 @@ namespace synthese
 			    
 				void insertDepartureSchedule (int index, const synthese::time::Schedule& schedule);
 				void insertArrivalSchedule (int index, const synthese::time::Schedule& schedule);
-
-		private:
-				
-				int getDepartureFromIndex (int hour) const;
-				int getArrivalFromIndex (int hour) const;
 
 				void updateDepartureIndex ();
 				void updateArrivalIndex ();

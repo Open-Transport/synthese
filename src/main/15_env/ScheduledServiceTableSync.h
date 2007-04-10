@@ -52,7 +52,6 @@ namespace synthese
 			static const std::string COL_RESERVATIONRULEID;
 			
 			ScheduledServiceTableSync();
-			~ScheduledServiceTableSync();
 
 
 			/** ScheduledService search.
@@ -63,7 +62,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<ScheduledService*> search(
+			static std::vector<boost::shared_ptr<ScheduledService> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
 
@@ -75,7 +74,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on ScheduledService creation.
 				This method updates the corresponding object in ram.
@@ -91,6 +90,15 @@ namespace synthese
 			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
+
+			/** The schedules indexes of each linestop are updated after the whole first sync.
+				@param sqlite SQLite thread
+				@param sync SQLite synchonizer
+				@author Hugues Romain
+				@date 2007				
+			*/
+			void afterFirstSync (const db::SQLiteQueueThreadExec* sqlite, 
+				db::SQLiteSync* sync);
 
 		};
 	}

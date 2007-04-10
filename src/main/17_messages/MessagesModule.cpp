@@ -25,6 +25,7 @@
 #include "17_messages/TextTemplate.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -79,11 +80,10 @@ namespace synthese
 		std::vector<pair<uid, std::string> > MessagesModule::getTextTemplateLabels(const AlarmLevel& level)
 		{
 			vector<pair<uid, string> > m;
-			vector<TextTemplate*> v = TextTemplateTableSync::search(level);
-			for (vector<TextTemplate*>::iterator it = v.begin(); it != v.end(); ++it)
+			vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::search(level);
+			for (vector<shared_ptr<TextTemplate> >::iterator it = v.begin(); it != v.end(); ++it)
 			{
 				m.push_back(make_pair((*it)->getKey(), (*it)->getName()));
-				delete *it;
 			}
 			return m;
 		}

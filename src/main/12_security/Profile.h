@@ -26,6 +26,8 @@
 #include <vector>
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
@@ -57,8 +59,8 @@ namespace synthese
 		class Profile : public util::Registrable<uid,Profile>
 		{
 		public:
-			typedef std::map<std::pair<std::string, std::string>, Right*> RightsVector;
-			typedef std::map<std::string, Right*> RightsOfSameClassMap;
+			typedef std::map<std::pair<std::string, std::string>, boost::shared_ptr<Right> > RightsVector;
+			typedef std::map<std::string, boost::shared_ptr<Right> > RightsOfSameClassMap;
 
 		private:
 			std::string		_name;
@@ -81,8 +83,7 @@ namespace synthese
 			int operator<=(const Profile& profile) const;
 
 			Profile(uid id=0);
-			~Profile();
-
+			
 			//!	\name Getters
 			//@{
 				const std::string&	getName()														const;
@@ -97,7 +98,7 @@ namespace synthese
 				void setRights(const RightsVector& rightsvector);
 				void cleanRights();
 				void removeRight(const std::string& key, const std::string& parameter);
-				void addRight(Right* right);
+				void addRight(boost::shared_ptr<Right> right);
 				void setParent(uid id);
 			//@}
 
@@ -113,7 +114,7 @@ namespace synthese
 					@date 2007
 					
 				*/
-				bool isAuthorized(const Right* right) const;
+				bool isAuthorized(boost::shared_ptr<const Right> right) const;
 
 				/** Search of a contained right in the right vector, from the class key and the perimeter string.
 					@param key Class key to search (default : the global right)
@@ -122,7 +123,16 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007					
 				*/
-				Right* getRight(const std::string key = GLOBAL_PERIMETER, const std::string parameter = GLOBAL_PERIMETER)	const;
+				boost::shared_ptr<Right> getRight(const std::string key = GLOBAL_PERIMETER, const std::string parameter = GLOBAL_PERIMETER);
+
+				/** Search of a contained right in the right vector, from the class key and the perimeter string.
+					@param key Class key to search (default : the global right)
+					@param parameter Perimeter string to search (default : global perimeter)
+					@return Right* The specified right if exists, NULL else
+					@author Hugues Romain
+					@date 2007					
+				*/
+				boost::shared_ptr<const Right> getRight(const std::string key = GLOBAL_PERIMETER, const std::string parameter = GLOBAL_PERIMETER) const;
 
 			//@}
 		};

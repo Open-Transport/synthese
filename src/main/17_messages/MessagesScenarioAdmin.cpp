@@ -50,7 +50,6 @@ namespace synthese
 	{
 		MessagesScenarioAdmin::MessagesScenarioAdmin()
 			: AdminInterfaceElement("messageslibrary", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
-			, _scenario(NULL)
 		{}
 
 
@@ -107,13 +106,13 @@ namespace synthese
 			h.push_back(make_pair(string(), "Message"));
 			h.push_back(make_pair(string(), "Emplacement"));
 			h.push_back(make_pair(string(), "Actions"));
-			ActionResultHTMLTable t(h, HTMLForm(string(), string()), string(), true, addRequest.getHTMLForm("add"), NewMessageAction::PARAMETER_IS_TEMPLATE);
+			ActionResultHTMLTable t(h, HTMLForm(string(), string()), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addRequest.getHTMLForm("add"), NewMessageAction::PARAMETER_IS_TEMPLATE);
 
 			stream << t.open();
 
 			for(Scenario::AlarmsSet::const_iterator it = _scenario->getAlarms().begin(); it != _scenario->getAlarms().end(); ++it)
 			{
-				Alarm* alarm = *it;
+				const Alarm* alarm = *it;
 				messRequest.setObjectId(alarm->getKey());
 				deleteRequest.getFunction()->setParameter(DeleteAlarmAction::PARAMETER_ALARM, Conversion::ToString(alarm->getKey()));
 				stream << t.row(Conversion::ToString(alarm->getKey()));

@@ -25,19 +25,19 @@
 #include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/PrintInterfaceElement.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	namespace interfaces
 	{
-		std::string PrintInterfaceElement::display(std::ostream& stream, const interfaces::ParametersVector& parameters, VariablesMap& vars, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		std::string PrintInterfaceElement::display(std::ostream& stream
+			, const interfaces::ParametersVector& parameters, VariablesMap& vars
+			, const void* rootObject /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			stream << _toBePrinted->getValue(parameters, vars, rootObject, request);
 			return "";
-		}
-
-		PrintInterfaceElement::~PrintInterfaceElement()
-		{
-			delete _toBePrinted;
 		}
 
 		void PrintInterfaceElement::storeParameters(ValueElementList& vel )
@@ -48,4 +48,3 @@ namespace synthese
 		}
 	}
 }
-

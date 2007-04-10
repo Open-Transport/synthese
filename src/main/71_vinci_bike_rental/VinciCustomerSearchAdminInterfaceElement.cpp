@@ -64,15 +64,15 @@ namespace synthese
 		{
 			// Search request
 			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerSearchAdminInterfaceElement>());
+			searchRequest.getFunction()->setPage<VinciCustomerSearchAdminInterfaceElement>();
 
 			// Add contract request
 			ActionFunctionRequest<AddCustomerAction,AdminRequest> addContractRequest(request);
-			addContractRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
+			addContractRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 
 			// View contract request
 			FunctionRequest<AdminRequest> contractRequest(request);
-			contractRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciCustomerAdminInterfaceElement>());
+			contractRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 
 			stream << "<h1>Recherche de client</h1>";
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
@@ -89,7 +89,7 @@ namespace synthese
 				h.push_back(make_pair(string(), "ID"));
 				h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 				h.push_back(make_pair(PARAM_SEARCH_SURNAME, "Prénom"));
-				ActionResultHTMLTable t(h, st.getForm(), string(), true, addContractRequest.getHTMLForm("add"));
+				ActionResultHTMLTable t(h, st.getForm(), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addContractRequest.getHTMLForm("add"));
 				stream << t.open();
 				if (_contracts.size() == 0)
 				{
@@ -98,7 +98,7 @@ namespace synthese
 				}
 				else
 				{
-					for (vector<VinciContract*>::const_iterator it = _contracts.begin(); it != _contracts.end(); ++it)
+					for (vector<shared_ptr<VinciContract> >::const_iterator it = _contracts.begin(); it != _contracts.end(); ++it)
 					{
 						contractRequest.setObjectId((*it)->getKey());
 						stream << t.row();
@@ -129,12 +129,6 @@ namespace synthese
 
 			if (_activeSearch)
 				_contracts = VinciContractTableSync::search(_searchName, _searchSurname);
-		}
-
-		VinciCustomerSearchAdminInterfaceElement::~VinciCustomerSearchAdminInterfaceElement()
-		{
-			for (vector<VinciContract*>::iterator it = _contracts.begin(); it != _contracts.end(); ++it)
-				delete *it;
 		}
 
 		bool VinciCustomerSearchAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const

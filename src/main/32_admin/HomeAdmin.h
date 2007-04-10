@@ -30,7 +30,7 @@ namespace synthese
 	namespace admin
 	{
 		/** Page d'accueil de la console d'administration.
-			@ingroup m32
+			@ingroup m32Admin refAdmin
 
 			@image html cap_admin_home.png
 			@image latex cap_admin_home.png "Accueil de la console d'administration" width=14cm

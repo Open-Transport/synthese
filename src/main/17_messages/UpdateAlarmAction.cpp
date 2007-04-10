@@ -32,11 +32,13 @@
 #include "17_messages/MessagesModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
 	using namespace time;
+	using namespace db;
 	
 	namespace messages
 	{
@@ -61,7 +63,7 @@ namespace synthese
 			{
 				ParametersMap::const_iterator it;
 
-				_alarm = MessagesModule::getAlarms().get(_request->getObjectId());
+				_alarm = AlarmTableSync::get(_request->getObjectId());
 
 				it = map.find(PARAMETER_TYPE);
 				if (it == map.end())
@@ -108,11 +110,11 @@ namespace synthese
 					_enabled = Conversion::ToBool(it->second);
 				}
 			}
-			catch (Alarm::RegistryKeyException e)
+			catch (DBEmptyResultException<Alarm>)
 			{
 				throw ActionException("Specified alarm not found");
 			}
-			catch(TimeParseException e)
+			catch(TimeParseException)
 			{
 				throw ActionException("Une date ou une heure est mal formée");
 			}
@@ -124,7 +126,6 @@ namespace synthese
 
 		UpdateAlarmAction::UpdateAlarmAction()
 			: Action()
-			, _alarm(NULL)
 			, _startDate(TIME_UNKNOWN), _endDate(TIME_UNKNOWN)
 		{}
 
@@ -137,7 +138,7 @@ namespace synthese
 				_alarm->setPeriodEnd(_endDate);
 				_alarm->setIsEnabled(_enabled);
 			}
-			AlarmTableSync::save(_alarm);
+			AlarmTableSync::save(_alarm.get());
 		}
 	}
 }

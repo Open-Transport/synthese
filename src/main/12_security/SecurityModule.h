@@ -27,6 +27,8 @@
 #include <utility>
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/ModuleClass.h"
 
 #include "12_security/Profile.h"
@@ -65,6 +67,8 @@ namespace synthese
 	*/
 	namespace security
 	{
+		class User;
+
 		/** 12 Security module class.
 		*/
 		class SecurityModule : public util::ModuleClass
@@ -76,6 +80,9 @@ namespace synthese
 
 		private:
 			static Profile::Registry _profiles;
+
+			static boost::shared_ptr<Profile>	_rootProfile;
+			static boost::shared_ptr<User>		_rootUser;
 
 		public:
 			void initialize();
@@ -92,7 +99,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007					
 			*/
-			static std::vector<Profile*> getSubProfiles(const Profile* profile);
+			static std::vector<boost::shared_ptr<const Profile> > getSubProfiles(boost::shared_ptr<const Profile> profile);
 		};
 	}
 	/** @} */

@@ -48,8 +48,8 @@ namespace synthese
 			*/
 			ActionResultHTMLTable(const HeaderVector& header
 				, const HTMLForm& searchForm
-				, std::string currentOrderField
-				, bool RaisingOrder
+				, RequestParameters requestParameters
+				, ResultParameters resultParameters
 				, const HTMLForm& actionForm
 				, std::string selectName=std::string()
 				, std::string iconPath=std::string());

@@ -25,6 +25,8 @@
 
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "04_time/DateTime.h"
 
 namespace synthese
@@ -44,7 +46,7 @@ namespace synthese
 		private:
 			const std::string			_key;
 			const std::string			_ip;
-			synthese::security::User*	_user;
+			boost::shared_ptr<const security::User>	_user;
 			synthese::time::DateTime	_lastUse;
 
 			static const size_t KEY_LENGTH;
@@ -76,13 +78,13 @@ namespace synthese
 
 			//! \name Setters
 			//@{
-				void setUser(security::User* user);
+				void setUser(boost::shared_ptr<const security::User> user);
 			//@}
 
 			//! \name Getters
 			//@{
 				const std::string getKey() const;
-				const security::User* getUser() const;
+				boost::shared_ptr<const security::User> getUser() const;
 			//@}
 		};
 	}

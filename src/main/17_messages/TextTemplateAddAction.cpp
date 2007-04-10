@@ -27,6 +27,7 @@
 #include "TextTemplateTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -66,12 +67,9 @@ namespace synthese
 			if (_level == ALARM_LEVEL_UNKNOWN)
 				throw ActionException("Bad value for level");
 			
-			vector<TextTemplate*> v = TextTemplateTableSync::search(_level, _name, 0, 1);
+			vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::search(_level, _name, 0, 1);
 			if (!v.empty())
-			{
-				delete v.front();
 				throw ActionException("Un texte portant ce nom existe déjà.");
-			}
 
 			it = map.find(PARAMETER_LONG_MESSAGE);
 			if (it == map.end())
@@ -84,19 +82,14 @@ namespace synthese
 			 _shortMessage = it->second;
 		}
 
-		TextTemplateAddAction::TextTemplateAddAction()
-			: Action()
-		{}
-
 		void TextTemplateAddAction::run()
 		{
-			TextTemplate* tt = new TextTemplate;
+			shared_ptr<TextTemplate> tt(new TextTemplate);
 			tt->setAlarmLevel(_level);
 			tt->setLongMessage(_longMessage);
 			tt->setShortMessage(_shortMessage);
 			tt->setName(_name);
-			TextTemplateTableSync::save(tt);
-			delete tt;
+			TextTemplateTableSync::save(tt.get());
 		}
 	}
 }

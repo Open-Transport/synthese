@@ -40,7 +40,7 @@ namespace synthese
 			static const std::string PARAMETER_TEMPLATE_ID;
 
 		private:
-			const DisplayScreen*	_template;
+			boost::shared_ptr<const DisplayScreen>	_template;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -53,8 +53,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			CreateDisplayScreenAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

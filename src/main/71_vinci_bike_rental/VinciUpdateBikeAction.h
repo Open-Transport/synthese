@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_VinciUpdateBikeAction_H__
 #define SYNTHESE_VinciUpdateBikeAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -42,7 +44,7 @@ namespace synthese
 			static const std::string PARAMETER_MARKED_NUMBER;
 
 		private:
-			VinciBike*	_bike;
+			boost::shared_ptr<VinciBike>	_bike;
 			std::string	_number;
 			std::string	_markedNumber;
 
@@ -58,11 +60,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			VinciUpdateBikeAction();
-			~VinciUpdateBikeAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

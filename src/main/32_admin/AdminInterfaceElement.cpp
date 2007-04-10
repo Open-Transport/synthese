@@ -54,7 +54,7 @@ namespace synthese
 			return _superior;
 		}
 
-		std::string AdminInterfaceElement::getHTMLLink(const server::FunctionRequest<admin::AdminRequest>* request) const
+/*		std::string AdminInterfaceElement::getHTMLLink(const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			stringstream str;
 			FunctionRequest<AdminRequest> linkRequest(request);
@@ -63,7 +63,7 @@ namespace synthese
 			linkRequest.getFunction()->setPage(NULL); // To avoid the deletion of the page which can be used later
 			return str.str();
 		}
-
+*/
 		void AdminInterfaceElement::_setSuperior( const std::string& superior )
 		{
 			_superior = superior;

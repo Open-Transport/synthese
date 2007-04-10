@@ -34,6 +34,7 @@
 #include "LineTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -73,7 +74,7 @@ namespace synthese
 			uid reservationRuleId (Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_RESERVATIONRULEID)));
 
 			line->setName(name);
-			line->setAxis(EnvModule::getAxes().get(axisId));
+			line->setAxis(EnvModule::getAxes().get(axisId).get());
 			line->setTimetableName (timetableName);
 			line->setDirection (direction);
 			line->setWalkingLine (isWalkingLine);
@@ -82,10 +83,10 @@ namespace synthese
 			line->setUseInRoutePlanning (useInRoutePlanning);
 			line->setRollingStockId (rollingStockId);
 //			line->setFare (EnvModule::getFares ().get (fareId));
-			line->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId));
-			line->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId));
-			line->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId));
-			line->setCommercialLine(EnvModule::getCommercialLines().get(Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_COMMERCIAL_LINE_ID))));
+			line->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId).get());
+			line->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
+			line->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
+			line->setCommercialLine(EnvModule::getCommercialLines().get(Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_COMMERCIAL_LINE_ID))).get());
 //			line->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId));
 		}
 
@@ -157,12 +158,12 @@ namespace synthese
 			addTableColumn (COL_RESERVATIONRULEID, "INTEGER", true);
 		}
 
-		void LineTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void LineTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				Line* object = new Line;
-				load(object, rows, i);
+				shared_ptr<Line> object(new Line);
+				load(object.get(), rows, i);
 				EnvModule::getLines().add(object);
 			}
 		}
@@ -174,8 +175,8 @@ namespace synthese
 				uid lineId = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
 				if (EnvModule::getLines().contains(lineId))
 				{
-					Line* object = EnvModule::getLines().get(lineId);
-					load(object, rows, i);
+					shared_ptr<Line> object = EnvModule::getLines().getUpdateable(lineId);
+					load(object.get(), rows, i);
 				}
 			}
 		}
@@ -192,7 +193,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<Line*> LineTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<Line> > LineTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -211,11 +212,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<Line*> objects;
+				vector<shared_ptr<Line> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					Line* object = new Line();
-					load(object, result, i);
+					shared_ptr<Line> object(new Line());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

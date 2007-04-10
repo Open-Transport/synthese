@@ -114,22 +114,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\HtmlMapRenderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\HtmlMapRenderer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\JpegRenderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\JpegRenderer.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Map.cpp"
 				>
 			</File>
@@ -162,27 +146,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MapInfoRenderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MapInfoRenderer.h"
-				>
-			</File>
-			<File
 				RelativePath=".\PostscriptCanvas.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\PostscriptCanvas.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PostscriptRenderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PostscriptRenderer.h"
 				>
 			</File>
 			<File
@@ -225,6 +193,42 @@
 				RelativePath=".\XmlBuilder.h"
 				>
 			</File>
+			<Filter
+				Name="Renderer"
+				>
+				<File
+					RelativePath=".\HtmlMapRenderer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\HtmlMapRenderer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\JpegRenderer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\JpegRenderer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MapInfoRenderer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\MapInfoRenderer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\PostscriptRenderer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\PostscriptRenderer.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="AdminInterfaceElement"

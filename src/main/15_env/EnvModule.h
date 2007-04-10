@@ -277,8 +277,7 @@ namespace synthese
 
 
 		public:
-			~EnvModule();
-			
+		
 			void initialize();
 			
 			static Environment::Registry&			getEnvironments();
@@ -298,8 +297,8 @@ namespace synthese
 			static ContinuousService::Registry&		getContinuousServices();
 
 
-			static Path* fetchPath (const uid& id);
-			static Service* fetchService (const uid& id);
+			static boost::shared_ptr<Path> fetchPath (const uid& id);
+			static boost::shared_ptr<Service> fetchService (const uid& id);
 
 			static std::vector<std::pair<uid, std::string> >	getCommercialLineLabels(bool withAll=false);
 

@@ -40,6 +40,7 @@
 #include "34_departures_table/DepartureTableRowInterfacePage.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -57,28 +58,6 @@ namespace synthese
 		const std::string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_13 = "char(13)";
 		const std::string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_26 = "char(26)";
 
-		DeparturesTableDestinationContentInterfaceElement::DeparturesTableDestinationContentInterfaceElement()
-			: _destinationsToDisplayVIE(NULL)
-			, _displayTerminusVIE(NULL)
-			, _displayTypeVIE (NULL)
-			, _stopsSeparatorVIE (NULL)
-			, _beforeCityVIE (NULL)
-			, _afterCityVIE(NULL)
-		{
-
-		}
-
-		DeparturesTableDestinationContentInterfaceElement::~DeparturesTableDestinationContentInterfaceElement()
-		{
-			delete _destinationsToDisplayVIE;
-			delete _displayTerminusVIE;
-			delete _displayTypeVIE;
-			delete _stopsSeparatorVIE;
-			delete _beforeCityVIE;
-			delete _afterCityVIE;
-		}
-
-
 		void DeparturesTableDestinationContentInterfaceElement::storeParameters(ValueElementList& vel)
 		{
 			if (vel.size() < 6)
@@ -94,7 +73,7 @@ namespace synthese
 
 		string DeparturesTableDestinationContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			const ArrivalDepartureRow* __DP = ( const ArrivalDepartureRow* ) object;
+			const ArrivalDepartureRow* __DP = (const ArrivalDepartureRow*) object;
 
 			std::string __DestinationsAAfficher = _destinationsToDisplayVIE->getValue(parameters, variables, object, request);
 			bool __AfficherTerminus = !_displayTerminusVIE->isZero(parameters, variables, object, request);

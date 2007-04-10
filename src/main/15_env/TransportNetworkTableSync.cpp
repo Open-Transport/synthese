@@ -12,7 +12,7 @@
 
 
 using boost::logic::tribool;
-
+using namespace boost;
 using synthese::util::Conversion;
 
 namespace synthese
@@ -51,7 +51,7 @@ TransportNetworkTableSync::doAdd (const synthese::db::SQLiteResult& rows, int ro
     std::string name (
 	rows.getColumn (rowIndex, TRANSPORTNETWORKS_TABLE_COL_NAME));
     
-    synthese::env::TransportNetwork* tn = new synthese::env::TransportNetwork (id, name);
+    shared_ptr<TransportNetwork> tn(new synthese::env::TransportNetwork (id, name));
 
     environment.getTransportNetworks ().add (tn);
 }
@@ -63,7 +63,7 @@ TransportNetworkTableSync::doReplace (const synthese::db::SQLiteResult& rows, in
 			  synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-    synthese::env::TransportNetwork* tn = environment.getTransportNetworks ().get (id);
+    shared_ptr<TransportNetwork> tn = environment.getTransportNetworks ().getUpdateable(id);
     std::string name (
 	rows.getColumn (rowIndex, TRANSPORTNETWORKS_TABLE_COL_NAME));
     tn->setName (name);

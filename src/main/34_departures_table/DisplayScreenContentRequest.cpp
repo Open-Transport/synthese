@@ -44,11 +44,6 @@ namespace synthese
 		const std::string DisplayScreenContentRequest::PARAMETER_DATE = "date";
 		const std::string DisplayScreenContentRequest::PARAMETER_TB = "tb";
 
-		DisplayScreenContentRequest::DisplayScreenContentRequest()
-			: Function()
-			, _screen(NULL)
-		{}
-
 		ParametersMap DisplayScreenContentRequest::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -89,10 +84,6 @@ namespace synthese
 		void DisplayScreenContentRequest::_run( std::ostream& stream ) const
 		{
 			_screen->display(stream, _date);
-		}
-
-		DisplayScreenContentRequest::~DisplayScreenContentRequest()
-		{
 		}
 	}
 }

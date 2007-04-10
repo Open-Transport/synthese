@@ -23,7 +23,10 @@
 #ifndef SYNTHESE_INTERFACES_LIBRARY_INTERFACE_ELEMENT_H
 #define SYNTHESE_INTERFACES_LIBRARY_INTERFACE_ELEMENT_H
 
+#include<boost/shared_ptr.hpp>
+
 #include "01_util/Factorable.h"
+#include "01_util/Registrable.h"
 
 #include "11_interfaces/Types.h"
 
@@ -46,15 +49,20 @@ namespace synthese
 		/** element which can produce a single display.
 			@ingroup m11
 		*/
-		class LibraryInterfaceElement : public util::Factorable
+		class LibraryInterfaceElement
+			: public util::Factorable
+			, public util::Registrable<int, LibraryInterfaceElement>
 		{
 		protected:
-			const InterfacePage*	_page;
+			boost::shared_ptr<const InterfacePage>	_page;
+			std::string _label;
 
 			virtual void storeParameters(ValueElementList& vel) = 0;
 
 		public:
 
+			virtual std::string getLabel() const { return std::string(); }
+			
 			void parse( const std::string& text );
 
 			/** Library page element creation.
@@ -65,12 +73,12 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007
 			*/
-			static LibraryInterfaceElement* create( const std::string & text, const InterfacePage* page );
+			static boost::shared_ptr<LibraryInterfaceElement> create( const std::string & text, boost::shared_ptr<const InterfacePage> page );
 
 			template<class T>
-			LibraryInterfaceElement* copy( const ParametersVector& parameters )
+			boost::shared_ptr<LibraryInterfaceElement> copy( const ParametersVector& parameters )
 			{
-				return new T(*((T*) this));
+				return boost::shared_ptr<T>(new T(*((T*) this)));
 			}
 
 
@@ -87,7 +95,12 @@ namespace synthese
 				@param request The source request (read only)
 				@return Label to go after the display
 			*/
-			virtual std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const = 0;
+			virtual std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const = 0;
 		};
 	}
 }

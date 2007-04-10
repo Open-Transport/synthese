@@ -29,9 +29,11 @@
 #include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace server;
 	
 	namespace departurestable
@@ -50,7 +52,7 @@ namespace synthese
 		{
 			try
 			{
-				_screen = DeparturesTableModule::getDisplayScreens().get(_request->getObjectId());
+				_screen = DisplayScreenTableSync::get(_request->getObjectId());
 
 				ParametersMap::const_iterator it;
 
@@ -60,21 +62,16 @@ namespace synthese
 				_value = Conversion::ToBool(it->second);
 
 			}
-			catch (DisplayScreen::RegistryKeyException e)
+			catch (DBEmptyResultException<DisplayScreen>)
 			{
 				throw ActionException("Display screen not found");
 			}
 		}
 
-		UpdateAllStopsDisplayScreenAction::UpdateAllStopsDisplayScreenAction()
-			: Action()
-			, _screen(NULL)
-		{}
-
 		void UpdateAllStopsDisplayScreenAction::run()
 		{
 			_screen->setAllPhysicalStopsDisplayed(_value);
-			DisplayScreenTableSync::save(_screen);
+			DisplayScreenTableSync::save(_screen.get());
 		}
 	}
 }

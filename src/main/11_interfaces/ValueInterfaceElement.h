@@ -25,6 +25,8 @@
 
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/Factorable.h"
 
 #include "11_interfaces/Types.h"
@@ -51,19 +53,30 @@ namespace synthese
 		class ValueInterfaceElement : public util::Factorable
 		{
 		protected:
-			const InterfacePage*	_page;
+			boost::shared_ptr<const InterfacePage>	_page;
 
 		public:
 			//! \name Setters and modifiers
 			//@{
-				void				setPage(const InterfacePage* page);
+				void				setPage(boost::shared_ptr<const InterfacePage> page);
 				virtual void		storeParameters(ValueElementList& vel) = 0;
 			//@}
 
 			//! \name Evaluation methods
 			//@{
-				virtual std::string	getValue(const ParametersVector&, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const = 0;
-				bool				isZero(const ParametersVector&, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+				virtual std::string	getValue(
+					const ParametersVector&
+					, interfaces::VariablesMap& variables
+					, const void* object = NULL
+					, const server::Request* request = NULL
+					) const = 0;
+				
+				bool isZero(
+					const ParametersVector&
+					, interfaces::VariablesMap& variables
+					, const void* object = NULL
+					, const server::Request* request = NULL
+					) const;
 			//@}
 		};
 	}

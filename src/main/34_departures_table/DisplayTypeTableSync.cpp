@@ -36,6 +36,7 @@
 #include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -109,12 +110,12 @@ namespace synthese
 			addTableColumn(TABLE_COL_ROWS_NUMBER, "INTEGER", true);
 		}
 
-		void DisplayTypeTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void DisplayTypeTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				DisplayType* object = new DisplayType();
-				load(object, rows, i);
+				shared_ptr<DisplayType> object(new DisplayType());
+				load(object.get(), rows, i);
 				DeparturesTableModule::getDisplayTypes().add(object);
 			}
 		}
@@ -125,7 +126,7 @@ namespace synthese
 			{
 				if (DeparturesTableModule::getDisplayTypes().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
 				{
-					load(DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))), rows, i);
+					load(DeparturesTableModule::getDisplayTypes().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
 				}
 			}
 		}
@@ -141,7 +142,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<DisplayType*> DisplayTypeTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<DisplayType> > DisplayTypeTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -160,11 +161,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<DisplayType*> objects;
+				vector<shared_ptr<DisplayType> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					DisplayType* object = new DisplayType;
-					load(object, result, i);
+					shared_ptr<DisplayType> object(new DisplayType);
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

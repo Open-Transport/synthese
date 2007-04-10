@@ -45,8 +45,8 @@ namespace synthese
 			static const std::string PARAMETER_PHYSICAL;
 
 		private:
-			DisplayScreen*		_screen;
-			env::PhysicalStop*	_stop;
+			boost::shared_ptr<DisplayScreen>		_screen;
+			boost::shared_ptr<const env::PhysicalStop>	_stop;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -60,10 +60,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			DisplayScreenRemovePhysicalStopAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

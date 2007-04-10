@@ -34,11 +34,11 @@ namespace synthese
 		class JourneyLineListInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 		private:
-			interfaces::ValueInterfaceElement* _displayPedestrianLines;
-			interfaces::ValueInterfaceElement* _rowStartHtml;
-			interfaces::ValueInterfaceElement* _rowEndHtml;
-			interfaces::ValueInterfaceElement* _pixelWidth;
-			interfaces::ValueInterfaceElement* _pixelHeight;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _displayPedestrianLines;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _rowStartHtml;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _rowEndHtml;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _pixelWidth;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _pixelHeight;
 			~JourneyLineListInterfaceElement();
 
 		public:
@@ -48,7 +48,7 @@ namespace synthese
 				@param object (Journey*) Journey to display
 				@param site Site to display
 			*/
-			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, const void* object = NULL, const server::Request* request = NULL) const;
+			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, boost::shared_ptr<const void> object = boost::shared_ptr<const void>(), const server::Request* request = NULL) const;
 
 			/** Parser.
 			@param text Text to parse : standard list of parameters :

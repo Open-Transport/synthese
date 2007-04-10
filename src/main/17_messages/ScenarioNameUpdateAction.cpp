@@ -29,11 +29,13 @@
 #include "30_server/Request.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
-	
+	using namespace db;
+
 	namespace messages
 	{
 		const string ScenarioNameUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
@@ -50,7 +52,7 @@ namespace synthese
 		{
 			try
 			{
-				_scenario = MessagesModule::getScenarii().get(_request->getObjectId());
+				_scenario = ScenarioTableSync::get(_request->getObjectId());
 
 				ParametersMap::const_iterator it;
 
@@ -59,21 +61,16 @@ namespace synthese
 					throw ActionException("Name not specified");
 				_name = it->second;
 			}
-			catch (Scenario::RegistryKeyException e)
+			catch (DBEmptyResultException<Scenario>)
 			{
 				throw ActionException("Scenario not found");
 			}
 		}
 
-		ScenarioNameUpdateAction::ScenarioNameUpdateAction()
-			: Action()
-			, _scenario(NULL)
-		{}
-
 		void ScenarioNameUpdateAction::run()
 		{
 			_scenario->setName(_name);
-			ScenarioTableSync::save(_scenario);
+			ScenarioTableSync::save(_scenario.get());
 		}
 	}
 }

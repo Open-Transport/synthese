@@ -35,11 +35,11 @@ namespace synthese
 		class HtmlFormInterfaceElement : public interfaces::ValueInterfaceElement
 		{
 			// List of parameters to store
-			interfaces::ValueInterfaceElement* _name;
-			interfaces::ValueInterfaceElement* _function_key;
-			interfaces::ValueInterfaceElement* _function_parameters;
-			interfaces::ValueInterfaceElement* _action_key;
-			interfaces::ValueInterfaceElement* _action_parameters;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _name;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _function_key;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _function_parameters;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _action_key;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _action_parameters;
 			bool								_with_action;
 
 		public:
@@ -51,8 +51,11 @@ namespace synthese
 				-# action parameters (query string format)
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
-			std::string getValue(const interfaces::ParametersVector& parameters,interfaces::VariablesMap& variables,  const void* rootObject = NULL, const server::Request* request = NULL) const;
-			~HtmlFormInterfaceElement();
+			std::string getValue(const interfaces::ParametersVector& parameters
+				,interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
+			
 		};
 	}
 }

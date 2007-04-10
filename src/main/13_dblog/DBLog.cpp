@@ -23,6 +23,8 @@
 #include "13_dblog/DBLog.h"
 #include "13_dblog/DBLogEntryTableSync.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace util;
@@ -40,14 +42,14 @@ namespace synthese
 			return _name;
 		}
 
-		void DBLog::_addEntry( DBLogEntry::Level level, const DBLogEntry::Content& content, const security::User* user /*= NULL*/ )
+		void DBLog::_addEntry( DBLogEntry::Level level, const DBLogEntry::Content& content, shared_ptr<const security::User> user /*= NULL*/ )
 		{
-			DBLogEntry* e = new DBLogEntry;
+			shared_ptr<DBLogEntry> e(new DBLogEntry);
 			e->setLevel(level);
 			e->setUser(user);
 			e->setLogKey(getFactoryKey());
 			e->setContent(content);
-			DBLogEntryTableSync::save(e);
+			DBLogEntryTableSync::save(e.get());
 		}
 
 		DBLog::ColumnsVector DBLog::parse( const DBLogEntry::Content& cols ) const

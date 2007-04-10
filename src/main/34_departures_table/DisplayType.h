@@ -37,11 +37,14 @@ namespace synthese
 
 	namespace departurestable
 	{
+		/** Type of display screen, describing the input and output facilities.
+			@ingroup m34
+		*/
 		class DisplayType : public util::Registrable<uid, DisplayType>
 		{
 		private:
 			std::string						_name;
-			const interfaces::Interface*	_interf;
+			boost::shared_ptr<const interfaces::Interface>	_interf;
 			int								_rowNumber;
 
 		public:
@@ -49,11 +52,11 @@ namespace synthese
 			DisplayType(const uid&);
 
 			const std::string& getName() const;
-			const interfaces::Interface* getInterface() const;
+			boost::shared_ptr<const interfaces::Interface> getInterface() const;
 			int getRowNumber() const;
 
 			void setName(const std::string& name);
-			void setInterface(const interfaces::Interface* interf);
+			void setInterface(boost::shared_ptr<const interfaces::Interface> interf);
 			void setRowNumber(int number);
 
 		};

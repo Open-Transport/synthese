@@ -37,10 +37,6 @@ namespace synthese
 	{
 		std::string AdminRequest::PARAMETER_SITE = "site";
 		
-		RoutePlannerFunction::RoutePlannerFunction()
-			: Function(), _site(NULL)
-		{}
-
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -53,9 +49,7 @@ namespace synthese
 		{
 			ParametersMap::const_iterator it;
 
-			/// @todo Parameters parsing
-			// eg
-			// it = map.find(PARAMETER_PAGE);
+			it = map.find(PARAMETER_PAGE);
 			//try
 			//{
 			//	AdminInterfaceElement* page = (it == map.end())

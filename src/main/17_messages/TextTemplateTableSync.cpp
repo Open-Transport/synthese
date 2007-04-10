@@ -33,6 +33,7 @@
 #include "TextTemplateTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -103,7 +104,7 @@ namespace synthese
 			addTableColumn(COL_LEVEL, "INTEGER");
 		}
 
-		void TextTemplateTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void TextTemplateTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 		}
 
@@ -115,7 +116,7 @@ namespace synthese
 		{
 		}
 
-		std::vector<TextTemplate*> TextTemplateTableSync::search(AlarmLevel level, string name, int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<TextTemplate> > TextTemplateTableSync::search(AlarmLevel level, string name, int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -135,11 +136,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<TextTemplate*> objects;
+				vector<shared_ptr<TextTemplate> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					TextTemplate* object = new TextTemplate();
-					load(object, result, i);
+					shared_ptr<TextTemplate> object(new TextTemplate());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

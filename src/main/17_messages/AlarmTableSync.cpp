@@ -36,6 +36,7 @@
 #include <sqlite/sqlite3.h>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -59,7 +60,7 @@ namespace synthese
 			alarm->setLongMessage(rows.getColumn (rowId, AlarmTableSync::COL_LONG_MESSAGE));
 			alarm->setPeriodStart(DateTime::FromSQLTimestamp (rows.getColumn (rowId, AlarmTableSync::COL_PERIODSTART)));
 			alarm->setPeriodEnd(DateTime::FromSQLTimestamp (rows.getColumn (rowId, AlarmTableSync::COL_PERIODEND)));
-			alarm->setScenario(MessagesModule::getScenarii().get(Conversion::ToLongLong(rows.getColumn (rowId, AlarmTableSync::COL_SCENARIO_ID))));
+			alarm->setScenario(MessagesModule::getScenarii().getUpdateable(Conversion::ToLongLong(rows.getColumn (rowId, AlarmTableSync::COL_SCENARIO_ID))).get());
 			alarm->setIsEnabled(Conversion::ToBool(rows.getColumn(rowId, AlarmTableSync::COL_ENABLED)));
 		}
 
@@ -123,25 +124,25 @@ namespace synthese
 
 		void AlarmTableSync::rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
-			const db::SQLiteResult& rows)
+			const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
 			{
-				Alarm* alarm;
+				shared_ptr<Alarm> alarm;
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 				if (MessagesModule::getAlarms ().contains (id))
 				{
-					alarm = MessagesModule::getAlarms().get(id);
-					load(alarm, rows, rowIndex);
+					alarm = MessagesModule::getAlarms().getUpdateable(id);
+					load(alarm.get(), rows, rowIndex);
 				}
 				else
 				{
-					alarm = new Alarm;
-					load(alarm, rows, rowIndex);
+					alarm.reset(new Alarm);
+					load(alarm.get(), rows, rowIndex);
 					MessagesModule::getAlarms().add (alarm);
 				}
 				if (alarm->getScenario())
-					alarm->getScenario()->addAlarm(alarm);
+					alarm->getScenario()->addAlarm(alarm.get());
 			}
 		}
 
@@ -153,8 +154,8 @@ namespace synthese
 			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
 			{
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-				Alarm* alarm = MessagesModule::getAlarms ().get (id);
-				load(alarm, rows, rowIndex);
+				shared_ptr<Alarm> alarm = MessagesModule::getAlarms ().getUpdateable(id);
+				load(alarm.get(), rows, rowIndex);
 			}
 		}
 
@@ -168,13 +169,15 @@ namespace synthese
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 				if (MessagesModule::getAlarms().contains(id))
 				{
-					MessagesModule::getAlarms().get(id)->getScenario()->removeAlarm(MessagesModule::getAlarms().get(id));
+					shared_ptr<Alarm> alarm = MessagesModule::getAlarms().getUpdateable(id);
+					if (alarm->getScenario())
+						alarm->getScenario()->removeAlarm(alarm.get());
 					MessagesModule::getAlarms ().remove (id);
 				}
 			}
 		}
 
-		std::vector<Alarm*> AlarmTableSync::search(Scenario* scenario, time::DateTime startDate, time::DateTime endDate, int first /*= 0*/, int number /*= 0*/)
+		std::vector<shared_ptr<Alarm> > AlarmTableSync::search(Scenario* scenario, time::DateTime startDate, time::DateTime endDate, int first /*= 0*/, int number /*= 0*/)
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -195,11 +198,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<Alarm*> objects;
+				vector<shared_ptr<Alarm> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					Alarm* object =  new Alarm();
-					load(object, result, i);
+					shared_ptr<Alarm> object(new Alarm);
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

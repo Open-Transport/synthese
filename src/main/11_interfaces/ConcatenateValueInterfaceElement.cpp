@@ -32,6 +32,7 @@
 #include "ConcatenateValueInterfaceElement.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -40,7 +41,10 @@ namespace synthese
 
 	namespace interfaces
 	{
-		string ConcatenateValueInterfaceElement::getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string ConcatenateValueInterfaceElement::getValue(
+			const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object, const server::Request* request) const
 		{
 			stringstream s;
 			for (std::vector<boost::shared_ptr<interfaces::ValueInterfaceElement> >::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
@@ -51,7 +55,7 @@ namespace synthese
 		void ConcatenateValueInterfaceElement::storeParameters(ValueElementList& vel)
 		{
 			while(!vel.isEmpty())
-				_parameters.push_back(boost::shared_ptr<interfaces::ValueInterfaceElement>(vel.front()));
+				_parameters.push_back(vel.front());
 		}
 	}
 

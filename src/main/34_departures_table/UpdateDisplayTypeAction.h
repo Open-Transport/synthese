@@ -48,9 +48,9 @@ namespace synthese
 			static const std::string PARAMETER_ROWS_NUMBER;
 
 		private:
-			DisplayType* _dt;
+			boost::shared_ptr<DisplayType> _dt;
 			std::string _name;
-			interfaces::Interface*	_interface;
+			boost::shared_ptr<const interfaces::Interface>	_interface;
 			int	_rows_number;
 
 		protected:
@@ -64,9 +64,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			UpdateDisplayTypeAction();
-			~UpdateDisplayTypeAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

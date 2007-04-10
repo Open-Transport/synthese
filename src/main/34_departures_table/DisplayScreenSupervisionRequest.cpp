@@ -40,11 +40,6 @@ namespace synthese
 		const std::string DisplayScreenSupervisionRequest::PARAMETER_DISPLAY_SCREEN_ID = "tb";
 		const std::string DisplayScreenSupervisionRequest::PARAMETER_STATUS = "status";
 		
-		DisplayScreenSupervisionRequest::DisplayScreenSupervisionRequest()
-			: Function()
-			, _displayScreen(NULL)
-		{}
-
 		ParametersMap DisplayScreenSupervisionRequest::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -79,12 +74,7 @@ namespace synthese
 
 		void DisplayScreenSupervisionRequest::_run( std::ostream& stream ) const
 		{
-			if (_displayScreen != NULL)
-				_displayScreen->recordSupervision(_text);
-		}
-
-		DisplayScreenSupervisionRequest::~DisplayScreenSupervisionRequest()
-		{
+			_displayScreen->recordSupervision(_text);
 		}
 	}
 }

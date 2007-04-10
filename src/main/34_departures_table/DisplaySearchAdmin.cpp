@@ -43,7 +43,7 @@
 #include "34_departures_table/DisplayScreenContentRequest.h"
 #include "34_departures_table/DeparturesTableModule.h"
 
-
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -100,7 +100,26 @@ namespace synthese
 			if (it != map.end())
 				_searchMessage = Conversion::ToInt(it->second);
 
-			_result = DisplayScreenTableSync::search(_searchUId, _searchLocalizationUId, _searchLineId, _searchTypeId, _searchState, _searchMessage);
+			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAMETER_SEARCH_LOCALIZATION, 30);
+
+			_result = DisplayScreenTableSync::search(
+				_searchUId
+				, _searchLocalizationUId
+				, _searchLineId
+				, _searchTypeId
+				, _searchState
+				, _searchMessage
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, _requestParameters.orderField == PARAMETER_SEARCH_UID
+				, _requestParameters.orderField == PARAMETER_SEARCH_LOCALIZATION
+				, _requestParameters.orderField == PARAMETER_SEARCH_TYPE_ID
+				, _requestParameters.orderField == PARAMETER_SEARCH_STATE
+				, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
+				, _requestParameters.raisingOrder
+				);
+
+			_resultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _result);
 		}
 
 		string DisplaySearchAdmin::getTitle() const
@@ -141,13 +160,13 @@ namespace synthese
 			v.push_back(make_pair(string(), "Actions"));
 			v.push_back(make_pair(string(), "Actions"));
 
-			ActionResultHTMLTable t(v, searchRequest.getHTMLForm("search"), string(), true, createDisplayRequest.getHTMLForm("create"), CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, searchRequest.getHTMLForm("search"), _requestParameters, _resultParameters, createDisplayRequest.getHTMLForm("create"), CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 
-			for (vector<DisplayScreen*>::const_iterator it = _result.begin(); it != _result.end(); ++it)
+			for (vector<shared_ptr<DisplayScreen> >::const_iterator it = _result.begin(); it != _result.end(); ++it)
 			{
-				DisplayScreen* screen = *it;
+				shared_ptr<DisplayScreen> screen = *it;
 				updateRequest.setObjectId(screen->getKey());
 				viewRequest.setObjectId(screen->getKey());
 				maintRequest.setObjectId(screen->getKey());

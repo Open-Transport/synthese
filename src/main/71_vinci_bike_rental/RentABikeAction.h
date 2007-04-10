@@ -24,6 +24,8 @@
 #ifndef SYNTHESE_RentABikeAction_H__
 #define SYNTHESE_RentABikeAction_H__
 
+ #include <boost/shared_ptr.hpp>
+
 #include "04_time/DateTime.h"
 
 #include "30_server/Action.h"
@@ -51,10 +53,10 @@ namespace synthese
 
 		private:
 			time::DateTime	_date;
-			VinciRate*		_rate;
-			VinciBike*		_bike;
-			VinciContract*	_contract;
-			VinciAntivol*	_lock;
+			boost::shared_ptr<VinciRate>		_rate;
+			boost::shared_ptr<VinciBike>		_bike;
+			boost::shared_ptr<VinciContract>	_contract;
+			boost::shared_ptr<VinciAntivol>		_lock;
 			std::string		_lockMarkedNumber;
 			double			_amount;
 
@@ -69,9 +71,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			RentABikeAction();
-			~RentABikeAction();
-
 			/** Action execution.
 			*/
 			void run();

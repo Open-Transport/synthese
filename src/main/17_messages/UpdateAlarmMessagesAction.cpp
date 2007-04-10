@@ -29,10 +29,12 @@
 #include "17_messages/AlarmTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace db;
 	
 	namespace messages
 	{
@@ -51,9 +53,14 @@ namespace synthese
 		{
 			ParametersMap::const_iterator it;
 
-			if (!MessagesModule::getAlarms().contains(_request->getObjectId()))
+			try
+			{
+				_alarm = AlarmTableSync::get(_request->getObjectId());
+			}
+			catch (...)
+			{
 				throw ActionException("Specified alarm not found");
-			_alarm = MessagesModule::getAlarms().get(_request->getObjectId());
+			}
 			
 			it = map.find(PARAMETER_SHORT_MESSAGE);
 			if (it == map.end())
@@ -66,15 +73,11 @@ namespace synthese
 			_longMessage = it->second;
 		}
 
-		UpdateAlarmMessagesAction::UpdateAlarmMessagesAction()
-			: Action()
-		{}
-
 		void UpdateAlarmMessagesAction::run()
 		{
 			_alarm->setShortMessage(_shortMessage);
 			_alarm->setLongMessage(_longMessage);
-			AlarmTableSync::save(_alarm);
+			AlarmTableSync::save(_alarm.get());
 		}
 	}
 }

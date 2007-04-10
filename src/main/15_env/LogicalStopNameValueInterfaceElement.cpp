@@ -32,6 +32,8 @@
 #include "15_env/ConnectionPlace.h"
 #include "15_env/LogicalStopNameValueInterfaceElement.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace interfaces;
@@ -44,7 +46,7 @@ namespace synthese
 		{
 /*			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )
 			{
-*/				const ConnectionPlace* place = (ConnectionPlace*) object;
+*/				const ConnectionPlace* place = (const ConnectionPlace*) object;
 				return place->getName();
 /*			}
 			else
@@ -59,7 +61,7 @@ namespace synthese
 
 		void LogicalStopNameValueInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			_uid = (vel.size() >= 1) ? vel.front() : NULL;
+			_uid = (vel.size() >= 1) ? vel.front() : shared_ptr<ValueInterfaceElement>();
 		}
 	}
 

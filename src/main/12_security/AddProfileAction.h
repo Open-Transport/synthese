@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_AddProfileAction_H__
 #define SYNTHESE_AddProfileAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -42,7 +44,7 @@ namespace synthese
 
 		private:
 			std::string	_name;
-			Profile*	_templateProfile;
+			boost::shared_ptr<const Profile>	_templateProfile;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -50,13 +52,12 @@ namespace synthese
 			server::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
-			Removes the used parameters from the map.
+				@param map Parameters to read.
+				@throw ActionException if a parameter is invalid.
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			AddProfileAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

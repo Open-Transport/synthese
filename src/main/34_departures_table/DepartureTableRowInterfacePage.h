@@ -37,18 +37,16 @@ namespace synthese
 		class DepartureTableRowInterfacePage : public interfaces::InterfacePage
 		{
 		public:
-
-			~DepartureTableRowInterfacePage();
-
 			/** Display of the admin page.
 			*/
 			void display( std::ostream& stream
 				, interfaces::VariablesMap& vars
 				, int rowId
 				, int pageNumber
-                                , const std::string& message
-				, const ArrivalDepartureRow*
-				, const server::Request* request = NULL ) const;
+				, const std::string& message
+				, const ArrivalDepartureRow& row
+				, const server::Request* request = NULL
+				) const;
 
 		};
 	}

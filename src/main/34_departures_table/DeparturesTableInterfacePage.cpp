@@ -24,6 +24,8 @@
 
 #include "01_util/Conversion.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace util;
@@ -35,13 +37,19 @@ namespace synthese
 			, VariablesMap& vars
 			, const std::string& title
 			, int wiringCode
-			, const ArrivalDepartureListWithAlarm& rows, const server::Request* request /*= NULL*/ ) const
+			, const ArrivalDepartureListWithAlarm& rows
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			ParametersVector pv;
 			pv.push_back(title);
 			pv.push_back(Conversion::ToString(wiringCode));
 			
-			InterfacePage::display(stream, pv, vars, &rows, request);
+			InterfacePage::display(
+				stream
+				, pv
+				, vars
+				, (const void*) &rows
+				, request);
 		}
 	}
 }

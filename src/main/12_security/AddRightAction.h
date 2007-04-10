@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_AddRightAction_H__
 #define SYNTHESE_AddRightAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "12_security/Right.h"
 
 #include "30_server/Action.h"
@@ -45,7 +47,7 @@ namespace synthese
 			static const std::string PARAMETER_PARAMETER;
 
 		private:
-			Profile*		_profile;
+			boost::shared_ptr<Profile>		_profile;
 			std::string		_rightName;
 			std::string		_parameter;
 			Right::Level	_privateLevel;
@@ -62,8 +64,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			AddRightAction();
-			
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

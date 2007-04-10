@@ -41,14 +41,14 @@ namespace synthese
 		class EqualsValueInterfaceElement : public interfaces::ValueInterfaceElement
 		{
 		private:
-			interfaces::ValueInterfaceElement* _left;
-			interfaces::ValueInterfaceElement* _right;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _left;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _right;
 
 		public:
-			EqualsValueInterfaceElement();
-			~EqualsValueInterfaceElement();
-
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string getValue(const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 
 			/** Parser.
 			@param text Optional parameter

@@ -35,6 +35,7 @@
 
 using namespace std;
 using boost::logic::tribool;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -109,12 +110,12 @@ namespace synthese
 			addTableColumn (COL_CAPACITY, "INTEGER");
 		}
 
-		void BikeComplianceTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void BikeComplianceTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				BikeCompliance* object = new BikeCompliance();
-				load(object, rows, i);
+				shared_ptr<BikeCompliance> object(new BikeCompliance());
+				load(object.get(), rows, i);
 				EnvModule::getBikeCompliances().add(object);
 			}
 		}
@@ -126,8 +127,8 @@ namespace synthese
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
 				if (EnvModule::getBikeCompliances().contains(id))
 				{
-					BikeCompliance* object = EnvModule::getBikeCompliances().get(id);
-					load(object, rows, i);
+					shared_ptr<BikeCompliance> object = EnvModule::getBikeCompliances().getUpdateable(id);
+					load(object.get(), rows, i);
 				}
 			}
 		}
@@ -144,7 +145,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<BikeCompliance*> BikeComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<BikeCompliance> > BikeComplianceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -163,11 +164,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<BikeCompliance*> objects;
+				vector<shared_ptr<BikeCompliance> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					BikeCompliance* object = new BikeCompliance();
-					load(object, result, i);
+					shared_ptr<BikeCompliance> object(new BikeCompliance());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

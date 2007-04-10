@@ -44,7 +44,7 @@ namespace synthese
 			static const std::string PARAMETER_MESSAGE;
 
 		private:
-			DisplayScreen*	_displayScreen;
+			boost::shared_ptr<DisplayScreen>	_displayScreen;
 			int				_controls;
 			bool			_online;
 			std::string		_message;
@@ -61,10 +61,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			UpdateDisplayMaintenanceAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

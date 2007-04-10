@@ -36,6 +36,7 @@
 #include "34_departures_table/DepartureTableRowInterfacePage.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -47,26 +48,6 @@ namespace synthese
 		const string DeparturesTableInterfaceElement::VALUE_DESTINATION = "destination";
 		const string DeparturesTableInterfaceElement::VALUE_INTERMEDIATE = "intermediate";
 		const string DeparturesTableInterfaceElement::VALUE_NORMAL = "normal";
-
-		DeparturesTableInterfaceElement::DeparturesTableInterfaceElement()
-			: _multiplicateurRangeeVIE(NULL)
-			, _pageSeparator(NULL)
-			, _pagesVIE(NULL)
-			, _departuresToHide(NULL)
- 			, _message(NULL)
-        
-		{
-
-		}
-
-		DeparturesTableInterfaceElement::~DeparturesTableInterfaceElement()
-		{
-			delete _multiplicateurRangeeVIE;
-			delete _pageSeparator;
-			delete _pagesVIE;
-			delete _departuresToHide;
-			delete _message;
-		}
 
 		void DeparturesTableInterfaceElement::storeParameters( ValueElementList& vel )
 		{
@@ -84,7 +65,12 @@ namespace synthese
 				_message = vel.front();
 		}
 
-		string DeparturesTableInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string DeparturesTableInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
+			, VariablesMap& variables
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			const ArrivalDepartureList& ptds = ((const ArrivalDepartureListWithAlarm*) object)->map;
 			
@@ -130,8 +116,8 @@ namespace synthese
 						: (1 + __NumeroPage % __NombrePagesRangee);     // 1 : Numero de page
 
 					// Lancement de l'affichage de la rangee
-					const DepartureTableRowInterfacePage* const page = _page->getInterface()->getPage<DepartureTableRowInterfacePage>();
-					page->display(stream, variables, __Rangee, pageNumber, message, &___DP, request);
+					shared_ptr<const DepartureTableRowInterfacePage> page = _page->getInterface()->getPage<DepartureTableRowInterfacePage>();
+					page->display(stream, variables, __Rangee, pageNumber, message, ___DP, request);
 
 					// Incrementation du numero de rangee
 					__Rangee += __MultiplicateurRangee;

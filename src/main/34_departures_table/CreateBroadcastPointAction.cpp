@@ -31,6 +31,7 @@
 #include "34_departures_table/CreateBroadcastPointAction.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -65,7 +66,7 @@ namespace synthese
 				if (it != map.end())
 				{
 					_physicalStop = EnvModule::getPhysicalStops().get(Conversion::ToLongLong(it->second));
-					if (_physicalStop->getConnectionPlace() != _place)
+					if (_physicalStop->getConnectionPlace() != _place.get())
 						throw ActionException("Bad physical stop : does not belong to the specified place");
 				}
 
@@ -92,20 +93,11 @@ namespace synthese
 
 		void CreateBroadcastPointAction::run()
 		{
-			BroadcastPoint* bp = new BroadcastPoint;
+			shared_ptr<BroadcastPoint> bp(new BroadcastPoint);
 			bp->setConnectionPlace(_place);
 			bp->setPhysicalStop(_physicalStop);
 			bp->setName(_name);
-			BroadcastPointTableSync::save(bp);
-			delete bp;
-		}
-
-		CreateBroadcastPointAction::CreateBroadcastPointAction()
-			: Action()
-			, _physicalStop(NULL)
-			, _place(NULL)
-		{
-			
+			BroadcastPointTableSync::save(bp.get());
 		}
 	}
 }

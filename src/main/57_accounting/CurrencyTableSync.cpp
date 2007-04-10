@@ -34,6 +34,7 @@
 #include "57_accounting/CurrencyTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -90,12 +91,12 @@ namespace synthese
 			addTableColumn(TABLE_COL_SYMBOL, "TEXT", true);
 		}
 
-		void CurrencyTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void CurrencyTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				Currency* currency = new Currency;
-				load(currency, rows, i);
+				shared_ptr<Currency> currency(new Currency);
+				load(currency.get(), rows, i);
 				AccountingModule::getCurrencies().add(currency);
 			}
 		}
@@ -110,7 +111,7 @@ namespace synthese
 
 		}
 
-		std::vector<Currency*> CurrencyTableSync::search(const std::string& name, const std::string& symbol , int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<Currency> > CurrencyTableSync::search(const std::string& name, const std::string& symbol , int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -127,11 +128,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<Currency*> currencies;
+				vector<shared_ptr<Currency> > currencies;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					Currency* currency = new Currency;
-					load(currency, result, i);
+					shared_ptr<Currency> currency(new Currency);
+					load(currency.get(), result, i);
 					currencies.push_back(currency);
 				}
 				return currencies;

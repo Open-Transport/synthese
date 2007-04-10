@@ -25,6 +25,8 @@
 
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "12_security/Right.h"
 
 namespace synthese
@@ -55,7 +57,7 @@ namespace synthese
 		class SecurityRight : public Right
 		{
 		private:
-			static void _addSubProfilesLabel(ParameterLabelsVector& map, Profile* parent, std::string label);
+			static void _addSubProfilesLabel(ParameterLabelsVector& map, boost::shared_ptr<const Profile> parent, std::string label);
 
 		public:
 			std::string	displayParameter()	const;

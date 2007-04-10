@@ -26,6 +26,8 @@
 #include <vector>
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/UId.h"
 #include "01_util/Registrable.h"
 
@@ -81,7 +83,7 @@ namespace synthese
 			void setPlaceid(uid id);
 			void setComment(const std::string& comment);
 
-			TransactionPart* getPart(const Account* account);
+			boost::shared_ptr<TransactionPart> getPart(boost::shared_ptr<const Account> account) const;
 		};
 	}
 }

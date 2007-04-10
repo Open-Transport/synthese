@@ -48,7 +48,7 @@ namespace synthese
 	namespace routeplanner
 	{
 
-		void JourneyBoardInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		void JourneyBoardInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, boost::shared_ptr<const void> object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 		    const server::Site* site = request->getSite ();
 			// Parameters

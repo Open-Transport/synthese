@@ -33,6 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "34_departures_table/UpdateDisplayTypeAction.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -52,9 +53,11 @@ namespace synthese
 		ParametersMap UpdateDisplayTypeAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_ID, Conversion::ToString(_dt->getKey())));
+			if (_dt.get())
+				map.insert(make_pair(PARAMETER_ID, Conversion::ToString(_dt->getKey())));
 			map.insert(make_pair(PARAMETER_NAME, _name));
-			map.insert(make_pair(PARAMETER_INTERFACE_ID, Conversion::ToString(_interface->getKey())));
+			if (_interface.get())
+				map.insert(make_pair(PARAMETER_INTERFACE_ID, Conversion::ToString(_interface->getKey())));
 			map.insert(make_pair(PARAMETER_ROWS_NUMBER, Conversion::ToString(_rows_number)));
 			return map;
 		}
@@ -70,7 +73,7 @@ namespace synthese
 				{
 					_dt = DisplayTypeTableSync::get(Conversion::ToLongLong(it->second));
 				}
-				catch (DBEmptyResultException e)
+				catch (DBEmptyResultException<DisplayType>)
 				{
 					throw ActionException("Display Type not found");
 				}
@@ -107,17 +110,7 @@ namespace synthese
 			_dt->setName(_name);
 			_dt->setInterface(_interface);
 			_dt->setRowNumber(_rows_number);
-			DisplayTypeTableSync::save(_dt);
-		}
-
-		UpdateDisplayTypeAction::~UpdateDisplayTypeAction()
-		{
-			delete _dt;
-		}
-
-		UpdateDisplayTypeAction::UpdateDisplayTypeAction()
-			: _dt(NULL), _interface(NULL)
-		{
+			DisplayTypeTableSync::save(_dt.get());
 		}
 	}
 }

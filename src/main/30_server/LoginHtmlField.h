@@ -30,14 +30,17 @@ namespace synthese
 	namespace server
 	{
 		/** Login HTML Field Value InterfaceElement Class.
-			@ingroup m30
+			@ingroup m30Values refValues
 		*/
 		class LoginHtmlField : public interfaces::ValueInterfaceElement
 		{
 
 		public:
 			void storeParameters(interfaces::ValueElementList& vel);
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject = NULL, const server::Request* request = NULL) const;
+			std::string getValue(const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 		};
 	}
 }

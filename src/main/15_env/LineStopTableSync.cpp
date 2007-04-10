@@ -35,6 +35,7 @@
 #include "15_env/EnvModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -94,11 +95,11 @@ namespace synthese
 			ls->setMetricOffset(metricOffset);
 			ls->setIsArrival(isArrival);
 			ls->setIsDeparture(isDeparture);
-			ls->setPhysicalStop(EnvModule::getPhysicalStops ().get (fromPhysicalStopId));
-			ls->setLine(EnvModule::getLines ().get (lineId));
+			ls->setPhysicalStop(EnvModule::getPhysicalStops ().getUpdateable(fromPhysicalStopId).get());
+			ls->setLine(EnvModule::getLines ().getUpdateable (lineId).get());
 			ls->setRankInPath(rankInPath);
 
-			EnvModule::getLines ().get (lineId)->addEdge(ls);
+			EnvModule::getLines ().getUpdateable (lineId)->addEdge(ls);
 			
 		}
 
@@ -143,18 +144,18 @@ namespace synthese
 			addTableColumn (COL_VIAPOINTS, "TEXT", true);
 		}
 
-		void LineStopTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void LineStopTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
 				if (EnvModule::getLineStops().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
 				{
-					load(EnvModule::getLineStops().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))), rows, i);
+					load(EnvModule::getLineStops().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
 				}
 				else
 				{
-					LineStop* object = new LineStop;
-					load(object, rows, i);
+					shared_ptr<LineStop> object(new LineStop);
+					load(object.get(), rows, i);
 					EnvModule::getLineStops().add(object);
 				}
 			}
@@ -167,8 +168,8 @@ namespace synthese
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
 				if (EnvModule::getLineStops().contains(id))
 				{
-					LineStop* object = EnvModule::getLineStops().get(id);
-					load(object, rows, i);
+					shared_ptr<LineStop> object = EnvModule::getLineStops().getUpdateable(id);
+					load(object.get(), rows, i);
 				}
 			}
 		}
@@ -185,7 +186,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<LineStop*> LineStopTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<LineStop> > LineStopTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -204,11 +205,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<LineStop*> objects;
+				vector<shared_ptr<LineStop> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					LineStop* object = new LineStop();
-					load(object, result, i);
+					shared_ptr<LineStop> object(new LineStop());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

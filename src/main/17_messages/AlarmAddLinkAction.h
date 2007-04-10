@@ -45,7 +45,7 @@ namespace synthese
 
 		private:
 			std::string		_recipientKey;
-			Alarm*			_alarm;
+			boost::shared_ptr<const Alarm>			_alarm;
 			uid				_objectId;
 
 		protected:
@@ -60,10 +60,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			AlarmAddLinkAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

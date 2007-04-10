@@ -25,6 +25,8 @@
 
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "11_interfaces/InterfacePage.h"
 
 namespace synthese
@@ -49,7 +51,7 @@ namespace synthese
 			*/
 			void display(std::ostream& stream
 				, interfaces::VariablesMap& vars
-				, const VinciContract* contract
+				, boost::shared_ptr<const VinciContract> contract
 				, const server::Request* request = NULL) const;
 		};
 	}

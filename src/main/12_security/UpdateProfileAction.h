@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_UpdateProfileAction_H__
 #define SYNTHESE_UpdateProfileAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -40,7 +42,7 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 
 		private:
-			Profile*	_profile;
+			boost::shared_ptr<Profile>	_profile;
 			std::string	_name;
 
 		protected:
@@ -54,8 +56,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			UpdateProfileAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

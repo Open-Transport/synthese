@@ -260,17 +260,9 @@ namespace synthese
 				it->second = value;
 		}
 
-		std::string HTMLForm::getLinkButton(const std::string& caption, const std::string confirm, const std::string icon)
+		std::string HTMLForm::getLinkButton(const std::string& caption, const std::string confirm, const std::string icon) const
 		{
-			stringstream url;
-			url << _action << "?";
-			for (HiddenFieldsMap::const_iterator it = _hiddenFields.begin(); it != _hiddenFields.end(); ++it)
-			{
-				if (it != _hiddenFields.begin())
-					url << "&";
-				url << it->first << "=" << it->second;
-			}
-			return HTMLModule::getLinkButton(url.str(), caption, confirm, icon);
+			return HTMLModule::getLinkButton(getURL(), caption, confirm, icon);
 		}
 
 		std::string HTMLForm::getHiddenFields() const
@@ -286,6 +278,26 @@ namespace synthese
 			HiddenFieldsMap::iterator it = _hiddenFields.find(name);
 			if (it != _hiddenFields.end())
 				_hiddenFields.erase(it);
+		}
+
+		std::string HTMLForm::getURL( HiddenFieldsMap overridingFields ) const
+		{
+			stringstream url;
+			url << _action << "?";
+			for (HiddenFieldsMap::const_iterator it = _hiddenFields.begin(); it != _hiddenFields.end(); ++it)
+			{
+				HiddenFieldsMap::const_iterator it2 = overridingFields.find(it->first);
+				if (it2 == overridingFields.end())
+					overridingFields.insert(*it);
+			}
+
+			for (HiddenFieldsMap::const_iterator it = overridingFields.begin(); it != overridingFields.end(); ++it)
+			{
+				if (it != overridingFields.begin())
+					url << "&";
+				url << it->first << "=" << it->second;
+			}
+			return url.str();
 		}
 	}
 }

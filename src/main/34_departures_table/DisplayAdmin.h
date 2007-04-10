@@ -103,8 +103,8 @@ namespace synthese
 		*/
 		class DisplayAdmin : public admin::AdminInterfaceElement
 		{
-			DisplayScreen*			_displayScreen;
-			env::ConnectionPlace*	_place;
+			boost::shared_ptr<const DisplayScreen>			_displayScreen;
+			boost::shared_ptr<const env::ConnectionPlace>	_place;
 
 		public:
 			static const std::string PARAMETER_PLACE;

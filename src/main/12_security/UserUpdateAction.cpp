@@ -63,7 +63,7 @@ namespace synthese
 		{
 			try
 			{
-				_user.reset(UserTableSync::get(_request->getObjectId()));
+				_user = UserTableSync::get(_request->getObjectId());
 
 				ParametersMap::const_iterator it;
 
@@ -122,11 +122,11 @@ namespace synthese
 					throw ActionException("Profile not specified");
 				_profile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
 			}
-			catch (Profile::RegistryKeyException e)
+			catch (Profile::RegistryKeyException)
 			{
 				throw ActionException("Profil introuvable");
 			}
-			catch (DBEmptyResultException e)
+			catch (DBEmptyResultException<User>)
 			{
 				throw ActionException("Utilisateur introuvable");
 			}

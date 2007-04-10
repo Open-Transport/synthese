@@ -34,15 +34,22 @@ namespace synthese
 		class AdminRequest;
 
 		/** Position of current admin page in the tree.
-			@ingroup m32
+			@ingroup m32Values refValues
 		*/
 		class AdminPagePositionInterfaceElement : public interfaces::ValueInterfaceElement
 		{
-			// List of parameters to store
-			//interfaces::ValueInterfaceElement* _parameter1;
-			//...
+			
 
-			static std::string getUpPages(const AdminInterfaceElement* page, const server::FunctionRequest<admin::AdminRequest>* request, bool isFirst = true);
+			/** Upper pages list generator, with HTML links, according to the system registrations.
+				@param page Current page
+				@param request Current request
+				@param isFirst True if the current page is the lower page in the tree : will avoid to produce link to itself.
+				@return std::string The generated HTML code.
+				@author Hugues Romain
+				@date 2007
+				@note This static method is recursive.
+			*/
+			static std::string getUpPages(boost::shared_ptr<const AdminInterfaceElement> page, const server::FunctionRequest<admin::AdminRequest>* request, bool isFirst = true);
 
 		public:
 			/** Controls and store the internals parameters.
@@ -50,9 +57,11 @@ namespace synthese
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
 
-			std::string getValue(const interfaces::ParametersVector&, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL ) const;
-
-			~AdminPagePositionInterfaceElement();
+			std::string getValue(
+				const interfaces::ParametersVector&
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL ) const;
 		};
 	}
 }

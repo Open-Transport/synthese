@@ -49,7 +49,6 @@ namespace synthese
 			static const std::string COL_PERIODEND;
 
 			ScenarioTableSync();
-			~ScenarioTableSync();
 
 
 			/** Scenario search.
@@ -60,10 +59,11 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<Scenario*> search(
+			static std::vector<boost::shared_ptr<Scenario> > search(
 				 bool isATemplate, const std::string name=""
 				, int first = 0, int number = -1);
 
+			static void saveWithAlarms(Scenario* object);
 
 		protected:
 
@@ -72,7 +72,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on Scenario creation.
 				This method updates the corresponding object in ram.

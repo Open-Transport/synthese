@@ -40,7 +40,7 @@ namespace synthese
 			static const std::string PARAMETER_ALARM;
 
 		private:
-			Alarm*	_alarm;
+			boost::shared_ptr<const Alarm>	_alarm;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -54,10 +54,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			DeleteAlarmAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

@@ -10,7 +10,7 @@ namespace env
 
 
 ReservationRuleComplyer::ReservationRuleComplyer (const ReservationRuleComplyer* parent, 
-						  ReservationRule* reservationRule)
+						  const ReservationRule* reservationRule)
     : _parent (parent)
     , _reservationRule (reservationRule)
 {
@@ -34,7 +34,7 @@ ReservationRuleComplyer::getReservationRule () const
 
 
 void 
-ReservationRuleComplyer::setReservationRule (ReservationRule* reservationRule)
+ReservationRuleComplyer::setReservationRule (const ReservationRule* reservationRule)
 {
     _reservationRule = reservationRule;
 }

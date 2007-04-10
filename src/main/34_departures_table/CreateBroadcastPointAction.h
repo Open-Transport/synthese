@@ -48,8 +48,8 @@ namespace synthese
 			static const std::string PARAMETER_PLACE_ID;
 
 		private:
-			env::PhysicalStop*		_physicalStop;
-			env::ConnectionPlace*	_place;
+			boost::shared_ptr<const env::PhysicalStop>		_physicalStop;
+			boost::shared_ptr<const env::ConnectionPlace>	_place;
 			std::string				_name;
 
 		protected:
@@ -63,8 +63,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			CreateBroadcastPointAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

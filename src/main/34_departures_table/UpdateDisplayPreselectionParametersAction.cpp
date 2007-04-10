@@ -29,9 +29,11 @@
 #include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace server;
 	
 	namespace departurestable
@@ -53,7 +55,7 @@ namespace synthese
 			{
 				ParametersMap::const_iterator it;
 
-				_screen = DeparturesTableModule::getDisplayScreens().get(_request->getObjectId());
+				_screen = DisplayScreenTableSync::get(_request->getObjectId());
 
 				it = map.find(PARAMETER_ACTIVATE_PRESELECTION);
 				if (it == map.end())
@@ -65,21 +67,17 @@ namespace synthese
 					throw ActionException("Preselection delay not specified");
 				_preselectionDelay = Conversion::ToInt(it->second);
 			}
-			catch (DisplayScreen::RegistryKeyException e)
+			catch (DBEmptyResultException<DisplayScreen>)
 			{
 				throw ActionException("Display screen not found");
 			}
 		}
 
-		UpdateDisplayPreselectionParametersAction::UpdateDisplayPreselectionParametersAction()
-			: Action()
-		{}
-
 		void UpdateDisplayPreselectionParametersAction::run()
 		{
 			_screen->setDestinationForceDelay(_preselectionDelay);
 			_screen->setGenerationMethod(_activatePreselection ? DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD : DisplayScreen::STANDARD_METHOD);
-			DisplayScreenTableSync::save(_screen);
+			DisplayScreenTableSync::save(_screen.get());
 		}
 	}
 }

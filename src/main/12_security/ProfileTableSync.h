@@ -59,7 +59,6 @@ namespace synthese
 			static void setRightsFromString(Profile*, const std::string& text);
 
 			ProfileTableSync();
-			~ProfileTableSync ();
 
 			/** Profile search.
 				@param name name to search (empty = no search on name)
@@ -70,15 +69,18 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<Profile*> search(
+			static std::vector<boost::shared_ptr<Profile> > search(
 				std::string name=""
 				, std::string right=""
-				, int first = 0, int number = -1);
+				, int first = 0, int number = -1
+				, bool orderByName = true
+				, bool raisingOrder = true
+				);
 
 			/** Profile search by parent.
 			*/
-			static std::vector<Profile*> search(
-				Profile* parent
+			static std::vector<boost::shared_ptr<Profile> > search(
+				boost::shared_ptr<const Profile> parent
 				, int first = 0, int number = -1);
 
 		protected:
@@ -88,7 +90,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on user creation.
 			Updates the users objects in the opened sessions.

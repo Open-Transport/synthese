@@ -13,6 +13,7 @@
 
 
 using synthese::util::Conversion;
+using namespace boost;
 
 namespace synthese
 {
@@ -53,9 +54,9 @@ PublicPlaceTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowInde
     uid cityId (
 	Conversion::ToLongLong (rows.getColumn (rowIndex, PUBLICPLACES_TABLE_COL_CITYID)));
 
-    City* city = environment.getCities ().get (cityId);
-    PublicPlace* pp = new PublicPlace (id, name, city);
-    city->getPublicPlacesMatcher ().add (pp->getName (), pp);
+    shared_ptr<City> city = environment.getCities ().getUpdateable (cityId);
+    shared_ptr<PublicPlace> pp(new PublicPlace (id, name, city.get()));
+    city->getPublicPlacesMatcher ().add (pp->getName (), pp.get());
 
     environment.getPublicPlaces ().add (pp);
 
@@ -68,15 +69,15 @@ PublicPlaceTableSync::doReplace (const synthese::db::SQLiteResult& rows, int row
 			  synthese::env::Environment& environment)
 {
     uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-    PublicPlace* pp = environment.getPublicPlaces ().get (id);
-    City* city = environment.getCities ().get (pp->getCity ()->getKey ());
+    shared_ptr<PublicPlace> pp = environment.getPublicPlaces ().getUpdateable (id);
+    shared_ptr<City> city = environment.getCities ().getUpdateable (pp->getCity ()->getKey ());
     city->getPublicPlacesMatcher ().remove (pp->getName ());
 
     std::string name (
 	rows.getColumn (rowIndex, PUBLICPLACES_TABLE_COL_NAME));
     pp->setName (name);
 
-    city->getPublicPlacesMatcher ().add (pp->getName (), pp);
+    city->getPublicPlacesMatcher ().add (pp->getName (), pp.get());
 
 }
 
@@ -88,8 +89,8 @@ PublicPlaceTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowI
 {
     uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 
-    PublicPlace* pp = environment.getPublicPlaces ().get (id);
-    City* city = environment.getCities ().get (pp->getCity ()->getKey ());
+    shared_ptr<const PublicPlace> pp = environment.getPublicPlaces ().get (id);
+    shared_ptr<City> city = environment.getCities ().getUpdateable (pp->getCity ()->getKey ());
     city->getPublicPlacesMatcher ().remove (pp->getName ());
 
     environment.getPublicPlaces ().remove (id);

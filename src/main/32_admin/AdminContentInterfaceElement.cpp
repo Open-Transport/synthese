@@ -30,6 +30,7 @@
 #include "32_admin/AdminContentInterfaceElement.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -42,19 +43,15 @@ namespace synthese
 		{
 		}
 
-		string AdminContentInterfaceElement::display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string AdminContentInterfaceElement::display(
+			std::ostream& stream
+			, const interfaces::ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			const AdminInterfaceElement* aie = (const AdminInterfaceElement*) rootObject;
-			aie->display(stream, variables, (const FunctionRequest<AdminRequest>*) request);
+			const shared_ptr<const AdminInterfaceElement>* aie = (const shared_ptr<const AdminInterfaceElement>*) rootObject;
+			(*aie)->display(stream, variables, (const FunctionRequest<AdminRequest>*) request);
 			return "";
-		}
-
-		AdminContentInterfaceElement::~AdminContentInterfaceElement()
-		{
-		}
-
-		AdminContentInterfaceElement::AdminContentInterfaceElement()
-		{
 		}
 	}
 }

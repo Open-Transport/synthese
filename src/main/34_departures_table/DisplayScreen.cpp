@@ -38,6 +38,7 @@
 #include "34_departures_table/DisplayScreenAlarmRecipient.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -54,10 +55,8 @@ namespace synthese
 			, _direction(DISPLAY_DEPARTURES)
 			, _generationMethod(STANDARD_METHOD)
 			, _originsOnly(WITH_PASSING)
-			, _localization(NULL)
 			, _destinationForceDelay(120)	// default = 2 hours
 			, _maxDelay(24 * 60)			// default = 24 hours
-			, _displayType(NULL)
 			, _wiringCode(0)
 			, _blinkingDelay(1)
 			, _clearingDelay(0)
@@ -66,10 +65,6 @@ namespace synthese
 			, _allPhysicalStopsDisplayed(false)
 			, _trackNumberDisplay(false)
 			, _serviceNumberDisplay(false)
-		{
-		}
-
-		DisplayScreen::~DisplayScreen(void)
 		{
 		}
 
@@ -84,7 +79,7 @@ namespace synthese
 			_maxDelay = maxDelay;
 		}
 
-		void DisplayScreen::addForbiddenPlace(const ConnectionPlace* place)
+		void DisplayScreen::addForbiddenPlace(const env::ConnectionPlace* place)
 		{
 			_forbiddenArrivalPlaces.insert(place);
 		}
@@ -92,27 +87,27 @@ namespace synthese
 
 		/** Modificateur du point d'arrêt.
 		*/
-		void DisplayScreen::setLocalization(const BroadcastPoint* bp)
+		void DisplayScreen::setLocalization(shared_ptr<const BroadcastPoint> bp)
 		{
 			_localization = bp;
 		}
 
 
-		void DisplayScreen::addDisplayedPlace(const ConnectionPlace* __PointArret)
+		void DisplayScreen::addDisplayedPlace(const env::ConnectionPlace* __PointArret)
 		{
 			_displayedPlaces.insert(__PointArret);
 		}
 
 		
 
-		void DisplayScreen::addForcedDestination(const ConnectionPlace* place)
+		void DisplayScreen::addForcedDestination(const env::ConnectionPlace* place)
 		{
 			_forcedDestinations.insert(place);
 		}
 
 
 
-		ArrivalDepartureTableGenerator* DisplayScreen::getGenerator(const DateTime& startDateTime) const
+		shared_ptr<ArrivalDepartureTableGenerator> DisplayScreen::getGenerator(const DateTime& startDateTime) const
 		{
 			// End time
 			DateTime endDateTime = startDateTime;
@@ -122,7 +117,7 @@ namespace synthese
 			switch (_generationMethod)
 			{
 			case STANDARD_METHOD:
-				return (ArrivalDepartureTableGenerator*) new StandardArrivalDepartureTableGenerator(
+				return shared_ptr<ArrivalDepartureTableGenerator>((ArrivalDepartureTableGenerator*) new StandardArrivalDepartureTableGenerator(
 					getPhysicalStops()
 					, _direction
 					, _originsOnly
@@ -133,10 +128,10 @@ namespace synthese
 					, endDateTime
 					, _blinkingDelay
 					, _displayType->getRowNumber()
-				);
+				));
 
 			case WITH_FORCED_DESTINATIONS_METHOD:
-				return (ArrivalDepartureTableGenerator*) new ForcedDestinationsArrivalDepartureTableGenerator(
+				return shared_ptr<ArrivalDepartureTableGenerator>((ArrivalDepartureTableGenerator*) new ForcedDestinationsArrivalDepartureTableGenerator(
 					getPhysicalStops()
 					, _direction
 					, _originsOnly
@@ -149,11 +144,11 @@ namespace synthese
 					, _forcedDestinations
 					, _blinkingDelay
 					, _destinationForceDelay
-				);
+				));
 			}
 		}
 
-		const BroadcastPoint* DisplayScreen::getLocalization() const
+		shared_ptr<const BroadcastPoint> DisplayScreen::getLocalization() const
 		{
 			return _localization;
 		}
@@ -168,7 +163,7 @@ namespace synthese
 			_localizationComment = text;
 		}
 
-		void DisplayScreen::setType( const DisplayType* displayType)
+		void DisplayScreen::setType(const DisplayType* displayType)
 		{
 			_displayType = displayType;
 		}
@@ -203,7 +198,7 @@ namespace synthese
 			_serviceNumberDisplay = value;
 		}
 
-		void DisplayScreen::addPhysicalStop( const env::PhysicalStop* physicalStop)
+		void DisplayScreen::addPhysicalStop(const PhysicalStop* physicalStop)
 		{
 			_physicalStops.insert(physicalStop);
 		}
@@ -255,14 +250,13 @@ namespace synthese
 
 			try
 			{
-				ArrivalDepartureTableGenerator* generator = getGenerator(date);
+				shared_ptr<ArrivalDepartureTableGenerator> generator = getGenerator(date);
 				ArrivalDepartureListWithAlarm displayedObject;
 				displayedObject.map = generator->generate();
 				displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this);
-				const DeparturesTableInterfacePage* const page = _displayType->getInterface()->getPage<DeparturesTableInterfacePage>();
+				shared_ptr<const DeparturesTableInterfacePage> page = _displayType->getInterface()->getPage<DeparturesTableInterfacePage>();
 				VariablesMap variables;
 				page->display(stream, variables, getTitle(), getWiringCode(), displayedObject);
-				delete generator;
 			}
 			catch (InterfacePageException e)
 			{
@@ -396,7 +390,7 @@ namespace synthese
 
 		std::string DisplayScreen::getFullName() const
 		{
-			if (_localization == NULL)
+			if (!_localization.get())
 				return "(not localized)";
 			else
 			{
@@ -408,7 +402,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(const std::set<const ConnectionPlace*>& placesToAvoid) const
+		std::vector<std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(const std::set<const env::ConnectionPlace*>& placesToAvoid) const
 		{
 			map<std::string, std::pair<uid, string> > m;
 			for (PhysicalStopsSet::const_iterator it = getPhysicalStops().begin(); it != getPhysicalStops().end(); ++it)
@@ -427,9 +421,9 @@ namespace synthese
 			return v;
 		}
 
-		void DisplayScreen::removeForcedDestination( const env::ConnectionPlace* place)
+		void DisplayScreen::removeForcedDestination(shared_ptr<const ConnectionPlace> place)
 		{
-			DisplayedPlacesList::iterator it = _forcedDestinations.find(place);
+			DisplayedPlacesList::iterator it = _forcedDestinations.find(place.get());
 			if (it != _forcedDestinations.end())
 				_forcedDestinations.erase(it);
 		}
@@ -449,28 +443,28 @@ namespace synthese
 			_forcedDestinations.clear();
 		}
 
-		void DisplayScreen::removePhysicalStop( const env::PhysicalStop* stop)
+		void DisplayScreen::removePhysicalStop(shared_ptr<const PhysicalStop> stop)
 		{
-			PhysicalStopsSet::iterator it = _physicalStops.find(stop);
+			PhysicalStopsSet::iterator it = _physicalStops.find(stop.get());
 			if (it != _physicalStops.end())
 				_physicalStops.erase(it);
 		}
 
-		void DisplayScreen::removeDisplayedPlace( const env::ConnectionPlace* place)
+		void DisplayScreen::removeDisplayedPlace(shared_ptr<const ConnectionPlace> place)
 		{
-			DisplayedPlacesList::iterator it = _displayedPlaces.find(place);
+			DisplayedPlacesList::iterator it = _displayedPlaces.find(place.get());
 			if (it != _displayedPlaces.end())
 				_displayedPlaces.erase(it);
 		}
 
-		void DisplayScreen::removeForbiddenPlace( const env::ConnectionPlace* place)
+		void DisplayScreen::removeForbiddenPlace(shared_ptr<const ConnectionPlace> place)
 		{
-			DisplayedPlacesList::iterator it = _forbiddenArrivalPlaces.find(place);
+			DisplayedPlacesList::iterator it = _forbiddenArrivalPlaces.find(place.get());
 			if (it != _forbiddenArrivalPlaces.end())
 				_forbiddenArrivalPlaces.erase(it);
 		}
 
-		void DisplayScreen::copy( const DisplayScreen* other )
+		void DisplayScreen::copy( boost::shared_ptr<const DisplayScreen> other )
 		{
 			setAllPhysicalStopsDisplayed(other->getAllPhysicalStopsDisplayed());
 			setBlinkingDelay(other->getBlinkingDelay());
@@ -504,6 +498,7 @@ namespace synthese
 
 			// Put controls here
 
+			/// @todo move it into tablesync
 
 			// Gets last log entry
 

@@ -30,11 +30,13 @@
 #include "30_server/Request.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace db;
 	
 	namespace security
 	{
@@ -55,7 +57,7 @@ namespace synthese
 		{
 			try
 			{
-				_profile = SecurityModule::getProfiles().get(_request->getObjectId());
+				_profile = ProfileTableSync::get(_request->getObjectId());
 
 				ParametersMap::const_iterator it;
 
@@ -81,7 +83,7 @@ namespace synthese
 					throw ActionException("Private level not specified");
 				_privateLevel = (Right::Level) Conversion::ToInt(it->second);
 			}
-			catch(Profile::RegistryKeyException e)
+			catch(DBEmptyResultException<Profile>)
 			{
 				throw ActionException("Profil introuvable");
 			}
@@ -89,19 +91,12 @@ namespace synthese
 
 		void AddRightAction::run()
 		{
-			Right* right = Factory<Right>::create(_rightName);
+			shared_ptr<Right> right = Factory<Right>::create(_rightName);
 			right->setParameter(_parameter);
 			right->setPrivateLevel(_privateLevel);
 			right->setPublicLevel(_publicLevel);
 			_profile->addRight(right);
-			ProfileTableSync::save(_profile);
-		}
-
-		AddRightAction::AddRightAction()
-			: Action()
-			, _profile(NULL)
-		{
-			
+			ProfileTableSync::save(_profile.get());
 		}
 	}
 }

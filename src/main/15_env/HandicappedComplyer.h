@@ -28,12 +28,12 @@ private:
 
     const HandicappedComplyer* _parent;
 
-    HandicappedCompliance* _handicappedCompliance;
+    const HandicappedCompliance* _handicappedCompliance;
 
 protected:
 
     HandicappedComplyer (const HandicappedComplyer* parent, 
-		  HandicappedCompliance* handicappedCompliance = 0);
+		  const HandicappedCompliance* handicappedCompliance = 0);
 
 public:
 
@@ -43,7 +43,7 @@ public:
     //! @name Getters/Setters
     //@{
     const HandicappedCompliance* getHandicappedCompliance () const;
-    void setHandicappedCompliance (HandicappedCompliance* handicappedCompliance);
+    void setHandicappedCompliance (const HandicappedCompliance* handicappedCompliance);
 	void	setParent(HandicappedComplyer*	parent);
     //@}
 

@@ -28,8 +28,9 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePageException.h"
+#include "11_interfaces/SuperiorValueInterfaceElement.h"
 
-#include "SuperiorValueInterfaceElement.h"
+using namespace boost;
 
 namespace synthese
 {
@@ -39,7 +40,11 @@ namespace synthese
 
 	namespace interfaces
 	{
-		string SuperiorValueInterfaceElement::getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string SuperiorValueInterfaceElement::getValue(
+			const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object
+			, const server::Request* request) const
 		{
 			return (Conversion::ToLongLong(_left->getValue(parameters, variables, object, request)) > Conversion::ToLongLong(_right->getValue(parameters, variables, object, request))) ? "1" : "0";
 		}
@@ -49,8 +54,8 @@ namespace synthese
 			if (vel.size() != 2)
 				throw InterfacePageException("2 parameters must be provided");
 
-			_left.reset(vel.front());
-			_right.reset(vel.front());
+			_left = vel.front();
+			_right = vel.front();
 		}
 
 	}

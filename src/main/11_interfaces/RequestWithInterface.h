@@ -40,9 +40,7 @@ namespace synthese
 			static const std::string PARAMETER_INTERFACE;
 
 		protected:
-			const Interface*	_interface;
-
-			RequestWithInterface();
+			boost::shared_ptr<const Interface>	_interface;
 
 			/** Conversion from generic parameters map to attributes.
 			*/
@@ -58,7 +56,7 @@ namespace synthese
 			*/
 			virtual bool _runAfterSucceededAction(std::ostream& stream);
 
-			virtual void _copy(const Function* function);
+			virtual void _copy(boost::shared_ptr<const Function> function);
 
 		public:
 			/** Interface getter.
@@ -66,7 +64,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			const Interface* getInterface() const;
+			boost::shared_ptr<const Interface> getInterface() const;
 		};
 	}
 }

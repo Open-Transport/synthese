@@ -72,7 +72,7 @@ namespace synthese
 		class MessagesScenarioAdmin : public admin::AdminInterfaceElement
 		{
 		private:
-			Scenario* _scenario;
+			boost::shared_ptr<const Scenario> _scenario;
 
 		public:
 			MessagesScenarioAdmin();

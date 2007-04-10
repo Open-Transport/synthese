@@ -37,6 +37,7 @@
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -47,6 +48,12 @@ namespace synthese
 	namespace vinci
 	{
 		boost::shared_ptr<Account> VinciBikeRentalModule::_freeLockRent;
+		shared_ptr<User> VinciBikeRentalModule::_vinciUser;
+		shared_ptr<Profile> VinciBikeRentalModule::_adminProfile;
+		shared_ptr<Profile> VinciBikeRentalModule::_operatorProfile;
+		shared_ptr<Profile> VinciBikeRentalModule::_vinciProfile;
+		shared_ptr<Profile> VinciBikeRentalModule::_vinciCustomerProfile;
+		shared_ptr<Currency> VinciBikeRentalModule::_euroCurrency;
 
 		const string VinciBikeRentalModule::CSS_LIMITED_HEIGHT = "limitedheight";
 
@@ -86,84 +93,79 @@ namespace synthese
 		void VinciBikeRentalModule::initialize()
 		{
 			// Profile for bike rental administrator user
-			Profile* adminProfile;
-			vector<Profile*> profiles = ProfileTableSync::search(VINCI_ADMIN_PROFILE);
+			vector<shared_ptr<Profile> > profiles = ProfileTableSync::search(VINCI_ADMIN_PROFILE);
 			if (profiles.size() == 0)
-				adminProfile = new Profile;
+				_adminProfile.reset(new Profile);
 			else
-				adminProfile = profiles.front();
-			adminProfile->setName(VINCI_ADMIN_PROFILE);
-			Right* r = Factory<Right>::create<GlobalRight>();
+				_adminProfile = profiles.front();
+			_adminProfile->setName(VINCI_ADMIN_PROFILE);
+			shared_ptr<Right> r = Factory<Right>::create<GlobalRight>();
 			r->setPrivateLevel(Right::DELETE);
 			r->setPublicLevel(Right::DELETE);
-			adminProfile->cleanRights();
-			adminProfile->addRight(r);
-			ProfileTableSync::save(adminProfile);
+			_adminProfile->cleanRights();
+			_adminProfile->addRight(r);
+			ProfileTableSync::save(_adminProfile);
 
 			// Profile for bike rental operator user
-			Profile* operatorProfile;
 			profiles = ProfileTableSync::search(VINCI_OPERATOR_PROFILE);
 			if (profiles.size() == 0)
-				operatorProfile = new Profile;
+				_operatorProfile.reset(new Profile);
 			else
-				operatorProfile = profiles.front();
-			operatorProfile->setName(VINCI_OPERATOR_PROFILE);
+				_operatorProfile = profiles.front();
+			_operatorProfile->setName(VINCI_OPERATOR_PROFILE);
 			r = Factory<Right>::create<GlobalRight>();
 			r->setPrivateLevel(Right::USE);
 			r->setPublicLevel(Right::USE);
-			operatorProfile->cleanRights();
-			operatorProfile->addRight(r);
-			ProfileTableSync::save(operatorProfile);
+			_operatorProfile->cleanRights();
+			_operatorProfile->addRight(r);
+			ProfileTableSync::save(_operatorProfile);
 
 			// Profile for virtual owner user
-			Profile* vinciProfile;
 			profiles = ProfileTableSync::search(VINCI_ACCOUNTING_PROFILE);
 			if (profiles.size() == 0)
-				vinciProfile = new Profile;
+				_vinciProfile.reset(new Profile);
 			else
-				vinciProfile = profiles.front();
-			vinciProfile->setName(VINCI_ACCOUNTING_PROFILE);
+				_vinciProfile = profiles.front();
+			_vinciProfile->setName(VINCI_ACCOUNTING_PROFILE);
 			r = Factory<Right>::create<GlobalRight>();
 			r->setPrivateLevel(Right::FORBIDDEN);
 			r->setPublicLevel(Right::FORBIDDEN);
-			vinciProfile->cleanRights();
-			vinciProfile->addRight(r);
-			ProfileTableSync::save(vinciProfile);
+			_vinciProfile->cleanRights();
+			_vinciProfile->addRight(r);
+			ProfileTableSync::save(_vinciProfile);
 		
 			// Virtual owner user
-			User* vinciUser;
-			vector<User*> users = UserTableSync::search(VINCI_ACCOUNTING_USER, VINCI_ACCOUNTING_USER, vinciProfile->getKey());
+			vector<shared_ptr<User> > users = UserTableSync::search(VINCI_ACCOUNTING_USER, VINCI_ACCOUNTING_USER, _vinciProfile);
 			if (users.size() == 0)
 			{
-				vinciUser = new User;
-				vinciUser->setName(VINCI_ACCOUNTING_USER);
-				vinciUser->setLogin(VINCI_ACCOUNTING_USER);
-				vinciUser->setProfile(vinciProfile);
-				UserTableSync::save(vinciUser);
+				_vinciUser.reset(new User);
+				_vinciUser->setName(VINCI_ACCOUNTING_USER);
+				_vinciUser->setLogin(VINCI_ACCOUNTING_USER);
+				_vinciUser->setProfile(_vinciProfile);
+				UserTableSync::save(_vinciUser);
 			}
 			else
 			{
-				vinciUser = users.front();
+				_vinciUser = users.front();
 			}
 
 			// Required currencies
-			Currency* euroCurrency;
-			vector<Currency*> currencies = CurrencyTableSync::search(VINCI_CURRENCY_EURO_NAME, VINCI_CURRENCY_EURO);
+			vector<shared_ptr<Currency> > currencies = CurrencyTableSync::search(VINCI_CURRENCY_EURO_NAME, VINCI_CURRENCY_EURO);
 			if (currencies.size() == 0)
 			{
-				euroCurrency = new Currency;
-				euroCurrency->setName(VINCI_CURRENCY_EURO_NAME);
-				euroCurrency->setSymbol(VINCI_CURRENCY_EURO);
-				CurrencyTableSync::save(euroCurrency);
+				_euroCurrency.reset(new Currency);
+				_euroCurrency->setName(VINCI_CURRENCY_EURO_NAME);
+				_euroCurrency->setSymbol(VINCI_CURRENCY_EURO);
+				CurrencyTableSync::save(_euroCurrency);
 			}
 			else
-				euroCurrency = currencies.front();
+				_euroCurrency = currencies.front();
 
-			Currency* bikeCurrency;
+			shared_ptr<Currency> bikeCurrency;
 			currencies = CurrencyTableSync::search(VINCI_CURRENCY_BIKE_NAME, VINCI_CURRENCY_BIKE);
 			if (currencies.size() == 0)
 			{
-				bikeCurrency = new Currency;
+				bikeCurrency.reset(new Currency);
 				bikeCurrency->setName(VINCI_CURRENCY_BIKE_NAME);
 				bikeCurrency->setSymbol(VINCI_CURRENCY_BIKE);
 				CurrencyTableSync::save(bikeCurrency);
@@ -171,11 +173,11 @@ namespace synthese
 			else
 				bikeCurrency = currencies.front();
 
-			Currency* ticketCurrency;
+			shared_ptr<Currency> ticketCurrency;
 			currencies = CurrencyTableSync::search(VINCI_CURRENCY_TICKET_PUNCHING_NAME, VINCI_CURRENCY_TICKET_PUNCHING);
 			if (currencies.size() == 0)
 			{
-				ticketCurrency = new Currency;
+				ticketCurrency.reset(new Currency);
 				ticketCurrency->setName(VINCI_CURRENCY_TICKET_PUNCHING_NAME);
 				ticketCurrency->setSymbol(VINCI_CURRENCY_TICKET_PUNCHING);
 				CurrencyTableSync::save(ticketCurrency);
@@ -184,176 +186,154 @@ namespace synthese
 				ticketCurrency = currencies.front();
 
 			// Guarantee accounts
-			Account* guaranteeAccount;
-			vector<Account*> accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE, 0, "");
+			vector<shared_ptr<Account> > accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
-				guaranteeAccount = new Account;
+				shared_ptr<Account> guaranteeAccount(new Account);
 				guaranteeAccount->setRightClassNumber(VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE);
-				guaranteeAccount->setRightCurrency(euroCurrency);
-				guaranteeAccount->setLeftCurrency(euroCurrency);
-				guaranteeAccount->setRightUserId(vinciUser->getKey());
+				guaranteeAccount->setRightCurrency(_euroCurrency);
+				guaranteeAccount->setLeftCurrency(_euroCurrency);
+				guaranteeAccount->setRightUserId(_vinciUser->getKey());
 				AccountTableSync::save(guaranteeAccount);
 			}
 
-			Account* checkGuaranteeAccount;
 			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
-				checkGuaranteeAccount = new Account;
+				shared_ptr<Account> checkGuaranteeAccount(new Account);
 				checkGuaranteeAccount->setRightClassNumber(VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE);
-				checkGuaranteeAccount->setRightCurrency(euroCurrency);
-				checkGuaranteeAccount->setLeftCurrency(euroCurrency);
-				checkGuaranteeAccount->setRightUserId(vinciUser->getKey());
+				checkGuaranteeAccount->setRightCurrency(_euroCurrency);
+				checkGuaranteeAccount->setLeftCurrency(_euroCurrency);
+				checkGuaranteeAccount->setRightUserId(_vinciUser->getKey());
 				AccountTableSync::save(checkGuaranteeAccount);
 			}
 
-			Account* cardGuaranteeAccount;
 			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
-				cardGuaranteeAccount = new Account;
+				shared_ptr<Account> cardGuaranteeAccount(new Account);
 				cardGuaranteeAccount->setRightClassNumber(VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE);
-				cardGuaranteeAccount->setRightCurrency(euroCurrency);
-				cardGuaranteeAccount->setLeftCurrency(euroCurrency);
-				cardGuaranteeAccount->setRightUserId(vinciUser->getKey());
+				cardGuaranteeAccount->setRightCurrency(_euroCurrency);
+				cardGuaranteeAccount->setLeftCurrency(_euroCurrency);
+				cardGuaranteeAccount->setRightUserId(_vinciUser->getKey());
 				AccountTableSync::save(cardGuaranteeAccount);
 			}
 
 			// Customer accounts
-			Account* customerTicketAccount;
 			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
-				customerTicketAccount = new Account;
+				shared_ptr<Account> customerTicketAccount(new Account);
 				customerTicketAccount->setRightClassNumber(VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE);
 				customerTicketAccount->setRightCurrency(ticketCurrency);
 				customerTicketAccount->setLeftCurrency(ticketCurrency);
-				customerTicketAccount->setRightUserId(vinciUser->getKey());
+				customerTicketAccount->setRightUserId(_vinciUser->getKey());
 				AccountTableSync::save(customerTicketAccount);
 			}
 
-			Account* customerEuroAccount;
 			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
-				customerEuroAccount = new Account;
+				shared_ptr<Account> customerEuroAccount(new Account);
 				customerEuroAccount->setRightClassNumber(VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE);
 				customerEuroAccount->setRightCurrency(ticketCurrency);
 				customerEuroAccount->setLeftCurrency(ticketCurrency);
-				customerEuroAccount->setRightUserId(vinciUser->getKey());
+				customerEuroAccount->setRightUserId(_vinciUser->getKey());
 				AccountTableSync::save(customerEuroAccount);
 			}
 
 			// Services accounts
-			Account* ticketBikeRent;
+			shared_ptr<Account> ticketBikeRent;
 			accounts = AccountTableSync::search(getVinciUser()->getKey(), VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE, 0, "");
 			if (accounts.empty())
-				ticketBikeRent = new Account;
+				ticketBikeRent.reset(new Account);
 			else
 				ticketBikeRent = accounts.front();
 			ticketBikeRent->setRightClassNumber(VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
 			ticketBikeRent->setRightCurrency(ticketCurrency);
 			ticketBikeRent->setLeftCurrency(ticketCurrency);
-			ticketBikeRent->setRightUserId(vinciUser->getKey());
+			ticketBikeRent->setRightUserId(_vinciUser->getKey());
 			AccountTableSync::save(ticketBikeRent);
-			delete ticketBikeRent;
-		
+			
 			accounts = AccountTableSync::search(getVinciUser()->getKey(), VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE, 0, "");
 			if (accounts.empty())
 				_freeLockRent.reset(new Account);
 			else
-				_freeLockRent.reset(accounts.front());
+				_freeLockRent = accounts.front();
 			_freeLockRent->setRightClassNumber(VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE);
-			_freeLockRent->setRightCurrency(euroCurrency);
-			_freeLockRent->setLeftCurrency(euroCurrency);
-			_freeLockRent->setRightUserId(vinciUser->getKey());
-			AccountTableSync::save(_freeLockRent.get());
+			_freeLockRent->setRightCurrency(_euroCurrency);
+			_freeLockRent->setLeftCurrency(_euroCurrency);
+			_freeLockRent->setRightUserId(_vinciUser->getKey());
+			AccountTableSync::save(_freeLockRent);
 			
 
 			// Payment accounts
-			Account* ticketPunchings;
 			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_TICKETS_PUNCHING_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
-				ticketPunchings= new Account;
+				shared_ptr<Account> ticketPunchings(new Account);
 				ticketPunchings->setRightClassNumber(VINCI_CHANGE_TICKETS_PUNCHING_ACCOUNT_CODE);
 				ticketPunchings->setRightCurrency(ticketCurrency);
 				ticketPunchings->setLeftCurrency(ticketCurrency);
-				ticketPunchings->setRightUserId(vinciUser->getKey());
+				ticketPunchings->setRightUserId(_vinciUser->getKey());
 				AccountTableSync::save(ticketPunchings);
 			}
 
 			// Stock accounts
-			Account* bikeStockAccount;
 			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_STOCKS_BIKE_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
-				bikeStockAccount = new Account;
+				shared_ptr<Account> bikeStockAccount(new Account);
 				bikeStockAccount->setRightClassNumber(VINCI_STOCKS_BIKE_ACCOUNT_CODE);
 				bikeStockAccount->setRightCurrency(bikeCurrency);
 				bikeStockAccount->setLeftCurrency(bikeCurrency);
-				bikeStockAccount->setRightUserId(vinciUser->getKey());
+				bikeStockAccount->setRightUserId(_vinciUser->getKey());
 				AccountTableSync::save(bikeStockAccount);
 			}
 
 
 			
 			// Special profile for customers
-			Profile* vinciCustomerProfile;
 			profiles = ProfileTableSync::search(VINCI_CUSTOMER_PROFILE);
 			if (profiles.size() == 0)
-				vinciCustomerProfile = new Profile;
+				_vinciCustomerProfile.reset(new Profile);
 			else
-				vinciCustomerProfile = profiles.front();
-			vinciCustomerProfile->setName(VINCI_CUSTOMER_PROFILE);
+				_vinciCustomerProfile = profiles.front();
+			_vinciCustomerProfile->setName(VINCI_CUSTOMER_PROFILE);
 			r = Factory<Right>::create<GlobalRight>();
 			r->setPrivateLevel(Right::FORBIDDEN);
 			r->setPublicLevel(Right::FORBIDDEN);
-			vinciCustomerProfile->cleanRights();
-			vinciCustomerProfile->addRight(r);
-			ProfileTableSync::save(vinciCustomerProfile);
+			_vinciCustomerProfile->cleanRights();
+			_vinciCustomerProfile->addRight(r);
+			ProfileTableSync::save(_vinciCustomerProfile);
 		}
 
-		Profile* VinciBikeRentalModule::getCustomerProfile()
+		shared_ptr<const Profile> VinciBikeRentalModule::getCustomerProfile()
 		{
-			vector<Profile*> profiles = ProfileTableSync::search(VINCI_CUSTOMER_PROFILE);
-			if (profiles.size() == 0)
-				throw Exception("Vinci bike rental module incomplete installation : the customer profile is missing");
-			return profiles.front();
+			return _vinciCustomerProfile;
 		}
 
-		User* VinciBikeRentalModule::getVinciUser()
+		shared_ptr<const User> VinciBikeRentalModule::getVinciUser()
 		{
-			vector<Profile*> profiles = ProfileTableSync::search(VINCI_ACCOUNTING_PROFILE);
-			if (profiles.size() == 0)
-				throw Exception("Vinci bike rental module incomplete installation : the rental root user is missing");
-			Profile* vinciProfile = profiles.front();
-			vector<User*> users = UserTableSync::search(VINCI_ACCOUNTING_USER, VINCI_ACCOUNTING_USER, vinciProfile->getKey());
-			if (users.size() == 0)
-				throw Exception("Vinci bike rental module incomplete installation : the rental root user is missing");
-			return users.front();
+			return _vinciUser;
 		}
 
-		Currency* VinciBikeRentalModule::getEuroCurrency()
+		shared_ptr<const Currency> VinciBikeRentalModule::getEuroCurrency()
 		{
-			vector<Currency*> currencies = CurrencyTableSync::search(VINCI_CURRENCY_EURO_NAME, VINCI_CURRENCY_EURO);
-			if (currencies.size() == 0)
-				throw Exception("Vinci bike rental module incomplete installation : the euro currency is missing");
-			return currencies.front();
+			return _euroCurrency;
 		}
 
-		Account* VinciBikeRentalModule::getAccount(const std::string& code)
+		shared_ptr<Account> VinciBikeRentalModule::getAccount(const std::string& code)
 		{
-			vector<Account*> accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), code, 0, "");
+			vector<shared_ptr<Account> > accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), code, 0, "");
 			if (accounts.size() == 0)
 				throw Exception("Vinci bike rental module incomplete installation : the " + code + " account is missing");
 			return accounts.front();
 		}
 
-		accounts::Account* VinciBikeRentalModule::getFreeLockRentServiceAccount()
+		shared_ptr<const Account> VinciBikeRentalModule::getFreeLockRentServiceAccount()
 		{
-			return _freeLockRent.get();
+			return _freeLockRent;
 		}
 	}
 }

@@ -77,12 +77,11 @@ namespace synthese
 		{
 			static const std::string PARAM_PROFILE_ID;
 
-			const Profile* _profile;
+			boost::shared_ptr<const Profile> _profile;
 			bool _profileError;
 
 		public:
 			ProfileAdmin();
-			~ProfileAdmin();
 
 			/** Initialization of the parameters from a request.
 			@param request The request to use for the initialization.

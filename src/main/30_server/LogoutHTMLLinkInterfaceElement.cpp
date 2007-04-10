@@ -58,7 +58,11 @@ namespace synthese
 				_icon = vel.front();
 		}
 
-		string LogoutHTMLLinkInterfaceElement::getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string LogoutHTMLLinkInterfaceElement::getValue(
+			const interfaces::ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* rootObject /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			stringstream stream;
 			std::string url = _redirectionURL->getValue(parameters, variables, rootObject, request);
@@ -88,24 +92,6 @@ namespace synthese
 				stream << redirRequest.getHTMLForm().getLinkButton(content, "", icon);
 			}
 			return stream.str();
-		}
-
-		LogoutHTMLLinkInterfaceElement::~LogoutHTMLLinkInterfaceElement()
-		{
-			delete _redirectionURL;
-			delete _page_key;
-			delete _content;
-			delete _icon;
-		}
-
-		LogoutHTMLLinkInterfaceElement::LogoutHTMLLinkInterfaceElement()
-			: ValueInterfaceElement()
-			, _redirectionURL(NULL)
-			, _page_key(NULL)
-			, _content(NULL)
-			, _icon(NULL)
-		{
-
 		}
 	}
 }

@@ -51,24 +51,19 @@ namespace synthese
 		{
 			try
 			{
-				_scenario = MessagesModule::getScenarii().get(_request->getObjectId());
+				_scenario = ScenarioTableSync::get(_request->getObjectId());
 			}
 			catch (...) {
 				throw ActionException("Invalid scenario");
 			}
 		}
 
-		ScenarioStopAction::ScenarioStopAction()
-			: Action()
-			, _scenario(NULL)
-		{}
-
 		void ScenarioStopAction::run()
 		{
 			_scenario->stop(DateTime());
 			for (Scenario::AlarmsSet::const_iterator it = _scenario->getAlarms().begin(); it != _scenario->getAlarms().end(); ++it)
 				AlarmTableSync::save(*it);
-			ScenarioTableSync::save(_scenario);
+			ScenarioTableSync::save(_scenario.get());
 		}
 	}
 }

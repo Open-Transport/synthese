@@ -34,6 +34,7 @@
 #include "30_server/Request.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -46,20 +47,12 @@ namespace synthese
 
 		const std::string RequestWithInterface::PARAMETER_INTERFACE = "i";
 
-		RequestWithInterface::RequestWithInterface()
-			: Function()
-			, _interface(NULL)
-		{
-
-		}
-
-
 		/** @todo to be moved elsewhere because the interface is not necessarily an html interface */
 		bool RequestWithInterface::_runAfterSucceededAction(ostream& stream)
 		{
 			if (_interface != NULL)
 			{
-				const RedirectInterfacePage* page = _interface->getPage<RedirectInterfacePage>();
+				shared_ptr<const RedirectInterfacePage> page = _interface->getPage<RedirectInterfacePage>();
 				_request->deleteAction();
 				VariablesMap vm;
 				page->display(stream, vm, _request);
@@ -88,19 +81,19 @@ namespace synthese
 		ParametersMap RequestWithInterface::_getParametersMap() const
 		{
 			ParametersMap map;
-			if (_interface != NULL)
+			if (_interface.get())
 				map.insert(make_pair(PARAMETER_INTERFACE, Conversion::ToString(_interface->getKey())));
 			
 			return map;
 		}
 
-		void RequestWithInterface::_copy( const Function* function)
+		void RequestWithInterface::_copy(shared_ptr<const Function> function)
 		{
-			const RequestWithInterface* rwi = dynamic_cast<const RequestWithInterface*>(function);
+			shared_ptr<const RequestWithInterface> rwi = static_pointer_cast<const RequestWithInterface, const Function>(function);
 			_interface = rwi->_interface;
 		}
 
-		const Interface* RequestWithInterface::getInterface() const
+		shared_ptr<const Interface> RequestWithInterface::getInterface() const
 		{
 			return _interface;
 		}

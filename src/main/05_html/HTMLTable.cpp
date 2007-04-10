@@ -152,5 +152,10 @@ namespace synthese
 			s << col(colSpan, className);
 			return s.str();
 		}
+
+		int HTMLTable::_getColsNumber() const
+		{
+			return _cols;
+		}
 	}
 }

@@ -41,17 +41,16 @@ namespace synthese
 			_varValue = vel.front();
 		}
 
-		std::string SetInterfaceElement::display( std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		std::string SetInterfaceElement::display(
+			std::ostream& stream
+			, const interfaces::ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			if (!_varName->getValue(parameters, variables, object, request).empty())
 				variables[_varName->getValue(parameters, variables, object, request)] = _varValue->getValue(parameters, variables, object, request);
 			return "";
-		}
-
-		SetInterfaceElement::~SetInterfaceElement()
-		{
-			delete _varName;
-			delete _varValue;
 		}
 	}
 }

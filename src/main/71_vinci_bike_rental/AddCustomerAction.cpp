@@ -33,6 +33,7 @@
 #include "71_vinci_bike_rental/AddCustomerAction.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -72,23 +73,19 @@ namespace synthese
 
 		void AddCustomerAction::run()
 		{
-			User* user = new User;
-			Profile* profile = VinciBikeRentalModule::getCustomerProfile();
+			shared_ptr<User> user(new User);
+			shared_ptr<const Profile> profile = VinciBikeRentalModule::getCustomerProfile();
 			
 			user->setName(_name);
 			user->setSurname(_surname);
 			user->setProfile(profile);
-			UserTableSync::save(user);
+			UserTableSync::save(user.get());
 
-			VinciContract* contract = new VinciContract;
+			shared_ptr<VinciContract> contract(new VinciContract);
 			contract->setUserId(user->getKey());
-			VinciContractTableSync::save(contract);
+			VinciContractTableSync::save(contract.get());
 
 			_request->setObjectId(contract->getKey());
-
-			delete user;
-			delete profile;
-			delete contract;
 		}
 	}
 }

@@ -24,6 +24,8 @@
 
 #include "DepartureTableRowInterfacePage.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using util::Conversion;
@@ -35,8 +37,8 @@ namespace synthese
 				, VariablesMap& vars
 				, int rowId
 				, int pageNumber
-                                , const std::string& message
-				, const ArrivalDepartureRow* ptd
+                , const std::string& message
+				, const ArrivalDepartureRow& ptd
 				, const server::Request* request) const
 		{
 			ParametersVector parameters;
@@ -44,12 +46,12 @@ namespace synthese
 			parameters.push_back(Conversion::ToString (pageNumber));
 			if (message.empty () == false) parameters.push_back(message);
 			
-			InterfacePage::display(stream, parameters, vars, (const void*) ptd, request);
-		}
-
-		DepartureTableRowInterfacePage::~DepartureTableRowInterfacePage()
-		{
-		
+			InterfacePage::display(
+				stream
+				, parameters
+				, vars
+				, (const void*) &ptd
+				, request);
 		}
 	}
 }

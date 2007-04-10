@@ -37,13 +37,13 @@ namespace synthese
 		{
 		}
 
-		string RequestErrorMessageInterfaceElement::getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string RequestErrorMessageInterfaceElement::getValue(
+			const interfaces::ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* rootObject /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			return request->getErrorMessage();
-		}
-
-		RequestErrorMessageInterfaceElement::~RequestErrorMessageInterfaceElement()
-		{
 		}
 	}
 }

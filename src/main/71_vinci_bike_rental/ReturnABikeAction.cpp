@@ -36,6 +36,7 @@
 #include "71_vinci_bike_rental/VinciRateTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -68,32 +69,22 @@ namespace synthese
 
 				_transactionPart = TransactionPartTableSync::get(Conversion::ToLongLong(it->second));
 			}
-			catch (DBEmptyResultException e)
+			catch (DBEmptyResultException<TransactionPart> e)
 			{
 				throw ActionException("Specified transaction part not found ");
 			}
 		}
 
-		ReturnABikeAction::ReturnABikeAction()
-			: Action()
-			, _transactionPart(NULL)
-		{}
-
 		void ReturnABikeAction::run()
 		{
 			DateTime now;
-			VinciRate* rate = VinciRateTableSync::get(_transactionPart->getRateId());
+			shared_ptr<VinciRate> rate = VinciRateTableSync::get(_transactionPart->getRateId());
 
 			// Create an other transaction if the customer has to pay for the transaction
 
-			Transaction* t = TransactionTableSync::get(_transactionPart->getTransactionId());
+			shared_ptr<Transaction> t = TransactionTableSync::get(_transactionPart->getTransactionId());
 			t->setEndDateTime(now);
-			TransactionTableSync::save(t);
-		}
-
-		ReturnABikeAction::~ReturnABikeAction()
-		{
-			delete _transactionPart;
+			TransactionTableSync::save(t.get().();
 		}
 	}
 }

@@ -76,7 +76,6 @@ namespace synthese
 
 
 			DisplayScreenTableSync();
-			~DisplayScreenTableSync();
 
 
 			/** DisplayScreen search.
@@ -87,14 +86,22 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<DisplayScreen*> search(
+			static std::vector<boost::shared_ptr<DisplayScreen> > search(
 				uid duid=0
 				, uid localizationid = UNKNOWN_VALUE
 				, uid lineid = UNKNOWN_VALUE
 				, uid typeuid = UNKNOWN_VALUE
 				, int state = UNKNOWN_VALUE
 				, int message = UNKNOWN_VALUE
-				, int first = 0, int number = 0);
+				, int first = 0
+				, int number = 0
+				, bool orderByUid = false
+				, bool orderByLocalization = true
+				, bool orderByType = false
+				, bool orderByStatus = false
+				, bool orderByMessage = false
+				, bool raisingOrder = true
+				);
 
 
 		protected:
@@ -104,7 +111,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on DisplayScreen creation.
 				This method updates the corresponding object in ram.

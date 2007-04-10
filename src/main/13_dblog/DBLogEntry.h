@@ -26,6 +26,8 @@
 #include <vector>
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
@@ -46,26 +48,26 @@ namespace synthese
 		class DBLogEntry : public util::Registrable<uid, DBLogEntry>
 		{
 		public:
-			typedef enum { DB_LOG_INFO = 10, DB_LOG_WARNING = 50, DB_LOG_ERROR = 99 }	Level;
+			typedef enum 
+			{ DB_LOG_UNKNOWN = 0, DB_LOG_INFO = 10, DB_LOG_WARNING = 50, DB_LOG_ERROR = 99 }	Level;
 			typedef std::vector<std::string>											Content;
 
 		private:
 			std::string				_logKey;
 			time::DateTime			_date;
-			const security::User*	_user;
+			boost::shared_ptr<const security::User>	_user;
 			Content					_content;
 			Level					_level;
 
 		public:
-			DBLogEntry();
 			void					setLogKey(const std::string& key);
 			void					setDate(const time::DateTime& date);
-			void					setUser(const security::User* user);
+			void					setUser(boost::shared_ptr<const security::User> user);
 			void					setContent(const Content& content);
 			void					setLevel(Level level);
 			const std::string&		getLogKey()		const;
 			time::DateTime			getDate()		const;
-			const security::User*	getUser()		const;
+			boost::shared_ptr<const security::User>	getUser()		const;
 			const Content&			getContent()	const;
 			Level					getLevel()		const;
 		};

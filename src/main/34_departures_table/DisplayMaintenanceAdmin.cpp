@@ -35,6 +35,7 @@
 #include "34_departures_table/UpdateDisplayMaintenanceAction.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -49,8 +50,7 @@ namespace synthese
 	{
 		DisplayMaintenanceAdmin::DisplayMaintenanceAdmin()
 			: AdminInterfaceElement("displays", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
-			, _displayScreen(NULL)
-		{}
+			{}
 
 		void DisplayMaintenanceAdmin::setFromParametersMap(const ParametersMap& map)
 		{

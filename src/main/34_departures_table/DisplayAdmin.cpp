@@ -70,7 +70,6 @@ namespace synthese
 
 		DisplayAdmin::DisplayAdmin()
 			: AdminInterfaceElement("displays", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
-			, _place(NULL)
 		{}
 
 
@@ -177,7 +176,7 @@ namespace synthese
 			if (_place == NULL)
 				stream << "(Sélectionnez un lieu logique en premier)";
 			else
-				stream << uf.getSelectInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_ID, DeparturesTableModule::getBroadcastPointLabels(_place, false), _displayScreen->getLocalization() ? _displayScreen->getLocalization()->getKey() : 0);
+				stream << uf.getSelectInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_ID, DeparturesTableModule::getBroadcastPointLabels(_place, false), _displayScreen->getLocalization().get() ? _displayScreen->getLocalization()->getKey() : 0);
 			
 			stream << t.row();
 			stream << t.col() << "Complément de précision";
@@ -299,7 +298,7 @@ namespace synthese
 						stream << ap.getSelectInput(AddDepartureStopToDisplayScreenAction::PARAMETER_STOP, _displayScreen->getLocalization()->getConnectionPlace()->getPhysicalStopLabels(_displayScreen->getPhysicalStops()) , uid(0));
 						stream << ap.getSubmitButton("Ajouter");
 						stream << ap.close();
-					}									
+					}
 				}
 				stream << st.close();
 

@@ -36,7 +36,7 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Value Interface Element : Display screen alarm content (if applicable).
-			@ingroup m34
+			@ingroup m34Values refValues
 
 			Output : the alarm content if applicable
 			Parameters :
@@ -49,13 +49,14 @@ namespace synthese
 			static const std::string VALUE_BIG;
 
 		private:
-			interfaces::ValueInterfaceElement* _messageSize;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _messageSize;
 
 		public:
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
-
-			DisplayScreenAlarmContentValueInterfaceElement();
-			~DisplayScreenAlarmContentValueInterfaceElement();
+			std::string getValue(
+				const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 
 			/** Parser.
 			@param text Optional parameter
@@ -64,4 +65,5 @@ namespace synthese
 		};
 	}
 }
+
 #endif // SYNTHESE_DisplayScreenAlarmContentValueInterfaceElement_H__

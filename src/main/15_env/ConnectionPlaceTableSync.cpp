@@ -36,7 +36,7 @@
 #include <assert.h>
 
 
-
+using namespace boost;
 using synthese::util::Conversion;
 
 namespace synthese
@@ -123,7 +123,7 @@ namespace synthese
 		void 
 			ConnectionPlaceTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResult& rows)
+			const synthese::db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
 			{
@@ -142,9 +142,11 @@ namespace synthese
 
 				typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
-				City* city = EnvModule::getCities ().get (cityId);
-				ConnectionPlace* cp = new synthese::env::ConnectionPlace (
-					id, name, city, connectionType, defaultTransferDelay);
+				shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cityId);
+				shared_ptr<ConnectionPlace> cp(
+					new synthese::env::ConnectionPlace (
+										id, name, city.get(), connectionType, defaultTransferDelay))
+					;
 
 				boost::char_separator<char> sep1 (",");
 				boost::char_separator<char> sep2 (":");
@@ -163,12 +165,12 @@ namespace synthese
 
 				if (isCityMainConnection)
 				{
-					city->addIncludedPlace (cp);
+					city->addIncludedPlace (cp.get());
 				}
 
 			//    cp->setAlarm (environment.getAlarms ().get (alarmId));
 
-				city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
+				city->getConnectionPlacesMatcher ().add (cp->getName (), cp.get());
 				EnvModule::getConnectionPlaces ().add (cp);
 			}
 		}
@@ -182,13 +184,13 @@ namespace synthese
 		{
 			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
 			{
-				ConnectionPlace* cp = EnvModule::getConnectionPlaces().get (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-				City* city = EnvModule::getCities ().get (cp->getCity ()->getKey ());
+				shared_ptr<ConnectionPlace> cp = EnvModule::getConnectionPlaces().getUpdateable(Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+				shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cp->getCity ()->getKey ());
 				city->getConnectionPlacesMatcher ().remove (cp->getName ());
 
-				load(cp, rows, rowIndex);
+				load(cp.get(), rows, rowIndex);
 
-				city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
+				city->getConnectionPlacesMatcher ().add (cp->getName (), cp.get());
 			}
 		}
 
@@ -206,8 +208,8 @@ namespace synthese
 				// TODO not finished...
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 
-				ConnectionPlace* cp = EnvModule::getConnectionPlaces ().get (id);
-				City* city = EnvModule::getCities ().get (cp->getCity ()->getKey ());
+				shared_ptr<const ConnectionPlace> cp = EnvModule::getConnectionPlaces ().get (id);
+				shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cp->getCity ()->getKey ());
 				city->getConnectionPlacesMatcher ().remove (cp->getName ());
 
 				EnvModule::getConnectionPlaces ().remove (id);

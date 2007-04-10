@@ -32,6 +32,8 @@
 #include "15_env/Environment.h"
 #include "15_env/CityNameValueInterfaceElement.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace interfaces;
@@ -40,11 +42,14 @@ namespace synthese
 
 	namespace env
 	{
-		string CityNameValueInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string CityNameValueInterfaceElement::getValue(
+			const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object, const server::Request* request) const
 		{
 /*			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )
 			{
-*/				const City* city = (City*) object;
+*/				const City* city = (const City*) object;
 				return city->getName();
 /*			}
 			else
@@ -59,7 +64,7 @@ namespace synthese
 
 		void CityNameValueInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			_uid = (vel.size() > 0) ? vel.front() : NULL;
+			_uid = vel.isEmpty() ? shared_ptr<ValueInterfaceElement>() : vel.front();
 		}
 	}
 

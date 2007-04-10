@@ -32,6 +32,7 @@
 #include "02_db/SQLiteSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -57,7 +58,7 @@ namespace synthese
 		 
 
 		void 
-		SQLiteSync::addTableSynchronizer (const string& rank, SQLiteTableSync* synchronizer)
+		SQLiteSync::addTableSynchronizer (const string& rank, shared_ptr<SQLiteTableSync> synchronizer)
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
@@ -77,7 +78,7 @@ namespace synthese
 
 
 		   
-		SQLiteTableSync* 
+		shared_ptr<SQLiteTableSync>
 		SQLiteSync::getTableSynchronizer (const std::string& tableName) const
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
@@ -90,7 +91,7 @@ namespace synthese
 
 	    
 	    
-	    std::map<std::string, SQLiteTableSync* >
+	    std::map<std::string, shared_ptr<SQLiteTableSync> >
 	    SQLiteSync::getTableSynchronizers () const
 	    {
 		boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
@@ -107,7 +108,7 @@ namespace synthese
 			_isRegistered = true;
 			
 			// Call the init sequence on all synchronizers.
-			for (std::map<std::string, SQLiteTableSync*>::const_iterator it = 
+			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it = 
 				 _rankedTableSynchronizers.begin (); 
 			     it != _rankedTableSynchronizers.end (); ++it)
 			{
@@ -126,11 +127,11 @@ namespace synthese
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
-			for (std::map<std::string, SQLiteTableSync* >::const_iterator it 
+			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it 
 				 = _tableSynchronizers.begin ();
 			     it != _tableSynchronizers.end (); ++it)
 			{
-			    SQLiteTableSync* tableSync = it->second;
+			    shared_ptr<SQLiteTableSync> tableSync = it->second;
 			    if (tableSync->getTableName () != event.tbName) continue;
 			    
 			    if (event.opType == SQLITE_INSERT) 

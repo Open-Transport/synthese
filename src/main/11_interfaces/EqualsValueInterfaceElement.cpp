@@ -30,15 +30,18 @@
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/EqualsValueInterfaceElement.h"
 
+using namespace std;
+using namespace boost;
+
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using std::string;
-
+	
 	namespace interfaces
 	{
-		string EqualsValueInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string EqualsValueInterfaceElement::getValue( const ParametersVector& parameters
+			, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
 			return (_left->getValue(parameters, variables, object, request) == _right->getValue(parameters, variables, object, request)) ? "1" : "0";
 
@@ -52,19 +55,5 @@ namespace synthese
 			_left = vel.front();
 			_right = vel.front();
 		}
-
-		EqualsValueInterfaceElement::EqualsValueInterfaceElement()
-			: ValueInterfaceElement()
-			, _left(NULL), _right(NULL)
-		{
-
-		}
-
-		EqualsValueInterfaceElement::~EqualsValueInterfaceElement()
-		{
-			delete _right;
-			delete _left;
-		}
 	}
-
 }

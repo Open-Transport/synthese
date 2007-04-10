@@ -36,6 +36,7 @@
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -53,8 +54,8 @@ namespace synthese
 			static const string COL_DAY("day");
 
 			map<Date, RentReportResult> m;
-			Account* account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
-			if (account == NULL)
+			shared_ptr<Account> account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
+			if (!account.get())
 				return m;
 
 			try
@@ -134,8 +135,8 @@ namespace synthese
 		std::map<uid, RentReportResult> getRentsPerRate( const time::Date& start, const time::Date& end )
 		{
 			map<uid, RentReportResult> m;
-			Account* account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
-			if (account == NULL)
+			shared_ptr<Account> account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
+			if (!account.get())
 				return m;
 
 			static const string COL_NUMBER("number");

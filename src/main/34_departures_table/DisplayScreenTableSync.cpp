@@ -37,6 +37,7 @@
 #include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -56,7 +57,7 @@ namespace synthese
 			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			object->setLocalization(DeparturesTableModule::getBroadcastPoints().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_BROADCAST_POINT_ID))));
 			object->setLocalizationComment(rows.getColumn(rowId, DisplayScreenTableSync::COL_BROADCAST_POINT_COMMENT));
-			object->setType(DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_TYPE_ID))));
+			object->setType(DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_TYPE_ID))).get());
 			object->setWiringCode(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_WIRING_CODE)));
 			object->setTitle(rows.getColumn(rowId, DisplayScreenTableSync::COL_TITLE));
 			object->setBlinkingDelay(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_BLINKING_DELAY)));
@@ -69,7 +70,7 @@ namespace synthese
 			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
 				try
 				{
-					object->addPhysicalStop(EnvModule::getPhysicalStops().get(Conversion::ToLongLong(*it)));
+					object->addPhysicalStop(EnvModule::getPhysicalStops().get(Conversion::ToLongLong(*it)).get());
 				}
 				catch (PhysicalStop::RegistryKeyException e)
 				{
@@ -83,7 +84,7 @@ namespace synthese
 			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
 				try
 				{
-					object->addForbiddenPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
+					object->addForbiddenPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
 				}
 				catch (ConnectionPlace::RegistryKeyException e)
 				{
@@ -101,7 +102,7 @@ namespace synthese
 			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
 				try
 				{
-					object->addDisplayedPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
+					object->addDisplayedPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
 				}
 				catch (ConnectionPlace::RegistryKeyException e)
 				{
@@ -119,7 +120,7 @@ namespace synthese
 			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
 				try
 				{
-					object->addForcedDestination(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)));
+					object->addForcedDestination(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
 				}
 				catch (ConnectionPlace::RegistryKeyException e)
 				{
@@ -290,18 +291,18 @@ namespace synthese
 			addTableColumn(COL_MAINTENANCE_MESSAGE, "TEXT");
 		}
 
-		void DisplayScreenTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void DisplayScreenTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
 				if (DeparturesTableModule::getDisplayScreens().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
 				{
-					load(DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))), rows, i);
+					load(DeparturesTableModule::getDisplayScreens().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
 				}
 				else
 				{
-					DisplayScreen* object = new DisplayScreen;
-					load(object, rows, i);
+					shared_ptr<DisplayScreen> object(new DisplayScreen);
+					load(object.get(), rows, i);
 					DeparturesTableModule::getDisplayScreens().add(object);
 				}
 			}
@@ -311,8 +312,8 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				DisplayScreen* object = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-				load(object, rows, i);
+				shared_ptr<DisplayScreen> object = DeparturesTableModule::getDisplayScreens().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+				load(object.get(), rows, i);
 			}
 		}
 
@@ -324,15 +325,21 @@ namespace synthese
 			}
 		}
 
-		std::vector<DisplayScreen*> DisplayScreenTableSync::search(
+		std::vector<shared_ptr<DisplayScreen> > DisplayScreenTableSync::search(
 			uid duid
 			, uid localizationid
 			, uid lineid
 			, uid typeuid
 			, int state 
 			, int message 
-			, int first /*= 0*/, int number /*= 0*/ )
-		{
+			, int first /*= 0*/, int number /*= 0*/ 
+			, bool orderByUid
+			, bool orderByLocalization
+			, bool orderByType
+			, bool orderByStatus
+			, bool orderByMessage
+			, bool raisingOrder
+		){
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
@@ -345,6 +352,8 @@ namespace synthese
 				query << " AND b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=" << localizationid;
 			if (typeuid > 0)
 				query << " AND d." << COL_TYPE_ID << "=" << typeuid;
+			if (orderByUid)
+				query << " ORDER BY d." << TABLE_COL_ID << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -353,11 +362,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<DisplayScreen*> objects;
+				vector<shared_ptr<DisplayScreen> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					DisplayScreen* object = new DisplayScreen();
-					load(object, result, i);
+					shared_ptr<DisplayScreen> object(new DisplayScreen());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

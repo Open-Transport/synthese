@@ -52,7 +52,7 @@ namespace synthese
 			AlarmLevel		_type;
 			time::DateTime	_startDate;
 			time::DateTime	_endDate;
-			Alarm*			_alarm;
+			boost::shared_ptr<Alarm>	_alarm;
 			bool			_enabled;
 
 		protected:

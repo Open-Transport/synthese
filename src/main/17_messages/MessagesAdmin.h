@@ -25,6 +25,8 @@
 
 #include "04_time/DateTime.h"
 
+#include "05_html/ActionResultHTMLTable.h"
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
@@ -112,7 +114,7 @@ namespace synthese
 				
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
-
+@todo Faire un tableau unique avec UNION
 		*/
 		class MessagesAdmin : public admin::AdminInterfaceElement
 		{
@@ -123,11 +125,13 @@ namespace synthese
 			StatusSearch			_searchStatus;
 			AlarmLevel				_searchLevel;
 			AlarmConflict			_searchConflict;
+			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
+			html::ActionResultHTMLTable::ResultParameters		_resultParameters;
 
 			server::ParametersMap	_parametersMap;
 			
-			std::vector<Alarm*>		_result;
-			std::vector<Scenario*>	_scenarioResult;
+			std::vector<boost::shared_ptr<Alarm> >		_result;
+			std::vector<boost::shared_ptr<Scenario> >	_scenarioResult;
 
 			
 		public:

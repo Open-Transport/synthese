@@ -25,6 +25,8 @@
 
 #include <vector>
 
+#include "05_html/ActionResultHTMLTable.h"
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
@@ -118,8 +120,10 @@ namespace synthese
 			uid			_searchTypeId;
 			int			_searchState;
 			int			_searchMessage;
+			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
+			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
 
-			std::vector<DisplayScreen*>	_result;
+			std::vector<boost::shared_ptr<DisplayScreen> >	_result;
 
 		public:
 			static const std::string PARAMETER_SEARCH_UID;

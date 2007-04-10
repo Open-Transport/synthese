@@ -2,9 +2,8 @@
 /** TransactionPartTableSync class header.
 	@file TransactionPartTableSync.h
 
-	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
-	Copyright (C) 2006 Vinci Park 
-	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -23,7 +22,6 @@
 
 #ifndef SYNTHESE_TransationPartTableSync_H__
 #define SYNTHESE_TransationPartTableSync_H__
-
 
 #include <vector>
 #include <string>
@@ -67,7 +65,6 @@ namespace synthese
 			static const std::string TABLE_COL_COMMENT;
 
 			TransactionPartTableSync();
-			~TransactionPartTableSync ();
 
 
 			/** TransactionPart search.
@@ -78,8 +75,9 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<TransactionPart*> search(
-				Account* account, security::User* user
+			static std::vector<boost::shared_ptr<TransactionPart> > search(
+				boost::shared_ptr<const Account> account
+				, boost::shared_ptr<const security::User> user
 				, bool order=false
 				, int first = 0, int number = -1);
 
@@ -93,11 +91,14 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006				
 			*/
-			static std::vector<TransactionPart*> search(
-				const Transaction* transaction, const Account* account=NULL
+			static std::vector<boost::shared_ptr<TransactionPart> > search(
+				boost::shared_ptr<const Transaction> transaction
+				, boost::shared_ptr<const Account> account=boost::shared_ptr<const Account>()
 				, int first = 0, int number = -1);
 
-			static std::map<int, int> TransactionPartTableSync::count(Account* account, time::Date startDate, time::Date endDate, int first=0, int number=-1);
+			static std::map<int, int> TransactionPartTableSync::count(
+				boost::shared_ptr<const Account> account
+				, time::Date startDate, time::Date endDate, int first=0, int number=-1);
 
 		protected:
 
@@ -106,7 +107,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on user creation.
 			Updates the users objects in the opened sessions.

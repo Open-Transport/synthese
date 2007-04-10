@@ -57,10 +57,14 @@ namespace synthese
 		{
 			ParametersMap::const_iterator it;
 
-			// Profile
-			if (!SecurityModule::getProfiles().contains(_request->getObjectId()))
+			try
+			{
+				_profile = ProfileTableSync::get(_request->getObjectId());
+			}
+			catch(...)
+			{
 				throw ActionException("Profile not found");
-			_profile = SecurityModule::getProfiles().get(_request->getObjectId());
+			}
 
 			// Right code
 			string rightCode;
@@ -74,7 +78,7 @@ namespace synthese
 			if (it == map.end())
 				throw ActionException("Right parameter not specified");
 
-			_right.reset(_profile->getRight(rightCode, it->second));
+			_right = _profile->getRight(rightCode, it->second);
 			if (!_right.get())
 				throw ActionException("Specified right not found on profile");
 
@@ -95,7 +99,7 @@ namespace synthese
 		{
 			_right->setPrivateLevel(_privateLevel);
 			_right->setPublicLevel(_publicLevel);
-			ProfileTableSync::save(_profile);
+			ProfileTableSync::save(_profile.get());
 		}
 	}
 }

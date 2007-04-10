@@ -86,7 +86,7 @@ namespace synthese
 		*/
 		class DisplayMaintenanceAdmin : public admin::AdminInterfaceElement
 		{
-			DisplayScreen*	_displayScreen;
+			boost::shared_ptr<const DisplayScreen>	_displayScreen;
 
 		public:
 			

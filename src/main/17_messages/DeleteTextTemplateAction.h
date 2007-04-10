@@ -40,7 +40,7 @@ namespace synthese
 			static const std::string PARAMETER_TEXT_ID;
 
 		private:
-			TextTemplate*	_text;
+			boost::shared_ptr<const TextTemplate>	_text;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -54,11 +54,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			DeleteTextTemplateAction();
-			~DeleteTextTemplateAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

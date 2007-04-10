@@ -60,25 +60,14 @@ namespace synthese
 
 				_text = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
 			}
-			catch (DBEmptyResultException e)
+			catch (DBEmptyResultException<TextTemplate>)
 			{
 				throw ActionException("Specified text template not found");
 			}
 		}
-
-		DeleteTextTemplateAction::DeleteTextTemplateAction()
-			: Action()
-			, _text(NULL)
-		{}
-
 		void DeleteTextTemplateAction::run()
 		{
 			TextTemplateTableSync::remove(_text->getKey());
-		}
-
-		DeleteTextTemplateAction::~DeleteTextTemplateAction()
-		{
-			delete _text;
 		}
 	}
 }

@@ -110,8 +110,8 @@ namespace synthese
 			// Callbacks according to what already exists in the table.
 			if (_ignoreCallbacksOnFirstSync == false)
 			{
-			SQLiteResult result = sqlite->execQuery ("SELECT * FROM " + _tableName);
-			rowsAdded (sqlite, sync, result);
+				SQLiteResult result = sqlite->execQuery ("SELECT * FROM " + _tableName);
+				rowsAdded (sqlite, sync, result, true);
 			}
 
 			initAutoIncrement ();

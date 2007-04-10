@@ -43,7 +43,7 @@ namespace synthese
 			
 			//! \name Page parameters
 			//@{
-				const DisplayScreen*	_screen;
+				boost::shared_ptr<const DisplayScreen>	_screen;
 				time::DateTime			_date;
 			//@}
 
@@ -57,9 +57,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			DisplayScreenContentRequest();
-			~DisplayScreenContentRequest();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void _run(std::ostream& stream) const;

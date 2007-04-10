@@ -49,8 +49,8 @@ namespace synthese
 		, _previousDepartureForFineSteppingOnly(NULL)
 		, _followingConnectionArrival(NULL)
 		, _followingArrivalForFineSteppingOnly(NULL)
-		, _departureIndexUpdateNeeded (true)
-		, _arrivalIndexUpdateNeeded (true)
+//		, _departureIndexUpdateNeeded (true)
+//		, _arrivalIndexUpdateNeeded (true)
 		{ }
 
 
@@ -547,7 +547,7 @@ namespace synthese
 			{
 				_departureEndSchedule.insert (itInsertEnd, _departureBeginSchedule[index]);
 			}
-			_departureIndexUpdateNeeded = true;
+//			_departureIndexUpdateNeeded = true;
 		}
 
 
@@ -575,7 +575,7 @@ namespace synthese
 				_arrivalEndSchedule[index] = _arrivalBeginSchedule[index] + continuousService->getRange ();
 			}
 
-			_arrivalIndexUpdateNeeded = true;
+//			_arrivalIndexUpdateNeeded = true;
 		}
 
 
@@ -624,7 +624,7 @@ namespace synthese
 				}
 				lastHour = _departureEndSchedule[i].getHours ();
 			}
-			_departureIndexUpdateNeeded = false;
+//			_departureIndexUpdateNeeded = false;
 		}
 
 
@@ -673,7 +673,7 @@ namespace synthese
 				}
 				lastHour = _arrivalBeginSchedule[i].getHours ();
 			}
-			_arrivalIndexUpdateNeeded = false;
+//			_arrivalIndexUpdateNeeded = false;
 		}
 
 
@@ -715,19 +715,15 @@ namespace synthese
 
 
 
-	    int 
-	    Edge::getDepartureFromIndex (int hour) const
+	    int Edge::getDepartureFromIndex (int hour) const
 	    {
-		if (_departureIndexUpdateNeeded) updateDepartureIndex ();
-		return _departureIndex[hour];
+			return _departureIndex[hour];
 	    }
 
 
-	    int 
-	    Edge::getArrivalFromIndex (int hour) const
+	    int Edge::getArrivalFromIndex (int hour) const
 	    {
-		if (_arrivalIndexUpdateNeeded) updateArrivalIndex ();
-		return _arrivalIndex[hour];
+			return _arrivalIndex[hour];
 	    }
 
 	}

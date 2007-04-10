@@ -23,15 +23,17 @@
 #ifndef SYNTHESE_INTERFACES_PAGE_H
 #define SYNTHESE_INTERFACES_PAGE_H
 
+#include <vector>
+#include <utility>
+#include <string>
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 #include "01_util/Factorable.h"
 
 #include "11_interfaces/Types.h"
-
-#include <vector>
-#include <utility>
-#include <string>
+#include "11_interfaces/LibraryInterfaceElement.h"
 
 using synthese::util::Factory;
 
@@ -49,7 +51,6 @@ namespace synthese
 	namespace interfaces
 	{
 		class Interface;
-		class LibraryInterfaceElement;
 
 		/** Definition of a page, coming from the database. Page are elements of an interface.
 
@@ -58,16 +59,16 @@ namespace synthese
 				- additional pages : the page is not registerd in the Factory<InterfacePage>. It is saved directly as a InterfacePage object.
 			@ingroup m11
 		*/
-		class InterfacePage : public util::Factorable
+		class InterfacePage
+			: public util::Factorable
+			, public util::Registrable<uid, InterfacePage>
 		{
-		public:
-			typedef std::vector<std::pair<std::string, LibraryInterfaceElement*> > PageComponentsVector;
 			
 		private:
-			const Interface*		_interface;
-			PageComponentsVector	_components;
-			std::string				_code;
-
+			boost::shared_ptr<const Interface>	_interface;
+			LibraryInterfaceElement::Registry	_components;
+			std::string							_code;
+			
 		public:
 
 			InterfacePage();
@@ -82,13 +83,19 @@ namespace synthese
 				@param parameters Parameters vector
 				@return Name of the next line to display (empty = next line)
 			*/
-			void display(std::ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			void display(
+				std::ostream& stream
+				, const ParametersVector& parameters
+				, VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 
-			void				setInterface(const Interface*);
-			const Interface*	getInterface()	const;
+			void				setInterface(boost::shared_ptr<const Interface>);
+			boost::shared_ptr<const Interface>	getInterface()	const;
 
-			void				setCode(const std::string& code);
-			const std::string&	getCode()							const;
+			void setCode(const std::string& );
+
+			const std::string& getCode() const;
 		};
 	}
 }

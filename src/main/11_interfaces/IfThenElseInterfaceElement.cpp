@@ -25,11 +25,16 @@
 #include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/IfThenElseInterfaceElement.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	namespace interfaces
 	{
-		std::string IfThenElseInterfaceElement::getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		std::string IfThenElseInterfaceElement::getValue(const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			std::string result = _criteria->getValue(parameters, variables, object, request);
 			return ( result.size() == 0 || result == "0" )
@@ -37,13 +42,6 @@ namespace synthese
 				: _to_return_if_true->getValue(parameters, variables, object, request);
 		}
 		
-		IfThenElseInterfaceElement::~IfThenElseInterfaceElement()
-		{
-			delete _criteria;
-			delete _to_return_if_false;
-			delete _to_return_if_true;
-		}
-
 		void IfThenElseInterfaceElement::storeParameters(ValueElementList& vel )
 		{
 			if (vel.size() < 2)
@@ -51,7 +49,10 @@ namespace synthese
 
 			_criteria = vel.front();
 			_to_return_if_true = vel.front();
-			_to_return_if_false = vel.isEmpty() ? new StaticValueInterfaceElement("") : vel.front();
+			if (vel.isEmpty())
+				_to_return_if_false.reset(new StaticValueInterfaceElement(""));
+			else
+				_to_return_if_false = vel.front();
 		}
 	}
 }

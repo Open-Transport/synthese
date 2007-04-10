@@ -24,10 +24,11 @@
 #ifndef SYNTHESE_VinciContractTableSync_H__
 #define SYNTHESE_VinciContractTableSync_H__
 
-
 #include <vector>
 #include <string>
 #include <iostream>
+
+#include <boost/shared_ptr.hpp>
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
@@ -50,7 +51,6 @@ namespace synthese
 			static const std::string COL_PASSPORT;
 
 			VinciContractTableSync();
-			~VinciContractTableSync ();
 
 			/** VinciContract search.
 				@param sqlite SQLite thread
@@ -63,7 +63,7 @@ namespace synthese
 				@date 2006	
 				@warning The returned pointers must be deleted after use to avoid memory leak
 			*/
-			static std::vector<VinciContract*> search(
+			static std::vector<boost::shared_ptr<VinciContract> > search(
 				std::string name = "", std::string surname = ""
 				, int first = 0, int number = -1);
 
@@ -75,7 +75,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on user creation.
 			Updates the users objects in the opened sessions.

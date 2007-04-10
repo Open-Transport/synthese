@@ -47,12 +47,12 @@ namespace synthese
 
 			const ReservationRuleComplyer* _parent;
 
-			ReservationRule* _reservationRule;
+			const ReservationRule* _reservationRule;
 
 		protected:
 
 			ReservationRuleComplyer (const ReservationRuleComplyer* parent = NULL, 
-						ReservationRule* reservationRule = 0);
+						const ReservationRule* reservationRule = 0);
 
 		public:
 
@@ -63,7 +63,7 @@ namespace synthese
 			//@{
 			const ReservationRule* getReservationRule () const;
 			
-			void	setReservationRule (ReservationRule* reservationRule);
+			void	setReservationRule (const ReservationRule* reservationRule);
 			void	setParent(const ReservationRuleComplyer* parent);
 			//@}
 

@@ -40,6 +40,7 @@
 #include "DBLogEntryTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -69,7 +70,7 @@ namespace synthese
 				{
 					object->setUser(UserTableSync::get(Conversion::ToLongLong(rows.getColumn(rowId, DBLogEntryTableSync::COL_USER_ID))));
 				}
-				catch (DBEmptyResultException e)
+				catch (DBEmptyResultException<User>)
 				{					
 					/// @todo See if an exception should be thrown
 				}
@@ -78,8 +79,9 @@ namespace synthese
 			// Content column : parse all contents separated by | 
 			DBLogEntry::Content v;
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-			boost::char_separator<char> sep (DBLogEntryTableSync::CONTENT_SEPARATOR);
-			tokenizer columns (rows.getColumn(rowId, DBLogEntryTableSync::COL_CONTENT), sep);
+			boost::char_separator<char> sep (DBLogEntryTableSync::CONTENT_SEPARATOR.c_str());
+			string content = rows.getColumn(rowId, DBLogEntryTableSync::COL_CONTENT);
+			tokenizer columns (content, sep);
 			for (tokenizer::iterator it = columns.begin(); it != columns.end (); ++it)
 				v.push_back(*it);
 			object->setContent(v);
@@ -121,7 +123,7 @@ namespace synthese
 
 	namespace dblog
 	{
-		const char* DBLogEntryTableSync::CONTENT_SEPARATOR("|");
+		const string DBLogEntryTableSync::CONTENT_SEPARATOR("|");
 		const std::string DBLogEntryTableSync::COL_LOG_KEY = "log_key";
 		const std::string DBLogEntryTableSync::COL_DATE = "date";
 		const std::string DBLogEntryTableSync::COL_USER_ID = "user_id";
@@ -139,7 +141,7 @@ namespace synthese
 			addTableColumn(COL_CONTENT, "TEXT");
 		}
 
-		void DBLogEntryTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void DBLogEntryTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 		}
 
@@ -151,17 +153,43 @@ namespace synthese
 		{
 		}
 
-		std::vector<DBLogEntry*> DBLogEntryTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		std::vector<shared_ptr<DBLogEntry> > DBLogEntryTableSync::search(
+			const std::string& logKey
+			, const time::DateTime& startDate
+			, const time::DateTime& endDate
+			, const shared_ptr<const User> user
+			, DBLogEntry::Level level
+			, const std::string& text
+			, int first
+			, int number
+			, bool orderByDate
+			, bool orderByUser
+			, bool orderByLevel
+			, bool raisingOrder
+		){
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				;
+				<< " WHERE "
+					<< COL_LOG_KEY << "=" << Conversion::ToSQLiteString(logKey);
+			if (!startDate.isUnknown())
+				query << " AND " << COL_DATE << ">=" << startDate.toSQLString();
+			if (!endDate.isUnknown())
+				query << " AND " << COL_DATE << "<=" << endDate.toSQLString();
+			if (user.get())
+				query << " AND " << COL_USER_ID << "=" << user->getKey();
+			if (level != DBLogEntry::DB_LOG_UNKNOWN)
+				query << " AND " << COL_LEVEL << "=" << Conversion::ToString((int) level);
+			if (!text.empty())
+				query << " AND " << COL_CONTENT << " LIKE '%" << Conversion::ToSQLiteString(text, false) << "%'";
+			if (orderByDate)
+				query << " ORDER BY " << COL_DATE << (raisingOrder ? " ASC" : " DESC");
+			if (orderByUser)
+				query << " ORDER BY " << COL_USER_ID << (raisingOrder ? " ASC" : " DESC") << "," << COL_DATE << (raisingOrder ? " ASC" : " DESC");
+			if (orderByLevel)
+				query << " ORDER BY " << COL_LEVEL << (raisingOrder ? " ASC" : " DESC") << "," << COL_DATE << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -170,11 +198,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<DBLogEntry*> objects;
+				vector<shared_ptr<DBLogEntry> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					DBLogEntry* object = new DBLogEntry();
-					load(object, result, i);
+					shared_ptr<DBLogEntry> object(new DBLogEntry());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

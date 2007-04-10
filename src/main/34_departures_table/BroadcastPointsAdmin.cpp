@@ -23,7 +23,6 @@
 #include <map>
 
 #include "05_html/SearchFormHTMLTable.h"
-#include "05_html/ResultHTMLTable.h"
 
 #include "15_env/ConnectionPlace.h"
 #include "15_env/City.h"
@@ -35,6 +34,7 @@
 #include "34_departures_table/BroadcastPointAdmin.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -50,12 +50,10 @@ namespace synthese
 		const std::string BroadcastPointsAdmin::PARAMETER_PLACE_NAME = "place";
 		const std::string BroadcastPointsAdmin::PARAMETER_LINE_ID = "line";
 		const std::string BroadcastPointsAdmin::PARAMETER_DISPLAY_NUMBER = "dpln";
-		const std::string BroadcastPointsAdmin::PARAMETER_NUMBER = "n";
-		const std::string BroadcastPointsAdmin::PARAMETER_FIRST = "f";
 
 		BroadcastPointsAdmin::BroadcastPointsAdmin()
 			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) 
-			, _displayNumber(WITH_OR_WITHOU_ANY_BROADCASTPOINT), _number(50), _first(0)
+			, _displayNumber(WITH_OR_WITHOU_ANY_BROADCASTPOINT)
 		{}
 
 		void BroadcastPointsAdmin::setFromParametersMap(const ParametersMap& map)
@@ -76,15 +74,11 @@ namespace synthese
 			if (it != map.end())
 				_lineUId = Conversion::ToLongLong(it->second);
 
-			it = map.find(PARAMETER_NUMBER);
-			if (it != map.end())
-				_number = Conversion::ToInt(it->second);
+			_requestParameters = ResultHTMLTable::getParameters(map, PARAMETER_CITY_NAME, 30);
 
-			it = map.find(PARAMETER_FIRST);
-			if (it != map.end())
-				_first = Conversion::ToInt(it->second);
+			_searchResult = searchConnectionPlacesWithBroadcastPoints(_cityName, _placeName, _displayNumber, _lineUId, _requestParameters.maxSize, _requestParameters.first);
 
-			_searchResult = searchConnectionPlacesWithBroadcastPoints(_cityName, _placeName, _displayNumber, _lineUId, _number, _first);
+			_resultParameters = ResultHTMLTable::getParameters(_requestParameters, _searchResult);
 
 		}
 
@@ -123,27 +117,24 @@ namespace synthese
 			h.push_back(make_pair(PARAMETER_PLACE_NAME, "Nom zone d'arrêt"));
 			h.push_back(make_pair(PARAMETER_DISPLAY_NUMBER, "Afficheurs"));
 			h.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t(h,searchRequest.getHTMLForm(),string(),false);
+			ResultHTMLTable t(h,searchRequest.getHTMLForm(), _requestParameters, _resultParameters);
 
 			stream << t.open();
 
 
-			for (vector<ConnectionPlaceWithBroadcastPoint>::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
+			for (vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> >::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
 			{
-				goRequest.setObjectId(it->place->getKey());
+				shared_ptr<ConnectionPlaceWithBroadcastPoint> element = *it;
+				goRequest.setObjectId(element->place->getKey());
 				stream << t.row();
-				stream << t.col() << it->place->getCity()->getName();
-				stream << t.col() << it->place->getName();
-				stream << t.col() << it->broadCastPointsNumber;
+				stream << t.col() << element->place->getCity()->getName();
+				stream << t.col() << element->place->getName();
+				stream << t.col() << element->broadCastPointsNumber;
 				
 				HTMLForm gf(goRequest.getHTMLForm());
 				stream << t.col() << gf.getLinkButton("Editer");
 			}
 			stream << t.close();
-		}
-
-		BroadcastPointsAdmin::~BroadcastPointsAdmin()
-		{
 		}
 
 		bool BroadcastPointsAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const

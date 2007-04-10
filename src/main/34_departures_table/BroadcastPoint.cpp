@@ -28,6 +28,7 @@
 #include "34_departures_table/BroadcastPoint.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -47,12 +48,12 @@ namespace synthese
 			_name = name;
 		}
 
-		void BroadcastPoint::setConnectionPlace( ConnectionPlace* place )
+		void BroadcastPoint::setConnectionPlace(shared_ptr<const ConnectionPlace> place )
 		{
 			_place = place;
 		}
 
-		void BroadcastPoint::setPhysicalStop( PhysicalStop* physicalStop )
+		void BroadcastPoint::setPhysicalStop(shared_ptr<const PhysicalStop> physicalStop )
 		{
 			_physicalStop = physicalStop;
 		}
@@ -60,29 +61,29 @@ namespace synthese
 		const std::string BroadcastPoint::getName() const
 		{
 			stringstream s;
-			if ((_physicalStop != NULL) && _physicalStop->getName().size())
+			if (_physicalStop.get() && !_physicalStop->getName().empty())
 				s << _physicalStop->getName();
-			else if (_name.size())
+			else if (!_name.empty())
 				s << _name;
 			else
 				s << "(unnamed)";
 			return s.str();
 		}
 
-		ConnectionPlace* BroadcastPoint::getConnectionPlace() const
+		shared_ptr<const ConnectionPlace> BroadcastPoint::getConnectionPlace() const
 		{
 			return _place;
 		}
 
-		PhysicalStop* BroadcastPoint::getPhysicalStop() const
+		shared_ptr<const PhysicalStop> BroadcastPoint::getPhysicalStop() const
 		{
 			return _physicalStop;
 		}
 
 		std::string BroadcastPoint::getFullName() const
 		{
-			if (_place == NULL)
-				return "(not localized)";
+			if (!_place.get())
+				return "(non localisé)";
 			
 			stringstream s;
 			s << _place->getFullName() << "/" << getName();

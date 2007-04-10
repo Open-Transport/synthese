@@ -40,9 +40,13 @@ namespace synthese
 
 	namespace env
 	{
-		string LineShortNameInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string LineShortNameInterfaceElement::getValue(
+			const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object
+			, const server::Request* request) const
 		{
-			return (object != NULL) ? ((Line*) object)->getCommercialLine()->getShortName() : "";
+			return (object != NULL) ? ((const Line*) object)->getCommercialLine()->getShortName() : "";
 		}
 
 		void LineShortNameInterfaceElement::storeParameters(ValueElementList& vel)

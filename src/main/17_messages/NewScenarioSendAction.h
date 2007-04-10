@@ -40,7 +40,7 @@ namespace synthese
 			static const std::string PARAMETER_TEMPLATE;
 
 		private:
-			Scenario*	_template;
+			boost::shared_ptr<const Scenario>	_template;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -54,10 +54,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			NewScenarioSendAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

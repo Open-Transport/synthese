@@ -31,6 +31,7 @@
 #include "34_departures_table/CreateDisplayTypeAction.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -49,7 +50,8 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(make_pair(PARAMETER_NAME, _name));
-			map.insert(make_pair(PARAMETER_INTERFACE_ID, Conversion::ToString(_interface->getKey())));
+			if (_interface.get())
+				map.insert(make_pair(PARAMETER_INTERFACE_ID, Conversion::ToString(_interface->getKey())));
 			map.insert(make_pair(PARAMETER_ROWS_NUMBER, Conversion::ToString(_rows_number)));
 			return map;
 		}
@@ -88,12 +90,11 @@ namespace synthese
 
 		void CreateDisplayTypeAction::run()
 		{
-			DisplayType* dt = new DisplayType;
+			shared_ptr<DisplayType> dt(new DisplayType);
 			dt->setName(_name);
 			dt->setInterface(_interface);
 			dt->setRowNumber(_rows_number);
-			DisplayTypeTableSync::save(dt);
-			delete dt;
+			DisplayTypeTableSync::save(dt.get());
 		}
 	}
 }

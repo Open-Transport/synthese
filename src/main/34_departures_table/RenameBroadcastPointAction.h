@@ -41,7 +41,7 @@ namespace synthese
 			static const std::string PARAMETER_BROADCAST_ID;
 
 		private:
-			BroadcastPoint*	_broadcastPoint;
+			boost::shared_ptr<BroadcastPoint>	_broadcastPoint;
 			std::string		_name;
 
 			/** Conversion from attributes to generic parameter maps.
@@ -55,10 +55,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			RenameBroadcastPointAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

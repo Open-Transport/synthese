@@ -36,6 +36,7 @@
 #include "57_accounting/TransactionPartTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -63,7 +64,7 @@ namespace synthese
 		{
 			// Report Launch request
 			FunctionRequest<AdminRequest> reportRequest(request);
-			reportRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciReportsAdminInterfaceElement>());
+			reportRequest.getFunction()->setPage<VinciReportsAdminInterfaceElement>();
 		
 			// Search form
 			stream << "<h1>Dates de l'état journalier</h1>";
@@ -81,7 +82,7 @@ namespace synthese
 				h1.push_back(make_pair(string(), "Date"));
 				h1.push_back(make_pair(string(), "Départs"));
 				h1.push_back(make_pair(string(), "Retours"));
-				ResultHTMLTable v1(h1, t.getForm(), string(), false);
+				ResultHTMLTable v1(h1, t.getForm(), ResultHTMLTable::RequestParameters(), ResultHTMLTable::ResultParameters());
 				stream << v1.open();
 
 				for(std::map<time::Date, RentReportResult>::const_iterator it = _resultsPerDay.begin();
@@ -103,24 +104,23 @@ namespace synthese
 				h2.push_back(make_pair(string(), "Tarif"));
 				h2.push_back(make_pair(string(), "Départs"));
 				h2.push_back(make_pair(string(), "Retours"));
-				ResultHTMLTable v2(h2, t.getForm(), string(), false);
+				ResultHTMLTable v2(h2, t.getForm(), ResultHTMLTable::RequestParameters(), ResultHTMLTable::ResultParameters());
 				stream << v2.open();
 
 				for(std::map<uid, RentReportResult>::const_iterator it2 = _resultsPerRate.begin();
 					it2 != _resultsPerRate.end(); ++it2)
 				{
-					VinciRate* rate = NULL;
+					shared_ptr<VinciRate> rate;
 					try
 					{
 						rate = VinciRateTableSync::get(it2->first);
 					}
 					catch (...)
 					{
-						rate=NULL;
 					}
 
 					stream << v2.row();
-					stream << v2.col() << (rate ? rate->getName() : "inconnu");
+					stream << v2.col() << (rate.get() ? rate->getName() : "inconnu");
 					stream << v2.col() << it2->second.starts;
 					stream << v2.col() << it2->second.ends;
 				}

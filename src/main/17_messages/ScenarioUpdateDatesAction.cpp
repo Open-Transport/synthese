@@ -35,6 +35,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace server;
+	using namespace db;
 	using namespace time;
 	
 	namespace messages
@@ -58,7 +59,7 @@ namespace synthese
 		{
 			try
 			{
-				_scenario = MessagesModule::getScenarii().get(_request->getObjectId());
+				_scenario = ScenarioTableSync::get(_request->getObjectId());
 
 				ParametersMap::const_iterator it;
 
@@ -91,7 +92,7 @@ namespace synthese
 				if (!it->second.empty())
 					_endDate.getHour().FromString(it->second);
 			}
-			catch (Scenario::RegistryKeyException e)
+			catch (DBEmptyResultException<Scenario>)
 			{
 				throw ActionException("Scenario not found");
 			}
@@ -101,7 +102,6 @@ namespace synthese
 			: Action()
 			, _startDate(TIME_UNKNOWN)
 			, _endDate(TIME_UNKNOWN)
-			, _scenario(NULL)
 		{}
 
 		void ScenarioUpdateDatesAction::run()
@@ -109,7 +109,7 @@ namespace synthese
 			_scenario->setName(_name);
 			_scenario->setPeriodStart(_startDate);
 			_scenario->setPeriodEnd(_endDate);
-			ScenarioTableSync::save(_scenario);
+			ScenarioTableSync::save(_scenario.get());
 
 			for (Scenario::AlarmsSet::const_iterator it = _scenario->getAlarms().begin(); it != _scenario->getAlarms().end(); ++it)
 				AlarmTableSync::save(*it);

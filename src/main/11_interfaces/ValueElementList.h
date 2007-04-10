@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_ValueElementList_H__
 #define SYNTHESE_ValueElementList_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "11_interfaces/Types.h"
 
 namespace synthese
@@ -40,11 +42,11 @@ namespace synthese
 		class ValueElementList
 		{
 		private:
-			typedef std::deque<ValueInterfaceElement*> ElementsList;
+			typedef std::deque<boost::shared_ptr<ValueInterfaceElement> > ElementsList;
 
 			ElementsList _elements;	//!< The list
 
-			void parse(const std::string& text, const InterfacePage* page);
+			void parse(const std::string& text, boost::shared_ptr<const InterfacePage> page);
 
 		public:
 
@@ -82,23 +84,14 @@ namespace synthese
 						- <tt>{{stop 12 {{param:4}} text {long text}}}</tt>
 						- <tt>{{field hidden name {{cityname {{param 6}} {{param 2}}}} {style="visibility:hidden"}}}</tt>
 			*/
-			ValueElementList(const std::string& text, const InterfacePage* page);
+			ValueElementList(const std::string& text, boost::shared_ptr<const InterfacePage> page);
 
 			/** Empty constructor.
 			*/
 			ValueElementList();
 
-			/** Destructor.
-			@author Hugues
-			@date 2006
-
-			Deletes all the elements linked by the vector.
-			*/
-			~ValueElementList();
-
-
-			
-			ValueInterfaceElement* front();
+		
+			boost::shared_ptr<ValueInterfaceElement> front();
 			bool isEmpty() const;
 			size_t size() const;
 
@@ -106,13 +99,18 @@ namespace synthese
 				@param vel Object to read
 				@param page Interface page of the elements of the current object
 			*/
-			void	takeFrom(ValueElementList& vel, const InterfacePage* page);
+			void	takeFrom(ValueElementList& vel, boost::shared_ptr<const InterfacePage> page);
 
 			/** Builds a parameters vector from the value element list.
 				@param parameters Parameters to use when filling undefined parameter elements
 				@return Totally defined parameters.
 			*/
-			const ParametersVector fillParameters( const ParametersVector& parameters, VariablesMap& vars, const void* object=NULL, const server::Request* request=NULL ) const;
+			const ParametersVector fillParameters(
+				const ParametersVector& parameters
+				, VariablesMap& vars
+				, const void* object = NULL
+				, const server::Request* request=NULL
+				) const;
 		};
 	}
 }

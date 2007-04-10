@@ -42,6 +42,7 @@
 #include "32_admin/AdminParametersException.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -56,21 +57,13 @@ namespace synthese
 		const std::string AdminRequest::PARAMETER_PAGE = "rub";
 		const std::string AdminRequest::PARAMETER_ACTION_FAILED_PAGE = "afp";
 		
-		AdminRequest::AdminRequest()
-			: RequestWithInterfaceAndRequiredSession()
-			, _page(NULL), _actionFailedPage(NULL)
-		{}
-
 		ParametersMap AdminRequest::_getParametersMap() const
 		{
 			ParametersMap map(RequestWithInterfaceAndRequiredSession::_getParametersMap());
 
 			map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
-			if (_actionFailedPage != NULL)
+			if (_actionFailedPage.get())
 				map.insert(make_pair(PARAMETER_ACTION_FAILED_PAGE, _actionFailedPage->getFactoryKey()));
-//			for (ParametersMap::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
-//				if ((_action != NULL) || (it->first.compare(0, Action_PARAMETER_PREFIX.size(), Action_PARAMETER_PREFIX) != 0))
-//					map.insert(make_pair(it->first, it->second));
 			return map;
 		}
 
@@ -99,8 +92,8 @@ namespace synthese
 
 					it = map.find(PARAMETER_PAGE);
 				}
-				AdminInterfaceElement* page = (it == map.end())
-					? Factory<AdminInterfaceElement>::create<HomeAdmin>()
+				shared_ptr<AdminInterfaceElement> page = (it == map.end())
+					? static_pointer_cast<AdminInterfaceElement,HomeAdmin>(Factory<AdminInterfaceElement>::create<HomeAdmin>())
 					: Factory<AdminInterfaceElement>::create(it->second);
 				page->setFromParametersMap(map);
 				_page = page;
@@ -124,8 +117,8 @@ namespace synthese
 			{
 				if (_interface != NULL)
 				{
-					const AdminInterfacePage* const aip = _interface->getPage<AdminInterfacePage>();
-					aip->display(stream, _page, _request->getObjectId(), (const FunctionRequest<AdminRequest>*) _request);
+					shared_ptr<const AdminInterfacePage> const aip = _interface->getPage<AdminInterfacePage>();
+					aip->display(stream, &_page, _request->getObjectId(), (const FunctionRequest<AdminRequest>*) _request);
 				}
 				else
 				{
@@ -139,20 +132,13 @@ namespace synthese
 			}
 		}
 
-		AdminRequest::~AdminRequest()
-		{
-			if (_page != _actionFailedPage)
-				delete _actionFailedPage;
-			delete _page;
-		}
-
-		void AdminRequest::setPage( const AdminInterfaceElement* aie )
+		void AdminRequest::setPage(shared_ptr<const AdminInterfaceElement> aie )
 		{
 			_page = aie;
 		}
 
 		
-		const AdminInterfaceElement* AdminRequest::getPage() const
+		shared_ptr<const AdminInterfaceElement> AdminRequest::getPage() const
 		{
 			return _page;
 		}
@@ -166,7 +152,7 @@ namespace synthese
 				it->second = value;
 		}
 
-		void AdminRequest::setActionFailedPage( const AdminInterfaceElement* aie )
+		void AdminRequest::setActionFailedPage(shared_ptr<const AdminInterfaceElement> aie )
 		{
 			_actionFailedPage = aie;
 		}

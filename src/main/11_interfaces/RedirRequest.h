@@ -57,9 +57,6 @@ namespace synthese
 			void _run(std::ostream& stream) const;
 
 		public:
-			RedirRequest();
-			~RedirRequest();
-
 			void				setRedirURL(const std::string& url);
 			const std::string&	getRedirURL()	const;
 		};

@@ -29,6 +29,7 @@
 #include "01_util/ModuleClass.h"
 
 #include "11_interfaces/Interface.h"
+#include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/Types.h"
 
 namespace synthese
@@ -113,10 +114,13 @@ namespace synthese
 		class InterfaceModule : public util::ModuleClass
 		{
 		private:
-			static Interface::Registry	_interfaces;
+			static Interface::Registry		_interfaces;
+			static InterfacePage::Registry	_interfacePages;
 
 		public:
 			static Interface::Registry& getInterfaces ();
+			static InterfacePage::Registry&	getInterfacePages();
+
 			static std::vector<std::pair<uid, std::string> > getInterfaceLabels();
 
 			void initialize();

@@ -46,8 +46,8 @@ namespace synthese
 			static const std::string PARAMETER_PARAMETER;
 
 		private:
-			Profile*					_profile;
-			boost::shared_ptr<Right>	_right;
+			boost::shared_ptr<Profile>	_profile;
+			boost::shared_ptr<const Right>	_right;
 			
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -60,8 +60,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			DeleteRightAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

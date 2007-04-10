@@ -28,6 +28,7 @@
 #include "71_vinci_bike_rental/VinciAddBike.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -66,10 +67,10 @@ namespace synthese
 
 		void VinciAddBike::run()
 		{
-			VinciBike* bike = new VinciBike;
+			shared_ptr<VinciBike> bike(new VinciBike);
 			bike->setNumber(_number);
 			bike->setMarkedNumber(_marked_number);
-			VinciBikeTableSync::save(bike);
+			VinciBikeTableSync::save(bike.get());
 			_request->setObjectId(bike->getKey());
 		}
 	}

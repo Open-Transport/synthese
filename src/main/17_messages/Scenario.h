@@ -58,11 +58,6 @@ namespace synthese
 		public:
 			Scenario();
 
-			/** Destructor.
-				Deletes all contained alarms.
-			*/
-			~Scenario();
-
 			const std::string&		getName()			const;
 			bool					getIsATemplate()	const;
 			const time::DateTime&	getPeriodStart()	const;
@@ -88,7 +83,7 @@ namespace synthese
 			void addAlarm(Alarm* alarm);
 			void removeAlarm(Alarm* alarm);
 
-			Scenario*	createCopy()	const;
+			boost::shared_ptr<Scenario>	createCopy()	const;
 
 			void	stop(const time::DateTime& now);
 		};

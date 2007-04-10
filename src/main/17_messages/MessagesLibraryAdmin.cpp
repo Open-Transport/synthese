@@ -38,6 +38,7 @@
 #include "30_server/ActionFunctionRequest.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -94,10 +95,10 @@ namespace synthese
 
 			stream << t1.open();
 
-			vector<TextTemplate*> tw = TextTemplateTableSync::search(ALARM_LEVEL_INFO);
-			for (vector<TextTemplate*>::iterator itw = tw.begin(); itw != tw.end(); ++itw)
+			vector<shared_ptr<TextTemplate> > tw = TextTemplateTableSync::search(ALARM_LEVEL_INFO);
+			for (vector<shared_ptr<TextTemplate> >::iterator itw = tw.begin(); itw != tw.end(); ++itw)
 			{
-				TextTemplate* t = *itw;
+				shared_ptr<TextTemplate> t = *itw;
 
 				HTMLForm uf(updateRequest.getHTMLForm("upd" + Conversion::ToString(t->getKey())));
 				uf.addHiddenField(UpdateTextTemplateAction::PARAMETER_TEXT_ID, Conversion::ToString(t->getKey()));
@@ -117,7 +118,6 @@ namespace synthese
 					<< "</td>"
 					<< "</tr>";
 				stream << uf.close();
-				delete *itw;
 			}
 
 			HTMLForm af(addRequest.getHTMLForm("add1"));
@@ -145,10 +145,10 @@ namespace synthese
 
 			stream << t2.open();
 
-			vector<TextTemplate*> te = TextTemplateTableSync::search(ALARM_LEVEL_WARNING);
-			for (vector<TextTemplate*>::iterator ite = te.begin(); ite != te.end(); ++ite)
+			vector<shared_ptr<TextTemplate> > te = TextTemplateTableSync::search(ALARM_LEVEL_WARNING);
+			for (vector<shared_ptr<TextTemplate> >::iterator ite = te.begin(); ite != te.end(); ++ite)
 			{
-				TextTemplate* t = *ite;
+				shared_ptr<TextTemplate> t = *ite;
 
 				/// @todo See if we use textarea
 				HTMLForm uf(updateRequest.getHTMLForm("upd" + Conversion::ToString(t->getKey())));
@@ -167,7 +167,6 @@ namespace synthese
 					<< "<td>" << df.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer le modèle sélectionné ?") << "</td>"
 					<< "</tr>";
 				stream << uf.close();
-				delete *ite;
 			}
 			HTMLForm af2(addRequest.getHTMLForm("add2"));
 			af2.addHiddenField(TextTemplateAddAction::PARAMETER_TYPE, Conversion::ToString((int) ALARM_LEVEL_WARNING));
@@ -188,12 +187,12 @@ namespace synthese
 			ActionResultHTMLTable::HeaderVector h3;
 			h3.push_back(make_pair(string(), "Nom"));
 			h3.push_back(make_pair(string(), "Actions"));
-			ActionResultHTMLTable t3(h3, HTMLForm(string(),string()), string(), true, addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
+			ActionResultHTMLTable t3(h3, HTMLForm(string(),string()), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
 			stream << t3.open();
 			
 			for (Scenario::Registry::const_iterator it = MessagesModule::getScenarii().begin(); it != MessagesModule::getScenarii().end(); ++it)
 			{
-				Scenario* scenario = it->second;
+				shared_ptr<const Scenario> scenario = it->second;
 				updateScenarioRequest.setObjectId(scenario->getKey());
 				deleteScenarioRequest.setObjectId(scenario->getKey());
 				stream << t3.row();

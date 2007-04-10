@@ -51,39 +51,12 @@ namespace synthese
 			, ReservationRuleComplyer (0) // No parent complyer right now
 			, _calendar ()
 			, _fare(NULL)
-			, _alarm(NULL)
 		{
 		}
 		    
 
 		Path::~Path ()
 		{
-		}
-
-
-
-		bool 
-		Path::hasApplicableAlarm (const synthese::time::DateTime& start, 
-					const synthese::time::DateTime& end) const
-		{
-			if (_alarm == 0) return false;
-			return _alarm->isApplicable (start, end);
-		}
-
-
-
-		const Alarm* 
-		Path::getAlarm() const
-		{
-			return _alarm;
-		}
-
-
-
-		void
-		Path::setAlarm (Alarm* alarm)
-		{
-			_alarm = alarm;
 		}
 
 
@@ -97,7 +70,7 @@ namespace synthese
 
 
 		void 
-		Path::setFare (Fare* fare)
+		Path::setFare (const Fare* fare)
 		{
 			_fare = fare;
 		}
@@ -328,13 +301,6 @@ namespace synthese
 		}
 
 
-
-		int 
-		Path::getEdgesCount () const
-		{
-			return _edges.size ();
-		}
-
 		Edge* Path::getLastEdge() const
 		{
 			vector<Edge*>::const_iterator it = _edges.end();
@@ -347,5 +313,13 @@ namespace synthese
 			return _calendar;
 		}
 
+		void Path::updateScheduleIndexes()
+		{
+			for (Edges::const_iterator it = _edges.begin(); it != _edges.end(); ++it)
+			{
+				(*it)->updateDepartureIndex();
+				(*it)->updateArrivalIndex();
+			}
+		}
 	}
 }

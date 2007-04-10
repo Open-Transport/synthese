@@ -31,6 +31,7 @@
 #include "30_server/Request.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -49,16 +50,11 @@ namespace synthese
 			return map;
 		}
 
-		UpdateAlarmMessagesFromTemplateAction::~UpdateAlarmMessagesFromTemplateAction()
-		{
-			delete _template;
-		}
-
 		void UpdateAlarmMessagesFromTemplateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				_message = MessagesModule::getAlarms().get(_request->getObjectId());
+				_message = AlarmTableSync::get(_request->getObjectId());
 
 				ParametersMap::const_iterator it;
 
@@ -68,27 +64,21 @@ namespace synthese
 
 				_template = TextTemplateTableSync::get(Conversion::ToLongLong(it->second));
 			}
-			catch (Alarm::RegistryKeyException e)
+			catch (DBEmptyResultException<Alarm>)
 			{
 				throw ActionException("Specified message not found");
 			}
-			catch(DBEmptyResultException e)
+			catch(DBEmptyResultException<TextTemplate>)
 			{
 				throw ActionException("Specified template not found");
 			}
 		}
 
-		UpdateAlarmMessagesFromTemplateAction::UpdateAlarmMessagesFromTemplateAction()
-			: Action()
-			, _template(NULL)
-			, _message(NULL)
-		{}
-
 		void UpdateAlarmMessagesFromTemplateAction::run()
 		{
 			_message->setShortMessage(_template->getShortMessage());
 			_message->setLongMessage(_template->getLongMessage());
-			AlarmTableSync::save(_message);
+			AlarmTableSync::save(_message.get());
 		}
 	}
 }

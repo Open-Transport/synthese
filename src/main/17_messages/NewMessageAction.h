@@ -41,7 +41,7 @@ namespace synthese
 			static const std::string PARAMETER_SCENARIO_ID;
 
 		private:
-			Scenario*	_scenario;
+			boost::shared_ptr<Scenario>	_scenario;
 			bool		_isTemplate;
 
 		protected:
@@ -56,11 +56,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			NewMessageAction();
-			~NewMessageAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

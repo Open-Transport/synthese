@@ -24,10 +24,11 @@
 #ifndef SYNTHESE_VinciSiteTableSync_H__
 #define SYNTHESE_VinciSiteTableSync_H__
 
-
 #include <vector>
 #include <string>
 #include <iostream>
+
+#include <boost/shared_ptr.hpp>
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
@@ -53,7 +54,6 @@ namespace synthese
 		public:
 
 			VinciSiteTableSync();
-			~VinciSiteTableSync ();
 
 			/** VinciSite search.
 			@param sqlite SQLite thread
@@ -63,7 +63,7 @@ namespace synthese
 			@author Hugues Romain
 			@date 2006	
 			*/
-			static std::vector<VinciSite*> searchVinciSites(const db::SQLiteQueueThreadExec* sqlite
+			static std::vector<boost::shared_ptr<VinciSite> > searchVinciSites(const db::SQLiteQueueThreadExec* sqlite
 
 				, int first = 0, int number = 0);
 
@@ -75,7 +75,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on user creation.
 			Updates the users objects in the opened sessions.

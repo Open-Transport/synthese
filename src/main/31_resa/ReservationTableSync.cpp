@@ -125,7 +125,7 @@ namespace synthese
 			addTableIndex(COL_ARRIVAL_PLACE_ID);
 		}
 
-		void ReservationTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ReservationTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 		}
 		

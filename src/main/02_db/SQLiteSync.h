@@ -32,6 +32,7 @@
 #include <iostream>
 
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/shared_ptr.hpp>
 
 
 namespace synthese
@@ -59,8 +60,8 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
     std::string _idColumnName;
     bool _isRegistered;
 
-    std::map<std::string, SQLiteTableSync*> _tableSynchronizers;
-	std::map<std::string, SQLiteTableSync*> _rankedTableSynchronizers;
+	std::map<std::string, boost::shared_ptr<SQLiteTableSync> > _tableSynchronizers;
+	std::map<std::string, boost::shared_ptr<SQLiteTableSync> > _rankedTableSynchronizers;
     mutable boost::recursive_mutex _tableSynchronizersMutex; 
 
  public:
@@ -78,11 +79,11 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
 		@param rank Rank of the synchroniser in the load procedure
 		@param synchroniser The synchronizer singleton to store
     */
-	void addTableSynchronizer (const std::string& rank, SQLiteTableSync* synchronizer);
+	void addTableSynchronizer (const std::string& rank, boost::shared_ptr<SQLiteTableSync> synchronizer);
 
     bool hasTableSynchronizer (const std::string& tableName) const;
-    SQLiteTableSync* getTableSynchronizer (const std::string& tableName) const;
-    std::map<std::string, SQLiteTableSync* > getTableSynchronizers () const;
+	boost::shared_ptr<SQLiteTableSync> getTableSynchronizer (const std::string& tableName) const;
+	std::map<std::string, boost::shared_ptr<SQLiteTableSync> > getTableSynchronizers () const;
 
 
 };

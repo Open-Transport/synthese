@@ -43,6 +43,7 @@
 #include "71_vinci_bike_rental/VinciAddGuaranteeAction.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -50,6 +51,7 @@ namespace synthese
 	using namespace util;
 	using namespace accounts;
 	using namespace time;
+	using namespace db;
 	
 	namespace vinci
 	{
@@ -63,9 +65,9 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(make_pair(PARAMETER_AMOUNT, Conversion::ToString(_amount)));
-			if (_contract)
+			if (_contract.get())
 				map.insert(make_pair(PARAMETER_CONTRACT_ID, Conversion::ToString(_contract->getKey())));
-			if (_account)
+			if (_account.get())
 				map.insert(make_pair(PARAMETER_ACCOUNT_ID, Conversion::ToString(_account->getKey())));
 			map.insert(make_pair(PARAMETER_DATE, Conversion::ToString(_date.toString())));
 			return map;
@@ -101,6 +103,14 @@ namespace synthese
 					_date = DateTime::FromString(it->second);
 				}
 			}
+			catch (DBEmptyResultException<Account>)
+			{
+				throw ActionException("Specified account not found");
+			}
+			catch(DBEmptyResultException<VinciContract>)
+			{
+				throw ActionException("Specified contract not found");
+			}
 			catch (TimeParseException e)
 			{
 				throw ActionException("La date saisie n'est pas correcte");
@@ -112,43 +122,28 @@ namespace synthese
 			DateTime unknownDate(TIME_UNKNOWN);
 
 			// Transaction
-			Transaction* transaction = new Transaction;
+			shared_ptr<Transaction> transaction(new Transaction);
 			transaction->setStartDateTime(_date);
 			transaction->setEndDateTime(unknownDate);
 			transaction->setLeftUserId(_contract->getUserId());
-			TransactionTableSync::save(transaction);
+			TransactionTableSync::save(transaction.get());
 
 			// Part 1 : customer
-			TransactionPart* transactionPart = new TransactionPart;
-			Account* account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE);
+			shared_ptr<TransactionPart> transactionPart(new TransactionPart);
+			shared_ptr<Account> account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE);
 			transactionPart->setTransactionId(transaction->getKey());
 			transactionPart->setAccountId(account->getKey());
 			transactionPart->setLeftCurrencyAmount(_amount);
 			transactionPart->setRightCurrencyAmount(_amount);
-			TransactionPartTableSync::save(transactionPart);
+			TransactionPartTableSync::save(transactionPart.get());
 			
 			// Part 2 : 
-			TransactionPart* changeTransactionPart = new TransactionPart;
+			shared_ptr<TransactionPart> changeTransactionPart(new TransactionPart);
 			changeTransactionPart->setTransactionId(transaction->getKey());
 			changeTransactionPart->setAccountId(_account->getKey());
 			changeTransactionPart->setLeftCurrencyAmount(-_amount);
 			changeTransactionPart->setRightCurrencyAmount(-_amount);
-			TransactionPartTableSync::save(changeTransactionPart);
-
-			delete account;
-			delete transactionPart;
-			delete changeTransactionPart;
-			delete transaction;
+			TransactionPartTableSync::save(changeTransactionPart.get());
 		}
-
-		VinciAddGuaranteeAction::~VinciAddGuaranteeAction()
-		{
-			delete _contract;
-			delete _account;
-		}
-
-		VinciAddGuaranteeAction::VinciAddGuaranteeAction()
-			: _contract(NULL), _account(NULL)
-		{ }
 	}
 }

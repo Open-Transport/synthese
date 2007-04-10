@@ -100,17 +100,17 @@ namespace synthese
 		public:
 
 			typedef std::set<Service*, cmpService> ServiceSet;
-//			typedef std::set<Service*> ServiceSet;
+			typedef std::vector<Edge*> Edges;
 
 		protected:
 
-			std::vector<Edge*> _edges; 
-			ServiceSet _services;
+			
+			Edges			_edges; 
+			ServiceSet		_services;
 
-			Fare* _fare;
-			const messages::Alarm* _alarm;
-
-			Calendar _calendar; //!< Calendar indicating if there is at least one service running on each day.
+			const Fare*		_fare;
+			
+			Calendar		_calendar; //!< Calendar indicating if there is at least one service running on each day.
 
 			Path ();
 
@@ -119,28 +119,26 @@ namespace synthese
 			virtual ~Path ();
 
 
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
-				virtual const uid& getId () const = 0;
+				virtual const uid&			getId () const = 0;
 
-				int getEdgesCount () const;
-				const Edge* getEdge (int index) const;
+				const ServiceSet&			getServices () const;
+				const Service*				getService (int serviceIndex) const;
 
-				const ServiceSet& getServices () const;
-				const Service* getService (int serviceIndex) const;
+				const Fare*					getFare () const;
 
-				const Fare* getFare () const;
-				void setFare (Fare* fare);
+				virtual const Axis*			getAxis () const = 0;
 
-				bool hasApplicableAlarm (const synthese::time::DateTime& start, 
-							const synthese::time::DateTime& end) const;
-				const messages::Alarm* getAlarm () const;
-				void setAlarm (messages::Alarm* alarm);
+				const std::vector<Edge*>&	getEdges () const;
+				const Edge*					getEdge (int index) const;
 
-				virtual const Axis* getAxis () const = 0;
+				Calendar&					getCalendar();
+			//@}
 
-				const std::vector<Edge*>& getEdges () const;
-				Calendar&	getCalendar();
+			//! \name Setters
+			//@{
+				void setFare (const Fare* fare);
 			//@}
 
 			//! @name Query methods.
@@ -188,14 +186,22 @@ namespace synthese
 
 				/** Updates path calendar.
 
-				The generated calendar indicates whether or not a day contains at least one service.
-				It takes into account services running after midnight : if at least one minute
-				of a day is concerned by a service, then the whole day is selected.
+					The generated calendar indicates whether or not a day contains at least one service.
+					It takes into account services running after midnight : if at least one minute
+					of a day is concerned by a service, then the whole day is selected.
 
-				Thus, if a calculation request is done on a deselected calendar day, the path 
-				can safely be filtered.
+					Thus, if a calculation request is done on a deselected calendar day, the path 
+					can safely be filtered.
 				*/
 				void updateCalendar ();
+
+
+				/** Updates the schedule indexes of each linestop served by the service.
+					@author Hugues Romain
+					@date 2007
+					@throw No exception
+				*/
+				void updateScheduleIndexes();
 			//@}
 		    
 		};

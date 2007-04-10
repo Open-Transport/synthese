@@ -9,21 +9,32 @@
 
 namespace synthese
 {
-	/** @defgroup refActions Actions
-		@ingroup ref
-
-		@defgroup refFunctions Functions
-		@ingroup ref
-
-		@defgroup m30Actions Actions
+	/**	@defgroup m30Actions 30 Actions
 		@ingroup m30
-		
-		@defgroup m30Exceptions Exceptions
+
+		@defgroup m30Pages 30 Pages
+		@ingroup m30
+
+		@defgroup m30Values 30 Values
+		@ingroup m30
+
+		@defgroup m30Functions 30 Functions
+		@ingroup m30
+
+		@defgroup m30LS 30 Table synchronizers
+		@ingroup m30
+
+		@defgroup m30Admin 30 Administration pages
+		@ingroup m30
+
+		@defgroup m30Rights 30 Rights
+		@ingroup m30
+
+		@defgroup m30Logs 30 DB Logs
 		@ingroup m30
 	
 		@defgroup m30 30 Server
-
-	@{
+		@{
 	*/
 
 	/** 30 Server module namespace.

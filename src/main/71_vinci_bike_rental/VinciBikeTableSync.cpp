@@ -31,6 +31,7 @@
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -91,15 +92,13 @@ namespace synthese
 			addTableColumn(TABLE_COL_MARKED_NUMBER, "TEXT", true);
 		}
 
-		VinciBikeTableSync::~VinciBikeTableSync()
-		{}
 		
 		/** Action to do on user creation.
 		No action because the users are not permanently loaded in ram.
 		*/
 		void VinciBikeTableSync::rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
-			const db::SQLiteResult& rows)
+			const db::SQLiteResult& rows, bool isFirstSync)
 		{}
 
 		/** Action to do on user creation.
@@ -118,22 +117,40 @@ namespace synthese
 			const db::SQLiteResult& rows)
 		{}
 
-		std::vector<VinciBike*> VinciBikeTableSync::search(const std::string& id, const std::string& cadre , int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<VinciBike> > VinciBikeTableSync::search(
+			const std::string& id
+			, const std::string& cadre 
+			, int first /*= 0*/
+			, int number /*= 0*/
+			, bool orderByNumber
+			, bool orderByCadre
+			, bool raisingOrder
+			)
 		{
 			const db::SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 
 			stringstream query;
 			query 
 				<< " SELECT * FROM " << TABLE_NAME
-				<< " WHERE " << TABLE_COL_NUMBER << "='" << id << "' "
-				<< " AND " << TABLE_COL_MARKED_NUMBER << " LIKE '%" << cadre << "%' "
-				<< " LIMIT " << number << " OFFSET " << first
-				;
+				<< " WHERE 1 ";
+			if (!id.empty())
+				query << " AND " << TABLE_COL_NUMBER << "='" << id << "' ";
+			if (!cadre.empty())
+				query << " AND " << TABLE_COL_MARKED_NUMBER << " LIKE '%" << cadre << "%' ";
+			if (orderByNumber)
+				query << " ORDER BY " << TABLE_COL_NUMBER << (raisingOrder ? " ASC" : " DESC");
+			if (orderByCadre)
+				query << " ORDER BY " << TABLE_COL_MARKED_NUMBER << (raisingOrder ? " ASC" : " DESC");
+			if (number > 0)
+				query << " LIMIT " << (number + 1);
+			if (number > 0)
+				query << " OFFSET " << first;
+
 			SQLiteResult result = sqlite->execQuery(query.str());
-			vector<VinciBike*> bikes;
+			vector<shared_ptr<VinciBike> > bikes;
 			for (int i=0; i<result.getNbRows(); ++i)
 			{
-				VinciBike* bike = new VinciBike;
+				shared_ptr<VinciBike> bike(new VinciBike);
 				try
 				{
 					load(bike, result, i);

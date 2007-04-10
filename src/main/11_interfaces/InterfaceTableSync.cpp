@@ -28,6 +28,8 @@
 #include "11_interfaces/InterfaceModule.h"
 #include "11_interfaces/InterfaceTableSync.h"
 
+using boost::shared_ptr;
+
 namespace synthese
 {
 	using namespace db;
@@ -73,12 +75,12 @@ namespace synthese
 		}
 
 
-		void InterfaceTableSync::rowsAdded( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void InterfaceTableSync::rowsAdded( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows, bool isFirstSync )
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				Interface* obj = new Interface(Conversion::ToLongLong(rows.getColumn(i,TABLE_COL_ID)));
-				load(obj, rows, i);
+				shared_ptr<Interface> obj(new Interface(Conversion::ToLongLong(rows.getColumn(i,TABLE_COL_ID))));
+				load(obj.get(), rows, i);
 				InterfaceModule::getInterfaces().add(obj);
 			}
 		}

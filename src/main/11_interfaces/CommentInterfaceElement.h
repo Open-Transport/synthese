@@ -48,8 +48,12 @@ namespace synthese
 				@param rootObject Object to read at the display
 				@param request Source request
 			*/
-			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
-			~CommentInterfaceElement();
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 		};
 	}
 }

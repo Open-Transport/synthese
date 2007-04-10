@@ -58,8 +58,6 @@ namespace synthese
 		const std::string UsersAdmin::PARAM_SEARCH_PROFILE_ID = "searchprofileid";
 		const std::string UsersAdmin::PARAM_SEARCH_NAME = "searchname";
 		const std::string UsersAdmin::PARAM_SEARCH_LOGIN = "searchlogin";
-		const std::string UsersAdmin::PARAM_SEARCH_FIRST = "searchfirst";
-		const std::string UsersAdmin::PARAM_SEARCH_NUMBER = "searchnumber";
 
 
 		UsersAdmin::UsersAdmin()
@@ -70,6 +68,56 @@ namespace synthese
 		std::string UsersAdmin::getTitle() const
 		{
 			return "Utilisateurs";
+		}
+
+
+		void UsersAdmin::setFromParametersMap(const ParametersMap& map)
+		{
+			ParametersMap::const_iterator it;
+
+			// Searched login
+			it = map.find(PARAM_SEARCH_LOGIN);
+			if (it != map.end())
+				_searchLogin = it->second;
+
+			// Searched name
+			it = map.find(PARAM_SEARCH_NAME);
+			if (it != map.end())
+				_searchName = it->second;
+
+			// Searched profile
+			it = map.find(PARAM_SEARCH_PROFILE_ID);
+			if (it != map.end() && SecurityModule::getProfiles().contains(Conversion::ToLongLong(it->second)))
+				_searchProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
+
+			// Table Parameters
+			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAM_SEARCH_LOGIN, 30);
+
+			// Launch the users search
+			_users = UserTableSync::search(
+				_searchLogin
+				, _searchName
+				, _searchProfile
+				, false
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, _requestParameters.orderField == PARAM_SEARCH_LOGIN
+				, _requestParameters.orderField == PARAM_SEARCH_NAME
+				, _requestParameters.orderField == PARAM_SEARCH_PROFILE_ID
+				, _requestParameters.raisingOrder
+				);
+
+			// Result parameters
+			_resultParameters.next = (_users.size() == _requestParameters.maxSize + 1);
+			if (_resultParameters.next)
+				_users.pop_back();
+			_resultParameters.size = _users.size();
+
+		}
+
+		bool UsersAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
+		{
+			return request->isAuthorized<SecurityRight>(Right::READ);
 		}
 
 		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
@@ -98,7 +146,7 @@ namespace synthese
 			stream << searchTable.open();
 			stream << searchTable.cell("Login", searchTable.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin));
 			stream << searchTable.cell("Nom", searchTable.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
-			stream << searchTable.cell("Profil", searchTable.getForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(true), _searchProfileId));
+			stream << searchTable.cell("Profil", searchTable.getForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(true), _searchProfile.get() ? _searchProfile->getKey() : uid(0)));
 			stream << searchTable.close();
 
 			stream << "<h1>Résultats de la recherche</h1>";
@@ -112,13 +160,13 @@ namespace synthese
 			v.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			v.push_back(make_pair(PARAM_SEARCH_PROFILE_ID, "Profil"));
 			v.push_back(make_pair("", "Actions"));
-			ActionResultHTMLTable t(v, searchTable.getForm(), "", true, addUserRequest.getHTMLForm("add"),"", InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, searchTable.getForm(), _requestParameters, _resultParameters, addUserRequest.getHTMLForm("add"),"", InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 
-			for(vector<User*>::const_iterator it = _users.begin(); it != _users.end(); ++it)
+			for(vector<shared_ptr<User> >::const_iterator it = _users.begin(); it != _users.end(); ++it)
 			{
-				User* user = *it;
+				shared_ptr<User> user = *it;
 				userRequest.setObjectId(user->getKey());
 				deleteUserRequest.setObjectId(user->getKey());
 				stream << t.row();
@@ -135,72 +183,6 @@ namespace synthese
 			stream << t.col() << t.getActionForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), (uid) 0);
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
-		}
-
-		void UsersAdmin::setFromParametersMap(const ParametersMap& map)
-		{
-			ParametersMap::const_iterator it;
-
-			// Searched login
-			it = map.find(PARAM_SEARCH_LOGIN);
-			if (it != map.end())
-				_searchLogin = it->second;
-
-			// Searched name
-			it = map.find(PARAM_SEARCH_NAME);
-			if (it != map.end())
-				_searchName = it->second;
-
-			// Searched name
-			it = map.find(PARAM_SEARCH_PROFILE_ID);
-			if (it != map.end())
-				_searchProfileId = Conversion::ToLongLong(it->second);
-			else
-				_searchProfileId = 0;
-
-			// First
-			it = map.find(PARAM_SEARCH_FIRST);
-			if (it != map.end())
-				_first = Conversion::ToInt(it->second);
-			else
-				_first = 0;
-
-			// Number
-			it = map.find(PARAM_SEARCH_NUMBER);
-			if (it != map.end())
-				_number = Conversion::ToInt(it->second);
-			else
-				_number = 20;
-
-			// Launch the users search
-			_users = UserTableSync::search(
-				_searchLogin
-				, _searchName
-				, _searchProfileId
-				, false
-				, _first
-				, _number + 1
-				);
-
-			// Display of the "next users" button
-			if (_users.size() > _number)
-			{
-				_nextButton = true;
-				vector<User*>::iterator uit = _users.end() - 1;
-				delete *uit;
-				_users.erase(uit);
-			}
-		}
-
-		UsersAdmin::~UsersAdmin()
-		{
-			for(vector<User*>::iterator it = _users.begin(); it != _users.end(); ++it)
-				delete *it;
-		}
-
-		bool UsersAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
-		{
-			return request->isAuthorized<SecurityRight>(Right::READ);
 		}
 	}
 }

@@ -26,6 +26,7 @@
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminRequest.h"
+#include "32_admin/AdminParametersException.h"
 
 #include "71_vinci_bike_rental/VinciBike.h"
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
@@ -38,6 +39,7 @@ namespace synthese
 	using namespace admin;
 	using namespace util;
 	using namespace html;
+	using namespace db;
 
 	namespace vinci
 	{
@@ -54,7 +56,7 @@ namespace synthese
 		{
 			// Update bike request
 			ActionFunctionRequest<VinciUpdateBikeAction, AdminRequest> updateBikeRequest(request);
-			updateBikeRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<VinciBikeAdminInterfaceElement>());
+			updateBikeRequest.getFunction()->setPage<VinciBikeAdminInterfaceElement>();
 			
 			// Display of data board
 			stream << "<h1>Données</h1>";
@@ -80,9 +82,16 @@ namespace synthese
 
 		void VinciBikeAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
-			if (it != map.end())
-				_bike = VinciBikeTableSync::get(Conversion::ToLongLong(it->second));
+			try
+			{
+				ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
+				if (it != map.end())
+					_bike = VinciBikeTableSync::get(Conversion::ToLongLong(it->second));
+			}
+			catch(DBEmptyResultException<VinciBike>)
+			{
+				throw AdminParametersException("Specified bike not found");
+			}
 		}
 
 		bool VinciBikeAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const

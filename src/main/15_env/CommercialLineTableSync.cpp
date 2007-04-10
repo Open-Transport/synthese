@@ -34,6 +34,7 @@
 #include "15_env/EnvModule.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -106,12 +107,12 @@ namespace synthese
 			addTableColumn(COL_IMAGE, "TEXT", false);
 		}
 
-		void CommercialLineTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void CommercialLineTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				CommercialLine* object = new CommercialLine();
-				load(object, rows, i);
+				shared_ptr<CommercialLine> object(new CommercialLine());
+				load(object.get(), rows, i);
 				EnvModule::getCommercialLines().add(object);
 			}
 		}
@@ -120,8 +121,8 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				CommercialLine* object=EnvModule::getCommercialLines().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-				load(object, rows, i);
+				shared_ptr<CommercialLine> object=EnvModule::getCommercialLines().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+				load(object.get(), rows, i);
 			}
 		}
 
@@ -133,7 +134,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<CommercialLine*> CommercialLineTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<CommercialLine> > CommercialLineTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -152,11 +153,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<CommercialLine*> objects;
+				vector<shared_ptr<CommercialLine> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					CommercialLine* object = new CommercialLine();
-					load(object, result, i);
+					shared_ptr<CommercialLine> object(new CommercialLine());
+					load(object.get(), result, i);
 					objects.push_back(object);
 				}
 				return objects;

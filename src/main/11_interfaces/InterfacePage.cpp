@@ -29,6 +29,7 @@
 #include "11_interfaces/InterfacePageException.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -37,27 +38,26 @@ namespace synthese
 	namespace interfaces
 	{
 
-		void InterfacePage::display( std::ostream& stream, const ParametersVector& parameters, VariablesMap& vars, const void* object /*= NULL*/, const server::Request* request) const
+		void InterfacePage::display(
+			std::ostream& stream
+			, const ParametersVector& parameters
+			, VariablesMap& vars
+			, const void* object /*= NULL*/
+			, const server::Request* request) const
 		{
 			string label_to_go;
-			for (PageComponentsVector::const_iterator it = _components.begin(); it != _components.end(); ++it)
+			for (LibraryInterfaceElement::Registry::const_iterator it = _components.begin(); it != _components.end(); ++it)
 			{
-				if (label_to_go.empty() || it->first == label_to_go)
+				if (label_to_go.empty() || it->second->getLabel() == label_to_go)
 				{
 					label_to_go = it->second->display(stream, parameters, vars, object, request);
 				}
 			}
 		}
 
-		void InterfacePage::clear()
-		{
-			for ( PageComponentsVector::iterator it = _components.begin(); it != _components.end(); ++it )
-				delete it->second;
-			_components.clear();
-		}
-
 		void InterfacePage::parse( const std::string& text )
 		{
+			int counter = 0;
 			size_t start_pos;
 			size_t end_pos;
 			std::string last_label = "";
@@ -66,11 +66,11 @@ namespace synthese
 				for (end_pos = start_pos; end_pos < text.size() && text[end_pos] != '\n'; ++end_pos);
 
 				std::string line = text.substr(start_pos, end_pos - start_pos);
-				LibraryInterfaceElement* lie;
+				shared_ptr<LibraryInterfaceElement> lie;
 				try
 				{
-					lie = LibraryInterfaceElement::create(line, this);
-					if (lie == NULL)
+					lie = LibraryInterfaceElement::create(line, getRegisteredSharedPointer());
+					if (!lie.get())
 						continue;
 				}
 				// Jump interface elements with parse errors
@@ -79,32 +79,24 @@ namespace synthese
 					Log::GetInstance().warn("Interface page parsing error on " + line + "\n", e);
 					continue;
 				}
-				// Handle line labels
-				LineLabelInterfaceElement* llie = dynamic_cast<LineLabelInterfaceElement*>(lie);
-				if ( llie != NULL )
-				{
-					last_label = llie->getLabel();
-					delete lie;
-					continue;
-				}
+
 				// Jump over a comment
-				if (dynamic_cast<CommentInterfaceElement*>(lie) != NULL)
-				{
-					delete lie;
+				if (dynamic_pointer_cast<CommentInterfaceElement, LibraryInterfaceElement>(lie).get())
 					continue;
-				}
+
+				lie->setKey(counter++);
+
 				// Store other types of interface elements
-				_components.push_back( make_pair( last_label, lie ));
-				last_label = "";
+				_components.add(lie);
 			}
 		}
 
-		void InterfacePage::setInterface( const Interface* value )
+		void InterfacePage::setInterface(shared_ptr<const Interface> value )
 		{
 			_interface = value;
 		}
 
-		const Interface* InterfacePage::getInterface() const
+		shared_ptr<const Interface> InterfacePage::getInterface() const
 		{
 			return _interface;
 		}

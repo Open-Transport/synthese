@@ -50,12 +50,12 @@ private:
 
     const BikeComplyer* _parent;
 
-    BikeCompliance* _bikeCompliance;
+    const BikeCompliance* _bikeCompliance;
 
 protected:
 
     BikeComplyer (const BikeComplyer* parent, 
-		  BikeCompliance* bikeCompliance = 0);
+		  const BikeCompliance* bikeCompliance = 0);
 
 public:
 
@@ -65,7 +65,7 @@ public:
     //! @name Getters/Setters
     //@{
     const BikeCompliance* getBikeCompliance () const;
-    void setBikeCompliance (BikeCompliance* bikeCompliance);
+    void setBikeCompliance (const BikeCompliance* bikeCompliance);
 	void	setParent(BikeComplyer* parent);
     //@}
 

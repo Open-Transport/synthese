@@ -39,9 +39,6 @@ namespace synthese
 			@return true : interrupts the current execution.
 			*/
 			virtual bool	_runBeforeDisplayIfNoSession(std::ostream& stream);
-
-		public:
-			RequestWithInterfaceAndRequiredSession();
 		};
 	}
 }

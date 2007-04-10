@@ -171,7 +171,14 @@ namespace synthese
 		class VinciBikeRentalModule : public util::ModuleClass
 		{
 		private:
-			static boost::shared_ptr<accounts::Account>	_freeLockRent;
+			static boost::shared_ptr<accounts::Account>		_freeLockRent;
+			static boost::shared_ptr<security::User>		_vinciUser;
+			static boost::shared_ptr<security::Profile>		_adminProfile;
+			static boost::shared_ptr<security::Profile>		_operatorProfile;
+			static boost::shared_ptr<security::Profile>		_vinciProfile;
+			static boost::shared_ptr<security::Profile>		_vinciCustomerProfile;
+			static boost::shared_ptr<accounts::Currency>	_euroCurrency;
+
 
 			static const std::string VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE;
 
@@ -232,12 +239,13 @@ namespace synthese
 				/** Customer profile getter.
 					@warning the returned profile must be deallocated after use to avoid memory leaks
 				*/
-				static security::Profile* getCustomerProfile();
-				static security::User* getVinciUser();
-				static accounts::Currency* getEuroCurrency();
-				static accounts::Account* getAccount(const std::string& code);
+				static boost::shared_ptr<const security::Profile>	getCustomerProfile();
+				static boost::shared_ptr<const security::User>		getVinciUser();
+				static boost::shared_ptr<const accounts::Account>	getFreeLockRentServiceAccount();
+				static boost::shared_ptr<const accounts::Currency>	getEuroCurrency();
+				
+				static boost::shared_ptr<accounts::Account> getAccount(const std::string& code);
 
-				static accounts::Account*	getFreeLockRentServiceAccount();
 			//@}
 		};
 	}

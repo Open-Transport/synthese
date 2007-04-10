@@ -27,19 +27,14 @@
 
 #include "30_server/Request.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace server;
 
 	namespace interfaces
 	{
-
-
-		RequestWithInterfaceAndRequiredSession::RequestWithInterfaceAndRequiredSession()
-			: RequestWithInterface()
-		{
-
-		}
 
 		bool RequestWithInterfaceAndRequiredSession::_runBeforeDisplayIfNoSession( std::ostream& stream )
 		{
@@ -51,7 +46,7 @@ namespace synthese
 			{
 				try
 				{
-					const InterfacePage* page = _interface->getPage(_interface->getNoSessionDefaultPageCode());
+					shared_ptr<const InterfacePage> page = _interface->getPage(_interface->getNoSessionDefaultPageCode());
 					ParametersVector pv;
 					VariablesMap vm;
 					page->display(stream, pv, vm, NULL, _request);

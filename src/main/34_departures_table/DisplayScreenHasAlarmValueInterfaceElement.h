@@ -36,7 +36,7 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Value Interface Element : Test of presence of an alarm on the display screen.
-			@ingroup m34
+			@ingroup m34Values refValues
 
 			Output : The level of the present alarm, ALARM_LEVEL_NO_ALARM if no alarm.
 		*/
@@ -45,7 +45,11 @@ namespace synthese
 		private:
 
 		public:
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string getValue(
+				const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 
 			/** Parser.
 			@param text Optional parameter

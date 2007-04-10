@@ -36,7 +36,8 @@ namespace synthese
 
 	namespace departurestable
 	{
-		/** interface element.
+		/** Departure time content cell interface element.
+			@ingroup m34Library refLibrary
 		*/
 		class DeparturesTableTimeContentInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
@@ -44,17 +45,18 @@ namespace synthese
 			
 
 		private:
-			interfaces::ValueInterfaceElement* _zeroVIE;
-			interfaces::ValueInterfaceElement* _beforeIfNext;
-			interfaces::ValueInterfaceElement* _afterIfNext;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _zeroVIE;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _beforeIfNext;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _afterIfNext;
 
 		public:
-			DeparturesTableTimeContentInterfaceElement();
-			~DeparturesTableTimeContentInterfaceElement();
-
 			void storeParameters(interfaces::ValueElementList& vel);
-			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
-			const std::string getLabel(const interfaces::ParametersVector& parameters) const;
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 		};
 
 	}

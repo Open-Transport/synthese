@@ -21,7 +21,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
 #include "01_util/Conversion.h"
 
 #include "02_db/DBEmptyResultException.h"
@@ -49,6 +48,7 @@
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -98,7 +98,7 @@ namespace synthese
 				{
 					_rate = VinciRateTableSync::get(Conversion::ToLongLong(it->second));
 				}
-				catch (DBEmptyResultException	e)
+				catch (DBEmptyResultException<VinciRate> e)
 				{
 					throw ActionException("Specified rate not found");
 				}
@@ -107,10 +107,10 @@ namespace synthese
 				it=map.find(PARAMETER_BIKE_ID);
 				if (it == map.end())
 					throw ActionException("Bike not specified");
-				vector<VinciBike*> bikes = VinciBikeTableSync::search(it->second, "");
+				vector<shared_ptr<VinciBike> > bikes = VinciBikeTableSync::search(it->second, "");
 				if (bikes.empty())
 					throw ActionException("Vélo introuvable");
-				vector<VinciBike*>::iterator itb = bikes.begin();
+				vector<shared_ptr<VinciBike> >::iterator itb = bikes.begin();
 				_bike = *itb;
 
 				// Contract
@@ -121,7 +121,7 @@ namespace synthese
 				{
 					_contract = VinciContractTableSync::get(Conversion::ToLongLong(it->second));
 				}
-				catch(DBEmptyResultException e)
+				catch(DBEmptyResultException<VinciContract> e)
 				{
 					throw ActionException("Specified contract not found");
 				}
@@ -135,12 +135,9 @@ namespace synthese
 				if (!it->second.empty())
 				{
 					_lockMarkedNumber = it->second;
-					vector<VinciAntivol*> locks = VinciAntivolTableSync::search(_lockMarkedNumber);
+					vector<shared_ptr<VinciAntivol> > locks = VinciAntivolTableSync::search(_lockMarkedNumber);
 					if (!locks.empty())
-					{
-						vector<VinciAntivol*>::iterator itl = locks.begin();
-						_lock = *itl;
-					}
+						_lock = locks.front();
 				}
 
 				// Date
@@ -165,67 +162,50 @@ namespace synthese
 			DateTime unknownDate(TIME_UNKNOWN);
 
 			// Lock creation if necessary
-			if (_lock == NULL)
+			if (!_lock.get())
 			{
-				_lock = new VinciAntivol;
+				_lock.reset(new VinciAntivol);
 				_lock->setMarkedNumber(_lockMarkedNumber);
-				VinciAntivolTableSync::save(_lock);
+				VinciAntivolTableSync::save(_lock.get());
 			}
 
 			// Transaction
-			Transaction* transaction = new Transaction;
+			shared_ptr<Transaction> transaction(new Transaction);
 			transaction->setStartDateTime(_date);
 			transaction->setEndDateTime(unknownDate);
 			transaction->setLeftUserId(_contract->getUserId());
-			TransactionTableSync::save(transaction);
+			TransactionTableSync::save(transaction.get());
 
 			// Part 1 : service
-			TransactionPart* transactionPart = new TransactionPart;
+			shared_ptr<TransactionPart> transactionPart(new TransactionPart);
 			transactionPart->setTransactionId(transaction->getKey());
 			transactionPart->setAccountId(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE)->getKey());
 			transactionPart->setLeftCurrencyAmount(_amount);
 			transactionPart->setRightCurrencyAmount(_amount);
 			transactionPart->setRateId(_rate->getKey());
 			transactionPart->setTradedObjectId(Conversion::ToString(_bike->getKey()));
-			TransactionPartTableSync::save(transactionPart);
+			TransactionPartTableSync::save(transactionPart.get());
 
 			// Part 2 : customer
-			TransactionPart* changeTransactionPart = new TransactionPart;
+			shared_ptr<TransactionPart> changeTransactionPart(new TransactionPart);
 			changeTransactionPart->setTransactionId(transaction->getKey());
 			changeTransactionPart->setAccountId(VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE)->getKey());
 			changeTransactionPart->setLeftCurrencyAmount(-_amount);
 			changeTransactionPart->setRightCurrencyAmount(-_amount);
-			TransactionPartTableSync::save(changeTransactionPart);
+			TransactionPartTableSync::save(changeTransactionPart.get());
 
 			// Part 3 : bike stock lower
 
 			// Part 4 : rented bike higher
 
 			// Part 5 : Lock rent
-			TransactionPart* lockTransactionPart = new TransactionPart;
+			shared_ptr<TransactionPart> lockTransactionPart(new TransactionPart);
 			lockTransactionPart->setTransactionId(transaction->getKey());
 			lockTransactionPart->setAccountId(VinciBikeRentalModule::getFreeLockRentServiceAccount()->getKey());
 			lockTransactionPart->setLeftCurrencyAmount(0);
 			lockTransactionPart->setRightCurrencyAmount(0);
 			lockTransactionPart->setTradedObjectId(Conversion::ToString(_lock->getKey()));
-			TransactionPartTableSync::save(lockTransactionPart);
-		}
-
-		RentABikeAction::RentABikeAction()
-			: _rate(NULL)
-			, _bike(NULL)
-			, _contract(NULL)
-			, _lock(NULL)
-		{
-			
-		}
-
-		RentABikeAction::~RentABikeAction()
-		{
-			delete _rate;
-			delete _bike;
-			delete _contract;
-			delete _lock;
+			TransactionPartTableSync::save(lockTransactionPart.get());
 		}
 	}
 }

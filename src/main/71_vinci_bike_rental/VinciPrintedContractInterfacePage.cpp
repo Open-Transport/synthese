@@ -43,6 +43,7 @@
 #include "VinciSiteTableSync.h"
 #include "VinciRateTableSync.h"
 
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -57,26 +58,19 @@ namespace synthese
 
 		void VinciPrintedContractInterfacePage::display(std::ostream& stream
 			, VariablesMap& vars
-			, const VinciContract* contract
+			, shared_ptr<const VinciContract> contract
 			, const server::Request* request /*= NULL*/) const
 		{
-			User* user = UserTableSync::get(contract->getUserId());
-			VinciSite* site = NULL;
-			try
-			{
-				site = contract->getSiteId() ? VinciSiteTableSync::get(contract->getSiteId()) : NULL;
-			}
-			catch (DBEmptyResultException e)
-			{				
-			}
-			VinciBike*			bike = contract->getCurrentBike();
-			TransactionPart*	tp = contract->getCurrentRentTransactionPart();
-			Transaction*		t = NULL;
-			VinciAntivol*		antivol = NULL;
-			VinciRate*			rate = NULL;
-			DateTime			endDate(Date::UNKNOWN_DATE, Hour());
+			shared_ptr<User>			user = UserTableSync::get(contract->getUserId());
+			shared_ptr<VinciSite>		site = contract->getSite();
+			shared_ptr<VinciBike>		bike = contract->getCurrentBike();
+			shared_ptr<TransactionPart>	tp = contract->getCurrentRentTransactionPart();
+			shared_ptr<Transaction>		t;
+			shared_ptr<VinciAntivol>	antivol;
+			shared_ptr<VinciRate>		rate;
+			DateTime					endDate(Date::UNKNOWN_DATE, Hour());
 
-			if (tp != NULL)
+			if (!tp.get())
 			{
 				t = TransactionTableSync::get(tp->getTransactionId());
 				antivol = contract->getCurrentLock();
@@ -87,9 +81,9 @@ namespace synthese
 				}
 			}
 
-			TransactionPart*	guarantee = contract->getCurrentGuaranteeTransactionPart();
-			Account*			guaranteeAccount = NULL;
-			if (guarantee != NULL)
+			shared_ptr<TransactionPart>	guarantee = contract->getCurrentGuaranteeTransactionPart();
+			shared_ptr<Account>			guaranteeAccount;
+			if (!guarantee.get())
 			{
 				guaranteeAccount = AccountTableSync::get(guarantee->getAccountId());
 			}

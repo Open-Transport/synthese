@@ -2,6 +2,8 @@
 #ifndef SYNTHESE_AddGuaranteeAction_H__
 #define SYNTHESE_AddGuaranteeAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "04_time/DateTime.h"
 
 #include "30_server/Action.h"
@@ -29,10 +31,10 @@ namespace synthese
 			static const std::string PARAMETER_ACCOUNT_ID;
 
 		private:
-			double				_amount;
-			VinciContract*		_contract;
-			accounts::Account*	_account;
-			time::DateTime		_date;
+			double									_amount;
+			boost::shared_ptr<VinciContract>		_contract;
+			boost::shared_ptr<accounts::Account>	_account;
+			time::DateTime							_date;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -49,9 +51,6 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
-
-			VinciAddGuaranteeAction();
-			~VinciAddGuaranteeAction();
 		};
 	}
 }

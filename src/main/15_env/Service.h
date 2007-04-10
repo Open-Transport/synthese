@@ -80,8 +80,12 @@ namespace synthese
 			Path*			_path;
 			time::Schedule	_departureSchedule; //!< Service departure schedule (from the origin).
 			time::Schedule	_arrivalSchedule;
-		    
+
 		public:
+			//! \name Update methods
+			//@{
+
+			//@}
 
 			Service (int serviceNumber,
 				Path* path,
@@ -92,7 +96,8 @@ namespace synthese
 		    
 			//! @name Getters
 			//@{
-				Path*			getPath () const;
+				const Path*			getPath () const;
+				Path*			getPath ();
 				int				getServiceNumber () const;
 				Calendar&		getCalendar (); // MJ constness pb
 

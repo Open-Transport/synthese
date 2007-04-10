@@ -42,7 +42,31 @@ namespace synthese
 		class Line;
 	}
 
-	/** @defgroup m34 34 Arrival/departures tables service module.
+	/**	@defgroup m34Actions 34 Actions
+		@ingroup m34
+
+		@defgroup m34Pages 34 Pages
+		@ingroup m34
+
+		@defgroup m34Values 34 Values
+		@ingroup m34
+
+		@defgroup m34Functions 34 Functions
+		@ingroup m34
+
+		@defgroup m34LS 34 Table synchronizers
+		@ingroup m34
+
+		@defgroup m34Admin 34 Administration pages
+		@ingroup m34
+
+		@defgroup m34Rights 34 Rights
+		@ingroup m34
+
+		@defgroup m34Logs 34 DB Logs
+		@ingroup m34
+
+		@defgroup m34 34 Arrival/departures tables service module.
 
 		@subsection m34_target_structure Architecture fonctionnelle cible
 
@@ -78,7 +102,7 @@ namespace synthese
 
 			static std::vector<std::pair<uid, std::string> >	getDisplayTypeLabels(bool withAll = false);
 			static std::vector<std::pair<uid, std::string> >	getPlacesWithBroadcastPointsLabels(bool withAll = false);
-			static std::vector<std::pair<uid, std::string> >	getBroadcastPointLabels(const env::ConnectionPlace* place, bool withAll = false);
+			static std::vector<std::pair<uid, std::string> >	getBroadcastPointLabels(boost::shared_ptr<const env::ConnectionPlace> place, bool withAll = false);
 			static std::vector<std::pair<uid, std::string> >	getCommercialLineWithBroadcastLabels(bool withAll = false);
 		};
 	}

@@ -33,6 +33,7 @@
 #include "VinciAntivolTableSync.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -80,28 +81,19 @@ namespace synthese
 			addTableColumn(COL_MARKED_NUMBER, "TEXT", true);
 		}
 
-		void VinciAntivolTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void VinciAntivolTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-			}
 		}
 		
 		void VinciAntivolTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-			}
 		}
 
 		void VinciAntivolTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-			}
 		}
 
-		std::vector<VinciAntivol*> VinciAntivolTableSync::search(const std::string markedNumber, int first /*= 0*/, int number /*= 0*/ )
+		vector<shared_ptr<VinciAntivol> > VinciAntivolTableSync::search(const std::string markedNumber, int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -119,10 +111,10 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<VinciAntivol*> objects;
+				vector<shared_ptr<VinciAntivol> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					VinciAntivol* object = new VinciAntivol();
+					shared_ptr<VinciAntivol> object(new VinciAntivol());
 					load(object, result, i);
 					objects.push_back(object);
 				}

@@ -24,6 +24,8 @@
 #ifndef SYNTHESE_VinciBikeAdminInterfaceElement_H__
 #define SYNTHESE_VinciBikeAdminInterfaceElement_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
@@ -37,7 +39,7 @@ namespace synthese
 		*/
 		class VinciBikeAdminInterfaceElement : public admin::AdminInterfaceElement
 		{
-			VinciBike* _bike;
+			boost::shared_ptr<VinciBike> _bike;
 
 		public:
 			VinciBikeAdminInterfaceElement ();

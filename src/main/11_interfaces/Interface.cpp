@@ -26,9 +26,12 @@
 
 #include <string>
 
+using namespace boost;
+using namespace std;
+
 namespace synthese
 {
-	using namespace std;
+	using namespace time;
 
 	namespace interfaces
 	{
@@ -42,12 +45,7 @@ namespace synthese
 		}
 
 
-		Interface::~Interface()
-		{
-		}
-
-
-		InterfacePage* const Interface::getPage(const std::string& index) const
+		shared_ptr<const InterfacePage> Interface::getPage(const std::string& index) const
 		{
 			PagesMap::const_iterator it = _pages.find(index);
 			if (it == _pages.end())
@@ -86,15 +84,15 @@ namespace synthese
 		\author Hugues Romain
 		\date 2005
 		*/
-		const synthese::time::HourPeriod* Interface::getPeriod( size_t __Index ) const
+		shared_ptr<const HourPeriod> Interface::getPeriod( size_t index ) const
 		{
-			return ( __Index < _hourPeriods.size() ) ? _hourPeriods.at( __Index ) : NULL;
+			return ( index < _hourPeriods.size() ) ? _hourPeriods.at(index ) : shared_ptr<const HourPeriod>();
 		}
 
 
-		void Interface::AddPeriode( synthese::time::HourPeriod* __Element )
+		void Interface::AddPeriode(shared_ptr<HourPeriod> element )
 		{
-			_hourPeriods.push_back( __Element );
+			_hourPeriods.push_back(element );
 		}
 
 
@@ -146,9 +144,9 @@ namespace synthese
 			return it == _weekDayNames.end() ? NULL : it->second;
 		}
 
-		void Interface::addPage(const string& code, InterfacePage* page )
+		void Interface::addPage(const string& code, shared_ptr<InterfacePage> page )
 		{
-			page->setInterface(this);
+			page->setInterface(getRegisteredSharedPointer());
 			_pages.insert(make_pair( code, page ));
 		}
 
@@ -158,7 +156,6 @@ namespace synthese
 			PagesMap::const_iterator it = _pages.find(page_code);
 			if (it != _pages.end())
 			{
-				delete it->second;
 				_pages.erase( page_code );
 			}
 		}

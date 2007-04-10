@@ -25,6 +25,8 @@
 
 #include <vector>
 
+#include "05_html/ResultHTMLTable.h"
+
 #include "32_admin/AdminInterfaceElement.h"
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
@@ -79,21 +81,18 @@ namespace synthese
 			std::string				_placeName;
 			uid						_lineUId;
 			BroadcastPointsPresence	_displayNumber;
-			int						_number;
-			int						_first;
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
+			html::ResultHTMLTable::ResultParameters	_resultParameters;
 
-			std::vector<ConnectionPlaceWithBroadcastPoint> _searchResult;
+			std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > _searchResult;
 
 		public:
 			static const std::string PARAMETER_CITY_NAME;
 			static const std::string PARAMETER_PLACE_NAME;
 			static const std::string PARAMETER_LINE_ID;
 			static const std::string PARAMETER_DISPLAY_NUMBER;
-			static const std::string PARAMETER_NUMBER;
-			static const std::string PARAMETER_FIRST;
 
 			BroadcastPointsAdmin();
-			~BroadcastPointsAdmin();
 			
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.

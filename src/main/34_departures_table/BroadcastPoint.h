@@ -54,21 +54,21 @@ namespace synthese
 		{
 		private:
 			std::string	_name;
-			env::ConnectionPlace*	_place;
-			env::PhysicalStop*	_physicalStop;	//!< Indicates that the broadcastpoint corresponds to a real physical stop
+			boost::shared_ptr<const env::ConnectionPlace>	_place;
+			boost::shared_ptr<const env::PhysicalStop>	_physicalStop;	//!< Indicates that the broadcastpoint corresponds to a real physical stop
 
-			std::vector<BroadcastPointAlarmBroadcast*>	_alarms;
+			std::vector<boost::shared_ptr<BroadcastPointAlarmBroadcast> >	_alarms;
 
 		public:
 			BroadcastPoint();
 
 			void setName(const std::string& name);
-			void setConnectionPlace(env::ConnectionPlace* place);
-			void setPhysicalStop(env::PhysicalStop* physicalStop);
+			void setConnectionPlace(boost::shared_ptr<const env::ConnectionPlace> place);
+			void setPhysicalStop(boost::shared_ptr<const env::PhysicalStop> physicalStop);
 
 			const std::string getName() const;
-			env::ConnectionPlace* getConnectionPlace() const;
-			env::PhysicalStop* getPhysicalStop() const;
+			boost::shared_ptr<const env::ConnectionPlace> getConnectionPlace() const;
+			boost::shared_ptr<const env::PhysicalStop> getPhysicalStop() const;
 
 			std::string	getFullName()	const;
 		};

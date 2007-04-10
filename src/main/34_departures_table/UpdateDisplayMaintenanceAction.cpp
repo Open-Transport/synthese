@@ -29,10 +29,12 @@
 #include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace db;
 	
 	namespace departurestable
 	{
@@ -56,7 +58,7 @@ namespace synthese
 				it = map.find(Request::PARAMETER_OBJECT_ID);
 				if (it == map.end())
 					throw ActionException("Display screen not specified");
-				_displayScreen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
+				_displayScreen = DisplayScreenTableSync::get(Conversion::ToLongLong(it->second));
 
 				it = map.find(PARAMETER_CONTROLS);
 				if (it == map.end())
@@ -73,23 +75,18 @@ namespace synthese
 					throw ActionException("Maintenance message not specified");
 				_message = it->second;
 			}
-			catch (DisplayScreen::RegistryKeyException e)
+			catch (DBEmptyResultException<DisplayScreen>)
 			{
 				throw ActionException("Specified display screen not found");
 			}
 		}
-
-		UpdateDisplayMaintenanceAction::UpdateDisplayMaintenanceAction()
-			: Action()
-			, _displayScreen(NULL)
-		{}
 
 		void UpdateDisplayMaintenanceAction::run()
 		{
 			_displayScreen->setMaintenanceChecksPerDay(_controls);
 			_displayScreen->setMaintenanceIsOnline(_online);
 			_displayScreen->setMaintenanceMessage(_message);
-			DisplayScreenTableSync::save(_displayScreen);
+			DisplayScreenTableSync::save(_displayScreen.get());
 		}
 	}
 }

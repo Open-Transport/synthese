@@ -39,6 +39,7 @@
 #include "34_departures_table/DeparturesTableLineContentInterfaceElement.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -48,21 +49,6 @@ namespace synthese
 
 	namespace departurestable
 	{
-		DeparturesTableLineContentInterfaceElement::DeparturesTableLineContentInterfaceElement()
-			:			_htmlStartLine(NULL)
-			, _htmlEndLine(NULL)
-			, _cellWidth(NULL)
-			, _cellHeight(NULL)
-		{		}
-
-		DeparturesTableLineContentInterfaceElement::~DeparturesTableLineContentInterfaceElement()
-		{
-			delete _htmlStartLine;
-			delete _htmlEndLine;
-			delete _cellWidth;
-			delete _cellHeight;
-		}
-
 		void DeparturesTableLineContentInterfaceElement::storeParameters( ValueElementList& vel )
 		{
 			if (vel.size() < 4)
@@ -74,11 +60,16 @@ namespace synthese
 			_cellHeight = vel.front();
 		}
 
-		string DeparturesTableLineContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string DeparturesTableLineContentInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
+			, VariablesMap& variables
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
 			const Line* line = ((const ArrivalDepartureRow*) object)->first.linestop->getLine();
 
-			const LineMarkerInterfacePage* const page = _page->getInterface()->getPage<LineMarkerInterfacePage>();
+			shared_ptr<const LineMarkerInterfacePage> page = _page->getInterface()->getPage<LineMarkerInterfacePage>();
 			page->display(stream
 				, variables
 				, _htmlStartLine->getValue(parameters, variables, object, request)

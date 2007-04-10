@@ -23,6 +23,8 @@
 #include "12_security/User.h"
 #include "12_security/UserException.h"
 
+using boost::shared_ptr;
+
 namespace synthese
 {
 	using namespace util;
@@ -33,11 +35,10 @@ namespace synthese
 			: Registrable<uid, User>(id)
 			, _cityId(0)
 			, _isConnectionAllowed(true)
-			, _profile(NULL)
 		{
 		}
 
-		void User::setProfile( const Profile* profile )
+		void User::setProfile(shared_ptr<const Profile> profile )
 		{
 			_profile = profile;
 		}
@@ -62,7 +63,7 @@ namespace synthese
 			_surname = surname;
 		}
 
-		const Profile* User::getProfile() const
+		shared_ptr<const Profile> User::getProfile() const
 		{
 			return _profile;
 		}

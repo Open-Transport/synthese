@@ -31,17 +31,26 @@ namespace synthese
 	{
 		class ValueInterfaceElement;
 
+		/** Print interface library element.
+			
+			Usage :
+			@code print <content> @endcode
+
+			@ingroup m11Library refLibrary
+		*/
 		class PrintInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
-			ValueInterfaceElement* _toBePrinted;
+			boost::shared_ptr<ValueInterfaceElement> _toBePrinted;
 
 		public:
 			/** Parameters parser.
 				The parser copies the ValueElementList as is.
 			*/
 			void storeParameters(ValueElementList& vel);
-			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
-			~PrintInterfaceElement();
+			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 		};
 	}
 }

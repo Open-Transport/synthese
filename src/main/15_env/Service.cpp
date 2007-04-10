@@ -78,11 +78,16 @@ namespace synthese
 
 
 		Path* 
-		Service::getPath () const
+		Service::getPath ()
 		{
 			return _path;
 		}
 
+		const Path* 
+			Service::getPath () const
+		{
+			return _path;
+		}
 
 
 		Calendar&

@@ -26,6 +26,7 @@
 #include "15_env/EnvModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -73,17 +74,6 @@ namespace synthese
 			return _physicalStops;
 		}
 
-		EnvModule::~EnvModule()
-		{
-			_physicalStops.clear ();
-			_connectionPlaces.clear ();
-			_cities.clear ();
-			_commercialLines.clear();
-			_lineStops.clear ();
-			_scheduledServices.clear ();
-			_continuousServices.clear ();
-		}
-
 		CommercialLine::Registry& EnvModule::getCommercialLines()
 		{
 			return _commercialLines;
@@ -125,12 +115,11 @@ namespace synthese
 		}
 
 
-		Path* 
-			EnvModule::fetchPath (const uid& id)
+		shared_ptr<Path> EnvModule::fetchPath (const uid& id)
 		{
-			if (_lines.contains (id)) return _lines.get (id);
+			if (_lines.contains (id)) return _lines.getUpdateable (id);
 	//		if (_roads.contains (id)) return _roads.get (id);
-			return 0;
+			return shared_ptr<Path>();
 		}
 
 		std::vector<pair<uid, std::string> > EnvModule::getCommercialLineLabels(bool withAll)
@@ -154,11 +143,11 @@ namespace synthese
 		}
 
 
-		Service* EnvModule::fetchService (const uid& id)
+		shared_ptr<Service> EnvModule::fetchService (const uid& id)
 		{
-			if (_scheduledServices.contains (id)) return _scheduledServices.get (id);
-			if (_continuousServices.contains (id)) return _continuousServices.get (id);
-			return 0;
+			if (_scheduledServices.contains (id)) return _scheduledServices.getUpdateable (id);
+			if (_continuousServices.contains (id)) return _continuousServices.getUpdateable (id);
+			return shared_ptr<Service>();
 		}
 
 		ContinuousService::Registry& EnvModule::getContinuousServices()

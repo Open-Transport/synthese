@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_DeleteProfileAction_H__
 #define SYNTHESE_DeleteProfileAction_H__
 
+#include <boost/shared_ptr.hpp>
+
 #include "30_server/Action.h"
 
 namespace synthese
@@ -39,7 +41,7 @@ namespace synthese
 		public:
 
 		private:
-			Profile*	_profile;
+			boost::shared_ptr<const Profile>	_profile;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -52,8 +54,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			DeleteProfileAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

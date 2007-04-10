@@ -25,6 +25,8 @@
 #include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminInterfacePage.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace util;
@@ -32,13 +34,21 @@ namespace synthese
 
 	namespace admin
 	{
-		void AdminInterfacePage::display( std::ostream& stream , const AdminInterfaceElement* page , const uid objectId , const server::Request* request /*= NULL */ ) const
+		void AdminInterfacePage::display(
+			std::ostream& stream
+			, const boost::shared_ptr<const AdminInterfaceElement>* page
+			, const uid objectId , const server::Request* request /*= NULL */ ) const
 		{
 			ParametersVector parameters;
 			parameters.push_back(Conversion::ToString(objectId));
 			VariablesMap vars;
 
-			InterfacePage::display(stream, parameters, vars, (const void*) page, request);
+			InterfacePage::display(
+				stream
+				, parameters
+				, vars
+				, (const void*) page
+				, request);
 		}
 	}
 }

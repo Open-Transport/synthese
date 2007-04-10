@@ -39,6 +39,7 @@
 #include "12_security/Profile.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace synthese
 {
@@ -112,18 +113,18 @@ namespace synthese
 			addTableColumn(TABLE_COL_RIGHTS_STRING, "TEXT", true);
 		}
 
-		void ProfileTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ProfileTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i = 0; i < rows.getNbRows(); ++i)
 			{
 				if (SecurityModule::getProfiles().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
 				{
-					load(SecurityModule::getProfiles().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))), rows, i);
+					load(SecurityModule::getProfiles().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
 				}
 				else
 				{
-					Profile* profile = new Profile(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-					load(profile, rows, i);
+					shared_ptr<Profile> profile(new Profile(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))));
+					load(profile.get(), rows, i);
 					SecurityModule::getProfiles().add(profile);
 				}
 			}
@@ -131,16 +132,30 @@ namespace synthese
 
 		void ProfileTableSync::rowsUpdated( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
-			/// @todo Implementation
+			for (int i = 0; i < rows.getNbRows(); ++i)
+			{
+				if (SecurityModule::getProfiles().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				{
+					load(SecurityModule::getProfiles().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
+				}
+			}
 		}
 
 		void ProfileTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
-			/// @todo Implementation
+			for (int i = 0; i < rows.getNbRows(); ++i)
+			{
+				if (SecurityModule::getProfiles().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				{
+					SecurityModule::getProfiles().remove(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+				}
+			}
 		}
 
-		std::vector<Profile*> ProfileTableSync::search(std::string name, string right, int first /*= 0*/, int number /*= 0*/ )
-		{
+		std::vector<shared_ptr<Profile> > ProfileTableSync::search(std::string name, string right, int first /*= 0*/, int number /*= 0*/ 
+			, bool orderByName
+			, bool raisingOrder	
+		){
 			/** @todo Handle right filter */
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -148,6 +163,8 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME					
 				<< " WHERE " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			if (orderByName)
+				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -156,11 +173,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<Profile*> profiles;
+				vector<shared_ptr<Profile> > profiles;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					Profile* profile = new Profile;
-					load(profile, result, i);
+					shared_ptr<Profile> profile(new Profile);
+					load(profile.get(), result, i);
 					profiles.push_back(profile);
 				}
 				return profiles;
@@ -171,17 +188,17 @@ namespace synthese
 			}
 		}
 
-		std::vector<Profile*> ProfileTableSync::search( Profile* parent , int first /*= 0*/, int number /*= -1*/ )
+		std::vector<shared_ptr<Profile> > ProfileTableSync::search(
+			shared_ptr<const Profile> parent
+			, int first /*= 0*/, int number /*= -1*/ )
 		{
-			if (parent == NULL)
-				throw DBEmptyResultException("Null parent");
-
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME					
-				<< " WHERE " << TABLE_COL_PARENT_ID << "=" << Conversion::ToString(parent->getKey());
+				<< " WHERE " 
+				<< TABLE_COL_PARENT_ID << "=" << (parent.get() ? Conversion::ToString(parent->getKey()) : "0");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -190,11 +207,11 @@ namespace synthese
 			try
 			{
 				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<Profile*> profiles;
+				vector<shared_ptr<Profile> > profiles;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					Profile* profile = new Profile;
-					load(profile, result, i);
+					shared_ptr<Profile> profile(new Profile);
+					load(profile.get(), result, i);
 					profiles.push_back(profile);
 				}
 				return profiles;
@@ -204,13 +221,13 @@ namespace synthese
 				throw UserTableSyncException(e.getMessage());
 			}
 		}
-		std::string ProfileTableSync::getRightsString( const Profile* p)
+		std::string ProfileTableSync::getRightsString(const Profile* p)
 		{
 			stringstream s;
 			
 			for (Profile::RightsVector::const_iterator it = p->getRights().begin(); it != p->getRights().end(); ++it)
 			{
-				Right* right = it->second;
+				shared_ptr<const Right> right = it->second;
 				if (it != p->getRights().begin())
 					s	<< RIGHT_SEPARATOR;
 				s	<< right->getFactoryKey() 
@@ -240,7 +257,7 @@ namespace synthese
 
 				try
 				{
-					Right* right = Factory<Right>::create(*it);
+					shared_ptr<Right> right = Factory<Right>::create(*it);
 
 					++it;
 					right->setParameter(*it);

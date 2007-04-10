@@ -37,23 +37,25 @@ namespace synthese
 	namespace departurestable
 	{
 
-		/** interface element.
+		/** Line content interface element.
+			@ingroup m34Library refLibrary
 		*/
 		class DeparturesTableLineContentInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 		private:
-			interfaces::ValueInterfaceElement*	_htmlStartLine;
-			interfaces::ValueInterfaceElement*	_htmlEndLine;
-			interfaces::ValueInterfaceElement*	_cellWidth;
-			interfaces::ValueInterfaceElement*	_cellHeight;
+			boost::shared_ptr<interfaces::ValueInterfaceElement>	_htmlStartLine;
+			boost::shared_ptr<interfaces::ValueInterfaceElement>	_htmlEndLine;
+			boost::shared_ptr<interfaces::ValueInterfaceElement>	_cellWidth;
+			boost::shared_ptr<interfaces::ValueInterfaceElement>	_cellHeight;
 
 		public:
-			DeparturesTableLineContentInterfaceElement();
-			~DeparturesTableLineContentInterfaceElement();
-
 			void storeParameters(interfaces::ValueElementList& vel);
-			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
-			const std::string getLabel(const interfaces::ParametersVector& parameters) const;
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL) const;
 		};
 
 	}

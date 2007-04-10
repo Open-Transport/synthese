@@ -23,15 +23,21 @@
 #ifndef SYNTHESE_DBLogEntryTableSync_H__
 #define SYNTHESE_DBLogEntryTableSync_H__
 
-
 #include <vector>
 #include <string>
 #include <iostream>
+
+#include <boost/shared_ptr.hpp>
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace dblog
 	{
 		class DBLog;
@@ -42,7 +48,7 @@ namespace synthese
 		class DBLogEntryTableSync : public db::SQLiteTableSyncTemplate<DBLogEntry>
 		{
 		public:
-			static const char* CONTENT_SEPARATOR;
+			static const std::string CONTENT_SEPARATOR;
 			static const std::string COL_LOG_KEY;
 			static const std::string COL_DATE;
 			static const std::string COL_USER_ID;
@@ -50,7 +56,6 @@ namespace synthese
 			static const std::string COL_CONTENT;
 
 			DBLogEntryTableSync();
-			~DBLogEntryTableSync();
 
 
 			/** DBLog search.
@@ -61,9 +66,20 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<DBLogEntry*> search(
-				// other search parameters ,
-				int first = 0, int number = 0);
+			static std::vector<boost::shared_ptr<DBLogEntry> > search(
+				const std::string& logKey
+				, const time::DateTime& startDate
+				, const time::DateTime& endDate
+				, const boost::shared_ptr<const security::User> user
+				, DBLogEntry::Level level
+				, const std::string& text
+				, int first = 0
+				, int number = 0
+				, bool orderByDate = true
+				, bool orderByUser = false
+				, bool orderByLevel = false
+				, bool raisingOrder = true
+				);
 
 
 		protected:
@@ -73,7 +89,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on DBLog creation.
 				This method updates the corresponding object in ram.

@@ -32,13 +32,11 @@ namespace synthese
 		{
 		}
 
-		std::string CommentInterfaceElement::display(std::ostream& stream, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		std::string CommentInterfaceElement::display(std::ostream& stream
+			, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables
+			, const void* rootObject /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			return "";
-		}
-
-		CommentInterfaceElement::~CommentInterfaceElement()
-		{
 		}
 	}
 }

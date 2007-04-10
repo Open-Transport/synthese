@@ -63,11 +63,6 @@ namespace synthese
 			}
 		}
 
-		DeleteAlarmAction::DeleteAlarmAction()
-			: Action()
-			, _alarm(NULL)
-		{}
-
 		void DeleteAlarmAction::run()
 		{
 			/// @todo Delete alarm broadcast list

@@ -26,7 +26,10 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		std::string StaticValueInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		std::string StaticValueInterfaceElement::getValue(
+			const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object, const server::Request* request) const
 		{
 			return _value;
 		}

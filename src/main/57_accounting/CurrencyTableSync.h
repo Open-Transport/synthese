@@ -23,10 +23,11 @@
 #ifndef SYNTHESE_CurrencyTableSync_H__
 #define SYNTHESE_CurrencyTableSync_H__
 
-
 #include <vector>
 #include <string>
 #include <iostream>
+
+#include <boost/shared_ptr.hpp>
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
@@ -47,7 +48,6 @@ namespace synthese
 			static const std::string TABLE_COL_SYMBOL;
 
 			CurrencyTableSync();
-			~CurrencyTableSync ();
 
 
 			/** Currency search.
@@ -58,7 +58,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<Currency*> search(
+			static std::vector<boost::shared_ptr<Currency> > search(
 				const std::string& name, const std::string& symbol
 				, int first = 0, int number = 0);
 
@@ -70,7 +70,7 @@ namespace synthese
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on user creation.
 			Updates the users objects in the opened sessions.

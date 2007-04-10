@@ -62,7 +62,7 @@ namespace synthese
 			std::string				_phone;
 			std::string				_email;
 			bool					_authorizedLogin;
-			Profile*				_profile;
+			boost::shared_ptr<const Profile>		_profile;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

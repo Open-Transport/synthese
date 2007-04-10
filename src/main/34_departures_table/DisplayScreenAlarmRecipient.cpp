@@ -46,6 +46,7 @@
 #include "34_departures_table/DisplayScreenTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -110,7 +111,7 @@ namespace synthese
 
 				for (vector<AlarmObjectLink<DisplayScreen> >::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
 				{
-					DisplayScreen* ds = dsit->getObject();
+					shared_ptr<DisplayScreen> ds = dsit->getObject();
 					usedDisplayScreens.insert(ds->getKey());
 					removeRequest.getFunction()->setParameter(AlarmRemoveLinkAction::PARAMETER_LINK_ID, Conversion::ToString(dsit->getKey()));
 					
@@ -121,8 +122,6 @@ namespace synthese
 
 					stream << t.col() << "<FONT face=\"Wingdings\" color=\"#00cc00\">l</FONT>"; // Bullet
 					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir retirer l'afficheur des destinataires du message ?");
-
-					delete ds;
 				}
 
 				stream << t.close();
@@ -151,17 +150,17 @@ namespace synthese
 			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, "Etat"));
 			v1.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Msg"));
 			v1.push_back(make_pair(string(), "Add"));
-			ResultHTMLTable t1(v1,searchRequest.getHTMLForm(), string(), true);
+			ResultHTMLTable t1(v1,searchRequest.getHTMLForm(), ResultHTMLTable::RequestParameters(), ResultHTMLTable::ResultParameters());
 
 			stream << "<p>Résultats de la recherche :</p>";
 
 			stream << t1.open();
 
-			vector<DisplayScreen*> result2 = DisplayScreenTableSync::search(searchUid, searchPlace, searchLine, searchType, searchState, searchMessage);
+			vector<boost::shared_ptr<DisplayScreen> > result2 = DisplayScreenTableSync::search(searchUid, searchPlace, searchLine, searchType, searchState, searchMessage);
 
-			for (vector<DisplayScreen*>::const_iterator it = result2.begin(); it != result2.end(); ++it)
+			for (vector<shared_ptr<DisplayScreen> >::const_iterator it = result2.begin(); it != result2.end(); ++it)
 			{
-				const DisplayScreen* screen = *it;
+				shared_ptr<const DisplayScreen> screen = *it;
 				if (screen->getLocalization() == NULL)
 					continue;
 				if (usedDisplayScreens.find(screen->getKey()) != usedDisplayScreens.end())
@@ -185,12 +184,12 @@ namespace synthese
 
 			ParametersMap::const_iterator it;
 
-			ConnectionPlace* place = NULL;
+			shared_ptr<const ConnectionPlace> place;
 			it = parameters.find(PARAMETER_SEARCH_PLACE);
 			if (it != parameters.end() && EnvModule::getConnectionPlaces().contains(Conversion::ToLongLong(it->second)))
 				place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(it->second));
 
-			Line* line = NULL;
+			shared_ptr<const Line> line;
 			it = parameters.find(PARAMETER_SEARCH_LINE);
 			if (it != parameters.end() && EnvModule::getLines().contains(Conversion::ToLongLong(it->second)))
 				line  = EnvModule::getLines().get(Conversion::ToLongLong(it->second));
@@ -213,12 +212,12 @@ namespace synthese
 
 		void DisplayScreenAlarmRecipient::addObject(const Alarm* alarm, uid objectId )
 		{
-			add(DeparturesTableModule::getDisplayScreens().get(objectId), alarm);
+			add(DeparturesTableModule::getDisplayScreens().get(objectId).get(), alarm);
 		}
 
 		void DisplayScreenAlarmRecipient::removeObject(const Alarm* alarm, uid objectId )
 		{
-			remove(DeparturesTableModule::getDisplayScreens().get(objectId), alarm);
+			remove(DeparturesTableModule::getDisplayScreens().get(objectId).get(), alarm);
 		}
 	}
 }

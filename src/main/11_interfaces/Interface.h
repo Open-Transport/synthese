@@ -23,22 +23,21 @@
 #ifndef SYNTHESE_INTERFACES_INTERFACE_H
 #define SYNTHESE_INTERFACES_INTERFACE_H
 
+#include <string>
+#include <vector>
+#include <iostream>
+#include <map>
+
+#include <boost/shared_ptr.hpp>
+
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 #include "01_util/Factory.h"
 
 #include "04_time/HourPeriod.h"
 
-
-
-#include <string>
-#include <vector>
-#include <iostream>
-#include <map>
-
 namespace synthese
 {
-    
 	namespace interfaces
 	{
 
@@ -68,40 +67,39 @@ namespace synthese
 				static const size_t ALL_DAY_PERIOD;
 
 			private:
-
-				typedef std::map<std::string, InterfacePage*> PagesMap;
+				typedef std::map<std::string, boost::shared_ptr<InterfacePage> > PagesMap;
 				typedef std::map<int, std::string> TextMap;
 
-				std::string									_name;
-				PagesMap									_pages;
-				std::vector<synthese::time::HourPeriod*>	_hourPeriods;        //!< Tableau des p?riodes de la journ?e
-				TextMap										_weekDayNames; //!< Tableau des libell?s des jours de semaine
-				TextMap										_monthNames;  //!< Tableau des libell?s des mois
-				TextMap										_alertPrefixes;      //!< Pr?fixes de messages d'alerte
-				std::string									_noSessionDefaultPageCode;
-
+				std::string											_name;
+				PagesMap											_pages;
+				std::vector<boost::shared_ptr<const time::HourPeriod> >	_hourPeriods;        //!< Tableau des p?riodes de la journ?e
+				TextMap												_weekDayNames; //!< Tableau des libell?s des jours de semaine
+				TextMap												_monthNames;  //!< Tableau des libell?s des mois
+				TextMap												_alertPrefixes;      //!< Pr?fixes de messages d'alerte
+				std::string											_noSessionDefaultPageCode;
 
 			public:
 
 				//! \name Accesseurs
 				//@{
-					/** Builds a new page from the class factory key.
+					/** Gets a stored page from the class factory key.
 						@param key Key of the wanted class
-						@return A pointer to the existing wanted page in the interface definition (do not delete the pointer)
+						@return A pointer to the existing wanted page in the interface definition. The pointer does not know the real type of the page.
 						@exception InterfacePageException The code is not available in the factory
 					*/
-					InterfacePage* const getPage( const std::string& key) const;
+					boost::shared_ptr<const InterfacePage> getPage( const std::string& key) const;
 
-					/** Builds a new page from the class name.
-						@exception Factory<InterfacePage> The page is not implemented or declared in the factory init. (should not occur in production environment)
+					/** Gets a stored page from its class (template).
+						@return The required page, directly known as its type.
 					*/
 					template <class T>
-					const T* const getPage() const
+					boost::shared_ptr<const typename T> const getPage() const
 					{
 						std::string key = synthese::util::Factory<InterfacePage>::getKey<T>();
-						return dynamic_cast<const T*>( getPage(key) );
+						return boost::dynamic_pointer_cast<const T, const InterfacePage>(getPage(key));
 					}
-					const synthese::time::HourPeriod* getPeriod( size_t index = ALL_DAY_PERIOD ) const;
+
+					boost::shared_ptr<const time::HourPeriod> getPeriod( size_t index = ALL_DAY_PERIOD ) const;
 					const std::string& getAlertPrefix( int ) const;
 					const std::string& getWeekDayName( int ) const;
 					const std::string& getNoSessionDefaultPageCode() const;
@@ -144,9 +142,9 @@ namespace synthese
 
 				//! \name Modifiers
 				//@{
-					void	addPage(const std::string& key, InterfacePage* page );
+					void	addPage(const std::string& key, boost::shared_ptr<InterfacePage> page );
 					void	removePage( const std::string& page_code );
-					void AddPeriode( synthese::time::HourPeriod* );
+					void AddPeriode(boost::shared_ptr<time::HourPeriod>);
 					bool SetLibelleJour( int, const std::string& );
 					bool SetLibelleMois( int, const std::string& );
 					void SetPrefixeAlerte( int, const std::string& );
@@ -155,10 +153,7 @@ namespace synthese
 				//@}
 
 				Interface( const uid& id);
-				~Interface();
 		};
-
-
 	}
 }
 /** @} */

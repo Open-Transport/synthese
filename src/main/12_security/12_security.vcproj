@@ -179,10 +179,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Interface Pages"
-			>
-		</Filter>
-		<Filter
 			Name="Actions"
 			>
 			<Filter
@@ -297,6 +293,14 @@
 				RelativePath=".\UserTableSyncException.h"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Interface"
+			>
+			<Filter
+				Name="Interface Pages"
+				>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\Constants.h"

@@ -29,6 +29,7 @@
 #include "34_departures_table/AdvancedSelectTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -70,13 +71,16 @@ namespace synthese
 			vector<pair<uid, string> > localizations;
 			if (withAll)
 				localizations.push_back(make_pair(0, "(tous)"));
-			std::vector<ConnectionPlaceWithBroadcastPoint> bpv = searchConnectionPlacesWithBroadcastPoints("", "", AT_LEAST_ONE_BROADCASTPOINT);
-			for (vector<ConnectionPlaceWithBroadcastPoint>::const_iterator it = bpv.begin(); it != bpv.end(); ++it)
-				localizations.push_back(make_pair(it->place->getKey(), it->place->getFullName()));
+			std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > bpv = searchConnectionPlacesWithBroadcastPoints("", "", AT_LEAST_ONE_BROADCASTPOINT);
+			for (vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> >::const_iterator it = bpv.begin(); it != bpv.end(); ++it)
+			{
+				const shared_ptr<ConnectionPlaceWithBroadcastPoint>& con = *it;
+				localizations.push_back(make_pair(con->place->getKey(), con->place->getFullName()));
+			}
 			return localizations;
 		}
 
-		std::vector<pair<uid, std::string> > DeparturesTableModule::getBroadcastPointLabels( const ConnectionPlace* place, bool withAll /*= false*/ )
+		std::vector<pair<uid, std::string> > DeparturesTableModule::getBroadcastPointLabels(shared_ptr<const ConnectionPlace> place, bool withAll /*= false*/ )
 		{
 			vector<pair<uid, string> > m;
 			if (withAll)
@@ -92,8 +96,8 @@ namespace synthese
 			vector<pair<uid, string> > m;
 			if (withAll)
 				m.push_back(make_pair(0, "(toutes)"));
-			vector<const CommercialLine*> c = getCommercialLineWithBroadcastPoints();
-			for (vector<const CommercialLine*>::const_iterator it = c.begin(); it != c.end(); ++it)
+			vector<shared_ptr<const CommercialLine> > c = getCommercialLineWithBroadcastPoints();
+			for (vector<shared_ptr<const CommercialLine> >::const_iterator it = c.begin(); it != c.end(); ++it)
 				m.push_back(make_pair((*it)->getKey(), (*it)->getShortName()));
 			return m;
 		}

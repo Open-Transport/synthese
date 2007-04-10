@@ -31,14 +31,17 @@ namespace synthese
 	{
 		/** Logical stop name.
 			@code stop_name @endcode
+			@ingroup m15Values refValues
 		*/
 		class LogicalStopNameValueInterfaceElement : public interfaces::ValueInterfaceElement
 		{
 		private:
-			ValueInterfaceElement* _uid;
+			boost::shared_ptr<ValueInterfaceElement> _uid;
 
 		public:
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string getValue(
+				const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
 
 			/** Parser.
 			@param text Optional parameter :

@@ -20,17 +20,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DurationInterfacePage.h"
+#include "11_interfaces/DurationInterfacePage.h"
+
+using namespace boost;
 
 namespace synthese
 {
-	using namespace interfaces;
 	using namespace util;
 
 	namespace interfaces
 	{
 
-		void DurationInterfacePage::display(std::ostream& stream, int duration, VariablesMap& variables, void* object /*= NULL*/, const server::Request* request /*= NULL*/) const
+		void DurationInterfacePage::display(std::ostream& stream, int duration, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/) const
 		{
 			ParametersVector pv;
 			pv.push_back(Conversion::ToString(duration));
