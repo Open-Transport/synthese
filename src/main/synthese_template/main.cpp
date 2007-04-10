@@ -17,13 +17,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <string>
-#include <map>
-#include <iostream>
-#include <boost/program_options.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
-
 #include "01_util/Conversion.h"
 #include "01_util/Exception.h"
 #include "01_util/Log.h"
@@ -36,6 +29,17 @@
 
 #include "30_server/ServerModule.h"
 
+
+#include <csignal>
+#include <string>
+#include <map>
+#include <iostream>
+#include <boost/program_options.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+
+
+
 // included auto generated code
 #include "includes.cpp.inc"
 
@@ -47,8 +51,26 @@ using synthese::server::ServerModule;
 namespace po = boost::program_options;
 
 
+
+
+void sig_INT_handler(int sig)
+{
+    // Catch INT signal and close server properly with exit.
+    // This allows profiling info to be dumped.
+    Log::GetInstance ().info ("Caught signal no. " + Conversion::ToString (sig));
+
+    // Last chance cleaning actions can be added here as well ...
+
+    Log::GetInstance ().info ("Exit!");
+    exit (0);
+}
+
+
+
 int main( int argc, char **argv )
 {
+    std::signal(SIGINT, sig_INT_handler);
+
 	// included auto generated code
 	#include "generated.cpp.inc"
 

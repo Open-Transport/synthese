@@ -29,10 +29,15 @@ using namespace synthese::tcp;
 namespace po = boost::program_options;
 
 
-void sigint_handler(int sig)
+void sig_INT_handler(int sig)
 {
-    
-    std::cerr << "handling signal no. " << sig << "\n";
+    // Catch INT signal and close server properly with exit.
+    // This allows profiling info to be dumped.
+    Log::GetInstance ().info ("Caught signal no. " + Conversion::ToString (sig));
+
+    // Last chance cleaning actions can be added here as well ...
+
+    Log::GetInstance ().info ("Exit!");
     exit (0);
 }
 
@@ -43,7 +48,7 @@ const char ETB (23);
 
 int main( int argc, char **argv )
 {
-    std::signal(SIGINT, sigint_handler);
+    std::signal(SIGINT, sig_INT_handler);
 
     std::string host;
     int port;

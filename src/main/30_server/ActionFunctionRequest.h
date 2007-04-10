@@ -44,6 +44,9 @@ namespace synthese
 			ActionFunctionRequest(const Request* request=NULL);
 
 			A* getAction();
+
+			friend class Request;
+
 		};
 
 		template<class A, class F>
@@ -56,7 +59,7 @@ namespace synthese
 		template<class A, class F>
 		A* synthese::server::ActionFunctionRequest<A, F>::getAction()
 		{
-			return (A*) _action.get();
+		    return (A*) FunctionRequest<F>::_action.get();
 		}
 	}
 }

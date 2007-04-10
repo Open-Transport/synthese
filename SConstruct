@@ -150,9 +150,9 @@ def DefineDefaultCCFlags (env):
 
     if (platform=='posix'):
         if (env.IsDebug ()):
-            env.Append ( CCFLAGS = ['-ggdb', '-fno-inline', '-fpermissive'] )
+            env.Append ( CCFLAGS = ['-ggdb', '-fpermissive'] )
         else:
-            env.Append ( CCFLAGS = ['-O3', '-fno-inline', '-fpermissive'] )
+            env.Append ( CCFLAGS = ['-O3', '-fpermissive'] )
         if env.IsProfile ():
             env.Append ( CCFLAGS = ['-pg'] )
             

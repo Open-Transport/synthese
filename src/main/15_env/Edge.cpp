@@ -49,6 +49,8 @@ namespace synthese
 		, _previousDepartureForFineSteppingOnly(NULL)
 		, _followingConnectionArrival(NULL)
 		, _followingArrivalForFineSteppingOnly(NULL)
+		, _departureIndexUpdateNeeded (true)
+		, _arrivalIndexUpdateNeeded (true)
 		{ }
 
 
@@ -378,7 +380,7 @@ namespace synthese
 			int next;
 
 			// Search schedule
-			next = _departureIndex[ departureMoment.getHours () ];
+			next = getDepartureFromIndex (departureMoment.getHours ());
 			if ( next == UNKNOWN_VALUE )
 				next = getParentPath ()->getServices().size();
 
@@ -469,8 +471,7 @@ namespace synthese
 		{
 			int previous;
 
-			previous = _arrivalIndex[ arrivalMoment.getHours () ];
-
+			previous = getArrivalFromIndex (arrivalMoment.getHours ());
 			while ( arrivalMoment >= minArrivalMoment )  // Loop over dates
 			{
 				if ( getParentPath ()->isInService( arrivalMoment.getDate() ) )
@@ -546,7 +547,7 @@ namespace synthese
 			{
 				_departureEndSchedule.insert (itInsertEnd, _departureBeginSchedule[index]);
 			}
-			updateDepartureIndex ();
+			_departureIndexUpdateNeeded = true;
 		}
 
 
@@ -574,7 +575,7 @@ namespace synthese
 				_arrivalEndSchedule[index] = _arrivalBeginSchedule[index] + continuousService->getRange ();
 			}
 
-			updateArrivalIndex ();
+			_arrivalIndexUpdateNeeded = true;
 		}
 
 
@@ -622,7 +623,8 @@ namespace synthese
 					}
 				}
 				lastHour = _departureEndSchedule[i].getHours ();
-			}		    
+			}
+			_departureIndexUpdateNeeded = false;
 		}
 
 
@@ -671,7 +673,7 @@ namespace synthese
 				}
 				lastHour = _arrivalBeginSchedule[i].getHours ();
 			}
-		    
+			_arrivalIndexUpdateNeeded = false;
 		}
 
 
@@ -711,6 +713,22 @@ namespace synthese
 			_parentPath = path;
 		}
 
+
+
+	    int 
+	    Edge::getDepartureFromIndex (int hour) const
+	    {
+		if (_departureIndexUpdateNeeded) updateDepartureIndex ();
+		return _departureIndex[hour];
+	    }
+
+
+	    int 
+	    Edge::getArrivalFromIndex (int hour) const
+	    {
+		if (_arrivalIndexUpdateNeeded) updateArrivalIndex ();
+		return _arrivalIndex[hour];
+	    }
 
 	}
 }

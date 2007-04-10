@@ -1,4 +1,3 @@
-
 /** Function class header.
 	@file Function.h
 
@@ -91,7 +90,7 @@ namespace synthese
 			*/
 			virtual void _run(std::ostream& stream) const = 0;
 
-			friend Request;
+			friend class Request;
 		};
 	}
 }

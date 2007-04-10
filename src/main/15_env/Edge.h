@@ -93,6 +93,8 @@ namespace synthese
 			int _departureIndex[24];	//!< First line service index by departure hour of day
 			int _arrivalIndex[24];		//!< First line service index by arrival hour of day
 
+			mutable bool _departureIndexUpdateNeeded;
+			mutable bool _arrivalIndexUpdateNeeded;
 
 		protected:
 			Edge (bool isDeparture = true, bool isArrival = true,
@@ -229,6 +231,11 @@ namespace synthese
 			    
 				void insertDepartureSchedule (int index, const synthese::time::Schedule& schedule);
 				void insertArrivalSchedule (int index, const synthese::time::Schedule& schedule);
+
+		private:
+				
+				int getDepartureFromIndex (int hour) const;
+				int getArrivalFromIndex (int hour) const;
 
 				void updateDepartureIndex ();
 				void updateArrivalIndex ();

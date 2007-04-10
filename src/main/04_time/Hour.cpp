@@ -59,20 +59,6 @@ Hour::~Hour()
 
 
 
-int
-Hour::getMinutes() const
-{
-    return _minutes;
-}
-
-
-int
-Hour::getHours() const
-{
-    return _hours;
-}
-
-
 
 bool
 Hour::isValid () const
