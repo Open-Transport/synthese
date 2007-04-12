@@ -40,8 +40,8 @@ namespace synthese
 		public:
 			FunctionRequest(const Request* request=NULL);
 
-			boost::shared_ptr<typename F> getFunction();
-			boost::shared_ptr<const typename F> getFunction() const;
+			boost::shared_ptr<F> getFunction();
+			boost::shared_ptr<const F> getFunction() const;
 		};
 
 		template<class F>
@@ -51,15 +51,15 @@ namespace synthese
 		}
 
 		template<class F>
-		boost::shared_ptr<typename F> FunctionRequest<F>::getFunction()
+		boost::shared_ptr<F> FunctionRequest<F>::getFunction()
 		{
-			return boost::static_pointer_cast<typename F, Function>(_getFunction());
+			return boost::static_pointer_cast<F, Function> (_getFunction());
 		}
 
 		template<class F>
-		boost::shared_ptr<const typename F> FunctionRequest<F>::getFunction() const
+		boost::shared_ptr<const F> FunctionRequest<F>::getFunction() const
 		{
-			return boost::static_pointer_cast<const typename F, const Function>(_getFunction());
+			return boost::static_pointer_cast<const F, const Function> (_getFunction());
 		}
 	}
 }

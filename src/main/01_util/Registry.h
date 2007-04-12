@@ -57,7 +57,7 @@ namespace synthese
 			Registry ();
 			~Registry ();
 
-			typedef typename std::map<K, boost::shared_ptr<T>>::const_iterator const_iterator;
+			typedef typename std::map<K, boost::shared_ptr<T> >::const_iterator const_iterator;
 
 			//! @name Getters/Setters
 			//@{

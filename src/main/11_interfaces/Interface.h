@@ -93,7 +93,7 @@ namespace synthese
 						@return The required page, directly known as its type.
 					*/
 					template <class T>
-					boost::shared_ptr<const typename T> const getPage() const
+					boost::shared_ptr<const T> const getPage() const
 					{
 						std::string key = synthese::util::Factory<InterfacePage>::getKey<T>();
 						return boost::dynamic_pointer_cast<const T, const InterfacePage>(getPage(key));

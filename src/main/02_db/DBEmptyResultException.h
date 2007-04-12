@@ -25,8 +25,11 @@
 
 #include "01_util/UId.h"
 #include "01_util/Exception.h"
+#include "01_util/Conversion.h"
 
 #include <string>
+
+
 
 namespace synthese
 {
@@ -44,9 +47,10 @@ namespace synthese
 			DBEmptyResultException (uid& id, const std::string& message);
 		};
 
+
 		template <class T>
-		DBEmptyResultException<T>::DBEmptyResultException(uid& id, const std::string& message)
-			: Exception("Unable to fetch object with ID=" + Conversion::ToString(id) + " in table " + SQLiteTableSyncTemplate<T>::TABLE_NAME + ". Reason : " + message)
+		DBEmptyResultException<T>::DBEmptyResultException (uid& id, const std::string& message)
+		    : Exception("Unable to fetch object with ID=" + util::Conversion::ToString(id) /* + " in table " + SQLiteTableSyncTemplate<T>::TABLE_NAME */ + ". Reason : " + message)
 		{
 		}
 	}

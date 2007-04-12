@@ -46,9 +46,9 @@ namespace synthese
 		class Registrable
 		{
 		public:
-			typedef typename K								KeyType;
-			typedef typename Registry<K, T>					Registry;
-			typedef typename RegistryKeyException<K, T>		RegistryKeyException;
+			typedef K	 KeyType;
+			typedef Registry<K, T>					Registry;
+			typedef RegistryKeyException<K, T>		RegistryKeyException;
 
 		private:
 			K					_key;		//!< The key of the object in the registry.
@@ -90,7 +90,7 @@ namespace synthese
 		template<class K, class T>
 		boost::shared_ptr<const T> Registrable<K, T>::getRegisteredSharedPointer() const
 		{
-			return _registry ? _registry->get(_key) : shared_ptr<const T>();
+		    return _registry ? _registry->get(_key) : boost::shared_ptr<const T>();
 		}
 
 		template<class K, class T>
