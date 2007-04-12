@@ -127,7 +127,7 @@ namespace synthese
 				try
 				{
 					shared_ptr<VinciContract> contract(new VinciContract);
-					SQLiteTableSyncTemplate<VinciContract>::load(contract, result, i);
+					SQLiteTableSyncTemplate<VinciContract>::load(contract.get (), result, i);
 					contract->getUser();
 					contracts.push_back(contract);
 				}

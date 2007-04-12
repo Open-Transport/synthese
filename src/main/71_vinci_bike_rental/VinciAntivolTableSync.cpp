@@ -115,7 +115,7 @@ namespace synthese
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
 					shared_ptr<VinciAntivol> object(new VinciAntivol());
-					load(object, result, i);
+					load(object.get (), result, i);
 					objects.push_back(object);
 				}
 				return objects;

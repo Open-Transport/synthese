@@ -127,7 +127,7 @@ namespace synthese
 			addTableIndex(TABLE_COL_TRADED_OBJECT_ID);
 		}
 
-		void TransactionPartTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync = false)
+		void TransactionPartTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 
 		}
@@ -194,7 +194,7 @@ namespace synthese
 			for (int i=0; i<result.getNbRows(); ++i)
 			{
 				shared_ptr<TransactionPart> tp(new TransactionPart);
-				load(tp, result, i);
+				load(tp.get (), result, i);
 				tps.push_back(tp);
 			}
 			return tps;

@@ -153,7 +153,7 @@ namespace synthese
 				shared_ptr<VinciBike> bike(new VinciBike);
 				try
 				{
-					load(bike, result, i);
+					load(bike.get (), result, i);
 					bikes.push_back(bike);
 				}
 				catch (Exception e)

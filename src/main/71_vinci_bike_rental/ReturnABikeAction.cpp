@@ -84,7 +84,7 @@ namespace synthese
 
 			shared_ptr<Transaction> t = TransactionTableSync::get(_transactionPart->getTransactionId());
 			t->setEndDateTime(now);
-			TransactionTableSync::save(t.get().();
+			TransactionTableSync::save(t.get());
 		}
 	}
 }

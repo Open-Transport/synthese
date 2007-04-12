@@ -104,7 +104,7 @@ namespace synthese
 			r->setPublicLevel(Right::DELETE);
 			_adminProfile->cleanRights();
 			_adminProfile->addRight(r);
-			ProfileTableSync::save(_adminProfile);
+			ProfileTableSync::save(_adminProfile.get ());
 
 			// Profile for bike rental operator user
 			profiles = ProfileTableSync::search(VINCI_OPERATOR_PROFILE);
@@ -118,7 +118,7 @@ namespace synthese
 			r->setPublicLevel(Right::USE);
 			_operatorProfile->cleanRights();
 			_operatorProfile->addRight(r);
-			ProfileTableSync::save(_operatorProfile);
+			ProfileTableSync::save(_operatorProfile.get ());
 
 			// Profile for virtual owner user
 			profiles = ProfileTableSync::search(VINCI_ACCOUNTING_PROFILE);
@@ -132,7 +132,7 @@ namespace synthese
 			r->setPublicLevel(Right::FORBIDDEN);
 			_vinciProfile->cleanRights();
 			_vinciProfile->addRight(r);
-			ProfileTableSync::save(_vinciProfile);
+			ProfileTableSync::save(_vinciProfile.get ());
 		
 			// Virtual owner user
 			vector<shared_ptr<User> > users = UserTableSync::search(VINCI_ACCOUNTING_USER, VINCI_ACCOUNTING_USER, _vinciProfile);
@@ -142,7 +142,7 @@ namespace synthese
 				_vinciUser->setName(VINCI_ACCOUNTING_USER);
 				_vinciUser->setLogin(VINCI_ACCOUNTING_USER);
 				_vinciUser->setProfile(_vinciProfile);
-				UserTableSync::save(_vinciUser);
+				UserTableSync::save(_vinciUser.get ());
 			}
 			else
 			{
@@ -156,7 +156,7 @@ namespace synthese
 				_euroCurrency.reset(new Currency);
 				_euroCurrency->setName(VINCI_CURRENCY_EURO_NAME);
 				_euroCurrency->setSymbol(VINCI_CURRENCY_EURO);
-				CurrencyTableSync::save(_euroCurrency);
+				CurrencyTableSync::save(_euroCurrency.get ());
 			}
 			else
 				_euroCurrency = currencies.front();
@@ -168,7 +168,7 @@ namespace synthese
 				bikeCurrency.reset(new Currency);
 				bikeCurrency->setName(VINCI_CURRENCY_BIKE_NAME);
 				bikeCurrency->setSymbol(VINCI_CURRENCY_BIKE);
-				CurrencyTableSync::save(bikeCurrency);
+				CurrencyTableSync::save(bikeCurrency.get ());
 			}
 			else
 				bikeCurrency = currencies.front();
@@ -180,7 +180,7 @@ namespace synthese
 				ticketCurrency.reset(new Currency);
 				ticketCurrency->setName(VINCI_CURRENCY_TICKET_PUNCHING_NAME);
 				ticketCurrency->setSymbol(VINCI_CURRENCY_TICKET_PUNCHING);
-				CurrencyTableSync::save(ticketCurrency);
+				CurrencyTableSync::save(ticketCurrency.get ());
 			}
 			else
 				ticketCurrency = currencies.front();
@@ -194,7 +194,7 @@ namespace synthese
 				guaranteeAccount->setRightCurrency(_euroCurrency);
 				guaranteeAccount->setLeftCurrency(_euroCurrency);
 				guaranteeAccount->setRightUserId(_vinciUser->getKey());
-				AccountTableSync::save(guaranteeAccount);
+				AccountTableSync::save(guaranteeAccount.get ());
 			}
 
 			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE, 0, "");
@@ -205,7 +205,7 @@ namespace synthese
 				checkGuaranteeAccount->setRightCurrency(_euroCurrency);
 				checkGuaranteeAccount->setLeftCurrency(_euroCurrency);
 				checkGuaranteeAccount->setRightUserId(_vinciUser->getKey());
-				AccountTableSync::save(checkGuaranteeAccount);
+				AccountTableSync::save(checkGuaranteeAccount.get ());
 			}
 
 			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE, 0, "");
@@ -216,7 +216,7 @@ namespace synthese
 				cardGuaranteeAccount->setRightCurrency(_euroCurrency);
 				cardGuaranteeAccount->setLeftCurrency(_euroCurrency);
 				cardGuaranteeAccount->setRightUserId(_vinciUser->getKey());
-				AccountTableSync::save(cardGuaranteeAccount);
+				AccountTableSync::save(cardGuaranteeAccount.get ());
 			}
 
 			// Customer accounts
@@ -228,7 +228,7 @@ namespace synthese
 				customerTicketAccount->setRightCurrency(ticketCurrency);
 				customerTicketAccount->setLeftCurrency(ticketCurrency);
 				customerTicketAccount->setRightUserId(_vinciUser->getKey());
-				AccountTableSync::save(customerTicketAccount);
+				AccountTableSync::save(customerTicketAccount.get ());
 			}
 
 			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE, 0, "");
@@ -239,7 +239,7 @@ namespace synthese
 				customerEuroAccount->setRightCurrency(ticketCurrency);
 				customerEuroAccount->setLeftCurrency(ticketCurrency);
 				customerEuroAccount->setRightUserId(_vinciUser->getKey());
-				AccountTableSync::save(customerEuroAccount);
+				AccountTableSync::save(customerEuroAccount.get ());
 			}
 
 			// Services accounts
@@ -253,7 +253,7 @@ namespace synthese
 			ticketBikeRent->setRightCurrency(ticketCurrency);
 			ticketBikeRent->setLeftCurrency(ticketCurrency);
 			ticketBikeRent->setRightUserId(_vinciUser->getKey());
-			AccountTableSync::save(ticketBikeRent);
+			AccountTableSync::save(ticketBikeRent.get ());
 			
 			accounts = AccountTableSync::search(getVinciUser()->getKey(), VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE, 0, "");
 			if (accounts.empty())
@@ -264,7 +264,7 @@ namespace synthese
 			_freeLockRent->setRightCurrency(_euroCurrency);
 			_freeLockRent->setLeftCurrency(_euroCurrency);
 			_freeLockRent->setRightUserId(_vinciUser->getKey());
-			AccountTableSync::save(_freeLockRent);
+			AccountTableSync::save(_freeLockRent.get ());
 			
 
 			// Payment accounts
@@ -276,7 +276,7 @@ namespace synthese
 				ticketPunchings->setRightCurrency(ticketCurrency);
 				ticketPunchings->setLeftCurrency(ticketCurrency);
 				ticketPunchings->setRightUserId(_vinciUser->getKey());
-				AccountTableSync::save(ticketPunchings);
+				AccountTableSync::save(ticketPunchings.get ());
 			}
 
 			// Stock accounts
@@ -288,7 +288,7 @@ namespace synthese
 				bikeStockAccount->setRightCurrency(bikeCurrency);
 				bikeStockAccount->setLeftCurrency(bikeCurrency);
 				bikeStockAccount->setRightUserId(_vinciUser->getKey());
-				AccountTableSync::save(bikeStockAccount);
+				AccountTableSync::save(bikeStockAccount.get ());
 			}
 
 
@@ -305,7 +305,7 @@ namespace synthese
 			r->setPublicLevel(Right::FORBIDDEN);
 			_vinciCustomerProfile->cleanRights();
 			_vinciCustomerProfile->addRight(r);
-			ProfileTableSync::save(_vinciCustomerProfile);
+			ProfileTableSync::save(_vinciCustomerProfile.get ());
 		}
 
 		shared_ptr<const Profile> VinciBikeRentalModule::getCustomerProfile()

@@ -24,6 +24,8 @@
 
   <target name="build">
 
+    <property name="target" value="src/main/98_synthese_sai src/main/99_synthese_vinci src/main/91_cgi_client src/main/95_db_client"/>
+
     <antcall target="sconsbuild">
       <param name="goal" value="dist"/>
       <param name="target" value="${target}"/>

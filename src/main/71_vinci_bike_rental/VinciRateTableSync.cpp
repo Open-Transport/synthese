@@ -166,7 +166,7 @@ namespace synthese
 				shared_ptr<VinciRate> rate(new VinciRate);
 				try
 				{
-					load(rate, result, i);
+					load(rate.get (), result, i);
 					rates.push_back(rate);
 				}
 				catch (Exception e)

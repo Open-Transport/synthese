@@ -7,11 +7,11 @@
 #include <stdlib.h>
 #include <iostream>
 
+#include "module.h"
+#include "30_server/Request.h"
 #include "00_tcp/Socket.h"
 
-#include "30_server/Request.h"
 
-#include "module.h"
 
 using std::cout;
 using std::endl;

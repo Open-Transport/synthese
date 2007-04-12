@@ -168,7 +168,7 @@ namespace synthese
 			_user->setEMail(_email);
 			_user->setPhone(_phone);
 			_user->setBirthDate(_birthDate);
-			UserTableSync::save(_use.get());
+			UserTableSync::save(_user.get());
 			_contract->setPassport(_passport);
 			VinciContractTableSync::save(_contract.get());
 		}
