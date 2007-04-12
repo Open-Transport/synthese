@@ -24,45 +24,52 @@
 
   <target name="build">
 
-    <property name="target" value="src/main/98_synthese_sai src/main/99_synthese_vinci src/main/91_cgi_client src/main/95_db_client"/>
+     <property name="target" value="src/main/98_synthese_sai,src/main/99_synthese_vinci,src/main/91_cgi_client,src/main/95_db_client"/>     
 
-    <antcall target="sconsbuild">
-      <param name="goal" value="dist"/>
-      <param name="target" value="${target}"/>
-      <param name="profile" value="false"/>
-    </antcall>
+    <for param="targ" list="${target}">
+       <sequential>
 
-   <if>
-     <and>
-       <equals arg1="${platform}" arg2="posix"/>
-       <equals arg1="${mode}" arg2="release"/>
-     </and>
-     <then>
-       <echo message="Stripping ${distdir}/${distname}"/>
-       <exec executable="strip" failonerror="true" 
-	    resolveexecutable="true" searchpath="true">
-	<arg value="${distdir}/${distname}"/>
-      </exec>       
-     </then>
-   </if>
-   
-   <delete file="${distdir}.zip"/> 
-   <zip destfile="${distdir}.zip"> 
+	 <antcall target="sconsbuild">
+	   <param name="goal" value="dist"/>
+	   <param name="target" value="@{targ}"/>
+	   <param name="profile" value="false"/>
+	 </antcall>
+	 
+	 <if>
+	   <and>
+	     <equals arg1="${platform}" arg2="posix"/>
+	     <equals arg1="${mode}" arg2="release"/>
+	   </and>
+	   <then>
+	     <echo message="Stripping ${distdir}/${distname}"/>
+	     <exec executable="strip" failonerror="true" 
+		   resolveexecutable="true" searchpath="true">
+	       <arg value="${distdir}/${distname}"/>
+	     </exec>       
+	   </then>
+	 </if>
+	 
+	 <delete file="${distdir}.zip"/> 
+	 <zip destfile="${distdir}.zip"> 
+	   
+	   <zipfileset filemode="755" dir="${dist.home}" 
+		       includes="${distname}_${platform}_${mode}/${distname},
+				 ${distname}_${platform}_${mode}/**/*.sh"/>
+	   
+	   <zipfileset dir="${dist.home}"
+		       includes="${distname}_${platform}_${mode}/**"
+		       excludes="${distname}_${platform}_${mode}/${distname},
+				 ${distname}_${platform}_${mode}/**/*.sh"/>
+	   
+	 </zip>
 
-     <zipfileset filemode="755" dir="${dist.home}" 
-		 includes="${distname}_${platform}_${mode}/${distname},
-		           ${distname}_${platform}_${mode}/**/*.sh"/>
-
-     <zipfileset dir="${dist.home}"
-		 includes="${distname}_${platform}_${mode}/**"
-		 excludes="${distname}_${platform}_${mode}/${distname},
-		           ${distname}_${platform}_${mode}/**/*.sh"/>
-
-   </zip>
-
+       </sequential>
+    </for>
+       
+       
   </target>
-
-
+       
+       
 
 
 

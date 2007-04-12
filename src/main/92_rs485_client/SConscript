@@ -22,8 +22,8 @@ moduleenv.AddSQLiteDependency ()
 moduleenv.AppendMultithreadConf ()
 
 
-#if (moduleenv['PLATFORM'] == 'win32'):
-# Does not work under posix at the moment !
-moduleenv.Program ( moduleenv.DefaultModuleName (), files )
+if (moduleenv['PLATFORM'] == 'win32'):
+  # Does not work under posix at the moment !
+  moduleenv.Program ( moduleenv.DefaultModuleName (), files )
 
 

@@ -82,8 +82,12 @@ namespace synthese
 		void VinciContractPrintRequest::_run( std::ostream& stream ) const
 		{
 			shared_ptr<const VinciPrintedContractInterfacePage> page = _interface->getPage<VinciPrintedContractInterfacePage>();
-			page->display(stream, VariablesMap(), _contract, _request);
+			// TODO :  constness is not really *clean* here... review it
+			//         dirty C style cast right now.
+			VariablesMap vm;
+			page->display(stream, vm, _contract, _request);
 		}
+
 
 		void VinciContractPrintRequest::setContract(shared_ptr<const VinciContract> contract )
 		{

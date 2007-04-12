@@ -1,4 +1,4 @@
-﻿/** 91_cgi_client module wide definitions
+/** 91_cgi_client module wide definitions
 	@file 91_cgi_client/module.h
 */
 

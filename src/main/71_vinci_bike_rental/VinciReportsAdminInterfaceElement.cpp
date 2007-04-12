@@ -21,12 +21,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "05_html/SearchFormHTMLTable.h"
-#include "05_html/ResultHTMLTable.h"
-
-#include "04_time/Date.h"
-
-#include "32_admin/AdminRequest.h"
 
 #include "71_vinci_bike_rental/VinciReportsAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
@@ -34,6 +28,12 @@
 #include "71_vinci_bike_rental/VinciRateTableSync.h"
 
 #include "57_accounting/TransactionPartTableSync.h"
+#include "05_html/SearchFormHTMLTable.h"
+#include "05_html/ResultHTMLTable.h"
+
+#include "04_time/Date.h"
+
+#include "32_admin/AdminRequest.h"
 
 using namespace std;
 using boost::shared_ptr;

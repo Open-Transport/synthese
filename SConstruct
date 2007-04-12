@@ -23,6 +23,7 @@ sqliteversion = ARGUMENTS.get('sqliteversion').lower()
 
 
 
+print "librepo = ", librepo
 print "platform = ", platform
 print "mode     = ", mode
 print "goal     = ", goal
@@ -506,12 +507,8 @@ Export('rootenv')
 builddir = '#build' + '/' + platform + '/' + mode
 
 
-
-if 'doc' in COMMAND_LINE_TARGETS:
-  rootenv.SConscript ('doc/SConscript')
-else:
-  rootenv.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
-  rootenv.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)
+rootenv.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
+#rootenv.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)
 
 
     
