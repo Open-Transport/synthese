@@ -304,7 +304,8 @@ def SyntheseEnv (env, modules):
 
 
 def SynthesePostBuild (target = None, source = None, env = None):
-    if goal != 'dist': return
+    if goal != 'dist':
+      return
   
     distname = os.path.basename (target[0].abspath).replace ('.exe', '')
     distdir = os.path.join (distroot, distname)
