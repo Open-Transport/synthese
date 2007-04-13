@@ -9,25 +9,40 @@
   <property name="deploy.local.lib.regexp.from" value="(.*)"/>
   <property name="deploy.local.lib.regexp.to" value="\1"/>
 
-   <basename property="distname" file="${target}"/>
-
-   <property name="distdir"
-   value="${dist.home}/${distname}_${platform}_${mode}"/>
-
-
-
-
-
-  <target name="deploy"/>
+  <property name="target" value="src/main/98_synthese_sai,src/main/99_synthese_vinci,src/main/91_cgi_client,src/main/95_db_client"/>     
 
 
 
   <target name="build">
 
-     <property name="target" value="src/main/98_synthese_sai,src/main/99_synthese_vinci,src/main/91_cgi_client,src/main/95_db_client"/>     
 
     <for param="targ" list="${target}">
        <sequential>
+
+	 <antcall target="sconsbuild">
+	   <param name="goal" value="build"/>
+	   <param name="target" value="@{targ}"/>
+	   <param name="profile" value="false"/>
+	 </antcall>
+
+       </sequential>
+    </for>
+       
+  </target>
+       
+       
+  <target name="dist">
+
+
+    <for param="targ" list="${target}">
+       <sequential>
+	 <propertyregex property="distname" input="@{targ}" casesensitive="false"
+			regexp="^.*/(.*)" select="\1" override="true"/>
+	 <echo message="$DISTNAME = = ${distname}"/>
+
+	 <var name="distdir" 
+		   value="${dist.home}/${distname}_${platform}_${toolset}_${mode}"/>
+
 
 	 <antcall target="sconsbuild">
 	   <param name="goal" value="dist"/>
@@ -65,15 +80,12 @@
 
        </sequential>
     </for>
-       
-       
+
   </target>
-       
-       
 
 
-
-
+  <target name="deploy">
+  </target>
 
 
 </project>

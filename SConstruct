@@ -35,7 +35,7 @@ print "cxx  = ", rootenv['CXX']
 rootenv.Replace ( PLATFORM = platform )
 rootenv.Replace ( MODE = mode )
 
-buildroot = 'build' + '/' + platform + '/' +'/' + mode
+buildroot = 'build' + '/' + platform + '/' + toolset +'/' + mode
 buildmain = buildroot + '/main'
 buildtest = buildroot + '/test'
 
@@ -303,10 +303,12 @@ def SyntheseEnv (env, modules):
 
 
 
-def SyntheseDist (target = None, source = None, env = None):
+def SynthesePostBuild (target = None, source = None, env = None):
+    if goal != 'dist': return
+  
     distname = os.path.basename (target[0].abspath).replace ('.exe', '')
     distdir = os.path.join (distroot, distname)
-    distdir = distdir + '_' + platform + '_' + mode
+    distdir = distdir + '_' + platform + '_' + toolset + '_' + mode
 
     Execute (Delete (distdir))
     Execute (Mkdir (distdir))
@@ -384,10 +386,9 @@ def SyntheseBuild (env, binname, generatemain = True):
     
     mainobj = "main" + env['OBJSUFFIX']
     
-    if goal == 'dist':
-        # Copy dynamic libraries
-        postaction = Action (SyntheseDist)
-        env.AddPostAction (exename, postaction)
+    # Copy dynamic libraries (guarded by goal == dist)
+    postaction = Action (SynthesePostBuild)
+    env.AddPostAction (exename, postaction)
 
 
 			       
@@ -504,7 +505,7 @@ rootenv.Append(BUILDERS = {'CopyResources' :  bld})
 
 Export('rootenv')
 
-builddir = '#build' + '/' + platform + '/' + mode
+builddir = '#' + buildroot
 
 
 rootenv.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
