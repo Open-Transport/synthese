@@ -38,8 +38,6 @@
        <sequential>
 	 <propertyregex property="distname" input="@{targ}" casesensitive="false"
 			regexp="^.*/(.*)" select="\1" override="true"/>
-	 <echo message="$DISTNAME = = ${distname}"/>
-
 	 <var name="distdir" 
 		   value="${dist.home}/${distname}_${platform}_${toolset}_${mode}"/>
 
