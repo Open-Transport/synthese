@@ -45,7 +45,6 @@ namespace synthese
 
 			A* getAction();
 
-			friend class Request;
 
 		};
 
