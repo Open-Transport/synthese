@@ -111,8 +111,36 @@ namespace synthese
 				if (it != map.end())
 					_searchLevel = (AlarmLevel) Conversion::ToInt(it->second);
 
-				_result = AlarmTableSync::search(NULL, _startDate, _endDate);
-				_scenarioResult = ScenarioTableSync::search(false);
+				_requestParameters = ActionResultHTMLTable::getParameters(map, PARAMETER_SEARCH_LEVEL, 15);
+
+				_result = AlarmTableSync::search(
+					NULL
+					, _startDate
+					, _endDate
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, _requestParameters.orderField == PARAMETER_SEARCH_START
+					, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
+					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
+					, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
+					, _requestParameters.raisingOrder
+					);
+				_alarmResultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _result);
+
+				_scenarioResult = ScenarioTableSync::search(
+					false
+					, _startDate
+					, _endDate
+					, std::string()
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, _requestParameters.orderField == PARAMETER_SEARCH_START
+					, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
+					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
+					, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
+					, _requestParameters.raisingOrder
+					);
+				_scenarioResultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _scenarioResult);
 			}
 			catch (ConnectionPlace::RegistryKeyException e)
 			{
@@ -171,8 +199,8 @@ namespace synthese
 
 			SearchFormHTMLTable s(searchRequest.getHTMLForm());
 			stream << s.open();
-			stream << s.cell("Date début", s.getForm().getTextInput(PARAMETER_SEARCH_START, _startDate.toString()));
-			stream << s.cell("Date fin", s.getForm().getTextInput(PARAMETER_SEARCH_END, _endDate.toString()));
+			stream << s.cell("Date début", s.getForm().getCalendarInput(PARAMETER_SEARCH_START, _startDate));
+			stream << s.cell("Date fin", s.getForm().getCalendarInput(PARAMETER_SEARCH_END, _endDate));
 
 			for (Factory<AlarmRecipient>::Iterator it = Factory<AlarmRecipient>::begin(); it != Factory<AlarmRecipient>::end(); ++it)
 			{
@@ -195,7 +223,7 @@ namespace synthese
 			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v1.push_back(make_pair(string(), string("Actions")));
-			ActionResultHTMLTable t1(v1, searchRequest.getHTMLForm(), _requestParameters, _resultParameters, newScenarioRequest.getHTMLForm("newscen"), string(), InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t1(v1, searchRequest.getHTMLForm(), _requestParameters, _scenarioResultParameters, newScenarioRequest.getHTMLForm("newscen"), string(), InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 			
 			stream << t1.open();
 
@@ -227,7 +255,7 @@ namespace synthese
 			v.push_back(make_pair(PARAMETER_SEARCH_STATUS, string("Etat")));
 			v.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v.push_back(make_pair(string(), string("Actions")));
-			ActionResultHTMLTable t(v, searchRequest.getHTMLForm(), _requestParameters, _resultParameters, newMessageRequest.getHTMLForm("newmess"), NewMessageAction::PARAMETER_IS_TEMPLATE, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, searchRequest.getHTMLForm(), _requestParameters, _alarmResultParameters, newMessageRequest.getHTMLForm("newmess"), NewMessageAction::PARAMETER_IS_TEMPLATE, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();
 

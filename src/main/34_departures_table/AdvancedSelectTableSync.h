@@ -48,7 +48,12 @@ namespace synthese
 			@param _bpNumbers Filter on broadcast points number : 0 = no broadcast points, 1 = at least one broadcast point
 			@result vector of the founded searched connection places from the live data objects (do not delete the objects after use). 
 		*/
-		std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(std::string cityName = "", std::string placeName = "", BroadcastPointsPresence bpPresence = WITH_OR_WITHOU_ANY_BROADCASTPOINT, uid lineId = UNKNOWN_VALUE, int number=UNKNOWN_VALUE, int first=0);
+		std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(std::string cityName = "", std::string placeName = "", BroadcastPointsPresence bpPresence = WITH_OR_WITHOU_ANY_BROADCASTPOINT, uid lineId = UNKNOWN_VALUE, int number=UNKNOWN_VALUE, int first=0
+			, bool orderByCity = true
+			, bool orderByName = false
+			, bool orderByNumber = false
+			, bool raisingOrder = true
+		);
 
 		typedef struct { boost::shared_ptr<const env::PhysicalStop> stop; boost::shared_ptr<BroadcastPoint> bp; } PhysicalStopAndBroadcastPoint;
 

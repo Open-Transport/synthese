@@ -58,8 +58,7 @@ namespace synthese
 	{
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_NAME = "pasn";
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_RIGHT = "pasr";
-		const std::string ProfilesAdmin::PARAMETER_SEARCH_FIRST = "pasf";
-
+		
 		ProfilesAdmin::ProfilesAdmin()
 			: AdminInterfaceElement("users", AdminInterfaceElement::EVER_DISPLAYED) {}
 
@@ -67,27 +66,36 @@ namespace synthese
 		{
 			string name;
 			string right;
-			int first = 0;
 
-			ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_NAME);
+			ParametersMap::const_iterator it;
+			
+			// Profile name
+			it = map.find(PARAMETER_SEARCH_NAME);
 			if (it != map.end())
 			{
 				name = it->second;
 			}
 
+			// Profile right
 			it = map.find(PARAMETER_SEARCH_RIGHT);
 			if (it != map.end())
 			{
 				right = it->second;
 			}
 
-			it = map.find(PARAMETER_SEARCH_FIRST);
-			if (it != map.end())
-			{
-				first = Conversion::ToInt(it->second);
-			}
+			// Parameters
+			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAMETER_SEARCH_NAME, 30);
 
-			_searchResult = ProfileTableSync::search(name, right, first, 50);
+			_searchResult = ProfileTableSync::search(
+				name
+				, right
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
+				, _requestParameters.raisingOrder
+			);
+
+			_resultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _searchResult);
 		}
 
 		string ProfilesAdmin::getTitle() const
@@ -123,7 +131,7 @@ namespace synthese
 			v.push_back(make_pair(PARAMETER_SEARCH_NAME, string("Nom")));
 			v.push_back(make_pair(string(), string("Résumé")));
 			v.push_back(make_pair(string(), string("Actions")));
-			ActionResultHTMLTable t(v, s.getForm(), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addProfileRequest.getHTMLForm("add"), AddProfileAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(v, s.getForm(), _requestParameters, _resultParameters, addProfileRequest.getHTMLForm("add"), AddProfileAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 			t.getActionForm().addHiddenField(AddProfileAction::PARAMETER_TEMPLATE_ID, Conversion::ToString(UNKNOWN_VALUE));
 
 			stream << t.open();

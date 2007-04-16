@@ -120,13 +120,14 @@ namespace synthese
 		{
 			typedef enum { ALL_STATUS, BROADCAST_OVER, BROADCAST_RUNNING, BROADCAST_RUNNING_WITH_END, BROADCAST_RUNNING_WITHOUT_END, FUTURE_BROADCAST } StatusSearch;
 
-			time::DateTime			_startDate;
-			time::DateTime			_endDate;
-			StatusSearch			_searchStatus;
-			AlarmLevel				_searchLevel;
-			AlarmConflict			_searchConflict;
-			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
-			html::ActionResultHTMLTable::ResultParameters		_resultParameters;
+			time::DateTime										_startDate;
+			time::DateTime										_endDate;
+			StatusSearch										_searchStatus;
+			AlarmLevel											_searchLevel;
+			AlarmConflict										_searchConflict;
+			html::ActionResultHTMLTable::RequestParameters		_requestParameters;
+			html::ActionResultHTMLTable::ResultParameters		_scenarioResultParameters;
+			html::ActionResultHTMLTable::ResultParameters		_alarmResultParameters;
 
 			server::ParametersMap	_parametersMap;
 			

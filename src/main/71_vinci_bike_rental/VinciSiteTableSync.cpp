@@ -82,6 +82,8 @@ namespace synthese
 			addTableColumn(COL_NAME, "TEXT", true);
 			addTableColumn(COL_ADDRESS, "TEXT", true);
 			addTableColumn(COL_PHONE, "TEXT", true);
+
+			addTableIndex(COL_NAME);
 		}
 
 		void VinciSiteTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
@@ -97,6 +99,30 @@ namespace synthese
 		void VinciSiteTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
+		}
+
+		std::vector<boost::shared_ptr<VinciSite> > VinciSiteTableSync::search( int first /*= 0*/, int number /*= 0 */, bool orderByName/*=true */, bool raisingOrder/*=true */ )
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+
+			query
+				<< "SELECT *"
+				<< " FROM "
+				<< TABLE_NAME;
+			if (orderByName)
+				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+
+			SQLiteResult result = sqlite->execQuery(query.str());
+			vector<shared_ptr<VinciSite> > sites;
+
+			for (int i=0; i<result.getNbRows(); ++i)
+			{
+				shared_ptr<VinciSite> site(new VinciSite);
+				load(site.get(), result, i);
+				sites.push_back(site);
+			}
+			return sites;
 		}
 	}
 }

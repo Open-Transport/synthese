@@ -51,6 +51,7 @@ namespace synthese
 			int					_curCol;
 			int					_curRow;
 			const std::string	_className;
+			bool				_lastColWasH;
 			
 			std::string			_closeRow();
 
@@ -86,14 +87,15 @@ namespace synthese
 			/** Adds a cell to the table.
 				@param colSpan Number of columns the cell will use
 				@param className CSS class name
+				@param isHeader If true creates a th cell, else a td one
 				If the col number overloads the table col width, then a row is automatically defined. But this row can not have a CSS class name.
 			*/
-			std::string col(int colSpan=1, std::string className="");
+			std::string col(int colSpan=1, std::string className=std::string(), bool isHeader=false);
 
 			/** Adds a row to the table.
 				@param className CSS class name
 			*/
-			virtual std::string row(std::string className="");
+			virtual std::string row(std::string className=std::string());
 
 			/** Adds a cell at the specified column.
 				If the current col is before the specified one, then additional cols are added, else a new row is created (without any CSS)

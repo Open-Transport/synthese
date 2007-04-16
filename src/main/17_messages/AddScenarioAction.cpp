@@ -33,6 +33,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace server;
+	using namespace time;
 	
 	namespace messages
 	{
@@ -73,7 +74,8 @@ namespace synthese
 					_name = it->second;
 					if(_name.empty())
 						throw ActionException("Le scénario doit avoir un nom.");
-					vector<shared_ptr<Scenario> > v = ScenarioTableSync::search(_isTemplate, _name, 0, 1);
+					
+					vector<shared_ptr<Scenario> > v = ScenarioTableSync::search(_isTemplate, DateTime (TIME_UNKNOWN), DateTime (TIME_UNKNOWN), _name, 0, 1);
 					if (!v.empty())
 					{
 						throw ActionException("Un scénario de même nom existe déjà");

@@ -76,7 +76,18 @@ namespace synthese
 
 			_requestParameters = ResultHTMLTable::getParameters(map, PARAMETER_CITY_NAME, 30);
 
-			_searchResult = searchConnectionPlacesWithBroadcastPoints(_cityName, _placeName, _displayNumber, _lineUId, _requestParameters.maxSize, _requestParameters.first);
+			_searchResult = searchConnectionPlacesWithBroadcastPoints(
+				_cityName
+				, _placeName
+				, _displayNumber
+				, _lineUId
+				, _requestParameters.maxSize
+				, _requestParameters.first
+				, _requestParameters.orderField == PARAMETER_CITY_NAME
+				, _requestParameters.orderField == PARAMETER_PLACE_NAME
+				, _requestParameters.orderField == PARAMETER_DISPLAY_NUMBER
+				, _requestParameters.raisingOrder
+				);
 
 			_resultParameters = ResultHTMLTable::getParameters(_requestParameters, _searchResult);
 

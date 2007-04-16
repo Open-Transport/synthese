@@ -104,7 +104,8 @@ namespace synthese
 				throw RequestException("Interface redirect page not implemented");
 			}
 
-			_tableId = decodeTableId(Conversion::ToLongLong(it->second));
+			_tableId = decodeTableId(uidCode);
+
 
 			if (_tableId == VinciBikeTableSync::TABLE_ID)
 			{
@@ -192,6 +193,12 @@ namespace synthese
 				{
 					// Action : nothing
 					// Function : go to the contract
+					// Function : go to the bike page
+					FunctionRequest<AdminRequest> redirRequest(_request);
+					redirRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
+					redirRequest.setObjectId(_contract->getKey());
+					redirRequest.getFunction()->getInterface()->getPage<RedirectInterfacePage>()->display(stream, VariablesMap(), &redirRequest);
+					return;
 				}
 			}
 			else

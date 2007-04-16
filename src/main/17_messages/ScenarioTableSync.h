@@ -60,8 +60,18 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<Scenario> > search(
-				 bool isATemplate, const std::string name=""
-				, int first = 0, int number = -1);
+				bool isATemplate
+				, time::DateTime startDate
+				, time::DateTime endDate
+				, const std::string name= std::string()
+				, int first = 0
+				, int number = -1
+				, bool orderByDate = true
+				, bool orderByName = false
+				, bool orderByStatus = false
+				, bool orderByConflict = false
+				, bool raisingOrder = false
+				);
 
 			static void saveWithAlarms(Scenario* object);
 

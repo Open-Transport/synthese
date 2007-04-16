@@ -91,9 +91,17 @@ namespace synthese
 		public:
 			/** The returned alarms must be deleted */
 			static std::vector<boost::shared_ptr<Alarm> > search(
-				Scenario* scenario
-				, time::DateTime startDate, time::DateTime endDate
-				, int first = 0, int number = 0);
+				const Scenario* scenario
+				, time::DateTime startDate
+				, time::DateTime endDate
+				, int first = 0
+				, int number = 0
+				, bool orderByDate = true
+				, bool orderByLevel = false
+				, bool orderByStatus = false
+				, bool orderByConflict = false
+				, bool raisingOrder = false
+				);
 
 
 		};

@@ -85,7 +85,6 @@ namespace synthese
 		{
 			static const std::string PARAMETER_SEARCH_NAME;
 			static const std::string PARAMETER_SEARCH_RIGHT;
-			static const std::string PARAMETER_SEARCH_FIRST;
 
 			std::vector<boost::shared_ptr<Profile> >		_searchResult;
 			html::ActionResultHTMLTable::RequestParameters	_requestParameters;

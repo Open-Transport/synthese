@@ -60,7 +60,7 @@ namespace synthese
 		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_FINANCIAL_ACCOUNT_CODE = "4111";
 		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_GUARANTEES_ACCOUNT_CODE = "4117";
 		const std::string VinciBikeRentalModule::VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE = "4119";
-		const std::string VinciBikeRentalModule::VINCI_STOCKS_BIKE_ACCOUNT_CODE = "371";
+		const std::string VinciBikeRentalModule::VINCI_AVAILABLE_BIKES_STOCKS_ACCOUNT_CODE = "37101";
 		const std::string VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_EUROS_ACCOUNT_CODE = "70831";
 		const std::string VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE = "70832";
 		const std::string VinciBikeRentalModule::VINCI_SERVICES_LOCK_RENT_FREE_ACCOUNT_CODE = "70833";
@@ -280,11 +280,11 @@ namespace synthese
 			}
 
 			// Stock accounts
-			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_STOCKS_BIKE_ACCOUNT_CODE, 0, "");
+			accounts = AccountTableSync::search(VinciBikeRentalModule::getVinciUser()->getKey(), VinciBikeRentalModule::VINCI_AVAILABLE_BIKES_STOCKS_ACCOUNT_CODE, 0, "");
 			if (accounts.size() == 0)
 			{
 				shared_ptr<Account> bikeStockAccount(new Account);
-				bikeStockAccount->setRightClassNumber(VINCI_STOCKS_BIKE_ACCOUNT_CODE);
+				bikeStockAccount->setRightClassNumber(VINCI_AVAILABLE_BIKES_STOCKS_ACCOUNT_CODE);
 				bikeStockAccount->setRightCurrency(bikeCurrency);
 				bikeStockAccount->setLeftCurrency(bikeCurrency);
 				bikeStockAccount->setRightUserId(_vinciUser->getKey());

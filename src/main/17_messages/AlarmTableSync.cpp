@@ -113,6 +113,11 @@ namespace synthese
 			addTableColumn (COL_PERIODSTART, "TIMESTAMP", true);
 			addTableColumn (COL_PERIODEND, "TIMESTAMP", true);
 			addTableColumn(COL_SCENARIO_ID, "INTEGER");
+
+			vector<string> cols;
+			cols.push_back(COL_SCENARIO_ID);
+			cols.push_back(COL_PERIODSTART);
+			addTableIndex(cols);
 		}
 
 
@@ -177,8 +182,18 @@ namespace synthese
 			}
 		}
 
-		std::vector<shared_ptr<Alarm> > AlarmTableSync::search(Scenario* scenario, time::DateTime startDate, time::DateTime endDate, int first /*= 0*/, int number /*= 0*/)
-		{
+		std::vector<shared_ptr<Alarm> > AlarmTableSync::search(
+			const Scenario* scenario
+			, time::DateTime startDate
+			, time::DateTime endDate
+			, int first /*= 0*/
+			, int number /*= 0*/
+			, bool orderByDate
+			, bool orderByLevel
+			, bool orderByStatus
+			, bool orderByConflict
+			, bool raisingOrder
+		){
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query

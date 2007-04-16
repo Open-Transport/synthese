@@ -114,7 +114,7 @@ namespace synthese
 			stringstream s;
 
 			s << row();
-			s << "<th colspan=\"" << _getColsNumber() << "\">";
+			s << col(_getColsNumber(), string(), true);
 			if (_first)
 			{
 				HTMLForm::HiddenFieldsMap f;

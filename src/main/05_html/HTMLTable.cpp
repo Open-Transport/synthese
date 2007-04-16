@@ -107,17 +107,18 @@ namespace synthese
 			stringstream s;
 			for (; _curCol < _cols-1; ++_curCol)
 				s << col() << "&nbsp;";
-			s << "</td></tr>";
+			s << (_lastColWasH ? "</th>" : "</td>");
+			s << "</tr>";
 			return s.str();
 		}
 
-		std::string HTMLTable::col( int colSpan/*=1*/, string className )
+		std::string HTMLTable::col( int colSpan/*=1*/, string className, bool isHeader )
 		{
 			stringstream s;
 			if (_cols && (_curCol > _cols) || _curRow == -1)
 				s << row();
 			else if (_curCol != -1)
-				s << "</td>";
+				s << (_lastColWasH ? "</th>" : "</td>");
 			s << "<td";
 			if (colSpan > 1)
 				s << " colspan=\"" << colSpan << "\"";
@@ -125,6 +126,7 @@ namespace synthese
 				s << " class=\"" << className << "\"";
 			s << ">";
 			_curCol += colSpan;
+			_lastColWasH = isHeader;
 			return s.str();
 		}
 

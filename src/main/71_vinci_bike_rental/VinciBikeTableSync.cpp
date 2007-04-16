@@ -246,7 +246,7 @@ FROM
 					<< " INNER JOIN " << VinciContractTableSync::TABLE_NAME << " AS c ON c." << VinciContractTableSync::COL_USER_ID << "=t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID
 				<< " WHERE "
 					<< "p." << TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID << "=" << Conversion::ToString(bike->getKey())
-					<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << "=''"
+					<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << " IS NULL"
 				<< " ORDER BY "
 					<< "t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << " DESC"
 				<< " LIMIT 1 ";
@@ -268,7 +268,7 @@ FROM
 					<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID
 				<< " WHERE "
 					<< "p." << TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID << "=" << Conversion::ToString(bike->getKey())
-					<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << "=''"
+					<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << " IS NULL"
 				<< " ORDER BY "
 					<< "t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << " DESC"
 				<< " LIMIT 1 ";

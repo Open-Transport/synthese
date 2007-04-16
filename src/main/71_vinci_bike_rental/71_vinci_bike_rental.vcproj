@@ -162,6 +162,14 @@
 			Name="Admin Interface elements"
 			>
 			<File
+				RelativePath=".\VinciAccountsAdminInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciAccountsAdminInterfaceElement.h"
+				>
+			</File>
+			<File
 				RelativePath=".\VinciBikeAdminInterfaceElement.cpp"
 				>
 			</File>
@@ -199,6 +207,14 @@
 			</File>
 			<File
 				RelativePath=".\VinciReportsAdminInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciSitesAdminInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VinciSitesAdminInterfaceElement.h"
 				>
 			</File>
 		</Filter>

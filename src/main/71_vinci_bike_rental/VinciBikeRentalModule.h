@@ -194,7 +194,7 @@ namespace synthese
 			static const std::string VINCI_CHANGE_GUARANTEE_CHECK_ACCOUNT_CODE;
 			static const std::string VINCI_CHANGE_GUARANTEE_CARD_ACCOUNT_CODE;
 			static const std::string VINCI_CUSTOMER_TICKETS_ACCOUNT_CODE;
-			static const std::string VINCI_STOCKS_BIKE_ACCOUNT_CODE;
+			static const std::string VINCI_AVAILABLE_BIKES_STOCKS_ACCOUNT_CODE;
 			static const std::string VINCI_SERVICES_BIKE_RENT_EUROS_ACCOUNT_CODE;
 			static const std::string VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE;
 			static const std::string VINCI_SERVICES_DELAYED_PAYMENTS_ACCOUNT_CODE;

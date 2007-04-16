@@ -102,6 +102,11 @@ namespace synthese
 			addTableColumn(COL_NAME, "TEXT");
 			addTableColumn (COL_PERIODSTART, "TIMESTAMP", true);
 			addTableColumn (COL_PERIODEND, "TIMESTAMP", true);
+
+			vector<string> cols;
+			cols.push_back(COL_IS_TEMPLATE);
+			cols.push_back(COL_PERIODSTART);
+			addTableIndex(cols);
 		}
 
 		void ScenarioTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
@@ -144,9 +149,17 @@ namespace synthese
 		}
 
 		std::vector<shared_ptr<Scenario> > ScenarioTableSync::search(
-			bool isATemplate, const std::string name
-			, int first /*= 0*/, int number /*= 0*/ )
-		{
+			bool isATemplate
+			, time::DateTime startDate
+			, time::DateTime endDate
+			, const std::string name
+			, int first /*= 0*/, int number /*= 0*/
+			, bool orderByDate
+			, bool orderByName
+			, bool orderByStatus
+			, bool orderByConflict
+			, bool raisingOrder
+		){
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query

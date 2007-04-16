@@ -63,9 +63,11 @@ namespace synthese
 			@author Hugues Romain
 			@date 2006	
 			*/
-			static std::vector<boost::shared_ptr<VinciSite> > searchVinciSites(const db::SQLiteQueueThreadExec* sqlite
-
-				, int first = 0, int number = 0);
+			static std::vector<boost::shared_ptr<VinciSite> > search(
+				int first = 0, int number = 0
+				, bool orderByName=true
+				, bool raisingOrder=true
+				);
 
 
 		protected:

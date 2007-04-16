@@ -49,19 +49,27 @@ namespace synthese
 	{
 
 		std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints( 
-			std::string cityName /*= ""*/, std::string placeName /*= ""*/, BroadcastPointsPresence bpPresence /*= UNKNOWN_VALUE*/
-			, uid lineId /*= UNKNOWN_VALUE*/, int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
-		{
+			std::string cityName /*= ""*/
+			, std::string placeName /*= ""*/
+			, BroadcastPointsPresence bpPresence /*= UNKNOWN_VALUE*/
+			, uid lineId /*= UNKNOWN_VALUE*/
+			, int number/*=UNKNOWN_VALUE*/
+			, int first/*=0*/ 
+			, bool orderByCity
+			, bool orderByName
+			, bool orderByNumber
+			, bool raisingOrder
+		){
 			stringstream query;
 			query << " SELECT "
-				<< "p." << TABLE_COL_ID
-				<< ",COUNT(b." << TABLE_COL_ID << ") AS bc"
+					<< "p." << TABLE_COL_ID
+					<< ",COUNT(b." << TABLE_COL_ID << ") AS bc"
 				<< " FROM " << ConnectionPlaceTableSync::TABLE_NAME << " AS p"
-				<< " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
-				<< " LEFT JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=p." << TABLE_COL_ID
+					<< " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
+					<< " LEFT JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=p." << TABLE_COL_ID
 				<< " WHERE "
-				<< "c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'"
-				<< " AND p." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(placeName, false) << "%'";
+					<< "c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'"
+					<< " AND p." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(placeName, false) << "%'";
 			query << " GROUP BY p." << TABLE_COL_ID;
 			if (bpPresence != WITH_OR_WITHOU_ANY_BROADCASTPOINT)
 			{
@@ -71,6 +79,12 @@ namespace synthese
 				if (bpPresence == NO_BROADCASTPOINT)
 					query << "=0";
 			}
+			if (orderByCity)
+				query << " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",b."  << BroadcastPointTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (orderByName)
+				query << " ORDER BY b."  << BroadcastPointTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (orderByNumber)
+				query << " ORDER BY COUNT(b."  << TABLE_COL_ID << ")" << (raisingOrder ? " ASC" : " DESC");
 
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
