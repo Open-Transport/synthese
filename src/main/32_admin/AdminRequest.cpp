@@ -64,6 +64,8 @@ namespace synthese
 			map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
 			if (_actionFailedPage.get())
 				map.insert(make_pair(PARAMETER_ACTION_FAILED_PAGE, _actionFailedPage->getFactoryKey()));
+			ParametersMap adminMap = _page->getParametersMap();
+			map.insert(adminMap.begin(), adminMap.end());
 			return map;
 		}
 

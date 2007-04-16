@@ -25,15 +25,22 @@
 #include "05_html/ActionResultHTMLTable.h"
 #include "05_html/HTMLModule.h"
 
+#include "57_accounting/Transaction.h"
+
+#include "12_security/UserTableSync.h"
+
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminRequest.h"
 
+
 #include "71_vinci_bike_rental/VinciAddBike.h"
 #include "71_vinci_bike_rental/VinciBike.h"
+#include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
 #include "71_vinci_bike_rental/VinciBikeAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciBikeSearchAdminInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciCustomerAdminInterfaceElement.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -44,6 +51,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace html;
+	using namespace security;
 
 	namespace vinci
 	{
@@ -107,6 +115,10 @@ namespace synthese
 			FunctionRequest<AdminRequest> viewBikeRequest(request);
 			viewBikeRequest.getFunction()->setPage<VinciBikeAdminInterfaceElement>();
 
+			// Open a contract
+			FunctionRequest<AdminRequest> viewContract(request);
+			viewContract.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
+
 			stream << "<h1>Recherche de vélo</h1>";
 
 			SearchFormHTMLTable st(addStatusRequest.getHTMLForm("search"));
@@ -120,15 +132,33 @@ namespace synthese
 			ActionResultHTMLTable::HeaderVector rh;
 			rh.push_back(make_pair(PARAMETER_SEARCH_NUMBER, "Numéro"));
 			rh.push_back(make_pair(PARAMETER_SEARCH_CADRE, "Cadre"));
+			rh.push_back(make_pair(string(), "Statut"));
 			ActionResultHTMLTable rt(rh, st.getForm(), _resultRequestParameters, _resultResultParameters, addBikeRequest.getHTMLForm("create"));
 				
 			stream << rt.open();
 			for (vector<shared_ptr<VinciBike> >::const_iterator it = _bikes.begin(); it != _bikes.end(); ++it)
 			{
-				viewBikeRequest.setObjectId((*it)->getKey());
+				shared_ptr<const VinciBike> bike = *it;
+				viewBikeRequest.setObjectId(bike->getKey());
 				stream << rt.row();
 				stream << rt.col() << HTMLModule::getHTMLLink(viewBikeRequest.getURL(), (*it)->getNumber());
 				stream << rt.col() << HTMLModule::getHTMLLink(viewBikeRequest.getURL(), (*it)->getMarkedNumber());
+				stream << rt.col();
+				if (bike->getComplements().lastTransaction.get())
+				{
+					if (bike->getComplements().lastTransaction->getEndDateTime().isUnknown())
+						stream << "EN LOCATION depuis le ";
+					else
+						stream << "DISPONIBLE.<br />Dernière location le ";
+					stream << bike->getComplements().lastTransaction->getStartDateTime().toString();
+					if (bike->getComplements().lastContract.get())
+					{
+						viewContract.setObjectId(bike->getComplements().lastContract->getKey());
+						shared_ptr<User> user = UserTableSync::get(bike->getComplements().lastContract->getUserId());
+						stream << " par " << HTMLModule::getHTMLLink(viewContract.getURL(), user->getFullName());
+					}
+				}
+
 			}
 			stream << rt.row();
 			stream << rt.col() << rt.getActionForm().getTextInput(VinciAddBike::PARAMETER_NUMBER, _bikeNumber);

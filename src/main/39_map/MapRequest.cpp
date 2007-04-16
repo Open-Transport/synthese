@@ -49,6 +49,7 @@ using synthese::util::Log;
 using namespace boost::posix_time;
 
 using namespace std;
+using namespace boost;
 using namespace synthese::util::XmlToolkit;
 
 
@@ -189,7 +190,7 @@ namespace synthese
 			RenderingConfig conf;
 
 			// Choose the renderer
-			Renderer* renderer = Factory<Renderer>::create(_output);
+			shared_ptr<Renderer> renderer = Factory<Renderer>::create(_output);
 
 			// Generate an id for the map file based on current time
 			ptime timems (boost::date_time::microsec_clock<ptime>::local_time ());

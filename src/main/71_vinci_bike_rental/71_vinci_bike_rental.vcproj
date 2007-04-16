@@ -295,8 +295,16 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Requests"
+			Name="Functions"
 			>
+			<File
+				RelativePath=".\BarCodeInterpretFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BarCodeInterpretFunction.h"
+				>
+			</File>
 			<File
 				RelativePath=".\VinciContractPrintRequest.cpp"
 				>
@@ -312,6 +320,14 @@
 			<Filter
 				Name="Interface value elements"
 				>
+				<File
+					RelativePath=".\BarCodeHTMLFormValueInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\BarCodeHTMLFormValueInterfaceElement.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Interface elements library"

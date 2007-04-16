@@ -29,7 +29,7 @@ using synthese::env::Line;
 using synthese::env::LineStop;
 using synthese::env::Edge;
 
-
+using namespace boost;
 
 
 namespace synthese
@@ -153,7 +153,7 @@ HtmlMapRenderer::renderLines (std::ostream& _output, const synthese::env::Line::
 	{
 		// Differentiation on line stops
 		const DrawableLine* dbl = *(selectedLines.begin ());
-		const Line* line = lines.get (dbl->getLineId ());
+		shared_ptr<const Line> line = lines.get (dbl->getLineId ());
 		const std::vector<Edge*>& lineStops =  line->getEdges();
 		const std::vector<Point>& shiftedPoints = dbl->getShiftedPoints ();
 

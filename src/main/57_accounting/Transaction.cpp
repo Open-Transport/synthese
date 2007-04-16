@@ -117,11 +117,5 @@ namespace synthese
 		{
 			return _endDateTime;
 		}
-
-		shared_ptr<TransactionPart> Transaction::getPart(shared_ptr<const Account> account ) const
-		{
-			vector<shared_ptr<TransactionPart> > vtp = TransactionPartTableSync::search(shared_ptr<const Transaction>(this), account, 0, 1);
-			return vtp.empty() ? shared_ptr<TransactionPart>() : vtp.front();
-		}
 	}
 }

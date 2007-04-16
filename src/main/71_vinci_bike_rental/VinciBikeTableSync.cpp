@@ -27,8 +27,14 @@
 
 #include "02_db/DBModule.h"
 
+#include "57_accounting/Transaction.h"
+#include "57_accounting/TransactionTableSync.h"
+#include "57_accounting/TransactionPart.h"
+#include "57_accounting/TransactionPartTableSync.h"
+
 #include "71_vinci_bike_rental/VinciBike.h"
 #include "71_vinci_bike_rental/VinciBikeTableSync.h"
+#include "71_vinci_bike_rental/VinciContractTableSync.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -38,6 +44,7 @@ namespace synthese
 	using namespace db;
 	using namespace vinci;
 	using namespace util;
+	using namespace accounts;
 
 	namespace db
 	{
@@ -48,8 +55,8 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<VinciBike>::load(VinciBike* bike, const db::SQLiteResult& rows, int rowId)
 		{
 			bike->setKey(Conversion::ToLongLong(rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_ID)));
-			bike->_number = rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_NUMBER);
-			bike->_markedNumber = rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_MARKED_NUMBER);
+			bike->setNumber(rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_NUMBER));
+			bike->setMarkedNumber(rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_MARKED_NUMBER));
 		}
 
 		template<> void SQLiteTableSyncTemplate<VinciBike>::save(VinciBike* bike)
@@ -60,8 +67,8 @@ namespace synthese
 			{	//UPODATE
 				query << "UPDATE " << TABLE_NAME << " SET "
 					<< VinciBikeTableSync::TABLE_COL_ID << "=" << Conversion::ToString(bike->getKey())
-					<< "," << VinciBikeTableSync::TABLE_COL_NUMBER << "=" << Conversion::ToSQLiteString(bike->_number)
-					<< "," << VinciBikeTableSync::TABLE_COL_MARKED_NUMBER << "=" << Conversion::ToSQLiteString(bike->_markedNumber)
+					<< "," << VinciBikeTableSync::TABLE_COL_NUMBER << "=" << Conversion::ToSQLiteString(bike->getNumber())
+					<< "," << VinciBikeTableSync::TABLE_COL_MARKED_NUMBER << "=" << Conversion::ToSQLiteString(bike->getMarkedNumber())
 					;
 			}
 			else
@@ -69,8 +76,8 @@ namespace synthese
 				bike->setKey(getId(1,1)); /// @todo Handle grid number
 				query << "INSERT INTO " << TABLE_NAME << " VALUES("
 					<< Conversion::ToString(bike->getKey())
-					<< "," << Conversion::ToSQLiteString(bike->_number)
-					<< "," << Conversion::ToSQLiteString(bike->_markedNumber)
+					<< "," << Conversion::ToSQLiteString(bike->getNumber())
+					<< "," << Conversion::ToSQLiteString(bike->getMarkedNumber())
 					<< ")";
 			}
 			sqlite->execUpdate(query.str());
@@ -85,11 +92,14 @@ namespace synthese
 		const std::string VinciBikeTableSync::TABLE_COL_MARKED_NUMBER = "marked_number";
 
 		VinciBikeTableSync::VinciBikeTableSync()
-			: db::SQLiteTableSyncTemplate<VinciBike>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: db::SQLiteTableSyncTemplate<VinciBike>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NUMBER, "TEXT", true);
 			addTableColumn(TABLE_COL_MARKED_NUMBER, "TEXT", true);
+
+			addTableIndex(TABLE_COL_NUMBER);
+			addTableIndex(TABLE_COL_MARKED_NUMBER);
 		}
 
 		
@@ -117,6 +127,37 @@ namespace synthese
 			const db::SQLiteResult& rows)
 		{}
 
+		/** Example of support request :
+
+		@code
+SELECT *
+	, (	SELECT 
+			t031_transactions.id 
+		FROM 
+			t030_transaction_parts 
+			INNER JOIN t031_transactions ON t031_transactions.id = t030_transaction_parts.transaction_id 
+		WHERE
+			t030_transaction_parts.traded_object=t032_vinci_bike.id
+		ORDER BY
+			t031_transactions.start_date_time DESC
+		LIMIT 1
+		) AS transaction_id
+	, (	SELECT 
+			t035_vinci_contract.id
+		FROM
+			t030_transaction_parts
+			INNER JOIN t031_transactions ON t031_transactions.id = t030_transaction_parts.transaction_id
+			INNER JOIN t035_vinci_contract ON t035_vinci_contract.user_id = t031_transactions.left_user_id
+		WHERE
+			t030_transaction_parts.traded_object=t032_vinci_bike.id
+		ORDER BY
+			t031_transactions.start_date_time DESC
+		LIMIT 1
+		) AS contract_id
+FROM
+	t032_vinci_bike
+@endcode
+		*/
 		std::vector<shared_ptr<VinciBike> > VinciBikeTableSync::search(
 			const std::string& id
 			, const std::string& cadre 
@@ -131,14 +172,15 @@ namespace synthese
 
 			stringstream query;
 			query 
-				<< " SELECT * FROM " << TABLE_NAME
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
 				<< " WHERE 1 ";
 			if (!id.empty())
 				query << " AND " << TABLE_COL_NUMBER << "='" << id << "' ";
 			if (!cadre.empty())
 				query << " AND " << TABLE_COL_MARKED_NUMBER << " LIKE '%" << cadre << "%' ";
 			if (orderByNumber)
-				query << " ORDER BY " << TABLE_COL_NUMBER << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY CAST (" << TABLE_COL_NUMBER << " AS INTEGER)" << (raisingOrder ? " ASC" : " DESC");
 			if (orderByCadre)
 				query << " ORDER BY " << TABLE_COL_MARKED_NUMBER << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
@@ -153,7 +195,36 @@ namespace synthese
 				shared_ptr<VinciBike> bike(new VinciBike);
 				try
 				{
-					load(bike.get (), result, i);
+					load(bike.get(), result, i);
+					VinciBike::Complements c;
+					stringstream query2;
+					query2 << "SELECT tt." << TABLE_COL_ID << " AS transaction_id"
+						<< " FROM " 
+						<< TransactionPartTableSync::TABLE_NAME << " AS tp" 
+						<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS tt ON tt." << TABLE_COL_ID << "=tp." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID
+						<< " WHERE tp." << TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID << "=" << Conversion::ToString(bike->getKey())
+						<< " ORDER BY tt." << TransactionTableSync::TABLE_COL_START_DATE_TIME << " DESC"
+						<< " LIMIT 1";
+					SQLiteResult result2 = sqlite->execQuery(query2.str());
+
+					if (result2.getNbRows() > 0)
+						c.lastTransaction = TransactionTableSync::get(Conversion::ToLongLong(result2.getColumn(0, "transaction_id")));
+
+					stringstream query3;
+					query3
+						<< "SELECT cc." << TABLE_COL_ID  << " AS contract_id"
+						<< " FROM " 
+						<< TransactionPartTableSync::TABLE_NAME << " AS cp" 
+						<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS ct ON ct." << TABLE_COL_ID << "=cp." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID
+						<< " INNER JOIN " << VinciContractTableSync::TABLE_NAME << " AS cc ON cc." << VinciContractTableSync::COL_USER_ID << "=ct." << TransactionTableSync::TABLE_COL_LEFT_USER_ID
+						<< " WHERE cp." << TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID << "=" << Conversion::ToString(bike->getKey())
+						<< " ORDER BY ct." << TransactionTableSync::TABLE_COL_START_DATE_TIME << " DESC"
+						<< " LIMIT 1";
+					SQLiteResult result3 = sqlite->execQuery(query3.str());
+
+					if (result3.getNbRows() > 0)
+						c.lastContract = VinciContractTableSync::get(Conversion::ToLongLong(result3.getColumn(0, "contract_id")));
+					bike->setComplements(c);
 					bikes.push_back(bike);
 				}
 				catch (Exception e)
@@ -164,6 +235,50 @@ namespace synthese
 			return bikes;
 		}
 
+		boost::shared_ptr<VinciContract> VinciBikeTableSync::getRentContract( boost::shared_ptr<const VinciBike> bike )
+		{
+			stringstream query;
+			query
+				<< "SELECT c.*"
+				<< " FROM "
+					<< TransactionPartTableSync::TABLE_NAME << " AS p"
+					<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID
+					<< " INNER JOIN " << VinciContractTableSync::TABLE_NAME << " AS c ON c." << VinciContractTableSync::COL_USER_ID << "=t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID
+				<< " WHERE "
+					<< "p." << TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID << "=" << Conversion::ToString(bike->getKey())
+					<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << "=''"
+				<< " ORDER BY "
+					<< "t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << " DESC"
+				<< " LIMIT 1 ";
+			SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+			if (!result.getNbRows())
+				return shared_ptr<VinciContract>();
+			shared_ptr<VinciContract> contract(new VinciContract);
+			VinciContractTableSync::load(contract.get(), result, 0);
+			return contract;
+		}
+
+		boost::shared_ptr<accounts::TransactionPart> VinciBikeTableSync::getRentTransactionPart( boost::shared_ptr<const VinciBike> bike )
+		{
+			stringstream query;
+			query
+				<< "SELECT p.*"
+				<< " FROM "
+					<< TransactionPartTableSync::TABLE_NAME << " AS p"
+					<< " INNER JOIN " << TransactionTableSync::TABLE_NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TransactionPartTableSync::TABLE_COL_TRANSACTION_ID
+				<< " WHERE "
+					<< "p." << TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID << "=" << Conversion::ToString(bike->getKey())
+					<< " AND t." << TransactionTableSync::TABLE_COL_END_DATE_TIME << "=''"
+				<< " ORDER BY "
+					<< "t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << " DESC"
+				<< " LIMIT 1 ";
+			SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+			if (!result.getNbRows())
+				return shared_ptr<TransactionPart>();
+			shared_ptr<TransactionPart> tp(new TransactionPart);
+			TransactionPartTableSync::load(tp.get(), result, 0);
+			return tp;
+		}
 	}
 }
 

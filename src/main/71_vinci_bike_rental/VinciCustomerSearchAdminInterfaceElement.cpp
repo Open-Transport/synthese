@@ -81,38 +81,38 @@ namespace synthese
 			stream << st.cell("Prénom", st.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname));
 			stream << st.close();
 
+			stream << "<h1>Résultat de la recherche</h1>";
+
+			ActionResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(string(), "ID"));
+			h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
+			h.push_back(make_pair(PARAM_SEARCH_SURNAME, "Prénom"));
+			ActionResultHTMLTable t(h, st.getForm(), _requestParameters, _resultParameters, addContractRequest.getHTMLForm("add"));
+			stream << t.open();
+			if (_contracts.size() == 0)
+			{
+				stream << t.row();
+				stream << t.col(3) << "Aucun contrat trouvé";
+			}
+			else
+			{
+				for (vector<shared_ptr<VinciContract> >::const_iterator it = _contracts.begin(); it != _contracts.end(); ++it)
+				{
+					contractRequest.setObjectId((*it)->getKey());
+					stream << t.row();
+					stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), Conversion::ToString((*it)->getKey()));
+					stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), (*it)->getUser()->getName());
+					stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), (*it)->getUser()->getSurname());
+				}
+			}
 			if (_activeSearch)
 			{
-				stream << "<h1>Résultat de la recherche</h1>";
-
-				ActionResultHTMLTable::HeaderVector h;
-				h.push_back(make_pair(string(), "ID"));
-				h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
-				h.push_back(make_pair(PARAM_SEARCH_SURNAME, "Prénom"));
-				ActionResultHTMLTable t(h, st.getForm(), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addContractRequest.getHTMLForm("add"));
-				stream << t.open();
-				if (_contracts.size() == 0)
-				{
-					stream << t.row();
-					stream << t.col(3) << "Aucun contrat trouvé";
-				}
-				else
-				{
-					for (vector<shared_ptr<VinciContract> >::const_iterator it = _contracts.begin(); it != _contracts.end(); ++it)
-					{
-						contractRequest.setObjectId((*it)->getKey());
-						stream << t.row();
-						stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), Conversion::ToString((*it)->getKey()));
-						stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), (*it)->getUser()->getName());
-						stream << t.col() << HTMLModule::getHTMLLink(contractRequest.getURL(), (*it)->getUser()->getSurname());
-					}
-				}
 				stream << t.row();
 				stream << t.col() << t.getActionForm().getSubmitButton("Nouveau");
 				stream << t.col() << t.getActionForm().getTextInput(AddCustomerAction::PARAMETER_NAME, _searchName);
 				stream << t.col() << t.getActionForm().getTextInput(AddCustomerAction::PARAMETER_SURNAME, _searchSurname);
-				stream << t.close();
 			}
+			stream << t.close();
 		}
 
 		void VinciCustomerSearchAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
@@ -125,15 +125,39 @@ namespace synthese
 			if (it != map.end())
 				_searchName = it->second;
 
-			_activeSearch = (_searchSurname != "" || _searchName != "");
+			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAM_SEARCH_NAME, 30);
 
-			if (_activeSearch)
-				_contracts = VinciContractTableSync::search(_searchName, _searchSurname);
+			_activeSearch = !_searchName.empty() && !_searchSurname.empty();
+
+			_contracts = VinciContractTableSync::search(
+				_searchName
+				, _searchSurname
+				, _requestParameters.first
+				, _requestParameters.maxSize
+				, _requestParameters.orderField == PARAM_SEARCH_NAME
+				, _requestParameters.orderField == PARAM_SEARCH_SURNAME
+				, _requestParameters.raisingOrder
+			);
+
+			_resultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _contracts);
 		}
 
 		bool VinciCustomerSearchAdminInterfaceElement::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		server::ParametersMap VinciCustomerSearchAdminInterfaceElement::getParametersMap() const
+		{
+			ParametersMap map(ActionResultHTMLTable::getParametersMap(_requestParameters));
+			map.insert(make_pair(PARAM_SEARCH_NAME, _searchName));
+			map.insert(make_pair(PARAM_SEARCH_SURNAME, _searchSurname));
+			return map;
+		}
+
+		void VinciCustomerSearchAdminInterfaceElement::setSearchName( const std::string& name )
+		{
+			_searchName = name;
 		}
 	}
 }

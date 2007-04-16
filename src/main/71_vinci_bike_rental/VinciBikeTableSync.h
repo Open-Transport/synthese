@@ -34,9 +34,15 @@
 
 namespace synthese
 {
+	namespace accounts
+	{
+		class TransactionPart;
+	}
+
 	namespace vinci
 	{
 		class VinciBike;
+		class VinciContract;
 
 		/** Vinci Bike SQLite table synchronizer.
 			@ingroup m71LS refLS
@@ -67,13 +73,28 @@ namespace synthese
 				, bool raisingOrder = true
 				);
 
+			/** Gets the contract corresponding to a current rent..
+				@param bike The bike to search
+				@return boost::shared_ptr<VinciContract> The rent contract. If the bike is not rented, then the method returns null.
+				@author Hugues Romain
+				@date 2007				
+			*/
+			static boost::shared_ptr<VinciContract> getRentContract(boost::shared_ptr<const VinciBike> bike);
+
+			/** Gets the current rent service transaction part.
+				@param bike The bike to search
+				@return boost::shared_ptr<accounts::TransactionPart> The rent transaction part. If the bike is not rented, then th emethod returns a null shared pointer.
+				@author Hugues Romain
+				@date 2007				
+			*/
+			static boost::shared_ptr<accounts::TransactionPart> getRentTransactionPart(boost::shared_ptr<const VinciBike> bike);
 
 		protected:
 
 			/** Action to do on user creation.
 			No action because the users are not permanently loaded in ram.
 			*/
-			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite,	
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows, bool isFirstSync = false);
 

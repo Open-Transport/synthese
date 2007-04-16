@@ -5,5 +5,5 @@ synthese::util::Factory<synthese::map::Renderer>::integrate<synthese::map::JpegR
 synthese::util::Factory<synthese::map::Renderer>::integrate<synthese::map::MapInfoRenderer>("mapinfo");
 synthese::util::Factory<synthese::map::Renderer>::integrate<synthese::map::PostscriptRenderer>("ps");
 
-synthese::util::Factory<synthese::server::Request>::integrate<synthese::map::MapRequest> ("map");
+synthese::util::Factory<synthese::server::Function>::integrate<synthese::map::MapRequest> ("map");
 

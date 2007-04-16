@@ -12,15 +12,15 @@
 #include "MapBackgroundManager.h"
 
 
-using namespace synthese::util::XmlToolkit;
-
-using namespace synthese::util;
-
-
+using namespace boost;
 
 namespace synthese
 {
-namespace map
+	using namespace env;
+	using namespace util;
+	using namespace util::XmlToolkit;
+
+	namespace map
 {
 
 
@@ -32,7 +32,7 @@ XmlBuilder::CreateDrawableLine (XMLNode& node,
     
     uid lineId (GetLongLongAttr (node, "lineId"));
     
-    const synthese::env::Line* line = lines.get (lineId);
+    shared_ptr<const Line> line = lines.get (lineId);
     const std::vector<synthese::env::Edge*>& lineStops = line->getEdges ();
     
     assert (lineStops.size () >= 2);
@@ -42,7 +42,7 @@ XmlBuilder::CreateDrawableLine (XMLNode& node,
 
     bool withPhysicalStops (GetBoolAttr (node, "withPhysicalStops", false));
 
-    return new DrawableLine (line, 
+    return new DrawableLine (line.get(), 
 			     fromLineStopIndex, 
 			     toLineStopIndex,
 			     withPhysicalStops);

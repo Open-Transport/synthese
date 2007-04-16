@@ -86,5 +86,10 @@ namespace synthese
 			t->setEndDateTime(now);
 			TransactionTableSync::save(t.get());
 		}
+
+		void ReturnABikeAction::setTransactionPart( boost::shared_ptr<accounts::TransactionPart> transactionPart )
+		{
+			_transactionPart = transactionPart;
+		}
 	}
 }

@@ -34,6 +34,7 @@
 #include "57_accounting/AccountingModule.h"
 #include "57_accounting/Transaction.h"
 #include "57_accounting/TransactionTableSync.h"
+#include "57_accounting/TransactionPartTableSync.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -127,6 +128,12 @@ namespace synthese
 			addTableColumn(TABLE_COL_LEFT_USER_ID, "INTEGER", true);
 			addTableColumn(TABLE_COL_PLACE_ID, "INTEGER", true);
 			addTableColumn(TABLE_COL_COMMENT, "TEXT", true);
+
+			addTableIndex(TABLE_COL_START_DATE_TIME);
+			vector<string> v;
+			v.push_back(TABLE_COL_LEFT_USER_ID);
+			v.push_back(TABLE_COL_START_DATE_TIME);
+			addTableIndex(v);
 		}
 
 		void TransactionTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
@@ -143,5 +150,12 @@ namespace synthese
 		{
 
 		}
+
+		shared_ptr<TransactionPart> TransactionTableSync::getPart(shared_ptr<const Transaction> transaction, shared_ptr<const Account> account )
+		{
+			vector<shared_ptr<TransactionPart> > vtp = TransactionPartTableSync::search(transaction, account, 0, 1);
+			return vtp.empty() ? shared_ptr<TransactionPart>() : vtp.front();
+		}
+
 	}
 }

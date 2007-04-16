@@ -154,7 +154,7 @@ namespace synthese
 				if (!tp.get())
 					return shared_ptr<VinciAntivol>();
 				shared_ptr<Transaction> t = TransactionTableSync::get(tp->getTransactionId());
-				tp = t->getPart(VinciBikeRentalModule::getFreeLockRentServiceAccount());
+				tp = TransactionTableSync::getPart(t, VinciBikeRentalModule::getFreeLockRentServiceAccount());
 				return VinciAntivolTableSync::get(Conversion::ToLongLong(tp->getTradedObjectId()));
 			}
 			catch (...)

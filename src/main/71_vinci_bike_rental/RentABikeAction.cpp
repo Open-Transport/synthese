@@ -21,6 +21,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "57_accounting/TransactionPart.h"
+
+#include "71_vinci_bike_rental/RentABikeAction.h"
+#include "71_vinci_bike_rental/VinciBike.h"
+#include "71_vinci_bike_rental/VinciBikeTableSync.h"
+#include "71_vinci_bike_rental/VinciRate.h"
+#include "71_vinci_bike_rental/VinciAntivol.h"
+#include "71_vinci_bike_rental/VinciAntivolTableSync.h"
+#include "71_vinci_bike_rental/VinciRateTableSync.h"
+#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
+#include "71_vinci_bike_rental/VinciContract.h"
+#include "71_vinci_bike_rental/VinciContractTableSync.h"
+
 #include "01_util/Conversion.h"
 
 #include "02_db/DBEmptyResultException.h"
@@ -33,19 +46,7 @@
 #include "57_accounting/Account.h"
 #include "57_accounting/Transaction.h"
 #include "57_accounting/TransactionTableSync.h"
-#include "57_accounting/TransactionPart.h"
 #include "57_accounting/TransactionPartTableSync.h"
-
-#include "71_vinci_bike_rental/VinciBike.h"
-#include "71_vinci_bike_rental/VinciBikeTableSync.h"
-#include "71_vinci_bike_rental/VinciRate.h"
-#include "71_vinci_bike_rental/VinciAntivol.h"
-#include "71_vinci_bike_rental/VinciAntivolTableSync.h"
-#include "71_vinci_bike_rental/VinciRateTableSync.h"
-#include "71_vinci_bike_rental/VinciBikeRentalModule.h"
-#include "71_vinci_bike_rental/RentABikeAction.h"
-#include "71_vinci_bike_rental/VinciContract.h"
-#include "71_vinci_bike_rental/VinciContractTableSync.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -107,6 +108,8 @@ namespace synthese
 				it=map.find(PARAMETER_BIKE_ID);
 				if (it == map.end())
 					throw ActionException("Bike not specified");
+				if (it->second.empty())
+					throw ActionException("Le numéro de vélo doit être saisi");
 				vector<shared_ptr<VinciBike> > bikes = VinciBikeTableSync::search(it->second, "");
 				if (bikes.empty())
 					throw ActionException("Vélo introuvable");

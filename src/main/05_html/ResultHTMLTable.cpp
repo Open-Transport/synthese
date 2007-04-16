@@ -131,5 +131,15 @@ namespace synthese
 			s << HTMLTable::close();
 			return s.str();
 		}
+
+		std::map<std::string, std::string> ResultHTMLTable::getParametersMap( const RequestParameters& requestParameters)
+		{
+			std::map<std::string, std::string> map;
+			map.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString(requestParameters.first)));
+			map.insert(make_pair(_PARAMETER_MAX_SIZE, Conversion::ToString(requestParameters.maxSize)));
+			map.insert(make_pair(_PARAMETER_ORDER_FIELD, requestParameters.orderField));
+			map.insert(make_pair(_PARAMETER_RAISING_ORDER, Conversion::ToString(requestParameters.raisingOrder)));
+			return map;
+		}
 	}
 }

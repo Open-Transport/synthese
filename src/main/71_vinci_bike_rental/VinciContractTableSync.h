@@ -32,12 +32,17 @@
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
+#include "71_vinci_bike_rental/VinciContract.h"
+
 namespace synthese
 {
+	namespace accounts
+	{
+		class TransactionPart;
+	}
+
 	namespace vinci
 	{
-		class VinciContract;
-
 		/** Vinci Contract SQLite table synchronizer.
 			@ingroup m71LS refLS
 		*/
@@ -64,9 +69,16 @@ namespace synthese
 				@warning The returned pointers must be deleted after use to avoid memory leak
 			*/
 			static std::vector<boost::shared_ptr<VinciContract> > search(
-				std::string name = "", std::string surname = ""
-				, int first = 0, int number = -1);
+				std::string name = std::string()
+				, std::string surname = std::string()
+				, int first = 0
+				, int number = -1
+				, bool orderByNameAndSurname = true
+				, bool orderBySurnameAndName = false
+				, bool raisingOrder = true
+				);
 
+			static std::vector<boost::shared_ptr<accounts::TransactionPart> > getBikeRentTransactionParts(boost::shared_ptr<const VinciContract> contract);
 
 		protected:
 

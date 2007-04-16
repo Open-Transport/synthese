@@ -55,6 +55,7 @@ namespace synthese
 			vr->_firstPenaltyValidityDuration = Conversion::ToDouble(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_FIRST_PENALTY_VALIDITY_DURATION));
 			vr->_recurringPenalty = Conversion::ToDouble(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_RECURRING_PENALTY));
 			vr->_recurringPenaltyPeriod = Conversion::ToInt(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD));
+			vr->_recurringPenaltyCancelsFirst = Conversion::ToBool(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST));
 		}
 
 		template<> void SQLiteTableSyncTemplate<VinciRate>::save(VinciRate* vr)
@@ -74,6 +75,7 @@ namespace synthese
 					<< "," << VinciRateTableSync::TABLE_COL_FIRST_PENALTY_VALIDITY_DURATION << "=" << vr->_firstPenaltyValidityDuration
 					<< "," << VinciRateTableSync::TABLE_COL_RECURRING_PENALTY << "=" << vr->_recurringPenalty
 					<< "," << VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD << "=" << vr->_recurringPenaltyPeriod
+					<< "," << VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST << "=" << Conversion::ToString(vr->_recurringPenaltyCancelsFirst)
 					<< " WHERE " << VinciRateTableSync::TABLE_COL_ID << "=" << vr->getKey();
 			}
 			else
@@ -91,6 +93,7 @@ namespace synthese
 					<< "," << vr->_firstPenaltyValidityDuration
 					<< "," << vr->_recurringPenalty
 					<< "," << vr->_recurringPenaltyPeriod
+					<< "," << Conversion::ToString(vr->_recurringPenaltyCancelsFirst)
 					<< ")";
 			}
 			sqlite->execUpdate(query.str());
@@ -110,9 +113,10 @@ namespace synthese
 		const std::string VinciRateTableSync::TABLE_COL_FIRST_PENALTY_VALIDITY_DURATION = "first_penalty_duration";
 		const std::string VinciRateTableSync::TABLE_COL_RECURRING_PENALTY = "recurring_penalty";
 		const std::string VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD = "recurring_penalty_duration";
+		const std::string VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST = "recurring_penalty_cancels_first";
 
 		VinciRateTableSync::VinciRateTableSync()
-			: SQLiteTableSyncTemplate<VinciRate>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<VinciRate>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
@@ -125,6 +129,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_FIRST_PENALTY_VALIDITY_DURATION, "INT", true);
 			addTableColumn(TABLE_COL_RECURRING_PENALTY, "REAL", true);
 			addTableColumn(TABLE_COL_RECURRING_PENALTY_PERIOD, "REAL", true);
+			addTableColumn(TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST, "BOOLEAN", true);
 		}
 
 		void VinciRateTableSync::rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 

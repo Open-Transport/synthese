@@ -136,7 +136,7 @@ namespace synthese
 		const std::string UserTableSync::COL_BIRTH_DATE = "birth_date";
 
 		UserTableSync::UserTableSync()
-			: db::SQLiteTableSyncTemplate<User> ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: db::SQLiteTableSyncTemplate<User> ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			// Columns
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);

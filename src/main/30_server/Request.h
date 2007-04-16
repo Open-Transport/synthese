@@ -148,15 +148,16 @@ namespace synthese
 			//! \name Protected getters
 			//@{
 
-			boost::shared_ptr<Function> _getFunction();
-			boost::shared_ptr<const Function> _getFunction() const;
+				boost::shared_ptr<Function> _getFunction();
+				boost::shared_ptr<const Function> _getFunction() const;
 
 				/** Action getter.
 					@return const Action* The action of the request
 					@author Hugues Romain
 					@date 2007					
 				*/
-			boost::shared_ptr<const Action> _getAction() const;
+				boost::shared_ptr<const Action> _getAction() const;
+				boost::shared_ptr<Action> _getAction();
 			//@}
 
 			//! \name Protected setters

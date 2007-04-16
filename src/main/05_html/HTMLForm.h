@@ -58,6 +58,7 @@ namespace synthese
 			const std::string	_action;
 			IDCounterMap		_idCounter;
 			HiddenFieldsMap		_hiddenFields;
+			HiddenFieldsMap		_initialFields;
 
 
 			/** Field unique ID generator.
@@ -79,10 +80,11 @@ namespace synthese
 
 			/** Removes an hidden field if exists, to avoid to an interactive field to be in conflict with an hiddenone.
 				@param name Name of the hidden field to remove
+				@param value Initial value of the field
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 			*/
-			void _removeHiddenFieldIfExists(const std::string& name);
+			void _removeHiddenFieldIfExists(const std::string& name, const std::string& value);
 
 		public:
 
@@ -136,7 +138,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			std::string getURL(HiddenFieldsMap overridingFields = HiddenFieldsMap()) const;
+			std::string getURL(HiddenFieldsMap overridingFields = HiddenFieldsMap(), bool withInitialValues=true) const;
 
 			/** External sorted selection list HTML input field (template)
 				@param name Name of the field

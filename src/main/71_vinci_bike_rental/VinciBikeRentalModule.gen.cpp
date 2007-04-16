@@ -23,5 +23,8 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::Re
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::vinci::VinciUpdateBikeAction>("vinciupdatebike");
 
 synthese::util::Factory<synthese::server::Function>::integrate<synthese::vinci::VinciContractPrintRequest>("vinciprintcontract");
+synthese::util::Factory<synthese::server::Function>::integrate<synthese::vinci::BarCodeInterpretFunction>("barcoderead");
 
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::vinci::VinciPrintedContractInterfacePage>("vincicontractprint");
+
+synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::vinci::BarCodeHTMLFormValueInterfaceElement>("barcodefield");

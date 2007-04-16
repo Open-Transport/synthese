@@ -44,14 +44,17 @@ namespace synthese
 
 	namespace db
 	{
+		/** Table synchronizer template.
+			@ingroup m02
+		*/
 		template <class T>
 		class SQLiteTableSyncTemplate : public SQLiteTableSync
 		{
 		public:
-			static const std::string TABLE_NAME;
+			static const std::string	TABLE_NAME;		//!< Table name in the database
+			static const int			TABLE_ID;		//!< Table ID used by util::encodeID and util::decodeTableId
 
 		protected:
-			static const int TABLE_ID;
 			static const bool HAS_AUTO_INCREMENT;
 			static int _autoIncrementValue;
 

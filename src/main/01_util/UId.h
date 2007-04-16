@@ -23,31 +23,48 @@
 #ifndef SYNTHESE_UTIL_UID_H
 #define SYNTHESE_UTIL_UID_H
 
+/** Unique ID for SYNTHESE objects.
+	@ingroup m01
+	The ID is the binary concatenation of 4 sub-keys :
+		- a table ID (2 bytes)
+		- a grid ID (4 bits) determnating the gris which belongs the creator SYNTHESE instance
+		- a node ID (12 bits) determinating the creator SYNTHESE instance whitin the grid
+		- an autoincrement object ID, unique by instance and by table
+*/
 typedef unsigned long long int uid;
 
 namespace synthese
 {
-
-    
     namespace util
     {
+
+		/** @addtrogroup m01
+			@{
+		*/
 	
-	/** 
-	    Encodes a universal id.
-	    @param tableId (2 bytes)
-	    @param gridId (4 bits)
-	    @param gridNodeId (12 bits)
-	    @param objectId (4 bytes)
+		/** 
+			Encodes a universal id.
+			@param tableId (2 bytes)
+			@param gridId (4 bits)
+			@param gridNodeId (12 bits)
+			@param objectId (4 bytes)
 
-	 */
-	uid encodeUId (int tableId, int gridId, int gridNodeId, long objectId);
+		 */
+		uid encodeUId (int tableId, int gridId, int gridNodeId, long objectId);
 
-	int decodeTableId (const uid& id);
-	int decodeGridId (const uid& id);
-	int decodeGridNodeId (const uid& id);
-	long decodeObjectId (const uid& id);
-	    
 
+		/** Reads the table ID in an object uid.
+			@param id the object uid
+			@return int the table id
+			@author Marc Jambert
+			@date 2006
+		*/
+		int decodeTableId (const uid& id);
+		int decodeGridId (const uid& id);
+		int decodeGridNodeId (const uid& id);
+		long decodeObjectId (const uid& id);
+		    
+		/** @} */
     }
 
 

@@ -35,6 +35,8 @@ namespace synthese
 	namespace accounts
 	{
 		class Transaction;
+		class TransactionPart;
+		class Account;
 
 		/** Transaction SQLite table synchronizer.
 			@ingroup m57
@@ -66,6 +68,9 @@ namespace synthese
 
 				, int first = 0, int number = 0);
 
+			static boost::shared_ptr<TransactionPart> getPart(
+				boost::shared_ptr<const Transaction> transaction, boost::shared_ptr<const Account> account
+			);
 
 		protected:
 

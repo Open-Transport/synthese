@@ -75,7 +75,7 @@ namespace synthese
 		const std::string VinciAntivolTableSync::COL_MARKED_NUMBER = "marked_number";
 
 		VinciAntivolTableSync::VinciAntivolTableSync()
-			: SQLiteTableSyncTemplate<VinciAntivol>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<VinciAntivol>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_MARKED_NUMBER, "TEXT", true);

@@ -70,7 +70,7 @@ namespace synthese
 			shared_ptr<VinciRate>		rate;
 			DateTime					endDate(Date::UNKNOWN_DATE, Hour());
 
-			if (!tp.get())
+			if (tp.get())
 			{
 				t = TransactionTableSync::get(tp->getTransactionId());
 				antivol = contract->getCurrentLock();
@@ -83,7 +83,7 @@ namespace synthese
 
 			shared_ptr<TransactionPart>	guarantee = contract->getCurrentGuaranteeTransactionPart();
 			shared_ptr<Account>			guaranteeAccount;
-			if (!guarantee.get())
+			if (guarantee.get())
 			{
 				guaranteeAccount = AccountTableSync::get(guarantee->getAccountId());
 			}

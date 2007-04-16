@@ -28,6 +28,8 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "05_html/ActionResultHTMLTable.h"
+
 #include "32_admin/AdminInterfaceElement.h"
 
 namespace synthese
@@ -41,13 +43,17 @@ namespace synthese
 		*/
 		class VinciCustomerSearchAdminInterfaceElement : public admin::AdminInterfaceElement
 		{
+		public:
 			static const std::string PARAM_SEARCH_NAME;
 			static const std::string PARAM_SEARCH_SURNAME;
 
-			std::vector<boost::shared_ptr<VinciContract> > _contracts;
-			std::string _searchName;
-			std::string _searchSurname;
-			bool _activeSearch;
+		private:
+			std::vector<boost::shared_ptr<VinciContract> >	_contracts;
+			std::string										_searchName;
+			std::string										_searchSurname;
+			bool											_activeSearch;
+			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
+			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
 
 		public:
 			VinciCustomerSearchAdminInterfaceElement();
@@ -56,6 +62,8 @@ namespace synthese
 				@param request The request to use for the initialization.
 			*/
 			void setFromParametersMap(const server::ParametersMap& map);
+			void setSearchName(const std::string& name);
+			server::ParametersMap getParametersMap() const;
 			std::string getTitle() const;
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request = NULL) const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;

@@ -92,6 +92,13 @@ namespace synthese
 
 			//! \name Virtual output methods
 			//@{
+				/** Parameters map generator, used when building an url to the admin page.
+					@return server::ParametersMap The generated parameters map
+					@author Hugues Romain
+					@date 2007					
+				*/
+				virtual server::ParametersMap getParametersMap() const { return server::ParametersMap(); }
+
 				/** Authorization control.
 					@param request The current request
 					@return bool True if the displayed page can be displayed

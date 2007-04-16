@@ -63,7 +63,7 @@ namespace synthese
 
 		std::string HTMLForm::getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping/*=""*/)
 		{
-			_removeHiddenFieldIfExists(name);
+			_removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<input "
 				<< "type=\"text\" "
@@ -100,7 +100,7 @@ namespace synthese
 
 		std::string HTMLForm::getTextAreaInput( const std::string& name, const std::string& value, int rows, int cols )
 		{
-			_removeHiddenFieldIfExists(name);
+			_removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<textarea "
 				<< "name=\"" << name << "\" "
@@ -122,7 +122,7 @@ namespace synthese
 
 		std::string HTMLForm::getCheckBox( const std::string& name, const std::string& value, bool checked )
 		{
-			_removeHiddenFieldIfExists(name);
+			_removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<input "
 				<< "type=\"checkbox\" "
@@ -135,7 +135,7 @@ namespace synthese
 
 		std::string HTMLForm::getPasswordInput( const std::string& name, const std::string& value )
 		{
-			_removeHiddenFieldIfExists(name);
+			_removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<input "
 				<< "type=\"password\" "
@@ -148,7 +148,7 @@ namespace synthese
 
 		std::string HTMLForm::getCalendarInput( const std::string& name, const time::DateTime& value )
 		{
-			_removeHiddenFieldIfExists(name);
+			_removeHiddenFieldIfExists(name, value.toString());
 			string fieldId = _getFieldId(name);
 			string triggerId = _getFieldId(name + "TRIGGER");
 			stringstream s;
@@ -185,7 +185,7 @@ namespace synthese
 
 		std::string HTMLForm::getCalendarInput( const std::string& name, const time::Date& value )
 		{
-			_removeHiddenFieldIfExists(name);
+			_removeHiddenFieldIfExists(name, value.toString());
 			string fieldId = _getFieldId(name);
 			string triggerId = _getFieldId(name + "TRIGGER");
 			stringstream s;
@@ -273,30 +273,33 @@ namespace synthese
 			return s.str();
 		}
 
-		void HTMLForm::_removeHiddenFieldIfExists( const std::string& name )
+		void HTMLForm::_removeHiddenFieldIfExists( const std::string& name, const std::string& value )
 		{
 			HiddenFieldsMap::iterator it = _hiddenFields.find(name);
 			if (it != _hiddenFields.end())
 				_hiddenFields.erase(it);
+			_initialFields.insert(make_pair(name, value));
 		}
 
-		std::string HTMLForm::getURL( HiddenFieldsMap overridingFields ) const
+		std::string HTMLForm::getURL( HiddenFieldsMap overridingFields, bool withInitialValues ) const
 		{
 			stringstream url;
 			url << _action << "?";
-			for (HiddenFieldsMap::const_iterator it = _hiddenFields.begin(); it != _hiddenFields.end(); ++it)
-			{
-				HiddenFieldsMap::const_iterator it2 = overridingFields.find(it->first);
-				if (it2 == overridingFields.end())
-					overridingFields.insert(*it);
-			}
 
-			for (HiddenFieldsMap::const_iterator it = overridingFields.begin(); it != overridingFields.end(); ++it)
+			HiddenFieldsMap fields = overridingFields;
+
+			if (withInitialValues)
+				fields.insert(_initialFields.begin(), _initialFields.end());
+			
+			fields.insert( _hiddenFields.begin(),  _hiddenFields.end());
+
+			for (HiddenFieldsMap::const_iterator it = fields.begin(); it != fields.end(); ++it)
 			{
-				if (it != overridingFields.begin())
+				if (it != fields.begin())
 					url << "&";
 				url << it->first << "=" << it->second;
 			}
+
 			return url.str();
 		}
 	}

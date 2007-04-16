@@ -251,6 +251,11 @@ namespace synthese
 			return _action;
 		}
 
+		boost::shared_ptr<Action> Request::_getAction()
+		{
+			return _action;
+		}
+
 
 		void Request::setObjectId( uid id )
 		{

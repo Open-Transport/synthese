@@ -20,10 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <sstream>
+
 #include "12_security/User.h"
 #include "12_security/UserException.h"
 
 using boost::shared_ptr;
+using namespace std;
 
 namespace synthese
 {
@@ -173,6 +176,15 @@ namespace synthese
 		void User::setBirthDate( const time::Date& date )
 		{
 			_birthDate = date;
+		}
+
+		std::string User::getFullName() const
+		{
+			stringstream s;
+			if (!getSurname().empty())
+				s << getSurname() << " ";
+			s << getName();
+			return s.str();
 		}
 	}
 }

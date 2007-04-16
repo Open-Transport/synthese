@@ -23,6 +23,8 @@
 #include "71_vinci_bike_rental/VinciUpdateBikeAction.h"
 
 #include "71_vinci_bike_rental/VinciContractPrintRequest.h"
+#include "71_vinci_bike_rental/BarCodeInterpretFunction.h"
 
 #include "71_vinci_bike_rental/VinciPrintedContractInterfacePage.h"
 
+#include "71_vinci_bike_rental/BarCodeHTMLFormValueInterfaceElement.h"

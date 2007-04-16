@@ -62,6 +62,7 @@ namespace synthese
 				int					first;
 				std::string			orderField;
 				bool				raisingOrder;
+				RequestParameters() : maxSize(30), first(0), raisingOrder(true) {}
 			};
 
 			struct ResultParameters
@@ -92,6 +93,8 @@ namespace synthese
 			
 			template <class T>
 			static ResultParameters getParameters(const RequestParameters& requestParameters, std::vector<boost::shared_ptr<T> >& result);
+
+			static std::map<std::string, std::string> getParametersMap(const RequestParameters& requestParameters);
 			
 		};
 

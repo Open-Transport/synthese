@@ -56,5 +56,15 @@ namespace synthese
 		{
 			
 		}
+
+		VinciBike::Complements VinciBike::getComplements() const
+		{
+			return _complements;
+		}
+
+		void VinciBike::setComplements( const Complements& complements )
+		{
+			_complements = complements;
+		}
 	}
 }

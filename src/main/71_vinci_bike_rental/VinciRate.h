@@ -54,6 +54,7 @@ namespace synthese
 			double		_firstPenaltyValidityDuration;
 			double		_recurringPenalty;
 			int			_recurringPenaltyPeriod;
+			bool		_recurringPenaltyCancelsFirst;
 
 			friend class db::SQLiteTableSyncTemplate<VinciRate>;
 
@@ -70,6 +71,7 @@ namespace synthese
 			void setFirstPenaltyValidityDuration(double hours);
 			void setRecurringPenalty(double price);
 			void setRecurringPenaltyPeriod(int hours);
+			void setRecurringPenaltyCancelsFirst(bool value);
 
 			const std::string& getName() const;
 			double getValidityDuration() const;
@@ -81,6 +83,7 @@ namespace synthese
 			double getFirstPenaltyValidityDuration() const;
 			double getRecurringPenalty() const;
 			int getRecurringPenaltyPeriod() const;
+			bool getRecurringPenaltyCancelsFirst() const;
 
 			time::DateTime	getEndDate(const time::DateTime& startDate)	const;
 			time::DateTime	getFirstPenaltyEndDate(const time::DateTime& startDate)	const;

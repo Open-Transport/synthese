@@ -30,6 +30,8 @@
 #include "12_security/UserTableSync.h"
 #include "12_security/UserTableSyncException.h"
 
+#include "57_accounting/TransactionTableSync.h"
+
 #include "71_vinci_bike_rental/VinciContract.h"
 #include "71_vinci_bike_rental/VinciContractTableSync.h"
 
@@ -41,6 +43,7 @@ namespace synthese
 	using namespace db;
 	using namespace security;
 	using namespace vinci;
+	using namespace accounts;
 	
 	namespace db
 	{
@@ -83,13 +86,15 @@ namespace synthese
 		const std::string VinciContractTableSync::COL_PASSPORT = "passport";
 
 		VinciContractTableSync::VinciContractTableSync()
-			: SQLiteTableSyncTemplate<VinciContract>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<VinciContract>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_USER_ID, "INTEGER", true);
 			addTableColumn(COL_SITE_ID, "INTEGER", true);
 			addTableColumn(COL_DATE, "TIMESTAMP", true);
 			addTableColumn(COL_PASSPORT, "TEXT", true);
+
+			addTableIndex(COL_USER_ID);
 		}
 
 		void VinciContractTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
@@ -107,8 +112,15 @@ namespace synthese
 
 		}
 
-		std::vector<shared_ptr<VinciContract> > VinciContractTableSync::search(std::string name /*= ""*/, std::string surname /*= "" */, int first /*= 0*/, int number /*=-1*/ )
-		{
+		std::vector<shared_ptr<VinciContract> > VinciContractTableSync::search(
+			std::string name /*= ""*/
+			, std::string surname /*= "" */
+			, int first /*= 0*/
+			, int number /*=-1*/ 
+			, bool orderByNameAndSurname
+			, bool orderBySurnameAndName
+			, bool raisingOrder
+		){
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
@@ -118,8 +130,15 @@ namespace synthese
 					<< " INNER JOIN " << UserTableSync::TABLE_NAME << " AS u ON c." << COL_USER_ID << "=u." << UserTableSync::TABLE_COL_ID
 				<< " WHERE "
 					<< "u." << UserTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '%" << Conversion::ToSQLiteString(surname, false) << "%'"
-				<< " LIMIT " << number << " OFFSET " << first;
+					<< " AND u." << UserTableSync::TABLE_COL_SURNAME << " LIKE '%" << Conversion::ToSQLiteString(surname, false) << "%'";
+			if (orderByNameAndSurname)
+				query << " ORDER BY " << UserTableSync::TABLE_COL_NAME << "," << UserTableSync::TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC");
+			if (orderBySurnameAndName)
+				query << " ORDER BY " << UserTableSync::TABLE_COL_SURNAME << "," << UserTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (number)
+				query << " LIMIT " << (number + 1);
+			if (first)
+				query << " OFFSET " << first;
 			SQLiteResult result = sqlite->execQuery(query.str());
 			vector<shared_ptr<VinciContract> > contracts;
 			for (int i=0; i<result.getNbRows(); ++i)

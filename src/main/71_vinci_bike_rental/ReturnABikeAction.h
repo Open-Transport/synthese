@@ -59,6 +59,13 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			/** Transaction part setter.
+				@param transactionPart The transaction part to stop (bike return)
+				@author Hugues Romain
+				@date 2007				
+			*/
+			void setTransactionPart(boost::shared_ptr<accounts::TransactionPart> transactionPart);
+
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

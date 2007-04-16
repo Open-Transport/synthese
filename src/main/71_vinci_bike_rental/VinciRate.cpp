@@ -152,8 +152,16 @@ namespace synthese
 			if (now <= getFirstPenaltyEndDate(startDate))
 				return _firstPenalty;
 
-			double penalties = floor((double) ((now - getFirstPenaltyEndDate(startDate)) / (_recurringPenaltyPeriod * 60)));
+			if (getRecurringPenaltyCancelsFirst())
+			{
+				double penalties = ceil((double) ((now - startDate) / (double) (_recurringPenaltyPeriod * 60)));
+				return _recurringPenalty * penalties;
+			}
+			else
+			{
+				double penalties = ceil((double) ((now - getFirstPenaltyEndDate(startDate)) / (double) (_recurringPenaltyPeriod * 60)));
 				return _recurringPenalty * penalties + _firstPenalty;
+			}
 
 		}
 
@@ -162,6 +170,16 @@ namespace synthese
 			DateTime endDate = getEndDate(startDate);
 			endDate += (int) (_firstPenaltyValidityDuration * 60);
 			return endDate;
+		}
+
+		void VinciRate::setRecurringPenaltyCancelsFirst( bool value )
+		{
+			_recurringPenaltyCancelsFirst = value;
+		}
+
+		bool VinciRate::getRecurringPenaltyCancelsFirst() const
+		{
+			return _recurringPenaltyCancelsFirst;
 		}
 	}
 }

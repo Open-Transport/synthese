@@ -203,7 +203,6 @@ namespace synthese
 		map<int, int> TransactionPartTableSync::count(
 			shared_ptr<const Account> account, Date startDate, Date endDate, int first, int number
 		){
-			int transactionsNumber;
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query

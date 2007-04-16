@@ -120,6 +120,7 @@ namespace synthese
 			//! \name Services
 			//@{
 				void verifyPassword(const std::string& password) const;
+				std::string	getFullName()	const;
 			//@}
 		};
 	}

@@ -33,16 +33,35 @@
 
 namespace synthese
 {
+	namespace accounts
+	{
+		class Transaction;
+	}
+
 	namespace vinci
 	{
+		class VinciContract;
+
 		/** Bike to rent.
 			@ingroup m71
 		*/
 		class VinciBike : public util::Registrable<uid, VinciBike>
 		{
+		public:
+			typedef struct
+			{
+				boost::shared_ptr<VinciContract>			lastContract;		//!< Last rent contract
+				boost::shared_ptr<accounts::Transaction>	lastTransaction;	//!< Last transaction
+			} Complements;
+
 		private:
+			//! \name Attributes
+			//@{
 			std::string _number;
 			std::string _markedNumber;
+			//@}
+
+			Complements _complements;
 
 		public:
 			VinciBike(uid id=0);
@@ -50,10 +69,11 @@ namespace synthese
 			const std::string& getNumber() const;
 			const std::string& getMarkedNumber() const;
 
+			Complements getComplements() const;
+
 			void setNumber(const std::string& number);
 			void setMarkedNumber(const std::string& markedNumber);
-
-			friend class db::SQLiteTableSyncTemplate<VinciBike>;
+			void setComplements(const Complements& complements);
 		};
 	}
 }
