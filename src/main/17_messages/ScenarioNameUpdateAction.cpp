@@ -35,6 +35,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+	using namespace time;
 
 	namespace messages
 	{
@@ -52,14 +53,21 @@ namespace synthese
 		{
 			try
 			{
-				_scenario = ScenarioTableSync::get(_request->getObjectId());
-
 				ParametersMap::const_iterator it;
 
+				// Scenario
+				_scenario = ScenarioTableSync::get(_request->getObjectId());
+
+				// Name
 				it = map.find(PARAMETER_NAME);
 				if (it == map.end())
 					throw ActionException("Name not specified");
 				_name = it->second;
+
+				// Unicity control
+				vector<shared_ptr<Scenario> > existing = ScenarioTableSync::search(true, DateTime(TIME_UNKNOWN), DateTime(TIME_UNKNOWN), _name, 0, 1);
+				if (!existing.empty())
+					throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
 			}
 			catch (DBEmptyResultException<Scenario>)
 			{

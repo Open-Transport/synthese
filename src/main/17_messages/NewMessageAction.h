@@ -56,6 +56,9 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			void setScenarioId(uid scenarioId);
+			void setIsTemplate(bool value);
+
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

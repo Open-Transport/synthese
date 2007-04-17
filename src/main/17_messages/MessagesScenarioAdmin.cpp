@@ -91,8 +91,8 @@ namespace synthese
 
 			ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(request);
 			addRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
-			addRequest.getFunction()->setParameter(NewMessageAction::PARAMETER_SCENARIO_ID, Conversion::ToString(_scenario->getKey()));
-			addRequest.getFunction()->setParameter(NewMessageAction::PARAMETER_IS_TEMPLATE, Conversion::ToString(_scenario->getKey()));
+			addRequest.getAction()->setScenarioId(_scenario->getKey());
+			addRequest.getAction()->setIsTemplate(true);
 
 			stream << "<h1>Propriété</h1>";
 			HTMLForm uf(updateRequest.getHTMLForm("update"));
@@ -123,7 +123,7 @@ namespace synthese
 			}
 
 			stream << t.row();
-			stream << t.col(3) << "(sélectionnez un&nbsp;message existant pour créer une copie)";
+			stream << t.col(2) << "(sélectionnez un&nbsp;message existant pour créer une copie)";
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
 		}

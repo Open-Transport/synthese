@@ -74,7 +74,10 @@ namespace synthese
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_RECIPIENT_KEY, "TEXT");
 			addTableColumn(COL_OBJECT_ID, "INTEGER");
-			addTableColumn(COL_ALARM_ID, "INTEGER");			
+			addTableColumn(COL_ALARM_ID, "INTEGER");
+
+			addTableIndex(COL_OBJECT_ID);
+			addTableIndex(COL_ALARM_ID);
 		}
 
 		void AlarmObjectLinkTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)

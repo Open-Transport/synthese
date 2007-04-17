@@ -95,6 +95,9 @@ namespace synthese
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
 			addTableColumn(TABLE_COL_PLACE_ID, "INTEGER", true);
 			addTableColumn(TABLE_COL_PHYSICAL_STOP_ID, "INTEGER", true);
+
+			addTableIndex(TABLE_COL_PLACE_ID);
+			addTableIndex(TABLE_COL_PHYSICAL_STOP_ID);
 		}
 
 		void BroadcastPointTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)

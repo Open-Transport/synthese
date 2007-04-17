@@ -138,7 +138,7 @@ namespace synthese
 		void Request::run( std::ostream& stream )
 		{
 			// Handle of the action
-			if (_action.get())
+			if (_action.get() && !_actionException)
 			{
 				if (!_action->_beforeSessionControl()
 					&& _session == NULL && _action->_runBeforeActionIfNoSession())
@@ -341,6 +341,9 @@ namespace synthese
 				try
 				{
 					_action->_setFromParametersMap(map);
+
+					// Object ID update
+					map[PARAMETER_OBJECT_ID] = Conversion::ToString(_object_id);
 				}
 				catch (ActionException& e)	// Action parameters error
 				{

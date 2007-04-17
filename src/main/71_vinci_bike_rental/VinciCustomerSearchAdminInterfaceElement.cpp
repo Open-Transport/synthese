@@ -127,7 +127,7 @@ namespace synthese
 
 			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAM_SEARCH_NAME, 30);
 
-			_activeSearch = !_searchName.empty() && !_searchSurname.empty();
+			_activeSearch = !_searchName.empty() || !_searchSurname.empty();
 
 			_contracts = VinciContractTableSync::search(
 				_searchName

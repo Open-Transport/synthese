@@ -44,7 +44,9 @@ namespace synthese
 		ParametersMap NewMessageAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			map.insert(make_pair(PARAMETER_IS_TEMPLATE, Conversion::ToString(_isTemplate)));
+			if (_scenario.get())
+				map.insert(make_pair(PARAMETER_SCENARIO_ID, Conversion::ToString(_scenario->getKey())));
 			return map;
 		}
 
@@ -81,6 +83,16 @@ namespace synthese
 			alarm->setScenario(_scenario.get());
 			AlarmTableSync::save(alarm.get());
 			_request->setObjectId(alarm->getKey());
+		}
+
+		void NewMessageAction::setIsTemplate( bool value )
+		{
+			_isTemplate = value;
+		}
+
+		void NewMessageAction::setScenarioId(uid scenario )
+		{
+			_scenario = ScenarioTableSync::get(scenario);;
 		}
 	}
 }
