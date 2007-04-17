@@ -12,7 +12,7 @@ EXECLIBSDIR=$EXECDIR/libs
 export LD_LIBRARY_PATH=$EXECLIBSDIR:$LD_LIBRARY_PATH
 
 cd $EXECDIR
-./91_cgi_client
+./91_cgi_client $@
 
 
 
