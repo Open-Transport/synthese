@@ -12,7 +12,13 @@ EXECLIBSDIR=$EXECDIR/libs
 export LD_LIBRARY_PATH=$EXECLIBSDIR:$LD_LIBRARY_PATH
 
 cd $EXECDIR
-./99_synthese_vinci --db config.db3 $@
+
+while true
+do
+        echo "demarrage..."
+	./99_synthese_vinci --db config.db3 --param log_level=0  --param port=3595 --param db_port 3596
+done
+
 
 
 
