@@ -31,7 +31,7 @@
 		- a node ID (12 bits) determinating the creator SYNTHESE instance whitin the grid
 		- an autoincrement object ID, unique by instance and by table
 */
-typedef unsigned long long int uid;
+typedef signed long long int uid;
 
 namespace synthese
 {

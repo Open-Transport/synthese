@@ -179,13 +179,16 @@ namespace synthese
 					const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 					std::stringstream query;
 					query
-						<< "SELECT " << util::Conversion::ToString(0x00000000FFFFFFFFLL) << " & MAX(id) AS maxid FROM " << TABLE_NAME
-						<< " WHERE (id & " << util::Conversion::ToString(0xFFFFFFFF00000000LL) << ") = " << util::Conversion::ToString(encodeUId(1, 1, 0)); /// @todo GRID and NODEGRID to be replaced by the correct values
+					    << "SELECT " << util::Conversion::ToString((uid) 0x00000000FFFFFFFFLL) << " & MAX(id) AS maxid FROM " << TABLE_NAME
+					    << " WHERE (id & " << util::Conversion::ToString((uid) 0xFFFFFFFF00000000LL) << ") = " << util::Conversion::ToString(encodeUId(1, 1, 0)); /// @todo GRID and NODEGRID to be replaced by the correct values
 
 					SQLiteResult result = sqlite->execQuery(query.str());
 
 					if (result.getNbRows() > 0 && util::Conversion::ToLongLong(result.getColumn(0, "maxid")) > 0)
-						_autoIncrementValue = util::decodeObjectId(util::Conversion::ToLongLong(result.getColumn(0, "maxid"))) + 1;
+					{
+					    _autoIncrementValue = util::decodeObjectId(util::Conversion::ToLongLong(result.getColumn(0, "maxid"))) + 1;
+					}
+					
 				}
 				catch (SQLiteException& e)
 				{
