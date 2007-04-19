@@ -71,6 +71,14 @@ namespace synthese
 			@result map founded searched physical stops from the live data objects with the corresponding broadcast point if exists (NULL else) The broadcast points are temporary object and must be deleted after use. 
 		*/
 		std::vector<boost::shared_ptr<const env::CommercialLine> > getCommercialLineWithBroadcastPoints(int number=UNKNOWN_VALUE, int first=0);
+
+		/** Search of corrupted data in broadcast point definitions.
+			@return std::vector<boost::shared_ptr<BroadcastPoint> > List of broadcast points without valid place id.
+			@author Hugues Romain
+			@date 2007
+			A broadcast point can loose its corresponding place if the 15_env data update is done by an other source than the one used for the 34_departures_table module.
+		*/
+		std::vector<boost::shared_ptr<BroadcastPoint> > getBroadcastPointsWithoutValidPlace();
 	}
 }
 

@@ -1,6 +1,6 @@
 
-/** NewScenarioSendAction class header.
-	@file NewScenarioSendAction.h
+/** SentAlarm class header.
+	@file SentAlarm.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,46 +20,47 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_NewScenarioSendAction_H__
-#define SYNTHESE_NewScenarioSendAction_H__
+#ifndef SYNTHESE_SentAlarm_h__
+#define SYNTHESE_SentAlarm_h__
 
-#include "30_server/Action.h"
+#include "17_messages/Alarm.h"
+
+#include "04_time/DateTime.h"
+
+#include "01_util/Registrable.h"
 
 namespace synthese
 {
 	namespace messages
 	{
-		class ScenarioTemplate;
-
-		/** New scenario send action class.
-			@ingroup m17Actions refActions
+		/** Sent Alarm Interface.
+			@ingroup m17
 		*/
-		class NewScenarioSendAction : public server::Action
+		class SentAlarm
+			: public Alarm
+			, public util::Registrable<uid, SentAlarm>
 		{
-		public:
-			static const std::string PARAMETER_TEMPLATE;
-
-		private:
-			boost::shared_ptr<const ScenarioTemplate>	_template;
-
 		protected:
-			/** Conversion from attributes to generic parameter maps.
-			*/
-			server::ParametersMap getParametersMap() const;
-
-			/** Conversion from generic parameters map to attributes.
-				Removes the used parameters from the map.
-				@exception ActionException Occurs when some parameters are missing or incorrect.
-			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
+			SentAlarm();
+			~SentAlarm();
 
 		public:
-			/** Action to run, defined by each subclass.
+			virtual bool					getIsEnabled()		const = 0;
+			virtual const time::DateTime&	getPeriodStart()	const = 0;
+			virtual const time::DateTime&	getPeriodEnd()		const = 0;
+
+			/** Applicability test.
+				@param start Start of applicability period
+				@param end End of applicability period
+				@return true if the message is not empty and is valid for the whole period given as argument.
 			*/
-			void run();
+			bool isApplicable ( const time::DateTime& start, const time::DateTime& end ) const;
+
+			bool isApplicable(const time::DateTime& date) const;
+
+			uid getId() const;
 		};
 	}
 }
 
-#endif // SYNTHESE_NewScenarioSendAction_H__
- 
+#endif // SYNTHESE_SentAlarm_h__

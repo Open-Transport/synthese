@@ -223,5 +223,26 @@ namespace synthese
 				throw Exception(e.getMessage());
 			}
 		}
+
+		std::vector<boost::shared_ptr<BroadcastPoint> > getBroadcastPointsWithoutValidPlace()
+		{
+			stringstream query;
+			query
+				<< " SELECT "
+					<< " b.* "
+				<< " FROM "
+					<< BroadcastPointTableSync::TABLE_COL_NAME << " AS b"
+					<< " LEFT JOIN " << ConnectionPlaceTableSync::TABLE_COL_NAME << " AS p ON p." << TABLE_COL_ID << "=b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID
+				<< " WHERE "
+					<< "p." << TABLE_COL_ID << " IS NULL ";
+			SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+			vector<shared_ptr<BroadcastPoint> > bps;
+			for (int i = 0; i < result.getNbRows(); ++i)
+			{
+				shared_ptr<BroadcastPoint> bp(new BroadcastPoint);
+				bps.push_back(bp);
+			}
+			return bps;
+		}
 	}
 }

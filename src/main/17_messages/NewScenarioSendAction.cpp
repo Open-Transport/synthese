@@ -20,15 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "17_messages/NewScenarioSendAction.h"
+#include "17_messages/SentScenario.h"
+#include "17_messages/ScenarioTableSync.h"
+
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
-
-#include "17_messages/NewScenarioSendAction.h"
-#include "17_messages/Scenario.h"
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/Alarm.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesModule.h"
 
 using namespace std;
 using namespace boost;
@@ -51,28 +48,30 @@ namespace synthese
 
 		void NewScenarioSendAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			ParametersMap::const_iterator it;
+
+			// Template to source
+			it = map.find(PARAMETER_TEMPLATE);
+			if (it == map.end())
+				throw ActionException("Template not specified");
 			try
 			{
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_TEMPLATE);
-				if (it == map.end())
-					throw ActionException("Template not specified");
-
-				_template = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
-				
-				_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
+				_template = ScenarioTableSync::getTemplate(Conversion::ToLongLong(it->second));
 			}
-			catch (Scenario::RegistryKeyException e)
+			catch(...)
 			{
-				throw ActionException("Specified template not found");
+				throw ActionException("specified scenario template not found");
 			}
+			
+			// Anti error
+			_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void NewScenarioSendAction::run()
 		{
-			shared_ptr<Scenario> scenario = _template->createCopy();
+			shared_ptr<SentScenario> scenario(new SentScenario(*_template));
 			ScenarioTableSync::saveWithAlarms(scenario.get());
+			_request->setObjectId(scenario->getKey());
 		}
 	}
 }

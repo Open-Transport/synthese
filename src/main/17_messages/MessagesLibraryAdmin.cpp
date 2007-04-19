@@ -23,7 +23,8 @@
 #include "05_html/ActionResultHTMLTable.h"
 #include "05_html/HTMLForm.h"
 
-#include "17_messages/Scenario.h"
+#include "17_messages/ScenarioTemplate.h"
+#include "17_messages/ScenarioTableSync.h"
 #include "17_messages/MessagesLibraryAdmin.h"
 #include "17_messages/TextTemplate.h"
 #include "17_messages/TextTemplateTableSync.h"
@@ -33,7 +34,6 @@
 #include "17_messages/DeleteScenarioAction.h"
 #include "17_messages/AddScenarioAction.h"
 #include "17_messages/TextTemplateAddAction.h"
-#include "17_messages/MessagesModule.h"
 
 #include "30_server/ActionFunctionRequest.h"
 
@@ -47,15 +47,20 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
+	using namespace time;
 
 	namespace messages
 	{
+		const std::string MessagesLibraryAdmin::PARAMETER_NAME = "nam";
+		const std::string MessagesLibraryAdmin::PARAMETER_SHORT_TEXT = "stx";
+		const std::string MessagesLibraryAdmin::PARAMETER_LONG_TEXT = "ltx";
+
 		MessagesLibraryAdmin::MessagesLibraryAdmin()
 			: AdminInterfaceElement("messages", AdminInterfaceElement::EVER_DISPLAYED) {}
 
 		void MessagesLibraryAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			
+			_requestParameters = ResultHTMLTable::getParameters(map, PARAMETER_NAME, ResultHTMLTable::UNLIMITED_SIZE);
 		}
 
 		string MessagesLibraryAdmin::getTitle() const
@@ -65,37 +70,49 @@ namespace synthese
 
 		void MessagesLibraryAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
+			FunctionRequest<AdminRequest> searchRequest(request);
+			searchRequest.getFunction()->setPage<MessagesLibraryAdmin>();
+
 			ActionFunctionRequest<UpdateTextTemplateAction,AdminRequest> updateRequest(request);
-			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesLibraryAdmin>());
+			updateRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			
 			ActionFunctionRequest<DeleteTextTemplateAction,AdminRequest> deleteRequest(request);
-			deleteRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesLibraryAdmin>());
+			deleteRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			
 			ActionFunctionRequest<TextTemplateAddAction,AdminRequest> addRequest(request);
-			addRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesLibraryAdmin>());
+			addRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			
 			FunctionRequest<AdminRequest> updateScenarioRequest(request);
-			updateScenarioRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
+			updateScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			
 			ActionFunctionRequest<DeleteScenarioAction,AdminRequest> deleteScenarioRequest(request);
-			deleteScenarioRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesLibraryAdmin>());
+			deleteScenarioRequest.getFunction()->setPage<MessagesLibraryAdmin>();
 			
 			ActionFunctionRequest<AddScenarioAction,AdminRequest> addScenarioRequest(request);
-			addScenarioRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
+			addScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			addScenarioRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<MessagesLibraryAdmin>());
 
 			stream << "<h1>Modèles de textes destinés aux messages complémentaires</h1>";
 
-			vector<string> h1;
-			h1.push_back("Nom");
-			h1.push_back("Texte&nbsp;court");
-			h1.push_back("Texte&nbsp;long");
-			h1.push_back("Actions");
-			HTMLTable t1(h1);
+			vector<shared_ptr<TextTemplate> > tw = TextTemplateTableSync::search(
+				ALARM_LEVEL_INFO
+				, string(), NULL
+				, 0, -1
+				, _requestParameters.orderField == PARAMETER_NAME
+				, _requestParameters.orderField == PARAMETER_SHORT_TEXT
+				, _requestParameters.orderField == PARAMETER_LONG_TEXT
+				, _requestParameters.raisingOrder
+				);
+
+			ResultHTMLTable::HeaderVector h1;
+			h1.push_back(make_pair(PARAMETER_NAME, "Nom"));
+			h1.push_back(make_pair(PARAMETER_SHORT_TEXT, "Texte&nbsp;court"));
+			h1.push_back(make_pair(PARAMETER_LONG_TEXT, "Texte&nbsp;long"));
+			h1.push_back(make_pair(string(), "Actions"));
+			ResultHTMLTable t1(h1, searchRequest.getHTMLForm(), _requestParameters, ActionResultHTMLTable::getParameters(_requestParameters, tw));
 
 			stream << t1.open();
 
-			vector<shared_ptr<TextTemplate> > tw = TextTemplateTableSync::search(ALARM_LEVEL_INFO);
 			for (vector<shared_ptr<TextTemplate> >::iterator itw = tw.begin(); itw != tw.end(); ++itw)
 			{
 				shared_ptr<TextTemplate> t = *itw;
@@ -136,16 +153,25 @@ namespace synthese
 
 			stream << "<h1>Modèles de textes destinés aux messages prioritaires</h1>";
 
-			vector<string> h2;
-			h2.push_back("Nom");
-			h2.push_back("Texte&nbsp;court");
-			h2.push_back("Texte&nbsp;long");
-			h2.push_back("Actions");
-			HTMLTable t2(h2);
+			vector<shared_ptr<TextTemplate> > te = TextTemplateTableSync::search(
+				ALARM_LEVEL_WARNING
+				, string(), NULL
+				, 0, -1
+				, _requestParameters.orderField == PARAMETER_NAME
+				, _requestParameters.orderField == PARAMETER_SHORT_TEXT
+				, _requestParameters.orderField == PARAMETER_LONG_TEXT
+				, _requestParameters.raisingOrder
+				);
+
+			ResultHTMLTable::HeaderVector h2;
+			h2.push_back(make_pair(PARAMETER_NAME, "Nom"));
+			h2.push_back(make_pair(PARAMETER_SHORT_TEXT, "Texte&nbsp;court"));
+			h2.push_back(make_pair(PARAMETER_LONG_TEXT, "Texte&nbsp;long"));
+			h2.push_back(make_pair(string(), "Actions"));
+			ResultHTMLTable t2(h2, searchRequest.getHTMLForm(), _requestParameters, ResultHTMLTable::getParameters(_requestParameters, te));
 
 			stream << t2.open();
 
-			vector<shared_ptr<TextTemplate> > te = TextTemplateTableSync::search(ALARM_LEVEL_WARNING);
 			for (vector<shared_ptr<TextTemplate> >::iterator ite = te.begin(); ite != te.end(); ++ite)
 			{
 				shared_ptr<TextTemplate> t = *ite;
@@ -184,15 +210,22 @@ namespace synthese
 
 			stream << "<h1>Scénarios</h1>";
 
+			vector<shared_ptr<ScenarioTemplate> > sv = ScenarioTableSync::searchTemplate(
+				string(), NULL
+				, 0, -1
+				, _requestParameters.orderField == PARAMETER_NAME
+				, _requestParameters.raisingOrder
+				);
+
 			ActionResultHTMLTable::HeaderVector h3;
-			h3.push_back(make_pair(string(), "Nom"));
+			h3.push_back(make_pair(PARAMETER_NAME, "Nom"));
 			h3.push_back(make_pair(string(), "Actions"));
-			ActionResultHTMLTable t3(h3, HTMLForm(string(),string()), ActionResultHTMLTable::RequestParameters(), ActionResultHTMLTable::ResultParameters(), addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
+			ActionResultHTMLTable t3(h3, searchRequest.getHTMLForm(), _requestParameters, ActionResultHTMLTable::ResultParameters(), addScenarioRequest.getHTMLForm("addscenario"), AddScenarioAction::PARAMETER_TEMPLATE_ID);
 			stream << t3.open();
 			
-			for (Scenario::Registry::const_iterator it = MessagesModule::getScenarii().begin(); it != MessagesModule::getScenarii().end(); ++it)
+			for (vector<shared_ptr<ScenarioTemplate> >::const_iterator it = sv.begin(); it != sv.end(); ++it)
 			{
-				shared_ptr<const Scenario> scenario = it->second;
+				shared_ptr<ScenarioTemplate> scenario = *it;
 				updateScenarioRequest.setObjectId(scenario->getKey());
 				deleteScenarioRequest.setObjectId(scenario->getKey());
 				stream << t3.row();
@@ -200,8 +233,6 @@ namespace synthese
 				stream << t3.col() << HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Modifier")
 					<< " " << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le scénario " + scenario->getName() + " ?");
 			}
-
-			t3.getActionForm().addHiddenField(AddScenarioAction::PARAMETER_IS_TEMPLATE, Conversion::ToString(true));
 
 			stream << t3.row();
 			stream << t3.col() << t3.getActionForm().getTextInput(AddScenarioAction::PARAMETER_NAME, string(), "Entrez le nom ici");

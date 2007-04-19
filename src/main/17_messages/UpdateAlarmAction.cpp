@@ -27,7 +27,7 @@
 #include "30_server/Request.h"
 
 #include "17_messages/UpdateAlarmAction.h"
-#include "17_messages/Alarm.h"
+#include "17_messages/SingleSentAlarm.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesModule.h"
 
@@ -63,14 +63,15 @@ namespace synthese
 			{
 				ParametersMap::const_iterator it;
 
-				_alarm = AlarmTableSync::get(_request->getObjectId());
+				_alarm = AlarmTableSync::getAlarm(_request->getObjectId());
+				_singleSentAlarm = dynamic_pointer_cast<SingleSentAlarm, Alarm>(_alarm);
 
 				it = map.find(PARAMETER_TYPE);
 				if (it == map.end())
 					throw ActionException("Type not specified");
 				_type = (AlarmLevel) Conversion::ToInt(it->second);
 
-				if (_alarm->getScenario() == NULL)
+				if (_singleSentAlarm.get())
 				{
 					string date;
 					it = map.find(PARAMETER_START_DATE);
@@ -132,11 +133,11 @@ namespace synthese
 		void UpdateAlarmAction::run()
 		{
 			_alarm->setLevel(_type);
-			if (_alarm->getScenario() == NULL)
+			if (_singleSentAlarm.get())
 			{
-				_alarm->setPeriodStart(_startDate);
-				_alarm->setPeriodEnd(_endDate);
-				_alarm->setIsEnabled(_enabled);
+				_singleSentAlarm->setPeriodStart(_startDate);
+				_singleSentAlarm->setPeriodEnd(_endDate);
+				_singleSentAlarm->setIsEnabled(_enabled);
 			}
 			AlarmTableSync::save(_alarm.get());
 		}

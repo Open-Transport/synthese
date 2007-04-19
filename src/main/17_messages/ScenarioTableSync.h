@@ -23,21 +23,31 @@
 #ifndef SYNTHESE_ScenarioTableSync_H__
 #define SYNTHESE_ScenarioTableSync_H__
 
+#include "17_messages/Scenario.h"
+#include "17_messages/ScenarioSubclassTemplate.h"
+#include "17_messages/AlarmTableSync.h"
+#include "17_messages/AlarmTemplate.h"
+#include "17_messages/ScenarioSentAlarm.h"
+
+#include "04_time/DateTime.h"
+
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 #include <vector>
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSyncTemplate.h"
-
 namespace synthese
 {
 	namespace messages
 	{
-		class Scenario;
+		class SentScenario;
+		class ScenarioTemplate;
 
 		/** Scenario table synchronizer.
-			@ingroup m17
+			@ingroup m17LS refLS
+
+			@note As Scenario is an abstract class, do not use the get static method. Use getAlarm instead.
 		*/
 		class ScenarioTableSync : public db::SQLiteTableSyncTemplate<Scenario>
 		{
@@ -51,19 +61,18 @@ namespace synthese
 			ScenarioTableSync();
 
 
-			/** Scenario search.
-				(other search parameters)
+			/** Sent scenario search.
+				@param name Name of the template scenario
 				@param first First Scenario object to answer
 				@param number Number of Scenario objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@return vector<Scenario*> Founded Scenario objects.
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<Scenario> > search(
-				bool isATemplate
-				, time::DateTime startDate
-				, time::DateTime endDate
-				, const std::string name= std::string()
+			static std::vector<boost::shared_ptr<SentScenario> > searchSent(
+				time::DateTime startDate = time::DateTime(time::TIME_UNKNOWN)
+				, time::DateTime endDate = time::DateTime(time::TIME_UNKNOWN)
+				, const std::string name = std::string()
 				, int first = 0
 				, int number = -1
 				, bool orderByDate = true
@@ -73,12 +82,35 @@ namespace synthese
 				, bool raisingOrder = false
 				);
 
-			static void saveWithAlarms(Scenario* object);
+			/** Template scenario search.
+				@param name Name of the template
+				@param first First Scenario object to answer
+				@param number Number of Scenario objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return vector<Scenario*> Founded Scenario objects.
+				@author Hugues Romain
+				@date 2006
+			*/
+			static std::vector<boost::shared_ptr<ScenarioTemplate> > searchTemplate(
+				const std::string name = std::string()
+				, const ScenarioTemplate* scenarioToBeDifferentWith = NULL
+				, int first = 0
+				, int number = -1
+				, bool orderByName = true
+				, bool raisingOrder = false
+				);
+
+			template <class U>
+			static void saveWithAlarms(ScenarioSubclassTemplate<U>* object);
+
+			static boost::shared_ptr<ScenarioTemplate> getTemplate(uid key);
+			static boost::shared_ptr<SentScenario> getSent(uid key);
+			static boost::shared_ptr<Scenario> getScenario(uid key);
 
 		protected:
 
 			/** Action to do on Scenario creation.
-				This method loads a new object in ram.
+				This method loads the new sent scenarii in ram.
+				The templates are not loaded
 			*/
 			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
@@ -100,6 +132,20 @@ namespace synthese
 				const db::SQLiteResult& rows);
 
 		};
+
+		template <class S>
+		void synthese::messages::ScenarioTableSync::saveWithAlarms( ScenarioSubclassTemplate<S>* object )
+		{
+			save(object);
+			typename ScenarioSubclassTemplate<S>::AlarmsSet& alarms = object->getAlarms();
+			for (typename ScenarioSubclassTemplate<S>::AlarmsSet::iterator it = alarms.begin(); it != alarms.end(); ++it)
+			{
+				AlarmTableSync::save(static_cast<Alarm*>(*it));
+
+				/// @todo Saving of the broadcast list
+			}
+
+		}
 	}
 }
 

@@ -32,12 +32,15 @@
 #include "17_messages/UpdateAlarmMessagesAction.h"
 #include "17_messages/AlarmAddLinkAction.h"
 #include "17_messages/AlarmRemoveLinkAction.h"
+#include "17_messages/SentAlarm.h"
+#include "17_messages/AlarmTableSync.h"
 
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminParametersException.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -67,10 +70,15 @@ namespace synthese
 			if (Conversion::ToLongLong(it->second) == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 				return;
 
-			if (!MessagesModule::getAlarms().contains(Conversion::ToLongLong(it->second)))
-				throw AdminParametersException("Invalid message ID");
-			
-			_alarm = MessagesModule::getAlarms().get(Conversion::ToLongLong(it->second));
+			try
+			{
+				_alarm = AlarmTableSync::getAlarm(Conversion::ToLongLong(it->second));
+			}
+			catch(...)
+			{
+				throw AdminParametersException("Specified alarm not found");
+			}
+
 			_parameters = map;
 		}
 
@@ -80,6 +88,8 @@ namespace synthese
 			updateRequest.getFunction()->setPage<MessageAdmin>();
 			updateRequest.setObjectId(request->getObjectId());
 
+			shared_ptr<const SentAlarm> salarm = dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm);
+			
 			stream << "<h1>Paramètres</h1>";
 			HTMLForm f(updateRequest.getHTMLForm("update"));
 			HTMLTable t;
@@ -89,17 +99,17 @@ namespace synthese
 			stream << t.col() << "Type";
 			stream << t.col() << f.getRadioInput(UpdateAlarmAction::PARAMETER_TYPE, MessagesModule::getLevelLabels(), _alarm->getLevel());
 
-			if (_alarm->getScenario() == NULL)
+			if (salarm.get())
 			{
 				stream << t.row();
 				stream << t.col() << "Début diffusion";
-				stream << t.col() << f.getCalendarInput(UpdateAlarmAction::PARAMETER_START_DATE, _alarm->getPeriodStart());
+				stream << t.col() << f.getCalendarInput(UpdateAlarmAction::PARAMETER_START_DATE, salarm->getPeriodStart());
 				stream << t.row();
 				stream << t.col() << "Fin diffusion";
-				stream << t.col() << f.getCalendarInput(UpdateAlarmAction::PARAMETER_END_DATE, _alarm->getPeriodEnd());
+				stream << t.col() << f.getCalendarInput(UpdateAlarmAction::PARAMETER_END_DATE, salarm->getPeriodEnd());
 				stream << t.row();
 				stream << t.col() << "Actif";
-				stream << t.col() << f.getOuiNonRadioInput(UpdateAlarmAction::PARAMETER_ENABLED, _alarm->getIsEnabled());
+				stream << t.col() << f.getOuiNonRadioInput(UpdateAlarmAction::PARAMETER_ENABLED, salarm->getIsEnabled());
 			}
 			stream << t.row();
 			stream << t.col(2) << f.getSubmitButton("Enregistrer");
@@ -145,8 +155,7 @@ namespace synthese
 
 				ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(request);
 				addRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
-				addRequest.setObjectId(request->getObjectId());
-				addRequest.getFunction()->setParameter(AlarmAddLinkAction::PARAMETER_ALARM_ID, Conversion::ToString(_alarm->getKey()));
+				addRequest.getAction()->setAlarm(_alarm);
 
 				ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(request);
 				removeRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
@@ -155,7 +164,7 @@ namespace synthese
 				// Alarm messages destinations loop
 				for (Factory<AlarmRecipient>::Iterator arit = Factory<AlarmRecipient>::begin(); arit != Factory<AlarmRecipient>::end(); ++arit)
 				{
-					addRequest.getFunction()->setParameter(AlarmAddLinkAction::PARAMETER_RECIPIENT_KEY, arit->getFactoryKey());
+					addRequest.getAction()->setRecipientKey(arit->getFactoryKey());
 				
 					stream << "<h1>Diffusion sur " << arit->getTitle() << "</h1>";
 

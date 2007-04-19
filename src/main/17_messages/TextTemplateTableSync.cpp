@@ -116,9 +116,17 @@ namespace synthese
 		{
 		}
 
-		std::vector<shared_ptr<TextTemplate> > TextTemplateTableSync::search(AlarmLevel level, string name, int first /*= 0*/, int number /*= 0*/ )
-		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+		vector<shared_ptr<TextTemplate> > TextTemplateTableSync::search(
+			AlarmLevel level
+			, string name
+			, const TextTemplate* templateToBeDifferentWith
+			, int first
+			, int number
+			, bool orderByName
+			, bool orderByShortText
+			, bool orderByLongText
+			, bool raisingOrder
+		){
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -128,6 +136,14 @@ namespace synthese
 				;
 			if (!name.empty())
 				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
+			if (templateToBeDifferentWith)
+				query << " AND " << TABLE_COL_ID << "!=" << Conversion::ToString(templateToBeDifferentWith->getKey());
+			if (orderByName)
+				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (orderByShortText)
+				query << " ORDER BY " << COL_SHORT_TEXT << (raisingOrder ? " ASC" : " DESC");
+			if (orderByLongText)
+				query << " ORDER BY " << COL_LONG_TEXT << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -135,7 +151,7 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
 				vector<shared_ptr<TextTemplate> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{

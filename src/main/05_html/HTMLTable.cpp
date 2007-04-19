@@ -119,7 +119,7 @@ namespace synthese
 				s << row();
 			else if (_curCol != -1)
 				s << (_lastColWasH ? "</th>" : "</td>");
-			s << "<td";
+			s << (isHeader ? "<th" : "<td");
 			if (colSpan > 1)
 				s << " colspan=\"" << colSpan << "\"";
 			if (!className.empty())

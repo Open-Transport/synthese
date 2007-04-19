@@ -22,7 +22,7 @@
 
 #include "17_messages/ScenarioNameUpdateAction.h"
 #include "17_messages/MessagesModule.h"
-#include "17_messages/Scenario.h"
+#include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
 
 #include "30_server/ActionException.h"
@@ -35,7 +35,6 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
-	using namespace time;
 
 	namespace messages
 	{
@@ -56,7 +55,7 @@ namespace synthese
 				ParametersMap::const_iterator it;
 
 				// Scenario
-				_scenario = ScenarioTableSync::get(_request->getObjectId());
+				_scenario = ScenarioTableSync::getTemplate(_request->getObjectId());
 
 				// Name
 				it = map.find(PARAMETER_NAME);
@@ -65,7 +64,7 @@ namespace synthese
 				_name = it->second;
 
 				// Unicity control
-				vector<shared_ptr<Scenario> > existing = ScenarioTableSync::search(true, DateTime(TIME_UNKNOWN), DateTime(TIME_UNKNOWN), _name, 0, 1);
+				vector<shared_ptr<ScenarioTemplate> > existing = ScenarioTableSync::searchTemplate(_name, _scenario.get(), 0, 1);
 				if (!existing.empty())
 					throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
 			}

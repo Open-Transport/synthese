@@ -31,7 +31,8 @@
 
 #include "04_time/DateTime.h"
 
-#include "17_messages/Scenario.h"
+#include "17_messages/SentScenario.h"
+#include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesModule.h"
@@ -54,29 +55,48 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<Scenario>::load(Scenario* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			object->setIsATemplate(Conversion::ToBool(rows.getColumn(rowId, ScenarioTableSync::COL_IS_TEMPLATE)));
-			object->setIsEnabled(Conversion::ToBool(rows.getColumn(rowId, ScenarioTableSync::COL_ENABLED)));
 			object->setName(rows.getColumn(rowId, ScenarioTableSync::COL_NAME));
-			object->setPeriodStart(DateTime::FromSQLTimestamp (rows.getColumn (rowId, ScenarioTableSync::COL_PERIODSTART)));
-			object->setPeriodEnd(DateTime::FromSQLTimestamp (rows.getColumn (rowId, ScenarioTableSync::COL_PERIODEND)));
+			if (Conversion::ToBool(rows.getColumn (rowId, ScenarioTableSync::COL_IS_TEMPLATE)))
+			{
+				ScenarioTemplate* tobject = static_cast<ScenarioTemplate*>(object);
+				tobject->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			}
+			else
+			{
+				SentScenario* sobject = static_cast<SentScenario*>(object);
+				sobject->setIsEnabled(Conversion::ToBool(rows.getColumn(rowId, ScenarioTableSync::COL_ENABLED)));
+				sobject->setPeriodStart(DateTime::FromSQLTimestamp (rows.getColumn (rowId, ScenarioTableSync::COL_PERIODSTART)));
+				sobject->setPeriodEnd(DateTime::FromSQLTimestamp (rows.getColumn (rowId, ScenarioTableSync::COL_PERIODEND)));
+				sobject->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			}
 		}
 
 		template<> void SQLiteTableSyncTemplate<Scenario>::save(Scenario* object)
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() == 0)
-				object->setKey(getId(1,1));
+			
+			ScenarioTemplate* tobject = dynamic_cast<ScenarioTemplate*>(object);
+			if (tobject)
+			{
+				if (tobject->getKey() == 0)
+					tobject->setKey(getId(1,1));
+			}
+			SentScenario* sobject = dynamic_cast<SentScenario*>(object);
+			if (sobject)
+			{
+				if (sobject->getKey() == 0)
+					sobject->setKey(getId(1,1));
+			}
 
             query
 				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToString(object->getIsATemplate())
-				<< "," << Conversion::ToString(object->getIsEnabled())
+				<< Conversion::ToString(object->getId())
+				<< "," << Conversion::ToString(tobject != NULL)
+				<< "," << (sobject ? Conversion::ToString(sobject->getIsEnabled()) : "0")
 				<< "," << Conversion::ToSQLiteString(object->getName())
-				<< "," << object->getPeriodStart().toSQLString()
-				<< "," << object->getPeriodEnd().toSQLString()
+				<< "," << (sobject ? sobject->getPeriodStart().toSQLString() : "''")
+				<< "," << (sobject ? sobject->getPeriodEnd().toSQLString() : "''")
 				<< ")";
 
 			sqlite->execUpdate(query.str());
@@ -113,7 +133,10 @@ namespace synthese
 		{
 			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
 			{
-				shared_ptr<Scenario> scenario;
+				if (Conversion::ToBool(rows.getColumn (rowIndex, COL_IS_TEMPLATE)))
+					continue;
+
+				shared_ptr<SentScenario> scenario;
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 				if (MessagesModule::getScenarii().contains (id))
 				{
@@ -122,7 +145,7 @@ namespace synthese
 				}
 				else
 				{
-					scenario.reset(new Scenario);
+					scenario.reset(new SentScenario);
 					load(scenario.get(), rows, rowIndex);
 					MessagesModule::getScenarii().add (scenario);
 				}
@@ -133,8 +156,11 @@ namespace synthese
 		{
 			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
 			{
+				if (Conversion::ToBool(rows.getColumn (rowIndex, COL_IS_TEMPLATE)))
+					continue;
+
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-				shared_ptr<Scenario> alarm = MessagesModule::getScenarii().getUpdateable(id);
+				shared_ptr<SentScenario> alarm = MessagesModule::getScenarii().getUpdateable(id);
 				load(alarm.get(), rows, rowIndex);
 			}
 		}
@@ -143,14 +169,16 @@ namespace synthese
 		{
 			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
 			{
+				if (Conversion::ToBool(rows.getColumn (rowIndex, COL_IS_TEMPLATE)))
+					continue;
+
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 				MessagesModule::getScenarii().remove (id);	/// @todo Not so simple.
 			}
 		}
 
-		std::vector<shared_ptr<Scenario> > ScenarioTableSync::search(
-			bool isATemplate
-			, time::DateTime startDate
+		std::vector<shared_ptr<SentScenario> > ScenarioTableSync::searchSent(
+			time::DateTime startDate
 			, time::DateTime endDate
 			, const std::string name
 			, int first /*= 0*/, int number /*= 0*/
@@ -160,15 +188,22 @@ namespace synthese
 			, bool orderByConflict
 			, bool raisingOrder
 		){
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
 				<< " WHERE " 
-				<< COL_IS_TEMPLATE << "=" << Conversion::ToString(isATemplate);
+					<< COL_IS_TEMPLATE << "=0";
+			if (!startDate.isUnknown())
+				query << " AND " << ScenarioTableSync::COL_PERIODEND << "<=" << startDate.toSQLString();
+			if (!endDate.isUnknown())
+				query << " AND " << ScenarioTableSync::COL_PERIODSTART << "<=" << endDate.toSQLString();
 			if (!name.empty())
 				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
+			if (orderByDate)
+				query << " ORDER BY " << COL_PERIODSTART << (raisingOrder ? " ASC" : " DESC") << "," << COL_PERIODEND  << (raisingOrder ? " ASC" : " DESC");
+			if (orderByName)
+				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -176,11 +211,11 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<shared_ptr<Scenario> > objects;
+				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+				vector<shared_ptr<SentScenario> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					shared_ptr<Scenario> object(new Scenario);
+					shared_ptr<SentScenario> object(new SentScenario);
 					load(object.get(), result, i);
 					objects.push_back(object);
 				}
@@ -192,16 +227,80 @@ namespace synthese
 			}
 		}
 
-		void ScenarioTableSync::saveWithAlarms( Scenario* object )
-		{
-			save(object);
-			const Scenario::AlarmsSet& alarms = object->getAlarms();
-			for (Scenario::AlarmsSet::const_iterator it = alarms.begin(); it != alarms.end(); ++it)
-			{
-				AlarmTableSync::save(*it);
+		std::vector<boost::shared_ptr<ScenarioTemplate> > ScenarioTableSync::searchTemplate(
+			const std::string name /*= std::string() */
+			, const ScenarioTemplate* scenarioToBeDifferentWith
+			, int first /*= 0 */
+			, int number /*= -1 */
+			, bool orderByName /*= true */
+			, bool raisingOrder /*= false */
+		){
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE " 
+				<< COL_IS_TEMPLATE << "=1";
+			if (!name.empty())
+				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
+			if (scenarioToBeDifferentWith)
+				query << " AND " << TABLE_COL_ID << "!=" << scenarioToBeDifferentWith->getKey();
+			if (orderByName)
+				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
 
-				/// @todo Saving of the broadcast list
+			try
+			{
+				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+				vector<shared_ptr<ScenarioTemplate> > objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					shared_ptr<ScenarioTemplate> object(new ScenarioTemplate(result.getColumn(i, COL_NAME)));
+					load(object.get(), result, i);
+					objects.push_back(object);
+				}
+				return objects;
 			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+
 		}
+
+		boost::shared_ptr<ScenarioTemplate> ScenarioTableSync::getTemplate( uid key )
+		{
+			return dynamic_pointer_cast<ScenarioTemplate, Scenario>(getScenario(key));
+		}
+
+		boost::shared_ptr<SentScenario> ScenarioTableSync::getSent( uid key )
+		{
+			return dynamic_pointer_cast<SentScenario, Scenario>(getScenario(key));
+		}
+
+		boost::shared_ptr<Scenario> ScenarioTableSync::getScenario(uid key)
+		{
+			std::stringstream query;
+			query
+				<< "SELECT * "
+				<< "FROM " << TABLE_NAME
+				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key)
+				<< " LIMIT 1";
+			db::SQLiteResult rows = DBModule::GetSQLite()->execQuery(query.str());
+			if (rows.getNbRows() <= 0)
+				throw DBEmptyResultException<Scenario>(key, "ID not found in database.");
+			boost::shared_ptr<Scenario> object(
+				Conversion::ToBool(rows.getColumn (0, ScenarioTableSync::COL_IS_TEMPLATE))
+				? static_cast<Scenario*>(new ScenarioTemplate(rows.getColumn (0, ScenarioTableSync::COL_NAME)))
+				: static_cast<Scenario*>(new SentScenario)
+				);
+			load(object.get(), rows);
+			return object;
+		}
+
+
 	}
 }

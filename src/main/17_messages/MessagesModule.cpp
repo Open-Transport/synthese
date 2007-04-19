@@ -21,6 +21,9 @@
 */
 
 #include "17_messages/MessagesModule.h"
+#include "17_messages/SentScenario.h"
+#include "17_messages/ScenarioTemplate.h"
+#include "17_messages/ScenarioTableSync.h"
 #include "17_messages/TextTemplateTableSync.h"
 #include "17_messages/TextTemplate.h"
 
@@ -31,27 +34,28 @@ namespace synthese
 {
 	namespace messages
 	{
-		Alarm::Registry MessagesModule::_alarms;
-		Scenario::Registry MessagesModule::_scenarii;
+		SentAlarm::Registry MessagesModule::_alarms;
+		SentScenario::Registry MessagesModule::_scenarii;
 
-		Alarm::Registry& 
+		SentAlarm::Registry& 
 			MessagesModule::getAlarms ()
 		{
 			return _alarms;
 		}
 
-		Scenario::Registry& MessagesModule::getScenarii()
+		SentScenario::Registry& MessagesModule::getScenarii()
 		{
 			return _scenarii;
 		}
 
-		std::vector<pair<uid, std::string> > MessagesModule::getScenariiLabels( bool withAll /*= false*/ )
+		std::vector<pair<uid, std::string> > MessagesModule::getScenarioTemplatesLabels( bool withAll /*= false*/ )
 		{
 			vector<pair<uid,string> > m;
 			if (withAll)
 				m.push_back(make_pair(0, "(tous)"));
-			for(Scenario::Registry::const_iterator it = _scenarii.begin(); it != _scenarii.end(); ++it)
-				m.push_back(make_pair(it->first, it->second->getName()));
+			vector<shared_ptr<ScenarioTemplate> > sc = ScenarioTableSync::searchTemplate();
+			for(vector<shared_ptr<ScenarioTemplate> >::const_iterator it = sc.begin(); it != sc.end(); ++it)
+				m.push_back(make_pair((*it)->getKey(), (*it)->getName()));
 			return m;
 
 		}

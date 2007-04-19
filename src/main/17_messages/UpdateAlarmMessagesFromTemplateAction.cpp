@@ -54,7 +54,7 @@ namespace synthese
 		{
 			try
 			{
-				_message = AlarmTableSync::get(_request->getObjectId());
+				_message = AlarmTableSync::getAlarm(_request->getObjectId());
 
 				ParametersMap::const_iterator it;
 

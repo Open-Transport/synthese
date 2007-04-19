@@ -41,32 +41,24 @@ namespace synthese
 		ParametersMap DeleteAlarmAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_ALARM, Conversion::ToString(_alarm->getKey())));
+			if (_alarm.get())
+				map.insert(make_pair(PARAMETER_ALARM, Conversion::ToString(_alarm->getId())));
 			return map;
 		}
 
 		void DeleteAlarmAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				ParametersMap::const_iterator it;
+			ParametersMap::const_iterator it;
 
-				it = map.find(PARAMETER_ALARM);
-				if (it == map.end())
-					throw ActionException("Alarm not specified");
-
-				_alarm = MessagesModule::getAlarms().get(Conversion::ToLongLong(it->second));
-			}
-			catch (Alarm::RegistryKeyException e)
-			{
-				throw ActionException("Specified alarm not found");
-			}
+			it = map.find(PARAMETER_ALARM);
+			if (it == map.end())
+				throw ActionException("Alarm not specified");
 		}
 
 		void DeleteAlarmAction::run()
 		{
 			/// @todo Delete alarm broadcast list
-			AlarmTableSync::remove(_alarm->getKey());
+			AlarmTableSync::remove(_alarm->getId());
 		}
 	}
 }

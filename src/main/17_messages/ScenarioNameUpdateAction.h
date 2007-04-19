@@ -31,7 +31,7 @@ namespace synthese
 {
 	namespace messages
 	{
-		class Scenario;
+		class ScenarioTemplate;
 
 		/** ScenarioNameUpdateAction action class.
 			@ingroup m17
@@ -43,7 +43,7 @@ namespace synthese
 
 		private:
 			std::string		_name;
-			boost::shared_ptr<Scenario>		_scenario;
+			boost::shared_ptr<ScenarioTemplate>		_scenario;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

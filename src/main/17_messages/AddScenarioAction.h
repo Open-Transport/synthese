@@ -29,26 +29,20 @@ namespace synthese
 {
 	namespace messages
 	{
-		class Scenario;
+		class ScenarioTemplate;
 
-		/** Scenario creation action class.
-			@ingroup m17
-
-			The action runs in two ways :
-				- creation of a template scenario
-				- send to messages upon a template scenario
+		/** Scenario template creation action class.
+			@ingroup m17Actions refActions
 		*/
 		class AddScenarioAction : public server::Action
 		{
 		public:
 			static const std::string PARAMETER_TEMPLATE_ID;
-			static const std::string PARAMETER_IS_TEMPLATE;
 			static const std::string PARAMETER_NAME;
 
 		private:
-			boost::shared_ptr<const Scenario>	_template;
-			bool		_isTemplate;
-			std::string	_name;
+			boost::shared_ptr<const ScenarioTemplate>	_template;
+			std::string									_name;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

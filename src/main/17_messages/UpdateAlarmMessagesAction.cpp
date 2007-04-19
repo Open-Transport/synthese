@@ -55,7 +55,7 @@ namespace synthese
 
 			try
 			{
-				_alarm = AlarmTableSync::get(_request->getObjectId());
+				_alarm = AlarmTableSync::getAlarm(_request->getObjectId());
 			}
 			catch (...)
 			{

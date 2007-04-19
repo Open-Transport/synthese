@@ -1,6 +1,6 @@
 
-/** ScenarioStopAction class header.
-	@file ScenarioStopAction.h
+/** SingleSentAlarm class header.
+	@file SingleSentAlarm.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,45 +20,40 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ScenarioStopAction_H__
-#define SYNTHESE_ScenarioStopAction_H__
+#ifndef SYNTHESE_SingleSentAlarm_h__
+#define SYNTHESE_SingleSentAlarm_h__
 
-#include "30_server/Action.h"
+#include "17_messages/SentAlarm.h"
 
 namespace synthese
 {
 	namespace messages
 	{
-		class SentScenario;
-
-		/** ScenarioStopAction action class.
+		/** SingleSentAlarm class.
 			@ingroup m17
 		*/
-		class ScenarioStopAction : public server::Action
+		class SingleSentAlarm
+			: public SentAlarm
 		{
-		public:
-			// static const std::string PARAMETER_xxx;
-
 		private:
-			boost::shared_ptr<SentScenario>		_scenario;
-
-		protected:
-			/** Conversion from attributes to generic parameter maps.
-			*/
-			server::ParametersMap getParametersMap() const;
-
-			/** Conversion from generic parameters map to attributes.
-				Removes the used parameters from the map.
-				@exception ActionException Occurs when some parameters are missing or incorrect.
-			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
+			bool			_enabled;
+			time::DateTime	_periodStart; //!< Alarm applicability period start
+			time::DateTime	_periodEnd;   //!< Alarm applicability period end
 
 		public:
-			/** Action to run, defined by each subclass.
-			*/
-			void run();
+			SingleSentAlarm();
+			~SingleSentAlarm();
+
+			void setIsEnabled(bool value);
+			void setPeriodStart ( const time::DateTime& periodStart);
+			void setPeriodEnd ( const time::DateTime& periodEnd);
+
+			bool					getIsEnabled()		const;
+			const time::DateTime&	getPeriodStart()	const;
+			const time::DateTime&	getPeriodEnd()		const;
+
 		};
 	}
 }
 
-#endif // SYNTHESE_ScenarioStopAction_H__
+#endif // SYNTHESE_SingleSentAlarm_h__

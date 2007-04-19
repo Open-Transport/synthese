@@ -26,9 +26,9 @@
 #include "01_util/ModuleClass.h"
 
 #include "17_messages/AlarmBroadcastList.h"
-#include "17_messages/Alarm.h"
 #include "17_messages/Types.h"
-#include "17_messages/Scenario.h"
+#include "17_messages/SentAlarm.h"
+#include "17_messages/SentScenario.h"
 
 namespace synthese
 {
@@ -51,16 +51,16 @@ namespace synthese
 //			typedef messages::AlarmBroadcastList<departurestable::BroadcastPoint>	BroadcastPointBroadcastList;
 
 		private:
-			static Alarm::Registry		_alarms;
-			static Scenario::Registry	_scenarii;
+			static SentAlarm::Registry		_alarms;
+			static SentScenario::Registry	_scenarii;
 
 		public:
-			static Alarm::Registry&		getAlarms();
-			static Scenario::Registry&	getScenarii();
+			static SentAlarm::Registry&		getAlarms();
+			static SentScenario::Registry&	getScenarii();
 			
 			void initialize();
 
-			static std::vector<std::pair<uid, std::string> >			getScenariiLabels(bool withAll = false);
+			static std::vector<std::pair<uid, std::string> >			getScenarioTemplatesLabels(bool withAll = false);
 			static std::vector<std::pair<AlarmLevel, std::string> >		getLevelLabels(bool withAll = false);
 			static std::vector<std::pair<AlarmConflict, std::string> >	getConflictLabels(bool withAll = false);
 			static std::vector<std::pair<uid, std::string> >			getTextTemplateLabels(const AlarmLevel& level);

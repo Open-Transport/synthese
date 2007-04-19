@@ -1,6 +1,6 @@
 
-/** Scenario class header.
-	@file Scenario.h
+/** ScenarioSentAlarm class header.
+	@file ScenarioSentAlarm.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,53 +20,52 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_Scenario_h__
-#define SYNTHESE_Scenario_h__
+#ifndef SYNTHESE_ScenarioSentAlarm_h__
+#define SYNTHESE_ScenarioSentAlarm_h__
 
-#include "01_util/UId.h"
-
-#include <string>
-#include <set>
+#include "17_messages/SentAlarm.h"
 
 namespace synthese
 {
 	namespace messages
 	{
-		/** Scenario of alarms diffusion.
-			@ingroup m17
+		class SentScenario;
+		class AlarmTemplate;
 
-			A scenario is a collection of alarms.
-			The type of the contained alarms defines two categories of scenario :
-				- the template scenario
-				- the sent scenario
+		/** ScenarioSentAlarm class.
+			@ingroup m17
 		*/
-		class Scenario
+		class ScenarioSentAlarm
+			: public SentAlarm
 		{
 		private:
-			std::string					_name;
+			const SentScenario& const _scenario;
 
 		public:
-			Scenario(const std::string name = std::string());
-			virtual ~Scenario();
-
-			/** Name getter.
-				@return const std::string& The name of the scenario
+			/** Copy constructor.
+				@param scenario Scenario which belongs the new alarm
+				@param source Alarm template to copy
 				@author Hugues Romain
-				@date 2007
+				@date 2007				
 			*/
-			const std::string& getName() const;
-
-
-			/** Name setter.
-				@param name Name of the scenario
+			ScenarioSentAlarm(const SentScenario& scenario, const AlarmTemplate& source);
+			
+			/** Basic constructor.
+				@param scenario Scenario which belongs the new alarm
 				@author Hugues Romain
-				@date 2007
+				@date 2007				
 			*/
-			void setName(const std::string& name);
+			ScenarioSentAlarm(const SentScenario& scenario);
+			
+			~ScenarioSentAlarm();
 
-			virtual uid getId() const = 0;
+			bool					getIsEnabled()		const;
+			const time::DateTime&	getPeriodStart()	const;
+			const time::DateTime&	getPeriodEnd()		const;
+
+			const SentScenario&		getScenario()		const;
 		};
 	}
 }
 
-#endif // SYNTHESE_Scenario_h__
+#endif // SYNTHESE_ScenarioSentAlarm_h__

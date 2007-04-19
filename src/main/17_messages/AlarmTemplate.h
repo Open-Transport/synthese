@@ -1,6 +1,6 @@
 
-/** NewScenarioSendAction class header.
-	@file NewScenarioSendAction.h
+/** AlarmTemplate class header.
+	@file AlarmTemplate.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,10 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_NewScenarioSendAction_H__
-#define SYNTHESE_NewScenarioSendAction_H__
+#ifndef SYNTHESE_AlarmTemplate_h__
+#define SYNTHESE_AlarmTemplate_h__
 
-#include "30_server/Action.h"
+#include "17_messages/Alarm.h"
+
+#include "01_util/Registrable.h"
 
 namespace synthese
 {
@@ -31,35 +33,25 @@ namespace synthese
 	{
 		class ScenarioTemplate;
 
-		/** New scenario send action class.
-			@ingroup m17Actions refActions
+		/** AlarmTemplate class.
+			@ingroup m17
 		*/
-		class NewScenarioSendAction : public server::Action
+		class AlarmTemplate
+			: public Alarm
+			, public util::Registrable<uid, AlarmTemplate>
 		{
-		public:
-			static const std::string PARAMETER_TEMPLATE;
-
 		private:
-			boost::shared_ptr<const ScenarioTemplate>	_template;
-
-		protected:
-			/** Conversion from attributes to generic parameter maps.
-			*/
-			server::ParametersMap getParametersMap() const;
-
-			/** Conversion from generic parameters map to attributes.
-				Removes the used parameters from the map.
-				@exception ActionException Occurs when some parameters are missing or incorrect.
-			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
+			const uid _scenarioId;
 
 		public:
-			/** Action to run, defined by each subclass.
-			*/
-			void run();
+			AlarmTemplate(uid scenarioId);
+			AlarmTemplate(const AlarmTemplate& source, uid scenarioId);
+			~AlarmTemplate();
+			uid getId() const;
+
+			uid getScenarioId() const;
 		};
 	}
 }
 
-#endif // SYNTHESE_NewScenarioSendAction_H__
- 
+#endif // SYNTHESE_AlarmTemplate_h__

@@ -64,14 +64,6 @@
 			Name="Core Classes"
 			>
 			<File
-				RelativePath=".\Alarm.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Alarm.h"
-				>
-			</File>
-			<File
 				RelativePath=".\AlarmBroadcastList.h"
 				>
 			</File>
@@ -92,14 +84,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Scenario.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Scenario.h"
-				>
-			</File>
-			<File
 				RelativePath=".\TextTemplate.cpp"
 				>
 			</File>
@@ -107,6 +91,82 @@
 				RelativePath=".\TextTemplate.h"
 				>
 			</File>
+			<Filter
+				Name="Scenario"
+				>
+				<File
+					RelativePath=".\Scenario.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Scenario.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioSubclassTemplate.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioTemplate.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioTemplate.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SentScenario.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\SentScenario.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Alarm"
+				>
+				<File
+					RelativePath=".\Alarm.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Alarm.h"
+					>
+				</File>
+				<File
+					RelativePath=".\AlarmTemplate.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\AlarmTemplate.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioSentAlarm.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScenarioSentAlarm.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SentAlarm.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\SentAlarm.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SingleSentAlarm.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\SingleSentAlarm.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="LS SQL"
@@ -185,18 +245,6 @@
 			</File>
 			<File
 				RelativePath=".\MessagesScenarioSendAdmin.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="LS XML"
-			>
-			<File
-				RelativePath=".\AlarmLS.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AlarmLS.h"
 				>
 			</File>
 		</Filter>

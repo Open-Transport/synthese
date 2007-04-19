@@ -20,12 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "17_messages/AddScenarioAction.h"
+#include "17_messages/ScenarioTableSync.h"
+#include "17_messages/ScenarioTemplate.h"
+
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
-
-#include "17_messages/AddScenarioAction.h"
-#include "17_messages/MessagesModule.h"
-#include "17_messages/ScenarioTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -38,7 +38,6 @@ namespace synthese
 	namespace messages
 	{
 		const string AddScenarioAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "t";
-		const string AddScenarioAction::PARAMETER_IS_TEMPLATE = Action_PARAMETER_PREFIX + "i";
 		const string AddScenarioAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "n";
 
 
@@ -51,60 +50,46 @@ namespace synthese
 
 		void AddScenarioAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
+			ParametersMap::const_iterator it;
+
+			// Template to copy
+			it = map.find(PARAMETER_TEMPLATE_ID);
+			if (it != map.end())
 			{
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_TEMPLATE_ID);
-				if (it != map.end())
+				try
 				{
-					_template = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
+					_template = ScenarioTableSync::getTemplate(Conversion::ToLongLong(it->second));
 				}
-
-				it = map.find(PARAMETER_IS_TEMPLATE);
-				if (it == map.end())
-					throw ActionException("Scenario is template not found");
-				_isTemplate = Conversion::ToBool(it->second);
-				
-				if (_isTemplate)
+				catch(...)
 				{
-					it = map.find(PARAMETER_NAME);
-					if (it == map.end())
-						throw ActionException("Name not found");
-					_name = it->second;
-					if(_name.empty())
-						throw ActionException("Le scénario doit avoir un nom.");
-					
-					vector<shared_ptr<Scenario> > v = ScenarioTableSync::search(_isTemplate, DateTime (TIME_UNKNOWN), DateTime (TIME_UNKNOWN), _name, 0, 1);
-					if (!v.empty())
-					{
-						throw ActionException("Un scénario de même nom existe déjà");
-					}
+					throw ActionException("specified scenario template not found");
 				}
-				else if (!_template)
-					throw ActionException("A template must be specified");
+			}
+			
+			// Name
+			it = map.find(PARAMETER_NAME);
+			if (it == map.end())
+				throw ActionException("Name not found");
+			_name = it->second;
+			if(_name.empty())
+				throw ActionException("Le scénario doit avoir un nom.");
+			vector<shared_ptr<ScenarioTemplate> > v = ScenarioTableSync::searchTemplate(_name, 0, 1);
+			if (!v.empty())
+				throw ActionException("Un scénario de même nom existe déjà");
 
-				if (map.find(Request::PARAMETER_OBJECT_ID) == map.end())
-					_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
-			}
-			catch (Scenario::RegistryKeyException e)
-			{
-				throw ActionException("Specified scenario not found");
-			}
+			// Anti error
+			if (map.find(Request::PARAMETER_OBJECT_ID) == map.end())
+				_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void AddScenarioAction::run()
 		{
-			shared_ptr<Scenario> scenario;
+			shared_ptr<ScenarioTemplate> scenario;
 			if (_template.get())
-				scenario = _template->createCopy();
+				scenario.reset(new ScenarioTemplate(*_template, _name));
 			else
-				scenario.reset(new Scenario);
-			scenario->setIsATemplate(_isTemplate);
-			if (_isTemplate)
-				scenario->setName(_name);
-			ScenarioTableSync::save(scenario.get());
-
+				scenario.reset(new ScenarioTemplate(_name));
+			ScenarioTableSync::saveWithAlarms(scenario.get());
 			_request->setObjectId(scenario->getKey());
 		}
 	}

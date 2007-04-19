@@ -1,6 +1,6 @@
 
-/** ScenarioStopAction class implementation.
-	@file ScenarioStopAction.cpp
+/** AlarmTemplate class implementation.
+	@file AlarmTemplate.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,47 +20,41 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-
-#include "17_messages/ScenarioStopAction.h"
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesModule.h"
-
-using namespace std;
+#include "AlarmTemplate.h"
 
 namespace synthese
 {
-	using namespace server;
-	using namespace time;
-	
 	namespace messages
 	{
-		// const string ScenarioStopAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
 
 
-		ParametersMap ScenarioStopAction::getParametersMap() const
+		AlarmTemplate::~AlarmTemplate()
 		{
-			ParametersMap map;
-			return map;
+
 		}
 
-		void ScenarioStopAction::_setFromParametersMap(const ParametersMap& map)
+		uid AlarmTemplate::getId() const
 		{
-			try
-			{
-				_scenario = ScenarioTableSync::getSent(_request->getObjectId());
-			}
-			catch (...) {
-				throw ActionException("Invalid scenario");
-			}
+			return getKey();
+		}
+		AlarmTemplate::AlarmTemplate(uid scenario)
+			: Alarm()
+			, util::Registrable<uid, AlarmTemplate>()
+			, _scenarioId(scenario)
+		{
+
 		}
 
-		void ScenarioStopAction::run()
+		AlarmTemplate::AlarmTemplate( const AlarmTemplate& source, uid scenarioId )
+			: Alarm(source)
+			, _scenarioId(scenarioId)
 		{
-			_scenario->setPeriodEnd(DateTime());
-			ScenarioTableSync::save(_scenario.get());
+
+		}
+
+		uid AlarmTemplate::getScenarioId() const
+		{
+			return _scenarioId;
 		}
 	}
 }

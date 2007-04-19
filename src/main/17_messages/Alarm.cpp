@@ -23,114 +23,36 @@
 #include "17_messages/Alarm.h"
 #include "17_messages/Scenario.h"
 
-using namespace boost;
-
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
 
 	namespace messages
 	{
 
 		Alarm::Alarm()
-			: Registrable<uid,Alarm>()
-			, _enabled(false)
-			, _periodStart(TIME_UNKNOWN)
-			, _periodEnd(TIME_UNKNOWN)
-			, _level(ALARM_LEVEL_UNKNOWN)
-			, _scenario(NULL)
+			: _level(ALARM_LEVEL_UNKNOWN)
 		{
-
 		}
 
+		Alarm::Alarm( const Alarm& source )
+			: _level(source._level)
+			, _shortMessage(source._shortMessage)
+			, _longMessage(source._longMessage)
+		{
+		}
 
-		const AlarmLevel& 
-		Alarm::getLevel () const
+		const AlarmLevel& Alarm::getLevel () const
 		{
 			return _level;
 		}
 
 
-
-		void 
-		Alarm::setLevel (const AlarmLevel& level)
+		void Alarm::setLevel (const AlarmLevel& level)
 		{
 			_level = level;
 		}
 
-
-		void 
-		Alarm::setPeriodStart ( const synthese::time::DateTime& periodStart)
-		{
-			_periodStart = periodStart;
-		}
-
-
-		void 
-		Alarm::setPeriodEnd ( const synthese::time::DateTime& periodEnd)
-		{
-			_periodEnd = periodEnd;
-		}
-
-
-
-
-		bool 
-		Alarm::isApplicable ( const synthese::time::DateTime& start, 
-					const synthese::time::DateTime& end ) const
-		{
-			// Disabled alarm is never applicable
-			if (!_enabled)
-				return false;
-
-			// Start date control
-			if (!_periodStart.isUnknown() && end < _periodStart)
-				return false;
-
-			// End date control
-			if (!_periodEnd.isUnknown() && start >= _periodEnd)
-				return false;
-
-			return true;
-		}
-
-		bool Alarm::isApplicable( const time::DateTime& date ) const
-		{
-			// Disabled alarm is never applicable
-			if (!_enabled)
-				return false;
-
-			// Start date control
-			if (!_periodStart.isUnknown() && date < _periodStart)
-				return false;
-
-			// End date control
-			if (!_periodEnd.isUnknown() && date >= _periodEnd)
-				return false;
-
-			return true;
-		}
-
-		const time::DateTime& Alarm::getPeriodStart() const
-		{
-			return _periodStart;
-		}
-
-		const time::DateTime& Alarm::getPeriodEnd() const
-		{
-			return _periodEnd;
-		}
-
-		bool Alarm::getIsATemplate() const
-		{
-			return _isATemplate;
-		}
-
-		void Alarm::setIsATemplate( bool value )
-		{
-			_isATemplate = value;
-		}
 
 		void Alarm::setLongMessage( const std::string& message )
 		{
@@ -152,48 +74,9 @@ namespace synthese
 			return _shortMessage;
 		}
 
-		void Alarm::setScenario(Scenario* scenario)
+		Alarm::~Alarm()
 		{
-			_scenario = scenario;
-			if (_scenario)
-			{
-				setPeriodStart(_scenario->getPeriodStart());
-				setPeriodEnd(_scenario->getPeriodEnd());
-			}
-		}
 
-		const Scenario* Alarm::getScenario() const
-		{
-			return _scenario;
-		}
-
-		Scenario* Alarm::getScenario()
-		{
-			return _scenario;
-		}
-
-		bool Alarm::getIsEnabled() const
-		{
-			return _enabled;
-		}
-
-		void Alarm::setIsEnabled( bool value )
-		{
-			_enabled = value;
-		}
-
-		shared_ptr<Alarm> Alarm::createCopy(Scenario* scenario) const
-		{
-			shared_ptr<Alarm> alarm(new Alarm);
-			alarm->setIsATemplate(false);
-			alarm->setLevel(getLevel());
-			alarm->setScenario(scenario);
-			alarm->setShortMessage(getShortMessage());
-			alarm->setLongMessage(getLongMessage());
-			
-			/// @todo Broadcast list copy
-
-			return alarm;
 		}
 	}
 }

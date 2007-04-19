@@ -70,7 +70,7 @@ namespace synthese
 				_name = it->second;
 				if (_name.empty())
 					throw ActionException("Le nom ne peut être vide");
-				vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::search(_text->getAlarmLevel(), _name, 0, 1);
+				vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::search(_text->getAlarmLevel(), _name, _text.get(), 0, 1);
 				if (!v.empty())
 					throw ActionException("Un texte portant ce nom existe déjà.");
 

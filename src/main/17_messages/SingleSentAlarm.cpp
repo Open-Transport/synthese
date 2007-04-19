@@ -1,6 +1,6 @@
 
-/** ScenarioStopAction class implementation.
-	@file ScenarioStopAction.cpp
+/** SingleSentAlarm class implementation.
+	@file SingleSentAlarm.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,47 +20,60 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
+#include "17_messages/SingleSentAlarm.h"
 
-#include "17_messages/ScenarioStopAction.h"
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesModule.h"
-
-using namespace std;
+#include "01_util/Registrable.h"
 
 namespace synthese
 {
-	using namespace server;
 	using namespace time;
-	
+
 	namespace messages
 	{
-		// const string ScenarioStopAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
 
 
-		ParametersMap ScenarioStopAction::getParametersMap() const
+		SingleSentAlarm::SingleSentAlarm()
+			: SentAlarm()
+			, _enabled(false)
+			, _periodStart(DateTime(TIME_UNKNOWN))
+			, _periodEnd(DateTime(TIME_UNKNOWN))
 		{
-			ParametersMap map;
-			return map;
+
 		}
 
-		void ScenarioStopAction::_setFromParametersMap(const ParametersMap& map)
+		void SingleSentAlarm::setIsEnabled( bool value )
 		{
-			try
-			{
-				_scenario = ScenarioTableSync::getSent(_request->getObjectId());
-			}
-			catch (...) {
-				throw ActionException("Invalid scenario");
-			}
+			_enabled = value;
 		}
 
-		void ScenarioStopAction::run()
+		void SingleSentAlarm::setPeriodStart( const time::DateTime& periodStart )
 		{
-			_scenario->setPeriodEnd(DateTime());
-			ScenarioTableSync::save(_scenario.get());
+			_periodStart = periodStart;
+		}
+
+		void SingleSentAlarm::setPeriodEnd( const time::DateTime& periodEnd )
+		{
+			_periodEnd = periodEnd;
+		}
+
+		bool SingleSentAlarm::getIsEnabled() const
+		{
+			return _enabled;
+		}
+
+		const time::DateTime& SingleSentAlarm::getPeriodStart() const
+		{
+			return _periodStart;
+		}
+
+		const time::DateTime& SingleSentAlarm::getPeriodEnd() const
+		{
+			return _periodEnd;
+		}
+
+		SingleSentAlarm::~SingleSentAlarm()
+		{
+
 		}
 	}
 }

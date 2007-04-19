@@ -156,6 +156,8 @@ namespace synthese
 			addTableColumn (COL_HANDICAPPEDCOMPLIANCEID, "INTEGER", true);
 			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
 			addTableColumn (COL_RESERVATIONRULEID, "INTEGER", true);
+
+			addTableIndex(COL_COMMERCIAL_LINE_ID);
 		}
 
 		void LineTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)

@@ -55,6 +55,7 @@ namespace synthese
 			
 		public:
 			typedef std::vector<std::pair<std::string, std::string> > HeaderVector;
+			static const int UNLIMITED_SIZE;
 
 			struct RequestParameters
 			{
@@ -62,13 +63,21 @@ namespace synthese
 				int					first;
 				std::string			orderField;
 				bool				raisingOrder;
-				RequestParameters() : maxSize(30), first(0), raisingOrder(true) {}
+				RequestParameters() 
+					: first(0)
+					, maxSize(30)
+					, raisingOrder(true)
+				{}
 			};
 
 			struct ResultParameters
 			{
 				bool				next;
 				int					size;
+				ResultParameters()
+					: next(false)
+					, size(UNLIMITED_SIZE)
+				{}
 			};
 
 		protected:
@@ -85,24 +94,34 @@ namespace synthese
 				, const HTMLForm& searchForm
 				, const RequestParameters& requestParameters
 				, const ResultParameters& resultParameters
-				, std::string iconPath="");
+				, std::string iconPath = std::string()
+				);
 
 			virtual std::string close();
 
-			static RequestParameters getParameters(const std::map<std::string, std::string>& map, const std::string& defaultOrderField, int defaultMaxSize);
+			static RequestParameters getParameters(
+				const std::map<std::string, std::string>& map
+				, const std::string defaultOrderField = std::string()
+				, int defaultMaxSize = UNLIMITED_SIZE
+				);
 			
 			template <class T>
-			static ResultParameters getParameters(const RequestParameters& requestParameters, std::vector<boost::shared_ptr<T> >& result);
+			static ResultParameters getParameters(
+				const RequestParameters& requestParameters
+				, std::vector<boost::shared_ptr<T> >& result);
 
-			static std::map<std::string, std::string> getParametersMap(const RequestParameters& requestParameters);
+			static std::map<std::string, std::string> getParametersMap(
+				const RequestParameters& requestParameters);
 			
 		};
 
 		template <class T>
-		ResultHTMLTable::ResultParameters ResultHTMLTable::getParameters( const RequestParameters& requestParameters, std::vector<boost::shared_ptr<T> >& result )
-		{
+		ResultHTMLTable::ResultParameters ResultHTMLTable::getParameters(
+			const RequestParameters& requestParameters
+			, std::vector<boost::shared_ptr<T> >& result
+		){
 			ResultParameters p;
-			p.next = result.size() > requestParameters.maxSize;
+			p.next = (requestParameters.maxSize != UNLIMITED_SIZE) && (result.size() > requestParameters.maxSize);
 			if (p.next)
 				result.pop_back();
 			p.size = result.size();

@@ -1,4 +1,4 @@
-
+﻿
 /** AlarmTableSync class header.
 	@file AlarmTableSync.h
 
@@ -30,23 +30,25 @@
 #include "17_messages/Alarm.h"
 
 #include <string>
-#include <iostream>
 
 namespace synthese
 {
-	namespace env
-	{
-		class CommercialLine;
-		class ConnectionPlace;
-	}
-
 	namespace messages
 	{
-		class Alarm;
+		class ScenarioSentAlarm;
+		class SingleSentAlarm;
+		class AlarmTemplate;
+		class SentScenario;
 		class Scenario;
 
+
 		/** Alarm SQLite table synchronizer.
-			@ingroup m17
+			@ingroup m17LS refLS
+			@warning (for the future sqlite node synchronizer) The alarm table sync insertion hook must always be run after the one for the scenario
+
+			Only the sent alarms are loaded in ram.
+
+			@note As Alarm is an abstract class, do not use the get static method. Use getAlarm instead.
 		*/
 		class AlarmTableSync : public db::SQLiteTableSyncTemplate<Alarm>
 		{
@@ -89,10 +91,26 @@ namespace synthese
 				const db::SQLiteResult& rows);
 
 		public:
-			/** The returned alarms must be deleted */
 			static std::vector<boost::shared_ptr<Alarm> > search(
 				const Scenario* scenario
-				, time::DateTime startDate
+				, int first = 0
+				, int number = -1
+				, bool orderByLevel = false
+				, bool raisingOrder = false
+				);
+
+			static std::vector<boost::shared_ptr<ScenarioSentAlarm> > searchScenarioSent(
+				const SentScenario* scenario
+				, int first = 0
+				, int number = 0
+				, bool orderByLevel = false
+				, bool orderByStatus = false
+				, bool orderByConflict = false
+				, bool raisingOrder = false
+				);
+			
+			static std::vector<boost::shared_ptr<SingleSentAlarm> > searchSingleSent(
+				time::DateTime startDate
 				, time::DateTime endDate
 				, int first = 0
 				, int number = 0
@@ -102,8 +120,16 @@ namespace synthese
 				, bool orderByConflict = false
 				, bool raisingOrder = false
 				);
+			
+			static std::vector<boost::shared_ptr<AlarmTemplate> > searchTemplates(
+				const SentScenario* scenario
+				, int first = 0
+				, int number = 0
+				, bool orderByLevel = false
+				, bool raisingOrder = false
+				);
 
-
+			static boost::shared_ptr<Alarm> getAlarm(uid key);
 		};
 
 	}

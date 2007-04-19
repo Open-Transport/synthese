@@ -47,8 +47,10 @@ namespace synthese
 	{
 		class Alarm;
 
-		/**  table synchronizer.
+		/** Alarm object links table synchronizer.
 			@ingroup m17
+			
+			Only the links concerning the sent alarms are loaded in ram.
 		*/
 		class AlarmObjectLinkTableSync : public db::SQLiteTableSyncTemplate<AlarmObjectLink<Registrable<uid, void> > >
 		{
@@ -69,11 +71,18 @@ namespace synthese
 				@date 2006
 			*/
 			template<class T>
-			static std::vector< AlarmObjectLink<T> > search(
+			static std::vector<boost::shared_ptr<T> > search(
 				const Alarm* alarm,
 				const std::string& recipientKey,
 				int first = 0, int number = 0);
 
+			/** Remove a link between an alarm and an object specified by their id.
+				@param alarmId ID of the alarm
+				@param objectId ID of the object
+				@author Hugues Romain
+				@date 2007				
+			*/
+			static void remove(uid alarmId, uid objectId);
 
 		protected:
 
@@ -102,16 +111,16 @@ namespace synthese
 		};
 
 		template<class T>
-			std::vector< AlarmObjectLink<T> > AlarmObjectLinkTableSync::search(const Alarm* alarm, const std::string& recipientKey, int first /*= 0*/, int number /*= 0*/ )
+		std::vector< boost::shared_ptr<T> > AlarmObjectLinkTableSync::search(const Alarm* alarm, const std::string& recipientKey, int first /*= 0*/, int number /*= 0*/ )
 		{
-			const db::SQLiteQueueThreadExec* sqlite = db::DBModule::GetSQLite();
 			std::stringstream query;
 			query
-				<< " SELECT *"
+				<< " SELECT "
+					<< AlarmObjectLinkTableSync::COL_OBJECT_ID
 				<< " FROM " << TABLE_NAME
 				<< " WHERE " 
-				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getKey())
-				<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToSQLiteString(recipientKey);
+					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getId())
+					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToSQLiteString(recipientKey);
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -119,15 +128,11 @@ namespace synthese
 
 			try
 			{
-				db::SQLiteResult result = sqlite->execQuery(query.str());
-				std::vector< AlarmObjectLink<T> > objects;
+				db::SQLiteResult result = db::DBModule::GetSQLite()->execQuery(query.str());
+				std::vector< boost::shared_ptr<T> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
-					AlarmObjectLink<T> object;
-					object.setKey(util::Conversion::ToLongLong(result.getColumn(i, db::TABLE_COL_ID)));
-					object.setObject(db::SQLiteTableSyncTemplate<T>::get(util::Conversion::ToLongLong(result.getColumn(i, COL_OBJECT_ID))));
-					object.setAlarm(messages::MessagesModule::getAlarms().get(util::Conversion::ToLongLong(result.getColumn(i, COL_ALARM_ID))));
-					objects.push_back(object);
+					objects.push_back(db::SQLiteTableSyncTemplate<T>::get(util::Conversion::ToLongLong(result.getColumn(i, COL_OBJECT_ID))));
 				}
 				return objects;
 			}

@@ -26,7 +26,10 @@
 #include "17_messages/MessagesScenarioAdmin.h"
 #include "17_messages/MessageAdmin.h"
 #include "17_messages/Scenario.h"
-#include "17_messages/MessagesModule.h"
+#include "17_messages/ScenarioTemplate.h"
+#include "17_messages/SentScenario.h"
+#include "17_messages/ScenarioTableSync.h"
+#include "17_messages/AlarmTableSync.h"
 #include "17_messages/ScenarioNameUpdateAction.h"
 #include "17_messages/DeleteAlarmAction.h"
 #include "17_messages/NewMessageAction.h"
@@ -37,6 +40,7 @@
 #include "32_admin/AdminRequest.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -59,16 +63,25 @@ namespace synthese
 			it = map.find(Request::PARAMETER_OBJECT_ID);
 			if (it == map.end())
 				throw AdminParametersException("Scenario not specified");
-			if (Conversion::ToLongLong(it->second) != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+			if (Conversion::ToLongLong(it->second) == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+				return;
+
+			shared_ptr<const Scenario> scenario;
+			try
 			{
-				if (!MessagesModule::getScenarii().contains(Conversion::ToLongLong(it->second)))
-					throw AdminParametersException("Specified scenario not found");
-
-				_scenario = MessagesModule::getScenarii().get(Conversion::ToLongLong(it->second));
-
-				if (!_scenario->getIsATemplate())
-					_setSuperior("messages");
+				scenario = ScenarioTableSync::getScenario(Conversion::ToLongLong(it->second));
 			}
+			catch(...)
+			{
+				throw AdminParametersException("Specified scenario not found");
+			}
+
+			_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(scenario);
+			_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
+			_scenario = scenario.get();
+
+			if (_templateScenario.get())
+				_setSuperior("messages");
 		}
 
 		string MessagesScenarioAdmin::getTitle() const
@@ -80,18 +93,18 @@ namespace synthese
 		{
 			ActionFunctionRequest<ScenarioNameUpdateAction,AdminRequest> updateRequest(request);
 			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
-			updateRequest.setObjectId(_scenario->getKey());
+			updateRequest.setObjectId(_scenario->getId());
 
 			FunctionRequest<AdminRequest> messRequest(request);
 			messRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
 
 			ActionFunctionRequest<DeleteAlarmAction,AdminRequest> deleteRequest(request);
 			deleteRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
-			deleteRequest.setObjectId(_scenario->getKey());
+			deleteRequest.setObjectId(_scenario->getId());
 
 			ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(request);
 			addRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
-			addRequest.getAction()->setScenarioId(_scenario->getKey());
+			addRequest.getAction()->setScenarioId(_scenario->getId());
 			addRequest.getAction()->setIsTemplate(true);
 
 			stream << "<h1>Propriété</h1>";
@@ -102,6 +115,7 @@ namespace synthese
 
 			stream << "<h1>Messages</h1>";
 
+			vector<shared_ptr<Alarm> > v = AlarmTableSync::search(_scenario);
 			ActionResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(string(), "Message"));
 			h.push_back(make_pair(string(), "Emplacement"));
@@ -110,12 +124,12 @@ namespace synthese
 
 			stream << t.open();
 
-			for(Scenario::AlarmsSet::const_iterator it = _scenario->getAlarms().begin(); it != _scenario->getAlarms().end(); ++it)
+			for(vector<shared_ptr<Alarm> >::const_iterator it = v.begin(); it != v.end(); ++it)
 			{
-				const Alarm* alarm = *it;
-				messRequest.setObjectId(alarm->getKey());
-				deleteRequest.getFunction()->setParameter(DeleteAlarmAction::PARAMETER_ALARM, Conversion::ToString(alarm->getKey()));
-				stream << t.row(Conversion::ToString(alarm->getKey()));
+				shared_ptr<const Alarm> alarm = *it;
+				messRequest.setObjectId(alarm->getId());
+				deleteRequest.getFunction()->setParameter(DeleteAlarmAction::PARAMETER_ALARM, Conversion::ToString(alarm->getId()));
+				stream << t.row(Conversion::ToString(alarm->getId()));
 				stream << t.col() << alarm->getShortMessage();
 				stream << t.col() << ""; // Emplacement
 				stream << t.col() << HTMLModule::getLinkButton(messRequest.getURL(), "Modifier")

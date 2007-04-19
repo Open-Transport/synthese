@@ -36,13 +36,15 @@ namespace synthese
 	
 	namespace messages
 	{
-		const string AlarmRemoveLinkAction::PARAMETER_LINK_ID = Action_PARAMETER_PREFIX + "araid";
+		const string AlarmRemoveLinkAction::PARAMETER_ALARM_ID = Action_PARAMETER_PREFIX + "aid";
+		const string AlarmRemoveLinkAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "oid";
 		
 
 		ParametersMap AlarmRemoveLinkAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_LINK_ID, Conversion::ToString(_id)));
+			map.insert(make_pair(PARAMETER_ALARM_ID, Conversion::ToString(_alarmId)));
+			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_objectId)));
 			return map;
 		}
 
@@ -50,19 +52,20 @@ namespace synthese
 		{
 			ParametersMap::const_iterator it;
 
-			it = map.find(PARAMETER_LINK_ID);
+			it = map.find(PARAMETER_OBJECT_ID);
 			if (it == map.end())
-				throw ActionException("Link ID not found");
-			_id = Conversion::ToLongLong(it->second);
-		}
+				throw ActionException("Object ID not specified");
+			_objectId = Conversion::ToLongLong(it->second);
 
-		AlarmRemoveLinkAction::AlarmRemoveLinkAction()
-			: Action()
-		{}
+			it = map.find(PARAMETER_ALARM_ID);
+			if (it == map.end())
+				throw ActionException("Alarm ID not specified");
+			_alarmId = Conversion::ToLongLong(it->second);
+		}
 
 		void AlarmRemoveLinkAction::run()
 		{
-			AlarmObjectLinkTableSync::remove(_id);
+			AlarmObjectLinkTableSync::remove(_alarmId, _objectId);
 		}
 	}
 }

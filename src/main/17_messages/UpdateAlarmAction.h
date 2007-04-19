@@ -34,6 +34,7 @@ namespace synthese
 	namespace messages
 	{
 		class Alarm;
+		class SingleSentAlarm;
 
 		/** UpdateAlarmAction action class.
 			@ingroup m17
@@ -53,6 +54,7 @@ namespace synthese
 			time::DateTime	_startDate;
 			time::DateTime	_endDate;
 			boost::shared_ptr<Alarm>	_alarm;
+			boost::shared_ptr<SingleSentAlarm>	_singleSentAlarm;
 			bool			_enabled;
 
 		protected:

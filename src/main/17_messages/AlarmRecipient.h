@@ -46,6 +46,7 @@ namespace synthese
 	namespace messages
 	{
 		class Alarm;
+		class SentAlarm;
 
 		/** Alarm recipient class.
 			@ingroup m17
@@ -67,8 +68,8 @@ namespace synthese
 
 			virtual AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const = 0;
 
-			virtual void addObject(const Alarm* alarm, uid objectId) = 0;
-			virtual void removeObject(const Alarm* alarm, uid objectId) = 0;
+			virtual void addObject(const SentAlarm* alarm, uid objectId) = 0;
+			virtual void removeObject(const SentAlarm* alarm, uid objectId) = 0;
 
 		};
 	}

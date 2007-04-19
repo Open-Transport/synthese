@@ -60,6 +60,9 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			void setRecipientKey(const std::string& key);
+			void setAlarm(boost::shared_ptr<const Alarm> alarm);
+
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

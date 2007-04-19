@@ -31,14 +31,11 @@
 
 namespace synthese
 {
-	namespace env
-	{
-		class ConnectionPlace;
-		class CommercialLine;
-	}
-
 	namespace messages
 	{
+		class SingleSentAlarm;
+		class SentScenario;
+
 		/** Ecran de recherche et de liste de message.
 			@ingroup m17
 
@@ -114,7 +111,6 @@ namespace synthese
 				
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
-@todo Faire un tableau unique avec UNION
 		*/
 		class MessagesAdmin : public admin::AdminInterfaceElement
 		{
@@ -131,8 +127,8 @@ namespace synthese
 
 			server::ParametersMap	_parametersMap;
 			
-			std::vector<boost::shared_ptr<Alarm> >		_result;
-			std::vector<boost::shared_ptr<Scenario> >	_scenarioResult;
+			std::vector<boost::shared_ptr<SingleSentAlarm> >		_result;
+			std::vector<boost::shared_ptr<SentScenario> >	_scenarioResult;
 
 			
 		public:

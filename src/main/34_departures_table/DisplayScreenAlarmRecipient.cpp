@@ -70,11 +70,11 @@ namespace synthese
 
 	    template<> AlarmRecipientTemplate<DisplayScreen>::LinksSetAlarm
 	    AlarmRecipientTemplate<DisplayScreen>::_linksAlarm = 
-		std::map<const Alarm*, std::set<const DisplayScreen*> > ();
+		std::map<const SentAlarm*, std::set<const DisplayScreen*> > ();
 
 	    template<> AlarmRecipientTemplate<DisplayScreen>::LinksSetObject
 	      AlarmRecipientTemplate<DisplayScreen>::_linksObject = 
-		std::map<const DisplayScreen*, std::set<const Alarm*> > () ;
+		std::map<const DisplayScreen*, std::set<const SentAlarm*> > () ;
 
 	}
 
@@ -96,7 +96,7 @@ namespace synthese
 
 		void DisplayScreenAlarmRecipient::displayBroadcastListEditor(std::ostream& stream, const messages::Alarm* alarm, const server::ParametersMap& parameters, server::FunctionRequest<admin::AdminRequest>& searchRequest, server::FunctionRequest<admin::AdminRequest>& addRequest, server::FunctionRequest<admin::AdminRequest>& removeRequest)
 		{
-			vector<AlarmObjectLink<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreen> (alarm, this->getFactoryKey());
+			vector<shared_ptr<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreen> (alarm, this->getFactoryKey());
 			set<uid> usedDisplayScreens;
 
 			if (!dsv.empty())
@@ -109,19 +109,20 @@ namespace synthese
 
 				stream << t.open();
 
-				for (vector<AlarmObjectLink<DisplayScreen> >::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
+				for (vector<shared_ptr<DisplayScreen> >::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
 				{
-					shared_ptr<DisplayScreen> ds = dsit->getObject();
+					shared_ptr<DisplayScreen> ds = *dsit;
 					usedDisplayScreens.insert(ds->getKey());
-					removeRequest.getFunction()->setParameter(AlarmRemoveLinkAction::PARAMETER_LINK_ID, Conversion::ToString(dsit->getKey()));
-					
+					removeRequest.getFunction()->setParameter(AlarmRemoveLinkAction::PARAMETER_OBJECT_ID, Conversion::ToString(ds->getKey()));
+					removeRequest.getFunction()->setParameter(AlarmRemoveLinkAction::PARAMETER_ALARM_ID, Conversion::ToString(alarm->getId()));
+
 					stream << t.row();
 					stream << t.col() << ds->getLocalization()->getConnectionPlace()->getFullName() << "/" << ds->getLocalization()->getName();
 					if (ds->getLocalizationComment() != "")
 						stream << "/" << ds->getLocalizationComment();
 
 					stream << t.col() << "<FONT face=\"Wingdings\" color=\"#00cc00\">l</FONT>"; // Bullet
-					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir retirer l'afficheur des destinataires du message ?");
+					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir retirer l\'afficheur des destinataires du message ?");
 				}
 
 				stream << t.close();
@@ -138,8 +139,6 @@ namespace synthese
 			uid searchType = 0;
 			int searchState = 0;
 			int searchMessage = 0;
-
-			set<const DisplayScreen*> result = DisplayScreenAlarmRecipient::getLinkedObjects(alarm);
 
 			stream << DisplaySearchAdmin::getHtmlSearchForm(searchRequest.getHTMLForm(), searchUid, searchPlace, searchLine, searchType, searchState, searchMessage);
 
@@ -210,12 +209,12 @@ namespace synthese
 			return map;
 		}
 
-		void DisplayScreenAlarmRecipient::addObject(const Alarm* alarm, uid objectId )
+		void DisplayScreenAlarmRecipient::addObject(const SentAlarm* alarm, uid objectId )
 		{
 			add(DeparturesTableModule::getDisplayScreens().get(objectId).get(), alarm);
 		}
 
-		void DisplayScreenAlarmRecipient::removeObject(const Alarm* alarm, uid objectId )
+		void DisplayScreenAlarmRecipient::removeObject(const SentAlarm* alarm, uid objectId )
 		{
 			remove(DeparturesTableModule::getDisplayScreens().get(objectId).get(), alarm);
 		}

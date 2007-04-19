@@ -29,14 +29,10 @@
 
 #include "11_interfaces/InterfaceModule.h"
 
-#include "15_env/ConnectionPlace.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/EnvModule.h"
-
 #include "30_server/ActionFunctionRequest.h"
 
-#include "17_messages/Alarm.h"
-#include "17_messages/Scenario.h"
+#include "17_messages/SingleSentAlarm.h"
+#include "17_messages/SentScenario.h"
 #include "17_messages/AlarmRecipient.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/ScenarioTableSync.h"
@@ -63,7 +59,6 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace time;
-	using namespace env;
 	using namespace html;
 
 	namespace messages
@@ -113,9 +108,8 @@ namespace synthese
 
 				_requestParameters = ActionResultHTMLTable::getParameters(map, PARAMETER_SEARCH_LEVEL, 15);
 
-				_result = AlarmTableSync::search(
-					NULL
-					, _startDate
+				_result = AlarmTableSync::searchSingleSent(
+					_startDate
 					, _endDate
 					, _requestParameters.first
 					, _requestParameters.maxSize
@@ -123,13 +117,12 @@ namespace synthese
 					, _requestParameters.orderField == PARAMETER_SEARCH_LEVEL
 					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
 					, _requestParameters.orderField == PARAMETER_SEARCH_CONFLICT
-					, _requestParameters.raisingOrder
+					, _requestParameters.raisingOrder					
 					);
 				_alarmResultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _result);
 
-				_scenarioResult = ScenarioTableSync::search(
-					false
-					, _startDate
+				_scenarioResult = ScenarioTableSync::searchSent(
+					_startDate
 					, _endDate
 					, std::string()
 					, _requestParameters.first
@@ -141,14 +134,6 @@ namespace synthese
 					, _requestParameters.raisingOrder
 					);
 				_scenarioResultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _scenarioResult);
-			}
-			catch (ConnectionPlace::RegistryKeyException e)
-			{
-				throw AdminParametersException("Specified place not found ");
-			}
-			catch (CommercialLine::RegistryKeyException e)
-			{
-				throw AdminParametersException("Specified line not found ");
 			}
 			catch (TimeParseException e)
 			{
@@ -227,9 +212,9 @@ namespace synthese
 			
 			stream << t1.open();
 
-			for (vector<shared_ptr<Scenario> >::const_iterator it = _scenarioResult.begin(); it != _scenarioResult.end(); ++it)
+			for (vector<shared_ptr<SentScenario> >::const_iterator it = _scenarioResult.begin(); it != _scenarioResult.end(); ++it)
 			{
-				shared_ptr<Scenario> scenario = *it;
+				shared_ptr<SentScenario> scenario = *it;
 				scenarioRequest.setObjectId(scenario->getKey());
 				stream << t1.row();
 				stream << t1.col() << scenario->getPeriodStart().toString();
@@ -240,7 +225,7 @@ namespace synthese
 				stream << t1.col() << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?");
 			}
 			stream << t1.row();
-			stream << t1.col(4) << t1.getActionForm().getSelectInput(NewScenarioSendAction::PARAMETER_TEMPLATE, MessagesModule::getScenariiLabels(), uid(0));
+			stream << t1.col(4) << t1.getActionForm().getSelectInput(NewScenarioSendAction::PARAMETER_TEMPLATE, MessagesModule::getScenarioTemplatesLabels(), uid(0));
 			stream << t1.col() << t1.getActionForm().getSubmitButton("Nouvelle diffusion de scénario");
 
 			stream << t1.close();
@@ -259,9 +244,9 @@ namespace synthese
 
 			stream << t.open();
 
-			for (vector<shared_ptr<Alarm> >::const_iterator it= _result.begin(); it != _result.end(); ++it)
+			for (vector<shared_ptr<SingleSentAlarm> >::const_iterator it= _result.begin(); it != _result.end(); ++it)
 			{
-				shared_ptr<Alarm> alarm = *it;
+				shared_ptr<SingleSentAlarm> alarm = *it;
 				alarmRequest.setObjectId(alarm->getKey());
 				stream << t.row(Conversion::ToString(alarm->getKey()));
 				stream << t.col();

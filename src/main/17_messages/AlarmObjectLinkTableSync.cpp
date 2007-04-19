@@ -54,7 +54,7 @@ namespace synthese
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getRecipientKey())
 				<< "," << Conversion::ToString(object->getObjectId())
-				<< "," << Conversion::ToString(object->getAlarm()->getKey())
+				<< "," << Conversion::ToString(object->getAlarm()->getId())
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -84,8 +84,14 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
+				uid alarmId = Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID));
+				
+				// Alarm not found in ram : this is a template
+				if (!MessagesModule::getAlarms().contains(alarmId))
+					continue;
+
 				shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::create(rows.getColumn(i, COL_RECIPIENT_KEY));
-				shared_ptr<Alarm> alarm = MessagesModule::getAlarms().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID)));
+				shared_ptr<SentAlarm> alarm = MessagesModule::getAlarms().getUpdateable(alarmId);
 				ar->addObject(alarm.get(), Conversion::ToLongLong(rows.getColumn(i, COL_OBJECT_ID)));
 			}
 		}
@@ -99,10 +105,28 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
+				uid alarmId = Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID));
+
+				// Alarm not found in ram : this is a template
+				if (!MessagesModule::getAlarms().contains(alarmId))
+					continue;
+
 				shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::create(rows.getColumn(i, COL_RECIPIENT_KEY));
-				shared_ptr<Alarm> alarm = MessagesModule::getAlarms().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID)));
+				shared_ptr<SentAlarm> alarm = MessagesModule::getAlarms().getUpdateable(alarmId);
 				ar->removeObject(alarm.get(), Conversion::ToLongLong(rows.getColumn(i, COL_OBJECT_ID)));
 			}
+		}
+
+		void AlarmObjectLinkTableSync::remove( uid alarmId, uid objectId )
+		{
+			std::stringstream query;
+			query
+				<< "DELETE FROM " << TABLE_NAME
+				<< " WHERE " 
+				<< COL_ALARM_ID << "=" << Conversion::ToString(alarmId)
+				<< " AND " << COL_OBJECT_ID << "=" << Conversion::ToString(objectId)
+				;
+			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 	}
 }

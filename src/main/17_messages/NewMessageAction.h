@@ -30,6 +30,8 @@ namespace synthese
 	namespace messages
 	{
 		class Scenario;
+		class SentScenario;
+		class ScenarioTemplate;
 
 		/** Alarm creation action class.
 			@ingroup m17
@@ -41,7 +43,9 @@ namespace synthese
 			static const std::string PARAMETER_SCENARIO_ID;
 
 		private:
-			boost::shared_ptr<Scenario>	_scenario;
+			boost::shared_ptr<SentScenario>	_sentScenario;
+			boost::shared_ptr<ScenarioTemplate>	_scenarioTemplate;
+			boost::shared_ptr<Scenario> _scenario;
 			bool		_isTemplate;
 
 		protected:

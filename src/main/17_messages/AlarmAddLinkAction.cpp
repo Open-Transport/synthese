@@ -49,7 +49,7 @@ namespace synthese
 		ParametersMap AlarmAddLinkAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_ALARM_ID, _alarm ? Conversion::ToString(_alarm->getKey()) : "0"));
+			map.insert(make_pair(PARAMETER_ALARM_ID, _alarm.get() ? Conversion::ToString(_alarm->getId()) : "0"));
 			map.insert(make_pair(PARAMETER_RECIPIENT_KEY, _recipientKey));
 			return map;
 		}
@@ -88,6 +88,16 @@ namespace synthese
 			aol->setAlarm(_alarm);
 			aol->setObjectId(_objectId);
 			AlarmObjectLinkTableSync::save(aol.get());
+		}
+
+		void AlarmAddLinkAction::setRecipientKey( const std::string& key )
+		{
+			_recipientKey = key;
+		}
+
+		void AlarmAddLinkAction::setAlarm( boost::shared_ptr<const Alarm> alarm )
+		{
+			_alarm = alarm;
 		}
 	}
 }

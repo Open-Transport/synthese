@@ -94,6 +94,9 @@ namespace synthese
 			}
 			ProfileTableSync::save(profile.get());
 			_request->setObjectId(profile->getKey());
+
+			// DBLog
+
 		}
 	}
 }

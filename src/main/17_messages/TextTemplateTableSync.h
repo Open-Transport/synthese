@@ -61,8 +61,16 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<TextTemplate> > search(
-				AlarmLevel level, std::string name=""
-				, int first = 0, int number = -1);
+				AlarmLevel level
+				, std::string name = std::string()
+				, const TextTemplate* templateToBeDifferentWith = NULL
+				, int first = 0
+				, int number = -1
+				, bool orderByName = true
+				, bool orderByShortText = false
+				, bool orderByLongText = false
+				, bool raisingOrder = true
+				);
 
 
 		protected:

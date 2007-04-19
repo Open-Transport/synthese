@@ -33,7 +33,7 @@ namespace synthese
 {
 	namespace messages
 	{
-		class Scenario;
+		class SentScenario;
 
 		/** ScenarioUpdateDatesAction action class.
 			@ingroup m17Actions refActions
@@ -51,7 +51,7 @@ namespace synthese
 			std::string		_name;
 			time::DateTime	_startDate;
 			time::DateTime	_endDate;
-			boost::shared_ptr<Scenario>		_scenario;
+			boost::shared_ptr<SentScenario>		_scenario;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

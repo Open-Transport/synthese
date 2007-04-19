@@ -1,6 +1,6 @@
 
-/** ScenarioStopAction class implementation.
-	@file ScenarioStopAction.cpp
+/** ScenarioTemplate class implementation.
+	@file ScenarioTemplate.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,47 +20,37 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-
-#include "17_messages/ScenarioStopAction.h"
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesModule.h"
-
-using namespace std;
+#include "17_messages/ScenarioTemplate.h"
+#include "17_messages/AlarmTemplate.h"
 
 namespace synthese
 {
-	using namespace server;
-	using namespace time;
-	
 	namespace messages
 	{
-		// const string ScenarioStopAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
 
-
-		ParametersMap ScenarioStopAction::getParametersMap() const
+		ScenarioTemplate::ScenarioTemplate( const ScenarioTemplate& source, const std::string& name)
+			: ScenarioSubclassTemplate<AlarmTemplate>(name)
+			, util::Registrable<uid, ScenarioTemplate>()
 		{
-			ParametersMap map;
-			return map;
+			for (AlarmsSet::const_iterator it = source.getAlarms().begin(); it != source.getAlarms().end(); ++it)
+				addAlarm(new AlarmTemplate(**it, getKey()));
 		}
 
-		void ScenarioStopAction::_setFromParametersMap(const ParametersMap& map)
+		ScenarioTemplate::ScenarioTemplate(const std::string& name)
+			: ScenarioSubclassTemplate<AlarmTemplate>(name)
+			, util::Registrable<uid, ScenarioTemplate>()
 		{
-			try
-			{
-				_scenario = ScenarioTableSync::getSent(_request->getObjectId());
-			}
-			catch (...) {
-				throw ActionException("Invalid scenario");
-			}
+
 		}
 
-		void ScenarioStopAction::run()
+		ScenarioTemplate::~ScenarioTemplate()
 		{
-			_scenario->setPeriodEnd(DateTime());
-			ScenarioTableSync::save(_scenario.get());
+
+		}
+
+		uid ScenarioTemplate::getId() const
+		{
+			return getKey();
 		}
 	}
 }

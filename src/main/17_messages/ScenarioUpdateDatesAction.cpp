@@ -25,10 +25,8 @@
 
 #include "17_messages/ScenarioUpdateDatesAction.h"
 #include "17_messages/MessagesModule.h"
-#include "17_messages/Scenario.h"
+#include "17_messages/SentScenario.h"
 #include "17_messages/ScenarioTableSync.h"
-#include "17_messages/Alarm.h"
-#include "17_messages/AlarmTableSync.h"
 
 using namespace std;
 
@@ -59,7 +57,7 @@ namespace synthese
 		{
 			try
 			{
-				_scenario = ScenarioTableSync::get(_request->getObjectId());
+				_scenario = ScenarioTableSync::getSent(_request->getObjectId());
 
 				ParametersMap::const_iterator it;
 
@@ -110,9 +108,6 @@ namespace synthese
 			_scenario->setPeriodStart(_startDate);
 			_scenario->setPeriodEnd(_endDate);
 			ScenarioTableSync::save(_scenario.get());
-
-			for (Scenario::AlarmsSet::const_iterator it = _scenario->getAlarms().begin(); it != _scenario->getAlarms().end(); ++it)
-				AlarmTableSync::save(*it);
 		}
 	}
 }

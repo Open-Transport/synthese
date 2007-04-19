@@ -1,6 +1,6 @@
 
-/** ScenarioStopAction class implementation.
-	@file ScenarioStopAction.cpp
+/** SentAlarm class implementation.
+	@file SentAlarm.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,47 +20,51 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-
-#include "17_messages/ScenarioStopAction.h"
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesModule.h"
-
-using namespace std;
+#include "SentAlarm.h"
 
 namespace synthese
 {
-	using namespace server;
-	using namespace time;
-	
 	namespace messages
 	{
-		// const string ScenarioStopAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
 
-
-		ParametersMap ScenarioStopAction::getParametersMap() const
+		bool SentAlarm::isApplicable (
+			const synthese::time::DateTime& start
+			, const synthese::time::DateTime& end ) const
 		{
-			ParametersMap map;
-			return map;
+			// Disabled alarm is never applicable
+			if (!getIsEnabled())
+				return false;
+
+			// Start date control
+			if (!getPeriodStart().isUnknown() && end < getPeriodStart())
+				return false;
+
+			// End date control
+			if (!getPeriodEnd().isUnknown() && start >= getPeriodEnd())
+				return false;
+
+			return true;
 		}
 
-		void ScenarioStopAction::_setFromParametersMap(const ParametersMap& map)
+		bool SentAlarm::isApplicable( const time::DateTime& date ) const
 		{
-			try
-			{
-				_scenario = ScenarioTableSync::getSent(_request->getObjectId());
-			}
-			catch (...) {
-				throw ActionException("Invalid scenario");
-			}
+			return isApplicable(date, date);
 		}
 
-		void ScenarioStopAction::run()
+		SentAlarm::SentAlarm()
+			: util::Registrable<uid, SentAlarm>()
 		{
-			_scenario->setPeriodEnd(DateTime());
-			ScenarioTableSync::save(_scenario.get());
+
+		}
+
+		SentAlarm::~SentAlarm()
+		{
+
+		}
+
+		uid SentAlarm::getId() const
+		{
+			return getKey();
 		}
 	}
 }

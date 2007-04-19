@@ -135,7 +135,7 @@ namespace synthese
 				query << " ORDER BY " << UserTableSync::TABLE_COL_NAME << "," << UserTableSync::TABLE_COL_SURNAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderBySurnameAndName)
 				query << " ORDER BY " << UserTableSync::TABLE_COL_SURNAME << "," << UserTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (number)
+			if (number > 0)
 				query << " LIMIT " << (number + 1);
 			if (first)
 				query << " OFFSET " << first;

@@ -39,6 +39,7 @@ namespace synthese
 		const std::string ResultHTMLTable::_PARAMETER_ORDER_FIELD = "rhto";
 		const std::string ResultHTMLTable::_PARAMETER_RAISING_ORDER = "rhtr";
 		const std::string ResultHTMLTable::_PARAMETER_MAX_SIZE = "rhts";
+		const int ResultHTMLTable::UNLIMITED_SIZE = -1;
 
 		ResultHTMLTable::ResultHTMLTable(
 			const ResultHTMLTable::HeaderVector& header
@@ -89,7 +90,7 @@ namespace synthese
 			_searchForm.addHiddenField(_PARAMETER_MAX_SIZE, Conversion::ToString(_maxSize));
 		}
 
-		ResultHTMLTable::RequestParameters ResultHTMLTable::getParameters(const map<string, string>& m, const string& defaultOrderField, int defaultMaxSize )
+		ResultHTMLTable::RequestParameters ResultHTMLTable::getParameters(const map<string, string>& m, const string defaultOrderField, int defaultMaxSize )
 		{
 			map<string, string>::const_iterator it;
 			RequestParameters p;
@@ -113,20 +114,23 @@ namespace synthese
 		{
 			stringstream s;
 
-			s << row();
-			s << col(_getColsNumber(), string(), true);
-			if (_first)
+			if (_maxSize != UNLIMITED_SIZE && _size != UNLIMITED_SIZE)
 			{
-				HTMLForm::HiddenFieldsMap f;
-				f.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString((_first > _maxSize) ? _first - _maxSize : 0)));
-				s << HTMLModule::getHTMLLink(_searchForm.getURL(f), "<<") << "&nbsp;|&nbsp;";
-			}
-			s << _first << "&nbsp;->&nbsp;" << (_first + _size - 1);
-			if (_next)
-			{
-				HTMLForm::HiddenFieldsMap f;
-				f.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString(_first + _size)));
-				s << "&nbsp;|&nbsp;" << HTMLModule::getHTMLLink(_searchForm.getURL(f), ">>");
+				s << row();
+				s << col(_getColsNumber(), string(), true);
+				if (_first)
+				{
+					HTMLForm::HiddenFieldsMap f;
+					f.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString((_first > _maxSize) ? _first - _maxSize : 0)));
+					s << HTMLModule::getHTMLLink(_searchForm.getURL(f), "<<") << "&nbsp;|&nbsp;";
+				}
+				s << _first << "&nbsp;->&nbsp;" << (_first + _size - 1);
+				if (_next)
+				{
+					HTMLForm::HiddenFieldsMap f;
+					f.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString(_first + _size)));
+					s << "&nbsp;|&nbsp;" << HTMLModule::getHTMLLink(_searchForm.getURL(f), ">>");
+				}
 			}
 			s << HTMLTable::close();
 			return s.str();

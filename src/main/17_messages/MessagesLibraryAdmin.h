@@ -25,6 +25,8 @@
 
 #include "32_admin/AdminInterfaceElement.h"
 
+#include "05_html/ResultHTMLTable.h"
+
 namespace synthese
 {
 	namespace messages
@@ -72,6 +74,15 @@ namespace synthese
 		*/
 		class MessagesLibraryAdmin : public admin::AdminInterfaceElement
 		{
+		public:
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_SHORT_TEXT;
+			static const std::string PARAMETER_LONG_TEXT;
+
+		private:
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
+
+			
 		public:
 			MessagesLibraryAdmin();
 			

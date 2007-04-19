@@ -29,6 +29,8 @@ namespace synthese
 {
 	namespace messages
 	{
+		class SentScenario;
+		class ScenarioTemplate;
 		class Scenario;
 
 		/** Ecran d'édition de scénario de diffusion de message.
@@ -72,7 +74,9 @@ namespace synthese
 		class MessagesScenarioAdmin : public admin::AdminInterfaceElement
 		{
 		private:
-			boost::shared_ptr<const Scenario> _scenario;
+			boost::shared_ptr<const SentScenario> _sentScenario;
+			boost::shared_ptr<const ScenarioTemplate> _templateScenario;
+			const Scenario*								_scenario;
 
 		public:
 			MessagesScenarioAdmin();

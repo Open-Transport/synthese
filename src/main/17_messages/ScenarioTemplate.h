@@ -1,6 +1,6 @@
 
-/** ScenarioStopAction class header.
-	@file ScenarioStopAction.h
+/** ScenarioTemplate class header.
+	@file ScenarioTemplate.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,45 +20,33 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ScenarioStopAction_H__
-#define SYNTHESE_ScenarioStopAction_H__
+#ifndef SYNTHESE_ScenarioTemplate_h__
+#define SYNTHESE_ScenarioTemplate_h__
 
-#include "30_server/Action.h"
+#include "17_messages/ScenarioSubclassTemplate.h"
+
+#include "01_util/Registrable.h"
 
 namespace synthese
 {
 	namespace messages
 	{
-		class SentScenario;
+		class AlarmTemplate;
 
-		/** ScenarioStopAction action class.
+		/** Scenario template class.
 			@ingroup m17
 		*/
-		class ScenarioStopAction : public server::Action
+		class ScenarioTemplate
+			: public ScenarioSubclassTemplate<AlarmTemplate>
+			, public util::Registrable<uid, ScenarioTemplate>
 		{
 		public:
-			// static const std::string PARAMETER_xxx;
-
-		private:
-			boost::shared_ptr<SentScenario>		_scenario;
-
-		protected:
-			/** Conversion from attributes to generic parameter maps.
-			*/
-			server::ParametersMap getParametersMap() const;
-
-			/** Conversion from generic parameters map to attributes.
-				Removes the used parameters from the map.
-				@exception ActionException Occurs when some parameters are missing or incorrect.
-			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
-
-		public:
-			/** Action to run, defined by each subclass.
-			*/
-			void run();
+			ScenarioTemplate(const std::string& name);
+			ScenarioTemplate(const ScenarioTemplate& source, const std::string& name);
+			~ScenarioTemplate();
+			uid getId() const;
 		};
 	}
 }
 
-#endif // SYNTHESE_ScenarioStopAction_H__
+#endif // SYNTHESE_ScenarioTemplate_h__

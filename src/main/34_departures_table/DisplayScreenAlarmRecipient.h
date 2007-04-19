@@ -23,12 +23,12 @@
 #ifndef SYNTHESE_DisplayScreenAlarmRecipient_h__
 #define SYNTHESE_DisplayScreenAlarmRecipient_h__
 
+#include "34_departures_table/DisplayScreen.h"
+
 #include "17_messages/AlarmRecipientTemplate.h"
-#include "DisplayScreen.h"
 
 namespace synthese
 {
-
 	namespace departurestable
 	{
 
@@ -51,8 +51,8 @@ namespace synthese
 
 			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const;
 
-			void addObject(const messages::Alarm* alarm, uid objectId);
-			void removeObject(const messages::Alarm* alarm, uid objectId);
+			void addObject(const messages::SentAlarm* alarm, uid objectId);
+			void removeObject(const messages::SentAlarm* alarm, uid objectId);
 		};
 	}
 }

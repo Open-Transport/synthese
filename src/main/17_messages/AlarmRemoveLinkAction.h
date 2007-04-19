@@ -37,10 +37,12 @@ namespace synthese
 		class AlarmRemoveLinkAction : public server::Action
 		{
 		public:
-			static const std::string PARAMETER_LINK_ID;
+			static const std::string PARAMETER_ALARM_ID;
+			static const std::string PARAMETER_OBJECT_ID;
 			
 		private:
-			uid		_id;
+			uid		_alarmId;
+			uid		_objectId;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -54,10 +56,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Constructor.
-			*/
-			AlarmRemoveLinkAction();
-
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
