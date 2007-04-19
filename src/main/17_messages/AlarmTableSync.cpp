@@ -1,4 +1,3 @@
-﻿
 /** AlarmTableSync class implementation.
 	@file AlarmTableSync.cpp
 

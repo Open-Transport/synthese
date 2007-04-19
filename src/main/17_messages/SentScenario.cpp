@@ -30,7 +30,7 @@ namespace synthese
 	namespace messages
 	{
 		SentScenario::SentScenario()
-			: Registrable<uid, SentScenario>()
+			: util::Registrable<uid, SentScenario>()
 			, ScenarioSubclassTemplate<ScenarioSentAlarm>()
 			, _isEnabled(false)
 			, _periodStart(TIME_UNKNOWN)
@@ -39,7 +39,7 @@ namespace synthese
 		}
 
 		SentScenario::SentScenario( const ScenarioTemplate& source , time::DateTime periodStart /*= time::DateTime(time::TIME_UNKNOWN) */, time::DateTime periodEnd /*= time::DateTime(time::TIME_UNKNOWN) */ )
-			: Registrable<uid, SentScenario>()
+			: util::Registrable<uid, SentScenario>()
 			, ScenarioSubclassTemplate<ScenarioSentAlarm>(source.getName())
 			, _isEnabled(false)
 			, _periodStart(periodStart)

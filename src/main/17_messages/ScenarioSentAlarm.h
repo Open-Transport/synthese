@@ -39,7 +39,7 @@ namespace synthese
 			: public SentAlarm
 		{
 		private:
-			const SentScenario& const _scenario;
+			const SentScenario& _scenario;
 
 		public:
 			/** Copy constructor.

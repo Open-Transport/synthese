@@ -1,4 +1,3 @@
-﻿
 /** AlarmTableSync class header.
 	@file AlarmTableSync.h
 

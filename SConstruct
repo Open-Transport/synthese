@@ -63,8 +63,8 @@ def IsRelease (env):
   return env['MODE'] == 'release'
 
 def IsProfile (env):
-  #return False
-  return env['MODE'] == 'debug'
+  return False
+  #return env['MODE'] == 'debug'
 
 
 
@@ -186,7 +186,7 @@ def DefineDefaultLinkFlags (env):
           env.Append ( LINKFLAGS = ['/DEBUG'] )
     
     if platform == 'posix':
-      if env.IsProfile:
+      if env.IsProfile ():
         env.Append ( LINKFLAGS = ['-pg'] )
 
 

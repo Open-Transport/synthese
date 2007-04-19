@@ -149,7 +149,9 @@ namespace synthese
 						redirRequest.getAction()->setTransactionPart(transactionPart);
 						redirRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 						redirRequest.setObjectId(contract->getKey());
-						redirRequest.getFunction()->getInterface()->getPage<RedirectInterfacePage>()->display(stream, VariablesMap(), &redirRequest);
+						VariablesMap vm;
+						redirRequest.getFunction()->getInterface()->
+						  getPage<RedirectInterfacePage>()->display(stream, vm, &redirRequest);
 						return;
 					}
 					else
@@ -158,7 +160,9 @@ namespace synthese
 						FunctionRequest<AdminRequest> redirRequest(_request);
 						redirRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 						redirRequest.setObjectId(contract->getKey());
-						redirRequest.getFunction()->getInterface()->getPage<RedirectInterfacePage>()->display(stream, VariablesMap(), &redirRequest);
+						VariablesMap vm;
+						redirRequest.getFunction()->getInterface()->
+						  getPage<RedirectInterfacePage>()->display(stream, vm, &redirRequest);
 						return;
 					}
 				}
@@ -176,7 +180,9 @@ namespace synthese
 						FunctionRequest<AdminRequest> redirRequest(_request);
 						redirRequest.getFunction()->setPage<VinciBikeAdminInterfaceElement>();
 						redirRequest.setObjectId(_bike->getKey());
-						redirRequest.getFunction()->getInterface()->getPage<RedirectInterfacePage>()->display(stream, VariablesMap(), &redirRequest);
+						VariablesMap vm;
+						redirRequest.getFunction()->getInterface()->
+						  getPage<RedirectInterfacePage>()->display(stream, vm, &redirRequest);
 						return;
 					}
 				}
@@ -197,7 +203,9 @@ namespace synthese
 					FunctionRequest<AdminRequest> redirRequest(_request);
 					redirRequest.getFunction()->setPage<VinciCustomerAdminInterfaceElement>();
 					redirRequest.setObjectId(_contract->getKey());
-					redirRequest.getFunction()->getInterface()->getPage<RedirectInterfacePage>()->display(stream, VariablesMap(), &redirRequest);
+					VariablesMap vm;
+					redirRequest.getFunction()->getInterface()->
+					  getPage<RedirectInterfacePage>()->display(stream, vm, &redirRequest);
 					return;
 				}
 			}
@@ -208,7 +216,9 @@ namespace synthese
 				shared_ptr<VinciCustomerSearchAdminInterfaceElement> page = Factory<AdminInterfaceElement>::create<VinciCustomerSearchAdminInterfaceElement>();
 				page->setSearchName(_strCode);
 				redirRequest.getFunction()->setPage(page);
-				redirRequest.getFunction()->getInterface()->getPage<RedirectInterfacePage>()->display(stream, VariablesMap(), &redirRequest);
+				VariablesMap vm;
+				redirRequest.getFunction()->getInterface()->
+				  getPage<RedirectInterfacePage>()->display(stream, vm, &redirRequest);
 				return;
 			}
 		}
