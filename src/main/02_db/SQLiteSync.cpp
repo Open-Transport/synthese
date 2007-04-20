@@ -112,10 +112,18 @@ namespace synthese
 				 _rankedTableSynchronizers.begin (); 
 			     it != _rankedTableSynchronizers.end (); ++it)
 			{
-				Log::GetInstance().info("Loading table " + it->first);
-			    it->second->firstSync (emitter, this);
+			    Log::GetInstance().info("Loading table " + it->first);
+			    try 
+			    {
+				it->second->firstSync (emitter, this);
+			    }
+			    catch (std::exception e)
+			    {
+				Log::GetInstance().error ("Error during first sync of " + it->first + 
+							  ". In-memory data might be inconsistent.", e);
+			    }
 			}
-
+			
 		}
 		 
 

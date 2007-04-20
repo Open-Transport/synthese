@@ -152,26 +152,26 @@ namespace synthese
 		void
 		SQLiteQueueThreadExec::initialize()
 		{
-			// The database cannot be updated til all the hooks have been initialized
-			// through their registerCallback.
-			boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
+		    // The database cannot be updated til all the hooks have been initialized
+		    // through their registerCallback.
+		    boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
+		    
+		    // No hook can be added til the thread has finished its initialization.
+		    boost::mutex::scoped_lock hooksLock (*_hooksMutex);
 
-			// No hook can be added til the thread has finished its initialization.
-			boost::mutex::scoped_lock hooksLock (*_hooksMutex);
-
-			_initThread = new boost::thread (); // current thread of execution.
-
-			// Open a persistent DB connection
-			// It is crucial that the db connection is created inside the init proc
-			// so that the connection is created in the caller thread.
-			_db = SQLite::OpenConnection (_databaseFile);
-
-			// Initialize each hooks
-			std::for_each (_hooks.begin(), _hooks.end (), 
-				std::bind2nd (std::mem_fun (&SQLiteUpdateHook::registerCallback), this));
-
-			// Install the update hook
-			sqlite3_update_hook (_db, &sqliteUpdateHook, this);
+		    _initThread = new boost::thread (); // current thread of execution.
+		    
+		    // Open a persistent DB connection
+		    // It is crucial that the db connection is created inside the init proc
+		    // so that the connection is created in the caller thread.
+		    _db = SQLite::OpenConnection (_databaseFile);
+		    
+		    // Initialize each hooks
+		    std::for_each (_hooks.begin(), _hooks.end (), 
+				   std::bind2nd (std::mem_fun (&SQLiteUpdateHook::registerCallback), this));
+		    
+		    // Install the update hook
+		    sqlite3_update_hook (_db, &sqliteUpdateHook, this);
 		}
 
 
@@ -186,10 +186,29 @@ namespace synthese
 			boost::recursive_mutex::scoped_lock queueLock (*_queueMutex);
 			while (_eventQueue.empty () == false) 
 			{
-			SQLiteEvent event = _eventQueue.front ();
-			_eventQueue.pop_front ();
-			postEvent (event);
-			}    
+			    SQLiteEvent event = _eventQueue.front ();
+			    
+			    _eventQueue.pop_front ();
+			    
+			    try 
+			    {
+				postEvent (event);
+			    }
+			    catch (std::exception e)
+			    {
+				Log::GetInstance().error ("Error while SQLite sync. In-memory data might be inconsistent.", e);
+			    }
+			    
+			}
+
+			/*
+			    static int i = 0;
+			    i++;
+			    if (i % 1000 == 0) 
+				Log::GetInstance ().info ("time  = " + Conversion::ToString (i));
+			*/
+
+
 		}
 
 

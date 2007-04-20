@@ -59,8 +59,9 @@ namespace synthese
 		
 		_sqliteQueueThreadExec = new SQLiteQueueThreadExec (GetDatabasePath ());
 		
+		bool autorespawn (true);
 		ManagedThread* sqliteQueueThread = 
-		    new ManagedThread (_sqliteQueueThreadExec, "sqlite_queue", 1);
+		    new ManagedThread (_sqliteQueueThreadExec, "sqlite_queue", 1, autorespawn);
 		
 		SQLiteSync* syncHook = new SQLiteSync ();
 		
@@ -81,7 +82,6 @@ namespace synthese
 		// Just one thread
 		SQLiteThreadExec* sqliteThreadExec = new SQLiteThreadExec (service);
 		
-		bool autorespawn (true);
 		ManagedThread* sqliteThread = 
 		    new ManagedThread (sqliteThreadExec, "sqlite_tcp", 1, autorespawn);
 		
