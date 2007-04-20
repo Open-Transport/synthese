@@ -29,6 +29,7 @@
 #include "17_messages/Types.h"
 #include "17_messages/SentAlarm.h"
 #include "17_messages/SentScenario.h"
+#include "17_messages/AlarmObjectLink.h"
 
 namespace synthese
 {
@@ -51,12 +52,14 @@ namespace synthese
 //			typedef messages::AlarmBroadcastList<departurestable::BroadcastPoint>	BroadcastPointBroadcastList;
 
 		private:
-			static SentAlarm::Registry		_alarms;
-			static SentScenario::Registry	_scenarii;
+			static SentAlarm::Registry			_alarms;
+			static SentScenario::Registry		_scenarii;
+			static AlarmObjectLink::Registry	_alarmLinks;
 
 		public:
-			static SentAlarm::Registry&		getAlarms();
-			static SentScenario::Registry&	getScenarii();
+			static SentAlarm::Registry&			getAlarms();
+			static SentScenario::Registry&		getScenarii();
+			static AlarmObjectLink::Registry&	getAlarmLinks();
 			
 			void initialize();
 

@@ -155,11 +155,13 @@ namespace synthese
 
 				ActionFunctionRequest<AlarmAddLinkAction,AdminRequest> addRequest(request);
 				addRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+				addRequest.setObjectId(request->getObjectId());
 				addRequest.getAction()->setAlarm(_alarm);
 
 				ActionFunctionRequest<AlarmRemoveLinkAction,AdminRequest> removeRequest(request);
 				removeRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
 				removeRequest.setObjectId(request->getObjectId());
+				removeRequest.getAction()->setAlarmId(_alarm->getId());
 				
 				// Alarm messages destinations loop
 				for (Factory<AlarmRecipient>::Iterator arit = Factory<AlarmRecipient>::begin(); arit != Factory<AlarmRecipient>::end(); ++arit)

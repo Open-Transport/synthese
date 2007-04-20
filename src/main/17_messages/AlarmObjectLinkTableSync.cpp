@@ -23,6 +23,7 @@
 #include "17_messages/AlarmObjectLinkTableSync.h"
 #include "17_messages/MessagesModule.h"
 #include "17_messages/AlarmRecipient.h"
+#include "17_messages/AlarmObjectLink.h"
 
 using namespace std;
 using namespace boost;
@@ -35,15 +36,19 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate< AlarmObjectLink<Registrable<uid, void> > >::TABLE_NAME = "t040_alarm_object_links";
-		template<> const int SQLiteTableSyncTemplate< AlarmObjectLink<Registrable<uid, void> > >::TABLE_ID = 040;
-		template<> const bool SQLiteTableSyncTemplate< AlarmObjectLink<Registrable<uid, void> > >::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate< AlarmObjectLink>::TABLE_NAME = "t040_alarm_object_links";
+		template<> const int SQLiteTableSyncTemplate< AlarmObjectLink>::TABLE_ID = 40;
+		template<> const bool SQLiteTableSyncTemplate< AlarmObjectLink>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate< AlarmObjectLink<Registrable<uid, void> > >::load(AlarmObjectLink<Registrable<uid, void> >* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate< AlarmObjectLink>::load(AlarmObjectLink* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
+			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			object->setAlarmId(Conversion::ToLongLong(rows.getColumn(rowId, AlarmObjectLinkTableSync::COL_ALARM_ID)));
+			object->setObjectId(Conversion::ToLongLong(rows.getColumn(rowId, AlarmObjectLinkTableSync::COL_OBJECT_ID)));
+			object->setRecipientKey(rows.getColumn(rowId, AlarmObjectLinkTableSync::COL_RECIPIENT_KEY));
 		}
 
-		template<> void SQLiteTableSyncTemplate< AlarmObjectLink<Registrable<uid, void> > >::save(AlarmObjectLink<Registrable<uid, void> >* object)
+		template<> void SQLiteTableSyncTemplate< AlarmObjectLink>::save(AlarmObjectLink* object)
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -54,7 +59,7 @@ namespace synthese
 				<< Conversion::ToString(object->getKey())
 				<< "," << Conversion::ToSQLiteString(object->getRecipientKey())
 				<< "," << Conversion::ToString(object->getObjectId())
-				<< "," << Conversion::ToString(object->getAlarm()->getId())
+				<< "," << Conversion::ToString(object->getAlarmId())
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -69,14 +74,17 @@ namespace synthese
 
 
 		AlarmObjectLinkTableSync::AlarmObjectLinkTableSync()
-			: SQLiteTableSyncTemplate<AlarmObjectLink<Registrable<uid, void> > >(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<AlarmObjectLink>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_RECIPIENT_KEY, "TEXT");
 			addTableColumn(COL_OBJECT_ID, "INTEGER");
 			addTableColumn(COL_ALARM_ID, "INTEGER");
 
-			addTableIndex(COL_OBJECT_ID);
+			vector<string> c;
+			c.push_back(COL_OBJECT_ID);
+			c.push_back(COL_ALARM_ID);
+			addTableIndex(c);
 			addTableIndex(COL_ALARM_ID);
 		}
 
@@ -84,15 +92,17 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				uid alarmId = Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID));
+				shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
+				load(aol.get(), rows, i);
 				
 				// Alarm not found in ram : this is a template
-				if (!MessagesModule::getAlarms().contains(alarmId))
+				if (!MessagesModule::getAlarms().contains(aol->getAlarmId()))
 					continue;
 
-				shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::create(rows.getColumn(i, COL_RECIPIENT_KEY));
-				shared_ptr<SentAlarm> alarm = MessagesModule::getAlarms().getUpdateable(alarmId);
-				ar->addObject(alarm.get(), Conversion::ToLongLong(rows.getColumn(i, COL_OBJECT_ID)));
+				shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::create(aol->getRecipientKey());
+				shared_ptr<SentAlarm> alarm = MessagesModule::getAlarms().getUpdateable(aol->getAlarmId());
+				ar->addObject(alarm.get(), aol->getObjectId());
+				MessagesModule::getAlarmLinks().add(aol);
 			}
 		}
 
@@ -105,15 +115,19 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
-				uid alarmId = Conversion::ToLongLong(rows.getColumn(i, COL_ALARM_ID));
-
-				// Alarm not found in ram : this is a template
-				if (!MessagesModule::getAlarms().contains(alarmId))
+				if (!MessagesModule::getAlarmLinks().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
 					continue;
 
-				shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::create(rows.getColumn(i, COL_RECIPIENT_KEY));
-				shared_ptr<SentAlarm> alarm = MessagesModule::getAlarms().getUpdateable(alarmId);
-				ar->removeObject(alarm.get(), Conversion::ToLongLong(rows.getColumn(i, COL_OBJECT_ID)));
+				shared_ptr<AlarmObjectLink> aol = MessagesModule::getAlarmLinks().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+				
+				// Alarm not found in ram : this is a template
+				if (MessagesModule::getAlarms().contains(aol->getAlarmId()))
+				{
+					shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::create(aol->getRecipientKey());
+					shared_ptr<SentAlarm> alarm = MessagesModule::getAlarms().getUpdateable(aol->getAlarmId());
+					ar->removeObject(alarm.get(), aol->getObjectId());
+				}
+				MessagesModule::getAlarmLinks().remove(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
 			}
 		}
 

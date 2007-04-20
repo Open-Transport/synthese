@@ -67,5 +67,15 @@ namespace synthese
 		{
 			AlarmObjectLinkTableSync::remove(_alarmId, _objectId);
 		}
+
+		void AlarmRemoveLinkAction::setAlarmId( uid id )
+		{
+			_alarmId = id;
+		}
+
+		void AlarmRemoveLinkAction::setObjectId( uid id )
+		{
+			_objectId = id;
+		}
 	}
 }

@@ -63,6 +63,8 @@ namespace synthese
 			{
 				_marked_number = it->second;
 			}
+
+			_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void VinciAddBike::run()

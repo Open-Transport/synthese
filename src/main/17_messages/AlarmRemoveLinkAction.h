@@ -56,6 +56,9 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			void setAlarmId(uid id);
+			void setObjectId(uid id);
+
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

@@ -51,6 +51,7 @@ namespace synthese
 			ParametersMap map;
 			map.insert(make_pair(PARAMETER_ALARM_ID, _alarm.get() ? Conversion::ToString(_alarm->getId()) : "0"));
 			map.insert(make_pair(PARAMETER_RECIPIENT_KEY, _recipientKey));
+			map.insert(make_pair(PARAMETER_OBJECT_ID, Conversion::ToString(_objectId)));
 			return map;
 		}
 
@@ -83,9 +84,9 @@ namespace synthese
 
 		void AlarmAddLinkAction::run()
 		{
-			shared_ptr<AlarmObjectLink<Registrable<uid, void> > > aol(new AlarmObjectLink<Registrable<uid, void> >);
+			shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
 			aol->setRecipientKey(_recipientKey);
-			aol->setAlarm(_alarm);
+			aol->setAlarmId(_alarm->getId());
 			aol->setObjectId(_objectId);
 			AlarmObjectLinkTableSync::save(aol.get());
 		}
@@ -98,6 +99,11 @@ namespace synthese
 		void AlarmAddLinkAction::setAlarm( boost::shared_ptr<const Alarm> alarm )
 		{
 			_alarm = alarm;
+		}
+
+		void AlarmAddLinkAction::setObjectId( uid id )
+		{
+			_objectId = id;
 		}
 	}
 }

@@ -62,6 +62,7 @@ namespace synthese
 		public:
 			void setRecipientKey(const std::string& key);
 			void setAlarm(boost::shared_ptr<const Alarm> alarm);
+			void setObjectId(uid id);
 
 			/** Action to run, defined by each subclass.
 			*/

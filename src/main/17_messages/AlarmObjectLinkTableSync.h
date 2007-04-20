@@ -52,7 +52,7 @@ namespace synthese
 			
 			Only the links concerning the sent alarms are loaded in ram.
 		*/
-		class AlarmObjectLinkTableSync : public db::SQLiteTableSyncTemplate<AlarmObjectLink<Registrable<uid, void> > >
+		class AlarmObjectLinkTableSync : public db::SQLiteTableSyncTemplate<AlarmObjectLink>
 		{
 		public:
 			static const std::string COL_RECIPIENT_KEY;

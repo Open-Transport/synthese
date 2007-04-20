@@ -1,6 +1,6 @@
 
-/** AlarmObjectLink class header.
-	@file AlarmObjectLink.h
+/** AlarmObjectLink class implementation.
+	@file AlarmObjectLink.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,41 +20,42 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_AlarmObjectLink_h__
-#define SYNTHESE_AlarmObjectLink_h__
-
-#include <string>
-
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
+#include "AlarmObjectLink.h"
 
 namespace synthese
 {
 	namespace messages
 	{
 
-		/** Link between an alarm and an object.
-			@ingroup m17
 
-			@note This class is used only to permit the remove hook
-		*/
-		class AlarmObjectLink : public util::Registrable<uid, AlarmObjectLink>
+		uid AlarmObjectLink::getObjectId() const
 		{
-		private:
-			uid				_objectId;
-			uid				_alarmId;
-			std::string		_recipientKey;
+			return _objectId;
+		}
 
-		public:
-			uid getObjectId() const;
-			uid getAlarmId() const;
-			std::string getRecipientKey() const;
+		uid AlarmObjectLink::getAlarmId() const
+		{
+			return _alarmId;
+		}
 
-			void setObjectId(uid key);
-			void setAlarmId(uid key);
-			void setRecipientKey(const std::string& key);
-		};
+		std::string AlarmObjectLink::getRecipientKey() const
+		{
+			return _recipientKey;
+		}
+
+		void AlarmObjectLink::setObjectId( uid key )
+		{
+			_objectId = key;
+		}
+
+		void AlarmObjectLink::setAlarmId( uid key )
+		{
+			_alarmId = key;
+		}
+
+		void AlarmObjectLink::setRecipientKey( const std::string& key )
+		{
+			_recipientKey = key;
+		}
 	}
 }
-
-#endif // SYNTHESE_AlarmObjectLink_h__

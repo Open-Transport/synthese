@@ -36,6 +36,7 @@ namespace synthese
 	{
 		SentAlarm::Registry MessagesModule::_alarms;
 		SentScenario::Registry MessagesModule::_scenarii;
+		AlarmObjectLink::Registry MessagesModule::_alarmLinks;
 
 		SentAlarm::Registry& 
 			MessagesModule::getAlarms ()
@@ -100,6 +101,11 @@ namespace synthese
 			case ALARM_LEVEL_WARNING : return "Prioritaire";
 			default: return "Inconnu";
 			}
+		}
+
+		AlarmObjectLink::Registry& MessagesModule::getAlarmLinks()
+		{
+			return _alarmLinks;
 		}
 
 		void initialize()

@@ -47,7 +47,14 @@ namespace synthese
 
 			DisplayScreenAlarmRecipient();
 
-			void displayBroadcastListEditor(std::ostream& stream, const messages::Alarm* alarm, const server::ParametersMap& request, server::FunctionRequest<admin::AdminRequest>& searchRequest, server::FunctionRequest<admin::AdminRequest>& addRequest, server::FunctionRequest<admin::AdminRequest>& removeRequest);
+			void displayBroadcastListEditor(
+				std::ostream& stream
+				, const messages::Alarm* alarm
+				, const server::ParametersMap& request
+				, server::FunctionRequest<admin::AdminRequest>& searchRequest
+				, server::ActionFunctionRequest<messages::AlarmAddLinkAction,admin::AdminRequest>& addRequest
+				, server::ActionFunctionRequest<messages::AlarmRemoveLinkAction, admin::AdminRequest>& removeRequest
+				);
 
 			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const;
 

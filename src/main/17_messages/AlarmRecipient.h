@@ -29,7 +29,7 @@
 
 #include "17_messages/Types.h"
 
-#include "30_server/FunctionRequest.h"
+#include "30_server/ActionFunctionRequest.h"
 
 namespace synthese
 {
@@ -47,6 +47,8 @@ namespace synthese
 	{
 		class Alarm;
 		class SentAlarm;
+		class AlarmAddLinkAction;
+		class AlarmRemoveLinkAction;
 
 		/** Alarm recipient class.
 			@ingroup m17
@@ -64,7 +66,14 @@ namespace synthese
 
 			const std::string& getTitle();
 
-			virtual void displayBroadcastListEditor(std::ostream& stream, const messages::Alarm* alarm, const server::ParametersMap& request, server::FunctionRequest<admin::AdminRequest>& searchRequest, server::FunctionRequest<admin::AdminRequest>& addRequest, server::FunctionRequest<admin::AdminRequest>& removeRequest) = 0;
+			virtual void displayBroadcastListEditor(
+				std::ostream& stream
+				, const messages::Alarm* alarm
+				, const server::ParametersMap& request
+				, server::FunctionRequest<admin::AdminRequest>& searchRequest
+				, server::ActionFunctionRequest<messages::AlarmAddLinkAction,admin::AdminRequest>& addRequest
+				, server::ActionFunctionRequest<messages::AlarmRemoveLinkAction, admin::AdminRequest>& removeRequest
+				) = 0;
 
 			virtual AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const = 0;
 

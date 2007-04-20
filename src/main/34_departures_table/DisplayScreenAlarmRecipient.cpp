@@ -94,8 +94,14 @@ namespace synthese
 
 		}
 
-		void DisplayScreenAlarmRecipient::displayBroadcastListEditor(std::ostream& stream, const messages::Alarm* alarm, const server::ParametersMap& parameters, server::FunctionRequest<admin::AdminRequest>& searchRequest, server::FunctionRequest<admin::AdminRequest>& addRequest, server::FunctionRequest<admin::AdminRequest>& removeRequest)
-		{
+		void DisplayScreenAlarmRecipient::displayBroadcastListEditor(
+			std::ostream& stream
+			, const messages::Alarm* alarm
+			, const server::ParametersMap& parameters
+			, server::FunctionRequest<admin::AdminRequest>& searchRequest
+			, server::ActionFunctionRequest<messages::AlarmAddLinkAction,admin::AdminRequest>& addRequest
+			, server::ActionFunctionRequest<messages::AlarmRemoveLinkAction, admin::AdminRequest>& removeRequest
+		){
 			vector<shared_ptr<DisplayScreen> > dsv = AlarmObjectLinkTableSync::search<DisplayScreen> (alarm, this->getFactoryKey());
 			set<uid> usedDisplayScreens;
 
@@ -113,16 +119,15 @@ namespace synthese
 				{
 					shared_ptr<DisplayScreen> ds = *dsit;
 					usedDisplayScreens.insert(ds->getKey());
-					removeRequest.getFunction()->setParameter(AlarmRemoveLinkAction::PARAMETER_OBJECT_ID, Conversion::ToString(ds->getKey()));
-					removeRequest.getFunction()->setParameter(AlarmRemoveLinkAction::PARAMETER_ALARM_ID, Conversion::ToString(alarm->getId()));
-
+					removeRequest.getAction()->setObjectId(ds->getKey());
+					
 					stream << t.row();
 					stream << t.col() << ds->getLocalization()->getConnectionPlace()->getFullName() << "/" << ds->getLocalization()->getName();
 					if (ds->getLocalizationComment() != "")
 						stream << "/" << ds->getLocalizationComment();
 
 					stream << t.col() << "<FONT face=\"Wingdings\" color=\"#00cc00\">l</FONT>"; // Bullet
-					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir retirer l\'afficheur des destinataires du message ?");
+					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir retirer l\\'afficheur des destinataires du message ?");
 				}
 
 				stream << t.close();
@@ -165,7 +170,7 @@ namespace synthese
 				if (usedDisplayScreens.find(screen->getKey()) != usedDisplayScreens.end())
 					continue;
 
-				addRequest.getFunction()->setParameter(AlarmAddLinkAction::PARAMETER_OBJECT_ID, Conversion::ToString(screen->getKey()));
+				addRequest.getAction()->setObjectId(screen->getKey());
 
 				stream << t1.row(Conversion::ToString(screen->getKey()));
 				stream << t1.col() << screen->getFullName();
