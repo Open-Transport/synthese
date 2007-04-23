@@ -68,7 +68,12 @@ namespace synthese
 		const std::string MessagesAdmin::PARAMETER_SEARCH_LEVEL = "masl";
 		const std::string MessagesAdmin::PARAMETER_SEARCH_STATUS = "mast";
 		const std::string MessagesAdmin::PARAMETER_SEARCH_CONFLICT = "masc";
-		
+
+		const std::string MessagesAdmin::CSS_ALARM_DISABLED = "alarmdisabled";
+		const std::string MessagesAdmin::CSS_ALARM_DISPLAYED_WITHOUT_END_DATE = "alarmdisplayedwithoutenddate";
+		const std::string MessagesAdmin::CSS_ALARM_WILL_BE_DISPLAYED = "alarmwillbedisplayed";
+		const std::string MessagesAdmin::CSS_ALARM_DISPLAYED_WITH_END_DATE = "alarmdisplayedwithenddate";
+
 		MessagesAdmin::MessagesAdmin()
 			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED)
 			, _startDate(TIME_UNKNOWN), _endDate(TIME_UNKNOWN)
@@ -85,13 +90,13 @@ namespace synthese
 				ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_START);
 				if (it != map.end() && !it->second.empty())
 				{
-					_startDate.FromString(it->second);
+					_startDate = DateTime::FromString(it->second);
 				}
 
 				it = map.find(PARAMETER_SEARCH_END);
 				if (it != map.end() && !it->second.empty())
 				{
-					_endDate.FromString(it->second);
+					_endDate = DateTime::FromString(it->second);
 				}
 
 				it = map.find(PARAMETER_SEARCH_CONFLICT);
@@ -111,6 +116,8 @@ namespace synthese
 				_result = AlarmTableSync::searchSingleSent(
 					_startDate
 					, _endDate
+					, _searchConflict
+					, _searchLevel
 					, _requestParameters.first
 					, _requestParameters.maxSize
 					, _requestParameters.orderField == PARAMETER_SEARCH_START
@@ -220,13 +227,14 @@ namespace synthese
 				stream << t1.col() << scenario->getPeriodStart().toString();
 				stream << t1.col() << scenario->getName();
 				stream << t1.col(); // Bullet
-				stream << t1.col(); // Bullet
+				stream << t1.col() << MessagesModule::getConflictLabel(scenario->getConflictStatus()); /// @todo put a graphic bullet
 				stream << t1.col() << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Modifier");
-				stream << t1.col() << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?");
+				stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?");
 			}
 			stream << t1.row();
-			stream << t1.col(4) << t1.getActionForm().getSelectInput(NewScenarioSendAction::PARAMETER_TEMPLATE, MessagesModule::getScenarioTemplatesLabels(), uid(0));
-			stream << t1.col() << t1.getActionForm().getSubmitButton("Nouvelle diffusion de scénario");
+			stream << t1.col();
+			stream << t1.col() << t1.getActionForm().getSelectInput(NewScenarioSendAction::PARAMETER_TEMPLATE, MessagesModule::getScenarioTemplatesLabels(), uid(0));
+			stream << t1.col(3) << t1.getActionForm().getSubmitButton("Nouvelle diffusion de scénario");
 
 			stream << t1.close();
 
@@ -248,7 +256,32 @@ namespace synthese
 			{
 				shared_ptr<SingleSentAlarm> alarm = *it;
 				alarmRequest.setObjectId(alarm->getKey());
-				stream << t.row(Conversion::ToString(alarm->getKey()));
+				DateTime now;
+				bool alarmIsDisabled =
+					!alarm->getIsEnabled();
+				bool alarmIsDisplayedWithEndDate = 
+					(alarm->getPeriodStart().isUnknown() || alarm->getPeriodStart() <= now)
+					&& !alarm->getPeriodEnd().isUnknown()
+					&& alarm->getPeriodEnd() >= now
+					&& alarm->getIsEnabled();
+				bool alarmIsDisplayedWithoutEndDate =
+					(alarm->getPeriodStart().isUnknown() || alarm->getPeriodStart() <= now)
+					&& alarm->getPeriodEnd().isUnknown()
+					&& alarm->getIsEnabled();
+				bool alarmWillBeDisplayed =
+					!alarm->getPeriodStart().isUnknown()
+					&& alarm->getPeriodStart() > now
+					&& alarm->getIsEnabled();
+				string rowColorCSS;
+				if (alarmIsDisabled)
+					rowColorCSS = CSS_ALARM_DISABLED;
+				if (alarmIsDisplayedWithoutEndDate)
+					rowColorCSS = CSS_ALARM_DISPLAYED_WITHOUT_END_DATE;
+				if (alarmWillBeDisplayed)
+					rowColorCSS = CSS_ALARM_WILL_BE_DISPLAYED;
+				if (alarmIsDisplayedWithEndDate)
+					rowColorCSS = CSS_ALARM_DISPLAYED_WITH_END_DATE;
+				stream << t.row(Conversion::ToString(alarm->getKey()), rowColorCSS);
 				stream << t.col();
 				if (!alarm->getIsEnabled())
 					stream << "Non diffusé";
@@ -266,14 +299,22 @@ namespace synthese
 				stream << t.col() << alarm->getShortMessage();
 				stream << t.col() << MessagesModule::getLevelLabel(alarm->getLevel());
 				stream << t.col(); // Bullet
-				stream << t.col(); // Bullet
+				if (!alarm->getIsEnabled())
+					stream << "Désactivé";
+				else if (!alarm->getComplements().recipientsNumber)
+					stream << "Pas de destinataire";
+				else
+				{
+					stream << alarm->getComplements().recipientsNumber <"&nbsp;";
+				}
+				stream << t.col() << MessagesModule::getConflictLabel(alarm->getComplements().conflictStatus); // Bullet
 				stream << t.col() << HTMLModule::getLinkButton(alarmRequest.getURL(), "Modifier");
 				if (alarm->isApplicable(DateTime()))
 					stream << "&nbsp;" << HTMLModule::getLinkButton(stopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion du message ?");
 			}
 			stream << t.row();
-			stream << t.col(5) << "(Sélectionnez un message pour le copier)";
-			stream << t.col() << t.getActionForm().getSubmitButton("Nouvelle diffusion de message");
+			stream << t.col(2) << "(Sélectionnez un message pour le copier)";
+			stream << t.col(4) << t.getActionForm().getSubmitButton("Nouvelle diffusion de message");
 
 			stream << t.close();
 		}

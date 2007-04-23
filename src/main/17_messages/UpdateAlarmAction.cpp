@@ -44,9 +44,7 @@ namespace synthese
 	{
 		const string UpdateAlarmAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "typ";
 		const string UpdateAlarmAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sda";
-		const string UpdateAlarmAction::PARAMETER_START_HOUR = Action_PARAMETER_PREFIX + "sho";
 		const string UpdateAlarmAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "eda";
-		const string UpdateAlarmAction::PARAMETER_END_HOUR = Action_PARAMETER_PREFIX + "eho";
 		const string UpdateAlarmAction::PARAMETER_ENABLED = Action_PARAMETER_PREFIX + "ena";
 
 
@@ -73,20 +71,12 @@ namespace synthese
 
 				if (_singleSentAlarm.get())
 				{
-					string date;
 					it = map.find(PARAMETER_START_DATE);
 					if (it == map.end())
 						throw ActionException("Start date not specified");
 					if (!it->second.empty())
 					{
-						date = it->second;
-				
-						it = map.find(PARAMETER_START_HOUR);
-						if (it == map.end())
-							throw ActionException("Start hour not specified");
-						_startDate = it->second.empty()
-							? DateTime::FromString(date + " 0:0")
-							: DateTime::FromString(date + " " + it->second);
+						_startDate = DateTime::FromString(it->second);
 					}
 				
 					it = map.find(PARAMETER_END_DATE);
@@ -94,14 +84,7 @@ namespace synthese
 						throw ActionException("End date not specified");
 					if (!it->second.empty())
 					{
-						date = it->second;
-				
-						it = map.find(PARAMETER_END_HOUR);
-						if (it == map.end())
-							throw ActionException("End hour not specified");
-						_endDate = it->second.empty()
-							? DateTime::FromString(date + " 23:59")
-							: DateTime::FromString(date + " " + it->second);
+						_endDate = DateTime::FromString(it->second);
 					}
 				
 					// Enabled status

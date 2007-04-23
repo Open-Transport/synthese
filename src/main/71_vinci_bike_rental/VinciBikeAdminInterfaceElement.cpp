@@ -86,7 +86,11 @@ namespace synthese
 			{
 				ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
 				if (it != map.end())
+				{
+					if (Conversion::ToLongLong(it->second) == Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
+						return;
 					_bike = VinciBikeTableSync::get(Conversion::ToLongLong(it->second));
+				}
 			}
 			catch(DBEmptyResultException<VinciBike>)
 			{

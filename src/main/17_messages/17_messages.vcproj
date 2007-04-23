@@ -4,6 +4,7 @@
 	Version="8,00"
 	Name="17_messages"
 	ProjectGUID="{956A4D91-FF39-422F-B767-2F9E425D0183}"
+	RootNamespace="17_messages"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -63,10 +64,6 @@
 		<Filter
 			Name="Core Classes"
 			>
-			<File
-				RelativePath=".\AlarmBroadcastList.h"
-				>
-			</File>
 			<File
 				RelativePath=".\AlarmObjectLink.h"
 				>

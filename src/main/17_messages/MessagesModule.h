@@ -25,7 +25,6 @@
 
 #include "01_util/ModuleClass.h"
 
-#include "17_messages/AlarmBroadcastList.h"
 #include "17_messages/Types.h"
 #include "17_messages/SentAlarm.h"
 #include "17_messages/SentScenario.h"
@@ -69,6 +68,7 @@ namespace synthese
 			static std::vector<std::pair<uid, std::string> >			getTextTemplateLabels(const AlarmLevel& level);
 
 			static std::string							getLevelLabel(const AlarmLevel& level);
+			static std::string							getConflictLabel(const AlarmConflict& conflict);
 		};
 	}
 	/** @} */

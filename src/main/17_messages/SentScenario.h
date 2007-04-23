@@ -24,6 +24,7 @@
 #define SYNTHESE_SentScenario_h__
 
 #include "17_messages/ScenarioSubclassTemplate.h"
+#include "17_messages/Types.h"
 
 #include "04_time/DateTime.h"
 
@@ -75,6 +76,13 @@ namespace synthese
 			*/
 			void setPeriodEnd ( const synthese::time::DateTime& periodEnd);
 			void setIsEnabled(bool value);
+
+			/** Gets the "worse" conflict status of each alarm contained in the scenario.
+				@return synthese::messages::AlarmConflict The conflict status of the scenario.
+				@author Hugues Romain
+				@date 2007
+			*/
+			AlarmConflict getConflictStatus() const;
 		};
 	}
 }

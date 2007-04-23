@@ -42,36 +42,106 @@ namespace synthese
 	    class AlarmRecipientTemplate : public AlarmRecipient
 	{
 	public:
-	    typedef typename std::map<const SentAlarm*, std::set<const T*> >	LinksSetAlarm;
-	    typedef typename std::map<const T*, std::set<const SentAlarm*> >	LinksSetObject;
+		typedef std::set<const T*>										LinkedObjectsSet;
+		typedef std::set<const SentAlarm*>								LinkedAlarmsSet;
+	    typedef typename std::map<const SentAlarm*, LinkedObjectsSet>	AlarmLinks;
+	    typedef typename std::map<const T*, LinkedAlarmsSet>			ObjectLinks;
 
 	private:
-	    static LinksSetAlarm _linksAlarm;
-	    static LinksSetObject _linksObject;
+	    static AlarmLinks	_linksAlarm;
+	    static ObjectLinks	_linksObject;
 
 	protected:
 	    static void add(const T* object, const SentAlarm* alarm);
 	    static void remove(const T* object, const SentAlarm* alarm);
-			
+	
 	public:
 	    AlarmRecipientTemplate(const std::string& title);
 
-	    static std::set<const SentAlarm*>	getLinkedAlarms(const T* object);
-	    static std::set<const T*>			getLinkedObjects(const SentAlarm* alarm);
+	    static LinkedAlarmsSet	getLinkedAlarms(const T* object);
+	    static LinkedObjectsSet	getLinkedObjects(const SentAlarm* alarm);
 
 	    static const SentAlarm* getAlarm(const T* object);
 	    static const SentAlarm* getAlarm(const T* object, const time::DateTime& date);
+
+		/** Catch of an alarm conflict for a specified recipient.
+			@param object The recipient to analyze
+			@return synthese::messages::AlarmConflict the "worse" conflict status of all the alarms to display on the recipient.
+			@author Hugues Romain
+			@date 2007
+		*/
+		static AlarmConflict getConflicStatus(const T* object);
+
+		/** Catch of a conflict for a specified alarm regarding the current recipient type only.
+			@param alarm The alarm to analyze
+			@return synthese::messages::AlarmConflict the "worse" conflict between the alarm and all the others alarm to be displayed on the recipients ones
+			@author Hugues Romain
+			@date 2007
+			To obtain the global alarm conflict status, use the public method Alarm::getConflictStatus
+		*/
+		AlarmConflict getConflictStatus(const SentAlarm* alarm) const;
 	};
 
 	template<class T>
-	    const SentAlarm* synthese::messages::AlarmRecipientTemplate<T>::getAlarm( const T* object, const time::DateTime& date )
+	AlarmConflict synthese::messages::AlarmRecipientTemplate<T>::getConflictStatus( const SentAlarm* alarm ) const
 	{
-	    typename LinksSetObject::iterator it = _linksObject.find(object);
+		AlarmLinks::const_iterator it = _linksAlarm.find(alarm);
+		if (it == _linksAlarm.end())
+			return ALARM_CONFLICT_UNKNOWN;
+
+		AlarmConflict conflictStatus(ALARM_NO_CONFLICT);
+		for (LinkedObjectsSet::const_iterator ita = it->second.begin(); ita != it->second.end(); ++ita)
+		{
+			ObjectLinks::const_iterator ito = _linksObject.find(*ita);
+			if (ito == _linksObject.end())
+				return ALARM_CONFLICT_UNKNOWN; /// @todo throw an exception
+			for (LinkedAlarmsSet::const_iterator itb = ito->second.begin(); itb != ito->second.end(); ++itb)
+			{
+				if (*itb == alarm)
+					continue;
+
+				AlarmConflict thisConflictStatus = alarm->wereInConflictWith(**itb);
+				if (thisConflictStatus > conflictStatus)
+					conflictStatus = thisConflictStatus;
+				if (conflictStatus == ALARM_CONFLICT)
+					return conflictStatus;
+			}
+		}
+		return conflictStatus;
+	}
+
+	template<class T>
+		AlarmConflict AlarmRecipientTemplate<T>::getConflicStatus( const T* object )
+	{
+		ObjectLinks::const_iterator it = _linksObject.find(object);
+		if (it == _linksObject.end())
+			return ALARM_CONFLICT_UNKNOWN;
+
+		AlarmConflict conflictStatus(ALARM_NO_CONFLICT);
+		for (LinkedAlarmsSet::const_iterator ita = it->second.begin(); ita != it->second.end(); ++ita)
+			for (LinkedAlarmsSet::const_iterator itb = it->second.begin(); itb != it->second.end(); ++itb)
+			{
+				if (ita == itb)
+					continue;
+
+				AlarmConflict thisConflictStatus = (*ita)->wereInConflictWith(**itb);
+				if (thisConflictStatus > conflictStatus)
+					conflictStatus = thisConflictStatus;
+				if (conflictStatus == ALARM_CONFLICT)
+					return conflictStatus;
+			}
+		return conflictStatus;
+	}
+
+	template<class T>
+	    const SentAlarm* AlarmRecipientTemplate<T>::getAlarm( const T* object, const time::DateTime& date )
+	{
+	    typename ObjectLinks::const_iterator it = _linksObject.find(object);
 	    if (it == _linksObject.end())
 			return NULL;
 
 	    const SentAlarm* alarm = NULL;
-	    for (std::set<const SentAlarm*>::const_iterator its = it->second.begin(); its != it->second.end(); ++its)
+	    for (LinkedAlarmsSet::const_iterator its = it->second.begin(); its != it->second.end(); ++its)
 	    {
 			const SentAlarm* candidateAlarm = *its;
 			if (candidateAlarm->isApplicable(date) && (
@@ -87,7 +157,7 @@ namespace synthese
 	}
 
 	template<class T>
-	    const SentAlarm* synthese::messages::AlarmRecipientTemplate<T>::getAlarm( const T* object )
+	    const SentAlarm* AlarmRecipientTemplate<T>::getAlarm( const T* object )
 	{
 	    return AlarmRecipientTemplate<T>::getAlarm(object, time::DateTime());
 	}
@@ -100,36 +170,36 @@ namespace synthese
 	}
 
 	template<class T>
-	    std::set<const SentAlarm*> AlarmRecipientTemplate<T>::getLinkedAlarms(const T* object)
+	    typename AlarmRecipientTemplate<T>::LinkedAlarmsSet AlarmRecipientTemplate<T>::getLinkedAlarms(const T* object)
 	{
-	    typename LinksSetObject::iterator it = _linksObject.find(object);
-	    return (it == _linksObject.end()) ? std::set<const SentAlarm*>() : it->second;
+	    typename ObjectLinks::const_iterator it = _linksObject.find(object);
+	    return (it == _linksObject.end()) ? LinkedAlarmsSet() : it->second;
 	}
 
 	template<class T>
-	    std::set<const T*> AlarmRecipientTemplate<T>::getLinkedObjects(const SentAlarm* alarm)
+	    typename AlarmRecipientTemplate<T>::LinkedObjectsSet AlarmRecipientTemplate<T>::getLinkedObjects(const SentAlarm* alarm)
 	{
-	    typename  LinksSetAlarm::iterator it = _linksAlarm.find(alarm);
-	    return (it == _linksAlarm.end()) ? std::set<const T*>() : it->second;
+	    typename  AlarmLinks::const_iterator it = _linksAlarm.find(alarm);
+	    return (it == _linksAlarm.end()) ? LinkedObjectsSet() : it->second;
 	}
 
 	template<class T>
 	    void AlarmRecipientTemplate<T>::remove(const T* object, const SentAlarm* alarm)
 	{
-	    typename LinksSetObject::iterator it = 
+	    typename ObjectLinks::iterator it = 
 		_linksObject.find(object);
 
 	    if (it != _linksObject.end())
 	    {
-			std::set<const SentAlarm*>::iterator its = it->second.find(alarm);
+			LinkedAlarmsSet::iterator its = it->second.find(alarm);
 			if (its != it->second.end())
 				it->second.erase(its);
 	    }
 
-	    typename  LinksSetAlarm::iterator it2 = AlarmRecipientTemplate<T>::_linksAlarm.find(alarm);
+	    typename  AlarmLinks::iterator it2 = AlarmRecipientTemplate<T>::_linksAlarm.find(alarm);
 	    if (it2 != AlarmRecipientTemplate<T>::_linksAlarm.end())
 	    {
-			typename std::set<const T*>::iterator its = it2->second.find(object);
+			LinkedObjectsSet::iterator its = it2->second.find(object);
 			if (its != it2->second.end())
 				it2->second.erase(its);
 	    }
@@ -138,20 +208,20 @@ namespace synthese
 	template<class T>
 	    void AlarmRecipientTemplate<T>::add(const T* object, const SentAlarm* alarm)
 	{
-	    typename LinksSetObject::iterator it = _linksObject.find(object);
+	    typename ObjectLinks::iterator it = _linksObject.find(object);
 	    if (it == _linksObject.end())
 	    {
-			std::set<const SentAlarm*> s;
+			LinkedAlarmsSet s;
 			s.insert(alarm);
 			_linksObject.insert(make_pair(object, s));
 	    }
 	    else
 		it->second.insert(alarm);
 
-	    typename  LinksSetAlarm::iterator it2 = _linksAlarm.find(alarm);
+	    typename  AlarmLinks::iterator it2 = _linksAlarm.find(alarm);
 	    if (it2 == _linksAlarm.end())
 	    {
-			std::set<const T*> s;
+			LinkedObjectsSet s;
 			s.insert(object);
 			_linksAlarm.insert(make_pair(alarm, s));
 	    }

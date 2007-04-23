@@ -27,6 +27,7 @@
 #include "04_time/DateTime.h"
 
 #include "17_messages/Alarm.h"
+#include "17_messages/Types.h"
 
 #include <string>
 
@@ -51,6 +52,9 @@ namespace synthese
 		*/
 		class AlarmTableSync : public db::SQLiteTableSyncTemplate<Alarm>
 		{
+		private:
+			static const std::string _COL_CONFLICT_LEVEL;
+			static const std::string _COL_RECIPIENTS_NUMBER;
 
 		public:
 			static const std::string COL_LEVEL;
@@ -108,9 +112,37 @@ namespace synthese
 				, bool raisingOrder = false
 				);
 			
+			/** searchSingleSent.
+				@param startDate
+				@param endDate
+				@param first
+				@param number
+				@param orderByDate
+				@param orderByLevel
+				@param orderByStatus
+				@param orderByConflict
+				@param raisingOrder
+				@return std::vector<boost::shared_ptr<SingleSentAlarm> >
+				@author Hugues Romain
+				@date 2007
+			
+			Target query :
+			@code
+SELECT
+	al1.*
+	, (SELECT COUNT(object_id) FROM t040_alarm_object_links AS aol3 WHERE aol3.alarm_id=al1.id)
+	, (SELECT MAX(al2.level) FROM t040_alarm_object_links AS aol1 INNER JOIN t040_alarm_object_links AS aol2 ON aol1.object_id=aol2.object_id AND aol1.alarm_id != aol2.alarm_id INNER JOIN t003_alarms AS al2 ON al2.id = aol2.alarm_id WHERE aol1.alarm_id=al1.id AND  (al2.period_start IS NULL OR al1.period_end IS NULL OR al2.period_start < al1.period_end) AND (al2.period_end IS NULL OR al1.period_start IS NULL OR al2.period_end > al1.period_start)) AS conflict_level
+FROM
+	t003_alarms AS al1
+WHERE
+	is_template=0
+			@endcode
+			*/
 			static std::vector<boost::shared_ptr<SingleSentAlarm> > searchSingleSent(
 				time::DateTime startDate
 				, time::DateTime endDate
+				, AlarmConflict conflict
+				, AlarmLevel level
 				, int first = 0
 				, int number = 0
 				, bool orderByDate = true

@@ -79,6 +79,7 @@ namespace synthese
 
 			virtual void addObject(const SentAlarm* alarm, uid objectId) = 0;
 			virtual void removeObject(const SentAlarm* alarm, uid objectId) = 0;
+			virtual AlarmConflict getConflictStatus(const SentAlarm* alarm) const = 0;
 
 		};
 	}

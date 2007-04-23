@@ -20,10 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "SentAlarm.h"
+#include "17_messages/SentAlarm.h"
+#include "17_messages/AlarmRecipient.h"
+
+#include "01_util/Constants.h"
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace messages
 	{
 
@@ -52,9 +57,10 @@ namespace synthese
 		}
 
 		SentAlarm::SentAlarm()
-			: util::Registrable<uid, SentAlarm>()
+			: util::Registrable<uid, SentAlarm>()			
 		{
-
+			_complements.conflictStatus = ALARM_CONFLICT_UNKNOWN;
+			_complements.recipientsNumber = UNKNOWN_VALUE;
 		}
 
 		SentAlarm::~SentAlarm()
@@ -65,6 +71,52 @@ namespace synthese
 		uid SentAlarm::getId() const
 		{
 			return getKey();
+		}
+
+		AlarmConflict SentAlarm::wereInConflictWith( const SentAlarm& other ) const
+		{
+			// If one of the two alarms are not enabled, no conflict
+			if (!getIsEnabled() || !other.getIsEnabled())
+				return ALARM_NO_CONFLICT;
+
+			// Inverting the parameters if necessary
+			if ((other.getPeriodStart().isUnknown() && !getPeriodStart().isUnknown())
+				|| (!other.getPeriodStart().isUnknown() && !getPeriodStart().isUnknown() && other.getPeriodStart() < getPeriodStart()))
+				return other.wereInConflictWith(*this);
+
+			// No common period : no conflict
+			if (!other.getPeriodStart().isUnknown() && !getPeriodEnd().isUnknown() && other.getPeriodStart() > getPeriodEnd())
+				return ALARM_NO_CONFLICT;
+
+			// Common period : different level gives priority to an alarm
+			if (other.getLevel() != getLevel())
+				return ALARM_WARNING_ON_INFO;
+			
+			return ALARM_CONFLICT;
+		}
+
+		AlarmConflict SentAlarm::getConflictStatus() const
+		{
+			AlarmConflict conflictStatus(ALARM_NO_CONFLICT);
+			for (Factory<AlarmRecipient>::Iterator it = Factory<AlarmRecipient>::begin(); it != Factory<AlarmRecipient>::end(); ++it)
+			{
+				AlarmConflict thisConflictStatus = it->getConflictStatus(this);
+				if (thisConflictStatus > conflictStatus)
+					conflictStatus = thisConflictStatus;
+				if (conflictStatus == ALARM_CONFLICT)
+					return conflictStatus;
+			}
+			return conflictStatus;
+		}
+
+		SentAlarm::Complements SentAlarm::getComplements() const
+		{
+			return _complements;
+		}
+
+		void SentAlarm::setComplements( const Complements& complements )
+		{
+			_complements = complements;
 		}
 	}
 }

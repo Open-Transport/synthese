@@ -44,9 +44,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_TYPE;
 			static const std::string PARAMETER_START_DATE;
-			static const std::string PARAMETER_START_HOUR;
 			static const std::string PARAMETER_END_DATE;
-			static const std::string PARAMETER_END_HOUR;
 			static const std::string PARAMETER_ENABLED;
 
 		private:

@@ -58,12 +58,14 @@ namespace synthese
 		{
 			ParametersMap::const_iterator it;
 
+			// Template alarm ?
 			it = map.find(PARAMETER_IS_TEMPLATE);
 			if (it != map.end())
 			{
 				_isTemplate = Conversion::ToBool(it->second);
 			}
 
+			// Case template alarm
 			if (_isTemplate)
 			{
 				it = map.find(PARAMETER_SCENARIO_ID);

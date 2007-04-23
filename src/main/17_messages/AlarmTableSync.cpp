@@ -28,6 +28,7 @@
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/Types.h"
 #include "17_messages/MessagesModule.h"
+#include "17_messages/AlarmObjectLinkTableSync.h"
 
 #include "01_util/Conversion.h"
 
@@ -112,7 +113,7 @@ namespace synthese
 				query
 					<< " REPLACE INTO " << TABLE_NAME << " VALUES("
 					<< Conversion::ToString(gobject->getKey())
-					<< ",O"
+					<< ",0"
 					<< "," << Conversion::ToString(gobject->getIsEnabled())
 					<< "," << Conversion::ToString((int) gobject->getLevel())
 					<< "," << Conversion::ToSQLiteString(gobject->getShortMessage())
@@ -148,6 +149,9 @@ namespace synthese
 
 	namespace messages
 	{
+		const std::string AlarmTableSync::_COL_CONFLICT_LEVEL = "conflict_level";
+		const std::string AlarmTableSync::_COL_RECIPIENTS_NUMBER = "recipients";
+
 		const std::string AlarmTableSync::COL_IS_TEMPLATE = "is_template";
 		const std::string AlarmTableSync::COL_ENABLED = "is_enabled";
 		const std::string AlarmTableSync::COL_LEVEL = "level";
@@ -262,6 +266,8 @@ namespace synthese
 		std::vector<shared_ptr<SingleSentAlarm> > AlarmTableSync::searchSingleSent(
 			time::DateTime startDate
 			, time::DateTime endDate
+			, AlarmConflict conflict
+			, AlarmLevel level
 			, int first /*= 0*/
 			, int number /*= 0*/
 			, bool orderByDate
@@ -273,14 +279,32 @@ namespace synthese
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
-				<< " SELECT a.*"
+				<< " SELECT "
+					<< "a.*"
+					<< ",(SELECT COUNT(" << AlarmObjectLinkTableSync::COL_OBJECT_ID << ") FROM " << AlarmObjectLinkTableSync::TABLE_NAME << " AS aol3 WHERE aol3." << AlarmObjectLinkTableSync::COL_ALARM_ID << "=a." << TABLE_COL_ID << ") AS " << _COL_RECIPIENTS_NUMBER
+					<< ",(SELECT MAX(al2."  << COL_LEVEL << ") FROM " << AlarmObjectLinkTableSync::TABLE_NAME << " AS aol1 INNER JOIN " << AlarmObjectLinkTableSync::TABLE_NAME << " AS aol2 ON aol1." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=aol2." << AlarmObjectLinkTableSync::COL_OBJECT_ID << " AND aol1." << AlarmObjectLinkTableSync::COL_ALARM_ID << " != aol2." << AlarmObjectLinkTableSync::COL_ALARM_ID << " INNER JOIN " << TABLE_NAME << " AS al2 ON al2." << TABLE_COL_ID << " = aol2." << AlarmObjectLinkTableSync::COL_ALARM_ID << " WHERE "
+						<< " aol1." << AlarmObjectLinkTableSync::COL_ALARM_ID << "=a." << TABLE_COL_ID
+						<< " AND al2." << COL_IS_TEMPLATE << "=0 "
+						<< " AND (al2." << COL_PERIODSTART << " IS NULL OR a." << COL_PERIODEND << " IS NULL OR al2." << COL_PERIODSTART << " <= a." << COL_PERIODEND << ")"
+						<< " AND (al2." << COL_PERIODEND << " IS NULL OR a." << COL_PERIODSTART << " IS NULL OR al2." << COL_PERIODEND <<" >= a." << COL_PERIODSTART << ")"
+						<< ") AS " << _COL_CONFLICT_LEVEL
 				<< " FROM " << TABLE_NAME << " AS a "
 				<< " WHERE "
-				<< COL_IS_TEMPLATE << "=0";
+					<< "a." << COL_IS_TEMPLATE << "=0";
 			if (!startDate.isUnknown())
-				query << " AND " << COL_PERIODSTART << "<=" << startDate.toSQLString();
+				query << " AND a." << COL_PERIODSTART << "<=" << startDate.toSQLString();
 			if (!endDate.isUnknown())
-				query << " AND " << COL_PERIODEND << ">=" << endDate.toSQLString();
+				query << " AND a." << COL_PERIODEND << ">=" << endDate.toSQLString();
+			if (conflict == ALARM_NO_CONFLICT)
+				query << " AND " << _COL_CONFLICT_LEVEL << " IS NULL";
+			if (conflict == ALARM_WARNING_ON_INFO)
+				query << " AND a." << COL_LEVEL << "=" << ((int) ALARM_LEVEL_WARNING) << " AND " << _COL_CONFLICT_LEVEL << "=" << ((int) ALARM_LEVEL_INFO);
+			if (conflict == ALARM_INFO_UNDER_WARNING)
+				query << " AND a." << COL_LEVEL << "=" << ((int) ALARM_LEVEL_INFO) << " AND " << _COL_CONFLICT_LEVEL << "=" << ((int) ALARM_LEVEL_WARNING);
+			if (conflict == ALARM_CONFLICT)
+				query << " AND a." << COL_LEVEL << "=" << _COL_CONFLICT_LEVEL;
+			if (level != ALARM_LEVEL_UNKNOWN)
+				query << " AND a." << COL_LEVEL << "=" << ((int) level);
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -294,6 +318,32 @@ namespace synthese
 				{
 					shared_ptr<SingleSentAlarm> object(new SingleSentAlarm);
 					load(object.get(), result, i);
+					SingleSentAlarm::Complements c;
+					c.recipientsNumber = Conversion::ToInt(result.getColumn(i, _COL_RECIPIENTS_NUMBER));
+					if (!Conversion::ToInt(result.getColumn(i, _COL_CONFLICT_LEVEL)))
+						c.conflictStatus = ALARM_NO_CONFLICT;
+					else
+					{
+						AlarmLevel conflictLevel = static_cast<AlarmLevel>(Conversion::ToInt(result.getColumn(i, _COL_CONFLICT_LEVEL)));
+						switch (object->getLevel())
+						{
+						case ALARM_LEVEL_INFO:
+							switch (conflictLevel)
+							{
+							case ALARM_LEVEL_WARNING: c.conflictStatus = ALARM_WARNING_ON_INFO;
+							case ALARM_LEVEL_INFO: c.conflictStatus = ALARM_CONFLICT;
+							}
+							break;
+
+						case ALARM_LEVEL_WARNING:
+							switch (conflictLevel)
+							{
+							case ALARM_LEVEL_WARNING: c.conflictStatus = ALARM_CONFLICT;
+							case ALARM_LEVEL_INFO: c.conflictStatus = ALARM_INFO_UNDER_WARNING;
+							}
+						}
+					}
+					object->setComplements(c);
 					objects.push_back(object);
 				}
 				return objects;

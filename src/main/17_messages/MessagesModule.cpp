@@ -76,9 +76,10 @@ namespace synthese
 			vector<pair<AlarmConflict, string> > m;
 			if (withAll)
 				m.push_back(make_pair(ALARM_CONFLICT_UNKNOWN, "(tous)"));
-			m.push_back(make_pair(ALARM_NO_CONFLICT, "Sans conflit"));
-			m.push_back(make_pair(ALARM_WARNING_ON_INFO, "Prioritaire sur complémentaire"));
-			m.push_back(make_pair(ALARM_CONFLICT, "En conflit"));
+			m.push_back(make_pair(ALARM_NO_CONFLICT, getConflictLabel(ALARM_NO_CONFLICT)));
+			m.push_back(make_pair(ALARM_WARNING_ON_INFO, getConflictLabel(ALARM_WARNING_ON_INFO)));
+			m.push_back(make_pair(ALARM_INFO_UNDER_WARNING, getConflictLabel(ALARM_INFO_UNDER_WARNING)));
+			m.push_back(make_pair(ALARM_CONFLICT, getConflictLabel(ALARM_CONFLICT)));
 			return m;
 		}
 
@@ -106,6 +107,18 @@ namespace synthese
 		AlarmObjectLink::Registry& MessagesModule::getAlarmLinks()
 		{
 			return _alarmLinks;
+		}
+
+		std::string MessagesModule::getConflictLabel( const AlarmConflict& conflict )
+		{
+			switch (conflict)
+			{
+			case ALARM_NO_CONFLICT: return "Sans conflit";
+			case ALARM_WARNING_ON_INFO: return "Annulé par un prioritaire";
+			case ALARM_INFO_UNDER_WARNING: return "Annule un complémentaire";
+			case ALARM_CONFLICT: return "En conflit";
+			default: return "Inconnu";
+			}
 		}
 
 		void initialize()

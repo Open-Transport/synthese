@@ -24,6 +24,7 @@
 #define SYNTHESE_SentAlarm_h__
 
 #include "17_messages/Alarm.h"
+#include "17_messages/Types.h"
 
 #include "04_time/DateTime.h"
 
@@ -40,14 +41,27 @@ namespace synthese
 			: public Alarm
 			, public util::Registrable<uid, SentAlarm>
 		{
+		public:
+			typedef struct  
+			{
+				AlarmConflict	conflictStatus;
+				int				recipientsNumber;
+			} Complements;
+
+		private:
+			Complements					_complements;
+
 		protected:
 			SentAlarm();
 			~SentAlarm();
 
 		public:
+			void setComplements(const Complements& complements);
+
 			virtual bool					getIsEnabled()		const = 0;
 			virtual const time::DateTime&	getPeriodStart()	const = 0;
 			virtual const time::DateTime&	getPeriodEnd()		const = 0;
+			Complements						getComplements()	const;
 
 			/** Applicability test.
 				@param start Start of applicability period
@@ -59,6 +73,39 @@ namespace synthese
 			bool isApplicable(const time::DateTime& date) const;
 
 			uid getId() const;
+
+			
+			/** Conflict between two alarms detector.
+				@param other Other alarm to compare with
+				@return synthese::messages::AlarmConflict the conflict situation between the two alarms if they where displayed on the same recipient
+				@author Hugues Romain
+				@date 2007
+
+				Conflict :
+				@code
+<-------------------|
+   				|------------------>
+				@endcode
+
+				Not conflict :
+				@code
+<-------------------|
+          				|------------------>
+				@endcode
+
+				The other's start date is supposed to be after the current one. If not the method is relaunched with the parameters inverted.
+
+				@todo Test each case in an unit test
+			*/
+			AlarmConflict wereInConflictWith(const SentAlarm& other) const;
+
+			
+			/** Gets the "worse" conflict status of the alarm in each recipient type..
+				@return synthese::messages::AlarmConflict The conflict status of the alarm
+				@author Hugues Romain
+				@date 2007				
+			*/
+			AlarmConflict getConflictStatus() const;
 		};
 	}
 }

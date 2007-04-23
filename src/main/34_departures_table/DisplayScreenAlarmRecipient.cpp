@@ -68,11 +68,11 @@ namespace synthese
 	       This should be investigate further.
 	    */
 
-	    template<> AlarmRecipientTemplate<DisplayScreen>::LinksSetAlarm
+	    template<> AlarmRecipientTemplate<DisplayScreen>::AlarmLinks
 	    AlarmRecipientTemplate<DisplayScreen>::_linksAlarm = 
 		std::map<const SentAlarm*, std::set<const DisplayScreen*> > ();
 
-	    template<> AlarmRecipientTemplate<DisplayScreen>::LinksSetObject
+	    template<> AlarmRecipientTemplate<DisplayScreen>::ObjectLinks
 	      AlarmRecipientTemplate<DisplayScreen>::_linksObject = 
 		std::map<const DisplayScreen*, std::set<const SentAlarm*> > () ;
 

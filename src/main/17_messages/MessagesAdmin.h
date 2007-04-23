@@ -114,6 +114,13 @@ namespace synthese
 		*/
 		class MessagesAdmin : public admin::AdminInterfaceElement
 		{
+		public:
+			static const std::string CSS_ALARM_DISABLED;
+			static const std::string CSS_ALARM_DISPLAYED_WITHOUT_END_DATE;
+			static const std::string CSS_ALARM_WILL_BE_DISPLAYED;
+			static const std::string CSS_ALARM_DISPLAYED_WITH_END_DATE;
+
+		private:
 			typedef enum { ALL_STATUS, BROADCAST_OVER, BROADCAST_RUNNING, BROADCAST_RUNNING_WITH_END, BROADCAST_RUNNING_WITHOUT_END, FUTURE_BROADCAST } StatusSearch;
 
 			time::DateTime										_startDate;
