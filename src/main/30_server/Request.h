@@ -196,6 +196,9 @@ namespace synthese
 			void _setErrorMessage(const std::string& message);
 			void _setActionException(bool value);
 			void _setErrorLevel(const ErrorLevel& level);
+
+			boost::shared_ptr<const security::User> getUser() const;
+
 			//! \name Constructor and destructor
 			//@{
 				

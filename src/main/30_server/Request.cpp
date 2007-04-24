@@ -48,6 +48,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace html;
+	using namespace security;
 
 	namespace server
 	{
@@ -470,6 +471,14 @@ namespace synthese
 		void Request::deleteAction()
 		{
 			_action.reset();
+		}
+
+		shared_ptr<const User> Request::getUser() const
+		{
+			if (_session)
+				return _session->getUser();
+			return shared_ptr<User>();
+
 		}
 	}
 }

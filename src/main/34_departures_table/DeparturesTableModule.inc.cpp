@@ -44,3 +44,5 @@
 #include "34_departures_table/DisplayScreenHasAlarmValueInterfaceElement.h"
 #include "34_departures_table/DisplayScreenAlarmContentValueInterfaceElement.h"
 #include "34_departures_table/DisplayScreenSupervisionRequest.h"
+#include "34_departures_table/DisplayDataControlLog.h"
+#include "34_departures_table/DisplayScreenUpdateLocalizationAction.h"

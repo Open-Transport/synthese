@@ -52,5 +52,10 @@ namespace synthese
 		{
 			return true;
 		}
+
+		std::string HomeAdmin::getIcon() const
+		{
+			return "house.png";
+		}
 	}
 }

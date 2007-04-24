@@ -48,8 +48,6 @@ namespace synthese
 		class UpdateDisplayScreenAction : public server::Action
 		{
 		public:
-			static const std::string PARAMETER_LOCALIZATION_ID;
-			static const std::string PARAMETER_LOCALIZATION_COMMENT;
 			static const std::string PARAMETER_WIRING_CODE;
 			static const std::string PARAMETER_BLINKING_DELAY;
 			static const std::string PARAMETER_CLEANING_DELAY;
@@ -63,8 +61,6 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<DisplayScreen>			_screen;
-			boost::shared_ptr<const BroadcastPoint>		_localization;
-			std::string									_localizationComment;
 			std::string									_title;
 			int											_wiringCode;
 			int											_blinkingDelay;

@@ -44,6 +44,14 @@ namespace synthese
 		*/
 		class DisplayScreenTableSync : public db::SQLiteTableSyncTemplate<DisplayScreen>
 		{
+			static const std::string _COL_BROADCAST_POINT_ID;
+			static const std::string _COL_BROADCAST_POINT_NAME;
+			static const std::string _COL_LINE_EXISTS;
+			static const std::string _COL_LAST_MAINTENANCE_CONTROL;
+			static const std::string _COL_LAST_OK_MAINTENANCE_CONTROL;
+			static const std::string _COL_CORRUPTED_DATA_START_DATE;
+			static const std::string _COL_TYPE_NAME;
+
 		public:
 			//! \name Columns
 			//@{

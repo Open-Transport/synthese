@@ -62,6 +62,7 @@ namespace synthese
 			object->setLogKey(rows.getColumn(rowId, DBLogEntryTableSync::COL_LOG_KEY));
 			object->setDate(DateTime::FromSQLTimestamp(rows.getColumn(rowId, DBLogEntryTableSync::COL_DATE)));
 			object->setLevel((DBLogEntry::Level) Conversion::ToInt(rows.getColumn(rowId, DBLogEntryTableSync::COL_LEVEL)));
+			object->setObjectId(Conversion::ToLongLong(rows.getColumn(rowId, DBLogEntryTableSync::COL_OBJECT_ID)));
 
 			// User ID
 			if (Conversion::ToLongLong(rows.getColumn(rowId, DBLogEntryTableSync::COL_USER_ID)))
@@ -114,6 +115,7 @@ namespace synthese
 
 			query
 				<< "'"
+				<< "," << Conversion::ToString(object->getObjectId())
 				<< ")";
 
 			sqlite->execUpdate(query.str());
@@ -129,6 +131,7 @@ namespace synthese
 		const std::string DBLogEntryTableSync::COL_USER_ID = "user_id";
 		const std::string DBLogEntryTableSync::COL_LEVEL = "level";
 		const std::string DBLogEntryTableSync::COL_CONTENT = "content";
+		const std::string DBLogEntryTableSync::COL_OBJECT_ID = "object_id";
 
 		DBLogEntryTableSync::DBLogEntryTableSync()
 			: SQLiteTableSyncTemplate<DBLogEntry>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
@@ -139,6 +142,13 @@ namespace synthese
 			addTableColumn(COL_USER_ID, "INTEGER");
 			addTableColumn(COL_LEVEL, "INTEGER");
 			addTableColumn(COL_CONTENT, "TEXT");
+			addTableColumn(COL_OBJECT_ID, "INTEGER");
+
+			vector<string> m1;
+			m1.push_back(COL_LOG_KEY);
+			m1.push_back(COL_OBJECT_ID);
+			m1.push_back(COL_DATE);
+			addTableIndex(m1);
 		}
 
 		void DBLogEntryTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
@@ -159,6 +169,7 @@ namespace synthese
 			, const time::DateTime& endDate
 			, const shared_ptr<const User> user
 			, DBLogEntry::Level level
+			, uid objectId
 			, const std::string& text
 			, int first
 			, int number
@@ -184,6 +195,8 @@ namespace synthese
 				query << " AND " << COL_LEVEL << "=" << Conversion::ToString((int) level);
 			if (!text.empty())
 				query << " AND " << COL_CONTENT << " LIKE '%" << Conversion::ToSQLiteString(text, false) << "%'";
+			if (objectId != UNKNOWN_VALUE)
+				query << " AND " << COL_OBJECT_ID << "=" << Conversion::ToString(objectId);
 			if (orderByDate)
 				query << " ORDER BY " << COL_DATE << (raisingOrder ? " ASC" : " DESC");
 			if (orderByUser)

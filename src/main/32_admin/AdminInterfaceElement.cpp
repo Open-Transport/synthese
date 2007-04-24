@@ -68,5 +68,10 @@ namespace synthese
 		{
 			_superior = superior;
 		}
+
+		std::string AdminInterfaceElement::getIcon() const
+		{
+			return "application_form.png";
+		}
 	}
 }

@@ -141,17 +141,19 @@ namespace synthese
 			}
 		}
 
-		std::vector<shared_ptr<BroadcastPoint> > BroadcastPointTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<BroadcastPoint> > BroadcastPointTableSync::search(
+			boost::shared_ptr<const ConnectionPlace> place
+			, int first /*= 0*/, int number /*= 0*/ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE " ;
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-			if (number > 0)
+				<< " WHERE 1 " ;
+			if (place.get())
+				query << " AND " << TABLE_COL_PLACE_ID << "=" << place->getKey();
+ 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
 				query << " OFFSET " << Conversion::ToString(first);

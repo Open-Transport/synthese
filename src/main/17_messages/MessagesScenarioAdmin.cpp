@@ -80,7 +80,7 @@ namespace synthese
 			_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
 			_scenario = scenario.get();
 
-			if (_templateScenario.get())
+			if (_sentScenario.get())
 				_setSuperior("messages");
 		}
 
@@ -145,6 +145,11 @@ namespace synthese
 		bool MessagesScenarioAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		std::string MessagesScenarioAdmin::getIcon() const
+		{
+			return "cog.png";
 		}
 	}
 }

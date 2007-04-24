@@ -137,7 +137,7 @@ namespace synthese
 			db::SQLiteResult rows = sqlite->execQuery(query.str());
 			if (rows.getNbRows() <= 0)
 				throw DBEmptyResultException<T>(key, "ID not found in database.");
-			boost::shared_ptr<T> object(new T);
+			boost::shared_ptr<T> object(new T());
 			load(object.get(), rows);
 			return object;
 		}

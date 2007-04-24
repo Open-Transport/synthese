@@ -118,6 +118,8 @@ namespace synthese
 					@return The title of the admin compound, for display purposes.
 				*/
 				virtual std::string getTitle() const = 0;
+
+				virtual std::string getIcon() const;
 			//@}
 		};
 	}

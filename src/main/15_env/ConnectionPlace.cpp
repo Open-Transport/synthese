@@ -20,19 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <limits>
-#include <assert.h>
-
-#include "01_util/Constants.h"
-
-#include "04_time/DateTime.h"
-
 #include "15_env/ConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
 #include "15_env/SquareDistance.h"
 #include "15_env/Vertex.h"
 #include "15_env/Line.h"
 #include "15_env/Vertex.h"
+
+#include <assert.h>
+#include <limits>
+
+#include "01_util/Constants.h"
+
+#include "04_time/DateTime.h"
+
 
 using namespace std;
 
@@ -48,10 +49,11 @@ namespace synthese
 
 
 
-		ConnectionPlace::ConnectionPlace (const uid& id,
-						const std::string& name,
+		ConnectionPlace::ConnectionPlace (
+			uid id,
+						std::string name,
 						const City* city,
-						const ConnectionType& connectionType,
+						ConnectionType connectionType,
 						int defaultTransferDelay)
 			: synthese::util::Registrable<uid,ConnectionPlace> (id)
 			, AddressablePlace (name, city)
@@ -61,8 +63,6 @@ namespace synthese
 			, _maxTransferDelay (0)
 		{
 		}
-
-
 
 
 		ConnectionPlace::~ConnectionPlace ()

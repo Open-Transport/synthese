@@ -20,21 +20,26 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "34_departures_table/DisplayScreenTableSync.h"
+#include "34_departures_table/DisplayTypeTableSync.h"
+#include "34_departures_table/DisplayScreen.h"
+#include "34_departures_table/BroadcastPointTableSync.h"
+#include "34_departures_table/DeparturesTableModule.h"
 
-#include "01_util/Conversion.h"
+#include "15_env/EnvModule.h"
+#include "15_env/LineStopTableSync.h"
+#include "15_env/PhysicalStopTableSync.h"
+
+#include "13_dblog/DBLogEntryTableSync.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
-#include "15_env/EnvModule.h"
+#include "01_util/Conversion.h"
 
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/BroadcastPointTableSync.h"
-#include "34_departures_table/DeparturesTableModule.h"
+#include <sstream>
 
 using namespace std;
 using boost::shared_ptr;
@@ -45,6 +50,8 @@ namespace synthese
 	using namespace util;
 	using namespace departurestable;
 	using namespace env;
+	using namespace dblog;
+	using namespace time;
 
 	namespace db
 	{
@@ -224,7 +231,7 @@ namespace synthese
 
 			query
 				<< "'," << Conversion::ToString(object->getForceDestinationDelay())
-				<< "," << Conversion::ToString(object->getMaintenananceChecksPerDay())
+				<< "," << Conversion::ToString(object->getMaintenanceChecksPerDay())
 				<< "," << Conversion::ToString(object->getIsOnline())
 				<< "," << Conversion::ToSQLiteString(object->getMaintenanceMessage())
 				<< ")";
@@ -236,6 +243,14 @@ namespace synthese
 
 	namespace departurestable
 	{
+		const std::string DisplayScreenTableSync::_COL_BROADCAST_POINT_ID = "broadcast_point_id";
+		const std::string DisplayScreenTableSync::_COL_BROADCAST_POINT_NAME = "broadcast_point_name";
+		const std::string DisplayScreenTableSync::_COL_LINE_EXISTS = "line_exists";
+		const std::string DisplayScreenTableSync::_COL_LAST_MAINTENANCE_CONTROL = "last_maintenance_control";
+		const std::string DisplayScreenTableSync::_COL_LAST_OK_MAINTENANCE_CONTROL = "last_ok_maintenance_control";
+		const std::string DisplayScreenTableSync::_COL_CORRUPTED_DATA_START_DATE = "corrupted_data_start_date";
+		const std::string DisplayScreenTableSync::_COL_TYPE_NAME = "type_name";
+
 		const std::string DisplayScreenTableSync::COL_BROADCAST_POINT_ID = "broadcast_point_id";
 		const std::string DisplayScreenTableSync::COL_BROADCAST_POINT_COMMENT = "broadcast_point_comment";
 		const std::string DisplayScreenTableSync::COL_TYPE_ID = "type_id";
@@ -343,17 +358,29 @@ namespace synthese
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
-				<< " SELECT *"
+				<< " SELECT"
+					<< " d.*"
+					<< ", (SELECT b." << TABLE_COL_ID << " FROM " << BroadcastPointTableSync::TABLE_NAME << " AS b WHERE b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID << ") AS " << _COL_BROADCAST_POINT_ID
+					<< ", (SELECT b." << BroadcastPointTableSync::TABLE_COL_NAME << " FROM " << BroadcastPointTableSync::TABLE_NAME << " AS b WHERE b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID << ") AS " << _COL_BROADCAST_POINT_NAME
+					<< ", EXISTS(SELECT ls." << TABLE_COL_ID << " FROM " << LineStopTableSync::TABLE_NAME << " AS ls INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID << " INNER JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=p." << PhysicalStopTableSync::COL_PLACEID << " WHERE b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID << ") AS " << _COL_LINE_EXISTS
+					<< ", (SELECT l." << TABLE_COL_ID << " FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " ORDER BY l." << DBLogEntryTableSync::COL_DATE << " DESC LIMIT 1) AS " << _COL_LAST_MAINTENANCE_CONTROL
+					<< ", (SELECT MAX(l." << DBLogEntryTableSync::COL_DATE << ") FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " AND l." << DBLogEntryTableSync::COL_LEVEL << "=" << static_cast<int>(DBLogEntry::DB_LOG_INFO) << ") AS " << _COL_LAST_OK_MAINTENANCE_CONTROL
+					<< ", (SELECT l." << TABLE_COL_ID << " FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " AND l." << DBLogEntryTableSync::COL_LEVEL << "=" << static_cast<int>(DBLogEntry::DB_LOG_ERROR) << " ORDER BY l." << DBLogEntryTableSync::COL_DATE << " DESC LIMIT 1) AS " << _COL_CORRUPTED_DATA_START_DATE
+					<< ", (SELECT t." << DisplayTypeTableSync::TABLE_COL_NAME << " FROM " << DisplayTypeTableSync::TABLE_NAME << " AS t WHERE t." << TABLE_COL_ID << "=d." << COL_TYPE_ID << ") AS " << _COL_TYPE_NAME
 				<< " FROM " << TABLE_NAME << " AS d"
-				<< " LEFT JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID
-				<< " WHERE " 
-				<< "d." << TABLE_COL_ID << " LIKE '%" << (duid ? Conversion::ToString(duid) : "") << "%'";
+				<< " WHERE 1 ";
+			if (duid > 0)
+				query << " AND d." << TABLE_COL_ID << "=" << Conversion::ToString(duid);
 			if (localizationid > 0)
-				query << " AND b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=" << localizationid;
+				query << " AND " << _COL_BROADCAST_POINT_ID << "=" << localizationid;
 			if (typeuid > 0)
 				query << " AND d." << COL_TYPE_ID << "=" << typeuid;
 			if (orderByUid)
 				query << " ORDER BY d." << TABLE_COL_ID << (raisingOrder ? " ASC" : " DESC");
+			if (orderByLocalization)
+				query << " ORDER BY " << _COL_BROADCAST_POINT_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (orderByType)
+				query << " ORDER BY " << _COL_TYPE_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -368,6 +395,76 @@ namespace synthese
 					shared_ptr<DisplayScreen> object(new DisplayScreen());
 					load(object.get(), result, i);
 					objects.push_back(object);
+
+					DisplayScreen::Complements c;
+					DateTime now;
+
+					// No news test
+					if (object->getMaintenanceChecksPerDay())
+					{
+						if (Conversion::ToLongLong(result.getColumn(i, _COL_LAST_MAINTENANCE_CONTROL)))
+						{
+							shared_ptr<DBLogEntry> le = DBLogEntryTableSync::get(Conversion::ToLongLong(result.getColumn(i, _COL_LAST_MAINTENANCE_CONTROL)));
+							if ((now - le->getDate()) > ((1440 / object->getMaintenanceChecksPerDay()) * 2))
+							{
+								if ((now - le->getDate()) < ((1440 / object->getMaintenanceChecksPerDay()) * 5))
+									c.status = DISPLAY_STATUS_NO_NEWS_WARNING;
+								else
+									c.status = DISPLAY_STATUS_NO_NEWS_ERROR;
+								c.statusText = string("L'afficheur n'a pas envoyé de message de maintenance depuis ") + Conversion::ToString(now - le->getDate()) + string(" minutes.");
+								c.lastControl = le->getDate();
+							}
+							else
+							{
+								c.status = DISPLAY_STATUS_OK;
+								c.statusText = "OK";
+							}
+						}
+						else
+						{
+							c.status = DISPLAY_STATUS_NO_NEWS_WARNING;
+							c.statusText = "L'afficheur n'a jamais envoyé de message de maintenance.";
+						}
+					}
+
+					// Bad news test
+					if (Conversion::ToLongLong(result.getColumn(i, _COL_LAST_MAINTENANCE_CONTROL)))
+					{
+						shared_ptr<DBLogEntry> le = DBLogEntryTableSync::get(Conversion::ToLongLong(result.getColumn(i, _COL_LAST_MAINTENANCE_CONTROL)));
+						if (le->getLevel() == DBLogEntry::DB_LOG_ERROR)
+							c.status = DISPLAY_STATUS_HARDWARE_ERROR;
+						else
+							c.status = DISPLAY_STATUS_HARDWARE_WARNING;
+						
+						c.statusText = le->getStringContent();
+					}
+
+					// Last OK control
+					c.lastOKStatus = DateTime::FromSQLTimestamp(result.getColumn(i, _COL_LAST_OK_MAINTENANCE_CONTROL));
+
+					// Data control
+					if (!Conversion::ToLongLong(result.getColumn(i, _COL_BROADCAST_POINT_ID)))
+					{
+						c.dataControl = DISPLAY_DATA_CORRUPTED;
+						c.dataControlText = "L'afficheur est relié à un point de diffusion inexistant.";
+						/// @todo Put here a dblog entry writing
+						/// @todo Put a control of the link between broadcast point and its place
+					}
+					else if (!Conversion::ToInt(result.getColumn(i, _COL_LINE_EXISTS)))
+					{
+						c.dataControl = DISPLAY_DATA_NO_LINES;
+						c.dataControlText = "Aucune ligne ne dessert l'afficheur.";
+					}
+					else
+					{
+						c.dataControl = DISPLAY_DATA_OK;
+						c.dataControlText = "OK";
+						/// @todo Put here a dblog entry writing if the last entry was negative
+					}
+
+					c.lastOKDataControl = DateTime::FromSQLTimestamp(result.getColumn(i, _COL_LAST_OK_MAINTENANCE_CONTROL));
+
+					object->setComplements(c);
 				}
 				return objects;
 			}

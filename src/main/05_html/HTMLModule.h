@@ -82,6 +82,9 @@ input[type=submit]:hover {background-color:#0080E0;}
 			*/
 			static std::string getHTMLLink(const std::string& url, const std::string& content);
 
+			static std::string getHTMLImage(const std::string& url, const std::string& alt);
+
+			
 		};
 
 

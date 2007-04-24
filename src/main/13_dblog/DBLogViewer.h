@@ -96,12 +96,13 @@ namespace synthese
 		{
 			//! \name Stored parameters
 			//@{
-				time::DateTime						_searchStartDate;
-				time::DateTime						_searchEndDate;
-				DBLogEntry::Level					_searchLevel;
+				time::DateTime							_searchStartDate;
+				time::DateTime							_searchEndDate;
+				DBLogEntry::Level						_searchLevel;
 				boost::shared_ptr<const security::User>	_searchUser;
-				std::string							_searchText;
-				boost::shared_ptr<DBLog>			_dbLog;
+				std::string								_searchText;
+				boost::shared_ptr<DBLog>				_dbLog;
+				uid										_searchObjectId;
 			//@}
 
 			//! \name Stored search result
@@ -136,6 +137,7 @@ namespace synthese
 			*/
 			std::string getTitle() const;
 
+			std::string getIcon() const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}

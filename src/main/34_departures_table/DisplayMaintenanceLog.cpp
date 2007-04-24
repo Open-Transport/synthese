@@ -47,67 +47,34 @@ namespace synthese
 		DBLog::ColumnsVector DisplayMaintenanceLog::getColumnNames() const
 		{
 			ColumnsVector v;
-			v.push_back("Afficheur");
 			v.push_back("Type");
 			v.push_back("Description");
 			return v;
 		}
 
-		void DisplayMaintenanceLog::addControlEntry( boost::shared_ptr<const DisplayScreen> screen, const DBLogEntry::Level& level, const std::string& text )
-		{
-			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(screen->getKey()));
-			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_DATA_CONTROL));
-			c.push_back(text);
-			DBLog::_addEntry(level, c, boost::shared_ptr<const User>());
-		}
-
 		void DisplayMaintenanceLog::addAdminEntry(boost::shared_ptr<const DisplayScreen> screen, const DBLogEntry::Level& level, boost::shared_ptr<const security::User> user, const std::string& field, const std::string& oldValue, const std::string& newValue )
 		{
 			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(screen->getKey()));
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_ADMIN));
 			c.push_back(field + " : " + oldValue + " => " + newValue);
-			DBLog::_addEntry(DBLogEntry::DB_LOG_INFO, c, user);
+			DBLog::_addEntry(DBLogEntry::DB_LOG_INFO, c, user, screen->getKey());
 		}
 
 		void DisplayMaintenanceLog::addStatusEntry( boost::shared_ptr<const DisplayScreen> screen, bool status )
 		{
 			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(screen->getKey()));
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_STATUS));
 			c.push_back(Conversion::ToString(status));
-			DBLog::_addEntry(status ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_ERROR, c, boost::shared_ptr<const User>());
-		}
-
-		void DisplayMaintenanceLog::addDataControlEntry( boost::shared_ptr<const DisplayScreen> screen, bool ok, const std::string& text )
-		{
-			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(screen->getKey()));
-			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_DATA_CONTROL));
-			c.push_back(text);
-			DBLog::_addEntry(ok ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_WARNING, c, boost::shared_ptr<const User>());
+			DBLog::_addEntry(status ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_ERROR, c, boost::shared_ptr<const User>(), screen->getKey());
 		}
 
 		DBLog::ColumnsVector DisplayMaintenanceLog::parse( const DBLogEntry::Content& cols ) const
 		{
 			ColumnsVector v;
 
-			// Screen
-			try
-			{
-				shared_ptr<const DisplayScreen> screen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(cols.front()));
-				v.push_back(screen->getFullName());
-			}
-			catch (...)
-			{
-				v.push_back(cols.front());
-			}
-
 			// Type
 			switch ((EntryType) Conversion::ToInt(cols.front()))
 			{
-			case DISPLAY_MAINTENANCE_DATA_CONTROL: v.push_back("Contrôle des données"); break;
 			case DISPLAY_MAINTENANCE_DISPLAY_CONTROL: v.push_back("Contrôle du matériel"); break;
 			case DISPLAY_MAINTENANCE_ADMIN: v.push_back("Administration"); break;
 			case DISPLAY_MAINTENANCE_STATUS: v.push_back("Etat en service"); break;
@@ -118,6 +85,21 @@ namespace synthese
 			v.push_back(cols.front());
 
 			return v;
+		}
+
+		std::string DisplayMaintenanceLog::getObjectName( uid id ) const
+		{
+			// Screen
+			try
+			{
+				shared_ptr<const DisplayScreen> screen = DeparturesTableModule::getDisplayScreens().get(id);
+				return screen->getFullName();
+			}
+			catch (...)
+			{
+				return DBLog::getObjectName(id);
+			}
+
 		}
 	}
 }

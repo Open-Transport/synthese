@@ -22,6 +22,7 @@
 
 #include "05_html/HTMLForm.h"
 #include "05_html/HTMLTable.h"
+#include "05_html/Constants.h"
 
 #include "13_dblog/DBLogViewer.h"
 
@@ -31,6 +32,7 @@
 
 #include "34_departures_table/DisplayMaintenanceAdmin.h"
 #include "34_departures_table/DisplayScreen.h"
+#include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/UpdateDisplayMaintenanceAction.h"
 
@@ -54,18 +56,14 @@ namespace synthese
 
 		void DisplayMaintenanceAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
-				if (it == map.end())
-					throw AdminParametersException("Screen not specified");
+			ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
+			if (it == map.end())
+				throw AdminParametersException("Screen not specified");
 
-				_displayScreen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
-			}
-			catch (DisplayScreen::RegistryKeyException e)
-			{
-				throw AdminParametersException("Specified display screen not found (" + Conversion::ToString(e.getKey()) +")");
-			}
+			vector<shared_ptr<DisplayScreen> > result = DisplayScreenTableSync::search(Conversion::ToLongLong(it->second));
+			if (result.empty())
+				throw AdminParametersException("Specified display screen not found (" + it->second +")");
+			_displayScreen = result.front();
 		}
 
 		string DisplayMaintenanceAdmin::getTitle() const
@@ -84,6 +82,11 @@ namespace synthese
 			goToLogRequest.getFunction()->setParameter(DBLogViewer::PARAMETER_LOG_KEY, "displaymaintenance");
 			goToLogRequest.setObjectId(request->getObjectId());
 
+			FunctionRequest<AdminRequest> goToDataLogRequest(request);
+			goToDataLogRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DBLogViewer>());
+			goToDataLogRequest.getFunction()->setParameter(DBLogViewer::PARAMETER_LOG_KEY, "displaydata");
+			goToDataLogRequest.setObjectId(request->getObjectId());
+
 			stream << "<h1>Paramètres de maintenance</h1>";
 
 			HTMLForm f(updateRequest.getHTMLForm("update"));
@@ -93,7 +96,7 @@ namespace synthese
 
 			stream << t.row();
 			stream << t.col() << "Nombre de contrôles par jour";
-			stream << t.col() << f.getSelectNumberInput(UpdateDisplayMaintenanceAction::PARAMETER_CONTROLS, 0, 1440, _displayScreen->getMaintenananceChecksPerDay(), 10);
+			stream << t.col() << f.getSelectNumberInput(UpdateDisplayMaintenanceAction::PARAMETER_CONTROLS, 0, 1440, _displayScreen->getMaintenanceChecksPerDay(), 10);
 
 			stream << t.row();
 			stream << t.col() << "Afficheur déclaré en service";
@@ -115,17 +118,25 @@ namespace synthese
 
 			stream << ct.row();
 			stream << ct.col() << "Etat";
-			stream << ct.col() /* << pastille* <FONT face=\"Wingdings\" color=\"#00cc00\">
-				<FONT color=\"#ff9900\">l<FONT face=\"Verdana\"> <STRONG>Warning </STRONG><EM>(depuis 4j 22h 
-				35min)</EM></FONT></FONT></FONT></P>" */;
+			stream << ct.col();
+			if (_displayScreen->getComplements().dataControl == DISPLAY_DATA_CORRUPTED)
+				stream << HTMLModule::getHTMLImage(IMG_URL_ERROR, _displayScreen->getComplements().dataControlText);
+			if (_displayScreen->getComplements().dataControl == DISPLAY_DATA_NO_LINES)
+				stream << HTMLModule::getHTMLImage(IMG_URL_WARNING, _displayScreen->getComplements().dataControlText);
+			if (_displayScreen->getComplements().dataControl == DISPLAY_DATA_OK)
+				stream << HTMLModule::getHTMLImage(IMG_URL_INFO, "OK");
+
 
 			stream << ct.row();
-			stream << ct.col() << "Motif de l'alerte";
-			stream << ct.col() << "Aucune ligne ne dessert l'afficheur";
+			stream << ct.col() << "Détail";
+			stream << ct.col() << _displayScreen->getComplements().dataControlText;
 
 			stream << ct.row();
 			stream << ct.col() << "Date du dernier contrôle positif";
-			stream << ct.col() << "13/9/2006 8:30";
+			stream << ct.col() << _displayScreen->getComplements().lastOKDataControl.toString();
+
+			stream << ct.row();
+			stream << ct.col(2) << HTMLModule::getLinkButton(goToDataLogRequest.getURL(), "Accéder au journal de surveillance des données de l'afficheur", string(), "book_open.png");
 
 			stream << ct.close();
 
@@ -136,23 +147,30 @@ namespace synthese
 
 			stream << mt.row();
 			stream << mt.col() << "Etat";
-			stream << mt.col() /*<< ^pastille <FONT face=\"Wingdings\"><FONT color=\"#ff0000\">l<FONT face=\"Verdana\">
-				<STRONG>Error </STRONG><EM>(depuis 1j 12h 23min)</EM></FONT></FONT></FONT></P> */;
+			stream << mt.col();
+			if (_displayScreen->getComplements().status == DISPLAY_STATUS_NO_NEWS_WARNING
+				|| _displayScreen->getComplements().status == DISPLAY_STATUS_HARDWARE_WARNING)
+				stream << HTMLModule::getHTMLImage(IMG_URL_WARNING, _displayScreen->getComplements().statusText);
+			if (_displayScreen->getComplements().status == DISPLAY_STATUS_NO_NEWS_ERROR
+				|| _displayScreen->getComplements().status == DISPLAY_STATUS_HARDWARE_ERROR)
+				stream << HTMLModule::getHTMLImage(IMG_URL_ERROR, _displayScreen->getComplements().statusText);
+			if (_displayScreen->getComplements().status == DISPLAY_STATUS_OK)
+				stream << HTMLModule::getHTMLImage(IMG_URL_INFO, "OK");
+
+			stream << mt.row();
+			stream << mt.col() << "Détail";
+			stream << mt.col() << _displayScreen->getComplements().statusText;
 
 			stream << mt.row();
 			stream << mt.col() << "Date du dernier contrôle";
-			stream << mt.col() << "21/09/2006 16:30";
+			stream << mt.col() << _displayScreen->getComplements().lastControl.toString();
 
 			stream << mt.row();
 			stream << mt.col() << "Date du dernier contrôle positif";
-			stream << mt.col() << "20/09/2006 15:30";
+			stream << mt.col() << _displayScreen->getComplements().lastOKStatus.toString();
 
 			stream << mt.row();
-			stream << mt.col() << "Motif de l'alerte";
-			stream << mt.col() << "Température trop élevée, terminal éteint";
-
-			stream << mt.row();
-			stream << mt.col(2) << HTMLModule::getLinkButton(goToLogRequest.getURL(), "Accéder au journal de maintenance de l'afficheur");
+			stream << mt.col(2) << HTMLModule::getLinkButton(goToLogRequest.getURL(), "Accéder au journal de maintenance de l'afficheur", string(), "book_open.png");
 
 			stream << mt.close();
 		}
@@ -160,6 +178,11 @@ namespace synthese
 		bool DisplayMaintenanceAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		std::string DisplayMaintenanceAdmin::getIcon() const
+		{
+			return "monitor_lightning.png";
 		}
 	}
 }

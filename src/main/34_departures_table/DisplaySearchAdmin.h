@@ -150,6 +150,8 @@ namespace synthese
 			*/
 			std::string getTitle() const;
 
+			std::string getIcon() const;
+
 			static std::string DisplaySearchAdmin::getHtmlSearchForm(const html::HTMLForm& form, uid screenUid, uid placeUid, uid lineUid, uid typeUid, int state, int message );
 
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;

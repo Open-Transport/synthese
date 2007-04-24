@@ -30,6 +30,7 @@
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
+#include "01_util/Constants.h"
 
 #include "15_env/AddressablePlace.h"
 #include "15_env/Types.h"
@@ -84,11 +85,13 @@ namespace synthese
 
 		public:
 
-			ConnectionPlace (const uid& id,
-					const std::string& name,
-					const City* city,
-					const ConnectionType& connectionType,
-					int defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY);
+			ConnectionPlace (
+				uid id = UNKNOWN_VALUE
+				, std::string name = std::string()
+				, const City* city = NULL
+				, ConnectionType connectionType = CONNECTION_TYPE_FORBIDDEN
+				, int defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY
+				);
 
 			~ConnectionPlace ();
 

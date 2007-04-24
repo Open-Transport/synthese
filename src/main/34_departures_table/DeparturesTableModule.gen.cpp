@@ -41,6 +41,7 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::departure
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenRemoveDisplayedPlaceAction>("dsrdp");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenRemoveForbiddenPlaceAction>("dsrfp");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayMaintenanceAction>("udm");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenUpdateLocalizationAction>("dsula");
 
 
 synthese::util::Factory<synthese::server::Function>::integrate<synthese::departurestable::DisplayScreenContentRequest>("tdg");
@@ -53,6 +54,7 @@ synthese::util::Factory<synthese::security::Right>::integrate<synthese::departur
 synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::departurestable::ArrivalDepartureTableLog>("departurestable");
 synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::departurestable::BroadcastPointsDataLog>("broadcastpoints");
 synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::departurestable::DisplayMaintenanceLog>("displaymaintenance");
+synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::departurestable::DisplayDataControlLog>("displaydata");
 
 synthese::util::Factory<synthese::messages::AlarmRecipient>::integrate<synthese::departurestable::DisplayScreenAlarmRecipient>("displayscreen");
 

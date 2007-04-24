@@ -108,5 +108,10 @@ namespace synthese
 		{
 			return true;
 		}
+
+		std::string DisplayTypesAdmin::getIcon() const
+		{
+			return "monitor.png";
+		}
 	}
 }

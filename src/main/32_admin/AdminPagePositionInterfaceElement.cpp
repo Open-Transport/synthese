@@ -55,6 +55,7 @@ namespace synthese
 				str << getUpPages(*it, request, false);
 				str << "&nbsp;&gt;&nbsp;";
 			}
+			str << HTMLModule::getHTMLImage(page->getIcon(), page->getTitle());
 			if (!isFirst)
 			{
 				FunctionRequest<AdminRequest> r(request);

@@ -26,18 +26,21 @@
 
 #include "01_util/Constants.h"
 
+#include "02_db/DBEmptyResultException.h"
+
 #include "05_html/HTMLForm.h"
 #include "05_html/HTMLTable.h"
 
+#include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/ConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
-#include "15_env/EnvModule.h"
 
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminParametersException.h"
 
 #include "34_departures_table/DisplayAdmin.h"
+#include "34_departures_table/DisplayScreenUpdateLocalizationAction.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/BroadcastPoint.h"
@@ -63,6 +66,7 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace html;
+	using namespace db;
 
 	namespace departurestable
 	{
@@ -80,6 +84,11 @@ namespace synthese
 
 		void DisplayAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request /*= NULL*/ ) const
 		{
+			// Localization update request
+			ActionFunctionRequest<DisplayScreenUpdateLocalizationAction,AdminRequest> localizationUpdateDisplayRequest(request);
+			localizationUpdateDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			localizationUpdateDisplayRequest.setObjectId(request->getObjectId());
+
 			// Update request
 			ActionFunctionRequest<UpdateDisplayScreenAction,AdminRequest> updateDisplayRequest(request);
 			updateDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
@@ -162,13 +171,13 @@ namespace synthese
 			// Filling of the stream
 			stream << "<h1>Emplacement</h1>";
 
-			HTMLForm uf(updateDisplayRequest.getHTMLForm("update"));
+			HTMLForm uf(localizationUpdateDisplayRequest.getHTMLForm("updatelocalization"));
 			HTMLTable t;
 			
 			stream << uf.open() << t.open();
 			stream << t.row();
 			stream << t.col() << "Lieu logique";
-			stream << t.col() << uf.getSelectInput(PARAMETER_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(), _place ? _place->getKey() : 0);
+			stream << t.col() << uf.getSelectInput(DisplayScreenUpdateLocalizationAction::PARAMETER_PLACE_ID, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(), _place ? _place->getKey() : 0);
 
 			stream << t.row();
 			stream << t.col() << "Lieu physique";
@@ -176,11 +185,11 @@ namespace synthese
 			if (_place == NULL)
 				stream << "(Sélectionnez un lieu logique en premier)";
 			else
-				stream << uf.getSelectInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_ID, DeparturesTableModule::getBroadcastPointLabels(_place, false), _displayScreen->getLocalization().get() ? _displayScreen->getLocalization()->getKey() : 0);
+				stream << uf.getSelectInput(DisplayScreenUpdateLocalizationAction::PARAMETER_LOCALIZATION_ID, DeparturesTableModule::getBroadcastPointLabels(_place, false), _displayScreen->getLocalization().get() ? _displayScreen->getLocalization()->getKey() : 0);
 			
 			stream << t.row();
 			stream << t.col() << "Complément de précision";
-			stream << t.col() << uf.getTextInput(UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_COMMENT, _displayScreen->getLocalizationComment());
+			stream << t.col() << uf.getTextInput(DisplayScreenUpdateLocalizationAction::PARAMETER_LOCALIZATION_COMMENT, _displayScreen->getLocalizationComment());
 
 			stream << t.row();
 			stream << t.col(2) << uf.getSubmitButton("Enregistrer");
@@ -421,25 +430,25 @@ namespace synthese
 
 			try
 			{
-				_displayScreen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
+				_displayScreen = DisplayScreenTableSync::get(Conversion::ToLongLong(it->second));
 				if (_displayScreen->getLocalization())
 					_place = _displayScreen->getLocalization()->getConnectionPlace();
 			}
-			catch (DisplayScreen::RegistryKeyException e)
+			catch (DBEmptyResultException<DisplayScreen>)
 			{
 				throw AdminParametersException("Display screen not found");
 			}
 
 			if (_place == NULL)
 			{
-				it = map.find(PARAMETER_PLACE);
+				it = map.find(DisplayScreenUpdateLocalizationAction::PARAMETER_PLACE_ID);
 				if (it != map.end())
 				{
 					try
 					{
-						_place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(it->second));
+						_place = ConnectionPlaceTableSync::get(Conversion::ToLongLong(it->second));
 					}
-					catch (ConnectionPlace::RegistryKeyException e)
+					catch (DBEmptyResultException<ConnectionPlace>)
 					{
 						throw AdminParametersException("Place not found");
 					}
@@ -450,6 +459,11 @@ namespace synthese
 		bool DisplayAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		std::string DisplayAdmin::getIcon() const
+		{
+			return "monitor.png";
 		}
 	}
 }

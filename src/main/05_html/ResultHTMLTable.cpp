@@ -71,12 +71,8 @@ namespace synthese
 
 					if (it->first == _orderField)
 					{
-						s << "&nbsp;";
-						if (!iconPath.empty())
-							s << "<img src=\"" << iconPath << (_raisingOrder ? "down" : "up") << ".png\" alt=\"" << (_raisingOrder ? "V" : "^") << "\" />";
-						else
-							s << (_raisingOrder ? "V" : "^");
-					}
+						s << "&nbsp;" << HTMLModule::getHTMLImage(iconPath + (_raisingOrder ? "down" : "up") + ".png", _raisingOrder ? "V" : "^");
+					}						
 				}
 				else
 					s << it->second;
@@ -122,14 +118,14 @@ namespace synthese
 				{
 					HTMLForm::HiddenFieldsMap f;
 					f.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString((_first > _maxSize) ? _first - _maxSize : 0)));
-					s << HTMLModule::getHTMLLink(_searchForm.getURL(f), "<<") << "&nbsp;|&nbsp;";
+					s << HTMLModule::getHTMLLink(_searchForm.getURL(f), HTMLModule::getHTMLImage("resultset_previous.png", "<<")) << "&nbsp;|&nbsp;";
 				}
 				s << _first << "&nbsp;->&nbsp;" << (_first + _size - 1);
 				if (_next)
 				{
 					HTMLForm::HiddenFieldsMap f;
 					f.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString(_first + _size)));
-					s << "&nbsp;|&nbsp;" << HTMLModule::getHTMLLink(_searchForm.getURL(f), ">>");
+					s << "&nbsp;|&nbsp;" << HTMLModule::getHTMLLink(_searchForm.getURL(f), HTMLModule::getHTMLImage("resultset_next.png", ">>"));
 				}
 			}
 			s << HTMLTable::close();

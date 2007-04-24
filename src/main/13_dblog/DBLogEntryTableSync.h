@@ -54,6 +54,7 @@ namespace synthese
 			static const std::string COL_USER_ID;
 			static const std::string COL_LEVEL;
 			static const std::string COL_CONTENT;
+			static const std::string COL_OBJECT_ID;
 
 			DBLogEntryTableSync();
 
@@ -72,6 +73,7 @@ namespace synthese
 				, const time::DateTime& endDate
 				, const boost::shared_ptr<const security::User> user
 				, DBLogEntry::Level level
+				, uid id
 				, const std::string& text
 				, int first = 0
 				, int number = 0

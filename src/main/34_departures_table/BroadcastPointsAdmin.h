@@ -109,6 +109,7 @@ namespace synthese
 			*/
 			std::string getTitle() const;
 
+			std::string getIcon() const;
 			/** isAuthorized.
 				@param request
 				@return bool

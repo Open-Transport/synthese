@@ -244,5 +244,10 @@ namespace synthese
 		{
 			return true;
 		}
+
+		std::string MessagesLibraryAdmin::getIcon() const
+		{
+			return "package.png";
+		}
 	}
 }

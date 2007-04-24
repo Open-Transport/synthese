@@ -177,9 +177,9 @@ namespace synthese
 				stream << t.col() << (screen->getType() ? screen->getType()->getName() : "(indéterminé)");
 				stream << t.col(); // Bullets showing the states of the display
 				stream << t.col(); // Bullet showing the message status
-				stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Modifier");
-				stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler");
-				stream << t.col() << HTMLModule::getLinkButton(maintRequest.getURL(), "Supervision");
+				stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Modifier", string(), "monitor_edit.png");
+				stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "monitor_go.png");
+				stream << t.col() << HTMLModule::getLinkButton(maintRequest.getURL(), "Supervision", string(), "monitor_lightning.png");
 			}
 
 			stream << t.row();
@@ -221,6 +221,11 @@ namespace synthese
 		bool DisplaySearchAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		std::string DisplaySearchAdmin::getIcon() const
+		{
+			return "monitor.png";
 		}
 	}
 }

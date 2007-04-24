@@ -51,7 +51,7 @@ namespace synthese
 			ParametersMap::const_iterator it;
 
 			it = map.find(PARAMETER_TEMPLATE_ID);
-			if (it != map.end())
+			if (it != map.end() && Conversion::ToLongLong(it->second))
 			{
 				if (!DeparturesTableModule::getDisplayScreens().contains(Conversion::ToLongLong(it->second)))
 					throw ActionException("Specified template not found");

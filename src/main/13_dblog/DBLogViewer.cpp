@@ -68,7 +68,7 @@ namespace synthese
 		DBLogViewer::DBLogViewer()
 			: AdminInterfaceElement("dblogs", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
 			, _searchLevel(DBLogEntry::DB_LOG_UNKNOWN), _searchStartDate(TIME_UNKNOWN)
-			, _searchEndDate(TIME_UNKNOWN)
+			, _searchEndDate(TIME_UNKNOWN), _searchObjectId(UNKNOWN_VALUE)
 		{}
 
 		void DBLogViewer::setFromParametersMap(const ParametersMap& map)
@@ -108,6 +108,11 @@ namespace synthese
 			if (it != map.end())
 				_searchText = it->second;
 
+			// Object
+			it = map.find(Request::PARAMETER_OBJECT_ID);
+			if (it != map.end())
+				_searchObjectId = Conversion::ToLongLong(it->second);
+
 			// table parameters
 			_resultTableRequestParameters = ResultHTMLTable::getParameters(map, PARAMETER_START_DATE, 30);
 
@@ -118,6 +123,7 @@ namespace synthese
 				, _searchEndDate
 				, _searchUser
 				, _searchLevel
+				, _searchObjectId
 				, _searchText
 				, _resultTableRequestParameters.first
 				, _resultTableRequestParameters.maxSize
@@ -161,6 +167,7 @@ namespace synthese
 			v.push_back(make_pair(PARAMETER_SEARCH_TYPE, "Type"));
 			v.push_back(make_pair(PARAMETER_START_DATE, "Date"));
 			v.push_back(make_pair(PARAMETER_SEARCH_USER, "Utilisateur"));
+			v.push_back(make_pair(string(), "Objet"));
 			DBLog::ColumnsVector customCols = _dbLog->getColumnNames();
 			for (DBLog::ColumnsVector::const_iterator it = customCols.begin(); it != customCols.end(); ++it)
 				v.push_back(make_pair(string(), *it));
@@ -173,9 +180,10 @@ namespace synthese
 			{
 				shared_ptr<DBLogEntry> dbe = *it;
 				stream << t.row();
-				stream << t.col() << DBLogModule::getEntryLevelLabel(dbe->getLevel());
+				stream << t.col() << HTMLModule::getHTMLImage(DBLogModule::getEntryIcon(dbe->getLevel()), DBLogModule::getEntryLevelLabel(dbe->getLevel()));
 				stream << t.col() << dbe->getDate().toString();
 				stream << t.col() << (dbe->getUser() ? dbe->getUser()->getLogin() : "");
+				stream << t.col() << (dbe->getObjectId() ? _dbLog->getObjectName(dbe->getObjectId()) : string());
 
 				DBLog::ColumnsVector cols = _dbLog->parse(dbe->getContent());
 				for (DBLog::ColumnsVector::const_iterator it = cols.begin(); it != cols.end(); ++it)
@@ -188,6 +196,11 @@ namespace synthese
 		bool DBLogViewer::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		std::string DBLogViewer::getIcon() const
+		{
+			return "book_open.png";
 		}
 	}
 }

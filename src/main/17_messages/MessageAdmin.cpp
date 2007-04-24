@@ -33,6 +33,7 @@
 #include "17_messages/AlarmAddLinkAction.h"
 #include "17_messages/AlarmRemoveLinkAction.h"
 #include "17_messages/SentAlarm.h"
+#include "17_messages/AlarmTemplate.h"
 #include "17_messages/AlarmTableSync.h"
 
 #include "30_server/ActionFunctionRequest.h"
@@ -80,6 +81,9 @@ namespace synthese
 			}
 
 			_parameters = map;
+
+			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
+				_setSuperior("messageslibrary");
 		}
 
 		void MessageAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
@@ -178,6 +182,11 @@ namespace synthese
 		bool MessageAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		std::string MessageAdmin::getIcon() const
+		{
+			return "note.png";
 		}
 	}
 }

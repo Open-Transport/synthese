@@ -198,5 +198,10 @@ namespace synthese
 		{
 			return true;
 		}
+
+		std::string ProfileAdmin::getIcon() const
+		{
+			return "group.png";
+		}
 	}
 }

@@ -20,17 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Constants.h"
-
 #include "13_dblog/DBLogModule.h"
+
+#include "05_html/Constants.h"
+
+#include "01_util/Constants.h"
 
 using namespace std;
 
 namespace synthese
 {
+	using namespace html;
+
 	namespace dblog
 	{
-
 
 		vector<pair<int, std::string> > DBLogModule::getEntryLevelLabels( bool withAll/*=false*/ )
 		{
@@ -51,6 +54,17 @@ namespace synthese
 			case DBLogEntry::DB_LOG_INFO : return "Information";
 			case DBLogEntry::DB_LOG_WARNING : return "Alerte";
 			case DBLogEntry::DB_LOG_ERROR : return "Erreur";
+			}
+		}
+
+		std::string DBLogModule::getEntryIcon( const DBLogEntry::Level& level )
+		{
+			switch(level)
+			{
+			case DBLogEntry::DB_LOG_INFO : return IMG_URL_INFO;
+			case DBLogEntry::DB_LOG_WARNING : return IMG_URL_WARNING;
+			case DBLogEntry::DB_LOG_ERROR : return IMG_URL_ERROR;
+			default : return string();
 			}
 		}
 	}

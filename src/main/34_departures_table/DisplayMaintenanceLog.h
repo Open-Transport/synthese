@@ -61,8 +61,7 @@ namespace synthese
 			DisplayMaintenanceLog();
 			DBLog::ColumnsVector getColumnNames() const;
 			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
-			void	addControlEntry(boost::shared_ptr<const DisplayScreen> screen, const dblog::DBLogEntry::Level& level, const std::string& text);
-			void	addDataControlEntry(boost::shared_ptr<const DisplayScreen> screen, bool ok, const std::string& text);
+			std::string getObjectName(uid id) const;
 			void	addAdminEntry(boost::shared_ptr<const DisplayScreen> screen, const dblog::DBLogEntry::Level& level, boost::shared_ptr<const security::User> user, const std::string& field, const std::string& oldValue, const std::string& newValue);
 			void	addStatusEntry(boost::shared_ptr<const DisplayScreen> screen, bool status);
 		};

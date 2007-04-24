@@ -29,6 +29,7 @@
 #include "04_time/DateTime.h"
 
 #include "01_util/Registrable.h"
+#include "01_util/Constants.h"
 
 namespace synthese
 {
@@ -42,11 +43,12 @@ namespace synthese
 			, public util::Registrable<uid, SentAlarm>
 		{
 		public:
-			typedef struct  
+			struct Complements
 			{
 				AlarmConflict	conflictStatus;
 				int				recipientsNumber;
-			} Complements;
+				Complements() : conflictStatus(ALARM_CONFLICT_UNKNOWN), recipientsNumber(UNKNOWN_VALUE) {}
+			};
 
 		private:
 			Complements					_complements;

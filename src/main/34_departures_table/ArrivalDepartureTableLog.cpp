@@ -20,11 +20,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ArrivalDepartureTableLog.h"
+#include "34_departures_table/ArrivalDepartureTableLog.h"
+#include "34_departures_table/DisplayScreen.h"
+#include "34_departures_table/DisplayScreenTableSync.h"
+
+#include "12_security/User.h"
+
+using namespace boost;
 
 namespace synthese
 {
 	using namespace dblog;
+	using namespace security;
 
 	namespace departurestable
 	{
@@ -39,9 +46,28 @@ namespace synthese
 		DBLog::ColumnsVector ArrivalDepartureTableLog::getColumnNames() const
 		{
 			DBLog::ColumnsVector v;
-			v.push_back("Afficheur");
 			v.push_back("Action");
 			return v;
+		}
+
+		void ArrivalDepartureTableLog::addUpdateEntry( boost::shared_ptr<const DisplayScreen> screen , const std::string& text, shared_ptr<const User> user )
+		{
+			DBLogEntry::Content content;
+			content.push_back(text);
+			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, screen->getKey());
+		}
+
+		std::string ArrivalDepartureTableLog::getObjectName( uid id ) const
+		{
+			try
+			{
+				shared_ptr<DisplayScreen> ds = DisplayScreenTableSync::get(id);
+				return ds->getFullName();
+			}
+			catch(...)
+			{
+				return "(unknown)";
+			}
 		}
 	}
 }

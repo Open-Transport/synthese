@@ -154,5 +154,10 @@ namespace synthese
 		{
 			return true;
 		}
+
+		std::string BroadcastPointAdmin::getIcon() const
+		{
+			return "building.png";
+		}
 	}
 }

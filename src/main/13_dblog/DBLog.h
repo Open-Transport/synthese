@@ -63,7 +63,12 @@ namespace synthese
 			typedef std::vector<std::string> ColumnsVector;
 			
 		protected:
-			void _addEntry(DBLogEntry::Level level, const DBLogEntry::Content& content, boost::shared_ptr<const security::User> user = boost::shared_ptr<const security::User>());
+			void _addEntry(
+				DBLogEntry::Level level
+				, const DBLogEntry::Content& content
+				, boost::shared_ptr<const security::User> user = boost::shared_ptr<const security::User>()
+				, uid objectId = 0
+				);
 
 		private:
 			const std::string _name;
@@ -76,6 +81,7 @@ namespace synthese
 			
 			virtual ColumnsVector getColumnNames() const = 0;
 			virtual ColumnsVector parse(const DBLogEntry::Content& cols) const;
+			virtual std::string getObjectName(uid id) const;
 		};
 	}
 }

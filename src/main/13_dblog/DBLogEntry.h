@@ -53,11 +53,12 @@ namespace synthese
 			typedef std::vector<std::string>											Content;
 
 		private:
-			std::string				_logKey;
-			time::DateTime			_date;
+			std::string								_logKey;
+			time::DateTime							_date;
 			boost::shared_ptr<const security::User>	_user;
-			Content					_content;
-			Level					_level;
+			Content									_content;
+			Level									_level;
+			uid										_objectId;
 
 		public:
 			void					setLogKey(const std::string& key);
@@ -65,11 +66,15 @@ namespace synthese
 			void					setUser(boost::shared_ptr<const security::User> user);
 			void					setContent(const Content& content);
 			void					setLevel(Level level);
+			void					setObjectId(uid id);
+
 			const std::string&		getLogKey()		const;
 			time::DateTime			getDate()		const;
 			boost::shared_ptr<const security::User>	getUser()		const;
 			const Content&			getContent()	const;
+			std::string								getStringContent()	const;
 			Level					getLevel()		const;
+			uid						getObjectId()	const;
 		};
 	}
 }

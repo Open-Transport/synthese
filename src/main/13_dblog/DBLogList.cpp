@@ -79,5 +79,10 @@ namespace synthese
 		{
 			return true;
 		}
+
+		std::string DBLogList::getIcon() const
+		{
+			return "book.png";
+		}
 	}
 }

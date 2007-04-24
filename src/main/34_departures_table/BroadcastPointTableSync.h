@@ -32,6 +32,11 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class ConnectionPlace;
+	}
+
 	namespace departurestable
 	{
 		class BroadcastPoint;
@@ -59,8 +64,9 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<BroadcastPoint> > search(
+				boost::shared_ptr<const env::ConnectionPlace> place
 				// other search parameters
-				int first = 0, int number = 0);
+				,int first = 0, int number = 0);
 
 
 		protected:

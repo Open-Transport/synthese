@@ -30,6 +30,7 @@
 
 #include "32_admin/AdminInterfaceElement.h"
 #include "32_admin/AdminPagesTreeInterfaceElement.h"
+#include "32_admin/AdminParametersException.h"
 
 using namespace boost;
 using namespace std;
@@ -45,45 +46,73 @@ namespace synthese
 	{
 		void AdminPagesTreeInterfaceElement::storeParameters(ValueElementList& vel)
 		{
+			if (vel.size() < 5)
+				throw AdminParametersException("5 arguments needed");
+			_subpageIntroducerVIE = vel.front();
+			_lastSubpageIntroducerVIE = vel.front();
+			_levelIndenterVIE = vel.front();
+			_lastLevelIndenterVIE = vel.front();
+			_endingVIE = vel.front();
 		}
 
-		std::string AdminPagesTreeInterfaceElement::getValue( const ParametersVector&, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
+		std::string AdminPagesTreeInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
 		{
 			const shared_ptr<const AdminInterfaceElement>* page = (const shared_ptr<const AdminInterfaceElement>*) object;
-			return getSubPages("", *page, (const server::FunctionRequest<admin::AdminRequest>*) request);
+			_lastLevelIndenter = _lastLevelIndenterVIE->getValue(parameters, variables, object, request);
+			_levelIndenter = _levelIndenterVIE->getValue(parameters, variables, object, request);
+			_lastSubpageIntroducer = _lastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
+			_subpageIntroducer = _subpageIntroducerVIE->getValue(parameters, variables, object, request);
+			_ending = _endingVIE->getValue(parameters, variables, object, request);
+
+			return getSubPages(string(), *page, (const server::FunctionRequest<admin::AdminRequest>*) request);
 		}
 
-		/** @todo Put the html code as parameters */
-		std::string AdminPagesTreeInterfaceElement::getSubPages( const std::string& page, shared_ptr<const AdminInterfaceElement> currentPage, const server::FunctionRequest<admin::AdminRequest>* request)
+		std::string AdminPagesTreeInterfaceElement::getSubPages( const std::string& page, shared_ptr<const AdminInterfaceElement> currentPage, const server::FunctionRequest<admin::AdminRequest>* request, int level, string prefix) const
 		{
 			stringstream str;
+			vector<shared_ptr<AdminInterfaceElement> > pages;
 			for (Factory<AdminInterfaceElement>::Iterator it = Factory<AdminInterfaceElement>::begin(); it != Factory<AdminInterfaceElement>::end(); ++it)
 			{
 				if (it->getSuperior() == page 
 					&& ((it->getDisplayMode() == AdminInterfaceElement::EVER_DISPLAYED)
 						|| (it->getDisplayMode() == AdminInterfaceElement::DISPLAYED_IF_CURRENT && it.getKey() == currentPage->getFactoryKey()))
 					&& it->isAuthorized(request)
-				){
-					str << "<li>";
-					if (it.getKey() == currentPage->getFactoryKey())
+				)
+					pages.push_back(*it);
+			}
+
+			for (vector<shared_ptr<AdminInterfaceElement> >::const_iterator it = pages.begin(); it != pages.end(); ++it)
+			{
+				str << prefix;
+				string curPrefix(prefix);
+				if (level >= 0)
+				{
+					if (it == (pages.end() - 1))
 					{
-						str << currentPage->getTitle();
+						curPrefix += _lastLevelIndenter;
+						str << _lastSubpageIntroducer;
 					}
 					else
 					{
-						FunctionRequest<AdminRequest> r(request);
-						r.getFunction()->setPage(*it);
-						str << HTMLModule::getHTMLLink(r.getURL(), it->getTitle());
-					}
-					str << "</li>";
-
-					string sp = getSubPages(it->getFactoryKey(), currentPage, request);
-
-					if (sp.size() > 0)
-					{
-						str << "<ul style=\"margin:0px 0px 0px 15px\">" << sp << "</ul>";
+						curPrefix += _levelIndenter;
+						str << _subpageIntroducer;
 					}
 				}
+				if ((*it)->getFactoryKey() == currentPage->getFactoryKey())
+				{
+					str << HTMLModule::getHTMLImage(currentPage->getIcon(), currentPage->getTitle())
+						<< currentPage->getTitle();
+				}
+				else
+				{
+					FunctionRequest<AdminRequest> r(request);
+					r.getFunction()->setPage(*it);
+					str << HTMLModule::getHTMLImage((*it)->getIcon(), (*it)->getTitle())
+						<< HTMLModule::getHTMLLink(r.getURL(), (*it)->getTitle());
+				}
+				str << _ending;
+
+				str << getSubPages((*it)->getFactoryKey(), currentPage, request, level+1, curPrefix);
 			}
 			return str.str();
 		}

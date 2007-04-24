@@ -37,11 +37,24 @@ namespace synthese
 		*/
 		class AdminPagesTreeInterfaceElement : public interfaces::ValueInterfaceElement
 		{
-			static std::string getSubPages(
+			std::string getSubPages(
 				const std::string& page
 				, boost::shared_ptr<const AdminInterfaceElement> currentPage
 				, const server::FunctionRequest<admin::AdminRequest>* request
-			);
+				, int level = -1
+				, std::string prefix = std::string()
+			) const;
+
+			boost::shared_ptr<ValueInterfaceElement> _subpageIntroducerVIE;
+			boost::shared_ptr<ValueInterfaceElement> _lastSubpageIntroducerVIE;
+			boost::shared_ptr<ValueInterfaceElement> _levelIndenterVIE;
+			boost::shared_ptr<ValueInterfaceElement> _lastLevelIndenterVIE;
+			boost::shared_ptr<ValueInterfaceElement> _endingVIE;
+			mutable std::string _subpageIntroducer;
+			mutable std::string _lastSubpageIntroducer;
+			mutable std::string _levelIndenter;
+			mutable std::string _lastLevelIndenter;
+			mutable std::string _ending;
 
 		public:
 			/** Controls and store the internals parameters.

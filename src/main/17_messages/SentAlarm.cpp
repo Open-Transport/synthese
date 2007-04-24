@@ -23,8 +23,6 @@
 #include "17_messages/SentAlarm.h"
 #include "17_messages/AlarmRecipient.h"
 
-#include "01_util/Constants.h"
-
 namespace synthese
 {
 	using namespace util;
@@ -59,8 +57,6 @@ namespace synthese
 		SentAlarm::SentAlarm()
 			: util::Registrable<uid, SentAlarm>()			
 		{
-			_complements.conflictStatus = ALARM_CONFLICT_UNKNOWN;
-			_complements.recipientsNumber = UNKNOWN_VALUE;
 		}
 
 		SentAlarm::~SentAlarm()

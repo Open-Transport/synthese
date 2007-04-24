@@ -70,6 +70,25 @@ namespace synthese
 	typedef std::map<DeparturesTableElement, ActualDisplayedArrivalsList, DeparturesTableElementLess> ArrivalDepartureList;
 	struct ArrivalDepartureListWithAlarm { ArrivalDepartureList map; const messages::Alarm* alarm; };
 
+	typedef enum
+	{
+		DISPLAY_STATUS_UNKNOWN = -1
+		, DISPLAY_STATUS_OK = 0
+		, DISPLAY_STATUS_NO_NEWS_WARNING = 50
+		, DISPLAY_STATUS_HARDWARE_WARNING = 60
+		, DISPLAY_STATUS_NO_NEWS_ERROR = 80
+		, DISPLAY_STATUS_HARDWARE_ERROR = 90
+		, DISPLAY_STATUS_DISCONNECTED = 100
+	} DisplayStatus;
+
+	typedef enum
+	{
+		DISPLAY_DATA_UNKNOWN = -1
+		, DISPLAY_DATA_OK = 0
+		, DISPLAY_DATA_NO_LINES = 50
+		, DISPLAY_DATA_CORRUPTED = 90
+	} DisplayDataControlResult;
+
 	/** @} */
 }
 

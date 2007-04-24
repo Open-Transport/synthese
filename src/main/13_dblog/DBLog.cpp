@@ -42,19 +42,29 @@ namespace synthese
 			return _name;
 		}
 
-		void DBLog::_addEntry( DBLogEntry::Level level, const DBLogEntry::Content& content, shared_ptr<const security::User> user /*= NULL*/ )
-		{
+		void DBLog::_addEntry(
+			DBLogEntry::Level level
+			, const DBLogEntry::Content& content
+			, shared_ptr<const security::User> user /*= NULL*/ 
+			, uid objectId
+		){
 			shared_ptr<DBLogEntry> e(new DBLogEntry);
 			e->setLevel(level);
 			e->setUser(user);
 			e->setLogKey(getFactoryKey());
 			e->setContent(content);
+			e->setObjectId(objectId);
 			DBLogEntryTableSync::save(e.get());
 		}
 
 		DBLog::ColumnsVector DBLog::parse( const DBLogEntry::Content& cols ) const
 		{
 			return (ColumnsVector) cols;
+		}
+
+		std::string DBLog::getObjectName( uid id ) const
+		{
+			return Conversion::ToString(id);
 		}
 	}
 }

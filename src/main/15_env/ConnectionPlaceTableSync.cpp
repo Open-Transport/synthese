@@ -27,7 +27,6 @@
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 
-#include "15_env/ConnectionPlace.h"
 #include "15_env/City.h"
 #include "15_env/EnvModule.h"
 

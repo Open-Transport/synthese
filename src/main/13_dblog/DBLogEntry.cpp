@@ -20,9 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DBLogEntry.h"
+#include "13_dblog/DBLogEntry.h"
+
+#include <sstream>
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -75,6 +78,26 @@ namespace synthese
 		void DBLogEntry::setLevel( Level level )
 		{
 			_level = level;
+		}
+
+		uid DBLogEntry::getObjectId() const
+		{
+			return _objectId;
+		}
+
+		void DBLogEntry::setObjectId( uid id )
+		{
+			_objectId = id;
+		}
+
+		std::string DBLogEntry::getStringContent() const
+		{
+			stringstream s;
+			for (Content::const_iterator it = _content.begin(); it != _content.end(); ++it)
+			{
+				s << *it << " ";
+			}
+			return s.str();
 		}
 	}
 }

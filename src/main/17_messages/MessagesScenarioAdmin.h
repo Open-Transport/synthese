@@ -96,6 +96,7 @@ namespace synthese
 			*/
 			std::string getTitle() const;
 
+			std::string getIcon() const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}

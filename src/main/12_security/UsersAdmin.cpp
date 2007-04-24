@@ -184,5 +184,10 @@ namespace synthese
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
 		}
+
+		std::string UsersAdmin::getIcon() const
+		{
+			return "user.png";
+		}
 	}
 }

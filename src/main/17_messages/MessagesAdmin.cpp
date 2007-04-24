@@ -26,6 +26,7 @@
 
 #include "05_html/SearchFormHTMLTable.h"
 #include "05_html/ActionResultHTMLTable.h"
+#include "05_html/Constants.h"
 
 #include "11_interfaces/InterfaceModule.h"
 
@@ -307,10 +308,27 @@ namespace synthese
 				{
 					stream << alarm->getComplements().recipientsNumber <"&nbsp;";
 				}
-				stream << t.col() << MessagesModule::getConflictLabel(alarm->getComplements().conflictStatus); // Bullet
-				stream << t.col() << HTMLModule::getLinkButton(alarmRequest.getURL(), "Modifier");
+				stream << t.col();
+				switch(alarm->getComplements().conflictStatus)
+				{
+				case ALARM_WARNING_ON_INFO:
+					/// @Todo Describe which info is overrided by the warning
+					stream << HTMLModule::getHTMLImage(IMG_URL_INFO, MessagesModule::getConflictLabel(alarm->getComplements().conflictStatus));
+					break;
+
+				case ALARM_INFO_UNDER_WARNING:
+					/// @Todo Describe which warning overrides the info
+					stream << HTMLModule::getHTMLImage(IMG_URL_WARNING, MessagesModule::getConflictLabel(alarm->getComplements().conflictStatus));
+					break;
+
+				case ALARM_CONFLICT:
+					/// @Todo Describe the conflict
+					stream << HTMLModule::getHTMLImage(IMG_URL_ERROR, MessagesModule::getConflictLabel(alarm->getComplements().conflictStatus));
+					break;
+				}
+				stream << t.col() << HTMLModule::getLinkButton(alarmRequest.getURL(), "Modifier", string(), "note_edit.png");
 				if (alarm->isApplicable(DateTime()))
-					stream << "&nbsp;" << HTMLModule::getLinkButton(stopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion du message ?");
+					stream << "&nbsp;" << HTMLModule::getLinkButton(stopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion du message ?", "stop.png");
 			}
 			stream << t.row();
 			stream << t.col(2) << "(Sélectionnez un message pour le copier)";
@@ -322,6 +340,11 @@ namespace synthese
 		bool MessagesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
+		}
+
+		std::string MessagesAdmin::getIcon() const
+		{
+			return "note.png";
 		}
 	}
 }

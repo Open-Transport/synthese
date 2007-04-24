@@ -80,13 +80,31 @@ namespace synthese
 		*/
 		class DisplayScreen : public util::Registrable<uid,DisplayScreen>
 		{
-			public:
-			typedef enum { STANDARD_METHOD = 0, WITH_FORCED_DESTINATIONS_METHOD = 1 } GenerationMethod;
+		public:
+			typedef enum {
+				STANDARD_METHOD = 0
+				, WITH_FORCED_DESTINATIONS_METHOD = 1
+			} GenerationMethod;
+
+			struct Complements
+			{
+				DisplayStatus				status;
+				std::string					statusText;
+				time::DateTime				lastOKStatus;
+				time::DateTime				lastControl;
+				DisplayDataControlResult	dataControl;
+				std::string					dataControlText;
+				time::DateTime				lastOKDataControl;
+				Complements()
+					: status(DISPLAY_STATUS_UNKNOWN), lastOKStatus(time::TIME_UNKNOWN)
+					, lastControl(time::TIME_UNKNOWN), dataControl(DISPLAY_DATA_UNKNOWN)
+					, lastOKDataControl(time::TIME_UNKNOWN) {}
+			};
 
 		protected:
 			//! \name Localization
 			//@{
-			boost::shared_ptr<const BroadcastPoint>	_localization;		//!< Localization of the display screen (belongs to a place)
+				boost::shared_ptr<const BroadcastPoint>	_localization;		//!< Localization of the display screen (belongs to a place)
 				std::string				_localizationComment;
 			//@}
 
@@ -131,6 +149,7 @@ namespace synthese
 				int							_maintenanceChecksPerDay;
 				bool						_maintenanceIsOnline;
 				std::string					_maintenanceMessage;
+				Complements					_complements;
 			//@}
 
 
@@ -166,6 +185,7 @@ namespace synthese
 				void	setTrackNumberDisplay(bool value);
 				void	setType(const DisplayType*);
 				void	setWiringCode(int);				
+				void	setComplements(const Complements& complements);
 			//@}
 
 			//! \name Modifiers
@@ -207,10 +227,10 @@ namespace synthese
 				GenerationMethod				getGenerationMethod()			const;
 				const DisplayedPlacesList&		getForcedDestinations()			const;
 				int								getForceDestinationDelay()		const;
-				int								getMaintenananceChecksPerDay()	const;
+				int								getMaintenanceChecksPerDay()	const;
 				bool							getIsOnline()					const;
 				const std::string&				getMaintenanceMessage()			const;
-				
+				const Complements&				getComplements()				const;
 			//@}
 
 			//! \name Queries
@@ -223,9 +243,6 @@ namespace synthese
 
 				std::vector<std::pair<uid, std::string> > 
 					getSortedAvaliableDestinationsLabels(const std::set<const env::ConnectionPlace*>& placesToAvoid)	const;
-
-				bool							getDataControl()														const;
-
 			//@}
 
 		};

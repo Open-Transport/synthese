@@ -157,5 +157,10 @@ namespace synthese
 		{
 			return true;
 		}
+
+		std::string UserAdmin::getIcon() const
+		{
+			return "user.png";
+		}
 	}
 }

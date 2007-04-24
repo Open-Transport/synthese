@@ -45,7 +45,7 @@ namespace synthese
 				s << "onclick=\"if (window.confirm('" << confirm << "')) window.location='" << url << "';\"";
 			s	<< ">";
 			if (!icon.empty())
-				s << "<img src=\"" << icon << "\" alt=\"" << caption << "\" />&nbsp;";
+				s << getHTMLImage(icon, caption) << "&nbsp;";
 			s << caption << "</a>";
 			return s.str();
 		}
@@ -58,5 +58,11 @@ namespace synthese
 			return str.str();
 		}
 
+		std::string HTMLModule::getHTMLImage( const std::string& url, const std::string& alt )
+		{
+			stringstream s;
+			s << "<img src=\"" << url << "\" alt=\"" << alt << "\" />";
+			return s.str();
+		}
 	}
 }

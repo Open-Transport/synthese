@@ -1,6 +1,6 @@
 
-/** ArrivalDepartureTableLog class header.
-	@file ArrivalDepartureTableLog.h
+/** DisplayDataControlLog class header.
+	@file DisplayDataControlLog.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,34 +20,37 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ARRIVAL_DEPARTURE_TABLE_LOG
-#define SYNTHESE_ARRIVAL_DEPARTURE_TABLE_LOG
+#ifndef SYNTHESE_DISPLAY_DATACONTROL_LOG
+#define SYNTHESE_DISPLAY_DATACONTROL_LOG
 
 #include "13_dblog/DBLog.h"
+#include "13_dblog/DBLogEntry.h"
 
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace departurestable
 	{
 		class DisplayScreen;
+		
+		/** Journal relatif au contrôle des données de définition des afficheurs.
 
-		/** Journal relatif à la gestion des paramètres du téléaffichage.
-
-			Colonnes :
-				- Action effectuée				
-
-			@ingroup m34Log refLog
+			@ingroup m34log reflog				
 		*/
-		class ArrivalDepartureTableLog : public dblog::DBLog
+		class DisplayDataControlLog : public dblog::DBLog
 		{
 		public:
-			ArrivalDepartureTableLog();
+			DisplayDataControlLog();
 			DBLog::ColumnsVector getColumnNames() const;
-			void	addUpdateEntry(
+			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
+			void	addDataControlEntry(
 				boost::shared_ptr<const DisplayScreen> screen
-				, const std::string& text
-				, boost::shared_ptr<const security::User> user
-				);
+				, const dblog::DBLogEntry::Level& level
+				, const std::string& text);
 			std::string getObjectName(uid id) const;
 		};
 	}

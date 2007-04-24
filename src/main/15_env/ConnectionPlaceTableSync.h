@@ -23,13 +23,13 @@
 #ifndef SYNTHESE_ENVLSSQL_CONNECTIONPLACETABLESYNC_H
 #define SYNTHESE_ENVLSSQL_CONNECTIONPLACETABLESYNC_H
 
-
-#include <string>
-#include <iostream>
+#include "15_env/City.h"
+#include "15_env/ConnectionPlace.h"
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
-#include "15_env/City.h"
+#include <string>
+#include <iostream>
 
 namespace synthese
 {

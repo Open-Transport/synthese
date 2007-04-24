@@ -46,8 +46,6 @@ namespace synthese
 	
 	namespace departurestable
 	{
-		const std::string UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_ID = Action_PARAMETER_PREFIX + "li";
-		const std::string UpdateDisplayScreenAction::PARAMETER_LOCALIZATION_COMMENT = Action_PARAMETER_PREFIX + "lc";
 		const std::string UpdateDisplayScreenAction::PARAMETER_WIRING_CODE = Action_PARAMETER_PREFIX + "wc";
 		const std::string UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY = Action_PARAMETER_PREFIX + "bd";
 		const std::string UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY = Action_PARAMETER_PREFIX + "cd";
@@ -76,11 +74,6 @@ namespace synthese
 
 				ParametersMap::const_iterator it;
 				
-				it= map.find(PARAMETER_LOCALIZATION_COMMENT);
-				if (it == map.end())
-					throw ActionException("Localization comment not specified");
-				_localizationComment = it->second;
-
 				it= map.find(PARAMETER_TITLE);
 				if (it == map.end())
 					throw ActionException("Title not specified");
@@ -118,10 +111,6 @@ namespace synthese
 				if (it != map.end())
 					_endFilter = (EndFilter) Conversion::ToInt(it->second);
 
-				it = map.find(PARAMETER_LOCALIZATION_ID);
-				if (it != map.end())
-					_localization = DeparturesTableModule::getBroadcastPoints().get(Conversion::ToLongLong(it->second));
-
 				it = map.find(PARAMETER_TYPE);
 				if (it != map.end())
 					_type = DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(it->second));
@@ -143,10 +132,7 @@ namespace synthese
 
 		void UpdateDisplayScreenAction::run()
 		{
-			_screen->setLocalizationComment(_localizationComment);
 			_screen->setWiringCode(_wiringCode);
-			if (_localization.get())
-				_screen->setLocalization(_localization);
 			_screen->setBlinkingDelay(_blinkingDelay);
 			_screen->setTrackNumberDisplay(_displayPlatform);
 			_screen->setServiceNumberDisplay(_displayServiceNumber);

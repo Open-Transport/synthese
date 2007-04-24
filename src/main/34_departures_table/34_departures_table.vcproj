@@ -216,6 +216,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DisplayDataControlLog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayDataControlLog.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DisplayMaintenanceLog.cpp"
 				>
 			</File>
@@ -348,6 +356,14 @@
 				</File>
 				<File
 					RelativePath=".\DisplayScreenRemovePhysicalStopAction.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayScreenUpdateLocalizationAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayScreenUpdateLocalizationAction.h"
 					>
 				</File>
 				<File

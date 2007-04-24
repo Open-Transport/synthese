@@ -27,6 +27,7 @@
 #include "12_security/AddProfileAction.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/GlobalRight.h"
+#include "12_security/SecurityLog.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -38,6 +39,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace dblog;
 	
 	namespace security
 	{
@@ -96,7 +98,8 @@ namespace synthese
 			_request->setObjectId(profile->getKey());
 
 			// DBLog
-
+			shared_ptr<SecurityLog> log = Factory<DBLog>::create<SecurityLog>();
+			log->addProfileAdmin(_request->getUser(), profile, "Création du profil");
 		}
 	}
 }

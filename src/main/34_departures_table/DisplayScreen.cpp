@@ -65,6 +65,7 @@ namespace synthese
 			, _allPhysicalStopsDisplayed(false)
 			, _trackNumberDisplay(false)
 			, _serviceNumberDisplay(false)
+			, _displayType(NULL)
 		{
 		}
 
@@ -345,7 +346,7 @@ namespace synthese
 			return _destinationForceDelay;
 		}
 
-		int DisplayScreen::getMaintenananceChecksPerDay() const
+		int DisplayScreen::getMaintenanceChecksPerDay() const
 		{
 			return _maintenanceChecksPerDay;
 		}
@@ -474,7 +475,7 @@ namespace synthese
 			setFirstRow(other->getFirstRow());
 			setGenerationMethod(other->getGenerationMethod());
 			setLocalization(other->getLocalization());
-			setMaintenanceChecksPerDay(other->getMaintenananceChecksPerDay());
+			setMaintenanceChecksPerDay(other->getMaintenanceChecksPerDay());
 			setMaxDelay(other->getMaxDelay());
 			setOriginsOnly(other->getEndFilter());
 			setServiceNumberDisplay(other->getServiceNumberDisplay());
@@ -492,21 +493,14 @@ namespace synthese
 				addPhysicalStop(*it);
 		}
 
-		bool DisplayScreen::getDataControl() const
+		const DisplayScreen::Complements& DisplayScreen::getComplements() const
 		{
-			bool value = true;
-
-			// Put controls here
-
-			/// @todo move it into tablesync
-
-			// Gets last log entry
-
-			// Write log entry if status changed
-
-			
-			return value;
+			return _complements;
 		}
 
+		void DisplayScreen::setComplements( const Complements& complements )
+		{
+			_complements = complements;
+		}
 	}
 }
