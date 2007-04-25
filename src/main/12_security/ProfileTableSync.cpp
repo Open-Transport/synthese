@@ -80,7 +80,7 @@ namespace synthese
 					<< ")";
 				sqlite->execUpdate(query.str());
 			}
-			catch (SQLiteException e)
+			catch (SQLiteException& e)
 			{
 				throw UserTableSyncException("Insert/Update error " + e.getMessage());
 			}
