@@ -259,7 +259,7 @@ namespace synthese
 				VariablesMap variables;
 				page->display(stream, variables, getTitle(), getWiringCode(), displayedObject);
 			}
-			catch (InterfacePageException e)
+			catch (InterfacePageException& e)
 			{
 			}
 		}

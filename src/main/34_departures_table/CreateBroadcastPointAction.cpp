@@ -80,11 +80,11 @@ namespace synthese
 					throw ActionException("Physical stop or broadcast point name not specified");
 
 			}
-			catch (ConnectionPlace::RegistryKeyException e)
+			catch (ConnectionPlace::RegistryKeyException& e)
 			{
 				throw ActionException("Specified place not found");
 			}
-			catch (PhysicalStop::RegistryKeyException e)
+			catch (PhysicalStop::RegistryKeyException& e)
 			{
 				throw ActionException("Specified physical stop not found");
 			}

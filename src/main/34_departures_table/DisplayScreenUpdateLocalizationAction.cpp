@@ -80,7 +80,7 @@ namespace synthese
 				{
 					place = ConnectionPlaceTableSync::get(Conversion::ToLongLong(it->second));
 				}
-				catch (DBEmptyResultException<ConnectionPlace>)
+				catch (DBEmptyResultException<ConnectionPlace>&)
 				{
 					throw ActionException("Specified connection place not found");
 				}
@@ -93,7 +93,7 @@ namespace synthese
 				{
 					_localization = BroadcastPointTableSync::get(Conversion::ToLongLong(it->second));
 				}
-				catch (DBEmptyResultException<BroadcastPoint>)
+				catch (DBEmptyResultException<BroadcastPoint>&)
 				{
 					throw ActionException("Specified broadcast point not found");
 				}

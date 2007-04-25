@@ -75,7 +75,7 @@ namespace synthese
 					throw ActionException("Maintenance message not specified");
 				_message = it->second;
 			}
-			catch (DBEmptyResultException<DisplayScreen>)
+			catch (DBEmptyResultException<DisplayScreen>&)
 			{
 				throw ActionException("Specified display screen not found");
 			}

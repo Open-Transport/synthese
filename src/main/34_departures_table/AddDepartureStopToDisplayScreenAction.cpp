@@ -65,11 +65,11 @@ namespace synthese
 					throw ActionException("Place not specified");
 				_stop = EnvModule::getPhysicalStops().get(Conversion::ToLongLong(it->second));
 			}
-			catch (DBEmptyResultException<DisplayScreen>)
+			catch (DBEmptyResultException<DisplayScreen>&)
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch (PhysicalStop::RegistryKeyException)
+			catch (PhysicalStop::RegistryKeyException&)
 			{
 				throw ActionException("Specified stop not found");
 			}

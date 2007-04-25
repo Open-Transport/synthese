@@ -126,7 +126,7 @@ namespace synthese
 					shared_ptr<BroadcastPoint> object = DeparturesTableModule::getBroadcastPoints().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
 					load(object.get(), rows, i);
 				}
-				catch (Exception e)
+				catch (Exception& e)
 				{
 					
 				}

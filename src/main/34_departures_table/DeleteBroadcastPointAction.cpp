@@ -61,7 +61,7 @@ namespace synthese
 
 				 /// @todo Control of existence of a display screen. In this case throw an exception.
 			}
-			catch (BroadcastPoint::RegistryKeyException e)
+			catch (BroadcastPoint::RegistryKeyException& e)
 			{
 				throw ActionException("Specified broadcast point not found");
 			}

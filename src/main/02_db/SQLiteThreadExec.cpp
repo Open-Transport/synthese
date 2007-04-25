@@ -88,7 +88,7 @@ namespace synthese
 				
 			    }
 			}
-			catch (util::Exception e)
+			catch (util::Exception& e)
 			{
 			    Log::GetInstance().debug("Exception", e);
 			    tcpStream << "01" << e.what () << ETB;

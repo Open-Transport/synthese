@@ -69,7 +69,7 @@ namespace synthese
 				if (_name.size() == 0)
 					throw ActionException("Name must be non empty");
 			}
-			catch (DBEmptyResultException<BroadcastPoint>)
+			catch (DBEmptyResultException<BroadcastPoint>&)
 			{
 				throw ActionException("Specified broadcast point not found");
 			}

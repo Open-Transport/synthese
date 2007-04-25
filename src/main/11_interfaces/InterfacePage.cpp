@@ -74,7 +74,7 @@ namespace synthese
 						continue;
 				}
 				// Jump interface elements with parse errors
-				catch (InterfacePageException e)
+				catch (InterfacePageException& e)
 				{
 					Log::GetInstance().warn("Interface page parsing error on " + line + "\n", e);
 					continue;

@@ -79,7 +79,7 @@ namespace synthese
 				{
 					object->addPhysicalStop(EnvModule::getPhysicalStops().get(Conversion::ToLongLong(*it)).get());
 				}
-				catch (PhysicalStop::RegistryKeyException e)
+				catch (PhysicalStop::RegistryKeyException& e)
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, e);
 				}
@@ -93,7 +93,7 @@ namespace synthese
 				{
 					object->addForbiddenPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
 				}
-				catch (ConnectionPlace::RegistryKeyException e)
+				catch (ConnectionPlace::RegistryKeyException& e)
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
 				}
@@ -111,7 +111,7 @@ namespace synthese
 				{
 					object->addDisplayedPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
 				}
-				catch (ConnectionPlace::RegistryKeyException e)
+				catch (ConnectionPlace::RegistryKeyException& e)
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
 				}
@@ -129,7 +129,7 @@ namespace synthese
 				{
 					object->addForcedDestination(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
 				}
-				catch (ConnectionPlace::RegistryKeyException e)
+				catch (ConnectionPlace::RegistryKeyException& e)
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
 				}

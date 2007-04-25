@@ -117,7 +117,7 @@ namespace synthese
 			    {
 				it->second->firstSync (emitter, this);
 			    }
-			    catch (std::exception e)
+			    catch (std::exception& e)
 			    {
 				Log::GetInstance().error ("Error during first sync of " + it->first + 
 							  ". In-memory data might be inconsistent.", e);

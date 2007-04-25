@@ -67,7 +67,7 @@ namespace synthese
 				VariablesMap vm;
 				page->display(stream, vm, _url, _request);
 			}
-			catch (Exception e)
+			catch (Exception& e)
 			{
 				
 			}

@@ -66,11 +66,11 @@ namespace synthese
 				_place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(it->second));
 
 			}
-			catch (DBEmptyResultException<DisplayScreen>)
+			catch (DBEmptyResultException<DisplayScreen>&)
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch (ConnectionPlace::RegistryKeyException)
+			catch (ConnectionPlace::RegistryKeyException&)
 			{
 				throw ActionException("Specified place not found");
 			}

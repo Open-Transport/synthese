@@ -75,7 +75,7 @@ namespace synthese
 				if (it != map.end())
 					_date = DateTime::FromInternalString(it->second);
 			}
-			catch (DisplayScreen::RegistryKeyException e)
+			catch (DisplayScreen::RegistryKeyException& e)
 			{
 				throw RequestException("Display screen " + Conversion::ToString(screenId) + " not found");
 			}

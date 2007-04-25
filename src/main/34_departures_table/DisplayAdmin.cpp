@@ -434,7 +434,7 @@ namespace synthese
 				if (_displayScreen->getLocalization())
 					_place = _displayScreen->getLocalization()->getConnectionPlace();
 			}
-			catch (DBEmptyResultException<DisplayScreen>)
+			catch (DBEmptyResultException<DisplayScreen>&)
 			{
 				throw AdminParametersException("Display screen not found");
 			}
@@ -448,7 +448,7 @@ namespace synthese
 					{
 						_place = ConnectionPlaceTableSync::get(Conversion::ToLongLong(it->second));
 					}
-					catch (DBEmptyResultException<ConnectionPlace>)
+					catch (DBEmptyResultException<ConnectionPlace>&)
 					{
 						throw AdminParametersException("Place not found");
 					}

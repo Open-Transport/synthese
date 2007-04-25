@@ -87,7 +87,7 @@ namespace synthese
 					shared_ptr<Interface> interf = InterfaceModule::getInterfaces().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE )));
 					interf->addPage(rows.getColumn(i, TABLE_COL_PAGE), page );
 				}
-				catch (Interface::RegistryKeyException e)
+				catch (Interface::RegistryKeyException& e)
 				{
 					Log::GetInstance().warn("Corrupted data on "+ TABLE_NAME +" table : Interface not found", e);
 				}

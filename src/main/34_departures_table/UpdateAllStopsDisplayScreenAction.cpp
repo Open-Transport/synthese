@@ -62,7 +62,7 @@ namespace synthese
 				_value = Conversion::ToBool(it->second);
 
 			}
-			catch (DBEmptyResultException<DisplayScreen>)
+			catch (DBEmptyResultException<DisplayScreen>&)
 			{
 				throw ActionException("Display screen not found");
 			}

@@ -74,7 +74,7 @@ namespace synthese
 				_page = _interface->getPage(it->second);
 				_parameters.erase(it);
 			}
-			catch (InterfacePageException e)
+			catch (InterfacePageException& e)
 			{
 				throw RequestException("No such interface page : "+ it->second);
 			}

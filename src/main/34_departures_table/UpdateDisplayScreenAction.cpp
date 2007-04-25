@@ -116,15 +116,15 @@ namespace synthese
 					_type = DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(it->second));
 
 			}
-			catch (DBEmptyResultException<DisplayScreen>)
+			catch (DBEmptyResultException<DisplayScreen>&)
 			{
 				throw ActionException("Display screen not specified or specified display screen not found");
 			}
-			catch (BroadcastPoint::RegistryKeyException)
+			catch (BroadcastPoint::RegistryKeyException&)
 			{
 				throw ActionException("Specified localization not found");
 			}
-			catch (DisplayType::RegistryKeyException)
+			catch (DisplayType::RegistryKeyException&)
 			{
 				throw ActionException("Specified display type not found");
 			}

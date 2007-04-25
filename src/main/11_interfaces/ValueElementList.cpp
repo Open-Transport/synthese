@@ -169,7 +169,7 @@ namespace synthese
 							vel.parse(str.substr(position + 1, str.size() - position - 3), page);
 						vie->storeParameters(vel);
 					}
-					catch(Exception e)
+					catch(Exception& e)
 					{
 						throw InterfacePageException("Function not found in "+ text);
 					}

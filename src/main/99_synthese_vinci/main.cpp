@@ -71,70 +71,82 @@ int main( int argc, char **argv )
 {
     std::signal(SIGINT, sig_INT_handler);
 
+    try 
+    {
 	// included auto generated code
-	#include "generated.cpp.inc"
+#include "generated.cpp.inc"
 
-    std::string db;
-    std::vector<std::string> params;
+	std::string db;
+	std::vector<std::string> params;
 
-    // To define several params on the command line, the syntax is --param name1=val1 --param name2=val2 ....
+	// To define several params on the command line, the syntax is --param name1=val1 --param name2=val2 ....
 
-    po::options_description desc("Allowed options");
-    desc.add_options()
-	("help", "produce this help message")
-	("db", po::value<std::string>(&db)->default_value (std::string ("./config.db3")), "SQLite database file")
-	("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
+	po::options_description desc("Allowed options");
+	desc.add_options()
+	    ("help", "produce this help message")
+	    ("db", po::value<std::string>(&db)->default_value (std::string ("./config.db3")), "SQLite database file")
+	    ("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
 	 
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, desc), vm);
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc, argv, desc), vm);
     
-    po::notify(vm);    
+	po::notify(vm);    
     
-    if (vm.count("help"))
-    {
-	std::cout << desc << std::endl;
-	return 1;
-    }
+	if (vm.count("help"))
+	{
+	    std::cout << desc << std::endl;
+	    return 1;
+	}
     
-    DbModuleClass::Parameters defaultParams;
-    for (std::vector<std::string>::const_iterator it = params.begin (); 
-	 it != params.end (); ++it)
-    {
-	int index = it->find ("=");
+	DbModuleClass::Parameters defaultParams;
+	for (std::vector<std::string>::const_iterator it = params.begin (); 
+	     it != params.end (); ++it)
+	{
+	    int index = it->find ("=");
 	
-	std::string paramName (it->substr (0, index));
-	std::string paramValue (it->substr (index+1));
+	    std::string paramName (it->substr (0, index));
+	    std::string paramValue (it->substr (index+1));
 
-	defaultParams.insert (std::make_pair (paramName, paramValue));
+	    defaultParams.insert (std::make_pair (paramName, paramValue));
+	}
+
+	const boost::filesystem::path& workingDir = boost::filesystem::initial_path();
+	Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
+
+	boost::filesystem::path dbpath (db, boost::filesystem::native);
+	DbModuleClass::SetDefaultParameters (defaultParams);
+	DbModuleClass::SetDatabasePath (dbpath);
+    
+	// Initialize modules
+	if (Factory<ModuleClass>::size() == 0)
+	    throw Exception("No registered module !");
+    
+
+	for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
+	     it != Factory<ModuleClass>::end(); ++it)
+	{
+	    Log::GetInstance ().info ("Pre-initializing module " + it.getKey() + "...");
+	    it->preInit();
+	}
+    
+	for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
+	     it != Factory<ModuleClass>::end(); ++it)
+	{
+	    Log::GetInstance ().info ("Initializing module " + it.getKey() + "...");
+	    it->initialize();
+	}
+    
+	ThreadManager::Instance ()->run ();
     }
-
-    const boost::filesystem::path& workingDir = boost::filesystem::initial_path();
-    Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
-
-    boost::filesystem::path dbpath (db, boost::filesystem::native);
-    DbModuleClass::SetDefaultParameters (defaultParams);
-    DbModuleClass::SetDatabasePath (dbpath);
-    
-    // Initialize modules
-    if (Factory<ModuleClass>::size() == 0)
-	throw Exception("No registered module !");
-    
-
-    for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
-	 it != Factory<ModuleClass>::end(); ++it)
+    catch (std::exception& e)
     {
-	Log::GetInstance ().info ("Pre-initializing module " + it.getKey() + "...");
-	it->preInit();
+	Log::GetInstance ().fatal (std::string ("Fatal error : ") + e.what ());
     }
-    
-    for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
-	 it != Factory<ModuleClass>::end(); ++it)
+    catch (...)
     {
-	Log::GetInstance ().info ("Initializing module " + it.getKey() + "...");
-	it->initialize();
+	Log::GetInstance ().fatal ("Unexpected exception.");
     }
-    
-    ThreadManager::Instance ()->run ();
+ 
     
 }
 

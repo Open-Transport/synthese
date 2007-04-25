@@ -67,7 +67,7 @@ namespace synthese
 					throw ActionException("Preselection delay not specified");
 				_preselectionDelay = Conversion::ToInt(it->second);
 			}
-			catch (DBEmptyResultException<DisplayScreen>)
+			catch (DBEmptyResultException<DisplayScreen>&)
 			{
 				throw ActionException("Display screen not found");
 			}

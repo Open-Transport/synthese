@@ -73,7 +73,7 @@ namespace synthese
 				{
 					_dt = DisplayTypeTableSync::get(Conversion::ToLongLong(it->second));
 				}
-				catch (DBEmptyResultException<DisplayType>)
+				catch (DBEmptyResultException<DisplayType>&)
 				{
 					throw ActionException("Display Type not found");
 				}

@@ -54,7 +54,7 @@ namespace synthese
 			{
 				lie = Factory<LibraryInterfaceElement>::create(text.substr(start_pos, word_end_pos - start_pos));
 			}
-			catch (FactoryException<LibraryInterfaceElement> e)
+			catch (FactoryException<LibraryInterfaceElement>& e)
 			{
 				throw InterfacePageException("Specified interface function not found " + text.substr(start_pos, word_end_pos - start_pos));
 			}

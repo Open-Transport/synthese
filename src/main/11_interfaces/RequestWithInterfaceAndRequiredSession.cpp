@@ -51,7 +51,7 @@ namespace synthese
 					VariablesMap vm;
 					page->display(stream, pv, vm, NULL, _request);
 				}
-				catch (InterfacePageException e)
+				catch (InterfacePageException& e)
 				{
 					
 				}

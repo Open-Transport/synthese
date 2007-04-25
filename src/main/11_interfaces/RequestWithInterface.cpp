@@ -72,7 +72,7 @@ namespace synthese
 					_interface = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(it->second));
 				}
 			}
-			catch (Interface::RegistryKeyException e)
+			catch (Interface::RegistryKeyException& e)
 			{
 				throw RequestException("Specified interface not found (" + Conversion::ToString(e.getKey()) +")");
 			}

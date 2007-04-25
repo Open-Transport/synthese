@@ -194,7 +194,7 @@ namespace synthese
 			    {
 				postEvent (event);
 			    }
-			    catch (std::exception e)
+			    catch (std::exception& e)
 			    {
 				Log::GetInstance().error ("Error while SQLite sync. In-memory data might be inconsistent.", e);
 			    }
