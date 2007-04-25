@@ -85,14 +85,14 @@ namespace synthese
 	template<class T>
 	AlarmConflict synthese::messages::AlarmRecipientTemplate<T>::getConflictStatus( const SentAlarm* alarm ) const
 	{
-		AlarmLinks::const_iterator it = _linksAlarm.find(alarm);
+		typename AlarmLinks::const_iterator it = _linksAlarm.find(alarm);
 		if (it == _linksAlarm.end())
 			return ALARM_CONFLICT_UNKNOWN;
 
 		AlarmConflict conflictStatus(ALARM_NO_CONFLICT);
-		for (LinkedObjectsSet::const_iterator ita = it->second.begin(); ita != it->second.end(); ++ita)
+		for (typename LinkedObjectsSet::const_iterator ita = it->second.begin(); ita != it->second.end(); ++ita)
 		{
-			ObjectLinks::const_iterator ito = _linksObject.find(*ita);
+			typename ObjectLinks::const_iterator ito = _linksObject.find(*ita);
 			if (ito == _linksObject.end())
 				return ALARM_CONFLICT_UNKNOWN; /// @todo throw an exception
 			for (LinkedAlarmsSet::const_iterator itb = ito->second.begin(); itb != ito->second.end(); ++itb)
@@ -113,7 +113,7 @@ namespace synthese
 	template<class T>
 		AlarmConflict AlarmRecipientTemplate<T>::getConflicStatus( const T* object )
 	{
-		ObjectLinks::const_iterator it = _linksObject.find(object);
+		typename ObjectLinks::const_iterator it = _linksObject.find(object);
 		if (it == _linksObject.end())
 			return ALARM_CONFLICT_UNKNOWN;
 
@@ -199,7 +199,7 @@ namespace synthese
 	    typename  AlarmLinks::iterator it2 = AlarmRecipientTemplate<T>::_linksAlarm.find(alarm);
 	    if (it2 != AlarmRecipientTemplate<T>::_linksAlarm.end())
 	    {
-			LinkedObjectsSet::iterator its = it2->second.find(object);
+			typename LinkedObjectsSet::iterator its = it2->second.find(object);
 			if (its != it2->second.end())
 				it2->second.erase(its);
 	    }

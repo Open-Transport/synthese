@@ -71,7 +71,7 @@ namespace synthese
 		template<class T>
 		void ScenarioSubclassTemplate<T>::removeAlarm(T* alarm )
 		{
-			AlarmsSet::iterator it = _alarms.find(alarm);
+			typename AlarmsSet::iterator it = _alarms.find(alarm);
 			if (it != _alarms.end())
 				_alarms.erase(it);
 		}
