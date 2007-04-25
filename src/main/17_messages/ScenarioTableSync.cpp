@@ -20,6 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "17_messages/ScenarioTableSync.h"
+#include "17_messages/SentScenario.h"
+#include "17_messages/ScenarioTemplate.h"
+#include "17_messages/AlarmTableSync.h"
+#include "17_messages/MessagesModule.h"
+
 #include <sstream>
 
 #include "01_util/Conversion.h"
@@ -31,11 +37,6 @@
 
 #include "04_time/DateTime.h"
 
-#include "17_messages/SentScenario.h"
-#include "17_messages/ScenarioTemplate.h"
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesModule.h"
 
 using namespace std;
 using namespace boost;

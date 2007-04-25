@@ -306,7 +306,7 @@ namespace synthese
 					stream << "Pas de destinataire";
 				else
 				{
-					stream << alarm->getComplements().recipientsNumber <"&nbsp;";
+				    stream << alarm->getComplements().recipientsNumber << "&nbsp;";
 				}
 				stream << t.col();
 				switch(alarm->getComplements().conflictStatus)

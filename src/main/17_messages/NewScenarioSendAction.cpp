@@ -70,7 +70,8 @@ namespace synthese
 		void NewScenarioSendAction::run()
 		{
 			shared_ptr<SentScenario> scenario(new SentScenario(*_template));
-			ScenarioTableSync::saveWithAlarms(scenario.get());
+			ScenarioTableSync::save (scenario.get());
+			ScenarioTableSync::saveAlarms(scenario.get());
 			_request->setObjectId(scenario->getKey());
 		}
 	}

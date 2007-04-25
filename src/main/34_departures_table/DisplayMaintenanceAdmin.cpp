@@ -19,6 +19,11 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#include "34_departures_table/DisplayMaintenanceAdmin.h"
+#include "34_departures_table/DisplayScreen.h"
+#include "34_departures_table/DisplayScreenTableSync.h"
+#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/UpdateDisplayMaintenanceAction.h"
 
 #include "05_html/HTMLForm.h"
 #include "05_html/HTMLTable.h"
@@ -29,12 +34,6 @@
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminParametersException.h"
-
-#include "34_departures_table/DisplayMaintenanceAdmin.h"
-#include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/DeparturesTableModule.h"
-#include "34_departures_table/UpdateDisplayMaintenanceAction.h"
 
 using namespace std;
 using namespace boost;

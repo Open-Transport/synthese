@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_Types_H__
-#define SYNTHESE_Types_H__
+#ifndef SYNTHESE_messages_Types_H__
+#define SYNTHESE_messages_Types_H__
 
 #include <string>
 #include <map>
@@ -72,4 +72,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_Types_H__
+#endif // SYNTHESE_messages_Types_H__

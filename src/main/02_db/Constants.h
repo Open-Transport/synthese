@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_Constants_h__
-#define SYNTHESE_Constants_h__
+#ifndef SYNTHESE_db_Constants_h__
+#define SYNTHESE_db_Constants_h__
 
 namespace synthese
 {
@@ -37,4 +37,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_Constants_h__
+#endif // SYNTHESE_db_Constants_h__

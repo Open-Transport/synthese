@@ -100,7 +100,7 @@ namespace synthese
 				);
 
 			template <class U>
-			static void saveWithAlarms(ScenarioSubclassTemplate<U>* object);
+			static void saveAlarms(ScenarioSubclassTemplate<U>* object);
 
 			static boost::shared_ptr<ScenarioTemplate> getTemplate(uid key);
 			static boost::shared_ptr<SentScenario> getSent(uid key);
@@ -134,9 +134,9 @@ namespace synthese
 		};
 
 		template <class S>
-		void synthese::messages::ScenarioTableSync::saveWithAlarms( ScenarioSubclassTemplate<S>* object )
+		void synthese::messages::ScenarioTableSync::saveAlarms( ScenarioSubclassTemplate<S>* object )
 		{
-			save(object);
+		    // save(object);
 			typename ScenarioSubclassTemplate<S>::AlarmsSet& alarms = object->getAlarms();
 			for (typename ScenarioSubclassTemplate<S>::AlarmsSet::iterator it = alarms.begin(); it != alarms.end(); ++it)
 			{

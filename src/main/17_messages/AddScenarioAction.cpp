@@ -89,7 +89,9 @@ namespace synthese
 				scenario.reset(new ScenarioTemplate(*_template, _name));
 			else
 				scenario.reset(new ScenarioTemplate(_name));
-			ScenarioTableSync::saveWithAlarms(scenario.get());
+
+			ScenarioTableSync::save (scenario.get());
+			ScenarioTableSync::saveAlarms(scenario.get());
 			_request->setObjectId(scenario->getKey());
 		}
 	}
