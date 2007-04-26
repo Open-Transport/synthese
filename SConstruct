@@ -14,13 +14,13 @@ Help(opts.GenerateHelpText(rootenv))
 
 mode = ARGUMENTS.get('mode', 'release').lower()  
 platform = ARGUMENTS.get('os', str (Platform()))
-librepo = ARGUMENTS.get('librepo', os.environ['LIBS_REPO_HOME'])   
+librepo = ARGUMENTS.get('librepo')   
 goal = ARGUMENTS.get('goal', '').lower()  
 toolset = ARGUMENTS.get('toolset').lower()  
 version = ARGUMENTS.get('version').lower()  
 boostversion = ARGUMENTS.get('boostversion').lower()  
 sqliteversion = ARGUMENTS.get('sqliteversion').lower()  
-distname = ARGUMENTS.get('distname').lower()
+distname = ARGUMENTS.get('distname', 'dist').lower()
 
 
 print "librepo = ", librepo
