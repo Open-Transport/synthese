@@ -33,8 +33,8 @@ namespace synthese
 	{
 		class User;
 
-		/** UserPasswordUpdateAction action class.
-			@ingroup m12
+		/** Password update action class.
+			@ingroup m12Actions refActions
 		*/
 		class UserPasswordUpdateAction : public server::Action
 		{

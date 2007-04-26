@@ -196,8 +196,10 @@ namespace synthese
 
 			stream << t.close() << uf.close();
 
+			stream << "<h1>Propriétés</h1>";
+
 			// Technical data
-			stream << "<h1>Données techniques</h1>";
+			stream << "<h2>Données techniques</h2>";
 
 			HTMLForm pf(updateDisplayRequest.getHTMLForm("updateprops"));
 			HTMLTable pt;
@@ -219,7 +221,7 @@ namespace synthese
 			stream << pt.close();
 
 			// Appearance
-			stream << "<h1>Apparence</h1>";
+			stream << "<h2>Apparence</h2>";
 
 			HTMLTable dt;
 			stream << dt.open();
@@ -243,7 +245,7 @@ namespace synthese
 			stream << dt.close();
 
 			// Content
-			stream << "<h1>Contenu</h1>";
+			stream << "<h2>Contenu</h2>";
 
 			HTMLTable ct;
 			stream << ct.open();

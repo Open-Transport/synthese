@@ -62,8 +62,9 @@ namespace synthese
 
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
-
+			cp->setKey(id);
 			cp->setName (name);
+			cp->setCity(EnvModule::getCities().get(cityId).get());
 			cp->setConnectionType (connectionType);
 
 			cp->clearTransferDelays ();    
@@ -82,8 +83,6 @@ namespace synthese
 					Conversion::ToInt (*(++valueIter)),
 					Conversion::ToInt (*(++valueIter)));
 			}
-
-			//    cp->setAlarm (environment.getAlarms ().get (alarmId));
 		}
 	}
 

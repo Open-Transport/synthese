@@ -36,7 +36,7 @@ namespace synthese
 		class Profile;
 
 		/** Habilitation portant sur la gestion de la sécurité.
-			@ingroup m12
+			@ingroup m12Rights refRights
 
 			Les niveaux de droit utilisés sont les suivants :
 

@@ -37,7 +37,7 @@ namespace synthese
 		class Right;
 
 		/** DeleteRightAction action class.
-			@ingroup m12
+			@ingroup m12Actions refActions
 		*/
 		class DeleteRightAction : public server::Action
 		{

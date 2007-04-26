@@ -34,7 +34,7 @@ namespace synthese
 		class Profile;
 
 		/** DeleteProfileAction action class.
-			@ingroup m12
+			@ingroup m12Actions refActions
 		*/
 		class DeleteProfileAction : public server::Action
 		{

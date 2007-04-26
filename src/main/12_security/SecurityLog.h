@@ -35,6 +35,7 @@ namespace synthese
 		class Profile;
 
 		/** Journal de sécurité.
+			@ingroup m12Logs refLogs
 
 			Enregistre tous les événements liés à la sécurité et à l'administration des utilisateurs.
 

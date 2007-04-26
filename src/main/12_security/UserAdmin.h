@@ -32,7 +32,7 @@ namespace synthese
 		class User;
 
 		/** Ecran d'édition d'utilisateur.
-			@ingroup m12
+			@ingroup m12Admin refAdmin
 		
 			@image html cap_admin_user.png
 			@image latex cap_admin_user.png "Maquette de l'écran d'édition d'utilisateur" width=14cm

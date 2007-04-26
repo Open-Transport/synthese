@@ -35,7 +35,7 @@ namespace synthese
 		class User;
 
 		/** UserUpdateAction action class.
-			@ingroup m12
+			@ingroup m12Actions refActions
 		*/
 		class UserUpdateAction : public server::Action
 		{

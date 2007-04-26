@@ -71,13 +71,12 @@ namespace synthese
 			virtual ~Place ();
 
 
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
 
 				/** Gets name of this place.
 				*/
 				const std::string& getName () const;
-				void setName (const std::string& name);
 
 				const std::string& getName13() const;
 				const std::string& getName26() const;
@@ -95,6 +94,12 @@ namespace synthese
 				*/
 				const City* getCity () const;
 
+			//@}
+
+			//! @name Setters
+			//@{
+				void setName (const std::string& name);
+				void setCity(const City* city);
 			//@}
 
 

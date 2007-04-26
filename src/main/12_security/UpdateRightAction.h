@@ -36,7 +36,7 @@ namespace synthese
 		class Profile;
 
 		/** Right update action class.
-			@ingroup m12
+			@ingroup m12Actions refActions
 		*/
 		class UpdateRightAction : public server::Action
 		{

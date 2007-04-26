@@ -34,7 +34,7 @@ namespace synthese
 		class Profile;
 
 		/** UpdateProfileAction action class.
-			@ingroup m12
+			@ingroup m12Actions refActions
 		*/
 		class UpdateProfileAction : public server::Action
 		{

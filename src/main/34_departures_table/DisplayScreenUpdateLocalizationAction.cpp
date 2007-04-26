@@ -105,14 +105,27 @@ namespace synthese
 					_localization = result.front();
 				}
 			}
+			else if (place.get())
+			{
+				vector<shared_ptr<BroadcastPoint> > result = BroadcastPointTableSync::search(place, 0, 1);
+				if (result.empty())
+					throw ActionException("Corrupted data on Display Screen Localization Update Action");
+				_localization = result.front();
+			}
 		}
 
 		void DisplayScreenUpdateLocalizationAction::run()
 		{
+			// Trace of old value for the log
 			string oldLocalization = _screen->getFullName();
+			
+			// Object update
 			_screen->setLocalizationComment(_localizationComment);
 			if (_localization.get())
 				_screen->setLocalization(_localization);
+
+			// Database saving
+			DisplayScreenTableSync::save(_screen.get());
 
 			// Log
 			shared_ptr<ArrivalDepartureTableLog> log = Factory<dblog::DBLog>::create<ArrivalDepartureTableLog>();

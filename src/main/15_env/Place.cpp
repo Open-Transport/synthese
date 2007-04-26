@@ -23,98 +23,96 @@
 #include "15_env/Place.h"
 #include "15_env/City.h"
 
-
 namespace synthese
 {
-namespace env
-{
+	namespace env
+	{
+		Place::Place (const std::string& name,
+				  const City* city)
+			: _name (name)
+			, _city (city)
+		{
+			_name13 = _name.substr(0, 13);
+			_name26 = _name.substr(0, 26);
+		}
+
+
+		Place::~Place ()
+		{
+
+		}
 
 
 
-Place::Place (const std::string& name,
-	      const City* city)
-    : _name (name)
-    , _city (city)
-{
-	_name13 = _name.substr(0, 13);
-	_name26 = _name.substr(0, 26);
+		const std::string& 
+		Place::getName () const
+		{
+			return _name;
+		}
+
+
+
+		void 
+		Place::setName (const std::string& name)
+		{
+			_name = name;
+			if (_name13.empty())
+				_name13 = _name.substr(0, 13);
+			if (_name26.empty())
+				_name26 = _name.substr(0, 26);
+		}
+
+
+
+
+		const std::string& 
+		Place::getOfficialName () const
+		{
+			return getName ();
+		}
+
+
+
+		const City* 
+		Place::getCity () const
+		{
+			return _city;
+		}
+		    
+
+		    
+		VertexAccess
+		Place::getVertexAccess (const AccessDirection& accessDirection,
+					const AccessParameters& accessParameters,
+					const Vertex* destination,
+					const Vertex* origin) const
+		{
+			VertexAccess access;
+			access.approachDistance = 0;
+			access.approachTime = 0;
+
+			return access;
+		}
+
+		const std::string& Place::getName13() const
+		{
+			return _name13;
+		}
+
+		const std::string& Place::getName26() const
+		{
+			return _name26;
+		}
+
+		const std::string Place::getFullName() const
+		{
+			return ((_city != NULL) ? (_city->getName() + " ") : "") + getName();
+		}
+
+		void Place::setCity( const City* city )
+		{
+			_city = city;
+		}
+
+	}
 }
-
-
-Place::~Place ()
-{
-
-}
-
-
-
-const std::string& 
-Place::getName () const
-{
-    return _name;
-}
-
-
-
-void 
-Place::setName (const std::string& name)
-{
-    _name = name;
-	if (_name13.empty())
-		_name13 = _name.substr(0, 13);
-	if (_name26.empty())
-		_name26 = _name.substr(0, 26);
-}
-
-
-
-
-const std::string& 
-Place::getOfficialName () const
-{
-    return getName ();
-}
-
-
-
-const City* 
-Place::getCity () const
-{
-    return _city;
-}
-    
-
-    
-VertexAccess
-Place::getVertexAccess (const AccessDirection& accessDirection,
-			const AccessParameters& accessParameters,
-			const Vertex* destination,
-			const Vertex* origin) const
-{
-    VertexAccess access;
-    access.approachDistance = 0;
-    access.approachTime = 0;
-
-    return access;
-}
-
-const std::string& Place::getName13() const
-{
-	return _name13;
-}
-
-const std::string& Place::getName26() const
-{
-	return _name26;
-}
-
-const std::string Place::getFullName() const
-{
-	return ((_city != NULL) ? (_city->getName() + " ") : "") + getName();
-}
-
-
-}
-}
-
-

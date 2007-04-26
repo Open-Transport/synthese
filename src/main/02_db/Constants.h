@@ -27,7 +27,7 @@ namespace synthese
 {
 	namespace db
 	{
-		/** @addtogroup db
+		/** @addtogroup m02
 			@{
 		*/
 

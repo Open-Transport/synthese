@@ -33,6 +33,9 @@ namespace synthese
 	{
 		class Profile;
 
+		/** User creation action.
+			@ingroup m12Actions refActions
+		*/
 		class AddUserAction : public server::Action
 		{
 		public:

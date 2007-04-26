@@ -38,7 +38,7 @@ namespace synthese
 		class User;
 
 		/** Ecran de recherche et liste d'utilisateurs.
-			@ingroup m12
+			@ingroup m12Admin refAdmin
 		
 			@image html cap_admin_users.png
 			@image latex cap_admin_users.png "Maquette de l'écran de recherche d'utilisateur" width=14cm

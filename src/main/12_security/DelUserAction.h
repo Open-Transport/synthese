@@ -33,8 +33,8 @@ namespace synthese
 	{
 		class User;
 
-		/** DelUserAction action class.
-			@ingroup m12
+		/** User removal action class.
+			@ingroup m12Actions refActions
 		*/
 		class DelUserAction : public server::Action
 		{

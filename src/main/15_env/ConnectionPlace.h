@@ -35,7 +35,6 @@
 #include "15_env/AddressablePlace.h"
 #include "15_env/Types.h"
 
-
 namespace synthese
 {
 	namespace time
@@ -49,7 +48,6 @@ namespace synthese
 		class Edge;
 		class Path;
 		class SquareDistance; 
-
 
 		/** A connection place indicates that there are possible
 			connections between different network vertices.
