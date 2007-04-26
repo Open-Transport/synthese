@@ -1,4 +1,4 @@
-<project name="synthese" default="all" basedir=".">
+<project name="synthese" default="build" basedir=".">
 
   <import file="../common.xml"/>
 
