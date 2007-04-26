@@ -103,7 +103,7 @@ namespace synthese
 						out.push (PlainCharFilter());
 						out.push (ss);
 
-						out << __DP->second.at(__i)->getCity () ->getName();
+						out << __DP->second.at(__i)->getCity () ->getName() << std::flush;
 
 						// std::stringMinuscules __TexteMinuscule;
 						// __TexteMinuscule << __DP->GetGare( __i ) ->getTown() ->getName();
