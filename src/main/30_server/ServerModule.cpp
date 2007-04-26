@@ -78,7 +78,7 @@ namespace synthese
 			ManagedThread* serverThread = 
 			    new ManagedThread (serverThreadExec,
 					       "tcp_" + Conversion::ToString (i), 
-					       1, true);
+					       100, true);
 		    }
 				    
 		    // Create the cleaner thread (check every 5s)

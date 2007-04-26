@@ -48,7 +48,7 @@ class Thread
     std::string _name;
     boost::shared_ptr<ThreadExec> _exec;
 
-    int _loopDelay;  //!< Loop delay in milliseconds
+    int _loopDelay;  //!< Loop delay in nanoseconds
 
  private:
     
@@ -65,7 +65,7 @@ class Thread
 
     /** Constructs a Thread object given a ThreadExec pointer.
      */
-    Thread (ThreadExec* exec, const std::string& name = "", int loopDelay = 5);
+    Thread (ThreadExec* exec, const std::string& name = "", int loopDelay = 500);
 
     virtual ~Thread ();
 
@@ -81,7 +81,8 @@ class Thread
 
     //Thread& operator=(const Thread& ref);
 
-    static void Sleep (int ms);
+    static void Sleep (long ms);
+    static void NanoSleep (long ms);
 //    static void Yield ();
 
     ThreadState getState () const;

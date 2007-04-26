@@ -9,27 +9,135 @@
   <property name="deploy.local.lib.regexp.from" value="(.*)"/>
   <property name="deploy.local.lib.regexp.to" value="\1"/>
 
-  <property name="target" value="src/main/98_synthese_sai,src/main/99_synthese_vinci,src/main/91_cgi_client,src/main/95_db_client"/>     
-
+  <property name="profile" value="false"/>     
 
 
   <target name="build">
 
+    <fail unless="target"/>
 
-    <for param="targ" list="${target}">
-       <sequential>
-
-	 <antcall target="sconsbuild">
-	   <param name="goal" value="build"/>
-	   <param name="target" value="@{targ}"/>
-	   <param name="profile" value="false"/>
-	 </antcall>
-
-       </sequential>
-    </for>
-       
+    <antcall target="sconsbuild">
+      <param name="goal.param" value="build"/>
+      <param name="target.param" value="${target}"/>
+      <param name="profile.param" value="${profile}"/>
+    </antcall>
+    
   </target>
        
+
+
+  <target name="dist">
+
+    <fail unless="target"/>
+    <fail unless="distname"/>
+
+    <antcall target="sconsbuild">
+      <param name="goal.param" value="dist"/>
+      <param name="target.param" value="${target}"/>
+      <param name="profile.param" value="${profile}"/>
+      <param name="distname.param" value="${distname}"/>
+    </antcall>
+
+  </target>
+
+
+
+  <target name="install" depends="dist">
+
+    <propertyregex property="targetname" input="${target}" casesensitive="false"
+		   regexp="^.*/(.*)" select="\1" override="true"/>
+
+    <var name="distdir" 
+	 value="${build.home}/${platform}/${toolset}/${mode}/main/${targetname}/${distname}_dist"/>
+    
+    <switch value="${platform}">
+      
+      <case value="posix">
+	
+	<exec executable="sudo" dir="${distdir}">
+	  <arg value="./install.sh"/>
+	</exec>
+
+      </case>
+      
+      <default>
+	<fail message="Installation not supported on ${platform}" />
+      </default>
+      
+    </switch>
+
+  </target>
+
+
+
+
+
+  <target name="deploy" depends="dist">
+
+    <propertyregex property="targetname" input="${target}" casesensitive="false"
+		   regexp="^.*/(.*)" select="\1" override="true"/>
+
+    <var name="distdir" 
+	 value="${build.home}/${platform}/${toolset}/${mode}/main/${targetname}/${distname}_dist"/>
+
+
+      <switch value="${platform}">
+      
+        <case value="win32">
+
+	  <exec executable="${env.COMSPEC}" failonerror="true" 
+		resolveexecutable="true" searchpath="true">
+            <arg value="/c scp -q -C -r -P ${deploy.ssh.port} ${build.home}/${platform}/${toolset}/${mode}/main/${targetname}/${distname}_dist ${deploy.ssh.user}@${deploy.ssh.host}:" />
+	  </exec>
+	  
+	  <exec executable="${env.COMSPEC}" failonerror="true" 
+		resolveexecutable="true" searchpath="true">
+            <arg value="/c ssh -p ${deploy.ssh.port} ${deploy.ssh.user}@${deploy.ssh.host} &quot; cd ${distname}_dist &amp;&amp; sudo ./install.sh &quot;" />
+	  </exec>
+	  
+        </case>
+        
+        <case value="posix">
+	  
+           <exec executable="scp" failonerror="true"  
+                 resolveexecutable="true" searchpath="true"> 
+             <arg value="-q"/> 
+             <arg value="-C"/> 
+             <arg value="-r"/> 
+             <arg value="-P ${deploy.ssh.port}"/> 
+             <arg value="${build.home}/${platform}/${toolset}/${mode}/main/${targetname}/${distname}_dist"/> 
+             <arg value="${deploy.ssh.user}@${deploy.ssh.host}:${deploy.ssh.tmpdir}"/> 
+           </exec> 
+      
+          <exec executable="ssh" failonerror="true"
+                resolveexecutable="true" searchpath="true">
+            <arg value="-p ${deploy.ssh.port}"/>
+            <arg value="${deploy.ssh.user}@${deploy.ssh.host}"/>
+            <arg value="cd ${deploy.ssh.tmpdir}/${distname}_dist &amp;&amp; ./install.sh"/>
+          </exec>
+      
+	  
+
+        </case>
+        
+        <default>
+          <echo message="Do not know how to deploy on ${platform}" />
+        </default>
+      </switch>
+      
+      
+      
+<!--     <sshexec host="${deploy.ssh.host}" trust="true" -->
+<!-- 	     username="${deploy.ssh.user}" -->
+<!-- 	     port="200" password="${pwd}" -->
+<!-- 	     command="cd ${distname}_dist &amp;&amp; -->
+<!-- 		      sudo ./install.sh"/> -->
+
+  </target>
+
+
+
+<!--
        
   <target name="dist">
 
@@ -54,6 +162,10 @@
 	     <equals arg1="${mode}" arg2="release"/>
 	   </and>
 	   <then>
+	     <chmod dir="${distdir}" perm="+x" 
+		    includes="**/*.sh"/>
+	     <chmod file="${distdir}/${distname}" perm="+x" />
+
 	     <echo message="Stripping ${distdir}/${distname}"/>
 	     <exec executable="strip" failonerror="true" 
 		   resolveexecutable="true" searchpath="true">
@@ -75,15 +187,12 @@
 				 ${distname}_${platform}_${mode}/**/*.sh"/>
 	   
 	 </zip>
-
+	 
        </sequential>
     </for>
 
   </target>
-
-
-  <target name="deploy">
-  </target>
+-->
 
 
 </project>

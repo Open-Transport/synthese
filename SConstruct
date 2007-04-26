@@ -20,7 +20,7 @@ toolset = ARGUMENTS.get('toolset').lower()
 version = ARGUMENTS.get('version').lower()  
 boostversion = ARGUMENTS.get('boostversion').lower()  
 sqliteversion = ARGUMENTS.get('sqliteversion').lower()  
-
+distname = ARGUMENTS.get('distname').lower()
 
 
 print "librepo = ", librepo
@@ -42,10 +42,10 @@ buildtest = buildroot + '/test'
 resourcesroot = 'resources'
 resourcesmain = 'resources' + '/main'
 resourcestest = 'resources' + '/test'
-resourcesdist = 'resources' + '/dist'
+resourcesdist = 'resources' + '/dist/' + platform
 
 
-distroot = 'dist'
+distroot = 'dist' + '/' + platform + '/' + toolset +'/' + mode
 
 
 
@@ -63,8 +63,7 @@ def IsRelease (env):
   return env['MODE'] == 'release'
 
 def IsProfile (env):
-  return False
-  #return env['MODE'] == 'debug'
+  return env['MODE'] == 'debug'
 
 
 
@@ -303,33 +302,39 @@ def SyntheseEnv (env, modules):
 
 
 
-def SynthesePostBuild (target = None, source = None, env = None):
-    if goal != 'dist':
-      return
-  
-    distname = os.path.basename (target[0].abspath).replace ('.exe', '')
-    distdir = os.path.join (distroot, distname)
-    distdir = distdir + '_' + platform + '_' + toolset + '_' + mode
 
-    Execute (Delete (distdir))
-    Execute (Mkdir (distdir))
-    Execute (Mkdir (distdir + '/libs'))
 
-    # Executable file
-    Execute (Copy (os.path.join (distdir, os.path.basename (target[0].abspath)), target[0].abspath))
+def SyntheseDist (env, exeprog):
     
-    # Copy libs under posix (on windows exe is standalone)
-    if platform == 'posix':
-      env.CopyFiles (distdir + '/libs/', env['DISTLIBS'])
+  resourcesdistdir = '#' + resourcesdist + '/' + exeprog.name
+  installerdir = distname + '_dist'
+  localdir = installerdir + '/_' + distname
+  distexeprog = File (localdir + '/' + distname)
+  env.Command (distexeprog, exeprog,
+               Copy (distexeprog.abspath, exeprog.abspath))
+      
+  for distlib in env['DISTLIBS']:
+    distlibsrc = File (distlib)
+    distlibtarget = File (localdir + '/libs/' + os.path.basename (distlib))
+    env.Command (distlibtarget, distlibsrc,
+                 Copy (distlibtarget.abspath, distlibsrc.abspath))
+    Depends (Dir (localdir), distlibtarget)
 
-    # Copy resources
-    if (os.path.exists (resourcesdist + '/' + distname)):
-       env.CopyFiles (distdir, env.Glob (dir = resourcesdist + '/' + distname), False)
-    if (os.path.exists (resourcesdist + '/' + distname + '/' + platform)):
-       env.CopyFiles (distdir, env.Glob (dir = resourcesdist + '/' + distname + '/' + platform), False)
-    if (os.path.exists (resourcesdist + '/' + distname + '/' + platform + '/' + mode)):
-       env.CopyFiles (distdir, env.Glob (dir = resourcesdist + '/' + distname + '/' + platform + '/' + mode), False)
+  # Generate startup.sh
+  runnertemplate = File (resourcesdistdir + '/startup.sh')
+  runnerfile = File (localdir + '/startup.sh')
+  env.DistScript (runnerfile, [runnertemplate, distexeprog])
+  Depends (Dir (localdir), runnerfile)
 
+  installerscripts = env.Glob('*', ['startup.sh'], dir = resourcesdistdir)
+  for inscript in installerscripts:
+    installertemplate = File (inscript)
+    installerfile = File (installerdir + '/' + installertemplate.name)
+    env.DistScript (installerfile, [installertemplate, distexeprog])
+    Depends (Dir (installerdir), installerfile)
+
+  Depends (Dir (installerdir), Dir (localdir))
+  env.AlwaysBuild (Dir (installerdir))
 
 
 
@@ -382,15 +387,10 @@ def SyntheseBuild (env, binname, generatemain = True):
       env.CopyFile (env.Dir ('#src/main').abspath + '/' + currentmodule + '/includes.cpp.inc', tmpinc.name)
 
 
-    exename = env.Program ( binname, files )
-    exename = os.path.basename (exename[0].path)
+    exeprog = env.Program ( binname, files )[0]
     
-    mainobj = "main" + env['OBJSUFFIX']
-    
-    # Copy dynamic libraries (guarded by goal == dist)
-    postaction = Action (SynthesePostBuild)
-    env.AddPostAction (exename, postaction)
-
+    if goal == 'dist':
+      env.SyntheseDist (exeprog)
 
 			       
 def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[], withSQLite=False, withMultithreading=True):
@@ -444,6 +444,7 @@ SConsEnvironment.IsRelease=IsRelease
 SConsEnvironment.IsProfile=IsProfile
 
 SConsEnvironment.SyntheseBuild=SyntheseBuild
+SConsEnvironment.SyntheseDist=SyntheseDist
 
 SConsEnvironment.AddModuleDependency=AddModuleDependency
 SConsEnvironment.AddBoostDependency=AddBoostDependency
@@ -483,15 +484,36 @@ def builder_unit_test(target, source, env):
     return 1
 
 
-def builder_copy_resources (target, source, env):
-  env.Copy (target, source)
+
+
+def builder_distscript (target, source, env):
+  runnerresource = open(str(source[0]),'r')
+  runnerscript = runnerresource.read ();
+  runnerresource.close()
+
+  distprog = source[1]
+  runnerscript = runnerscript.replace ('#DISTNAME#', distprog.name)
+
+  runner = open(str(target[0]),'w')
+  runner.write (runnerscript)
+  runner.close ()
+  Execute(Chmod(target[0].abspath, 0755))
+  return None
+
+
+
+  
+
+
+
+
 
 
 bld = Builder(action = builder_unit_test)
 rootenv.Append(BUILDERS = {'Test' :  bld})
 
-bld = Builder(action = builder_copy_resources)
-rootenv.Append(BUILDERS = {'CopyResources' :  bld})
+bld = Builder(action = builder_distscript)
+rootenv.Append(BUILDERS = {'DistScript' :  bld})
 
 
 

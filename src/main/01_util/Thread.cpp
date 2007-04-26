@@ -119,8 +119,7 @@ Thread::operator()()
 	while (state != STOPPED) 
 	{
 	    execLoop ();
-
-	    Sleep (_loopDelay);
+	    NanoSleep (_loopDelay);
 	    state = getState ();
 	}
 	Log::GetInstance ().info ("Thread " + _name +  " is stopped.");
@@ -153,14 +152,23 @@ Thread::Yield ()
 
 
 void 
-Thread::Sleep (int ms)
+Thread::Sleep (long ms)
+{
+    NanoSleep (ms * 1000000);
+} 
+
+
+
+
+void 
+Thread::NanoSleep (long ns)
 {
     boost::xtime xt;
     boost::xtime_get(&xt, boost::TIME_UTC);
 
-    xt.sec += ms / 1000; 
-    xt.nsec += (ms % 1000000) * 1000000; 
-    
+    xt.sec += ns / 1000000000; 
+    xt.nsec += (ns % 1000000000) ; 
+
     if (xt.nsec >= 1000000000)
     {
 	xt.sec += 1;
@@ -169,7 +177,6 @@ Thread::Sleep (int ms)
 
     boost::thread::sleep(xt);
 } 
-
 
 
 

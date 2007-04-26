@@ -201,13 +201,6 @@ namespace synthese
 			    
 			}
 
-			/*
-			    static int i = 0;
-			    i++;
-			    if (i % 1000 == 0) 
-				Log::GetInstance ().info ("time  = " + Conversion::ToString (i));
-			*/
-
 
 		}
 
