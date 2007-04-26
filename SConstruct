@@ -326,7 +326,7 @@ def SyntheseDist (env, exeprog):
   env.DistScript (runnerfile, [runnertemplate, distexeprog])
   Depends (Dir (localdir), runnerfile)
 
-  installerscripts = env.Glob('*', ['startup.sh'], dir = resourcesdistdir)
+  installerscripts = env.Glob('*.sh', ['startup.sh'], dir = resourcesdistdir)
   for inscript in installerscripts:
     installertemplate = File (inscript)
     installerfile = File (installerdir + '/' + installertemplate.name)
