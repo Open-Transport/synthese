@@ -375,7 +375,7 @@ namespace synthese
 				
 				stream << tt.row();
 				stream << tt.col() << "Activer";
-				stream << tt.col() << tf.getOuiNonRadioInput(UpdateDisplayPreselectionParametersAction::PARAMETER_ACTIVATE_PRESELECTION, _displayScreen->getGenerationMethod() == DisplayScreen::STANDARD_METHOD);
+				stream << tt.col() << tf.getOuiNonRadioInput(UpdateDisplayPreselectionParametersAction::PARAMETER_ACTIVATE_PRESELECTION, _displayScreen->getGenerationMethod() != DisplayScreen::STANDARD_METHOD);
 				
 				stream << tt.row();
 				stream << tt.col() << "Délai maximum présélection";

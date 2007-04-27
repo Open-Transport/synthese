@@ -61,7 +61,7 @@ namespace synthese
 		{
 			return (_Left.realDepartureTime < _Right.realDepartureTime
 				|| _Left.realDepartureTime == _Right.realDepartureTime 
-				&& _Left.linestop != _Right.linestop
+				&& _Left.linestop < _Right.linestop
 				);
 		}
 	};

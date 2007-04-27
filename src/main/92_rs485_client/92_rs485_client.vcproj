@@ -17,17 +17,17 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug"
+			OutputDirectory="../../../build/win32/vc-8_0/$(ConfigurationName)/main/$(InputName)"
+			IntermediateDirectory="../../../build/win32/vc-8_0/$(ConfigurationName)/main/$(InputName)"
 			ConfigurationType="0"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="../../../proj/vs/vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				BuildCommandLine="../../../vsscons build -Dtarget=src/main/$(InputName)"
 				ReBuildCommandLine="../../../proj/vs/vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
 				CleanCommandLine="../../../proj/vs/vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"
+				Output="../../../build/win32/vc-8_0/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"
 				PreprocessorDefinitions=""
 				IncludeSearchPath=""
 				ForcedIncludes=""

@@ -27,6 +27,7 @@
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/ArrivalDepartureTableLog.h"
 
 using namespace std;
 using namespace boost;
@@ -75,9 +76,25 @@ namespace synthese
 
 		void UpdateDisplayPreselectionParametersAction::run()
 		{
+			// Old values
+			bool wasPreselection = (_screen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD);
+			int oldDelay = _screen->getForceDestinationDelay();
+			
+			// The update
 			_screen->setDestinationForceDelay(_preselectionDelay);
 			_screen->setGenerationMethod(_activatePreselection ? DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD : DisplayScreen::STANDARD_METHOD);
 			DisplayScreenTableSync::save(_screen.get());
+
+			// Log
+			stringstream t;
+			t << "Mise à jour paramètres présélection : ";
+			if (wasPreselection != _activatePreselection)
+				t << " Mode de présélection => " << (_activatePreselection ? "OUI" : "NON");
+			if (oldDelay != _preselectionDelay)
+				t << " Délai de préselection : " << oldDelay << " => " << _preselectionDelay;
+			shared_ptr<ArrivalDepartureTableLog> log = Factory<dblog::DBLog>::create<ArrivalDepartureTableLog>();
+			log->addUpdateEntry(_screen, t.str(), _request->getUser());
+
 		}
 	}
 }

@@ -71,7 +71,7 @@ namespace synthese
 				This method has to be overloaded.
 				The default behaviour is to do nothing and continue the execution without any session.
 			*/
-			virtual bool _runBeforeDisplayIfNoSession(std::ostream& stream) { return true; }
+			virtual bool _runBeforeDisplayIfNoSession(std::ostream& stream) { return false; }
 
 
 			/** Authorization control.

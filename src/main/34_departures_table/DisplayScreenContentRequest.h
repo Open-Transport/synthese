@@ -34,7 +34,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** DisplayScreenContentRequest class.
-			@ingroup m34
+			@ingroup m34Functions refFunctions
 		*/
 		class DisplayScreenContentRequest : public server::Function
 		{

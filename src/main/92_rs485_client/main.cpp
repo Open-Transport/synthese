@@ -34,19 +34,19 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <vector>
 
 #include <boost/thread/thread.hpp>
 #include <boost/iostreams/stream.hpp>
 
 
 #define MAX_QUERY_SIZE 4096
-#define MAX_CLIENTS 128
 #define STATUS_MESSAGE_SIZE 17
 
 
 using namespace synthese::util;
 using namespace synthese::tcp;
-
+using namespace std;
 
 
 /** Main function of the RS485 Client binary.
@@ -57,87 +57,87 @@ using namespace synthese::tcp;
 int main(int argc, char* argv[])
 {
 
-    char *codes[MAX_CLIENTS], *server, *comm;
-    int outdate[MAX_CLIENTS];
+    vector<string> codes;
+    vector<int> outdate;
     int nbclients;
     DCB dcb;
     HANDLE hCom;
     BOOL fSuccess;
 
     // get parameters 
-    if(argc > MAX_CLIENTS+4 || argc < 4) 
+    if(argc < 4) 
 	{
 		Log::GetInstance ().fatal ("Invalid number of arguments");
 		exit(-1);
 	}
 
-    server = argv[1];
+    string server(argv[1]);
     int port = atoi (argv[2]);
-    comm = argv[3];
-    bool useCOM (true);
-    if ( (comm.substr (0, 3) == "COM") ||
-	 (comm.substr (0, 3) == "com") )
+    string comm(argv[3]);
+    bool useCOM (false);
+    if ( (comm.substr (0, 3) == "COM") || (comm.substr (0, 3) == "com") )
     {
-	useCOM = true;
+		useCOM = true;
     }
 
 
-    memset(codes, MAX_CLIENTS, sizeof(char*));
-    for(nbclients=0; nbclients<argc-4; nbclients++) {
-	codes[nbclients] = argv[nbclients+4];
-	outdate[nbclients] = 0;
+    //memset(codes, MAX_CLIENTS, sizeof(char*));
+    for(nbclients=0; nbclients<argc-4; nbclients++)
+	{
+		codes.push_back(argv[nbclients+4]);
+		outdate.push_back(0);
     }
 
     if (useCOM)
     {
-	hCom = CreateFile( comm,
-			   GENERIC_READ | GENERIC_WRITE,
-			   0,    // must be opened with exclusive-access
-			   NULL, // no security attributes
-			   OPEN_EXISTING, // must use OPEN_EXISTING
-			   0,    // not overlapped I/O
-			   NULL  // hTemplate must be NULL for comm devices
-	    );
-	
-	if (hCom == INVALID_HANDLE_VALUE) 
-	{
-	    Log::GetInstance ().fatal ("Error while creating comm file " + Conversion::ToString (GetLastError()));
-	    exit(1);
-	}
-	
-	// Build on the current configuration, and skip setting the size
-	// of the input and output buffers with SetupComm.
-	fSuccess = GetCommState(hCom, &dcb);
-	if (!fSuccess) 
-	{
-	    // Handle the error.
-	    Log::GetInstance ().fatal ("Error while getting comm state " + Conversion::ToString (GetLastError()));
-	    exit(2);
-	}
-  
-	COMMTIMEOUTS lpct;
-	lpct.ReadIntervalTimeout = 200;
-	lpct.ReadTotalTimeoutMultiplier = 200;
-	lpct.ReadTotalTimeoutConstant = 0;
-	lpct.WriteTotalTimeoutMultiplier = 200;
-	lpct.WriteTotalTimeoutConstant = 0;
+		hCom = CreateFile( comm.c_str(),
+				   GENERIC_READ | GENERIC_WRITE,
+				   0,    // must be opened with exclusive-access
+				   NULL, // no security attributes
+				   OPEN_EXISTING, // must use OPEN_EXISTING
+				   0,    // not overlapped I/O
+				   NULL  // hTemplate must be NULL for comm devices
+			);
+		
+		if (hCom == INVALID_HANDLE_VALUE) 
+		{
+			Log::GetInstance ().fatal ("Error while creating comm file " + Conversion::ToString (GetLastError()));
+			exit(1);
+		}
+		
+		// Build on the current configuration, and skip setting the size
+		// of the input and output buffers with SetupComm.
+		fSuccess = GetCommState(hCom, &dcb);
+		if (!fSuccess) 
+		{
+			// Handle the error.
+			Log::GetInstance ().fatal ("Error while getting comm state " + Conversion::ToString (GetLastError()));
+			exit(2);
+		}
+	  
+		COMMTIMEOUTS lpct;
+		lpct.ReadIntervalTimeout = 200;
+		lpct.ReadTotalTimeoutMultiplier = 200;
+		lpct.ReadTotalTimeoutConstant = 0;
+		lpct.WriteTotalTimeoutMultiplier = 200;
+		lpct.WriteTotalTimeoutConstant = 0;
 
-	fSuccess = SetCommTimeouts (hCom, &lpct);
+		fSuccess = SetCommTimeouts (hCom, &lpct);
 
-	// Fill in DCB: 57,600 bps, 8 data bits, no parity, and 1 stop bit.
-	dcb.BaudRate = CBR_9600;      // set the baud rate
-	dcb.ByteSize = 8;             // data size, xmit, and rcv
-	dcb.Parity = NOPARITY;      // parity bit
-	dcb.StopBits = ONESTOPBIT;    // one stop bit
-	fSuccess = SetCommState(hCom, &dcb);
-	if (!fSuccess) 
-	{
-	    // Handle the error.
-	    Log::GetInstance ().fatal ("SetCommState failed with error " + Conversion::ToString (GetLastError()));
-	    exit(3);
-	}
-	
-	Log::GetInstance ().info ("Serial port " + std::string (comm) + " successfully reconfigured.");
+		// Fill in DCB: 57,600 bps, 8 data bits, no parity, and 1 stop bit.
+		dcb.BaudRate = CBR_9600;      // set the baud rate
+		dcb.ByteSize = 8;             // data size, xmit, and rcv
+		dcb.Parity = NOPARITY;      // parity bit
+		dcb.StopBits = ONESTOPBIT;    // one stop bit
+		fSuccess = SetCommState(hCom, &dcb);
+		if (!fSuccess) 
+		{
+			// Handle the error.
+			Log::GetInstance ().fatal ("SetCommState failed with error " + Conversion::ToString (GetLastError()));
+			exit(3);
+		}
+		
+		Log::GetInstance ().info ("Serial port " + std::string (comm) + " successfully reconfigured.");
     }
 	    
 
@@ -154,45 +154,45 @@ int main(int argc, char* argv[])
         stamp = hms->tm_min;
 
 
-        for(int client=0; client<nbclients; client++)
-        {
-              try 
-              {
+		for(int client=0; client<nbclients; client++)
+		{
+			try
+			{
 
-                  if(outdate[client] == stamp) continue;
-                  
-                  //if(!SetCommState(hCom, &dcb))
-                  //    fichier << "erreur reinit port com" << endl;
-                  
-                  Log::GetInstance ().info ("Connecting " + std::string (server) 
-					    + std::string (":") + Conversion::ToString (port));
-                  
-                  int timeout = 2; // 2 seconds timeout
-		  {
-		      TcpClientSocket clientSock (server, port, timeout);
-		      
-		      while (clientSock.isConnected () == false)
-		      {
-                          clientSock.tryToConnect ();
-                          Thread::Sleep (500);
-		      }
-		      
-		      // The client is connected.
-		      Log::GetInstance ().info ("Connected.");
-		      
-		      // Create commodity stream:
-		      boost::iostreams::stream<TcpClientSocket> cliSocketStream;
-		      cliSocketStream.open (clientSock);
-		      
-		      cliSocketStream << "fonction=tdg&date=A&tb=" << codes[client] 
-				      << "&ipaddr=0.0.0.0" << std::endl;
+			  if(outdate[client] == stamp) continue;
 			  
-		      cliSocketStream.flush ();
-			  memset (buf, 0, sizeof (buf));
-		      cliSocketStream.getline (buf, sizeof (buf), (char) 0);
-		      cliSocketStream.close ();
-		  }
-		  std::string received (buf);  
+			  //if(!SetCommState(hCom, &dcb))
+			  //    fichier << "erreur reinit port com" << endl;
+			  
+			  Log::GetInstance ().info ("Connecting " + std::string (server) 
+					+ std::string (":") + Conversion::ToString (port));
+			  
+              int timeout = 2; // 2 seconds timeout
+			  {
+				  TcpClientSocket clientSock (server, port, timeout);
+			      
+				  while (clientSock.isConnected () == false)
+				  {
+					  clientSock.tryToConnect ();
+					  Thread::Sleep (500);
+				  }
+			      
+				  // The client is connected.
+				  Log::GetInstance ().info ("Connected.");
+			      
+				  // Create commodity stream:
+				  boost::iostreams::stream<TcpClientSocket> cliSocketStream;
+				  cliSocketStream.open (clientSock);
+			      
+				  cliSocketStream << "fonction=tdg&date=A&tb=" << codes[client] 
+						  << "&ipaddr=0.0.0.0" << std::endl;
+				  
+				  cliSocketStream.flush ();
+				  memset (buf, 0, sizeof (buf));
+				  cliSocketStream.getline (buf, sizeof (buf), (char) 0);
+				  cliSocketStream.close ();
+			  }
+			  std::string received (buf);  
 
 		  if (received.empty ())
 		  {
