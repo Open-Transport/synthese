@@ -86,6 +86,8 @@ namespace synthese
 	    }
 
 
+
+
 	    
 	    void 
 	    DbModuleClass::RegisterParameter (const std::string& name,
