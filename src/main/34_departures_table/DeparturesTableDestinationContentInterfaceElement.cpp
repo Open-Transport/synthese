@@ -104,11 +104,18 @@ namespace synthese
 						out.push (ss);
 
 						out << __DP->second.at(__i)->getCity () ->getName() << std::flush;
+						std::string cityName (ss.str ());
+						
 
 						// std::stringMinuscules __TexteMinuscule;
 						// __TexteMinuscule << __DP->GetGare( __i ) ->getTown() ->getName();
+						if ((cityName.size () > 0) &&
+						    (cityName[0] >= 'a') && (cityName[0]  <= 'z'))
+						{
+						    cityName[0] = cityName[0] - 'a' + 'A';
+						}
+						stream << __AvantCommune << cityName << __ApresCommune;
 
-						stream << __AvantCommune << ss.str () << __ApresCommune;
 						__DerniereCommune = __DP->second.at(__i)->getCity();
 
 
