@@ -119,7 +119,7 @@ Thread::operator()()
 	while (state != STOPPED) 
 	{
 	    execLoop ();
-	    NanoSleep (_loopDelay);
+	    Sleep (_loopDelay);
 	    state = getState ();
 	}
 	Log::GetInstance ().info ("Thread " + _name +  " is stopped.");

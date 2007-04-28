@@ -82,8 +82,12 @@ class Thread
     //Thread& operator=(const Thread& ref);
 
     static void Sleep (long ms);
+
+    /** WARNING : timer functionalities might not be accurate enough to use 
+     *  a sleep time in nanoseconds, depending on platform.
+     *  Use nanosecond resolution with great care.
+     */
     static void NanoSleep (long ms);
-//    static void Yield ();
 
     ThreadState getState () const;
 
