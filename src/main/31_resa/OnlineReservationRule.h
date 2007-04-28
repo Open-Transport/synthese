@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class ReservationRule;
+	}
+
 	namespace resa
 	{
 
@@ -44,7 +49,7 @@ namespace synthese
 		private:
 			//! \name Link with env reservation rules
 			//@{
-				uid _reservationRuleId;
+				boost::shared_ptr<const env::ReservationRule> _reservationRule;
 			//@}
 
 			//! \name Addresses for reports sending
@@ -85,7 +90,7 @@ namespace synthese
 
 			//! \name Setters
 			//@{
-				void	setReservationRuleId(uid id);
+				void	setReservationRule(boost::shared_ptr<const env::ReservationRule>);
 				void	setEMail(const std::string& email);
 				void	setCopyEMail(const std::string& email);
 				void	setNeedsSurname(boost::logic::tribool value);

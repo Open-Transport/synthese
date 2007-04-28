@@ -92,12 +92,12 @@ namespace synthese
 
             query
 				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
-				<< Conversion::ToString(object->getId())
-				<< "," << Conversion::ToString(tobject != NULL)
-				<< "," << (sobject ? Conversion::ToString(sobject->getIsEnabled()) : "0")
-				<< "," << Conversion::ToSQLiteString(object->getName())
-				<< "," << (sobject ? sobject->getPeriodStart().toSQLString() : "NULL")
-				<< "," << (sobject ? sobject->getPeriodEnd().toSQLString() : "NULL")
+					<< Conversion::ToString(object->getId())
+					<< "," << Conversion::ToString(tobject != NULL)
+					<< "," << (sobject ? Conversion::ToString(sobject->getIsEnabled()) : "0")
+					<< "," << Conversion::ToSQLiteString(object->getName())
+					<< "," << (sobject ? sobject->getPeriodStart().toSQLString() : "NULL")
+					<< "," << (sobject ? sobject->getPeriodEnd().toSQLString() : "NULL")
 				<< ")";
 			sqlite->execUpdate(query.str());
 
@@ -105,10 +105,13 @@ namespace synthese
 			{
 				stringstream alarmquery;
 				alarmquery
-					<< "UPDATE " << AlarmTableSync::TABLE_NAME << " SET "
-					<< AlarmTableSync::COL_PERIODSTART << "=" << sobject->getPeriodStart().toSQLString()
-					<< AlarmTableSync::COL_PERIODEND << "=" << sobject->getPeriodEnd().toSQLString()
-					<< " WHERE " << AlarmTableSync::COL_SCENARIO_ID << "=" << sobject->getKey();
+					<< "UPDATE "
+						<< AlarmTableSync::TABLE_NAME
+					<< " SET "
+						<< AlarmTableSync::COL_PERIODSTART << "=" << sobject->getPeriodStart().toSQLString()
+						<< "," << AlarmTableSync::COL_PERIODEND << "=" << sobject->getPeriodEnd().toSQLString()
+					<< " WHERE " 
+						<< AlarmTableSync::COL_SCENARIO_ID << "=" << sobject->getKey();
 				sqlite->execUpdate(alarmquery.str());
 			}
 

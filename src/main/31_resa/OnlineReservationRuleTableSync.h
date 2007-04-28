@@ -37,14 +37,22 @@ namespace synthese
 		class OnlineReservationRule;
 
 		/** OnlineReservationRule table synchronizer.
-			@ingroup m31
+			@ingroup m31LS refLS
 		*/
 		class OnlineReservationRuleTableSync : public db::SQLiteTableSyncTemplate<OnlineReservationRule>
 		{
 		public:
-			/// @todo Column list
-			// eg : static const std::string TABLE_COL_NAME;
-			
+			static const std::string COL_RESERVATION_RULE_ID;
+			static const std::string COL_EMAIL;
+			static const std::string COL_COPY_EMAIL;
+			static const std::string COL_NEEDS_SURNAME;
+			static const std::string COL_NEEDS_ADDRESS;
+			static const std::string COL_NEEDS_PHONE;
+			static const std::string COL_NEEDS_EMAIL;
+			static const std::string COL_NEEDS_CUSTOMER_NUMBER;
+			static const std::string COL_MAX_SEATS;
+			static const std::string COL_THRESHOLDS;
+
 			OnlineReservationRuleTableSync();
 			~OnlineReservationRuleTableSync();
 

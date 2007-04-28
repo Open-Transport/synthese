@@ -72,14 +72,33 @@ namespace synthese
 
 	namespace resa
 	{
-		const std::string OnlineReservationRuleTableSync::TABLE_COL_ID = "id";
-		/// @todo Other fields
+		const string OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
+		const string OnlineReservationRuleTableSync::COL_EMAIL = "email";
+		const string OnlineReservationRuleTableSync::COL_COPY_EMAIL = "copy_email";
+		const string OnlineReservationRuleTableSync::COL_NEEDS_SURNAME = "needs_surname";
+		const string OnlineReservationRuleTableSync::COL_NEEDS_ADDRESS = "needs_address";
+		const string OnlineReservationRuleTableSync::COL_NEEDS_PHONE = "needs_phone";
+		const string OnlineReservationRuleTableSync::COL_NEEDS_EMAIL = "needs_email";
+		const string OnlineReservationRuleTableSync::COL_NEEDS_CUSTOMER_NUMBER = "needs_customer_number";
+		const string OnlineReservationRuleTableSync::COL_MAX_SEATS = "max_seat";
+		const string OnlineReservationRuleTableSync::COL_THRESHOLDS = "thresholds";
 
 		OnlineReservationRuleTableSync::OnlineReservationRuleTableSync()
 			: SQLiteTableSyncTemplate<OnlineReservationRule>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			/// @todo Other fields (types ar INTEGER, TEXT)
+			addTableColumn(COL_RESERVATION_RULE_ID, "INTEGER");
+			addTableColumn(COL_EMAIL, "TEXT");
+			addTableColumn(COL_COPY_EMAIL, "TEXT");
+			addTableColumn(COL_NEEDS_SURNAME, "INTEGER");
+			addTableColumn(COL_NEEDS_ADDRESS, "INTEGER");
+			addTableColumn(COL_NEEDS_PHONE, "INTEGER");
+			addTableColumn(COL_NEEDS_EMAIL, "INTEGER");
+			addTableColumn(COL_NEEDS_CUSTOMER_NUMBER, "INTEGER");
+			addTableColumn(COL_MAX_SEATS, "INTEGER");
+			addTableColumn(COL_THRESHOLDS, "INTEGER");
+
+			addTableIndex(COL_RESERVATION_RULE_ID);
 		}
 
 		void OnlineReservationRuleTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)

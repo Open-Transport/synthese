@@ -37,17 +37,14 @@ namespace synthese
 
 
 		OnlineReservationRule::OnlineReservationRule()
-			: _reservationRuleId(UNKNOWN_VALUE)
-			, _maxSeats(UNKNOWN_VALUE)
+			: _maxSeats(UNKNOWN_VALUE)
 		{
 			
 		}
 
 		boost::shared_ptr<const env::ReservationRule> OnlineReservationRule::getReservationRule() const
 		{
-			return EnvModule::getReservationRules().contains(_reservationRuleId)
-				? EnvModule::getReservationRules().get(_reservationRuleId)
-				: shared_ptr<const ReservationRule>();
+			return _reservationRule;
 		}
 
 		const std::string& OnlineReservationRule::getEMail() const
@@ -95,9 +92,9 @@ namespace synthese
 			return _thresholds;
 		}
 
-		void OnlineReservationRule::setReservationRuleId( uid id )
+		void OnlineReservationRule::setReservationRule(shared_ptr<ReservationRule> rule)
 		{
-			_reservationRuleId = id;
+			_reservationRule = rule;
 		}
 
 		void OnlineReservationRule::setEMail( const std::string& email )
