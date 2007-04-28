@@ -1,9 +1,6 @@
 #ifndef SYNTHESE_UTIL_LOWERCASEFILTER_H
 #define SYNTHESE_UTIL_LOWERCASEFILTER_H
 
-
-#include "module.h"
-
 #include <string>
 #include <iostream>
 

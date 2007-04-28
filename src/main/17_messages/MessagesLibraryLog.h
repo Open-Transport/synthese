@@ -29,17 +29,33 @@ namespace synthese
 {
 	namespace messages
 	{
+		class AlarmTemplate;
+		class ScenarioTemplate;
+
 		/** Journal concernant la bibliothèque de messages.
 
 			Les colonnes additionnelles du journal de sécurité sont :
 				- Action : décrit l'action effectuée (ex : création de modèle de message prioritaire)
 				- UID objet concerné : lien vers le message
+
+			@ingroup m17Logs refLogs
 		*/
 		class MessagesLibraryLog : public dblog::DBLog
 		{
 		public:
 			MessagesLibraryLog();
 			DBLog::ColumnsVector getColumnNames() const;
+			void	addUpdateEntry(
+				boost::shared_ptr<const AlarmTemplate> alarm
+				, const std::string& text
+				, boost::shared_ptr<const security::User> user
+				);
+			void	addUpdateEntry(
+				boost::shared_ptr<const ScenarioTemplate> scenario
+				, const std::string& text
+				, boost::shared_ptr<const security::User> user
+				);
+			std::string getObjectName(uid id) const;
 		};
 	}
 }

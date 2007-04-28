@@ -134,10 +134,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SqlFilter.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Thread.cpp"
 				>
 			</File>
@@ -178,14 +174,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\XmlException.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\XmlException.h"
-				>
-			</File>
-			<File
 				RelativePath=".\XmlParser.cpp"
 				>
 			</File>
@@ -210,6 +198,10 @@
 				</File>
 				<File
 					RelativePath=".\PlainCharFilter.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SqlFilter.h"
 					>
 				</File>
 				<File
@@ -241,13 +233,17 @@
 				RelativePath=".\ThreadException.h"
 				>
 			</File>
+			<File
+				RelativePath=".\XmlException.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\XmlException.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\Constants.h"
-			>
-		</File>
-		<File
-			RelativePath=".\module.h"
 			>
 		</File>
 		<File

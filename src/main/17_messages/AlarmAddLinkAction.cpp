@@ -25,11 +25,15 @@
 #include "30_server/ActionException.h"
 
 #include "17_messages/AlarmAddLinkAction.h"
-#include "17_messages/Alarm.h"
-#include "17_messages/MessagesModule.h"
+#include "17_messages/SingleSentAlarm.h"
+#include "17_messages/ScenarioSentAlarm.h"
+#include "17_messages/AlarmTemplate.h"
 #include "17_messages/AlarmRecipient.h"
 #include "17_messages/AlarmObjectLink.h"
 #include "17_messages/AlarmObjectLinkTableSync.h"
+#include "17_messages/AlarmTableSync.h"
+#include "17_messages/MessagesLibraryLog.h"
+#include "17_messages/MessagesLog.h"
 
 using namespace std;
 using namespace boost;
@@ -38,6 +42,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace dblog;
 	
 	namespace messages
 	{
@@ -71,9 +76,14 @@ namespace synthese
 			it = map.find(PARAMETER_ALARM_ID);
 			if (it == map.end())
 				throw ActionException("Alarm not specified");
-			if (!MessagesModule::getAlarms().contains(Conversion::ToLongLong(it->second)))
+			try
+			{
+				_alarm = AlarmTableSync::getAlarm(Conversion::ToLongLong(it->second));
+			}
+			catch (...)
+			{
 				throw ActionException("Specified alarm not found");
-			_alarm = MessagesModule::getAlarms().get(Conversion::ToLongLong(it->second));
+			}
 			
 			// Object ID
 			it = map.find(PARAMETER_OBJECT_ID);
@@ -84,11 +94,32 @@ namespace synthese
 
 		void AlarmAddLinkAction::run()
 		{
+			// Action
 			shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
 			aol->setRecipientKey(_recipientKey);
 			aol->setAlarmId(_alarm->getId());
 			aol->setObjectId(_objectId);
 			AlarmObjectLinkTableSync::save(aol.get());
+
+			// Log
+			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
+			{
+				shared_ptr<const AlarmTemplate> alarmTemplate = dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm);
+				shared_ptr<MessagesLibraryLog> log = Factory<DBLog>::create<MessagesLibraryLog>();
+				log->addUpdateEntry(alarmTemplate, "Ajout de destinataire " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser() );
+			}
+			else if (dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm).get())
+			{
+				shared_ptr<const SingleSentAlarm> singleSentAlarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
+				shared_ptr<MessagesLog> log = Factory<DBLog>::create<MessagesLog>();
+				log->addUpdateEntry(singleSentAlarm, "Ajout de destinataire à message simple " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser());
+			}
+			else
+			{
+				shared_ptr<const ScenarioSentAlarm> scenarioSentAlarm = dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(_alarm);
+				shared_ptr<MessagesLog> log = Factory<DBLog>::create<MessagesLog>();
+				log->addUpdateEntry(scenarioSentAlarm, "Ajout de destinataire à message de scénario " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser());
+			}
 		}
 
 		void AlarmAddLinkAction::setRecipientKey( const std::string& key )

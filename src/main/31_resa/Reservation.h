@@ -27,23 +27,12 @@
 
 #include "04_time/DateTime.h"
 
+#include "01_util/UId.h"
+
 namespace synthese
 {
-	namespace env
-	{
-		class CommercialLine;
-		class Place;
-	}
-
-	namespace security
-	{
-		class User;
-	}
-
 	namespace resa
 	{
-		class OnlineReservationRule;
-
 		/** Reservation class.
 			@ingroup m31
 
@@ -60,35 +49,35 @@ namespace synthese
 
 			//!	\name Service réservé
 			//@{
-			const env::CommercialLine*		_line;				//!< Axe de la ligne à la demande
-			std::string						_lineCode;			//<! Comprehensive line code
-			std::string						_serviceCode;			//!< Code du service au sein l'axe
-			const env::Place*				_departurePlace;		//!< Code du point d'arrêt de montée
-			std::string						_departurePlaceName;
-			const env::Place*				_arrivalPlace;	//!< Code du point d'arrêt de descente
-			std::string						_arrivalPlaceName;
-			const OnlineReservationRule*	_reservationRule;	//!< Code de la modalité de reservation
-			std::string						_departureAddress;			//!< Adresse du départ
-			std::string						_arrivalAddress;		//!< Adresse d'arrivée
-			time::DateTime					_departureTime;			//!< Moment de montée prévu
-			time::DateTime					_arrivalTime;			//!< Moment d'arrivée prévue
+				uid								_lineId;			//<! ID of the booked CommercialLine
+				std::string						_lineCode;			//<! Comprehensive line code
+				std::string						_serviceCode;			//!< Code du service au sein l'axe
+				uid								_departurePlaceId;		//!< ID of the departure Place
+				std::string						_departurePlaceName;
+				uid								_arrivalPlaceId;		//!< ID of the arrival Place
+				std::string						_arrivalPlaceName;
+				uid								_reservationRuleId;	//!< ID of the used OnlineReservationRule
+				std::string						_departureAddress;			//!< Adresse du départ
+				std::string						_arrivalAddress;		//!< Adresse d'arrivée
+				time::DateTime					_departureTime;			//!< Moment de montée prévu
+				time::DateTime					_arrivalTime;			//!< Moment d'arrivée prévue
 			//@}
 
 			//!	\name Caractéristiques de la réservation
 			//@{
-			uid								_lastReservation;		//!< Code de la réservation annulée en cas de modification
-			int								_seats;			//!< Nombre de places
-			time::DateTime					_bookingTime;		//!< Date de la réservation
-			time::DateTime					_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
+				uid								_lastReservation;		//!< Code de la réservation annulée en cas de modification
+				int								_seats;			//!< Nombre de places
+				time::DateTime					_bookingTime;		//!< Date de la réservation
+				time::DateTime					_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
 			//@}
 
 			//!	\name Personnes
 			//@{
-			security::User*					_customerUser;
-			std::string						_customerName;
-			std::string						_customerPhone;
-			security::User*					_bookingUser;
-			security::User*					_cancelUser;
+				uid								_customerUserId;
+				std::string						_customerName;
+				std::string						_customerPhone;
+				uid								_bookingUserId;
+				uid								_cancelUserId;
 			//@}
 
 		public:

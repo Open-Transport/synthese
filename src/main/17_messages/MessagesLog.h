@@ -29,6 +29,10 @@ namespace synthese
 {
 	namespace messages
 	{
+		class SingleSentAlarm;
+		class ScenarioSentAlarm;
+		class SentScenario;
+
 		/** Journal des envois de messages.
 
 			Les entrées du journal de messages sont :
@@ -40,13 +44,30 @@ namespace synthese
 				- UID objet concerné : 
 					- lien vers le message si envoi de message unique
 					- lien vers le scénario si envoi selon un scénario de diffusion
-
+			
+			@ingroup m17Logs refLogs
 		*/
 		class MessagesLog : public dblog::DBLog
 		{
 		public:
 			MessagesLog();
 			DBLog::ColumnsVector getColumnNames() const;
+			void	addUpdateEntry(
+				boost::shared_ptr<const SingleSentAlarm> alarm
+				, const std::string& text
+				, boost::shared_ptr<const security::User> user
+				);
+			void	addUpdateEntry(
+				boost::shared_ptr<const SentScenario> scenario
+				, const std::string& text
+				, boost::shared_ptr<const security::User> user
+				);
+			void	addUpdateEntry(
+				boost::shared_ptr<const ScenarioSentAlarm> alarm
+				, const std::string& text
+				, boost::shared_ptr<const security::User> user
+				);
+			std::string getObjectName(uid id) const;
 		};
 	}
 }

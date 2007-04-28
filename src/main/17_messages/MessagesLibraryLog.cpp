@@ -20,11 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "MessagesLibraryLog.h"
+#include "17_messages/MessagesLibraryLog.h"
+#include "17_messages/AlarmTemplate.h"
+#include "17_messages/ScenarioTemplate.h"
+#include "17_messages/ScenarioTableSync.h"
+
+#include "01_util/Conversion.h"
+
+using namespace boost;
+using namespace std;
 
 namespace synthese
 {
 	using namespace dblog;
+	using namespace util;
 
 	namespace messages
 	{
@@ -37,9 +46,40 @@ namespace synthese
 		DBLog::ColumnsVector MessagesLibraryLog::getColumnNames() const
 		{
 			DBLog::ColumnsVector v;
+			v.push_back("Message");
 			v.push_back("Action");
-			v.push_back("Texte");
 			return v;
+		}
+
+		std::string MessagesLibraryLog::getObjectName( uid id ) const
+		{
+			try
+			{
+				shared_ptr<Scenario> scenario = ScenarioTableSync::getScenario(id);
+				return scenario->getName();
+			}
+			catch (...)
+			{
+				return Conversion::ToString(id);
+			}			
+		}
+
+		void MessagesLibraryLog::addUpdateEntry( boost::shared_ptr<const ScenarioTemplate> scenario , const std::string& text , boost::shared_ptr<const security::User> user )
+		{
+			DBLogEntry::Content content;
+			content.push_back(string());
+			content.push_back(text);
+			
+			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
+		}
+
+		void MessagesLibraryLog::addUpdateEntry( boost::shared_ptr<const AlarmTemplate> alarm , const std::string& text , boost::shared_ptr<const security::User> user )
+		{
+			DBLogEntry::Content content;
+			content.push_back(Conversion::ToString(alarm->getKey()));
+			content.push_back(text);
+
+			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenarioId());
 		}
 	}
 }

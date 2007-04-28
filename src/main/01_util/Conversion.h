@@ -23,9 +23,6 @@
 #ifndef SYNTHESE_UTIL_CONVERSION_H
 #define SYNTHESE_UTIL_CONVERSION_H
 
-
-#include "module.h"
-
 #include <string>
 #include <iostream>
 #include <vector>

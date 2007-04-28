@@ -20,11 +20,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "MessagesLog.h"
+#include "17_messages/MessagesLog.h"
+#include "17_messages/SingleSentAlarm.h"
+#include "17_messages/ScenarioSentAlarm.h"
+#include "17_messages/SentScenario.h"
+#include "17_messages/AlarmTableSync.h"
+#include "17_messages/ScenarioTableSync.h"
+
+#include "01_util/Conversion.h"
+
+using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace dblog;
+	using namespace util;
 
 	namespace messages
 	{
@@ -39,10 +50,49 @@ namespace synthese
 		DBLog::ColumnsVector MessagesLog::getColumnNames() const
 		{
 			DBLog::ColumnsVector v;
-			v.push_back("Action");
 			v.push_back("Message");
+			v.push_back("Action");
 			return v;
 		}
-	}
 
+		void MessagesLog::addUpdateEntry( boost::shared_ptr<const SingleSentAlarm> alarm , const std::string& text , boost::shared_ptr<const security::User> user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back(string());
+			content.push_back(text);
+			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, alarm->getKey());
+		}
+
+		void MessagesLog::addUpdateEntry( boost::shared_ptr<const SentScenario> scenario , const std::string& text , boost::shared_ptr<const security::User> user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back(string());
+			content.push_back(text);
+			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
+		}
+
+		void MessagesLog::addUpdateEntry( boost::shared_ptr<const ScenarioSentAlarm> alarm , const std::string& text , boost::shared_ptr<const security::User> user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back(Conversion::ToString(alarm->getKey()));
+			content.push_back(text);
+			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario().getKey());
+		}
+
+		std::string MessagesLog::getObjectName( uid id ) const
+		{
+			int tableId = decodeTableId(id);
+
+			if (tableId == AlarmTableSync::TABLE_ID)
+			{
+				shared_ptr<Alarm> alarm = AlarmTableSync::getAlarm(id);
+				return alarm->getShortMessage();
+			}
+			else if (tableId == ScenarioTableSync::TABLE_ID)
+			{
+				shared_ptr<Scenario> scenario = ScenarioTableSync::getScenario(id);
+				return scenario->getName();
+			}
+		}
+	}
 }

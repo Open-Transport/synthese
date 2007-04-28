@@ -23,13 +23,12 @@
 #ifndef SYNTHESE_UTIL_EXCEPTION_H
 #define SYNTHESE_UTIL_EXCEPTION_H
 
-
-#include "module.h"
-
 #include <string>
 #include <iostream>
 
-
+/** @defgroup refExceptions Exceptions 
+	@ingroup ref
+*/
 
 namespace synthese
 {
@@ -37,7 +36,7 @@ namespace util
 {
 
 /** Base exception class
-@ingroup m01
+	@ingroup m01
 */
 class Exception : public std::exception
 {

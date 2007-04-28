@@ -1,9 +1,6 @@
 #ifndef SYNTHESE_UTIL_PLAINCHARFILTER_H
 #define SYNTHESE_UTIL_PLAINCHARFILTER_H
 
-
-#include "module.h"
-
 #include <string>
 #include <iostream>
 

@@ -38,51 +38,68 @@ namespace synthese
 		*/
 		class OnlineReservationRule : public env::ReservationRule
 		{
-			//! \name Adresses d'envoi des états
+		public:
+			typedef std::set<int> CapacityThresholds;
+
+		private:
+			//! \name Link with env reservation rules
 			//@{
-			std::string _eMail;		//!< Adresse e-mail du destinataire des mails d'états de réservations (ex: le transporteur)
-			std::string	_copyEMail;	//!< Adresse e-mail de copie des mails d'états de réservations (ex: l'organisme autoritaire)
+				uid _reservationRuleId;
 			//@}
 
-			//! \name Champs optionnels affichés dans le formulaire
+			//! \name Addresses for reports sending
 			//@{
-			boost::logic::tribool	_needsSurname;			//!< Prénom du client (Indifferent = champ affiché, remplissage facultatif)
-			boost::logic::tribool	_neetsaddress;			//!< Adresse du client (Indifferent = champ affiché, remplissage facultatif)
-			boost::logic::tribool	_needsPhone;			//!< Numéro de téléphone du client (Indifferent = champ affiché, remplissage facultatif)
-			boost::logic::tribool	_needsCustomerNumber;		//!< Numéro d'abonné du client (Indifferent = champ affiché, remplissage facultatif)
-			boost::logic::tribool	_needsEMail;			//!< Adresse e-mail du client (Indifferent = champ affiché, remplissage facultatif)
+				std::string _eMail;		//!< Adresse e-mail du destinataire des mails d'états de réservations (ex: le transporteur)
+				std::string	_copyEMail;	//!< Adresse e-mail de copie des mails d'états de réservations (ex: l'organisme autoritaire)
 			//@}
 
-			//! \name champs de gestion des places
+			//! \name Optional form fields
 			//@{
-			int				_maxSeats;				//!< Nombre maximal de réservations par service
-			std::set<int>	_thresholds;				//!< Paliers de nombre de réservations générant un envoi de mail d'alerte
+				boost::logic::tribool	_needsSurname;			//!< Prénom du client (Indifferent = champ affiché, remplissage facultatif)
+				boost::logic::tribool	_needsAddress;			//!< Adresse du client (Indifferent = champ affiché, remplissage facultatif)
+				boost::logic::tribool	_needsPhone;			//!< Numéro de téléphone du client (Indifferent = champ affiché, remplissage facultatif)
+				boost::logic::tribool	_needsCustomerNumber;		//!< Numéro d'abonné du client (Indifferent = champ affiché, remplissage facultatif)
+				boost::logic::tribool	_needsEMail;			//!< Adresse e-mail du client (Indifferent = champ affiché, remplissage facultatif)
+			//@}
+
+			//! \name Capacity
+			//@{
+				int					_maxSeats;				//!< Nombre maximal de réservations par service (UNKNOWN_VALUE = unlimited capacity)
+				CapacityThresholds	_thresholds;				//!< Paliers de nombre de réservations générant un envoi de mail d'alerte
 			//@}
 
 		public:
-			//! \name Accesseurs
+			//! \name Getters
 			//@{
+				boost::shared_ptr<const env::ReservationRule>	getReservationRule()		const;
+				const std::string&								getEMail()					const;
+				const std::string&								getCopyEMail()				const;
+				boost::logic::tribool							getNeedsSurname()			const;
+				boost::logic::tribool							getNeedsAddress()			const;
+				boost::logic::tribool							getNeedsPhone()				const;
+				boost::logic::tribool							getNeedsCustomerNumber()	const;
+				boost::logic::tribool							getNeedsEMail()				const;
+				int												getMaxSeats()				const;
+				const CapacityThresholds&						getThresholds()				const;
 			//@}
 
-			//! \name Calculateurs
+			//! \name Setters
 			//@{
-			/*	size_t		Disponibilite(const cTrain* Circulation, const cMoment&, cDatabaseManager* tBaseManager)	const;
-			tSeuilResa	getSeuil(const int ancienneValeur, const int nouvelleValeur) 						const;
-			bool		Reserver(const cTrain* Service	, const cGare* tPADepart, const cGare* tPAArrivee
-			, const cMoment& DateDepart, const cTexteSQL& tNom, const cTexteSQL& tNomBrut
-			, const cTexteSQL& tPrenom, const cTexteSQL& tAdresse, const cTexteSQL& tEmail
-			, const cTexteSQL& tTelephone, const cTexteSQL& tNumAbonne
-			, const cTexteSQL& tAdressePAArrivee, const cTexteSQL& tAdressePADepart
-			, const size_t iNombrePlaces, cDatabaseManager* baseManager)				const;
-			bool		Annuler(const cTexte& CodeReservation, cDatabaseManager* tBaseManager)				const;
-			*/	//@}
-
-			//! \name Modificateurs
-			//@{
+				void	setReservationRuleId(uid id);
+				void	setEMail(const std::string& email);
+				void	setCopyEMail(const std::string& email);
+				void	setNeedsSurname(boost::logic::tribool value);
+				void	setNeedsAddress(boost::logic::tribool value);
+				void	setNeedsPhone(boost::logic::tribool value);
+				void	setNeedsCustomerNumber(boost::logic::tribool value);
+				void	setNeedsEMail(boost::logic::tribool value);
+				void	setMaxSeats(int value);
+				void	setThresholds(const CapacityThresholds& thresholds);
 			//@}
 
 			//! \name Constructeurs et destructeurs
 			//@{
+				OnlineReservationRule();
 			//@}
 
 		};
