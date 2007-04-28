@@ -23,8 +23,18 @@
 #include "15_env/Place.h"
 #include "15_env/City.h"
 
+#include "01_util/WithoutAccentsFilter.h"
+#include "01_util/PlainCharFilter.h"
+
+#include <sstream>
+#include <boost/iostreams/filtering_stream.hpp>
+
+using namespace std;
+
 namespace synthese
 {
+	using namespace util;
+
 	namespace env
 	{
 		Place::Place (const std::string& name,
@@ -32,8 +42,15 @@ namespace synthese
 			: _name (name)
 			, _city (city)
 		{
-			_name13 = _name.substr(0, 13);
-			_name26 = _name.substr(0, 26);
+			stringstream ss;
+			boost::iostreams::filtering_ostream out;
+			out.push (WithoutAccentsFilter());
+			out.push (PlainCharFilter());
+			out.push (ss);
+			out << _name << std::flush;
+
+			_name13 = ss.str().substr(0, 13);
+			_name26 = ss.str().substr(0, 26);
 		}
 
 
@@ -55,11 +72,19 @@ namespace synthese
 		void 
 		Place::setName (const std::string& name)
 		{
+			stringstream ss;
+			boost::iostreams::filtering_ostream out;
+			out.push (WithoutAccentsFilter());
+			out.push (PlainCharFilter());
+			out.push (ss);
+			out << name << std::flush;
+
 			_name = name;
+			
 			if (_name13.empty())
-				_name13 = _name.substr(0, 13);
+				_name13 = ss.str().substr(0, 13);
 			if (_name26.empty())
-				_name26 = _name.substr(0, 26);
+				_name26 = ss.str().substr(0, 26);
 		}
 
 

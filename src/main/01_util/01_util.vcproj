@@ -212,6 +212,10 @@
 					RelativePath=".\PlainCharFilter.h"
 					>
 				</File>
+				<File
+					RelativePath=".\WithoutAccentsFilter.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
