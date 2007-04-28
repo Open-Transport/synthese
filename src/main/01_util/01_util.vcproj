@@ -102,10 +102,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\LowerCaseFilter.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ManagedThread.cpp"
 				>
 			</File>
@@ -119,10 +115,6 @@
 			</File>
 			<File
 				RelativePath=".\ModuleClass.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PlainCharFilter.h"
 				>
 			</File>
 			<File
@@ -209,6 +201,18 @@
 				RelativePath=".\XmlToolkit.h"
 				>
 			</File>
+			<Filter
+				Name="Filter"
+				>
+				<File
+					RelativePath=".\LowerCaseFilter.h"
+					>
+				</File>
+				<File
+					RelativePath=".\PlainCharFilter.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Exceptions"
