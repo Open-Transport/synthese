@@ -82,18 +82,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Factorable.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Factorable.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Factory.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Log.cpp"
 				>
 			</File>
@@ -206,6 +194,26 @@
 				</File>
 				<File
 					RelativePath=".\WithoutAccentsFilter.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Factory"
+				>
+				<File
+					RelativePath=".\Factorable.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Factorable.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FactorableTemplate.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Factory.h"
 					>
 				</File>
 			</Filter>

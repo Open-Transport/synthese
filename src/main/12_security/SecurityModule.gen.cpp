@@ -23,4 +23,4 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::security:
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::security::SecurityRight>("Security");
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::security::GlobalRight>("*");
 
-synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::security::SecurityLog>("security");
+synthese::security::SecurityLog::integrate();

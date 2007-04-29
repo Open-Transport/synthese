@@ -63,23 +63,19 @@ namespace synthese
 			typedef std::vector<std::string> ColumnsVector;
 			
 		protected:
-			void _addEntry(
-				DBLogEntry::Level level
+			static void _addEntry(
+				const std::string& logKey
+				, DBLogEntry::Level level
 				, const DBLogEntry::Content& content
 				, boost::shared_ptr<const security::User> user = boost::shared_ptr<const security::User>()
 				, uid objectId = 0
 				);
 
-		private:
-			const std::string _name;
-				
 		public:
-			DBLog(const std::string& name);
 
-			//static std::string getModuleName() = 0;
-			const std::string& getName() const;
-			
+			virtual std::string getName() const = 0;
 			virtual ColumnsVector getColumnNames() const = 0;
+
 			virtual ColumnsVector parse(const DBLogEntry::Content& cols) const;
 			virtual std::string getObjectName(uid id) const;
 		};

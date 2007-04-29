@@ -51,10 +51,10 @@ synthese::util::Factory<synthese::security::Right>::integrate<synthese::departur
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::DisplayMaintenanceRight>("DisplayMaintenance");
 synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::BroadcastPointsRight>("BroadcastPoints");
 
-synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::departurestable::ArrivalDepartureTableLog>("departurestable");
-synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::departurestable::BroadcastPointsDataLog>("broadcastpoints");
-synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::departurestable::DisplayMaintenanceLog>("displaymaintenance");
-synthese::util::Factory<synthese::dblog::DBLog>::integrate<synthese::departurestable::DisplayDataControlLog>("displaydata");
+synthese::departurestable::ArrivalDepartureTableLog::integrate();
+synthese::departurestable::BroadcastPointsDataLog::integrate();
+synthese::departurestable::DisplayMaintenanceLog::integrate();
+synthese::departurestable::DisplayDataControlLog::integrate();
 
 synthese::util::Factory<synthese::messages::AlarmRecipient>::integrate<synthese::departurestable::DisplayScreenAlarmRecipient>("displayscreen");
 

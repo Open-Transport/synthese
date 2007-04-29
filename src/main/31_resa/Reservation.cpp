@@ -38,6 +38,11 @@ namespace synthese
 			_lineCode = code;
 		}
 
+		const std::string& Reservation::getLineCode() const
+		{
+			return _lineCode;
+		}
+
 		void Reservation::setServiceCode( const std::string& code )
 		{
 			_serviceCode = code;
@@ -131,6 +136,11 @@ namespace synthese
 		void Reservation::setCancelUserId( uid id )
 		{
 			_cancelUserId = id;
+		}
+
+		uid Reservation::getLineId() const
+		{
+			return _lineId;
 		}
 	}
 }

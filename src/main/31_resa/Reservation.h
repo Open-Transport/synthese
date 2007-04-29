@@ -81,7 +81,7 @@ namespace synthese
 			//@}
 
 		public:
-			//!	\name Modificateurs
+			//!	\name Setters
 			//@{
 				void setLineId(uid id);
 				void setLineCode(const std::string& code);
@@ -103,15 +103,32 @@ namespace synthese
 				void setCustomerName(const std::string& name);
 				void setCustomerPhone(const std::string& phone);
 				void setBookingUserId(uid id);
-
+				void setCancelUserId(uid id);
 			//@}
 
-			//!	\name Modificateurs
+			//!	\name Getters
 			//@{
-			//@}
-
-			//!	\name Accesseurs
-			//@{
+				uid getLineId() const;
+				const std::string& getLineCode() const;
+				void setServiceCode(const std::string& code);
+				void setDeparturePlaceId(uid id);
+				void setDeparturePlaceName(const std::string& name);
+				void setArrivalPlaceId(uid id);
+				void setArrivalPlaceName(const std::string& name);
+				void setReservationRuleId(uid id);
+				void setDepartureAddress(const std::string& address);
+				void setArrivalAddress(const std::string& address);
+				void setDepartureTime(const time::DateTime& time);
+				void setArrivalTime(const time::DateTime& time);
+				void setLastReservation(uid id);
+				void setSeats(int seats);
+				void setBookingTime(const time::DateTime& time);
+				void setCancellationTime(const time::DateTime& time);
+				void setCustomerUserId(uid id);
+				void setCustomerName(const std::string& name);
+				void setCustomerPhone(const std::string& phone);
+				void setBookingUserId(uid id);
+				void setCancelUserId(uid id);
 			//@}
 
 		};

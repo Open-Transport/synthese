@@ -25,6 +25,8 @@
 
 #include "13_dblog/DBLog.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace departurestable
@@ -38,12 +40,12 @@ namespace synthese
 
 			@ingroup m34Log refLog
 		*/
-		class ArrivalDepartureTableLog : public dblog::DBLog
+		class ArrivalDepartureTableLog : public util::FactorableTemplate<dblog::DBLog, ArrivalDepartureTableLog>
 		{
 		public:
-			ArrivalDepartureTableLog();
+			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
-			void	addUpdateEntry(
+			static void	addUpdateEntry(
 				boost::shared_ptr<const DisplayScreen> screen
 				, const std::string& text
 				, boost::shared_ptr<const security::User> user

@@ -25,23 +25,26 @@
 namespace synthese
 {
 	using namespace dblog;
+	using namespace departurestable;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<DBLog, BroadcastPointsDataLog>::FACTORY_KEY = "broadcastpoints";
+	}
 
 	namespace departurestable
 	{
-
-
-		BroadcastPointsDataLog::BroadcastPointsDataLog()
-			: DBLog("Administration des emplacements d'affichage (tableaux de départs)")
-		{
-	
-		}
-
 		DBLog::ColumnsVector BroadcastPointsDataLog::getColumnNames() const
 		{
 			DBLog::ColumnsVector v;
 			v.push_back("Point de diffusion");
 			v.push_back("Action");
 			return v;
+		}
+
+		std::string BroadcastPointsDataLog::getName() const
+		{
+			return "Administration des emplacements d'affichage (tableaux de départs)";
 		}
 	}
 }

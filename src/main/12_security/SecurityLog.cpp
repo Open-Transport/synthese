@@ -39,15 +39,15 @@ namespace synthese
 {
 	using namespace dblog;
 	using namespace util;
+	using namespace security;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<DBLog, SecurityLog>::FACTORY_KEY = "security";
+	}
 
 	namespace security
 	{
-		SecurityLog::SecurityLog()
-			: DBLog("Journal général de sécurité")
-		{
-
-		}
-
 		DBLog::ColumnsVector SecurityLog::getColumnNames() const
 		{
 			ColumnsVector v;
@@ -63,7 +63,7 @@ namespace synthese
 			c.push_back(Conversion::ToString(LOGIN_ENTRY));
 			c.push_back(Conversion::ToString(user->getKey()));
 			c.push_back("Login succeeded");
-			_addEntry(DBLogEntry::DB_LOG_INFO, c, user, user->getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, user, user->getKey());
 		}
 
 		void SecurityLog::addUserAdmin(shared_ptr<const User> user, shared_ptr<const User> subject, const string& text)
@@ -72,7 +72,7 @@ namespace synthese
 			c.push_back(Conversion::ToString(USER_ADMIN_ENTRY));
 			c.push_back(Conversion::ToString(subject->getKey()));
 			c.push_back(text);
-			_addEntry(DBLogEntry::DB_LOG_INFO, c, user, subject->getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, user, subject->getKey());
 		}
 
 		void SecurityLog::addProfileAdmin( shared_ptr<const User> user, shared_ptr<const Profile> subject, const std::string& text )
@@ -81,7 +81,7 @@ namespace synthese
 			c.push_back(Conversion::ToString(PROFILE_ADMIN_ENTRY));
 			c.push_back(Conversion::ToString(subject->getKey()));
 			c.push_back(text);
-			_addEntry(DBLogEntry::DB_LOG_INFO, c, user, subject->getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, user, subject->getKey());
 		}
 
 		DBLog::ColumnsVector SecurityLog::parse( const dblog::DBLogEntry::Content& cols ) const
@@ -139,6 +139,11 @@ namespace synthese
 			}
 
 			return v;
+		}
+
+		std::string SecurityLog::getName() const
+		{
+			return "Journal général de sécurité";
 		}
 	}
 }

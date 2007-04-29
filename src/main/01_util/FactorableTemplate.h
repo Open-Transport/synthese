@@ -1,6 +1,6 @@
 
-/** TransportNetworkDataLog class header.
-	@file TransportNetworkDataLog.h
+/** FactorableTemplate class header.
+	@file FactorableTemplate.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,37 +20,39 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_TRANSPORT_NETWORK_DATA_LOG
-#define SYNTHESE_TRANSPORT_NETWORK_DATA_LOG
-
-#include "13_dblog/DBLog.h"
-
-#include "01_util/FactorableTemplate.h"
+#ifndef SYNTHESE_util_FactorableTemplate_h__
+#define SYNTHESE_util_FactorableTemplate_h__
 
 namespace synthese
 {
-	namespace departurestable
+	namespace util
 	{
-		/** Journal des modifications de la base transport.
-			@ingroup m34
-
-			Les entrées du journal de modification de la base transport sont toutes les modifications effectuées à chaud sur les objets de description du réseau (places, lines, etc.)
-				
-			Les colonnes additionnelles du journal de sécurité sont :
-				- Action : décrit l'action effectuée (ex : création de profil)
-				- UID objet concerné
-				- Classe objet concerné
-				- Description de l'action
-
+		/** FactorableTemplate class.
+			@ingroup m01
 		*/
-		class BroadcastPointsDataLog : public util::FactorableTemplate<dblog::DBLog, BroadcastPointsDataLog>
+		template<class F, class C>
+		class FactorableTemplate : public F
 		{
 		public:
-			std::string getName() const;
-			DBLog::ColumnsVector getColumnNames() const;
+			static const std::string FACTORY_KEY;
+
+			virtual const std::string& getFactoryKey() const;
+
+			static void integrate();
 		};
+
+		template<class F, class C>
+		void synthese::util::FactorableTemplate<F, C>::integrate()
+		{
+			Factory<F>::integrate<C>();
+		}
+
+		template<class F, class C>
+		const std::string& synthese::util::FactorableTemplate<F, C>::getFactoryKey() const
+		{
+			return FACTORY_KEY;
+		}
 	}
 }
 
-#endif
-
+#endif // SYNTHESE_util_FactorableTemplate_h__

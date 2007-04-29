@@ -31,19 +31,10 @@ namespace synthese
 
 	namespace dblog
 	{
-		DBLog::DBLog( const std::string& name )
-			: Factorable(), _name(name)
-		{
-
-		}
-
-		const std::string& DBLog::getName() const
-		{
-			return _name;
-		}
 
 		void DBLog::_addEntry(
-			DBLogEntry::Level level
+			const std::string& logKey
+			, DBLogEntry::Level level
 			, const DBLogEntry::Content& content
 			, shared_ptr<const security::User> user /*= NULL*/ 
 			, uid objectId
@@ -51,7 +42,7 @@ namespace synthese
 			shared_ptr<DBLogEntry> e(new DBLogEntry);
 			e->setLevel(level);
 			e->setUser(user);
-			e->setLogKey(getFactoryKey());
+			e->setLogKey(logKey);
 			e->setContent(content);
 			e->setObjectId(objectId);
 			DBLogEntryTableSync::save(e.get());

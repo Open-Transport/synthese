@@ -124,6 +124,24 @@ namespace synthese
 							       CreatorInterface*>(key, creator));
 			}
 
+			/** Subclass automatic registration.
+				@return the key if ok, empty string if the subclass is already registered
+			*/
+			template <class T>
+				static void integrate()
+			{
+				Log::GetInstance ().debug ("Registering compound... " + T::FACTORY_KEY);
+
+				// If the key is already used then return false (it would be better to use exceptions)
+				if(_registeredCreator.find(T::FACTORY_KEY) != _registeredCreator.end())
+					throw FactoryException<RootObject>("Attempted to integrate a class twice");
+
+				// Saving of the auto generated builder
+				CreatorInterface* creator = new Creator<T>;
+				_registeredCreator.insert(std::pair<typename Map::key_type, 
+					CreatorInterface*>(T::FACTORY_KEY, creator));
+			}
+
 			template <class T>
 				static typename Map::key_type getKey()
 			{

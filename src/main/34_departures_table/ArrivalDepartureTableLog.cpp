@@ -32,17 +32,15 @@ namespace synthese
 {
 	using namespace dblog;
 	using namespace security;
+	using namespace departurestable;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<DBLog, ArrivalDepartureTableLog>::FACTORY_KEY = "departurestable";
+	}
 
 	namespace departurestable
 	{
-
-
-		ArrivalDepartureTableLog::ArrivalDepartureTableLog()
-			: DBLog("Administration des terminaux d'affichage (tableaux de départs)")
-		{
-		
-		}
-
 		DBLog::ColumnsVector ArrivalDepartureTableLog::getColumnNames() const
 		{
 			DBLog::ColumnsVector v;
@@ -54,7 +52,7 @@ namespace synthese
 		{
 			DBLogEntry::Content content;
 			content.push_back(text);
-			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, screen->getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, screen->getKey());
 		}
 
 		std::string ArrivalDepartureTableLog::getObjectName( uid id ) const
@@ -68,6 +66,11 @@ namespace synthese
 			{
 				return "(unknown)";
 			}
+		}
+
+		std::string ArrivalDepartureTableLog::getName() const
+		{
+			return "Administration des terminaux d'affichage (tableaux de départs)";
 		}
 	}
 }

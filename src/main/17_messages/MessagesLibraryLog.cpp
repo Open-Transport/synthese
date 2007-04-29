@@ -34,15 +34,15 @@ namespace synthese
 {
 	using namespace dblog;
 	using namespace util;
+	using namespace messages;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<DBLog, MessagesLibraryLog>::FACTORY_KEY = "messageslibrary";
+	}
 
 	namespace messages
 	{
-		MessagesLibraryLog::MessagesLibraryLog()
-			: DBLog("Administration bibliothèque de messages")
-		{
-
-		}
-
 		DBLog::ColumnsVector MessagesLibraryLog::getColumnNames() const
 		{
 			DBLog::ColumnsVector v;
@@ -70,7 +70,7 @@ namespace synthese
 			content.push_back(string());
 			content.push_back(text);
 			
-			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
 		}
 
 		void MessagesLibraryLog::addUpdateEntry( boost::shared_ptr<const AlarmTemplate> alarm , const std::string& text , boost::shared_ptr<const security::User> user )
@@ -79,7 +79,12 @@ namespace synthese
 			content.push_back(Conversion::ToString(alarm->getKey()));
 			content.push_back(text);
 
-			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenarioId());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenarioId());
+		}
+
+		std::string MessagesLibraryLog::getName() const
+		{
+			return "Administration bibliothèque de messages";
 		}
 	}
 }

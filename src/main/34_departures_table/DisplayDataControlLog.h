@@ -26,6 +26,8 @@
 #include "13_dblog/DBLog.h"
 #include "13_dblog/DBLogEntry.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -41,13 +43,13 @@ namespace synthese
 
 			@ingroup m34log reflog				
 		*/
-		class DisplayDataControlLog : public dblog::DBLog
+		class DisplayDataControlLog : public util::FactorableTemplate<dblog::DBLog, DisplayDataControlLog>
 		{
 		public:
-			DisplayDataControlLog();
+			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
-			void	addDataControlEntry(
+			static void	addDataControlEntry(
 				boost::shared_ptr<const DisplayScreen> screen
 				, const dblog::DBLogEntry::Level& level
 				, const std::string& text);

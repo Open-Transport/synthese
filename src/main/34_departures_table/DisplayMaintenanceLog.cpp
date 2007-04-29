@@ -33,16 +33,15 @@ namespace synthese
 {
 	using namespace dblog;
 	using namespace security;
+	using namespace departurestable;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<DBLog, DisplayMaintenanceLog>::FACTORY_KEY("displaymaintenance");
+	}
     
 	namespace departurestable
 	{
-
-
-		DisplayMaintenanceLog::DisplayMaintenanceLog()
-			: DBLog("Supervision et maintenance des afficheurs (tableaux de départs)")
-		{
-		
-		}
 
 		DBLog::ColumnsVector DisplayMaintenanceLog::getColumnNames() const
 		{
@@ -57,7 +56,7 @@ namespace synthese
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_ADMIN));
 			c.push_back(field + " : " + oldValue + " => " + newValue);
-			DBLog::_addEntry(DBLogEntry::DB_LOG_INFO, c, user, screen->getKey());
+			DBLog::_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, user, screen->getKey());
 		}
 
 		void DisplayMaintenanceLog::addStatusEntry( boost::shared_ptr<const DisplayScreen> screen, bool status )
@@ -65,7 +64,7 @@ namespace synthese
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_STATUS));
 			c.push_back(Conversion::ToString(status));
-			DBLog::_addEntry(status ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_ERROR, c, boost::shared_ptr<const User>(), screen->getKey());
+			DBLog::_addEntry(FACTORY_KEY, status ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_ERROR, c, boost::shared_ptr<const User>(), screen->getKey());
 		}
 
 		DBLog::ColumnsVector DisplayMaintenanceLog::parse( const DBLogEntry::Content& cols ) const
@@ -100,6 +99,11 @@ namespace synthese
 				return DBLog::getObjectName(id);
 			}
 
+		}
+
+		std::string DisplayMaintenanceLog::getName() const
+		{
+			return "Supervision et maintenance des afficheurs (tableaux de départs)";
 		}
 	}
 }

@@ -25,6 +25,8 @@
 
 #include "13_dblog/DBLog.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace messages
@@ -40,17 +42,17 @@ namespace synthese
 
 			@ingroup m17Logs refLogs
 		*/
-		class MessagesLibraryLog : public dblog::DBLog
+		class MessagesLibraryLog : public util::FactorableTemplate<dblog::DBLog, MessagesLibraryLog>
 		{
 		public:
-			MessagesLibraryLog();
+			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
-			void	addUpdateEntry(
+			static void	addUpdateEntry(
 				boost::shared_ptr<const AlarmTemplate> alarm
 				, const std::string& text
 				, boost::shared_ptr<const security::User> user
 				);
-			void	addUpdateEntry(
+			static void	addUpdateEntry(
 				boost::shared_ptr<const ScenarioTemplate> scenario
 				, const std::string& text
 				, boost::shared_ptr<const security::User> user

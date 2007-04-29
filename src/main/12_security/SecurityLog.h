@@ -27,6 +27,8 @@
 
 #include "13_dblog/DBLog.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -51,18 +53,19 @@ namespace synthese
 					- lien vers le profil traité pour les actions d'administration sur les profils
 					- rien pour les entrées concernant les connexions d'utilisateurs
 
+			@ingroup m12Logs refLogs
 		*/
-		class SecurityLog : public dblog::DBLog
+		class SecurityLog : public util::FactorableTemplate<dblog::DBLog, SecurityLog>
 		{
 			typedef enum { LOGIN_ENTRY = 10, USER_ADMIN_ENTRY = 20, PROFILE_ADMIN_ENTRY = 30 } _EntryType;
 
 		public:
-			SecurityLog();
+			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
-			void addUserLogin(boost::shared_ptr<const User> user);
-			void addUserAdmin(boost::shared_ptr<const User> user, boost::shared_ptr<const User> subject, const std::string& text);
-			void addProfileAdmin(boost::shared_ptr<const User> user, boost::shared_ptr<const Profile> subject, const std::string& text);
+			static void addUserLogin(boost::shared_ptr<const User> user);
+			static void addUserAdmin(boost::shared_ptr<const User> user, boost::shared_ptr<const User> subject, const std::string& text);
+			static void addProfileAdmin(boost::shared_ptr<const User> user, boost::shared_ptr<const Profile> subject, const std::string& text);
 		};
 	}
 }

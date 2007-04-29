@@ -26,6 +26,8 @@
 #include "13_dblog/DBLog.h"
 #include "13_dblog/DBLogEntry.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -54,16 +56,16 @@ namespace synthese
 				- Description de l'entrée
 				
 		*/
-		class DisplayMaintenanceLog : public dblog::DBLog
+		class DisplayMaintenanceLog : public util::FactorableTemplate<dblog::DBLog, DisplayMaintenanceLog>
 		{
 		public:
 			typedef enum { DISPLAY_MAINTENANCE_DISPLAY_CONTROL = 10, DISPLAY_MAINTENANCE_DATA_CONTROL = 15, DISPLAY_MAINTENANCE_ADMIN = 20, DISPLAY_MAINTENANCE_STATUS = 30 } EntryType;
-			DisplayMaintenanceLog();
+			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
 			std::string getObjectName(uid id) const;
-			void	addAdminEntry(boost::shared_ptr<const DisplayScreen> screen, const dblog::DBLogEntry::Level& level, boost::shared_ptr<const security::User> user, const std::string& field, const std::string& oldValue, const std::string& newValue);
-			void	addStatusEntry(boost::shared_ptr<const DisplayScreen> screen, bool status);
+			static void	addAdminEntry(boost::shared_ptr<const DisplayScreen> screen, const dblog::DBLogEntry::Level& level, boost::shared_ptr<const security::User> user, const std::string& field, const std::string& oldValue, const std::string& newValue);
+			static void	addStatusEntry(boost::shared_ptr<const DisplayScreen> screen, bool status);
 		};
 	}
 }

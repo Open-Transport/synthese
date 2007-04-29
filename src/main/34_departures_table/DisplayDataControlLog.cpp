@@ -32,6 +32,13 @@ namespace synthese
 {
 	using namespace dblog;
 	using namespace security;
+	using namespace departurestable;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<DBLog, DisplayDataControlLog>::FACTORY_KEY = "displaydata";
+		
+	}
 
 	namespace departurestable
 	{
@@ -45,7 +52,8 @@ namespace synthese
 			DBLogEntry::Content c;
 			c.push_back(text);
 			DBLog::_addEntry(
-				level
+				FACTORY_KEY
+				, level
 				, c
 				, boost::shared_ptr<const User>()
 				, screen->getKey()
@@ -82,10 +90,9 @@ namespace synthese
 
 		}
 
-		DisplayDataControlLog::DisplayDataControlLog()
-			: DBLog("Contrôles de cohérence des données des afficheurs (tableaux de départs)")
+		std::string DisplayDataControlLog::getName() const
 		{
-
+			return "Contrôles de cohérence des données des afficheurs (tableaux de départs)";
 		}
 	}
 }

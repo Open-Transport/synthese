@@ -36,17 +36,15 @@ namespace synthese
 {
 	using namespace dblog;
 	using namespace util;
+	using namespace messages;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<DBLog, MessagesLog>::FACTORY_KEY("messages");
+	}
 
 	namespace messages
 	{
-
-
-		MessagesLog::MessagesLog()
-			: DBLog("Diffusion de messages")
-		{
-	
-		}
-
 		DBLog::ColumnsVector MessagesLog::getColumnNames() const
 		{
 			DBLog::ColumnsVector v;
@@ -60,7 +58,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(string());
 			content.push_back(text);
-			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, alarm->getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getKey());
 		}
 
 		void MessagesLog::addUpdateEntry( boost::shared_ptr<const SentScenario> scenario , const std::string& text , boost::shared_ptr<const security::User> user )
@@ -68,7 +66,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(string());
 			content.push_back(text);
-			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
 		}
 
 		void MessagesLog::addUpdateEntry( boost::shared_ptr<const ScenarioSentAlarm> alarm , const std::string& text , boost::shared_ptr<const security::User> user )
@@ -76,7 +74,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(Conversion::ToString(alarm->getKey()));
 			content.push_back(text);
-			_addEntry(DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario().getKey());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario().getKey());
 		}
 
 		std::string MessagesLog::getObjectName( uid id ) const
@@ -93,6 +91,11 @@ namespace synthese
 				shared_ptr<Scenario> scenario = ScenarioTableSync::getScenario(id);
 				return scenario->getName();
 			}
+		}
+
+		std::string MessagesLog::getName() const
+		{
+			return "Diffusion de messages";
 		}
 	}
 }
