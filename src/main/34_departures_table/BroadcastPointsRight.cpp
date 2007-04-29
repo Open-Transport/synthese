@@ -74,6 +74,31 @@ namespace synthese
 	{
 		std::string BroadcastPointsRight::displayParameter() const
 		{
+			uid id = Conversion::ToLongLong(_parameter);
+			if (!id)
+				return _parameter;
+			int tableId = decodeTableId(id);
+			if (tableId == TransportNetworkTableSync::TABLE_ID)
+			{
+				try
+				{
+					shared_ptr<TransportNetwork> tn = TransportNetworkTableSync::get(id);
+					return string("Réseau ") + tn->getName();
+				}
+				catch (...) {
+				}
+			}
+			else if (tableId == CommercialLineTableSync::TABLE_ID)
+			{
+				try
+				{
+					shared_ptr<CommercialLine> cl = CommercialLineTableSync::get(id);
+					return string("Ligne ") + cl->getShortName();
+				}
+				catch (...)
+				{					
+				}
+			}
 			return _parameter;
 		}
 

@@ -55,7 +55,10 @@ namespace synthese
 	{
 		std::string DBLogRight::displayParameter() const
 		{
-			return _parameter;
+			if (Factory<DBLog>::contains(_parameter))
+				return Factory<DBLog>::create(_parameter)->getName();
+			else
+				return _parameter;
 		}
 
 		bool DBLogRight::perimeterIncludes( const std::string& perimeter ) const

@@ -32,6 +32,7 @@
 #include "12_security/Right.h"
 #include "12_security/AddRightAction.h"
 #include "12_security/DeleteRightAction.h"
+#include "12_security/Constants.h"
 
 #include "30_server/ActionFunctionRequest.h"
 
@@ -169,7 +170,7 @@ namespace synthese
 					<< "<tr>"
 					<< form.open()
 					<< "<td>" << it.getKey() << "</td>"
-					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PARAMETER, it->getParametersLabels(), string("")) << "</td>"
+					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PARAMETER, it->getParametersLabels(), GLOBAL_PERIMETER) << "</td>"
 					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, (int) Right::Level(Right::USE)) << "</td>"
 					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, (int) Right::Level(Right::USE)) << "</td>"
 					<< "<td>" 
