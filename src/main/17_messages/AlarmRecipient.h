@@ -57,14 +57,8 @@ namespace synthese
 		*/
 		class AlarmRecipient : public util::Factorable
 		{
-		private:
-			const std::string _title;
-			
-
 		public:
-			AlarmRecipient(const std::string& title);
-
-			const std::string& getTitle();
+			virtual const std::string& getTitle() const = 0;
 
 			virtual void displayBroadcastListEditor(
 				std::ostream& stream

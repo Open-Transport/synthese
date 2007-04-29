@@ -56,5 +56,5 @@ synthese::departurestable::BroadcastPointsDataLog::integrate();
 synthese::departurestable::DisplayMaintenanceLog::integrate();
 synthese::departurestable::DisplayDataControlLog::integrate();
 
-synthese::util::Factory<synthese::messages::AlarmRecipient>::integrate<synthese::departurestable::DisplayScreenAlarmRecipient>("displayscreen");
+synthese::departurestable::DisplayScreenAlarmRecipient::integrate();
 

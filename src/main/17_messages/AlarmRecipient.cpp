@@ -26,17 +26,5 @@ namespace synthese
 {
 	namespace messages
 	{
-
-
-		AlarmRecipient::AlarmRecipient( const std::string& title )
-			: _title(title)
-		{
-
-		}
-
-		const std::string& AlarmRecipient::getTitle()
-		{
-			return _title;
-		}
 	}
 }

@@ -35,7 +35,7 @@ namespace synthese
 		/** DisplayScreenAlarmRecipient class.
 			@ingroup m34 refAlarmrecipients
 		*/
-		class DisplayScreenAlarmRecipient : public messages::AlarmRecipientTemplate<DisplayScreen>
+		class DisplayScreenAlarmRecipient : public messages::AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>
 		{
 		public:
 			static const std::string PARAMETER_SEARCH_UID;
@@ -44,8 +44,6 @@ namespace synthese
 			static const std::string PARAMETER_SEARCH_TYPE;
 			static const std::string PARAMETER_SEARCH_STATUS;
 			static const std::string PARAMETER_SEARCH_MESSAGE;
-
-			DisplayScreenAlarmRecipient();
 
 			void displayBroadcastListEditor(
 				std::ostream& stream

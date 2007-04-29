@@ -50,8 +50,6 @@ using namespace boost;
 
 namespace synthese
 {
-
-
 	using namespace messages;
 	using namespace util;
 	using namespace departurestable;
@@ -61,6 +59,11 @@ namespace synthese
 	using namespace interfaces;
 	using namespace html;
 
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<AlarmRecipient, DisplayScreenAlarmRecipient>::FACTORY_KEY("displayscreen");
+	}
+
 	namespace messages
 	{
 	    /* IMPORTANT : for some reason, probably a gcc bug, is was necessary to 
@@ -68,14 +71,15 @@ namespace synthese
 	       This should be investigate further.
 	    */
 
-	    template<> AlarmRecipientTemplate<DisplayScreen>::AlarmLinks
-	    AlarmRecipientTemplate<DisplayScreen>::_linksAlarm = 
-		std::map<const SentAlarm*, std::set<const DisplayScreen*> > ();
+	    template<> AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::AlarmLinks
+	    AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::_linksAlarm =
+			std::map<const SentAlarm*, std::set<const DisplayScreen*> > ();
 
-	    template<> AlarmRecipientTemplate<DisplayScreen>::ObjectLinks
-	      AlarmRecipientTemplate<DisplayScreen>::_linksObject = 
-		std::map<const DisplayScreen*, std::set<const SentAlarm*> > () ;
+	    template<> AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::ObjectLinks
+	    AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::_linksObject = 
+			std::map<const DisplayScreen*, std::set<const SentAlarm*> > ();
 
+		template<> const string AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::TITLE("Afficheurs");
 	}
 
 
@@ -87,12 +91,6 @@ namespace synthese
 		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_TYPE = "dsarst";
 		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_STATUS = "dsarss";
 		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_MESSAGE = "dsarsm";
-
-		DisplayScreenAlarmRecipient::DisplayScreenAlarmRecipient()
-			: AlarmRecipientTemplate<DisplayScreen>("Afficheurs")
-		{
-
-		}
 
 		void DisplayScreenAlarmRecipient::displayBroadcastListEditor(
 			std::ostream& stream
