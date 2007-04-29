@@ -128,8 +128,7 @@ namespace synthese
 			DisplayScreenTableSync::save(_screen.get());
 
 			// Log
-			shared_ptr<ArrivalDepartureTableLog> log = Factory<dblog::DBLog>::create<ArrivalDepartureTableLog>();
-			log->addUpdateEntry(_screen, "Mise à jour localisation " + oldLocalization + "=>" + _screen->getFullName(), _request->getUser());
+			ArrivalDepartureTableLog::addUpdateEntry(_screen, "Mise à jour localisation " + oldLocalization + "=>" + _screen->getFullName(), _request->getUser());
 		}
 	}
 }

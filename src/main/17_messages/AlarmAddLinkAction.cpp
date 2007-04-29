@@ -105,20 +105,17 @@ namespace synthese
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
 			{
 				shared_ptr<const AlarmTemplate> alarmTemplate = dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm);
-				shared_ptr<MessagesLibraryLog> log = Factory<DBLog>::create<MessagesLibraryLog>();
-				log->addUpdateEntry(alarmTemplate, "Ajout de destinataire " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser() );
+				MessagesLibraryLog::addUpdateEntry(alarmTemplate, "Ajout de destinataire " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser() );
 			}
 			else if (dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm).get())
 			{
 				shared_ptr<const SingleSentAlarm> singleSentAlarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
-				shared_ptr<MessagesLog> log = Factory<DBLog>::create<MessagesLog>();
-				log->addUpdateEntry(singleSentAlarm, "Ajout de destinataire à message simple " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser());
+				MessagesLog::addUpdateEntry(singleSentAlarm, "Ajout de destinataire à message simple " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser());
 			}
 			else
 			{
 				shared_ptr<const ScenarioSentAlarm> scenarioSentAlarm = dynamic_pointer_cast<const ScenarioSentAlarm, const Alarm>(_alarm);
-				shared_ptr<MessagesLog> log = Factory<DBLog>::create<MessagesLog>();
-				log->addUpdateEntry(scenarioSentAlarm, "Ajout de destinataire à message de scénario " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser());
+				MessagesLog::addUpdateEntry(scenarioSentAlarm, "Ajout de destinataire à message de scénario " + _recipientKey + " #" + Conversion::ToString(_objectId), _request->getUser());
 			}
 		}
 

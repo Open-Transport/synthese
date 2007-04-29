@@ -100,8 +100,7 @@ namespace synthese
 			}
 
 			// The log
-			shared_ptr<MessagesLog> log = Factory<DBLog>::create<MessagesLog>();
-			log->addUpdateEntry(static_pointer_cast<const SentScenario, SentScenario>(scenario), "Diffusion", _request->getUser());
+			MessagesLog::addUpdateEntry(static_pointer_cast<const SentScenario, SentScenario>(scenario), "Diffusion", _request->getUser());
 		}
 	}
 }

@@ -89,7 +89,7 @@ namespace synthese
 				profile->setParent(_templateProfile->getKey());
 			else
 			{
-				shared_ptr<Right> r = Factory<Right>::create<GlobalRight>();
+				shared_ptr<Right> r(new GlobalRight);
 				r->setPrivateLevel(Right::FORBIDDEN);
 				r->setPublicLevel(Right::FORBIDDEN);
 				profile->addRight(r);
@@ -98,8 +98,7 @@ namespace synthese
 			_request->setObjectId(profile->getKey());
 
 			// DBLog
-			shared_ptr<SecurityLog> log = Factory<DBLog>::create<SecurityLog>();
-			log->addProfileAdmin(_request->getUser(), profile, "Création du profil");
+			SecurityLog::addProfileAdmin(_request->getUser(), profile, "Création du profil");
 		}
 	}
 }

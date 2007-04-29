@@ -82,8 +82,7 @@ namespace synthese
 				session->setUser(user);
 				_request->setSession(session);
 
-				shared_ptr<SecurityLog> sl(Factory<dblog::DBLog>::create<SecurityLog>());
-				sl->addUserLogin(user);
+				SecurityLog::addUserLogin(user);
 			}
 			catch (UserTableSyncException e)
 			{
