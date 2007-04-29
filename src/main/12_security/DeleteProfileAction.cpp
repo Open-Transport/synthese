@@ -31,6 +31,7 @@
 #include "12_security/UserTableSync.h"
 #include "12_security/Profile.h"
 #include "12_security/ProfileTableSync.h"
+#include "12_security/SecurityLog.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -70,6 +71,9 @@ namespace synthese
 		void DeleteProfileAction::run()
 		{
 			ProfileTableSync::remove(_profile->getKey());
+
+			// Log
+			SecurityLog::addProfileAdmin(_request->getUser(), _profile, "Suppression de " + _profile->getName());
 		}
 	}
 }

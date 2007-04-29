@@ -24,7 +24,7 @@
 #include "12_security/Profile.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfileTableSync.h"
-
+#include "12_security/SecurityLog.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -77,8 +77,15 @@ namespace synthese
 
 		void UpdateProfileAction::run()
 		{
+			// Old value
+			string oldName = _name;
+
+			// Action
 			_profile->setName(_name);
 			ProfileTableSync::save(_profile.get());
+
+			// Log
+			SecurityLog::addProfileAdmin(_request->getUser(), _profile, "Changement de nom : " + oldName + " => " _name);
 		}
 	}
 }
