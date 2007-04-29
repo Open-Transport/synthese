@@ -82,7 +82,7 @@ namespace synthese
 		const std::string ServiceDateTableSync::COL_DATE("date");
 
 		ServiceDateTableSync::ServiceDateTableSync()
-			: SQLiteTableSyncTemplate<ServiceDate>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<ServiceDate>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_SERVICEID, "INTEGER", false);

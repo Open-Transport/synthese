@@ -86,7 +86,7 @@ namespace synthese
 		const std::string VinciContractTableSync::COL_PASSPORT = "passport";
 
 		VinciContractTableSync::VinciContractTableSync()
-			: SQLiteTableSyncTemplate<VinciContract>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteTableSyncTemplate<VinciContract>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_USER_ID, "INTEGER", true);

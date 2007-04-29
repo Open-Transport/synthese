@@ -174,7 +174,7 @@ namespace synthese
 		const std::string ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 
 		ContinuousServiceTableSync::ContinuousServiceTableSync()
-			: SQLiteTableSyncTemplate<ContinuousService>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<ContinuousService>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_SERVICENUMBER, "TEXT", true);

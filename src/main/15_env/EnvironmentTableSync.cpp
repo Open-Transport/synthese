@@ -90,7 +90,7 @@ namespace synthese
 		const string EnvironmentTableSync::TABLE_COL_NAME = "name";
 
 		EnvironmentTableSync::EnvironmentTableSync ()
-		: SQLiteTableSyncTemplate<Environment> (TABLE_NAME, true, true, db::TRIGGERS_ENABLED_CLAUSE)
+		: SQLiteTableSyncTemplate<Environment> (true, true, db::TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn (TABLE_COL_ID, "INTEGER");
 			addTableColumn (TABLE_COL_NAME, "TEXT");

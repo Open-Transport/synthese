@@ -87,12 +87,11 @@ namespace synthese
 
 	namespace vinci
 	{
-		const std::string VinciBikeTableSync::TABLE_COL_ID = "id";
 		const std::string VinciBikeTableSync::TABLE_COL_NUMBER = "number";
 		const std::string VinciBikeTableSync::TABLE_COL_MARKED_NUMBER = "marked_number";
 
 		VinciBikeTableSync::VinciBikeTableSync()
-			: db::SQLiteTableSyncTemplate<VinciBike>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: db::SQLiteTableSyncTemplate<VinciBike>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NUMBER, "TEXT", true);

@@ -98,7 +98,7 @@ namespace synthese
 
 
 		ConnectionPlaceTableSync::ConnectionPlaceTableSync ()
-		: SQLiteTableSyncTemplate<ConnectionPlace> (TABLE_NAME, true, false, db::TRIGGERS_ENABLED_CLAUSE)
+		: SQLiteTableSyncTemplate<ConnectionPlace> (true, false, db::TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn (TABLE_COL_ID, "INTEGER", true);
 			addTableColumn (TABLE_COL_NAME, "TEXT", true);

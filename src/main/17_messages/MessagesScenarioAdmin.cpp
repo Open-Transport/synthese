@@ -115,7 +115,21 @@ namespace synthese
 
 			stream << "<h1>Messages</h1>";
 
-			vector<shared_ptr<Alarm> > v = AlarmTableSync::search(_scenario);
+			vector<shared_ptr<Alarm> > v;
+			
+			if (_sentScenario.get())
+			{
+				vector<shared_ptr<ScenarioSentAlarm> > vs = AlarmTableSync::searchScenarioSent(_sentScenario.get());
+				for (vector<shared_ptr<ScenarioSentAlarm> >::const_iterator it = vs.begin(); it != vs.end(); ++it)
+					v.push_back(static_pointer_cast<Alarm, ScenarioSentAlarm>(*it));
+			}
+			else
+			{
+				vector<shared_ptr<AlarmTemplate> > vs = AlarmTableSync::searchTemplates(_templateScenario.get());
+				for (vector<shared_ptr<AlarmTemplate> >::const_iterator it = vs.begin(); it != vs.end(); ++it)
+					v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(*it));
+			}
+
 			ActionResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(string(), "Message"));
 			h.push_back(make_pair(string(), "Emplacement"));

@@ -132,7 +132,7 @@ namespace synthese
 		const std::string LineStopTableSync::COL_VIAPOINTS ("via_points");
 
 		LineStopTableSync::LineStopTableSync()
-			: SQLiteTableSyncTemplate<LineStop>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<LineStop>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_PHYSICALSTOPID, "INTEGER", false);

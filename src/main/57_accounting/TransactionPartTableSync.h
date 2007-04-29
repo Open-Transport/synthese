@@ -55,7 +55,6 @@ namespace synthese
 		class TransactionPartTableSync : public db::SQLiteTableSyncTemplate<TransactionPart>
 		{
 		public:
-			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_TRANSACTION_ID;
 			static const std::string TABLE_COL_LEFT_CURRENCY_AMOUNT;
 			static const std::string TABLE_COL_RIGHT_CURRENCY_AMOUNT;

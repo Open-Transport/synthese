@@ -83,13 +83,12 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const std::string BroadcastPointTableSync::TABLE_COL_ID = "id";
 		const std::string BroadcastPointTableSync::TABLE_COL_NAME = "name";
 		const std::string BroadcastPointTableSync::TABLE_COL_PLACE_ID = "place_id";
 		const std::string BroadcastPointTableSync::TABLE_COL_PHYSICAL_STOP_ID = "physical_stop_id";
 
 		BroadcastPointTableSync::BroadcastPointTableSync()
-			: SQLiteTableSyncTemplate<BroadcastPoint>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<BroadcastPoint>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);

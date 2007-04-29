@@ -129,7 +129,7 @@ namespace synthese
 
 		
 		ScenarioTableSync::ScenarioTableSync()
-			: SQLiteTableSyncTemplate<Scenario>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<Scenario>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_IS_TEMPLATE, "INTEGER");

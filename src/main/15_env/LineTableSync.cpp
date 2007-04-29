@@ -135,7 +135,7 @@ namespace synthese
 		const std::string LineTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
 
 		LineTableSync::LineTableSync()
-			: SQLiteTableSyncTemplate<Line>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<Line>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_COMMERCIAL_LINE_ID, "INTEGER", false);

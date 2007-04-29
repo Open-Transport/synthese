@@ -39,6 +39,7 @@ namespace synthese
 		class SingleSentAlarm;
 		class AlarmTemplate;
 		class SentScenario;
+		class ScenarioTemplate;
 		class Scenario;
 
 
@@ -94,14 +95,14 @@ namespace synthese
 				const db::SQLiteResult& rows);
 
 		public:
-			static std::vector<boost::shared_ptr<Alarm> > search(
+/*			static std::vector<boost::shared_ptr<Alarm> > search(
 				const Scenario* scenario
 				, int first = 0
 				, int number = -1
 				, bool orderByLevel = false
 				, bool raisingOrder = false
 				);
-
+*/
 			static std::vector<boost::shared_ptr<ScenarioSentAlarm> > searchScenarioSent(
 				const SentScenario* scenario
 				, int first = 0
@@ -153,7 +154,7 @@ WHERE
 				);
 			
 			static std::vector<boost::shared_ptr<AlarmTemplate> > searchTemplates(
-				const SentScenario* scenario
+				const ScenarioTemplate* scenario
 				, int first = 0
 				, int number = 0
 				, bool orderByLevel = false

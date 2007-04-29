@@ -173,7 +173,7 @@ namespace synthese
 		const std::string ScheduledServiceTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
 
 		ScheduledServiceTableSync::ScheduledServiceTableSync()
-			: SQLiteTableSyncTemplate<ScheduledService>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<ScheduledService>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_SERVICENUMBER, "TEXT", true);

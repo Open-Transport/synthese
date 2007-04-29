@@ -61,9 +61,9 @@ namespace synthese
 
 			AlarmObjectLinkTableSync();
 
-
-			/**  search.
-				(other search parameters)
+			/** Search of alarm object links for a specified alarm in a specified recipient type.
+				@param alarm Alarm to the object must be liked with
+				@param recipientKey Key of the recipient to search (REMOVE THIS PARAMETER WHEN THE FACTORY KEY WILL BE STATIC)
 				@param first First  object to answer
 				@param number Number of  objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@return vector<*> Founded  objects.
@@ -74,6 +74,18 @@ namespace synthese
 			static std::vector<boost::shared_ptr<T> > search(
 				const Alarm* alarm,
 				const std::string& recipientKey,
+				int first = 0, int number = 0);
+
+			/** Search of alarm object links for a specified alarm in all the recipient types.
+				@param alarm Alarm to the object must be liked with
+				@param first First  object to answer
+				@param number Number of  objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return vector<*> Founded  objects.
+				@author Hugues Romain
+				@date 2006
+			*/
+			static std::vector<boost::shared_ptr<AlarmObjectLink> > search(
+				const Alarm* alarm,
 				int first = 0, int number = 0);
 
 			/** Remove a link between an alarm and an object specified by their id.

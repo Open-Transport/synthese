@@ -72,7 +72,7 @@ namespace synthese
 
 
 		PhysicalStopTableSync::PhysicalStopTableSync ()
-		: SQLiteTableSyncTemplate<PhysicalStop>(TABLE_NAME, true, false, db::TRIGGERS_ENABLED_CLAUSE)
+		: SQLiteTableSyncTemplate<PhysicalStop>(true, false, db::TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn (TABLE_COL_ID, "INTEGER", true);
 			addTableColumn (COL_NAME, "TEXT", true);

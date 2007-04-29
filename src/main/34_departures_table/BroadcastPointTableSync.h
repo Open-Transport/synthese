@@ -47,7 +47,6 @@ namespace synthese
 		class BroadcastPointTableSync : public db::SQLiteTableSyncTemplate<BroadcastPoint>
 		{
 		public:
-			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_PLACE_ID;
 			static const std::string TABLE_COL_PHYSICAL_STOP_ID;

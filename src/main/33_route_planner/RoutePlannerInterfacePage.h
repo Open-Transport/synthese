@@ -1,6 +1,6 @@
 
-/** RoutePlannerModule class header.
-	@file RoutePlannerModule.h
+/** RoutePlannerInterfacePage class header.
+	@file RoutePlannerInterfacePage.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,49 +20,39 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_RoutePlannerModule_H__
-#define SYNTHESE_RoutePlannerModule_H__
+#ifndef SYNTHESE_RoutePlannerInterfacePage_H__
+#define SYNTHESE_RoutePlannerInterfacePage_H__
 
-#include "33_route_planner/Site.h"
 #include "33_route_planner/Types.h"
 
-#include "01_util/ModuleClass.h"
+#include "11_interfaces/InterfacePage.h"
 
 namespace synthese
 {
-	namespace env
+	namespace server
 	{
-		class ConnectionPlace;
+		class Request;
 	}
 
-	/** @defgroup m33 33 Route planner service module.
-	@{
-	*/
-
-	/** 33 Route planner service module namespace.
-	*/
 	namespace routeplanner
 	{
-		/** Route planner module class.
+		/** RoutePlannerInterfacePage Interface Page Class.
+			@ingroup m33Pages refPages
 		*/
-		class RoutePlannerModule : public util::ModuleClass
+		class RoutePlannerInterfacePage : public interfaces::InterfacePage
 		{
-		private:
-			static Site::Registry			_sites;	//!< Sites Registry
-
 		public:
-
-			/** Sites registry getter.
-				@return Site::Registry& The sites registry
-				@author Hugues Romain
-				@date 2007
+			/** Overloaded display method for specific parameter conversion.
+				This function converts the parameters into a single ParametersVector object.
 			*/
-			static Site::Registry& getSites();
-
+			void display(
+				std::ostream& stream
+				, interfaces::VariablesMap& variables
+				, const Journeys* object
+				, const server::Request* request = NULL
+				) const;
 		};
 	}
 }
 
-/** @} */
-
-#endif // SYNTHESE_RoutePlannerModule_H__
+#endif // SYNTHESE_RoutePlannerInterfacePage_H__

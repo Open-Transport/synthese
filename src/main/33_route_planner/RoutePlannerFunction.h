@@ -23,24 +23,40 @@
 #ifndef SYNTHESE_RoutePlannerFunction_H__
 #define SYNTHESE_RoutePlannerFunction_H__
 
-#include "11_interfaces/RequestWithInterface.h"
+#include "30_server/Function.h"
+
+#include "04_time/DateTime.h"
 
 namespace synthese
 {
+	namespace env
+	{
+		class ConnectionPlace;
+	}
+
 	namespace routeplanner
 	{
-		/** RoutePlannerFunction class.
-			@ingroup m33
+		class Site;
+		class RoutePlannerInterfacePage;
+
+		/** Route planning Function class.
+			@ingroup m33Functions refFunctions
 		*/
-		class RoutePlannerFunction : public interfaces::RequestWithInterface
+		class RoutePlannerFunction : public server::Function
 		{
 			static const std::string PARAMETER_SITE;
-			static const std::string PARAMETER_PAGE;
+//			static const std::string PARAMETER_PAGE;
+			static const std::string PARAMETER_DEPARTURE_PLACE_ID;
+			static const std::string PARAMETER_ARRIVAL_PLACE_ID;
+			static const std::string PARAMETER_DATE;
 			
 			//! \name Parameters
 			//@{
-//				Site*			_site;
-				boost::shared_ptr<const InterfacePage>	_page;
+				boost::shared_ptr<const Site>						_site;
+				boost::shared_ptr<const RoutePlannerInterfacePage>	_page;
+				boost::shared_ptr<const env::ConnectionPlace>		_departure_place;
+				boost::shared_ptr<const env::ConnectionPlace>		_arrival_place;
+				time::DateTime										_date;
 			//@}
 
 
@@ -55,8 +71,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/// @todo Getters/Setters for parsed parameters
-
 			/** Action to run, defined by each subclass.
 			*/
 			void _run(std::ostream& stream);

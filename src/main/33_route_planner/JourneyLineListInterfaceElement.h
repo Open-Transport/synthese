@@ -39,8 +39,7 @@ namespace synthese
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _rowEndHtml;
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _pixelWidth;
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _pixelHeight;
-			~JourneyLineListInterfaceElement();
-
+			
 		public:
 			/** Display.
 				@param stream Stream to write on
@@ -48,7 +47,13 @@ namespace synthese
 				@param object (Journey*) Journey to display
 				@param site Site to display
 			*/
-			void display(std::ostream& stream, const interfaces::ParametersVector& parameters, boost::shared_ptr<const void> object = boost::shared_ptr<const void>(), const server::Request* request = NULL) const;
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL
+				) const;
 
 			/** Parser.
 			@param text Text to parse : standard list of parameters :

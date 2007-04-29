@@ -45,7 +45,6 @@ namespace synthese
 		class TransactionTableSync : public db::SQLiteTableSyncTemplate<Transaction>
 		{
 		public:
-			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_DOCUMENT_ID;
 			static const std::string TABLE_COL_START_DATE_TIME;

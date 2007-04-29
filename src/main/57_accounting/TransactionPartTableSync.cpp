@@ -99,7 +99,6 @@ namespace synthese
 
 	namespace accounts
 	{
-		const std::string TransactionPartTableSync::TABLE_COL_ID = "id";
 		const std::string TransactionPartTableSync::TABLE_COL_TRANSACTION_ID = "transaction_id";
 		const std::string TransactionPartTableSync::TABLE_COL_LEFT_CURRENCY_AMOUNT = "left_currency_amount";
 		const std::string TransactionPartTableSync::TABLE_COL_RIGHT_CURRENCY_AMOUNT = "right_currency_amount";
@@ -109,7 +108,7 @@ namespace synthese
 		const std::string TransactionPartTableSync::TABLE_COL_COMMENT = "comment";
 
 		TransactionPartTableSync::TransactionPartTableSync()
-			: SQLiteTableSyncTemplate<TransactionPart>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteTableSyncTemplate<TransactionPart>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			// Columns
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);

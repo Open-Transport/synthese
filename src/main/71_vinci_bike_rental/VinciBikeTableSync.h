@@ -51,7 +51,6 @@ namespace synthese
 		class VinciBikeTableSync : public db::SQLiteTableSyncTemplate<VinciBike>
 		{
 		public:
-			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_NUMBER;
 			static const std::string TABLE_COL_MARKED_NUMBER;
 

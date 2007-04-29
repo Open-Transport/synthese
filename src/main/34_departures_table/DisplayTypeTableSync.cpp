@@ -94,7 +94,6 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const std::string DisplayTypeTableSync::TABLE_COL_ID = "id";
 		const std::string DisplayTypeTableSync::TABLE_COL_NAME = "name";
 		const std::string DisplayTypeTableSync::TABLE_COL_INTERFACE_ID = "interface_id";
 		const std::string DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER = "rows_number";
@@ -102,7 +101,7 @@ namespace synthese
 		/// @todo Other fields
 
 		DisplayTypeTableSync::DisplayTypeTableSync()
-			: SQLiteTableSyncTemplate<DisplayType>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<DisplayType>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);

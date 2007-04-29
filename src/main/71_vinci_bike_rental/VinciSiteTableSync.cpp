@@ -76,7 +76,7 @@ namespace synthese
 		const std::string VinciSiteTableSync::COL_PHONE = "phone";
 
 		VinciSiteTableSync::VinciSiteTableSync()
-			: SQLiteTableSyncTemplate<VinciSite>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteTableSyncTemplate<VinciSite>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_NAME, "TEXT", true);

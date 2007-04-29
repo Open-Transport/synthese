@@ -90,7 +90,7 @@ namespace synthese
 		const std::string CityTableSync::TABLE_COL_NAME = "name";
 		
 		CityTableSync::CityTableSync ()
-			: SQLiteTableSyncTemplate<City> (TABLE_NAME, true, false, db::TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<City> (true, false, db::TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn (TABLE_COL_ID, "INTEGER");
 			addTableColumn (TABLE_COL_NAME, "TEXT");

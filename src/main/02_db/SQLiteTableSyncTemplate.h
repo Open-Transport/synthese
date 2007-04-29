@@ -66,12 +66,12 @@ namespace synthese
 			*/
 			static uid getId(int gridId, int gridNodeId);
 
-			SQLiteTableSyncTemplate( const std::string& tableName, 
+			SQLiteTableSyncTemplate(
 				bool allowInsert = true, 
 				bool allowRemove = true,
 				const std::string& triggerOverrideClause = "1",
 				bool ignoreCallbacksOnFirstSync = false)
-				: SQLiteTableSync(tableName, allowInsert, allowRemove, triggerOverrideClause, ignoreCallbacksOnFirstSync)
+				: SQLiteTableSync(TABLE_NAME, allowInsert, allowRemove, triggerOverrideClause, ignoreCallbacksOnFirstSync)
 			{			}
 
 			void initAutoIncrement();

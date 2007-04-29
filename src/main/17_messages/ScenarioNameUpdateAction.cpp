@@ -55,7 +55,7 @@ namespace synthese
 				ParametersMap::const_iterator it;
 
 				// Scenario
-				_scenario = ScenarioTableSync::getTemplate(_request->getObjectId());
+				_scenario = ScenarioTableSync::getScenario(_request->getObjectId());
 
 				// Name
 				it = map.find(PARAMETER_NAME);
@@ -64,9 +64,12 @@ namespace synthese
 				_name = it->second;
 
 				// Unicity control
-				vector<shared_ptr<ScenarioTemplate> > existing = ScenarioTableSync::searchTemplate(_name, _scenario.get(), 0, 1);
-				if (!existing.empty())
-					throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
+				if (dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get())
+				{
+					vector<shared_ptr<ScenarioTemplate> > existing = ScenarioTableSync::searchTemplate(_name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);
+					if (!existing.empty())
+						throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
+				}
 			}
 			catch (DBEmptyResultException<Scenario>)
 			{

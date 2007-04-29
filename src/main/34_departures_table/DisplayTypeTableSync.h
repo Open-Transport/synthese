@@ -42,7 +42,6 @@ namespace synthese
 		class DisplayTypeTableSync : public db::SQLiteTableSyncTemplate<DisplayType>
 		{
 		public:
-			static const std::string TABLE_COL_ID;
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_INTERFACE_ID;
 			static const std::string TABLE_COL_ROWS_NUMBER;

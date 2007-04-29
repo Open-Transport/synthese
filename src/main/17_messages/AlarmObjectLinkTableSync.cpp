@@ -74,7 +74,7 @@ namespace synthese
 
 
 		AlarmObjectLinkTableSync::AlarmObjectLinkTableSync()
-			: SQLiteTableSyncTemplate<AlarmObjectLink>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<AlarmObjectLink>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_RECIPIENT_KEY, "TEXT");
@@ -141,6 +141,37 @@ namespace synthese
 				<< " AND " << COL_OBJECT_ID << "=" << Conversion::ToString(objectId)
 				;
 			DBModule::GetSQLite()->execUpdate(query.str());
+		}
+
+		std::vector<boost::shared_ptr<AlarmObjectLink> > AlarmObjectLinkTableSync::search( const Alarm* alarm, int first /*= 0*/, int number /*= 0*/ )
+		{
+			std::stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE " 
+				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarm->getId());
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				db::SQLiteResult result = db::DBModule::GetSQLite()->execQuery(query.str());
+				std::vector< boost::shared_ptr<AlarmObjectLink> > objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					shared_ptr<AlarmObjectLink> object(new AlarmObjectLink);
+					load(object.get(), result, i);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(db::SQLiteException& e)
+			{
+				throw util::Exception(e.getMessage());
+			}
 		}
 	}
 }

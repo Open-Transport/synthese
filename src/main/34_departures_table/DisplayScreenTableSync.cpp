@@ -277,7 +277,7 @@ namespace synthese
 		const std::string DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE = "maintenance_message";
 
 		DisplayScreenTableSync::DisplayScreenTableSync()
-			: SQLiteTableSyncTemplate<DisplayScreen>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<DisplayScreen>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_BROADCAST_POINT_ID, "INTEGER");

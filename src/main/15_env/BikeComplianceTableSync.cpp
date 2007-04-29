@@ -103,7 +103,7 @@ namespace synthese
 		const std::string BikeComplianceTableSync::COL_CAPACITY ("capacity");
 
 		BikeComplianceTableSync::BikeComplianceTableSync()
-			: SQLiteTableSyncTemplate<BikeCompliance>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<BikeCompliance>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_STATUS, "INTEGER");

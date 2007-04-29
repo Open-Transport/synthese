@@ -84,7 +84,7 @@ namespace synthese
 		const string OnlineReservationRuleTableSync::COL_THRESHOLDS = "thresholds";
 
 		OnlineReservationRuleTableSync::OnlineReservationRuleTableSync()
-			: SQLiteTableSyncTemplate<OnlineReservationRule>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<OnlineReservationRule>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_RESERVATION_RULE_ID, "INTEGER");

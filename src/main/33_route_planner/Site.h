@@ -24,6 +24,7 @@
 #define SYNTHESE_CSITE_H
 
 #include "04_time/Date.h"
+
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
@@ -32,9 +33,14 @@
 
 namespace synthese
 {
-	namespace environment
+	namespace env
 	{
 		class CommercialLine;
+	}
+
+	namespace interfaces
+	{
+		class Interface;
 	}
 
 	namespace routeplanner
@@ -49,9 +55,10 @@ namespace synthese
 		{
 			//! \name Properties
 			//@{
-				std::string				_name;  //!< Name of the site
-				synthese::time::Date	_startValidityDate;   
-				synthese::time::Date	_endValidityDate;   
+				const interfaces::Interface*	_interface;
+				std::string						_name;  //!< Name of the site
+				synthese::time::Date			_startValidityDate;   
+				synthese::time::Date			_endValidityDate;   
 			//@}
 
 			//! \name Environment
@@ -83,13 +90,10 @@ namespace synthese
 
 			//! \name Accesseurs
 			//@{
-//			const std::string& getClef() const;
-			const synthese::env::Environment* getEnvironment() const;
 //			const std::string& getIdentifiant() const;
 			const interfaces::Interface* getInterface() const;
 //			const synthese::time::Date& getDateDebut() const;
 //			const synthese::time::Date& getDateFin() const;
-			const std::string& getClientURL() const;
 			bool onlineBookingAllowed() const;
 //			bool getSolutionsPassees() const;
 			//@}

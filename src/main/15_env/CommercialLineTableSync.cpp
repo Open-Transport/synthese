@@ -95,7 +95,7 @@ namespace synthese
 		const std::string CommercialLineTableSync::COL_IMAGE ("image");
 
 		CommercialLineTableSync::CommercialLineTableSync()
-			: SQLiteTableSyncTemplate<CommercialLine>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<CommercialLine>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_NETWORK_ID, "INTEGER", false);

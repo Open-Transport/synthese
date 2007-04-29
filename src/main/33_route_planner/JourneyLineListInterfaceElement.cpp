@@ -20,19 +20,24 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "JourneyLineListInterfaceElement.h"
-#include "Journey.h"
-#include "JourneyLeg.h"
+#include "33_route_planner/JourneyLineListInterfaceElement.h"
+#include "33_route_planner/Journey.h"
+#include "33_route_planner/JourneyLeg.h"
+
+#include "30_server/Request.h"
+
 #include "15_env/Road.h"
+#include "15_env/Line.h"
 #include "15_env/LineMarkerInterfacePage.h"
-#include "01_util/Conversion.h"
+
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/ValueInterfaceElement.h"
-#include "30_server/Request.h"
-#include "30_server/Site.h"
 
+#include "01_util/Conversion.h"
 
+using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -42,29 +47,35 @@ namespace synthese
 
 	namespace routeplanner
 	{
-		void JourneyLineListInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, boost::shared_ptr<const void> object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string JourneyLineListInterfaceElement::display(
+			std::ostream& stream
+			, const ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
-		    const server::Site* site = request->getSite ();
- 
-
-			// Collecte des param�tres
-			const Journey* __Trajet = ( const Journey* ) object;
-			bool __AfficherLignesPied = Conversion::ToBool(_displayPedestrianLines->getValue(parameters));
-			const LineMarkerInterfacePage* const lineMarkerInterfacePage = site->getInterface()->getPage<LineMarkerInterfacePage>();
+			// Parameters
+			const Journey* journey = static_cast<const Journey*>(object);
+			bool __AfficherLignesPied = Conversion::ToBool(_displayPedestrianLines->getValue(parameters, variables, object, request));
+			shared_ptr<const LineMarkerInterfacePage> lineMarkerInterfacePage = _page->getInterface()->getPage<LineMarkerInterfacePage>();
 
 			// Fabrication de l'affichage
-			for (int l=0; l<__Trajet->getJourneyLegCount (); ++l)
+			for (JourneyLegs::const_iterator it = journey->getJourneyLegs().begin(); it != journey->getJourneyLegs().end(); ++it)
 			{
-				const JourneyLeg* __ET = __Trajet->getJourneyLeg (l);
-				if ( __AfficherLignesPied || !dynamic_cast<const Road*> (__ET->getService ()->getPath ()) )
-					lineMarkerInterfacePage->display(stream
-						, _rowStartHtml->getValue(parameters)
-						, _rowEndHtml->getValue(parameters)
-						, Conversion::ToInt(_pixelWidth->getValue(parameters))
-						, Conversion::ToInt(_pixelHeight->getValue(parameters))
-						, (const Line*) __ET->getService ()->getPath ()
+				const JourneyLeg* leg = *it;
+				if ( __AfficherLignesPied || !dynamic_cast<const Road*> (leg->getService ()->getPath ()) )
+					lineMarkerInterfacePage->display(
+						stream
+						, variables
+						, _rowStartHtml->getValue(parameters, variables, object, request)
+						, _rowEndHtml->getValue(parameters, variables, object, request)
+						, Conversion::ToInt(_pixelWidth->getValue(parameters, variables, object, request))
+						, Conversion::ToInt(_pixelHeight->getValue(parameters, variables, object, request))
+						, static_cast<const Line*>(leg->getService ()->getPath ())
 						, request);
 			}
+
+			return string();
 		}
 
 		void JourneyLineListInterfaceElement::storeParameters( interfaces::ValueElementList& vel )

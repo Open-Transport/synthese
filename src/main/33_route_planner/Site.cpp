@@ -45,11 +45,11 @@ namespace synthese
 			return _interface;
 		}
 
-		const synthese::env::Environment* Site::getEnvironment() const
+/*		const synthese::env::Environment* Site::getEnvironment() const
 		{
 			return _env;
 		}
-
+*/
 		bool Site::onlineBookingAllowed() const
 		{
 			return _onlineBookingAllowed;
@@ -59,11 +59,6 @@ namespace synthese
 		{
 			DateTime tempDate;
 			return tempDate.getDate() >= _startValidityDate && tempDate.getDate() <= _endValidityDate;
-		}
-
-		void Site::setEnvironment( synthese::env::Environment* environment )
-		{
-			_env = environment;
 		}
 
 		void Site::setInterface( const synthese::interfaces::Interface* interf )
@@ -86,11 +81,6 @@ namespace synthese
 			_onlineBookingAllowed = valeur;
 		}
 
-		void Site::setClientURL( const std::string& clientURL )
-		{
-			_clientURL = clientURL;
-		}
-
 		void Site::setPastSolutionsDisplayed( bool pastSolutions)
 		{
 			_pastSolutionsDisplayed = pastSolutions;
@@ -100,29 +90,5 @@ namespace synthese
 		{
 			_name = name;
 		}
-
-		const std::string& Site::getClientURL() const
-		{
-			return _clientURL;
-		}
 	}
 }
-
-/* To put in request parsing
-
-			it = map.find(PARAMETER_SITE);
-			if (it == map.end())
-				throw RequestException("Site not specified");
-			try
-			{
-				request->_site = ServerModule::getSites().get(Conversion::ToLongLong(it->second));
-			}
-			catch (Site::RegistryKeyException e)
-			{
-				throw RequestException("Site not found");
-			}
-			// Site validity control
-			if (!request->_site->dateControl())
-				throw RequestException("Site is deactivated");
-			map.erase(it);
-*/

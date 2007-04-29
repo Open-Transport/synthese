@@ -94,7 +94,7 @@ namespace synthese
 		const string ReservationTableSync::COL_CANCEL_USER_ID = "cancel_user_id";
 
 		ReservationTableSync::ReservationTableSync()
-			: SQLiteTableSyncTemplate<Reservation>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<Reservation>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_LINE_ID, "INTEGER");

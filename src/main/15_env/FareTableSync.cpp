@@ -86,7 +86,7 @@ namespace synthese
 		const std::string FareTableSync::COL_FARETYPE ("fare_type");
 
 		FareTableSync::FareTableSync()
-			: SQLiteTableSyncTemplate<Fare>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<Fare>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_NAME, "TEXT", true);

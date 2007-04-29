@@ -102,7 +102,6 @@ namespace synthese
 
 	namespace vinci
 	{
-		const std::string VinciRateTableSync::TABLE_COL_ID = "id";
 		const std::string VinciRateTableSync::TABLE_COL_NAME = "name";
 		const std::string VinciRateTableSync::TABLE_COL_VALIDITY_DURATION = "validity_duration";
 		const std::string VinciRateTableSync::TABLE_COL_START_FINANCIAL_PRICE = "start_financial_price";
@@ -116,7 +115,7 @@ namespace synthese
 		const std::string VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST = "recurring_penalty_cancels_first";
 
 		VinciRateTableSync::VinciRateTableSync()
-			: SQLiteTableSyncTemplate<VinciRate>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteTableSyncTemplate<VinciRate>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);

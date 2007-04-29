@@ -95,7 +95,7 @@ namespace synthese
 		const std::string TextTemplateTableSync::COL_LEVEL = "level";
 
 		TextTemplateTableSync::TextTemplateTableSync()
-			: SQLiteTableSyncTemplate<TextTemplate>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<TextTemplate>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_NAME, "TEXT");

@@ -1,7 +1,7 @@
 
 Import ('mainenv')
 
-modules = ['34_departures_table', '17_messages', '30_server', '15_env', '12_security', '32_admin', '13_dblog', '11_interfaces', '07_lex_matcher', '05_html', '04_time', '02_db', '01_util', '00_tcp'];
+modules = ['33_route_planner', '34_departures_table', '17_messages', '30_server', '15_env', '12_security', '32_admin', '13_dblog', '11_interfaces', '07_lex_matcher', '05_html', '04_time', '02_db', '01_util', '00_tcp'];
 
 
 syntheseenv = mainenv.SyntheseEnv (modules)

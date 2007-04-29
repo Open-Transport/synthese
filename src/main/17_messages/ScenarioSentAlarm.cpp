@@ -37,7 +37,6 @@ namespace synthese
 			setLevel(source.getLevel());
 			setShortMessage(source.getShortMessage());
 			setLongMessage(source.getLongMessage());
-			/// @todo copy the broadcast list
 		}
 
 		ScenarioSentAlarm::ScenarioSentAlarm( const SentScenario& scenario )

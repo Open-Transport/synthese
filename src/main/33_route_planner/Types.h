@@ -1,6 +1,6 @@
 
-/** RoutePlannerModule class header.
-	@file RoutePlannerModule.h
+/** Types class header.
+	@file Types.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,13 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_RoutePlannerModule_H__
-#define SYNTHESE_RoutePlannerModule_H__
+#ifndef SYNTHESE_routeplanner_Types_h__
+#define SYNTHESE_routeplanner_Types_h__
 
-#include "33_route_planner/Site.h"
-#include "33_route_planner/Types.h"
-
-#include "01_util/ModuleClass.h"
+#include <vector>
+#include <deque>
 
 namespace synthese
 {
@@ -35,34 +33,22 @@ namespace synthese
 		class ConnectionPlace;
 	}
 
-	/** @defgroup m33 33 Route planner service module.
-	@{
-	*/
-
-	/** 33 Route planner service module namespace.
-	*/
 	namespace routeplanner
 	{
-		/** Route planner module class.
+		class Journey;
+		class JourneyLeg;
+
+		/** @addtogroup m33
+			@{
 		*/
-		class RoutePlannerModule : public util::ModuleClass
-		{
-		private:
-			static Site::Registry			_sites;	//!< Sites Registry
 
-		public:
+		typedef std::vector<Journey>				Journeys;
+		typedef std::deque<const JourneyLeg*>		JourneyLegs;
 
-			/** Sites registry getter.
-				@return Site::Registry& The sites registry
-				@author Hugues Romain
-				@date 2007
-			*/
-			static Site::Registry& getSites();
+		typedef std::vector<const env::ConnectionPlace*>	JourneyBoardPlaces;
 
-		};
+		/** @} */
 	}
 }
 
-/** @} */
-
-#endif // SYNTHESE_RoutePlannerModule_H__
+#endif // SYNTHESE_routeplanner_Types_h__

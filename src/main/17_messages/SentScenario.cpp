@@ -46,7 +46,8 @@ namespace synthese
 			, _periodStart(periodStart)
 			, _periodEnd(periodEnd)
 		{
-			// Creation of the SentAlarm from the AlarmTemplate
+			for (ScenarioTemplate::AlarmsSet::const_iterator it = source.getAlarms().begin(); it != source.getAlarms().end(); ++it)
+				addAlarm(new ScenarioSentAlarm(*this, **it));
 		}
 
 		void SentScenario::setPeriodStart( const synthese::time::DateTime& periodStart )

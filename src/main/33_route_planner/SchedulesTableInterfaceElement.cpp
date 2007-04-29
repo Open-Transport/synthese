@@ -1,45 +1,69 @@
 
-#include "SchedulesTableInterfaceElement.h"
-#include "11_interfaces/Interface.h"
-#include "RoutePlannerNoSolutionInterfacePage.h"
-#include "RoutePlannerSheetColumnInterfacePage.h"
-#include "RoutePlannerSheetLineInterfacePage.h"
-#include "04_time/DateTime.h"
-#include "JourneyLeg.h"
+/** SchedulesTableInterfaceElement class implementation.
+	@file SchedulesTableInterfaceElement.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "33_route_planner/SchedulesTableInterfaceElement.h"
+#include "33_route_planner/RoutePlannerNoSolutionInterfacePage.h"
+#include "33_route_planner/RoutePlannerSheetColumnInterfacePage.h"
+#include "33_route_planner/RoutePlannerSheetLineInterfacePage.h"
+#include "33_route_planner/JourneyLeg.h"
+
+#include "30_server/Request.h"
+
 #include "15_env/Service.h"
 #include "15_env/Road.h"
 #include "15_env/Edge.h"
 #include "15_env/Vertex.h"
 
-#include "30_server/Site.h"
-#include "30_server/Request.h"
+#include "11_interfaces/Interface.h"
 
+#include "04_time/DateTime.h"
 
 #include <vector>
 #include <sstream>
+
+using namespace boost;
+using namespace std;
 
 namespace synthese
 {
 	using namespace routeplanner;
 	using namespace time;
 	using namespace env;
-	using std::vector;
-	using std::ostringstream;
+	using namespace interfaces;
 	
-	namespace interfaces
+	namespace routeplanner
 	{
-//		const bool SchedulesTableInterfaceElement::_registered = Factory<LibraryInterfaceElement>::integrate<SchedulesTableInterfaceElement>("schedules_table");
-
-
-		void SchedulesTableInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string SchedulesTableInterfaceElement::display(
+			std::ostream& stream
+			, const ParametersVector& parameters
+			, VariablesMap& variables
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
-		    const server::Site* site = request->getSite ();
+			const Journeys* jv = static_cast<const Journeys*>(object);
 
-			const JourneyVector* jv = (const JourneyVector*) object;
-
-			if ( jv == NULL )  // No solution or type error
+			if ( jv == NULL || jv->empty())  // No solution or type error
 			{
-				const RoutePlannerNoSolutionInterfacePage* noSolutionPage = site->getInterface()->getPage<RoutePlannerNoSolutionInterfacePage>();
+				shared_ptr<const RoutePlannerNoSolutionInterfacePage> noSolutionPage = _page->getInterface()->getPage<RoutePlannerNoSolutionInterfacePage>();
 				noSolutionPage->display(stream, request);
 			}
 			else
@@ -50,8 +74,8 @@ namespace synthese
 				DateTime lastDepartureDateTime;
 				DateTime lastArrivalDateTime;
 				Hour unknownTime( TIME_UNKNOWN );
-				const RoutePlannerSheetColumnInterfacePage* columnInterfacePage = site->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>();
-				const RoutePlannerSheetLineInterfacePage* lineInterfacePage = site->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>();
+				shared_ptr<const RoutePlannerSheetColumnInterfacePage> columnInterfacePage = _page->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>();
+				shared_ptr<const RoutePlannerSheetLineInterfacePage> lineInterfacePage = _page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>();
 
 				// Initialization of text lines
 				vector<ostringstream*> __Tampons(placesList.size());
@@ -60,7 +84,7 @@ namespace synthese
 
 				// Loop on each journey
 				int i=1;
-				for ( JourneyVector::const_iterator it = jv->begin(); it != jv->end(); ++it, ++i )
+				for (Journeys::const_iterator it = jv->begin(); it != jv->end(); ++it, ++i )
 				{
 					// Loop on each leg
 					__Ligne=0;
@@ -90,7 +114,13 @@ namespace synthese
 				bool __Couleur = false;
 				for ( __Ligne = 0; __Ligne < placesList.size(); __Ligne++ )
 				{
-					lineInterfacePage->display( stream, __Tampons[ __Ligne ]->str(), __Couleur, placesList[ __Ligne ], request );
+					lineInterfacePage->display(
+						stream
+						, __Tampons[ __Ligne ]->str()
+						, __Couleur
+						, variables
+						, placesList[ __Ligne ]
+						, request );
 				}
 
 				// Cleaning the string vector
@@ -188,13 +218,12 @@ namespace synthese
 
 				//    delete [] Tampons;
 			}
-
+			return string();
 		}
 
-		size_t SchedulesTableInterfaceElement::OrdrePAEchangeSiPossible( const JourneyVector& jv, PlaceList& pl, const LockedLinesList& lll, size_t PositionActuelle, size_t PositionGareSouhaitee )
+		size_t SchedulesTableInterfaceElement::OrdrePAEchangeSiPossible( const Journeys& jv, PlaceList& pl, const LockedLinesList& lll, size_t PositionActuelle, size_t PositionGareSouhaitee )
 		{
-			bool * LignesAPermuter = ( bool* ) calloc( PositionActuelle + 1, sizeof( bool ) );
-			bool* curLignesET = ( bool* ) malloc( ( PositionActuelle + 1 ) * sizeof( bool ) );
+			vector<bool> LignesAPermuter(PositionActuelle + 1, false);
 			bool Echangeable = true;
 			const ConnectionPlace* tempGare;
 			size_t i;
@@ -203,9 +232,9 @@ namespace synthese
 			// Construction de l'ensemble des lignes a permuter
 			LignesAPermuter[ PositionActuelle ] = true;
 			size_t __i=0;
-			for ( JourneyVector::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
+			for ( Journeys::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
 			{
-				OrdrePAConstruitLignesAPermuter( pl, *it, curLignesET, PositionActuelle );
+				vector<bool> curLignesET = OrdrePAConstruitLignesAPermuter( pl, *it, PositionActuelle );
 				for ( i = PositionActuelle; i > PositionGareSouhaitee; i-- )
 					if ( curLignesET[ i ] && LignesAPermuter[ i ] )
 						break;
@@ -217,9 +246,9 @@ namespace synthese
 			// Tests d'ï¿½changeabilitï¿½ binaire
 			// A la premiere contradiction on s'arrete
 			__i=0;
-			for ( JourneyVector::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
+			for ( Journeys::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
 			{
-				OrdrePAConstruitLignesAPermuter( pl, *it, curLignesET, PositionActuelle );
+				vector<bool> curLignesET = OrdrePAConstruitLignesAPermuter( pl, *it, PositionActuelle );
 				i = PositionGareSouhaitee;
 				for ( j = PositionGareSouhaitee; true; j++ )
 				{
@@ -252,10 +281,10 @@ namespace synthese
 						break;
 
 					LignesAPermuter[ i ] = false;
-
+/// @todo Write on lll too !
 					tempGare = pl[ i ];
 					for ( ; i > PositionGareSouhaitee + j; i-- )
-						pl[ i - 1 ] = pl[ i ];
+						pl[i] = pl[i-1];
 					pl[ i ] = tempGare;
 				}
 				return PositionGareSouhaitee + j;
@@ -265,42 +294,39 @@ namespace synthese
 
 		}
 
-		size_t SchedulesTableInterfaceElement::OrdrePAInsere(PlaceList& pl, const LockedLinesList& lll, const synthese::env::ConnectionPlace* place, size_t Position )
+		size_t SchedulesTableInterfaceElement::OrdrePAInsere(PlaceList& pl, const LockedLinesList& lll, const synthese::env::ConnectionPlace* place, size_t position )
 		{
-			// Saut de ligne vï¿½rouillï¿½e par un cheminement piï¿½ton
-			for ( ; Position < lll.size() && lll[ Position ]; Position++ )
-				;
+			// Saut de ligne vérouillée par un cheminement piéton
+			for (; position < lll.size() && lll[position]; ++position);
 
-			// Dï¿½calage des arrï¿½ts suivants
-			for ( size_t i = pl.size(); i > Position; i-- )
-				pl[ i - 1 ] = pl[ i ];
-
-			// Stockage de l'arrï¿½t demandï¿½
-			pl[ Position ] = place;
+			// Insertion
+			pl.insert(pl.begin() + position, place); /// @todo why not insert a false in ll ???
 
 			// Retour de la position choisie
-			return Position;
+			return position;
 
+			/// @todo update lll too !
 		}
 
-		void SchedulesTableInterfaceElement::OrdrePAConstruitLignesAPermuter( const PlaceList& pl, const synthese::routeplanner::Journey& __TrajetATester, bool* Resultat, size_t LigneMax )
+		vector<bool> SchedulesTableInterfaceElement::OrdrePAConstruitLignesAPermuter( const PlaceList& pl, const Journey& __TrajetATester, size_t LigneMax )
 		{
+			vector<bool> result;
 			int l = 0;
 			const JourneyLeg* curET = (l >= __TrajetATester.getJourneyLegCount ()) ? NULL : __TrajetATester.getJourneyLeg (l);
 			for (size_t i = 0; pl[ i ] != NULL && i <= LigneMax; i++ )
 			{
 				if ( curET != NULL && pl[ i ] == curET->getOrigin() ->getConnectionPlace() )
 				{
-					Resultat[ i ] = true;
+					result.push_back(true);
 					++l;
 					curET = (l >= __TrajetATester.getJourneyLegCount ()) ? NULL : __TrajetATester.getJourneyLeg (l);
 				}
 				else
 				{
-					Resultat[ i ] = false;
+					result.push_back(false);
 				}
 			}
-
+			return result;
 		}
 
 		bool SchedulesTableInterfaceElement::OrdrePARechercheGare( const PlaceList& pl, size_t& i, const synthese::env::ConnectionPlace* GareAChercher )
@@ -586,7 +612,7 @@ namespace synthese
 			</table>
 
 		*/
-		SchedulesTableInterfaceElement::PlaceList SchedulesTableInterfaceElement::getStopsListForScheduleTable( const JourneyVector& jv )
+		SchedulesTableInterfaceElement::PlaceList SchedulesTableInterfaceElement::getStopsListForScheduleTable( const Journeys& jv )
 		{
 			// Variables locales
 			size_t i;
@@ -597,7 +623,7 @@ namespace synthese
 			PlaceList pl;
 
 			// Horizontal loop
-			for ( JourneyVector::const_iterator it = jv.begin(); it != jv.end(); ++it )
+			for ( Journeys::const_iterator it = jv.begin(); it != jv.end(); ++it )
 			{
 				i = 0;
 				dernieri = -1;

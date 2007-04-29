@@ -99,13 +99,12 @@ namespace synthese
 		const std::string ProfileTableSync::RIGHT_SEPARATOR = "|";
 		const std::string ProfileTableSync::RIGHT_VALUE_SEPARATOR = ",";
 
-		const std::string ProfileTableSync::TABLE_COL_ID = "id";
 		const std::string ProfileTableSync::TABLE_COL_NAME = "name";
 		const std::string ProfileTableSync::TABLE_COL_PARENT_ID = "parent";
 		const std::string ProfileTableSync::TABLE_COL_RIGHTS_STRING = "rights";
 
 		ProfileTableSync::ProfileTableSync()
-			: db::SQLiteTableSyncTemplate<Profile>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: db::SQLiteTableSyncTemplate<Profile>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);

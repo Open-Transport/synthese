@@ -119,7 +119,6 @@ namespace synthese
 	}
 	namespace security
 	{
-		const std::string UserTableSync::TABLE_COL_ID = "id";
 		const std::string UserTableSync::TABLE_COL_NAME = "name";
 		const std::string UserTableSync::TABLE_COL_SURNAME = "surname";
 		const std::string UserTableSync::TABLE_COL_LOGIN = "login";
@@ -136,7 +135,7 @@ namespace synthese
 		const std::string UserTableSync::COL_BIRTH_DATE = "birth_date";
 
 		UserTableSync::UserTableSync()
-			: db::SQLiteTableSyncTemplate<User> ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: db::SQLiteTableSyncTemplate<User> (true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			// Columns
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);

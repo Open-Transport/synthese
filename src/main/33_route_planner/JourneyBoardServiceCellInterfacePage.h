@@ -1,31 +1,54 @@
 
+/** JourneyBoardServiceCellInterfacePage class header.
+	@file JourneyBoardServiceCellInterfacePage.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_JourneyBoardServiceCellInterfacePage_H__
 #define SYNTHESE_JourneyBoardServiceCellInterfacePage_H__
 
 
 #include "11_interfaces/InterfacePage.h"
 #include "04_time/DateTime.h"
-#include "15_env/ReservationRule.h"
-#include "15_env/Alarm.h"
-
 
 #include <boost/logic/tribool.hpp>
 
 namespace synthese
 {
+	namespace messages
+	{
+		class SentAlarm;
+	}
+
 	namespace env
 	{
 		class Path;
+		class ReservationRule;
 	}
 
-	namespace interfaces
+	namespace routeplanner
 	{
-		class Site;
-
 		/** Journey board cell for use of a service.
-		@code journey_board_service_cell @endcode
+			@code journey_board_service_cell @endcode
+			@ingroup m33Pages refPages
 		*/
-		class JourneyBoardServiceCellInterfacePage : public InterfacePage
+		class JourneyBoardServiceCellInterfacePage : public interfaces::InterfacePage
 		{
 		public:
 			/** Display.
@@ -53,10 +76,10 @@ namespace synthese
 				@param site Displayed site
 			*/
 			void display( std::ostream& stream
-				, const synthese::time::Hour& firstDepartureTime
-				, const synthese::time::Hour& lastDepartureTime
-				, const synthese::time::Hour& firstArrivalTime
-				, const synthese::time::Hour& lastArrivalTime
+				, const time::Hour& firstDepartureTime
+				, const time::Hour& lastDepartureTime
+				, const time::Hour& firstArrivalTime
+				, const time::Hour& lastArrivalTime
 				, int rollingStockId
 				, const std::string& rollingStockName
 				, const std::string& rollingStockFullDescription
@@ -67,16 +90,16 @@ namespace synthese
 				, int bikePlacesNumber
 				, bool isReservationCompulsory
 				, bool isReservationOptional
-				, const synthese::time::DateTime maxBookingDate
-				, const synthese::env::ReservationRule* reservationRule
+				, const time::DateTime maxBookingDate
+				, const env::ReservationRule* reservationRule
 				, const std::string& syntheseOnlineBookingURL
-				, const synthese::env::Alarm* alarm
+				, const messages::SentAlarm* alarm
 				, bool color
-				, const synthese::env::Path* line
+				, const env::Path* line
 				, const server::Request* request = NULL ) const;
 
 		};
 	}
 }
-#endif // SYNTHESE_JourneyBoardServiceCellInterfacePage_H__
 
+#endif // SYNTHESE_JourneyBoardServiceCellInterfacePage_H__

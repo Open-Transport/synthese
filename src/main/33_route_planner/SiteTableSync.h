@@ -26,21 +26,22 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSync.h"
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace routeplanner
 	{
+		class Site;
 
 		/** InterfaceTableSync SQLite table synchronizer.
-			@ingroup m33
+			@ingroup m33LS refLS
 		*/
 
 		class SiteTableSync : public db::SQLiteTableSyncTemplate<Site>
 		{
 		private:
-			static const std::string TABLE_COL_ID;
+			static const std::string COL_INTERFACE_ID;
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_START_DATE;
 			static const std::string TABLE_COL_END_DATE;

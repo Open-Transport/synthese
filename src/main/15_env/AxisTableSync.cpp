@@ -89,7 +89,7 @@ namespace synthese
 
 
 		AxisTableSync::AxisTableSync()
-			: SQLiteTableSyncTemplate<Axis>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<Axis>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_NAME, "TEXT", true);

@@ -22,7 +22,11 @@
 
 #include "17_messages/NewScenarioSendAction.h"
 #include "17_messages/SentScenario.h"
+#include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
+#include "17_messages/AlarmTableSync.h"
+#include "17_messages/AlarmObjectLinkTableSync.h"
+#include "17_messages/MessagesLog.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -33,6 +37,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace server;
+	using namespace dblog;
 	
 	namespace messages
 	{
@@ -69,10 +74,34 @@ namespace synthese
 
 		void NewScenarioSendAction::run()
 		{
-			shared_ptr<SentScenario> scenario(new SentScenario(*_template));
+			// The action on the scenario
+			shared_ptr<SentScenario> scenario(new SentScenario(_template->getName()));
 			ScenarioTableSync::save (scenario.get());
-			ScenarioTableSync::saveAlarms(scenario.get());
+
+			// Remember of the id of created object to view it after the action
 			_request->setObjectId(scenario->getKey());
+
+			// The action on the alarms
+			vector<shared_ptr<AlarmTemplate> > alarms = AlarmTableSync::searchTemplates(_template.get());
+			for (vector<shared_ptr<AlarmTemplate> >::const_iterator it = alarms.begin(); it != alarms.end(); ++it)
+			{
+				shared_ptr<ScenarioSentAlarm> alarm(new ScenarioSentAlarm(*scenario, **it));
+				AlarmTableSync::save(alarm.get());
+
+				vector<shared_ptr<AlarmObjectLink> > aols = AlarmObjectLinkTableSync::search(it->get());
+				for (vector<shared_ptr<AlarmObjectLink> >::const_iterator itaol = aols.begin(); itaol != aols.end(); ++itaol)
+				{
+					shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
+					aol->setAlarmId(alarm->getKey());
+					aol->setObjectId((*itaol)->getObjectId());
+					aol->setRecipientKey((*itaol)->getRecipientKey());
+					AlarmObjectLinkTableSync::save(aol.get());
+				}
+			}
+
+			// The log
+			shared_ptr<MessagesLog> log = Factory<DBLog>::create<MessagesLog>();
+			log->addUpdateEntry(static_pointer_cast<const SentScenario, SentScenario>(scenario), "Diffusion", _request->getUser());
 		}
 	}
 }

@@ -134,7 +134,7 @@ namespace synthese
 		const std::string DBLogEntryTableSync::COL_OBJECT_ID = "object_id";
 
 		DBLogEntryTableSync::DBLogEntryTableSync()
-			: SQLiteTableSyncTemplate<DBLogEntry>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<DBLogEntry>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_LOG_KEY, "TEXT");

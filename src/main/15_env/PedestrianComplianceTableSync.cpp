@@ -103,7 +103,7 @@ namespace synthese
 		const std::string PedestrianComplianceTableSync::COL_CAPACITY ("capacity");
 
 		PedestrianComplianceTableSync::PedestrianComplianceTableSync()
-			: SQLiteTableSyncTemplate<PedestrianCompliance>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<PedestrianCompliance>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_STATUS, "INTEGER");

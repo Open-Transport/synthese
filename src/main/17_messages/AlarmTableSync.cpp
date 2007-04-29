@@ -96,7 +96,7 @@ namespace synthese
 				query
 					<< " REPLACE INTO " << TABLE_NAME << " VALUES("
 					<< Conversion::ToString(sobject->getKey())
-					<< ",O"
+					<< ",0"
 					<< "," << Conversion::ToString(sobject->getIsEnabled())
 					<< "," << Conversion::ToString((int) sobject->getLevel())
 					<< "," << Conversion::ToSQLiteString(sobject->getShortMessage())
@@ -162,7 +162,7 @@ namespace synthese
 		const std::string AlarmTableSync::COL_SCENARIO_ID = "scenario_id"; 
 		
 		AlarmTableSync::AlarmTableSync ()
-		: SQLiteTableSyncTemplate<Alarm>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+		: SQLiteTableSyncTemplate<Alarm>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(COL_IS_TEMPLATE, "INTEGER", true);
@@ -290,7 +290,8 @@ namespace synthese
 						<< ") AS " << _COL_CONFLICT_LEVEL
 				<< " FROM " << TABLE_NAME << " AS a "
 				<< " WHERE "
-					<< "a." << COL_IS_TEMPLATE << "=0";
+					<< "a." << COL_IS_TEMPLATE << "=0"
+					<< " AND " << COL_SCENARIO_ID << "=0";
 			if (!startDate.isUnknown())
 				query << " AND a." << COL_PERIODSTART << "<=" << startDate.toSQLString();
 			if (!endDate.isUnknown())
@@ -391,8 +392,8 @@ namespace synthese
 			return object;
 		}
 
-		std::vector<boost::shared_ptr<Alarm> > AlarmTableSync::search( const Scenario* scenario , int first /*= 0 */, int number /*= -1 */, bool orderByLevel /*= false */, bool raisingOrder /*= false */ )
-		{
+//		std::vector<boost::shared_ptr<Alarm> > AlarmTableSync::search( const Scenario* scenario , int first /*= 0 */, int number /*= -1 */, bool orderByLevel /*= false */, bool raisingOrder /*= false */ )
+/*		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
@@ -414,7 +415,7 @@ namespace synthese
 					shared_ptr<Alarm> object(
 						Conversion::ToBool(result.getColumn(i, COL_IS_TEMPLATE))
 						? static_cast<Alarm*>(new AlarmTemplate(Conversion::ToLongLong(result.getColumn(i, COL_SCENARIO_ID))))
-						: static_cast<Alarm*>(new SingleSentAlarm));
+						: static_cast<Alarm*>(new ScenarioSentAlarm));
 					load(object.get(), result, i);
 					objects.push_back(object);
 				}
@@ -426,7 +427,7 @@ namespace synthese
 			}
 
 		}
-
+*/
 		std::vector<boost::shared_ptr<ScenarioSentAlarm> > AlarmTableSync::searchScenarioSent( const SentScenario* scenario , int first /*= 0 */, int number /*= 0 */, bool orderByLevel /*= false */, bool orderByStatus /*= false */, bool orderByConflict /*= false */, bool raisingOrder /*= false */ )
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
@@ -459,6 +460,39 @@ namespace synthese
 				throw Exception(e.getMessage());
 			}
 
+		}
+
+		std::vector<boost::shared_ptr<AlarmTemplate> > AlarmTableSync::searchTemplates( const ScenarioTemplate* scenario , int first /*= 0 */, int number /*= 0 */, bool orderByLevel /*= false */, bool raisingOrder /*= false */ )
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT a.*"
+				<< " FROM " << TABLE_NAME << " AS a "
+				<< " WHERE "
+					<< COL_IS_TEMPLATE << "=1"
+					<< " AND " << COL_SCENARIO_ID << "=" << scenario->getKey();
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<shared_ptr<AlarmTemplate> > objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					shared_ptr<AlarmTemplate> object(new AlarmTemplate(scenario->getKey()));
+					load(object.get(), result, i);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
 		}
 	}
 }

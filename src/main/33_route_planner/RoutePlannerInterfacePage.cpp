@@ -1,6 +1,6 @@
 
-/** RoutePlannerModule class header.
-	@file RoutePlannerModule.h
+/** RoutePlannerInterfacePage class implementation.
+	@file RoutePlannerInterfacePage.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,49 +20,28 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_RoutePlannerModule_H__
-#define SYNTHESE_RoutePlannerModule_H__
-
-#include "33_route_planner/Site.h"
-#include "33_route_planner/Types.h"
-
-#include "01_util/ModuleClass.h"
+#include "RoutePlannerInterfacePage.h"
 
 namespace synthese
 {
-	namespace env
-	{
-		class ConnectionPlace;
-	}
+	using namespace interfaces;
 
-	/** @defgroup m33 33 Route planner service module.
-	@{
-	*/
-
-	/** 33 Route planner service module namespace.
-	*/
 	namespace routeplanner
 	{
-		/** Route planner module class.
-		*/
-		class RoutePlannerModule : public util::ModuleClass
+
+		void RoutePlannerInterfacePage::display(
+			std::ostream& stream
+			, VariablesMap& variables
+			, const Journeys* object /*= NULL*/
+			, const server::Request* request /*= NULL*/
+			) const
 		{
-		private:
-			static Site::Registry			_sites;	//!< Sites Registry
+			const void* vobj = static_cast<const void*>(object);
+			ParametersVector pv;
 
-		public:
+			/// @todo Implement the building of the parameter vector with parameters of the function
 
-			/** Sites registry getter.
-				@return Site::Registry& The sites registry
-				@author Hugues Romain
-				@date 2007
-			*/
-			static Site::Registry& getSites();
-
-		};
+			InterfacePage::display(stream, pv, variables, vobj, request);
+		}
 	}
 }
-
-/** @} */
-
-#endif // SYNTHESE_RoutePlannerModule_H__

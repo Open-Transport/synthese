@@ -103,7 +103,7 @@ namespace synthese
 		const std::string HandicappedComplianceTableSync::COL_CAPACITY ("capacity");
 
 		HandicappedComplianceTableSync::HandicappedComplianceTableSync()
-			: SQLiteTableSyncTemplate<HandicappedCompliance>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<HandicappedCompliance>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_STATUS, "INTEGER");

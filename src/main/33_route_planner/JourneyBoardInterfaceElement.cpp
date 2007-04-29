@@ -21,64 +21,81 @@
 */
 
 
-#include "JourneyBoardInterfaceElement.h"
+#include "33_route_planner/JourneyBoardInterfaceElement.h"
+#include "33_route_planner/JourneyBoardStopCellInterfacePage.h"
+#include "33_route_planner/JourneyBoardServiceCellInterfacePage.h"
+#include "33_route_planner/JourneyBoardJunctionCellInterfacePage.h"
+#include "33_route_planner/Journey.h"
+#include "33_route_planner/JourneyLeg.h"
+#include "33_route_planner/RoutePlannerModule.h"
 
-#include "JourneyBoardStopCellInterfacePage.h"
-#include "JourneyBoardServiceCellInterfacePage.h"
-#include "JourneyBoardJunctionCellInterfacePage.h"
-#include "Journey.h"
-#include "JourneyLeg.h"
-#include "01_util/Conversion.h"
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/ValueElementList.h"
-#include "04_time/module.h"
+#include "30_server/Request.h"
+
 #include "15_env/Edge.h"
 #include "15_env/Vertex.h"
 #include "15_env/ConnectionPlace.h"
 #include "15_env/Road.h"
 #include "15_env/HandicappedCompliance.h"
 #include "15_env/BikeCompliance.h"
-#include "30_server/Request.h"
-#include "30_server/Site.h"
+#include "15_env/ReservationRule.h"
+
+#include "11_interfaces/Interface.h"
+#include "11_interfaces/ValueElementList.h"
+
+#include "04_time/module.h"
+
+#include "01_util/Conversion.h"
+
+using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace util;
+	using namespace time;
+	using namespace env;
 
 	namespace routeplanner
 	{
 
-		void JourneyBoardInterfaceElement::display( std::ostream& stream, const ParametersVector& parameters, boost::shared_ptr<const void> object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
+		string JourneyBoardInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
+			, VariablesMap& variables
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/ ) const
 		{
-		    const server::Site* site = request->getSite ();
+//		    const server::Site* site = request->getSite ();
 			// Parameters
-			const Journey* __Trajet = ( const Journey* ) object;
-			int __FiltreHandicape = (synthese::util::Conversion::ToInt(_handicappedFilter->getValue(parameters)) > 1);
-			int __FiltreVelo = ( synthese::util::Conversion::ToInt(_bikeFilter->getValue(parameters)) > 1 );
+			const Journey* journey = static_cast<const Journey*>(object);
+			int __FiltreHandicape = (Conversion::ToInt(_handicappedFilter->getValue(parameters, variables, object, request)) > 1);
+			int __FiltreVelo = (Conversion::ToInt(_bikeFilter->getValue(parameters, variables, object, request)) > 1 );
 
 			// Resources
-			const JourneyBoardStopCellInterfacePage* const stopCellInterfacePage = site->getInterface()->getPage<JourneyBoardStopCellInterfacePage>();
-			const JourneyBoardServiceCellInterfacePage* const serviceCellInterfacePage = site->getInterface()->getPage<JourneyBoardServiceCellInterfacePage>();
-			const JourneyBoardJunctionCellInterfacePage* const junctionCellInterfacePage = site->getInterface()->getPage<JourneyBoardJunctionCellInterfacePage>();
-			const synthese::time::Hour unknownHour( synthese::time::TIME_UNKNOWN );
-			const synthese::time::DateTime unknownDateTime( synthese::time::TIME_UNKNOWN );
+			shared_ptr<const JourneyBoardStopCellInterfacePage> stopCellInterfacePage = _page->getInterface()->getPage<JourneyBoardStopCellInterfacePage>();
+			shared_ptr<const JourneyBoardServiceCellInterfacePage> serviceCellInterfacePage = _page->getInterface()->getPage<JourneyBoardServiceCellInterfacePage>();
+			shared_ptr<const JourneyBoardJunctionCellInterfacePage> junctionCellInterfacePage = _page->getInterface()->getPage<JourneyBoardJunctionCellInterfacePage>();
+			const Hour unknownHour(TIME_UNKNOWN );
+			const DateTime unknownDateTime(TIME_UNKNOWN );
 
 			// Loop on lines of the board
 			bool __Couleur = false;
-			for (int l=0; l<__Trajet->getJourneyLegCount (); ++l)
+
+			for (JourneyLegs::const_iterator it = journey->getJourneyLegs().begin(); it != journey->getJourneyLegs().end(); ++it)
 			{
-				const JourneyLeg* __ET = __Trajet->getJourneyLeg (l);
+				const JourneyLeg* leg = *it;
 
 				// LIGNE ARRET MONTEE Si premier point d'arr�t et si alerte
-				if ( l == 0 )
+				if (it == journey->getJourneyLegs().begin())
 				{
-					synthese::time::DateTime debutPrem, finPrem;
-					debutPrem = __ET->getDepartureTime();
+					time::DateTime debutPrem, finPrem;
+					debutPrem = leg->getDepartureTime();
 					finPrem = debutPrem;
-					if ( __Trajet->getContinuousServiceRange () )
-						finPrem += __Trajet->getContinuousServiceRange ();
+					if (journey->getContinuousServiceRange () )
+						finPrem += journey->getContinuousServiceRange ();
 
-					if ( __ET->getOrigin()->getFromVertex ()->getConnectionPlace()
+/*					if (leg->getOrigin()->getFromVertex ()->getConnectionPlace()
 						->hasApplicableAlarm ( debutPrem, finPrem ) )
 					{
 						stopCellInterfacePage->display( stream, false
@@ -87,45 +104,45 @@ namespace synthese
 							, __Couleur, unknownHour, unknownHour
 							, request );
 					}
-				}
+*/				}
 
-				if ( dynamic_cast<const synthese::env::Road*> (__ET->getService ()->getPath ()) == 0 )
+				if ( dynamic_cast<const synthese::env::Road*> (leg->getService ()->getPath ()) == 0 )
 				{
 					// LIGNE CIRCULATIONS
 					synthese::time::DateTime debutLigne, finLigne
 						, lastDepartureTime(synthese::time::TIME_UNKNOWN), lastArrivalTime(synthese::time::TIME_UNKNOWN);
-					debutLigne = __ET->getDepartureTime();
-					finLigne = __ET->getArrivalTime ();
+					debutLigne = leg->getDepartureTime();
+					finLigne = leg->getArrivalTime ();
 
-					if ( __Trajet->getContinuousServiceRange () )
+					if (journey->getContinuousServiceRange () )
 					{
-						lastDepartureTime = __ET->getDepartureTime();
-						lastDepartureTime += __Trajet->getContinuousServiceRange ();
+						lastDepartureTime = leg->getDepartureTime();
+						lastDepartureTime += journey->getContinuousServiceRange ();
 					}
-					if ( __Trajet->getContinuousServiceRange () )
+					if ( journey->getContinuousServiceRange () )
 					{
-						lastArrivalTime = __ET->getArrivalTime ();
-						lastArrivalTime += __Trajet->getContinuousServiceRange ();
+						lastArrivalTime = leg->getArrivalTime ();
+						lastArrivalTime += journey->getContinuousServiceRange ();
 						finLigne = lastArrivalTime;
 					}
 
 					// 12/18 Reservation
 					synthese::time::DateTime maintenant;
-					const synthese::env::ReservationRule* reservationRule = __ET->getService ()->getPath ()->getReservationRule ();
+					const synthese::env::ReservationRule* reservationRule = leg->getService ()->getPath ()->getReservationRule ();
 
 					maintenant.updateDateTime();
 					bool openedCompulsoryReservation = ( 
-						(reservationRule->getType () == synthese::env::ReservationRule::RESERVATION_TYPE_COMPULSORY)
-						&& (reservationRule->isReservationPossible( __ET->getService(), maintenant, __ET->getDepartureTime() )) 
+						(reservationRule->getType () == ReservationRule::RESERVATION_TYPE_COMPULSORY)
+						&& (reservationRule->isReservationPossible( leg->getService(), maintenant, leg->getDepartureTime() )) 
 						);
 					maintenant.updateDateTime();
 					bool openedOptionalReservation = (
 						(reservationRule->getType () == synthese::env::ReservationRule::RESERVATION_TYPE_OPTIONAL) &&
-						(reservationRule->isReservationPossible( __ET->getService(), maintenant, __ET->getDepartureTime() )) 
+						(reservationRule->isReservationPossible(leg->getService(), maintenant, leg->getDepartureTime() )) 
 						);
 					bool openedReservation = openedCompulsoryReservation || openedOptionalReservation;
 					std::string syntheseOnlineBookingURL;
-					if (openedReservation && site->onlineBookingAllowed() ) /// @todo implement && __ET->getLigne() ->GetResa() ->ReservationEnLigne()
+//					if (openedReservation && site->onlineBookingAllowed() ) /// @todo implement && __ET->getLigne() ->GetResa() ->ReservationEnLigne()
 					{	/** @todo implement this
 						synthese::server::Request request;
 						request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_RESERVATION_FORM );
@@ -142,26 +159,26 @@ namespace synthese
 					}
 
 					serviceCellInterfacePage->display( stream 
-						, __ET->getDepartureTime().getHour()
+						, leg->getDepartureTime().getHour()
 						, lastDepartureTime.getHour()
-						, __ET->getArrivalTime().getHour()
+						, leg->getArrivalTime().getHour()
 						, lastArrivalTime.getHour()
 						, 0 /// @todo implement __ET->getLigne() ->Materiel() ->Code(); //4
 						, "ligne" /// @todo implement __ET->getLigne() ->Materiel() ->getLibelleSimple() //5
 						, "la ligne" /// @todo implement __ET->getLigne()->LibelleComplet(LibelleCompletMatosHTML);
 						, "destination" /// @todo implement __ET->getLigne()->LibelleDestination(DestinationHTML);
 						, __FiltreHandicape
-						, __ET->getService ()->getHandicappedCompliance ()->getCapacity ()
+						, leg->getService ()->getHandicappedCompliance ()->getCapacity ()
 						, __FiltreVelo
-						, __ET->getService ()->getBikeCompliance ()->getCapacity ()
+						, leg->getService ()->getBikeCompliance ()->getCapacity ()
 						, openedCompulsoryReservation
 						, openedOptionalReservation
-						, openedReservation ? reservationRule->getReservationDeadLine ( __ET->getService(), __ET->getDepartureTime() ) : unknownDateTime 
+						, openedReservation ? reservationRule->getReservationDeadLine (leg->getService(), leg->getDepartureTime() ) : unknownDateTime
 						, openedReservation ? reservationRule : NULL
 						, openedReservation ? syntheseOnlineBookingURL : ""
-						, __ET->getService ()->getPath ()->hasApplicableAlarm ( debutLigne, finLigne ) ? __ET->getService()->getPath ()->getAlarm() : NULL
+						, NULL // leg->getService ()->getPath ()->hasApplicableAlarm ( debutLigne, finLigne ) ? __ET->getService()->getPath ()->getAlarm() : NULL
 						, __Couleur
-						, __ET->getService ()->getPath ()
+						, leg->getService ()->getPath ()
 						, request );
 					
 					__Couleur = !__Couleur;
@@ -170,25 +187,25 @@ namespace synthese
 					// LIGNE ARRET DE DESCENTE
 
 					synthese::time::DateTime debutArret, finArret, tempMoment(synthese::time::TIME_UNKNOWN);
-					debutArret = __ET->getArrivalTime ();
+					debutArret = leg->getArrivalTime ();
 					finArret = debutArret;
-					if ( l < __Trajet->getJourneyLegCount ()-1)
-						finArret = __Trajet->getJourneyLeg (l+1)->getDepartureTime();
-					if ( __Trajet->getContinuousServiceRange () )
-						finArret += __Trajet->getContinuousServiceRange ();
+					if ( (it + 1) < journey->getJourneyLegs().end())
+						finArret = (*(it + 1))->getDepartureTime();
+					if ( journey->getContinuousServiceRange () )
+						finArret += journey->getContinuousServiceRange ();
 
 					
-					if ( __Trajet->getContinuousServiceRange () )
+					if ( journey->getContinuousServiceRange () )
 					{
-						tempMoment = __ET->getArrivalTime ();
-						tempMoment += __Trajet->getContinuousServiceRange ();
+						tempMoment = leg->getArrivalTime ();
+						tempMoment += journey->getContinuousServiceRange ();
 					}
 					
 					stopCellInterfacePage->display( stream, true
-						, __ET->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
-						, __ET->getDestination()->getConnectionPlace() == __ET->getService ()->getPath ()->getEdges ().back()->getFromVertex ()->getConnectionPlace()
-						, __ET->getDestination()->getConnectionPlace()->getName()
-						, __Couleur, __ET->getArrivalTime().getHour(), tempMoment.getHour()
+						, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
+						, leg->getDestination()->getConnectionPlace() == leg->getService ()->getPath ()->getEdges ().back()->getFromVertex ()->getConnectionPlace()
+						, leg->getDestination()->getConnectionPlace()->getName()
+						, __Couleur, leg->getArrivalTime().getHour(), tempMoment.getHour()
 						, request);
 
 					__Couleur = !__Couleur;
@@ -198,16 +215,16 @@ namespace synthese
 				{
 					// 1/2 Alerte
 					synthese::time::DateTime debutArret, finArret;
-					debutArret = __ET->getArrivalTime ();
+					debutArret = leg->getArrivalTime ();
 					finArret = debutArret;
-					if ( l < __Trajet->getJourneyLegCount ()-1)
-						finArret = __Trajet->getJourneyLeg (l+1)->getDepartureTime();
-					if ( __Trajet->getContinuousServiceRange () )
-						finArret += __Trajet->getContinuousServiceRange ();
+					if ((it+1) < journey->getJourneyLegs().end())
+						finArret = (*(it + 1))->getDepartureTime();
+					if ( journey->getContinuousServiceRange () )
+						finArret += journey->getContinuousServiceRange ();
 
 					junctionCellInterfacePage->display( stream
-						, __ET->getDestination()->getConnectionPlace()
-						, __ET->getDestination()->getConnectionPlace()->hasApplicableAlarm(debutArret, finArret) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
+						, leg->getDestination()->getConnectionPlace()
+						, NULL // leg->getDestination()->getConnectionPlace()->hasApplicableAlarm(debutArret, finArret) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 						, __Couleur
 						, request);
 				
@@ -215,13 +232,7 @@ namespace synthese
 					__Couleur = !__Couleur;
 				}
 			}
-
-		}
-
-		JourneyBoardInterfaceElement::~JourneyBoardInterfaceElement()
-		{
-			delete _handicappedFilter;
-			delete _bikeFilter;
+			return string();
 		}
 
 		void JourneyBoardInterfaceElement::storeParameters( interfaces::ValueElementList& vel )

@@ -37,18 +37,23 @@ namespace synthese
 
 	namespace routeplanner
 	{
+		/** Journey board Library Interface Element Class.
+			@ingroup m33Library refLibrary
+		*/
 		class JourneyBoardInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 		private:
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _handicappedFilter;
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _bikeFilter;
-			~JourneyBoardInterfaceElement();
-
+			
 		public:
-			void display(std::ostream& stream, 
-				interfaces::ParametersVector& parameters, 
-				     boost::shared_ptr<const void> object = boost::shared_ptr<const void>(), 
-				     const server::Request* request = NULL) const;
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
+				, interfaces::VariablesMap& variables
+				, const void* object = NULL
+				, const server::Request* request = NULL
+				) const;
 			
 			/** Parser.
 				@param text Text to parse : standard list of parameters

@@ -47,6 +47,7 @@ namespace synthese
 				@param source Alarm template to copy
 				@author Hugues Romain
 				@date 2007				
+				@warning the recipients are not copied. Do it at the table synchronization.
 			*/
 			ScenarioSentAlarm(const SentScenario& scenario, const AlarmTemplate& source);
 			

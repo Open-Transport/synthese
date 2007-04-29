@@ -131,7 +131,7 @@ namespace synthese
 		const std::string ReservationRuleTableSync::COL_WEBSITEURL ("web_site_url");
 
 		ReservationRuleTableSync::ReservationRuleTableSync()
-			: SQLiteTableSyncTemplate<ReservationRule>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<ReservationRule>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn (COL_TYPE, "INTEGER", true);
