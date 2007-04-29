@@ -42,6 +42,8 @@
 #include "15_env/PedestrianCompliance.h"
 #include "15_env/ScheduledService.h"
 #include "15_env/ContinuousService.h"
+#include "15_env/ReservationRule.h"
+#include "15_env/TransportNetwork.h"
 
 namespace synthese
 {
@@ -298,6 +300,7 @@ namespace synthese
 			static LineStop::Registry				_lineStops;
 			static ScheduledService::Registry		_scheduledServices;
 			static ContinuousService::Registry		_continuousServices;
+			static TransportNetwork::Registry		_networks;
 
 
 		public:
@@ -319,6 +322,7 @@ namespace synthese
 			static LineStop::Registry&				getLineStops();
 			static ScheduledService::Registry&		getScheduledServices();
 			static ContinuousService::Registry&		getContinuousServices();
+			static TransportNetwork::Registry&		getTransportNetworks();
 
 
 			static boost::shared_ptr<Path> fetchPath (const uid& id);

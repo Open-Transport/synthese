@@ -37,7 +37,7 @@ namespace synthese
 		class Reservation;
 
 		/** Reservation table synchronizer.
-			@ingroup m31
+			@ingroup m31LS refLS
 		*/
 		class ReservationTableSync : public db::SQLiteTableSyncTemplate<Reservation>
 		{

@@ -32,8 +32,6 @@
 #include "PublicPlace.h"
 #include "RoadChunk.h"
 #include "Road.h"
-#include "ReservationRule.h"
-#include "TransportNetwork.h"
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
@@ -79,7 +77,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     PublicPlace::Registry _publicPlaces;
     RoadChunk::Registry _roadChunks;
     Road::Registry _roads;
-    TransportNetwork::Registry _transportNetworks;
     
     synthese::lexmatcher::LexicalMatcher<uid> _citiesMatcher;
 
@@ -113,9 +110,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
     Document::Registry& getDocuments ();
     const Document::Registry& getDocuments () const;
 
-    CommercialLine::Registry& getCommercialLines ();
-    const CommercialLine::Registry& getCommercialLines () const;
-
 
     PlaceAlias::Registry& getPlaceAliases ();
     const PlaceAlias::Registry& getPlaceAliases () const;
@@ -128,9 +122,6 @@ class Environment : public synthese::util::Registrable<uid,Environment>
 
     Road::Registry& getRoads ();
     const Road::Registry& getRoads () const;
-
-    TransportNetwork::Registry& getTransportNetworks ();
-    const TransportNetwork::Registry& getTransportNetworks () const;
 
     synthese::lexmatcher::LexicalMatcher<uid>& getCitiesMatcher ();
     const synthese::lexmatcher::LexicalMatcher<uid>& getCitiesMatcher () const;

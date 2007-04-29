@@ -29,6 +29,8 @@
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
+#include "04_time/DateTime.h"
+
 #include "31_resa/Reservation.h"
 #include "31_resa/ReservationTableSync.h"
 
@@ -39,6 +41,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace resa;
+	using namespace time;
 
 	namespace db
 	{
@@ -49,7 +52,30 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<Reservation>::load(Reservation* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
 			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			/// @todo Set all other attributes from the row
+			object->setLineId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_LINE_ID)));
+			object->setLineCode(rows.getColumn(rowId, ReservationTableSync::COL_LINE_CODE));
+			object->setServiceCode(rows.getColumn(rowId, ReservationTableSync::COL_SERVICE_CODE));
+			object->setDeparturePlaceId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_DEPARTURE_PLACE_ID)));
+			object->setDeparturePlaceName(rows.getColumn(rowId, ReservationTableSync::COL_DEPARTURE_PLACE_NAME));
+			object->setDepartureAddress(rows.getColumn(rowId, ReservationTableSync::COL_DEPARTURE_ADDRESS));
+			object->setDepartureTime(DateTime::FromSQLTimestamp(rows.getColumn(rowId, ReservationTableSync::COL_DEPARTURE_TIME)));
+			object->setArrivalPlaceId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_ARRIVAL_PLACE_ID)));
+			object->setArrivalPlaceName(rows.getColumn(rowId, ReservationTableSync::COL_ARRIVAL_PLACE_NAME));
+			object->setArrivalAddress(rows.getColumn(rowId, ReservationTableSync::COL_ARRIVAL_ADDRESS));
+			object->setArrivalTime(DateTime::FromSQLTimestamp(rows.getColumn(rowId, ReservationTableSync::COL_ARRIVAL_TIME)));
+
+			const string ReservationTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
+			const string ReservationTableSync::COL_LAST_RESERVATION_ID = "last_reservation_id";
+			const string ReservationTableSync::COL_SEATS = "seats";
+			const string ReservationTableSync::COL_BOOKING_TIME = "booking_time";
+			const string ReservationTableSync::COL_CANCELLATION_TIME = "cancellation_time";
+			const string ReservationTableSync::COL_CUSTOMER_ID = "customer_id";
+			const string ReservationTableSync::COL_CUSTOMER_NAME = "customer_name";
+			const string ReservationTableSync::COL_CUSTOMER_PHONE = "customer_phone";
+			const string ReservationTableSync::COL_BOOKING_USER_ID = "booking_user_id";
+			const string ReservationTableSync::COL_CANCEL_USER_ID = "cancel_user_id";
+
+
 		}
 
 		template<> void SQLiteTableSyncTemplate<Reservation>::save(Reservation* object)
@@ -73,7 +99,7 @@ namespace synthese
 	{
 		const string ReservationTableSync::COL_LINE_ID = "line_id";
 		const string ReservationTableSync::COL_LINE_CODE = "line_code";
-		const string ReservationTableSync::COL_SERVICE_CODE = "line_code";
+		const string ReservationTableSync::COL_SERVICE_CODE = "service_code";
 		const string ReservationTableSync::COL_DEPARTURE_PLACE_ID = "departure_place_id";
 		const string ReservationTableSync::COL_DEPARTURE_PLACE_NAME = "departure_place_name";
 		const string ReservationTableSync::COL_DEPARTURE_ADDRESS = "departure_address";

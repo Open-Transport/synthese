@@ -85,7 +85,7 @@ namespace synthese
 			ProfileTableSync::save(_profile.get());
 
 			// Log
-			SecurityLog::addProfileAdmin(_request->getUser(), _profile, "Changement de nom : " + oldName + " => " _name);
+			SecurityLog::addProfileAdmin(_request->getUser(), _profile, "Changement de nom : " + oldName + " => " + _name);
 		}
 	}
 }

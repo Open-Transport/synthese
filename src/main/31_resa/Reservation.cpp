@@ -142,5 +142,100 @@ namespace synthese
 		{
 			return _lineId;
 		}
+
+		const std::string& Reservation::getServiceCode() const
+		{
+			return _serviceCode;
+		}
+
+		uid Reservation::getDeparturePlaceId() const
+		{
+			return _departurePlaceId;
+		}
+
+		const std::string& Reservation::getDeparturePlaceName() const
+		{
+			return _departurePlaceName;
+		}
+
+		uid Reservation::getArrivalPlaceId() const
+		{
+			return _arrivalPlaceId;
+		}
+
+		const std::string& Reservation::getArrivalPlaceName() const
+		{
+			return _arrivalPlaceName;
+		}
+
+		uid Reservation::getArrivalPlaceName() const
+		{
+			return _reservationRuleId;
+		}
+
+		const std::string& Reservation::getDepartureAddress() const
+		{
+			return _departureAddress;
+		}
+
+		const std::string& Reservation::getArrivalAddress() const
+		{
+			return _arrivalAddress;
+		}
+
+		const time::DateTime& Reservation::getDepartureTime() const
+		{
+			return _departureTime;
+		}
+
+		const time::DateTime& Reservation::getDepartureTime() const
+		{
+			return _arrivalTime;
+		}
+
+		uid Reservation::getLastReservation() const
+		{
+			return _lastReservation;
+		}
+
+		int Reservation::getSeats() const
+		{
+			return _seats;
+		}
+
+		const time::DateTime& Reservation::getBookingTime() const
+		{
+			return _bookingTime;
+		}
+
+		const time::DateTime& Reservation::getCancellationTime() const
+		{
+			return _cancellationTime;
+		}
+
+		uid Reservation::getCustomerUserId() const
+		{
+			return _customerUserId;
+		}
+
+		const std::string& Reservation::getCustomerName() const
+		{
+			return _customerName;
+		}
+
+		const std::string& Reservation::getCustomerPhone() const
+		{
+			return _customerPhone;
+		}
+
+		uid Reservation::getBookingUserId() const
+		{
+			return _bookingUserId;
+		}
+
+		uid Reservation::getCancelUserId() const
+		{
+			return _cancelUserId;
+		}
 	}
 }

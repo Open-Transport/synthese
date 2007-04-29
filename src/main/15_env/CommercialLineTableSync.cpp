@@ -20,21 +20,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
-#include "01_util/Conversion.h"
+#include "15_env/CommercialLineTableSync.h"
+#include "15_env/CommercialLine.h"
+#include "15_env/TransportNetworkTableSync.h"
+#include "15_env/EnvModule.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
-#include "15_env/CommercialLine.h"
-#include "15_env/CommercialLineTableSync.h"
-#include "15_env/EnvModule.h"
+#include "01_util/Conversion.h"
+
+#include <sstream>
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -134,17 +135,31 @@ namespace synthese
 			}
 		}
 
-		std::vector<shared_ptr<CommercialLine> > CommercialLineTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		std::vector<shared_ptr<CommercialLine> > CommercialLineTableSync::search(
+			const TransportNetwork* network
+			, std::string name
+			, int first
+			, int number
+			, bool orderByNetwork
+			, bool orderByName
+			, bool raisingOrder
+		){
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
-				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
-				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				;
+				<< " SELECT l.*"
+				<< " FROM " << TABLE_NAME << " AS l "
+				<< " WHERE 1 ";
+			if (network)
+				query << " AND l." << COL_NETWORK_ID << "=" << network->getKey();
+			if (name.empty())
+				query << " AND l." << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			if (orderByNetwork)
+				query << " ORDER BY "
+					<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE_NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
+					<< ",l." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (orderByName)
+				query << " ORDER BY l." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

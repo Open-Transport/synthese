@@ -108,27 +108,27 @@ namespace synthese
 
 			//!	\name Getters
 			//@{
-				uid getLineId() const;
-				const std::string& getLineCode() const;
-				void setServiceCode(const std::string& code);
-				void setDeparturePlaceId(uid id);
-				void setDeparturePlaceName(const std::string& name);
-				void setArrivalPlaceId(uid id);
-				void setArrivalPlaceName(const std::string& name);
-				void setReservationRuleId(uid id);
-				void setDepartureAddress(const std::string& address);
-				void setArrivalAddress(const std::string& address);
-				void setDepartureTime(const time::DateTime& time);
-				void setArrivalTime(const time::DateTime& time);
-				void setLastReservation(uid id);
-				void setSeats(int seats);
-				void setBookingTime(const time::DateTime& time);
-				void setCancellationTime(const time::DateTime& time);
-				void setCustomerUserId(uid id);
-				void setCustomerName(const std::string& name);
-				void setCustomerPhone(const std::string& phone);
-				void setBookingUserId(uid id);
-				void setCancelUserId(uid id);
+				uid						getLineId() const;
+				const std::string&		getLineCode() const;
+				const std::string&		getServiceCode() const;
+				uid						getDeparturePlaceId() const;
+				const std::string&		getDeparturePlaceName() const;
+				uid						getArrivalPlaceId() const;
+				const std::string&		getArrivalPlaceName() const;
+				uid						getReservationRuleId() const;
+				const std::string&		getDepartureAddress() const;
+				const std::string&		getArrivalAddress() const;
+				const time::DateTime&	getDepartureTime() const;
+				const time::DateTime&	getArrivalTime() const;
+				uid						getLastReservation() const;
+				int						getSeats() const;
+				const time::DateTime&	getBookingTime() const;
+				const time::DateTime&	getCancellationTime() const;
+				uid						getCustomerUserId() const;
+				const std::string&		getCustomerName() const;
+				const std::string&		getCustomerPhone() const;
+				uid						getBookingUserId() const;
+				uid						getCancelUserId() const;
 			//@}
 
 		};

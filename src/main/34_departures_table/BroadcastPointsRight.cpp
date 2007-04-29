@@ -20,14 +20,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "BroadcastPointsRight.h"
+#include "34_departures_table/BroadcastPointsRight.h"
+
+#include "15_env/TransportNetworkTableSync.h"
+#include "15_env/TransportNetwork.h"
+#include "15_env/CommercialLineTableSync.h"
+#include "15_env/CommercialLine.h"
+
+#include "12_security/Constants.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace security;
 	using namespace departurestable;
+	using namespace env;
 
 	namespace util
 	{
@@ -40,7 +49,23 @@ namespace synthese
 		RightTemplate<BroadcastPointsRight>::ParameterLabelsVector RightTemplate<BroadcastPointsRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
-			m.push_back(make_pair("*","(tous les points de diffusion)"));
+			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les points de diffusion)"));
+			m.push_back(make_pair(UNKNOWN_PERIMETER, "--- Réseaux ---"));
+
+			vector<shared_ptr<TransportNetwork> > tn = TransportNetworkTableSync::search();
+			for (vector<shared_ptr<TransportNetwork> >::const_iterator itn = tn.begin(); itn != tn.end(); ++itn)
+			{
+				m.push_back(make_pair(Conversion::ToString((*itn)->getKey()), (*itn)->getName() ));
+			}
+
+			m.push_back(make_pair(UNKNOWN_PERIMETER, "--- Lignes ---"));
+
+			vector<shared_ptr<CommercialLine> > tl = CommercialLineTableSync::search();
+			for (vector<shared_ptr<CommercialLine> >::const_iterator itl = tl.begin(); itl != tl.end(); ++itl)
+			{
+				m.push_back(make_pair(Conversion::ToString((*itl)->getKey()), (*itl)->getName() ));
+			}
+
 			return m;
 		}
 	}

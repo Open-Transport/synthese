@@ -35,6 +35,7 @@ namespace synthese
 	namespace env
 	{
 		class CommercialLine;
+		class TransportNetwork;
 
 		/** CommercialLine table synchronizer.
 			@ingroup m15
@@ -62,8 +63,14 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<CommercialLine> > search(
-				// other search parameters ,
-				int first = 0, int number = 0);
+				const TransportNetwork* network = NULL
+				, std::string name = std::string()
+				, int first = 0
+				, int number = 0
+				, bool orderByNetwork = true
+				, bool orderByName = false
+				, bool raisingOrder = true
+				);
 
 
 		protected:

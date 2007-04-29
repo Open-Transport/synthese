@@ -47,6 +47,7 @@ namespace synthese
 		LineStop::Registry				EnvModule::_lineStops;
 		ScheduledService::Registry		EnvModule::_scheduledServices;
 		ContinuousService::Registry		EnvModule::_continuousServices;
+		TransportNetwork::Registry		EnvModule::_networks;
 
 		void EnvModule::initialize()
 		{
@@ -155,5 +156,9 @@ namespace synthese
 			return _continuousServices;
 		}
 
+		TransportNetwork::Registry& EnvModule::getTransportNetworks()
+		{
+			return _networks;
+		}
 	}
 }

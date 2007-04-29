@@ -212,23 +212,6 @@ Environment::getRoads () const
 }
 
 
-
-TransportNetwork::Registry& 
-Environment::getTransportNetworks ()
-{
-    return _transportNetworks;
-}
-
-
-
-const TransportNetwork::Registry& 
-Environment::getTransportNetworks () const
-{
-    return _transportNetworks;
-}
-
-
-
 synthese::lexmatcher::LexicalMatcher<uid>& 
 Environment::getCitiesMatcher ()
 {
