@@ -31,30 +31,31 @@ namespace synthese
 {
 	using namespace security;
 	using namespace util;
+	using namespace dblog;
 
-	namespace dblog
+	namespace util
 	{
-		
+		template<> const std::string FactorableTemplate<Right, DBLogRight>::FACTORY_KEY("Logs");
+	}
 
-
-		DBLogRight::DBLogRight()
-			: Right()
-		{
-
-		}
-
-		std::string DBLogRight::displayParameter() const
-		{
-			return _parameter;
-		}
-
-		DBLogRight::ParameterLabelsVector DBLogRight::getParametersLabels() const
+	namespace security
+	{
+		template<>
+		Right::ParameterLabelsVector RightTemplate<DBLogRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les journaux)"));
 			for (Factory<DBLog>::Iterator it = Factory<DBLog>::begin(); it != Factory<DBLog>::end(); ++it)
 				m.push_back(make_pair(it.getKey(), it->getName()));
 			return m;
+		}
+	}
+
+	namespace dblog
+	{
+		std::string DBLogRight::displayParameter() const
+		{
+			return _parameter;
 		}
 
 		bool DBLogRight::perimeterIncludes( const std::string& perimeter ) const

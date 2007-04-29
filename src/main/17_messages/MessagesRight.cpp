@@ -29,27 +29,29 @@ using namespace std;
 namespace synthese
 {
 	using namespace security;
+	using namespace messages;
 
-	namespace messages
+	namespace util
 	{
+		template<> const std::string FactorableTemplate<Right, MessagesRight>::FACTORY_KEY("Messages");
+	}
 
-
-		MessagesRight::MessagesRight()
-			: Right()
-		{
-
-		}
-
-		std::string MessagesRight::displayParameter() const
-		{
-			return _parameter;
-		}
-
-		MessagesRight::ParameterLabelsVector MessagesRight::getParametersLabels() const
+	namespace security
+	{
+		template<>
+		Right::ParameterLabelsVector RightTemplate<MessagesRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les messages)"));
 			return m;
+		}
+	}
+
+	namespace messages
+	{
+		std::string MessagesRight::displayParameter() const
+		{
+			return _parameter;
 		}
 
 		bool MessagesRight::perimeterIncludes( const std::string& perimeter ) const

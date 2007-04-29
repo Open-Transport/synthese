@@ -27,27 +27,29 @@ using namespace std;
 namespace synthese
 {
 	using namespace security;
+	using namespace departurestable;
 
-	namespace departurestable
+	namespace util
 	{
+		template<> const std::string FactorableTemplate<Right, DisplayMaintenanceRight>::FACTORY_KEY("DisplayMaintenance");
+	}
 
-
-		DisplayMaintenanceRight::DisplayMaintenanceRight()
-			: Right()
-		{
-		
-		}
-
-		std::string DisplayMaintenanceRight::displayParameter() const
-		{
-			return _parameter;
-		}
-
-		DisplayMaintenanceRight::ParameterLabelsVector DisplayMaintenanceRight::getParametersLabels() const
+	namespace security
+	{
+		template<>
+		RightTemplate<DisplayMaintenanceRight>::ParameterLabelsVector RightTemplate<DisplayMaintenanceRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair("*","(tous les afficheurs)"));
 			return m;
+		}
+	}
+
+	namespace departurestable
+	{
+		std::string DisplayMaintenanceRight::displayParameter() const
+		{
+			return _parameter;
 		}
 
 		bool DisplayMaintenanceRight::perimeterIncludes( const std::string& perimeter ) const

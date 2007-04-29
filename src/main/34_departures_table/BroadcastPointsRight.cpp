@@ -27,27 +27,29 @@ using namespace std;
 namespace synthese
 {
 	using namespace security;
+	using namespace departurestable;
 
-	namespace departurestable
+	namespace util
 	{
+		template<> const std::string FactorableTemplate<Right, BroadcastPointsRight>::FACTORY_KEY("BroadcastPoints");
+	}
 
-
-		BroadcastPointsRight::BroadcastPointsRight()
-			: Right()
-		{
-
-		}
-
-		std::string BroadcastPointsRight::displayParameter() const
-		{
-			return _parameter;
-		}
-
-		BroadcastPointsRight::ParameterLabelsVector BroadcastPointsRight::getParametersLabels() const
+	namespace security
+	{
+		template<>
+		RightTemplate<BroadcastPointsRight>::ParameterLabelsVector RightTemplate<BroadcastPointsRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair("*","(tous les points de diffusion)"));
 			return m;
+		}
+	}
+
+	namespace departurestable
+	{
+		std::string BroadcastPointsRight::displayParameter() const
+		{
+			return _parameter;
 		}
 
 		bool BroadcastPointsRight::perimeterIncludes( const std::string& perimeter ) const

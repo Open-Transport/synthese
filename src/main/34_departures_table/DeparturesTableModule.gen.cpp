@@ -47,9 +47,9 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::departure
 synthese::util::Factory<synthese::server::Function>::integrate<synthese::departurestable::DisplayScreenContentRequest>("tdg");
 synthese::util::Factory<synthese::server::Function>::integrate<synthese::departurestable::DisplayScreenSupervisionRequest>("tds");
 
-synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::ArrivalDepartureTableRight>("ArrivalDepartureTable");
-synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::DisplayMaintenanceRight>("DisplayMaintenance");
-synthese::util::Factory<synthese::security::Right>::integrate<synthese::departurestable::BroadcastPointsRight>("BroadcastPoints");
+synthese::departurestable::ArrivalDepartureTableRight::integrate();
+synthese::departurestable::DisplayMaintenanceRight::integrate();
+synthese::departurestable::BroadcastPointsRight::integrate();
 
 synthese::departurestable::ArrivalDepartureTableLog::integrate();
 synthese::departurestable::BroadcastPointsDataLog::integrate();

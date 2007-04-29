@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_DISPLAY_MAINTENANCE_RIGHT_H
 #define SYNTHESE_DISPLAY_MAINTENANCE_RIGHT_H
 
-#include "12_security/Right.h"
+#include "12_security/RightTemplate.h"
 
 namespace synthese
 {
@@ -45,12 +45,10 @@ namespace synthese
 					- si le point de diffusion est un arrêt physique, alors il doit être desservi par la ligne
 					- si le point de diffusion n'est pas un arrêt physique, alors au moins un arrêt physique du lieu auquel appartient le point de diffusion doit être desservi par la ligne
 		*/
-		class DisplayMaintenanceRight : public security::Right
+		class DisplayMaintenanceRight : public security::RightTemplate<DisplayMaintenanceRight>
 		{
 		public:
-			DisplayMaintenanceRight();
 			std::string displayParameter() const;
-			ParameterLabelsVector	getParametersLabels()	const;
 			bool perimeterIncludes(const std::string& perimeter) const;
 		};
 	}

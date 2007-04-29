@@ -20,7 +20,7 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::security:
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UserUpdateAction>("uua");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UserPasswordUpdateAction>("upua");
 
-synthese::util::Factory<synthese::security::Right>::integrate<synthese::security::SecurityRight>("Security");
-synthese::util::Factory<synthese::security::Right>::integrate<synthese::security::GlobalRight>("*");
+synthese::security::GlobalRight::integrate();
+synthese::security::SecurityRight::integrate();
 
 synthese::security::SecurityLog::integrate();

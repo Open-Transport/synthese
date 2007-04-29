@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_MESSAGES_RIGHT_H
 #define SYNTHESE_MESSAGES_RIGHT_H
 
-#include "12_security/Right.h"
+#include "12_security/RightTemplate.h"
 
 namespace synthese
 {
@@ -56,12 +56,10 @@ namespace synthese
 				- Permission de lire tous les messages diffusés sur un arrêt desservi par les lignes 12 et 14, permission de créer un message sur la 12 uniquement : créer une WRITE/belong sur la ligne 12, READ sur la ligne 12, READ sur la ligne 14
 				- Permission de lire tous les messages diffusés sur un réseau, permission de créer un message sur la ligne 2, permission de créer un message et d'éditer ceux des autres utilisateurs sur la ligne 8 : créer un READ sur le réseau, un WRITE/belong sur la ligne 2, et un WRITE sur la ligne 8
 		*/
-		class MessagesRight : public security::Right
+		class MessagesRight : public security::RightTemplate<MessagesRight>
 		{
 		public:
-			MessagesRight();
 			std::string displayParameter() const;
-			ParameterLabelsVector	getParametersLabels()	const;
 			bool perimeterIncludes(const std::string& perimeter) const;
 		};
 	}

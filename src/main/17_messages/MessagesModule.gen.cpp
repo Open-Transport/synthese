@@ -13,8 +13,8 @@ synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synth
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessagesLibraryAdmin>("messageslibrary");
 synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessagesScenarioAdmin>("messagesscenario");
 
-synthese::util::Factory<synthese::security::Right>::integrate<synthese::messages::MessagesRight>("Messages");
-synthese::util::Factory<synthese::security::Right>::integrate<synthese::messages::MessagesLibraryRight>("MessagesLibrary");
+synthese::messages::MessagesRight::integrate();
+synthese::messages::MessagesLibraryRight::integrate();
 
 synthese::messages::MessagesLog::integrate();
 synthese::messages::MessagesLibraryLog::integrate();

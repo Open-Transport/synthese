@@ -27,12 +27,25 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+	using namespace security;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<Right, GlobalRight>::FACTORY_KEY("*");
+	}
+
 	namespace security
 	{
-
+		template<> Right::ParameterLabelsVector RightTemplate<GlobalRight>::getParametersLabels() const
+		{
+			ParameterLabelsVector m;
+			m.push_back(make_pair(GLOBAL_PERIMETER, "(tout)"));
+			return m;
+		}
 
 		GlobalRight::GlobalRight()
-			: Right()
+			: RightTemplate<GlobalRight>()
 		{
 			setParameter("*");
 		}
@@ -40,13 +53,6 @@ namespace synthese
 		std::string GlobalRight::displayParameter() const
 		{
 			return "par défaut";
-		}
-
-		GlobalRight::ParameterLabelsVector GlobalRight::getParametersLabels() const
-		{
-			ParameterLabelsVector m;
-			m.push_back(make_pair(GLOBAL_PERIMETER, "(tout)"));
-			return m;
 		}
 
 		bool GlobalRight::perimeterIncludes( const std::string& perimeter ) const

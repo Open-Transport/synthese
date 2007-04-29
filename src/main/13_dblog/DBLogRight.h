@@ -25,7 +25,7 @@
 
 #include <string>
 
-#include "12_security/Right.h"
+#include "12_security/RightTemplate.h"
 
 namespace synthese
 {
@@ -41,12 +41,10 @@ namespace synthese
 			Définition du périmètre :
 				- NB : Le périmètre n'est pas défini par l'habilitation DBLogRight qui porte sur le principe même d'accéder aux journaux. Chaque journal fait à son tour l'objet d'un contrôle de droits le plus souvent basé sur les habilitations du module auquel ils appartiennent. Voir la documentation de chaque journal.
 		*/
-		class DBLogRight : public security::Right
+		class DBLogRight : public security::RightTemplate<DBLogRight>
 		{
 		public:
-			DBLogRight();
 			std::string displayParameter() const;
-			ParameterLabelsVector	getParametersLabels()	const;
 			bool perimeterIncludes(const std::string& perimeter) const;
 		};
 	}

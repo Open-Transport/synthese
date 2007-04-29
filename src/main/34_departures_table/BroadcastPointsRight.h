@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_PLACES_RIGHT_H
 #define SYNTHESE_PLACES_RIGHT_H
 
-#include "12_security/Right.h"
+#include "12_security/RightTemplate.h"
 
 namespace synthese
 {
@@ -45,12 +45,10 @@ namespace synthese
 				- City : Autorisation portant sur les lieux appartenant à la commune spécifiée
 				- Place : Autorisation portant sur le lieu spécifié
 		*/
-		class BroadcastPointsRight : public security::Right
+		class BroadcastPointsRight : public security::RightTemplate<BroadcastPointsRight>
 		{
 		public:
-			BroadcastPointsRight();
 			std::string displayParameter() const;
-			ParameterLabelsVector	getParametersLabels()	const;
 			bool perimeterIncludes(const std::string& perimeter) const;
 		};
 	}

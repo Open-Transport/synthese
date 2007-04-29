@@ -1,6 +1,6 @@
 
-/** MessagesLibraryRight class header.
-	@file MessagesLibraryRight.h
+/** RightTemplate class header.
+	@file RightTemplate.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,34 +20,34 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_MESSAGES_LIBRARY_RIGHT_H
-#define SYNTHESE_MESSAGES_LIBRARY_RIGHT_H
+#ifndef SYNTHESE_security_RightTemplate_h__
+#define SYNTHESE_security_RightTemplate_h__
 
-#include "12_security/RightTemplate.h"
+#include "12_security/Right.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
-	namespace messages
+	namespace security
 	{
-		/** Habilitation portant sur la bibliothèque de messages et de scénarios de diffusion.
-			@ingroup m17
-
-			Les niveaux de droit public utilisés sont les suivants :
-				- WRITE : Permet de créer, modifier des modèles de messages et des scénarios de diffusion
-				- DELETE : Permet de supprimer des modèles de messages et des scénarios de diffusion
-			
-			Aucun niveau de droit privé n'est utilisé pour cette habilitation.
-
-			Cette habilitation ne peut être paramétrée
-
+		/** RightTemplate class.
+			@ingroup m12
 		*/
-		class MessagesLibraryRight : public security::RightTemplate<MessagesLibraryRight>
+		template<class T>
+		class RightTemplate : public util::FactorableTemplate<Right, T>
 		{
 		public:
-			std::string displayParameter() const;
-			bool perimeterIncludes(const std::string& perimeter) const;
+			Right::ParameterLabelsVector			getParametersLabels()	const;
+			static Right::ParameterLabelsVector	getStaticParametersLabels();
 		};
+
+		template<class T>
+		Right::ParameterLabelsVector synthese::security::RightTemplate<T>::getParametersLabels() const
+		{
+			return getStaticParametersLabels();
+		}
 	}
 }
 
-#endif
+#endif // SYNTHESE_security_RightTemplate_h__

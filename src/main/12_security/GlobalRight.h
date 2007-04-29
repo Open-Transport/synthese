@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_GLOBAL_RIGHT_H
 #define SYNTHESE_GLOBAL_RIGHT_H
 
-#include "12_security/Right.h"
+#include "12_security/RightTemplate.h"
 
 namespace synthese
 {
@@ -32,12 +32,11 @@ namespace synthese
 		/** Global right.
 			@ingroup m12Rights refRights
 		*/
-		class GlobalRight : public Right
+		class GlobalRight : public RightTemplate<GlobalRight>
 		{
 		public:
 			GlobalRight();
 			std::string	displayParameter()	const;
-			ParameterLabelsVector	getParametersLabels()	const;
 			bool perimeterIncludes(const std::string& perimeter) const;
 		};
 	}

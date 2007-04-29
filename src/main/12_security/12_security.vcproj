@@ -82,6 +82,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RightTemplate.h"
+				>
+			</File>
+			<File
 				RelativePath=".\User.cpp"
 				>
 			</File>

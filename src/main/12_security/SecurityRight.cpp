@@ -33,9 +33,23 @@ using namespace boost;
 namespace synthese
 {
 	using namespace util;
+	using namespace security;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<Right, SecurityRight>::FACTORY_KEY("Security");
+	}
 
 	namespace security
 	{
+		template<> Right::ParameterLabelsVector RightTemplate<SecurityRight>::getStaticParametersLabels()
+		{
+			ParameterLabelsVector m;
+			m.push_back(make_pair(GLOBAL_PERIMETER, "(tous profils)"));
+			SecurityRight::addSubProfilesLabel(m, shared_ptr<const Profile>(), string());
+			return m;
+		}
+
 
 		std::string SecurityRight::displayParameter() const
 		{
@@ -45,14 +59,6 @@ namespace synthese
 			return (SecurityModule::getProfiles().contains(Conversion::ToLongLong(_parameter)))
 				? SecurityModule::getProfiles().get(Conversion::ToLongLong(_parameter))->getName()
 				: "(invalide)";
-		}
-
-		Right::ParameterLabelsVector SecurityRight::getParametersLabels() const
-		{
-			ParameterLabelsVector m;
-			m.push_back(make_pair(GLOBAL_PERIMETER, "(tous profils)"));
-			_addSubProfilesLabel(m, shared_ptr<const Profile>(), string());
-			return m;
 		}
 
 		bool SecurityRight::perimeterIncludes( const std::string& perimeter ) const
@@ -76,7 +82,7 @@ namespace synthese
 			return false;
 		}
 
-		void SecurityRight::_addSubProfilesLabel( ParameterLabelsVector& plv, shared_ptr<const Profile> parent, std::string prefix)
+		void SecurityRight::addSubProfilesLabel( ParameterLabelsVector& plv, shared_ptr<const Profile> parent, std::string prefix)
 		{
 			vector<shared_ptr<const Profile> > p = SecurityModule::getSubProfiles(parent);
 
@@ -84,7 +90,7 @@ namespace synthese
 			{
 				plv.push_back(make_pair(Conversion::ToString((*it)->getKey()), prefix + (*it)->getName()));
 
-				_addSubProfilesLabel(plv, *it, "&nbsp;&nbsp;" + prefix);
+				addSubProfilesLabel(plv, *it, "&nbsp;&nbsp;" + prefix);
 			}
 		}
 	}

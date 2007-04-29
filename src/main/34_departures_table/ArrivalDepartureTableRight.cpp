@@ -27,27 +27,29 @@ using namespace std;
 namespace synthese
 {
 	using namespace security;
+	using namespace departurestable;
 
-	namespace departurestable
+	namespace util
 	{
+		template<> const string FactorableTemplate<Right, ArrivalDepartureTableRight>::FACTORY_KEY("ArrivalDepartureTable");
+	}
 
-
-		ArrivalDepartureTableRight::ArrivalDepartureTableRight()
-			: Right()
-		{
-
-		}
-
-		std::string ArrivalDepartureTableRight::displayParameter() const
-		{
-			return _parameter;
-		}
-
-		ArrivalDepartureTableRight::ParameterLabelsVector ArrivalDepartureTableRight::getParametersLabels() const
+	namespace security
+	{
+		template<>
+		RightTemplate<ArrivalDepartureTableRight>::ParameterLabelsVector RightTemplate<ArrivalDepartureTableRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair("*","(tous les afficheurs)"));
 			return m;
+		}
+	}
+
+	namespace departurestable
+	{
+		std::string ArrivalDepartureTableRight::displayParameter() const
+		{
+			return _parameter;
 		}
 
 		bool ArrivalDepartureTableRight::perimeterIncludes( const std::string& perimeter ) const

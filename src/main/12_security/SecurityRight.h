@@ -20,14 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_SECURITY_RIGHT_H
-#define SYNTHESE_SECURITY_RIGHT_H
+#ifndef SYNTHESE_SECURITY_SECURITY_RIGHT_H
+#define SYNTHESE_SECURITY_SECURITY_RIGHT_H
 
 #include <string>
 
 #include <boost/shared_ptr.hpp>
 
-#include "12_security/Right.h"
+#include "12_security/RightTemplate.h"
 
 namespace synthese
 {
@@ -54,14 +54,11 @@ namespace synthese
 				- Profile : Autorisation portant sur les utilisateurs du profil spécifié
 				- NB : Une habilitation sans périmètre reste restreinte à l'ensemble des profils inférieurs ou égaux, au sens de l'opérateur <= sur les profils.
 		*/
-		class SecurityRight : public Right
+		class SecurityRight : public RightTemplate<SecurityRight>
 		{
-		private:
-			static void _addSubProfilesLabel(ParameterLabelsVector& map, boost::shared_ptr<const Profile> parent, std::string label);
-
 		public:
+			static void addSubProfilesLabel(ParameterLabelsVector& map, boost::shared_ptr<const Profile> parent, std::string label);
 			std::string	displayParameter()	const;
-			ParameterLabelsVector	getParametersLabels()	const;
 			bool perimeterIncludes(const std::string& perimeter) const;
 		};
 	}
