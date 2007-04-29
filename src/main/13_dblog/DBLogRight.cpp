@@ -40,6 +40,8 @@ namespace synthese
 
 	namespace security
 	{
+		template<> const string RightTemplate<DBLogRight>::NAME("Journaux");
+
 		template<>
 		Right::ParameterLabelsVector RightTemplate<DBLogRight>::getStaticParametersLabels()
 		{

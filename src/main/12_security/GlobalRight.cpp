@@ -37,6 +37,8 @@ namespace synthese
 
 	namespace security
 	{
+		template<> const string RightTemplate<GlobalRight>::NAME("Général");
+
 		template<> Right::ParameterLabelsVector RightTemplate<GlobalRight>::getParametersLabels() const
 		{
 			ParameterLabelsVector m;

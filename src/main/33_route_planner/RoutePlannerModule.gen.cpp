@@ -1,5 +1,5 @@
 
-//synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::routeplanner::SiteTableSync>("30.01 Site");
+synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::routeplanner::SiteTableSync>("30.01 Site");
 
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::routeplanner::RoutePlannerSheetLinesCellInterfacePage>("schedule_sheet_lines_cell");
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::routeplanner::RoutePlannerSheetLineInterfacePage>("schedule_sheet_row");

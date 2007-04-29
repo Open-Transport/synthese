@@ -63,19 +63,16 @@ namespace synthese
 			object->setArrivalPlaceName(rows.getColumn(rowId, ReservationTableSync::COL_ARRIVAL_PLACE_NAME));
 			object->setArrivalAddress(rows.getColumn(rowId, ReservationTableSync::COL_ARRIVAL_ADDRESS));
 			object->setArrivalTime(DateTime::FromSQLTimestamp(rows.getColumn(rowId, ReservationTableSync::COL_ARRIVAL_TIME)));
-
-			const string ReservationTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
-			const string ReservationTableSync::COL_LAST_RESERVATION_ID = "last_reservation_id";
-			const string ReservationTableSync::COL_SEATS = "seats";
-			const string ReservationTableSync::COL_BOOKING_TIME = "booking_time";
-			const string ReservationTableSync::COL_CANCELLATION_TIME = "cancellation_time";
-			const string ReservationTableSync::COL_CUSTOMER_ID = "customer_id";
-			const string ReservationTableSync::COL_CUSTOMER_NAME = "customer_name";
-			const string ReservationTableSync::COL_CUSTOMER_PHONE = "customer_phone";
-			const string ReservationTableSync::COL_BOOKING_USER_ID = "booking_user_id";
-			const string ReservationTableSync::COL_CANCEL_USER_ID = "cancel_user_id";
-
-
+			object->setReservationRuleId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_RESERVATION_RULE_ID)));
+			object->setLastReservationId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_LAST_RESERVATION_ID)));
+			object->setSeats(Conversion::ToInt(rows.getColumn(rowId, ReservationTableSync::COL_SEATS)));
+			object->setBookingTime(DateTime::FromSQLTimeStamp(rows.getColumn(rowId, ReservationTableSync::COL_BOOKING_TIME)));
+			object->setCancellationTime(DateTime::FromSQLTimeStamp(rows.getColumn(rowId, ReservationTableSync::COL_CANCELLATION_TIME)));
+			object->setCustomerUserId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_CUSTOMER_ID)));
+			object->setCustomerName(rows.getColumn(rowId, ReservationTableSync::COL_CUSTOMER_NAME));
+			object->setCustomerPhone(rows.getColumn(rowId, ReservationTableSync::COL_CUSTOMER_PHONE));
+			object->setBookingUserId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_BOOKING_USER_ID)));
+			object->setCancelUserId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_CANCEL_USER_ID)));
 		}
 
 		template<> void SQLiteTableSyncTemplate<Reservation>::save(Reservation* object)
@@ -88,7 +85,27 @@ namespace synthese
 			 query
 				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
-				/// @todo fill other fields separated by ,
+				<< "," << Conversion::ToString(object->getLineId())
+				<< "," << Conversion::ToSQLiteString(object->getLineCode())
+				<< "," << Conversion::ToSQLiteString(object->getServiceCode())
+				<< "," << Conversion::ToString(object->getDeparturePlaceId())
+				<< "," << Conversion::ToSQLiteString(object->getDeparturePlaceName())
+				<< "," << Conversion::ToSQLiteString(object->getDepartureAddress())
+				<< "," << object->getDepartureTime().toSQLString()
+				<< "," << Conversion::ToString(object->getArrivalPlaceId())
+				<< "," << Conversion::ToSQLiteString(object->getArrivalPlaceName())
+				<< "," << Conversion::ToSQLiteString(object->getArrivalAddress())
+				<< "," << object->getArrivalTime().toSQLString()
+				<< "," << Conversion::ToString(object->getReservationRuleId())
+				<< "," << Conversion::ToString(object->getLastReservationId())
+				<< "," << Conversion::ToString(object->getSeats())
+				<< "," << object->getBookingTime().toSQLString()
+				<< "," << object->getCancellationTime().toSQLString()
+				<< "," << Conversion::ToString(object->getCustomerId())
+				<< "," << Conversion::ToSQLiteString(object->getCustomerName())
+				<< "," << Conversion::ToSQLiteString(object->getCustomerPhone())
+				<< "," << Conversion::ToString(object->getBookingUserId())
+				<< "," << Conversion::ToString(object->getCancelUserId())
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}

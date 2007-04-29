@@ -157,6 +157,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ReservationReportAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationReportAdmin.h"
+				>
+			</File>
+			<File
 				RelativePath=".\UserReservationsAdmin.cpp"
 				>
 			</File>

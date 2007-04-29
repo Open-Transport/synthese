@@ -38,9 +38,17 @@ namespace synthese
 		class RightTemplate : public util::FactorableTemplate<Right, T>
 		{
 		public:
+			static const std::string NAME;
 			Right::ParameterLabelsVector			getParametersLabels()	const;
 			static Right::ParameterLabelsVector	getStaticParametersLabels();
+			const std::string& getName() const;
 		};
+
+		template<class T>
+		const std::string& synthese::security::RightTemplate<T>::getName() const
+		{
+			return NAME;
+		}
 
 		template<class T>
 		Right::ParameterLabelsVector synthese::security::RightTemplate<T>::getParametersLabels() const

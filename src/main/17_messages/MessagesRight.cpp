@@ -38,6 +38,8 @@ namespace synthese
 
 	namespace security
 	{
+		template<> const string RightTemplate<MessagesRight>::NAME("Gestion des messages");
+
 		template<>
 		Right::ParameterLabelsVector RightTemplate<MessagesRight>::getStaticParametersLabels()
 		{

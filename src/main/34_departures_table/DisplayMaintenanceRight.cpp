@@ -36,6 +36,8 @@ namespace synthese
 
 	namespace security
 	{
+		template<> const string RightTemplate<DisplayMaintenanceRight>::NAME("Maintenance des afficheurs");
+
 		template<>
 		RightTemplate<DisplayMaintenanceRight>::ParameterLabelsVector RightTemplate<DisplayMaintenanceRight>::getStaticParametersLabels()
 		{

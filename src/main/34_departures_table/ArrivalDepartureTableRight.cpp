@@ -36,6 +36,8 @@ namespace synthese
 
 	namespace security
 	{
+		template<> const string RightTemplate<ArrivalDepartureTableRight>::NAME("Tableaux de départs");
+
 		template<>
 		RightTemplate<ArrivalDepartureTableRight>::ParameterLabelsVector RightTemplate<ArrivalDepartureTableRight>::getStaticParametersLabels()
 		{

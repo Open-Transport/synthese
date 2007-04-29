@@ -38,6 +38,7 @@
 #include "12_security/AddProfileAction.h"
 #include "12_security/DeleteProfileAction.h"
 #include "12_security/Right.h"
+#include "12_security/Constants.h"
 
 #include "30_server/ActionFunctionRequest.h"
 
@@ -153,8 +154,8 @@ namespace synthese
 				for (Profile::RightsVector::const_iterator it = profile->getRights().begin(); it != profile->getRights().end(); ++it)
 				{
 					shared_ptr<const Right> r = it->second;
-					stream << "<li>Accès " << Right::getLevelLabel(r->getPublicRightLevel()) << " public et " << Right::getLevelLabel(r->getPrivateRightLevel()) << " privé pour " << r->getFactoryKey();
-					if (r->getParameter() != "*")
+					stream << "<li>Accès " << Right::getLevelLabel(r->getPublicRightLevel()) << " public et " << Right::getLevelLabel(r->getPrivateRightLevel()) << " privé pour " << r->getName();
+					if (r->getParameter() != GLOBAL_PERIMETER)
 						stream << "/" << r->displayParameter();
 					stream << "</li>";
 				}

@@ -38,6 +38,8 @@ namespace synthese
 
 	namespace security
 	{
+		template<> const string RightTemplate<MessagesLibraryRight>::NAME("Bilbliothèque de messages");
+
 		template<>
 		RightTemplate<MessagesLibraryRight>::ParameterLabelsVector RightTemplate<MessagesLibraryRight>::getStaticParametersLabels()
 		{

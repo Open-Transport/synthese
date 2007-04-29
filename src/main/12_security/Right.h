@@ -127,6 +127,7 @@ namespace synthese
 
 			static std::string getLevelLabel(Level level);
 
+			virtual const std::string& getName() const = 0;
 		};
 	}
 }

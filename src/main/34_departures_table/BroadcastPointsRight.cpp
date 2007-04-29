@@ -45,6 +45,8 @@ namespace synthese
 
 	namespace security
 	{
+		template<> const string RightTemplate<BroadcastPointsRight>::NAME("Gestion de points de diffusion de tableaux de départs");
+
 		template<>
 		RightTemplate<BroadcastPointsRight>::ParameterLabelsVector RightTemplate<BroadcastPointsRight>::getStaticParametersLabels()
 		{

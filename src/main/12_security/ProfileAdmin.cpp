@@ -126,7 +126,7 @@ namespace synthese
 				{
 					shared_ptr<const Right> right = it->second;
 					stream << t.row();
-					stream << t.col() << right->getFactoryKey();
+					stream << t.col() << right->getName();
 					stream << t.col() << right->displayParameter();
 					stream << t.col();
 					{
@@ -169,7 +169,7 @@ namespace synthese
 				stream
 					<< "<tr>"
 					<< form.open()
-					<< "<td>" << it.getKey() << "</td>"
+					<< "<td>" << it->getName() << "</td>"
 					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PARAMETER, it->getParametersLabels(), GLOBAL_PERIMETER) << "</td>"
 					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, (int) Right::Level(Right::USE)) << "</td>"
 					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, (int) Right::Level(Right::USE)) << "</td>"
