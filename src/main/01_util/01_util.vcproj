@@ -90,14 +90,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ManagedThread.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ManagedThread.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ModuleClass.cpp"
 				>
 			</File>
@@ -106,51 +98,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Registrable.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Registry.h"
-				>
-			</File>
-			<File
 				RelativePath=".\RGBColor.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\RGBColor.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Thread.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Thread.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ThreadExec.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ThreadExec.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ThreadGroup.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ThreadGroup.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ThreadManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ThreadManager.h"
 				>
 			</File>
 			<File
@@ -214,6 +166,62 @@
 				</File>
 				<File
 					RelativePath=".\Factory.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Registry"
+				>
+				<File
+					RelativePath=".\Registrable.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Registry.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Thread"
+				>
+				<File
+					RelativePath=".\ManagedThread.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ManagedThread.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Thread.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Thread.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ThreadExec.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ThreadExec.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ThreadGroup.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ThreadGroup.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ThreadManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ThreadManager.h"
 					>
 				</File>
 			</Filter>
