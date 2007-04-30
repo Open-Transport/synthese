@@ -56,7 +56,7 @@ namespace synthese
 				boost::shared_ptr<const RoutePlannerInterfacePage>	_page;
 				boost::shared_ptr<const env::ConnectionPlace>		_departure_place;
 				boost::shared_ptr<const env::ConnectionPlace>		_arrival_place;
-				time::DateTime										_date;
+				time::Date											_date;
 			//@}
 
 
@@ -73,7 +73,7 @@ namespace synthese
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void _run(std::ostream& stream);
+			void _run(std::ostream& stream) const;
 		};
 	}
 }

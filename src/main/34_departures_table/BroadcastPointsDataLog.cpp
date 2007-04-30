@@ -44,7 +44,7 @@ namespace synthese
 
 		std::string BroadcastPointsDataLog::getName() const
 		{
-			return "Administration des emplacements d'affichage (tableaux de départs)";
+			return "Administration des emplacements de tableaux de départs";
 		}
 	}
 }

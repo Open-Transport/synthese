@@ -79,6 +79,8 @@ namespace synthese
 			addTableColumn (COL_PLACEID, "INTEGER", false);
 			addTableColumn (COL_X, "DOUBLE", true);
 			addTableColumn (COL_Y, "DOUBLE", true);
+
+			addTableIndex(COL_PLACEID);
 		}
 
 

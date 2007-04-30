@@ -49,6 +49,12 @@ namespace synthese
 	@{
 	*/
 
+	typedef enum {
+		AT_LEAST_ONE_BROADCASTPOINT,
+		NO_BROADCASTPOINT,
+		WITH_OR_WITHOUT_ANY_BROADCASTPOINT
+		} BroadcastPointsPresence;
+
 	typedef std::set<const env::ConnectionPlace*> DisplayedPlacesList;
 	typedef std::set<const env::Line*> LineFilter;
 	typedef std::set<const env::ConnectionPlace*> ForbiddenPlacesList;

@@ -7,9 +7,6 @@ synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LineShortNameInterfaceElement>("line_short_name");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LineImageURLInterfaceElement>("line_image");
 
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::EnvironmentTableSync>("15.00.00 Environments");
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::EnvironmentLinkTableSync>("15.00.01 Environments Links");
-
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::FareTableSync>("15.10.02 Fares");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::BikeComplianceTableSync>("15.10.03 Bike compliances");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::HandicappedComplianceTableSync>("15.10.04 Handicapped compliances");

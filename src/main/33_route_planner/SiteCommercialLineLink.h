@@ -1,6 +1,6 @@
 
-/** RoutePlannerModule class header.
-	@file RoutePlannerModule.h
+/** SiteCommercialLineLink class header.
+	@file SiteCommercialLineLink.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,47 +20,35 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_RoutePlannerModule_H__
-#define SYNTHESE_RoutePlannerModule_H__
+#ifndef SYNTHESE_routeplanner_SiteCommercialLineLink_h__
+#define SYNTHESE_routeplanner_SiteCommercialLineLink_h__
 
-#include "33_route_planner/Site.h"
-#include "33_route_planner/SiteCommercialLineLink.h"
-#include "33_route_planner/Types.h"
-
-#include "01_util/ModuleClass.h"
+#include "01_util/Registrable.h"
+#include "01_util/UId.h"
+#include "01_util/Constants.h"
 
 namespace synthese
 {
-	/** @defgroup m33 33 Route planner service module.
-	@{
-	*/
-
-	/** 33 Route planner service module namespace.
-	*/
 	namespace routeplanner
 	{
-		/** Route planner module class.
+		/** SiteCommercialLineLink class.
+			@ingroup m33
 		*/
-		class RoutePlannerModule : public util::ModuleClass
+		class SiteCommercialLineLink : public util::Registrable<uid, SiteCommercialLineLink>
 		{
-		private:
-			static Site::Registry			_sites;	//!< Sites Registry
-			static SiteCommercialLineLink::Registry	_siteLineLinks;
+			uid _siteId;
+			uid _commercialLineId;
 
 		public:
+			SiteCommercialLineLink(uid id = UNKNOWN_VALUE);
 
-			/** Sites registry getter.
-				@return Site::Registry& The sites registry
-				@author Hugues Romain
-				@date 2007
-			*/
-			static Site::Registry& getSites();
+			void setSiteId(uid id);
+			void setCommercialLineId(uid id);
 
-			static SiteCommercialLineLink::Registry& getSiteLineLinks();
+			uid getSiteId() const;
+			uid getCommercialLineId() const;
 		};
 	}
 }
 
-/** @} */
-
-#endif // SYNTHESE_RoutePlannerModule_H__
+#endif // SYNTHESE_routeplanner_SiteCommercialLineLink_h__

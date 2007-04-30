@@ -30,9 +30,11 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace lexmatcher;
+
 	namespace env
 	{
-		Environment::Registry			EnvModule::_environments;
+		Address::Registry				EnvModule::_addresses;
 		City::Registry					EnvModule::_cities;
 		ConnectionPlace::Registry		EnvModule::_connectionPlaces;
 		PhysicalStop::Registry			EnvModule::_physicalStops;
@@ -48,17 +50,18 @@ namespace synthese
 		ScheduledService::Registry		EnvModule::_scheduledServices;
 		ContinuousService::Registry		EnvModule::_continuousServices;
 		TransportNetwork::Registry		EnvModule::_networks;
+		PlaceAlias::Registry			EnvModule::_placeAliases;
+		PublicPlace::Registry			EnvModule::_publicPlaces;
+		RoadChunk::Registry				EnvModule::_roadChunks;
+		Road::Registry					EnvModule::_roads;
+
+		LexicalMatcher<uid>				EnvModule::_citiesMatcher; //!< @todo To be moved in RoutePlanner
 
 		void EnvModule::initialize()
 		{
 		}
 
 
-		Environment::Registry& 
-			EnvModule::getEnvironments ()
-		{
-			return _environments;
-		}
 
 		City::Registry& EnvModule::getCities()
 		{
@@ -127,7 +130,7 @@ namespace synthese
 		{
 			vector<pair<uid,string> > m;
 			if (withAll)
-				m.push_back(make_pair(0, "(toutes)"));
+				m.push_back(make_pair(UNKNOWN_VALUE, "(toutes)"));
 			for(CommercialLine::Registry::const_iterator it = _commercialLines.begin(); it != _commercialLines.end(); ++it)
 				m.push_back(make_pair(it->first, it->second->getShortName()));
 			return m;
@@ -160,5 +163,117 @@ namespace synthese
 		{
 			return _networks;
 		}
+
+		Address::Registry& EnvModule::getAddresses()
+		{
+			return _addresses;
+		}
+
+		PlaceAlias::Registry& EnvModule::getPlaceAliases()
+		{
+			return _placeAliases;
+		}
+
+		PublicPlace::Registry& EnvModule::getPublicPlaces()
+		{
+			return _publicPlaces;
+		}
+
+		RoadChunk::Registry& EnvModule::getRoadChunks()
+		{
+			return _roadChunks;
+		}
+
+		Road::Registry& EnvModule::getRoads()
+		{
+			return _roads;
+		}
+
+
+		shared_ptr<const Place> 
+			EnvModule::fetchPlace (const uid& id)
+		{
+			shared_ptr<const Place> place = static_pointer_cast<const Place, const AddressablePlace>(fetchAddressablePlace (id));
+			if (!place.get())
+				place = static_pointer_cast<const Place, const IncludingPlace>(fetchIncludingPlace (id));
+			return place;
+		}
+
+
+
+
+		shared_ptr<const AddressablePlace> 
+			EnvModule::fetchAddressablePlace (const uid& id)
+		{
+			if (_connectionPlaces.contains (id))
+				return static_pointer_cast<const AddressablePlace, const ConnectionPlace>(_connectionPlaces.get (id));
+			if (_publicPlaces.contains (id))
+				return static_pointer_cast<const AddressablePlace, const PublicPlace>(_publicPlaces.get (id));
+			if (_roads.contains (id))
+				return static_pointer_cast<const AddressablePlace, const Road>(_roads.get (id));
+
+			return shared_ptr<const AddressablePlace>();
+		}
+
+
+
+
+		shared_ptr<const IncludingPlace> 
+			EnvModule::fetchIncludingPlace (const uid& id)
+		{
+			if (_placeAliases.contains (id))
+				return static_pointer_cast<const IncludingPlace, const PlaceAlias>(_placeAliases.get (id));
+			if (_cities.contains (id))
+				return static_pointer_cast<const IncludingPlace, const City>(_cities.get (id));
+
+			return shared_ptr<const IncludingPlace>();
+		}
+
+
+
+
+
+
+
+		shared_ptr<const Vertex> 
+			EnvModule::fetchVertex (const uid& id)
+		{
+			if (_physicalStops.contains (id))
+				return static_pointer_cast<const Vertex, const PhysicalStop>(_physicalStops.get (id));
+			if (_addresses.contains (id))
+				return static_pointer_cast<const Vertex, const Address>(_addresses.get (id));
+			return shared_ptr<const Vertex>();
+		}
+
+
+/*
+		Vertex* 
+			Environment::fetchVertex (const uid& id)
+		{
+			if (EnvModule::getPhysicalStops().contains (id)) return EnvModule::getPhysicalStops().getUpdateable (id).get();
+			if (_addresses.contains (id)) return _addresses.getUpdateable(id).get();
+			return 0;
+		}
+*/
+
+		CityList EnvModule::guessCity (const std::string& fuzzyName, int nbMatches)
+		{
+			CityList result;
+			LexicalMatcher<uid>::MatchResult matches =  _citiesMatcher.bestMatches (fuzzyName, nbMatches);
+			for (LexicalMatcher<uid>::MatchResult::iterator it = matches.begin ();
+				it != matches.end (); ++it)
+			{
+				uid id = it->value;
+				result.push_back (getCities ().get (id));
+			}
+			return result;
+		}
+
+		synthese::lexmatcher::LexicalMatcher<uid>& 
+			EnvModule::getCitiesMatcher ()
+		{
+			return _citiesMatcher;
+		}
+
 	}
 }

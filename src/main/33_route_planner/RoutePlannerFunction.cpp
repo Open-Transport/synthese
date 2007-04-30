@@ -91,10 +91,19 @@ namespace synthese
 			// Date
 			it = map.find(PARAMETER_DATE);
 			if (it != map.end())
-				_date = DateTime::FromInternalString(it->second);
+			{
+				try
+				{
+					_date = Date::FromInternalString(it->second);
+				}
+				catch (...)
+				{
+					throw RequestException("Bad date");
+				}
+			}
 		}
 
-		void RoutePlannerFunction::_run( std::ostream& stream )
+		void RoutePlannerFunction::_run( std::ostream& stream ) const
 		{
 			DateTime endDate(_date);
 			endDate.addDaysDuration(1);

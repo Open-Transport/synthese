@@ -23,12 +23,14 @@
 #ifndef SYNTHESE_BroadcastPointTableSync_H__
 #define SYNTHESE_BroadcastPointTableSync_H__
 
+#include "02_db/SQLiteTableSyncTemplate.h"
+
+#include "01_util/Constants.h"
+#include "01_util/UId.h"
 
 #include <vector>
 #include <string>
 #include <iostream>
-
-#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -63,9 +65,12 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<BroadcastPoint> > search(
-				boost::shared_ptr<const env::ConnectionPlace> place
-				// other search parameters
-				,int first = 0, int number = 0);
+				uid placeId = UNKNOWN_VALUE
+				, int number = UNKNOWN_VALUE
+				, int first=0
+				, bool orderByName = true
+				, bool raisingOrder = true
+				);
 
 
 		protected:

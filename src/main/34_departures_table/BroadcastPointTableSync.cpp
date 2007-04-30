@@ -141,17 +141,22 @@ namespace synthese
 		}
 
 		std::vector<shared_ptr<BroadcastPoint> > BroadcastPointTableSync::search(
-			boost::shared_ptr<const ConnectionPlace> place
-			, int first /*= 0*/, int number /*= 0*/ )
-		{
+			uid placeId
+			, int number
+			, int first
+			, bool orderByName
+			, bool raisingOrder
+		){
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
 				<< " WHERE 1 " ;
-			if (place.get())
-				query << " AND " << TABLE_COL_PLACE_ID << "=" << place->getKey();
+			if (placeId != UNKNOWN_VALUE)
+				query << " AND " << TABLE_COL_PLACE_ID << "=" << placeId;
+			if (orderByName)
+				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
  			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

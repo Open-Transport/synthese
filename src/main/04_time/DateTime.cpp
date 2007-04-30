@@ -402,7 +402,7 @@ namespace synthese
 
 
 		DateTime 
-		operator + ( const DateTime& op, const int& minutesDuration )
+		operator + ( const DateTime& op, int minutesDuration )
 		{
 			DateTime result (op);
 			result += minutesDuration;
@@ -412,7 +412,7 @@ namespace synthese
 
 
 		DateTime 
-		operator - ( const DateTime& op, const int& minutesDuration )
+		operator - ( const DateTime& op, int minutesDuration )
 		{
 			DateTime result (op);
 			result -= minutesDuration;

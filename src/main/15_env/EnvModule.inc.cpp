@@ -14,6 +14,7 @@
 #include "15_env/AxisTableSync.h"
 #include "15_env/BikeComplianceTableSync.h"
 #include "15_env/CityTableSync.h"
+#include "15_env/CommercialLineTableSync.h"
 #include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/ContinuousServiceTableSync.h"
 #include "15_env/FareTableSync.h"
@@ -30,7 +31,4 @@
 #include "15_env/ScheduledServiceTableSync.h"
 #include "15_env/ServiceDateTableSync.h"
 #include "15_env/TransportNetworkTableSync.h"
-#include "15_env/EnvironmentTableSync.h"
-#include "15_env/EnvironmentLinkTableSync.h"
-#include "15_env/CommercialLineTableSync.h"
 

@@ -34,10 +34,10 @@ namespace synthese
 {
 	namespace env
 	{
-		class PedestrianCompliances;
+		class PedestrianCompliance;
 
 		/** PedestrianCompliances table synchronizer.
-			@ingroup m15
+			@ingroup m15LS refLS
 		*/
 		class PedestrianComplianceTableSync : public db::SQLiteTableSyncTemplate<PedestrianCompliance>
 		{

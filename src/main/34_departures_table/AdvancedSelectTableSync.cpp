@@ -61,31 +61,44 @@ namespace synthese
 			, bool raisingOrder
 		){
 			stringstream query;
-			query << " SELECT "
-					<< "p." << TABLE_COL_ID
-					<< ",COUNT(b." << TABLE_COL_ID << ") AS bc"
-				<< " FROM " << ConnectionPlaceTableSync::TABLE_NAME << " AS p"
+			query
+				<< " SELECT "
+					<< "p." << TABLE_COL_ID << " AS pid "
+					<< ",c." << CityTableSync::TABLE_COL_NAME << " AS city_name"
+					<< ",p." << ConnectionPlaceTableSync::TABLE_COL_NAME << " AS place_name"
+					<< ",(SELECT COUNT(b." << TABLE_COL_ID << ") FROM " << BroadcastPointTableSync::TABLE_NAME << " AS b WHERE b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS bc"
+				<< " FROM "
+					<< ConnectionPlaceTableSync::TABLE_NAME << " AS p"
 					<< " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
-					<< " LEFT JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=p." << TABLE_COL_ID
-				<< " WHERE "
-					<< "c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'"
-					<< " AND p." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(placeName, false) << "%'";
-			query << " GROUP BY p." << TABLE_COL_ID;
-			if (bpPresence != WITH_OR_WITHOU_ANY_BROADCASTPOINT)
+				<< " WHERE 1 ";
+			if (!cityName.empty())
+				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
+			if (!placeName.empty())
+				query << " AND p." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(placeName, false) << "%'";
+			if (bpPresence != WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
 			{
-				query << " HAVING COUNT(b." << TABLE_COL_ID << ")";
+				query << " AND bc ";
 				if (bpPresence == AT_LEAST_ONE_BROADCASTPOINT)
 					query << ">0";
 				if (bpPresence == NO_BROADCASTPOINT)
 					query << "=0";
 			}
+			if (lineId != UNKNOWN_VALUE)
+				query << " AND EXISTS(SELECT ls." << TABLE_COL_ID 
+					<< " FROM "
+						<< PhysicalStopTableSync::TABLE_NAME << " AS ps "
+						<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
+						<< " INNER JOIN " << LineTableSync::TABLE_NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID
+					<< " WHERE "
+						<< " ps." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
+						<< " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId
+					<< ")";
 			if (orderByCity)
-				query << " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",b."  << BroadcastPointTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",p."  << BroadcastPointTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByName)
-				query << " ORDER BY b."  << BroadcastPointTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY p." << BroadcastPointTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByNumber)
-				query << " ORDER BY COUNT(b."  << TABLE_COL_ID << ")" << (raisingOrder ? " ASC" : " DESC");
-
+				query << " ORDER BY bc" << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -93,14 +106,15 @@ namespace synthese
 
 			try
 			{
-				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
 				vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)
 				{
 					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
 					object->broadCastPointsNumber = Conversion::ToInt(result.getColumn(i, "bc"));
-					object->place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(result.getColumn(i, "p." + TABLE_COL_ID)));
+					object->placeId = Conversion::ToLongLong(result.getColumn(i, "pid"));
+					object->placeName = result.getColumn(i, "place_name");
+					object->cityName = result.getColumn(i, "city_name");
 					objects.push_back(object);
 				}
 				return objects;

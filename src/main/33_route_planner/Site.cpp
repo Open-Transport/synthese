@@ -24,6 +24,9 @@
 
 #include "33_route_planner/Site.h"
 
+using namespace boost;
+using namespace std;
+
 namespace synthese
 {
 	using namespace time;
@@ -34,23 +37,21 @@ namespace synthese
 
 	namespace routeplanner
 	{
-		Site::Site( const uid& id)
+		const string Site::TEMPS_MIN_CIRCULATIONS ("r");
+		const string Site::TEMPS_MAX_CIRCULATIONS ("R");
+
+		Site::Site(uid id)
 			: Registrable<uid, Site>(id)
 		{
 			
 		}
 
-		const Interface* Site::getInterface() const
+		shared_ptr<const Interface> Site::getInterface() const
 		{
 			return _interface;
 		}
 
-/*		const synthese::env::Environment* Site::getEnvironment() const
-		{
-			return _env;
-		}
-*/
-		bool Site::onlineBookingAllowed() const
+		bool Site::getOnlineBookingAllowed() const
 		{
 			return _onlineBookingAllowed;
 		}
@@ -61,7 +62,7 @@ namespace synthese
 			return tempDate.getDate() >= _startValidityDate && tempDate.getDate() <= _endValidityDate;
 		}
 
-		void Site::setInterface( const synthese::interfaces::Interface* interf )
+		void Site::setInterface(shared_ptr<const Interface> interf )
 		{
 			_interface = interf;
 		}
@@ -90,5 +91,75 @@ namespace synthese
 		{
 			_name = name;
 		}
+
+		bool Site::getPastSolutionsDisplayed() const
+		{
+			return _pastSolutionsDisplayed;
+		}
+
+		const time::Date& Site::getStartDate() const
+		{
+			return _startValidityDate;
+		}
+
+		const time::Date& Site::getEndDate() const
+		{
+			return _endValidityDate;
+		}
+
+		const time::Date& Site::getMaxDateInUse() const
+		{
+			return _maxDateInUse;
+		}
+
+		const time::Date& Site::getMinDateInUse() const
+		{
+			return _minDateInUse;
+		}
+
+		Date Site::interpretDate( const std::string& text ) const
+		{
+			if ( text.empty() )
+				return Date();
+
+			if ( text == TEMPS_MIN_CIRCULATIONS)
+				return getMinDateInUse ();
+
+			if (text == TEMPS_MAX_CIRCULATIONS)
+				return getMaxDateInUse ();
+
+			if (text.size() == 1)
+			{
+				Date tempDate;
+				tempDate.updateDate(text[ 0 ] );
+				return tempDate;
+			}
+
+			return Date::FromString(text);
+		}
+
+		void Site::updateMinMaxDatesInUse (const time::Date& newDate, bool marked)
+		{
+			if (marked)
+			{
+				if ( (_minDateInUse == synthese::time::Date::UNKNOWN_DATE) ||
+					(newDate < _minDateInUse) ) 
+				{
+					_minDateInUse = newDate;
+				}
+
+				if ( (_maxDateInUse == synthese::time::Date::UNKNOWN_DATE) ||
+					(newDate > _maxDateInUse) ) 
+				{
+					_maxDateInUse = newDate;
+				}
+			}
+			else
+			{
+				// TODO not written yet...
+			}
+
+		}
+
 	}
 }

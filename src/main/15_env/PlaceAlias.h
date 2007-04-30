@@ -30,10 +30,10 @@ private:
 
 public:
 
-    PlaceAlias (const uid& id,
-		const std::string& name,
-		const Place* aliasedPlace,
-		const City* city);
+    PlaceAlias (const uid id = UNKNOWN_VALUE,
+		std::string name = std::string(),
+		const Place* aliasedPlace = NULL,
+		const City* city = NULL);
 
     virtual ~PlaceAlias ();
 
@@ -51,7 +51,8 @@ public:
     /** Gets aliased place.
      */
     const Place* getAliasedPlace () const;
-    
+
+	void setAliasedPlace(const Place* place);
     //@}
 
 

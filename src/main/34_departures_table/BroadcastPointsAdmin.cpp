@@ -53,7 +53,8 @@ namespace synthese
 
 		BroadcastPointsAdmin::BroadcastPointsAdmin()
 			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) 
-			, _displayNumber(WITH_OR_WITHOU_ANY_BROADCASTPOINT)
+			, _displayNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
+			, _lineUId(UNKNOWN_VALUE)
 		{}
 
 		void BroadcastPointsAdmin::setFromParametersMap(const ParametersMap& map)
@@ -107,7 +108,7 @@ namespace synthese
 			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointsAdmin>());
 
 			vector<pair<int, string> > m;
-			m.push_back(make_pair((int) WITH_OR_WITHOU_ANY_BROADCASTPOINT, "(filtre désactivé)"));
+			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));
 			m.push_back(make_pair((int) AT_LEAST_ONE_BROADCASTPOINT, "Au moins un"));
 			m.push_back(make_pair((int) NO_BROADCASTPOINT, "Aucun"));
 
@@ -135,12 +136,11 @@ namespace synthese
 
 			for (vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> >::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
 			{
-				shared_ptr<ConnectionPlaceWithBroadcastPoint> element = *it;
-				goRequest.setObjectId(element->place->getKey());
+				goRequest.setObjectId((*it)->placeId);
 				stream << t.row();
-				stream << t.col() << element->place->getCity()->getName();
-				stream << t.col() << element->place->getName();
-				stream << t.col() << element->broadCastPointsNumber;
+				stream << t.col() << (*it)->cityName;
+				stream << t.col() << (*it)->placeName;
+				stream << t.col() << (*it)->broadCastPointsNumber;
 				
 				HTMLForm gf(goRequest.getHTMLForm());
 				stream << t.col() << gf.getLinkButton("Editer");

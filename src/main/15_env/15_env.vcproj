@@ -506,35 +506,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ComponentTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ComponentTableSync.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ConnectionPlaceTableSync.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\ConnectionPlaceTableSync.h"
-				>
-			</File>
-			<File
-				RelativePath=".\EnvironmentLinkTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\EnvironmentLinkTableSync.h"
-				>
-			</File>
-			<File
-				RelativePath=".\EnvironmentTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\EnvironmentTableSync.h"
 				>
 			</File>
 			<File
@@ -699,14 +675,6 @@
 			</File>
 			<File
 				RelativePath=".\Document.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Environment.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Environment.h"
 				>
 			</File>
 			<File

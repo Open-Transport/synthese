@@ -34,14 +34,14 @@
 #include <sqlite/sqlite3.h>
 #include <assert.h>
 
-
+using namespace std;
 using namespace boost;
-using synthese::util::Conversion;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace env;
+	using namespace util;
 
 	namespace db
 	{
@@ -108,6 +108,11 @@ namespace synthese
 			addTableColumn (TABLE_COL_DEFAULTTRANSFERDELAY, "INTEGER", true);
 			addTableColumn (TABLE_COL_TRANSFERDELAYS, "TEXT", true);
 			addTableColumn (TABLE_COL_ALARMID, "INTEGER", true);
+
+			vector<string> c;
+			c.push_back(TABLE_COL_CITYID);
+			c.push_back(TABLE_COL_NAME);
+			addTableIndex(c);
 		}
 
 

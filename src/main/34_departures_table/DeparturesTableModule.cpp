@@ -75,7 +75,7 @@ namespace synthese
 			for (vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> >::const_iterator it = bpv.begin(); it != bpv.end(); ++it)
 			{
 				const shared_ptr<ConnectionPlaceWithBroadcastPoint>& con = *it;
-				localizations.push_back(make_pair(con->place->getKey(), con->place->getFullName()));
+				localizations.push_back(make_pair(con->placeId, con->cityName + " " + con->placeName));
 			}
 			return localizations;
 		}

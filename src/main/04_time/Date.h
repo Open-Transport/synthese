@@ -103,6 +103,15 @@ namespace synthese
 			*/
 			static Date FromSQLDate (const std::string& sqlDate);
 
+			/** Constructs a Date from an internal date string (AAAAMMJJ).
+				@param date The text to parse
+				@return synthese::time::Date The parsed date
+				@throw TimeParseException if the format of the date is not parsable
+				@author Hugues Romain
+				@date 2007				
+			*/
+			static Date FromInternalString(const std::string& date);
+
 			static Date FromString (const std::string& sqlString);
 
 				//! @name Update methods

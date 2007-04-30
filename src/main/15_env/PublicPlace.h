@@ -23,53 +23,50 @@
 #ifndef SYNTHESE_ENV_PUBLICPLACE_H
 #define SYNTHESE_ENV_PUBLICPLACE_H
 
+#include "15_env/AddressablePlace.h"
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
-#include "AddressablePlace.h"
-#include <string>
+#include "01_util/Constants.h"
 
+#include <string>
 
 namespace synthese
 {
-namespace env
-{
+	namespace env
+	{
+		class City;
 
 
-class City;
+		/** Public place class.
+			@ingroup m15
+		*/
+		class PublicPlace : public synthese::util::Registrable<uid, PublicPlace>, public AddressablePlace
+		{
+
+		private:
+
+		protected:
+
+		public:
+
+			PublicPlace (
+				const uid id = UNKNOWN_VALUE
+				, std::string name = std::string()
+				, const City* city = NULL
+				);
+
+			virtual ~PublicPlace ();
 
 
-/** Public place class.
+			//! @name Getters/Setters
+			//@{
 
- @ingroup m15
-*/
-class PublicPlace : public synthese::util::Registrable<uid, PublicPlace>, public AddressablePlace
-{
+			//@}
 
-private:
-
-protected:
-
-public:
-
-    PublicPlace (const uid& id,
-		 const std::string& name,
-		 const City* city);
-
-    virtual ~PublicPlace ();
-
-
-    //! @name Getters/Setters
-    //@{
-
-    //@}
-
-    
-};
-
-
-}
+		    
+		};
+	}
 }
 
 #endif 	    
-

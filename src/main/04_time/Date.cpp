@@ -497,5 +497,23 @@ namespace synthese
 			return Conversion::ToString(_day.getValue()) + "/" + Conversion::ToString(_month.getValue()) +"/" + Conversion::ToString(_year.getValue());
 		}
 
+		Date Date::FromInternalString( const std::string& date )
+		{
+			if (date == "A")
+			{
+				Date result;
+				result.updateDate();
+				return result;
+			}
+
+			if (date.size() != 8)
+				throw TimeParseException("Bad length for internal date string");
+
+			Date result;
+			result._year = Conversion::ToInt(date.substr(0,4));
+			result._month = Conversion::ToInt(date.substr(4,2));
+			result._day = Conversion::ToInt(date.substr(6,2));
+			return result;			
+		}
 	}
 }

@@ -28,7 +28,11 @@
 
 #include "01_util/ModuleClass.h"
 
-#include "15_env/Environment.h"
+#include "07_lex_matcher/LexicalMatcher.h"
+
+#include "15_env/Address.h"
+#include "15_env/PlaceAlias.h"
+#include "15_env/PublicPlace.h"
 #include "15_env/City.h"
 #include "15_env/PhysicalStop.h"
 #include "15_env/ConnectionPlace.h"
@@ -44,6 +48,9 @@
 #include "15_env/ContinuousService.h"
 #include "15_env/ReservationRule.h"
 #include "15_env/TransportNetwork.h"
+#include "15_env/RoadChunk.h"
+#include "15_env/Road.h"
+#include "15_env/Types.h"
 
 namespace synthese
 {
@@ -285,9 +292,11 @@ namespace synthese
 		{
 		private:
 
-			static Environment::Registry			_environments;
+			static Address::Registry				_addresses;
 			static City::Registry					_cities;
 			static ConnectionPlace::Registry		_connectionPlaces;
+			static PlaceAlias::Registry				_placeAliases;
+			static PublicPlace::Registry			_publicPlaces;
 			static PhysicalStop::Registry			_physicalStops;
 			static CommercialLine::Registry			_commercialLines;
 			static Line::Registry					_lines;
@@ -301,13 +310,16 @@ namespace synthese
 			static ScheduledService::Registry		_scheduledServices;
 			static ContinuousService::Registry		_continuousServices;
 			static TransportNetwork::Registry		_networks;
+			static RoadChunk::Registry				_roadChunks;
+			static Road::Registry					_roads;
 
+			static lexmatcher::LexicalMatcher<uid> _citiesMatcher; //!< @todo To be moved in RoutePlanner
 
 		public:
 		
 			void initialize();
 			
-			static Environment::Registry&			getEnvironments();
+			static Address::Registry&				getAddresses();
 			static City::Registry&					getCities();
 			static ConnectionPlace::Registry&		getConnectionPlaces();
 			static PhysicalStop::Registry&			getPhysicalStops();
@@ -323,6 +335,29 @@ namespace synthese
 			static ScheduledService::Registry&		getScheduledServices();
 			static ContinuousService::Registry&		getContinuousServices();
 			static TransportNetwork::Registry&		getTransportNetworks();
+			static PlaceAlias::Registry&			getPlaceAliases();
+			static PublicPlace::Registry&			getPublicPlaces();
+			static RoadChunk::Registry&				getRoadChunks();
+			static Road::Registry&					getRoads();
+			
+			
+
+			/** Fetches a addressable place given its id.
+			All the containers storong objects typed (or subtyped) as AddressablePlace
+			are inspected.
+			*/
+			static boost::shared_ptr<const AddressablePlace> fetchAddressablePlace (const uid& id);
+
+			static boost::shared_ptr<const IncludingPlace> fetchIncludingPlace (const uid& id);
+
+			static boost::shared_ptr<const Place> fetchPlace (const uid& id);
+
+
+			static boost::shared_ptr<const Vertex> fetchVertex (const uid& id);
+			//Vertex* fetchVertex (const uid& id);
+
+			static CityList guessCity (const std::string& fuzzyName, int nbMatches = 10);
+			synthese::lexmatcher::LexicalMatcher<uid>& getCitiesMatcher ();
 
 
 			static boost::shared_ptr<Path> fetchPath (const uid& id);

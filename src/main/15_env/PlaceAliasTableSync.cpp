@@ -1,123 +1,207 @@
-#include "PlaceAliasTableSync.h"
 
-#include "01_util/Conversion.h"
+/** PlaceAliasTableSync class implementation.
+	@file PlaceAliasTableSync.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include <sstream>
+
+#include "PlaceAliasTableSync.h"
+#include "PlaceAlias.h"
+#include "15_env/EnvModule.h"
+
+#include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLiteException.h"
 
-#include "15_env/PlaceAlias.h"
-#include "15_env/City.h"
+#include "01_util/Conversion.h"
 
-#include <sqlite/sqlite3.h>
-#include <assert.h>
-
-
+using namespace std;
 using namespace boost;
-using synthese::util::Conversion;
 
 namespace synthese
 {
 	using namespace db;
+	using namespace util;
+	using namespace env;
 
-namespace env
-{
+	namespace util
+	{
+		// template<> const std::string FactorableTemplate<SQLiteTableSync, PlaceAliasTableSync>::FACTORY_KEY("");
+	}
+	
+	namespace db
+	{
+		template<> const std::string SQLiteTableSyncTemplate<PlaceAlias>::TABLE_NAME = "t011_place_aliases";
+		template<> const int SQLiteTableSyncTemplate<PlaceAlias>::TABLE_ID = 11;
+		template<> const bool SQLiteTableSyncTemplate<PlaceAlias>::HAS_AUTO_INCREMENT = true;
 
+		template<> void SQLiteTableSyncTemplate<PlaceAlias>::load(PlaceAlias* object, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		{
 
-PlaceAliasTableSync::PlaceAliasTableSync ()
-: ComponentTableSync (PLACEALIASES_TABLE_NAME, true, false, db::TRIGGERS_ENABLED_CLAUSE)
-{
-    addTableColumn (PLACEALIASES_TABLE_COL_NAME, "TEXT", true);
-    addTableColumn (PLACEALIASES_TABLE_COL_ALIASEDPLACEID, "INTEGER", false);
-    addTableColumn (PLACEALIASES_TABLE_COL_CITYID, "INTEGER", false);
-    addTableColumn (PLACEALIASES_TABLE_COL_ISCITYMAINCONNECTION, "BOOLEAN", false);
+			uid aliasedPlaceId (
+				Conversion::ToLongLong (rows.getColumn (rowIndex, PlaceAliasTableSync::COL_ALIASEDPLACEID)));
+			uid cityId (
+				Conversion::ToLongLong (rows.getColumn (rowIndex, PlaceAliasTableSync::COL_CITYID)));
+
+			object->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
+			object->setName (rows.getColumn (rowIndex, PlaceAliasTableSync::COL_NAME));
+			object->setCity(EnvModule::getCities ().get (cityId).get());
+			object->setAliasedPlace(EnvModule::fetchPlace (aliasedPlaceId).get());
+
+		}
+
+		template<> void SQLiteTableSyncTemplate<PlaceAlias>::save(PlaceAlias* object)
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			if (object->getKey() <= 0)
+				object->setKey(getId(1,1));	/// @todo Use grid ID
+               
+			 query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->getKey())
+				/// @todo fill other fields separated by ,
+				<< ")";
+			sqlite->execUpdate(query.str());
+		}
+
+	}
+
+	namespace env
+	{
+		const std::string PlaceAliasTableSync::COL_NAME ("name");
+		const std::string PlaceAliasTableSync::COL_ALIASEDPLACEID ("aliased_place_id");
+		const std::string PlaceAliasTableSync::COL_CITYID ("city_id");
+		const std::string PlaceAliasTableSync::COL_ISCITYMAINCONNECTION ("is_city_main_connection");
+
+		PlaceAliasTableSync::PlaceAliasTableSync()
+			: SQLiteTableSyncTemplate<PlaceAlias>(true, true, TRIGGERS_ENABLED_CLAUSE)
+		{
+			addTableColumn(TABLE_COL_ID, "INTEGER", false);
+			addTableColumn (COL_NAME, "TEXT", true);
+			addTableColumn (COL_ALIASEDPLACEID, "INTEGER", false);
+			addTableColumn (COL_CITYID, "INTEGER", false);
+			addTableColumn (COL_ISCITYMAINCONNECTION, "BOOLEAN", false);
+		}
+
+		void PlaceAliasTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool)
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (EnvModule::getPlaceAliases().contains(id))
+				{
+					load(EnvModule::getPlaceAliases().getUpdateable(id).get(), rows, i);
+				}
+				else
+				{
+					shared_ptr<PlaceAlias> object(new PlaceAlias);
+					load(object.get(), rows, i);
+					EnvModule::getPlaceAliases().add(object);
+
+					uid cityId (
+						Conversion::ToLongLong (rows.getColumn (i, COL_CITYID)));
+
+					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cityId);
+
+					bool isCityMainConnection (
+						Conversion::ToBool (rows.getColumn (i, COL_ISCITYMAINCONNECTION)));
+
+					if (isCityMainConnection)
+					{
+						city->addIncludedPlace (object.get());
+					}
+
+					city->getPlaceAliasesMatcher ().add (object->getName (), object.get() );
+				}
+			}
+		}
+		
+		void PlaceAliasTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (EnvModule::getPlaceAliases().contains(id))
+				{
+					shared_ptr<PlaceAlias> object = EnvModule::getPlaceAliases().getUpdateable(id);
+					load(object.get(), rows, i);
+
+					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (object->getCity ()->getKey ());
+					city->getPlaceAliasesMatcher ().add (object->getName (), object.get());
+					/// @todo Where is the removal of the old name ??
+				}
+			}
+		}
+
+		void PlaceAliasTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (EnvModule::getPlaceAliases().contains(id))
+				{
+					shared_ptr<const PlaceAlias> pa = EnvModule::getPlaceAliases ().get(id);
+					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (pa->getCity ()->getKey ());
+					city->getPlaceAliasesMatcher ().remove (pa->getName ());
+
+					EnvModule::getPlaceAliases().remove(id);
+				}
+			}
+		}
+
+		vector<shared_ptr<PlaceAlias> > PlaceAliasTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		{
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE 1 ";
+			/// @todo Fill Where criteria
+			// if (!name.empty())
+			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+				;
+			//if (orderByName)
+			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+				vector<shared_ptr<PlaceAlias> > objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					shared_ptr<PlaceAlias> object(new PlaceAlias);
+					load(object.get(), result, i);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
+	}
 }
-
-
-
-PlaceAliasTableSync::~PlaceAliasTableSync ()
-{
-
-}
-
-    
-
-
-void 
-PlaceAliasTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-		      synthese::env::Environment& environment)
-{
-    uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-
-    if (environment.getPlaceAliases ().contains (id)) return;
-
-    std::string name (
-	rows.getColumn (rowIndex, PLACEALIASES_TABLE_COL_NAME));
-    uid aliasedPlaceId (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, PLACEALIASES_TABLE_COL_ALIASEDPLACEID)));
-    uid cityId (
-	Conversion::ToLongLong (rows.getColumn (rowIndex, PLACEALIASES_TABLE_COL_CITYID)));
-    int tableId = synthese::util::decodeTableId (aliasedPlaceId);
-
-    const Place* place = environment.fetchPlace (aliasedPlaceId);
-
-    if (place == 0) return;
-
-    City* city = environment.getCities ().getUpdateable (cityId).get();
-    shared_ptr<PlaceAlias> pa(new PlaceAlias (id, name, place, city));
-
-    bool isCityMainConnection (
-	Conversion::ToBool (rows.getColumn (rowIndex, PLACEALIASES_TABLE_COL_ISCITYMAINCONNECTION)));
-
-    if (isCityMainConnection)
-    {
-		city->addIncludedPlace (pa.get());
-    }
-
-    city->getPlaceAliasesMatcher ().add (pa->getName (), pa.get() );
-    environment.getPlaceAliases ().add (pa);
-
-}
-
-
-
-void 
-PlaceAliasTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
-			  synthese::env::Environment& environment)
-{
-    uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-    PlaceAlias* pa = environment.getPlaceAliases ().getUpdateable(id).get();
-    City* city = environment.getCities ().getUpdateable (pa->getCity ()->getKey ()).get();
-    pa->setName (rows.getColumn (rowIndex, PLACEALIASES_TABLE_COL_NAME));
-    city->getPlaceAliasesMatcher ().add (pa->getName (), pa);
-
-}
-
-
-
-void 
-PlaceAliasTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
-			 synthese::env::Environment& environment)
-{
-    // TODO not finished
-    uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-    shared_ptr<const PlaceAlias> pa = environment.getPlaceAliases ().get(id);
-    shared_ptr<City> city = environment.getCities ().getUpdateable (pa->getCity ()->getKey ());
-    city->getPlaceAliasesMatcher ().remove (pa->getName ());
-    environment.getPlaceAliases ().remove (id);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-}
-

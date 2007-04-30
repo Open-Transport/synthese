@@ -33,7 +33,10 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/InterfaceModule.h"
 
+#include <sstream>
+
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -49,6 +52,27 @@ namespace synthese
 		template<> const std::string SQLiteTableSyncTemplate<Site>::TABLE_NAME = "t025_sites";
 		template<> const int SQLiteTableSyncTemplate<Site>::TABLE_ID = 25;
 		template<> const bool SQLiteTableSyncTemplate<Site>::HAS_AUTO_INCREMENT = true;
+
+		template<> void SQLiteTableSyncTemplate<Site>::load(Site* site, const SQLiteResult& rows, int i)
+		{
+			site->setKey(Conversion::ToLongLong(rows.getColumn(i,TABLE_COL_ID)));
+			site->setName(rows.getColumn(i, SiteTableSync::TABLE_COL_NAME));
+			shared_ptr<const Interface> interf = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(i, SiteTableSync::COL_INTERFACE_ID)));
+			site->setInterface(interf);
+			site->setStartDate(Date::FromSQLDate(rows.getColumn(i, SiteTableSync::TABLE_COL_START_DATE)));
+			site->setEndDate(Date::FromSQLDate(rows.getColumn(i, SiteTableSync::TABLE_COL_END_DATE)));
+			site->setOnlineBookingAllowed(Conversion::ToBool(rows.getColumn(i, SiteTableSync::TABLE_COL_ONLINE_BOOKING)));
+			site->setPastSolutionsDisplayed(Conversion::ToBool(rows.getColumn(i, SiteTableSync::TABLE_COL_USE_OLD_DATA)));
+		}
+
+		template<> void SQLiteTableSyncTemplate<Site>::save(Site* site)
+		{
+			stringstream query;
+			query << " REPLACE INTO " << TABLE_NAME << " VALUES("
+				
+				<< ")";
+			DBModule::GetSQLite()->execUpdate(query.str());
+		}
 	}
 
 	namespace routeplanner
@@ -76,6 +100,12 @@ namespace synthese
 
 		void SiteTableSync::rowsUpdated( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (RoutePlannerModule::getSites().contains(id))
+					load(RoutePlannerModule::getSites().getUpdateable(id).get(), rows, i);
+			}
 		}
 
 
@@ -83,34 +113,31 @@ namespace synthese
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
 				shared_ptr<Site> site;
-				try
+				if (RoutePlannerModule::getSites().contains(id))
 				{
-					site.reset(new Site(Conversion::ToLongLong(rows.getColumn(i,TABLE_COL_ID))));
-					site->setName(rows.getColumn(i,TABLE_COL_NAME));
-					shared_ptr<const Interface> interf = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(i, COL_INTERFACE_ID)));
-					site->setInterface(interf.get());
-					site->setStartDate(Date::FromSQLDate(rows.getColumn(i, TABLE_COL_START_DATE)));
-					site->setEndDate(Date::FromSQLDate(rows.getColumn(i, TABLE_COL_END_DATE)));
-					site->setOnlineBookingAllowed(Conversion::ToBool(rows.getColumn(i, TABLE_COL_ONLINE_BOOKING)));
-					site->setPastSolutionsDisplayed(Conversion::ToBool(rows.getColumn(i, TABLE_COL_USE_OLD_DATA)));
+					site = RoutePlannerModule::getSites().getUpdateable(id);
+					load(site.get(), rows, i);
 				}
-				catch (Interface::RegistryKeyException e)
+				else
 				{
-					Log::GetInstance().warn("Corrupted data on "+ TABLE_NAME +" table : Interface not found", e);
-					continue;
+					site.reset(new Site);
+					load(site.get(), rows, i);
+					RoutePlannerModule::getSites().add(site);
 				}
-
-				RoutePlannerModule::getSites().add(site);
 			}
 		}
 
 
 		void SiteTableSync::rowsRemoved( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (RoutePlannerModule::getSites().contains(id))
+					RoutePlannerModule::getSites().remove(id);
+			}
 		}
 	}
 }
-
-
-

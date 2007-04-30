@@ -1,6 +1,6 @@
 
-/** Environment module related types definitions.
-	@file Types.h
+/** SiteCommercialLineLink class implementation.
+	@file SiteCommercialLineLink.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,51 +20,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_Env_Types_H__
-#define SYNTHESE_Env_Types_H__
-
-#include <set>
-#include <vector>
-#include <boost/shared_ptr.hpp>
+#include "SiteCommercialLineLink.h"
 
 namespace synthese
 {
-	namespace env
+	namespace routeplanner
 	{
-		class PhysicalStop;
-		class City;
 
-		/** @addtogroup m15
-		@{
-		*/
 
-		typedef std::set<const PhysicalStop*> PhysicalStopsSet;
+		void SiteCommercialLineLink::setSiteId( uid id )
+		{
+			_siteId = id;
+		}
 
-		typedef std::vector<boost::shared_ptr<const City> > CityList;
+		void SiteCommercialLineLink::setCommercialLineId( uid id )
+		{
+			_commercialLineId = id;
+		}
 
-		/** @} */
+		uid SiteCommercialLineLink::getSiteId() const
+		{
+			return _siteId;
+		}
+
+		uid SiteCommercialLineLink::getCommercialLineId() const
+		{
+			return _commercialLineId;
+		}
 	}
-
-	/** @addtogroup m15
-		@{
-	*/
-	typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
-
-	typedef struct {
-		double maxApproachDistance;
-		double maxApproachTime;
-		double approachSpeed;
-		int maxTransportConnectionCount;
-
-		bool bikeCompliance;
-		bool handicappedCompliance;
-		bool pedestrianCompliance;
-		bool withReservation;
-
-	} AccessParameters;
-
-	/** @} */
-
 }
-
-#endif // SYNTHESE_Env_Types_H__

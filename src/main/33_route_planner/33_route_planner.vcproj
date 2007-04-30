@@ -113,10 +113,26 @@
 				RelativePath=".\Site.h"
 				>
 			</File>
+			<File
+				RelativePath=".\SiteCommercialLineLink.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SiteCommercialLineLink.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
 			>
+			<File
+				RelativePath=".\EnvironmentLinkTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\EnvironmentLinkTableSync.h"
+				>
+			</File>
 			<File
 				RelativePath=".\SiteTableSync.cpp"
 				>

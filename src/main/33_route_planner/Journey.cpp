@@ -382,6 +382,10 @@ namespace synthese
 			return _effectiveDuration;
 		}
 
+		int Journey::getDistance() const
+		{
+			return _distance;
+		}
 
 	}
 }

@@ -1,6 +1,6 @@
 
-/** EnvironmentTableSync class header.
-	@file EnvironmentTableSync.h
+/** EnvironmentLinkTableSync class header.
+	@file EnvironmentLinkTableSync.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ENVLSSQL_ENVIRONMENTTABLESYNC_H
-#define SYNTHESE_ENVLSSQL_ENVIRONMENTTABLESYNC_H
+#ifndef SYNTHESE_ENVLSSQL_ENVIRONMENTLINKTABLESYNC_H
+#define SYNTHESE_ENVLSSQL_ENVIRONMENTLINKTABLESYNC_H
 
 #include <string>
 #include <iostream>
@@ -30,36 +30,44 @@
 
 namespace synthese
 {
-	namespace env
+	namespace routeplanner
 	{
-		/** Environment table sync.
-			@ingroup m15
+		class SiteCommercialLineLink;
+
+		/** Synchronizer for environment link tables.
+		    
+			This class holds a static mapping of classId <=> tableName to be maintained
+			each time a new component registry is added to the environment.
+			This synchronizer MUST be registered after all component synchronizers so that the mapping
+			is complete.
+
+			@ingroup m33
 		*/
-		class EnvironmentTableSync : public synthese::db::SQLiteTableSyncTemplate<Environment>
+
+		class EnvironmentLinkTableSync : public db::SQLiteTableSyncTemplate<SiteCommercialLineLink>
 		{
 		public:
-			static const std::string TABLE_COL_NAME;
+			static const std::string COL_SITE_ID;
+			static const std::string COL_COMMERCIAL_LINE_ID;
 
-			EnvironmentTableSync ();
-			~EnvironmentTableSync ();
+		 protected:
+
+			EnvironmentLinkTableSync ();
 
 			void rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
 					synthese::db::SQLiteSync* sync,
 					const synthese::db::SQLiteResult& rows, bool isFirstSync = false);
 
 			void rowsUpdated (const synthese::db::SQLiteQueueThreadExec* sqlite, 
-					synthese::db::SQLiteSync* sync,
-					const synthese::db::SQLiteResult& rows);
+					   synthese::db::SQLiteSync* sync,
+					   const synthese::db::SQLiteResult& rows);
 
 			void rowsRemoved (const synthese::db::SQLiteQueueThreadExec* sqlite, 
-					synthese::db::SQLiteSync* sync,
-					const synthese::db::SQLiteResult& rows);
-
-
-		private:
-
+					  synthese::db::SQLiteSync* sync,
+					  const synthese::db::SQLiteResult& rows);
 
 		};
 	}
 }
+
 #endif

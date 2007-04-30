@@ -144,6 +144,7 @@ namespace synthese
 			addTableColumn (COL_VIAPOINTS, "TEXT", true);
 
 			addTableIndex(COL_LINEID);
+			addTableIndex(COL_PHYSICALSTOPID);
 		}
 
 		void LineStopTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)

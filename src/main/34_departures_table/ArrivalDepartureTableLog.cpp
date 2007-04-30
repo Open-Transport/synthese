@@ -70,7 +70,7 @@ namespace synthese
 
 		std::string ArrivalDepartureTableLog::getName() const
 		{
-			return "Administration des terminaux d'affichage (tableaux de départs)";
+			return "Administration des tableaux de départs";
 		}
 	}
 }

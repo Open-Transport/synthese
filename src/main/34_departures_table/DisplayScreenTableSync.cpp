@@ -28,6 +28,7 @@
 
 #include "15_env/EnvModule.h"
 #include "15_env/LineStopTableSync.h"
+#include "15_env/LineTableSync.h"
 #include "15_env/PhysicalStopTableSync.h"
 
 #include "13_dblog/DBLogEntryTableSync.h"
@@ -375,6 +376,17 @@ namespace synthese
 				query << " AND " << _COL_BROADCAST_POINT_ID << "=" << localizationid;
 			if (typeuid > 0)
 				query << " AND d." << COL_TYPE_ID << "=" << typeuid;
+			if (lineid > 0)
+				query << " AND EXISTS(SELECT ls." << TABLE_COL_ID 
+					<< " FROM "
+						<< LineStopTableSync::TABLE_NAME << " AS ls "
+						<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
+						<< " INNER JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=p." << PhysicalStopTableSync::COL_PLACEID
+						<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS ll ON ll." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_LINEID 
+					<< " WHERE "
+						<< " b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID 
+						<< " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineid
+					<< ")";
 			if (orderByUid)
 				query << " ORDER BY d." << TABLE_COL_ID << (raisingOrder ? " ASC" : " DESC");
 			if (orderByLocalization)

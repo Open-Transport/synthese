@@ -1,4 +1,5 @@
 
+
 /** AddressTableSync class implementation.
 	@file AddressTableSync.cpp
 
@@ -20,108 +21,160 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sqlite/sqlite3.h>
-#include <assert.h>
+#include <sstream>
+
+#include "AddressTableSync.h"
+#include "Address.h"
+#include "15_env/EnvModule.h"
+
+#include "02_db/DBModule.h"
+#include "02_db/SQLiteResult.h"
+#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLiteException.h"
 
 #include "01_util/Conversion.h"
 
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLiteQueueThreadExec.h"
-
-#include "15_env/AddressTableSync.h"
-#include "15_env/Address.h"
-
+using namespace std;
 using namespace boost;
-
-using synthese::util::Conversion;
-using synthese::db::SQLiteResult;
 
 namespace synthese
 {
 	using namespace db;
+	using namespace util;
+	using namespace env;
 
-	namespace env
+	namespace db
 	{
+		template<> const std::string SQLiteTableSyncTemplate<Address>::TABLE_NAME = "t002_addresses";
+		template<> const int SQLiteTableSyncTemplate<Address>::TABLE_ID = 2;
+		template<> const bool SQLiteTableSyncTemplate<Address>::HAS_AUTO_INCREMENT = true;
 
-			AddressTableSync::AddressTableSync ()
-				: ComponentTableSync (ADDRESSES_TABLE_NAME, true, false, db::TRIGGERS_ENABLED_CLAUSE)
+		template<> void SQLiteTableSyncTemplate<Address>::load(Address* object, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
 		{
-			addTableColumn (ADDRESSES_TABLE_COL_PLACEID, "INTEGER", false);
-			addTableColumn (ADDRESSES_TABLE_COL_ROADID, "INTEGER", false);
-			addTableColumn (ADDRESSES_TABLE_COL_METRICOFFSET, "DOUBLE", false);
-			addTableColumn (ADDRESSES_TABLE_COL_X, "DOUBLE", true);
-			addTableColumn (ADDRESSES_TABLE_COL_Y, "DOUBLE", true);
+			uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
 
+			object->setKey(id);
+			object->setPlace(EnvModule::getConnectionPlaces ().get (Conversion::ToLongLong (rows.getColumn (rowIndex, AddressTableSync::COL_PLACEID))).get());
+			object->setRoad(EnvModule::getRoads ().get (Conversion::ToLongLong (rows.getColumn (rowIndex, AddressTableSync::COL_ROADID))).get());
+			object->setMetricOffset(Conversion::ToDouble (rows.getColumn (rowIndex, AddressTableSync::COL_METRICOFFSET)));
+			object->setX(Conversion::ToDouble (rows.getColumn (rowIndex, AddressTableSync::COL_X)));
+			object->setY(Conversion::ToDouble (rows.getColumn (rowIndex, AddressTableSync::COL_Y)));
 		}
 
-
-
-		AddressTableSync::~AddressTableSync ()
+		template<> void SQLiteTableSyncTemplate<Address>::save(Address* object)
 		{
-
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			if (object->getKey() <= 0)
+				object->setKey(getId(1,1));	/// @todo Use grid ID
+               
+			 query
+				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->getKey())
+				/// @todo fill other fields separated by ,
+				<< ")";
+			sqlite->execUpdate(query.str());
 		}
-
-		    
-
-
-		void 
-		AddressTableSync::doAdd (const synthese::db::SQLiteResult& rows, int rowIndex,
-					synthese::env::Environment& environment)
-		{
-			uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, db::TABLE_COL_ID)));
-		    
-			if (environment.getAddresses ().contains (id)) return;
-
-			shared_ptr<Address> address(
-			new synthese::env::Address (
-						id,
-						environment.getConnectionPlaces ().get (Conversion::ToLongLong (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_PLACEID))).get(),
-						environment.getRoads ().get (Conversion::ToLongLong (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_ROADID))).get(),
-						Conversion::ToDouble (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_METRICOFFSET)),
-						Conversion::ToDouble (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_X)),
-						Conversion::ToDouble (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_Y))
-						))
-			;
-		    
-
-			environment.getAddresses ().add (address);
-		}
-
-
-
-		void 
-		AddressTableSync::doReplace (const synthese::db::SQLiteResult& rows, int rowIndex,
-					synthese::env::Environment& environment)
-		{
-			uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-			shared_ptr<Address> address = environment.getAddresses ().getUpdateable (id);
-			address->setX (Conversion::ToDouble (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_X)));
-			address->setY (Conversion::ToDouble (rows.getColumn (rowIndex, ADDRESSES_TABLE_COL_Y)));
-		}
-
-
-
-		void 
-		AddressTableSync::doRemove (const synthese::db::SQLiteResult& rows, int rowIndex,
-					synthese::env::Environment& environment)
-		{
-			uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-			environment.getAddresses ().remove (id);
-		}
-
-
-
-
-
-
-
-
-
-
-
-
 
 	}
 
-}
+	namespace env
+	{
+		const std::string AddressTableSync::COL_PLACEID ("place_id");  // NU
+		const std::string AddressTableSync::COL_ROADID ("road_id");  // NU
+		const std::string AddressTableSync::COL_METRICOFFSET ("metric_offset");  // U ??
+		const std::string AddressTableSync::COL_X ("x");  // U ??
+		const std::string AddressTableSync::COL_Y ("y");  // U ??
 
+		AddressTableSync::AddressTableSync()
+			: SQLiteTableSyncTemplate<Address>(true, false, TRIGGERS_ENABLED_CLAUSE)
+		{
+			addTableColumn(TABLE_COL_ID, "INTEGER", false);
+			addTableColumn (COL_PLACEID, "INTEGER", false);
+			addTableColumn (COL_ROADID, "INTEGER", false);
+			addTableColumn (COL_METRICOFFSET, "DOUBLE", false);
+			addTableColumn (COL_X, "DOUBLE", true);
+			addTableColumn (COL_Y, "DOUBLE", true);
+		}
+
+		AddressTableSync::~AddressTableSync()
+		{
+
+		}
+
+		void AddressTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool)
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				if (EnvModule::getAddresses().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				{
+					load(EnvModule::getAddresses().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
+				}
+				else
+				{
+					shared_ptr<Address> object(new Address);
+					load(object.get(), rows, i);
+					EnvModule::getAddresses().add(object);
+				}
+			}
+		}
+		
+		void AddressTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (EnvModule::getAddresses().contains(id))
+				{
+					load(EnvModule::getAddresses().getUpdateable(id).get(), rows, i);
+				}
+			}
+		}
+
+		void AddressTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		{
+			for (int i=0; i<rows.getNbRows(); ++i)
+			{
+				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				if (EnvModule::getAddresses().contains(id))
+				{
+					EnvModule::getAddresses().remove(id);
+				}
+			}
+		}
+
+		std::vector<shared_ptr<Address> > AddressTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		{
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< " SELECT *"
+				<< " FROM " << TABLE_NAME
+				<< " WHERE " 
+				/// @todo Fill Where criteria
+				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+				;
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<shared_ptr<Address> > objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					shared_ptr<Address> object(new Address);
+					load(object.get(), result, i);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
+	}
+}

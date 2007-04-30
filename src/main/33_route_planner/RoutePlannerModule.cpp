@@ -39,11 +39,17 @@ namespace synthese
 	namespace routeplanner
 	{
 		Site::Registry				RoutePlannerModule::_sites;
+		SiteCommercialLineLink::Registry	RoutePlannerModule::_siteLineLinks;
 
 
 		Site::Registry& RoutePlannerModule::getSites()
 		{
 			return _sites;
+		}
+
+		SiteCommercialLineLink::Registry& RoutePlannerModule::getSiteLineLinks()
+		{
+			return _siteLineLinks;
 		}
 	}
 }

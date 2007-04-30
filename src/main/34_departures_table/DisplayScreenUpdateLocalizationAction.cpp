@@ -36,6 +36,7 @@
 #include "02_db/DBEmptyResultException.h"
 
 #include "01_util/Conversion.h"
+#include "01_util/Constants.h"
 
 using namespace std;
 using namespace boost;
@@ -99,7 +100,7 @@ namespace synthese
 				}
 				if (_localization->getConnectionPlace() != place)
 				{
-					vector<shared_ptr<BroadcastPoint> > result = BroadcastPointTableSync::search(place, 0, 1);
+					vector<shared_ptr<BroadcastPoint> > result = BroadcastPointTableSync::search(place.get() ? place->getKey() : UNKNOWN_VALUE, 0, 1);
 					if (result.empty())
 						throw ActionException("Corrupted data on Display Screen Localization Update Action");
 					_localization = result.front();
@@ -107,7 +108,7 @@ namespace synthese
 			}
 			else if (place.get())
 			{
-				vector<shared_ptr<BroadcastPoint> > result = BroadcastPointTableSync::search(place, 0, 1);
+				vector<shared_ptr<BroadcastPoint> > result = BroadcastPointTableSync::search(place->getKey(), 0, 1);
 				if (result.empty())
 					throw ActionException("Corrupted data on Display Screen Localization Update Action");
 				_localization = result.front();

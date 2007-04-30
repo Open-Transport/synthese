@@ -27,6 +27,7 @@
 
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
+#include "01_util/Constants.h"
 
 #include <string>
 #include <set>
@@ -55,10 +56,10 @@ namespace synthese
 		{
 			//! \name Properties
 			//@{
-				const interfaces::Interface*	_interface;
-				std::string						_name;  //!< Name of the site
-				synthese::time::Date			_startValidityDate;   
-				synthese::time::Date			_endValidityDate;   
+				boost::shared_ptr<const interfaces::Interface>	_interface;
+				std::string										_name;  //!< Name of the site
+				time::Date										_startValidityDate;
+				time::Date										_endValidityDate;
 			//@}
 
 			//! \name Environment
@@ -72,15 +73,25 @@ namespace synthese
 				bool _pastSolutionsDisplayed;
 			//@}
 
-		public:
-			//! \name Constructeur
+			//! \name Cached used days
 			//@{
-			Site( const uid& uid);
+				time::Date _minDateInUse;
+				time::Date _maxDateInUse;
 			//@}
 
-			//! \name Modificateurs
+		public:
+			static const std::string TEMPS_MIN_CIRCULATIONS;
+			static const std::string TEMPS_MAX_CIRCULATIONS;
+
+
+			//! \name Constructeur
 			//@{
-				void setInterface ( const synthese::interfaces::Interface* interf);
+				Site(uid uid = UNKNOWN_VALUE);
+			//@}
+
+			//! \name Setters
+			//@{
+				void setInterface (boost::shared_ptr<const interfaces::Interface> interf);
 				void setStartDate ( const synthese::time::Date& dateDebut );
 				void setEndDate ( const synthese::time::Date& dateFin );
 				void setOnlineBookingAllowed ( const bool valeur );
@@ -88,25 +99,47 @@ namespace synthese
 				void setName(const std::string& name);
 			//@}
 
-			//! \name Accesseurs
+			//! \name Getters
 			//@{
-//			const std::string& getIdentifiant() const;
-			const interfaces::Interface* getInterface() const;
-//			const synthese::time::Date& getDateDebut() const;
-//			const synthese::time::Date& getDateFin() const;
-			bool onlineBookingAllowed() const;
-//			bool getSolutionsPassees() const;
+				boost::shared_ptr<const interfaces::Interface> getInterface() const;
+				bool getOnlineBookingAllowed() const;
+				bool getPastSolutionsDisplayed() const;
+				const time::Date& getStartDate() const;
+				const time::Date& getEndDate() const;
+				const time::Date& getMinDateInUse () const;
+				const time::Date& getMaxDateInUse () const;
 			//@}
 
-			//! \name Calculateurs
+			// \name Modifiers
 			//@{
-			bool dateControl() const;
+				void updateMinMaxDatesInUse (const time::Date& newDate, bool marked);
 			//@}
 
+			//! \name Queries
+			//@{
+				bool dateControl() const;
+
+				/** Interprets date from text and environment data.
+					@param text Text to interpret
+					@return Interpreted date
+					@author Hugues Romain
+					@date 2005-2006
+					@warning The parameters are not verified
+
+					The returned date depends on the text :
+						- date au format texte interne : date transcrite (no control) (ex : 20070201 => 1/2/2007)
+						- commande de date classique (synthese::time::TIME_MIN ('m'), synthese::time::TIME_MAX ('M'), synthese::time::TIME_CURRENT ('A'), synthese::time::TIME_UNKNOWN ('?')) : la date correspondante (voir synthese::time::Date::setDate())
+						- texte vide : identical to synthese::time::TIME_CURRENT
+						- synthese::time::TIME_MIN_CIRCULATIONS ('r') : First date where at least one service runs (see Environment::getMinDateInUse())
+						- TEMPS_MAX_CIRCULATIONS ('R') : Last date where at least one service runs (see Environment::getMaxDateInUse())
+
+					The following assertion is always assumed : \f$ TEMPS_{INCONNU}<=TEMPS_{MIN}<=TEMPS_{MIN ENVIRONNEMENT}<=TEMPS_{MIN CIRCULATIONS}<=TEMPS_{ACTUEL}<=TEMPS_{MAX CIRCULATIONS}<=TEMPS_{MAX ENVIRONNEMENT}<=TEMPS_{MAX} \f$.
+				*/	
+				time::Date interpretDate( const std::string& text ) const;
+			//@}
 
 		};
 	}
 }
 
 #endif
-

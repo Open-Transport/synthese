@@ -40,7 +40,7 @@ namespace synthese
 
 		class SiteTableSync : public db::SQLiteTableSyncTemplate<Site>
 		{
-		private:
+		public:
 			static const std::string COL_INTERFACE_ID;
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_START_DATE;
@@ -48,12 +48,9 @@ namespace synthese
 			static const std::string TABLE_COL_ONLINE_BOOKING;
 			static const std::string TABLE_COL_USE_OLD_DATA;
 
-		public:
-
 			/** Site SQLite table constructor.
 			*/
 			SiteTableSync();
-			~SiteTableSync ();
 
 		protected:
 

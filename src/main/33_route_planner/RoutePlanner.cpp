@@ -139,38 +139,31 @@ namespace synthese
 		RoutePlanner::isPathCompliant (const Path* path) const
 		{
 
-			if (_accessParameters.bikeCompliance &&
-			path->getBikeCompliance ()->isCompliant () == false)
-			{
-			return false;
+			if (_accessParameters.bikeCompliance && path->getBikeCompliance () &&
+				path->getBikeCompliance ()->isCompliant () == false
+			){
+				return false;
 			}
 
-			if (_accessParameters.handicappedCompliance &&
-			path->getHandicappedCompliance ()->isCompliant () == false)
-			{
-			return false;
+			if (_accessParameters.handicappedCompliance && path->getHandicappedCompliance () &&
+				path->getHandicappedCompliance ()->isCompliant () == false
+			){
+				return false;
 			}
 
-			if (_accessParameters.handicappedCompliance &&
-			path->getHandicappedCompliance ()->isCompliant () == false)
-			{
-			return false;
+			if (_accessParameters.pedestrianCompliance && path->getPedestrianCompliance ()
+				&& path->getPedestrianCompliance ()->isCompliant () == false
+			){
+				return false;
 			}
 
-			if (_accessParameters.pedestrianCompliance &&
-			path->getPedestrianCompliance ()->isCompliant () == false)
-			{
-			return false;
-			}
-
-			if (_accessParameters.withReservation &&
-			path->getReservationRule ()->getType () != ReservationRule::RESERVATION_TYPE_COMPULSORY)
-			{
-			return false;
+			if (_accessParameters.withReservation && path->getReservationRule () &&
+				path->getReservationRule ()->getType () != ReservationRule::RESERVATION_TYPE_COMPULSORY
+			){
+				return false;
 			}
 
 			// TODO : fare testing...
-
 
 			return true;
 		}

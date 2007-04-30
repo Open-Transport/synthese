@@ -103,7 +103,7 @@ namespace synthese
 
 		std::string DisplayMaintenanceLog::getName() const
 		{
-			return "Supervision et maintenance des afficheurs (tableaux de départs)";
+			return "Supervision et maintenance des tableaux de départs";
 		}
 	}
 }

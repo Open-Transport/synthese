@@ -94,6 +94,8 @@ namespace synthese
 		{
 			addTableColumn (TABLE_COL_ID, "INTEGER");
 			addTableColumn (TABLE_COL_NAME, "TEXT");
+
+			addTableIndex(TABLE_COL_NAME);
 		}
 
 
