@@ -138,7 +138,6 @@ namespace synthese
 		bool 
 		RoutePlanner::isPathCompliant (const Path* path) const
 		{
-
 			if (_accessParameters.bikeCompliance && path->getBikeCompliance () &&
 				path->getBikeCompliance ()->isCompliant () == false
 			){

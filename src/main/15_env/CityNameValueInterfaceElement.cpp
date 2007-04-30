@@ -29,7 +29,6 @@
 #include "11_interfaces/ValueElementList.h"
 
 #include "15_env/City.h"
-#include "15_env/Environment.h"
 #include "15_env/CityNameValueInterfaceElement.h"
 
 using namespace boost;
