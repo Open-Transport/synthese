@@ -31,7 +31,8 @@ namespace synthese
 	{
 		void RoutePlannerNoSolutionInterfacePage::display( std::ostream& stream , const server::Request* request /*= NULL*/ ) const
 		{
-			InterfacePage::display(stream, ParametersVector(), VariablesMap(), NULL, request);
+		    VariablesMap vm;
+		    InterfacePage::display(stream, ParametersVector(), vm, NULL, request);
 		}
 	}
 }

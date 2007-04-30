@@ -8,52 +8,46 @@
 #include <iostream>
 
 #include "module.h"
-#include "30_server/Request.h"
-#include "00_tcp/Socket.h"
 
+#include "30_server/Request.h"
+#include "00_tcp/TcpClientSocket.h"
+#include "00_tcp/SocketException.h"
+
+#include <boost/iostreams/stream.hpp>
 
 
 using std::cout;
 using std::endl;
 
 using namespace synthese::server;
+using namespace synthese::tcp;
 
-namespace synthese
-{
-    namespace cgi_client
-    {
-    }
-}
 
 #define MAX_QUERY_SIZE 4096
 
-#ifdef UNIX
-	int main(int argc, char **argv)
-#endif
-#ifdef WIN32
-	#include <io.h>
-    int main(int argc, TCHAR* argv[], TCHAR* envp[])
-#endif
+int main(int argc, char **argv)
 {
+    // Response header 
+    cout << "Cache-Control: no-cache\n";
+    cout << "Content-type: text/html; charset=ISO-8859-1\n\n";
 
-  // first command line argument = server name or ip address
-  const char* server = "localhost";
-  if (argc > 1) 
+    // first command line argument = server name or ip address
+    const char* server = "localhost";
+    if (argc > 1) 
     {
-      server = argv[1];
+	server = argv[1];
     }
-  int port = DEF_PORT;
-  if (argc > 2) 
-  {
-      port = atoi (argv[2]);
-  }
+    int port = DEF_PORT;
+    if (argc > 2) 
+    {
+	port = atoi (argv[2]);
+    }
   
     char *path, *soft, *method, *script, *ip, *qptr, *query = NULL;
     struct in_addr addr;
     static char buffer[MAX_QUERY_SIZE+16]; /* query + ip */
     static char welcome[32];
     int bufpos;
-    synthese::tcp::Socket socket;
 
     // Récupèration de l'environnement CGI
     path = getenv("PATH");
@@ -63,8 +57,8 @@ namespace synthese
     if(method) {
 	if(*method == 'p' || *method == 'P')
 	{
-		query = (char*) malloc((atoi(getenv("CONTENT_LENGTH"))+2) * sizeof(char));
-		fgets(query, atoi(getenv("CONTENT_LENGTH"))+1, stdin);
+	    query = (char*) malloc((atoi(getenv("CONTENT_LENGTH"))+2) * sizeof(char));
+	    fgets(query, atoi(getenv("CONTENT_LENGTH"))+1, stdin);
 	}
 	else
 	    query = getenv("QUERY_STRING");
@@ -73,13 +67,13 @@ namespace synthese
     }
     ip = getenv("REMOTE_ADDR");
     if (ip)
-		addr.s_addr = inet_addr(getenv("REMOTE_ADDR"));
+	addr.s_addr = inet_addr(getenv("REMOTE_ADDR"));
 
     // Erreur si pas de requête
     if( query == NULL )
     {
-		cout << "HTTP/1.0 400 Bad Request\n\n";
-		exit(1);
+	cout << "HTTP/1.0 400 Bad Request\n\n";
+	exit(1);
     }
 
     // Formattage de la requête
@@ -88,94 +82,83 @@ namespace synthese
     qptr = query;
     while( *qptr && (qptr-query<MAX_QUERY_SIZE-1))
     {
-		// Conversion des caractères de la forme %30
-		if(*qptr == '%') 
-		{
-			char hex[3];
-			memcpy(hex,qptr+1,2);
-			hex[2] = 0;
-			buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
-			if(buffer[bufpos] == '~') buffer[bufpos] = '\''; 
-			bufpos++; qptr += 3;
-		}
-		// Conversion des caractères de la forme \\30
-		else if(*qptr == '\\')
-		{
-			char hex[3];
-			memcpy(hex,qptr+2,2);
-			hex[2] = 0;
-			buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
-			bufpos++; qptr += 4;
-		}
-		// Conversion du '+' en ' ' 
-		else if(*qptr == '+') 
-		{
-			buffer[bufpos++] = ' ';
-			qptr++;
-		}
-		else if(*qptr)
-		{
-			buffer[bufpos++] = *qptr;
-			qptr++;
-		}
+	// Conversion des caractères de la forme %30
+	if(*qptr == '%') 
+	{
+	    char hex[3];
+	    memcpy(hex,qptr+1,2);
+	    hex[2] = 0;
+	    buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
+	    if(buffer[bufpos] == '~') buffer[bufpos] = '\''; 
+	    bufpos++; qptr += 3;
+	}
+	// Conversion des caractères de la forme \\30
+	else if(*qptr == '\\')
+	{
+	    char hex[3];
+	    memcpy(hex,qptr+2,2);
+	    hex[2] = 0;
+	    buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
+	    bufpos++; qptr += 4;
+	}
+	// Conversion du '+' en ' ' 
+	else if(*qptr == '+') 
+	{
+	    buffer[bufpos++] = ' ';
+	    qptr++;
+	}
+	else if(*qptr)
+	{
+	    buffer[bufpos++] = *qptr;
+	    qptr++;
+	}
     }
 
-	// Adding of the client IP address to the request
-	strcat(buffer, Request::PARAMETER_SEPARATOR.c_str());
-	strcat(buffer, Request::PARAMETER_IP.c_str());
-	strcat(buffer, Request::PARAMETER_ASSIGNMENT.c_str());
-	strcat(buffer, ip);
-	// Adding of the client url prefix to the request
-	strcat(buffer, Request::PARAMETER_SEPARATOR.c_str());
-	strcat(buffer, Request::PARAMETER_CLIENT_URL.c_str());
-	strcat(buffer, Request::PARAMETER_ASSIGNMENT.c_str());
-	strcat(buffer, script);
-	// Adding end of line to close the request
-	strcat(buffer, "\r\n");
-		    
-    // Initialise la connection au serveur
-    try
-    {
-		socket.open(server, port, DEF_PROTO);
-		socket.connectToServer();
-    }
-    catch (const char *err)
-    {
-		socket.closeSocket();
-		cout << "HTTP/1.0 503 Service Unavailable: " << err << "\n\n";
-		exit(2);
-    }
-    // Vérification de l'identité du serveur
-/*    try
-    {
-		socket.read(welcome, strlen(WELCOME_MSG), 10);
-		if(strncmp(welcome, WELCOME_MSG, strlen(WELCOME_MSG)))
-			throw "no server";
-    }
-    catch (const char *err)
-    {
-	socket.closeSocket();
-	cout << "HTTP/1.0 500 Internal Server Error\n\n";
-	exit(3);
-    }
-*/
-    // Envoi de la requête au serveur
-    socket.write(buffer, strlen(buffer), 0);
+    // Adding of the client IP address to the request
+    strcat(buffer, Request::PARAMETER_SEPARATOR.c_str());
+    strcat(buffer, Request::PARAMETER_IP.c_str());
+    strcat(buffer, Request::PARAMETER_ASSIGNMENT.c_str());
+    strcat(buffer, ip);
+    // Adding of the client url prefix to the request
+    strcat(buffer, Request::PARAMETER_SEPARATOR.c_str());
+    strcat(buffer, Request::PARAMETER_CLIENT_URL.c_str());
+    strcat(buffer, Request::PARAMETER_ASSIGNMENT.c_str());
+    strcat(buffer, script);
+    // Adding end of line to close the request
+    strcat(buffer, "\r\n");
+		
+    // Init server connection
+    int timeout = 1;
+    TcpClientSocket clientSock (server, port, timeout);
+    boost::iostreams::stream<TcpClientSocket> cliSocketStream;
 
-    // Retour de la réponse
-    cout << "Cache-Control: no-cache\n";
-    cout << "Content-type: text/html; charset=ISO-8859-1\n\n";
-    while(socket.read(buffer, MAX_QUERY_SIZE, 10))
-		cout << buffer;
+    try 
+    {
+	clientSock.tryToConnect ();
+	
+	if (clientSock.isConnected () == false)
+	{
+	    cout << "HTTP/1.0 503 Service Unavailable\n\n";
+	    exit(2);
+	}
+	
+	cliSocketStream.open (clientSock);
+	
+	// Send request to server
+	cliSocketStream << buffer << std::flush;
+	
+	while (cliSocketStream.get (buffer, MAX_QUERY_SIZE))
+	    cout << buffer;
+	
+	cliSocketStream.close ();
+	exit(0);
+    }
+    catch (SocketException& e)
+    {
+	cliSocketStream.close ();
+	cout << "HTTP/1.0 503 Service Unavailable: " << e.getMessage () << "\n\n";
+	exit(2);
+    }
 
-	/** ATTENTION
-	ici danger de fermer avant la fin
-	si read=0 alors que calcul en cours ?
-	-> ajouter une séquence de terminaison !
-    */
-
-    // Fin nominale
-    socket.closeSocket();
-    exit(0);
 }
 

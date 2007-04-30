@@ -44,7 +44,8 @@ namespace synthese
 			pv.push_back( firstDepartureTime.isUnknown() ? "" : lastDepartureTime.toInternalString() );
 			pv.push_back( synthese::util::Conversion::ToString( isItContinuousService ) );
 
-			InterfacePage::display( stream, pv, VariablesMap(), NULL, request );
+			VariablesMap vm;
+			InterfacePage::display( stream, pv, vm, NULL, request );
 			
 		}
 	}

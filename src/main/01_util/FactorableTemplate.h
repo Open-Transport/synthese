@@ -38,13 +38,13 @@ namespace synthese
 
 			virtual const std::string& getFactoryKey() const;
 
-			static void integrate();
+			static void integrate ();
 		};
 
 		template<class F, class C>
-		void synthese::util::FactorableTemplate<F, C>::integrate()
+		void synthese::util::FactorableTemplate<F, C>::integrate ()
 		{
-			Factory<F>::integrate<C>();
+		    synthese::util::Factory<F>::template integrate<C> ();
 		}
 
 		template<class F, class C>

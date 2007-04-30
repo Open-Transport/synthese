@@ -21,8 +21,6 @@
 */
 
 
-#include "00_tcp/TcpService.h"
-#include "00_tcp/TcpServerSocket.h"
 #include "00_tcp/TcpClientSocket.h"
 #include "00_tcp/SocketException.h"
 

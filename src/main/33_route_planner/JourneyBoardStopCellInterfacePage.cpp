@@ -48,7 +48,8 @@ namespace synthese
 			pv.push_back( firstTime.isUnknown() ? "" : firstTime.toInternalString() );
 			pv.push_back( lastTime.isUnknown() ? "" : lastTime.toInternalString() );
 
-			InterfacePage::display( stream, pv, VariablesMap(), NULL, request );
+			VariablesMap vm;
+			InterfacePage::display( stream, pv, vm, NULL, request );
 		}
 	}
 }

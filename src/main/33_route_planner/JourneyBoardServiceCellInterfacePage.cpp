@@ -66,7 +66,8 @@ namespace synthese
 			pv.push_back( alarm != NULL ? synthese::util::Conversion::ToString( alarm->getLevel() ) : "" );
 			pv.push_back( synthese::util::Conversion::ToString( color ) );
 
-			InterfacePage::display( stream, pv, VariablesMap(), (const void*) line, request );
+			VariablesMap vm;
+			InterfacePage::display( stream, pv, vm, (const void*) line, request );
 		}
 	}
 }

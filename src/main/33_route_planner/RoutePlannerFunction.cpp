@@ -100,7 +100,8 @@ namespace synthese
 			endDate.addDaysDuration(1);
 			RoutePlanner r(_departure_place.get(), _arrival_place.get(), AccessParameters(), PlanningOrder(), _date, endDate);
 			Journeys jv = r.computeJourneySheetDepartureArrival();
-			_page->display(stream, VariablesMap(), &jv, _request);
+			VariablesMap vm;
+			_page->display(stream, vm, &jv, _request);
 		}
 	}
 }
