@@ -39,7 +39,7 @@ namespace synthese
 	{
 		template<> const string RightTemplate<GlobalRight>::NAME("Général");
 
-		template<> Right::ParameterLabelsVector RightTemplate<GlobalRight>::getParametersLabels() const
+		template<> Right::ParameterLabelsVector RightTemplate<GlobalRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER, "(tout)"));
