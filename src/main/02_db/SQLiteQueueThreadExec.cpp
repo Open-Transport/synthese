@@ -26,6 +26,7 @@
 #include "01_util/Factory.h"
 
 #include "02_db/SQLite.h"
+#include "02_db/SQLiteException.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteTableSync.h"
 #include "02_db/SQLiteQueueThreadExec.h"
@@ -100,13 +101,24 @@ namespace synthese
 			// Lock db til register callback is executed (can use this db connection)
 			boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
 
-			_hooks.push_back (hook);
 			if (_db != 0)
 			{
-				// database handle has been initialized
-				// call the register callback directly
-				hook->registerCallback (this);
+			    throw SQLiteException ("Update hooks should have been registered before SQLite queue thread is started!");
 			}
+
+			_hooks.push_back (hook);
+
+			/*
+			  // NOTE : If we really need to add update hook on the fly, review this cos synchronous updates
+			  // causes inifite loop (enqueued events but loop not started.)
+
+			  if (_db != 0)
+			  {
+			  // database handle has been initialized
+			  // call the register callback directly
+			  hook->registerCallback (this);
+			}
+			*/
 		}
 
 

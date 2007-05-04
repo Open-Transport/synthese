@@ -60,9 +60,7 @@ namespace synthese
 		_sqliteQueueThreadExec = new SQLiteQueueThreadExec (GetDatabasePath ());
 		
 		bool autorespawn (true);
-		ManagedThread* sqliteQueueThread = 
-		    new ManagedThread (_sqliteQueueThreadExec, "sqlite_queue", 100, autorespawn);
-		
+
 		SQLiteSync* syncHook = new SQLiteSync ();
 		
 		// Register all table syncs
@@ -75,6 +73,10 @@ namespace synthese
 		}
 		
 		_sqliteQueueThreadExec->registerUpdateHook (syncHook);
+
+		ManagedThread* sqliteQueueThread = 
+		    new ManagedThread (_sqliteQueueThreadExec, "sqlite_queue", 100, autorespawn);
+		
 		
 		synthese::tcp::TcpService* service = 
 		    synthese::tcp::TcpService::openService (sqliteServicePort);
