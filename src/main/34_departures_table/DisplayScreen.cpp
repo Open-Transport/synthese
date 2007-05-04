@@ -143,8 +143,8 @@ namespace synthese
 					, endDateTime
 					, _displayType->getRowNumber()
 					, _forcedDestinations
-					, _blinkingDelay
 					, _destinationForceDelay
+					, _blinkingDelay
 				));
 			}
 		}

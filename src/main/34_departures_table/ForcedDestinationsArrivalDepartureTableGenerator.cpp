@@ -159,6 +159,15 @@ namespace synthese
 				}
 			}
 
+
+			if (_result.size() > _maxSize)
+			{
+			    ArrivalDepartureList::iterator itr = _result.begin ();
+			    std::advance(itr, _maxSize);
+			    _result.erase (itr, _result.end ());
+			}
+
+
 			return _result;
 
 		}
