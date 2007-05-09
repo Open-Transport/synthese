@@ -6,6 +6,7 @@
   <property name="lang" value="c++"/>
   
   <property name="include.home" value="${src.home}"/>
+
   <property name="deploy.local.lib.regexp.from" value="(.*)"/>
   <property name="deploy.local.lib.regexp.to" value="\1"/>
 
@@ -72,7 +73,11 @@
 
 
 
-  <target name="deploy" depends="dist">
+  <target name="remoteinstall" depends="dist">
+
+    <fail unless="remoteinstall.host"/>
+
+    <property name="remoteinstall.user" value="build"/>
 
     <propertyregex property="targetname" input="${target}" casesensitive="false"
 		   regexp="^.*/(.*)" select="\1" override="true"/>
@@ -83,116 +88,24 @@
 
       <switch value="${platform}">
       
-        <case value="win32">
-
-	  <exec executable="${env.COMSPEC}" failonerror="true" 
-		resolveexecutable="true" searchpath="true">
-            <arg value="/c scp -q -C -r -P ${deploy.ssh.port} ${build.home}/${platform}/${toolset}/${mode}/main/${targetname}/${distname}_dist ${deploy.ssh.user}@${deploy.ssh.host}:" />
-	  </exec>
-	  
-	  <exec executable="${env.COMSPEC}" failonerror="true" 
-		resolveexecutable="true" searchpath="true">
-            <arg value="/c ssh -p ${deploy.ssh.port} ${deploy.ssh.user}@${deploy.ssh.host} &quot; cd ${distname}_dist &amp;&amp; sudo ./install.sh &quot;" />
-	  </exec>
-	  
-        </case>
         
         <case value="posix">
-	  
-           <exec executable="scp" failonerror="true"  
-                 resolveexecutable="true" searchpath="true"> 
-             <arg value="-q"/> 
-             <arg value="-C"/> 
-             <arg value="-r"/> 
-             <arg value="-P ${deploy.ssh.port}"/> 
-             <arg value="${build.home}/${platform}/${toolset}/${mode}/main/${targetname}/${distname}_dist"/> 
-             <arg value="${deploy.ssh.user}@${deploy.ssh.host}:${deploy.ssh.tmpdir}"/> 
-           </exec> 
-      
-          <exec executable="ssh" failonerror="true"
-                resolveexecutable="true" searchpath="true">
-            <arg value="-p ${deploy.ssh.port}"/>
-            <arg value="${deploy.ssh.user}@${deploy.ssh.host}"/>
-            <arg value="cd ${deploy.ssh.tmpdir}/${distname}_dist &amp;&amp; ./install.sh"/>
-          </exec>
-      
+	  <shellscript shell="bash">
+           scp -r -C -P 200 ${distdir} ${remoteinstall.user}@${remoteinstall.host}:/srv/tmp/ 
+           ssh -p 200 ${remoteinstall.user}@${remoteinstall.host} &quot;cd /srv/tmp/${distname}_dist &amp;&amp; sudo ./install.sh&quot;
+          </shellscript>
 	  
 
         </case>
         
         <default>
-          <echo message="Do not know how to deploy on ${platform}" />
+          <echo message="Do not know how to remoteinstall on ${platform}" />
         </default>
       </switch>
       
       
-      
-<!--     <sshexec host="${deploy.ssh.host}" trust="true" -->
-<!-- 	     username="${deploy.ssh.user}" -->
-<!-- 	     port="200" password="${pwd}" -->
-<!-- 	     command="cd ${distname}_dist &amp;&amp; -->
-<!-- 		      sudo ./install.sh"/> -->
-
   </target>
 
-
-
-<!--
-       
-  <target name="dist">
-
-
-    <for param="targ" list="${target}">
-       <sequential>
-	 <propertyregex property="distname" input="@{targ}" casesensitive="false"
-			regexp="^.*/(.*)" select="\1" override="true"/>
-	 <var name="distdir" 
-		   value="${dist.home}/${distname}_${platform}_${toolset}_${mode}"/>
-
-
-	 <antcall target="sconsbuild">
-	   <param name="goal" value="dist"/>
-	   <param name="target" value="@{targ}"/>
-	   <param name="profile" value="false"/>
-	 </antcall>
-	 
-	 <if>
-	   <and>
-	     <equals arg1="${platform}" arg2="posix"/>
-	     <equals arg1="${mode}" arg2="release"/>
-	   </and>
-	   <then>
-	     <chmod dir="${distdir}" perm="+x" 
-		    includes="**/*.sh"/>
-	     <chmod file="${distdir}/${distname}" perm="+x" />
-
-	     <echo message="Stripping ${distdir}/${distname}"/>
-	     <exec executable="strip" failonerror="true" 
-		   resolveexecutable="true" searchpath="true">
-	       <arg value="${distdir}/${distname}"/>
-	     </exec>       
-	   </then>
-	 </if>
-	 
-	 <delete file="${distdir}.zip"/> 
-	 <zip destfile="${distdir}.zip"> 
-	   
-	   <zipfileset filemode="755" dir="${dist.home}" 
-		       includes="${distname}_${platform}_${mode}/${distname},
-				 ${distname}_${platform}_${mode}/**/*.sh"/>
-	   
-	   <zipfileset dir="${dist.home}"
-		       includes="${distname}_${platform}_${mode}/**"
-		       excludes="${distname}_${platform}_${mode}/${distname},
-				 ${distname}_${platform}_${mode}/**/*.sh"/>
-	   
-	 </zip>
-	 
-       </sequential>
-    </for>
-
-  </target>
--->
 
 
 </project>
