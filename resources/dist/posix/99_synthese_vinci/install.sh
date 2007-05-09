@@ -12,8 +12,18 @@ INSTALLLOGFILE=${4:-/var/log/$DISTNAME.log}
 echo Install dir is set to $INSTALLDIR
 mkdir -p $INSTALLDIR/$DISTNAME
 
-echo Stopping service $DISTNAME
-test -x /etc/init.d/$DISTNAME && /etc/init.d/$DISTNAME stop
+
+WASSTARTED=0
+(pgrep -x $DISTNAME >> /dev/null) && {
+    WASSTARTED=1
+}
+
+
+
+[ "$WASSTARTED" != 0 ] && {
+  test -x /etc/init.d/$DISTNAME && /etc/init.d/$DISTNAME stop
+}
+
 
 echo Installing server in $INSTALLDIR
 cp -rf _$DISTNAME/* $INSTALLDIR/$DISTNAME/
@@ -27,8 +37,11 @@ sed -i "s?#INSTALLLOGLEVEL#?$INSTALLLOGLEVEL?" /etc/init.d/$DISTNAME
 
 sed -i "s?#INSTALLLOGFILE#?$INSTALLLOGFILE?" $INSTALLDIR/$DISTNAME/startup.sh
 
-echo Starting service $DISTNAME
-test -x /etc/init.d/$DISTNAME && /etc/init.d/$DISTNAME start
+[ "$WASSTARTED" != 0 ] && {
+  test -x /etc/init.d/$DISTNAME && /etc/init.d/$DISTNAME start
+}
+
+
 
 
 

@@ -33,7 +33,7 @@ case "$1" in
 		log_daemon_msg "Stopping #DISTNAME# service..."
 
 		start-stop-daemon --stop --quiet --pidfile $PIDFILE
-		kill -2 `pidof #DISTNAME#`
+		pkill -SIGINT -x #DISTNAME#
 
 		# Wait a little and remove stale PID file
 		sleep 1
