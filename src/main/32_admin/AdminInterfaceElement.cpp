@@ -39,39 +39,10 @@ namespace synthese
 
 	namespace admin
 	{
-		AdminInterfaceElement::AdminInterfaceElement(const std::string& superior, AdminInterfaceElement::DisplayMode everDisplayed)
-			: _superior(superior)
-			, _everDisplayed(everDisplayed)
-		{		}
 
-		const AdminInterfaceElement::DisplayMode AdminInterfaceElement::getDisplayMode() const
+		AdminInterfaceElement::AdminInterfaceElement()
 		{
-			return _everDisplayed;
-		}
 
-		const std::string& AdminInterfaceElement::getSuperior() const
-		{
-			return _superior;
-		}
-
-/*		std::string AdminInterfaceElement::getHTMLLink(const server::FunctionRequest<admin::AdminRequest>* request) const
-		{
-			stringstream str;
-			FunctionRequest<AdminRequest> linkRequest(request);
-			linkRequest.getFunction()->setPage(this);
-			str << HTMLModule::getHTMLLink(linkRequest.getURL(), getTitle());
-			linkRequest.getFunction()->setPage(NULL); // To avoid the deletion of the page which can be used later
-			return str.str();
-		}
-*/
-		void AdminInterfaceElement::_setSuperior( const std::string& superior )
-		{
-			_superior = superior;
-		}
-
-		std::string AdminInterfaceElement::getIcon() const
-		{
-			return "application_form.png";
 		}
 	}
 }

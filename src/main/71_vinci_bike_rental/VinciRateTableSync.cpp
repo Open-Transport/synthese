@@ -44,7 +44,7 @@ namespace synthese
 		
 		template<> void SQLiteTableSyncTemplate<VinciRate>::load(VinciRate* vr, const SQLiteResult& rows, int rowId)
 		{
-			vr->setKey(Conversion::ToLongLong(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_ID)));
+			vr->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			vr->_name = rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_NAME);
 			vr->_validityDuration = Conversion::ToDouble(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_VALIDITY_DURATION));
 			vr->_startFinancialPrice = Conversion::ToDouble(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_START_FINANCIAL_PRICE));
@@ -76,7 +76,7 @@ namespace synthese
 					<< "," << VinciRateTableSync::TABLE_COL_RECURRING_PENALTY << "=" << vr->_recurringPenalty
 					<< "," << VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD << "=" << vr->_recurringPenaltyPeriod
 					<< "," << VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST << "=" << Conversion::ToString(vr->_recurringPenaltyCancelsFirst)
-					<< " WHERE " << VinciRateTableSync::TABLE_COL_ID << "=" << vr->getKey();
+					<< " WHERE " << TABLE_COL_ID << "=" << vr->getKey();
 			}
 			else
 			{	// INSERT

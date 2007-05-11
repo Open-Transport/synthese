@@ -24,6 +24,7 @@
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/UpdateDisplayMaintenanceAction.h"
+#include "34_departures_table/DisplaySearchAdmin.h"
 
 #include "05_html/HTMLForm.h"
 #include "05_html/HTMLTable.h"
@@ -46,13 +47,25 @@ namespace synthese
 	using namespace util;
 	using namespace html;
 	using namespace dblog;
+	using namespace departurestable;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement, DisplayMaintenanceAdmin>::FACTORY_KEY("dmaint");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<DisplayMaintenanceAdmin>::ICON("monitor_lightning.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<DisplayMaintenanceAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
+		template<> string AdminInterfaceElementTemplate<DisplayMaintenanceAdmin>::getSuperior()
+		{
+			return DisplaySearchAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace departurestable
 	{
-		DisplayMaintenanceAdmin::DisplayMaintenanceAdmin()
-			: AdminInterfaceElement("displays", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
-			{}
-
 		void DisplayMaintenanceAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
@@ -179,9 +192,10 @@ namespace synthese
 			return true;
 		}
 
-		std::string DisplayMaintenanceAdmin::getIcon() const
+		DisplayMaintenanceAdmin::DisplayMaintenanceAdmin()
+			: AdminInterfaceElementTemplate<DisplayMaintenanceAdmin>()
 		{
-			return "monitor_lightning.png";
+	
 		}
 	}
 }

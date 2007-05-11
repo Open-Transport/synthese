@@ -54,33 +54,24 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<VinciBike>::load(VinciBike* bike, const db::SQLiteResult& rows, int rowId)
 		{
-			bike->setKey(Conversion::ToLongLong(rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_ID)));
+			bike->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			bike->setNumber(rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_NUMBER));
 			bike->setMarkedNumber(rows.getColumn(rowId, VinciBikeTableSync::TABLE_COL_MARKED_NUMBER));
 		}
 
 		template<> void SQLiteTableSyncTemplate<VinciBike>::save(VinciBike* bike)
 		{
-			const db::SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (bike->getKey() != 0)
-			{	//UPODATE
-				query << "UPDATE " << TABLE_NAME << " SET "
-					<< VinciBikeTableSync::TABLE_COL_ID << "=" << Conversion::ToString(bike->getKey())
-					<< "," << VinciBikeTableSync::TABLE_COL_NUMBER << "=" << Conversion::ToSQLiteString(bike->getNumber())
-					<< "," << VinciBikeTableSync::TABLE_COL_MARKED_NUMBER << "=" << Conversion::ToSQLiteString(bike->getMarkedNumber())
-					;
-			}
-			else
-			{	// INSERT
+			if (bike->getKey() <= 0)
 				bike->setKey(getId(1,1)); /// @todo Handle grid number
-				query << "INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(bike->getKey())
-					<< "," << Conversion::ToSQLiteString(bike->getNumber())
-					<< "," << Conversion::ToSQLiteString(bike->getMarkedNumber())
-					<< ")";
-			}
-			sqlite->execUpdate(query.str());
+
+			stringstream query;
+			query << "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(bike->getKey())
+				<< "," << Conversion::ToSQLiteString(bike->getNumber())
+				<< "," << Conversion::ToSQLiteString(bike->getMarkedNumber())
+				<< ")";
+
+			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 
 	}

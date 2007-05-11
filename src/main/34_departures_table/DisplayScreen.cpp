@@ -30,7 +30,6 @@
 #include "15_env/Edge.h"
 #include "15_env/Types.h"
 
-#include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DisplayMaintenanceLog.h"
@@ -88,7 +87,7 @@ namespace synthese
 
 		/** Modificateur du point d'arrêt.
 		*/
-		void DisplayScreen::setLocalization(shared_ptr<const BroadcastPoint> bp)
+		void DisplayScreen::setLocalization(shared_ptr<const ConnectionPlace> bp)
 		{
 			_localization = bp;
 		}
@@ -149,7 +148,7 @@ namespace synthese
 			}
 		}
 
-		shared_ptr<const BroadcastPoint> DisplayScreen::getLocalization() const
+		shared_ptr<const ConnectionPlace> DisplayScreen::getLocalization() const
 		{
 			return _localization;
 		}
@@ -307,7 +306,7 @@ namespace synthese
 		const PhysicalStopsSet& DisplayScreen::getPhysicalStops(bool result) const
 		{
 			return (_allPhysicalStopsDisplayed && _localization && result)
-				? _localization->getConnectionPlace()->getPhysicalStops()
+				? _localization->getPhysicalStops()
 				: _physicalStops;
 		}
 

@@ -34,7 +34,7 @@
 
 #include "13_dblog/DBLogEntry.h"
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -92,7 +92,7 @@ namespace synthese
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
 		*/
-		class DBLogViewer : public admin::AdminInterfaceElement
+		class DBLogViewer : public admin::AdminInterfaceElementTemplate<DBLogViewer>
 		{
 			//! \name Stored parameters
 			//@{
@@ -136,8 +136,6 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
-
-			std::string getIcon() const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}

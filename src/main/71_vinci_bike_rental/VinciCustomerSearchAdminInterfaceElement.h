@@ -26,11 +26,9 @@
 
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
-
 #include "05_html/ActionResultHTMLTable.h"
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -41,7 +39,7 @@ namespace synthese
 		/** VinciCustomerSearchAdminInterfaceElement Class.
 			@ingroup m71Admin refAdmin
 		*/
-		class VinciCustomerSearchAdminInterfaceElement : public admin::AdminInterfaceElement
+		class VinciCustomerSearchAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>
 		{
 		public:
 			static const std::string PARAM_SEARCH_NAME;

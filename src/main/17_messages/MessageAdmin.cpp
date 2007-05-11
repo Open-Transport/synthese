@@ -35,6 +35,8 @@
 #include "17_messages/SentAlarm.h"
 #include "17_messages/AlarmTemplate.h"
 #include "17_messages/AlarmTableSync.h"
+#include "17_messages/MessagesAdmin.h"
+#include "17_messages/MessagesLibraryAdmin.h"
 
 #include "30_server/ActionFunctionRequest.h"
 
@@ -50,13 +52,27 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
+	using namespace messages;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement,MessageAdmin>::FACTORY_KEY("message");
+	}
+
+	namespace admin
+	{
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<MessageAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
+		template<> const string AdminInterfaceElementTemplate<MessageAdmin>::ICON("note.png");
+		template<> string AdminInterfaceElementTemplate<MessageAdmin>::getSuperior()
+		{
+//			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
+//				return MessagesLibraryAdmin::FACTORY_KEY;
+			return MessagesAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace messages
 	{
-		/// @todo Verify the parent constructor parameters
-		MessageAdmin::MessageAdmin()
-			: AdminInterfaceElement("messages", AdminInterfaceElement::DISPLAYED_IF_CURRENT) {}
-
 		string MessageAdmin::getTitle() const
 		{
 			return _alarm->getShortMessage();
@@ -81,9 +97,6 @@ namespace synthese
 			}
 
 			_parameters = map;
-
-			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
-				_setSuperior("messageslibrary");
 		}
 
 		void MessageAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
@@ -184,9 +197,10 @@ namespace synthese
 			return true;
 		}
 
-		std::string MessageAdmin::getIcon() const
+		MessageAdmin::MessageAdmin()
+			: AdminInterfaceElementTemplate<MessageAdmin>()
 		{
-			return "note.png";
+		
 		}
 	}
 }

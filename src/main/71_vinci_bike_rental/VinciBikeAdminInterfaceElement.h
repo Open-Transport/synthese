@@ -26,7 +26,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -37,7 +37,7 @@ namespace synthese
 		/** VinciBikeSearchAdminInterfaceElement Class.
 			@ingroup m71Admin refAdmin
 		*/
-		class VinciBikeAdminInterfaceElement : public admin::AdminInterfaceElement
+		class VinciBikeAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>
 		{
 			boost::shared_ptr<VinciBike> _bike;
 

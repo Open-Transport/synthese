@@ -27,7 +27,7 @@
 
 #include "05_html/ResultHTMLTable.h"
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
 #include "34_departures_table/Types.h"
@@ -75,7 +75,7 @@ namespace synthese
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
 
 		*/
-		class BroadcastPointsAdmin : public admin::AdminInterfaceElement
+		class BroadcastPointsAdmin : public admin::AdminInterfaceElementTemplate<BroadcastPointsAdmin>
 		{
 			std::string				_cityName;
 			std::string				_placeName;
@@ -109,7 +109,6 @@ namespace synthese
 			*/
 			std::string getTitle() const;
 
-			std::string getIcon() const;
 			/** isAuthorized.
 				@param request
 				@return bool

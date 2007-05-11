@@ -136,28 +136,34 @@ namespace synthese
 
 
 		bool 
-		RoutePlanner::isPathCompliant (const Path* path) const
+		RoutePlanner::isPathCompliant (const Path& path) const
 		{
-			if (_accessParameters.bikeCompliance && path->getBikeCompliance () &&
-				path->getBikeCompliance ()->isCompliant () == false
+
+			if (_accessParameters.bikeCompliance
+				&& (!path.getBikeCompliance ()
+					|| path.getBikeCompliance ()->isCompliant () == false
+					)
 			){
 				return false;
 			}
 
-			if (_accessParameters.handicappedCompliance && path->getHandicappedCompliance () &&
-				path->getHandicappedCompliance ()->isCompliant () == false
+			if (_accessParameters.handicappedCompliance
+				&& path.getHandicappedCompliance ()
+				&& path.getHandicappedCompliance ()->isCompliant () == false
 			){
 				return false;
 			}
 
-			if (_accessParameters.pedestrianCompliance && path->getPedestrianCompliance ()
-				&& path->getPedestrianCompliance ()->isCompliant () == false
+			if (_accessParameters.pedestrianCompliance
+				&& path.getPedestrianCompliance ()
+				&& path.getPedestrianCompliance ()->isCompliant () == false
 			){
 				return false;
 			}
 
-			if (_accessParameters.withReservation && path->getReservationRule () &&
-				path->getReservationRule ()->getType () != ReservationRule::RESERVATION_TYPE_COMPULSORY
+			if (_accessParameters.withReservation
+				&& path.getReservationRule ()
+				&& path.getReservationRule ()->getType () != ReservationRule::RESERVATION_TYPE_COMPULSORY
 			){
 				return false;
 			}
@@ -491,7 +497,7 @@ namespace synthese
 		RoutePlanner::integralSearch (const VertexAccessMap& vam, 
 						  const DateTime& desiredTime,
 						  const AccessDirection& accessDirection,
-						  const Journey* currentJourney,
+						  const Journey& currentJourney,
 						  int maxDepth,
 						  SearchAddresses searchAddresses, 
 						  SearchPhysicalStops searchPhysicalStops,
@@ -516,10 +522,10 @@ namespace synthese
 			{
 				const Edge* edge = (*itEdge);
 
-				if (isPathCompliant (edge->getParentPath ()) == false) continue;
+				if (isPathCompliant (*edge->getParentPath ()) == false) continue;
 
 				// TODO : reintroduce optimization on following axis departure/arrival ?
-				if (areAxisContraintsFulfilled (edge->getParentPath (), *currentJourney) == false) continue;
+				if (areAxisContraintsFulfilled (edge->getParentPath (), currentJourney) == false) continue;
 
 				int continuousServiceRange = 0;
 				int serviceNumber = 0;
@@ -569,7 +575,7 @@ namespace synthese
 				{
 				
 				if (evaluateArrival (curEdge, departureMoment, edge, service, 
-							 journeyPart, *currentJourney, strictTime,
+							 journeyPart, currentJourney, strictTime,
 							 continuousServiceRange) == false) 
 				{
 					break;
@@ -617,7 +623,7 @@ namespace synthese
 									   nextVertex,
 									   useRoads,
 									   useLines);
-			Journey nextCurrentJourney (*currentJourney);
+			Journey nextCurrentJourney (currentJourney);
 			nextCurrentJourney.append (*itLeg);
 			
 			if ( (searchAddresses && (nextVertex->isAddress ())) ||
@@ -633,7 +639,7 @@ namespace synthese
 				Journeys nextParts = integralSearch (nextVam,
 									  (*itLeg)->getArrivalTime (),
 									  accessDirection,
-									  &nextCurrentJourney,
+									  nextCurrentJourney,
 									  --maxDepth,
 									  searchAddresses,
 									  searchPhysicalStops,
@@ -679,7 +685,7 @@ namespace synthese
 			Journeys journeyParts = integralSearch (vam, 
 								 _minDepartureTime,
 								 accessDirection, 
-								 &currentJourney,
+								 currentJourney,
 								 0, 
 								 DO_NOT_SEARCH_ADDRESSES,
 								 SEARCH_PHYSICALSTOPS,
@@ -831,7 +837,7 @@ namespace synthese
 			Journeys originJourneys = integralSearch (_originVam,
 								   _journeySheetStartTime,
 								   TO_DESTINATION,
-								   0,
+								   Journey(),
 								   std::numeric_limits<int>::max (),
 								   DO_NOT_SEARCH_ADDRESSES,
 								   SEARCH_PHYSICALSTOPS,
@@ -850,15 +856,15 @@ namespace synthese
 			for (Journeys::const_iterator itoj = originJourneys.begin ();
 			 itoj != originJourneys.end (); ++itoj)
 			{
-			const Journey& oj = (*itoj);
-			VertexAccess va;
-			va.approachTime = _originVam.getVertexAccess (
-				oj.getOrigin ()->getFromVertex ()).approachTime + oj.getDuration ();
+				const Journey& oj = (*itoj);
+				VertexAccess va;
+				va.approachTime = _originVam.getVertexAccess (
+					oj.getOrigin ()->getFromVertex ()).approachTime + oj.getDuration ();
 
-			va.approachDistance = _originVam.getVertexAccess (
-				oj.getOrigin ()->getFromVertex ()).approachDistance + oj.getDistance ();
+				va.approachDistance = _originVam.getVertexAccess (
+					oj.getOrigin ()->getFromVertex ()).approachDistance + oj.getDistance ();
 			
-			ovam.insert (oj.getDestination ()->getFromVertex (), va);
+				ovam.insert (oj.getDestination ()->getFromVertex (), va);
 			}
 
 
@@ -866,7 +872,7 @@ namespace synthese
 			Journeys destinationJourneys = integralSearch (_destinationVam,
 									_journeySheetEndTime,
 									FROM_ORIGIN,
-									0,
+									Journey(),
 									std::numeric_limits<int>::max (),
 									DO_NOT_SEARCH_ADDRESSES,
 									SEARCH_PHYSICALSTOPS,
@@ -884,14 +890,14 @@ namespace synthese
 			for (Journeys::const_iterator itdj = destinationJourneys.begin ();
 			 itdj != destinationJourneys.end (); ++itdj)
 			{
-			const Journey& dj = (*itdj);
-			VertexAccess va;
-			va.approachTime = _destinationVam.getVertexAccess (
-				dj.getDestination ()->getFromVertex ()).approachTime + dj.getDuration ();
-			va.approachDistance = _destinationVam.getVertexAccess (
-				dj.getDestination ()->getFromVertex ()).approachDistance + dj.getDistance ();
-			
-			dvam.insert (dj.getDestination ()->getFromVertex (), va);
+				const Journey& dj = (*itdj);
+				VertexAccess va;
+				va.approachTime = _destinationVam.getVertexAccess (
+					dj.getDestination ()->getFromVertex ()).approachTime + dj.getDuration ();
+				va.approachDistance = _destinationVam.getVertexAccess (
+					dj.getDestination ()->getFromVertex ()).approachDistance + dj.getDistance ();
+				
+				dvam.insert (dj.getDestination ()->getFromVertex (), va);
 			}
 
 

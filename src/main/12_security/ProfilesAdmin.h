@@ -29,7 +29,7 @@
 
 #include "05_html/ActionResultHTMLTable.h"
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -81,7 +81,7 @@ namespace synthese
 				- INFO : Suppression de profil
 				- WARNING : Tentative de suppression de profil utilisé
 		*/
-		class ProfilesAdmin : public admin::AdminInterfaceElement
+		class ProfilesAdmin : public admin::AdminInterfaceElementTemplate<ProfilesAdmin>
 		{
 			static const std::string PARAMETER_SEARCH_NAME;
 			static const std::string PARAMETER_SEARCH_RIGHT;
@@ -92,10 +92,8 @@ namespace synthese
 
 		public:
 			ProfilesAdmin();
-
 			void setFromParametersMap(const server::ParametersMap& map);
 			std::string getTitle() const;
-			std::string getIcon() const;
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request = NULL) const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};

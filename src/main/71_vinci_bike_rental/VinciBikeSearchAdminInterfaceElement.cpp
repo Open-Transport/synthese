@@ -21,6 +21,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "71_vinci_bike_rental/VinciBikeSearchAdminInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciAddBike.h"
+#include "71_vinci_bike_rental/VinciBike.h"
+#include "71_vinci_bike_rental/VinciContract.h"
+#include "71_vinci_bike_rental/VinciBikeTableSync.h"
+#include "71_vinci_bike_rental/VinciBikeAdminInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciCustomerAdminInterfaceElement.h"
+
 #include "05_html/SearchFormHTMLTable.h"
 #include "05_html/ActionResultHTMLTable.h"
 #include "05_html/HTMLModule.h"
@@ -32,15 +40,7 @@
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminRequest.h"
-
-
-#include "71_vinci_bike_rental/VinciAddBike.h"
-#include "71_vinci_bike_rental/VinciBike.h"
-#include "71_vinci_bike_rental/VinciContract.h"
-#include "71_vinci_bike_rental/VinciBikeTableSync.h"
-#include "71_vinci_bike_rental/VinciBikeAdminInterfaceElement.h"
-#include "71_vinci_bike_rental/VinciBikeSearchAdminInterfaceElement.h"
-#include "71_vinci_bike_rental/VinciCustomerAdminInterfaceElement.h"
+#include "32_admin/HomeAdmin.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -52,6 +52,22 @@ namespace synthese
 	using namespace server;
 	using namespace html;
 	using namespace security;
+	using namespace vinci;
+
+	namespace util
+	{
+		const string FactorableTemplate<AdminInterfaceElement, VinciBikeSearchAdminInterfaceElement>::FACTORY_KEY("vincibikes");
+	}
+
+	namespace admin
+	{
+		const string AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::ICON("tag_blue.png");
+		const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		string AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>::getSuperior()
+		{
+			return HomeAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace vinci
 	{
@@ -59,7 +75,7 @@ namespace synthese
 		const std::string VinciBikeSearchAdminInterfaceElement::PARAMETER_SEARCH_CADRE = "searchcadre";
 
 		VinciBikeSearchAdminInterfaceElement::VinciBikeSearchAdminInterfaceElement()
-			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) {}
+			: AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>() {}
 
 		string VinciBikeSearchAdminInterfaceElement::getTitle() const
 		{

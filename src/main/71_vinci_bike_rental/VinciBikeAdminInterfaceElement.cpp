@@ -20,6 +20,12 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#include "71_vinci_bike_rental/VinciBikeSearchAdminInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciBikeAdminInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciUpdateBikeAction.h"
+#include "71_vinci_bike_rental/VinciBike.h"
+#include "71_vinci_bike_rental/VinciBikeTableSync.h"
+
 #include "05_html/HTMLTable.h"
 #include "05_html/HTMLForm.h"
 
@@ -28,10 +34,9 @@
 #include "32_admin/AdminRequest.h"
 #include "32_admin/AdminParametersException.h"
 
-#include "71_vinci_bike_rental/VinciBike.h"
-#include "71_vinci_bike_rental/VinciBikeTableSync.h"
-#include "71_vinci_bike_rental/VinciBikeAdminInterfaceElement.h"
-#include "71_vinci_bike_rental/VinciUpdateBikeAction.h"
+#include <string>
+
+using namespace std;
 
 namespace synthese
 {
@@ -40,11 +45,27 @@ namespace synthese
 	using namespace util;
 	using namespace html;
 	using namespace db;
+	using namespace vinci;
+
+	namespace util
+	{
+		const string FactorableTemplate<AdminInterfaceElement, VinciBikeAdminInterfaceElement>::FACTORY_KEY("vincibike");
+	}
+
+	namespace admin
+	{
+		const string AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>::ICON("tag_blue.png");
+		const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
+		string AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>::getSuperior()
+		{
+			return VinciBikeSearchAdminInterfaceElement::FACTORY_KEY;
+		}
+	}
 
 	namespace vinci
 	{
 		VinciBikeAdminInterfaceElement::VinciBikeAdminInterfaceElement()
-			: AdminInterfaceElement("vincibikes", AdminInterfaceElement::DISPLAYED_IF_CURRENT) {}
+			: AdminInterfaceElementTemplate<VinciBikeAdminInterfaceElement>() {}
 
 
 		std::string VinciBikeAdminInterfaceElement::getTitle() const

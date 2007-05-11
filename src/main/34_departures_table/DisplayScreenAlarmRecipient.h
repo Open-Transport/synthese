@@ -38,8 +38,9 @@ namespace synthese
 		class DisplayScreenAlarmRecipient : public messages::AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>
 		{
 		public:
-			static const std::string PARAMETER_SEARCH_UID;
-			static const std::string PARAMETER_SEARCH_PLACE;
+			static const std::string PARAMETER_SEARCH_CITY_NAME;
+			static const std::string PARAMETER_SEARCH_STOP_NAME;
+			static const std::string PARAMETER_SEARCH_NAME;
 			static const std::string PARAMETER_SEARCH_LINE;
 			static const std::string PARAMETER_SEARCH_TYPE;
 			static const std::string PARAMETER_SEARCH_STATUS;

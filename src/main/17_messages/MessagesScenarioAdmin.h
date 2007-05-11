@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_MessagesScenarioAdmin_H__
 #define SYNTHESE_MessagesScenarioAdmin_H__
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -71,7 +71,7 @@ namespace synthese
 				- INFO : Suppression de message du scénario
 
 		*/
-		class MessagesScenarioAdmin : public admin::AdminInterfaceElement
+		class MessagesScenarioAdmin : public admin::AdminInterfaceElementTemplate<MessagesScenarioAdmin>
 		{
 		private:
 			boost::shared_ptr<const SentScenario> _sentScenario;
@@ -80,7 +80,7 @@ namespace synthese
 
 		public:
 			MessagesScenarioAdmin();
-			
+
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
@@ -96,7 +96,6 @@ namespace synthese
 			*/
 			std::string getTitle() const;
 
-			std::string getIcon() const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}

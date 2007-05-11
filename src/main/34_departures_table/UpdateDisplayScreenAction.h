@@ -48,6 +48,7 @@ namespace synthese
 		class UpdateDisplayScreenAction : public server::Action
 		{
 		public:
+			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_WIRING_CODE;
 			static const std::string PARAMETER_BLINKING_DELAY;
 			static const std::string PARAMETER_CLEANING_DELAY;
@@ -60,6 +61,7 @@ namespace synthese
 			static const std::string PARAMETER_TITLE;
 
 		private:
+			std::string									_name;
 			boost::shared_ptr<DisplayScreen>			_screen;
 			std::string									_title;
 			int											_wiringCode;

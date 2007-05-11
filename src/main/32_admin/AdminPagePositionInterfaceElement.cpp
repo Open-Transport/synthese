@@ -48,7 +48,7 @@ namespace synthese
 		{
 			stringstream str;
 			Factory<AdminInterfaceElement>::Iterator it = Factory<AdminInterfaceElement>::begin(); 
-			for (; it != Factory<AdminInterfaceElement>::end() && it->getFactoryKey() != page->getSuperior(); ++it);
+			for (; it != Factory<AdminInterfaceElement>::end() && it->getFactoryKey() != page->getSuperiorVirtual(); ++it);
 			
 			if (it != Factory<AdminInterfaceElement>::end())
 			{

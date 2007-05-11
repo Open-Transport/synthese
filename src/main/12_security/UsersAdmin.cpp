@@ -41,6 +41,7 @@
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminModule.h"
+#include "32_admin/HomeAdmin.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -52,18 +53,28 @@ namespace synthese
 	using namespace interfaces;
 	using namespace admin;
 	using namespace html;
+	using namespace security;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement,UsersAdmin>::FACTORY_KEY("users");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<UsersAdmin>::ICON("user.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<UsersAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		template<> string AdminInterfaceElementTemplate<UsersAdmin>::getSuperior()
+		{
+			return HomeAdmin::FACTORY_KEY;
+		}
+	}
+	
 	namespace security
 	{
 		const std::string UsersAdmin::PARAM_SEARCH_PROFILE_ID = "searchprofileid";
 		const std::string UsersAdmin::PARAM_SEARCH_NAME = "searchname";
 		const std::string UsersAdmin::PARAM_SEARCH_LOGIN = "searchlogin";
-
-
-		UsersAdmin::UsersAdmin()
-			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED)
-		{
-		}
 
 		std::string UsersAdmin::getTitle() const
 		{
@@ -185,9 +196,10 @@ namespace synthese
 			stream << t.close();
 		}
 
-		std::string UsersAdmin::getIcon() const
+		UsersAdmin::UsersAdmin()
+			: AdminInterfaceElementTemplate<UsersAdmin>()
 		{
-			return "user.png";
+		
 		}
 	}
 }

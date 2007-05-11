@@ -71,6 +71,10 @@
 				RelativePath=".\AdminInterfaceElement.h"
 				>
 			</File>
+			<File
+				RelativePath=".\AdminInterfaceElementTemplate.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Admin compounds"

@@ -33,6 +33,7 @@
 #include "34_departures_table/UpdateDisplayScreenAction.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
+#include "34_departures_table/ArrivalDepartureTableLog.h"
 
 using namespace std;
 using namespace boost;
@@ -46,6 +47,7 @@ namespace synthese
 	
 	namespace departurestable
 	{
+		const string UpdateDisplayScreenAction::PARAMETER_NAME(Action_PARAMETER_PREFIX + "name");
 		const std::string UpdateDisplayScreenAction::PARAMETER_WIRING_CODE = Action_PARAMETER_PREFIX + "wc";
 		const std::string UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY = Action_PARAMETER_PREFIX + "bd";
 		const std::string UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY = Action_PARAMETER_PREFIX + "cd";
@@ -73,7 +75,12 @@ namespace synthese
 				_screen = DisplayScreenTableSync::get(_request->getObjectId());
 
 				ParametersMap::const_iterator it;
-				
+
+				it = map.find(PARAMETER_NAME);
+				if (it == map.end())
+					throw ActionException("Name not specified");
+				_name = it->second;
+
 				it= map.find(PARAMETER_TITLE);
 				if (it == map.end())
 					throw ActionException("Title not specified");
@@ -132,6 +139,33 @@ namespace synthese
 
 		void UpdateDisplayScreenAction::run()
 		{
+			// Comparison for log text generation
+			stringstream log;
+			if (_screen->getLocalizationComment() != _name)
+				log << " - Nom : " << _screen->getLocalizationComment() << " => " << _name;
+			if (_screen->getWiringCode() != _wiringCode)
+				log << " - Code de branchement : " << _screen->getWiringCode() << " => " << _wiringCode;
+			if (_screen->getBlinkingDelay() != _blinkingDelay)
+				log << " - Délai de clignotement : " << _screen->getBlinkingDelay() << " => " << _blinkingDelay;
+			if (_screen->getTrackNumberDisplay() != _displayPlatform)
+				log << " - Affichage du numéro de quai : " << _screen->getTrackNumberDisplay() << " => " << _displayPlatform;
+			if (_screen->getServiceNumberDisplay() != _displayServiceNumber)
+				log << " - Affichage du numéro de service : " << _screen->getServiceNumberDisplay() << " => " << _displayServiceNumber;
+			if (_screen->getDirection() != _direction)
+				log << " - Type de tableau : " << _screen->getDirection() << " => " << _direction;
+			if (_screen->getDirection() != _endFilter)
+				log << " - Affichage des terminus seulement : " << _screen->getDirection() << " => " << _endFilter;
+			if (_screen->getClearingDelay() != _cleaningDelay)
+				log << " - Délai d'effacement : " << _screen->getClearingDelay() << " => " << _cleaningDelay;
+			if (_screen->getMaxDelay() != _maxDelay)
+				log << " - Délai d'apparition : " << _screen->getMaxDelay() << " => " << _maxDelay;
+			if (_screen->getType() && _screen->getType() != _type.get())
+				log << " - Type de panneau : " << _screen->getType()->getName() << " => " << _type->getName();
+			if (_screen->getTitle() != _title)
+				log << " - Titre : " << _screen->getTitle() << " => " << _title;
+
+			// Preparation of the action
+			_screen->setLocalizationComment(_name);
 			_screen->setWiringCode(_wiringCode);
 			_screen->setBlinkingDelay(_blinkingDelay);
 			_screen->setTrackNumberDisplay(_displayPlatform);
@@ -143,7 +177,11 @@ namespace synthese
 			_screen->setType(_type.get());
 			_screen->setTitle(_title);
 
+			// The action
 			DisplayScreenTableSync::save(_screen.get());
+
+			// Log
+			ArrivalDepartureTableLog::addUpdateEntry(_screen, log.str(), _request->getUser());
 		}
 	}
 }

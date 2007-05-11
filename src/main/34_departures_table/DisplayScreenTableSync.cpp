@@ -30,6 +30,8 @@
 #include "15_env/LineStopTableSync.h"
 #include "15_env/LineTableSync.h"
 #include "15_env/PhysicalStopTableSync.h"
+#include "15_env/ConnectionPlaceTableSync.h"
+#include "15_env/CityTableSync.h"
 
 #include "13_dblog/DBLogEntryTableSync.h"
 
@@ -63,8 +65,8 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<DisplayScreen>::load(DisplayScreen* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
 			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			object->setLocalization(DeparturesTableModule::getBroadcastPoints().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_BROADCAST_POINT_ID))));
-			object->setLocalizationComment(rows.getColumn(rowId, DisplayScreenTableSync::COL_BROADCAST_POINT_COMMENT));
+			object->setLocalization(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_PLACE_ID))));
+			object->setLocalizationComment(rows.getColumn(rowId, DisplayScreenTableSync::COL_NAME));
 			object->setType(DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_TYPE_ID))).get());
 			object->setWiringCode(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_WIRING_CODE)));
 			object->setTitle(rows.getColumn(rowId, DisplayScreenTableSync::COL_TITLE));
@@ -244,16 +246,14 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const std::string DisplayScreenTableSync::_COL_BROADCAST_POINT_ID = "broadcast_point_id";
-		const std::string DisplayScreenTableSync::_COL_BROADCAST_POINT_NAME = "broadcast_point_name";
 		const std::string DisplayScreenTableSync::_COL_LINE_EXISTS = "line_exists";
 		const std::string DisplayScreenTableSync::_COL_LAST_MAINTENANCE_CONTROL = "last_maintenance_control";
 		const std::string DisplayScreenTableSync::_COL_LAST_OK_MAINTENANCE_CONTROL = "last_ok_maintenance_control";
 		const std::string DisplayScreenTableSync::_COL_CORRUPTED_DATA_START_DATE = "corrupted_data_start_date";
 		const std::string DisplayScreenTableSync::_COL_TYPE_NAME = "type_name";
 
-		const std::string DisplayScreenTableSync::COL_BROADCAST_POINT_ID = "broadcast_point_id";
-		const std::string DisplayScreenTableSync::COL_BROADCAST_POINT_COMMENT = "broadcast_point_comment";
+		const std::string DisplayScreenTableSync::COL_PLACE_ID = "broadcast_point_id";
+		const std::string DisplayScreenTableSync::COL_NAME = "broadcast_point_comment";
 		const std::string DisplayScreenTableSync::COL_TYPE_ID = "type_id";
 		const std::string DisplayScreenTableSync::COL_WIRING_CODE = "wiring_code";
 		const std::string DisplayScreenTableSync::COL_TITLE = "title";
@@ -281,8 +281,8 @@ namespace synthese
 			: SQLiteTableSyncTemplate<DisplayScreen>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_BROADCAST_POINT_ID, "INTEGER");
-			addTableColumn(COL_BROADCAST_POINT_COMMENT, "TEXT");
+			addTableColumn(COL_PLACE_ID, "INTEGER");
+			addTableColumn(COL_NAME, "TEXT");
 			addTableColumn(COL_TYPE_ID, "INTEGER");
 			addTableColumn(COL_WIRING_CODE, "INTEGER");
 			addTableColumn(COL_TITLE, "TEXT");
@@ -346,12 +346,18 @@ namespace synthese
 			, uid localizationid
 			, uid lineid
 			, uid typeuid
+			, std::string cityName
+			, std::string stopName
+			, std::string name
 			, int state 
 			, int message 
-			, int first /*= 0*/, int number /*= 0*/ 
-			, bool orderByUid
-			, bool orderByLocalization
-			, bool orderByType
+			, int first /*= 0*/
+			, int number /*= 0*/ 
+			, bool orderByUid /*= false*/
+			, bool orderByCity /*= true*/
+			, bool orderByStopName /*= false*/
+			, bool orderByName /*= false*/
+			, bool orderByType /*= false*/
 			, bool orderByStatus
 			, bool orderByMessage
 			, bool raisingOrder
@@ -361,42 +367,72 @@ namespace synthese
 			query
 				<< " SELECT"
 					<< " d.*"
-					<< ", (SELECT b." << TABLE_COL_ID << " FROM " << BroadcastPointTableSync::TABLE_NAME << " AS b WHERE b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID << ") AS " << _COL_BROADCAST_POINT_ID
-					<< ", (SELECT b." << BroadcastPointTableSync::TABLE_COL_NAME << " FROM " << BroadcastPointTableSync::TABLE_NAME << " AS b WHERE b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID << ") AS " << _COL_BROADCAST_POINT_NAME
-					<< ", EXISTS(SELECT ls." << TABLE_COL_ID << " FROM " << LineStopTableSync::TABLE_NAME << " AS ls INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID << " INNER JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=p." << PhysicalStopTableSync::COL_PLACEID << " WHERE b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID << ") AS " << _COL_LINE_EXISTS
+					<< ", EXISTS(SELECT ls." << TABLE_COL_ID << " FROM " << LineStopTableSync::TABLE_NAME << " AS ls INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID << " WHERE p." << PhysicalStopTableSync::COL_PLACEID << "=d." << COL_PLACE_ID << ") AS " << _COL_LINE_EXISTS
 					<< ", (SELECT l." << TABLE_COL_ID << " FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " ORDER BY l." << DBLogEntryTableSync::COL_DATE << " DESC LIMIT 1) AS " << _COL_LAST_MAINTENANCE_CONTROL
 					<< ", (SELECT MAX(l." << DBLogEntryTableSync::COL_DATE << ") FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " AND l." << DBLogEntryTableSync::COL_LEVEL << "=" << static_cast<int>(DBLogEntry::DB_LOG_INFO) << ") AS " << _COL_LAST_OK_MAINTENANCE_CONTROL
 					<< ", (SELECT l." << TABLE_COL_ID << " FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " AND l." << DBLogEntryTableSync::COL_LEVEL << "=" << static_cast<int>(DBLogEntry::DB_LOG_ERROR) << " ORDER BY l." << DBLogEntryTableSync::COL_DATE << " DESC LIMIT 1) AS " << _COL_CORRUPTED_DATA_START_DATE
 					<< ", (SELECT t." << DisplayTypeTableSync::TABLE_COL_NAME << " FROM " << DisplayTypeTableSync::TABLE_NAME << " AS t WHERE t." << TABLE_COL_ID << "=d." << COL_TYPE_ID << ") AS " << _COL_TYPE_NAME
-				<< " FROM " << TABLE_NAME << " AS d"
-				<< " WHERE 1 ";
-			if (duid > 0)
+				<< " FROM "
+					<< TABLE_NAME << " AS d"
+					<< " INNER JOIN " << ConnectionPlaceTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=d." << COL_PLACE_ID
+					<< " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
+					<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
+					;
+			if (lineid != UNKNOWN_VALUE)
+				query
+					<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS ls " << " ON s." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
+					<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS ll ON ll." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_LINEID
+					;
+
+			query << " WHERE 1 ";
+			if (!cityName.empty())
+				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << cityName << "%'";
+			if (!stopName.empty())
+				query << " AND p." << ConnectionPlaceTableSync::TABLE_COL_NAME << " LIKE '%" << stopName << "%'";
+			if (!name.empty())
+				query << " AND d." << COL_NAME << " LIKE '%" << name << "%'";
+			if (duid != UNKNOWN_VALUE)
 				query << " AND d." << TABLE_COL_ID << "=" << Conversion::ToString(duid);
-			if (localizationid > 0)
-				query << " AND " << _COL_BROADCAST_POINT_ID << "=" << localizationid;
-			if (typeuid > 0)
+			if (localizationid != UNKNOWN_VALUE)
+				query << " AND p." << TABLE_COL_ID << "=" << Conversion::ToString(localizationid);
+			if (typeuid != UNKNOWN_VALUE)
 				query << " AND d." << COL_TYPE_ID << "=" << typeuid;
-			if (lineid > 0)
-				query << " AND EXISTS(SELECT ls." << TABLE_COL_ID 
-					<< " FROM "
-						<< LineStopTableSync::TABLE_NAME << " AS ls "
-						<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
-						<< " INNER JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=p." << PhysicalStopTableSync::COL_PLACEID
-						<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS ll ON ll." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_LINEID 
-					<< " WHERE "
-						<< " b." << TABLE_COL_ID << "=d." << COL_BROADCAST_POINT_ID 
-						<< " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineid
-					<< ")";
+			if (lineid != UNKNOWN_VALUE)
+				query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineid;
+			query << " GROUP BY d." << TABLE_COL_ID;
 			if (orderByUid)
 				query << " ORDER BY d." << TABLE_COL_ID << (raisingOrder ? " ASC" : " DESC");
-			if (orderByLocalization)
-				query << " ORDER BY " << _COL_BROADCAST_POINT_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (orderByType)
-				query << " ORDER BY " << _COL_TYPE_NAME << (raisingOrder ? " ASC" : " DESC");
+			else if (orderByCity)
+				query
+					<< " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					;
+			else if (orderByStopName)
+				query
+					<< " ORDER BY s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					;
+			else if (orderByName)
+				query
+					<< " ORDER BY d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					;
+			else if (orderByType)
+				query
+					<< " ORDER BY " << _COL_TYPE_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
+					;
 			if (number > 0)
+			{
 				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				if (first > 0)
+					query << " OFFSET " << Conversion::ToString(first);
+			}
 
 			try
 			{
@@ -455,14 +491,14 @@ namespace synthese
 					c.lastOKStatus = DateTime::FromSQLTimestamp(result.getColumn(i, _COL_LAST_OK_MAINTENANCE_CONTROL));
 
 					// Data control
-					if (!Conversion::ToLongLong(result.getColumn(i, _COL_BROADCAST_POINT_ID)))
-					{
-						c.dataControl = DISPLAY_DATA_CORRUPTED;
-						c.dataControlText = "L'afficheur est relié à un point de diffusion inexistant.";
+//					if (!Conversion::ToLongLong(result.getColumn(i, _COL_BROADCAST_POINT_ID)))
+//					{
+//						c.dataControl = DISPLAY_DATA_CORRUPTED;
+//						c.dataControlText = "L'afficheur est relié à un point de diffusion inexistant.";
 						/// @todo Put here a dblog entry writing
 						/// @todo Put a control of the link between broadcast point and its place
-					}
-					else if (!Conversion::ToInt(result.getColumn(i, _COL_LINE_EXISTS)))
+//					}
+			/*		else*/ if (!Conversion::ToInt(result.getColumn(i, _COL_LINE_EXISTS)))
 					{
 						c.dataControl = DISPLAY_DATA_NO_LINES;
 						c.dataControlText = "Aucune ligne ne dessert l'afficheur.";

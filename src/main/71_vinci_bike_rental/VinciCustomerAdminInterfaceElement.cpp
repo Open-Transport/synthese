@@ -57,6 +57,7 @@
 #include "71_vinci_bike_rental/VinciContractPrintRequest.h"
 #include "71_vinci_bike_rental/VinciReturnGuaranteeAction.h"
 #include "71_vinci_bike_rental/ReturnABikeAction.h"
+#include "71_vinci_bike_rental/VinciCustomerSearchAdminInterfaceElement.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -70,11 +71,27 @@ namespace synthese
 	using namespace time;
 	using namespace html;
 	using namespace interfaces;
+	using namespace vinci;
+
+	namespace util
+	{
+		const string FactorableTemplate<AdminInterfaceElement,VinciCustomerAdminInterfaceElement>::FACTORY_KEY("vincicustomer");
+	}
+
+	namespace admin
+	{
+		const string AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::ICON("user_gray.png");
+		const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
+		string AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>::getSuperior()
+		{
+			return VinciCustomerSearchAdminInterfaceElement::FACTORY_KEY;
+		}
+	}
 
 	namespace vinci
 	{
 		VinciCustomerAdminInterfaceElement::VinciCustomerAdminInterfaceElement()
-			: AdminInterfaceElement("vincicustomers", AdminInterfaceElement::DISPLAYED_IF_CURRENT) 
+			: AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>() 
 		{}
 
 

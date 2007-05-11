@@ -44,8 +44,6 @@ namespace synthese
 		*/
 		class DisplayScreenTableSync : public db::SQLiteTableSyncTemplate<DisplayScreen>
 		{
-			static const std::string _COL_BROADCAST_POINT_ID;
-			static const std::string _COL_BROADCAST_POINT_NAME;
 			static const std::string _COL_LINE_EXISTS;
 			static const std::string _COL_LAST_MAINTENANCE_CONTROL;
 			static const std::string _COL_LAST_OK_MAINTENANCE_CONTROL;
@@ -55,30 +53,30 @@ namespace synthese
 		public:
 			//! \name Columns
 			//@{
-			static const std::string COL_BROADCAST_POINT_ID;
-			static const std::string COL_BROADCAST_POINT_COMMENT;
-			static const std::string COL_TYPE_ID;
-			static const std::string COL_WIRING_CODE;
-			static const std::string COL_TITLE;
-			static const std::string COL_BLINKING_DELAY;
-			static const std::string COL_TRACK_NUMBER_DISPLAY;
-			static const std::string COL_SERVICE_NUMBER_DISPLAY;
-			static const std::string COL_PHYSICAL_STOPS_IDS;	//!< List of physical stops uids, separated by comas
-			static const std::string COL_ALL_PHYSICAL_DISPLAYED;
-			static const std::string COL_FORBIDDEN_ARRIVAL_PLACES_IDS;	//!< List of forbidden connection places uids, separated by comas
-			static const std::string COL_FORBIDDEN_LINES_IDS;	//!< List of forbidden lines uids, separated by comas
-			static const std::string COL_DIRECTION;
-			static const std::string COL_ORIGINS_ONLY;
-			static const std::string COL_DISPLAYED_PLACES_IDS;	//!< List of displayed places uids, separated by comas
-			static const std::string COL_MAX_DELAY;
-			static const std::string COL_CLEARING_DELAY;
-			static const std::string COL_FIRST_ROW;
-			static const std::string COL_GENERATION_METHOD;
-			static const std::string COL_FORCED_DESTINATIONS_IDS;	//!< List of forced destination uids in preselection, separated by comas
-			static const std::string COL_DESTINATION_FORCE_DELAY;
-			static const std::string COL_MAINTENANCE_CHECKS_PER_DAY;
-			static const std::string COL_MAINTENANCE_IS_ONLINE;
-			static const std::string COL_MAINTENANCE_MESSAGE;
+				static const std::string COL_PLACE_ID;
+				static const std::string COL_NAME;
+				static const std::string COL_TYPE_ID;
+				static const std::string COL_WIRING_CODE;
+				static const std::string COL_TITLE;
+				static const std::string COL_BLINKING_DELAY;
+				static const std::string COL_TRACK_NUMBER_DISPLAY;
+				static const std::string COL_SERVICE_NUMBER_DISPLAY;
+				static const std::string COL_PHYSICAL_STOPS_IDS;	//!< List of physical stops uids, separated by comas
+				static const std::string COL_ALL_PHYSICAL_DISPLAYED;
+				static const std::string COL_FORBIDDEN_ARRIVAL_PLACES_IDS;	//!< List of forbidden connection places uids, separated by comas
+				static const std::string COL_FORBIDDEN_LINES_IDS;	//!< List of forbidden lines uids, separated by comas
+				static const std::string COL_DIRECTION;
+				static const std::string COL_ORIGINS_ONLY;
+				static const std::string COL_DISPLAYED_PLACES_IDS;	//!< List of displayed places uids, separated by comas
+				static const std::string COL_MAX_DELAY;
+				static const std::string COL_CLEARING_DELAY;
+				static const std::string COL_FIRST_ROW;
+				static const std::string COL_GENERATION_METHOD;
+				static const std::string COL_FORCED_DESTINATIONS_IDS;	//!< List of forced destination uids in preselection, separated by comas
+				static const std::string COL_DESTINATION_FORCE_DELAY;
+				static const std::string COL_MAINTENANCE_CHECKS_PER_DAY;
+				static const std::string COL_MAINTENANCE_IS_ONLINE;
+				static const std::string COL_MAINTENANCE_MESSAGE;
 			//@}
 			
 
@@ -95,16 +93,21 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<DisplayScreen> > search(
-				uid duid=0
+				uid duid = UNKNOWN_VALUE
 				, uid localizationid = UNKNOWN_VALUE
 				, uid lineid = UNKNOWN_VALUE
 				, uid typeuid = UNKNOWN_VALUE
+				, std::string cityName = std::string()
+				, std::string stopName = std::string()
+				, std::string name = std::string()
 				, int state = UNKNOWN_VALUE
 				, int message = UNKNOWN_VALUE
 				, int first = 0
 				, int number = 0
 				, bool orderByUid = false
-				, bool orderByLocalization = true
+				, bool orderByCity = true
+				, bool orderByStopName = false
+				, bool orderByName = false
 				, bool orderByType = false
 				, bool orderByStatus = false
 				, bool orderByMessage = false

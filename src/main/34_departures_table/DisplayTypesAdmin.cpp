@@ -31,6 +31,7 @@
 #include "34_departures_table/DisplayTypesAdmin.h"
 #include "34_departures_table/CreateDisplayTypeAction.h"
 #include "34_departures_table/UpdateDisplayTypeAction.h"
+#include "34_departures_table/DisplaySearchAdmin.h"
 
 using namespace std;
 using namespace boost;
@@ -42,13 +43,25 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
+	using namespace departurestable;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement,DisplayTypesAdmin>::FACTORY_KEY("displaytypes");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<DisplayTypesAdmin>::ICON("monitor.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<DisplayTypesAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		template<> string AdminInterfaceElementTemplate<DisplayTypesAdmin>::getSuperior()
+		{
+			return DisplaySearchAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace departurestable
 	{
-		/// @todo Verify the parent constructor parameters
-		DisplayTypesAdmin::DisplayTypesAdmin()
-			: AdminInterfaceElement("displays", AdminInterfaceElement::EVER_DISPLAYED) {}
-
 		void DisplayTypesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			/// @todo Initialize internal attributes from the map
@@ -109,9 +122,10 @@ namespace synthese
 			return true;
 		}
 
-		std::string DisplayTypesAdmin::getIcon() const
+		DisplayTypesAdmin::DisplayTypesAdmin()
+			: AdminInterfaceElementTemplate<DisplayTypesAdmin>()
 		{
-			return "monitor.png";
+
 		}
 	}
 }

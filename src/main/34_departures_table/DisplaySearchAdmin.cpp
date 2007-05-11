@@ -20,20 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
-
-#include "11_interfaces/InterfaceModule.h"
-
-#include "15_env/ConnectionPlace.h"
-#include "15_env/EnvModule.h"
-
-#include "05_html/ActionResultHTMLTable.h"
-#include "05_html/SearchFormHTMLTable.h"
-
-#include "30_server/ActionFunctionRequest.h"
-
-#include "32_admin/AdminModule.h"
-
 #include "34_departures_table/DisplaySearchAdmin.h"
 #include "34_departures_table/AdvancedSelectTableSync.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
@@ -42,6 +28,23 @@
 #include "34_departures_table/DisplayMaintenanceAdmin.h"
 #include "34_departures_table/DisplayScreenContentRequest.h"
 #include "34_departures_table/DeparturesTableModule.h"
+
+#include "01_util/Conversion.h"
+
+#include "11_interfaces/InterfaceModule.h"
+
+#include "05_html/ActionResultHTMLTable.h"
+#include "05_html/SearchFormHTMLTable.h"
+
+#include "30_server/ActionFunctionRequest.h"
+
+#include "32_admin/AdminModule.h"
+#include "32_admin/HomeAdmin.h"
+#include "32_admin/AdminParametersException.h"
+
+#include "15_env/ConnectionPlace.h"
+#include "15_env/ConnectionPlaceTableSync.h"
+#include "15_env/EnvModule.h"
 
 using namespace boost;
 using namespace std;
@@ -54,65 +57,95 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace html;
+	using namespace departurestable;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement,DisplaySearchAdmin>::FACTORY_KEY("displays");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::ICON("monitor.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<DisplaySearchAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		template<> string AdminInterfaceElementTemplate<DisplaySearchAdmin>::getSuperior()
+		{
+			return HomeAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace departurestable
 	{
-		const string DisplaySearchAdmin::PARAMETER_SEARCH_UID = "dsasuid";
-		const string DisplaySearchAdmin::PARAMETER_SEARCH_LINE_ID = "dsaslid";
-		const string DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION = "dsasloc";
+		const string DisplaySearchAdmin::PARAMETER_SEARCH_CITY = "dsascity";
+		const string DisplaySearchAdmin::PARAMETER_SEARCH_STOP = "dsaslid";
+		const string DisplaySearchAdmin::PARAMETER_SEARCH_NAME = "dsasloc";
+		const string DisplaySearchAdmin::PARAMETER_SEARCH_LINE_ID = "dsasli";
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_TYPE_ID = "dsasti";
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_STATE = "dsass";
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_MESSAGE = "dsasm";
+		const string DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION_ID("dsapsli");
 
 		DisplaySearchAdmin::DisplaySearchAdmin()
-			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED)
-			, _searchUId(0)
-			, _searchLocalizationUId(0)
-			, _searchLineId(0)
-			, _searchTypeId(0)
+			: AdminInterfaceElementTemplate<DisplaySearchAdmin>()
+			, _searchLineId(UNKNOWN_VALUE)
+			, _searchTypeId(UNKNOWN_VALUE)
 			, _searchState(UNKNOWN_VALUE)
 			, _searchMessage(UNKNOWN_VALUE)
 		{}
 
 		void DisplaySearchAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it = map.find(PARAMETER_SEARCH_UID);
-			if (it != map.end())
-				_searchUId = Conversion::ToLongLong(it->second);
+			ParametersMap::const_iterator it;
+			
+			it = map.find(PARAMETER_SEARCH_LOCALIZATION_ID);
+			if (it == map.end() || Conversion::ToLongLong(it->second) == UNKNOWN_VALUE)
+			{
+				it = map.find(PARAMETER_SEARCH_LINE_ID);
+				if (it != map.end())
+					_searchLineId = Conversion::ToLongLong(it->second);
 
-			it = map.find(PARAMETER_SEARCH_LOCALIZATION);
-			if (it != map.end())
-				_searchLocalizationUId = Conversion::ToLongLong(it->second);
+				it = map.find(PARAMETER_SEARCH_TYPE_ID);
+				if (it != map.end())
+					_searchTypeId = Conversion::ToLongLong(it->second);
 
-			it = map.find(PARAMETER_SEARCH_LINE_ID);
-			if (it != map.end())
-				_searchLineId = Conversion::ToLongLong(it->second);
+				it = map.find(PARAMETER_SEARCH_STATE);
+				if (it != map.end())
+					_searchState = Conversion::ToInt(it->second);
 
-			it = map.find(PARAMETER_SEARCH_TYPE_ID);
-			if (it != map.end())
-				_searchTypeId = Conversion::ToLongLong(it->second);
+				it = map.find(PARAMETER_SEARCH_MESSAGE);
+				if (it != map.end())
+					_searchMessage = Conversion::ToInt(it->second);
+			}
+			else
+			{
+				try
+				{
+					_place = ConnectionPlaceTableSync::get(Conversion::ToLongLong(it->second));
+				}
+				catch (...)
+				{
+					throw AdminParametersException("Specified place not found");
+				}
+			}
 
-			it = map.find(PARAMETER_SEARCH_STATE);
-			if (it != map.end())
-				_searchState = Conversion::ToInt(it->second);
-
-			it = map.find(PARAMETER_SEARCH_MESSAGE);
-			if (it != map.end())
-				_searchMessage = Conversion::ToInt(it->second);
-
-			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAMETER_SEARCH_LOCALIZATION, 30);
+			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAMETER_SEARCH_CITY, 30);
 
 			_result = DisplayScreenTableSync::search(
-				_searchUId
-				, _searchLocalizationUId
+				UNKNOWN_VALUE
+				, _place.get() ? _place->getKey() : UNKNOWN_VALUE
 				, _searchLineId
 				, _searchTypeId
+				, _searchCity
+				, _searchStop
+				, _searchName
 				, _searchState
 				, _searchMessage
 				, _requestParameters.first
 				, _requestParameters.maxSize
-				, _requestParameters.orderField == PARAMETER_SEARCH_UID
-				, _requestParameters.orderField == PARAMETER_SEARCH_LOCALIZATION
+				, false
+				, _requestParameters.orderField == PARAMETER_SEARCH_CITY
+				, _requestParameters.orderField == PARAMETER_SEARCH_STOP
+				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
 				, _requestParameters.orderField == PARAMETER_SEARCH_TYPE_ID
 				, _requestParameters.orderField == PARAMETER_SEARCH_STATE
 				, _requestParameters.orderField == PARAMETER_SEARCH_MESSAGE
@@ -124,7 +157,7 @@ namespace synthese
 
 		string DisplaySearchAdmin::getTitle() const
 		{
-			return "Afficheurs";
+			return _place.get() ? "Afficheurs " + _place->getName() : "Afficheurs";
 		}
 
 		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
@@ -132,6 +165,7 @@ namespace synthese
 			ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(request);
 			createDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
 			createDisplayRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<DisplaySearchAdmin>());
+			createDisplayRequest.getAction()->setPlace(_place);
 
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplaySearchAdmin>());
@@ -144,15 +178,19 @@ namespace synthese
 			FunctionRequest<AdminRequest> maintRequest(request);
 			maintRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayMaintenanceAdmin>());
 
-			stream << "<h1>Recherche</h1>";
+			if (!_place.get())
+			{
+				stream << "<h1>Recherche</h1>";
 
-			stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchUId, _searchLocalizationUId, _searchLineId, _searchTypeId, _searchState, _searchMessage);
+				stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,  _searchLineId, _searchTypeId, _searchState, _searchMessage);
+			}
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
 			ActionResultHTMLTable::HeaderVector v;
-			v.push_back(make_pair(PARAMETER_SEARCH_UID, "UID"));
-			v.push_back(make_pair(PARAMETER_SEARCH_LOCALIZATION, "Emplacement"));
+			v.push_back(make_pair(PARAMETER_SEARCH_CITY, "Commune"));
+			v.push_back(make_pair(PARAMETER_SEARCH_STOP, "Arrêt"));
+			v.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 			v.push_back(make_pair(PARAMETER_SEARCH_TYPE_ID, "Type"));
 			v.push_back(make_pair(PARAMETER_SEARCH_STATE, "Etat"));
 			v.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Msg"));
@@ -172,8 +210,9 @@ namespace synthese
 				maintRequest.setObjectId(screen->getKey());
 
 				stream << t.row(Conversion::ToString(screen->getKey()));
-				stream << t.col() << screen->getKey();
-				stream << t.col() << (screen->getLocalization() ? screen->getLocalization()->getFullName() : "(indéterminé)");
+				stream << t.col() << (screen->getLocalization().get() ? screen->getLocalization()->getCity()->getName() : "(indéterminé)");
+				stream << t.col() << (screen->getLocalization().get() ? screen->getLocalization()->getName() : "(indéterminé)");
+				stream << t.col() << screen->getLocalizationComment();
 				stream << t.col() << (screen->getType() ? screen->getType()->getName() : "(indéterminé)");
 				stream << t.col(); // Bullets showing the states of the display
 				stream << t.col(); // Bullet showing the message status
@@ -182,15 +221,22 @@ namespace synthese
 				stream << t.col() << HTMLModule::getLinkButton(maintRequest.getURL(), "Supervision", string(), "monitor_lightning.png");
 			}
 
-			stream << t.row();
-			stream << t.col(5) << "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel afficheur)";
-			stream << t.col(3) << t.getActionForm().getSubmitButton("Créer un nouvel afficheur");
+			if (_place.get())
+			{
+				stream << t.row();
+				stream << t.col(6) << "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel afficheur)";
+				stream << t.col(3) << t.getActionForm().getSubmitButton("Créer un nouvel afficheur");
+			}
 
 			stream << t.close();
 		}
 
-		std::string DisplaySearchAdmin::getHtmlSearchForm(const HTMLForm& form, uid screenUid, uid placeUid, uid lineUid, uid typeUid, int state, int message )
-		{
+		std::string DisplaySearchAdmin::getHtmlSearchForm(const HTMLForm& form
+			, const std::string& cityName
+			, const std::string& stopName
+			, const std::string& displayName
+			, uid lineUid, uid typeUid, int state, int message
+		){
 			vector<pair<int, string> > states;
 			states.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
 			states.push_back(make_pair(1, "OK"));
@@ -207,8 +253,9 @@ namespace synthese
 			stringstream stream;
 			SearchFormHTMLTable s(form);
 			stream << s.open();
-			stream << s.cell("UID", s.getForm().getTextInput(PARAMETER_SEARCH_UID, screenUid ? Conversion::ToString(screenUid) : string()));
-			stream << s.cell("Emplacement", s.getForm().getSelectInput(PARAMETER_SEARCH_LOCALIZATION, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), placeUid));
+			stream << s.cell("Commune", s.getForm().getTextInput(PARAMETER_SEARCH_CITY, cityName));
+			stream << s.cell("Arrêt", s.getForm().getTextInput(PARAMETER_SEARCH_STOP, stopName));
+			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, displayName));
 			stream << s.cell("Ligne", s.getForm().getSelectInput(PARAMETER_SEARCH_LINE_ID, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), lineUid));
 			stream << s.cell("Type", s.getForm().getSelectInput(PARAMETER_SEARCH_TYPE_ID, DeparturesTableModule::getDisplayTypeLabels(true), typeUid));
 			stream << s.cell("Etat", s.getForm().getSelectInput(PARAMETER_SEARCH_TYPE_ID, states, state));
@@ -221,11 +268,6 @@ namespace synthese
 		bool DisplaySearchAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
-		}
-
-		std::string DisplaySearchAdmin::getIcon() const
-		{
-			return "monitor.png";
 		}
 	}
 }

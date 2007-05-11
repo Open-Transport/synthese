@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_DISPLAY_TYPES_ADMIN_H
 #define SYNTHESE_DISPLAY_TYPES_ADMIN_H
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -64,7 +64,7 @@ namespace synthese
 				- INFO : Modification de type d'afficheur
 				- INFO : Suppression de type d'afficheur
 		*/
-		class DisplayTypesAdmin : public admin::AdminInterfaceElement
+		class DisplayTypesAdmin : public admin::AdminInterfaceElementTemplate<DisplayTypesAdmin>
 		{
 		public:
 			DisplayTypesAdmin();
@@ -83,8 +83,6 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
-
-			std::string getIcon() const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}

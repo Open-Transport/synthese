@@ -24,7 +24,7 @@
 #ifndef SYNTHESE_VinciReportsAdminInterfaceElement_H__
 #define SYNTHESE_VinciReportsAdminInterfaceElement_H__
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 #include "71_vinci_bike_rental/AdvancedSelectTableSync.h"
 
@@ -35,7 +35,7 @@ namespace synthese
 		/** VinciReportsAdminInterfaceElement Class.
 			@ingroup m71Admin refAdmin
 		*/
-		class VinciReportsAdminInterfaceElement : public admin::AdminInterfaceElement
+		class VinciReportsAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>
 		{
 			static const std::string PARAM_START_DATE;
 			static const std::string PARAM_END_DATE;

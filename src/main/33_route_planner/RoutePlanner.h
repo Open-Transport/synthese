@@ -148,7 +148,7 @@ namespace synthese
 			Journeys integralSearch (const synthese::env::VertexAccessMap& vertices, 
 						  const synthese::time::DateTime& desiredTime,
 						  const AccessDirection& accessDirection,
-						  const Journey* currentJourney,
+						  const Journey& currentJourney,
 						  int maxDepth,
 						  SearchAddresses searchAddresses, 
 						  SearchPhysicalStops searchPhysicalStops,
@@ -186,7 +186,7 @@ namespace synthese
 			bool areAxisContraintsFulfilled (const synthese::env::Path* path, 
 							 const Journey& journey) const;
 
-			bool isPathCompliant (const synthese::env::Path* path) const;
+			bool isPathCompliant (const env::Path& path) const;
 
 			bool isServiceCompliant (const synthese::env::Service* service) const;
 

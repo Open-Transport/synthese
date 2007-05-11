@@ -59,26 +59,8 @@ namespace synthese
 		public:
 			typedef enum { EVER_DISPLAYED, DISPLAYED_IF_CURRENT, NEVER_DISPLAYED } DisplayMode;
 
-		private:
-			std::string							_superior;
-			const DisplayMode					_everDisplayed;
-			
-		protected:
-			void								_setSuperior(const std::string& superior);
-			
 		public:
-			/** Constructor.
-				@param superior Key of the superior admin interface element class in the tree
-				@param everDisplayed Indicates when the admin interface element is displayed in the tree
-				@param needeRight Right object describing minimum right to have in order to be able to see the admin interface element
-			*/
-			AdminInterfaceElement(const std::string& superior, DisplayMode everDisplayed);
-
-			//!	@name Getters
-			//@{
-				const std::string& getSuperior() const;
-				const DisplayMode getDisplayMode() const;
-			//@}
+			AdminInterfaceElement();
 
 //			std::string getHTMLLink(const server::FunctionRequest<admin::AdminRequest>* request) const;
 
@@ -119,7 +101,11 @@ namespace synthese
 				*/
 				virtual std::string getTitle() const = 0;
 
-				virtual std::string getIcon() const;
+				virtual std::string getIcon() const = 0;
+
+				virtual std::string getSuperiorVirtual() const = 0;
+
+				virtual DisplayMode getDisplayMode() const = 0;
 			//@}
 		};
 	}

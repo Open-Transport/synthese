@@ -45,8 +45,10 @@
 #include "17_messages/NewMessageAction.h"
 #include "17_messages/AlarmStopAction.h"
 #include "17_messages/ScenarioStopAction.h"
+#include "17_messages/MessagesRight.h"
 
 #include "32_admin/AdminRequest.h"
+#include "32_admin/HomeAdmin.h"
 #include "32_admin/AdminModule.h"
 #include "32_admin/AdminParametersException.h"
 
@@ -61,6 +63,23 @@ namespace synthese
 	using namespace util;
 	using namespace time;
 	using namespace html;
+	using namespace messages;
+	using namespace security;
+
+	namespace util
+	{
+		template <> const string FactorableTemplate<AdminInterfaceElement,MessagesAdmin>::FACTORY_KEY("messages");
+	}
+
+	namespace admin
+	{
+		template <> const string AdminInterfaceElementTemplate<MessagesAdmin>::ICON("note.png");
+		template <> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<MessagesAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		template <> string AdminInterfaceElementTemplate<MessagesAdmin>::getSuperior()
+		{
+			return HomeAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace messages
 	{
@@ -76,7 +95,7 @@ namespace synthese
 		const std::string MessagesAdmin::CSS_ALARM_DISPLAYED_WITH_END_DATE = "alarmdisplayedwithenddate";
 
 		MessagesAdmin::MessagesAdmin()
-			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED)
+			: AdminInterfaceElementTemplate<MessagesAdmin>()
 			, _startDate(TIME_UNKNOWN), _endDate(TIME_UNKNOWN)
 			, _searchStatus(ALL_STATUS), _searchLevel(ALARM_LEVEL_UNKNOWN)
 			, _searchConflict(ALARM_CONFLICT_UNKNOWN)
@@ -339,12 +358,7 @@ namespace synthese
 
 		bool MessagesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
-			return true;
-		}
-
-		std::string MessagesAdmin::getIcon() const
-		{
-			return "note.png";
+			return request->isAuthorized<MessagesRight>(Right::READ);
 		}
 	}
 }

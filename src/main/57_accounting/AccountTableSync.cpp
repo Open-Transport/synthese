@@ -128,7 +128,7 @@ namespace synthese
 		}
 
 		AccountTableSync::AccountTableSync()
-			: SQLiteTableSyncTemplate<Account>(TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE, true)
+			: SQLiteTableSyncTemplate<Account>(true, true, TRIGGERS_ENABLED_CLAUSE, true)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);

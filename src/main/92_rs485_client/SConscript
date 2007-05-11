@@ -18,7 +18,6 @@ moduleenv.AddBoostDependency ('boost_date_time')
 moduleenv.AddBoostDependency ('boost_program_options')
 moduleenv.AddBoostDependency ('boost_thread')
 moduleenv.AddBoostDependency ('boost_iostreams')
-moduleenv.AddSQLiteDependency ()
 moduleenv.AppendMultithreadConf ()
 
 

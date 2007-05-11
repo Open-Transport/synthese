@@ -29,7 +29,7 @@
 
 #include "05_html/ResultHTMLTable.h"
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -40,7 +40,7 @@ namespace synthese
 		/** VinciBikeSearchAdminInterfaceElement Class.
 			@ingroup m71Admin refAdmin
 		*/
-		class VinciBikeSearchAdminInterfaceElement : public admin::AdminInterfaceElement
+		class VinciBikeSearchAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciBikeSearchAdminInterfaceElement>
 		{
 			static const std::string PARAMETER_SEARCH_NUMBER;
 			static const std::string PARAMETER_SEARCH_CADRE;

@@ -85,8 +85,9 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_UID = "dsarsu";
-		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_PLACE = "dsarsp";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_CITY_NAME = "dsarsu";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_STOP_NAME = "dsarsp";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_NAME = "dsarsp";
 		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_LINE = "dsarsl";
 		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_TYPE = "dsarst";
 		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_STATUS = "dsarss";
@@ -120,7 +121,7 @@ namespace synthese
 					removeRequest.getAction()->setObjectId(ds->getKey());
 					
 					stream << t.row();
-					stream << t.col() << ds->getLocalization()->getConnectionPlace()->getFullName() << "/" << ds->getLocalization()->getName();
+					stream << t.col() << ds->getLocalization()->getFullName() << "/" << ds->getLocalization()->getName();
 					if (ds->getLocalizationComment() != "")
 						stream << "/" << ds->getLocalizationComment();
 
@@ -134,20 +135,33 @@ namespace synthese
 			stream << "<p>Ajout d'afficheur</p>";
 
 			ParametersMap::const_iterator it;
-			it = parameters.find(PARAMETER_SEARCH_UID);
-			uid searchUid = (it == parameters.end()) ? 0 : Conversion::ToLongLong(it->second);
-			it = parameters.find(PARAMETER_SEARCH_PLACE);
-			uid searchPlace = (it == parameters.end()) ? 0 : Conversion::ToLongLong(it->second);
-			uid searchLine = 0;
-			uid searchType = 0;
-			int searchState = 0;
-			int searchMessage = 0;
+			it = parameters.find(PARAMETER_SEARCH_CITY_NAME);
+			string searchCity = (it == parameters.end()) ? string() : it->second;
+			it = parameters.find(PARAMETER_SEARCH_STOP_NAME);
+			string searchStop = (it == parameters.end()) ? string() : it->second;
+			it = parameters.find(PARAMETER_SEARCH_NAME);
+			string searchName = (it == parameters.end()) ? string() : it->second;
+			uid searchLine = UNKNOWN_VALUE;
+			uid searchType = UNKNOWN_VALUE;
+			int searchState = UNKNOWN_VALUE;
+			int searchMessage = UNKNOWN_VALUE;
 
-			stream << DisplaySearchAdmin::getHtmlSearchForm(searchRequest.getHTMLForm(), searchUid, searchPlace, searchLine, searchType, searchState, searchMessage);
+			stream << DisplaySearchAdmin::getHtmlSearchForm(
+				searchRequest.getHTMLForm()
+				, searchCity
+				, searchStop
+				, searchName
+				, searchLine
+				, searchType
+				, searchState
+				, searchMessage
+				);
 
 
 			ResultHTMLTable::HeaderVector v1;
-			v1.push_back(make_pair(PARAMETER_SEARCH_PLACE, "Emplacement"));
+			v1.push_back(make_pair(PARAMETER_SEARCH_CITY_NAME, "Commune"));
+			v1.push_back(make_pair(PARAMETER_SEARCH_STOP_NAME, "Arrêt"));
+			v1.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 			v1.push_back(make_pair(PARAMETER_SEARCH_TYPE, "Type"));
 			v1.push_back(make_pair(PARAMETER_SEARCH_STATUS, "Etat"));
 			v1.push_back(make_pair(PARAMETER_SEARCH_MESSAGE, "Msg"));
@@ -158,7 +172,7 @@ namespace synthese
 
 			stream << t1.open();
 
-			vector<boost::shared_ptr<DisplayScreen> > result2 = DisplayScreenTableSync::search(searchUid, searchPlace, searchLine, searchType, searchState, searchMessage);
+			vector<boost::shared_ptr<DisplayScreen> > result2 = DisplayScreenTableSync::search(UNKNOWN_VALUE, UNKNOWN_VALUE, searchLine, searchType, searchCity, searchStop, searchName, searchState, searchMessage);
 
 			for (vector<shared_ptr<DisplayScreen> >::const_iterator it = result2.begin(); it != result2.end(); ++it)
 			{
@@ -186,11 +200,6 @@ namespace synthese
 
 			ParametersMap::const_iterator it;
 
-			shared_ptr<const ConnectionPlace> place;
-			it = parameters.find(PARAMETER_SEARCH_PLACE);
-			if (it != parameters.end() && EnvModule::getConnectionPlaces().contains(Conversion::ToLongLong(it->second)))
-				place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(it->second));
-
 			shared_ptr<const Line> line;
 			it = parameters.find(PARAMETER_SEARCH_LINE);
 			if (it != parameters.end() && EnvModule::getLines().contains(Conversion::ToLongLong(it->second)))
@@ -198,11 +207,6 @@ namespace synthese
 
 			AlarmRecipientSearchFieldsMap map;
 			AlarmRecipientFilter arf;
-
-			arf.label = "Arrêt";
-			arf.htmlField = form.getSelectInput(PARAMETER_SEARCH_PLACE, DeparturesTableModule::getPlacesWithBroadcastPointsLabels(true), place ? place->getKey() : UNKNOWN_VALUE);
-			arf.query = "";
-			map.insert(make_pair(PARAMETER_SEARCH_PLACE, arf));
 
 			arf.label = "Ligne";
 			arf.htmlField = form.getSelectInput(PARAMETER_SEARCH_LINE, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), line ? line->getKey() : UNKNOWN_VALUE);

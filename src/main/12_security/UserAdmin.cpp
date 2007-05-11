@@ -25,8 +25,9 @@
 
 #include "02_db/DBEmptyResultException.h"
 
-#include "12_security/User.h"
 #include "12_security/UserAdmin.h"
+#include "12_security/UsersAdmin.h"
+#include "12_security/User.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/UserUpdateAction.h"
@@ -44,13 +45,29 @@ namespace synthese
 	using namespace admin;
 	using namespace db;
 	using namespace html;
+	using namespace security;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement, UserAdmin>::FACTORY_KEY("user");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<UserAdmin>::ICON("user.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<UserAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
+		template<> string AdminInterfaceElementTemplate<UserAdmin>::getSuperior()
+		{
+			return UsersAdmin::FACTORY_KEY;
+		}
+	}
+	
 	namespace security
 	{
 		const string UserAdmin::PARAM_USER_ID = "roid";
 
 		UserAdmin::UserAdmin()
-			: AdminInterfaceElement("users", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
+			: AdminInterfaceElementTemplate<UserAdmin>()
 			, _userError(false)
 		{
 		}
@@ -156,11 +173,6 @@ namespace synthese
 		bool UserAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
-		}
-
-		std::string UserAdmin::getIcon() const
-		{
-			return "user.png";
 		}
 	}
 }

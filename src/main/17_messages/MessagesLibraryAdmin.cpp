@@ -34,6 +34,8 @@
 #include "17_messages/DeleteScenarioAction.h"
 #include "17_messages/AddScenarioAction.h"
 #include "17_messages/TextTemplateAddAction.h"
+#include "17_messages/MessagesAdmin.h"
+#include "17_messages/MessagesLibraryRight.h"
 
 #include "30_server/ActionFunctionRequest.h"
 
@@ -48,15 +50,29 @@ namespace synthese
 	using namespace util;
 	using namespace html;
 	using namespace time;
+	using namespace messages;
+	using namespace security;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement,MessagesLibraryAdmin>::FACTORY_KEY("messageslibrary");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<MessagesLibraryAdmin>::ICON("package.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<MessagesLibraryAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		template<> string AdminInterfaceElementTemplate<MessagesLibraryAdmin>::getSuperior()
+		{
+			return MessagesAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace messages
 	{
 		const std::string MessagesLibraryAdmin::PARAMETER_NAME = "nam";
 		const std::string MessagesLibraryAdmin::PARAMETER_SHORT_TEXT = "stx";
 		const std::string MessagesLibraryAdmin::PARAMETER_LONG_TEXT = "ltx";
-
-		MessagesLibraryAdmin::MessagesLibraryAdmin()
-			: AdminInterfaceElement("messages", AdminInterfaceElement::EVER_DISPLAYED) {}
 
 		void MessagesLibraryAdmin::setFromParametersMap(const ParametersMap& map)
 		{
@@ -242,12 +258,13 @@ namespace synthese
 
 		bool MessagesLibraryAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
-			return true;
+			return request->isAuthorized<MessagesLibraryRight>(Right::READ);
 		}
 
-		std::string MessagesLibraryAdmin::getIcon() const
+		MessagesLibraryAdmin::MessagesLibraryAdmin()
+			: AdminInterfaceElementTemplate<MessagesLibraryAdmin>()
 		{
-			return "package.png";
+			
 		}
 	}
 }

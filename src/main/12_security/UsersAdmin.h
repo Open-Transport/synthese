@@ -86,7 +86,7 @@ namespace synthese
 				- INFO : Création d'utilisateur
 				- INFO : Suppression d'utilisateur : le choix "suppression ou désactivation" est notifié dans l'entrée
 		*/
-		class UsersAdmin: public admin::AdminInterfaceElement
+		class UsersAdmin: public admin::AdminInterfaceElementTemplate<UsersAdmin>
 		{
 		public:
 			static const std::string PARAM_SEARCH_PROFILE_ID;
@@ -110,8 +110,6 @@ namespace synthese
 			void setFromParametersMap(const server::ParametersMap& map);
 			std::string getTitle() const;
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request = NULL) const;
-			std::string getIcon() const;
-
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}

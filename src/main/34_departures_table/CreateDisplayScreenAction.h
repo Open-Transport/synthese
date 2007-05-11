@@ -27,20 +27,27 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class ConnectionPlace;
+	}
+
 	namespace departurestable
 	{
 		class DisplayScreen;
 
 		/** Display screen creation action class.
-			@ingroup m34
+			@ingroup m34Actions refActions
 		*/
 		class CreateDisplayScreenAction : public server::Action
 		{
 		public:
+			static const std::string PARAMETER_LOCALIZATION_ID;
 			static const std::string PARAMETER_TEMPLATE_ID;
 
 		private:
-			boost::shared_ptr<const DisplayScreen>	_template;
+			boost::shared_ptr<const DisplayScreen>			_template;
+			boost::shared_ptr<const env::ConnectionPlace>	_place;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -56,6 +63,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			void setPlace(boost::shared_ptr<const env::ConnectionPlace> place);
 		};
 	}
 }

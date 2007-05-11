@@ -21,7 +21,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
 #include "71_vinci_bike_rental/VinciReportsAdminInterfaceElement.h"
 #include "71_vinci_bike_rental/VinciBikeRentalModule.h"
 #include "71_vinci_bike_rental/VinciRate.h"
@@ -34,6 +33,7 @@
 #include "04_time/Date.h"
 
 #include "32_admin/AdminRequest.h"
+#include "32_admin/HomeAdmin.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -46,11 +46,27 @@ namespace synthese
 	using namespace time;
 	using namespace accounts;
 	using namespace html;
+	using namespace vinci;
+
+	namespace util
+	{
+		const string FactorableTemplate<AdminInterfaceElement,VinciReportsAdminInterfaceElement>::FACTORY_KEY("vincireports");
+	}
+
+	namespace admin
+	{
+		const string AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>::ICON("chart_curve.png");
+		const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		string AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>::getSuperior()
+		{
+			return HomeAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace vinci
 	{
 		VinciReportsAdminInterfaceElement::VinciReportsAdminInterfaceElement()
-			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) {}
+			: AdminInterfaceElementTemplate<VinciReportsAdminInterfaceElement>() {}
 
 		const std::string VinciReportsAdminInterfaceElement::PARAM_START_DATE = "vraiepsd";
 		const std::string VinciReportsAdminInterfaceElement::PARAM_END_DATE = "vraieped";

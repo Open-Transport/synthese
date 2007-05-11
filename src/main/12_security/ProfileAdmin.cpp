@@ -33,6 +33,7 @@
 #include "12_security/AddRightAction.h"
 #include "12_security/DeleteRightAction.h"
 #include "12_security/Constants.h"
+#include "12_security/ProfilesAdmin.h"
 
 #include "30_server/ActionFunctionRequest.h"
 
@@ -48,13 +49,29 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace html;
+	using namespace security;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement, ProfileAdmin>::FACTORY_KEY("profile");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<ProfileAdmin>::ICON("group.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<ProfileAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
+		template<> string AdminInterfaceElementTemplate<ProfileAdmin>::getSuperior()
+		{
+			return ProfilesAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace security
 	{
 		const string ProfileAdmin::PARAM_PROFILE_ID = "roid";
 
 		ProfileAdmin::ProfileAdmin()
-			: AdminInterfaceElement("profiles", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
+			: AdminInterfaceElementTemplate<ProfileAdmin>()
 			, _profileError(false)
 		{
 
@@ -198,11 +215,6 @@ namespace synthese
 		bool ProfileAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
-		}
-
-		std::string ProfileAdmin::getIcon() const
-		{
-			return "group.png";
 		}
 	}
 }

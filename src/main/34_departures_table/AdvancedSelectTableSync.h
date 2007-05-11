@@ -27,6 +27,7 @@
 #include <string>
 
 #include <boost/logic/tribool.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
@@ -42,9 +43,8 @@ namespace synthese
 		class BroadcastPoint;
 
 		typedef struct {
-			uid			placeId;
+			boost::shared_ptr<env::ConnectionPlace> place;
 			std::string	cityName;
-			std::string placeName;
 			int broadCastPointsNumber;
 			} ConnectionPlaceWithBroadcastPoint;
 		

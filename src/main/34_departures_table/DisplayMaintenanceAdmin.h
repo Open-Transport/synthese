@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_DisplayMaintenanceAdmin_H__
 #define SYNTHESE_DisplayMaintenanceAdmin_H__
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -84,14 +84,13 @@ namespace synthese
 				- NB : Des entrées INFO/WARNING/ERROR sont entrées dans le journal de maintenance directement par les clients de supervision via une requête SendLogEntry.
 			
 		*/
-		class DisplayMaintenanceAdmin : public admin::AdminInterfaceElement
+		class DisplayMaintenanceAdmin : public admin::AdminInterfaceElementTemplate<DisplayMaintenanceAdmin>
 		{
 			boost::shared_ptr<const DisplayScreen>	_displayScreen;
 
 		public:
-			
 			DisplayMaintenanceAdmin();
-			
+
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
@@ -106,8 +105,6 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
-
-			std::string getIcon() const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 
 		};

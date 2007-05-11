@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_DBLogList_H__
 #define SYNTHESE_DBLogList_H__
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -55,7 +55,7 @@ namespace synthese
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
 		*/
-		class DBLogList : public admin::AdminInterfaceElement
+		class DBLogList : public admin::AdminInterfaceElementTemplate<DBLogList>
 		{
 		public:
 			DBLogList();
@@ -74,8 +74,6 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
-
-			std::string getIcon() const;
 
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};

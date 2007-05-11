@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_BroadcastPointAdmin_H__
 #define SYNTHESE_BroadcastPointAdmin_H__
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -73,13 +73,13 @@ namespace synthese
 				- INFO : Création d'emplacement
 
 		*/
-		class BroadcastPointAdmin : public admin::AdminInterfaceElement
+		class BroadcastPointAdmin : public admin::AdminInterfaceElementTemplate<BroadcastPointAdmin>
 		{
 			boost::shared_ptr<const env::ConnectionPlace> _place;
 
 		public:
 			BroadcastPointAdmin();
-			
+
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
@@ -94,8 +94,6 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
-
-			std::string getIcon() const;
 
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};

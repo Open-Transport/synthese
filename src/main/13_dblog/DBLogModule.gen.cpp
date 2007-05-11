@@ -1,6 +1,6 @@
 
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::dblog::DBLogList>("dblogs");
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::dblog::DBLogViewer>("dblog");
+synthese::dblog::DBLogList::integrate();
+synthese::dblog::DBLogViewer::integrate();
 
 synthese::dblog::DBLogRight::integrate();
 

@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_DISPLAY_ADMIN_H
 #define SYNTHESE_DISPLAY_ADMIN_H
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -101,22 +101,21 @@ namespace synthese
 			<i>Journal</i> : Les actions suivantes génèrent une entrée dans le journal du téléaffichage ArrivalDepartureTableLog :
 				- INFO : Modification d'un afficheur
 		*/
-		class DisplayAdmin : public admin::AdminInterfaceElement
+		class DisplayAdmin : public admin::AdminInterfaceElementTemplate<DisplayAdmin>
 		{
 			boost::shared_ptr<const DisplayScreen>			_displayScreen;
 			boost::shared_ptr<const env::ConnectionPlace>	_place;
 
 		public:
-			static const std::string PARAMETER_PLACE;
-
 			DisplayAdmin();
+
+			static const std::string PARAMETER_PLACE;
 
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
 			void setFromParametersMap(const server::ParametersMap& map);
 			std::string getTitle() const;
-			std::string getIcon() const;
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request = NULL) const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};

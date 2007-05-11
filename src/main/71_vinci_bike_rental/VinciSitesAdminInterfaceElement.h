@@ -27,7 +27,7 @@
 
 #include "05_html/ActionResultHTMLTable.h"
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -40,7 +40,7 @@ namespace synthese
 			@author Hugues Romain
 			@date 2007
 		*/
-		class VinciSitesAdminInterfaceElement : public admin::AdminInterfaceElement
+		class VinciSitesAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>
 		{
 			std::vector<boost::shared_ptr<VinciSite> >		_sites;
 			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
@@ -63,8 +63,8 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007
 			*/
-			void display(std::ostream& stream, const server::FunctionRequest<admin::AdminRequest>* request=NULL) const;
-			
+			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request = NULL) const;
+
 			/** Title of the admin compound.
 				@return The title of the admin compound, for display purposes.
 				@author Hugues Romain

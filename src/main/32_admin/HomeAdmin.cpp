@@ -22,20 +22,31 @@
 
 #include "HomeAdmin.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace server;
+	using namespace admin;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement, HomeAdmin>::FACTORY_KEY = "home";
+	}
 
 	namespace admin
 	{
-		HomeAdmin::HomeAdmin()
-			: AdminInterfaceElement("", AdminInterfaceElement::EVER_DISPLAYED)
+		template<> const string AdminInterfaceElementTemplate<HomeAdmin>::ICON = "house.png";
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<HomeAdmin>::DISPLAY_MODE = AdminInterfaceElement::EVER_DISPLAYED;
+
+		template<> string AdminInterfaceElementTemplate<HomeAdmin>::getSuperior()
 		{
+			return string();
 		}
 
 		void HomeAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
-			stream << "Bienvenue sur le module d'interfaces";
+			stream << "Bienvenue sur le panneau de configuration de SYNTHESE";
 		}
 
 		std::string HomeAdmin::getTitle() const
@@ -53,9 +64,10 @@ namespace synthese
 			return true;
 		}
 
-		std::string HomeAdmin::getIcon() const
+		HomeAdmin::HomeAdmin()
+			: AdminInterfaceElementTemplate<HomeAdmin>()
 		{
-			return "house.png";
+	
 		}
 	}
 }

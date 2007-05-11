@@ -38,7 +38,9 @@
 #include "12_security/AddProfileAction.h"
 #include "12_security/DeleteProfileAction.h"
 #include "12_security/Right.h"
+#include "12_security/SecurityRight.h"
 #include "12_security/Constants.h"
+#include "12_security/UsersAdmin.h"
 
 #include "30_server/ActionFunctionRequest.h"
 
@@ -54,15 +56,28 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
+	using namespace security;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement, ProfilesAdmin>::FACTORY_KEY("profiles");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<ProfilesAdmin>::ICON("group.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<ProfilesAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		template<> string AdminInterfaceElementTemplate<ProfilesAdmin>::getSuperior()
+		{
+			return UsersAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace security
 	{
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_NAME = "pasn";
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_RIGHT = "pasr";
 		
-		ProfilesAdmin::ProfilesAdmin()
-			: AdminInterfaceElement("users", AdminInterfaceElement::EVER_DISPLAYED) {}
-
 		void ProfilesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			string name;
@@ -176,12 +191,13 @@ namespace synthese
 
 		bool ProfilesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
-			return true;
+			return request->isAuthorized<SecurityRight>(Right::READ);
 		}
 
-		std::string ProfilesAdmin::getIcon() const
+		ProfilesAdmin::ProfilesAdmin()
+			: AdminInterfaceElementTemplate<ProfilesAdmin>()
 		{
-			return "group.png";
+
 		}
 	}
 }

@@ -73,7 +73,7 @@ namespace synthese
 			vector<shared_ptr<AdminInterfaceElement> > pages;
 			for (Factory<AdminInterfaceElement>::Iterator it = Factory<AdminInterfaceElement>::begin(); it != Factory<AdminInterfaceElement>::end(); ++it)
 			{
-				if (it->getSuperior() == page 
+				if (it->getSuperiorVirtual() == page 
 					&& ((it->getDisplayMode() == AdminInterfaceElement::EVER_DISPLAYED)
 						|| (it->getDisplayMode() == AdminInterfaceElement::DISPLAYED_IF_CURRENT && it.getKey() == currentPage->getFactoryKey()))
 					&& it->isAuthorized(request)

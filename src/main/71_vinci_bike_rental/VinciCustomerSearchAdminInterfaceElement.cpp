@@ -21,6 +21,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "71_vinci_bike_rental/VinciContract.h"
+#include "71_vinci_bike_rental/VinciContractTableSync.h"
+#include "71_vinci_bike_rental/AddCustomerAction.h"
+#include "71_vinci_bike_rental/VinciCustomerAdminInterfaceElement.h"
+#include "71_vinci_bike_rental/VinciCustomerSearchAdminInterfaceElement.h"
+
 #include "05_html/SearchFormHTMLTable.h"
 #include "05_html/ActionResultHTMLTable.h"
 
@@ -29,12 +35,7 @@
 #include "30_server/ActionFunctionRequest.h"
 
 #include "32_admin/AdminRequest.h"
-
-#include "71_vinci_bike_rental/VinciContract.h"
-#include "71_vinci_bike_rental/VinciContractTableSync.h"
-#include "71_vinci_bike_rental/AddCustomerAction.h"
-#include "71_vinci_bike_rental/VinciCustomerAdminInterfaceElement.h"
-#include "71_vinci_bike_rental/VinciCustomerSearchAdminInterfaceElement.h"
+#include "32_admin/HomeAdmin.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -46,6 +47,22 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
+	using namespace vinci;
+
+	namespace util
+	{
+		const string FactorableTemplate<AdminInterfaceElement,VinciCustomerSearchAdminInterfaceElement>::FACTORY_KEY("vincicustomers");
+	}
+
+	namespace admin
+	{
+		const string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::ICON("user_gray.png");
+		const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		string AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>::getSuperior()
+		{
+			return HomeAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace vinci
 	{
@@ -53,7 +70,7 @@ namespace synthese
 		const string VinciCustomerSearchAdminInterfaceElement::PARAM_SEARCH_SURNAME = "searchsurname";
 
 		VinciCustomerSearchAdminInterfaceElement::VinciCustomerSearchAdminInterfaceElement()
-			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) {}
+			: AdminInterfaceElementTemplate<VinciCustomerSearchAdminInterfaceElement>() {}
 
 		string VinciCustomerSearchAdminInterfaceElement::getTitle() const
 		{

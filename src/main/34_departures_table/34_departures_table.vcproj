@@ -359,14 +359,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\DisplayScreenUpdateLocalizationAction.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplayScreenUpdateLocalizationAction.h"
-					>
-				</File>
-				<File
 					RelativePath=".\RemovePreselectionPlaceFromDisplayScreenAction.cpp"
 					>
 				</File>

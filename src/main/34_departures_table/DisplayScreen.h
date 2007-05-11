@@ -52,7 +52,6 @@ namespace synthese
 
 	namespace departurestable
 	{
-		class BroadcastPoint;
 		class DisplayType;
 
 		/** Terminal d'affichage.
@@ -104,8 +103,8 @@ namespace synthese
 		protected:
 			//! \name Localization
 			//@{
-				boost::shared_ptr<const BroadcastPoint>	_localization;		//!< Localization of the display screen (belongs to a place)
-				std::string				_localizationComment;
+				boost::shared_ptr<const env::ConnectionPlace>	_localization;		//!< Localization of the display screen (belongs to a place)
+				std::string									_localizationComment;
 			//@}
 
 			//! \name Technical data
@@ -173,7 +172,7 @@ namespace synthese
 				void	setDirection(DeparturesTableDirection direction);
 				void	setFirstRow(int row);
 				void	setGenerationMethod(GenerationMethod method);
-				void	setLocalization(boost::shared_ptr<const BroadcastPoint>);
+				void	setLocalization(boost::shared_ptr<const env::ConnectionPlace>);
 				void	setLocalizationComment(const std::string&);
 				void	setMaintenanceChecksPerDay(int number);
 				void	setMaintenanceIsOnline(bool value);
@@ -207,7 +206,7 @@ namespace synthese
 
 			//!	\name Getters
 			//@{
-				boost::shared_ptr<const BroadcastPoint>	getLocalization()				const;
+				boost::shared_ptr<const env::ConnectionPlace>	getLocalization()				const;
 				const std::string&				getLocalizationComment()		const;
 				const DisplayType*				getType()						const;				
 				int								getWiringCode()					const;

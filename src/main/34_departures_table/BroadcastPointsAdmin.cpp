@@ -20,18 +20,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "34_departures_table/BroadcastPointsAdmin.h"
+#include "34_departures_table/DisplaySearchAdmin.h"
+#include "34_departures_table/BroadcastPointsRight.h"
+
 #include <map>
 
 #include "05_html/SearchFormHTMLTable.h"
 
 #include "15_env/ConnectionPlace.h"
+#include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/City.h"
 #include "15_env/EnvModule.h"
 
 #include "30_server/FunctionRequest.h"
 
-#include "34_departures_table/BroadcastPointsAdmin.h"
-#include "34_departures_table/BroadcastPointAdmin.h"
+#include "32_admin/HomeAdmin.h"
 
 using namespace std;
 using namespace boost;
@@ -43,6 +47,23 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace html;
+	using namespace departurestable;
+	using namespace security;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement, BroadcastPointsAdmin>::FACTORY_KEY("broadcastpoints");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<BroadcastPointsAdmin>::ICON("building.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<BroadcastPointsAdmin>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		template<> string AdminInterfaceElementTemplate<BroadcastPointsAdmin>::getSuperior()
+		{
+			return HomeAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace departurestable
 	{
@@ -52,7 +73,7 @@ namespace synthese
 		const std::string BroadcastPointsAdmin::PARAMETER_DISPLAY_NUMBER = "dpln";
 
 		BroadcastPointsAdmin::BroadcastPointsAdmin()
-			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) 
+			: AdminInterfaceElementTemplate<BroadcastPointsAdmin>() 
 			, _displayNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
 			, _lineUId(UNKNOWN_VALUE)
 		{}
@@ -102,7 +123,7 @@ namespace synthese
 		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			FunctionRequest<AdminRequest> goRequest(request);
-			goRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointAdmin>());
+			goRequest.getFunction()->setPage<DisplaySearchAdmin>();
 
 			FunctionRequest<AdminRequest> searchRequest(request);
 			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointsAdmin>());
@@ -129,33 +150,35 @@ namespace synthese
 			h.push_back(make_pair(PARAMETER_PLACE_NAME, "Nom zone d'arrêt"));
 			h.push_back(make_pair(PARAMETER_DISPLAY_NUMBER, "Afficheurs"));
 			h.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t(h,searchRequest.getHTMLForm(), _requestParameters, _resultParameters);
+			ResultHTMLTable t(h,st.getForm(), _requestParameters, _resultParameters);
 
 			stream << t.open();
 
 
 			for (vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> >::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
 			{
-				goRequest.setObjectId((*it)->placeId);
 				stream << t.row();
-				stream << t.col() << (*it)->cityName;
-				stream << t.col() << (*it)->placeName;
-				stream << t.col() << (*it)->broadCastPointsNumber;
-				
-				HTMLForm gf(goRequest.getHTMLForm());
-				stream << t.col() << gf.getLinkButton("Editer");
+				try
+				{
+					shared_ptr<ConnectionPlace> place((*it)->place);
+					stream << t.col() << (*it)->cityName;
+					stream << t.col() << place->getName();
+					stream << t.col() << (*it)->broadCastPointsNumber;
+					HTMLForm gf(goRequest.getHTMLForm());
+					gf.addHiddenField(DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION_ID, Conversion::ToString(place->getKey()));
+					stream << t.col() << gf.getLinkButton("Editer", string(), "building_edit.png");
+				}
+				catch (...)
+				{
+					stream << t.col(3) << HTMLModule::getHTMLImage("exclamation.png", "Erreur de données") << " Erreur de données : arrêt inexistant";
+				}
 			}
 			stream << t.close();
 		}
 
 		bool BroadcastPointsAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
-			return true;
-		}
-
-		std::string BroadcastPointsAdmin::getIcon() const
-		{
-			return "building.png";
+			return request->isAuthorized<BroadcastPointsRight>(Right::READ);
 		}
 	}
 }

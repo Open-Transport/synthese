@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_MessageAdmin_H__
 #define SYNTHESE_MessageAdmin_H__
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -32,7 +32,7 @@ namespace synthese
 		class Alarm;
 
 		/** Ecran d'édition de message.
-			@ingroup m17
+			@ingroup m17Admin refAdmin
 
 			@image html cap_admin_message.png
 			@image latex cap_admin_message.png "Maquette de l'écran d'édition de message" width=14cm
@@ -94,7 +94,7 @@ namespace synthese
 				- WARNING : Diffusion de message sur un afficheur signalé hors service
 
 		*/
-		class MessageAdmin : public admin::AdminInterfaceElement
+		class MessageAdmin : public admin::AdminInterfaceElementTemplate<MessageAdmin>
 		{
 		private:
 			boost::shared_ptr<const Alarm>	_alarm;
@@ -102,7 +102,7 @@ namespace synthese
 
 		public:
 			MessageAdmin();
-			
+
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
@@ -117,7 +117,6 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
-			std::string getIcon() const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}

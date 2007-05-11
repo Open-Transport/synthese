@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_SECURITY_USER_ADMIN_H
 #define SYNTHESE_SECURITY_USER_ADMIN_H
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -79,7 +79,7 @@ namespace synthese
 				- INFO : Chaque modification effectuée avec succès
 
 		*/
-		class UserAdmin: public admin::AdminInterfaceElement
+		class UserAdmin: public admin::AdminInterfaceElementTemplate<UserAdmin>
 		{
 			static const std::string PARAM_USER_ID;
 
@@ -95,7 +95,6 @@ namespace synthese
 			void setFromParametersMap(const server::ParametersMap& map);
 
 			std::string getTitle() const;
-			std::string getIcon() const;
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};

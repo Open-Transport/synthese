@@ -8,10 +8,10 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::mess
 
 
 
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessagesAdmin>("messages");
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessageAdmin>("message");
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessagesLibraryAdmin>("messageslibrary");
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::messages::MessagesScenarioAdmin>("messagesscenario");
+synthese::messages::MessagesAdmin::integrate();
+synthese::messages::MessageAdmin::integrate();
+synthese::messages::MessagesLibraryAdmin::integrate();
+synthese::messages::MessagesScenarioAdmin::integrate();
 
 synthese::messages::MessagesRight::integrate();
 synthese::messages::MessagesLibraryRight::integrate();

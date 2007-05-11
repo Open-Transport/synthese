@@ -38,6 +38,7 @@
 #include "13_dblog/DBLog.h"
 #include "13_dblog/DBLogViewer.h"
 #include "13_dblog/DBLogModule.h"
+#include "13_dblog/DBLogList.h"
 #include "13_dblog/DBLogEntryTableSync.h"
 
 #include "32_admin/AdminParametersException.h"
@@ -55,6 +56,22 @@ namespace synthese
 	using namespace security;
 	using namespace html;
 	using namespace time;
+	using namespace dblog;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement,DBLogViewer>::FACTORY_KEY("dblog");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<DBLogViewer>::ICON("book_open.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<DBLogViewer>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
+		template<> string AdminInterfaceElementTemplate<DBLogViewer>::getSuperior()
+		{
+			return DBLogList::FACTORY_KEY;
+		}
+	}
 
 	namespace dblog
 	{
@@ -66,7 +83,7 @@ namespace synthese
 		const string DBLogViewer::PARAMETER_SEARCH_TEXT = "dlvsx";
 
 		DBLogViewer::DBLogViewer()
-			: AdminInterfaceElement("dblogs", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
+			: AdminInterfaceElementTemplate<DBLogViewer>()
 			, _searchLevel(DBLogEntry::DB_LOG_UNKNOWN), _searchStartDate(TIME_UNKNOWN)
 			, _searchEndDate(TIME_UNKNOWN), _searchObjectId(UNKNOWN_VALUE)
 		{}
@@ -196,11 +213,6 @@ namespace synthese
 		bool DBLogViewer::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
 			return true;
-		}
-
-		std::string DBLogViewer::getIcon() const
-		{
-			return "book_open.png";
 		}
 	}
 }

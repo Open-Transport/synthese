@@ -50,8 +50,11 @@ BikeComplyer::~BikeComplyer ()
 const BikeCompliance* 
 BikeComplyer::getBikeCompliance () const
 {
-    if (_bikeCompliance != 0) return _bikeCompliance;
-    return (_parent != 0) ? _parent->getBikeCompliance () : 0;
+    if (_bikeCompliance)
+		return _bikeCompliance;
+	if (_parent)
+		return _parent->getBikeCompliance ();
+    return NULL;
 }
 
 

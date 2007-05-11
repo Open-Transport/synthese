@@ -27,7 +27,7 @@
 
 #include "05_html/ActionResultHTMLTable.h"
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -36,12 +36,17 @@ namespace synthese
 		class AdminRequest;
 	}
 
+	namespace env
+	{
+		class ConnectionPlace;
+	}
+
 	namespace departurestable
 	{
 		class DisplayScreen;
 
 		/** Ecran de gestion du parc matériel d'afficheurs.
-			@ingroup m34
+			@ingroup m34Admin refAdmin
 
 			@image html cap_admin_displays.png
 			@image latex cap_admin_displays.png "Maquette de l'écran de gestion des afficheurs" width=14cm
@@ -112,26 +117,30 @@ namespace synthese
 				- ERROR : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai supérieur à 500% de la durée présupposée entre deux contrôles. 
 				- NB : Ces deux entrées apparaissent à la première visualisation d'un problème de ce type dans une console d'administration, afin de suppléer à l'absence de démon de surveillance. Un passage en contrôle continu avec alerte pourrait être implémenté.
 		*/
-		class DisplaySearchAdmin : public admin::AdminInterfaceElement
+		class DisplaySearchAdmin : public admin::AdminInterfaceElementTemplate<DisplaySearchAdmin>
 		{
-			uid			_searchUId;
-			uid			_searchLocalizationUId;
-			uid			_searchLineId;
-			uid			_searchTypeId;
-			int			_searchState;
-			int			_searchMessage;
+			std::string										_searchCity;
+			std::string										_searchStop;
+			std::string										_searchName;
+			uid												_searchLineId;
+			uid												_searchTypeId;
+			boost::shared_ptr<const env::ConnectionPlace>	_place;
+			int												_searchState;
+			int												_searchMessage;
 			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
 			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
 
 			std::vector<boost::shared_ptr<DisplayScreen> >	_result;
 
 		public:
-			static const std::string PARAMETER_SEARCH_UID;
-			static const std::string PARAMETER_SEARCH_LOCALIZATION;
+			static const std::string PARAMETER_SEARCH_CITY;
+			static const std::string PARAMETER_SEARCH_STOP;
+			static const std::string PARAMETER_SEARCH_NAME;
 			static const std::string PARAMETER_SEARCH_LINE_ID;
 			static const std::string PARAMETER_SEARCH_TYPE_ID;
 			static const std::string PARAMETER_SEARCH_STATE;
 			static const std::string PARAMETER_SEARCH_MESSAGE;
+			static const std::string PARAMETER_SEARCH_LOCALIZATION_ID;
 
 			DisplaySearchAdmin();
 			
@@ -150,9 +159,12 @@ namespace synthese
 			*/
 			std::string getTitle() const;
 
-			std::string getIcon() const;
-
-			static std::string DisplaySearchAdmin::getHtmlSearchForm(const html::HTMLForm& form, uid screenUid, uid placeUid, uid lineUid, uid typeUid, int state, int message );
+			static std::string DisplaySearchAdmin::getHtmlSearchForm(
+				const html::HTMLForm& form
+				, const std::string& cityName
+				, const std::string& stopName
+				, const std::string& displayName
+				, uid lineUid, uid typeUid, int state, int message );
 
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};

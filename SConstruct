@@ -180,7 +180,7 @@ def DefineDefaultLinkFlags (env):
     mode = env['MODE']
 
     if (platform=='win32'):
-        env.Append ( LINKFLAGS = ['/NOLOGO', '/MACHINE:X86', '/OPT:NOREF'] )
+        env.Append ( LINKFLAGS = ['/NOLOGO', '/MACHINE:X86', '/OPT:NOREF', '/INCREMENTAL:NO'] )
         if (env.IsDebug ()):
           env.Append ( LINKFLAGS = ['/DEBUG'] )
     

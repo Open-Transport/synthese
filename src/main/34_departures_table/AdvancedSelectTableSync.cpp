@@ -34,6 +34,7 @@
 #include "15_env/EnvModule.h"
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
+#include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/BroadcastPointTableSync.h"
 
@@ -61,16 +62,24 @@ namespace synthese
 			, bool raisingOrder
 		){
 			stringstream query;
+			// Columns
 			query
 				<< " SELECT "
-					<< "p." << TABLE_COL_ID << " AS pid "
+					<< "p.*"
 					<< ",c." << CityTableSync::TABLE_COL_NAME << " AS city_name"
-					<< ",p." << ConnectionPlaceTableSync::TABLE_COL_NAME << " AS place_name"
-					<< ",(SELECT COUNT(b." << TABLE_COL_ID << ") FROM " << BroadcastPointTableSync::TABLE_NAME << " AS b WHERE b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS bc"
-				<< " FROM "
+					<< ",(SELECT COUNT(b." << TABLE_COL_ID << ") FROM " << DisplayScreenTableSync::TABLE_NAME << " AS b WHERE b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS bc"
+				<< " FROM " // Tables
 					<< ConnectionPlaceTableSync::TABLE_NAME << " AS p"
-					<< " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
-				<< " WHERE 1 ";
+					<< " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID;
+			if (lineId != UNKNOWN_VALUE)
+				query
+					<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS ps ON " 	<< " ps." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
+					<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
+					<< " INNER JOIN " << LineTableSync::TABLE_NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID;
+			// Where	
+			query << " WHERE 1 ";
+			if (lineId != UNKNOWN_VALUE)
+				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId;
 			if (!cityName.empty())
 				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
 			if (!placeName.empty())
@@ -83,22 +92,16 @@ namespace synthese
 				if (bpPresence == NO_BROADCASTPOINT)
 					query << "=0";
 			}
-			if (lineId != UNKNOWN_VALUE)
-				query << " AND EXISTS(SELECT ls." << TABLE_COL_ID 
-					<< " FROM "
-						<< PhysicalStopTableSync::TABLE_NAME << " AS ps "
-						<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
-						<< " INNER JOIN " << LineTableSync::TABLE_NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID
-					<< " WHERE "
-						<< " ps." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
-						<< " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId
-					<< ")";
+			// Grouping
+			query << " GROUP BY p." << TABLE_COL_ID;
+			// Order
 			if (orderByCity)
 				query << " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",p."  << BroadcastPointTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByName)
-				query << " ORDER BY p." << BroadcastPointTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY p." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByNumber)
 				query << " ORDER BY bc" << (raisingOrder ? " ASC" : " DESC");
+			// Limits
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -112,8 +115,8 @@ namespace synthese
 				{
 					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
 					object->broadCastPointsNumber = Conversion::ToInt(result.getColumn(i, "bc"));
-					object->placeId = Conversion::ToLongLong(result.getColumn(i, "pid"));
-					object->placeName = result.getColumn(i, "place_name");
+					object->place.reset(new ConnectionPlace);
+					ConnectionPlaceTableSync::load(object->place.get(), result, i);
 					object->cityName = result.getColumn(i, "city_name");
 					objects.push_back(object);
 				}

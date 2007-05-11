@@ -33,6 +33,7 @@
 #include "17_messages/ScenarioNameUpdateAction.h"
 #include "17_messages/DeleteAlarmAction.h"
 #include "17_messages/NewMessageAction.h"
+#include "17_messages/MessagesLibraryAdmin.h"
 
 #include "30_server/ActionFunctionRequest.h"
 
@@ -49,14 +50,27 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
+	using namespace messages;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement,MessagesScenarioAdmin>::FACTORY_KEY("messagesscenario");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<MessagesScenarioAdmin>::ICON("cog.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<MessagesScenarioAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
+		template<> string AdminInterfaceElementTemplate<MessagesScenarioAdmin>::getSuperior()
+		{
+//			if (_sentScenario.get())
+//				_setSuperior("messages");
+			return MessagesLibraryAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace messages
 	{
-		MessagesScenarioAdmin::MessagesScenarioAdmin()
-			: AdminInterfaceElement("messageslibrary", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
-		{}
-
-
 		void MessagesScenarioAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			ParametersMap::const_iterator it;
@@ -79,9 +93,6 @@ namespace synthese
 			_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(scenario);
 			_templateScenario = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
 			_scenario = scenario.get();
-
-			if (_sentScenario.get())
-				_setSuperior("messages");
 		}
 
 		string MessagesScenarioAdmin::getTitle() const
@@ -161,9 +172,10 @@ namespace synthese
 			return true;
 		}
 
-		std::string MessagesScenarioAdmin::getIcon() const
+		MessagesScenarioAdmin::MessagesScenarioAdmin()
+			: AdminInterfaceElementTemplate<MessagesScenarioAdmin>()
 		{
-			return "cog.png";
+
 		}
 	}
 }

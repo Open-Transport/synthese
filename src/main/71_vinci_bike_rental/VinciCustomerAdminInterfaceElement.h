@@ -24,9 +24,7 @@
 #ifndef SYNTHESE_VinciCustomerAdminInterfaceElement_H__
 #define SYNTHESE_VinciCustomerAdminInterfaceElement_H__
 
-#include <boost/shared_ptr.hpp>
-
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -42,7 +40,7 @@ namespace synthese
 		/** VinciCustomerAdminInterfaceElement Class.
 			@ingroup m71Admin refAdmin
 		*/
-		class VinciCustomerAdminInterfaceElement : public admin::AdminInterfaceElement
+		class VinciCustomerAdminInterfaceElement : public admin::AdminInterfaceElementTemplate<VinciCustomerAdminInterfaceElement>
 		{
 			boost::shared_ptr<VinciContract>	_contract;
 			boost::shared_ptr<security::User>	_user;

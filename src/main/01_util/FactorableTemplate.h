@@ -34,6 +34,12 @@ namespace synthese
 		class FactorableTemplate : public F
 		{
 		public:
+			FactorableTemplate()
+				: F()
+			{
+
+			}
+
 			static const std::string FACTORY_KEY;
 
 			virtual const std::string& getFactoryKey() const;

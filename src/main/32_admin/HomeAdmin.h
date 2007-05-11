@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_DISPLAY_HOME_ADMIN_H
 #define SYNTHESE_DISPLAY_HOME_ADMIN_H
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -46,7 +46,7 @@ namespace synthese
 
 			Une page d'administration est imprimable grace à une feuille de style dédiée à l'impression : seule la zone de contenus est alors imprimée. Si une page d'administration contient des formulaires, les boutons ne sont pas imprimés.
 		*/
-		class HomeAdmin : public AdminInterfaceElement
+		class HomeAdmin : public AdminInterfaceElementTemplate<HomeAdmin>
 		{
 		public:
 			HomeAdmin();
@@ -65,8 +65,6 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
-
-			std::string getIcon() const;
 
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};

@@ -27,7 +27,7 @@
 
 #include "05_html/ActionResultHTMLTable.h"
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -37,7 +37,7 @@ namespace synthese
 		class SentScenario;
 
 		/** Ecran de recherche et de liste de message.
-			@ingroup m17
+			@ingroup m17Admin refAdmin
 
 			@image html cap_admin_messages.png
 			@image latex cap_admin_messages.png "Maquette de l'écran de liste de messages" width=14cm
@@ -112,7 +112,7 @@ namespace synthese
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
 		*/
-		class MessagesAdmin : public admin::AdminInterfaceElement
+		class MessagesAdmin : public admin::AdminInterfaceElementTemplate<MessagesAdmin>
 		{
 		public:
 			static const std::string CSS_ALARM_DISABLED;
@@ -161,9 +161,6 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
-
-			std::string getIcon() const;
-
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}

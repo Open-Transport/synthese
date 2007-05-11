@@ -35,6 +35,7 @@
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
 #include "34_departures_table/BroadcastPointAdmin.h"
+#include "34_departures_table/BroadcastPointsAdmin.h"
 #include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/CreateBroadcastPointAction.h"
 #include "34_departures_table/RenameBroadcastPointAction.h"
@@ -49,14 +50,25 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace html;
+	using namespace departurestable;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement,BroadcastPointAdmin>::FACTORY_KEY("broadcastpoint");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<BroadcastPointAdmin>::ICON("building.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<BroadcastPointAdmin>::DISPLAY_MODE(AdminInterfaceElement::DISPLAYED_IF_CURRENT);
+		template<> string AdminInterfaceElementTemplate<BroadcastPointAdmin>::getSuperior()
+		{
+			return BroadcastPointsAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace departurestable
 	{
-		BroadcastPointAdmin::BroadcastPointAdmin()
-			: AdminInterfaceElement("broadcastpoints", AdminInterfaceElement::DISPLAYED_IF_CURRENT)
-		{}
-
-
 		void BroadcastPointAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 			// Place ID
@@ -116,7 +128,7 @@ namespace synthese
 					f.addHiddenField(DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(it->bp->getKey()));
 					stream
 						<< "Arrêt physique actif en tant que point de diffusion "
-						<< f.getLinkButton("Supprimer", "Etes-vous sûr(e) de vouloir supprimer le point de diffusion ?");
+						<< f.getLinkButton("Désactiver", "Etes-vous sûr(e) de vouloir supprimer le point de diffusion ?");
 				}
 			}
 
@@ -136,7 +148,7 @@ namespace synthese
 				HTMLForm df(deleteRequest.getHTMLForm("delete" + Conversion::ToString(bit->bp->getKey())));
 				df.addHiddenField(DeleteBroadcastPointAction::PARAMETER_BROADCAST_ID, Conversion::ToString(bit->bp->getKey()));
 
-				stream << t.col() << rf.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer le point de diffusion ?");
+				stream << t.col() << df.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer le point de diffusion ?");
 			}
 
 			HTMLForm cf(createRequest.getHTMLForm("createbp"));
@@ -155,9 +167,10 @@ namespace synthese
 			return true;
 		}
 
-		std::string BroadcastPointAdmin::getIcon() const
+		BroadcastPointAdmin::BroadcastPointAdmin()
+			: AdminInterfaceElementTemplate<BroadcastPointAdmin>()
 		{
-			return "building.png";
+		
 		}
 	}
 }

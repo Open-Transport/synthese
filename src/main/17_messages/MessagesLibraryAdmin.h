@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_MessagesLibraryAdmin_H__
 #define SYNTHESE_MessagesLibraryAdmin_H__
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 #include "05_html/ResultHTMLTable.h"
 
@@ -72,7 +72,7 @@ namespace synthese
 				- INFO : Suppression de modèle de texte
 
 		*/
-		class MessagesLibraryAdmin : public admin::AdminInterfaceElement
+		class MessagesLibraryAdmin : public admin::AdminInterfaceElementTemplate<MessagesLibraryAdmin>
 		{
 		public:
 			static const std::string PARAMETER_NAME;
@@ -85,7 +85,7 @@ namespace synthese
 			
 		public:
 			MessagesLibraryAdmin();
-			
+
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
@@ -100,7 +100,6 @@ namespace synthese
 				@return The title of the admin compound, for display purposes.
 			*/
 			std::string getTitle() const;
-			std::string getIcon() const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};
 	}

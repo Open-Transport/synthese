@@ -26,6 +26,7 @@
 #include "71_vinci_bike_rental/VinciSiteTableSync.h"
 
 #include "32_admin/AdminParametersException.h"
+#include "32_admin/HomeAdmin.h"
 
 #include "05_html/ActionResultHTMLTable.h"
 
@@ -37,12 +38,28 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
+	using namespace vinci;
+
+	namespace util
+	{
+		const string FactorableTemplate<AdminInterfaceElement,VinciSitesAdminInterfaceElement>::FACTORY_KEY("vincisites");
+	}
+
+	namespace admin
+	{
+		const string AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::ICON("building.png");
+		const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		string AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>::getSuperior()
+		{
+			return HomeAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace vinci
 	{
 		/// @todo Verify the parent constructor parameters
 		VinciSitesAdminInterfaceElement::VinciSitesAdminInterfaceElement()
-			: AdminInterfaceElement("superior", AdminInterfaceElement::EVER_DISPLAYED) {}
+			: AdminInterfaceElementTemplate<VinciSitesAdminInterfaceElement>() {}
 
 		void VinciSitesAdminInterfaceElement::setFromParametersMap(const ParametersMap& map)
 		{
@@ -54,9 +71,9 @@ namespace synthese
 			return "Sites";
 		}
 
-		void VinciSitesAdminInterfaceElement::display(ostream& stream, const FunctionRequest<AdminRequest>* request) const
+		void VinciSitesAdminInterfaceElement::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request /*= NULL*/ ) const
 		{
-			/// @todo Implement the display by streaming the output to the stream variable
+
 		}
 
 		bool VinciSitesAdminInterfaceElement::isAuthorized(const FunctionRequest<AdminRequest>* request) const

@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_SECURITY_PROFILE_ADMIN_H
 #define SYNTHESE_SECURITY_PROFILE_ADMIN_H
 
-#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
@@ -73,7 +73,7 @@ namespace synthese
 				- INFO : Ajout d'habilitation au profil
 				- INFO : Suppression d'habilitation au profil
 		*/
-		class ProfileAdmin : public admin::AdminInterfaceElement
+		class ProfileAdmin : public admin::AdminInterfaceElementTemplate<ProfileAdmin>
 		{
 			static const std::string PARAM_PROFILE_ID;
 
@@ -89,7 +89,6 @@ namespace synthese
 			void setFromParametersMap(const server::ParametersMap& map);
 
 			std::string getTitle() const;
-			std::string getIcon() const;
 			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const;
 			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>* request) const;
 		};

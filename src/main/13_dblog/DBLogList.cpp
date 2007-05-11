@@ -20,6 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "32_admin/HomeAdmin.h"
+
 #include <boost/shared_ptr.hpp>
 
 #include "05_html/HTMLTable.h"
@@ -28,6 +30,7 @@
 #include "13_dblog/DBLog.h"
 #include "13_dblog/DBLogList.h"
 #include "13_dblog/DBLogViewer.h"
+#include "13_dblog/DBLogRight.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -39,12 +42,26 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
+	using namespace dblog;
+	using namespace security;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<AdminInterfaceElement,DBLogList>::FACTORY_KEY("dblogs");
+	}
+
+	namespace admin
+	{
+		template<> const string AdminInterfaceElementTemplate<DBLogList>::ICON("book.png");
+		template<> const AdminInterfaceElement::DisplayMode AdminInterfaceElementTemplate<DBLogList>::DISPLAY_MODE(AdminInterfaceElement::EVER_DISPLAYED);
+		template<> string AdminInterfaceElementTemplate<DBLogList>::getSuperior()
+		{
+			return HomeAdmin::FACTORY_KEY;
+		}
+	}
 
 	namespace dblog
 	{
-		DBLogList::DBLogList()
-			: AdminInterfaceElement("home", AdminInterfaceElement::EVER_DISPLAYED) {}
-
 		void DBLogList::setFromParametersMap(const ParametersMap& map)
 		{
 		}
@@ -77,12 +94,13 @@ namespace synthese
 
 		bool DBLogList::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
-			return true;
+			return request->isAuthorized<DBLogRight>(Right::READ);
 		}
 
-		std::string DBLogList::getIcon() const
+		DBLogList::DBLogList()
+			: AdminInterfaceElementTemplate<DBLogList>()
 		{
-			return "book.png";
+
 		}
 	}
 }

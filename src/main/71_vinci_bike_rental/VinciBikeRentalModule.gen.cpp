@@ -1,11 +1,12 @@
 
 synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::vinci::VinciBikeRentalModule>("71_vinci_bike_rental");
 
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::vinci::VinciCustomerAdminInterfaceElement>("vincicustomer");
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::vinci::VinciCustomerSearchAdminInterfaceElement>("vincicustomers");
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::vinci::VinciBikeSearchAdminInterfaceElement>("vincibikes");
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::vinci::VinciReportsAdminInterfaceElement>("vincireports");
-synthese::util::Factory<synthese::admin::AdminInterfaceElement>::integrate<synthese::vinci::VinciBikeAdminInterfaceElement>("vincibike");
+synthese::vinci::VinciCustomerAdminInterfaceElement::integrate();
+synthese::vinci::VinciCustomerSearchAdminInterfaceElement::integrate();
+synthese::vinci::VinciBikeSearchAdminInterfaceElement::integrate();
+synthese::vinci::VinciReportsAdminInterfaceElement::integrate();
+synthese::vinci::VinciBikeAdminInterfaceElement::integrate();
+synthese::vinci::VinciSitesAdminInterfaceElement::integrate();
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::vinci::VinciBikeTableSync>("71.01 Vinci Bike");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::vinci::VinciRateTableSync>("71.02 Vinci Rate");
