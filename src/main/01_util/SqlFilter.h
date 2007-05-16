@@ -24,7 +24,6 @@
 #define SYNTHESE_UTIL_LOWERCASEFILTER_H
 
 
-#include "module.h"
 
 #include <string>
 #include <iostream>

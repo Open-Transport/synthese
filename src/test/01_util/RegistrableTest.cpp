@@ -1,29 +1,13 @@
-#include "RegistrableTest.h"
-
 #include "01_util/RegistryKeyException.h"
 #include "01_util/Registrable.h"
 
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 
 
-namespace synthese
-{
-namespace util
-{
+#include <boost/test/auto_unit_test.hpp>
 
-
-  void 
-  RegistrableTest::setUp () 
-  {
-
-  }
-
-
-  void 
-  RegistrableTest::tearDown() 
-  {
-
-  } 
+using namespace synthese::util;
 
 
     class RegistrableForTest : public Registrable<int, RegistrableForTest>
@@ -38,41 +22,36 @@ namespace util
     };
 
 
+typedef boost::shared_ptr<RegistrableForTest> SPtr;
 
 
-  void
-  RegistrableTest::testConstruction ()
-  {
-      RegistrableForTest reg (1);
+BOOST_AUTO_TEST_CASE (testRegistryOperations)
+{
+      {
+	  RegistrableForTest reg (1);
+	  BOOST_REQUIRE_EQUAL (1, reg.getKey ());
+      }
 
-      CPPUNIT_ASSERT_EQUAL (1, reg.getKey ());
-  }
-
-
-  
-  void
-  RegistrableTest::testRegistryOperations ()
-  {
       bool exceptionThrown (false);
       RegistrableForTest::Registry reg;
 
-      CPPUNIT_ASSERT_EQUAL ((size_t) 0, reg.size ());
+      BOOST_REQUIRE_EQUAL ((size_t) 0, reg.size ());
 
       RegistrableForTest* reg1 = new RegistrableForTest (1);
-      reg.add (reg1);
+      reg.add (SPtr (reg1));
 
-      CPPUNIT_ASSERT_EQUAL ((size_t)1, reg.size ());
-      CPPUNIT_ASSERT (reg.contains (1));
-      CPPUNIT_ASSERT_EQUAL (reg1, reg.get (1));
+      BOOST_REQUIRE_EQUAL ((size_t)1, reg.size ());
+      BOOST_REQUIRE (reg.contains (1));
+      BOOST_REQUIRE_EQUAL (reg1, reg.get (1).get ());
       
       RegistrableForTest* reg2 = new RegistrableForTest (2);
-      reg.add (reg2);
+      reg.add (SPtr (reg2));
 
-      CPPUNIT_ASSERT_EQUAL ((size_t)2, reg.size ());
-      CPPUNIT_ASSERT (reg.contains (1));
-      CPPUNIT_ASSERT (reg.contains (2));
-      CPPUNIT_ASSERT_EQUAL (reg1, reg.get (1));
-      CPPUNIT_ASSERT_EQUAL (reg2, reg.get (2));
+      BOOST_REQUIRE_EQUAL ((size_t)2, reg.size ());
+      BOOST_REQUIRE (reg.contains (1));
+      BOOST_REQUIRE (reg.contains (2));
+      BOOST_REQUIRE_EQUAL (reg1, reg.get (1).get ());
+      BOOST_REQUIRE_EQUAL (reg2, reg.get (2).get ());
 
       exceptionThrown = false;
       try
@@ -83,27 +62,25 @@ namespace util
       {
 	  exceptionThrown = true;
       }
-      CPPUNIT_ASSERT (exceptionThrown);
+      BOOST_REQUIRE (exceptionThrown);
 
       RegistrableForTest* reg3 = new RegistrableForTest (1);
       exceptionThrown = false;
       try
       {
-	  reg.add (reg3);
+	  reg.add (SPtr (reg3));
       } 
       catch (RegistrableForTest::RegistryKeyException& rke)
       {
 	  exceptionThrown = true;
       }
-      CPPUNIT_ASSERT (exceptionThrown);
+      BOOST_REQUIRE (exceptionThrown);
 
-      delete reg3;
-
-      CPPUNIT_ASSERT_EQUAL ((size_t) 2, reg.size ());
-      CPPUNIT_ASSERT (reg.contains (1));
-      CPPUNIT_ASSERT (reg.contains (2));
-      CPPUNIT_ASSERT_EQUAL (reg1, reg.get (1));
-      CPPUNIT_ASSERT_EQUAL (reg2, reg.get (2));
+      BOOST_REQUIRE_EQUAL ((size_t) 2, reg.size ());
+      BOOST_REQUIRE (reg.contains (1));
+      BOOST_REQUIRE (reg.contains (2));
+      BOOST_REQUIRE_EQUAL (reg1, reg.get (1).get ());
+      BOOST_REQUIRE_EQUAL (reg2, reg.get (2).get ());
 
       exceptionThrown = false;
       try
@@ -114,22 +91,15 @@ namespace util
       {
 	  exceptionThrown = true;
       }
-      CPPUNIT_ASSERT (exceptionThrown);
+      BOOST_REQUIRE (exceptionThrown);
       
       reg.remove (1);
-      CPPUNIT_ASSERT_EQUAL ((size_t) 1, reg.size ());
-      CPPUNIT_ASSERT (reg.contains (2));
-      CPPUNIT_ASSERT_EQUAL (reg2, reg.get (2));
+      BOOST_REQUIRE_EQUAL ((size_t) 1, reg.size ());
+      BOOST_REQUIRE (reg.contains (2));
+      BOOST_REQUIRE_EQUAL (reg2, reg.get (2).get ());
       
       reg.clear ();
-      CPPUNIT_ASSERT_EQUAL ((size_t) 0, reg.size ());
-  }
-
-
-
-
-
-}
+      BOOST_REQUIRE_EQUAL ((size_t) 0, reg.size ());
 }
 
 

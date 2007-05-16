@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_html_Constants_h__
 #define SYNTHESE_html_Constants_h__
 
+#include <string>
+
 namespace synthese
 {
 	namespace html

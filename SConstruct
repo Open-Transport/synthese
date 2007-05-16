@@ -301,6 +301,38 @@ def SyntheseEnv (env, modules):
 
 
 
+def UnitTestEnv (env, modules):
+    testenv = env.ModuleEnv ()
+    testenv.Append ( CPPDEFINES = ['BOOST_AUTO_TEST_MAIN='] )
+
+    for module in modules:
+        testenv.AddModuleDependency (module)
+
+    # Some hard-coded dependencies
+    testenv.AddBoostDependency ('boost_program_options')
+    testenv.AddBoostDependency ('boost_filesystem')
+    testenv.AddBoostDependency ('boost_date_time')
+    testenv.AddBoostDependency ('boost_thread')
+    testenv.AddBoostDependency ('boost_iostreams')
+    testenv.AddBoostDependency ('boost_unit_test_framework')
+    testenv.AddSQLiteDependency ()
+    testenv.AppendMultithreadConf ()
+
+    return testenv
+
+
+
+def UnitTest (env):
+  includes = '*Test.cpp'
+  excludes = []
+  files = env.Glob(includes, excludes)
+  for f in files:
+    binname = f.replace ('.cpp', '')
+    testprogram  = env.Program ( binname, f )[0]
+    env.Test(binname + '.passed', testprogram)
+    env.AlwaysBuild (binname + '.passed')
+
+
 
 
 
@@ -438,6 +470,7 @@ SConsEnvironment.DefineDefaultLibs=DefineDefaultLibs
 SConsEnvironment.AppendMultithreadConf=AppendMultithreadConf
 SConsEnvironment.ModuleEnv=ModuleEnv
 SConsEnvironment.TestModuleEnv=TestModuleEnv
+SConsEnvironment.UnitTestEnv=UnitTestEnv
 SConsEnvironment.SyntheseEnv=SyntheseEnv
 SConsEnvironment.IsDebug=IsDebug
 SConsEnvironment.IsRelease=IsRelease
@@ -445,6 +478,9 @@ SConsEnvironment.IsProfile=IsProfile
 
 SConsEnvironment.SyntheseBuild=SyntheseBuild
 SConsEnvironment.SyntheseDist=SyntheseDist
+
+SConsEnvironment.UnitTest=UnitTest
+
 
 SConsEnvironment.AddModuleDependency=AddModuleDependency
 SConsEnvironment.AddBoostDependency=AddBoostDependency
@@ -532,7 +568,7 @@ builddir = '#' + buildroot
 
 
 rootenv.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
-#rootenv.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)
+rootenv.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)
 
 
     

@@ -1,5 +1,3 @@
-#include "SqlFilterTest.h"
-
 #include "01_util/SqlFilter.h"
 
 #include <sstream>
@@ -7,31 +5,14 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/operations.hpp>
 
-namespace synthese
+#include <boost/test/auto_unit_test.hpp>
+
+using namespace synthese::util;
+namespace io = boost::iostreams;
+
+
+BOOST_AUTO_TEST_CASE (testFiltering)
 {
-namespace util
-{
-
-  namespace io = boost::iostreams;
-
-
-  void 
-  SqlFilterTest::setUp () 
-  {
-
-  }
-
-
-  void 
-  SqlFilterTest::tearDown() 
-  {
-
-  } 
-
-
-  void
-  SqlFilterTest::testFiltering ()
-  {
       std::stringstream sout;
 
       SqlFilter filter;
@@ -43,14 +24,9 @@ namespace util
       {
 	  out << "Hello\n\r\\\"\032;" << std::flush;
 	  std::string expected ("Hello\\n\\r\\\\'\\Z,");
-	  CPPUNIT_ASSERT_EQUAL (expected, sout.str ());
+	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
 
-
-  }
-
-
-}
 }
 
 

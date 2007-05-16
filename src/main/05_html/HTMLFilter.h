@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_UTIL_HTMLFILTER_H
 #define SYNTHESE_UTIL_HTMLFILTER_H
 
+#include "05_html/Constants.h"
+
 #include <string>
 #include <iostream>
 

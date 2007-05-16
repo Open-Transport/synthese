@@ -1,47 +1,18 @@
-#include "ConversionTest.h"
-
 #include "01_util/Conversion.h"
 
+#include <boost/test/auto_unit_test.hpp>
+
+using namespace synthese::util;
 
 
-namespace synthese
+BOOST_AUTO_TEST_CASE (testLongLongConversion)
 {
-namespace util
-{
 
-
-  void 
-  ConversionTest::setUp () 
-  {
-
-  }
-
-
-  void 
-  ConversionTest::tearDown() 
-  {
-
-  } 
-
-
-  void
-  ConversionTest::testLongLongConversion ()
-  {
-      long long lli = 123456789012345LL;
-      std::string lls = Conversion::ToString (lli);
+     long long lli = 123456789012345LL;
+     std::string lls = Conversion::ToString (lli);
       
-      CPPUNIT_ASSERT_EQUAL (std::string ("123456789012345"), lls);
-      CPPUNIT_ASSERT_EQUAL (lli, Conversion::ToLongLong ("123456789012345"));
-
-  }
-
-
-
-
-
-
-
-}
+     BOOST_CHECK_EQUAL (std::string ("123456789012345"), lls);
+     BOOST_CHECK_EQUAL (lli, Conversion::ToLongLong ("123456789012345"));
 }
 
 

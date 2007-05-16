@@ -6,15 +6,6 @@ Import ('rootenv')
 
 testenv = rootenv.Copy()
 
-# Add specific configuration for building test modules
-# ...
-
-if testenv['PLATFORM'] == 'win32':
-  testenv.Append ( LIBS = 'cppunitd' )
-else:
-  testenv.Append ( LIBS = 'cppunit' )
-
-#testenv.Append ( LINKFLAGS= ['-ldl'] )
 
 Export ('testenv')
 
