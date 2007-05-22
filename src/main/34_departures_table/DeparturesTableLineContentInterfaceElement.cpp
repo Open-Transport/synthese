@@ -67,18 +67,20 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const Line* line = static_cast<const LineStop*>(static_cast<const ArrivalDepartureRow*>(object)->first.servicePointer.getEdge())->getLine();
+			const Line* line(static_cast<const LineStop*>(static_cast<const ArrivalDepartureRow*>(object)->first.servicePointer.getEdge())->getLine());
+			shared_ptr<const LineMarkerInterfacePage> page(_page->getInterface()->getPage<LineMarkerInterfacePage>());
 
-			shared_ptr<const LineMarkerInterfacePage> page = _page->getInterface()->getPage<LineMarkerInterfacePage>();
-			page->display(stream
+			page->display(
+				stream
 				, variables
 				, _htmlStartLine->getValue(parameters, variables, object, request)
 				, _htmlEndLine->getValue(parameters, variables, object, request)
 				, Conversion::ToInt(_cellWidth->getValue(parameters, variables, object, request))
 				, Conversion::ToInt(_cellHeight->getValue(parameters, variables, object,request))
-				, line, request
+				, line
+				, request
 				);
-			return "";
+			return string();
 		}
 	}
 }

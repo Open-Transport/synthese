@@ -24,6 +24,8 @@
 
 #include "15_env/LineMarkerInterfacePage.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace util;
@@ -31,8 +33,16 @@ namespace synthese
 
 	namespace env
 	{
-		void LineMarkerInterfacePage::display( std::ostream& stream, interfaces::VariablesMap& vars, const std::string& tableOpeningHTML , const std::string& tableClosingHTML , int pixelWidth , int pixelHeight , const synthese::env::Line* line , const server::Request* request /*= NULL */ ) const
-		{
+		void LineMarkerInterfacePage::display(
+			ostream& stream
+			, VariablesMap& vars
+			, const string& tableOpeningHTML
+			, const string& tableClosingHTML
+			, int pixelWidth
+			, int pixelHeight
+			, const Line* line
+			, const Request* request /*= NULL */
+		) const {
 			ParametersVector pv;
 			pv.push_back(tableOpeningHTML);
 			pv.push_back(tableClosingHTML);
