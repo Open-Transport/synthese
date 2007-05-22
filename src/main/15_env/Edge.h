@@ -23,11 +23,14 @@
 #ifndef SYNTHESE_ENV_EDGE_H
 #define SYNTHESE_ENV_EDGE_H
 
+#include "15_env/Types.h"
+
 #include <vector>
 
 #include "01_util/Constants.h"
 
-#include "Point.h"
+#include "15_env/Point.h"
+#include "15_env/ServicePointer.h"
 
 #include "04_time/DateTime.h"
 #include "04_time/Schedule.h"
@@ -84,11 +87,6 @@ namespace synthese
 			const Edge* _followingArrivalForFineSteppingOnly;	//!< Next arrival edge with or without connection
 
 			std::vector<const Point*> _viaPoints;				//!< Intermediate points along the edge (for map drawing)
-
-			std::vector<synthese::time::Schedule> _departureBeginSchedule;	//!< 
-			std::vector<synthese::time::Schedule> _departureEndSchedule;	//!< 
-			std::vector<synthese::time::Schedule> _arrivalBeginSchedule;	//!< 
-			std::vector<synthese::time::Schedule> _arrivalEndSchedule;		//!< 
 
 			int _departureIndex[24];	//!< First line service index by departure hour of day
 			int _arrivalIndex[24];		//!< First line service index by arrival hour of day
@@ -153,18 +151,6 @@ namespace synthese
 				*/
 				const std::vector<const Point*>& getViaPoints () const;
 
-				const synthese::time::Schedule& 
-				getDepartureBeginSchedule (int serviceIndex) const;
-
-				const synthese::time::Schedule& 
-				getDepartureEndSchedule (int serviceIndex) const;
-
-				const synthese::time::Schedule& 
-				getArrivalBeginSchedule (int serviceIndex) const;
-
-				const synthese::time::Schedule& 
-				getArrivalEndSchedule (int serviceIndex) const;
-
 				int getDepartureFromIndex (int hour) const;
 				int getArrivalFromIndex (int hour) const;
 			//@}
@@ -184,23 +170,13 @@ namespace synthese
 				bool isRunning( const synthese::time::DateTime& startMoment, 
 						const synthese::time::DateTime& endMoment ) const;
 
-				void calculateArrival (const Edge& departureEdge, 
-							int serviceIndex,
-							const synthese::time::DateTime& departureMoment, 
-							synthese::time::DateTime& arrivalMoment ) const;
-
-				void calculateDeparture (const Edge& arrivalEdge, 
-							int serviceIndex,
-							const synthese::time::DateTime& arrivalMoment, 
-							synthese::time::DateTime& departureMoment ) const;
-
-				int getBestRunTime (const Edge& other ) const;
+//				int getBestRunTime (const Edge& other ) const;
 			    
 				/** Checks consistency of input schedules.
 				@param edgeWithPreviousSchedule Previous edge with schedule
 				@return true if no problem detected, false otherwise
 				*/
-				bool checkSchedule (const Edge* edgeWithPreviousSchedule ) const;
+//				bool checkSchedule (const Edge* edgeWithPreviousSchedule ) const;
 
 
 
@@ -212,21 +188,26 @@ namespace synthese
 					@param departureMoment Presence hour at departure place
 					@param maxDepartureMoment Maximum departure hour
 					@param calculationMoment Calculation moment for reservation delay checking
-					@return Found service index or -1 if none was found.
+					@return Found service instance index or -1 if none was found.
 					@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
 					0 means scheduled service.
 				*/
-				int getNextService (synthese::time::DateTime& departureMoment, 
-						const synthese::time::DateTime& maxDepartureMoment,
-						const synthese::time::DateTime& calculationMoment,
-						int minNextServiceIndex = UNKNOWN_VALUE ) const;
+				ServicePointer getNextService (
+					time::DateTime departureMoment
+					, const time::DateTime& maxDepartureMoment
+					, const time::DateTime& calculationMoment
+					, int minNextServiceIndex = UNKNOWN_VALUE
+					) const;
 
 			    
 			 
 
-				int getPreviousService ( synthese::time::DateTime& arrivalMoment, 
-							const synthese::time::DateTime& minArrivalMoment,
-							int maxPreviousServiceIndex = UNKNOWN_VALUE) const;
+				ServicePointer getPreviousService(
+					time::DateTime arrivalMoment
+					, const synthese::time::DateTime& minArrivalMoment
+					, const time::DateTime& calculationMoment
+					, int maxPreviousServiceIndex = UNKNOWN_VALUE
+					) const;
 			    
 			//@}
 
@@ -235,11 +216,7 @@ namespace synthese
 				void clearViaPoints ();
 				void addViaPoint (const Point& viaPoint);
 			    
-				void insertDepartureSchedule (int index, const synthese::time::Schedule& schedule);
-				void insertArrivalSchedule (int index, const synthese::time::Schedule& schedule);
-
-				void updateDepartureIndex ();
-				void updateArrivalIndex ();
+				void updateServiceIndex();
 			//@}
 	    
 		};

@@ -31,22 +31,17 @@ namespace synthese
 	namespace env
 	{
 		Service::Service (int serviceNumber,
-				Path* path,
-				const synthese::time::Schedule& departureSchedule)
-			: BikeComplyer (path) 
-			, HandicappedComplyer (path) 
-			, PedestrianComplyer (path) 
+				Path* path
+		)
+			: Complyer () 
 			, _serviceNumber (serviceNumber)
 			, _path (path)
-			, _departureSchedule (departureSchedule)
 		{
 		}
 
 
 		Service::Service()
-		: BikeComplyer(NULL)
-		, HandicappedComplyer(NULL)
-		, PedestrianComplyer(NULL)
+		: Complyer()
 		, _serviceNumber(0)
 		, _path(NULL)
 		{
@@ -98,21 +93,6 @@ namespace synthese
 
 
 
-		const synthese::time::Schedule&
-		Service::getDepartureSchedule () const
-		{
-			return _departureSchedule;
-		}
-
-
-
-		void 
-		Service::setDepartureSchedule (const synthese::time::Schedule& departureSchedule)
-		{
-			_departureSchedule = departureSchedule;
-		}
-
-
 
 		bool 
 		Service::isReservationPossible ( const synthese::time::DateTime& departureMoment, 
@@ -123,30 +103,17 @@ namespace synthese
 
 
 
-		bool 
-		Service::isProvided ( const synthese::time::Date& departureDate,
-					int jplus ) const
+		bool Service::isProvided (const Date& departureDate) const
 		{
-			if ( jplus > 0 )
-			{
-				synthese::time::Date _originDepartureDate;
-				_originDepartureDate = departureDate;
-				_originDepartureDate -= jplus;
-				return _calendar.isMarked( _originDepartureDate );
-			}
-			else
-				return _calendar.isMarked ( departureDate );
+			return _calendar.isMarked ( departureDate );
 		}
 
 		void Service::setPath( Path* path )
 		{
 			_path = path;
-			BikeComplyer::setParent(path);
-			HandicappedComplyer::setParent(path);
-			PedestrianComplyer::setParent(path);
 		}
 
-		const Schedule& Service::getLastArrivalSchedule() const
+/*		const Schedule& Service::getLastArrivalSchedule() const
 		{
 			return _arrivalSchedule;
 		}
@@ -154,6 +121,14 @@ namespace synthese
 		void Service::setArrivalSchedule( const synthese::time::Schedule& schedule )
 		{
 			_arrivalSchedule = schedule;
+		}
+*/
+		DateTime Service::getOriginDateTime(const Date& departureDate, const Schedule& departureTime) const
+		{
+			DateTime originDateTime(departureDate);
+			originDateTime -= (departureTime.getDaysSinceDeparture() - getDepartureSchedule().getDaysSinceDeparture());
+			originDateTime.setHour(getDepartureSchedule().getHour());
+			return originDateTime;
 		}
 	}
 }

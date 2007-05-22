@@ -52,7 +52,6 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<ReservationRule>::load(ReservationRule* rr, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
 		{
 			rr->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
-			ReservationRule::ReservationType type = (ReservationRule::ReservationType) Conversion::ToInt (rows.getColumn (rowIndex,ReservationRuleTableSync::COL_TYPE));
 
 			bool online (
 				Conversion::ToBool (rows.getColumn (rowIndex,ReservationRuleTableSync::COL_ONLINE)));
@@ -78,7 +77,7 @@ namespace synthese
 			std::string webSiteUrl (
 				rows.getColumn (rowIndex,ReservationRuleTableSync::COL_WEBSITEURL));
 
-			rr->setType (type);
+			rr->setCompliant(Conversion::ToTribool(rows.getColumn(rowIndex, ReservationRuleTableSync::COL_TYPE)));
 			rr->setOnline (online);
 			rr->setOriginIsReference (originIsReference);
 			rr->setMinDelayMinutes (minDelayMinutes);

@@ -22,7 +22,7 @@
 
 #include "34_departures_table/BroadcastPointsAdmin.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
-#include "34_departures_table/BroadcastPointsRight.h"
+#include "34_departures_table/ArrivalDepartureTableRight.h"
 
 #include <map>
 
@@ -178,7 +178,7 @@ namespace synthese
 
 		bool BroadcastPointsAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
-			return request->isAuthorized<BroadcastPointsRight>(Right::READ);
+			return request->isAuthorized<ArrivalDepartureTableRight>(Right::READ);
 		}
 	}
 }

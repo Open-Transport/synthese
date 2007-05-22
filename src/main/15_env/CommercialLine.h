@@ -36,6 +36,7 @@ namespace synthese
 		class TransportNetwork;
 
 		/** Commercial line class.
+			TRIDENT = Line
 			@ingroup m15
 		*/
 		class CommercialLine : public util::Registrable<uid, CommercialLine>

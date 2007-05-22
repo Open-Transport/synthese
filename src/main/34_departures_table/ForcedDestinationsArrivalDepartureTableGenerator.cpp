@@ -98,16 +98,16 @@ namespace synthese
 					DateTime maxTimeForForcedDestination(_startDateTime);
 					maxTimeForForcedDestination += _persistanceDuration;
 
-					int serviceNumber = ls->getNextService(tempStartDateTime, maxTimeForForcedDestination, _startDateTime);
+					ServicePointer serviceInstance = ls->getNextService(tempStartDateTime, maxTimeForForcedDestination, _startDateTime);
 					
 					// No service
-					if (serviceNumber == UNKNOWN_VALUE)
+					if (serviceInstance.getService() == NULL)
 						continue;
 
 					bool insertionIsDone = false;
 
 					// Exploration of the line
-					for (const LineStop* curGLA = (const LineStop*) ls->getFollowingArrivalForFineSteppingOnly(); curGLA != NULL; curGLA = (const LineStop*) curGLA->getFollowingArrivalForFineSteppingOnly())
+					for (const LineStop* curGLA = static_cast<const LineStop*>(ls->getFollowingArrivalForFineSteppingOnly()); curGLA != NULL; curGLA = (const LineStop*) curGLA->getFollowingArrivalForFineSteppingOnly())
 					{
 						// Attempting to select the destination
 						if (_forcedDestinations.find(curGLA->getConnectionPlace()) == _forcedDestinations.end())
@@ -117,16 +117,16 @@ namespace synthese
 						if (reachedDestination.find(curGLA->getConnectionPlace()) == reachedDestination.end())
 						{
 							// Allocation
-							ArrivalDepartureList::iterator itr = _insert(ls, serviceNumber, tempStartDateTime, FORCE_UNLIMITED_SIZE);
+							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
 
 							// Links
 							reachedDestination[curGLA->getConnectionPlace()] = itr;
 						}
 						// Else optimizing a previously founded ptd
-						else if (tempStartDateTime < reachedDestination[curGLA->getConnectionPlace()]->first.realDepartureTime)
+						else if (tempStartDateTime < reachedDestination[curGLA->getConnectionPlace()]->first.servicePointer.getActualDateTime())
 						{
 							// Allocation
-							ArrivalDepartureList::iterator itr = _insert(ls, serviceNumber, tempStartDateTime, FORCE_UNLIMITED_SIZE);
+							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
 							ArrivalDepartureList::iterator oldIt = reachedDestination[curGLA->getConnectionPlace()];
 
 							reachedDestination[curGLA->getConnectionPlace()] = itr;
@@ -155,7 +155,7 @@ namespace synthese
 					_result.size() < _maxSize && itr != standardTableResult.end(); ++itr)
 				{
 					if (_result.find(itr->first) == _result.end())
-						_insert(itr->first.linestop, itr->first.serviceNumber, itr->first.realDepartureTime);
+						_insert(itr->first.servicePointer);
 				}
 			}
 

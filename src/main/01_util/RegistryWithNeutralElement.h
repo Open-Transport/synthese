@@ -1,6 +1,6 @@
 
-/** TransportNetworkDataLog class header.
-	@file TransportNetworkDataLog.h
+/** RegistryWithNeutralElement class header.
+	@file RegistryWithNeutralElement.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,37 +20,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_TRANSPORT_NETWORK_DATA_LOG
-#define SYNTHESE_TRANSPORT_NETWORK_DATA_LOG
+#ifndef SYNTHESE_util_RegistryWithNeutralElement_h__
+#define SYNTHESE_util_RegistryWithNeutralElement_h__
 
-#include "13_dblog/DBLog.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "01_util/Registry.h"
 
 namespace synthese
 {
-	namespace departurestable
+	namespace util
 	{
-		/** Journal des modifications de la base transport.
-			@ingroup m34
-
-			Les entrées du journal de modification de la base transport sont toutes les modifications effectuées à chaud sur les objets de description du réseau (places, lines, etc.)
-				
-			Les colonnes additionnelles du journal de sécurité sont :
-				- Action : décrit l'action effectuée (ex : création de profil)
-				- UID objet concerné
-				- Classe objet concerné
-				- Description de l'action
-
+		/** RegistryWithNeutralElement class.
+			@ingroup m01
 		*/
-		class BroadcastPointsDataLog : public util::FactorableTemplate<dblog::DBLog, BroadcastPointsDataLog>
+		template<class K, class T>
+		class RegistryWithNeutralElement : public Registry<K,T>
 		{
 		public:
-			std::string getName() const;
-			DBLog::ColumnsVector getColumnNames() const;
+			RegistryWithNeutralElement()
+				: Registry<K,T>()
+			{
+				boost::shared_ptr<T> object(new T);
+				object->setKey(0);
+				add(object);
+			}
+
 		};
 	}
 }
 
-#endif
-
+#endif // SYNTHESE_util_RegistryWithNeutralElement_h__

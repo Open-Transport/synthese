@@ -23,7 +23,6 @@
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/DisplayTypeTableSync.h"
 #include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/BroadcastPointTableSync.h"
 #include "34_departures_table/DeparturesTableModule.h"
 
 #include "15_env/EnvModule.h"
@@ -67,7 +66,8 @@ namespace synthese
 			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			object->setLocalization(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_PLACE_ID))));
 			object->setLocalizationComment(rows.getColumn(rowId, DisplayScreenTableSync::COL_NAME));
-			object->setType(DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_TYPE_ID))).get());
+			if (Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_TYPE_ID)) > 0)
+				object->setType(DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_TYPE_ID))).get());
 			object->setWiringCode(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_WIRING_CODE)));
 			object->setTitle(rows.getColumn(rowId, DisplayScreenTableSync::COL_TITLE));
 			object->setBlinkingDelay(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_BLINKING_DELAY)));

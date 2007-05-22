@@ -46,6 +46,8 @@ namespace synthese
 
 
 		/** Technical line.
+			TRIDENT JourneyPattern = Mission
+			 inherits from Route
 			@ingroup m15
 
 			Une ligne technique est un regroupement de services, constitué dans un but d’amélioration des performances de la recherche d'itinéraires. En effet, plusieurs services groupés dans une ligne ne comptent que pour un dans leur participation au temps de calcul, ce qui rend tout son intérêt au regroupement des services en lignes.

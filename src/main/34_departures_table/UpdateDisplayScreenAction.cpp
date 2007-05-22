@@ -127,10 +127,6 @@ namespace synthese
 			{
 				throw ActionException("Display screen not specified or specified display screen not found");
 			}
-			catch (BroadcastPoint::RegistryKeyException&)
-			{
-				throw ActionException("Specified localization not found");
-			}
 			catch (DisplayType::RegistryKeyException&)
 			{
 				throw ActionException("Specified display type not found");

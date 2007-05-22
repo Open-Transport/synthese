@@ -153,11 +153,11 @@ namespace synthese
 			_transferDelays[std::make_pair (departureId, arrivalId)] = transferDelay;
 			if (transferDelay < _minTransferDelay)
 			{
-			_minTransferDelay = transferDelay;
+				_minTransferDelay = transferDelay;
 			}
 			if (transferDelay < _maxTransferDelay)
 			{
-			_maxTransferDelay = transferDelay;
+				_maxTransferDelay = transferDelay;
 			}
 		}
 
@@ -190,29 +190,25 @@ namespace synthese
 
 			if (origin != 0)
 			{
-			access.approachDistance = 0;
-			if (accessDirection == FROM_ORIGIN)
-			{
-				access.approachTime = getTransferDelay (origin, destination);
-			} 
+				access.approachDistance = 0;
+				if (accessDirection == FROM_ORIGIN)
+				{
+					access.approachTime = getTransferDelay (origin, destination);
+				} 
+				else
+				{
+					access.approachTime = getTransferDelay (destination, origin);
+				}
+			}
 			else
 			{
-				access.approachTime = getTransferDelay (destination, origin);
-			}
-			}
-			else
-			{
-			access.approachDistance = 0;
-			access.approachTime = 0;
+				access.approachDistance = 0;
+				access.approachTime = 0;
 			}
 
 			return access;
 		}
-		    
-
-
-
-
+		
 
 
 		void
@@ -228,14 +224,14 @@ namespace synthese
 		    
 			if (returnPhysicalStops)
 			{
-			for (PhysicalStopsSet::const_iterator it = _physicalStops.begin ();
-				it != _physicalStops.end (); ++it)
-			{
-				if (origin == (*it)) continue;
-				result.insert ((*it), getVertexAccess (accessDirection,
-								accessParameters,
-								(*it), origin));
-			}
+				for (PhysicalStopsSet::const_iterator it = _physicalStops.begin ();
+					it != _physicalStops.end (); ++it)
+				{
+					if (origin == (*it)) continue;
+					result.insert ((*it), getVertexAccess (accessDirection,
+									accessParameters,
+									(*it), origin));
+				}
 			}
 		}
 

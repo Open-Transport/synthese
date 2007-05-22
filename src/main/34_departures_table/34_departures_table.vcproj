@@ -64,14 +64,6 @@
 			Name="AdminInterfaceElement"
 			>
 			<File
-				RelativePath=".\BroadcastPointAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BroadcastPointAdmin.h"
-				>
-			</File>
-			<File
 				RelativePath=".\BroadcastPointsAdmin.cpp"
 				>
 			</File>
@@ -115,14 +107,6 @@
 		<Filter
 			Name="Core classes"
 			>
-			<File
-				RelativePath=".\BroadcastPoint.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BroadcastPoint.h"
-				>
-			</File>
 			<File
 				RelativePath=".\DisplayScreen.cpp"
 				>
@@ -180,14 +164,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\BroadcastPointsRight.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BroadcastPointsRight.h"
-				>
-			</File>
-			<File
 				RelativePath=".\DisplayMaintenanceRight.cpp"
 				>
 			</File>
@@ -205,14 +181,6 @@
 			</File>
 			<File
 				RelativePath=".\ArrivalDepartureTableLog.h"
-				>
-			</File>
-			<File
-				RelativePath=".\BroadcastPointsDataLog.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BroadcastPointsDataLog.h"
 				>
 			</File>
 			<File
@@ -261,14 +229,6 @@
 			</File>
 			<File
 				RelativePath=".\AdvancedSelectTableSync.h"
-				>
-			</File>
-			<File
-				RelativePath=".\BroadcastPointTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BroadcastPointTableSync.h"
 				>
 			</File>
 			<File
@@ -416,34 +376,6 @@
 				</File>
 				<File
 					RelativePath=".\UpdateDisplayTypeAction.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Broadcast point"
-				>
-				<File
-					RelativePath=".\CreateBroadcastPointAction.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\CreateBroadcastPointAction.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DeleteBroadcastPointAction.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DeleteBroadcastPointAction.h"
-					>
-				</File>
-				<File
-					RelativePath=".\RenameBroadcastPointAction.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\RenameBroadcastPointAction.h"
 					>
 				</File>
 			</Filter>

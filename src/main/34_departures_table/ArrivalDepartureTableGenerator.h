@@ -85,7 +85,10 @@ namespace synthese
 			/** Insertion.
 				@return iterator on the element.
 			*/
-				ArrivalDepartureList::iterator _insert(const env::LineStop* linestop, int serviceNumber, const time::DateTime& realDepartureTime, UnlimitedSize unlimitedSize=SIZE_AS_DEFINED);
+				ArrivalDepartureList::iterator _insert(
+					const env::ServicePointer& servicePointer
+					, UnlimitedSize unlimitedSize=SIZE_AS_DEFINED
+					);
 
 			/** Constructor.
 				@param maxSize Maximal size of the departure table (default = unlimited).

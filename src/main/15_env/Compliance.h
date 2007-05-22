@@ -23,53 +23,52 @@
 #ifndef SYNTHESE_COMPLIANCE_H
 #define SYNTHESE_COMPLIANCE_H
 
-
 #include <boost/logic/tribool.hpp>
 #include <string>
 
 namespace synthese
 {
-namespace env
-{
+	namespace env
+	{
 
+		/** Compliance class.
+			@ingroup m15
+		*/
+		class Compliance
+		{
+		private:
+			boost::logic::tribool _compliant;
+			int _capacity;
 
+		protected:
 
+			Compliance (
+				boost::logic::tribool compliant,
+					int capacity);
+			
+		public:
 
-/** Compliance class.
- @ingroup m15
- */
-class Compliance 
-{
-private:
-        boost::logic::tribool _compliant;
-	int _capacity;
+			~Compliance();
 
-protected:
+			//! @name Getters/Setters
+			//@{
+				int getCapacity () const;
+				boost::logic::tribool isCompliant () const;
+			//@}
 
-        Compliance (const boost::logic::tribool& compliant,
-		    const int& capacity);
-		Compliance();
-	
-public:
+			//! @name Setters
+			//@{
+				void setCapacity (int capacity);
+				void setCompliant (boost::logic::tribool status);
+			//@}
 
-        ~Compliance();
+			//! @name Queries
+			//@{
+				virtual bool isCompatibleWith(const Compliance& compliance) const;
+			//@}
 
-	//! @name Getters/Setters
-	//@{
-	int getCapacity () const;
-	void setCapacity (int capacity);
-
-        boost::logic::tribool isCompliant () const;
-	void setCompliant (boost::logic::tribool status);
-	//@}
-
-
-};
-
-
+		};
+	}
 }
-}
-
 
 #endif
-

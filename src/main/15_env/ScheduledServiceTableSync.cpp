@@ -76,8 +76,8 @@ namespace synthese
 			boost::char_separator<char> sep1 (",");
 			tokenizer schedulesTokens (schedules, sep1);
 
-			std::vector<synthese::time::Schedule> departureSchedules;
-			std::vector<synthese::time::Schedule> arrivalSchedules;
+			ScheduledService::Schedules departureSchedules;
+			ScheduledService::Schedules arrivalSchedules;
 
 			for (tokenizer::iterator schedulesIter = schedulesTokens.begin();
 				schedulesIter != schedulesTokens.end (); ++schedulesIter)
@@ -133,15 +133,15 @@ namespace synthese
 				Conversion::ToLongLong (rows.getColumn (rowIndex, ScheduledServiceTableSync::COL_RESERVATIONRULEID)));
 
 			ss->setPath(path.get());
-			ss->setDepartureSchedule(departureSchedules.at (0));
-			ss->setArrivalSchedule(arrivalSchedules.at(arrivalSchedules.size()-1));
 			ss->setServiceNumber(serviceNumber);
 			ss->setKey(id);
 			ss->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId).get());
 			ss->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
 			ss->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
 			ss->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId).get());
-			ss->getPath()->addService(ss, departureSchedules, arrivalSchedules);
+			ss->setDepartureSchedules(departureSchedules);
+			ss->setArrivalSchedules(arrivalSchedules);
+			ss->getPath()->addService(ss);
 		}
 
 		template<> void SQLiteTableSyncTemplate<ScheduledService>::save(ScheduledService* object)

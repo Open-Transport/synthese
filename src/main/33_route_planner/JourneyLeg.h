@@ -1,8 +1,32 @@
+
+/** JourneyLeg class header.
+	@file JourneyLeg.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_ROUTEPLANNER_JOURNEYLEG_H
 #define SYNTHESE_ROUTEPLANNER_JOURNEYLEG_H
 
 #include "04_time/DateTime.h"
+
 #include "15_env/SquareDistance.h"
+#include "15_env/ServicePointer.h"
 
 
 #include <string>
@@ -11,105 +35,85 @@
 namespace synthese
 {
 
-namespace env
-{
-    class Axis;
-    class Service;
-    class Edge;
-    class Path;
+	namespace env
+	{
+		class Axis;
+		class Service;
+		class Edge;
+		class Path;
+	}
+
+	namespace routeplanner
+	{
+
+		/** Journey leg class.
+
+			@ingroup m33
+		*/
+		class JourneyLeg
+		{
+		 private:
+			const env::ServicePointer _servicePointer;			//!< Used service.
+
+			const env::Edge* _origin;   //!< Origin
+			const env::Edge* _destination;  //!< Destination
+
+			time::DateTime _departureTime; //!< Departure moment (first if continuous service)
+			time::DateTime _arrivalTime;    //!< Arrival moment (first if continuous service)
+			
+			int _continuousServiceRange;
+		    
+			env::SquareDistance _squareDistance;
+
+		 public:
+
+			 JourneyLeg (const env::ServicePointer& servicePointer);
+			~JourneyLeg ();
+
+			//! @name Setters
+			//@{
+				void setDepartureTime (const time::DateTime& departureTime);
+				void setArrivalTime (const time::DateTime& arrivalTime);
+				void setOrigin (const env::Edge* origin);
+				void setDestination (const env::Edge* destination);
+				void setContinuousServiceRange (int continuousServiceRange);
+				void setSquareDistance (const env::SquareDistance& squareDistance);
+			//@}
+
+			//! @name Getters
+			//@{
+				const env::Path*			getPath ()					const;
+				const env::ServicePointer&	getServiceInstance()		const;
+				const time::DateTime&		getDepartureTime ()			const;
+				const time::DateTime&		getArrivalTime ()			const;
+				const env::Edge*			getOrigin ()				const;
+				const env::Edge*			getDestination ()			const;
+				int							getContinuousServiceRange()	const;
+				const env::SquareDistance&	getSquareDistance ()		const;
+				env::SquareDistance&		getSquareDistance ();
+			//@}
+
+
+			//! @name Query methods
+			//@{
+				const synthese::env::Axis* getAxis () const;
+
+				/** Returns this journey leg duration in minutes.
+				 */
+				int getDuration () const;
+
+				int getDistance () const;
+			//@}
+
+
+			//! @name Update methods
+			//@{
+
+			//@}
+
+
+		};
+	}
 }
 
-namespace routeplanner
-{
-
-
-
-/** Journey leg class.
-
-
-@ingroup m33
-*/
-class JourneyLeg
-{
- private:
-
-    const synthese::env::Edge* _origin;   //!< Origin
-    const synthese::env::Edge* _destination;  //!< Destination
-
-    synthese::time::DateTime _departureTime; //!< Departure moment (first if continuous service)
-    synthese::time::DateTime _arrivalTime;    //!< Arrival moment (first if continuous service)
-    const synthese::env::Service* _service; //!< Used service.
-
-    int _continuousServiceRange;
-    
-    synthese::env::SquareDistance _squareDistance;
-
- public:
-
-
-    JourneyLeg ();
-    ~JourneyLeg ();
-
-
-    //! @name Getters/Setters
-    //@{
-    const synthese::env::Path* getPath () const;
-    
-    const synthese::env::Service* getService () const;
-    void setService (const synthese::env::Service* service);
-
-    const synthese::time::DateTime& getDepartureTime () const;
-    void setDepartureTime (const synthese::time::DateTime& departureTime);
-
-    const synthese::time::DateTime& getArrivalTime () const;
-    void setArrivalTime (const synthese::time::DateTime& arrivalTime);
-
-    const synthese::env::Edge* getOrigin () const;
-    void setOrigin (const synthese::env::Edge* origin);
-
-    const synthese::env::Edge* getDestination () const;
-    void setDestination (const synthese::env::Edge* destination);
-
-    int getContinuousServiceRange () const;
-    void setContinuousServiceRange (int continuousServiceRange);
-
-    const synthese::env::SquareDistance& getSquareDistance () const;
-    synthese::env::SquareDistance& getSquareDistance ();
-    void setSquareDistance (const synthese::env::SquareDistance& squareDistance);
-
-
-    //@}
-
-
-    //! @name Query methods
-    //@{
-    const synthese::env::Axis* getAxis () const;
-
-    /** Returns this journey leg duration in minutes.
-     */
-    int getDuration () const;
-
-    int getDistance () const;
-    //@}
-
-
-    //! @name Update methods
-    //@{
-
-    //@}
-
-
- private:
-
-
-};
-
-
-
-
-
-}
-}
 #endif
-
-

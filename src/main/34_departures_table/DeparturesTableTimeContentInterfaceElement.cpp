@@ -62,7 +62,7 @@ namespace synthese
 			, const server::Request* request /*= NULL*/ ) const
 		{
 			const ArrivalDepartureRow*	row = (const ArrivalDepartureRow*) object;
-			const DateTime&				__Moment = row->first.realDepartureTime;
+			const DateTime&				__Moment = row->first.servicePointer.getActualDateTime();
 			bool						blinking = row->first.blinking;
 			string						__Zero = _zeroVIE->getValue(parameters, variables, object, request);
 			string						__AvantSiImminent = _beforeIfNext->getValue(parameters, variables, object, request);

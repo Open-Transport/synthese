@@ -29,6 +29,7 @@
 #include <iostream>
 
 #include "01_util/Registry.h"
+#include "01_util/Constants.h"
 
 namespace synthese
 {
@@ -95,7 +96,7 @@ namespace synthese
 
 		template<class K, class T>
 			synthese::util::Registrable<K, T>::Registrable()
-			: _key(0), _registry(NULL)
+			: _key(UNKNOWN_VALUE), _registry(NULL)
 		{
 
 		}

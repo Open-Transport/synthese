@@ -13,13 +13,11 @@ synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese
 synthese::departurestable::DisplaySearchAdmin::integrate();
 synthese::departurestable::DisplayTypesAdmin::integrate();
 synthese::departurestable::BroadcastPointsAdmin::integrate();
-synthese::departurestable::BroadcastPointAdmin::integrate();
 synthese::departurestable::DisplayAdmin::integrate();
 synthese::departurestable::DisplayMaintenanceAdmin::integrate();
 
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::departurestable::DisplayTypeTableSync>("34.00 Display Types");
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::departurestable::BroadcastPointTableSync>("34.10 Broadcast points");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::departurestable::DisplayScreenTableSync>("34.50 Display Screens");
 
 
@@ -27,9 +25,6 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::departure
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayTypeAction>("updatedisplaytype");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateDisplayScreenAction>("createdisplayscreen");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayScreenAction>("updatedisplayscreen");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateBroadcastPointAction>("crebp");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::RenameBroadcastPointAction>("renbp");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DeleteBroadcastPointAction>("delbp");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::AddPreselectionPlaceToDisplayScreen>("apptds");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::RemovePreselectionPlaceFromDisplayScreenAction>("rmpsfds");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateAllStopsDisplayScreenAction>("uasdsa");
@@ -48,10 +43,8 @@ synthese::util::Factory<synthese::server::Function>::integrate<synthese::departu
 
 synthese::departurestable::ArrivalDepartureTableRight::integrate();
 synthese::departurestable::DisplayMaintenanceRight::integrate();
-synthese::departurestable::BroadcastPointsRight::integrate();
 
 synthese::departurestable::ArrivalDepartureTableLog::integrate();
-synthese::departurestable::BroadcastPointsDataLog::integrate();
 synthese::departurestable::DisplayMaintenanceLog::integrate();
 synthese::departurestable::DisplayDataControlLog::integrate();
 

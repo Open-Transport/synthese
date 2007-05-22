@@ -25,6 +25,8 @@
 
 #include "33_route_planner/Types.h"
 
+#include "15_env/Types.h"
+
 namespace synthese
 {
 	namespace time
@@ -87,35 +89,43 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-			int getJourneyLegCount () const;
-			const JourneyLeg* getJourneyLeg (int index) const;
+				bool	empty()	const;
+				int getJourneyLegCount () const;
+				const JourneyLeg* getJourneyLeg (int index) const;
 
-			const JourneyLeg* getFirstJourneyLeg () const;
-			const JourneyLeg* getLastJourneyLeg () const;
+				const JourneyLeg* getFirstJourneyLeg () const;
+				const JourneyLeg* getLastJourneyLeg () const;
 
-			const synthese::env::Edge* getOrigin() const;
-			const synthese::env::Edge* getDestination() const;
+				const synthese::env::Edge* getOrigin() const;
+				const synthese::env::Edge* getDestination() const;
 
-			const synthese::time::DateTime& getDepartureTime () const;
-			const synthese::time::DateTime& getArrivalTime () const;
+				const synthese::time::DateTime& getDepartureTime () const;
+				const synthese::time::DateTime& getArrivalTime () const;
 
-			int getDuration () const;
-	
-	
-			/** Detects max alarm level in journey.
-		      
-				For each journey leg, 4 cases are possible :
-			- Alert on origin
-			- Service with reservation rule
-			- Service alert
-			- Alert on destination
-		      
-			@return Maximum journey alert level.
-			*/
-			int getMaxAlarmLevel () const;
+				int getDuration () const;
+		
+		
+				/** Detects max alarm level in journey.
+			      
+					For each journey leg, 4 cases are possible :
+				- Alert on origin
+				- Service with reservation rule
+				- Service alert
+				- Alert on destination
+			      
+				@return Maximum journey alert level.
+				*/
+				int getMaxAlarmLevel () const;
 
 
-			void setContinuousServiceRange (int continuousServiceRange);
+				void setContinuousServiceRange (int continuousServiceRange);
+
+				/** Comparison between journeys.
+					@param other Journey to compare with
+					@param direction Direction of the route planning
+					@return true if the current journey is a best choice than the other one
+				*/
+				bool isBestThan(const Journey& other, const AccessDirection& direction) const;
 
 			//@}
 
@@ -133,8 +143,6 @@ namespace synthese
 		    
 			//@}
 
-
-			int operator > (const Journey& op) const;
 			Journey& operator = (const Journey& ref);
 
 

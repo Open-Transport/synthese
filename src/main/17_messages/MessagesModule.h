@@ -46,10 +46,6 @@ namespace synthese
 		*/
 		class MessagesModule : public util::ModuleClass
 		{
-		public:
-//			typedef messages::AlarmBroadcastList<env::Line>				LineBroadcastList;
-//			typedef messages::AlarmBroadcastList<departurestable::BroadcastPoint>	BroadcastPointBroadcastList;
-
 		private:
 			static SentAlarm::Registry			_alarms;
 			static SentScenario::Registry		_scenarii;

@@ -43,7 +43,7 @@ namespace synthese
 		} VertexAccess;
 		 
 		/** 
-
+TRIDENT : VertexAccess => AccesPoint
 		@ingroup m15
 		*/
 		class VertexAccessMap

@@ -27,12 +27,17 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include "15_env/Complyer.h"
+
+#include "01_util/Constants.h"
+
 namespace synthese
 {
 	namespace env
 	{
 		class PhysicalStop;
 		class City;
+		class Service;
 
 		/** @addtogroup m15
 		@{
@@ -50,18 +55,15 @@ namespace synthese
 	*/
 	typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
 
-	typedef struct {
+	struct AccessParameters {
 		double maxApproachDistance;
 		double maxApproachTime;
 		double approachSpeed;
 		int maxTransportConnectionCount;
 
-		bool bikeCompliance;
-		bool handicappedCompliance;
-		bool pedestrianCompliance;
-		bool withReservation;
+		env::Complyer	complyer;
 
-	} AccessParameters;
+	};
 
 	/** @} */
 

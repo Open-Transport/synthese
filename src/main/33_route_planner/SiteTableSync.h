@@ -47,6 +47,7 @@ namespace synthese
 			static const std::string TABLE_COL_END_DATE;
 			static const std::string TABLE_COL_ONLINE_BOOKING;
 			static const std::string TABLE_COL_USE_OLD_DATA;
+			static const std::string COL_MAX_CONNECTIONS;
 
 			/** Site SQLite table constructor.
 			*/

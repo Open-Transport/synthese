@@ -28,12 +28,10 @@
 
 #include "04_time/Schedule.h"
 
-
-using synthese::time::Schedule;
-
-
 namespace synthese
 {
+	using namespace time;
+
 	namespace env
 	{
 		Edge::Edge (bool isDeparture,
@@ -225,43 +223,6 @@ namespace synthese
 
 
 
-		const synthese::time::Schedule& 
-		Edge::getDepartureBeginSchedule (int serviceIndex) const
-		{
-			return _departureBeginSchedule.at (serviceIndex);
-		}
-
-
-
-
-		const synthese::time::Schedule& 
-		Edge::getDepartureEndSchedule (int serviceIndex) const
-		{
-			return _departureEndSchedule.at (serviceIndex);
-		}
-
-
-
-		const synthese::time::Schedule& 
-		Edge::getArrivalBeginSchedule (int serviceIndex) const
-		{
-			return _arrivalBeginSchedule.at (serviceIndex);
-		}
-
-
-
-
-
-		const synthese::time::Schedule& 
-		Edge::getArrivalEndSchedule (int serviceIndex) const
-		{
-			return _arrivalEndSchedule.at (serviceIndex);
-		}
-
-
-
-
-
 		bool 
 		Edge::isRunning( const synthese::time::DateTime& startMoment, 
 				const synthese::time::DateTime& endMoment ) const
@@ -277,51 +238,7 @@ namespace synthese
 
 
 
-		void 
-		Edge::calculateArrival (const Edge& departureEdge, 
-					int serviceIndex,
-					const synthese::time::DateTime& departureMoment, 
-					synthese::time::DateTime& arrivalMoment ) const
-		{
-			if ( getParentPath ()->getService (serviceIndex)->isContinuous () )
-			{
-				arrivalMoment = departureMoment;
-				arrivalMoment += ( _arrivalBeginSchedule[serviceIndex] - 
-					departureEdge._departureBeginSchedule[serviceIndex] );
-			} 
-			else
-			{
-				arrivalMoment = _arrivalBeginSchedule[serviceIndex];
-				arrivalMoment.addDaysDuration( _arrivalBeginSchedule[serviceIndex].getDaysSinceDeparture () - 
-							departureEdge._departureBeginSchedule[serviceIndex].getDaysSinceDeparture () );
-			}
-		    
-		}
-
-
-
-		void 
-		Edge::calculateDeparture (const Edge& arrivalEdge, 
-					int serviceIndex,
-					const synthese::time::DateTime& arrivalMoment, 
-					synthese::time::DateTime& departureMoment ) const
-		{
-			if ( getParentPath ()->getService( serviceIndex )->isContinuous() )
-			{
-				departureMoment = arrivalMoment;
-				departureMoment -= ( arrivalEdge._arrivalBeginSchedule[ serviceIndex ] - _departureBeginSchedule[ serviceIndex ] );
-			} 
-			else
-			{
-				departureMoment = _departureBeginSchedule[ serviceIndex ];
-				departureMoment.subDaysDuration( arrivalEdge._arrivalBeginSchedule[ serviceIndex ].getDaysSinceDeparture () - _departureBeginSchedule[ serviceIndex ].getDaysSinceDeparture () );
-			}
-		}
-
-
-
-
-
+/*
 		int 
 		Edge::getBestRunTime (const Edge& other ) const
 		{
@@ -339,12 +256,12 @@ namespace synthese
 			return ( bestT );
 		}
 
+*/
 
 
 
 
-
-		bool 
+/*		bool 
 		Edge::checkSchedule (const Edge* edgeWithPreviousSchedule ) const
 		{
 			// Vertical chronology check
@@ -367,315 +284,174 @@ namespace synthese
 
 			return true;
 		}
+*/
 
 
 
-
-		int 
-		Edge::getNextService (synthese::time::DateTime& departureMoment, 
-					const synthese::time::DateTime& maxDepartureMoment,
-					const synthese::time::DateTime& calculationMoment,
-					int minNextServiceIndex ) const
+		ServicePointer Edge::getNextService (
+			DateTime departureMoment, 
+			const DateTime& maxDepartureMoment,
+			const DateTime& calculationMoment
+			, int minNextServiceIndex
+		) const
 		{
-			int next;
-
 			// Search schedule
-			next = getDepartureFromIndex (departureMoment.getHours ());
+			int next(getDepartureFromIndex (departureMoment.getHours ()));
+
 			if ( next == UNKNOWN_VALUE )
 				next = getParentPath ()->getServices().size();
 
-			if ( minNextServiceIndex > next )
+			if (minNextServiceIndex > next )
 				next = minNextServiceIndex;
 
 			while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
 			{
 				// Look in schedule for when the line is in service
-				if ( getParentPath ()->isInService( departureMoment.getDate() ) )
+				if (getParentPath ()->isInService( departureMoment.getDate()))
 				{
-					while ( next < getParentPath ()->getServices().size() )  // boucle sur les services
+					for (; next < getParentPath ()->getServices().size(); ++next)  // boucle sur les services
 					{
-						// Case != continuous service
-						if ( getParentPath ()->getService( next )->isContinuous() && _departureBeginSchedule[ next ].getDaysSinceDeparture () != _departureEndSchedule[ next ].getDaysSinceDeparture () )
-						{
-							// if service after departure moment then modification
-							if ( departureMoment > _departureEndSchedule[ next ] && departureMoment < _departureBeginSchedule[ next ] )
-								departureMoment = _departureBeginSchedule[ next ];
+						// Saving of the used service
+						ServicePointer servicePointer(
+							getParentPath ()->getService(next)->getFromPresenceTime(ServicePointer::DEPARTURE_TO_ARRIVAL, this, departureMoment, calculationMoment)
+							);
 
-							if ( departureMoment > maxDepartureMoment )
-								return UNKNOWN_VALUE;
+						if (servicePointer.getActualDateTime() > departureMoment)
+							departureMoment = servicePointer.getActualDateTime();
 
-							// Check for reservation possibility
-							if ( getParentPath ()->getService( next )->isReservationPossible( departureMoment, calculationMoment ) )
-							{
-								if ( departureMoment < _departureEndSchedule[ next ] )
-								{
-									if (getParentPath ()->getService (next)->isProvided ( departureMoment.getDate(),
-											_departureEndSchedule[ next ].getDaysSinceDeparture () ) )
-										return next;
-								}
-								else
-									if ( getParentPath ()->getService( next )->isProvided( departureMoment.getDate(), 
-											_departureBeginSchedule[ next ].getDaysSinceDeparture () ) )
-										return next;
-							}
-						} 
-						else // Normal case
-						{
-							// If too early, not convenient
-							if ( departureMoment <= _departureEndSchedule[ next ] )
-							{
-								if ( departureMoment < _departureBeginSchedule[ next ] )
-									departureMoment = _departureBeginSchedule[ next ];
+						if (!servicePointer.getService())
+							continue;
 
-								if ( departureMoment > maxDepartureMoment )
-									return UNKNOWN_VALUE;
+						// Control of validity of departure date time
+						if (servicePointer.getActualDateTime() > maxDepartureMoment )
+							return ServicePointer();
 
-								if ( getParentPath ()->getService( next )->isProvided( departureMoment.getDate(), _departureBeginSchedule[ next ].getDaysSinceDeparture () ) )
-								{
-									if ( getParentPath ()->getService( next )->isReservationPossible( departureMoment, calculationMoment ) )
-									{
-										return next;
-									}
-								}
-							}
-						}
+						// Store the service rank in edge
+						servicePointer.setServiceIndex(next);
 
-						next++;
+						// The service is now returned
+						return servicePointer;
 
 					} //end while
-
-				} //end if
-
+				}
+				
 				departureMoment++;
 				departureMoment.updateHour ( 0, 0 );
 
 				next = _departureIndex[ 0 ];
 			}
 
-			return UNKNOWN_VALUE;
+			return ServicePointer();
 		}
 
 
 
-
-
-
-
-
-
-		int 
-		Edge::getPreviousService ( synthese::time::DateTime& arrivalMoment, 
-					const synthese::time::DateTime& minArrivalMoment,
-					int maxPreviousServiceIndex) const
-
-		{
-			int previous;
-
-			previous = getArrivalFromIndex (arrivalMoment.getHours ());
+		ServicePointer Edge::getPreviousService(
+			DateTime arrivalMoment
+			, const DateTime& minArrivalMoment
+			, const DateTime& computingDateTime
+			, int maxPreviousServiceIndex
+		) const	{
+			int previous(getArrivalFromIndex (arrivalMoment.getHours ()));
+			
 			while ( arrivalMoment >= minArrivalMoment )  // Loop over dates
 			{
-				if ( getParentPath ()->isInService( arrivalMoment.getDate() ) )
-					while ( previous >= 0 )  // Loop over services
+				if (getParentPath ()->isInService( arrivalMoment.getDate()))
+				{
+					for (; previous >= 0; --previous)  // Loop over services
 					{
-						// Case != continuous service
-						if ( getParentPath ()->getService( previous )->isContinuous() && _arrivalBeginSchedule[ previous ].getDaysSinceDeparture () != _arrivalEndSchedule[ previous ].getDaysSinceDeparture () )
-						{
-							// if service after departure moment then modification
-							if ( arrivalMoment > _arrivalEndSchedule[ previous ] && arrivalMoment < _arrivalBeginSchedule[ previous ] )
-								arrivalMoment = _arrivalEndSchedule[ previous ];
+						// Saving of the used service
+						ServicePointer servicePointer(
+							getParentPath ()->getService(previous)->getFromPresenceTime(ServicePointer::ARRIVAL_TO_DEPARTURE, this, arrivalMoment, computingDateTime)
+							);
+						arrivalMoment = servicePointer.getActualDateTime();
 
-							if ( arrivalMoment < minArrivalMoment )
-								return UNKNOWN_VALUE;
+						if (!servicePointer.getService())
+							continue;
 
-							if ( arrivalMoment > _departureBeginSchedule[ previous ] )
-							{
-								if ( getParentPath ()->getService( previous )->isProvided( arrivalMoment.getDate(), _arrivalBeginSchedule[ previous ].getDaysSinceDeparture () ) )
-									return previous;
-							}
-							else
-								if ( getParentPath ()->getService( previous )->isProvided( arrivalMoment.getDate(), _arrivalEndSchedule[ previous ].getDaysSinceDeparture () ) )
-									return previous;
-						}
-						else
-						{
-							if ( arrivalMoment >= _arrivalBeginSchedule[ previous ] )
-							{
-								if ( arrivalMoment > _arrivalEndSchedule[ previous ] )
-									arrivalMoment = _arrivalEndSchedule[ previous ];
+						// Control of validity of departure date time
+						if (servicePointer.getActualDateTime() < minArrivalMoment)
+							return ServicePointer();
 
-								if ( arrivalMoment < minArrivalMoment )
-									return UNKNOWN_VALUE;
+						// Store service rank in edge
+						servicePointer.setServiceIndex(previous);
 
-								if ( getParentPath ()->getService( previous )->isProvided( arrivalMoment.getDate(), _arrivalEndSchedule[ previous ].getDaysSinceDeparture () ) )
-									return previous;
-							}
-						}
-						previous--;
+						// The service is now returned
+						return servicePointer;
 					}
+				}
 
 				arrivalMoment--;
 				arrivalMoment.updateHour ( 23, 59 );
 				previous = _arrivalIndex[ 23 ];
 			}
 
-			return UNKNOWN_VALUE;
+			return ServicePointer();
 		}
 
 
 
-
-
-		void 
-		Edge::insertDepartureSchedule (int index, const Schedule& schedule)
-		{
-			const Service* service = _parentPath->getService (index);
-
-			std::vector<synthese::time::Schedule>::iterator itInsertBegin = _departureBeginSchedule.begin ();
-			advance (itInsertBegin, index);
-
-			_departureBeginSchedule.insert (itInsertBegin, schedule);
-
-			std::vector<synthese::time::Schedule>::iterator itInsertEnd = _departureEndSchedule.begin ();
-			advance (itInsertEnd, index);
-
-			if (service->isContinuous ())
-			{
-				const ContinuousService* continuousService = dynamic_cast<const ContinuousService*> (service);
-				_departureEndSchedule.insert (itInsertEnd, _departureBeginSchedule[index] + continuousService->getRange ());
-			}
-			else 
-			{
-				_departureEndSchedule.insert (itInsertEnd, _departureBeginSchedule[index]);
-			}
-//			_departureIndexUpdateNeeded = true;
-		}
-
-
-
-
-		void 
-		Edge::insertArrivalSchedule (int index, const Schedule& schedule)
-		{
-			const Service* service = _parentPath->getService (index);
-		    
-			std::vector<synthese::time::Schedule>::iterator itInsertBegin = _arrivalBeginSchedule.begin ();
-			advance (itInsertBegin, index);
-
-			_arrivalBeginSchedule.insert (itInsertBegin, schedule);
-
-			std::vector<synthese::time::Schedule>::iterator itInsertEnd = _arrivalEndSchedule.begin ();
-			advance (itInsertEnd, index);
-
-			_arrivalEndSchedule.insert (itInsertEnd, schedule);
-
-			if (service->isContinuous ())
-			{
-				const ContinuousService* continuousService = dynamic_cast<const ContinuousService*> (service);
-				_arrivalBeginSchedule[index] += continuousService->getMaxWaitingTime ();
-				_arrivalEndSchedule[index] = _arrivalBeginSchedule[index] + continuousService->getRange ();
-			}
-
-//			_arrivalIndexUpdateNeeded = true;
-		}
-
-
-
-
-
-
-		void 
-		Edge::updateDepartureIndex ()
+		void Edge::updateServiceIndex()
 		{
 			int numHour;
+			int i;
 
-			int lastHour = 25; 
-			int serviceOverMidnightNumber = 0;
-		    
 			// Reset
-			for ( numHour = 0; numHour < synthese::time::HOURS_PER_DAY; numHour++ )
-				_departureIndex[ numHour ] = -1;
-
-
-			for (int i = 0; i < _parentPath->getServices().size (); ++i)
+			for ( numHour = 0; numHour < HOURS_PER_DAY; ++numHour)
 			{
-				if ( _departureEndSchedule[i].getHours () < lastHour )
-					serviceOverMidnightNumber = i;
-			
-				if ( _departureEndSchedule[i].getHours () >= _departureBeginSchedule[i].getHours () )
+				_departureIndex[ numHour ] = UNKNOWN_VALUE;
+				_arrivalIndex[numHour] = UNKNOWN_VALUE;
+			}
+
+			// Departures
+			for (i=0; i<getParentPath()->getServices().size(); ++i)
+			{
+				const Service* service = getParentPath()->getService(i);
+				const Schedule& endSchedule(service->getDepartureEndScheduleToIndex(this));
+				const Schedule& beginSchedule(service->getDepartureBeginScheduleToIndex(this));
+
+				for (numHour = 0; numHour <= endSchedule.getHours(); ++numHour)
 				{
-					for ( numHour = 0; numHour <= _departureEndSchedule[i].getHours (); ++numHour )
+					if (_departureIndex[numHour] == UNKNOWN_VALUE
+						|| getParentPath()->getService(_departureIndex[numHour])->getDepartureBeginScheduleToIndex(this).getHour() > endSchedule.getHour()
+						)
+						_departureIndex[numHour] = i;
+				}
+				if (endSchedule.getHour() < beginSchedule.getHour())
+				{
+					for (numHour = endSchedule.getHours(); numHour < HOURS_PER_DAY; ++numHour)
 					{
-						if ( (_departureIndex[numHour] == -1) || 
-							(_departureIndex[numHour] < serviceOverMidnightNumber) ) 
-						{
+						if (_departureIndex[numHour] == UNKNOWN_VALUE)
 							_departureIndex[numHour] = i;
-						}
 					}
 				}
-				else
-				{
-					for (numHour = 0; numHour < synthese::time::HOURS_PER_DAY; ++numHour)
-					{
-						if (_departureIndex[numHour] == -1)
-						{
-							_departureIndex[ numHour ] = i;
-						}
-					}
-				}
-				lastHour = _departureEndSchedule[i].getHours ();
 			}
-//			_departureIndexUpdateNeeded = false;
-		}
 
-
-
-
-
-		void 
-		Edge::updateArrivalIndex ()
-		{
-			int numHour;
-
-			int lastHour = 25; 
-			int serviceOverMidnightNumber = _parentPath->getServices ().size ();
-
-			// Reset
-			for (numHour = 0; numHour < synthese::time::HOURS_PER_DAY; ++numHour)
-				_arrivalIndex[numHour] = -1;
-		    
-		    
-			for (int i = _parentPath->getServices().size () - 1; i >= 0; --i)
+			// Arrivals
+			for (i=getParentPath()->getServices().size()-1; i>=0; --i)
 			{
-				if ( _arrivalBeginSchedule[i].getHours () > lastHour )
-					serviceOverMidnightNumber = i;
-			
-				if ( _arrivalEndSchedule[i].getHours () >= _arrivalBeginSchedule[i].getHours () )
-				{
-					for ( numHour = _arrivalBeginSchedule[i].getHours (); 
-				numHour < synthese::time::HOURS_PER_DAY; numHour++ )
-				{
-						if ( (_arrivalIndex[numHour] == -1) || 
-					(_arrivalIndex[numHour] > serviceOverMidnightNumber) )
-				{
-							_arrivalIndex[numHour] = i;
-				}
-				}
-				}
-				else
-				{
-					for (numHour = 0; numHour < synthese::time::HOURS_PER_DAY; ++numHour)
-				{
-						if ( _arrivalIndex[numHour] == -1 )
-				{
-							_arrivalIndex[numHour] = i;
-				}
-				}
-				}
-				lastHour = _arrivalBeginSchedule[i].getHours ();
-			}
-//			_arrivalIndexUpdateNeeded = false;
-		}
+				const Service* service = getParentPath()->getService(i);
+				const Schedule& endSchedule(service->getArrivalEndScheduleToIndex(this));
+				const Schedule& beginSchedule(service->getArrivalBeginScheduleToIndex(this));
 
+				for (numHour = HOURS_PER_DAY-1; numHour >= endSchedule.getHours(); --numHour)
+				{
+					if (_arrivalIndex[numHour] == UNKNOWN_VALUE
+						|| getParentPath()->getService(_arrivalIndex[numHour])->getArrivalBeginScheduleToIndex(this).getHour() < endSchedule.getHour()
+						)
+						_arrivalIndex[numHour] = i;
+				}
+				if (endSchedule.getHour() < beginSchedule.getHour())
+				{
+					for (numHour = endSchedule.getHours(); numHour >= 0; --numHour)
+					{
+						if (_arrivalIndex[numHour] == UNKNOWN_VALUE)
+							_arrivalIndex[numHour] = i;
+					}
+				}
+			}
+
+		}
 
 
 

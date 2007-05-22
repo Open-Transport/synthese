@@ -164,6 +164,17 @@ namespace synthese
 			time_t rawtime;
 			struct tm * timeinfo = 0;
 
+			bool tomorrow(false);
+			if (day = TIME_TOMORROW)
+			{
+				day = TIME_CURRENT;
+				tomorrow = true;
+			}
+			if (month == TIME_TOMORROW)
+				month = TIME_CURRENT;
+			if (year == TIME_TOMORROW)
+				year = TIME_CURRENT;
+
 			if ( day == TIME_CURRENT || month == TIME_CURRENT || year == TIME_CURRENT )
 			{
 				std::time ( &rawtime );
@@ -208,6 +219,8 @@ namespace synthese
 			else if ( day != TIME_UNCHANGED && day >= 1 && day <= 31 )
 				_day = day;
 
+			if (tomorrow)
+				operator++(0);
 		}
 
 
@@ -499,10 +512,11 @@ namespace synthese
 
 		Date Date::FromInternalString( const std::string& date )
 		{
-			if (date == "A")
-			{
+			if (date.size() == 1 
+				&& (date[0] == TIME_CURRENT || date[0] == TIME_TOMORROW)
+			){
 				Date result;
-				result.updateDate();
+				result.updateDate(date[0]);
 				return result;
 			}
 

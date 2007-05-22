@@ -33,6 +33,7 @@ static const char TIME_MAX = 'M';
 static const char TIME_UNCHANGED = '_';
 static const char TIME_SAME = 'I';
 static const char TIME_CURRENT = 'A';
+static const char TIME_TOMORROW = 'T';
 static const char TIME_UNKNOWN = '?';
 
 }

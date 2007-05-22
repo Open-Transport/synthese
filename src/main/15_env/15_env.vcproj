@@ -289,14 +289,6 @@
 				Name="Attributes"
 				>
 				<File
-					RelativePath=".\BikeCompliance.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\BikeCompliance.h"
-					>
-				</File>
-				<File
 					RelativePath=".\Calendar.cpp"
 					>
 				</File>
@@ -305,11 +297,39 @@
 					>
 				</File>
 				<File
+					RelativePath=".\RollingStock.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\RollingStock.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Compliance"
+				>
+				<File
+					RelativePath=".\BikeCompliance.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\BikeCompliance.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Compliance.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\Compliance.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Complyer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Complyer.h"
 					>
 				</File>
 				<File
@@ -344,48 +364,24 @@
 					RelativePath=".\ReservationRule.h"
 					>
 				</File>
-				<File
-					RelativePath=".\RollingStock.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\RollingStock.h"
-					>
-				</File>
 			</Filter>
 			<Filter
-				Name="Complyers"
+				Name="Use"
 				>
 				<File
-					RelativePath=".\BikeComplyer.cpp"
+					RelativePath=".\ServicePointer.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\BikeComplyer.h"
+					RelativePath=".\ServicePointer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\HandicappedComplyer.cpp"
+					RelativePath=".\ServiceUse.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\HandicappedComplyer.h"
-					>
-				</File>
-				<File
-					RelativePath=".\PedestrianComplyer.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\PedestrianComplyer.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ReservationRuleComplyer.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ReservationRuleComplyer.h"
+					RelativePath=".\ServiceUse.h"
 					>
 				</File>
 			</Filter>
@@ -694,6 +690,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\Constants.h"
+			>
+		</File>
 		<File
 			RelativePath=".\EnvModule.cpp"
 			>

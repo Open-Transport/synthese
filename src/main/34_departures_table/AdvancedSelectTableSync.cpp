@@ -35,8 +35,6 @@
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/BroadcastPoint.h"
-#include "34_departures_table/BroadcastPointTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -96,7 +94,7 @@ namespace synthese
 			query << " GROUP BY p." << TABLE_COL_ID;
 			// Order
 			if (orderByCity)
-				query << " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",p."  << BroadcastPointTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",p."  << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByName)
 				query << " ORDER BY p." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByNumber)
@@ -128,85 +126,8 @@ namespace synthese
 			}
 		}
 
-		vector<PhysicalStopAndBroadcastPoint> getConnectionPlacePhysicalStopsAndBroadcastPoints( uid placeId, int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
-		{
-			stringstream query;
-			query << " SELECT "
-				<< "p." << TABLE_COL_ID << " AS pid"
-				<< ",b." << TABLE_COL_ID << " AS bid"
-				<< " FROM " << PhysicalStopTableSync::TABLE_NAME << " AS p"
-				<< " LEFT JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << BroadcastPointTableSync::TABLE_COL_PHYSICAL_STOP_ID << "=p." << TABLE_COL_ID
-				<< " WHERE "
-				<< "p." << PhysicalStopTableSync::COL_PLACEID << "=" << Conversion::ToString(placeId);
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
-
-			try
-			{
-				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
-				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<PhysicalStopAndBroadcastPoint> objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
-				{
-					PhysicalStopAndBroadcastPoint object;
-					object.stop = EnvModule::getPhysicalStops().get(Conversion::ToLongLong(result.getColumn(i, "pid")));
-					object.bp = (result.getColumn(i, "bid") != "")
-						? BroadcastPointTableSync::get(Conversion::ToLongLong(result.getColumn(i, "bid")))
-						: shared_ptr<BroadcastPoint>();
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
-
-		}
-
-		std::vector<PhysicalStopAndBroadcastPoint> getConnectionPlaceBroadcastPointsAndPhysicalStops( uid placeId, boost::logic::tribool withPhysical, int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
-		{
-			stringstream query;
-			query << " SELECT "
-				<< "p." << TABLE_COL_ID << " AS pid"
-				<< ",b." << TABLE_COL_ID << " AS bid"
-				<< " FROM " << BroadcastPointTableSync::TABLE_NAME << " AS b"
-				<< " LEFT JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON b." << BroadcastPointTableSync::TABLE_COL_PHYSICAL_STOP_ID << "=p." << TABLE_COL_ID
-				<< " WHERE "
-				<< "b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=" << Conversion::ToString(placeId);
-			if (withPhysical == true)
-				query << " AND p." << TABLE_COL_ID << " IS NOT NULL";
-			if (withPhysical == false)
-				query << " AND p." << TABLE_COL_ID << " IS NULL";
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
-
-			try
-			{
-				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
-				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<PhysicalStopAndBroadcastPoint> objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
-				{
-					PhysicalStopAndBroadcastPoint object;
-					object.stop = (result.getColumn(i, "pid") != "")
-						? EnvModule::getPhysicalStops().get(Conversion::ToLongLong(result.getColumn(i, "pid")))
-						: boost::shared_ptr<const PhysicalStop>();
-					object.bp = BroadcastPointTableSync::get(Conversion::ToLongLong(result.getColumn(i, "bid")));
-					objects.push_back(object);
-				}
-				return objects;
-			}
-			catch(SQLiteException& e)
-			{
-				throw Exception(e.getMessage());
-			}
-		}
-
+		
+		
 		std::vector<shared_ptr<const CommercialLine> > getCommercialLineWithBroadcastPoints( int number/*=UNKNOWN_VALUE*/, int first/*=0*/ )
 		{
 			stringstream query;
@@ -216,7 +137,7 @@ namespace synthese
 				<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS l ON l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=c." << TABLE_COL_ID
 				<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS s ON s." << LineStopTableSync::COL_LINEID << "=l." << TABLE_COL_ID
 				<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineStopTableSync::COL_PHYSICALSTOPID
-				<< " INNER JOIN " << BroadcastPointTableSync::TABLE_NAME << " AS b ON b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID << "=p." << PhysicalStopTableSync::COL_PLACEID
+				<< " INNER JOIN " << DisplayScreenTableSync::TABLE_NAME << " AS b ON b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << PhysicalStopTableSync::COL_PLACEID
 				<< " GROUP BY c." << TABLE_COL_ID
 				<< " ORDER BY c." << CommercialLineTableSync::COL_SHORT_NAME;
 			if (number > 0)
@@ -239,27 +160,6 @@ namespace synthese
 			{
 				throw Exception(e.getMessage());
 			}
-		}
-
-		std::vector<boost::shared_ptr<BroadcastPoint> > getBroadcastPointsWithoutValidPlace()
-		{
-			stringstream query;
-			query
-				<< " SELECT "
-					<< " b.* "
-				<< " FROM "
-					<< BroadcastPointTableSync::TABLE_COL_NAME << " AS b"
-					<< " LEFT JOIN " << ConnectionPlaceTableSync::TABLE_COL_NAME << " AS p ON p." << TABLE_COL_ID << "=b." << BroadcastPointTableSync::TABLE_COL_PLACE_ID
-				<< " WHERE "
-					<< "p." << TABLE_COL_ID << " IS NULL ";
-			SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
-			vector<shared_ptr<BroadcastPoint> > bps;
-			for (int i = 0; i < result.getNbRows(); ++i)
-			{
-				shared_ptr<BroadcastPoint> bp(new BroadcastPoint);
-				bps.push_back(bp);
-			}
-			return bps;
 		}
 	}
 }

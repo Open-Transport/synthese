@@ -45,12 +45,8 @@ namespace synthese
 	{
 
 		Path::Path ()
-			: BikeComplyer (0) // No parent complyer right now
-			, HandicappedComplyer (0) // No parent complyer right now
-			, PedestrianComplyer (0) // No parent complyer right now
-			, ReservationRuleComplyer (0) // No parent complyer right now
+			: Complyer()
 			, _calendar ()
-			, _fare(NULL)
 		{
 		}
 		    
@@ -58,24 +54,6 @@ namespace synthese
 		Path::~Path ()
 		{
 		}
-
-
-
-		const Fare* 
-		Path::getFare () const
-		{
-			return _fare;
-		}
-
-
-
-		void 
-		Path::setFare (const Fare* fare)
-		{
-			_fare = fare;
-		}
-
-
 
 
 
@@ -101,27 +79,16 @@ namespace synthese
 
 
 
-		void 
-		Path::addService (Service* service,
-				const std::vector<synthese::time::Schedule>& departureSchedules,
-				const std::vector<synthese::time::Schedule>& arrivalSchedules)
+		void Path::addService (Service* service)
 		{
 			if (_services.find(service) != _services.end())
-				throw Exception("toto");
+				throw Exception("The service already exists.");
 
 			std::pair<ServiceSet::iterator, bool> result = _services.insert (service);
 			if (result.second == false)
 			{
 				throw Exception ("Service number " + Conversion::ToString (service->getServiceNumber ())
 						+ " is already defined in path " + Conversion::ToString (getId ()));
-			}
-			
-			// Otherwise updates each edge
-			int index = distance (_services.begin (), result.first);
-			for (int i=0; i<_edges.size (); ++i)
-			{
-				_edges[i]->insertDepartureSchedule (index, departureSchedules.at (i));
-				_edges[i]->insertArrivalSchedule (index, arrivalSchedules.at (i));
 			}
 		}
 
@@ -316,10 +283,7 @@ namespace synthese
 		void Path::updateScheduleIndexes()
 		{
 			for (Edges::const_iterator it = _edges.begin(); it != _edges.end(); ++it)
-			{
-				(*it)->updateDepartureIndex();
-				(*it)->updateArrivalIndex();
-			}
+				(*it)->updateServiceIndex();
 		}
 	}
 }

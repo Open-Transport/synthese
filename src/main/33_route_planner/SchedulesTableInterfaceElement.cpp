@@ -94,7 +94,7 @@ namespace synthese
 						
 						// Saving of the columns on each lines
 						columnInterfacePage->display( *__Tampons[__Ligne]
-							, __Ligne == 0, true, i, dynamic_cast<const Road*> (curET->getService ()->getPath ()) != NULL
+							, __Ligne == 0, true, i, dynamic_cast<const Road*> (curET->getServiceInstance().service->getPath ()) != NULL
 							, curET->getDepartureTime().getHour(), lastDepartureDateTime.getHour(), it->getContinuousServiceRange() > 0
 							, request );
 						
@@ -104,7 +104,7 @@ namespace synthese
 								, request );
 						
 						columnInterfacePage->display( *__Tampons[ __Ligne ] 
-							, true, l == it->getJourneyLegCount ()-1, i, dynamic_cast<const Road*> (curET->getService ()->getPath ()) != NULL
+							, true, l == it->getJourneyLegCount ()-1, i, dynamic_cast<const Road*> (curET->getServiceInstance().service->getPath ()) != NULL
 							, curET->getArrivalTime ().getHour (), lastArrivalDateTime.getHour(), it->getContinuousServiceRange() > 0
 							, request );
 					}

@@ -31,15 +31,10 @@ namespace synthese
 
 
 
-		Compliance::Compliance (const boost::logic::tribool& compliant,
-					const int& capacity)
+		Compliance::Compliance (boost::logic::tribool compliant,
+					int capacity)
 			: _compliant (compliant)
 			, _capacity (capacity)
-		{
-
-		}
-
-		Compliance::Compliance()
 		{
 
 		}
@@ -76,6 +71,13 @@ namespace synthese
 			_compliant = compliant;
 		}
 
+		bool Compliance::isCompatibleWith( const Compliance& compliance ) const
+		{
+			return
+				boost::logic::indeterminate(isCompliant())
+				|| boost::logic::indeterminate(compliance.isCompliant())
+				|| compliance.isCompliant() == isCompliant();
+		}
 
 
 	}

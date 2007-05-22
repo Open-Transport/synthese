@@ -38,6 +38,3 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env:
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::ServiceDateTableSync>("15.70.01 Service dates");
 
-
-
-

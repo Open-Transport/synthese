@@ -20,20 +20,24 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ContinuousService.h"
+#include "15_env/ContinuousService.h"
+#include "15_env/Edge.h"
+
+#include "04_time/DateTime.h"
 
 namespace synthese
 {
+	using namespace time;
+
 	namespace env
 	{
 		ContinuousService::ContinuousService (const uid& id,
 							int serviceNumber,
 							Path* path,
-							const synthese::time::Schedule& departureSchedule,
 							int range,
 							int maxWaitingTime)
 			: synthese::util::Registrable<uid,ContinuousService> (id)
-			, Service (serviceNumber, path, departureSchedule)
+			, Service (serviceNumber, path)
 			, _range (range)
 			, _maxWaitingTime (maxWaitingTime)
 		{
@@ -101,5 +105,129 @@ namespace synthese
 			return getKey();
 		}
 
+
+
+		ServicePointer ContinuousService::getFromPresenceTime(
+			ServicePointer::DeterminationMethod method
+			, const Edge* edge
+			, const time::DateTime& presenceDateTime
+			, const time::DateTime& computingTime
+		) const	{
+
+			ServicePointer ptr(method, edge);
+			ptr.setService(this);
+			Schedule schedule;
+			DateTime actualDateTime(presenceDateTime);
+			int edgeIndex(edge->getRankInPath());
+			
+			if (method == ServicePointer::DEPARTURE_TO_ARRIVAL)
+			{
+				schedule = _departureSchedules.at(edgeIndex).first;
+				if (_departureSchedules.at(edgeIndex).first.getHour() <= _departureSchedules.at(edgeIndex).second.getHour())
+				{
+					if (presenceDateTime.getHour() > _departureSchedules.at(edgeIndex).second.getHour())
+						return ServicePointer();
+					if (presenceDateTime.getHour() < schedule.getHour())
+						actualDateTime.setHour(schedule.getHour());
+				}
+				else
+				{
+					if (presenceDateTime.getHour() > _departureSchedules.at(edgeIndex).second.getHour()
+						&& presenceDateTime.getHour() < _departureSchedules.at(edgeIndex).first.getHour())
+						actualDateTime.setHour(schedule.getHour());
+				}
+			}
+			else
+			{
+				schedule = _arrivalSchedules.at(edgeIndex).first;
+				if (_arrivalSchedules.at(edgeIndex).first.getHour() <= _arrivalSchedules.at(edgeIndex).second.getHour())
+				{
+					if (presenceDateTime.getHour() < _arrivalSchedules.at(edgeIndex).first.getHour())
+						return ServicePointer();
+					if (presenceDateTime.getHour() > _arrivalSchedules.at(edgeIndex).second.getHour())
+						actualDateTime.setHour(_arrivalSchedules.at(edgeIndex).second.getHour());
+				}
+				else
+				{
+					if (presenceDateTime.getHour() < _arrivalSchedules.at(edgeIndex).second.getHour()
+						&& presenceDateTime.getHour() > _arrivalSchedules.at(edgeIndex).first.getHour())
+						actualDateTime.setHour(_arrivalSchedules.at(edgeIndex).second.getHour());
+				}
+			}
+			ptr.setActualTime(actualDateTime);
+
+			// Origin departure time
+			DateTime originDateTime(actualDateTime);
+			int duration = schedule - _departureSchedules.at(0).first;
+			originDateTime -= duration;
+			ptr.setOriginDateTime(originDateTime);
+
+			// Date control
+			if (!isProvided(originDateTime.getDate()))
+				return ServicePointer();
+
+			// Reservation control
+			if (!ptr.isReservationRuleCompliant(computingTime))
+				return ServicePointer();
+
+			return ptr;
+
+		}
+
+		time::DateTime ContinuousService::getLeaveTime(
+			const ServicePointer& servicePointer
+			, const Edge* edge) const
+		{
+			int edgeIndex(edge->getRankInPath());
+			Schedule schedule(
+				(servicePointer.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+				? _arrivalSchedules.at(edgeIndex).first
+				: _departureSchedules.at(edgeIndex).first
+				);
+			DateTime actualDateTime(servicePointer.getOriginDateTime());
+			actualDateTime += (schedule - _departureSchedules.at(0).first);
+			return actualDateTime;
+		}
+
+		const time::Schedule& ContinuousService::getDepartureSchedule() const
+		{
+			return _departureSchedules.at(0).first;
+		}
+
+		void ContinuousService::setDepartureSchedules( const Schedules& schedules )
+		{
+			_departureSchedules = schedules;
+		}
+
+		void ContinuousService::setArrivalSchedules( const Schedules& schedules )
+		{
+			_arrivalSchedules = schedules;
+		}
+
+		const Schedule& ContinuousService::getDepartureBeginScheduleToIndex( const Edge* edge ) const
+		{
+			return _departureSchedules.at(edge->getRankInPath()).first;
+		}
+
+		const Schedule& ContinuousService::getDepartureEndScheduleToIndex( const Edge* edge ) const
+		{
+			return _departureSchedules.at(edge->getRankInPath()).second;
+		}
+
+		const Schedule& ContinuousService::getArrivalBeginScheduleToIndex( const Edge* edge ) const
+		{
+			return _arrivalSchedules.at(edge->getRankInPath()).first;
+		}
+
+		const Schedule& ContinuousService::getArrivalEndScheduleToIndex( const Edge* edge ) const
+		{
+			return _arrivalSchedules.at(edge->getRankInPath()).second;
+		}
+
+		const time::Schedule& ContinuousService::getLastArrivalSchedule() const
+		{
+			const Schedules::const_iterator it(_arrivalSchedules.end() - 1);
+			return it->second;
+		}
 	}
 }

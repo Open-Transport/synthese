@@ -106,7 +106,7 @@ namespace synthese
 					}
 */				}
 
-				if ( dynamic_cast<const synthese::env::Road*> (leg->getService ()->getPath ()) == 0 )
+				if ( dynamic_cast<const synthese::env::Road*> (leg->getServiceInstance().getService()->getPath ()) == 0 )
 				{
 					// LIGNE CIRCULATIONS
 					synthese::time::DateTime debutLigne, finLigne
@@ -128,17 +128,17 @@ namespace synthese
 
 					// 12/18 Reservation
 					synthese::time::DateTime maintenant;
-					const synthese::env::ReservationRule* reservationRule = leg->getService ()->getPath ()->getReservationRule ();
+					const ReservationRule* reservationRule = leg->getServiceInstance().getService()->getReservationRule ();
 
 					maintenant.updateDateTime();
 					bool openedCompulsoryReservation = ( 
-						(reservationRule->getType () == ReservationRule::RESERVATION_TYPE_COMPULSORY)
-						&& (reservationRule->isReservationPossible( leg->getService(), maintenant, leg->getDepartureTime() )) 
+						(reservationRule->isCompliant() == true)
+						&& (reservationRule->isReservationPossible( leg->getServiceInstance().getOriginDateTime(), maintenant, leg->getDepartureTime() )) 
 						);
 					maintenant.updateDateTime();
 					bool openedOptionalReservation = (
-						(reservationRule->getType () == synthese::env::ReservationRule::RESERVATION_TYPE_OPTIONAL) &&
-						(reservationRule->isReservationPossible(leg->getService(), maintenant, leg->getDepartureTime() )) 
+						(reservationRule->isCompliant() == boost::logic::indeterminate) &&
+						(reservationRule->isReservationPossible(leg->getServiceInstance().getOriginDateTime(), maintenant, leg->getDepartureTime() )) 
 						);
 					bool openedReservation = openedCompulsoryReservation || openedOptionalReservation;
 					std::string syntheseOnlineBookingURL;
@@ -168,17 +168,17 @@ namespace synthese
 						, "la ligne" /// @todo implement __ET->getLigne()->LibelleComplet(LibelleCompletMatosHTML);
 						, "destination" /// @todo implement __ET->getLigne()->LibelleDestination(DestinationHTML);
 						, __FiltreHandicape
-						, leg->getService ()->getHandicappedCompliance ()->getCapacity ()
+						, leg->getServiceInstance().getService()->getHandicappedCompliance ()->getCapacity ()
 						, __FiltreVelo
-						, leg->getService ()->getBikeCompliance ()->getCapacity ()
+						, leg->getServiceInstance().getService()->getBikeCompliance ()->getCapacity ()
 						, openedCompulsoryReservation
 						, openedOptionalReservation
-						, openedReservation ? reservationRule->getReservationDeadLine (leg->getService(), leg->getDepartureTime() ) : unknownDateTime
+						, openedReservation ? reservationRule->getReservationDeadLine (leg->getServiceInstance().getOriginDateTime(), leg->getDepartureTime() ) : unknownDateTime
 						, openedReservation ? reservationRule : NULL
 						, openedReservation ? syntheseOnlineBookingURL : ""
 						, NULL // leg->getService ()->getPath ()->hasApplicableAlarm ( debutLigne, finLigne ) ? __ET->getService()->getPath ()->getAlarm() : NULL
 						, __Couleur
-						, leg->getService ()->getPath ()
+						, leg->getServiceInstance().getService()->getPath ()
 						, request );
 					
 					__Couleur = !__Couleur;
@@ -203,7 +203,7 @@ namespace synthese
 					
 					stopCellInterfacePage->display( stream, true
 						, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
-						, leg->getDestination()->getConnectionPlace() == leg->getService ()->getPath ()->getEdges ().back()->getFromVertex ()->getConnectionPlace()
+						, leg->getDestination()->getConnectionPlace() == leg->getServiceInstance().getService()->getPath ()->getEdges ().back()->getFromVertex ()->getConnectionPlace()
 						, leg->getDestination()->getConnectionPlace()->getName()
 						, __Couleur, leg->getArrivalTime().getHour(), tempMoment.getHour()
 						, request);

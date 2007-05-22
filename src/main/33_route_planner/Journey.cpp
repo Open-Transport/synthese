@@ -43,6 +43,7 @@ namespace synthese
 {
 	using namespace env;
 	using namespace messages;
+	using namespace time;
 
 	namespace routeplanner
 	{
@@ -201,8 +202,8 @@ namespace synthese
 				// Alarm stop = last departure
 				alarmStart = leg->getDepartureTime ();
 				alarmStop = alarmStart;
-			if (leg->getService ()->isContinuous ()) 
-				alarmStop += ((const ContinuousService*) leg->getService ())->getRange ();
+			if (leg->getServiceInstance().getService()->isContinuous ()) 
+				alarmStop += ((const ContinuousService*) leg->getServiceInstance().getService())->getRange ();
 			
 /*				if ( leg->getOrigin ()->getFromVertex ()->getConnectionPlace ()
 				 ->hasApplicableAlarm (alarmStart, alarmStop)
@@ -210,36 +211,33 @@ namespace synthese
 				 getConnectionPlace ()->getAlarm ()->getLevel () )
 					maxAlarmLevel = leg->getOrigin()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
 */			
-			const ReservationRuleComplyer* rr = dynamic_cast<const ReservationRuleComplyer*> (leg->getService ());
 			
-				// -- Mandatory reservation --
-				now.updateDateTime ();
-			if ( (rr != 0) &&
-				 (rr->getReservationRule ()->getType () == ReservationRule::RESERVATION_TYPE_COMPULSORY) &&
-				 (leg->getService ()->isReservationPossible ( now, leg->getDepartureTime ())) &&
+			// -- Compulsory reservation --
+			now.updateDateTime ();
+			if ( (leg->getServiceInstance().getService()->getReservationRule ()->isCompliant() == true) &&
+				 (leg->getServiceInstance().getService()->isReservationPossible ( now, leg->getDepartureTime ())) &&
 				 (maxAlarmLevel < ALARM_LEVEL_WARNING) )
 			{
 					maxAlarmLevel = ALARM_LEVEL_WARNING;
 			}
 
-				// -- Possible reservation --
-				now.updateDateTime();
-			if ( (rr != 0) &&
-				 (rr->getReservationRule ()->getType () == ReservationRule::RESERVATION_TYPE_OPTIONAL) &&
-				 (leg->getService ()->isReservationPossible ( now, leg->getDepartureTime ())) &&
+			// -- Possible reservation --
+			now.updateDateTime();
+			if ( (leg->getServiceInstance().getService()->getReservationRule ()->isCompliant() == boost::logic::indeterminate) &&
+				 (leg->getServiceInstance().getService()->isReservationPossible ( now, leg->getDepartureTime ())) &&
 				 (maxAlarmLevel < ALARM_LEVEL_INFO) )
 			{
 					maxAlarmLevel = ALARM_LEVEL_INFO;
 			}
 
 
-				// -- Service alarme --
+				// -- Service alarm --
 				// Alarm start = first departure
 				// Alarm stop = last arrival
 				alarmStart = leg->getDepartureTime ();
 				alarmStop = leg->getArrivalTime ();
-			if (leg->getService ()->isContinuous ()) 
-				alarmStop += ((const ContinuousService*) leg->getService ())->getRange ();
+			if (leg->getServiceInstance().getService()->isContinuous ()) 
+				alarmStop += ((const ContinuousService*) leg->getServiceInstance().getService())->getRange ();
 
 /*				if ( (leg->getService ()->getPath ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
 				 (maxAlarmLevel < leg->getService ()->getPath ()->getAlarm ()->getLevel ()) )
@@ -257,8 +255,8 @@ namespace synthese
 					alarmStop = getJourneyLeg (i+1)->getDepartureTime ();
 			}
 
-			if (leg->getService ()->isContinuous ()) 
-				alarmStop += ((const ContinuousService*) leg->getService ())->getRange ();
+			if (leg->getServiceInstance().getService()->isContinuous ()) 
+				alarmStop += ((const ContinuousService*) leg->getServiceInstance().getService())->getRange ();
 
 /*				if ( (leg->getDestination ()->getFromVertex ()->getConnectionPlace ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
 					 (maxAlarmLevel < leg->getDestination()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ()) )
@@ -331,35 +329,6 @@ namespace synthese
 
 
 
-
-
-		int 
-		Journey::operator > (const Journey& op) const
-		{
-			//! <li>An empty journey cannot be superior to another</li> 
-			if (_journeyLegs.empty ()) return false;
-		    
-			//! <li>A populated journey is superior to an empty journey</li> 
-			if (op._journeyLegs.empty ()) return true;
-		    
-			//! <li>A shorter journey is best</li>
-			if (getDuration () != op.getDuration ())
-			return getDuration() < op.getDuration();
-		    
-			//! <li>Less transport connection count is best</li> 
-			if (_transportConnectionCount != op._transportConnectionCount)
-			return _transportConnectionCount < op._transportConnectionCount;
-		    
-			//! <li>Un trajet où l'on circule moins longtemps est supérieur à celui-ci (plus de marge de fiabilité pour les correspondaces)</li>
-			if (getEffectiveDuration () != op.getEffectiveDuration ())
-			return getEffectiveDuration () < op.getEffectiveDuration ();
-		    
-			return false;
-		}
-
-
-
-
 		Journey& 
 		Journey::operator= (const Journey& ref) 
 		{
@@ -387,6 +356,56 @@ namespace synthese
 			return _distance;
 		}
 
+		bool Journey::isBestThan( const Journey& other, const AccessDirection& direction ) const
+		{
+
+			//! <li>An empty journey cannot be superior to another</li> 
+			if (empty())
+				return false;
+
+			//! <li>A populated journey is superior to an empty journey</li> 
+			if (other.empty())
+				return true;
+
+			//! <li>Time comparison</li>
+			DateTime currentsTime = (direction == TO_DESTINATION) 
+				? getArrivalTime ()
+				: getDepartureTime ();
+
+			DateTime othersTime = (direction == TO_DESTINATION) 
+				? other.getArrivalTime ()
+				: other.getDepartureTime ();
+
+			bool betterTime = (direction == TO_DESTINATION) 
+				? currentsTime < othersTime
+				: currentsTime > othersTime; 
+
+			if (betterTime)
+				return true;
+			if (currentsTime != othersTime)
+				return false;
+
+			/** </ul><p>Comparison between journey of same duration.</p><ul>
+				<li>A shorter journey is best</li>
+			*/
+			if (getDuration () != other.getDuration ())
+				return getDuration() < other.getDuration();
+
+			//! <li>Less transport connection count is best</li> 
+			if (_transportConnectionCount != other._transportConnectionCount)
+				return _transportConnectionCount < other._transportConnectionCount;
+
+			//! <li>Un trajet où l'on circule moins longtemps est supérieur à celui-ci (plus de marge de fiabilité pour les correspondaces)</li>
+			if (getEffectiveDuration () != other.getEffectiveDuration ())
+				return getEffectiveDuration () < other.getEffectiveDuration ();
+
+			return false;
+		}
+
+		bool Journey::empty() const
+		{
+			return _journeyLegs.empty();
+		}
 	}
 }
 

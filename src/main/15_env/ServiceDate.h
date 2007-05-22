@@ -36,6 +36,7 @@ namespace synthese
 		/** ServiceDate class.
 			This class is available for the template instanciation of the ServiceDateTableSync.
 			It can be used as a simple structure.
+			CalendarDate
 			@ingroup m15
 		*/
 		class ServiceDate

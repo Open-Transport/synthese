@@ -71,6 +71,7 @@ namespace synthese
 				throw RequestException("Specified site not found");
 			_site = RoutePlannerModule::getSites().get(Conversion::ToLongLong(it->second));
 			_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
+			_accessParameters = _site->getDefaultAccessParameters();
 
 			// Departure place
 			it = map.find(PARAMETER_DEPARTURE_PLACE_ID);
@@ -105,9 +106,12 @@ namespace synthese
 
 		void RoutePlannerFunction::_run( std::ostream& stream ) const
 		{
-			DateTime endDate(_date);
+			DateTime startDate(_date);
+			startDate.updateHour(2,30);
+			DateTime endDate(startDate);
 			endDate.addDaysDuration(1);
-			RoutePlanner r(_departure_place.get(), _arrival_place.get(), AccessParameters(), PlanningOrder(), _date, endDate);
+			/// @todo Add one minute per kilometer between departure place and arrival place
+			RoutePlanner r(_departure_place.get(), _arrival_place.get(), _accessParameters, PlanningOrder(), startDate, endDate);
 			Journeys jv = r.computeJourneySheetDepartureArrival();
 			VariablesMap vm;
 			_page->display(stream, vm, &jv, _request);

@@ -42,6 +42,7 @@ namespace synthese
 
 		/** Physical stop (bus stop, etc.).
 			A physical stop is an entry point to the transport network.
+			RoutePoint
 		@ingroup m15
 		*/
 		class PhysicalStop : 

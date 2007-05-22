@@ -42,7 +42,6 @@
 #include "34_departures_table/DisplayAdmin.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/UpdateDisplayScreenAction.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"

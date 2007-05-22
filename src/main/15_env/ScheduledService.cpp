@@ -22,29 +22,29 @@
 
 #include "15_env/ScheduledService.h"
 #include "15_env/Path.h"
+#include "15_env/Edge.h"
 #include "15_env/ReservationRule.h"
 
 namespace synthese
 {
 	using namespace util;
+	using namespace time;
 
 	namespace env
 	{
 
 		ScheduledService::ScheduledService (const uid& id,
 							int serviceNumber,
-							Path* path,
-							const synthese::time::Schedule& departureSchedule)
+							Path* path
+							)
 			: synthese::util::Registrable<uid,ScheduledService> (id)
-			, ReservationRuleComplyer (path) 
-			, Service (serviceNumber, path, departureSchedule)
+			, Service (serviceNumber, path)
 		{
 
 		}
 
 		ScheduledService::ScheduledService()
 			: Registrable<uid,ScheduledService>()
-			, ReservationRuleComplyer()
 			, Service()
 		{
 		}
@@ -65,27 +65,117 @@ namespace synthese
 		}
 
 
-
-		bool 
-		ScheduledService::isReservationPossible ( const synthese::time::DateTime& departureMoment, 
-							const synthese::time::DateTime& calculationMoment ) const
-		{
-			if (getReservationRule () == 0) return true;
-
-			return getReservationRule ()->isRunPossible 
-			(this, calculationMoment, departureMoment );
-		    
-		}
-
 		void ScheduledService::setPath(Path* path )
 		{
 			Service::setPath(path);
-			ReservationRuleComplyer::setParent(path);
 		}
 
 		uid ScheduledService::getId() const
 		{
 			return getKey();
+		}
+
+		ServicePointer ScheduledService::getFromPresenceTime(
+			ServicePointer::DeterminationMethod method
+			, const Edge* edge
+			, const time::DateTime& presenceDateTime
+			, const time::DateTime& computingTime
+		) const {
+
+			// Initializations
+			ServicePointer ptr(method, edge);
+			ptr.setService(this);
+			DateTime actualTime(presenceDateTime);
+			Schedule schedule;
+			int edgeIndex(edge->getRankInPath());
+
+			// Actual time
+			if (method == ServicePointer::DEPARTURE_TO_ARRIVAL)
+			{
+				schedule = _departureSchedules.at(edgeIndex);
+				if (presenceDateTime.getHour() > schedule.getHour())
+					return ServicePointer();
+			}
+			if (method == ServicePointer::ARRIVAL_TO_DEPARTURE)
+			{
+				schedule = _arrivalSchedules.at(edgeIndex);
+				if (presenceDateTime.getHour() < schedule.getHour())
+					return ServicePointer();
+			}
+			actualTime = schedule;
+			ptr.setActualTime(actualTime);
+
+			// Origin departure time
+			DateTime originDateTime(actualTime);
+			int duration = schedule - _departureSchedules.at(0);
+			originDateTime -= duration;
+			ptr.setOriginDateTime(originDateTime);
+
+			// Date control
+			if (!isProvided(originDateTime.getDate()))
+				return ServicePointer();
+
+			// Reservation control
+			if (!ptr.isReservationRuleCompliant(computingTime))
+				return ServicePointer();
+
+			return ptr;
+		}
+
+		time::DateTime ScheduledService::getLeaveTime(
+			const ServicePointer& servicePointer
+			, const Edge* edge
+		) const	{
+			int edgeIndex(edge->getRankInPath());
+			Schedule schedule(
+				(servicePointer.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+				? _arrivalSchedules.at(edgeIndex)
+				: _departureSchedules.at(edgeIndex)
+				);
+			DateTime actualDateTime(servicePointer.getOriginDateTime());
+			actualDateTime += (schedule - _departureSchedules.at(0));
+			return actualDateTime;
+		}
+
+		void ScheduledService::setDepartureSchedules( const Schedules& schedules )
+		{
+			_departureSchedules = schedules;
+		}
+
+		void ScheduledService::setArrivalSchedules( const Schedules& schedules )
+		{
+			_arrivalSchedules = schedules;
+		}
+
+		const time::Schedule& ScheduledService::getDepartureSchedule() const
+		{
+			return _departureSchedules.at(0);
+		}
+
+		const Schedule& ScheduledService::getDepartureBeginScheduleToIndex( const Edge* edge ) const
+		{
+			return _departureSchedules.at(edge->getRankInPath());
+		}
+
+		const Schedule& ScheduledService::getDepartureEndScheduleToIndex( const Edge* edge ) const
+		{
+			return _departureSchedules.at(edge->getRankInPath());
+		}
+
+		const Schedule& ScheduledService::getArrivalBeginScheduleToIndex( const Edge* edge ) const
+		{
+			return _arrivalSchedules.at(edge->getRankInPath());
+		}
+
+		const Schedule& ScheduledService::getArrivalEndScheduleToIndex( const Edge* edge ) const
+		{
+			return _arrivalSchedules.at(edge->getRankInPath());
+		}
+
+		const time::Schedule& ScheduledService::getLastArrivalSchedule() const
+		{
+			Schedules::const_iterator it(_arrivalSchedules.end() - 1);
+			return *it;
 		}
 	}
 }

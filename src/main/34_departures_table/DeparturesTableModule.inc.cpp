@@ -1,30 +1,33 @@
 
 #include "34_departures_table/DeparturesTableInterfaceElement.h"
+
+
+#include "34_departures_table/DepartureTableRowInterfacePage.h"
+
+#include "34_departures_table/DisplayMaintenanceAdmin.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
 #include "34_departures_table/DisplayTypesAdmin.h"
-#include "34_departures_table/DepartureTableRowInterfacePage.h"
 #include "34_departures_table/BroadcastPointsAdmin.h"
-#include "34_departures_table/BroadcastPointAdmin.h"
-#include "34_departures_table/BroadcastPointTableSync.h"
+#include "34_departures_table/DisplayAdmin.h"
+
 #include "34_departures_table/DisplayTypeTableSync.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
+
 #include "34_departures_table/CreateDisplayTypeAction.h"
 #include "34_departures_table/UpdateDisplayTypeAction.h"
+#include "34_departures_table/UpdateDisplayScreenAction.h"
+#include "34_departures_table/CreateDisplayScreenAction.h"
+
 #include "34_departures_table/ArrivalDepartureTableRight.h"
 #include "34_departures_table/DisplayMaintenanceRight.h"
-#include "34_departures_table/BroadcastPointsRight.h"
+
 #include "34_departures_table/ArrivalDepartureTableLog.h"
-#include "34_departures_table/BroadcastPointsDataLog.h"
 #include "34_departures_table/DisplayMaintenanceLog.h"
+#include "34_departures_table/DisplayDataControlLog.h"
+
 #include "34_departures_table/DisplayScreenAlarmRecipient.h"
-#include "34_departures_table/CreateDisplayScreenAction.h"
-#include "34_departures_table/DisplayAdmin.h"
-#include "34_departures_table/UpdateDisplayScreenAction.h"
+
 #include "34_departures_table/DisplayScreenContentRequest.h"
-#include "34_departures_table/DisplayMaintenanceAdmin.h"
-#include "34_departures_table/CreateBroadcastPointAction.h"
-#include "34_departures_table/RenameBroadcastPointAction.h"
-#include "34_departures_table/DeleteBroadcastPointAction.h"
 #include "34_departures_table/AddPreselectionPlaceToDisplayScreen.h"
 #include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"
 #include "34_departures_table/RemovePreselectionPlaceFromDisplayScreenAction.h"
@@ -44,4 +47,3 @@
 #include "34_departures_table/DisplayScreenHasAlarmValueInterfaceElement.h"
 #include "34_departures_table/DisplayScreenAlarmContentValueInterfaceElement.h"
 #include "34_departures_table/DisplayScreenSupervisionRequest.h"
-#include "34_departures_table/DisplayDataControlLog.h"

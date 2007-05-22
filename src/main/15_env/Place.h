@@ -67,7 +67,6 @@ namespace synthese
 
 		public:
 
-
 			virtual ~Place ();
 
 
@@ -128,5 +127,5 @@ namespace synthese
 	}
 }
 
-#endif 	    
+#endif
 

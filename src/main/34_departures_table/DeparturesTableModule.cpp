@@ -38,17 +38,11 @@ namespace synthese
 	namespace departurestable
 	{
 		DisplayType::Registry DeparturesTableModule::_displayTypes;
-		BroadcastPoint::Registry	DeparturesTableModule::_broadcastPoints;
 		DisplayScreen::Registry	DeparturesTableModule::_displayScreens;
 
 		DisplayType::Registry& DeparturesTableModule::getDisplayTypes()
 		{
 			return _displayTypes;
-		}
-
-		BroadcastPoint::Registry& DeparturesTableModule::getBroadcastPoints()
-		{
-			return _broadcastPoints;
 		}
 
 		DisplayScreen::Registry& DeparturesTableModule::getDisplayScreens()
@@ -78,17 +72,6 @@ namespace synthese
 				localizations.push_back(make_pair(con->place->getKey(), con->cityName + " " + con->place->getName()));
 			}
 			return localizations;
-		}
-
-		std::vector<pair<uid, std::string> > DeparturesTableModule::getBroadcastPointLabels(shared_ptr<const ConnectionPlace> place, bool withAll /*= false*/ )
-		{
-			vector<pair<uid, string> > m;
-			if (withAll)
-				m.push_back(make_pair(0, "(tous)"));
-			vector<PhysicalStopAndBroadcastPoint> b = getConnectionPlaceBroadcastPointsAndPhysicalStops(place->getKey());
-			for (vector<PhysicalStopAndBroadcastPoint>::const_iterator it = b.begin(); it != b.end(); ++it)
-				m.push_back(make_pair(it->bp->getKey(), it->bp->getName()));
-			return m;
 		}
 
 		std::vector<pair<uid, std::string> > DeparturesTableModule::getCommercialLineWithBroadcastLabels( bool withAll /*= false*/ )

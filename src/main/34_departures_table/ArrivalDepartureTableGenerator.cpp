@@ -78,19 +78,19 @@ namespace synthese
 
 		ArrivalDepartureList::iterator
 		ArrivalDepartureTableGenerator::_insert(
-			const LineStop* linestop, int serviceNumber, const DateTime& realDepartureTime, UnlimitedSize unlimitedSize)
-		{
+			const ServicePointer& servicePointer
+			, UnlimitedSize unlimitedSize
+		){
 			// Values
-			DeparturesTableElement element;
-			element.linestop = linestop;
-			element.serviceNumber = serviceNumber;
-			element.realDepartureTime = realDepartureTime;
-			element.blinking = ((realDepartureTime - _startDateTime) <= _blinkingDelay);
+			DeparturesTableElement element(
+				servicePointer
+				, (servicePointer.getActualDateTime() - _startDateTime) <= _blinkingDelay
+				);
 
 			ActualDisplayedArrivalsList arrivals;
 			set<const ConnectionPlace*> encounteredPlaces;
-			const ConnectionPlace* destinationPlace = linestop->getLine()->getDestination()->getConnectionPlace();
-			for (const LineStop* curLinestop = linestop; curLinestop != NULL; curLinestop = (LineStop*) curLinestop->getFollowingArrivalForFineSteppingOnly())
+			const ConnectionPlace* destinationPlace = static_cast<const Line*>(servicePointer.getEdge()->getParentPath())->getDestination()->getConnectionPlace();
+			for (const LineStop* curLinestop = static_cast<const LineStop*>(servicePointer.getEdge()); curLinestop != NULL; curLinestop = (LineStop*) curLinestop->getFollowingArrivalForFineSteppingOnly())
 			{
 				const ConnectionPlace* place = curLinestop->getPhysicalStop()->getConnectionPlace();
 				
@@ -98,7 +98,7 @@ namespace synthese
 							&& encounteredPlaces.find(place) == encounteredPlaces.end()	// If the place must be displayed according to the display rules (only once per place)
 							&& place != destinationPlace
 						|| curLinestop->getFollowingArrivalForFineSteppingOnly() == NULL		// or if the place is the terminus
-						|| curLinestop == linestop			// or if the place is the origin
+						|| curLinestop == servicePointer.getEdge()			// or if the place is the origin
 				){
 					arrivals.push_back(place);
 					encounteredPlaces.insert(place);

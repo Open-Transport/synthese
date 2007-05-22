@@ -1,3 +1,25 @@
+
+/** AddressablePlace class header.
+	@file AddressablePlace.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_ENV_ADDRESSABLEPLACE_H
 #define SYNTHESE_ENV_ADDRESSABLEPLACE_H
 
@@ -9,91 +31,91 @@
 
 namespace synthese
 {
-namespace env
-{
+	namespace env
+	{
 
 
- class Address;
+		 class Address;
 
 
-/** Addressable place base class.
+		/** Addressable place base class.
 
-AddressablePlace is the base for any place which can provide
-addresses. 
+		AddressablePlace is the base for any place which can provide
+		addresses. 
 
- @ingroup m15
-*/
-class AddressablePlace : public Place
-{
-public:
+		 @ingroup m15
+		*/
+		class AddressablePlace : public Place
+		{
+		public:
 
-    typedef enum { 
-	CONNECTION_TYPE_FORBIDDEN = 0,         //!< neither road connection nor line connection
-	CONNECTION_TYPE_ROADROAD = 1,          //!< only road to road connection
-	CONNECTION_TYPE_ROADLINE = 2,          //!< only road to line, or line to road, or road to road
-	CONNECTION_TYPE_LINELINE = 3,          //!< any connection possible
-	CONNECTION_TYPE_RECOMMENDED_SHORT = 4, //!< any connection possible, recommended if short journey
-	CONNECTION_TYPE_RECOMMENDED = 5        //!< any connection possible, recommended for any journey
-    } ConnectionType;
-
-
-private:
+			typedef enum { 
+			CONNECTION_TYPE_FORBIDDEN = 0,         //!< neither road connection nor line connection
+			CONNECTION_TYPE_ROADROAD = 1,          //!< only road to road connection
+			CONNECTION_TYPE_ROADLINE = 2,          //!< only road to line, or line to road, or road to road
+			CONNECTION_TYPE_LINELINE = 3,          //!< any connection possible
+			CONNECTION_TYPE_RECOMMENDED_SHORT = 4, //!< any connection possible, recommended if short journey
+			CONNECTION_TYPE_RECOMMENDED = 5        //!< any connection possible, recommended for any journey
+			} ConnectionType;
 
 
-
-protected:
-
-    std::vector<const Address*> _addresses; 
-
-
-    AddressablePlace (const std::string& name,
-		      const City* city);
-
-
-public:
-
-    virtual ~AddressablePlace ();
-
-    //! @name Getters/Setters
-    //@{
-
-    /** Gets addresses of this place.
-     */
-    const std::vector<const Address*>& getAddresses () const;
-
-    virtual const ConnectionType getConnectionType () const;
-
-    //@}
-
-
-    //! @name Query methods
-    //@{
-
-    virtual void getImmediateVertices (VertexAccessMap& result, 
-				       const AccessDirection& accessDirection,
-				       const AccessParameters& accessParameters,
-				       const Vertex* origin = 0,
-				       bool returnAddresses = true,
-				       bool returnPhysicalStops = true) const;
-
-    //@}
+		private:
 
 
 
+		protected:
 
-    //! @name Update methods.
-    //@{
-
-    /** Adds an address to this place.
-     */
-    void addAddress (const Address* address);
-    //@}
+			std::vector<const Address*> _addresses; 
 
 
-};
+			AddressablePlace (const std::string& name,
+					  const City* city);
 
 
-}
+		public:
+
+			virtual ~AddressablePlace ();
+
+			//! @name Getters/Setters
+			//@{
+
+			/** Gets addresses of this place.
+			 */
+			const std::vector<const Address*>& getAddresses () const;
+
+			virtual const ConnectionType getConnectionType () const;
+
+			//@}
+
+
+			//! @name Query methods
+			//@{
+
+			virtual void getImmediateVertices (VertexAccessMap& result, 
+							   const AccessDirection& accessDirection,
+							   const AccessParameters& accessParameters,
+							   const Vertex* origin = 0,
+							   bool returnAddresses = true,
+							   bool returnPhysicalStops = true) const;
+
+			//@}
+
+
+
+
+			//! @name Update methods.
+			//@{
+
+			/** Adds an address to this place.
+			 */
+			void addAddress (const Address* address);
+			//@}
+
+
+		};
+
+
+	}
 }
 
 #endif 	    

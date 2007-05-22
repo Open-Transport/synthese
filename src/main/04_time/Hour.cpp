@@ -275,6 +275,11 @@ Hour::updateHour ( int hours, int minutes )
     time_t rawtime;
     struct tm * timeinfo = 0;
 
+	if (hours == TIME_TOMORROW)
+		hours = TIME_CURRENT;
+	if (minutes == TIME_TOMORROW)
+		minutes = TIME_CURRENT;
+
     if ( hours == TIME_CURRENT || minutes == TIME_CURRENT )
     {
         std::time ( &rawtime );

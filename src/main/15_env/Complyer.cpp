@@ -1,0 +1,111 @@
+
+/** Complyer class implementation.
+	@file Complyer.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "15_env/Complyer.h"
+#include "15_env/EnvModule.h"
+#include "15_env/BikeComplyer.h"
+#include "15_env/HandicappedComplyer.h"
+#include "15_env/PedestrianComplyer.h"
+#include "15_env/ReservationRuleComplyer.h"
+#include "15_env/Fare.h"
+
+namespace synthese
+{
+	namespace env
+	{
+		Complyer::Complyer()
+			: _bikeCompliance(EnvModule::getBikeCompliances().get(0).get())
+			, _fare(EnvModule::getFares().get(0).get())
+			, _pedestrianCompliance(EnvModule::getPedestrianCompliances().get(0).get())
+			, _reservationRule(EnvModule::getReservationRules().get(0).get())
+			, _handicappedCompliance(EnvModule::getHandicappedCompliances().get(0).get())
+		{
+
+		}
+
+		const BikeCompliance* Complyer::getBikeCompliance() const
+		{
+			return _bikeCompliance;
+		}
+
+		const Fare* Complyer::getFare() const
+		{
+			return _fare;
+		}
+
+		const HandicappedCompliance* Complyer::getHandicappedCompliance() const
+		{
+			return _handicappedCompliance;
+		}
+
+		const PedestrianCompliance* Complyer::getPedestrianCompliance() const
+		{
+			return _pedestrianCompliance;
+		}
+
+		const ReservationRule* Complyer::getReservationRule() const
+		{
+			return _reservationRule;
+		}
+
+		void Complyer::setHandicappedCompliance( const HandicappedCompliance* compliance )
+		{
+			_handicappedCompliance = compliance;
+		}
+
+		void Complyer::setPedestrianCompliance( const PedestrianCompliance* compliance )
+		{
+			_pedestrianCompliance = compliance;
+		}
+
+		void Complyer::setBikeCompliance( const BikeCompliance* compliance )
+		{
+			_bikeCompliance = compliance;
+		}
+
+		void Complyer::setFare( const Fare* fare )
+		{
+			_fare = fare;
+		}
+
+		void Complyer::setReservationRule( const ReservationRule* rule )
+		{
+			_reservationRule = rule;
+		}
+
+		bool Complyer::isCompatibleWith( const Complyer& complyer ) const
+		{
+			return
+				getBikeCompliance()->isCompatibleWith(*complyer.getBikeCompliance())
+				&& getFare()->isCompatibleWith(*complyer.getFare())
+				&& getHandicappedCompliance()->isCompatibleWith(*complyer.getHandicappedCompliance())
+				&& getPedestrianCompliance()->isCompatibleWith(*complyer.getPedestrianCompliance())
+				&& getReservationRule()->isCompatibleWith(*complyer.getReservationRule())
+				;
+		}
+
+		Complyer::~Complyer()
+		{
+
+		}
+	}
+}

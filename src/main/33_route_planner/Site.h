@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_CSITE_H
 #define SYNTHESE_CSITE_H
 
+#include "15_env/Types.h"
+
 #include "04_time/Date.h"
 
 #include "01_util/Registrable.h"
@@ -46,7 +48,6 @@ namespace synthese
 
 	namespace routeplanner
 	{
-
 		/** Route planning workspace.
 			@ingroup m33
 			@author Hugues Romain
@@ -67,10 +68,11 @@ namespace synthese
 				std::set<env::CommercialLine*>	_lines;
 			//@}
 
-			//! \name Filters
+			//! \name Parameters
 			//@{
 				bool _onlineBookingAllowed;
 				bool _pastSolutionsDisplayed;
+				int		_maxTransportConnectionsCount;
 			//@}
 
 			//! \name Cached used days
@@ -97,17 +99,19 @@ namespace synthese
 				void setOnlineBookingAllowed ( const bool valeur );
 				void setPastSolutionsDisplayed ( bool );
 				void setName(const std::string& name);
+				void setMaxTransportConnectionsCount(int number);
 			//@}
 
 			//! \name Getters
 			//@{
-				boost::shared_ptr<const interfaces::Interface> getInterface() const;
-				bool getOnlineBookingAllowed() const;
-				bool getPastSolutionsDisplayed() const;
-				const time::Date& getStartDate() const;
-				const time::Date& getEndDate() const;
-				const time::Date& getMinDateInUse () const;
-				const time::Date& getMaxDateInUse () const;
+				boost::shared_ptr<const interfaces::Interface>	getInterface() const;
+				bool											getOnlineBookingAllowed() const;
+				bool											getPastSolutionsDisplayed() const;
+				const time::Date&								getStartDate() const;
+				const time::Date&								getEndDate() const;
+				const time::Date&								getMinDateInUse () const;
+				const time::Date&								getMaxDateInUse () const;
+				int												getMaxTransportConnectionsCount()	const;
 			//@}
 
 			// \name Modifiers
@@ -117,6 +121,7 @@ namespace synthese
 
 			//! \name Queries
 			//@{
+				AccessParameters	getDefaultAccessParameters()	const;
 				bool dateControl() const;
 
 				/** Interprets date from text and environment data.

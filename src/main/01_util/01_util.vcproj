@@ -177,7 +177,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\RegistrableWithNeutralElement.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Registry.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RegistryWithNeutralElement.h"
 					>
 				</File>
 			</Filter>

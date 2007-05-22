@@ -20,9 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "04_time/DateTime.h"
-
 #include "33_route_planner/Site.h"
+#include "33_route_planner/Types.h"
+
+#include "04_time/DateTime.h"
 
 using namespace boost;
 using namespace std;
@@ -161,5 +162,22 @@ namespace synthese
 
 		}
 
+		void Site::setMaxTransportConnectionsCount( int number )
+		{
+			_maxTransportConnectionsCount = number;
+		}
+
+		int Site::getMaxTransportConnectionsCount() const
+		{
+			return _maxTransportConnectionsCount;
+		}
+
+		AccessParameters Site::getDefaultAccessParameters() const
+		{
+			AccessParameters ap;
+			ap.maxTransportConnectionCount = _maxTransportConnectionsCount;
+			
+			return ap;
+		}
 	}
 }

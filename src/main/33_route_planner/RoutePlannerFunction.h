@@ -25,6 +25,8 @@
 
 #include "30_server/Function.h"
 
+#include "15_env/Types.h"
+
 #include "04_time/DateTime.h"
 
 namespace synthese
@@ -57,6 +59,7 @@ namespace synthese
 				boost::shared_ptr<const env::ConnectionPlace>		_departure_place;
 				boost::shared_ptr<const env::ConnectionPlace>		_arrival_place;
 				time::Date											_date;
+				AccessParameters									_accessParameters;
 			//@}
 
 

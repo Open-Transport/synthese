@@ -52,6 +52,7 @@ namespace synthese
 		class Vertex;
 		class Service;
 		class SquareDistance;
+		class ServicePointer;
 	}
 
 	namespace routeplanner
@@ -132,32 +133,35 @@ namespace synthese
 
 
 			/** Integral serach of objects within the network.
-			   @param vertices
-			   @param desiredTime Desired time.
-			   @param accessDirection
-			   @param currentJourney Journey currently being built.
-			   @param maxDepth Maximum recursion depth.
-			   @param accessDirection
-			   @param accessDirection
-			   @param searchAddresses Whether or not to search for addresses.
-			   @param searchPhysicalStops Whether or not to search for physicalStops.
+				@param vertices
+				@param desiredTime Desired time.
+				@param accessDirection
+				@param currentJourney Journey currently being built.
+				@param maxDepth Maximum recursion depth.
+				@param accessDirection
+				@param accessDirection
+				@param searchAddresses Whether or not to search for addresses.
+				@param searchPhysicalStops Whether or not to search for physicalStops.
 				@param useRoads Filter : true = the search is allowed to use the road network
 				@param useLines Filter : true = the search is allowed to use the transport network
-			   @param strictTime Must the departure time be strictly equal to desired time ?
+				@param strictTime Must the departure time be strictly equal to desired time ?
 			 */
-			Journeys integralSearch (const synthese::env::VertexAccessMap& vertices, 
-						  const synthese::time::DateTime& desiredTime,
-						  const AccessDirection& accessDirection,
-						  const Journey& currentJourney,
-						  int maxDepth,
-						  SearchAddresses searchAddresses, 
-						  SearchPhysicalStops searchPhysicalStops,
-						  UseRoads useRoads,
-						  UseLines useLines,
-						  bool strictTime = false);
+			Journeys integralSearch (
+				const env::VertexAccessMap& vertices, 
+				const time::DateTime& desiredTime,
+				const AccessDirection& accessDirection,
+				const Journey& currentJourney,
+				int maxDepth,
+				SearchAddresses searchAddresses, 
+				SearchPhysicalStops searchPhysicalStops,
+				UseRoads useRoads,
+				UseLines useLines,
+				bool strictTime = false
+				);
 
 			/** Best journey finder.
-				@param vam Vertex acces map containing each departure physical stops.
+				@param ovam Vertex access map containing each departure physical stops.
+				@param dvam Vertex access map containing each destination stops.
 				@param accessDirection Type of computing : search of better arrival or of a better departure
 				@param currentJourney Journey conducting to the departure vam
 				@param sctrictTime Filter : 
@@ -167,12 +171,13 @@ namespace synthese
 					- true : solutions allowing a comfort raising and a time saving are selected
 					- false :solutions allowing a time saving are only selected
 			*/
-			void findBestJourney (Journey& result,
-					  const synthese::env::VertexAccessMap& vam, 
-					  const AccessDirection& accessDirection,
-					  const Journey& currentJourney,
-					  bool strictTime, 
-					  bool optim);
+			void findBestJourney (Journey& result
+					  , const env::VertexAccessMap& ovam
+					  , const env::VertexAccessMap& dvam
+					  , const AccessDirection& accessDirection
+					  , const Journey& currentJourney
+					  , bool strictTime
+					  , bool optim);
 			
 			
 			void computeRoutePlanningDepartureArrival (Journey& result,
@@ -186,23 +191,12 @@ namespace synthese
 			bool areAxisContraintsFulfilled (const synthese::env::Path* path, 
 							 const Journey& journey) const;
 
-			bool isPathCompliant (const env::Path& path) const;
-
-			bool isServiceCompliant (const synthese::env::Service* service) const;
-
-			bool isVertexUseful (const synthese::env::Vertex* vertex,
-					 const synthese::time::DateTime& dateTime,
-					 const AccessDirection& accessDirection,
-					 synthese::env::SquareDistance& sqd) const;
-		    
-			bool evaluateArrival (const synthese::env::Edge* arrivalEdge,
-					  const synthese::time::DateTime& departureMoment,
-					  const synthese::env::Edge* departureEdge,
-					  const synthese::env::Service* service,
-					  std::deque<JourneyLeg*>& journeyPart,
-					  const Journey& currentJourney,
-					  bool strictTime,
-					  int continuousServiceRange);
+			bool evaluateServiceUse(
+				const env::ServiceUse& serviceUse
+				const Journey& currentJourney,
+				bool strictTime,
+				int continuousServiceRange
+				);
 			
 			//@}
 

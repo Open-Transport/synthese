@@ -63,6 +63,7 @@ namespace synthese
 			site->setEndDate(Date::FromSQLDate(rows.getColumn(i, SiteTableSync::TABLE_COL_END_DATE)));
 			site->setOnlineBookingAllowed(Conversion::ToBool(rows.getColumn(i, SiteTableSync::TABLE_COL_ONLINE_BOOKING)));
 			site->setPastSolutionsDisplayed(Conversion::ToBool(rows.getColumn(i, SiteTableSync::TABLE_COL_USE_OLD_DATA)));
+			site->setMaxTransportConnectionsCount(Conversion::ToInt(rows.getColumn(i, SiteTableSync::COL_MAX_CONNECTIONS)));
 		}
 
 		template<> void SQLiteTableSyncTemplate<Site>::save(Site* site)
@@ -83,6 +84,7 @@ namespace synthese
 		const std::string SiteTableSync::TABLE_COL_END_DATE = "end_date";
 		const std::string SiteTableSync::TABLE_COL_ONLINE_BOOKING = "online_booking";
 		const std::string SiteTableSync::TABLE_COL_USE_OLD_DATA = "use_old_data";
+		const std::string SiteTableSync::COL_MAX_CONNECTIONS = "max_connections";
 		
 
 		SiteTableSync::SiteTableSync()
@@ -95,6 +97,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_END_DATE, "DATE", true);
 			addTableColumn(TABLE_COL_ONLINE_BOOKING, "INTEGER", true);
 			addTableColumn(TABLE_COL_USE_OLD_DATA, "INTEGER", true);
+			addTableColumn(COL_MAX_CONNECTIONS, "INTEGER", true);
 		}
 
 

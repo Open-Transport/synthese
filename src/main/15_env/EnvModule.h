@@ -319,6 +319,8 @@ namespace synthese
 		
 			void initialize();
 			
+			
+
 			static Address::Registry&				getAddresses();
 			static City::Registry&					getCities();
 			static ConnectionPlace::Registry&		getConnectionPlaces();

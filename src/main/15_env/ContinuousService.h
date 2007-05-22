@@ -46,10 +46,15 @@ namespace synthese
 			public synthese::util::Registrable<uid,ContinuousService>, 
 			public Service
 		{
+		public:
+			typedef std::vector<std::pair<time::Schedule, time::Schedule> > Schedules;
+
 		private:
 
-			int _range; //!< Continuous service range (minutes).
-			int _maxWaitingTime; //!< Max waiting waiting time before next service.
+			int			_range;				//!< Continuous service range (minutes).
+			int			_maxWaitingTime;	//!< Max waiting waiting time before next service.
+			Schedules	_departureSchedules;	//!< Departure schedules at each Edge
+			Schedules	_arrivalSchedules;		//!< Arrival schedules at each edge
 		    
 
 		public:
@@ -57,7 +62,6 @@ namespace synthese
 			ContinuousService (const uid& id,
 					int serviceNumber,
 					Path* path,
-					const synthese::time::Schedule& departureSchedule,
 					int range,
 					int maxWaitingTime);
 			ContinuousService();
@@ -65,20 +69,45 @@ namespace synthese
 			~ContinuousService ();
 
 		    
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
 				int getMaxWaitingTime () const;
-				void setMaxWaitingTime (int maxWaitingTime);
-
 				int getRange () const;
-				void setRange (int range);
-
 				uid	getId() const;
+			//@}
+
+			//! @name Setters
+			//@{
+				void setMaxWaitingTime (int maxWaitingTime);
+				void setRange (int range);
+				void setDepartureSchedules(const Schedules& schedules);
+				void setArrivalSchedules(const Schedules& schedules);
 			//@}
 
 			//! @name Query methods
 			//@{
 				bool isContinuous () const;
+
+				virtual ServicePointer getFromPresenceTime(
+					ServicePointer::DeterminationMethod method
+					, const Edge* edge
+					, const time::DateTime& presenceDateTime
+					, const time::DateTime& computingTime
+					) const;
+
+				virtual time::DateTime getLeaveTime(
+					const ServicePointer& servicePointer
+					, const Edge* edge
+					) const;
+
+				virtual const time::Schedule& getDepartureSchedule () const;
+				virtual const time::Schedule& getLastArrivalSchedule() const;
+
+				virtual const time::Schedule& getDepartureBeginScheduleToIndex(const Edge* edge) const;
+				virtual const time::Schedule& getDepartureEndScheduleToIndex(const Edge* edge) const;
+				virtual const time::Schedule& getArrivalBeginScheduleToIndex(const Edge* edge) const;
+				virtual const time::Schedule& getArrivalEndScheduleToIndex(const Edge* edge) const;
+
 			//@}
 
 		};

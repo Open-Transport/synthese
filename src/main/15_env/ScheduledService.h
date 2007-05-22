@@ -41,45 +41,62 @@ namespace synthese
 		*/
 		class ScheduledService : 
 			public synthese::util::Registrable<uid,ScheduledService>, 
-			public ReservationRuleComplyer,
 			public Service
 		{
-		private:
+		public:
+			typedef std::vector<time::Schedule> Schedules;
 
+		private:
+			Schedules	_departureSchedules;	//!< Departure schedules
+			Schedules	_arrivalSchedules;		//!< Arrival schedules
 
 		public:
 
 			ScheduledService (const uid& id,
 					int serviceNumber,
-					Path* path,
-					const synthese::time::Schedule& departureSchedule);
+					Path* path
+					);
 			ScheduledService();
 
 			~ScheduledService ();
 
 		    
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
 				uid		getId()	const;
+			//@}
+
+			//! @name Setters
+			//@{
 				void	setPath(Path* path);
+				void	setDepartureSchedules(const Schedules& schedules);
+				void	setArrivalSchedules(const Schedules& schedules);
 			//@}
 
 			//! @name Query methods
 			//@{
 				bool isContinuous () const;
-
-				/** Is this service reservable ?
-				@param departureMoment Desired departure moment
-				@param calculationMoment Calculation moment taken as reference 
-				for reservation delay calculation
-				@return true if service can be reserved, false otherwise.
 				
-				A service can be reserved if :
-				- the path does not have any reservation rule
-				- the reservation rule accepts condition
-				*/
-				bool isReservationPossible ( const synthese::time::DateTime& departureMoment, 
-							const synthese::time::DateTime& calculationMoment ) const;
+				virtual ServicePointer getFromPresenceTime(
+					ServicePointer::DeterminationMethod method
+					, const Edge* edge
+					, const time::DateTime& presenceDateTime
+					, const time::DateTime& computingTime
+					) const;
+				
+				virtual time::DateTime getLeaveTime(
+					const ServicePointer& servicePointer
+					, const Edge* edge
+					) const;
+
+				virtual const time::Schedule& getDepartureSchedule () const;
+				virtual const time::Schedule& getLastArrivalSchedule() const;
+
+				virtual const time::Schedule& getDepartureBeginScheduleToIndex(const Edge* edge) const;
+				virtual const time::Schedule& getDepartureEndScheduleToIndex(const Edge* edge) const;
+				virtual const time::Schedule& getArrivalBeginScheduleToIndex(const Edge* edge) const;
+				virtual const time::Schedule& getArrivalEndScheduleToIndex(const Edge* edge) const;
+	
 			//@}
 
 		};

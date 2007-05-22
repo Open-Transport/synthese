@@ -29,6 +29,8 @@
 #include <map>
 #include <set>
 
+#include "15_env/ServicePointer.h"
+
 #include "04_time/DateTime.h"
 
 namespace synthese
@@ -60,14 +62,19 @@ namespace synthese
 	typedef std::set<const env::ConnectionPlace*> ForbiddenPlacesList;
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
 	typedef enum { ENDS_ONLY = 0, WITH_PASSING = 1 } EndFilter;
-	struct DeparturesTableElement { const env::LineStop* linestop; int serviceNumber; time::DateTime realDepartureTime; bool blinking; };
+	struct DeparturesTableElement { 
+		const env::ServicePointer servicePointer;
+		bool blinking;
+		DeparturesTableElement(const env::ServicePointer& __servicePointer, bool __blinking)
+			: servicePointer(__servicePointer), blinking(__blinking) {}
+	};
 	struct DeparturesTableElementLess : public std::binary_function<DeparturesTableElement, DeparturesTableElement, bool>
 	{
 		bool operator()(const DeparturesTableElement& _Left, const DeparturesTableElement& _Right) const
 		{
-			return (_Left.realDepartureTime < _Right.realDepartureTime
-				|| _Left.realDepartureTime == _Right.realDepartureTime 
-				&& _Left.linestop < _Right.linestop
+			return (_Left.servicePointer.getActualDateTime() < _Right.servicePointer.getActualDateTime()
+				|| _Left.servicePointer.getActualDateTime() == _Right.servicePointer.getActualDateTime() 
+				&& _Left.servicePointer.getEdge() < _Right.servicePointer.getEdge()
 				);
 		}
 	};

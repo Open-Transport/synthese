@@ -61,12 +61,16 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			Name="Core classes"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
 				RelativePath=".\Date.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Date.h"
 				>
 			</File>
 			<File
@@ -74,41 +78,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Day.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Hour.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\HourPeriod.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Month.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Schedule.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Year.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath=".\Date.h"
-				>
-			</File>
-			<File
 				RelativePath=".\DateTime.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Day.cpp"
 				>
 			</File>
 			<File
@@ -116,7 +90,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hour.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Hour.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HourPeriod.cpp"
 				>
 			</File>
 			<File
@@ -124,11 +106,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Month.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Month.h"
 				>
 			</File>
 			<File
+				RelativePath=".\Schedule.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Schedule.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Year.cpp"
 				>
 			</File>
 			<File

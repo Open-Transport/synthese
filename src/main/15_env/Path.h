@@ -30,12 +30,9 @@
 
 #include "04_time/Schedule.h"
 
-#include "15_env/BikeComplyer.h"
-#include "15_env/HandicappedComplyer.h"
-#include "15_env/PedestrianComplyer.h"
-#include "15_env/ReservationRuleComplyer.h"
 #include "15_env/Calendar.h"
 #include "15_env/Service.h"
+#include "15_env/Complyer.h"
 
 namespace synthese
 {
@@ -76,12 +73,7 @@ namespace synthese
 
 			@ingroup m15
 		*/
-		class Path : 
-			public BikeComplyer,
-			public HandicappedComplyer,
-			public PedestrianComplyer,
-			public ReservationRuleComplyer
-		    
+		class Path : public Complyer
 		{
 
 		private:
@@ -103,14 +95,10 @@ namespace synthese
 			typedef std::vector<Edge*> Edges;
 
 		protected:
-
-			
 			Edges			_edges; 
 			ServiceSet		_services;
-
-			const Fare*		_fare;
 			
-			Calendar		_calendar; //!< Calendar indicating if there is at least one service running on each day.
+			Calendar		_calendar; //!< Calendar indicating if there is at least one service running on each day. (move it in Complyer)
 
 			Path ();
 
@@ -126,19 +114,12 @@ namespace synthese
 				const ServiceSet&			getServices () const;
 				const Service*				getService (int serviceIndex) const;
 
-				const Fare*					getFare () const;
-
 				virtual const Axis*			getAxis () const = 0;
 
 				const std::vector<Edge*>&	getEdges () const;
 				const Edge*					getEdge (int index) const;
 
 				Calendar&					getCalendar();
-			//@}
-
-			//! \name Setters
-			//@{
-				void setFare (const Fare* fare);
 			//@}
 
 			//! @name Query methods.
@@ -177,9 +158,12 @@ namespace synthese
 				*/
 				void addEdge (Edge* edge);
 
-				void addService (Service* service, 
-						const std::vector<synthese::time::Schedule>& departureSchedules,
-						const std::vector<synthese::time::Schedule>& arrivalSchedules);
+				/** Adds a service to a path.
+					@param service Service to add
+					@author Hugues Romain
+					@date 2007
+				*/
+				void addService (Service* service);
 
 				void removeService (Service* service);
 

@@ -34,6 +34,7 @@ namespace synthese
 	namespace env 
 	{
 		/** Transport network.
+		TRIDENT OK
 			@ingroup m15
 		*/
 		class TransportNetwork : public synthese::util::Registrable<uid,TransportNetwork>

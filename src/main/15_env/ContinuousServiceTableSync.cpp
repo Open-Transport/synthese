@@ -63,6 +63,12 @@ namespace synthese
 			int serviceNumber (Conversion::ToInt (
 				rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_SERVICENUMBER)));
 
+			int range (Conversion::ToInt (
+				rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_RANGE)));
+
+			int maxWaitingTime (Conversion::ToInt (
+				rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_MAXWAITINGTIME)));
+
 			std::string schedules (
 				rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_SCHEDULES));
 
@@ -72,8 +78,8 @@ namespace synthese
 			boost::char_separator<char> sep1 (",");
 			tokenizer schedulesTokens (schedules, sep1);
 
-			std::vector<synthese::time::Schedule> departureSchedules;
-			std::vector<synthese::time::Schedule> arrivalSchedules;
+			ContinuousService::Schedules departureSchedules;
+			ContinuousService::Schedules arrivalSchedules;
 
 			for (tokenizer::iterator schedulesIter = schedulesTokens.begin();
 				schedulesIter != schedulesTokens.end (); ++schedulesIter)
@@ -100,10 +106,17 @@ namespace synthese
 				}
 
 				Schedule departureSchedule (Schedule::FromString (departureScheduleStr));
-				Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
 
-				departureSchedules.push_back (departureSchedule);
-				arrivalSchedules.push_back (arrivalSchedule);
+				Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
+				arrivalSchedule += maxWaitingTime;
+
+				Schedule endDepartureSchedule(departureSchedule);
+				endDepartureSchedule += range;
+				Schedule endArrivalSchedule(arrivalSchedule);
+				endArrivalSchedule += range;
+
+				departureSchedules.push_back (make_pair(departureSchedule, endDepartureSchedule));
+				arrivalSchedules.push_back (make_pair(arrivalSchedule, endArrivalSchedule));
 			}
 
 			assert (departureSchedules.size () > 0);
@@ -115,12 +128,6 @@ namespace synthese
 			shared_ptr<Path> path = EnvModule::fetchPath (pathId);
 			assert (path.get());
 			assert (path->getEdges ().size () == arrivalSchedules.size ());
-
-			int range (Conversion::ToInt (
-				rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_RANGE)));
-
-			int maxWaitingTime (Conversion::ToInt (
-				rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_MAXWAITINGTIME)));
 
 			uid bikeComplianceId (
 				Conversion::ToLongLong (rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_BIKECOMPLIANCEID)));
@@ -134,15 +141,15 @@ namespace synthese
 			cs->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
 			cs->setServiceNumber(serviceNumber);
 			cs->setPath(path.get());
-			cs->setDepartureSchedule(departureSchedules.at(0));
-			cs->setArrivalSchedule(arrivalSchedules.at(arrivalSchedules.size()-1));
 			cs->setRange(range);
 			cs->setMaxWaitingTime(maxWaitingTime);
 			cs->setBikeCompliance (EnvModule::getBikeCompliances ().get(bikeComplianceId).get());
 			cs->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
 			cs->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
+			cs->setDepartureSchedules(departureSchedules);
+			cs->setArrivalSchedules(arrivalSchedules);
 
-			path->addService (cs, departureSchedules, arrivalSchedules);
+			path->addService (cs);
 		}
 
 		template<> void SQLiteTableSyncTemplate<ContinuousService>::save(ContinuousService* object)

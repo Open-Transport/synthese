@@ -22,6 +22,7 @@
 
 #include "BikeCompliance.h"
 
+using namespace std;
 
 namespace synthese
 {
@@ -30,19 +31,10 @@ namespace synthese
 	namespace env
 	{
 
-		BikeCompliance::BikeCompliance (const uid& id, 
-						const boost::logic::tribool& compliant,
-						const int& capacity)
-			: synthese::util::Registrable<uid,BikeCompliance> (id)
-			, Compliance (compliant, capacity)
-		{
-		    
-		}
-
 		BikeCompliance::BikeCompliance()
-		: Registrable<uid, BikeCompliance>(), Compliance()
+		: RegistrableWithNeutralElement<uid, BikeCompliance>()
+		, Compliance(false, UNKNOWN_VALUE)
 		{
-
 		}
 
 		BikeCompliance::~BikeCompliance()

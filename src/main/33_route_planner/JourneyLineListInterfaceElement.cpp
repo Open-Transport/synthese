@@ -63,7 +63,7 @@ namespace synthese
 			for (JourneyLegs::const_iterator it = journey->getJourneyLegs().begin(); it != journey->getJourneyLegs().end(); ++it)
 			{
 				const JourneyLeg* leg = *it;
-				if ( __AfficherLignesPied || !dynamic_cast<const Road*> (leg->getService ()->getPath ()) )
+				if ( __AfficherLignesPied || !dynamic_cast<const Road*> (leg->getServiceInstance().getService()->getPath ()) )
 					lineMarkerInterfacePage->display(
 						stream
 						, variables
@@ -71,7 +71,7 @@ namespace synthese
 						, _rowEndHtml->getValue(parameters, variables, object, request)
 						, Conversion::ToInt(_pixelWidth->getValue(parameters, variables, object, request))
 						, Conversion::ToInt(_pixelHeight->getValue(parameters, variables, object, request))
-						, static_cast<const Line*>(leg->getService ()->getPath ())
+						, static_cast<const Line*>(leg->getServiceInstance().getService()->getPath ())
 						, request);
 			}
 

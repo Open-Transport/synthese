@@ -36,14 +36,11 @@ namespace synthese
 
 		class Exception;
 
-		/** Generic registry class for common environment
-			operations (get, add, remove...).
-			Note that the registry has the responsability of destroying
-			registered objects.
-			This class should not be used directly : use instead the
-			"template" typedef in the classes derived from Registrable.
+		/** Generic registry class for common operations (get, add, remove...).
+			Note that the registry has the responsability of destroying	registered objects due to the use of shared pointers.
+			This class should not be used directly : use instead the "template" typedef in the classes derived from Registrable.
 
-		@ingroup m01
+			@ingroup m01
 		*/
 		template<class K, class T>
 		class Registry
@@ -54,6 +51,9 @@ namespace synthese
 
 		 public:
 
+			/** Constructor.
+				@param createNullObject if true, an element indexed at 0 position is automatically created, and is considered as neutral element
+			*/
 			Registry ();
 			~Registry ();
 
@@ -100,8 +100,6 @@ namespace synthese
 		template<class K, class T>
 		boost::shared_ptr<T> synthese::util::Registry<K, T>::getUpdateable( const K& key )
 		{
-			if (key == 0)
-				return boost::shared_ptr<T>();
 			if (contains (key) == false) 
 				throw RegistryKeyException<K,T> ("No such key in registry", key);
 
@@ -148,8 +146,6 @@ namespace synthese
 		template<class K, class T>
 		boost::shared_ptr<const T> Registry<K,T>::get (const K& key) const
 		{
-			if (key == 0)
-				return boost::shared_ptr<const T>();
 			if (contains (key) == false) 
 				throw RegistryKeyException<K,T> ("No such key in registry", key);
 
@@ -179,10 +175,14 @@ namespace synthese
 		template<class K, class T>
 		void Registry<K,T>::add (boost::shared_ptr<T> ptr)
 		{
+			if (ptr->getKey() == UNKNOWN_VALUE)
+				throw RegistryKeyException<K,T>("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
+
 			if (contains (ptr->getKey ())) 
 				throw RegistryKeyException<K,T> ("Duplicate key in registry", ptr->getKey ());
 		    
 			_registry.insert (std::make_pair (ptr->getKey (), ptr));
+
 			ptr->_registry = this;
 		}
 
@@ -200,6 +200,9 @@ namespace synthese
 		void 
 		Registry<K,T>::remove (const K& key)
 		{
+			if (key == 0)
+				throw RegistryKeyException<K,T>("Neutral object cannot be removed at execution time", 0);
+
 			if (contains (key) == false) 
 				throw RegistryKeyException<K,T> ("No such key in registry", key);
 

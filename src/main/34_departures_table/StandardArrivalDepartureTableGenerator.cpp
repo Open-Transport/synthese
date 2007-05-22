@@ -64,10 +64,15 @@ namespace synthese
 
 					// Loop on services
 					DateTime departureDateTime = _startDateTime;
-					int serviceNumber = -2;
-					while ((serviceNumber = ls->getNextService(departureDateTime, _endDateTime, _startDateTime, ++serviceNumber)) != UNKNOWN_VALUE)
+					int index(UNKNOWN_VALUE);
+					while(true)
 					{
-						_insert(ls, serviceNumber, departureDateTime);
+						ServicePointer servicePointer(ls->getNextService(departureDateTime, _endDateTime, _startDateTime, index));
+						if (!servicePointer.getService())
+							break;
+						_insert(servicePointer);
+						index = servicePointer.getServiceIndex() + 1;
+						departureDateTime = servicePointer.getActualDateTime();
 					}		
 				}
 			}

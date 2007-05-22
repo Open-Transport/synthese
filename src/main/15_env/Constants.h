@@ -1,6 +1,6 @@
 
-/** BroadcastPointsDataLog class implementation.
-	@file BroadcastPointsDataLog.cpp
+/** Constants class header.
+	@file Constants.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,31 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "BroadcastPointsDataLog.h"
+#ifndef SYNTHESE_env_Constants_h__
+#define SYNTHESE_env_Constants_h__
 
 namespace synthese
 {
-	using namespace dblog;
-	using namespace departurestable;
-
-	namespace util
+	namespace env
 	{
-		template<> const std::string FactorableTemplate<DBLog, BroadcastPointsDataLog>::FACTORY_KEY = "broadcastpoints";
-	}
+		/** @addtogroup m15
+			@{
+		*/
 
-	namespace departurestable
-	{
-		DBLog::ColumnsVector BroadcastPointsDataLog::getColumnNames() const
-		{
-			DBLog::ColumnsVector v;
-			v.push_back("Point de diffusion");
-			v.push_back("Action");
-			return v;
-		}
 
-		std::string BroadcastPointsDataLog::getName() const
-		{
-			return "Administration des emplacements de tableaux de départs";
-		}
+		/** @} */
 	}
 }
+
+#endif // SYNTHESE_env_Constants_h__

@@ -14,6 +14,7 @@ namespace env
 
 
 /** Rolling stock.
+ TRIDENT = VehicleType
  @ingroup m15
 */
 class RollingStock : public synthese::util::Registrable<uid,RollingStock>

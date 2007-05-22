@@ -40,7 +40,6 @@
 
 #include "32_admin/AdminModule.h"
 
-#include "34_departures_table/BroadcastPoint.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
 #include "34_departures_table/DisplayScreenTableSync.h"

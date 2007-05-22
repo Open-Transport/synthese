@@ -1,6 +1,6 @@
 
-/** Factorable class header.
-	@file Factorable.h
+/** RegistrableWithNeutralElement class header.
+	@file RegistrableWithNeutralElement.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,30 +20,33 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_Factorable_H__
-#define SYNTHESE_Factorable_H__
+#ifndef SYNTHESE_util_RegistrableWithNeutralElement_h__
+#define SYNTHESE_util_RegistrableWithNeutralElement_h__
 
-#include "01_util/Factory.h"
-#include "01_util/FactorableTemplate.h"
-
-#include <string>
+#include "01_util/Registrable.h"
+#include "01_util/RegistryWithNeutralElement.h"
 
 namespace synthese
 {
 	namespace util
 	{
-		class Factorable
+		/** RegistrableWithNeutralElement class.
+			@ingroup m01
+		*/
+		template<class K, class T>
+		class RegistrableWithNeutralElement : public Registrable<K,T>
 		{
-		private:
-			std::string __factory_key;
-
 		public:
-			Factorable();
-			void setFactoryKey(const std::string& key);
-			virtual const std::string& getFactoryKey() const;
+			typedef RegistryWithNeutralElement<K, T>	Registry;
+
+			RegistrableWithNeutralElement()
+				: Registrable()
+			{
+
+			}
+
 		};
 	}
 }
 
-#endif // SYNTHESE_Factorable_H__
-
+#endif // SYNTHESE_util_RegistrableWithNeutralElement_h__

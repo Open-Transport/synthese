@@ -24,10 +24,10 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/test/$(RootNamespace)"
+				BuildCommandLine="../../../vsscons build -Dtarget=src/test/15_env"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/test/$(RootNamespace)"
 				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/test/$(RootNamespace)"
-				Output="../../../build/win32/$(ConfigurationName)/test/$(RootNamespace)/$(InputName).exe"
+				Output="../../../build/win32/vc-8_0/$(ConfigurationName)/test/15_env/$(InputName).exe"
 				PreprocessorDefinitions=""
 				IncludeSearchPath=""
 				ForcedIncludes=""
