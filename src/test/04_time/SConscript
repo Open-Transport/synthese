@@ -1,10 +1,9 @@
 Import ('testenv')
-testmoduleenv = testenv.TestModuleEnv (includes='*.cpp', 
-                                       excludes=[], 
-                                       modules=['04_time'], 
-                                       boostlibs=[], 
-                                       withSQLite=False, 
-                                       withMultithreading=True)
+
+modules = ['04_time', '01_util'];
+
+unittestenv = testenv.UnitTestEnv (modules)
+unittestenv.UnitTest ()
 
 
 
