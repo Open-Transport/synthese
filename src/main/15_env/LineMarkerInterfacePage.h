@@ -56,8 +56,9 @@ namespace synthese
 				, const std::string& tableClosingHTML
 				, int pixelWidth
 				, int pixelHeight
-				, const synthese::env::Line* line
-				, const server::Request* request = NULL ) const;
+				, const env::Line* line
+				, const server::Request* request = NULL
+				) const;
 
 
 		};
