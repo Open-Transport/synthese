@@ -38,7 +38,7 @@ namespace synthese
 			pv.push_back(tableClosingHTML);
 			pv.push_back(Conversion::ToString(pixelWidth));
 			pv.push_back(Conversion::ToString(pixelHeight));
-			InterfacePage::display(stream, pv, vars, (const void*) line, request);
+			InterfacePage::display(stream, pv, vars, static_cast<const void*>(line), request);
 		}
 	}
 }
