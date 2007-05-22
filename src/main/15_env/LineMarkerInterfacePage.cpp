@@ -30,6 +30,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace interfaces;
+	using namespace server;
 
 	namespace env
 	{
