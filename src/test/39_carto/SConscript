@@ -1,10 +1,12 @@
 Import ('testenv')
-testmoduleenv = testenv.TestModuleEnv (includes='*.cpp', 
-                                       excludes=[], 
-                                       modules=['39_carto', '15_env', '04_time', '01_util'], 
-                                       boostlibs=['boost_filesystem', 'boost_thread', 'boost_iostreams'], 
-                                       withSQLite=False, 
-                                       withMultithreading=True)
+
+# frozen module; tests inactive, must be migrated to boost::test at some stage
+#testmoduleenv = testenv.TestModuleEnv (includes='*.cpp', 
+#                                       excludes=[], 
+#                                       modules=['39_carto', '15_env', '04_time', '01_util'], 
+#                                       boostlibs=['boost_filesystem', 'boost_thread', 'boost_iostreams'], 
+#                                       withSQLite=False, 
+#                                       withMultithreading=True)
 
 
 
