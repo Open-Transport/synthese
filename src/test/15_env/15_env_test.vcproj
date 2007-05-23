@@ -70,36 +70,6 @@
 				RelativePath=".\CalendarTest.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\CityTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\EnvironmentTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\main.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath=".\CalendarTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CityTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\EnvironmentTest.h"
-				>
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\SConscript"
