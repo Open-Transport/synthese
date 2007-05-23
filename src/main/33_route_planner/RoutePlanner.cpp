@@ -673,12 +673,13 @@ namespace synthese
 		    
 			// If a journey was found, try to optimize by delaying departure hour as much as possible.
 			_bestDepartureVertexReachesMap.clear ();
-		    
-			for (int i=0; i<currentJourney.getJourneyLegCount (); ++i)
+
+
+			for (int i=0; i<result.getJourneyLegCount (); ++i)
 			{
 				_bestDepartureVertexReachesMap.insert (
-					currentJourney.getJourneyLeg (i)->getOrigin ()->getFromVertex (),
-					currentJourney.getJourneyLeg (i)->getDepartureTime () );
+					result.getJourneyLeg (i)->getOrigin ()->getFromVertex (),
+					result.getJourneyLeg (i)->getDepartureTime () );
 			}
 		    
 			for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = dvam.getMap ().begin ();
@@ -705,8 +706,10 @@ namespace synthese
 			ovam.getVertexAccess (result.getOrigin ()->getFromVertex ()).approachTime;
 			_maxArrivalTime = result.getArrivalTime () + 
 			dvam.getVertexAccess (result.getDestination ()->getFromVertex ()).approachTime;
-		    
+
+			
 			// Look for best departure
+			// A revoir il faut surement faire currentJourney = result
 			findBestJourney (result, dvam, ovam, FROM_ORIGIN, currentJourney, true, true);
 
 		}
