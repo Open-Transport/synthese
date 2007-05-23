@@ -77,4 +77,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_ScenarioUpdateDatesAction_H__
- 

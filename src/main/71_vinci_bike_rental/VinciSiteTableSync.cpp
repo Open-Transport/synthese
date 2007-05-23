@@ -54,7 +54,7 @@ namespace synthese
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (vs->getKey() == 0)
+			if (vs->getKey() <= 0)
 				vs->setKey(getId(0,0)); /// @todo Handle grid id
 
 			// INSERT

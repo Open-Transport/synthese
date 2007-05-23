@@ -50,7 +50,8 @@ namespace synthese
 				@param line Line to display
 				@param site Displayed site
 			*/
-			void display( std::ostream& stream
+			void display(
+				std::ostream& stream
 				, interfaces::VariablesMap& vars
 				, const std::string& tableOpeningHTML
 				, const std::string& tableClosingHTML
@@ -59,7 +60,6 @@ namespace synthese
 				, const env::Line* line
 				, const server::Request* request = NULL
 				) const;
-
 
 		};
 	}

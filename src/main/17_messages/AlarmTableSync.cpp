@@ -91,7 +91,7 @@ namespace synthese
 
 			if (sobject)
 			{
-				if (!sobject->getKey())
+				if (sobject->getKey() <= 0)
 					sobject->setKey(getId(1,1));
 				query
 					<< " REPLACE INTO " << TABLE_NAME << " VALUES("

@@ -84,7 +84,7 @@ namespace synthese
 			{
 				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 				stringstream query;
-				if (user->getKey() == 0)
+				if (user->getKey() <= 0)
 					user->setKey(getId(1,1));	/// @todo handle grid id
 				query
 					<< "REPLACE INTO " << TABLE_NAME

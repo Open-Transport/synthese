@@ -147,7 +147,7 @@ namespace synthese
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (object->getKey() == 0)
+			if (object->getKey() <= 0)
 				object->setKey(getId(1,1));
 
             query

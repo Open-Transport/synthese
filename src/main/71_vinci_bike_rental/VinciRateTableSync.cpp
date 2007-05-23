@@ -62,7 +62,7 @@ namespace synthese
 		{
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
-			if (vr->getKey() != 0)
+			if (vr->getKey() > 0)
 			{	// UPDATE
 				query << "UPDATE " << TABLE_NAME << " SET "
 					<< VinciRateTableSync::TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(vr->_name)

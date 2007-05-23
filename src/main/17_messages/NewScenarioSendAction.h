@@ -62,4 +62,3 @@ namespace synthese
 }
 
 #endif // SYNTHESE_NewScenarioSendAction_H__
- 
