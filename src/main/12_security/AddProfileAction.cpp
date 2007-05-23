@@ -79,6 +79,8 @@ namespace synthese
 			vector<shared_ptr<Profile> > existingProfiles = ProfileTableSync::search(_name,"",0,1);
 			if (!existingProfiles.empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
+
+			_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}
 
 		void AddProfileAction::run()

@@ -161,7 +161,7 @@ namespace synthese
 						HTMLForm form(deleteRightRequest.getHTMLForm("d" + right->getFactoryKey() + right->getParameter()));
 						form.addHiddenField(DeleteRightAction::PARAMETER_RIGHT, right->getFactoryKey());
 						form.addHiddenField(DeleteRightAction::PARAMETER_PARAMETER, right->getParameter());
-						stream << form.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer l'habilitation sélectionnée ?");
+						stream << form.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer l\\'habilitation sélectionnée ?");
 					}
 				}
 				stream << t.close();

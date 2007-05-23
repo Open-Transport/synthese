@@ -184,14 +184,14 @@ namespace synthese
 				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getLogin());
 				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getName());
 				stream << t.col() << user->getProfile()->getName();
-				stream << t.col() << userRequest.getHTMLForm().getLinkButton("Editer") << "&nbsp;"
+				stream << t.col() << userRequest.getHTMLForm().getLinkButton("Modifier") << "&nbsp;"
 					<< deleteUserRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr(e) de vouloir supprimer l\\'utilisateur " + user->getLogin() + " ?");
 			}
 
 			stream << t.row();
 			stream << t.col() << t.getActionForm().getTextInput(AddUserAction::PARAMETER_LOGIN, "", "Entrez le login ici");
 			stream << t.col() << t.getActionForm().getTextInput(AddUserAction::PARAMETER_NAME, "", "Entrez le nom ici");
-			stream << t.col() << t.getActionForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), (uid) 0);
+			stream << t.col() << t.getActionForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), uid(0));
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
 		}
