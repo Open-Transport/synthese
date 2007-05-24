@@ -40,9 +40,9 @@ namespace synthese
 
 	namespace security
 	{
-		const std::string AddUserAction::PARAMETER_NAME = "actionParamnm";
-		const std::string AddUserAction::PARAMETER_LOGIN = "actionParamlg";
-		const std::string AddUserAction::PARAMETER_PROFILE_ID = "actionParampid";
+		const std::string AddUserAction::PARAMETER_NAME(Action_PARAMETER_PREFIX + "nm");
+		const std::string AddUserAction::PARAMETER_LOGIN(Action_PARAMETER_PREFIX + "lg");
+		const std::string AddUserAction::PARAMETER_PROFILE_ID(Action_PARAMETER_PREFIX + "pid");
 
 		ParametersMap AddUserAction::getParametersMap() const
 		{
@@ -77,7 +77,7 @@ namespace synthese
 			it = map.find(PARAMETER_PROFILE_ID);
 			if (it == map.end())
 				throw ActionException("Profile not specified");
-			if (!SecurityModule::getProfiles().contains(Conversion::ToLongLong(it->second)));
+			if (!SecurityModule::getProfiles().contains(Conversion::ToLongLong(it->second)))
 				throw ActionException("Profil inexistant");
 			_profile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
 

@@ -203,7 +203,7 @@ namespace synthese
 			try
 			{
 				ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
-				if (it != map.end())
+				if (it != map.end() && Conversion::ToLongLong(it->second) != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
 					_profile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
 			}
 			catch (Profile::RegistryKeyException e)
