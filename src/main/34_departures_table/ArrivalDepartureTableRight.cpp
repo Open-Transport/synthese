@@ -20,14 +20,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ArrivalDepartureTableRight.h"
+#include "34_departures_table/ArrivalDepartureTableRight.h"
+
+#include "15_env/TransportNetworkTableSync.h"
+#include "15_env/TransportNetwork.h"
+#include "15_env/CommercialLineTableSync.h"
+#include "15_env/CommercialLine.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace security;
 	using namespace departurestable;
+	using namespace env;
 
 	namespace util
 	{
@@ -43,6 +50,17 @@ namespace synthese
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair("*","(tous les afficheurs)"));
+			
+			m.push_back(make_pair(string(), "--- Réseaux ---"));
+			vector<shared_ptr<TransportNetwork> > networks(TransportNetworkTableSync::search());
+			for (vector<shared_ptr<TransportNetwork> >::const_iterator it = networks.begin(); it != networks.end(); ++it)
+				m.push_back(make_pair(Conversion::ToString((*it)->getKey()), (*it)->getName() ));
+
+			m.push_back(make_pair(string(), "--- Lignes ---"));
+			vector<shared_ptr<CommercialLine> > lines(CommercialLineTableSync::search());
+			for (vector<shared_ptr<CommercialLine> >::const_iterator itl = lines.begin(); itl != lines.end(); ++itl)
+				m.push_back(make_pair(Conversion::ToString((*itl)->getKey()), (*itl)->getName() ));
+
 			return m;
 		}
 	}
