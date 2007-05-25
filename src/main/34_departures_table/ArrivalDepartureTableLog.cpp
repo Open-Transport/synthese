@@ -72,5 +72,12 @@ namespace synthese
 		{
 			return "Administration des tableaux de départs";
 		}
+
+		void ArrivalDepartureTableLog::addRemoveEntry( boost::shared_ptr<const DisplayScreen> screen , boost::shared_ptr<const security::User> user )
+		{
+			DBLogEntry::Content content;
+			content.push_back("Suppression de l'afficheur " + screen->getFullName());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, screen->getKey());
+		}
 	}
 }

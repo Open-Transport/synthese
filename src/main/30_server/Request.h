@@ -262,6 +262,8 @@ namespace synthese
 
 				template<class R>
 				bool isAuthorized(security::Right::Level publicr = security::Right::FORBIDDEN, security::Right::Level privater = security::Right::FORBIDDEN, std::string parameter = security::UNKNOWN_PERIMETER) const;
+
+				bool isActionFunctionAuthorized() const;
 			//@}
 
 			//! \name Output methods

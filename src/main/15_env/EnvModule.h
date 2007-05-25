@@ -52,6 +52,8 @@
 #include "15_env/Road.h"
 #include "15_env/Types.h"
 
+#include "12_security/Right.h"
+
 namespace synthese
 {
 	/**	@defgroup m15Actions 15 Actions
@@ -366,6 +368,8 @@ namespace synthese
 			static boost::shared_ptr<Service> fetchService (const uid& id);
 
 			static std::vector<std::pair<uid, std::string> >	getCommercialLineLabels(bool withAll=false);
+
+			static void getNetworkLinePlaceRightParameterList(security::Right::ParameterLabelsVector& m);
 
 		};
 	}

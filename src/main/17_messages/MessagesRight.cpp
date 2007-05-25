@@ -45,6 +45,7 @@ namespace synthese
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les messages)"));
+
 			return m;
 		}
 	}

@@ -295,6 +295,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\DisplayScreenRemove.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayScreenRemove.h"
+					>
+				</File>
+				<File
 					RelativePath=".\DisplayScreenRemoveDisplayedPlaceAction.cpp"
 					>
 				</File>

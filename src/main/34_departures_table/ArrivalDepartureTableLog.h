@@ -50,6 +50,11 @@ namespace synthese
 				, const std::string& text
 				, boost::shared_ptr<const security::User> user
 				);
+			static void addRemoveEntry(
+				boost::shared_ptr<const DisplayScreen> screen
+				, boost::shared_ptr<const security::User> user
+				);
+
 			std::string getObjectName(uid id) const;
 		};
 	}

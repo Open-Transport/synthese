@@ -480,5 +480,11 @@ namespace synthese
 			return shared_ptr<User>();
 
 		}
+
+		bool Request::isActionFunctionAuthorized() const
+		{
+			return (!_action.get() || _action->_isAuthorized())
+				&& (!_function.get() || _function->_isAuthorized());
+		}
 	}
 }

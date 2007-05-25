@@ -55,6 +55,9 @@
 #include "34_departures_table/DisplayScreenRemoveDisplayedPlaceAction.h"
 #include "34_departures_table/DisplayScreenRemoveForbiddenPlaceAction.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
+#include "34_departures_table/DisplayScreenRemove.h"
+#include "34_departures_table/DisplayMaintenanceAdmin.h"
+#include "34_departures_table/DisplayScreenContentRequest.h"
 
 using namespace std;
 
@@ -149,6 +152,18 @@ namespace synthese
 			rmForbiddenRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
 			rmForbiddenRequest.setObjectId(request->getObjectId());
 
+			// Delete the screen request
+			ActionFunctionRequest<DisplayScreenRemove, AdminRequest> deleteRequest;
+			deleteRequest.getFunction()->setPage<DisplaySearchAdmin>();
+			deleteRequest.getAction()->setDisplayScreen(_displayScreen);
+
+			FunctionRequest<DisplayScreenContentRequest> viewRequest(request);
+			viewRequest.setObjectId(_displayScreen->getKey());
+
+			FunctionRequest<AdminRequest> maintRequest(request);
+			maintRequest.getFunction()->setPage<DisplayMaintenanceAdmin>();
+			maintRequest.setObjectId(_displayScreen->getKey());
+
 			// Maps for particular select fields
 			vector<pair<int, string> > blinkingDelaysMap;
 			blinkingDelaysMap.push_back(make_pair(0, "Pas de clignotement"));
@@ -172,6 +187,13 @@ namespace synthese
 			clearDelayMap.push_back(make_pair(1, "1 minute après le départ"));
 			for (int i=2; i<6; ++i)
 				clearDelayMap.push_back(make_pair(i, Conversion::ToString(i) + " minutes après le départ"));
+
+			stream << "<h1>Actions</h1>";
+
+			if (deleteRequest.isActionFunctionAuthorized())
+				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'afficheur " + _displayScreen->getFullName() + " ?", "monitor_delete.png") << " ";
+			stream << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "monitor_go.png") << " ";
+			stream << HTMLModule::getLinkButton(maintRequest.getURL(), "Supervision", string(), "monitor_lightning.png") << " ";
 
 
 			stream << "<h1>Propriétés</h1>";
