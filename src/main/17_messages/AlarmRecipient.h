@@ -27,6 +27,8 @@
 
 #include "01_util/Factorable.h"
 
+#include "12_security/Types.h"
+
 #include "17_messages/Types.h"
 
 #include "30_server/ActionFunctionRequest.h"
@@ -74,6 +76,7 @@ namespace synthese
 			virtual void addObject(const SentAlarm* alarm, uid objectId) = 0;
 			virtual void removeObject(const SentAlarm* alarm, uid objectId) = 0;
 			virtual AlarmConflict getConflictStatus(const SentAlarm* alarm) const = 0;
+			virtual void getStaticParametersLabelsVirtual(security::ParameterLabelsVector& m) = 0;
 
 		};
 	}

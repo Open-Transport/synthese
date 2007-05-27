@@ -94,7 +94,7 @@ namespace synthese
 
 		bool DBLogList::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
-			return request->isAuthorized<DBLogRight>(Right::READ);
+			return request->isAuthorized<DBLogRight>(READ);
 		}
 
 		DBLogList::DBLogList()

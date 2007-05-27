@@ -43,7 +43,7 @@ namespace synthese
 		template<> const string RightTemplate<DBLogRight>::NAME("Journaux");
 
 		template<>
-		Right::ParameterLabelsVector RightTemplate<DBLogRight>::getStaticParametersLabels()
+		ParameterLabelsVector RightTemplate<DBLogRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les journaux)"));

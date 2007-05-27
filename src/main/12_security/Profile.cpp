@@ -96,7 +96,7 @@ namespace synthese
 			return (it == _rights.end()) ? shared_ptr<Right>() : it->second;
 		}
 
-		const Profile::RightsVector& Profile::getRights() const
+		const RightsVector& Profile::getRights() const
 		{
 			return _rights;
 		}
@@ -129,7 +129,7 @@ namespace synthese
 			}
 			
 			// 2 Attempting to find same right with compatible perimeter : the more favorable is selected
-			RightsOfSameClassMap m = _getRights(right->getFactoryKey());
+			RightsOfSameClassMap m = getRights(right->getFactoryKey());
 			for (RightsOfSameClassMap::const_iterator it = m.begin(); it != m.end(); ++it)
 			{
 				if (it->second->perimeterIncludes(right->getParameter()))
@@ -144,7 +144,7 @@ namespace synthese
 			return privateAuthorization && publicAuthorization;
 		}
 
-		Profile::RightsOfSameClassMap Profile::_getRights( const std::string& key ) const
+		RightsOfSameClassMap Profile::getRights( const std::string& key ) const
 		{
 			RightsOfSameClassMap m;
 			for (RightsVector::const_iterator it = _rights.begin(); it != _rights.end(); ++it)

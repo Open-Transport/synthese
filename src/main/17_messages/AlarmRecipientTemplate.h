@@ -68,6 +68,8 @@ namespace synthese
 	    static const SentAlarm* getAlarm(const T* object);
 	    static const SentAlarm* getAlarm(const T* object, const time::DateTime& date);
 
+		static void getStaticParametersLabels(security::ParameterLabelsVector& m);
+
 		/** Catch of an alarm conflict for a specified recipient.
 			@param object The recipient to analyze
 			@return synthese::messages::AlarmConflict the "worse" conflict status of all the alarms to display on the recipient.
@@ -84,7 +86,15 @@ namespace synthese
 			To obtain the global alarm conflict status, use the public method Alarm::getConflictStatus
 		*/
 		AlarmConflict getConflictStatus(const SentAlarm* alarm) const;
+
+		virtual void getStaticParametersLabelsVirtual(security::ParameterLabelsVector& m);
 	};
+
+	template<class T, class C>
+	void synthese::messages::AlarmRecipientTemplate<T, C>::getStaticParametersLabelsVirtual( security::ParameterLabelsVector& m )
+	{
+		getStaticParametersLabels(m);
+	}
 
 	template<class T, class C>
 	const std::string& synthese::messages::AlarmRecipientTemplate<T, C>::getTitle() const

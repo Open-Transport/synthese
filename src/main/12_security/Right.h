@@ -30,6 +30,8 @@
 
 #include "01_util/Factorable.h"
 
+#include "12_security/Types.h"
+
 namespace synthese
 {
 	namespace security
@@ -59,27 +61,9 @@ namespace synthese
 		*/
 		class Right : public util::Factorable
 		{
-		public:
-			/** Available vality areas map.
-				Key : heading of areas (eg: lines, stops...)
-				Value : set of allowed strings representing an area
-			*/
-			typedef std::map<std::string, std::set<std::string> > AvailableValidityAreasMap;
-
-			/** Niveaux d'habilitation. */
-			typedef enum {
-				FORBIDDEN	= 0		//!< Interdiction
-				, USE		= 20	//!< Utilisation de fonction autorisée
-				, READ		= 40	//!< Lecture directe de données autorisée
-				, WRITE		= 60	//!< Ecriture directe de donnée autorisée
-				, DELETE	= 80	//!< Suppression de donnée autorisée
-			} Level;
-
-			typedef std::vector<std::pair<std::string, std::string> > ParameterLabelsVector;
-
 		private:
-			Level _privateRightLevel;
-			Level _publicRightLevel;
+			RightLevel _privateRightLevel;
+			RightLevel _publicRightLevel;
 
 		protected:
 			std::string _parameter;
@@ -112,20 +96,20 @@ namespace synthese
 
 			//! \name Getters
 			//@{
-				Level				getPrivateRightLevel()	const;
-				Level				getPublicRightLevel()	const;
+				RightLevel			getPrivateRightLevel()	const;
+				RightLevel			getPublicRightLevel()	const;
 				const std::string&	getParameter() const;
 			//@}
 
 			//! \name Setters
 			//@{
-				void	setPrivateLevel(const Level& level);
-				void	setPublicLevel(const Level& level);
+				void	setPrivateLevel(const RightLevel& level);
+				void	setPublicLevel(const RightLevel& level);
 				void	setParameter(const std::string& parameter);
 			//@}
 
 
-			static std::string getLevelLabel(Level level);
+			static std::string getLevelLabel(RightLevel level);
 
 			virtual const std::string& getName() const = 0;
 		};

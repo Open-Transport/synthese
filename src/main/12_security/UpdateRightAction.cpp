@@ -23,6 +23,7 @@
 #include "12_security/UpdateRightAction.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/SecurityModule.h"
+#include "12_security/Right.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -47,8 +48,8 @@ namespace synthese
 			{
 				map.insert(make_pair(PARAMETER_RIGHT_CODE, _right->getFactoryKey()));
 				map.insert(make_pair(PARAMETER_RIGHT_PARAMETER, _right->getParameter()));
-				map.insert(make_pair(PARAMETER_PUBLIC_VALUE, Conversion::ToString((int) _right->getPublicRightLevel())));
-				map.insert(make_pair(PARAMETER_PRIVATE_VALUE, Conversion::ToString((int) _right->getPrivateRightLevel())));
+				map.insert(make_pair(PARAMETER_PUBLIC_VALUE, Conversion::ToString(static_cast<int>(_right->getPublicRightLevel()))));
+				map.insert(make_pair(PARAMETER_PRIVATE_VALUE, Conversion::ToString(static_cast<int>(_right->getPrivateRightLevel()))));
 			}
 			return map;
 		}
@@ -86,13 +87,13 @@ namespace synthese
 			it = map.find(PARAMETER_PUBLIC_VALUE);
 			if (it == map.end())
 				throw ActionException("Public level not specified");
-			_publicLevel = (Right::Level) Conversion::ToInt(it->second);
+			_publicLevel = static_cast<RightLevel>(Conversion::ToInt(it->second));
 
 			// Private level
 			it = map.find(PARAMETER_PRIVATE_VALUE);
 			if (it == map.end())
 				throw ActionException("Private level not specified");
-			_privateLevel = (Right::Level) Conversion::ToInt(it->second);
+			_privateLevel = static_cast<RightLevel>(Conversion::ToInt(it->second));
 		}
 
 		void UpdateRightAction::run()

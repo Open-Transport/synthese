@@ -80,31 +80,28 @@ namespace synthese
 		
 		void ProfilesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			string name;
-			string right;
-
 			ParametersMap::const_iterator it;
 			
 			// Profile name
 			it = map.find(PARAMETER_SEARCH_NAME);
 			if (it != map.end())
 			{
-				name = it->second;
+				_searchName = it->second;
 			}
 
 			// Profile right
 			it = map.find(PARAMETER_SEARCH_RIGHT);
 			if (it != map.end())
 			{
-				right = it->second;
+				_searchRightName = it->second;
 			}
 
 			// Parameters
 			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAMETER_SEARCH_NAME, 30);
 
 			_searchResult = ProfileTableSync::search(
-				name
-				, right
+				_searchName
+				, _searchRightName
 				, _requestParameters.first
 				, _requestParameters.maxSize
 				, _requestParameters.orderField == PARAMETER_SEARCH_NAME
@@ -136,8 +133,8 @@ namespace synthese
 			
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 			stream << s.open();
-			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, ""));
-			stream << s.cell("Habilitation", s.getForm().getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightLabels(true), string()));
+			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, _searchName));
+			stream << s.cell("Habilitation", s.getForm().getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightLabels(true), _searchRightName));
 			stream << s.close();
 			stream << s.getForm().setFocus(PARAMETER_SEARCH_NAME);
 				
@@ -166,7 +163,7 @@ namespace synthese
 
 				if (profile->getParentId())
 					stream << "<li>Hérite de " << SecurityModule::getProfiles().get(profile->getParentId())->getName() << "</li>";
-				for (Profile::RightsVector::const_iterator it = profile->getRights().begin(); it != profile->getRights().end(); ++it)
+				for (RightsVector::const_iterator it = profile->getRights().begin(); it != profile->getRights().end(); ++it)
 				{
 					shared_ptr<const Right> r = it->second;
 					stream << "<li>Accès " << Right::getLevelLabel(r->getPublicRightLevel()) << " public et " << Right::getLevelLabel(r->getPrivateRightLevel()) << " privé pour " << r->getName();
@@ -191,7 +188,7 @@ namespace synthese
 
 		bool ProfilesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
-			return request->isAuthorized<SecurityRight>(Right::READ);
+			return request->isAuthorized<SecurityRight>(READ);
 		}
 
 		ProfilesAdmin::ProfilesAdmin()

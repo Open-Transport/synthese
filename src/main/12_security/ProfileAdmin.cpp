@@ -101,11 +101,11 @@ namespace synthese
 			addRightRequest.setObjectId(_profile->getKey());
 			
 			vector<pair<int, string> > privatePublicMap;
-			privatePublicMap.push_back(make_pair((int) Right::FORBIDDEN, "Interdit"));
-			privatePublicMap.push_back(make_pair((int) Right::USE, "Utilisation"));
-			privatePublicMap.push_back(make_pair((int) Right::READ, "Lecture"));
-			privatePublicMap.push_back(make_pair((int) Right::WRITE, "Ecriture"));
-			privatePublicMap.push_back(make_pair((int) Right::DELETE, "Contrôle total"));
+			privatePublicMap.push_back(make_pair((int) FORBIDDEN, "Interdit"));
+			privatePublicMap.push_back(make_pair((int) USE, "Utilisation"));
+			privatePublicMap.push_back(make_pair((int) READ, "Lecture"));
+			privatePublicMap.push_back(make_pair((int) WRITE, "Ecriture"));
+			privatePublicMap.push_back(make_pair((int) DELETE, "Contrôle total"));
 			
 
 			stream	<< "<h1>Propriétés</h1>";
@@ -139,7 +139,7 @@ namespace synthese
 				stream << t.open();
 
 				// Habilitations list
-				for (Profile::RightsVector::const_iterator it = _profile->getRights().begin(); it != _profile->getRights().end(); ++it)
+				for (RightsVector::const_iterator it = _profile->getRights().begin(); it != _profile->getRights().end(); ++it)
 				{
 					shared_ptr<const Right> right = it->second;
 					stream << t.row();
@@ -181,15 +181,25 @@ namespace synthese
 
 			for (Factory<Right>::Iterator it = Factory<Right>::begin(); it != Factory<Right>::end(); ++it)
 			{
+				ParameterLabelsVector pl = it->getParametersLabels();
 				HTMLForm form(addRightRequest.getHTMLForm("add" + it.getKey()));
 				form.addHiddenField(AddRightAction::PARAMETER_RIGHT, it.getKey());
 				stream
 					<< "<tr>"
 					<< form.open()
 					<< "<td>" << it->getName() << "</td>"
-					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PARAMETER, it->getParametersLabels(), GLOBAL_PERIMETER) << "</td>"
-					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, (int) Right::Level(Right::USE)) << "</td>"
-					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, (int) Right::Level(Right::USE)) << "</td>"
+					<< "<td>";
+				if (pl.size() == 1)
+				{
+					stream << pl.at(0).second;
+					form.addHiddenField(AddRightAction::PARAMETER_PARAMETER, pl.at(0).first);
+				}
+				else
+					stream << form.getSelectInput(AddRightAction::PARAMETER_PARAMETER, pl, GLOBAL_PERIMETER);
+				stream
+					<< "</td>"
+					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, (int) USE) << "</td>"
+					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, (int) USE) << "</td>"
 					<< "<td>" 
 					<< form.getSubmitButton("Ajouter") << "</td>"
 					<< form.close()

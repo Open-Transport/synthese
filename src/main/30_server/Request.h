@@ -25,7 +25,7 @@
 
 #include "01_util/UId.h"
 
-#include "12_security/Right.h"
+#include "12_security/Types.h"
 #include "12_security/User.h"
 #include "12_security/Profile.h"
 #include "12_security/Constants.h"
@@ -261,7 +261,7 @@ namespace synthese
 				void run(std::ostream& stream);
 
 				template<class R>
-				bool isAuthorized(security::Right::Level publicr = security::Right::FORBIDDEN, security::Right::Level privater = security::Right::FORBIDDEN, std::string parameter = security::UNKNOWN_PERIMETER) const;
+				bool isAuthorized(security::RightLevel publicr = security::FORBIDDEN, security::RightLevel privater = security::FORBIDDEN, std::string parameter = security::UNKNOWN_PERIMETER) const;
 
 				bool isActionFunctionAuthorized() const;
 			//@}
@@ -291,7 +291,7 @@ namespace synthese
 		};
 
 		template<class R>
-		bool Request::isAuthorized(security::Right::Level publicr, security::Right::Level privater, std::string parameter /*= security::GLOBAL_PERIMETER*/ ) const
+		bool Request::isAuthorized(security::RightLevel publicr, security::RightLevel privater, std::string parameter /*= security::GLOBAL_PERIMETER*/ ) const
 		{
 			if (_session == NULL)
 				return false;

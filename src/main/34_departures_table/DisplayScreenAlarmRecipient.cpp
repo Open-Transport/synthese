@@ -28,6 +28,8 @@
 
 #include "11_interfaces/InterfaceModule.h"
 
+#include "12_security/Constants.h"
+
 #include "15_env/ConnectionPlace.h"
 #include "15_env/Line.h"
 #include "15_env/EnvModule.h"
@@ -57,6 +59,7 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace html;
+	using namespace security;
 
 	namespace util
 	{
@@ -79,6 +82,13 @@ namespace synthese
 			std::map<const DisplayScreen*, std::set<const SentAlarm*> > ();
 
 		template<> const string AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::TITLE("Afficheurs");
+
+		template<> void AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::getStaticParametersLabels(ParameterLabelsVector& m)
+		{
+			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les afficheurs)"));
+			EnvModule::getNetworkLinePlaceRightParameterList(m);
+		}
+
 	}
 
 

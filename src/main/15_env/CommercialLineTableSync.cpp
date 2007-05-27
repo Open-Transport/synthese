@@ -32,6 +32,9 @@
 
 #include "01_util/Conversion.h"
 
+#include "12_security/Constants.h"
+#include "12_security/Right.h"
+
 #include <sstream>
 
 using namespace std;
@@ -42,6 +45,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace env;
+	using namespace security;
 
 	namespace db
 	{
@@ -182,5 +186,144 @@ namespace synthese
 				throw Exception(e.getMessage());
 			}
 		}
+
+		std::vector<boost::shared_ptr<CommercialLine> > CommercialLineTableSync::search(
+			const security::RightsOfSameClassMap& rights 
+			, bool totalControl 
+			, RightLevel neededLevel 
+			, int first /*= 0 */
+			, int number /*= 0 */
+			, bool orderByNetwork /*= true */
+			, bool orderByName /*= false */
+			, bool raisingOrder /*= true */
+		){
+			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			stringstream query;
+			query
+				<< getSQLLinesList(rights, totalControl, neededLevel, "*");
+			if (orderByNetwork)
+				query << " ORDER BY "
+				<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE_NAME << " AS n WHERE n." << TABLE_COL_ID << "=" << TABLE_NAME << "." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
+				<< "," << TABLE_NAME << "." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (orderByName)
+				query << " ORDER BY " << TABLE_NAME << "." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			if (number > 0)
+				query << " LIMIT " << Conversion::ToString(number + 1);
+			if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
+
+			try
+			{
+				SQLiteResult result = sqlite->execQuery(query.str());
+				vector<shared_ptr<CommercialLine> > objects;
+				for (int i = 0; i < result.getNbRows(); ++i)
+				{
+					shared_ptr<CommercialLine> object(new CommercialLine());
+					load(object.get(), result, i);
+					objects.push_back(object);
+				}
+				return objects;
+			}
+			catch(SQLiteException& e)
+			{
+				throw Exception(e.getMessage());
+			}
+
+		}
+
+		std::string CommercialLineTableSync::getSQLLinesList(
+			const security::RightsOfSameClassMap& rights
+			, bool totalControl
+			, RightLevel neededLevel
+			, std::string selectedColumns
+		){
+			RightsOfSameClassMap::const_iterator it;
+			bool all(totalControl);
+			set<uid> allowedNetworks;
+			set<uid> forbiddenNetworks;
+			set<uid> allowedLines;
+			set<uid> forbiddenLines;
+
+			// All ?
+			it = rights.find(GLOBAL_PERIMETER);
+			if (it != rights.end())
+			{
+				all = it->second->getPublicRightLevel() >= neededLevel;
+			}
+
+			for (RightsOfSameClassMap::const_iterator it = rights.begin(); it != rights.end(); ++it)
+			{
+				if (decodeTableId(Conversion::ToLongLong(it->first)) == TransportNetworkTableSync::TABLE_ID)
+				{
+					if (it->second->getPublicRightLevel() < neededLevel)
+						forbiddenNetworks.insert(Conversion::ToLongLong(it->first));
+					else
+						allowedNetworks.insert(Conversion::ToLongLong(it->first));
+				}
+				else if (decodeTableId(Conversion::ToLongLong(it->first)) == CommercialLineTableSync::TABLE_ID)
+				{
+					if (it->second->getPublicRightLevel() < neededLevel)
+						forbiddenLines.insert(Conversion::ToLongLong(it->first));
+					else
+						allowedLines.insert(Conversion::ToLongLong(it->first));
+				}
+			}
+
+			stringstream query;
+			query << " SELECT " << selectedColumns << " FROM " << TABLE_NAME << " WHERE 1 ";
+
+			if (all && (!forbiddenNetworks.empty() || !allowedLines.empty()))
+			{
+				query << " AND (";
+				if (!forbiddenNetworks.empty())
+				{
+					query << "(";
+					for (set<uid>::const_iterator it(forbiddenNetworks.begin()); it != forbiddenNetworks.end(); ++it)
+					{
+						if (it != forbiddenNetworks.begin())
+							query << " AND ";
+						query << CommercialLineTableSync::COL_NETWORK_ID << "!=" << *it;
+					}
+					query << ")";
+				}
+				if (!allowedLines.empty())
+				{
+					if (!forbiddenNetworks.empty())
+						query << " OR ";
+					query << "(";
+					for (set<uid>::const_iterator it(allowedLines.begin()); it != allowedLines.end(); ++it)
+					{
+						if (it != allowedLines.begin())
+							query << " OR ";
+						query << TABLE_COL_ID << "=" << *it;
+					}
+					query << ")";
+				}
+				query << ")";
+			}
+			else if (!all)
+			{
+				query << "(0";
+				if (!allowedNetworks.empty())
+				{
+					for (set<uid>::const_iterator it(allowedNetworks.begin()); it != allowedNetworks.end(); ++it)
+						query << " OR " << COL_NETWORK_ID << "=" << *it;
+				}
+				if (!allowedLines.empty())
+				{
+					for (set<uid>::const_iterator it(allowedLines.begin()); it != allowedLines.end(); ++it)
+						query << " OR " << TABLE_COL_ID << "=" << *it;
+				}
+				query << ")";
+			}
+			if (!forbiddenLines.empty())
+			{
+				for (set<uid>::const_iterator it(forbiddenLines.begin()); it != forbiddenLines.end(); ++it)
+					query << " AND " << TABLE_COL_ID << "!=" << *it;
+			}
+
+			return query.str();
+		}
+
 	}
 }

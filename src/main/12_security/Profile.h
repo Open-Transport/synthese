@@ -32,6 +32,8 @@
 #include "01_util/UId.h"
 
 #include "12_security/Constants.h"
+#include "12_security/Types.h"
+#include "12_security/GlobalRight.h"
 
 namespace synthese
 {
@@ -58,22 +60,10 @@ namespace synthese
 		*/
 		class Profile : public util::Registrable<uid,Profile>
 		{
-		public:
-			typedef std::map<std::pair<std::string, std::string>, boost::shared_ptr<Right> > RightsVector;
-			typedef std::map<std::string, boost::shared_ptr<Right> > RightsOfSameClassMap;
-
 		private:
 			std::string		_name;
 			RightsVector	_rights;
 			uid				_parentId;
-
-			/** Extractor of the rights corresponding to a class key.
-				@param key The class key to search
-				@return RightsOfSameClassMap Rights of the specified class
-				@author Hugues Romain
-				@date 2007				
-			*/
-			RightsOfSameClassMap	_getRights(const std::string& key) const;
 
 		public:
 			/** Comparison operator between profiles.
@@ -134,8 +124,38 @@ namespace synthese
 				*/
 				boost::shared_ptr<const Right> getRight(const std::string key = GLOBAL_PERIMETER, const std::string parameter = GLOBAL_PERIMETER) const;
 
+				/** Extractor of the rights corresponding to a class key.
+					@param key The class key to search
+					@return RightsOfSameClassMap Rights of the specified class
+					@author Hugues Romain
+					@date 2007				
+				*/
+				RightsOfSameClassMap	getRights(const std::string& key) const;
+
+				template<class T>
+				RightsOfSameClassMap	getRightsForModuleClass()	const;
+
+				template<class T>
+				RightLevel	getGlobalPublicRight()	const;
 			//@}
 		};
+
+		template<class T>
+		RightLevel Profile::getGlobalPublicRight() const
+		{
+			boost::shared_ptr<const Right> r(getRight(T::FACTORY_KEY));
+			if (r.get())
+				return r->getPublicRightLevel();
+			if (T::FACTORY_KEY == GlobalRight::FACTORY_KEY)
+				return FORBIDDEN;
+			return getGlobalPublicRight<GlobalRight>();
+		}
+
+		template<class T>
+		RightsOfSameClassMap Profile::getRightsForModuleClass() const
+		{
+			return getRights(T::FACTORY_KEY);
+		}
 	}
 }
 

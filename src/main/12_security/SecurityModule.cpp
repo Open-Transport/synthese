@@ -61,8 +61,8 @@ namespace synthese
 	
 			_rootProfile->setName(ROOT_PROFILE);
 			shared_ptr<Right> r = Factory<Right>::create<GlobalRight>();
-			r->setPublicLevel(Right::DELETE);
-			r->setPrivateLevel(Right::DELETE);
+			r->setPublicLevel(DELETE);
+			r->setPrivateLevel(DELETE);
 			_rootProfile->cleanRights();
 			_rootProfile->addRight(r);
 			ProfileTableSync::save(_rootProfile.get());
@@ -120,7 +120,7 @@ namespace synthese
 			if (withAll)
 				m.push_back(make_pair("", "(toutes)"));
 			for (Factory<Right>::Iterator it = Factory<Right>::begin(); it != Factory<Right>::end(); ++it)
-				m.push_back(make_pair(it.getKey(), it.getKey()));
+				m.push_back(make_pair(it.getKey(), it->getName()));
 			return m;
 		}
 

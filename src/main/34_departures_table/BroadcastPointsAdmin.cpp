@@ -140,7 +140,15 @@ namespace synthese
 			stream << st.cell("Commune", st.getForm().getTextInput(PARAMETER_CITY_NAME, _cityName));
 			stream << st.cell("Nom", st.getForm().getTextInput(PARAMETER_PLACE_NAME, _placeName));
 			stream << st.cell("Terminaux d'affichage", st.getForm().getSelectInput(PARAMETER_DISPLAY_NUMBER, m, (int) _displayNumber));
-			stream << st.cell("Ligne", st.getForm().getSelectInput(PARAMETER_LINE_ID, EnvModule::getCommercialLineLabels(true), _lineUId));
+			stream << st.cell("Ligne", st.getForm().getSelectInput(
+				PARAMETER_LINE_ID
+				, EnvModule::getCommercialLineLabels(
+					request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+					, request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+					, READ
+					, true)
+				, _lineUId)
+				);
 			stream << st.close();
 
 			stream << "<h1>Résultats de la recherche</h1>";
@@ -178,7 +186,7 @@ namespace synthese
 
 		bool BroadcastPointsAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
-			return request->isAuthorized<ArrivalDepartureTableRight>(Right::READ);
+			return request->isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 	}
 }

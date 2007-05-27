@@ -86,6 +86,9 @@ namespace synthese
 			static const std::string PARAMETER_SEARCH_NAME;
 			static const std::string PARAMETER_SEARCH_RIGHT;
 
+			std::string _searchName;
+			std::string _searchRightName;
+
 			std::vector<boost::shared_ptr<Profile> >		_searchResult;
 			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
 			html::ActionResultHTMLTable::ResultParameters	_resultParameters;

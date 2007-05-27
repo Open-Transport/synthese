@@ -224,15 +224,15 @@ namespace synthese
 		{
 			stringstream s;
 			
-			for (Profile::RightsVector::const_iterator it = p->getRights().begin(); it != p->getRights().end(); ++it)
+			for (RightsVector::const_iterator it = p->getRights().begin(); it != p->getRights().end(); ++it)
 			{
 				shared_ptr<const Right> right = it->second;
 				if (it != p->getRights().begin())
 					s	<< RIGHT_SEPARATOR;
 				s	<< right->getFactoryKey() 
 					<< RIGHT_VALUE_SEPARATOR << right->getParameter()
-					<< RIGHT_VALUE_SEPARATOR << ((int) right->getPrivateRightLevel())
-					<< RIGHT_VALUE_SEPARATOR << ((int) right->getPublicRightLevel())
+					<< RIGHT_VALUE_SEPARATOR << (static_cast<int>(right->getPrivateRightLevel()))
+					<< RIGHT_VALUE_SEPARATOR << (static_cast<int>(right->getPublicRightLevel()))
 					;
 			}
 			return s.str();
@@ -262,10 +262,10 @@ namespace synthese
 					right->setParameter(*it);
 
 					++it;
-					right->setPrivateLevel((Right::Level) Conversion::ToInt(*it));
+					right->setPrivateLevel(static_cast<RightLevel>(Conversion::ToInt(*it)));
 
 					++it;
-					right->setPublicLevel((Right::Level) Conversion::ToInt(*it));
+					right->setPublicLevel(static_cast<RightLevel>(Conversion::ToInt(*it)));
 
 					profile->addRight(right);
 				}

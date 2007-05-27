@@ -31,27 +31,25 @@ namespace synthese
 	namespace security
 	{
 		Right::Right()
-			: Factorable(), _parameter(""), _privateRightLevel(FORBIDDEN), _publicRightLevel(FORBIDDEN)
-		{
-
-		}
+			: Factorable()
+			, _privateRightLevel(FORBIDDEN)
+			, _publicRightLevel(FORBIDDEN)
+		{	}
 
 		Right::~Right()
-		{
+		{	}
 
-		}
-
-		Right::Level Right::getPrivateRightLevel() const
+		RightLevel Right::getPrivateRightLevel() const
 		{
 			return _privateRightLevel;
 		}
 
-		Right::Level Right::getPublicRightLevel() const
+		RightLevel Right::getPublicRightLevel() const
 		{
 			return _publicRightLevel;
 		}
 
-		std::string Right::getLevelLabel(Level level)
+		std::string Right::getLevelLabel(RightLevel level)
 		{
 			switch (level)
 			{
@@ -64,12 +62,12 @@ namespace synthese
 			return "";
 		}
 
-		void Right::setPrivateLevel( const Level& level )
+		void Right::setPrivateLevel( const RightLevel& level )
 		{
 			_privateRightLevel = level;
 		}
 
-		void Right::setPublicLevel( const Level& level )
+		void Right::setPublicLevel( const RightLevel& level )
 		{
 			_publicRightLevel = level;
 		}

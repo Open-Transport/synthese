@@ -25,6 +25,7 @@
 #include "12_security/AddRightAction.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfileTableSync.h"
+#include "12_security/Right.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -76,12 +77,12 @@ namespace synthese
 				it = map.find(PARAMETER_PUBLIC_LEVEL);
 				if (it == map.end())
 					throw ActionException("Public level not specified");
-				_publicLevel = (Right::Level) Conversion::ToInt(it->second);
+				_publicLevel = (RightLevel) Conversion::ToInt(it->second);
 
 				it = map.find(PARAMETER_PRIVATE_LEVEL);
 				if (it == map.end())
 					throw ActionException("Private level not specified");
-				_privateLevel = (Right::Level) Conversion::ToInt(it->second);
+				_privateLevel = (RightLevel) Conversion::ToInt(it->second);
 			}
 			catch(DBEmptyResultException<Profile>)
 			{

@@ -52,7 +52,7 @@
 #include "15_env/Road.h"
 #include "15_env/Types.h"
 
-#include "12_security/Right.h"
+#include "12_security/Types.h"
 
 namespace synthese
 {
@@ -367,9 +367,14 @@ namespace synthese
 			static boost::shared_ptr<Path> fetchPath (const uid& id);
 			static boost::shared_ptr<Service> fetchService (const uid& id);
 
-			static std::vector<std::pair<uid, std::string> >	getCommercialLineLabels(bool withAll=false);
+			static std::vector<std::pair<uid, std::string> >	getCommercialLineLabels(
+				const security::RightsOfSameClassMap& rights 
+				, bool totalControl 
+				, security::RightLevel neededLevel 
+				, bool withAll=false
+				);
 
-			static void getNetworkLinePlaceRightParameterList(security::Right::ParameterLabelsVector& m);
+			static void getNetworkLinePlaceRightParameterList(security::ParameterLabelsVector& m);
 
 		};
 	}

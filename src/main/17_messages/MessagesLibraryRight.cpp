@@ -39,9 +39,10 @@ namespace synthese
 	namespace security
 	{
 		template<> const string RightTemplate<MessagesLibraryRight>::NAME("Bilbliothèque de messages");
+		template<> const bool RightTemplate<MessagesLibraryRight>::USE_PRIVATE_RIGHTS(false);
 
 		template<>
-		RightTemplate<MessagesLibraryRight>::ParameterLabelsVector RightTemplate<MessagesLibraryRight>::getStaticParametersLabels()
+		ParameterLabelsVector RightTemplate<MessagesLibraryRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER, "(tous les modèles)"));

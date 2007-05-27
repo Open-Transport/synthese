@@ -39,8 +39,9 @@ namespace synthese
 		{
 		public:
 			static const std::string NAME;
-			Right::ParameterLabelsVector			getParametersLabels()	const;
-			static Right::ParameterLabelsVector	getStaticParametersLabels();
+			static const bool USE_PRIVATE_RIGHTS;
+			ParameterLabelsVector			getParametersLabels()	const;
+			static ParameterLabelsVector	getStaticParametersLabels();
 			const std::string& getName() const;
 		};
 
@@ -51,7 +52,7 @@ namespace synthese
 		}
 
 		template<class T>
-		Right::ParameterLabelsVector synthese::security::RightTemplate<T>::getParametersLabels() const
+		ParameterLabelsVector synthese::security::RightTemplate<T>::getParametersLabels() const
 		{
 			return getStaticParametersLabels();
 		}

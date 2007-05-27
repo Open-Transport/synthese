@@ -29,6 +29,9 @@
 #include "15_env/CommercialLineTableSync.h"
 #include "15_env/CommercialLine.h"
 
+#include "12_security/Constants.h"
+#include "12_security/Right.h"
+
 using namespace std;
 using namespace boost;
 
@@ -131,13 +134,19 @@ namespace synthese
 			return shared_ptr<Path>();
 		}
 
-		std::vector<pair<uid, std::string> > EnvModule::getCommercialLineLabels(bool withAll)
-		{
+		std::vector<pair<uid, std::string> > EnvModule::getCommercialLineLabels(
+			const security::RightsOfSameClassMap& rights 
+			, bool totalControl 
+			, RightLevel neededLevel
+			, bool withAll
+		){
 			vector<pair<uid,string> > m;
 			if (withAll)
 				m.push_back(make_pair(UNKNOWN_VALUE, "(toutes)"));
-			for(CommercialLine::Registry::const_iterator it = _commercialLines.begin(); it != _commercialLines.end(); ++it)
-				m.push_back(make_pair(it->first, it->second->getShortName()));
+		
+			vector<shared_ptr<CommercialLine> > vl(CommercialLineTableSync::search(rights, totalControl, neededLevel));
+			for(vector<shared_ptr<CommercialLine> >::const_iterator it = vl.begin(); it != vl.end(); ++it)
+				m.push_back(make_pair((*it)->getKey(), (*it)->getShortName()));
 			return m;
 		}
 
@@ -280,7 +289,7 @@ namespace synthese
 			return _citiesMatcher;
 		}
 
-		void EnvModule::getNetworkLinePlaceRightParameterList(Right::ParameterLabelsVector& m)
+		void EnvModule::getNetworkLinePlaceRightParameterList(ParameterLabelsVector& m)
 		{
 
 
@@ -295,5 +304,6 @@ namespace synthese
 				m.push_back(make_pair(Conversion::ToString((*itl)->getKey()), (*itl)->getName() ));
 
 		}
+
 	}
 }

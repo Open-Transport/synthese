@@ -43,8 +43,9 @@ namespace synthese
 	namespace security
 	{
 		template<> const string RightTemplate<SecurityRight>::NAME("Gestion de la sécurité");
+		template<> const bool RightTemplate<SecurityRight>::USE_PRIVATE_RIGHTS(true);
 
-		template<> Right::ParameterLabelsVector RightTemplate<SecurityRight>::getStaticParametersLabels()
+		template<> ParameterLabelsVector RightTemplate<SecurityRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER, "(tous profils)"));

@@ -25,7 +25,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "12_security/Right.h"
+#include "12_security/Types.h"
 
 #include "30_server/Action.h"
 
@@ -50,8 +50,8 @@ namespace synthese
 			boost::shared_ptr<Profile>		_profile;
 			std::string		_rightName;
 			std::string		_parameter;
-			Right::Level	_privateLevel;
-			Right::Level	_publicLevel;
+			RightLevel	_privateLevel;
+			RightLevel	_publicLevel;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

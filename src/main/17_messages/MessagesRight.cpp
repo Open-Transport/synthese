@@ -23,6 +23,7 @@
 #include "12_security/Constants.h"
 
 #include "17_messages/MessagesRight.h"
+#include "17_messages/AlarmRecipient.h"
 
 using namespace std;
 
@@ -30,6 +31,7 @@ namespace synthese
 {
 	using namespace security;
 	using namespace messages;
+	using namespace util;
 
 	namespace util
 	{
@@ -39,12 +41,19 @@ namespace synthese
 	namespace security
 	{
 		template<> const string RightTemplate<MessagesRight>::NAME("Gestion des messages");
+		template<> const bool RightTemplate<MessagesRight>::USE_PRIVATE_RIGHTS(false);
 
 		template<>
-		Right::ParameterLabelsVector RightTemplate<MessagesRight>::getStaticParametersLabels()
+		ParameterLabelsVector RightTemplate<MessagesRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les messages)"));
+
+			for (Factory<AlarmRecipient>::Iterator it = Factory<AlarmRecipient>::begin(); it != Factory<AlarmRecipient>::end(); ++it)
+			{
+				m.push_back(make_pair(UNKNOWN_PERIMETER, "=== " + it->getTitle() + " ==="));
+				it->getStaticParametersLabelsVirtual(m);
+			}
 
 			return m;
 		}

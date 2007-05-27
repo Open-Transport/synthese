@@ -30,6 +30,8 @@
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
+#include "12_security/Types.h"
+
 namespace synthese
 {
 	namespace env
@@ -70,6 +72,56 @@ namespace synthese
 				, bool orderByNetwork = true
 				, bool orderByName = false
 				, bool raisingOrder = true
+				);
+
+			/** CommercialLine search.
+				(other search parameters)
+				@param first First CommercialLine object to answer
+				@param number Number of CommercialLine objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return vector<CommercialLine*> Founded CommercialLine objects.
+				@author Hugues Romain
+				@date 2006
+			*/
+			static std::vector<boost::shared_ptr<CommercialLine> > search(
+				const security::RightsOfSameClassMap& rights
+				, bool totalControl
+				, security::RightLevel neededLevel
+				, int first = 0
+				, int number = 0
+				, bool orderByNetwork = true
+				, bool orderByName = false
+				, bool raisingOrder = true
+				);
+
+			/** Build of a SQL query selecting all the lines allowed by a profile.
+				@param rights Rights vector defining the profile
+				@param totalControl Default authorization level
+				@param neededLevel Right level to reach to be in the results
+
+				The right policy is defined by two right families :
+					- Rights on a network
+					- Rights on a line
+
+				If the default authorization level is true, the selected lines are in increasing priority order :
+					- all the lines
+					- except all the lines of a forbidden network
+					- and additionally all the specific allowed lines
+					- except all the specific forbidden lines
+
+				In this case, an allowed network is useless because the right is covered by the general authorization.
+
+				If the default authorization level is false, the selected lines are in increasing priority order :
+					- all the lines of allowed networks
+					- and additionally all the specific allowed lines
+					- except all the specific forbidden lines
+
+				In this case, a forbidden network is useless because the right is covered by the general authorization and a specific line will always be selected.
+			*/
+			static std::string getSQLLinesList(
+				const security::RightsOfSameClassMap& rights
+				, bool totalControl
+				, security::RightLevel neededLevel
+				, std::string selectedColumns = db::TABLE_COL_ID
 				);
 
 

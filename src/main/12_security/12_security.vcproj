@@ -86,6 +86,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Types.h"
+				>
+			</File>
+			<File
 				RelativePath=".\User.cpp"
 				>
 			</File>

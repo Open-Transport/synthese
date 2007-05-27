@@ -258,7 +258,7 @@ namespace synthese
 
 		bool MessagesLibraryAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
-			return request->isAuthorized<MessagesLibraryRight>(Right::READ);
+			return request->isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessagesLibraryAdmin::MessagesLibraryAdmin()

@@ -38,8 +38,10 @@ namespace synthese
 	namespace security
 	{
 		template<> const string RightTemplate<GlobalRight>::NAME("Général");
+		template<> const bool RightTemplate<GlobalRight>::USE_PRIVATE_RIGHTS(false);
 
-		template<> Right::ParameterLabelsVector RightTemplate<GlobalRight>::getStaticParametersLabels()
+		template<>
+		ParameterLabelsVector RightTemplate<GlobalRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER, "(tout)"));
@@ -49,7 +51,7 @@ namespace synthese
 		GlobalRight::GlobalRight()
 			: RightTemplate<GlobalRight>()
 		{
-			setParameter("*");
+			setParameter(GLOBAL_PERIMETER);
 		}
 
 		std::string GlobalRight::displayParameter() const

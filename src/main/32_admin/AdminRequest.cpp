@@ -162,8 +162,8 @@ namespace synthese
 		bool AdminRequest::_isAuthorized() const
 		{
 			return 
-				_request->isAuthorized<GlobalRight>(Right::USE, Right::USE)
-				&& _page->isAuthorized((const FunctionRequest<AdminRequest>*) _request);
+				_request->isAuthorized<GlobalRight>(USE, USE)
+				&& _page->isAuthorized(static_cast<const FunctionRequest<AdminRequest>* >(_request));
 		}
 	}
 }

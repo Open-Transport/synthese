@@ -41,9 +41,10 @@ namespace synthese
 	namespace security
 	{
 		template<> const string RightTemplate<ArrivalDepartureTableRight>::NAME("Tableaux de départs");
+		template<> const bool RightTemplate<ArrivalDepartureTableRight>::USE_PRIVATE_RIGHTS(false);
 
 		template<>
-		RightTemplate<ArrivalDepartureTableRight>::ParameterLabelsVector RightTemplate<ArrivalDepartureTableRight>::getStaticParametersLabels()
+		ParameterLabelsVector RightTemplate<ArrivalDepartureTableRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair("*","(tous les afficheurs)"));

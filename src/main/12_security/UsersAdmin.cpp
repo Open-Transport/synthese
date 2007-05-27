@@ -128,7 +128,7 @@ namespace synthese
 
 		bool UsersAdmin::isAuthorized( const server::FunctionRequest<AdminRequest>* request ) const
 		{
-			return request->isAuthorized<SecurityRight>(Right::READ);
+			return request->isAuthorized<SecurityRight>(READ);
 		}
 
 		void UsersAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
@@ -170,7 +170,7 @@ namespace synthese
 			v.push_back(make_pair(PARAM_SEARCH_LOGIN, "Login"));
 			v.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			v.push_back(make_pair(PARAM_SEARCH_PROFILE_ID, "Profil"));
-			v.push_back(make_pair("", "Actions"));
+			v.push_back(make_pair(string(), "Actions"));
 			ActionResultHTMLTable t(v, searchTable.getForm(), _requestParameters, _resultParameters, addUserRequest.getHTMLForm("add"),"", InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
 
 			stream << t.open();

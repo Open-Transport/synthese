@@ -92,8 +92,8 @@ namespace synthese
 			else
 			{
 				shared_ptr<Right> r(new GlobalRight);
-				r->setPrivateLevel(Right::FORBIDDEN);
-				r->setPublicLevel(Right::FORBIDDEN);
+				r->setPrivateLevel(FORBIDDEN);
+				r->setPublicLevel(FORBIDDEN);
 				profile->addRight(r);
 			}
 			ProfileTableSync::save(profile.get());

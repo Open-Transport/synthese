@@ -22,12 +22,17 @@
 
 #include "DisplayMaintenanceRight.h"
 
+#include "15_env/EnvModule.h"
+
+#include "12_security/Constants.h"
+
 using namespace std;
 
 namespace synthese
 {
 	using namespace security;
 	using namespace departurestable;
+	using namespace env;
 
 	namespace util
 	{
@@ -37,12 +42,16 @@ namespace synthese
 	namespace security
 	{
 		template<> const string RightTemplate<DisplayMaintenanceRight>::NAME("Maintenance des afficheurs");
+		template<> const bool RightTemplate<DisplayMaintenanceRight>::USE_PRIVATE_RIGHTS(false);
 
 		template<>
-		RightTemplate<DisplayMaintenanceRight>::ParameterLabelsVector RightTemplate<DisplayMaintenanceRight>::getStaticParametersLabels()
+		ParameterLabelsVector RightTemplate<DisplayMaintenanceRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
-			m.push_back(make_pair("*","(tous les afficheurs)"));
+			m.push_back(make_pair(GLOBAL_PERIMETER, "(tous les afficheurs)"));
+
+			EnvModule::getNetworkLinePlaceRightParameterList(m);
+
 			return m;
 		}
 	}
