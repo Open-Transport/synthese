@@ -303,7 +303,7 @@ namespace synthese
 			}
 			else if (!all)
 			{
-				query << "(0";
+				query << " AND (0";
 				if (!allowedNetworks.empty())
 				{
 					for (set<uid>::const_iterator it(allowedNetworks.begin()); it != allowedNetworks.end(); ++it)
