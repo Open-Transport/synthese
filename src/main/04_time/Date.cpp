@@ -165,7 +165,7 @@ namespace synthese
 			struct tm * timeinfo = 0;
 
 			bool tomorrow(false);
-			if (day = TIME_TOMORROW)
+			if (day == TIME_TOMORROW)
 			{
 				day = TIME_CURRENT;
 				tomorrow = true;
