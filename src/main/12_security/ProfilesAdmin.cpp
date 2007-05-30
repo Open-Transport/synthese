@@ -101,6 +101,7 @@ namespace synthese
 
 			_searchResult = ProfileTableSync::search(
 				_searchName
+				, string()
 				, _searchRightName
 				, _requestParameters.first
 				, _requestParameters.maxSize
@@ -119,16 +120,16 @@ namespace synthese
 		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
+			searchRequest.getFunction()->setPage<ProfilesAdmin>();
 
 			FunctionRequest<AdminRequest> profileRequest(request);
-			profileRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			profileRequest.getFunction()->setPage<ProfileAdmin>();
 
 			ActionFunctionRequest<DeleteProfileAction, AdminRequest> deleteProfileRequest(request);
-			deleteProfileRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
+			deleteProfileRequest.getFunction()->setPage<ProfilesAdmin>();
 			
 			ActionFunctionRequest<AddProfileAction, AdminRequest> addProfileRequest(request);
-			addProfileRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<ProfileAdmin>());
+			addProfileRequest.getFunction()->setPage<ProfileAdmin>();
 			addProfileRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
 			
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
@@ -162,7 +163,7 @@ namespace synthese
 				stream << t.col() << "<ul>";
 
 				if (profile->getParentId())
-					stream << "<li>Hérite de " << SecurityModule::getProfiles().get(profile->getParentId())->getName() << "</li>";
+					stream << "<li>Fils de " << SecurityModule::getProfiles().get(profile->getParentId())->getName() << "</li>";
 				for (RightsVector::const_iterator it = profile->getRights().begin(); it != profile->getRights().end(); ++it)
 				{
 					shared_ptr<const Right> r = it->second;
@@ -174,9 +175,8 @@ namespace synthese
 
 				stream
 					<< t.col()
-					<< profileRequest.getHTMLForm().getLinkButton("Modifier")
-					<< "&nbsp;"
-					<< deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?");
+					<< profileRequest.getHTMLForm().getLinkButton("Modifier", string(), "group_edit.png")
+					<< deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?", "group_delete.png");
 			}
 
 			stream << t.row();

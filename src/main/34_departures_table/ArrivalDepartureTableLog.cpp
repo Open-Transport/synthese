@@ -23,6 +23,8 @@
 #include "34_departures_table/ArrivalDepartureTableLog.h"
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
+#include "34_departures_table/DisplayType.h"
+#include "34_departures_table/DisplayTypeTableSync.h"
 
 #include "12_security/User.h"
 
@@ -59,8 +61,17 @@ namespace synthese
 		{
 			try
 			{
-				shared_ptr<DisplayScreen> ds = DisplayScreenTableSync::get(id);
-				return ds->getFullName();
+				if (decodeTableId(id) == DisplayScreenTableSync::TABLE_ID)
+				{
+					shared_ptr<DisplayScreen> ds = DisplayScreenTableSync::get(id);
+					return ds->getFullName();
+				}
+				else if (decodeTableId(id) == DisplayTypeTableSync::TABLE_ID)
+				{
+					shared_ptr<DisplayType> dt(DisplayTypeTableSync::get(id));
+					return dt->getName();
+				}
+
 			}
 			catch(...)
 			{
@@ -78,6 +89,27 @@ namespace synthese
 			DBLogEntry::Content content;
 			content.push_back("Suppression de l'afficheur " + screen->getFullName());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, screen->getKey());
+		}
+
+		void ArrivalDepartureTableLog::addUpdateTypeEntry( boost::shared_ptr<const DisplayType> type , boost::shared_ptr<const security::User> user , const std::string& text )
+		{
+			DBLogEntry::Content content;
+			content.push_back("Mise à jour type d'afficheur " + type->getName() + text);
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
+		}
+
+		void ArrivalDepartureTableLog::addCreateTypeEntry( boost::shared_ptr<const DisplayType> type , boost::shared_ptr<const security::User> user )
+		{
+			DBLogEntry::Content content;
+			content.push_back("Création type d'afficheur " + type->getName());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
+		}
+
+		void ArrivalDepartureTableLog::addDeleteTypeEntry( boost::shared_ptr<const DisplayType> type , boost::shared_ptr<const security::User> user )
+		{
+			DBLogEntry::Content content;
+			content.push_back("Suppression type d'afficheur " + type->getName());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
 		}
 	}
 }

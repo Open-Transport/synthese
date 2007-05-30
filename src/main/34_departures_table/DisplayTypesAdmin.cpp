@@ -32,6 +32,9 @@
 #include "34_departures_table/CreateDisplayTypeAction.h"
 #include "34_departures_table/UpdateDisplayTypeAction.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
+#include "34_departures_table/DisplayTypeTableSync.h"
+#include "34_departures_table/DisplayTypeRemoveAction.h"
+#include "34_departures_table/ArrivalDepartureTableRight.h"
 
 using namespace std;
 using namespace boost;
@@ -44,6 +47,7 @@ namespace synthese
 	using namespace util;
 	using namespace html;
 	using namespace departurestable;
+	using namespace security;
 
 	namespace util
 	{
@@ -74,22 +78,28 @@ namespace synthese
 
 		void DisplayTypesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
+			vector<shared_ptr<DisplayType> > searchResult(DisplayTypeTableSync::search(string()));
+
 			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(request);
-			createRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayTypesAdmin>());
+			createRequest.getFunction()->setPage<DisplayTypesAdmin>();
 			
 			ActionFunctionRequest<UpdateDisplayTypeAction,AdminRequest> updateRequest(request);
-			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayTypesAdmin>());
+			updateRequest.getFunction()->setPage<DisplayTypesAdmin>();
+
+			ActionFunctionRequest<DisplayTypeRemoveAction,AdminRequest> deleteRequest(request);
+			deleteRequest.getFunction()->setPage<DisplayTypesAdmin>();
 			
 			stream
 				<< "<h1>Liste des types d'afficheurs disponibles</h1>"
 				<< "<table id=\"searchresult\"><tr><th>Nom</th><th>Interface</th><th>Lignes</th><th>Actions</th></tr>";
 
 			// Display types loop
-			for (DisplayType::Registry::const_iterator it = DeparturesTableModule::getDisplayTypes().begin(); it != DeparturesTableModule::getDisplayTypes().end(); ++it)
+			for (vector<shared_ptr<DisplayType> >::const_iterator it = searchResult.begin(); it != searchResult.end(); ++it)
 			{
-				shared_ptr<const DisplayType> dt = it->second;
+				shared_ptr<const DisplayType> dt = *it;
+				deleteRequest.getAction()->setType(dt);
 
-				HTMLForm uf(updateRequest.getHTMLForm("update" + Conversion::ToString(it->second->getKey())));
+				HTMLForm uf(updateRequest.getHTMLForm("update" + Conversion::ToString(dt->getKey())));
 				uf.addHiddenField(UpdateDisplayTypeAction::PARAMETER_ID, Conversion::ToString(dt->getKey()));
 				stream << uf.open();
 				stream
@@ -98,6 +108,7 @@ namespace synthese
 					<< "<td>" << uf.getSelectInput(UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), dt->getInterface()->getKey()) << "</td>"
 					<< "<td>" << uf.getSelectNumberInput(UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99, dt->getRowNumber()) << "</td>"
 					<< "<td>" << uf.getSubmitButton("Modifier") << "</td>"
+					<< "<td>" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le type " + dt->getName() + " ?", "monitor_delete.png")
 					<< "</tr>"
 					;
 				stream << uf.close();
@@ -119,7 +130,7 @@ namespace synthese
 
 		bool DisplayTypesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
-			return true;
+			return request->isAuthorized<ArrivalDepartureTableRight>(WRITE, FORBIDDEN, GLOBAL_PERIMETER);
 		}
 
 		DisplayTypesAdmin::DisplayTypesAdmin()

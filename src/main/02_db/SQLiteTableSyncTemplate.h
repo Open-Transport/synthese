@@ -29,6 +29,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "01_util/UId.h"
+#include "01_util/Constants.h"
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 

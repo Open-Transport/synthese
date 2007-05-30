@@ -58,8 +58,12 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<DisplayType> > search(
-				// other search parameters
-				 int first = 0, int number = 0);
+				std::string exactName = std::string()
+				, int first = 0
+				, int number = UNKNOWN_VALUE
+				, bool orderByName = true
+				, bool raisingOrder = true
+				);
 
 
 		protected:

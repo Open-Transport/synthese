@@ -34,6 +34,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace env;
+	using namespace security;
 
 	namespace departurestable
 	{
@@ -60,12 +61,16 @@ namespace synthese
 			return m;
 		}
 
-		std::vector<pair<uid, std::string> > DeparturesTableModule::getPlacesWithBroadcastPointsLabels( bool withAll /*= false*/ )
-		{
+		std::vector<pair<uid, std::string> > DeparturesTableModule::getPlacesWithBroadcastPointsLabels(
+			const security::RightsOfSameClassMap& rights 
+			, bool totalControl 
+			, RightLevel neededLevel
+			, bool withAll /*= false*/
+		){
 			vector<pair<uid, string> > localizations;
 			if (withAll)
 				localizations.push_back(make_pair(0, "(tous)"));
-			std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > bpv = searchConnectionPlacesWithBroadcastPoints("", "", AT_LEAST_ONE_BROADCASTPOINT);
+			std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > bpv = searchConnectionPlacesWithBroadcastPoints(rights, totalControl, neededLevel, string(), string(), AT_LEAST_ONE_BROADCASTPOINT);
 			for (vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> >::const_iterator it = bpv.begin(); it != bpv.end(); ++it)
 			{
 				const shared_ptr<ConnectionPlaceWithBroadcastPoint>& con = *it;

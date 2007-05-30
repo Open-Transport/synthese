@@ -53,8 +53,8 @@ namespace synthese
 
 		void SecurityModule::initialize()
 		{
-			vector<shared_ptr<Profile> > profiles = ProfileTableSync::search(ROOT_PROFILE);
-			if (profiles.size() == 0)
+			vector<shared_ptr<Profile> > profiles = ProfileTableSync::search(string(), ROOT_PROFILE);
+			if (profiles.empty())
 				_rootProfile.reset(new Profile);
 			else
 				_rootProfile = profiles.front();

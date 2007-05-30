@@ -29,6 +29,8 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "12_security/Types.h"
+
 namespace synthese
 {
 	namespace env
@@ -59,12 +61,15 @@ namespace synthese
 			@result vector of the founded searched connection places from the live data objects (do not delete the objects after use). 
 		*/
 		std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(
-			std::string cityName = ""
-			, std::string placeName = ""
+			const security::RightsOfSameClassMap& rights 
+			, bool totalControl 
+			, security::RightLevel neededLevel
+			, std::string cityName = std::string()
+			, std::string placeName = std::string()
 			, BroadcastPointsPresence bpPresence = WITH_OR_WITHOUT_ANY_BROADCASTPOINT
 			, uid lineId = UNKNOWN_VALUE
-			, int number=UNKNOWN_VALUE
-			, int first=0
+			, int number = UNKNOWN_VALUE
+			, int first = 0
 			, bool orderByCity = true
 			, bool orderByName = false
 			, bool orderByNumber = false

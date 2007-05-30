@@ -141,17 +141,23 @@ namespace synthese
 			}
 		}
 
-		std::vector<shared_ptr<DisplayType> > DisplayTypeTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		std::vector<shared_ptr<DisplayType> > DisplayTypeTableSync::search(
+			std::string exactName
+			, int first /*= 0*/
+			, int number /*= 0*/
+			, bool orderByName
+			, bool raisingOrder
+		){
 			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
-				//<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				;
+				<< " WHERE 1";
+			if (!exactName.empty())
+				query << " AND " << TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(exactName);
+			if (orderByName)
+				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

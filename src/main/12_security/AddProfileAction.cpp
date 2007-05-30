@@ -68,7 +68,7 @@ namespace synthese
 
 			// Template
 			it = map.find(PARAMETER_TEMPLATE_ID);
-			if (it != map.end())
+			if (it != map.end() && Conversion::ToLongLong(it->second) != UNKNOWN_VALUE)
 			{
 				if (!SecurityModule::getProfiles().contains(Conversion::ToLongLong(it->second)))
 					throw ActionException("Specified root profile not found.");
@@ -76,7 +76,7 @@ namespace synthese
 			}
 
 			// Name unicity
-			vector<shared_ptr<Profile> > existingProfiles = ProfileTableSync::search(_name,"",0,1);
+			vector<shared_ptr<Profile> > existingProfiles = ProfileTableSync::search(string(), _name, string(),0,1);
 			if (!existingProfiles.empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
 
@@ -87,8 +87,13 @@ namespace synthese
 		{
 			shared_ptr<Profile> profile(new Profile);
 			profile->setName(_name);
-			if (_templateProfile != NULL)
+			if (_templateProfile.get())
+			{
 				profile->setParent(_templateProfile->getKey());
+				const RightsVector& rights(_templateProfile->getRights());
+				for (RightsVector::const_iterator it(rights.begin()); it != rights.end(); ++it)
+					profile->addRight(it->second);
+			}
 			else
 			{
 				shared_ptr<Right> r(new GlobalRight);
@@ -100,7 +105,7 @@ namespace synthese
 			_request->setObjectId(profile->getKey());
 
 			// DBLog
-			SecurityLog::addProfileAdmin(_request->getUser(), profile, "Création du profil");
+			SecurityLog::addProfileAdmin(_request->getUser(), profile, "Création du profil" + (_templateProfile.get() ? " à partir de " + _templateProfile->getName() : string()));
 		}
 	}
 }

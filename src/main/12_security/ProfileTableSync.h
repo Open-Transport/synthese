@@ -69,9 +69,11 @@ namespace synthese
 				@date 2006				
 			*/
 			static std::vector<boost::shared_ptr<Profile> > search(
-				std::string name=""
-				, std::string right=""
-				, int first = 0, int number = -1
+				std::string name = std::string()
+				, std::string exactName = std::string()
+				, std::string right = std::string()
+				, int first = 0
+				, int number = UNKNOWN_VALUE
 				, bool orderByName = true
 				, bool raisingOrder = true
 				);

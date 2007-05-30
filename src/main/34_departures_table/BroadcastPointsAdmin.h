@@ -25,12 +25,12 @@
 
 #include <vector>
 
-#include "05_html/ResultHTMLTable.h"
-
 #include "32_admin/AdminInterfaceElementTemplate.h"
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
 #include "34_departures_table/Types.h"
+
+#include "05_html/ResultHTMLTable.h"
 
 namespace synthese
 {
@@ -77,14 +77,11 @@ namespace synthese
 		*/
 		class BroadcastPointsAdmin : public admin::AdminInterfaceElementTemplate<BroadcastPointsAdmin>
 		{
-			std::string				_cityName;
-			std::string				_placeName;
-			uid						_lineUId;
-			BroadcastPointsPresence	_displayNumber;
+			std::string									_cityName;
+			std::string									_placeName;
+			uid											_lineUId;
+			BroadcastPointsPresence						_displayNumber;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			html::ResultHTMLTable::ResultParameters	_resultParameters;
-
-			std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > _searchResult;
 
 		public:
 			static const std::string PARAMETER_CITY_NAME;

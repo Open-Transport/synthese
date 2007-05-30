@@ -32,6 +32,7 @@ namespace synthese
 	namespace departurestable
 	{
 		class DisplayScreen;
+		class DisplayType;
 
 		/** Journal relatif à la gestion des paramètres du téléaffichage.
 
@@ -52,6 +53,19 @@ namespace synthese
 				);
 			static void addRemoveEntry(
 				boost::shared_ptr<const DisplayScreen> screen
+				, boost::shared_ptr<const security::User> user
+				);
+			static void addUpdateTypeEntry(
+				boost::shared_ptr<const DisplayType> type
+				, boost::shared_ptr<const security::User> user
+				, const std::string& text
+				);
+			static void addCreateTypeEntry(
+				boost::shared_ptr<const DisplayType> type
+				, boost::shared_ptr<const security::User> user
+				);
+			static void addDeleteTypeEntry(
+				boost::shared_ptr<const DisplayType> type
 				, boost::shared_ptr<const security::User> user
 				);
 

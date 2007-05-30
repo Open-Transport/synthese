@@ -151,7 +151,12 @@ namespace synthese
 			}
 		}
 
-		std::vector<shared_ptr<Profile> > ProfileTableSync::search(std::string name, string right, int first /*= 0*/, int number /*= 0*/ 
+		std::vector<shared_ptr<Profile> > ProfileTableSync::search(
+			std::string name
+			, string exactName
+			, string right
+			, int first /*= 0*/
+			, int number /*= -1*/ 
 			, bool orderByName
 			, bool raisingOrder	
 		){
@@ -161,7 +166,11 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME					
-				<< " WHERE " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+				<< " WHERE 1 ";
+			if (!name.empty())
+				query << " AND " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			if (!exactName.empty())
+				query << " AND " << TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(exactName);
 			if (orderByName)
 				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)

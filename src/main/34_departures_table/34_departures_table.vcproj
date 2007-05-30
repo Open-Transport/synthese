@@ -379,6 +379,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\DisplayTypeRemoveAction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayTypeRemoveAction.h"
+					>
+				</File>
+				<File
 					RelativePath=".\UpdateDisplayTypeAction.cpp"
 					>
 				</File>

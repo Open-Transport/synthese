@@ -43,12 +43,16 @@ namespace synthese
 {
 	using namespace db;
 	using namespace env;
+	using namespace security;
 
 	namespace departurestable
 	{
 
 		std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints( 
-			std::string cityName /*= ""*/
+			const security::RightsOfSameClassMap& rights 
+			, bool totalControl 
+			, RightLevel neededLevel
+			, std::string cityName /*= ""*/
 			, std::string placeName /*= ""*/
 			, BroadcastPointsPresence bpPresence /*= UNKNOWN_VALUE*/
 			, uid lineId /*= UNKNOWN_VALUE*/
@@ -68,14 +72,14 @@ namespace synthese
 					<< ",(SELECT COUNT(b." << TABLE_COL_ID << ") FROM " << DisplayScreenTableSync::TABLE_NAME << " AS b WHERE b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS bc"
 				<< " FROM " // Tables
 					<< ConnectionPlaceTableSync::TABLE_NAME << " AS p"
-					<< " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID;
-			if (lineId != UNKNOWN_VALUE)
-				query
+					<< " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
 					<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS ps ON " 	<< " ps." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
 					<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
 					<< " INNER JOIN " << LineTableSync::TABLE_NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID;
 			// Where	
 			query << " WHERE 1 ";
+			if (neededLevel > FORBIDDEN)
+				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel) << ")";
 			if (lineId != UNKNOWN_VALUE)
 				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId;
 			if (!cityName.empty())

@@ -27,10 +27,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "11_interfaces/InterfaceModule.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DisplayTypeTableSync.h"
 #include "34_departures_table/UpdateDisplayTypeAction.h"
+#include "34_departures_table/ArrivalDepartureTableLog.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -83,12 +87,22 @@ namespace synthese
 			if (it != map.end())
 			{
 				_name = it->second;
+
+				if (_name.empty())
+					throw ActionException("Le nom ne peut être vide.");
+				
+				vector<shared_ptr<DisplayType> > v(DisplayTypeTableSync::search(_name, 0, 1));
+				if (!v.empty())
+					throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 			}
 
 			it = map.find(PARAMETER_ROWS_NUMBER);
 			if (it != map.end())
 			{
 				_rows_number = Conversion::ToInt(it->second);
+
+				if (_rows_number < 0)
+					throw ActionException("Un nombre positif de lignes doit être choisi");
 			}
 
 			it = map.find(PARAMETER_INTERFACE_ID);
@@ -107,10 +121,23 @@ namespace synthese
 
 		void UpdateDisplayTypeAction::run()
 		{
+			// Log entry content
+			stringstream log;
+			if (_dt->getName() != _name)
+				log << " - Nom : " << _dt->getName() << " => " << _name;
+			if (_dt->getInterface() != _interface)
+				log << " - Interface : " << _dt->getInterface()->getName() << " => " << _interface->getName();
+			if (_dt->getRowNumber() != _rows_number)
+				log << " - Nombre de lignes : " << _dt->getRowNumber() <<  " => " << _rows_number;
+
+			// Update
 			_dt->setName(_name);
 			_dt->setInterface(_interface);
 			_dt->setRowNumber(_rows_number);
 			DisplayTypeTableSync::save(_dt.get());
+
+			// Log
+			ArrivalDepartureTableLog::addUpdateTypeEntry(_dt, _request->getUser(), log.str());
 		}
 	}
 }

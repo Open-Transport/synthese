@@ -86,10 +86,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Types.h"
-				>
-			</File>
-			<File
 				RelativePath=".\User.cpp"
 				>
 			</File>
@@ -332,6 +328,10 @@
 		</File>
 		<File
 			RelativePath=".\SecurityModule.inc.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Types.h"
 			>
 		</File>
 	</Files>

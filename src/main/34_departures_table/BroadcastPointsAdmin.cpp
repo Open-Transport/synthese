@@ -97,22 +97,6 @@ namespace synthese
 				_lineUId = Conversion::ToLongLong(it->second);
 
 			_requestParameters = ResultHTMLTable::getParameters(map, PARAMETER_CITY_NAME, 30);
-
-			_searchResult = searchConnectionPlacesWithBroadcastPoints(
-				_cityName
-				, _placeName
-				, _displayNumber
-				, _lineUId
-				, _requestParameters.maxSize
-				, _requestParameters.first
-				, _requestParameters.orderField == PARAMETER_CITY_NAME
-				, _requestParameters.orderField == PARAMETER_PLACE_NAME
-				, _requestParameters.orderField == PARAMETER_DISPLAY_NUMBER
-				, _requestParameters.raisingOrder
-				);
-
-			_resultParameters = ResultHTMLTable::getParameters(_requestParameters, _searchResult);
-
 		}
 
 		string BroadcastPointsAdmin::getTitle() const
@@ -122,6 +106,24 @@ namespace synthese
 
 		void BroadcastPointsAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
+			std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(searchConnectionPlacesWithBroadcastPoints(
+				request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+				, request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+				, READ
+				, _cityName
+				, _placeName
+				, _displayNumber
+				, _lineUId
+				, _requestParameters.maxSize
+				, _requestParameters.first
+				, _requestParameters.orderField == PARAMETER_CITY_NAME
+				, _requestParameters.orderField == PARAMETER_PLACE_NAME
+				, _requestParameters.orderField == PARAMETER_DISPLAY_NUMBER
+				, _requestParameters.raisingOrder
+				));
+
+			ResultHTMLTable::ResultParameters resultParameters(ResultHTMLTable::getParameters(_requestParameters, searchResult));
+
 			FunctionRequest<AdminRequest> goRequest(request);
 			goRequest.getFunction()->setPage<DisplaySearchAdmin>();
 
@@ -139,7 +141,7 @@ namespace synthese
 			stream << st.open();
 			stream << st.cell("Commune", st.getForm().getTextInput(PARAMETER_CITY_NAME, _cityName));
 			stream << st.cell("Nom", st.getForm().getTextInput(PARAMETER_PLACE_NAME, _placeName));
-			stream << st.cell("Terminaux d'affichage", st.getForm().getSelectInput(PARAMETER_DISPLAY_NUMBER, m, (int) _displayNumber));
+			stream << st.cell("Terminaux d'affichage", st.getForm().getSelectInput(PARAMETER_DISPLAY_NUMBER, m, static_cast<int>(_displayNumber)));
 			stream << st.cell("Ligne", st.getForm().getSelectInput(
 				PARAMETER_LINE_ID
 				, EnvModule::getCommercialLineLabels(
@@ -158,12 +160,12 @@ namespace synthese
 			h.push_back(make_pair(PARAMETER_PLACE_NAME, "Nom zone d'arrêt"));
 			h.push_back(make_pair(PARAMETER_DISPLAY_NUMBER, "Afficheurs"));
 			h.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t(h,st.getForm(), _requestParameters, _resultParameters);
+			ResultHTMLTable t(h,st.getForm(), _requestParameters, resultParameters);
 
 			stream << t.open();
 
 
-			for (vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> >::const_iterator it = _searchResult.begin(); it != _searchResult.end(); ++it)
+			for (vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> >::const_iterator it = searchResult.begin(); it != searchResult.end(); ++it)
 			{
 				stream << t.row();
 				try

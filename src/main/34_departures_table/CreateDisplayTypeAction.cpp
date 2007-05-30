@@ -25,10 +25,12 @@
 #include "11_interfaces/InterfaceModule.h"
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DisplayTypeTableSync.h"
 #include "34_departures_table/CreateDisplayTypeAction.h"
+#include "34_departures_table/ArrivalDepartureTableLog.h"
 
 using namespace std;
 using namespace boost;
@@ -64,14 +66,21 @@ namespace synthese
 			if (it != map.end())
 			{
 				_name = it->second;
-				if (_name == "")
-					throw ActionException("Name must be non empty");
+
+				if (_name.empty())
+					throw ActionException("Le nom ne peut être vide.");
+
+				vector<shared_ptr<DisplayType> > v(DisplayTypeTableSync::search(_name, 0, 1));
+				if (!v.empty())
+					throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 			}
 
 			it = map.find(PARAMETER_ROWS_NUMBER);
 			if (it != map.end())
 			{
 				_rows_number = Conversion::ToInt(it->second);
+				if (_rows_number < 0)
+					throw ActionException("Un nombre positif de lignes doit être choisi");
 			}
 
 			it = map.find(PARAMETER_INTERFACE_ID);
@@ -95,6 +104,9 @@ namespace synthese
 			dt->setInterface(_interface);
 			dt->setRowNumber(_rows_number);
 			DisplayTypeTableSync::save(dt.get());
+
+			// Log
+			ArrivalDepartureTableLog::addCreateTypeEntry(dt, _request->getUser());
 		}
 	}
 }

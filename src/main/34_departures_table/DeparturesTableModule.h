@@ -31,6 +31,8 @@
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DisplayScreen.h"
 
+#include "12_security/Types.h"
+
 namespace synthese
 {
 	namespace env
@@ -98,7 +100,12 @@ namespace synthese
 			static DisplayScreen::Registry&		getDisplayScreens();
 
 			static std::vector<std::pair<uid, std::string> >	getDisplayTypeLabels(bool withAll = false);
-			static std::vector<std::pair<uid, std::string> >	getPlacesWithBroadcastPointsLabels(bool withAll = false);
+			static std::vector<std::pair<uid, std::string> >	getPlacesWithBroadcastPointsLabels(
+				const security::RightsOfSameClassMap& rights 
+				, bool totalControl 
+				, security::RightLevel neededLevel
+				, bool withAll = false
+				);
 			static std::vector<std::pair<uid, std::string> >	getCommercialLineWithBroadcastLabels(bool withAll = false);
 		};
 	}

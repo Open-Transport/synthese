@@ -93,7 +93,7 @@ namespace synthese
 		void VinciBikeRentalModule::initialize()
 		{
 			// Profile for bike rental administrator user
-			vector<shared_ptr<Profile> > profiles = ProfileTableSync::search(VINCI_ADMIN_PROFILE);
+			vector<shared_ptr<Profile> > profiles = ProfileTableSync::search(string(), VINCI_ADMIN_PROFILE);
 			if (profiles.size() == 0)
 				_adminProfile.reset(new Profile);
 			else
@@ -107,7 +107,7 @@ namespace synthese
 			ProfileTableSync::save(_adminProfile.get ());
 
 			// Profile for bike rental operator user
-			profiles = ProfileTableSync::search(VINCI_OPERATOR_PROFILE);
+			profiles = ProfileTableSync::search(string(), VINCI_OPERATOR_PROFILE);
 			if (profiles.size() == 0)
 				_operatorProfile.reset(new Profile);
 			else
@@ -121,7 +121,7 @@ namespace synthese
 			ProfileTableSync::save(_operatorProfile.get ());
 
 			// Profile for virtual owner user
-			profiles = ProfileTableSync::search(VINCI_ACCOUNTING_PROFILE);
+			profiles = ProfileTableSync::search(string(), VINCI_ACCOUNTING_PROFILE);
 			if (profiles.size() == 0)
 				_vinciProfile.reset(new Profile);
 			else
@@ -294,7 +294,7 @@ namespace synthese
 
 			
 			// Special profile for customers
-			profiles = ProfileTableSync::search(VINCI_CUSTOMER_PROFILE);
+			profiles = ProfileTableSync::search(string(), VINCI_CUSTOMER_PROFILE);
 			if (profiles.size() == 0)
 				_vinciCustomerProfile.reset(new Profile);
 			else

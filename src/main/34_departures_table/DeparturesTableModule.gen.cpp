@@ -36,6 +36,7 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::departure
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenRemoveDisplayedPlaceAction>("dsrdp");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayScreenRemoveForbiddenPlaceAction>("dsrfp");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayMaintenanceAction>("udm");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::DisplayTypeRemoveAction>("dtra");
 
 
 synthese::util::Factory<synthese::server::Function>::integrate<synthese::departurestable::DisplayScreenContentRequest>("tdg");
