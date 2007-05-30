@@ -154,29 +154,23 @@ Thread::Yield ()
 void 
 Thread::Sleep (long ms)
 {
-    NanoSleep (ms * 1000000);
-} 
-
-
-
-
-void 
-Thread::NanoSleep (long ns)
-{
     boost::xtime xt;
     boost::xtime_get(&xt, boost::TIME_UTC);
 
-    xt.sec += ns / 1000000000; 
-    xt.nsec += (ns % 1000000000) ; 
-
-    if (xt.nsec >= 1000000000)
+    xt.sec += ms / 1000; 
+    unsigned long ns = ((long) xt.nsec) + (ms % 1000000L) * 1000000L;
+    
+    if (ns >= 1000000000)
     {
 	xt.sec += 1;
-	xt.nsec = xt.nsec % 1000000000;
+	ns = ns % 1000000000;
     }
-
+    xt.nsec = ns;
     boost::thread::sleep(xt);
 } 
+
+
+
 
 
 
