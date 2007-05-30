@@ -153,7 +153,7 @@ namespace synthese
 			rmForbiddenRequest.setObjectId(request->getObjectId());
 
 			// Delete the screen request
-			ActionFunctionRequest<DisplayScreenRemove, AdminRequest> deleteRequest;
+			ActionFunctionRequest<DisplayScreenRemove, AdminRequest> deleteRequest(request);
 			deleteRequest.getFunction()->setPage<DisplaySearchAdmin>();
 			deleteRequest.getAction()->setDisplayScreen(_displayScreen);
 
@@ -191,7 +191,7 @@ namespace synthese
 			stream << "<h1>Actions</h1>";
 
 			if (deleteRequest.isActionFunctionAuthorized())
-				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'afficheur " + _displayScreen->getFullName() + " ?", "monitor_delete.png") << " ";
+				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l\\'afficheur " + _displayScreen->getFullName() + " ?", "monitor_delete.png") << " ";
 			stream << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "monitor_go.png") << " ";
 			stream << HTMLModule::getLinkButton(maintRequest.getURL(), "Supervision", string(), "monitor_lightning.png") << " ";
 

@@ -61,27 +61,27 @@ namespace synthese
 			try
 			{
 				_type = DisplayTypeTableSync::get(Conversion::ToLongLong(it->second));
-				
-				vector<shared_ptr<DisplayScreen> > v = DisplayScreenTableSync::search(
-					UNKNOWN_VALUE
-					, UNKNOWN_VALUE
-					, UNKNOWN_VALUE
-					, _type->getKey()
-					, std::string()
-					, std::string()
-					, std::string()
-					, UNKNOWN_VALUE
-					, UNKNOWN_VALUE
-					, 0
-					, 1
-					);
-				if (v.empty())
-					throw ActionException("Ce type d'afficheur ne peut être supprimé car il est utilisé par au moins un afficheur.");
 			}
 			catch(...)
 			{
 				throw ActionException("Specified type not found");
 			}
+				
+			vector<shared_ptr<DisplayScreen> > v = DisplayScreenTableSync::search(
+				UNKNOWN_VALUE
+				, UNKNOWN_VALUE
+				, UNKNOWN_VALUE
+				, _type->getKey()
+				, std::string()
+				, std::string()
+				, std::string()
+				, UNKNOWN_VALUE
+				, UNKNOWN_VALUE
+				, 0
+				, 1
+				);
+			if (!v.empty())
+				throw ActionException("Ce type d'afficheur ne peut être supprimé car il est utilisé par au moins un afficheur.");
 		}
 
 		void DisplayTypeRemoveAction::run()

@@ -18,6 +18,7 @@
 #include "34_departures_table/UpdateDisplayScreenAction.h"
 #include "34_departures_table/CreateDisplayScreenAction.h"
 #include "34_departures_table/DisplayTypeRemoveAction.h"
+#include "34_departures_table/DisplayScreenRemove.h"
 
 #include "34_departures_table/ArrivalDepartureTableRight.h"
 #include "34_departures_table/DisplayMaintenanceRight.h"
