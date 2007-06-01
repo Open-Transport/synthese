@@ -26,7 +26,7 @@
 				Name="VCNMakeTool"
 				BuildCommandLine="../../../vsscons build -Dtarget=src/main/$(InputName)"
 				ReBuildCommandLine="../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
-				CleanCommandLine="../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)"
+				CleanCommandLine="../../../vsscons clean -Dtarget=src/main/$(InputName)"
 				Output="../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).exe"
 				PreprocessorDefinitions=""
 				IncludeSearchPath=""

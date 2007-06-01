@@ -146,7 +146,6 @@ namespace synthese
 					<< "<td>" << uf.getTextInput(UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE, t->getShortMessage()) << "</td>"
 					<< "<td>" << uf.getTextInput(UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE, t->getLongMessage()) << "</td>"
 					<< "<td>" << uf.getSubmitButton("Modifier") << "</td>"
-					<< "</form>"
 					<< "<td>" << df.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer le modèle sélectionné ?")
 					<< "</td>"
 					<< "</tr>";
@@ -211,7 +210,7 @@ namespace synthese
 				stream << uf.close();
 			}
 			HTMLForm af2(addRequest.getHTMLForm("add2"));
-			af2.addHiddenField(TextTemplateAddAction::PARAMETER_TYPE, Conversion::ToString((int) ALARM_LEVEL_WARNING));
+			af2.addHiddenField(TextTemplateAddAction::PARAMETER_TYPE, Conversion::ToString(static_cast<int>(ALARM_LEVEL_WARNING)));
 			stream << af2.open();
 			stream
 				<< "<tr>"

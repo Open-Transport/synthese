@@ -67,7 +67,7 @@ namespace synthese
 			if (_level == ALARM_LEVEL_UNKNOWN)
 				throw ActionException("Bad value for level");
 			
-			vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::search(_level, _name, 0, 1);
+			vector<shared_ptr<TextTemplate> > v = TextTemplateTableSync::search(_level, _name, NULL, 0, 1);
 			if (!v.empty())
 				throw ActionException("Un texte portant ce nom existe déjà.");
 

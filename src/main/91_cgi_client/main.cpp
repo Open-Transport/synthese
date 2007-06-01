@@ -82,36 +82,46 @@ int main(int argc, char **argv)
     qptr = query;
     while( *qptr && (qptr-query<MAX_QUERY_SIZE-1))
     {
-	// Conversion des caractères de la forme %30
-	if(*qptr == '%') 
-	{
-	    char hex[3];
-	    memcpy(hex,qptr+1,2);
-	    hex[2] = 0;
-	    buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
-	    if(buffer[bufpos] == '~') buffer[bufpos] = '\''; 
-	    bufpos++; qptr += 3;
-	}
-	// Conversion des caractères de la forme \\30
-	else if(*qptr == '\\')
-	{
-	    char hex[3];
-	    memcpy(hex,qptr+2,2);
-	    hex[2] = 0;
-	    buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
-	    bufpos++; qptr += 4;
-	}
-	// Conversion du '+' en ' ' 
-	else if(*qptr == '+') 
-	{
-	    buffer[bufpos++] = ' ';
-	    qptr++;
-	}
-	else if(*qptr)
-	{
-	    buffer[bufpos++] = *qptr;
-	    qptr++;
-	}
+		// Conversion des caractères de la forme %30
+		if(*qptr == '%') 
+		{
+			char hex[3];
+			memcpy(hex,qptr+1,2);
+			hex[2] = 0;
+			buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
+			if(buffer[bufpos] == '~') buffer[bufpos] = '\''; 
+			if (buffer[bufpos] == '\n') --bufpos;
+			bufpos++; qptr += 3;
+		}
+		// Conversion des caractères de la forme \\30
+		else if(*qptr == '\\')
+		{
+			char hex[3];
+			memcpy(hex,qptr+2,2);
+			hex[2] = 0;
+			buffer[bufpos] = (unsigned char)strtol(hex, NULL, 16);
+			bufpos++; qptr += 4;
+		}
+		// Conversion du '+' en ' ' 
+		else if(*qptr == '+') 
+		{
+			buffer[bufpos++] = ' ';
+			qptr++;
+		}
+		// Deleting \n comments (only \r will be taken as carriage return in the parameters)
+		else if (*qptr == '\n')
+		{
+			++qptr;
+		}
+		else if (*qptr == '\r')
+		{
+			++qptr;
+		}
+		else if(*qptr)
+		{
+			buffer[bufpos++] = *qptr;
+			qptr++;
+		}
     }
 
     // Adding of the client IP address to the request
@@ -125,7 +135,7 @@ int main(int argc, char **argv)
     strcat(buffer, Request::PARAMETER_ASSIGNMENT.c_str());
     strcat(buffer, script);
     // Adding end of line to close the request
-    strcat(buffer, "\r\n");
+    strcat(buffer, "\n");
 		
     // Init server connection
     int timeout = 1800;

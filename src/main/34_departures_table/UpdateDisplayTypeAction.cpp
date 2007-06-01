@@ -88,12 +88,15 @@ namespace synthese
 			{
 				_name = it->second;
 
-				if (_name.empty())
-					throw ActionException("Le nom ne peut être vide.");
-				
-				vector<shared_ptr<DisplayType> > v(DisplayTypeTableSync::search(_name, 0, 1));
-				if (!v.empty())
-					throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
+				if (_name != _dt->getName())
+				{
+					if (_name.empty())
+						throw ActionException("Le nom ne peut être vide.");
+
+					vector<shared_ptr<DisplayType> > v(DisplayTypeTableSync::search(_name, 0, 1));
+					if (!v.empty())
+						throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
+				}
 			}
 
 			it = map.find(PARAMETER_ROWS_NUMBER);
