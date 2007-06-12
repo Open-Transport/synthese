@@ -21,25 +21,29 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
-#include "AlarmStopAction.h"
+#include "17_messages/SingleSentAlarm.h"
+#include "17_messages/AlarmStopAction.h"
+#include "17_messages/AlarmTableSync.h"
+#include "17_messages/MessagesLog.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace time;
 	
 	namespace messages
 	{
-		/// @todo Parameters constants definition
-		// const string AlarmStopAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
+		const string AlarmStopAction::PARAMETER_ALARM_ID(Action_PARAMETER_PREFIX + "ai");
 
 
 		ParametersMap AlarmStopAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
@@ -47,24 +51,33 @@ namespace synthese
 		{
 			ParametersMap::const_iterator it;
 
-			// it = map.find(PARAMETER_xxx);
-			// if (it == map.end())
-			//	throw ActionException("Parameter xxx not found");
-			//
-			// _xxx = it->second;
-			// map.erase(it);
-			// if (_xxx <= 0)
-			//	throw ActionException("Bad value for xxx parameter ");	
-			// 
+			try
+			{
+				_alarm = AlarmTableSync::getSingleSentAlarm(_request->getObjectId());
+			}
+			catch(...)
+			{
+				throw ActionException("Specified alarm not found.");
+			}
+
+			DateTime now;
+			if (!_alarm->getPeriodEnd().isUnknown() && _alarm->getPeriodEnd() < now)
+				throw ActionException("This alarm has not to be stopped.");
 		}
 
 		AlarmStopAction::AlarmStopAction()
-			: Action()
-			/// @todo Put here other parameters initialization
+			: Action(), _stopDateTime()
 		{}
 
 		void AlarmStopAction::run()
 		{
+			// Action
+			_alarm->setPeriodEnd(_stopDateTime);
+			_alarm->setIsEnabled(false);
+			AlarmTableSync::save(_alarm.get());
+
+			// Log
+			MessagesLog::addUpdateEntry(dynamic_pointer_cast<const SingleSentAlarm, SingleSentAlarm>(_alarm), "Diffusion arrêtée le " + _stopDateTime.toString(), _request->getUser());
 		}
 	}
 }

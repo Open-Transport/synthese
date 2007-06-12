@@ -86,5 +86,14 @@ namespace synthese
 		{
 			return "Administration bibliothèque de messages";
 		}
+
+		void MessagesLibraryLog::addDeleteEntry( boost::shared_ptr<const ScenarioTemplate> scenario , boost::shared_ptr<const security::User> user )
+		{
+			DBLogEntry::Content content;
+			content.push_back(Conversion::ToString(scenario->getKey()));
+			content.push_back("Suppression du scénario " + scenario->getName());
+
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
+		}
 	}
 }

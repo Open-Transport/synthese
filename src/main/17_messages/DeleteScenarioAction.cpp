@@ -21,8 +21,12 @@
 */
 
 #include "30_server/ActionException.h"
+#include "30_server/Request.h"
 
-#include "DeleteScenarioAction.h"
+#include "17_messages/DeleteScenarioAction.h"
+#include "17_messages/ScenarioTableSync.h"
+#include "17_messages/ScenarioTemplate.h"
+#include "17_messages/MessagesLibraryLog.h"
 
 using namespace std;
 
@@ -32,14 +36,14 @@ namespace synthese
 	
 	namespace messages
 	{
-		/// @todo Parameters constants definition
-		// const string DeleteScenarioAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
+		const string DeleteScenarioAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "si";
 
 
 		ParametersMap DeleteScenarioAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
+			if (_scenario.get())
+				map.insert(make_pair(PARAMETER_SCENARIO_ID, Conversion::ToString(_scenario->getKey())));
 			return map;
 		}
 
@@ -47,23 +51,36 @@ namespace synthese
 		{
 			ParametersMap::const_iterator it;
 
-			// it = map.find(PARAMETER_xxx);
-			// if (it == map.end())
-			//	throw ActionException("Parameter xxx not found");
-			//
-			// _xxx = it->second;
-			// if (_xxx <= 0)
-			//	throw ActionException("Bad value for xxx parameter ");	
-			// 
+			it = map.find(PARAMETER_SCENARIO_ID);
+			if (it == map.end())
+				throw ActionException("Scenario not specified.");
+			
+			try
+			{
+				_scenario = ScenarioTableSync::getTemplate(Conversion::ToLongLong(it->second));
+			}
+			catch(...)
+			{
+				throw ActionException("Specified scenario not found.");	
+			}
 		}
 
 		DeleteScenarioAction::DeleteScenarioAction()
 			: Action()
-			/// @todo Put here other parameters initialization
 		{}
 
 		void DeleteScenarioAction::run()
 		{
+			// Action
+			ScenarioTableSync::remove(_scenario->getKey());
+
+			// Log
+			MessagesLibraryLog::addDeleteEntry(_scenario, _request->getUser());
+		}
+
+		void DeleteScenarioAction::setScenario( boost::shared_ptr<const ScenarioTemplate> scenario )
+		{
+			_scenario = scenario;
 		}
 	}
 }

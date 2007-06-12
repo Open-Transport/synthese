@@ -120,7 +120,10 @@ namespace synthese
 					f.insert(make_pair(_PARAMETER_FIRST, Conversion::ToString((_first > _maxSize) ? _first - _maxSize : 0)));
 					s << HTMLModule::getHTMLLink(_searchForm.getURL(f), HTMLModule::getHTMLImage("resultset_previous.png", "<<")) << "&nbsp;|&nbsp;";
 				}
-				s << _first << "&nbsp;->&nbsp;" << (_first + _size - 1);
+				if (_size > 0)
+					s << "Résultats&nbsp;" << (_first + 1) << "&nbspà&nbsp;" << (_first + _size);
+				else
+					s << "Aucun résultat";
 				if (_next)
 				{
 					HTMLForm::HiddenFieldsMap f;

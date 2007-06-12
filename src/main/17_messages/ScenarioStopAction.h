@@ -25,6 +25,8 @@
 
 #include "30_server/Action.h"
 
+#include "04_time/DateTime.h"
+
 namespace synthese
 {
 	namespace messages
@@ -36,11 +38,9 @@ namespace synthese
 		*/
 		class ScenarioStopAction : public server::Action
 		{
-		public:
-			// static const std::string PARAMETER_xxx;
-
 		private:
-			boost::shared_ptr<SentScenario>		_scenario;
+			boost::shared_ptr<SentScenario>	_scenario;
+			const time::DateTime			_stopDateTime;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -54,6 +54,8 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			ScenarioStopAction();
+
 			/** Action to run, defined by each subclass.
 			*/
 			void run();

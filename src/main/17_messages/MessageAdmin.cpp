@@ -32,7 +32,7 @@
 #include "17_messages/UpdateAlarmMessagesAction.h"
 #include "17_messages/AlarmAddLinkAction.h"
 #include "17_messages/AlarmRemoveLinkAction.h"
-#include "17_messages/SentAlarm.h"
+#include "17_messages/SingleSentAlarm.h"
 #include "17_messages/AlarmTemplate.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesAdmin.h"
@@ -105,7 +105,7 @@ namespace synthese
 			updateRequest.getFunction()->setPage<MessageAdmin>();
 			updateRequest.setObjectId(request->getObjectId());
 
-			shared_ptr<const SentAlarm> salarm = dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm);
+			shared_ptr<const SingleSentAlarm> salarm = dynamic_pointer_cast<const SingleSentAlarm, const Alarm>(_alarm);
 			
 			stream << "<h1>Paramètres</h1>";
 			HTMLForm f(updateRequest.getHTMLForm("update"));

@@ -28,3 +28,4 @@
 #include "17_messages/UpdateAlarmMessagesAction.h"
 #include "17_messages/AlarmRemoveLinkAction.h"
 #include "17_messages/AlarmAddLinkAction.h"
+#include "17_messages/ScenarioStopAction.h"

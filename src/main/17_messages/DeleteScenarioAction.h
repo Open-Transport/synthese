@@ -29,17 +29,19 @@ namespace synthese
 {
 	namespace messages
 	{
+		class ScenarioTemplate;
+
 		/** DeleteScenarioAction action class.
 			@ingroup m17
 		*/
 		class DeleteScenarioAction : public server::Action
 		{
 		public:
-			/// @todo Parameters list
-			// static const std::string PARAMETER_xxx;
+			static const std::string PARAMETER_SCENARIO_ID;
 
 		private:
-			/// @todo Attributes list
+			/// Attributes list
+			boost::shared_ptr<const ScenarioTemplate>	_scenario;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -60,6 +62,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			void setScenario(boost::shared_ptr<const ScenarioTemplate> scenario);
 		};
 	}
 }

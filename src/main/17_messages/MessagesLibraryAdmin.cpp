@@ -242,11 +242,12 @@ namespace synthese
 			{
 				shared_ptr<ScenarioTemplate> scenario = *it;
 				updateScenarioRequest.setObjectId(scenario->getKey());
-				deleteScenarioRequest.setObjectId(scenario->getKey());
+				deleteScenarioRequest.getAction()->setScenario(scenario);
 				stream << t3.row();
 				stream << t3.col() << scenario->getName();
-				stream << t3.col() << HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Modifier")
-					<< " " << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le scénario " + scenario->getName() + " ?");
+				stream << t3.col()
+					<< HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Modifier", string(), "cog_edit.png")
+					<< " " << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le scénario " + scenario->getName() + " ?", "cog_delete.png");
 			}
 
 			stream << t3.row();

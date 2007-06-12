@@ -57,6 +57,10 @@ namespace synthese
 				, const std::string& text
 				, boost::shared_ptr<const security::User> user
 				);
+			static void addDeleteEntry(
+				boost::shared_ptr<const ScenarioTemplate> scenario
+				, boost::shared_ptr<const security::User> user
+				);
 			std::string getObjectName(uid id) const;
 		};
 	}

@@ -27,8 +27,10 @@
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/MessagesModule.h"
+#include "17_messages/MessagesLog.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -37,9 +39,6 @@ namespace synthese
 	
 	namespace messages
 	{
-		// const string ScenarioStopAction::PARAMETER_xxx = Action_PARAMETER_PREFIX + "xxx";
-
-
 		ParametersMap ScenarioStopAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -59,8 +58,19 @@ namespace synthese
 
 		void ScenarioStopAction::run()
 		{
-			_scenario->setPeriodEnd(DateTime());
+			// Action
+			_scenario->setPeriodEnd(_stopDateTime);
+			_scenario->setIsEnabled(false);
 			ScenarioTableSync::save(_scenario.get());
+
+			// Log
+			MessagesLog::addUpdateEntry(dynamic_pointer_cast<const SentScenario, SentScenario>(_scenario), "Diffusion arrêtée le " + _stopDateTime.toString(), _request->getUser());
+		}
+
+		ScenarioStopAction::ScenarioStopAction()
+			: Action(), _stopDateTime()
+		{
+	
 		}
 	}
 }

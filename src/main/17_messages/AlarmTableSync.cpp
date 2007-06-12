@@ -494,5 +494,14 @@ namespace synthese
 				throw Exception(e.getMessage());
 			}
 		}
+
+		boost::shared_ptr<SingleSentAlarm> AlarmTableSync::getSingleSentAlarm( uid key )
+		{
+			shared_ptr<Alarm> alarm(getAlarm(key));
+			shared_ptr<SingleSentAlarm> singleSentAlarm(dynamic_pointer_cast<SingleSentAlarm, Alarm>(alarm));
+			if (!singleSentAlarm.get())
+				throw DBEmptyResultException<SingleSentAlarm>(key, "Not a single sent alarm");
+			return singleSentAlarm;
+		}
 	}
 }

@@ -162,6 +162,7 @@ WHERE
 				);
 
 			static boost::shared_ptr<Alarm> getAlarm(uid key);
+			static boost::shared_ptr<SingleSentAlarm> getSingleSentAlarm(uid key);
 		};
 
 	}

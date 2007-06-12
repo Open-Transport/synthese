@@ -42,15 +42,13 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_START_DATE;
-			static const std::string PARAMETER_START_HOUR;
 			static const std::string PARAMETER_END_DATE;
-			static const std::string PARAMETER_END_HOUR;
-			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_ENABLED;
 
 		private:
-			std::string		_name;
-			time::DateTime	_startDate;
-			time::DateTime	_endDate;
+			bool								_enabled;
+			time::DateTime						_startDate;
+			time::DateTime						_endDate;
 			boost::shared_ptr<SentScenario>		_scenario;
 
 		protected:

@@ -104,5 +104,27 @@ namespace synthese
 			}
 			return conflictStatus;
 		}
+
+		bool SentScenario::isApplicable( const time::DateTime& start, const time::DateTime& end ) const
+		{
+			// Disabled alarm is never applicable
+			if (!getIsEnabled())
+				return false;
+
+			// Start date control
+			if (!getPeriodStart().isUnknown() && end < getPeriodStart())
+				return false;
+
+			// End date control
+			if (!getPeriodEnd().isUnknown() && start >= getPeriodEnd())
+				return false;
+
+			return true;
+		}
+
+		bool SentScenario::isApplicable( const time::DateTime& date ) const
+		{
+			return isApplicable(date, date);
+		}
 	}
 }

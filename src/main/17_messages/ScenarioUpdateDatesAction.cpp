@@ -27,8 +27,14 @@
 #include "17_messages/MessagesModule.h"
 #include "17_messages/SentScenario.h"
 #include "17_messages/ScenarioTableSync.h"
+#include "17_messages/MessagesLog.h"
+
+#include "04_time/TimeParseException.h"
+
+#include <sstream>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -38,17 +44,14 @@ namespace synthese
 	
 	namespace messages
 	{
-		const string ScenarioUpdateDatesAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
-		const string ScenarioUpdateDatesAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sda";
-		const string ScenarioUpdateDatesAction::PARAMETER_START_HOUR = Action_PARAMETER_PREFIX + "sho";
-		const string ScenarioUpdateDatesAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "eda";
-		const string ScenarioUpdateDatesAction::PARAMETER_END_HOUR = Action_PARAMETER_PREFIX + "eho";
+		const string ScenarioUpdateDatesAction::PARAMETER_ENABLED(Action_PARAMETER_PREFIX + "ena");
+		const string ScenarioUpdateDatesAction::PARAMETER_START_DATE(Action_PARAMETER_PREFIX + "sda");
+		const string ScenarioUpdateDatesAction::PARAMETER_END_DATE(Action_PARAMETER_PREFIX + "eda");
 
 
 		ParametersMap ScenarioUpdateDatesAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(make_pair(PARAMETER_NAME, _name));
 			/// @todo Finish the implementation
 			return map;
 		}
@@ -61,39 +64,32 @@ namespace synthese
 
 				ParametersMap::const_iterator it;
 
-				it = map.find(PARAMETER_NAME);
+				it = map.find(PARAMETER_ENABLED);
 				if (it == map.end())
-					throw ActionException("Name not specified");
-				_name = it->second;
+					throw ActionException("Enabled status not specified");
+				_enabled = Conversion::ToBool(it->second);
 
 				it = map.find(PARAMETER_START_DATE);
 				if (it == map.end())
 					throw ActionException("Start date not specified");
 				if (!it->second.empty())
-					_startDate.getDate().FromString(it->second);
-
-				it = map.find(PARAMETER_START_HOUR);
-				if (it == map.end())
-					throw ActionException("Start hour not specified");
-				if (!it->second.empty())
-					_startDate.getHour().FromString(it->second);
+					_startDate = DateTime::FromString(it->second);
 
 				it = map.find(PARAMETER_END_DATE);
 				if (it == map.end())
 					throw ActionException("End date not specified");
 				if (!it->second.empty())
-					_endDate.getDate().FromString(it->second);
-
-				it = map.find(PARAMETER_END_HOUR);
-				if (it == map.end())
-					throw ActionException("End hour not specified");
-				if (!it->second.empty())
-					_endDate.getHour().FromString(it->second);
+					_endDate = DateTime::FromString(it->second);
 			}
 			catch (DBEmptyResultException<Scenario>)
 			{
 				throw ActionException("Scenario not found");
 			}
+			catch(TimeParseException)
+			{
+				throw ActionException("Une date ou une heure est mal formée");
+			}
+
 		}
 
 		ScenarioUpdateDatesAction::ScenarioUpdateDatesAction()
@@ -104,10 +100,23 @@ namespace synthese
 
 		void ScenarioUpdateDatesAction::run()
 		{
-			_scenario->setName(_name);
+			// Log message
+			stringstream text;
+			if (_scenario->getIsEnabled() != _enabled)
+				text << " - " << (_enabled ? "Affichage activé" : "Affichage désactivé");
+			if (_scenario->getPeriodStart() != _startDate)
+				text << " - Date de début : " << _scenario->getPeriodStart().toString() << " => " << _startDate.toString();
+			if (_scenario->getPeriodEnd() != _endDate)
+				text << " - Date de fin : " << _scenario->getPeriodEnd().toString() << " => " << _endDate.toString();
+
+			// Action
+			_scenario->setIsEnabled(_enabled);
 			_scenario->setPeriodStart(_startDate);
 			_scenario->setPeriodEnd(_endDate);
 			ScenarioTableSync::save(_scenario.get());
+
+			// Log
+			MessagesLog::addUpdateEntry(static_pointer_cast<const SentScenario, SentScenario>(_scenario), text.str(), _request->getUser());
 		}
 	}
 }

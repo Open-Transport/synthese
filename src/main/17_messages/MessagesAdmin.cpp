@@ -207,6 +207,8 @@ namespace synthese
 			statusMap.push_back(make_pair(BROADCAST_RUNNING_WITHOUT_END, "En cours sans date de fin"));
 			statusMap.push_back(make_pair(FUTURE_BROADCAST, "Diffusion ultérieure"));
 
+			DateTime now;
+
 			stream << "<h1>Recherche</h1>";
 
 			SearchFormHTMLTable s(searchRequest.getHTMLForm());
@@ -243,13 +245,56 @@ namespace synthese
 			{
 				shared_ptr<SentScenario> scenario = *it;
 				scenarioRequest.setObjectId(scenario->getKey());
-				stream << t1.row();
-				stream << t1.col() << scenario->getPeriodStart().toString();
+				scenarioStopRequest.setObjectId(scenario->getKey());
+
+				bool scenarioIsDisabled =
+					!scenario->getIsEnabled();
+				bool scenarioIsDisplayedWithEndDate = 
+					(scenario->getPeriodStart().isUnknown() || scenario->getPeriodStart() <= now)
+					&& !scenario->getPeriodEnd().isUnknown()
+					&& scenario->getPeriodEnd() >= now
+					&& scenario->getIsEnabled();
+				bool scenarioIsDisplayedWithoutEndDate =
+					(scenario->getPeriodStart().isUnknown() || scenario->getPeriodStart() <= now)
+					&& scenario->getPeriodEnd().isUnknown()
+					&& scenario->getIsEnabled();
+				bool scenarioWillBeDisplayed =
+					!scenario->getPeriodStart().isUnknown()
+					&& scenario->getPeriodStart() > now
+					&& scenario->getIsEnabled();
+				string rowColorCSS;
+				if (scenarioIsDisabled)
+					rowColorCSS = CSS_ALARM_DISABLED;
+				if (scenarioIsDisplayedWithoutEndDate)
+					rowColorCSS = CSS_ALARM_DISPLAYED_WITHOUT_END_DATE;
+				if (scenarioWillBeDisplayed)
+					rowColorCSS = CSS_ALARM_WILL_BE_DISPLAYED;
+				if (scenarioIsDisplayedWithEndDate)
+					rowColorCSS = CSS_ALARM_DISPLAYED_WITH_END_DATE;
+				stream << t1.row(Conversion::ToString(scenario->getKey()), rowColorCSS);
+
+				stream << t1.col();
+				
+				if (!scenario->getIsEnabled())
+					stream << "Non diffusé";
+				else
+				{
+					if (scenario->getPeriodStart().isUnknown() && scenario->getPeriodEnd().isUnknown())
+						stream << "Diffusion permanente";
+					if (scenario->getPeriodStart().isUnknown() && !scenario->getPeriodEnd().isUnknown())
+						stream << "Jusqu'au " << scenario->getPeriodEnd().toString();
+					if (!scenario->getPeriodStart().isUnknown() && scenario->getPeriodEnd().isUnknown())
+						stream << "A compter du " << scenario->getPeriodStart().toString();
+					if (!scenario->getPeriodStart().isUnknown() && !scenario->getPeriodEnd().isUnknown())
+						stream << "Du " << scenario->getPeriodStart().toString() << " au " << scenario->getPeriodEnd().toString();
+				}
+
 				stream << t1.col() << scenario->getName();
 				stream << t1.col(); // Bullet
 				stream << t1.col() << MessagesModule::getConflictLabel(scenario->getConflictStatus()); /// @todo put a graphic bullet
 				stream << t1.col() << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Modifier");
-				stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?");
+				if (scenario->isApplicable(DateTime()))
+					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "stop.png");
 			}
 			stream << t1.row();
 			stream << t1.col();
@@ -276,7 +321,7 @@ namespace synthese
 			{
 				shared_ptr<SingleSentAlarm> alarm = *it;
 				alarmRequest.setObjectId(alarm->getKey());
-				DateTime now;
+				stopRequest.setObjectId(alarm->getKey());
 				bool alarmIsDisabled =
 					!alarm->getIsEnabled();
 				bool alarmIsDisplayedWithEndDate = 
@@ -320,13 +365,14 @@ namespace synthese
 				stream << t.col() << MessagesModule::getLevelLabel(alarm->getLevel());
 				stream << t.col(); // Bullet
 				if (!alarm->getIsEnabled())
-					stream << "Désactivé";
+					stream << HTMLModule::getHTMLImage(IMG_URL_INFO, "Désactivé");
 				else if (!alarm->getComplements().recipientsNumber)
-					stream << "Pas de destinataire";
+					stream << HTMLModule::getHTMLImage(IMG_URL_INFO, "Pas de destinataire");
 				else
 				{
-				    stream << alarm->getComplements().recipientsNumber << "&nbsp;";
+					stream << HTMLModule::getHTMLImage(IMG_URL_INFO, "Diffusion sur " + Conversion::ToString(alarm->getComplements().recipientsNumber) + "&nbsp;afficheur" + ((alarm->getComplements().recipientsNumber > 1) ? "s" : "") );
 				}
+
 				stream << t.col();
 				switch(alarm->getComplements().conflictStatus)
 				{

@@ -24,22 +24,25 @@
 #define SYNTHESE_AlarmStopAction_H__
 
 #include "30_server/Action.h"
+#include "04_time/DateTime.h"
 
 namespace synthese
 {
 	namespace messages
 	{
+		class SingleSentAlarm;
+
 		/** AlarmStopAction action class.
 			@ingroup m17
 		*/
 		class AlarmStopAction : public server::Action
 		{
 		public:
-			/// @todo Parameters list
-			// static const std::string PARAMETER_xxx;
+			static const std::string PARAMETER_ALARM_ID;
 
 		private:
-			/// @todo Attributes list
+			boost::shared_ptr<SingleSentAlarm>	_alarm;
+			const time::DateTime				_stopDateTime;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

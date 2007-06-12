@@ -83,6 +83,16 @@ namespace synthese
 				@date 2007
 			*/
 			AlarmConflict getConflictStatus() const;
+
+			/** Applicability test.
+				@param start Start of applicability period
+				@param end End of applicability period
+				@return true if the message is not empty and is valid for the whole period given as argument.
+			*/
+			bool isApplicable ( const time::DateTime& start, const time::DateTime& end ) const;
+
+			bool isApplicable(const time::DateTime& date) const;
+
 		};
 	}
 }

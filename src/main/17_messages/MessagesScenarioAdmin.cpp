@@ -31,6 +31,7 @@
 #include "17_messages/ScenarioTableSync.h"
 #include "17_messages/AlarmTableSync.h"
 #include "17_messages/ScenarioNameUpdateAction.h"
+#include "17_messages/ScenarioUpdateDatesAction.h"
 #include "17_messages/DeleteAlarmAction.h"
 #include "17_messages/NewMessageAction.h"
 #include "17_messages/MessagesLibraryAdmin.h"
@@ -103,7 +104,7 @@ namespace synthese
 		void MessagesScenarioAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			ActionFunctionRequest<ScenarioNameUpdateAction,AdminRequest> updateRequest(request);
-			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
+			updateRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			updateRequest.setObjectId(_scenario->getId());
 
 			FunctionRequest<AdminRequest> messRequest(request);
@@ -123,6 +124,34 @@ namespace synthese
 			stream << uf.open();
 			stream << "<p>Nom : " << uf.getTextInput(ScenarioNameUpdateAction::PARAMETER_NAME, _scenario->getName()) << uf.getSubmitButton("Modifier") << "</p>";
 			stream << uf.close();
+
+			if (_sentScenario.get())
+			{
+				ActionFunctionRequest<ScenarioUpdateDatesAction, AdminRequest> updateDatesRequest(request);
+				updateDatesRequest.getFunction()->setPage<MessagesScenarioAdmin>();
+				updateDatesRequest.setObjectId(_scenario->getId());
+
+				stream << "<h1>Diffusion</h1>";
+				HTMLForm udf(updateDatesRequest.getHTMLForm("update_dates"));
+				HTMLTable udt;
+
+				stream << udf.open() << udt.open();
+
+				stream << udt.row();
+				stream << udt.col() << "Début diffusion";
+				stream << udt.col() << udf.getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart());
+				stream << udt.row();
+				stream << udt.col() << "Fin diffusion";
+				stream << udt.col() << udf.getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_END_DATE, _sentScenario->getPeriodEnd());
+				stream << udt.row();
+				stream << udt.col() << "Actif";
+				stream << udt.col() << udf.getOuiNonRadioInput(ScenarioUpdateDatesAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled());
+
+				stream << udt.row();
+				stream << udt.col(2) << udf.getSubmitButton("Enregistrer");
+
+				stream << udt.close() << udf.close();
+			}
 
 			stream << "<h1>Messages</h1>";
 

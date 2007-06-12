@@ -20,6 +20,7 @@ synthese::messages::MessagesLog::integrate();
 synthese::messages::MessagesLibraryLog::integrate();
 
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::ScenarioUpdateDatesAction>("messscenarioud");
+synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::ScenarioStopAction>("scenariostop");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::DeleteAlarmAction>("deletealarm");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::UpdateAlarmMessagesFromTemplateAction>("uaft");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::messages::UpdateAlarmAction>("updatealarm");
