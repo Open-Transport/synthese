@@ -128,9 +128,6 @@ namespace synthese
 			int												_searchState;
 			int												_searchMessage;
 			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
-			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
-
-			std::vector<boost::shared_ptr<DisplayScreen> >	_result;
 
 		public:
 			static const std::string PARAMETER_SEARCH_CITY;

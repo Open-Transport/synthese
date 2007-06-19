@@ -45,6 +45,7 @@
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplaySearchAdmin.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
+#include "34_departures_table/ArrivalDepartureTableRight.h"
 
 using namespace std;
 using namespace boost;
@@ -181,7 +182,11 @@ namespace synthese
 
 			stream << t1.open();
 
-			vector<boost::shared_ptr<DisplayScreen> > result2 = DisplayScreenTableSync::search(UNKNOWN_VALUE, UNKNOWN_VALUE, searchLine, searchType, searchCity, searchStop, searchName, searchState, searchMessage);
+			vector<boost::shared_ptr<DisplayScreen> > result2 = DisplayScreenTableSync::search(
+				searchRequest.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+				, searchRequest.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+				, READ
+				, UNKNOWN_VALUE, UNKNOWN_VALUE, searchLine, searchType, searchCity, searchStop, searchName, searchState, searchMessage);
 
 			for (vector<shared_ptr<DisplayScreen> >::const_iterator it = result2.begin(); it != result2.end(); ++it)
 			{

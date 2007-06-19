@@ -36,6 +36,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace server;
+	using namespace security;
 	
 	namespace departurestable
 	{
@@ -68,7 +69,10 @@ namespace synthese
 			}
 				
 			vector<shared_ptr<DisplayScreen> > v = DisplayScreenTableSync::search(
-				UNKNOWN_VALUE
+				RightsOfSameClassMap()
+				, true
+				, FORBIDDEN
+				, UNKNOWN_VALUE
 				, UNKNOWN_VALUE
 				, UNKNOWN_VALUE
 				, _type->getKey()

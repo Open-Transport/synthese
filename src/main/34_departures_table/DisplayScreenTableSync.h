@@ -33,8 +33,12 @@
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
+#include "12_security/Types.h"
+
 namespace synthese
 {
+	using namespace security;
+
 	namespace departurestable
 	{
 		class DisplayScreen;
@@ -93,7 +97,10 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<DisplayScreen> > search(
-				uid duid = UNKNOWN_VALUE
+				const security::RightsOfSameClassMap& rights 
+				, bool totalControl 
+				, RightLevel neededLevel
+				, uid duid = UNKNOWN_VALUE
 				, uid localizationid = UNKNOWN_VALUE
 				, uid lineid = UNKNOWN_VALUE
 				, uid typeuid = UNKNOWN_VALUE

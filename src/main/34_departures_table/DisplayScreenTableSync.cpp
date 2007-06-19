@@ -342,7 +342,10 @@ namespace synthese
 		}
 
 		std::vector<shared_ptr<DisplayScreen> > DisplayScreenTableSync::search(
-			uid duid
+			const security::RightsOfSameClassMap& rights 
+			, bool totalControl 
+			, RightLevel neededLevel
+			, uid duid
 			, uid localizationid
 			, uid lineid
 			, uid typeuid
@@ -386,11 +389,11 @@ namespace synthese
 
 			query << " WHERE 1 ";
 			if (!cityName.empty())
-				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << cityName << "%'";
+				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
 			if (!stopName.empty())
-				query << " AND p." << ConnectionPlaceTableSync::TABLE_COL_NAME << " LIKE '%" << stopName << "%'";
+				query << " AND p." << ConnectionPlaceTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(stopName, false) << "%'";
 			if (!name.empty())
-				query << " AND d." << COL_NAME << " LIKE '%" << name << "%'";
+				query << " AND d." << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
 			if (duid != UNKNOWN_VALUE)
 				query << " AND d." << TABLE_COL_ID << "=" << Conversion::ToString(duid);
 			if (localizationid != UNKNOWN_VALUE)

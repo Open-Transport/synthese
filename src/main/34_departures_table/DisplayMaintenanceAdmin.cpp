@@ -72,10 +72,14 @@ namespace synthese
 			if (it == map.end())
 				throw AdminParametersException("Screen not specified");
 
-			vector<shared_ptr<DisplayScreen> > result = DisplayScreenTableSync::search(Conversion::ToLongLong(it->second));
-			if (result.empty())
+			try
+			{
+				_displayScreen = DisplayScreenTableSync::get(Conversion::ToLongLong(it->second));
+			}
+			catch(...)
+			{
 				throw AdminParametersException("Specified display screen not found (" + it->second +")");
-			_displayScreen = result.front();
+			}
 		}
 
 		string DisplayMaintenanceAdmin::getTitle() const

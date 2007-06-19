@@ -55,7 +55,7 @@ namespace synthese
 		{
 			vector<pair<uid, string> > m;
 			if (withAll)
-				m.push_back(make_pair(0, "(tous)"));
+				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
 			for(DisplayType::Registry::const_iterator it = _displayTypes.begin(); it != _displayTypes.end(); ++it)
 				m.push_back(make_pair(it->first, it->second->getName()));
 			return m;
@@ -69,7 +69,7 @@ namespace synthese
 		){
 			vector<pair<uid, string> > localizations;
 			if (withAll)
-				localizations.push_back(make_pair(0, "(tous)"));
+				localizations.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
 			std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > bpv = searchConnectionPlacesWithBroadcastPoints(rights, totalControl, neededLevel, string(), string(), AT_LEAST_ONE_BROADCASTPOINT);
 			for (vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> >::const_iterator it = bpv.begin(); it != bpv.end(); ++it)
 			{
@@ -83,7 +83,7 @@ namespace synthese
 		{
 			vector<pair<uid, string> > m;
 			if (withAll)
-				m.push_back(make_pair(0, "(toutes)"));
+				m.push_back(make_pair(UNKNOWN_VALUE, "(toutes)"));
 			vector<shared_ptr<const CommercialLine> > c = getCommercialLineWithBroadcastPoints();
 			for (vector<shared_ptr<const CommercialLine> >::const_iterator it = c.begin(); it != c.end(); ++it)
 				m.push_back(make_pair((*it)->getKey(), (*it)->getShortName()));

@@ -28,6 +28,7 @@
 #include "34_departures_table/DisplayMaintenanceAdmin.h"
 #include "34_departures_table/DisplayScreenContentRequest.h"
 #include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/ArrivalDepartureTableRight.h"
 
 #include "01_util/Conversion.h"
 
@@ -100,6 +101,18 @@ namespace synthese
 			it = map.find(PARAMETER_SEARCH_LOCALIZATION_ID);
 			if (it == map.end() || Conversion::ToLongLong(it->second) == UNKNOWN_VALUE)
 			{
+				it = map.find(PARAMETER_SEARCH_CITY);
+				if (it != map.end())
+					_searchCity = it->second;
+
+				it = map.find(PARAMETER_SEARCH_STOP);
+				if (it != map.end())
+					_searchStop = it->second;
+
+				it = map.find(PARAMETER_SEARCH_NAME);
+				if (it != map.end())
+					_searchName = it->second;
+
 				it = map.find(PARAMETER_SEARCH_LINE_ID);
 				if (it != map.end())
 					_searchLineId = Conversion::ToLongLong(it->second);
@@ -129,9 +142,25 @@ namespace synthese
 			}
 
 			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAMETER_SEARCH_CITY, 30);
+		}
+
+		string DisplaySearchAdmin::getTitle() const
+		{
+			return _place.get() ? "Afficheurs " + _place->getName() : "Afficheurs";
+		}
+
+		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
+		{
+
+			html::ActionResultHTMLTable::ResultParameters	_resultParameters;
+
+			std::vector<boost::shared_ptr<DisplayScreen> >	_result;
 
 			_result = DisplayScreenTableSync::search(
-				UNKNOWN_VALUE
+				request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+				, request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+				, READ
+				, UNKNOWN_VALUE
 				, _place.get() ? _place->getKey() : UNKNOWN_VALUE
 				, _searchLineId
 				, _searchTypeId
@@ -153,15 +182,8 @@ namespace synthese
 				);
 
 			_resultParameters = ActionResultHTMLTable::getParameters(_requestParameters, _result);
-		}
 
-		string DisplaySearchAdmin::getTitle() const
-		{
-			return _place.get() ? "Afficheurs " + _place->getName() : "Afficheurs";
-		}
 
-		void DisplaySearchAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
-		{
 			ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(request);
 			createDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
 			createDisplayRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<DisplaySearchAdmin>());
