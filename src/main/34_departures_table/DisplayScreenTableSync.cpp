@@ -30,6 +30,7 @@
 #include "15_env/LineTableSync.h"
 #include "15_env/PhysicalStopTableSync.h"
 #include "15_env/ConnectionPlaceTableSync.h"
+#include "15_env/CommercialLineTableSync.h"
 #include "15_env/CityTableSync.h"
 
 #include "13_dblog/DBLogEntryTableSync.h"
@@ -381,13 +382,16 @@ namespace synthese
 					<< " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
 					<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
 					;
-			if (lineid != UNKNOWN_VALUE)
+			if (lineid != UNKNOWN_VALUE || neededLevel > FORBIDDEN)
 				query
 					<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS ls " << " ON s." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
 					<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS ll ON ll." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_LINEID
 					;
 
+			// Filtering
 			query << " WHERE 1 ";
+			if (neededLevel > FORBIDDEN)
+				query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel) << ")";
 			if (!cityName.empty())
 				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
 			if (!stopName.empty())
@@ -402,7 +406,11 @@ namespace synthese
 				query << " AND d." << COL_TYPE_ID << "=" << typeuid;
 			if (lineid != UNKNOWN_VALUE)
 				query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineid;
+			
+			// Grouping
 			query << " GROUP BY d." << TABLE_COL_ID;
+
+			// Ordering
 			if (orderByUid)
 				query << " ORDER BY d." << TABLE_COL_ID << (raisingOrder ? " ASC" : " DESC");
 			else if (orderByCity)

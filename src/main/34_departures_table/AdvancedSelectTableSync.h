@@ -62,8 +62,8 @@ namespace synthese
 		*/
 		std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(
 			const security::RightsOfSameClassMap& rights 
-			, bool totalControl 
-			, security::RightLevel neededLevel
+			, bool totalControl = true
+			, security::RightLevel neededLevel = security::FORBIDDEN
 			, std::string cityName = std::string()
 			, std::string placeName = std::string()
 			, BroadcastPointsPresence bpPresence = WITH_OR_WITHOUT_ANY_BROADCASTPOINT

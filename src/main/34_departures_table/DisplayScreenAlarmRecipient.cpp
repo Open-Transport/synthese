@@ -39,6 +39,7 @@
 #include "17_messages/AlarmObjectLinkTableSync.h"
 #include "17_messages/AlarmRemoveLinkAction.h"
 #include "17_messages/AlarmAddLinkAction.h"
+#include "17_messages/MessagesRight.h"
 
 #include "32_admin/AdminModule.h"
 
@@ -95,13 +96,13 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_CITY_NAME = "dsarsu";
-		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_STOP_NAME = "dsarsp";
-		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_NAME = "dsarsp";
-		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_LINE = "dsarsl";
-		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_TYPE = "dsarst";
-		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_STATUS = "dsarss";
-		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_MESSAGE = "dsarsm";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_CITY_NAME = "dsascity";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_STOP_NAME = "dsaslid";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_NAME = "dsasloc";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_LINE = "dsasli";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_TYPE = "dsasti";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_STATUS = "dsass";
+		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_MESSAGE = "dsasm";
 
 		void DisplayScreenAlarmRecipient::displayBroadcastListEditor(
 			std::ostream& stream
@@ -183,10 +184,18 @@ namespace synthese
 			stream << t1.open();
 
 			vector<boost::shared_ptr<DisplayScreen> > result2 = DisplayScreenTableSync::search(
-				searchRequest.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-				, searchRequest.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
-				, READ
-				, UNKNOWN_VALUE, UNKNOWN_VALUE, searchLine, searchType, searchCity, searchStop, searchName, searchState, searchMessage);
+				searchRequest.getUser()->getProfile()->getRightsForModuleClass<MessagesRight>()
+				, searchRequest.getUser()->getProfile()->getGlobalPublicRight<MessagesRight>() >= READ
+				, WRITE
+				, UNKNOWN_VALUE
+				, UNKNOWN_VALUE
+				, searchLine
+				, searchType
+				, searchCity
+				, searchStop
+				, searchName
+				, searchState
+				, searchMessage);
 
 			for (vector<shared_ptr<DisplayScreen> >::const_iterator it = result2.begin(); it != result2.end(); ++it)
 			{
