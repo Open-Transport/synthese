@@ -40,7 +40,7 @@ namespace synthese
 			typedef RegistryWithNeutralElement<K, T>	Registry;
 
 			RegistrableWithNeutralElement()
-				: Registrable()
+				: Registrable<K,T>()
 			{
 
 			}
