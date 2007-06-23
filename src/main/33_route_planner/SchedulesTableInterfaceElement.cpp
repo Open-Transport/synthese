@@ -68,7 +68,7 @@ namespace synthese
 			}
 			else
 			{
-				const JourneyLeg* curET;
+				shared_ptr<JourneyLeg> curET;
 				size_t __Ligne;
 				const PlaceList placesList = getStopsListForScheduleTable( *jv );
 				DateTime lastDepartureDateTime;
@@ -94,7 +94,7 @@ namespace synthese
 						
 						// Saving of the columns on each lines
 						columnInterfacePage->display( *__Tampons[__Ligne]
-							, __Ligne == 0, true, i, dynamic_cast<const Road*> (curET->getServiceInstance().service->getPath ()) != NULL
+							, __Ligne == 0, true, i, dynamic_cast<const Road*> (curET->getServiceInstance().getService()->getPath ()) != NULL
 							, curET->getDepartureTime().getHour(), lastDepartureDateTime.getHour(), it->getContinuousServiceRange() > 0
 							, request );
 						
@@ -104,7 +104,7 @@ namespace synthese
 								, request );
 						
 						columnInterfacePage->display( *__Tampons[ __Ligne ] 
-							, true, l == it->getJourneyLegCount ()-1, i, dynamic_cast<const Road*> (curET->getServiceInstance().service->getPath ()) != NULL
+							, true, l == it->getJourneyLegCount ()-1, i, dynamic_cast<const Road*> (curET->getServiceInstance().getService()->getPath ()) != NULL
 							, curET->getArrivalTime ().getHour (), lastArrivalDateTime.getHour(), it->getContinuousServiceRange() > 0
 							, request );
 					}
@@ -312,14 +312,14 @@ namespace synthese
 		{
 			vector<bool> result;
 			int l = 0;
-			const JourneyLeg* curET = (l >= __TrajetATester.getJourneyLegCount ()) ? NULL : __TrajetATester.getJourneyLeg (l);
+			shared_ptr<JourneyLeg> curET((l >= __TrajetATester.getJourneyLegCount ()) ? shared_ptr<JourneyLeg>() : __TrajetATester.getJourneyLeg (l));
 			for (size_t i = 0; pl[ i ] != NULL && i <= LigneMax; i++ )
 			{
 				if ( curET != NULL && pl[ i ] == curET->getOrigin() ->getConnectionPlace() )
 				{
 					result.push_back(true);
 					++l;
-					curET = (l >= __TrajetATester.getJourneyLegCount ()) ? NULL : __TrajetATester.getJourneyLeg (l);
+					curET = (l >= __TrajetATester.getJourneyLegCount ()) ? shared_ptr<JourneyLeg>() : __TrajetATester.getJourneyLeg (l);
 				}
 				else
 				{
@@ -631,7 +631,7 @@ namespace synthese
 				// Vertical loop
 				for (int l = 0; l < it->getJourneyLegCount (); ++l)
 				{
-					const JourneyLeg * curET = it->getJourneyLeg (l);
+					shared_ptr<JourneyLeg> curET(it->getJourneyLeg(l));
 
 					// Search of the place from the preceding one
 					if ( OrdrePARechercheGare( pl, i, curET->getOrigin()->getConnectionPlace() ) )

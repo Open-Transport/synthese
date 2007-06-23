@@ -118,12 +118,13 @@ namespace synthese
 			ptr.setService(this);
 			Schedule schedule;
 			DateTime actualDateTime(presenceDateTime);
+			DateTime validityEndTime(presenceDateTime);
 			int edgeIndex(edge->getRankInPath());
 			
 			if (method == ServicePointer::DEPARTURE_TO_ARRIVAL)
 			{
 				schedule = _departureSchedules.at(edgeIndex).first;
-				if (_departureSchedules.at(edgeIndex).first.getHour() <= _departureSchedules.at(edgeIndex).second.getHour())
+				if (_departureSchedules.at(edgeIndex).first.getHour() > _departureSchedules.at(edgeIndex).second.getHour())
 				{
 					if (presenceDateTime.getHour() > _departureSchedules.at(edgeIndex).second.getHour())
 						return ServicePointer();
@@ -136,11 +137,12 @@ namespace synthese
 						&& presenceDateTime.getHour() < _departureSchedules.at(edgeIndex).first.getHour())
 						actualDateTime.setHour(schedule.getHour());
 				}
+				validityEndTime.setHour(_departureSchedules.at(edgeIndex).second.getHour());
 			}
 			else
 			{
 				schedule = _arrivalSchedules.at(edgeIndex).first;
-				if (_arrivalSchedules.at(edgeIndex).first.getHour() <= _arrivalSchedules.at(edgeIndex).second.getHour())
+				if (_arrivalSchedules.at(edgeIndex).first.getHour() > _arrivalSchedules.at(edgeIndex).second.getHour())
 				{
 					if (presenceDateTime.getHour() < _arrivalSchedules.at(edgeIndex).first.getHour())
 						return ServicePointer();
@@ -153,8 +155,10 @@ namespace synthese
 						&& presenceDateTime.getHour() > _arrivalSchedules.at(edgeIndex).first.getHour())
 						actualDateTime.setHour(_arrivalSchedules.at(edgeIndex).second.getHour());
 				}
+				validityEndTime.setHour(_arrivalSchedules.at(edgeIndex).first.getHour());
 			}
 			ptr.setActualTime(actualDateTime);
+			ptr.setValidityEndTime(validityEndTime);
 
 			// Origin departure time
 			DateTime originDateTime(actualDateTime);

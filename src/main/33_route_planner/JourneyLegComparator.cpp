@@ -29,6 +29,8 @@
 
 #include <assert.h>
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace env;
@@ -54,7 +56,7 @@ namespace synthese
 
 
 		int 
-		JourneyLegComparator::operator () (const JourneyLeg* jl1, const JourneyLeg* jl2) const
+		JourneyLegComparator::operator () (shared_ptr<JourneyLeg> jl1, shared_ptr<JourneyLeg> jl2) const
 		{
 
 			if (jl1->getSquareDistance () == 0) return true;
@@ -62,10 +64,10 @@ namespace synthese
 		    
 			if (jl1->getSquareDistance () == jl2->getSquareDistance ()) return false;
 
-			assert ((jl1->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
-			assert ((jl2->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
-
-			ConnectionPlace::ConnectionType type1 = 
+		//	assert ((jl1->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
+		//	assert ((jl2->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
+/// @todo Reactivate this code
+/*			ConnectionPlace::ConnectionType type1 = 
 				(jl1->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace ()
 					->getRecommendedConnectionType (jl1->getSquareDistance ());
 
@@ -74,7 +76,7 @@ namespace synthese
 					->getRecommendedConnectionType (jl2->getSquareDistance ());
 		    
 			if (type1 != type2)	return type2 - type1;
-
+*/
 			return (jl2->getSquareDistance () <= jl1->getSquareDistance ());
 		}
 

@@ -137,7 +137,7 @@ namespace synthese
 //			if (arrivalEdge == 0) return true;
 
 			// Initialization
-			const Edge*	fromEdge = serviceUse.getServicePointer()->getEdge();
+			const Edge*	fromEdge = serviceUse.getServicePointer().getEdge();
 			const Vertex* goalVertex = serviceUse.getEdge()->getFromVertex ();
 			const DateTime& goalDateTime = serviceUse.getActualDateTime();
 			SquareDistance sqd;
@@ -370,7 +370,7 @@ namespace synthese
 						  UseLines useLines,
 						  bool strictTime)
 		{
-			std::deque<JourneyLeg*> journeyPart;
+			JourneyLegs journeyPart;
 
 			// TODO : the whole other way depending on accessdirection !!
 			// What follows is in case TO_DESTINATION only
@@ -423,17 +423,16 @@ namespace synthese
 				    
 					if (serviceInstance.getService()->isContinuous () )
 					{
-						if ( departureMoment > edge->getDepartureEndSchedule (serviceNumber) )
+						/// @todo See if this case switch is necessary
+						if ( departureMoment > serviceInstance.getValidityDateTime())
 						{
 							continuousServiceRange = 
-							60*24 - ( departureMoment.getHour() - 
-							  edge->getDepartureEndSchedule (serviceNumber).getHour() );
+							60*24 - ( departureMoment - serviceInstance.getValidityDateTime());
 						}
 						else
 						{
 							continuousServiceRange = 
-							edge->getDepartureEndSchedule (serviceNumber).getHour() - 
-							departureMoment.getHour();
+							serviceInstance.getValidityDateTime() -	departureMoment;
 						}
 					}
 				    
@@ -456,20 +455,20 @@ namespace synthese
 							break;
 
 						shared_ptr<JourneyLeg> journeyLeg(new JourneyLeg(serviceInstance));
-						journeyLeg->setOrigin (departureEdge);
-						journeyLeg->setDestination (arrivalEdge);
-						journeyLeg->setDepartureTime (departureMoment);
-						journeyLeg->setArrivalTime (arrivalMoment);
+						journeyLeg->setOrigin (serviceUse.getDepartureEdge());
+						journeyLeg->setDestination (serviceUse.getArrivalEdge());
+						journeyLeg->setDepartureTime (serviceUse.getDepartureDateTime());
+						journeyLeg->setArrivalTime (serviceUse.getArrivalDateTime());
 						journeyLeg->setContinuousServiceRange (continuousServiceRange);
-						journeyLeg->setSquareDistance (sqd);
-
+						journeyLeg->setSquareDistance (0); /// @todo Compute the square distance
 						journeyPart.push_front (journeyLeg);
-						_bestArrivalVertexReachesMap.insert (arrivalVertex, journeyLeg);
 
-						if (_destinationVam.contains (arrivalVertex))
+						_bestArrivalVertexReachesMap.insert (serviceUse.getArrivalEdge()->getFromVertex(), journeyLeg);
+
+						if (_destinationVam.contains (serviceUse.getArrivalEdge()->getFromVertex()))
 						{
-							_maxArrivalTime = arrivalMoment;
-							_maxArrivalTime += _destinationVam.getVertexAccess (arrivalVertex).approachTime;
+							_maxArrivalTime = serviceUse.getArrivalDateTime();
+							_maxArrivalTime += _destinationVam.getVertexAccess (serviceUse.getArrivalEdge()->getFromVertex()).approachTime;
 						}
 
 
@@ -479,23 +478,20 @@ namespace synthese
 				
 			} // next vertex in vam
 
-			std::deque<JourneyLeg*> legs;
+			JourneyLegs legs;
 			while (journeyPart.empty () == false)
 			{
-				JourneyLeg* journeyLeg = journeyPart.front ();
+				shared_ptr<JourneyLeg> journeyLeg(journeyPart.front());
 				journeyPart.pop_front ();
 				
-				if (_destinationVam.contains (journeyLeg->getDestination ()->getFromVertex ()) ||
-					isVertexUseful (journeyLeg->getDestination ()->getFromVertex (),
-							journeyLeg->getArrivalTime (), 
-							accessDirection,
-							journeyLeg->getSquareDistance ()) )
-				{
+				if (_destinationVam.contains (journeyLeg->getDestination ()->getFromVertex ())
+/// @todo Reactivate this code
+		//			|| isVertexUseful (journeyLeg->getDestination ()->getFromVertex (),
+		//					journeyLeg->getArrivalTime (), 
+		//					accessDirection,
+		//					journeyLeg->getSquareDistance ()) 
+				){
 					legs.push_back (journeyLeg);
-				}
-				else
-				{ 
-					delete journeyLeg;
 				}
 			}
 			    
@@ -504,8 +500,7 @@ namespace synthese
 			Journeys result;
 
 			// Now iterate on each journey leg and call recursively the integral search
-			for (std::deque<JourneyLeg*>::const_iterator itLeg = legs.begin ();
-				 itLeg != legs.end (); ++itLeg)
+			for (JourneyLegs::const_iterator itLeg(legs.begin()); itLeg != legs.end (); ++itLeg)
 			{
 				const Vertex* nextVertex = (*itLeg)->getDestination ()->getFromVertex ();
 				VertexAccessMap nextVam;

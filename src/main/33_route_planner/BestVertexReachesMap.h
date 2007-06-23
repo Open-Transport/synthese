@@ -51,7 +51,7 @@ namespace synthese
 		{
 		 private:
 
-			typedef std::map<const synthese::env::Vertex*, JourneyLeg*> JourneyLegMap;
+			 typedef std::map<const synthese::env::Vertex*, boost::shared_ptr<JourneyLeg> > JourneyLegMap;
 			typedef std::map<const synthese::env::Vertex*, synthese::time::DateTime> TimeMap;
 		    
 			const AccessDirection _accessDirection;
@@ -79,7 +79,7 @@ namespace synthese
 			getBestTime (const synthese::env::Vertex* vertex, 
 					 const synthese::time::DateTime& defaultValue) const;
 
-			JourneyLeg* getBestJourneyLeg (const synthese::env::Vertex* vertex);
+			boost::shared_ptr<JourneyLeg> getBestJourneyLeg (const synthese::env::Vertex* vertex);
 
 			//@}
 
@@ -88,7 +88,7 @@ namespace synthese
 			//@{
 			void clear ();
 			void insert (const synthese::env::Vertex* vertex, 
-				 JourneyLeg* journeyLeg);
+				boost::shared_ptr<JourneyLeg> journeyLeg);
 		    
 			void insert (const synthese::env::Vertex* vertex, 
 				 const synthese::time::DateTime& dateTime,

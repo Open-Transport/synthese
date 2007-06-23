@@ -30,6 +30,8 @@
 
 #include <assert.h>
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace env;
@@ -65,7 +67,7 @@ namespace synthese
 
 
 		void 
-		BestVertexReachesMap::insert (const synthese::env::Vertex* vertex, JourneyLeg* journeyLeg)
+		BestVertexReachesMap::insert (const synthese::env::Vertex* vertex, shared_ptr<JourneyLeg> journeyLeg)
 		{
 			// Update journey leg map
 			// Implementation note : journey legs are reused and never re-allocated.
@@ -76,11 +78,11 @@ namespace synthese
 			// Update time map (replacement)
 			if (_accessDirection == TO_DESTINATION)
 			{
-			insert (vertex, journeyLeg->getArrivalTime ());
+				insert (vertex, journeyLeg->getArrivalTime ());
 			}
 			else
 			{
-			insert (vertex, journeyLeg->getDepartureTime ());
+				insert (vertex, journeyLeg->getDepartureTime ());
 			}
 		    
 		}    
@@ -171,10 +173,11 @@ namespace synthese
 
 
 
-		JourneyLeg*
+		shared_ptr<JourneyLeg>
 		BestVertexReachesMap::getBestJourneyLeg (const Vertex* vertex)
 		{
-			if (contains (vertex) == false) return 0;
+			if (contains (vertex) == false)
+				return shared_ptr<JourneyLeg>();
 			return _bestJourneyLegMap.find (vertex)->second;
 		}
 

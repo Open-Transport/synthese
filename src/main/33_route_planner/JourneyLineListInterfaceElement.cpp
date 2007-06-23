@@ -62,7 +62,7 @@ namespace synthese
 			// Fabrication de l'affichage
 			for (JourneyLegs::const_iterator it = journey->getJourneyLegs().begin(); it != journey->getJourneyLegs().end(); ++it)
 			{
-				const JourneyLeg* leg = *it;
+				shared_ptr<JourneyLeg> leg(*it);
 				if ( __AfficherLignesPied || !dynamic_cast<const Road*> (leg->getServiceInstance().getService()->getPath ()) )
 					lineMarkerInterfacePage->display(
 						stream

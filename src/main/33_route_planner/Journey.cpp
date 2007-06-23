@@ -39,6 +39,8 @@
 
 #include "01_util/Constants.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace env;
@@ -73,7 +75,7 @@ namespace synthese
 
 
 
-		const JourneyLeg* 
+		shared_ptr<JourneyLeg> 
 		Journey::getJourneyLeg (int index) const
 		{
 			return _journeyLegs.at (index);
@@ -82,15 +84,14 @@ namespace synthese
 
 
 
-		const 
-		JourneyLeg* Journey::getFirstJourneyLeg () const
+		shared_ptr<JourneyLeg> Journey::getFirstJourneyLeg () const
 		{
 			return getJourneyLeg (0);
 		}
 
 
 
-		const JourneyLeg* 
+		shared_ptr<JourneyLeg> 
 		Journey::getLastJourneyLeg () const
 		{
 			return getJourneyLeg (getJourneyLegCount () - 1);
@@ -134,7 +135,7 @@ namespace synthese
 
 
 		void 
-		Journey::prepend (const JourneyLeg* leg)
+		Journey::prepend (shared_ptr<JourneyLeg> leg)
 		{
 			_journeyLegs.push_front (leg);
 			_effectiveDuration += leg->getDuration ();
@@ -160,7 +161,7 @@ namespace synthese
 
 
 		void 
-		Journey::append (const JourneyLeg* leg)
+		Journey::append (shared_ptr<JourneyLeg> leg)
 		{
 			_journeyLegs.push_back (leg);
 			_effectiveDuration += leg->getDuration ();
@@ -194,7 +195,7 @@ namespace synthese
 		    
 			for (int i=0; i<getJourneyLegCount (); ++i)
 			{
-			const JourneyLeg* leg = getJourneyLeg (i);
+			shared_ptr<JourneyLeg> leg(getJourneyLeg (i));
 			bool legIsConnection = (i < getJourneyLegCount ()-1);
 
 				// -- Alarm on origin --
@@ -287,16 +288,15 @@ namespace synthese
 			if (_continuousServiceRange != UNKNOWN_VALUE) return _continuousServiceRange;
 
 			int continuousServiceRange = UNKNOWN_VALUE;
-			for (std::deque<const JourneyLeg*>::const_iterator it =  _journeyLegs.begin ();
-			 it != _journeyLegs.end (); ++it)
+			for (JourneyLegs::const_iterator it = _journeyLegs.begin();	it != _journeyLegs.end(); ++it)
 			{
-			const JourneyLeg* leg = *it;
-			if ( (continuousServiceRange == UNKNOWN_VALUE) ||
-				 (leg->getContinuousServiceRange () < continuousServiceRange) )
-			{
-				continuousServiceRange = leg->getContinuousServiceRange ();
-			}
-			if (continuousServiceRange == 0) break;
+				shared_ptr<JourneyLeg> leg(*it);
+				if ( (continuousServiceRange == UNKNOWN_VALUE) ||
+					 (leg->getContinuousServiceRange () < continuousServiceRange) )
+				{
+					continuousServiceRange = leg->getContinuousServiceRange ();
+				}
+				if (continuousServiceRange == 0) break;
 			}
 			return continuousServiceRange;
 		}
@@ -320,11 +320,7 @@ namespace synthese
 			_effectiveDuration = 0;
 			_transportConnectionCount = 0;
 			_distance = 0;
-			for (std::deque<const JourneyLeg*>::const_iterator itjl = _journeyLegs.begin ();
-			 itjl != _journeyLegs.end (); ++itjl)
-			{
-			delete (*itjl);
-			}
+			_journeyLegs.clear();
 		}
 
 

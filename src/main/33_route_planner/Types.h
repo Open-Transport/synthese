@@ -26,6 +26,8 @@
 #include <vector>
 #include <deque>
 
+#include <boost/shared_ptr.hpp>
+
 namespace synthese
 {
 	namespace env
@@ -42,8 +44,8 @@ namespace synthese
 			@{
 		*/
 
-		typedef std::vector<Journey>				Journeys;
-		typedef std::deque<const JourneyLeg*>		JourneyLegs;
+		typedef std::vector<Journey>						Journeys;
+		typedef std::deque<boost::shared_ptr<JourneyLeg> >	JourneyLegs;
 
 		typedef std::vector<const env::ConnectionPlace*>	JourneyBoardPlaces;
 

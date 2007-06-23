@@ -67,6 +67,7 @@ namespace synthese
 			//@{
 				const Service*				_service;
 				time::DateTime				_originDateTime;
+				time::DateTime				_validityEndTime;	// For continuous services
 				time::DateTime				_actualTime;
 				int							_serviceIndex;
 			//@}
@@ -81,15 +82,17 @@ namespace synthese
 				void	setService(const Service* service);
 				void	setOriginDateTime(const time::DateTime& dateTime);
 				void	setServiceIndex(int index);
+				void	setValidityEndTime(const time::DateTime& dateTime);
 			//@}
 
 			//! @name Getters
 			//@{
-				const Service*			getService()		const;
-				const time::DateTime&	getActualDateTime()	const;
-				const time::DateTime&	getOriginDateTime()	const;
-				DeterminationMethod		getMethod()			const;
-				int						getServiceIndex()	const;
+				const Service*			getService()			const;
+				const time::DateTime&	getActualDateTime()		const;
+				const time::DateTime&	getOriginDateTime()		const;
+				DeterminationMethod		getMethod()				const;
+				int						getServiceIndex()		const;
+				const time::DateTime&	getValidityDateTime()	const;
 			//@}
 
 			//! @name Queries

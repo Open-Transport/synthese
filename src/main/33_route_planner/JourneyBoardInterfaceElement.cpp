@@ -84,7 +84,7 @@ namespace synthese
 
 			for (JourneyLegs::const_iterator it = journey->getJourneyLegs().begin(); it != journey->getJourneyLegs().end(); ++it)
 			{
-				const JourneyLeg* leg = *it;
+				shared_ptr<JourneyLeg> leg(*it);
 
 				// LIGNE ARRET MONTEE Si premier point d'arr�t et si alerte
 				if (it == journey->getJourneyLegs().begin())

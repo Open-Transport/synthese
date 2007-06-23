@@ -91,10 +91,10 @@ namespace synthese
 			//@{
 				bool	empty()	const;
 				int getJourneyLegCount () const;
-				const JourneyLeg* getJourneyLeg (int index) const;
+				boost::shared_ptr<JourneyLeg> getJourneyLeg (int index) const;
 
-				const JourneyLeg* getFirstJourneyLeg () const;
-				const JourneyLeg* getLastJourneyLeg () const;
+				boost::shared_ptr<JourneyLeg> getFirstJourneyLeg () const;
+				boost::shared_ptr<JourneyLeg> getLastJourneyLeg () const;
 
 				const synthese::env::Edge* getOrigin() const;
 				const synthese::env::Edge* getDestination() const;
@@ -135,10 +135,10 @@ namespace synthese
 			//@{
 			void clear ();
 
-			void prepend (const JourneyLeg* leg);
+			void prepend (boost::shared_ptr<JourneyLeg> leg);
 			void prepend (const Journey& journey);
 
-			void append (const JourneyLeg* leg);
+			void append (boost::shared_ptr<JourneyLeg> leg);
 			void append (const Journey& journey);
 		    
 			//@}

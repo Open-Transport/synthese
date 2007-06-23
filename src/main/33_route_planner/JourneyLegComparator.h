@@ -53,7 +53,7 @@ namespace synthese
 			JourneyLegComparator (const AccessDirection& accessDirection);
 			~JourneyLegComparator ();
 
-			int operator () (const JourneyLeg* jl1, const JourneyLeg* jl2) const;
+			int operator () (boost::shared_ptr<JourneyLeg> jl1, boost::shared_ptr<JourneyLeg> jl2) const;
 		    
 		};
 	}
