@@ -69,7 +69,7 @@ namespace synthese
 		void 
 		BestVertexReachesMap::insert (const synthese::env::Vertex* vertex, shared_ptr<JourneyLeg> journeyLeg)
 		{
-			_bestJourneyLegMap.insert (std::make_pair (vertex, journeyLeg));
+			_bestJourneyLegMap[vertex] = journeyLeg;
 
 			// Update time map (replacement)
 			if (_accessDirection == TO_DESTINATION)
@@ -95,21 +95,21 @@ namespace synthese
 
 			if (itc == _bestTimeMap.end ()) 
 			{
-			_bestTimeMap.insert (std::make_pair (vertex, bestTime));
+				_bestTimeMap.insert (std::make_pair (vertex, bestTime));
 			}
 			else
 			{
-			// TODO : rename FROM_ORIGIN into TOWARD_ORIGIN
-			// TODO : rename TO_DESTINATION into TOWARD_DESTINATION
-			if ( (_accessDirection == TO_DESTINATION) && (bestTime < itc->second) ||
-				 (_accessDirection == FROM_ORIGIN) && (bestTime > itc->second) )
-			{
-				itc->second = bestTime;
-			}
-			else
-			{
-				bestTime = itc->second;
-			}
+				// TODO : rename FROM_ORIGIN into TOWARD_ORIGIN
+				// TODO : rename TO_DESTINATION into TOWARD_DESTINATION
+				if ( (_accessDirection == TO_DESTINATION) && (bestTime < itc->second) ||
+					 (_accessDirection == FROM_ORIGIN) && (bestTime > itc->second) )
+				{
+					itc->second = bestTime;
+				}
+				else
+				{
+					bestTime = itc->second;
+				}
 			}
 
 			if (propagateInConnectionPlace)
