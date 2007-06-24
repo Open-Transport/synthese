@@ -69,10 +69,6 @@ namespace synthese
 		void 
 		BestVertexReachesMap::insert (const synthese::env::Vertex* vertex, shared_ptr<JourneyLeg> journeyLeg)
 		{
-			// Update journey leg map
-			// Implementation note : journey legs are reused and never re-allocated.
-			// Thus the insertion happens only once
-			assert (contains (vertex) == false);
 			_bestJourneyLegMap.insert (std::make_pair (vertex, journeyLeg));
 
 			// Update time map (replacement)

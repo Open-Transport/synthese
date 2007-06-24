@@ -447,7 +447,7 @@ namespace synthese
 					: (&Edge::getFollowingConnectionArrival);
 					
 					for (const Edge* curEdge = (edge->*step) ();
-					 curEdge != 0; curEdge = (edge->*step) ())
+					 curEdge != 0; curEdge = (curEdge->*step) ())
 					{
 						ServiceUse serviceUse(serviceInstance, curEdge);
 					
