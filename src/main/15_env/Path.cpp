@@ -182,21 +182,27 @@ namespace synthese
 
 		void Path::addEdge (Edge* edge)
 		{
-			if (_edges.empty() == false)
+			if (!_edges.empty())
 			{
 				_edges.back ()->setNextInPath (edge);
 			
 				// Chaining departure/arrival
-				for ( std::vector<Edge*>::reverse_iterator riter = _edges.rbegin();
-				( riter != _edges.rend() )
-				&& (
-					(( *riter )->getFollowingConnectionArrival () == 0) ||
-					(( *riter )->getFollowingArrivalForFineSteppingOnly () == 0) ||
-					(edge->getPreviousDepartureForFineSteppingOnly () == 0) ||
-					(edge->getPreviousConnectionDeparture () == 0)
+				AddressablePlace::ConnectionType neededConnectionTypeToStep(
+					edge->getParentPath ()->isRoad ()
+					? AddressablePlace::CONNECTION_TYPE_ROADROAD 
+					: AddressablePlace::CONNECTION_TYPE_LINELINE
 					);
-				++riter )
-				{
+
+				for ( std::vector<Edge*>::reverse_iterator riter = _edges.rbegin();
+					( riter != _edges.rend() )
+					&& (
+						(( *riter )->getFollowingConnectionArrival () == 0) ||
+						(( *riter )->getFollowingArrivalForFineSteppingOnly () == 0) ||
+						(edge->getPreviousDepartureForFineSteppingOnly () == 0) ||
+						(edge->getPreviousConnectionDeparture () == 0)
+						);
+					++riter
+				){
 					Edge* currentEdge = *riter;
 		         
 					/* TODO : Check later on if the following block should be re-introduced
@@ -207,44 +213,39 @@ namespace synthese
 					(currentEdge->getType () != edge->getType ()) ) continue;
 					*/
 				    
-					// Chain following arrivals
-					if ( currentEdge->getFollowingArrivalForFineSteppingOnly () == 0 && 
-					edge->isArrival () )
+					if (edge->isArrival())
 					{
-						currentEdge->setFollowingArrivalForFineSteppingOnly (edge);
-					}
+						// Chain following arrivals
+						if( currentEdge->getFollowingArrivalForFineSteppingOnly () == NULL)
+						{
+							currentEdge->setFollowingArrivalForFineSteppingOnly (edge);
+						}
 
-					// Chain following connecting arrivals
-					if ( (currentEdge->getFollowingConnectionArrival () == 0) && 
-					edge->getFromVertex ()->getPlace ()->getConnectionType () >= 
-					(currentEdge->getParentPath ()->isRoad ()
-					? AddressablePlace::CONNECTION_TYPE_ROADROAD 
-					: AddressablePlace::CONNECTION_TYPE_LINELINE ) )
-					{
-						currentEdge->setFollowingConnectionArrival (edge);
-					} 
+						// Chain following connecting arrivals
+						if(	currentEdge->getFollowingConnectionArrival () == NULL
+							&& edge->getFromVertex ()->getPlace ()->getConnectionType () >= neededConnectionTypeToStep
+						){
+							currentEdge->setFollowingConnectionArrival (edge);
+						} 
+					}
 
 
 					// Chain previous departures
-					if ( currentEdge->isDeparture () && 
-					edge->getPreviousDepartureForFineSteppingOnly () == 0 )
-					{   
-						edge->setPreviousDepartureForFineSteppingOnly (currentEdge);
-					}
-
-
-					// Chain previous connecting departures
-					if ( currentEdge->isDeparture () && 
-					(edge->getPreviousConnectionDeparture () == 0) && 
-					currentEdge->getFromVertex ()->getPlace ()->getConnectionType () >= 
-					(edge->getParentPath ()->isRoad () 
-					? AddressablePlace::CONNECTION_TYPE_ROADROAD 
-					: AddressablePlace::CONNECTION_TYPE_LINELINE ) )
+					if (currentEdge->isDeparture ())
 					{
-						edge->setPreviousConnectionDeparture (currentEdge);
+						if (edge->getPreviousDepartureForFineSteppingOnly () == NULL)
+						{   
+							edge->setPreviousDepartureForFineSteppingOnly (currentEdge);
+						}
+
+						// Chain previous connecting departures
+						if(	edge->getPreviousConnectionDeparture () == NULL
+							&& currentEdge->getFromVertex ()->getPlace ()->getConnectionType () >= neededConnectionTypeToStep
+						){
+							edge->setPreviousConnectionDeparture (currentEdge);
+						}
 					}
 				}
-
 			}
 
 			_edges.push_back( edge );

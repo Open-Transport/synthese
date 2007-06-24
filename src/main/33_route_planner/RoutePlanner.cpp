@@ -643,7 +643,8 @@ namespace synthese
 									const VertexAccessMap& dvam)
 		{
 			_bestArrivalVertexReachesMap.clear ();
-
+			_maxArrivalTime = _journeySheetEndTime;
+			_maxArrivalTime.addDaysDuration(7);	/// @todo Replace 7 by a parameter
 		    
 			for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = dvam.getMap ().begin ();
 			 itVertex != dvam.getMap ().end (); ++itVertex)

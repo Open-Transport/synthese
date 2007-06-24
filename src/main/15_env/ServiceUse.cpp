@@ -21,6 +21,7 @@
 */
 
 #include "ServiceUse.h"
+#include "Service.h"
 
 namespace synthese
 {
@@ -31,8 +32,8 @@ namespace synthese
 		ServiceUse::ServiceUse( const ServicePointer& servicePointer, const Edge* edge)
 			: _servicePointer(servicePointer)
 			, _edge(edge)
+			, _actualDateTime(servicePointer.getService()->getLeaveTime(servicePointer, edge))
 		{
-			
 		}
 
 		const env::Edge* ServiceUse::getDepartureEdge() const
