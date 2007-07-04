@@ -40,6 +40,7 @@
 
 #include "02_db/SQLiteUpdateHook.h"
 #include "02_db/SQLiteResult.h"
+#include "02_db/SQLite.h"
 
 namespace synthese
 {
@@ -96,8 +97,12 @@ namespace synthese
 			//! @name Query methods.
 			//@{
 			bool hasEnqueuedEvent () const;
-			//@}
 
+			/* Returns whether or not the thread calling this function is
+			   the SQLite queue thread.
+			*/
+			bool insideSQLiteQueueThread () const;
+			//@}
 
 			//! @name Update methods.
 			//@{
@@ -115,6 +120,18 @@ namespace synthese
 			//@{
 			SQLiteResult execQuery (const std::string& sql) const;
 			void execUpdate (const std::string& sql, bool asynchronous = false) const;
+			
+			/* Begins an exclusive transaction on the SQLite db. Exclusive means no read nor write
+			   until the transaction is commited. If exclusive is false, it means that read is still
+			   possible before the transaction is completed.
+			*/
+			void beginTransaction (bool exclusive = false);
+			void commitTransaction ();
+			
+			SQLiteStatement prepareStatement (const std::string& sql);
+			void finalizeStatement (const SQLiteStatement& statement);
+
+
 			//@}
 
 

@@ -50,7 +50,7 @@ class Exception : public std::exception
     Exception ( const std::string& message ) throw ();
     Exception ( const Exception& ref );
 
-    ~Exception () throw ();
+    virtual ~Exception () throw ();
     
 
     //! @name Getters/Setters

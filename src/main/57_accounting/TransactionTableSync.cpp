@@ -84,7 +84,7 @@ namespace synthese
 				}
 				else
 				{
-					t->setKey(getId(1,1));	/// @todo Handle grid
+					t->setKey(getId());	/// @todo Handle grid
 					query << "INSERT INTO " << TABLE_NAME << " VALUES("
 						<< Conversion::ToString(t->getKey())
 						<< "," << Conversion::ToSQLiteString(t->getName())

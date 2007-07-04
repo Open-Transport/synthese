@@ -69,7 +69,7 @@ class ThreadExec
     virtual void loop () = 0;
     virtual void finalize ();
 
-    void loop (int nbLoops);
+    void loops (int nbLoops = 5);
 
  private:
     

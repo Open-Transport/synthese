@@ -27,7 +27,6 @@
 #include <string>
 
 #include "01_util/Registrable.h"
-#include "ReservationRuleComplyer.h"
 
 
 namespace synthese

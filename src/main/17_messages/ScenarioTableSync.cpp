@@ -81,13 +81,13 @@ namespace synthese
 			if (tobject)
 			{
 				if (tobject->getKey() <= 0)
-					tobject->setKey(getId(1,1));
+					tobject->setKey(getId());
 			}
 			SentScenario* sobject = dynamic_cast<SentScenario*>(object);
 			if (sobject)
 			{
 				if (sobject->getKey() <= 0)
-					sobject->setKey(getId(1,1));
+					sobject->setKey(getId());
 			}
 
             query

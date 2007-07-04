@@ -55,6 +55,19 @@ namespace synthese
 		class Fare;
 		class Point;
 
+		struct cmpService
+		{
+		    bool operator() (const Service* s1, const Service* s2) const
+			{
+			    return (s1->getDepartureSchedule () < s2->getDepartureSchedule ())
+				|| (s1->getDepartureSchedule () == s2->getDepartureSchedule ()
+				    && s1 < s2)						
+				;
+			}
+		};
+
+		typedef std::set<Service*, cmpService> ServiceSet;
+
 		/** Path abstract base class.
 
 			A path is a sequence of edges.
@@ -78,20 +91,9 @@ namespace synthese
 
 		private:
 
-			struct cmpService
-			{
-				bool operator() (const Service* s1, const Service* s2) const
-				{
-					return (s1->getDepartureSchedule () < s2->getDepartureSchedule ())
-						|| (s1->getDepartureSchedule () == s2->getDepartureSchedule ()
-						&& s1 < s2)						
-						;
-				}
-			};
 
 		public:
 
-			typedef std::set<Service*, cmpService> ServiceSet;
 			typedef std::vector<Edge*> Edges;
 
 		protected:

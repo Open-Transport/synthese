@@ -68,6 +68,7 @@ namespace synthese
 			public Path
 		{
 		private:
+
 			const Axis*				_axis;
 			const CommercialLine*	_commercialLine;
 		    

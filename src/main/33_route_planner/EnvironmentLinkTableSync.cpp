@@ -56,7 +56,7 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<SiteCommercialLineLink>::save(SiteCommercialLineLink* obj)
 		{
 			if (!obj->getKey())
-				obj->setKey(getId(1,1));
+				obj->setKey(getId());
 			stringstream query;
 			query << " REPLACE INTO " << TABLE_NAME << " VALUES("
 				<< Conversion::ToString(obj->getKey())

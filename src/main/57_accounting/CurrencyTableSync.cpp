@@ -64,7 +64,7 @@ namespace synthese
 			}
 			else
 			{
-				currency->setKey(getId(1,1));
+				currency->setKey(getId());
                 query
 					<< " INSERT INTO " << TABLE_NAME << " VALUES("
 					<< Conversion::ToString(currency->getKey())

@@ -94,7 +94,7 @@ namespace synthese
 			stringstream query;
 
 			if (object->getKey() <= 0)
-				object->setKey(getId(1,1));
+				object->setKey(getId());
 
 			query
 				<< " REPLACE INTO " << TABLE_NAME << " VALUES("

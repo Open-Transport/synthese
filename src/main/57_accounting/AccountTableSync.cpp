@@ -75,7 +75,7 @@ namespace synthese
 			stringstream query;
 			if (account->getKey() == 0)
 			{
-				account->setKey(getId(1,1));
+				account->setKey(getId());
 				query
 					<< " INSERT INTO " << TABLE_NAME << " VALUES("
 					<< Conversion::ToString(account->getKey())

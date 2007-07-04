@@ -55,13 +55,18 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<CommercialLine>::load(CommercialLine* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			object->setName(rows.getColumn(rowId, CommercialLineTableSync::COL_NAME));
-			object->setShortName(rows.getColumn(rowId, CommercialLineTableSync::COL_SHORT_NAME));
-			object->setLongName(rows.getColumn(rowId, CommercialLineTableSync::COL_LONG_NAME));
-			object->setColor(RGBColor(rows.getColumn(rowId, CommercialLineTableSync::COL_COLOR)));
-			object->setStyle(rows.getColumn(rowId, CommercialLineTableSync::COL_STYLE));
-			object->setImage(rows.getColumn(rowId, CommercialLineTableSync::COL_IMAGE));
+		    object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+
+		    boost::shared_ptr<const TransportNetwork> tn = 
+			EnvModule::getTransportNetworks ().get (Conversion::ToLongLong(rows.getColumn(rowId, CommercialLineTableSync::COL_NETWORK_ID)));
+		    
+		    object->setNetwork (tn.get ());
+		    object->setName(rows.getColumn(rowId, CommercialLineTableSync::COL_NAME));
+		    object->setShortName(rows.getColumn(rowId, CommercialLineTableSync::COL_SHORT_NAME));
+		    object->setLongName(rows.getColumn(rowId, CommercialLineTableSync::COL_LONG_NAME));
+		    object->setColor(RGBColor(rows.getColumn(rowId, CommercialLineTableSync::COL_COLOR)));
+		    object->setStyle(rows.getColumn(rowId, CommercialLineTableSync::COL_STYLE));
+		    object->setImage(rows.getColumn(rowId, CommercialLineTableSync::COL_IMAGE));
 		}
 
 		template<> void SQLiteTableSyncTemplate<CommercialLine>::save(CommercialLine* object)
@@ -77,7 +82,7 @@ namespace synthese
 			}
 			else
 			{
-				object->setKey(getId(1,1));
+				object->setKey(getId());
                 query
 					<< " INSERT INTO " << TABLE_NAME << " VALUES("
 					<< Conversion::ToString(object->getKey())

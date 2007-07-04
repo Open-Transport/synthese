@@ -71,7 +71,7 @@ namespace synthese
 
 			PhysicalStopsSet _physicalStops; 
 
-			std::map< std::pair<uid, uid>, int > _transferDelays; //!< Transfer delays between vertices
+			std::map< std::pair<uid, uid>, int > _transferDelays; //!< Transfer delays between vertices (in minutes)
 			int _defaultTransferDelay;
 			int _minTransferDelay;
 			int _maxTransferDelay;
@@ -135,6 +135,7 @@ namespace synthese
 							bool returnPhysicalStops = true) const;
 
 				std::vector<std::pair<uid, std::string> >	getPhysicalStopLabels(bool withAll = false) const;
+
 				/** Labels list for select field containing physical stops, with exclusion list.
 					@param noDisplay Physical stops to exclude
 					@return Labels list for select field containing physical stops

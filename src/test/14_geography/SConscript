@@ -1,0 +1,9 @@
+Import ('testenv')
+
+modules = ['14_geography', '06_geometry'];
+
+unittestenv = testenv.UnitTestEnv (modules)
+unittestenv.UnitTest ()
+
+
+

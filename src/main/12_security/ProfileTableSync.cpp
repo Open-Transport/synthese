@@ -67,7 +67,7 @@ namespace synthese
 			{
 				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 				if (profile->getKey() <= 0)
-					profile->setKey(getId(1,1));	/// @todo handle grid id
+					profile->setKey(getId());
 				
 				stringstream query;
 				query

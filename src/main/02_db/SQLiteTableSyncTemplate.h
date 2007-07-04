@@ -34,6 +34,7 @@
 #include "01_util/Log.h"
 
 #include "02_db/DBModule.h"
+#include "02_db/DbModuleClass.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/DBEmptyResultException.h"
 #include "02_db/SQLiteException.h"
@@ -61,11 +62,11 @@ namespace synthese
 
 			static boost::shared_ptr<boost::mutex> _idMutex; 
 
-			static uid encodeUId (int gridId, int gridNodeId, long objectId);
+			static uid encodeUId (long objectId);
 
 			/** Unique ID getter for autoincremented tables.
 			*/
-			static uid getId(int gridId, int gridNodeId);
+			static uid getId();
 
 			SQLiteTableSyncTemplate(
 				bool allowInsert = true, 
@@ -150,7 +151,7 @@ namespace synthese
 			int SQLiteTableSyncTemplate<T>::_autoIncrementValue(1); 
 
 		template <class T>
-			uid SQLiteTableSyncTemplate<T>::getId( int gridId, int gridNodeId )
+			uid SQLiteTableSyncTemplate<T>::getId()
 		{			
 			boost::mutex::scoped_lock mutex(*_idMutex);
 
@@ -160,15 +161,23 @@ namespace synthese
 			//	int retval = it->second++;
 			int retval = _autoIncrementValue++;
 
-			return encodeUId(gridId, gridNodeId, retval);
+			return encodeUId(retval);
 		}
 
 
 		template <class T>
-			uid SQLiteTableSyncTemplate<T>::encodeUId (int gridId, int gridNodeId, long objectId)
+			uid SQLiteTableSyncTemplate<T>::encodeUId (long objectId)
 		{
-			return synthese::util::encodeUId (TABLE_ID, gridId, gridNodeId, objectId);
+		    // TODO : plenty of functions should be at SQLiteTableSync level directly.
+		    // default value is 1 for compatibility
+		    static int nodeId = Conversion::ToInt (DbModuleClass::GetParameter ("dbring_node_id", "1"));
+			return synthese::util::encodeUId (TABLE_ID, 
+							  1, // TODO : remove grid id, deprecated with ring nodes
+							  nodeId, 
+							  objectId);
 		}
+
+
 
 		template <class T>
 			void SQLiteTableSyncTemplate<T>::initAutoIncrement()
@@ -180,14 +189,20 @@ namespace synthese
 					const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 					std::stringstream query;
 					query
-					    << "SELECT " << util::Conversion::ToString((uid) 0x00000000FFFFFFFFLL) << " & MAX(id) AS maxid FROM " << TABLE_NAME
-					    << " WHERE (id & " << util::Conversion::ToString((uid) 0xFFFFFFFF00000000LL) << ") = " << util::Conversion::ToString(encodeUId(1, 1, 0)); /// @todo GRID and NODEGRID to be replaced by the correct values
+					    << "SELECT " << util::Conversion::ToString((uid) 0x00000000FFFFFFFFLL) 
+					    << " & MAX(id) AS maxid FROM " << TABLE_NAME
+					    << " WHERE (id & " << util::Conversion::ToString((uid) 0xFFFFFFFF00000000LL) << ") = " 
+					    << util::Conversion::ToString(encodeUId(0)); 
+
+/// @todo GRID and NODEGRID to be replaced by the correct values
+
 
 					SQLiteResult result = sqlite->execQuery(query.str());
+					uid maxid = util::Conversion::ToLongLong(result.getColumn(0, "maxid"));
 
 					if (result.getNbRows() > 0 && util::Conversion::ToLongLong(result.getColumn(0, "maxid")) > 0)
 					{
-					    _autoIncrementValue = util::decodeObjectId(util::Conversion::ToLongLong(result.getColumn(0, "maxid"))) + 1;
+					    _autoIncrementValue = util::decodeObjectId(maxid) + 1;
 					}
 					
 				}

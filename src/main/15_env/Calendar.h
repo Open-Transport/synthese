@@ -6,6 +6,7 @@
 #include "04_time/Date.h"
 
 #include <boost/dynamic_bitset.hpp>
+#include <vector>
 
 
 namespace synthese
@@ -85,14 +86,15 @@ namespace synthese
 			//! @name Query methods
 			//@{
 			int getNbMarkedDates () const;
-			bool isMarked (synthese::time::Date date) const;
+			bool isMarked (time::Date date) const;
+			std::vector<time::Date> getMarkedDates () const;
 			//@}
 
 
 
 			//! @name Update methods
 			//@{
-			void mark (synthese::time::Date date, bool state = true);
+			void mark (time::Date date, bool state = true);
 
 			//@}
 
@@ -113,10 +115,10 @@ namespace synthese
 			void updateFirstMark ();
 			void updateLastMark ();
 
-			static synthese::time::Date DateAfter (synthese::time::Date date, unsigned int nbBits);
-			static synthese::time::Date DateBefore (synthese::time::Date date, unsigned int nbBits);
+			static time::Date DateAfter (time::Date date, unsigned int nbBits);
+			static time::Date DateBefore (time::Date date, unsigned int nbBits);
 
-			static int NbBitsBetweenDates (synthese::time::Date date1, synthese::time::Date date2);
+			static int NbBitsBetweenDates (time::Date date1, time::Date date2);
 
 
 		};

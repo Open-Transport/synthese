@@ -112,26 +112,85 @@ SQLite::ExecQuery (sqlite3* connection, const std::string& sql)
     // Log::GetInstance ().debug ("Executing SQLite query " + sql);
     SQLiteResult result;
     char* errMsg = 0;
-	int retc;
-	try {
-		retc = sqlite3_exec (connection, 
-					sql.c_str (), 
-					&sqlite_callback, 
-					&result, &errMsg);
-	}
-	catch(...){
-		throw SQLiteException("Unknown problem in query "+ sql);
-	}
+    int retc;
+    try {
+	retc = sqlite3_exec (connection, 
+			     sql.c_str (), 
+			     &sqlite_callback, 
+			     &result, &errMsg);
+    }
+    catch(...){
+	throw SQLiteException("Unknown problem in query "+ sql);
+    }
     if (retc != SQLITE_OK)
     {
-		std::string msg (errMsg);
-		sqlite3_free (errMsg);
-		throw SQLiteException ("Error executing query \"" + sql + " : " + 
-					msg + "\" (error=" + Conversion::ToString (retc) + ")");
+	std::string msg (errMsg);
+	sqlite3_free (errMsg);
+	throw SQLiteException ("Error executing query \"" + sql + " : " + 
+			       msg + "\" (error=" + Conversion::ToString (retc) + ")");
     }
     // Log::GetInstance ().debug ("Query successful (" + Conversion::ToString (result.getNbRows ()) + " rows).");
     return result;
 }
+
+
+
+void 
+SQLite::BeginTransaction (sqlite3* connection, bool exclusive)
+{
+    std::string sql ("BEGIN ");
+    // Note : we prefer not to use the DEFERRED sqlite mode right now...  
+    sql += exclusive ? "EXCLUSIVE" : "IMMEDIATE";
+    ExecUpdate (connection, sql);
+}
+    
+	    
+void 
+SQLite::CommitTransaction (sqlite3* connection)
+{
+    ExecUpdate (connection, "COMMIT");
+}
+    
+
+
+
+SQLiteStatement 
+SQLite::PrepareStatement (sqlite3* connection, const std::string& sql)
+{
+    
+    sqlite3_stmt* stmt;
+    int retc = sqlite3_prepare_v2 (connection, sql.c_str (), sql.length (), &stmt, 0);
+
+    if (retc != SQLITE_OK)
+    {
+	throw SQLiteException ("Error compiling \"" + sql + "\" (error=" + Conversion::ToString (retc) + ")");
+    }
+    return stmt;
+}
+
+
+
+
+
+void 
+SQLite::FinalizeStatement (const SQLiteStatement& statement)
+{
+    int retc = sqlite3_finalize (statement);
+
+    if (retc != SQLITE_OK)
+    {
+	throw SQLiteException ("Error while finalizing statement (error=" + Conversion::ToString (retc) + ")");
+    }
+    
+}
+
+
+
+
+
+
+
+
 
 
 

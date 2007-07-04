@@ -25,9 +25,7 @@
 #include "01_util/Thread.h"
 #include "01_util/Factory.h"
 
-#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
-#include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteTableSync.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 
@@ -49,10 +47,7 @@ namespace synthese
 	namespace db
 	{
 
-		boost::mutex eventQueueMutex; 
-		    
-
-
+//		boost::mutex eventQueueMutex; 
 
 		void sqliteUpdateHook (void* userData, int opType, const char* dbName, const char* tbName, sqlite_int64 rowId)
 		{
@@ -161,6 +156,14 @@ namespace synthese
 
 
 
+	    bool 
+	    SQLiteQueueThreadExec::insideSQLiteQueueThread () const
+	    {
+		boost::thread currentThread;
+		return ((*_initThread) == currentThread) ;
+	    }
+
+
 		void
 		SQLiteQueueThreadExec::initialize()
 		{
@@ -252,10 +255,9 @@ namespace synthese
 
 		    if (asynchronous == false) 
 		    {
-			boost::thread currentThread;
-			if ((*_initThread) == currentThread) 
+			if (insideSQLiteQueueThread ()) 
 			{
-			    // We are in the "looping" thread 
+			    // We are in the "queue" thread 
 			    // (because running monothreaded or in a unit test)
 			    // So, just loop once to ensure the events are consumed.
 			    ((SQLiteQueueThreadExec*) this)->loop ();
@@ -269,6 +271,38 @@ namespace synthese
 			}
 		    }
 		}
+	    
+	    
+	    void 
+	    SQLiteQueueThreadExec::beginTransaction (bool exclusive)
+	    {
+		SQLite::BeginTransaction (_db, exclusive);
+	    }
+	    
+
+	    
+	    void 
+	    SQLiteQueueThreadExec::commitTransaction ()
+	    {
+		SQLite::CommitTransaction (_db);
+	    }
+
+
+	    
+	    SQLiteStatement 
+	    SQLiteQueueThreadExec::prepareStatement (const std::string& sql)
+	    {
+		SQLite::PrepareStatement (_db, sql);
+	    }
+
+
+	    void 
+	    SQLiteQueueThreadExec::finalizeStatement (const SQLiteStatement& statement)
+	    {
+		SQLite::FinalizeStatement (statement);
+	    }
+
+	    
 	}
 }
 

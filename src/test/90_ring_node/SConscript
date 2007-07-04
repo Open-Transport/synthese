@@ -1,0 +1,11 @@
+
+Import ('testenv')
+
+modules = ['03_db_ring', '02_db', '01_util', '00_tcp'];
+
+
+syntheseenv = testenv.SyntheseEnv (modules)
+
+syntheseenv.Program (syntheseenv.DefaultModuleName (), 'main.cpp')
+
+

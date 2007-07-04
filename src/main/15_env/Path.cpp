@@ -57,7 +57,7 @@ namespace synthese
 
 
 
-		const Path::ServiceSet& 
+		const ServiceSet& 
 		Path::getServices () const
 		{
 			return _services;

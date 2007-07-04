@@ -27,6 +27,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "01_util/Constants.h"
 #include "01_util/RegistryKeyException.h"
 #include "01_util/Constants.h"
 

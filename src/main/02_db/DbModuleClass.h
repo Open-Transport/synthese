@@ -41,7 +41,8 @@ namespace synthese
 		    static void SetDatabasePath (const boost::filesystem::path& databasePath);
 		    
 		    static bool HasParameter (const std::string& name);
-		    static std::string GetParameter (const std::string& name);
+		    static std::string GetParameter (const std::string& name, 
+						     const std::string defaultValue = "");
 		    static void SetParameter (const std::string& name, 
 					      const std::string& value);
 		    

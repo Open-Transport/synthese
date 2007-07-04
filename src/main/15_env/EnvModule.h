@@ -24,6 +24,7 @@
 #define SYNTHESE_EnvModule_H__
 
 #include <vector>
+#include <set>
 #include <utility>
 
 #include "01_util/ModuleClass.h"
@@ -31,6 +32,7 @@
 #include "07_lex_matcher/LexicalMatcher.h"
 
 #include "15_env/Address.h"
+#include "15_env/Path.h"
 #include "15_env/PlaceAlias.h"
 #include "15_env/PublicPlace.h"
 #include "15_env/City.h"
@@ -357,8 +359,11 @@ namespace synthese
 			static boost::shared_ptr<const Place> fetchPlace (const uid& id);
 
 
-			static boost::shared_ptr<const Vertex> fetchVertex (const uid& id);
-			//Vertex* fetchVertex (const uid& id);
+ 		        static boost::shared_ptr<const Vertex> fetchVertex (const uid& id);
+
+			/** Retrieves all lines associated withb a given commercial line id.
+			 */
+			static LineSet fetchLines (const uid& commercialLineId);
 
 			static CityList guessCity (const std::string& fuzzyName, int nbMatches = 10);
 			synthese::lexmatcher::LexicalMatcher<uid>& getCitiesMatcher ();

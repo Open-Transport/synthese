@@ -103,6 +103,7 @@ TcpService::closeService (int portNumber)
 TcpServerSocket*
 TcpService::acceptConnection () 
 {
+    if (_socket == 0) throw SocketException ("Socket not ready !");
     try 
     {
 	int socketId = _socket->acceptConnection ();

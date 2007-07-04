@@ -62,7 +62,7 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<VinciBike>::save(VinciBike* bike)
 		{
 			if (bike->getKey() <= 0)
-				bike->setKey(getId(1,1)); /// @todo Handle grid number
+				bike->setKey(getId()); /// @todo Handle grid number
 
 			stringstream query;
 			query << "REPLACE INTO " << TABLE_NAME << " VALUES("

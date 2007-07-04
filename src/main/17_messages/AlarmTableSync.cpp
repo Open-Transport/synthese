@@ -92,7 +92,7 @@ namespace synthese
 			if (sobject)
 			{
 				if (sobject->getKey() <= 0)
-					sobject->setKey(getId(1,1));
+				    sobject->setKey(getId());
 				query
 					<< " REPLACE INTO " << TABLE_NAME << " VALUES("
 					<< Conversion::ToString(sobject->getKey())
@@ -109,7 +109,7 @@ namespace synthese
 			else if (gobject)
 			{
 				if (!gobject->getKey())
-					gobject->setKey(getId(1,1));
+					gobject->setKey(getId());
 				query
 					<< " REPLACE INTO " << TABLE_NAME << " VALUES("
 					<< Conversion::ToString(gobject->getKey())
@@ -126,7 +126,7 @@ namespace synthese
 			else if (tobject)
 			{
 				if (!tobject->getKey())
-					tobject->setKey(getId(1,1));
+					tobject->setKey(getId());
 			
 				query
 					<< " REPLACE INTO " << TABLE_NAME << " VALUES("

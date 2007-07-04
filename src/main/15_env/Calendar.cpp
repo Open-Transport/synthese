@@ -50,6 +50,20 @@ namespace synthese
 
 
 
+	std::vector<time::Date> 
+	Calendar::getMarkedDates () const
+	{
+	    std::vector<time::Date> result;
+	    if (_firstMarkedDate == Date::UNKNOWN_DATE) return result;
+	    
+	    for (time::Date d = _firstMarkedDate; d <= _lastMarkedDate; d++)
+	    {
+		if (isMarked (d)) result.push_back (d);
+	    }
+	    return result;
+	}
+
+
 	bool 
 	Calendar::isMarked (synthese::time::Date date) const
 	{

@@ -77,7 +77,8 @@ namespace synthese
 		ManagedThread* sqliteQueueThread = 
 		    new ManagedThread (_sqliteQueueThreadExec, "sqlite_queue", 100, autorespawn);
 		
-		
+
+		/*
 		synthese::tcp::TcpService* service = 
 		    synthese::tcp::TcpService::openService (sqliteServicePort);
 		
@@ -86,6 +87,7 @@ namespace synthese
 		
 		ManagedThread* sqliteThread = 
 		    new ManagedThread (sqliteThreadExec, "sqlite_tcp", 100, autorespawn);
+		*/
 		
 	    }
 	    

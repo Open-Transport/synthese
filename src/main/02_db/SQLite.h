@@ -17,6 +17,9 @@ namespace db
 {
 
 
+typedef sqlite3_stmt* SQLiteStatement;
+
+
 /** Wrapper class for SQLite calls (more C++ friendly).
     The return codes must be treated at this level and
     transformed into exceptions.
@@ -44,9 +47,14 @@ class SQLite
     
     static bool IsUpdateStatement (const std::string& sql);
 
+    static SQLiteStatement PrepareStatement (sqlite3* connection, const std::string& sql);
+    static void FinalizeStatement (const SQLiteStatement& statement);
+
     static void ExecUpdate (sqlite3* connection, const std::string& sql);
     static SQLiteResult ExecQuery (sqlite3* connection, const std::string& sql);
 
+    static void BeginTransaction (sqlite3* connection, bool exclusive = false);
+    static void CommitTransaction (sqlite3* connection);
 
 
     //@}

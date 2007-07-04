@@ -85,7 +85,7 @@ namespace synthese
 			}
 			else
 			{
-				object->setKey(getId(1,1));
+				object->setKey(getId());
                 query
 					<< " INSERT INTO " << TABLE_NAME << " VALUES("
 					<< Conversion::ToString(object->getKey())

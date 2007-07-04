@@ -37,6 +37,7 @@ namespace synthese
 	{
 		class PhysicalStop;
 		class City;
+		class Line;
 		class Service;
 
 		/** @addtogroup m15
@@ -46,6 +47,7 @@ namespace synthese
 		typedef std::set<const PhysicalStop*> PhysicalStopsSet;
 
 		typedef std::vector<boost::shared_ptr<const City> > CityList;
+		typedef std::set<boost::shared_ptr<const Line> > LineSet;
 
 		/** @} */
 	}

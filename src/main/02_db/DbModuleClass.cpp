@@ -58,11 +58,12 @@ namespace synthese
 
 
 	    std::string 
-	    DbModuleClass::GetParameter (const std::string& name)
+	    DbModuleClass::GetParameter (const std::string& name,
+					 const std::string defaultValue)
 	    {
 		Parameters::const_iterator it = 
 		    _Parameters.find (name);
-		if (it == _Parameters.end ()) return "";
+		if (it == _Parameters.end ()) return defaultValue;
 		return it->second;
 	    }
 
