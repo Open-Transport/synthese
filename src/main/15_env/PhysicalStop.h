@@ -53,6 +53,7 @@ namespace synthese
 		private:
 
 			std::string _name; //! Physical stop name
+			std::string _operatorCode;	//! Code as known by the operator
 			
 		public:
 
@@ -67,10 +68,12 @@ namespace synthese
 
 			//! @name Getters/Setters
 			//@{
-			const uid& getId () const;
+				const uid&			getId ()			const;
+				const std::string&	getOperatorCode()	const;
 
-			const std::string& getName () const;
-			void setName (const std::string& name);
+				const std::string& getName () const;
+				void setName (const std::string& name);
+				void setOperatorCode(const std::string& code);
 			//@}
 
 

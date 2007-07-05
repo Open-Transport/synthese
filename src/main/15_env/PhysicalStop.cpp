@@ -85,7 +85,15 @@ namespace synthese
 			return synthese::util::Registrable<uid,PhysicalStop>::getKey();
 		}
 
+		const std::string& PhysicalStop::getOperatorCode() const
+		{
+			return _operatorCode;
+		}
 
+		void PhysicalStop::setOperatorCode( const std::string& code )
+		{
+			_operatorCode = code;
+		}
 
 	}
 }

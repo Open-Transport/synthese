@@ -31,7 +31,7 @@ namespace synthese
 	{
 
 		Alarm::Alarm()
-			: _level(ALARM_LEVEL_UNKNOWN)
+			: _level(ALARM_LEVEL_INFO)
 		{
 		}
 

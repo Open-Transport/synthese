@@ -117,7 +117,7 @@ namespace synthese
 			ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(request);
 			addRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
 			addRequest.getAction()->setScenarioId(_scenario->getId());
-			addRequest.getAction()->setIsTemplate(true);
+			addRequest.getAction()->setIsTemplate(_templateScenario.get() != NULL);
 
 			stream << "<h1>Propriété</h1>";
 			HTMLForm uf(updateRequest.getHTMLForm("update"));

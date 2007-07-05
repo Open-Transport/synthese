@@ -314,7 +314,7 @@ namespace synthese
 						rs.addHiddenField(DisplayScreenRemovePhysicalStopAction::PARAMETER_PHYSICAL, Conversion::ToString(ps->getKey()));
 
 						stream << st.row();
-						stream << st.col() << ps->getName();
+						stream << st.col() << ps->getOperatorCode() << " / " << ps->getName();
 						stream << st.col() << rs.getLinkButton("Supprimer");
 					}
 					if (_displayScreen->getPhysicalStops().size() != _displayScreen->getLocalization()->getPhysicalStops().size())

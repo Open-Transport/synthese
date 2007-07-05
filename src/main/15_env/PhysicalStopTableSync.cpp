@@ -54,6 +54,7 @@ namespace synthese
 			object->setName(rows.getColumn(rowId, PhysicalStopTableSync::COL_NAME));
 			object->setX (Conversion::ToDouble (rows.getColumn (rowId, PhysicalStopTableSync::COL_X)));
 			object->setY (Conversion::ToDouble (rows.getColumn (rowId, PhysicalStopTableSync::COL_Y)));
+			object->setOperatorCode(rows.getColumn(rowId, PhysicalStopTableSync::COL_OPERATOR_CODE));
 		}
 
 		template<> void SQLiteTableSyncTemplate<PhysicalStop>::save(PhysicalStop* object)
@@ -68,6 +69,7 @@ namespace synthese
 		const std::string PhysicalStopTableSync::COL_PLACEID = "place_id";
 		const std::string PhysicalStopTableSync::COL_X = "x";
 		const std::string PhysicalStopTableSync::COL_Y = "y";
+		const string PhysicalStopTableSync::COL_OPERATOR_CODE("operator_code");
 
 
 
@@ -79,6 +81,7 @@ namespace synthese
 			addTableColumn (COL_PLACEID, "INTEGER", false);
 			addTableColumn (COL_X, "DOUBLE", true);
 			addTableColumn (COL_Y, "DOUBLE", true);
+			addTableColumn(COL_OPERATOR_CODE, "TEXT", true);
 
 			addTableIndex(COL_PLACEID);
 		}
@@ -115,6 +118,7 @@ namespace synthese
 				;
 
 				place->addPhysicalStop(ps.get());
+				ps->setOperatorCode(rows.getColumn(rowIndex, COL_OPERATOR_CODE));
 
 				EnvModule::getPhysicalStops ().add (ps);
 			}

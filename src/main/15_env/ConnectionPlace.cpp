@@ -287,7 +287,7 @@ namespace synthese
 			if (withAll)
 				m.push_back(make_pair(0, "(tous)"));
 			for (PhysicalStopsSet::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
-				m.push_back(make_pair((*it)->getKey(), (*it)->getName()));
+				m.push_back(make_pair((*it)->getKey(), (*it)->getOperatorCode() + " / " + (*it)->getName()));
 			return m;
 		}
 

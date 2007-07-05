@@ -51,6 +51,7 @@ namespace synthese
 			static const std::string COL_PLACEID;
 			static const std::string COL_X;
 			static const std::string COL_Y;
+			static const std::string COL_OPERATOR_CODE;
 
 			PhysicalStopTableSync ();
 			~PhysicalStopTableSync ();
