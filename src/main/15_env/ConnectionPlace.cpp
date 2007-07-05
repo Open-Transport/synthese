@@ -296,7 +296,7 @@ namespace synthese
 			vector<pair<uid, string> > m;
 			for (PhysicalStopsSet::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 				if (noDisplay.find(*it) == noDisplay.end())
-					m.push_back(make_pair((*it)->getKey(), (*it)->getName()));
+					m.push_back(make_pair((*it)->getKey(), (*it)->getOperatorCode() + " / " + (*it)->getName()));
 			return m;
 		}
 
