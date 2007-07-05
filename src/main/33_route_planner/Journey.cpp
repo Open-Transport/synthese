@@ -21,7 +21,6 @@
 */
 
 #include "33_route_planner/Journey.h"
-#include "33_route_planner/JourneyLeg.h"
 
 #include "17_messages/SentAlarm.h"
 #include "17_messages/Types.h"
@@ -34,6 +33,7 @@
 #include "15_env/ConnectionPlace.h"
 #include "15_env/Vertex.h"
 #include "15_env/Edge.h"
+#include "15_env/Axis.h"
 
 #include "04_time/DateTime.h"
 
@@ -75,8 +75,7 @@ namespace synthese
 
 
 
-		shared_ptr<JourneyLeg> 
-		Journey::getJourneyLeg (int index) const
+		const ServiceUse& Journey::getJourneyLeg (int index) const
 		{
 			return _journeyLegs.at (index);
 		}
@@ -84,17 +83,16 @@ namespace synthese
 
 
 
-		shared_ptr<JourneyLeg> Journey::getFirstJourneyLeg () const
+		const ServiceUse& Journey::getFirstJourneyLeg () const
 		{
-			return getJourneyLeg (0);
+			return *_journeyLegs.begin();
 		}
 
 
 
-		shared_ptr<JourneyLeg> 
-		Journey::getLastJourneyLeg () const
+		const ServiceUse& Journey::getLastJourneyLeg () const
 		{
-			return getJourneyLeg (getJourneyLegCount () - 1);
+			return *(_journeyLegs.end() - 1);
 		}
 
 
@@ -102,7 +100,7 @@ namespace synthese
 		const synthese::env::Edge* 
 		Journey::getOrigin() const
 		{
-			return getFirstJourneyLeg ()->getOrigin ();
+			return getFirstJourneyLeg ().getDepartureEdge();
 		}
 
 
@@ -110,7 +108,7 @@ namespace synthese
 		const synthese::env::Edge* 
 		Journey::getDestination() const
 		{
-			return getLastJourneyLeg ()->getDestination ();
+			return getLastJourneyLeg ().getArrivalEdge();
 		}
 
 
@@ -118,7 +116,7 @@ namespace synthese
 		const synthese::time::DateTime& 
 		Journey::getDepartureTime () const
 		{
-			return getFirstJourneyLeg ()->getDepartureTime ();
+			return getFirstJourneyLeg ().getDepartureDateTime();
 		}
 
 
@@ -126,7 +124,7 @@ namespace synthese
 		const synthese::time::DateTime& 
 		Journey::getArrivalTime () const
 		{
-			return getLastJourneyLeg ()->getArrivalTime ();
+			return getLastJourneyLeg ().getArrivalDateTime();
 		}
 
 
@@ -135,14 +133,14 @@ namespace synthese
 
 
 		void 
-		Journey::prepend (shared_ptr<JourneyLeg> leg)
+		Journey::prepend (const ServiceUse& leg)
 		{
 			_journeyLegs.push_front (leg);
-			_effectiveDuration += leg->getDuration ();
-			_distance += leg->getDistance ();
+			_effectiveDuration += leg.getDuration ();
+			_distance += leg.getDistance ();
 
-			if (leg->getPath ()->isRoad () == false) ++_transportConnectionCount;
-
+			if (!leg.getEdge()->getParentPath()->isRoad())
+				++_transportConnectionCount;
 		}
 
 
@@ -152,7 +150,7 @@ namespace synthese
 		{
 			for (int i=journey.getJourneyLegCount ()-1; i>= 0; --i)
 			{
-			prepend (journey.getJourneyLeg (i));
+				prepend (journey.getJourneyLeg (i));
 			}
 		}
 
@@ -161,14 +159,14 @@ namespace synthese
 
 
 		void 
-		Journey::append (shared_ptr<JourneyLeg> leg)
+		Journey::append (const ServiceUse& leg)
 		{
 			_journeyLegs.push_back (leg);
-			_effectiveDuration += leg->getDuration ();
-			_distance += leg->getDistance ();
+			_effectiveDuration += leg.getDuration ();
+			_distance += leg.getDistance ();
 
-			if (leg->getPath ()->isRoad () == false) ++_transportConnectionCount;
-
+			if (!leg.getEdge()->getParentPath()->isRoad ())
+				++_transportConnectionCount;
 		}
 
 
@@ -193,80 +191,81 @@ namespace synthese
 			synthese::time::DateTime alarmStart, alarmStop, now;
 			int maxAlarmLevel = 0;
 		    
-			for (int i=0; i<getJourneyLegCount (); ++i)
+			for (JourneyLegs::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
 			{
-			shared_ptr<JourneyLeg> leg(getJourneyLeg (i));
-			bool legIsConnection = (i < getJourneyLegCount ()-1);
+				const ServiceUse& leg(*it);
+				const Service* service(leg.getService());
+				bool legIsConnection = (it < _journeyLegs.end() - 2);
 
-				// -- Alarm on origin --
-				// Alarm start = first departure
-				// Alarm stop = last departure
-				alarmStart = leg->getDepartureTime ();
-				alarmStop = alarmStart;
-			if (leg->getServiceInstance().getService()->isContinuous ()) 
-				alarmStop += ((const ContinuousService*) leg->getServiceInstance().getService())->getRange ();
-			
-/*				if ( leg->getOrigin ()->getFromVertex ()->getConnectionPlace ()
-				 ->hasApplicableAlarm (alarmStart, alarmStop)
-				 && maxAlarmLevel < leg->getOrigin()->getFromVertex ()->
-				 getConnectionPlace ()->getAlarm ()->getLevel () )
-					maxAlarmLevel = leg->getOrigin()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
-*/			
-			
-			// -- Compulsory reservation --
-			now.updateDateTime ();
-			if ( (leg->getServiceInstance().getService()->getReservationRule ()->isCompliant() == true) &&
-				 (leg->getServiceInstance().getService()->isReservationPossible ( now, leg->getDepartureTime ())) &&
-				 (maxAlarmLevel < ALARM_LEVEL_WARNING) )
-			{
-					maxAlarmLevel = ALARM_LEVEL_WARNING;
-			}
+					// -- Alarm on origin --
+					// Alarm start = first departure
+					// Alarm stop = last departure
+					alarmStart = leg.getDepartureDateTime();
+					alarmStop = alarmStart;
+				if (service->isContinuous ()) 
+					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
+				
+	/*				if ( leg->getOrigin ()->getFromVertex ()->getConnectionPlace ()
+					 ->hasApplicableAlarm (alarmStart, alarmStop)
+					 && maxAlarmLevel < leg->getOrigin()->getFromVertex ()->
+					 getConnectionPlace ()->getAlarm ()->getLevel () )
+						maxAlarmLevel = leg->getOrigin()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
+	*/			
+				
+				// -- Compulsory reservation --
+				now.updateDateTime ();
+				if ( (service->getReservationRule ()->isCompliant() == true) &&
+					 (service->isReservationPossible ( now, leg.getDepartureDateTime())) &&
+					 (maxAlarmLevel < ALARM_LEVEL_WARNING) )
+				{
+						maxAlarmLevel = ALARM_LEVEL_WARNING;
+				}
 
-			// -- Possible reservation --
-			now.updateDateTime();
-			if ( (leg->getServiceInstance().getService()->getReservationRule ()->isCompliant() == boost::logic::indeterminate) &&
-				 (leg->getServiceInstance().getService()->isReservationPossible ( now, leg->getDepartureTime ())) &&
-				 (maxAlarmLevel < ALARM_LEVEL_INFO) )
-			{
-					maxAlarmLevel = ALARM_LEVEL_INFO;
-			}
+				// -- Possible reservation --
+				now.updateDateTime();
+				if ( (service->getReservationRule ()->isCompliant() == boost::logic::indeterminate) &&
+					 (service->isReservationPossible ( now, leg.getDepartureDateTime())) &&
+					 (maxAlarmLevel < ALARM_LEVEL_INFO) )
+				{
+						maxAlarmLevel = ALARM_LEVEL_INFO;
+				}
 
 
-				// -- Service alarm --
-				// Alarm start = first departure
-				// Alarm stop = last arrival
-				alarmStart = leg->getDepartureTime ();
-				alarmStop = leg->getArrivalTime ();
-			if (leg->getServiceInstance().getService()->isContinuous ()) 
-				alarmStop += ((const ContinuousService*) leg->getServiceInstance().getService())->getRange ();
+					// -- Service alarm --
+					// Alarm start = first departure
+					// Alarm stop = last arrival
+					alarmStart = leg.getDepartureDateTime();
+					alarmStop = leg.getArrivalDateTime();
+				if (service->isContinuous ()) 
+					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
 
-/*				if ( (leg->getService ()->getPath ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
-				 (maxAlarmLevel < leg->getService ()->getPath ()->getAlarm ()->getLevel ()) )
-			{
-					maxAlarmLevel = leg->getService ()->getPath ()->getAlarm ()->getLevel ();
-			}
-*/			
-				// -- Alarm on arrival --
-				// Alarm start = first arrival
-				// Alarm stop = last arrival if connection, last arrival otherwise
-				alarmStart = leg->getArrivalTime ();
-				alarmStop = alarmStart;
-				if (legIsConnection)
-			{
-					alarmStop = getJourneyLeg (i+1)->getDepartureTime ();
-			}
+	/*				if ( (leg->getService ()->getPath ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
+					 (maxAlarmLevel < leg->getService ()->getPath ()->getAlarm ()->getLevel ()) )
+				{
+						maxAlarmLevel = leg->getService ()->getPath ()->getAlarm ()->getLevel ();
+				}
+	*/			
+					// -- Alarm on arrival --
+					// Alarm start = first arrival
+					// Alarm stop = last arrival if connection, last arrival otherwise
+					alarmStart = leg.getArrivalDateTime();
+					alarmStop = alarmStart;
+					if (legIsConnection)
+				{
+						alarmStop = (it+1)->getDepartureDateTime ();
+				}
 
-			if (leg->getServiceInstance().getService()->isContinuous ()) 
-				alarmStop += ((const ContinuousService*) leg->getServiceInstance().getService())->getRange ();
+				if (service->isContinuous ()) 
+					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
 
-/*				if ( (leg->getDestination ()->getFromVertex ()->getConnectionPlace ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
-					 (maxAlarmLevel < leg->getDestination()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ()) )
-			{
-				maxAlarmLevel = leg->getDestination()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
-			}
-*/			}
+	/*				if ( (leg->getDestination ()->getFromVertex ()->getConnectionPlace ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
+						 (maxAlarmLevel < leg->getDestination()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ()) )
+				{
+					maxAlarmLevel = leg->getDestination()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
+				}
+	*/			}
 
-			return maxAlarmLevel;
+				return maxAlarmLevel;
 		}
 
 
@@ -290,11 +289,11 @@ namespace synthese
 			int continuousServiceRange = UNKNOWN_VALUE;
 			for (JourneyLegs::const_iterator it = _journeyLegs.begin();	it != _journeyLegs.end(); ++it)
 			{
-				shared_ptr<JourneyLeg> leg(*it);
+				const ServiceUse& leg(*it);
 				if ( (continuousServiceRange == UNKNOWN_VALUE) ||
-					 (leg->getContinuousServiceRange () < continuousServiceRange) )
+					 (leg.getServiceRange() < continuousServiceRange) )
 				{
-					continuousServiceRange = leg->getContinuousServiceRange ();
+					continuousServiceRange = leg.getServiceRange();
 				}
 				if (continuousServiceRange == 0) break;
 			}
@@ -401,6 +400,33 @@ namespace synthese
 		bool Journey::empty() const
 		{
 			return _journeyLegs.empty();
+		}
+
+		bool Journey::verifyAxisConstraints( const Axis* axis ) const
+		{
+			// Null Axis is allowed
+			if (axis == NULL)
+				return true;
+
+			// Check if axis is allowed.
+			if (!axis->isAllowed())
+				return false;
+			
+			// Check if axis is free
+			if (axis->isFree())
+				return true;
+
+			// Check if current journey is empty
+			if (_journeyLegs.empty())
+				return true;
+
+			// Check axis against already followed axes
+			for (JourneyLegs::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
+			{
+				if (it->getEdge()->getParentPath()->getAxis () == axis)
+					return false;
+			}
+			return true;
 		}
 	}
 }

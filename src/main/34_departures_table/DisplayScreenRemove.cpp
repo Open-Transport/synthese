@@ -78,7 +78,7 @@ namespace synthese
 		bool DisplayScreenRemove::_isAuthorized() const
 		{
 			return _request->isAuthorized<ArrivalDepartureTableRight>(
-				DELETE
+				DELETE_RIGHT
 				, FORBIDDEN
 				, Conversion::ToString(_displayScreen->getKey())
 				);

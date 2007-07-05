@@ -32,11 +32,12 @@ namespace synthese
 	namespace env
 	{
 		class Edge;
+		class ServiceUse;
 	}
 
 	namespace routeplanner
 	{
-		class JourneyLeg;
+		class Journey;
 
 		/** Journey leg comparator class.
 			@ingroup m33
@@ -45,15 +46,16 @@ namespace synthese
 		{
 		private:
 
-			typedef const synthese::env::Edge* (JourneyLeg::*PtrEdgeAccessor) () const;
-			PtrEdgeAccessor _edgeAccessor;
+			typedef const env::ServiceUse& (Journey::*PtrEdgeAccessor) () const;
+			const PtrEdgeAccessor _firstServiceUseAccessor;
+			const PtrEdgeAccessor _secondServiceUseAccessor;			
 
 		public:
 
 			JourneyLegComparator (const AccessDirection& accessDirection);
 			~JourneyLegComparator ();
 
-			int operator () (boost::shared_ptr<JourneyLeg> jl1, boost::shared_ptr<JourneyLeg> jl2) const;
+			int operator () (const Journey& jl1, const Journey& jl2) const;
 		    
 		};
 	}

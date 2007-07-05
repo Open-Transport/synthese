@@ -108,7 +108,7 @@ namespace synthese
 			}
 			else if (gobject)
 			{
-				if (!gobject->getKey())
+				if (gobject->getKey() <= 0)
 					gobject->setKey(getId());
 				query
 					<< " REPLACE INTO " << TABLE_NAME << " VALUES("
@@ -125,7 +125,7 @@ namespace synthese
 			}
 			else if (tobject)
 			{
-				if (!tobject->getKey())
+				if (tobject->getKey() <= 0)
 					tobject->setKey(getId());
 			
 				query

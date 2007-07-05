@@ -292,7 +292,7 @@ namespace synthese
 	    SQLiteStatement 
 	    SQLiteQueueThreadExec::prepareStatement (const std::string& sql)
 	    {
-		SQLite::PrepareStatement (_db, sql);
+			return SQLite::PrepareStatement (_db, sql);
 	    }
 
 

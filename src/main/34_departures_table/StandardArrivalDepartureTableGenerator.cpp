@@ -67,7 +67,7 @@ namespace synthese
 					int index(UNKNOWN_VALUE);
 					while(true)
 					{
-						ServicePointer servicePointer(ls->getNextService(departureDateTime, _endDateTime, _startDateTime, index));
+						ServicePointer servicePointer(ls->getNextService(departureDateTime, _endDateTime, _calculationDateTime, index));
 						if (!servicePointer.getService())
 							break;
 						_insert(servicePointer);

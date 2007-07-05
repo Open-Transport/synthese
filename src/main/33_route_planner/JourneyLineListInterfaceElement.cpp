@@ -22,13 +22,13 @@
 
 #include "33_route_planner/JourneyLineListInterfaceElement.h"
 #include "33_route_planner/Journey.h"
-#include "33_route_planner/JourneyLeg.h"
 
 #include "30_server/Request.h"
 
 #include "15_env/Road.h"
 #include "15_env/Line.h"
 #include "15_env/LineMarkerInterfacePage.h"
+#include "15_env/ServiceUse.h"
 
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
@@ -62,8 +62,8 @@ namespace synthese
 			// Fabrication de l'affichage
 			for (JourneyLegs::const_iterator it = journey->getJourneyLegs().begin(); it != journey->getJourneyLegs().end(); ++it)
 			{
-				shared_ptr<JourneyLeg> leg(*it);
-				if ( __AfficherLignesPied || !dynamic_cast<const Road*> (leg->getServiceInstance().getService()->getPath ()) )
+				const ServiceUse& leg(*it);
+				if ( __AfficherLignesPied || !dynamic_cast<const Road*> (leg.getService()->getPath ()) )
 					lineMarkerInterfacePage->display(
 						stream
 						, variables
@@ -71,7 +71,7 @@ namespace synthese
 						, _rowEndHtml->getValue(parameters, variables, object, request)
 						, Conversion::ToInt(_pixelWidth->getValue(parameters, variables, object, request))
 						, Conversion::ToInt(_pixelHeight->getValue(parameters, variables, object, request))
-						, static_cast<const Line*>(leg->getServiceInstance().getService()->getPath ())
+						, static_cast<const Line*>(leg.getService()->getPath ())
 						, request);
 			}
 

@@ -20,8 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ServiceUse.h"
-#include "Service.h"
+#include "15_env/ServiceUse.h"
+#include "15_env/Service.h"
+#include "15_env/Edge.h"
 
 namespace synthese
 {
@@ -30,53 +31,67 @@ namespace synthese
 
 
 		ServiceUse::ServiceUse( const ServicePointer& servicePointer, const Edge* edge)
-			: _servicePointer(servicePointer)
-			, _edge(edge)
-			, _actualDateTime(servicePointer.getService()->getLeaveTime(servicePointer, edge))
+			: ServicePointer(servicePointer)
+			, _secondEdge(edge)
+			, _secondActualDateTime(servicePointer.getService()->getLeaveTime(servicePointer, edge))
 		{
 		}
 
+		ServiceUse::ServiceUse()
+		{
+
+		}
 		const env::Edge* ServiceUse::getDepartureEdge() const
 		{
-			return (_servicePointer.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
-				? _servicePointer.getEdge()
-				: _edge;
+			return (getMethod() == DEPARTURE_TO_ARRIVAL)
+				? getEdge()
+				: getSecondEdge();
 		}
 
 		const env::Edge* ServiceUse::getArrivalEdge() const
 		{
-			return (_servicePointer.getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE)
-				? _servicePointer.getEdge()
-				: _edge;
+			return (getMethod() == ARRIVAL_TO_DEPARTURE)
+				? getEdge()
+				: getSecondEdge();
 		}
 
 		const time::DateTime& ServiceUse::getDepartureDateTime() const
 		{
-			return  (_servicePointer.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
-				? _servicePointer.getActualDateTime()
-				: _actualDateTime;
+			return  (getMethod() == DEPARTURE_TO_ARRIVAL)
+				? getActualDateTime()
+				: getSecondActualDateTime();
 		}
 
 		const time::DateTime& ServiceUse::getArrivalDateTime() const
 		{
-			return  (_servicePointer.getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE)
-				? _servicePointer.getActualDateTime()
-				: _actualDateTime;
+			return  (getMethod() == ARRIVAL_TO_DEPARTURE)
+				? getActualDateTime()
+				: getSecondActualDateTime();
 		}
 
-		const env::Edge* ServiceUse::getEdge() const
+		const env::Edge* ServiceUse::getSecondEdge() const
 		{
-			return _edge;
+			return _secondEdge;
 		}
 
-		const ServicePointer& ServiceUse::getServicePointer() const
+		const time::DateTime& ServiceUse::getSecondActualDateTime() const
 		{
-			return _servicePointer;
+			return _secondActualDateTime;
 		}
 
-		const time::DateTime& ServiceUse::getActualDateTime() const
+		int ServiceUse::getDuration() const
 		{
-			return _actualDateTime;
+			return getArrivalDateTime() - getDepartureDateTime();
+		}
+
+		int ServiceUse::getDistance() const
+		{
+			return getArrivalEdge()->getMetricOffset() - getDepartureEdge()->getMetricOffset();
+		}
+
+		const SquareDistance& ServiceUse::getSquareDistance() const
+		{
+			return _squareDistance;
 		}
 	}
 }

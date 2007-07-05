@@ -91,7 +91,8 @@ public:
     const Path*			getPath () const;
     Path*			getPath ();
     int				getServiceNumber () const;
-    Calendar&		getCalendar (); // MJ constness pb
+	Calendar&		getCalendar (); // MJ constness pb
+	const Calendar&		getCalendar () const; // MJ constness pb
 
     /** Returns the departure schedule for this service.
 

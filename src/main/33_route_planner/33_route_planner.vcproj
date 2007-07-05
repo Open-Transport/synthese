@@ -74,19 +74,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\IntegralSearcher.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\IntegralSearcher.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Journey.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Journey.h"
-				>
-			</File>
-			<File
-				RelativePath=".\JourneyLeg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\JourneyLeg.h"
 				>
 			</File>
 			<File

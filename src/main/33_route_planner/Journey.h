@@ -36,6 +36,7 @@ namespace synthese
 	namespace env
 	{
 		class Edge;
+		class Axis;
 	}
 
 	namespace routeplanner
@@ -91,10 +92,10 @@ namespace synthese
 			//@{
 				bool	empty()	const;
 				int getJourneyLegCount () const;
-				boost::shared_ptr<JourneyLeg> getJourneyLeg (int index) const;
-
-				boost::shared_ptr<JourneyLeg> getFirstJourneyLeg () const;
-				boost::shared_ptr<JourneyLeg> getLastJourneyLeg () const;
+				
+				const env::ServiceUse& getJourneyLeg (int index) const;
+				const env::ServiceUse& getFirstJourneyLeg () const;
+				const env::ServiceUse& getLastJourneyLeg () const;
 
 				const synthese::env::Edge* getOrigin() const;
 				const synthese::env::Edge* getDestination() const;
@@ -120,27 +121,28 @@ namespace synthese
 
 				void setContinuousServiceRange (int continuousServiceRange);
 
-				/** Comparison between journeys.
+				/** Comparison between journeys doing the same relation..
 					@param other Journey to compare with
 					@param direction Direction of the route planning
 					@return true if the current journey is a best choice than the other one
 				*/
 				bool isBestThan(const Journey& other, const AccessDirection& direction) const;
 
+
+				bool verifyAxisConstraints(const env::Axis* axis) const;
 			//@}
 
 
 
 			//! @name Update methods
 			//@{
-			void clear ();
+				void clear ();
 
-			void prepend (boost::shared_ptr<JourneyLeg> leg);
-			void prepend (const Journey& journey);
+				void prepend (const env::ServiceUse& leg);
+				void prepend (const Journey& journey);
 
-			void append (boost::shared_ptr<JourneyLeg> leg);
-			void append (const Journey& journey);
-		    
+				void append (const env::ServiceUse& leg);
+				void append (const Journey& journey);
 			//@}
 
 			Journey& operator = (const Journey& ref);

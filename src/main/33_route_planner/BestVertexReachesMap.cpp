@@ -21,12 +21,12 @@
 */
 
 #include "33_route_planner/BestVertexReachesMap.h"
-#include "33_route_planner/JourneyLeg.h"
 
 #include "15_env/ConnectionPlace.h"
 #include "15_env/Address.h"
 #include "15_env/PhysicalStop.h"
 #include "15_env/Vertex.h"
+#include "15_env/Edge.h"
 
 #include <assert.h>
 
@@ -67,20 +67,12 @@ namespace synthese
 
 
 		void 
-		BestVertexReachesMap::insert (const synthese::env::Vertex* vertex, shared_ptr<JourneyLeg> journeyLeg)
+		BestVertexReachesMap::insert (const ServiceUse& journeyLeg)
 		{
-			_bestJourneyLegMap[vertex] = journeyLeg;
+			const Vertex* vertex(journeyLeg.getSecondEdge()->getFromVertex());
+//			_bestJourneyLegMap[vertex] = journeyLeg;
 
-			// Update time map (replacement)
-			if (_accessDirection == TO_DESTINATION)
-			{
-				insert (vertex, journeyLeg->getArrivalTime ());
-			}
-			else
-			{
-				insert (vertex, journeyLeg->getDepartureTime ());
-			}
-		    
+			insert (vertex, journeyLeg.getSecondActualDateTime());
 		}    
 		    
 
@@ -166,18 +158,6 @@ namespace synthese
 			return defaultValue;
 
 		}
-
-
-
-		shared_ptr<JourneyLeg>
-		BestVertexReachesMap::getBestJourneyLeg (const Vertex* vertex)
-		{
-			if (contains (vertex) == false)
-				return shared_ptr<JourneyLeg>();
-			return _bestJourneyLegMap.find (vertex)->second;
-		}
-
-
 
 		void 
 		BestVertexReachesMap::clear ()

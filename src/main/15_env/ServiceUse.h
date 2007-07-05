@@ -35,31 +35,26 @@ namespace synthese
 		/** ServiceUse class.
 			@ingroup m15
 		*/
-		class ServiceUse
+		class ServiceUse : public ServicePointer
 		{
 		private:
-			//! @name First step data
-			//@{
-				const ServicePointer	_servicePointer;
-			//@}
-
 			//! @name Second step data
 			//@{
-				const Edge*				_edge;
-				time::DateTime			_actualDateTime;
+				const Edge*				_secondEdge;
+				time::DateTime			_secondActualDateTime;
+				SquareDistance			_squareDistance;
 			//@}
-
-			int _continuousServiceRange;
-			SquareDistance _squareDistance;
 
 		public:
 			ServiceUse(const ServicePointer& servicePointer, const Edge* edge);
+			ServiceUse();
+			
 
 			//! @name Getters
 			//@{
-				const Edge*				getEdge()				const;
-				const ServicePointer&	getServicePointer()		const;
-				const time::DateTime&	getActualDateTime()		const;
+				const Edge*				getSecondEdge()				const;
+				const time::DateTime&	getSecondActualDateTime()	const;
+				const SquareDistance&	getSquareDistance()			const;
 			//@}
 
 			//! @name Queries
@@ -68,6 +63,8 @@ namespace synthese
 				const Edge*				getArrivalEdge()		const;
 				const time::DateTime&	getDepartureDateTime()	const;
 				const time::DateTime&	getArrivalDateTime()	const;
+				int						getDuration()			const;
+				int						getDistance()			const;
 			//@}
 		};
 	}

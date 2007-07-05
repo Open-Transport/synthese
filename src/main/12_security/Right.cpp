@@ -57,7 +57,7 @@ namespace synthese
 			case USE: return "Utilisation";
 			case READ: return "Lecture";
 			case WRITE: return "Lecture/Ecriture";
-			case DELETE: return "Contrôle total";
+			case DELETE_RIGHT: return "Contrôle total";
 			}
 			return "";
 		}

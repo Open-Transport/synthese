@@ -41,7 +41,7 @@ namespace synthese
 			, _serviceIndex(UNKNOWN_VALUE)
 			, _determinationMethod(method)
 			, _actualTime(TIME_UNKNOWN)
-			, _validityEndTime(TIME_UNKNOWN)
+			, _range(0)
 			, _edge(edge)
 		{
 
@@ -53,7 +53,7 @@ namespace synthese
 			, _originDateTime(TIME_UNKNOWN)
 			, _serviceIndex(UNKNOWN_VALUE)
 			, _actualTime(TIME_UNKNOWN)
-			, _validityEndTime(TIME_UNKNOWN)
+			, _range(0)
 			, _edge(NULL) 
 		{
 
@@ -116,14 +116,14 @@ namespace synthese
 			return _serviceIndex;
 		}
 
-		void ServicePointer::setValidityEndTime( const time::DateTime& dateTime )
+		void ServicePointer::setServiceRange(int duration)
 		{
-			_validityEndTime = dateTime;
+			_range = duration;
 		}
 
-		const time::DateTime& ServicePointer::getValidityDateTime() const
+		int ServicePointer::getServiceRange() const
 		{
-			return _validityEndTime;
+			return _range;
 		}
 	}
 }

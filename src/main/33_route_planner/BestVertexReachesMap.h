@@ -26,6 +26,7 @@
 
 #include "15_env/Types.h"
 #include "15_env/VertexAccessMap.h"
+#include "15_env/ServiceUse.h"
 
 #include "04_time/DateTime.h"
 
@@ -42,8 +43,6 @@ namespace synthese
 
 	namespace routeplanner
 	{
-		class JourneyLeg;
-
 		/** Best vertex reaches map class.
 			@ingroup m33
 		*/
@@ -51,8 +50,9 @@ namespace synthese
 		{
 		 private:
 
-			 typedef std::map<const synthese::env::Vertex*, boost::shared_ptr<JourneyLeg> > JourneyLegMap;
-			typedef std::map<const synthese::env::Vertex*, synthese::time::DateTime> TimeMap;
+
+			typedef std::map<const env::Vertex*, env::ServiceUse> JourneyLegMap;
+			typedef std::map<const env::Vertex*, time::DateTime> TimeMap;
 		    
 			const AccessDirection _accessDirection;
 
@@ -79,16 +79,13 @@ namespace synthese
 			getBestTime (const synthese::env::Vertex* vertex, 
 					 const synthese::time::DateTime& defaultValue) const;
 
-			boost::shared_ptr<JourneyLeg> getBestJourneyLeg (const synthese::env::Vertex* vertex);
-
 			//@}
 
 
 			//! @name Update methods
 			//@{
 			void clear ();
-			void insert (const synthese::env::Vertex* vertex, 
-				boost::shared_ptr<JourneyLeg> journeyLeg);
+			void insert (const env::ServiceUse& journeyLeg);
 		    
 			void insert (const synthese::env::Vertex* vertex, 
 				 const synthese::time::DateTime& dateTime,

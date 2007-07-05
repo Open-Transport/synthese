@@ -22,7 +22,6 @@
 
 #include "33_route_planner/RoutePlannerModule.h"
 #include "33_route_planner/Journey.h"
-#include "33_route_planner/JourneyLeg.h"
 
 #include "15_env/Edge.h"
 #include "15_env/Path.h"

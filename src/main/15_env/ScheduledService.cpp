@@ -104,8 +104,7 @@ namespace synthese
 			}
 			actualTime = schedule;
 			ptr.setActualTime(actualTime);
-			ptr.setValidityEndTime(actualTime);
-
+			
 			// Origin departure time
 			DateTime originDateTime(actualTime);
 			int duration = schedule - _departureSchedules.at(0);

@@ -61,8 +61,8 @@ namespace synthese
 	
 			_rootProfile->setName(ROOT_PROFILE);
 			shared_ptr<Right> r = Factory<Right>::create<GlobalRight>();
-			r->setPublicLevel(DELETE);
-			r->setPrivateLevel(DELETE);
+			r->setPublicLevel(DELETE_RIGHT);
+			r->setPrivateLevel(DELETE_RIGHT);
 			_rootProfile->cleanRights();
 			_rootProfile->addRight(r);
 			ProfileTableSync::save(_rootProfile.get());

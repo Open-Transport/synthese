@@ -26,7 +26,6 @@
 #include "33_route_planner/JourneyBoardServiceCellInterfacePage.h"
 #include "33_route_planner/JourneyBoardJunctionCellInterfacePage.h"
 #include "33_route_planner/Journey.h"
-#include "33_route_planner/JourneyLeg.h"
 #include "33_route_planner/RoutePlannerModule.h"
 
 #include "30_server/Request.h"
@@ -38,6 +37,7 @@
 #include "15_env/HandicappedCompliance.h"
 #include "15_env/BikeCompliance.h"
 #include "15_env/ReservationRule.h"
+#include "15_env/ServiceUse.h"
 
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
@@ -84,13 +84,13 @@ namespace synthese
 
 			for (JourneyLegs::const_iterator it = journey->getJourneyLegs().begin(); it != journey->getJourneyLegs().end(); ++it)
 			{
-				shared_ptr<JourneyLeg> leg(*it);
+				const ServiceUse& leg(*it);
 
 				// LIGNE ARRET MONTEE Si premier point d'arr�t et si alerte
 				if (it == journey->getJourneyLegs().begin())
 				{
 					time::DateTime debutPrem, finPrem;
-					debutPrem = leg->getDepartureTime();
+					debutPrem = leg.getDepartureDateTime();
 					finPrem = debutPrem;
 					if (journey->getContinuousServiceRange () )
 						finPrem += journey->getContinuousServiceRange ();
@@ -106,39 +106,39 @@ namespace synthese
 					}
 */				}
 
-				if ( dynamic_cast<const synthese::env::Road*> (leg->getServiceInstance().getService()->getPath ()) == 0 )
+				if ( dynamic_cast<const synthese::env::Road*> (leg.getService()->getPath ()) == 0 )
 				{
 					// LIGNE CIRCULATIONS
 					synthese::time::DateTime debutLigne, finLigne
 						, lastDepartureTime(synthese::time::TIME_UNKNOWN), lastArrivalTime(synthese::time::TIME_UNKNOWN);
-					debutLigne = leg->getDepartureTime();
-					finLigne = leg->getArrivalTime ();
+					debutLigne = leg.getDepartureDateTime();
+					finLigne = leg.getArrivalDateTime();
 
 					if (journey->getContinuousServiceRange () )
 					{
-						lastDepartureTime = leg->getDepartureTime();
+						lastDepartureTime = leg.getDepartureDateTime();
 						lastDepartureTime += journey->getContinuousServiceRange ();
 					}
 					if ( journey->getContinuousServiceRange () )
 					{
-						lastArrivalTime = leg->getArrivalTime ();
+						lastArrivalTime = leg.getArrivalDateTime ();
 						lastArrivalTime += journey->getContinuousServiceRange ();
 						finLigne = lastArrivalTime;
 					}
 
 					// 12/18 Reservation
 					synthese::time::DateTime maintenant;
-					const ReservationRule* reservationRule = leg->getServiceInstance().getService()->getReservationRule ();
+					const ReservationRule* reservationRule = leg.getService()->getReservationRule ();
 
 					maintenant.updateDateTime();
 					bool openedCompulsoryReservation = ( 
 						(reservationRule->isCompliant() == true)
-						&& (reservationRule->isReservationPossible( leg->getServiceInstance().getOriginDateTime(), maintenant, leg->getDepartureTime() )) 
+						&& (reservationRule->isReservationPossible(leg.getOriginDateTime(), maintenant, leg.getDepartureDateTime() )) 
 						);
 					maintenant.updateDateTime();
 					bool openedOptionalReservation = (
 						(reservationRule->isCompliant() == boost::logic::indeterminate) &&
-						(reservationRule->isReservationPossible(leg->getServiceInstance().getOriginDateTime(), maintenant, leg->getDepartureTime() )) 
+						(reservationRule->isReservationPossible(leg.getOriginDateTime(), maintenant, leg.getDepartureDateTime() )) 
 						);
 					bool openedReservation = openedCompulsoryReservation || openedOptionalReservation;
 					std::string syntheseOnlineBookingURL;
@@ -159,26 +159,26 @@ namespace synthese
 					}
 
 					serviceCellInterfacePage->display( stream 
-						, leg->getDepartureTime().getHour()
+						, leg.getDepartureDateTime().getHour()
 						, lastDepartureTime.getHour()
-						, leg->getArrivalTime().getHour()
+						, leg.getArrivalDateTime().getHour()
 						, lastArrivalTime.getHour()
 						, 0 /// @todo implement __ET->getLigne() ->Materiel() ->Code(); //4
 						, "ligne" /// @todo implement __ET->getLigne() ->Materiel() ->getLibelleSimple() //5
 						, "la ligne" /// @todo implement __ET->getLigne()->LibelleComplet(LibelleCompletMatosHTML);
 						, "destination" /// @todo implement __ET->getLigne()->LibelleDestination(DestinationHTML);
 						, __FiltreHandicape
-						, leg->getServiceInstance().getService()->getHandicappedCompliance ()->getCapacity ()
+						, leg.getService()->getHandicappedCompliance ()->getCapacity ()
 						, __FiltreVelo
-						, leg->getServiceInstance().getService()->getBikeCompliance ()->getCapacity ()
+						, leg.getService()->getBikeCompliance ()->getCapacity ()
 						, openedCompulsoryReservation
 						, openedOptionalReservation
-						, openedReservation ? reservationRule->getReservationDeadLine (leg->getServiceInstance().getOriginDateTime(), leg->getDepartureTime() ) : unknownDateTime
+						, openedReservation ? reservationRule->getReservationDeadLine (leg.getOriginDateTime(), leg.getDepartureDateTime() ) : unknownDateTime
 						, openedReservation ? reservationRule : NULL
 						, openedReservation ? syntheseOnlineBookingURL : ""
 						, NULL // leg->getService ()->getPath ()->hasApplicableAlarm ( debutLigne, finLigne ) ? __ET->getService()->getPath ()->getAlarm() : NULL
 						, __Couleur
-						, leg->getServiceInstance().getService()->getPath ()
+						, leg.getService()->getPath ()
 						, request );
 					
 					__Couleur = !__Couleur;
@@ -187,25 +187,26 @@ namespace synthese
 					// LIGNE ARRET DE DESCENTE
 
 					synthese::time::DateTime debutArret, finArret, tempMoment(synthese::time::TIME_UNKNOWN);
-					debutArret = leg->getArrivalTime ();
+					debutArret = leg.getArrivalDateTime ();
 					finArret = debutArret;
 					if ( (it + 1) < journey->getJourneyLegs().end())
-						finArret = (*(it + 1))->getDepartureTime();
+						finArret = (it + 1)->getDepartureDateTime();
 					if ( journey->getContinuousServiceRange () )
 						finArret += journey->getContinuousServiceRange ();
 
 					
 					if ( journey->getContinuousServiceRange () )
 					{
-						tempMoment = leg->getArrivalTime ();
+						tempMoment = leg.getArrivalDateTime ();
 						tempMoment += journey->getContinuousServiceRange ();
 					}
 					
 					stopCellInterfacePage->display( stream, true
 						, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
-						, leg->getDestination()->getConnectionPlace() == leg->getServiceInstance().getService()->getPath ()->getEdges ().back()->getFromVertex ()->getConnectionPlace()
-						, leg->getDestination()->getConnectionPlace()->getName()
-						, __Couleur, leg->getArrivalTime().getHour(), tempMoment.getHour()
+						, leg.getArrivalEdge()->getConnectionPlace() == leg.getService()->getPath ()->getEdges ().back()->getFromVertex ()->getConnectionPlace()
+						, leg.getArrivalEdge()->getConnectionPlace()->getName()
+						, __Couleur
+						, leg.getArrivalDateTime().getHour(), tempMoment.getHour()
 						, request);
 
 					__Couleur = !__Couleur;
@@ -215,15 +216,15 @@ namespace synthese
 				{
 					// 1/2 Alerte
 					synthese::time::DateTime debutArret, finArret;
-					debutArret = leg->getArrivalTime ();
+					debutArret = leg.getArrivalDateTime ();
 					finArret = debutArret;
 					if ((it+1) < journey->getJourneyLegs().end())
-						finArret = (*(it + 1))->getDepartureTime();
+						finArret = (it + 1)->getDepartureDateTime();
 					if ( journey->getContinuousServiceRange () )
 						finArret += journey->getContinuousServiceRange ();
 
 					junctionCellInterfacePage->display( stream
-						, leg->getDestination()->getConnectionPlace()
+						, leg.getArrivalEdge()->getConnectionPlace()
 						, NULL // leg->getDestination()->getConnectionPlace()->hasApplicableAlarm(debutArret, finArret) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 						, __Couleur
 						, request);

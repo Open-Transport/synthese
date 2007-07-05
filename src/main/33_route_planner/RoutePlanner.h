@@ -70,14 +70,7 @@ namespace synthese
 		public:
 
 		private:
-
-			typedef const synthese::env::Edge* (synthese::env::Edge::*PtrEdgeStep) () const;
-
-			typedef enum { USE_ROADS, DO_NOT_USE_ROADS } UseRoads;
-			typedef enum { USE_LINES, DO_NOT_USE_LINES } UseLines;
-			typedef enum { SEARCH_ADDRESSES, DO_NOT_SEARCH_ADDRESSES } SearchAddresses;
-			typedef enum { SEARCH_PHYSICALSTOPS, DO_NOT_SEARCH_PHYSICALSTOPS } SearchPhysicalStops;
-
+			
 
 			const synthese::env::Place* _origin;  //<! Origin place for route planning.
 			const synthese::env::Place* _destination;  //!< Destination place for route planning.
@@ -133,32 +126,6 @@ namespace synthese
 			//@{
 
 
-			/** Integral serach of objects within the network.
-				@param vertices
-				@param desiredTime Desired time.
-				@param accessDirection
-				@param currentJourney Journey currently being built.
-				@param maxDepth Maximum recursion depth.
-				@param accessDirection
-				@param accessDirection
-				@param searchAddresses Whether or not to search for addresses.
-				@param searchPhysicalStops Whether or not to search for physicalStops.
-				@param useRoads Filter : true = the search is allowed to use the road network
-				@param useLines Filter : true = the search is allowed to use the transport network
-				@param strictTime Must the departure time be strictly equal to desired time ?
-			 */
-			Journeys integralSearch (
-				const env::VertexAccessMap& vertices, 
-				const time::DateTime& desiredTime,
-				const AccessDirection& accessDirection,
-				const Journey& currentJourney,
-				int maxDepth,
-				SearchAddresses searchAddresses, 
-				SearchPhysicalStops searchPhysicalStops,
-				UseRoads useRoads,
-				UseLines useLines,
-				bool strictTime = false
-				);
 
 			/** Best journey finder.
 				@param ovam Vertex access map containing each departure physical stops.
@@ -187,18 +154,6 @@ namespace synthese
 
 			Journeys computeJourneySheetDepartureArrival ();
 
-		 private:
-
-			bool areAxisContraintsFulfilled (const synthese::env::Path* path, 
-							 const Journey& journey) const;
-
-			bool evaluateServiceUse(
-				const env::ServiceUse& serviceUse,
-				const Journey& currentJourney,
-				bool strictTime,
-				int continuousServiceRange
-				);
-			
 			//@}
 
 

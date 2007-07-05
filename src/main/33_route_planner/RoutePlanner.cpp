@@ -22,7 +22,7 @@
 
 #include "33_route_planner/RoutePlanner.h"
 #include "33_route_planner/Journey.h"
-#include "33_route_planner/JourneyLeg.h"
+#include "33_route_planner/IntegralSearcher.h"
 
 #include "15_env/Axis.h"
 #include "15_env/ConnectionPlace.h"
@@ -43,6 +43,7 @@
 #include <algorithm>
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -99,141 +100,10 @@ namespace synthese
 
 
 
-		bool 
-		RoutePlanner::areAxisContraintsFulfilled (const synthese::env::Path* path, 
-							  const Journey& journey) const
-		{
-			// Check if axis is allowed.
-			if (path->getAxis () && (path->getAxis ()->isAllowed () == false)) 
-			{
-			return false;
-			}
-
-			// Check axis against already followed axes
-			if ( path->getAxis () && 
-			 (path->getAxis ()->isFree () == false) &&
-			 (journey.getJourneyLegCount () > 0) )
-			{
-			for (int i=0; i<journey.getJourneyLegCount (); ++i)
-			{
-				if (journey.getJourneyLeg (i)->getAxis () == path->getAxis ()) 
-				{
-				return false;
-				}
-			}
-			}
-			return true;
-		}
 
 
 
 
-		bool RoutePlanner::evaluateServiceUse (
-			const ServiceUse& serviceUse
-			, const Journey& currentJourney
-			, bool strictTime
-			, int continuousServiceRange
-		){
-//			if (arrivalEdge == 0) return true;
-
-			// Initialization
-			const Edge*	fromEdge = serviceUse.getServicePointer().getEdge();
-			const Vertex* goalVertex = serviceUse.getEdge()->getFromVertex ();
-			const DateTime& goalDateTime = serviceUse.getActualDateTime();
-			SquareDistance sqd;
-		
-		    
-			// If the edge is an address, the currentJourney necessarily contains
-			// only road legs, filter on max approach distance (= walk distance).
-			if ( (goalVertex->isAddress ()) &&
-			 (currentJourney.getDistance () + fromEdge->getLength () > 
-			  _accessParameters.maxApproachDistance) )
-				return false;
-
-
-			// If the edge is an address, the currentJourney necessarily contains
-			// only road legs, filter on max approach time (= walk time).
-			if ( (goalVertex->isAddress ()) &&
-			 (currentJourney.getEffectiveDuration () + 
-			 (fromEdge->getLength () / _accessParameters.approachSpeed) > 
-			  _accessParameters.maxApproachTime) )
-				return false;
-
-
-
-			// The vertex is considered useful if it allows a soon access for arrival
-			// or late access for departure.
-			const VertexAccessMap& vam =
-				(serviceUse.getServicePointer().getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL) 
-				? _destinationVam 
-				: _originVam ;
-
-			if (sqd.getSquareDistance () == UNKNOWN_VALUE)
-			{
-				sqd.setFromPoints (*goalVertex, vam.getIsobarycenter ());  
-				sqd.setSquareDistance (sqd.getSquareDistance () - 
-					vam.getIsobarycenterMaxSquareDistance ().getSquareDistance ());
-
-			}
-
-			// Check that the limit time (min or max) is not exceeded
-			DateTime accessMoment (goalDateTime);
-			if ((vam.contains (goalVertex) && (goalVertex->getConnectionPlace ())))
-			{
-				accessMoment +=
-					((serviceUse.getServicePointer().getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL) ? 1 : -1)
-					* goalVertex->getConnectionPlace ()->getMinTransferDelay ();
-			}
-
-			if ( (serviceUse.getServicePointer().getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE) &&
-				(accessMoment < _minDepartureTime) )
-				return false;
-
-			if ( (serviceUse.getServicePointer().getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL) &&
-				(accessMoment > _maxArrivalTime) )
-				return false;
-
-			/// @todo : re-implement VMax control.
-
-
-			// Continuous service breaking
-/*			if (_previousContinuousServiceDuration)
-			{
-				if ( (currentJourney.getJourneyLegCount () > 0) &&
-					 (currentJourney.getDepartureTime () <= _previousContinuousServiceLastDeparture) &&
-					 (arrivalMoment - currentJourney.getDepartureTime () >= _previousContinuousServiceDuration) )
-				{
-					return false;
-				}
-				else if ( (departureMoment < _previousContinuousServiceLastDeparture) && 
-					  (arrivalMoment - departureMoment >= _previousContinuousServiceDuration) )
-				{
-					return false;
-				}
-			}
-*/		    
-
-
-			// Best vertex map control
-			if ( (serviceUse.getServicePointer().getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE) &&
-				(accessMoment < _bestArrivalVertexReachesMap.getBestTime (goalVertex, goalDateTime)) )
-				return false;
-
-			if ( (serviceUse.getServicePointer().getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL) &&
-				(accessMoment > _bestArrivalVertexReachesMap.getBestTime (goalVertex, goalDateTime)) )
-				return false;
-
-
-			// Strict time control
-			if ( strictTime && 
-				(goalDateTime != _bestArrivalVertexReachesMap.getBestTime (goalVertex, goalDateTime) )) 
-				return false;
-
-//			return arrivalMoment <= (_maxArrivalTime - _destinationVam.getMinApproachTime ());
-
-			return true;
-
-		}
 						    
 
 
@@ -358,203 +228,6 @@ namespace synthese
 		*/
 
 
-		Journeys 
-		RoutePlanner::integralSearch (const VertexAccessMap& vam, 
-						  const DateTime& desiredTime,
-						  const AccessDirection& accessDirection,
-						  const Journey& currentJourney,
-						  int maxDepth,
-						  SearchAddresses searchAddresses, 
-						  SearchPhysicalStops searchPhysicalStops,
-						  UseRoads useRoads,
-						  UseLines useLines,
-						  bool strictTime)
-		{
-			JourneyLegs journeyPart;
-
-			// TODO : the whole other way depending on accessdirection !!
-			// What follows is in case TO_DESTINATION only
-
-			for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = vam.getMap ().begin ();
-			 itVertex != vam.getMap ().end (); ++itVertex)
-			{
-				const Vertex* origin = itVertex->first;
-
-				if (origin->isAddress() && useRoads != USE_ROADS
-					|| origin->isPhysicalStop() && useLines != USE_LINES)
-					continue;
-				
-				const std::set<const Edge*>& edges = origin->getDepartureEdges ();
-
-				for (std::set<const Edge*>::const_iterator itEdge = edges.begin ();
-					 itEdge != edges.end () ; ++itEdge)
-				{
-					const Edge* edge = (*itEdge);
-
-					if (!edge->getParentPath ()->isCompatibleWith(_accessParameters.complyer))
-						continue;
-
-					// TODO : reintroduce optimization on following axis departure/arrival ?
-					if (areAxisContraintsFulfilled (edge->getParentPath (), currentJourney) == false) continue;
-
-					int continuousServiceRange = 0;
-					int serviceNumber = 0;
-				    
-					DateTime departureMoment = desiredTime;
-					DateTime originDateTime;
-					departureMoment += (int) itVertex->second.approachTime;
-				    
-					ServicePointer serviceInstance(
-						edge->getNextService (
-							departureMoment
-							, _maxArrivalTime
-							, _calculationTime
-					)	);
-				    
-					if (!serviceInstance.getService())
-						continue;
-					
-					if (strictTime && serviceInstance.getActualDateTime() != desiredTime)
-						continue;
-				    
-					// Check for service compliancy rules.
-					if (!serviceInstance.getService()->isCompatibleWith(_accessParameters.complyer))
-						continue;
-				    
-					if (serviceInstance.getService()->isContinuous () )
-					{
-						/// @todo See if this case switch is necessary
-						if ( departureMoment > serviceInstance.getValidityDateTime())
-						{
-							continuousServiceRange = 
-							60*24 - ( departureMoment - serviceInstance.getValidityDateTime());
-						}
-						else
-						{
-							continuousServiceRange = 
-							serviceInstance.getValidityDateTime() -	departureMoment;
-						}
-					}
-				    
-				    
-					bool needFineStepping (
-						_destinationVam.needFineSteppingForArrival (edge->getParentPath ())
-					);
-				    
-				    
-					PtrEdgeStep step = needFineStepping 
-					? (&Edge::getFollowingArrivalForFineSteppingOnly)
-					: (&Edge::getFollowingConnectionArrival);
-					
-					for (const Edge* curEdge = (edge->*step) ();
-					 curEdge != 0; curEdge = (curEdge->*step) ())
-					{
-						ServiceUse serviceUse(serviceInstance, curEdge);
-					
-						if (!evaluateServiceUse(serviceUse,currentJourney,strictTime,continuousServiceRange))
-							break;
-
-						shared_ptr<JourneyLeg> journeyLeg(new JourneyLeg(serviceInstance));
-						journeyLeg->setOrigin (serviceUse.getDepartureEdge());
-						journeyLeg->setDestination (serviceUse.getArrivalEdge());
-						journeyLeg->setDepartureTime (serviceUse.getDepartureDateTime());
-						journeyLeg->setArrivalTime (serviceUse.getArrivalDateTime());
-						journeyLeg->setContinuousServiceRange (continuousServiceRange);
-						journeyLeg->setSquareDistance (0); /// @todo Compute the square distance
-						journeyPart.push_front (journeyLeg);
-
-						_bestArrivalVertexReachesMap.insert (serviceUse.getArrivalEdge()->getFromVertex(), journeyLeg);
-
-						if (_destinationVam.contains (serviceUse.getArrivalEdge()->getFromVertex()))
-						{
-							_maxArrivalTime = serviceUse.getArrivalDateTime();
-							_maxArrivalTime += _destinationVam.getVertexAccess (serviceUse.getArrivalEdge()->getFromVertex()).approachTime;
-						}
-
-
-					}
-
-				} // next edge
-				
-			} // next vertex in vam
-
-			JourneyLegs legs;
-			while (journeyPart.empty () == false)
-			{
-				shared_ptr<JourneyLeg> journeyLeg(journeyPart.front());
-				journeyPart.pop_front ();
-				
-				if (_destinationVam.contains (journeyLeg->getDestination ()->getFromVertex ())
-/// @todo Reactivate this code
-		//			|| isVertexUseful (journeyLeg->getDestination ()->getFromVertex (),
-		//					journeyLeg->getArrivalTime (), 
-		//					accessDirection,
-		//					journeyLeg->getSquareDistance ()) 
-				){
-					legs.push_back (journeyLeg);
-				}
-			}
-			    
-			std::sort (legs.begin (), legs.end (), _journeyLegComparatorForBestArrival);
-			    
-			Journeys result;
-
-			// Now iterate on each journey leg and call recursively the integral search
-			for (JourneyLegs::const_iterator itLeg(legs.begin()); itLeg != legs.end (); ++itLeg)
-			{
-				const Vertex* nextVertex = (*itLeg)->getDestination ()->getFromVertex ();
-				VertexAccessMap nextVam;
-				nextVertex->getPlace ()->getImmediateVertices (nextVam,
-											   accessDirection,
-											   _accessParameters,
-											   nextVertex,
-											   useRoads,
-											   useLines);
-				Journey nextCurrentJourney (currentJourney);
-				nextCurrentJourney.append (*itLeg);
-					
-				if ( (searchAddresses && (nextVertex->isAddress ())) ||
-						 (searchPhysicalStops && (nextVertex->isPhysicalStop ())) )
-				{
-					result.push_back (nextCurrentJourney);
-				}
-					
-					
-				if (maxDepth > 0)
-				{
-					    
-					Journeys nextParts = integralSearch (nextVam,
-										  (*itLeg)->getArrivalTime (),
-										  accessDirection,
-										  nextCurrentJourney,
-										  --maxDepth,
-										  searchAddresses,
-										  searchPhysicalStops,
-										  USE_ROADS,
-										  DO_NOT_USE_LINES,
-										  false);
-				    
-					// Now, prepend each resulting journey with nextCurrentJourney.
-					for (Journeys::iterator itj = nextParts.begin (); 
-					 itj != nextParts.end (); ++itj)
-					{
-						Journey newJourney (nextCurrentJourney);
-						newJourney.append (*itj);
-						result.push_back (newJourney);
-					}
-				}
-			}
-			return result;
-		}
-				     
-			
-				
-
-			    
-
-
-
-
 		void
 		RoutePlanner::findBestJourney (Journey& result
 						   , const VertexAccessMap& ovam
@@ -569,16 +242,24 @@ namespace synthese
 			if (currentJourney.getJourneyLegCount () > 
 			_accessParameters.maxTransportConnectionCount) return;
 
-			Journeys journeyParts = integralSearch (ovam, 
-								 _minDepartureTime,
-								 accessDirection, 
-								 currentJourney,
-								 0, 
-								 DO_NOT_SEARCH_ADDRESSES,
-								 SEARCH_PHYSICALSTOPS,
-								 DO_NOT_USE_ROADS,
-								 USE_LINES,
-								 strictTime);
+			IntegralSearcher is(
+				accessDirection
+				, _accessParameters
+				, DO_NOT_SEARCH_ADDRESSES
+				, SEARCH_PHYSICALSTOPS
+				, DO_NOT_USE_ROADS
+				, USE_LINES
+				, (accessDirection == TO_DESTINATION) ? _bestArrivalVertexReachesMap : _bestDepartureVertexReachesMap
+				, dvam 
+				, _calculationTime
+				, (accessDirection == TO_DESTINATION) ? _maxArrivalTime : _minDepartureTime
+				);
+			Journeys journeyParts(is.integralSearch(
+				ovam
+				, _minDepartureTime
+				, 0
+				, strictTime
+				));
 
 			for (Journeys::const_iterator itj = journeyParts.begin ();
 			 itj != journeyParts.end (); ++itj)
@@ -674,8 +355,8 @@ namespace synthese
 			for (int i=0; i<result.getJourneyLegCount (); ++i)
 			{
 				_bestDepartureVertexReachesMap.insert (
-					result.getJourneyLeg (i)->getOrigin ()->getFromVertex (),
-					result.getJourneyLeg (i)->getDepartureTime () );
+					result.getJourneyLeg (i).getDepartureEdge()->getFromVertex (),
+					result.getJourneyLeg (i).getDepartureDateTime () );
 			}
 		    
 			for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = dvam.getMap ().begin ();
@@ -721,17 +402,23 @@ namespace synthese
 			Journey journey;
 
 			// Create origin vam from integral search on roads
-			Journeys originJourneys = integralSearch (
-				_originVam,
-				_journeySheetStartTime,
-				TO_DESTINATION,
-				Journey(),
-				std::numeric_limits<int>::max (),
-				DO_NOT_SEARCH_ADDRESSES,
-				SEARCH_PHYSICALSTOPS,
-				USE_ROADS,
-				DO_NOT_USE_LINES
+			IntegralSearcher iso(
+				TO_DESTINATION
+				, _accessParameters
+				, DO_NOT_SEARCH_ADDRESSES
+				, SEARCH_PHYSICALSTOPS
+				, USE_ROADS
+				, DO_NOT_USE_LINES
+				, _bestArrivalVertexReachesMap
+				, _destinationVam
+				, _calculationTime
+				, _maxArrivalTime
 				);
+			Journeys originJourneys(iso.integralSearch (
+				_originVam
+				, _journeySheetStartTime
+				, std::numeric_limits<int>::max ()
+				));
 			
 			VertexAccessMap ovam;
 			// Include physical stops from originVam into result of integral search
@@ -757,15 +444,23 @@ namespace synthese
 
 
 			// Create destination vam from integral search on roads
-			Journeys destinationJourneys = integralSearch (_destinationVam,
-									_journeySheetEndTime,
-									FROM_ORIGIN,
-									Journey(),
-									std::numeric_limits<int>::max (),
-									DO_NOT_SEARCH_ADDRESSES,
-									SEARCH_PHYSICALSTOPS,
-									USE_ROADS,
-									DO_NOT_USE_LINES);
+			IntegralSearcher isd(
+				FROM_ORIGIN
+				, _accessParameters
+				, DO_NOT_SEARCH_ADDRESSES
+				, SEARCH_PHYSICALSTOPS
+				, USE_ROADS
+				, DO_NOT_USE_LINES
+				, _bestDepartureVertexReachesMap
+				, _originVam
+				, _calculationTime
+				, _minDepartureTime
+				);
+			Journeys destinationJourneys(isd.integralSearch (
+					_destinationVam
+					, _journeySheetEndTime
+					, std::numeric_limits<int>::max ()
+					));
 
 			VertexAccessMap dvam;
 			// Include physical stops from destinationVam into result of integral search

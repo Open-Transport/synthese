@@ -24,7 +24,6 @@
 #include "33_route_planner/RoutePlannerNoSolutionInterfacePage.h"
 #include "33_route_planner/RoutePlannerSheetColumnInterfacePage.h"
 #include "33_route_planner/RoutePlannerSheetLineInterfacePage.h"
-#include "33_route_planner/JourneyLeg.h"
 
 #include "30_server/Request.h"
 
@@ -32,6 +31,7 @@
 #include "15_env/Road.h"
 #include "15_env/Edge.h"
 #include "15_env/Vertex.h"
+#include "15_env/ServiceUse.h"
 
 #include "11_interfaces/Interface.h"
 
@@ -68,7 +68,6 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<JourneyLeg> curET;
 				size_t __Ligne;
 				const PlaceList placesList = getStopsListForScheduleTable( *jv );
 				DateTime lastDepartureDateTime;
@@ -90,22 +89,22 @@ namespace synthese
 					__Ligne=0;
 					for (int l=0; l< it->getJourneyLegCount(); ++l)
 					{
-						curET = it->getJourneyLeg (l);
+						const ServiceUse& curET(it->getJourneyLeg (l));
 						
 						// Saving of the columns on each lines
 						columnInterfacePage->display( *__Tampons[__Ligne]
-							, __Ligne == 0, true, i, dynamic_cast<const Road*> (curET->getServiceInstance().getService()->getPath ()) != NULL
-							, curET->getDepartureTime().getHour(), lastDepartureDateTime.getHour(), it->getContinuousServiceRange() > 0
+							, __Ligne == 0, true, i, dynamic_cast<const Road*> (curET.getService()->getPath ()) != NULL
+							, curET.getDepartureDateTime().getHour(), lastDepartureDateTime.getHour(), it->getContinuousServiceRange() > 0
 							, request );
 						
-						for ( __Ligne++; placesList[ __Ligne ] != curET->getDestination()->getFromVertex ()->getConnectionPlace(); __Ligne++ )
+						for ( __Ligne++; placesList[ __Ligne ] != curET.getArrivalEdge()->getFromVertex ()->getConnectionPlace(); __Ligne++ )
 							columnInterfacePage->display( *__Tampons[ __Ligne ]
 								, true, true, i, false, unknownTime, unknownTime, false
 								, request );
 						
 						columnInterfacePage->display( *__Tampons[ __Ligne ] 
-							, true, l == it->getJourneyLegCount ()-1, i, dynamic_cast<const Road*> (curET->getServiceInstance().getService()->getPath ()) != NULL
-							, curET->getArrivalTime ().getHour (), lastArrivalDateTime.getHour(), it->getContinuousServiceRange() > 0
+							, true, l == it->getJourneyLegCount ()-1, i, dynamic_cast<const Road*> (curET.getService()->getPath ()) != NULL
+							, curET.getArrivalDateTime().getHour (), lastArrivalDateTime.getHour(), it->getContinuousServiceRange() > 0
 							, request );
 					}
 				}
@@ -312,14 +311,14 @@ namespace synthese
 		{
 			vector<bool> result;
 			int l = 0;
-			shared_ptr<JourneyLeg> curET((l >= __TrajetATester.getJourneyLegCount ()) ? shared_ptr<JourneyLeg>() : __TrajetATester.getJourneyLeg (l));
+			const ServiceUse* curET((l >= __TrajetATester.getJourneyLegCount ()) ? NULL : &__TrajetATester.getJourneyLeg (l));
 			for (size_t i = 0; pl[ i ] != NULL && i <= LigneMax; i++ )
 			{
-				if ( curET != NULL && pl[ i ] == curET->getOrigin() ->getConnectionPlace() )
+				if ( curET != NULL && pl[ i ] == curET->getDepartureEdge() ->getConnectionPlace() )
 				{
 					result.push_back(true);
 					++l;
-					curET = (l >= __TrajetATester.getJourneyLegCount ()) ? shared_ptr<JourneyLeg>() : __TrajetATester.getJourneyLeg (l);
+					curET = (l >= __TrajetATester.getJourneyLegCount ()) ? NULL : &__TrajetATester.getJourneyLeg (l);
 				}
 				else
 				{
@@ -631,17 +630,17 @@ namespace synthese
 				// Vertical loop
 				for (int l = 0; l < it->getJourneyLegCount (); ++l)
 				{
-					shared_ptr<JourneyLeg> curET(it->getJourneyLeg(l));
+					const ServiceUse& curET(it->getJourneyLeg(l));
 
 					// Search of the place from the preceding one
-					if ( OrdrePARechercheGare( pl, i, curET->getOrigin()->getConnectionPlace() ) )
+					if ( OrdrePARechercheGare( pl, i, curET.getDepartureEdge()->getConnectionPlace() ) )
 					{
 						if ( i < dernieri )
 							i = OrdrePAEchangeSiPossible( jv, pl, lll, dernieri, i );
 					}
 					else
 					{
-						i = OrdrePAInsere( pl, lll, curET->getOrigin() ->getConnectionPlace(), dernieri + 1 );
+						i = OrdrePAInsere( pl, lll, curET.getDepartureEdge()->getConnectionPlace(), dernieri + 1 );
 					}
 
 					dernieri = i;
@@ -649,9 +648,9 @@ namespace synthese
 
 					// Controle gare suivante pour trajet a pied
 					if ( /* MJ que deviennent les lignes à pied ??? curET->getLigne() ->Materiel() ->Code() == MATERIELPied && */   
-						pl[ i ] != curET->getDestination() ->getConnectionPlace() && (l != it->getJourneyLegCount ()-1) )
+						pl[ i ] != curET.getArrivalEdge()->getConnectionPlace() && (l != it->getJourneyLegCount ()-1) )
 					{
-						if ( OrdrePARechercheGare( pl, i, curET->getDestination() ->getConnectionPlace() ) )
+						if ( OrdrePARechercheGare( pl, i, curET.getArrivalEdge()->getConnectionPlace() ) )
 						{
 							OrdrePAEchangeSiPossible(jv, pl, lll, dernieri, i );
 							i = dernieri + 1;
@@ -659,7 +658,7 @@ namespace synthese
 						else
 						{
 							i = dernieri + 1;
-							OrdrePAInsere( pl, lll, curET->getDestination() ->getConnectionPlace(), i );
+							OrdrePAInsere( pl, lll, curET.getArrivalEdge()->getConnectionPlace(), i );
 						}
 						lll.insert( lll.begin() + i, true );
 					}

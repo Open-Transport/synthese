@@ -50,7 +50,7 @@ namespace synthese
 			std::string			_style;		//!< CSS style (cartouche)
 			std::string			_image;		//!< Display image (cartouche)
 
-			TransportNetwork*	_network;	//!< Network
+			const TransportNetwork*	_network;	//!< Network
 
 		public:
 			CommercialLine();
@@ -59,7 +59,7 @@ namespace synthese
 			void setStyle (const std::string& style);
 
 			const TransportNetwork* getNetwork () const;
-			void setNetwork (TransportNetwork* network);
+			void setNetwork (const TransportNetwork* network);
 
 			const std::string& getShortName () const;
 			void setShortName (const std::string& shortName);

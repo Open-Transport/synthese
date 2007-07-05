@@ -28,6 +28,8 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "15_env/ServiceUse.h"
+
 namespace synthese
 {
 	namespace env
@@ -38,16 +40,20 @@ namespace synthese
 	namespace routeplanner
 	{
 		class Journey;
-		class JourneyLeg;
 
 		/** @addtogroup m33
 			@{
 		*/
 
 		typedef std::vector<Journey>						Journeys;
-		typedef std::deque<boost::shared_ptr<JourneyLeg> >	JourneyLegs;
+		typedef std::deque<env::ServiceUse>					JourneyLegs;
 
 		typedef std::vector<const env::ConnectionPlace*>	JourneyBoardPlaces;
+
+		typedef enum { USE_ROADS, DO_NOT_USE_ROADS } UseRoads;
+		typedef enum { USE_LINES, DO_NOT_USE_LINES } UseLines;
+		typedef enum { SEARCH_ADDRESSES, DO_NOT_SEARCH_ADDRESSES } SearchAddresses;
+		typedef enum { SEARCH_PHYSICALSTOPS, DO_NOT_SEARCH_PHYSICALSTOPS } SearchPhysicalStops;
 
 		/** @} */
 	}

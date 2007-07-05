@@ -58,7 +58,7 @@ namespace synthese
 		private:
 			//! @name Initial parameters
 			//@{
-				const DeterminationMethod	_determinationMethod;
+				DeterminationMethod	_determinationMethod;
 				const env::Edge*			_edge;
 			//@}
 
@@ -67,9 +67,9 @@ namespace synthese
 			//@{
 				const Service*				_service;
 				time::DateTime				_originDateTime;
-				time::DateTime				_validityEndTime;	// For continuous services
 				time::DateTime				_actualTime;
 				int							_serviceIndex;
+				int							_range;
 			//@}
 			
 		public:
@@ -82,7 +82,7 @@ namespace synthese
 				void	setService(const Service* service);
 				void	setOriginDateTime(const time::DateTime& dateTime);
 				void	setServiceIndex(int index);
-				void	setValidityEndTime(const time::DateTime& dateTime);
+				void	setServiceRange(int duration);
 			//@}
 
 			//! @name Getters
@@ -92,7 +92,7 @@ namespace synthese
 				const time::DateTime&	getOriginDateTime()		const;
 				DeterminationMethod		getMethod()				const;
 				int						getServiceIndex()		const;
-				const time::DateTime&	getValidityDateTime()	const;
+				int						getServiceRange()		const;
 			//@}
 
 			//! @name Queries

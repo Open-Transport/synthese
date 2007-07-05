@@ -81,7 +81,7 @@ namespace synthese
 			, USE		= 20	//!< Utilisation de fonction autorisée
 			, READ		= 40	//!< Lecture directe de données autorisée
 			, WRITE		= 60	//!< Ecriture directe de donnée autorisée
-			, DELETE	= 80	//!< Suppression de donnée autorisée
+			, DELETE_RIGHT	= 80	//!< Suppression de donnée autorisée
 		} RightLevel;
 
 		typedef std::vector<

@@ -91,6 +91,10 @@ namespace synthese
 			return _calendar;
 		}
 
+		const Calendar& Service::getCalendar() const
+		{
+			return _calendar;
+		}
 
 
 

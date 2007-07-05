@@ -119,12 +119,13 @@ namespace synthese
 			Schedule schedule;
 			DateTime actualDateTime(presenceDateTime);
 			DateTime validityEndTime(presenceDateTime);
+			int range;
 			int edgeIndex(edge->getRankInPath());
 			
 			if (method == ServicePointer::DEPARTURE_TO_ARRIVAL)
 			{
 				schedule = _departureSchedules.at(edgeIndex).first;
-				if (_departureSchedules.at(edgeIndex).first.getHour() > _departureSchedules.at(edgeIndex).second.getHour())
+				if (_departureSchedules.at(edgeIndex).first.getHour() <= _departureSchedules.at(edgeIndex).second.getHour())
 				{
 					if (presenceDateTime.getHour() > _departureSchedules.at(edgeIndex).second.getHour())
 						return ServicePointer();
@@ -138,6 +139,7 @@ namespace synthese
 						actualDateTime.setHour(schedule.getHour());
 				}
 				validityEndTime.setHour(_departureSchedules.at(edgeIndex).second.getHour());
+				range = validityEndTime - actualDateTime;
 			}
 			else
 			{
@@ -156,9 +158,10 @@ namespace synthese
 						actualDateTime.setHour(_arrivalSchedules.at(edgeIndex).second.getHour());
 				}
 				validityEndTime.setHour(_arrivalSchedules.at(edgeIndex).first.getHour());
+				range = actualDateTime - validityEndTime;
 			}
 			ptr.setActualTime(actualDateTime);
-			ptr.setValidityEndTime(validityEndTime);
+			ptr.setServiceRange(range);
 
 			// Origin departure time
 			DateTime originDateTime(actualDateTime);
@@ -175,7 +178,6 @@ namespace synthese
 				return ServicePointer();
 
 			return ptr;
-
 		}
 
 		time::DateTime ContinuousService::getLeaveTime(

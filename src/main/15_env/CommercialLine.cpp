@@ -33,7 +33,7 @@ namespace synthese
 			return _network;
 		}
 
-		void CommercialLine::setNetwork( TransportNetwork* network )
+		void CommercialLine::setNetwork(const TransportNetwork* network )
 		{
 			_network = network;
 		}

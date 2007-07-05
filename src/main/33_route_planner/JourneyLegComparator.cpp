@@ -21,11 +21,12 @@
 */
 
 #include "33_route_planner/JourneyLegComparator.h"
-#include "33_route_planner/JourneyLeg.h"
+#include "33_route_planner/Journey.h"
 
 #include "15_env/Edge.h"
 #include "15_env/Vertex.h"
 #include "15_env/ConnectionPlace.h"
+#include "15_env/ServiceUse.h"
 
 #include <assert.h>
 
@@ -39,30 +40,27 @@ namespace synthese
 	{
 
 		JourneyLegComparator::JourneyLegComparator (const AccessDirection& accessDirection)
-			: _edgeAccessor ( (accessDirection == TO_DESTINATION)
-					? (&JourneyLeg::getDestination)
-					: (&JourneyLeg::getOrigin) ) 
-		{
-
-		}
+			: _firstServiceUseAccessor((accessDirection == TO_DESTINATION) ? &Journey::getFirstJourneyLeg : &Journey::getLastJourneyLeg)
+			, _secondServiceUseAccessor((accessDirection == TO_DESTINATION) ? &Journey::getLastJourneyLeg : &Journey::getFirstJourneyLeg)
+		{	}
 		 
 
 		JourneyLegComparator::~JourneyLegComparator ()
-		{
-
-		}
+		{	}
 
 
 
 
 		int 
-		JourneyLegComparator::operator () (shared_ptr<JourneyLeg> jl1, shared_ptr<JourneyLeg> jl2) const
+		JourneyLegComparator::operator () (const Journey& j1, const Journey& j2) const
 		{
-
-			if (jl1->getSquareDistance () == 0) return true;
-			if (jl2->getSquareDistance () == 0) return false;
+			const ServiceUse& secondServiceUse1((j1.*_secondServiceUseAccessor)());
+			const ServiceUse& secondServiceUse2((j2.*_secondServiceUseAccessor)());
+			
+			if (secondServiceUse1.getSquareDistance () == 0) return true;
+			if (secondServiceUse1.getSquareDistance () == 0) return false;
 		    
-			if (jl1->getSquareDistance () == jl2->getSquareDistance ()) return false;
+			if (secondServiceUse1.getSquareDistance () == secondServiceUse1.getSquareDistance ()) return false;
 
 		//	assert ((jl1->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
 		//	assert ((jl2->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
@@ -77,7 +75,7 @@ namespace synthese
 		    
 			if (type1 != type2)	return type2 - type1;
 */
-			return (jl2->getSquareDistance () <= jl1->getSquareDistance ());
+			return (secondServiceUse1.getSquareDistance () <= secondServiceUse1.getSquareDistance ());
 		}
 
 

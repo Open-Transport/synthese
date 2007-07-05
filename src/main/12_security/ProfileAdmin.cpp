@@ -105,7 +105,7 @@ namespace synthese
 			privatePublicMap.push_back(make_pair((int) USE, "Utilisation"));
 			privatePublicMap.push_back(make_pair((int) READ, "Lecture"));
 			privatePublicMap.push_back(make_pair((int) WRITE, "Ecriture"));
-			privatePublicMap.push_back(make_pair((int) DELETE, "Contrôle total"));
+			privatePublicMap.push_back(make_pair((int) DELETE_RIGHT, "Contrôle total"));
 			
 
 			stream	<< "<h1>Propriétés</h1>";
