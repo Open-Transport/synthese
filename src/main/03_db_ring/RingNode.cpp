@@ -28,7 +28,7 @@ namespace dbring
 
 
 const time_duration RingNode::RECV_TOKEN_TIMEOUT = milliseconds (4000);
-const int RingNode::SEND_TOKEN_TIMEOUT (2); // 2 seconds
+const int RingNode::TCP_TOKEN_TIMEOUT (2); // 2 seconds
 const int RingNode::SEND_TOKEN_MAX_NB_TRIES (3);
 
 
@@ -190,38 +190,38 @@ RingNode::sendToken ()
     {
 	const NodeInfo& ni = _data->getInfo (tryNodes[i]);
 
-	// Tries 3 times to send token to next node
-	std::cerr << ">> Node " << _data->getEmitterNodeId ();
-	std::cerr << " send [" ;
-	std::cerr << (*_data) << "] to node " << ni.getNodeId ();
+	// Prepare update log for token recipient.
+	_data->getUpdateLog ()->flush ();
 	
-	TcpClientSocket clientSock (ni.getHost (), ni.getPort (), SEND_TOKEN_TIMEOUT);
+	// Temporary logs
+	UpdateLogSPtr sinceLastPending (new UpdateLog ());
+	UpdateLogSPtr sinceLastAcknowledged (new UpdateLog ());
+	
+	UpdateRecordTableSync::loadAllAfterTimestamp (sinceLastAcknowledged, ni.getLastAcknowledgedTimestamp ());
+	
+	for (UpdateRecordSet::iterator it = sinceLastAcknowledged->getUpdateRecords ().begin ();
+	     it != sinceLastAcknowledged->getUpdateRecords ().end (); ++it)
+	{
+	    UpdateRecordSPtr ur = *it;
+	    if ((ur->getState () == ACKNOWLEDGED) && (ur->getTimestamp () <= ni.getLastPendingTimestamp ()))
+	    {
+		// SQL for this update record was already transmitted. Remove SQL part and acknowledge it.
+		ur->setSQL ("");
+	    }
+	    _data->getUpdateLog ()->setUpdateRecord (ur);
+	}
+	    
+	// Tries 3 times to send token to next node
+	// std::cerr << ">> Node " << _data->getEmitterNodeId ();
+	// std::cerr << " send [" ;
+	// std::cerr << (*_data) << "] to node " << ni.getNodeId ();
+	
+/*	TcpClientSocket clientSock (ni.getHost (), ni.getPort (), SEND_TOKEN_TIMEOUT);
 	for (int i=0; i<SEND_TOKEN_MAX_NB_TRIES; ++i)
 	{
 	    clientSock.tryToConnect ();
 	    if (clientSock.isConnected () == false) continue;
 
-	    // Prepare update log for token recipient.
-	    _data->getUpdateLog ()->flush ();
-
-	    // Temporary logs
-	    UpdateLogSPtr sinceLastPending (new UpdateLog ());
-	    UpdateLogSPtr sinceLastAcknowledged (new UpdateLog ());
-
-	    UpdateRecordTableSync::loadAllAfterTimestamp (sinceLastAcknowledged, ni.getLastAcknowledgedTimestamp ());
-	    
-	    for (UpdateRecordSet::iterator it = sinceLastAcknowledged->getUpdateRecords ().begin ();
-		 it != sinceLastAcknowledged->getUpdateRecords ().end (); ++it)
-	    {
-		UpdateRecordSPtr ur = *it;
-		if ((ur->getState () == ACKNOWLEDGED) && (ur->getTimestamp () <= ni.getLastPendingTimestamp ()))
-		{
-		    // SQL for this update record was already transmitted. Remove SQL part and acknowledge it.
-		    ur->setSQL ("");
-		}
-		_data->getUpdateLog ()->setUpdateRecord (ur);
-	    }
-	    
 	    try
 	    {
 		boost::iostreams::stream<TcpClientSocket> cliSocketStream;
@@ -230,7 +230,7 @@ RingNode::sendToken ()
 		cliSocketStream.flush ();
 		cliSocketStream.close ();
 		
-		std::cerr << std::endl;
+		// std::cerr << std::endl;
 		return true;
 	    }
 	    catch (std::exception& e) 
@@ -238,11 +238,13 @@ RingNode::sendToken ()
 		std::cerr << "ERREUR : " << e.what () << std::endl;
 	    }
 	}
+*/
+	if (sendSurefireToken (ni.getHost (), ni.getPort ())) return true;
 
 	// Failed to send token, mark node as OUTRING
 	_data->setState (ni.getNodeId (), OUTRING);
 	
-	std::cerr << " # FAILED!" << std::endl;
+//	std::cerr << " # FAILED!" << std::endl;
     }
 
     return false;
@@ -342,6 +344,52 @@ void RingNode::dump ()
 }
 
 
+bool 
+RingNode::sendSurefireToken (const std::string& host, int port)
+{
+    bool success (false);
+    // TODO : add ckecksum (utiliser byte array temporaire)
+    // TODO : add compression
+    // TODO : move this method to a generic Protocol service class in util.
+
+    TcpClientSocket clientSock (host, port, TCP_TOKEN_TIMEOUT);
+    for (int i=0; i<SEND_TOKEN_MAX_NB_TRIES; ++i)
+    {
+	clientSock.tryToConnect ();
+	if (clientSock.isConnected () == false) continue;
+	
+	try
+	{
+	    boost::iostreams::stream<TcpClientSocket> cliSocketStream;
+	    cliSocketStream.open (clientSock);
+	    cliSocketStream << (*_data) << ETB;
+	    cliSocketStream.flush ();
+	    
+	    try
+	    {
+		char answer = cliSocketStream.get ();
+		cliSocketStream.close ();
+		
+		if (answer == ACK) 
+		{
+		    success = true;
+		    break;
+		}
+	    }
+	    catch (std::exception e)
+	    {
+		// Timeout essentially...
+		Log::GetInstance ().error ("Error receiving acknowledgment", e);
+	    }
+	}
+	catch (std::exception& e) 
+	{
+	    Log::GetInstance ().error ("Error sending token", e);
+	}
+    }
+
+    return success;
+}
 
 
 

@@ -34,7 +34,7 @@ class RingNode
 private:
 
     static const boost::posix_time::time_duration RECV_TOKEN_TIMEOUT;
-    static const int SEND_TOKEN_TIMEOUT;
+    static const int TCP_TOKEN_TIMEOUT;
     static const int SEND_TOKEN_MAX_NB_TRIES;
     
     const TokenSPtr _data;  // State token (the one to be sent)
@@ -88,6 +88,9 @@ public:
 
  private:
 
+    /** Sends token and guarantees acknowledgement has been received (with retries).
+     */
+    bool sendSurefireToken (const std::string& host, int port);
     
     void resetTimer ();
 

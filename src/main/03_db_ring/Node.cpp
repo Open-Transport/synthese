@@ -296,7 +296,6 @@ Node::loop ()
 	    try
 	    {
 		ss >> (*(token.get ()));
-
 	    }
 	    catch (std::exception& e)
 	    {
@@ -304,7 +303,13 @@ Node::loop ()
 		continue;
 	    }
 
+	    // Token successfully parsed
+	    // TODO : check cheksum
+	    
+	    // Acknowledge it
+	    tcpStream << ACK;
 	    tcpStream.flush();
+
 	    tcpService->closeConnection (serverSocket);
 
 	}
