@@ -23,6 +23,7 @@
 #include "Conversion.h"
 
 #include <sstream>
+#include <iomanip>
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 
@@ -143,7 +144,7 @@ namespace synthese
 		Conversion::ToString (double d)
 		{
 			std::stringstream ss;
-			ss << d;
+			ss << std::fixed << d;
 			return ss.str ();
 		}
 

@@ -12,6 +12,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <iomanip>
 #include <locale>
 
 
@@ -69,8 +70,11 @@ TridentExport::Export (std::ostream& os,
 {
 
     os.imbue (std::locale(""));
+
     // os.imbue (std::locale("en_US.ISO-8859-15"));
     std::cerr << "locale = " << os.getloc ().name () << std::endl;
+
+
 
     os << "<?xml version='1.0' encoding='ISO-8859-15'?>" << std::endl << std::endl;
 
@@ -139,7 +143,7 @@ TridentExport::Export (std::ostream& os,
 	os << "<name>" << tn->getName () << "</name>" << std::endl;
 	os << "<lineId>" << TridentId (peerid, "Line", commercialLine->getKey ()) << "</lineId>" << std::endl;
 	os << "<registration>" << std::endl;
-	os << "<registrationNumber>" << tn->getKey () << "</registrationNumber>" << std::endl;
+	os << "<registrationNumber>" << Conversion::ToString (tn->getKey ()) << "</registrationNumber>" << std::endl;
 	os << "</registration>" << std::endl;
 
 	os << "</PTNetwork>" << std::endl;
@@ -150,9 +154,17 @@ TridentExport::Export (std::ostream& os,
 
     // --------------------------------------------------- Company
     os << "<Company>" << std::endl;
-    os << "inconnue" << std::endl;
+    os << "<objectId>SYNTHESE:Company:1</objectId>" << std::endl;
+    os << "<name>Tisséo Réseau Urbain</name>" << std::endl;
+    os << "<shortName>TRU</shortName>" << std::endl;
+    os << "<organisationalUnit></organisationalUnit>" << std::endl;
+    os << "<operatingDepartmentName></operatingDepartmentName>" << std::endl;
+    os << "<code>31000</code>" << std::endl;
+    os << "<phone>0561417070</phone>" << std::endl;
+    os << "<fax></fax>" << std::endl;
+    os << "<email></email>" << std::endl;
+    os << "<registration><registrationNumber>1</registrationNumber></registration>" << std::endl;
     os << "</Company>" << std::endl;
-
 
     os << "<ChouetteArea>" << std::endl;
 
@@ -160,15 +172,17 @@ TridentExport::Export (std::ostream& os,
     // BoardingPosition corresponds to a very accurate location along a quay for instance.
     // Not implemented right now.
 
-    // --------------------------------------------------- StopArea (type = Quay)
+    // --------------------------------------------------- StopArea (type = Quay) <=> PysicalStop
     {
 	for (std::set<const PhysicalStop*>::const_iterator it = physicalStops.begin ();
 	     it != physicalStops.end (); ++it)
 	{
 	    const PhysicalStop* ps = (*it);
 	    os << "<StopArea>" << std::endl;
+	    std::string stopname (ps->getName ());
+	    stopname += " (" + Conversion::ToString (ps->getKey ()) + ")";
 	    os << "<objectId>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</objectId>" << std::endl;
-	    os << "<name>" << ps->getName () << "</name>" << std::endl;
+	    os << "<name>" << stopname << "</name>" << std::endl;
 	    os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", ps->getKey ()) << "</centroidOfArea>" << std::endl;
 	    
 	    os << "<StopAreaExtension>" << std::endl;
@@ -269,13 +283,13 @@ TridentExport::Export (std::ostream& os,
 	    Point2D pt (ps->getX (), ps->getY ());
 	    GeoPoint gp = FromLambertIIe (pt);
 	    
-	    os << "<longitude>" << gp.getLongitude () << "</longitude>" << std::endl;
-	    os << "<latitude>" << gp.getLatitude () << "</latitude>" << std::endl;
+	    os << "<longitude>" << Conversion::ToString (gp.getLongitude ()) << "</longitude>" << std::endl;
+	    os << "<latitude>" << Conversion::ToString (gp.getLatitude ()) << "</latitude>" << std::endl;
 	    os << "<longLatType>" << "WGS84" << "</longLatType>" << std::endl;
 
 	    os << "<projectedPoint>" << std::endl;
-	    os << "<X>" << pt.getX () << "</X>" << std::endl;
-	    os << "<Y>" << pt.getY () << "</Y>" << std::endl;
+	    os << "<X>" << Conversion::ToString (pt.getX ()) << "</X>" << std::endl;
+	    os << "<Y>" << Conversion::ToString (pt.getY ()) << "</Y>" << std::endl;
 	    os << "<projectionType>" << "LambertIIe" << "</projectionType>" << std::endl;
 	    os << "</projectedPoint>" << std::endl;
       
@@ -372,7 +386,7 @@ TridentExport::Export (std::ostream& os,
 		os << "<routeId>" << TridentId (peerid, "ChouetteRoute", (*itline)->getKey ()) << "</routeId>" << std::endl;
 	    }
 	    os << "<registration>" << std::endl;
-	    os << "<registrationNumber>" << commercialLine->getKey () << "</registrationNumber>" << std::endl;
+	    os << "<registrationNumber>" << Conversion::ToString (commercialLine->getKey ()) << "</registrationNumber>" << std::endl;
 	    os << "</registration>" << std::endl;
 
 	    os << "</Line>" << std::endl;
@@ -394,6 +408,7 @@ TridentExport::Export (std::ostream& os,
 		     itedge != edges.end (); ++itedge)
 		{
 		    const LineStop* lineStop = dynamic_cast<const LineStop*> (*itedge);
+		    if (lineStop->getNextInPath () == 0) continue;
 		    os << "<ptLinkId>" << TridentId (peerid, "PtLink", lineStop->getKey ()) << "</ptLinkId>" << std::endl;
 		}
 		os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", line->getKey ()) << "</journeyPatternId>" << std::endl;
@@ -415,13 +430,13 @@ TridentExport::Export (std::ostream& os,
 		Point2D pt (ps->getX (), ps->getY ());
 		GeoPoint gp = FromLambertIIe (pt);
 		
-		os << "<longitude>" << gp.getLongitude () << "</longitude>" << std::endl;
-		os << "<latitude>" << gp.getLatitude () << "</latitude>" << std::endl;
+		os << "<longitude>" << Conversion::ToString (gp.getLongitude ()) << "</longitude>" << std::endl;
+		os << "<latitude>" << Conversion::ToString (gp.getLatitude ()) << "</latitude>" << std::endl;
 		os << "<longLatType>" << "WGS84" << "</longLatType>" << std::endl;
 		
 		os << "<projectedPoint>" << std::endl;
-		os << "<X>" << pt.getX () << "</X>" << std::endl;
-		os << "<Y>" << pt.getY () << "</Y>" << std::endl;
+		os << "<X>" << Conversion::ToString (pt.getX ()) << "</X>" << std::endl;
+		os << "<Y>" << Conversion::ToString (pt.getY ()) << "</Y>" << std::endl;
 		os << "<projectionType>" << "LambertIIe" << "</projectionType>" << std::endl;
 		os << "</projectedPoint>" << std::endl;
 
@@ -460,7 +475,7 @@ TridentExport::Export (std::ostream& os,
 		os << "<objectId>" << TridentId (peerid, "PtLink", from->getKey ()) << "</objectId>" << std::endl;
 		os << "<startOfLink>" << TridentId (peerid, "StopPoint", from->getKey ()) << "</startOfLink>" << std::endl;
 		os << "<endOfLink>" << TridentId (peerid, "StopPoint", to->getKey ()) << "</endOfLink>" << std::endl;
-		os << "<linkDistance>" << from->getLength () << "</linkDistance>" << std::endl;   // in meters!
+		os << "<linkDistance>" << Conversion::ToString (from->getLength ()) << "</linkDistance>" << std::endl;   // in meters!
 		os << "</PtLink>" << std::endl;
 	    }
 	}
@@ -510,6 +525,7 @@ TridentExport::Export (std::ostream& os,
 		os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</routeIdShortcut>" << std::endl;
 		
 		os << "<number>" << srv->getServiceNumber () << "</number>" << std::endl;
+		os << "<comment>" << TridentId (peerid, "VehicleJourney", srv) << "</comment>" << std::endl;
 
 		// --------------------------------------------------- VehicleJourneyAtStop
 		{
