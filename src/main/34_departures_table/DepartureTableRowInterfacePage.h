@@ -31,8 +31,17 @@ namespace synthese
 {
 	namespace departurestable
 	{
-		/** Admin template page.
-		@code admin @endcode
+		/** Departure table row Interface Page.
+			@code departurestablerow <row_id> <page_number> <message> <display_service_number> @endcode
+
+			Parameters :
+				- <row_id> : Rank of the row in the departure table
+				- <page_number> : Number of the page to display for multiple page protocol (eg Lumiplan)
+				- <message> : Message to display instead of timetables
+				- <display_service_number> : 1|0 Indicates if the service number cell must be displayed in the row
+
+			Object :
+				- Must be a ArrivalDepartureRow object
 		*/
 		class DepartureTableRowInterfacePage : public interfaces::InterfacePage
 		{
@@ -44,6 +53,7 @@ namespace synthese
 				, int rowId
 				, int pageNumber
 				, const std::string& message
+				, bool displayServiceNumber
 				, const ArrivalDepartureRow& row
 				, const server::Request* request = NULL
 				) const;

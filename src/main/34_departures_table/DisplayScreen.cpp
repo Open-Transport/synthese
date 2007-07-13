@@ -254,9 +254,9 @@ namespace synthese
 				ArrivalDepartureListWithAlarm displayedObject;
 				displayedObject.map = generator->generate();
 				displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this);
-				shared_ptr<const DeparturesTableInterfacePage> page = _displayType->getInterface()->getPage<DeparturesTableInterfacePage>();
+				shared_ptr<const DeparturesTableInterfacePage> page(_displayType->getInterface()->getPage<DeparturesTableInterfacePage>());
 				VariablesMap variables;
-				page->display(stream, variables, getTitle(), getWiringCode(), displayedObject);
+				page->display(stream, variables, getTitle(), getWiringCode(), getServiceNumberDisplay(), displayedObject);
 			}
 			catch (InterfacePageException& e)
 			{

@@ -269,7 +269,7 @@ namespace synthese
 				// Case the journey goes to a final destination
 				if (dvam.contains(itj->getDestination()->getFromVertex()))
 				{
-					// A destination without any approch time stops the recursion
+					// A destination without any approach time stops the recursion
 					const VertexAccess& va = dvam.getVertexAccess(itj->getDestination()->getFromVertex());
 					if (va.approachTime == 0)
 						recursion = false;
@@ -491,9 +491,9 @@ namespace synthese
 			for (_minDepartureTime = _journeySheetStartTime; 
 			 _minDepartureTime < _journeySheetEndTime; )
 			{
-
+				journey.clear();
 				computeRoutePlanningDepartureArrival (journey, ovam, dvam);
-				    
+				
 				//! <li> If no journey was found and last service is continuous, 
 					//! then repeat computation after continuous service range. </li>
 				if ( (journey.getJourneyLegCount () == 0) &&
@@ -506,8 +506,8 @@ namespace synthese
 					computeRoutePlanningDepartureArrival (journey, ovam, dvam);	
 				}
 				
-				if (journey.getJourneyLegCount () == 0) break;
-				
+				if (journey.getJourneyLegCount () == 0)
+					break;				
 				
 				//! <li>If last continuous service was broken, update its range</li>
 				if ( (result.empty () == false) &&
@@ -517,11 +517,18 @@ namespace synthese
 					int duration = journey.getArrivalTime () - result.back ().getArrivalTime () - 1;
 					result.back ().setContinuousServiceRange (duration);
 				}
-				else
+
+				/*!	<li>En cas de nouveau service continu, enregistrement de valeur pour le calcul de la prochaine solution</li>	*/
+				if (journey.getContinuousServiceRange() > 1)
 				{
-					_previousContinuousServiceDuration = 0;
+					_previousContinuousServiceDuration = journey.getArrivalTime() - journey.getDepartureTime();
+					_previousContinuousServiceLastDeparture = journey.getDepartureTime();
+					_previousContinuousServiceLastDeparture += journey.getContinuousServiceRange();
 				}
-				
+				else
+					_previousContinuousServiceDuration = 0;
+
+
 				result.push_back (journey);
 				
 				_minDepartureTime = journey.getDepartureTime ();

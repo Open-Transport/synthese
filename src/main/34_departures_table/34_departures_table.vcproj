@@ -439,6 +439,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\DeparturesTableRowServiceNumberInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DeparturesTableRowServiceNumberInterfaceElement.h"
+					>
+				</File>
+				<File
 					RelativePath=".\DeparturesTableTimeContentInterfaceElement.cpp"
 					>
 				</File>

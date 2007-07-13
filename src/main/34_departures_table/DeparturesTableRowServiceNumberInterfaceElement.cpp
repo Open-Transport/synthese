@@ -1,6 +1,6 @@
 
-/** DeparturesTableInterfacePage class implementation.
-	@file DeparturesTableInterfacePage.cpp
+/** DeparturesTableRowServiceNumberInterfaceElement class implementation.
+	@file DeparturesTableRowServiceNumberInterfaceElement.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,39 +20,41 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DeparturesTableInterfacePage.h"
+#include "34_departures_table/Types.h"
+#include "34_departures_table/DeparturesTableRowServiceNumberInterfaceElement.h"
 
-#include "01_util/Conversion.h"
+#include "15_env/Service.h"
 
-using namespace boost;
+#include "11_interfaces/ValueElementList.h"
+
+using namespace std;
 
 namespace synthese
 {
-	using namespace util;
 	using namespace interfaces;
 
 	namespace departurestable
 	{
-		void DeparturesTableInterfacePage::display( std::ostream& stream
-			, VariablesMap& vars
-			, const std::string& title
-			, int wiringCode
-			, bool displayServiceNumber
-			, const ArrivalDepartureListWithAlarm& rows
+		void DeparturesTableRowServiceNumberInterfaceElement::storeParameters(ValueElementList& vel)
+		{
+		}
+
+		string DeparturesTableRowServiceNumberInterfaceElement::display(
+			std::ostream& stream
+			, const interfaces::ParametersVector& parameters
+			, VariablesMap& variables
+			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			ParametersVector pv;
-			pv.push_back(title);
-			pv.push_back(Conversion::ToString(wiringCode));
-			pv.push_back(Conversion::ToString(displayServiceNumber));
-			
-			InterfacePage::display(
-				stream
-				, pv
-				, vars
-				, (const void*) &rows
-				, request);
+			const ArrivalDepartureRow* row(static_cast<const ArrivalDepartureRow*>(object));
+
+			stream << row->first.servicePointer.getService()->getServiceNumber();
+
+			return string();
+		}
+
+		DeparturesTableRowServiceNumberInterfaceElement::~DeparturesTableRowServiceNumberInterfaceElement()
+		{
 		}
 	}
 }
- 

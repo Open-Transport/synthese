@@ -63,6 +63,9 @@ namespace synthese
 
 			if (!vel.isEmpty())
 				_message = vel.front();
+
+			if (!vel.isEmpty())
+				_displayServiceNumber = vel.front();
 		}
 
 		string DeparturesTableInterfaceElement::display(
@@ -72,16 +75,17 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const ArrivalDepartureList& ptds = ((const ArrivalDepartureListWithAlarm*) object)->map;
+			const ArrivalDepartureList& ptds(static_cast<const ArrivalDepartureListWithAlarm*>(object)->map);
 			
 			int __MultiplicateurRangee = _multiplicateurRangeeVIE->isZero(parameters, variables, object, request) ? 1 : Conversion::ToInt(_multiplicateurRangeeVIE->getValue(parameters, variables, object, request));
-			const std::string& __Pages = _pagesVIE->getValue(parameters, variables, object, request);
-			const std::string& __SeparateurPage = _pageSeparator->getValue(parameters, variables, object, request);
-			int departuresToHide = _departuresToHide ? Conversion::ToInt(_departuresToHide->getValue(parameters, variables, object, request)) : 0;
-			const std::string message (_message ? _message->getValue(parameters, variables, object, request) : "");
+			const string& __Pages = _pagesVIE->getValue(parameters, variables, object, request);
+			const string& __SeparateurPage = _pageSeparator->getValue(parameters, variables, object, request);
+			int departuresToHide(_departuresToHide ? Conversion::ToInt(_departuresToHide->getValue(parameters, variables, object, request)) : 0);
+			const string message (_message ? _message->getValue(parameters, variables, object, request) : string());
+			bool displayServiceNumber(_displayServiceNumber ? Conversion::ToBool(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
 
 			// Gestion des pages
-			int __NombrePages = 1;
+			int __NombrePages(1);
 			if ((__Pages == VALUE_INTERMEDIATE) || (__Pages == VALUE_DESTINATION))
 			{
 				int departuresNumber = ptds.size() - departuresToHide;
@@ -94,7 +98,7 @@ namespace synthese
 			}
 
 			if (__Pages == VALUE_DESTINATION)
-				__NombrePages++;
+				++__NombrePages;
 
 			// Boucle sur les pages
 			for ( int __NumeroPage = 1; __NumeroPage <= __NombrePages; __NumeroPage++ )
@@ -117,7 +121,7 @@ namespace synthese
 
 					// Lancement de l'affichage de la rangee
 					shared_ptr<const DepartureTableRowInterfacePage> page = _page->getInterface()->getPage<DepartureTableRowInterfacePage>();
-					page->display(stream, variables, __Rangee, pageNumber, message, ___DP, request);
+					page->display(stream, variables, __Rangee, pageNumber, message, displayServiceNumber, ___DP, request);
 
 					// Incrementation du numero de rangee
 					__Rangee += __MultiplicateurRangee;

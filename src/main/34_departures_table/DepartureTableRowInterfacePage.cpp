@@ -38,13 +38,15 @@ namespace synthese
 				, int rowId
 				, int pageNumber
                 , const std::string& message
+				, bool displayServiceNumber
 				, const ArrivalDepartureRow& ptd
 				, const server::Request* request) const
 		{
 			ParametersVector parameters;
 			parameters.push_back(Conversion::ToString (rowId));
 			parameters.push_back(Conversion::ToString (pageNumber));
-			if (message.empty () == false) parameters.push_back(message);
+			parameters.push_back(message);
+			parameters.push_back(Conversion::ToString(displayServiceNumber));
 			
 			InterfacePage::display(
 				stream

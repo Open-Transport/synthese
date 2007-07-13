@@ -34,10 +34,16 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Departures table.
+			
+			@code departurestable P1 P2 P3 @endcode
+			
 			Parameters :
 				-# Title of the screen
+				-# Wiring code
+				-# 1|0 : Service number display
 			Object :
 				- result of table generation
+
 			@ingroup m34Pages refPages
 		*/
 		class DeparturesTableInterfacePage : public interfaces::InterfacePage
@@ -47,13 +53,15 @@ namespace synthese
 				This function converts the parameters into a single ParametersVector object.
 
 				@param title Title to display in the generated code
-				@param wiring code Wiring code to display in the generated code
+				@param wiringCode Wiring code to display in the generated code
+				@param displayServiceNumber The service number must be displayed in this departure table
 			*/
 			void display(
 				std::ostream& stream
 				, interfaces::VariablesMap& vars
 				, const std::string& title
 				, int wiringCode
+				, bool displayServiceNumber
 				, const ArrivalDepartureListWithAlarm& rows
 				, const server::Request* request = NULL) const;
 		};

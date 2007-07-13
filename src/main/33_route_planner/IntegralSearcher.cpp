@@ -77,9 +77,6 @@ namespace synthese
 			SimplifiedResult simplifiedResult;
 			SimplifiedResultIndex simplifiedResultIndex;
 
-			// TODO : the whole other way depending on accessdirection !!
-			// What follows is in case TO_DESTINATION only
-
 			for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = vam.getMap ().begin ();
 				itVertex != vam.getMap ().end (); ++itVertex)
 			{
@@ -89,7 +86,7 @@ namespace synthese
 					|| origin->isPhysicalStop() && _useLines != USE_LINES)
 					continue;
 
-				const std::set<const Edge*>& edges = origin->getDepartureEdges ();
+				const std::set<const Edge*>& edges((_accessDirection == TO_DESTINATION) ? origin->getDepartureEdges() : origin->getArrivalEdges());
 
 				for (std::set<const Edge*>::const_iterator itEdge = edges.begin ();
 					itEdge != edges.end () ; ++itEdge)
@@ -105,7 +102,10 @@ namespace synthese
 
 					DateTime departureMoment(desiredTime);
 					DateTime originDateTime;
-					departureMoment += static_cast<int>(itVertex->second.approachTime);
+					if (_accessDirection == TO_DESTINATION)
+						departureMoment += static_cast<int>(itVertex->second.approachTime);
+					else
+						departureMoment -= static_cast<int>(itVertex->second.approachTime);
 
 					ServicePointer serviceInstance(
 						edge->getNextService (
@@ -199,11 +199,14 @@ namespace synthese
 				//		if (_destinationVam.contains (vertex)
 
 				// Now, prepend each resulting journey with nextCurrentJourney.
-				if ( (_searchAddresses && (vertex->isAddress ())) ||
-					(_searchPhysicalStops && (vertex->isPhysicalStop ())) )
-				{
+				if(	(_searchAddresses == SEARCH_ADDRESSES && vertex->isAddress())
+					|| (_searchPhysicalStops == SEARCH_PHYSICALSTOPS && vertex->isPhysicalStop()) 
+				){
 					Journey newJourney (currentJourney);
-					newJourney.append (serviceUse);
+					if (_accessDirection == TO_DESTINATION)
+						newJourney.append (serviceUse);
+					else
+						newJourney.prepend(serviceUse);
 					_result[vertex] = newJourney;
 				}
 			}
