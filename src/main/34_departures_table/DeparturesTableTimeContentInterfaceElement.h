@@ -37,6 +37,12 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Departure time content cell interface element.
+
+			Parameters :
+				- 1|0 indicates if a zero character must be added on <10 hours
+				- text to write before the hour if the departure is immediate
+				- text to write after the hour if the departure is immediate
+
 			@ingroup m34Library refLibrary
 		*/
 		class DeparturesTableTimeContentInterfaceElement : public interfaces::LibraryInterfaceElement

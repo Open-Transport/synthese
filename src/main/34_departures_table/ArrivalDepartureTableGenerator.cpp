@@ -85,7 +85,7 @@ namespace synthese
 			// Values
 			DeparturesTableElement element(
 				servicePointer
-				, (servicePointer.getActualDateTime() - _startDateTime) <= _blinkingDelay
+				, (servicePointer.getActualDateTime() - _startDateTime) < _blinkingDelay
 				);
 
 			ActualDisplayedArrivalsList arrivals;

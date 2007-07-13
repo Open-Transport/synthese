@@ -110,7 +110,9 @@ namespace synthese
 		shared_ptr<ArrivalDepartureTableGenerator> DisplayScreen::getGenerator(const DateTime& startDateTime) const
 		{
 			// End time
-			DateTime endDateTime = startDateTime;
+			DateTime realStartDateTime(startDateTime);
+			realStartDateTime += (-_clearingDelay + 1);
+			DateTime endDateTime(realStartDateTime);
 			endDateTime += _maxDelay;
 
 			// Construction of the generator
@@ -124,7 +126,7 @@ namespace synthese
 					, _forbiddenLines
 					, _displayedPlaces
 					, _forbiddenArrivalPlaces
-					, startDateTime
+					, realStartDateTime
 					, endDateTime
 					, _blinkingDelay
 					, _displayType->getRowNumber()
@@ -138,7 +140,7 @@ namespace synthese
 					, _forbiddenLines
 					, _displayedPlaces
 					, _forbiddenArrivalPlaces
-					, startDateTime
+					, realStartDateTime
 					, endDateTime
 					, _displayType->getRowNumber()
 					, _forcedDestinations
