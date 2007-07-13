@@ -247,7 +247,7 @@ namespace synthese
 
 		void DisplayScreen::display( std::ostream& stream, const DateTime& date ) const
 		{
-			if (!_displayType || !_displayType->getInterface())
+			if (!_displayType || !_displayType->getInterface() || !_maintenanceIsOnline)
 				return;
 
 			try

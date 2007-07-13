@@ -87,6 +87,7 @@ namespace synthese
 			if (_template)
 				screen->copy(_template);
 			screen->setLocalization(_place);
+			screen->setMaintenanceIsOnline(true);
 
 			// Action
 			DisplayScreenTableSync::save(screen.get());
