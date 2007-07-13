@@ -56,7 +56,7 @@ public:
 
 private:
 
-    static const int DEFAULT_TIME_OUT = 10;
+    static const int DEFAULT_TIME_OUT = 10000;  // 10s
 
     const std::string _hostName;
     const int _portNumber;

@@ -43,7 +43,7 @@ namespace synthese
 		bool autorespawn = false;
 
 		ManagedThread* nodeThread = 
-		    new ManagedThread (_Node, "dbring_node", 500, autorespawn);
+		    new ManagedThread (_Node, "dbring_node", 10, autorespawn);
 		
 	    }
 	    

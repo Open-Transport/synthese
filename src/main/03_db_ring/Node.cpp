@@ -1,4 +1,5 @@
 #include "03_db_ring/Node.h"
+#include "03_db_ring/Constants.h"
 #include "03_db_ring/DbRingException.h"
 
 #include "03_db_ring/UpdateRecordTableSync.h"
@@ -19,6 +20,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
 
 
 using namespace synthese::tcp;
@@ -182,6 +186,13 @@ void
 Node::initialize ()
 {
     _lastUpdateIndex = UpdateRecordTableSync::getLastUpdateIndex (_id);
+
+    for (RingNodes::iterator it = _ringNodes.begin ();
+	 it != _ringNodes.end (); ++it)
+    {
+	RingNodeSPtr rn = it->second;
+	rn->initialize ();
+    }
 }
 
 
@@ -279,23 +290,22 @@ Node::loop ()
 
 	synthese::tcp::TcpServerSocket* serverSocket =
 	    tcpService->acceptConnection ();
-	
+
 	// Non-blocking mode (default)
 	if (serverSocket != 0) 
 	{
+	    serverSocket->setTimeOut (TCP_TOKEN_TIMEOUT);
 	    token.reset (new Token ());
 	    
 	    boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
 		tcpStream (*serverSocket);
-	    
-	    char buffer[1024*512]; // 512K buffer max
-	    tcpStream.getline (buffer, 1024*512, ETB);
-	    
-	    // Create token object from received message
-	    std::stringstream ss (buffer);
+
 	    try
 	    {
-		ss >> (*(token.get ()));
+		boost::iostreams::filtering_istream zlibin;
+		zlibin.push (boost::iostreams::zlib_decompressor ());
+		zlibin.push (tcpStream);
+		zlibin >> (*(token.get ()));
 	    }
 	    catch (std::exception& e)
 	    {
@@ -303,44 +313,29 @@ Node::loop ()
 		continue;
 	    }
 
-	    // Token successfully parsed
-	    // TODO : check cheksum
-	    
-	    // Acknowledge it
-	    tcpStream << ACK;
-	    tcpStream.flush();
-
 	    tcpService->closeConnection (serverSocket);
 
 	}
 
 	if (token.get ())
 	{
-	    // Time to filter update log
-	    // filterUpdateLog (token);
-
+            /*
 	    std::stringstream logstr;
 	    logstr << "Node " << _id << " recv [" 
 		   << (*token) << "] fm node " << token->getEmitterNodeId () << std::endl;
 	    
 	    Log::GetInstance ().debug (logstr.str ());
-	    
+	    */
+
 	    mergeUpdateLog (token);
 	}
 	
-	//bool masterAuthority (true);
-
 	for (RingNodes::iterator it = _ringNodes.begin ();
 	     it != _ringNodes.end (); ++it)
 	{
 	    RingNodeSPtr rn = it->second;
 	    rn->loop (token);
 	}
-
-	
-
-	// At this stage we are sure that local updates have also been taken into account.
-	//flushUpdates ();
 	
     }
 
@@ -383,6 +378,14 @@ void
 Node::mergeUpdateLog (const TokenSPtr& token)
 {
     const UpdateRecordSet& records  = token->getUpdateLog ()->getUpdateRecords ();
+    if (records.size () == 0) return;
+    
+    // Prepare local in-memory update log for merge
+    UpdateRecordTableSync::loadAllAfterTimestamp (_updateLog, 
+						  token->getUpdateLog ()->getUpdateLogBeginTimestamp (),
+						  true //inclusive
+	);    
+    
     for (UpdateRecordSet::const_iterator itr = records.begin ();
 	 itr != records.end (); ++itr)
     {
@@ -391,8 +394,13 @@ Node::mergeUpdateLog (const TokenSPtr& token)
 	// Do not propagate failed update record.
 	if (ur->getState () == FAILED) continue;
 
+	// Do not propagate locally acknowledged update record (authority might not have got the
+	// info that local node has already acknowledged it).
+	if (_updateLog->hasUpdateRecord (ur->getKey ()) &&
+	    _updateLog->getUpdateRecord (ur->getKey ())->getState () == ACKNOWLEDGED) continue;
+
 	std::stringstream ss;
-	ss << "Merging record " << ur;
+	ss << "Merging record " << (*ur);
 	Log::GetInstance ().debug (ss.str ());
 
 	if (ur->getTimestamp () < getLastAcknowledgedTimestamp ())

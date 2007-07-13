@@ -56,7 +56,7 @@ public:
 
 private:
 
-    static const int DEFAULT_TIME_OUT = 10;
+    static const int DEFAULT_TIME_OUT = 10000; // 10 seconds
 
     TcpService& _service;
     const int _socketId;

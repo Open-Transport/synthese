@@ -114,7 +114,7 @@ socket.write(Client,Buffer,Size,Timeout);
 			SOCKET _socket;
 
 		protected:
-			void name(const char* hostName, const int portNumber);
+			void name(const char* hostName, int portNumber);
 			void initializeSocket(const char* protoName);
 		    
 		public:
@@ -123,20 +123,20 @@ socket.write(Client,Buffer,Size,Timeout);
 			void closeSocket();
 			void closeSocket (SOCKET socket);
 			void open(const char* hostName, 
-				  const int portNumber, 
+				  int portNumber, 
 				  const char* protoName);
 
 			void server();
 			SOCKET acceptConnection();
 			SOCKET connectToServer();
-			int write(const char* buffer, const int size, const int timeout);
-			int write(SOCKET socket, const char* buffer, const int size, const int timeout);
+			int write(const char* buffer, int size, int timeout);
+			int write(SOCKET socket, const char* buffer, int size, int timeout);
 
-			/** If timeout (in seconds) is not strictly positive this is a blocking read operation.
+			/** If timeout (in milliseconds) is not strictly positive this is a blocking read operation.
 			 */
-			int read(char* buffer, const int size, const int timeout);
+			int read(char* buffer, int size, int timeout_ms);
 
-			int read(SOCKET socket, char* buffer, const int size, const int timeout);
+			int read(SOCKET socket, char* buffer, int size, int timeout_ms);
 		};
 
 	}

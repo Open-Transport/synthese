@@ -91,6 +91,14 @@ UpdateLog::flush ()
 
 
 
+boost::posix_time::ptime 
+UpdateLog::getUpdateLogBeginTimestamp () const
+{
+    assert (_set.size () > 0);
+    return (*_set.begin ())->getTimestamp ();
+}
+
+
 
 std::ostream& 
 operator<< ( std::ostream& os, const UpdateLog& op )

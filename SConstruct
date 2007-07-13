@@ -19,7 +19,8 @@ goal = ARGUMENTS.get('goal', '').lower()
 toolset = ARGUMENTS.get('toolset').lower()  
 version = ARGUMENTS.get('version').lower()  
 boostversion = ARGUMENTS.get('boostversion').lower()  
-sqliteversion = ARGUMENTS.get('sqliteversion').lower()  
+sqliteversion = ARGUMENTS.get('sqliteversion').lower()
+zlibversion = ARGUMENTS.get('zlibversion').lower()
 distname = ARGUMENTS.get('distname', 'dist').lower()
 
 
@@ -240,6 +241,9 @@ def AddBoostDependency (env, libname):
 def AddSQLiteDependency (env):
   AddDependency (env, "sqlite", sqliteversion, True)
     
+def AddZlibDependency (env):
+  AddDependency (env, "zlib", zlibversion, True)
+    
 
 
 def AppendMultithreadConf (env):
@@ -294,6 +298,7 @@ def SyntheseEnv (env, modules):
     syntheseenv.AddBoostDependency ('boost_thread')
     syntheseenv.AddBoostDependency ('boost_iostreams')
     syntheseenv.AddSQLiteDependency ()
+    syntheseenv.AddZlibDependency ()
     syntheseenv.AppendMultithreadConf ()
 
     return syntheseenv
@@ -316,6 +321,7 @@ def UnitTestEnv (env, modules):
     testenv.AddBoostDependency ('boost_iostreams')
     testenv.AddBoostDependency ('boost_unit_test_framework')
     testenv.AddSQLiteDependency ()
+    testenv.AddZlibDependency ()
     testenv.AppendMultithreadConf ()
 
     return testenv
@@ -485,6 +491,7 @@ SConsEnvironment.UnitTest=UnitTest
 SConsEnvironment.AddModuleDependency=AddModuleDependency
 SConsEnvironment.AddBoostDependency=AddBoostDependency
 SConsEnvironment.AddSQLiteDependency=AddSQLiteDependency
+SConsEnvironment.AddZlibDependency=AddZlibDependency
 
 
 

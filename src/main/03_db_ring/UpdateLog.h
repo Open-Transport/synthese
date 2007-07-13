@@ -65,6 +65,8 @@ public:
     const UpdateRecordSet& getUpdateRecords () const { return _set; }
     UpdateRecordSet& getUpdateRecords () { return _set; }
 
+    boost::posix_time::ptime getUpdateLogBeginTimestamp () const;
+
     void flush ();
 
 private:

@@ -46,7 +46,8 @@ public:
 			      const db::SQLiteResult& rows);
 
     static void loadAllAfterTimestamp (UpdateLogSPtr dest, 
-				       const boost::posix_time::ptime& timestamp);
+				       const boost::posix_time::ptime& timestamp,
+				       bool inclusive = false);
 
     static boost::posix_time::ptime getLastPendingTimestamp ();
 

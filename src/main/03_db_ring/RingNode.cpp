@@ -1,10 +1,14 @@
 #include "03_db_ring/RingNode.h"
+#include "03_db_ring/Constants.h"
 
 #include "03_db_ring/DbRingException.h"
 #include "03_db_ring/UpdateRecordTableSync.h"
 
 #include <boost/iostreams/stream.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
 
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
@@ -28,7 +32,6 @@ namespace dbring
 
 
 const time_duration RingNode::RECV_TOKEN_TIMEOUT = milliseconds (4000);
-const int RingNode::TCP_TOKEN_TIMEOUT (2); // 2 seconds
 const int RingNode::SEND_TOKEN_MAX_NB_TRIES (3);
 
 
@@ -52,6 +55,14 @@ RingNode::RingNode (const NodeInfo& nodeInfo,
 RingNode::~RingNode ()
 {
 }
+
+
+
+void 
+RingNode::initialize ()
+{
+}
+
 
 
 
@@ -211,40 +222,22 @@ RingNode::sendToken ()
 	    _data->getUpdateLog ()->setUpdateRecord (ur);
 	}
 	    
-	// Tries 3 times to send token to next node
-	// std::cerr << ">> Node " << _data->getEmitterNodeId ();
-	// std::cerr << " send [" ;
-	// std::cerr << (*_data) << "] to node " << ni.getNodeId ();
-	
-/*	TcpClientSocket clientSock (ni.getHost (), ni.getPort (), SEND_TOKEN_TIMEOUT);
-	for (int i=0; i<SEND_TOKEN_MAX_NB_TRIES; ++i)
+	if (sendSurefireToken (ni.getHost (), ni.getPort ())) 
 	{
-	    clientSock.tryToConnect ();
-	    if (clientSock.isConnected () == false) continue;
-
-	    try
-	    {
-		boost::iostreams::stream<TcpClientSocket> cliSocketStream;
-		cliSocketStream.open (clientSock);
-		cliSocketStream << (*_data) << ETB;
-		cliSocketStream.flush ();
-		cliSocketStream.close ();
-		
-		// std::cerr << std::endl;
-		return true;
-	    }
-	    catch (std::exception& e) 
-	    {
-		std::cerr << "ERREUR : " << e.what () << std::endl;
-	    }
-	}
+/*
+	    std::stringstream logstr;
+	    logstr << "Node " << _data->getEmitterNodeId () << " sent [" 
+		   << (*_data) << "] to node " << ni.getNodeId () << std::endl;
+	    
+	    Log::GetInstance ().debug (logstr.str ());
 */
-	if (sendSurefireToken (ni.getHost (), ni.getPort ())) return true;
+	    return true;
+	}
+
 
 	// Failed to send token, mark node as OUTRING
 	_data->setState (ni.getNodeId (), OUTRING);
 	
-//	std::cerr << " # FAILED!" << std::endl;
     }
 
     return false;
@@ -268,7 +261,6 @@ RingNode::loop (const TokenSPtr& token)
     if (_token.get ())
     {
 	// A token was received. 
-	resetTimer ();
 
 	// Update local state
 	if (_data->getInfo ().getState () == ENTRING)	{
@@ -306,6 +298,9 @@ RingNode::loop (const TokenSPtr& token)
 	}
 	else
 	{
+	    // Reset the timer only if the token has not been discarded!
+	    resetTimer ();
+
 	    if (sendToken () == false)
 	    {
 		// failed to forward token. revert this node state
@@ -320,7 +315,7 @@ RingNode::loop (const TokenSPtr& token)
 	
 	// Reset timer.
 	resetTimer ();
-	std::cerr << "## TIMEOUT!! " << std::endl;
+	// std::cerr << "## TIMEOUT!! " << std::endl;
 
 	// Create init token...
 	_data->setState (ENTRING);
@@ -348,39 +343,28 @@ bool
 RingNode::sendSurefireToken (const std::string& host, int port)
 {
     bool success (false);
-    // TODO : add ckecksum (utiliser byte array temporaire)
-    // TODO : add compression
-    // TODO : move this method to a generic Protocol service class in util.
 
     TcpClientSocket clientSock (host, port, TCP_TOKEN_TIMEOUT);
     for (int i=0; i<SEND_TOKEN_MAX_NB_TRIES; ++i)
     {
 	clientSock.tryToConnect ();
 	if (clientSock.isConnected () == false) continue;
-	
+
 	try
 	{
+	    boost::iostreams::filtering_ostream zlibout;
+
 	    boost::iostreams::stream<TcpClientSocket> cliSocketStream;
 	    cliSocketStream.open (clientSock);
-	    cliSocketStream << (*_data) << ETB;
-	    cliSocketStream.flush ();
-	    
-	    try
-	    {
-		char answer = cliSocketStream.get ();
-		cliSocketStream.close ();
-		
-		if (answer == ACK) 
-		{
-		    success = true;
-		    break;
-		}
-	    }
-	    catch (std::exception e)
-	    {
-		// Timeout essentially...
-		Log::GetInstance ().error ("Error receiving acknowledgment", e);
-	    }
+	    zlibout.push (boost::iostreams::zlib_compressor (boost::iostreams::zlib::best_speed));
+	    zlibout.push (cliSocketStream);
+	    zlibout << (*_data) << std::flush;
+	    zlibout.reset (); // necessary
+
+	    cliSocketStream.close ();
+	    success = true;
+	    break;
+
 	}
 	catch (std::exception& e) 
 	{

@@ -194,7 +194,6 @@ Token::saveInfo (const NodeId& nodeId,
     {
 	// An important info (other than clock) is updated.
 	// We can mark this token as modified.
-	// if (hasInfo (nodeId)) std::cerr << "OLD=" << getInfo (nodeId) << "   NEW=" << info << std::endl;
 	setModified (true);
     }
 

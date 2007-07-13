@@ -140,12 +140,13 @@ namespace synthese
 
 	void 
 	UpdateRecordTableSync::loadAllAfterTimestamp (UpdateLogSPtr dest, 
-						      const boost::posix_time::ptime& timestamp)
+						      const boost::posix_time::ptime& timestamp,
+						      bool inclusive)
 	{
 	    std::stringstream query;
 
 	    query << "SELECT * FROM " << TABLE_NAME << " WHERE " 
-		  << TABLE_COL_TIMESTAMP << " > " << Conversion::ToSQLiteString (to_iso_string (timestamp));
+		  << TABLE_COL_TIMESTAMP << " " << (inclusive ? ">=" : ">") << " " << Conversion::ToSQLiteString (to_iso_string (timestamp));
 
 	    SQLiteResult result = DBModule::GetSQLite()->execQuery (query.str());
 	    

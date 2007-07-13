@@ -34,7 +34,7 @@ class Token;
 typedef boost::shared_ptr<Token> TokenSPtr;
 
 
-class Token 
+class Token
 {
  private:
 

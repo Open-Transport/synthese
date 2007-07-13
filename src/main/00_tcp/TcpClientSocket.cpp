@@ -112,7 +112,7 @@ TcpClientSocket::write(const char* s, std::streamsize n)
 {
     try 
     {
-	return _socket->write (s, n, 0);
+	return _socket->write (s, n, _timeOut);
     }
     catch (const char* msg)
     {

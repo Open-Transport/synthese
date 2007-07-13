@@ -34,7 +34,6 @@ class RingNode
 private:
 
     static const boost::posix_time::time_duration RECV_TOKEN_TIMEOUT;
-    static const int TCP_TOKEN_TIMEOUT;
     static const int SEND_TOKEN_MAX_NB_TRIES;
     
     const TokenSPtr _data;  // State token (the one to be sent)
@@ -52,6 +51,10 @@ public:
 	      UpdateLogSPtr& updateLog,
 	      synthese::tcp::TcpService* tcpService);
     ~RingNode ();
+
+    /** Ring node initialzation. Called by Node initialization.
+     */
+    void initialize ();
 
     bool hasInfo (const NodeId& nodeId) const;
     NodeInfo getInfo (const NodeId& nodeId) const;

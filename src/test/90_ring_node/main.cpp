@@ -91,6 +91,13 @@ public:
 
 
 
+/*
+
+r create table toto (t);
+ */
+
+
+
 int main( int argc, char **argv )
 {
     try 

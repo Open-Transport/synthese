@@ -68,7 +68,7 @@ Socket::closeSocket (SOCKET socket)
 */
 void 
 Socket::open(const char* hostName, 
-	     const int portNumber, 
+	     int portNumber, 
 	     const char* protoName)
 {
     name(hostName, portNumber);
@@ -82,7 +82,7 @@ Socket::open(const char* hostName,
     \date 2005
 */
 void 
-Socket::name(const char* hostName, const int portNumber)
+Socket::name(const char* hostName, int portNumber)
 {
     _sockAddr.sin_family = AF_INET;
     _sockAddr.sin_port = htons(portNumber);
@@ -192,6 +192,9 @@ Socket::acceptConnection()
     
     if (client == INVALID_SOCKET)
     {
+	if (errno != EWOULDBLOCK)
+	    std::cerr << errno;
+
 	/* if (errno == EWOULDBLOCK)
 	{
 	    std::cerr << "Non-Blocking mode!" << std::endl;
@@ -229,7 +232,7 @@ Socket::connectToServer()
     \date 2005
 */
 int 
-Socket::write(const char* buffer, const int size, const int timeout)
+Socket::write(const char* buffer, int size, int timeout)
 {
     return write(_socket, buffer, size, timeout);
 }
@@ -238,10 +241,19 @@ Socket::write(const char* buffer, const int size, const int timeout)
 
 
 int 
-Socket::write(SOCKET socket, const char* buffer, const int size, const int timeout)
+Socket::write(SOCKET socket, const char* buffer, int size, int timeout)
 {
+    // timeout in milliseconds.
+    struct timeval tv = {0, timeout*1000};
+    fd_set fd;
+    FD_ZERO(&fd);
+    FD_SET(socket, &fd);
 
-    // @todo timeout is not implemented for write operations !
+    if(select(socket+1, 0, &fd, 0, (timeout > 0) ? &tv : 0) == 0)
+    {
+        throw "Socket send timeout";
+    }
+    
     int bytesSent;
     bytesSent = send (socket, buffer, size, 0);
 
@@ -259,7 +271,7 @@ Socket::write(SOCKET socket, const char* buffer, const int size, const int timeo
     \date 2005
 */
 int 
-Socket::read(char* buffer, const int size, const int timeout)
+Socket::read(char* buffer, int size, int timeout)
 {
     return read(_socket, buffer, size, timeout);
 }
@@ -268,17 +280,18 @@ Socket::read(char* buffer, const int size, const int timeout)
 
 
 int 
-Socket::read(SOCKET socket, char* buffer, const int size, const int timeout)
+Socket::read(SOCKET socket, char* buffer, int size, int timeout)
 {
-
-    struct timeval tv = {timeout, 0};
+    // timeout in milliseconds.
+    struct timeval tv = {0, timeout*1000};
     fd_set fd;
     FD_ZERO(&fd);
     FD_SET(socket, &fd);
 
     if(select(socket+1, &fd, 0, 0, (timeout > 0) ? &tv : 0) == 0)
-//    if(select(socket+1, &fd, 0, 0, NULL))
-        throw "Receive timeout";
+    {
+        throw "Socket recv timeout";
+    }
 
     int bytesReceived;
     memset(buffer, 0, size);
