@@ -192,5 +192,11 @@ namespace synthese
 			return result;
 
 		}
+
+	    std::string Conversion::ToTruncatedString (const std::string& s, int size)
+	    {
+		return (s.length () <= size ? s : (s.substr (0, size) + "  (...)"));
+	    }
+
 	}
 }

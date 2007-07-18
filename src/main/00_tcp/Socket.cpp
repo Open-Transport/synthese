@@ -254,11 +254,13 @@ Socket::write(SOCKET socket, const char* buffer, int size, int timeout)
         throw "Socket send timeout";
     }
     
+
+
     int bytesSent;
     bytesSent = send (socket, buffer, size, 0);
 
     if(bytesSent == SOCKET_ERROR)
-        throw "Send";
+	throw "Send";
 
     return bytesSent;
 }
@@ -299,7 +301,7 @@ Socket::read(SOCKET socket, char* buffer, int size, int timeout)
     bytesReceived = recv(socket, buffer, size, 0);
 
     if(bytesReceived == SOCKET_ERROR)
-        throw "Receive";
+	throw "Receive";
 
     return bytesReceived;
 }

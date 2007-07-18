@@ -75,6 +75,8 @@ namespace synthese
 
 			static double ToDouble (const std::string& s);
 
+			static std::string ToTruncatedString (const std::string& s, int size = 255);
+
 			static std::string ToString (int i);
 			static std::string ToString (unsigned int i);
 

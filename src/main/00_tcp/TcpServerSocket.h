@@ -52,8 +52,14 @@ class TcpServerSocket
 public:
 
     typedef char char_type;
-    typedef boost::iostreams::bidirectional_device_tag category;
-
+    // typedef boost::iostreams::bidirectional_device_tag category;
+    struct category : 
+	boost::iostreams::device_tag, 
+	boost::iostreams::bidirectional,
+	boost::iostreams::multichar_tag,
+	boost::iostreams::flushable_tag
+	{ };
+    
 private:
 
     static const int DEFAULT_TIME_OUT = 10000; // 10 seconds
@@ -72,6 +78,8 @@ public:
     ~TcpServerSocket ();
 
     int getSocketId () const;
+
+    bool flush () { std::cerr << "<<<<<<<<<<<<<<< TCPSRV FLUSH" << std::endl; }
 
     std::streamsize read(char* s, std::streamsize n);
 
