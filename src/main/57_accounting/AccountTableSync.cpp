@@ -71,7 +71,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<Account>::save(Account* account)
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (account->getKey() == 0)
 			{
@@ -112,17 +112,17 @@ namespace synthese
 
 
 
-		void AccountTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void AccountTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 
 		}
 
-		void AccountTableSync::rowsUpdated( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void AccountTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void AccountTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void AccountTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
@@ -146,7 +146,7 @@ namespace synthese
 			, const std::string& rightClassNumber, uid leftUserId, const std::string& leftClassNumber, const std::string name
 			, int first /*= 0*/, int number /*= 0*/ )
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

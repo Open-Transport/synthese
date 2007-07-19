@@ -33,7 +33,7 @@ namespace synthese
 
 
 		void 
-		DbModuleConfigTableSync::rowsAdded (const SQLiteQueueThreadExec* sqlite, 
+		DbModuleConfigTableSync::rowsAdded (SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
 						const SQLiteResult& rows, bool isFirstSync)
 		{
@@ -49,7 +49,7 @@ namespace synthese
 
 
 		void 
-		DbModuleConfigTableSync::rowsUpdated (const SQLiteQueueThreadExec* sqlite, 
+		DbModuleConfigTableSync::rowsUpdated (SQLiteQueueThreadExec* sqlite, 
 							SQLiteSync* sync,
 							const SQLiteResult& rows)
 		{
@@ -59,7 +59,7 @@ namespace synthese
 
 
 		void 
-		DbModuleConfigTableSync::rowsRemoved (const SQLiteQueueThreadExec* sqlite, 
+		DbModuleConfigTableSync::rowsRemoved (SQLiteQueueThreadExec* sqlite, 
 							SQLiteSync* sync,
 							const SQLiteResult& rows)
 		{

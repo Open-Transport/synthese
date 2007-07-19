@@ -72,7 +72,7 @@ namespace synthese
 		{
 			try
 			{
-				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+				SQLiteHandle* sqlite = DBModule::GetSQLite();
 				if (!tp->getKey())
 					tp->setKey(getId()); /// @todo Handle grid
 				stringstream query;
@@ -126,17 +126,17 @@ namespace synthese
 			addTableIndex(TABLE_COL_TRADED_OBJECT_ID);
 		}
 
-		void TransactionPartTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void TransactionPartTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 
 		}
 
-		void TransactionPartTableSync::rowsUpdated( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionPartTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
 
-		void TransactionPartTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionPartTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 
 		}
@@ -145,7 +145,7 @@ namespace synthese
 				shared_ptr<const Transaction> transaction, shared_ptr<const Account> account
 				, int first, int number)
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT * "
@@ -172,7 +172,7 @@ namespace synthese
 			, shared_ptr<const User> user
 			, bool order, int first /*= 0*/, int number /*= 0*/
 		){
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT * "
@@ -202,7 +202,7 @@ namespace synthese
 		map<int, int> TransactionPartTableSync::count(
 			shared_ptr<const Account> account, Date startDate, Date endDate, int first, int number
 		){
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT strftime('%H', t.start_date_time) AS hours,"

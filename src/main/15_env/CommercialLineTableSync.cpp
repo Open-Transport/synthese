@@ -71,7 +71,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<CommercialLine>::save(CommercialLine* object)
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() > 0)
 			{
@@ -117,7 +117,7 @@ namespace synthese
 			addTableColumn(COL_IMAGE, "TEXT", false);
 		}
 
-		void CommercialLineTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void CommercialLineTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -127,7 +127,7 @@ namespace synthese
 			}
 		}
 
-		void CommercialLineTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void CommercialLineTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -136,7 +136,7 @@ namespace synthese
 			}
 		}
 
-		void CommercialLineTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void CommercialLineTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -153,7 +153,7 @@ namespace synthese
 			, bool orderByName
 			, bool raisingOrder
 		){
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT l.*"
@@ -202,7 +202,7 @@ namespace synthese
 			, bool orderByName /*= false */
 			, bool raisingOrder /*= true */
 		){
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< getSQLLinesList(rights, totalControl, neededLevel, "*");

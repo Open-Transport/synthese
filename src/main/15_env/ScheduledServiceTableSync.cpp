@@ -41,6 +41,7 @@
 #include <sqlite/sqlite3.h>
 
 #include <assert.h>
+#include <set>
 
 using namespace std;
 using namespace boost;
@@ -146,7 +147,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<ScheduledService>::save(ScheduledService* object)
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());	/// @todo Use grid ID
@@ -185,41 +186,37 @@ namespace synthese
 			addTableColumn (COL_RESERVATIONRULEID, "INTEGER", true);
 		}
 
-		void ScheduledServiceTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void ScheduledServiceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
-			Path* lastPath(NULL);
 
-			// Loop on each added row
-			for (int i=0; i<rows.getNbRows(); ++i)
+		    std::set<Path*> processedPaths;
+		    
+		    // Loop on each added row
+		    for (int i=0; i<rows.getNbRows(); ++i)
+		    {
+			boost::shared_ptr<ScheduledService> service;
+			if (EnvModule::getScheduledServices().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
 			{
-				boost::shared_ptr<ScheduledService> service;
-				if (EnvModule::getScheduledServices().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
-				{
-					service = EnvModule::getScheduledServices().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-					service->getPath()->removeService(service.get());
-					load(service.get(), rows, i);
-				}
-				else
-				{
-					service.reset(new ScheduledService);
-					load(service.get(), rows, i);
-					EnvModule::getScheduledServices().add(service);
-				}
-
-				/* At the execution syncs, update the schedules indexes at each path change */
-				if (!isFirstSync && service.get() && service->getPath() != lastPath)
-				{
-					lastPath->updateScheduleIndexes();
-					lastPath = service->getPath();
-				}
+			    service = EnvModule::getScheduledServices().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+			    service->getPath()->removeService(service.get());
+			    load(service.get(), rows, i);
 			}
-
-			if (!isFirstSync && lastPath)
-				lastPath->updateScheduleIndexes();
-
+			else
+			{
+			    service.reset(new ScheduledService);
+			    load(service.get(), rows, i);
+			    EnvModule::getScheduledServices().add(service);
+			}
+			
+			processedPaths.insert (service->getPath());
+		    }
+		    
+		    for (std::set<Path*>::iterator it = processedPaths.begin ();
+			 it != processedPaths.end (); ++it) (*it)->updateScheduleIndexes();
 		}
-		
-		void ScheduledServiceTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+	    
+
+		void ScheduledServiceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -233,7 +230,7 @@ namespace synthese
 			}
 		}
 
-		void ScheduledServiceTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ScheduledServiceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -249,7 +246,7 @@ namespace synthese
 
 		std::vector<shared_ptr<ScheduledService> > ScheduledServiceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -281,19 +278,21 @@ namespace synthese
 			}
 		}
 
-		void ScheduledServiceTableSync::afterFirstSync( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync )
+		void ScheduledServiceTableSync::afterFirstSync( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync )
 		{
-			// Lines
-			for (Line::Registry::const_iterator it = EnvModule::getLines().begin(); it != EnvModule::getLines().end(); it++)
-			{
-				shared_ptr<Line> line = EnvModule::getLines().getUpdateable(it->first);
-				line ->updateScheduleIndexes();
-			}
-
-			// Roads
+		    // Lines
+		    /*
+		      for (Line::Registry::const_iterator it = EnvModule::getLines().begin(); it != EnvModule::getLines().end(); it++)
+		    {
+			shared_ptr<Line> line = EnvModule::getLines().getUpdateable(it->first);
+			line ->updateScheduleIndexes();
+		    }
+		    */
+		    
+		    // Roads
 /*			for (Road::Registry::const_iterator it = EnvModule::getRoads().begin(); it != EnvModule::getLines().end(); it++)
 			{
-				(*it)->updateSchedulesIndexes();
+			(*it)->updateSchedulesIndexes();
 			}
 */
 		}

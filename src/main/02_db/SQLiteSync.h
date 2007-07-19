@@ -69,9 +69,9 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
     SQLiteSync (const std::string& idColumnName = TABLE_COL_ID);
     ~SQLiteSync ();
 
-    void registerCallback (const SQLiteQueueThreadExec* emitter);
+    void registerCallback (SQLiteQueueThreadExec* emitter);
     
-    void eventCallback (const SQLiteQueueThreadExec* emitter,
+    void eventCallback (SQLiteQueueThreadExec* emitter,
 			const SQLiteEvent& event);
 
     /** Adds a new table synchronizer to this global synchronizer update hook.

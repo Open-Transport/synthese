@@ -71,7 +71,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<PublicPlace>::save(PublicPlace* object)
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());	/// @todo Use grid ID
@@ -99,7 +99,7 @@ namespace synthese
 			addTableColumn (COL_CITYID, "INTEGER", false);
 		}
 
-		void PublicPlaceTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool)
+		void PublicPlaceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -123,7 +123,7 @@ namespace synthese
 			}
 		}
 		
-		void PublicPlaceTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void PublicPlaceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -141,7 +141,7 @@ namespace synthese
 			}
 		}
 
-		void PublicPlaceTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void PublicPlaceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{

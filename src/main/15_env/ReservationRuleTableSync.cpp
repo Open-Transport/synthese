@@ -92,7 +92,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<ReservationRule>::save(ReservationRule* object)
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() > 0)
 			{
@@ -146,7 +146,7 @@ namespace synthese
 			addTableColumn (COL_WEBSITEURL, "TEXT", true);
 		}
 
-		void ReservationRuleTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void ReservationRuleTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -156,7 +156,7 @@ namespace synthese
 			}
 		}
 
-		void ReservationRuleTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ReservationRuleTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -169,7 +169,7 @@ namespace synthese
 			}
 		}
 
-		void ReservationRuleTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ReservationRuleTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -183,7 +183,7 @@ namespace synthese
 
 		std::vector<ReservationRule*> ReservationRuleTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

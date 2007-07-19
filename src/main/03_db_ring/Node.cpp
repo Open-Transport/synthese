@@ -6,11 +6,12 @@
 #include "03_db_ring/UpdateChronologyException.h"
 
 #include "02_db/DBModule.h"
-#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
+#include "02_db/SQLite.h"
   
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
+#include "01_util/Compression.h"
 
 #include "00_tcp/TcpServerSocket.h"
 #include "00_tcp/TcpClientSocket.h"
@@ -20,9 +21,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filter/zlib.hpp>
 
 
 using namespace synthese::tcp;
@@ -187,12 +185,20 @@ Node::initialize ()
 {
     _lastUpdateIndex = UpdateRecordTableSync::getLastUpdateIndex (_id);
 
-    for (RingNodes::iterator it = _ringNodes.begin ();
-	 it != _ringNodes.end (); ++it)
+    if (_ringNodes.empty ())
     {
-	RingNodeSPtr rn = it->second;
-	rn->initialize ();
+	Log::GetInstance ().warn ("This node is not connected to any ring; it will be writable by default.");
     }
+    else
+    {
+	for (RingNodes::iterator it = _ringNodes.begin ();
+	     it != _ringNodes.end (); ++it)
+	{
+	    RingNodeSPtr rn = it->second;
+	    rn->initialize ();
+	}
+    }
+
 }
 
 
@@ -200,6 +206,7 @@ Node::initialize ()
 bool 
 Node::earlyCompileUpdate (const std::string& sql)
 {
+
     bool res (true);
 
     // Compilation will fail on pure syntactic error, but *also* when a given table does not
@@ -223,11 +230,35 @@ Node::earlyCompileUpdate (const std::string& sql)
 
 
 
+sqlite3* 
+Node::getHandle ()
+{
+    return DBModule::GetSQLite()->getHandle ();
+}
+
+
+
+db::SQLiteResult 
+Node::execQuery (const std::string& sql)
+{
+    if (SQLite::IsUpdateStatement (sql)) throw ("Not a query statement : " + sql);
+
+    return DBModule::GetSQLite()->execQuery (sql); 
+}
+
+
 
 
 void 
-Node::execUpdate (const std::string& sql)
+Node::execUpdate (const std::string& sql, bool asynchronous)
 {
+    // If this is not an update statement, return directly
+    if (SQLite::IsUpdateStatement (sql) == false)
+    {
+	Log::GetInstance ().warn ("Not an update statement, discarded : " + sql);
+	return;
+    }
+
     // Ensure that the update log cannot be modified both by main loop and by local
     // update action. This guarantees that the local update will not occur after token sending
     // and before update log flushing.
@@ -236,13 +267,6 @@ Node::execUpdate (const std::string& sql)
     if (canWrite () == false)
     {
 	throw DbRingException ("Node is locked for writing");
-    }
-
-    // If this is not an update statement, return directly
-    if (SQLite::IsUpdateStatement (sql) == false)
-    {
-	Log::GetInstance ().warn ("Not an update statement, discarded : " + sql);
-	return;
     }
 
     // Early compilation of SQL statement. If the node is writeable, it must be up to date with its authority.
@@ -265,7 +289,12 @@ Node::execUpdate (const std::string& sql)
 					    sql ));
     saveUpdateRecord (urp);
     
-
+    if (asynchronous == false)
+    {
+	// If synchronous update is done, we must wait until the update record is acknowledged locally.
+	
+	// TODO : it means taking a lock on the update record key and release it whenever the local update record is acknowledged.
+    }
 }
 
 
@@ -302,10 +331,9 @@ Node::loop ()
 
 	    try
 	    {
-		boost::iostreams::filtering_istream zlibin;
-		zlibin.push (boost::iostreams::zlib_decompressor ());
-		zlibin.push (tcpStream);
-		zlibin >> (*(token.get ()));
+		std::stringstream tmp;
+		Compression::ZlibDecompress (tcpStream, tmp);
+		tmp >> (*(token.get ()));
 	    }
 	    catch (std::exception& e)
 	    {
@@ -420,6 +448,11 @@ bool
 Node::isMasterAuthority () const
 {
     boost::recursive_mutex::scoped_lock ringNodesLock (*_ringNodesMutex);
+
+    // By default, a node which is not connected to any other ring node is
+    // a master authority.
+    if (_ringNodes.empty ()) return true;
+
     for (RingNodes::const_iterator it = _ringNodes.begin (); it != _ringNodes.end (); ++it)
     {
 	if (it->second->getInfo ().isAuthority () == false) return false;
@@ -439,19 +472,19 @@ Node::saveUpdateRecord (const UpdateRecordSPtr& urp)
     if (isMasterAuthority ())
     {
 	assert (urp->getState () == PENDING);
-
+	const std::string& sql = urp->getSQL ();
 	try
 	{
 	    DBModule::GetSQLite()->beginTransaction (true);  // exclusive
-	    DBModule::GetSQLite()->execUpdate (urp->getSQL ());
+	    DBModule::GetSQLite()->execUpdate (sql);
 	    urp->setState (ACKNOWLEDGED);
 	    UpdateRecordTableSync::save (urp.get ());
 	    DBModule::GetSQLite()->commitTransaction (); 
-	    Log::GetInstance ().info ("Executed : " + urp->getSQL ());
+	    Log::GetInstance ().info ("Executed : " + Conversion::ToTruncatedString (sql));
 	}
-	catch (std::exception e)
+	catch (std::exception& e)
 	{
-	    Log::GetInstance ().error ("Error while executing SQL statement on master authority : " + urp->getSQL ());
+	    Log::GetInstance ().error ("Error while executing SQL statement on master authority : " + urp->getSQL (), e);
 	    urp->setState (FAILED);
 	    UpdateRecordTableSync::save (urp.get ());
 	}
@@ -474,7 +507,7 @@ Node::saveUpdateRecord (const UpdateRecordSPtr& urp)
 	    DBModule::GetSQLite()->execUpdate (aur->getSQL ());
 	    UpdateRecordTableSync::save (aur.get ());
 	    DBModule::GetSQLite()->commitTransaction (); 
-	    Log::GetInstance ().info ("Executed : " + aur->getSQL ());
+	    Log::GetInstance ().info ("Executed : " + Conversion::ToTruncatedString (aur->getSQL ()));
 	}
 	catch (std::exception e)
 	{

@@ -151,7 +151,7 @@ namespace synthese
 
 			try
 			{
-				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+				SQLiteHandle* sqlite = DBModule::GetSQLite();
 				SQLiteResult result = sqlite->execQuery(query.str());
 				vector<shared_ptr<const CommercialLine> > objects;
 				for (int i = 0; i < result.getNbRows(); ++i)

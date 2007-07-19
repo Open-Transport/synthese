@@ -103,21 +103,21 @@ namespace synthese
 			/** Action to do on user creation.
 				No action because the users are not permanently loaded in ram.
 			*/
-			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+			void rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on user creation.
 				Updates the users objects in the opened sessions.
 			*/
-			void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
+			void rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 
 			/** Action to do on user deletion.
 				Closes the sessions of the deleted user.
 			*/
-			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
+			void rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 

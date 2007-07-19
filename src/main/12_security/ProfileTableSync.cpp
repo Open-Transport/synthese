@@ -65,7 +65,7 @@ namespace synthese
 		{
 			try
 			{
-				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+				SQLiteHandle* sqlite = DBModule::GetSQLite();
 				if (profile->getKey() <= 0)
 					profile->setKey(getId());
 				
@@ -112,7 +112,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_RIGHTS_STRING, "TEXT", true);
 		}
 
-		void ProfileTableSync::rowsAdded( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void ProfileTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
 			for (int i = 0; i < rows.getNbRows(); ++i)
 			{
@@ -129,7 +129,7 @@ namespace synthese
 			}
 		}
 
-		void ProfileTableSync::rowsUpdated( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ProfileTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			for (int i = 0; i < rows.getNbRows(); ++i)
 			{
@@ -140,7 +140,7 @@ namespace synthese
 			}
 		}
 
-		void ProfileTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ProfileTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			for (int i = 0; i < rows.getNbRows(); ++i)
 			{
@@ -161,7 +161,7 @@ namespace synthese
 			, bool raisingOrder	
 		){
 			/** @todo Handle right filter */
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -200,7 +200,7 @@ namespace synthese
 			shared_ptr<const Profile> parent
 			, int first /*= 0*/, int number /*= -1*/ )
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"

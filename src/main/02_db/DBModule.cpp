@@ -26,7 +26,6 @@
 #include "02_db/SQLiteSync.h"
 #include "02_db/SQLiteTableSync.h"
 #include "02_db/SQLiteQueueThreadExec.h"
-#include "02_db/SQLiteThreadExec.h"
 
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
@@ -47,15 +46,12 @@ namespace synthese
 
 	    void DBModule::preInit ()
 	    {
-		RegisterParameter ("db_port", "3592", &ParameterCallback);
 	    }
 
 
 
 	    void DBModule::initialize()
 	    {
-		
-		int sqliteServicePort = Conversion::ToInt (GetParameter ("db_port"));
 		
 		_sqliteQueueThreadExec = new SQLiteQueueThreadExec (GetDatabasePath ());
 		
@@ -78,17 +74,6 @@ namespace synthese
 		    new ManagedThread (_sqliteQueueThreadExec, "sqlite_queue", 100, autorespawn);
 		
 
-		/*
-		synthese::tcp::TcpService* service = 
-		    synthese::tcp::TcpService::openService (sqliteServicePort);
-		
-		// Just one thread
-		SQLiteThreadExec* sqliteThreadExec = new SQLiteThreadExec (service);
-		
-		ManagedThread* sqliteThread = 
-		    new ManagedThread (sqliteThreadExec, "sqlite_tcp", 100, autorespawn);
-		*/
-		
 	    }
 	    
 	    
@@ -104,11 +89,6 @@ namespace synthese
 		DBModule::ParameterCallback (const std::string& name, 
 						 const std::string& value)
 	    {
-		if (name == "db_port") 
-		{
-		    // TODO : close and reopen service on the new port
-		}
-
 	    }
 
 	}

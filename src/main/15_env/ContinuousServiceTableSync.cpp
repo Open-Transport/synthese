@@ -40,6 +40,9 @@
 #include "15_env/EnvModule.h"
 #include "15_env/ContinuousServiceTableSync.h"
 
+#include <set>
+
+
 using namespace std;
 using namespace boost;
 
@@ -154,7 +157,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<ContinuousService>::save(ContinuousService* object)
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());	/// @todo Use grid ID
@@ -194,10 +197,9 @@ namespace synthese
 			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
 		}
 
-		void ContinuousServiceTableSync::rowsAdded(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void ContinuousServiceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
 		{
-
-			Path* lastPath(NULL);
+		    std::set<Path*> processedPaths;
 
 			// Loop on each added row
 			for (int i=0; i<rows.getNbRows(); ++i)
@@ -216,20 +218,16 @@ namespace synthese
 					EnvModule::getContinuousServices().add(service);
 				}
 
-				/* At the execution syncs, update the schedules indexes at each path change */
-				if (!isFirstSync && service.get() && service->getPath() != lastPath)
-				{
-					lastPath->updateScheduleIndexes();
-					lastPath = service->getPath();
-				}
+
+				processedPaths.insert (service->getPath());
 			}
 
-			if (!isFirstSync && lastPath)
-				lastPath->updateScheduleIndexes();
+			for (std::set<Path*>::iterator it = processedPaths.begin ();
+			     it != processedPaths.end (); ++it) (*it)->updateScheduleIndexes();
 
 		}
 		
-		void ContinuousServiceTableSync::rowsUpdated(const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ContinuousServiceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -243,7 +241,7 @@ namespace synthese
 			}
 		}
 
-		void ContinuousServiceTableSync::rowsRemoved( const db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ContinuousServiceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
@@ -259,7 +257,7 @@ namespace synthese
 
 		std::vector<shared_ptr<ContinuousService> > ContinuousServiceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
@@ -291,7 +289,7 @@ namespace synthese
 			}
 		}
 
-		void ContinuousServiceTableSync::afterFirstSync( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync )
+		void ContinuousServiceTableSync::afterFirstSync( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync )
 		{
 			// Lines
 			for (Line::Registry::const_iterator it = EnvModule::getLines().begin(); it != EnvModule::getLines().end(); it++)

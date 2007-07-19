@@ -28,7 +28,7 @@ createTestDb (const std::string& dbFile, bool prefilled)
     boost::filesystem::remove (testDbPath);
       
     // Creation of the test_db
-    sqlite3* db = SQLite::OpenConnection (testDbPath);
+    sqlite3* db = SQLite::OpenHandle (testDbPath);
       
     // Create test_table
     SQLite::ExecUpdate (db, 
@@ -39,13 +39,13 @@ createTestDb (const std::string& dbFile, bool prefilled)
     {
 	// Insert some values
 	SQLite::ExecUpdate (db, 
-			    "INSERT INTO test_table VALUES (0, 'label0');\
+				  "INSERT INTO test_table VALUES (0, 'label0');\
          INSERT INTO test_table VALUES (1, 'label1');\
          INSERT INTO test_table VALUES (2, 'label2');\
         ");
     }
 
-    SQLite::CloseConnection (db);
+    SQLite::CloseHandle (db);
 
 	
 }
@@ -80,14 +80,14 @@ public:
 	    return _labels;
 	}
 
-    void registerCallback (const SQLiteQueueThreadExec* emitter)
+    void registerCallback (SQLiteQueueThreadExec* emitter)
 	{
 	    _registerCalled = true;
 	}
 	
 
 	
-    void eventCallback (const SQLiteQueueThreadExec* emitter,
+    void eventCallback (SQLiteQueueThreadExec* emitter,
 			const SQLiteEvent& event)
 	{
 	    if ((event.opType == SQLITE_INSERT) 
@@ -95,8 +95,8 @@ public:
 	    {
 		// Query for row values
 		SQLiteResult result = 
-		    emitter->execQuery ("SELECT * FROM test_table WHERE id=" + 
-					Conversion::ToString (event.rowId));
+		    ((SQLiteQueueThreadExec*) emitter)->execQuery ("SELECT * FROM test_table WHERE id=" + 
+								   Conversion::ToString (event.rowId));
 
 		for (int i=0; i<result.getNbRows (); ++i)
 		{
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE (testSingleUpdateHook1)
     sqliteExec->execUpdate ("INSERT INTO test_table VALUES (2, 'label2')");
     sqliteExec->execUpdate ("INSERT INTO test_table VALUES (3, 'label3')");
 
-    Thread::Sleep (100);
+    Thread::Sleep (300);
     BOOST_CHECK_EQUAL (3, (int) hook->getLabels().size ());
     BOOST_CHECK_EQUAL (std::string ("label0"), hook->getLabels()[0]);
     BOOST_CHECK_EQUAL (std::string ("label2"), hook->getLabels()[2]);

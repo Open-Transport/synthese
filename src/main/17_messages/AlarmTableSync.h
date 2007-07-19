@@ -76,21 +76,21 @@ namespace synthese
 			/** Action to do on alarm creation.
 				
 			*/
-			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+			void rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on alarm update.
 			
 			*/
-			void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
+			void rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 
 			/** Action to do on alarm deletion.
 			
 			*/
-			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
+			void rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 

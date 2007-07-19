@@ -1,5 +1,5 @@
-#ifndef SYNTHESE_DB_SQLITETHREADEXEC_H
-#define SYNTHESE_DB_SQLITETHREADEXEC_H
+#ifndef SYNTHESE_DB_DBCOMMANDTHREADEXEC_H
+#define SYNTHESE_DB_DBCOMMANDTHREADEXEC_H
 
 #include "01_util/ThreadExec.h"
 
@@ -15,7 +15,7 @@ namespace tcp
 
 
 
-namespace db
+namespace dbring
 {
 
 
@@ -25,14 +25,14 @@ namespace db
 
 @ingroup m02
 */
-class SQLiteThreadExec : public synthese::util::ThreadExec
+class DbCommandThreadExec : public synthese::util::ThreadExec
 {
  private:
     synthese::tcp::TcpService* _tcpService;
 
  public:
 
-    SQLiteThreadExec (synthese::tcp::TcpService* tcpService);
+    DbCommandThreadExec (synthese::tcp::TcpService* tcpService);
 
 
     /** Execution body.

@@ -52,13 +52,14 @@ class TcpClientSocket
 public:
 
     typedef char char_type;
-//    typedef boost::iostreams::bidirectional_device_tag category;
-    struct category : 
+    typedef boost::iostreams::bidirectional_device_tag category;
+
+/*    struct category : 
 	boost::iostreams::device_tag, 
 	boost::iostreams::bidirectional,
 	boost::iostreams::multichar_tag
 	{ };
-
+*/
 
 private:
 

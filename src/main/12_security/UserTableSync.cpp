@@ -82,7 +82,7 @@ namespace synthese
 		{
 			try
 			{
-				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+				SQLiteHandle* sqlite = DBModule::GetSQLite();
 				stringstream query;
 				if (user->getKey() <= 0)
 					user->setKey(getId());
@@ -161,23 +161,23 @@ namespace synthese
 		}
 
 
-		void UserTableSync::rowsUpdated( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void UserTableSync::rowsUpdated( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 		}
 
 
-		void UserTableSync::rowsAdded( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows, bool isFirstSync)
+		void UserTableSync::rowsAdded( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows, bool isFirstSync)
 		{
 		}
 
 
-		void UserTableSync::rowsRemoved( const SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void UserTableSync::rowsRemoved( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
 		{
 		}
 
 		shared_ptr<User> UserTableSync::getUserFromLogin(const std::string& login )
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
 			query
 				<< "SELECT *"
@@ -209,7 +209,7 @@ namespace synthese
 			, bool orderByProfileName
 			, bool raisingOrder
 		){
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT "
@@ -258,7 +258,7 @@ namespace synthese
 		{
 			try
 			{
-				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+				SQLiteHandle* sqlite = DBModule::GetSQLite();
 				std::stringstream query;
 				query
 					<< "SELECT " << TABLE_COL_ID

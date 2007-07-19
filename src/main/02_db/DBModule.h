@@ -29,6 +29,15 @@
 #include "02_db/Constants.h"
 
 
+
+#ifdef WITH_DBRING
+
+#else
+  
+#endif
+
+
+
 namespace synthese
 {
 	/** @defgroup m02 02 SQLite database access

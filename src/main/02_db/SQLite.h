@@ -42,19 +42,29 @@ class SQLite
     
     //! @name Query methods.
     //@{
-    static sqlite3* OpenConnection (const boost::filesystem::path& databaseFile);
-    static void CloseConnection (sqlite3* connection);
+    static sqlite3* OpenHandle (const boost::filesystem::path& databaseFile);
+    static void CloseHandle (sqlite3* handle);
+
+    /** Returns true if the statement is complete (ready to be executed).
+	Useful for command line parsing.
+    */
+    static bool IsStatementComplete (const std::string& sql);
     
     static bool IsUpdateStatement (const std::string& sql);
 
-    static SQLiteStatement PrepareStatement (sqlite3* connection, const std::string& sql);
+    static SQLiteStatement PrepareStatement (sqlite3* handle, const std::string& sql);
     static void FinalizeStatement (const SQLiteStatement& statement);
 
-    static void ExecUpdate (sqlite3* connection, const std::string& sql);
-    static SQLiteResult ExecQuery (sqlite3* connection, const std::string& sql);
+    static void ExecUpdate (sqlite3* handle, const std::string& sql);
+    static SQLiteResult ExecQuery (sqlite3* handle, const std::string& sql);
 
-    static void BeginTransaction (sqlite3* connection, bool exclusive = false);
-    static void CommitTransaction (sqlite3* connection);
+    /** Returns true if a transaction is already opened.
+	SQLite does not support nested transaction.
+     */
+    static bool IsTransactionOpened (sqlite3* handle);
+
+    static void BeginTransaction (sqlite3* handle, bool exclusive = false);
+    static void CommitTransaction (sqlite3* handle);
 
 
     //@}

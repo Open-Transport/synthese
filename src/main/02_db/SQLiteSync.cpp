@@ -101,7 +101,7 @@ namespace synthese
 
 
 		void 
-		SQLiteSync::registerCallback (const SQLiteQueueThreadExec* emitter)
+		SQLiteSync::registerCallback (SQLiteQueueThreadExec* emitter)
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 
@@ -130,10 +130,11 @@ namespace synthese
 
 		   
 		void 
-		SQLiteSync::eventCallback (const SQLiteQueueThreadExec* emitter,
+		SQLiteSync::eventCallback (SQLiteQueueThreadExec* emitter,
 					const SQLiteEvent& event)
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
+			SQLiteQueueThreadExec* em = (SQLiteQueueThreadExec*) emitter;
 
 			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it 
 				 = _tableSynchronizers.begin ();
@@ -145,7 +146,7 @@ namespace synthese
 			    if (event.opType == SQLITE_INSERT) 
 			    {
 				// Query for the modified row
-				SQLiteResult result = emitter->execQuery ("SELECT * FROM " + event.tbName + " WHERE " 
+				SQLiteResult result = em->execQuery ("SELECT * FROM " + event.tbName + " WHERE " 
 									  + _idColumnName + "=" + Conversion::ToString (event.rowId));
 				
 				tableSync->rowsAdded (emitter, this, result);
@@ -153,10 +154,10 @@ namespace synthese
 			    else if (event.opType == SQLITE_UPDATE) 
 			    {
 				// Query for the modified row
-				SQLiteResult result = emitter->execQuery ("SELECT * FROM " + event.tbName + " WHERE " 
+				SQLiteResult result = em->execQuery ("SELECT * FROM " + event.tbName + " WHERE " 
 									  + _idColumnName + "=" + Conversion::ToString (event.rowId));
 				
-				tableSync->rowsUpdated (emitter, this, result);
+				tableSync->rowsUpdated (em, this, result);
 			    }
 			    else if (event.opType == SQLITE_DELETE) 
 			    {
@@ -168,7 +169,7 @@ namespace synthese
 				values.push_back (Conversion::ToString (event.rowId));
 				result.addRow (values, columns);
 				
-				tableSync->rowsRemoved (emitter, this, result);
+				tableSync->rowsRemoved (em, this, result);
 			    }
 			}
 			

@@ -110,7 +110,7 @@ namespace synthese
 		template <class T>
 			void synthese::db::SQLiteTableSyncTemplate<T>::remove(uid key)
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
 			query
 				<< "DELETE FROM " << TABLE_NAME
@@ -129,7 +129,7 @@ namespace synthese
 		template <class T>
 		boost::shared_ptr<T> synthese::db::SQLiteTableSyncTemplate<T>::get(uid key)
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
 			query
 				<< "SELECT * "
@@ -186,7 +186,7 @@ namespace synthese
 			{
 				try
 				{
-					const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+					SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
 					std::stringstream query;
 					query
 					    << "SELECT " << util::Conversion::ToString((uid) 0x00000000FFFFFFFFLL) 

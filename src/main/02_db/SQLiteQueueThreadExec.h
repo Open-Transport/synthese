@@ -39,8 +39,7 @@
 #include "01_util/UId.h"
 
 #include "02_db/SQLiteUpdateHook.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
+#include "02_db/SQLiteHandle.h"
 
 namespace synthese
 {
@@ -55,8 +54,6 @@ namespace synthese
 			a dedicated SQLite db handle (connection) which is not released until
 			the thread dies. Only one database file is managed per instance of this class.
 
-			The interface wraps common SQLite operations into a C++ interface
-			and wraps the result into STL containers.
 			The other reason for this interface to exist is proper handling of update hooks
 			triggered on db modification. To do so, this class manages internally a queue
 			of db events which are treated in FIFO mode inside the body of the thread. 
@@ -70,7 +67,7 @@ namespace synthese
 
 			@ingroup m02
 		*/
-		class SQLiteQueueThreadExec : public synthese::util::ThreadExec
+		class SQLiteQueueThreadExec : public SQLiteHandle, public synthese::util::ThreadExec
 		{
 		public:
 
@@ -81,12 +78,12 @@ namespace synthese
 			boost::thread* _initThread;
 
 			const boost::filesystem::path _databaseFile;
-			sqlite3* _db;  //!< SQLite db handle (connection).
+			sqlite3* _handle;  //!< SQLite db handle (connection).
 			std::vector<SQLiteUpdateHook*> _hooks;   //!< Hooks to trigger on db update.
 			
 			boost::shared_ptr<boost::mutex> _hooksMutex; 
 			boost::shared_ptr<boost::recursive_mutex> _queueMutex; 
-			boost::shared_ptr<boost::recursive_mutex> _dbMutex; 
+			boost::shared_ptr<boost::recursive_mutex> _handleMutex; 
 
 		public:
 		    
@@ -107,7 +104,7 @@ namespace synthese
 			//! @name Update methods.
 			//@{
 			void enqueueEvent (const SQLiteEvent& event);
-			void postEvent (const SQLiteEvent& event) const;
+			void postEvent (const SQLiteEvent& event);
 
 		public:
 
@@ -115,22 +112,14 @@ namespace synthese
 
 			//@}
 
+		public:
 
 			//! @name SQLite db access methods.
 			//@{
-			SQLiteResult execQuery (const std::string& sql) const;
-			void execUpdate (const std::string& sql, bool asynchronous = false) const;
-			
-			/* Begins an exclusive transaction on the SQLite db. Exclusive means no read nor write
-			   until the transaction is commited. If exclusive is false, it means that read is still
-			   possible before the transaction is completed.
-			*/
-			void beginTransaction (bool exclusive = false);
-			void commitTransaction ();
-			
-			SQLiteStatement prepareStatement (const std::string& sql);
-			void finalizeStatement (const SQLiteStatement& statement);
+			sqlite3* getHandle () { return _handle; }
 
+			SQLiteResult execQuery (const std::string& sql);
+			void execUpdate (const std::string& sql, bool asynchronous = false);
 
 			//@}
 

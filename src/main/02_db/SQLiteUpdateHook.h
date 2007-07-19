@@ -54,9 +54,9 @@ namespace db
 
     /** Method callback on hook registration with the SQLiteQueueThreadExec object.
      */
-    virtual void registerCallback (const SQLiteQueueThreadExec* emitter) = 0;
+    virtual void registerCallback (SQLiteQueueThreadExec* emitter) = 0;
     
-    virtual void eventCallback (const SQLiteQueueThreadExec* emitter,
+    virtual void eventCallback (SQLiteQueueThreadExec* emitter,
 				const SQLiteEvent& event) = 0;
 
 

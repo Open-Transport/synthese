@@ -1,6 +1,7 @@
 #include "00_tcp/TcpService.h"
 
 #include "03_db_ring/DbRingModule.h"
+#include "03_db_ring/DbCommandThreadExec.h"
 #include "03_db_ring/Node.h"
 
 #include "01_util/Conversion.h"
@@ -27,6 +28,7 @@ namespace synthese
 
 	    void DbRingModule::preInit ()
 	    {
+		RegisterParameter ("db_port", "3592", &ParameterCallback);
 		RegisterParameter ("dbring_node_id", "1", &ParameterCallback); // Default node id is 1 (just like before to keep compliant with existing UIDs for orphan nodes).
 
 		
@@ -40,10 +42,23 @@ namespace synthese
 
 	    void DbRingModule::initialize()
 	    {
+		int sqliteServicePort = Conversion::ToInt (GetParameter ("db_port"));
+		
 		bool autorespawn = false;
 
 		ManagedThread* nodeThread = 
-		    new ManagedThread (_Node, "dbring_node", 10, autorespawn);
+		    new ManagedThread (_Node, "dbring_node", 1000, autorespawn);
+
+		
+		synthese::tcp::TcpService* service = 
+		    synthese::tcp::TcpService::openService (sqliteServicePort, true);
+		
+		// Just one thread
+		DbCommandThreadExec* dbCommandThreadExec = new DbCommandThreadExec (service);
+		
+		ManagedThread* dbCommandThread = 
+		    new ManagedThread (dbCommandThreadExec, "db_command", 100, autorespawn);
+		
 		
 	    }
 	    
@@ -60,7 +75,11 @@ namespace synthese
 	    void DbRingModule::ParameterCallback (const std::string& name, 
 						  const std::string& value)
 	    {
-		if (name == "dbring_node_id") 
+		if (name == "db_port") 
+		{
+		    // TODO : close and reopen service on the new port
+		}
+		else if (name == "dbring_node_id") 
 		{
 		    // Erreur critique ...
 		}

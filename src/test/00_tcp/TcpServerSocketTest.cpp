@@ -1,4 +1,6 @@
 #include "01_util/Conversion.h"
+#include "01_util/Compression.h"
+#include "01_util/Thread.h"
 
 #include "00_tcp/TcpService.h"
 #include "00_tcp/TcpServerSocket.h"
@@ -16,7 +18,8 @@
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace synthese::tcp;
-
+using namespace synthese::util;
+using namespace boost::iostreams;
 
 struct TcpClientThread
 {
@@ -219,3 +222,91 @@ BOOST_AUTO_TEST_CASE (testMultipleConnections)
 
 
 
+struct TcpZlibClientThread
+{
+    std::string _replyToSend;
+
+    TcpZlibClientThread (const std::string& replyToSend) 
+	: _replyToSend (replyToSend)
+	{
+	}
+	
+    void operator()()
+	{
+
+	    try
+	    {
+		TcpClientSocket clientSock ("localhost", 8899, 0);
+		
+		while (clientSock.isConnected () == false)
+		{
+		    clientSock.tryToConnect ();
+		    boost::thread::yield ();
+		}
+		
+		BOOST_CHECK (clientSock.isConnected ());
+		
+		// The client is connected.
+
+		stream<TcpClientSocket> ss (clientSock);
+	    
+		std::stringstream msg;
+		Compression::ZlibDecompress (ss, msg);
+
+		std::string expectedMessage ("MessageToClient");
+		BOOST_CHECK_EQUAL (expectedMessage, msg.str ());
+		
+                // Send a reply
+		msg.str (_replyToSend);
+		Compression::ZlibCompress (msg, ss);
+
+
+	    }
+	    catch (std::exception& e)
+	    {
+		BOOST_FAIL (e.what ());
+	    }
+	}
+};
+    
+
+
+BOOST_AUTO_TEST_CASE (testSimpleConnectionWithCompression)
+{
+    TcpZlibClientThread clientThread ("MessageToServerFromClient0");
+    boost::thread client (clientThread);
+    
+    TcpService* service = TcpService::openService (8899, true, true);
+    
+    try 
+    {
+	// Wait for client connection...
+	TcpServerSocket* socket (0);
+	while (!socket) socket = service->acceptConnection ();
+
+	BOOST_CHECK_EQUAL (1, service->getConnectionCount ());
+
+	stream<TcpServerSocket> ss (*socket);
+
+	// Send a compressed message to client:
+	std::stringstream msg ("MessageToClient");
+	Compression::ZlibCompress (msg, ss);
+
+	// Wait for a reply
+	msg.str("");
+	Compression::ZlibDecompress (ss, msg);
+
+	BOOST_CHECK_EQUAL ("MessageToServerFromClient0", msg.str ());
+	service->closeConnection (socket);
+	BOOST_CHECK_EQUAL (0, service->getConnectionCount ());
+    } 
+    catch (SocketException& se)
+    {
+	BOOST_FAIL (se.what ());
+    }
+    
+    client.join ();
+    
+    
+    TcpService::closeService (8899);
+} 

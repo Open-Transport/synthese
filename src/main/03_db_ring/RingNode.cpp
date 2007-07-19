@@ -6,12 +6,10 @@
 
 #include <boost/iostreams/stream.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filter/zlib.hpp>
 
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
+#include "01_util/Compression.h"
 
 #include "00_tcp/TcpServerSocket.h"
 #include "00_tcp/TcpClientSocket.h"
@@ -224,13 +222,13 @@ RingNode::sendToken ()
 	    
 	if (sendSurefireToken (ni.getHost (), ni.getPort ())) 
 	{
-/*
+
 	    std::stringstream logstr;
 	    logstr << "Node " << _data->getEmitterNodeId () << " sent [" 
 		   << (*_data) << "] to node " << ni.getNodeId () << std::endl;
 	    
-	    Log::GetInstance ().debug (logstr.str ());
-*/
+	    Log::GetInstance ().info (logstr.str ());
+
 	    return true;
 	}
 
@@ -315,7 +313,7 @@ RingNode::loop (const TokenSPtr& token)
 	
 	// Reset timer.
 	resetTimer ();
-	// std::cerr << "## TIMEOUT!! " << std::endl;
+	std::cerr << "## TIMEOUT!! " << std::endl;
 
 	// Create init token...
 	_data->setState (ENTRING);
@@ -352,14 +350,10 @@ RingNode::sendSurefireToken (const std::string& host, int port)
 
 	try
 	{
-	    boost::iostreams::filtering_ostream zlibout;
-
-	    boost::iostreams::stream<TcpClientSocket> cliSocketStream;
-	    cliSocketStream.open (clientSock);
-	    zlibout.push (boost::iostreams::zlib_compressor (boost::iostreams::zlib::best_speed));
-	    zlibout.push (cliSocketStream);
-	    zlibout << (*_data) << std::flush;
-	    zlibout.reset (); // necessary
+	    boost::iostreams::stream<TcpClientSocket> cliSocketStream (clientSock);
+	    std::stringstream tmp;
+	    tmp << (*_data);
+	    Compression::ZlibCompress (tmp, cliSocketStream);
 
 	    cliSocketStream.close ();
 	    success = true;

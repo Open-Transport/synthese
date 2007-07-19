@@ -1,4 +1,6 @@
 #include "03_db_ring/UpdateLog.h"
+#include "00_tcp/Constants.h"
+
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -6,6 +8,8 @@
 
 
 using namespace boost::posix_time;
+
+using namespace synthese::tcp;
 
 
 namespace synthese
@@ -108,8 +112,7 @@ operator<< ( std::ostream& os, const UpdateLog& op )
     for (UpdateRecordMap::const_iterator it = op._map.begin ();
 	 it != op._map.end (); ++it)
     {
-	// TODO : replace qith a special char
-	os << (*(it->second)) << "#"; 
+	os << (*(it->second)) << ETX; 
     }
     
     return os;
@@ -123,7 +126,7 @@ operator>> ( std::istream& is, UpdateLog& op )
     static char buf[1024*256]; // 256 KBytes max.
 
     std::string lut;
-    while (is.getline (buf, 1024*256, '#'))
+    while (is.getline (buf, 1024*256, ETX))
     {
 	std::stringstream input (buf);
 	UpdateRecord* updateRecord = new UpdateRecord ();

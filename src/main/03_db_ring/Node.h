@@ -2,6 +2,10 @@
 #define SYNTHESE_DBRING_NODE_H
 
 #include "01_util/ThreadExec.h"
+
+#include "02_db/SQLiteHandle.h"
+#include "02_db/SQLiteResult.h"
+
 #include "03_db_ring/RingNode.h"
 #include "03_db_ring/UpdateLog.h"
 
@@ -34,7 +38,7 @@ namespace dbring
 
 @ingroup m03
 */
-class Node : public util::ThreadExec 
+class Node : public db::SQLiteHandle, public util::ThreadExec 
 {
 private:
     
@@ -58,6 +62,10 @@ protected:
 
     ~Node ();
 
+public:
+
+    sqlite3* getHandle ();
+
     const NodeId& getId () const;
 
     bool hasInfo (const NodeId& nodeId, const RingId& ringId) const;
@@ -73,7 +81,8 @@ protected:
     */
     bool canWrite () const;
 
-    void execUpdate (const std::string& sql); 
+    db::SQLiteResult execQuery (const std::string& sql);
+    void execUpdate (const std::string& sql, bool asynchronous = false); 
 
     void initialize ();
     void loop ();

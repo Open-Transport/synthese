@@ -1,15 +1,18 @@
-
-
 #include "00_tcp/TcpClientSocket.h"
 #include "00_tcp/SocketException.h"
+#include "00_tcp/Constants.h"
 
+#include "02_db/SQLite.h"
 
+#include "01_util/Compression.h"
 #include "01_util/Conversion.h"
 #include "01_util/Exception.h"
 #include "01_util/Log.h"
 #include "01_util/Thread.h"
 
+
 #include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/copy.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -22,8 +25,28 @@
 #include <sstream>
 #include <string>
 
+
+#if defined(UNIX) 
+  #include <unistd.h>
+#endif
+
+
+#if defined(_WIN32) || defined(WIN32)
+# include <io.h>
+#else
+/* Make sure isatty() has a prototype.
+*/
+extern int isatty();
+#endif
+
+
+
+
+
+
 using namespace synthese::util;
 using namespace synthese::tcp;
+using namespace synthese::db;
 
 
 namespace po = boost::program_options;
@@ -43,12 +66,12 @@ void sig_INT_handler(int sig)
 
 
 
-
-const char ETB (23);
-
 int main( int argc, char **argv )
 {
     std::signal(SIGINT, sig_INT_handler);
+
+    // Check if stdin is interactive or a redirection.
+    bool isInteractive = isatty(0);
 
     std::string host;
     int port;
@@ -70,7 +93,8 @@ int main( int argc, char **argv )
 
     Log::GetInstance ().info ("Connecting " + host + ":" + Conversion::ToString (port));
 
-    char buf[4096];
+    char buf[1024*64];
+
     // No timeout !
     int timeout = 0;
     TcpClientSocket clientSock (host, port, timeout);
@@ -84,63 +108,98 @@ int main( int argc, char **argv )
     // The client is connected.
 
     // Create commodity stream:
-    boost::iostreams::stream<TcpClientSocket> cliSocketStream;
-    cliSocketStream.open (clientSock);
+    boost::iostreams::stream<TcpClientSocket> cliSocketStream (clientSock);
 
     Log::GetInstance ().info ("Connected.");
 
     // Wait for the welcome message...
     std::stringstream message;
-    cliSocketStream.getline (buf, 4096);
+    cliSocketStream.getline (buf, sizeof(buf));
 
     message << buf;
 
-    std::cout << message.str () << std::endl;
+    if (isInteractive) 
+	std::cout << message.str () << std::endl;
 
-    std::string input;
     try
     {
-	std::cout << "? ";
-	// Wait for input...
-	while (std::cin.getline (buf, 4096, ';'))
+
+	if (isInteractive == false)
 	{
-	    std::string input (buf);
+	    // boost::iostreams::copy (std::cin, reply);
+	    Compression::ZlibCompress (std::cin, cliSocketStream);
 
-	    cliSocketStream << input << ETB;
-	    cliSocketStream.flush ();
-
-	    // Wait for reply
-	    cliSocketStream.getline (buf, 4096, ETB);
-	    
-	    std::string answer (buf);
+	    std::stringstream reply;
+	    Compression::ZlibDecompress (cliSocketStream, reply);
 	    
 	    // Keeps first two characters as error code.
-	    std::string errorCode (answer.substr (0, 2));
-	    answer = answer.substr (2);
-
-	    if (answer == "00")
+	    std::string errorCode;
+	    errorCode += ((char) reply.get ());
+	    errorCode += ((char) reply.get ());
+		    
+	    if (errorCode == "00")
 	    {
-		// Everything went fine. Dump the answer
-		std::cout << answer << std::endl;
-		
+		// Everything went fine. Do not dump the answer in non-interactive mode
 	    }
 	    else 
 	    {
-		// Error!
-		std::cerr << answer << std::endl;
+		boost::iostreams::copy (reply, std::cerr);
+		std::cerr << std::endl;
 	    }
-
-	    // std::cout << "Answer received : " << answer << std::endl;
 	    
-	    input = "";
+	}
+	else 
+	{
+	    std::stringstream input;
+	    char c;
 	    std::cout << "? ";
-	} 
+	    
+	    int nbStatements;
+	    bool processIt (false);
+	    while (!std::cin.eof ())
+	    {
+		std::cin.get(c);
+		input << c;
+		if ((c == ';') && (SQLite::IsStatementComplete (input.str ())))
+		{
+		    Compression::ZlibCompress (input, cliSocketStream);
 
-    }
+		    std::stringstream reply;
+		    Compression::ZlibDecompress (cliSocketStream, reply);
+		    
+		    // Keeps first two characters as error code.
+		    std::string errorCode;
+		    errorCode += ((char) reply.get ());
+		    errorCode += ((char) reply.get ());
+		    
+		    if (errorCode == "00")
+		    {
+			// Everything went fine. Dump the answer
+			boost::iostreams::copy (reply, std::cout);
+			std::cout << std::endl;
+		    }
+		    else 
+		    {
+			// Error!
+			boost::iostreams::copy (reply, std::cerr);
+			std::cerr << std::endl;
+		    }
+		    ++nbStatements;
+		    
+		    // Clear temporary stringstream
+		    input.str ("");
+		    std::cout << "? ";
+		}
+	    }
+	    
+	}
+    } 
+	
     catch (synthese::util::Exception& ex)
     {
 	Log::GetInstance ().fatal ("Exit!", ex);
     }
+
     cliSocketStream.close ();
 
     

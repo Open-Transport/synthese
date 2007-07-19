@@ -33,15 +33,15 @@ public:
     ~UpdateRecordTableSync ();
 
 
-    virtual void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+    virtual void rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 			    db::SQLiteSync* sync,
 			    const db::SQLiteResult& rows, bool isFirstSync = false);
 
-    virtual void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
+    virtual void rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 			      db::SQLiteSync* sync,
 			      const db::SQLiteResult& rows);
 
-    virtual void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
+    virtual void rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 			      db::SQLiteSync* sync,
 			      const db::SQLiteResult& rows);
 

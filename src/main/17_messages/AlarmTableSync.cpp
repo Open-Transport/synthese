@@ -187,7 +187,7 @@ namespace synthese
 		}
 		    
 
-		void AlarmTableSync::rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+		void AlarmTableSync::rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows, bool isFirstSync)
 		{
@@ -227,7 +227,7 @@ namespace synthese
 		}
 
 
-		void AlarmTableSync::rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
+		void AlarmTableSync::rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{
@@ -243,7 +243,7 @@ namespace synthese
 		}
 
 
-		void AlarmTableSync::rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
+		void AlarmTableSync::rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{
@@ -276,7 +276,7 @@ namespace synthese
 			, bool orderByConflict
 			, bool raisingOrder
 		){
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT "
@@ -394,7 +394,7 @@ namespace synthese
 
 //		std::vector<boost::shared_ptr<Alarm> > AlarmTableSync::search( const Scenario* scenario , int first /*= 0 */, int number /*= -1 */, bool orderByLevel /*= false */, bool raisingOrder /*= false */ )
 /*		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT a.*"
@@ -430,7 +430,7 @@ namespace synthese
 */
 		std::vector<boost::shared_ptr<ScenarioSentAlarm> > AlarmTableSync::searchScenarioSent( const SentScenario* scenario , int first /*= 0 */, int number /*= 0 */, bool orderByLevel /*= false */, bool orderByStatus /*= false */, bool orderByConflict /*= false */, bool raisingOrder /*= false */ )
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT a.*"
@@ -464,7 +464,7 @@ namespace synthese
 
 		std::vector<boost::shared_ptr<AlarmTemplate> > AlarmTableSync::searchTemplates( const ScenarioTemplate* scenario , int first /*= 0 */, int number /*= 0 */, bool orderByLevel /*= false */, bool raisingOrder /*= false */ )
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT a.*"

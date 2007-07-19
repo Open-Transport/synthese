@@ -3,7 +3,6 @@
 #include "01_util/Thread.h"
 
 #include "02_db/DBModule.h"
-#include "02_db/SQLite.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteSync.h"
 #include "02_db/SQLiteQueueThreadExec.h"
@@ -171,16 +170,16 @@ public:
     SQLiteTableSyncForTest (const std::string& tableName) 
 	: SQLiteTableSync (tableName) {}
 
-    void rowsAdded (const SQLiteQueueThreadExec* sqlite, 
+    void rowsAdded (SQLiteQueueThreadExec* sqlite, 
 		    SQLiteSync* sync,
 		    const SQLiteResult& rows,
 	            bool isFirstSync = false) {}
 	
-    void rowsUpdated (const SQLiteQueueThreadExec* sqlite, 
+    void rowsUpdated (SQLiteQueueThreadExec* sqlite, 
 		      SQLiteSync* sync,
 		      const SQLiteResult& rows) {}
 	
-    void rowsRemoved (const SQLiteQueueThreadExec* sqlite, 
+    void rowsRemoved (SQLiteQueueThreadExec* sqlite, 
 		      SQLiteSync* sync,
 		      const SQLiteResult& rows) {}
 	

@@ -60,7 +60,7 @@ namespace synthese
 
 		template<> void SQLiteTableSyncTemplate<VinciRate>::save(VinciRate* vr)
 		{
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (vr->getKey() > 0)
 			{	// UPDATE
@@ -131,7 +131,7 @@ namespace synthese
 			addTableColumn(TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST, "BOOLEAN", true);
 		}
 
-		void VinciRateTableSync::rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+		void VinciRateTableSync::rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows, bool isFirstSync)
 		{
@@ -139,14 +139,14 @@ namespace synthese
 		}
 
 		
-		void VinciRateTableSync::rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
+		void VinciRateTableSync::rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{
 
 		}
 
-		void VinciRateTableSync::rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
+		void VinciRateTableSync::rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{
@@ -156,7 +156,7 @@ namespace synthese
 		std::vector<shared_ptr<VinciRate> > VinciRateTableSync::search(
 				 int first, int number)
 		{
-			const db::SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			db::SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT * FROM " << TABLE_NAME

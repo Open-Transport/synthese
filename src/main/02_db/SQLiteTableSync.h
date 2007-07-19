@@ -106,32 +106,32 @@ namespace synthese
 
 				Note : It does not delete any useless table present in the database.
 			*/
-			void firstSync (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			void firstSync (synthese::db::SQLiteQueueThreadExec* sqlite, 
 					synthese::db::SQLiteSync* sync);
 			
 			/** This method can be overriden to invoke some code before
 			    executing firstSync body.
 			    Default implementation is doing nothing.
 			*/
-			virtual void beforeFirstSync (const SQLiteQueueThreadExec* sqlite, 
+			virtual void beforeFirstSync (SQLiteQueueThreadExec* sqlite, 
 						      SQLiteSync* sync);
 
 			/** This method can be overriden to invoke some code after
 			    having executed firstSync body.
 			    Default implementation is doing nothing.
 			*/
-			virtual void afterFirstSync (const SQLiteQueueThreadExec* sqlite, 
+			virtual void afterFirstSync (SQLiteQueueThreadExec* sqlite, 
 						     SQLiteSync* sync);
 
-			virtual void rowsAdded (const SQLiteQueueThreadExec* sqlite, 
+			virtual void rowsAdded (SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
 						const SQLiteResult& rows, bool isFirstSync = false) = 0;
 
-			virtual void rowsUpdated (const SQLiteQueueThreadExec* sqlite, 
+			virtual void rowsUpdated (SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
 						const SQLiteResult& rows) = 0;
 
-			virtual void rowsRemoved (const SQLiteQueueThreadExec* sqlite, 
+			virtual void rowsRemoved (SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
 						const SQLiteResult& rows) = 0;
 
@@ -168,7 +168,7 @@ namespace synthese
 			 *
 			 * @param tableSchema Required table schema.
 			 */
-			void createTable (const synthese::db::SQLiteQueueThreadExec* sqlite,
+			void createTable (synthese::db::SQLiteQueueThreadExec* sqlite,
 					  const std::string& tableSchema,
 					  const std::string& triggerNoInsert,
 					  const std::string& triggerNoRemove,
@@ -182,7 +182,7 @@ namespace synthese
 			 * @param tableSchema Required table schema.
 			 * @param dbSchema Actual table schema in db.
 			 */
-			void adaptTable (const synthese::db::SQLiteQueueThreadExec* sqlite,
+			void adaptTable (synthese::db::SQLiteQueueThreadExec* sqlite,
 					 const std::string& tableSchema,
 					 const std::string& triggerNoInsert,
 					 const std::string& triggerNoRemove,
@@ -225,22 +225,22 @@ namespace synthese
 
 
 			static std::vector<std::string> 
-			    GetTableColumnsDb (const synthese::db::SQLiteQueueThreadExec* sqlite,
+			    GetTableColumnsDb (synthese::db::SQLiteQueueThreadExec* sqlite,
 					       const std::string& tableName);
 
-			static std::string GetSQLSchemaDb (const synthese::db::SQLiteQueueThreadExec* sqlite,
+			static std::string GetSQLSchemaDb (synthese::db::SQLiteQueueThreadExec* sqlite,
 							   const std::string& tableName);
 			
 			static std::string GetTriggerNoInsertDb (
-			    const synthese::db::SQLiteQueueThreadExec* sqlite,
+			    synthese::db::SQLiteQueueThreadExec* sqlite,
 			    const std::string& tableName);
 
 			static std::string GetTriggerNoRemoveDb (
-			    const synthese::db::SQLiteQueueThreadExec* sqlite,
+			    synthese::db::SQLiteQueueThreadExec* sqlite,
 			    const std::string& tableName);
 
 			static std::string GetTriggerNoUpdateDb (
-			    const synthese::db::SQLiteQueueThreadExec* sqlite,
+			    synthese::db::SQLiteQueueThreadExec* sqlite,
 			    const std::string& tableName);
 
 			/** Builds the name of the index in the sqlite master table.

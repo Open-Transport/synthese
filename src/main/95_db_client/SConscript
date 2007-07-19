@@ -2,7 +2,7 @@
 
 Import ('mainenv')
 
-modules = ['01_util', '00_tcp'];
+modules = ['02_db', '01_util', '00_tcp'];
 
 
 syntheseenv = mainenv.SyntheseEnv (modules)

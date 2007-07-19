@@ -124,7 +124,7 @@ namespace synthese
 
 		    
 		void 
-			ConnectionPlaceTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			ConnectionPlaceTableSync::rowsAdded (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResult& rows, bool isFirstSync)
 		{
@@ -181,7 +181,7 @@ namespace synthese
 
 
 		void 
-			ConnectionPlaceTableSync::rowsUpdated (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			ConnectionPlaceTableSync::rowsUpdated (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResult& rows)
 		{
@@ -202,7 +202,7 @@ namespace synthese
 
 
 		void 
-			ConnectionPlaceTableSync::rowsRemoved (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			ConnectionPlaceTableSync::rowsRemoved (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResult& rows)
 		{

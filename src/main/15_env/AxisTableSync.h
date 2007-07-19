@@ -69,14 +69,14 @@ namespace synthese
 			/** Action to do on Axis creation.
 				This method loads a new object in ram.
 			*/
-			void rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+			void rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows, bool isFirstSync = false);
 
 			/** Action to do on Axis creation.
 				This method updates the corresponding object in ram.
 			*/
-			void rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
+			void rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 
@@ -84,7 +84,7 @@ namespace synthese
 				This method deletes the corresponding object in ram and runs 
 				all necessary cleaning actions.
 			*/
-			void rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
+			void rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
 				const db::SQLiteResult& rows);
 

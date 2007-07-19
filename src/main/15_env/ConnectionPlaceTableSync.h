@@ -57,15 +57,15 @@ namespace synthese
 			ConnectionPlaceTableSync ();
 			~ConnectionPlaceTableSync ();
 
-			void rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			void rowsAdded (synthese::db::SQLiteQueueThreadExec* sqlite, 
 				synthese::db::SQLiteSync* sync,
 				const synthese::db::SQLiteResult& rows, bool isFirstSync = false);
 
-			void rowsUpdated (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			void rowsUpdated (synthese::db::SQLiteQueueThreadExec* sqlite, 
 				synthese::db::SQLiteSync* sync,
 				const synthese::db::SQLiteResult& rows);
 
-			void rowsRemoved (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			void rowsRemoved (synthese::db::SQLiteQueueThreadExec* sqlite, 
 				synthese::db::SQLiteSync* sync,
 				const synthese::db::SQLiteResult& rows);
 		};

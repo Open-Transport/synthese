@@ -6,6 +6,8 @@
 
 #include "01_util/Log.h"
 
+#include "00_tcp/Constants.h"
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/time_formatters.hpp>
 #include <boost/date_time/posix_time/time_parsers.hpp>
@@ -15,6 +17,7 @@
 #include <assert.h>
 
 
+using namespace synthese::tcp;
 using namespace synthese::util;
 using namespace boost::posix_time;
 
@@ -472,16 +475,16 @@ operator<< ( std::ostream& os, const Token& op )
     boost::recursive_mutex::scoped_lock infosLock (*op._infosMutex);
     
     os << op._emitterNodeId << " "
-       << op._emitterRingId << " " << std::endl;
+       << op._emitterRingId << " " << ETB;
 
     for (std::map<NodeId, NodeInfo>::const_iterator it = op._infos.begin ();
 	 it != op._infos.end (); ++it)
     {
-	os << it->second << ";"; 
+	os << it->second << ETX; 
     }
-    os << std::endl;
+    os << ETB;
 
-    os << *(op._updateLog) << std::endl;
+    os << *(op._updateLog) << ETB;
     
     return os;
 }
@@ -498,13 +501,13 @@ operator>> ( std::istream& is, Token& op )
     std::stringstream nodeInfos;
     std::stringstream updateRecords;
     
-    is.getline (buf, 1024*16);
+    is.getline (buf, 1024*16, ETB);
     ids << buf;
 
-    is.getline (buf, 1024*16);
+    is.getline (buf, 1024*16, ETB);
     nodeInfos << buf;
 
-    is.getline (buf, 1024*16);
+    is.getline (buf, 1024*16, ETB);
     updateRecords << buf;
 
     ids >> op._emitterNodeId;
@@ -513,7 +516,7 @@ operator>> ( std::istream& is, Token& op )
     std::string ts;
     ids >> ts;
 
-    while (nodeInfos.getline (buf, 1024*16, ';'))
+    while (nodeInfos.getline (buf, 1024*16, ETX))
     {
 	std::stringstream input (buf);
 	NodeInfo nodeInfo;
@@ -526,7 +529,6 @@ operator>> ( std::istream& is, Token& op )
     return is;
 
 }
-
 
 
 }

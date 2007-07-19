@@ -60,7 +60,7 @@ namespace synthese
 
 			try
 			{
-				const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+				SQLiteHandle* sqlite = DBModule::GetSQLite();
 
 				// Rent Starts
 				stringstream query;
@@ -142,7 +142,7 @@ namespace synthese
 			static const string COL_NUMBER("number");
 			static const string COL_RATE("rate");
 
-			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 
 			// Rent Starts
 			stringstream query;

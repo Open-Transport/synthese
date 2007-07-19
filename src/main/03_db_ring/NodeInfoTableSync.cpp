@@ -48,7 +48,7 @@ namespace synthese
 
 	template<> void SQLiteTableSyncTemplate<NodeInfo>::save (NodeInfo* object)
 	{
-	    const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+	    SQLiteHandle* sqlite = DBModule::GetSQLite();
 	    std::stringstream query;
 
 	    uid key = util::encodeUId (TABLE_ID, 
@@ -115,7 +115,7 @@ namespace synthese
 
 
 	void 
-	NodeInfoTableSync::rowsAdded (const SQLiteQueueThreadExec* sqlite, 
+	NodeInfoTableSync::rowsAdded (SQLiteQueueThreadExec* sqlite, 
 				      SQLiteSync* sync,
 				      const SQLiteResult& rows, bool isFirstSync)
 	{
@@ -125,7 +125,7 @@ namespace synthese
 	
 
 	void 
-	NodeInfoTableSync::rowsUpdated (const SQLiteQueueThreadExec* sqlite, 
+	NodeInfoTableSync::rowsUpdated (SQLiteQueueThreadExec* sqlite, 
 					SQLiteSync* sync,
 					const SQLiteResult& rows)
 	{
@@ -155,7 +155,7 @@ namespace synthese
  
 
 	void 
-	NodeInfoTableSync::rowsRemoved (const SQLiteQueueThreadExec* sqlite, 
+	NodeInfoTableSync::rowsRemoved (SQLiteQueueThreadExec* sqlite, 
 					SQLiteSync* sync,
 					const SQLiteResult& rows)
 	{

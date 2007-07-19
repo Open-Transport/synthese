@@ -65,7 +65,7 @@ namespace synthese
 
 
 		void 
-		SQLiteTableSync::firstSync (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+		SQLiteTableSync::firstSync (synthese::db::SQLiteQueueThreadExec* sqlite, 
 						synthese::db::SQLiteSync* sync)
 		{
 			// Pre-init phase
@@ -154,13 +154,13 @@ namespace synthese
 			    
 
 		void 
-		SQLiteTableSync::beforeFirstSync (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+		SQLiteTableSync::beforeFirstSync (synthese::db::SQLiteQueueThreadExec* sqlite, 
 						  synthese::db::SQLiteSync* sync)
 		{
 		}
 
 		void 
-		SQLiteTableSync::afterFirstSync (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+		SQLiteTableSync::afterFirstSync (synthese::db::SQLiteQueueThreadExec* sqlite, 
 						 synthese::db::SQLiteSync* sync)
 		{
 		}
@@ -252,7 +252,7 @@ namespace synthese
 		
 
 		void 
-		SQLiteTableSync::createTable (const synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::createTable (synthese::db::SQLiteQueueThreadExec* sqlite,
 						  const std::string& tableSchema,
 						  const std::string& triggerNoInsert,
 						  const std::string& triggerNoRemove,
@@ -360,7 +360,7 @@ namespace synthese
 
 
 		std::vector<std::string> 
-		SQLiteTableSync::GetTableColumnsDb (const synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::GetTableColumnsDb (synthese::db::SQLiteQueueThreadExec* sqlite,
 							const std::string& tableName)
 		{
 			std::vector<std::string> cols;
@@ -379,7 +379,7 @@ namespace synthese
 
 
 		std::string 
-		SQLiteTableSync::GetSQLSchemaDb (const synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::GetSQLSchemaDb (synthese::db::SQLiteQueueThreadExec* sqlite,
 						 const std::string& tableName)
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='table' and name='" +
@@ -394,7 +394,7 @@ namespace synthese
 		
 
 		std::string 
-		SQLiteTableSync::GetTriggerNoInsertDb (const synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::GetTriggerNoInsertDb (synthese::db::SQLiteQueueThreadExec* sqlite,
 							   const std::string& tableName)
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='trigger' and name='" +
@@ -406,7 +406,7 @@ namespace synthese
 
 		
 		std::string 
-		SQLiteTableSync::GetTriggerNoRemoveDb (const synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::GetTriggerNoRemoveDb (synthese::db::SQLiteQueueThreadExec* sqlite,
 							   const std::string& tableName)
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='trigger' and name='" +
@@ -418,7 +418,7 @@ namespace synthese
 		
 
 		std::string 
-		SQLiteTableSync::GetTriggerNoUpdateDb (const synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::GetTriggerNoUpdateDb (synthese::db::SQLiteQueueThreadExec* sqlite,
 							   const std::string& tableName)
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='trigger' and name='" +
@@ -438,7 +438,7 @@ namespace synthese
 
 		
 		void 
-		SQLiteTableSync::adaptTable (const synthese::db::SQLiteQueueThreadExec* sqlite,
+		SQLiteTableSync::adaptTable (synthese::db::SQLiteQueueThreadExec* sqlite,
 						 const std::string& tableSchema,
 						 const std::string& triggerNoInsert,
 						 const std::string& triggerNoRemove,

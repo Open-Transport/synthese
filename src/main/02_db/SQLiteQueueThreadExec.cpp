@@ -1,30 +1,9 @@
-
-/** SQLiteQueueThreadExec class Implementation.
-	@file SQLiteQueueThreadExec.cpp
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 #include "01_util/Thread.h"
 #include "01_util/Factory.h"
 
+#include "02_db/SQLite.h"
 #include "02_db/SQLiteException.h"
 #include "02_db/SQLiteTableSync.h"
 #include "02_db/SQLiteQueueThreadExec.h"
@@ -47,8 +26,6 @@ namespace synthese
 	namespace db
 	{
 
-//		boost::mutex eventQueueMutex; 
-
 		void sqliteUpdateHook (void* userData, int opType, const char* dbName, const char* tbName, sqlite_int64 rowId)
 		{
 			// WARNING : the update hook is invoked only when working with the connection
@@ -67,14 +44,13 @@ namespace synthese
 
 
 
-
-
 		SQLiteQueueThreadExec::SQLiteQueueThreadExec (const boost::filesystem::path& databaseFile)
-		: _databaseFile (databaseFile)
-		, _db (0)
-		, _hooksMutex (new boost::mutex ())
-		, _queueMutex (new boost::recursive_mutex ())
-		, _dbMutex (new boost::recursive_mutex ())
+		    : SQLiteHandle ()
+		    ,_databaseFile (databaseFile)
+		    , _handle (0)
+		    , _hooksMutex (new boost::mutex ())
+		    , _queueMutex (new boost::recursive_mutex ())
+		    , _handleMutex (new boost::recursive_mutex ())
 
 		{
 		}
@@ -94,9 +70,9 @@ namespace synthese
 			boost::mutex::scoped_lock hooksLock (*_hooksMutex);
 
 			// Lock db til register callback is executed (can use this db connection)
-			boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
+			boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
 
-			if (_db != 0)
+			if (_handle != 0)
 			{
 			    throw SQLiteException ("Update hooks should have been registered before SQLite queue thread is started!");
 			}
@@ -107,7 +83,7 @@ namespace synthese
 			  // NOTE : If we really need to add update hook on the fly, review this cos synchronous updates
 			  // causes inifite loop (enqueued events but loop not started.)
 
-			  if (_db != 0)
+			  if (_handle != 0)
 			  {
 			  // database handle has been initialized
 			  // call the register callback directly
@@ -120,7 +96,7 @@ namespace synthese
 
 
 		void 
-		SQLiteQueueThreadExec::postEvent (const SQLiteEvent& event) const
+		SQLiteQueueThreadExec::postEvent (const SQLiteEvent& event)
 		{
 			boost::mutex::scoped_lock hooksLock (*_hooksMutex);
 
@@ -169,7 +145,7 @@ namespace synthese
 		{
 		    // The database cannot be updated til all the hooks have been initialized
 		    // through their registerCallback.
-		    boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
+		    boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
 		    
 		    // No hook can be added til the thread has finished its initialization.
 		    boost::mutex::scoped_lock hooksLock (*_hooksMutex);
@@ -179,14 +155,14 @@ namespace synthese
 		    // Open a persistent DB connection
 		    // It is crucial that the db connection is created inside the init proc
 		    // so that the connection is created in the caller thread.
-		    _db = SQLite::OpenConnection (_databaseFile);
+		    _handle = SQLite::OpenHandle (_databaseFile);
 		    
 		    // Initialize each hooks
 		    std::for_each (_hooks.begin(), _hooks.end (), 
 				   std::bind2nd (std::mem_fun (&SQLiteUpdateHook::registerCallback), this));
 		    
 		    // Install the update hook
-		    sqlite3_update_hook (_db, &sqliteUpdateHook, this);
+		    sqlite3_update_hook (_handle, &sqliteUpdateHook, this);
 		}
 
 
@@ -197,7 +173,7 @@ namespace synthese
 		{
 			// Lock the db to ensure that the handle is used by only one thread at
 			// the same time!
-			boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
+			boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
 			boost::recursive_mutex::scoped_lock queueLock (*_queueMutex);
 			while (_eventQueue.empty () == false) 
 			{
@@ -225,7 +201,7 @@ namespace synthese
 		void
 		SQLiteQueueThreadExec::finalize()
 		{
-		    SQLite::CloseConnection (_db);
+		    SQLite::CloseHandle (_handle);
 		    delete _initThread;
 		}
 
@@ -233,24 +209,23 @@ namespace synthese
 
 
 		SQLiteResult 
-		SQLiteQueueThreadExec::execQuery (const std::string& sql) const
+		SQLiteQueueThreadExec::execQuery (const std::string& sql)
 		{
 			// Only one thread can use this db at the same time.
-			boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
+			boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
 
-			return SQLite::ExecQuery (_db, sql);
+			return SQLiteHandle::execQuery (sql);
 		}
 
 
 
-
 		void 
-		SQLiteQueueThreadExec::execUpdate (const std::string& sql, bool asynchronous) const
+		SQLiteQueueThreadExec::execUpdate (const std::string& sql, bool asynchronous)
 		{
 		    {
 			// Only one thread can use this db at the same time.
-			boost::recursive_mutex::scoped_lock dbLock (*_dbMutex);
-			SQLite::ExecUpdate (_db, sql);
+			boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
+			return SQLiteHandle::execUpdate (sql);
 		    }
 
 		    if (asynchronous == false) 
@@ -273,35 +248,8 @@ namespace synthese
 		}
 	    
 	    
-	    void 
-	    SQLiteQueueThreadExec::beginTransaction (bool exclusive)
-	    {
-		SQLite::BeginTransaction (_db, exclusive);
-	    }
-	    
 
 	    
-	    void 
-	    SQLiteQueueThreadExec::commitTransaction ()
-	    {
-		SQLite::CommitTransaction (_db);
-	    }
-
-
-	    
-	    SQLiteStatement 
-	    SQLiteQueueThreadExec::prepareStatement (const std::string& sql)
-	    {
-			return SQLite::PrepareStatement (_db, sql);
-	    }
-
-
-	    void 
-	    SQLiteQueueThreadExec::finalizeStatement (const SQLiteStatement& statement)
-	    {
-		SQLite::FinalizeStatement (statement);
-	    }
-
 	    
 	}
 }

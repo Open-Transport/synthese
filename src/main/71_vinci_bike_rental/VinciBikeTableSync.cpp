@@ -96,7 +96,7 @@ namespace synthese
 		/** Action to do on user creation.
 		No action because the users are not permanently loaded in ram.
 		*/
-		void VinciBikeTableSync::rowsAdded (const db::SQLiteQueueThreadExec* sqlite, 
+		void VinciBikeTableSync::rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows, bool isFirstSync)
 		{}
@@ -104,7 +104,7 @@ namespace synthese
 		/** Action to do on user creation.
 		Updates the users objects in the opened sessions.
 		*/
-		void VinciBikeTableSync::rowsUpdated (const db::SQLiteQueueThreadExec* sqlite, 
+		void VinciBikeTableSync::rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{}
@@ -112,7 +112,7 @@ namespace synthese
 		/** Action to do on user deletion.
 		Closes the sessions of the deleted user.
 		*/
-		void VinciBikeTableSync::rowsRemoved (const db::SQLiteQueueThreadExec* sqlite, 
+		void VinciBikeTableSync::rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
 			const db::SQLiteResult& rows)
 		{}
@@ -158,7 +158,7 @@ FROM
 			, bool raisingOrder
 			)
 		{
-			const db::SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			db::SQLiteHandle* sqlite = DBModule::GetSQLite();
 
 			stringstream query;
 			query 

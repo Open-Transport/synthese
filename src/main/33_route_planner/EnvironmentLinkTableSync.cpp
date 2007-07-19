@@ -86,7 +86,7 @@ namespace synthese
 
 				    
 		void 
-		EnvironmentLinkTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+		EnvironmentLinkTableSync::rowsAdded (synthese::db::SQLiteQueueThreadExec* sqlite, 
 							 synthese::db::SQLiteSync* sync,
 							 const synthese::db::SQLiteResult& rows, bool isFirstSync)
 		{
@@ -109,7 +109,7 @@ namespace synthese
 
 
 		void 
-		EnvironmentLinkTableSync::rowsUpdated (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+		EnvironmentLinkTableSync::rowsUpdated (synthese::db::SQLiteQueueThreadExec* sqlite, 
 						 synthese::db::SQLiteSync* sync,
 						 const synthese::db::SQLiteResult& rows)
 		{
@@ -126,7 +126,7 @@ namespace synthese
 
 
 		void 
-		EnvironmentLinkTableSync::rowsRemoved (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+		EnvironmentLinkTableSync::rowsRemoved (synthese::db::SQLiteQueueThreadExec* sqlite, 
 							   synthese::db::SQLiteSync* sync,
 							   const synthese::db::SQLiteResult& rows)
 		{

@@ -58,7 +58,7 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<City>::save(City* object)
 		{
 			/// @todo Implement
-			/*			const SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			/*			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			if (object->getKey() > 0)
 			{
@@ -106,7 +106,7 @@ namespace synthese
 
 		    
 		void 
-			CityTableSync::rowsAdded (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			CityTableSync::rowsAdded (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResult& rows, bool isFirstSync)
 		{
@@ -128,7 +128,7 @@ namespace synthese
 
 
 		void 
-			CityTableSync::rowsUpdated (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			CityTableSync::rowsUpdated (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResult& rows)
 		{
@@ -148,7 +148,7 @@ namespace synthese
 
 
 		void 
-			CityTableSync::rowsRemoved (const synthese::db::SQLiteQueueThreadExec* sqlite, 
+			CityTableSync::rowsRemoved (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
 			const synthese::db::SQLiteResult& rows)
 		{
