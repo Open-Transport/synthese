@@ -11,3 +11,4 @@
 #include "33_route_planner/JourneyBoardJunctionCellInterfacePage.h"
 #include "33_route_planner/JourneyLineListInterfaceElement.h"
 #include "33_route_planner/JourneyBoardInterfaceElement.h"
+#include "33_route_planner/SchedulesTableInterfaceElement.h"

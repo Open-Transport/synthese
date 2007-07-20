@@ -75,7 +75,12 @@ namespace synthese
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request= NULL) const;
-			void parse( const std::string& text);
+
+			/** Parser.
+				@param vel list of parameters :
+			*/
+			void storeParameters(interfaces::ValueElementList& vel);
+
 		};
 
 	}

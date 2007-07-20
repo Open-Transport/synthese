@@ -672,6 +672,10 @@ namespace synthese
 			return pl;
 		}
 
+		void SchedulesTableInterfaceElement::storeParameters( interfaces::ValueElementList& vel )
+		{
+			
+		}
 
 
 
