@@ -24,12 +24,10 @@
 #define SYNTHESE_TCP_TCPCLIENTSOCKET_H
 
 
-#include "module.h"
 
 #include <boost/iostreams/concepts.hpp> 
 #include <boost/shared_ptr.hpp>
 
-#include "Socket.h"
 #include "SocketException.h"
 
 
@@ -38,6 +36,8 @@ namespace synthese
 namespace tcp
 {
 
+class Socket;
+  
 /** TCP client side socket device.
 
 This class implements the concept of Boost Iostreams

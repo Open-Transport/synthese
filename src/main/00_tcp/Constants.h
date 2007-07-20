@@ -8,6 +8,9 @@ namespace synthese
 namespace tcp
 {
 
+    static const std::string PROTOCOL_TYPE_TCP ("tcp");
+    static const std::string PROTOCOL_TYPE_UDP ("udp");
+
     static const char ETX (03);
     static const char ACK (06);
     static const char NAK (21);

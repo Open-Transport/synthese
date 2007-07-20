@@ -1,4 +1,7 @@
-#include "TcpClientSocket.h"
+#include "00_tcp/TcpClientSocket.h"
+
+#include "00_tcp/Socket.h"
+#include "00_tcp/Constants.h"
 
 
 namespace synthese

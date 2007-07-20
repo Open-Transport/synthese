@@ -192,8 +192,8 @@ Socket::acceptConnection()
     
     if (client == INVALID_SOCKET)
     {
-	if (errno != EWOULDBLOCK)
-	    std::cerr << errno;
+	// if (errno != EWOULDBLOCK)
+	//    std::cerr << errno;
 
 	/* if (errno == EWOULDBLOCK)
 	{

@@ -24,8 +24,6 @@
 #define SYNTHESE_TCP_TCPSERVERSOCKET_H
 
 
-#include "module.h"
-
 #include <boost/iostreams/concepts.hpp> 
 
 #include "SocketException.h"

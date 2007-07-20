@@ -25,8 +25,6 @@
 
 #include <map>
 
-#include "module.h"
-
 #include "SocketException.h"
 #include "TcpServerSocket.h"
 
