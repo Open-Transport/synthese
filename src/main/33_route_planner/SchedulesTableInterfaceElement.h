@@ -46,22 +46,27 @@ namespace synthese
 			typedef std::vector<const synthese::env::ConnectionPlace*> PlaceList;
 			typedef std::vector<bool> LockedLinesList;
 
-			static size_t OrdrePAEchangeSiPossible( const 
-				Journeys&, PlaceList&, const LockedLinesList&, size_t PositionOrigine, size_t PositionSouhaitee );
+			static int OrdrePAEchangeSiPossible(
+				const Journeys&
+				, PlaceList&
+				, const LockedLinesList&
+				, int PositionOrigine
+				, int PositionSouhaitee
+				);
 			
-			/** Insertion d'un arr�t de passage dans la liste des arr�ts d'une fiche horaire.
-				@param ArretLogique Arr�t � ins�rer
-				@param Position Position minimale � donner � l'arr�t
+			/** Insertion d'un arrêt de passage dans la liste des arrêts d'une fiche horaire.
+				@param ArretLogique Arrêt à insérer
+				@param Position Position minimale à donner à l'arrêt
 
-				L'insertion d�cale les arr�ts suivants une ligne plus bas. Si un trajet pi�ton (repr�sent� par deux fl�ches devant �tre attenantes) se trouve � la position demand�e, alors l'arr�t est plac� en suivant pour ne pas rompre le cheminement pi�ton.
+				L'insertion décale les arrêts suivants une ligne plus bas. Si un trajet piéton (représenté par deux flèches devant être attenantes) se trouve à la position demandée, alors l'arrêt est placé en suivant pour ne pas rompre le cheminement piéton.
 			*/
-			static size_t OrdrePAInsere(PlaceList&, const LockedLinesList&, const synthese::env::ConnectionPlace*, size_t Position );
+			static int OrdrePAInsere(PlaceList&, const LockedLinesList&, const synthese::env::ConnectionPlace*, int Position );
 			
-			/** Contr�le de la compatibilit� entre l'ordre des arr�ts dans la grille horaire et les arr�ts du trajet. */
-			static std::vector<bool> OrdrePAConstruitLignesAPermuter( const PlaceList&, const Journey& __TrajetATester, size_t LigneMax );
+			/** Contrôle de la compatibilité entre l'ordre des arrêts dans la grille horaire et les arrêts du trajet. */
+			static std::vector<bool> OrdrePAConstruitLignesAPermuter( const PlaceList&, const Journey& __TrajetATester, int LigneMax );
 			
-			/** Recherche de point d'arr�t dans la liste des points d'arr�t.			*/
-			static bool OrdrePARechercheGare( const PlaceList&, size_t& i, const synthese::env::ConnectionPlace* GareAChercher );
+			/** Recherche de point d'arrêt dans la liste des points d'arrêt.			*/
+			static bool OrdrePARechercheGare( const PlaceList&, int& i, const synthese::env::ConnectionPlace* GareAChercher );
 
 			static PlaceList getStopsListForScheduleTable( const synthese::routeplanner::Journeys& );
 

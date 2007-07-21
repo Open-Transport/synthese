@@ -24,6 +24,8 @@
 
 #include "30_server/Request.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace interfaces;
@@ -40,8 +42,8 @@ namespace synthese
 			pv.push_back( synthese::util::Conversion::ToString( isItLastLine ) );
 			pv.push_back( synthese::util::Conversion::ToString( columnNumber ) );
 			pv.push_back( synthese::util::Conversion::ToString( isItFootLine ) );
-			pv.push_back( firstDepartureTime.isUnknown() ? "" : firstDepartureTime.toInternalString() );
-			pv.push_back( firstDepartureTime.isUnknown() ? "" : lastDepartureTime.toInternalString() );
+			pv.push_back( firstDepartureTime.isUnknown() ? string() : firstDepartureTime.toString());
+			pv.push_back( firstDepartureTime.isUnknown() ? string() : lastDepartureTime.toString() );
 			pv.push_back( synthese::util::Conversion::ToString( isItContinuousService ) );
 
 			VariablesMap vm;

@@ -55,5 +55,10 @@ namespace synthese
 
 			return string();
 		}
+
+		void ScheduleSheetLinesListLineInterfaceElement::storeParameters( interfaces::ValueElementList& vel )
+		{
+
+		}
 	}
 }

@@ -84,14 +84,16 @@ WARN_LOGFILE           =
 # configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = . \
-                         ../src
+                         ../src \
+                         ../resources
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cpp \
                          *.h \
                          *.php \
                          *.doxygen \
-                         *.py
+                         *.py \
+                         *.sql
 RECURSIVE              = YES
 EXCLUDE                = exemples \
                          ../src/main/client_rs485 \

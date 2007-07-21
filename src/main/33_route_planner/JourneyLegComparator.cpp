@@ -21,7 +21,6 @@
 */
 
 #include "33_route_planner/JourneyLegComparator.h"
-#include "33_route_planner/Journey.h"
 
 #include "15_env/Edge.h"
 #include "15_env/Vertex.h"
@@ -40,8 +39,8 @@ namespace synthese
 	{
 
 		JourneyLegComparator::JourneyLegComparator (const AccessDirection& accessDirection)
-			: _firstServiceUseAccessor((accessDirection == TO_DESTINATION) ? &Journey::getFirstJourneyLeg : &Journey::getLastJourneyLeg)
-			, _secondServiceUseAccessor((accessDirection == TO_DESTINATION) ? &Journey::getLastJourneyLeg : &Journey::getFirstJourneyLeg)
+			: _secondServiceUseAccessor((accessDirection == TO_DESTINATION) ? &Journey::getLastJourneyLeg : &Journey::getFirstJourneyLeg)
+			, _firstServiceUseAccessor((accessDirection == TO_DESTINATION) ? &Journey::getFirstJourneyLeg : &Journey::getLastJourneyLeg)
 		{	}
 		 
 
@@ -57,10 +56,10 @@ namespace synthese
 			const ServiceUse& secondServiceUse1((j1.*_secondServiceUseAccessor)());
 			const ServiceUse& secondServiceUse2((j2.*_secondServiceUseAccessor)());
 			
-			if (secondServiceUse1.getSquareDistance () == 0) return true;
-			if (secondServiceUse1.getSquareDistance () == 0) return false;
+			if (secondServiceUse1.getSquareDistance().getSquareDistance() == 0) return true;
+			if (secondServiceUse2.getSquareDistance().getSquareDistance() == 0) return false;
 		    
-			if (secondServiceUse1.getSquareDistance () == secondServiceUse1.getSquareDistance ()) return false;
+			if (secondServiceUse1.getSquareDistance () == secondServiceUse2.getSquareDistance ()) return false;
 
 		//	assert ((jl1->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
 		//	assert ((jl2->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
@@ -75,7 +74,7 @@ namespace synthese
 		    
 			if (type1 != type2)	return type2 - type1;
 */
-			return (secondServiceUse1.getSquareDistance () <= secondServiceUse1.getSquareDistance ());
+			return (secondServiceUse1.getSquareDistance () <= secondServiceUse2.getSquareDistance ());
 		}
 
 

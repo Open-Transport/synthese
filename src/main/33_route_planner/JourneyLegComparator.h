@@ -24,6 +24,8 @@
 #ifndef SYNTHESE_ROUTEPLANNER_JOURNEYLEGCOMPARATOR_H
 #define SYNTHESE_ROUTEPLANNER_JOURNEYLEGCOMPARATOR_H
 
+#include "33_route_planner/Journey.h"
+
 #include "15_env/Types.h"
 
 namespace synthese
@@ -37,8 +39,6 @@ namespace synthese
 
 	namespace routeplanner
 	{
-		class Journey;
-
 		/** Journey leg comparator class.
 			@ingroup m33
 		*/
@@ -48,7 +48,7 @@ namespace synthese
 
 			typedef const env::ServiceUse& (Journey::*PtrEdgeAccessor) () const;
 			const PtrEdgeAccessor _firstServiceUseAccessor;
-			const PtrEdgeAccessor _secondServiceUseAccessor;			
+			const PtrEdgeAccessor _secondServiceUseAccessor;
 
 		public:
 

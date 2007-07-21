@@ -59,7 +59,7 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const Journeys* jv = static_cast<const Journeys*>(object);
+			const Journeys* jv(static_cast<const Journeys*>(object));
 
 			if ( jv == NULL || jv->empty())  // No solution or type error
 			{
@@ -69,12 +69,12 @@ namespace synthese
 			else
 			{
 				size_t __Ligne;
-				const PlaceList placesList = getStopsListForScheduleTable( *jv );
+				const PlaceList placesList(getStopsListForScheduleTable(*jv));
 				DateTime lastDepartureDateTime;
 				DateTime lastArrivalDateTime;
 				Hour unknownTime( TIME_UNKNOWN );
-				shared_ptr<const RoutePlannerSheetColumnInterfacePage> columnInterfacePage = _page->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>();
-				shared_ptr<const RoutePlannerSheetLineInterfacePage> lineInterfacePage = _page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>();
+				shared_ptr<const RoutePlannerSheetColumnInterfacePage> columnInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>());
+				shared_ptr<const RoutePlannerSheetLineInterfacePage> lineInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>());
 
 				// Initialization of text lines
 				vector<ostringstream*> __Tampons(placesList.size());
@@ -220,17 +220,22 @@ namespace synthese
 			return string();
 		}
 
-		size_t SchedulesTableInterfaceElement::OrdrePAEchangeSiPossible( const Journeys& jv, PlaceList& pl, const LockedLinesList& lll, size_t PositionActuelle, size_t PositionGareSouhaitee )
-		{
+		int SchedulesTableInterfaceElement::OrdrePAEchangeSiPossible(
+			const Journeys& jv
+			, PlaceList& pl
+			, const LockedLinesList& lll
+			, int PositionActuelle
+			, int PositionGareSouhaitee
+		){
 			vector<bool> LignesAPermuter(PositionActuelle + 1, false);
-			bool Echangeable = true;
+			bool Echangeable(true);
 			const ConnectionPlace* tempGare;
-			size_t i;
-			size_t j;
+			int i;
+			int j;
 
 			// Construction de l'ensemble des lignes a permuter
 			LignesAPermuter[ PositionActuelle ] = true;
-			size_t __i=0;
+			int __i(0);
 			for ( Journeys::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
 			{
 				vector<bool> curLignesET = OrdrePAConstruitLignesAPermuter( pl, *it, PositionActuelle );
@@ -293,8 +298,12 @@ namespace synthese
 
 		}
 
-		size_t SchedulesTableInterfaceElement::OrdrePAInsere(PlaceList& pl, const LockedLinesList& lll, const synthese::env::ConnectionPlace* place, size_t position )
-		{
+		int SchedulesTableInterfaceElement::OrdrePAInsere(
+			PlaceList& pl
+			, const LockedLinesList& lll
+			, const synthese::env::ConnectionPlace* place
+			, int position
+		){
 			// Saut de ligne vérouillée par un cheminement piéton
 			for (; position < lll.size() && lll[position]; ++position);
 
@@ -307,12 +316,15 @@ namespace synthese
 			/// @todo update lll too !
 		}
 
-		vector<bool> SchedulesTableInterfaceElement::OrdrePAConstruitLignesAPermuter( const PlaceList& pl, const Journey& __TrajetATester, size_t LigneMax )
-		{
+		vector<bool> SchedulesTableInterfaceElement::OrdrePAConstruitLignesAPermuter(
+			const PlaceList& pl
+			, const Journey& __TrajetATester
+			, int LigneMax
+		){
 			vector<bool> result;
-			int l = 0;
+			int l(0);
 			const ServiceUse* curET((l >= __TrajetATester.getJourneyLegCount ()) ? NULL : &__TrajetATester.getJourneyLeg (l));
-			for (size_t i = 0; pl[ i ] != NULL && i <= LigneMax; i++ )
+			for (int i(0); pl[ i ] != NULL && i <= LigneMax; i++ )
 			{
 				if ( curET != NULL && pl[ i ] == curET->getDepartureEdge() ->getConnectionPlace() )
 				{
@@ -328,8 +340,11 @@ namespace synthese
 			return result;
 		}
 
-		bool SchedulesTableInterfaceElement::OrdrePARechercheGare( const PlaceList& pl, size_t& i, const synthese::env::ConnectionPlace* GareAChercher )
-		{
+		bool SchedulesTableInterfaceElement::OrdrePARechercheGare(
+			const PlaceList& pl
+			, int& i
+			, const ConnectionPlace* GareAChercher
+		){
 			// Recherche de la gare en suivant ï¿½ partir de la position i
 			for ( ; i < pl.size() && pl[ i ] != NULL && pl[ i ] != GareAChercher; ++i );
 
@@ -614,8 +629,8 @@ namespace synthese
 		SchedulesTableInterfaceElement::PlaceList SchedulesTableInterfaceElement::getStopsListForScheduleTable( const Journeys& jv )
 		{
 			// Variables locales
-			size_t i;
-			size_t dernieri;
+			int i;
+			int dernieri;
 
 			// Allocation
 			LockedLinesList lll;
@@ -648,8 +663,9 @@ namespace synthese
 
 					// Controle gare suivante pour trajet a pied
 					if ( /* MJ que deviennent les lignes à pied ??? curET->getLigne() ->Materiel() ->Code() == MATERIELPied && */   
-						pl[ i ] != curET.getArrivalEdge()->getConnectionPlace() && (l != it->getJourneyLegCount ()-1) )
-					{
+						(l != it->getJourneyLegCount ()-1) 
+						&& pl[ i ] != curET.getArrivalEdge()->getConnectionPlace()
+					){
 						if ( OrdrePARechercheGare( pl, i, curET.getArrivalEdge()->getConnectionPlace() ) )
 						{
 							OrdrePAEchangeSiPossible(jv, pl, lll, dernieri, i );
