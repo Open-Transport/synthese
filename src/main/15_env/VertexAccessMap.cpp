@@ -32,7 +32,7 @@
 #include <set>
 #include <limits>
 
-
+using namespace std;
 
 namespace synthese
 {
@@ -74,26 +74,16 @@ namespace synthese
 		bool 
 		VertexAccessMap::needFineSteppingForDeparture (const Path* path) const
 		{
-			std::map<const Path*, bool>::const_iterator it = 
-			_fineSteppingForDeparture.find (path);
-		    
-			if (it == _fineSteppingForDeparture.end()) return false;
-			return it->second;
+			return _pathOnWhichFineSteppingForDeparture.find(path) != _pathOnWhichFineSteppingForDeparture.end();
 		}
-
 
 
 
 		bool 
 		VertexAccessMap::needFineSteppingForArrival (const Path* path) const
 		{
-			std::map<const Path*, bool>::const_iterator it = 
-			_fineSteppingForArrival.find (path);
-		    
-			if (it == _fineSteppingForArrival.end()) return false;
-			return it->second;
+			return _pathOnWhichFineSteppingForArrival.find(path) != _pathOnWhichFineSteppingForArrival.end();
 		}
-
 
 
 
@@ -111,12 +101,29 @@ namespace synthese
 					 const VertexAccess& vertexAccess)
 		{
 			_map.insert (std::make_pair (vertex, vertexAccess));
-			updateFineSteppingVertexMap ();
 			_isobarycenterUpToDate = false;
 			_isobarycenterMaxSquareDistanceUpToDate = false;
 			if (vertexAccess.approachTime < _minApproachTime)
 			{
 				_minApproachTime = vertexAccess.approachTime;
+			}
+
+			// Updating the paths which needs fine stepping set
+			if (!vertex->isConnectionAllowed())
+			{
+				// Departure vertices
+				for (set<const Edge*>::const_iterator itEdge(vertex->getDepartureEdges().begin());
+					itEdge != vertex->getDepartureEdges().end (); ++itEdge)
+				{
+					_pathOnWhichFineSteppingForDeparture.insert((*itEdge)->getParentPath());
+				}
+
+				// Arrival vertices
+				for (set<const Edge*>::const_iterator itEdge(vertex->getArrivalEdges().begin());
+					itEdge != vertex->getArrivalEdges().end (); ++itEdge)
+				{
+					_pathOnWhichFineSteppingForArrival.insert((*itEdge)->getParentPath());
+				}
 			}
 
 		}
@@ -188,49 +195,6 @@ namespace synthese
 			}
 			return _isobarycenterMaxSquareDistance;		    
 		}
-
-
-
-
-
-
-		void 
-		VertexAccessMap::updateFineSteppingVertexMap ()
-		{
-			// TODO : make it lazy... on demand
-
-			for (std::map<const Vertex*, VertexAccess>::const_iterator it = _map.begin ();
-			 it != _map.end (); ++it)
-			{
-			for (std::set<const Edge*>::const_iterator itEdge = it->first->getDepartureEdges ().begin ();
-				 itEdge != it->first->getDepartureEdges ().end (); ++itEdge)
-			{
-				const Line* line = dynamic_cast<const Line*> ((*itEdge)->getParentPath ());
-				if (line != 0)
-				{
-				_fineSteppingForDeparture[line] = 
-					(it->first->getConnectionPlace () == 0) ||
-					(it->first->getConnectionPlace ()->getConnectionType () == 
-					 ConnectionPlace::CONNECTION_TYPE_ROADROAD);
-				}
-			}
-
-			for (std::set<const Edge*>::const_iterator itEdge = it->first->getArrivalEdges ().begin ();
-				 itEdge != it->first->getArrivalEdges ().end (); ++itEdge)
-			{
-				const Line* line = dynamic_cast<const Line*> ((*itEdge)->getParentPath ());
-				if (line != 0)
-				{
-				_fineSteppingForDeparture[line] = 
-					(it->first->getConnectionPlace () == 0) ||
-					(it->first->getConnectionPlace ()->getConnectionType () == 
-					 ConnectionPlace::CONNECTION_TYPE_ROADROAD);
-				}
-			}
-			
-			}
-		}
-
 
 
 

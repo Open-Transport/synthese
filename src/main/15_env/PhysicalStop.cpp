@@ -21,8 +21,7 @@
 */
 
 #include "15_env/PhysicalStop.h"
-
-
+#include "15_env/ConnectionPlace.h"
 
 namespace synthese
 {
@@ -95,6 +94,10 @@ namespace synthese
 			_operatorCode = code;
 		}
 
+		bool PhysicalStop::isConnectionAllowed() const
+		{
+			return getConnectionPlace()->getConnectionType() >= ConnectionPlace::CONNECTION_TYPE_LINELINE;
+		}
 	}
 }
 

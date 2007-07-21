@@ -91,6 +91,7 @@ namespace synthese
 			//@{
 				virtual bool isAddress () const = 0;
 				virtual bool isPhysicalStop () const = 0;
+				virtual bool isConnectionAllowed() const = 0;
 			//@}
 		};
 	}

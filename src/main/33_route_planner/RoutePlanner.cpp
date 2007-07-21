@@ -256,7 +256,7 @@ namespace synthese
 				);
 			Journeys journeyParts(is.integralSearch(
 				ovam
-				, _minDepartureTime
+				, (accessDirection == TO_DESTINATION) ? _minDepartureTime : _maxArrivalTime
 				, 0
 				, strictTime
 				));

@@ -124,17 +124,12 @@ namespace synthese
 					if (!serviceInstance.getService()->isCompatibleWith(_accessParameters.complyer))
 						continue;
 
-					bool needFineStepping (
-						_destinationVam.needFineSteppingForArrival (edge->getParentPath ())
-						);
-
-
 					PtrEdgeStep step(	
 						(_accessDirection == TO_DESTINATION)
-							? (	needFineStepping 
+							? (	_destinationVam.needFineSteppingForArrival (edge->getParentPath ())
 								? (&Edge::getFollowingArrivalForFineSteppingOnly)
 								: (&Edge::getFollowingConnectionArrival)
-							):( needFineStepping
+							):( _destinationVam.needFineSteppingForDeparture (edge->getParentPath ())
 								? (&Edge::getPreviousDepartureForFineSteppingOnly)
 								: (&Edge::getPreviousConnectionDeparture)
 							))
@@ -169,7 +164,7 @@ namespace synthese
 
 						if (_destinationVam.contains (reachedVertex))
 						{
-							_minMaxDateTimeAtDestination = serviceUse.getActualDateTime();
+							_minMaxDateTimeAtDestination = serviceUse.getSecondActualDateTime();
 							if (_accessDirection == TO_DESTINATION)
 								_minMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
 							else
@@ -185,7 +180,7 @@ namespace synthese
 			// Validating all the service uses compared to the final result list
 			// HANDLE SIMPLIFIED RESULT INDEX
 			simplifiedResult.erase(
-				remove_if(simplifiedResult.begin(), simplifiedResult.end(), UsefullServiceUse(*this, currentJourney, strictTime))
+				remove_if(simplifiedResult.begin(), simplifiedResult.end(), UselessServiceUse(*this, currentJourney, strictTime))
 				, simplifiedResult.end()
 				);
 
@@ -277,7 +272,7 @@ namespace synthese
 			// Initialization
 			const Edge*	fromEdge = serviceUse.getEdge();
 			const Vertex* goalVertex = serviceUse.getSecondEdge()->getFromVertex ();
-			const DateTime& goalDateTime = serviceUse.getActualDateTime();
+			const DateTime& goalDateTime(serviceUse.getSecondActualDateTime());
 			SquareDistance sqd;
 
 
@@ -311,11 +306,12 @@ namespace synthese
 
 			// Check that the limit time (min or max) is not exceeded
 			DateTime accessMoment (goalDateTime);
-			if ((_destinationVam.contains (goalVertex) && (goalVertex->getConnectionPlace ())))
+			if (!_destinationVam.contains(goalVertex) && goalVertex->isConnectionAllowed())
 			{
-				accessMoment +=
-					((serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL) ? 1 : -1)
-					* goalVertex->getConnectionPlace ()->getMinTransferDelay ();
+				if (serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+					accessMoment += goalVertex->getConnectionPlace ()->getMinTransferDelay ();
+				else
+					accessMoment -= goalVertex->getConnectionPlace ()->getMinTransferDelay ();
 			}
 
 			if ( (serviceUse.getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE) &&
@@ -349,11 +345,11 @@ namespace synthese
 
 			// Best vertex map control
 			if ( (serviceUse.getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE) &&
-				(accessMoment < _bestVertexReachesMap.getBestTime (goalVertex, goalDateTime)) )
+				(accessMoment < _bestVertexReachesMap.getBestTime (goalVertex, accessMoment)) )
 				return false;
 
 			if ( (serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL) &&
-				(accessMoment > _bestVertexReachesMap.getBestTime (goalVertex, goalDateTime)) )
+				(accessMoment > _bestVertexReachesMap.getBestTime (goalVertex, accessMoment)) )
 				return false;
 
 
@@ -369,7 +365,7 @@ namespace synthese
 		}
 
 
-		IntegralSearcher::UsefullServiceUse::UsefullServiceUse(
+		IntegralSearcher::UselessServiceUse::UselessServiceUse(
 			const IntegralSearcher& integralSearcher
 			, const Journey& currentJourney
 			, bool strictTime
@@ -378,9 +374,9 @@ namespace synthese
 			, _strictTime(strictTime)
 		{	}
 
-		bool IntegralSearcher::UsefullServiceUse::operator() (const env::ServiceUse& serviceUse)
+		bool IntegralSearcher::UselessServiceUse::operator() (const env::ServiceUse& serviceUse)
 		{
-			return _integralSearcher._evaluateServiceUse(serviceUse, _currentJourney, _strictTime);
+			return !_integralSearcher._evaluateServiceUse(serviceUse, _currentJourney, _strictTime);
 		}
 	}
 }

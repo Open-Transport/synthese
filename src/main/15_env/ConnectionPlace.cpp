@@ -59,8 +59,8 @@ namespace synthese
 			, AddressablePlace (name, city)
 			, _connectionType (connectionType)
 			, _defaultTransferDelay (defaultTransferDelay)
-			, _minTransferDelay (std::numeric_limits<int>::max ())
-			, _maxTransferDelay (0)
+			, _minTransferDelay (defaultTransferDelay)
+			, _maxTransferDelay (defaultTransferDelay)
 		{
 		}
 

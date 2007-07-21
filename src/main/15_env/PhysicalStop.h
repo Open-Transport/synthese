@@ -79,8 +79,9 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-			bool isAddress () const;
-			bool isPhysicalStop () const;
+				bool isAddress () const;
+				bool isPhysicalStop () const;
+				bool isConnectionAllowed() const;
 			//@}
 
 		};

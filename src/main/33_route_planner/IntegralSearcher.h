@@ -111,7 +111,7 @@ namespace synthese
 				, bool strictTime
 				) const;
 
-			class UsefullServiceUse
+			class UselessServiceUse
 			{
 			private:
 				const IntegralSearcher&	_integralSearcher;
@@ -119,7 +119,7 @@ namespace synthese
 				bool					_strictTime;
 
 			public:
-				UsefullServiceUse(
+				UselessServiceUse(
 					const IntegralSearcher& integralSearcher
 					, const Journey& currentJourney
 					, bool strictTime
@@ -128,7 +128,7 @@ namespace synthese
 				bool operator() (const env::ServiceUse& serviceUse);
 			};
 
-			friend class UsefullServiceUse;
+			friend class UselessServiceUse;
 
 		public:
 			IntegralSearcher(

@@ -25,10 +25,10 @@
 
 #include <vector>
 #include <map>
+#include <set>
 
 #include "15_env/Point.h"
 #include "15_env/SquareDistance.h"
-
 
 namespace synthese
 {
@@ -57,8 +57,8 @@ TRIDENT : VertexAccess => AccesPoint
 		private:
 
 			std::map<const Vertex*, VertexAccess> _map;
-			std::map<const Path*, bool> _fineSteppingForDeparture;
-			std::map<const Path*, bool> _fineSteppingForArrival;
+			std::set<const Path*> _pathOnWhichFineSteppingForDeparture;
+			std::set<const Path*> _pathOnWhichFineSteppingForArrival;
 		    
 			mutable bool _isobarycenterUpToDate;
 			mutable bool _isobarycenterMaxSquareDistanceUpToDate;

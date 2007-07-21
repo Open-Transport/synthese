@@ -85,6 +85,7 @@ namespace synthese
 			//@{
 				bool isAddress () const;
 				bool isPhysicalStop () const;
+				bool isConnectionAllowed() const;
 			//@}
 
 

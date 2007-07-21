@@ -26,88 +26,91 @@
 
 namespace synthese
 {
-namespace env
-{
+	namespace env
+	{
 
 
+		Address::Address (const uid id,
+				  const AddressablePlace* place,
+				  const Road* road, 
+				  double metricOffset,
+				  double x,
+				  double y)
+			: synthese::util::Registrable<uid,Address> (id)
+			, Vertex (place, x, y)
+			, _road (road)
+			, _metricOffset (metricOffset)
+		{
 
-Address::Address (const uid id,
-		  const AddressablePlace* place,
-		  const Road* road, 
-		  double metricOffset,
-		  double x,
-		  double y)
-    : synthese::util::Registrable<uid,Address> (id)
-    , Vertex (place, x, y)
-    , _road (road)
-    , _metricOffset (metricOffset)
-{
-
-}
-
-
-
-
-
-Address::~Address()
-{
-}
-
-
-
-
-const Road* 
-Address::getRoad() const
-{
-    return _road;
-}
-
-
-
-
-double 
-Address::getMetricOffset () const
-{
-    return _metricOffset;
-}
-
-
-
-bool 
-Address::isAddress () const
-{
-    return true;
-}
-
-
-
-bool 
-Address::isPhysicalStop () const
-{
-    return false;
-}
+		}
 
 
 
 
 
-const uid& 
-Address::getId () const
-{
-    return synthese::util::Registrable<uid,Address>::getKey();
-}
+		Address::~Address()
+		{
+		}
 
-void Address::setRoad( const Road* road )
-{
-	_road = road;
-}
 
-void Address::setMetricOffset( double value )
-{
-	_metricOffset = value;
-}
 
-}
+
+		const Road* 
+		Address::getRoad() const
+		{
+			return _road;
+		}
+
+
+
+
+		double 
+		Address::getMetricOffset () const
+		{
+			return _metricOffset;
+		}
+
+
+
+		bool 
+		Address::isAddress () const
+		{
+			return true;
+		}
+
+
+
+		bool 
+		Address::isPhysicalStop () const
+		{
+			return false;
+		}
+
+
+
+
+
+		const uid& 
+		Address::getId () const
+		{
+			return synthese::util::Registrable<uid,Address>::getKey();
+		}
+
+		void Address::setRoad( const Road* road )
+		{
+			_road = road;
+		}
+
+		void Address::setMetricOffset( double value )
+		{
+			_metricOffset = value;
+		}
+
+		bool Address::isConnectionAllowed() const
+		{
+			return getConnectionPlace()->getConnectionType() >= ConnectionPlace::CONNECTION_TYPE_ROADROAD;
+		}
+	}
 }
 
 
