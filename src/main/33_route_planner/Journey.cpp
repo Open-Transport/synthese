@@ -138,6 +138,10 @@ namespace synthese
 			_journeyLegs.push_front (leg);
 			_effectiveDuration += leg.getDuration ();
 			_distance += leg.getDistance ();
+			if(	_continuousServiceRange == UNKNOWN_VALUE
+			||	_continuousServiceRange > leg.getServiceRange()
+			)	_continuousServiceRange = leg.getServiceRange();
+
 
 			if (!leg.getEdge()->getParentPath()->isRoad())
 				++_transportConnectionCount;
@@ -164,6 +168,9 @@ namespace synthese
 			_journeyLegs.push_back (leg);
 			_effectiveDuration += leg.getDuration ();
 			_distance += leg.getDistance ();
+			if(	_continuousServiceRange == UNKNOWN_VALUE
+			||	_continuousServiceRange > leg.getServiceRange()
+			)	_continuousServiceRange = leg.getServiceRange();
 
 			if (!leg.getEdge()->getParentPath()->isRoad ())
 				++_transportConnectionCount;
