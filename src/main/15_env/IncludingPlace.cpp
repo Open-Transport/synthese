@@ -20,18 +20,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "IncludingPlace.h"
+#include "15_env/IncludingPlace.h"
 
-
+using namespace std;
 
 namespace synthese
 {
 	namespace env
 	{
-
-		IncludingPlace::IncludingPlace (const std::string& name,
-						const City* city)
-			: Place (name, city)
+		IncludingPlace::IncludingPlace(
+			const string& name
+			, const City* city
+		)	: Place (name, city)
 		{
 		}
 
@@ -59,26 +59,25 @@ namespace synthese
 
 
 
+		void IncludingPlace::getImmediateVertices(
+			VertexAccessMap& result
+			, const AccessDirection& accessDirection
+			, const AccessParameters& accessParameters
+			, SearchAddresses returnAddresses
+			, SearchPhysicalStops returnPhysicalStops
+			, const Vertex* origin
+		) const	{
 
-
-
-		void
-		IncludingPlace::getImmediateVertices (VertexAccessMap& result, 
-							  const AccessDirection& accessDirection,
-							  const AccessParameters& accessParameters,
-							  const Vertex* origin,
-							  bool returnAddresses,
-							  bool returnPhysicalStops) const
-		{
-
-			for (std::vector<const Place*>::const_iterator it = _includedPlaces.begin ();
-			 it != _includedPlaces.end (); ++it
+			for(vector<const Place*>::const_iterator it(_includedPlaces.begin());
+				it != _includedPlaces.end();
+				++it
 			){
-				(*it)->getImmediateVertices (result, accessDirection, accessParameters, 
-							 origin, returnAddresses, returnPhysicalStops);
+				(*it)->getImmediateVertices(
+					result, accessDirection, accessParameters
+					, returnAddresses, returnPhysicalStops
+					, origin
+				);
 			}
-
 		}
-
 	}
 }

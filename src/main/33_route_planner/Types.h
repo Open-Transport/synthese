@@ -52,8 +52,6 @@ namespace synthese
 
 		typedef enum { USE_ROADS, DO_NOT_USE_ROADS } UseRoads;
 		typedef enum { USE_LINES, DO_NOT_USE_LINES } UseLines;
-		typedef enum { SEARCH_ADDRESSES, DO_NOT_SEARCH_ADDRESSES } SearchAddresses;
-		typedef enum { SEARCH_PHYSICALSTOPS, DO_NOT_SEARCH_PHYSICALSTOPS } SearchPhysicalStops;
 
 		/** @} */
 	}

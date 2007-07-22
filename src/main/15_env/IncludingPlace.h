@@ -67,9 +67,10 @@ namespace synthese
 				void getImmediateVertices (VertexAccessMap& result, 
 						   const AccessDirection& accessDirection,
 						   const AccessParameters& accessParameters,
-						   const Vertex* origin = 0,
-						   bool returnAddresses = true,
-						   bool returnPhysicalStops = true) const;
+						   SearchAddresses returnAddresses
+						   , SearchPhysicalStops returnPhysicalStops
+						   , const Vertex* origin = 0
+						   ) const;
 
 			//@}
 

@@ -57,6 +57,8 @@ namespace synthese
 	/** @addtogroup m15
 		@{
 	*/
+	typedef enum { SEARCH_ADDRESSES, DO_NOT_SEARCH_ADDRESSES } SearchAddresses;
+	typedef enum { SEARCH_PHYSICALSTOPS, DO_NOT_SEARCH_PHYSICALSTOPS } SearchPhysicalStops;
 	typedef enum { FROM_ORIGIN, TO_DESTINATION } AccessDirection ;
 
 	struct AccessParameters {

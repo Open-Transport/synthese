@@ -58,7 +58,7 @@ namespace synthese
 			@ingroup m15
 		*/
 		class ConnectionPlace : 
-			public synthese::util::Registrable<uid,ConnectionPlace>, 
+			public util::Registrable<uid,ConnectionPlace>, 
 			public AddressablePlace
 		{
 		public:
@@ -127,12 +127,14 @@ namespace synthese
 							const Vertex* destination,
 							const Vertex* origin = 0) const;
 			    
-				void getImmediateVertices (VertexAccessMap& result, 
-							const AccessDirection& accessDirection,
-							const AccessParameters& accessParameters,
-							const Vertex* origin = 0,
-							bool returnAddresses = true,
-							bool returnPhysicalStops = true) const;
+				virtual void getImmediateVertices(
+					VertexAccessMap& result
+					, const AccessDirection& accessDirection
+					, const AccessParameters& accessParameters
+					, SearchAddresses returnAddresses
+					, SearchPhysicalStops returnPhysicalStops
+					, const Vertex* origin = NULL
+				) const;
 
 				std::vector<std::pair<uid, std::string> >	getPhysicalStopLabels(bool withAll = false) const;
 

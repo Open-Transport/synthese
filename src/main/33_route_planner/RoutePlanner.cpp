@@ -71,8 +71,20 @@ namespace synthese
 			, _journeyLegComparatorForBestDeparture (FROM_ORIGIN)
 
 		{
-			origin->getImmediateVertices (_originVam, TO_DESTINATION, accessParameters);
-			destination->getImmediateVertices (_destinationVam, FROM_ORIGIN, accessParameters);
+			origin->getImmediateVertices (
+				_originVam
+				, TO_DESTINATION
+				, accessParameters
+				, SEARCH_ADDRESSES
+				, SEARCH_PHYSICALSTOPS
+			);
+			destination->getImmediateVertices(
+				_destinationVam
+				, FROM_ORIGIN
+				, accessParameters
+				, SEARCH_ADDRESSES
+				, SEARCH_PHYSICALSTOPS
+			);
 		}
 
 
@@ -293,10 +305,11 @@ namespace synthese
 					VertexAccessMap nextVam;
 					nextVertex->getPlace ()->getImmediateVertices (nextVam,
 						accessDirection,
-						_accessParameters,
-						nextVertex,
-						false,
-						true);
+						_accessParameters
+						, DO_NOT_SEARCH_ADDRESSES
+						, SEARCH_PHYSICALSTOPS
+						, nextVertex
+					);
 
 					findBestJourney (recursiveCandidate, nextVam, dvam, accessDirection, tempJourney, false, optim);
 

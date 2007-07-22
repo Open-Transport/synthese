@@ -211,18 +211,21 @@ namespace synthese
 		
 
 
-		void
-		ConnectionPlace::getImmediateVertices (VertexAccessMap& result, 
-							const AccessDirection& accessDirection,
-							const AccessParameters& accessParameters,
-							const Vertex* origin,
-							bool returnAddresses,
-							bool returnPhysicalStops) const
-		{
-			AddressablePlace::getImmediateVertices (result, accessDirection, accessParameters,
-								origin, returnAddresses, returnPhysicalStops);
+		void ConnectionPlace::getImmediateVertices (
+			VertexAccessMap& result
+			, const AccessDirection& accessDirection
+			, const AccessParameters& accessParameters
+			, SearchAddresses returnAddresses
+			, SearchPhysicalStops returnPhysicalStops
+			, const Vertex* origin
+		) const {
+			AddressablePlace::getImmediateVertices(
+				result, accessDirection, accessParameters
+				, returnAddresses, returnPhysicalStops
+				, origin
+			);
 		    
-			if (returnPhysicalStops)
+			if (returnPhysicalStops == SEARCH_PHYSICALSTOPS)
 			{
 				for (PhysicalStops::const_iterator it = _physicalStops.begin ();
 					it != _physicalStops.end (); ++it)

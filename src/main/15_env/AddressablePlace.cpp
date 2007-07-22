@@ -77,11 +77,11 @@ namespace synthese
 		AddressablePlace::getImmediateVertices (VertexAccessMap& result, 
 							const AccessDirection& accessDirection,
 							const AccessParameters& accessParameters,
-							const Vertex* origin,
-							bool returnAddresses,
-							bool returnPhysicalStops) const
-		{
-			if (returnAddresses)
+							SearchAddresses returnAddresses,
+							SearchPhysicalStops returnPhysicalStops
+							, const Vertex* origin
+		) const {
+			if (returnAddresses == SEARCH_ADDRESSES)
 			{
 				for (Addresses::const_iterator it = _addresses.begin ();
 					 it != _addresses.end (); ++it)

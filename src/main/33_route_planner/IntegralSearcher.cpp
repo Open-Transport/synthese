@@ -230,10 +230,11 @@ namespace synthese
 					nextVertex->getPlace ()->getImmediateVertices(
 						nextVam,
 						_accessDirection,
-						_accessParameters,
-						nextVertex,
-						_useRoads,
-						_useLines);
+						_accessParameters
+						, (_useRoads == USE_ROADS) ? SEARCH_ADDRESSES : DO_NOT_SEARCH_ADDRESSES
+						, (_useLines == USE_LINES) ? SEARCH_PHYSICALSTOPS : DO_NOT_SEARCH_PHYSICALSTOPS
+						, nextVertex
+					);
 
 					Journey nextCurrentJourney (currentJourney);
 					nextCurrentJourney.append (serviceUse);

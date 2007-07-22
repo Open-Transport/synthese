@@ -50,9 +50,6 @@ namespace synthese
 		*/
 		class Place 
 		{
-		public:
-
-
 		private:
 
 			std::string _name;  //!< The name
@@ -112,12 +109,14 @@ namespace synthese
 							const Vertex* origin) const;
 
 
-			virtual void getImmediateVertices (VertexAccessMap& result, 
-							const AccessDirection& accessDirection,
-							const AccessParameters& accessParameters,
-							const Vertex* origin = 0,
-							bool returnAddresses = true,
-							bool returnPhysicalStops = true) const = 0;
+			virtual void getImmediateVertices(
+				VertexAccessMap& result
+				, const AccessDirection& accessDirection
+				, const AccessParameters& accessParameters
+				, SearchAddresses returnAddresses
+				, SearchPhysicalStops returnPhysicalStops
+				, const Vertex* origin = NULL
+			) const = 0;
 			//@}
 
 		    

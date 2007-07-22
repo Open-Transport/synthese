@@ -99,9 +99,10 @@ class City : public synthese::util::Registrable<uid, City>,
     void getImmediateVertices (VertexAccessMap& result, 
 			       const AccessDirection& accessDirection,
 			       const AccessParameters& accessParameters,
-			       const Vertex* origin = 0,
-			       bool returnAddresses = true,
-			       bool returnPhysicalStops = true) const;
+			       SearchAddresses returnAddresses
+			       , SearchPhysicalStops returnPhysicalStops
+				   , const Vertex* origin = NULL
+	) const;
     
     std::vector<const Road*> searchRoad (const std::string& fuzzyName, int nbMatches = 10) const;
 
