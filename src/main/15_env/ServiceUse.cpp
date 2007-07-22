@@ -94,19 +94,5 @@ namespace synthese
 		{
 			return _squareDistance;
 		}
-
-		DateTime ServiceUse::getLastDepartureDateTime() const
-		{
-			DateTime result(getDepartureDateTime());
-			result += _range;
-			return result;
-		}
-
-		DateTime ServiceUse::getLastArrivalDateTime() const
-		{
-			DateTime result(getArrivalDateTime());
-			result += _range;
-			return result;
-		}
 	}
 }

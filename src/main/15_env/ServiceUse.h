@@ -62,9 +62,7 @@ namespace synthese
 				const Edge*				getDepartureEdge()			const;
 				const Edge*				getArrivalEdge()			const;
 				const time::DateTime&	getDepartureDateTime()		const;
-				time::DateTime			getLastDepartureDateTime()	const;
 				const time::DateTime&	getArrivalDateTime()		const;
-				time::DateTime			getLastArrivalDateTime()	const;
 				int						getDuration()				const;
 				int						getDistance()				const;
 			//@}

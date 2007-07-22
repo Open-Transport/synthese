@@ -91,6 +91,8 @@ namespace synthese
 					for (JourneyLegs::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 					{
 						const ServiceUse& curET(*itl);
+						DateTime lastDateTime(curET.getDepartureDateTime());
+						lastDateTime += it->getContinuousServiceRange();
 												
 						// Saving of the columns on each lines
 						columnInterfacePage->display(
@@ -100,7 +102,7 @@ namespace synthese
 							, i
 							, dynamic_cast<const Road*> (curET.getService()->getPath ()) != NULL
 							, curET.getDepartureDateTime().getHour()
-							, curET.getLastDepartureDateTime().getHour()
+							, lastDateTime.getHour()
 							, it->getContinuousServiceRange() > 0
 							, itl == jl.begin()
 							, true
@@ -122,6 +124,9 @@ namespace synthese
 								, request
 							);
 						
+						lastDateTime = curET.getArrivalDateTime();
+						lastDateTime += it->getContinuousServiceRange();
+
 						columnInterfacePage->display(
 							*__Tampons[__Ligne]
 							, true
@@ -129,7 +134,7 @@ namespace synthese
 							, i
 							, dynamic_cast<const Road*> (curET.getService()->getPath()) != NULL
 							, curET.getArrivalDateTime().getHour ()
-							, curET.getLastArrivalDateTime().getHour()
+							, lastDateTime.getHour()
 							, it->getContinuousServiceRange() > 0
 							, true
 							, (itl + 1) == jl.end()
