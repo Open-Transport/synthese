@@ -111,135 +111,6 @@ namespace synthese
 		}
 
 
-
-
-
-
-
-						    
-
-
-
-
-
-		/* TODO
-
-
-		bool 
-		RoutePlanner::evaluateDeparture (const Edge* departureEdge,
-						 const DateTime& departureMoment,
-						 const Edge* arrivalEdge,
-						 const AccessDirection& accessDirection,
-						 const Service* service,
-						 std::deque<JourneyLeg*>& journeyPart,
-						 const Journey& currentJourney,
-						 bool strictTime,
-						 int continuousServiceRange)
-		{
-			if (departureEdge == 0) return true;
-
-			const Vertex* departureVertex = departureEdge->getFromVertex ();
-		    
-			// If the edge is an address, the currentJourney necessarily contains
-			// only road legs, filter on max approach distance (= walk distance).
-			if ( (departureVertex->isAddress ()) &&
-			 (currentJourney.getDistance () + arrivalEdge->getLength () > 
-			  _accessParameters.maxApproachDistance) ) return false;
-
-
-			// If the edge is an address, the currentJourney necessarily contains
-			// only road legs, filter on max approach time (= walk time).
-			if ( (departureVertex->isAddress ()) &&
-			 (currentJourney.getEffectiveDuration () + 
-			  (arrivalEdge->getLength () / _accessParameters.approachSpeed) > 
-			  _accessParameters.maxApproachTime) ) return false;
-
-
-			DateTime arrivalMoment = departureMoment;
-			departureEdge->calculateArrival (*arrivalEdge, 
-						  service->getServiceNumber (), 
-						  departureMoment, 
-						  arrivalMoment);
-
-
-			SquareDistance sqd;
-			if (isVertexUseful (departureVertex,
-					arrivalMoment,
-					accessDirection, sqd) == false)
-			{
-			return false;
-			}
-
-
-
-			// Continuous service breaking
-			if (_previousContinuousServiceDuration)
-			{
-			if ( (currentJourney.getJourneyLegCount () > 0) &&
-				 (currentJourney.getDepartureTime () <= _previousContinuousServiceLastDeparture) &&
-				 (arrivalMoment - currentJourney.getDepartureTime () >= _previousContinuousServiceDuration) )
-			{
-				return false;
-			}
-			else if ( (departureMoment < _previousContinuousServiceLastDeparture) && 
-				  (arrivalMoment - departureMoment >= _previousContinuousServiceDuration) )
-			{
-				return false;
-			}
-			}
-		    
-
-
-
-			// Add a journey leg if necessary
-			if ( (arrivalMoment < _bestArrivalVertexReachesMap.getBestTime (departureVertex, arrivalMoment)) ||
-			 (strictTime && 
-			  (arrivalMoment == _bestArrivalVertexReachesMap.getBestTime (departureVertex, arrivalMoment) )) )
-			{
-
-			
-			JourneyLeg* journeyLeg = 0;
-			if (_bestArrivalVertexReachesMap.contains (departureVertex) == false)
-			{
-				journeyLeg = new JourneyLeg ();
-				journeyLeg->setOrigin (arrivalEdge);
-				journeyLeg->setDestination (departureEdge);
-				journeyLeg->setDepartureTime (departureMoment);
-				journeyLeg->setArrivalTime (arrivalMoment);
-				journeyLeg->setService (service);
-				journeyLeg->setContinuousServiceRange (continuousServiceRange);
-				journeyLeg->setSquareDistance (sqd);
-
-				journeyPart.push_front (journeyLeg);
-				_bestArrivalVertexReachesMap.insert (departureVertex, journeyLeg);
-			}
-			else
-			{
-				journeyLeg->setOrigin (arrivalEdge);
-				journeyLeg->setDepartureTime (departureMoment);
-				journeyLeg->setArrivalTime (arrivalMoment);
-				journeyLeg->setService (service);
-				journeyLeg->setContinuousServiceRange (continuousServiceRange);
-			}
-
-			
-			if (_destinationVam.contains (departureVertex))
-			{
-				_maxArrivalTime = arrivalMoment;
-				_maxArrivalTime += _destinationVam.getVertexAccess (departureVertex).approachTime;
-			}
-			
-			}
-			return arrivalMoment <= (_maxArrivalTime - _destinationVam.getMinApproachTime ());
-
-		}
-						    
-
-
-
-		*/
-
-
 		void
 		RoutePlanner::findBestJourney (Journey& result
 						   , const VertexAccessMap& ovam
@@ -268,7 +139,9 @@ namespace synthese
 				);
 			Journeys journeyParts(is.integralSearch(
 				ovam
-				, (accessDirection == TO_DESTINATION) ? _minDepartureTime : _maxArrivalTime
+				, (accessDirection == TO_DESTINATION)
+					? (currentJourney.empty() ? _minDepartureTime : currentJourney.getArrivalTime())
+					: (currentJourney.empty() ? _maxArrivalTime : currentJourney.getDepartureTime())
 				, 0
 				, strictTime
 				));
