@@ -1,6 +1,6 @@
 
-/** ServiceDate class header.
-	@file ServiceDate.h
+/** NonPermanentService class implementation.
+	@file NonPermanentService.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,33 +20,39 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ServiceDate_h__
-#define SYNTHESE_ServiceDate_h__
-
-#include "01_util/UId.h"
-
-#include "04_time/Date.h"
+#include "NonPermanentService.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		class NonPermanentService;
 
-		/** ServiceDate class.
-			This class is available for the template instanciation of the ServiceDateTableSync.
-			It can be used as a simple structure.
-			CalendarDate
-			@ingroup m15
-		*/
-		class ServiceDate
+
+		NonPermanentService::NonPermanentService()
+			: Service()
 		{
-		public:
-			uid			key;
-			NonPermanentService*	service;
-			time::Date	date;
-		};
+
+		}
+
+		NonPermanentService::NonPermanentService( int serviceNumber , Path* path )
+			: Service(serviceNumber, path)
+		{
+
+		}
+
+		bool NonPermanentService::isProvided( const time::Date& departureDate) const
+		{
+			return _calendar.isMarked ( departureDate );
+		}
+
+		Calendar& NonPermanentService::getCalendar()
+		{
+			return _calendar;
+		}
+
+		const Calendar& NonPermanentService::getCalendar() const
+		{
+			return _calendar;
+		}
 	}
 }
-
-#endif // SYNTHESE_ServiceDate_h__

@@ -38,14 +38,14 @@ namespace synthese
 							Path* path
 							)
 			: synthese::util::Registrable<uid,ScheduledService> (id)
-			, Service (serviceNumber, path)
+			, NonPermanentService(serviceNumber, path)
 		{
 
 		}
 
 		ScheduledService::ScheduledService()
 			: Registrable<uid,ScheduledService>()
-			, Service()
+			, NonPermanentService()
 		{
 		}
 
@@ -147,27 +147,27 @@ namespace synthese
 			_arrivalSchedules = schedules;
 		}
 
-		const time::Schedule& ScheduledService::getDepartureSchedule() const
+		Schedule ScheduledService::getDepartureSchedule() const
 		{
 			return _departureSchedules.at(0);
 		}
 
-		const Schedule& ScheduledService::getDepartureBeginScheduleToIndex( const Edge* edge ) const
+		Schedule ScheduledService::getDepartureBeginScheduleToIndex( const Edge* edge ) const
 		{
 			return _departureSchedules.at(edge->getRankInPath());
 		}
 
-		const Schedule& ScheduledService::getDepartureEndScheduleToIndex( const Edge* edge ) const
+		Schedule ScheduledService::getDepartureEndScheduleToIndex( const Edge* edge ) const
 		{
 			return _departureSchedules.at(edge->getRankInPath());
 		}
 
-		const Schedule& ScheduledService::getArrivalBeginScheduleToIndex( const Edge* edge ) const
+		Schedule ScheduledService::getArrivalBeginScheduleToIndex( const Edge* edge ) const
 		{
 			return _arrivalSchedules.at(edge->getRankInPath());
 		}
 
-		const Schedule& ScheduledService::getArrivalEndScheduleToIndex( const Edge* edge ) const
+		Schedule ScheduledService::getArrivalEndScheduleToIndex( const Edge* edge ) const
 		{
 			return _arrivalSchedules.at(edge->getRankInPath());
 		}

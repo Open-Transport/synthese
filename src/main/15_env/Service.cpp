@@ -85,18 +85,6 @@ namespace synthese
 		}
 
 
-		Calendar&
-		Service::getCalendar ()
-		{
-			return _calendar;
-		}
-
-		const Calendar& Service::getCalendar() const
-		{
-			return _calendar;
-		}
-
-
 
 		bool 
 		Service::isReservationPossible ( const synthese::time::DateTime& departureMoment, 
@@ -106,11 +94,6 @@ namespace synthese
 		}
 
 
-
-		bool Service::isProvided (const Date& departureDate) const
-		{
-			return _calendar.isMarked ( departureDate );
-		}
 
 		void Service::setPath( Path* path )
 		{

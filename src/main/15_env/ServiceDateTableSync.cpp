@@ -115,7 +115,7 @@ namespace synthese
 			// Get the corresponding calendar
 			uid serviceId = Conversion::ToLongLong (rows.getColumn (rowIndex, COL_SERVICEID));
 
-			shared_ptr<Service> service = EnvModule::fetchService (serviceId);
+			shared_ptr<NonPermanentService> service(EnvModule::fetchService (serviceId));
 			assert (service != 0);
 
 			// Mark the date in service calendar

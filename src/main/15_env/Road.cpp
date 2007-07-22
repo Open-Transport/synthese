@@ -23,6 +23,7 @@
 #include "15_env/Road.h"
 #include "15_env/Address.h"
 #include "15_env/RoadChunk.h"
+#include "15_env/PermanentService.h"
 
 namespace synthese
 {
@@ -38,7 +39,8 @@ namespace synthese
 			, AddressablePlace (name, city)
 			, _type (type)
 		{
-
+			// Creation of the permanent service
+			addService(new PermanentService(this));
 		}
 
 

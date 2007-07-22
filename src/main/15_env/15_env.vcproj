@@ -77,6 +77,22 @@
 					>
 				</File>
 				<File
+					RelativePath=".\NonPermanentService.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\NonPermanentService.h"
+					>
+				</File>
+				<File
+					RelativePath=".\PermanentService.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\PermanentService.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ScheduledService.cpp"
 					>
 				</File>

@@ -1,6 +1,6 @@
 
-/** ServiceDate class header.
-	@file ServiceDate.h
+/** NonPermanentService class header.
+	@file NonPermanentService.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,33 +20,44 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ServiceDate_h__
-#define SYNTHESE_ServiceDate_h__
+#ifndef SYNTHESE_env_NonPermanentService_h__
+#define SYNTHESE_env_NonPermanentService_h__
 
-#include "01_util/UId.h"
-
-#include "04_time/Date.h"
+#include "15_env/Service.h"
+#include "15_env/Calendar.h"
 
 namespace synthese
 {
 	namespace env
 	{
-		class NonPermanentService;
-
-		/** ServiceDate class.
-			This class is available for the template instanciation of the ServiceDateTableSync.
-			It can be used as a simple structure.
-			CalendarDate
+		/** NonPermanentService class.
 			@ingroup m15
 		*/
-		class ServiceDate
+		class NonPermanentService : public Service
 		{
+		private:
+			Calendar		_calendar;  //!< Which days is this service available ?
+
 		public:
-			uid			key;
-			NonPermanentService*	service;
-			time::Date	date;
+			NonPermanentService();
+			NonPermanentService(
+				int serviceNumber
+				, Path* path
+			);
+
+
+			Calendar&		getCalendar (); // MJ constness pb
+			const Calendar&		getCalendar () const; // MJ constness pb
+
+			virtual bool isProvided(const time::Date& originDate) const;
+
+			/** Latest schedule of the service : the last arrival at the last vertex.
+			@return The latest schedule of the service
+			*/
+			virtual const time::Schedule& getLastArrivalSchedule() const = 0;
+
 		};
 	}
 }
 
-#endif // SYNTHESE_ServiceDate_h__
+#endif // SYNTHESE_env_NonPermanentService_h__

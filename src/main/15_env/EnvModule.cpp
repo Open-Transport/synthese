@@ -161,11 +161,13 @@ namespace synthese
 	}
 
 
-	shared_ptr<Service> EnvModule::fetchService (const uid& id)
+	shared_ptr<NonPermanentService> EnvModule::fetchService (const uid& id)
 	{
-	    if (_scheduledServices.contains (id)) return _scheduledServices.getUpdateable (id);
-	    if (_continuousServices.contains (id)) return _continuousServices.getUpdateable (id);
-	    return shared_ptr<Service>();
+	    if (_scheduledServices.contains (id))
+			return _scheduledServices.getUpdateable (id);
+	    if (_continuousServices.contains (id))
+			return _continuousServices.getUpdateable (id);
+	    return shared_ptr<NonPermanentService>();
 	}
 
 	ContinuousService::Registry& EnvModule::getContinuousServices()

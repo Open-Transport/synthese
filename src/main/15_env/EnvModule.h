@@ -370,7 +370,7 @@ namespace synthese
 
 
 			static boost::shared_ptr<Path> fetchPath (const uid& id);
-			static boost::shared_ptr<Service> fetchService (const uid& id);
+			static boost::shared_ptr<NonPermanentService> fetchService (const uid& id);
 
 			static std::vector<std::pair<uid, std::string> >	getCommercialLineLabels(
 				const security::RightsOfSameClassMap& rights 

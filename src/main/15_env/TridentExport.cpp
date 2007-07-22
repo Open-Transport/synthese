@@ -346,7 +346,10 @@ TridentExport::Export (std::ostream& os,
 	     it != services.end (); ++it)
 	{
 	    // One timetable per service
-	    const Service* srv = (*it);
+	    const ScheduledService* srv(dynamic_cast<const ScheduledService*>(*it));
+		if (srv == NULL)
+			continue;
+
 	    const Calendar& cal = srv->getCalendar ();
 	    
 	    os << "<Timetable>" << std::endl;
@@ -513,7 +516,10 @@ TridentExport::Export (std::ostream& os,
 		 it != services.end (); ++it)
 	    {
 		// One timetable per service
-		const Service* srv = (*it);
+		const ScheduledService* srv(dynamic_cast<const ScheduledService*>(*it));
+		if (srv == NULL)
+			continue;
+
 		const Line* line = ((const Line*) srv->getPath ());
 		const Calendar& cal = srv->getCalendar ();
 		

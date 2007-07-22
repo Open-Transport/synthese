@@ -37,7 +37,7 @@ namespace synthese
 							int range,
 							int maxWaitingTime)
 			: synthese::util::Registrable<uid,ContinuousService> (id)
-			, Service (serviceNumber, path)
+			, NonPermanentService(serviceNumber, path)
 			, _range (range)
 			, _maxWaitingTime (maxWaitingTime)
 		{
@@ -46,7 +46,7 @@ namespace synthese
 
 		ContinuousService::ContinuousService()
 			: synthese::util::Registrable<uid,ContinuousService> ()
-			, Service()
+			, NonPermanentService()
 
 		{
 
@@ -195,7 +195,7 @@ namespace synthese
 			return actualDateTime;
 		}
 
-		const time::Schedule& ContinuousService::getDepartureSchedule() const
+		time::Schedule ContinuousService::getDepartureSchedule() const
 		{
 			return _departureSchedules.at(0).first;
 		}
@@ -210,22 +210,22 @@ namespace synthese
 			_arrivalSchedules = schedules;
 		}
 
-		const Schedule& ContinuousService::getDepartureBeginScheduleToIndex( const Edge* edge ) const
+		Schedule ContinuousService::getDepartureBeginScheduleToIndex( const Edge* edge ) const
 		{
 			return _departureSchedules.at(edge->getRankInPath()).first;
 		}
 
-		const Schedule& ContinuousService::getDepartureEndScheduleToIndex( const Edge* edge ) const
+		Schedule ContinuousService::getDepartureEndScheduleToIndex( const Edge* edge ) const
 		{
 			return _departureSchedules.at(edge->getRankInPath()).second;
 		}
 
-		const Schedule& ContinuousService::getArrivalBeginScheduleToIndex( const Edge* edge ) const
+		Schedule ContinuousService::getArrivalBeginScheduleToIndex( const Edge* edge ) const
 		{
 			return _arrivalSchedules.at(edge->getRankInPath()).first;
 		}
 
-		const Schedule& ContinuousService::getArrivalEndScheduleToIndex( const Edge* edge ) const
+		Schedule ContinuousService::getArrivalEndScheduleToIndex( const Edge* edge ) const
 		{
 			return _arrivalSchedules.at(edge->getRankInPath()).second;
 		}

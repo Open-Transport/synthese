@@ -23,28 +23,23 @@
 #ifndef SYNTHESE_ENV_CONTINUOUSSERVICE_H
 #define SYNTHESE_ENV_CONTINUOUSSERVICE_H
 
-#include "Service.h"
-#include <string>
+#include "15_env/NonPermanentService.h"
 
 #include "01_util/Registrable.h"
 
+#include <string>
 
 namespace synthese
 {
 	namespace env
 	{
 
-		class Calendar;
-
-
 		/** Continuous service.
-
-
-		@ingroup m15
+			@ingroup m15
 		*/
 		class ContinuousService : 
-			public synthese::util::Registrable<uid,ContinuousService>, 
-			public Service
+			public util::Registrable<uid,ContinuousService>, 
+			public NonPermanentService
 		{
 		public:
 			typedef std::vector<std::pair<time::Schedule, time::Schedule> > Schedules;
@@ -100,13 +95,13 @@ namespace synthese
 					, const Edge* edge
 					) const;
 
-				virtual const time::Schedule& getDepartureSchedule () const;
+				virtual time::Schedule getDepartureSchedule () const;
 				virtual const time::Schedule& getLastArrivalSchedule() const;
 
-				virtual const time::Schedule& getDepartureBeginScheduleToIndex(const Edge* edge) const;
-				virtual const time::Schedule& getDepartureEndScheduleToIndex(const Edge* edge) const;
-				virtual const time::Schedule& getArrivalBeginScheduleToIndex(const Edge* edge) const;
-				virtual const time::Schedule& getArrivalEndScheduleToIndex(const Edge* edge) const;
+				virtual time::Schedule getDepartureBeginScheduleToIndex(const Edge* edge) const;
+				virtual time::Schedule getDepartureEndScheduleToIndex(const Edge* edge) const;
+				virtual time::Schedule getArrivalBeginScheduleToIndex(const Edge* edge) const;
+				virtual time::Schedule getArrivalEndScheduleToIndex(const Edge* edge) const;
 
 			//@}
 
