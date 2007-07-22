@@ -307,9 +307,9 @@ namespace synthese
 					stream << st.col() << "Arrêt";
 					stream << st.col() << "Action";
 
-					for (PhysicalStopsSet::const_iterator it = _displayScreen->getPhysicalStops().begin(); it != _displayScreen->getPhysicalStops().end(); ++it)
+					for (PhysicalStops::const_iterator it = _displayScreen->getPhysicalStops().begin(); it != _displayScreen->getPhysicalStops().end(); ++it)
 					{
-						const PhysicalStop* ps = *it;
+						const PhysicalStop* ps(*it);
 						HTMLForm rs(rmPhysicalRequest.getHTMLForm("rm" + Conversion::ToString(ps->getKey())));
 						rs.addHiddenField(DisplayScreenRemovePhysicalStopAction::PARAMETER_PHYSICAL, Conversion::ToString(ps->getKey()));
 

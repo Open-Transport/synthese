@@ -69,7 +69,7 @@ namespace synthese
 
 		private:
 
-			PhysicalStopsSet _physicalStops; 
+			PhysicalStops _physicalStops; 
 
 			std::map< std::pair<uid, uid>, int > _transferDelays; //!< Transfer delays between vertices (in minutes)
 			int _defaultTransferDelay;
@@ -102,7 +102,7 @@ namespace synthese
 				int							getMinTransferDelay () const;
 				int							getMaxTransferDelay () const;
 
-				const PhysicalStopsSet&		getPhysicalStops () const;
+				const PhysicalStops&		getPhysicalStops () const;
 
 				const ConnectionType		getConnectionType () const;
 				void						setConnectionType (const ConnectionType& connectionType);
@@ -142,7 +142,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 				*/
-				std::vector<std::pair<uid, std::string> >	getPhysicalStopLabels(const PhysicalStopsSet& noDisplay) const;
+				std::vector<std::pair<uid, std::string> >	getPhysicalStopLabels(const PhysicalStops& noDisplay) const;
 			//@}
 
 

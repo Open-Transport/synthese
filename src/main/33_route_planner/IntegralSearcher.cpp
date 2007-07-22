@@ -135,15 +135,24 @@ namespace synthese
 							))
 						;
 
+					// The path is traversed
 					for (const Edge* curEdge = (edge->*step) ();
 						curEdge != 0; curEdge = (curEdge->*step) ())
 					{
+						// The reached vertex is analyzed only in two cases :
+						//  - if the vertex belongs to the goal
+						//  - if the vertex is a connecting vertex
+						const Vertex* reachedVertex(curEdge->getFromVertex());
+						if (!reachedVertex->isConnectionAllowed() && !_destinationVam.contains(reachedVertex))
+							continue;
+						
+						// Analyze of the utility of the edge
+						// If the edge is useless, the path is not traversed anymore
 						ServiceUse serviceUse(serviceInstance, curEdge);
-						const Vertex* reachedVertex(serviceUse.getSecondEdge()->getFromVertex());
-
 						if (!_evaluateServiceUse(serviceUse,currentJourney,strictTime))
 							break;
 
+						// Storage of the useful solution
 						SimplifiedResultIndex::iterator it(simplifiedResultIndex.find(reachedVertex));
 						if (it != simplifiedResultIndex.end())
 						{
@@ -267,66 +276,97 @@ namespace synthese
 			, const Journey& currentJourney
 			, bool strictTime
 		) const {
-			//			if (arrivalEdge == 0) return true;
 
-			// Initialization
-			const Edge*	fromEdge = serviceUse.getEdge();
-			const Vertex* goalVertex = serviceUse.getSecondEdge()->getFromVertex ();
-			const DateTime& goalDateTime(serviceUse.getSecondActualDateTime());
-			SquareDistance sqd;
+			/// <h2>Initialization of local variables</h2>
+			const Edge*	fromEdge(serviceUse.getEdge());
+			const Vertex* reachedVertex(serviceUse.getSecondEdge()->getFromVertex());
+			const DateTime& reachDateTime(serviceUse.getSecondActualDateTime());
 
+			/// <h2>Control of the compliance with the current filters</h2>
 
-			// If the edge is an address, the currentJourney necessarily contains
-			// only road legs, filter on max approach distance (= walk distance).
-			if ( (goalVertex->isAddress ()) &&
+			/** - If the edge is an address, the currentJourney necessarily contains
+				only road legs, filter on max approach distance (= walk distance).
+			*/
+			if ((reachedVertex->isAddress ()) &&
 				(currentJourney.getDistance () + fromEdge->getLength () > 
 				_accessParameters.maxApproachDistance) )
 				return false;
 
-
-			// If the edge is an address, the currentJourney necessarily contains
-			// only road legs, filter on max approach time (= walk time).
-			if ( (goalVertex->isAddress ()) &&
+			/** - If the edge is an address, the currentJourney necessarily contains
+				only road legs, filter on max approach time (= walk time).
+			*/
+			if ( (reachedVertex->isAddress ()) &&
 				(currentJourney.getEffectiveDuration () + 
 				(fromEdge->getLength () / _accessParameters.approachSpeed) > 
 				_accessParameters.maxApproachTime) )
 				return false;
 
+			/// <h2>Determination of the utility to store the service use</h2>
 
+			/** - If the reached vertex does not belong to the goal, comparison with the known best time at the goal, to determinate 
+				if there is any chance to reach the goal more efficiently by using this path
+				The time used for comparison corresponds to the minimal time to reach the goal from the vertex, constituted of : 
+					-# the known time to reach the current vertex
+					-# the minimal time to do a transfer in the connecting place
+					-# the minimal travel time from the connecting place and the goal (=1 minute)
 
-			// The vertex is considered useful if it allows a soon access for arrival
-			// or late access for departure.
-			if (sqd.getSquareDistance () == UNKNOWN_VALUE)
-			{
+				@todo Replace the third value (1 minute) by a more accurate value ("VMAX algorithm")
+			*/
+			if(	!_destinationVam.contains(reachedVertex)
+				&& reachedVertex->isConnectionAllowed()
+			){
+
+/* Extract of the old VMAX code
+				SquareDistance sqd;
+				if (sqd.getSquareDistance () == UNKNOWN_VALUE)
+				{
 				sqd.setFromPoints (*goalVertex, _destinationVam.getIsobarycenter ());  
 				sqd.setSquareDistance (sqd.getSquareDistance () - 
-					_destinationVam.getIsobarycenterMaxSquareDistance ().getSquareDistance ());
+				_destinationVam.getIsobarycenterMaxSquareDistance ().getSquareDistance ());
+				}
+*/
+				DateTime bestHopedGoalAccessDateTime (reachDateTime);
+				int minimalGoalReachDuration(
+					reachedVertex->getConnectionPlace()->getMinTransferDelay()	// Minimal time to transfer
+					+ 1															// Minimal time to reach the goal
+				);
 
-			}
-
-			// Check that the limit time (min or max) is not exceeded
-			DateTime accessMoment (goalDateTime);
-			if (!_destinationVam.contains(goalVertex) && goalVertex->isConnectionAllowed())
-			{
 				if (serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
-					accessMoment += goalVertex->getConnectionPlace ()->getMinTransferDelay ();
+					bestHopedGoalAccessDateTime += minimalGoalReachDuration;
 				else
-					accessMoment -= goalVertex->getConnectionPlace ()->getMinTransferDelay ();
+					bestHopedGoalAccessDateTime -= minimalGoalReachDuration;
+
+				if(	(	(serviceUse.getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE)
+					&&	(bestHopedGoalAccessDateTime < _minMaxDateTimeAtDestination)
+					)
+				||	(	(serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+					&&	(bestHopedGoalAccessDateTime > _minMaxDateTimeAtDestination)
+					)
+				)	return false;
+
 			}
 
-			if ( (serviceUse.getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE) &&
-				(accessMoment < _minMaxDateTimeAtDestination) )
-				return false;
+			/** - Best vertex map control : the service use is useful only if no other already founded
+				service use reaches the vertex at a strictly better time.
+			*/
+			if( (	(serviceUse.getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE)
+				&&	(reachDateTime < _bestVertexReachesMap.getBestTime(reachedVertex, reachDateTime))
+				)
+			||	(	(serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+				&&	(reachDateTime > _bestVertexReachesMap.getBestTime (reachedVertex, reachDateTime))
+				)
+			)	return false;
 
-			if ( (serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL) &&
-				(accessMoment > _minMaxDateTimeAtDestination) )
-				return false;
 
-			/// @todo : re-implement VMax control.
+			// Strict time control
+			if(	strictTime
+			&&	(reachDateTime != _bestVertexReachesMap.getBestTime(reachedVertex, reachDateTime))
+			)	return false;
+
 
 			/// @todo Reimplement continuous service break
 			// Continuous service breaking
-			/*			if (_previousContinuousServiceDuration)
+/*			if (_previousContinuousServiceDuration)
 			{
 			if ( (currentJourney.getJourneyLegCount () > 0) &&
 			(currentJourney.getDepartureTime () <= _previousContinuousServiceLastDeparture) &&
@@ -340,28 +380,9 @@ namespace synthese
 			return false;
 			}
 			}
-			*/		    
-
-
-			// Best vertex map control
-			if ( (serviceUse.getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE) &&
-				(accessMoment < _bestVertexReachesMap.getBestTime (goalVertex, accessMoment)) )
-				return false;
-
-			if ( (serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL) &&
-				(accessMoment > _bestVertexReachesMap.getBestTime (goalVertex, accessMoment)) )
-				return false;
-
-
-			// Strict time control
-			if ( strictTime && 
-				(goalDateTime != _bestVertexReachesMap.getBestTime (goalVertex, goalDateTime) )) 
-				return false;
-
-			//			return arrivalMoment <= (_maxArrivalTime - _destinationVam.getMinApproachTime ());
+*/		    
 
 			return true;
-
 		}
 
 

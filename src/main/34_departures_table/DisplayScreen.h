@@ -123,7 +123,7 @@ namespace synthese
 
 			//! \name Content
 			//@{
-				env::PhysicalStopsSet		_physicalStops;				//!< Quai(s) affichés
+				env::PhysicalStops			_physicalStops;				//!< Quai(s) affichés
 				bool						_allPhysicalStopsDisplayed;
 				ForbiddenPlacesList			_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
 				LineFilter					_forbiddenLines;
@@ -235,10 +235,10 @@ namespace synthese
 			//! \name Queries
 			//@{
 				boost::shared_ptr<ArrivalDepartureTableGenerator>	getGenerator(const time::DateTime& startTime)		const;
-				void							display(std::ostream& stream, const time::DateTime& date)				const;
-				void							recordSupervision(const std::string&)	const;
-				std::string						getFullName()															const;
-				const env::PhysicalStopsSet&	getPhysicalStops(bool result=true)										const;
+				void												display(std::ostream& stream, const time::DateTime& date)				const;
+				void												recordSupervision(const std::string&)	const;
+				std::string											getFullName()															const;
+				const env::PhysicalStops&							getPhysicalStops(bool result=true)										const;
 
 				std::vector<std::pair<uid, std::string> > 
 					getSortedAvaliableDestinationsLabels(const std::set<const env::ConnectionPlace*>& placesToAvoid)	const;

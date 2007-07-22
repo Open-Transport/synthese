@@ -109,11 +109,11 @@ TridentExport::Export (std::ostream& os,
 		if (connectionPlace) 
 		{
 		    connectionPlaces.insert (connectionPlace);
-		    const PhysicalStopsSet& cpps = connectionPlace->getPhysicalStops ();
+		    const PhysicalStops& cpps(connectionPlace->getPhysicalStops());
 
 		    // add also physical stops of each connection place otherwise we will
 		    // lack connection links.
-		    for (PhysicalStopsSet::const_iterator itcpps = cpps.begin ();
+		    for (PhysicalStops::const_iterator itcpps = cpps.begin ();
 			 itcpps != cpps.end (); ++itcpps) physicalStops.insert (*itcpps);
 
 		    cities.insert (connectionPlace->getCity ());

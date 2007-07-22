@@ -59,7 +59,7 @@ namespace synthese
 
 			//! \name Parameters
 			//@{
-				const env::PhysicalStopsSet		_physicalStops;
+				const env::PhysicalStops		_physicalStops;
 				const DeparturesTableDirection	_direction;
 				const EndFilter					_endFilter;
 				const LineFilter				_lineFilter;
@@ -94,7 +94,7 @@ namespace synthese
 				@param maxSize Maximal size of the departure table (default = unlimited).
 			*/
 			ArrivalDepartureTableGenerator(
-				const env::PhysicalStopsSet&
+				const env::PhysicalStops&
 				, const DeparturesTableDirection&
 				, const EndFilter&
 				, const LineFilter&

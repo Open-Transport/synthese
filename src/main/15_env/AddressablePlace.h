@@ -26,24 +26,19 @@
 
 #include <vector>
 
-#include "Place.h"
-
+#include "15_env/Place.h"
+#include "15_env/Types.h"
 
 namespace synthese
 {
 	namespace env
 	{
-
-
-		 class Address;
-
-
 		/** Addressable place base class.
 
-		AddressablePlace is the base for any place which can provide
-		addresses. 
+			AddressablePlace is the base for any place which can provide
+			addresses. 
 
-		 @ingroup m15
+			@ingroup m15
 		*/
 		class AddressablePlace : public Place
 		{
@@ -65,7 +60,7 @@ namespace synthese
 
 		protected:
 
-			std::vector<const Address*> _addresses; 
+			Addresses _addresses; 
 
 
 			AddressablePlace (const std::string& name,
@@ -81,7 +76,7 @@ namespace synthese
 
 			/** Gets addresses of this place.
 			 */
-			const std::vector<const Address*>& getAddresses () const;
+			const Addresses& getAddresses () const;
 
 			virtual const ConnectionType getConnectionType () const;
 
@@ -108,7 +103,7 @@ namespace synthese
 
 			/** Adds an address to this place.
 			 */
-			void addAddress (const Address* address);
+				void addAddress (const Address* address);
 			//@}
 
 

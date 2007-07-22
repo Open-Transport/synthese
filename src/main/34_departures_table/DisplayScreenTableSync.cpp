@@ -165,8 +165,8 @@ namespace synthese
 				<< ",'";
 
 			int count=0;
-			const PhysicalStopsSet& pss = object->getPhysicalStops(false);
-			for (PhysicalStopsSet::const_iterator itp = pss.begin(); itp != pss.end(); ++itp)
+			const PhysicalStops& pss = object->getPhysicalStops(false);
+			for (PhysicalStops::const_iterator itp = pss.begin(); itp != pss.end(); ++itp)
 			{
 				if (!(*itp)->getKey())
 					continue;

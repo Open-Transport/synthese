@@ -45,8 +45,7 @@ namespace synthese
 
 
 
-		const std::vector<const Address*>& 
-		AddressablePlace::getAddresses () const
+		const Addresses& AddressablePlace::getAddresses () const
 		{
 			return _addresses;
 		}
@@ -84,7 +83,7 @@ namespace synthese
 		{
 			if (returnAddresses)
 			{
-				for (std::vector<const Address*>::const_iterator it = _addresses.begin ();
+				for (Addresses::const_iterator it = _addresses.begin ();
 					 it != _addresses.end (); ++it)
 				{
 					if (origin == (*it)) continue;

@@ -39,7 +39,7 @@ namespace synthese
 	{
 
 		ForcedDestinationsArrivalDepartureTableGenerator::ForcedDestinationsArrivalDepartureTableGenerator(
-			const PhysicalStopsSet& physicalStops
+			const PhysicalStops& physicalStops
 			, const DeparturesTableDirection& direction
 			, const EndFilter& endfilter
 			, const LineFilter& lineFilter
@@ -57,7 +57,7 @@ namespace synthese
 			, _persistanceDuration(persistanceDuration)
 		{
 			// Add terminuses to forced destinations
-			for (PhysicalStopsSet::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 			{
 				for (set<const Edge*>::const_iterator eit = (*it)->getDepartureEdges().begin(); eit != (*it)->getDepartureEdges().end(); ++eit)
 				{
@@ -81,7 +81,7 @@ namespace synthese
 			typedef map<const ConnectionPlace*, ArrivalDepartureList::iterator> ReachedDestinationMap;
 			ReachedDestinationMap reachedDestination;
 			
-			for (PhysicalStopsSet::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
 			{
 				for (set<const Edge*>::const_iterator eit = (*it)->getDepartureEdges().begin(); eit != (*it)->getDepartureEdges().end(); ++eit)
 				{
