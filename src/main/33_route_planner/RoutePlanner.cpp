@@ -222,15 +222,17 @@ namespace synthese
 			_maxArrivalTime = _journeySheetEndTime;
 			_maxArrivalTime.addDaysDuration(7);	/// @todo Replace 7 by a parameter
 		    
-			for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = dvam.getMap ().begin ();
-			 itVertex != dvam.getMap ().end (); ++itVertex)
-			{
+			for(map<const Vertex*, VertexAccess>::const_iterator itVertex(dvam.getMap().begin());
+				itVertex != dvam.getMap ().end ();
+				++itVertex
+			){
 				_bestArrivalVertexReachesMap.insert (itVertex->first, 
 								 _maxArrivalTime - itVertex->second.approachTime);
 			}
-			for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = ovam.getMap ().begin ();
-			 itVertex != ovam.getMap ().end (); ++itVertex)
-			{
+			for(map<const Vertex*, VertexAccess>::const_iterator itVertex(ovam.getMap().begin());
+				itVertex != ovam.getMap().end();
+				++itVertex
+			){
 				_bestArrivalVertexReachesMap.insert (itVertex->first, 
 								 _minDepartureTime + itVertex->second.approachTime);
 			}
@@ -241,31 +243,38 @@ namespace synthese
 			// Look for best arrival
 			findBestJourney (result, ovam, dvam, TO_DESTINATION, currentJourney, false, false);
 		    
-			if (result.getJourneyLegCount () == 0) return;
+			if (result.empty() || result.getDepartureTime() > _journeySheetEndTime)
+			{
+				result.clear();
+				return;
+			}
 		    
 			// If a journey was found, try to optimize by delaying departure hour as much as possible.
 			_bestDepartureVertexReachesMap.clear ();
 
-
-			for (int i=0; i<result.getJourneyLegCount (); ++i)
+			const JourneyLegs& jl(result.getJourneyLegs());
+			for (JourneyLegs::const_iterator it(jl.begin()); it != jl.end(); ++it)
 			{
 				_bestDepartureVertexReachesMap.insert (
-					result.getJourneyLeg (i).getDepartureEdge()->getFromVertex (),
-					result.getJourneyLeg (i).getDepartureDateTime () );
+					it->getDepartureEdge()->getFromVertex (),
+					it->getDepartureDateTime ()
+				);
 			}
 		    
-			for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = dvam.getMap ().begin ();
-			 itVertex != dvam.getMap ().end (); ++itVertex)
-			{
+			for(map<const Vertex*, VertexAccess>::const_iterator itVertex(dvam.getMap().begin());
+				itVertex != dvam.getMap().end ();
+				++itVertex
+			){
 				_bestDepartureVertexReachesMap.insert (
 					itVertex->first, 
 					result.getArrivalTime () + 
 					dvam.getVertexAccess (result.getDestination ()->getFromVertex ()).approachTime - 
 					itVertex->second.approachTime);
 			}
-			for (std::map<const Vertex*, VertexAccess>::const_iterator itVertex = ovam.getMap ().begin ();
-			 itVertex != ovam.getMap ().end (); ++itVertex)
-			{
+			for(map<const Vertex*, VertexAccess>::const_iterator itVertex(ovam.getMap().begin());
+				itVertex != ovam.getMap().end();
+				++itVertex
+			){
 				_bestDepartureVertexReachesMap.insert (
 					itVertex->first, 
 					result.getDepartureTime () -
@@ -387,7 +396,7 @@ namespace synthese
 				
 				//! <li> If no journey was found and last service is continuous, 
 					//! then repeat computation after continuous service range. </li>
-				if ( (journey.getJourneyLegCount () == 0) &&
+				if ( (journey.empty()) &&
 					 (result.empty () == false) && 
 					 (result.back ().getContinuousServiceRange () > 0) )
 				{
@@ -397,7 +406,7 @@ namespace synthese
 					computeRoutePlanningDepartureArrival (journey, ovam, dvam);	
 				}
 				
-				if (journey.getJourneyLegCount () == 0)
+				if (journey.empty())
 					break;				
 				
 				//! <li>If last continuous service was broken, update its range</li>
