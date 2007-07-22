@@ -14,5 +14,6 @@ synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrat
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::JourneyBoardInterfaceElement>("journey_board");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::SchedulesTableInterfaceElement>("schedules_table");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::ScheduleSheetLinesListLineInterfaceElement>("schedules_lines");
+synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::ScheduleSheetDurationRowInterfaceElement>("schedules_durations");
 
 synthese::util::Factory<synthese::server::Function>::integrate<synthese::routeplanner::RoutePlannerFunction>("rp");

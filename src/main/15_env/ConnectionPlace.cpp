@@ -180,12 +180,12 @@ namespace synthese
 
 
 
-		VertexAccess 
-		ConnectionPlace::getVertexAccess (const AccessDirection& accessDirection,
-						const AccessParameters& accessParameters,
-						const Vertex* destination,
-						const Vertex* origin) const
-		{
+		VertexAccess ConnectionPlace::getVertexAccess(
+			const AccessDirection& accessDirection,
+			const AccessParameters& accessParameters,
+			const Vertex* destination,
+			const Vertex* origin
+		) const	{
 			VertexAccess access;
 
 			if (origin != 0)
@@ -227,18 +227,22 @@ namespace synthese
 		    
 			if (returnPhysicalStops == SEARCH_PHYSICALSTOPS)
 			{
-				for (PhysicalStops::const_iterator it = _physicalStops.begin ();
-					it != _physicalStops.end (); ++it)
-				{
-					if (origin == (*it)) continue;
-					result.insert ((*it), getVertexAccess (accessDirection,
-									accessParameters,
-									(*it), origin));
+				for(PhysicalStops::const_iterator it(_physicalStops.begin());
+					it != _physicalStops.end();
+					++it
+				){
+					result.insert(
+						*it
+						, getVertexAccess(
+							accessDirection
+							, accessParameters
+							, *it
+							, origin
+						)
+					);
 				}
 			}
 		}
-
-
 
 
 		    
@@ -247,15 +251,12 @@ namespace synthese
 		{
 			if (_connectionType == CONNECTION_TYPE_RECOMMENDED_SHORT)
 			{
-			return (squareDistance.getSquareDistance () > SQUAREDISTANCE_SHORT_LONG) 
-				? CONNECTION_TYPE_LINELINE
-				: CONNECTION_TYPE_RECOMMENDED ;
-			
+				return (squareDistance.getSquareDistance () > SQUAREDISTANCE_SHORT_LONG)
+					? CONNECTION_TYPE_LINELINE
+					: CONNECTION_TYPE_RECOMMENDED ;
 			}
 			return _connectionType;
-
 		}
-
 
 
 
@@ -263,22 +264,26 @@ namespace synthese
 		ConnectionPlace::isConnectionAllowed (const Vertex* fromVertex, 
 							const Vertex* toVertex) const
 		{
-			if (_connectionType == CONNECTION_TYPE_FORBIDDEN) return false;
+			if(_connectionType == CONNECTION_TYPE_FORBIDDEN)
+				return false;
 		    
 			bool fromVertexOnLine (dynamic_cast<const PhysicalStop*> (fromVertex));
 			bool toVertexOnLine (dynamic_cast<const PhysicalStop*> (toVertex));
 
-			if ( (_connectionType == CONNECTION_TYPE_ROADROAD) &&
-			(fromVertexOnLine == false) &&
-			(toVertexOnLine == false) ) return true;
+			if(	(_connectionType == CONNECTION_TYPE_ROADROAD)
+			&&	(fromVertexOnLine == false)
+			&&	(toVertexOnLine == false)
+			)	return true;
 
-			if ( (_connectionType == CONNECTION_TYPE_ROADLINE) &&
-			((fromVertexOnLine == false) || (toVertexOnLine == false)) ) return true;
+			if(	(_connectionType == CONNECTION_TYPE_ROADLINE)
+			&&	(	(fromVertexOnLine == false)
+				||	(toVertexOnLine == false)
+				)
+			) return true;
 		    
 			if (_connectionType >= CONNECTION_TYPE_LINELINE) 
 			{
-			return getTransferDelay (fromVertex,
-						toVertex) != FORBIDDEN_TRANSFER_DELAY;
+				return getTransferDelay(fromVertex,	toVertex) != FORBIDDEN_TRANSFER_DELAY;
 			}
 		    
 			return false;

@@ -26,9 +26,10 @@
 
 namespace synthese
 {
+	using namespace time;
+
 	namespace env
 	{
-
 
 		ServiceUse::ServiceUse( const ServicePointer& servicePointer, const Edge* edge)
 			: ServicePointer(servicePointer)
@@ -92,6 +93,20 @@ namespace synthese
 		const SquareDistance& ServiceUse::getSquareDistance() const
 		{
 			return _squareDistance;
+		}
+
+		DateTime ServiceUse::getLastDepartureDateTime() const
+		{
+			DateTime result(getDepartureDateTime());
+			result += _range;
+			return result;
+		}
+
+		DateTime ServiceUse::getLastArrivalDateTime() const
+		{
+			DateTime result(getArrivalDateTime());
+			result += _range;
+			return result;
 		}
 	}
 }

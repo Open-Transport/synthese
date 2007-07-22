@@ -177,6 +177,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\ScheduleSheetDurationRowInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScheduleSheetDurationRowInterfaceElement.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ScheduleSheetLinesListLineInterfaceElement.cpp"
 					>
 				</File>

@@ -118,7 +118,7 @@ INSERT INTO t022_transport_networks VALUES(6192449487677434,'Network1');
 INSERT INTO t022_transport_networks VALUES(6192449487677437,'Network2');
 
 DELETE FROM t025_sites;
-INSERT INTO t025_sites VALUES(1,'test',2,'','',1,0,NULL);
+INSERT INTO t025_sites(id,name,interface_id,start_date,end_date,online_booking,use_old_data,max_connections) VALUES(1,'test',2,'','',1,0,10);
 
 DELETE FROM t042_commercial_lines;
 INSERT INTO t042_commercial_lines VALUES(11821949021891553,6192449487677434,'Network1-CommLine1','1.1','','blanc','blanc','ter');

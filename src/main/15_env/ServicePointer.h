@@ -69,9 +69,11 @@ namespace synthese
 				time::DateTime				_originDateTime;
 				time::DateTime				_actualTime;
 				int							_serviceIndex;
-				int							_range;
 			//@}
-			
+
+		protected:
+				int							_range;
+
 		public:
 			ServicePointer();
 			ServicePointer(DeterminationMethod method, const env::Edge* edge);

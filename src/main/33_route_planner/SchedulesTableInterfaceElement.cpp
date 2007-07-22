@@ -32,6 +32,7 @@
 #include "15_env/Edge.h"
 #include "15_env/Vertex.h"
 #include "15_env/ServiceUse.h"
+#include "15_env/Line.h"
 
 #include "11_interfaces/Interface.h"
 
@@ -68,50 +69,78 @@ namespace synthese
 			}
 			else
 			{
-				size_t __Ligne;
 				const PlaceList placesList(getStopsListForScheduleTable(*jv));
-				DateTime lastDepartureDateTime;
-				DateTime lastArrivalDateTime;
 				Hour unknownTime( TIME_UNKNOWN );
 				shared_ptr<const RoutePlannerSheetColumnInterfacePage> columnInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>());
 				shared_ptr<const RoutePlannerSheetLineInterfacePage> lineInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>());
 
-				// Initialization of text lines
-				vector<ostringstream*> __Tampons(placesList.size());
-				for (vector<ostringstream*>::iterator it = __Tampons.begin(); it != __Tampons.end(); ++it)
-					*it = new ostringstream;
-
+				// Cells
+				vector<ostringstream*> __Tampons;
+				for (PlaceList::const_iterator it = placesList.begin(); it != placesList.end(); ++it)
+					__Tampons.push_back(new ostringstream);
+				
 				// Loop on each journey
 				int i=1;
-				for (Journeys::const_iterator it = jv->begin(); it != jv->end(); ++it, ++i )
-				{
+				for(Journeys::const_iterator it = jv->begin();
+					it != jv->end();
+					++it, ++i
+				){
 					// Loop on each leg
-					__Ligne=0;
-					for (int l=0; l< it->getJourneyLegCount(); ++l)
+					int __Ligne(0);
+					const JourneyLegs& jl(it->getJourneyLegs());
+					for (JourneyLegs::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 					{
-						const ServiceUse& curET(it->getJourneyLeg (l));
-						
+						const ServiceUse& curET(*itl);
+												
 						// Saving of the columns on each lines
-						columnInterfacePage->display( *__Tampons[__Ligne]
-							, __Ligne == 0, true, i, dynamic_cast<const Road*> (curET.getService()->getPath ()) != NULL
-							, curET.getDepartureDateTime().getHour(), lastDepartureDateTime.getHour(), it->getContinuousServiceRange() > 0
-							, request );
+						columnInterfacePage->display(
+							*__Tampons[__Ligne]
+							, __Ligne == 0
+							, true
+							, i
+							, dynamic_cast<const Road*> (curET.getService()->getPath ()) != NULL
+							, curET.getDepartureDateTime().getHour()
+							, curET.getLastDepartureDateTime().getHour()
+							, it->getContinuousServiceRange() > 0
+							, itl == jl.begin()
+							, true
+							, request
+						);
 						
 						for ( __Ligne++; placesList[ __Ligne ] != curET.getArrivalEdge()->getFromVertex ()->getConnectionPlace(); __Ligne++ )
-							columnInterfacePage->display( *__Tampons[ __Ligne ]
-								, true, true, i, false, unknownTime, unknownTime, false
-								, request );
+							columnInterfacePage->display(
+								*__Tampons[__Ligne]
+								, true
+								, true
+								, i
+								, false
+								, unknownTime
+								, unknownTime
+								, false
+								, true
+								, true
+								, request
+							);
 						
-						columnInterfacePage->display( *__Tampons[ __Ligne ] 
-							, true, l == it->getJourneyLegCount ()-1, i, dynamic_cast<const Road*> (curET.getService()->getPath ()) != NULL
-							, curET.getArrivalDateTime().getHour (), lastArrivalDateTime.getHour(), it->getContinuousServiceRange() > 0
-							, request );
+						columnInterfacePage->display(
+							*__Tampons[__Ligne]
+							, true
+							, (itl + 1) == jl.end()
+							, i
+							, dynamic_cast<const Road*> (curET.getService()->getPath()) != NULL
+							, curET.getArrivalDateTime().getHour ()
+							, curET.getLastArrivalDateTime().getHour()
+							, it->getContinuousServiceRange() > 0
+							, true
+							, (itl + 1) == jl.end()
+							, request
+						);
 					}
 				}
 
 				// Initialization of text lines
 				bool __Couleur = false;
-				for ( __Ligne = 0; __Ligne < placesList.size(); __Ligne++ )
+				for (int __Ligne(0); __Ligne < placesList.size(); __Ligne++ )
 				{
 					lineInterfacePage->display(
 						stream
@@ -120,11 +149,8 @@ namespace synthese
 						, variables
 						, placesList[ __Ligne ]
 						, request );
+					delete __Tampons[__Ligne];
 				}
-
-				// Cleaning the string vector
-				for (vector<ostringstream*>::iterator it = __Tampons.begin(); it != __Tampons.end(); ++it)
-					delete *it;
 
 
 				/*
@@ -626,8 +652,9 @@ namespace synthese
 			</table>
 
 		*/
-		SchedulesTableInterfaceElement::PlaceList SchedulesTableInterfaceElement::getStopsListForScheduleTable( const Journeys& jv )
-		{
+		SchedulesTableInterfaceElement::PlaceList SchedulesTableInterfaceElement::getStopsListForScheduleTable(
+			const Journeys& jv
+		){
 			// Variables locales
 			int i;
 			int dernieri;
@@ -637,15 +664,16 @@ namespace synthese
 			PlaceList pl;
 
 			// Horizontal loop
-			for ( Journeys::const_iterator it = jv.begin(); it != jv.end(); ++it )
+			for (Journeys::const_iterator it(jv.begin()); it != jv.end(); ++it)
 			{
 				i = 0;
 				dernieri = -1;
 
 				// Vertical loop
-				for (int l = 0; l < it->getJourneyLegCount (); ++l)
+				const JourneyLegs& jl(it->getJourneyLegs());
+				for (JourneyLegs::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 				{
-					const ServiceUse& curET(it->getJourneyLeg(l));
+					const ServiceUse& curET(*itl);
 
 					// Search of the place from the preceding one
 					if ( OrdrePARechercheGare( pl, i, curET.getDepartureEdge()->getConnectionPlace() ) )
@@ -662,9 +690,11 @@ namespace synthese
 					i++;
 
 					// Controle gare suivante pour trajet a pied
-					if ( /* MJ que deviennent les lignes à pied ??? curET->getLigne() ->Materiel() ->Code() == MATERIELPied && */   
-						(l != it->getJourneyLegCount ()-1) 
-						&& pl[ i ] != curET.getArrivalEdge()->getConnectionPlace()
+					if(	curET.getService()->getPath()->isLine()
+					&&	static_cast<const Line*>(curET.getService()->getPath())->getWalkingLine()
+					&&	(itl+1 != jl.end())
+					&&	(i < pl.size())
+					&&	(pl[ i ] != curET.getArrivalEdge()->getConnectionPlace())
 					){
 						if ( OrdrePARechercheGare( pl, i, curET.getArrivalEdge()->getConnectionPlace() ) )
 						{

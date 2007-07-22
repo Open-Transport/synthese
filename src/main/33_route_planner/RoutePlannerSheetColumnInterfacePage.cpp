@@ -29,22 +29,33 @@ using namespace std;
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace time;
 
 	namespace routeplanner
 	{
-		void RoutePlannerSheetColumnInterfacePage::display( std::ostream& stream
-			, bool isItFirstLine, bool isItLastLine, size_t columnNumber, bool isItFootLine 
-			, const synthese::time::Hour& firstDepartureTime, const synthese::time::Hour& lastDepartureTime 
-			, bool isItContinuousService, const server::Request* request /*= NULL */ ) const
-		{
+		void RoutePlannerSheetColumnInterfacePage::display(
+			ostream& stream
+			, bool isItFirstLine
+			, bool isItLastLine
+			, size_t columnNumber
+			, bool isItFootLine 
+			, const Hour& firstArrivalTime
+			, const Hour& lastArrivalTime 
+			, bool isItContinuousService
+			, bool isFirstWriting
+			, bool isLastWriting
+			, const server::Request* request /*= NULL */
+		) const	{
 			ParametersVector pv;
-			pv.push_back( synthese::util::Conversion::ToString( isItFirstLine ) );
-			pv.push_back( synthese::util::Conversion::ToString( isItLastLine ) );
-			pv.push_back( synthese::util::Conversion::ToString( columnNumber ) );
-			pv.push_back( synthese::util::Conversion::ToString( isItFootLine ) );
-			pv.push_back( firstDepartureTime.isUnknown() ? string() : firstDepartureTime.toString());
-			pv.push_back( firstDepartureTime.isUnknown() ? string() : lastDepartureTime.toString() );
-			pv.push_back( synthese::util::Conversion::ToString( isItContinuousService ) );
+			pv.push_back( Conversion::ToString( isItFirstLine ) );
+			pv.push_back( Conversion::ToString( isItLastLine ) );
+			pv.push_back( Conversion::ToString( columnNumber ) );
+			pv.push_back( Conversion::ToString( isItFootLine ) );
+			pv.push_back( firstArrivalTime.isUnknown() ? string() : firstArrivalTime.toString());
+			pv.push_back( firstArrivalTime.isUnknown() ? string() : lastArrivalTime.toString() );
+			pv.push_back( Conversion::ToString( isItContinuousService ) );
+			pv.push_back( Conversion::ToString( isFirstWriting ) );
+			pv.push_back( Conversion::ToString( isLastWriting ) );
 
 			VariablesMap vm;
 			InterfacePage::display( stream, pv, vm, NULL, request );

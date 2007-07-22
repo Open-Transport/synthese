@@ -320,22 +320,19 @@ namespace synthese
 							candidate = recursiveCandidate;
 					}
 				}
-				
-			}
 
-			if (candidate.isBestThan(result, accessDirection))
-				result = candidate;
+				if (candidate.isBestThan(result, accessDirection))
+					result = candidate;
+			}
 		}
 
 
 
-
-
-		void
-		RoutePlanner::computeRoutePlanningDepartureArrival (Journey& result,
-									const VertexAccessMap& ovam,
-									const VertexAccessMap& dvam)
-		{
+		void RoutePlanner::computeRoutePlanningDepartureArrival(
+			Journey& result
+			, const VertexAccessMap& ovam
+			, const VertexAccessMap& dvam
+		){
 			_bestArrivalVertexReachesMap.clear ();
 			_maxArrivalTime = _journeySheetEndTime;
 			_maxArrivalTime.addDaysDuration(7);	/// @todo Replace 7 by a parameter
@@ -406,11 +403,7 @@ namespace synthese
 
 
 
-
-
-
-		Journeys
-		RoutePlanner::computeJourneySheetDepartureArrival ()
+		Journeys RoutePlanner::computeJourneySheetDepartureArrival()
 		{
 			Journey journey;
 

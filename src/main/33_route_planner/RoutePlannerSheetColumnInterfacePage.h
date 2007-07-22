@@ -43,11 +43,23 @@ namespace synthese
 				@param firstTime (4) Start of continuous service, Time else
 				@param lastTime (5) End of continuous service, Time else
 				@param isItContinuousService (6) Is the cell on a continuous service ?
+				@param isFirstWriting (7) Is it the first time that we write on the column ?
+				@param isLastWriting (8) Is it the last time that we write on the column ?
 				@param session 
 			*/
-			void display( std::ostream& stream, bool isItFirstLine, bool isItLastLine, size_t columnNumber, bool isItFootLine
-				, const synthese::time::Hour& firstTime, const synthese::time::Hour& lastTime
-				, bool isItContinuousService, const server::Request* request = NULL ) const;
+			void display(
+				std::ostream& stream
+				, bool isItFirstLine
+				, bool isItLastLine
+				, size_t columnNumber
+				, bool isItFootLine
+				, const time::Hour& firstTime
+				, const time::Hour& lastTime
+				, bool isItContinuousService
+				, bool isFirstWriting
+				, bool isLastWriting
+				, const server::Request* request = NULL
+			) const;
 		};
 	}
 }
