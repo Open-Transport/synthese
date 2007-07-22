@@ -144,7 +144,7 @@ namespace synthese
 			else
 			{
 				schedule = _arrivalSchedules.at(edgeIndex).first;
-				if (_arrivalSchedules.at(edgeIndex).first.getHour() > _arrivalSchedules.at(edgeIndex).second.getHour())
+				if (_arrivalSchedules.at(edgeIndex).first.getHour() <= _arrivalSchedules.at(edgeIndex).second.getHour())
 				{
 					if (presenceDateTime.getHour() < _arrivalSchedules.at(edgeIndex).first.getHour())
 						return ServicePointer();

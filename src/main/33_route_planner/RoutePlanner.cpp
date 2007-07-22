@@ -152,10 +152,15 @@ namespace synthese
 				bool recursion(true);
 
 				// Case the journey goes to a final destination
-				if (dvam.contains(itj->getDestination()->getFromVertex()))
+				const Vertex* reachedVertex(
+					(accessDirection == TO_DESTINATION)
+					? itj->getDestination()->getFromVertex()
+					: itj->getOrigin()->getFromVertex()
+					);
+				if (dvam.contains(reachedVertex))
 				{
 					// A destination without any approach time stops the recursion
-					const VertexAccess& va = dvam.getVertexAccess(itj->getDestination()->getFromVertex());
+					const VertexAccess& va = dvam.getVertexAccess(reachedVertex);
 					if (va.approachTime == 0)
 						recursion = false;
 					
@@ -169,7 +174,10 @@ namespace synthese
 				{
 					Journey tempJourney (currentJourney);
 					Journey recursiveCandidate;
-					tempJourney.append (*itj);
+					if (accessDirection == TO_DESTINATION)
+						tempJourney.append (*itj);
+					else
+						tempJourney.prepend(*itj);
 
 					const Vertex* nextVertex = (accessDirection == TO_DESTINATION) 
 						? tempJourney.getDestination ()->getFromVertex ()
@@ -188,7 +196,11 @@ namespace synthese
 
 					if (!recursiveCandidate.empty())
 					{
-						recursiveCandidate.prepend (*itj);
+						if (accessDirection == TO_DESTINATION)
+							recursiveCandidate.prepend (*itj);
+						else
+							recursiveCandidate.append(*itj);
+
 						if (recursiveCandidate.isBestThan(candidate, accessDirection))
 							candidate = recursiveCandidate;
 					}

@@ -108,11 +108,18 @@ namespace synthese
 						departureMoment -= static_cast<int>(itVertex->second.approachTime);
 
 					ServicePointer serviceInstance(
-						edge->getNextService (
-						departureMoment
-						, _minMaxDateTimeAtDestination
-						, _calculationTime
-						)	);
+						(_accessDirection == TO_DESTINATION)
+						?	edge->getNextService (
+								departureMoment
+								, _minMaxDateTimeAtDestination
+								, _calculationTime
+							)
+						:	edge->getPreviousService(
+								departureMoment
+								, _minMaxDateTimeAtDestination
+								, _calculationTime
+							)
+					);
 
 					if (!serviceInstance.getService())
 						continue;
@@ -149,7 +156,7 @@ namespace synthese
 						// Analyze of the utility of the edge
 						// If the edge is useless, the path is not traversed anymore
 						ServiceUse serviceUse(serviceInstance, curEdge);
-						if (!_evaluateServiceUse(serviceUse,currentJourney,strictTime))
+						if (!_evaluateServiceUse(serviceUse,currentJourney))
 							break;
 
 						// Storage of the useful solution
@@ -275,7 +282,6 @@ namespace synthese
 		bool IntegralSearcher::_evaluateServiceUse(
 			const env::ServiceUse& serviceUse
 			, const Journey& currentJourney
-			, bool strictTime
 		) const {
 
 			/// <h2>Initialization of local variables</h2>
@@ -359,12 +365,6 @@ namespace synthese
 			)	return false;
 
 
-			// Strict time control
-			if(	strictTime
-			&&	(reachDateTime != _bestVertexReachesMap.getBestTime(reachedVertex, reachDateTime))
-			)	return false;
-
-
 			/// @todo Reimplement continuous service break
 			// Continuous service breaking
 /*			if (_previousContinuousServiceDuration)
@@ -398,7 +398,7 @@ namespace synthese
 
 		bool IntegralSearcher::UselessServiceUse::operator() (const env::ServiceUse& serviceUse)
 		{
-			return !_integralSearcher._evaluateServiceUse(serviceUse, _currentJourney, _strictTime);
+			return !_integralSearcher._evaluateServiceUse(serviceUse, _currentJourney);
 		}
 	}
 }

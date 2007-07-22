@@ -108,7 +108,6 @@ namespace synthese
 			bool _evaluateServiceUse(
 				const env::ServiceUse& serviceUse
 				, const Journey& currentJourney
-				, bool strictTime
 				) const;
 
 			class UselessServiceUse
