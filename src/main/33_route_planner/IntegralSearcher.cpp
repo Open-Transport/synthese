@@ -55,6 +55,9 @@ namespace synthese
 			, const VertexAccessMap& destinationVam
 			, const DateTime& calculationDateTime
 			, DateTime&	minMaxDateTimeAtDestination
+			, int previousContinuousServiceDuration
+			, const DateTime& previousContinuousServiceLastDeparture
+			, const Journey& accessJourney
 		)	: _accessDirection(accessDirection)
 			, _accessParameters(accessParameters)
 			, _searchAddresses(searchAddresses)
@@ -65,6 +68,9 @@ namespace synthese
 			, _destinationVam(destinationVam)
 			, _calculationTime(calculationDateTime)
 			, _minMaxDateTimeAtDestination(minMaxDateTimeAtDestination)
+			, _previousContinuousServiceDuration(previousContinuousServiceDuration)
+			, _previousContinuousServiceLastDeparture(previousContinuousServiceLastDeparture)
+			, _accessJourney(accessJourney)
 		{	}
 
 		void IntegralSearcher::_integralSearchRecursion(
@@ -365,23 +371,27 @@ namespace synthese
 			)	return false;
 
 
-			/// @todo Reimplement continuous service break
-			// Continuous service breaking
-/*			if (_previousContinuousServiceDuration)
+			/** - Continuous service breaking test : if the solution is between a service continuous range
+				then it is stored only if its duration is better than the one of the continuous service.
+			*/
+			if (_previousContinuousServiceDuration > 0)
 			{
-			if ( (currentJourney.getJourneyLegCount () > 0) &&
-			(currentJourney.getDepartureTime () <= _previousContinuousServiceLastDeparture) &&
-			(arrivalMoment - currentJourney.getDepartureTime () >= _previousContinuousServiceDuration) )
-			{
-			return false;
+				DateTime departureTime(
+					(serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+					? (_accessJourney.empty() ? serviceUse.getActualDateTime() : _accessJourney.getDepartureTime())
+					: serviceUse.getSecondActualDateTime()
+				);
+				if (departureTime < _previousContinuousServiceLastDeparture)
+				{
+					DateTime arrivalTime(
+						(serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+						? serviceUse.getSecondActualDateTime()
+						: (_accessJourney.empty() ? serviceUse.getActualDateTime() : _accessJourney.getArrivalTime())
+					);
+					if ((arrivalTime - departureTime) >= _previousContinuousServiceDuration)
+						return false;
+				}
 			}
-			else if ( (departureMoment < _previousContinuousServiceLastDeparture) && 
-			(arrivalMoment - departureMoment >= _previousContinuousServiceDuration) )
-			{
-			return false;
-			}
-			}
-*/		    
 
 			return true;
 		}

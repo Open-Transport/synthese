@@ -76,6 +76,9 @@ namespace synthese
 				const env::VertexAccessMap&	_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
 				const time::DateTime&		_calculationTime;
 				time::DateTime&				_minMaxDateTimeAtDestination;
+				const int					_previousContinuousServiceDuration;
+				const time::DateTime&		_previousContinuousServiceLastDeparture;
+				const Journey&				_accessJourney;
 			//@}
 
 			//! @name Result
@@ -141,6 +144,9 @@ namespace synthese
 				, const env::VertexAccessMap&	destinationVam
 				, const time::DateTime&			calculationTime
 				, time::DateTime&				minMaxDateTimeAtDestination
+				, int							previousContinuousServiceDuration
+				, const time::DateTime&			previousContinuousServiceLastDeparture
+				, const Journey&				accessJourney
 				);
 
 			Journeys integralSearch(

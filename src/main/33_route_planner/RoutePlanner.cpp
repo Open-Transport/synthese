@@ -136,6 +136,9 @@ namespace synthese
 				, dvam 
 				, _calculationTime
 				, (accessDirection == TO_DESTINATION) ? _maxArrivalTime : _minDepartureTime
+				, _previousContinuousServiceDuration
+				, _previousContinuousServiceLastDeparture
+				, currentJourney
 				);
 			Journeys journeyParts(is.integralSearch(
 				ovam
@@ -313,6 +316,9 @@ namespace synthese
 				, _destinationVam
 				, _calculationTime
 				, _maxArrivalTime
+				, 0
+				, DateTime(TIME_UNKNOWN)
+				, Journey()
 				);
 			Journeys originJourneys(iso.integralSearch (
 				_originVam
@@ -355,6 +361,9 @@ namespace synthese
 				, _originVam
 				, _calculationTime
 				, _minDepartureTime
+				, 0
+				, DateTime(TIME_UNKNOWN)
+				, Journey()
 				);
 			Journeys destinationJourneys(isd.integralSearch (
 					_destinationVam
