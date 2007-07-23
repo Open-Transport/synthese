@@ -77,17 +77,17 @@ namespace synthese
 			it = map.find(PARAMETER_DEPARTURE_PLACE_ID);
 			if (it == map.end())
 				throw RequestException("Departure place not specified");
-			if (!EnvModule::getConnectionPlaces().contains(Conversion::ToLongLong(it->second)))
+			_departure_place = EnvModule::fetchPlace(Conversion::ToLongLong(it->second));
+			if (!_departure_place.get())
 				throw RequestException("Specified departure place not found");
-			_departure_place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(it->second));
 
 			// Arrival place
 			it = map.find(PARAMETER_ARRIVAL_PLACE_ID);
 			if (it == map.end())
 				throw RequestException("Arrival place not specified");
-			if (!EnvModule::getConnectionPlaces().contains(Conversion::ToLongLong(it->second)))
+			_arrival_place = EnvModule::fetchPlace(Conversion::ToLongLong(it->second));
+			if (!_arrival_place.get())
 				throw RequestException("Specified arrival place not found");
-			_arrival_place = EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(it->second));
 
 			// Date
 			it = map.find(PARAMETER_DATE);

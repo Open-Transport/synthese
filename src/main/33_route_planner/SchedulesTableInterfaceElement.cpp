@@ -692,33 +692,23 @@ namespace synthese
 					}
 
 					dernieri = i;
-					i++;
+					++i;
 
-					// Controle gare suivante pour trajet a pied
-					if(	curET.getService()->getPath()->isLine()
-					&&	static_cast<const Line*>(curET.getService()->getPath())->getWalkingLine()
-					&&	(itl+1 != jl.end())
-					&&	(i < pl.size())
-					&&	(pl[ i ] != curET.getArrivalEdge()->getConnectionPlace())
-					){
 						if ( OrdrePARechercheGare( pl, i, curET.getArrivalEdge()->getConnectionPlace() ) )
 						{
-							OrdrePAEchangeSiPossible(jv, pl, lll, dernieri, i );
-							i = dernieri + 1;
+							if ( i < dernieri )
+								i=OrdrePAEchangeSiPossible(jv, pl, lll, dernieri, i );
 						}
 						else
 						{
-							i = dernieri + 1;
-							OrdrePAInsere( pl, lll, curET.getArrivalEdge()->getConnectionPlace(), i );
+							i = OrdrePAInsere( pl, lll, curET.getArrivalEdge()->getConnectionPlace(), dernieri + 1 );
 						}
-						lll.insert( lll.begin() + i, true );
-					}
+						dernieri = i;
+
+						//						lll.insert( lll.begin() + i, true );
+					
 				}
 			}
-
-			// Ajout de la destination finale en fin de tableau
-			if ( jv.size() > 0 )
-				pl.push_back( jv[0].getDestination()->getConnectionPlace() );
 
 			return pl;
 		}

@@ -33,7 +33,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
+		class Place;
 	}
 
 	namespace routeplanner
@@ -56,8 +56,8 @@ namespace synthese
 			//@{
 				boost::shared_ptr<const Site>						_site;
 				boost::shared_ptr<const RoutePlannerInterfacePage>	_page;
-				boost::shared_ptr<const env::ConnectionPlace>		_departure_place;
-				boost::shared_ptr<const env::ConnectionPlace>		_arrival_place;
+				boost::shared_ptr<const env::Place>					_departure_place;
+				boost::shared_ptr<const env::Place>					_arrival_place;
 				time::Date											_date;
 				AccessParameters									_accessParameters;
 			//@}
