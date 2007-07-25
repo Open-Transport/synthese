@@ -460,8 +460,6 @@ namespace synthese
 		   , bool strictTime
 		   , bool optim
 		){
-			Journey candidate(accessDirection);
-		    
 			if (currentJourney.getJourneyLegCount () > 
 			_accessParameters.maxTransportConnectionCount) return;
 
@@ -507,8 +505,9 @@ namespace synthese
 					if (va.approachTime == 0)
 						recursion = false;
 					
-					// Build of a candidate
-					candidate = *itj;
+					// Attempt to elect the solution as the result
+					if (itj->isBestThan(result))
+						result = *itj;
 				}
 			
 
@@ -532,15 +531,10 @@ namespace synthese
 
 					findBestJourney (recursiveCandidate, nextVam, dvam, accessDirection, *itj, false, optim);
 
-					if (!recursiveCandidate.empty())
-					{
-						if (recursiveCandidate.isBestThan(candidate))
-							candidate = recursiveCandidate;
-					}
+					// Attempt to elect the solution as the result
+					if (recursiveCandidate.isBestThan(result))
+						result = recursiveCandidate;
 				}
-
-				if (candidate.isBestThan(result))
-					result = candidate;
 			}
 		}
 	}
