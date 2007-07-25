@@ -29,6 +29,7 @@
 
 #include "15_env/Point.h"
 #include "15_env/SquareDistance.h"
+#include "15_env/Journey.h"
 
 namespace synthese
 {
@@ -37,10 +38,20 @@ namespace synthese
 		class Vertex;
 		class Path;
 
-		typedef struct {
+		struct VertexAccess {
 			int approachTime;
 			double approachDistance;
-		} VertexAccess;
+			Journey approachJourney;
+			VertexAccess(int __approachTime, double __approachDistance, const Journey& __approachJourney)
+			: approachTime(__approachTime), approachDistance(__approachDistance), approachJourney(__approachJourney)
+			{
+
+			}
+			VertexAccess(AccessDirection method)
+				: approachJourney(method)
+			{}
+			
+		};
 		 
 		/** 
 TRIDENT : VertexAccess => AccesPoint
@@ -52,11 +63,11 @@ TRIDENT : VertexAccess => AccesPoint
 		    
 			typedef enum { MERGE_ADDRESSES, DO_NOT_MERGE_ADDRESSES } MergeAddresses;
 			typedef enum { MERGE_PHYSICALSTOPS, DO_NOT_MERGE_PHYSICALSTOPS } MergePhysicalStops;
-		    
-
+			typedef std::map<const Vertex*, VertexAccess> VamMap;
+	    
 		private:
 
-			std::map<const Vertex*, VertexAccess> _map;
+			VamMap _map;
 			std::set<const Path*> _pathOnWhichFineSteppingForDeparture;
 			std::set<const Path*> _pathOnWhichFineSteppingForArrival;
 		    
@@ -79,7 +90,7 @@ TRIDENT : VertexAccess => AccesPoint
 			~VertexAccessMap ();
 
 
-			const std::map<const Vertex*, VertexAccess>& getMap () const;
+			const VamMap& getMap () const;
 
 			const VertexAccess& getVertexAccess (const Vertex* vertex) const;
 

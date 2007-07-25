@@ -73,7 +73,7 @@ TemporaryPlace::getVertexAccess (const AccessDirection& accessDirection,
 				 const Vertex* destination,
 				 const Vertex* origin) const
 {
-    VertexAccess access;
+    VertexAccess access(accessDirection);
     access.approachDistance = _metricOffset - ((Address*) destination)->getMetricOffset ();
     access.approachTime = access.approachDistance / accessParameters.approachSpeed;
 	return access;
@@ -100,20 +100,20 @@ TemporaryPlace::getImmediateVertices (VertexAccessMap& result,
 
     if (closestBefore != 0)
     {
-	VertexAccess access;
-	access.approachDistance = _metricOffset - closestBefore->getMetricOffset ();
-	access.approachTime = access.approachDistance / accessParameters.approachSpeed;
-	
-	result.insert (closestBefore, access);
+		VertexAccess access(accessDirection);
+		access.approachDistance = _metricOffset - closestBefore->getMetricOffset ();
+		access.approachTime = access.approachDistance / accessParameters.approachSpeed;
+		
+		result.insert (closestBefore, access);
     }
 
     if ( (closestAfter != 0) && (closestAfter != closestBefore) )
     {
-	VertexAccess access;
-	access.approachDistance = _metricOffset - closestAfter->getMetricOffset ();
-	access.approachTime = access.approachDistance / accessParameters.approachSpeed;
-	
-	result.insert (closestAfter, access);
+		VertexAccess access(accessDirection);
+		access.approachDistance = _metricOffset - closestAfter->getMetricOffset ();
+		access.approachTime = access.approachDistance / accessParameters.approachSpeed;
+		
+		result.insert (closestAfter, access);
     }
 }
 

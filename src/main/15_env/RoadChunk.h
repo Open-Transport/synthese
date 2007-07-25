@@ -33,60 +33,62 @@
 
 namespace synthese
 {
-namespace env
-{
+	namespace env
+	{
 
-    class Address;
-    class Road;
-
-
-
-/** Association class between road and address.
-A road chunk is always delimited by two adresses, with no other
-address in between.
-These delimiting addresses can correspond to :
-- a crossing address
-- a physical stop address
-- a public place address
-
- @ingroup m15
-*/
-class RoadChunk : 
-    public synthese::util::Registrable<uid,RoadChunk>,
-    public Edge 
-{
-private:
-
-    const Address* _fromAddress;
-
-public:
-
-  RoadChunk (uid id = UNKNOWN_VALUE,
-	     const Address* fromAddress = NULL,
-	     int rankInRoad = UNKNOWN_VALUE,
-	     bool isDeparture = false,
-	     bool isArrival = false);
-
-  
-  virtual ~RoadChunk ();
+		class Address;
+		class Road;
 
 
-  //! @name Getters/Setters
-  //@{
-  const Vertex* getFromVertex () const;
-  double getMetricOffset () const;
-	void setFromAddress(const Address* fromAddress);
-  //@}
-    
 
-  //! @name Query methods.
-  //@{
-  //@}
+		/** Association class between road and address.
+		A road chunk is always delimited by two adresses, with no other
+		address in between.
+		These delimiting addresses can correspond to :
+		- a crossing address
+		- a physical stop address
+		- a public place address
 
-};
+		 @ingroup m15
+		*/
+		class RoadChunk : 
+			public synthese::util::Registrable<uid,RoadChunk>,
+			public Edge 
+		{
+		private:
+
+			Address* _fromAddress;
+
+		public:
+
+		RoadChunk(
+			uid id = UNKNOWN_VALUE,
+			Address* fromAddress = NULL,
+			int rankInRoad = UNKNOWN_VALUE,
+			bool isDeparture = false,
+			bool isArrival = false
+		);
+
+		  
+		  virtual ~RoadChunk ();
 
 
-}
+		  //! @name Getters/Setters
+		  //@{
+		  const Vertex* getFromVertex () const;
+		  double getMetricOffset () const;
+			void setFromAddress(Address* fromAddress);
+		  //@}
+		    
+
+		  //! @name Query methods.
+		  //@{
+		  //@}
+
+		};
+
+
+	}
 }
 
 #endif 

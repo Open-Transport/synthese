@@ -35,7 +35,7 @@ namespace synthese
 		    std::ostream& stream, 
 		    size_t columnNumber, 
 			VariablesMap& variables,
-		    const synthese::routeplanner::Journey* object, 
+		    const env::Journey* object, 
 		    const server::Request* request /*= NULL */ ) const
 		{
 			ParametersVector pv;

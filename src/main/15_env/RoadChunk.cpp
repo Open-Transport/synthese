@@ -30,13 +30,17 @@ namespace synthese
 	{
 		RoadChunk::RoadChunk (
 			uid id
-			, const Address* fromAddress
+			, Address* fromAddress
 			, int rankInRoad
 			, bool isDeparture
 			, bool isArrival
 		)	: synthese::util::Registrable<uid,RoadChunk> (id)
-			, Edge (isDeparture, isArrival, fromAddress->getRoad (), rankInRoad)
-			, _fromAddress (fromAddress)
+			, Edge (
+				isDeparture
+				, isArrival
+				, (fromAddress == NULL) ? NULL : fromAddress->getRoad ()
+				, rankInRoad
+			), _fromAddress (fromAddress)
 		{
 		}
 
@@ -65,9 +69,17 @@ namespace synthese
 			return _fromAddress->getMetricOffset ();
 		}
 
-		void RoadChunk::setFromAddress( const Address* fromAddress )
+		void RoadChunk::setFromAddress(Address* fromAddress )
 		{
 			_fromAddress = fromAddress;
+
+			// Links from stop to the linestop
+			if (isArrival())
+				_fromAddress->addArrivalEdge(static_cast<Edge*>(this));
+			if (isDeparture())
+				_fromAddress->addDepartureEdge(static_cast<Edge*>(this));
+
+			updateServiceIndex();
 		}
 
 

@@ -232,6 +232,19 @@ namespace synthese
 	}
 
 
+	shared_ptr<AddressablePlace> 
+		EnvModule::fetchUpdateableAddressablePlace (const uid& id)
+	{
+		if (_connectionPlaces.contains (id))
+			return static_pointer_cast<AddressablePlace, ConnectionPlace>(_connectionPlaces.getUpdateable(id));
+		if (_publicPlaces.contains (id))
+			return static_pointer_cast<AddressablePlace, PublicPlace>(_publicPlaces.getUpdateable(id));
+		if (_roads.contains (id))
+			return static_pointer_cast<AddressablePlace, Road>(_roads.getUpdateable(id));
+
+		return shared_ptr<AddressablePlace>();
+	}
+
 
 
 	shared_ptr<const IncludingPlace> 

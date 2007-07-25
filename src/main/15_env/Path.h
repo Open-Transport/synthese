@@ -101,6 +101,7 @@ namespace synthese
 			ServiceSet		_services;
 			
 			Calendar		_calendar; //!< Calendar indicating if there is at least one service running on each day. (move it in Complyer)
+			bool			_allDays;	//!< A permanent service is present : the calendar is ignored
 
 			Path ();
 
@@ -170,24 +171,14 @@ namespace synthese
 				void removeService (Service* service);
 
 
-				/** Updates path calendar.
-
-					The generated calendar indicates whether or not a day contains at least one service.
-					It takes into account services running after midnight : if at least one minute
-					of a day is concerned by a service, then the whole day is selected.
-
-					Thus, if a calculation request is done on a deselected calendar day, the path 
-					can safely be filtered.
-				*/
-				void updateCalendar ();
-
-
 				/** Updates the schedule indexes of each linestop served by the service.
 					@author Hugues Romain
 					@date 2007
 					@throw No exception
 				*/
 				void updateScheduleIndexes();
+
+				void setAllDays(bool value);
 			//@}
 		    
 		};

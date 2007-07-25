@@ -22,7 +22,8 @@
 
 #include "33_route_planner/ScheduleSheetDurationRowInterfaceElement.h"
 #include "33_route_planner/Types.h"
-#include "33_route_planner/Journey.h"
+
+#include "15_env/Journey.h"
 
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/DurationInterfacePage.h"
@@ -34,6 +35,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace env;
 
 	namespace routeplanner
 	{

@@ -20,11 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/Journey.h"
-
 #include "17_messages/SentAlarm.h"
 #include "17_messages/Types.h"
 
+#include "15_env/Journey.h"
 #include "15_env/ReservationRuleComplyer.h"
 #include "15_env/ReservationRule.h"
 #include "15_env/Path.h"
@@ -43,21 +42,23 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace env;
 	using namespace messages;
 	using namespace time;
 
-	namespace routeplanner
+	namespace env
 	{
 
-		Journey::Journey ()
+		Journey::Journey (AccessDirection method)
 			: _continuousServiceRange (UNKNOWN_VALUE)
 			, _effectiveDuration (0)
 			, _transportConnectionCount (0)
 			, _distance (0)
+			, _method(method)
+			, _startApproachDuration(0)
+			, _endApproachDuration(0)
 		{
 		}
-		    
+		
 
 
 		Journey::~Journey ()
@@ -92,7 +93,7 @@ namespace synthese
 
 		const ServiceUse& Journey::getLastJourneyLeg () const
 		{
-			return *(_journeyLegs.end() - 1);
+			return *_journeyLegs.rbegin();
 		}
 
 
@@ -113,23 +114,25 @@ namespace synthese
 
 
 
-		const synthese::time::DateTime& 
-		Journey::getDepartureTime () const
+		DateTime Journey::getDepartureTime () const
 		{
-			return getFirstJourneyLeg ().getDepartureDateTime();
+			DateTime d(getFirstJourneyLeg ().getDepartureDateTime());
+			if (d.isUnknown())
+				return d;
+			d -= (_method == TO_DESTINATION) ? _startApproachDuration : _endApproachDuration;
+			return d;
 		}
 
 
 
-		const synthese::time::DateTime& 
-		Journey::getArrivalTime () const
+		DateTime Journey::getArrivalTime () const
 		{
-			return getLastJourneyLeg ().getArrivalDateTime();
+			DateTime d(getLastJourneyLeg ().getArrivalDateTime());
+			if (d.isUnknown())
+				return d;
+			d += (_method == TO_DESTINATION) ? _endApproachDuration : _startApproachDuration;
+			return d;
 		}
-
-
-
-
 
 
 		void 
@@ -142,7 +145,6 @@ namespace synthese
 			||	_continuousServiceRange > leg.getServiceRange()
 			)	_continuousServiceRange = leg.getServiceRange();
 
-
 			if (!leg.getEdge()->getParentPath()->isRoad())
 				++_transportConnectionCount;
 		}
@@ -152,10 +154,17 @@ namespace synthese
 		void 
 		Journey::prepend (const Journey& journey)
 		{
-			for (int i=journey.getJourneyLegCount ()-1; i>= 0; --i)
-			{
-				prepend (journey.getJourneyLeg (i));
-			}
+			assert(_method == journey._method);
+
+			for(JourneyLegs::const_reverse_iterator it(journey.getJourneyLegs().rbegin());
+				it != journey.getJourneyLegs().rend();
+				++it
+			)	prepend(*it);
+
+			if (_method == TO_DESTINATION)
+				_startApproachDuration = journey._startApproachDuration;
+			else
+				_endApproachDuration = journey._endApproachDuration;
 		}
 
 
@@ -179,13 +188,19 @@ namespace synthese
 
 
 
-		void 
-		Journey::append (const Journey& journey)
+		void Journey::append (const Journey& journey)
 		{
-			for (int i=0; i<journey.getJourneyLegCount (); ++i)
-			{
-			append (journey.getJourneyLeg (i));
-			}
+			assert(_method == journey._method);
+
+			for(JourneyLegs::const_iterator it(journey.getJourneyLegs().begin());
+				it != journey.getJourneyLegs().end();
+				++it
+			)	append(*it);
+
+			if (_method == TO_DESTINATION)
+				_endApproachDuration = journey._endApproachDuration;
+			else
+				_startApproachDuration = journey._startApproachDuration;
 		}
 
 
@@ -277,8 +292,7 @@ namespace synthese
 
 
 
-		int
-		Journey::getDuration () const
+		int	Journey::getDuration () const
 		{
 			if (getDepartureTime ().getHour ().isUnknown () ||
 			getArrivalTime ().getHour ().isUnknown ()) return UNKNOWN_VALUE;
@@ -326,6 +340,8 @@ namespace synthese
 			_effectiveDuration = 0;
 			_transportConnectionCount = 0;
 			_distance = 0;
+			_endApproachDuration = 0;
+			_startApproachDuration = 0;
 			_journeyLegs.clear();
 		}
 
@@ -340,6 +356,8 @@ namespace synthese
 			_effectiveDuration = ref._effectiveDuration;
 			_transportConnectionCount = ref._transportConnectionCount;
 			_distance = ref._distance;
+			_endApproachDuration = ref._endApproachDuration;
+			_startApproachDuration = ref._startApproachDuration;
 			return *this;
 		}
 
@@ -358,9 +376,8 @@ namespace synthese
 			return _distance;
 		}
 
-		bool Journey::isBestThan( const Journey& other, const AccessDirection& direction ) const
+		bool Journey::isBestThan( const Journey& other) const
 		{
-
 			//! <li>An empty journey cannot be superior to another</li> 
 			if (empty())
 				return false;
@@ -370,15 +387,15 @@ namespace synthese
 				return true;
 
 			//! <li>Time comparison</li>
-			DateTime currentsTime = (direction == TO_DESTINATION) 
+			DateTime currentsTime = (_method == TO_DESTINATION) 
 				? getArrivalTime ()
 				: getDepartureTime ();
 
-			DateTime othersTime = (direction == TO_DESTINATION) 
+			DateTime othersTime = (_method == TO_DESTINATION) 
 				? other.getArrivalTime ()
 				: other.getDepartureTime ();
 
-			bool betterTime = (direction == TO_DESTINATION) 
+			bool betterTime = (_method == TO_DESTINATION) 
 				? currentsTime < othersTime
 				: currentsTime > othersTime; 
 
@@ -434,6 +451,56 @@ namespace synthese
 					return false;
 			}
 			return true;
+		}
+
+		void Journey::setEndApproachDuration(int duration)
+		{
+			_endApproachDuration = duration;
+		}
+
+		void Journey::shift( int duration, int continuousServiceRange /*= UNKNOWN_VALUE*/ )
+		{
+			for(JourneyLegs::iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
+			{
+				it->shift(duration);
+			}
+			_continuousServiceRange = (continuousServiceRange == UNKNOWN_VALUE) ? _continuousServiceRange - duration : continuousServiceRange;
+		}
+
+		void Journey::setStartApproachDuration( int duration )
+		{
+			_startApproachDuration = duration;
+		}
+
+		const env::ServiceUse& Journey::getEndServiceUse() const
+		{
+			return
+				(_method == TO_DESTINATION)
+				? getLastJourneyLeg()
+				: getFirstJourneyLeg()
+			;
+		}
+
+		const env::ServiceUse& Journey::getStartServiceUse() const
+		{
+			return
+				(_method == TO_DESTINATION)
+				? getFirstJourneyLeg()
+				: getLastJourneyLeg()
+			;
+		}
+
+		void Journey::reverse()
+		{
+			_method = (_method == TO_DESTINATION) ? FROM_ORIGIN : TO_DESTINATION;
+			int duration(_startApproachDuration);
+			_startApproachDuration = _endApproachDuration;
+			_endApproachDuration = duration;
+		}
+
+		synthese::AccessDirection Journey::getMethod() const
+		{
+			return _method;
 		}
 	}
 }

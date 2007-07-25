@@ -21,7 +21,6 @@
 */
 
 #include "33_route_planner/JourneyLineListInterfaceElement.h"
-#include "33_route_planner/Journey.h"
 
 #include "30_server/Request.h"
 
@@ -29,6 +28,7 @@
 #include "15_env/Line.h"
 #include "15_env/LineMarkerInterfacePage.h"
 #include "15_env/ServiceUse.h"
+#include "15_env/Journey.h"
 
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"

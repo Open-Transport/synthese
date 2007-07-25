@@ -112,11 +112,7 @@ namespace synthese
 					const Vertex* destination,
 					const Vertex* origin) const
 		{
-			VertexAccess access;
-			access.approachDistance = 0;
-			access.approachTime = 0;
-
-			return access;
+			return VertexAccess(0, 0, Journey(accessDirection));
 		}
 
 		const std::string& Place::getName13() const

@@ -82,14 +82,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Journey.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Journey.h"
-				>
-			</File>
-			<File
 				RelativePath=".\JourneyLegComparator.cpp"
 				>
 			</File>

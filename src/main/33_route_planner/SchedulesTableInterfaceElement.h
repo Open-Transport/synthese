@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/Journey.h"
+#include "15_env/Types.h"
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
@@ -31,7 +31,9 @@ namespace synthese
 	namespace env
 	{
 		class ConnectionPlace;
+		class Journey;
 	}
+
 	namespace routeplanner
 	{
 		/** Timetable generator.
@@ -47,7 +49,7 @@ namespace synthese
 			typedef std::vector<bool> LockedLinesList;
 
 			static int OrdrePAEchangeSiPossible(
-				const Journeys&
+				const env::Journeys&
 				, PlaceList&
 				, const LockedLinesList&
 				, int PositionOrigine
@@ -60,15 +62,28 @@ namespace synthese
 
 				L'insertion décale les arrêts suivants une ligne plus bas. Si un trajet piéton (représenté par deux flèches devant être attenantes) se trouve à la position demandée, alors l'arrêt est placé en suivant pour ne pas rompre le cheminement piéton.
 			*/
-			static int OrdrePAInsere(PlaceList&, const LockedLinesList&, const synthese::env::ConnectionPlace*, int Position );
+			static int OrdrePAInsere(
+				PlaceList&
+				, const LockedLinesList&
+				, const env::ConnectionPlace*
+				, int Position
+			);
 			
 			/** Contrôle de la compatibilité entre l'ordre des arrêts dans la grille horaire et les arrêts du trajet. */
-			static std::vector<bool> OrdrePAConstruitLignesAPermuter( const PlaceList&, const Journey& __TrajetATester, int LigneMax );
+			static std::vector<bool> OrdrePAConstruitLignesAPermuter(
+				const PlaceList&
+				, const env::Journey& __TrajetATester
+				, int LigneMax
+			);
 			
 			/** Recherche de point d'arrêt dans la liste des points d'arrêt.			*/
-			static bool OrdrePARechercheGare( const PlaceList&, int& i, const synthese::env::ConnectionPlace* GareAChercher );
+			static bool OrdrePARechercheGare(
+				const PlaceList&
+				, int& i
+				, const env::ConnectionPlace* GareAChercher
+			);
 
-			static PlaceList getStopsListForScheduleTable( const synthese::routeplanner::Journeys& );
+			static PlaceList getStopsListForScheduleTable( const env::Journeys& );
 
 		public:
 			/** Display.

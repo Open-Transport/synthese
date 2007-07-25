@@ -25,6 +25,7 @@
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace env;
 
 	namespace routeplanner
 	{
@@ -36,7 +37,7 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 			) const
 		{
-			const void* vobj = static_cast<const void*>(object);
+			const void* vobj(static_cast<const void*>(object));
 			ParametersVector pv;
 
 			/// @todo Implement the building of the parameter vector with parameters of the function

@@ -176,7 +176,9 @@ namespace synthese
 		{
 			AccessParameters ap;
 			ap.maxTransportConnectionCount = _maxTransportConnectionsCount;
-			
+			ap.approachSpeed = 67; // m/min = 4 km/h
+			ap.maxApproachDistance = 1500;
+			ap.maxApproachTime = 23;
 			return ap;
 		}
 	}

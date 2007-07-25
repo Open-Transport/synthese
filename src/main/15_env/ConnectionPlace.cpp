@@ -186,7 +186,7 @@ namespace synthese
 			const Vertex* destination,
 			const Vertex* origin
 		) const	{
-			VertexAccess access;
+			VertexAccess access(accessDirection);
 
 			if (origin != 0)
 			{

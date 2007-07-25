@@ -353,6 +353,7 @@ namespace synthese
 			are inspected.
 			*/
 			static boost::shared_ptr<const AddressablePlace> fetchAddressablePlace (const uid& id);
+			static boost::shared_ptr<AddressablePlace> fetchUpdateableAddressablePlace (const uid& id);
 
 			static boost::shared_ptr<const IncludingPlace> fetchIncludingPlace (const uid& id);
 

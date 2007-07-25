@@ -36,7 +36,6 @@
 
 #include "33_route_planner/BestVertexReachesMap.h"
 #include "33_route_planner/JourneyLegComparator.h"
-#include "33_route_planner/Journey.h"
 
 namespace synthese
 {
@@ -54,12 +53,11 @@ namespace synthese
 		class Service;
 		class SquareDistance;
 		class ServicePointer;
+		class Journey;
 	}
 
 	namespace routeplanner
 	{
-		class JourneyLeg;
-
 		typedef enum {DEPARTURE_FIRST, ARRIVAL_FIRST} PlanningOrder;
 
 		/** Route planner class.
@@ -139,20 +137,24 @@ namespace synthese
 					- true : solutions allowing a comfort raising and a time saving are selected
 					- false :solutions allowing a time saving are only selected
 			*/
-			void findBestJourney (Journey& result
-					  , const env::VertexAccessMap& ovam
-					  , const env::VertexAccessMap& dvam
-					  , const AccessDirection& accessDirection
-					  , const Journey& currentJourney
-					  , bool strictTime
-					  , bool optim);
+			void findBestJourney(
+				env::Journey& result
+				, const env::VertexAccessMap& ovam
+				, const env::VertexAccessMap& dvam
+				, const AccessDirection& accessDirection
+				, const env::Journey& currentJourney
+				, bool strictTime
+				, bool optim
+			);
 			
 			
-			void computeRoutePlanningDepartureArrival (Journey& result,
-								   const synthese::env::VertexAccessMap& ovam,
-								   const synthese::env::VertexAccessMap& dvam);
+			void computeRoutePlanningDepartureArrival(
+				env::Journey& result
+				, const env::VertexAccessMap& ovam
+				, const env::VertexAccessMap& dvam
+			);
 
-			Journeys computeJourneySheetDepartureArrival ();
+			env::Journeys computeJourneySheetDepartureArrival ();
 
 			//@}
 

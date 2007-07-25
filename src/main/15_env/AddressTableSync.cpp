@@ -102,6 +102,8 @@ namespace synthese
 
 		}
 
+
+
 		void AddressTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool)
 		{
 			for (int i=0; i<rows.getNbRows(); ++i)
@@ -113,8 +115,10 @@ namespace synthese
 				else
 				{
 					shared_ptr<Address> object(new Address);
+					shared_ptr<AddressablePlace> place = EnvModule::fetchUpdateableAddressablePlace(Conversion::ToLongLong(rows.getColumn(i, COL_PLACEID)));
 					load(object.get(), rows, i);
 					EnvModule::getAddresses().add(object);
+					place->addAddress(object.get());
 				}
 			}
 		}

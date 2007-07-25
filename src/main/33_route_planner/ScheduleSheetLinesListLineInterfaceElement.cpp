@@ -34,6 +34,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace env;
 
 	namespace routeplanner
 	{

@@ -22,6 +22,7 @@
 
 #include "15_env/PermanentService.h"
 #include "15_env/Edge.h"
+#include "15_env/Path.h"
 
 #include "04_time/module.h"
 
@@ -101,7 +102,7 @@ namespace synthese
 		PermanentService::PermanentService( Path* path )
 			: Service(UNKNOWN_VALUE, path)
 		{
-
+			path->setAllDays(true);
 		}
 	}
 }

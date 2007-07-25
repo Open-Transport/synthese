@@ -23,8 +23,6 @@
 #ifndef SYNTHESE_ROUTEPLANNER_JOURNEY_H
 #define SYNTHESE_ROUTEPLANNER_JOURNEY_H
 
-#include "33_route_planner/Types.h"
-
 #include "15_env/Types.h"
 
 namespace synthese
@@ -37,28 +35,39 @@ namespace synthese
 	{
 		class Edge;
 		class Axis;
-	}
-
-	namespace routeplanner
-	{
-		class JourneyLeg;
 
 		/** Journey class.
-			@ingroup m33
+			@ingroup m15
 		*/
 		class Journey
 		{
 		private:
+			//! @name Content
+			//@{
+				JourneyLegs		_journeyLegs;
+			//@}
 
-			JourneyLegs	_journeyLegs;
-			int			_continuousServiceRange;
-			int			_effectiveDuration;
-			int			_transportConnectionCount;
-			int			_distance;
+			//! @name Supplemental data
+			//@{
+				AccessDirection	_method;
+				int				_continuousServiceRange;
+			//@}
+
+			//! @name Query cache
+			//@{
+				int				_effectiveDuration;
+				int				_transportConnectionCount;
+				int				_distance;
+			//@}
+			
+			//! @name Oriented supplemental data
+			//@{
+				int				_startApproachDuration;
+				int				_endApproachDuration;
+			//@}
 
 		 public:
-
-			Journey ();
+			Journey(AccessDirection method = TO_DESTINATION);
 			~Journey ();
 
 
@@ -71,6 +80,7 @@ namespace synthese
 				*/
 				const JourneyLegs& getJourneyLegs() const;
 
+				AccessDirection getMethod() const;
 
 				/** Returns the effective amount of time spent
 					travelling, excluding tranfer delays.
@@ -83,27 +93,38 @@ namespace synthese
 					@return Range duration in minutes, or 0 if unique service.
 				*/
 				int getContinuousServiceRange () const;
+			//@}
 
-				int getDistance () const;
+			//! @name Setters
+			//@{
+				void setContinuousServiceRange (int continuousServiceRange);
+			//@}
 
+			//! @name Orientation relative methods
+			//@{
+				const env::ServiceUse& getEndServiceUse() const;
+				const env::ServiceUse& getStartServiceUse() const;
+				void setEndApproachDuration(int duration);
+				void setStartApproachDuration(int duration);
 			//@}
 
 			//! @name Query methods
 			//@{
-				bool	empty()	const;
+				bool empty()	const;
 				int getJourneyLegCount () const;
 				
 				const env::ServiceUse& getJourneyLeg (int index) const;
 				const env::ServiceUse& getFirstJourneyLeg () const;
 				const env::ServiceUse& getLastJourneyLeg () const;
+				
+				const env::Edge* getOrigin() const;
+				const env::Edge* getDestination() const;
 
-				const synthese::env::Edge* getOrigin() const;
-				const synthese::env::Edge* getDestination() const;
-
-				const synthese::time::DateTime& getDepartureTime () const;
-				const synthese::time::DateTime& getArrivalTime () const;
+				time::DateTime getDepartureTime () const;
+				time::DateTime getArrivalTime () const;
 
 				int getDuration () const;
+				int getDistance () const;
 		
 		
 				/** Detects max alarm level in journey.
@@ -118,15 +139,12 @@ namespace synthese
 				*/
 				int getMaxAlarmLevel () const;
 
-
-				void setContinuousServiceRange (int continuousServiceRange);
-
 				/** Comparison between journeys doing the same relation..
 					@param other Journey to compare with
-					@param direction Direction of the route planning
 					@return true if the current journey is a best choice than the other one
+					@warning Journey objects must have same method
 				*/
-				bool isBestThan(const Journey& other, const AccessDirection& direction) const;
+				bool isBestThan(const Journey& other) const;
 
 
 				bool verifyAxisConstraints(const env::Axis* axis) const;
@@ -138,11 +156,17 @@ namespace synthese
 			//@{
 				void clear ();
 
-				void prepend (const env::ServiceUse& leg);
+				void push(const ServiceUse& leg);
+				void push(const Journey& journey);
+				
+				void prepend (const ServiceUse& leg);
 				void prepend (const Journey& journey);
 
 				void append (const env::ServiceUse& leg);
 				void append (const Journey& journey);
+
+				void shift(int duration, int continuousServiceRange = UNKNOWN_VALUE);
+				void reverse();
 			//@}
 
 			Journey& operator = (const Journey& ref);

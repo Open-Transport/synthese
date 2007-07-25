@@ -24,11 +24,8 @@
 #define SYNTHESE_routeplanner_Types_h__
 
 #include <vector>
-#include <deque>
 
 #include <boost/shared_ptr.hpp>
-
-#include "15_env/ServiceUse.h"
 
 namespace synthese
 {
@@ -39,14 +36,10 @@ namespace synthese
 
 	namespace routeplanner
 	{
-		class Journey;
 
 		/** @addtogroup m33
 			@{
 		*/
-
-		typedef std::vector<Journey>						Journeys;
-		typedef std::deque<env::ServiceUse>					JourneyLegs;
 
 		typedef std::vector<const env::ConnectionPlace*>	JourneyBoardPlaces;
 

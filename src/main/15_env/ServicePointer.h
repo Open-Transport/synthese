@@ -62,7 +62,7 @@ namespace synthese
 				const env::Edge*			_edge;
 			//@}
 
-
+		protected:
 			//! @name Result elements
 			//@{
 				const Service*				_service;
@@ -71,7 +71,6 @@ namespace synthese
 				int							_serviceIndex;
 			//@}
 
-		protected:
 				int							_range;
 
 		public:

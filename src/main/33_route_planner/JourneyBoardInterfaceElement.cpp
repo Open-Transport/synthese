@@ -25,7 +25,6 @@
 #include "33_route_planner/JourneyBoardStopCellInterfacePage.h"
 #include "33_route_planner/JourneyBoardServiceCellInterfacePage.h"
 #include "33_route_planner/JourneyBoardJunctionCellInterfacePage.h"
-#include "33_route_planner/Journey.h"
 #include "33_route_planner/RoutePlannerModule.h"
 
 #include "30_server/Request.h"
@@ -38,6 +37,7 @@
 #include "15_env/BikeCompliance.h"
 #include "15_env/ReservationRule.h"
 #include "15_env/ServiceUse.h"
+#include "15_env/Journey.h"
 
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"

@@ -94,5 +94,13 @@ namespace synthese
 		{
 			return _squareDistance;
 		}
+
+		void ServiceUse::shift( int duration)
+		{
+			_actualTime += duration;
+			_originDateTime += duration;
+			_secondActualDateTime += duration;
+			setServiceRange(getServiceRange() - duration);
+		}
 	}
 }

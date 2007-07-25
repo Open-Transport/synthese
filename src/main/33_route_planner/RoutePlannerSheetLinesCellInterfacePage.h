@@ -25,9 +25,13 @@
 
 namespace synthese
 {
-	namespace routeplanner
+	namespace env
 	{
 		class Journey;
+	}
+
+	namespace routeplanner
+	{
 
 		/** Schedule sheet lines list cell.
 			@code schedule_sheet_lines_cell @endcode
@@ -46,7 +50,7 @@ namespace synthese
 				std::ostream& stream
 				, size_t columnNumber
 				, interfaces::VariablesMap& variables
-				, const Journey* object
+				, const env::Journey* object
 				, const server::Request* request= NULL ) const;
 		};
 	}

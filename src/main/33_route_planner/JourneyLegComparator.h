@@ -24,8 +24,7 @@
 #ifndef SYNTHESE_ROUTEPLANNER_JOURNEYLEGCOMPARATOR_H
 #define SYNTHESE_ROUTEPLANNER_JOURNEYLEGCOMPARATOR_H
 
-#include "33_route_planner/Journey.h"
-
+#include "15_env/Journey.h"
 #include "15_env/Types.h"
 
 namespace synthese
@@ -46,7 +45,7 @@ namespace synthese
 		{
 		private:
 
-			typedef const env::ServiceUse& (Journey::*PtrEdgeAccessor) () const;
+			typedef const env::ServiceUse& (env::Journey::*PtrEdgeAccessor) () const;
 			const PtrEdgeAccessor _firstServiceUseAccessor;
 			const PtrEdgeAccessor _secondServiceUseAccessor;
 
@@ -55,7 +54,7 @@ namespace synthese
 			JourneyLegComparator (const AccessDirection& accessDirection);
 			~JourneyLegComparator ();
 
-			int operator () (const Journey& jl1, const Journey& jl2) const;
+			int operator () (const env::Journey& jl1, const env::Journey& jl2) const;
 		    
 		};
 	}

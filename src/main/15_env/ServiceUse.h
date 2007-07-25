@@ -66,6 +66,11 @@ namespace synthese
 				int						getDuration()				const;
 				int						getDistance()				const;
 			//@}
+
+			//! @name Update
+			//@{
+				void shift(int duration);
+			//@}
 		};
 	}
 }

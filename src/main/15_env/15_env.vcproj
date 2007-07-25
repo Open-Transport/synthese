@@ -385,6 +385,14 @@
 				Name="Use"
 				>
 				<File
+					RelativePath=".\Journey.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Journey.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ServicePointer.cpp"
 					>
 				</File>

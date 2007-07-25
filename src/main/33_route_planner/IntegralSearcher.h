@@ -38,6 +38,7 @@ namespace synthese
 		class Vertex;
 		class VertexAccessMap;
 		class Edge;
+		class Journey;
 	}
 
 	namespace routeplanner
@@ -57,11 +58,8 @@ namespace synthese
 		class IntegralSearcher
 		{
 		private:
-			typedef std::list<env::ServiceUse>									SimplifiedResult;
-			typedef std::map<const env::Vertex*, SimplifiedResult::iterator>	SimplifiedResultIndex;
-
-			typedef std::map<const env::Vertex*, Journey> IntegralSearchWorkingResult;
-
+			typedef std::map<const env::Vertex*, env::Journey> IntegralSearchWorkingResult;
+			
 			typedef const env::Edge* (env::Edge::*PtrEdgeStep) () const;
 
 			//! @name Parameters
@@ -78,7 +76,6 @@ namespace synthese
 				time::DateTime&				_minMaxDateTimeAtDestination;
 				const int					_previousContinuousServiceDuration;
 				const time::DateTime&		_previousContinuousServiceLastDeparture;
-				const Journey&				_accessJourney;
 			//@}
 
 			//! @name Result
@@ -103,34 +100,14 @@ namespace synthese
 			void _integralSearchRecursion (
 				const env::VertexAccessMap& vertices
 				, const time::DateTime& desiredTime
-				, const Journey& currentJourney
+				, const env::Journey& currentJourney
 				, int maxDepth
 				, bool strictTime = false
-				);
+			);
 
-			bool _evaluateServiceUse(
-				const env::ServiceUse& serviceUse
-				, const Journey& currentJourney
-				) const;
-
-			class UselessServiceUse
-			{
-			private:
-				const IntegralSearcher&	_integralSearcher;
-				const Journey&			_currentJourney;
-				bool					_strictTime;
-
-			public:
-				UselessServiceUse(
-					const IntegralSearcher& integralSearcher
-					, const Journey& currentJourney
-					, bool strictTime
-					);
-
-				bool operator() (const env::ServiceUse& serviceUse);
-			};
-
-			friend class UselessServiceUse;
+			bool _evaluateJourney(
+				const env::Journey& journey
+			) const;
 
 		public:
 			IntegralSearcher(
@@ -146,11 +123,11 @@ namespace synthese
 				, time::DateTime&				minMaxDateTimeAtDestination
 				, int							previousContinuousServiceDuration
 				, const time::DateTime&			previousContinuousServiceLastDeparture
-				, const Journey&				accessJourney
 				);
 
-			Journeys integralSearch(
+			env::Journeys integralSearch(
 				const env::VertexAccessMap& vertices
+				, const env::Journey& journey
 				, const time::DateTime& desiredTime
 				, int maxDepth
 				, bool strictTime = false

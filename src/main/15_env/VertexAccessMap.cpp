@@ -141,7 +141,7 @@ namespace synthese
 				double sumy (0.0);
 				double points(0);
 				
-				for (std::map<const Vertex*, VertexAccess>::const_iterator it = _map.begin ();
+				for (VamMap::const_iterator it = _map.begin ();
 					 it != _map.end (); ++it)
 				{
 					if (it->first->getX() > 0 && it->first->getY() > 0)
@@ -178,7 +178,7 @@ namespace synthese
 				_isobarycenterMaxSquareDistance.setSquareDistance (0);
 				if (!_isobarycenter.isUnknown())
 				{
-					for (std::map<const Vertex*, VertexAccess>::const_iterator it = _map.begin ();
+					for (VamMap::const_iterator it = _map.begin ();
 						it != _map.end (); ++it)
 					{
 						if (it->first->getX() > 0 && it->first->getY() > 0)
@@ -207,8 +207,7 @@ namespace synthese
 
 
 
-		const std::map<const Vertex*, VertexAccess>& 
-		VertexAccessMap::getMap () const
+		const VertexAccessMap::VamMap& VertexAccessMap::getMap () const
 		{
 			return _map;
 		}
@@ -220,7 +219,7 @@ namespace synthese
 					MergeAddresses mergeAddresses,
 					MergePhysicalStops mergePhysicalStops)
 		{
-			for (std::map<const Vertex*, VertexAccess>::const_iterator itps = vam.getMap ().begin ();
+			for (VamMap::const_iterator itps = vam.getMap ().begin ();
 			 itps != vam.getMap ().end (); ++itps)
 			{
 			if ( (mergeAddresses == MERGE_ADDRESSES) && 
@@ -236,10 +235,6 @@ namespace synthese
 			}
 
 		}
-
-
-
-
 	}
 }
 

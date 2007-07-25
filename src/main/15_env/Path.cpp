@@ -107,34 +107,9 @@ namespace synthese
 		bool 
 		Path::isInService (const synthese::time::Date& date) const
 		{
-			return _calendar.isMarked ( date );
-
+			return _allDays || _calendar.isMarked ( date );
 		}
 
-
-
-
-		void 
-		Path::updateCalendar ()
-		{
-			/* MJ TODO REVIEW this
-
-			_calendar.reset ();
-			LineStop* lastLineStop = _lineStops.back();
-			for (int s=0; s<_services.size (); ++s)
-			{
-				if ( lastLineStop->getLastArrivalSchedule (s).getDaysSinceDeparture() != 
-				_lineStops.front()->getFirstDepartureSchedule(s).getDaysSinceDeparture() )
-				{
-					_calendar.reset (true);
-					break;
-				}
-			// MJ constness problem !
-				((Service*) getService (s))->getCalendar ()->setInclusionToMask (_calendar);
-			}
-			*/
-
-		}
 
 
 		const Edge* 
@@ -285,6 +260,11 @@ namespace synthese
 		{
 			for (Edges::const_iterator it = _edges.begin(); it != _edges.end(); ++it)
 				(*it)->updateServiceIndex();
+		}
+
+		void Path::setAllDays( bool value )
+		{
+			_allDays = value;
 		}
 	}
 }

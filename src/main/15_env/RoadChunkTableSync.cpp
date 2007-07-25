@@ -77,7 +77,8 @@ namespace synthese
 
 			// From address
 			uid fromAddressId (Conversion::ToLongLong (rows.getColumn (rowIndex, RoadChunkTableSync::COL_ADDRESSID)));
-			shared_ptr<const Address> fromAddress = EnvModule::getAddresses ().get (fromAddressId);
+			shared_ptr<Address> fromAddress(EnvModule::getAddresses().getUpdateable(fromAddressId));
+			object->setParentPath(fromAddress->getRoad());
 			object->setFromAddress(fromAddress.get());
 
 			// Via points
