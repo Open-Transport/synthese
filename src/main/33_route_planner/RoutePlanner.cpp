@@ -126,7 +126,7 @@ namespace synthese
 				, _bestArrivalVertexReachesMap
 				, _destinationVam
 				, _calculationTime
-				, _maxArrivalTime
+				, DateTime(_journeySheetEndTime)
 				, 0
 				, DateTime(TIME_UNKNOWN)
 				);
@@ -207,7 +207,7 @@ namespace synthese
 				, _bestDepartureVertexReachesMap
 				, _originVam
 				, _calculationTime
-				, _minDepartureTime
+				, DateTime(_journeySheetStartTime)
 				, 0
 				, DateTime(TIME_UNKNOWN)
 				);
@@ -406,6 +406,12 @@ namespace synthese
 			// A revoir il faut surement faire currentJourney = result
 			findBestJourney (result, dvam, ovam, FROM_ORIGIN, currentJourney, true, true);
 
+			if (result.getDepartureTime() > _journeySheetEndTime)
+			{
+				result.clear();
+				return;
+			}
+
 			// Inclusion of approach journeys
 			result.setStartApproachDuration(0);
 			result.setEndApproachDuration(0);
@@ -509,16 +515,11 @@ namespace synthese
 				// Recursion if needed
 				if (recursion)
 				{
-					Journey tempJourney (currentJourney);
 					Journey recursiveCandidate(accessDirection);
-					if (accessDirection == TO_DESTINATION)
-						tempJourney.append (*itj);
-					else
-						tempJourney.prepend(*itj);
-
+					
 					const Vertex* nextVertex = (accessDirection == TO_DESTINATION) 
-						? tempJourney.getDestination ()->getFromVertex ()
-						: tempJourney.getOrigin ()->getFromVertex ();
+						? itj->getDestination ()->getFromVertex ()
+						: itj->getOrigin ()->getFromVertex ();
 
 					VertexAccessMap nextVam;
 					nextVertex->getPlace ()->getImmediateVertices (nextVam,
@@ -529,7 +530,7 @@ namespace synthese
 						, nextVertex
 					);
 
-					findBestJourney (recursiveCandidate, nextVam, dvam, accessDirection, tempJourney, false, optim);
+					findBestJourney (recursiveCandidate, nextVam, dvam, accessDirection, *itj, false, optim);
 
 					if (!recursiveCandidate.empty())
 					{
