@@ -50,6 +50,8 @@ namespace synthese
 		const std::string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_ID = "dp";
 		const std::string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_ID = "ap";
 		const std::string RoutePlannerFunction::PARAMETER_DATE = "da";
+		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER("msn");
+		const string RoutePlannerFunction::PARAMETER_DAY("dy");
 
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
@@ -89,32 +91,71 @@ namespace synthese
 			if (!_arrival_place.get())
 				throw RequestException("Specified arrival place not found");
 
-			// Date
-			it = map.find(PARAMETER_DATE);
+			// Day
+			it = map.find(PARAMETER_DAY);
 			if (it != map.end())
 			{
 				try
 				{
-					_date = Date::FromInternalString(it->second);
+					_startDate = DateTime(
+						Date::FromInternalString(it->second)
+						, Hour(2, 30)
+						);
+					_endDate.addDaysDuration(1);
 				}
 				catch (...)
 				{
 					throw RequestException("Bad date");
 				}
 			}
+			else
+			{
+				// Date
+				it = map.find(PARAMETER_DATE);
+				if (it != map.end())
+				{
+					try
+					{
+						_startDate = DateTime::FromInternalString(it->second);
+						_endDate = _startDate;
+						_endDate.addDaysDuration(1);
+						_endDate.setHour(Hour(2,30));
+					}
+					catch (...)
+					{
+						throw RequestException("Bad date");
+					}
+				}
+			}
+
+			// Max solutions number
+			it = map.find(PARAMETER_MAX_SOLUTIONS_NUMBER);
+			if (it != map.end())
+				_maxSolutionsNumber = Conversion::ToInt(it->second);
+			if (_maxSolutionsNumber < 0)
+				throw RequestException("Bad max solutions number");
 		}
 
 		void RoutePlannerFunction::_run( std::ostream& stream ) const
 		{
-			DateTime startDate(_date);
-			startDate.updateHour(2,30);
-			DateTime endDate(startDate);
-			endDate.addDaysDuration(1);
-			/// @todo Add one minute per kilometer between departure place and arrival place
-			RoutePlanner r(_departure_place.get(), _arrival_place.get(), _accessParameters, PlanningOrder(), startDate, endDate);
+			RoutePlanner r(
+				_departure_place.get()
+				, _arrival_place.get()
+				, _accessParameters
+				, PlanningOrder()
+				, _startDate
+				, _endDate
+				, _maxSolutionsNumber
+			);
 			Journeys jv = r.computeJourneySheetDepartureArrival();
 			VariablesMap vm;
 			_page->display(stream, vm, &jv, _request);
+		}
+
+		RoutePlannerFunction::RoutePlannerFunction()
+			: _maxSolutionsNumber(UNKNOWN_VALUE)
+		{
+
 		}
 	}
 }

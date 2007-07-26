@@ -69,55 +69,50 @@ namespace synthese
 
 		private:
 			
+			//! @name Parameters
+			//@{
+				const env::Place* _origin;  //<! Origin place for route planning.
+				const env::Place* _destination;  //!< Destination place for route planning.
+				const AccessParameters _accessParameters;
+				const time::DateTime _journeySheetStartTime;  //!< Start time of schedule sheet.
+				const time::DateTime _journeySheetEndTime;    //!< End time of schedule sheet.
+				const PlanningOrder _planningOrder;  //!< Define planning sequence.
+				const time::DateTime _calculationTime;    //!< Time of calculation (initialized to current time)
+				const int _maxSolutionsNumber;
+			//@}
 
-			const synthese::env::Place* _origin;  //<! Origin place for route planning.
-			const synthese::env::Place* _destination;  //!< Destination place for route planning.
-
-			synthese::env::VertexAccessMap _originVam;
-			synthese::env::VertexAccessMap _destinationVam;
-
-			const AccessParameters _accessParameters;
-		    
-			const PlanningOrder _planningOrder;  //!< Define planning sequence.
-
-
-			synthese::time::DateTime _minDepartureTime;  //!< Min departure time.
-			synthese::time::DateTime _maxArrivalTime;  //!< Max arrival time.
-
-			const synthese::time::DateTime _journeySheetStartTime;  //!< Start time of schedule sheet.
-			const synthese::time::DateTime _journeySheetEndTime;    //!< End time of schedule sheet.
-
-			const synthese::time::DateTime _calculationTime;    //!< Time of calculation (initialized to current time)
-
-			int _previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
-
-			synthese::time::DateTime _previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
-		    
-			BestVertexReachesMap _bestDepartureVertexReachesMap;  //!< 
-			BestVertexReachesMap _bestArrivalVertexReachesMap;  //!< 
-
-			JourneyLegComparator _journeyLegComparatorForBestArrival;
-			JourneyLegComparator _journeyLegComparatorForBestDeparture;
-		    
-	    
+			//! @name Working variables
+			//@{
+				env::VertexAccessMap _originVam;
+				env::VertexAccessMap _destinationVam;
+				time::DateTime _minDepartureTime;  //!< Min departure time.
+				time::DateTime _maxArrivalTime;  //!< Max arrival time.
+				int _previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
+				time::DateTime _previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
+				BestVertexReachesMap _bestDepartureVertexReachesMap;  //!< 
+				BestVertexReachesMap _bestArrivalVertexReachesMap;  //!< 
+				JourneyLegComparator _journeyLegComparatorForBestArrival;
+				JourneyLegComparator _journeyLegComparatorForBestDeparture;
+			//@}
 
 		 public:
-			 RoutePlanner (const synthese::env::Place* origin,
-				 const synthese::env::Place* destination,
+			 RoutePlanner(
+				 const env::Place* origin,
+				 const env::Place* destination,
 				 const AccessParameters& accessParameters,
 				 const PlanningOrder& planningOrder,
-				 const synthese::time::DateTime& journeySheetStartTime,
-				 const synthese::time::DateTime& journeySheetEndTime);
+				 const time::DateTime& journeySheetStartTime,
+				 const time::DateTime& journeySheetEndTime
+				 , int maxSolutionsNumber = UNKNOWN_VALUE
+			);
 
 			~RoutePlanner ();
 
 
 			//! @name Getters/Setters
 			//@{
-
-			const synthese::env::Place* getOrigin () const;
-			const synthese::env::Place* getDestination () const;
-
+				const env::Place* getOrigin () const;
+				const env::Place* getDestination () const;
 			//@}
 
 			//! @name Query methods
@@ -157,16 +152,6 @@ namespace synthese
 			env::Journeys computeJourneySheetDepartureArrival ();
 
 			//@}
-
-
-
-			//! @name Update methods
-			//@{
-		    
-			//@}
-
-
-
 		};
 	}
 }

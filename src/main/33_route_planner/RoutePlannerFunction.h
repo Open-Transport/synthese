@@ -51,6 +51,8 @@ namespace synthese
 			static const std::string PARAMETER_DEPARTURE_PLACE_ID;
 			static const std::string PARAMETER_ARRIVAL_PLACE_ID;
 			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_DAY;
+			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER;
 			
 			//! \name Parameters
 			//@{
@@ -58,8 +60,10 @@ namespace synthese
 				boost::shared_ptr<const RoutePlannerInterfacePage>	_page;
 				boost::shared_ptr<const env::Place>					_departure_place;
 				boost::shared_ptr<const env::Place>					_arrival_place;
-				time::Date											_date;
+				time::DateTime										_startDate;
+				time::DateTime										_endDate;
 				AccessParameters									_accessParameters;
+				int													_maxSolutionsNumber;
 			//@}
 
 
@@ -77,6 +81,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void _run(std::ostream& stream) const;
+
+			RoutePlannerFunction();
 		};
 	}
 }

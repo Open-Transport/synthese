@@ -316,9 +316,6 @@ namespace synthese
 							getParentPath ()->getService(next)->getFromPresenceTime(ServicePointer::DEPARTURE_TO_ARRIVAL, this, departureMoment, calculationMoment)
 							);
 
-						if (servicePointer.getActualDateTime() > departureMoment)
-							departureMoment = servicePointer.getActualDateTime();
-
 						if (!servicePointer.getService())
 							continue;
 
@@ -364,7 +361,6 @@ namespace synthese
 						ServicePointer servicePointer(
 							getParentPath ()->getService(previous)->getFromPresenceTime(ServicePointer::ARRIVAL_TO_DEPARTURE, this, arrivalMoment, computingDateTime)
 							);
-						arrivalMoment = servicePointer.getActualDateTime();
 
 						if (!servicePointer.getService())
 							continue;

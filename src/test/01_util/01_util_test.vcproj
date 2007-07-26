@@ -71,18 +71,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FactoryTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\HtmlFilterTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LexicalMatcherTest.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\LogTest.cpp"
 				>
 			</File>
@@ -108,68 +96,6 @@
 			</File>
 			<File
 				RelativePath=".\UIdTest.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath=".\ConversionTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FactoryTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FactoryTestBase.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FactoryTestChild1.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FactoryTestChild2.h"
-				>
-			</File>
-			<File
-				RelativePath=".\HtmlFilterTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LexicalMatcherTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LogTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LowerCaseFilterTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PlainCharFilterTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RegistrableTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SqlFilterTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ThreadTest.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UIdTest.h"
 				>
 			</File>
 		</Filter>

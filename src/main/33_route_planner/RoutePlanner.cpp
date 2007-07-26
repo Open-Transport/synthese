@@ -56,8 +56,9 @@ namespace synthese
 						const AccessParameters& accessParameters,
 						const PlanningOrder& planningOrder,
 						const DateTime& journeySheetStartTime,
-						const DateTime& journeySheetEndTime)
-			: _origin (origin)
+						const DateTime& journeySheetEndTime
+						, int maxSolutionsNumber
+		)	: _origin (origin)
 			, _destination (destination)
 			, _accessParameters (accessParameters)
 			, _planningOrder (planningOrder)
@@ -67,7 +68,7 @@ namespace synthese
 			, _bestArrivalVertexReachesMap (TO_DESTINATION)
 			, _journeyLegComparatorForBestArrival (TO_DESTINATION)
 			, _journeyLegComparatorForBestDeparture (FROM_ORIGIN)
-
+			, _maxSolutionsNumber(maxSolutionsNumber)
 		{
 			origin->getImmediateVertices (
 				_originVam
@@ -269,11 +270,14 @@ namespace synthese
 
 
 			_previousContinuousServiceDuration = 0;
-
 			// Time loop
-			for (_minDepartureTime = _journeySheetStartTime; 
-			 _minDepartureTime < _journeySheetEndTime; )
-			{
+			for(_minDepartureTime = _journeySheetStartTime; 
+				(_minDepartureTime < _journeySheetEndTime
+				&&	(_maxSolutionsNumber == UNKNOWN_VALUE 
+					|| _maxSolutionsNumber > result.size()
+					)
+				);
+			){
 				journey.clear();
 				computeRoutePlanningDepartureArrival (journey, ovam, dvam);
 				
