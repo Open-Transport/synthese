@@ -107,12 +107,12 @@ namespace synthese
 
 		public:
 			IntegralSearcher(
-				const AccessDirection&			accessDirection
+				AccessDirection					accessDirection
 				, const AccessParameters&		accessParameters
-				, const SearchAddresses&		searchAddresses
-				, const SearchPhysicalStops&	searchPhysicalStops
-				, const UseRoads&				useRoads
-				, const UseLines&				useLines
+				, SearchAddresses				searchAddresses
+				, SearchPhysicalStops			searchPhysicalStops
+				, UseRoads						useRoads
+				, UseLines						useLines
 				, BestVertexReachesMap&			bestVertexReachesMap
 				, const env::VertexAccessMap&	destinationVam
 				, const time::DateTime&			calculationTime

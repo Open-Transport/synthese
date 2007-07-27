@@ -46,12 +46,12 @@ namespace synthese
 // -----------------------------------------------------------------------1 Construction
 
 		IntegralSearcher::IntegralSearcher(
-			const AccessDirection& accessDirection
+			AccessDirection accessDirection
 			, const AccessParameters&	accessParameters
-			, const SearchAddresses& searchAddresses
-			, const SearchPhysicalStops& searchPhysicalStops
-			, const UseRoads& useRoads
-			, const UseLines& useLines
+			, SearchAddresses searchAddresses
+			, SearchPhysicalStops searchPhysicalStops
+			, UseRoads useRoads
+			, UseLines useLines
 			, BestVertexReachesMap& bestVertexReachesMap
 			, const VertexAccessMap& destinationVam
 			, const DateTime& calculationDateTime
