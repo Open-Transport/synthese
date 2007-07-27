@@ -105,10 +105,6 @@ namespace synthese
 				, bool strictTime = false
 			);
 
-			bool _evaluateJourney(
-				const env::Journey& journey
-			) const;
-
 		public:
 			IntegralSearcher(
 				const AccessDirection&			accessDirection
@@ -131,7 +127,12 @@ namespace synthese
 				, const time::DateTime& desiredTime
 				, int maxDepth
 				, bool strictTime = false
-				);
+			);
+
+			bool evaluateJourney(
+				const env::Journey& journey
+			) const;
+
 		};
 	}
 }

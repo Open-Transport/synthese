@@ -47,6 +47,7 @@ namespace synthese
 		{
 			ColumnsVector v;
 			v.push_back("Type");
+			v.push_back("Etat");
 			v.push_back("Description");
 			return v;
 		}
@@ -64,7 +65,13 @@ namespace synthese
 			DBLogEntry::Content c;
 			c.push_back(Conversion::ToString((int) DISPLAY_MAINTENANCE_STATUS));
 			c.push_back(Conversion::ToString(status));
-			DBLog::_addEntry(FACTORY_KEY, status ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_ERROR, c, boost::shared_ptr<const User>(), screen->getKey());
+			DBLog::_addEntry(
+				FACTORY_KEY
+				, status ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_ERROR
+				, c
+				, boost::shared_ptr<const User>()
+				, screen->getKey()
+			);
 		}
 
 		DBLog::ColumnsVector DisplayMaintenanceLog::parse( const DBLogEntry::Content& cols ) const
@@ -104,6 +111,40 @@ namespace synthese
 		std::string DisplayMaintenanceLog::getName() const
 		{
 			return "Supervision et maintenance des tableaux de départs";
+		}
+
+		void DisplayMaintenanceLog::addControlEntry(
+			boost::shared_ptr<const DisplayScreen> screen
+			, bool messageOK
+			, bool cpuOK
+			, std::string cpuCode
+			, bool peripheralsOK
+			, std::string peripheralsCode
+			, bool driverOK
+			, std::string driverCode
+			, bool lightOK
+			, std::string lightCode
+		){
+			stringstream s;
+			s	<< "Message : " << (messageOK ? "OK" : "KO")
+				<< " - CPU : " << (cpuOK ? "OK" : "KO (code" + cpuCode +")")
+				<< " - Périphériques : " << (peripheralsOK ? "OK" : "KO (code" + peripheralsCode +")")
+				<< " - Driver affichage : " << (driverOK ? "OK" : "KO (code" + driverCode +")")
+				<< " - Lumière : " << (lightOK ? "OK" : "KO (code" + lightCode +")")
+			;
+
+			bool status(messageOK && cpuOK && peripheralsOK && driverOK && lightOK);
+
+			DBLogEntry::Content c;
+			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MAINTENANCE_DISPLAY_CONTROL)));
+			c.push_back(Conversion::ToString(s.str()));
+			DBLog::_addEntry(
+				FACTORY_KEY
+				, status ? DBLogEntry::DB_LOG_OK : DBLogEntry::DB_LOG_ERROR
+				, c
+				, boost::shared_ptr<const User>()
+				, screen->getKey()
+				);
 		}
 	}
 }

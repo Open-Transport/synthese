@@ -61,6 +61,7 @@ namespace synthese
 		{
 			switch(level)
 			{
+			case DBLogEntry::DB_LOG_OK : return IMG_URL_OK;
 			case DBLogEntry::DB_LOG_INFO : return IMG_URL_INFO;
 			case DBLogEntry::DB_LOG_WARNING : return IMG_URL_WARNING;
 			case DBLogEntry::DB_LOG_ERROR : return IMG_URL_ERROR;

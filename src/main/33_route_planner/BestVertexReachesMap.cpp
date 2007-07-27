@@ -41,8 +41,7 @@ namespace synthese
 	namespace routeplanner
 	{
 
-		BestVertexReachesMap::BestVertexReachesMap (const AccessDirection& accessDirection)
-			: _accessDirection (accessDirection)
+		BestVertexReachesMap::BestVertexReachesMap ()
 		{
 		    
 		}
@@ -171,10 +170,11 @@ namespace synthese
 
 
 
-		void BestVertexReachesMap::clear ()
+		void BestVertexReachesMap::clear (const AccessDirection& accessDirection)
 		{
 			_bestJourneyLegMap.clear ();
 			_bestTimeMap.clear ();
+			_accessDirection = accessDirection;
 		}
 	}
 }

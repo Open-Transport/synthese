@@ -89,10 +89,7 @@ namespace synthese
 				time::DateTime _maxArrivalTime;  //!< Max arrival time.
 				int _previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
 				time::DateTime _previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
-				BestVertexReachesMap _bestDepartureVertexReachesMap;  //!< 
-				BestVertexReachesMap _bestArrivalVertexReachesMap;  //!< 
-				JourneyLegComparator _journeyLegComparatorForBestArrival;
-				JourneyLegComparator _journeyLegComparatorForBestDeparture;
+				BestVertexReachesMap _bestVertexReachesMap;  //!< 
 			//@}
 
 		 public:
@@ -136,10 +133,8 @@ namespace synthese
 				env::Journey& result
 				, const env::VertexAccessMap& ovam
 				, const env::VertexAccessMap& dvam
-				, const AccessDirection& accessDirection
 				, const env::Journey& currentJourney
 				, bool strictTime
-				, bool optim
 			);
 			
 			

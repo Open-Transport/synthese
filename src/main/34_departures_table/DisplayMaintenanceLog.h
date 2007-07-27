@@ -53,19 +53,53 @@ namespace synthese
 					- contrôle : l'entrée est issue d'une requête de contrôle de bon fonctionnement (une requete sur la dernière entrée connue de ce type donne l'état de l'afficheur, et l'absence d'entrée de ce type depuis un certain délai peut également être interprétée comme une absence de fonctionnement)
 					- admin : l'entrée trace une manipulation faite dans la console d'administration
 					- state : l'entrée trace un basculement manuel en service / hors service (une requete sur la dernière entrée connue de ce type donne l'état de l'afficheur)
+				- Contrôle positif :
+					- 1 : Contrôle positif
+					- 0 : Contrôle négatif
+					- -1 : Pas de contrôle
 				- Description de l'entrée
 				
 		*/
 		class DisplayMaintenanceLog : public util::FactorableTemplate<dblog::DBLog, DisplayMaintenanceLog>
 		{
 		public:
-			typedef enum { DISPLAY_MAINTENANCE_DISPLAY_CONTROL = 10, DISPLAY_MAINTENANCE_DATA_CONTROL = 15, DISPLAY_MAINTENANCE_ADMIN = 20, DISPLAY_MAINTENANCE_STATUS = 30 } EntryType;
+			typedef enum
+			{
+				DISPLAY_MAINTENANCE_DISPLAY_CONTROL = 10
+				, DISPLAY_MAINTENANCE_DATA_CONTROL = 15
+				, DISPLAY_MAINTENANCE_ADMIN = 20
+				, DISPLAY_MAINTENANCE_STATUS = 30
+			} EntryType;
+			
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
 			DBLog::ColumnsVector parse(const dblog::DBLogEntry::Content& cols ) const;
 			std::string getObjectName(uid id) const;
-			static void	addAdminEntry(boost::shared_ptr<const DisplayScreen> screen, const dblog::DBLogEntry::Level& level, boost::shared_ptr<const security::User> user, const std::string& field, const std::string& oldValue, const std::string& newValue);
-			static void	addStatusEntry(boost::shared_ptr<const DisplayScreen> screen, bool status);
+			
+			static void	addAdminEntry(
+				boost::shared_ptr<const DisplayScreen> screen
+				, const dblog::DBLogEntry::Level& level
+				, boost::shared_ptr<const security::User> user
+				, const std::string& field
+				, const std::string& oldValue
+				, const std::string& newValue
+			);
+			static void	addStatusEntry(
+				boost::shared_ptr<const DisplayScreen> screen
+				, bool status
+			);
+			static void addControlEntry(
+				boost::shared_ptr<const DisplayScreen> screen
+				, bool messageOK
+				, bool cpuOK
+				, std::string cpuCode
+				, bool peripheralsOK
+				, std::string peripheralsCode
+				, bool driverOK
+				, std::string driverCode
+				, bool lightOK
+				, std::string lightCode
+			);
 		};
 	}
 }

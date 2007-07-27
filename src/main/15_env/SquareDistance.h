@@ -91,15 +91,6 @@ class SquareDistance
 	//@}
 
 
-
-	/** Inferior or equal operator.
-	  @param op Square distance to compare.
-	  @return true if the square distance to compare is likely to be 
-	  superior or equal to this square distance taking into account inaccuracy.
-	*/
-	int operator <= ( const SquareDistance& op ) const;
-
-
 	/** Strictly inferior operator.
 	  @param op Square distance to compare.
 	  @return true if the square distance is guaranteed to be superior  

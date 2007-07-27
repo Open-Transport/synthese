@@ -90,11 +90,6 @@ namespace synthese
 			return getArrivalEdge()->getMetricOffset() - getDepartureEdge()->getMetricOffset();
 		}
 
-		const SquareDistance& ServiceUse::getSquareDistance() const
-		{
-			return _squareDistance;
-		}
-
 		void ServiceUse::shift( int duration)
 		{
 			_actualTime += duration;

@@ -66,6 +66,9 @@ namespace synthese
 
 			if (!vel.isEmpty())
 				_displayServiceNumber = vel.front();
+
+			if (!vel.isEmpty())
+				_displayQuai = vel.front();
 		}
 
 		string DeparturesTableInterfaceElement::display(
@@ -83,6 +86,7 @@ namespace synthese
 			int departuresToHide(_departuresToHide ? Conversion::ToInt(_departuresToHide->getValue(parameters, variables, object, request)) : 0);
 			const string message (_message ? _message->getValue(parameters, variables, object, request) : string());
 			bool displayServiceNumber(_displayServiceNumber ? Conversion::ToBool(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
+			bool displayQuai(_displayQuai ? Conversion::ToBool(_displayQuai->getValue(parameters, variables, object, request)) : false);
 
 			// Gestion des pages
 			int __NombrePages(1);
@@ -121,13 +125,15 @@ namespace synthese
 
 					// Lancement de l'affichage de la rangee
 					shared_ptr<const DepartureTableRowInterfacePage> page = _page->getInterface()->getPage<DepartureTableRowInterfacePage>();
-					page->display(stream, variables, __Rangee, pageNumber, message, displayServiceNumber, ___DP, request);
+					page->display(stream, variables, __Rangee, pageNumber, displayQuai, displayServiceNumber, ___DP, request);
 
 					// Incrementation du numero de rangee
 					__Rangee += __MultiplicateurRangee;
 				}
+
+				stream << message;
 			}
-			return "";
+			return string();
 		}
 	}
 }

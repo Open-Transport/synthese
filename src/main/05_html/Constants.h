@@ -33,6 +33,7 @@ namespace synthese
 		/** @addtogroup m05
 			@{
 		*/
+		static const std::string IMG_URL_OK("accept.png");
 		static const std::string IMG_URL_WARNING("error.png");
 		static const std::string IMG_URL_ERROR("exclamation.png");
 		static const std::string IMG_URL_INFO("information.png");

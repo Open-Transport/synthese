@@ -52,7 +52,7 @@ namespace synthese
 				, interfaces::VariablesMap& vars
 				, int rowId
 				, int pageNumber
-				, const std::string& message
+				, bool displayQuaiNumber
 				, bool displayServiceNumber
 				, const ArrivalDepartureRow& row
 				, const server::Request* request = NULL

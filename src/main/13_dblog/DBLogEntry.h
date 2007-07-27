@@ -49,7 +49,13 @@ namespace synthese
 		{
 		public:
 			typedef enum 
-			{ DB_LOG_UNKNOWN = 0, DB_LOG_INFO = 10, DB_LOG_WARNING = 50, DB_LOG_ERROR = 99 }	Level;
+			{
+				DB_LOG_UNKNOWN = 0
+				, DB_LOG_OK = 5
+				, DB_LOG_INFO = 10
+				, DB_LOG_WARNING = 50
+				, DB_LOG_ERROR = 99
+			}	Level;
 			typedef std::vector<std::string>											Content;
 
 		private:

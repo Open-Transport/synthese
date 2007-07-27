@@ -37,15 +37,15 @@ namespace synthese
 				, VariablesMap& vars
 				, int rowId
 				, int pageNumber
-                , const std::string& message
+                , bool displayQuai
 				, bool displayServiceNumber
 				, const ArrivalDepartureRow& ptd
 				, const server::Request* request) const
 		{
 			ParametersVector parameters;
-			parameters.push_back(Conversion::ToString (rowId));
-			parameters.push_back(Conversion::ToString (pageNumber));
-			parameters.push_back(message);
+			parameters.push_back(Conversion::ToString(rowId));
+			parameters.push_back(Conversion::ToString(pageNumber));
+			parameters.push_back(Conversion::ToString(displayQuai));
 			parameters.push_back(Conversion::ToString(displayServiceNumber));
 			
 			InterfacePage::display(

@@ -59,27 +59,16 @@ void SquareDistance::setDistance ( long int distance )
 
 
 
-
-
-int 
-SquareDistance::operator <= ( const SquareDistance& op ) const
-{
-    return op.getSquareDistance () - getSquareDistance () > -4;
-}
-
-
-
 int SquareDistance::operator < ( const SquareDistance& op ) const
 {
-    return op.getSquareDistance () - getSquareDistance () > 4;
+    return abs(op.getSquareDistance () - getSquareDistance ()) > 4;
 }
 
 
 
 int SquareDistance::operator == ( const SquareDistance& op ) const
 {
-    return op.getSquareDistance () - getSquareDistance () < 4 && 
-	op.getSquareDistance () - getSquareDistance () > -4;
+    return abs(op.getSquareDistance () - getSquareDistance ()) <= 4;
 }
 
 

@@ -38,20 +38,20 @@ namespace synthese
 
 	namespace routeplanner
 	{
-		/** Journey leg comparator class.
+		/** Journey comparison operator.
 			@ingroup m33
 		*/
 		class JourneyLegComparator
 		{
 		private:
 
-			typedef const env::ServiceUse& (env::Journey::*PtrEdgeAccessor) () const;
-			const PtrEdgeAccessor _firstServiceUseAccessor;
-			const PtrEdgeAccessor _secondServiceUseAccessor;
+//			typedef const env::ServiceUse& (env::Journey::*PtrEdgeAccessor) () const;
+//			const PtrEdgeAccessor _firstServiceUseAccessor;
+//			const PtrEdgeAccessor _secondServiceUseAccessor;
 
 		public:
 
-			JourneyLegComparator (const AccessDirection& accessDirection);
+			JourneyLegComparator ();
 			~JourneyLegComparator ();
 
 			int operator () (const env::Journey& jl1, const env::Journey& jl2) const;

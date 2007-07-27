@@ -24,7 +24,6 @@
 #define SYNTHESE_env_ServiceUse_h__
 
 #include "15_env/ServicePointer.h"
-#include "15_env/SquareDistance.h"
 
 namespace synthese
 {
@@ -42,7 +41,6 @@ namespace synthese
 			//@{
 				const Edge*				_secondEdge;
 				time::DateTime			_secondActualDateTime;
-				SquareDistance			_squareDistance;
 			//@}
 
 		public:
@@ -54,7 +52,6 @@ namespace synthese
 			//@{
 				const Edge*				getSecondEdge()				const;
 				const time::DateTime&	getSecondActualDateTime()	const;
-				const SquareDistance&	getSquareDistance()			const;
 			//@}
 
 			//! @name Queries

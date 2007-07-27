@@ -92,10 +92,14 @@ namespace synthese
 				);
 
 			Journeys result;
-			for (IntegralSearchWorkingResult::const_iterator it(_result.begin()); it != _result.end(); ++it)
+			for (IntegralSearchWorkingResult::iterator it(_result.begin()); it != _result.end(); ++it)
+			{
+				it->second.setSquareDistanceToEnd(_destinationVam);
+				it->second.setMinSpeedToEnd(_minMaxDateTimeAtDestination);
 				result.push_back(it->second);
+			}
 
-			std::sort (result.begin(), result.end(), JourneyLegComparator(_accessDirection));
+			std::sort (result.begin(), result.end(), JourneyLegComparator());
 
 			return result;
 		}
@@ -216,8 +220,10 @@ namespace synthese
 
 						// Analyze of the utility of the edge
 						// If the edge is useless, the path is not traversed anymore
-						if (!_evaluateJourney(resultJourney))
+						if (!evaluateJourney(resultJourney))
 							break;
+
+						resultJourney.setEndReached(isGoalReached);
 
 						// Storage of the journey as a result
 						if(	(	_searchAddresses == SEARCH_ADDRESSES
@@ -239,7 +245,7 @@ namespace synthese
 						_bestVertexReachesMap.insert (serviceUse);
 
 						// Storage of the reach time at the goal if applicable
-						if (_destinationVam.contains (reachedVertex))
+						if (isGoalReached)
 						{
 							_minMaxDateTimeAtDestination = serviceUse.getSecondActualDateTime();
 							if (_accessDirection == TO_DESTINATION)
@@ -289,7 +295,7 @@ namespace synthese
 			// Validating all the service uses compared to the final result list
 			for (IntegralSearchWorkingResult::iterator it(result.begin()); it != result.end();)
 			{
-				if (!_evaluateJourney(it->second))
+				if (!evaluateJourney(it->second))
 					result.erase(it++);
 				else
 				{
@@ -301,7 +307,7 @@ namespace synthese
 
 // ------------------------------------------------------------------------- Utilities
 
-		bool IntegralSearcher::_evaluateJourney(
+		bool IntegralSearcher::evaluateJourney(
 			const Journey& journey
 		) const {
 

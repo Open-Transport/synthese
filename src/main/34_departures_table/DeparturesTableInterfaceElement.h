@@ -54,6 +54,7 @@ namespace synthese
 				-# Number of departures to hide (default = 0)
 				-# Message to display
 				-# Display services number (default : false)
+				-# Display quai
 		*/
 		class DeparturesTableInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
@@ -69,6 +70,7 @@ namespace synthese
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _departuresToHide;
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _message;
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _displayServiceNumber;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _displayQuai;
 
 		public:
 			void storeParameters(interfaces::ValueElementList& vel);

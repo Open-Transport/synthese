@@ -24,6 +24,7 @@
 #define SYNTHESE_ROUTEPLANNER_JOURNEY_H
 
 #include "15_env/Types.h"
+#include "15_env/SquareDistance.h"
 
 namespace synthese
 {
@@ -35,12 +36,16 @@ namespace synthese
 	{
 		class Edge;
 		class Axis;
+		class VertexAccessMap;
 
 		/** Journey class.
 			@ingroup m15
 		*/
 		class Journey
 		{
+		public:
+			typedef unsigned int MinSpeed;
+
 		private:
 			//! @name Content
 			//@{
@@ -51,6 +56,9 @@ namespace synthese
 			//@{
 				AccessDirection	_method;
 				int				_continuousServiceRange;
+				bool			_endReached;
+				SquareDistance	_squareDistanceToEnd;
+				MinSpeed		_minSpeedToEnd;
 			//@}
 
 			//! @name Query cache
@@ -64,6 +72,10 @@ namespace synthese
 			//@{
 				int				_startApproachDuration;
 				int				_endApproachDuration;
+			//@}
+
+			//! @name Oriented operators
+			//@{
 			//@}
 
 		 public:
@@ -92,12 +104,15 @@ namespace synthese
 				/** Continuous service range of this journey.
 					@return Range duration in minutes, or 0 if unique service.
 				*/
-				int getContinuousServiceRange () const;
+				int			getContinuousServiceRange () const;
+				MinSpeed	getMinSpeedToEnd() const;
 			//@}
 
 			//! @name Setters
 			//@{
 				void setContinuousServiceRange (int continuousServiceRange);
+				void setEndReached(bool value);
+				SquareDistance getSquareDistanceToEnd() const;
 			//@}
 
 			//! @name Orientation relative methods
@@ -119,6 +134,9 @@ namespace synthese
 				
 				const env::Edge* getOrigin() const;
 				const env::Edge* getDestination() const;
+
+				const Edge* getEndEdge() const;
+				time::DateTime getEndTime() const;
 
 				time::DateTime getDepartureTime () const;
 				time::DateTime getArrivalTime () const;
@@ -167,9 +185,12 @@ namespace synthese
 
 				void shift(int duration, int continuousServiceRange = UNKNOWN_VALUE);
 				void reverse();
+
+				void setSquareDistanceToEnd(const VertexAccessMap& vam);
+				void setMinSpeedToEnd(const time::DateTime& dateTime);
 			//@}
 
-			Journey& operator = (const Journey& ref);
+//			Journey& operator = (const Journey& ref);
 
 
 		};

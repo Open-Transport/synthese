@@ -38,9 +38,9 @@ namespace synthese
 	namespace routeplanner
 	{
 
-		JourneyLegComparator::JourneyLegComparator (const AccessDirection& accessDirection)
-			: _secondServiceUseAccessor((accessDirection == TO_DESTINATION) ? &Journey::getLastJourneyLeg : &Journey::getFirstJourneyLeg)
-			, _firstServiceUseAccessor((accessDirection == TO_DESTINATION) ? &Journey::getFirstJourneyLeg : &Journey::getLastJourneyLeg)
+		JourneyLegComparator::JourneyLegComparator ()
+//			: _secondServiceUseAccessor((accessDirection == TO_DESTINATION) ? &Journey::getLastJourneyLeg : &Journey::getFirstJourneyLeg)
+//			, _firstServiceUseAccessor((accessDirection == TO_DESTINATION) ? &Journey::getFirstJourneyLeg : &Journey::getLastJourneyLeg)
 		{	}
 		 
 
@@ -53,13 +53,15 @@ namespace synthese
 		int 
 		JourneyLegComparator::operator () (const Journey& j1, const Journey& j2) const
 		{
-			const ServiceUse& secondServiceUse1((j1.*_secondServiceUseAccessor)());
-			const ServiceUse& secondServiceUse2((j2.*_secondServiceUseAccessor)());
-			
-			if (secondServiceUse1.getSquareDistance().getSquareDistance() == 0) return true;
-			if (secondServiceUse2.getSquareDistance().getSquareDistance() == 0) return false;
-		    
-			if (secondServiceUse1.getSquareDistance () == secondServiceUse2.getSquareDistance ()) return false;
+			assert(j1.getMethod() == j2.getMethod());
+
+			if (j1.getMinSpeedToEnd() == j2.getMinSpeedToEnd())
+			{
+				if (j1.getMethod() == TO_DESTINATION)
+					return j1.getEndTime() < j2.getEndTime();
+				else
+					return j1.getEndTime() > j2.getEndTime();
+			}
 
 		//	assert ((jl1->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
 		//	assert ((jl2->*_edgeAccessor) ()->getFromVertex ()->getConnectionPlace () != 0);
@@ -74,7 +76,7 @@ namespace synthese
 		    
 			if (type1 != type2)	return type2 - type1;
 */
-			return (secondServiceUse1.getSquareDistance () <= secondServiceUse2.getSquareDistance ());
+			return (j1.getMinSpeedToEnd() < j2.getMinSpeedToEnd());
 		}
 
 

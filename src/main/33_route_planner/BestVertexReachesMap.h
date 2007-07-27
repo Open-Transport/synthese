@@ -54,7 +54,7 @@ namespace synthese
 			typedef std::map<const env::Vertex*, env::ServiceUse> JourneyLegMap;
 			typedef std::map<const env::Vertex*, time::DateTime> TimeMap;
 		    
-			const AccessDirection _accessDirection;
+			AccessDirection _accessDirection;
 
 			JourneyLegMap _bestJourneyLegMap;
 			TimeMap _bestTimeMap;
@@ -62,8 +62,8 @@ namespace synthese
 		 public:
 
 
-			BestVertexReachesMap (const AccessDirection& accessDirection);
-			~BestVertexReachesMap ();
+			BestVertexReachesMap();
+			~BestVertexReachesMap();
 
 
 			//! @name Getters/Setters
@@ -73,22 +73,21 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-			bool contains (const synthese::env::Vertex* vertex) const;
+			bool contains (const env::Vertex* vertex) const;
 
-			const synthese::time::DateTime& 
-			getBestTime (const synthese::env::Vertex* vertex, 
-					 const synthese::time::DateTime& defaultValue) const;
+			const time::DateTime& getBestTime (const env::Vertex* vertex, 
+					 const time::DateTime& defaultValue) const;
 
 			//@}
 
 
 			//! @name Update methods
 			//@{
-			void clear ();
+			void clear (const AccessDirection& accessDirection);
 			void insert (const env::ServiceUse& journeyLeg);
 		    
-			void insert (const synthese::env::Vertex* vertex, 
-				 const synthese::time::DateTime& dateTime,
+			void insert (const env::Vertex* vertex, 
+				 const time::DateTime& dateTime,
 				 bool propagateInConnectionPlace = true);
 
 			//@}

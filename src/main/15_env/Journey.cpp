@@ -33,6 +33,7 @@
 #include "15_env/Vertex.h"
 #include "15_env/Edge.h"
 #include "15_env/Axis.h"
+#include "15_env/VertexAccessMap.h"
 
 #include "04_time/DateTime.h"
 
@@ -56,6 +57,9 @@ namespace synthese
 			, _method(method)
 			, _startApproachDuration(0)
 			, _endApproachDuration(0)
+			, _endReached(false)
+			, _squareDistanceToEnd(UNKNOWN_VALUE)
+			, _minSpeedToEnd(UNKNOWN_VALUE)
 		{
 		}
 		
@@ -164,7 +168,10 @@ namespace synthese
 			if (_method == TO_DESTINATION)
 				_startApproachDuration = journey._startApproachDuration;
 			else
+			{
+				_endReached = journey._endReached;
 				_endApproachDuration = journey._endApproachDuration;
+			}
 		}
 
 
@@ -198,7 +205,10 @@ namespace synthese
 			)	append(*it);
 
 			if (_method == TO_DESTINATION)
+			{
+				_endReached = journey._endReached;
 				_endApproachDuration = journey._endApproachDuration;
+			}
 			else
 				_startApproachDuration = journey._startApproachDuration;
 		}
@@ -342,12 +352,13 @@ namespace synthese
 			_distance = 0;
 			_endApproachDuration = 0;
 			_startApproachDuration = 0;
+			_endReached = false;
 			_journeyLegs.clear();
 		}
 
 
 
-		Journey& 
+/*		Journey& 
 		Journey::operator= (const Journey& ref) 
 		{
 			clear ();
@@ -360,6 +371,7 @@ namespace synthese
 			_startApproachDuration = ref._startApproachDuration;
 			return *this;
 		}
+		*/
 
 		const JourneyLegs& Journey::getJourneyLegs() const
 		{
@@ -387,13 +399,9 @@ namespace synthese
 				return true;
 
 			//! <li>Time comparison</li>
-			DateTime currentsTime = (_method == TO_DESTINATION) 
-				? getArrivalTime ()
-				: getDepartureTime ();
+			DateTime currentsTime = getEndTime();
 
-			DateTime othersTime = (_method == TO_DESTINATION) 
-				? other.getArrivalTime ()
-				: other.getDepartureTime ();
+			DateTime othersTime = other.getEndTime();
 
 			bool betterTime = (_method == TO_DESTINATION) 
 				? currentsTime < othersTime
@@ -501,6 +509,59 @@ namespace synthese
 		synthese::AccessDirection Journey::getMethod() const
 		{
 			return _method;
+		}
+
+		void Journey::setEndReached( bool value )
+		{
+			_endReached = value;
+		}
+
+		void Journey::setSquareDistanceToEnd( const VertexAccessMap& vam )
+		{
+			if (_endReached)
+				_squareDistanceToEnd = 0;
+			else
+				_squareDistanceToEnd.setFromPoints(vam.getIsobarycenter(), *getEndEdge()->getFromVertex());
+		}
+
+		const Edge* Journey::getEndEdge() const
+		{
+			return
+				(_method == TO_DESTINATION)
+				? getDestination()
+				: getOrigin()
+			;
+		}
+
+		time::DateTime Journey::getEndTime() const
+		{
+			return
+				(_method == TO_DESTINATION)
+				? getArrivalTime()
+				: getDepartureTime()
+			;
+		}
+
+		void Journey::setMinSpeedToEnd( const time::DateTime& dateTime )
+		{
+			if (_endReached)
+				_minSpeedToEnd = 0;
+			else
+			{
+				assert((_method == TO_DESTINATION) ? dateTime > getArrivalTime() : getDepartureTime() > dateTime);
+
+				_minSpeedToEnd = (1000 * _squareDistanceToEnd.getSquareDistance()) / ((_method == TO_DESTINATION) ? dateTime - getArrivalTime() : getDepartureTime() - dateTime);
+			}
+		}
+
+		Journey::MinSpeed Journey::getMinSpeedToEnd() const
+		{
+			return _minSpeedToEnd;
+		}
+
+		SquareDistance Journey::getSquareDistanceToEnd() const
+		{
+			return _squareDistanceToEnd;
 		}
 	}
 }
