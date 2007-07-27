@@ -369,6 +369,8 @@ namespace synthese
 
 		void DisplayScreen::recordSupervision(const std::string& text ) const
 		{
+
+			shared_ptr<const Interface> interf(_displayType->getInterface());
 //			DisplayMaintenanceLog::addControlEntry(this, level, text);
 			
 		}

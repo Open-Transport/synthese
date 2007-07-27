@@ -474,6 +474,14 @@
 					RelativePath=".\DepartureTableRowInterfacePage.h"
 					>
 				</File>
+				<File
+					RelativePath=".\ParseDisplayReturnInterfacePage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ParseDisplayReturnInterfacePage.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Value Interface Elements"

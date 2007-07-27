@@ -189,6 +189,14 @@
 				Name="ValueInterfaceElement"
 				>
 				<File
+					RelativePath=".\AndValueInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\AndValueInterfaceElement.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ChrInterfaceElement.cpp"
 					>
 				</File>
@@ -237,11 +245,27 @@
 					>
 				</File>
 				<File
+					RelativePath=".\PlainCharFilterValueInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\PlainCharFilterValueInterfaceElement.h"
+					>
+				</File>
+				<File
 					RelativePath=".\StaticValueInterfaceElement.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\StaticValueInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SubstrValueInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\SubstrValueInterfaceElement.h"
 					>
 				</File>
 				<File

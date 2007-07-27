@@ -200,7 +200,7 @@ namespace synthese
 				stream << t.col() << HTMLModule::getHTMLImage(DBLogModule::getEntryIcon(dbe->getLevel()), DBLogModule::getEntryLevelLabel(dbe->getLevel()));
 				stream << t.col() << dbe->getDate().toString();
 				stream << t.col() << (dbe->getUser() ? dbe->getUser()->getLogin() : "");
-				stream << t.col() << (dbe->getObjectId() ? _dbLog->getObjectName(dbe->getObjectId()) : string());
+				stream << t.col() << ((dbe->getObjectId() > 0) ? _dbLog->getObjectName(dbe->getObjectId()) : string());
 
 				DBLog::ColumnsVector cols = _dbLog->parse(dbe->getContent());
 				for (DBLog::ColumnsVector::const_iterator it = cols.begin(); it != cols.end(); ++it)

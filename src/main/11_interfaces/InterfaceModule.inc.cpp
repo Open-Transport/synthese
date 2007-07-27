@@ -20,3 +20,6 @@
 #include "11_interfaces/DurationInterfacePage.h"
 #include "11_interfaces/ConcatenateValueInterfaceElement.h"
 #include "11_interfaces/SuperiorValueInterfaceElement.h"
+#include "11_interfaces/SubstrValueInterfaceElement.h"
+#include "11_interfaces/AndValueInterfaceElement.h"
+#include "11_interfaces/PlainCharFilterValueInterfaceElement.h"

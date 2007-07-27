@@ -8,6 +8,9 @@ synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::ChrInterfaceElement>("chr");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::SuperiorValueInterfaceElement>(">");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::ConcatenateValueInterfaceElement>("$");
+synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::SubstrValueInterfaceElement>("substr");
+synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::AndValueInterfaceElement>("&&");
+synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::PlainCharFilterValueInterfaceElement>("plain_char");
 
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::CommentInterfaceElement>("//");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::PrintInterfaceElement>("print");

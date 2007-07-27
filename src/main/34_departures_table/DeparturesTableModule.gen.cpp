@@ -10,6 +10,7 @@ synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<
 
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::departurestable::DeparturesTableInterfacePage>("departurestable");
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::departurestable::DepartureTableRowInterfacePage>("departurestablerow");
+synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::departurestable::ParseDisplayReturnInterfacePage>("parse_display_return");
 
 synthese::departurestable::DisplaySearchAdmin::integrate();
 synthese::departurestable::DisplayTypesAdmin::integrate();
