@@ -1,6 +1,10 @@
 #include "SquareDistance.h"
 
 #include "Point.h"
+#include <cmath>
+
+
+using namespace std;
 
 
 namespace synthese
@@ -61,14 +65,14 @@ void SquareDistance::setDistance ( long int distance )
 
 int SquareDistance::operator < ( const SquareDistance& op ) const
 {
-    return abs(op.getSquareDistance () - getSquareDistance ()) > 4;
+    return abs((double) op.getSquareDistance () - getSquareDistance ()) > 4;
 }
 
 
 
 int SquareDistance::operator == ( const SquareDistance& op ) const
 {
-    return abs(op.getSquareDistance () - getSquareDistance ()) <= 4;
+    return abs((double) op.getSquareDistance () - getSquareDistance ()) <= 4;
 }
 
 
