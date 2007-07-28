@@ -104,8 +104,8 @@ namespace synthese
 				setSquareDistance( UNKNOWN_VALUE );
 			else
 			{
-				int deltaX(point2.getX() - point1.getX());
-				int deltaY(point2.getY() - point1.getY());
+				int deltaX((point2.getX() - point1.getX()) / 1000);
+				int deltaY((point2.getY() - point1.getY()) / 1000);
 				setSquareDistance(deltaX * deltaX + deltaY * deltaY);
 			}
 		}
