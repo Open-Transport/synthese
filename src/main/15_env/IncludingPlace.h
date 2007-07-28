@@ -28,6 +28,8 @@
 
 #include "Place.h"
 
+#include "06_geometry/IsoBarycentre.h"
+
 namespace synthese
 {
 	namespace env
@@ -40,7 +42,8 @@ namespace synthese
 		class IncludingPlace : public Place
 		{
 		private:
-
+			mutable bool _isoBarycentreToUpdate;
+			mutable geometry::IsoBarycentre _isoBarycentre;
 
 		protected:
 
@@ -71,6 +74,8 @@ namespace synthese
 						   , SearchPhysicalStops returnPhysicalStops
 						   , const Vertex* origin = 0
 						   ) const;
+
+				virtual const geometry::Point2D& getPoint() const;
 
 			//@}
 

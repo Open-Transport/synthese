@@ -697,22 +697,6 @@
 				RelativePath=".\Document.h"
 				>
 			</File>
-			<File
-				RelativePath=".\Point.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Point.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SquareDistance.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SquareDistance.h"
-				>
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\Constants.h"

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8,00"
 	Name="14_geography"
-	ProjectGUID="{623D048D-A499-44EB-A82C-556F02FD0D76}"
+	ProjectGUID="{9DB64101-C8A0-4275-89E1-529199D1EA73}"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -64,11 +64,23 @@
 			Name="Core Classes"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\GeoPoint.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPoint.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Projection.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Projection.h"
+				>
+			</File>
 		</Filter>
-		<File
-			RelativePath=".\main.cpp"
-			>
-		</File>
 		<File
 			RelativePath=".\SConscript"
 			>

@@ -46,6 +46,10 @@ namespace synthese
 	{
 		class Alarm;
 	}
+	namespace geometry
+	{
+		class Point2D;
+	}
 
 	namespace env
 	{
@@ -53,7 +57,6 @@ namespace synthese
 		class Axis;
 		class Edge;
 		class Fare;
-		class Point;
 
 		struct cmpService
 		{
@@ -141,7 +144,7 @@ namespace synthese
 					- vertices (address/physical stops)
 					- via points
 				*/
-				std::vector<const Point*> getPoints (int fromEdgeIndex = 0,
+				std::vector<const geometry::Point2D*> getPoints (int fromEdgeIndex = 0,
 								int toEdgeIndex = -1) const;
 
 				bool isInService (const synthese::time::Date& date) const;

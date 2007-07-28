@@ -29,8 +29,12 @@
 #include "15_env/Place.h"
 #include "15_env/Types.h"
 
+#include "06_geometry/IsoBarycentre.h"
+
 namespace synthese
 {
+	using namespace geometry;
+
 	namespace env
 	{
 		/** Addressable place base class.
@@ -54,6 +58,8 @@ namespace synthese
 			} ConnectionType;
 
 		protected:
+			mutable bool _isoBarycentreToUpdateA;
+			mutable geometry::IsoBarycentre _isoBarycentreA;
 
 			Addresses _addresses; 
 
@@ -90,6 +96,8 @@ namespace synthese
 				, const Vertex* origin = NULL
 			) const;
 
+			virtual const geometry::Point2D& getPoint() const;
+
 			//@}
 
 
@@ -100,7 +108,7 @@ namespace synthese
 
 			/** Adds an address to this place.
 			 */
-				void addAddress (const Address* address);
+				virtual void addAddress (const Address* address);
 			//@}
 
 

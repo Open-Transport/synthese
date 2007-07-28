@@ -22,16 +22,18 @@
 
 #include "LineStop.h"
 
-#include "SquareDistance.h"
 #include "Line.h"
 #include "Service.h"
 #include "ContinuousService.h"
 #include "PhysicalStop.h"
 
+#include "06_geometry/SquareDistance.h"
 
 
 namespace synthese
 {
+	using namespace geometry;
+
 	namespace env
 	{
 

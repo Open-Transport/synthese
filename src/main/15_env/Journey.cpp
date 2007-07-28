@@ -45,6 +45,7 @@ namespace synthese
 {
 	using namespace messages;
 	using namespace time;
+	using namespace geometry;
 
 	namespace env
 	{
@@ -521,7 +522,7 @@ namespace synthese
 			if (_endReached)
 				_squareDistanceToEnd = 0;
 			else
-				_squareDistanceToEnd.setFromPoints(vam.getIsobarycenter(), *getEndEdge()->getFromVertex());
+				_squareDistanceToEnd.setFromPoints(vam.getIsobarycenter(), getEndEdge()->getFromVertex()->getConnectionPlace()->getPoint());
 		}
 
 		const Edge* Journey::getEndEdge() const

@@ -27,9 +27,10 @@
 #include <map>
 #include <set>
 
-#include "15_env/Point.h"
-#include "15_env/SquareDistance.h"
 #include "15_env/Journey.h"
+
+#include "06_geometry/IsoBarycentre.h"
+#include "06_geometry/SquareDistance.h"
 
 namespace synthese
 {
@@ -71,11 +72,11 @@ TRIDENT : VertexAccess => AccesPoint
 			std::set<const Path*> _pathOnWhichFineSteppingForDeparture;
 			std::set<const Path*> _pathOnWhichFineSteppingForArrival;
 		    
-			mutable bool _isobarycenterUpToDate;
+			mutable bool _isobarycentreToUpdate;
 			mutable bool _isobarycenterMaxSquareDistanceUpToDate;
 
-			mutable Point _isobarycenter;   //!< Isobarycenter of all points contained in this map.
-			mutable SquareDistance _isobarycenterMaxSquareDistance;   //!< Maximum square distance of one map point with the isobarycenter.
+			mutable geometry::IsoBarycentre _isobarycentre;   //!< Isobarycenter of all points contained in this map.
+			mutable geometry::SquareDistance _isobarycenterMaxSquareDistance;   //!< Maximum square distance of one map point with the isobarycenter.
 
 			int _minApproachTime;
 
@@ -104,8 +105,8 @@ TRIDENT : VertexAccess => AccesPoint
 				MergeAddresses mergeAddresses = MERGE_ADDRESSES,
 				MergePhysicalStops mergePhysicalStops = MERGE_PHYSICALSTOPS);
 
-			const Point& getIsobarycenter () const;
-			const SquareDistance& getIsobarycenterMaxSquareDistance () const;
+			const geometry::IsoBarycentre& getIsobarycenter () const;
+			const geometry::SquareDistance& getIsobarycenterMaxSquareDistance () const;
 		    
 			int getMinApproachTime () const;
 

@@ -2,9 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="03_db_ring"
-	ProjectGUID="{0ED914AC-1C44-49AF-8034-260628622ECC}"
-	RootNamespace="03_db_ring"
+	Name="06_geometry"
+	ProjectGUID="{1FEE17FB-95D3-41DD-A212-BB6209C7A359}"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -63,126 +62,49 @@
 	<Files>
 		<Filter
 			Name="Core Classes"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\DbCommandThreadExec.cpp"
+				RelativePath=".\Angle.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\DbCommandThreadExec.h"
+				RelativePath=".\Angle.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Node.cpp"
+				RelativePath=".\IsoBarycentre.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Node.h"
+				RelativePath=".\IsoBarycentre.h"
 				>
 			</File>
 			<File
-				RelativePath=".\NodeInfo.cpp"
+				RelativePath=".\Point2D.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\NodeInfo.h"
+				RelativePath=".\Point2D.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Ring.h"
+				RelativePath=".\Point3D.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\RingNode.cpp"
+				RelativePath=".\Point3D.h"
 				>
 			</File>
 			<File
-				RelativePath=".\RingNode.h"
+				RelativePath=".\SquareDistance.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Token.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Token.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UpdateLog.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UpdateLog.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UpdateRecord.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UpdateRecord.h"
+				RelativePath=".\SquareDistance.h"
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="Exceptions"
-			>
-			<File
-				RelativePath=".\DbRingException.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DbRingException.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UpdateChronologyException.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Table sync"
-			>
-			<File
-				RelativePath=".\NodeInfoTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\NodeInfoTableSync.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UpdateRecordTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UpdateRecordTableSync.h"
-				>
-			</File>
-		</Filter>
-		<File
-			RelativePath=".\Constants.h"
-			>
-		</File>
-		<File
-			RelativePath=".\DbRingModule.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\DbRingModule.gen.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\DbRingModule.h"
-			>
-		</File>
-		<File
-			RelativePath=".\DbRingModule.inc.cpp"
-			>
-		</File>
 		<File
 			RelativePath=".\SConscript"
 			>

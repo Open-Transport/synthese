@@ -40,6 +40,7 @@ namespace synthese
 {
 	using namespace messages;
 	using namespace util;
+	using namespace geometry;
 
 	namespace env
 	{
@@ -130,20 +131,20 @@ namespace synthese
 
 
 
-		std::vector<const Point*> 
+		std::vector<const Point2D*> 
 		Path::getPoints (int fromEdgeIndex,
 				int toEdgeIndex) const
 		{
 			if (toEdgeIndex == -1) toEdgeIndex = _edges.size () - 1;
-			std::vector<const Point*> points;
+			std::vector<const Point2D*> points;
 		    
 			for (int i=fromEdgeIndex; i<=toEdgeIndex; ++i)
 			{
 			points.push_back (_edges[i]->getFromVertex ());
 			
 			// Adds all the via points of the line stop
-			const std::vector<const Point*>& viaPoints = _edges[i]->getViaPoints ();
-			for (std::vector<const Point*>::const_iterator it = viaPoints.begin (); 
+			const std::vector<const Point2D*>& viaPoints = _edges[i]->getViaPoints ();
+			for (std::vector<const Point2D*>::const_iterator it = viaPoints.begin (); 
 				it != viaPoints.end (); 
 				++it)
 			{

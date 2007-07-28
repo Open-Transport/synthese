@@ -29,7 +29,6 @@
 
 #include "01_util/Constants.h"
 
-#include "15_env/Point.h"
 #include "15_env/ServicePointer.h"
 
 #include "04_time/DateTime.h"
@@ -38,6 +37,11 @@
 
 namespace synthese
 {
+	namespace geometry
+	{
+		class Point2D;
+	}
+
 	namespace env
 	{
 		class Path;
@@ -86,7 +90,7 @@ namespace synthese
 			const Edge* _followingConnectionArrival;			//!< Next connection arrival edge along path.
 			const Edge* _followingArrivalForFineSteppingOnly;	//!< Next arrival edge with or without connection
 
-			std::vector<const Point*> _viaPoints;				//!< Intermediate points along the edge (for map drawing)
+			std::vector<const geometry::Point2D*> _viaPoints;				//!< Intermediate points along the edge (for map drawing)
 
 			int _departureIndex[24];	//!< First line service index by departure hour of day
 			int _arrivalIndex[24];		//!< First line service index by arrival hour of day
@@ -149,7 +153,7 @@ namespace synthese
 				/** Gets intermediate points 
 				* between this line stop and the next in path.
 				*/
-				const std::vector<const Point*>& getViaPoints () const;
+				const std::vector<const geometry::Point2D*>& getViaPoints () const;
 
 				int getDepartureFromIndex (int hour) const;
 				int getArrivalFromIndex (int hour) const;
@@ -214,7 +218,7 @@ namespace synthese
 			//! @name Update methods
 			//@{
 				void clearViaPoints ();
-				void addViaPoint (const Point& viaPoint);
+				void addViaPoint (const geometry::Point2D& viaPoint);
 			    
 				void updateServiceIndex();
 			//@}

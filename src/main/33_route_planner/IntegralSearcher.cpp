@@ -33,12 +33,17 @@
 
 #include "04_time/DateTime.h"
 
+#include "01_util/Log.h"
+
+#include <sstream>
+
 using namespace std;
 
 namespace synthese
 {
 	using namespace env;
 	using namespace time;
+	using namespace util;
 
 	namespace routeplanner
 	{
@@ -100,6 +105,36 @@ namespace synthese
 			}
 
 			std::sort (result.begin(), result.end(), JourneyLegComparator());
+
+			if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+			{
+				string spaces(journey.getJourneyLegs().size(), '*');
+				
+				stringstream s;
+				s	<< spaces;
+				if (journey.getMethod() == TO_DESTINATION)
+					s << "TO_DESTINATION";
+				else
+					s << "FROM_ORIGIN   ";
+				s	<< " IntegralSearch. Start : ";
+				if (journey.empty())
+					s << " at " << desiredTime.toString();
+				else
+					s	<< journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
+						<< " at " << journey.getEndTime().toString();
+				s << "\n";
+				for (Journeys::iterator it(result.begin()); it != result.end(); ++it)
+				{
+					s	<< spaces
+						<< " -> " << it->getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
+						<< " at " << it->getEndTime().toString()
+						<< "(dst = " << it->getSquareDistanceToEnd().getDistance()
+						<< " - min speed = " << it->getMinSpeedToEnd()
+						<< ")\n";
+				}
+
+				Log::GetInstance().trace(s.str());
+			}
 
 			return result;
 		}

@@ -27,6 +27,8 @@
 
 namespace synthese
 {
+	using namespace geometry;
+
 	namespace env
 	{
 
@@ -55,6 +57,7 @@ namespace synthese
 		void 
 		AddressablePlace::addAddress (const Address* address)
 		{
+			_isoBarycentreToUpdateA = true;
 			_addresses.push_back (address);
 		}
 
@@ -94,5 +97,16 @@ namespace synthese
 			}
 		}
 
+		const geometry::Point2D& AddressablePlace::getPoint() const
+		{
+			if (_isoBarycentreToUpdateA)
+			{
+				_isoBarycentreA.clear();
+				for (Addresses::const_iterator it(_addresses.begin()); it != _addresses.end(); ++it)
+					_isoBarycentreA.add(**it);
+				_isoBarycentreToUpdateA = false;
+			}
+			return _isoBarycentreA;
+		}
 	}
 }

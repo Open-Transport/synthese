@@ -28,7 +28,6 @@
 #include "15_env/Edge.h"
 #include "15_env/Line.h"
 #include "15_env/Service.h"
-#include "15_env/SquareDistance.h"
 #include "15_env/Vertex.h"
 #include "15_env/Journey.h"
 #include "15_env/VertexAccessMap.h"
@@ -37,6 +36,8 @@
 #include "15_env/PedestrianCompliance.h"
 #include "15_env/ReservationRule.h"
 #include "15_env/Fare.h"
+
+#include "06_geometry/SquareDistance.h"
 
 #include <algorithm>
 
@@ -47,6 +48,7 @@ namespace synthese
 {
 	using namespace time;
 	using namespace env;
+	using namespace geometry;
 
 	namespace routeplanner
 	{
@@ -365,7 +367,7 @@ namespace synthese
 			// If a journey was found, try to optimize by delaying departure hour as much as possible.
 			_bestVertexReachesMap.clear (FROM_ORIGIN);
 
-			const JourneyLegs& jl(result.getJourneyLegs());
+/*			const JourneyLegs& jl(result.getJourneyLegs());
 			for (JourneyLegs::const_iterator it(jl.begin()); it != jl.end(); ++it)
 			{
 				_bestVertexReachesMap.insert (
@@ -373,7 +375,7 @@ namespace synthese
 					it->getDepartureDateTime ()
 				);
 			}
-		    
+*/		    
 			for(map<const Vertex*, VertexAccess>::const_iterator itVertex(dvam.getMap().begin());
 				itVertex != dvam.getMap().end ();
 				++itVertex

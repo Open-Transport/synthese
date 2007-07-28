@@ -24,7 +24,8 @@
 #define SYNTHESE_ROUTEPLANNER_JOURNEY_H
 
 #include "15_env/Types.h"
-#include "15_env/SquareDistance.h"
+
+#include "06_geometry/SquareDistance.h"
 
 namespace synthese
 {
@@ -54,11 +55,11 @@ namespace synthese
 
 			//! @name Supplemental data
 			//@{
-				AccessDirection	_method;
-				int				_continuousServiceRange;
-				bool			_endReached;
-				SquareDistance	_squareDistanceToEnd;
-				MinSpeed		_minSpeedToEnd;
+				AccessDirection				_method;
+				int							_continuousServiceRange;
+				bool						_endReached;
+				geometry::SquareDistance	_squareDistanceToEnd;
+				MinSpeed					_minSpeedToEnd;
 			//@}
 
 			//! @name Query cache
@@ -112,13 +113,13 @@ namespace synthese
 			//@{
 				void setContinuousServiceRange (int continuousServiceRange);
 				void setEndReached(bool value);
-				SquareDistance getSquareDistanceToEnd() const;
+				geometry::SquareDistance getSquareDistanceToEnd() const;
 			//@}
 
 			//! @name Orientation relative methods
 			//@{
-				const env::ServiceUse& getEndServiceUse() const;
-				const env::ServiceUse& getStartServiceUse() const;
+				const ServiceUse& getEndServiceUse() const;
+				const ServiceUse& getStartServiceUse() const;
 				void setEndApproachDuration(int duration);
 				void setStartApproachDuration(int duration);
 			//@}

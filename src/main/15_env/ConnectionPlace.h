@@ -35,6 +35,8 @@
 #include "15_env/AddressablePlace.h"
 #include "15_env/Types.h"
 
+#include "06_geometry/IsoBarycentre.h"
+
 namespace synthese
 {
 	namespace time
@@ -42,12 +44,16 @@ namespace synthese
 		class DateTime;
 	}
 
+	namespace geometry
+	{
+		class SquareDistance; 
+	}
+
 	namespace env
 	{
 		class Address;
 		class Edge;
 		class Path;
-		class SquareDistance; 
 
 		/** A connection place indicates that there are possible
 			connections between different network vertices.
@@ -68,6 +74,8 @@ namespace synthese
 			static const int SQUAREDISTANCE_SHORT_LONG;
 
 		private:
+			mutable bool _isoBarycentreToUpdateC;
+			mutable geometry::IsoBarycentre _isoBarycentreC;
 
 			PhysicalStops _physicalStops; 
 
@@ -77,9 +85,6 @@ namespace synthese
 			int _maxTransferDelay;
 
 			ConnectionType _connectionType;
-
-		protected:
-
 
 		public:
 
@@ -136,6 +141,9 @@ namespace synthese
 					, const Vertex* origin = NULL
 				) const;
 
+				virtual const geometry::Point2D& getPoint() const;
+
+
 				std::vector<std::pair<uid, std::string> >	getPhysicalStopLabels(bool withAll = false) const;
 
 				/** Labels list for select field containing physical stops, with exclusion list.
@@ -151,6 +159,7 @@ namespace synthese
 			//! @name Update methods.
 			//@{
 				void addPhysicalStop (const PhysicalStop* physicalStop);
+				virtual void addAddress (const Address* address);
 				void addTransferDelay (uid departureId, uid arrivalId, int transferDelay);
 				void clearTransferDelays ();
 			//@}

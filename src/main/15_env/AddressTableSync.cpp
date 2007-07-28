@@ -57,8 +57,10 @@ namespace synthese
 			object->setPlace(EnvModule::getConnectionPlaces ().get (Conversion::ToLongLong (rows.getColumn (rowIndex, AddressTableSync::COL_PLACEID))).get());
 			object->setRoad(EnvModule::getRoads ().get (Conversion::ToLongLong (rows.getColumn (rowIndex, AddressTableSync::COL_ROADID))).get());
 			object->setMetricOffset(Conversion::ToDouble (rows.getColumn (rowIndex, AddressTableSync::COL_METRICOFFSET)));
-			object->setX(Conversion::ToDouble (rows.getColumn (rowIndex, AddressTableSync::COL_X)));
-			object->setY(Conversion::ToDouble (rows.getColumn (rowIndex, AddressTableSync::COL_Y)));
+			object->setXY(
+				Conversion::ToDouble (rows.getColumn (rowIndex, AddressTableSync::COL_X))
+				, Conversion::ToDouble (rows.getColumn (rowIndex, AddressTableSync::COL_Y))
+			);
 		}
 
 		template<> void SQLiteTableSyncTemplate<Address>::save(Address* object)

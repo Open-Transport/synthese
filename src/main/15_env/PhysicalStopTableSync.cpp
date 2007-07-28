@@ -52,8 +52,10 @@ namespace synthese
 		{
 			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
 			object->setName(rows.getColumn(rowId, PhysicalStopTableSync::COL_NAME));
-			object->setX (Conversion::ToDouble (rows.getColumn (rowId, PhysicalStopTableSync::COL_X)));
-			object->setY (Conversion::ToDouble (rows.getColumn (rowId, PhysicalStopTableSync::COL_Y)));
+			object->setXY(
+				Conversion::ToDouble (rows.getColumn (rowId, PhysicalStopTableSync::COL_X))
+				, Conversion::ToDouble (rows.getColumn (rowId, PhysicalStopTableSync::COL_Y))
+			);
 			object->setOperatorCode(rows.getColumn(rowId, PhysicalStopTableSync::COL_OPERATOR_CODE));
 		}
 

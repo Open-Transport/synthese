@@ -31,6 +31,7 @@
 namespace synthese
 {
 	using namespace time;
+	using namespace geometry;
 
 	namespace env
 	{
@@ -55,7 +56,7 @@ namespace synthese
 		Edge::~Edge ()
 		{
 			// Delete via points
-			for (std::vector<const Point*>::iterator iter = _viaPoints.begin (); 
+			for (std::vector<const Point2D*>::iterator iter = _viaPoints.begin (); 
 			iter != _viaPoints.end (); 
 			++iter)
 			{
@@ -171,7 +172,7 @@ namespace synthese
 
 
 
-		const std::vector<const Point*>& 
+		const std::vector<const Point2D*>& 
 		Edge::getViaPoints () const
 		{
 			return _viaPoints;
@@ -180,9 +181,9 @@ namespace synthese
 
 
 		void 
-		Edge::addViaPoint (const Point& viaPoint)
+		Edge::addViaPoint (const Point2D& viaPoint)
 		{
-			_viaPoints.push_back (new Point (viaPoint));
+			_viaPoints.push_back (new Point2D (viaPoint));
 		}
 
 

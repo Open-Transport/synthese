@@ -27,7 +27,7 @@
 
 #include "01_util/UId.h"
 
-#include "15_env/Point.h"
+#include "06_geometry/Point2D.h"
 
 
 namespace synthese
@@ -45,7 +45,7 @@ namespace synthese
 			A vertex is necessarily connected to its corresponding path.
 		@ingroup m15
 		*/
-		class Vertex : public Point
+		class Vertex : public geometry::Point2D
 		{
 		private:
 

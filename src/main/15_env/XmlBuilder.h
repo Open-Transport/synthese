@@ -121,7 +121,7 @@ class XmlBuilder
 	 static boost::shared_ptr<PhysicalStop> CreatePhysicalStop (XMLNode& node, 
 					     const ConnectionPlace::Registry& connectionPlaces);
     
-    static Point CreatePoint (XMLNode& node);
+	 static geometry::Point2D CreatePoint (XMLNode& node);
 
 
 };

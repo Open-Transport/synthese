@@ -36,12 +36,14 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace geometry;
+
 	namespace env
 	{
 
 
 		VertexAccessMap::VertexAccessMap ()
-			: _isobarycenterUpToDate (false)
+			: _isobarycentreToUpdate (false)
 			, _isobarycenterMaxSquareDistanceUpToDate (false)
 			, _minApproachTime (std::numeric_limits<int>::max ())
 		{
@@ -101,7 +103,7 @@ namespace synthese
 					 const VertexAccess& vertexAccess)
 		{
 			_map.insert (std::make_pair (vertex, vertexAccess));
-			_isobarycenterUpToDate = false;
+			_isobarycentreToUpdate = true;
 			_isobarycenterMaxSquareDistanceUpToDate = false;
 			if (vertexAccess.approachTime < _minApproachTime)
 			{
@@ -132,40 +134,18 @@ namespace synthese
 
 
 
-		const Point& 
+		const IsoBarycentre& 
 		VertexAccessMap::getIsobarycenter () const
 		{
-			if (_isobarycenterUpToDate == false)
+			if (_isobarycentreToUpdate)
 			{
-				double sumx (0.0);
-				double sumy (0.0);
-				double points(0);
-				
+				_isobarycentre.clear();
 				for (VamMap::const_iterator it = _map.begin ();
 					 it != _map.end (); ++it)
-				{
-					if (it->first->getX() > 0 && it->first->getY() > 0)
-					{
-						sumx += it->first->getX();
-						sumy += it->first->getY();
-						++points;
-					}
-				}
-				
-				if (points)
-				{
-					_isobarycenter.setX (sumx / points);
-					_isobarycenter.setY (sumy / points);
-				}
-				else
-				{
-					_isobarycenter.setX(UNKNOWN_VALUE);
-					_isobarycenter.setY(UNKNOWN_VALUE);
-				}
-				
-				_isobarycenterUpToDate = true;
+					_isobarycentre.add(*it->first);
+				_isobarycentreToUpdate = false;
 			}
-			return _isobarycenter;
+			return _isobarycentre;
 		    
 		}
 
@@ -176,14 +156,14 @@ namespace synthese
 			if (_isobarycenterMaxSquareDistanceUpToDate == false)
 			{
 				_isobarycenterMaxSquareDistance.setSquareDistance (0);
-				if (!_isobarycenter.isUnknown())
+				if (!_isobarycentre.isUnknown())
 				{
 					for (VamMap::const_iterator it = _map.begin ();
 						it != _map.end (); ++it)
 					{
 						if (it->first->getX() > 0 && it->first->getY() > 0)
 						{
-							SquareDistance sqd (*(it->first), _isobarycenter);
+							SquareDistance sqd (*(it->first), _isobarycentre);
 							if (_isobarycenterMaxSquareDistance < sqd)
 							{
 								_isobarycenterMaxSquareDistance.setSquareDistance (sqd.getSquareDistance ());

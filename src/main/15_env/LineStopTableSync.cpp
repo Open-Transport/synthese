@@ -42,6 +42,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace env;
+	using namespace geometry;
 
 	namespace db
 	{
@@ -87,7 +88,7 @@ namespace synthese
 				tokenizer::iterator valueIter = valueTokens.begin();
 
 				// X:Y
-				ls->addViaPoint (synthese::env::Point (Conversion::ToDouble (*valueIter), 
+				ls->addViaPoint (Point2D (Conversion::ToDouble (*valueIter), 
 					Conversion::ToDouble (*(++valueIter))));
 			}
 

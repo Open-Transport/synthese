@@ -22,10 +22,12 @@
 
 #include "15_env/ConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
-#include "15_env/SquareDistance.h"
+#include "15_env/Address.h"
 #include "15_env/Vertex.h"
 #include "15_env/Line.h"
 #include "15_env/Vertex.h"
+
+#include "06_geometry/SquareDistance.h"
 
 #include <assert.h>
 #include <limits>
@@ -40,6 +42,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace messages;
+	using namespace geometry;
 
 	namespace env
 	{
@@ -175,6 +178,7 @@ namespace synthese
 		void 
 		ConnectionPlace::addPhysicalStop (const PhysicalStop* physicalStop)
 		{
+			_isoBarycentreToUpdateC = true;
 			_physicalStops.insert(physicalStop);
 		}
 
@@ -313,5 +317,23 @@ namespace synthese
 			return _physicalStops;
 		}
 
+		const geometry::Point2D& ConnectionPlace::getPoint() const
+		{
+			if (_isoBarycentreToUpdateC)
+			{
+				_isoBarycentreC.clear();
+				for (PhysicalStops::const_iterator it(_physicalStops.begin()); it != _physicalStops.end(); ++it)
+					_isoBarycentreC.add(**it);
+				_isoBarycentreC.add(_isoBarycentreA);
+				_isoBarycentreToUpdateC = false;
+			}
+			return _isoBarycentreC;
+		}
+
+		void ConnectionPlace::addAddress( const Address* address )
+		{
+			_isoBarycentreToUpdateC = true;
+			AddressablePlace::addAddress(address);
+		}
 	}
 }

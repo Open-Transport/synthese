@@ -33,6 +33,11 @@
 
 namespace synthese
 {
+	namespace geometry
+	{
+		class Point2D;
+	}
+
 	namespace env
 	{
 		class City;
@@ -117,6 +122,8 @@ namespace synthese
 				, SearchPhysicalStops returnPhysicalStops
 				, const Vertex* origin = NULL
 			) const = 0;
+
+			virtual const geometry::Point2D& getPoint() const = 0;
 			//@}
 
 		    

@@ -36,9 +36,10 @@
 #include "15_env/ContinuousService.h"
 #include "15_env/Path.h"
 #include "15_env/Line.h"
-#include "15_env/Point.h"
 #include "15_env/EnvModule.h"
 #include "15_env/ContinuousServiceTableSync.h"
+
+#include "06_geometry/Point2D.h"
 
 #include <set>
 

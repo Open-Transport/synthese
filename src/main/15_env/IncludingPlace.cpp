@@ -32,6 +32,7 @@ namespace synthese
 			const string& name
 			, const City* city
 		)	: Place (name, city)
+			, _isoBarycentreToUpdate(false)
 		{
 		}
 
@@ -54,6 +55,7 @@ namespace synthese
 		void 
 		IncludingPlace::addIncludedPlace (const Place* place)
 		{
+			_isoBarycentreToUpdate = true;
 			_includedPlaces.push_back (place);
 		}
 
@@ -78,6 +80,18 @@ namespace synthese
 					, origin
 				);
 			}
+		}
+
+		const geometry::Point2D& IncludingPlace::getPoint() const
+		{
+			if (_isoBarycentreToUpdate)
+			{
+				_isoBarycentre.clear();
+				for (std::vector<const Place*>::const_iterator it(_includedPlaces.begin()); it != _includedPlaces.end(); ++it)
+					_isoBarycentre.add((*it)->getPoint());
+				_isoBarycentreToUpdate = false;
+			}
+			return _isoBarycentre;
 		}
 	}
 }
