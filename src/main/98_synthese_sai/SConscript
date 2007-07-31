@@ -1,7 +1,7 @@
 
 Import ('mainenv')
 
-modules = ['06_geometry', '34_departures_table', '33_route_planner', '17_messages', '30_server', '12_security', '32_admin', '13_dblog', '11_interfaces', '15_env', '07_lex_matcher', '05_html', '04_time', '03_db_ring', '02_db', '01_util', '00_tcp'];
+modules = ['34_departures_table', '33_route_planner', '17_messages', '30_server', '12_security', '32_admin', '13_dblog', '11_interfaces', '15_env', '07_lex_matcher', '06_geometry', '05_html', '04_time', '03_db_ring', '02_db', '01_util', '00_tcp'];
 syntheseenv = mainenv.SyntheseEnv (modules)
 
 syntheseenv.SyntheseBuild (syntheseenv.DefaultModuleName ())
