@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_RoutePlannerInterfacePage_H__
 #define SYNTHESE_RoutePlannerInterfacePage_H__
 
-#include "15_env/Types.h"
+#include "33_route_planner/Types.h"
 
 #include "11_interfaces/InterfacePage.h"
 
@@ -53,7 +53,7 @@ namespace synthese
 			void display(
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
-				, const env::Journeys* object
+				, const JourneyBoardJourneys& object
 				, const server::Request* request = NULL
 				) const;
 		};

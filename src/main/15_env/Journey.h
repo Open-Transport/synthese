@@ -23,16 +23,17 @@
 #ifndef SYNTHESE_ROUTEPLANNER_JOURNEY_H
 #define SYNTHESE_ROUTEPLANNER_JOURNEY_H
 
+#include <deque>
+
+#include "15_env/ServiceUse.h"
 #include "15_env/Types.h"
 
 #include "06_geometry/SquareDistance.h"
 
+#include "04_time/DateTime.h"
+
 namespace synthese
 {
-	namespace time
-	{
-		class DateTime;
-	}
 	namespace env
 	{
 		class Edge;
@@ -46,17 +47,19 @@ namespace synthese
 		{
 		public:
 			typedef unsigned int MinSpeed;
+			typedef std::deque<ServiceUse>	ServiceUses;
 
 		private:
+			typedef const env::ServiceUse& (Journey::*ServiceUseGetter) () const;
+
 			//! @name Content
 			//@{
-				JourneyLegs		_journeyLegs;
+				ServiceUses		_journeyLegs;
 			//@}
 
 			//! @name Supplemental data
 			//@{
 				AccessDirection				_method;
-				int							_continuousServiceRange;
 				bool						_endReached;
 				geometry::SquareDistance	_squareDistanceToEnd;
 				MinSpeed					_minSpeedToEnd;
@@ -64,6 +67,7 @@ namespace synthese
 
 			//! @name Query cache
 			//@{
+				mutable int		_continuousServiceRange;
 				int				_effectiveDuration;
 				int				_transportConnectionCount;
 				int				_distance;
@@ -77,10 +81,13 @@ namespace synthese
 
 			//! @name Oriented operators
 			//@{
+				time::DateTime::ComparisonOperator	_bestTimeStrictOperator;
+				ServiceUseGetter					_endServiceUseGetter;
+				ServiceUseGetter					_beginServiceUseGetter;
 			//@}
 
 		 public:
-			Journey(AccessDirection method = TO_DESTINATION);
+			Journey(AccessDirection method);
 			~Journey ();
 
 
@@ -91,7 +98,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007					
 				*/
-				const JourneyLegs& getJourneyLegs() const;
+				const ServiceUses& getServiceUses() const;
 
 				AccessDirection getMethod() const;
 
@@ -107,6 +114,8 @@ namespace synthese
 				*/
 				int			getContinuousServiceRange () const;
 				MinSpeed	getMinSpeedToEnd() const;
+				bool		getEndReached() const;
+				const time::DateTime::ComparisonOperator& getBestTimeStrictOperator() const;
 			//@}
 
 			//! @name Setters

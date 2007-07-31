@@ -34,8 +34,12 @@
 #include "15_env/EnvModule.h"
 
 #include "30_server/FunctionRequest.h"
+#include "30_server/Session.h"
 
 #include "32_admin/HomeAdmin.h"
+
+#include "12_security/User.h"
+#include "12_security/Profile.h"
 
 using namespace std;
 using namespace boost;

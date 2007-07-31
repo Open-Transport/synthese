@@ -102,7 +102,7 @@ namespace synthese
 				if (presenceDateTime.getHour() < schedule.getHour())
 					return ServicePointer();
 			}
-			actualTime = schedule;
+			actualTime.setHour(schedule.getHour());
 			ptr.setActualTime(actualTime);
 			
 			// Origin departure time

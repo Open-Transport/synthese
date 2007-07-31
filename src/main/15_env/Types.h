@@ -25,11 +25,9 @@
 
 #include <set>
 #include <vector>
-#include <deque>
 #include <boost/shared_ptr.hpp>
 
 #include "15_env/Complyer.h"
-#include "15_env/ServiceUse.h"
 
 #include "01_util/Constants.h"
 
@@ -42,21 +40,15 @@ namespace synthese
 		class Line;
 		class Service;
 		class Address;
-		class Journey;
 
 		/** @addtogroup m15
 		@{
 		*/
-
 		typedef std::set<const PhysicalStop*> PhysicalStops;
 		typedef std::vector<const Address*> Addresses;
 
 		typedef std::vector<boost::shared_ptr<const City> > CityList;
 		typedef std::set<boost::shared_ptr<const Line> > LineSet;
-
-		typedef std::vector<Journey>						Journeys;
-		typedef std::deque<env::ServiceUse>					JourneyLegs;
-
 		/** @} */
 	}
 

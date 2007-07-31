@@ -29,6 +29,7 @@
 #include "15_env/LineMarkerInterfacePage.h"
 #include "15_env/ServiceUse.h"
 #include "15_env/Journey.h"
+#include "15_env/Service.h"
 
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
@@ -60,7 +61,7 @@ namespace synthese
 			shared_ptr<const LineMarkerInterfacePage> lineMarkerInterfacePage = _page->getInterface()->getPage<LineMarkerInterfacePage>();
 
 			// Fabrication de l'affichage
-			for (JourneyLegs::const_iterator it = journey->getJourneyLegs().begin(); it != journey->getJourneyLegs().end(); ++it)
+			for (Journey::ServiceUses::const_iterator it(journey->getServiceUses().begin()); it != journey->getServiceUses().end(); ++it)
 			{
 				const ServiceUse& leg(*it);
 				if ( __AfficherLignesPied || !dynamic_cast<const Road*> (leg.getService()->getPath ()) )

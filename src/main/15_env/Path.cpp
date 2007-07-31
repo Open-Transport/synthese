@@ -267,5 +267,13 @@ namespace synthese
 		{
 			_allDays = value;
 		}
+
+		bool cmpService::operator ()(const Service *s1, const Service *s2) const
+		{
+			return (s1->getDepartureSchedule () < s2->getDepartureSchedule ())
+				|| (s1->getDepartureSchedule () == s2->getDepartureSchedule ()
+				&& s1 < s2)						
+				;
+		}
 	}
 }

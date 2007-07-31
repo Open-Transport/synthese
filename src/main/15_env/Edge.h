@@ -23,13 +23,9 @@
 #ifndef SYNTHESE_ENV_EDGE_H
 #define SYNTHESE_ENV_EDGE_H
 
-#include "15_env/Types.h"
-
 #include <vector>
 
 #include "01_util/Constants.h"
-
-#include "15_env/ServicePointer.h"
 
 #include "04_time/DateTime.h"
 #include "04_time/Schedule.h"
@@ -48,6 +44,7 @@ namespace synthese
 		class Vertex;
 		class AddressablePlace;
 		class ConnectionPlace;
+		class ServicePointer;
 
 		/** Edge abstract base class.
 

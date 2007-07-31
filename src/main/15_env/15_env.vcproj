@@ -393,6 +393,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\JourneyComparator.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\JourneyComparator.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ServicePointer.cpp"
 					>
 				</File>

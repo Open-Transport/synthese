@@ -22,6 +22,7 @@
 
 #include "15_env/Place.h"
 #include "15_env/City.h"
+#include "15_env/VertexAccessMap.h"
 
 #include "01_util/WithoutAccentsFilter.h"
 #include "01_util/PlainCharFilter.h"

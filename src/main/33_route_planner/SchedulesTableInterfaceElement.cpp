@@ -33,6 +33,7 @@
 #include "15_env/Vertex.h"
 #include "15_env/ServiceUse.h"
 #include "15_env/Line.h"
+#include "15_env/Journey.h"
 
 #include "11_interfaces/Interface.h"
 
@@ -60,7 +61,7 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const Journeys* jv(static_cast<const Journeys*>(object));
+			const JourneyBoardJourneys* jv(static_cast<const JourneyBoardJourneys*>(object));
 
 			if ( jv == NULL || jv->empty())  // No solution or type error
 			{
@@ -81,18 +82,18 @@ namespace synthese
 				
 				// Loop on each journey
 				int i=1;
-				for(Journeys::const_iterator it = jv->begin();
+				for(JourneyBoardJourneys::const_iterator it(jv->begin());
 					it != jv->end();
 					++it, ++i
 				){
 					// Loop on each leg
 					int __Ligne(0);
-					const JourneyLegs& jl(it->getJourneyLegs());
-					for (JourneyLegs::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
+					const Journey::ServiceUses& jl((*it)->getServiceUses());
+					for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 					{
 						const ServiceUse& curET(*itl);
 						DateTime lastDateTime(curET.getDepartureDateTime());
-						lastDateTime += it->getContinuousServiceRange();
+						lastDateTime += (*it)->getContinuousServiceRange();
 												
 						// Saving of the columns on each lines
 						columnInterfacePage->display(
@@ -103,7 +104,7 @@ namespace synthese
 							, dynamic_cast<const Road*> (curET.getService()->getPath ()) != NULL
 							, curET.getDepartureDateTime().getHour()
 							, lastDateTime.getHour()
-							, it->getContinuousServiceRange() > 0
+							, (*it)->getContinuousServiceRange() > 0
 							, itl == jl.begin()
 							, true
 							, request
@@ -125,7 +126,7 @@ namespace synthese
 							);
 						
 						lastDateTime = curET.getArrivalDateTime();
-						lastDateTime += it->getContinuousServiceRange();
+						lastDateTime += (*it)->getContinuousServiceRange();
 
 						columnInterfacePage->display(
 							*__Tampons[__Ligne]
@@ -135,7 +136,7 @@ namespace synthese
 							, dynamic_cast<const Road*> (curET.getService()->getPath()) != NULL
 							, curET.getArrivalDateTime().getHour ()
 							, lastDateTime.getHour()
-							, it->getContinuousServiceRange() > 0
+							, (*it)->getContinuousServiceRange() > 0
 							, true
 							, (itl + 1) == jl.end()
 							, request
@@ -252,7 +253,7 @@ namespace synthese
 		}
 
 		int SchedulesTableInterfaceElement::OrdrePAEchangeSiPossible(
-			const Journeys& jv
+			const JourneyBoardJourneys& jv
 			, PlaceList& pl
 			, const LockedLinesList& lll
 			, int PositionActuelle
@@ -267,9 +268,9 @@ namespace synthese
 			// Construction de l'ensemble des lignes a permuter
 			LignesAPermuter[ PositionActuelle ] = true;
 			int __i(0);
-			for ( Journeys::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
+			for (JourneyBoardJourneys::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
 			{
-				vector<bool> curLignesET = OrdrePAConstruitLignesAPermuter( pl, *it, PositionActuelle );
+				vector<bool> curLignesET = OrdrePAConstruitLignesAPermuter( pl, **it, PositionActuelle );
 				for ( i = PositionActuelle; i > PositionGareSouhaitee; i-- )
 					if ( curLignesET[ i ] && LignesAPermuter[ i ] )
 						break;
@@ -281,9 +282,9 @@ namespace synthese
 			// Tests d'ï¿½changeabilitï¿½ binaire
 			// A la premiere contradiction on s'arrete
 			__i=0;
-			for ( Journeys::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
+			for (JourneyBoardJourneys::const_iterator it = jv.begin(); it != jv.end(); ++it, ++__i )
 			{
-				vector<bool> curLignesET = OrdrePAConstruitLignesAPermuter( pl, *it, PositionActuelle );
+				vector<bool> curLignesET = OrdrePAConstruitLignesAPermuter( pl, **it, PositionActuelle );
 				i = PositionGareSouhaitee;
 				for ( j = PositionGareSouhaitee; true; j++ )
 				{
@@ -332,7 +333,7 @@ namespace synthese
 		int SchedulesTableInterfaceElement::OrdrePAInsere(
 			PlaceList& pl
 			, const LockedLinesList& lll
-			, const synthese::env::ConnectionPlace* place
+			, const ConnectionPlace* place
 			, int position
 		){
 			// Saut de ligne vérouillée par un cheminement piéton
@@ -658,7 +659,7 @@ namespace synthese
 
 		*/
 		SchedulesTableInterfaceElement::PlaceList SchedulesTableInterfaceElement::getStopsListForScheduleTable(
-			const Journeys& jv
+			const JourneyBoardJourneys& jv
 		){
 			// Variables locales
 			int i;
@@ -669,14 +670,14 @@ namespace synthese
 			PlaceList pl;
 
 			// Horizontal loop
-			for (Journeys::const_iterator it(jv.begin()); it != jv.end(); ++it)
+			for (JourneyBoardJourneys::const_iterator it(jv.begin()); it != jv.end(); ++it)
 			{
 				i = 0;
 				dernieri = -1;
 
 				// Vertical loop
-				const JourneyLegs& jl(it->getJourneyLegs());
-				for (JourneyLegs::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
+				const Journey::ServiceUses& jl((*it)->getServiceUses());
+				for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 				{
 					const ServiceUse& curET(*itl);
 

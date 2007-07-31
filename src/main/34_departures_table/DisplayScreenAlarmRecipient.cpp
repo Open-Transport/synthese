@@ -48,6 +48,9 @@
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/ArrivalDepartureTableRight.h"
 
+#include "12_security/User.h"
+#include "12_security/Profile.h"
+
 using namespace std;
 using namespace boost;
 

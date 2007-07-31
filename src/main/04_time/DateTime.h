@@ -48,24 +48,27 @@ namespace synthese
 		*/
 		class DateTime
 		{
-			private:
+		public:
+			typedef bool (DateTime::*ComparisonOperator) (const time::DateTime&) const;
 
-				Date _date; //!< Date
-				Hour _hour; //!< Hour
+		private:
 
-			public:
+			Date _date; //!< Date
+			Hour _hour; //!< Hour
 
-				DateTime ( int day = TIME_CURRENT, int month = TIME_SAME, int year = TIME_SAME,
-						int hours = TIME_SAME, int minutes = TIME_SAME );
+		public:
 
-				DateTime ( const DateTime& ref);
-				DateTime ( const Date& date );
-				DateTime(const Date& date, const Hour& hour);
+			DateTime ( int day = TIME_CURRENT, int month = TIME_SAME, int year = TIME_SAME,
+					int hours = TIME_SAME, int minutes = TIME_SAME );
 
-				~DateTime();
+			DateTime ( const DateTime& ref);
+			DateTime ( const Date& date );
+			DateTime(const Date& date, const Hour& hour);
 
-				//! @name Getters/Setters
-				//@{
+			~DateTime();
+
+			//! @name Getters/Setters
+			//@{
 				const Date& getDate() const;
 				const Hour& getHour() const;
 
@@ -76,13 +79,13 @@ namespace synthese
 				int getMinutes() const;
 
 				void setHour ( const Hour& );
-				//@}
+			//@}
 
-				//! @name Update methods
-				//@{
+			//! @name Update methods
+			//@{
 				void updateDateTime ( int day = TIME_CURRENT, int month = TIME_SAME,
-									int year = TIME_SAME, int hours = TIME_SAME,
-									int minutes = TIME_SAME );
+								int year = TIME_SAME, int hours = TIME_SAME,
+								int minutes = TIME_SAME );
 
 				void updateDate ( int day = TIME_CURRENT, int month = TIME_SAME, int year = TIME_SAME );
 				void updateHour ( int hours = TIME_SAME, int minutes = TIME_SAME );
@@ -90,42 +93,38 @@ namespace synthese
 				void updateHour ( const std::string& );
 				void subDaysDuration ( int daysDuration );
 				void addDaysDuration ( int daysDuration = 1);
-				//@}
+			//@}
 
 
-				//! @name Query methods
-				//@{
+			//! @name Query methods
+			//@{
 				bool isValid () const;
 				bool isUnknown() const;
 				std::string toInternalString () const;
 				std::string toSQLString(bool withApostrophes = true) const;
 				std::string toString() const;
-				//@}
+			//@}
 
 
 
-				/** Adds one day to this DateTime
-				*/
-				DateTime& operator ++ ( int );
+			/** Adds one day to this DateTime
+			*/
+			DateTime& operator ++ ( int );
 
 
-				/** Subs one day to this DateTime
-				*/
-				DateTime& operator -- ( int );
+			/** Subs one day to this DateTime
+			*/
+			DateTime& operator -- ( int );
 
-				DateTime& operator += ( int minutesDuration );
-				DateTime& operator -= ( int minutesDuration );
+			DateTime& operator += ( int minutesDuration );
+			DateTime& operator -= ( int minutesDuration );
 
-				DateTime& operator = ( const DateTime& ref);
+			DateTime& operator = ( const DateTime& ref);
 
-				DateTime& operator = ( const std::string& );
-				DateTime& operator = ( const Date& );
-				DateTime& operator = ( const Hour& );
+			DateTime& operator = ( const std::string& );
+			DateTime& operator = ( const Date& );
+			DateTime& operator = ( const Hour& );
 
-
-				/** Sets schedule hour to this DateTime.
-				*/
-				DateTime& operator = ( const Schedule& );
 
 			/** Constructs a DateTime from an SQL timestamp string (AAAAMMJJhhmmss);
 				seconds are ignored.
@@ -142,6 +141,16 @@ namespace synthese
 			*/
 			static DateTime FromString (const std::string& str);
 
+			bool operator == (const DateTime& op2 ) const;
+			bool operator != (const DateTime& op2 ) const;
+			bool operator <= (const DateTime& op2 ) const;
+//			bool operator <= (const Schedule& op2 ) const;
+			bool operator < (const DateTime& op2 ) const;
+//			bool operator < (const Schedule& op2 ) const;
+			bool operator >= (const DateTime& op2 ) const;
+//			bool operator >= (const Schedule& op2 ) const;
+			bool operator > (const DateTime& op2 ) const;
+//			bool operator > (const Schedule& op2 ) const;
 
 		};
 
@@ -150,16 +159,6 @@ namespace synthese
 
 
 
-		bool operator == ( const DateTime& op1, const DateTime& op2 );
-		bool operator != ( const DateTime& op1, const DateTime& op2 );
-		bool operator <= ( const DateTime& op1, const DateTime& op2 );
-		bool operator <= ( const DateTime& op1, const Schedule& op2 );
-		bool operator < ( const DateTime& op1, const DateTime& op2 );
-		bool operator < ( const DateTime& op1, const Schedule& op2 );
-		bool operator >= ( const DateTime& op1, const DateTime& op2 );
-		bool operator >= ( const DateTime& op1, const Schedule& op2 );
-		bool operator > ( const DateTime& op1, const DateTime& op2 );
-		bool operator > ( const DateTime& op1, const Schedule& op2 );
 
 
 		/**

@@ -61,6 +61,9 @@ namespace synthese
 			, _endReached(false)
 			, _squareDistanceToEnd(UNKNOWN_VALUE)
 			, _minSpeedToEnd(UNKNOWN_VALUE)
+			, _bestTimeStrictOperator((method == TO_DESTINATION) ? &DateTime::operator< : &DateTime::operator >)
+			, _endServiceUseGetter((_method == TO_DESTINATION) ? &Journey::getLastJourneyLeg : &Journey::getFirstJourneyLeg)
+			, _beginServiceUseGetter((_method == TO_DESTINATION) ? &Journey::getFirstJourneyLeg : &Journey::getLastJourneyLeg)
 		{
 		}
 		
@@ -161,8 +164,8 @@ namespace synthese
 		{
 			assert(_method == journey._method);
 
-			for(JourneyLegs::const_reverse_iterator it(journey.getJourneyLegs().rbegin());
-				it != journey.getJourneyLegs().rend();
+			for(ServiceUses::const_reverse_iterator it(journey._journeyLegs.rbegin());
+				it != journey._journeyLegs.rend();
 				++it
 			)	prepend(*it);
 
@@ -200,8 +203,8 @@ namespace synthese
 		{
 			assert(_method == journey._method);
 
-			for(JourneyLegs::const_iterator it(journey.getJourneyLegs().begin());
-				it != journey.getJourneyLegs().end();
+			for(ServiceUses::const_iterator it(journey._journeyLegs.begin());
+				it != journey._journeyLegs.end();
 				++it
 			)	append(*it);
 
@@ -224,7 +227,7 @@ namespace synthese
 			synthese::time::DateTime alarmStart, alarmStop, now;
 			int maxAlarmLevel = 0;
 		    
-			for (JourneyLegs::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
+			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
 			{
 				const ServiceUse& leg(*it);
 				const Service* service(leg.getService());
@@ -316,20 +319,21 @@ namespace synthese
 		int 
 		Journey::getContinuousServiceRange () const
 		{
-			if (_continuousServiceRange != UNKNOWN_VALUE) return _continuousServiceRange;
-
-			int continuousServiceRange = UNKNOWN_VALUE;
-			for (JourneyLegs::const_iterator it = _journeyLegs.begin();	it != _journeyLegs.end(); ++it)
+			if (_continuousServiceRange == UNKNOWN_VALUE)
 			{
-				const ServiceUse& leg(*it);
-				if ( (continuousServiceRange == UNKNOWN_VALUE) ||
-					 (leg.getServiceRange() < continuousServiceRange) )
+				int continuousServiceRange = UNKNOWN_VALUE;
+				for (ServiceUses::const_iterator it = _journeyLegs.begin();	it != _journeyLegs.end(); ++it)
 				{
-					continuousServiceRange = leg.getServiceRange();
+					const ServiceUse& leg(*it);
+					if ( (continuousServiceRange == UNKNOWN_VALUE) ||
+						(leg.getServiceRange() < continuousServiceRange) )
+					{
+						continuousServiceRange = leg.getServiceRange();
+					}
+					if (continuousServiceRange == 0) break;
 				}
-				if (continuousServiceRange == 0) break;
 			}
-			return continuousServiceRange;
+			return _continuousServiceRange;
 		}
 
 
@@ -374,7 +378,7 @@ namespace synthese
 		}
 		*/
 
-		const JourneyLegs& Journey::getJourneyLegs() const
+		const Journey::ServiceUses& Journey::getServiceUses() const
 		{
 			return _journeyLegs;
 		}
@@ -454,7 +458,7 @@ namespace synthese
 				return true;
 
 			// Check axis against already followed axes
-			for (JourneyLegs::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
+			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
 			{
 				if (it->getEdge()->getParentPath()->getAxis () == axis)
 					return false;
@@ -469,7 +473,7 @@ namespace synthese
 
 		void Journey::shift( int duration, int continuousServiceRange /*= UNKNOWN_VALUE*/ )
 		{
-			for(JourneyLegs::iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
+			for(ServiceUses::iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
 			{
 				it->shift(duration);
 			}
@@ -483,20 +487,12 @@ namespace synthese
 
 		const env::ServiceUse& Journey::getEndServiceUse() const
 		{
-			return
-				(_method == TO_DESTINATION)
-				? getLastJourneyLeg()
-				: getFirstJourneyLeg()
-			;
+			return (this->*_endServiceUseGetter)();
 		}
 
 		const env::ServiceUse& Journey::getStartServiceUse() const
 		{
-			return
-				(_method == TO_DESTINATION)
-				? getFirstJourneyLeg()
-				: getLastJourneyLeg()
-			;
+			return (this->*_beginServiceUseGetter)();
 		}
 
 		void Journey::reverse()
@@ -564,6 +560,15 @@ namespace synthese
 		{
 			return _squareDistanceToEnd;
 		}
+
+		bool Journey::getEndReached() const
+		{
+			return _endReached;
+		}
+
+		const time::DateTime::ComparisonOperator& Journey::getBestTimeStrictOperator() const
+		{
+			return _bestTimeStrictOperator;
+		}
 	}
 }
-

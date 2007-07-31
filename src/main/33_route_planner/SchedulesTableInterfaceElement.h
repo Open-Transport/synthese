@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/Types.h"
+#include "33_route_planner/Types.h"
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
@@ -49,7 +49,7 @@ namespace synthese
 			typedef std::vector<bool> LockedLinesList;
 
 			static int OrdrePAEchangeSiPossible(
-				const env::Journeys&
+				const JourneyBoardJourneys&
 				, PlaceList&
 				, const LockedLinesList&
 				, int PositionOrigine
@@ -83,7 +83,7 @@ namespace synthese
 				, const env::ConnectionPlace* GareAChercher
 			);
 
-			static PlaceList getStopsListForScheduleTable( const env::Journeys& );
+			static PlaceList getStopsListForScheduleTable( const JourneyBoardJourneys& );
 
 		public:
 			/** Display.

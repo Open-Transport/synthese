@@ -23,6 +23,7 @@
 #include "15_env/PermanentService.h"
 #include "15_env/Edge.h"
 #include "15_env/Path.h"
+#include "15_env/Types.h"
 
 #include "04_time/module.h"
 

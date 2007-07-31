@@ -38,6 +38,7 @@
 #include "15_env/ReservationRule.h"
 #include "15_env/ServiceUse.h"
 #include "15_env/Journey.h"
+#include "15_env/Service.h"
 
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
@@ -82,12 +83,12 @@ namespace synthese
 			// Loop on lines of the board
 			bool __Couleur = false;
 
-			for (JourneyLegs::const_iterator it = journey->getJourneyLegs().begin(); it != journey->getJourneyLegs().end(); ++it)
+			for (Journey::ServiceUses::const_iterator it = journey->getServiceUses().begin(); it != journey->getServiceUses().end(); ++it)
 			{
 				const ServiceUse& leg(*it);
 
 				// LIGNE ARRET MONTEE Si premier point d'arr�t et si alerte
-				if (it == journey->getJourneyLegs().begin())
+				if (it == journey->getServiceUses().begin())
 				{
 					time::DateTime debutPrem, finPrem;
 					debutPrem = leg.getDepartureDateTime();
@@ -189,7 +190,7 @@ namespace synthese
 					synthese::time::DateTime debutArret, finArret, tempMoment(synthese::time::TIME_UNKNOWN);
 					debutArret = leg.getArrivalDateTime ();
 					finArret = debutArret;
-					if ( (it + 1) < journey->getJourneyLegs().end())
+					if ( (it + 1) < journey->getServiceUses().end())
 						finArret = (it + 1)->getDepartureDateTime();
 					if ( journey->getContinuousServiceRange () )
 						finArret += journey->getContinuousServiceRange ();
@@ -218,7 +219,7 @@ namespace synthese
 					synthese::time::DateTime debutArret, finArret;
 					debutArret = leg.getArrivalDateTime ();
 					finArret = debutArret;
-					if ((it+1) < journey->getJourneyLegs().end())
+					if ((it+1) < journey->getServiceUses().end())
 						finArret = (it + 1)->getDepartureDateTime();
 					if ( journey->getContinuousServiceRange () )
 						finArret += journey->getContinuousServiceRange ();

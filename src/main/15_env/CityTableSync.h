@@ -28,12 +28,12 @@
 
 #include "02_db/SQLiteTableSyncTemplate.h"
 
-#include "15_env/City.h"
-
 namespace synthese
 {
 	namespace env
 	{
+		class City;
+
 		/** City SQLite table synchronizer.
 			@ingroup m15
 

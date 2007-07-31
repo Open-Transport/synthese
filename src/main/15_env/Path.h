@@ -28,10 +28,7 @@
 
 #include "01_util/UId.h"
 
-#include "04_time/Schedule.h"
-
 #include "15_env/Calendar.h"
-#include "15_env/Service.h"
 #include "15_env/Complyer.h"
 
 namespace synthese
@@ -53,20 +50,14 @@ namespace synthese
 
 	namespace env
 	{
-
+		class Service;
 		class Axis;
 		class Edge;
 		class Fare;
 
 		struct cmpService
 		{
-		    bool operator() (const Service* s1, const Service* s2) const
-			{
-			    return (s1->getDepartureSchedule () < s2->getDepartureSchedule ())
-				|| (s1->getDepartureSchedule () == s2->getDepartureSchedule ()
-				    && s1 < s2)						
-				;
-			}
+		    bool operator() (const Service* s1, const Service* s2) const;
 		};
 
 		typedef std::set<Service*, cmpService> ServiceSet;

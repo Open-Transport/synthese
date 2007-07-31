@@ -31,6 +31,8 @@
 
 #include "12_security/Types.h"
 
+#include "01_util/Constants.h"
+
 namespace synthese
 {
 	namespace env

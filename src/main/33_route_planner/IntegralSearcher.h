@@ -23,13 +23,14 @@
 #ifndef SYNTHESE_routeplanner_IntegralSearcher_h__
 #define SYNTHESE_routeplanner_IntegralSearcher_h__
 
-#include "15_env/ServiceUse.h"
 #include "15_env/Types.h"
 
 #include "33_route_planner/Types.h"
+#include "33_route_planner/JourneysResult.h"
 
 #include <map>
 #include <list>
+#include <utility>
 
 namespace synthese
 {
@@ -41,9 +42,15 @@ namespace synthese
 		class Journey;
 	}
 
+	namespace time
+	{
+		class DateTime;
+	}
+
 	namespace routeplanner
 	{
 		class BestVertexReachesMap;
+		class JourneysResult;
 
 		/** IntegralSearcher class.
 			@ingroup m33
@@ -58,8 +65,6 @@ namespace synthese
 		class IntegralSearcher
 		{
 		private:
-			typedef std::map<const env::Vertex*, env::Journey> IntegralSearchWorkingResult;
-			
 			typedef const env::Edge* (env::Edge::*PtrEdgeStep) () const;
 
 			//! @name Parameters
@@ -70,17 +75,15 @@ namespace synthese
 				const SearchPhysicalStops	_searchPhysicalStops;
 				const UseRoads				_useRoads;
 				const UseLines				_useLines;
+				JourneysResult&				_result;
 				BestVertexReachesMap&		_bestVertexReachesMap;
 				const env::VertexAccessMap&	_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
 				const time::DateTime&		_calculationTime;
 				time::DateTime&				_minMaxDateTimeAtDestination;
 				const int					_previousContinuousServiceDuration;
 				const time::DateTime&		_previousContinuousServiceLastDeparture;
-			//@}
-
-			//! @name Result
-			//@{
-				IntegralSearchWorkingResult	_result;
+				const int					_maxDepth;
+				const bool					_optim;
 			//@}
 
 			/** Integral search of objects within the network.
@@ -113,24 +116,55 @@ namespace synthese
 				, SearchPhysicalStops			searchPhysicalStops
 				, UseRoads						useRoads
 				, UseLines						useLines
+				, JourneysResult&				result
 				, BestVertexReachesMap&			bestVertexReachesMap
 				, const env::VertexAccessMap&	destinationVam
 				, const time::DateTime&			calculationTime
 				, time::DateTime&				minMaxDateTimeAtDestination
 				, int							previousContinuousServiceDuration
 				, const time::DateTime&			previousContinuousServiceLastDeparture
+				, const int						maxDepth
+				, bool							optim
 				);
 
-			env::Journeys integralSearch(
+			/** Launch of the integral search upon a vertex access map.
+				@param result Result to consider and to write on
+				@param vertices Access map
+				@param desiredTime Time to use for starting the search
+				@param maxDepth Maximum depth of recursion
+				@param strictTime If true, only the journeys starting exactly at the desired time are selected, and the best vertex map use is in optimizing purpose
+				@author Hugues Romain
+				@date 2007				
+			*/
+			void integralSearch(
 				const env::VertexAccessMap& vertices
-				, const env::Journey& journey
 				, const time::DateTime& desiredTime
-				, int maxDepth
 				, bool strictTime = false
 			);
 
-			bool evaluateJourney(
+			/** Launch of the integral search upon a journey corresponding to a beginning of a route planning.
+				@param journey The journey to complete.
+				@warning The journey must be non empty
+				@author Hugues Romain
+				@date 2007				
+			*/
+			void integralSearch(
 				const env::Journey& journey
+			);
+
+
+			/** Journey utility evaluation.
+				@param journey Journey to evaluate
+				@param bool optimization mode
+				@return pair<bool,bool> Possible values : false/false, true/true, false/true
+					- first : utility to store the journey as result or a future result part.
+					- second : utility to continue to traverse the rest of the path
+				@author Hugues Romain
+				@date 2007				
+			*/
+			std::pair<bool,bool> evaluateJourney(
+				const env::Journey& journey
+				, bool optim
 			) const;
 
 		};

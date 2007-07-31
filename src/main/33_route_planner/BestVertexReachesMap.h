@@ -23,10 +23,7 @@
 #ifndef SYNTHESE_ROUTEPLANNER_BESTVERTEXREACHESMAP_H
 #define SYNTHESE_ROUTEPLANNER_BESTVERTEXREACHESMAP_H
 
-
 #include "15_env/Types.h"
-#include "15_env/VertexAccessMap.h"
-#include "15_env/ServiceUse.h"
 
 #include "04_time/DateTime.h"
 
@@ -38,6 +35,7 @@ namespace synthese
 	namespace env
 	{
 		class Vertex;
+		class ServiceUse;
 	}
 
 
@@ -51,18 +49,22 @@ namespace synthese
 		 private:
 
 
-			typedef std::map<const env::Vertex*, env::ServiceUse> JourneyLegMap;
 			typedef std::map<const env::Vertex*, time::DateTime> TimeMap;
 		    
-			AccessDirection _accessDirection;
-
-			JourneyLegMap _bestJourneyLegMap;
+			const AccessDirection _accessDirection;
 			TimeMap _bestTimeMap;
+
+			time::DateTime::ComparisonOperator	_comparison;
+			time::DateTime::ComparisonOperator	_cleanUpUselessComparison;
+			time::DateTime::ComparisonOperator	_strictWeakCTimeComparison;
 
 		 public:
 
 
-			BestVertexReachesMap();
+			BestVertexReachesMap(
+				AccessDirection accessDirection
+				, bool optim
+			);
 			~BestVertexReachesMap();
 
 
@@ -73,28 +75,37 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-			bool contains (const env::Vertex* vertex) const;
+				bool contains (const env::Vertex* vertex) const;
 
-			const time::DateTime& getBestTime (const env::Vertex* vertex, 
-					 const time::DateTime& defaultValue) const;
+				const time::DateTime& getBestTime(
+					const env::Vertex* vertex
+					, const time::DateTime& defaultValue
+				) const;
+
+				bool isUseless(
+					const env::Vertex* vertex
+					, const time::DateTime& dateTime
+				) const;
+				bool mustBeCleared(
+					const env::Vertex* vertex
+					, const time::DateTime& dateTime
+					, const time::DateTime& bestEndTime
+				) const;
+
 
 			//@}
 
 
 			//! @name Update methods
 			//@{
-			void clear (const AccessDirection& accessDirection);
-			void insert (const env::ServiceUse& journeyLeg);
-		    
-			void insert (const env::Vertex* vertex, 
-				 const time::DateTime& dateTime,
-				 bool propagateInConnectionPlace = true);
-
+				void insert(const env::ServiceUse& journeyLeg);
+			    
+				void insert(
+					const env::Vertex* vertex
+					, const time::DateTime& dateTime
+					, bool propagateInConnectionPlace = true
+				);
 			//@}
-
-
-		 private:
-
 
 		};
 	}

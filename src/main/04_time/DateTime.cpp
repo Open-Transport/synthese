@@ -21,7 +21,6 @@
 */
 
 #include "DateTime.h"
-#include "Schedule.h"
 
 #include "01_util/Conversion.h"
 
@@ -112,15 +111,6 @@ namespace synthese
 		DateTime::operator --( int )
 		{
 			_date--;
-			return ( *this );
-		}
-
-
-
-		DateTime&
-		DateTime::operator = ( const Schedule& op )
-		{
-			_hour = op.getHour ();
 			return ( *this );
 		}
 
@@ -298,10 +288,10 @@ namespace synthese
 
 
 		bool
-		operator == ( const DateTime& op1, const DateTime& op2 )
+			DateTime::operator == ( const DateTime& op2 ) const
 		{
-			return ( op1.getDate () == op2.getDate () ) &&
-				( op1.getHour () == op2.getHour () );
+			return (getDate () == op2.getDate () ) &&
+				( getHour () == op2.getHour () );
 		}
 
 
@@ -309,30 +299,30 @@ namespace synthese
 
 
 		bool
-		operator != ( const DateTime& op1, const DateTime& op2 )
+			DateTime::operator != ( const DateTime& op2 ) const
 		{
-			return ( op1.getDate () != op2.getDate () || op1.getHour () != op2.getHour () );
+			return ( getDate () != op2.getDate () || getHour () != op2.getHour () );
 		}
 
 
 
 		bool
-		operator<=( const DateTime& op1, const DateTime &op2 )
+			DateTime::operator<=( const DateTime &op2 ) const
 		{
-			return ( op1.getDate () < op2.getDate () || op1.getDate () == op2.getDate () && op1.getHour () <= op2.getHour () );
+			return ( getDate () < op2.getDate () || getDate () == op2.getDate () && getHour () <= op2.getHour () );
 		}
 
 
 
 		bool
-		operator < ( const DateTime& op1, const DateTime &op2 )
+			DateTime::operator < ( const DateTime &op2 ) const
 		{
-			return ( op1.getDate () < op2.getDate () || op1.getDate () == op2.getDate () && op1.getHour () < op2.getHour () );
+			return ( getDate () < op2.getDate () || getDate () == op2.getDate () && getHour () < op2.getHour () );
 		}
 
 
 
-		bool
+/*		bool
 		operator<=( const DateTime& op1, const Schedule& op2 )
 		{
 			return ( op2 >= op1.getHour () );
@@ -361,23 +351,23 @@ namespace synthese
 		{
 			return ( op2 < op1.getHour () );
 		}
-
+*/
 
 
 		bool
-		operator>=( const DateTime& op1, const DateTime& op2 )
+			DateTime::operator>=( const DateTime& op2 ) const
 		{
-			return ( op1.getDate () > op2.getDate () ||
-					op1.getDate () == op2.getDate () && op1.getHour () >= op2.getHour () );
+			return ( getDate () > op2.getDate () ||
+					getDate () == op2.getDate () && getHour () >= op2.getHour () );
 		}
 
 
 
 		bool
-		operator > ( const DateTime& op1, const DateTime &op2 )
+			DateTime::operator > ( const DateTime &op2 ) const
 		{
-			return ( op1.getDate () > op2.getDate () ||
-					( op1.getDate () == op2.getDate () && op1.getHour () > op2.getHour () ) );
+			return ( getDate () > op2.getDate () ||
+					( getDate () == op2.getDate () && getHour () > op2.getHour () ) );
 		}
 
 

@@ -28,9 +28,6 @@
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
-#include "04_time/DateTime.h"
-#include "04_time/Schedule.h"
-
 #include "15_env/Edge.h"
 
 namespace synthese

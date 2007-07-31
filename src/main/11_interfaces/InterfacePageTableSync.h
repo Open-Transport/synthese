@@ -28,8 +28,6 @@
 
 #include "02_db/SQLiteTableSync.h"
 
-#include "11_interfaces/Interface.h"
-
 namespace synthese
 {
 	namespace interfaces

@@ -33,11 +33,11 @@ namespace synthese
 		void RoutePlannerInterfacePage::display(
 			std::ostream& stream
 			, VariablesMap& variables
-			, const Journeys* object /*= NULL*/
+			, const JourneyBoardJourneys& object /*= NULL*/
 			, const server::Request* request /*= NULL*/
 			) const
 		{
-			const void* vobj(static_cast<const void*>(object));
+			const void* vobj(static_cast<const void*>(&object));
 			ParametersVector pv;
 
 			/// @todo Implement the building of the parameter vector with parameters of the function

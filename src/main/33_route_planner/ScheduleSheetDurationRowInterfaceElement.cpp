@@ -53,13 +53,13 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 			
-			const Journeys* jv = static_cast<const Journeys*>(object);
+			const JourneyBoardJourneys* jv = static_cast<const JourneyBoardJourneys*>(object);
 			shared_ptr<const DurationInterfacePage> durationInterfacePage = _page->getInterface()->getPage<DurationInterfacePage>();
 			
-			for (Journeys::const_iterator it = jv->begin(); it != jv->end(); ++it)
+			for (JourneyBoardJourneys::const_iterator it = jv->begin(); it != jv->end(); ++it)
 			{
 				stream << _cellHeader->getValue(parameters, variables, object, request);
-				durationInterfacePage->display(stream, it->getDuration(), variables, object, request);
+				durationInterfacePage->display(stream, (*it)->getDuration(), variables, object, request);
 				stream << _cellFooter->getValue(parameters, variables, object, request);
 			}
 

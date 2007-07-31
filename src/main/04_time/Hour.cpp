@@ -203,6 +203,9 @@ operator-( const Hour& op1, const Hour& op2 )
 int
 Hour::operator+=( int minutesToAdd )
 {
+	if (minutesToAdd < 0)
+		operator-=(-minutesToAdd);
+
     // 1: Minutes
     int calculatedTime = getMinutes () + minutesToAdd;
     int retain = calculatedTime / MINUTES_PER_HOUR;
@@ -223,7 +226,10 @@ Hour::operator+=( int minutesToAdd )
 int
 Hour::operator-=( int minutesToSubstract )
 {
-    // 1: Minutes
+	if (minutesToSubstract < 0)
+		operator+=(-minutesToSubstract);
+
+	// 1: Minutes
     int retain = ( MINUTES_PER_HOUR - 1 + minutesToSubstract - getMinutes() ) / MINUTES_PER_HOUR;
     _minutes = retain * MINUTES_PER_HOUR + _minutes - minutesToSubstract;
     int hoursToSubstract = retain;

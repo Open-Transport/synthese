@@ -30,12 +30,10 @@
 #include "04_time/DateTime.h"
 
 #include "15_env/Place.h"
-#include "15_env/Types.h"
 #include "15_env/VertexAccessMap.h"
 #include "15_env/ServiceUse.h"
 
-#include "33_route_planner/BestVertexReachesMap.h"
-#include "33_route_planner/JourneyLegComparator.h"
+#include "33_route_planner/Types.h"
 
 namespace synthese
 {
@@ -66,13 +64,20 @@ namespace synthese
 		class RoutePlanner
 		{
 		public:
+			class Result
+			{
+			public:
+				JourneyBoardJourneys journeys;
+				void clear();
+				~Result();
+			};
 
 		private:
 			
 			//! @name Parameters
 			//@{
-				const env::Place* _origin;  //<! Origin place for route planning.
-				const env::Place* _destination;  //!< Destination place for route planning.
+				env::VertexAccessMap _originVam;
+				env::VertexAccessMap _destinationVam;
 				const AccessParameters _accessParameters;
 				const time::DateTime _journeySheetStartTime;  //!< Start time of schedule sheet.
 				const time::DateTime _journeySheetEndTime;    //!< End time of schedule sheet.
@@ -83,13 +88,12 @@ namespace synthese
 
 			//! @name Working variables
 			//@{
-				env::VertexAccessMap _originVam;
-				env::VertexAccessMap _destinationVam;
 				time::DateTime _minDepartureTime;  //!< Min departure time.
 				time::DateTime _maxArrivalTime;  //!< Max arrival time.
 				int _previousContinuousServiceDuration;  //!< Journey duration in previously found continuous service.
 				time::DateTime _previousContinuousServiceLastDeparture;  //!< End time of validity range of previously found continuous service.
-				BestVertexReachesMap _bestVertexReachesMap;  //!< 
+				Result			_result;
+				 //!< 
 			//@}
 
 		 public:
@@ -105,12 +109,6 @@ namespace synthese
 
 			~RoutePlanner ();
 
-
-			//! @name Getters/Setters
-			//@{
-				const env::Place* getOrigin () const;
-				const env::Place* getDestination () const;
-			//@}
 
 			//! @name Query methods
 			//@{
@@ -129,22 +127,36 @@ namespace synthese
 					- true : solutions allowing a comfort raising and a time saving are selected
 					- false :solutions allowing a time saving are only selected
 			*/
-			void findBestJourney(
+/*			void findBestJourney(
 				env::Journey& result
 				, const env::VertexAccessMap& ovam
 				, const env::VertexAccessMap& dvam
 				, const env::Journey& currentJourney
 				, bool strictTime
 			);
-			
-			
+*/			
+
+			void findBestJourney(
+				env::Journey& result
+				, const env::VertexAccessMap& startVam
+				, const env::VertexAccessMap& endVam
+				, const time::DateTime& startTime
+				, bool strictTime
+			);
+
 			void computeRoutePlanningDepartureArrival(
 				env::Journey& result
 				, const env::VertexAccessMap& ovam
 				, const env::VertexAccessMap& dvam
 			);
 
-			env::Journeys computeJourneySheetDepartureArrival ();
+			/** Launch of the route planning, applying the "from the departure to the arrival" method.
+				@return JourneyBoardJourneys The founded journeys
+				@warning The journeys must be deleted after use to avoid memory leak
+				@author Hugues Romain
+				@date 2007
+			*/
+			const Result& computeJourneySheetDepartureArrival ();
 
 			//@}
 		};

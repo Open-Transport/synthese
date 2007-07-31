@@ -22,6 +22,7 @@
 
 #include "15_env/AddressablePlace.h"
 #include "15_env/Address.h"
+#include "15_env/VertexAccessMap.h"
 
 #include <assert.h>
 

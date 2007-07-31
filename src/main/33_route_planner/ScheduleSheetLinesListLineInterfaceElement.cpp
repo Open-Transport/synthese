@@ -23,6 +23,7 @@
 #include "33_route_planner/ScheduleSheetLinesListLineInterfaceElement.h"
 #include "33_route_planner/RoutePlanner.h"
 #include "33_route_planner/RoutePlannerSheetLinesCellInterfacePage.h"
+#include "33_route_planner/Types.h"
 
 #include "30_server/Request.h"
 
@@ -45,13 +46,13 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const Journeys* jv = static_cast<const Journeys*>(object);
+			const JourneyBoardJourneys* jv = static_cast<const JourneyBoardJourneys*>(object);
 			shared_ptr<const RoutePlannerSheetLinesCellInterfacePage> linesInterfacePage = _page->getInterface()->getPage<RoutePlannerSheetLinesCellInterfacePage>();
 
 			int n = 1;
-			for (Journeys::const_iterator it = jv->begin(); it != jv->end(); ++it, ++n )
+			for (JourneyBoardJourneys::const_iterator it = jv->begin(); it != jv->end(); ++it, ++n )
 			{
-				linesInterfacePage->display( stream, n, variables, &(*it), request );
+				linesInterfacePage->display( stream, n, variables, *it, request );
 			}
 
 			return string();

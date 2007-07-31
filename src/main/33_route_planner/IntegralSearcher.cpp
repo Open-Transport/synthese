@@ -22,7 +22,7 @@
 
 #include "33_route_planner/IntegralSearcher.h"
 #include "33_route_planner/BestVertexReachesMap.h"
-#include "33_route_planner/JourneyLegComparator.h"
+#include "33_route_planner/JourneysResult.h"
 
 #include "15_env/VertexAccessMap.h"
 #include "15_env/Vertex.h"
@@ -57,88 +57,124 @@ namespace synthese
 			, SearchPhysicalStops searchPhysicalStops
 			, UseRoads useRoads
 			, UseLines useLines
+			, JourneysResult&				result
 			, BestVertexReachesMap& bestVertexReachesMap
 			, const VertexAccessMap& destinationVam
 			, const DateTime& calculationDateTime
 			, DateTime&	minMaxDateTimeAtDestination
 			, int previousContinuousServiceDuration
 			, const DateTime& previousContinuousServiceLastDeparture
+			, int maxDepth
+			, bool optim
 		)	: _accessDirection(accessDirection)
 			, _accessParameters(accessParameters)
 			, _searchAddresses(searchAddresses)
 			, _searchPhysicalStops(searchPhysicalStops)
 			, _useRoads(useRoads)
 			, _useLines(useLines)
+			, _result(result)
 			, _bestVertexReachesMap(bestVertexReachesMap)
 			, _destinationVam(destinationVam)
 			, _calculationTime(calculationDateTime)
 			, _minMaxDateTimeAtDestination(minMaxDateTimeAtDestination)
 			, _previousContinuousServiceDuration(previousContinuousServiceDuration)
 			, _previousContinuousServiceLastDeparture(previousContinuousServiceLastDeparture)
+			, _maxDepth(maxDepth)
+			, _optim(optim)
 		{	}
 
 // ------------------------------------------------------------------- 2 Initialization
 
-		Journeys IntegralSearcher::integralSearch(
+		void IntegralSearcher::integralSearch(
 			const VertexAccessMap& vertices
-			, const Journey& journey
 			, const DateTime& desiredTime
-			, int maxDepth
 			, bool strictTime /*= false  */
 		){
-			_result.clear();
-
 			_integralSearchRecursion(
 				vertices
 				, desiredTime
-				, journey
-				, maxDepth
+				, Journey(_accessDirection)
+				, _maxDepth
 				, strictTime
 				);
 
-			Journeys result;
-			for (IntegralSearchWorkingResult::iterator it(_result.begin()); it != _result.end(); ++it)
-			{
-				it->second.setSquareDistanceToEnd(_destinationVam);
-				it->second.setMinSpeedToEnd(_minMaxDateTimeAtDestination);
-				result.push_back(it->second);
-			}
-
-			std::sort (result.begin(), result.end(), JourneyLegComparator());
-
 			if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
 			{
-				string spaces(journey.getJourneyLegs().size(), '*');
-				
 				stringstream s;
-				s	<< spaces;
-				if (journey.getMethod() == TO_DESTINATION)
+				if (_accessDirection == TO_DESTINATION)
 					s << "TO_DESTINATION";
 				else
 					s << "FROM_ORIGIN   ";
-				s	<< " IntegralSearch. Start : ";
-				if (journey.empty())
-					s << " at " << desiredTime.toString();
-				else
-					s	<< journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
-						<< " at " << journey.getEndTime().toString();
-				s << "\n";
-				for (Journeys::iterator it(result.begin()); it != result.end(); ++it)
+				s	<< " Initial IntegralSearch. Start : "
+					<< " at " << desiredTime.toString()
+					<< "\n";
+				for (JourneysResult::ResultSet::const_iterator it(_result.getJourneys().begin()); it != _result.getJourneys().end(); ++it)
 				{
-					s	<< spaces
-						<< " -> " << it->getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
-						<< " at " << it->getEndTime().toString()
-						<< "(dst = " << it->getSquareDistanceToEnd().getDistance()
-						<< " - min speed = " << it->getMinSpeedToEnd()
+					const Journey& journey(**it);
+					s	<< " -> " << journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
+						<< " at " << journey.getEndTime().toString()
+						<< "(dst = " << journey.getSquareDistanceToEnd().getDistance()
+						<< " - min speed = " << journey.getMinSpeedToEnd()
 						<< ")\n";
 				}
 
 				Log::GetInstance().trace(s.str());
 			}
-
-			return result;
 		}
 
+		void IntegralSearcher::integralSearch(
+			const env::Journey& journey
+		){
+			assert(!journey.empty());
+
+			VertexAccessMap vertices;
+			const Vertex* vertex(journey.getEndEdge()->getFromVertex());
+			vertex->getPlace()->getImmediateVertices(
+				vertices
+				, _accessDirection
+				, _accessParameters
+				, _searchAddresses
+				, _searchPhysicalStops
+				, vertex
+				);
+
+			_integralSearchRecursion(
+				vertices
+				, journey.getEndTime()
+				, journey
+				, _maxDepth
+				, false
+			);
+
+
+			if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+			{
+				string spaces(journey.getServiceUses().size(), '*');
+
+				stringstream s;
+				s	<< spaces;
+				if (_accessDirection == TO_DESTINATION)
+					s << "TO_DESTINATION";
+				else
+					s << "FROM_ORIGIN   ";
+				s	<< " IntegralSearch. Start : "
+					<< journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
+					<< " at " << journey.getEndTime().toString();
+				s << "\n";
+				for (JourneysResult::ResultSet::const_iterator it(_result.getJourneys().begin()); it != _result.getJourneys().end(); ++it)
+				{
+					const Journey& journey(**it);
+					s	<< spaces
+						<< " -> " << journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
+						<< " at " << journey.getEndTime().toString()
+						<< "(dst = " << journey.getSquareDistanceToEnd().getDistance()
+						<< " - min speed = " << journey.getMinSpeedToEnd()
+						<< ")\n";
+				}
+
+				Log::GetInstance().trace(s.str());
+			}
+		}
 // ------------------------------------------------------------------------ 3 Recursion
 
 		void IntegralSearcher::_integralSearchRecursion(
@@ -149,8 +185,7 @@ namespace synthese
 			, bool strictTime /*= false  */ 
 		){
 			// Local variables initialization
-			IntegralSearchWorkingResult result;
-			IntegralSearchWorkingResult recursionVertices;
+			map<const Vertex*, Journey*> recursionVertices;
 
 			// Loop on each origin vertex
 			for(std::map<const Vertex*, VertexAccess>::const_iterator itVertex(vam.getMap ().begin());
@@ -243,22 +278,45 @@ namespace synthese
 							continue;
 						
 						// Storage of the useful solution
-						Journey resultJourney(fullApproachJourney);
+						Journey* resultJourney = new Journey(fullApproachJourney);
 						ServiceUse serviceUse(serviceInstance, curEdge);
 						if (_accessDirection == TO_DESTINATION)
-							resultJourney.append (serviceUse);
+							resultJourney->append (serviceUse);
 						else
-							resultJourney.prepend(serviceUse);
+							resultJourney->prepend(serviceUse);
 						if (isGoalReached)
-							resultJourney.setEndApproachDuration(_destinationVam.getVertexAccess(reachedVertex).approachTime);
+							resultJourney->setEndApproachDuration(_destinationVam.getVertexAccess(reachedVertex).approachTime);
 							
 
 						// Analyze of the utility of the edge
 						// If the edge is useless, the path is not traversed anymore
-						if (!evaluateJourney(resultJourney))
-							break;
+						pair<bool,bool> evaluationResult(evaluateJourney(*resultJourney, _optim));
+						if (!evaluationResult.first)
+						{
+							delete resultJourney;
 
-						resultJourney.setEndReached(isGoalReached);
+							if (!evaluationResult.second)
+								break;
+							else
+								continue;
+						}
+
+						// Storage of the journey for recursion
+						if (maxDepth > 0)
+						{
+							map<const Vertex*, Journey*>::iterator itr(recursionVertices.find(reachedVertex));
+							if (itr != recursionVertices.end())
+							{
+								delete itr->second;
+								itr->second = new Journey(*resultJourney);
+							}
+							else
+								recursionVertices.insert(make_pair<const Vertex*, Journey*>(reachedVertex, new Journey(*resultJourney)));
+						}
+
+						resultJourney->setEndReached(isGoalReached);
+						resultJourney->setSquareDistanceToEnd(_destinationVam);
+						resultJourney->setMinSpeedToEnd(_minMaxDateTimeAtDestination);
 
 						// Storage of the journey as a result
 						if(	(	_searchAddresses == SEARCH_ADDRESSES
@@ -268,14 +326,8 @@ namespace synthese
 							&&	!reachedVertex->getConnectionPlace()->getPhysicalStops().empty()
 							)
 						||	isGoalReached
-						)	result[reachedVertex] = resultJourney;
+						)	_result.add(resultJourney);
 
-						// Storage of the journey for recursion
-						if (maxDepth > 0)
-						{
-							recursionVertices[reachedVertex] = resultJourney;
-						}
-						
 						// Storage of the reach time at the vertex in the best vertex reaches map
 						_bestVertexReachesMap.insert (serviceUse);
 
@@ -299,11 +351,11 @@ namespace synthese
 			if (maxDepth > 0)
 			{
 				// Now iterate on each journey leg and call recursively the integral search
-				for(IntegralSearchWorkingResult::const_iterator itLeg(recursionVertices.begin());
+				for(map<const Vertex*, Journey*>::const_iterator itLeg(recursionVertices.begin());
 					itLeg != recursionVertices.end();
 					++itLeg
 				){
-					const Journey& journey(itLeg->second);
+					const Journey& journey(*itLeg->second);
 					const ServiceUse& serviceUse(journey.getEndServiceUse());
 					const Vertex* nextVertex(itLeg->first);
 
@@ -328,7 +380,7 @@ namespace synthese
 			}
 
 			// Validating all the service uses compared to the final result list
-			for (IntegralSearchWorkingResult::iterator it(result.begin()); it != result.end();)
+/*			for (IntegralSearchWorkingResult::iterator it(result.begin()); it != result.end();)
 			{
 				if (!evaluateJourney(it->second))
 					result.erase(it++);
@@ -338,39 +390,58 @@ namespace synthese
 					++it;
 				}
 			}
+*/
+
 		}
 
 // ------------------------------------------------------------------------- Utilities
 
-		bool IntegralSearcher::evaluateJourney(
+		pair<bool,bool> IntegralSearcher::evaluateJourney(
 			const Journey& journey
+			, bool optim
 		) const {
 
 			assert(!journey.empty());
-
-			/// <h2>Initialization of local variables</h2>
-			const ServiceUse& serviceUse(journey.getEndServiceUse());
-			const Edge*	fromEdge(serviceUse.getEdge());
-			const Vertex* reachedVertex(serviceUse.getSecondEdge()->getFromVertex());
-			const DateTime& reachDateTime(serviceUse.getSecondActualDateTime());
-
+			
 			/// <h2>Control of the compliance with the current filters</h2>
+			const ServiceUse& serviceUse(journey.getEndServiceUse());
+			const Vertex* reachedVertex(serviceUse.getSecondEdge()->getFromVertex());
+			if (reachedVertex->isAddress ())
+			{
+				/** - If the edge is an address, the currentJourney necessarily contains
+					only road legs, filter on max approach distance (= walk distance).
+				*/
+				if(journey.getDistance () > _accessParameters.maxApproachDistance)
+					return make_pair(false,false);
 
-			/** - If the edge is an address, the currentJourney necessarily contains
-				only road legs, filter on max approach distance (= walk distance).
-			*/
-			if ((reachedVertex->isAddress ()) &&
-				(journey.getDistance () > _accessParameters.maxApproachDistance)
-			)	return false;
-
-			/** - If the edge is an address, the currentJourney necessarily contains
-				only road legs, filter on max approach time (= walk time).
-			*/
-			if ( (reachedVertex->isAddress ()) &&
-				(journey.getEffectiveDuration () > _accessParameters.maxApproachTime)
-			)	return false;
+				/** - If the edge is an address, the currentJourney necessarily contains
+					only road legs, filter on max approach time (= walk time).
+				*/
+				if(journey.getEffectiveDuration () > _accessParameters.maxApproachTime)
+					return make_pair(false,false);
+			}
 
 			/// <h2>Determination of the utility to store the service use</h2>
+
+			/** - Continuous service breaking test : if the solution is between a service continuous range
+				then it is stored only if its duration is better than the one of the continuous service.
+			*/
+			if(	(_previousContinuousServiceDuration > 0)
+			&&	(journey.getDepartureTime() < _previousContinuousServiceLastDeparture)
+			&&	(journey.getDuration() >= _previousContinuousServiceDuration)
+			)	return make_pair(false,false);
+
+
+			/** - To be worse than the absolute best time is forbidden. */
+			const DateTime& reachDateTime(serviceUse.getSecondActualDateTime());
+			const AccessDirection& method(journey.getMethod());
+			if(	(	(method == FROM_ORIGIN)
+				&&	(reachDateTime < _minMaxDateTimeAtDestination)
+				)
+			||	(	(method == TO_DESTINATION)
+				&&	(reachDateTime > _minMaxDateTimeAtDestination)
+				)
+			)	return make_pair(false,false);
 
 			/** - If the reached vertex does not belong to the goal, comparison with the known best time at the goal, to determinate 
 				if there is any chance to reach the goal more efficiently by using this path
@@ -381,6 +452,7 @@ namespace synthese
 
 				@todo Replace the third value (1 minute) by a more accurate value ("VMAX algorithm")
 			*/
+			pair<bool,bool> result(make_pair(true,true));
 			if(	!_destinationVam.contains(reachedVertex)
 				&& reachedVertex->isConnectionAllowed()
 			){
@@ -400,42 +472,56 @@ namespace synthese
 					+ 1															// Minimal time to reach the goal
 				);
 
-				if (serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+				if (method == TO_DESTINATION)
 					bestHopedGoalAccessDateTime += minimalGoalReachDuration;
 				else
 					bestHopedGoalAccessDateTime -= minimalGoalReachDuration;
 
-				if(	(	(serviceUse.getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE)
+				if(	(	(method == FROM_ORIGIN)
 					&&	(bestHopedGoalAccessDateTime < _minMaxDateTimeAtDestination)
 					)
-				||	(	(serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+				||	(	(method == TO_DESTINATION)
 					&&	(bestHopedGoalAccessDateTime > _minMaxDateTimeAtDestination)
 					)
-				)	return false;
-
+				)	result.first = false;
 			}
 
 			/** - Best vertex map control : the service use is useful only if no other already founded
 				service use reaches the vertex at a strictly better time.
 			*/
-			if( (	(serviceUse.getMethod() == ServicePointer::ARRIVAL_TO_DEPARTURE)
+			if( (	(method == FROM_ORIGIN)
 				&&	(reachDateTime < _bestVertexReachesMap.getBestTime(reachedVertex, reachDateTime))
 				)
-			||	(	(serviceUse.getMethod() == ServicePointer::DEPARTURE_TO_ARRIVAL)
+			||	(	(method == TO_DESTINATION)
 				&&	(reachDateTime > _bestVertexReachesMap.getBestTime (reachedVertex, reachDateTime))
 				)
-			)	return false;
+			)	result.first = false;
 
 
-			/** - Continuous service breaking test : if the solution is between a service continuous range
-				then it is stored only if its duration is better than the one of the continuous service.
+			/** - Best vertex map controle : the path is not traversed anymore if the vertex was reached at a time
+				which permitted to use the path at a better or equal time. In optim mode this criteria is ignored
+				in order to find the solutions with the least transfer number.
 			*/
-			if(	(_previousContinuousServiceDuration > 0)
-			&&	(journey.getDepartureTime() < _previousContinuousServiceLastDeparture)
-			&&	(journey.getDuration() >= _previousContinuousServiceDuration)
-			)	return false;
+			if (!optim)
+			{
+				DateTime vertexShouldAlreadyVisitedAt(reachDateTime);
+				if (method == TO_DESTINATION)
+				{
+					vertexShouldAlreadyVisitedAt -= reachedVertex->getConnectionPlace()->getMaxTransferDelay();
+					if (_bestVertexReachesMap.getBestTime(reachedVertex, vertexShouldAlreadyVisitedAt) < vertexShouldAlreadyVisitedAt)
+						result.second = false;
+				}
+				else
+				{
+					vertexShouldAlreadyVisitedAt += reachedVertex->getConnectionPlace()->getMaxTransferDelay();
+					if (_bestVertexReachesMap.getBestTime(reachedVertex, vertexShouldAlreadyVisitedAt) > vertexShouldAlreadyVisitedAt)
+						result.second = false;
+				}
+			}
 
-			return true;
+			assert(result != make_pair(true,false));
+
+			return result;
 		}
 	}
 }

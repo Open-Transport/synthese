@@ -92,6 +92,9 @@ namespace synthese
 
 		void ServiceUse::shift( int duration)
 		{
+			if (duration == 0)
+				return;
+
 			_actualTime += duration;
 			_originDateTime += duration;
 			_secondActualDateTime += duration;

@@ -22,8 +22,9 @@
 
 #include "TemporaryPlace.h"
 
-#include "Address.h"
-#include "Road.h"
+#include "15_env/Address.h"
+#include "15_env/Road.h"
+#include "15_env/VertexAccessMap.h"
 
 
 namespace synthese

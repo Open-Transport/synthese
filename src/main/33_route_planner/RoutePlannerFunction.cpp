@@ -147,9 +147,10 @@ namespace synthese
 				, _endDate
 				, _maxSolutionsNumber
 			);
-			Journeys jv = r.computeJourneySheetDepartureArrival();
+			const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
 			VariablesMap vm;
-			_page->display(stream, vm, &jv, _request);
+			_page->display(stream, vm, jv.journeys, _request);
+
 		}
 
 		RoutePlannerFunction::RoutePlannerFunction()

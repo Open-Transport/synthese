@@ -26,6 +26,7 @@
 #include "15_env/Vertex.h"
 #include "15_env/Line.h"
 #include "15_env/Vertex.h"
+#include "15_env/VertexAccessMap.h"
 
 #include "06_geometry/SquareDistance.h"
 

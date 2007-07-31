@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "15_env/VertexAccessMap.h"
 #include "15_env/Types.h"
 
 namespace synthese
@@ -42,6 +41,8 @@ namespace synthese
 	{
 		class City;
 		class Vertex;
+		struct VertexAccess;
+		class VertexAccessMap;
 
 
 		/** Place base class.

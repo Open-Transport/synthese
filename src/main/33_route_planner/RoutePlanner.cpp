@@ -20,8 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/RoutePlanner.h"
+#include "RoutePlanner.h"
+
 #include "33_route_planner/IntegralSearcher.h"
+#include "33_route_planner/BestVertexReachesMap.h"
 
 #include "15_env/Axis.h"
 #include "15_env/ConnectionPlace.h"
@@ -40,6 +42,7 @@
 #include "06_geometry/SquareDistance.h"
 
 #include <algorithm>
+#include <set>
 
 using namespace boost;
 using namespace std;
@@ -61,9 +64,7 @@ namespace synthese
 			const DateTime& journeySheetStartTime,
 			const DateTime& journeySheetEndTime
 			, int maxSolutionsNumber
-		)	: _origin (origin)
-			, _destination (destination)
-			, _accessParameters (accessParameters)
+		)	: _accessParameters (accessParameters)
 			, _planningOrder (planningOrder)
 			, _journeySheetStartTime (journeySheetStartTime)
 			, _journeySheetEndTime (journeySheetEndTime)
@@ -92,31 +93,15 @@ namespace synthese
 		}
 
 
-
-		const Place* 
-		RoutePlanner::getOrigin () const
-		{
-			return _origin;
-		}
-
-
-
-		const Place* 
-		RoutePlanner::getDestination () const
-		{
-			return _destination;
-		}
-
-
 // --------------------------------------------------------- Journey sheet calculation
 
-		Journeys RoutePlanner::computeJourneySheetDepartureArrival()
+		const RoutePlanner::Result& RoutePlanner::computeJourneySheetDepartureArrival()
 		{
-			Journey journey;
-			Journeys result;
+			_result.clear();
 
 			// Create origin vam from integral search on roads
-			_bestVertexReachesMap.clear(TO_DESTINATION);
+			JourneysResult originJourneys;
+			BestVertexReachesMap bvrmd(TO_DESTINATION, true);
 			IntegralSearcher iso(
 				TO_DESTINATION
 				, _accessParameters
@@ -124,19 +109,20 @@ namespace synthese
 				, SEARCH_PHYSICALSTOPS
 				, USE_ROADS
 				, DO_NOT_USE_LINES
-				, _bestVertexReachesMap
+				, originJourneys
+				, bvrmd
 				, _destinationVam
 				, _calculationTime
 				, DateTime(_journeySheetEndTime)
 				, 0
 				, DateTime(TIME_UNKNOWN)
-				);
-			Journeys originJourneys(iso.integralSearch (
-				_originVam
-				, Journey(TO_DESTINATION)
-				, _journeySheetStartTime
 				, std::numeric_limits<int>::max ()
-				));
+				, false
+				);
+			iso.integralSearch (
+				_originVam
+				, _journeySheetStartTime
+			);
 			
 			VertexAccessMap ovam;
 			// Include physical stops from originVam into result of integral search
@@ -145,11 +131,12 @@ namespace synthese
 				VertexAccessMap::DO_NOT_MERGE_ADDRESSES,
 				VertexAccessMap::MERGE_PHYSICALSTOPS);
 			
-			Journey candidate;
-			for (Journeys::const_iterator itoj = originJourneys.begin ();
-			 itoj != originJourneys.end (); ++itoj)
-			{
-				const Journey& oj = (*itoj);
+			Journey* candidate(new Journey(TO_DESTINATION));
+			for(JourneysResult::ResultSet::const_iterator itoj(originJourneys.getJourneys().begin());
+				itoj != originJourneys.getJourneys().end ();
+				++itoj
+			){
+				const Journey& oj = (**itoj);
 			
 				// Store each reached physical stop with full approach time addition :
 				//	- approach time in departure place
@@ -188,17 +175,19 @@ namespace synthese
 
 				// Store the journey as a candidate if it goes directly to the destination
 				if(	_destinationVam.contains(oj.getDestination()->getFromVertex())
-					&& oj.isBestThan(candidate)
-				)	candidate = oj;
+					&& oj.isBestThan(*candidate)
+				)	*candidate = oj;
 			}
 
 			// If a candidate was elected, store it in the result array
-			if (!candidate.empty())
-				result.push_back(candidate);
-
+			if (!candidate->empty())
+				_result.journeys.push_back(candidate);
+			else
+				delete candidate;
 
 			// Create destination vam from integral search on roads
-			_bestVertexReachesMap.clear(FROM_ORIGIN);
+			JourneysResult destinationJourneys;
+			BestVertexReachesMap bvrmo(TO_DESTINATION, true);
 			IntegralSearcher isd(
 				FROM_ORIGIN
 				, _accessParameters
@@ -206,19 +195,20 @@ namespace synthese
 				, SEARCH_PHYSICALSTOPS
 				, USE_ROADS
 				, DO_NOT_USE_LINES
-				, _bestVertexReachesMap
+				, destinationJourneys
+				, bvrmo
 				, _originVam
 				, _calculationTime
 				, DateTime(_journeySheetStartTime)
 				, 0
 				, DateTime(TIME_UNKNOWN)
-				);
-			Journeys destinationJourneys(isd.integralSearch (
-					_destinationVam
-					, Journey(FROM_ORIGIN)
-					, _journeySheetEndTime
-					, std::numeric_limits<int>::max ()
-					));
+				, std::numeric_limits<int>::max ()
+				, false
+			);
+			isd.integralSearch (
+				_destinationVam
+				, _journeySheetEndTime
+			);
 
 			VertexAccessMap dvam;
 			// Include physical stops from destinationVam into result of integral search
@@ -228,10 +218,11 @@ namespace synthese
 				VertexAccessMap::MERGE_PHYSICALSTOPS);
 
 
-			for (Journeys::const_iterator itdj = destinationJourneys.begin ();
-			 itdj != destinationJourneys.end (); ++itdj)
-			{
-				const Journey& j(*itdj);
+			for(JourneysResult::ResultSet::const_iterator itdj(destinationJourneys.getJourneys().begin());
+				itdj != destinationJourneys.getJourneys().end ();
+				++itdj
+			){
+				const Journey& j(**itdj);
 
 				// Store each reached physical stop with full approach time addition :
 				//	- approach time in destination place
@@ -275,55 +266,55 @@ namespace synthese
 			for(_minDepartureTime = _journeySheetStartTime; 
 				(_minDepartureTime < _journeySheetEndTime
 				&&	(_maxSolutionsNumber == UNKNOWN_VALUE 
-					|| _maxSolutionsNumber > result.size()
+					|| _maxSolutionsNumber > _result.journeys.size()
 					)
 				);
 			){
-				journey.clear();
-				computeRoutePlanningDepartureArrival (journey, ovam, dvam);
+				Journey* journey(new Journey(TO_DESTINATION));
+				computeRoutePlanningDepartureArrival(*journey, ovam, dvam);
 				
 				//! <li> If no journey was found and last service is continuous, 
 					//! then repeat computation after continuous service range. </li>
-				if ( (journey.empty()) &&
-					 (result.empty () == false) && 
-					 (result.back ().getContinuousServiceRange () > 0) )
-				{
+				if(	journey->empty()
+				&&	!_result.journeys.empty()
+				&&	(_result.journeys.back ()->getContinuousServiceRange () > 0)
+				){
 					_minDepartureTime = _previousContinuousServiceLastDeparture;
 					_minDepartureTime += 1;
 					_previousContinuousServiceDuration = 0;
-					computeRoutePlanningDepartureArrival (journey, ovam, dvam);	
+					computeRoutePlanningDepartureArrival (*journey, ovam, dvam);	
 				}
 				
-				if (journey.empty())
+				if (journey->empty())
 					break;				
 				
 				//! <li>If last continuous service was broken, update its range</li>
-				if ( (result.empty () == false) &&
-					 (result.back ().getContinuousServiceRange () > 0) &&
-					 (journey.getDepartureTime () <= _previousContinuousServiceLastDeparture) )
-				{
-					int duration = journey.getArrivalTime () - result.back ().getArrivalTime () - 1;
-					result.back ().setContinuousServiceRange (duration);
+				if(	!_result.journeys.empty ()
+				&&	(_result.journeys.back ()->getContinuousServiceRange () > 0)
+				&&	(journey->getDepartureTime () <= _previousContinuousServiceLastDeparture)
+				){
+					int duration(journey->getArrivalTime() - _result.journeys.back()->getArrivalTime () - 1);
+					_result.journeys.back()->setContinuousServiceRange (duration);
 				}
 
 				/*!	<li>En cas de nouveau service continu, enregistrement de valeur pour le calcul de la prochaine solution</li>	*/
-				if (journey.getContinuousServiceRange() > 1)
+				if (journey->getContinuousServiceRange() > 1)
 				{
-					_previousContinuousServiceDuration = journey.getArrivalTime() - journey.getDepartureTime();
-					_previousContinuousServiceLastDeparture = journey.getDepartureTime();
-					_previousContinuousServiceLastDeparture += journey.getContinuousServiceRange();
+					_previousContinuousServiceDuration = journey->getDuration();
+					_previousContinuousServiceLastDeparture = journey->getDepartureTime();
+					_previousContinuousServiceLastDeparture += journey->getContinuousServiceRange();
 				}
 				else
 					_previousContinuousServiceDuration = 0;
 
 
-				result.push_back (journey);
+				_result.journeys.push_back(journey);
 				
-				_minDepartureTime = journey.getDepartureTime ();
+				_minDepartureTime = journey->getDepartureTime ();
 				_minDepartureTime += 1;
 			}
 			
-			return result;
+			return _result;
 			
 		}
 
@@ -335,28 +326,11 @@ namespace synthese
 			, const VertexAccessMap& ovam
 			, const VertexAccessMap& dvam
 		){
-			_bestVertexReachesMap.clear (TO_DESTINATION);
 			_maxArrivalTime = _journeySheetEndTime;
 			_maxArrivalTime.addDaysDuration(7);	/// @todo Replace 7 by a parameter
 		    
-			for(map<const Vertex*, VertexAccess>::const_iterator itVertex(dvam.getMap().begin());
-				itVertex != dvam.getMap ().end ();
-				++itVertex
-			){
-				_bestVertexReachesMap.insert (itVertex->first, 
-								 _maxArrivalTime - itVertex->second.approachTime);
-			}
-			for(map<const Vertex*, VertexAccess>::const_iterator itVertex(ovam.getMap().begin());
-				itVertex != ovam.getMap().end();
-				++itVertex
-			){
-				_bestVertexReachesMap.insert (itVertex->first, 
-								 _minDepartureTime + itVertex->second.approachTime);
-			}
-		    
-
 			// Look for best arrival
-			findBestJourney (result, ovam, dvam, Journey(TO_DESTINATION), false);
+			findBestJourney (result, ovam, dvam, _minDepartureTime, false);
 		    
 			if (result.empty() || result.getDepartureTime() > _journeySheetEndTime)
 			{
@@ -365,49 +339,17 @@ namespace synthese
 			}
 		    
 			// If a journey was found, try to optimize by delaying departure hour as much as possible.
-			_bestVertexReachesMap.clear (FROM_ORIGIN);
-
-/*			const JourneyLegs& jl(result.getJourneyLegs());
-			for (JourneyLegs::const_iterator it(jl.begin()); it != jl.end(); ++it)
-			{
-				_bestVertexReachesMap.insert (
-					it->getDepartureEdge()->getFromVertex (),
-					it->getDepartureDateTime ()
-				);
-			}
-*/		    
-			for(map<const Vertex*, VertexAccess>::const_iterator itVertex(dvam.getMap().begin());
-				itVertex != dvam.getMap().end ();
-				++itVertex
-			){
-				_bestVertexReachesMap.insert (
-					itVertex->first, 
-					result.getArrivalTime () + 
-					dvam.getVertexAccess (result.getDestination ()->getFromVertex ()).approachTime - 
-					itVertex->second.approachTime);
-			}
-			for(map<const Vertex*, VertexAccess>::const_iterator itVertex(ovam.getMap().begin());
-				itVertex != ovam.getMap().end();
-				++itVertex
-			){
-				_bestVertexReachesMap.insert (
-					itVertex->first, 
-					result.getDepartureTime () -
-					ovam.getVertexAccess (result.getOrigin ()->getFromVertex ()).approachTime + 
-					itVertex->second.approachTime);
-			}
-		    
 			// Update bounds
 			_minDepartureTime = result.getDepartureTime () -
-			ovam.getVertexAccess (result.getOrigin ()->getFromVertex ()).approachTime;
+				ovam.getVertexAccess (result.getOrigin ()->getFromVertex ()).approachTime;
 			_maxArrivalTime = result.getArrivalTime () + 
-			dvam.getVertexAccess (result.getDestination ()->getFromVertex ()).approachTime;
+				dvam.getVertexAccess (result.getDestination ()->getFromVertex ()).approachTime;
 
 			result.reverse();
 		
 			// Look for best departure
 			// A revoir il faut surement faire currentJourney = result
-			findBestJourney (result, dvam, ovam, Journey(FROM_ORIGIN), true);
+			findBestJourney (result, dvam, ovam, _maxArrivalTime, true);
 
 			if (result.getDepartureTime() > _journeySheetEndTime)
 			{
@@ -454,7 +396,7 @@ namespace synthese
 
 // -------------------------------------------------------------------------- Recursion
 
-		void RoutePlanner::findBestJourney(
+/*		void RoutePlanner::findBestJourney(
 			Journey& result
 		   , const VertexAccessMap& ovam
 		   , const VertexAccessMap& dvam
@@ -536,6 +478,121 @@ namespace synthese
 						result = recursiveCandidate;
 				}
 			}
+		}
+*/
+		void RoutePlanner::findBestJourney(
+			env::Journey& result
+			, const env::VertexAccessMap& startVam
+			, const env::VertexAccessMap& endVam
+			, const time::DateTime& startTime
+			, bool strictTime
+		){
+			const AccessDirection& accessDirection(result.getMethod());
+
+			JourneysResult todo;
+
+			DateTime& bestEndTime((accessDirection == TO_DESTINATION) ? _maxArrivalTime : _minDepartureTime);
+			DateTime lastBestEndTime(bestEndTime);
+			
+			// Initialization of the best vertex reaches map
+			BestVertexReachesMap bestVertexReachesMap(accessDirection, strictTime);
+			for(VertexAccessMap::VamMap::const_iterator itVertex(startVam.getMap().begin());
+				itVertex != startVam.getMap().end();
+				++itVertex
+			){
+				bestVertexReachesMap.insert(
+					itVertex->first
+					, (accessDirection == TO_DESTINATION)
+						? _minDepartureTime + itVertex->second.approachTime
+						: _maxArrivalTime - itVertex->second.approachTime
+				);
+			}
+			for(VertexAccessMap::VamMap::const_iterator itVertex(endVam.getMap().begin());
+				itVertex != endVam.getMap ().end ();
+				++itVertex
+			){
+				bestVertexReachesMap.insert(
+					itVertex->first
+					, (accessDirection == TO_DESTINATION)
+						? _maxArrivalTime - itVertex->second.approachTime
+						: _minDepartureTime + itVertex->second.approachTime
+				);
+			}
+
+			// Initialization of the integral searcher
+			IntegralSearcher is(
+				accessDirection
+				, _accessParameters
+				, DO_NOT_SEARCH_ADDRESSES
+				, SEARCH_PHYSICALSTOPS
+				, DO_NOT_USE_ROADS
+				, USE_LINES
+				, todo
+				, bestVertexReachesMap
+				, endVam
+				, _calculationTime
+				, bestEndTime
+				, _previousContinuousServiceDuration
+				, _previousContinuousServiceLastDeparture
+				, 0
+				, strictTime
+				);
+
+			is.integralSearch(startVam, startTime, strictTime);
+			
+			while(true)
+			{
+
+				// Take into account of the end reached journeys
+				for(JourneysResult::ResultSet::const_iterator it(todo.getJourneys().begin());
+					it != todo.getJourneys().end();
+				){
+					JourneysResult::ResultSet::const_iterator next(it);
+					++next;
+					const Journey& journey(**it);
+					
+					if (!journey.getEndReached())
+						break;
+					
+					// A destination without any approach time stops the recursion
+					const Vertex* reachedVertex(journey.getEndEdge()->getFromVertex());
+					const VertexAccess& va = endVam.getVertexAccess(reachedVertex);
+					
+					// Attempt to elect the solution as the result
+					if (journey.isBestThan(result))
+						result = journey;
+
+					if (va.approachTime == 0)
+						todo.remove(*it);
+										
+					it = next;
+				}
+
+				todo.cleanup(lastBestEndTime != bestEndTime, bestEndTime, bestVertexReachesMap);
+
+				// Loop exit
+				if (todo.empty())
+					break;
+
+				lastBestEndTime = bestEndTime;
+
+				const Journey* journey(todo.front());
+
+				is.integralSearch(*journey);
+
+				delete journey;
+			}
+		}
+
+		RoutePlanner::Result::~Result()
+		{
+			clear();
+		}
+
+		void RoutePlanner::Result::clear()
+		{
+			for(JourneyBoardJourneys::iterator it(journeys.begin()); it != journeys.end(); ++it)
+				delete *it;
 		}
 	}
 }

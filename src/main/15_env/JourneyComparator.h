@@ -1,6 +1,6 @@
 
-/** Types class header.
-	@file Types.h
+/** JourneyComparator class header.
+	@file JourneyComparator.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,36 +20,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_routeplanner_Types_h__
-#define SYNTHESE_routeplanner_Types_h__
-
-#include <vector>
-
-#include <boost/shared_ptr.hpp>
+#ifndef SYNTHESE_env_JourneyComparator_h__
+#define SYNTHESE_env_JourneyComparator_h__
 
 namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
 		class Journey;
-	}
 
-	namespace routeplanner
-	{
-
-		/** @addtogroup m33
-			@{
+		/** JourneyComparator class.
+			@ingroup m15
 		*/
+		class JourneyComparator
+		{
+		public:
+			bool operator()(const Journey* j1, const Journey* j2) const;
 
-		typedef std::vector<env::Journey*>			JourneyBoardJourneys;
-		typedef std::vector<const env::ConnectionPlace*>	JourneyBoardPlaces;
-
-		typedef enum { USE_ROADS, DO_NOT_USE_ROADS } UseRoads;
-		typedef enum { USE_LINES, DO_NOT_USE_LINES } UseLines;
-
-		/** @} */
+		};
 	}
 }
 
-#endif // SYNTHESE_routeplanner_Types_h__
+#endif // SYNTHESE_env_JourneyComparator_h__

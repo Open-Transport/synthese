@@ -27,6 +27,7 @@
 #include "15_env/PhysicalStop.h"
 #include "15_env/Vertex.h"
 #include "15_env/Edge.h"
+#include "15_env/ServiceUse.h"
 
 #include <assert.h>
 
@@ -41,9 +42,23 @@ namespace synthese
 	namespace routeplanner
 	{
 
-		BestVertexReachesMap::BestVertexReachesMap ()
+		BestVertexReachesMap::BestVertexReachesMap (
+			AccessDirection accessDirection
+			, bool optim
+		)	: _accessDirection(accessDirection)
 		{
-		    
+		    if (accessDirection == TO_DESTINATION)
+			{
+				_cleanUpUselessComparison = &DateTime::operator>;
+				_comparison = optim ? &DateTime::operator> : &DateTime::operator>=;
+				_strictWeakCTimeComparison = &DateTime::operator>=;
+			}
+			else
+			{
+				_cleanUpUselessComparison = &DateTime::operator<;
+				_comparison = optim ? &DateTime::operator< : &DateTime::operator<=;
+				_strictWeakCTimeComparison = &DateTime::operator<=;
+			}
 		}
 
 
@@ -57,7 +72,7 @@ namespace synthese
 
 		bool BestVertexReachesMap::contains (const Vertex* vertex) const
 		{
-			return (_bestJourneyLegMap.find (vertex) != _bestJourneyLegMap.end ());
+			return (_bestTimeMap.find (vertex) != _bestTimeMap.end ());
 		}
 
 
@@ -86,15 +101,9 @@ namespace synthese
 			}
 			else
 			{
-				// TODO : rename FROM_ORIGIN into TOWARD_ORIGIN
-				// TODO : rename TO_DESTINATION into TOWARD_DESTINATION
-				if ( (_accessDirection == TO_DESTINATION) && (bestTime < itc->second) ||
-					 (_accessDirection == FROM_ORIGIN) && (bestTime > itc->second) )
-				{
-					itc->second = bestTime;
-				}
-				else
+				if((bestTime.*_comparison)(itc->second))
 					return;
+				itc->second = bestTime;
 			}
 
 			if (propagateInConnectionPlace && vertex->isConnectionAllowed())
@@ -168,13 +177,25 @@ namespace synthese
 			return defaultValue;
 		}
 
-
-
-		void BestVertexReachesMap::clear (const AccessDirection& accessDirection)
+		bool BestVertexReachesMap::isUseless( const env::Vertex* vertex , const time::DateTime& dateTime) const
 		{
-			_bestJourneyLegMap.clear ();
-			_bestTimeMap.clear ();
-			_accessDirection = accessDirection;
+			TimeMap::const_iterator itc(_bestTimeMap.find (vertex));
+			if (itc != _bestTimeMap.end ())
+				return (dateTime.*_comparison)(itc->second);
+			return false;
 		}
+
+		bool BestVertexReachesMap::mustBeCleared( const env::Vertex* vertex , const time::DateTime& dateTime, const time::DateTime& bestEndTime  ) const
+		{
+			if ((dateTime.*_strictWeakCTimeComparison)(bestEndTime))
+				return true;
+			TimeMap::const_iterator itc(_bestTimeMap.find (vertex));
+			if (itc != _bestTimeMap.end ())
+				return (dateTime.*_cleanUpUselessComparison)(itc->second);
+			return false;
+
+		}
+
+
 	}
 }

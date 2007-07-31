@@ -23,9 +23,6 @@
 #ifndef SYNTHESE_ENVLSSQL_CONNECTIONPLACETABLESYNC_H
 #define SYNTHESE_ENVLSSQL_CONNECTIONPLACETABLESYNC_H
 
-#include "15_env/City.h"
-#include "15_env/ConnectionPlace.h"
-
 #include "02_db/SQLiteTableSyncTemplate.h"
 
 #include <string>
@@ -35,6 +32,8 @@ namespace synthese
 {
 	namespace env
 	{
+		class ConnectionPlace;
+
 		/** ConnectionPlace SQLite table synchronizer.
 			@ingroup m15
 
