@@ -102,6 +102,8 @@ namespace synthese
 			// Create origin vam from integral search on roads
 			JourneysResult originJourneys;
 			BestVertexReachesMap bvrmd(TO_DESTINATION, true);
+			DateTime dt3(_journeySheetEndTime);
+			DateTime dt4(TIME_UNKNOWN);
 			IntegralSearcher iso(
 				TO_DESTINATION
 				, _accessParameters
@@ -113,9 +115,9 @@ namespace synthese
 				, bvrmd
 				, _destinationVam
 				, _calculationTime
-				, DateTime(_journeySheetEndTime)
+				, dt3
 				, 0
-				, DateTime(TIME_UNKNOWN)
+				, dt4
 				, std::numeric_limits<int>::max ()
 				, false
 				);
@@ -188,6 +190,8 @@ namespace synthese
 			// Create destination vam from integral search on roads
 			JourneysResult destinationJourneys;
 			BestVertexReachesMap bvrmo(TO_DESTINATION, true);
+			DateTime dt1(_journeySheetStartTime);
+			DateTime dt2(TIME_UNKNOWN);
 			IntegralSearcher isd(
 				FROM_ORIGIN
 				, _accessParameters
@@ -199,9 +203,9 @@ namespace synthese
 				, bvrmo
 				, _originVam
 				, _calculationTime
-				, DateTime(_journeySheetStartTime)
+				, dt1
 				, 0
-				, DateTime(TIME_UNKNOWN)
+				, dt2
 				, std::numeric_limits<int>::max ()
 				, false
 			);
