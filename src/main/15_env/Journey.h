@@ -51,6 +51,8 @@ namespace synthese
 
 		private:
 			typedef const env::ServiceUse& (Journey::*ServiceUseGetter) () const;
+			typedef const env::Edge* (Journey::*EdgeGetter) () const;
+			typedef time::DateTime (Journey::*DateTimeGetter) () const;
 
 			//! @name Content
 			//@{
@@ -84,7 +86,13 @@ namespace synthese
 				time::DateTime::ComparisonOperator	_bestTimeStrictOperator;
 				ServiceUseGetter					_endServiceUseGetter;
 				ServiceUseGetter					_beginServiceUseGetter;
+				EdgeGetter							_endEdgeGetter;
+				EdgeGetter							_beginEdgeGetter;
+				DateTimeGetter						_endDateTimeGetter;
+				DateTimeGetter						_beginDateTimeGetter;
 			//@}
+
+				void _setMethod(AccessDirection method);
 
 		 public:
 			Journey(AccessDirection method);

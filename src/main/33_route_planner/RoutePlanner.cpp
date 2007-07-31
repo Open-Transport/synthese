@@ -41,6 +41,8 @@
 
 #include "06_geometry/SquareDistance.h"
 
+#include "01_util/Log.h"
+
 #include <algorithm>
 #include <set>
 
@@ -52,6 +54,7 @@ namespace synthese
 	using namespace time;
 	using namespace env;
 	using namespace geometry;
+	using namespace util;
 
 	namespace routeplanner
 	{
@@ -400,90 +403,6 @@ namespace synthese
 
 // -------------------------------------------------------------------------- Recursion
 
-/*		void RoutePlanner::findBestJourney(
-			Journey& result
-		   , const VertexAccessMap& ovam
-		   , const VertexAccessMap& dvam
-		   , const Journey& currentJourney
-		   , bool strictTime
-		){
-			if (currentJourney.getJourneyLegCount () > 
-			_accessParameters.maxTransportConnectionCount) return;
-
-			const AccessDirection& accessDirection(currentJourney.getMethod());
-
-			IntegralSearcher is(
-				accessDirection
-				, _accessParameters
-				, DO_NOT_SEARCH_ADDRESSES
-				, SEARCH_PHYSICALSTOPS
-				, DO_NOT_USE_ROADS
-				, USE_LINES
-				, _bestVertexReachesMap
-				, dvam
-				, _calculationTime
-				, (accessDirection == TO_DESTINATION) ? _maxArrivalTime : _minDepartureTime
-				, _previousContinuousServiceDuration
-				, _previousContinuousServiceLastDeparture
-				);
-			Journeys journeyParts(is.integralSearch(
-				ovam
-				, currentJourney
-				, (accessDirection == TO_DESTINATION)
-					? (currentJourney.empty() ? _minDepartureTime : currentJourney.getArrivalTime())
-					: (currentJourney.empty() ? _maxArrivalTime : currentJourney.getDepartureTime())
-				, 0
-				, strictTime
-				));
-
-			for (Journeys::const_iterator itj = journeyParts.begin ();
-			 itj != journeyParts.end (); ++itj)
-			{
-				if (!is.evaluateJourney(*itj))
-					continue;
-
-				bool recursion(true);
-				
-				// Case the journey goes to a final destination
-				const Vertex* reachedVertex(itj->getEndEdge()->getFromVertex());
-
-				if (dvam.contains(reachedVertex))
-				{
-					// A destination without any approach time stops the recursion
-					const VertexAccess& va = dvam.getVertexAccess(reachedVertex);
-					if (va.approachTime == 0)
-						recursion = false;
-					
-					// Attempt to elect the solution as the result
-					if (itj->isBestThan(result))
-						result = *itj;
-				}
-			
-
-				// Recursion if needed
-				if (recursion)
-				{
-					Journey recursiveCandidate(accessDirection);
-					
-					VertexAccessMap nextVam;
-					reachedVertex->getPlace()->getImmediateVertices(
-						nextVam,
-						accessDirection,
-						_accessParameters
-						, DO_NOT_SEARCH_ADDRESSES
-						, SEARCH_PHYSICALSTOPS
-						, reachedVertex
-					);
-
-					findBestJourney (recursiveCandidate, nextVam, dvam, *itj, false);
-
-					// Attempt to elect the solution as the result
-					if (recursiveCandidate.isBestThan(result))
-						result = recursiveCandidate;
-				}
-			}
-		}
-*/
 		void RoutePlanner::findBestJourney(
 			env::Journey& result
 			, const env::VertexAccessMap& startVam
@@ -563,8 +482,12 @@ namespace synthese
 					const VertexAccess& va = endVam.getVertexAccess(reachedVertex);
 					
 					// Attempt to elect the solution as the result
-					if (journey.isBestThan(result))
+					bool saved(journey.isBestThan(result));
+					if (saved)
 						result = journey;
+
+					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+						Log::GetInstance().trace(reachedVertex->getConnectionPlace()->getFullName() + " was found at " + journey.getEndTime().toString() + (saved ? " (accepted)" : " (rejected)"));
 
 					if (va.approachTime == 0)
 						todo.remove(*it);
@@ -577,6 +500,9 @@ namespace synthese
 				// Loop exit
 				if (todo.empty())
 					break;
+
+				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+					todo.log();
 
 				lastBestEndTime = bestEndTime;
 

@@ -107,16 +107,7 @@ namespace synthese
 					s << "FROM_ORIGIN   ";
 				s	<< " Initial IntegralSearch. Start : "
 					<< " at " << desiredTime.toString()
-					<< "\n";
-				for (JourneysResult::ResultSet::const_iterator it(_result.getJourneys().begin()); it != _result.getJourneys().end(); ++it)
-				{
-					const Journey& journey(**it);
-					s	<< " -> " << journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
-						<< " at " << journey.getEndTime().toString()
-						<< "(dst = " << journey.getSquareDistanceToEnd().getDistance()
-						<< " - min speed = " << journey.getMinSpeedToEnd()
-						<< ")\n";
-				}
+				;
 
 				Log::GetInstance().trace(s.str());
 			}
@@ -160,17 +151,6 @@ namespace synthese
 				s	<< " IntegralSearch. Start : "
 					<< journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
 					<< " at " << journey.getEndTime().toString();
-				s << "\n";
-				for (JourneysResult::ResultSet::const_iterator it(_result.getJourneys().begin()); it != _result.getJourneys().end(); ++it)
-				{
-					const Journey& journey(**it);
-					s	<< spaces
-						<< " -> " << journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
-						<< " at " << journey.getEndTime().toString()
-						<< "(dst = " << journey.getSquareDistanceToEnd().getDistance()
-						<< " - min speed = " << journey.getMinSpeedToEnd()
-						<< ")\n";
-				}
 
 				Log::GetInstance().trace(s.str());
 			}

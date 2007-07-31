@@ -55,16 +55,13 @@ namespace synthese
 			, _effectiveDuration (0)
 			, _transportConnectionCount (0)
 			, _distance (0)
-			, _method(method)
 			, _startApproachDuration(0)
 			, _endApproachDuration(0)
 			, _endReached(false)
 			, _squareDistanceToEnd(UNKNOWN_VALUE)
 			, _minSpeedToEnd(UNKNOWN_VALUE)
-			, _bestTimeStrictOperator((method == TO_DESTINATION) ? &DateTime::operator< : &DateTime::operator >)
-			, _endServiceUseGetter((_method == TO_DESTINATION) ? &Journey::getLastJourneyLeg : &Journey::getFirstJourneyLeg)
-			, _beginServiceUseGetter((_method == TO_DESTINATION) ? &Journey::getFirstJourneyLeg : &Journey::getLastJourneyLeg)
 		{
+			_setMethod(method);
 		}
 		
 
@@ -362,22 +359,6 @@ namespace synthese
 		}
 
 
-
-/*		Journey& 
-		Journey::operator= (const Journey& ref) 
-		{
-			clear ();
-			_journeyLegs = ref._journeyLegs;
-			_continuousServiceRange = ref._continuousServiceRange;
-			_effectiveDuration = ref._effectiveDuration;
-			_transportConnectionCount = ref._transportConnectionCount;
-			_distance = ref._distance;
-			_endApproachDuration = ref._endApproachDuration;
-			_startApproachDuration = ref._startApproachDuration;
-			return *this;
-		}
-		*/
-
 		const Journey::ServiceUses& Journey::getServiceUses() const
 		{
 			return _journeyLegs;
@@ -408,11 +389,7 @@ namespace synthese
 
 			DateTime othersTime = other.getEndTime();
 
-			bool betterTime = (_method == TO_DESTINATION) 
-				? currentsTime < othersTime
-				: currentsTime > othersTime; 
-
-			if (betterTime)
+			if ((currentsTime.*_bestTimeStrictOperator)(othersTime))
 				return true;
 			if (currentsTime != othersTime)
 				return false;
@@ -497,7 +474,7 @@ namespace synthese
 
 		void Journey::reverse()
 		{
-			_method = (_method == TO_DESTINATION) ? FROM_ORIGIN : TO_DESTINATION;
+			_setMethod((_method == TO_DESTINATION) ? FROM_ORIGIN : TO_DESTINATION);
 			int duration(_startApproachDuration);
 			_startApproachDuration = _endApproachDuration;
 			_endApproachDuration = duration;
@@ -523,20 +500,12 @@ namespace synthese
 
 		const Edge* Journey::getEndEdge() const
 		{
-			return
-				(_method == TO_DESTINATION)
-				? getDestination()
-				: getOrigin()
-			;
+			return (this->*_endEdgeGetter)();
 		}
 
 		time::DateTime Journey::getEndTime() const
 		{
-			return
-				(_method == TO_DESTINATION)
-				? getArrivalTime()
-				: getDepartureTime()
-			;
+			return (this->*_endDateTimeGetter)();
 		}
 
 		void Journey::setMinSpeedToEnd( const time::DateTime& dateTime )
@@ -569,6 +538,31 @@ namespace synthese
 		const time::DateTime::ComparisonOperator& Journey::getBestTimeStrictOperator() const
 		{
 			return _bestTimeStrictOperator;
+		}
+
+		void Journey::_setMethod( AccessDirection method )
+		{
+			_method = method;
+			if (_method == TO_DESTINATION)
+			{
+				_bestTimeStrictOperator = &DateTime::operator<;
+				_endServiceUseGetter = &Journey::getLastJourneyLeg;
+				_beginServiceUseGetter = &Journey::getFirstJourneyLeg;
+				_endEdgeGetter = &Journey::getDestination;
+				_beginEdgeGetter = &Journey::getOrigin;
+				_endDateTimeGetter = &Journey::getArrivalTime;
+				_beginDateTimeGetter = &Journey::getDepartureTime;
+			}
+			else
+			{
+				_bestTimeStrictOperator = &DateTime::operator>;
+				_endServiceUseGetter = &Journey::getFirstJourneyLeg;
+				_beginServiceUseGetter = &Journey::getLastJourneyLeg;
+				_endEdgeGetter = &Journey::getOrigin;
+				_beginEdgeGetter = &Journey::getDestination;
+				_endDateTimeGetter = &Journey::getDepartureTime;
+				_beginDateTimeGetter = &Journey::getArrivalTime;
+			}
 		}
 	}
 }

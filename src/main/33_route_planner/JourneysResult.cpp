@@ -27,14 +27,20 @@
 #include "15_env/Journey.h"
 #include "15_env/Edge.h"
 #include "15_env/JourneyComparator.h"
+#include "15_env/Vertex.h"
+#include "15_env/ConnectionPlace.h"
+
+#include "01_util/Log.h"
 
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace env;
+	using namespace util;
 
 	namespace routeplanner
 	{
@@ -124,9 +130,21 @@ namespace synthese
 				add(*it);
 		}
 
-/*		bool JourneysResult::JourneyPointersComparator::operator()(const env::Journey* j1, const env::Journey* j2)
+		void JourneysResult::log() const
 		{
-			return JourneyComparator().operator()(*j1, *j2);
+			stringstream s;
+			s << "Exploration queue : (size=" << _result.size() << ")";
+			for (JourneysResult::ResultSet::const_iterator it(_result.begin()); it != _result.end(); ++it)
+			{
+				const Journey& journey(**it);
+				s	<< "\n -> " << journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
+					<< " at " << journey.getEndTime().toString()
+					<< "(dst = " << journey.getSquareDistanceToEnd().getDistance()
+					<< " - min speed = " << journey.getMinSpeedToEnd()
+					<< ")";
+			}
+			s << "\n";
+			Log::GetInstance().trace(s.str());
 		}
-*/	}
+	}
 }

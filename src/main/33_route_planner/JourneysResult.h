@@ -88,6 +88,7 @@ namespace synthese
 			//@{
 				const env::Journey* const get(const env::Vertex* vertex) const;
 				bool empty() const;
+				void log() const;
 			//@}
 		};
 	}
