@@ -49,6 +49,7 @@ namespace synthese
 		{
 		private:
 			bool _online;  //!< Reservation via SYNTHESE active
+			bool _compulsory;
 
 			bool _originIsReference; //!< Whether reference departure time is the line run departure time at its origin (true) or client departure time (false)
 

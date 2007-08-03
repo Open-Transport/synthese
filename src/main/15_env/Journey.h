@@ -65,6 +65,7 @@ namespace synthese
 				bool						_endReached;
 				geometry::SquareDistance	_squareDistanceToEnd;
 				MinSpeed					_minSpeedToEnd;
+				int							_score;
 			//@}
 
 			//! @name Query cache
@@ -124,6 +125,7 @@ namespace synthese
 				MinSpeed	getMinSpeedToEnd() const;
 				bool		getEndReached() const;
 				const time::DateTime::ComparisonOperator& getBestTimeStrictOperator() const;
+				int			getScore()	const;
 			//@}
 
 			//! @name Setters

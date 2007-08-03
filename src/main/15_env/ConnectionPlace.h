@@ -86,6 +86,8 @@ namespace synthese
 
 			ConnectionType _connectionType;
 
+			mutable int _score;
+
 		public:
 
 			ConnectionPlace (
@@ -117,6 +119,21 @@ namespace synthese
 
 			//! @name Query methods.
 			//@{
+				/** Score getter.
+					@return int the score of the place
+					@author Hugues Romain
+					@date 2007
+
+					The vertex score is calculated by the following way :
+						- each commercial line gives some points, depending of the number of services which belongs to the line :
+							- 1 to 10 services lines gives 2 point
+							- 10 to 50 services lines gives 3 points
+							- 50 to 100 services lines gives 4 points
+							- much than 100 services lines gives 5 points
+						- if the score is bigger than 100 points, then the score is 100
+				*/
+				int getScore() const;
+
 				bool isConnectionAllowed (const Vertex* fromVertex, 
 							const Vertex* toVertex) const;
 

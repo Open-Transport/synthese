@@ -67,7 +67,7 @@ namespace synthese
 
 
 		    
-		const std::set<const Edge*>& 
+		const Vertex::Edges& 
 		Vertex::getDepartureEdges () const
 		{
 			return _departureEdges;
@@ -75,7 +75,7 @@ namespace synthese
 
 
 
-		const std::set<const Edge*>& 
+		const Vertex::Edges& 
 		Vertex::getArrivalEdges () const
 		{
 			return _arrivalEdges;

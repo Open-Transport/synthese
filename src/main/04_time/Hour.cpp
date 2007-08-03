@@ -204,7 +204,7 @@ int
 Hour::operator+=( int minutesToAdd )
 {
 	if (minutesToAdd < 0)
-		operator-=(-minutesToAdd);
+		return operator-=(-minutesToAdd);
 
     // 1: Minutes
     int calculatedTime = getMinutes () + minutesToAdd;
@@ -227,7 +227,7 @@ int
 Hour::operator-=( int minutesToSubstract )
 {
 	if (minutesToSubstract < 0)
-		operator+=(-minutesToSubstract);
+		return operator+=(-minutesToSubstract);
 
 	// 1: Minutes
     int retain = ( MINUTES_PER_HOUR - 1 + minutesToSubstract - getMinutes() ) / MINUTES_PER_HOUR;

@@ -139,8 +139,11 @@ namespace synthese
 				const Journey& journey(**it);
 				s	<< "\n -> " << journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getFullName()
 					<< " at " << journey.getEndTime().toString()
-					<< "(dst = " << journey.getSquareDistanceToEnd().getDistance()
-					<< " - min speed = " << journey.getMinSpeedToEnd()
+					<< "(score=" << journey.getScore()
+					<< " - dst=" << journey.getSquareDistanceToEnd().getDistance()
+					<< " - min_speed=" << (journey.getSquareDistanceToEnd().getDistance() ? (0.06 * journey.getMinSpeedToEnd() / journey.getSquareDistanceToEnd().getDistance()) : -1)
+					<< " - min_speed.dst=" << journey.getMinSpeedToEnd()
+					<< " - place_score=" << journey.getEndEdge()->getFromVertex()->getConnectionPlace()->getScore()
 					<< ")";
 			}
 			s << "\n";

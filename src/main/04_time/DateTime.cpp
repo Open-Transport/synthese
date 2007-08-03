@@ -81,6 +81,9 @@ namespace synthese
 		DateTime&
 		DateTime::operator += ( int minutesDuration )
 		{
+			if (minutesDuration < 0)
+				return operator -=(-minutesDuration);
+			
 			_date += ( _hour += minutesDuration );
 			return ( *this );
 		}
@@ -92,6 +95,9 @@ namespace synthese
 		DateTime&
 		DateTime::operator -= ( int minutesDuration )
 		{
+			if (minutesDuration < 0)
+				return operator +=(-minutesDuration);
+
 			_date -= ( _hour -= minutesDuration );
 			return ( *this );
 		}

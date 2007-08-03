@@ -27,6 +27,7 @@
 #include "15_env/Line.h"
 #include "15_env/Vertex.h"
 #include "15_env/VertexAccessMap.h"
+#include "15_env/Edge.h"
 
 #include "06_geometry/SquareDistance.h"
 
@@ -65,6 +66,7 @@ namespace synthese
 			, _defaultTransferDelay (defaultTransferDelay)
 			, _minTransferDelay (defaultTransferDelay)
 			, _maxTransferDelay (defaultTransferDelay)
+			, _score(UNKNOWN_VALUE)
 		{
 		}
 
@@ -335,6 +337,42 @@ namespace synthese
 		{
 			_isoBarycentreToUpdateC = true;
 			AddressablePlace::addAddress(address);
+		}
+
+		int ConnectionPlace::getScore() const
+		{
+			if (_score == UNKNOWN_VALUE)
+			{
+				map<const CommercialLine*, int> scores;
+				for (PhysicalStops::const_iterator its(_physicalStops.begin()); its != _physicalStops.end(); ++its)
+					for (PhysicalStop::Edges::const_iterator ite((*its)->getDepartureEdges().begin()); ite != (*its)->getDepartureEdges().end(); ++ite)
+					{
+						const Line* route(static_cast<const Line*>((*ite)->getParentPath()));
+						map<const CommercialLine*, int>::iterator itl(scores.find(route->getCommercialLine()));
+						if (itl == scores.end())
+							scores.insert(make_pair(route->getCommercialLine(), route->getServices().size()));
+						else
+							itl->second += route->getServices().size();
+					}
+
+				for (map<const CommercialLine*, int>::const_iterator itc(scores.begin()); itc != scores.end(); ++itc)
+				{
+					if (itc->second <= 10)
+						_score += 2;
+					else if (itc->second <= 50)
+						_score += 3;
+					else if (itc->second <= 100)
+						_score += 4;
+					else
+						_score += 5;
+					if (_score > 100)
+					{
+						_score = 100;
+						break;
+					}
+				}
+			}
+			return _score;
 		}
 	}
 }

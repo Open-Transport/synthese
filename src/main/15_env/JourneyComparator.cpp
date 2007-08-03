@@ -51,10 +51,12 @@ namespace synthese
 				// Priority 1c : order between addresses
 				return j1 < j2;
 			}
+			if (j1->getScore() != j2->getScore())
+				return j1->getScore() < j2->getScore();
 
 			// Priority 2 : min speed to end
 			if (j1->getMinSpeedToEnd() != j2->getMinSpeedToEnd())
-				return (j1->getMinSpeedToEnd() < j2->getMinSpeedToEnd());
+				return j1->getMinSpeedToEnd() < j2->getMinSpeedToEnd();
 
 			// Priority 3 : end time
 			if (j1->getEndTime() != j2->getEndTime())

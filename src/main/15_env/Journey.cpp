@@ -517,6 +517,11 @@ namespace synthese
 				assert((_method == TO_DESTINATION) ? dateTime > getArrivalTime() : getDepartureTime() > dateTime);
 
 				_minSpeedToEnd = (1000 * _squareDistanceToEnd.getSquareDistance()) / ((_method == TO_DESTINATION) ? dateTime - getArrivalTime() : getDepartureTime() - dateTime);
+
+				_score = _minSpeedToEnd;
+				if (_score < 100)
+					_score = 100;
+				_score /= getEndEdge()->getFromVertex()->getConnectionPlace()->getScore();
 			}
 		}
 
@@ -563,6 +568,11 @@ namespace synthese
 				_endDateTimeGetter = &Journey::getDepartureTime;
 				_beginDateTimeGetter = &Journey::getArrivalTime;
 			}
+		}
+
+		int Journey::getScore() const
+		{
+			return _score;
 		}
 	}
 }

@@ -31,6 +31,22 @@ namespace synthese
 
 		/** JourneyComparator class.
 			@ingroup m15
+
+			The journey comparison is used for ordering purposes, in the exploration queue of the route planner for example.
+
+			Each journey is scored upon the following elements :
+				- the main part of the score is the "MinSpeedToEnd" which actually is the squared distance from the reached vertex to the goal vertex, divided by the available time to reach it.
+				- if the min speed is lower than 100 then the score is 100
+				- the score is now divided by the score of the vertex : it depends of the transport offer and the variety of destinations available from the vertex. If a vertex has a high score,
+					then the min speed to end is attenuated, and the vertex raises to a better rank in the exploration queue.
+
+			The vertex score is calculated by the following way :
+				- each commercial line gives some points, depending of the number of services which belongs to the line :
+					- 1 to 10 services lines gives 2 point
+					- 10 to 50 services lines gives 3 points
+					- 50 to 100 services lines gives 4 points
+					- much than 100 services lines gives 5 points
+				- if the score is bigger than 100 points, then the score is 100
 		*/
 		class JourneyComparator
 		{

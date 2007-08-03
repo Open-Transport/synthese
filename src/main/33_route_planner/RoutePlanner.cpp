@@ -413,7 +413,8 @@ namespace synthese
 			const AccessDirection& accessDirection(result.getMethod());
 
 			JourneysResult todo;
-
+			int integralSerachsNumber(1);
+			
 			DateTime& bestEndTime((accessDirection == TO_DESTINATION) ? _maxArrivalTime : _minDepartureTime);
 			DateTime lastBestEndTime(bestEndTime);
 			
@@ -509,9 +510,14 @@ namespace synthese
 				const Journey* journey(todo.front());
 
 				is.integralSearch(*journey);
+				++integralSerachsNumber;
 
 				delete journey;
 			}
+
+			if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
+				Log::GetInstance().trace("End of findJourney computing. Was made with " + Conversion::ToString(integralSerachsNumber) + " integral searches.");
+
 		}
 
 		RoutePlanner::Result::~Result()

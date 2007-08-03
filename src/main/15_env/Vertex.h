@@ -47,12 +47,14 @@ namespace synthese
 		*/
 		class Vertex : public geometry::Point2D
 		{
+		public:
+			typedef std::set<const Edge*> Edges;
 		private:
 
 			const AddressablePlace* _addressablePlace;
 
-			std::set<const Edge*> _departureEdges; //!< Departure edges from this physical stop
-			std::set<const Edge*> _arrivalEdges; //!< Arrival edges to this physical stop
+			Edges _departureEdges; //!< Departure edges from this physical stop
+			Edges _arrivalEdges; //!< Arrival edges to this physical stop
 
 		protected:
 
@@ -67,11 +69,11 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const AddressablePlace*			getPlace ()				const;  
-				const ConnectionPlace*			getConnectionPlace ()	const;  
-				const std::set<const Edge*>&	getDepartureEdges ()	const;
-				const std::set<const Edge*>&	getArrivalEdges ()		const;
-				virtual const uid&				getId ()				const = 0;
+				const AddressablePlace*		getPlace ()				const;  
+				const ConnectionPlace*		getConnectionPlace ()	const;  
+				const Edges&				getDepartureEdges ()	const;
+				const Edges&				getArrivalEdges ()		const;
+				virtual const uid&			getId ()				const = 0;
 			//@}
 
 			//! @name Setters
