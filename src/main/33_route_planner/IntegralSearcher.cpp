@@ -260,6 +260,9 @@ namespace synthese
 						// Storage of the useful solution
 						Journey* resultJourney = new Journey(fullApproachJourney);
 						ServiceUse serviceUse(serviceInstance, curEdge);
+						if (_accessDirection == FROM_ORIGIN && !serviceUse.isReservationRuleCompliant(_calculationTime))
+							continue;
+
 						if (_accessDirection == TO_DESTINATION)
 							resultJourney->append (serviceUse);
 						else
@@ -432,7 +435,6 @@ namespace synthese
 
 				@todo Replace the third value (1 minute) by a more accurate value ("VMAX algorithm")
 			*/
-			pair<bool,bool> result(make_pair(true,true));
 			if(	!_destinationVam.contains(reachedVertex)
 				&& reachedVertex->isConnectionAllowed()
 			){
@@ -463,7 +465,7 @@ namespace synthese
 				||	(	(method == TO_DESTINATION)
 					&&	(bestHopedGoalAccessDateTime > _minMaxDateTimeAtDestination)
 					)
-				)	result.first = false;
+				)	return make_pair(false, true);
 			}
 
 			/** - Best vertex map control : the service use is useful only if no other already founded
@@ -475,33 +477,9 @@ namespace synthese
 			||	(	(method == TO_DESTINATION)
 				&&	(reachDateTime > _bestVertexReachesMap.getBestTime (reachedVertex, reachDateTime))
 				)
-			)	result.first = false;
+			)	return make_pair(false, true);
 
-
-			/** - Best vertex map controle : the path is not traversed anymore if the vertex was reached at a time
-				which permitted to use the path at a better or equal time. In optim mode this criteria is ignored
-				in order to find the solutions with the least transfer number.
-			*/
-			if (!optim)
-			{
-				DateTime vertexShouldAlreadyVisitedAt(reachDateTime);
-				if (method == TO_DESTINATION)
-				{
-					vertexShouldAlreadyVisitedAt -= reachedVertex->getConnectionPlace()->getMaxTransferDelay();
-					if (_bestVertexReachesMap.getBestTime(reachedVertex, vertexShouldAlreadyVisitedAt) < vertexShouldAlreadyVisitedAt)
-						result.second = false;
-				}
-				else
-				{
-					vertexShouldAlreadyVisitedAt += reachedVertex->getConnectionPlace()->getMaxTransferDelay();
-					if (_bestVertexReachesMap.getBestTime(reachedVertex, vertexShouldAlreadyVisitedAt) > vertexShouldAlreadyVisitedAt)
-						result.second = false;
-				}
-			}
-
-			assert(result != make_pair(true,false));
-
-			return result;
+			return make_pair(true,true);
 		}
 	}
 }

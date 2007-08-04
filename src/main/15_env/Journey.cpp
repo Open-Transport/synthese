@@ -397,6 +397,11 @@ namespace synthese
 			/** </ul><p>Comparison between journey of same duration.</p><ul>
 				<li>A shorter journey is best</li>
 			*/
+			if (getReservationCompliance() == true && other.getReservationCompliance() != true)
+				return false;
+			if (other.getReservationCompliance() == true && getReservationCompliance() != true)
+				return true;
+
 			if (getDuration () != other.getDuration ())
 				return getDuration() < other.getDuration();
 
@@ -573,6 +578,36 @@ namespace synthese
 		int Journey::getScore() const
 		{
 			return _score;
+		}
+
+		boost::logic::tribool Journey::getReservationCompliance() const
+		{
+			boost::logic::tribool result(false);
+			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
+			{
+				if (it->getService()->getReservationRule()->isCompliant() == true)
+					return true;
+				if (boost::logic::indeterminate(it->getService()->getReservationRule()->isCompliant()))
+					result = boost::logic::indeterminate;
+			}
+			return result;
+		}
+
+		time::DateTime Journey::getReservationDeadLine() const
+		{
+			DateTime result(TIME_UNKNOWN);
+			boost::logic::tribool compliance(getReservationCompliance());
+			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
+			{
+				if ((boost::logic::indeterminate(compliance) && boost::logic::indeterminate(it->getService()->getReservationRule()->isCompliant()))
+					|| (compliance == true && it->getService()->getReservationRule()->isCompliant() == true)
+				){
+					DateTime deadLine(it->getReservationDeadLine());
+					if (result.isUnknown() || deadLine < result)
+						result = deadLine;
+				}
+			}
+			return result;
 		}
 	}
 }

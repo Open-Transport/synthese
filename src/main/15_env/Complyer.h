@@ -53,6 +53,8 @@ namespace synthese
 			const HandicappedCompliance*	_handicappedCompliance;
 			const PedestrianCompliance*		_pedestrianCompliance;
 			const ReservationRule*			_reservationRule;
+			
+			const Complyer*					_complianceParent;
 
 		public:
 
@@ -75,6 +77,7 @@ namespace synthese
 				void	setBikeCompliance(const BikeCompliance* compliance);
 				void	setFare(const Fare* fare);
 				void	setReservationRule(const ReservationRule* rule);
+				void	setComplianceParent(const Complyer* parent);
 			//@}
 
 			//! @name Query methods.

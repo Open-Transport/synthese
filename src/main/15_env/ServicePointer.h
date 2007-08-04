@@ -98,7 +98,17 @@ namespace synthese
 
 			//! @name Queries
 			//@{
-				bool				isReservationRuleCompliant(const time::DateTime& computingDateTime)	const;
+				/** Test the respect of the reservation rules.
+					@param computingDateTime date of the request
+					@return bool true if the service can be used
+					@warning If the service is determinated by ARRIVAL_TO_DEPARTURE, then this method always aswers true, because the reservation
+						deadline depends only on the departure time, which is not known at this stage. Use ServiceUse::isReservationRuleCompliant method to validate the reservation
+						deadline respect.
+					@author Hugues Romain
+					@date 2007
+					
+				*/
+				virtual bool isReservationRuleCompliant(const time::DateTime& computingDateTime)	const;
 				const env::Edge*	getEdge()															const;
 			//@}
 

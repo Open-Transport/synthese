@@ -80,6 +80,9 @@ namespace synthese
 
 		bool ServicePointer::isReservationRuleCompliant(const DateTime& computingDateTime) const
 		{
+			if (_determinationMethod == ARRIVAL_TO_DEPARTURE)
+				return true;
+
 			if (_service->getReservationRule()->isCompliant() == true)
 				return _service->getReservationRule()->isRunPossible(_originDateTime, computingDateTime, _actualTime);
 

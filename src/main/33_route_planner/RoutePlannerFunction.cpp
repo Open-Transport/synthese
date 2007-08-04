@@ -75,6 +75,11 @@ namespace synthese
 			_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
 			_accessParameters = _site->getDefaultAccessParameters();
 
+			// Temporary
+			ReservationRule* resa(new ReservationRule);
+			resa->setCompliant(boost::logic::indeterminate);
+			_accessParameters.complyer.setReservationRule(resa);
+
 			// Departure place
 			it = map.find(PARAMETER_DEPARTURE_PLACE_ID);
 			if (it == map.end())

@@ -37,6 +37,7 @@ namespace synthese
 			, _serviceNumber (serviceNumber)
 			, _path (path)
 		{
+			setComplianceParent(path);
 		}
 
 
@@ -98,6 +99,7 @@ namespace synthese
 		void Service::setPath( Path* path )
 		{
 			_path = path;
+			setComplianceParent(path);
 		}
 
 /*		const Schedule& Service::getLastArrivalSchedule() const

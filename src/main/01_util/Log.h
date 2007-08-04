@@ -52,7 +52,7 @@ namespace synthese
 			typedef enum
 			{	
 				LEVEL_TRACE = -1
-				, LEVEL_DEBUG = 0, 
+ 				, LEVEL_DEBUG = 0, 
 				   LEVEL_INFO, 
 				   LEVEL_WARN, 
 				   LEVEL_ERROR, 

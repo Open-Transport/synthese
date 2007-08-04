@@ -38,6 +38,7 @@ namespace synthese
 			, _pedestrianCompliance(EnvModule::getPedestrianCompliances().get(0).get())
 			, _reservationRule(EnvModule::getReservationRules().get(0).get())
 			, _handicappedCompliance(EnvModule::getHandicappedCompliances().get(0).get())
+			, _complianceParent(NULL)
 		{
 
 		}
@@ -64,6 +65,8 @@ namespace synthese
 
 		const ReservationRule* Complyer::getReservationRule() const
 		{
+			if ((_reservationRule == NULL || _reservationRule->isCompliant() == false) && _complianceParent != NULL)
+				return _complianceParent->getReservationRule();
 			return _reservationRule;
 		}
 
@@ -106,6 +109,11 @@ namespace synthese
 		Complyer::~Complyer()
 		{
 
+		}
+
+		void Complyer::setComplianceParent( const Complyer* parent )
+		{
+			_complianceParent = parent;
 		}
 	}
 }

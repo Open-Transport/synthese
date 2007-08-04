@@ -185,6 +185,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\ScheduleSheetReservationRowInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ScheduleSheetReservationRowInterfaceElement.h"
+					>
+				</File>
+				<File
 					RelativePath=".\SchedulesTableInterfaceElement.cpp"
 					>
 				</File>

@@ -20,10 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "IncludePageInterfaceElement.h"
+
 #include "11_interfaces/InterfacePageException.h"
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/ValueInterfaceElement.h"
-#include "11_interfaces/IncludePageInterfaceElement.h"
+#include "11_interfaces/Interface.h"
 
 using namespace boost;
 using namespace std;
@@ -39,7 +41,7 @@ namespace synthese
 			, const void* object
 			, const server::Request* request) const
 		{
-			shared_ptr<const InterfacePage> page_to_include = Factory<InterfacePage>::create(_page_code->getValue(parameters, variables, object, request));
+			shared_ptr<const InterfacePage> page_to_include = _page->getInterface()->getPage(_page_code->getValue(parameters, variables, object, request));
 			page_to_include->display(stream, _parameters.fillParameters( parameters, variables, object, request ), variables, object, request);
 			return string();
 		}

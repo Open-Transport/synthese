@@ -49,15 +49,14 @@ namespace synthese
 		{
 		private:
 			bool _online;  //!< Reservation via SYNTHESE active
-			bool _compulsory;
-
+			
 			bool _originIsReference; //!< Whether reference departure time is the line run departure time at its origin (true) or client departure time (false)
 
 			int _minDelayMinutes;  //!< Minimum delay in minutes between reservation and reference moment
 			int _minDelayDays;   //!< Minimum delay in days between reservation and reference moment
 			int _maxDelayDays;  //!< Maxium number of days between reservation and departure.
 
-			synthese::time::Hour _hourDeadLine; //!< Latest reservation hour the last day open for reservation
+			time::Hour _hourDeadLine; //!< Latest reservation hour the last day open for reservation
 
 			std::string _phoneExchangeNumber;  //!< Phone number for reservation
 			std::string _phoneExchangeOpeningHours;  //!< Opening hours for phone exchange

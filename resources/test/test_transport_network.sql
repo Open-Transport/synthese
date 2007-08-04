@@ -97,7 +97,7 @@ INSERT INTO t005_service_dates VALUES(1407374883553284,4785074604183676,date('no
 
 
 INSERT INTO t042_commercial_lines VALUES(11821949021891555,6192449487677434,'Network1-CommLine3','94','','orange','orange','');
-INSERT INTO t009_lines VALUES(2533274790397694,11821949021891555,1125899906844499,'Network1-Line3',' 1.3','',0,1,1,1,0,2251799814850473,0,0,0,0,0);
+INSERT INTO t009_lines VALUES(2533274790397694,11821949021891555,1125899906844499,'Network1-Line3',' 1.3','',0,1,1,1,0,2251799814850473,0,0,0,0,5910974511914805);
 INSERT INTO t010_line_stops VALUES(2814749767106567,3377699720880583,2533274790397694,0,1,0,14141.0,'');
 INSERT INTO t010_line_stops VALUES(2814749767106568,3377699720880585,2533274790397694,1,1,1,15141.0,'');
 INSERT INTO t010_line_stops VALUES(2814749767106569,3377699720880580,2533274790397694,2,1,1,16141.0,'');
@@ -166,5 +166,8 @@ INSERT INTO t022_transport_networks VALUES(6192449487677437,'Network2');
 
 DELETE FROM t025_sites;
 INSERT INTO t025_sites(id,name,interface_id,start_date,end_date,online_booking,use_old_data,max_connections) VALUES(1,'test',2,'','',1,0,10);
+
+REPLACE INTO t021_reservation_rules(id,reservation_type,online,origin_is_reference,min_delay_minutes,min_delay_days,max_delay_days,hour_deadline,phone_exchange_number,phone_exchange_opening_hours,description,web_site_url) 
+	VALUES(5910974511914805,-1,1,0,10,0,0,"23:59:00","0800 929 929 (gratuit depuis un poste fixe) ou 05 34 25 33 75","entre 6h30 et 22h30","Test","");
 
 COMMIT;

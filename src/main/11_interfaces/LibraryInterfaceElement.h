@@ -358,12 +358,6 @@ namespace synthese
 */
 
 
-/*	case EI_BIBLIOTHEQUE_Date:
-			synthese::time::Date curDate;
-			curDate = _Parametres[ EI_BIBLIOTHEQUE_Date_Date ] ->Texte( __Parametres );
-			synthese::time::Date& refDate = curDate;
-			__Site->getInterface() ->AfficheDate( pCtxt, refDate );
-*/
 /*	case ELEMENTINTERFACEListeArrets:
 			/*   const Environment* __Environnement = __Site->getEnvironnement();
 			int n = _Parametres[ELEMENTINTERFACEListeArretsNombre]->Nombre(__Parametres);

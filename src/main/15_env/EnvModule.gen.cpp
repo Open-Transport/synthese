@@ -1,5 +1,6 @@
 
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::env::LineMarkerInterfacePage>("line_marker");
+synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::env::ReservationRuleInterfacePage>("reservation_rule");
 
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LogicalStopNameValueInterfaceElement>("stop_name");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::CityNameValueInterfaceElement>("city_name");

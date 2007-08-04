@@ -24,6 +24,7 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::inte
 
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::interfaces::RedirectInterfacePage>("redir");
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::interfaces::DurationInterfacePage>("duration");
+synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::interfaces::DateTimeInterfacePage>("datetime");
 
 synthese::util::Factory<synthese::server::Function>::integrate<synthese::interfaces::SimplePageRequest>("page");
 

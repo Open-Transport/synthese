@@ -78,10 +78,10 @@ namespace synthese
 				tokenizer valueTokens (*tripletIter, sep2);
 				tokenizer::iterator valueIter = valueTokens.begin();
 
-				// (departureRank:arrivalRank:transferDelay)
-				cp->addTransferDelay (Conversion::ToInt (*valueIter), 
-					Conversion::ToInt (*(++valueIter)),
-					Conversion::ToInt (*(++valueIter)));
+				// departureRank:arrivalRank:transferDelay
+				uid startStop(Conversion::ToLongLong(*valueIter));
+				uid endStop(Conversion::ToLongLong(*(++valueIter)));
+				cp->addTransferDelay (startStop, endStop, Conversion::ToInt (*(++valueIter)));
 			}
 		}
 	}
@@ -161,9 +161,9 @@ namespace synthese
 					tokenizer::iterator valueIter = valueTokens.begin();
 
 					// (departureRank:arrivalRank:transferDelay)
-					cp->addTransferDelay (Conversion::ToInt (*valueIter), 
-								Conversion::ToInt (*(++valueIter)),
-								Conversion::ToInt (*(++valueIter)));
+					uid startStop(Conversion::ToLongLong(*valueIter));
+					uid endStop(Conversion::ToLongLong(*(++valueIter)));
+					cp->addTransferDelay (startStop, endStop, Conversion::ToInt (*(++valueIter)));
 				}
 
 				if (isCityMainConnection)

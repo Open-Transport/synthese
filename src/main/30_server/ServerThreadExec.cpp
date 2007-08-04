@@ -74,6 +74,10 @@ namespace synthese
 			{
 				Log::GetInstance().debug("Exception", e);
 			}
+			catch(...)
+			{
+				Log::GetInstance().debug("An unhandled exception has occured.");
+			}
 			tcpStream.flush();
 			_tcpService->closeConnection (serverSocket);
 		}

@@ -62,6 +62,8 @@ namespace synthese
 				const time::DateTime&	getArrivalDateTime()		const;
 				int						getDuration()				const;
 				int						getDistance()				const;
+				virtual bool			isReservationRuleCompliant(const time::DateTime& computingDateTime)	const;
+				time::DateTime			getReservationDeadLine()	const;
 			//@}
 
 			//! @name Update

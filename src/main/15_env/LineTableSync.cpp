@@ -87,7 +87,7 @@ namespace synthese
 			line->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
 			line->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
 			line->setCommercialLine(EnvModule::getCommercialLines().get(Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_COMMERCIAL_LINE_ID))).get());
-//			line->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId));
+			line->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId).get());
 		}
 
 		template<> void SQLiteTableSyncTemplate<Line>::save(Line* object)

@@ -23,6 +23,7 @@
 #include "15_env/ServiceUse.h"
 #include "15_env/Service.h"
 #include "15_env/Edge.h"
+#include "15_env/ReservationRule.h"
 
 namespace synthese
 {
@@ -99,6 +100,23 @@ namespace synthese
 			_originDateTime += duration;
 			_secondActualDateTime += duration;
 			setServiceRange(getServiceRange() - duration);
+		}
+
+		bool ServiceUse::isReservationRuleCompliant( const time::DateTime& computingDateTime ) const
+		{
+			if (_service->getReservationRule()->isCompliant() == true)
+				return _service->getReservationRule()->isRunPossible(_originDateTime, computingDateTime, getDepartureDateTime());
+
+			return true;
+
+		}
+
+		time::DateTime ServiceUse::getReservationDeadLine() const
+		{
+			if (_service->getReservationRule()->isCompliant() || boost::logic::indeterminate(_service->getReservationRule()->isCompliant()))
+				return _service->getReservationRule()->getReservationDeadLine(_originDateTime, getDepartureDateTime());
+
+			return DateTime(TIME_UNKNOWN);
 		}
 	}
 }

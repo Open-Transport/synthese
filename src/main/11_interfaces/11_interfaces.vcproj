@@ -281,6 +281,14 @@
 				Name="Interface Pages"
 				>
 				<File
+					RelativePath=".\DateTimeInterfacePage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DateTimeInterfacePage.h"
+					>
+				</File>
+				<File
 					RelativePath=".\DurationInterfacePage.cpp"
 					>
 				</File>

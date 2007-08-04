@@ -419,10 +419,6 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="LibraryInterfaceElement"
-			>
-		</Filter>
-		<Filter
 			Name="AdminInterfaceElement"
 			>
 		</Filter>
@@ -433,62 +429,6 @@
 		<Filter
 			Name="DBLog"
 			>
-		</Filter>
-		<Filter
-			Name="ValueInterfaceElement"
-			>
-			<File
-				RelativePath=".\CityNameValueInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CityNameValueInterfaceElement.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LineImageURLInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LineImageURLInterfaceElement.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LineShortNameInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LineShortNameInterfaceElement.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LineStyleInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LineStyleInterfaceElement.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LogicalStopNameValueInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LogicalStopNameValueInterfaceElement.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="InterfacePage"
-			>
-			<File
-				RelativePath=".\LineMarkerInterfacePage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LineMarkerInterfacePage.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
@@ -706,6 +646,82 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Interface"
+			>
+			<Filter
+				Name="ValueInterfaceElement"
+				>
+				<File
+					RelativePath=".\CityNameValueInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CityNameValueInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\LineImageURLInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\LineImageURLInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\LineShortNameInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\LineShortNameInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\LineStyleInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\LineStyleInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\LogicalStopNameValueInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\LogicalStopNameValueInterfaceElement.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="LibraryInterfaceElement"
+				>
+			</Filter>
+			<Filter
+				Name="InterfacePage"
+				>
+				<File
+					RelativePath=".\LineMarkerInterfacePage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\LineMarkerInterfacePage.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ReservationRuleInterfacePage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ReservationRuleInterfacePage.h"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<File
+			RelativePath=".\VTune\15_env.vpj"
+			>
+		</File>
 		<File
 			RelativePath=".\Constants.h"
 			>

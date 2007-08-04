@@ -24,6 +24,7 @@
 #define SYNTHESE_ROUTEPLANNER_JOURNEY_H
 
 #include <deque>
+#include <boost/logic/tribool.hpp>
 
 #include "15_env/ServiceUse.h"
 #include "15_env/Types.h"
@@ -186,6 +187,10 @@ namespace synthese
 
 
 				bool verifyAxisConstraints(const env::Axis* axis) const;
+
+
+				boost::logic::tribool	getReservationCompliance() const;
+				time::DateTime			getReservationDeadLine() const;
 			//@}
 
 
