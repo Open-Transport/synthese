@@ -47,6 +47,7 @@ namespace synthese
 		Session::Session(const std::string& ip)
 			: _ip(ip)
 			, _key(generateKey())
+			, _lastUse(TIME_CURRENT)
 		{
 			ServerModule::getSessions().insert(make_pair(_key, this));
 		}
@@ -56,7 +57,7 @@ namespace synthese
 			if (ip != _ip)
 				throw SessionException("IP has changed during the session.");
 
-			DateTime now;
+			DateTime now(TIME_CURRENT);
 			if (now - _lastUse > MAX_MINUTES_DURATION)
 				throw SessionException("Session is too old");
 

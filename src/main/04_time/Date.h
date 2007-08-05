@@ -60,9 +60,42 @@ namespace synthese
 
 			static const Date UNKNOWN_DATE;
 
-			Date( int day = UNKNOWN_VALUE,
-					int month = UNKNOWN_VALUE,
-					int year = UNKNOWN_VALUE );
+				/** Update this date given three int values, without control.
+		            
+					@param day Day value
+					@param month Month value
+					@param year Year value
+
+					Allowed values for each param :
+						- int number : integral value "as is" without control
+						(31/2/1650 is acceptable).
+						- TIME_CURRENT ('A') = identical to system current time.
+						- TIME_MAX ('M') = identical to max absolute date 31/12/9999
+						- TIME_MIN ('m') = identical to min absolute date 1/1/1
+						- TIME_SAME ('I') = identical to previous special char ?
+						- TIME_UNKNOWN ('?') = unknown date (codée -1/-1/-1)
+						- TIME_UNCHANGED ('_') = no modification
+
+					Any invalid special character is taken as TIME_UNCHANGED
+
+					Main uses :
+						- use without param : current date
+						- use with special char : date set according so command 
+							character (ex : updateDate(TIME_MAX) => 31/12/9999)
+						- use with three values : fixed date (ex : updateDate(2, 10, 2006) => 2/10/2006
+
+					- use with three mixed params : special commands (ex :
+					updateDate(15, TIME_CURRENT, TIME_CURRENT) => the 15th
+					of current month)
+
+					Special command chars follows current relantionship : 
+					\f$ TIME_{UNKNOWN} \leq TIME_{MIN} \leq TIME_{CURRENT} \leq TIME_{MAX} \f$
+				*/
+			Date(
+				int day
+				, int month = TIME_SAME
+				, int year = TIME_SAME
+			);
 
 				~Date();
 
@@ -114,43 +147,6 @@ namespace synthese
 
 			static Date FromString (const std::string& sqlString);
 
-				//! @name Update methods
-				//@{
-				/** Update this date given three int values, without control.
-		            
-					@param day Day value
-					@param month Month value
-					@param year Year value
-
-					Allowed values for each param :
-						- int number : integral value "as is" without control
-						(31/2/1650 is acceptable).
-						- TIME_CURRENT ('A') = identical to system current time.
-						- TIME_MAX ('M') = identical to max absolute date 31/12/9999
-						- TIME_MIN ('m') = identical to min absolute date 1/1/1
-						- TIME_SAME ('I') = identical to previous special char ?
-						- TIME_UNKNOWN ('?') = unknown date (codée -1/-1/-1)
-						- TIME_UNCHANGED ('_') = no modification
-
-					Any invalid special character is taken as TIME_UNCHANGED
-
-					Main uses :
-						- use without param : current date
-						- use with special char : date set according so command 
-							character (ex : updateDate(TIME_MAX) => 31/12/9999)
-						- use with three values : fixed date (ex : updateDate(2, 10, 2006) => 2/10/2006
-
-					- use with three mixed params : special commands (ex :
-					updateDate(15, TIME_CURRENT, TIME_CURRENT) => the 15th
-					of current month)
-
-					Special command chars follows current relantionship : 
-					\f$ TIME_{UNKNOWN} \leq TIME_{MIN} \leq TIME_{CURRENT} \leq TIME_{MAX} \f$
-				*/
-				void updateDate( int day = TIME_CURRENT, int month = TIME_SAME,
-								int year = TIME_SAME );
-
-				//@}
 
 
 				/** Adds one day to this date.

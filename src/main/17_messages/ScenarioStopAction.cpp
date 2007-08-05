@@ -68,7 +68,7 @@ namespace synthese
 		}
 
 		ScenarioStopAction::ScenarioStopAction()
-			: Action(), _stopDateTime()
+			: Action(), _stopDateTime(TIME_CURRENT)
 		{
 	
 		}

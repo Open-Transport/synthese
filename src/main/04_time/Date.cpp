@@ -40,14 +40,72 @@ namespace synthese
 	namespace time
 	{
 
-		const Date Date::UNKNOWN_DATE;
+		const Date Date::UNKNOWN_DATE(TIME_UNKNOWN);
 
 
 		Date::Date( int day, int month, int year )
-				: _day ( day )
-				, _month ( month )
-				, _year ( year )
+			: _day(UNKNOWN_VALUE), _month(UNKNOWN_VALUE), _year(UNKNOWN_VALUE)
 		{
+			time_t rawtime;
+			struct tm * timeinfo = 0;
+
+			bool tomorrow(false);
+			if (day == TIME_TOMORROW)
+			{
+				day = TIME_CURRENT;
+				tomorrow = true;
+			}
+			if (month == TIME_TOMORROW)
+				month = TIME_CURRENT;
+			if (year == TIME_TOMORROW)
+				year = TIME_CURRENT;
+
+			if ( day == TIME_CURRENT || month == TIME_CURRENT || year == TIME_CURRENT )
+			{
+				std::time ( &rawtime );
+				timeinfo = localtime ( &rawtime );
+			}
+
+			// Month
+			if ( month == TIME_CURRENT || month == TIME_SAME && day == TIME_CURRENT )
+				_month = ( *timeinfo ).tm_mon + 1;
+			else if ( month == TIME_MAX || month == TIME_SAME && day == TIME_MAX )
+				_month = MONTHS_PER_YEAR;
+			else if ( month == TIME_MIN || month == TIME_SAME && day == TIME_MIN )
+				_month = 1;
+			else if ( month == TIME_UNKNOWN || month == TIME_SAME && day == TIME_UNKNOWN )
+				_month = UNKNOWN_VALUE;
+			else if ( month != TIME_UNCHANGED &&
+					( month != TIME_SAME || day != TIME_UNCHANGED ) &&
+					month >= 1 && month <= MONTHS_PER_YEAR )
+				_month = month;
+
+			// Year
+			if ( year == TIME_CURRENT || year == TIME_SAME && day == TIME_CURRENT )
+				_year = ( *timeinfo ).tm_year + 1900;
+			else if ( year == TIME_MAX || year == TIME_SAME && day == TIME_MAX )
+				_year = MAX_YEAR;
+			else if ( year == TIME_MIN || year == TIME_SAME && day == TIME_MIN )
+				_year = 1;
+			else if ( year == TIME_UNKNOWN || year == TIME_SAME && day == TIME_UNKNOWN )
+				_year = UNKNOWN_VALUE;
+			else if ( year != TIME_UNCHANGED && ( year != TIME_SAME || day != TIME_UNCHANGED ) && year >= 0 && year <= MAX_YEAR )
+				_year = year;
+
+			// Day
+			if ( day == TIME_CURRENT )
+				_day = ( *timeinfo ).tm_mday;
+			else if ( day == TIME_MAX )
+				_day = _month.getDaysCount( _year );
+			else if ( day == TIME_MIN )
+				_day = 1;
+			else if ( day == TIME_UNKNOWN )
+				_day = UNKNOWN_VALUE;
+			else if ( day != TIME_UNCHANGED && day >= 1 && day <= 31 )
+				_day = day;
+
+			if (tomorrow)
+				operator++(0);
 		}
 
 
@@ -158,72 +216,6 @@ namespace synthese
 		}
 
 
-		void
-		Date::updateDate ( int day, int month, int year )
-		{
-			time_t rawtime;
-			struct tm * timeinfo = 0;
-
-			bool tomorrow(false);
-			if (day == TIME_TOMORROW)
-			{
-				day = TIME_CURRENT;
-				tomorrow = true;
-			}
-			if (month == TIME_TOMORROW)
-				month = TIME_CURRENT;
-			if (year == TIME_TOMORROW)
-				year = TIME_CURRENT;
-
-			if ( day == TIME_CURRENT || month == TIME_CURRENT || year == TIME_CURRENT )
-			{
-				std::time ( &rawtime );
-				timeinfo = localtime ( &rawtime );
-			}
-
-			// Month
-			if ( month == TIME_CURRENT || month == TIME_SAME && day == TIME_CURRENT )
-				_month = ( *timeinfo ).tm_mon + 1;
-			else if ( month == TIME_MAX || month == TIME_SAME && day == TIME_MAX )
-				_month = MONTHS_PER_YEAR;
-			else if ( month == TIME_MIN || month == TIME_SAME && day == TIME_MIN )
-				_month = 1;
-			else if ( month == TIME_UNKNOWN || month == TIME_SAME && day == TIME_UNKNOWN )
-				_month = UNKNOWN_VALUE;
-			else if ( month != TIME_UNCHANGED &&
-					( month != TIME_SAME || day != TIME_UNCHANGED ) &&
-					month >= 1 && month <= MONTHS_PER_YEAR )
-				_month = month;
-
-			// Year
-			if ( year == TIME_CURRENT || year == TIME_SAME && day == TIME_CURRENT )
-				_year = ( *timeinfo ).tm_year + 1900;
-			else if ( year == TIME_MAX || year == TIME_SAME && day == TIME_MAX )
-				_year = MAX_YEAR;
-			else if ( year == TIME_MIN || year == TIME_SAME && day == TIME_MIN )
-				_year = 1;
-			else if ( year == TIME_UNKNOWN || year == TIME_SAME && day == TIME_UNKNOWN )
-				_year = UNKNOWN_VALUE;
-			else if ( year != TIME_UNCHANGED && ( year != TIME_SAME || day != TIME_UNCHANGED ) && year >= 0 && year <= MAX_YEAR )
-				_year = year;
-
-			// Day
-			if ( day == TIME_CURRENT )
-				_day = ( *timeinfo ).tm_mday;
-			else if ( day == TIME_MAX )
-				_day = _month.getDaysCount( _year );
-			else if ( day == TIME_MIN )
-				_day = 1;
-			else if ( day == TIME_UNKNOWN )
-				_day = UNKNOWN_VALUE;
-			else if ( day != TIME_UNCHANGED && day >= 1 && day <= 31 )
-				_day = day;
-
-			if (tomorrow)
-				operator++(0);
-		}
-
-
 
 
 		Date&
@@ -290,18 +282,18 @@ namespace synthese
 			switch ( op.size() )
 			{
 				case 0:
-					updateDate ( TIME_UNKNOWN );
+					operator=(Date(TIME_UNKNOWN));
 					break;
 
 				case 1:
-					updateDate( op[ 0 ] );
+					operator=(Date(op[ 0 ]));
 					break;
 
 				default:
 					int year = atoi ( op.substr ( 0, 4 ).c_str () );
 					int month = atoi ( op.substr ( 4, 2 ).c_str () );
 					int day = atoi ( op.substr ( 6, 2 ).c_str () );
-					updateDate ( day, month, year );
+					operator=(Date(day, month, year));
 					break;
 			}
 			return *this;
@@ -515,19 +507,17 @@ namespace synthese
 			if (date.size() == 1 
 				&& (date[0] == TIME_CURRENT || date[0] == TIME_TOMORROW)
 			){
-				Date result;
-				result.updateDate(date[0]);
-				return result;
+				return Date(date[0]);
 			}
 
 			if (date.size() != 8)
 				throw TimeParseException("Bad length for internal date string");
 
-			Date result;
-			result._year = Conversion::ToInt(date.substr(0,4));
-			result._month = Conversion::ToInt(date.substr(4,2));
-			result._day = Conversion::ToInt(date.substr(6,2));
-			return result;			
+			return Date(
+				Conversion::ToInt(date.substr(6,2))
+				, Conversion::ToInt(date.substr(4,2))
+				, Conversion::ToInt(date.substr(0,4))
+			);
 		}
 	}
 }

@@ -107,8 +107,8 @@ namespace synthese
 				boost::shared_ptr<const interfaces::Interface>	getInterface() const;
 				bool											getOnlineBookingAllowed() const;
 				bool											getPastSolutionsDisplayed() const;
-				const time::Date&								getStartDate() const;
-				const time::Date&								getEndDate() const;
+				const time::Date								getStartDate() const;
+				const time::Date								getEndDate() const;
 				const time::Date&								getMinDateInUse () const;
 				const time::Date&								getMaxDateInUse () const;
 				int												getMaxTransportConnectionsCount()	const;

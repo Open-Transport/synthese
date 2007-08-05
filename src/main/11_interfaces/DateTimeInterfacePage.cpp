@@ -30,6 +30,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
+	using namespace time;
 
 	namespace util
 	{
@@ -51,7 +52,21 @@ namespace synthese
 			pv.push_back(Conversion::ToString(dateTime.getMinutes()));
 			pv.push_back(Conversion::ToString(dateTime.getDate().getWeekDay()));
 
-			InterfacePage::display(stream, pv, variables, static_cast<const void*>(&dateTime), request);
+			InterfacePage::display(stream, pv, variables, NULL, request);
+		}
+
+		void DateTimeInterfacePage::display( std::ostream& stream , interfaces::VariablesMap& variables , const time::Date& date , const server::Request* request /*= NULL  */ ) const
+		{
+			ParametersVector pv;
+
+			pv.push_back(Conversion::ToString(date.getYear()));
+			pv.push_back(Conversion::ToString(date.getMonth()));
+			pv.push_back(Conversion::ToString(date.getDay()));
+			pv.push_back(Conversion::ToString(UNKNOWN_VALUE));
+			pv.push_back(Conversion::ToString(UNKNOWN_VALUE));
+			pv.push_back(Conversion::ToString(date.getWeekDay()));
+
+			InterfacePage::display(stream, pv, variables, NULL, request);
 		}
 	}
 }

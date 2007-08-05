@@ -289,8 +289,19 @@ namespace synthese
 					@return The query string corresponding to the request.
 				*/
 				std::string getQueryString() const;
+
+
+				template <class F>
+				boost::shared_ptr<const F> getFunction() const;
 			//@}
 		};
+
+		template <class F>
+		boost::shared_ptr<const F>
+			synthese::server::Request::getFunction() const
+		{
+			return boost::dynamic_pointer_cast<const F, const Function>(_getFunction());
+		}
 
 		template<class R>
 		bool Request::isAuthorized(security::RightLevel publicr, security::RightLevel privater, std::string parameter /*= security::GLOBAL_PERIMETER*/ ) const

@@ -153,6 +153,14 @@
 				Name="LibraryInterfaceElement"
 				>
 				<File
+					RelativePath=".\DatesListInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DatesListInterfaceElement.h"
+					>
+				</File>
+				<File
 					RelativePath=".\JourneyBoardInterfaceElement.cpp"
 					>
 				</File>

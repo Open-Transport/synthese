@@ -154,14 +154,21 @@ namespace synthese
 			);
 			const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
 			VariablesMap vm;
-			_page->display(stream, vm, jv.journeys, _request);
+			_page->display(stream, vm, jv.journeys, _startDate.getDate(), _request);
 
 		}
 
 		RoutePlannerFunction::RoutePlannerFunction()
 			: _maxSolutionsNumber(UNKNOWN_VALUE)
+			, _startDate(TIME_UNKNOWN)
+			, _endDate(TIME_UNKNOWN)
 		{
 
+		}
+
+		boost::shared_ptr<const Site> RoutePlannerFunction::getSite() const
+		{
+			return _site;
 		}
 	}
 }

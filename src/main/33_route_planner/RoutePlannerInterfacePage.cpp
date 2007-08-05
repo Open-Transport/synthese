@@ -22,6 +22,8 @@
 
 #include "RoutePlannerInterfacePage.h"
 
+#include "04_time/Date.h"
+
 namespace synthese
 {
 	using namespace interfaces;
@@ -34,13 +36,13 @@ namespace synthese
 			std::ostream& stream
 			, VariablesMap& variables
 			, const JourneyBoardJourneys& object /*= NULL*/
+			, const time::Date& date
 			, const server::Request* request /*= NULL*/
 			) const
 		{
 			const void* vobj(static_cast<const void*>(&object));
 			ParametersVector pv;
-
-			/// @todo Implement the building of the parameter vector with parameters of the function
+			pv.push_back(date.toInternalString());
 
 			InterfacePage::display(stream, pv, variables, vobj, request);
 		}

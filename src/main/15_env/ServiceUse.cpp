@@ -40,6 +40,7 @@ namespace synthese
 		}
 
 		ServiceUse::ServiceUse()
+			: _secondActualDateTime(TIME_UNKNOWN)
 		{
 
 		}

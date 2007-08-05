@@ -31,6 +31,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+	using namespace time;
 
 	namespace security
 	{
@@ -38,6 +39,7 @@ namespace synthese
 			: Registrable<uid, User>(id)
 			, _cityId(0)
 			, _isConnectionAllowed(true)
+			, _birthDate(TIME_UNKNOWN)
 		{
 		}
 

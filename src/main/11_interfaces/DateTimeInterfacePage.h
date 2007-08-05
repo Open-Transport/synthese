@@ -37,6 +37,7 @@ namespace synthese
 	namespace time
 	{
 		class DateTime;
+		class Date;
 	}
 
 	namespace interfaces
@@ -48,7 +49,7 @@ namespace synthese
 			 - year
 			 - month
 			 - day
-			 - hours
+			 - hours (TIME_UNKNOWN = do not display hour)
 			 - minutes
 			 - day of week  : 0 = sunday, 1 = monday, ..., 6 = saturday 
 
@@ -67,6 +68,17 @@ namespace synthese
 				, const time::DateTime& dateTime
 				, const server::Request* request = NULL
 			) const;
+
+			/** Overloaded display method for specific parameter conversion.
+				This function converts the parameters into a single ParametersVector object.
+			*/
+			void display(
+				std::ostream& stream
+				, interfaces::VariablesMap& variables
+				, const time::Date& date
+				, const server::Request* request = NULL
+			) const;
+
 		};
 	}
 }

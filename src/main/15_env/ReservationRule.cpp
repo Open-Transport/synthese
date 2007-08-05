@@ -42,6 +42,7 @@ namespace synthese
 		, _minDelayMinutes(0)
 		, _minDelayDays(0)
 		, _maxDelayDays(0)
+		, _hourDeadLine(TIME_UNKNOWN)
 		{
 		}
 
@@ -137,7 +138,7 @@ namespace synthese
 			if ( _minDelayDays )
 			{
 				daysMoment.subDaysDuration( _minDelayDays );
-				daysMoment.updateHour( synthese::time::TIME_MAX );
+				daysMoment.setHour(Hour(TIME_MAX));
 			}
 
 			if ( _hourDeadLine < daysMoment.getHour () )
@@ -160,7 +161,7 @@ namespace synthese
 			if ( _maxDelayDays )
 			{
 				reservationStartTime.subDaysDuration( _maxDelayDays );
-				reservationStartTime.updateHour( synthese::time::TIME_MIN );
+				reservationStartTime.setHour(Hour(TIME_MIN));
 			}
 
 			return reservationStartTime;

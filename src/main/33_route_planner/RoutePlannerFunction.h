@@ -46,6 +46,7 @@ namespace synthese
 		*/
 		class RoutePlannerFunction : public server::Function
 		{
+		public:
 			static const std::string PARAMETER_SITE;
 //			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_DEPARTURE_PLACE_ID;
@@ -54,6 +55,7 @@ namespace synthese
 			static const std::string PARAMETER_DAY;
 			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER;
 			
+		private:
 			//! \name Parameters
 			//@{
 				boost::shared_ptr<const Site>						_site;
@@ -81,6 +83,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void _run(std::ostream& stream) const;
+
+			boost::shared_ptr<const Site> getSite() const;
 
 			RoutePlannerFunction();
 		};

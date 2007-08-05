@@ -26,23 +26,16 @@
 
 #include "module.h"
 
-#include "Date.h"
-#include "Hour.h"
-
+#include "04_time/Date.h"
+#include "04_time/Hour.h"
 
 #include <iostream>
 #include <string>
-
-
 
 namespace synthese
 {
 	namespace time
 	{
-
-
-		class Schedule;
-
 		/** DateTime
 			@ingroup m04
 		*/
@@ -58,7 +51,9 @@ namespace synthese
 
 		public:
 
-			DateTime ( int day = TIME_CURRENT, int month = TIME_SAME, int year = TIME_SAME,
+			DateTime (
+				int day
+				, int month = TIME_SAME, int year = TIME_SAME,
 					int hours = TIME_SAME, int minutes = TIME_SAME );
 
 			DateTime ( const DateTime& ref);
@@ -83,14 +78,6 @@ namespace synthese
 
 			//! @name Update methods
 			//@{
-				void updateDateTime ( int day = TIME_CURRENT, int month = TIME_SAME,
-								int year = TIME_SAME, int hours = TIME_SAME,
-								int minutes = TIME_SAME );
-
-				void updateDate ( int day = TIME_CURRENT, int month = TIME_SAME, int year = TIME_SAME );
-				void updateHour ( int hours = TIME_SAME, int minutes = TIME_SAME );
-
-				void updateHour ( const std::string& );
 				void subDaysDuration ( int daysDuration );
 				void addDaysDuration ( int daysDuration = 1);
 			//@}
@@ -144,21 +131,12 @@ namespace synthese
 			bool operator == (const DateTime& op2 ) const;
 			bool operator != (const DateTime& op2 ) const;
 			bool operator <= (const DateTime& op2 ) const;
-//			bool operator <= (const Schedule& op2 ) const;
 			bool operator < (const DateTime& op2 ) const;
-//			bool operator < (const Schedule& op2 ) const;
 			bool operator >= (const DateTime& op2 ) const;
-//			bool operator >= (const Schedule& op2 ) const;
 			bool operator > (const DateTime& op2 ) const;
-//			bool operator > (const Schedule& op2 ) const;
-
 		};
 
-
 		std::ostream& operator<< ( std::ostream& os, const DateTime& op );
-
-
-
 
 
 		/**

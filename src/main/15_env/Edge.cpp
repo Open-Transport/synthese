@@ -21,10 +21,11 @@
 */
 
 #include "Edge.h"
-#include "Path.h"
-#include "Service.h"
-#include "Vertex.h"
-#include "ContinuousService.h"
+
+#include "15_env/Path.h"
+#include "15_env/Service.h"
+#include "15_env/Vertex.h"
+#include "15_env/ContinuousService.h"
 
 #include "04_time/Schedule.h"
 
@@ -224,12 +225,11 @@ namespace synthese
 
 
 
-		bool 
-		Edge::isRunning( const synthese::time::DateTime& startMoment, 
-				const synthese::time::DateTime& endMoment ) const
-		{
-			synthese::time::Date startDate;
-			for ( startDate = startMoment; startDate <= endMoment; startDate++ )
+		bool Edge::isRunning(
+			const DateTime& startMoment
+			, const DateTime& endMoment
+		) const	{
+			for (Date startDate(startMoment.getDate()); startDate <= endMoment; startDate++ )
 				if ( getParentPath ()->isInService ( startDate ) )
 					return true;
 			return false;
@@ -334,7 +334,7 @@ namespace synthese
 				}
 				
 				departureMoment++;
-				departureMoment.updateHour ( 0, 0 );
+				departureMoment.setHour(Hour(TIME_MIN));
 
 				next = _departureIndex[ 0 ];
 			}
@@ -379,7 +379,7 @@ namespace synthese
 				}
 
 				arrivalMoment--;
-				arrivalMoment.updateHour ( 23, 59 );
+				arrivalMoment.setHour(Hour(TIME_MAX));
 				previous = _arrivalIndex[ 23 ];
 			}
 

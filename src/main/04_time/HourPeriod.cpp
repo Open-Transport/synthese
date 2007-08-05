@@ -35,6 +35,9 @@ namespace time
 HourPeriod::HourPeriod ( const std::string caption, 
 	       const Hour& startHour, 
 	       const Hour& endHour )
+		   : _startHour(startHour)
+		   , _endHour(endHour)
+		   , _caption(caption)
 {
 
 }

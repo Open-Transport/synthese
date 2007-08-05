@@ -60,13 +60,13 @@ namespace synthese
 				throw ActionException("Specified alarm not found.");
 			}
 
-			DateTime now;
+			DateTime now(TIME_CURRENT);
 			if (!_alarm->getPeriodEnd().isUnknown() && _alarm->getPeriodEnd() < now)
 				throw ActionException("This alarm has not to be stopped.");
 		}
 
 		AlarmStopAction::AlarmStopAction()
-			: Action(), _stopDateTime()
+			: Action(), _stopDateTime(TIME_CURRENT)
 		{}
 
 		void AlarmStopAction::run()

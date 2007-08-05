@@ -15,3 +15,4 @@
 #include "33_route_planner/ScheduleSheetLinesListLineInterfaceElement.h"
 #include "33_route_planner/ScheduleSheetDurationRowInterfaceElement.h"
 #include "33_route_planner/ScheduleSheetReservationRowInterfaceElement.h"
+#include "33_route_planner/DatesListInterfaceElement.h"

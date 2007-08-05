@@ -67,6 +67,7 @@ namespace synthese
 			uid										_objectId;
 
 		public:
+			DBLogEntry();
 			void					setLogKey(const std::string& key);
 			void					setDate(const time::DateTime& date);
 			void					setUser(boost::shared_ptr<const security::User> user);

@@ -14,7 +14,8 @@ namespace time
 {
 
 
-  Schedule::Schedule () 
+  Schedule::Schedule ()
+	  : _hour(TIME_UNKNOWN)
   {
   }
 
@@ -95,7 +96,7 @@ void
 Schedule::setMinimum()
 {
     _daysSinceDeparture = 0;
-    _hour.updateHour ( TIME_MIN, TIME_MIN );
+    _hour = Hour(TIME_MIN );
 }
 
 
@@ -103,7 +104,7 @@ void
 Schedule::setMaximum()
 {
     _daysSinceDeparture = 255;
-    _hour.updateHour( TIME_MAX, TIME_MAX );
+    _hour = Hour(TIME_MAX );
 }
 
 

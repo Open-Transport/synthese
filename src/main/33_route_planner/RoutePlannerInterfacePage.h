@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace time
+	{
+		class Date;
+	}
+
 	namespace server
 	{
 		class Request;
@@ -43,6 +48,10 @@ namespace synthese
 	{
 		/** RoutePlannerInterfacePage Interface Page Class.
 			@ingroup m33Pages refPages
+
+			Parameters :
+				- 0 : date (internal format)
+				
 		*/
 		class RoutePlannerInterfacePage : public interfaces::InterfacePage
 		{
@@ -54,6 +63,7 @@ namespace synthese
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
 				, const JourneyBoardJourneys& object
+				, const time::Date& date
 				, const server::Request* request = NULL
 				) const;
 		};

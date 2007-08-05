@@ -31,7 +31,6 @@
 #include <string>
 
 
-
 namespace synthese
 {
 	namespace time
@@ -49,7 +48,12 @@ namespace synthese
 
 			public :
 
-				Hour ( int hours = UNKNOWN_VALUE, int minutes = UNKNOWN_VALUE );
+				/** Sets time including special characters conventions.
+					@param hour Hours (A = current, M=maximum, m=minimum, _=unchanged)
+					@param minutes Minutes (A=current, M=maximum, m=minimum,
+						_=unchanged, I=same than hours)
+				*/
+				Hour ( int hours, int minutes = TIME_SAME);
 				Hour ( const Hour& ref );
 
 
@@ -69,20 +73,6 @@ namespace synthese
 					std::string toString () const;
 					std::string toInternalString () const;
 					std::string toSQLString(bool withApostrophes = true) const;
-				//@}
-
-
-				//! @name Update methods
-				//@{
-
-				/** Sets time including special characters conventions.
-				@param hour Hours (A = current, M=maximum, m=minimum, _=unchanged)
-				@param minutes Minutes (A=current, M=maximum, m=minimum,
-										_=unchanged, I=same than hours)
-				*/
-				void updateHour ( int hour = TIME_CURRENT,
-								int minutes = TIME_SAME );
-
 				//@}
 
 

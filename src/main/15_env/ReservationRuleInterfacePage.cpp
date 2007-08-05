@@ -49,11 +49,12 @@ namespace synthese
 
 		void ReservationRuleInterfacePage::display( std::ostream& stream , interfaces::VariablesMap& variables , const Journey& journey, const server::Request* request /*= NULL  */ ) const
 		{
+			DateTime now(TIME_CURRENT);
 			ParametersVector pv;
 
-			pv.push_back(Conversion::ToString(boost::logic::indeterminate(journey.getReservationCompliance()) && journey.getReservationDeadLine() > DateTime()));
+			pv.push_back(Conversion::ToString(boost::logic::indeterminate(journey.getReservationCompliance()) && journey.getReservationDeadLine() > now));
 			pv.push_back(Conversion::ToString(journey.getReservationCompliance() == true));
-			pv.push_back(Conversion::ToString(journey.getReservationDeadLine() - DateTime()));
+			pv.push_back(Conversion::ToString(journey.getReservationDeadLine() - now));
 			
 			stringstream s;
 			boost::shared_ptr<const DateTimeInterfacePage> datePage(getInterface()->getPage<DateTimeInterfacePage>());

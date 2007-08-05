@@ -72,6 +72,10 @@ namespace synthese
 			, _journeySheetStartTime (journeySheetStartTime)
 			, _journeySheetEndTime (journeySheetEndTime)
 			, _maxSolutionsNumber(maxSolutionsNumber)
+			, _minDepartureTime(TIME_UNKNOWN)
+			, _maxArrivalTime(TIME_UNKNOWN)
+			, _previousContinuousServiceLastDeparture(TIME_UNKNOWN)
+			, _calculationTime(TIME_CURRENT)
 		{
 			origin->getImmediateVertices (
 				_originVam

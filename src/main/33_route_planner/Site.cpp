@@ -43,6 +43,10 @@ namespace synthese
 
 		Site::Site(uid id)
 			: Registrable<uid, Site>(id)
+			, _startValidityDate(TIME_UNKNOWN)
+			, _endValidityDate(TIME_UNKNOWN)
+			, _minDateInUse(TIME_UNKNOWN)
+			, _maxDateInUse(TIME_UNKNOWN)
 		{
 			
 		}
@@ -59,8 +63,8 @@ namespace synthese
 
 		bool Site::dateControl() const
 		{
-			DateTime tempDate;
-			return tempDate.getDate() >= _startValidityDate && tempDate.getDate() <= _endValidityDate;
+			Date tempDate(TIME_CURRENT);
+			return tempDate >= _startValidityDate && tempDate <= _endValidityDate;
 		}
 
 		void Site::setInterface(shared_ptr<const Interface> interf )
@@ -98,14 +102,18 @@ namespace synthese
 			return _pastSolutionsDisplayed;
 		}
 
-		const time::Date& Site::getStartDate() const
+		const time::Date Site::getStartDate() const
 		{
-			return _startValidityDate;
+			/// @todo customize
+			return Date(TIME_CURRENT);
 		}
 
-		const time::Date& Site::getEndDate() const
+		const time::Date Site::getEndDate() const
 		{
-			return _endValidityDate;
+			/// @todo customize 14
+			Date date(TIME_CURRENT);
+			date += 14;
+			return date;
 		}
 
 		const time::Date& Site::getMaxDateInUse() const
@@ -121,7 +129,7 @@ namespace synthese
 		Date Site::interpretDate( const std::string& text ) const
 		{
 			if ( text.empty() )
-				return Date();
+				return Date(TIME_UNKNOWN);
 
 			if ( text == TEMPS_MIN_CIRCULATIONS)
 				return getMinDateInUse ();
@@ -130,12 +138,8 @@ namespace synthese
 				return getMaxDateInUse ();
 
 			if (text.size() == 1)
-			{
-				Date tempDate;
-				tempDate.updateDate(text[ 0 ] );
-				return tempDate;
-			}
-
+				return Date(text[ 0 ]);
+			
 			return Date::FromString(text);
 		}
 

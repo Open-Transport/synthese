@@ -24,36 +24,36 @@
 
 #include "01_util/Conversion.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace util;
 
 	namespace time
 	{
-
-
-
-
 		DateTime::DateTime ( int day, int month, int year,
 							int hours, int minutes )
+							: _date(day, month, year)
+							, _hour((hours == TIME_SAME) ? day : hours, minutes)
 		{
-			updateDateTime ( day, month, year, hours, minutes );
 		}
 
 
 
 
 		DateTime::DateTime (const DateTime& ref)
+			: _date(ref._date)
+			, _hour(ref._hour)
 		{
-			_date = ref._date;
-			_hour = ref._hour;
 		}
 
 
 
 		DateTime::DateTime( const Date& date )
+			: _date(date)
+			, _hour(TIME_MIN)
 		{
-			operator= ( date );
 		}
 
 		DateTime::DateTime( const Date& date, const Hour& hour )
@@ -123,7 +123,7 @@ namespace synthese
 
 
 		DateTime&
-		DateTime::operator = ( const std::string& op )
+		DateTime::operator = ( const string& op )
 		{
 		_date = op.substr (0, 8);
 		_hour = op.substr (8, 4);
@@ -207,15 +207,6 @@ namespace synthese
 
 
 
-		void
-		DateTime::updateDate( int day, int month, int year )
-		{
-			_date.updateDate( day, month, year );
-		}
-
-
-
-
 		const Hour&
 		DateTime::getHour() const
 		{
@@ -228,15 +219,6 @@ namespace synthese
 		{
 		_hour = hour;
 		}
-
-
-
-		void
-		DateTime::updateHour ( int hours, int minutes )
-		{
-			_hour.updateHour ( hours, minutes );
-		}
-
 
 
 
@@ -257,31 +239,18 @@ namespace synthese
 
 
 
-		void
-		DateTime::updateDateTime ( int day, int month, int year, int hours, int minutes )
-		{
-			_date.updateDate ( day, month, year );
-			if ( hours == TIME_SAME )
-				_hour.updateHour ( day, minutes ); // is it right ??
-			else
-				_hour.updateHour ( hours, minutes );
-
-		}
-
-
-
-		std::string 
+		string 
 		DateTime::toInternalString () const
 		{
-			return std::string (getDate ().toInternalString() + 
+			return string (getDate ().toInternalString() + 
 					getHour ().toInternalString ());
 		}
 
 
 
 
-		std::ostream&
-		operator<< ( std::ostream& os, const DateTime& op )
+		ostream&
+		operator<< ( ostream& os, const DateTime& op )
 		{
 			os << op.getDate () << op.getHour ();
 			return os;
@@ -326,38 +295,6 @@ namespace synthese
 			return ( getDate () < op2.getDate () || getDate () == op2.getDate () && getHour () < op2.getHour () );
 		}
 
-
-
-/*		bool
-		operator<=( const DateTime& op1, const Schedule& op2 )
-		{
-			return ( op2 >= op1.getHour () );
-		}
-
-
-
-		bool
-		operator<( const DateTime& op1, const Schedule& op2 )
-		{
-			return ( op2 > op1.getHour () );
-		}
-
-
-
-		bool
-		operator>=( const DateTime& op1, const Schedule& op2 )
-		{
-			return ( op2 <= op1.getHour () );
-		}
-
-
-
-		bool
-		operator>( const DateTime& op1, const Schedule& op2 )
-		{
-			return ( op2 < op1.getHour () );
-		}
-*/
 
 
 		bool
@@ -419,7 +356,7 @@ namespace synthese
 
 
 		DateTime // AAAA/(M)M/(J)J hh:mm
-		DateTime::FromSQLTimestamp (const std::string& sqlTimestamp)
+		DateTime::FromSQLTimestamp (const string& sqlTimestamp)
 		{
 			if (sqlTimestamp == "")
 				return DateTime(time::TIME_UNKNOWN);
@@ -434,7 +371,7 @@ namespace synthese
 
 
 		DateTime 
-		DateTime::FromString (const std::string& str)
+		DateTime::FromString (const string& str)
 		{
 			if (str.empty())
 				return DateTime(time::TIME_UNKNOWN);
@@ -446,11 +383,11 @@ namespace synthese
 				: DateTime(Date::FromString(str.substr(0, spaceSeparator)), Hour::FromSQLTime(str.substr(spaceSeparator+1, str.length() - spaceSeparator)));
 		}
 
-		std::string DateTime::toSQLString(bool withApostrophes) const
+		string DateTime::toSQLString(bool withApostrophes) const
 		{
 			return isUnknown()
 				? "NULL"
-				: ((withApostrophes ? "'" : "") + _date.toSQLString(false) + " " + _hour.toSQLString(false) + (withApostrophes ? "'" : ""));
+				: ((withApostrophes ? "'" : string()) + _date.toSQLString(false) + " " + _hour.toSQLString(false) + (withApostrophes ? "'" : string()));
 		}
 
 		bool DateTime::isUnknown() const
@@ -458,17 +395,17 @@ namespace synthese
 			return _date.isUnknown();
 		}
 
-		std::string DateTime::toString() const
+		string DateTime::toString() const
 		{
 			return isUnknown()
-				? ""
+				? string()
 				: (_date.toString() + " " + _hour.toString());
 		}
 
-		DateTime DateTime::FromInternalString( const std::string& str )
+		DateTime DateTime::FromInternalString( const string& str )
 		{
 			if (str == "A")
-				return DateTime();
+				return DateTime(TIME_CURRENT);
 
 			return DateTime (Conversion::ToInt (str.substr (6, 2)),
 				Conversion::ToInt (str.substr (4, 2)),

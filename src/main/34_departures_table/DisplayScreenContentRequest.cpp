@@ -85,5 +85,11 @@ namespace synthese
 		{
 			_screen->display(stream, _date);
 		}
+
+		DisplayScreenContentRequest::DisplayScreenContentRequest()
+			: _date(TIME_CURRENT)
+		{
+	
+		}
 	}
 }

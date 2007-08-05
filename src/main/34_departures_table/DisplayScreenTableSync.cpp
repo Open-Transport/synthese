@@ -456,7 +456,7 @@ namespace synthese
 					objects.push_back(object);
 
 					DisplayScreen::Complements c;
-					DateTime now;
+					DateTime now(TIME_CURRENT);
 
 					// No news test
 					if (object->getMaintenanceChecksPerDay())

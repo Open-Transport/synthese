@@ -38,7 +38,7 @@ namespace synthese
 		{
 			ServicePointer sp(method,edge);
 			sp.setActualTime(presenceDateTime);
-			sp.setOriginDateTime(DateTime(presenceDateTime.getDate(), Hour(0,0)));
+			sp.setOriginDateTime(DateTime(presenceDateTime.getDate(), Hour(TIME_MIN)));
 			sp.setService(this);
 			sp.setServiceIndex(0);
 			sp.setServiceRange(MINUTES_PER_DAY);
@@ -62,22 +62,22 @@ namespace synthese
 
 		time::Schedule PermanentService::getDepartureBeginScheduleToIndex( const Edge* edge ) const
 		{
-			return Schedule(Hour(0,0),0);
+			return Schedule(Hour(TIME_MIN),0);
 		}
 
 		time::Schedule PermanentService::getDepartureEndScheduleToIndex( const Edge* edge ) const
 		{
-			return Schedule(Hour(23,59),0);
+			return Schedule(Hour(TIME_MAX),0);
 		}
 
 		time::Schedule PermanentService::getArrivalBeginScheduleToIndex( const Edge* edge ) const
 		{
-			return Schedule(Hour(0,0),0);
+			return Schedule(Hour(TIME_MIN),0);
 		}
 
 		time::Schedule PermanentService::getArrivalEndScheduleToIndex( const Edge* edge ) const
 		{
-			return Schedule(Hour(23,59),0);
+			return Schedule(Hour(TIME_MAX),0);
 		}
 
 		bool PermanentService::isProvided( const time::Date& originDate ) const
@@ -97,7 +97,7 @@ namespace synthese
 
 		Schedule PermanentService::getDepartureSchedule() const
 		{
-			return Schedule(Hour(0,0),0);
+			return Schedule(Hour(TIME_MIN),0);
 		}
 
 		PermanentService::PermanentService( Path* path )

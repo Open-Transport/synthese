@@ -207,7 +207,7 @@ namespace synthese
 			statusMap.push_back(make_pair(BROADCAST_RUNNING_WITHOUT_END, "En cours sans date de fin"));
 			statusMap.push_back(make_pair(FUTURE_BROADCAST, "Diffusion ultérieure"));
 
-			DateTime now;
+			DateTime now(TIME_CURRENT);
 
 			stream << "<h1>Recherche</h1>";
 
@@ -293,7 +293,7 @@ namespace synthese
 				stream << t1.col(); // Bullet
 				stream << t1.col() << MessagesModule::getConflictLabel(scenario->getConflictStatus()); /// @todo put a graphic bullet
 				stream << t1.col() << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Modifier");
-				if (scenario->isApplicable(DateTime()))
+				if (scenario->isApplicable(DateTime(TIME_CURRENT)))
 					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "stop.png");
 			}
 			stream << t1.row();
@@ -392,7 +392,7 @@ namespace synthese
 					break;
 				}
 				stream << t.col() << HTMLModule::getLinkButton(alarmRequest.getURL(), "Modifier", string(), "note_edit.png");
-				if (alarm->isApplicable(DateTime()))
+				if (alarm->isApplicable(DateTime(TIME_CURRENT)))
 					stream << "&nbsp;" << HTMLModule::getLinkButton(stopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion du message ?", "stop.png");
 			}
 			stream << t.row();

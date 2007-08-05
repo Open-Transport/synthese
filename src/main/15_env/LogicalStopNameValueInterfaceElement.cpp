@@ -46,7 +46,7 @@ namespace synthese
 /*			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )
 			{
 */				const ConnectionPlace* place = (const ConnectionPlace*) object;
-				return place->getName();
+				return place->getFullName();
 /*			}
 			else
 			{

@@ -46,7 +46,8 @@ class Schedule
 
     public:
 
-        Schedule ();
+		/** Unknown schedule constructor */
+		Schedule ();
         Schedule ( const Hour& hour, int daysSinceDeparture );
         Schedule ( const Schedule& ref );
         ~Schedule ();

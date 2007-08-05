@@ -29,6 +29,8 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace time;
+
 	namespace dblog
 	{
 		void DBLogEntry::setDate( const time::DateTime& date )
@@ -90,7 +92,7 @@ namespace synthese
 			_objectId = id;
 		}
 
-		std::string DBLogEntry::getStringContent() const
+		string DBLogEntry::getStringContent() const
 		{
 			stringstream s;
 			for (Content::const_iterator it = _content.begin(); it != _content.end(); ++it)
@@ -98,6 +100,12 @@ namespace synthese
 				s << *it << " ";
 			}
 			return s.str();
+		}
+
+		DBLogEntry::DBLogEntry()
+			: _date(TIME_UNKNOWN)
+		{
+
 		}
 	}
 }

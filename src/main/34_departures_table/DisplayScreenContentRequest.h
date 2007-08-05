@@ -57,6 +57,8 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			DisplayScreenContentRequest();
+
 			/** Action to run, defined by each subclass.
 			*/
 			void _run(std::ostream& stream) const;

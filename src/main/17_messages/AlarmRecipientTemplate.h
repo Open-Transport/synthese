@@ -179,7 +179,7 @@ namespace synthese
 	template<class T, class C>
 	    const SentAlarm* AlarmRecipientTemplate<T, C>::getAlarm( const T* object )
 	{
-	    return AlarmRecipientTemplate<T, C>::getAlarm(object, time::DateTime());
+	    return AlarmRecipientTemplate<T, C>::getAlarm(object, time::DateTime(TIME_CURRENT));
 	}
 
 	template<class T, class C>

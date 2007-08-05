@@ -87,12 +87,11 @@ namespace synthese
 			{
 				const ServiceUse& leg(*it);
 
-				// LIGNE ARRET MONTEE Si premier point d'arr�t et si alerte
+				// LIGNE ARRET MONTEE Si premier point d'arrêt et si alerte
 				if (it == journey->getServiceUses().begin())
 				{
-					time::DateTime debutPrem, finPrem;
-					debutPrem = leg.getDepartureDateTime();
-					finPrem = debutPrem;
+					DateTime debutPrem(leg.getDepartureDateTime());
+					DateTime finPrem(debutPrem);
 					if (journey->getContinuousServiceRange () )
 						finPrem += journey->getContinuousServiceRange ();
 
@@ -110,10 +109,10 @@ namespace synthese
 				if ( dynamic_cast<const synthese::env::Road*> (leg.getService()->getPath ()) == 0 )
 				{
 					// LIGNE CIRCULATIONS
-					synthese::time::DateTime debutLigne, finLigne
-						, lastDepartureTime(synthese::time::TIME_UNKNOWN), lastArrivalTime(synthese::time::TIME_UNKNOWN);
-					debutLigne = leg.getDepartureDateTime();
-					finLigne = leg.getArrivalDateTime();
+					DateTime debutLigne(leg.getDepartureDateTime());
+					DateTime finLigne(leg.getArrivalDateTime());
+					DateTime lastDepartureTime(TIME_UNKNOWN);
+					DateTime lastArrivalTime(TIME_UNKNOWN);
 
 					if (journey->getContinuousServiceRange () )
 					{
@@ -128,19 +127,17 @@ namespace synthese
 					}
 
 					// 12/18 Reservation
-					synthese::time::DateTime maintenant;
-					const ReservationRule* reservationRule = leg.getService()->getReservationRule ();
+					DateTime maintenant(TIME_CURRENT);
+					const ReservationRule* reservationRule(leg.getService()->getReservationRule ());
 
-					maintenant.updateDateTime();
-					bool openedCompulsoryReservation = ( 
+					bool openedCompulsoryReservation( 
 						(reservationRule->isCompliant() == true)
 						&& (reservationRule->isReservationPossible(leg.getOriginDateTime(), maintenant, leg.getDepartureDateTime() )) 
-						);
-					maintenant.updateDateTime();
-					bool openedOptionalReservation = (
+					);
+					bool openedOptionalReservation(
 						(reservationRule->isCompliant() == boost::logic::indeterminate) &&
 						(reservationRule->isReservationPossible(leg.getOriginDateTime(), maintenant, leg.getDepartureDateTime() )) 
-						);
+					);
 					bool openedReservation = openedCompulsoryReservation || openedOptionalReservation;
 					std::string syntheseOnlineBookingURL;
 //					if (openedReservation && site->onlineBookingAllowed() ) /// @todo implement && __ET->getLigne() ->GetResa() ->ReservationEnLigne()
@@ -187,9 +184,9 @@ namespace synthese
 
 					// LIGNE ARRET DE DESCENTE
 
-					synthese::time::DateTime debutArret, finArret, tempMoment(synthese::time::TIME_UNKNOWN);
-					debutArret = leg.getArrivalDateTime ();
-					finArret = debutArret;
+					DateTime debutArret(leg.getArrivalDateTime ());
+					DateTime finArret(debutArret);
+					DateTime tempMoment(TIME_UNKNOWN);
 					if ( (it + 1) < journey->getServiceUses().end())
 						finArret = (it + 1)->getDepartureDateTime();
 					if ( journey->getContinuousServiceRange () )
@@ -216,9 +213,8 @@ namespace synthese
 				else
 				{
 					// 1/2 Alerte
-					synthese::time::DateTime debutArret, finArret;
-					debutArret = leg.getArrivalDateTime ();
-					finArret = debutArret;
+					DateTime debutArret(leg.getArrivalDateTime ());
+					DateTime finArret(debutArret);
 					if ((it+1) < journey->getServiceUses().end())
 						finArret = (it + 1)->getDepartureDateTime();
 					if ( journey->getContinuousServiceRange () )

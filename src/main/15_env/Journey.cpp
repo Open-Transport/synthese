@@ -221,8 +221,10 @@ namespace synthese
 		int 
 		Journey::getMaxAlarmLevel () const
 		{
-			synthese::time::DateTime alarmStart, alarmStop, now;
-			int maxAlarmLevel = 0;
+			DateTime alarmStart(TIME_UNKNOWN);
+			DateTime alarmStop(TIME_UNKNOWN);
+			DateTime now(TIME_CURRENT);
+			int maxAlarmLevel(0);
 		    
 			for (ServiceUses::const_iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
 			{
@@ -245,24 +247,6 @@ namespace synthese
 						maxAlarmLevel = leg->getOrigin()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
 	*/			
 				
-				// -- Compulsory reservation --
-				now.updateDateTime ();
-				if ( (service->getReservationRule ()->isCompliant() == true) &&
-					 (service->isReservationPossible ( now, leg.getDepartureDateTime())) &&
-					 (maxAlarmLevel < ALARM_LEVEL_WARNING) )
-				{
-						maxAlarmLevel = ALARM_LEVEL_WARNING;
-				}
-
-				// -- Possible reservation --
-				now.updateDateTime();
-				if ( (service->getReservationRule ()->isCompliant() == boost::logic::indeterminate) &&
-					 (service->isReservationPossible ( now, leg.getDepartureDateTime())) &&
-					 (maxAlarmLevel < ALARM_LEVEL_INFO) )
-				{
-						maxAlarmLevel = ALARM_LEVEL_INFO;
-				}
-
 
 					// -- Service alarm --
 					// Alarm start = first departure
