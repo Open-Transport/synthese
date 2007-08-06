@@ -61,50 +61,6 @@
 	</References>
 	<Files>
 		<Filter
-			Name="AdminInterfaceElement"
-			>
-			<File
-				RelativePath=".\BroadcastPointsAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BroadcastPointsAdmin.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DisplayAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DisplayAdmin.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DisplayMaintenanceAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DisplayMaintenanceAdmin.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DisplaySearchAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DisplaySearchAdmin.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DisplayTypesAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DisplayTypesAdmin.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Core classes"
 			>
 			<File
@@ -500,6 +456,50 @@
 				</File>
 				<File
 					RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="AdminInterfaceElement"
+				>
+				<File
+					RelativePath=".\BroadcastPointsAdmin.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\BroadcastPointsAdmin.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayAdmin.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayAdmin.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayMaintenanceAdmin.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayMaintenanceAdmin.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplaySearchAdmin.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplaySearchAdmin.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayTypesAdmin.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DisplayTypesAdmin.h"
 					>
 				</File>
 			</Filter>

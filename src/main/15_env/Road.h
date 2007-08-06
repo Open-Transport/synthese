@@ -86,7 +86,7 @@ namespace synthese
 
 		  //! @name Getters/Setters
 		  //@{
-		  const uid& getId () const;
+		  virtual uid getId () const;
 
 		  bool hasReservationRule () const;
 		  const ReservationRule* getReservationRule () const;

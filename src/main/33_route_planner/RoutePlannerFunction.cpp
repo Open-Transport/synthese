@@ -46,12 +46,19 @@ namespace synthese
 
 	namespace routeplanner
 	{
-		const std::string RoutePlannerFunction::PARAMETER_SITE = "si";
-		const std::string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_ID = "dp";
-		const std::string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_ID = "ap";
-		const std::string RoutePlannerFunction::PARAMETER_DATE = "da";
+		const string RoutePlannerFunction::PARAMETER_SITE = "si";
+		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_ID = "dp";
+		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_ID = "ap";
+		const string RoutePlannerFunction::PARAMETER_DATE = "da";
 		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER("msn");
 		const string RoutePlannerFunction::PARAMETER_DAY("dy");
+
+		const string RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_ID("dci");
+		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_ID("aci");
+		const string RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_TEXT("dct");
+		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT("act");
+		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT("dpt");
+		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT("apt");
 
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
@@ -141,7 +148,7 @@ namespace synthese
 				throw RequestException("Bad max solutions number");
 		}
 
-		void RoutePlannerFunction::_run( std::ostream& stream ) const
+		void RoutePlannerFunction::_run( ostream& stream ) const
 		{
 			RoutePlanner r(
 				_departure_place.get()
@@ -154,7 +161,15 @@ namespace synthese
 			);
 			const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
 			VariablesMap vm;
-			_page->display(stream, vm, jv.journeys, _startDate.getDate(), _request);
+			_page->display(
+				stream
+				, vm
+				, jv.journeys
+				, _startDate.getDate()
+				, _departure_place.get()
+				, _arrival_place.get()
+				, _request
+			);
 
 		}
 

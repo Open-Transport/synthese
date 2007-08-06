@@ -81,6 +81,7 @@ public:
 			       bool returnAddresses = true,
 			       bool returnPhysicalStops = true) const;
 
+	virtual uid getId() const;
     //@}
     
 };

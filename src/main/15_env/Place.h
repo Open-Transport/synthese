@@ -30,6 +30,8 @@
 
 #include "15_env/Types.h"
 
+#include "01_util/UId.h"
+
 namespace synthese
 {
 	namespace geometry
@@ -125,6 +127,8 @@ namespace synthese
 			) const = 0;
 
 			virtual const geometry::Point2D& getPoint() const = 0;
+
+			virtual uid getId() const = 0;
 			//@}
 
 		    

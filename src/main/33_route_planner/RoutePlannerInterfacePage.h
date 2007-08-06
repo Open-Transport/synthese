@@ -42,6 +42,7 @@ namespace synthese
 	namespace env
 	{
 		class Journey;
+		class Place;
 	}
 
 	namespace routeplanner
@@ -51,7 +52,15 @@ namespace synthese
 
 			Parameters :
 				- 0 : date (internal format)
-				
+				- 1 : origin city id
+				- 2 : origin city text
+				- 3 : origin place id
+				- 4 : origin place text
+				- 5 : destination city id
+				- 6 : destination city text
+				- 7 : destination place id
+				- 8 : destination place text
+			
 		*/
 		class RoutePlannerInterfacePage : public interfaces::InterfacePage
 		{
@@ -64,6 +73,8 @@ namespace synthese
 				, interfaces::VariablesMap& variables
 				, const JourneyBoardJourneys& object
 				, const time::Date& date
+				, const env::Place* originPlace
+				, const env::Place* destinationPlace
 				, const server::Request* request = NULL
 				) const;
 		};

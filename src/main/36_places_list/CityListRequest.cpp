@@ -20,20 +20,81 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/Environment.h"
+#include "CityListRequest.h"
 
-#include "36_places_list/CityListRequest.h"
+#include "36_places_list/PlacesListInterfacePage.h"
+#include "36_places_list/Types.h"
+
+#include "33_route_planner/Site.h"
+#include "33_route_planner/RoutePlannerModule.h"
+
+#include "30_server/RequestException.h"
+
+#include "15_env/EnvModule.h"
+
+#include "11_interfaces/Interface.h"
+
+#include "01_util/Conversion.h"
 
 namespace synthese
 {
+	using namespace env;
+	using namespace server;
+	using namespace interfaces;
+	using namespace util;
+	using namespace routeplanner;
+	
 	namespace placeslist
 	{
-
+		const std::string CityListRequest::PARAMETER_INPUT("t");
+		const std::string CityListRequest::PARAMETER_NUMBER("n");
+		const std::string CityListRequest::PARAMETER_SITE("s");
 
 		void CityListRequest::_run( std::ostream& stream ) const
 		{
-			env::Environment::CityList tbCommunes = _site->getEnvironment()->guessCity(_input, _n );
+			/// @todo Read city list from site
+			CityList tbCommunes(EnvModule::guessCity(_input, _n ));
+			PlacesList placesList;
+			for(CityList::const_iterator it(tbCommunes.begin()); it != tbCommunes.end(); ++it)
+				placesList.push_back(make_pair((*it)->getKey(), (*it)->getName()));
 
+			VariablesMap vm;
+			_page->display(stream, vm, placesList, _request);
+		}
+
+		ParametersMap CityListRequest::_getParametersMap() const
+		{
+			ParametersMap pm;
+			pm.insert(make_pair(PARAMETER_INPUT, _input));
+			pm.insert(make_pair(PARAMETER_NUMBER, Conversion::ToString(_n)));
+			pm.insert(make_pair(PARAMETER_SITE, Conversion::ToString(_site->getKey())));
+			return pm;
+		}
+
+		void CityListRequest::_setFromParametersMap( const server::ParametersMap& map )
+		{
+			ParametersMap::const_iterator it;
+
+			// Site
+			it = map.find(PARAMETER_SITE);
+			if (it == map.end())
+				throw RequestException("Site not specified");
+			if (!RoutePlannerModule::getSites().contains(Conversion::ToLongLong(it->second)))
+				throw RequestException("Specified site not found");
+			_site = RoutePlannerModule::getSites().get(Conversion::ToLongLong(it->second));
+			_page = _site->getInterface()->getPage<PlacesListInterfacePage>();
+
+			it = map.find(PARAMETER_INPUT);
+			if (it == map.end())
+				throw RequestException("Text input not specified");
+			_input = it->second;
+
+			it = map.find(PARAMETER_NUMBER);
+			if (it == map.end())
+				throw RequestException("Number not specified");
+			_n = Conversion::ToInt(it->second);
+			if (_n < 0)
+				throw RequestException("Bad value for number");
 		}
 	}
 }

@@ -1,6 +1,6 @@
 
-/** CityListRequest class header.
-	@file CityListRequest.h
+/** Transport website Types.
+	@file Types.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,51 +20,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_CityListRequest_H__
-#define SYNTHESE_CityListRequest_H__
+#ifndef SYNTHESE_TRANSPORT_WEBSITE_Types_H__
+#define SYNTHESE_TRANSPORT_WEBSITE_Types_H__
 
-#include "30_server/Function.h"
+#include "01_util/UId.h"
 
+#include <vector>
+#include <utility>
 #include <string>
 
 namespace synthese
 {
-	namespace routeplanner
-	{
-		class Site;
-	}
-
 	namespace placeslist
 	{
-		class PlacesListInterfacePage;
-
-		/** City list request.
-			@ingroup m36
-
-		*/
-		class CityListRequest : public server::Function
-		{
-		public:
-			static const std::string PARAMETER_INPUT;
-			static const std::string PARAMETER_NUMBER;
-			static const std::string PARAMETER_SITE;
-
-		private:
-			std::string _input;
-			int _n;
-			boost::shared_ptr<const routeplanner::Site>			_site;
-			boost::shared_ptr<const PlacesListInterfacePage>	_page;
-
-		protected:
-			server::ParametersMap _getParametersMap() const;
-			void _setFromParametersMap(const server::ParametersMap& map);
-
-		public:
-			void _run(std::ostream& stream) const;
-
-		};
+		typedef std::vector<std::pair<uid, std::string> > PlacesList;
 	}
 }
 
-#endif // SYNTHESE_CityListRequest_H__
-
+#endif // SYNTHESE_Types_H__

@@ -17,5 +17,6 @@ synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrat
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::ScheduleSheetDurationRowInterfaceElement>("schedules_durations");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::ScheduleSheetReservationRowInterfaceElement>("schedules_reservation");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::DatesListInterfaceElement>("dates_list");
+synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::TextInputInterfaceElemet>("route_planner_input");
 
 synthese::util::Factory<synthese::server::Function>::integrate<synthese::routeplanner::RoutePlannerFunction>("rp");

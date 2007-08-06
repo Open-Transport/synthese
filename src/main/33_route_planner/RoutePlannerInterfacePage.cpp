@@ -22,12 +22,18 @@
 
 #include "RoutePlannerInterfacePage.h"
 
+#include "15_env/City.h"
+#include "15_env/Place.h"
+
 #include "04_time/Date.h"
+
+#include "01_util/Conversion.h"
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace env;
+	using namespace util;
 
 	namespace routeplanner
 	{
@@ -37,12 +43,22 @@ namespace synthese
 			, VariablesMap& variables
 			, const JourneyBoardJourneys& object /*= NULL*/
 			, const time::Date& date
+			, const env::Place* originPlace
+			, const env::Place* destinationPlace
 			, const server::Request* request /*= NULL*/
 			) const
 		{
 			const void* vobj(static_cast<const void*>(&object));
 			ParametersVector pv;
 			pv.push_back(date.toInternalString());
+			pv.push_back(Conversion::ToString(originPlace->getCity()->getKey()));
+			pv.push_back(originPlace->getCity()->getName());
+			pv.push_back(Conversion::ToString(originPlace->getId()));
+			pv.push_back(originPlace->getName());
+			pv.push_back(Conversion::ToString(destinationPlace->getCity()->getKey()));
+			pv.push_back(destinationPlace->getCity()->getName());
+			pv.push_back(Conversion::ToString(destinationPlace->getId()));
+			pv.push_back(destinationPlace->getName());
 
 			InterfacePage::display(stream, pv, variables, vobj, request);
 		}

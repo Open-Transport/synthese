@@ -208,6 +208,14 @@
 					RelativePath=".\SchedulesTableInterfaceElement.h"
 					>
 				</File>
+				<File
+					RelativePath=".\TextInputInterfaceElemet.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TextInputInterfaceElemet.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="InterfacePage"

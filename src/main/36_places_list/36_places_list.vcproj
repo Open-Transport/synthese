@@ -66,23 +66,7 @@
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\39_map\MapRequest.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="AdminInterfaceElement"
-			>
-		</Filter>
-		<Filter
-			Name="LibraryInterfaceElement"
-			>
-			<File
-				RelativePath=".\CityListInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CityListInterfaceElement.h"
+				RelativePath=".\Types.h"
 				>
 			</File>
 		</Filter>
@@ -105,6 +89,46 @@
 				RelativePath=".\CityListRequest.h"
 				>
 			</File>
+			<File
+				RelativePath=".\PlacesListFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PlacesListFunction.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Interface"
+			>
+			<Filter
+				Name="LibraryInterfaceElement"
+				>
+				<File
+					RelativePath=".\CityListInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CityListInterfaceElement.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Interface Pages"
+				>
+				<File
+					RelativePath=".\PlacesListInterfacePage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\PlacesListInterfacePage.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="AdminInterfaceElement"
+				>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\PlacesListModule.cpp"

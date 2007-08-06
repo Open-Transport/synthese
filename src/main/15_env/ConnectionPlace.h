@@ -160,6 +160,7 @@ namespace synthese
 
 				virtual const geometry::Point2D& getPoint() const;
 
+				virtual uid getId() const;
 
 				std::vector<std::pair<uid, std::string> >	getPhysicalStopLabels(bool withAll = false) const;
 

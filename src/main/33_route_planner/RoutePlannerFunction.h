@@ -48,12 +48,19 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_SITE;
-//			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_DEPARTURE_PLACE_ID;
 			static const std::string PARAMETER_ARRIVAL_PLACE_ID;
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_DAY;
 			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER;
+
+			// Parameters for text verifying only
+			static const std::string PARAMETER_DEPARTURE_CITY_ID;
+			static const std::string PARAMETER_ARRIVAL_CITY_ID;
+			static const std::string PARAMETER_DEPARTURE_CITY_TEXT;
+			static const std::string PARAMETER_ARRIVAL_CITY_TEXT;
+			static const std::string PARAMETER_DEPARTURE_PLACE_TEXT;
+			static const std::string PARAMETER_ARRIVAL_PLACE_TEXT;
 			
 		private:
 			//! \name Parameters

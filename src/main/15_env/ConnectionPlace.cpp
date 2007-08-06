@@ -374,5 +374,10 @@ namespace synthese
 			}
 			return _score;
 		}
+
+		uid ConnectionPlace::getId() const
+		{
+			return getKey();
+		}
 	}
 }

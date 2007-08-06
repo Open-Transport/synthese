@@ -1,6 +1,6 @@
 
-/** CityListRequest class header.
-	@file CityListRequest.h
+/** PlacesListInterfacePage class implementation.
+	@file PlacesListInterfacePage.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,51 +20,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_CityListRequest_H__
-#define SYNTHESE_CityListRequest_H__
+#include "PlacesListInterfacePage.h"
 
-#include "30_server/Function.h"
-
-#include <string>
+using namespace std;
 
 namespace synthese
 {
-	namespace routeplanner
+	using namespace interfaces;
+	using namespace placeslist;
+
+	namespace util
 	{
-		class Site;
+		// template<> const string FactoryTemplate<InterfacePage, PlacesListInterfacePage>::FACTORY_KEY("");
 	}
 
 	namespace placeslist
 	{
-		class PlacesListInterfacePage;
 
-		/** City list request.
-			@ingroup m36
-
-		*/
-		class CityListRequest : public server::Function
+		void PlacesListInterfacePage::display(
+			std::ostream& stream
+			, VariablesMap& variables
+			, const PlacesList& results
+			, const server::Request* request /*= NULL*/) const
 		{
-		public:
-			static const std::string PARAMETER_INPUT;
-			static const std::string PARAMETER_NUMBER;
-			static const std::string PARAMETER_SITE;
+			ParametersVector pv;
 
-		private:
-			std::string _input;
-			int _n;
-			boost::shared_ptr<const routeplanner::Site>			_site;
-			boost::shared_ptr<const PlacesListInterfacePage>	_page;
-
-		protected:
-			server::ParametersMap _getParametersMap() const;
-			void _setFromParametersMap(const server::ParametersMap& map);
-
-		public:
-			void _run(std::ostream& stream) const;
-
-		};
+			InterfacePage::display(stream, pv, variables, static_cast<const void*>(&results), request);
+		}
 	}
 }
-
-#endif // SYNTHESE_CityListRequest_H__
-

@@ -198,5 +198,10 @@ namespace synthese
 				);
 			}
 		}
+
+		uid City::getId() const
+		{
+			return getKey();
+		}
 	}
 }

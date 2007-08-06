@@ -67,6 +67,10 @@ namespace synthese
 			addIncludedPlace(place);
 		}
 
+		uid PlaceAlias::getId() const
+		{
+			return getKey();
+		}
 
 
 

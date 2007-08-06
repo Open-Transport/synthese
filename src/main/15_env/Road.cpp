@@ -142,7 +142,7 @@ namespace synthese
 
 
 
-		const uid& 
+		uid
 		Road::getId () const
 		{
 			return synthese::util::Registrable<uid,Road>::getKey();

@@ -64,6 +64,7 @@ namespace synthese
 
 			//@}
 
+			virtual uid getId() const;
 		    
 		};
 	}

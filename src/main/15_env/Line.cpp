@@ -244,8 +244,7 @@ namespace synthese
 
 
 
-		const uid& 
-		Line::getId () const
+		uid	Line::getId () const
 		{
 			return synthese::util::Registrable<uid,Line>::getKey();
 		}

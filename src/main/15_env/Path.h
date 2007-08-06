@@ -106,7 +106,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				virtual const uid&			getId () const = 0;
+				virtual uid			getId () const = 0;
 
 				const ServiceSet&			getServices () const;
 				const Service*				getService (int serviceIndex) const;

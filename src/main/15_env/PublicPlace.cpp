@@ -38,5 +38,10 @@ namespace synthese
 		PublicPlace::~PublicPlace ()
 		{
 		}
+
+		uid PublicPlace::getId() const
+		{
+			return getKey();
+		}
 	}
 }

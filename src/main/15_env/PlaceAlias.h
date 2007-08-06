@@ -74,6 +74,8 @@ namespace synthese
 			 */
 			const Place* getAliasedPlace () const;
 
+			virtual uid getId() const;
+
 			void setAliasedPlace(const Place* place);
 			//@}
 

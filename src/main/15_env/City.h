@@ -106,6 +106,7 @@ class City : public synthese::util::Registrable<uid, City>,
     
     std::vector<const Road*> searchRoad (const std::string& fuzzyName, int nbMatches = 10) const;
 
+	virtual uid getId() const;
     //@}
 
 

@@ -97,7 +97,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const uid&				getId ()					const;
+				virtual uid				getId ()					const;
 				const std::string&		getName ()					const;
 				bool					getUseInDepartureBoards ()	const;
 				bool					getUseInTimetables ()		const;
