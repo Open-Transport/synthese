@@ -97,42 +97,10 @@
 				RelativePath=".\RoutePlanner.h"
 				>
 			</File>
-			<File
-				RelativePath=".\Site.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Site.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SiteCommercialLineLink.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SiteCommercialLineLink.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="LS SQL"
 			>
-			<File
-				RelativePath=".\EnvironmentLinkTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\EnvironmentLinkTableSync.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SiteTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SiteTableSync.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Functions"
@@ -174,6 +142,22 @@
 				</File>
 				<File
 					RelativePath=".\JourneyLineListInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\PeriodsListInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\PeriodsListInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RequestInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\RequestInterfaceElement.h"
 					>
 				</File>
 				<File

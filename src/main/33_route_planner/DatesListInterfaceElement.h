@@ -26,10 +26,14 @@
 #define SYNTHESE_DatesListInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
-#include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
+	namespace interfaces
+	{
+		class ValueInterfaceElement;
+	}
+
 	namespace routeplanner
 	{
 		/** DatesListInterfaceElement Library Interface Element Class.

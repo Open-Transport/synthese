@@ -26,6 +26,7 @@
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/ValueInterfaceElement.h"
 #include "11_interfaces/Interface.h"
+#include "11_interfaces/ValueElementList.h"
 
 using namespace boost;
 using namespace std;

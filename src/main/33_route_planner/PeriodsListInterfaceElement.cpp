@@ -1,6 +1,6 @@
 
-/** ScheduleSheetReservationRowInterfaceElement class implementation.
-	@file ScheduleSheetReservationRowInterfaceElement.cpp
+/** PeriodsListInterfaceElement class implementation.
+	@file PeriodsListInterfaceElement.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,15 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ScheduleSheetReservationRowInterfaceElement.h"
+#include "PeriodsListInterfaceElement.h"
 
-#include "33_route_planner/Types.h"
+#include "36_places_list/Site.h"
+#include "36_places_list/HourPeriod.h"
 
-#include "15_env/ReservationRuleInterfacePage.h"
+#include "33_route_planner/RoutePlannerFunction.h"
+
+#include "30_server/Request.h"
 
 #include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/ValueInterfaceElement.h"
 
 using namespace std;
 using namespace boost;
@@ -36,37 +37,45 @@ using namespace boost;
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace env;
+	using namespace transportwebsite;
 
 	namespace routeplanner
 	{
-		void ScheduleSheetReservationRowInterfaceElement::storeParameters(ValueElementList& vel)
+		void PeriodsListInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			_cellHeader = vel.front();
-			_cellFooter = vel.front();
+			_current = vel.front();
 		}
 
-		string ScheduleSheetReservationRowInterfaceElement::display(
+		string PeriodsListInterfaceElement::display(
 			std::ostream& stream
 			, const interfaces::ParametersVector& parameters
 			, VariablesMap& variables
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/
 		) const {
-			const JourneyBoardJourneys* jv = static_cast<const JourneyBoardJourneys*>(object);
-			shared_ptr<const ReservationRuleInterfacePage> resaInterfacePage = _page->getInterface()->getPage<ReservationRuleInterfacePage>();
 
-			for (JourneyBoardJourneys::const_iterator it = jv->begin(); it != jv->end(); ++it)
+			shared_ptr<const RoutePlannerFunction> function(request->getFunction<RoutePlannerFunction>());
+
+			assert(function.get());
+
+			const Site::Periods& periods(function->getSite()->getPeriods());
+
+			int current(Conversion::ToInt(_current->getValue(parameters, variables, object, request)));
+
+			stream << "<select name=\"" << RoutePlannerFunction::PARAMETER_PERIOD_ID << "\">";
+			for(int i(0); i<periods.size(); ++i)
 			{
-				stream << _cellHeader->getValue(parameters, variables, object, request);
-				resaInterfacePage->display(stream, variables, **it, request);
-				stream << _cellFooter->getValue(parameters, variables, object, request);
+				stream << "<option value=\"" << i << "\"";
+				if (i == current)
+					stream << " selected=\"1\"";
+				stream << ">" << periods.at(i).getCaption() << "</option>";
 			}
+			stream << "</select>";
 
 			return string();
 		}
 
-		ScheduleSheetReservationRowInterfaceElement::~ScheduleSheetReservationRowInterfaceElement()
+		PeriodsListInterfaceElement::~PeriodsListInterfaceElement()
 		{
 		}
 	}

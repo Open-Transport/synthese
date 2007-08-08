@@ -23,10 +23,6 @@
 #ifndef SYNTHESE_RoutePlannerModule_H__
 #define SYNTHESE_RoutePlannerModule_H__
 
-#include "33_route_planner/Site.h"
-#include "33_route_planner/SiteCommercialLineLink.h"
-#include "33_route_planner/Types.h"
-
 #include "01_util/ModuleClass.h"
 
 namespace synthese
@@ -44,19 +40,9 @@ namespace synthese
 		class RoutePlannerModule : public util::ModuleClass
 		{
 		private:
-			static Site::Registry			_sites;	//!< Sites Registry
-			static SiteCommercialLineLink::Registry	_siteLineLinks;
 
 		public:
 
-			/** Sites registry getter.
-				@return Site::Registry& The sites registry
-				@author Hugues Romain
-				@date 2007
-			*/
-			static Site::Registry& getSites();
-
-			static SiteCommercialLineLink::Registry& getSiteLineLinks();
 		};
 	}
 }

@@ -1,6 +1,6 @@
 
-/** ScheduleSheetDurationRowInterfaceElement class header.
-	@file ScheduleSheetDurationRowInterfaceElement.h
+/** PeriodsListInterfaceElement class header.
+	@file PeriodsListInterfaceElement.h
 	@author Hugues Romain
 	@date 2007
 
@@ -22,30 +22,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ScheduleSheetDurationRowInterfaceElement_H__
-#define SYNTHESE_ScheduleSheetDurationRowInterfaceElement_H__
+#ifndef SYNTHESE_PeriodsListInterfaceElement_H__
+#define SYNTHESE_PeriodsListInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
+#include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
-	namespace interfaces
-	{
-		class ValueInterfaceElement;
-	}
-
 	namespace routeplanner
 	{
-		/** ScheduleSheetDurationRowInterfaceElement Library Interface Element Class.
+		/** PeriodsListInterfaceElement Library Interface Element Class.
 			@author Hugues Romain
 			@date 2007
 			@ingroup m33Library refLibrary
 		*/
-		class ScheduleSheetDurationRowInterfaceElement : public interfaces::LibraryInterfaceElement
+		class PeriodsListInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _cellHeader;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _cellFooter;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _current;
 
 		public:
 			/** Controls and store the internals parameters.
@@ -68,9 +63,9 @@ namespace synthese
 				, const server::Request* request = NULL
 				) const;
 				
-			~ScheduleSheetDurationRowInterfaceElement();
+			~PeriodsListInterfaceElement();
 		};
 	}
 }
 
-#endif // SYNTHESE_ScheduleSheetDurationRowInterfaceElement_H__
+#endif // SYNTHESE_PeriodsListInterfaceElement_H__

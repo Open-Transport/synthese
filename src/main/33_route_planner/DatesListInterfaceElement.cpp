@@ -22,12 +22,14 @@
 
 #include "DatesListInterfaceElement.h"
 
+#include "36_places_list/Site.h"
+
 #include "33_route_planner/RoutePlannerFunction.h"
-#include "33_route_planner/Site.h"
 
 #include "30_server/Request.h"
 
 #include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/ValueInterfaceElement.h"
 #include "11_interfaces/DateTimeInterfacePage.h"
 #include "11_interfaces/Interface.h"
 
@@ -38,6 +40,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace time;
+	using namespace transportwebsite;
 
 	namespace routeplanner
 	{
@@ -53,14 +56,14 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/
 		) const {
-			// Collecte des param�tres sp�cifiques
+			
 			Date dateDefaut(Date::FromInternalString(_value->getValue(parameters, variables, object, request)));
 			shared_ptr<const RoutePlannerFunction> function(request->getFunction<RoutePlannerFunction>());
 
 			assert(function.get());
 			
-			Date minDate(function->getSite()->getStartDate());
-			Date maxDate(function->getSite()->getEndDate());
+			Date minDate(function->getSite()->getMinUseDate());
+			Date maxDate(function->getSite()->getMaxUseDate());
 				
 			//time::Date __DateJour;
 			//if ( !__Site->getSolutionsPassees() && DateMin < __DateJour )

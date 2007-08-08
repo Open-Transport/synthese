@@ -1,6 +1,8 @@
 
-/** CityListRequest class header.
-	@file CityListRequest.h
+/** FunctionWithSite class header.
+	@file FunctionWithSite.h
+	@author Hugues Romain
+	@date 2007
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,46 +22,53 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_CityListRequest_H__
-#define SYNTHESE_CityListRequest_H__
+#ifndef SYNTHESE_FunctionWithSite_H__
+#define SYNTHESE_FunctionWithSite_H__
 
-#include "36_places_list/FunctionWithSite.h"
-
-#include <string>
+#include "30_server/Function.h"
 
 namespace synthese
 {
 	namespace transportwebsite
 	{
-		class PlacesListInterfacePage;
+		class Site;
 
-		/** City list request.
+		/** FunctionWithSite Function class.
+			@author Hugues Romain
+			@date 2007
 			@ingroup m36
-
 		*/
-		class CityListRequest : public FunctionWithSite
+		class FunctionWithSite : public server::Function
 		{
 		public:
-			static const std::string PARAMETER_INPUT;
-			static const std::string PARAMETER_INPUT_ID;
-			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_SITE;
-			static const std::string PARAMETER_IS_FOR_ORIGIN;
-
-		private:
-			std::string _input;
-			int _n;
-			boost::shared_ptr<const PlacesListInterfacePage>	_page;
-
+			
 		protected:
+			//! \name Page parameters
+			//@{
+				boost::shared_ptr<const Site>	_site;
+			//@}
+			
+			
+			/** Conversion from attributes to generic parameter maps.
+				@return Generated parameters map
+			*/
 			server::ParametersMap _getParametersMap() const;
+			
+			/** Conversion from generic parameters map to attributes.
+				@param map Parameters map to interpret
+			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
+			
+			virtual void _copy(boost::shared_ptr<const Function> function);
 
 		public:
-			void _run(std::ostream& stream) const;
+
+			boost::shared_ptr<const Site> getSite() const;
+			void setSite(boost::shared_ptr<const Site>);
+
 		};
 	}
 }
 
-#endif // SYNTHESE_CityListRequest_H__
-
+#endif // SYNTHESE_FunctionWithSite_H__

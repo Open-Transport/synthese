@@ -26,10 +26,14 @@
 #define SYNTHESE_TextInputInterfaceElemet_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
-#include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
+	namespace interfaces
+	{
+		class ValueInterfaceElement;
+	}
+
 	namespace routeplanner
 	{
 		/** TextInputInterfaceElemet Library Interface Element Class.

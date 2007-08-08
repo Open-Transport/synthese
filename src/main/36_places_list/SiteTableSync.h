@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		class Site;
 
@@ -48,6 +48,8 @@ namespace synthese
 			static const std::string TABLE_COL_ONLINE_BOOKING;
 			static const std::string TABLE_COL_USE_OLD_DATA;
 			static const std::string COL_MAX_CONNECTIONS;
+			static const std::string COL_USE_DATES_RANGE;
+			static const std::string COL_PERIODS;
 
 			/** Site SQLite table constructor.
 			*/

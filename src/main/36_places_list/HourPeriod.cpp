@@ -22,91 +22,58 @@
 
 #include "HourPeriod.h"
 
-#include "DateTime.h"
-
+using namespace std;
 
 namespace synthese
 {
-namespace time 
-{
+	using namespace time;
 
-
-
-HourPeriod::HourPeriod ( const std::string caption, 
-	       const Hour& startHour, 
-	       const Hour& endHour )
-		   : _startHour(startHour)
-		   , _endHour(endHour)
-		   , _caption(caption)
-{
-
-}
-
-
-
-HourPeriod::~HourPeriod ()
-{
-
-}
-
-
-
-
-const std::string& 
-HourPeriod::getCaption () const
-{
-  return _caption;
-}
-
-
-
-
-int 
-HourPeriod::getId() const
-{
-  return _id;
-}
-
-
-
-
-
-bool 
-HourPeriod::applyPeriod ( DateTime& startTime, 
-			  DateTime& endTime, 
-			  const DateTime& calculationTime, 
-			  bool pastSolutions ) const
-{
-    // Updates
-    if ( _startHour <= _endHour )
-    {
-	endTime.addDaysDuration ( 1 );
-    }
-  
-     
-    endTime = _endHour;
-    startTime = _startHour;
-    
-    
-    // Checks
-    if ( pastSolutions == false )
-    {
-	if ( endTime < calculationTime ) return false;
-	
-	if ( startTime < calculationTime ) 
+	namespace transportwebsite
 	{
-	    startTime = calculationTime;
+		HourPeriod::HourPeriod (
+			const string& caption
+			, const Hour& startHour
+			, const Hour& endHour
+		)	: _startHour(startHour)
+			, _endHour(endHour)
+			, _caption(caption)
+		{}
+
+/*		HourPeriod::HourPeriod()
+			: _startHour(TIME_UNKNOWN)
+			, _endHour(TIME_UNKNOWN)
+		{}
+
+		HourPeriod::HourPeriod( const HourPeriod& period )
+			: _caption(period._caption)
+			, _startHour(period._startHour)
+			, _endHour(period._endHour)
+		{
+
+		}
+*/
+		HourPeriod::~HourPeriod ()
+		{}
+
+
+
+		const string& HourPeriod::getCaption() const
+		{
+			return _caption;
+		}
+
+
+
+		const time::Hour& HourPeriod::getBeginHour() const
+		{
+			return _startHour;
+		}
+
+
+
+		const time::Hour& HourPeriod::getEndHour() const
+		{
+			return _endHour;
+		}
 	}
-    }
-    
-  return true;
-  
 }
-
-
-
-
-
-}
-}
-

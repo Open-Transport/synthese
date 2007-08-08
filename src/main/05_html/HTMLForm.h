@@ -102,7 +102,7 @@ namespace synthese
 				@date 2007
 				
 			*/
-			std::string open();
+			std::string open(const std::string htmlComplement = std::string());
 
 			/** Generator of the closing HTML tag.
 				@return std::string The HTML generated code.

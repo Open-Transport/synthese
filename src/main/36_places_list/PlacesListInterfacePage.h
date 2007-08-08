@@ -36,7 +36,7 @@ namespace synthese
 		class Request;
 	}
 
-	namespace placeslist
+	namespace transportwebsite
 	{
 		/** PlacesListInterfacePage Interface Page Class.
 			@ingroup m36Pages refPages

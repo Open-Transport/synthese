@@ -36,13 +36,14 @@ namespace synthese
 	{
 
 
-		std::string HTMLForm::open()
+		std::string HTMLForm::open(const std::string htmlComplement)
 		{
 			stringstream s;
 			s	<< "<form "
 				<< "name=\"" << _name << "\" "
 				<< "method=\"post\" "
 				<< "action=\"" << _action << "\" "
+				<< htmlComplement
 				<< ">";
 			return s.str();
 		}

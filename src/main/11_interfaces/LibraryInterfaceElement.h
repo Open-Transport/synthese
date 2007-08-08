@@ -380,25 +380,6 @@ namespace synthese
 			pCtxt << _Parametres[ELEMENTINTERFACEListeArretsTexteSiVide]->Texte(__Parametres);
 			}
 			*/  
-
-/*			// 29 A mettre dans 41
-	case ELEMENTINTERFACESelecteurVelo:
-			tBool3 VeloDefaut = ( tBool3 ) _Parametres[ ELEMENTINTERFACESelecteurVeloDefaut ] ->Nombre( __Parametres );
-
-			if ( VeloDefaut == Vrai )
-				pCtxt << " checked>";
-			else
-				pCtxt << " >";
-*/
-/*		// 31 A mettre dans 41
-	case ELEMENTINTERFACESelecteurTaxiBus:
-			tBool3 TaxiBusDefaut = ( tBool3 ) _Parametres[ ELEMENTINTERFACESelecteurTaxiBusDefaut ] ->Nombre( __Parametres );
-
-			if ( TaxiBusDefaut == Vrai )
-				pCtxt << " checked>";
-			else
-				pCtxt << " >";
-*/
 		// 34
 /*	case ELEMENTINTERFACEChampsReservation:
 			// affichage du champ nom
@@ -526,265 +507,6 @@ namespace synthese
 			}
 */
 
-/*	case EI_BIBLIOTHEQUE_Trajet_Duree:
-			// Collecte des paramï¿½tres
-			const Journey* __Trajet = ( const Journey* ) __Objet;
-
-			cInterface_Objet_Connu_ListeParametres __Parametres;
-
-			//0 : Durï¿½e du trajet
-			__Parametres << __Trajet->getDuration ();
-
-			//1 : Durï¿½e < 1h ?
-			__Parametres << ( __Trajet->getDuration () < synthese::time::MINUTES_PER_HOUR ? "1" : "" );
-
-			//2 : Nombre d'heures
-			__Parametres << ( __Trajet->getDuration () / synthese::time::MINUTES_PER_HOUR );
-
-			//3 : Nombre de minutes
-			__Parametres << ( __Trajet->getDuration () % synthese::time::MINUTES_PER_HOUR );
-
-			//4 : Nombre de minutes superieur a 10 ou inferieur a 60 ?
-			__Parametres << ( __Trajet->getDuration () < synthese::time::MINUTES_PER_HOUR || __Trajet->getDuration () % synthese::time::MINUTES_PER_HOUR >= 10 ? "1" : "" );
-
-			// Lancement de l'affichage
-			__Site->Affiche( pCtxt, INTERFACEDuree, __Parametres, NULL );
-*/
-/*	case EI_BIBLIOTHEQUE_FicheHoraire_LigneDurees:
-			// Collecte des paramï¿½tres
-			const cTrajets* __Trajets = ( const cTrajets* ) __Objet;
-
-			// Affichage de chaque feuille de route
-			for ( int __n = 0; __n < __Trajets->Taille(); __n++ )
-			{
-				cInterface_Objet_Connu_ListeParametres __ParametresCase;
-				__ParametresCase << __n + 1;
-
-				__Site->Affiche( pCtxt, INTERFACECaseDuree, __ParametresCase, ( const void* ) & ( __Trajets->operator[] ( __n ) ) );
-			}
-*/
-/*	case ELEMENTINTERFACEURLFormulaire:
-			// Initialisation des paramï¿½tres
-			const std::string& __TypeSortie = _Parametres[ ELEMENTINTERFACEURLFormulaireTypeSortie ] ->Texte( __Parametres );
-			const std::string& __Fonction = _Parametres[ ELEMENTINTERFACEURLFormulaireFonction ] ->Texte( __Parametres );
-
-			// Fabrication de la requï¿½te
-			synthese::server::Request request;
-
-			// Site d'affichage
-			request.addParameter( synthese::server::PARAMETER_SITE, __Site->getClef() );
-
-			// Parametres cas validation fiche horaire
-			if ( __Fonction == "timetable validation" )
-			{
-				request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_SCHEDULE_SHEET_VALIDATION );
-
-				request.addParameter( synthese::server::PARAMETER_DEPARTURE_CITY_NUMBER
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroCommuneDepart ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroArretDepart ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_DEPARTURE_WORDING_NUMBER
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroDesignationDepart ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_ARRIVAL_CITY_NUMBER
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroCommuneArrivee ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroArretArrivee ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_ARRIVAL_WORDING_NUMBER
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireVFHNumeroDesignationArrivee ] ->Texte( __Parametres ) );
-			}
-			// Pour fiche horaire seulement
-			else if ( __Fonction == "timetable" )
-			{
-				request.addParameter( synthese::server::PARAMETER_FUNCTION, 
-					synthese::server::FUNCTION_SCHEDULE_SHEET );
-
-				request.addParameter( synthese::server::PARAMETER_DATE
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireFHDate ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_PERIOD
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireFHPeriode ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_BIKE
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireFHVelo ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_HANDICAPPED
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireFHHandicape ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_TAXIBUS
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireFHResa ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_PRICE
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireFHTarif ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroArretDepart ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_DEPARTURE_WORDING_NUMBER
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroDesignationDepart ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroArretArrivee ] ->Texte( __Parametres ) );
-				request.addParameter( synthese::server::PARAMETER_ARRIVAL_WORDING_NUMBER
-					, _Parametres[ ELEMENTINTERFACEURLFormulaireFHNumeroDesignationArrivee ] ->Texte( __Parametres ) );
-			}
-			else if ( __Fonction == ( "from city list" ) )
-			{
-				request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_CITY_LIST );
-				request.addParameter( synthese::server::PARAMETER_DIRECTION, 1 );
-			}
-			else if ( __Fonction == ( "to city list" ) )
-			{
-				request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_CITY_LIST );
-				request.addParameter( synthese::server::PARAMETER_DIRECTION, 0 );
-			}
-			else if ( __Fonction == ( "from station list" ) )
-			{
-				request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_STOP_LIST );
-				request.addParameter( synthese::server::PARAMETER_DIRECTION, 1 );
-			}
-			else if ( __Fonction == ( "to station list" ) )
-			{
-				request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_STOP_LIST );
-				request.addParameter( synthese::server::PARAMETER_DIRECTION, 0 );
-			}
-
-			// Affichage de la requï¿½te au format voulu
-			if ( __TypeSortie == ( "url" ) )
-			{
-				// Partie exï¿½cutable de l'url
-				pCtxt << __Site->getURLClient() << "?";
-
-				// Champ fonction
-				pCtxt << request.toInternalString ();
-			}
-			else if ( __TypeSortie.substr (0, 4) == "form" )
-			{
-				// Tag d'ouverture du formulaire
-				pCtxt << "<form method=\"get\" action=\"" << __Site->getURLClient() << "\" "
-					<< __TypeSortie.substr (5) << ">";
-
-				for ( std::map<std::string, std::string>::const_iterator iter = request.getParameters().begin();
-					iter != request.getParameters().end(); 
-					++iter )
-				{
-					pCtxt << "<input type=\"hidden\" name=\"" << iter->first << "\" value=\"" << iter->second << "\" />";
-				}
-			}
-*/
-/*	case ELEMENTINTERFACEInputHTML:  //41
-			// Initialisation des paramï¿½tres
-			const std::string& __Champ = _Parametres[ ELEMENTINTERFACEInputHTMLChamp ] ->Texte( __Parametres );
-			const std::string& __Type = _Parametres[ ELEMENTINTERFACEInputHTMLType ] ->Texte( __Parametres );
-
-			// Balise d'ouverture
-			std::string __Balise;
-			if ( !__Type.size () )
-			{
-				if ( __Champ == ( "date" ) || __Champ == ( "period" ) )
-					__Balise = "select";
-				else if ( __Champ == ( "handicap filter" ) )
-					__Balise = "input type=\"checkbox\"";
-				else
-					__Balise = "input type=\"text\"";
-			}
-			else
-			{
-				if ( __Type == ( "text" ) )
-					__Balise = "input type=\"text\"";
-				else if ( __Type == ( "select" ) )
-					__Balise = "select";
-				else if ( __Type.substr (0, 8) == "checkbox" )
-					__Balise = "input type=\"checkbox\"";
-			}
-
-			// Ecriture de l'ouverture
-			pCtxt << "<" << __Balise << " " << _Parametres[ ELEMENTINTERFACEInputHTMLSuite ] ->Texte( __Parametres );
-
-			// Ecriture du nom du champ
-			pCtxt << " name=\"";
-			if ( __Champ == "date" )
-				pCtxt << synthese::server::PARAMETER_DATE;
-			else if ( __Champ == ( "period" ) )
-				pCtxt << synthese::server::PARAMETER_PERIOD;
-			else if ( __Champ == ( "from city" ) )
-				pCtxt << synthese::server::PARAMETER_DEPARTURE_CITY;
-			else if ( __Champ == ( "from station" ) )
-				pCtxt << synthese::server::PARAMETER_DEPARTURE_STOP;
-			else if ( __Champ == ( "to city" ) )
-				pCtxt << synthese::server::PARAMETER_ARRIVAL_CITY;
-			else if ( __Champ == ( "to station" ) )
-				pCtxt << synthese::server::PARAMETER_ARRIVAL_STOP;
-			else if ( __Champ == ( "handicap filter" ) )
-				pCtxt << synthese::server::PARAMETER_HANDICAPPED;
-			else if ( __Champ == ( "tariff" ) )
-				pCtxt << synthese::server::PARAMETER_PRICE;
-			pCtxt << "\"";
-
-			// Cas champ checkbox
-			if ( __Balise == ( "input type=\"checkbox\"" ) )
-			{
-				// Etat cochï¿½
-				tBool3 __Bool3Defaut = Faux;
-
-				// Chackbox filtre sur valeur
-				if ( __Type.size () > 9 )
-				{
-					if ( _Parametres[ ELEMENTINTERFACEInputHTMLValeurDefaut ] ->Texte( __Parametres ) ==  __Type.substr (9) )
-						__Bool3Defaut = Vrai;
-					pCtxt << " value=\"" << __Type.substr( 9 ) << "\"";
-				}
-				else //Checkbox boolï¿½en
-				{
-					__Bool3Defaut = ( tBool3 ) _Parametres[ ELEMENTINTERFACEInputHTMLValeurDefaut ] ->Nombre( __Parametres );
-					pCtxt << " value=\"1\"";
-				}
-				if ( __Bool3Defaut == Vrai )
-					pCtxt << " checked=\"1\"";
-				pCtxt << " />";
-			}
-			if ( __Balise == ( "input type=\"text\"" ) )  // Cas champ input texte
-			{
-				pCtxt << " value=\"" << _Parametres[ ELEMENTINTERFACEInputHTMLValeurDefaut ] ->Texte( __Parametres ) << "\" />";
-			}
-			else if ( __Balise == ( "select" ) )  // Cas champ select
-			{
-				pCtxt << ">";
-
-				// Si select auto alors fourniture des choix
-				if ( !__Type.size () )
-				{
-					if ( __Champ == ( "date" ) )
-					{
-						// Collecte des paramï¿½tres spï¿½cifiques
-						const Environment * __Environnement = __Site->getEnvironnement();
-						synthese::time::Date DateDefaut = 
-							dateInterpretee( __Environnement, _Parametres[ ELEMENTINTERFACEInputHTMLValeurDefaut ] ->Texte( __Parametres ) );
-						synthese::time::Date DateMin = dateInterpretee( __Environnement, _Parametres[ ELEMENTINTERFACEInputHTMLListeDatesMin ] ->Texte( __Parametres ) );
-						synthese::time::Date __DateJour;
-						__DateJour.updateDate();
-						if ( !__Site->getSolutionsPassees() && DateMin < __DateJour )
-							DateMin = __DateJour;
-						synthese::time::Date DateMax = dateInterpretee( __Environnement, _Parametres[ ELEMENTINTERFACEInputHTMLListeDatesMax ] ->Texte( __Parametres ) );
-
-						// Construction de l'objet HTML
-						for ( synthese::time::Date iDate = DateMin; iDate <= DateMax; iDate++ )
-						{
-							pCtxt << "<option ";
-							if ( iDate == DateDefaut )
-								pCtxt << "selected=\"1\" ";
-							pCtxt << "value=\"" << iDate.toInternalString() << "\">";
-							__Site->getInterface() ->AfficheDate( pCtxt, iDate );
-							pCtxt << "</option>";
-						}
-					}
-					else if ( __Champ == ( "period" ) )
-					{
-						int __IndexPeriodeDefaut = _Parametres[ ELEMENTINTERFACEInputHTMLValeurDefaut ] ->Nombre( __Parametres );
-
-						for ( int iPeriode = 0; __Site->getInterface() ->GetPeriode( iPeriode ); iPeriode++ )
-						{
-							pCtxt << "<option ";
-							if ( iPeriode == __IndexPeriodeDefaut )
-								pCtxt << "selected ";
-							pCtxt << "value=\"" << iPeriode << "\">" << __Site->getInterface() ->GetPeriode( iPeriode ) ->getCaption () << "</option>";
-						}
-					}
-					pCtxt << "</select>";
-				}
-			}
-*/
 /*	case EI_BIBLIOTHEQUE_Interface_PrefixeAlerte:  //42
 			// Lecture des paramï¿½tres
 			int __Niveau = _Parametres[ EI_BIBLIOTHEQUE_Interface_PrefixeAlerte_Niveau ] ->Nombre( __Parametres );
@@ -815,23 +537,6 @@ namespace synthese
 				__Site->Affiche( pCtxt, INTERFACENomArret, __ParametresLigne, ( const void* ) __Ligne->getEdges ().back()->getFromVertex ()->getConnectionPlace() );
 			}
 */
-
-			// 45
-/*	case EI_BIBLIOTHEQUE_Nombre_Formate:
-		{
-			// Lecture des paramï¿½tres
-			int __Nombre = _Parametres[ 0 ] ->Nombre( __Parametres ) + _Parametres[ 2 ] ->Nombre( __Parametres );
-			int __Chiffres = _Parametres[ 1 ] ->Nombre( __Parametres );
-
-
-			for ( ; __Chiffres; __Chiffres-- )
-			{
-				if ( __Nombre < pow( 10.0, __Chiffres - 1 ) )
-					pCtxt << "0";
-			}
-			pCtxt << __Nombre;
-*/
-
 
 /*
 			case EI_BIBLIOTHEQUE_Cases_Particularites:  //49
@@ -967,58 +672,6 @@ Retour :
 #define ELEMENTINTERFACEListeArrets      24
 
 
-/** Nom de Commune
-@code O25 @endcode
-@param 0 Num?ro de la commune
-@return Nom de la commune
-*/
-#define ELEMENTINTERFACENomCommune  25
-
-
-/** Tableau de d?part de gare
-@code O26 @endcode
-<<<<<<< .working
-@param Objet cDescriptionPassage *  : Liste des d?parts et arriv?es
-@return Tableau de d?parts de gare
-=======
-@param Objet cDescriptionPassage *  : Liste des d?parts et arriv?es
-@param 0 Facteur multiplicateur du num?ro de rang?e transmis ? l'affichage de rang?e (vide=1)
-@param 1 Gestion des pages. Valeurs :
-- @c normal Une page unique
-- @c intermediate Une page par destination interm?diaire
-- @c destination Une page par destination interm?diaire et une pour le terminus
-@param 2 Texte s?parateur de page
-@return Tableau de d?parts de gare
->>>>>>> .merge-right.r440
-*/
-#define ELEMENTINTERFACETbDepGare 26
-
-
-/** Departure table.
-@code O27 @endcode
-@param Objet cDescriptionPassage * : Departures list
-@return Departure table.
-@deprecated Utilité douteuse (objet 26 avec autre interface suffit)
-*/
-#define ELEMENTINTERFACETbDep 27
-
-/** S?lecteur du filtre velo
-@code O29 @endcode
-@param 0 Valeur par d?faut (1/0)
-@return HTML ?l?ment de formulaire du filtre v?lo
-@todo int?grer cet objet ? l'objet 41
-*/
-#define ELEMENTINTERFACESelecteurVelo 29
-
-/** S?lecteur du filtre taxi bus
-@code O31 @endcode
-@param 0 Valeur par d?faut (1/0)
-@return HTML ?l?ment de formulaire du filtre taxi bus
-@todo int?grer cet objet ? l'objet 41
-*/
-
-#define ELEMENTINTERFACESelecteurTaxiBus 31
-
 /** Formulaire de r?servation
 @code O33 @endcode
 @param 0 Contenu champ nom
@@ -1063,22 +716,6 @@ Retour :
 #define ELEMENTINTERFACEFeuilleRoute        36
 
 
-/** Dur?e du trajet
-@code 038 @endcode
-@param Objet cTrajet *
-@return Dur?e du trajet
-*/
-#define EI_BIBLIOTHEQUE_Trajet_Duree        38
-
-
-/** Ligne de tableau contenant les dur?es de chaque trajet
-@code O39 @endcode
-@param Objet cTrajets * Liste de trajets
-@return Ligne de tableau contenant les dur?es de chaque trajet
-*/
-#define EI_BIBLIOTHEQUE_FicheHoraire_LigneDurees     39
-
-
 /** Fabrication d'objets HTML permettant le lancement de fonctionnalit?s de SYNTHEES (formulaire ou lien)
 @code O40 @endcode
 @param 0 Type de sortie, valeurs :
@@ -1121,39 +758,6 @@ Retour :
 #define ELEMENTINTERFACEURLFormulaire        40
 
 
-/** Fabrication d'?l?ments HTML permettant l'entr?e de param?tres pour des formulaires de lancement de fonctionnalit?s de SYNTHESE
-@code O41 @endcode
-@param 0 Champ, valeurs :
-- @c date
-- @c from @c city
-- @c from @c station
-- @c to @c city
-- @c to @c station
-- @c period : P?riode de la journ?e
-- @c handicap @c filter
-- @c tariff
-@param 1 Valeur par d?faut
-@param 2 Type de la balise input, valeurs :
-- (rien) : type automatique
-- @c text
-- @c select
-- @c checkbox : case ? cocher
-- @c checkbox @a texte : case ? cocher de valeur @a tetxe si coch?e
-NB : en cas de choix auto, l'?l?ment est fabriqu? int?gralement (ex: liste des dates) et est ferm?. en cas de choix d?termin?, alors aucun remplissage n'est effectu? et le select doit ?tre ferm?
-@param 3 Code HTML ? ins?rer ? l'interieur de la balise
-
-@code O41 {date} @endcode
-@param 1 Valeur par d?faut (format AAAAMMJJ, ou commandes  de date (\ref cEnvironnement::dateInterpretee )
-@param 2 Laisser vide pour s?lection
-@param 3 Code HTML ? ins?rer ? l'int?rieur de la balise
-@param 4 Premi?re date de la liste
-@param 5 Derni?re date de la liste
-
-@return El?ment HTML permettant l'entr?e de param?tres pour des formulaires de lancement de fonctionnalit?s de SYNTHESE
-*/
-#define ELEMENTINTERFACEInputHTML         41
-
-
 /** Pr?fixe des messages d'alerte selon le niveau fourni en param?tre
 @code O42 @endcode
 @param 0 Niveau de l'alerte
@@ -1182,15 +786,6 @@ NB : en cas de choix auto, l'?l?ment est fabriqu? int?gralement (ex: liste des d
 @return Ligne d'un d?part
 */
 #define EI_BIBLIOTHEQUE_DescriptionPassage_Ligne     44
-
-
-/** Affichage d'un nombre format?.
-@code O 045 @endcode
-@param 0 Nombre ? afficher
-@param 1 Nombre de chiffres ? afficher syst?matiquement
-@param 2 Nombre ? ajouter au nombre ? afficher
-*/
-#define EI_BIBLIOTHEQUE_Nombre_Formate        45
 
 
 /** Affichage de destination d'un service au d?part
@@ -1228,26 +823,9 @@ Table de v?rit? des affichages de destinations :
 #define EI_BIBLIOTHEQUE_DescriptionPassage_ArretPhysique      47
 
 
-/** Affichage de l'heure de d?part.
-@code O 048 @endcode
-@param Objet cDescriptionPassage* D?part
-@param 0 Texte pr?c?dent le chiffre des heures si inf?rieur ? 10 (conseill? : espace, vide, ou 0)
-@param 1 Texte pr?c?dent l'heure si le d?part s'effectue ? moins d'une minute
-@param 2 Texte suivant l'heure si le d?part s'effectue ? moins d'une minute
-*/
-#define EI_BIBLIOTHEQUE_DescriptionPassage_Heure     48
 
 #define EI_BIBLIOTHEQUE_Cases_Particularites      49
 
-
-
-/** Num?ro de panneau affichant un tableau de d?part
-@code O50 @endcode
-@param Objet cTableauAffichage * : Tableau de d?part
-@param 0 Format du num?ro. Valeurs :
-- @c char(2) Num?ro sur 2 caract?res
-*/
-#define EI_BIBLIOTHEQUE_Tbdep_NumeroPanneau       50
 
 //@}
 

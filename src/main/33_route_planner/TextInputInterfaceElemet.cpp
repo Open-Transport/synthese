@@ -25,6 +25,7 @@
 #include "33_route_planner/RoutePlannerFunction.h"
 
 #include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/ValueInterfaceElement.h"
 
 using namespace std;
 

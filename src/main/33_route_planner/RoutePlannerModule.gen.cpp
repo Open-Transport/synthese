@@ -1,6 +1,4 @@
 
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::routeplanner::SiteTableSync>("30.01 Site");
-
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::routeplanner::RoutePlannerSheetLinesCellInterfacePage>("schedule_sheet_lines_cell");
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::routeplanner::RoutePlannerSheetLineInterfacePage>("schedule_sheet_row");
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::routeplanner::RoutePlannerSheetColumnInterfacePage>("schedule_sheet_column");
@@ -18,5 +16,7 @@ synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrat
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::ScheduleSheetReservationRowInterfaceElement>("schedules_reservation");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::DatesListInterfaceElement>("dates_list");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::TextInputInterfaceElemet>("route_planner_input");
+synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::RequestInterfaceElement>("route_planner_form");
+synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::PeriodsListInterfaceElement>("route_planner_periods");
 
 synthese::util::Factory<synthese::server::Function>::integrate<synthese::routeplanner::RoutePlannerFunction>("rp");

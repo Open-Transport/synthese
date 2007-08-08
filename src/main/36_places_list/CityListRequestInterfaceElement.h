@@ -1,6 +1,6 @@
 
-/** ScheduleSheetDurationRowInterfaceElement class header.
-	@file ScheduleSheetDurationRowInterfaceElement.h
+/** CityListRequestInterfaceElement class header.
+	@file CityListRequestInterfaceElement.h
 	@author Hugues Romain
 	@date 2007
 
@@ -22,30 +22,28 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ScheduleSheetDurationRowInterfaceElement_H__
-#define SYNTHESE_ScheduleSheetDurationRowInterfaceElement_H__
+#ifndef SYNTHESE_CityListRequestInterfaceElement_H__
+#define SYNTHESE_CityListRequestInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
+#include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
-	namespace interfaces
+	namespace transportwebsite
 	{
-		class ValueInterfaceElement;
-	}
-
-	namespace routeplanner
-	{
-		/** ScheduleSheetDurationRowInterfaceElement Library Interface Element Class.
+		/** CityListRequestInterfaceElement Library Interface Element Class.
 			@author Hugues Romain
 			@date 2007
-			@ingroup m33Library refLibrary
+			@ingroup m36Library refLibrary
 		*/
-		class ScheduleSheetDurationRowInterfaceElement : public interfaces::LibraryInterfaceElement
+		class CityListRequestInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _cellHeader;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _cellFooter;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _idField;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _txtField;
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _isForOrigin;
+			//...
 
 		public:
 			/** Controls and store the internals parameters.
@@ -68,9 +66,9 @@ namespace synthese
 				, const server::Request* request = NULL
 				) const;
 				
-			~ScheduleSheetDurationRowInterfaceElement();
+			~CityListRequestInterfaceElement();
 		};
 	}
 }
 
-#endif // SYNTHESE_ScheduleSheetDurationRowInterfaceElement_H__
+#endif // SYNTHESE_CityListRequestInterfaceElement_H__

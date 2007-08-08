@@ -43,6 +43,7 @@ namespace synthese
 			, VariablesMap& variables
 			, const JourneyBoardJourneys& object /*= NULL*/
 			, const time::Date& date
+			, int periodId
 			, const env::Place* originPlace
 			, const env::Place* destinationPlace
 			, const server::Request* request /*= NULL*/
@@ -59,6 +60,7 @@ namespace synthese
 			pv.push_back(destinationPlace->getCity()->getName());
 			pv.push_back(Conversion::ToString(destinationPlace->getId()));
 			pv.push_back(destinationPlace->getName());
+			pv.push_back(Conversion::ToString(periodId));
 
 			InterfacePage::display(stream, pv, variables, vobj, request);
 		}

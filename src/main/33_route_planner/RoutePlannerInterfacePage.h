@@ -60,6 +60,7 @@ namespace synthese
 				- 6 : destination city text
 				- 7 : destination place id
 				- 8 : destination place text
+				- 9 : period
 			
 		*/
 		class RoutePlannerInterfacePage : public interfaces::InterfacePage
@@ -73,6 +74,7 @@ namespace synthese
 				, interfaces::VariablesMap& variables
 				, const JourneyBoardJourneys& object
 				, const time::Date& date
+				, int period
 				, const env::Place* originPlace
 				, const env::Place* destinationPlace
 				, const server::Request* request = NULL

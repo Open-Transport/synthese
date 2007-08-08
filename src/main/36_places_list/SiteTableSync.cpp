@@ -20,9 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/SiteTableSync.h"
-#include "33_route_planner/Site.h"
-#include "33_route_planner/RoutePlannerModule.h"
+#include "SiteTableSync.h"
+
+#include "36_places_list/Site.h"
+#include "36_places_list/PlacesListModule.h"
 
 #include "01_util/Conversion.h"
 
@@ -34,6 +35,7 @@
 #include "11_interfaces/InterfaceModule.h"
 
 #include <sstream>
+#include <boost/tokenizer.hpp>
 
 using namespace boost;
 using namespace std;
@@ -45,11 +47,11 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace time;
-	using namespace routeplanner;
+	using namespace transportwebsite;
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<Site>::TABLE_NAME = "t025_sites";
+		template<> const string SQLiteTableSyncTemplate<Site>::TABLE_NAME = "t025_sites";
 		template<> const int SQLiteTableSyncTemplate<Site>::TABLE_ID = 25;
 		template<> const bool SQLiteTableSyncTemplate<Site>::HAS_AUTO_INCREMENT = true;
 
@@ -64,6 +66,30 @@ namespace synthese
 			site->setOnlineBookingAllowed(Conversion::ToBool(rows.getColumn(i, SiteTableSync::TABLE_COL_ONLINE_BOOKING)));
 			site->setPastSolutionsDisplayed(Conversion::ToBool(rows.getColumn(i, SiteTableSync::TABLE_COL_USE_OLD_DATA)));
 			site->setMaxTransportConnectionsCount(Conversion::ToInt(rows.getColumn(i, SiteTableSync::COL_MAX_CONNECTIONS)));
+			site->setUseDateRange(Conversion::ToInt(rows.getColumn(i, SiteTableSync::COL_USE_DATES_RANGE)));
+
+			string periodsStr(rows.getColumn(i, SiteTableSync::COL_PERIODS));
+
+			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+
+			boost::char_separator<char> sep1 (",");
+			boost::char_separator<char> sep2 ("|");
+			tokenizer tripletTokens (periodsStr, sep1);
+			for (tokenizer::iterator tripletIter = tripletTokens.begin();
+				tripletIter != tripletTokens.end (); ++tripletIter)
+			{
+				tokenizer valueTokens (*tripletIter, sep2);
+				tokenizer::iterator valueIter = valueTokens.begin();
+
+				// (beginHour|endHour|Caption)
+				Hour beginHour(Hour::FromSQLTime(*valueIter));
+				Hour endHour(Hour::FromSQLTime(*(++valueIter)));
+				HourPeriod period(*(++valueIter), beginHour, endHour);
+
+				site->addHourPeriod(period);
+			}
+
+
 		}
 
 		template<> void SQLiteTableSyncTemplate<Site>::save(Site* site)
@@ -76,15 +102,18 @@ namespace synthese
 		}
 	}
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
-		const std::string SiteTableSync::TABLE_COL_NAME = "name";
-		const std::string SiteTableSync::COL_INTERFACE_ID = "interface_id";
-		const std::string SiteTableSync::TABLE_COL_START_DATE = "start_date";
-		const std::string SiteTableSync::TABLE_COL_END_DATE = "end_date";
-		const std::string SiteTableSync::TABLE_COL_ONLINE_BOOKING = "online_booking";
-		const std::string SiteTableSync::TABLE_COL_USE_OLD_DATA = "use_old_data";
-		const std::string SiteTableSync::COL_MAX_CONNECTIONS = "max_connections";
+		const string SiteTableSync::TABLE_COL_NAME = "name";
+		const string SiteTableSync::COL_INTERFACE_ID = "interface_id";
+		const string SiteTableSync::TABLE_COL_START_DATE = "start_date";
+		const string SiteTableSync::TABLE_COL_END_DATE = "end_date";
+		const string SiteTableSync::TABLE_COL_ONLINE_BOOKING = "online_booking";
+		const string SiteTableSync::TABLE_COL_USE_OLD_DATA = "use_old_data";
+		const string SiteTableSync::COL_MAX_CONNECTIONS = "max_connections";
+		const string SiteTableSync::COL_USE_DATES_RANGE("use_dates_range");
+		const string SiteTableSync::COL_PERIODS("periods");
+
 		
 
 		SiteTableSync::SiteTableSync()
@@ -98,6 +127,8 @@ namespace synthese
 			addTableColumn(TABLE_COL_ONLINE_BOOKING, "INTEGER", true);
 			addTableColumn(TABLE_COL_USE_OLD_DATA, "INTEGER", true);
 			addTableColumn(COL_MAX_CONNECTIONS, "INTEGER", true);
+			addTableColumn(COL_USE_DATES_RANGE, "INTEGER", true);
+			addTableColumn(COL_PERIODS, "TEXT", true);
 		}
 
 
@@ -106,8 +137,8 @@ namespace synthese
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
-				if (RoutePlannerModule::getSites().contains(id))
-					load(RoutePlannerModule::getSites().getUpdateable(id).get(), rows, i);
+				if (PlacesListModule::getSites().contains(id))
+					load(PlacesListModule::getSites().getUpdateable(id).get(), rows, i);
 			}
 		}
 
@@ -118,16 +149,16 @@ namespace synthese
 			{
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
 				shared_ptr<Site> site;
-				if (RoutePlannerModule::getSites().contains(id))
+				if (PlacesListModule::getSites().contains(id))
 				{
-					site = RoutePlannerModule::getSites().getUpdateable(id);
+					site = PlacesListModule::getSites().getUpdateable(id);
 					load(site.get(), rows, i);
 				}
 				else
 				{
 					site.reset(new Site);
 					load(site.get(), rows, i);
-					RoutePlannerModule::getSites().add(site);
+					PlacesListModule::getSites().add(site);
 				}
 			}
 		}
@@ -138,8 +169,8 @@ namespace synthese
 			for (int i=0; i<rows.getNbRows(); ++i)
 			{
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
-				if (RoutePlannerModule::getSites().contains(id))
-					RoutePlannerModule::getSites().remove(id);
+				if (PlacesListModule::getSites().contains(id))
+					PlacesListModule::getSites().remove(id);
 			}
 		}
 	}

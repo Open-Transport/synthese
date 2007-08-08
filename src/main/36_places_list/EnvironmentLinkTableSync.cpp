@@ -20,9 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/EnvironmentLinkTableSync.h"
-#include "33_route_planner/SiteCommercialLineLink.h"
-#include "33_route_planner/RoutePlannerModule.h"
+#include "EnvironmentLinkTableSync.h"
+
+#include "36_places_list/SiteCommercialLineLink.h"
+#include "36_places_list/PlacesListModule.h"
 
 #include "02_db/SQLiteException.h"
 #include "02_db/SQLiteSync.h"
@@ -38,7 +39,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace routeplanner;
+	using namespace transportwebsite;
 
 	namespace db
 	{
@@ -67,7 +68,7 @@ namespace synthese
 		}
 	}
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		const std::string EnvironmentLinkTableSync::COL_SITE_ID ("site_id");
 		const std::string EnvironmentLinkTableSync::COL_COMMERCIAL_LINE_ID ("commercial_line_id");
@@ -93,15 +94,15 @@ namespace synthese
 			for (int i=0; i<rows.getNbRows (); ++i)
 			{
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
-				if (RoutePlannerModule::getSiteLineLinks().contains(id))
+				if (PlacesListModule::getSiteLineLinks().contains(id))
 				{
-					load(RoutePlannerModule::getSiteLineLinks().getUpdateable(id).get(), rows, i);
+					load(PlacesListModule::getSiteLineLinks().getUpdateable(id).get(), rows, i);
 				}
 				else
 				{
 					shared_ptr<SiteCommercialLineLink> scl(new SiteCommercialLineLink);
 					load(scl.get(), rows, i);
-					RoutePlannerModule::getSiteLineLinks().add(scl);
+					PlacesListModule::getSiteLineLinks().add(scl);
 				}
 			}
 		}
@@ -116,9 +117,9 @@ namespace synthese
 			for (int i=0; i<rows.getNbRows (); ++i)
 			{
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
-				if (RoutePlannerModule::getSiteLineLinks().contains(id))
+				if (PlacesListModule::getSiteLineLinks().contains(id))
 				{
-					load(RoutePlannerModule::getSiteLineLinks().getUpdateable(id).get(), rows, i);
+					load(PlacesListModule::getSiteLineLinks().getUpdateable(id).get(), rows, i);
 				}
 			}
 		}
@@ -133,9 +134,9 @@ namespace synthese
 			for (int i=0; i<rows.getNbRows (); ++i)
 			{
 				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
-				if (RoutePlannerModule::getSiteLineLinks().contains(id))
+				if (PlacesListModule::getSiteLineLinks().contains(id))
 				{
-					RoutePlannerModule::getSiteLineLinks().remove(id);
+					PlacesListModule::getSiteLineLinks().remove(id);
 				}
 			}
 		}

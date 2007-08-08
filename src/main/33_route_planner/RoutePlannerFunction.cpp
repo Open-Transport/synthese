@@ -20,9 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/RoutePlannerFunction.h"
-#include "33_route_planner/Site.h"
-#include "33_route_planner/RoutePlannerModule.h"
+#include "RoutePlannerFunction.h"
+
+#include "36_places_list/Site.h"
+
 #include "33_route_planner/RoutePlannerInterfacePage.h"
 #include "33_route_planner/RoutePlanner.h"
 
@@ -31,6 +32,8 @@
 #include "15_env/EnvModule.h"
 
 #include "11_interfaces/Interface.h"
+
+#include "04_time/TimeParseException.h"
 
 #include "01_util/Conversion.h"
 
@@ -46,12 +49,12 @@ namespace synthese
 
 	namespace routeplanner
 	{
-		const string RoutePlannerFunction::PARAMETER_SITE = "si";
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_ID = "dp";
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_ID = "ap";
 		const string RoutePlannerFunction::PARAMETER_DATE = "da";
 		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER("msn");
 		const string RoutePlannerFunction::PARAMETER_DAY("dy");
+		const string RoutePlannerFunction::PARAMETER_PERIOD_ID("pi");
 
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_ID("dci");
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_ID("aci");
@@ -62,23 +65,16 @@ namespace synthese
 
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
-			ParametersMap map;
-			/// @todo Map filling
-			// eg : map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
+			ParametersMap map(FunctionWithSite::_getParametersMap());
 			return map;
 		}
 
 		void RoutePlannerFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			FunctionWithSite::_setFromParametersMap(map);
+
 			ParametersMap::const_iterator it;
 
-			// Site
-			it = map.find(PARAMETER_SITE);
-			if (it == map.end())
-				throw RequestException("Site not specified");
-			if (!RoutePlannerModule::getSites().contains(Conversion::ToLongLong(it->second)))
-				throw RequestException("Specified site not found");
-			_site = RoutePlannerModule::getSites().get(Conversion::ToLongLong(it->second));
 			_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
 			_accessParameters = _site->getDefaultAccessParameters();
 
@@ -109,13 +105,18 @@ namespace synthese
 			{
 				try
 				{
-					_startDate = DateTime(
-						Date::FromInternalString(it->second)
-						, Hour(2, 30)
-						);
-					_endDate.addDaysDuration(1);
+					Date day(Date::FromInternalString(it->second));
+					it = map.find(PARAMETER_PERIOD_ID);
+					if (it == map.end())
+						throw RequestException("Period not specified");
+					_periodId = Conversion::ToInt(it->second);
+					if (_periodId < 0 || _periodId >= _site->getPeriods().size())
+						throw RequestException("Bad value for period id");
+					_startDate = DateTime(day, Hour(0, 0));
+					_endDate = _startDate;
+					_site->applyPeriod(_site->getPeriods().at(_periodId), _startDate, _endDate);
 				}
-				catch (...)
+				catch (time::TimeParseException)
 				{
 					throw RequestException("Bad date");
 				}
@@ -130,10 +131,9 @@ namespace synthese
 					{
 						_startDate = DateTime::FromInternalString(it->second);
 						_endDate = _startDate;
-						_endDate.addDaysDuration(1);
-						_endDate.setHour(Hour(2,30));
+						_endDate.addDaysDuration(1);						
 					}
-					catch (...)
+					catch (time::TimeParseException)
 					{
 						throw RequestException("Bad date");
 					}
@@ -166,6 +166,7 @@ namespace synthese
 				, vm
 				, jv.journeys
 				, _startDate.getDate()
+				, _periodId
 				, _departure_place.get()
 				, _arrival_place.get()
 				, _request
@@ -174,16 +175,22 @@ namespace synthese
 		}
 
 		RoutePlannerFunction::RoutePlannerFunction()
-			: _maxSolutionsNumber(UNKNOWN_VALUE)
+			: _maxSolutionsNumber(numeric_limits<int>::max())
 			, _startDate(TIME_UNKNOWN)
 			, _endDate(TIME_UNKNOWN)
+			, _periodId(UNKNOWN_VALUE)
 		{
 
 		}
 
-		boost::shared_ptr<const Site> RoutePlannerFunction::getSite() const
+		int RoutePlannerFunction::getMaxSolutions() const
 		{
-			return _site;
+			return _maxSolutionsNumber;
+		}
+
+		void RoutePlannerFunction::setMaxSolutions( int number )
+		{
+			_maxSolutionsNumber = number;
 		}
 	}
 }

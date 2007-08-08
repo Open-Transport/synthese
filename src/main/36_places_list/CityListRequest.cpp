@@ -24,9 +24,8 @@
 
 #include "36_places_list/PlacesListInterfacePage.h"
 #include "36_places_list/Types.h"
-
-#include "33_route_planner/Site.h"
-#include "33_route_planner/RoutePlannerModule.h"
+#include "36_places_list/Site.h"
+#include "36_places_list/PlacesListModule.h"
 
 #include "30_server/RequestException.h"
 
@@ -36,21 +35,24 @@
 
 #include "01_util/Conversion.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace env;
 	using namespace server;
 	using namespace interfaces;
 	using namespace util;
-	using namespace routeplanner;
 	
-	namespace placeslist
+	namespace transportwebsite
 	{
-		const std::string CityListRequest::PARAMETER_INPUT("t");
-		const std::string CityListRequest::PARAMETER_NUMBER("n");
-		const std::string CityListRequest::PARAMETER_SITE("s");
+		const string CityListRequest::PARAMETER_INPUT("t");
+		const string CityListRequest::PARAMETER_INPUT_ID("i");
+		const string CityListRequest::PARAMETER_NUMBER("n");
+		const string CityListRequest::PARAMETER_SITE("s");
+		const string CityListRequest::PARAMETER_IS_FOR_ORIGIN("o");
 
-		void CityListRequest::_run( std::ostream& stream ) const
+		void CityListRequest::_run( ostream& stream ) const
 		{
 			/// @todo Read city list from site
 			CityList tbCommunes(EnvModule::guessCity(_input, _n ));
@@ -73,15 +75,10 @@ namespace synthese
 
 		void CityListRequest::_setFromParametersMap( const server::ParametersMap& map )
 		{
+			FunctionWithSite::_setFromParametersMap(map);
+
 			ParametersMap::const_iterator it;
 
-			// Site
-			it = map.find(PARAMETER_SITE);
-			if (it == map.end())
-				throw RequestException("Site not specified");
-			if (!RoutePlannerModule::getSites().contains(Conversion::ToLongLong(it->second)))
-				throw RequestException("Specified site not found");
-			_site = RoutePlannerModule::getSites().get(Conversion::ToLongLong(it->second));
 			_page = _site->getInterface()->getPage<PlacesListInterfacePage>();
 
 			it = map.find(PARAMETER_INPUT);

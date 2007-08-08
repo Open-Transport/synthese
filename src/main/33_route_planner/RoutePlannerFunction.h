@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_RoutePlannerFunction_H__
 #define SYNTHESE_RoutePlannerFunction_H__
 
-#include "30_server/Function.h"
+#include "36_places_list/FunctionWithSite.h"
 
 #include "15_env/Types.h"
 
@@ -38,13 +38,12 @@ namespace synthese
 
 	namespace routeplanner
 	{
-		class Site;
 		class RoutePlannerInterfacePage;
 
 		/** Route planning Function class.
 			@ingroup m33Functions refFunctions
 		*/
-		class RoutePlannerFunction : public server::Function
+		class RoutePlannerFunction : public transportwebsite::FunctionWithSite
 		{
 		public:
 			static const std::string PARAMETER_SITE;
@@ -52,6 +51,7 @@ namespace synthese
 			static const std::string PARAMETER_ARRIVAL_PLACE_ID;
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_DAY;
+			static const std::string PARAMETER_PERIOD_ID;
 			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER;
 
 			// Parameters for text verifying only
@@ -65,7 +65,6 @@ namespace synthese
 		private:
 			//! \name Parameters
 			//@{
-				boost::shared_ptr<const Site>						_site;
 				boost::shared_ptr<const RoutePlannerInterfacePage>	_page;
 				boost::shared_ptr<const env::Place>					_departure_place;
 				boost::shared_ptr<const env::Place>					_arrival_place;
@@ -73,6 +72,7 @@ namespace synthese
 				time::DateTime										_endDate;
 				AccessParameters									_accessParameters;
 				int													_maxSolutionsNumber;
+				int													_periodId;
 			//@}
 
 
@@ -91,7 +91,9 @@ namespace synthese
 			*/
 			void _run(std::ostream& stream) const;
 
-			boost::shared_ptr<const Site> getSite() const;
+			int getMaxSolutions() const;
+
+			void setMaxSolutions(int number);
 
 			RoutePlannerFunction();
 		};

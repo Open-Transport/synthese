@@ -20,8 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/Site.h"
-#include "33_route_planner/Types.h"
+#include "Site.h"
 
 #include "04_time/DateTime.h"
 
@@ -36,7 +35,7 @@ namespace synthese
 	using namespace env;
 	using namespace interfaces;
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		const string Site::TEMPS_MIN_CIRCULATIONS ("r");
 		const string Site::TEMPS_MAX_CIRCULATIONS ("R");
@@ -45,8 +44,6 @@ namespace synthese
 			: Registrable<uid, Site>(id)
 			, _startValidityDate(TIME_UNKNOWN)
 			, _endValidityDate(TIME_UNKNOWN)
-			, _minDateInUse(TIME_UNKNOWN)
-			, _maxDateInUse(TIME_UNKNOWN)
 		{
 			
 		}
@@ -102,28 +99,18 @@ namespace synthese
 			return _pastSolutionsDisplayed;
 		}
 
-		const time::Date Site::getStartDate() const
+		const time::Date Site::getMinUseDate() const
 		{
 			/// @todo customize
 			return Date(TIME_CURRENT);
 		}
 
-		const time::Date Site::getEndDate() const
+		const time::Date Site::getMaxUseDate() const
 		{
 			/// @todo customize 14
 			Date date(TIME_CURRENT);
 			date += 14;
 			return date;
-		}
-
-		const time::Date& Site::getMaxDateInUse() const
-		{
-			return _maxDateInUse;
-		}
-
-		const time::Date& Site::getMinDateInUse() const
-		{
-			return _minDateInUse;
 		}
 
 		Date Site::interpretDate( const std::string& text ) const
@@ -132,10 +119,10 @@ namespace synthese
 				return Date(TIME_UNKNOWN);
 
 			if ( text == TEMPS_MIN_CIRCULATIONS)
-				return getMinDateInUse ();
+				return getMinUseDate();
 
 			if (text == TEMPS_MAX_CIRCULATIONS)
-				return getMaxDateInUse ();
+				return getMaxUseDate();
 
 			if (text.size() == 1)
 				return Date(text[ 0 ]);
@@ -143,38 +130,21 @@ namespace synthese
 			return Date::FromString(text);
 		}
 
-		void Site::updateMinMaxDatesInUse (const time::Date& newDate, bool marked)
-		{
-			if (marked)
-			{
-				if ( (_minDateInUse == synthese::time::Date::UNKNOWN_DATE) ||
-					(newDate < _minDateInUse) ) 
-				{
-					_minDateInUse = newDate;
-				}
 
-				if ( (_maxDateInUse == synthese::time::Date::UNKNOWN_DATE) ||
-					(newDate > _maxDateInUse) ) 
-				{
-					_maxDateInUse = newDate;
-				}
-			}
-			else
-			{
-				// TODO not written yet...
-			}
-
-		}
 
 		void Site::setMaxTransportConnectionsCount( int number )
 		{
 			_maxTransportConnectionsCount = number;
 		}
 
+
+
 		int Site::getMaxTransportConnectionsCount() const
 		{
 			return _maxTransportConnectionsCount;
 		}
+
+
 
 		AccessParameters Site::getDefaultAccessParameters() const
 		{
@@ -184,6 +154,49 @@ namespace synthese
 			ap.maxApproachDistance = 1500;
 			ap.maxApproachTime = 23;
 			return ap;
+		}
+
+
+
+		void Site::applyPeriod(
+			const HourPeriod& period
+			, DateTime& startTime
+			, DateTime& endTime
+		) const {
+			
+			// Updates
+			if (period.getEndHour() <= period.getBeginHour())
+			{
+				endTime.addDaysDuration ( 1 );
+			}
+
+			endTime.setHour(period.getEndHour());
+			startTime.setHour(period.getBeginHour());
+
+			// Checks
+			if (_pastSolutionsDisplayed == false )
+			{
+				DateTime now(TIME_CURRENT);
+				assert(endTime >= now);
+
+				if ( startTime < now) 
+					startTime = now;
+			}
+		}
+
+		void Site::addHourPeriod( const HourPeriod& hourPeriod )
+		{
+			_periods.push_back(hourPeriod);
+		}
+
+		const Site::Periods& Site::getPeriods() const
+		{
+			return _periods;
+		}
+
+		void Site::setUseDateRange( int range )
+		{
+			_useDateRange = range;
 		}
 	}
 }

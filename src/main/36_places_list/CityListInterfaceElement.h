@@ -36,7 +36,7 @@ namespace synthese
 		class Request;
 	}
 
-	namespace placeslist
+	namespace transportwebsite
 	{
 		/** List of cities.
 			@code city_list @endcode

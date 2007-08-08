@@ -25,7 +25,6 @@
 #define SYNTHESE_JourneyBoardInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
-#include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
@@ -34,6 +33,10 @@ namespace synthese
 		class Request;
     }
 
+	namespace interfaces
+	{
+		class ValueInterfaceElement;
+	}
 
 	namespace routeplanner
 	{

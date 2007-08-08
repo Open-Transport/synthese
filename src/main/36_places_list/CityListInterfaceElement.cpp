@@ -41,7 +41,7 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 
-	namespace placeslist
+	namespace transportwebsite
 	{
 		string CityListInterfaceElement::display(
 			std::ostream& stream

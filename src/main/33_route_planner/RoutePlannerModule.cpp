@@ -20,35 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/RoutePlannerModule.h"
-
-#include "15_env/Journey.h"
-#include "15_env/Edge.h"
-#include "15_env/Path.h"
-#include "15_env/ConnectionPlace.h"
-
-#include "01_util/Constants.h"
+#include "RoutePlannerModule.h"
 
 using namespace std;
 
 namespace synthese
 {
-	using namespace env;
-
 	namespace routeplanner
 	{
-		Site::Registry				RoutePlannerModule::_sites;
-		SiteCommercialLineLink::Registry	RoutePlannerModule::_siteLineLinks;
-
-
-		Site::Registry& RoutePlannerModule::getSites()
-		{
-			return _sites;
-		}
-
-		SiteCommercialLineLink::Registry& RoutePlannerModule::getSiteLineLinks()
-		{
-			return _siteLineLinks;
-		}
 	}
 }

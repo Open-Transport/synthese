@@ -1,6 +1,6 @@
 
-/** SiteCommercialLineLink class header.
-	@file SiteCommercialLineLink.h
+/** SiteCommercialLineLink class implementation.
+	@file SiteCommercialLineLink.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,35 +20,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_routeplanner_SiteCommercialLineLink_h__
-#define SYNTHESE_routeplanner_SiteCommercialLineLink_h__
-
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-#include "01_util/Constants.h"
+#include "SiteCommercialLineLink.h"
 
 namespace synthese
 {
-	namespace routeplanner
+	namespace transportwebsite
 	{
-		/** SiteCommercialLineLink class.
-			@ingroup m33
-		*/
-		class SiteCommercialLineLink : public util::Registrable<uid, SiteCommercialLineLink>
+
+
+		void SiteCommercialLineLink::setSiteId( uid id )
 		{
-			uid _siteId;
-			uid _commercialLineId;
+			_siteId = id;
+		}
 
-		public:
-			SiteCommercialLineLink(uid id = UNKNOWN_VALUE);
+		void SiteCommercialLineLink::setCommercialLineId( uid id )
+		{
+			_commercialLineId = id;
+		}
 
-			void setSiteId(uid id);
-			void setCommercialLineId(uid id);
+		uid SiteCommercialLineLink::getSiteId() const
+		{
+			return _siteId;
+		}
 
-			uid getSiteId() const;
-			uid getCommercialLineId() const;
-		};
+		uid SiteCommercialLineLink::getCommercialLineId() const
+		{
+			return _commercialLineId;
+		}
 	}
 }
-
-#endif // SYNTHESE_routeplanner_SiteCommercialLineLink_h__

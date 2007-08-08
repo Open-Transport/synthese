@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_CSITE_H
 #define SYNTHESE_CSITE_H
 
+#include "36_places_list/HourPeriod.h"
+
 #include "15_env/Types.h"
 
 #include "04_time/Date.h"
@@ -46,15 +48,19 @@ namespace synthese
 		class Interface;
 	}
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		/** Route planning workspace.
 			@ingroup m33
 			@author Hugues Romain
 			@date 2005-2006
 		*/
-		class Site : public synthese::util::Registrable<uid, Site>
+		class Site : public util::Registrable<uid, Site>
 		{
+		public:
+			typedef std::vector<HourPeriod> Periods;
+
+		private:
 			//! \name Properties
 			//@{
 				boost::shared_ptr<const interfaces::Interface>	_interface;
@@ -77,9 +83,10 @@ namespace synthese
 
 			//! \name Cached used days
 			//@{
-				time::Date _minDateInUse;
-				time::Date _maxDateInUse;
+				int		_useDateRange;
+				Periods	_periods;
 			//@}
+
 
 		public:
 			static const std::string TEMPS_MIN_CIRCULATIONS;
@@ -94,12 +101,13 @@ namespace synthese
 			//! \name Setters
 			//@{
 				void setInterface (boost::shared_ptr<const interfaces::Interface> interf);
-				void setStartDate ( const synthese::time::Date& dateDebut );
-				void setEndDate ( const synthese::time::Date& dateFin );
+				void setStartDate ( const time::Date& dateDebut );
+				void setEndDate ( const time::Date& dateFin );
 				void setOnlineBookingAllowed ( const bool valeur );
 				void setPastSolutionsDisplayed ( bool );
 				void setName(const std::string& name);
 				void setMaxTransportConnectionsCount(int number);
+				void setUseDateRange(int range);
 			//@}
 
 			//! \name Getters
@@ -107,16 +115,15 @@ namespace synthese
 				boost::shared_ptr<const interfaces::Interface>	getInterface() const;
 				bool											getOnlineBookingAllowed() const;
 				bool											getPastSolutionsDisplayed() const;
-				const time::Date								getStartDate() const;
-				const time::Date								getEndDate() const;
-				const time::Date&								getMinDateInUse () const;
-				const time::Date&								getMaxDateInUse () const;
+				const time::Date								getMinUseDate() const;
+				const time::Date								getMaxUseDate() const;
 				int												getMaxTransportConnectionsCount()	const;
+				const Periods&									getPeriods()	const;
 			//@}
 
 			// \name Modifiers
 			//@{
-				void updateMinMaxDatesInUse (const time::Date& newDate, bool marked);
+				void addHourPeriod(const HourPeriod& hourPeriod);
 			//@}
 
 			//! \name Queries
@@ -133,14 +140,36 @@ namespace synthese
 
 					The returned date depends on the text :
 						- date au format texte interne : date transcrite (no control) (ex : 20070201 => 1/2/2007)
-						- commande de date classique (synthese::time::TIME_MIN ('m'), synthese::time::TIME_MAX ('M'), synthese::time::TIME_CURRENT ('A'), synthese::time::TIME_UNKNOWN ('?')) : la date correspondante (voir synthese::time::Date::setDate())
-						- texte vide : identical to synthese::time::TIME_CURRENT
-						- synthese::time::TIME_MIN_CIRCULATIONS ('r') : First date where at least one service runs (see Environment::getMinDateInUse())
+						- commande de date classique (time::TIME_MIN ('m'), time::TIME_MAX ('M'), time::TIME_CURRENT ('A'), time::TIME_UNKNOWN ('?')) : la date correspondante (voir time::Date::setDate())
+						- texte vide : identical to time::TIME_CURRENT
+						- time::TIME_MIN_CIRCULATIONS ('r') : First date where at least one service runs (see Environment::getMinDateInUse())
 						- TEMPS_MAX_CIRCULATIONS ('R') : Last date where at least one service runs (see Environment::getMaxDateInUse())
 
 					The following assertion is always assumed : \f$ TEMPS_{INCONNU}<=TEMPS_{MIN}<=TEMPS_{MIN ENVIRONNEMENT}<=TEMPS_{MIN CIRCULATIONS}<=TEMPS_{ACTUEL}<=TEMPS_{MAX CIRCULATIONS}<=TEMPS_{MAX ENVIRONNEMENT}<=TEMPS_{MAX} \f$.
 				*/	
 				time::Date interpretDate( const std::string& text ) const;
+
+					
+				/** Apply this period to given dates.
+					@param startTime The DateTime object to be modified.
+					@param endTime The DateTime object to be modified.
+					@param calculationTime Time of calculation.
+					@param pastSolutions Past solutions filter (true = past solutions kept)
+					@return true if the applied period of time is valid (ie if the required period is not anterior 
+						to current time or if the pastSolutions filter is active).
+
+					This method does the following :
+						- Period validity checking
+						- Sets startTime to period start hour or to calculationTime if pastSolutions filter is active.
+						- If this period end hour is inferior to this period start hour, one day is added to endTime.
+						- Sets endTime to period endHour.
+				*/
+				void applyPeriod(
+					const HourPeriod& period
+					, time::DateTime& startTime
+					, time::DateTime& endTime
+				) const;				
+				
 			//@}
 
 		};

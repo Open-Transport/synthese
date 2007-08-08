@@ -66,7 +66,59 @@
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\Types.h"
+				RelativePath=".\HourPeriod.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HourPeriod.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Site.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Site.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SiteCommercialLineLink.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SiteCommercialLineLink.h"
+				>
+			</File>
+			<Filter
+				Name="Functions"
+				>
+				<File
+					RelativePath=".\FunctionWithSite.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FunctionWithSite.h"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="LS SQL"
+			>
+			<File
+				RelativePath=".\EnvironmentLinkTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\EnvironmentLinkTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SiteTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SiteTableSync.h"
 				>
 			</File>
 		</Filter>
@@ -112,6 +164,14 @@
 					RelativePath=".\CityListInterfaceElement.h"
 					>
 				</File>
+				<File
+					RelativePath=".\CityListRequestInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CityListRequestInterfaceElement.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Interface Pages"
@@ -125,10 +185,10 @@
 					>
 				</File>
 			</Filter>
-			<Filter
-				Name="AdminInterfaceElement"
-				>
-			</Filter>
+		</Filter>
+		<Filter
+			Name="AdminInterfaceElement"
+			>
 		</Filter>
 		<File
 			RelativePath=".\PlacesListModule.cpp"
@@ -148,6 +208,10 @@
 		</File>
 		<File
 			RelativePath=".\SConscript"
+			>
+		</File>
+		<File
+			RelativePath=".\Types.h"
 			>
 		</File>
 	</Files>

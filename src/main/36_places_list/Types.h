@@ -31,7 +31,7 @@
 
 namespace synthese
 {
-	namespace placeslist
+	namespace transportwebsite
 	{
 		typedef std::vector<std::pair<uid, std::string> > PlacesList;
 	}

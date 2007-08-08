@@ -1,6 +1,6 @@
 
-/** PlacesListInterfacePage class implementation.
-	@file PlacesListInterfacePage.cpp
+/** CityListRequestInterfaceElement class implementation.
+	@file CityListRequestInterfaceElement.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,32 +20,51 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PlacesListInterfacePage.h"
+#include "CityListRequestInterfaceElement.h"
+
+#include "36_places_list/CityListRequest.h"
+
+#include "30_server/FunctionRequest.h"
+
+#include "11_interfaces/ValueElementList.h"
+
+#include "05_html/HTMLForm.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace transportwebsite;
-
-	namespace util
-	{
-		// template<> const string FactoryTemplate<InterfacePage, PlacesListInterfacePage>::FACTORY_KEY("");
-	}
+	using namespace server;
+	using namespace html;
 
 	namespace transportwebsite
 	{
-
-		void PlacesListInterfacePage::display(
-			std::ostream& stream
-			, VariablesMap& variables
-			, const PlacesList& results
-			, const server::Request* request /*= NULL*/) const
+		void CityListRequestInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			ParametersVector pv;
+			_idField = vel.front();
+			_txtField = vel.front();
+			_isForOrigin = vel.front();
+		}
 
-			InterfacePage::display(stream, pv, variables, static_cast<const void*>(&results), request);
+		string CityListRequestInterfaceElement::display(
+			std::ostream& stream
+			, const interfaces::ParametersVector& parameters
+			, VariablesMap& variables
+			, const void* object /*= NULL*/
+			, const server::Request* request /*= NULL*/
+		) const {
+			
+			FunctionRequest<CityListRequest> clrequest(request);
+			
+
+			stream << clrequest.getURL();
+
+			return string();
+		}
+
+		CityListRequestInterfaceElement::~CityListRequestInterfaceElement()
+		{
 		}
 	}
 }
