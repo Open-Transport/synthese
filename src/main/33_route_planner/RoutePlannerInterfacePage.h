@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace transportwebsite
+	{
+		class HourPeriod;
+	}
+
 	namespace time
 	{
 		class Date;
@@ -60,7 +65,10 @@ namespace synthese
 				- 6 : destination city text
 				- 7 : destination place id
 				- 8 : destination place text
-				- 9 : period
+				- 9 : period (id)
+				- 10 : date (text format)
+				- 11 : period (text format)
+				- 12 : solutions number
 			
 		*/
 		class RoutePlannerInterfacePage : public interfaces::InterfacePage
@@ -74,9 +82,10 @@ namespace synthese
 				, interfaces::VariablesMap& variables
 				, const JourneyBoardJourneys& object
 				, const time::Date& date
-				, int period
+				, int periodId
 				, const env::Place* originPlace
 				, const env::Place* destinationPlace
+				, const transportwebsite::HourPeriod* period
 				, const server::Request* request = NULL
 				) const;
 		};

@@ -110,7 +110,7 @@ namespace synthese
 			shared_ptr<const City> city(_city);
 			if (!city.get())
 			{
-				CityList cities(EnvModule::guessCity(_cityText, 1));
+				CityList cities(EnvModule::guessCity(_cityText, 10));
 				if (cities.empty())
 				{
 					return;

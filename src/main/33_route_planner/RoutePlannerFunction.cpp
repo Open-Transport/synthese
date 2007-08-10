@@ -23,6 +23,7 @@
 #include "RoutePlannerFunction.h"
 
 #include "36_places_list/Site.h"
+#include "36_places_list/HourPeriod.h"
 
 #include "33_route_planner/RoutePlannerInterfacePage.h"
 #include "33_route_planner/RoutePlanner.h"
@@ -114,7 +115,8 @@ namespace synthese
 						throw RequestException("Bad value for period id");
 					_startDate = DateTime(day, Hour(0, 0));
 					_endDate = _startDate;
-					_site->applyPeriod(_site->getPeriods().at(_periodId), _startDate, _endDate);
+					_period = &_site->getPeriods().at(_periodId);
+					_site->applyPeriod(*_period, _startDate, _endDate);
 				}
 				catch (time::TimeParseException)
 				{
@@ -169,6 +171,7 @@ namespace synthese
 				, _periodId
 				, _departure_place.get()
 				, _arrival_place.get()
+				, _period
 				, _request
 			);
 
@@ -179,6 +182,7 @@ namespace synthese
 			, _startDate(TIME_UNKNOWN)
 			, _endDate(TIME_UNKNOWN)
 			, _periodId(UNKNOWN_VALUE)
+			, _period(NULL)
 		{
 
 		}

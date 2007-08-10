@@ -22,20 +22,29 @@
 
 #include "RoutePlannerInterfacePage.h"
 
+#include "36_places_list/HourPeriod.h"
+
 #include "15_env/City.h"
 #include "15_env/Place.h"
+
+#include "11_interfaces/DateTimeInterfacePage.h"
+#include "11_interfaces/Interface.h"
 
 #include "04_time/Date.h"
 
 #include "01_util/Conversion.h"
 
+#include <sstream>
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace env;
 	using namespace util;
+	using namespace transportwebsite;
 
 	namespace routeplanner
 	{
@@ -48,6 +57,7 @@ namespace synthese
 			, int periodId
 			, const env::Place* originPlace
 			, const env::Place* destinationPlace
+			, const HourPeriod* period
 			, const server::Request* request /*= NULL*/
 			) const
 		{
@@ -67,6 +77,11 @@ namespace synthese
 				destinationPlaceName = destinationPlace->getName();
 			}
 			
+			// Text formatted date
+			shared_ptr<const DateTimeInterfacePage> datePage(getInterface()->getPage<DateTimeInterfacePage>());
+			stringstream sDate;
+			datePage->display(sDate, variables, date, request);
+
 			ParametersVector pv;
 			pv.push_back(date.toInternalString());
 			pv.push_back(Conversion::ToString(originCity->getKey()));
@@ -78,6 +93,9 @@ namespace synthese
 			pv.push_back(Conversion::ToString(destinationPlace->getId()));
 			pv.push_back(destinationPlaceName);
 			pv.push_back(Conversion::ToString(periodId));
+			pv.push_back(sDate.str());
+			pv.push_back((period == NULL) ? string() : period->getCaption());
+			pv.push_back(Conversion::ToString(object.size()));
 
 			InterfacePage::display(stream, pv, variables, vobj, request);
 		}

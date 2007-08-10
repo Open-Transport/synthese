@@ -31,6 +31,11 @@
 
 namespace synthese
 {
+	namespace transportwebsite
+	{
+		class HourPeriod;
+	}
+
 	namespace env
 	{
 		class Place;
@@ -73,6 +78,7 @@ namespace synthese
 				AccessParameters									_accessParameters;
 				int													_maxSolutionsNumber;
 				int													_periodId;
+				const transportwebsite::HourPeriod*					_period;
 			//@}
 
 

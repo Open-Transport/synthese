@@ -40,7 +40,6 @@
 #include "04_time/DateTime.h"
 
 #include <vector>
-#include <sstream>
 
 using namespace boost;
 using namespace std;
@@ -76,9 +75,6 @@ namespace synthese
 				shared_ptr<const RoutePlannerSheetLineInterfacePage> lineInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>());
 
 				// Cells
-				vector<ostringstream*> __Tampons;
-				for (PlaceList::const_iterator it = placesList.begin(); it != placesList.end(); ++it)
-					__Tampons.push_back(new ostringstream);
 				
 				// Loop on each journey
 				int i=1;
@@ -97,7 +93,7 @@ namespace synthese
 												
 						// Saving of the columns on each lines
 						columnInterfacePage->display(
-							*__Tampons[__Ligne]
+							*(placesList[__Ligne].content)
 							, __Ligne == 0
 							, true
 							, i
@@ -110,9 +106,9 @@ namespace synthese
 							, request
 						);
 						
-						for ( __Ligne++; placesList[ __Ligne ] != curET.getArrivalEdge()->getFromVertex ()->getConnectionPlace(); __Ligne++ )
+						for ( __Ligne++; placesList[ __Ligne ].place != curET.getArrivalEdge()->getFromVertex ()->getConnectionPlace(); __Ligne++ )
 							columnInterfacePage->display(
-								*__Tampons[__Ligne]
+								*(placesList[__Ligne].content)
 								, true
 								, true
 								, i
@@ -129,7 +125,7 @@ namespace synthese
 						lastDateTime += (*it)->getContinuousServiceRange();
 
 						columnInterfacePage->display(
-							*__Tampons[__Ligne]
+							*(placesList[__Ligne].content)
 							, true
 							, (itl + 1) == jl.end()
 							, i
@@ -145,7 +141,7 @@ namespace synthese
 
 					for (++__Ligne; __Ligne < placesList.size(); ++__Ligne)
 						columnInterfacePage->display(
-							*__Tampons[__Ligne]
+							*(placesList[__Ligne].content)
 							, true
 							, true
 							, i
@@ -160,17 +156,21 @@ namespace synthese
 				}
 
 				// Initialization of text lines
-				bool __Couleur = false;
-				for (int __Ligne(0); __Ligne < placesList.size(); __Ligne++ )
+				bool color(false);
+				for (PlaceList::const_iterator it(placesList.begin()); it != placesList.end(); ++it)
 				{
 					lineInterfacePage->display(
 						stream
-						, __Tampons[ __Ligne ]->str()
-						, __Couleur
+						, it->content->str()
+						, color
+						, it->isOrigin
+						, it->isDestination
 						, variables
-						, placesList[ __Ligne ]
-						, request );
-					delete __Tampons[__Ligne];
+						, it->place
+						, request
+					);
+					delete it->content;
+					color = !color;
 				}
 
 
@@ -270,13 +270,12 @@ namespace synthese
 		int SchedulesTableInterfaceElement::OrdrePAEchangeSiPossible(
 			const JourneyBoardJourneys& jv
 			, PlaceList& pl
-			, const LockedLinesList& lll
 			, int PositionActuelle
 			, int PositionGareSouhaitee
 		){
 			vector<bool> LignesAPermuter(PositionActuelle + 1, false);
 			bool Echangeable(true);
-			const ConnectionPlace* tempGare;
+			PlaceInformation tempGare;
 			int i;
 			int j;
 
@@ -332,35 +331,39 @@ namespace synthese
 						break;
 
 					LignesAPermuter[ i ] = false;
-/// @todo Write on lll too !
+
 					tempGare = pl[ i ];
 					for ( ; i > PositionGareSouhaitee + j; i-- )
 						pl[i] = pl[i-1];
+
 					pl[ i ] = tempGare;
 				}
 				return PositionGareSouhaitee + j;
 			}
 			else
-				return OrdrePAInsere( pl, lll, pl[ PositionGareSouhaitee ], PositionActuelle + 1 );
-
+				return OrdrePAInsere( pl, pl[ PositionGareSouhaitee ].place, PositionActuelle + 1);
 		}
 
 		int SchedulesTableInterfaceElement::OrdrePAInsere(
 			PlaceList& pl
-			, const LockedLinesList& lll
 			, const ConnectionPlace* place
 			, int position
 		){
 			// Saut de ligne vérouillée par un cheminement piéton
-			for (; position < lll.size() && lll[position]; ++position);
+			for (; position < pl.size() && pl[position].isLocked; ++position);
 
 			// Insertion
-			pl.insert(pl.begin() + position, place); /// @todo why not insert a false in ll ???
+			PlaceInformation pi;
+			pi.content = new ostringstream;
+			pi.isOrigin = false;
+			pi.isDestination = false;
+			pi.place = place;
+			pi.isLocked = false;
+
+			pl.insert(pl.begin() + position, pi);
 
 			// Retour de la position choisie
 			return position;
-
-			/// @todo update lll too !
 		}
 
 		vector<bool> SchedulesTableInterfaceElement::OrdrePAConstruitLignesAPermuter(
@@ -371,9 +374,9 @@ namespace synthese
 			vector<bool> result;
 			int l(0);
 			const ServiceUse* curET((l >= __TrajetATester.getJourneyLegCount ()) ? NULL : &__TrajetATester.getJourneyLeg (l));
-			for (int i(0); pl[ i ] != NULL && i <= LigneMax; i++ )
+			for (int i(0); pl[ i ].place != NULL && i <= LigneMax; i++ )
 			{
-				if ( curET != NULL && pl[ i ] == curET->getDepartureEdge() ->getConnectionPlace() )
+				if ( curET != NULL && pl[ i ].place == curET->getDepartureEdge() ->getConnectionPlace() )
 				{
 					result.push_back(true);
 					++l;
@@ -393,16 +396,16 @@ namespace synthese
 			, const ConnectionPlace* GareAChercher
 		){
 			// Recherche de la gare en suivant ï¿½ partir de la position i
-			for ( ; i < pl.size() && pl[ i ] != NULL && pl[ i ] != GareAChercher; ++i );
+			for ( ; i < pl.size() && pl[ i ].place != NULL && pl[ i ].place != GareAChercher; ++i );
 
 			// Gare trouvï¿½e en suivant avant la fin du tableau
-			if ( i < pl.size() && pl[ i ] != NULL )
+			if ( i < pl.size() && pl[ i ].place != NULL )
 				return true;
 
 			// Recherche de position antï¿½rieure ï¿½ i
-			for ( i = 0; i < pl.size() && pl[ i ] != NULL && pl[ i ] != GareAChercher; ++i );
+			for ( i = 0; i < pl.size() && pl[ i ].place != NULL && pl[ i ].place != GareAChercher; ++i );
 
-			return i < pl.size() && pl[ i ] != NULL;
+			return i < pl.size() && pl[ i ].place != NULL;
 
 		}
 
@@ -681,7 +684,6 @@ namespace synthese
 			int dernieri;
 
 			// Allocation
-			LockedLinesList lll;
 			PlaceList pl;
 
 			// Horizontal loop
@@ -695,34 +697,36 @@ namespace synthese
 				for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 				{
 					const ServiceUse& curET(*itl);
-
+					
 					// Search of the place from the preceding one
 					if ( OrdrePARechercheGare( pl, i, curET.getDepartureEdge()->getConnectionPlace() ) )
 					{
 						if ( i < dernieri )
-							i = OrdrePAEchangeSiPossible( jv, pl, lll, dernieri, i );
+							i = OrdrePAEchangeSiPossible( jv, pl, dernieri, i );
 					}
 					else
 					{
-						i = OrdrePAInsere( pl, lll, curET.getDepartureEdge()->getConnectionPlace(), dernieri + 1 );
+						i = OrdrePAInsere( pl, curET.getDepartureEdge()->getConnectionPlace(), dernieri + 1);
 					}
+					pl[i].isOrigin = (itl == jl.begin());
 
 					dernieri = i;
 					++i;
 
-						if ( OrdrePARechercheGare( pl, i, curET.getArrivalEdge()->getConnectionPlace() ) )
-						{
-							if ( i < dernieri )
-								i=OrdrePAEchangeSiPossible(jv, pl, lll, dernieri, i );
-						}
-						else
-						{
-							i = OrdrePAInsere( pl, lll, curET.getArrivalEdge()->getConnectionPlace(), dernieri + 1 );
-						}
-						dernieri = i;
+					if ( OrdrePARechercheGare( pl, i, curET.getArrivalEdge()->getConnectionPlace() ) )
+					{
+						if ( i < dernieri )
+							i=OrdrePAEchangeSiPossible(jv, pl, dernieri, i );
+					}
+					else
+					{
+						i = OrdrePAInsere( pl, curET.getArrivalEdge()->getConnectionPlace(), dernieri + 1);
+					}
+					dernieri = i;
+					pl[i].isDestination = (itl == jl.end() - 1);
 
-						//						lll.insert( lll.begin() + i, true );
-					
+					//						lll.insert( lll.begin() + i, true );
+				
 				}
 			}
 

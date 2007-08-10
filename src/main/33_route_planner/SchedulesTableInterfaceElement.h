@@ -25,6 +25,7 @@
 #include "11_interfaces/LibraryInterfaceElement.h"
 
 #include <vector>
+#include <sstream>
 
 namespace synthese
 {
@@ -45,13 +46,19 @@ namespace synthese
 		private:
 			static const bool _registered;
 
-			typedef std::vector<const synthese::env::ConnectionPlace*> PlaceList;
-			typedef std::vector<bool> LockedLinesList;
-
+			struct PlaceInformation
+			{
+				const env::ConnectionPlace* place;
+				bool isOrigin;
+				bool isDestination;
+				bool isLocked;
+				std::ostringstream* content;
+			};
+			typedef std::vector<PlaceInformation> PlaceList;
+			
 			static int OrdrePAEchangeSiPossible(
 				const JourneyBoardJourneys&
 				, PlaceList&
-				, const LockedLinesList&
 				, int PositionOrigine
 				, int PositionSouhaitee
 				);
@@ -64,7 +71,6 @@ namespace synthese
 			*/
 			static int OrdrePAInsere(
 				PlaceList&
-				, const LockedLinesList&
 				, const env::ConnectionPlace*
 				, int Position
 			);

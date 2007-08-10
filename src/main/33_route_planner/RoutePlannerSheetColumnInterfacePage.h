@@ -30,6 +30,18 @@ namespace synthese
 		/** Schedule sheet cell.
 			@code schedule_sheet_column @endcode
 			@ingroup m33Pages refPages
+
+			Parameters :
+				- 0 : isItFirst row
+				- 1 : isItLast row
+				- 2 : columnNumber
+				- 3 : isItFoot row
+				- 4 : firstArrivalTime
+				- 5 : lastArrivalTime
+				- 6 : isItContinuousService
+				- 7 : isFirstWriting
+				- 8 : isLastWriting
+
 		*/
 		class RoutePlannerSheetColumnInterfacePage : public interfaces::InterfacePage
 		{

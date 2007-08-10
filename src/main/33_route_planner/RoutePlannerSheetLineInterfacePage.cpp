@@ -25,20 +25,25 @@
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace util;
 	
 	namespace routeplanner
 	{
 		void RoutePlannerSheetLineInterfacePage::display( 
 		    std::ostream& stream, 
 		    const std::string& text, 
-		    bool alternateColor, 
-			VariablesMap& variables,
-		    const synthese::env::ConnectionPlace* place, 
-		    const server::Request* request /*= NULL */ ) const
-		{
+		    bool alternateColor
+			, bool isOrigin
+			, bool isDestination
+			, VariablesMap& variables,
+		    const env::ConnectionPlace* place, 
+		    const server::Request* request /*= NULL */
+		) const {
 			ParametersVector pv;
 			pv.push_back(text);
-			pv.push_back( synthese::util::Conversion::ToString( alternateColor ));
+			pv.push_back(Conversion::ToString( alternateColor ));
+			pv.push_back(Conversion::ToString(isOrigin));
+			pv.push_back(Conversion::ToString(isDestination));
 
 			InterfacePage::display( stream, pv, variables, place, request );
 		}

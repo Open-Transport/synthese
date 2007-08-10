@@ -45,6 +45,14 @@ namespace synthese
 		/** Line of schedule sheet.
 			@code schedule_sheet_row @endcode
 			@ingroup m33Pages refPages
+
+			Parameters :
+				- 0 : text conaining cells
+				- 1 : alternateColor (1) indicates if the line rank is odd or even. Values :
+					- false/0 = odd
+					- true/1 = even
+				- 2 : 0|1 is origin row
+				- 3 : 0|1 is destination row
 		*/
 		class RoutePlannerSheetLineInterfacePage : public interfaces::InterfacePage
 		{
@@ -58,12 +66,16 @@ namespace synthese
 				@param place (Place* object) : Corresponding place of the line
 				@param site Displayed site
 			*/
-			void display( std::ostream& stream, 
-				      const std::string& text, 
-				      bool alternateColor, 
-					  interfaces::VariablesMap& variables,
-				      const synthese::env::ConnectionPlace* place,
-				      const server::Request* request = NULL ) const;
+			void display(
+				std::ostream& stream
+				, const std::string& text
+				, bool alternateColor
+				, bool isOrigin
+				, bool isDestination
+				, interfaces::VariablesMap& variables
+				, const synthese::env::ConnectionPlace* place
+				, const server::Request* request = NULL
+			) const;
 
 
 		};
