@@ -64,7 +64,10 @@ namespace synthese
 		void
 		ReservationRule::setHourDeadLine (const synthese::time::Hour& hourDeadLine)
 		{
-			_hourDeadLine = hourDeadLine;
+			if (hourDeadLine == Hour(0,0))
+				_hourDeadLine = Hour(23,59);
+			else
+				_hourDeadLine = hourDeadLine;
 		}
 
 
