@@ -30,6 +30,7 @@
 #include "30_server/RequestException.h"
 
 #include "15_env/EnvModule.h"
+#include "15_env/City.h"
 
 #include "11_interfaces/Interface.h"
 
@@ -47,7 +48,6 @@ namespace synthese
 	namespace transportwebsite
 	{
 		const string CityListRequest::PARAMETER_INPUT("t");
-		const string CityListRequest::PARAMETER_INPUT_ID("i");
 		const string CityListRequest::PARAMETER_NUMBER("n");
 		const string CityListRequest::PARAMETER_SITE("s");
 		const string CityListRequest::PARAMETER_IS_FOR_ORIGIN("o");
@@ -61,15 +61,15 @@ namespace synthese
 				placesList.push_back(make_pair((*it)->getKey(), (*it)->getName()));
 
 			VariablesMap vm;
-			_page->display(stream, vm, placesList, _request);
+			_page->display(stream, vm, placesList, true, _isForOrigin, _request);
 		}
 
 		ParametersMap CityListRequest::_getParametersMap() const
 		{
-			ParametersMap pm;
+			ParametersMap pm(FunctionWithSite::_getParametersMap());
 			pm.insert(make_pair(PARAMETER_INPUT, _input));
 			pm.insert(make_pair(PARAMETER_NUMBER, Conversion::ToString(_n)));
-			pm.insert(make_pair(PARAMETER_SITE, Conversion::ToString(_site->getKey())));
+			pm.insert(make_pair(PARAMETER_IS_FOR_ORIGIN, Conversion::ToString(_isForOrigin)));
 			return pm;
 		}
 
@@ -86,12 +86,32 @@ namespace synthese
 				throw RequestException("Text input not specified");
 			_input = it->second;
 
+			it = map.find(PARAMETER_IS_FOR_ORIGIN);
+			if (it == map.end())
+				throw RequestException("Is for origin not specified");
+			_isForOrigin = Conversion::ToBool(it->second);
+
 			it = map.find(PARAMETER_NUMBER);
 			if (it == map.end())
 				throw RequestException("Number not specified");
 			_n = Conversion::ToInt(it->second);
 			if (_n < 0)
 				throw RequestException("Bad value for number");
+		}
+
+		void CityListRequest::setTextInput( const std::string& text )
+		{
+			_input = text;
+		}
+
+		void CityListRequest::setNumber( int number )
+		{
+			_n = number;
+		}
+
+		void CityListRequest::setIsForOrigin( bool isForOrigin )
+		{
+			_isForOrigin = isForOrigin;
 		}
 	}
 }

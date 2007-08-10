@@ -1,6 +1,8 @@
 
-/** CityListInterfaceElement class header.
-	@file CityListInterfaceElement.h
+/** PlacesListItemInterfacePage class header.
+	@file PlacesListItemInterfacePage.h
+	@author Hugues Romain
+	@date 2007
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,17 +22,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_CityListInterfaceElement_H__
-#define SYNTHESE_CityListInterfaceElement_H__
+#ifndef SYNTHESE_PlacesListItemInterfacePage_H__
+#define SYNTHESE_PlacesListItemInterfacePage_H__
 
-#include "11_interfaces/LibraryInterfaceElement.h"
+#include "11_interfaces/InterfacePage.h"
 
 namespace synthese
 {
-	namespace interfaces
-	{
-		class ValueInterfaceElement;
-	}
 	namespace server
 	{
 		class Request;
@@ -38,30 +36,30 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		/** List of cities.
-			@ingroup m36Library refLibrary
-			@code city_list @endcode
+		/** PlacesListItemInterfacePage Interface Page Class.
+			@ingroup m36Pages refPages
 
-			Parameters : none
+			Parameters :
+			 - 0 : n rank of the item
+			 - 1 : name of the idem
+			 - 2 : id of the item
 		*/
-		class CityListInterfaceElement : public interfaces::LibraryInterfaceElement
+		class PlacesListItemInterfacePage : public interfaces::InterfacePage
 		{
-		private:
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _errorMessage;
-
 		public:
-			std::string display(
+			/** Overloaded display method for specific parameter conversion.
+				This function converts the parameters into a single ParametersVector object.
+			*/
+			void display(
 				std::ostream& stream
-				, const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables
-				, const void* object = NULL
+				, int n
+				, const std::string& name
+				, uid id
 				, const server::Request* request = NULL
-			) const;
-			void storeParameters(interfaces::ValueElementList& vel);
+				) const;
 		};
-
 	}
 }
 
-#endif // SYNTHESE_CityListInterfaceElement_H__
-
+#endif // SYNTHESE_PlacesListItemInterfacePage_H__

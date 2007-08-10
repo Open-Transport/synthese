@@ -101,15 +101,13 @@ namespace synthese
 
 		const time::Date Site::getMinUseDate() const
 		{
-			/// @todo customize
 			return Date(TIME_CURRENT);
 		}
 
 		const time::Date Site::getMaxUseDate() const
 		{
-			/// @todo customize 14
 			Date date(TIME_CURRENT);
-			date += 14;
+			date += _useDateRange;
 			return date;
 		}
 

@@ -121,8 +121,7 @@ namespace synthese
 					rows.getColumn (rowIndex, TABLE_COL_NAME) ));
 
 				EnvModule::getCities ().add (city);
-				//environment.getCitiesMatcher ().add (city->getName (), city->getKey ());
-				/// @todo put the matcher update in the update line method
+				EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
 			}
 		}
 
@@ -137,11 +136,11 @@ namespace synthese
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 				shared_ptr<City> city = EnvModule::getCities ().getUpdateable (id);
 
-				// environment.getCitiesMatcher ().remove (city->getName ());
+				EnvModule::getCitiesMatcher ().remove (city->getName ());
 
 				load(city.get(), rows, rowIndex);
 
-				// environment.getCitiesMatcher ().add (city->getName (), city->getKey ());
+				EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
 			}
 		}
 
@@ -156,8 +155,7 @@ namespace synthese
 			{
 				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
 
-				//environment.getCitiesMatcher ().remove (environment.getCities ().get (id)->getName ());
-
+				EnvModule::getCitiesMatcher ().remove (EnvModule::getCities ().get (id)->getName ());
 				EnvModule::getCities ().remove (id);
 			}
 		}

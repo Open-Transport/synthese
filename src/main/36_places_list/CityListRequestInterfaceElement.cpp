@@ -30,6 +30,8 @@
 
 #include "05_html/HTMLForm.h"
 
+#include "01_util/Conversion.h"
+
 using namespace std;
 
 namespace synthese
@@ -37,14 +39,15 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace html;
+	using namespace util;
 
 	namespace transportwebsite
 	{
 		void CityListRequestInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			_idField = vel.front();
 			_txtField = vel.front();
 			_isForOrigin = vel.front();
+			_number = vel.front();
 		}
 
 		string CityListRequestInterfaceElement::display(
@@ -56,9 +59,11 @@ namespace synthese
 		) const {
 			
 			FunctionRequest<CityListRequest> clrequest(request);
-			
+			clrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
+			clrequest.getFunction()->setIsForOrigin(Conversion::ToBool(_isForOrigin->getValue(parameters, variables, object, request)));
+			clrequest.getFunction()->setNumber(Conversion::ToInt(_number->getValue(parameters, variables, object, request)));
 
-			stream << clrequest.getURL();
+			stream << clrequest.getURL(false);
 
 			return string();
 		}

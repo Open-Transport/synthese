@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class City;
+	}
+
 	namespace transportwebsite
 	{
 		class PlacesListInterfacePage;
@@ -41,7 +46,6 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_INPUT;
-			static const std::string PARAMETER_INPUT_ID;
 			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_SITE;
 			static const std::string PARAMETER_IS_FOR_ORIGIN;
@@ -49,6 +53,8 @@ namespace synthese
 		private:
 			std::string _input;
 			int _n;
+			bool _isForOrigin;
+			boost::shared_ptr<const env::City>					_city;
 			boost::shared_ptr<const PlacesListInterfacePage>	_page;
 
 		protected:
@@ -57,9 +63,12 @@ namespace synthese
 
 		public:
 			void _run(std::ostream& stream) const;
+
+			void setTextInput(const std::string& text);
+			void setNumber(int number);
+			void setIsForOrigin(bool isForOrigin);
 		};
 	}
 }
 
 #endif // SYNTHESE_CityListRequest_H__
-

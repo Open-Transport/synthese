@@ -118,7 +118,7 @@ namespace synthese
 			return s;
 		}
 
-		std::string Request::getQueryString() const
+		std::string Request::getQueryString(bool normalize) const
 		{
 			// Serialize the parameter lists in a synthese querystring
 			std::stringstream ss;
@@ -132,7 +132,7 @@ namespace synthese
 				ss << iter->first << PARAMETER_ASSIGNMENT << iter->second;
 			}
 
-			return _normalizeQueryString(ss.str());
+			return normalize ? _normalizeQueryString(ss.str()) : ss.str();
 
 		}
 
@@ -195,10 +195,10 @@ namespace synthese
 		}
 
 
-		std::string Request::getURL() const
+		std::string Request::getURL(bool normalize) const
 		{
 			stringstream str;
-			str << _clientURL << PARAMETER_STARTER << getQueryString();
+			str << _clientURL << PARAMETER_STARTER << getQueryString(normalize);
 			return str.str();
 		}
 		const std::string& Request::getClientURL() const

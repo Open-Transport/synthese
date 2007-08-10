@@ -1,6 +1,6 @@
 
-/** PlacesListInterfacePage class implementation.
-	@file PlacesListInterfacePage.cpp
+/** PlacesListItemInterfacePage class implementation.
+	@file PlacesListItemInterfacePage.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PlacesListInterfacePage.h"
+#include "PlacesListItemInterfacePage.h"
 
 #include "01_util/Conversion.h"
 
@@ -34,26 +34,26 @@ namespace synthese
 
 	namespace util
 	{
-		// template<> const string FactoryTemplate<InterfacePage, PlacesListInterfacePage>::FACTORY_KEY("");
+		// template<> const string FactoryTemplate<InterfacePage, PlacesListItemInterfacePage>::FACTORY_KEY("");
 	}
 
 	namespace transportwebsite
 	{
 
-		void PlacesListInterfacePage::display(
+		void PlacesListItemInterfacePage::display(
 			std::ostream& stream
 			, VariablesMap& variables
-			, const PlacesList& results
-			, bool isCities
-			, bool isForOrigin
-			, const server::Request* request /*= NULL*/) const
-		{
+			, int n
+			, const std::string& name
+			, uid id
+			, const server::Request* request /*= NULL*/
+		) const	{
 			ParametersVector pv;
-			pv.push_back(Conversion::ToString(isCities));
-			pv.push_back(Conversion::ToString(isForOrigin));
-			pv.push_back(Conversion::ToString(results.size()));
+			pv.push_back(Conversion::ToString(n));
+			pv.push_back(name);
+			pv.push_back(Conversion::ToString(id));
 
-			InterfacePage::display(stream, pv, variables, static_cast<const void*>(&results), request);
+			InterfacePage::display(stream, pv, variables, NULL, request);
 		}
 	}
 }

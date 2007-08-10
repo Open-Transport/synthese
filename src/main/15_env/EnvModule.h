@@ -367,7 +367,7 @@ namespace synthese
 			static LineSet fetchLines (const uid& commercialLineId);
 
 			static CityList guessCity (const std::string& fuzzyName, int nbMatches = 10);
-			synthese::lexmatcher::LexicalMatcher<uid>& getCitiesMatcher ();
+			static lexmatcher::LexicalMatcher<uid>& getCitiesMatcher ();
 
 
 			static boost::shared_ptr<Path> fetchPath (const uid& id);

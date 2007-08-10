@@ -184,6 +184,14 @@
 					RelativePath=".\PlacesListInterfacePage.h"
 					>
 				</File>
+				<File
+					RelativePath=".\PlacesListItemInterfacePage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\PlacesListItemInterfacePage.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

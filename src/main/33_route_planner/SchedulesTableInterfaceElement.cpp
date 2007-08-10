@@ -142,6 +142,21 @@ namespace synthese
 							, request
 						);
 					}
+
+					for (++__Ligne; __Ligne < placesList.size(); ++__Ligne)
+						columnInterfacePage->display(
+							*__Tampons[__Ligne]
+							, true
+							, true
+							, i
+							, false
+							, unknownTime
+							, unknownTime
+							, false
+							, true
+							, true
+							, request
+						);
 				}
 
 				// Initialization of text lines

@@ -36,14 +36,18 @@ namespace synthese
 			@author Hugues Romain
 			@date 2007
 			@ingroup m36Library refLibrary
+
+			Parameters :
+			 - 0 : Text field (can be a string with script code)
+			 - 1 : 1|0 : 1 = departures city list, 0 = arrival city list
+			 - 2 : Number of answers in the popup
 		*/
 		class CityListRequestInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _idField;
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _txtField;
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _isForOrigin;
-			//...
+			boost::shared_ptr<interfaces::ValueInterfaceElement> _number;
 
 		public:
 			/** Controls and store the internals parameters.

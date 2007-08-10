@@ -40,6 +40,14 @@ namespace synthese
 	{
 		/** PlacesListInterfacePage Interface Page Class.
 			@ingroup m36Pages refPages
+
+			Parameters :
+			 - 0 : 1|0 is city list
+			 - 1 : 1|0 is for origin selection
+			 - 2 : size of the results
+
+			Object :
+			 - PlacesList list of results
 		*/
 		class PlacesListInterfacePage : public interfaces::InterfacePage
 		{
@@ -51,6 +59,8 @@ namespace synthese
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
 				, const PlacesList& results
+				, bool isCities
+				, bool isForOrigin
 				, const server::Request* request = NULL
 			) const;
 		};

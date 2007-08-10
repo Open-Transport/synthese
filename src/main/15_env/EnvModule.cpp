@@ -63,7 +63,7 @@ namespace synthese
 	RoadChunk::Registry				EnvModule::_roadChunks;
 	Road::Registry					EnvModule::_roads;
 
-	LexicalMatcher<uid>				EnvModule::_citiesMatcher; //!< @todo To be moved in RoutePlanner
+	LexicalMatcher<uid>				EnvModule::_citiesMatcher; //!< @todo To be moved in transportwebsite::Site
 
 	void EnvModule::initialize()
 	{
@@ -315,8 +315,7 @@ namespace synthese
 	    return result;
 	}
 
-	synthese::lexmatcher::LexicalMatcher<uid>& 
-	EnvModule::getCitiesMatcher ()
+	lexmatcher::LexicalMatcher<uid>& EnvModule::getCitiesMatcher ()
 	{
 	    return _citiesMatcher;
 	}

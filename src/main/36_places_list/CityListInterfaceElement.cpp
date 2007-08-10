@@ -25,19 +25,19 @@
 #include <string>
 #include <vector>
 
-#include "01_util/Conversion.h"
+#include "36_places_list/Types.h"
+#include "36_places_list/PlacesListItemInterfacePage.h"
 
-#include "15_env/City.h"
-#include "15_env/EnvModule.h"
+#include "01_util/Conversion.h"
 
 #include "11_interfaces/ValueInterfaceElement.h"
 #include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/Interface.h"
 
 using namespace std;
 
 namespace synthese
 {
-	using namespace env;
 	using namespace util;
 	using namespace interfaces;
 
@@ -50,45 +50,23 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request
 		) const	{
-			// Parameters
-			string errorMessage = _errorMessage->getValue(parameters, variables, object, request);
-			string openingText = _openingText->getValue(parameters, variables, object, request);
-			string closingText = _closingText->getValue(parameters, variables, object, request);
-			int n = Conversion::ToInt(_n->getValue(parameters, variables, object, request));
-			string inputText = _inputText->getValue(parameters, variables, object, request);
-			string emptyLineText = _emptyLineText->getValue(parameters, variables, object, request);
-
-			const CityList& tbCommunes = *static_cast<const CityList*>(object);
-
-
-			if ( tbCommunes[ 1 ] == NULL )
-				stream << errorMessage;
-			else
-			{
-				stream << "<script>Nom = new Array; Num = new Array;</script>";
-				for ( int i = 1; i <= n; i++ )
-					if ( tbCommunes[ i ] != NULL )
-					{
-						stream
-							<< "<script>Nom[" << i << "]=\"" << tbCommunes[ i ] ->getName() << "\";Num[" << i << "]=" << tbCommunes[ i ] ->getKey() << ";</script>"
-							<< openingText
-                            << "<a href=\"javascript:MAJ(" << i << ")\">" << tbCommunes[ i ] ->getName() << "</a>"
-							<< closingText;
-					}
-					else
-						stream << emptyLineText;
-			}
+			const PlacesList& tbCommunes = *static_cast<const PlacesList*>(object);
+			boost::shared_ptr<const PlacesListItemInterfacePage> page(_page->getInterface()->getPage<PlacesListItemInterfacePage>());
+			
+			int i(0);
+			for (PlacesList::const_iterator it(tbCommunes.begin()); it != tbCommunes.end(); ++it, ++i)
+				page->display(
+					stream
+					, variables
+					, i
+					, it->second
+					, it->first
+				);
 			return string();
 		}
 
 		void CityListInterfaceElement::storeParameters( interfaces::ValueElementList& pv)
 		{
-			_errorMessage = pv.front();
-			_openingText = pv.front();
-			_closingText = pv.front();
-			_n = pv.front();
-			_inputText = pv.front();
-			_emptyLineText = pv.front();
 		}
 	}
 }

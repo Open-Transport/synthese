@@ -29,6 +29,8 @@
 
 #include "01_util/Conversion.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace interfaces;
@@ -50,16 +52,31 @@ namespace synthese
 			) const
 		{
 			const void* vobj(static_cast<const void*>(&object));
+			const City* originCity(dynamic_cast<const City*>(originPlace));
+			string originPlaceName;
+			if (originCity == NULL)
+			{
+				originCity = originPlace->getCity();
+				originPlaceName = originPlace->getName();
+			}
+			const City* destinationCity(dynamic_cast<const City*>(destinationPlace));
+			string destinationPlaceName;
+			if (destinationCity == NULL)
+			{
+				destinationCity = destinationPlace->getCity();
+				destinationPlaceName = destinationPlace->getName();
+			}
+			
 			ParametersVector pv;
 			pv.push_back(date.toInternalString());
-			pv.push_back(Conversion::ToString(originPlace->getCity()->getKey()));
-			pv.push_back(originPlace->getCity()->getName());
+			pv.push_back(Conversion::ToString(originCity->getKey()));
+			pv.push_back(originCity->getName());
 			pv.push_back(Conversion::ToString(originPlace->getId()));
-			pv.push_back(originPlace->getName());
-			pv.push_back(Conversion::ToString(destinationPlace->getCity()->getKey()));
-			pv.push_back(destinationPlace->getCity()->getName());
+			pv.push_back(originPlaceName);
+			pv.push_back(Conversion::ToString(destinationCity->getKey()));
+			pv.push_back(destinationCity->getName());
 			pv.push_back(Conversion::ToString(destinationPlace->getId()));
-			pv.push_back(destinationPlace->getName());
+			pv.push_back(destinationPlaceName);
 			pv.push_back(Conversion::ToString(periodId));
 
 			InterfacePage::display(stream, pv, variables, vobj, request);
