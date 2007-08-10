@@ -31,6 +31,11 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class City;
+	}
+
 	namespace server
 	{
 		class Request;
@@ -45,6 +50,8 @@ namespace synthese
 			 - 0 : 1|0 is city list
 			 - 1 : 1|0 is for origin selection
 			 - 2 : size of the results
+			 - 3 : if places list, city id
+			 - 4 : if places list, city name
 
 			Object :
 			 - PlacesList list of results
@@ -61,6 +68,7 @@ namespace synthese
 				, const PlacesList& results
 				, bool isCities
 				, bool isForOrigin
+				, boost::shared_ptr<const env::City> city
 				, const server::Request* request = NULL
 			) const;
 		};

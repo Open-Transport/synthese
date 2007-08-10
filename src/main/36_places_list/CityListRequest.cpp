@@ -37,6 +37,7 @@
 #include "01_util/Conversion.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -49,7 +50,6 @@ namespace synthese
 	{
 		const string CityListRequest::PARAMETER_INPUT("t");
 		const string CityListRequest::PARAMETER_NUMBER("n");
-		const string CityListRequest::PARAMETER_SITE("s");
 		const string CityListRequest::PARAMETER_IS_FOR_ORIGIN("o");
 
 		void CityListRequest::_run( ostream& stream ) const
@@ -61,7 +61,7 @@ namespace synthese
 				placesList.push_back(make_pair((*it)->getKey(), (*it)->getName()));
 
 			VariablesMap vm;
-			_page->display(stream, vm, placesList, true, _isForOrigin, _request);
+			_page->display(stream, vm, placesList, true, _isForOrigin, shared_ptr<City>(), _request);
 		}
 
 		ParametersMap CityListRequest::_getParametersMap() const

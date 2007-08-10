@@ -22,15 +22,19 @@
 
 #include "PlacesListInterfacePage.h"
 
+#include "15_env/City.h"
+
 #include "01_util/Conversion.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace transportwebsite;
 	using namespace util;
+	using namespace env;
 
 	namespace util
 	{
@@ -46,12 +50,15 @@ namespace synthese
 			, const PlacesList& results
 			, bool isCities
 			, bool isForOrigin
+			, shared_ptr<const City> city
 			, const server::Request* request /*= NULL*/) const
 		{
 			ParametersVector pv;
 			pv.push_back(Conversion::ToString(isCities));
 			pv.push_back(Conversion::ToString(isForOrigin));
 			pv.push_back(Conversion::ToString(results.size()));
+			pv.push_back((isCities || !city.get()) ? string() : Conversion::ToString(city->getKey()));
+			pv.push_back((isCities || !city.get()) ? string() : Conversion::ToString(city->getName()));
 
 			InterfacePage::display(stream, pv, variables, static_cast<const void*>(&results), request);
 		}

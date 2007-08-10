@@ -6,3 +6,5 @@
 #include "36_places_list/PlacesListInterfacePage.h"
 #include "36_places_list/SiteTableSync.h"
 #include "36_places_list/PlacesListItemInterfacePage.h"
+#include "36_places_list/PlacesListFunction.h"
+#include "36_places_list/PlacesListRequestInterfaceElement.h"

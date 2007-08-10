@@ -172,6 +172,14 @@
 					RelativePath=".\CityListRequestInterfaceElement.h"
 					>
 				</File>
+				<File
+					RelativePath=".\PlacesListRequestInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\PlacesListRequestInterfaceElement.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Interface Pages"

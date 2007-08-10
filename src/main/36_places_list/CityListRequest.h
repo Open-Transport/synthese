@@ -47,7 +47,6 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_INPUT;
 			static const std::string PARAMETER_NUMBER;
-			static const std::string PARAMETER_SITE;
 			static const std::string PARAMETER_IS_FOR_ORIGIN;
 
 		private:
