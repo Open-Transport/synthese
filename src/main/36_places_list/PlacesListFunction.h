@@ -47,7 +47,6 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_INPUT;
-			static const std::string PARAMETER_CITY_ID;
 			static const std::string PARAMETER_CITY_TEXT;
 			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_IS_FOR_ORIGIN;
@@ -56,11 +55,9 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				std::string							_input;
-				std::string							_cityId;
 				std::string							_cityText;
 				int									_n;
 				bool								_isForOrigin;
-				boost::shared_ptr<const env::City>	_city;
 				boost::shared_ptr<const PlacesListInterfacePage>	_page;
 			//@}
 			
@@ -86,7 +83,6 @@ namespace synthese
 			void setNumber(int number);
 			void setIsForOrigin(bool isForOrigin);
 			void setCityTextInput(const std::string& text);
-			void setCityIdInput(const std::string& text);
 		};
 	}
 }

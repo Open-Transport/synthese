@@ -50,7 +50,6 @@ namespace synthese
 			// List of parameters to store
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _txtField;
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _cityTxtField;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _cityIdField;
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _isForOrigin;
 			boost::shared_ptr<interfaces::ValueInterfaceElement> _number;
 

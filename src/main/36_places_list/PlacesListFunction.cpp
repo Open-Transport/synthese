@@ -50,7 +50,6 @@ namespace synthese
 	namespace transportwebsite
 	{
 		const std::string PlacesListFunction::PARAMETER_INPUT("i");
-		const std::string PlacesListFunction::PARAMETER_CITY_ID("ci");
 		const std::string PlacesListFunction::PARAMETER_CITY_TEXT("ct");
 		const std::string PlacesListFunction::PARAMETER_NUMBER("n");
 		const std::string PlacesListFunction::PARAMETER_IS_FOR_ORIGIN("o");
@@ -59,7 +58,6 @@ namespace synthese
 		{
 			ParametersMap map(FunctionWithSite::_getParametersMap());
 			map.insert(make_pair(PARAMETER_INPUT, _input));
-			map.insert(make_pair(PARAMETER_CITY_ID, _cityId));
 			map.insert(make_pair(PARAMETER_CITY_TEXT, _cityText));
 			map.insert(make_pair(PARAMETER_NUMBER, Conversion::ToString(_n)));
 			map.insert(make_pair(PARAMETER_IS_FOR_ORIGIN, Conversion::ToString(_isForOrigin)));
@@ -79,20 +77,6 @@ namespace synthese
 				throw RequestException("Text input not specified");
 			_input = it->second;
 
-			it = map.find(PARAMETER_CITY_ID);
-			if (it == map.end())
-				throw RequestException("City ID not specified");
-			_cityId = it->second;
-			if (EnvModule::getCities().contains(Conversion::ToLongLong(_cityId)))
-				_city = EnvModule::getCities().get(Conversion::ToLongLong(_cityId));
-			else
-			{
-				it = map.find(PARAMETER_INPUT);
-				if (it == map.end())
-					throw RequestException("City text not specified");
-				_cityText = it->second;
-			}
-
 			it = map.find(PARAMETER_IS_FOR_ORIGIN);
 			if (it == map.end())
 				throw RequestException("Is for origin status not specified");
@@ -103,20 +87,21 @@ namespace synthese
 				throw RequestException("Number not specified");
 			_n = Conversion::ToInt(it->second);
 
+			it = map.find(PARAMETER_CITY_TEXT);
+			if (it == map.end())
+				throw RequestException("City text not specified");
+			_cityText = it->second;
+
 		}
 
 		void PlacesListFunction::_run( std::ostream& stream ) const
 		{
-			shared_ptr<const City> city(_city);
-			if (!city.get())
+			CityList cities(EnvModule::guessCity(_cityText, 10));
+			if (cities.empty())
 			{
-				CityList cities(EnvModule::guessCity(_cityText, 10));
-				if (cities.empty())
-				{
-					return;
-				}
-				city = cities.front();
+				return;
 			}
+			shared_ptr<const City> city(cities.front());
 
 			PlacesList placesList;
 			LexicalMatcher<const ConnectionPlace*>::MatchResult places(city->getConnectionPlacesMatcher().bestMatches(_input, _n));
@@ -148,11 +133,6 @@ namespace synthese
 		void PlacesListFunction::setCityTextInput( const std::string& text )
 		{
 			_cityText = text;
-		}
-
-		void PlacesListFunction::setCityIdInput( const std::string& text )
-		{
-			_cityId = text;
 		}
 	}
 }

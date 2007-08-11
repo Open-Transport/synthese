@@ -52,16 +52,10 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_SITE;
-			static const std::string PARAMETER_DEPARTURE_PLACE_ID;
-			static const std::string PARAMETER_ARRIVAL_PLACE_ID;
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_DAY;
 			static const std::string PARAMETER_PERIOD_ID;
 			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER;
-
-			// Parameters for text verifying only
-			static const std::string PARAMETER_DEPARTURE_CITY_ID;
-			static const std::string PARAMETER_ARRIVAL_CITY_ID;
 			static const std::string PARAMETER_DEPARTURE_CITY_TEXT;
 			static const std::string PARAMETER_ARRIVAL_CITY_TEXT;
 			static const std::string PARAMETER_DEPARTURE_PLACE_TEXT;
@@ -71,14 +65,19 @@ namespace synthese
 			//! \name Parameters
 			//@{
 				boost::shared_ptr<const RoutePlannerInterfacePage>	_page;
-				boost::shared_ptr<const env::Place>					_departure_place;
-				boost::shared_ptr<const env::Place>					_arrival_place;
+				const env::Place*									_departure_place;
+				const env::Place*									_arrival_place;
+				std::string											_originCityText;
+				std::string											_destinationCityText;
+				std::string											_originPlaceText;
+				std::string											_destinationPlaceText;
 				time::DateTime										_startDate;
 				time::DateTime										_endDate;
 				AccessParameters									_accessParameters;
 				int													_maxSolutionsNumber;
 				int													_periodId;
 				const transportwebsite::HourPeriod*					_period;
+				bool												_home;
 			//@}
 
 

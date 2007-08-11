@@ -73,17 +73,6 @@ namespace synthese
 				stream << RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT;
 			stream << "\" value=\"" << value << "\" id=\"" << field << "_txt\" " << html << " />";
 
-			stream << "<input type=\"hidden\" name=\"";
-			if (field == FIELD_ORIGIN_CITY)
-				stream << RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_ID;
-			else if (field == FIELD_DESTINATION_CITY)
-				stream << RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_ID;
-			else if (field == FIELD_ORIGIN_PLACE)
-				stream << RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_ID;
-			else if (field == FIELD_DESTINATION_PLACE)
-				stream << RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_ID;
-			stream << "\" value=\"" << number << "\" id=\"" << field << "_id\" />";
-
 			return string();
 		}
 

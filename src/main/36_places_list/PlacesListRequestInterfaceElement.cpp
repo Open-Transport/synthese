@@ -41,7 +41,6 @@ namespace synthese
 		{
 			_txtField = vel.front();
 			_cityTxtField = vel.front();
-			_cityIdField = vel.front();
 			_isForOrigin = vel.front();
 			_number = vel.front();
 		}
@@ -57,7 +56,6 @@ namespace synthese
 			plrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
 			plrequest.getFunction()->setIsForOrigin(Conversion::ToBool(_isForOrigin->getValue(parameters, variables, object, request)));
 			plrequest.getFunction()->setNumber(Conversion::ToInt(_number->getValue(parameters, variables, object, request)));
-			plrequest.getFunction()->setCityIdInput(_cityIdField->getValue(parameters, variables, object, request));
 			plrequest.getFunction()->setCityTextInput(_cityTxtField->getValue(parameters, variables, object, request));
 
 			stream << plrequest.getURL(false);

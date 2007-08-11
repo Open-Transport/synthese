@@ -84,7 +84,7 @@ namespace synthese
 
 			ParametersVector pv;
 			pv.push_back(date.toInternalString());
-			pv.push_back(Conversion::ToString(originCity->getKey()));
+			pv.push_back("0");
 			pv.push_back(originCity->getName());
 			pv.push_back(Conversion::ToString(originPlace->getId()));
 			pv.push_back(originPlaceName);
@@ -98,6 +98,32 @@ namespace synthese
 			pv.push_back(Conversion::ToString(object.size()));
 
 			InterfacePage::display(stream, pv, variables, vobj, request);
+		}
+
+		void RoutePlannerInterfacePage::display( std::ostream& stream , interfaces::VariablesMap& variables , const time::Date& date , int periodId , bool home, const std::string& originCity , const std::string& originPlace , const std::string& destinationCity , const std::string& destinationPlace , const transportwebsite::HourPeriod* period , const server::Request* request /*= NULL  */ ) const
+		{
+			// Text formatted date
+			shared_ptr<const DateTimeInterfacePage> datePage(getInterface()->getPage<DateTimeInterfacePage>());
+			stringstream sDate;
+			datePage->display(sDate, variables, date, request);
+
+			ParametersVector pv;
+			pv.push_back(date.toInternalString());
+			pv.push_back(Conversion::ToString(home));
+			pv.push_back(originCity);
+			pv.push_back(string());
+			pv.push_back(originPlace);
+			pv.push_back(string());
+			pv.push_back(destinationCity);
+			pv.push_back(string());
+			pv.push_back(destinationPlace);
+			pv.push_back(Conversion::ToString(periodId));
+			pv.push_back(sDate.str());
+			pv.push_back((period == NULL) ? string() : period->getCaption());
+			pv.push_back("0");
+
+			InterfacePage::display(stream, pv, variables, NULL, request);
+
 		}
 	}
 }

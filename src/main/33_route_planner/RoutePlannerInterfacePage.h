@@ -57,7 +57,7 @@ namespace synthese
 
 			Parameters :
 				- 0 : date (internal format)
-				- 1 : origin city id
+				- 1 : home display
 				- 2 : origin city text
 				- 3 : origin place id
 				- 4 : origin place text
@@ -74,7 +74,8 @@ namespace synthese
 		class RoutePlannerInterfacePage : public interfaces::InterfacePage
 		{
 		public:
-			/** Overloaded display method for specific parameter conversion.
+			/** Display of a successful route planning
+				Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 			*/
 			void display(
@@ -87,7 +88,21 @@ namespace synthese
 				, const env::Place* destinationPlace
 				, const transportwebsite::HourPeriod* period
 				, const server::Request* request = NULL
-				) const;
+			) const;
+
+			void display(
+				std::ostream& stream
+				, interfaces::VariablesMap& variables
+				, const time::Date& date
+				, int periodId
+				, bool home
+				, const std::string& originCity
+				, const std::string& originPlace
+				, const std::string& destinationCity
+				, const std::string& destinationPlace
+				, const transportwebsite::HourPeriod* period
+				, const server::Request* request = NULL
+			) const;
 		};
 	}
 }

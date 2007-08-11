@@ -34,11 +34,14 @@
 
 #include "11_interfaces/Interface.h"
 
+#include "07_lex_matcher/LexicalMatcher.h"
+
 #include "04_time/TimeParseException.h"
 
 #include "01_util/Conversion.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -47,18 +50,15 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace interfaces;
+	using namespace lexmatcher;
 
 	namespace routeplanner
 	{
-		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_ID = "dp";
-		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_ID = "ap";
 		const string RoutePlannerFunction::PARAMETER_DATE = "da";
 		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER("msn");
 		const string RoutePlannerFunction::PARAMETER_DAY("dy");
 		const string RoutePlannerFunction::PARAMETER_PERIOD_ID("pi");
 
-		const string RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_ID("dci");
-		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_ID("aci");
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_TEXT("dct");
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT("act");
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT("dpt");
@@ -85,20 +85,64 @@ namespace synthese
 			_accessParameters.complyer.setReservationRule(resa);
 
 			// Departure place
-			it = map.find(PARAMETER_DEPARTURE_PLACE_ID);
-			if (it == map.end())
-				throw RequestException("Departure place not specified");
-			_departure_place = EnvModule::fetchPlace(Conversion::ToLongLong(it->second));
-			if (!_departure_place.get())
-				throw RequestException("Specified departure place not found");
+			it = map.find(PARAMETER_DEPARTURE_CITY_TEXT);
+			if (it != map.end())
+			{
+				shared_ptr<const City> city;
+				_originCityText = it->second;
+				CityList cityList = EnvModule::guessCity(_originCityText, 1);
+				if (!cityList.empty())
+				{
+					city = cityList.front();
+					_departure_place = city.get();
+				}
+
+				it = map.find(PARAMETER_DEPARTURE_PLACE_TEXT);
+				if (it != map.end())
+				{
+					_originPlaceText = it->second;
+					if (city.get() && !_originPlaceText.empty())
+					{
+						LexicalMatcher<const ConnectionPlace*>::MatchResult places = city->getConnectionPlacesMatcher().bestMatches(_originPlaceText, 1);
+						if (!places.empty())
+						{
+							_departure_place = places.front().value;
+						}
+					}
+				}
+			}
+			else
+				_home = true;
 
 			// Arrival place
-			it = map.find(PARAMETER_ARRIVAL_PLACE_ID);
-			if (it == map.end())
-				throw RequestException("Arrival place not specified");
-			_arrival_place = EnvModule::fetchPlace(Conversion::ToLongLong(it->second));
-			if (!_arrival_place.get())
-				throw RequestException("Specified arrival place not found");
+			it = map.find(PARAMETER_ARRIVAL_CITY_TEXT);
+			if (it != map.end())
+			{
+				_destinationCityText = it->second;
+				shared_ptr<const City> city;
+				CityList cityList = EnvModule::guessCity(_destinationCityText, 1);
+				if (!cityList.empty())
+				{
+					city = cityList.front();
+					_arrival_place = city.get();
+				}
+
+				it = map.find(PARAMETER_ARRIVAL_PLACE_TEXT);
+				if (it != map.end())
+				{
+					_destinationPlaceText = it->second;
+					if (city.get() && !_destinationPlaceText.empty())
+					{
+						LexicalMatcher<const ConnectionPlace*>::MatchResult places = city->getConnectionPlacesMatcher().bestMatches(_destinationPlaceText, 1);
+						if (!places.empty())
+						{
+							_arrival_place = places.front().value;
+						}
+					}
+				}
+			}
+			else
+				_home = true;
 
 			// Day
 			it = map.find(PARAMETER_DAY);
@@ -152,29 +196,48 @@ namespace synthese
 
 		void RoutePlannerFunction::_run( ostream& stream ) const
 		{
-			RoutePlanner r(
-				_departure_place.get()
-				, _arrival_place.get()
-				, _accessParameters
-				, PlanningOrder()
-				, _startDate
-				, _endDate
-				, _maxSolutionsNumber
-			);
-			const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
 			VariablesMap vm;
-			_page->display(
-				stream
-				, vm
-				, jv.journeys
-				, _startDate.getDate()
-				, _periodId
-				, _departure_place.get()
-				, _arrival_place.get()
-				, _period
-				, _request
-			);
+			if (_departure_place && _arrival_place)
+			{
+				RoutePlanner r(
+					_departure_place
+					, _arrival_place
+					, _accessParameters
+					, PlanningOrder()
+					, _startDate
+					, _endDate
+					, _maxSolutionsNumber
+					);
+				const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
+				_page->display(
+					stream
+					, vm
+					, jv.journeys
+					, _startDate.getDate()
+					, _periodId
+					, _departure_place
+					, _arrival_place
+					, _period
+					, _request
+					);
+			}
+			else
+			{
+				_page->display(
+					stream
+					, vm
+					, _startDate.getDate()
+					, _periodId
+					, _home
+					, _originCityText
+					, _originPlaceText
+					, _destinationCityText
+					, _destinationPlaceText
+					, _period
+					, _request
+					);
 
+			}
 		}
 
 		RoutePlannerFunction::RoutePlannerFunction()
@@ -183,6 +246,9 @@ namespace synthese
 			, _endDate(TIME_UNKNOWN)
 			, _periodId(UNKNOWN_VALUE)
 			, _period(NULL)
+			, _departure_place(NULL)
+			, _arrival_place(NULL)
+			, _home(false)
 		{
 
 		}
