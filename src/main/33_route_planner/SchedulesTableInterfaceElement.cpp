@@ -90,7 +90,22 @@ namespace synthese
 						const ServiceUse& curET(*itl);
 						DateTime lastDateTime(curET.getDepartureDateTime());
 						lastDateTime += (*it)->getContinuousServiceRange();
-												
+
+						for (; placesList[ __Ligne ].place != curET.getDepartureEdge()->getFromVertex ()->getConnectionPlace(); ++__Ligne)
+							columnInterfacePage->display(
+								*(placesList[__Ligne].content)
+								, __Ligne==0
+								, (itl + 1) == jl.end()
+								, i
+								, false
+								, unknownTime
+								, unknownTime
+								, false
+								, true
+								, true
+								, request
+							);
+
 						// Saving of the columns on each lines
 						columnInterfacePage->display(
 							*(placesList[__Ligne].content)
