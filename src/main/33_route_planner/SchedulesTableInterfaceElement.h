@@ -51,7 +51,6 @@ namespace synthese
 				const env::ConnectionPlace* place;
 				bool isOrigin;
 				bool isDestination;
-				bool isLocked;
 				std::ostringstream* content;
 			};
 			typedef std::vector<PlaceInformation> PlaceList;
@@ -73,6 +72,8 @@ namespace synthese
 				PlaceList&
 				, const env::ConnectionPlace*
 				, int Position
+				, bool isLockedAtTheTop
+				, bool isLockedAtTheEnd
 			);
 			
 			/** Contrôle de la compatibilité entre l'ordre des arrêts dans la grille horaire et les arrêts du trajet. */

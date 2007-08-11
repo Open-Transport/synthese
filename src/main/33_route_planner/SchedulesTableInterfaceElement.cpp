@@ -282,6 +282,8 @@ namespace synthese
 			return string();
 		}
 
+
+
 		int SchedulesTableInterfaceElement::OrdrePAEchangeSiPossible(
 			const JourneyBoardJourneys& jv
 			, PlaceList& pl
@@ -356,24 +358,31 @@ namespace synthese
 				return PositionGareSouhaitee + j;
 			}
 			else
-				return OrdrePAInsere( pl, pl[ PositionGareSouhaitee ].place, PositionActuelle + 1);
+				return OrdrePAInsere( pl, pl[ PositionGareSouhaitee ].place, PositionActuelle + 1, false, false);
 		}
+
+
 
 		int SchedulesTableInterfaceElement::OrdrePAInsere(
 			PlaceList& pl
 			, const ConnectionPlace* place
 			, int position
+			, bool lockedAtTheTop
+			, bool lockedAtTheEnd
 		){
-			// Saut de ligne vérouillée par un cheminement piéton
-			for (; position < pl.size() && pl[position].isLocked; ++position);
+			if (lockedAtTheEnd)
+				position = pl.size();
+			else if (lockedAtTheTop)
+				position = 0;
+			else
+				for (; pl[position].isOrigin; ++position);
 
 			// Insertion
 			PlaceInformation pi;
 			pi.content = new ostringstream;
-			pi.isOrigin = false;
-			pi.isDestination = false;
+			pi.isOrigin = lockedAtTheTop;
+			pi.isDestination = lockedAtTheEnd;
 			pi.place = place;
-			pi.isLocked = false;
 
 			pl.insert(pl.begin() + position, pi);
 
@@ -721,9 +730,8 @@ namespace synthese
 					}
 					else
 					{
-						i = OrdrePAInsere( pl, curET.getDepartureEdge()->getConnectionPlace(), dernieri + 1);
+						i = OrdrePAInsere( pl, curET.getDepartureEdge()->getConnectionPlace(), dernieri + 1, itl == jl.begin(), false);
 					}
-					pl[i].isOrigin = (itl == jl.begin());
 
 					dernieri = i;
 					++i;
@@ -735,10 +743,9 @@ namespace synthese
 					}
 					else
 					{
-						i = OrdrePAInsere( pl, curET.getArrivalEdge()->getConnectionPlace(), dernieri + 1);
+						i = OrdrePAInsere( pl, curET.getArrivalEdge()->getConnectionPlace(), dernieri + 1, false, itl == jl.end()-1);
 					}
 					dernieri = i;
-					pl[i].isDestination = (itl == jl.end() - 1);
 
 					//						lll.insert( lll.begin() + i, true );
 				
