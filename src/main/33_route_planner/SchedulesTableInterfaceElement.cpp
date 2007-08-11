@@ -375,7 +375,7 @@ namespace synthese
 			else if (lockedAtTheTop)
 				position = 0;
 			else
-				for (; pl[position].isOrigin; ++position);
+				for (; position < pl.size() && pl[position].isOrigin; ++position);
 
 			// Insertion
 			PlaceInformation pi;
