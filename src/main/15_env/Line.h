@@ -136,6 +136,7 @@ namespace synthese
 			//@{
 				bool isRoad () const;
 				bool isLine () const;
+				bool isPedestrianMode() const;
 
 				bool isReservable () const;
 

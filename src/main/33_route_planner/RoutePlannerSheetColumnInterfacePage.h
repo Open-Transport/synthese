@@ -41,6 +41,7 @@ namespace synthese
 				- 6 : isItContinuousService
 				- 7 : isFirstWriting
 				- 8 : isLastWriting
+				- 9 : is it first foot
 
 		*/
 		class RoutePlannerSheetColumnInterfacePage : public interfaces::InterfacePage
@@ -70,6 +71,7 @@ namespace synthese
 				, bool isItContinuousService
 				, bool isFirstWriting
 				, bool isLastWriting
+				, bool isFirstFoot
 				, const server::Request* request = NULL
 			) const;
 		};

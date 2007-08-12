@@ -73,7 +73,9 @@ namespace synthese
 				Hour unknownTime( TIME_UNKNOWN );
 				shared_ptr<const RoutePlannerSheetColumnInterfacePage> columnInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>());
 				shared_ptr<const RoutePlannerSheetLineInterfacePage> lineInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>());
-
+				bool pedestrianMode = false;
+				bool lastPedestrianMode = false;
+				
 				// Cells
 				
 				// Loop on each journey
@@ -88,70 +90,87 @@ namespace synthese
 					for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 					{
 						const ServiceUse& curET(*itl);
-						DateTime lastDateTime(curET.getDepartureDateTime());
-						lastDateTime += (*it)->getContinuousServiceRange();
 
-						for (; placesList[ __Ligne ].place != curET.getDepartureEdge()->getFromVertex ()->getConnectionPlace(); ++__Ligne)
+						if (itl == jl.begin() || !curET.getEdge()->getParentPath()->isPedestrianMode())
+						{
+							DateTime lastDateTime(curET.getDepartureDateTime());
+							lastDateTime += (*it)->getContinuousServiceRange();
+
+							for (; placesList[ __Ligne ].place != curET.getDepartureEdge()->getFromVertex ()->getConnectionPlace(); ++__Ligne)
+								columnInterfacePage->display(
+									*(placesList[__Ligne].content)
+									, __Ligne==0
+									, (itl + 1) == jl.end()
+									, i
+									, pedestrianMode
+									, unknownTime
+									, unknownTime
+									, false
+									, true
+									, true
+									, false
+									, request
+								);
+
+							pedestrianMode = curET.getEdge()->getParentPath()->isPedestrianMode();
+							
+							// Saving of the columns on each lines
 							columnInterfacePage->display(
 								*(placesList[__Ligne].content)
-								, __Ligne==0
+								, __Ligne == 0
+								, true
+								, i
+								, pedestrianMode
+								, curET.getDepartureDateTime().getHour()
+								, lastDateTime.getHour()
+								, (*it)->getContinuousServiceRange() > 0
+								, itl == jl.begin()
+								, true
+								, pedestrianMode && !lastPedestrianMode
+								, request
+							);
+							++__Ligne;
+							lastPedestrianMode = pedestrianMode;
+						}
+						
+						if(	itl == jl.end()-1
+						||	!(itl+1)->getEdge()->getParentPath()->isPedestrianMode()
+						||	!curET.getEdge()->getParentPath()->isPedestrianMode()
+						){
+							for (; placesList[ __Ligne ].place != curET.getArrivalEdge()->getFromVertex ()->getConnectionPlace(); __Ligne++ )
+								columnInterfacePage->display(
+									*(placesList[__Ligne].content)
+									, true
+									, true
+									, i
+									, pedestrianMode
+									, unknownTime
+									, unknownTime
+									, false
+									, true
+									, true
+									, false
+									, request
+								);
+							
+							DateTime lastDateTime(curET.getArrivalDateTime());
+							lastDateTime += (*it)->getContinuousServiceRange();
+
+							columnInterfacePage->display(
+								*(placesList[__Ligne].content)
+								, true
 								, (itl + 1) == jl.end()
 								, i
-								, false
-								, unknownTime
-								, unknownTime
-								, false
+								, pedestrianMode
+								, curET.getArrivalDateTime().getHour ()
+								, lastDateTime.getHour()
+								, (*it)->getContinuousServiceRange() > 0
 								, true
-								, true
+								, (itl + 1) == jl.end()
+								, false
 								, request
 							);
-
-						// Saving of the columns on each lines
-						columnInterfacePage->display(
-							*(placesList[__Ligne].content)
-							, __Ligne == 0
-							, true
-							, i
-							, dynamic_cast<const Road*> (curET.getService()->getPath ()) != NULL
-							, curET.getDepartureDateTime().getHour()
-							, lastDateTime.getHour()
-							, (*it)->getContinuousServiceRange() > 0
-							, itl == jl.begin()
-							, true
-							, request
-						);
-						
-						for ( __Ligne++; placesList[ __Ligne ].place != curET.getArrivalEdge()->getFromVertex ()->getConnectionPlace(); __Ligne++ )
-							columnInterfacePage->display(
-								*(placesList[__Ligne].content)
-								, true
-								, true
-								, i
-								, false
-								, unknownTime
-								, unknownTime
-								, false
-								, true
-								, true
-								, request
-							);
-						
-						lastDateTime = curET.getArrivalDateTime();
-						lastDateTime += (*it)->getContinuousServiceRange();
-
-						columnInterfacePage->display(
-							*(placesList[__Ligne].content)
-							, true
-							, (itl + 1) == jl.end()
-							, i
-							, dynamic_cast<const Road*> (curET.getService()->getPath()) != NULL
-							, curET.getArrivalDateTime().getHour ()
-							, lastDateTime.getHour()
-							, (*it)->getContinuousServiceRange() > 0
-							, true
-							, (itl + 1) == jl.end()
-							, request
-						);
+						}
 					}
 
 					for (++__Ligne; __Ligne < placesList.size(); ++__Ligne)
@@ -166,6 +185,7 @@ namespace synthese
 							, false
 							, true
 							, true
+							, false
 							, request
 						);
 				}
@@ -723,32 +743,35 @@ namespace synthese
 					const ServiceUse& curET(*itl);
 					
 					// Search of the place from the preceding one
-					if ( OrdrePARechercheGare( pl, i, curET.getDepartureEdge()->getConnectionPlace() ) )
+					if (itl == jl.begin() || !curET.getEdge()->getParentPath()->isPedestrianMode())
 					{
-						if ( i < dernieri )
-							i = OrdrePAEchangeSiPossible( jv, pl, dernieri, i );
-					}
-					else
-					{
-						i = OrdrePAInsere( pl, curET.getDepartureEdge()->getConnectionPlace(), dernieri + 1, itl == jl.begin(), false);
+						if ( OrdrePARechercheGare( pl, i, curET.getDepartureEdge()->getConnectionPlace() ) )
+						{
+							if ( i < dernieri )
+								i = OrdrePAEchangeSiPossible( jv, pl, dernieri, i );
+						}
+						else
+						{
+							i = OrdrePAInsere( pl, curET.getDepartureEdge()->getConnectionPlace(), dernieri + 1, itl == jl.begin(), false);
+						}
+
+						dernieri = i;
+						++i;
 					}
 
-					dernieri = i;
-					++i;
-
-					if ( OrdrePARechercheGare( pl, i, curET.getArrivalEdge()->getConnectionPlace() ) )
+					if (itl == jl.end()-1 || !curET.getEdge()->getParentPath()->isPedestrianMode())
 					{
-						if ( i < dernieri )
-							i=OrdrePAEchangeSiPossible(jv, pl, dernieri, i );
+						if ( OrdrePARechercheGare( pl, i, curET.getArrivalEdge()->getConnectionPlace() ) )
+						{
+							if ( i < dernieri )
+								i=OrdrePAEchangeSiPossible(jv, pl, dernieri, i );
+						}
+						else
+						{
+							i = OrdrePAInsere( pl, curET.getArrivalEdge()->getConnectionPlace(), dernieri + 1, false, itl == jl.end()-1);
+						}
+						dernieri = i;
 					}
-					else
-					{
-						i = OrdrePAInsere( pl, curET.getArrivalEdge()->getConnectionPlace(), dernieri + 1, false, itl == jl.end()-1);
-					}
-					dernieri = i;
-
-					//						lll.insert( lll.begin() + i, true );
-				
 				}
 			}
 

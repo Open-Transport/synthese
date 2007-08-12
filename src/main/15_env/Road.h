@@ -103,6 +103,7 @@ namespace synthese
 
 		  bool isRoad () const;
 		  bool isLine () const;
+		  virtual bool isPedestrianMode() const;
 		  
 		  /** Find closest address of this road, before a given metric offset.
 			  @param metricOffset The reference point.

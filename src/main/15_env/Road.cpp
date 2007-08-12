@@ -148,6 +148,10 @@ namespace synthese
 			return synthese::util::Registrable<uid,Road>::getKey();
 		}
 
+		bool Road::isPedestrianMode() const
+		{
+			return true;
+		}
 
 
 

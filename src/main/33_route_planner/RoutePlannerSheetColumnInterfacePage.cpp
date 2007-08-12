@@ -44,6 +44,7 @@ namespace synthese
 			, bool isItContinuousService
 			, bool isFirstWriting
 			, bool isLastWriting
+			, bool isFirstFoot
 			, const server::Request* request /*= NULL */
 		) const	{
 			ParametersVector pv;
@@ -56,6 +57,7 @@ namespace synthese
 			pv.push_back( Conversion::ToString( isItContinuousService ) );
 			pv.push_back( Conversion::ToString( isFirstWriting ) );
 			pv.push_back( Conversion::ToString( isLastWriting ) );
+			pv.push_back( Conversion::ToString( isFirstFoot ) );
 
 			VariablesMap vm;
 			InterfacePage::display( stream, pv, vm, NULL, request );

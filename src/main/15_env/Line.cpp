@@ -269,5 +269,10 @@ namespace synthese
 		{
 			return _commercialLine;
 		}
+
+		bool Line::isPedestrianMode() const
+		{
+			return getWalkingLine();
+		}
 	}
 }
