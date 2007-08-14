@@ -220,6 +220,14 @@
 					RelativePath=".\RequestErrorMessageInterfaceElement.h"
 					>
 				</File>
+				<File
+					RelativePath=".\ValidSessionInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ValidSessionInterfaceElement.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<File

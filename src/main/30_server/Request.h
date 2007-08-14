@@ -223,6 +223,7 @@ namespace synthese
 
 				*/
 				bool getActionException() const;
+				const Session*		getSession()		const;
 
 				const std::string&	getClientURL()		const;
 				const std::string&	getIP()				const;

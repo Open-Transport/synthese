@@ -6,4 +6,4 @@
 #include "30_server/HtmlFormInterfaceElement.h"
 #include "30_server/RequestErrorMessageInterfaceElement.h"
 #include "30_server/LogoutHTMLLinkInterfaceElement.h"
-
+#include "30_server/ValidSessionInterfaceElement.h"

@@ -10,3 +10,4 @@ synthese::server::LogoutHTMLLinkInterfaceElement::integrate();
 synthese::server::LoginHtmlField::integrate();
 synthese::server::PasswordHtmlField::integrate();
 synthese::server::RequestErrorMessageInterfaceElement::integrate();
+synthese::server::ValidSessionInterfaceElement::integrate();

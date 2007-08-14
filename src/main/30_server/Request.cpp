@@ -296,8 +296,7 @@ namespace synthese
 			}
 
 			// Session
-			if (_session != NULL)
-				map.insert(make_pair(PARAMETER_SESSION, _session->getKey()));
+			map.insert(make_pair(PARAMETER_SESSION, _session ? _session->getKey() : string()));
 
 			// Object ID
 			if (_object_id)
@@ -485,6 +484,11 @@ namespace synthese
 		{
 			return (!_action.get() || _action->_isAuthorized())
 				&& (!_function.get() || _function->_isAuthorized());
+		}
+
+		const Session* Request::getSession() const
+		{
+			return _session;
 		}
 	}
 }
