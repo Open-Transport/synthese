@@ -44,21 +44,28 @@ namespace synthese
 
 	namespace interfaces
 	{
-
 		const std::string RequestWithInterface::PARAMETER_INTERFACE = "i";
+		const std::string RequestWithInterface::PARAMETER_NO_REDIRECT_AFTER_ACTION = "nr";
+
+		RequestWithInterface::RequestWithInterface()
+			: Function()
+			, _redirectAfterAction(true)
+		{
+
+		}
 
 		/** @todo to be moved elsewhere because the interface is not necessarily an html interface */
 		bool RequestWithInterface::_runAfterSucceededAction(ostream& stream)
 		{
-			if (_interface != NULL)
+			if (_redirectAfterAction && _interface)
 			{
 				shared_ptr<const RedirectInterfacePage> page = _interface->getPage<RedirectInterfacePage>();
 				_request->deleteAction();
 				VariablesMap vm;
 				page->display(stream, vm, _request);
+				return true;
 			}
-
-			return true;
+			return _interface == NULL;
 		}
 
 		void RequestWithInterface::_setFromParametersMap( const ParametersMap& map )
@@ -71,6 +78,10 @@ namespace synthese
 				{
 					_interface = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(it->second));
 				}
+
+				it = map.find(PARAMETER_NO_REDIRECT_AFTER_ACTION);
+				if (it != map.end())
+					_redirectAfterAction = !Conversion::ToBool(it->second);
 			}
 			catch (Interface::RegistryKeyException& e)
 			{

@@ -38,9 +38,11 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_INTERFACE;
+			static const std::string PARAMETER_NO_REDIRECT_AFTER_ACTION;
 
 		protected:
 			boost::shared_ptr<const Interface>	_interface;
+			bool								_redirectAfterAction;
 
 			/** Conversion from generic parameters map to attributes.
 			*/
@@ -65,6 +67,8 @@ namespace synthese
 				@date 2007				
 			*/
 			boost::shared_ptr<const Interface> getInterface() const;
+
+			RequestWithInterface();
 		};
 	}
 }
