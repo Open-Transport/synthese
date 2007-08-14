@@ -39,6 +39,16 @@ namespace synthese
 		/** Journey board cell for stop at a place.
 			@code journey_board_stop_cell @endcode
 			@ingroup m33Pages refPages
+
+			Parameters
+				- 0 isItArrival : true if the stop is used as an arrival, false else
+				- 1 : Alert message
+				- 2 : Alert level
+				- 3 isItTerminus : true if the stop is the terminus of the used line, false else
+				- 4 : Stop name
+				- 5 Odd or even color
+				- 6 Fist time
+				- 7 Last time (empty if continuous service)
 		*/
 		class JourneyBoardStopCellInterfacePage : public interfaces::InterfacePage
 		{

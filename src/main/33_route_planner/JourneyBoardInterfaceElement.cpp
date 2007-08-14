@@ -33,8 +33,6 @@
 #include "15_env/Vertex.h"
 #include "15_env/ConnectionPlace.h"
 #include "15_env/Road.h"
-#include "15_env/HandicappedCompliance.h"
-#include "15_env/BikeCompliance.h"
 #include "15_env/ReservationRule.h"
 #include "15_env/ServiceUse.h"
 #include "15_env/Journey.h"
@@ -43,6 +41,7 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/InterfacePageException.h"
 
 #include "04_time/module.h"
 
@@ -68,7 +67,6 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-//		    const server::Site* site = request->getSite ();
 			// Parameters
 			const Journey* journey = static_cast<const Journey*>(object);
 			int __FiltreHandicape = (Conversion::ToInt(_handicappedFilter->getValue(parameters, variables, object, request)) > 1);
@@ -157,7 +155,9 @@ namespace synthese
 						*/
 					}
 
-					serviceCellInterfacePage->display( stream 
+					serviceCellInterfacePage->display(
+						stream 
+						, leg
 						, leg.getDepartureDateTime().getHour()
 						, lastDepartureTime.getHour()
 						, leg.getArrivalDateTime().getHour()
@@ -167,9 +167,7 @@ namespace synthese
 						, "la ligne" /// @todo implement __ET->getLigne()->LibelleComplet(LibelleCompletMatosHTML);
 						, "destination" /// @todo implement __ET->getLigne()->LibelleDestination(DestinationHTML);
 						, __FiltreHandicape
-						, leg.getService()->getHandicappedCompliance ()->getCapacity ()
 						, __FiltreVelo
-						, leg.getService()->getBikeCompliance ()->getCapacity ()
 						, openedCompulsoryReservation
 						, openedOptionalReservation
 						, openedReservation ? reservationRule->getReservationDeadLine (leg.getOriginDateTime(), leg.getDepartureDateTime() ) : unknownDateTime
@@ -177,8 +175,8 @@ namespace synthese
 						, openedReservation ? syntheseOnlineBookingURL : ""
 						, NULL // leg->getService ()->getPath ()->hasApplicableAlarm ( debutLigne, finLigne ) ? __ET->getService()->getPath ()->getAlarm() : NULL
 						, __Couleur
-						, leg.getService()->getPath ()
-						, request );
+						, request
+					);
 					
 					__Couleur = !__Couleur;
 
@@ -236,6 +234,8 @@ namespace synthese
 
 		void JourneyBoardInterfaceElement::storeParameters( interfaces::ValueElementList& vel )
 		{
+			if (vel.size() != 2)
+				throw InterfacePageException("Insufficient parameters number");
 			_handicappedFilter = vel.front();
 			_bikeFilter = vel.front();
 		}

@@ -137,6 +137,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\JourneyBoardsInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\JourneyBoardsInterfaceElement.h"
+					>
+				</File>
+				<File
 					RelativePath=".\JourneyLineListInterfaceElement.cpp"
 					>
 				</File>
@@ -204,6 +212,14 @@
 			<Filter
 				Name="InterfacePage"
 				>
+				<File
+					RelativePath=".\JourneyBoardInterfacePage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\JourneyBoardInterfacePage.h"
+					>
+				</File>
 				<File
 					RelativePath=".\JourneyBoardJunctionCellInterfacePage.cpp"
 					>

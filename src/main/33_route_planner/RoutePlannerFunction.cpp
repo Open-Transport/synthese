@@ -58,7 +58,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER("msn");
 		const string RoutePlannerFunction::PARAMETER_DAY("dy");
 		const string RoutePlannerFunction::PARAMETER_PERIOD_ID("pi");
-
+		const string RoutePlannerFunction::PARAMETER_ACCESSIBILITY("ac");
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_TEXT("dct");
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT("act");
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT("dpt");
@@ -78,11 +78,6 @@ namespace synthese
 
 			_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
 			_accessParameters = _site->getDefaultAccessParameters();
-
-			// Temporary
-			ReservationRule* resa(new ReservationRule);
-			resa->setCompliant(boost::logic::indeterminate);
-			_accessParameters.complyer.setReservationRule(resa);
 
 			// Departure place
 			it = map.find(PARAMETER_DEPARTURE_CITY_TEXT);
@@ -192,6 +187,41 @@ namespace synthese
 				_maxSolutionsNumber = Conversion::ToInt(it->second);
 			if (_maxSolutionsNumber < 0)
 				throw RequestException("Bad max solutions number");
+
+			// Accessibility
+			it = map.find(PARAMETER_ACCESSIBILITY);
+			if (it != map.end())
+			{
+				switch(static_cast<Accessibility>(Conversion::ToInt(it->second)))
+				{
+					case HANDICCAPED_ACCESSIBILITY:
+						{
+							HandicappedCompliance* hc(new HandicappedCompliance);
+							hc->setCompliant(true);
+							_accessParameters.complyer.setHandicappedCompliance(hc);
+							BikeCompliance* bc(new BikeCompliance);
+							bc->setCompliant(false);
+							_accessParameters.complyer.setBikeCompliance(bc);
+							break;
+						}
+
+					case BIKE_ACCESSIBILITY:
+						{
+							HandicappedCompliance* hc(new HandicappedCompliance);
+							hc->setCompliant(false);
+							_accessParameters.complyer.setHandicappedCompliance(hc);
+							BikeCompliance* bc(new BikeCompliance);
+							bc->setCompliant(true);
+							_accessParameters.complyer.setBikeCompliance(bc);
+							break;
+						}
+				}
+			}
+			// Temporary
+			ReservationRule* resa(new ReservationRule);
+			resa->setCompliant(boost::logic::indeterminate);
+			_accessParameters.complyer.setReservationRule(resa);
+
 		}
 
 		void RoutePlannerFunction::_run( ostream& stream ) const
@@ -218,6 +248,7 @@ namespace synthese
 					, _departure_place
 					, _arrival_place
 					, _period
+					, _accessParameters
 					, _request
 					);
 			}
@@ -234,6 +265,7 @@ namespace synthese
 					, _destinationCityText
 					, _destinationPlaceText
 					, _period
+					, _accessParameters
 					, _request
 					);
 

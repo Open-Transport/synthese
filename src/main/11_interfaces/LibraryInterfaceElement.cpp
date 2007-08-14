@@ -26,7 +26,10 @@
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePageException.h"
 
-using boost::shared_ptr;
+#include <sstream>
+
+using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -70,6 +73,23 @@ namespace synthese
 		{
 			ValueElementList vai(text, _page);
 			storeParameters(vai);
+		}
+
+		const string LibraryInterfaceElement::getValue(
+			const interfaces::ParametersVector& parameters
+			, interfaces::VariablesMap& variables
+			, const void* object /*= NULL */
+			, const server::Request* request /*= NULL  */
+		) const	{
+			stringstream s;
+			display(s, parameters, variables, object, request);
+			return s.str();
+		}
+
+		bool LibraryInterfaceElement::isZero( const ParametersVector& pv, interfaces::VariablesMap& variables , const void* object /*= NULL */, const server::Request* request /*= NULL  */ ) const
+		{
+			string value(getValue(pv, variables, object, request));
+			return value.empty() || Conversion::ToLongLong(value) == 0;
 		}
 	}
 }

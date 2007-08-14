@@ -51,6 +51,12 @@ namespace synthese
 		class RoutePlannerFunction : public transportwebsite::FunctionWithSite
 		{
 		public:
+			typedef enum
+			{
+				HANDICCAPED_ACCESSIBILITY = 1
+				, BIKE_ACCESSIBILITY = 2
+			} Accessibility;
+
 			static const std::string PARAMETER_SITE;
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_DAY;
@@ -60,6 +66,7 @@ namespace synthese
 			static const std::string PARAMETER_ARRIVAL_CITY_TEXT;
 			static const std::string PARAMETER_DEPARTURE_PLACE_TEXT;
 			static const std::string PARAMETER_ARRIVAL_PLACE_TEXT;
+			static const std::string PARAMETER_ACCESSIBILITY;
 			
 		private:
 			//! \name Parameters

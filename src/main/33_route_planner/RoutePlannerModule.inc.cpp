@@ -18,3 +18,5 @@
 #include "33_route_planner/TextInputInterfaceElemet.h"
 #include "33_route_planner/RequestInterfaceElement.h"
 #include "33_route_planner/PeriodsListInterfaceElement.h"
+#include "33_route_planner/JourneyBoardsInterfaceElement.h"
+#include "33_route_planner/JourneyBoardInterfacePage.h"

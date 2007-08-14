@@ -81,28 +81,5 @@ namespace synthese
 		};
 	}
 }
+
 #endif // SYNTHESE_ValueInterfaceElement_H__
-
-/** @todo implement and register this
-case EI_ATTRIBUT_Ligne_LibelleSimple:
-return ( ( const Line* ) __Objet ) ->getShortName ();
-
-case EI_ATTRIBUT_Ligne_Image:
-return ( ( const Line* ) __Objet ) ->getImage();
-
-case EI_ATTRIBUT_Ligne_LibelleComplet:
-return ( ( const Line* ) __Objet ) ->getLongName ();
-
-case EI_ATTRIBUT_Ligne_Style:
-return ( ( const Line* ) __Objet ) ->getStyle();
-
-case EI_ATTRIBUT_Ligne_ArticleMateriel:
-return ( ( const Line* ) __Objet ) ->getLongName ();
-// MJ TODO return ( ( const Line* ) __Objet ) ->Materiel() ->getArticle();
-
-case EI_ATTRIBUT_Ligne_LibelleMateriel:
-return ( ( const Line* ) __Objet ) ->getLongName ();
-// MJ TODO return ( ( const Line* ) __Objet ) ->Materiel() ->getLibelleSimple();
-*/
-
-

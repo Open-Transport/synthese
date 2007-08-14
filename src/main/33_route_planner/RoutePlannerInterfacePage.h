@@ -25,6 +25,8 @@
 
 #include "33_route_planner/Types.h"
 
+#include "15_env/Types.h"
+
 #include "11_interfaces/InterfacePage.h"
 
 namespace synthese
@@ -59,17 +61,16 @@ namespace synthese
 				- 0 : date (internal format)
 				- 1 : home display
 				- 2 : origin city text
-				- 3 : origin place id
+				- 3 : handicapped filter
 				- 4 : origin place text
-				- 5 : destination city id
+				- 5 : bike filter
 				- 6 : destination city text
 				- 7 : destination place id
 				- 8 : destination place text
 				- 9 : period (id)
 				- 10 : date (text format)
 				- 11 : period (text format)
-				- 12 : solutions number
-			
+				- 12 : solutions number			
 		*/
 		class RoutePlannerInterfacePage : public interfaces::InterfacePage
 		{
@@ -87,6 +88,7 @@ namespace synthese
 				, const env::Place* originPlace
 				, const env::Place* destinationPlace
 				, const transportwebsite::HourPeriod* period
+				, const AccessParameters& accessParameters
 				, const server::Request* request = NULL
 			) const;
 
@@ -101,6 +103,7 @@ namespace synthese
 				, const std::string& destinationCity
 				, const std::string& destinationPlace
 				, const transportwebsite::HourPeriod* period
+				, const AccessParameters& accessParameters
 				, const server::Request* request = NULL
 			) const;
 		};

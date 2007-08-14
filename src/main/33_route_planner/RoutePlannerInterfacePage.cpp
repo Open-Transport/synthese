@@ -26,6 +26,8 @@
 
 #include "15_env/City.h"
 #include "15_env/Place.h"
+#include "15_env/HandicappedCompliance.h"
+#include "15_env/BikeCompliance.h"
 
 #include "11_interfaces/DateTimeInterfacePage.h"
 #include "11_interfaces/Interface.h"
@@ -58,6 +60,7 @@ namespace synthese
 			, const env::Place* originPlace
 			, const env::Place* destinationPlace
 			, const HourPeriod* period
+			, const AccessParameters& accessParameters
 			, const server::Request* request /*= NULL*/
 			) const
 		{
@@ -86,9 +89,9 @@ namespace synthese
 			pv.push_back(date.toInternalString());
 			pv.push_back("0");
 			pv.push_back(originCity->getName());
-			pv.push_back(Conversion::ToString(originPlace->getId()));
+			pv.push_back(Conversion::ToString(accessParameters.complyer.getHandicappedCompliance()->isCompliant()));
 			pv.push_back(originPlaceName);
-			pv.push_back(Conversion::ToString(destinationCity->getKey()));
+			pv.push_back(Conversion::ToString(accessParameters.complyer.getBikeCompliance()->isCompliant()));
 			pv.push_back(destinationCity->getName());
 			pv.push_back(Conversion::ToString(destinationPlace->getId()));
 			pv.push_back(destinationPlaceName);
@@ -100,8 +103,10 @@ namespace synthese
 			InterfacePage::display(stream, pv, variables, vobj, request);
 		}
 
-		void RoutePlannerInterfacePage::display( std::ostream& stream , interfaces::VariablesMap& variables , const time::Date& date , int periodId , bool home, const std::string& originCity , const std::string& originPlace , const std::string& destinationCity , const std::string& destinationPlace , const transportwebsite::HourPeriod* period , const server::Request* request /*= NULL  */ ) const
-		{
+		void RoutePlannerInterfacePage::display( std::ostream& stream , interfaces::VariablesMap& variables , const time::Date& date , int periodId , bool home, const std::string& originCity , const std::string& originPlace , const std::string& destinationCity , const std::string& destinationPlace , const transportwebsite::HourPeriod* period 
+			, const AccessParameters& accessParameters
+			, const server::Request* request /*= NULL  */
+		) const	{
 			// Text formatted date
 			shared_ptr<const DateTimeInterfacePage> datePage(getInterface()->getPage<DateTimeInterfacePage>());
 			stringstream sDate;
@@ -111,9 +116,9 @@ namespace synthese
 			pv.push_back(date.toInternalString());
 			pv.push_back(Conversion::ToString(home));
 			pv.push_back(originCity);
-			pv.push_back(string());
+			pv.push_back(Conversion::ToString(accessParameters.complyer.getHandicappedCompliance()->isCompliant()));
 			pv.push_back(originPlace);
-			pv.push_back(string());
+			pv.push_back(Conversion::ToString(accessParameters.complyer.getBikeCompliance()->isCompliant()));
 			pv.push_back(destinationCity);
 			pv.push_back(string());
 			pv.push_back(destinationPlace);

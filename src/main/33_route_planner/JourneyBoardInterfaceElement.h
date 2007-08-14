@@ -42,6 +42,10 @@ namespace synthese
 	{
 		/** Journey board Library Interface Element Class.
 			@ingroup m33Library refLibrary
+
+			Parameters :
+			 - 0 : Handicapped filter
+			 - 1 : Bike filter
 		*/
 		class JourneyBoardInterfaceElement : public interfaces::LibraryInterfaceElement
 		{

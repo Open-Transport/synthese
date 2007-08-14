@@ -28,6 +28,8 @@
 #include "11_interfaces/CommentInterfaceElement.h"
 #include "11_interfaces/InterfacePageException.h"
 
+#include <sstream>
+
 using namespace std;
 using namespace boost;
 
@@ -119,6 +121,13 @@ namespace synthese
 		InterfacePage::InterfacePage()
 		{
 
+		}
+
+		string InterfacePage::getValue( const ParametersVector& parameters , VariablesMap& variables , const void* object /*= NULL */, const server::Request* request /*= NULL  */ ) const
+		{
+			stringstream s;
+			display(s, parameters, variables, object, request);
+			return s.str();
 		}
 	}
 }

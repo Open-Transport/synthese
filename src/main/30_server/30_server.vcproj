@@ -175,48 +175,56 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Value Interface Elements"
+			Name="Interface"
 			>
-			<File
-				RelativePath=".\HtmlFormInterfaceElement.cpp"
+			<Filter
+				Name="Value Interface Elements"
 				>
-			</File>
-			<File
-				RelativePath=".\HtmlFormInterfaceElement.h"
+				<File
+					RelativePath=".\HtmlFormInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\HtmlFormInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\LoginHtmlField.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\LoginHtmlField.h"
+					>
+				</File>
+				<File
+					RelativePath=".\LogoutHTMLLinkInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\LogoutHTMLLinkInterfaceElement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\PasswordHtmlField.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\PasswordHtmlField.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RequestErrorMessageInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\RequestErrorMessageInterfaceElement.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="LibraryInterfaceElement"
 				>
-			</File>
-			<File
-				RelativePath=".\LoginHtmlField.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LoginHtmlField.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LogoutHTMLLinkInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LogoutHTMLLinkInterfaceElement.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PasswordHtmlField.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PasswordHtmlField.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RequestErrorMessageInterfaceElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RequestErrorMessageInterfaceElement.h"
-				>
-			</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\SConscript"

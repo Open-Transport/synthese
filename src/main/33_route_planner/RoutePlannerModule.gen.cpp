@@ -7,6 +7,7 @@ synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::routeplanner::JourneyBoardJunctionCellInterfacePage>("journey_board_junction_cell");
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::routeplanner::RoutePlannerNoSolutionInterfacePage>("routeplanner_no_solution");
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::routeplanner::RoutePlannerInterfacePage>("route_planner");
+synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::routeplanner::JourneyBoardInterfacePage>("journey_board");
 
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::JourneyLineListInterfaceElement>("journey_line_list");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::JourneyBoardInterfaceElement>("journey_board");
@@ -18,5 +19,6 @@ synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrat
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::TextInputInterfaceElemet>("route_planner_input");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::RequestInterfaceElement>("route_planner_form");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::PeriodsListInterfaceElement>("route_planner_periods");
+synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::routeplanner::JourneyBoardsInterfaceElement>("journey_boards");
 
 synthese::util::Factory<synthese::server::Function>::integrate<synthese::routeplanner::RoutePlannerFunction>("rp");
