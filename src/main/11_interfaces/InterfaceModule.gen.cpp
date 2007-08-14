@@ -12,7 +12,7 @@ synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::AndValueInterfaceElement>("&&");
 synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::PlainCharFilterValueInterfaceElement>("plain_char");
 
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::CommentInterfaceElement>("//");
+synthese::interfaces::CommentInterfaceElement::integrate();
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::PrintInterfaceElement>("print");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::LineLabelInterfaceElement>("label");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::IncludePageInterfaceElement>("include");

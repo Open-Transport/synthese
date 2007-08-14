@@ -26,6 +26,13 @@
 
 namespace synthese
 {
+	using namespace interfaces;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<LibraryInterfaceElement, CommentInterfaceElement>::FACTORY_KEY = "//";
+	}
+
 	namespace interfaces
 	{
 		void CommentInterfaceElement::storeParameters(ValueElementList& vel)

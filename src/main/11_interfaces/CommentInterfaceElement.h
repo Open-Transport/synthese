@@ -24,6 +24,7 @@
 #define SYNTHESE_CommentInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -34,7 +35,8 @@ namespace synthese
 		/** Comment library interface element class.
 			@ingroup m11Library refLibrary
 		*/
-		class CommentInterfaceElement : public interfaces::LibraryInterfaceElement
+		class CommentInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, CommentInterfaceElement>
 		{
 		public:
 			/** Controls and store the internals parameters.
