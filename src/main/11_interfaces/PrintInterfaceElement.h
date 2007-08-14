@@ -25,32 +25,44 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace interfaces
 	{
-		class ValueInterfaceElement;
-
 		/** Print interface library element.
-			
-			Usage :
-			@code print <content> @endcode
-
 			@ingroup m11Library refLibrary
+
+		Usage :
+			@code {{$ <param1> <param2> ... <paramn>}} @endcode
+			
+			The output is the concatenation of each param.
+			@warning no space will be inserted between the parameters.
+
+			Example :
+			@code {{$ This { is } an [ interesting way of coding] ! {{param 1}}}} @endcode
+			with the first execution parameter containing the ? character, it outputs :
+			@code This is an interesting way of coding!? @endcode
 		*/
-		class PrintInterfaceElement : public interfaces::LibraryInterfaceElement
+		class PrintInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, PrintInterfaceElement>
 		{
-			boost::shared_ptr<ValueInterfaceElement> _toBePrinted;
+			std::vector<boost::shared_ptr<interfaces::LibraryInterfaceElement> > _parameters; // Parameters storage
 
 		public:
 			/** Parameters parser.
 				The parser copies the ValueElementList as is.
 			*/
 			void storeParameters(ValueElementList& vel);
-			std::string display(std::ostream& stream, const interfaces::ParametersVector& parameters
+
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
-				, const server::Request* request = NULL) const;
+				, const server::Request* request = NULL
+			) const;
 		};
 	}
 }

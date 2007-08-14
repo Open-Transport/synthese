@@ -20,11 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/FactoryException.h"
+#include "LibraryInterfaceElement.h"
 
-#include "11_interfaces/LibraryInterfaceElement.h"
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePageException.h"
+
+#include "01_util/Factory.h"
+#include "01_util/FactoryException.h"
 
 #include <sstream>
 
@@ -90,6 +92,11 @@ namespace synthese
 		{
 			string value(getValue(pv, variables, object, request));
 			return value.empty() || Conversion::ToLongLong(value) == 0;
+		}
+
+		void LibraryInterfaceElement::setPage( boost::shared_ptr<const InterfacePage> page )
+		{
+			_page = page;
 		}
 	}
 }

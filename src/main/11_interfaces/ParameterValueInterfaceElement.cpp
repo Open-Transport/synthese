@@ -20,26 +20,36 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Conversion.h"
+#include "ParameterValueInterfaceElement.h"
 
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/ParameterValueInterfaceElement.h"
+
+#include "01_util/Conversion.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
-	using namespace std;
 	using namespace util;
+	using namespace interfaces;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<LibraryInterfaceElement, ParameterValueInterfaceElement>::FACTORY_KEY = "param";
+	}
 
 	namespace interfaces
 	{
-		string ParameterValueInterfaceElement::getValue( const ParametersVector& parameters
+		string ParameterValueInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* object, const server::Request* request) const
 		{
-			return parameters[Conversion::ToInt(_rank->getValue(parameters, variables, object, request))] ;
+			stream << parameters[Conversion::ToInt(_rank->getValue(parameters, variables, object, request))] ;
+			return string();
 		}
 
 		void ParameterValueInterfaceElement::storeParameters(ValueElementList& vel)

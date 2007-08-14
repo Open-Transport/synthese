@@ -23,7 +23,9 @@
 #ifndef SYNTHESE_RequestErrorMessageInterfaceElement_H__
 #define SYNTHESE_RequestErrorMessageInterfaceElement_H__
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -34,7 +36,8 @@ namespace synthese
 		/** Request error message Value Interface Element Class.
 			@ingroup m30Values refValues
 		*/
-		class RequestErrorMessageInterfaceElement : public interfaces::ValueInterfaceElement
+		class RequestErrorMessageInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, RequestErrorMessageInterfaceElement>
 		{
 
 		public:
@@ -48,8 +51,9 @@ namespace synthese
 				@param rootObject Object to read at the display
 				@param request Source request
 			*/
-			std::string getValue(
-				const interfaces::ParametersVector& parameters
+			std::string display(
+				std::ostream&
+				, const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;

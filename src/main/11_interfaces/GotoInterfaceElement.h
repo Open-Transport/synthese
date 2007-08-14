@@ -17,7 +17,7 @@ namespace synthese
 		class GotoInterfaceElement : public LibraryInterfaceElement
 		{
 		private:
-			boost::shared_ptr<ValueInterfaceElement> _label;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _label;
 
 		public:
 			void storeParameters(ValueElementList& vel);

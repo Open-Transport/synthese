@@ -32,21 +32,29 @@
 #include "15_env/LogicalStopNameValueInterfaceElement.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using std::string;
+	using namespace env;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<LibraryInterfaceElement, LogicalStopNameValueInterfaceElement>::FACTORY_KEY = "stop_name";
+	}
 
 	namespace env
 	{
-		string LogicalStopNameValueInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string LogicalStopNameValueInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
 /*			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )
 			{
-*/				const ConnectionPlace* place = (const ConnectionPlace*) object;
-				return place->getFullName();
+*/				const ConnectionPlace* place = static_cast<const ConnectionPlace*>(object);
+				stream << place->getFullName();
 /*			}
 			else
 			{
@@ -55,12 +63,13 @@ namespace synthese
 
 				const ConnectionPlace* place = __Environnement->getConnectionPlaces().get(placeUID);
 				return place->getName();
-			}
-*/		}
+			} */
+			return string();
+		}
 
 		void LogicalStopNameValueInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			_uid = (vel.size() >= 1) ? vel.front() : shared_ptr<ValueInterfaceElement>();
+			_uid = (vel.size() >= 1) ? vel.front() : shared_ptr<LibraryInterfaceElement>();
 		}
 	}
 

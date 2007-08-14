@@ -30,6 +30,7 @@
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 #include "01_util/ManagedThread.h"
+#include "01_util/Factory.h"
 
 
 #include <iostream>

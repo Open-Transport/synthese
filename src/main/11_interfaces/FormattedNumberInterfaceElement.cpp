@@ -20,16 +20,16 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "FormattedNumberInterfaceElement.h"
+
+
+#include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/InterfacePageException.h"
+#include "11_interfaces/StaticValueInterfaceElement.h"
+
 #include <complex>
 
 #include "01_util/Conversion.h"
-
-#include "11_interfaces/ValueInterfaceElement.h"
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/FormattedNumberInterfaceElement.h"
-#include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/StaticValueInterfaceElement.h"
 
 using namespace std;
 using namespace boost;
@@ -37,6 +37,12 @@ using namespace boost;
 namespace synthese
 {
 	using namespace util;
+	using namespace interfaces;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<LibraryInterfaceElement, FormattedNumberInterfaceElement>::FACTORY_KEY = "format";
+	}
 
 	namespace interfaces
 	{
@@ -65,8 +71,9 @@ namespace synthese
 			}
 		}
 
-		string FormattedNumberInterfaceElement::getValue(
-			const ParametersVector& parameters
+		string FormattedNumberInterfaceElement::display(
+			ostream& s
+			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
@@ -76,7 +83,6 @@ namespace synthese
 				__Nombre += Conversion::ToInt(_numberToAdd->getValue(parameters, variables, object, request));
 			}
 			std::string __Format = _formatVIE->getValue(parameters, variables, object, request);
-			stringstream s;
 
 			int numbers = Conversion::ToInt(__Format);
 			if (numbers > 0)
@@ -87,7 +93,7 @@ namespace synthese
 						s << "0";
 				}
 				s << __Nombre;
-				return s.str();
+				return string();
 			}
 
 			if (__Format == TYPE_CHAR_2)
@@ -95,11 +101,11 @@ namespace synthese
 				__Nombre = __Nombre % 100;
 				s << __Nombre / 10;
 				s << __Nombre % 10;
-				return s.str();
+				return string();
 			}
 
 			s << __Nombre;
-			return s.str();
+			return string();
 		}
 	}
 }

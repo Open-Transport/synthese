@@ -419,10 +419,6 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="AdminInterfaceElement"
-			>
-		</Filter>
-		<Filter
 			Name="Rights"
 			>
 		</Filter>
@@ -650,7 +646,7 @@
 			Name="Interface"
 			>
 			<Filter
-				Name="ValueInterfaceElement"
+				Name="LibraryInterfaceElement"
 				>
 				<File
 					RelativePath=".\CityNameValueInterfaceElement.cpp"
@@ -694,10 +690,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="LibraryInterfaceElement"
-				>
-			</Filter>
-			<Filter
 				Name="InterfacePage"
 				>
 				<File
@@ -716,6 +708,10 @@
 					RelativePath=".\ReservationRuleInterfacePage.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="AdminInterfaceElement"
+				>
 			</Filter>
 		</Filter>
 		<File

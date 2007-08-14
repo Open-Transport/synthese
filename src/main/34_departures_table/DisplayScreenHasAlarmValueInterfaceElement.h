@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_DisplayScreenHasAlarmValueInterfaceElement_H__
 #define SYNTHESE_DisplayScreenHasAlarmValueInterfaceElement_H__
 
-#include "01_util/UId.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
 
 namespace synthese
 {
@@ -40,13 +41,13 @@ namespace synthese
 
 			Output : The level of the present alarm, ALARM_LEVEL_NO_ALARM if no alarm.
 		*/
-		class DisplayScreenHasAlarmValueInterfaceElement : public interfaces::ValueInterfaceElement
+		class DisplayScreenHasAlarmValueInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DisplayScreenHasAlarmValueInterfaceElement>
 		{
-		private:
-
 		public:
-			std::string getValue(
-				const interfaces::ParametersVector& parameters
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;
@@ -58,4 +59,5 @@ namespace synthese
 		};
 	}
 }
+
 #endif // SYNTHESE_DisplayScreenHasAlarmValueInterfaceElement_H__

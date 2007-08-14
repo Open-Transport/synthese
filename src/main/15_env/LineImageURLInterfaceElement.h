@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_LineImageURLInterfaceElement_H__
 #define SYNTHESE_LineImageURLInterfaceElement_H__
 
-#include "01_util/UId.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
 
 namespace synthese
 {
@@ -38,15 +39,17 @@ namespace synthese
 		/** LineImageURLInterfaceElement class.
 			@ingroup m15Values refValues
 		*/
-		class LineImageURLInterfaceElement : public interfaces::ValueInterfaceElement
+		class LineImageURLInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, LineImageURLInterfaceElement>
 		{
 		private:
 			// Attributes
-			// boost::shared_ptr<interfaces::ValueInterfaceElement> _xxx;
+			// boost::shared_ptr<interfaces::LibraryInterfaceElement> _xxx;
 
 		public:
-			std::string getValue(
-				const interfaces::ParametersVector& parameters
+			std::string display(
+				std::ostream&
+				, const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;

@@ -26,7 +26,6 @@
 #define SYNTHESE_CityListRequestInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
-#include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
@@ -45,9 +44,9 @@ namespace synthese
 		class CityListRequestInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _txtField;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _isForOrigin;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _number;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _txtField;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _isForOrigin;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _number;
 
 		public:
 			/** Controls and store the internals parameters.

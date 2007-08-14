@@ -20,6 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "CityNameValueInterfaceElement.h"
+
+#include "15_env/City.h"
+
 #include <string>
 
 #include "01_util/UId.h"
@@ -28,28 +32,32 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
 
-#include "15_env/City.h"
-#include "15_env/CityNameValueInterfaceElement.h"
-
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using std::string;
+	using namespace env;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<LibraryInterfaceElement, CityNameValueInterfaceElement>::FACTORY_KEY = "city_name";
+	}
 
 	namespace env
 	{
-		string CityNameValueInterfaceElement::getValue(
-			const ParametersVector& parameters
+		string CityNameValueInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* object, const server::Request* request) const
 		{
 /*			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )
 			{
 */				const City* city = (const City*) object;
-				return city->getName();
+				stream << city->getName();
 /*			}
 			else
 			{
@@ -58,12 +66,13 @@ namespace synthese
 
 				const City* curCommune = __Environnement->getCities().get(cityUID);
 				return curCommune->getName();
-			}
-*/		}
+			}*/
+			return string ();
+		}
 
 		void CityNameValueInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			_uid = vel.isEmpty() ? shared_ptr<ValueInterfaceElement>() : vel.front();
+			_uid = vel.isEmpty() ? shared_ptr<LibraryInterfaceElement>() : vel.front();
 		}
 	}
 

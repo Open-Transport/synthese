@@ -20,9 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "HtmlFormInterfaceElement.h"
 
-#include <boost/shared_ptr.hpp>
+#include "30_server/Request.h"
+#include "30_server/Action.h"
 
 #include "01_util/FactoryException.h"
 
@@ -34,18 +35,20 @@
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/Interface.h"
 
-#include "30_server/Request.h"
-#include "30_server/Action.h"
-#include "30_server/HtmlFormInterfaceElement.h"
-
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace html;
 	using namespace util;
+	using namespace server;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, HtmlFormInterfaceElement>::FACTORY_KEY("htmlform");
+	}
 
 	namespace server
 	{
@@ -69,12 +72,12 @@ namespace synthese
 			}
 		}
 
-		string HtmlFormInterfaceElement::getValue(
-			const interfaces::ParametersVector& parameters
+		string HtmlFormInterfaceElement::display(
+			ostream& stream
+			, const interfaces::ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			stringstream stream;
 			try
 			{
 				string actionKey;
@@ -111,7 +114,7 @@ namespace synthese
 				stream << f.open();
 				stream << f.getHiddenFields();
 				
-				return stream.str();
+				return string();
 			}
 			catch(FactoryException<Request> e)
 			{

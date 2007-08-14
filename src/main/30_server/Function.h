@@ -26,6 +26,8 @@
 
 #include "30_server/Types.h"
 
+#include <boost/shared_ptr.hpp>
+
 /** @defgroup refFunctions Functions
 	@ingroup ref
 */

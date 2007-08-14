@@ -20,33 +20,41 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "SuperiorValueInterfaceElement.h"
+
+#include "11_interfaces/Interface.h"
+#include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/InterfacePageException.h"
+
 #include <string>
 
 #include "01_util/UId.h"
 #include "01_util/Conversion.h"
 
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/SuperiorValueInterfaceElement.h"
-
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using std::string;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<LibraryInterfaceElement, SuperiorValueInterfaceElement>::FACTORY_KEY = ">";
+	}
 
 	namespace interfaces
 	{
-		string SuperiorValueInterfaceElement::getValue(
-			const ParametersVector& parameters
+		string SuperiorValueInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* object
 			, const server::Request* request) const
 		{
-			return (Conversion::ToLongLong(_left->getValue(parameters, variables, object, request)) > Conversion::ToLongLong(_right->getValue(parameters, variables, object, request))) ? "1" : "0";
+			stream << (Conversion::ToLongLong(_left->getValue(parameters, variables, object, request)) > Conversion::ToLongLong(_right->getValue(parameters, variables, object, request))) ? "1" : "0";
+			return string();
 		}
 
 		void SuperiorValueInterfaceElement::storeParameters(ValueElementList& vel)

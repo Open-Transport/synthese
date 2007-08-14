@@ -20,10 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "LoginHtmlField.h"
 
 #include "30_server/LoginAction.h"
-#include "30_server/LoginHtmlField.h"
 
 using namespace std;
 using namespace boost;
@@ -31,6 +30,12 @@ using namespace boost;
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace server;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, LoginHtmlField>::FACTORY_KEY("loginhtmlfield");
+	}
 
 	namespace server
 	{
@@ -38,14 +43,15 @@ namespace synthese
 		{
 		}
 
-		string LoginHtmlField::getValue(const interfaces::ParametersVector& parameters
+		string LoginHtmlField::display(
+			ostream& stream
+			, const interfaces::ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* rootObject /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			stringstream stream;
 			stream << "<input type=\"text\" name=\"" << LoginAction::PARAMETER_LOGIN << "\" />";
-			return stream.str();
+			return string();
 		}
 	}
 }

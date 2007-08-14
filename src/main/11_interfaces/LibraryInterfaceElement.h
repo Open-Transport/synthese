@@ -59,7 +59,10 @@ namespace synthese
 
 			virtual void storeParameters(ValueElementList& vel) = 0;
 
+			friend class ValueElementList;
+
 		public:
+			void setPage(boost::shared_ptr<const InterfacePage> page);
 
 			virtual std::string getLabel() const { return std::string(); }
 			
@@ -73,10 +76,10 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007
 			*/
-			static boost::shared_ptr<LibraryInterfaceElement> create( const std::string & text, boost::shared_ptr<const InterfacePage> page );
+			static boost::shared_ptr<interfaces::LibraryInterfaceElement> create( const std::string & text, boost::shared_ptr<const InterfacePage> page );
 
 			template<class T>
-			boost::shared_ptr<LibraryInterfaceElement> copy( const ParametersVector& parameters )
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> copy( const ParametersVector& parameters )
 			{
 				return boost::shared_ptr<T>(new T(*((T*) this)));
 			}

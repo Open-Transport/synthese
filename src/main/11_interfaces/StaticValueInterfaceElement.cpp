@@ -22,16 +22,20 @@
 
 #include "StaticValueInterfaceElement.h"
 
+using namespace std;
+
 namespace synthese
 {
 	namespace interfaces
 	{
-		std::string StaticValueInterfaceElement::getValue(
-			const ParametersVector& parameters
+		std::string StaticValueInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* object, const server::Request* request) const
 		{
-			return _value;
+			stream << _value;
+			return string();
 		}
 
 		void StaticValueInterfaceElement::storeParameters(ValueElementList& vel )

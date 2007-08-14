@@ -25,6 +25,8 @@
 #include "13_dblog/DBLog.h"
 #include "13_dblog/DBLogRight.h"
 
+#include "01_util/Factory.h"
+
 using namespace std;
 
 namespace synthese

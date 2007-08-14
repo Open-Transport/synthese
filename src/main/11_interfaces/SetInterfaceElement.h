@@ -40,8 +40,8 @@ namespace synthese
 		*/
 		class SetInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _varName;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _varValue;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _varName;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _varValue;
 
 		public:
 			/** Controls and store the internals parameters.

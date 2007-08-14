@@ -39,22 +39,28 @@ namespace synthese
 
 	namespace util
 	{
-		// template<> const string FactoryTemplate<ValueInterfaceElement, AndValueInterfaceElement>::FACTORY_KEY("");
+		template<> const string FactorableTemplate<LibraryInterfaceElement, AndValueInterfaceElement>::FACTORY_KEY("&&");
 	}
 
 	namespace interfaces
 	{
-		string AndValueInterfaceElement::getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string AndValueInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
 			ValueElementList vel(_parameters);
 			while (!vel.isEmpty())
 			{
-				boost::shared_ptr<ValueInterfaceElement> vie(vel.front());
+				boost::shared_ptr<interfaces::LibraryInterfaceElement> vie(vel.front());
 				string criteria( vie->getValue(parameters, variables, object, request));
 				if (criteria.empty() || criteria == "0")
-					return "0";
+				{
+					stream << "0";
+					return string();
+				}
 			}
-			return "1";
+			stream << "1";
+			return string();
 		}
 
 		void AndValueInterfaceElement::storeParameters(ValueElementList& vel)
@@ -62,5 +68,4 @@ namespace synthese
 			_parameters = vel;
 		}
 	}
-
 }

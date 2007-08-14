@@ -4,9 +4,8 @@ synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrat
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableLineContentInterfaceElement>("departurestablelinecell");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableDestinationContentInterfaceElement>("departurestabledestinationcell");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableRowServiceNumberInterfaceElement>("departurestableservicenumbercell");
-
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::departurestable::DisplayScreenHasAlarmValueInterfaceElement>("displayscreenalarmlevel");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::departurestable::DisplayScreenAlarmContentValueInterfaceElement>("displayscreenalarmcontent");
+synthese::departurestable::DisplayScreenHasAlarmValueInterfaceElement::integrate();
+synthese::departurestable::DisplayScreenAlarmContentValueInterfaceElement::integrate();
 
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::departurestable::DeparturesTableInterfacePage>("departurestable");
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::departurestable::DepartureTableRowInterfacePage>("departurestablerow");

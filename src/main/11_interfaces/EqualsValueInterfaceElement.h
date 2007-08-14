@@ -23,29 +23,31 @@
 #ifndef SYNTHESE_EqualsValueInterfaceElement_H__
 #define SYNTHESE_EqualsValueInterfaceElement_H__
 
-#include "01_util/UId.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
 
 namespace synthese
 {
 	namespace interfaces
 	{
 		class ValueElementList;
-	}
-	namespace interfaces
-	{
+
 		/** Equality test Value Interface Element class.
 			@ingroup m11Values refValues
 		*/
-		class EqualsValueInterfaceElement : public interfaces::ValueInterfaceElement
+		class EqualsValueInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, EqualsValueInterfaceElement>
 		{
 		private:
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _left;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _right;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _left;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _right;
 
 		public:
-			std::string getValue(const interfaces::ParametersVector& parameters
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;
@@ -57,4 +59,5 @@ namespace synthese
 		};
 	}
 }
+
 #endif // SYNTHESE_EqualsValueInterfaceElement_H__

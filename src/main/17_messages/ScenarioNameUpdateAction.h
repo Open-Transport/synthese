@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_ScenarioNameUpdateAction_H__
 #define SYNTHESE_ScenarioNameUpdateAction_H__
 
-#include <string>
-
 #include "30_server/Action.h"
+
+#include <boost/shared_ptr.hpp>
+#include <string>
 
 namespace synthese
 {

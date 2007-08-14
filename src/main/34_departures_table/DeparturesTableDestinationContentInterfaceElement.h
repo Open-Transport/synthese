@@ -32,8 +32,6 @@ namespace synthese
 {
 	namespace departurestable
 	{
-		class interfaces::ValueInterfaceElement;
-
 		/** Departure Table Destination Content Interface Element Class.
 			@ingroup m34Library refLibrary
 		*/
@@ -50,12 +48,12 @@ namespace synthese
 			
 
 		private:
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _destinationsToDisplayVIE;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _displayTerminusVIE;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _displayTypeVIE;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _stopsSeparatorVIE;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _beforeCityVIE;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _afterCityVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _destinationsToDisplayVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayTerminusVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayTypeVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _stopsSeparatorVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _beforeCityVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _afterCityVIE;
 
 			void displayDestination(std::ostream& stream, bool displayCity) const;
 

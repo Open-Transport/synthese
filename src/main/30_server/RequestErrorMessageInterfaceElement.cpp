@@ -20,16 +20,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "11_interfaces/ValueElementList.h"
+#include "RequestErrorMessageInterfaceElement.h"
 
-#include "30_server/RequestErrorMessageInterfaceElement.h"
 #include "30_server/Request.h"
+
+#include "11_interfaces/ValueElementList.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace server;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, RequestErrorMessageInterfaceElement>::FACTORY_KEY("errormessage");
+	}
 
 	namespace server
 	{
@@ -37,13 +44,15 @@ namespace synthese
 		{
 		}
 
-		string RequestErrorMessageInterfaceElement::getValue(
-			const interfaces::ParametersVector& parameters
+		string RequestErrorMessageInterfaceElement::display(
+			ostream& stream
+			, const interfaces::ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* rootObject /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			return request->getErrorMessage();
+			stream << request->getErrorMessage();
+			return string();
 		}
 	}
 }

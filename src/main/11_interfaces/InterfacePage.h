@@ -35,8 +35,6 @@
 #include "11_interfaces/Types.h"
 #include "11_interfaces/LibraryInterfaceElement.h"
 
-using synthese::util::Factory;
-
 /** @defgroup refPages Interface Pages
 	@ingroup refInt
 */

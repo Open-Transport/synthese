@@ -20,6 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "LineShortNameInterfaceElement.h"
+
+#include "15_env/Line.h"
+#include "15_env/CommercialLine.h"
+
 #include <string>
 
 #include "01_util/UId.h"
@@ -28,25 +33,31 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
 
-#include "15_env/Line.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/LineShortNameInterfaceElement.h"
+using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using std::string;
+	using namespace env;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<LibraryInterfaceElement, LineShortNameInterfaceElement>::FACTORY_KEY = "line_short_name";
+	}
 
 	namespace env
 	{
-		string LineShortNameInterfaceElement::getValue(
-			const ParametersVector& parameters
+		string LineShortNameInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* object
 			, const server::Request* request) const
 		{
-			return (object != NULL) ? ((const Line*) object)->getCommercialLine()->getShortName() : "";
+			if (object != NULL)
+				stream << static_cast<const Line*>(object)->getCommercialLine()->getShortName();
+			return string();
 		}
 
 		void LineShortNameInterfaceElement::storeParameters(ValueElementList& vel)

@@ -20,26 +20,37 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "IfThenElseInterfaceElement.h"
+
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/StaticValueInterfaceElement.h"
 #include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/IfThenElseInterfaceElement.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
+	using namespace interfaces;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<LibraryInterfaceElement, IfThenElseInterfaceElement>::FACTORY_KEY = "if";
+	}
+
 	namespace interfaces
 	{
-		std::string IfThenElseInterfaceElement::getValue(const ParametersVector& parameters
+		std::string IfThenElseInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
 			std::string result = _criteria->getValue(parameters, variables, object, request);
 			return ( result.size() == 0 || result == "0" )
-				? _to_return_if_false->getValue(parameters, variables, object, request)
-				: _to_return_if_true->getValue(parameters, variables, object, request);
+				? _to_return_if_false->display(stream, parameters, variables, object, request)
+				: _to_return_if_true->display(stream, parameters, variables, object, request);
 		}
 		
 		void IfThenElseInterfaceElement::storeParameters(ValueElementList& vel )

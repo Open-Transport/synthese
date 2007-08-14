@@ -44,8 +44,8 @@ namespace synthese
 		class ScheduleSheetReservationRowInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _cellHeader;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _cellFooter;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _cellHeader;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _cellFooter;
 
 		public:
 			/** Controls and store the internals parameters.

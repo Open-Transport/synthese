@@ -23,7 +23,9 @@
 #ifndef SYNTHESE_IfThenElseInterfaceElement_H__
 #define SYNTHESE_IfThenElseInterfaceElement_H__
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -54,15 +56,18 @@ label end_of_bloc
 
 			@ingroup m11Values refValues
 		*/
-		class IfThenElseInterfaceElement : public ValueInterfaceElement
+		class IfThenElseInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, IfThenElseInterfaceElement>
 		{
 		private:
-			boost::shared_ptr<ValueInterfaceElement> _criteria;
-			boost::shared_ptr<ValueInterfaceElement> _to_return_if_true;
-			boost::shared_ptr<ValueInterfaceElement> _to_return_if_false;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _criteria;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _to_return_if_true;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _to_return_if_false;
 
 		public:
-			std::string getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables
+			std::string display(
+				std::ostream&
+				, const ParametersVector& parameters, interfaces::VariablesMap& variables
 				, const void* object = NULL, const server::Request* request = NULL) const;
 			void storeParameters(ValueElementList& vel);
 		};

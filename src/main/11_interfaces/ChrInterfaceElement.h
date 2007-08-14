@@ -23,7 +23,9 @@
 #ifndef SYNTHESE_ChrInterfaceElement_H__
 #define SYNTHESE_ChrInterfaceElement_H__
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -46,17 +48,19 @@ namespace synthese
 			will output
 			@code M @endcode
 		*/
-		class ChrInterfaceElement : public interfaces::ValueInterfaceElement
+		class ChrInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, ChrInterfaceElement>
 		{
-			boost::shared_ptr<ValueInterfaceElement> _asciiCode;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _asciiCode;
 
 		public:
 			/** Parameters parser.
 				The parser copies the ValueElementList as is.
 			*/
 			void storeParameters (ValueElementList& vel);
-			std::string getValue (
-				const ParametersVector&, 
+			std::string display(
+				std::ostream&
+				, const ParametersVector&, 
 				interfaces::VariablesMap& variables, 
 				const void* object = NULL,
 				const server::Request* request = NULL

@@ -20,30 +20,35 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/ValueInterfaceElement.h"
-#include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/ChrInterfaceElement.h"
+#include "ChrInterfaceElement.h"
 
-#include <sstream>
+#include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/InterfacePageException.h"
 
 using namespace std;
 using namespace boost;
 
 namespace synthese
 {
+	using namespace interfaces;
+	using namespace util;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, ChrInterfaceElement>::FACTORY_KEY("chr");
+	}
 
 	namespace interfaces
 	{
-		std::string 
-                ChrInterfaceElement::getValue (const ParametersVector& parameters, 
-                                              interfaces::VariablesMap& vars, 
-                                              const void* rootObject, 
-                                              const server::Request* request ) const
-		{
-			stringstream s;
-			s << ((char) atoi (_asciiCode->getValue (parameters, vars, rootObject, request).c_str ()));
-            return s.str ();
+		string ChrInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters, 
+              interfaces::VariablesMap& vars, 
+              const void* rootObject, 
+			const server::Request* request
+		) const	{
+			stream << static_cast<char>(atoi (_asciiCode->getValue (parameters, vars, rootObject, request).c_str ()));
+            return string();
 		}
 
               

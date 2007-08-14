@@ -24,14 +24,13 @@
 #define SYNTHESE_CommentInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
+
 #include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
 	namespace interfaces
 	{
-		class ValueInterfaceElement;
-
 		/** Comment library interface element class.
 			@ingroup m11Library refLibrary
 		*/

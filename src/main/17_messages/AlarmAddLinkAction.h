@@ -27,6 +27,8 @@
 
 #include "30_server/Action.h"
 
+#include <boost/shared_ptr.hpp>
+
 namespace synthese
 {
 	namespace messages

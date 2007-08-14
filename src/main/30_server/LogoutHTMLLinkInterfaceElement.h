@@ -23,7 +23,9 @@
 #ifndef SYNTHESE_LogoutHTMLLinkInterfaceElement_H__
 #define SYNTHESE_LogoutHTMLLinkInterfaceElement_H__
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -32,12 +34,13 @@ namespace synthese
 		/** Logout link Value Interface Element Class.
 			@ingroup m30Values refValues
 		*/
-		class LogoutHTMLLinkInterfaceElement : public interfaces::ValueInterfaceElement
+		class LogoutHTMLLinkInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, LogoutHTMLLinkInterfaceElement>
 		{
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _redirectionURL;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _page_key;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _content;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _icon;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _redirectionURL;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _page_key;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _content;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _icon;
 
 		public:
 			/** Parameters parser.
@@ -47,8 +50,9 @@ namespace synthese
 					-# Text to put in the link
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
-			std::string getValue(
-				const interfaces::ParametersVector& parameters
+			std::string display(
+				std::ostream&
+				, const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;

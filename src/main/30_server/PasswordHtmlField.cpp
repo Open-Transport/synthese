@@ -20,16 +20,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "PasswordHtmlField.h"
 
 #include "30_server/LoginAction.h"
-#include "30_server/PasswordHtmlField.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace server;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, PasswordHtmlField>::FACTORY_KEY("passwordhtmlfield");
+	}
 
 	namespace server
 	{
@@ -37,15 +42,15 @@ namespace synthese
 		{
 		}
 
-		string PasswordHtmlField::getValue(
-			const interfaces::ParametersVector& parameters
+		string PasswordHtmlField::display(
+			ostream& stream
+			, const interfaces::ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* rootObject /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			stringstream stream;
 			stream << "<input type=\"password\" name=\"" << LoginAction::PARAMETER_PASSWORD << "\" />";
-			return stream.str();
+			return string();
 		}
 	}
 }

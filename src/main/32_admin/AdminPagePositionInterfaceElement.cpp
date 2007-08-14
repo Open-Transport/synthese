@@ -41,6 +41,12 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace html;
+	using namespace admin;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, AdminPagePositionInterfaceElement>::FACTORY_KEY("adminpos");
+	}
 
 	namespace admin
 	{
@@ -74,15 +80,17 @@ namespace synthese
 
 		}
 
-		std::string AdminPagePositionInterfaceElement::getValue(
-			const ParametersVector&
+		std::string AdminPagePositionInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector&
 			, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
 		{
 			const shared_ptr<const AdminInterfaceElement>* page = (const shared_ptr<const AdminInterfaceElement>*) object;
-			return getUpPages(
+			stream << getUpPages(
 				*page
 				, (const server::FunctionRequest<admin::AdminRequest>*) request
 			);
+			return string();
 		}
 	}
 }

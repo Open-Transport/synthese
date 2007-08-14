@@ -23,19 +23,24 @@
 #ifndef SYNTHESE_AdminPagesTreeInterfaceElement_H__
 #define SYNTHESE_AdminPagesTreeInterfaceElement_H__
 
-#include <string>
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "30_server/FunctionRequest.h"
+
+#include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
 	namespace admin
 	{
 		class AdminRequest;
-
+		class AdminInterfaceElement;
+		
 		/** Tree of admin pages links.
 			@ingroup m32Values refValues
 		*/
-		class AdminPagesTreeInterfaceElement : public interfaces::ValueInterfaceElement
+		class AdminPagesTreeInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, AdminPagesTreeInterfaceElement>
 		{
 			std::string getSubPages(
 				const std::string& page
@@ -45,11 +50,11 @@ namespace synthese
 				, std::string prefix = std::string()
 			) const;
 
-			boost::shared_ptr<ValueInterfaceElement> _subpageIntroducerVIE;
-			boost::shared_ptr<ValueInterfaceElement> _lastSubpageIntroducerVIE;
-			boost::shared_ptr<ValueInterfaceElement> _levelIndenterVIE;
-			boost::shared_ptr<ValueInterfaceElement> _lastLevelIndenterVIE;
-			boost::shared_ptr<ValueInterfaceElement> _endingVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _subpageIntroducerVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _lastSubpageIntroducerVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _levelIndenterVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _lastLevelIndenterVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _endingVIE;
 			mutable std::string _subpageIntroducer;
 			mutable std::string _lastSubpageIntroducer;
 			mutable std::string _levelIndenter;
@@ -62,8 +67,9 @@ namespace synthese
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
 
-			std::string getValue(
-				const interfaces::ParametersVector&
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector&
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL

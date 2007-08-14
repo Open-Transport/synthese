@@ -23,8 +23,9 @@
 #ifndef SYNTHESE_ParameterValueInterfaceElement_H__
 #define SYNTHESE_ParameterValueInterfaceElement_H__
 
+#include "11_interfaces/LibraryInterfaceElement.h"
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -37,14 +38,16 @@ namespace synthese
 
 			@ingroup m11Values refValues
 		*/
-		class ParameterValueInterfaceElement : public ValueInterfaceElement
+		class ParameterValueInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, ParameterValueInterfaceElement>
 		{
 		private:
-			boost::shared_ptr<ValueInterfaceElement> _rank;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _rank;
 
 		public:
-			std::string getValue(
-				const ParametersVector&
+			std::string display(
+				std::ostream& stream
+				, const ParametersVector&
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL

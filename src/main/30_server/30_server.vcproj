@@ -178,7 +178,7 @@
 			Name="Interface"
 			>
 			<Filter
-				Name="Value Interface Elements"
+				Name="LibraryInterfaceElement"
 				>
 				<File
 					RelativePath=".\HtmlFormInterfaceElement.cpp"
@@ -220,10 +220,6 @@
 					RelativePath=".\RequestErrorMessageInterfaceElement.h"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="LibraryInterfaceElement"
-				>
 			</Filter>
 		</Filter>
 		<File

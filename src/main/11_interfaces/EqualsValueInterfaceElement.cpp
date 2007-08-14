@@ -38,13 +38,20 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, EqualsValueInterfaceElement>::FACTORY_KEY("=");
+	}
+
 	namespace interfaces
 	{
-		string EqualsValueInterfaceElement::getValue( const ParametersVector& parameters
+		string EqualsValueInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
-			return (_left->getValue(parameters, variables, object, request) == _right->getValue(parameters, variables, object, request)) ? "1" : "0";
-
+			stream << ((_left->getValue(parameters, variables, object, request) == _right->getValue(parameters, variables, object, request)) ? "1" : "0");
+			return string();
 		}
 
 		void EqualsValueInterfaceElement::storeParameters(ValueElementList& vel)

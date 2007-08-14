@@ -26,7 +26,6 @@
 #define SYNTHESE_JourneyBoardsInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
-#include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
@@ -43,8 +42,8 @@ namespace synthese
 		*/
 		class JourneyBoardsInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _handicappedFilter;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _bikeFilter;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _handicappedFilter;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _bikeFilter;
 
 
 		public:

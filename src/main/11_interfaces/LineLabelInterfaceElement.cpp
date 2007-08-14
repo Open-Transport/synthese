@@ -45,8 +45,8 @@ namespace synthese
 		{
 			if (vel.size() != 1)
 				throw InterfacePageException("Malformed line label declaration");
-			shared_ptr<ValueInterfaceElement> vie = vel.front();
-            if (!dynamic_pointer_cast<StaticValueInterfaceElement, ValueInterfaceElement>(vie).get())
+			shared_ptr<LibraryInterfaceElement> vie = vel.front();
+            if (!dynamic_pointer_cast<StaticValueInterfaceElement, LibraryInterfaceElement>(vie).get())
 				throw InterfacePageException("Line label must be statically defined");
 			ParametersVector pv;
 			VariablesMap vars;

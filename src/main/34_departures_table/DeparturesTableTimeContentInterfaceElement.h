@@ -51,9 +51,9 @@ namespace synthese
 			
 
 		private:
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _zeroVIE;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _beforeIfNext;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _afterIfNext;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _zeroVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _beforeIfNext;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _afterIfNext;
 
 		public:
 			void storeParameters(interfaces::ValueElementList& vel);

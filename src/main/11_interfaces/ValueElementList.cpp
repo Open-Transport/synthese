@@ -22,13 +22,15 @@
 
 #include <vector>
 
-#include "01_util/Conversion.h"
-#include "01_util/Exception.h"
+#include "ValueElementList.h"
 
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
 #include "11_interfaces/StaticValueInterfaceElement.h"
 #include "11_interfaces/InterfacePageException.h"
+
+#include "01_util/Conversion.h"
+#include "01_util/Exception.h"
+#include "01_util/Factory.h"
 
 using namespace boost;
 
@@ -62,16 +64,16 @@ namespace synthese
 			return pv;
 		}
 
-		shared_ptr<ValueInterfaceElement> ValueElementList::front()
+		shared_ptr<LibraryInterfaceElement> ValueElementList::front()
 		{
 			if (_elements.size() > 0)
 			{
-				shared_ptr<ValueInterfaceElement> vie = _elements.front();
+				shared_ptr<LibraryInterfaceElement> vie(_elements.front());
 				_elements.pop_front();
 				return vie;
 			}
 			else
-				return shared_ptr<ValueInterfaceElement>();
+				return shared_ptr<LibraryInterfaceElement>();
 		}
 
 		size_t ValueElementList::size() const
@@ -140,7 +142,7 @@ namespace synthese
 			// Registering each word as ValueInterfaceElement
 			for (vector<string>::const_iterator it = elements.begin(); it != elements.end(); ++it)
 			{
-				shared_ptr<ValueInterfaceElement> vie;
+				shared_ptr<LibraryInterfaceElement> vie;
 				const std::string& str = *it;
 
 				// Case 1 : single word
@@ -163,7 +165,7 @@ namespace synthese
 
 					try
 					{
-						vie = Factory<ValueInterfaceElement>::create(str.substr(2, position - 2));
+						vie = Factory<LibraryInterfaceElement>::create(str.substr(2, position - 2));
 						ValueElementList vel;
 						if (position < str.size() - 3)
 							vel.parse(str.substr(position + 1, str.size() - position - 3), page);

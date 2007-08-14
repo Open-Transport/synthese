@@ -23,7 +23,9 @@
 #ifndef SYNTHESE_HtmlFormInterfaceElement_H__
 #define SYNTHESE_HtmlFormInterfaceElement_H__
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -32,14 +34,15 @@ namespace synthese
 		/** HTML Form generator Value Interface Element Class.
 			@ingroup m30
 		*/
-		class HtmlFormInterfaceElement : public interfaces::ValueInterfaceElement
+		class HtmlFormInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, HtmlFormInterfaceElement>
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _name;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _function_key;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _function_parameters;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _action_key;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _action_parameters;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _name;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _function_key;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _function_parameters;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _action_key;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _action_parameters;
 			bool								_with_action;
 
 		public:
@@ -51,7 +54,9 @@ namespace synthese
 				-# action parameters (query string format)
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
-			std::string getValue(const interfaces::ParametersVector& parameters
+			std::string display(
+				std::ostream&
+				, const interfaces::ParametersVector& parameters
 				,interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;

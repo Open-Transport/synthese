@@ -26,7 +26,6 @@
 #define SYNTHESE_RequestInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
-#include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
@@ -44,8 +43,8 @@ namespace synthese
 		class RequestInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _formName;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _html;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _formName;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _html;
 
 		public:
 			/** Controls and store the internals parameters.

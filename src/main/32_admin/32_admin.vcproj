@@ -142,10 +142,6 @@
 					RelativePath=".\AdminContentInterfaceElement.h"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="Interface Value Elements"
-				>
 				<File
 					RelativePath=".\AdminPagePositionInterfaceElement.cpp"
 					>

@@ -23,9 +23,6 @@
 #ifndef SYNTHESE_Factorable_H__
 #define SYNTHESE_Factorable_H__
 
-#include "01_util/Factory.h"
-#include "01_util/FactorableTemplate.h"
-
 #include <string>
 
 namespace synthese

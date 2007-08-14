@@ -1,19 +1,18 @@
 
 synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::interfaces::InterfaceModule>("11_interfaces");
 
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::ParameterValueInterfaceElement>("param");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::IfThenElseInterfaceElement>("if");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::FormattedNumberInterfaceElement>("format");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::EqualsValueInterfaceElement>("=");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::ChrInterfaceElement>("chr");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::SuperiorValueInterfaceElement>(">");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::ConcatenateValueInterfaceElement>("$");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::SubstrValueInterfaceElement>("substr");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::AndValueInterfaceElement>("&&");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::interfaces::PlainCharFilterValueInterfaceElement>("plain_char");
+synthese::interfaces::ParameterValueInterfaceElement::integrate();
+synthese::interfaces::IfThenElseInterfaceElement::integrate();
+synthese::interfaces::FormattedNumberInterfaceElement::integrate();
+synthese::interfaces::EqualsValueInterfaceElement::integrate();
+synthese::interfaces::ChrInterfaceElement::integrate();
+synthese::interfaces::SuperiorValueInterfaceElement::integrate();
+synthese::interfaces::SubstrValueInterfaceElement::integrate();
+synthese::interfaces::AndValueInterfaceElement::integrate();
+synthese::interfaces::PlainCharFilterValueInterfaceElement::integrate();
 
 synthese::interfaces::CommentInterfaceElement::integrate();
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::PrintInterfaceElement>("print");
+synthese::interfaces::PrintInterfaceElement::integrate();
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::LineLabelInterfaceElement>("label");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::IncludePageInterfaceElement>("include");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::GotoInterfaceElement>("goto");

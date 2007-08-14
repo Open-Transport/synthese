@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_DisplayScreenAlarmContentValueInterfaceElement_H__
 #define SYNTHESE_DisplayScreenAlarmContentValueInterfaceElement_H__
 
-#include "01_util/UId.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
 
 namespace synthese
 {
@@ -42,18 +43,20 @@ namespace synthese
 			Parameters :
 				- Text size : {small|big} : chooses the message of the alarm to display
 		*/
-		class DisplayScreenAlarmContentValueInterfaceElement : public interfaces::ValueInterfaceElement
+		class DisplayScreenAlarmContentValueInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DisplayScreenAlarmContentValueInterfaceElement>
 		{
 		public:
 			static const std::string VALUE_SMALL;
 			static const std::string VALUE_BIG;
 
 		private:
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _messageSize;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _messageSize;
 
 		public:
-			std::string getValue(
-				const interfaces::ParametersVector& parameters
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;

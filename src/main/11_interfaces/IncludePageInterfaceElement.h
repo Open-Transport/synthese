@@ -34,7 +34,7 @@ namespace synthese
 		class IncludePageInterfaceElement : public LibraryInterfaceElement
 		{
 		private:
-			boost::shared_ptr<ValueInterfaceElement>	_page_code;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_page_code;
 			ValueElementList							_parameters;
 
 		public:

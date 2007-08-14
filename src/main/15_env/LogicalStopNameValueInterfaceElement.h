@@ -23,7 +23,9 @@
 #ifndef SYNTHESE_LogicalStopNameValueInterfaceElement_H__
 #define SYNTHESE_LogicalStopNameValueInterfaceElement_H__
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -33,14 +35,16 @@ namespace synthese
 			@code stop_name @endcode
 			@ingroup m15Values refValues
 		*/
-		class LogicalStopNameValueInterfaceElement : public interfaces::ValueInterfaceElement
+		class LogicalStopNameValueInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, LogicalStopNameValueInterfaceElement>
 		{
 		private:
-			boost::shared_ptr<ValueInterfaceElement> _uid;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _uid;
 
 		public:
-			std::string getValue(
-				const interfaces::ParametersVector& parameters
+			std::string display(
+				std::ostream&
+				, const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
 
 			/** Parser.

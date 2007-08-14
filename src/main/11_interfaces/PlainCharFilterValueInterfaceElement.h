@@ -25,9 +25,9 @@
 #ifndef SYNTHESE_PlainCharFilterValueInterfaceElement_H__
 #define SYNTHESE_PlainCharFilterValueInterfaceElement_H__
 
-#include <boost/shared_ptr.hpp>
+#include "11_interfaces/LibraryInterfaceElement.h"
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -55,11 +55,12 @@ namespace synthese
 			outputs :
 			@code @endcode
 		*/
-		class PlainCharFilterValueInterfaceElement : public interfaces::ValueInterfaceElement
+		class PlainCharFilterValueInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, PlainCharFilterValueInterfaceElement>
 		{
 		private:
 			// Attributes
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _text;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _text;
 			
 		public:
 			/** Evaluates the context and builds the output.
@@ -69,7 +70,9 @@ namespace synthese
 				@param request Current request
 				@return Generated string output
 			*/
-			std::string getValue(const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
+			std::string display(
+				std::ostream&
+				, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
 			
 			/** Parameters storage and quantity verification.
 				@param vel Value Elements List : the parameters

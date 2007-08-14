@@ -20,8 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-#include <boost/shared_ptr.hpp>
+#include "LogoutHTMLLinkInterfaceElement.h"
+
+#include "30_server/LogoutAction.h"
+#include "30_server/ActionFunctionRequest.h"
 
 #include "05_html/HTMLForm.h"
 
@@ -32,10 +34,6 @@
 #include "11_interfaces/RedirRequest.h"
 #include "11_interfaces/SimplePageRequest.h"
 
-#include "30_server/LogoutAction.h"
-#include "30_server/LogoutHTMLLinkInterfaceElement.h"
-#include "30_server/ActionFunctionRequest.h"
-
 using namespace std;
 using boost::shared_ptr;
 
@@ -44,6 +42,12 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 	using namespace html;
+	using namespace server;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, LogoutHTMLLinkInterfaceElement>::FACTORY_KEY("logouthtmllink");
+	}
 
 	namespace server
 	{
@@ -58,13 +62,13 @@ namespace synthese
 				_icon = vel.front();
 		}
 
-		string LogoutHTMLLinkInterfaceElement::getValue(
-			const interfaces::ParametersVector& parameters
+		string LogoutHTMLLinkInterfaceElement::display(
+			ostream& stream
+			, const interfaces::ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* rootObject /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			stringstream stream;
 			std::string url = _redirectionURL->getValue(parameters, variables, rootObject, request);
 			std::string requestKey = _page_key->getValue(parameters, variables, rootObject, request);
 			std::string content = _content->getValue(parameters, variables, NULL, request);
@@ -91,7 +95,7 @@ namespace synthese
 				redirRequest.getFunction()->setRedirURL(url);
 				stream << redirRequest.getHTMLForm().getLinkButton(content, "", icon);
 			}
-			return stream.str();
+			return string();
 		}
 	}
 }

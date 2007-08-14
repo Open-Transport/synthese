@@ -26,7 +26,6 @@
 #define SYNTHESE_PeriodsListInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
-#include "11_interfaces/ValueInterfaceElement.h"
 
 namespace synthese
 {
@@ -40,7 +39,7 @@ namespace synthese
 		class PeriodsListInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _current;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _current;
 
 		public:
 			/** Controls and store the internals parameters.

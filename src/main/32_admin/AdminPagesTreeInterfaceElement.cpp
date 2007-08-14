@@ -20,17 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "AdminPagesTreeInterfaceElement.h"
+
+#include "32_admin/AdminInterfaceElement.h"
+#include "32_admin/AdminParametersException.h"
 
 #include "05_html/HTMLModule.h"
 
 #include "11_interfaces/ValueElementList.h"
 
 #include "30_server/FunctionRequest.h"
-
-#include "32_admin/AdminInterfaceElement.h"
-#include "32_admin/AdminPagesTreeInterfaceElement.h"
-#include "32_admin/AdminParametersException.h"
 
 using namespace boost;
 using namespace std;
@@ -41,6 +40,12 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace html;
+	using namespace admin;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, AdminPagesTreeInterfaceElement>::FACTORY_KEY("admintree");
+	}
 
 	namespace admin
 	{
@@ -55,7 +60,9 @@ namespace synthese
 			_endingVIE = vel.front();
 		}
 
-		std::string AdminPagesTreeInterfaceElement::getValue( const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
+		std::string AdminPagesTreeInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object /* = NULL */, const server::Request* request /* = NULL */ ) const
 		{
 			const shared_ptr<const AdminInterfaceElement>* page = (const shared_ptr<const AdminInterfaceElement>*) object;
 			_lastLevelIndenter = _lastLevelIndenterVIE->getValue(parameters, variables, object, request);
@@ -64,7 +71,8 @@ namespace synthese
 			_subpageIntroducer = _subpageIntroducerVIE->getValue(parameters, variables, object, request);
 			_ending = _endingVIE->getValue(parameters, variables, object, request);
 
-			return getSubPages(string(), *page, (const server::FunctionRequest<admin::AdminRequest>*) request);
+			stream << getSubPages(string(), *page, static_cast<const server::FunctionRequest<AdminRequest>*>(request));
+			return string();
 		}
 
 		std::string AdminPagesTreeInterfaceElement::getSubPages( const std::string& page, shared_ptr<const AdminInterfaceElement> currentPage, const server::FunctionRequest<admin::AdminRequest>* request, int level, string prefix) const

@@ -27,7 +27,7 @@
 #include "01_util/LowerCaseFilter.h"
 #include "01_util/PlainCharFilter.h"
 
-#include "11_interfaces/ValueInterfaceElement.h"
+
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePageException.h"
 

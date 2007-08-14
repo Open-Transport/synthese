@@ -64,13 +64,13 @@ namespace synthese
 			static const std::string VALUE_DESTINATION;
 
 		private:
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _multiplicateurRangeeVIE;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _pagesVIE;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _pageSeparator;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _departuresToHide;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _message;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _displayServiceNumber;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _displayQuai;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _multiplicateurRangeeVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _pagesVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _pageSeparator;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _departuresToHide;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _message;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayServiceNumber;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayQuai;
 
 		public:
 			void storeParameters(interfaces::ValueElementList& vel);

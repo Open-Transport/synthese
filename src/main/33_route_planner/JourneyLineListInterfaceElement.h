@@ -34,11 +34,11 @@ namespace synthese
 		class JourneyLineListInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 		private:
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _displayPedestrianLines;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _rowStartHtml;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _rowEndHtml;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _pixelWidth;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _pixelHeight;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayPedestrianLines;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _rowStartHtml;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _rowEndHtml;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _pixelWidth;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _pixelHeight;
 			
 		public:
 			/** Display.

@@ -47,7 +47,7 @@ namespace synthese
 		class CityListInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 		private:
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _errorMessage;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _errorMessage;
 
 		public:
 			std::string display(

@@ -30,7 +30,6 @@
 
 #include "01_util/Conversion.h"
 
-#include "11_interfaces/ValueInterfaceElement.h"
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/Interface.h"
 

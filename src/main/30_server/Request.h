@@ -23,8 +23,6 @@
 #ifndef SYNTHESE_Request_H__
 #define SYNTHESE_Request_H__
 
-#include "01_util/UId.h"
-
 #include "12_security/Types.h"
 #include "12_security/Constants.h"
 
@@ -34,6 +32,9 @@
 
 #include "30_server/Types.h"
 #include "30_server/Session.h"
+
+#include "01_util/UId.h"
+#include "01_util/Factory.h"
 
 #include <boost/shared_ptr.hpp>
 

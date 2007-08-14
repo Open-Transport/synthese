@@ -24,9 +24,6 @@
 
 #include <boost/tokenizer.hpp>
 
-#include "01_util/Conversion.h"
-#include "01_util/Log.h"
-
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
@@ -37,6 +34,10 @@
 #include "12_security/UserTableSyncException.h"
 #include "12_security/Right.h"
 #include "12_security/Profile.h"
+
+#include "01_util/Conversion.h"
+#include "01_util/Log.h"
+#include "01_util/Factory.h"
 
 using namespace std;
 using boost::shared_ptr;

@@ -50,8 +50,8 @@ namespace synthese
 		class JourneyBoardInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 		private:
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _handicappedFilter;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _bikeFilter;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _handicappedFilter;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _bikeFilter;
 			
 		public:
 			std::string display(

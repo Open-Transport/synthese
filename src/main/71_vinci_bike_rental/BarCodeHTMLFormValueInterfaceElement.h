@@ -25,7 +25,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "11_interfaces/ValueInterfaceElement.h"
+
 
 namespace synthese
 {

@@ -43,10 +43,10 @@ namespace synthese
 		class DeparturesTableLineContentInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 		private:
-			boost::shared_ptr<interfaces::ValueInterfaceElement>	_htmlStartLine;
-			boost::shared_ptr<interfaces::ValueInterfaceElement>	_htmlEndLine;
-			boost::shared_ptr<interfaces::ValueInterfaceElement>	_cellWidth;
-			boost::shared_ptr<interfaces::ValueInterfaceElement>	_cellHeight;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_htmlStartLine;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_htmlEndLine;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_cellWidth;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement>	_cellHeight;
 
 		public:
 			void storeParameters(interfaces::ValueElementList& vel);

@@ -25,7 +25,9 @@
 
 #include <string>
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -36,10 +38,10 @@ namespace synthese
 		/** Position of current admin page in the tree.
 			@ingroup m32Values refValues
 		*/
-		class AdminPagePositionInterfaceElement : public interfaces::ValueInterfaceElement
+		class AdminPagePositionInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, AdminPagePositionInterfaceElement>
 		{
 			
-
 			/** Upper pages list generator, with HTML links, according to the system registrations.
 				@param page Current page
 				@param request Current request
@@ -57,8 +59,9 @@ namespace synthese
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
 
-			std::string getValue(
-				const interfaces::ParametersVector&
+			std::string display(
+				std::ostream& stream
+				, const interfaces::ParametersVector&
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL ) const;

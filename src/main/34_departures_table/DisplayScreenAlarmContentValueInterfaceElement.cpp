@@ -43,26 +43,35 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace messages;
+	using namespace departurestable;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, DisplayScreenAlarmContentValueInterfaceElement>::FACTORY_KEY("displayscreenalarmcontent");
+	}
 
 	namespace departurestable
 	{
 		const string DisplayScreenAlarmContentValueInterfaceElement::VALUE_BIG = "big";
 		const string DisplayScreenAlarmContentValueInterfaceElement::VALUE_SMALL = "small";
 
-		string DisplayScreenAlarmContentValueInterfaceElement::getValue(
-			const ParametersVector& parameters
+		string DisplayScreenAlarmContentValueInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* object, const server::Request* request) const
 		{
 			if (object == NULL)
-				return "";
+				return string();
 
-			const Alarm* alarm = ((const ArrivalDepartureListWithAlarm*) object)->alarm;
+			const Alarm* alarm(static_cast<const ArrivalDepartureListWithAlarm*>(object)->alarm);
 			
 			if (_messageSize->getValue(parameters, variables, object, request) == VALUE_BIG)
-				return alarm->getLongMessage();
+				stream << alarm->getLongMessage();
+			else
+				stream << alarm->getShortMessage();
 
-			return  alarm->getShortMessage();
+			return string();
 		}
 
 		void DisplayScreenAlarmContentValueInterfaceElement::storeParameters(ValueElementList& vel)

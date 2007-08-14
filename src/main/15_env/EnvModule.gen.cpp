@@ -2,11 +2,11 @@
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::env::LineMarkerInterfacePage>("line_marker");
 synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::env::ReservationRuleInterfacePage>("reservation_rule");
 
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LogicalStopNameValueInterfaceElement>("stop_name");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::CityNameValueInterfaceElement>("city_name");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LineStyleInterfaceElement>("line_style");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LineShortNameInterfaceElement>("line_short_name");
-synthese::util::Factory<synthese::interfaces::ValueInterfaceElement>::integrate<synthese::env::LineImageURLInterfaceElement>("line_image");
+synthese::env::LogicalStopNameValueInterfaceElement::integrate();
+synthese::env::CityNameValueInterfaceElement::integrate();
+synthese::env::LineStyleInterfaceElement::integrate();
+synthese::env::LineShortNameInterfaceElement::integrate();
+synthese::env::LineImageURLInterfaceElement::integrate();
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::FareTableSync>("15.10.02 Fares");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::BikeComplianceTableSync>("15.10.03 Bike compliances");

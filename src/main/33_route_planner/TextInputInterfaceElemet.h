@@ -51,10 +51,10 @@ namespace synthese
 		class TextInputInterfaceElemet : public interfaces::LibraryInterfaceElement
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _field;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _uid;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _text;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _html;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _field;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _uid;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _text;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _html;
 			
 		public:
 			static const std::string FIELD_ORIGIN_CITY;

@@ -24,9 +24,10 @@
 #ifndef SYNTHESE_LineStyleInterfaceElement_H__
 #define SYNTHESE_LineStyleInterfaceElement_H__
 
-#include "01_util/UId.h"
+#include "11_interfaces/LibraryInterfaceElement.h"
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "01_util/FactorableTemplate.h"
+#include "01_util/UId.h"
 
 namespace synthese
 {
@@ -39,12 +40,14 @@ namespace synthese
 		/** Line style.
 			@ingroup m15Values refValues
 		*/
-		class LineStyleInterfaceElement : public interfaces::ValueInterfaceElement
+		class LineStyleInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, LineStyleInterfaceElement>
 		{
 
 		public:
-			std::string getValue(
-				const interfaces::ParametersVector& parameters
+			std::string display(
+				std::ostream&
+				, const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;

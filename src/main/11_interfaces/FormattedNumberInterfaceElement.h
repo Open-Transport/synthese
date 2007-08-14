@@ -24,31 +24,34 @@
 #define SYNTHESE_FormattedNumberInterfaceElement_H__
 
 #include "11_interfaces/LibraryInterfaceElement.h"
+
+#include "01_util/FactorableTemplate.h"
+
 #include <string>
 
 namespace synthese
 {
 	namespace interfaces
 	{
-		class ValueInterfaceElement;
-
 		/** Formatted number interface element.
 			@ingroup m11Values refValues
 		*/
-		class FormattedNumberInterfaceElement : public ValueInterfaceElement
+		class FormattedNumberInterfaceElement
+			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, FormattedNumberInterfaceElement>
 		{
 		public:
 			static const std::string TYPE_CHAR_2;
 			static const std::string TYPE_IDENTICAL;
 
 		private:
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _numberVIE;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _formatVIE;
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _numberToAdd;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _numberVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _formatVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _numberToAdd;
 
 		public:
-			std::string	getValue(
-				const ParametersVector&
+			std::string	display(
+				std::ostream&
+				, const ParametersVector&
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL ) const;

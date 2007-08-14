@@ -42,22 +42,26 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace messages;
+	using namespace departurestable;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<LibraryInterfaceElement, DisplayScreenHasAlarmValueInterfaceElement>::FACTORY_KEY("displayscreenalarmlevel");
+	}
 
 	namespace departurestable
 	{
-		string DisplayScreenHasAlarmValueInterfaceElement::getValue(
-			const ParametersVector& parameters
+		string DisplayScreenHasAlarmValueInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* object, const server::Request* request) const
 		{
-			const Alarm* alarm = ((const ArrivalDepartureListWithAlarm*) object)->alarm;
+			const Alarm* alarm(static_cast<const ArrivalDepartureListWithAlarm*>(object)->alarm);
 			
-			// No alarm
-			if (alarm == NULL)
-				return Conversion::ToString((int) ALARM_LEVEL_NO_ALARM);
-			
-			// Alarm is present : returning its level
-			return Conversion::ToString((int) alarm->getLevel());
+			stream << static_cast<int>(alarm ? alarm->getLevel() : ALARM_LEVEL_NO_ALARM);
+
+			return string();
 		}
 
 		void DisplayScreenHasAlarmValueInterfaceElement::storeParameters(ValueElementList& vel)

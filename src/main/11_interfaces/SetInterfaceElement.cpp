@@ -20,11 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "11_interfaces/ValueElementList.h"
-
 #include "SetInterfaceElement.h"
-#include "InterfacePageException.h"
-#include "ValueInterfaceElement.h"
+
+#include "11_interfaces/ValueElementList.h"
+#include "11_interfaces/InterfacePageException.h"
 
 namespace synthese
 {

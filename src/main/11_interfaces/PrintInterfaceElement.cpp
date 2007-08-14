@@ -20,31 +20,40 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "PrintInterfaceElement.h"
+
 #include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/ValueInterfaceElement.h"
-#include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/PrintInterfaceElement.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
+	using namespace interfaces;
+	
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<LibraryInterfaceElement, PrintInterfaceElement>::FACTORY_KEY = "print";
+	}
+
 	namespace interfaces
 	{
-		std::string PrintInterfaceElement::display(std::ostream& stream
-			, const interfaces::ParametersVector& parameters, VariablesMap& vars
+		std::string PrintInterfaceElement::display(
+			std::ostream& stream
+			, const interfaces::ParametersVector& parameters
+			, VariablesMap& vars
 			, const void* rootObject /*= NULL*/
-			, const server::Request* request /*= NULL*/ ) const
-		{
-			stream << _toBePrinted->getValue(parameters, vars, rootObject, request);
-			return "";
+			, const server::Request* request /*= NULL*/
+		) const {
+			for (vector<shared_ptr<LibraryInterfaceElement> >::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
+				(*it)->display(stream, parameters, vars, rootObject, request);
+			return string();
 		}
 
 		void PrintInterfaceElement::storeParameters(ValueElementList& vel )
 		{
-			if (vel.size() != 1)
-				throw InterfacePageException("Malformed print command");
-			_toBePrinted = vel.front();
+			while(!vel.isEmpty())
+				_parameters.push_back(vel.front());
 		}
 	}
 }

@@ -36,13 +36,13 @@ namespace synthese
 
 	namespace interfaces
 	{
-		class ValueInterfaceElement;
+		class LibraryInterfaceElement;
 		class InterfacePage;
 
 		class ValueElementList
 		{
 		private:
-			typedef std::deque<boost::shared_ptr<ValueInterfaceElement> > ElementsList;
+			typedef std::deque<boost::shared_ptr<interfaces::LibraryInterfaceElement> > ElementsList;
 
 			ElementsList _elements;	//!< The list
 
@@ -91,7 +91,7 @@ namespace synthese
 			ValueElementList();
 
 		
-			boost::shared_ptr<ValueInterfaceElement> front();
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> front();
 			bool isEmpty() const;
 			size_t size() const;
 
@@ -110,7 +110,7 @@ namespace synthese
 				, VariablesMap& vars
 				, const void* object = NULL
 				, const server::Request* request=NULL
-				) const;
+			) const;
 		};
 	}
 }

@@ -44,7 +44,7 @@ namespace synthese
 		class DatesListInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
 			// List of parameters to store
-			boost::shared_ptr<interfaces::ValueInterfaceElement> _value;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _value;
 			//...
 
 		public:

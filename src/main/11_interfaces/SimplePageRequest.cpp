@@ -20,18 +20,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "SimplePageRequest.h"
+
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/InterfacePage.h"
 #include "11_interfaces/InterfacePageException.h"
-#include "11_interfaces/SimplePageRequest.h"
 
 #include "30_server/RequestException.h"
+
+#include "01_util/Factory.h"
 
 using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
 
 	namespace interfaces
 	{

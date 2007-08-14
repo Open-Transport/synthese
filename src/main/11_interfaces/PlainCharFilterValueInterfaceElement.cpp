@@ -45,15 +45,18 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
+	using namespace interfaces;
 
 	namespace util
 	{
-		// template<> const string FactoryTemplate<ValueInterfaceElement, PlainCharFilterValueInterfaceElement>::FACTORY_KEY("");
+		template<> const std::string FactorableTemplate<LibraryInterfaceElement, PlainCharFilterValueInterfaceElement>::FACTORY_KEY = "plain_char";
 	}
 
 	namespace interfaces
 	{
-		string PlainCharFilterValueInterfaceElement::getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string PlainCharFilterValueInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
 			string text = _text->getValue(parameters, variables, object, request);
 			
@@ -65,7 +68,8 @@ namespace synthese
 			out.push (filter);
 			out.push (sout);
 			out << text << std::flush;
-			return sout.str();
+			stream << sout.str();
+			return string();
 		}
 
 		void PlainCharFilterValueInterfaceElement::storeParameters(ValueElementList& vel)

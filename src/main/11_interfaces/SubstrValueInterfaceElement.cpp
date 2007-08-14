@@ -20,6 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "SubstrValueInterfaceElement.h"
+
 #include <string>
 
 #include "01_util/Conversion.h"
@@ -27,8 +29,6 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePageException.h"
-
-#include "SubstrValueInterfaceElement.h"
 
 using namespace std;
 
@@ -39,18 +39,21 @@ namespace synthese
 
 	namespace util
 	{
-		// template<> const string FactoryTemplate<ValueInterfaceElement, SubstrValueInterfaceElement>::FACTORY_KEY("");
+		template<> const std::string FactorableTemplate<LibraryInterfaceElement, SubstrValueInterfaceElement>::FACTORY_KEY = "substr";
 	}
 
 	namespace interfaces
 	{
-		string SubstrValueInterfaceElement::getValue(const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
+		string SubstrValueInterfaceElement::display(
+			ostream& stream
+			, const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
 			string text = _string->getValue(parameters, variables, object, request);
 			int start = Conversion::ToInt(_start->getValue(parameters, variables, object, request));
 			int length = Conversion::ToInt(_length->getValue(parameters, variables, object, request));
 
-			return text.substr(start, length);
+			stream << text.substr(start, length);
+			return string();
 		}
 
 		void SubstrValueInterfaceElement::storeParameters(ValueElementList& vel)

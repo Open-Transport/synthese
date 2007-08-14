@@ -23,8 +23,9 @@
 #ifndef SYNTHESE_StaticValueInterfaceElement_H__
 #define SYNTHESE_StaticValueInterfaceElement_H__
 
+#include "11_interfaces/LibraryInterfaceElement.h"
 
-#include "11_interfaces/ValueInterfaceElement.h"
+#include "01_util/FactorableTemplate.h"
 
 namespace synthese
 {
@@ -54,14 +55,17 @@ this_is_also_an_element
 
 			@ingroup m11Values refValues
 		*/
-		class StaticValueInterfaceElement : public ValueInterfaceElement
+		class StaticValueInterfaceElement
+			: public LibraryInterfaceElement
 		{
 		private:
 			const std::string _value;
 
 		public:
 			StaticValueInterfaceElement(const std::string& value);
-			std::string	getValue( const ParametersVector&, interfaces::VariablesMap& variables
+			std::string	display(
+				std::ostream&
+				, const ParametersVector&, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL ) const;
 			void storeParameters(ValueElementList& vel);
