@@ -1,18 +1,4 @@
-import os.path
 
-Import ('mainenv')
-moduleenv = mainenv.ModuleEnv()
-
-includes = '*.cpp'
-excludes = []
-
-moduleenv.AppendMultithreadConf ()
-
-files = moduleenv.Glob(includes, excludes)
-
-
-moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
-
-
-
+Import ('env')
+env.ModuleBuild ();
 

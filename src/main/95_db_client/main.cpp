@@ -4,11 +4,11 @@
 
 #include "02_db/SQLite.h"
 
-#include "01_util/Compression.h"
+#include "01_util/iostreams/Compression.h"
 #include "01_util/Conversion.h"
 #include "01_util/Exception.h"
 #include "01_util/Log.h"
-#include "01_util/Thread.h"
+#include "01_util/threads/Thread.h"
 
 
 #include <boost/iostreams/stream.hpp>
@@ -75,12 +75,15 @@ int main( int argc, char **argv )
 
     std::string host;
     int port;
+
     po::options_description desc("Allowed options");
 
     desc.add_options()
 	("help", "produce this help message")
 	("host", po::value<std::string>(&host)->default_value ("localhost"), "SQLite db server host")
-	("port", po::value<int>(&port)->default_value (3592), "SQLite db server port"); 
+	("port", po::value<int>(&port)->default_value (3592), "SQLite db server port")
+        ("without-replication", "Disable ring replication for all updates");
+
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -91,9 +94,13 @@ int main( int argc, char **argv )
 	return 1;
     }
 
+    bool withoutReplication (vm.count("without-replication") > 0);
+
     Log::GetInstance ().info ("Connecting " + host + ":" + Conversion::ToString (port));
 
     char buf[1024*64];
+
+    
 
     // No timeout !
     int timeout = 0;
@@ -115,6 +122,10 @@ int main( int argc, char **argv )
     // Wait for the welcome message...
     std::stringstream message;
     cliSocketStream.getline (buf, sizeof(buf));
+
+    // R = Replication
+    // L = Local node only
+    cliSocketStream << (withoutReplication ? 'L' : 'R');  
 
     message << buf;
 

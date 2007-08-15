@@ -6,6 +6,7 @@
 #include "03_db_ring/Node.h"
 
 #include "01_util/Conversion.h"
+#include "01_util/iostreams/Compression.h"
 
 #include <boost/date_time/posix_time/time_formatters.hpp>
 #include <boost/date_time/posix_time/time_parsers.hpp>
@@ -31,13 +32,19 @@ namespace synthese
 	template<> const int SQLiteTableSyncTemplate<UpdateRecord>::TABLE_ID = 997;
 	template<> const bool SQLiteTableSyncTemplate<UpdateRecord>::HAS_AUTO_INCREMENT = true;
 
-	template<> void SQLiteTableSyncTemplate<UpdateRecord>::load (UpdateRecord* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+	template<> void SQLiteTableSyncTemplate<UpdateRecord>::load (UpdateRecord* object, const db::SQLiteResultSPtr& rows)
 	{
-	    object->setKey (Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-	    object->setTimestamp (from_iso_string (rows.getColumn (rowId, UpdateRecordTableSync::TABLE_COL_TIMESTAMP)));
-	    object->setEmitterNodeId (Conversion::ToInt (rows.getColumn (rowId, UpdateRecordTableSync::TABLE_COL_EMITTERNODEID)));
-	    object->setState ((RecordState) Conversion::ToInt (rows.getColumn (rowId, UpdateRecordTableSync::TABLE_COL_STATE)));
-	    object->setSQL (rows.getColumn (rowId, UpdateRecordTableSync::TABLE_COL_SQL));
+	    object->setKey (rows->getLongLong (TABLE_COL_ID));
+	    object->setTimestamp (rows->getTimestamp (UpdateRecordTableSync::TABLE_COL_TIMESTAMP));
+	    object->setEmitterNodeId (rows->getInt ( UpdateRecordTableSync::TABLE_COL_EMITTERNODEID));
+	    object->setState ((RecordState) rows->getInt ( UpdateRecordTableSync::TABLE_COL_STATE));
+
+	    // Uncompress SQL
+	    std::stringstream compressed (rows->getBlob (UpdateRecordTableSync::TABLE_COL_SQL));
+	    std::stringstream sql;
+
+	    Compression::ZlibDecompress (compressed, sql);
+	    object->setSQL (sql.str ());
 	}
 
 
@@ -50,15 +57,23 @@ namespace synthese
 
 	    assert (object->getKey() != 0);
 	    
-	    query << "REPLACE INTO " << TABLE_NAME << " VALUES ("
-		  << object->getKey () << ","   
-		  << Conversion::ToSQLiteString (to_iso_string (object->getTimestamp ())) << "," 
-		  << object->getEmitterNodeId () << ","
-		  << object->getState () << ","
-		  << Conversion::ToSQLiteString (object->getSQL ()) 
-		  << ")";	    
+	    query << "REPLACE INTO " << TABLE_NAME << " VALUES (:key, :timestamp, :emitter_node_id, :state, :sql)";
+	    SQLiteStatementSPtr statement (sqlite->compileStatement (query.str ()));
+	    
+	    statement->bindParameterLongLong (":key", object->getKey ());
+	    statement->bindParameterTimestamp (":timestamp", object->getTimestamp ());
+	    statement->bindParameterLongLong (":emitter_node_id", object->getEmitterNodeId ());
+	    statement->bindParameterInt (":state", object->getState ());
 
-	    sqlite->execUpdate(query.str());
+	    // Compress SQL
+	    std::stringstream sql (object->getSQL ());
+	    std::stringstream compressed;
+	    Compression::ZlibCompress (sql, compressed);
+
+	    statement->bindParameterBlob (":sql", compressed.str ());
+
+	    sqlite->execUpdate (statement);
+
 	}
     }
 
@@ -81,7 +96,7 @@ namespace synthese
 	    addTableColumn (TABLE_COL_TIMESTAMP, "TEXT", false);
 	    addTableColumn (TABLE_COL_EMITTERNODEID, "INTEGER", false);
 	    addTableColumn (TABLE_COL_STATE, "INTEGER", false);
-	    addTableColumn (TABLE_COL_SQL, "TEXT", false);
+	    addTableColumn (TABLE_COL_SQL, "BLOB", false);
 	    
 	    addTableIndex(TABLE_COL_EMITTERNODEID);
 	    addTableIndex(TABLE_COL_TIMESTAMP);
@@ -100,7 +115,7 @@ namespace synthese
 	void 
 	UpdateRecordTableSync::rowsAdded (SQLiteQueueThreadExec* sqlite, 
 					  SQLiteSync* sync,
-					  const SQLiteResult& rows, bool isFirstSync)
+					  const SQLiteResultSPtr& rows, bool isFirstSync)
 	{
 	    rowsUpdated (sqlite, sync, rows);
 	}
@@ -110,12 +125,12 @@ namespace synthese
 	void 
 	UpdateRecordTableSync::rowsUpdated (SQLiteQueueThreadExec* sqlite, 
 					    SQLiteSync* sync,
-					    const SQLiteResult& rows)
+					    const SQLiteResultSPtr& rows)
 	{
-	    for (int i=0; i<rows.getNbRows (); ++i)
+	    while (rows->next ())
 	    {
 		UpdateRecord* ur = new UpdateRecord ();
-		load (ur, rows, i);
+		load (ur, rows);
 		UpdateRecordSPtr urp (ur);
 		DbRingModule::GetNode ()->setUpdateRecordCallback (urp);
 	    }
@@ -126,7 +141,7 @@ namespace synthese
 	void 
 	UpdateRecordTableSync::rowsRemoved (SQLiteQueueThreadExec* sqlite, 
 					    SQLiteSync* sync,
-					    const SQLiteResult& rows)
+					    const SQLiteResultSPtr& rows)
 	{
 
 	}
@@ -148,12 +163,12 @@ namespace synthese
 	    query << "SELECT * FROM " << TABLE_NAME << " WHERE " 
 		  << TABLE_COL_TIMESTAMP << " " << (inclusive ? ">=" : ">") << " " << Conversion::ToSQLiteString (to_iso_string (timestamp));
 
-	    SQLiteResult result = DBModule::GetSQLite()->execQuery (query.str());
+	    SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
 	    
-	    for (int i=0; i<result.getNbRows (); ++i)
+	    while (result->next ())
 	    {
 		UpdateRecord* ur = new UpdateRecord ();
-		load (ur, result, i);
+		load (ur, result);
 		dest->setUpdateRecord (UpdateRecordSPtr (ur));
 	    }
 	}
@@ -167,15 +182,16 @@ namespace synthese
 	    std::stringstream query;
 
 	    query << "SELECT MAX(" << TABLE_COL_TIMESTAMP << ") AS ts FROM " << TABLE_NAME ;
-	    SQLiteResult result = DBModule::GetSQLite()->execQuery (query.str());
-	    if (result.getNbRows () && (result.getColumn (0, "ts") != ""))
+	    SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
+	    if (result->next () && (result->getText ("ts") != ""))
 	    {
-		std::string ts (result.getColumn (0, "ts"));
-		return from_iso_string (ts);
+		return result->getTimestamp ("ts");
 	    }
 	    
 	    return min_date_time;
 	}
+
+
 
 
 	long 
@@ -185,11 +201,10 @@ namespace synthese
 
 	    query << "SELECT COUNT(*) AS lui FROM " << TABLE_NAME <<  " WHERE " 
 		  << TABLE_COL_EMITTERNODEID << "=" << nodeId;
-	    SQLiteResult result = DBModule::GetSQLite()->execQuery (query.str());
-	    if (result.getNbRows () && (result.getColumn (0, "lui") != ""))
+	    SQLiteResultSPtr result = DBModule::GetSQLite()->execQuery (query.str());
+	    if (result->next () && (result->getText ("lui") != ""))
 	    {
-		std::string lui (result.getColumn (0, "lui"));
-		return Conversion::ToLong (lui);
+		return result->getLong ("lui");
 	    }
 	    return 0;
 	}

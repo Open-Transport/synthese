@@ -58,91 +58,86 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<ScheduledService>::TABLE_ID = 16;
 		template<> const bool SQLiteTableSyncTemplate<ScheduledService>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ScheduledService>::load(ScheduledService* ss, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<ScheduledService>::load(ScheduledService* ss, const db::SQLiteResultSPtr& rows )
 		{
 
 
-			uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+		    uid id (rows->getLongLong (TABLE_COL_ID));
+		    
+		    int serviceNumber (rows->getInt (ScheduledServiceTableSync::COL_SERVICENUMBER));
+		    
+		    std::string schedules (rows->getText (ScheduledServiceTableSync::COL_SCHEDULES));
 
-			int serviceNumber (Conversion::ToInt (
-				rows.getColumn (rowIndex, ScheduledServiceTableSync::COL_SERVICENUMBER)));
+		    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
-			std::string schedules (
-				rows.getColumn (rowIndex, ScheduledServiceTableSync::COL_SCHEDULES));
-
-			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-
-			// Parse all schedules arrival#departure,arrival#departure...
-			boost::char_separator<char> sep1 (",");
-			tokenizer schedulesTokens (schedules, sep1);
-
-			ScheduledService::Schedules departureSchedules;
-			ScheduledService::Schedules arrivalSchedules;
-
-			for (tokenizer::iterator schedulesIter = schedulesTokens.begin();
-				schedulesIter != schedulesTokens.end (); ++schedulesIter)
+		    // Parse all schedules arrival#departure,arrival#departure...
+		    boost::char_separator<char> sep1 (",");
+		    tokenizer schedulesTokens (schedules, sep1);
+		    
+		    ScheduledService::Schedules departureSchedules;
+		    ScheduledService::Schedules arrivalSchedules;
+		    
+		    for (tokenizer::iterator schedulesIter = schedulesTokens.begin();
+			 schedulesIter != schedulesTokens.end (); ++schedulesIter)
+		    {
+			std::string arrDep (*schedulesIter);
+			size_t sepPos = arrDep.find ("#");
+			assert (sepPos != std::string::npos);
+			
+			std::string arrivalScheduleStr (arrDep.substr (0, sepPos));
+			std::string departureScheduleStr (arrDep.substr (sepPos+1));
+			
+			// unnecessary : boost::trim (departureScheduleStr);
+			// unnecessary : boost::trim (arrivalScheduleStr);
+			
+			if (departureScheduleStr.empty ())
 			{
-				std::string arrDep (*schedulesIter);
-				size_t sepPos = arrDep.find ("#");
-				assert (sepPos != std::string::npos);
-
-				std::string arrivalScheduleStr (arrDep.substr (0, sepPos));
-				std::string departureScheduleStr (arrDep.substr (sepPos+1));
-
-				// unnecessary : boost::trim (departureScheduleStr);
-				// unnecessary : boost::trim (arrivalScheduleStr);
-
-				if (departureScheduleStr.empty ())
-				{
-					assert (arrivalScheduleStr.empty () == false);
-					departureScheduleStr = arrivalScheduleStr;
-				}
-				if (arrivalScheduleStr.empty ())
-				{
-					assert (departureScheduleStr.empty () == false);
-					arrivalScheduleStr = departureScheduleStr;
-				}
-
-				Schedule departureSchedule (Schedule::FromString (departureScheduleStr));
-				Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
-
-				departureSchedules.push_back (departureSchedule);
-				arrivalSchedules.push_back (arrivalSchedule);
+			    assert (arrivalScheduleStr.empty () == false);
+			    departureScheduleStr = arrivalScheduleStr;
 			}
+			if (arrivalScheduleStr.empty ())
+			{
+			    assert (departureScheduleStr.empty () == false);
+			    arrivalScheduleStr = departureScheduleStr;
+			}
+			
+			Schedule departureSchedule (Schedule::FromString (departureScheduleStr));
+			Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
+			
+			departureSchedules.push_back (departureSchedule);
+			arrivalSchedules.push_back (arrivalSchedule);
+		    }
+		    
+		    assert (departureSchedules.size () > 0);
+		    assert (arrivalSchedules.size () > 0);
+		    assert (departureSchedules.size () == arrivalSchedules.size ());
+		    
+		    uid pathId (rows->getLongLong (ScheduledServiceTableSync::COL_PATHID));
+		    
+		    shared_ptr<Path> path = EnvModule::fetchPath (pathId);
+		    assert (path != 0);
+		    assert (path->getEdges ().size () == arrivalSchedules.size ());
+		    
+		    uid bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
+		    
+		    uid handicappedComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+		    
+		    uid pedestrianComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
+		    
+		    uid reservationRuleId (rows->getLongLong (ScheduledServiceTableSync::COL_RESERVATIONRULEID));
 
-			assert (departureSchedules.size () > 0);
-			assert (arrivalSchedules.size () > 0);
-			assert (departureSchedules.size () == arrivalSchedules.size ());
-
-			uid pathId (Conversion::ToLongLong (rows.getColumn (rowIndex, ScheduledServiceTableSync::COL_PATHID)));
-
-			shared_ptr<Path> path = EnvModule::fetchPath (pathId);
-			assert (path != 0);
-			assert (path->getEdges ().size () == arrivalSchedules.size ());
-
-			uid bikeComplianceId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, ScheduledServiceTableSync::COL_BIKECOMPLIANCEID)));
-
-			uid handicappedComplianceId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID)));
-
-			uid pedestrianComplianceId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID)));
-
-			uid reservationRuleId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, ScheduledServiceTableSync::COL_RESERVATIONRULEID)));
-
-			ss->setPath(path.get());
-			ss->setServiceNumber(serviceNumber);
-			ss->setKey(id);
-			ss->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId).get());
-			ss->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
-			ss->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
-			ss->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId).get());
-			ss->setDepartureSchedules(departureSchedules);
-			ss->setArrivalSchedules(arrivalSchedules);
-			ss->getPath()->addService(ss);
+		    ss->setPath(path.get());
+		    ss->setServiceNumber(serviceNumber);
+		    ss->setKey(id);
+		    ss->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId).get());
+		    ss->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
+		    ss->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
+		    ss->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId).get());
+		    ss->setDepartureSchedules(departureSchedules);
+		    ss->setArrivalSchedules(arrivalSchedules);
+		    ss->getPath()->addService(ss);
 		}
+
 
 		template<> void SQLiteTableSyncTemplate<ScheduledService>::save(ScheduledService* object)
 		{
@@ -185,63 +180,58 @@ namespace synthese
 			addTableColumn (COL_RESERVATIONRULEID, "INTEGER", true);
 		}
 
-		void ScheduledServiceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void ScheduledServiceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-
-		    std::set<Path*> processedPaths;
-		    
 		    // Loop on each added row
-		    for (int i=0; i<rows.getNbRows(); ++i)
+		    while (rows->next ())
 		    {
 			boost::shared_ptr<ScheduledService> service;
-			if (EnvModule::getScheduledServices().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+			if (EnvModule::getScheduledServices().contains(rows->getLongLong (TABLE_COL_ID)))
 			{
-			    service = EnvModule::getScheduledServices().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+			    service = EnvModule::getScheduledServices().getUpdateable(rows->getLongLong (TABLE_COL_ID));
 			    service->getPath()->removeService(service.get());
-			    load(service.get(), rows, i);
+			    load(service.get(), rows);
 			}
 			else
 			{
 			    service.reset(new ScheduledService);
-			    load(service.get(), rows, i);
+			    load(service.get(), rows);
 			    EnvModule::getScheduledServices().add(service);
 			}
 			
-			processedPaths.insert (service->getPath());
 		    }
-		    
-		    for (std::set<Path*>::iterator it = processedPaths.begin ();
-			 it != processedPaths.end (); ++it) (*it)->updateScheduleIndexes();
 		}
 	    
 
-		void ScheduledServiceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+
+		void ScheduledServiceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
-				if (EnvModule::getScheduledServices().contains(id))
-				{
-					shared_ptr<ScheduledService> object = EnvModule::getScheduledServices().getUpdateable(id);
-					object->getPath()->removeService(object.get());
-					load(object.get(), rows, i);
-				}
+			    uid id = rows->getLongLong (TABLE_COL_ID);
+			    if (EnvModule::getScheduledServices().contains(id))
+			    {
+				shared_ptr<ScheduledService> object = EnvModule::getScheduledServices().getUpdateable(id);
+				object->getPath()->removeService(object.get());
+				load(object.get(), rows);
+			    }
 			}
 		}
 
-		void ScheduledServiceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ScheduledServiceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+		    while (rows->next ())
+		    {
+			uid id = rows->getLongLong (TABLE_COL_ID);
+			if (EnvModule::getScheduledServices().contains(id))
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
-				if (EnvModule::getScheduledServices().contains(id))
-				{
-					shared_ptr<ScheduledService> object(EnvModule::getScheduledServices().getUpdateable(id));
-					object->getPath()->removeService(object.get());
-					EnvModule::getScheduledServices().remove(id);
-				}
+			    shared_ptr<ScheduledService> object(EnvModule::getScheduledServices().getUpdateable(id));
+			    object->getPath()->removeService(object.get());
+			    EnvModule::getScheduledServices().remove(id);
 			}
+		    }
 		}
+
 
 		std::vector<shared_ptr<ScheduledService> > ScheduledServiceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
@@ -261,12 +251,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<ScheduledService> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<ScheduledService> object ( new ScheduledService());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;
@@ -279,21 +269,22 @@ namespace synthese
 
 		void ScheduledServiceTableSync::afterFirstSync( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync )
 		{
+/*
 		    // Lines
-		    /*
-		      for (Line::Registry::const_iterator it = EnvModule::getLines().begin(); it != EnvModule::getLines().end(); it++)
+		    for (Line::Registry::const_iterator it = EnvModule::getLines().begin(); it != EnvModule::getLines().end(); it++)
 		    {
 			shared_ptr<Line> line = EnvModule::getLines().getUpdateable(it->first);
 			line ->updateScheduleIndexes();
 		    }
-		    */
+
 		    
 		    // Roads
-/*			for (Road::Registry::const_iterator it = EnvModule::getRoads().begin(); it != EnvModule::getLines().end(); it++)
+			for (Road::Registry::const_iterator it = EnvModule::getRoads().begin(); it != EnvModule::getLines().end(); it++)
 			{
 			(*it)->updateSchedulesIndexes();
 			}
 */
+
 		}
 	}
 }

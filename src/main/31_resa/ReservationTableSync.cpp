@@ -49,30 +49,30 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Reservation>::TABLE_ID = 44;
 		template<> const bool SQLiteTableSyncTemplate<Reservation>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Reservation>::load(Reservation* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Reservation>::load(Reservation* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			object->setLineId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_LINE_ID)));
-			object->setLineCode(rows.getColumn(rowId, ReservationTableSync::COL_LINE_CODE));
-			object->setServiceCode(rows.getColumn(rowId, ReservationTableSync::COL_SERVICE_CODE));
-			object->setDeparturePlaceId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_DEPARTURE_PLACE_ID)));
-			object->setDeparturePlaceName(rows.getColumn(rowId, ReservationTableSync::COL_DEPARTURE_PLACE_NAME));
-			object->setDepartureAddress(rows.getColumn(rowId, ReservationTableSync::COL_DEPARTURE_ADDRESS));
-			object->setDepartureTime(DateTime::FromSQLTimestamp(rows.getColumn(rowId, ReservationTableSync::COL_DEPARTURE_TIME)));
-			object->setArrivalPlaceId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_ARRIVAL_PLACE_ID)));
-			object->setArrivalPlaceName(rows.getColumn(rowId, ReservationTableSync::COL_ARRIVAL_PLACE_NAME));
-			object->setArrivalAddress(rows.getColumn(rowId, ReservationTableSync::COL_ARRIVAL_ADDRESS));
-			object->setArrivalTime(DateTime::FromSQLTimestamp(rows.getColumn(rowId, ReservationTableSync::COL_ARRIVAL_TIME)));
-			object->setReservationRuleId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_RESERVATION_RULE_ID)));
-			object->setLastReservationId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_LAST_RESERVATION_ID)));
-			object->setSeats(Conversion::ToInt(rows.getColumn(rowId, ReservationTableSync::COL_SEATS)));
-			object->setBookingTime(DateTime::FromSQLTimeStamp(rows.getColumn(rowId, ReservationTableSync::COL_BOOKING_TIME)));
-			object->setCancellationTime(DateTime::FromSQLTimeStamp(rows.getColumn(rowId, ReservationTableSync::COL_CANCELLATION_TIME)));
-			object->setCustomerUserId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_CUSTOMER_ID)));
-			object->setCustomerName(rows.getColumn(rowId, ReservationTableSync::COL_CUSTOMER_NAME));
-			object->setCustomerPhone(rows.getColumn(rowId, ReservationTableSync::COL_CUSTOMER_PHONE));
-			object->setBookingUserId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_BOOKING_USER_ID)));
-			object->setCancelUserId(Conversion::ToLongLong(rows.getColumn(rowId, ReservationTableSync::COL_CANCEL_USER_ID)));
+			object->setKey(rows->getLongLong (TABLE_COL_ID));
+			object->setLineId(rows->getLongLong ( ReservationTableSync::COL_LINE_ID)));
+			object->setLineCode(rows->get ( ReservationTableSync::COL_LINE_CODE));
+			object->setServiceCode(rows->get ( ReservationTableSync::COL_SERVICE_CODE));
+			object->setDeparturePlaceId(rows->getLongLong ( ReservationTableSync::COL_DEPARTURE_PLACE_ID)));
+			object->setDeparturePlaceName(rows->get ( ReservationTableSync::COL_DEPARTURE_PLACE_NAME));
+			object->setDepartureAddress(rows->get ( ReservationTableSync::COL_DEPARTURE_ADDRESS));
+			object->setDepartureTime(DateTime::FromSQLTimestamp(rows->get ( ReservationTableSync::COL_DEPARTURE_TIME)));
+			object->setArrivalPlaceId(rows->getLongLong ( ReservationTableSync::COL_ARRIVAL_PLACE_ID)));
+			object->setArrivalPlaceName(rows->get ( ReservationTableSync::COL_ARRIVAL_PLACE_NAME));
+			object->setArrivalAddress(rows->get ( ReservationTableSync::COL_ARRIVAL_ADDRESS));
+			object->setArrivalTime(DateTime::FromSQLTimestamp(rows->get ( ReservationTableSync::COL_ARRIVAL_TIME)));
+			object->setReservationRuleId(rows->getLongLong ( ReservationTableSync::COL_RESERVATION_RULE_ID)));
+			object->setLastReservationId(rows->getLongLong ( ReservationTableSync::COL_LAST_RESERVATION_ID)));
+			object->setSeats(Conversion::ToInt(rows->get ( ReservationTableSync::COL_SEATS)));
+			object->setBookingTime(DateTime::FromSQLTimeStamp(rows->get ( ReservationTableSync::COL_BOOKING_TIME)));
+			object->setCancellationTime(DateTime::FromSQLTimeStamp(rows->get ( ReservationTableSync::COL_CANCELLATION_TIME)));
+			object->setCustomerUserId(rows->getLongLong ( ReservationTableSync::COL_CUSTOMER_ID)));
+			object->setCustomerName(rows->get ( ReservationTableSync::COL_CUSTOMER_NAME));
+			object->setCustomerPhone(rows->get ( ReservationTableSync::COL_CUSTOMER_PHONE));
+			object->setBookingUserId(rows->getLongLong ( ReservationTableSync::COL_BOOKING_USER_ID)));
+			object->setCancelUserId(rows->getLongLong ( ReservationTableSync::COL_CANCEL_USER_ID)));
 		}
 
 		template<> void SQLiteTableSyncTemplate<Reservation>::save(Reservation* object)
@@ -168,15 +168,15 @@ namespace synthese
 			addTableIndex(COL_ARRIVAL_PLACE_ID);
 		}
 
-		void ReservationTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void ReservationTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		}
 		
-		void ReservationTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ReservationTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 		}
 
-		void ReservationTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ReservationTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 		}
 
@@ -198,9 +198,9 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<Reservation*> objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					Reservation* object = new Reservation();
 					load(object, result, i);

@@ -109,13 +109,6 @@ namespace synthese
 		@skip ComponentTableSync
 		@until }
 
-		<h3>Environments links</h3>
-
-		@copydoc synthese::envlssql::EnvironmentLinkTableSync
-		@dontinclude EnvironmentLinkTableSync.cpp
-		@skip synthese::db::SQLiteTableSync
-		@until }
-
 		<h3>Environments</h3>
 
 		@copydoc synthese::envlssql::EnvironmentTableSync

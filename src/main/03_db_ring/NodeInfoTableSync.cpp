@@ -32,17 +32,17 @@ namespace synthese
 	template<> const int SQLiteTableSyncTemplate<NodeInfo>::TABLE_ID = 998;
 	template<> const bool SQLiteTableSyncTemplate<NodeInfo>::HAS_AUTO_INCREMENT = true;
 
-	template<> void SQLiteTableSyncTemplate<NodeInfo>::load (NodeInfo* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+	template<> void SQLiteTableSyncTemplate<NodeInfo>::load (NodeInfo* object, const db::SQLiteResultSPtr& rows)
 	{
-	    object->setNodeId (Conversion::ToInt (rows.getColumn (rowId, NodeInfoTableSync::TABLE_COL_NODEID)));
-	    object->setRingId (Conversion::ToInt (rows.getColumn (rowId, NodeInfoTableSync::TABLE_COL_RINGID)));
-	    object->setHost (rows.getColumn (rowId, NodeInfoTableSync::TABLE_COL_HOST));
-	    object->setPort (Conversion::ToInt (rows.getColumn (rowId, NodeInfoTableSync::TABLE_COL_PORT)));
-	    object->setAuthority (Conversion::ToBool (rows.getColumn (rowId, NodeInfoTableSync::TABLE_COL_AUTH)));
-	    object->setState ((NodeState) Conversion::ToInt (rows.getColumn (rowId, NodeInfoTableSync::TABLE_COL_STATE)));
-	    object->setClock (Conversion::ToLongLong (rows.getColumn (rowId, NodeInfoTableSync::TABLE_COL_CLOCK)));
-	    object->setLastPendingTimestamp (from_iso_string (rows.getColumn (rowId, NodeInfoTableSync::TABLE_COL_LASTPENDINGTIMESTAMP)));
-	    object->setLastAcknowledgedTimestamp (from_iso_string (rows.getColumn (rowId, NodeInfoTableSync::TABLE_COL_LASTACKNOWLEDGEDTIMESTAMP)));
+	    object->setNodeId (rows->getInt (NodeInfoTableSync::TABLE_COL_NODEID));
+	    object->setRingId (rows->getInt (NodeInfoTableSync::TABLE_COL_RINGID));
+	    object->setHost (rows->getText (NodeInfoTableSync::TABLE_COL_HOST));
+	    object->setPort (rows->getInt (NodeInfoTableSync::TABLE_COL_PORT));
+	    object->setAuthority (rows->getBool (NodeInfoTableSync::TABLE_COL_AUTH));
+	    object->setState ((NodeState) rows->getInt (NodeInfoTableSync::TABLE_COL_STATE));
+	    object->setClock (rows->getLongLong (NodeInfoTableSync::TABLE_COL_CLOCK));
+	    object->setLastPendingTimestamp (rows->getTimestamp (NodeInfoTableSync::TABLE_COL_LASTPENDINGTIMESTAMP));
+	    object->setLastAcknowledgedTimestamp (rows->getTimestamp (NodeInfoTableSync::TABLE_COL_LASTACKNOWLEDGEDTIMESTAMP));
 	}
 
 
@@ -117,7 +117,7 @@ namespace synthese
 	void 
 	NodeInfoTableSync::rowsAdded (SQLiteQueueThreadExec* sqlite, 
 				      SQLiteSync* sync,
-				      const SQLiteResult& rows, bool isFirstSync)
+				      const SQLiteResultSPtr& rows, bool isFirstSync)
 	{
 	    rowsUpdated (sqlite, sync, rows);
 	}
@@ -127,29 +127,36 @@ namespace synthese
 	void 
 	NodeInfoTableSync::rowsUpdated (SQLiteQueueThreadExec* sqlite, 
 					SQLiteSync* sync,
-					const SQLiteResult& rows)
+					const SQLiteResultSPtr& rows)
 	{
 	    NodeInfo info;
 	    std::set<int> processedRows;
 
 	    // Check if there is info concerning this node. If there is, 
 	    // process it first.
-	    for (int i=0; i<rows.getNbRows (); ++i)
+	    int i = 0;
+	    while (rows->next ())
 	    {
-		load (&info, rows, i);
-		if (info.getNodeId () == DbRingModule::GetNode ()->getId ())
+		int nodeId = rows->getInt (NodeInfoTableSync::TABLE_COL_NODEID);
+		if (nodeId == DbRingModule::GetNode ()->getId ())
 		{
+		    load (&info, rows);
 		    DbRingModule::GetNode ()->setNodeInfoCallback (info);
 		    processedRows.insert (i);
 		}
+		++i;
 	    }
-	    for (int i=0; i<rows.getNbRows (); ++i)
+
+	    i = 0;
+	    rows->reset ();
+	    while (rows->next ())
 	    {
 		if (processedRows.find (i) == processedRows.end ())
 		{
-		    load (&info, rows, i);
+		    load (&info, rows);
 		    DbRingModule::GetNode ()->setNodeInfoCallback (info);
 		}
+		++i;
 	    }
 	}
  
@@ -157,7 +164,7 @@ namespace synthese
 	void 
 	NodeInfoTableSync::rowsRemoved (SQLiteQueueThreadExec* sqlite, 
 					SQLiteSync* sync,
-					const SQLiteResult& rows)
+					const SQLiteResultSPtr& rows)
 	{
 
 	}

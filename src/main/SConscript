@@ -4,34 +4,14 @@ import os.path
 
 Import ('rootenv')
 
+
 mainenv = rootenv.Copy()
+
 
 # Add specific configuration for building main modules
 # ...
 
 Export ('mainenv')
 
-
-builddir = mainenv['BUILDROOT'] + '/' + 'main'
-
-srcpath = Dir('.').srcnode().abspath
-
-files = os.listdir( srcpath )
-modules = []
-
-
-# Build the list of modules to be processed
-for f in files:
-  if not os.path.isdir (os.path.join (srcpath, f)): continue
-  if not os.path.exists (os.path.join (srcpath, f, 'SConscript')): continue
-  modules.append (f)
-    
-
-
-for module in modules:
-  mainenv.SConscript(os.path.join (srcpath, module, 'SConscript'),
-                     build_dir=os.path.join (builddir, module),
-                     duplicate=0)
-
-
+mainenv.RecursiveBuild ()
 

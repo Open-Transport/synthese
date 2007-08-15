@@ -20,8 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "00_tcp/TcpService.h"
-
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteSync.h"
 #include "02_db/SQLiteTableSync.h"
@@ -29,8 +27,10 @@
 
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
-#include "01_util/ManagedThread.h"
+#include "01_util/threads/ManagedThread.h"
 #include "01_util/Factory.h"
+
+#include "00_tcp/TcpService.h"
 
 
 #include <iostream>

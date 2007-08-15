@@ -49,19 +49,17 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Address>::TABLE_ID = 2;
 		template<> const bool SQLiteTableSyncTemplate<Address>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Address>::load(Address* object, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Address>::load(Address* object, const db::SQLiteResultSPtr& rows )
 		{
-			uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+		    uid id (rows->getLongLong (TABLE_COL_ID));
 
-			object->setKey(id);
-			object->setPlace(EnvModule::getConnectionPlaces ().get (Conversion::ToLongLong (rows.getColumn (rowIndex, AddressTableSync::COL_PLACEID))).get());
-			object->setRoad(EnvModule::getRoads ().get (Conversion::ToLongLong (rows.getColumn (rowIndex, AddressTableSync::COL_ROADID))).get());
-			object->setMetricOffset(Conversion::ToDouble (rows.getColumn (rowIndex, AddressTableSync::COL_METRICOFFSET)));
-			object->setXY(
-				Conversion::ToDouble (rows.getColumn (rowIndex, AddressTableSync::COL_X))
-				, Conversion::ToDouble (rows.getColumn (rowIndex, AddressTableSync::COL_Y))
-			);
+		    object->setKey (id);
+		    object->setPlace (EnvModule::getConnectionPlaces ().get (rows->getLongLong (AddressTableSync::COL_PLACEID)).get ());
+		    object->setRoad (EnvModule::getRoads ().get (rows->getLongLong (AddressTableSync::COL_ROADID)).get());
+		    object->setMetricOffset (rows->getDouble (AddressTableSync::COL_METRICOFFSET));
+		    object->setXY (rows->getDouble (AddressTableSync::COL_X), rows->getDouble (AddressTableSync::COL_Y));
 		}
+
 
 		template<> void SQLiteTableSyncTemplate<Address>::save(Address* object)
 		{
@@ -105,43 +103,43 @@ namespace synthese
 		}
 
 
-
-		void AddressTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool)
+		void AddressTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				if (EnvModule::getAddresses().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				if (EnvModule::getAddresses().contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load(EnvModule::getAddresses().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
+					load (EnvModule::getAddresses().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
 				}
 				else
 				{
 					shared_ptr<Address> object(new Address);
-					shared_ptr<AddressablePlace> place = EnvModule::fetchUpdateableAddressablePlace(Conversion::ToLongLong(rows.getColumn(i, COL_PLACEID)));
-					load(object.get(), rows, i);
+					shared_ptr<AddressablePlace> place = 
+					    EnvModule::fetchUpdateableAddressablePlace(rows->getLongLong(COL_PLACEID));
+					load(object.get(), rows);
 					EnvModule::getAddresses().add(object);
 					place->addAddress(object.get());
 				}
 			}
 		}
 		
-		void AddressTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void AddressTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getAddresses().contains(id))
 				{
-					load(EnvModule::getAddresses().getUpdateable(id).get(), rows, i);
+					load(EnvModule::getAddresses().getUpdateable(id).get(), rows);
 				}
 			}
 		}
 
-		void AddressTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void AddressTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getAddresses().contains(id))
 				{
 					EnvModule::getAddresses().remove(id);
@@ -167,12 +165,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<Address> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<Address> object(new Address);
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

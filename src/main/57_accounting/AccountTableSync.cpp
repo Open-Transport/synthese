@@ -49,20 +49,24 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Account>::TABLE_ID = 28;
 		template<> const bool SQLiteTableSyncTemplate<Account>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Account>::load(Account* account, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Account>::load(Account* account, const db::SQLiteResultSPtr& rows )
 		{
 			try
 			{
-				account->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-				account->setLeftClassNumber(rows.getColumn(rowId, AccountTableSync::TABLE_COL_LEFT_CLASS_NUMBER));
-				account->setLeftCurrency(AccountingModule::getCurrencies().get(Conversion::ToLongLong(rows.getColumn(rowId, AccountTableSync::TABLE_COL_LEFT_CURRENCY_ID))));
-				account->setLeftNumber(rows.getColumn(rowId, AccountTableSync::TABLE_COL_LEFT_NUMBER));
-				account->setLeftUserId(Conversion::ToLongLong(rows.getColumn(rowId, AccountTableSync::TABLE_COL_LEFT_USER_ID)));
-				account->setRightClassNumber(rows.getColumn(rowId, AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER));
-				account->setRightCurrency(AccountingModule::getCurrencies().get(Conversion::ToLongLong(rows.getColumn(rowId, AccountTableSync::TABLE_COL_RIGHT_CURRENCY_ID))));
-				account->setRightNumber(rows.getColumn(rowId, AccountTableSync::TABLE_COL_RIGHT_NUMBER));
-				account->setRightUserId(Conversion::ToLongLong(rows.getColumn(rowId, AccountTableSync::TABLE_COL_RIGHT_USER_ID)));
-				account->setName(rows.getColumn(rowId, AccountTableSync::TABLE_COL_NAME));
+			    account->setKey(rows->getLongLong (TABLE_COL_ID));
+			    account->setLeftClassNumber(rows->getText ( AccountTableSync::TABLE_COL_LEFT_CLASS_NUMBER));
+			    account->setLeftCurrency(AccountingModule::getCurrencies().get(
+							 rows->getLongLong ( AccountTableSync::TABLE_COL_LEFT_CURRENCY_ID)));
+
+			    account->setLeftNumber(rows->getText ( AccountTableSync::TABLE_COL_LEFT_NUMBER));
+			    account->setLeftUserId(rows->getLongLong ( AccountTableSync::TABLE_COL_LEFT_USER_ID));
+			    account->setRightClassNumber(rows->getText ( AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER));
+			    account->setRightCurrency(AccountingModule::getCurrencies().get (
+							  rows->getLongLong ( AccountTableSync::TABLE_COL_RIGHT_CURRENCY_ID)));
+
+			    account->setRightNumber(rows->getText ( AccountTableSync::TABLE_COL_RIGHT_NUMBER));
+			    account->setRightUserId(rows->getLongLong ( AccountTableSync::TABLE_COL_RIGHT_USER_ID));
+			    account->setName(rows->getText ( AccountTableSync::TABLE_COL_NAME));
 			}
 			catch (Currency::RegistryKeyException& e)
 			{
@@ -112,17 +116,17 @@ namespace synthese
 
 
 
-		void AccountTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void AccountTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 
 		}
 
-		void AccountTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void AccountTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
 
-		void AccountTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void AccountTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
@@ -164,12 +168,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<Account> > accounts;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<Account> account(new Account);
-					load(account.get(), result, i);
+					load(account.get(), rows);
 					accounts.push_back(account);
 				}
 				return accounts;

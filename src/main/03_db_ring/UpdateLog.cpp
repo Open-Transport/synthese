@@ -123,10 +123,11 @@ std::istream&
 operator>> ( std::istream& is, UpdateLog& op )
 {
     boost::recursive_mutex::scoped_lock updateLock (*(op._updateMutex));
-    static char buf[1024*256]; // 256 KBytes max.
+    static const int maxlen (1024*1024*64); 
+    static char buf[maxlen]; 
 
     std::string lut;
-    while (is.getline (buf, 1024*256, ETX))
+    while (is.getline (buf, maxlen, ETX))
     {
 	std::stringstream input (buf);
 	UpdateRecord* updateRecord = new UpdateRecord ();

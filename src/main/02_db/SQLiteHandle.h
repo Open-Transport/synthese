@@ -36,8 +36,13 @@ namespace synthese
 
 			virtual sqlite3* getHandle () = 0;
 
-			virtual SQLiteResult execQuery (const std::string& sql) ;
-			virtual void execUpdate (const std::string& sql, bool asynchronous = false) ;
+			virtual SQLiteStatementSPtr compileStatement (const SQLData& sql);
+
+			virtual SQLiteResultSPtr execQuery (const SQLiteStatementSPtr& statement, bool lazy = true) ;
+			virtual SQLiteResultSPtr execQuery (const SQLData& sql, bool lazy = true) ;
+
+			virtual void execUpdate (const SQLiteStatementSPtr& statement, bool asynchronous = false) ;
+			virtual void execUpdate (const SQLData& sql, bool asynchronous = false) ;
 
 			/** Returns true if a transaction is already opened.
 			    SQLite does not support nested transaction.
@@ -50,9 +55,8 @@ namespace synthese
 			*/
 			virtual void beginTransaction (bool exclusive = false);
 			virtual void commitTransaction ();
+			virtual void rollbackTransaction ();
 			
-			virtual SQLiteStatement prepareStatement (const std::string& sql);
-			virtual void finalizeStatement (const SQLiteStatement& statement);
 
 			//@}
 

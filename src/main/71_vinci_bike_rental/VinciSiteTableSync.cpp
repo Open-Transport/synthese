@@ -42,12 +42,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<VinciSite>::TABLE_ID = 34;
 		template<> const bool SQLiteTableSyncTemplate<VinciSite>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<VinciSite>::load(VinciSite* vs, const SQLiteResult& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<VinciSite>::load(VinciSite* vs, const SQLiteResultSPtr& rows, int rowId)
 		{
-			vs->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			vs->setName(rows.getColumn(rowId, VinciSiteTableSync::COL_NAME));
-			vs->setAddress(rows.getColumn(rowId, VinciSiteTableSync::COL_ADDRESS));
-			vs->setPhone(rows.getColumn(rowId, VinciSiteTableSync::COL_PHONE));
+			vs->setKey(rows->getLongLong (TABLE_COL_ID));
+			vs->setName(rows->get ( VinciSiteTableSync::COL_NAME));
+			vs->setAddress(rows->get ( VinciSiteTableSync::COL_ADDRESS));
+			vs->setPhone(rows->get ( VinciSiteTableSync::COL_PHONE));
 		}
 
 		template<> void SQLiteTableSyncTemplate<VinciSite>::save(VinciSite* vs)
@@ -86,17 +86,17 @@ namespace synthese
 			addTableIndex(COL_NAME);
 		}
 
-		void VinciSiteTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void VinciSiteTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 
 		}
 
-		void VinciSiteTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciSiteTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
 
-		void VinciSiteTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciSiteTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
@@ -113,7 +113,7 @@ namespace synthese
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 
-			SQLiteResult result = sqlite->execQuery(query.str());
+			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			vector<shared_ptr<VinciSite> > sites;
 
 			for (int i=0; i<result.getNbRows(); ++i)

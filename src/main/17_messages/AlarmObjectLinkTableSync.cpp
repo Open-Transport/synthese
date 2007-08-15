@@ -40,12 +40,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate< AlarmObjectLink>::TABLE_ID = 40;
 		template<> const bool SQLiteTableSyncTemplate< AlarmObjectLink>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate< AlarmObjectLink>::load(AlarmObjectLink* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate< AlarmObjectLink>::load(AlarmObjectLink* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			object->setAlarmId(Conversion::ToLongLong(rows.getColumn(rowId, AlarmObjectLinkTableSync::COL_ALARM_ID)));
-			object->setObjectId(Conversion::ToLongLong(rows.getColumn(rowId, AlarmObjectLinkTableSync::COL_OBJECT_ID)));
-			object->setRecipientKey(rows.getColumn(rowId, AlarmObjectLinkTableSync::COL_RECIPIENT_KEY));
+			object->setKey(rows->getLongLong (TABLE_COL_ID));
+			object->setAlarmId(rows->getLongLong ( AlarmObjectLinkTableSync::COL_ALARM_ID));
+			object->setObjectId(rows->getLongLong ( AlarmObjectLinkTableSync::COL_OBJECT_ID));
+			object->setRecipientKey(rows->getText ( AlarmObjectLinkTableSync::COL_RECIPIENT_KEY));
 		}
 
 		template<> void SQLiteTableSyncTemplate< AlarmObjectLink>::save(AlarmObjectLink* object)
@@ -88,12 +88,12 @@ namespace synthese
 			addTableIndex(COL_ALARM_ID);
 		}
 
-		void AlarmObjectLinkTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void AlarmObjectLinkTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
-				load(aol.get(), rows, i);
+				load(aol.get(), rows);
 				
 				// Alarm not found in ram : this is a template
 				if (!MessagesModule::getAlarms().contains(aol->getAlarmId()))
@@ -106,19 +106,19 @@ namespace synthese
 			}
 		}
 
-		void AlarmObjectLinkTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void AlarmObjectLinkTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			rowsAdded(sqlite, sync, rows);
 		}
 
-		void AlarmObjectLinkTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void AlarmObjectLinkTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				if (!MessagesModule::getAlarmLinks().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				if (!MessagesModule::getAlarmLinks().contains(rows->getLongLong (TABLE_COL_ID)))
 					continue;
 
-				shared_ptr<AlarmObjectLink> aol = MessagesModule::getAlarmLinks().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+				shared_ptr<AlarmObjectLink> aol = MessagesModule::getAlarmLinks().getUpdateable(rows->getLongLong (TABLE_COL_ID));
 				
 				// Alarm not found in ram : this is a template
 				if (MessagesModule::getAlarms().contains(aol->getAlarmId()))
@@ -127,7 +127,7 @@ namespace synthese
 					shared_ptr<SentAlarm> alarm = MessagesModule::getAlarms().getUpdateable(aol->getAlarmId());
 					ar->removeObject(alarm.get(), aol->getObjectId());
 				}
-				MessagesModule::getAlarmLinks().remove(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+				MessagesModule::getAlarmLinks().remove(rows->getLongLong (TABLE_COL_ID));
 			}
 		}
 
@@ -158,12 +158,12 @@ namespace synthese
 
 			try
 			{
-				db::SQLiteResult result = db::DBModule::GetSQLite()->execQuery(query.str());
+				db::SQLiteResultSPtr rows = db::DBModule::GetSQLite()->execQuery(query.str());
 				std::vector< boost::shared_ptr<AlarmObjectLink> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<AlarmObjectLink> object(new AlarmObjectLink);
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

@@ -23,17 +23,17 @@
 #ifndef SYNTHESE_DB_SQLITETABLESYNC_H
 #define SYNTHESE_DB_SQLITETABLESYNC_H
 
-#include <map>
-#include <string>
-#include <vector>
-#include <iostream>
-#include <boost/shared_ptr.hpp>
+#include "02_db/SQLiteTableFormat.h"
+#include "02_db/SQLiteResult.h"
+#include "02_db/SQLiteStatement.h"
 
 #include "01_util/Factorable.h"
 #include "01_util/UId.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteTableFormat.h"
+#include <string>
+#include <vector>
+#include <iostream>
+
 
 
 #define UPDATEABLE true;
@@ -62,14 +62,16 @@ namespace synthese
 		{
 		private:
 
-			const bool _allowInsert;
-			const bool _allowRemove;
-			const std::string _triggerOverrideClause;
-			bool _ignoreCallbacksOnFirstSync;
-			bool _enableTriggers;
+		    SQLiteStatementSPtr _getRowByIdStatement;
 
-			const std::string _tableName;
-			SQLiteTableFormat _tableFormat;
+		    const bool _allowInsert;
+		    const bool _allowRemove;
+		    const std::string _triggerOverrideClause;
+		    bool _ignoreCallbacksOnFirstSync;
+		    bool _enableTriggers;
+		    
+		    const std::string _tableName;
+		    SQLiteTableFormat _tableFormat;
 
 		protected:
 			virtual void initAutoIncrement();
@@ -80,7 +82,8 @@ namespace synthese
 					  bool allowInsert = true, 
 					  bool allowRemove = true,
 					  const std::string& triggerOverrideClause = "1",
-					  bool ignoreCallbacksOnFirstSync = false);
+					  bool ignoreCallbacksOnFirstSync = false
+			    );
 
 			~SQLiteTableSync ();
 
@@ -125,17 +128,27 @@ namespace synthese
 
 			virtual void rowsAdded (SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
-						const SQLiteResult& rows, bool isFirstSync = false) = 0;
+						const SQLiteResultSPtr& rows, bool isFirstSync = false) = 0;
 
 			virtual void rowsUpdated (SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
-						const SQLiteResult& rows) = 0;
+						const SQLiteResultSPtr& rows) = 0;
 
 			virtual void rowsRemoved (SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
-						const SQLiteResult& rows) = 0;
+						const SQLiteResultSPtr& rows) = 0;
+
+			/** Utility method to get a row by id.
+			    This uses a precompiled statement for performance 
+			*/
+			SQLiteResultSPtr getRowById (synthese::db::SQLiteQueueThreadExec* sqlite, const uid& id) const;
 
 		protected:
+
+			/** By default, return first column name.
+			 */
+			virtual const std::string& getPrimaryKey () const;
+
 
 			void addTableColumn (const std::string& columnName, 
 					const std::string& columnType, 

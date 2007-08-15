@@ -57,7 +57,6 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
 {
  private:
 
-    std::string _idColumnName;
     bool _isRegistered;
 
 	std::map<std::string, boost::shared_ptr<SQLiteTableSync> > _tableSynchronizers;
@@ -66,7 +65,7 @@ class SQLiteSync : public synthese::db::SQLiteUpdateHook
 
  public:
 
-    SQLiteSync (const std::string& idColumnName = TABLE_COL_ID);
+    SQLiteSync ();
     ~SQLiteSync ();
 
     void registerCallback (SQLiteQueueThreadExec* emitter);

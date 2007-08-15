@@ -47,11 +47,11 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Currency>::TABLE_ID = 29;
 		template<> const bool SQLiteTableSyncTemplate<Currency>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Currency>::load(Currency* currency, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Currency>::load(Currency* currency, const db::SQLiteResultSPtr& rows )
 		{
-			currency->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			currency->setName(rows.getColumn(rowId, CurrencyTableSync::TABLE_COL_NAME));
-			currency->setSymbol(rows.getColumn(rowId, CurrencyTableSync::TABLE_COL_SYMBOL));
+			currency->setKey(rows->getLongLong (TABLE_COL_ID));
+			currency->setName(rows->getText ( CurrencyTableSync::TABLE_COL_NAME));
+			currency->setSymbol(rows->getText ( CurrencyTableSync::TABLE_COL_SYMBOL));
 		}
 
 		template<> void SQLiteTableSyncTemplate<Currency>::save(Currency* currency)
@@ -91,22 +91,22 @@ namespace synthese
 			addTableColumn(TABLE_COL_SYMBOL, "TEXT", true);
 		}
 
-		void CurrencyTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void CurrencyTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				shared_ptr<Currency> currency(new Currency);
-				load(currency.get(), rows, i);
+				load(currency.get(), rows);
 				AccountingModule::getCurrencies().add(currency);
 			}
 		}
 
-		void CurrencyTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void CurrencyTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
 
-		void CurrencyTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void CurrencyTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
@@ -127,12 +127,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<Currency> > currencies;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<Currency> currency(new Currency);
-					load(currency.get(), result, i);
+					load(currency.get(), rows);
 					currencies.push_back(currency);
 				}
 				return currencies;

@@ -60,25 +60,20 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<ContinuousService>::TABLE_ID = 17;
 		template<> const bool SQLiteTableSyncTemplate<ContinuousService>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ContinuousService>::load(ContinuousService* cs, const db::SQLiteResult& rows, int rowIndex )
+		template<> void SQLiteTableSyncTemplate<ContinuousService>::load(ContinuousService* cs, const db::SQLiteResultSPtr& rows )
 		{
-			uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+		    uid id (rows->getLongLong (TABLE_COL_ID));
 
-			int serviceNumber (Conversion::ToInt (
-				rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_SERVICENUMBER)));
+		    int serviceNumber (rows->getInt (ContinuousServiceTableSync::COL_SERVICENUMBER));
+		    int range (rows->getInt (ContinuousServiceTableSync::COL_RANGE));
+		    int maxWaitingTime (rows->getInt (ContinuousServiceTableSync::COL_MAXWAITINGTIME));
 
-			int range (Conversion::ToInt (
-				rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_RANGE)));
+		    std::string schedules (
+			rows->getText (ContinuousServiceTableSync::COL_SCHEDULES));
 
-			int maxWaitingTime (Conversion::ToInt (
-				rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_MAXWAITINGTIME)));
-
-			std::string schedules (
-				rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_SCHEDULES));
-
-			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-
-			// Parse all schedules arrival#departure,arrival#departure...
+		    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+		    
+		    // Parse all schedules arrival#departure,arrival#departure...
 			boost::char_separator<char> sep1 (",");
 			tokenizer schedulesTokens (schedules, sep1);
 
@@ -127,22 +122,22 @@ namespace synthese
 			assert (arrivalSchedules.size () > 0);
 			assert (departureSchedules.size () == arrivalSchedules.size ());
 
-			uid pathId (Conversion::ToLongLong (rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_PATHID)));
+			uid pathId (rows->getLongLong (ContinuousServiceTableSync::COL_PATHID));
 
 			shared_ptr<Path> path = EnvModule::fetchPath (pathId);
 			assert (path.get());
 			assert (path->getEdges ().size () == arrivalSchedules.size ());
 
 			uid bikeComplianceId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_BIKECOMPLIANCEID)));
-
+			    rows->getLongLong (ContinuousServiceTableSync::COL_BIKECOMPLIANCEID));
+			
 			uid handicappedComplianceId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID)));
-
+			    rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+			
 			uid pedestrianComplianceId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID)));
+			    rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
 
-			cs->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
+			cs->setKey(rows->getLongLong (TABLE_COL_ID));
 			cs->setServiceNumber(serviceNumber);
 			cs->setPath(path.get());
 			cs->setRange(range);
@@ -198,55 +193,48 @@ namespace synthese
 			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
 		}
 
-		void ContinuousServiceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void ContinuousServiceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-		    std::set<Path*> processedPaths;
-
 			// Loop on each added row
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				boost::shared_ptr<ContinuousService> service;
-				if (EnvModule::getContinuousServices().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				if (EnvModule::getContinuousServices().contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					service = EnvModule::getContinuousServices().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+					service = EnvModule::getContinuousServices().getUpdateable(rows->getLongLong (TABLE_COL_ID));
 					service->getPath()->removeService(service.get());
-					load(service.get(), rows, i);
+					load(service.get(), rows);
 				}
 				else
 				{
 					service.reset(new ContinuousService);
-					load(service.get(), rows, i);
+					load(service.get(), rows);
 					EnvModule::getContinuousServices().add(service);
 				}
 
-
-				processedPaths.insert (service->getPath());
 			}
-
-			for (std::set<Path*>::iterator it = processedPaths.begin ();
-			     it != processedPaths.end (); ++it) (*it)->updateScheduleIndexes();
 
 		}
 		
-		void ContinuousServiceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ContinuousServiceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getContinuousServices().contains(id))
 				{
 					shared_ptr<ContinuousService> object = EnvModule::getContinuousServices().getUpdateable(id);
 					object->getPath()->removeService(object.get());
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 				}
 			}
 		}
 
-		void ContinuousServiceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ContinuousServiceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getContinuousServices().contains(id))
 				{
 					shared_ptr<ContinuousService> object = EnvModule::getContinuousServices().getUpdateable(id);
@@ -274,12 +262,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<ContinuousService> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<ContinuousService> object(new ContinuousService());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;
@@ -292,19 +280,6 @@ namespace synthese
 
 		void ContinuousServiceTableSync::afterFirstSync( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync )
 		{
-			// Lines
-			for (Line::Registry::const_iterator it = EnvModule::getLines().begin(); it != EnvModule::getLines().end(); it++)
-			{
-				shared_ptr<Line> line = EnvModule::getLines().getUpdateable(it->first);
-				line ->updateScheduleIndexes();
-			}
-
-			// Roads
-/*			for (Road::Registry::const_iterator it = EnvModule::getRoads().begin(); it != EnvModule::getLines().end(); it++)
-			{
-				(*it)->updateSchedulesIndexes();
-			}
-*/
 		}
 	}
 }

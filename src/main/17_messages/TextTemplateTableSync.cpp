@@ -47,14 +47,15 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<TextTemplate>::TABLE_ID = 38;
 		template<> const bool SQLiteTableSyncTemplate<TextTemplate>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<TextTemplate>::load(TextTemplate* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<TextTemplate>::load(TextTemplate* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			object->setName(rows.getColumn(rowId, TextTemplateTableSync::COL_NAME));
-			object->setShortMessage(rows.getColumn(rowId, TextTemplateTableSync::COL_SHORT_TEXT));
-			object->setLongMessage(rows.getColumn(rowId, TextTemplateTableSync::COL_LONG_TEXT));
-			object->setAlarmLevel((AlarmLevel) Conversion::ToInt(rows.getColumn(rowId, TextTemplateTableSync::COL_LEVEL)));
+			object->setKey(rows->getLongLong (TABLE_COL_ID));
+			object->setName(rows->getText (TextTemplateTableSync::COL_NAME));
+			object->setShortMessage(rows->getText ( TextTemplateTableSync::COL_SHORT_TEXT));
+			object->setLongMessage(rows->getText ( TextTemplateTableSync::COL_LONG_TEXT));
+			object->setAlarmLevel((AlarmLevel) rows->getInt ( TextTemplateTableSync::COL_LEVEL));
 		}
+
 
 		template<> void SQLiteTableSyncTemplate<TextTemplate>::save(TextTemplate* object)
 		{
@@ -104,15 +105,15 @@ namespace synthese
 			addTableColumn(COL_LEVEL, "INTEGER");
 		}
 
-		void TextTemplateTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void TextTemplateTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		}
 
-		void TextTemplateTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void TextTemplateTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 		}
 
-		void TextTemplateTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TextTemplateTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 		}
 
@@ -151,12 +152,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
 				vector<shared_ptr<TextTemplate> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<TextTemplate> object(new TextTemplate());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

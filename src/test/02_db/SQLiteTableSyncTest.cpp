@@ -1,6 +1,6 @@
 
 #include "01_util/Conversion.h"
-#include "01_util/Thread.h"
+#include "01_util/threads/Thread.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -21,7 +21,7 @@ using namespace synthese::db;
 using namespace synthese::util;
 
 
-
+/*
     
 BOOST_AUTO_TEST_CASE (testGetTableColumnsDb)
 {
@@ -337,5 +337,5 @@ BOOST_AUTO_TEST_CASE (testAdaptTableOnColumnDeletion)
 }
     
 
-
+*/
 

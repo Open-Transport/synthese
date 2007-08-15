@@ -23,6 +23,10 @@
 #ifndef SYNTHESE_util_FactorableTemplate_h__
 #define SYNTHESE_util_FactorableTemplate_h__
 
+
+#include "01_util/Factory.h"
+
+
 namespace synthese
 {
 	namespace util

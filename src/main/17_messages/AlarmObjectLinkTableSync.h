@@ -103,14 +103,14 @@ namespace synthese
 			*/
 			void rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows, bool isFirstSync = false);
+				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
 
 			/** Action to do on  creation.
 				This method updates the corresponding object in ram.
 			*/
 			void rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResultSPtr& rows);
 
 			/** Action to do on  deletion.
 				This method deletes the corresponding object in ram and runs 
@@ -118,7 +118,7 @@ namespace synthese
 			*/
 			void rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResultSPtr& rows);
 
 		};
 
@@ -140,11 +140,12 @@ namespace synthese
 
 			try
 			{
-				db::SQLiteResult result = db::DBModule::GetSQLite()->execQuery(query.str());
+				db::SQLiteResultSPtr rows = db::DBModule::GetSQLite()->execQuery(query.str());
 				std::vector< boost::shared_ptr<T> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
-					objects.push_back(db::SQLiteTableSyncTemplate<T>::get(util::Conversion::ToLongLong(result.getColumn(i, COL_OBJECT_ID))));
+				    objects.push_back (db::SQLiteTableSyncTemplate<T>::get(
+							   rows->getLongLong (COL_OBJECT_ID)));
 				}
 				return objects;
 			}

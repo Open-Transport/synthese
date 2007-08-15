@@ -2,13 +2,11 @@
 #define SYNTHESE_DB_SQLITE_H
 
 
-#include <string>
-
-#include <boost/filesystem/path.hpp>
-#include <sqlite/sqlite3.h>
-
+#include "02_db/SQLiteStatement.h"
 #include "02_db/SQLiteResult.h"
-#include "02_db/DBModule.h"
+#include <string>
+#include <boost/filesystem/path.hpp>
+
 
 namespace synthese
 {
@@ -16,8 +14,6 @@ namespace synthese
 namespace db
 {
 
-
-typedef sqlite3_stmt* SQLiteStatement;
 
 
 /** Wrapper class for SQLite calls (more C++ friendly).
@@ -48,15 +44,19 @@ class SQLite
     /** Returns true if the statement is complete (ready to be executed).
 	Useful for command line parsing.
     */
-    static bool IsStatementComplete (const std::string& sql);
+    static bool IsStatementComplete (const SQLData& sql);
     
-    static bool IsUpdateStatement (const std::string& sql);
+    static bool IsUpdateStatement (const SQLData& sql);
 
-    static SQLiteStatement PrepareStatement (sqlite3* handle, const std::string& sql);
-    static void FinalizeStatement (const SQLiteStatement& statement);
 
-    static void ExecUpdate (sqlite3* handle, const std::string& sql);
-    static SQLiteResult ExecQuery (sqlite3* handle, const std::string& sql);
+    static SQLiteStatementSPtr CompileStatement (sqlite3* handle, const SQLData& sql);
+
+    static SQLiteResultSPtr ExecQuery (const SQLiteStatementSPtr& statement, bool lazy = true);
+    static SQLiteResultSPtr ExecQuery (sqlite3* handle, const SQLData& sql, bool lazy = true);
+
+    static void ExecUpdate (const SQLiteStatementSPtr& statement);
+    static void ExecUpdate (sqlite3* handle, const SQLData& sql);
+
 
     /** Returns true if a transaction is already opened.
 	SQLite does not support nested transaction.
@@ -65,6 +65,7 @@ class SQLite
 
     static void BeginTransaction (sqlite3* handle, bool exclusive = false);
     static void CommitTransaction (sqlite3* handle);
+    static void RollbackTransaction (sqlite3* handle);
 
 
     //@}

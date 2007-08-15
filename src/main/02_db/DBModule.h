@@ -25,7 +25,6 @@
 #define SYNTHESE_DBModule_H__
 
 #include "02_db/DbModuleClass.h"
-
 #include "02_db/Constants.h"
 
 
@@ -49,7 +48,6 @@ namespace synthese
 	*/
 	namespace db
 	{
-
 
 	    class SQLiteQueueThreadExec;
 	    
@@ -76,17 +74,6 @@ namespace synthese
 
 		};
 		
-	// TEMPORARY
-		/// @todo Handle better TRIGGER and co...
-
-		static const std::string CONFIG_TABLE_NAME ("t999_config");
-		static const std::string CONFIG_TABLE_COL_PARAMNAME ("param_name");
-		static const std::string CONFIG_TABLE_COL_PARAMVALUE ("param_value");
-		static const std::string CONFIG_TABLE_COL_PARAMVALUE_TRIGGERSENABLED ("triggers_enabled");
-		static const std::string TRIGGERS_ENABLED_CLAUSE (
-			"(SELECT " + CONFIG_TABLE_COL_PARAMVALUE
-			+ " FROM " + CONFIG_TABLE_NAME + " WHERE " + CONFIG_TABLE_COL_PARAMNAME
-			+ "='" + CONFIG_TABLE_COL_PARAMVALUE_TRIGGERSENABLED + "')");
 
 	}
 

@@ -62,87 +62,98 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<DisplayScreen>::TABLE_ID = 41;
 		template<> const bool SQLiteTableSyncTemplate<DisplayScreen>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<DisplayScreen>::load(DisplayScreen* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<DisplayScreen>::load(DisplayScreen* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			object->setLocalization(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_PLACE_ID))));
-			object->setLocalizationComment(rows.getColumn(rowId, DisplayScreenTableSync::COL_NAME));
-			if (Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_TYPE_ID)) > 0)
-				object->setType(DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayScreenTableSync::COL_TYPE_ID))).get());
-			object->setWiringCode(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_WIRING_CODE)));
-			object->setTitle(rows.getColumn(rowId, DisplayScreenTableSync::COL_TITLE));
-			object->setBlinkingDelay(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_BLINKING_DELAY)));
-			object->setTrackNumberDisplay(Conversion::ToBool(rows.getColumn(rowId, DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY)));
-			object->setServiceNumberDisplay(Conversion::ToBool(rows.getColumn(rowId, DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY)));
+			object->setKey (rows->getLongLong (TABLE_COL_ID));
+			object->setLocalization (EnvModule::getConnectionPlaces().get(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID)));
+			object->setLocalizationComment (rows->getText ( DisplayScreenTableSync::COL_NAME));
+			if (rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID) > 0)
+			{
+			    object->setType(DeparturesTableModule::getDisplayTypes().get(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID)).get());
+			}
+			object->setWiringCode (rows->getInt ( DisplayScreenTableSync::COL_WIRING_CODE));
+			object->setTitle (rows->getText ( DisplayScreenTableSync::COL_TITLE));
+			object->setBlinkingDelay (rows->getInt ( DisplayScreenTableSync::COL_BLINKING_DELAY));
+			object->setTrackNumberDisplay (rows->getBool ( DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY));
+			object->setServiceNumberDisplay (rows->getBool ( DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY));
 
 			// Physical stops
-			vector<string> stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
+			vector<string> stops = Conversion::ToStringVector(rows->getText ( DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
 			object->clearPhysicalStops();
 			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-				try
-				{
-					object->addPhysicalStop(EnvModule::getPhysicalStops().get(Conversion::ToLongLong(*it)).get());
-				}
-				catch (PhysicalStop::RegistryKeyException& e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, e);
-				}
-			object->setAllPhysicalStopsDisplayed(Conversion::ToBool(rows.getColumn(rowId, DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED)));
-
+			{
+			    try
+			    {
+				object->addPhysicalStop(EnvModule::getPhysicalStops().get(Conversion::ToLongLong(*it)).get());
+			    }
+			    catch (PhysicalStop::RegistryKeyException& e)
+			    {
+				Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, e);
+			    }
+			}
+			object->setAllPhysicalStopsDisplayed (rows->getBool (DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED));
+			
 			// Forbidden places
 			object->clearForbiddenPlaces();
-			stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS));
+			stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS));
 			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-				try
-				{
-					object->addForbiddenPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
-				}
-				catch (ConnectionPlace::RegistryKeyException& e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
-				}
+			{
+			    try
+			    {
+				object->addForbiddenPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
+			    }
+			    catch (ConnectionPlace::RegistryKeyException& e)
+			    {
+				Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
+			    }
+			}
 
 			// DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS // List of forbidden lines uids, separated by comas
 
-			object->setDirection((DeparturesTableDirection) Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_DIRECTION)));
-			object->setOriginsOnly((EndFilter) Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_ORIGINS_ONLY)));
-
+			object->setDirection ((DeparturesTableDirection) rows->getInt ( DisplayScreenTableSync::COL_DIRECTION));
+			object->setOriginsOnly ((EndFilter) rows->getInt ( DisplayScreenTableSync::COL_ORIGINS_ONLY));
+			
 			// Displayed places
-			stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS));
+			stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS));
 			object->clearDisplayedPlaces();
 			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-				try
-				{
-					object->addDisplayedPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
-				}
-				catch (ConnectionPlace::RegistryKeyException& e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
-				}
-
-			object->setMaxDelay(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_MAX_DELAY)));
-			object->setClearingDelay(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_CLEARING_DELAY)));
-			object->setFirstRow(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_FIRST_ROW)));
-			object->setGenerationMethod((DisplayScreen::GenerationMethod) Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_GENERATION_METHOD)));
-
+			{
+			    try
+			    {
+				object->addDisplayedPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
+			    }
+			    catch (ConnectionPlace::RegistryKeyException& e)
+			    {
+				Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
+			    }
+			}
+			
+			object->setMaxDelay (rows->getInt ( DisplayScreenTableSync::COL_MAX_DELAY));
+			object->setClearingDelay (rows->getInt ( DisplayScreenTableSync::COL_CLEARING_DELAY));
+			object->setFirstRow (rows->getInt ( DisplayScreenTableSync::COL_FIRST_ROW));
+			object->setGenerationMethod ((DisplayScreen::GenerationMethod) 
+						     rows->getInt ( DisplayScreenTableSync::COL_GENERATION_METHOD));
 			// Forced destinations
-			stops = Conversion::ToStringVector(rows.getColumn(rowId, DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS));
+			stops = Conversion::ToStringVector (rows->getText ( DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS));
 			object->clearForcedDestinations();
 			for (vector<string>::iterator it = stops.begin(); it != stops.end(); ++it)
-				try
-				{
-					object->addForcedDestination(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
-				}
-				catch (ConnectionPlace::RegistryKeyException& e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
-				}
-
-			object->setDestinationForceDelay(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY)));
-			object->setMaintenanceChecksPerDay(Conversion::ToInt(rows.getColumn(rowId, DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY)));
-			object->setMaintenanceIsOnline(Conversion::ToBool(rows.getColumn(rowId, DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE)));
-			object->setMaintenanceMessage(rows.getColumn(rowId, DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE));
+			{
+			    try
+			    {
+				object->addForcedDestination(EnvModule::getConnectionPlaces().get (Conversion::ToLongLong(*it)).get());
+			    }
+			    catch (ConnectionPlace::RegistryKeyException& e)
+			    {
+				Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+			    }
+			}
+			
+			object->setDestinationForceDelay (rows->getInt ( DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY));
+			object->setMaintenanceChecksPerDay (rows->getInt ( DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY));
+			object->setMaintenanceIsOnline (rows->getBool ( DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE));
+			object->setMaintenanceMessage (rows->getText ( DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE));
 		}
+
 
 		template<> void SQLiteTableSyncTemplate<DisplayScreen>::save(DisplayScreen* object)
 		{
@@ -308,41 +319,51 @@ namespace synthese
 			addTableColumn(COL_MAINTENANCE_MESSAGE, "TEXT");
 		}
 
-		void DisplayScreenTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+	    void DisplayScreenTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  
+						   db::SQLiteSync* sync, 
+						   const db::SQLiteResultSPtr& rows, bool isFirstSync)
+	    {
+		while (rows->next ())
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-				if (DeparturesTableModule::getDisplayScreens().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
-				{
-					load(DeparturesTableModule::getDisplayScreens().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
-				}
-				else
-				{
-					shared_ptr<DisplayScreen> object(new DisplayScreen);
-					load(object.get(), rows, i);
-					DeparturesTableModule::getDisplayScreens().add(object);
-				}
-			}
+		    if (DeparturesTableModule::getDisplayScreens().contains(rows->getLongLong (TABLE_COL_ID)))
+		    {
+			load(DeparturesTableModule::getDisplayScreens().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
+		    }
+		    else
+		    {
+			shared_ptr<DisplayScreen> object(new DisplayScreen);
+			load(object.get(), rows);
+			DeparturesTableModule::getDisplayScreens().add(object);
+		    }
 		}
-
-		void DisplayScreenTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+	    }
+	    
+	    
+	    void DisplayScreenTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  
+						     db::SQLiteSync* sync, 
+						     const db::SQLiteResultSPtr& rows)
+	    {
+		while (rows->next ())
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-				shared_ptr<DisplayScreen> object = DeparturesTableModule::getDisplayScreens().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-				load(object.get(), rows, i);
-			}
+		    shared_ptr<DisplayScreen> object = DeparturesTableModule::getDisplayScreens().getUpdateable(rows->getLongLong (TABLE_COL_ID));
+		    load(object.get(), rows);
 		}
+	    }
+	    
 
-		void DisplayScreenTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+	    
+	    void DisplayScreenTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  
+						      db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+	    {
+		while (rows->next ())
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-				DeparturesTableModule::getDisplayScreens().remove(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-			}
+		    DeparturesTableModule::getDisplayScreens().remove(rows->getLongLong (TABLE_COL_ID));
 		}
+	    }
+	    
 
-		std::vector<shared_ptr<DisplayScreen> > DisplayScreenTableSync::search(
+	    
+	    std::vector<shared_ptr<DisplayScreen> > DisplayScreenTableSync::search(
 			const security::RightsOfSameClassMap& rights 
 			, bool totalControl 
 			, RightLevel neededLevel
@@ -369,147 +390,150 @@ namespace synthese
 			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
-				<< " SELECT"
-					<< " d.*"
-					<< ", EXISTS(SELECT ls." << TABLE_COL_ID << " FROM " << LineStopTableSync::TABLE_NAME << " AS ls INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID << " WHERE p." << PhysicalStopTableSync::COL_PLACEID << "=d." << COL_PLACE_ID << ") AS " << _COL_LINE_EXISTS
-					<< ", (SELECT l." << TABLE_COL_ID << " FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " ORDER BY l." << DBLogEntryTableSync::COL_DATE << " DESC LIMIT 1) AS " << _COL_LAST_MAINTENANCE_CONTROL
-					<< ", (SELECT MAX(l." << DBLogEntryTableSync::COL_DATE << ") FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " AND l." << DBLogEntryTableSync::COL_LEVEL << "=" << static_cast<int>(DBLogEntry::DB_LOG_INFO) << ") AS " << _COL_LAST_OK_MAINTENANCE_CONTROL
-					<< ", (SELECT l." << TABLE_COL_ID << " FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " AND l." << DBLogEntryTableSync::COL_LEVEL << "=" << static_cast<int>(DBLogEntry::DB_LOG_ERROR) << " ORDER BY l." << DBLogEntryTableSync::COL_DATE << " DESC LIMIT 1) AS " << _COL_CORRUPTED_DATA_START_DATE
-					<< ", (SELECT t." << DisplayTypeTableSync::TABLE_COL_NAME << " FROM " << DisplayTypeTableSync::TABLE_NAME << " AS t WHERE t." << TABLE_COL_ID << "=d." << COL_TYPE_ID << ") AS " << _COL_TYPE_NAME
-				<< " FROM "
-					<< TABLE_NAME << " AS d"
-					<< " INNER JOIN " << ConnectionPlaceTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=d." << COL_PLACE_ID
-					<< " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
-					<< " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
-					;
+			    << " SELECT"
+			    << " d.*"
+			    << ", EXISTS(SELECT ls." << TABLE_COL_ID << " FROM " << LineStopTableSync::TABLE_NAME << " AS ls INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID << " WHERE p." << PhysicalStopTableSync::COL_PLACEID << "=d." << COL_PLACE_ID << ") AS " << _COL_LINE_EXISTS
+			    << ", (SELECT l." << TABLE_COL_ID << " FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " ORDER BY l." << DBLogEntryTableSync::COL_DATE << " DESC LIMIT 1) AS " << _COL_LAST_MAINTENANCE_CONTROL
+			    << ", (SELECT MAX(l." << DBLogEntryTableSync::COL_DATE << ") FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " AND l." << DBLogEntryTableSync::COL_LEVEL << "=" << static_cast<int>(DBLogEntry::DB_LOG_INFO) << ") AS " << _COL_LAST_OK_MAINTENANCE_CONTROL
+			    << ", (SELECT l." << TABLE_COL_ID << " FROM " << DBLogEntryTableSync::TABLE_NAME << " AS l WHERE l." << DBLogEntryTableSync::COL_LOG_KEY << "='displaymaintenance' AND l." << DBLogEntryTableSync::COL_OBJECT_ID << "=d." << TABLE_COL_ID << " AND l." << DBLogEntryTableSync::COL_LEVEL << "=" << static_cast<int>(DBLogEntry::DB_LOG_ERROR) << " ORDER BY l." << DBLogEntryTableSync::COL_DATE << " DESC LIMIT 1) AS " << _COL_CORRUPTED_DATA_START_DATE
+			    << ", (SELECT t." << DisplayTypeTableSync::TABLE_COL_NAME << " FROM " << DisplayTypeTableSync::TABLE_NAME << " AS t WHERE t." << TABLE_COL_ID << "=d." << COL_TYPE_ID << ") AS " << _COL_TYPE_NAME
+			    << " FROM "
+			    << TABLE_NAME << " AS d"
+			    << " INNER JOIN " << ConnectionPlaceTableSync::TABLE_NAME << " AS p ON p." << TABLE_COL_ID << "=d." << COL_PLACE_ID
+			    << " INNER JOIN " << CityTableSync::TABLE_NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
+			    << " INNER JOIN " << PhysicalStopTableSync::TABLE_NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
+			    ;
 			if (lineid != UNKNOWN_VALUE || neededLevel > FORBIDDEN)
-				query
-					<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS ls " << " ON s." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
-					<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS ll ON ll." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_LINEID
-					;
-
+			    query
+				<< " INNER JOIN " << LineStopTableSync::TABLE_NAME << " AS ls " << " ON s." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
+				<< " INNER JOIN " << LineTableSync::TABLE_NAME << " AS ll ON ll." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_LINEID
+				;
+			
 			// Filtering
 			query << " WHERE 1 ";
 			if (neededLevel > FORBIDDEN)
-				query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel) << ")";
+			    query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel) << ")";
 			if (!cityName.empty())
-				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
+			    query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
 			if (!stopName.empty())
-				query << " AND p." << ConnectionPlaceTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(stopName, false) << "%'";
+			    query << " AND p." << ConnectionPlaceTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(stopName, false) << "%'";
 			if (!name.empty())
-				query << " AND d." << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			    query << " AND d." << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
 			if (duid != UNKNOWN_VALUE)
-				query << " AND d." << TABLE_COL_ID << "=" << Conversion::ToString(duid);
+			    query << " AND d." << TABLE_COL_ID << "=" << Conversion::ToString(duid);
 			if (localizationid != UNKNOWN_VALUE)
-				query << " AND p." << TABLE_COL_ID << "=" << Conversion::ToString(localizationid);
+			    query << " AND p." << TABLE_COL_ID << "=" << Conversion::ToString(localizationid);
 			if (typeuid != UNKNOWN_VALUE)
-				query << " AND d." << COL_TYPE_ID << "=" << typeuid;
+			    query << " AND d." << COL_TYPE_ID << "=" << typeuid;
 			if (lineid != UNKNOWN_VALUE)
-				query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineid;
+			    query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineid;
 			
 			// Grouping
 			query << " GROUP BY d." << TABLE_COL_ID;
-
+			
 			// Ordering
 			if (orderByUid)
-				query << " ORDER BY d." << TABLE_COL_ID << (raisingOrder ? " ASC" : " DESC");
+			    query << " ORDER BY d." << TABLE_COL_ID << (raisingOrder ? " ASC" : " DESC");
 			else if (orderByCity)
-				query
-					<< " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					;
+			    query
+				<< " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				;
 			else if (orderByStopName)
-				query
-					<< " ORDER BY s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					;
+			    query
+				<< " ORDER BY s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				;
 			else if (orderByName)
-				query
-					<< " ORDER BY d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					;
+			    query
+				<< " ORDER BY d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				;
 			else if (orderByType)
-				query
-					<< " ORDER BY " << _COL_TYPE_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					;
+			    query
+				<< " ORDER BY " << _COL_TYPE_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
+				;
 			if (number > 0)
 			{
-				query << " LIMIT " << Conversion::ToString(number + 1);
-				if (first > 0)
-					query << " OFFSET " << Conversion::ToString(first);
+			    query << " LIMIT " << Conversion::ToString(number + 1);
+			    if (first > 0)
+				query << " OFFSET " << Conversion::ToString(first);
 			}
-
+			
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
-				vector<shared_ptr<DisplayScreen> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+			    SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+			    vector<shared_ptr<DisplayScreen> > objects;
+			    while (rows->next ())
+			    {
+				shared_ptr<DisplayScreen> object(new DisplayScreen());
+				load(object.get(), rows);
+				objects.push_back(object);
+				
+				DisplayScreen::Complements c;
+				DateTime now (TIME_CURRENT);
+				
+				// No news test
+				if (object->getMaintenanceChecksPerDay())
 				{
-					shared_ptr<DisplayScreen> object(new DisplayScreen());
-					load(object.get(), result, i);
-					objects.push_back(object);
-
-					DisplayScreen::Complements c;
-					DateTime now(TIME_CURRENT);
-
-					// No news test
-					if (object->getMaintenanceChecksPerDay())
+				    if (rows->getLongLong(_COL_LAST_MAINTENANCE_CONTROL))
+				    {
+					shared_ptr<DBLogEntry> le = DBLogEntryTableSync::get(rows->getLongLong(_COL_LAST_MAINTENANCE_CONTROL));
+					if ((now - le->getDate()) > ((1440 / object->getMaintenanceChecksPerDay()) * 2))
 					{
-						if (Conversion::ToLongLong(result.getColumn(i, _COL_LAST_MAINTENANCE_CONTROL)))
-						{
-							shared_ptr<DBLogEntry> le = DBLogEntryTableSync::get(Conversion::ToLongLong(result.getColumn(i, _COL_LAST_MAINTENANCE_CONTROL)));
-							if ((now - le->getDate()) > ((1440 / object->getMaintenanceChecksPerDay()) * 2))
-							{
-								if ((now - le->getDate()) < ((1440 / object->getMaintenanceChecksPerDay()) * 5))
-									c.status = DISPLAY_STATUS_NO_NEWS_WARNING;
-								else
-									c.status = DISPLAY_STATUS_NO_NEWS_ERROR;
-								c.statusText = string("L'afficheur n'a pas envoyé de message de maintenance depuis ") + Conversion::ToString(now - le->getDate()) + string(" minutes.");
-								c.lastControl = le->getDate();
-							}
-							else
-							{
-								c.status = DISPLAY_STATUS_OK;
-								c.statusText = "OK";
-							}
-						}
-						else
-						{
-							c.status = DISPLAY_STATUS_NO_NEWS_WARNING;
-							c.statusText = "L'afficheur n'a jamais envoyé de message de maintenance.";
-						}
+					    if ((now - le->getDate()) < ((1440 / object->getMaintenanceChecksPerDay()) * 5))
+						c.status = DISPLAY_STATUS_NO_NEWS_WARNING;
+					    else
+						c.status = DISPLAY_STATUS_NO_NEWS_ERROR;
+					    c.statusText = string("L'afficheur n'a pas envoyé de message de maintenance depuis ") + 
+						Conversion::ToString(now - le->getDate()) + string(" minutes.");
+					    c.lastControl = le->getDate();
+					}
+					else
+					{
+					    c.status = DISPLAY_STATUS_OK;
+					    c.statusText = "OK";
+					}
+				    }
+				    else
+				    {
+					c.status = DISPLAY_STATUS_NO_NEWS_WARNING;
+					c.statusText = "L'afficheur n'a jamais envoyé de message de maintenance.";
+				    }
+				}
+
+				// Bad news test
+				if (rows->getLongLong (_COL_LAST_MAINTENANCE_CONTROL))
+				{
+				    shared_ptr<DBLogEntry> le = DBLogEntryTableSync::get(
+					rows->getLongLong (_COL_LAST_MAINTENANCE_CONTROL));
+
+				    if (le->getLevel() == DBLogEntry::DB_LOG_ERROR)
+					c.status = DISPLAY_STATUS_HARDWARE_ERROR;
+				    else
+					c.status = DISPLAY_STATUS_HARDWARE_WARNING;
+				    
+				    c.statusText = le->getStringContent();
 					}
 
-					// Bad news test
-					if (Conversion::ToLongLong(result.getColumn(i, _COL_LAST_MAINTENANCE_CONTROL)))
-					{
-						shared_ptr<DBLogEntry> le = DBLogEntryTableSync::get(Conversion::ToLongLong(result.getColumn(i, _COL_LAST_MAINTENANCE_CONTROL)));
-						if (le->getLevel() == DBLogEntry::DB_LOG_ERROR)
-							c.status = DISPLAY_STATUS_HARDWARE_ERROR;
-						else
-							c.status = DISPLAY_STATUS_HARDWARE_WARNING;
-						
-						c.statusText = le->getStringContent();
-					}
-
-					// Last OK control
-					c.lastOKStatus = DateTime::FromSQLTimestamp(result.getColumn(i, _COL_LAST_OK_MAINTENANCE_CONTROL));
+				// Last OK control
+				c.lastOKStatus = DateTime::FromSQLTimestamp(rows->getText (_COL_LAST_OK_MAINTENANCE_CONTROL));
 
 					// Data control
-//					if (!Conversion::ToLongLong(result.getColumn(i, _COL_BROADCAST_POINT_ID)))
+//					if (!Conversion::ToLongLong(rows->getText(_COL_BROADCAST_POINT_ID)))
 //					{
 //						c.dataControl = DISPLAY_DATA_CORRUPTED;
 //						c.dataControlText = "L'afficheur est relié à un point de diffusion inexistant.";
 						/// @todo Put here a dblog entry writing
 						/// @todo Put a control of the link between broadcast point and its place
 //					}
-			/*		else*/ if (!Conversion::ToInt(result.getColumn(i, _COL_LINE_EXISTS)))
+				/*		else*/ if (!rows->getInt (_COL_LINE_EXISTS))
 					{
 						c.dataControl = DISPLAY_DATA_NO_LINES;
 						c.dataControlText = "Aucune ligne ne dessert l'afficheur.";
@@ -520,11 +544,11 @@ namespace synthese
 						c.dataControlText = "OK";
 						/// @todo Put here a dblog entry writing if the last entry was negative
 					}
-
-					c.lastOKDataControl = DateTime::FromSQLTimestamp(result.getColumn(i, _COL_LAST_OK_MAINTENANCE_CONTROL));
-
-					object->setComplements(c);
-				}
+				
+				c.lastOKDataControl = DateTime::FromSQLTimestamp(rows->getText (_COL_LAST_OK_MAINTENANCE_CONTROL));
+				
+				object->setComplements(c);
+			    }
 				return objects;
 			}
 			catch(SQLiteException& e)

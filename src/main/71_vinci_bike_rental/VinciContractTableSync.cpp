@@ -51,12 +51,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<VinciContract>::TABLE_ID = 35;
 		template<> const bool SQLiteTableSyncTemplate<VinciContract>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<VinciContract>::load(VinciContract* vc, const SQLiteResult& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<VinciContract>::load(VinciContract* vc, const SQLiteResultSPtr& rows, int rowId)
 		{
-			vc->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			vc->setUserId(Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::COL_USER_ID)));
-			vc->setSiteId(Conversion::ToLongLong(rows.getColumn(rowId, VinciContractTableSync::COL_SITE_ID)));
-			vc->setPassport(rows.getColumn(rowId, VinciContractTableSync::COL_PASSPORT));
+			vc->setKey(rows->getLongLong (TABLE_COL_ID));
+			vc->setUserId(rows->getLongLong ( VinciContractTableSync::COL_USER_ID)));
+			vc->setSiteId(rows->getLongLong ( VinciContractTableSync::COL_SITE_ID)));
+			vc->setPassport(rows->get ( VinciContractTableSync::COL_PASSPORT));
 		}
 
 		template<> void SQLiteTableSyncTemplate<VinciContract>::save(VinciContract* vc)
@@ -97,17 +97,17 @@ namespace synthese
 			addTableIndex(COL_USER_ID);
 		}
 
-		void VinciContractTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void VinciContractTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 
 		}
 
-		void VinciContractTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciContractTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
 
-		void VinciContractTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciContractTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
@@ -139,7 +139,7 @@ namespace synthese
 				query << " LIMIT " << (number + 1);
 			if (first)
 				query << " OFFSET " << first;
-			SQLiteResult result = sqlite->execQuery(query.str());
+			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			vector<shared_ptr<VinciContract> > contracts;
 			for (int i=0; i<result.getNbRows(); ++i)
 			{

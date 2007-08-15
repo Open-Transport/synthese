@@ -23,6 +23,15 @@
 #ifndef SYNTHESE_SQLiteTableSyncTemplate_H__
 #define SYNTHESE_SQLiteTableSyncTemplate_H__
 
+
+#include "02_db/DBModule.h"
+#include "02_db/DbModuleClass.h"
+#include "02_db/SQLiteQueueThreadExec.h"
+#include "02_db/SQLiteTableSync.h"
+#include "02_db/SQLiteResult.h"
+#include "02_db/DBEmptyResultException.h"
+#include "02_db/SQLiteException.h"
+
 #include <sstream>
 #include <string>
 
@@ -33,12 +42,6 @@
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/DbModuleClass.h"
-#include "02_db/SQLiteQueueThreadExec.h"
-#include "02_db/DBEmptyResultException.h"
-#include "02_db/SQLiteException.h"
-#include "02_db/SQLiteTableSync.h"
 
 namespace synthese
 {
@@ -81,7 +84,7 @@ namespace synthese
 		public:
 			typedef T ObjectsClass;
 
-			static void load(T* obj, const db::SQLiteResult& rows, int rowId=0);
+			static void load(T* obj, const db::SQLiteResultSPtr& rows);
 			
 			
 			/** Saving of the object in database.
@@ -129,15 +132,15 @@ namespace synthese
 		template <class T>
 		boost::shared_ptr<T> synthese::db::SQLiteTableSyncTemplate<T>::get(uid key)
 		{
-			SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			std::stringstream query;
 			query
 				<< "SELECT * "
 				<< "FROM " << TABLE_NAME
 				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key)
 				<< " LIMIT 1";
-			db::SQLiteResult rows = sqlite->execQuery(query.str());
-			if (rows.getNbRows() <= 0)
+			db::SQLiteResultSPtr rows (sqlite->execQuery (query.str(), true));
+			if (rows->next() == false)
 				throw DBEmptyResultException<T>(key, "ID not found in database.");
 			boost::shared_ptr<T> object(new T());
 			load(object.get(), rows);
@@ -186,7 +189,7 @@ namespace synthese
 			{
 				try
 				{
-					SQLiteQueueThreadExec* sqlite = DBModule::GetSQLite();
+					SQLiteHandle* sqlite = DBModule::GetSQLite();
 					std::stringstream query;
 					query
 					    << "SELECT " << util::Conversion::ToString((uid) 0x00000000FFFFFFFFLL) 
@@ -197,12 +200,11 @@ namespace synthese
 /// @todo GRID and NODEGRID to be replaced by the correct values
 
 
-					SQLiteResult result = sqlite->execQuery(query.str());
-					uid maxid = util::Conversion::ToLongLong(result.getColumn(0, "maxid"));
-
-					if (result.getNbRows() > 0 && util::Conversion::ToLongLong(result.getColumn(0, "maxid")) > 0)
+					SQLiteResultSPtr result (sqlite->execQuery(query.str()));
+					if (result->next ())
 					{
-					    _autoIncrementValue = util::decodeObjectId(maxid) + 1;
+					    uid maxid = result->getLongLong ("maxid");
+					    if (maxid > 0) _autoIncrementValue = util::decodeObjectId(maxid) + 1;
 					}
 					
 				}

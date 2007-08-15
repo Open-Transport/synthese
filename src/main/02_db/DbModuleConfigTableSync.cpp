@@ -1,7 +1,7 @@
 #include "DbModuleConfigTableSync.h"
 
 #include "DbModuleClass.h"
-
+#include "Constants.h"
 
 
 
@@ -35,15 +35,14 @@ namespace synthese
 		void 
 		DbModuleConfigTableSync::rowsAdded (SQLiteQueueThreadExec* sqlite, 
 						SQLiteSync* sync,
-						const SQLiteResult& rows, bool isFirstSync)
+						const SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-		    for (int i=0; i<rows.getNbRows (); ++i)
+		    while (rows->next ())
 		    {
-			DbModuleClass::SetParameter (
-			    rows.getColumn (i, COL_PARAMNAME),
-			    rows.getColumn (i, COL_PARAMVALUE)
-			    );
+			DbModuleClass::SetParameter (rows->getText (COL_PARAMNAME), 
+						     rows->getText (COL_PARAMVALUE));
 		    }
+		    
 		}
 
 
@@ -51,7 +50,7 @@ namespace synthese
 		void 
 		DbModuleConfigTableSync::rowsUpdated (SQLiteQueueThreadExec* sqlite, 
 							SQLiteSync* sync,
-							const SQLiteResult& rows)
+							const SQLiteResultSPtr& rows)
 		{
 		    rowsAdded (sqlite, sync, rows);
 		}
@@ -61,7 +60,7 @@ namespace synthese
 		void 
 		DbModuleConfigTableSync::rowsRemoved (SQLiteQueueThreadExec* sqlite, 
 							SQLiteSync* sync,
-							const SQLiteResult& rows)
+							const SQLiteResultSPtr& rows)
 		{
 
 		}

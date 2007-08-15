@@ -24,7 +24,7 @@
 #ifndef SYNTHESE_UTIL_MANAGEDTHREAD_H
 #define SYNTHESE_UTIL_MANAGEDTHREAD_H
 
-#include "01_util/Thread.h"
+#include "01_util/threads/Thread.h"
 
 
 namespace synthese

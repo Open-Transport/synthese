@@ -55,20 +55,20 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Site>::TABLE_ID = 25;
 		template<> const bool SQLiteTableSyncTemplate<Site>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Site>::load(Site* site, const SQLiteResult& rows, int i)
+		template<> void SQLiteTableSyncTemplate<Site>::load(Site* site, const SQLiteResultSPtr& rows)
 		{
-			site->setKey(Conversion::ToLongLong(rows.getColumn(i,TABLE_COL_ID)));
-			site->setName(rows.getColumn(i, SiteTableSync::TABLE_COL_NAME));
-			shared_ptr<const Interface> interf = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(i, SiteTableSync::COL_INTERFACE_ID)));
-			site->setInterface(interf);
-			site->setStartDate(Date::FromSQLDate(rows.getColumn(i, SiteTableSync::TABLE_COL_START_DATE)));
-			site->setEndDate(Date::FromSQLDate(rows.getColumn(i, SiteTableSync::TABLE_COL_END_DATE)));
-			site->setOnlineBookingAllowed(Conversion::ToBool(rows.getColumn(i, SiteTableSync::TABLE_COL_ONLINE_BOOKING)));
-			site->setPastSolutionsDisplayed(Conversion::ToBool(rows.getColumn(i, SiteTableSync::TABLE_COL_USE_OLD_DATA)));
-			site->setMaxTransportConnectionsCount(Conversion::ToInt(rows.getColumn(i, SiteTableSync::COL_MAX_CONNECTIONS)));
-			site->setUseDateRange(Conversion::ToInt(rows.getColumn(i, SiteTableSync::COL_USE_DATES_RANGE)));
-
-			string periodsStr(rows.getColumn(i, SiteTableSync::COL_PERIODS));
+		    site->setKey(rows->getLongLong (TABLE_COL_ID));
+		    site->setName(rows->getText (SiteTableSync::TABLE_COL_NAME));
+		    shared_ptr<const Interface> interf = InterfaceModule::getInterfaces().get(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
+		    site->setInterface(interf);
+		    site->setStartDate(Date::FromSQLDate(rows->getText (SiteTableSync::TABLE_COL_START_DATE)));
+		    site->setEndDate(Date::FromSQLDate(rows->getText(SiteTableSync::TABLE_COL_END_DATE)));
+		    site->setOnlineBookingAllowed(rows->getBool(SiteTableSync::TABLE_COL_ONLINE_BOOKING));
+		    site->setPastSolutionsDisplayed(rows->getBool(SiteTableSync::TABLE_COL_USE_OLD_DATA));
+		    site->setMaxTransportConnectionsCount(rows->getInt(SiteTableSync::COL_MAX_CONNECTIONS));
+		    site->setUseDateRange(rows->getInt(SiteTableSync::COL_USE_DATES_RANGE));
+		    
+		    string periodsStr(rows->getText(SiteTableSync::COL_PERIODS));
 
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
@@ -132,46 +132,47 @@ namespace synthese
 		}
 
 
-		void SiteTableSync::rowsUpdated( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void SiteTableSync::rowsUpdated( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
-				if (PlacesListModule::getSites().contains(id))
-					load(PlacesListModule::getSites().getUpdateable(id).get(), rows, i);
-			}
+		    while (rows->next ())
+		    {
+			uid id = rows->getLongLong (TABLE_COL_ID);
+			if (PlacesListModule::getSites().contains(id))
+			    load(PlacesListModule::getSites().getUpdateable(id).get(), rows);
+		    }
 		}
 
 
-		void SiteTableSync::rowsAdded( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows, bool isFirstSync)
+
+		void SiteTableSync::rowsAdded( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+		    while (rows->next ())
+		    {
+			uid id = rows->getLongLong (TABLE_COL_ID);
+			shared_ptr<Site> site;
+			if (PlacesListModule::getSites().contains(id))
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
-				shared_ptr<Site> site;
-				if (PlacesListModule::getSites().contains(id))
-				{
-					site = PlacesListModule::getSites().getUpdateable(id);
-					load(site.get(), rows, i);
-				}
-				else
-				{
-					site.reset(new Site);
-					load(site.get(), rows, i);
-					PlacesListModule::getSites().add(site);
-				}
+			    site = PlacesListModule::getSites().getUpdateable(id);
+			    load(site.get(), rows);
 			}
+			else
+			{
+			    site.reset(new Site);
+			    load(site.get(), rows);
+			    PlacesListModule::getSites().add(site);
+			}
+		    }
 		}
 
 
-		void SiteTableSync::rowsRemoved( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void SiteTableSync::rowsRemoved( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
-				if (PlacesListModule::getSites().contains(id))
-					PlacesListModule::getSites().remove(id);
-			}
+		    while (rows->next ())
+		    {
+			uid id = rows->getLongLong (TABLE_COL_ID);
+			if (PlacesListModule::getSites().contains(id))
+			    PlacesListModule::getSites().remove(id);
+		    }
 		}
 	}
 }

@@ -50,30 +50,27 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<LineStop>::TABLE_ID = 10;
 		template<> const bool SQLiteTableSyncTemplate<LineStop>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<LineStop>::load(LineStop* ls, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<LineStop>::load(LineStop* ls, const db::SQLiteResultSPtr& rows )
 		{
 
-			uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+			uid id (rows->getLongLong (TABLE_COL_ID));
 
 			uid fromPhysicalStopId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, LineStopTableSync::COL_PHYSICALSTOPID)));
+			    rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID));
 
 			uid lineId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, LineStopTableSync::COL_LINEID)));
+			    rows->getLongLong (LineStopTableSync::COL_LINEID));
 
 			int rankInPath (
-				Conversion::ToInt (rows.getColumn (rowIndex, LineStopTableSync::COL_RANKINPATH)));
+			    rows->getInt (LineStopTableSync::COL_RANKINPATH));
+			
+			bool isDeparture (rows->getBool (LineStopTableSync::COL_ISDEPARTURE));
 
-			bool isDeparture (Conversion::ToBool (
-				rows.getColumn (rowIndex, LineStopTableSync::COL_ISDEPARTURE)));
-			bool isArrival (Conversion::ToBool (
-				rows.getColumn (rowIndex, LineStopTableSync::COL_ISARRIVAL)));
+			bool isArrival (rows->getBool (LineStopTableSync::COL_ISARRIVAL));
 
-			double metricOffset (
-				Conversion::ToDouble (rows.getColumn (rowIndex, LineStopTableSync::COL_METRICOFFSET)));
+			double metricOffset (rows->getDouble (LineStopTableSync::COL_METRICOFFSET));
 
-			std::string viaPointsStr (
-				rows.getColumn (rowIndex, LineStopTableSync::COL_VIAPOINTS));
+			std::string viaPointsStr (rows->getText (LineStopTableSync::COL_VIAPOINTS));
 
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 			ls->clearViaPoints ();
@@ -148,41 +145,41 @@ namespace synthese
 			addTableIndex(COL_PHYSICALSTOPID);
 		}
 
-		void LineStopTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void LineStopTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				if (EnvModule::getLineStops().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				if (EnvModule::getLineStops().contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load(EnvModule::getLineStops().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
+					load(EnvModule::getLineStops().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
 				}
 				else
 				{
 					shared_ptr<LineStop> object(new LineStop);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 					EnvModule::getLineStops().add(object);
 				}
 			}
 		}
 		
-		void LineStopTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void LineStopTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getLineStops().contains(id))
 				{
 					shared_ptr<LineStop> object = EnvModule::getLineStops().getUpdateable(id);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 				}
 			}
 		}
 
-		void LineStopTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void LineStopTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getLineStops().contains(id))
 				{
 					EnvModule::getLineStops().remove(id);
@@ -208,12 +205,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<LineStop> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<LineStop> object(new LineStop());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

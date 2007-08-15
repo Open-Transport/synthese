@@ -53,46 +53,39 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Road>::TABLE_ID = 15;
 		template<> const bool SQLiteTableSyncTemplate<Road>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Road>::load(Road* object, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Road>::load(Road* object, const db::SQLiteResultSPtr& rows )
 		{
 			// ID
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
+			object->setKey(rows->getLongLong (TABLE_COL_ID));
 
 			// Name
-			std::string name (
-				rows.getColumn (rowIndex, RoadTableSync::COL_NAME));
+			std::string name (rows->getText (RoadTableSync::COL_NAME));
+
 			object->setName(name);
 
 			// Type
-			Road::RoadType roadType = (Road::RoadType)
-				Conversion::ToInt (rows.getColumn (rowIndex, RoadTableSync::COL_ROADTYPE));
+			Road::RoadType roadType = (Road::RoadType) rows->getInt (RoadTableSync::COL_ROADTYPE);
 			object->setType(roadType);
 
 			// City
-			uid cityId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, RoadTableSync::COL_CITYID)));
+			uid cityId (rows->getLongLong (RoadTableSync::COL_CITYID));
 			object->setCity(EnvModule::getCities ().get(cityId).get());
 
 			// Fare
-			uid fareId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, RoadTableSync::COL_FAREID)));
+			uid fareId (rows->getLongLong (RoadTableSync::COL_FAREID));
 			object->setFare(EnvModule::getFares ().get (fareId).get());
 
 
-			uid bikeComplianceId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, RoadTableSync::COL_BIKECOMPLIANCEID)));
+			uid bikeComplianceId (rows->getLongLong (RoadTableSync::COL_BIKECOMPLIANCEID));
 			object->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId).get());
-
-			uid handicappedComplianceId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID)));
+			
+			uid handicappedComplianceId (rows->getLongLong (RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID));
 			object->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
 
-			uid pedestrianComplianceId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, RoadTableSync::COL_PEDESTRIANCOMPLIANCEID)));
+			uid pedestrianComplianceId (rows->getLongLong (RoadTableSync::COL_PEDESTRIANCOMPLIANCEID));
 			object->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
 
-			uid reservationRuleId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, RoadTableSync::COL_RESERVATIONRULEID)));
+			uid reservationRuleId (rows->getLongLong (RoadTableSync::COL_RESERVATIONRULEID));
 			object->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId).get()); 
 
 
@@ -142,25 +135,25 @@ namespace synthese
 			addTableColumn (COL_VIAPOINTS, "TEXT", true);
 		}
 
-		void RoadTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isItFirstSync)
+		void RoadTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isItFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getRoads().contains(id))
 				{
 					shared_ptr<const Road> road = EnvModule::getRoads().get(id);
 					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (road->getCity ()->getKey ());
 					city->getRoadsMatcher ().remove (road->getName ());
 
-					load(EnvModule::getRoads().getUpdateable(id).get(), rows, i);
+					load(EnvModule::getRoads().getUpdateable(id).get(), rows);
 
 					city->getRoadsMatcher ().add (road->getName (), road.get());
 				}
 				else
 				{
 					shared_ptr<Road> object(new Road);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 					EnvModule::getRoads().add(object);
 
 					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (object->getCity ()->getKey ());
@@ -169,29 +162,29 @@ namespace synthese
 			}
 		}
 		
-		void RoadTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void RoadTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getRoads().contains(id))
 				{
 					shared_ptr<const Road> road = EnvModule::getRoads().get(id);
 					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (road->getCity ()->getKey ());
 					city->getRoadsMatcher ().remove (road->getName ());
 
-					load(EnvModule::getRoads().getUpdateable(id).get(), rows, i);
+					load(EnvModule::getRoads().getUpdateable(id).get(), rows);
 
 					city->getRoadsMatcher ().add (road->getName (), road.get());
 				}
 			}
 		}
 
-		void RoadTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void RoadTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getRoads().contains(id))
 				{
 					shared_ptr<const Road> road = EnvModule::getRoads().get(id);
@@ -223,12 +216,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
 				vector<shared_ptr<Road> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<Road> object(new Road);
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

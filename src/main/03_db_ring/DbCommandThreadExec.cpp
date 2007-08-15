@@ -2,16 +2,18 @@
 #include "03_db_ring/DbRingModule.h"
 #include "03_db_ring/Node.h"
 
-#include "02_db/SQLite.h"
+#include "02_db/DBModule.h"
+#include "02_db/SQLiteHandle.h"
+#include "02_db/SQLiteQueueThreadExec.h"
 
 #include "00_tcp/TcpServerSocket.h"
 #include "00_tcp/TcpService.h"
 #include "00_tcp/Constants.h"
 
 #include "01_util/Conversion.h"
-#include "01_util/Compression.h"
+#include "01_util/iostreams/Compression.h"
 #include "01_util/Log.h"
-#include "01_util/Thread.h"
+#include "01_util/threads/Thread.h"
 
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/copy.hpp>
@@ -36,6 +38,7 @@ namespace synthese
 		}
 
 	    
+
 			
 		void 
 		DbCommandThreadExec::loop ()
@@ -55,6 +58,11 @@ namespace synthese
 		    
 		    // Sends welcome message
 		    tcpStream << "Welcome to SYNTHESE SQLite embedded db server!" << std::endl << std::flush;
+
+		    // Get info about connection mode
+		    char replicationMode;
+		    tcpStream.get (replicationMode);
+		    bool withoutReplication (replicationMode == 'L');
 
 		    while (tcpStream.good ()) 
 		    {
@@ -79,19 +87,24 @@ namespace synthese
 			    if (SQLite::IsUpdateStatement (requestString))
 			    {
 				// With ring replication
-				DbRingModule::GetNode ()->execUpdate (requestString);  
-				// DBModule::GetSQLite ()->execUpdate (requestString);
+				if (withoutReplication)
+				{
+				    DBModule::GetSQLite ()->execUpdate (requestString);
+				}
+				else
+				{
+				    DbRingModule::GetNode ()->execUpdate (requestString);  
+				}
 
 				reply << "00" << "Update successful.";
 				    
 			    }
 			    else
 			    {
+				// We want a cached result so lazy parameter is false
+				SQLiteResultSPtr result (DbRingModule::GetNode ()->execQuery (requestString, true));
 
-				// SQLiteResult result = DBModule::GetSQLite ()->execQuery (requestString);
-				SQLiteResult result = DbRingModule::GetNode ()->execQuery (requestString);
-
-				reply << "00" << result << std::flush;
+				reply << "00" << (*result) << std::flush;
 			    }
 
 			}

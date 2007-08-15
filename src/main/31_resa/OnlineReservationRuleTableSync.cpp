@@ -47,9 +47,9 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<OnlineReservationRule>::TABLE_ID = 46;
 		template<> const bool SQLiteTableSyncTemplate<OnlineReservationRule>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<OnlineReservationRule>::load(OnlineReservationRule* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<OnlineReservationRule>::load(OnlineReservationRule* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			/// @todo Set all other attributes from the row
 		}
 
@@ -101,14 +101,14 @@ namespace synthese
 			addTableIndex(COL_RESERVATION_RULE_ID);
 		}
 
-		void OnlineReservationRuleTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void OnlineReservationRuleTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			// 
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				if (.contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				if (.contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load(ResaModule::getOnlineReservationRules().get(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))), rows, i);
+					load(ResaModule::getOnlineReservationRules().get(rows->getLongLong (TABLE_COL_ID)), rows, i);
 				}
 				else
 				{
@@ -119,11 +119,11 @@ namespace synthese
 			}
 		}
 		
-		void OnlineReservationRuleTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void OnlineReservationRuleTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (ResaModule::getOnlineReservationRules().contains(id))
 				{
 					OnlineReservationRule* object = ResaModule::getOnlineReservationRules().get(id);
@@ -132,11 +132,11 @@ namespace synthese
 			}
 		}
 
-		void OnlineReservationRuleTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void OnlineReservationRuleTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (ResaModule::getOnlineReservationRules().contains(id))
 				{
 					ResaModule::getOnlineReservationRules().remove(id);
@@ -162,9 +162,9 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<OnlineReservationRule*> objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					OnlineReservationRule* object = new OnlineReservationRule();
 					load(object, result, i);

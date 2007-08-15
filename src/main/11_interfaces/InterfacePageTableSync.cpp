@@ -1,4 +1,3 @@
-
 /** InterfacePageTableSync class implementation.
 	@file InterfacePageTableSync.cpp
 
@@ -23,6 +22,7 @@
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
+#include "02_db/Constants.h"
 #include "02_db/SQLiteResult.h"
 
 #include "11_interfaces/InterfaceModule.h"
@@ -54,38 +54,40 @@ namespace synthese
 		}
 
 
-		void InterfacePageTableSync::rowsUpdated( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void InterfacePageTableSync::rowsUpdated( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				shared_ptr<InterfacePage> page = InterfaceModule::getInterfacePages().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-				page->parse( rows.getColumn(i, TABLE_COL_CONTENT ) );
+			    shared_ptr<InterfacePage> page = InterfaceModule::getInterfacePages().getUpdateable (rows->getLongLong (TABLE_COL_ID));
+			    page->parse (rows->getText(TABLE_COL_CONTENT) );
 			}
 		}
 
 
-		void InterfacePageTableSync::rowsAdded( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows, bool isFirstSync)
+		void InterfacePageTableSync::rowsAdded( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				// Search the specified interface
-				try
-				{
+			    // Search the specified interface
+			    try
+			    {
+				
+				shared_ptr<InterfacePage> page;
+				if (Factory<InterfacePage>::contains(rows->getText (TABLE_COL_PAGE)))
+				    page = Factory<InterfacePage>::create( rows->getText (TABLE_COL_PAGE) );
+				else
+				    page.reset(new InterfacePage);
+				page->setKey(rows->getLongLong ( TABLE_COL_ID));
+				page->setCode(rows->getText (TABLE_COL_PAGE));
 
-					shared_ptr<InterfacePage> page;
-					if (Factory<InterfacePage>::contains(rows.getColumn(i,TABLE_COL_PAGE)))
-						page = Factory<InterfacePage>::create( rows.getColumn(i,TABLE_COL_PAGE) );
-					else
-						page.reset(new InterfacePage);
-					page->setKey(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-					page->setCode(rows.getColumn(i,TABLE_COL_PAGE));
-
-					InterfaceModule::getInterfacePages().add(page);
-
-					page->parse( rows.getColumn(i, TABLE_COL_CONTENT) );	// Needs the page to be already registered
-
-					shared_ptr<Interface> interf = InterfaceModule::getInterfaces().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE )));
-					interf->addPage(rows.getColumn(i, TABLE_COL_PAGE), page );
+				InterfaceModule::getInterfacePages().add(page);
+				
+				page->parse( rows->getText ( TABLE_COL_CONTENT) );	// Needs the page to be already registered
+				
+				shared_ptr<Interface> interf = InterfaceModule::getInterfaces().getUpdateable(
+				    rows->getLongLong ( TABLE_COL_INTERFACE ));
+				
+				interf->addPage(rows->getText ( TABLE_COL_PAGE), page );
 				}
 				catch (Interface::RegistryKeyException& e)
 				{
@@ -95,11 +97,12 @@ namespace synthese
 		}
 
 
-		void InterfacePageTableSync::rowsRemoved( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void InterfacePageTableSync::rowsRemoved( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				InterfaceModule::getInterfaces().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_INTERFACE)))->removePage( rows.getColumn(i, TABLE_COL_PAGE) );
+				InterfaceModule::getInterfaces().getUpdateable (rows->getLongLong ( TABLE_COL_INTERFACE))
+				    ->removePage( rows->getText ( TABLE_COL_PAGE) );
 			}
 		}
 	}

@@ -8,35 +8,5 @@ testenv = rootenv.Copy()
 
 
 Export ('testenv')
-
-
-builddir = testenv['BUILDROOT'] + '/' + 'test'
-
-
-srcpath = Dir('.').srcnode().abspath
-files = os.listdir( srcpath )
-
-modules = []
-
-
-# Build the list of modules to be processed
-for f in files:
-  if not os.path.isdir (os.path.join (srcpath, f)): continue
-  if not os.path.exists (os.path.join (srcpath, f, 'SConscript')): continue
-  modules.append (f)
-    
-
-#conf = Configure(testenv)
-#if not conf.CheckLibWithHeader('cppunit', 'cppunit/TestCase.h'):
-#  print 'Did not find lib.a or m.lib, exiting!'
-#  Exit(1)
-
-for module in modules:
-  testenv.SConscript(os.path.join (srcpath, module, 'SConscript'),
-                     build_dir=os.path.join (builddir, module),
-                     duplicate=0)
-  
-
-
-
+testenv.RecursiveBuild ()
 

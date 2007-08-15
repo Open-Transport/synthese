@@ -1,7 +1,7 @@
 #ifndef SYNTHESE_SERVER_CLEANERTHREADEXEC_H
 #define SYNTHESE_SERVER_CLEANERTHREADEXEC_H
 
-#include "01_util/ThreadExec.h"
+#include "01_util/threads/ThreadExec.h"
 
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>

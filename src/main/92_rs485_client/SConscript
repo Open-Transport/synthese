@@ -1,28 +1,12 @@
-import os.path
-
-Import ('mainenv')
-
-moduleenv = mainenv.ModuleEnv()
-
-includes = '*.cpp'
-excludes = []
 
 
-files = moduleenv.Glob(includes, excludes)
-
-# Modules libs
-moduleenv.AddModuleDependency ('00_tcp')
-moduleenv.AddModuleDependency ('01_util')
-moduleenv.AddBoostDependency ('boost_filesystem')
-moduleenv.AddBoostDependency ('boost_date_time')
-moduleenv.AddBoostDependency ('boost_program_options')
-moduleenv.AddBoostDependency ('boost_thread')
-moduleenv.AddBoostDependency ('boost_iostreams')
-moduleenv.AppendMultithreadConf ()
+Import ('env')
 
 
-if (moduleenv['PLATFORM'] == 'win32'):
-  # Does not work under posix at the moment !
-  moduleenv.Program ( moduleenv.DefaultModuleName (), files )
+if (env['PLATFORM'] == 'win32'):
+  modules = ['01_util', '00_tcp'];
+  syntheseenv = env.SyntheseEnv (modules)
+  syntheseenv.SyntheseBuild (syntheseenv.DefaultModuleName (), False)
+
 
 

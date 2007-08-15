@@ -1,6 +1,6 @@
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
-#include "01_util/Thread.h"
+#include "01_util/threads/Thread.h"
 #include "01_util/Factory.h"
 
 #include "02_db/SQLite.h"
@@ -208,24 +208,43 @@ namespace synthese
 
 
 
-		SQLiteResult 
-		SQLiteQueueThreadExec::execQuery (const std::string& sql)
+		SQLiteResultSPtr 
+		SQLiteQueueThreadExec::execQuery (const SQLiteStatementSPtr& statement, bool lazy)
 		{
 			// Only one thread can use this db at the same time.
 			boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
 
-			return SQLiteHandle::execQuery (sql);
+			// Note : lazy results can be used only inside the SQLite queue thread
+			// (beacause of stepping which must be done in the same thread that created
+			// statement). If this function is not called from inside the sqlite queue thread
+			// (which is always the case for sync) we override lazy param and cache result anyway
+			// so that calling thread will not be bothered by these threading considerations.
+			// This limits a bit usage of lazy results... 
+			// A good solution would be to implement a special event for queries which would be 
+			// enqueued as well in the SQLiteQueueThread... see if really useful.
+			if (insideSQLiteQueueThread () == false) lazy = false;
+			return SQLiteHandle::execQuery (statement, lazy);
 		}
 
 
 
-		void 
-		SQLiteQueueThreadExec::execUpdate (const std::string& sql, bool asynchronous)
-		{
+	    
+   	    SQLiteResultSPtr 
+	    SQLiteQueueThreadExec::execQuery (const SQLData& sql, bool lazy)
+	    {
+		return this->execQuery (compileStatement (sql), lazy);
+	    }
+ 
+
+
+
+	    void
+	    SQLiteQueueThreadExec::execUpdate (const SQLiteStatementSPtr& statement, bool asynchronous)
+	    {
 		    {
 			// Only one thread can use this db at the same time.
 			boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
-			return SQLiteHandle::execUpdate (sql);
+			SQLiteHandle::execUpdate (statement);
 		    }
 
 		    if (asynchronous == false) 
@@ -245,10 +264,86 @@ namespace synthese
 			    }
 			}
 		    }
+	    }
+
+
+
+
+
+	    
+	    void 
+	    SQLiteQueueThreadExec::execUpdate (const SQLData& sql, bool asynchronous)
+	    {
+		{
+		    // Only one thread can use this db at the same time.
+		    boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
+		    SQLiteHandle::execUpdate (sql, asynchronous);
 		}
+
+		if (asynchronous == false) 
+		{
+		    if (insideSQLiteQueueThread ()) 
+		    {
+			// We are in the "queue" thread 
+			// (because running monothreaded or in a unit test)
+			// So, just loop once to ensure the events are consumed.
+			((SQLiteQueueThreadExec*) this)->loop ();
+		    }
+		    else
+		    {
+			while (hasEnqueuedEvent ()) 
+			{
+			    Thread::Sleep (1);			    
+			}
+		    }
+		}
+	    }
 	    
 	    
 
+	    SQLiteStatementSPtr 
+	    SQLiteQueueThreadExec::compileStatement (const std::string& sql)
+	    {
+		// Important : even compiling requires the lock on the db handle.
+		// Actually, ANY operation using a db handle must take the lock.
+		boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
+		return SQLiteHandle::compileStatement (sql);
+	    }
+
+
+
+
+	    bool 
+	    SQLiteQueueThreadExec::isTransactionOpened ()
+	    {
+		boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
+		return SQLiteHandle::isTransactionOpened ();
+	    }
+	    
+	    
+	    void 
+	    SQLiteQueueThreadExec::beginTransaction (bool exclusive)
+	    {
+		boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
+		return SQLiteHandle::beginTransaction (exclusive);
+	    }
+	    
+	    
+	    
+	    void 
+	    SQLiteQueueThreadExec::commitTransaction ()
+	    {
+		boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
+		return SQLiteHandle::commitTransaction ();
+	    }
+
+	    
+	    void 
+	    SQLiteQueueThreadExec::rollbackTransaction ()
+	    {
+		boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
+		return SQLiteHandle::rollbackTransaction ();
+	    }
 	    
 	    
 	}

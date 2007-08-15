@@ -22,8 +22,8 @@
 #include "01_util/Log.h"
 #include "01_util/Factory.h"
 #include "01_util/ModuleClass.h"
-#include "01_util/Thread.h"
-#include "01_util/ThreadManager.h"
+#include "01_util/threads/Thread.h"
+#include "01_util/threads/ThreadManager.h"
 
 #include "02_db/DbModuleClass.h"
 

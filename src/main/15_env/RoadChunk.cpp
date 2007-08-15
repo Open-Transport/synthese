@@ -79,7 +79,7 @@ namespace synthese
 			if (isDeparture())
 				_fromAddress->addDepartureEdge(static_cast<Edge*>(this));
 
-			updateServiceIndex();
+			markServiceIndexUpdateNeeded();
 		}
 
 

@@ -56,20 +56,20 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<DBLogEntry>::TABLE_ID = 45;
 		template<> const bool SQLiteTableSyncTemplate<DBLogEntry>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<DBLogEntry>::load(DBLogEntry* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<DBLogEntry>::load(DBLogEntry* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			object->setLogKey(rows.getColumn(rowId, DBLogEntryTableSync::COL_LOG_KEY));
-			object->setDate(DateTime::FromSQLTimestamp(rows.getColumn(rowId, DBLogEntryTableSync::COL_DATE)));
-			object->setLevel((DBLogEntry::Level) Conversion::ToInt(rows.getColumn(rowId, DBLogEntryTableSync::COL_LEVEL)));
-			object->setObjectId(Conversion::ToLongLong(rows.getColumn(rowId, DBLogEntryTableSync::COL_OBJECT_ID)));
+			object->setKey(rows->getLongLong (TABLE_COL_ID));
+			object->setLogKey(rows->getText ( DBLogEntryTableSync::COL_LOG_KEY));
+			object->setDate(DateTime::FromSQLTimestamp(rows->getText ( DBLogEntryTableSync::COL_DATE)));
+			object->setLevel((DBLogEntry::Level) rows->getInt ( DBLogEntryTableSync::COL_LEVEL));
+			object->setObjectId(rows->getLongLong ( DBLogEntryTableSync::COL_OBJECT_ID));
 
 			// User ID
-			if (Conversion::ToLongLong(rows.getColumn(rowId, DBLogEntryTableSync::COL_USER_ID)))
+			if (rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID))
 			{
 				try
 				{
-					object->setUser(UserTableSync::get(Conversion::ToLongLong(rows.getColumn(rowId, DBLogEntryTableSync::COL_USER_ID))));
+				    object->setUser(UserTableSync::get (rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID)));
 				}
 				catch (DBEmptyResultException<User>)
 				{					
@@ -81,7 +81,7 @@ namespace synthese
 			DBLogEntry::Content v;
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 			boost::char_separator<char> sep (DBLogEntryTableSync::CONTENT_SEPARATOR.c_str());
-			string content = rows.getColumn(rowId, DBLogEntryTableSync::COL_CONTENT);
+			string content = rows->getText ( DBLogEntryTableSync::COL_CONTENT);
 			tokenizer columns (content, sep);
 			for (tokenizer::iterator it = columns.begin(); it != columns.end (); ++it)
 				v.push_back(*it);
@@ -151,15 +151,15 @@ namespace synthese
 			addTableIndex(m1);
 		}
 
-		void DBLogEntryTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void DBLogEntryTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		}
 
-		void DBLogEntryTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void DBLogEntryTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 		}
 
-		void DBLogEntryTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void DBLogEntryTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 		}
 
@@ -210,12 +210,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<DBLogEntry> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<DBLogEntry> object(new DBLogEntry());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

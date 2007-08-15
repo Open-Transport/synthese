@@ -1,5 +1,7 @@
 #include "SQLite.h"
 
+#include "02_db/SQLiteLazyResult.h"
+#include "02_db/SQLiteCachedResult.h"
 #include "02_db/SQLiteException.h"
 
 #include "01_util/Conversion.h"
@@ -17,14 +19,6 @@ namespace synthese
 namespace db
 {
 
-
-int 
-sqlite_callback (void* result, int nbColumns, char** values, char** columns)
-{
-    SQLiteResult* dbResult = (SQLiteResult*) result;
-    dbResult->addRow (nbColumns, values, columns);
-    return 0;
-}
 
 
 
@@ -61,7 +55,7 @@ SQLite::CloseHandle (sqlite3* handle)
 
 
 bool 
-SQLite::IsUpdateStatement (const std::string& sql)
+SQLite::IsUpdateStatement (const SQLData& sql)
 {
     std::string str = boost::algorithm::to_upper_copy (sql);
     // SQL is an update statement if it contains one of the following keywords :
@@ -85,54 +79,63 @@ SQLite::IsUpdateStatement (const std::string& sql)
 
 
 void 
-SQLite::ExecUpdate (sqlite3* handle, const std::string& sql)
+SQLite::ExecUpdate (sqlite3* handle, const SQLData& sql)
 {
-    // Log::GetInstance ().debug ("Executing SQLite updtate " + sql);
+    // Do a batch execution (no precompilation since it can contains more than one 
+    // statement which is impossible to validate wihtout executing them one by one, given one database state)
+    assert (sql.size () > 0);
+
     char* errMsg = 0;
     int retc = sqlite3_exec (handle, 
-			     sql.c_str (), 
-			     0, 
-			     0, &errMsg);
-//	sqlite3_finalize();
+                             sql.c_str (), 
+                             0, 
+                             0, &errMsg);
+
     if (retc != SQLITE_OK)
     {
-	std::string msg (errMsg);
-	sqlite3_free (errMsg);
-	
-	throw SQLiteException ("Error executing query \"" + sql + "\" : " + 
-			       msg + " (error=" + Conversion::ToString (retc) + ")");
+        std::string msg (errMsg);
+        sqlite3_free (errMsg);
+
+        throw SQLiteException ("Error executing batch update \"" + Conversion::ToTruncatedString (sql) + "\" : " + 
+                               msg + " (error=" + Conversion::ToString (retc) + ")");
     }
-    // Log::GetInstance ().debug ("Query successful.");
 }
 
 
 
-SQLiteResult 
-SQLite::ExecQuery (sqlite3* handle, const std::string& sql)
+
+SQLiteResultSPtr 
+SQLite::ExecQuery (const SQLiteStatementSPtr& statement, bool lazy)
 {
-    // Log::GetInstance ().debug ("Executing SQLite query " + sql);
-    SQLiteResult result;
-    char* errMsg = 0;
-    int retc;
-    try {
-	retc = sqlite3_exec (handle, 
-			     sql.c_str (), 
-			     &sqlite_callback, 
-			     &result, &errMsg);
-    }
-    catch(...){
-	throw SQLiteException("Unknown problem in query "+ sql);
-    }
-    if (retc != SQLITE_OK)
+    // lazy = false;
+    SQLiteResultSPtr result (new SQLiteLazyResult (statement));
+    if (lazy)
     {
-	std::string msg (errMsg);
-	sqlite3_free (errMsg);
-	throw SQLiteException ("Error executing query \"" + sql + " : " + 
-			       msg + "\" (error=" + Conversion::ToString (retc) + ")");
+	return result;
     }
-    // Log::GetInstance ().debug ("Query successful (" + Conversion::ToString (result.getNbRows ()) + " rows).");
-    return result;
+    else
+    {
+	SQLiteCachedResult* cachedResult = new SQLiteCachedResult (result);
+	return SQLiteResultSPtr (cachedResult);
+    }
 }
+
+
+
+
+
+
+
+SQLiteResultSPtr 
+SQLite::ExecQuery (sqlite3* handle, const std::string& sql, bool lazy)
+{
+    // Compiling a statement on an empty sql string raise errors with sqlite.
+    assert (sql.size () > 0);
+
+    return ExecQuery (CompileStatement (handle, sql), lazy);
+}
+
+
 
 
 
@@ -168,45 +171,58 @@ SQLite::CommitTransaction (sqlite3* handle)
 }
     
 
-
-
-SQLiteStatement 
-SQLite::PrepareStatement (sqlite3* handle, const std::string& sql)
+void 
+SQLite::RollbackTransaction (sqlite3* handle)
 {
-    
-    sqlite3_stmt* stmt;
-    int retc = sqlite3_prepare_v2 (handle, sql.c_str (), sql.length (), &stmt, 0);
-
-    if (retc != SQLITE_OK)
-    {
-	throw SQLiteException ("Error compiling \"" + sql + "\" (error=" + Conversion::ToString (retc) + ")");
-    }
-    return stmt;
+    ExecUpdate (handle, "ROLLBACK");
 }
+
+	
+
+
+SQLiteStatementSPtr 
+SQLite::CompileStatement (sqlite3* handle, const std::string& sql)
+{
+    return SQLiteStatementSPtr (new SQLiteStatement (handle, sql));
+}
+
+
 
 
 
 
 
 void 
-SQLite::FinalizeStatement (const SQLiteStatement& statement)
+SQLite::ExecUpdate (const SQLiteStatementSPtr& statement)
 {
-    int retc = sqlite3_finalize (statement);
-
-    if (retc != SQLITE_OK)
+    int retc = SQLITE_ROW;
+    while (retc == SQLITE_ROW)
     {
-	throw SQLiteException ("Error while finalizing statement (error=" + Conversion::ToString (retc) + ")");
+	retc = sqlite3_step (statement->getStatement ());
     }
-    
+    if (retc != SQLITE_DONE)
+    {
+	throw SQLiteException ("Error executing precompiled statement (error=" + Conversion::ToString (retc) + ")" + 
+			       Conversion::ToTruncatedString (statement->getSQL ()));
+    }
+
 }
+
+
+
+
+
+
+
 
 
 
 bool 
-SQLite::IsStatementComplete (const std::string& sql)
+SQLite::IsStatementComplete (const SQLData& sql)
 {
     return sqlite3_complete (sql.c_str ());
 }
+
 
 
 

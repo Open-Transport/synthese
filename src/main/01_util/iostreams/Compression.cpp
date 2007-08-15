@@ -1,4 +1,4 @@
-#include "01_util/Compression.h"
+#include "01_util/iostreams/Compression.h"
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
@@ -23,7 +23,6 @@ namespace util
     {
 	// Note : this is important to add the block size in order to be able to exchange
 	// several messages accross not EOF bounded streams (TCP dialog for instance).
-	
 	std::stringstream tmp;
 
 	std::stringstream ss;
@@ -37,6 +36,7 @@ namespace util
 	int size = tmp.str ().length (); 
 	os << size << '#';
 	boost::iostreams::copy (tmp, os);
+
     }
     
 
@@ -47,13 +47,14 @@ namespace util
 	is.getline (buffer, sizeof(buffer), '#');
 	int size (atoi (buffer));
 	if (size == 0) return;
-	
+
 	filtering_stream<input> fs;
 	fs.push (zlib_decompressor());
 	fs.push (restrict (is, 0, size));
-
+	
 	boost::iostreams::copy(fs, os);
 	fs.pop ();
+
     }
 
 

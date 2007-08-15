@@ -49,13 +49,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<BikeCompliance>::TABLE_ID = 20;
 		template<> const bool SQLiteTableSyncTemplate<BikeCompliance>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<BikeCompliance>::load(BikeCompliance* cmp, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<BikeCompliance>::load(BikeCompliance* cmp, const db::SQLiteResultSPtr& rows )
 		{
-			cmp->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
+		    cmp->setKey(rows->getLongLong (TABLE_COL_ID));
 
 			tribool status = true;
-			int statusInt (
-				Conversion::ToInt (rows.getColumn (rowIndex, BikeComplianceTableSync::COL_STATUS)));
+			int statusInt (rows->getInt (BikeComplianceTableSync::COL_STATUS));
 			if (statusInt < 0)
 			{
 				status = boost::logic::indeterminate;
@@ -65,12 +64,12 @@ namespace synthese
 				status = false;
 			}
 
-			int capacity (
-				Conversion::ToInt (rows.getColumn (rowIndex, BikeComplianceTableSync::COL_CAPACITY)));
-
+			int capacity (rows->getInt (BikeComplianceTableSync::COL_CAPACITY));
+			
 			cmp->setCompliant (status);
 			cmp->setCapacity (capacity);
 		}
+
 
 		template<> void SQLiteTableSyncTemplate<BikeCompliance>::save(BikeCompliance* object)
 		{
@@ -86,11 +85,11 @@ namespace synthese
 			else
 			{
 				object->setKey(getId());
-                query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					/// @todo fill other fields separated by ,
-					<< ")";
+				query
+				    << " INSERT INTO " << TABLE_NAME << " VALUES("
+				    << Conversion::ToString(object->getKey())
+				    /// @todo fill other fields separated by ,
+				    << ")";
 			}
 			sqlite->execUpdate(query.str());
 		}
@@ -110,34 +109,35 @@ namespace synthese
 			addTableColumn (COL_CAPACITY, "INTEGER");
 		}
 
-		void BikeComplianceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void BikeComplianceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				shared_ptr<BikeCompliance> object(new BikeCompliance());
-				load(object.get(), rows, i);
+				load(object.get(), rows);
 				EnvModule::getBikeCompliances().add(object);
 			}
 		}
 
-		void BikeComplianceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+
+		void BikeComplianceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getBikeCompliances().contains(id))
 				{
 					shared_ptr<BikeCompliance> object = EnvModule::getBikeCompliances().getUpdateable(id);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 				}
 			}
 		}
 
-		void BikeComplianceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void BikeComplianceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getBikeCompliances().contains(id))
 				{
 					EnvModule::getBikeCompliances().remove(id);
@@ -163,12 +163,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<BikeCompliance> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<BikeCompliance> object(new BikeCompliance());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

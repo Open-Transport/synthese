@@ -1,8 +1,8 @@
-Import ('testenv')
+Import ('env')
 
 modules = ['15_env', '07_lex_matcher', '04_time', '02_db', '01_util'];
 
-unittestenv = testenv.UnitTestEnv (modules)
+unittestenv = env.UnitTestEnv (modules)
 unittestenv.UnitTest ()
 
 

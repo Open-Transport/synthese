@@ -132,14 +132,14 @@ namespace synthese
 			*/
 			void rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows, bool isFirstSync = false);
+				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
 
 			/** Action to do on CommercialLine creation.
 				This method updates the corresponding object in ram.
 			*/
 			void rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResultSPtr& rows);
 
 			/** Action to do on CommercialLine deletion.
 				This method deletes the corresponding object in ram and runs 
@@ -147,7 +147,7 @@ namespace synthese
 			*/
 			void rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResultSPtr& rows);
 
 		};
 	}

@@ -1,9 +1,9 @@
 
-Import ('testenv')
+Import ('env')
 
 modules = ['15_env', '14_geography', '12_security', '11_interfaces', '07_lex_matcher', '06_geometry', '05_html', '04_time', '02_db', '01_util', '00_tcp'];
 
-syntheseenv = testenv.SyntheseEnv (modules)
+syntheseenv = env.SyntheseEnv (modules)
 
 syntheseenv.Program (syntheseenv.DefaultModuleName (), 'main.cpp')
 

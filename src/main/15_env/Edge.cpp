@@ -49,8 +49,7 @@ namespace synthese
 		, _previousDepartureForFineSteppingOnly(NULL)
 		, _followingConnectionArrival(NULL)
 		, _followingArrivalForFineSteppingOnly(NULL)
-//		, _departureIndexUpdateNeeded (true)
-//		, _arrivalIndexUpdateNeeded (true)
+		, _serviceIndexUpdateNeeded (true)
 		{ }
 
 
@@ -447,6 +446,7 @@ namespace synthese
 					}
 				}
 			}
+			_serviceIndexUpdateNeeded = false;
 
 		}
 
@@ -488,15 +488,25 @@ namespace synthese
 
 
 
+	    void 
+	    Edge::markServiceIndexUpdateNeeded ()
+	    {
+		_serviceIndexUpdateNeeded = true;
+	    }
+
+
+
 	    int Edge::getDepartureFromIndex (int hour) const
 	    {
-			return _departureIndex[hour];
+		if (_serviceIndexUpdateNeeded) updateServiceIndex ();
+		return _departureIndex[hour];
 	    }
 
 
 	    int Edge::getArrivalFromIndex (int hour) const
 	    {
-			return _arrivalIndex[hour];
+		if (_serviceIndexUpdateNeeded) updateServiceIndex ();
+		return _arrivalIndex[hour];
 	    }
 
 	}

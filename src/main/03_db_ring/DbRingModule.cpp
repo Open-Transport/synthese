@@ -6,7 +6,7 @@
 
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
-#include "01_util/ManagedThread.h"
+#include "01_util/threads/ManagedThread.h"
 
 #include <iostream>
 
@@ -47,7 +47,7 @@ namespace synthese
 		bool autorespawn = false;
 
 		ManagedThread* nodeThread = 
-		    new ManagedThread (_Node, "dbring_node", 1000, autorespawn);
+		    new ManagedThread (_Node, "dbring_node", 300, autorespawn);
 
 		
 		synthese::tcp::TcpService* service = 

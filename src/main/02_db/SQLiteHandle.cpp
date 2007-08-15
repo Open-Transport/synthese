@@ -35,21 +35,38 @@ namespace synthese
 
 
 
-	SQLiteResult 
-	SQLiteHandle::execQuery (const std::string& sql)
+	SQLiteResultSPtr 
+	SQLiteHandle::execQuery (const SQLiteStatementSPtr& statement, bool lazy)
 	{
-	    assert (getHandle ());
 
-	    return SQLite::ExecQuery (getHandle (), sql);
+	    return SQLite::ExecQuery (statement, lazy);
+	}
+
+
+	SQLiteResultSPtr 
+	SQLiteHandle::execQuery (const SQLData& sql, bool lazy)
+	{
+
+	    return SQLite::ExecQuery (getHandle (), sql, lazy);
 	}
 
 
 	void 
-	SQLiteHandle::execUpdate (const std::string& sql, bool asynchronous)
+	SQLiteHandle::execUpdate (const SQLiteStatementSPtr& statement, bool asynchronous)
 	{
-	    assert (getHandle ());
+
 	    // asynchronous is ignored in default implementation.
-	    return SQLite::ExecUpdate (getHandle (), sql);
+	    SQLite::ExecUpdate (statement);
+	}
+
+
+
+	void 
+	SQLiteHandle::execUpdate (const SQLData& sql, bool asynchronous)
+	{
+
+	    // asynchronous is ignored in default implementation.
+	    SQLite::ExecUpdate (getHandle (), sql);
 	}
 
 
@@ -74,26 +91,28 @@ namespace synthese
 	void 
 	SQLiteHandle::commitTransaction ()
 	{
-	    execUpdate ("COMMIT");
-	}
-
-
-	    
-	SQLiteStatement 
-	SQLiteHandle::prepareStatement (const std::string& sql)
-	{
-	    assert (getHandle ());
-	    return SQLite::PrepareStatement (getHandle (), sql);
+	    SQLite::CommitTransaction (getHandle ());
 	}
 
 
 	void 
-	SQLiteHandle::finalizeStatement (const SQLiteStatement& statement)
+	SQLiteHandle::rollbackTransaction ()
 	{
-	    SQLite::FinalizeStatement (statement);
+	    SQLite::RollbackTransaction (getHandle ());
 	}
 
+
 	    
+	SQLiteStatementSPtr 
+	SQLiteHandle::compileStatement (const SQLData& sql)
+	{
+	    assert (getHandle ());
+	    return SQLite::CompileStatement (getHandle (), sql);
+	}
+
+
+
+
     }
 }
 

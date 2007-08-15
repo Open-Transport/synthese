@@ -48,31 +48,31 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Line>::TABLE_ID = 9;
 		template<> const bool SQLiteTableSyncTemplate<Line>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Line>::load(Line* line, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Line>::load(Line* line, const db::SQLiteResultSPtr& rows )
 		{
-			line->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
-			uid axisId (Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_AXISID)));
+			line->setKey(rows->getLongLong (TABLE_COL_ID));
+			uid axisId (rows->getLongLong (LineTableSync::COL_AXISID));
 
 			std::string name (
-				rows.getColumn (rowIndex, LineTableSync::COL_NAME));
+			    rows->getText (LineTableSync::COL_NAME));
 			std::string timetableName (
-				rows.getColumn (rowIndex, LineTableSync::COL_TIMETABLENAME));
+			    rows->getText (LineTableSync::COL_TIMETABLENAME));
 			std::string direction (
-				rows.getColumn (rowIndex, LineTableSync::COL_DIRECTION));
+			    rows->getText (LineTableSync::COL_DIRECTION));
 
-			bool isWalkingLine (Conversion::ToBool (rows.getColumn (rowIndex, LineTableSync::COL_ISWALKINGLINE)));
-			bool useInDepartureBoards (Conversion::ToBool (rows.getColumn (rowIndex, LineTableSync::COL_USEINDEPARTUREBOARDS)));
-			bool useInTimetables (Conversion::ToBool (rows.getColumn (rowIndex, LineTableSync::COL_USEINTIMETABLES)));
-			bool useInRoutePlanning (Conversion::ToBool (rows.getColumn (rowIndex, LineTableSync::COL_USEINROUTEPLANNING)));
-
-			uid rollingStockId (Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_ROLLINGSTOCKID)));
-			uid fareId (Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_FAREID)));
-			uid alarmId (Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_ALARMID)));
-			uid bikeComplianceId (Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_BIKECOMPLIANCEID)));
-			uid pedestrianComplianceId (Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_PEDESTRIANCOMPLIANCEID)));
-			uid handicappedComplianceId (Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_HANDICAPPEDCOMPLIANCEID)));
-			uid reservationRuleId (Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_RESERVATIONRULEID)));
-
+			bool isWalkingLine (rows->getBool (LineTableSync::COL_ISWALKINGLINE));
+			bool useInDepartureBoards (rows->getBool (LineTableSync::COL_USEINDEPARTUREBOARDS));
+			bool useInTimetables (rows->getBool (LineTableSync::COL_USEINTIMETABLES));
+			bool useInRoutePlanning (rows->getBool (LineTableSync::COL_USEINROUTEPLANNING));
+			
+			uid rollingStockId (rows->getLongLong (LineTableSync::COL_ROLLINGSTOCKID));
+			uid fareId (rows->getLongLong (LineTableSync::COL_FAREID));
+			uid alarmId (rows->getLongLong (LineTableSync::COL_ALARMID));
+			uid bikeComplianceId (rows->getLongLong (LineTableSync::COL_BIKECOMPLIANCEID));
+			uid pedestrianComplianceId (rows->getLongLong (LineTableSync::COL_PEDESTRIANCOMPLIANCEID));
+			uid handicappedComplianceId (rows->getLongLong (LineTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+			uid reservationRuleId (rows->getLongLong (LineTableSync::COL_RESERVATIONRULEID));
+			
 			line->setName(name);
 			line->setAxis(EnvModule::getAxes().get(axisId).get());
 			line->setTimetableName (timetableName);
@@ -86,7 +86,7 @@ namespace synthese
 			line->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId).get());
 			line->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
 			line->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
-			line->setCommercialLine(EnvModule::getCommercialLines().get(Conversion::ToLongLong (rows.getColumn (rowIndex, LineTableSync::COL_COMMERCIAL_LINE_ID))).get());
+			line->setCommercialLine(EnvModule::getCommercialLines().get(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID)).get());
 			line->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId).get());
 		}
 
@@ -160,34 +160,34 @@ namespace synthese
 			addTableIndex(COL_COMMERCIAL_LINE_ID);
 		}
 
-		void LineTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void LineTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				shared_ptr<Line> object(new Line);
-				load(object.get(), rows, i);
+				load(object.get(), rows);
 				EnvModule::getLines().add(object);
 			}
 		}
 
-		void LineTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void LineTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid lineId = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid lineId = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getLines().contains(lineId))
 				{
 					shared_ptr<Line> object = EnvModule::getLines().getUpdateable(lineId);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 				}
 			}
 		}
 
-		void LineTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void LineTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid lineId = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid lineId = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getLines().contains(lineId))
 				{
 					EnvModule::getLines().remove(lineId);
@@ -213,12 +213,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<Line> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<Line> object(new Line());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

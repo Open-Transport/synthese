@@ -49,11 +49,11 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<TransportNetwork>::TABLE_ID(22);
 		template<> const bool SQLiteTableSyncTemplate<TransportNetwork>::HAS_AUTO_INCREMENT(true);
 
-		template<> void SQLiteTableSyncTemplate<TransportNetwork>::load(TransportNetwork* object, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<TransportNetwork>::load(TransportNetwork* object, const db::SQLiteResultSPtr& rows )
 		{
-			std::string name (rows.getColumn (rowIndex, TransportNetworkTableSync::COL_NAME));
+			std::string name (rows->getText (TransportNetworkTableSync::COL_NAME));
 
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
+			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setName(name);
 		}
 
@@ -86,52 +86,55 @@ namespace synthese
 		}
 
 
-		void TransportNetworkTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync /*= false*/ )
+		void TransportNetworkTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync /*= false*/ )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id (Conversion::ToLongLong (rows.getColumn (i, TABLE_COL_ID)));
+			    uid id (rows->getLongLong (TABLE_COL_ID));
 
-				shared_ptr<TransportNetwork> object;
-				if (EnvModule::getTransportNetworks().contains(id))
-				{
-					object = EnvModule::getTransportNetworks().getUpdateable(id);
-					load(object.get(), rows, i);
-				}
-				else
-				{
-					object.reset(new TransportNetwork);
-					load(object.get(), rows, i);
-					EnvModule::getTransportNetworks ().add (object);
-				}
+			    shared_ptr<TransportNetwork> object;
+			    if (EnvModule::getTransportNetworks().contains(id))
+			    {
+				object = EnvModule::getTransportNetworks().getUpdateable(id);
+				load(object.get(), rows);
+			    }
+			    else
+			    {
+				object.reset(new TransportNetwork);
+				load(object.get(), rows);
+				EnvModule::getTransportNetworks ().add (object);
+			    }
 			}
 		}
 
-		void TransportNetworkTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransportNetworkTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-				uid id (Conversion::ToLongLong (rows.getColumn (i, TABLE_COL_ID)));
-				
-				if (!EnvModule::getTransportNetworks().contains(id))
-					continue;
-
-				shared_ptr<TransportNetwork> object = EnvModule::getTransportNetworks().getUpdateable(id);
-				load(object.get(), rows, i);
-			}
+		    while (rows->next ())
+		    {
+			uid id (rows->getLongLong ( TABLE_COL_ID));
+			
+			if (!EnvModule::getTransportNetworks().contains(id))
+			    continue;
+			
+			shared_ptr<TransportNetwork> object = EnvModule::getTransportNetworks().getUpdateable(id);
+			load(object.get(), rows);
+		    }
 		}
 
-		void TransportNetworkTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+
+		void TransportNetworkTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  
+							     db::SQLiteSync* sync, 
+							     const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-				uid id (Conversion::ToLongLong (rows.getColumn (i, TABLE_COL_ID)));
-
-				EnvModule::getTransportNetworks().remove(id);
-			}
+		    while (rows->next ())
+		    {
+			uid id (rows->getLongLong (TABLE_COL_ID));
+			EnvModule::getTransportNetworks().remove(id);
+		    }
 		}
-
-		std::vector<boost::shared_ptr<TransportNetwork> > TransportNetworkTableSync::search(
+	    
+	    
+	    std::vector<boost::shared_ptr<TransportNetwork> > TransportNetworkTableSync::search(
 			string name
 			, int first /*= 0*/
 			, int number /*= 0*/
@@ -154,12 +157,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
 				vector<shared_ptr<TransportNetwork> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<TransportNetwork> object(new TransportNetwork());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

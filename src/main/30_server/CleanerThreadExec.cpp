@@ -10,7 +10,7 @@
 #include <boost/thread/xtime.hpp>
 
 #include "01_util/Log.h"
-#include "01_util/Thread.h"
+#include "01_util/threads/Thread.h"
 
 using synthese::util::Log;
 using synthese::util::Conversion;

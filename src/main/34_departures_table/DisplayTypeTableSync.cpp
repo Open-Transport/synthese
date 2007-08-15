@@ -50,18 +50,20 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<DisplayType>::TABLE_ID = 36;
 		template<> const bool SQLiteTableSyncTemplate<DisplayType>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<DisplayType>::load(DisplayType* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<DisplayType>::load(DisplayType* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			object->setName(rows.getColumn(rowId, DisplayTypeTableSync::TABLE_COL_NAME));
+			object->setKey(rows->getLongLong (TABLE_COL_ID));
+			object->setName(rows->getText ( DisplayTypeTableSync::TABLE_COL_NAME));
 
-			if (InterfaceModule::getInterfaces().contains(Conversion::ToLongLong(rows.getColumn(rowId, DisplayTypeTableSync::TABLE_COL_INTERFACE_ID))))
+			if (InterfaceModule::getInterfaces().contains(rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID)))
 			{
-				object->setInterface(InterfaceModule::getInterfaces().get(Conversion::ToLongLong(rows.getColumn(rowId, DisplayTypeTableSync::TABLE_COL_INTERFACE_ID))));
+			    object->setInterface(InterfaceModule::getInterfaces().get(
+						     rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID)));
 			}
 
-			object->setRowNumber(Conversion::ToInt(rows.getColumn(rowId, DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER)));
-		}
+	    object->setRowNumber(rows->getInt ( DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER));
+	}
+    
 
 		template<> void SQLiteTableSyncTemplate<DisplayType>::save(DisplayType* object)
 		{
@@ -109,34 +111,34 @@ namespace synthese
 			addTableColumn(TABLE_COL_ROWS_NUMBER, "INTEGER", true);
 		}
 
-		void DisplayTypeTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void DisplayTypeTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				shared_ptr<DisplayType> object(new DisplayType());
-				load(object.get(), rows, i);
+				load(object.get(), rows);
 				DeparturesTableModule::getDisplayTypes().add(object);
 			}
 		}
 
-		void DisplayTypeTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void DisplayTypeTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				if (DeparturesTableModule::getDisplayTypes().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				if (DeparturesTableModule::getDisplayTypes().contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load(DeparturesTableModule::getDisplayTypes().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
+					load(DeparturesTableModule::getDisplayTypes().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
 				}
 			}
 		}
 
-		void DisplayTypeTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void DisplayTypeTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				if (DeparturesTableModule::getDisplayTypes().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				if (DeparturesTableModule::getDisplayTypes().contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					DeparturesTableModule::getDisplayTypes().remove(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+					DeparturesTableModule::getDisplayTypes().remove(rows->getLongLong (TABLE_COL_ID));
 				}
 			}
 		}
@@ -165,12 +167,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<DisplayType> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<DisplayType> object(new DisplayType);
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

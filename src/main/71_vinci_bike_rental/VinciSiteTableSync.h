@@ -77,21 +77,21 @@ namespace synthese
 			*/
 			void rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows, bool isFirstSync = false);
+				const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
 
 			/** Action to do on user creation.
 			Updates the users objects in the opened sessions.
 			*/
 			void rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResultSPtr& rows);
 
 			/** Action to do on user deletion.
 			Closes the sessions of the deleted user.
 			*/
 			void rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResult& rows);
+				const db::SQLiteResultSPtr& rows);
 
 		};
 

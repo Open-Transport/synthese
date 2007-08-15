@@ -1,17 +1,153 @@
 #include "03_db_ring/Node.h"
 
-#include "01_util/Thread.h"
+#include "01_util/threads/Thread.h"
+
+#include "02_db/DBModule.inc.cpp"
+#include "03_db_ring/DbRingModule.inc.cpp"
 
 #include "00_tcp/TcpService.h"
 
+#include <boost/filesystem/operations.hpp>
 
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace synthese::tcp;
 using namespace synthese::util;
+using namespace synthese::db;
 using namespace synthese::dbring;
 
 
+
+BOOST_AUTO_TEST_CASE (testNodeExecUpdate)
+{
+    #include "02_db/DBModule.gen.cpp"
+    #include "03_db_ring/DbRingModule.gen.cpp"
+
+    DbModuleClass::Parameters defaultParams;
+    // defaultParams.insert (std::make_pair ());
+    
+    std::string db ("test.db3");
+    boost::filesystem::remove (db);
+    boost::filesystem::path dbpath (db, boost::filesystem::native);
+
+    DbModuleClass::SetDefaultParameters (defaultParams);
+    DbModuleClass::SetDatabasePath (dbpath);
+    
+    // Initialize modules
+    if (Factory<ModuleClass>::size() == 0)
+	throw Exception("No registered module !");
+    
+    
+    for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
+	 it != Factory<ModuleClass>::end(); ++it)
+    {
+	Log::GetInstance ().info ("Pre-initializing module " + it.getKey() + "...");
+	it->preInit();
+    }
+    
+    for (Factory<ModuleClass>::Iterator it = Factory<ModuleClass>::begin(); 
+	 it != Factory<ModuleClass>::end(); ++it)
+    {
+	Log::GetInstance ().info ("Initializing module " + it.getKey() + "...");
+	it->initialize();
+    }
+
+    Node* node = DbRingModule::GetNode ();
+    std::stringstream sql;
+    sql << "CREATE TABLE t1 (key); CREATE TABLE t2 (key);DROP TABLE t1;";
+
+    node->execUpdate (sql.str ());
+    
+    Thread::Sleep (1000);
+    
+
+/*
+    while (true)
+    {
+	Thread::Sleep (500);
+	// checkForDeadThreads ();
+    }    
+
+
+
+    // node0 alone out of ring.
+    // initially, its ring table contains only its own info.
+    Node node0 (0, "localhost", 9990);
+    node0.loop ();
+    BOOST_REQUIRE_EQUAL (OUTRING, node0.getInfo ().state );
+
+    // node1 alone out of ring
+    // initially, its ring table contains only its own info.
+    Node node1 (1, "localhost", 9991);
+    node1.loop ();
+    BOOST_REQUIRE_EQUAL (OUTRING, node1.getInfo ().state );
+    
+    // at this stage, node0 does not know node1 and vice-versa.
+    // we now update one of the nodes ring table (manual action)
+    // node1 ring table is updated with node0 info (id, address, port).
+    node1.appendNode (0, "localhost", 9990);
+
+    // since node1 was OUTRING, it immediately sends a token message to node0
+    // the sent token holds a snapshot of node1 local ring table.
+    node1.loop ();
+    BOOST_REQUIRE_EQUAL (ENTRING, node1.getInfo ().state );
+
+
+
+    // node0 has received its first token message. it merges it with its own local
+    // ring table and sends token message to its next successor (ie node1).
+    node0.loop ();
+    BOOST_REQUIRE_EQUAL (ENTRING, node0.getInfo ().state );
+
+    // node1 has received back the token; since its status says entering ring,
+    // it means that at least one other node is aware of its existence in ring.
+    // Thus, node1 is now inside ring
+    node1.loops ();
+    BOOST_REQUIRE_EQUAL (INSRING, node1.getInfo ().state );
+
+    // idem for node0
+    node0.loops ();
+    BOOST_REQUIRE_EQUAL (INSRING, node0.getInfo ().state );
+
+    // A third node comes into play
+    Node node2 (2, "localhost", 9992);
+    node2.loops ();
+    BOOST_REQUIRE_EQUAL (OUTRING, node2.getInfo ().state );
+
+    // token is now on node1, another round to set token on node0
+    node1.loops ();
+
+    // appends node1 on node2
+    // this should always be done this way : a insider should be added to the outsider
+    node2.appendNode (1, "localhost", 9991);
+
+    node2.loops ();
+    BOOST_REQUIRE_EQUAL (ENTRING, node2.getInfo ().state );
+    
+    node1.loops ();
+    // node1 is now aware of node2; however there is already a token
+    // running. so the info is not forwarded immediateley.
+    BOOST_REQUIRE_EQUAL (ENTRING, node2.getInfo ().state );
+
+    node2.loops ();
+    BOOST_REQUIRE_EQUAL (ENTRING, node2.getInfo ().state );
+    
+    // we forgot the token on node0... another round to make it pass through node2
+    node0.loops ();
+    node1.loops ();
+    node2.loops ();
+
+    //  everything should be up to date
+    BOOST_REQUIRE_EQUAL (INSRING, node0.getInfo ().state );
+    BOOST_REQUIRE_EQUAL (INSRING, node1.getInfo ().state );
+    BOOST_REQUIRE_EQUAL (INSRING, node2.getInfo ().state );
+
+*/    
+
+    
+}
+
+/*
 BOOST_AUTO_TEST_CASE (testNodeStateCycle)
 {
     
@@ -156,6 +292,8 @@ public:
 	return Node::sendToken (token);
     }
 };
+
+*/
 
 
 

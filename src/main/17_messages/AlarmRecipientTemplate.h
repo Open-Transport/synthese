@@ -31,6 +31,7 @@
 
 #include "04_time/DateTime.h"
 
+
 #include "01_util/FactorableTemplate.h"
 
 namespace synthese
@@ -179,7 +180,7 @@ namespace synthese
 	template<class T, class C>
 	    const SentAlarm* AlarmRecipientTemplate<T, C>::getAlarm( const T* object )
 	{
-	    return AlarmRecipientTemplate<T, C>::getAlarm(object, time::DateTime(TIME_CURRENT));
+	    return AlarmRecipientTemplate<T, C>::getAlarm(object, time::DateTime(time::TIME_CURRENT));
 	}
 
 	template<class T, class C>

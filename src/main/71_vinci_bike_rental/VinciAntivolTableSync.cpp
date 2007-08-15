@@ -47,10 +47,10 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<VinciAntivol>::TABLE_ID = 43;
 		template<> const bool SQLiteTableSyncTemplate<VinciAntivol>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<VinciAntivol>::load(VinciAntivol* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<VinciAntivol>::load(VinciAntivol* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			object->setMarkedNumber(rows.getColumn(rowId, VinciAntivolTableSync::COL_MARKED_NUMBER));
+			object->setKey(rows->getLongLong (TABLE_COL_ID));
+			object->setMarkedNumber(rows->getText ( VinciAntivolTableSync::COL_MARKED_NUMBER));
 		}
 
 		template<> void SQLiteTableSyncTemplate<VinciAntivol>::save(VinciAntivol* object)
@@ -81,15 +81,15 @@ namespace synthese
 			addTableColumn(COL_MARKED_NUMBER, "TEXT", true);
 		}
 
-		void VinciAntivolTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void VinciAntivolTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 		}
 		
-		void VinciAntivolTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void VinciAntivolTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 		}
 
-		void VinciAntivolTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void VinciAntivolTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 		}
 
@@ -110,12 +110,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<VinciAntivol> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<VinciAntivol> object(new VinciAntivol());
-					load(object.get (), result, i);
+					load(object.get (), rows);
 					objects.push_back(object);
 				}
 				return objects;

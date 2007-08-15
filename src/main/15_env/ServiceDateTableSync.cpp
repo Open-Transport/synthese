@@ -51,11 +51,11 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<ServiceDate>::TABLE_ID = 5;
 		template<> const bool SQLiteTableSyncTemplate<ServiceDate>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ServiceDate>::load(ServiceDate* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<ServiceDate>::load(ServiceDate* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->key = Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID));
-			object->service = EnvModule::fetchService(Conversion::ToLongLong(rows.getColumn(rowId, ServiceDateTableSync::COL_SERVICEID))).get();
-			object->date = Date::FromSQLDate(rows.getColumn(rowId, ServiceDateTableSync::COL_DATE));
+			object->key = rows->getLongLong (TABLE_COL_ID);
+			object->service = EnvModule::fetchService (rows->getLongLong ( ServiceDateTableSync::COL_SERVICEID)).get();
+			object->date = Date::FromSQLDate (rows->getText ( ServiceDateTableSync::COL_DATE));
 		}
 
 		template<> void SQLiteTableSyncTemplate<ServiceDate>::save(ServiceDate* object)
@@ -89,50 +89,52 @@ namespace synthese
 			addTableColumn (COL_DATE , "DATE", false);
 		}
 
-		void ServiceDateTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void ServiceDateTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
-			{
-				_updateServiceCalendar (rows, i, true);
-			}
+		    while (rows->next ())
+		    {
+			_updateServiceCalendar (rows, true);
+		    }
 		}
 		
-		void ServiceDateTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ServiceDateTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 		}
 
-		void ServiceDateTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ServiceDateTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				_updateServiceCalendar (rows, i, false);
+				_updateServiceCalendar (rows, false);
 			}
 		}
 
 
-		void ServiceDateTableSync::_updateServiceCalendar (const SQLiteResult& rows, int rowIndex, bool marked) 
+		void ServiceDateTableSync::_updateServiceCalendar (const SQLiteResultSPtr& rows, bool marked) 
 		{
 			// Get the corresponding calendar
-			uid serviceId = Conversion::ToLongLong (rows.getColumn (rowIndex, COL_SERVICEID));
+			uid serviceId = rows->getLongLong (COL_SERVICEID);
 
-			shared_ptr<NonPermanentService> service(EnvModule::fetchService (serviceId));
+			shared_ptr<NonPermanentService> service (EnvModule::fetchService (serviceId));
 			assert (service != 0);
 
 			// Mark the date in service calendar
-			Date newDate = Date::FromSQLDate (rows.getColumn (rowIndex, COL_DATE));
+			Date newDate = Date::FromSQLDate (rows->getText (COL_DATE));
 			service->getCalendar ().mark (newDate, marked);
-
+			
 			if (marked)
 			{
-				for (int i = service->getDepartureSchedule().getDaysSinceDeparture(); i<= service->getLastArrivalSchedule().getDaysSinceDeparture(); ++i)
-				{
-					service->getPath()->getCalendar().mark(newDate, marked);
-					newDate++;
-				}
+			    for (int i = service->getDepartureSchedule().getDaysSinceDeparture(); 
+				 i<= service->getLastArrivalSchedule().getDaysSinceDeparture(); ++i)
+			    {
+				service->getPath()->getCalendar().mark(newDate, marked);
+				newDate++;
+			    }
 			}
 			else
 			{
-				/// @todo Implement it : see in each date if there is at least an other service which runs. If not unmark the date and see the following one.
+			    /// @todo Implement it : 
+                            // see in each date if there is at least an other service which runs. If not unmark the date and see the following one.
 			}
 
 			//environment.updateMinMaxDatesInUse (newDate, marked);

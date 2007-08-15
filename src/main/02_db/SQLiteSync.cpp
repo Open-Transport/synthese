@@ -26,8 +26,10 @@
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 
+#include "02_db/Constants.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteTableSync.h"
+#include "02_db/SQLiteCachedResult.h"
 #include "02_db/SQLiteException.h"
 #include "02_db/SQLiteSync.h"
 
@@ -42,9 +44,8 @@ namespace synthese
 	{
 
 
-		SQLiteSync::SQLiteSync (const std::string& idColumnName)
-		: _idColumnName (idColumnName)
-		, _isRegistered (false)
+		SQLiteSync::SQLiteSync ()
+		: _isRegistered (false)
 		{
 
 		}
@@ -134,7 +135,6 @@ namespace synthese
 					const SQLiteEvent& event)
 		{
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
-			SQLiteQueueThreadExec* em = (SQLiteQueueThreadExec*) emitter;
 
 			for (std::map<std::string, shared_ptr<SQLiteTableSync> >::const_iterator it 
 				 = _tableSynchronizers.begin ();
@@ -145,31 +145,24 @@ namespace synthese
 			    
 			    if (event.opType == SQLITE_INSERT) 
 			    {
-				// Query for the modified row
-				SQLiteResult result = em->execQuery ("SELECT * FROM " + event.tbName + " WHERE " 
-									  + _idColumnName + "=" + Conversion::ToString (event.rowId));
-				
-				tableSync->rowsAdded (emitter, this, result);
+				tableSync->rowsAdded (emitter, this, tableSync->getRowById (emitter, event.rowId));
 			    }
 			    else if (event.opType == SQLITE_UPDATE) 
 			    {
 				// Query for the modified row
-				SQLiteResult result = em->execQuery ("SELECT * FROM " + event.tbName + " WHERE " 
-									  + _idColumnName + "=" + Conversion::ToString (event.rowId));
-				
-				tableSync->rowsUpdated (em, this, result);
+				tableSync->rowsUpdated (emitter, this, tableSync->getRowById (emitter, event.rowId));
 			    }
 			    else if (event.opType == SQLITE_DELETE) 
 			    {
-				// Query for the modified row
-				SQLiteResult result;
-				std::vector<std::string> columns;
-				std::vector<std::string> values;
-				columns.push_back (_idColumnName);
-				values.push_back (Conversion::ToString (event.rowId));
-				result.addRow (values, columns);
+				std::vector<std::string> columnNames;
+				columnNames.push_back (TABLE_COL_ID);
+				SQLiteCachedResult* cachedResult = new SQLiteCachedResult (columnNames);
 				
-				tableSync->rowsRemoved (em, this, result);
+				SQLiteResultRow values;
+				values.push_back (SQLiteValueSPtr (new SQLiteValue (Conversion::ToString (event.rowId))));
+                                cachedResult->addRow (values);
+				
+				tableSync->rowsRemoved (emitter, this, SQLiteResultSPtr (cachedResult));
 			    }
 			}
 			

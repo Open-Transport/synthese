@@ -56,17 +56,18 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<TransactionPart>::TABLE_ID = 30;
 		template<> const bool SQLiteTableSyncTemplate<TransactionPart>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<TransactionPart>::load(TransactionPart* tp, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<TransactionPart>::load(TransactionPart* tp, const db::SQLiteResultSPtr& rows )
 		{
-			tp->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			tp->setTransactionId(Conversion::ToLongLong(rows.getColumn(rowId, TransactionPartTableSync::TABLE_COL_TRANSACTION_ID)));
-			tp->setAccountId(Conversion::ToLongLong(rows.getColumn(rowId, TransactionPartTableSync::TABLE_COL_ACCOUNT_ID)));
-			tp->setComment(rows.getColumn(rowId, TransactionPartTableSync::TABLE_COL_COMMENT));
-			tp->setLeftCurrencyAmount(Conversion::ToDouble(rows.getColumn(rowId, TransactionPartTableSync::TABLE_COL_LEFT_CURRENCY_AMOUNT)));
-			tp->setRightCurrencyAmount(Conversion::ToDouble(rows.getColumn(rowId, TransactionPartTableSync::TABLE_COL_RIGHT_CURRENCY_AMOUNT)));
-			tp->setRateId(Conversion::ToLongLong(rows.getColumn(rowId, TransactionPartTableSync::TABLE_COL_RATE_ID)));
-			tp->setTradedObjectId(rows.getColumn(rowId, TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID));
+			tp->setKey (rows->getLongLong (TABLE_COL_ID));
+			tp->setTransactionId(rows->getLongLong ( TransactionPartTableSync::TABLE_COL_TRANSACTION_ID));
+			tp->setAccountId(rows->getLongLong ( TransactionPartTableSync::TABLE_COL_ACCOUNT_ID));
+			tp->setComment (rows->getText ( TransactionPartTableSync::TABLE_COL_COMMENT));
+			tp->setLeftCurrencyAmount (rows->getDouble ( TransactionPartTableSync::TABLE_COL_LEFT_CURRENCY_AMOUNT));
+			tp->setRightCurrencyAmount (rows->getDouble ( TransactionPartTableSync::TABLE_COL_RIGHT_CURRENCY_AMOUNT));
+			tp->setRateId (rows->getLongLong ( TransactionPartTableSync::TABLE_COL_RATE_ID));
+			tp->setTradedObjectId (rows->getText ( TransactionPartTableSync::TABLE_COL_TRADED_OBJECT_ID));
 		}
+
 
 		template<> void SQLiteTableSyncTemplate<TransactionPart>::save(TransactionPart* tp)
 		{
@@ -126,17 +127,17 @@ namespace synthese
 			addTableIndex(TABLE_COL_TRADED_OBJECT_ID);
 		}
 
-		void TransactionPartTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void TransactionPartTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 
 		}
 
-		void TransactionPartTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionPartTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
 
-		void TransactionPartTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void TransactionPartTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
 
 		}
@@ -156,16 +157,17 @@ namespace synthese
 				query << " AND p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey());
 			query << " LIMIT " << number << " OFFSET " << first;
 			
-			SQLiteResult result = sqlite->execQuery(query.str());
+			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			vector<shared_ptr<TransactionPart> > tps;
-			for (int i=0; i<result.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				shared_ptr<TransactionPart> tp(new TransactionPart);
-				load(tp.get(), result, i);
-				tps.push_back(tp);
+			    shared_ptr<TransactionPart> tp(new TransactionPart);
+			    load(tp.get(), rows);
+			    tps.push_back(tp);
 			}
 			return tps;
 		}
+
 
 		vector<shared_ptr<TransactionPart> > TransactionPartTableSync::search(
 			shared_ptr<const Account> account
@@ -188,17 +190,18 @@ namespace synthese
 				query << " DESC ";
 			query << " LIMIT " << number << " OFFSET " << first;
 			
-			SQLiteResult result = sqlite->execQuery(query.str());
+			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			vector<shared_ptr<TransactionPart> > tps;
-			for (int i=0; i<result.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				shared_ptr<TransactionPart> tp(new TransactionPart);
-				load(tp.get (), result, i);
-				tps.push_back(tp);
+			    shared_ptr<TransactionPart> tp(new TransactionPart);
+			    load(tp.get (), rows);
+			    tps.push_back(tp);
 			}
 			return tps;
 		}
-
+	    
+	    
 		map<int, int> TransactionPartTableSync::count(
 			shared_ptr<const Account> account, Date startDate, Date endDate, int first, int number
 		){
@@ -217,11 +220,11 @@ namespace synthese
 				<< " LIMIT " << number << " OFFSET " << first
 			;
 			
-			SQLiteResult result = sqlite->execQuery(query.str());
+			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			map<int, int> mapii;
-			for (int i=0; i<result.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				mapii.insert(make_pair(Conversion::ToInt(result.getColumn(i, "hours")), Conversion::ToInt(result.getColumn(i, "numbers"))));
+			    mapii.insert (make_pair(rows->getInt("hours"), rows->getInt ("numbers")));
 			}
 			return mapii;
 		}

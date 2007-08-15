@@ -165,15 +165,12 @@ namespace synthese
 
 				void removeService (Service* service);
 
-
-				/** Updates the schedule indexes of each linestop served by the service.
-					@author Hugues Romain
-					@date 2007
-					@throw No exception
-				*/
-				void updateScheduleIndexes();
-
 				void setAllDays(bool value);
+
+		private:
+
+				void markScheduleIndexesUpdateNeeded ();
+
 			//@}
 		    
 		};

@@ -20,16 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
 
-#include <sqlite/sqlite3.h>
-
-#include <boost/thread/mutex.hpp>
-
-#include "01_util/Conversion.h"
+#include "02_db/Constants.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteTableSync.h"
 #include "02_db/SQLiteException.h"
+#include "01_util/Conversion.h"
+#include <sstream>
+
+#include <boost/thread/mutex.hpp>
 
 using namespace std;
 
@@ -64,6 +63,19 @@ namespace synthese
 
 
 
+	        const std::string& 
+		SQLiteTableSync::getPrimaryKey () const
+		{
+		    if (_tableFormat.getTableColumnCount () == 0)
+		    {
+			throw SQLiteException ("No column defined for table " + _tableName);
+		    }
+		    return _tableFormat.getTableColumn (0).name;
+		}
+
+
+
+
 		void 
 		SQLiteTableSync::firstSync (synthese::db::SQLiteQueueThreadExec* sqlite, 
 						synthese::db::SQLiteSync* sync)
@@ -75,7 +87,7 @@ namespace synthese
 			// Check if the table already exists
 			std::string sql = "SELECT * FROM SQLITE_MASTER WHERE name='" + _tableName + "' AND type='table'";
 
-			SQLiteResult res = sqlite->execQuery (sql);
+			SQLiteResultSPtr res = sqlite->execQuery (sql);
 			std::string tableSchema = CreateSQLSchema (_tableName, _tableFormat);
 
 			std::string triggerNoInsert = _allowInsert ? "" : 
@@ -88,7 +100,7 @@ namespace synthese
 			CreateTriggerNoUpdate (_tableName, _tableFormat, getTriggerOverrideClause ());
 		    
 		    
-			if (res.getNbRows () == 0)
+			if (res->next () == false)
 			{
 			// If not, create it...
 			createTable (sqlite, 
@@ -107,10 +119,15 @@ namespace synthese
 					triggerNoUpdate);
 			}
 				
+			// Create precompiled statement(s)
+			_getRowByIdStatement =
+			    sqlite->compileStatement ("SELECT * FROM " + _tableName + " WHERE " + getPrimaryKey () + "=:id LIMIT 1");
+			    
+
 			// Callbacks according to what already exists in the table.
 			if (_ignoreCallbacksOnFirstSync == false)
 			{
-				SQLiteResult result = sqlite->execQuery ("SELECT * FROM " + _tableName);
+				SQLiteResultSPtr result = sqlite->execQuery ("SELECT * FROM " + _tableName);
 				rowsAdded (sqlite, sync, result, true);
 			}
 
@@ -125,14 +142,13 @@ namespace synthese
 				sql << "SELECT sql FROM SQLITE_MASTER WHERE name='" << getIndexDBName(_tableName, it->first)
 					<< "' AND type='index'";
 
-				SQLiteResult res = sqlite->execQuery (sql.str());
+				SQLiteResultSPtr res = sqlite->execQuery (sql.str());
 
 				// The index already exists
-				if (res.getNbRows())
+				if (res->next ())
 				{
 					// The index already exists and is identical : do nothing
-					if (res.getColumn(0, "sql") == CreateIndexSQLSchema(_tableName, *it))
-						continue;
+					if (res->getText("sql") == CreateIndexSQLSchema(_tableName, *it)) continue;
 
 					// Drop the old index
 					stringstream drop;
@@ -264,9 +280,9 @@ namespace synthese
 			sqlite->execUpdate (tableSchema);
 
 			// Insert some triggers to prevent unallowed insert/update/remove operations
-			sqlite->execUpdate (triggerNoInsert);
-			sqlite->execUpdate (triggerNoRemove);
-			sqlite->execUpdate (triggerNoUpdate);
+			if (triggerNoInsert != "") sqlite->execUpdate (triggerNoInsert);
+			if (triggerNoRemove != "") sqlite->execUpdate (triggerNoRemove);
+			if (triggerNoUpdate != "") sqlite->execUpdate (triggerNoUpdate);
 				
 		}
 
@@ -365,11 +381,10 @@ namespace synthese
 		{
 			std::vector<std::string> cols;
 			std::string sql = "PRAGMA TABLE_INFO (" + tableName + ")";
-			SQLiteResult result = sqlite->execQuery (sql);
-			for (int i=0; i<result.getNbRows (); ++i)
+			SQLiteResultSPtr result = sqlite->execQuery (sql);
+			while (result->next ())
 			{
-			// Column 1 is column name.
-			cols.push_back (result.getColumn (i, 1));
+			    cols.push_back (result->getText (1));
 			}
 			return cols;
 		}
@@ -384,9 +399,9 @@ namespace synthese
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='table' and name='" +
 			tableName + "'";
-			SQLiteResult result = sqlite->execQuery (sql);
-			if (result.getNbRows () == 0) return "";
-			return result.getColumn (0, 0);
+			SQLiteResultSPtr result = sqlite->execQuery (sql);
+			if (result->next() == false) return "";
+			return result->getText (0);
 		}
 
 
@@ -399,9 +414,9 @@ namespace synthese
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='trigger' and name='" +
 			tableName + "_no_insert" + "'";
-			SQLiteResult result = sqlite->execQuery (sql);
-			if (result.getNbRows () == 0) return "";
-			return result.getColumn (0, 0);
+			SQLiteResultSPtr result = sqlite->execQuery (sql);
+			if (result->next () == false) return "";
+			return result->getText (0);
 		}
 
 		
@@ -411,9 +426,9 @@ namespace synthese
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='trigger' and name='" +
 			tableName + "_no_remove" + "'";
-			SQLiteResult result = sqlite->execQuery (sql);
-			if (result.getNbRows () == 0) return "";
-			return result.getColumn (0, 0);
+			SQLiteResultSPtr result = sqlite->execQuery (sql);
+			if (result->next () == false) return "";
+			return result->getText (0);
 		}
 		
 
@@ -423,9 +438,9 @@ namespace synthese
 		{
 			std::string sql = "SELECT sql FROM SQLITE_MASTER where type='trigger' and name='" +
 			tableName + "_no_update" + "'";
-			SQLiteResult result = sqlite->execQuery (sql);
-			if (result.getNbRows () == 0) return "";
-			return result.getColumn (0, 0);
+			SQLiteResultSPtr result = sqlite->execQuery (sql);
+			if (result->next () == false) return "";
+			return result->getText (0);
 		}
 
 
@@ -439,10 +454,10 @@ namespace synthese
 		
 		void 
 		SQLiteTableSync::adaptTable (synthese::db::SQLiteQueueThreadExec* sqlite,
-						 const std::string& tableSchema,
-						 const std::string& triggerNoInsert,
-						 const std::string& triggerNoRemove,
-						 const std::string& triggerNoUpdate)
+					     const std::string& tableSchema,
+					     const std::string& triggerNoInsert,
+					     const std::string& triggerNoRemove,
+					     const std::string& triggerNoUpdate)
 		{
 		    
 			std::string schemaDb = GetSQLSchemaDb (sqlite, getTableName ()); 
@@ -542,6 +557,18 @@ namespace synthese
 			return s.str();
 
 		}
+
+	
+	         SQLiteResultSPtr 
+		 SQLiteTableSync::getRowById (synthese::db::SQLiteQueueThreadExec* sqlite, const uid& id) const
+		 {
+		     _getRowByIdStatement->reset ();
+		     _getRowByIdStatement->clearBindings ();
+		     _getRowByIdStatement->bindParameterLongLong (":id", id);
+		     
+		     return sqlite->execQuery (_getRowByIdStatement, false); // not lazy !
+		 }
+
 
     }
 }

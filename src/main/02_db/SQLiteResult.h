@@ -1,11 +1,12 @@
 #ifndef SYNTHESE_DB_SQLITERESULT_H
 #define SYNTHESE_DB_SQLITERESULT_H
 
-#include "DbResult.h"
 
-#include <string>
-#include <vector>
+#include "02_db/SQLiteValue.h"
+
 #include <iostream>
+#include <vector>
+
 
 
 namespace synthese
@@ -13,60 +14,71 @@ namespace synthese
 
 namespace db
 {
+    class SQLiteResult;
 
+    typedef boost::shared_ptr<SQLiteResult> SQLiteResultSPtr;
+    typedef std::vector<SQLiteValueSPtr> SQLiteResultRow;
+    
 
-/** Implementation class for access to a SQLite query result.
+/** Interface for access to a SQLite query result.
 
  @ingroup m02
 */
-class SQLiteResult : public DbResult
+class SQLiteResult 
 {
  public:
-    typedef std::vector<std::string> Row;
 
- private:
+ protected:
 
-
-    int _nbColumns;
-    int _nbRows;
-    int _maxColumnWidth;  //!< For display only
-    std::vector<std::string> _columnNames;
-    std::vector<Row> _values;
-
-
-
+    SQLiteResult (); 
+    virtual ~SQLiteResult ();
+    
  public:
 
-    SQLiteResult ();
-    ~SQLiteResult ();
-    
     //! @name Query methods.
     //@{
-    int getNbColumns () const;
-    int getNbRows () const;
 
-    std::string getColumnName (int column) const;
-    int getColumnIndex (const std::string& columnName) const;
+    virtual void reset () const = 0;
+    virtual bool next () const = 0;
 
-    std::string getColumn (int row, int column) const;
-    std::string getColumn (int row, const std::string& name) const;
-    std::vector<std::string> getColumns (int row) const;
+    virtual int getNbColumns () const = 0;
+
+    virtual std::string getColumnName (int column) const = 0;
+    virtual int getColumnIndex (const std::string& columnName) const;
+
+    virtual SQLiteValueSPtr getValue (int column) const = 0;
+    virtual SQLiteValueSPtr getValue (const std::string& name) const;
+
+    virtual std::string getText (int column) const;
+    virtual std::string getText (const std::string& name) const;
+
+    virtual int getInt (int column) const;
+    virtual int getInt (const std::string& name) const;
+
+    virtual long getLong (int column) const;
+    virtual long getLong (const std::string& name) const;
+
+    virtual bool getBool (int column) const;
+    virtual bool getBool (const std::string& name) const;
+
+    virtual boost::logic::tribool getTribool (int column) const;
+    virtual boost::logic::tribool getTribool (const std::string& name) const;
+
+    virtual double getDouble (int column) const;
+    virtual double getDouble (const std::string& name) const;
+
+    virtual std::string getBlob (int column) const;
+    virtual std::string getBlob (const std::string& name) const;
+
+    virtual long long getLongLong (int column) const;
+    virtual long long getLongLong (const std::string& name) const;
+
+    virtual boost::posix_time::ptime getTimestamp (int column) const;
+    virtual boost::posix_time::ptime getTimestamp (const std::string& name) const;
+
+    virtual SQLiteResultRow getRow () const;
 
     std::vector<int> computeMaxColWidths () const;
-
-    //@}
-
-    //! @name Update methods.
-    //@{
-    void addRow (int nbColumns, char** values, char** columns);
-
-    void addRow (const std::vector<std::string>& values, 
-		 const std::vector<std::string>& columns);
-
- private:
-
-    //@}
-
     
 
 };
@@ -75,9 +87,9 @@ class SQLiteResult : public DbResult
 
 std::ostream& operator<< ( std::ostream& os, const SQLiteResult& op );
 
+}
+}
 
-}
-}
 
 
 #endif

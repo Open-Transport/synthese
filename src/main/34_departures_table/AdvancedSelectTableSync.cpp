@@ -111,15 +111,15 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
 				vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
-					object->broadCastPointsNumber = Conversion::ToInt(result.getColumn(i, "bc"));
+					object->broadCastPointsNumber = rows->getInt ("bc");
 					object->place.reset(new ConnectionPlace);
-					ConnectionPlaceTableSync::load(object->place.get(), result, i);
-					object->cityName = result.getColumn(i, "city_name");
+					ConnectionPlaceTableSync::load(object->place.get(), rows);
+					object->cityName = rows->getText ("city_name");
 					objects.push_back(object);
 				}
 				return objects;
@@ -152,11 +152,12 @@ namespace synthese
 			try
 			{
 				SQLiteHandle* sqlite = DBModule::GetSQLite();
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<const CommercialLine> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
-					objects.push_back(EnvModule::getCommercialLines().get(Conversion::ToLongLong(result.getColumn(i, TABLE_COL_ID))));
+				    objects.push_back(EnvModule::getCommercialLines().get(
+							  rows->getLongLong (TABLE_COL_ID)));
 				}
 				return objects;
 			}

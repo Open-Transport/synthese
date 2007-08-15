@@ -1,4 +1,4 @@
-Import ('testenv')
+Import ('env')
 
 # frozen module; tests inactive, must be migrated to boost::test at some stage
 #testmoduleenv = testenv.TestModuleEnv (includes='*.cpp', 

@@ -108,11 +108,18 @@ def CopyFiles (env, dest, files, recursive = False, onlyIfDifferent = True):
            CopyFile (env, destfile, file)
 
 
-def DefaultModuleName ( env, dir = '.' ):
-    return os.path.basename (os.path.abspath (dir))
+def DefaultModuleName ( env ):
+  prefix = 'src/main/'
+  mn = env.Dir('.').srcnode ().abspath
+  mn = mn[mn.rfind (prefix) + len(prefix):].replace('/', '__')
+  return mn
+
 
 def DefaultTestModuleName ( env, dir = '.' ):
-    return os.path.basename (os.path.abspath (dir) + '_test')
+  prefix = 'src/test/'
+  mn = env.Dir('.').srcnode ().abspath
+  mn = mn[mn.rfind (prefix) + len(prefix):].replace('/', '__')
+  return mn + '_test'
 
 
 def DefineDefaultLibPath (env):
@@ -264,25 +271,71 @@ def AppendMultithreadConf (env):
 
 def AddModuleDependency (env, modulename):
     env.Append ( MODULES = [modulename] )  
-    env.Append ( LIBPATH = ['../../main/' + modulename] )  
-    env.Append ( LIBS = [modulename] )  
+    env.Append ( LIBS = [modulename] )
+    #lp = '../../../main/' + modulename.replace ('__', '/')
+    lp = Dir('#' + buildmain).abspath + '/' + modulename.replace ('__', '/')
+
+    env.Append ( LIBPATH = [lp] )  
+      
+    
+    # print '*** ', Dir('../../main').abspath + '/' + modulename.replace ('.', '/')
+    #env.Append ( LIBPATH = [Dir(buildmain).abspath + '/' + modulename.replace ('.', '/')] )  
+    #env.Append ( LIBPATH = [buildmain + '/' + modulename.replace ('.', '/')] )  
+    #libdir = Dir('src/main').abspath + '/' + modulename
+    #print '%' , libdir
+    #env.Append ( LIBPATH = [libdir])
 
 
 
 
 
 
-def ModuleEnv (env):
-    moduleenv = env.Copy()
-    # Add default include path for dependencies
-    moduleenv.Append (CPPPATH = [Dir('../../main').srcnode().abspath] )
-    return moduleenv
+
+
+def ModuleBuild (moduleenv, includes = '*.cpp', excludes = [], recursive = True):
+
+    # default include path
+    # moduleenv.Append (CPPPATH = [Dir('../../main').srcnode().abspath] )
+
+    # Create module static library
+
+    files = moduleenv.Glob(includes, excludes)
+    
+    moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
+    
+    moduleenv.RecursiveBuild ()
+
+
+
+
+def RecursiveBuild (parentenv):
+    env = parentenv.Copy ()
+
+    builddir = Dir('.').abspath
+    srcpath = Dir('.').srcnode().abspath
+    
+    subdirs = os.listdir( srcpath )
+    modules = []
+
+    # Build the list of modules to be processed
+    for f in subdirs:
+      if not os.path.isdir (os.path.join (srcpath, f)): continue
+      if not os.path.exists (os.path.join (srcpath, f, 'SConscript')): continue
+      modules.append (f)
+    
+    for module in modules:
+      s0 = os.path.join (srcpath, module, 'SConscript')
+      s1 = os.path.join (builddir, module)
+      env.SConscript(s0, build_dir=s1, duplicate=0, exports=['env'])
+
+
+
 
 
 
 
 def SyntheseEnv (env, modules):
-    syntheseenv = env.ModuleEnv ()
+    syntheseenv = env.Copy ()
     includes = 'main.cpp'
     excludes = []
 
@@ -307,7 +360,7 @@ def SyntheseEnv (env, modules):
 
 
 def UnitTestEnv (env, modules):
-    testenv = env.ModuleEnv ()
+    testenv = env.Copy ()
     testenv.Append ( CPPDEFINES = ['BOOST_AUTO_TEST_MAIN='] )
 
     for module in modules:
@@ -337,6 +390,8 @@ def UnitTest (env):
     testprogram  = env.Program ( binname, f )[0]
     env.Test(binname + '.passed', testprogram)
     env.AlwaysBuild (binname + '.passed')
+
+  env.RecursiveBuild ()
 
 
 
@@ -403,7 +458,7 @@ def SyntheseBuild (env, binname, generatemain = True):
       tmpinc = open (tempfile.gettempdir () + '/includes.cpp.inc', "w" )
 
       for module in reversed (modules):
-        moduledir = os.path.join (env.Dir ('..').srcnode ().abspath, module)
+        moduledir = os.path.join (env.Dir ('..').srcnode ().abspath, module.replace ('__', '/'))
         for file in os.listdir (moduledir) :
           if fnmatch.fnmatch (file, '*.gen.cpp') :
             fragmentfile = os.path.join (moduledir, file)
@@ -431,33 +486,6 @@ def SyntheseBuild (env, binname, generatemain = True):
       env.SyntheseDist (exeprog)
 
 			       
-def TestModuleEnv (env, includes='*.cpp', excludes=[], modules=[], boostlibs=[], withSQLite=False, withMultithreading=True):
-    testmoduleenv = ModuleEnv (env)
-    testmodulename = testmoduleenv.DefaultTestModuleName ()
-
-    for module in modules:
-      testmoduleenv.AddModuleDependency (module)
-
-    for boostlib in boostlibs:
-      testmoduleenv.AddBoostDependency (boostlib)
-
-    if withSQLite == True:
-      testmoduleenv.AddSQLiteDependency ()
-      
-    testmoduleenv.AppendMultithreadConf ();
-
-    files = testmoduleenv.Glob (includes, excludes)
-    testprogram = testmoduleenv.Program (testmodulename, files)
-    testmoduleenv.Test("test.passed", testprogram)
-
-    testmoduleresources = testmoduleenv.Dir ('resources').abspath
-    # to be reviewed with new resources dir structure
-    #testmoduleenv.AddPreAction ("test.passed",
-    #                            [Delete (testmoduleresources),
-    #                             Copy (testmoduleresources, resourcestest)])
-    testmoduleenv.AlwaysBuild ("test.passed")
-
-
 
 
 
@@ -474,8 +502,9 @@ SConsEnvironment.DefineDefaultCCFlags=DefineDefaultCCFlags
 SConsEnvironment.DefineDefaultLinkFlags=DefineDefaultLinkFlags
 SConsEnvironment.DefineDefaultLibs=DefineDefaultLibs
 SConsEnvironment.AppendMultithreadConf=AppendMultithreadConf
-SConsEnvironment.ModuleEnv=ModuleEnv
-SConsEnvironment.TestModuleEnv=TestModuleEnv
+
+SConsEnvironment.ModuleBuild=ModuleBuild
+SConsEnvironment.RecursiveBuild=RecursiveBuild
 SConsEnvironment.UnitTestEnv=UnitTestEnv
 SConsEnvironment.SyntheseEnv=SyntheseEnv
 SConsEnvironment.IsDebug=IsDebug
@@ -493,19 +522,6 @@ SConsEnvironment.AddBoostDependency=AddBoostDependency
 SConsEnvironment.AddSQLiteDependency=AddSQLiteDependency
 SConsEnvironment.AddZlibDependency=AddZlibDependency
 
-
-
-
-
-# -------------------------------------------------------
-# Common build configuration
-# -------------------------------------------------------
-
-rootenv.DefineDefaultLibPath ()
-rootenv.DefineDefaultCPPDefines ()
-rootenv.DefineDefaultCCFlags ()
-rootenv.DefineDefaultLinkFlags ()
-rootenv.DefineDefaultLibs ()
 
 
 
@@ -548,8 +564,18 @@ def builder_distscript (target, source, env):
   
 
 
+# -------------------------------------------------------
+# Common build configuration
+# -------------------------------------------------------
 
+rootenv.DefineDefaultLibPath ()
+rootenv.DefineDefaultCPPDefines ()
+rootenv.DefineDefaultCCFlags ()
+rootenv.DefineDefaultLinkFlags ()
+rootenv.DefineDefaultLibs ()
 
+# default include path
+rootenv.Append (CPPPATH = ['#src/main'] )
 
 
 bld = Builder(action = builder_unit_test)
@@ -559,7 +585,9 @@ bld = Builder(action = builder_distscript)
 rootenv.Append(BUILDERS = {'DistScript' :  bld})
 
 
+rootenv.AppendMultithreadConf ()
 
+Export('rootenv')
 
 
 
@@ -569,10 +597,8 @@ rootenv.Append(BUILDERS = {'DistScript' :  bld})
 # Build process
 # -------------------------------------------------------
 
-Export('rootenv')
 
 builddir = '#' + buildroot
-
 
 rootenv.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
 rootenv.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)

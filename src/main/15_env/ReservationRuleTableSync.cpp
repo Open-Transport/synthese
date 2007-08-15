@@ -49,46 +49,46 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<ReservationRule>::TABLE_ID = 21;
 		template<> const bool SQLiteTableSyncTemplate<ReservationRule>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ReservationRule>::load(ReservationRule* rr, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<ReservationRule>::load(ReservationRule* rr, const db::SQLiteResultSPtr& rows )
 		{
-			rr->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
+		    rr->setKey (rows->getLongLong (TABLE_COL_ID));
+		    
+		    bool online (rows->getBool (ReservationRuleTableSync::COL_ONLINE));
 
-			bool online (
-				Conversion::ToBool (rows.getColumn (rowIndex,ReservationRuleTableSync::COL_ONLINE)));
+		    bool originIsReference (rows->getBool (ReservationRuleTableSync::COL_ORIGINISREFERENCE));
+		    
+		    int minDelayMinutes = rows->getInt (ReservationRuleTableSync::COL_MINDELAYMINUTES);
+		    int minDelayDays = rows->getInt (ReservationRuleTableSync::COL_MINDELAYDAYS);
+		    int maxDelayDays = rows->getInt (ReservationRuleTableSync::COL_MAXDELAYDAYS);
+		    
+		    synthese::time::Hour hourDeadline = 
+			synthese::time::Hour::FromSQLTime (rows->getText (ReservationRuleTableSync::COL_HOURDEADLINE));
+		    
+		    std::string phoneExchangeNumber (
+			rows->getText (ReservationRuleTableSync::COL_PHONEEXCHANGENUMBER));
 
-			bool originIsReference (
-				Conversion::ToBool (rows.getColumn (rowIndex,ReservationRuleTableSync::COL_ORIGINISREFERENCE)));
+		    std::string phoneExchangeOpeningHours (
+			rows->getText (ReservationRuleTableSync::COL_PHONEEXCHANGEOPENINGHOURS));
 
-			int minDelayMinutes = Conversion::ToInt (rows.getColumn (rowIndex,ReservationRuleTableSync::COL_MINDELAYMINUTES));
-			int minDelayDays = Conversion::ToInt (rows.getColumn (rowIndex,ReservationRuleTableSync::COL_MINDELAYDAYS));
-			int maxDelayDays = Conversion::ToInt (rows.getColumn (rowIndex,ReservationRuleTableSync::COL_MAXDELAYDAYS));
+		    std::string description (
+			rows->getText (ReservationRuleTableSync::COL_DESCRIPTION));
 
-			synthese::time::Hour hourDeadline = synthese::time::Hour::FromSQLTime (rows.getColumn (rowIndex,ReservationRuleTableSync::COL_HOURDEADLINE));
+		    std::string webSiteUrl (
+			rows->getText (ReservationRuleTableSync::COL_WEBSITEURL));
 
-			std::string phoneExchangeNumber (
-				rows.getColumn (rowIndex,ReservationRuleTableSync::COL_PHONEEXCHANGENUMBER));
-
-			std::string phoneExchangeOpeningHours (
-				rows.getColumn (rowIndex,ReservationRuleTableSync::COL_PHONEEXCHANGEOPENINGHOURS));
-
-			std::string description (
-				rows.getColumn (rowIndex,ReservationRuleTableSync::COL_DESCRIPTION));
-
-			std::string webSiteUrl (
-				rows.getColumn (rowIndex,ReservationRuleTableSync::COL_WEBSITEURL));
-
-			rr->setCompliant(Conversion::ToTribool(rows.getColumn(rowIndex, ReservationRuleTableSync::COL_TYPE)));
-			rr->setOnline (online);
-			rr->setOriginIsReference (originIsReference);
-			rr->setMinDelayMinutes (minDelayMinutes);
-			rr->setMinDelayDays (minDelayDays);
-			rr->setMaxDelayDays (maxDelayDays);
-			rr->setHourDeadLine (hourDeadline);
-			rr->setPhoneExchangeNumber (phoneExchangeNumber);
-			rr->setPhoneExchangeOpeningHours (phoneExchangeOpeningHours);
-			rr->setDescription (description);
-			rr->setWebSiteUrl (webSiteUrl);
+		    rr->setCompliant (rows->getTribool (ReservationRuleTableSync::COL_TYPE));
+		    rr->setOnline (online);
+		    rr->setOriginIsReference (originIsReference);
+		    rr->setMinDelayMinutes (minDelayMinutes);
+		    rr->setMinDelayDays (minDelayDays);
+		    rr->setMaxDelayDays (maxDelayDays);
+		    rr->setHourDeadLine (hourDeadline);
+		    rr->setPhoneExchangeNumber (phoneExchangeNumber);
+		    rr->setPhoneExchangeOpeningHours (phoneExchangeOpeningHours);
+		    rr->setDescription (description);
+		    rr->setWebSiteUrl (webSiteUrl);
 		}
+
 
 		template<> void SQLiteTableSyncTemplate<ReservationRule>::save(ReservationRule* object)
 		{
@@ -146,34 +146,34 @@ namespace synthese
 			addTableColumn (COL_WEBSITEURL, "TEXT", true);
 		}
 
-		void ReservationRuleTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void ReservationRuleTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				shared_ptr<ReservationRule> object(new ReservationRule());
-				load(object.get(), rows, i);
+				load(object.get(), rows);
 				EnvModule::getReservationRules().add(object);
 			}
 		}
 
-		void ReservationRuleTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ReservationRuleTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
-				if (EnvModule::getReservationRules().contains(id))
-				{
-					shared_ptr<ReservationRule> object = EnvModule::getReservationRules().getUpdateable(id);
-					load(object.get(), rows, i);
-				}
+			    uid id = rows->getLongLong (TABLE_COL_ID);
+			    if (EnvModule::getReservationRules().contains(id))
+			    {
+				shared_ptr<ReservationRule> object = EnvModule::getReservationRules().getUpdateable(id);
+				load(object.get(), rows);
+			    }
 			}
 		}
 
-		void ReservationRuleTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ReservationRuleTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getReservationRules().contains(id))
 				{
 					EnvModule::getReservationRules().remove(id);
@@ -199,12 +199,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<ReservationRule*> objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					ReservationRule* object = new ReservationRule();
-					load(object, result, i);
+					load(object, rows);
 					objects.push_back(object);
 				}
 				return objects;

@@ -1,5 +1,5 @@
-#include "01_util/Thread.h"
-#include "01_util/ThreadExec.h"
+#include "01_util/threads/Thread.h"
+#include "01_util/threads/ThreadExec.h"
 
 #include <iostream>
 #include <sstream>

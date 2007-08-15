@@ -61,8 +61,8 @@ namespace synthese
 
 				//! @name Getters/Setters
 				//@{
-				inline int getMinutes() const;
-				inline int getHours() const;
+				int getMinutes() const { return _minutes; }
+				int getHours() const { return _hours; }
 				//@}
 
 
@@ -117,18 +117,6 @@ namespace synthese
 
 		std::ostream& operator<< ( std::ostream& os, const Hour& op );
 
-		int
-		    Hour::getMinutes() const
-		{
-		    return _minutes;
-		}
-		
-		
-		int
-		    Hour::getHours() const
-		{
-		    return _hours;
-		}
 
 
 	}

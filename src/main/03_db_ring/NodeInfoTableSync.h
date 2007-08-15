@@ -37,15 +37,15 @@ public:
 
     virtual void rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 			    db::SQLiteSync* sync,
-			    const db::SQLiteResult& rows, bool isFirstSync = false);
+			    const db::SQLiteResultSPtr& rows, bool isFirstSync = false);
 
     virtual void rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 			      db::SQLiteSync* sync, 
-			      const db::SQLiteResult& rows);
+			      const db::SQLiteResultSPtr& rows);
 
     virtual void rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 			      db::SQLiteSync* sync,
-			      const db::SQLiteResult& rows);
+			      const db::SQLiteResultSPtr& rows);
 
 
 };

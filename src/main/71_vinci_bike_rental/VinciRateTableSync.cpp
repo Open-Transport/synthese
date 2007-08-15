@@ -42,20 +42,20 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<VinciRate>::TABLE_ID = 33;
 		template<> const bool SQLiteTableSyncTemplate<VinciRate>::HAS_AUTO_INCREMENT = true;
 		
-		template<> void SQLiteTableSyncTemplate<VinciRate>::load(VinciRate* vr, const SQLiteResult& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<VinciRate>::load(VinciRate* vr, const SQLiteResultSPtr& rows, int rowId)
 		{
-			vr->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			vr->_name = rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_NAME);
-			vr->_validityDuration = Conversion::ToDouble(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_VALIDITY_DURATION));
-			vr->_startFinancialPrice = Conversion::ToDouble(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_START_FINANCIAL_PRICE));
-			vr->_startTicketsPrice = Conversion::ToInt(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_START_TICKETS_PRICE));
-			vr->_endFinancialPrice = Conversion::ToDouble(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_END_FINANCIAL_PRICE));
-			vr->_endTicketsPrice = Conversion::ToInt(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_END_TICKETS_PRICE));
-			vr->_firstPenalty = Conversion::ToDouble(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_FIRST_PENALTY));
-			vr->_firstPenaltyValidityDuration = Conversion::ToDouble(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_FIRST_PENALTY_VALIDITY_DURATION));
-			vr->_recurringPenalty = Conversion::ToDouble(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_RECURRING_PENALTY));
-			vr->_recurringPenaltyPeriod = Conversion::ToInt(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD));
-			vr->_recurringPenaltyCancelsFirst = Conversion::ToBool(rows.getColumn(rowId, VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST));
+			vr->setKey(rows->getLongLong (TABLE_COL_ID));
+			vr->_name = rows->get ( VinciRateTableSync::TABLE_COL_NAME);
+			vr->_validityDuration = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_VALIDITY_DURATION));
+			vr->_startFinancialPrice = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_START_FINANCIAL_PRICE));
+			vr->_startTicketsPrice = Conversion::ToInt(rows->get ( VinciRateTableSync::TABLE_COL_START_TICKETS_PRICE));
+			vr->_endFinancialPrice = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_END_FINANCIAL_PRICE));
+			vr->_endTicketsPrice = Conversion::ToInt(rows->get ( VinciRateTableSync::TABLE_COL_END_TICKETS_PRICE));
+			vr->_firstPenalty = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_FIRST_PENALTY));
+			vr->_firstPenaltyValidityDuration = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_FIRST_PENALTY_VALIDITY_DURATION));
+			vr->_recurringPenalty = Conversion::ToDouble(rows->get ( VinciRateTableSync::TABLE_COL_RECURRING_PENALTY));
+			vr->_recurringPenaltyPeriod = Conversion::ToInt(rows->get ( VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_PERIOD));
+			vr->_recurringPenaltyCancelsFirst = Conversion::ToBool(rows->get ( VinciRateTableSync::TABLE_COL_RECURRING_PENALTY_CANCELS_FIRST));
 		}
 
 		template<> void SQLiteTableSyncTemplate<VinciRate>::save(VinciRate* vr)
@@ -133,7 +133,7 @@ namespace synthese
 
 		void VinciRateTableSync::rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
-			const db::SQLiteResult& rows, bool isFirstSync)
+			const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 
 		}
@@ -141,14 +141,14 @@ namespace synthese
 		
 		void VinciRateTableSync::rowsUpdated (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
-			const db::SQLiteResult& rows)
+			const db::SQLiteResultSPtr& rows)
 		{
 
 		}
 
 		void VinciRateTableSync::rowsRemoved (db::SQLiteQueueThreadExec* sqlite, 
 			db::SQLiteSync* sync,
-			const db::SQLiteResult& rows)
+			const db::SQLiteResultSPtr& rows)
 		{
 
 		}
@@ -163,7 +163,7 @@ namespace synthese
 				<< " ORDER BY " << TABLE_COL_NAME
 				;
 
-			SQLiteResult result = sqlite->execQuery(query.str());
+			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 			vector<shared_ptr<VinciRate> > rates;
 			for (int i=0; i<result.getNbRows(); ++i)
 			{

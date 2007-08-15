@@ -79,13 +79,13 @@ namespace synthese
 						<< "strftime('%Y-%m-%d', " << TransactionTableSync::TABLE_COL_START_DATE_TIME << ")"
 					;
 
-				SQLiteResult result = sqlite->execQuery(query.str());
-				for (int i = 0; i < result.getNbRows(); ++i)
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				while (rows->next ())
 				{
 					RentReportResult r;
-					r.starts = Conversion::ToInt(result.getColumn(i, COL_NUMBER));
+					r.starts = rows->getInt ( COL_NUMBER);
 					r.ends = 0;
-					m.insert(make_pair(Date::FromSQLDate(result.getColumn(i, COL_DAY)), r));
+					m.insert(make_pair(Date::FromSQLDate(rows->getText (COL_DAY)), r));
 				}
 	
 				// Rent ends
@@ -104,23 +104,23 @@ namespace synthese
 					<< " GROUP BY "
 						<< "strftime('%Y-%m-%d', " << TransactionTableSync::TABLE_COL_END_DATE_TIME << ")"
 					;
-
-				result = sqlite->execQuery(endQuery.str());
-				for (int i = 0; i < result.getNbRows(); ++i)
+				
+				rows = sqlite->execQuery(endQuery.str());
+				while (rows->next ())
 				{
-					Date date = Date::FromSQLDate(result.getColumn(i, COL_DAY));
-					map<Date, RentReportResult>::iterator it = m.find(date);
-					if (it == m.end())
-					{
-						RentReportResult r;
-						r.starts = 0;
-						r.ends = Conversion::ToInt(result.getColumn(i, COL_NUMBER));
-						m.insert(make_pair(date, r));
-					}
-					else
-					{
-						it->second.ends = Conversion::ToInt(result.getColumn(i, COL_NUMBER));
-					}
+				    Date date = Date::FromSQLDate(rows->getText (COL_DAY));
+				    map<Date, RentReportResult>::iterator it = m.find(date);
+				    if (it == m.end())
+				    {
+					RentReportResult r;
+					r.starts = 0;
+					r.ends = rows->getInt (COL_NUMBER);
+					m.insert(make_pair(date, r));
+				    }
+				    else
+				    {
+					it->second.ends = rows->getInt (COL_NUMBER);
+				    }
 				}
 
 				return m;
@@ -135,9 +135,11 @@ namespace synthese
 		std::map<uid, RentReportResult> getRentsPerRate( const time::Date& start, const time::Date& end )
 		{
 			map<uid, RentReportResult> m;
-			shared_ptr<Account> account = VinciBikeRentalModule::getAccount(VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
+			shared_ptr<Account> account = VinciBikeRentalModule::getAccount(
+			    VinciBikeRentalModule::VINCI_SERVICES_BIKE_RENT_TICKETS_ACCOUNT_CODE);
+
 			if (!account.get())
-				return m;
+			    return m;
 
 			static const string COL_NUMBER("number");
 			static const string COL_RATE("rate");
@@ -161,13 +163,13 @@ namespace synthese
 					<< "p." << TransactionPartTableSync::TABLE_COL_RATE_ID
 				;
 
-			SQLiteResult result = sqlite->execQuery(query.str());
-			for (int i = 0; i < result.getNbRows(); ++i)
+			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+			while (rows->next ())
 			{
 				RentReportResult r;
-				r.starts = Conversion::ToInt(result.getColumn(i, COL_NUMBER));
+				r.starts = rows->getInt (COL_NUMBER);
 				r.ends = 0;
-				m.insert(make_pair(Conversion::ToLongLong(result.getColumn(i, COL_RATE)), r));
+				m.insert(make_pair(rows->getLongLong (COL_RATE), r));
 			}
 
 			// Rent ends
@@ -187,21 +189,21 @@ namespace synthese
 					<< "p." << TransactionPartTableSync::TABLE_COL_RATE_ID
 				;
 
-			result = sqlite->execQuery(endQuery.str());
-			for (int i = 0; i < result.getNbRows(); ++i)
+			rows = sqlite->execQuery (endQuery.str());
+			while (rows->next ())
 			{
-				uid rateId = Conversion::ToLongLong(result.getColumn(i, COL_RATE));
-				map<uid, RentReportResult>::iterator it2 = m.find(rateId);
+			    uid rateId = rows->getLongLong (COL_RATE);
+			    map<uid, RentReportResult>::iterator it2 = m.find(rateId);
 				if (it2 == m.end())
 				{
 					RentReportResult r;
 					r.starts = 0;
-					r.ends = Conversion::ToInt(result.getColumn(i, COL_NUMBER));;
+					r.ends = rows->getInt (COL_NUMBER);
 					m.insert(make_pair(rateId, r));
 				}
 				else
 				{
-					it2->second.ends = Conversion::ToInt(result.getColumn(i, COL_NUMBER));
+				    it2->second.ends = rows->getInt (COL_NUMBER);
 				}
 			}
 

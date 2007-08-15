@@ -11,7 +11,8 @@
   
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
-#include "01_util/Compression.h"
+#include "01_util/iostreams/Compression.h"
+#include "01_util/threads/Thread.h"
 
 #include "00_tcp/TcpServerSocket.h"
 #include "00_tcp/TcpClientSocket.h"
@@ -28,6 +29,8 @@ using namespace synthese::util;
 using namespace synthese::db;
 
 using namespace boost::posix_time;
+
+extern int nbres;
 
 
 namespace synthese
@@ -160,8 +163,10 @@ void
 Node::setUpdateRecordCallback (const UpdateRecordSPtr& updateRecord)
 {
     boost::recursive_mutex::scoped_lock callbackLock (*_ringNodesMutex);
-
     _updateLog->setUpdateRecord (updateRecord);
+    
+    // If this is an acknowledgement, release the lock taken on update record key just before
+    // it was saved.
 
 }
 
@@ -203,30 +208,6 @@ Node::initialize ()
 
 
 
-bool 
-Node::earlyCompileUpdate (const std::string& sql)
-{
-
-    bool res (true);
-
-    // Compilation will fail on pure syntactic error, but *also* when a given table does not
-    // exist. 
-    // select * from toto ;                            => will fail if table toto does not exist in db
-    // create table toto (key); select * from toto ;   => OK ! 
-
-    // It can still happen that the statement does not fail locally and fail when executed
-    // on authority (race for two updates). But in this case, authority will reject one of the
-    // update statements and mark it as failed.
-    try
-    {
-	DBModule::GetSQLite()->finalizeStatement (DBModule::GetSQLite()->prepareStatement (sql));
-	return true;
-    }
-    catch (SQLiteException sqle)
-    {
-	return false;
-    }
-}
 
 
 
@@ -238,19 +219,37 @@ Node::getHandle ()
 
 
 
-db::SQLiteResult 
-Node::execQuery (const std::string& sql)
+db::SQLiteResultSPtr 
+Node::execQuery (const SQLiteStatementSPtr& statement, bool lazy)
 {
-    if (SQLite::IsUpdateStatement (sql)) throw ("Not a query statement : " + sql);
+    if (SQLite::IsUpdateStatement (statement->getSQL ())) throw ("Not a query statement : " + statement->getSQL ());
 
-    return DBModule::GetSQLite()->execQuery (sql); 
+    return DBModule::GetSQLite()->execQuery (statement, lazy); 
+}
+
+
+
+
+SQLiteResultSPtr 
+Node::execQuery (const SQLData& sql, bool lazy)
+{
+    return DBModule::GetSQLite()->execQuery (sql, lazy);
+}
+
+
+
+
+void
+Node::execUpdate (const SQLiteStatementSPtr& statement, bool asynchronous)
+{
+    execUpdate (statement->getSQL (), asynchronous);
 }
 
 
 
 
 void 
-Node::execUpdate (const std::string& sql, bool asynchronous)
+Node::execUpdate (const SQLData& sql, bool asynchronous)
 {
     // If this is not an update statement, return directly
     if (SQLite::IsUpdateStatement (sql) == false)
@@ -269,16 +268,6 @@ Node::execUpdate (const std::string& sql, bool asynchronous)
 	throw DbRingException ("Node is locked for writing");
     }
 
-    // Early compilation of SQL statement. If the node is writeable, it must be up to date with its authority.
-    // It means that it must be in a proper state for execution of the desired SQL code.
-    // For this reason, we do an early compilation of the SQL code, and do not propagate anything if
-    // the compilation fails.
-    if (earlyCompileUpdate (sql) == false)
-    {
-	Log::GetInstance ().warn ("Early compilation of \"" + sql + "\" failed. Not propagated.");
-	return;
-    }
-
     // Use UTC time
     boost::posix_time::ptime now (boost::date_time::microsec_clock<ptime>::universal_time ());
 
@@ -287,13 +276,36 @@ Node::execUpdate (const std::string& sql, bool asynchronous)
     UpdateRecordSPtr urp (new UpdateRecord (encodeUpdateKey (_id, _lastUpdateIndex) , now,
 					    _id, PENDING,
 					    sql ));
+
+    // TODO : wrong way to do this. because
+    // 1) the node hangs til the update has finished and does not respond to another nodes nor propagate the info
+    // 2) the synchronous stuff is wrong cos no loop is done til update record acknowledged, but acknoledgement cannot 
+    //    be done if node is not looping.
+
+    // should have another thread polling acknowledged update records and executing them.
+    // with another state succeeded ?
+
     saveUpdateRecord (urp);
     
     if (asynchronous == false)
     {
 	// If synchronous update is done, we must wait until the update record is acknowledged locally.
-	
-	// TODO : it means taking a lock on the update record key and release it whenever the local update record is acknowledged.
+        // This will be notified asynchronously by ::setUpdateRecordCallback.
+	while (true)
+	{
+	    // Note : if node is not authority, getting the acknowledgement can take a while...
+	    // or just not happened (TODO : add a timeout ?)
+	    RecordState state = _updateLog->getUpdateRecord (urp->getKey ())->getState ();
+	    if (state == ACKNOWLEDGED) break;
+	    if (state == FAILED) 
+	    {
+		throw DbRingException ("ring update failed");
+	    }
+	    
+	    loop ();
+	    Thread::Sleep (10);
+	}
+
     }
 }
 
@@ -323,7 +335,7 @@ Node::loop ()
 	// Non-blocking mode (default)
 	if (serverSocket != 0) 
 	{
-	    serverSocket->setTimeOut (TCP_TOKEN_TIMEOUT);
+	    serverSocket->setTimeOut (5*10*TCP_TOKEN_TIMEOUT);
 	    token.reset (new Token ());
 	    
 	    boost::iostreams::stream<synthese::tcp::TcpServerSocket> 
@@ -347,13 +359,11 @@ Node::loop ()
 
 	if (token.get ())
 	{
-            /*
 	    std::stringstream logstr;
 	    logstr << "Node " << _id << " recv [" 
 		   << (*token) << "] fm node " << token->getEmitterNodeId () << std::endl;
 	    
-	    Log::GetInstance ().debug (logstr.str ());
-	    */
+	    // Log::GetInstance ().debug (logstr.str ());
 
 	    mergeUpdateLog (token);
 	}
@@ -472,19 +482,20 @@ Node::saveUpdateRecord (const UpdateRecordSPtr& urp)
     if (isMasterAuthority ())
     {
 	assert (urp->getState () == PENDING);
-	const std::string& sql = urp->getSQL ();
 	try
 	{
 	    DBModule::GetSQLite()->beginTransaction (true);  // exclusive
-	    DBModule::GetSQLite()->execUpdate (sql);
+	    // batch execution, without precompilation!
+	    DBModule::GetSQLite()->execUpdate (urp->getSQL ());
 	    urp->setState (ACKNOWLEDGED);
 	    UpdateRecordTableSync::save (urp.get ());
 	    DBModule::GetSQLite()->commitTransaction (); 
-	    Log::GetInstance ().info ("Executed : " + Conversion::ToTruncatedString (sql));
+	    Log::GetInstance ().info ("Executed : " + Conversion::ToTruncatedString (urp->getSQL ()));
 	}
 	catch (std::exception& e)
 	{
-	    Log::GetInstance ().error ("Error while executing SQL statement on master authority : " + urp->getSQL (), e);
+	    Log::GetInstance ().error ("Error while executing SQL statement on master authority : " + 
+				       Conversion::ToTruncatedString (urp->getSQL ()), e);
 	    urp->setState (FAILED);
 	    UpdateRecordTableSync::save (urp.get ());
 	}
@@ -509,9 +520,10 @@ Node::saveUpdateRecord (const UpdateRecordSPtr& urp)
 	    DBModule::GetSQLite()->commitTransaction (); 
 	    Log::GetInstance ().info ("Executed : " + Conversion::ToTruncatedString (aur->getSQL ()));
 	}
-	catch (std::exception e)
+	catch (std::exception& e)
 	{
-	    Log::GetInstance ().error ("Error while propagating SQL statement " + aur->getSQL ());
+	    Log::GetInstance ().error ("Error while propagating SQL statement " + 
+				       Conversion::ToTruncatedString (aur->getSQL ()), e);
 	    aur->setState (FAILED);
 	    UpdateRecordTableSync::save (aur.get ());
 	}

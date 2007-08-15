@@ -48,13 +48,14 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Axis>::TABLE_ID = 4;
 		template<> const bool SQLiteTableSyncTemplate<Axis>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Axis>::load(Axis* axis, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Axis>::load(Axis* axis, const db::SQLiteResultSPtr& rows)
 		{
-			axis->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
-			axis->setName (rows.getColumn (rowIndex, AxisTableSync::COL_NAME));
-			axis->setFree (Conversion::ToBool (rows.getColumn (rowIndex, AxisTableSync::COL_FREE)));
-			axis->setAllowed (Conversion::ToBool (rows.getColumn (rowIndex, AxisTableSync::COL_ALLOWED)));
+		    axis->setKey(rows->getLongLong (TABLE_COL_ID));
+		    axis->setName (rows->getText (AxisTableSync::COL_NAME));
+		    axis->setFree (rows->getBool (AxisTableSync::COL_FREE));
+		    axis->setAllowed (rows->getBool (AxisTableSync::COL_ALLOWED));
 		}
+	    
 
 		template<> void SQLiteTableSyncTemplate<Axis>::save(Axis* object)
 		{
@@ -97,34 +98,34 @@ namespace synthese
 			addTableColumn (COL_ALLOWED, "BOOLEAN", true);
 		}
 
-		void AxisTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void AxisTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				shared_ptr<Axis> object(new Axis());
-				load(object.get(), rows, i);
+				load(object.get(), rows);
 				EnvModule::getAxes().add(object);
 			}
 		}
 
-		void AxisTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void AxisTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid lineId = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid lineId = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getAxes().contains(lineId))
 				{
 					shared_ptr<Axis> object = EnvModule::getAxes().getUpdateable(lineId);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 				}
 			}
 		}
 
-		void AxisTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void AxisTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid lineId = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid lineId = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getAxes().contains(lineId))
 				{
 					EnvModule::getAxes().remove(lineId);
@@ -150,12 +151,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<Axis> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<Axis> object(new Axis());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

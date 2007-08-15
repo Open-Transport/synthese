@@ -1,8 +1,19 @@
 #include "SQLiteResult.h"
 
+#include "01_util/Conversion.h"
+
 #include "SQLiteException.h"
+#include "sqlite3.h"
 
 #include <iomanip>
+#include <boost/date_time/posix_time/time_formatters.hpp>
+#include <boost/date_time/posix_time/time_parsers.hpp>
+
+
+
+using namespace synthese::util;
+using namespace boost::posix_time;
+
 
 
 namespace synthese
@@ -12,8 +23,6 @@ namespace db
 
 
 SQLiteResult::SQLiteResult ()
-    : _nbColumns (0)
-    , _nbRows (0)
 {
 }
 
@@ -21,32 +30,6 @@ SQLiteResult::SQLiteResult ()
 
 SQLiteResult::~SQLiteResult ()
 {
-
-}
-
-
-
-int 
-SQLiteResult::getNbColumns () const
-{
-    return _nbColumns;
-}
-
-
-
-
-int 
-SQLiteResult::getNbRows () const
-{
-    return _nbRows;
-}
-
-
-
-std::string
-SQLiteResult::getColumnName (int column) const
-{
-    return _columnNames.at (column);
 }
 
 
@@ -54,94 +37,201 @@ SQLiteResult::getColumnName (int column) const
 int
 SQLiteResult::getColumnIndex (const std::string& columnName) const
 {
-    for (int i=0; i<(int) _columnNames.size (); ++i)
+    for (int i=0; i<getNbColumns (); ++i)
     {
-	if (_columnNames.at(i) == columnName) return i;
+	if (getColumnName (i) == columnName) return i;
     }
     return -1;
 }
 
 
 
-
-std::string
-SQLiteResult::getColumn (int row, int column) const
-{
-    return _values.at (row).at (column);
-}
-
-
-
-std::string
-SQLiteResult::getColumn (int row, const std::string& name) const
+SQLiteValueSPtr
+SQLiteResult::getValue (const std::string& name) const
 {
     int index = getColumnIndex (name);
     if (index == -1)
-		throw SQLiteException ("No such column " + name);
-    return getColumn (row, index);
+	throw SQLiteException ("No such column " + name);
+    return getValue (index);
 }
 
 
 
-
-std::vector<std::string> 
-SQLiteResult::getColumns (int row) const
+std::string 
+SQLiteResult::getText (int column) const
 {
-    return _values.at (row);
+    return getValue (column)->getText ();
 }
 
 
-
-void 
-SQLiteResult::addRow (int nbColumns, char** values, char** columns)
+std::string
+SQLiteResult::getText (const std::string& name) const
 {
-	_nbColumns = nbColumns;
-	++_nbRows;
-
-    Row row;
-    if (_columnNames.size () == 0) 
-    {
-		for (int j=0; j<nbColumns; ++j)
-		{
-			_columnNames.push_back (columns[j]);
-		}
-    }
-
-    for (int i=0; i<nbColumns; ++i)
-    {
-		row.push_back ((values[i] == NULL) ? "" : values[i]);
-    }
-    _values.push_back (row);
-
+    int index = getColumnIndex (name);
+    if (index == -1)
+	throw SQLiteException ("No such column " + name);
+    return getText (index);
 }
 
 
 
 
-void 
-SQLiteResult::addRow (const std::vector<std::string>& values, 
-		      const std::vector<std::string>& columns)
+int 
+SQLiteResult::getInt (int column) const
 {
-    int nbColumns = (int) values.size ();
-    ++_nbRows;
-    _nbColumns = nbColumns;
+    return getValue (column)->getInt ();
+}
 
-    Row row;
-    if (_columnNames.size () == 0) 
-    {
-	for (int j=0; j<nbColumns; ++j)
-	{
-	    _columnNames.push_back (columns[j]);
-	}
-    }
+int 
+SQLiteResult::getInt (const std::string& name) const
+{
+    int index = getColumnIndex (name);
+    if (index == -1)
+	throw SQLiteException ("No such column " + name);
+    return getInt (index);
+}
 
-    for (int i=0; i<nbColumns; ++i)
-    {
-	row.push_back (values[i]);
-    }
-    _values.push_back (row);
+
+
+long 
+SQLiteResult::getLong (int column) const
+{
+    return getValue (column)->getLong ();
+}
+
+long
+SQLiteResult::getLong (const std::string& name) const
+{
+    int index = getColumnIndex (name);
+    if (index == -1)
+	throw SQLiteException ("No such column " + name);
+    return getLong (index);
+}
+
+
+
+
+bool
+SQLiteResult::getBool (int column) const
+{
+    return getValue (column)->getBool ();
+}
+
+bool 
+SQLiteResult::getBool (const std::string& name) const
+{
+    int index = getColumnIndex (name);
+    if (index == -1)
+	throw SQLiteException ("No such column " + name);
+    return getBool (index);
+}
+
+
+
+boost::logic::tribool
+SQLiteResult::getTribool (int column) const
+{
+    return getValue (column)->getTribool ();
+}
+
+
+
+boost::logic::tribool 
+SQLiteResult::getTribool (const std::string& name) const
+{
+    int index = getColumnIndex (name);
+    if (index == -1)
+	throw SQLiteException ("No such column " + name);
+    return getTribool (index);
+}
+
+
+
+
+double 
+SQLiteResult::getDouble (int column) const
+{
+    return getValue (column)->getDouble ();
+}
+
+double 
+SQLiteResult::getDouble (const std::string& name) const
+{
+    int index = getColumnIndex (name);
+    if (index == -1)
+	throw SQLiteException ("No such column " + name);
+    return getDouble (index);
+}
+
+
+
+std::string 
+SQLiteResult::getBlob (int column) const
+{
+    return getValue (column)->getBlob ();
+}
+
+std::string 
+SQLiteResult::getBlob (const std::string& name) const
+{
+    int index = getColumnIndex (name);
+    if (index == -1)
+	throw SQLiteException ("No such column " + name);
+    return getBlob (index);
+}
+
+
+
+
+
+long long 
+SQLiteResult::getLongLong (int column) const
+{
+    return getValue (column)->getLongLong ();
+}
+
+
+long long 
+SQLiteResult::getLongLong (const std::string& name) const
+{
+    int index = getColumnIndex (name);
+    if (index == -1)
+	throw SQLiteException ("No such column " + name);
+    return getLongLong (index);
 
 }
+
+
+
+boost::posix_time::ptime 
+SQLiteResult::getTimestamp (int column) const
+{
+    return getValue (column)->getTimestamp ();
+}
+
+
+boost::posix_time::ptime
+SQLiteResult::getTimestamp (const std::string& name) const
+{
+    int index = getColumnIndex (name);
+    if (index == -1)
+	throw SQLiteException ("No such column " + name);
+    return getTimestamp (index);
+}
+
+
+    
+SQLiteResultRow 
+SQLiteResult::getRow () const
+{
+    SQLiteResultRow row;
+    for (int i=0; i<getNbColumns (); ++i)
+    {
+	row.push_back (getValue (i));
+    }
+    return row;
+}
+
 
 
 
@@ -149,19 +239,21 @@ SQLiteResult::addRow (const std::vector<std::string>& values,
 std::vector<int>
 SQLiteResult::computeMaxColWidths () const
 {
+    reset ();
+
     std::vector<int> widths;
     for (int c=0; c<getNbColumns (); ++c) 
     {
-	int max = 0;
-	std::string name (getColumnName (c));
-	if (name.length () > max) max = name.length ();
+        int max = 0;
+        std::string name (getColumnName (c));
+        if (name.length () > max) max = name.length ();
 
-	for (int r=0; r<getNbRows (); ++r) 
-	{
-	    std::string value (getColumn (r, c));
-	    if (value.length () > max) max = value.length ();
-	}
-	widths.push_back (max);
+        while (next ())
+        {
+            std::string value (getText (c));
+            if (value.length () > max) max = value.length ();
+        }
+        widths.push_back (max);
     }
     return widths;
 }
@@ -177,34 +269,23 @@ operator<< ( std::ostream& os, const SQLiteResult& op )
 
     for (int c=0; c<op.getNbColumns (); ++c) 
     {
-	os << std::setw (widths.at(c)) << std::setfill (' ') << op.getColumnName (c);
-	if (c != op.getNbColumns ()-1) os << " | ";
+        os << std::setw (widths.at(c)) << std::setfill (' ') << op.getColumnName (c);
+        if (c != op.getNbColumns ()-1) os << " | ";
     }
     os << std::endl;
-	
-    for (int r=0; r<op.getNbRows (); ++r) 
+
+    op.reset ();
+    while (op.next ())
     {
-	for (int c=0; c<op.getNbColumns (); ++c) 
-	{
-	    os << std::setw (widths.at(c)) << std::setfill (' ') << op.getColumn (r, c);
-	    if (c != op.getNbColumns ()-1) os << " | ";
-	}
-	os << std::endl;
+        for (int c=0; c<op.getNbColumns (); ++c) 
+        {
+            os << std::setw (widths.at(c)) << std::setfill (' ') << op.getText (c);
+            if (c != op.getNbColumns ()-1) os << " | ";
+        }
+        os << std::endl;
     }
-
-
-/*
-    os << std::setw( 2 ) << std::setfill ( '0' )
-    << op.getHours ()
-    << std::setw( 2 ) << std::setfill ( '0' )
-    << op.getMinutes ();
-*/
     return os;
 }
-
-
-
-
 
 
 }

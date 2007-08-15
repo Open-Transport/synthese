@@ -20,8 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_UTIL_SQLITEQUEUETHREADEXEC_H
-#define SYNTHESE_UTIL_SQLITEQUEUETHREADEXEC_H
+#ifndef SYNTHESE_DB_SQLITEQUEUETHREADEXEC_H
+#define SYNTHESE_DB_SQLITEQUEUETHREADEXEC_H
+
+
+#include "02_db/SQLiteHandle.h"
+
+#include "02_db/SQLiteUpdateHook.h"
+
+#include "01_util/threads/ThreadExec.h"
+#include "01_util/UId.h"
 
 #include <vector>
 #include <string>
@@ -32,14 +40,6 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/shared_ptr.hpp>
-
-#include <sqlite/sqlite3.h>
-
-#include "01_util/ThreadExec.h"
-#include "01_util/UId.h"
-
-#include "02_db/SQLiteUpdateHook.h"
-#include "02_db/SQLiteHandle.h"
 
 namespace synthese
 {
@@ -118,8 +118,18 @@ namespace synthese
 			//@{
 			sqlite3* getHandle () { return _handle; }
 
-			SQLiteResult execQuery (const std::string& sql);
-			void execUpdate (const std::string& sql, bool asynchronous = false);
+			SQLiteStatementSPtr compileStatement (const SQLData& sql);
+
+			SQLiteResultSPtr execQuery (const SQLiteStatementSPtr& statement, bool lazy = true) ;
+			SQLiteResultSPtr execQuery (const SQLData& sql, bool lazy = true) ;
+
+			void execUpdate (const SQLiteStatementSPtr& statement, bool asynchronous = false) ;
+			void execUpdate (const SQLData& sql, bool asynchronous = false);
+
+			bool isTransactionOpened () ;
+			void beginTransaction (bool exclusive = false);
+			void commitTransaction ();
+			void rollbackTransaction ();
 
 			//@}
 

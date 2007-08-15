@@ -12,6 +12,7 @@
 #include <boost/date_time/posix_time/time_formatters.hpp>
 #include <boost/date_time/posix_time/time_parsers.hpp>
 
+#include <boost/iostreams/copy.hpp>
 
 #include <sstream>
 #include <assert.h>
@@ -157,6 +158,7 @@ Token::setInfo (const NodeId& nodeId, const NodeInfo& info)
 {
     boost::recursive_mutex::scoped_lock authorityLock (*_authorityMutex);
     boost::recursive_mutex::scoped_lock infosLock (*_infosMutex);
+
     _infos[nodeId] = info;
 
     if (info.isAuthority ()) 
@@ -191,7 +193,10 @@ Token::saveInfo (const NodeId& nodeId,
     if (hasInfo (nodeId) && (getInfo (nodeId) == info) )
     {
 	// if clock is equal as well, then really nothing to do.
-	if (getInfo (nodeId).getClock () == info.getClock ()) return; 
+	if (getInfo (nodeId).getClock () == info.getClock ()) 
+	{
+	    return; 
+	}
     }
     else
     {
@@ -406,10 +411,16 @@ Token::merge (const TokenSPtr& token)
 	    // This node is authoritative on its own state
 	    continue;
 	}
-	
-	if ( (token->getInfo ().getClock () >= getInfo ().getClock ()) ||
-	     (hasInfo (token->getEmitterNodeId ()) == false) )
+
+	const NodeId& nid = it->first;
+	const NodeInfo& nif = it->second;
+
+	if ( (token->getInfo ().getClock () >= getInfo ().getClock ()) ||  
+	     (hasInfo (token->getEmitterNodeId ()) == false) )  
+//	if ( (nif.getClock () >= getInfo (nid).getClock ()) ||  
+//	     (hasInfo (nid) == false) )  
 	{
+
 	    // merge info only if recevd token has been updated more recently.
 	    // than this node.
 	    saveInfo (it->first, it->second);
@@ -495,19 +506,20 @@ std::istream&
 operator>> ( std::istream& is, Token& op )
 {
     boost::recursive_mutex::scoped_lock infosLock (*op._infosMutex);
-    static char buf[1024*16]; // 16 KBytes max.
+    static const int maxlen (1024*1024*64); 
+    static char buf[maxlen];
 
     std::stringstream ids;
     std::stringstream nodeInfos;
     std::stringstream updateRecords;
     
-    is.getline (buf, 1024*16, ETB);
+    is.getline (buf, maxlen, ETB);
     ids << buf;
 
-    is.getline (buf, 1024*16, ETB);
+    is.getline (buf, maxlen, ETB);
     nodeInfos << buf;
 
-    is.getline (buf, 1024*16, ETB);
+    is.getline (buf, maxlen, ETB);
     updateRecords << buf;
 
     ids >> op._emitterNodeId;
@@ -516,7 +528,7 @@ operator>> ( std::istream& is, Token& op )
     std::string ts;
     ids >> ts;
 
-    while (nodeInfos.getline (buf, 1024*16, ETX))
+    while (nodeInfos.getline (buf, maxlen, ETX))
     {
 	std::stringstream input (buf);
 	NodeInfo nodeInfo;

@@ -132,6 +132,14 @@ namespace synthese
 
 
 		std::string 
+		Conversion::ToString (long l)
+		{
+			std::stringstream ss;
+			ss << l;
+			return ss.str ();
+		}
+
+		std::string 
 		Conversion::ToString (unsigned long l)
 		{
 			std::stringstream ss;
@@ -177,6 +185,9 @@ namespace synthese
 				result.push_back('\'');
 			return result;
 		}
+
+
+
 
 		std::vector<std::string> Conversion::ToStringVector(const std::string& text)
 		{

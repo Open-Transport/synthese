@@ -49,13 +49,13 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<PedestrianCompliance>::TABLE_ID = 18;
 		template<> const bool SQLiteTableSyncTemplate<PedestrianCompliance>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<PedestrianCompliance>::load(PedestrianCompliance* cmp, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<PedestrianCompliance>::load(PedestrianCompliance* cmp, const db::SQLiteResultSPtr& rows )
 		{
-			cmp->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
+			cmp->setKey(rows->getLongLong (TABLE_COL_ID));
 
 			tribool status = true;
 			int statusInt (
-				Conversion::ToInt (rows.getColumn (rowIndex, PedestrianComplianceTableSync::COL_STATUS)));
+			    rows->getInt (PedestrianComplianceTableSync::COL_STATUS));
 			if (statusInt < 0)
 			{
 				status = boost::logic::indeterminate;
@@ -66,7 +66,7 @@ namespace synthese
 			}
 
 			int capacity (
-				Conversion::ToInt (rows.getColumn (rowIndex, PedestrianComplianceTableSync::COL_CAPACITY)));
+				rows->getInt (PedestrianComplianceTableSync::COL_CAPACITY));
 
 			cmp->setCompliant (status);
 			cmp->setCapacity (capacity);
@@ -110,34 +110,34 @@ namespace synthese
 			addTableColumn (COL_CAPACITY, "INTEGER");
 		}
 
-		void PedestrianComplianceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void PedestrianComplianceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				shared_ptr<PedestrianCompliance> object(new PedestrianCompliance());
-				load(object.get(), rows, i);
+				load(object.get(), rows);
 				EnvModule::getPedestrianCompliances().add(object);
 			}
 		}
 
-		void PedestrianComplianceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void PedestrianComplianceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getPedestrianCompliances().contains(id))
 				{
 					shared_ptr<PedestrianCompliance> object = EnvModule::getPedestrianCompliances().getUpdateable(id);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 				}
 			}
 		}
 
-		void PedestrianComplianceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void PedestrianComplianceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getPedestrianCompliances().contains(id))
 				{
 					EnvModule::getPedestrianCompliances().remove(id);
@@ -163,12 +163,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<PedestrianCompliance> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<PedestrianCompliance> object(new PedestrianCompliance());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

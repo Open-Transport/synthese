@@ -49,28 +49,29 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<HandicappedCompliance>::TABLE_ID = 19;
 		template<> const bool SQLiteTableSyncTemplate<HandicappedCompliance>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<HandicappedCompliance>::load(HandicappedCompliance* cmp, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<HandicappedCompliance>::load(HandicappedCompliance* cmp, const db::SQLiteResultSPtr& rows )
 		{
-			cmp->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
+		    cmp->setKey(rows->getLongLong (TABLE_COL_ID));
+		    
+		    tribool status = true;
+		    int statusInt (rows->getInt (HandicappedComplianceTableSync::COL_STATUS));
 
-			tribool status = true;
-			int statusInt (
-				Conversion::ToInt (rows.getColumn (rowIndex, HandicappedComplianceTableSync::COL_STATUS)));
-			if (statusInt < 0)
-			{
-				status = boost::logic::indeterminate;
-			}
-			else if (statusInt == 0)
-			{
-				status = false;
-			}
-
-			int capacity (
-				Conversion::ToInt (rows.getColumn (rowIndex, HandicappedComplianceTableSync::COL_CAPACITY)));
-
-			cmp->setCompliant (status);
-			cmp->setCapacity (capacity);
+		    if (statusInt < 0)
+		    {
+			status = boost::logic::indeterminate;
+		    }
+		    else if (statusInt == 0)
+		    {
+			status = false;
+		    }
+		    
+		    int capacity (
+			rows->getInt (HandicappedComplianceTableSync::COL_CAPACITY));
+		    
+		    cmp->setCompliant (status);
+		    cmp->setCapacity (capacity);
 		}
+
 
 		template<> void SQLiteTableSyncTemplate<HandicappedCompliance>::save(HandicappedCompliance* object)
 		{
@@ -110,34 +111,34 @@ namespace synthese
 			addTableColumn (COL_CAPACITY, "INTEGER");
 		}
 
-		void HandicappedComplianceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void HandicappedComplianceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				shared_ptr<HandicappedCompliance> object(new HandicappedCompliance());
-				load(object.get(), rows, i);
+				load(object.get(), rows);
 				EnvModule::getHandicappedCompliances().add(object);
 			}
 		}
 
-		void HandicappedComplianceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void HandicappedComplianceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getHandicappedCompliances().contains(id))
 				{
 					shared_ptr<HandicappedCompliance> object = EnvModule::getHandicappedCompliances().getUpdateable(id);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 				}
 			}
 		}
 
-		void HandicappedComplianceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void HandicappedComplianceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getHandicappedCompliances().contains(id))
 				{
 					EnvModule::getHandicappedCompliances().remove(id);
@@ -163,12 +164,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<HandicappedCompliance> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<HandicappedCompliance> object(new HandicappedCompliance());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

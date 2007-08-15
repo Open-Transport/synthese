@@ -9,7 +9,7 @@
 
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"
-#include "01_util/Compression.h"
+#include "01_util/iostreams/Compression.h"
 
 #include "00_tcp/TcpServerSocket.h"
 #include "00_tcp/TcpClientSocket.h"
@@ -224,10 +224,10 @@ RingNode::sendToken ()
 	{
 
 	    std::stringstream logstr;
-	    logstr << "Node " << _data->getEmitterNodeId () << " sent [" 
-		   << (*_data) << "] to node " << ni.getNodeId () << std::endl;
+	     logstr << "Node " << _data->getEmitterNodeId () << " sent [" 
+	       << (*_data) << "] to node " << ni.getNodeId () << std::endl;
 	    
-	    Log::GetInstance ().info (logstr.str ());
+	     // Log::GetInstance ().debug (logstr.str ());
 
 	    return true;
 	}
@@ -284,6 +284,7 @@ RingNode::loop (const TokenSPtr& token)
 	    // I am the authority. any deprecated node compared to my local clock is discarded.
             // std::cerr << " ** 00 Discarded" << std::endl;
 	} 
+
 	else if ( (tokenInfo.getState () == ENTRING) && 
 		  (tokenInfo.isAuthority () == false) &&
 		  (_token->getAuthorityState () == INSRING) )
@@ -293,7 +294,8 @@ RingNode::loop (const TokenSPtr& token)
 	    // is out ring. This way, write-locked nodes can still exchange info between each
 	    // other.
 	    // std::cerr << " ** 11 Discarded" << std::endl;
-	}
+	} 
+
 	else
 	{
 	    // Reset the timer only if the token has not been discarded!
@@ -342,7 +344,7 @@ RingNode::sendSurefireToken (const std::string& host, int port)
 {
     bool success (false);
 
-    TcpClientSocket clientSock (host, port, TCP_TOKEN_TIMEOUT);
+    TcpClientSocket clientSock (host, port, 5*10*TCP_TOKEN_TIMEOUT);
     for (int i=0; i<SEND_TOKEN_MAX_NB_TRIES; ++i)
     {
 	clientSock.tryToConnect ();
@@ -353,6 +355,7 @@ RingNode::sendSurefireToken (const std::string& host, int port)
 	    boost::iostreams::stream<TcpClientSocket> cliSocketStream (clientSock);
 	    std::stringstream tmp;
 	    tmp << (*_data);
+
 	    Compression::ZlibCompress (tmp, cliSocketStream);
 
 	    cliSocketStream.close ();
@@ -363,6 +366,11 @@ RingNode::sendSurefireToken (const std::string& host, int port)
 	catch (std::exception& e) 
 	{
 	    Log::GetInstance ().error ("Error sending token", e);
+	}
+	catch (...) 
+	{
+	    
+	    Log::GetInstance ().error ("Error sending token UNKNOWN");
 	}
     }
 

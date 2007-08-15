@@ -49,11 +49,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<City>::TABLE_ID = 6;
 		template<> const bool SQLiteTableSyncTemplate<City>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<City>::load(City* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<City>::load(City* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			object->setName(rows.getColumn(rowId, CityTableSync::TABLE_COL_NAME));
+		    object->setKey(rows->getLongLong (TABLE_COL_ID));
+		    object->setName(rows->getText ( CityTableSync::TABLE_COL_NAME));
 		}
+
 
 		template<> void SQLiteTableSyncTemplate<City>::save(City* object)
 		{
@@ -108,39 +109,39 @@ namespace synthese
 		void 
 			CityTableSync::rowsAdded (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResult& rows, bool isFirstSync)
+			const synthese::db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
-			{
-				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-
-				if (EnvModule::getCities ().contains (id)) return;
-
-				shared_ptr<City> city(new City (
-					id,
-					rows.getColumn (rowIndex, TABLE_COL_NAME) ));
-
-				EnvModule::getCities ().add (city);
-				EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
-			}
+		    while (rows->next ())
+		    {
+			uid id = rows->getLongLong (TABLE_COL_ID);
+			
+			if (EnvModule::getCities ().contains (id)) return;
+			
+			shared_ptr<City> city(new City (
+						  id,
+						  rows->getText (TABLE_COL_NAME) ));
+			
+			EnvModule::getCities ().add (city);
+			EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
+		    }
 		}
 
 
 		void 
 			CityTableSync::rowsUpdated (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResult& rows)
+			const synthese::db::SQLiteResultSPtr& rows)
 		{
-			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-				shared_ptr<City> city = EnvModule::getCities ().getUpdateable (id);
-
-				EnvModule::getCitiesMatcher ().remove (city->getName ());
-
-				load(city.get(), rows, rowIndex);
-
-				EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
+			    uid id = rows->getLongLong (TABLE_COL_ID);
+			    shared_ptr<City> city = EnvModule::getCities ().getUpdateable (id);
+			    
+			    EnvModule::getCitiesMatcher ().remove (city->getName ());
+			    
+			    load(city.get(), rows);
+			    
+			     EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
 			}
 		}
 
@@ -149,14 +150,14 @@ namespace synthese
 		void 
 			CityTableSync::rowsRemoved (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResult& rows)
+			const synthese::db::SQLiteResultSPtr& rows)
 		{
-			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-
-				EnvModule::getCitiesMatcher ().remove (EnvModule::getCities ().get (id)->getName ());
-				EnvModule::getCities ().remove (id);
+			    uid id =rows->getLongLong (TABLE_COL_ID);
+			    
+			    EnvModule::getCitiesMatcher ().remove (EnvModule::getCities ().get (id)->getName ());
+			    EnvModule::getCities ().remove (id);
 			}
 		}
 

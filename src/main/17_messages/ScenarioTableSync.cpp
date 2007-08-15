@@ -54,21 +54,21 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Scenario>::TABLE_ID = 39;
 		template<> const bool SQLiteTableSyncTemplate<Scenario>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Scenario>::load(Scenario* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Scenario>::load(Scenario* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->setName(rows.getColumn(rowId, ScenarioTableSync::COL_NAME));
-			if (Conversion::ToBool(rows.getColumn (rowId, ScenarioTableSync::COL_IS_TEMPLATE)))
+			object->setName(rows->getText ( ScenarioTableSync::COL_NAME));
+			if (rows->getBool ( ScenarioTableSync::COL_IS_TEMPLATE))
 			{
 				ScenarioTemplate* tobject = static_cast<ScenarioTemplate*>(object);
-				tobject->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+				tobject->setKey(rows->getLongLong (TABLE_COL_ID));
 			}
 			else
 			{
 				SentScenario* sobject = static_cast<SentScenario*>(object);
-				sobject->setIsEnabled(Conversion::ToBool(rows.getColumn(rowId, ScenarioTableSync::COL_ENABLED)));
-				sobject->setPeriodStart(DateTime::FromSQLTimestamp (rows.getColumn (rowId, ScenarioTableSync::COL_PERIODSTART)));
-				sobject->setPeriodEnd(DateTime::FromSQLTimestamp (rows.getColumn (rowId, ScenarioTableSync::COL_PERIODEND)));
-				sobject->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+				sobject->setIsEnabled(rows->getBool ( ScenarioTableSync::COL_ENABLED));
+				sobject->setPeriodStart(DateTime::FromSQLTimestamp (rows->getText ( ScenarioTableSync::COL_PERIODSTART)));
+				sobject->setPeriodEnd(DateTime::FromSQLTimestamp (rows->getText ( ScenarioTableSync::COL_PERIODEND)));
+				sobject->setKey(rows->getLongLong (TABLE_COL_ID));
 			}
 		}
 
@@ -144,51 +144,51 @@ namespace synthese
 			addTableIndex(cols);
 		}
 
-		void ScenarioTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void ScenarioTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
+		    while (rows->next ())
 			{
-				if (Conversion::ToBool(rows.getColumn (rowIndex, COL_IS_TEMPLATE)))
-					continue;
-
+			    if (rows->getBool (COL_IS_TEMPLATE))
+				continue;
+				
 				shared_ptr<SentScenario> scenario;
-				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+				    uid id = rows->getLongLong (TABLE_COL_ID);
 				if (MessagesModule::getScenarii().contains (id))
 				{
 					scenario = MessagesModule::getScenarii().getUpdateable(id);
-					load(scenario.get(), rows, rowIndex);
+					load(scenario.get(), rows);
 				}
 				else
 				{
 					scenario.reset(new SentScenario);
-					load(scenario.get(), rows, rowIndex);
+					load(scenario.get(), rows);
 					MessagesModule::getScenarii().add (scenario);
 				}
 			}
 		}
 
-		void ScenarioTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void ScenarioTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
+		    while (rows->next ())
 			{
-				if (Conversion::ToBool(rows.getColumn (rowIndex, COL_IS_TEMPLATE)))
+			    if (rows->getBool (COL_IS_TEMPLATE))
 					continue;
 
-				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				shared_ptr<SentScenario> alarm = MessagesModule::getScenarii().getUpdateable(id);
-				load(alarm.get(), rows, rowIndex);
+				load(alarm.get(), rows);
 			}
 		}
 
-		void ScenarioTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ScenarioTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int rowIndex=0; rowIndex<rows.getNbRows(); ++rowIndex)
-			{
-				if (Conversion::ToBool(rows.getColumn (rowIndex, COL_IS_TEMPLATE)))
+		    while (rows->next ())
+		    {
+			if (rows->getBool (COL_IS_TEMPLATE))
 					continue;
 
-				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-				MessagesModule::getScenarii().remove (id);	/// @todo Not so simple.
+			    uid id = rows->getLongLong (TABLE_COL_ID);
+			    MessagesModule::getScenarii().remove (id);	/// @todo Not so simple.
 			}
 		}
 
@@ -226,12 +226,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
 				vector<shared_ptr<SentScenario> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<SentScenario> object(new SentScenario);
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;
@@ -269,13 +269,13 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
 				vector<shared_ptr<ScenarioTemplate> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
-					shared_ptr<ScenarioTemplate> object(new ScenarioTemplate(result.getColumn(i, COL_NAME)));
-					load(object.get(), result, i);
-					objects.push_back(object);
+					shared_ptr<ScenarioTemplate> object(new ScenarioTemplate(rows->getText (COL_NAME)));
+					load (object.get(), rows);
+					objects.push_back (object);
 				}
 				return objects;
 			}
@@ -304,14 +304,17 @@ namespace synthese
 				<< "FROM " << TABLE_NAME
 				<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(key)
 				<< " LIMIT 1";
-			db::SQLiteResult rows = DBModule::GetSQLite()->execQuery(query.str());
-			if (rows.getNbRows() <= 0)
-				throw DBEmptyResultException<Scenario>(key, "ID not found in database.");
+
+			db::SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
+			if (rows->next () == false)
+			    throw DBEmptyResultException<Scenario>(key, "ID not found in database.");
+
 			boost::shared_ptr<Scenario> object(
-				Conversion::ToBool(rows.getColumn (0, ScenarioTableSync::COL_IS_TEMPLATE))
-				? static_cast<Scenario*>(new ScenarioTemplate(rows.getColumn (0, ScenarioTableSync::COL_NAME)))
-				: static_cast<Scenario*>(new SentScenario)
-				);
+			    rows->getBool (ScenarioTableSync::COL_IS_TEMPLATE)
+			    ? static_cast<Scenario*>(new ScenarioTemplate(rows->getText (ScenarioTableSync::COL_NAME)))
+			    : static_cast<Scenario*>(new SentScenario)
+			    );
+
 			load(object.get(), rows);
 			return object;
 		}

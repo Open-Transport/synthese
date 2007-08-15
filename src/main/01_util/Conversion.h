@@ -83,6 +83,7 @@ namespace synthese
 			static std::string ToString (long long l);
 			static std::string ToString (unsigned long long l);
 
+			static std::string ToString (long l);
 			static std::string ToString (unsigned long l);
 
 			static std::string ToString (double d);

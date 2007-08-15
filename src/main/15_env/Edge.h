@@ -92,8 +92,7 @@ namespace synthese
 			int _departureIndex[24];	//!< First line service index by departure hour of day
 			int _arrivalIndex[24];		//!< First line service index by arrival hour of day
 
-//			mutable bool _departureIndexUpdateNeeded;
-//			mutable bool _arrivalIndexUpdateNeeded;
+			mutable bool _serviceIndexUpdateNeeded;
 
 		protected:
 			Edge (bool isDeparture = true, bool isArrival = true,
@@ -217,6 +216,9 @@ namespace synthese
 				void clearViaPoints ();
 				void addViaPoint (const geometry::Point2D& viaPoint);
 			    
+				void markServiceIndexUpdateNeeded();
+		private:
+				
 				void updateServiceIndex();
 			//@}
 	    

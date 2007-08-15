@@ -42,12 +42,13 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Interface>::TABLE_ID = 24;
 		template<> const bool SQLiteTableSyncTemplate<Interface>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Interface>::load(Interface* interf, const db::SQLiteResult& rows, int rowId)
+		template<> void SQLiteTableSyncTemplate<Interface>::load(Interface* interf, const db::SQLiteResultSPtr& rows)
 		{
-			interf->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			interf->setNoSessionDefaultPageCode(rows.getColumn(rowId, InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE));
-			interf->setName(rows.getColumn(rowId, InterfaceTableSync::TABLE_COL_NAME));
+			interf->setKey(rows->getLongLong ( TABLE_COL_ID));
+			interf->setNoSessionDefaultPageCode(rows->getText ( InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE));
+			interf->setName(rows->getText ( InterfaceTableSync::TABLE_COL_NAME));
 		}
+
 
 		template<> void SQLiteTableSyncTemplate<Interface>::save(Interface* interf)
 		{
@@ -69,23 +70,23 @@ namespace synthese
 		}
 
 
-		void InterfaceTableSync::rowsUpdated( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void InterfaceTableSync::rowsUpdated( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
 		}
 
 
-		void InterfaceTableSync::rowsAdded( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows, bool isFirstSync )
+		void InterfaceTableSync::rowsAdded( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows, bool isFirstSync )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				shared_ptr<Interface> obj(new Interface(Conversion::ToLongLong(rows.getColumn(i,TABLE_COL_ID))));
-				load(obj.get(), rows, i);
+			    shared_ptr<Interface> obj(new Interface(rows->getLongLong (TABLE_COL_ID)));
+				load(obj.get(), rows);
 				InterfaceModule::getInterfaces().add(obj);
 			}
 		}
 
 
-		void InterfaceTableSync::rowsRemoved( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResult& rows )
+		void InterfaceTableSync::rowsRemoved( SQLiteQueueThreadExec* sqlite,  SQLiteSync* sync, const SQLiteResultSPtr& rows )
 		{
 		}
 	}

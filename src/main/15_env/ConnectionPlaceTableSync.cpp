@@ -49,16 +49,19 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<ConnectionPlace>::TABLE_ID = 7;
 		template<> const bool SQLiteTableSyncTemplate<ConnectionPlace>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ConnectionPlace>::load(ConnectionPlace* cp, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<ConnectionPlace>::load(ConnectionPlace* cp, const db::SQLiteResultSPtr& rows )
 		{
-			uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
-			std::string name (	rows.getColumn (rowIndex, ConnectionPlaceTableSync::TABLE_COL_NAME));
-			uid cityId (Conversion::ToLongLong (rows.getColumn (rowIndex, ConnectionPlaceTableSync::TABLE_COL_CITYID)));
+			uid id (rows->getLongLong (TABLE_COL_ID));
+			std::string name (rows->getText (ConnectionPlaceTableSync::TABLE_COL_NAME));
+			uid cityId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_CITYID));
+			
 			ConnectionPlace::ConnectionType connectionType = 
-				(ConnectionPlace::ConnectionType) Conversion::ToInt (rows.getColumn (rowIndex, ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE));
-			int defaultTransferDelay (	Conversion::ToInt (rows.getColumn (rowIndex, ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY)));
-			std::string transferDelaysStr (	rows.getColumn (rowIndex, ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS));
-			uid alarmId (Conversion::ToLongLong (rows.getColumn (rowIndex, ConnectionPlaceTableSync::TABLE_COL_ALARMID)));
+			    (ConnectionPlace::ConnectionType) rows->getInt (ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE);
+			
+			int defaultTransferDelay (rows->getInt (ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY));
+			
+			std::string transferDelaysStr (rows->getText (ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS));
+			uid alarmId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_ALARMID));
 
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
@@ -126,36 +129,38 @@ namespace synthese
 		void 
 			ConnectionPlaceTableSync::rowsAdded (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResult& rows, bool isFirstSync)
+			const synthese::db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
+			while (rows->next ())
 			{
-				uid id (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+			    uid id (rows->getLongLong (TABLE_COL_ID));
+			    
+			    if (EnvModule::getConnectionPlaces ().contains (id)) return;
+			    
+			    std::string name (rows->getText (TABLE_COL_NAME));
+			    uid cityId (rows->getLongLong (TABLE_COL_CITYID));
+			    ConnectionPlace::ConnectionType connectionType = (ConnectionPlace::ConnectionType)
+				rows->getInt (TABLE_COL_CONNECTIONTYPE);
+			    
+			    bool isCityMainConnection (	rows->getBool (TABLE_COL_ISCITYMAINCONNECTION));
+			    
+			    int defaultTransferDelay (	rows->getInt (TABLE_COL_DEFAULTTRANSFERDELAY));
+			    std::string transferDelaysStr (rows->getText (TABLE_COL_TRANSFERDELAYS));
+			    uid alarmId (rows->getLongLong (TABLE_COL_ALARMID));
 
-				if (EnvModule::getConnectionPlaces ().contains (id)) return;
+			    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+			    
+			    shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cityId);
+			    shared_ptr<ConnectionPlace> cp(
+				new synthese::env::ConnectionPlace (
+				    id, name, city.get(), connectionType, defaultTransferDelay))
+				;
 
-				std::string name (rows.getColumn (rowIndex, TABLE_COL_NAME));
-				uid cityId (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_CITYID)));
-				ConnectionPlace::ConnectionType connectionType = (ConnectionPlace::ConnectionType)
-				Conversion::ToInt (rows.getColumn (rowIndex, TABLE_COL_CONNECTIONTYPE));
-				bool isCityMainConnection (	Conversion::ToBool (rows.getColumn (rowIndex, TABLE_COL_ISCITYMAINCONNECTION)));
-				int defaultTransferDelay (	Conversion::ToInt (rows.getColumn (rowIndex, TABLE_COL_DEFAULTTRANSFERDELAY)));
-				std::string transferDelaysStr (	rows.getColumn (rowIndex, TABLE_COL_TRANSFERDELAYS));
-				uid alarmId (Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ALARMID)));
-
-				typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-
-				shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cityId);
-				shared_ptr<ConnectionPlace> cp(
-					new synthese::env::ConnectionPlace (
-										id, name, city.get(), connectionType, defaultTransferDelay))
-					;
-
-				boost::char_separator<char> sep1 (",");
-				boost::char_separator<char> sep2 (":");
-				tokenizer tripletTokens (transferDelaysStr, sep1);
-				for (tokenizer::iterator tripletIter = tripletTokens.begin();
-					tripletIter != tripletTokens.end (); ++tripletIter)
+			    boost::char_separator<char> sep1 (",");
+			    boost::char_separator<char> sep2 (":");
+			    tokenizer tripletTokens (transferDelaysStr, sep1);
+			    for (tokenizer::iterator tripletIter = tripletTokens.begin();
+				 tripletIter != tripletTokens.end (); ++tripletIter)
 				{
 					tokenizer valueTokens (*tripletIter, sep2);
 					tokenizer::iterator valueIter = valueTokens.begin();
@@ -183,16 +188,17 @@ namespace synthese
 		void 
 			ConnectionPlaceTableSync::rowsUpdated (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResult& rows)
+			const synthese::db::SQLiteResultSPtr& rows)
 		{
-			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
+			while (rows->next ())
 			{
-				shared_ptr<ConnectionPlace> cp = EnvModule::getConnectionPlaces().getUpdateable(Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID)));
+				shared_ptr<ConnectionPlace> cp = EnvModule::getConnectionPlaces().getUpdateable(
+				    rows->getLongLong (TABLE_COL_ID));
+				
 				shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cp->getCity ()->getKey ());
 				city->getConnectionPlacesMatcher ().remove (cp->getName ());
-
-				load(cp.get(), rows, rowIndex);
-
+				
+				load(cp.get(), rows);
 				city->getConnectionPlacesMatcher ().add (cp->getName (), cp.get());
 			}
 		}
@@ -204,21 +210,21 @@ namespace synthese
 		void 
 			ConnectionPlaceTableSync::rowsRemoved (synthese::db::SQLiteQueueThreadExec* sqlite, 
 			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResult& rows)
+			const synthese::db::SQLiteResultSPtr& rows)
 		{
-			for (int rowIndex=0; rowIndex<rows.getNbRows (); ++rowIndex)
+			while (rows->next ())
 			{
 				// TODO not finished...
-				uid id = Conversion::ToLongLong (rows.getColumn (rowIndex, TABLE_COL_ID));
-
-				shared_ptr<const ConnectionPlace> cp = EnvModule::getConnectionPlaces ().get (id);
-				shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cp->getCity ()->getKey ());
-				city->getConnectionPlacesMatcher ().remove (cp->getName ());
-
-				EnvModule::getConnectionPlaces ().remove (id);
+			    uid id = rows->getLongLong (TABLE_COL_ID);
+			    
+			    shared_ptr<const ConnectionPlace> cp = EnvModule::getConnectionPlaces ().get (id);
+			    shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cp->getCity ()->getKey ());
+			    city->getConnectionPlacesMatcher ().remove (cp->getName ());
+			    
+			    EnvModule::getConnectionPlaces ().remove (id);
 			}
 		}
-
+	    
 
 	}
 }

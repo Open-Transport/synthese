@@ -48,11 +48,11 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Fare>::TABLE_ID = 8;
 		template<> const bool SQLiteTableSyncTemplate<Fare>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Fare>::load(Fare* fare, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Fare>::load(Fare* fare, const db::SQLiteResultSPtr& rows )
 		{
-			fare->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
-			fare->setName (rows.getColumn (rowIndex, FareTableSync::COL_NAME));
-			fare->setType ((synthese::env::Fare::FareType) Conversion::ToInt (rows.getColumn (rowIndex, FareTableSync::COL_FARETYPE)));
+			fare->setKey(rows->getLongLong (TABLE_COL_ID));
+			fare->setName (rows->getText (FareTableSync::COL_NAME));
+			fare->setType ((synthese::env::Fare::FareType) rows->getInt (FareTableSync::COL_FARETYPE));
 		}
 
 		template<> void SQLiteTableSyncTemplate<Fare>::save(Fare* object)
@@ -93,34 +93,34 @@ namespace synthese
 			addTableColumn (COL_FARETYPE, "INTEGER", true);
 		}
 
-		void FareTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void FareTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				shared_ptr<Fare> object(new Fare());
-				load(object.get(), rows, i);
+				load(object.get(), rows);
 				EnvModule::getFares().add(object);
 			}
 		}
 
-		void FareTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void FareTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getFares().contains(id))
 				{
 					shared_ptr<Fare> object = EnvModule::getFares().getUpdateable(id);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 				}
 			}
 		}
 
-		void FareTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void FareTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getFares().contains(id))
 				{
 					EnvModule::getFares().remove(id);
@@ -146,12 +146,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<Fare> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<Fare> object(new Fare());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

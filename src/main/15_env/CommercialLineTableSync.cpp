@@ -53,20 +53,20 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<CommercialLine>::TABLE_ID = 42;
 		template<> const bool SQLiteTableSyncTemplate<CommercialLine>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<CommercialLine>::load(CommercialLine* object, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<CommercialLine>::load(CommercialLine* object, const db::SQLiteResultSPtr& rows )
 		{
-		    object->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
+		    object->setKey(rows->getLongLong (TABLE_COL_ID));
 
 		    boost::shared_ptr<const TransportNetwork> tn = 
-			EnvModule::getTransportNetworks ().get (Conversion::ToLongLong(rows.getColumn(rowId, CommercialLineTableSync::COL_NETWORK_ID)));
+			EnvModule::getTransportNetworks ().get (rows->getLongLong ( CommercialLineTableSync::COL_NETWORK_ID));
 		    
 		    object->setNetwork (tn.get ());
-		    object->setName(rows.getColumn(rowId, CommercialLineTableSync::COL_NAME));
-		    object->setShortName(rows.getColumn(rowId, CommercialLineTableSync::COL_SHORT_NAME));
-		    object->setLongName(rows.getColumn(rowId, CommercialLineTableSync::COL_LONG_NAME));
-		    object->setColor(RGBColor(rows.getColumn(rowId, CommercialLineTableSync::COL_COLOR)));
-		    object->setStyle(rows.getColumn(rowId, CommercialLineTableSync::COL_STYLE));
-		    object->setImage(rows.getColumn(rowId, CommercialLineTableSync::COL_IMAGE));
+		    object->setName(rows->getText ( CommercialLineTableSync::COL_NAME));
+		    object->setShortName(rows->getText ( CommercialLineTableSync::COL_SHORT_NAME));
+		    object->setLongName(rows->getText ( CommercialLineTableSync::COL_LONG_NAME));
+		    object->setColor(RGBColor(rows->getText ( CommercialLineTableSync::COL_COLOR)));
+		    object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
+		    object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
 		}
 
 		template<> void SQLiteTableSyncTemplate<CommercialLine>::save(CommercialLine* object)
@@ -117,30 +117,30 @@ namespace synthese
 			addTableColumn(COL_IMAGE, "TEXT", false);
 		}
 
-		void CommercialLineTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void CommercialLineTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
 				shared_ptr<CommercialLine> object(new CommercialLine());
-				load(object.get(), rows, i);
+				load(object.get(), rows);
 				EnvModule::getCommercialLines().add(object);
 			}
 		}
 
-		void CommercialLineTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void CommercialLineTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				shared_ptr<CommercialLine> object=EnvModule::getCommercialLines().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
-				load(object.get(), rows, i);
+				shared_ptr<CommercialLine> object=EnvModule::getCommercialLines().getUpdateable(rows->getLongLong (TABLE_COL_ID));
+				load(object.get(), rows);
 			}
 		}
 
-		void CommercialLineTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void CommercialLineTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				EnvModule::getCommercialLines().remove(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+				EnvModule::getCommercialLines().remove(rows->getLongLong (TABLE_COL_ID));
 			}
 		}
 
@@ -176,12 +176,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<CommercialLine> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<CommercialLine> object(new CommercialLine());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;
@@ -219,12 +219,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<CommercialLine> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<CommercialLine> object(new CommercialLine());
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

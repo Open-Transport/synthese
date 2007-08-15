@@ -91,6 +91,7 @@ namespace synthese
 				throw Exception ("Service number " + Conversion::ToString (service->getServiceNumber ())
 						+ " is already defined in path " + Conversion::ToString (getId ()));
 			}
+			markScheduleIndexesUpdateNeeded ();
 		}
 
 
@@ -99,6 +100,9 @@ namespace synthese
 		Path::removeService (Service* service)
 		{
 			// TODO 
+
+
+			markScheduleIndexesUpdateNeeded ();
 
 		}
 
@@ -257,11 +261,14 @@ namespace synthese
 			return _calendar;
 		}
 
-		void Path::updateScheduleIndexes()
-		{
-			for (Edges::const_iterator it = _edges.begin(); it != _edges.end(); ++it)
-				(*it)->updateServiceIndex();
-		}
+
+
+	    void 
+	    Path::markScheduleIndexesUpdateNeeded()
+	    {
+		for (Edges::const_iterator it = _edges.begin(); it != _edges.end(); ++it)
+		    (*it)->markServiceIndexUpdateNeeded ();
+	    }
 
 		void Path::setAllDays( bool value )
 		{

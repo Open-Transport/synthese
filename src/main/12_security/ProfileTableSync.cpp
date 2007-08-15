@@ -1,4 +1,3 @@
-
 /** ProfileTableSync class implementation.
 	@file ProfileTableSync.cpp
 
@@ -20,24 +19,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
-#include <boost/tokenizer.hpp>
+#include "12_security/ProfileTableSync.h"
+#include "12_security/SecurityModule.h"
+#include "12_security/UserTableSyncException.h"
+#include "12_security/Right.h"
+#include "12_security/Profile.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
-#include "12_security/SecurityModule.h"
-#include "12_security/ProfileTableSync.h"
-#include "12_security/UserTableSyncException.h"
-#include "12_security/Right.h"
-#include "12_security/Profile.h"
-
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
 #include "01_util/Factory.h"
+
+#include <sstream>
+
+#include <boost/tokenizer.hpp>
+
 
 using namespace std;
 using boost::shared_ptr;
@@ -54,12 +54,12 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Profile>::TABLE_ID = 27;
 		template<> const bool SQLiteTableSyncTemplate<Profile>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Profile>::load(Profile* profile, const db::SQLiteResult& rows, int rowId/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<Profile>::load(Profile* profile, const db::SQLiteResultSPtr& rows )
 		{
-			profile->setKey(Conversion::ToLongLong(rows.getColumn(rowId, TABLE_COL_ID)));
-			profile->setName(rows.getColumn(rowId, ProfileTableSync::TABLE_COL_NAME));
-			profile->setParent(Conversion::ToLongLong(rows.getColumn(rowId, ProfileTableSync::TABLE_COL_PARENT_ID)));
-			ProfileTableSync::setRightsFromString(profile, rows.getColumn(rowId, ProfileTableSync::TABLE_COL_RIGHTS_STRING));
+			profile->setKey(rows->getLongLong (TABLE_COL_ID));
+			profile->setName(rows->getText ( ProfileTableSync::TABLE_COL_NAME));
+			profile->setParent(rows->getLongLong ( ProfileTableSync::TABLE_COL_PARENT_ID));
+			ProfileTableSync::setRightsFromString(profile, rows->getText ( ProfileTableSync::TABLE_COL_RIGHTS_STRING));
 		}
 
 		template<> void SQLiteTableSyncTemplate<Profile>::save(Profile* profile )
@@ -113,41 +113,42 @@ namespace synthese
 			addTableColumn(TABLE_COL_RIGHTS_STRING, "TEXT", true);
 		}
 
-		void ProfileTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool isFirstSync)
+		void ProfileTableSync::rowsAdded( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
-			for (int i = 0; i < rows.getNbRows(); ++i)
+		    while (rows->next ())
+		    {
+			if (SecurityModule::getProfiles().contains(rows->getLongLong (TABLE_COL_ID)))
 			{
-				if (SecurityModule::getProfiles().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+			    load(SecurityModule::getProfiles().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
+			}
+			else
+			{
+			    shared_ptr<Profile> profile(new Profile(rows->getLongLong (TABLE_COL_ID)));
+			    load(profile.get(), rows);
+			    SecurityModule::getProfiles().add(profile);
+			}
+		    }
+		}
+
+
+		void ProfileTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
+		{
+			while (rows->next ())
+			{
+				if (SecurityModule::getProfiles().contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load(SecurityModule::getProfiles().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
-				}
-				else
-				{
-					shared_ptr<Profile> profile(new Profile(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))));
-					load(profile.get(), rows, i);
-					SecurityModule::getProfiles().add(profile);
+					load(SecurityModule::getProfiles().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
 				}
 			}
 		}
 
-		void ProfileTableSync::rowsUpdated( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void ProfileTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i = 0; i < rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				if (SecurityModule::getProfiles().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
+				if (SecurityModule::getProfiles().contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load(SecurityModule::getProfiles().getUpdateable(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))).get(), rows, i);
-				}
-			}
-		}
-
-		void ProfileTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
-		{
-			for (int i = 0; i < rows.getNbRows(); ++i)
-			{
-				if (SecurityModule::getProfiles().contains(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID))))
-				{
-					SecurityModule::getProfiles().remove(Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID)));
+					SecurityModule::getProfiles().remove(rows->getLongLong (TABLE_COL_ID));
 				}
 			}
 		}
@@ -181,12 +182,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<Profile> > profiles;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<Profile> profile(new Profile);
-					load(profile.get(), result, i);
+					load(profile.get(), rows);
 					profiles.push_back(profile);
 				}
 				return profiles;
@@ -215,12 +216,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = sqlite->execQuery(query.str());
+				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				vector<shared_ptr<Profile> > profiles;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<Profile> profile(new Profile);
-					load(profile.get(), result, i);
+					load(profile.get(), rows);
 					profiles.push_back(profile);
 				}
 				return profiles;

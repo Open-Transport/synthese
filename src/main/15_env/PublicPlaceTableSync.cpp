@@ -55,13 +55,11 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<PublicPlace>::TABLE_ID = 13;
 		template<> const bool SQLiteTableSyncTemplate<PublicPlace>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<PublicPlace>::load(PublicPlace* object, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<PublicPlace>::load(PublicPlace* object, const db::SQLiteResultSPtr& rows )
 		{
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
-			std::string name (
-				rows.getColumn (rowIndex, PublicPlaceTableSync::COL_NAME));
-			uid cityId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, PublicPlaceTableSync::COL_CITYID)));
+		    object->setKey (rows->getLongLong (TABLE_COL_ID));
+		    std::string name (rows->getText (PublicPlaceTableSync::COL_NAME));
+		    uid cityId (rows->getLongLong (PublicPlaceTableSync::COL_CITYID));
 
 			shared_ptr<const City> city = EnvModule::getCities ().get(cityId);
 
@@ -69,7 +67,8 @@ namespace synthese
 			object->setCity(city.get());
 		}
 
-		template<> void SQLiteTableSyncTemplate<PublicPlace>::save(PublicPlace* object)
+
+		template<> void SQLiteTableSyncTemplate<PublicPlace>::save (PublicPlace* object)
 		{
 			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -99,53 +98,53 @@ namespace synthese
 			addTableColumn (COL_CITYID, "INTEGER", false);
 		}
 
-		void PublicPlaceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool)
+		void PublicPlaceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getPublicPlaces().contains(id))
 				{
 					shared_ptr<PublicPlace> pp = EnvModule::getPublicPlaces ().getUpdateable (id);
 					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (pp->getCity ()->getKey ());
 					city->getPublicPlacesMatcher ().remove (pp->getName ());
 
-					load(EnvModule::getPublicPlaces().getUpdateable(id).get(), rows, i);
+					load(EnvModule::getPublicPlaces().getUpdateable(id).get(), rows);
 
 					city->getPublicPlacesMatcher ().add (pp->getName (), pp.get());
 				}
 				else
 				{
 					shared_ptr<PublicPlace> object(new PublicPlace);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 					EnvModule::getPublicPlaces().add(object);
 				}
 			}
 		}
 		
-		void PublicPlaceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void PublicPlaceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getPublicPlaces().contains(id))
 				{
 					shared_ptr<PublicPlace> pp = EnvModule::getPublicPlaces ().getUpdateable (id);
 					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (pp->getCity ()->getKey ());
 					city->getPublicPlacesMatcher ().remove (pp->getName ());
 
-					load(EnvModule::getPublicPlaces().getUpdateable(id).get(), rows, i);
+					load(EnvModule::getPublicPlaces().getUpdateable(id).get(), rows);
 
 					city->getPublicPlacesMatcher ().add (pp->getName (), pp.get());
 				}
 			}
 		}
 
-		void PublicPlaceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void PublicPlaceTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getPublicPlaces().contains(id))
 				{
 					shared_ptr<const PublicPlace> pp = EnvModule::getPublicPlaces ().get (id);
@@ -177,12 +176,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
 				vector<shared_ptr<PublicPlace> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<PublicPlace> object(new PublicPlace);
-					load(object.get(), result, i);
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;

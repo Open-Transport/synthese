@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include "01_util/Thread.h"
+#include "01_util/threads/Thread.h"
 
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteSync.h"

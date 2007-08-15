@@ -1,10 +1,9 @@
 #ifndef SYNTHESE_DBRING_NODE_H
 #define SYNTHESE_DBRING_NODE_H
 
-#include "01_util/ThreadExec.h"
+#include "01_util/threads/ThreadExec.h"
 
 #include "02_db/SQLiteHandle.h"
-#include "02_db/SQLiteResult.h"
 
 #include "03_db_ring/RingNode.h"
 #include "03_db_ring/UpdateLog.h"
@@ -81,8 +80,11 @@ public:
     */
     bool canWrite () const;
 
-    db::SQLiteResult execQuery (const std::string& sql);
-    void execUpdate (const std::string& sql, bool asynchronous = false); 
+    db::SQLiteResultSPtr execQuery (const db::SQLiteStatementSPtr& statement, bool lazy = true);
+    db::SQLiteResultSPtr execQuery (const db::SQLData& sql, bool lazy = true) ;
+
+    void execUpdate (const db::SQLiteStatementSPtr& statement, bool asynchronous = false) ;
+    void execUpdate (const db::SQLData& sql, bool asynchronous = false); 
 
     void initialize ();
     void loop ();
@@ -96,8 +98,6 @@ public:
     void dump ();
 
 private:
-
-    bool earlyCompileUpdate (const std::string& sql);
 
     bool isMasterAuthority () const;
     

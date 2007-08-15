@@ -53,16 +53,16 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<PlaceAlias>::TABLE_ID = 11;
 		template<> const bool SQLiteTableSyncTemplate<PlaceAlias>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<PlaceAlias>::load(PlaceAlias* object, const db::SQLiteResult& rows, int rowIndex/*=0*/ )
+		template<> void SQLiteTableSyncTemplate<PlaceAlias>::load(PlaceAlias* object, const db::SQLiteResultSPtr& rows )
 		{
 
 			uid aliasedPlaceId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, PlaceAliasTableSync::COL_ALIASEDPLACEID)));
+				rows->getLongLong (PlaceAliasTableSync::COL_ALIASEDPLACEID));
 			uid cityId (
-				Conversion::ToLongLong (rows.getColumn (rowIndex, PlaceAliasTableSync::COL_CITYID)));
+				rows->getLongLong (PlaceAliasTableSync::COL_CITYID));
 
-			object->setKey(Conversion::ToLongLong(rows.getColumn(rowIndex, TABLE_COL_ID)));
-			object->setName (rows.getColumn (rowIndex, PlaceAliasTableSync::COL_NAME));
+			object->setKey (rows->getLongLong (TABLE_COL_ID));
+			object->setName (rows->getText (PlaceAliasTableSync::COL_NAME));
 			object->setCity(EnvModule::getCities ().get (cityId).get());
 			object->setAliasedPlace(EnvModule::fetchPlace (aliasedPlaceId).get());
 
@@ -102,28 +102,26 @@ namespace synthese
 			addTableColumn (COL_ISCITYMAINCONNECTION, "BOOLEAN", false);
 		}
 
-		void PlaceAliasTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows, bool)
+		void PlaceAliasTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getPlaceAliases().contains(id))
 				{
-					load(EnvModule::getPlaceAliases().getUpdateable(id).get(), rows, i);
+					load(EnvModule::getPlaceAliases().getUpdateable(id).get(), rows);
 				}
 				else
 				{
 					shared_ptr<PlaceAlias> object(new PlaceAlias);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 					EnvModule::getPlaceAliases().add(object);
 
-					uid cityId (
-						Conversion::ToLongLong (rows.getColumn (i, COL_CITYID)));
-
+					uid cityId (rows->getLongLong (COL_CITYID));
+					
 					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cityId);
 
-					bool isCityMainConnection (
-						Conversion::ToBool (rows.getColumn (i, COL_ISCITYMAINCONNECTION)));
+					bool isCityMainConnection (rows->getBool ( COL_ISCITYMAINCONNECTION));
 
 					if (isCityMainConnection)
 					{
@@ -135,15 +133,15 @@ namespace synthese
 			}
 		}
 		
-		void PlaceAliasTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows)
+		void PlaceAliasTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getPlaceAliases().contains(id))
 				{
 					shared_ptr<PlaceAlias> object = EnvModule::getPlaceAliases().getUpdateable(id);
-					load(object.get(), rows, i);
+					load(object.get(), rows);
 
 					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (object->getCity ()->getKey ());
 					city->getPlaceAliasesMatcher ().add (object->getName (), object.get());
@@ -152,11 +150,11 @@ namespace synthese
 			}
 		}
 
-		void PlaceAliasTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResult& rows )
+		void PlaceAliasTableSync::rowsRemoved( db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows )
 		{
-			for (int i=0; i<rows.getNbRows(); ++i)
+			while (rows->next ())
 			{
-				uid id = Conversion::ToLongLong(rows.getColumn(i, TABLE_COL_ID));
+				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (EnvModule::getPlaceAliases().contains(id))
 				{
 					shared_ptr<const PlaceAlias> pa = EnvModule::getPlaceAliases ().get(id);
@@ -188,12 +186,12 @@ namespace synthese
 
 			try
 			{
-				SQLiteResult result = DBModule::GetSQLite()->execQuery(query.str());
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
 				vector<shared_ptr<PlaceAlias> > objects;
-				for (int i = 0; i < result.getNbRows(); ++i)
+				while (rows->next ())
 				{
 					shared_ptr<PlaceAlias> object(new PlaceAlias);
-					load(object.get(), result, i);
+					load (object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;
