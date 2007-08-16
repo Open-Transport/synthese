@@ -305,6 +305,18 @@
 				Name="Interface Pages"
 				>
 			</Filter>
+			<Filter
+				Name="Library"
+				>
+				<File
+					RelativePath=".\UserNameInterfaceElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\UserNameInterfaceElement.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\Constants.h"

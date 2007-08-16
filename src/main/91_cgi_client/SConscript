@@ -2,7 +2,7 @@
 
 Import ('env')
 
-modules = ['30_server', '05_html', '04_time', '02_db', '01_util', '00_tcp'];
+modules = ['30_server', '05_html', '04_time', '02_db', '01_util__threads', '01_util', '00_tcp'];
 
 
 syntheseenv = env.SyntheseEnv (modules)

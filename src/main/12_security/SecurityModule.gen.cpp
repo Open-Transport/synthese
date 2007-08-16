@@ -4,6 +4,8 @@ synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::securi
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::security::ProfileTableSync>("12.01 Profile");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::security::UserTableSync>("12.02 User");
 
+synthese::security::UserNameInterfaceElement::integrate();
+
 synthese::security::UsersAdmin::integrate();
 synthese::security::UserAdmin::integrate();
 synthese::security::ProfilesAdmin::integrate();

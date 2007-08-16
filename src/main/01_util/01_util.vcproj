@@ -189,50 +189,6 @@
 					>
 				</File>
 			</Filter>
-			<Filter
-				Name="Thread"
-				>
-				<File
-					RelativePath=".\ManagedThread.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ManagedThread.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Thread.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Thread.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ThreadExec.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ThreadExec.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ThreadGroup.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ThreadGroup.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ThreadManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ThreadManager.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Exceptions"
@@ -250,14 +206,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ThreadException.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ThreadException.h"
-				>
-			</File>
-			<File
 				RelativePath=".\XmlException.cpp"
 				>
 			</File>
@@ -265,6 +213,82 @@
 				RelativePath=".\XmlException.h"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Modules"
+			>
+			<Filter
+				Name="threads"
+				>
+				<File
+					RelativePath=".\threads\ManagedThread.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\ManagedThread.h"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\SConscript"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\Thread.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\Thread.h"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\ThreadException.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\ThreadException.h"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\ThreadExec.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\ThreadExec.h"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\ThreadGroup.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\ThreadGroup.h"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\ThreadManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\threads\ThreadManager.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="iostreams"
+				>
+				<File
+					RelativePath=".\iostreams\Compression.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\iostreams\Compression.h"
+					>
+				</File>
+				<File
+					RelativePath=".\iostreams\SConscript"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\Constants.h"

@@ -1,6 +1,4 @@
 BEGIN TRANSACTION;
-DELETE FROM t000_environments;
-INSERT INTO t000_environments VALUES(1,'Test environment 1');
 
 DELETE FROM t004_axes;
 INSERT INTO t004_axes VALUES(1125899906844436,'Test axis 1, non free, allowed',0,1);
@@ -11,9 +9,9 @@ INSERT INTO t004_axes VALUES(1125899906844502,'Test axis 4, non free, non allowe
 DELETE FROM t005_service_dates;
 
 DELETE FROM t006_cities;
-INSERT INTO t006_cities VALUES(1688849860508968,'City68');
-INSERT INTO t006_cities VALUES(1688849860509006,'City6');
-INSERT INTO t006_cities VALUES(1688849860509012,'City12');
+INSERT INTO t006_cities(id,name) VALUES(1688849860508968,'City68');
+INSERT INTO t006_cities(id,name) VALUES(1688849860509006,'City6');
+INSERT INTO t006_cities(id,name) VALUES(1688849860509012,'City12');
 
 DELETE FROM t007_connection_places;
 DELETE FROM t012_physical_stops;

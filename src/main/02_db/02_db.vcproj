@@ -82,15 +82,43 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DbResult.h"
-				>
-			</File>
-			<File
 				RelativePath=".\SQLite.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\SQLite.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteCachedResult.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteCachedResult.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteDummyResult.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteDummyResult.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteHandle.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteHandle.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteLazyResult.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteLazyResult.h"
 				>
 			</File>
 			<File
@@ -107,6 +135,14 @@
 			</File>
 			<File
 				RelativePath=".\SQLiteResult.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteStatement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteStatement.h"
 				>
 			</File>
 			<File
@@ -138,15 +174,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SQLiteThreadExec.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SQLiteThreadExec.h"
-				>
-			</File>
-			<File
 				RelativePath=".\SQLiteUpdateHook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteValue.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteValue.h"
 				>
 			</File>
 		</Filter>

@@ -112,10 +112,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\module.h"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
