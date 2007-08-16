@@ -2,7 +2,6 @@
 
 #include "01_util/Conversion.h"
 
-#include "sqlite3.h"
 #include "SQLiteException.h"
 
 #include <iomanip>

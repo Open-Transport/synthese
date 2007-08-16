@@ -3,7 +3,7 @@
 
 
 #include "02_db/SQLiteValue.h"
-#include <sqlite3.h>
+#include <sqlite/sqlite3.h>
 
 
 #include <boost/shared_ptr.hpp>

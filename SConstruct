@@ -109,16 +109,16 @@ def CopyFiles (env, dest, files, recursive = False, onlyIfDifferent = True):
 
 
 def DefaultModuleName ( env ):
-  prefix = 'src/main/'
+  prefix = 'src' + os.sep + 'main' + os.sep  # be careful with / and os.path.separator when doing string find!!!
   mn = env.Dir('.').srcnode ().abspath
-  mn = mn[mn.rfind (prefix) + len(prefix):].replace('/', '__')
+  mn = mn[mn.rfind (prefix) + len(prefix):].replace(os.sep, '__')
   return mn
 
 
 def DefaultTestModuleName ( env, dir = '.' ):
   prefix = 'src/test/'
   mn = env.Dir('.').srcnode ().abspath
-  mn = mn[mn.rfind (prefix) + len(prefix):].replace('/', '__')
+  mn = mn[mn.rfind (prefix) + len(prefix):].replace(os.sep, '__')
   return mn + '_test'
 
 
@@ -272,13 +272,11 @@ def AppendMultithreadConf (env):
 def AddModuleDependency (env, modulename):
     env.Append ( MODULES = [modulename] )  
     env.Append ( LIBS = [modulename] )
-    #lp = '../../../main/' + modulename.replace ('__', '/')
-    lp = Dir('#' + buildmain).abspath + '/' + modulename.replace ('__', '/')
-
+    lp = Dir('#' + buildmain).abspath + '/' + modulename.replace ('__', os.sep)
     env.Append ( LIBPATH = [lp] )  
       
     
-    # print '*** ', Dir('../../main').abspath + '/' + modulename.replace ('.', '/')
+    # print '*** ', Dir('../../main').abspath + '/' + modulename.replace ('.', os.sep)
     #env.Append ( LIBPATH = [Dir(buildmain).abspath + '/' + modulename.replace ('.', '/')] )  
     #env.Append ( LIBPATH = [buildmain + '/' + modulename.replace ('.', '/')] )  
     #libdir = Dir('src/main').abspath + '/' + modulename
@@ -458,7 +456,7 @@ def SyntheseBuild (env, binname, generatemain = True):
       tmpinc = open (tempfile.gettempdir () + '/includes.cpp.inc', "w" )
 
       for module in reversed (modules):
-        moduledir = os.path.join (env.Dir ('..').srcnode ().abspath, module.replace ('__', '/'))
+        moduledir = os.path.join (env.Dir ('..').srcnode ().abspath, module.replace ('__', os.sep))
         for file in os.listdir (moduledir) :
           if fnmatch.fnmatch (file, '*.gen.cpp') :
             fragmentfile = os.path.join (moduledir, file)

@@ -89,8 +89,8 @@ namespace synthese
 
 			std::vector<const geometry::Point2D*> _viaPoints;				//!< Intermediate points along the edge (for map drawing)
 
-			int _departureIndex[24];	//!< First line service index by departure hour of day
-			int _arrivalIndex[24];		//!< First line service index by arrival hour of day
+			mutable int _departureIndex[24];	//!< First line service index by departure hour of day
+			mutable int _arrivalIndex[24];		//!< First line service index by arrival hour of day
 
 			mutable bool _serviceIndexUpdateNeeded;
 
@@ -219,7 +219,7 @@ namespace synthese
 				void markServiceIndexUpdateNeeded();
 		private:
 				
-				void updateServiceIndex();
+				void updateServiceIndex () const;
 			//@}
 	    
 		};

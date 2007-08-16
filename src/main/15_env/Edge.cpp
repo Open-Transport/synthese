@@ -387,7 +387,7 @@ namespace synthese
 
 
 
-		void Edge::updateServiceIndex()
+		void Edge::updateServiceIndex() const
 		{
 			int numHour;
 			int i;
