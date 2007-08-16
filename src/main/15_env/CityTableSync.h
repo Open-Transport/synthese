@@ -45,6 +45,7 @@ namespace synthese
 		{
 		public:
 			static const std::string TABLE_COL_NAME;
+			static const std::string TABLE_COL_CODE;
 
 			CityTableSync ();
 			~CityTableSync ();

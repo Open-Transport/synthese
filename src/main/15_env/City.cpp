@@ -36,9 +36,12 @@ namespace synthese
 	{
 
 		City::City (const uid& key,
-				const std::string& name)
+			    const std::string& name,
+			    const std::string& code
+		    )
 			: synthese::util::Registrable<uid,City> (key)
 			, IncludingPlace (name, 0)  // Note this city's city is null ?
+			, _code (code)
 		{
 		}
 

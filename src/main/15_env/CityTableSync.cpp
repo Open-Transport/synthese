@@ -53,6 +53,7 @@ namespace synthese
 		{
 		    object->setKey(rows->getLongLong (TABLE_COL_ID));
 		    object->setName(rows->getText ( CityTableSync::TABLE_COL_NAME));
+		    object->setCode(rows->getText ( CityTableSync::TABLE_COL_CODE));  
 		}
 
 
@@ -89,14 +90,17 @@ namespace synthese
 	namespace env
 	{
 		const std::string CityTableSync::TABLE_COL_NAME = "name";
+		const std::string CityTableSync::TABLE_COL_CODE = "code";
 		
 		CityTableSync::CityTableSync ()
 			: SQLiteTableSyncTemplate<City> (true, false, db::TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn (TABLE_COL_ID, "INTEGER");
 			addTableColumn (TABLE_COL_NAME, "TEXT");
+			addTableColumn (TABLE_COL_CODE, "TEXT");
 
 			addTableIndex(TABLE_COL_NAME);
+			addTableIndex(TABLE_COL_CODE);
 		}
 
 
@@ -117,9 +121,8 @@ namespace synthese
 			
 			if (EnvModule::getCities ().contains (id)) return;
 			
-			shared_ptr<City> city(new City (
-						  id,
-						  rows->getText (TABLE_COL_NAME) ));
+			shared_ptr<City> city(new City);
+			load (city.get (), rows);
 			
 			EnvModule::getCities ().add (city);
 			EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());

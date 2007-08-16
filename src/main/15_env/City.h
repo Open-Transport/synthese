@@ -64,16 +64,23 @@ class City : public synthese::util::Registrable<uid, City>,
     synthese::lexmatcher::LexicalMatcher<const Road*> _roadsMatcher;
     synthese::lexmatcher::LexicalMatcher<const PlaceAlias*> _placeAliasesMatcher;
 
+    std::string _code; //!< Unique code identifier for city within its country (france => INSEE code)
+
  public:
 
-    City (const uid& key,
-	  const std::string& name);
+    City (const uid& key = UNKNOWN_VALUE,
+	  const std::string& name = "",
+	  const std::string& code = ""
+	);
     
     ~City ();
 
 
     //! @name Getters/Setters
     //@{
+    const std::string& getCode () const { return _code; }
+    void setCode (const std::string& code) { _code = code; }
+
     synthese::lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher ();
     const synthese::lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher () const;
 

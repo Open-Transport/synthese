@@ -107,7 +107,11 @@ SQLite::ExecUpdate (sqlite3* handle, const SQLData& sql)
 SQLiteResultSPtr 
 SQLite::ExecQuery (const SQLiteStatementSPtr& statement, bool lazy)
 {
-    // lazy = false;
+    lazy = false;  
+    // TODO : lazy results are not used right now. stepping keeps the lock 
+    // external queries (from interface complain about wrong thread access
+    // dbtable adaptation does not work anymore!
+
     SQLiteResultSPtr result (new SQLiteLazyResult (statement));
     if (lazy)
     {

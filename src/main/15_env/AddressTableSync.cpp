@@ -54,7 +54,9 @@ namespace synthese
 		    uid id (rows->getLongLong (TABLE_COL_ID));
 
 		    object->setKey (id);
-		    object->setPlace (EnvModule::getConnectionPlaces ().get (rows->getLongLong (AddressTableSync::COL_PLACEID)).get ());
+		    uid connectionPlaceId = rows->getLongLong (AddressTableSync::COL_PLACEID);
+		    assert (EnvModule::getConnectionPlaces ().contains (connectionPlaceId));
+		    object->setPlace (EnvModule::getConnectionPlaces ().get (connectionPlaceId).get ());
 		    object->setRoad (EnvModule::getRoads ().get (rows->getLongLong (AddressTableSync::COL_ROADID)).get());
 		    object->setMetricOffset (rows->getDouble (AddressTableSync::COL_METRICOFFSET));
 		    object->setXY (rows->getDouble (AddressTableSync::COL_X), rows->getDouble (AddressTableSync::COL_Y));
@@ -114,10 +116,14 @@ namespace synthese
 				else
 				{
 					shared_ptr<Address> object(new Address);
-					shared_ptr<AddressablePlace> place = 
-					    EnvModule::fetchUpdateableAddressablePlace(rows->getLongLong(COL_PLACEID));
 					load(object.get(), rows);
 					EnvModule::getAddresses().add(object);
+					
+					uid placeId = rows->getLongLong(COL_PLACEID);
+
+					shared_ptr<AddressablePlace> place = 
+					    EnvModule::fetchUpdateableAddressablePlace (placeId);
+					    
 					place->addAddress(object.get());
 				}
 			}
