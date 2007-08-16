@@ -17,6 +17,7 @@
 #include "15_env/CityTableSync.h"
 #include "15_env/CommercialLineTableSync.h"
 #include "15_env/ConnectionPlaceTableSync.h"
+#include "15_env/CrossingTableSync.h"
 #include "15_env/ContinuousServiceTableSync.h"
 #include "15_env/FareTableSync.h"
 #include "15_env/HandicappedComplianceTableSync.h"

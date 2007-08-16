@@ -69,6 +69,7 @@ namespace synthese
 			cp->setName (name);
 			cp->setCity(EnvModule::getCities().get(cityId).get());
 			cp->setConnectionType (connectionType);
+			cp->setDefaultTransferDelay (defaultTransferDelay);
 
 			cp->clearTransferDelays ();    
 

@@ -98,7 +98,7 @@ namespace synthese
 				, int defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY
 				);
 
-			~ConnectionPlace ();
+			virtual ~ConnectionPlace ();
 
 
 			//! @name Getters/Setters

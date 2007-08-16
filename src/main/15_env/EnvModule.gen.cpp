@@ -24,7 +24,8 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env:
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::RoadTableSync>("15.30.02 Roads");
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::ConnectionPlaceTableSync>("15.40.01 Connection places");
-synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::PublicPlaceTableSync>("15.40.02 Public places");
+synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::CrossingTableSync>("15.40.02 Crossings");
+synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::PublicPlaceTableSync>("15.40.03 Public places");
 
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::PlaceAliasTableSync>("15.50.01 Places");
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::env::AddressTableSync>("15.50.02 Addresses");
