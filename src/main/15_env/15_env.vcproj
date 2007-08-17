@@ -421,6 +421,14 @@
 		<Filter
 			Name="Rights"
 			>
+			<File
+				RelativePath=".\NetworkLineBasedRight.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NetworkLineBasedRight.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="DBLog"

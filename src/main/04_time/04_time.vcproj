@@ -98,14 +98,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\HourPeriod.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\HourPeriod.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Month.cpp"
 				>
 			</File>

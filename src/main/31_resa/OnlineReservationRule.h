@@ -23,9 +23,13 @@
 #ifndef SYNTHESE_CMODALITERESERVATIONENLIGNE_H
 #define SYNTHESE_CMODALITERESERVATIONENLIGNE_H
 
-#include <boost/logic/tribool.hpp>
+#include "01_util/Registrable.h"
+#include "01_util/UId.h"
 
-#include "15_env/ReservationRule.h"
+#include <boost/logic/tribool.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include <set>
 
 namespace synthese
 {
@@ -40,8 +44,9 @@ namespace synthese
 		/**	Online reservation rule class.
 			@author Hugues Romain
 			@date 2007
+			@ingroup m31
 		*/
-		class OnlineReservationRule : public env::ReservationRule
+		class OnlineReservationRule : public util::Registrable<uid, OnlineReservationRule>
 		{
 		public:
 			typedef std::set<int> CapacityThresholds;

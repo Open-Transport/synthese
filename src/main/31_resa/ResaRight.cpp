@@ -1,6 +1,8 @@
 
-/** ResaModule class implementation.
-	@file ResaModule.cpp
+/** ResaRight class implementation.
+	@file ResaRight.cpp
+	@author Hugues Romain
+	@date 2007
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,18 +22,38 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ResaModule.h"
+#include "ResaRight.h"
+
+
+#include "12_security/Constants.h"
+
+using namespace std;
+using namespace boost;
 
 namespace synthese
 {
+	using namespace resa;
+	using namespace security;
+	using namespace env;
+
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<Right, ResaRight>::FACTORY_KEY("resa");
+	}
+
+	namespace security
+	{
+		template<> const string RightTemplate<ResaRight>::NAME("Reservation");
+		template<> const bool RightTemplate<ResaRight>::USE_PRIVATE_RIGHTS(true);
+
+		template<>
+		ParameterLabelsVector RightTemplate<ResaRight>::getStaticParametersLabels()
+		{
+			return NetworkLineBasedRight<ResaRight>::_getStaticParametersLabels();
+		}
+	}
+
 	namespace resa
 	{
-		OnlineReservationRule::Registry ResaModule::_onlineReservationRules;
-
-
-		OnlineReservationRule::Registry& ResaModule::getOnlineReservationRules()
-		{
-			return _onlineReservationRules;
-		}
 	}
 }

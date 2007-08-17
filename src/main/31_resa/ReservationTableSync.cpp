@@ -35,6 +35,7 @@
 #include "31_resa/ReservationTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -49,30 +50,21 @@ namespace synthese
 		template<> const int SQLiteTableSyncTemplate<Reservation>::TABLE_ID = 44;
 		template<> const bool SQLiteTableSyncTemplate<Reservation>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<Reservation>::load(Reservation* object, const db::SQLiteResultSPtr& rows )
-		{
+		template<> void SQLiteTableSyncTemplate<Reservation>::load(
+			Reservation* object
+			, const db::SQLiteResultSPtr& rows
+		){
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
-			object->setLineId(rows->getLongLong ( ReservationTableSync::COL_LINE_ID)));
-			object->setLineCode(rows->get ( ReservationTableSync::COL_LINE_CODE));
-			object->setServiceCode(rows->get ( ReservationTableSync::COL_SERVICE_CODE));
-			object->setDeparturePlaceId(rows->getLongLong ( ReservationTableSync::COL_DEPARTURE_PLACE_ID)));
-			object->setDeparturePlaceName(rows->get ( ReservationTableSync::COL_DEPARTURE_PLACE_NAME));
-			object->setDepartureAddress(rows->get ( ReservationTableSync::COL_DEPARTURE_ADDRESS));
-			object->setDepartureTime(DateTime::FromSQLTimestamp(rows->get ( ReservationTableSync::COL_DEPARTURE_TIME)));
-			object->setArrivalPlaceId(rows->getLongLong ( ReservationTableSync::COL_ARRIVAL_PLACE_ID)));
-			object->setArrivalPlaceName(rows->get ( ReservationTableSync::COL_ARRIVAL_PLACE_NAME));
-			object->setArrivalAddress(rows->get ( ReservationTableSync::COL_ARRIVAL_ADDRESS));
-			object->setArrivalTime(DateTime::FromSQLTimestamp(rows->get ( ReservationTableSync::COL_ARRIVAL_TIME)));
-			object->setReservationRuleId(rows->getLongLong ( ReservationTableSync::COL_RESERVATION_RULE_ID)));
-			object->setLastReservationId(rows->getLongLong ( ReservationTableSync::COL_LAST_RESERVATION_ID)));
-			object->setSeats(Conversion::ToInt(rows->get ( ReservationTableSync::COL_SEATS)));
-			object->setBookingTime(DateTime::FromSQLTimeStamp(rows->get ( ReservationTableSync::COL_BOOKING_TIME)));
-			object->setCancellationTime(DateTime::FromSQLTimeStamp(rows->get ( ReservationTableSync::COL_CANCELLATION_TIME)));
-			object->setCustomerUserId(rows->getLongLong ( ReservationTableSync::COL_CUSTOMER_ID)));
-			object->setCustomerName(rows->get ( ReservationTableSync::COL_CUSTOMER_NAME));
-			object->setCustomerPhone(rows->get ( ReservationTableSync::COL_CUSTOMER_PHONE));
-			object->setBookingUserId(rows->getLongLong ( ReservationTableSync::COL_BOOKING_USER_ID)));
-			object->setCancelUserId(rows->getLongLong ( ReservationTableSync::COL_CANCEL_USER_ID)));
+			object->setLineId(rows->getLongLong ( ReservationTableSync::COL_LINE_ID));
+			object->setLineCode(rows->getText ( ReservationTableSync::COL_LINE_CODE));
+			object->setServiceCode(rows->getText ( ReservationTableSync::COL_SERVICE_CODE));
+			object->setDeparturePlaceId(rows->getLongLong ( ReservationTableSync::COL_DEPARTURE_PLACE_ID));
+			object->setDeparturePlaceName(rows->getText ( ReservationTableSync::COL_DEPARTURE_PLACE_NAME));
+			object->setDepartureTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_DEPARTURE_TIME)));
+			object->setArrivalPlaceId(rows->getLongLong ( ReservationTableSync::COL_ARRIVAL_PLACE_ID));
+			object->setArrivalPlaceName(rows->getText ( ReservationTableSync::COL_ARRIVAL_PLACE_NAME));
+			object->setArrivalTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_ARRIVAL_TIME)));
+			object->setReservationRuleId(rows->getLongLong ( ReservationTableSync::COL_RESERVATION_RULE_ID));
 		}
 
 		template<> void SQLiteTableSyncTemplate<Reservation>::save(Reservation* object)
@@ -90,22 +82,11 @@ namespace synthese
 				<< "," << Conversion::ToSQLiteString(object->getServiceCode())
 				<< "," << Conversion::ToString(object->getDeparturePlaceId())
 				<< "," << Conversion::ToSQLiteString(object->getDeparturePlaceName())
-				<< "," << Conversion::ToSQLiteString(object->getDepartureAddress())
 				<< "," << object->getDepartureTime().toSQLString()
 				<< "," << Conversion::ToString(object->getArrivalPlaceId())
 				<< "," << Conversion::ToSQLiteString(object->getArrivalPlaceName())
-				<< "," << Conversion::ToSQLiteString(object->getArrivalAddress())
 				<< "," << object->getArrivalTime().toSQLString()
 				<< "," << Conversion::ToString(object->getReservationRuleId())
-				<< "," << Conversion::ToString(object->getLastReservationId())
-				<< "," << Conversion::ToString(object->getSeats())
-				<< "," << object->getBookingTime().toSQLString()
-				<< "," << object->getCancellationTime().toSQLString()
-				<< "," << Conversion::ToString(object->getCustomerId())
-				<< "," << Conversion::ToSQLiteString(object->getCustomerName())
-				<< "," << Conversion::ToSQLiteString(object->getCustomerPhone())
-				<< "," << Conversion::ToString(object->getBookingUserId())
-				<< "," << Conversion::ToString(object->getCancelUserId())
 				<< ")";
 			sqlite->execUpdate(query.str());
 		}
@@ -119,22 +100,11 @@ namespace synthese
 		const string ReservationTableSync::COL_SERVICE_CODE = "service_code";
 		const string ReservationTableSync::COL_DEPARTURE_PLACE_ID = "departure_place_id";
 		const string ReservationTableSync::COL_DEPARTURE_PLACE_NAME = "departure_place_name";
-		const string ReservationTableSync::COL_DEPARTURE_ADDRESS = "departure_address";
 		const string ReservationTableSync::COL_DEPARTURE_TIME = "departure_time";
 		const string ReservationTableSync::COL_ARRIVAL_PLACE_ID = "arrival_place_id";
 		const string ReservationTableSync::COL_ARRIVAL_PLACE_NAME = "arrival_place_name";
-		const string ReservationTableSync::COL_ARRIVAL_ADDRESS = "arrival_address";
 		const string ReservationTableSync::COL_ARRIVAL_TIME = "arrival_time";
 		const string ReservationTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
-		const string ReservationTableSync::COL_LAST_RESERVATION_ID = "last_reservation_id";
-		const string ReservationTableSync::COL_SEATS = "seats";
-		const string ReservationTableSync::COL_BOOKING_TIME = "booking_time";
-		const string ReservationTableSync::COL_CANCELLATION_TIME = "cancellation_time";
-		const string ReservationTableSync::COL_CUSTOMER_ID = "customer_id";
-		const string ReservationTableSync::COL_CUSTOMER_NAME = "customer_name";
-		const string ReservationTableSync::COL_CUSTOMER_PHONE = "customer_phone";
-		const string ReservationTableSync::COL_BOOKING_USER_ID = "booking_user_id";
-		const string ReservationTableSync::COL_CANCEL_USER_ID = "cancel_user_id";
 
 		ReservationTableSync::ReservationTableSync()
 			: SQLiteTableSyncTemplate<Reservation>(true, true, TRIGGERS_ENABLED_CLAUSE)
@@ -145,25 +115,12 @@ namespace synthese
 			addTableColumn(COL_SERVICE_CODE, "TEXT");
 			addTableColumn(COL_DEPARTURE_PLACE_ID, "INTEGER");
 			addTableColumn(COL_DEPARTURE_PLACE_NAME, "TEXT");
-			addTableColumn(COL_DEPARTURE_ADDRESS, "TEXT");
 			addTableColumn(COL_DEPARTURE_TIME, "TIMESTAMP");
 			addTableColumn(COL_ARRIVAL_PLACE_ID, "INTEGER");
 			addTableColumn(COL_ARRIVAL_PLACE_NAME, "TEXT");
-			addTableColumn(COL_ARRIVAL_ADDRESS, "TEXT");
 			addTableColumn(COL_ARRIVAL_TIME, "TIMESTAMP");
 			addTableColumn(COL_RESERVATION_RULE_ID, "INTEGER");
-			addTableColumn(COL_LAST_RESERVATION_ID, "INTEGER");
-			addTableColumn(COL_SEATS, "INTEGER");
-			addTableColumn(COL_BOOKING_TIME, "TIMESTAMP");
-			addTableColumn(COL_CANCELLATION_TIME, "TIMESTAMP");
-			addTableColumn(COL_CUSTOMER_ID, "INTEGER");
-			addTableColumn(COL_CUSTOMER_NAME, "TEXT");
-			addTableColumn(COL_CUSTOMER_PHONE, "TEXT");
-			addTableColumn(COL_BOOKING_USER_ID, "INTEGER");
-			addTableColumn(COL_CANCEL_USER_ID, "INTEGER");
-
 			addTableIndex(COL_LINE_ID);
-			addTableIndex(COL_CUSTOMER_ID);
 			addTableIndex(COL_DEPARTURE_PLACE_ID);
 			addTableIndex(COL_ARRIVAL_PLACE_ID);
 		}
@@ -180,7 +137,7 @@ namespace synthese
 		{
 		}
 
-		std::vector<Reservation*> ReservationTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		std::vector<shared_ptr<Reservation> > ReservationTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -199,11 +156,11 @@ namespace synthese
 			try
 			{
 				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<Reservation*> objects;
+				vector<shared_ptr<Reservation> > objects;
 				while (rows->next ())
 				{
-					Reservation* object = new Reservation();
-					load(object, result, i);
+					shared_ptr<Reservation> object(new Reservation());
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;
@@ -212,6 +169,11 @@ namespace synthese
 			{
 				throw Exception(e.getMessage());
 			}
+		}
+
+		ReservationTableSync::~ReservationTableSync()
+		{
+
 		}
 	}
 }

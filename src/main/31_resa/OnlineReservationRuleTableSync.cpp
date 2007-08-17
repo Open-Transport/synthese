@@ -22,7 +22,7 @@
 
 #include "31_resa/OnlineReservationRuleTableSync.h"
 #include "31_resa/OnlineReservationRule.h"
-#include "31_resa/ModuleClass.h"
+#include "31_resa/ResaModule.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -34,6 +34,7 @@
 #include <sstream>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -101,19 +102,23 @@ namespace synthese
 			addTableIndex(COL_RESERVATION_RULE_ID);
 		}
 
-		void OnlineReservationRuleTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
-		{
+		void OnlineReservationRuleTableSync::rowsAdded(
+			SQLiteQueueThreadExec* sqlite
+			, SQLiteSync* sync
+			, const SQLiteResultSPtr& rows
+			, bool isFirstSync
+		){
 			// 
 			while (rows->next ())
 			{
-				if (.contains(rows->getLongLong (TABLE_COL_ID)))
+				if (ResaModule::getOnlineReservationRules().contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load(ResaModule::getOnlineReservationRules().get(rows->getLongLong (TABLE_COL_ID)), rows, i);
+					load(ResaModule::getOnlineReservationRules().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
 				}
 				else
 				{
-					OnlineReservationRule* object = new OnlineReservationRule;
-					load(object, rows, i);
+					shared_ptr<OnlineReservationRule> object(new OnlineReservationRule);
+					load(object.get(), rows);
 					ResaModule::getOnlineReservationRules().add(object);
 				}
 			}
@@ -126,8 +131,8 @@ namespace synthese
 				uid id = rows->getLongLong (TABLE_COL_ID);
 				if (ResaModule::getOnlineReservationRules().contains(id))
 				{
-					OnlineReservationRule* object = ResaModule::getOnlineReservationRules().get(id);
-					load(object, rows, i);
+					shared_ptr<OnlineReservationRule> object(ResaModule::getOnlineReservationRules().getUpdateable(id));
+					load(object.get(), rows);
 				}
 			}
 		}
@@ -144,7 +149,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<OnlineReservationRule*> OnlineReservationRuleTableSync::search(int first /*= 0*/, int number /*= 0*/ )
+		vector<shared_ptr<OnlineReservationRule> > OnlineReservationRuleTableSync::search(int first /*= 0*/, int number /*= 0*/ )
 		{
 			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
@@ -163,11 +168,11 @@ namespace synthese
 			try
 			{
 				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
-				vector<OnlineReservationRule*> objects;
+				vector<shared_ptr<OnlineReservationRule> > objects;
 				while (rows->next ())
 				{
-					OnlineReservationRule* object = new OnlineReservationRule();
-					load(object, result, i);
+					shared_ptr<OnlineReservationRule> object(new OnlineReservationRule());
+					load(object.get(), rows);
 					objects.push_back(object);
 				}
 				return objects;
@@ -176,6 +181,11 @@ namespace synthese
 			{
 				throw Exception(e.getMessage());
 			}
+		}
+
+		OnlineReservationRuleTableSync::~OnlineReservationRuleTableSync()
+		{
+
 		}
 	}
 }

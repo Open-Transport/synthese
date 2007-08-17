@@ -65,7 +65,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<OnlineReservationRule*> search(
+			static std::vector<boost::shared_ptr<OnlineReservationRule> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
 
@@ -77,7 +77,8 @@ namespace synthese
 			*/
 			void rowsAdded (db::SQLiteQueueThreadExec* sqlite, 
 				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows);
+				const db::SQLiteResultSPtr& rows
+				, bool isFirstSync = false);
 
 			/** Action to do on OnlineReservationRule creation.
 				This method updates the corresponding object in ram.

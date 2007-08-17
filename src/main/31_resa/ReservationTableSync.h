@@ -47,22 +47,11 @@ namespace synthese
 			static const std::string COL_SERVICE_CODE;
 			static const std::string COL_DEPARTURE_PLACE_ID;
 			static const std::string COL_DEPARTURE_PLACE_NAME;
-			static const std::string COL_DEPARTURE_ADDRESS;
 			static const std::string COL_DEPARTURE_TIME;
 			static const std::string COL_ARRIVAL_PLACE_ID;
 			static const std::string COL_ARRIVAL_PLACE_NAME;
-			static const std::string COL_ARRIVAL_ADDRESS;
 			static const std::string COL_ARRIVAL_TIME;
 			static const std::string COL_RESERVATION_RULE_ID;
-			static const std::string COL_LAST_RESERVATION_ID;
-			static const std::string COL_SEATS;
-			static const std::string COL_BOOKING_TIME;
-			static const std::string COL_CANCELLATION_TIME;
-			static const std::string COL_CUSTOMER_ID;
-			static const std::string COL_CUSTOMER_NAME;
-			static const std::string COL_CUSTOMER_PHONE;
-			static const std::string COL_BOOKING_USER_ID;
-			static const std::string COL_CANCEL_USER_ID;
 
 			ReservationTableSync();
 			~ReservationTableSync();
@@ -76,7 +65,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<Reservation*> search(
+			static std::vector<boost::shared_ptr<Reservation> > search(
 				// other search parameters ,
 				int first = 0, int number = 0);
 

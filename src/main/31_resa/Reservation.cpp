@@ -24,8 +24,20 @@
 
 namespace synthese
 {
+	using namespace util;
+	using namespace time;
+
 	namespace resa
 	{
+		Reservation::Reservation()
+			: Registrable<uid,Reservation>()
+			, _departureTime(TIME_UNKNOWN)
+			, _arrivalTime(TIME_UNKNOWN)
+			, _originDateTime(TIME_UNKNOWN)
+		{
+
+		}
+
 
 
 		void Reservation::setLineId( uid id )
@@ -93,50 +105,6 @@ namespace synthese
 			_arrivalTime = time;
 		}
 
-		void Reservation::setLastReservation( uid id )
-		{
-			_lastReservation = id;
-		}
-
-		void Reservation::setSeats( int seats )
-		{
-			_seats = seats;
-		}
-
-		void Reservation::setBookingTime( const time::DateTime& time )
-		{
-			_bookingTime = time;
-		}
-
-		void Reservation::setCancellationTime( const time::DateTime& time )
-		{
-			_cancellationTime = time;
-		}
-
-		void Reservation::setCustomerUserId( uid id )
-		{
-			_customerUserId = id;
-		}
-
-		void Reservation::setCustomerName( const std::string& name )
-		{
-			_customerName = name;
-		}
-
-		void Reservation::setCustomerPhone( const std::string& phone )
-		{
-			_customerPhone = phone;
-		}
-
-		void Reservation::setBookingUserId( uid id )
-		{
-			_bookingUserId = id;
-		}
-
-		void Reservation::setCancelUserId( uid id )
-		{
-			_cancelUserId = id;
-		}
 
 		uid Reservation::getLineId() const
 		{
@@ -168,7 +136,7 @@ namespace synthese
 			return _arrivalPlaceName;
 		}
 
-		uid Reservation::getArrivalPlaceName() const
+		uid Reservation::getReservationRuleId() const
 		{
 			return _reservationRuleId;
 		}
@@ -188,54 +156,10 @@ namespace synthese
 			return _departureTime;
 		}
 
-		const time::DateTime& Reservation::getDepartureTime() const
+		const time::DateTime& Reservation::getArrivalTime() const
 		{
 			return _arrivalTime;
 		}
 
-		uid Reservation::getLastReservation() const
-		{
-			return _lastReservation;
-		}
-
-		int Reservation::getSeats() const
-		{
-			return _seats;
-		}
-
-		const time::DateTime& Reservation::getBookingTime() const
-		{
-			return _bookingTime;
-		}
-
-		const time::DateTime& Reservation::getCancellationTime() const
-		{
-			return _cancellationTime;
-		}
-
-		uid Reservation::getCustomerUserId() const
-		{
-			return _customerUserId;
-		}
-
-		const std::string& Reservation::getCustomerName() const
-		{
-			return _customerName;
-		}
-
-		const std::string& Reservation::getCustomerPhone() const
-		{
-			return _customerPhone;
-		}
-
-		uid Reservation::getBookingUserId() const
-		{
-			return _bookingUserId;
-		}
-
-		uid Reservation::getCancelUserId() const
-		{
-			return _cancelUserId;
-		}
 	}
 }

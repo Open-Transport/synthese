@@ -80,6 +80,14 @@
 				RelativePath=".\Reservation.h"
 				>
 			</File>
+			<File
+				RelativePath=".\ReservationTransaction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationTransaction.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Actions"
@@ -200,6 +208,14 @@
 				RelativePath=".\ReservationTableSync.h"
 				>
 			</File>
+			<File
+				RelativePath=".\ReservationTransactionTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationTransactionTableSync.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Interface pages"
@@ -226,6 +242,18 @@
 			</File>
 			<File
 				RelativePath=".\ServiceReservationsRoadMapInterfacePage.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Rights"
+			>
+			<File
+				RelativePath=".\ResaRight.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ResaRight.h"
 				>
 			</File>
 		</Filter>

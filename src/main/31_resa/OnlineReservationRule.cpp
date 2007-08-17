@@ -87,12 +87,12 @@ namespace synthese
 			return _maxSeats;
 		}
 
-		std::set<int> OnlineReservationRule::getThresholds() const
+		const OnlineReservationRule::CapacityThresholds& OnlineReservationRule::getThresholds() const
 		{
 			return _thresholds;
 		}
 
-		void OnlineReservationRule::setReservationRule(shared_ptr<ReservationRule> rule)
+		void OnlineReservationRule::setReservationRule(shared_ptr<const ReservationRule> rule)
 		{
 			_reservationRule = rule;
 		}
