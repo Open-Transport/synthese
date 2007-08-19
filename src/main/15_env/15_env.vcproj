@@ -226,6 +226,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Crossing.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Crossing.h"
+					>
+				</File>
+				<File
 					RelativePath=".\IncludingPlace.cpp"
 					>
 				</File>
@@ -484,6 +492,14 @@
 			</File>
 			<File
 				RelativePath=".\ConnectionPlaceTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CrossingTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CrossingTableSync.h"
 				>
 			</File>
 			<File

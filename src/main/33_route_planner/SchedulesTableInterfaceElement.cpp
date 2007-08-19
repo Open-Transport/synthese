@@ -91,7 +91,7 @@ namespace synthese
 					{
 						const ServiceUse& curET(*itl);
 
-						if (itl == jl.begin() || !curET.getEdge()->getParentPath()->isPedestrianMode())
+						if (itl == jl.begin() || !curET.getEdge()->getParentPath()->isPedestrianMode() || lastPedestrianMode != curET.getEdge()->getParentPath()->isPedestrianMode())
 						{
 							DateTime lastDateTime(curET.getDepartureDateTime());
 							lastDateTime += (*it)->getContinuousServiceRange();
