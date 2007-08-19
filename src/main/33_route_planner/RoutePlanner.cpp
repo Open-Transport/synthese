@@ -172,14 +172,15 @@ namespace synthese
 				);
 				for (VertexAccessMap::VamMap::const_iterator it(vam.getMap().begin()); it != vam.getMap().end(); ++it)
 				{
-					ovam.insert(
-						it->first
-						, VertexAccess(
-							commonApproachTime + cp->getTransferDelay(v, it->first)
-							, commonApproachDistance
-							, oj
-						)
-					);
+					if (!_destinationVam.contains(it->first))
+						ovam.insert(
+							it->first
+							, VertexAccess(
+								commonApproachTime + cp->getTransferDelay(v, it->first)
+								, commonApproachDistance
+								, oj
+							)
+						);
 				}
 
 				// Store the journey as a candidate if it goes directly to the destination
@@ -260,19 +261,30 @@ namespace synthese
 					);
 				for (VertexAccessMap::VamMap::const_iterator it(vam.getMap().begin()); it != vam.getMap().end(); ++it)
 				{
-					dvam.insert(
-						it->first
-						, VertexAccess(
-							commonApproachTime + cp->getTransferDelay(it->first, v)
-							, commonApproachDistance
-							, j
-						)
-					);
+					if (!_originVam.contains(it->first))
+						dvam.insert(
+							it->first
+							, VertexAccess(
+								commonApproachTime + cp->getTransferDelay(it->first, v)
+								, commonApproachDistance
+								, j
+							)
+						);
 				}
 			}
 
+			if (_result.journeys.empty())
+			{
+				_previousContinuousServiceDuration = 0;
+			}
+			else
+			{
+				const Journey* journey(_result.journeys.front());
+				_previousContinuousServiceDuration = journey->getDuration();
+				_previousContinuousServiceLastDeparture = journey->getDepartureTime();
+				_previousContinuousServiceLastDeparture += journey->getContinuousServiceRange();
+			}
 
-			_previousContinuousServiceDuration = 0;
 			// Time loop
 			for(_minDepartureTime = _journeySheetStartTime; 
 				(_minDepartureTime < _journeySheetEndTime
