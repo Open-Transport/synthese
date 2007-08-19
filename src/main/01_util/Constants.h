@@ -27,6 +27,7 @@
 	@ingroup m01
 	
 	@defgroup m01 01 Various utilities
+	@ingroup m0
 	@{
 */
 

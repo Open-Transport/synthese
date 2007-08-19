@@ -4,6 +4,7 @@
 	Version="8,00"
 	Name="31_resa"
 	ProjectGUID="{8F8F9564-B955-4459-B726-548BECDC4E2A}"
+	RootNamespace="51_resa"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -61,7 +62,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core Classes"
+			Name="00 Core Classes"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
@@ -90,7 +91,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Actions"
+			Name="18 Actions"
 			>
 			<File
 				RelativePath=".\BookReservationAction.cpp"
@@ -110,35 +111,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Functions"
-			>
-			<File
-				RelativePath=".\BookingScreenFunction.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BookingScreenFunction.h"
-				>
-			</File>
-			<File
-				RelativePath=".\BoolingConfirmationFunction.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BoolingConfirmationFunction.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ServiceReservationsRoadMapFunction.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ServiceReservationsRoadMapFunction.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Admin Pages"
+			Name="14 Admin Pages"
 			>
 			<File
 				RelativePath=".\CommercialLineReservationsAdmin.h"
@@ -182,43 +155,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="LS SQL"
-			>
-			<File
-				RelativePath=".\AdvancedSelectTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AdvancedSelectTableSync.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OnlineReservationRuleTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\OnlineReservationRuleTableSync.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ReservationTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ReservationTableSync.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ReservationTransactionTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ReservationTransactionTableSync.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Interface pages"
+			Name="11 Interface pages"
 			>
 			<File
 				RelativePath=".\BookingConfirmationInterfacePage.cpp"
@@ -246,7 +183,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Rights"
+			Name="12 Rights"
 			>
 			<File
 				RelativePath=".\ResaRight.cpp"
@@ -257,8 +194,72 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="10 LS SQL"
+			>
+			<File
+				RelativePath=".\AdvancedSelectTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AdvancedSelectTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OnlineReservationRuleTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationTransactionTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationTransactionTableSync.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="18 Functions"
+			>
+			<File
+				RelativePath=".\BookingScreenFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BookingScreenFunction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\BoolingConfirmationFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BoolingConfirmationFunction.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ServiceReservationsRoadMapFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ServiceReservationsRoadMapFunction.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\71_vinci_bike_rental\LICENSE.txt"
+			>
+		</File>
+		<File
+			RelativePath=".\OnlineReservationRuleTableSync.cpp"
 			>
 		</File>
 		<File

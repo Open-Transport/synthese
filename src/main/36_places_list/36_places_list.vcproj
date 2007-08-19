@@ -2,8 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="36_places_list"
+	Name="36_transport_website"
 	ProjectGUID="{388CA45F-FEBF-4160-AAB7-39B11FA1E28C}"
+	RootNamespace="16_transport_website"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -61,7 +62,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core classes"
+			Name="00 Core classes"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
@@ -103,16 +104,8 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="LS SQL"
+			Name="10 LS SQL"
 			>
-			<File
-				RelativePath=".\EnvironmentLinkTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\EnvironmentLinkTableSync.h"
-				>
-			</File>
 			<File
 				RelativePath=".\SiteTableSync.cpp"
 				>
@@ -123,15 +116,15 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="DBLog"
+			Name="13 DBLog"
 			>
 		</Filter>
 		<Filter
-			Name="Rights"
+			Name="12 Rights"
 			>
 		</Filter>
 		<Filter
-			Name="Functions"
+			Name="18 Functions"
 			>
 			<File
 				RelativePath=".\CityListRequest.cpp"
@@ -151,60 +144,56 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Interface"
+			Name="14 AdminInterfaceElement"
 			>
-			<Filter
-				Name="LibraryInterfaceElement"
-				>
-				<File
-					RelativePath=".\CityListInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\CityListInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\CityListRequestInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\CityListRequestInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\PlacesListRequestInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\PlacesListRequestInterfaceElement.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Interface Pages"
-				>
-				<File
-					RelativePath=".\PlacesListInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\PlacesListInterfacePage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\PlacesListItemInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\PlacesListItemInterfacePage.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
-			Name="AdminInterfaceElement"
+			Name="11 LibraryInterfaceElement"
 			>
+			<File
+				RelativePath=".\CityListInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CityListInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CityListRequestInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CityListRequestInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PlacesListRequestInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PlacesListRequestInterfaceElement.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="11 Interface Pages"
+			>
+			<File
+				RelativePath=".\PlacesListInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PlacesListInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PlacesListItemInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PlacesListItemInterfacePage.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\PlacesListModule.cpp"

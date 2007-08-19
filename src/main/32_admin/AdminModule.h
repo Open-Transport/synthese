@@ -27,39 +27,34 @@
 
 namespace synthese
 {
-/**	@defgroup m32Actions 32 Actions
-		@ingroup m32
+/**	@defgroup m14Actions 14 Actions
+		@ingroup m14
 
-		@defgroup m32Pages 32 Pages
-		@ingroup m32
+		@defgroup m14Pages 14 Pages
+		@ingroup m14
 
-		@defgroup m32Values 32 Values
-		@ingroup m32
+		@defgroup m14Functions 14 Functions
+		@ingroup m14
 
-		@defgroup m32Functions 32 Functions
-		@ingroup m32
+		@defgroup m14Admin 14 Administration pages
+		@ingroup m14
 
-		@defgroup m32LS 32 Table synchronizers
-		@ingroup m32
+		@defgroup m14Rights 14 Rights
+		@ingroup m14
 
-		@defgroup m32Admin 32 Administration pages
-		@ingroup m32
+		@defgroup m14Logs 14 DB Logs
+		@ingroup m14
 
-		@defgroup m32Rights 32 Rights
-		@ingroup m32
-
-		@defgroup m32Logs 32 DB Logs
-		@ingroup m32
-
-		@defgroup m32 32 Generic administration console
-	@{
+		@defgroup m14 14 Generic administration console
+		@ingroup m1
+		@{
 	*/
 
-	/** 32 Generic administration console module namespace.
+	/** 14 Generic administration console module namespace.
 	*/
 	namespace admin
 	{
-		/** 32 Generic administration console module class.
+		/** 14 Generic administration console module class.
 		*/
 		class AdminModule : public util::ModuleClass
 		{

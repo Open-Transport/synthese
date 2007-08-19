@@ -33,7 +33,6 @@
 #include "15_env/Vertex.h"
 #include "15_env/ConnectionPlace.h"
 #include "15_env/Road.h"
-#include "15_env/ReservationRule.h"
 #include "15_env/ServiceUse.h"
 #include "15_env/Journey.h"
 #include "15_env/Service.h"
@@ -82,97 +81,58 @@ namespace synthese
 			// Loop on lines of the board
 			bool __Couleur = false;
 
+			const Place* lastPlace(journey->getOrigin()->getFromVertex()->getPlace());
+
 			for (Journey::ServiceUses::const_iterator it = journey->getServiceUses().begin(); it != journey->getServiceUses().end(); ++it)
 			{
 				const ServiceUse& leg(*it);
 
-				// LIGNE ARRET MONTEE Si premier point d'arrêt et si alerte
-				if (it == journey->getServiceUses().begin())
+
+				const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
+				if (road == NULL)
 				{
-					DateTime debutPrem(leg.getDepartureDateTime());
-					DateTime finPrem(debutPrem);
-					if (journey->getContinuousServiceRange () )
+
+					// LIGNE ARRET MONTEE Si premier point d'arrêt et si alerte
+					if (leg.getDepartureEdge()->getConnectionPlace() != lastPlace)
+					{
+						/*					DateTime debutPrem(leg.getDepartureDateTime());
+						DateTime finPrem(debutPrem);
+						if (journey->getContinuousServiceRange () )
 						finPrem += journey->getContinuousServiceRange ();
+						*/
 
-/*					if (leg->getOrigin()->getFromVertex ()->getConnectionPlace()
-						->hasApplicableAlarm ( debutPrem, finPrem ) )
-					{
-						stopCellInterfacePage->display( stream, false
-							, __ET->getOrigin() ->getConnectionPlace() ->getAlarm()
-							, false, __ET->getOrigin() ->getConnectionPlace() ->getName()
-							, __Couleur, unknownHour, unknownHour
-							, request );
+						stopCellInterfacePage->display(
+							stream
+							, false
+							, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
+							, false
+							, leg.getDepartureEdge()->getConnectionPlace()
+							, __Couleur
+							, leg.getDepartureDateTime()
+							, journey->getContinuousServiceRange()
+							, request
+							);
+
+						lastPlace = leg.getDepartureEdge()->getConnectionPlace();
+						__Couleur = !__Couleur;
 					}
-*/				}
 
-				if ( dynamic_cast<const synthese::env::Road*> (leg.getService()->getPath ()) == 0 )
-				{
 					// LIGNE CIRCULATIONS
-					DateTime debutLigne(leg.getDepartureDateTime());
+/*					DateTime debutLigne(leg.getDepartureDateTime());
 					DateTime finLigne(leg.getArrivalDateTime());
-					DateTime lastDepartureTime(TIME_UNKNOWN);
-					DateTime lastArrivalTime(TIME_UNKNOWN);
 
-					if (journey->getContinuousServiceRange () )
-					{
-						lastDepartureTime = leg.getDepartureDateTime();
-						lastDepartureTime += journey->getContinuousServiceRange ();
-					}
 					if ( journey->getContinuousServiceRange () )
 					{
-						lastArrivalTime = leg.getArrivalDateTime ();
-						lastArrivalTime += journey->getContinuousServiceRange ();
 						finLigne = lastArrivalTime;
 					}
-
-					// 12/18 Reservation
-					DateTime maintenant(TIME_CURRENT);
-					const ReservationRule* reservationRule(leg.getService()->getReservationRule ());
-
-					bool openedCompulsoryReservation( 
-						(reservationRule->isCompliant() == true)
-						&& (reservationRule->isReservationPossible(leg.getOriginDateTime(), maintenant, leg.getDepartureDateTime() )) 
-					);
-					bool openedOptionalReservation(
-						(reservationRule->isCompliant() == boost::logic::indeterminate) &&
-						(reservationRule->isReservationPossible(leg.getOriginDateTime(), maintenant, leg.getDepartureDateTime() )) 
-					);
-					bool openedReservation = openedCompulsoryReservation || openedOptionalReservation;
-					std::string syntheseOnlineBookingURL;
-//					if (openedReservation && site->onlineBookingAllowed() ) /// @todo implement && __ET->getLigne() ->GetResa() ->ReservationEnLigne()
-					{	/** @todo implement this
-						synthese::server::Request request;
-						request.addParameter( synthese::server::PARAMETER_FUNCTION, synthese::server::FUNCTION_RESERVATION_FORM );
-						request.addParameter( synthese::server::PARAMETER_SITE, __Site->getClef() );
-						request.addParameter( synthese::server::PARAMETER_LINE_CODE, __ET->getLigne() ->getCode() );
-						request.addParameter( synthese::server::PARAMETER_SERVICE_NUMBER, ( __ET->getService() ->getNumero() ) );
-						request.addParameter( synthese::server::PARAMETER_SERVICE_NUMBER, __ET->getLigne() ->GetResa() ->Index() );
-						request.addParameter( synthese::server::PARAMETER_DEPARTURE_STOP_NUMBER, __ET->getOrigin() ->getConnectionPlace() ->getId() );
-						request.addParameter( synthese::server::PARAMETER_ARRIVAL_STOP_NUMBER, __ET->getDestination() ->getConnectionPlace() ->getId() );
-						request.addParameter( synthese::server::PARAMETER_DATE, __ET->getDepartureTime() );
-						
-						syntheseOnLineBookingURL = site->getClientURL() + "?" + request.toInternalString (); //18
-						*/
-					}
+*/
 
 					serviceCellInterfacePage->display(
 						stream 
 						, leg
-						, leg.getDepartureDateTime().getHour()
-						, lastDepartureTime.getHour()
-						, leg.getArrivalDateTime().getHour()
-						, lastArrivalTime.getHour()
-						, 0 /// @todo implement __ET->getLigne() ->Materiel() ->Code(); //4
-						, "ligne" /// @todo implement __ET->getLigne() ->Materiel() ->getLibelleSimple() //5
-						, "la ligne" /// @todo implement __ET->getLigne()->LibelleComplet(LibelleCompletMatosHTML);
-						, "destination" /// @todo implement __ET->getLigne()->LibelleDestination(DestinationHTML);
+						, journey->getContinuousServiceRange()
 						, __FiltreHandicape
 						, __FiltreVelo
-						, openedCompulsoryReservation
-						, openedOptionalReservation
-						, openedReservation ? reservationRule->getReservationDeadLine (leg.getOriginDateTime(), leg.getDepartureDateTime() ) : unknownDateTime
-						, openedReservation ? reservationRule : NULL
-						, openedReservation ? syntheseOnlineBookingURL : ""
 						, NULL // leg->getService ()->getPath ()->hasApplicableAlarm ( debutLigne, finLigne ) ? __ET->getService()->getPath ()->getAlarm() : NULL
 						, __Couleur
 						, request
@@ -180,52 +140,49 @@ namespace synthese
 					
 					__Couleur = !__Couleur;
 
-
 					// LIGNE ARRET DE DESCENTE
 
-					DateTime debutArret(leg.getArrivalDateTime ());
+/*					DateTime debutArret(leg.getArrivalDateTime ());
 					DateTime finArret(debutArret);
-					DateTime tempMoment(TIME_UNKNOWN);
 					if ( (it + 1) < journey->getServiceUses().end())
 						finArret = (it + 1)->getDepartureDateTime();
 					if ( journey->getContinuousServiceRange () )
 						finArret += journey->getContinuousServiceRange ();
-
-					
-					if ( journey->getContinuousServiceRange () )
-					{
-						tempMoment = leg.getArrivalDateTime ();
-						tempMoment += journey->getContinuousServiceRange ();
-					}
+*/
 					
 					stopCellInterfacePage->display( stream, true
 						, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 						, leg.getArrivalEdge()->getConnectionPlace() == leg.getService()->getPath ()->getEdges ().back()->getFromVertex ()->getConnectionPlace()
-						, leg.getArrivalEdge()->getConnectionPlace()->getName()
+						, leg.getArrivalEdge()->getConnectionPlace()
 						, __Couleur
-						, leg.getArrivalDateTime().getHour(), tempMoment.getHour()
-						, request);
+						, leg.getArrivalDateTime()
+						, journey->getContinuousServiceRange()
+						, request
+					);
 
+					lastPlace = leg.getArrivalEdge()->getConnectionPlace();
 					__Couleur = !__Couleur;
 
 				}
 				else
 				{
 					// 1/2 Alerte
-					DateTime debutArret(leg.getArrivalDateTime ());
+/*					DateTime debutArret(leg.getArrivalDateTime ());
 					DateTime finArret(debutArret);
 					if ((it+1) < journey->getServiceUses().end())
 						finArret = (it + 1)->getDepartureDateTime();
 					if ( journey->getContinuousServiceRange () )
 						finArret += journey->getContinuousServiceRange ();
-
-					junctionCellInterfacePage->display( stream
+*/
+					junctionCellInterfacePage->display(
+						stream
 						, leg.getArrivalEdge()->getConnectionPlace()
 						, NULL // leg->getDestination()->getConnectionPlace()->hasApplicableAlarm(debutArret, finArret) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 						, __Couleur
-						, request);
+						, road
+						, request
+					);
 				
-					// 3 Couleur du fond de case
 					__Couleur = !__Couleur;
 				}
 			}

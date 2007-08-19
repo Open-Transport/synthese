@@ -9,41 +9,24 @@
 
 namespace synthese
 {
-	/**	@defgroup m30Actions 30 Actions
-		@ingroup m30
+	/**	@defgroup m18Actions 18 Actions
+		@ingroup m18
 
-		@defgroup m30Pages 30 Pages
-		@ingroup m30
-
-		@defgroup m30Values 30 Values
-		@ingroup m30
-
-		@defgroup m30Functions 30 Functions
-		@ingroup m30
-
-		@defgroup m30LS 30 Table synchronizers
-		@ingroup m30
-
-		@defgroup m30Admin 30 Administration pages
-		@ingroup m30
-
-		@defgroup m30Rights 30 Rights
-		@ingroup m30
-
-		@defgroup m30Logs 30 DB Logs
-		@ingroup m30
+		@defgroup m18Functions 18 Functions
+		@ingroup m18
 	
-		@defgroup m30 30 Server
+		@defgroup m18 18 Server
+		@ingroup m1
 		@{
 	*/
 
-	/** 30 Server module namespace.
+	/** 08 Server module namespace.
 	*/
 	namespace server
 	{
 		class Session;
 
-		/** Server module class.
+		/** 08 Server module class.
 		*/
 		class ServerModule : public db::DbModuleClass
 		{

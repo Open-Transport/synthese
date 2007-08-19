@@ -28,7 +28,7 @@ namespace synthese
 	{
 		/** No solution message.
 			@code routeplanner_no_solution @endcode
-			@ingroup m33Pages refPages
+			@ingroup m53Pages refPages
 		*/
 		class RoutePlannerNoSolutionInterfacePage : public interfaces::InterfacePage
 		{

@@ -25,26 +25,32 @@
 #include "17_messages/SentAlarm.h"
 
 #include "15_env/ConnectionPlace.h"
+#include "15_env/Road.h"
+
+using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace messages;
+	using namespace env;
 	
 	namespace routeplanner
 	{
 		void JourneyBoardJunctionCellInterfacePage::display( 
-		    std::ostream& stream, 
-		    const synthese::env::ConnectionPlace* place, 
-		    const SentAlarm* alarm, 
-		    bool color, 
-		    const server::Request* request /*= NULL */ ) const
-		{
+		    ostream& stream
+		    , const ConnectionPlace* place
+		    , const SentAlarm* alarm
+		    , bool color
+			, const Road* road
+		    , const server::Request* request /*= NULL */
+		) const	{
 			ParametersVector pv;
 			pv.push_back(synthese::util::Conversion::ToString(place->getKey()));
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
 			pv.push_back(synthese::util::Conversion::ToString(color));
+			pv.push_back(road ? road->getName() : string());
 
 			VariablesMap vm;
 

@@ -14,7 +14,7 @@ class Map;
 class PostscriptCanvas;
 
 
-/** @ingroup m39 */
+/** @ingroup m59 */
 class Drawable
 {
 

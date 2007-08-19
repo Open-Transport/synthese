@@ -41,7 +41,7 @@ namespace synthese
 	    class Map;
 
 	    /** MapRequest class.
-		@ingroup m39
+			@ingroup m59Functions refFunctions
 	    */
 	    class MapRequest : public server::Function
 	    {

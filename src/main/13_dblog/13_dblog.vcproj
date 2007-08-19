@@ -61,18 +61,10 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core classes"
+			Name="00 Core classes"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\DBLog.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DBLog.h"
-				>
-			</File>
 			<File
 				RelativePath=".\DBLogEntry.cpp"
 				>
@@ -83,7 +75,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="AdminInterfaceElement"
+			Name="14 AdminInterfaceElement"
 			>
 			<File
 				RelativePath=".\DBLogList.cpp"
@@ -103,11 +95,11 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="DBLog"
+			Name="13 DBLog"
 			>
 		</Filter>
 		<Filter
-			Name="Rights"
+			Name="12 Rights"
 			>
 			<File
 				RelativePath=".\DBLogRight.cpp"
@@ -119,7 +111,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="LS SQL"
+			Name="10 LS SQL"
 			>
 			<File
 				RelativePath=".\DBLogEntryTableSync.cpp"
@@ -131,16 +123,28 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Interface Pages"
+			Name="11 Interface Pages"
 			>
 		</Filter>
 		<Filter
-			Name="Actions"
+			Name="18 Actions"
 			>
 		</Filter>
 		<Filter
 			Name="Exceptions"
 			>
+		</Filter>
+		<Filter
+			Name="00 Factory"
+			>
+			<File
+				RelativePath=".\DBLog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DBLog.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\DBLogModule.cpp"

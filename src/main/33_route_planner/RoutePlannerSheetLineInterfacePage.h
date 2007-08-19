@@ -44,7 +44,7 @@ namespace synthese
 	{
 		/** Line of schedule sheet.
 			@code schedule_sheet_row @endcode
-			@ingroup m33Pages refPages
+			@ingroup m53Pages refPages
 
 			Parameters :
 				- 0 : text conaining cells

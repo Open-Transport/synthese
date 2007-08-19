@@ -29,6 +29,9 @@ namespace synthese
 {
 	namespace util
 	{
+		/** Factorable class.
+			@ingroup m01
+		*/
 		class Factorable
 		{
 		private:

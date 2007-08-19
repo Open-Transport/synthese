@@ -2,8 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="14_geography"
+	Name="09_geography"
 	ProjectGUID="{9DB64101-C8A0-4275-89E1-529199D1EA73}"
+	RootNamespace="09_geography"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>

@@ -32,7 +32,7 @@ namespace synthese
 	namespace server
 	{
 		/** Login HTML Field Value InterfaceElement Class.
-			@ingroup m30Values refValues
+			@ingroup m18Values refValues
 		*/
 		class LoginHtmlField
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, LoginHtmlField>

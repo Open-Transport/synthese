@@ -39,7 +39,7 @@ namespace synthese
 		class Request;
 
 		/** Function abstract class to use in a Request.
-			@ingroup m30
+			@ingroup m18
 		*/
 		class Function : public util::Factorable
 		{

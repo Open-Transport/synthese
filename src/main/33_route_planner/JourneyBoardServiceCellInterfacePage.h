@@ -45,75 +45,51 @@ namespace synthese
 	{
 		/** Journey board cell for use of a service.
 			@code journey_board_service_cell @endcode
-			@ingroup m33Pages refPages
+			@ingroup m53Pages refPages
 
 			Parameters :
-			 - 0 : First start time
-			 - 1 : Last start time (will be empty if not continuous service)
-			@param firstArrivalTime (2) First start time
-			@param lastArrivalTime (3) Last start time (will be empty if not continuous service)
-			@param rollingStockId (4) ID of used rolling stock
-			@param rollingStockName (5) Display name of used rolling stock
-			@param rollingStockFullDescription (6) HTML description of used Rolling stock
-			@param destinationName (7) Destination name of the vehicle
-			@param handicappedFilterStatus (8)
-			@param handicappedPlacesNumber (9)
-			@param bikeFilterStatus (10)
-			@param bikePlacesNumber (11)
-			@param isReservationCompulsory (12)
-			@param isReservationOptional (13)
-			@param maxBookingDate (14)
-			@param reservationRule (15/16/17) Reservation rule (15=tel number, 16=times of opening, 17=web URL)
-			@param syntheseOnlineBookingURL (18) URL to run to book on the service. Empty if online booking unavailable
-			@param alarm (19/20) Alert (19=message, 20=level)
-			@param color (21) Odd or even color
-
+				- 0 : First departure time
+				- 1 : Last departure time (will be empty if not continuous service)
+				- 2 : First arrival time
+				- 3 : Last arrival time (will be empty if not continuous service)
+				- 4 : rollingStockId (4) ID of used rolling stock
+				- 5 : rollingStockName (5) Display name of used rolling stock
+				- 6 : rollingStockFullDescription (6) HTML description of used Rolling stock
+				- 7 : destinationName (7) Destination name of the vehicle
+				- 8 : handicappedFilterStatus (8)
+				- 9 : handicappedPlacesNumber (9)
+				- 10 : bikeFilterStatus (10)
+				- 11 : bikePlacesNumber (11)
+				- 12 : Line short name
+				- 13 : Line full description
+				- 14 : Waiting duration
+				- 15 : (nothing)
+				- 16 : (nothing)
+				- 17 : (nothing)
+				- 18 : (nothing)
+				- 19 : Alarm message
+				- 20 : Alarm level
+				- 21 : Odd or even color
 		*/
 		class JourneyBoardServiceCellInterfacePage : public interfaces::InterfacePage
 		{
 		public:
 			/** Display.
 				@param stream Stream to write on
-				@param firstDepartureTime (0) First start time
-				@param lastDepartureTime (1) Last start time (will be empty if not continuous service)
-				@param firstArrivalTime (2) First start time
-				@param lastArrivalTime (3) Last start time (will be empty if not continuous service)
-				@param rollingStockId (4) ID of used rolling stock
-				@param rollingStockName (5) Display name of used rolling stock
-				@param rollingStockFullDescription (6) HTML description of used Rolling stock
-				@param destinationName (7) Destination name of the vehicle
+				@param serviceUse The service use to display
+				@param continuousServiceRange Continuous service range
 				@param handicappedFilterStatus (8)
-				@param handicappedPlacesNumber (9)
 				@param bikeFilterStatus (10)
-				@param bikePlacesNumber (11)
-				@param isReservationCompulsory (12)
-				@param isReservationOptional (13)
-				@param maxBookingDate (14)
-				@param reservationRule (15/16/17) Reservation rule (15=tel number, 16=times of opening, 17=web URL)
-				@param syntheseOnlineBookingURL (18) URL to run to book on the service. Empty if online booking unavailable
-				@param alarm (19/20) Alert (19=message, 20=level)
+				@param alarm (19/20) Alarm
 				@param color (21) Odd or even color
-				@param line (Path* object)
-				@param site Displayed site
+				@param request Source request
 			*/
 			void display(
 				std::ostream& stream
 				, const env::ServiceUse& serviceUse
-				, const time::Hour& firstDepartureTime
-				, const time::Hour& lastDepartureTime
-				, const time::Hour& firstArrivalTime
-				, const time::Hour& lastArrivalTime
-				, int rollingStockId
-				, const std::string& rollingStockName
-				, const std::string& rollingStockFullDescription
-				, const std::string& destinationName
+				, int continuousServiceRange
 				, boost::logic::tribool handicappedFilterStatus
 				, boost::logic::tribool bikeFilterStatus
-				, bool isReservationCompulsory
-				, bool isReservationOptional
-				, const time::DateTime maxBookingDate
-				, const env::ReservationRule* reservationRule
-				, const std::string& syntheseOnlineBookingURL
 				, const messages::SentAlarm* alarm
 				, bool color
 				, const server::Request* request = NULL

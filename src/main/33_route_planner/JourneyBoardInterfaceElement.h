@@ -41,7 +41,7 @@ namespace synthese
 	namespace routeplanner
 	{
 		/** Journey board Library Interface Element Class.
-			@ingroup m33Library refLibrary
+			@ingroup m53Library refLibrary
 
 			Parameters :
 			 - 0 : Handicapped filter

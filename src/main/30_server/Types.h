@@ -30,7 +30,7 @@ namespace synthese
 {
 	namespace server
 	{
-		/** @addtogroup m30
+		/** @addtogroup m18
 			@{
 		*/
 

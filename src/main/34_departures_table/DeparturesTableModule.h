@@ -43,31 +43,29 @@ namespace synthese
 		class Line;
 	}
 
-	/**	@defgroup m34Actions 34 Actions
+	/**	@defgroup m34Actions 54 Actions
 		@ingroup m34
 
-		@defgroup m34Pages 34 Pages
+		@defgroup m34Pages 54 Pages
 		@ingroup m34
 
-		@defgroup m34Values 34 Values
+		@defgroup m34Functions 54 Functions
 		@ingroup m34
 
-		@defgroup m34Functions 34 Functions
+		@defgroup m34LS 54 Table synchronizers
 		@ingroup m34
 
-		@defgroup m34LS 34 Table synchronizers
+		@defgroup m34Admin 54 Administration pages
 		@ingroup m34
 
-		@defgroup m34Admin 34 Administration pages
+		@defgroup m34Rights 54 Rights
 		@ingroup m34
 
-		@defgroup m34Rights 34 Rights
+		@defgroup m34Logs 54 DB Logs
 		@ingroup m34
 
-		@defgroup m34Logs 34 DB Logs
-		@ingroup m34
-
-		@defgroup m34 34 Arrival/departures tables service module.
+		@defgroup m34 54 Arrival/departures tables service module.
+		@ingroup m5
 
 		@subsection m34_target_structure Architecture fonctionnelle cible
 

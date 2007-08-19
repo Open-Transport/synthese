@@ -46,7 +46,7 @@ namespace synthese
 		class RoutePlannerInterfacePage;
 
 		/** Route planning Function class.
-			@ingroup m33Functions refFunctions
+			@ingroup m53Functions refFunctions
 		*/
 		class RoutePlannerFunction : public transportwebsite::FunctionWithSite
 		{

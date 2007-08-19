@@ -1,6 +1,8 @@
 
-/** AtLeastOneAlertInJourneyVectorValueInterfaceElement class header.
-	@file AtLeastOneAlertInJourneyVectorValueInterfaceElement.h
+/** TCPModule class header.
+	@file TCPModule.h
+	@author Hugues Romain
+	@date 2007
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,22 +22,47 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef SYNTHESE_TCPModule_H__
+#define SYNTHESE_TCPModule_H__
+
+#include "01_util/ModuleClass.h"
+
 namespace synthese
 {
-	namespace routeplanner
+	/**	@defgroup m00 00 TCP Module.
+		@ingroup m0
+		
+		@{
+	*/
+
+	/** 00 TCP Module Module namespace.
+		@author Hugues Romain
+		@date 2007
+	*/
+	namespace tcp
 	{
-		/** @todo convert this and register it
-		case EI_ATTRIBUT_TRAJETS_TAILLE:
-		return ( ( const cTrajets* ) __Objet ) ->GetTailleTexte();
 
-		case EI_ATTRIBUT_TRAJETS_AUMOINSUNEALERTE:
-		return ( ( const cTrajets* ) __Objet ) ->getAuMoinsUneAlerte();
+		/** 00 TCP Module Module class.
+			@author Hugues Romain
+			@date 2007
 		*/
-		class AtLeastOneAlertInJournayVectorValueInterfaceElement : public interfaces::ValueInterfaceElement
+		class TCPModule : public util::ModuleClass
 		{
-
+		private:
+			// static Object::Registry _registry;	//!< Objects registry
+			
+			
+		public:
+			/** Initialization of the 00 TCP Module module after the automatic database loads.
+				@author Hugues Romain
+				@date 2007
+			*/			
+			//void initialize();
+			
+			// static Object::Registry& getObjects();
 		};
 	}
+	/** @} */
 }
 
-
+#endif // SYNTHESE_TCPModule_H__

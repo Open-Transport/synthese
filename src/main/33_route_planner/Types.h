@@ -38,7 +38,7 @@ namespace synthese
 	namespace routeplanner
 	{
 
-		/** @addtogroup m33
+		/** @addtogroup m53
 			@{
 		*/
 

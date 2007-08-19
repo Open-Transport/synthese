@@ -37,7 +37,7 @@ namespace synthese
 		class AdminInterfaceElement;
 		
 		/** Tree of admin pages links.
-			@ingroup m32Values refValues
+			@ingroup m14Values refValues
 		*/
 		class AdminPagesTreeInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, AdminPagesTreeInterfaceElement>

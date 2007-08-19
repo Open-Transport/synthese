@@ -34,7 +34,7 @@ namespace synthese
 		/** RequestInterfaceElement Library Interface Element Class.
 			@author Hugues Romain
 			@date 2007
-			@ingroup m33Library refLibrary
+			@ingroup m53Library refLibrary
 
 			Parameters :
 				- 0 : Form name

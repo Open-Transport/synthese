@@ -35,7 +35,7 @@ namespace synthese
 
 		/** Schedule sheet lines list cell.
 			@code schedule_sheet_lines_cell @endcode
-			@ingroup m33Pages refPages
+			@ingroup m53Pages refPages
 		*/
 		class RoutePlannerSheetLinesCellInterfacePage : public interfaces::InterfacePage
 		{

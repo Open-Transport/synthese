@@ -46,7 +46,7 @@ namespace synthese
 		class BestVertexReachesMap;
 
 		/** JourneysResult class.
-			@ingroup m33
+			@ingroup m53
 		*/
 		class JourneysResult
 		{			

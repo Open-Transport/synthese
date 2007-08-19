@@ -64,25 +64,23 @@ namespace synthese
 		@defgroup m15Pages 15 Pages
 		@ingroup m15
 
-		@defgroup m15Values 15 Values
+		@defgroup m15Functions 35 Functions
 		@ingroup m15
 
-		@defgroup m15Functions 15 Functions
+		@defgroup m15LS 35 Table synchronizers
 		@ingroup m15
 
-		@defgroup m15LS 15 Table synchronizers
+		@defgroup m15Admin 35 Administration pages
 		@ingroup m15
 
-		@defgroup m15Admin 15 Administration pages
+		@defgroup m15Rights 35 Rights
 		@ingroup m15
 
-		@defgroup m15Rights 15 Rights
+		@defgroup m15Logs 35 DB Logs
 		@ingroup m15
 
-		@defgroup m15Logs 15 DB Logs
-		@ingroup m15
-
-		@defgroup m15 15 Transport
+		@defgroup m15 35 Transport
+		@ingroup m3
 	@{
 		SQLite persistent data loader (with CDM)
 
@@ -249,34 +247,9 @@ namespace synthese
 		- class @ref synthese::envlssql::EnvironmentSyncException "EnvironmentSyncException"
 		- module @ref m02
 
-		<h3>questions</h3>
-
-		@todo Answer to the questions
-
-		1) next connection/departure/arrival in path : est ce que ca a un sens pour les road chunks ?
-		si non, splitter roadchunk et linestop;
-
-		oui ca en a un; on garde et on factorise
-
-		2) format de stockage en base des schedules/services. table a part pour les schedules ?
-
-		les services sont stockés dans une table à part. les horaires d'un service sont une propriété
-		(un champ) de cette table. le calendrier du service est stocké sous forme d'une liste de dates
-		séparées par des virgules.
-
-		3) est ce que le service a besoin de connaitre son path (line/road) ? si oui calculateur fonctionne
-		que sur des services ? si non virer l'attribut.
-
-		a priori oui meme si on sait pas pourquoi ...
-
-		4) le service connait son calendrier. pourquoi la ligne a-t-elle aussi un calendrier ???
-
-		pour des raisons d'optim : le calendrier porté par la ligne est le ou logique de tous les
-		calendriers des services de la ligne
-
 	*/
 
-	/** 15 Transport network module namespace.
+	/** 35 Transport network module namespace.
 		The env name is due to historical reasons.
 	*/
 	namespace env

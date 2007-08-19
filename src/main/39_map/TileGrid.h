@@ -22,7 +22,7 @@ namespace map
    of non painted tiles. 
    The grid is generated here and then dumped in the postscript file
    for interrogation when drawing non overlapping objects.
-	@ingroup m39
+	@ingroup m59
 */
 class TileGrid
 {

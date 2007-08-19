@@ -39,7 +39,7 @@ namespace synthese
 	namespace server
 	{
 		/** User session class.
-			@ingroup m30
+			@ingroup m18
 		*/
 		class Session
 		{

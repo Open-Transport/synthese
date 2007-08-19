@@ -62,22 +62,10 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core Classes"
+			Name="00 Core Classes"
 			>
 			<File
 				RelativePath=".\AlarmObjectLink.h"
-				>
-			</File>
-			<File
-				RelativePath=".\AlarmRecipient.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AlarmRecipient.h"
-				>
-			</File>
-			<File
-				RelativePath=".\AlarmRecipientTemplate.h"
 				>
 			</File>
 			<File
@@ -166,7 +154,7 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="LS SQL"
+			Name="10 LS SQL"
 			>
 			<File
 				RelativePath=".\AlarmObjectLinkTableSync.cpp"
@@ -202,7 +190,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Admin Compounds"
+			Name="14 Admin Compounds"
 			>
 			<File
 				RelativePath=".\MessageAdmin.cpp"
@@ -246,7 +234,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Rights"
+			Name="12 Rights"
 			>
 			<File
 				RelativePath=".\MessagesLibraryRight.cpp"
@@ -266,7 +254,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="DBLog"
+			Name="13 DBLog"
 			>
 			<File
 				RelativePath=".\MessagesLibraryLog.cpp"
@@ -286,7 +274,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Actions"
+			Name="18 Actions"
 			>
 			<Filter
 				Name="Scenario"
@@ -436,6 +424,22 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="00 Factory"
+			>
+			<File
+				RelativePath=".\AlarmRecipient.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AlarmRecipient.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AlarmRecipientTemplate.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\MessagesModule.cpp"

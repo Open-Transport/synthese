@@ -32,7 +32,7 @@ namespace synthese
 	namespace admin
 	{
 		/** AdminInterfaceElementTemplate class.
-			@ingroup m32
+			@ingroup m14
 		*/
 		template<class T>
 		class AdminInterfaceElementTemplate : public util::FactorableTemplate<AdminInterfaceElement, T>

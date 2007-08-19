@@ -42,7 +42,7 @@ namespace synthese
 	namespace routeplanner
 	{
 		/** Best vertex reaches map class.
-			@ingroup m33
+			@ingroup m53
 		*/
 		class BestVertexReachesMap
 		{

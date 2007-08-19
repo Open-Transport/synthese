@@ -38,7 +38,7 @@ namespace synthese
     namespace util
     {
 
-		/** @addtrogroup m01
+		/** @addtogroup m01
 			@{
 		*/
 	

@@ -1,104 +1,28 @@
+/** @page mod Documentation technique
+
+@htmlonly <script>document.location.replace('modules.html');</script> @endhtmlonly
+
+*/
+
 /**
 
-@page mod Documentation technique
+@defgroup ref Reference
 
- - @subpage tech_architecture
- - @subpage m0
- - @subpage m1
- - @subpage m3
- - @subpage m7
+@defgroup m0 0 Utilities and technical elements
 
-@page m0 0 Utilities and technical elements
+@defgroup m1 1 Factories and related technical services
 
-	- @subpage pm00
-	- @subpage pm01
-	- @subpage pm02
-	- @subpage pm03
-	- @subpage pm04
-	- @subpage pm07
-	
-@page m1 1 SYNTHESE Data
+@defgroup m3 3 Business data
+The services contained in class 3 modules are only basic services to handle the business data (insertion, list, ...)
+No complex algorithm should be present in a class 3 module.
 
-	- @subpage pm11
-	- @subpage pm15
-	- @subpage pm16
-	- @subpage pm17
-	- @subpage pm40
-	
-@page m3 3 SYNTHESE Services
+@defgroup m5 5 Business services
+The data tables of class 5 modules contains only stored service parameters.
+No business data should be present in a class 5 module.
 
-	- @subpage pm31
-	- @subpage pm33
-	- @subpage pm34
-	- @subpage pm35
-	- @subpage pm39
+@defgroup m7 7 Third-party business services and data
+The class 7 modules can contain business data and services : the division between class 7 modules corresponds to the third parties which have initiated the module (one module per company)
 
-@page m7 7 SYNTHESE Binaries
-
-	- @subpage pm70
-	- @subpage pm71
-	- @subpage pm72
-	- @subpage pm73
-
-@page pm00 00 TCP socket handler
-	@htmlonly <script>document.location.replace('group__m00.html');</script> @endhtmlonly
-
-@page pm01 01 Various utilities
-	@htmlonly <script>document.location.replace('group__m01.html');</script> @endhtmlonly
-
-@page pm02 02 DAO : SQLite database access
-	@htmlonly <script>document.location.replace('group__m02.html');</script> @endhtmlonly
-
-@page pm03 03 Database Grid management module
-	@htmlonly <script>document.location.replace('group__m03.html');</script> @endhtmlonly
-
-@page pm04 04 Date and time
-	@htmlonly <script>document.location.replace('group__m04.html');</script> @endhtmlonly
-
-@page pm07 07 Lexical matcher
-	@htmlonly <script>document.location.replace('group__m07.html');</script> @endhtmlonly
-
-@page pm11 11 Output : Interface
-	@htmlonly <script>document.location.replace('group__m11.html');</script> @endhtmlonly
-
-@page pm15 15 Object model : Environment
-	@htmlonly <script>document.location.replace('group__m15.html');</script> @endhtmlonly
-
-@page pm16 16 Input : XML temporary environment data loader
-	@htmlonly <script>document.location.replace('group__m16.html');</script> @endhtmlonly
-
-@page pm17 17 Input : SQLite persistent data loader (with CDM)
-	@htmlonly <script>document.location.replace('group__m17.html');</script> @endhtmlonly
-
-@page pm40 40 Input : XML temporary map query loader
-	@htmlonly <script>document.location.replace('group__m40.html');</script> @endhtmlonly
-
-@page pm31 31 Reservation
-	@htmlonly <script>document.location.replace('group__m31.html');</script> @endhtmlonly
-
-@page pm33 33 Route planner
-	@htmlonly <script>document.location.replace('group__m33.html');</script> @endhtmlonly
-
-@page pm34 34 Arrival/departure tables
-	@htmlonly <script>document.location.replace('group__m34.html');</script> @endhtmlonly
-
-@page pm35 35 Timetables
-	@htmlonly <script>document.location.replace('group__m35.html');</script> @endhtmlonly
-
-@page pm39 39 Map drawing
-	@htmlonly <script>document.location.replace('group__m39.html');</script> @endhtmlonly
-
-
-@page pm70 70 Server
-	@htmlonly <script>document.location.replace('group__m70.html');</script> @endhtmlonly
-
-@page pm71 71 CGI client
-	@htmlonly <script>document.location.replace('group__m71.html');</script> @endhtmlonly
-	
-@page pm72 72 RS485 client
-	@htmlonly <script>document.location.replace('group__m72.html');</script> @endhtmlonly
-
-@page pm73 73 Terminal client
-	@htmlonly <script>document.location.replace('group__m73.html');</script> @endhtmlonly
+@defgroup m9 9 Binaires
 
 */

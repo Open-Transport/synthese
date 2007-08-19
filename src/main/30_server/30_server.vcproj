@@ -2,8 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="30_server"
+	Name="18_server"
 	ProjectGUID="{01E44092-75D3-433D-988C-8B0BB7612AB8}"
+	RootNamespace="08_server"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -61,14 +62,10 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core classes"
+			Name="00 Core classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath=".\Action.h"
-				>
-			</File>
 			<File
 				RelativePath=".\ActionFunctionRequest.h"
 				>
@@ -79,10 +76,6 @@
 			</File>
 			<File
 				RelativePath=".\CleanerThreadExec.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Function.h"
 				>
 			</File>
 			<File
@@ -151,11 +144,19 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="LS_SQL"
+			Name="00 Factories"
 			>
+			<File
+				RelativePath=".\Action.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Function.h"
+				>
+			</File>
 		</Filter>
 		<Filter
-			Name="Actions"
+			Name="18 Actions"
 			>
 			<File
 				RelativePath=".\LoginAction.cpp"
@@ -175,60 +176,56 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Interface"
+			Name="11 LibraryInterfaceElement"
 			>
-			<Filter
-				Name="LibraryInterfaceElement"
+			<File
+				RelativePath=".\HtmlFormInterfaceElement.cpp"
 				>
-				<File
-					RelativePath=".\HtmlFormInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\HtmlFormInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\LoginHtmlField.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\LoginHtmlField.h"
-					>
-				</File>
-				<File
-					RelativePath=".\LogoutHTMLLinkInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\LogoutHTMLLinkInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\PasswordHtmlField.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\PasswordHtmlField.h"
-					>
-				</File>
-				<File
-					RelativePath=".\RequestErrorMessageInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\RequestErrorMessageInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ValidSessionInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ValidSessionInterfaceElement.h"
-					>
-				</File>
-			</Filter>
+			</File>
+			<File
+				RelativePath=".\HtmlFormInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LoginHtmlField.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LoginHtmlField.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LogoutHTMLLinkInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LogoutHTMLLinkInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PasswordHtmlField.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PasswordHtmlField.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RequestErrorMessageInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RequestErrorMessageInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ValidSessionInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ValidSessionInterfaceElement.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\SConscript"

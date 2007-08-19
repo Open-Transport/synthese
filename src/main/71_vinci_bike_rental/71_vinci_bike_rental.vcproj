@@ -61,7 +61,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core classes"
+			Name="00 Core classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
@@ -159,7 +159,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Admin Interface elements"
+			Name="14 Admin Interface elements"
 			>
 			<File
 				RelativePath=".\VinciAccountsAdminInterfaceElement.cpp"
@@ -219,7 +219,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Actions"
+			Name="18 Actions"
 			>
 			<Filter
 				Name="Bike rent"
@@ -311,7 +311,7 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Functions"
+			Name="18 Functions"
 			>
 			<File
 				RelativePath=".\BarCodeInterpretFunction.cpp"

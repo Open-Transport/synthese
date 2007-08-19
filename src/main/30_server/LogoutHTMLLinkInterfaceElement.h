@@ -32,7 +32,7 @@ namespace synthese
 	namespace server
 	{
 		/** Logout link Value Interface Element Class.
-			@ingroup m30Values refValues
+			@ingroup m18Values refValues
 		*/
 		class LogoutHTMLLinkInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, LogoutHTMLLinkInterfaceElement>

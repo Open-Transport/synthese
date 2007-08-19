@@ -61,7 +61,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core classes"
+			Name="00 Core classes"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
@@ -74,18 +74,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Right.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Right.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RightTemplate.h"
-				>
-			</File>
-			<File
 				RelativePath=".\User.cpp"
 				>
 			</File>
@@ -95,7 +83,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="AdminInterfaceElement"
+			Name="14 AdminInterfaceElement"
 			>
 			<File
 				RelativePath=".\ProfileAdmin.cpp"
@@ -131,7 +119,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="DBLog"
+			Name="13 DBLog"
 			>
 			<File
 				RelativePath=".\SecurityLog.cpp"
@@ -143,7 +131,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Rights"
+			Name="12 Rights"
 			>
 			<File
 				RelativePath=".\GlobalRight.cpp"
@@ -163,7 +151,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="LS SQL"
+			Name="10 LS SQL"
 			>
 			<File
 				RelativePath=".\ProfileTableSync.cpp"
@@ -183,7 +171,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Actions"
+			Name="18 Actions"
 			>
 			<Filter
 				Name="Right"
@@ -299,24 +287,36 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Interface"
+			Name="00 Factory"
 			>
-			<Filter
-				Name="Interface Pages"
+			<File
+				RelativePath=".\Right.cpp"
 				>
-			</Filter>
-			<Filter
-				Name="Library"
+			</File>
+			<File
+				RelativePath=".\Right.h"
 				>
-				<File
-					RelativePath=".\UserNameInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\UserNameInterfaceElement.h"
-					>
-				</File>
-			</Filter>
+			</File>
+			<File
+				RelativePath=".\RightTemplate.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="11 Interface Pages"
+			>
+		</Filter>
+		<Filter
+			Name="11 Interface Library"
+			>
+			<File
+				RelativePath=".\UserNameInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UserNameInterfaceElement.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\Constants.h"

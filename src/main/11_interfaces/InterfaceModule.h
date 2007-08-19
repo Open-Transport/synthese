@@ -43,9 +43,6 @@ namespace synthese
 		@defgroup m11Library Interface Library
 		@ingroup m11
 
-		@defgroup m11Values Interface Values
-		@ingroup m11
-
 		@defgroup m11LS Table sync
 		@ingroup m11
 
@@ -56,6 +53,7 @@ namespace synthese
 		@ingroup m11
 		
 		@defgroup m11 11 Interface
+		@ingroup m1
 
 		Classes of the interface module :
 			- Interface class : defines an interface entirely : each defined pages is stored in a map page => definition

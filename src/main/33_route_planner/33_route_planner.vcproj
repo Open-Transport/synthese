@@ -2,8 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="33_route_planner"
+	Name="53_route_planner"
 	ProjectGUID="{DCB40545-776B-4B6E-A050-D4A513880697}"
+	RootNamespace="53_route_planner"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -61,7 +62,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core classes"
+			Name="00 Core classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
@@ -99,11 +100,11 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="LS SQL"
+			Name="10 LS SQL"
 			>
 		</Filter>
 		<Filter
-			Name="Functions"
+			Name="18 Functions"
 			>
 			<File
 				RelativePath=".\RoutePlannerFunction.cpp"
@@ -115,184 +116,172 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Interface"
+			Name="11 LibraryInterfaceElement"
 			>
-			<Filter
-				Name="LibraryInterfaceElement"
+			<File
+				RelativePath=".\DatesListInterfaceElement.cpp"
 				>
-				<File
-					RelativePath=".\DatesListInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DatesListInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyBoardInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyBoardInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyBoardsInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyBoardsInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyLineListInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyLineListInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\PeriodsListInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\PeriodsListInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\RequestInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\RequestInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ScheduleSheetDurationRowInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ScheduleSheetDurationRowInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ScheduleSheetLinesListLineInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ScheduleSheetLinesListLineInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ScheduleSheetReservationRowInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ScheduleSheetReservationRowInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\SchedulesTableInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\SchedulesTableInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\TextInputInterfaceElemet.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TextInputInterfaceElemet.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="InterfacePage"
+			</File>
+			<File
+				RelativePath=".\DatesListInterfaceElement.h"
 				>
-				<File
-					RelativePath=".\JourneyBoardInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyBoardInterfacePage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyBoardJunctionCellInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyBoardJunctionCellInterfacePage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyBoardServiceCellInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyBoardServiceCellInterfacePage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyBoardStopCellInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\JourneyBoardStopCellInterfacePage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\RoutePlannerInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\RoutePlannerInterfacePage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\RoutePlannerNoSolutionInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\RoutePlannerNoSolutionInterfacePage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\RoutePlannerSheetColumnInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\RoutePlannerSheetColumnInterfacePage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\RoutePlannerSheetLineInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\RoutePlannerSheetLineInterfacePage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="ValueInterfaceElement"
+			</File>
+			<File
+				RelativePath=".\JourneyBoardInterfaceElement.cpp"
 				>
-				<File
-					RelativePath=".\AtLeastOneAlertInJourneyVectorValueInterfaceElement.h"
-					>
-				</File>
-			</Filter>
+			</File>
+			<File
+				RelativePath=".\JourneyBoardInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\JourneyBoardsInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\JourneyBoardsInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\JourneyLineListInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\JourneyLineListInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PeriodsListInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PeriodsListInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RequestInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RequestInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ScheduleSheetDurationRowInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ScheduleSheetDurationRowInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ScheduleSheetLinesListLineInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ScheduleSheetLinesListLineInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ScheduleSheetReservationRowInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ScheduleSheetReservationRowInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SchedulesTableInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SchedulesTableInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TextInputInterfaceElemet.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TextInputInterfaceElemet.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="11 InterfacePage"
+			>
+			<File
+				RelativePath=".\JourneyBoardInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\JourneyBoardInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\JourneyBoardJunctionCellInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\JourneyBoardJunctionCellInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\JourneyBoardServiceCellInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\JourneyBoardServiceCellInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\JourneyBoardStopCellInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\JourneyBoardStopCellInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlannerInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlannerInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlannerNoSolutionInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlannerNoSolutionInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetColumnInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetColumnInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetLineInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetLineInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RoutePlannerSheetLinesCellInterfacePage.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\RoutePlannerModule.cpp"

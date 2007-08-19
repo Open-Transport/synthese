@@ -39,6 +39,9 @@ namespace synthese
 		class LibraryInterfaceElement;
 		class InterfacePage;
 
+		/** Value element list.
+			@ingroup m11
+		*/
 		class ValueElementList
 		{
 		private:

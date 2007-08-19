@@ -9,6 +9,7 @@ namespace synthese
 {
 
 /** @defgroup m04 04 Time classes
+	@ingroup m0
  
 @{
 */

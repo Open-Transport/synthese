@@ -51,6 +51,7 @@ namespace synthese
 				- Factory<FactoryClass>::contains("class_key") -> Answers if a class is registered with the specified key
 
 			@todo See if the getKey() method could be optimized by use of static variable (my first attempts have failed)
+			@ingroup m01
 		*/
 		template <class RootObject>
 		class Factory

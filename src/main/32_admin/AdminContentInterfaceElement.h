@@ -40,7 +40,7 @@ namespace synthese
 			admincontent
 			@endcode
 
-			@ingroup m32Library refLibrary
+			@ingroup m14Library refLibrary
 		*/
 		class AdminContentInterfaceElement : public interfaces::LibraryInterfaceElement
 		{

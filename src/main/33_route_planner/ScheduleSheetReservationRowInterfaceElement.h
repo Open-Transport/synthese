@@ -39,7 +39,7 @@ namespace synthese
 		/** ScheduleSheetReservationRowInterfaceElement Library Interface Element Class.
 			@author Hugues Romain
 			@date 2007
-			@ingroup m33Library refLibrary
+			@ingroup m53Library refLibrary
 		*/
 		class ScheduleSheetReservationRowInterfaceElement : public interfaces::LibraryInterfaceElement
 		{

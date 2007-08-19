@@ -55,7 +55,7 @@ namespace synthese
 	namespace routeplanner
 	{
 		/** RoutePlannerInterfacePage Interface Page Class.
-			@ingroup m33Pages refPages
+			@ingroup m53Pages refPages
 
 			Parameters :
 				- 0 : date (internal format)

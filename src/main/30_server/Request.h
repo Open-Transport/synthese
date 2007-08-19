@@ -54,7 +54,7 @@ namespace synthese
 		class Function;
 
 		/** Parsed request.
-			@ingroup m30
+			@ingroup m18
 
 			A request object determinates a couple of services to run, and can be used to launch it or to describe it (build of links, etc.)
 

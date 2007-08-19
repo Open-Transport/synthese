@@ -8,7 +8,8 @@
 
 namespace synthese
 {
-	/** @defgroup m57 57 Accounting
+	/** @defgroup m57 37 Accounting
+		@ingroup m3
 
 	@{
 	*/

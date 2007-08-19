@@ -60,6 +60,7 @@ namespace synthese
 		@ingroup m12
 
 		@defgroup m12 12 Security
+		@ingroup m1
 		@{
 	*/
 

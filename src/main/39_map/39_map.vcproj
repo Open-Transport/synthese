@@ -2,8 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="39_map"
+	Name="59_map"
 	ProjectGUID="{C96EECCD-579E-41C2-ABB8-82E4CBF84290}"
+	RootNamespace="59_map"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -61,7 +62,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core classes"
+			Name="00 Core classes"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
 			>
@@ -231,23 +232,23 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="AdminInterfaceElement"
+			Name="14 AdminInterfaceElement"
 			>
 		</Filter>
 		<Filter
-			Name="LibraryInterfaceElement"
+			Name="11 LibraryInterfaceElement"
 			>
 		</Filter>
 		<Filter
-			Name="DBLog"
+			Name="13 DBLog"
 			>
 		</Filter>
 		<Filter
-			Name="Rights"
+			Name="12 Rights"
 			>
 		</Filter>
 		<Filter
-			Name="Functions"
+			Name="18 Functions"
 			>
 			<File
 				RelativePath=".\MapRequest.cpp"

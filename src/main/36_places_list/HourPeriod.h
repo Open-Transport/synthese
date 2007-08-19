@@ -32,7 +32,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** Hour period in a day.
-			@ingroup m04
+			@ingroup m36
 
 			These objects describe a period of time in a day.
 		*/

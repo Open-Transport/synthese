@@ -39,7 +39,7 @@ namespace synthese
 		class PlacesListInterfacePage;
 
 		/** City list request.
-			@ingroup m36
+			@ingroup m36Functions refFunctions
 
 		*/
 		class CityListRequest : public FunctionWithSite

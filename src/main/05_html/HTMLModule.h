@@ -30,6 +30,7 @@
 namespace synthese
 {
 	/** @defgroup m05 05 HTML Library
+		@ingroup m0
 		@{
 	*/
 

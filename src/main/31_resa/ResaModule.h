@@ -30,6 +30,7 @@
 namespace synthese
 {
 	/** @defgroup m31 31 Reservation
+		@ingroup m3
 
 		The reservation module provides the ability to book seats on transport on demand lines.
 
@@ -68,11 +69,11 @@ namespace synthese
 	@{
 	*/
 
-	/** 31 Reservation module namespace.
+	/** 51 Reservation module namespace.
 	*/
 	namespace resa
 	{
-		/** 31 Reservation module class.
+		/** 51 Reservation module class.
 		*/
 		class ResaModule : public util::ModuleClass
 		{

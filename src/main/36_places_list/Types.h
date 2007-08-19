@@ -33,7 +33,13 @@ namespace synthese
 {
 	namespace transportwebsite
 	{
+		/** @addtogroup m36
+			@{
+		*/
+
 		typedef std::vector<std::pair<uid, std::string> > PlacesList;
+
+		/** @} */
 	}
 }
 

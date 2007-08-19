@@ -53,7 +53,7 @@ namespace synthese
 		class JourneysResult;
 
 		/** IntegralSearcher class.
-			@ingroup m33
+			@ingroup m53
 
 			This class provides an algorithm which returns all the vertices available in an area.
 

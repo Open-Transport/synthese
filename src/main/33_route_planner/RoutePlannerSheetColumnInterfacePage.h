@@ -29,7 +29,7 @@ namespace synthese
 	{
 		/** Schedule sheet cell.
 			@code schedule_sheet_column @endcode
-			@ingroup m33Pages refPages
+			@ingroup m53Pages refPages
 
 			Parameters :
 				- 0 : isItFirst row

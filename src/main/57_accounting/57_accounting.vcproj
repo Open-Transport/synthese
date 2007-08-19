@@ -2,8 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="57_accounts"
+	Name="37_accounting"
 	ProjectGUID="{2482F13A-2891-4A54-B969-BCE410593E00}"
+	RootNamespace="37_accounts"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -61,7 +62,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core classes"
+			Name="00 Core classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
@@ -99,7 +100,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="LS SQL"
+			Name="10 LS SQL"
 			>
 			<File
 				RelativePath=".\AccountTableSync.cpp"
@@ -135,15 +136,11 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Admin Interface elements"
+			Name="14 Admin Interface elements"
 			>
 		</Filter>
 		<Filter
-			Name="Interface elements library"
-			>
-		</Filter>
-		<Filter
-			Name="Interface value elements"
+			Name="11 Interface elements library"
 			>
 		</Filter>
 		<File

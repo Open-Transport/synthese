@@ -67,6 +67,7 @@ namespace synthese
 			@ingroup m71
 
 			@defgroup m71 71 Vinci bike rental
+			@ingroup m7
 						
 			Most of the events are treated as transaction parts between accounts.
 

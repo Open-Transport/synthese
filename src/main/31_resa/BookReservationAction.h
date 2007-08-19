@@ -68,6 +68,7 @@ namespace synthese
 			static const std::string PARAMETER_CUSTOMER_ID;
 			static const std::string PARAMETER_CUSTOMER_NAME;
 			static const std::string PARAMETER_CUSTOMER_PHONE;
+			static const std::string PARAMETER_CUSTOMER_EMAIL;
 
 			// Requester information
 			static const std::string PARAMETER_PASSWORD;

@@ -35,7 +35,7 @@ namespace synthese
 	namespace admin
 	{
 		/** ADmin page parameters load error.
-			@ingroup m32
+			@ingroup m14
 
 		*/
 		class AdminParametersException : public util::Exception

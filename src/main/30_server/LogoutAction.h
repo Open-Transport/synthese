@@ -30,7 +30,7 @@ namespace synthese
 	namespace server
 	{
 		/** Logout Action Class
-			@ingroup m30Action refActions
+			@ingroup m18Action refActions
 		*/
 		class LogoutAction : public server::Action
 		{

@@ -36,7 +36,7 @@ namespace synthese
 		class AdminInterfaceElement;
 
 		/** Administration console Function Class.
-			@ingroup m32Functions refFunctions
+			@ingroup m14Functions refFunctions
 		*/
 		class AdminRequest : public interfaces::RequestWithInterfaceAndRequiredSession
 		{

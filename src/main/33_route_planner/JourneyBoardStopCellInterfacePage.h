@@ -23,12 +23,16 @@
 #ifndef SYNTHESE_JourneyBoardStopCellInterfacePage_H__
 #define SYNTHESE_JourneyBoardStopCellInterfacePage_H__
 
-
 #include "11_interfaces/InterfacePage.h"
-#include "04_time/Hour.h"
+#include "04_time/DateTime.h"
 
 namespace synthese
 {
+	namespace env
+	{
+		class ConnectionPlace;
+	}
+
 	namespace messages
 	{
 		class SentAlarm;
@@ -38,7 +42,7 @@ namespace synthese
 	{
 		/** Journey board cell for stop at a place.
 			@code journey_board_stop_cell @endcode
-			@ingroup m33Pages refPages
+			@ingroup m53Pages refPages
 
 			Parameters
 				- 0 isItArrival : true if the stop is used as an arrival, false else
@@ -58,20 +62,23 @@ namespace synthese
 				@param isItArrival (0) true if the stop is used as an arrival, false else
 				@param alarm (1/2) Alert (1=message, 2=level)
 				@param isItTerminus (3) true if the stop is the terminus of the used line, false else
-				@param stopName (4) Stop name
+				@param place Place to display
 				@param color (5) Odd or even color
-				@param firstTime (6) Fist time
-				@param lastTime (7) Last time (UNKNOWN if continuous service)
+				@param time Time
+				@param continuousServiceRange Continuous service range (if <= 0 then no continuous service displayed)
 				@param site Displayed site
 			*/
 			void display(
 				std::ostream& stream
 				, bool isItArrival
 				, const messages::SentAlarm* alarm
-				, bool isItTerminus, const std::string& stopName, bool color
-				, const time::Hour& firstTime, const time::Hour& lastTime
-				, const server::Request* request = NULL ) const;
-
+				, bool isItTerminus
+				, const env::ConnectionPlace* place
+				, bool color
+				, const time::DateTime& time
+				, int continuousServiceRange
+				, const server::Request* request = NULL
+			) const;
 		};
 	}
 }

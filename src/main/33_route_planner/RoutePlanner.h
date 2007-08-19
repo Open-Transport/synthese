@@ -59,7 +59,7 @@ namespace synthese
 		typedef enum {DEPARTURE_FIRST, ARRIVAL_FIRST} PlanningOrder;
 
 		/** Route planner class.
-			@ingroup m33
+			@ingroup m53
 		*/
 		class RoutePlanner
 		{

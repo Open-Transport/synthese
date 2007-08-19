@@ -34,7 +34,7 @@ namespace synthese
 		class ValueInterfaceElement;
 
 		/** Request error message Value Interface Element Class.
-			@ingroup m30Values refValues
+			@ingroup m18Values refValues
 		*/
 		class RequestErrorMessageInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, RequestErrorMessageInterfaceElement>

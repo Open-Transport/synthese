@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="02_db_test"
+	Name="10_db_test"
 	ProjectGUID="{7D65F41B-4F6D-4B0F-B15C-F3796032D037}"
 	RootNamespace="02_db"
 	Keyword="MakeFileProj"

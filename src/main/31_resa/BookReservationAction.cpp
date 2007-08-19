@@ -25,11 +25,17 @@
 #include "33_route_planner/RoutePlannerFunction.h"
 
 #include "31_resa/ResaRight.h"
+#include "31_resa/ReservationTransaction.h"
+#include "31_resa/Reservation.h"
+#include "31_resa/ReservationTransactionTableSync.h"
+#include "31_resa/ReservationTableSync.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 
 #include "12_security/Types.h"
+#include "12_security/User.h"
+#include "12_security/UserTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -67,10 +73,35 @@ namespace synthese
 		void BookReservationAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			ParametersMap::const_iterator it;
-
+			
 			// Right control
 			if (_request->isAuthorized<ResaRight>(WRITE, WRITE))
 			{	// Case operator
+
+				// Customer ID
+				it = map.find(PARAMETER_CUSTOMER_ID);
+				if (it != map.end() && Conversion::ToLongLong(it->second))
+					_customer = UserTableSync::get(Conversion::ToLongLong(it->second));
+
+				// Customer name
+				it = map.find(PARAMETER_CUSTOMER_NAME);
+				if (it == map.end() && !_customer.get())
+					throw ActionException("Neither name nor id of customer is specified");
+				_customerName = it->second;
+
+				// Customer contact phone
+				it = map.find(PARAMETER_CUSTOMER_PHONE);
+				if (!_customer.get() && it == map.end())
+					throw ActionException("Phone not specified");
+				if (it != map.end() && !it->second.empty())
+					_customerPhone = it->second;
+				else if (_customer.get())
+					_customerPhone = _customer->getPhone();
+				else
+					throw ActionException("Empty phone number");
+
+				// CUstomer email
+				it = map.find(PARAMETER_CUSTOMER_EMAIL);
 
 			}
 			else if (_request->isAuthorized<ResaRight>(FORBIDDEN, WRITE))

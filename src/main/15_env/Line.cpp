@@ -182,8 +182,6 @@ namespace synthese
 
 
 
-
-
 		const TransportNetwork* 
 		Line::getNetwork () const
 		{
@@ -205,10 +203,6 @@ namespace synthese
 		{
 			_rollingStockId = rollingStockId;
 		}
-
-
-
-
 
 
 
@@ -249,10 +243,10 @@ namespace synthese
 			return synthese::util::Registrable<uid,Line>::getKey();
 		}
 
-		PhysicalStop* Line::getDestination() const
+		const PhysicalStop* Line::getDestination() const
 		{
 			Edge* edge = getLastEdge();
-			return (PhysicalStop*) edge->getFromVertex();
+			return static_cast<const PhysicalStop*>(edge->getFromVertex());
 		}
 
 		void Line::setAxis( const Axis* axis )

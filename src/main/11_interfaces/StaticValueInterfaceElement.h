@@ -53,7 +53,7 @@ this_is_also_an_element
 			will output
 			@code element with spaces and [ character element with space and { character OK! @endcode
 
-			@ingroup m11Values refValues
+			@ingroup m11Library refLibrary
 		*/
 		class StaticValueInterfaceElement
 			: public LibraryInterfaceElement

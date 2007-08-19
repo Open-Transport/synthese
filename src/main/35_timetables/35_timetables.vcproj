@@ -2,8 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="35_timetables"
+	Name="55_timetables"
 	ProjectGUID="{796AD0E4-801D-4551-84CB-90C3AD6A97D0}"
+	RootNamespace="55_timetables"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -60,18 +61,6 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
-			>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995381-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-		</Filter>
 		<File
 			RelativePath=".\module.h"
 			>

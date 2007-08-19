@@ -25,6 +25,10 @@
 namespace synthese
 {
 	/** @defgroup m07 07 Lexical matcher
+		@ingroup m0
+
+		@todo Move this module into the 01 util as sub-module
+
 		@{
 	*/
 

@@ -32,7 +32,7 @@ namespace synthese
 	namespace server
 	{
 		/** HTML Form generator Value Interface Element Class.
-			@ingroup m30
+			@ingroup m18
 		*/
 		class HtmlFormInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, HtmlFormInterfaceElement>

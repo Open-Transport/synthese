@@ -20,6 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+
+#ifndef SYNTHESE_PlacesListModule_H__
+#define SYNTHESE_PlacesListModule_H__
+
 #include "36_places_list/Site.h"
 #include "36_places_list/SiteCommercialLineLink.h"
 
@@ -27,8 +31,42 @@
 
 namespace synthese
 {
+	/**	@defgroup m36Actions 36 Actions
+		@ingroup m36
+
+		@defgroup m36Pages 36 Pages
+		@ingroup m36
+
+		@defgroup m36Functions 36 Functions
+		@ingroup m36
+
+		@defgroup m36Exceptions 36 Exceptions
+		@ingroup m36
+
+		@defgroup m36LS 36 Table synchronizers
+		@ingroup m36
+
+		@defgroup m36Admin 36 Administration pages
+		@ingroup m36
+
+		@defgroup m36Rights 36 Rights
+		@ingroup m36
+
+		@defgroup m36Logs 36 DB Logs
+		@ingroup m36
+		
+		@defgroup m36 Transport website
+		@ingroup m3
+		
+		(Module documentation)
+		
+		@{
+	*/
+
+	/** 16 Transport website namespace. */
 	namespace transportwebsite
 	{
+		/** 16 Transport website module class. */
 		class PlacesListModule : public util::ModuleClass
 		{
 		private:
@@ -48,4 +86,8 @@ namespace synthese
 			void initialize();
 		};
 	}
+
+	/** @} */
 }
+
+#endif // SYNTHESE_PlacesListModule_H__

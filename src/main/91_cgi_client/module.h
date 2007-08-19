@@ -9,6 +9,7 @@ namespace synthese
 {
 
 	/** @defgroup m91 91 CGI Client
+		@ingroup m9
 
 		Le client CGI est destiné à l'usage de SYNTHESE dans le cadre d'un site web. Il permet au serveur web de commander à SYNTHESE des pages web contenant les résultats de requêtes. L'interface définit le langage de sortie des pages, qui est ainsi indéfini. En règle général, le client CGI est utilisé pour obtenir des pages HTML ou XML.
 

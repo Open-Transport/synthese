@@ -43,7 +43,7 @@ namespace synthese
 	namespace admin
 	{
 		/** Composant d'administration.
-			@ingroup m32
+			@ingroup m14
 			
 			Un composant d'administration est un formulaire paramétrable, destiné à effectuer une écriture en temps réel dans la base SYNTHESE, dans un but de paramétrage de l'application (il ne s'agit pas du seul moyen d'écriture).
 			Une même donnée peut être mise à jour par autant de composants que nécessaire, défini avant tout sur la base d'une ergonomie de qualité.

@@ -8,6 +8,7 @@
 namespace synthese
 {
 	/** @defgroup m03 03 Database synchronisation ring.
+		@ingroup m0
 
 	@{
 	*/

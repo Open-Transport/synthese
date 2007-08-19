@@ -2,8 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="02_db"
+	Name="10_db"
 	ProjectGUID="{F0BEDE6D-51E1-4226-9F5E-3D4A72BFE6F4}"
+	RootNamespace="12_db"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -61,7 +62,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core Classes"
+			Name="00 Core Classes"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
@@ -154,18 +155,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SQLiteTableSync.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SQLiteTableSync.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SQLiteTableSyncTemplate.h"
-				>
-			</File>
-			<File
 				RelativePath=".\SQLiteUpdateHook.h"
 				>
 			</File>
@@ -192,6 +181,22 @@
 			</File>
 			<File
 				RelativePath=".\SQLiteException.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="00 Factory"
+			>
+			<File
+				RelativePath=".\SQLiteTableSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteTableSync.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SQLiteTableSyncTemplate.h"
 				>
 			</File>
 		</Filter>

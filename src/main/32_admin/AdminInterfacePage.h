@@ -33,7 +33,7 @@ namespace synthese
 
 		/** Admin template page.
 		@code admin @endcode
-			@ingroup m32Pages refPages
+			@ingroup m14Pages refPages
 		*/
 		class AdminInterfacePage : public interfaces::InterfacePage
 		{

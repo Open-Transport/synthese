@@ -44,7 +44,7 @@ namespace synthese
 	namespace routeplanner
 	{
 		/** JourneyBoardInterfacePage Interface Page Class.
-			@ingroup m33Pages refPages
+			@ingroup m53Pages refPages
 
 			Parameters :
 			 - 0 : index of the journey board

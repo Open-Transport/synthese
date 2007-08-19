@@ -8,12 +8,13 @@
 namespace synthese
 {
 
-	/** @defgroup m35 35 Time tables Generation.
+	/** @defgroup m55 55 Time tables Generation.
+		@ingroup m5
 		
 		@{
 	*/
 
-	/** 35_timetables namespace */
+	/** 55_timetables namespace */
 	namespace timetables
 	{
 

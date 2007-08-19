@@ -30,7 +30,7 @@ namespace synthese
 	namespace server
 	{
 		/** Template for a Request containing an action and a function.
-			@ingroup m30
+			@ingroup m18
 		*/
 		template<class A, class F>
 		class ActionFunctionRequest : public FunctionRequest<F>

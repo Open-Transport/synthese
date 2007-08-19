@@ -39,7 +39,7 @@ namespace synthese
 	{
 		/** Timetable generator.
 			@code schedules_table @endcode
-			@ingroup m33Library refLibrary
+			@ingroup m53Library refLibrary
 		*/
 		class SchedulesTableInterfaceElement : public interfaces::LibraryInterfaceElement
 		{

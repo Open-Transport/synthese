@@ -50,10 +50,14 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		/** Route planning workspace.
-			@ingroup m33
+		/** Transport website.
+			@ingroup m36
 			@author Hugues Romain
 			@date 2005-2006
+
+			Includes :
+				- transport sub-environment definition
+
 		*/
 		class Site : public util::Registrable<uid, Site>
 		{

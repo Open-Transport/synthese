@@ -36,6 +36,7 @@ namespace synthese
 		@ingroup m17
 
 		@defgroup m17 17 Messages
+		@ingroup m1
 	@{	*/
 
 	/** 17 Messages module namespace.

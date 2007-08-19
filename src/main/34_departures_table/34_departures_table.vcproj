@@ -2,8 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="34_departures_table"
+	Name="54_departures_table"
 	ProjectGUID="{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
+	RootNamespace="54_departures_table"
 	Keyword="MakeFileProj"
 	>
 	<Platforms>
@@ -61,7 +62,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Core classes"
+			Name="00 Core classes"
 			>
 			<File
 				RelativePath=".\DisplayScreen.cpp"
@@ -109,7 +110,7 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Rights"
+			Name="12 Rights"
 			>
 			<File
 				RelativePath=".\ArrivalDepartureTableRight.cpp"
@@ -129,7 +130,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="DBLog"
+			Name="13 DBLog"
 			>
 			<File
 				RelativePath=".\ArrivalDepartureTableLog.cpp"
@@ -157,7 +158,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Functions"
+			Name="18 Functions"
 			>
 			<File
 				RelativePath=".\DisplayScreenContentRequest.cpp"
@@ -177,7 +178,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="LS SQL"
+			Name="10 LS SQL"
 			>
 			<File
 				RelativePath=".\AdvancedSelectTableSync.cpp"
@@ -205,7 +206,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Actions"
+			Name="18 Actions"
 			>
 			<Filter
 				Name="Display screen"
@@ -353,7 +354,7 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Alarm recipient"
+			Name="17 Alarm recipient"
 			>
 			<File
 				RelativePath=".\DisplayScreenAlarmRecipient.cpp"
@@ -365,140 +366,136 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Interface"
+			Name="11 LibraryInterfaceElement"
 			>
-			<Filter
-				Name="LibraryInterfaceElement"
+			<File
+				RelativePath=".\DeparturesTableDestinationContentInterfaceElement.cpp"
 				>
-				<File
-					RelativePath=".\DeparturesTableDestinationContentInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DeparturesTableDestinationContentInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DeparturesTableInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DeparturesTableInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DeparturesTableLineContentInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DeparturesTableLineContentInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DeparturesTableRowServiceNumberInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DeparturesTableRowServiceNumberInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DeparturesTableTimeContentInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DeparturesTableTimeContentInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="InterfacePage"
+			</File>
+			<File
+				RelativePath=".\DeparturesTableDestinationContentInterfaceElement.h"
 				>
-				<File
-					RelativePath=".\DeparturesTableInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DeparturesTableInterfacePage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DepartureTableRowInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DepartureTableRowInterfacePage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ParseDisplayReturnInterfacePage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ParseDisplayReturnInterfacePage.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="AdminInterfaceElement"
+			</File>
+			<File
+				RelativePath=".\DeparturesTableInterfaceElement.cpp"
 				>
-				<File
-					RelativePath=".\BroadcastPointsAdmin.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\BroadcastPointsAdmin.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplayAdmin.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplayAdmin.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplayMaintenanceAdmin.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplayMaintenanceAdmin.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplaySearchAdmin.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplaySearchAdmin.h"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplayTypesAdmin.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DisplayTypesAdmin.h"
-					>
-				</File>
-			</Filter>
+			</File>
+			<File
+				RelativePath=".\DeparturesTableInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DeparturesTableLineContentInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DeparturesTableLineContentInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DeparturesTableRowServiceNumberInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DeparturesTableRowServiceNumberInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DeparturesTableTimeContentInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DeparturesTableTimeContentInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayScreenAlarmContentValueInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayScreenHasAlarmValueInterfaceElement.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="11 InterfacePage"
+			>
+			<File
+				RelativePath=".\DeparturesTableInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DeparturesTableInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DepartureTableRowInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DepartureTableRowInterfacePage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ParseDisplayReturnInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ParseDisplayReturnInterfacePage.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="14 AdminInterfaceElement"
+			>
+			<File
+				RelativePath=".\BroadcastPointsAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BroadcastPointsAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayMaintenanceAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayMaintenanceAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplaySearchAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplaySearchAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayTypesAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayTypesAdmin.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\DeparturesTableModule.cpp"

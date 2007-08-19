@@ -140,7 +140,7 @@ namespace synthese
 
 				bool isReservable () const;
 
-				PhysicalStop* getDestination() const;
+				const PhysicalStop* getDestination() const;
 			//@}
 		    
 		};

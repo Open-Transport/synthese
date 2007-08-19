@@ -9,6 +9,7 @@ namespace synthese
 {
 
 	/** @defgroup m92 92 RS485 Client
+		@ingroup m9
 
 		Le client RS485 assure en service continu les opérations suivantes :
 			- demande du contenu au serveur, en spécifiant la clé de l'afficheur, ce qui détermine à la fois le protocole et le contenu

@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_JourneyBoardJunctionCellInterfacePage_H__
 #define SYNTHESE_JourneyBoardJunctionCellInterfacePage_H__
 
-
 #include "11_interfaces/InterfacePage.h"
 
 namespace synthese
@@ -31,6 +30,7 @@ namespace synthese
 	namespace env
 	{
 		class ConnectionPlace;
+		class Road;
 	}
 
 	namespace messages
@@ -42,21 +42,34 @@ namespace synthese
 	{
 		/** Journey board cell for use of a junction.
 			@code journey_board_junction_cell @endcode
-			@ingroup m33Pages refPages
+			@ingroup m53Pages refPages
+
+			Parameters :
+				- 0 : Reached place name
+				- 1 : Alarm
+				- 2 : Alarm
+				- 3 : Odd or even row in the journey board
+				- 4 : Road name
 		*/
 		class JourneyBoardJunctionCellInterfacePage : public interfaces::InterfacePage
 		{
 		public:
 			/** Display.
-				@param place (0) Arr?t ? rejoindre ? pied</th><th>Index de l'arr?t
-				@param alarm (1/2) Message d'alerte de l'arr?t ? rejoindre ? pied (RIEN = Pas d'alerte)
-				@param site Displayed site
+				@param stream Stream to display on
+				@param place Reached place
+				@param alarm Alarm to display for the road use
+				@param color Odd or even row in the journey board
+				@param road Used road
+				@param request Source request
 			*/
-			void display( std::ostream& stream
-				, const synthese::env::ConnectionPlace* place
+			void display(
+				std::ostream& stream
+				, const env::ConnectionPlace* place
 				, const messages::SentAlarm* alarm
 				, bool color
-				, const server::Request* request = NULL ) const;
+				, const env::Road* road
+				, const server::Request* request = NULL
+			) const;
 
 		};
 	}

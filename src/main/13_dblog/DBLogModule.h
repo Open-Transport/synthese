@@ -33,6 +33,7 @@
 namespace synthese
 {
 	/** @defgroup m13 13 Database stored applicative log.
+		@ingroup m1
 		@{
 	*/
 

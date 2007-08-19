@@ -35,7 +35,7 @@ namespace synthese
 		class Site;
 
 		/** InterfaceTableSync SQLite table synchronizer.
-			@ingroup m33LS refLS
+			@ingroup m36LS refLS
 		*/
 
 		class SiteTableSync : public db::SQLiteTableSyncTemplate<Site>

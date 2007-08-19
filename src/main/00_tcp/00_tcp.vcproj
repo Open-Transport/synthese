@@ -112,6 +112,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\TCPModule.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
