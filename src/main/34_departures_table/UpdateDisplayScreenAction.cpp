@@ -24,7 +24,7 @@
 
 #include "02_db/DBEmptyResultException.h"
 
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
 
 #include "30_server/ActionException.h"

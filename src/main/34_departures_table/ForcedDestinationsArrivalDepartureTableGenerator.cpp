@@ -78,7 +78,7 @@ namespace synthese
 		const ArrivalDepartureList& ForcedDestinationsArrivalDepartureTableGenerator::generate()
 		{
 			/** - Search of best departure for each forced destination */
-			typedef map<const ConnectionPlace*, ArrivalDepartureList::iterator> ReachedDestinationMap;
+			typedef map<const PublicTransportStopZoneConnectionPlace*, ArrivalDepartureList::iterator> ReachedDestinationMap;
 			ReachedDestinationMap reachedDestination;
 			
 			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)

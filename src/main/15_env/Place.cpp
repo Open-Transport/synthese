@@ -42,6 +42,7 @@ namespace synthese
 				  const City* city)
 			: _name (name)
 			, _city (city)
+			, _isoBarycentreToUpdate(false)
 		{
 			stringstream ss;
 			boost::iostreams::filtering_ostream out;

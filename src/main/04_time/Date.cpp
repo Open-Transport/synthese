@@ -510,14 +510,19 @@ namespace synthese
 				return Date(date[0]);
 			}
 
-			if (date.size() != 8)
+			if (date.size() < 8)
 				throw TimeParseException("Bad length for internal date string");
 
-			return Date(
+			Date result(
 				Conversion::ToInt(date.substr(6,2))
 				, Conversion::ToInt(date.substr(4,2))
 				, Conversion::ToInt(date.substr(0,4))
 			);
+
+			if (!result.isValid())
+				throw TimeParseException("Bad date value");
+
+			return result;
 		}
 	}
 }

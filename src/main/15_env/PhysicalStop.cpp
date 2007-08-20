@@ -20,19 +20,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/PhysicalStop.h"
-#include "15_env/ConnectionPlace.h"
+#include "PhysicalStop.h"
+
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace env 
 	{
 
 		PhysicalStop::PhysicalStop (const uid& id,
 						const std::string& name,
-						const AddressablePlace* place,
+						const PublicTransportStopZoneConnectionPlace* place,
 						double x, double y)
-			: synthese::util::Registrable<uid,PhysicalStop> (id)
+			: Registrable<uid,PhysicalStop> (id)
 			, Vertex (place, x, y)
 			, _name (name)
 		{
@@ -97,6 +100,11 @@ namespace synthese
 		bool PhysicalStop::isConnectionAllowed() const
 		{
 			return getConnectionPlace()->getConnectionType() >= ConnectionPlace::CONNECTION_TYPE_LINELINE;
+		}
+
+		const PublicTransportStopZoneConnectionPlace* PhysicalStop::getConnectionPlace() const
+		{
+			return static_cast<const PublicTransportStopZoneConnectionPlace*>(Vertex::getPlace());
 		}
 	}
 }

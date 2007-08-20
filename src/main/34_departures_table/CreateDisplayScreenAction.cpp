@@ -29,7 +29,7 @@
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/ConnectionPlaceTableSync.h"
 
 using namespace std;
@@ -99,7 +99,7 @@ namespace synthese
 			ArrivalDepartureTableLog::addUpdateEntry(screen, "Création", _request->getUser());
 		}
 
-		void CreateDisplayScreenAction::setPlace( boost::shared_ptr<const env::ConnectionPlace> place )
+		void CreateDisplayScreenAction::setPlace( boost::shared_ptr<const PublicTransportStopZoneConnectionPlace> place )
 		{
 			_place = place;
 		}

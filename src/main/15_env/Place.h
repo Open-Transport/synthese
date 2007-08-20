@@ -30,6 +30,8 @@
 
 #include "15_env/Types.h"
 
+#include "06_geometry/IsoBarycentre.h"
+
 #include "01_util/UId.h"
 
 namespace synthese
@@ -58,6 +60,10 @@ namespace synthese
 		*/
 		class Place 
 		{
+		protected:
+			mutable bool _isoBarycentreToUpdate;
+			mutable geometry::IsoBarycentre _isoBarycentre;
+
 		private:
 
 			std::string _name;  //!< The name

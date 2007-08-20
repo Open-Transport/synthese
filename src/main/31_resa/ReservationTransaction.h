@@ -55,11 +55,12 @@ namespace synthese
 
 			//!	\name Personnes
 			//@{
-				uid								_customerUserId;
-				std::string						_customerName;
-				std::string						_customerPhone;
-				uid								_bookingUserId;
-				uid								_cancelUserId;
+				uid					_customerUserId;
+				std::string			_customerName;
+				std::string			_customerPhone;
+				std::string			_customerEMail;
+				uid					_bookingUserId;
+				uid					_cancelUserId;
 			//@}
 
 			//! \name Journey
@@ -85,6 +86,7 @@ namespace synthese
 			void setCustomerPhone(const std::string& phone);
 			void setBookingUserId(uid id);
 			void setCancelUserId(uid id);
+			void setCustomerEMail(const std::string& email);
 
 			uid						getLastReservation() const;
 			int						getSeats() const;
@@ -95,6 +97,7 @@ namespace synthese
 			const std::string&		getCustomerPhone() const;
 			uid						getBookingUserId() const;
 			uid						getCancelUserId() const;
+			const std::string&		getCustomerEMail() const;
 		};
 	}
 }

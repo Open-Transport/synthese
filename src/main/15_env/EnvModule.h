@@ -37,7 +37,7 @@
 #include "15_env/PublicPlace.h"
 #include "15_env/City.h"
 #include "15_env/PhysicalStop.h"
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/CommercialLine.h"
 #include "15_env/Line.h"
 #include "15_env/LineStop.h"
@@ -262,9 +262,9 @@ namespace synthese
 		{
 		private:
 
-			static Address::Registry				_addresses;
-			static City::Registry					_cities;
-			static ConnectionPlace::Registry		_connectionPlaces;
+			static Address::Registry						_addresses;
+			static City::Registry							_cities;
+			static PublicTransportStopZoneConnectionPlace::Registry	_publicTransportStopZones;
 			static PlaceAlias::Registry				_placeAliases;
 			static PublicPlace::Registry			_publicPlaces;
 			static PhysicalStop::Registry			_physicalStops;
@@ -293,8 +293,8 @@ namespace synthese
 
 			static Address::Registry&				getAddresses();
 			static City::Registry&					getCities();
-			static ConnectionPlace::Registry&		getConnectionPlaces();
 			static PhysicalStop::Registry&			getPhysicalStops();
+			static PublicTransportStopZoneConnectionPlace::Registry&	getPublicTransportStopZones();
 			static CommercialLine::Registry&		getCommercialLines();
 			static Line::Registry&					getLines();
 			static Axis::Registry&					getAxes();
@@ -326,7 +326,7 @@ namespace synthese
 			static boost::shared_ptr<const Place> fetchPlace (const uid& id);
 
 
- 		        static boost::shared_ptr<const Vertex> fetchVertex (const uid& id);
+ 		    static boost::shared_ptr<const Vertex> fetchVertex (const uid& id);
 
 			/** Retrieves all lines associated withb a given commercial line id.
 			 */

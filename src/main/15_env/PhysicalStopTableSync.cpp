@@ -28,6 +28,7 @@
 
 #include "15_env/EnvModule.h"
 #include "15_env/PhysicalStop.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 
 #include <sqlite/sqlite3.h>
 #include <assert.h>
@@ -104,7 +105,7 @@ namespace synthese
 			
 		if (EnvModule::getPhysicalStops ().contains (id)) return;
 			
-		shared_ptr<ConnectionPlace> place = EnvModule::getConnectionPlaces().getUpdateable(rows->getLongLong (COL_PLACEID));
+		shared_ptr<PublicTransportStopZoneConnectionPlace> place = EnvModule::getPublicTransportStopZones().getUpdateable(rows->getLongLong (COL_PLACEID));
 		    
 	    shared_ptr<PhysicalStop> ps(
 		new PhysicalStop (

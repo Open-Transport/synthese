@@ -22,7 +22,7 @@
 
 #include "01_util/UId.h"
 
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/CommercialLine.h"
 
 #include "34_departures_table/DeparturesTableModule.h"

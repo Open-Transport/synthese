@@ -46,10 +46,10 @@ namespace synthese
 		    , const server::Request* request /*= NULL */
 		) const	{
 			ParametersVector pv;
-			pv.push_back(synthese::util::Conversion::ToString(place->getKey()));
+			pv.push_back(util::Conversion::ToString(place->getId()));
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
 			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
-			pv.push_back(synthese::util::Conversion::ToString(color));
+			pv.push_back(util::Conversion::ToString(color));
 			pv.push_back(road ? road->getName() : string());
 
 			VariablesMap vm;

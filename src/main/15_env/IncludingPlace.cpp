@@ -32,7 +32,6 @@ namespace synthese
 			const string& name
 			, const City* city
 		)	: Place (name, city)
-			, _isoBarycentreToUpdate(false)
 		{
 		}
 
@@ -44,7 +43,7 @@ namespace synthese
 
 
 
-		const std::vector<const Place*>& 
+		const IncludingPlace::IncludedPlaces& 
 		IncludingPlace::getIncludedPlaces () const
 		{
 			return _includedPlaces;
@@ -70,7 +69,7 @@ namespace synthese
 			, const Vertex* origin
 		) const	{
 
-			for(vector<const Place*>::const_iterator it(_includedPlaces.begin());
+			for(IncludedPlaces::const_iterator it(_includedPlaces.begin());
 				it != _includedPlaces.end();
 				++it
 			){
@@ -87,7 +86,7 @@ namespace synthese
 			if (_isoBarycentreToUpdate)
 			{
 				_isoBarycentre.clear();
-				for (std::vector<const Place*>::const_iterator it(_includedPlaces.begin()); it != _includedPlaces.end(); ++it)
+				for (IncludedPlaces::const_iterator it(_includedPlaces.begin()); it != _includedPlaces.end(); ++it)
 					_isoBarycentre.add((*it)->getPoint());
 				_isoBarycentreToUpdate = false;
 			}

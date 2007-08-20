@@ -89,11 +89,11 @@ namespace synthese
 				);
 
 			ActualDisplayedArrivalsList arrivals;
-			set<const ConnectionPlace*> encounteredPlaces;
-			const ConnectionPlace* destinationPlace = static_cast<const Line*>(servicePointer.getEdge()->getParentPath())->getDestination()->getConnectionPlace();
+			set<const PublicTransportStopZoneConnectionPlace*> encounteredPlaces;
+			const PublicTransportStopZoneConnectionPlace* destinationPlace = static_cast<const Line*>(servicePointer.getEdge()->getParentPath())->getDestination()->getConnectionPlace();
 			for (const LineStop* curLinestop = static_cast<const LineStop*>(servicePointer.getEdge()); curLinestop != NULL; curLinestop = (LineStop*) curLinestop->getFollowingArrivalForFineSteppingOnly())
 			{
-				const ConnectionPlace* place = curLinestop->getPhysicalStop()->getConnectionPlace();
+				const PublicTransportStopZoneConnectionPlace* place(curLinestop->getConnectionPlace());
 				
 				if (	_displayedPlaces.find(place) != _displayedPlaces.end()
 							&& encounteredPlaces.find(place) == encounteredPlaces.end()	// If the place must be displayed according to the display rules (only once per place)

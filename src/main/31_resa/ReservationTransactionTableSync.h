@@ -53,6 +53,7 @@ namespace synthese
 			static const std::string COL_CUSTOMER_PHONE;
 			static const std::string COL_BOOKING_USER_ID;
 			static const std::string COL_CANCEL_USER_ID;
+			static const std::string COL_CUSTOMER_EMAIL;
 			
 			ReservationTransactionTableSync();
 			~ReservationTransactionTableSync();

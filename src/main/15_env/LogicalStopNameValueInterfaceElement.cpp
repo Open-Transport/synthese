@@ -28,7 +28,7 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
 
-#include "15_env/ConnectionPlace.h"
+#include "15_env/Place.h"
 #include "15_env/LogicalStopNameValueInterfaceElement.h"
 
 using namespace boost;
@@ -53,7 +53,7 @@ namespace synthese
 		{
 /*			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )
 			{
-*/				const ConnectionPlace* place = static_cast<const ConnectionPlace*>(object);
+*/				const Place* place(static_cast<const Place*>(object));
 				stream << place->getFullName();
 /*			}
 			else

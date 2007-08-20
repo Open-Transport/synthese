@@ -20,14 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/ConnectionPlace.h"
-#include "15_env/PhysicalStop.h"
-#include "15_env/Address.h"
-#include "15_env/Vertex.h"
-#include "15_env/Line.h"
-#include "15_env/Vertex.h"
+#include "ConnectionPlace.h"
+
 #include "15_env/VertexAccessMap.h"
-#include "15_env/Edge.h"
 
 #include "06_geometry/SquareDistance.h"
 
@@ -36,37 +31,22 @@
 
 #include "01_util/Constants.h"
 
-#include "04_time/DateTime.h"
-
-
 using namespace std;
 
 namespace synthese
 {
-	using namespace messages;
 	using namespace geometry;
 
 	namespace env
 	{
-		const int ConnectionPlace::UNKNOWN_TRANSFER_DELAY = -1;
-		const int ConnectionPlace::FORBIDDEN_TRANSFER_DELAY = std::numeric_limits<int>::max ();
-		const int ConnectionPlace::SQUAREDISTANCE_SHORT_LONG = 625;
-
-
+		const int ConnectionPlace::FORBIDDEN_TRANSFER_DELAY(99);
 
 		ConnectionPlace::ConnectionPlace (
-			uid id,
-						std::string name,
-						const City* city,
-						ConnectionType connectionType,
-						int defaultTransferDelay)
-			: synthese::util::Registrable<uid,ConnectionPlace> (id)
-			, AddressablePlace (name, city)
-			, _connectionType (connectionType)
-			, _defaultTransferDelay (defaultTransferDelay)
-			, _minTransferDelay (defaultTransferDelay)
-			, _maxTransferDelay (defaultTransferDelay)
-			, _score(UNKNOWN_VALUE)
+			std::string name
+			, const City* city
+			, ConnectionType type
+		)	: AddressablePlace (name, city)
+			, _connectionType(type)
 		{
 		}
 
@@ -74,117 +54,7 @@ namespace synthese
 		ConnectionPlace::~ConnectionPlace ()
 		{
 		}
-
-
-
-
-		const AddressablePlace::ConnectionType
-		ConnectionPlace::getConnectionType () const
-		{
-			return _connectionType;
-		}
-
-
-
-
-
-
-
-		int 
-		ConnectionPlace::getDefaultTransferDelay () const
-		{
-			return _defaultTransferDelay;
-		}
-
-
-
-
-
-		int 
-		ConnectionPlace::getMinTransferDelay () const
-		{
-			return _minTransferDelay;
-		}
-
-
-		int 
-		ConnectionPlace::getMaxTransferDelay () const
-		{
-			return _maxTransferDelay;
-		}
-
-
-
-
-
-
-		void 
-		ConnectionPlace::setDefaultTransferDelay (int defaultTransferDelay)
-		{
-			_defaultTransferDelay = defaultTransferDelay;
-		}
-
-
-
-
-
-
-		void 
-		ConnectionPlace::setConnectionType (const ConnectionType& connectionType)
-		{
-			_connectionType = connectionType;
-		}
-
-
-
-
-		int 
-		ConnectionPlace::getTransferDelay (const Vertex* fromVertex, 
-						const Vertex* toVertex) const
-		{
-			std::map< std::pair<uid, uid>, int >::const_iterator iter = 
-			_transferDelays.find (std::make_pair (fromVertex->getId (), 
-								toVertex->getId ()));
-		    
-			// If not defined in map, return default transfer delay
-			if (iter == _transferDelays.end ()) return _defaultTransferDelay;
-			return iter->second;
-		}
 		 
-
-
-		void 
-		ConnectionPlace::addTransferDelay (uid departureId, uid arrivalId, int transferDelay)
-		{
-			_transferDelays[std::make_pair (departureId, arrivalId)] = transferDelay;
-			if (transferDelay < _minTransferDelay)
-			{
-				_minTransferDelay = transferDelay;
-			}
-			if (transferDelay < _maxTransferDelay)
-			{
-				_maxTransferDelay = transferDelay;
-			}
-		}
-
-		    
-
-		void 
-		ConnectionPlace::clearTransferDelays ()
-		{
-			_transferDelays.clear ();
-		}
-
-
-
-
-		void 
-		ConnectionPlace::addPhysicalStop (const PhysicalStop* physicalStop)
-		{
-			_isoBarycentreToUpdateC = true;
-			_physicalStops.insert(physicalStop);
-		}
-
 
 
 		VertexAccess ConnectionPlace::getVertexAccess(
@@ -215,169 +85,12 @@ namespace synthese
 
 			return access;
 		}
-		
 
 
-		void ConnectionPlace::getImmediateVertices (
-			VertexAccessMap& result
-			, const AccessDirection& accessDirection
-			, const AccessParameters& accessParameters
-			, SearchAddresses returnAddresses
-			, SearchPhysicalStops returnPhysicalStops
-			, const Vertex* origin
-		) const {
-			AddressablePlace::getImmediateVertices(
-				result, accessDirection, accessParameters
-				, returnAddresses, returnPhysicalStops
-				, origin
-			);
-		    
-			if (returnPhysicalStops == SEARCH_PHYSICALSTOPS)
-			{
-				for(PhysicalStops::const_iterator it(_physicalStops.begin());
-					it != _physicalStops.end();
-					++it
-				){
-					result.insert(
-						*it
-						, getVertexAccess(
-							accessDirection
-							, accessParameters
-							, *it
-							, origin
-						)
-					);
-				}
-			}
-		}
 
-
-		    
-		ConnectionPlace::ConnectionType 
-		ConnectionPlace::getRecommendedConnectionType (const SquareDistance& squareDistance) const
+		ConnectionPlace::ConnectionType ConnectionPlace::getConnectionType() const
 		{
-			if (_connectionType == CONNECTION_TYPE_RECOMMENDED_SHORT)
-			{
-				return (squareDistance.getSquareDistance () > SQUAREDISTANCE_SHORT_LONG)
-					? CONNECTION_TYPE_LINELINE
-					: CONNECTION_TYPE_RECOMMENDED ;
-			}
 			return _connectionType;
-		}
-
-
-
-		bool 
-		ConnectionPlace::isConnectionAllowed (const Vertex* fromVertex, 
-							const Vertex* toVertex) const
-		{
-			if(_connectionType == CONNECTION_TYPE_FORBIDDEN)
-				return false;
-		    
-			bool fromVertexOnLine (dynamic_cast<const PhysicalStop*> (fromVertex));
-			bool toVertexOnLine (dynamic_cast<const PhysicalStop*> (toVertex));
-
-			if(	(_connectionType == CONNECTION_TYPE_ROADROAD)
-			&&	(fromVertexOnLine == false)
-			&&	(toVertexOnLine == false)
-			)	return true;
-
-			if(	(_connectionType == CONNECTION_TYPE_ROADLINE)
-			&&	(	(fromVertexOnLine == false)
-				||	(toVertexOnLine == false)
-				)
-			) return true;
-		    
-			if (_connectionType >= CONNECTION_TYPE_LINELINE) 
-			{
-				return getTransferDelay(fromVertex,	toVertex) != FORBIDDEN_TRANSFER_DELAY;
-			}
-		    
-			return false;
-		}
-
-		std::vector<std::pair<uid, std::string> > ConnectionPlace::getPhysicalStopLabels( bool withAll /*= false*/ ) const
-		{
-			vector<pair<uid, string> > m;
-			if (withAll)
-				m.push_back(make_pair(0, "(tous)"));
-			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
-				m.push_back(make_pair((*it)->getKey(), (*it)->getOperatorCode() + " / " + (*it)->getName()));
-			return m;
-		}
-
-		std::vector<std::pair<uid, std::string> > ConnectionPlace::getPhysicalStopLabels( const PhysicalStops& noDisplay ) const
-		{
-			vector<pair<uid, string> > m;
-			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
-				if (noDisplay.find(*it) == noDisplay.end())
-					m.push_back(make_pair((*it)->getKey(), (*it)->getOperatorCode() + " / " + (*it)->getName()));
-			return m;
-		}
-
-		const PhysicalStops& ConnectionPlace::getPhysicalStops() const
-		{
-			return _physicalStops;
-		}
-
-		const geometry::Point2D& ConnectionPlace::getPoint() const
-		{
-			if (_isoBarycentreToUpdateC)
-			{
-				_isoBarycentreC.clear();
-				for (PhysicalStops::const_iterator it(_physicalStops.begin()); it != _physicalStops.end(); ++it)
-					_isoBarycentreC.add(**it);
-				_isoBarycentreC.add(_isoBarycentreA);
-				_isoBarycentreToUpdateC = false;
-			}
-			return _isoBarycentreC;
-		}
-
-		void ConnectionPlace::addAddress( const Address* address )
-		{
-			_isoBarycentreToUpdateC = true;
-			AddressablePlace::addAddress(address);
-		}
-
-		int ConnectionPlace::getScore() const
-		{
-			if (_score == UNKNOWN_VALUE)
-			{
-				map<const CommercialLine*, int> scores;
-				for (PhysicalStops::const_iterator its(_physicalStops.begin()); its != _physicalStops.end(); ++its)
-					for (PhysicalStop::Edges::const_iterator ite((*its)->getDepartureEdges().begin()); ite != (*its)->getDepartureEdges().end(); ++ite)
-					{
-						const Line* route(static_cast<const Line*>((*ite)->getParentPath()));
-						map<const CommercialLine*, int>::iterator itl(scores.find(route->getCommercialLine()));
-						if (itl == scores.end())
-							scores.insert(make_pair(route->getCommercialLine(), route->getServices().size()));
-						else
-							itl->second += route->getServices().size();
-					}
-
-				for (map<const CommercialLine*, int>::const_iterator itc(scores.begin()); itc != scores.end(); ++itc)
-				{
-					if (itc->second <= 10)
-						_score += 2;
-					else if (itc->second <= 50)
-						_score += 3;
-					else if (itc->second <= 100)
-						_score += 4;
-					else
-						_score += 5;
-					if (_score > 100)
-					{
-						_score = 100;
-						break;
-					}
-				}
-			}
-			return _score;
-		}
-
-		uid ConnectionPlace::getId() const
-		{
-			return getKey();
 		}
 	}
 }

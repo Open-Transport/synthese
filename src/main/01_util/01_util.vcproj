@@ -113,22 +113,6 @@
 				RelativePath=".\UId.h"
 				>
 			</File>
-			<File
-				RelativePath=".\XmlParser.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\XmlParser.h"
-				>
-			</File>
-			<File
-				RelativePath=".\XmlToolkit.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\XmlToolkit.h"
-				>
-			</File>
 			<Filter
 				Name="Filter"
 				>
@@ -168,6 +152,14 @@
 					RelativePath=".\Factory.h"
 					>
 				</File>
+				<File
+					RelativePath=".\FactoryException.h"
+					>
+				</File>
+				<File
+					RelativePath=".\RegistryException.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Registry"
@@ -185,7 +177,39 @@
 					>
 				</File>
 				<File
+					RelativePath=".\RegistryKeyException.h"
+					>
+				</File>
+				<File
 					RelativePath=".\RegistryWithNeutralElement.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="XML"
+				>
+				<File
+					RelativePath=".\XmlException.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\XmlException.h"
+					>
+				</File>
+				<File
+					RelativePath=".\XmlParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\XmlParser.h"
+					>
+				</File>
+				<File
+					RelativePath=".\XmlToolkit.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\XmlToolkit.h"
 					>
 				</File>
 			</Filter>
@@ -193,26 +217,6 @@
 		<Filter
 			Name="Exceptions"
 			>
-			<File
-				RelativePath=".\FactoryException.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RegistryException.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RegistryKeyException.h"
-				>
-			</File>
-			<File
-				RelativePath=".\XmlException.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\XmlException.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Modules"

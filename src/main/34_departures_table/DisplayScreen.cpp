@@ -25,7 +25,7 @@
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/InterfacePageException.h"
 
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
 #include "15_env/Edge.h"
 #include "15_env/Types.h"
@@ -79,7 +79,7 @@ namespace synthese
 			_maxDelay = maxDelay;
 		}
 
-		void DisplayScreen::addForbiddenPlace(const env::ConnectionPlace* place)
+		void DisplayScreen::addForbiddenPlace(const env::PublicTransportStopZoneConnectionPlace* place)
 		{
 			_forbiddenArrivalPlaces.insert(place);
 		}
@@ -87,20 +87,20 @@ namespace synthese
 
 		/** Modificateur du point d'arrêt.
 		*/
-		void DisplayScreen::setLocalization(shared_ptr<const ConnectionPlace> bp)
+		void DisplayScreen::setLocalization(shared_ptr<const PublicTransportStopZoneConnectionPlace> bp)
 		{
 			_localization = bp;
 		}
 
 
-		void DisplayScreen::addDisplayedPlace(const env::ConnectionPlace* __PointArret)
+		void DisplayScreen::addDisplayedPlace(const env::PublicTransportStopZoneConnectionPlace* __PointArret)
 		{
 			_displayedPlaces.insert(__PointArret);
 		}
 
 		
 
-		void DisplayScreen::addForcedDestination(const env::ConnectionPlace* place)
+		void DisplayScreen::addForcedDestination(const env::PublicTransportStopZoneConnectionPlace* place)
 		{
 			_forcedDestinations.insert(place);
 		}
@@ -150,7 +150,7 @@ namespace synthese
 			}
 		}
 
-		shared_ptr<const ConnectionPlace> DisplayScreen::getLocalization() const
+		shared_ptr<const PublicTransportStopZoneConnectionPlace> DisplayScreen::getLocalization() const
 		{
 			return _localization;
 		}
@@ -404,7 +404,7 @@ namespace synthese
 			}
 		}
 
-		std::vector<std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(const std::set<const env::ConnectionPlace*>& placesToAvoid) const
+		std::vector<std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(const std::set<const env::PublicTransportStopZoneConnectionPlace*>& placesToAvoid) const
 		{
 			map<std::string, std::pair<uid, string> > m;
 			for (PhysicalStops::const_iterator it = getPhysicalStops().begin(); it != getPhysicalStops().end(); ++it)
@@ -414,7 +414,7 @@ namespace synthese
 				for (std::set<const Edge*>::const_iterator ite = edges.begin(); ite != edges.end(); ++ite)
 				{
 					for (const Edge* edge= (*ite)->getFollowingArrivalForFineSteppingOnly(); edge != NULL; edge = edge->getFollowingArrivalForFineSteppingOnly())
-						m.insert(make_pair(edge->getConnectionPlace()->getFullName(), make_pair(edge->getConnectionPlace()->getKey(), edge->getConnectionPlace()->getFullName())));
+						m.insert(make_pair(edge->getConnectionPlace()->getFullName(), make_pair(edge->getConnectionPlace()->getId(), edge->getConnectionPlace()->getFullName())));
 				}
 			}
 			vector<pair<uid, string> > v;
@@ -423,7 +423,7 @@ namespace synthese
 			return v;
 		}
 
-		void DisplayScreen::removeForcedDestination(shared_ptr<const ConnectionPlace> place)
+		void DisplayScreen::removeForcedDestination(shared_ptr<const PublicTransportStopZoneConnectionPlace> place)
 		{
 			DisplayedPlacesList::iterator it = _forcedDestinations.find(place.get());
 			if (it != _forcedDestinations.end())
@@ -452,14 +452,14 @@ namespace synthese
 				_physicalStops.erase(it);
 		}
 
-		void DisplayScreen::removeDisplayedPlace(shared_ptr<const ConnectionPlace> place)
+		void DisplayScreen::removeDisplayedPlace(shared_ptr<const PublicTransportStopZoneConnectionPlace> place)
 		{
 			DisplayedPlacesList::iterator it = _displayedPlaces.find(place.get());
 			if (it != _displayedPlaces.end())
 				_displayedPlaces.erase(it);
 		}
 
-		void DisplayScreen::removeForbiddenPlace(shared_ptr<const ConnectionPlace> place)
+		void DisplayScreen::removeForbiddenPlace(shared_ptr<const PublicTransportStopZoneConnectionPlace> place)
 		{
 			DisplayedPlacesList::iterator it = _forbiddenArrivalPlaces.find(place.get());
 			if (it != _forbiddenArrivalPlaces.end())

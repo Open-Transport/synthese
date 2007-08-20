@@ -33,7 +33,6 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
 		class Line;
 		class LineStop;
 	}

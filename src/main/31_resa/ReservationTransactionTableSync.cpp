@@ -68,6 +68,7 @@ namespace synthese
 			object->setCustomerPhone(rows->getText ( ReservationTransactionTableSync::COL_CUSTOMER_PHONE));
 			object->setBookingUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_BOOKING_USER_ID));
 			object->setCancelUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_CANCEL_USER_ID));
+			object->setCustomerEMail(rows->getText(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL));
 		}
 
 		template<> void SQLiteTableSyncTemplate<ReservationTransaction>::save(ReservationTransaction* object)
@@ -87,6 +88,7 @@ namespace synthese
 				<< "," << Conversion::ToString(object->getCustomerUserId())
 				<< "," << Conversion::ToSQLiteString(object->getCustomerName())
 				<< "," << Conversion::ToSQLiteString(object->getCustomerPhone())
+				<< "," << Conversion::ToSQLiteString(object->getCustomerEMail())
 				<< "," << Conversion::ToString(object->getBookingUserId())
 				<< "," << Conversion::ToString(object->getCancelUserId())
 				<< ")";
@@ -105,6 +107,7 @@ namespace synthese
 		const string ReservationTransactionTableSync::COL_CUSTOMER_ID = "customer_id";
 		const string ReservationTransactionTableSync::COL_CUSTOMER_NAME = "customer_name";
 		const string ReservationTransactionTableSync::COL_CUSTOMER_PHONE = "customer_phone";
+		const string ReservationTransactionTableSync::COL_CUSTOMER_EMAIL = "customer_email";
 		const string ReservationTransactionTableSync::COL_BOOKING_USER_ID = "booking_user_id";
 		const string ReservationTransactionTableSync::COL_CANCEL_USER_ID = "cancel_user_id";
 
@@ -119,6 +122,7 @@ namespace synthese
 			addTableColumn(COL_CUSTOMER_ID, "INTEGER");
 			addTableColumn(COL_CUSTOMER_NAME, "TEXT");
 			addTableColumn(COL_CUSTOMER_PHONE, "TEXT");
+			addTableColumn(COL_CUSTOMER_EMAIL, "TEXT");
 			addTableColumn(COL_BOOKING_USER_ID, "INTEGER");
 			addTableColumn(COL_CANCEL_USER_ID, "INTEGER");
 		}

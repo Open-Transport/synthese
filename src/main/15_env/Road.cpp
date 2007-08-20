@@ -95,7 +95,7 @@ namespace synthese
 		Road::findClosestAddressBefore (double metricOffset) const
 		{
 			const Address* address = 0;
-			for (std::vector<const Address*>::const_iterator it = getAddresses ().begin ();
+			for (Addresses::const_iterator it = getAddresses ().begin ();
 			 it != getAddresses ().end (); ++it)
 			{
 			if ( ((*it)->getMetricOffset () <= metricOffset) &&
@@ -112,7 +112,7 @@ namespace synthese
 		Road::findClosestAddressAfter (double metricOffset) const
 		{
 			const Address* address = 0;
-			for (std::vector<const Address*>::const_iterator it = getAddresses ().begin ();
+			for (Addresses::const_iterator it = getAddresses ().begin ();
 			 it != getAddresses ().end (); ++it)
 			{
 			if ( ((*it)->getMetricOffset () >= metricOffset) &&

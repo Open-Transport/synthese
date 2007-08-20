@@ -29,7 +29,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
+		class PublicTransportStopZoneConnectionPlace;
 	}
 
 	namespace departurestable
@@ -38,7 +38,7 @@ namespace synthese
 		class ForcedDestinationsArrivalDepartureTableGenerator : public ArrivalDepartureTableGenerator
 		{
 		public:
-			typedef std::set<const env::ConnectionPlace*> ForcedDestinationsSet;
+			typedef std::set<const env::PublicTransportStopZoneConnectionPlace*> ForcedDestinationsSet;
 
 		private:
 

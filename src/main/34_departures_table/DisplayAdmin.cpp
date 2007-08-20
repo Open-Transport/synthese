@@ -32,7 +32,7 @@
 #include "05_html/HTMLTable.h"
 
 #include "15_env/ConnectionPlaceTableSync.h"
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/PhysicalStop.h"
 
 #include "30_server/ActionFunctionRequest.h"

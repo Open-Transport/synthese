@@ -21,12 +21,13 @@
 */
 
 #include "Path.h"
-#include "ConnectionPlace.h"
-#include "Edge.h"
-#include "Vertex.h"
-#include "Service.h"
-#include "Road.h"
-#include "Exception.h"
+
+#include "15_env/ConnectionPlace.h"
+#include "15_env/Edge.h"
+#include "15_env/Vertex.h"
+#include "15_env/Service.h"
+#include "15_env/Road.h"
+#include "15_env/Exception.h"
 
 #include "01_util/Conversion.h"
 
@@ -167,10 +168,10 @@ namespace synthese
 				_edges.back ()->setNextInPath (edge);
 			
 				// Chaining departure/arrival
-				AddressablePlace::ConnectionType neededConnectionTypeToStep(
+				ConnectionPlace::ConnectionType neededConnectionTypeToStep(
 					edge->getParentPath ()->isRoad ()
-					? AddressablePlace::CONNECTION_TYPE_ROADROAD 
-					: AddressablePlace::CONNECTION_TYPE_LINELINE
+					? ConnectionPlace::CONNECTION_TYPE_ROADROAD 
+					: ConnectionPlace::CONNECTION_TYPE_LINELINE
 					);
 
 				for ( std::vector<Edge*>::reverse_iterator riter = _edges.rbegin();
@@ -203,7 +204,8 @@ namespace synthese
 
 						// Chain following connecting arrivals
 						if(	currentEdge->getFollowingConnectionArrival () == NULL
-							&& edge->getFromVertex ()->getPlace ()->getConnectionType () >= neededConnectionTypeToStep
+							&& edge->getConnectionPlace()
+							&& edge->getConnectionPlace()->getConnectionType () >= neededConnectionTypeToStep
 						){
 							currentEdge->setFollowingConnectionArrival (edge);
 						} 
@@ -220,7 +222,8 @@ namespace synthese
 
 						// Chain previous connecting departures
 						if(	edge->getPreviousConnectionDeparture () == NULL
-							&& currentEdge->getFromVertex ()->getPlace ()->getConnectionType () >= neededConnectionTypeToStep
+							&& currentEdge->getConnectionPlace()
+							&& currentEdge->getConnectionPlace()->getConnectionType () >= neededConnectionTypeToStep
 						){
 							edge->setPreviousConnectionDeparture (currentEdge);
 						}

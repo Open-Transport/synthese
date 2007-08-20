@@ -33,7 +33,7 @@
 #include "15_env/CommercialLine.h"
 #include "15_env/ContinuousService.h"
 #include "15_env/PhysicalStop.h"
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 
 using namespace std;
 using namespace boost;

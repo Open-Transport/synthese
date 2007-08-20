@@ -65,7 +65,7 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<DisplayScreen>::load(DisplayScreen* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey (rows->getLongLong (TABLE_COL_ID));
-			object->setLocalization (EnvModule::getConnectionPlaces().get(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID)));
+			object->setLocalization (EnvModule::getPublicTransportStopZones().get(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID)));
 			object->setLocalizationComment (rows->getText ( DisplayScreenTableSync::COL_NAME));
 			if (rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID) > 0)
 			{
@@ -100,9 +100,9 @@ namespace synthese
 			{
 			    try
 			    {
-				object->addForbiddenPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
+				object->addForbiddenPlace(EnvModule::getPublicTransportStopZones().get(Conversion::ToLongLong(*it)).get());
 			    }
-			    catch (ConnectionPlace::RegistryKeyException& e)
+			    catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
 			    {
 				Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
 			    }
@@ -120,9 +120,9 @@ namespace synthese
 			{
 			    try
 			    {
-				object->addDisplayedPlace(EnvModule::getConnectionPlaces().get(Conversion::ToLongLong(*it)).get());
+				object->addDisplayedPlace(EnvModule::getPublicTransportStopZones().get(Conversion::ToLongLong(*it)).get());
 			    }
-			    catch (ConnectionPlace::RegistryKeyException& e)
+			    catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
 			    {
 				Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
 			    }
@@ -140,9 +140,9 @@ namespace synthese
 			{
 			    try
 			    {
-				object->addForcedDestination(EnvModule::getConnectionPlaces().get (Conversion::ToLongLong(*it)).get());
+				object->addForcedDestination(EnvModule::getPublicTransportStopZones().get (Conversion::ToLongLong(*it)).get());
 			    }
-			    catch (ConnectionPlace::RegistryKeyException& e)
+			    catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
 			    {
 				Log::GetInstance().warn("Data corrupted in " + TABLE_NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
 			    }

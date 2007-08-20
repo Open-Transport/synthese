@@ -22,7 +22,16 @@
 
 #include "Site.h"
 
+#include "15_env/EnvModule.h"
+#include "15_env/HandicappedCompliance.h"
+#include "15_env/BikeCompliance.h"
+#include "15_env/ReservationRule.h"
+
+#include "07_lex_matcher/LexicalMatcher.h"
+
 #include "04_time/DateTime.h"
+
+#include "01_util/Exception.h"
 
 using namespace boost;
 using namespace std;
@@ -34,6 +43,7 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace interfaces;
+	using namespace lexmatcher;
 
 	namespace transportwebsite
 	{
@@ -144,13 +154,52 @@ namespace synthese
 
 
 
-		AccessParameters Site::getDefaultAccessParameters() const
+		AccessParameters Site::getAccessParameters(AccessibilityParameter parameter) const
 		{
 			AccessParameters ap;
-			ap.maxTransportConnectionCount = _maxTransportConnectionsCount;
-			ap.approachSpeed = 67; // m/min = 4 km/h
-			ap.maxApproachDistance = 1500;
+
+			switch(parameter)
+			{
+			case HANDICCAPED_ACCESSIBILITY:
+				{
+					HandicappedCompliance* hc(new HandicappedCompliance);
+					hc->setCompliant(true);
+					ap.complyer.setHandicappedCompliance(hc);
+					BikeCompliance* bc(new BikeCompliance);
+					bc->setCompliant(false);
+					ap.complyer.setBikeCompliance(bc);
+					ap.approachSpeed = 34; // m/min = 2 km/h
+					ap.maxApproachDistance = 300;
+				}
+				break;
+
+			case BIKE_ACCESSIBILITY:
+				{
+					HandicappedCompliance* hc(new HandicappedCompliance);
+					hc->setCompliant(false);
+					ap.complyer.setHandicappedCompliance(hc);
+					BikeCompliance* bc(new BikeCompliance);
+					bc->setCompliant(true);
+					ap.complyer.setBikeCompliance(bc);
+					ap.approachSpeed = 201; // m/min = 12 km/h
+					ap.maxApproachDistance = 3000;
+				}
+				break;
+
+			default:
+				{
+					ap.approachSpeed = 67; // m/min = 4 km/h
+					ap.maxApproachDistance = 1000;
+				}
+			}
+
+			// Temporary
+			ReservationRule* resa(new ReservationRule);
+			resa->setCompliant(boost::logic::indeterminate);
+			ap.complyer.setReservationRule(resa);
 			ap.maxApproachTime = 23;
+
+			ap.maxTransportConnectionCount = _maxTransportConnectionsCount;
 			return ap;
 		}
 
@@ -195,6 +244,35 @@ namespace synthese
 		void Site::setUseDateRange( int range )
 		{
 			_useDateRange = range;
+		}
+
+		const env::Place* Site::fetchPlace(
+			const std::string& cityName
+			, const std::string& placeName
+		) const {
+			const Place* place(NULL);
+
+			if (cityName.empty())
+				throw Exception("Empty city name");
+
+			shared_ptr<const City> city;
+			CityList cityList = EnvModule::guessCity(cityName, 1);
+			if (cityName.empty())
+				throw Exception("An error has occured in city name search");
+			city = cityList.front();
+			place = city.get();
+			assert(place != NULL);
+
+			if (!placeName.empty())
+			{
+				LexicalMatcher<const ConnectionPlace*>::MatchResult places = city->getConnectionPlacesMatcher().bestMatches(placeName, 1);
+				if (!places.empty())
+				{
+					place = places.front().value;
+				}
+			}
+
+			return place;		
 		}
 	}
 }

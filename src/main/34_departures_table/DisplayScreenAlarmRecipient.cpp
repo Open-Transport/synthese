@@ -30,7 +30,7 @@
 
 #include "12_security/Constants.h"
 
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/Line.h"
 #include "15_env/EnvModule.h"
 

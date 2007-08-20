@@ -46,7 +46,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
+		class PublicTransportStopZoneConnectionPlace;
 		class Line;
 	}
 
@@ -103,7 +103,7 @@ namespace synthese
 		protected:
 			//! \name Localization
 			//@{
-				boost::shared_ptr<const env::ConnectionPlace>	_localization;		//!< Localization of the display screen (belongs to a place)
+				boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_localization;		//!< Localization of the display screen (belongs to a place)
 				std::string									_localizationComment;
 			//@}
 
@@ -172,7 +172,7 @@ namespace synthese
 				void	setDirection(DeparturesTableDirection direction);
 				void	setFirstRow(int row);
 				void	setGenerationMethod(GenerationMethod method);
-				void	setLocalization(boost::shared_ptr<const env::ConnectionPlace>);
+				void	setLocalization(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>);
 				void	setLocalizationComment(const std::string&);
 				void	setMaintenanceChecksPerDay(int number);
 				void	setMaintenanceIsOnline(bool value);
@@ -189,24 +189,24 @@ namespace synthese
 
 			//! \name Modifiers
 			//@{
-				void	addDisplayedPlace(const env::ConnectionPlace*);
-				void	addForbiddenPlace(const env::ConnectionPlace*);
-				void	addForcedDestination(const env::ConnectionPlace*);
+				void	addDisplayedPlace(const env::PublicTransportStopZoneConnectionPlace*);
+				void	addForbiddenPlace(const env::PublicTransportStopZoneConnectionPlace*);
+				void	addForcedDestination(const env::PublicTransportStopZoneConnectionPlace*);
 				void	addPhysicalStop(const env::PhysicalStop*);
 				void	clearDisplayedPlaces();
 				void	clearForbiddenPlaces();
 				void	clearForcedDestinations();
 				void	clearPhysicalStops();
 				void	copy(boost::shared_ptr<const DisplayScreen>);
-				void	removeDisplayedPlace(boost::shared_ptr<const env::ConnectionPlace>);
-				void	removeForbiddenPlace(boost::shared_ptr<const env::ConnectionPlace>);
-				void	removeForcedDestination(boost::shared_ptr<const env::ConnectionPlace>);
+				void	removeDisplayedPlace(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>);
+				void	removeForbiddenPlace(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>);
+				void	removeForcedDestination(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>);
 				void	removePhysicalStop(boost::shared_ptr<const env::PhysicalStop>);
 			//@}
 
 			//!	\name Getters
 			//@{
-				boost::shared_ptr<const env::ConnectionPlace>	getLocalization()				const;
+				boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	getLocalization()				const;
 				const std::string&				getLocalizationComment()		const;
 				const DisplayType*				getType()						const;				
 				int								getWiringCode()					const;
@@ -241,7 +241,7 @@ namespace synthese
 				const env::PhysicalStops&							getPhysicalStops(bool result=true)										const;
 
 				std::vector<std::pair<uid, std::string> > 
-					getSortedAvaliableDestinationsLabels(const std::set<const env::ConnectionPlace*>& placesToAvoid)	const;
+					getSortedAvaliableDestinationsLabels(const std::set<const env::PublicTransportStopZoneConnectionPlace*>& placesToAvoid)	const;
 			//@}
 
 		};

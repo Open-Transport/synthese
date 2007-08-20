@@ -37,7 +37,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
+		class PublicTransportStopZoneConnectionPlace;
 		class PhysicalStop;
 		class CommercialLine;
 	}
@@ -47,7 +47,7 @@ namespace synthese
 		class BroadcastPoint;
 
 		typedef struct {
-			boost::shared_ptr<env::ConnectionPlace> place;
+			boost::shared_ptr<env::PublicTransportStopZoneConnectionPlace> place;
 			std::string	cityName;
 			int broadCastPointsNumber;
 			} ConnectionPlaceWithBroadcastPoint;

@@ -22,6 +22,8 @@
 
 #include "DateTime.h"
 
+#include "04_time/TimeParseException.h"
+
 #include "01_util/Conversion.h"
 
 using namespace std;
@@ -404,15 +406,28 @@ namespace synthese
 
 		DateTime DateTime::FromInternalString( const string& str )
 		{
-			if (str == "A")
-				return DateTime(TIME_CURRENT);
+			if(	str.size() == 1 
+			&&	(	str.at(0) == TIME_CURRENT
+				||	str.at(0) == TIME_TOMORROW
+				)
+			){
+				return DateTime(str.at(0));
+			}
 
-			return DateTime (Conversion::ToInt (str.substr (6, 2)),
+			if (str.length() < 12)
+				throw TimeParseException("Invalid string length");
+
+			DateTime result(Conversion::ToInt (str.substr (6, 2)),
 				Conversion::ToInt (str.substr (4, 2)),
 				Conversion::ToInt (str.substr (0, 4)),
 				Conversion::ToInt (str.substr (8, 2)),
-				Conversion::ToInt (str.substr (10, 2)));
+				Conversion::ToInt (str.substr (10, 2))
+			);
 
+			if (!result.isValid())
+				throw TimeParseException("Invalid date time value");
+
+			return result;
 		}
 	}
 }

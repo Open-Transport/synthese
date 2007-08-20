@@ -104,8 +104,8 @@ namespace synthese
 
 			shared_ptr<const City> city = cities.get (cityId);
 
-			return shared_ptr<ConnectionPlace>(
-						new ConnectionPlace (id, name, city.get(),
+			return shared_ptr<PublicTransportStopZoneConnectionPlace>(
+						new PublicTransportStopZoneConnectionPlace(id, name, city.get(),
 										type, defaultTransferDelay))
 						;
 		    
@@ -215,7 +215,7 @@ namespace synthese
 
 
 		shared_ptr<PhysicalStop> 
-		XmlBuilder::CreatePhysicalStop (XMLNode& node, const ConnectionPlace::Registry& connectionPlaces)
+		XmlBuilder::CreatePhysicalStop (XMLNode& node, const PublicTransportStopZoneConnectionPlace::Registry& connectionPlaces)
 		{
 			// assert ("physicalStop" == node.getName ());
 			uid id (GetLongLongAttr (node, "id"));

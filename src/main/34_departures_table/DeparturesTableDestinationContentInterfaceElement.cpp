@@ -33,7 +33,7 @@
 
 #include "15_env/LineMarkerInterfacePage.h"
 #include "15_env/City.h"
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 
 #include "34_departures_table/Types.h"
 #include "34_departures_table/DeparturesTableDestinationContentInterfaceElement.h"

@@ -196,6 +196,93 @@ namespace synthese
 				);
 				
 		public:
+			/** Search for the value of a parameter in a ParameterMap object.
+				@param map Map to search in
+				@param parameterName Name of the searched parameter
+				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
+				@param source Name of the action or function that requested the parameter (for the error message only)
+				@return std::string Value of the parameter (empty if parameter nor found)
+				@throw RequestMissingParameterException if the parameter is not found and if it is needed
+				@author Hugues Romain
+				@date 2007
+			*/
+			static std::string getStringFormParameterMap(
+				const ParametersMap& map
+				, const std::string& parameterName
+				, bool neededParameter
+				, const std::string& source
+			);
+
+			/** Search for the value of a parameter in a ParameterMap object and converts into an uid.
+				@param map Map to search in
+				@param parameterName Name of the searched parameter
+				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
+				@param source Name of the action or function that requested the parameter (for the error message only)
+				@return uid Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
+				@throw RequestMissingParameterException if the parameter is not found and if it is needed
+				@author Hugues Romain
+				@date 2007
+			*/
+			static uid getUidFromParameterMap(
+				const ParametersMap& map
+				, const std::string& parameterName
+				, bool neededParameter
+				, const std::string& source
+			);
+
+			/** Search for the value of a parameter in a ParameterMap object and converts into an integer.
+				@param map Map to search in
+				@param parameterName Name of the searched parameter
+				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
+				@param source Name of the action or function that requested the parameter (for the error message only)
+				@return int Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
+				@throw RequestMissingParameterException if the parameter is not found and if it is needed
+				@author Hugues Romain
+				@date 2007
+			*/
+			static int getIntFromParameterMap(
+				const ParametersMap& map
+				, const std::string& parameterName
+				, bool neededParameter
+				, const std::string& source
+			);
+
+			/** Search for the value of a parameter in a ParameterMap object and converts into an DateTime object.
+				@param map Map to search in
+				@param parameterName Name of the searched parameter
+				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
+				@param source Name of the action or function that requested the parameter (for the error message only)
+				@return DateTime Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
+				@throw RequestMissingParameterException if the parameter is not found and if it is needed
+				@throw TimeParseException if the parameter can not be parsed as a date time (eg : empty string)
+				@author Hugues Romain
+				@date 2007
+			*/
+			static time::DateTime getDateTimeFromParameterMap(
+				const ParametersMap& map
+				, const std::string& parameterName
+				, bool neededParameter
+				, const std::string& source
+			);
+
+			/** Search for the value of a parameter in a ParameterMap object and converts into an Date object.
+				@param map Map to search in
+				@param parameterName Name of the searched parameter
+				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
+				@param source Name of the action or function that requested the parameter (for the error message only)
+				@return Date Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
+				@throw RequestMissingParameterException if the parameter is not found and if it is needed
+				@throw TimeParseException if the parameter can not be parsed as a date time (eg : empty string)
+				@author Hugues Romain
+				@date 2007
+			*/
+			static time::Date getDateFromParameterMap(
+				const ParametersMap& map
+				, const std::string& parameterName
+				, bool neededParameter
+				, const std::string& source
+			);
+
 			void _setErrorMessage(const std::string& message);
 			void _setActionException(bool value);
 			void _setErrorLevel(const ErrorLevel& level);

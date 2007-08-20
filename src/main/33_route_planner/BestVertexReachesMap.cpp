@@ -22,7 +22,7 @@
 
 #include "33_route_planner/BestVertexReachesMap.h"
 
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/Address.h"
 #include "15_env/PhysicalStop.h"
 #include "15_env/Vertex.h"
@@ -87,10 +87,9 @@ namespace synthese
 		    
 
 
-		void 
-		BestVertexReachesMap::insert (
-			const synthese::env::Vertex* vertex
-			, const synthese::time::DateTime& bestTime
+		void BestVertexReachesMap::insert (
+			const Vertex* vertex
+			, const DateTime& bestTime
 			, bool propagateInConnectionPlace
 		){
 			TimeMap::iterator itc = _bestTimeMap.find (vertex);
@@ -108,11 +107,12 @@ namespace synthese
 
 			if (propagateInConnectionPlace && vertex->isConnectionAllowed())
 			{
-				const ConnectionPlace* cp(vertex->getConnectionPlace());
-				assert (cp != 0);
+				const Place* p(vertex->getPlace());
+				assert (p != 0);
 
 				if (vertex->isAddress())
 				{
+					const ConnectionPlace* cp(static_cast<const ConnectionPlace*>(p));
 					const Addresses& ads(cp->getAddresses());
 					for (Addresses::const_iterator ita(ads.begin()); ita != ads.end(); ++ita)
 					{
@@ -136,6 +136,7 @@ namespace synthese
 				}
 				else
 				{
+					const PublicTransportStopZoneConnectionPlace* cp(static_cast<const PublicTransportStopZoneConnectionPlace*>(p));
 					const PhysicalStops& ps(cp->getPhysicalStops());
 					for (PhysicalStops::const_iterator itp(ps.begin()); itp != ps.end(); ++itp)
 					{

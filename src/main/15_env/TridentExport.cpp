@@ -86,7 +86,7 @@ TridentExport::Export (std::ostream& os,
     // Collect all data related to selected commercial line
 
     std::set<const PhysicalStop*> physicalStops;
-    std::set<const ConnectionPlace*> connectionPlaces;
+    std::set<const PublicTransportStopZoneConnectionPlace*> connectionPlaces;
     std::set<const City*> cities;
     std::set<const LineStop*> lineStops;
     ServiceSet services;
@@ -102,24 +102,24 @@ TridentExport::Export (std::ostream& os,
 	    lineStops.insert (lineStop);
 	    if (lineStop->getFromVertex ()->isPhysicalStop ()) 
 	    {
-		const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (lineStop->getFromVertex ());
-		physicalStops.insert (physicalStop);
+			const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (lineStop->getFromVertex ());
+			physicalStops.insert (physicalStop);
 
-		const ConnectionPlace* connectionPlace = physicalStop->getConnectionPlace ();
-		if (connectionPlace) 
-		{
-		    connectionPlaces.insert (connectionPlace);
-		    const PhysicalStops& cpps(connectionPlace->getPhysicalStops());
+			const PublicTransportStopZoneConnectionPlace* connectionPlace(physicalStop->getConnectionPlace ());
+			if (connectionPlace) 
+			{
+				connectionPlaces.insert (connectionPlace);
+				const PhysicalStops& cpps(connectionPlace->getPhysicalStops());
 
-		    // add also physical stops of each connection place otherwise we will
-		    // lack connection links.
-		    for (PhysicalStops::const_iterator itcpps = cpps.begin ();
-			 itcpps != cpps.end (); ++itcpps) physicalStops.insert (*itcpps);
+				// add also physical stops of each connection place otherwise we will
+				// lack connection links.
+				for (PhysicalStops::const_iterator itcpps = cpps.begin ();
+				 itcpps != cpps.end (); ++itcpps) physicalStops.insert (*itcpps);
 
-		    cities.insert (connectionPlace->getCity ());
-		}
-		
-	    }    
+				cities.insert (connectionPlace->getCity ());
+			}
+			
+		}    
 	    
 	    const ServiceSet& lservices = (*itline)->getServices ();
 	    for (ServiceSet::const_iterator itsrv = lservices.begin ();
@@ -195,10 +195,10 @@ TridentExport::Export (std::ostream& os,
     
     // --------------------------------------------------- StopArea (type = CommercialStopPoint)
     {
-	for (std::set<const ConnectionPlace*>::const_iterator it = connectionPlaces.begin ();
+	for (std::set<const PublicTransportStopZoneConnectionPlace*>::const_iterator it = connectionPlaces.begin ();
 	     it != connectionPlaces.end (); ++it)
 	{
-	    const ConnectionPlace* cp = (*it);
+	    const PublicTransportStopZoneConnectionPlace* cp = (*it);
 	    os << "<StopArea>" << std::endl;
 	    os << "<objectId>" << TridentId (peerid, "StopArea", cp->getKey ()) << "</objectId>" << std::endl;
 	    os << "<name>" << cp->getName () << "</name>" << std::endl;
@@ -243,7 +243,7 @@ TridentExport::Export (std::ostream& os,
 	    for (std::vector<const Place*>::const_iterator itip = ciip.begin ();
 		 itip != ciip.end (); ++itip)
 	    {
-		const ConnectionPlace* cp = dynamic_cast<const ConnectionPlace*> (*itip);
+		const PublicTransportStopZoneConnectionPlace* cp = dynamic_cast<const PublicTransportStopZoneConnectionPlace*> (*itip);
 		if (cp == 0) continue;
 
 		// filter physical stops not concerned by this line.
@@ -302,10 +302,10 @@ TridentExport::Export (std::ostream& os,
 
     // --------------------------------------------------- ConnectionLink
     {
-	for (std::set<const ConnectionPlace*>::const_iterator it = connectionPlaces.begin ();
+	for (std::set<const PublicTransportStopZoneConnectionPlace*>::const_iterator it = connectionPlaces.begin ();
 	     it != connectionPlaces.end (); ++it)
 	{
-	    const ConnectionPlace* cp = (*it);
+	    const PublicTransportStopZoneConnectionPlace* cp = (*it);
 	    
 
 	    // Contained physical stops

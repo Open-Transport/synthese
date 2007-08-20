@@ -117,7 +117,7 @@ namespace synthese
 				{
 					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
 					object->broadCastPointsNumber = rows->getInt ("bc");
-					object->place.reset(new ConnectionPlace);
+					object->place.reset(new PublicTransportStopZoneConnectionPlace);
 					ConnectionPlaceTableSync::load(object->place.get(), rows);
 					object->cityName = rows->getText ("city_name");
 					objects.push_back(object);

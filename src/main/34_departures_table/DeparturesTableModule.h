@@ -38,7 +38,7 @@ namespace synthese
 	namespace env
 	{
 		class LineStop;
-		class ConnectionPlace;
+		class PublicTransportStopZoneConnectionPlace;
 		class PhysicalStop;
 		class Line;
 	}

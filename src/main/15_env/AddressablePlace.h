@@ -29,8 +29,6 @@
 #include "15_env/Place.h"
 #include "15_env/Types.h"
 
-#include "06_geometry/IsoBarycentre.h"
-
 namespace synthese
 {
 	using namespace geometry;
@@ -40,33 +38,20 @@ namespace synthese
 		/** Addressable place base class.
 
 			AddressablePlace is the base for any place which can provide
-			addresses. 
+			addresses, i.e. it contains vertices which could be found at a path
+			traversing.
 
 			@ingroup m15
 		*/
 		class AddressablePlace : public Place
 		{
-		public:
-
-			typedef enum { 
-				CONNECTION_TYPE_FORBIDDEN = 0,         //!< neither road connection nor line connection
-				CONNECTION_TYPE_ROADROAD = 1,          //!< only road to road connection
-				CONNECTION_TYPE_ROADLINE = 2,          //!< only road to line, or line to road, or road to road
-				CONNECTION_TYPE_LINELINE = 3,          //!< any connection possible
-				CONNECTION_TYPE_RECOMMENDED_SHORT = 4, //!< any connection possible, recommended if short journey
-				CONNECTION_TYPE_RECOMMENDED = 5        //!< any connection possible, recommended for any journey
-			} ConnectionType;
-
 		protected:
-			mutable bool _isoBarycentreToUpdateA;
-			mutable geometry::IsoBarycentre _isoBarycentreA;
-
 			Addresses _addresses; 
 
-
-			AddressablePlace (const std::string& name,
-					  const City* city);
-
+			AddressablePlace(
+				const std::string& name
+				, const City* city
+			);
 
 		public:
 
@@ -74,30 +59,27 @@ namespace synthese
 
 			//! @name Getters/Setters
 			//@{
-
-			/** Gets addresses of this place.
-			 */
-			const Addresses& getAddresses () const;
-
-			virtual const ConnectionType getConnectionType () const;
-
+				/** Gets addresses of this place.
+				 */
+				const Addresses& getAddresses () const;
 			//@}
 
 
 			//! @name Query methods
 			//@{
+				virtual void getImmediateVertices (
+					VertexAccessMap& result, 
+					const AccessDirection& accessDirection,
+					const AccessParameters& accessParameters
+					, SearchAddresses returnAddresses
+					, SearchPhysicalStops returnPhysicalStops
+					, const Vertex* origin = NULL
+				) const;
 
-			virtual void getImmediateVertices (
-				VertexAccessMap& result, 
-				const AccessDirection& accessDirection,
-				const AccessParameters& accessParameters
-				, SearchAddresses returnAddresses
-				, SearchPhysicalStops returnPhysicalStops
-				, const Vertex* origin = NULL
-			) const;
+				virtual const geometry::Point2D& getPoint() const;
 
-			virtual const geometry::Point2D& getPoint() const;
-
+				bool hasAddresses() const;
+				virtual bool hasPhysicalStops()	const;
 			//@}
 
 
@@ -106,9 +88,11 @@ namespace synthese
 			//! @name Update methods.
 			//@{
 
-			/** Adds an address to this place.
-			 */
-				virtual void addAddress (const Address* address);
+				/** Adds an address to this place.
+					@param address Address to add
+					This methods cancels the caching of the isobarycentre
+				 */
+				void addAddress (const Address* address);
 			//@}
 
 

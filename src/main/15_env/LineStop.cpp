@@ -22,10 +22,11 @@
 
 #include "LineStop.h"
 
-#include "Line.h"
-#include "Service.h"
-#include "ContinuousService.h"
-#include "PhysicalStop.h"
+#include "15_env/Line.h"
+#include "15_env/Service.h"
+#include "15_env/ContinuousService.h"
+#include "15_env/PhysicalStop.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 
 #include "06_geometry/SquareDistance.h"
 
@@ -134,6 +135,11 @@ namespace synthese
 				stop->addArrivalEdge((Edge*) this);
 			if (isDeparture())
 				stop->addDepartureEdge((Edge*) this);
+		}
+
+		const PublicTransportStopZoneConnectionPlace* LineStop::getConnectionPlace() const
+		{
+			return static_cast<const PublicTransportStopZoneConnectionPlace*>(Edge::getConnectionPlace());
 		}
 	}
 }

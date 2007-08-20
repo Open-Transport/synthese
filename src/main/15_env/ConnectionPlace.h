@@ -23,37 +23,16 @@
 #ifndef SYNTHESE_ENV_CONNECTIONPLACE_H
 #define SYNTHESE_ENV_CONNECTIONPLACE_H
 
-
-#include <map>
-#include <set>
 #include <string>
-
-#include "01_util/Registrable.h"
-#include "01_util/UId.h"
-#include "01_util/Constants.h"
 
 #include "15_env/AddressablePlace.h"
 #include "15_env/Types.h"
 
-#include "06_geometry/IsoBarycentre.h"
-
 namespace synthese
 {
-	namespace time
-	{
-		class DateTime;
-	}
-
-	namespace geometry
-	{
-		class SquareDistance; 
-	}
-
 	namespace env
 	{
-		class Address;
-		class Edge;
-		class Path;
+		class Vertex;
 
 		/** A connection place indicates that there are possible
 			connections between different network vertices.
@@ -64,122 +43,67 @@ namespace synthese
 			@ingroup m15
 		*/
 		class ConnectionPlace : 
-			public util::Registrable<uid,ConnectionPlace>, 
 			public AddressablePlace
 		{
 		public:
-
-			static const int UNKNOWN_TRANSFER_DELAY;
+			typedef enum { 
+				CONNECTION_TYPE_FORBIDDEN = 0,         //!< neither road connection nor line connection
+				CONNECTION_TYPE_ROADROAD = 1,          //!< only road to road connection
+				CONNECTION_TYPE_ROADLINE = 2,          //!< only road to line, or line to road, or road to road
+				CONNECTION_TYPE_LINELINE = 3,          //!< any connection possible
+				CONNECTION_TYPE_RECOMMENDED_SHORT = 4, //!< any connection possible, recommended if short journey (deprecated)
+				CONNECTION_TYPE_RECOMMENDED = 5        //!< any connection possible, recommended for any journey (deprecated)
+			} ConnectionType;
 			static const int FORBIDDEN_TRANSFER_DELAY;
-			static const int SQUAREDISTANCE_SHORT_LONG;
 
-		private:
-			mutable bool _isoBarycentreToUpdateC;
-			mutable geometry::IsoBarycentre _isoBarycentreC;
-
-			PhysicalStops _physicalStops; 
-
-			std::map< std::pair<uid, uid>, int > _transferDelays; //!< Transfer delays between vertices (in minutes)
-			int _defaultTransferDelay;
-			int _minTransferDelay;
-			int _maxTransferDelay;
-
-			ConnectionType _connectionType;
-
-			mutable int _score;
+		protected:
+			ConnectionType		_connectionType;
 
 		public:
 
+			/** Constructor.
+				@param name Name of the connection place
+				@param city City which belongs the connection place
+			*/
 			ConnectionPlace (
-				uid id = UNKNOWN_VALUE
-				, std::string name = std::string()
+				std::string name = std::string()
 				, const City* city = NULL
-				, ConnectionType connectionType = CONNECTION_TYPE_FORBIDDEN
-				, int defaultTransferDelay = FORBIDDEN_TRANSFER_DELAY
-				);
-
+				, ConnectionType type = CONNECTION_TYPE_FORBIDDEN
+			);
 			virtual ~ConnectionPlace ();
 
-
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
-				int							getDefaultTransferDelay () const;
-				void						setDefaultTransferDelay (int defaultTransferDelay);
+				ConnectionType	getConnectionType () const;
+			//@}
 
-				int							getMinTransferDelay () const;
-				int							getMaxTransferDelay () const;
+			//! @name Interface for query methods
+			//@{
+				virtual int						getMinTransferDelay() const = 0;
+				
+				virtual bool isConnectionAllowed(
+					const Vertex* fromVertex
+					, const Vertex* toVertex
+				) const = 0;
 
-				const PhysicalStops&		getPhysicalStops () const;
+				virtual int getTransferDelay(
+					const Vertex* fromVertex
+					, const Vertex* toVertex
+				) const = 0;
 
-				const ConnectionType		getConnectionType () const;
-				void						setConnectionType (const ConnectionType& connectionType);
-
+				virtual int getScore() const = 0;
 			//@}
 
 
 			//! @name Query methods.
 			//@{
-				/** Score getter.
-					@return int the score of the place
-					@author Hugues Romain
-					@date 2007
-
-					The vertex score is calculated by the following way :
-						- each commercial line gives some points, depending of the number of services which belongs to the line :
-							- 1 to 10 services lines gives 2 point
-							- 10 to 50 services lines gives 3 points
-							- 50 to 100 services lines gives 4 points
-							- much than 100 services lines gives 5 points
-						- if the score is bigger than 100 points, then the score is 100
-				*/
-				int getScore() const;
-
-				bool isConnectionAllowed (const Vertex* fromVertex, 
-							const Vertex* toVertex) const;
-
-				ConnectionType getRecommendedConnectionType (const SquareDistance& squareDistance) const;
-
-
-				int getTransferDelay (const Vertex* fromVertex, 
-						const Vertex* toVertex) const;
-
-
-				VertexAccess getVertexAccess (const AccessDirection& accessDirection,
-							const AccessParameters& accessParameters,
-							const Vertex* destination,
-							const Vertex* origin = 0) const;
-			    
-				virtual void getImmediateVertices(
-					VertexAccessMap& result
-					, const AccessDirection& accessDirection
+				VertexAccess getVertexAccess(
+					const AccessDirection& accessDirection
 					, const AccessParameters& accessParameters
-					, SearchAddresses returnAddresses
-					, SearchPhysicalStops returnPhysicalStops
+					, const Vertex* destination
 					, const Vertex* origin = NULL
 				) const;
 
-				virtual const geometry::Point2D& getPoint() const;
-
-				virtual uid getId() const;
-
-				std::vector<std::pair<uid, std::string> >	getPhysicalStopLabels(bool withAll = false) const;
-
-				/** Labels list for select field containing physical stops, with exclusion list.
-					@param noDisplay Physical stops to exclude
-					@return Labels list for select field containing physical stops
-					@author Hugues Romain
-					@date 2007
-				*/
-				std::vector<std::pair<uid, std::string> >	getPhysicalStopLabels(const PhysicalStops& noDisplay) const;
-			//@}
-
-
-			//! @name Update methods.
-			//@{
-				void addPhysicalStop (const PhysicalStop* physicalStop);
-				virtual void addAddress (const Address* address);
-				void addTransferDelay (uid departureId, uid arrivalId, int transferDelay);
-				void clearTransferDelays ();
 			//@}
 
 		};

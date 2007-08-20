@@ -29,12 +29,9 @@
 #include "33_route_planner/RoutePlanner.h"
 
 #include "30_server/RequestException.h"
-
-#include "15_env/EnvModule.h"
+#include "30_server/Request.h"
 
 #include "11_interfaces/Interface.h"
-
-#include "07_lex_matcher/LexicalMatcher.h"
 
 #include "04_time/TimeParseException.h"
 
@@ -50,7 +47,7 @@ namespace synthese
 	using namespace env;
 	using namespace time;
 	using namespace interfaces;
-	using namespace lexmatcher;
+	using namespace transportwebsite;
 
 	namespace routeplanner
 	{
@@ -74,82 +71,35 @@ namespace synthese
 		{
 			FunctionWithSite::_setFromParametersMap(map);
 
-			ParametersMap::const_iterator it;
-
 			_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
-			_accessParameters = _site->getDefaultAccessParameters();
 
-			// Departure place
-			it = map.find(PARAMETER_DEPARTURE_CITY_TEXT);
-			if (it != map.end())
-			{
-				shared_ptr<const City> city;
-				_originCityText = it->second;
-				CityList cityList = EnvModule::guessCity(_originCityText, 1);
-				if (!cityList.empty())
-				{
-					city = cityList.front();
-					_departure_place = city.get();
-				}
-
-				it = map.find(PARAMETER_DEPARTURE_PLACE_TEXT);
-				if (it != map.end())
-				{
-					_originPlaceText = it->second;
-					if (city.get() && !_originPlaceText.empty())
-					{
-						LexicalMatcher<const ConnectionPlace*>::MatchResult places = city->getConnectionPlacesMatcher().bestMatches(_originPlaceText, 1);
-						if (!places.empty())
-						{
-							_departure_place = places.front().value;
-						}
-					}
-				}
-			}
-			else
+			// Origin and destination places
+			_originCityText = Request::getStringFormParameterMap(map, PARAMETER_DEPARTURE_CITY_TEXT, false, string());
+			_destinationCityText = Request::getStringFormParameterMap(map, PARAMETER_ARRIVAL_CITY_TEXT, false, string());
+			if (_originCityText.empty() || _destinationCityText.empty())
 				_home = true;
-
-			// Arrival place
-			it = map.find(PARAMETER_ARRIVAL_CITY_TEXT);
-			if (it != map.end())
-			{
-				_destinationCityText = it->second;
-				shared_ptr<const City> city;
-				CityList cityList = EnvModule::guessCity(_destinationCityText, 1);
-				if (!cityList.empty())
-				{
-					city = cityList.front();
-					_arrival_place = city.get();
-				}
-
-				it = map.find(PARAMETER_ARRIVAL_PLACE_TEXT);
-				if (it != map.end())
-				{
-					_destinationPlaceText = it->second;
-					if (city.get() && !_destinationPlaceText.empty())
-					{
-						LexicalMatcher<const ConnectionPlace*>::MatchResult places = city->getConnectionPlacesMatcher().bestMatches(_destinationPlaceText, 1);
-						if (!places.empty())
-						{
-							_arrival_place = places.front().value;
-						}
-					}
-				}
-			}
 			else
-				_home = true;
-
-			// Day
-			it = map.find(PARAMETER_DAY);
-			if (it != map.end())
 			{
-				try
+				_originPlaceText = Request::getStringFormParameterMap(map, PARAMETER_DEPARTURE_PLACE_TEXT, false, string());
+				_departure_place = _site->fetchPlace(_originCityText, _originPlaceText);
+
+				_destinationPlaceText = Request::getStringFormParameterMap(map, PARAMETER_ARRIVAL_PLACE_TEXT, false, string());
+				_arrival_place = _site->fetchPlace(_destinationCityText, _destinationPlaceText);
+			}
+
+			// Date
+			try
+			{
+				Date day(Request::getDateFromParameterMap(map, PARAMETER_DAY, false, string()));
+				if (day.isUnknown())
 				{
-					Date day(Date::FromInternalString(it->second));
-					it = map.find(PARAMETER_PERIOD_ID);
-					if (it == map.end())
-						throw RequestException("Period not specified");
-					_periodId = Conversion::ToInt(it->second);
+					_startDate = Request::getDateTimeFromParameterMap(map, PARAMETER_DATE, !_home, string());
+					_endDate = _startDate;
+					_endDate.addDaysDuration(1);						
+				}
+				else
+				{
+					_periodId = Request::getIntFromParameterMap(map, PARAMETER_PERIOD_ID, true, string());
 					if (_periodId < 0 || _periodId >= _site->getPeriods().size())
 						throw RequestException("Bad value for period id");
 					_startDate = DateTime(day, Hour(0, 0));
@@ -157,71 +107,22 @@ namespace synthese
 					_period = &_site->getPeriods().at(_periodId);
 					_site->applyPeriod(*_period, _startDate, _endDate);
 				}
-				catch (time::TimeParseException)
-				{
-					throw RequestException("Bad date");
-				}
 			}
-			else
+			catch (time::TimeParseException)
 			{
-				// Date
-				it = map.find(PARAMETER_DATE);
-				if (it != map.end())
-				{
-					try
-					{
-						_startDate = DateTime::FromInternalString(it->second);
-						_endDate = _startDate;
-						_endDate.addDaysDuration(1);						
-					}
-					catch (time::TimeParseException)
-					{
-						throw RequestException("Bad date");
-					}
-				}
+				throw RequestException("Bad date");
 			}
 
 			// Max solutions number
-			it = map.find(PARAMETER_MAX_SOLUTIONS_NUMBER);
-			if (it != map.end())
-				_maxSolutionsNumber = Conversion::ToInt(it->second);
-			if (_maxSolutionsNumber < 0)
+			_maxSolutionsNumber = Request::getIntFromParameterMap(map, PARAMETER_MAX_SOLUTIONS_NUMBER, false, string());
+			if (_maxSolutionsNumber < UNKNOWN_VALUE)
 				throw RequestException("Bad max solutions number");
 
 			// Accessibility
-			it = map.find(PARAMETER_ACCESSIBILITY);
-			if (it != map.end())
-			{
-				switch(static_cast<Accessibility>(Conversion::ToInt(it->second)))
-				{
-					case HANDICCAPED_ACCESSIBILITY:
-						{
-							HandicappedCompliance* hc(new HandicappedCompliance);
-							hc->setCompliant(true);
-							_accessParameters.complyer.setHandicappedCompliance(hc);
-							BikeCompliance* bc(new BikeCompliance);
-							bc->setCompliant(false);
-							_accessParameters.complyer.setBikeCompliance(bc);
-							break;
-						}
-
-					case BIKE_ACCESSIBILITY:
-						{
-							HandicappedCompliance* hc(new HandicappedCompliance);
-							hc->setCompliant(false);
-							_accessParameters.complyer.setHandicappedCompliance(hc);
-							BikeCompliance* bc(new BikeCompliance);
-							bc->setCompliant(true);
-							_accessParameters.complyer.setBikeCompliance(bc);
-							break;
-						}
-				}
-			}
-			// Temporary
-			ReservationRule* resa(new ReservationRule);
-			resa->setCompliant(boost::logic::indeterminate);
-			_accessParameters.complyer.setReservationRule(resa);
-
+			Site::AccessibilityParameter accessibility(static_cast<Site::AccessibilityParameter>(
+				Request::getIntFromParameterMap(map, PARAMETER_ACCESSIBILITY, !_home, string()))
+			);
+			_accessParameters = _site->getAccessParameters(accessibility);
 		}
 
 		void RoutePlannerFunction::_run( ostream& stream ) const
@@ -237,7 +138,7 @@ namespace synthese
 					, _startDate
 					, _endDate
 					, _maxSolutionsNumber
-					);
+				);
 				const RoutePlanner::Result& jv(r.computeJourneySheetDepartureArrival());
 				_page->display(
 					stream
@@ -250,7 +151,7 @@ namespace synthese
 					, _period
 					, _accessParameters
 					, _request
-					);
+				);
 			}
 			else
 			{
@@ -267,22 +168,21 @@ namespace synthese
 					, _period
 					, _accessParameters
 					, _request
-					);
-
+				);
 			}
 		}
 
 		RoutePlannerFunction::RoutePlannerFunction()
-			: _maxSolutionsNumber(numeric_limits<int>::max())
-			, _startDate(TIME_UNKNOWN)
+			: _startDate(TIME_UNKNOWN)
 			, _endDate(TIME_UNKNOWN)
 			, _periodId(UNKNOWN_VALUE)
 			, _period(NULL)
 			, _departure_place(NULL)
 			, _arrival_place(NULL)
 			, _home(false)
+			, _maxSolutionsNumber(UNKNOWN_VALUE)
 		{
-
+			
 		}
 
 		int RoutePlannerFunction::getMaxSolutions() const

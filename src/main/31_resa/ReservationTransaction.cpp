@@ -131,5 +131,14 @@ namespace synthese
 			return _cancelUserId;
 		}
 
+		void ReservationTransaction::setCustomerEMail( const std::string& email )
+		{
+			_customerEMail = email;
+		}
+
+		const std::string& ReservationTransaction::getCustomerEMail() const
+		{
+			return _customerEMail;
+		}
 	}
 }

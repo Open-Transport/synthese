@@ -37,7 +37,7 @@ namespace synthese
 	namespace env
 	{
 		class LineStop;
-		class ConnectionPlace;
+		class PublicTransportStopZoneConnectionPlace;
 		 
 
 		/** Physical stop (bus stop, etc.).
@@ -59,7 +59,7 @@ namespace synthese
 
 			PhysicalStop (const uid& id,
 				const std::string& name, 
-				const AddressablePlace* place,
+				const PublicTransportStopZoneConnectionPlace* place,
 				double x = UNKNOWN_VALUE,
 				double y = UNKNOWN_VALUE);
 
@@ -70,6 +70,7 @@ namespace synthese
 			//@{
 				const uid&			getId ()			const;
 				const std::string&	getOperatorCode()	const;
+				const PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
 
 				const std::string& getName () const;
 				void setName (const std::string& name);

@@ -32,6 +32,8 @@
 
 #include "05_html/HTMLForm.h"
 
+#include "04_time/DateTime.h"
+
 #include "30_server/ActionException.h"
 #include "30_server/ServerModule.h"
 #include "30_server/Session.h"
@@ -40,15 +42,17 @@
 #include "30_server/Function.h"
 #include "30_server/RequestException.h"
 #include "30_server/Request.h"
+#include "30_server/RequestMissingParameterException.h"
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace html;
 	using namespace security;
+	using namespace time;
 
 	namespace server
 	{
@@ -489,6 +493,46 @@ namespace synthese
 		const Session* Request::getSession() const
 		{
 			return _session;
+		}
+
+		std::string Request::getStringFormParameterMap(
+			const ParametersMap& map
+			, const std::string& parameterName
+			, bool neededParameter
+			, const std::string& source
+		){
+			ParametersMap::const_iterator it(map.find(parameterName));
+			if (it == map.end())
+			{
+				if (neededParameter)
+					throw RequestMissingParameterException(parameterName, source);
+				return string();
+			}
+			return it->second;
+		}
+
+		uid Request::getUidFromParameterMap( const ParametersMap& map , const std::string& parameterName , bool neededParameter , const std::string& source )
+		{
+			const string result(getStringFormParameterMap(map, parameterName, neededParameter, source));
+			return result.empty() ? UNKNOWN_VALUE : Conversion::ToLongLong(result);
+		}
+
+		int Request::getIntFromParameterMap( const ParametersMap& map , const std::string& parameterName , bool neededParameter , const std::string& source )
+		{
+			const string result(getStringFormParameterMap(map, parameterName, neededParameter, source));
+			return result.empty() ? UNKNOWN_VALUE : Conversion::ToInt(result);
+		}
+
+		time::DateTime Request::getDateTimeFromParameterMap( const ParametersMap& map , const std::string& parameterName , bool neededParameter , const std::string& source )
+		{
+			const string result(getStringFormParameterMap(map, parameterName, neededParameter, source));
+			return result.empty() ? DateTime(TIME_UNKNOWN) : DateTime::FromInternalString(result);
+		}
+
+		time::Date Request::getDateFromParameterMap( const ParametersMap& map , const std::string& parameterName , bool neededParameter , const std::string& source )
+		{
+			const string result(getStringFormParameterMap(map, parameterName, neededParameter, source));
+			return result.empty() ? Date(TIME_UNKNOWN) : Date::FromInternalString(result);
 		}
 	}
 }

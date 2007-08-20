@@ -29,7 +29,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
+		class PublicTransportStopZoneConnectionPlace;
 	}
 
 	namespace departurestable
@@ -104,7 +104,7 @@ namespace synthese
 		class DisplayAdmin : public admin::AdminInterfaceElementTemplate<DisplayAdmin>
 		{
 			boost::shared_ptr<const DisplayScreen>			_displayScreen;
-			boost::shared_ptr<const env::ConnectionPlace>	_place;
+			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_place;
 
 		public:
 			DisplayAdmin();

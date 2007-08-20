@@ -32,17 +32,17 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
+		class PublicTransportStopZoneConnectionPlace;
 
 		/** ConnectionPlace SQLite table synchronizer.
-			@ingroup m15
+			@ingroup m15LS refLS
 
 			Connection places table :
 				- on insert : 
 				- on update : 
 				- on delete : X
 		*/
-		class ConnectionPlaceTableSync : public db::SQLiteTableSyncTemplate<ConnectionPlace>
+		class ConnectionPlaceTableSync : public db::SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;

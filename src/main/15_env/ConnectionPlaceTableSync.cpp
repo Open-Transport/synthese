@@ -28,6 +28,7 @@
 #include "02_db/SQLiteQueueThreadExec.h"
 
 #include "15_env/City.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/EnvModule.h"
 
 #include <boost/tokenizer.hpp>
@@ -45,18 +46,18 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ConnectionPlace>::TABLE_NAME = "t007_connection_places";
-		template<> const int SQLiteTableSyncTemplate<ConnectionPlace>::TABLE_ID = 7;
-		template<> const bool SQLiteTableSyncTemplate<ConnectionPlace>::HAS_AUTO_INCREMENT = true;
+		template<> const std::string SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::TABLE_NAME = "t007_connection_places";
+		template<> const int SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::TABLE_ID = 7;
+		template<> const bool SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteTableSyncTemplate<ConnectionPlace>::load(ConnectionPlace* cp, const db::SQLiteResultSPtr& rows )
+		template<> void SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::load(PublicTransportStopZoneConnectionPlace* cp, const db::SQLiteResultSPtr& rows )
 		{
 			uid id (rows->getLongLong (TABLE_COL_ID));
 			std::string name (rows->getText (ConnectionPlaceTableSync::TABLE_COL_NAME));
 			uid cityId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_CITYID));
 			
 			ConnectionPlace::ConnectionType connectionType = 
-			    (ConnectionPlace::ConnectionType) rows->getInt (ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE);
+			    static_cast<ConnectionPlace::ConnectionType>(rows->getInt (ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE));
 			
 			int defaultTransferDelay (rows->getInt (ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY));
 			
@@ -102,7 +103,7 @@ namespace synthese
 
 
 		ConnectionPlaceTableSync::ConnectionPlaceTableSync ()
-		: SQLiteTableSyncTemplate<ConnectionPlace> (true, false, db::TRIGGERS_ENABLED_CLAUSE)
+		: SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace> (true, false, db::TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn (TABLE_COL_ID, "INTEGER", true);
 			addTableColumn (TABLE_COL_NAME, "TEXT", true);
@@ -136,7 +137,7 @@ namespace synthese
 			{
 			    uid id (rows->getLongLong (TABLE_COL_ID));
 			    
-			    if (EnvModule::getConnectionPlaces ().contains (id)) return;
+			    if (EnvModule::getPublicTransportStopZones().contains (id)) return;
 			    
 			    std::string name (rows->getText (TABLE_COL_NAME));
 			    uid cityId (rows->getLongLong (TABLE_COL_CITYID));
@@ -152,10 +153,9 @@ namespace synthese
 			    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 			    
 			    shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cityId);
-			    shared_ptr<ConnectionPlace> cp(
-				new synthese::env::ConnectionPlace (
-				    id, name, city.get(), connectionType, defaultTransferDelay))
-				;
+			    shared_ptr<PublicTransportStopZoneConnectionPlace> cp(
+					new PublicTransportStopZoneConnectionPlace(id, name, city.get(), connectionType, defaultTransferDelay)
+				);
 
 			    boost::char_separator<char> sep1 (",");
 			    boost::char_separator<char> sep2 (":");
@@ -180,7 +180,7 @@ namespace synthese
 			//    cp->setAlarm (environment.getAlarms ().get (alarmId));
 
 				city->getConnectionPlacesMatcher ().add (cp->getName (), cp.get());
-				EnvModule::getConnectionPlaces ().add (cp);
+				EnvModule::getPublicTransportStopZones().add (cp);
 			}
 		}
 
@@ -193,8 +193,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<ConnectionPlace> cp = EnvModule::getConnectionPlaces().getUpdateable(
-				    rows->getLongLong (TABLE_COL_ID));
+				shared_ptr<PublicTransportStopZoneConnectionPlace> cp = EnvModule::getPublicTransportStopZones().getUpdateable(
+				    rows->getLongLong (TABLE_COL_ID)
+				);
 				
 				shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cp->getCity ()->getKey ());
 				city->getConnectionPlacesMatcher ().remove (cp->getName ());
@@ -218,11 +219,11 @@ namespace synthese
 				// TODO not finished...
 			    uid id = rows->getLongLong (TABLE_COL_ID);
 			    
-			    shared_ptr<const ConnectionPlace> cp = EnvModule::getConnectionPlaces ().get (id);
+			    shared_ptr<const ConnectionPlace> cp = EnvModule::getPublicTransportStopZones().get (id);
 			    shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cp->getCity ()->getKey ());
 			    city->getConnectionPlacesMatcher ().remove (cp->getName ());
 			    
-			    EnvModule::getConnectionPlaces ().remove (id);
+			    EnvModule::getPublicTransportStopZones().remove (id);
 			}
 		}
 	    

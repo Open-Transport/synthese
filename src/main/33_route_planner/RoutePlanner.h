@@ -96,8 +96,19 @@ namespace synthese
 				 //!< 
 			//@}
 
-		 public:
-			 RoutePlanner(
+		public:
+			/** Constructor.
+				@param origin Origin place
+				@param destination Destination place
+				@param accessParameters Access Parameters
+				@param planningOrder Planning order
+				@param journeySheetStartTime Start date time
+				@param journeySheetEndTime End date time
+				@param maxSolutionsNumber Maximum of solutions number
+				@author Hugues Romain
+				@date 2007
+			*/
+			RoutePlanner(
 				 const env::Place* origin,
 				 const env::Place* destination,
 				 const AccessParameters& accessParameters,

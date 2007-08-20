@@ -24,8 +24,12 @@
 #include <sstream>
 
 #include "AddressTableSync.h"
-#include "Address.h"
+
+#include "15_env/Address.h"
 #include "15_env/EnvModule.h"
+#include "15_env/Crossing.h"
+#include "15_env/CrossingTableSync.h"
+#include "15_env/ConnectionPlaceTableSync.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -54,10 +58,13 @@ namespace synthese
 		    uid id (rows->getLongLong (TABLE_COL_ID));
 
 		    object->setKey (id);
-		    uid connectionPlaceId = rows->getLongLong (AddressTableSync::COL_PLACEID);
-		    assert (EnvModule::getConnectionPlaces ().contains (connectionPlaceId));
-		    object->setPlace (EnvModule::getConnectionPlaces ().get (connectionPlaceId).get ());
-		    object->setRoad (EnvModule::getRoads ().get (rows->getLongLong (AddressTableSync::COL_ROADID)).get());
+		    uid placeId = rows->getLongLong (AddressTableSync::COL_PLACEID);
+			int tableId = decodeTableId(placeId);
+			if (tableId == CrossingTableSync::TABLE_ID)
+				object->setPlace(Crossing::getElements().get(placeId).get());
+			else if (tableId == ConnectionPlaceTableSync::TABLE_ID)
+				object->setPlace(EnvModule::getPublicTransportStopZones().get(placeId).get());
+			object->setRoad (EnvModule::getRoads ().get (rows->getLongLong (AddressTableSync::COL_ROADID)).get());
 		    object->setMetricOffset (rows->getDouble (AddressTableSync::COL_METRICOFFSET));
 		    object->setXY (rows->getDouble (AddressTableSync::COL_X), rows->getDouble (AddressTableSync::COL_Y));
 		}

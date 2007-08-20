@@ -43,7 +43,7 @@
 #include "32_admin/HomeAdmin.h"
 #include "32_admin/AdminParametersException.h"
 
-#include "15_env/ConnectionPlace.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/EnvModule.h"
 

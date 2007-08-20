@@ -28,8 +28,6 @@
 
 #include "Place.h"
 
-#include "06_geometry/IsoBarycentre.h"
-
 namespace synthese
 {
 	namespace env
@@ -41,13 +39,11 @@ namespace synthese
 		*/
 		class IncludingPlace : public Place
 		{
-		private:
-			mutable bool _isoBarycentreToUpdate;
-			mutable geometry::IsoBarycentre _isoBarycentre;
+		public:
+			typedef std::vector<const Place*> IncludedPlaces;
 
 		protected:
-
-			std::vector<const Place*> _includedPlaces; 
+			IncludedPlaces _includedPlaces; 
 
 		public:
 
@@ -59,7 +55,7 @@ namespace synthese
 
 				/** Gets included places.
 				 */
-				const std::vector<const Place*>& getIncludedPlaces () const;
+				const IncludedPlaces& getIncludedPlaces () const;
 			    
 			//@}
 
@@ -84,6 +80,8 @@ namespace synthese
 			//@{
 
 				/** Adds an included place to this place.
+					@param place Place to include
+					This methods cancels the caching of the isobarycentre.
 				 */
 				void addIncludedPlace (const Place* place);
 

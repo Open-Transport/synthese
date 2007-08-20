@@ -58,22 +58,9 @@ namespace synthese
 		void 
 		AddressablePlace::addAddress (const Address* address)
 		{
-			_isoBarycentreToUpdateA = true;
+			_isoBarycentreToUpdate = true;
 			_addresses.push_back (address);
 		}
-
-
-
-
-
-
-		const AddressablePlace::ConnectionType 
-		AddressablePlace::getConnectionType () const
-		{
-			return CONNECTION_TYPE_FORBIDDEN;
-		}
-
-
 
 
 
@@ -100,14 +87,24 @@ namespace synthese
 
 		const geometry::Point2D& AddressablePlace::getPoint() const
 		{
-			if (_isoBarycentreToUpdateA)
+			if (_isoBarycentreToUpdate)
 			{
-				_isoBarycentreA.clear();
+				_isoBarycentre.clear();
 				for (Addresses::const_iterator it(_addresses.begin()); it != _addresses.end(); ++it)
-					_isoBarycentreA.add(**it);
-				_isoBarycentreToUpdateA = false;
+					_isoBarycentre.add(**it);
+				_isoBarycentreToUpdate = false;
 			}
-			return _isoBarycentreA;
+			return _isoBarycentre;
+		}
+
+		bool AddressablePlace::hasAddresses() const
+		{
+			return !_addresses.empty();
+		}
+
+		bool AddressablePlace::hasPhysicalStops() const
+		{
+			return false;
 		}
 	}
 }

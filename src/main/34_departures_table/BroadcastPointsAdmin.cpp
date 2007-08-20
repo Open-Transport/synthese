@@ -28,7 +28,6 @@
 
 #include "05_html/SearchFormHTMLTable.h"
 
-#include "15_env/ConnectionPlace.h"
 #include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/City.h"
 #include "15_env/EnvModule.h"
@@ -174,7 +173,7 @@ namespace synthese
 				stream << t.row();
 				try
 				{
-					shared_ptr<ConnectionPlace> place((*it)->place);
+					shared_ptr<PublicTransportStopZoneConnectionPlace> place((*it)->place);
 					stream << t.col() << (*it)->cityName;
 					stream << t.col() << place->getName();
 					stream << t.col() << (*it)->broadCastPointsNumber;

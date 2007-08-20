@@ -266,6 +266,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\PublicTransportStopZoneConnectionPlace.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\PublicTransportStopZoneConnectionPlace.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TemporaryPlace.cpp"
 					>
 				</File>
@@ -632,7 +640,7 @@
 			>
 		</Filter>
 		<Filter
-			Name="Exceptions"
+			Name="01 Exceptions"
 			>
 			<File
 				RelativePath=".\Exception.cpp"

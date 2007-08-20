@@ -108,7 +108,7 @@ namespace synthese
 
 			for(LexicalMatcher<const ConnectionPlace*>::MatchResult::const_iterator it(places.begin()); it != places.end(); ++it)
 			{
-				placesList.push_back(make_pair(it->value->getKey(), it->value->getName()));
+				placesList.push_back(make_pair(it->value->getId(), it->value->getName()));
 			}
 
 			VariablesMap vm;

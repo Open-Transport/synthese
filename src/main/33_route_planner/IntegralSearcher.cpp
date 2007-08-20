@@ -303,10 +303,10 @@ namespace synthese
 
 						// Storage of the journey as a result
 						if(	(	_searchAddresses == SEARCH_ADDRESSES
-							&&	!reachedVertex->getConnectionPlace()->getAddresses().empty()
+							&&	reachedVertex->getConnectionPlace()->hasAddresses()
 							)
 						||	(	_searchPhysicalStops == SEARCH_PHYSICALSTOPS
-							&&	!reachedVertex->getConnectionPlace()->getPhysicalStops().empty()
+							&&	reachedVertex->getConnectionPlace()->hasPhysicalStops()
 							)
 						||	isGoalReached
 						)	_result.add(resultJourney);

@@ -41,6 +41,7 @@ namespace synthese
 	namespace env
 	{
 		class CommercialLine;
+		class Place;
 	}
 
 	namespace interfaces
@@ -63,6 +64,12 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<HourPeriod> Periods;
+			typedef enum
+			{
+				HANDICCAPED_ACCESSIBILITY = 1
+				, BIKE_ACCESSIBILITY = 2
+			} AccessibilityParameter;
+
 
 		private:
 			//! \name Properties
@@ -132,7 +139,15 @@ namespace synthese
 
 			//! \name Queries
 			//@{
-				AccessParameters	getDefaultAccessParameters()	const;
+				/** Access parameter generator.
+					@param parameter Access profile
+					@return synthese::AccessParameters
+					@author Hugues Romain
+					@date 2007
+					@todo Modify the generated object to avoid memory leaks due to the use of new operator
+				*/
+				AccessParameters	getAccessParameters(AccessibilityParameter parameter)	const;
+	
 				bool dateControl() const;
 
 				/** Interprets date from text and environment data.
@@ -150,7 +165,7 @@ namespace synthese
 						- TEMPS_MAX_CIRCULATIONS ('R') : Last date where at least one service runs (see Environment::getMaxDateInUse())
 
 					The following assertion is always assumed : \f$ TEMPS_{INCONNU}<=TEMPS_{MIN}<=TEMPS_{MIN ENVIRONNEMENT}<=TEMPS_{MIN CIRCULATIONS}<=TEMPS_{ACTUEL}<=TEMPS_{MAX CIRCULATIONS}<=TEMPS_{MAX ENVIRONNEMENT}<=TEMPS_{MAX} \f$.
-				*/	
+				*/
 				time::Date interpretDate( const std::string& text ) const;
 
 					
@@ -173,7 +188,20 @@ namespace synthese
 					, time::DateTime& startTime
 					, time::DateTime& endTime
 				) const;				
-				
+
+				/** Find the best place corresponding to a city name and a place name.
+					@param cityName City name
+					@param placeName Place name
+					@return const env::Place* best place found
+					@author Hugues Romain
+					@date 2007
+					@throw Exception if no place can be found
+				*/
+				const env::Place* fetchPlace(
+					const std::string& cityName
+					, const std::string& placeName
+				) const;
+
 			//@}
 
 		};

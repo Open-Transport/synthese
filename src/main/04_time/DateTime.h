@@ -118,8 +118,12 @@ namespace synthese
 			*/
 			static DateTime FromSQLTimestamp (const std::string& sqlTimestamp);
 
-			/** Constructs a DateTime from an SQL timestamp string (AAAAMMJJhhmmss);
-			seconds are ignored.
+			/** Constructs a DateTime from an SQL timestamp string
+				@param str Internal string : 
+					- format YYYYMMDDHHMM, additional seconds are ignored
+					- "A" = TIME_CURRENT, the result is now
+				@return DateTime object
+				@throw TimeParseException if no valid DateTime can be builded
 			*/
 			static DateTime FromInternalString (const std::string& str);
 

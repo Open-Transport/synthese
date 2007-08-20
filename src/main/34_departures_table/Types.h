@@ -37,7 +37,7 @@ namespace synthese
 {
 	namespace env
 	{
-		class ConnectionPlace;
+		class PublicTransportStopZoneConnectionPlace;
 		class Line;
 		class LineStop;
 	}
@@ -57,9 +57,9 @@ namespace synthese
 		WITH_OR_WITHOUT_ANY_BROADCASTPOINT
 		} BroadcastPointsPresence;
 
-	typedef std::set<const env::ConnectionPlace*> DisplayedPlacesList;
+	typedef std::set<const env::PublicTransportStopZoneConnectionPlace*> DisplayedPlacesList;
 	typedef std::set<const env::Line*> LineFilter;
-	typedef std::set<const env::ConnectionPlace*> ForbiddenPlacesList;
+	typedef std::set<const env::PublicTransportStopZoneConnectionPlace*> ForbiddenPlacesList;
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
 	typedef enum { ENDS_ONLY = 0, WITH_PASSING = 1 } EndFilter;
 	struct DeparturesTableElement { 
@@ -78,7 +78,7 @@ namespace synthese
 				);
 		}
 	};
-	typedef std::vector<const env::ConnectionPlace*> ActualDisplayedArrivalsList;
+	typedef std::vector<const env::PublicTransportStopZoneConnectionPlace*> ActualDisplayedArrivalsList;
 	typedef std::pair<DeparturesTableElement, ActualDisplayedArrivalsList> ArrivalDepartureRow;
 	typedef std::map<DeparturesTableElement, ActualDisplayedArrivalsList, DeparturesTableElementLess> ArrivalDepartureList;
 	struct ArrivalDepartureListWithAlarm { ArrivalDepartureList map; const messages::Alarm* alarm; };

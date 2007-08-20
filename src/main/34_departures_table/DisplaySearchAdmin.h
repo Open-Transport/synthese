@@ -38,7 +38,7 @@ namespace synthese
 
 	namespace env
 	{
-		class ConnectionPlace;
+		class PublicTransportStopZoneConnectionPlace;
 	}
 
 	namespace departurestable
@@ -124,7 +124,7 @@ namespace synthese
 			std::string										_searchName;
 			uid												_searchLineId;
 			uid												_searchTypeId;
-			boost::shared_ptr<const env::ConnectionPlace>	_place;
+			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_place;
 			int												_searchState;
 			int												_searchMessage;
 			html::ActionResultHTMLTable::RequestParameters	_requestParameters;

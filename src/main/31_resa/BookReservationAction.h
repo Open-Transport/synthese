@@ -29,6 +29,8 @@
 
 #include "15_env/Journey.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <boost/shared_ptr.hpp>
 #include <string>
 
@@ -44,6 +46,8 @@ namespace synthese
 		/** BookReservationAction action class.
 			@ingroup m31Actions refActions
 
+			@todo Move this action into route planner and rename it BookJourneyFromRoutePlannerAction
+
 			The reservation is made upon a journey. Each journey leg allowing reservation
 			is booked simultaneously.
 
@@ -54,9 +58,13 @@ namespace synthese
 			The datetime must be precisely identical with the start time of the founded journey. If not, the reservation is cancelled and the route planning must be launched again.
 			This case can occur if a hot update has been done while the customer asked for his reservation.
 		*/
-		class BookReservationAction : public server::Action
+		class BookReservationAction
+			: public util::FactorableTemplate<server::Action, BookReservationAction>
 		{
 		public:
+			static const std::string PARAMETER_SITE;
+			static const std::string PARAMETER_ACCESSIBILITY;
+
 			// Journey information
 			static const std::string PARAMETER_ORIGIN_CITY;
 			static const std::string PARAMETER_ORIGIN_PLACE;
@@ -77,11 +85,12 @@ namespace synthese
 			static const std::string PARAMETER_SEATS_NUMBER;
 
 		private:
-			env::Journey						_journey;
-			boost::shared_ptr<security::User>	_customer;
-			std::string							_customerName;
-			std::string							_customerPhone;
-			int									_seatsNumber;
+			env::Journey							_journey;
+			boost::shared_ptr<const security::User>	_customer;
+			std::string								_customerName;
+			std::string								_customerPhone;
+			std::string								_customerEMail;
+			int										_seatsNumber;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -100,6 +109,8 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run();
+
+			BookReservationAction();
 		};
 	}
 }

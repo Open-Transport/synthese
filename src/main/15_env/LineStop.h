@@ -36,6 +36,7 @@ namespace synthese
 	{
 		class PhysicalStop;
 		class Line;
+		class PublicTransportStopZoneConnectionPlace;
 
 		/** Association class between line and physical stop.
 			The linestop is the implementation of the edge of a transport line.
@@ -91,6 +92,7 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
+				const PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
 
 				const Vertex*		getFromVertex () const;
 

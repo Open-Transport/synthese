@@ -127,6 +127,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RequestMissingParameterException.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RequestMissingParameterException.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ServerModuleException.cpp"
 				>
 			</File>
