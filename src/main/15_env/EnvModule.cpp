@@ -20,15 +20,26 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "EnvModule.h"
+
 #include "01_util/Constants.h"
 #include "01_util/UId.h"
 
-#include "15_env/EnvModule.h"
 #include "15_env/TransportNetworkTableSync.h"
 #include "15_env/TransportNetwork.h"
 #include "15_env/CommercialLineTableSync.h"
 #include "15_env/CommercialLine.h"
 #include "15_env/Crossing.h"
+#include "15_env/Line.h"
+#include "15_env/ScheduledService.h"
+#include "15_env/ContinuousService.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "15_env/Road.h"
+#include "15_env/PublicPlace.h"
+#include "15_env/City.h"
+#include "15_env/PlaceAlias.h"
+#include "15_env/Address.h"
+#include "15_env/PhysicalStop.h"
 
 #include "12_security/Constants.h"
 #include "12_security/Right.h"
@@ -43,89 +54,16 @@ namespace synthese
 
     namespace env
     {
-		Address::Registry				EnvModule::_addresses;
-		City::Registry					EnvModule::_cities;
-		PublicTransportStopZoneConnectionPlace::Registry	EnvModule::_publicTransportStopZones;
-		PhysicalStop::Registry			EnvModule::_physicalStops;
-		CommercialLine::Registry		EnvModule::_commercialLines;
-		Line::Registry					EnvModule::_lines;
-		Axis::Registry					EnvModule::_axes;
-		Fare::Registry					EnvModule::_fares;
-		BikeCompliance::Registry		EnvModule::_bikeCompliances;
-		HandicappedCompliance::Registry	EnvModule::_handicappedCompliances;
-		PedestrianCompliance::Registry	EnvModule::_pedestrianCompliances;
-		ReservationRule::Registry		EnvModule::_reservationRules;
-		LineStop::Registry				EnvModule::_lineStops;
-		ScheduledService::Registry		EnvModule::_scheduledServices;
-		ContinuousService::Registry		EnvModule::_continuousServices;
-		TransportNetwork::Registry		EnvModule::_networks;
-		PlaceAlias::Registry			EnvModule::_placeAliases;
-		PublicPlace::Registry			EnvModule::_publicPlaces;
-		RoadChunk::Registry				EnvModule::_roadChunks;
-		Road::Registry					EnvModule::_roads;
-
 		LexicalMatcher<uid>				EnvModule::_citiesMatcher; //!< @todo To be moved in transportwebsite::Site
 
 		void EnvModule::initialize()
 		{
 		}
 
-
-
-		City::Registry& EnvModule::getCities()
-		{
-			return _cities;
-		}
-
-		PhysicalStop::Registry& EnvModule::getPhysicalStops()
-		{
-			return _physicalStops;
-		}
-
-		CommercialLine::Registry& EnvModule::getCommercialLines()
-		{
-			return _commercialLines;
-		}
-
-		Line::Registry& EnvModule::getLines()
-		{
-			return _lines;
-		}
-
-		Axis::Registry& EnvModule::getAxes()
-		{
-			return _axes;
-		}
-
-		Fare::Registry& EnvModule::getFares()
-		{
-			return _fares;
-		}
-
-		BikeCompliance::Registry& EnvModule::getBikeCompliances()
-		{
-			return _bikeCompliances;
-		}
-
-		HandicappedCompliance::Registry& EnvModule::getHandicappedCompliances()
-		{
-			return _handicappedCompliances;
-		}
-
-		PedestrianCompliance::Registry& EnvModule::getPedestrianCompliances()
-		{
-			return _pedestrianCompliances;
-		}
-
-		ReservationRule::Registry& EnvModule::getReservationRules()
-		{
-			return _reservationRules;
-		}
-
-
 		shared_ptr<Path> EnvModule::fetchPath (const uid& id)
 		{
-			if (_lines.contains (id)) return _lines.getUpdateable (id);
+			if (Line::Contains (id))
+				return Line::GetUpdateable (id);
 			//		if (_roads.contains (id)) return _roads.get (id);
 			return shared_ptr<Path>();
 		}
@@ -146,62 +84,19 @@ namespace synthese
 			return m;
 		}
 
-		LineStop::Registry& EnvModule::getLineStops()
-		{
-			return _lineStops;
-		}
-
-		ScheduledService::Registry& EnvModule::getScheduledServices()
-		{
-			return _scheduledServices;
-		}
 
 
 		shared_ptr<NonPermanentService> EnvModule::fetchService (const uid& id)
 		{
-			if (_scheduledServices.contains (id))
-				return _scheduledServices.getUpdateable (id);
-			if (_continuousServices.contains (id))
-				return _continuousServices.getUpdateable (id);
+			if (ScheduledService::Contains (id))
+				return ScheduledService::GetUpdateable (id);
+			if (ContinuousService::Contains (id))
+				return ContinuousService::GetUpdateable (id);
 			return shared_ptr<NonPermanentService>();
 		}
 
-		ContinuousService::Registry& EnvModule::getContinuousServices()
-		{
-			return _continuousServices;
-		}
 
-		TransportNetwork::Registry& EnvModule::getTransportNetworks()
-		{
-			return _networks;
-		}
-
-		Address::Registry& EnvModule::getAddresses()
-		{
-			return _addresses;
-		}
-
-		PlaceAlias::Registry& EnvModule::getPlaceAliases()
-		{
-			return _placeAliases;
-		}
-
-		PublicPlace::Registry& EnvModule::getPublicPlaces()
-		{
-			return _publicPlaces;
-		}
-
-		RoadChunk::Registry& EnvModule::getRoadChunks()
-		{
-			return _roadChunks;
-		}
-
-		Road::Registry& EnvModule::getRoads()
-		{
-			return _roads;
-		}
-
-
+		
 		shared_ptr<const Place> 
 		EnvModule::fetchPlace (const uid& id)
 		{
@@ -217,14 +112,14 @@ namespace synthese
 		shared_ptr<const AddressablePlace> 
 		EnvModule::fetchAddressablePlace (const uid& id)
 		{
-			if (_publicTransportStopZones.contains (id))
-				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(_publicTransportStopZones.get (id));
-			if (_publicPlaces.contains (id))
-				return static_pointer_cast<const AddressablePlace, const PublicPlace>(_publicPlaces.get (id));
-			if (_roads.contains (id))
-				return static_pointer_cast<const AddressablePlace, const Road>(_roads.get (id));
-			if (Crossing::getElements().contains(id))
-				return static_pointer_cast<const AddressablePlace, const Crossing>(Crossing::getElements().get(id));
+			if (PublicTransportStopZoneConnectionPlace::Contains (id))
+				return static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(PublicTransportStopZoneConnectionPlace::Get (id));
+			if (PublicPlace::Contains (id))
+				return static_pointer_cast<const AddressablePlace, const PublicPlace>(PublicPlace::Get (id));
+			if (Road::Contains (id))
+				return static_pointer_cast<const AddressablePlace, const Road>(Road::Get (id));
+			if (Crossing::Contains(id))
+				return static_pointer_cast<const AddressablePlace, const Crossing>(Crossing::Get(id));
 
 			return shared_ptr<const AddressablePlace>();
 		}
@@ -233,14 +128,14 @@ namespace synthese
 		shared_ptr<AddressablePlace> 
 			EnvModule::fetchUpdateableAddressablePlace (const uid& id)
 		{
-			if (_publicTransportStopZones.contains (id))
-				return static_pointer_cast<AddressablePlace, PublicTransportStopZoneConnectionPlace>(_publicTransportStopZones.getUpdateable(id));
-			if (_publicPlaces.contains (id))
-				return static_pointer_cast<AddressablePlace, PublicPlace>(_publicPlaces.getUpdateable(id));
-			if (_roads.contains (id))
-				return static_pointer_cast<AddressablePlace, Road>(_roads.getUpdateable(id));
-			if (Crossing::getElements().contains (id))
-				return static_pointer_cast<AddressablePlace, Crossing>(Crossing::getElements().getUpdateable(id));
+			if (PublicTransportStopZoneConnectionPlace::Contains (id))
+				return static_pointer_cast<AddressablePlace, PublicTransportStopZoneConnectionPlace>(PublicTransportStopZoneConnectionPlace::GetUpdateable(id));
+			if (PublicPlace::Contains (id))
+				return static_pointer_cast<AddressablePlace, PublicPlace>(PublicPlace::GetUpdateable(id));
+			if (Road::Contains (id))
+				return static_pointer_cast<AddressablePlace, Road>(Road::GetUpdateable(id));
+			if (Crossing::Contains (id))
+				return static_pointer_cast<AddressablePlace, Crossing>(Crossing::GetUpdateable(id));
 
 			return shared_ptr<AddressablePlace>();
 		}
@@ -250,48 +145,34 @@ namespace synthese
 		shared_ptr<const IncludingPlace> 
 		EnvModule::fetchIncludingPlace (const uid& id)
 		{
-			if (_placeAliases.contains (id))
-			return static_pointer_cast<const IncludingPlace, const PlaceAlias>(_placeAliases.get (id));
-			if (_cities.contains (id))
-			return static_pointer_cast<const IncludingPlace, const City>(_cities.get (id));
+			if (PlaceAlias::Contains (id))
+				return static_pointer_cast<const IncludingPlace, const PlaceAlias>(PlaceAlias::Get (id));
+			if (City::Contains (id))
+				return static_pointer_cast<const IncludingPlace, const City>(City::Get (id));
 
 			return shared_ptr<const IncludingPlace>();
 		}
 
 
 
-
-
-
-
 		shared_ptr<const Vertex> 
 		EnvModule::fetchVertex (const uid& id)
 		{
-			if (_physicalStops.contains (id))
-			return static_pointer_cast<const Vertex, const PhysicalStop>(_physicalStops.get (id));
-			if (_addresses.contains (id))
-			return static_pointer_cast<const Vertex, const Address>(_addresses.get (id));
+			if (PhysicalStop::Contains (id))
+				return static_pointer_cast<const Vertex, const PhysicalStop>(PhysicalStop::Get (id));
+			if (Address::Contains (id))
+				return static_pointer_cast<const Vertex, const Address>(Address::Get (id));
 			return shared_ptr<const Vertex>();
 		}
 
-
-	/*
-	  Vertex* 
-	  Environment::fetchVertex (const uid& id)
-	  {
-	  if (EnvModule::getPhysicalStops().contains (id)) return EnvModule::getPhysicalStops().getUpdateable (id).get();
-	  if (_addresses.contains (id)) return _addresses.getUpdateable(id).get();
-	  return 0;
-	  }
-	*/
 
 
 		LineSet
 		EnvModule::fetchLines (const uid& commercialLineId) 
 		{
 			LineSet result;
-			for (Line::Registry::const_iterator it = _lines.begin ();
-			 it != _lines.end (); ++it)
+			for (Line::ConstIterator it = Line::Begin ();
+				it != Line::End (); ++it)
 			{
 			if (it->second->getCommercialLine ()->getKey () == commercialLineId) 
 				result.insert (it->second);
@@ -310,7 +191,7 @@ namespace synthese
 			 it != matches.end (); ++it)
 			{
 			uid id = it->value;
-			result.push_back (getCities ().get (id));
+			result.push_back (City::Get (id));
 			}
 			return result;
 		}
@@ -334,11 +215,6 @@ namespace synthese
 			for (vector<shared_ptr<CommercialLine> >::const_iterator itl = lines.begin(); itl != lines.end(); ++itl)
 			m.push_back(make_pair(Conversion::ToString((*itl)->getKey()), (*itl)->getName() ));
 
-		}
-
-		PublicTransportStopZoneConnectionPlace::Registry& EnvModule::getPublicTransportStopZones()
-		{
-			return _publicTransportStopZones;
 		}
     }
 }

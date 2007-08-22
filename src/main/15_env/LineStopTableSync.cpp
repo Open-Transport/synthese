@@ -31,8 +31,11 @@
 #include "02_db/SQLiteException.h"
 
 #include "LineStop.h"
+#include "Line.h"
 #include "LineStopTableSync.h"
-#include "15_env/EnvModule.h"
+#include "PhysicalStop.h"
+
+#include "06_geometry/Point2D.h"
 
 using namespace std;
 using namespace boost;
@@ -93,11 +96,11 @@ namespace synthese
 			ls->setMetricOffset(metricOffset);
 			ls->setIsArrival(isArrival);
 			ls->setIsDeparture(isDeparture);
-			ls->setPhysicalStop(EnvModule::getPhysicalStops ().getUpdateable(fromPhysicalStopId).get());
-			ls->setLine(EnvModule::getLines ().getUpdateable (lineId).get());
+			ls->setPhysicalStop(PhysicalStop::GetUpdateable(fromPhysicalStopId).get());
+			ls->setLine(Line::GetUpdateable (lineId).get());
 			ls->setRankInPath(rankInPath);
 
-			EnvModule::getLines ().getUpdateable (lineId)->addEdge(ls);
+			Line::GetUpdateable (lineId)->addEdge(ls);
 			
 		}
 
@@ -149,15 +152,15 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				if (EnvModule::getLineStops().contains(rows->getLongLong (TABLE_COL_ID)))
+				if (LineStop::Contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load(EnvModule::getLineStops().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
+					load(LineStop::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
 				}
 				else
 				{
-					shared_ptr<LineStop> object(new LineStop);
-					load(object.get(), rows);
-					EnvModule::getLineStops().add(object);
+					LineStop* object(new LineStop);
+					load(object, rows);
+					object->store();
 				}
 			}
 		}
@@ -167,9 +170,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getLineStops().contains(id))
+				if (LineStop::Contains(id))
 				{
-					shared_ptr<LineStop> object = EnvModule::getLineStops().getUpdateable(id);
+					shared_ptr<LineStop> object = LineStop::GetUpdateable(id);
 					load(object.get(), rows);
 				}
 			}
@@ -180,9 +183,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getLineStops().contains(id))
+				if (LineStop::Contains(id))
 				{
-					EnvModule::getLineStops().remove(id);
+					LineStop::Remove(id);
 				}
 			}
 		}

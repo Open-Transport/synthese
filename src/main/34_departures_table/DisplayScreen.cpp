@@ -47,6 +47,11 @@ namespace synthese
 	using namespace dblog;
 	using namespace interfaces;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,departurestable::DisplayScreen>::Registry Registrable<uid,departurestable::DisplayScreen>::_registry;
+	}
+
 	namespace departurestable
 	{
 		DisplayScreen::DisplayScreen()
@@ -256,7 +261,7 @@ namespace synthese
 				ArrivalDepartureListWithAlarm displayedObject;
 				displayedObject.map = generator->generate();
 				displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this);
-				shared_ptr<const DeparturesTableInterfacePage> page(_displayType->getInterface()->getPage<DeparturesTableInterfacePage>());
+				const DeparturesTableInterfacePage* page(_displayType->getInterface()->getPage<DeparturesTableInterfacePage>());
 				VariablesMap variables;
 				page->display(stream, variables, getTitle(), getWiringCode(), getServiceNumberDisplay(), displayedObject);
 			}

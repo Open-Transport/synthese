@@ -20,15 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/EnvModule.h"
-
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 
 #include "34_departures_table/AddForbiddenPlaceToDisplayScreen.h"
-#include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
+
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 
 using namespace std;
 using namespace boost;
@@ -63,7 +62,7 @@ namespace synthese
 				if (it == map.end())
 					throw ActionException("Place not specified");
 				
-				_place = EnvModule::getPublicTransportStopZones().get(Conversion::ToLongLong(it->second));
+				_place = PublicTransportStopZoneConnectionPlace::Get(Conversion::ToLongLong(it->second));
 			}
 			catch (DBEmptyResultException<DisplayScreen>&)
 			{

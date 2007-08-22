@@ -47,9 +47,13 @@ namespace synthese
 		template<class K, class T>
 		class Registry
 		{
+		public:
+			typedef std::map<K, boost::shared_ptr<T> > Map;
+			typedef typename Map::const_iterator const_iterator;
+
 		 private:
 		    
-			 std::map<K, boost::shared_ptr<T> > _registry;
+			 Map _registry;
 
 		 public:
 
@@ -59,7 +63,6 @@ namespace synthese
 			Registry ();
 			~Registry ();
 
-			typedef typename std::map<K, boost::shared_ptr<T> >::const_iterator const_iterator;
 
 			//! @name Getters/Setters
 			//@{
@@ -184,8 +187,6 @@ namespace synthese
 				throw RegistryKeyException<K,T> ("Duplicate key in registry", ptr->getKey ());
 		    
 			_registry.insert (std::make_pair (ptr->getKey (), ptr));
-
-			ptr->_registry = this;
 		}
 
 

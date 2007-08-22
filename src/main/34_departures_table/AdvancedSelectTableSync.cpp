@@ -31,7 +31,8 @@
 #include "15_env/CommercialLineTableSync.h"
 #include "15_env/LineStopTableSync.h"
 #include "15_env/LineTableSync.h"
-#include "15_env/EnvModule.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "15_env/CommercialLine.h"
 
 #include "34_departures_table/AdvancedSelectTableSync.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
@@ -156,7 +157,7 @@ namespace synthese
 				vector<shared_ptr<const CommercialLine> > objects;
 				while (rows->next ())
 				{
-				    objects.push_back(EnvModule::getCommercialLines().get(
+					objects.push_back(CommercialLine::Get(
 							  rows->getLongLong (TABLE_COL_ID)));
 				}
 				return objects;

@@ -24,7 +24,6 @@
 
 #include "34_departures_table/DisplayMaintenanceLog.h"
 #include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
 using namespace boost;
@@ -98,7 +97,7 @@ namespace synthese
 			// Screen
 			try
 			{
-				shared_ptr<const DisplayScreen> screen = DeparturesTableModule::getDisplayScreens().get(id);
+				shared_ptr<const DisplayScreen> screen = DisplayScreen::Get(id);
 				return screen->getFullName();
 			}
 			catch (...)

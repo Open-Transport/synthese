@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/MessagesModule.h"
+#include "MessagesModule.h"
+
 #include "17_messages/SentScenario.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/ScenarioTableSync.h"
@@ -34,21 +35,6 @@ namespace synthese
 {
 	namespace messages
 	{
-		SentAlarm::Registry MessagesModule::_alarms;
-		SentScenario::Registry MessagesModule::_scenarii;
-		AlarmObjectLink::Registry MessagesModule::_alarmLinks;
-
-		SentAlarm::Registry& 
-			MessagesModule::getAlarms ()
-		{
-			return _alarms;
-		}
-
-		SentScenario::Registry& MessagesModule::getScenarii()
-		{
-			return _scenarii;
-		}
-
 		std::vector<pair<uid, std::string> > MessagesModule::getScenarioTemplatesLabels( bool withAll /*= false*/ )
 		{
 			vector<pair<uid,string> > m;
@@ -104,10 +90,7 @@ namespace synthese
 			}
 		}
 
-		AlarmObjectLink::Registry& MessagesModule::getAlarmLinks()
-		{
-			return _alarmLinks;
-		}
+
 
 		std::string MessagesModule::getConflictLabel( const AlarmConflict& conflict )
 		{

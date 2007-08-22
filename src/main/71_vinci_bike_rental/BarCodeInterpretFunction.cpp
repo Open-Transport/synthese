@@ -151,7 +151,7 @@ namespace synthese
 						redirRequest.setObjectId(contract->getKey());
 						VariablesMap vm;
 						redirRequest.getFunction()->getInterface()->
-						  getPage<RedirectInterfacePage>()->display(stream, vm, &redirRequest);
+							getPage<RedirectInterfacePage>()->display(stream, vm, &redirRequest);
 						return;
 					}
 					else
@@ -162,7 +162,7 @@ namespace synthese
 						redirRequest.setObjectId(contract->getKey());
 						VariablesMap vm;
 						redirRequest.getFunction()->getInterface()->
-						  getPage<RedirectInterfacePage>()->display(stream, vm, &redirRequest);
+							getPage<RedirectInterfacePage>()->display(stream, vm, &redirRequest);
 						return;
 					}
 				}

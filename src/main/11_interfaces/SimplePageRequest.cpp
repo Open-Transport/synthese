@@ -94,7 +94,7 @@ namespace synthese
 			return map;
 		}
 
-		void SimplePageRequest::setPage(shared_ptr<const InterfacePage> page )
+		void SimplePageRequest::setPage(const InterfacePage* page )
 		{
 			_page = page;
 		}

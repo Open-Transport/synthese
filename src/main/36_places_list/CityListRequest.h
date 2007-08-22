@@ -54,7 +54,7 @@ namespace synthese
 			int _n;
 			bool _isForOrigin;
 			boost::shared_ptr<const env::City>					_city;
-			boost::shared_ptr<const PlacesListInterfacePage>	_page;
+			const PlacesListInterfacePage*	_page;
 
 		protected:
 			server::ParametersMap _getParametersMap() const;

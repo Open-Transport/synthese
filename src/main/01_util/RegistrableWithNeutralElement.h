@@ -24,7 +24,6 @@
 #define SYNTHESE_util_RegistrableWithNeutralElement_h__
 
 #include "01_util/Registrable.h"
-#include "01_util/RegistryWithNeutralElement.h"
 
 namespace synthese
 {
@@ -36,14 +35,27 @@ namespace synthese
 		template<class K, class T>
 		class RegistrableWithNeutralElement : public Registrable<K,T>
 		{
-		public:
-			typedef RegistryWithNeutralElement<K, T>	Registry;
+		private:
+			
+			static boost::shared_ptr<const T> _neutral;
 
+		public:
 			RegistrableWithNeutralElement()
 				: Registrable<K,T>()
 			{
 
 			}
+
+			static boost::shared_ptr<const T>	Get(const K& key)
+			{
+				return key ? Registrable<K,T>::Get(key) : _neutral;
+			}
+
+			static bool Contains(const K& key)
+			{
+				return key ? Registrable<K,T>::Contains(key) : true;
+			}
+
 
 		};
 	}

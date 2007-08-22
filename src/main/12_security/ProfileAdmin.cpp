@@ -24,7 +24,6 @@
 #include "05_html/HTMLForm.h"
 
 #include "12_security/Profile.h"
-#include "12_security/SecurityModule.h"
 #include "12_security/ProfileAdmin.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/UpdateProfileAction.h"
@@ -214,7 +213,7 @@ namespace synthese
 			{
 				ParametersMap::const_iterator it = map.find(Request::PARAMETER_OBJECT_ID);
 				if (it != map.end() && Conversion::ToLongLong(it->second) != Request::UID_WILL_BE_GENERATED_BY_THE_ACTION)
-					_profile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
+					_profile = Profile::Get(Conversion::ToLongLong(it->second));
 			}
 			catch (Profile::RegistryKeyException e)
 			{

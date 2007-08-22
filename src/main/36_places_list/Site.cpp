@@ -26,6 +26,8 @@
 #include "15_env/HandicappedCompliance.h"
 #include "15_env/BikeCompliance.h"
 #include "15_env/ReservationRule.h"
+#include "15_env/City.h"
+#include "15_env/ConnectionPlace.h"
 
 #include "07_lex_matcher/LexicalMatcher.h"
 
@@ -44,6 +46,11 @@ namespace synthese
 	using namespace env;
 	using namespace interfaces;
 	using namespace lexmatcher;
+
+	namespace util
+	{
+		template<> typename Registrable<uid,transportwebsite::Site>::Registry Registrable<uid,transportwebsite::Site>::_registry;
+	}
 
 	namespace transportwebsite
 	{
@@ -166,7 +173,7 @@ namespace synthese
 					hc->setCompliant(true);
 					ap.complyer.setHandicappedCompliance(hc);
 					BikeCompliance* bc(new BikeCompliance);
-					bc->setCompliant(false);
+					bc->setCompliant(logic::indeterminate);
 					ap.complyer.setBikeCompliance(bc);
 					ap.approachSpeed = 34; // m/min = 2 km/h
 					ap.maxApproachDistance = 300;
@@ -176,7 +183,7 @@ namespace synthese
 			case BIKE_ACCESSIBILITY:
 				{
 					HandicappedCompliance* hc(new HandicappedCompliance);
-					hc->setCompliant(false);
+					hc->setCompliant(logic::indeterminate);
 					ap.complyer.setHandicappedCompliance(hc);
 					BikeCompliance* bc(new BikeCompliance);
 					bc->setCompliant(true);

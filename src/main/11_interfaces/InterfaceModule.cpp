@@ -22,13 +22,15 @@
 
 #include <string>
 
+#include "InterfaceModule.h"
+
 #include "01_util/threads/Thread.h"
 
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteSync.h"
 
-#include "11_interfaces/InterfaceModule.h"
 #include "11_interfaces/InterfaceTableSync.h"
+#include "11_interfaces/Interface.h"
 #include "11_interfaces/InterfacePageTableSync.h"
 
 using namespace std;
@@ -39,23 +41,14 @@ namespace synthese
 
 	namespace interfaces
 	{
-		Interface::Registry		InterfaceModule::_interfaces;
-		InterfacePage::Registry	InterfaceModule::_interfacePages;
-
 		void InterfaceModule::initialize()
 		{
-		}
-
-		Interface::Registry& 
-			InterfaceModule::getInterfaces ()
-		{
-			return _interfaces;
 		}
 
 		vector<pair<uid, std::string> > InterfaceModule::getInterfaceLabels()
 		{
 			vector<pair<uid, string> > m;
-			for (Interface::Registry::const_iterator it = _interfaces.begin(); it != _interfaces.end(); ++it)
+			for (Interface::ConstIterator it = Interface::Begin(); it != Interface::End(); ++it)
 				m.push_back(make_pair(it->first, it->second->getName()));
 			return m;
 		}
@@ -67,11 +60,5 @@ namespace synthese
 				return "";
 			return it->second;
 		}
-
-		InterfacePage::Registry& InterfaceModule::getInterfacePages()
-		{
-			return _interfacePages;
-		}
 	}
 }
-

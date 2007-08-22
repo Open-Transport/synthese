@@ -29,6 +29,12 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,departurestable::DisplayType>::Registry Registrable<uid,departurestable::DisplayType>::_registry;
+	}
+
+
 	namespace departurestable
 	{
 

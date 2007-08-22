@@ -57,7 +57,7 @@ namespace synthese
 			pv.push_back(Conversion::ToString(journey.getReservationDeadLine() - now));
 			
 			stringstream s;
-			boost::shared_ptr<const DateTimeInterfacePage> datePage(getInterface()->getPage<DateTimeInterfacePage>());
+			const DateTimeInterfacePage* datePage(getInterface()->getPage<DateTimeInterfacePage>());
 			datePage->display(s, variables, journey.getReservationDeadLine(), request);
 			pv.push_back(s.str());
 

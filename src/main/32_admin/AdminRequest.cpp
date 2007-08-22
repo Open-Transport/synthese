@@ -90,13 +90,13 @@ namespace synthese
 					// Saving of the action failed page for url output purposes
 					it = map.find(PARAMETER_ACTION_FAILED_PAGE);
 					if (it != map.end())
-						_actionFailedPage = Factory<AdminInterfaceElement>::create(it->second);
+						_actionFailedPage = Factory<AdminInterfaceElement>::createSharedPtr(it->second);
 
 					it = map.find(PARAMETER_PAGE);
 				}
 				shared_ptr<AdminInterfaceElement> page = (it == map.end())
-					? static_pointer_cast<AdminInterfaceElement,HomeAdmin>(Factory<AdminInterfaceElement>::create<HomeAdmin>())
-					: Factory<AdminInterfaceElement>::create(it->second);
+					? static_pointer_cast<AdminInterfaceElement,HomeAdmin>(Factory<AdminInterfaceElement>::createSharedPtr<HomeAdmin>())
+					: Factory<AdminInterfaceElement>::createSharedPtr(it->second);
 				page->setFromParametersMap(map);
 				_page = page;
 				
@@ -119,7 +119,7 @@ namespace synthese
 			{
 				if (_interface != NULL)
 				{
-					shared_ptr<const AdminInterfacePage> const aip = _interface->getPage<AdminInterfacePage>();
+					const AdminInterfacePage* const aip = _interface->getPage<AdminInterfacePage>();
 					aip->display(stream, &_page, _request->getObjectId(), (const FunctionRequest<AdminRequest>*) _request);
 				}
 				else

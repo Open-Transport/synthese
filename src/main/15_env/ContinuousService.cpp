@@ -29,6 +29,11 @@ namespace synthese
 {
 	using namespace time;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,env::ContinuousService>::Registry Registrable<uid,env::ContinuousService>::_registry;
+	}
+
 	namespace env
 	{
 		ContinuousService::ContinuousService (const uid& id,

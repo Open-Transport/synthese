@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace interfaces
 	{
-		shared_ptr<LibraryInterfaceElement> LibraryInterfaceElement::create( const std::string & text, shared_ptr<const InterfacePage> page )
+		shared_ptr<LibraryInterfaceElement> LibraryInterfaceElement::create( const std::string & text, const InterfacePage* page )
 		{
 			// Trim the left spaces
 			size_t start_pos;
@@ -57,7 +57,7 @@ namespace synthese
 			shared_ptr<LibraryInterfaceElement> lie;
 			try
 			{
-				lie = Factory<LibraryInterfaceElement>::create(text.substr(start_pos, word_end_pos - start_pos));
+				lie = Factory<LibraryInterfaceElement>::createSharedPtr(text.substr(start_pos, word_end_pos - start_pos));
 			}
 			catch (FactoryException<LibraryInterfaceElement>& e)
 			{
@@ -94,7 +94,7 @@ namespace synthese
 			return value.empty() || Conversion::ToLongLong(value) == 0;
 		}
 
-		void LibraryInterfaceElement::setPage( boost::shared_ptr<const InterfacePage> page )
+		void LibraryInterfaceElement::setPage(const InterfacePage* page )
 		{
 			_page = page;
 		}

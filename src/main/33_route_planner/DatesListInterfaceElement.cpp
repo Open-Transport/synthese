@@ -70,7 +70,7 @@ namespace synthese
 			//	DateMin = __DateJour;
 			//synthese::time::Date DateMax = dateInterpretee( __Environnement, _Parametres[ ELEMENTINTERFACEInputHTMLListeDatesMax ] ->Texte( __Parametres ) );
 
-			shared_ptr<const DateTimeInterfacePage> datePage(_page->getInterface()->getPage<DateTimeInterfacePage>());
+			const DateTimeInterfacePage* datePage(_page->getInterface()->getPage<DateTimeInterfacePage>());
 
 			// Construction de l'objet HTML
 			stream << "<select name=\"" << RoutePlannerFunction::PARAMETER_DAY << "\">";

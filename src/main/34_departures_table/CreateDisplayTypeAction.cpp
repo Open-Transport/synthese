@@ -22,7 +22,7 @@
 
 #include "01_util/Conversion.h"
 
-#include "11_interfaces/InterfaceModule.h"
+#include "11_interfaces/Interface.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -86,9 +86,9 @@ namespace synthese
 			it = map.find(PARAMETER_INTERFACE_ID);
 			if (it != map.end())
 			{
-				if (InterfaceModule::getInterfaces().contains(Conversion::ToLongLong(it->second)))
+				if (Interface::Contains(Conversion::ToLongLong(it->second)))
 				{
-					_interface = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(it->second));
+					_interface = Interface::Get(Conversion::ToLongLong(it->second));
 				}
 				else
 				{

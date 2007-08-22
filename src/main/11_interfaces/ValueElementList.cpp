@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace interfaces
 	{
-		ValueElementList::ValueElementList(const std::string& text, shared_ptr<const InterfacePage> page)
+		ValueElementList::ValueElementList(const std::string& text, const InterfacePage* page)
 		{
 			parse(text, page);
 		}
@@ -86,7 +86,7 @@ namespace synthese
 			return _elements.size() == 0;
 		}
 
-		void ValueElementList::takeFrom(ValueElementList& vel, shared_ptr<const InterfacePage> page )
+		void ValueElementList::takeFrom(ValueElementList& vel, const InterfacePage* page )
 		{
 			for (; vel._elements.size() > 0; vel._elements.pop_back())
 			{
@@ -95,7 +95,7 @@ namespace synthese
 			}
 		}
 
-		void ValueElementList::parse(const std::string& text, shared_ptr<const InterfacePage> page)
+		void ValueElementList::parse(const std::string& text, const InterfacePage* page)
 		{
 			size_t position = 0;
 			std::vector<std::string> elements;
@@ -165,7 +165,7 @@ namespace synthese
 
 					try
 					{
-						vie = Factory<LibraryInterfaceElement>::create(str.substr(2, position - 2));
+						vie = Factory<LibraryInterfaceElement>::createSharedPtr(str.substr(2, position - 2));
 						ValueElementList vel;
 						if (position < str.size() - 3)
 							vel.parse(str.substr(position + 1, str.size() - position - 3), page);

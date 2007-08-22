@@ -72,9 +72,9 @@ namespace synthese
 			int __FiltreVelo = (Conversion::ToInt(_bikeFilter->getValue(parameters, variables, object, request)) > 1 );
 
 			// Resources
-			shared_ptr<const JourneyBoardStopCellInterfacePage> stopCellInterfacePage = _page->getInterface()->getPage<JourneyBoardStopCellInterfacePage>();
-			shared_ptr<const JourneyBoardServiceCellInterfacePage> serviceCellInterfacePage = _page->getInterface()->getPage<JourneyBoardServiceCellInterfacePage>();
-			shared_ptr<const JourneyBoardJunctionCellInterfacePage> junctionCellInterfacePage = _page->getInterface()->getPage<JourneyBoardJunctionCellInterfacePage>();
+			const JourneyBoardStopCellInterfacePage* stopCellInterfacePage = _page->getInterface()->getPage<JourneyBoardStopCellInterfacePage>();
+			const JourneyBoardServiceCellInterfacePage* serviceCellInterfacePage = _page->getInterface()->getPage<JourneyBoardServiceCellInterfacePage>();
+			const JourneyBoardJunctionCellInterfacePage* junctionCellInterfacePage = _page->getInterface()->getPage<JourneyBoardJunctionCellInterfacePage>();
 			const Hour unknownHour(TIME_UNKNOWN );
 			const DateTime unknownDateTime(TIME_UNKNOWN );
 

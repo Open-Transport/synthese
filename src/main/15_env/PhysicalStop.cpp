@@ -28,6 +28,11 @@ namespace synthese
 {
 	using namespace util;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,env::PhysicalStop>::Registry Registrable<uid,env::PhysicalStop>::_registry;
+	}
+
 	namespace env 
 	{
 

@@ -26,20 +26,6 @@ namespace synthese
 {
 	namespace transportwebsite
 	{
-		Site::Registry				PlacesListModule::_sites;
-		SiteCommercialLineLink::Registry	PlacesListModule::_siteLineLinks;
-
-
-		Site::Registry& PlacesListModule::getSites()
-		{
-			return _sites;
-		}
-
-		SiteCommercialLineLink::Registry& PlacesListModule::getSiteLineLinks()
-		{
-			return _siteLineLinks;
-		}
-
 		void PlacesListModule::initialize()
 		{
 

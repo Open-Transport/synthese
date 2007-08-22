@@ -24,6 +24,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> typename Registrable<uid,env::TransportNetwork>::Registry Registrable<uid,env::TransportNetwork>::_registry;
+	}
+
 	namespace env
 	{
 		TransportNetwork::TransportNetwork (uid id, std::string name)

@@ -26,7 +26,6 @@
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
 
-#include "15_env/EnvModule.h"
 #include "15_env/PhysicalStop.h"
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
 
@@ -103,11 +102,11 @@ namespace synthese
 			
 		uid id = rows->getLongLong (TABLE_COL_ID);
 			
-		if (EnvModule::getPhysicalStops ().contains (id)) return;
+		if (PhysicalStop::Contains (id)) return;
 			
-		shared_ptr<PublicTransportStopZoneConnectionPlace> place = EnvModule::getPublicTransportStopZones().getUpdateable(rows->getLongLong (COL_PLACEID));
+		shared_ptr<PublicTransportStopZoneConnectionPlace> place = PublicTransportStopZoneConnectionPlace::GetUpdateable(rows->getLongLong (COL_PLACEID));
 		    
-	    shared_ptr<PhysicalStop> ps(
+	    PhysicalStop* ps(
 		new PhysicalStop (
 		    id,
 		    rows->getText (COL_NAME),
@@ -117,10 +116,10 @@ namespace synthese
 		    ))
 		;
 		    
-	    place->addPhysicalStop(ps.get());
+	    place->addPhysicalStop(ps);
 	    ps->setOperatorCode(rows->getText (COL_OPERATOR_CODE));
 		    
-	    EnvModule::getPhysicalStops ().add (ps);
+	    ps->store();
 	}
     }
 
@@ -131,7 +130,7 @@ namespace synthese
 	while (rows->next ())
 	{
 	    uid id = rows->getLongLong ( TABLE_COL_ID);
-	    shared_ptr<PhysicalStop> ps = EnvModule::getPhysicalStops ().getUpdateable(id);
+	    shared_ptr<PhysicalStop> ps = PhysicalStop::GetUpdateable(id);
 
 	    load(ps.get(), rows);
 
@@ -145,7 +144,7 @@ namespace synthese
 	while (rows->next ())
 	{
 	    uid id = rows->getLongLong ( TABLE_COL_ID);
-	    EnvModule::getPhysicalStops ().remove (id);
+	    PhysicalStop::Remove (id);
 	    /// @todo Handle the link between place and stop
 	}
     }

@@ -25,6 +25,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> typename Registrable<uid,env::PlaceAlias>::Registry Registrable<uid,env::PlaceAlias>::_registry;
+	}
+
 	namespace env
 	{
 

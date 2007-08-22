@@ -30,10 +30,13 @@ namespace synthese
 {
 	using namespace util;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,env::Crossing>::Registry Registrable<uid,env::Crossing>::_registry;
+	}
+
 	namespace env
 	{
-		Crossing::Registry	Crossing::_elements;
-
 		Crossing::Crossing(
 			const uid& key
 			, const City* city
@@ -64,10 +67,7 @@ namespace synthese
 			return 50;
 		}
 
-		Crossing::Registry& Crossing::getElements()
-		{
-			return _elements;
-		}
+
 
 		uid Crossing::getId() const
 		{

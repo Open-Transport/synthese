@@ -19,7 +19,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/AlarmTableSync.h"
+#include "AlarmTableSync.h"
+
 #include "17_messages/AlarmTemplate.h"
 #include "17_messages/ScenarioSentAlarm.h"
 #include "17_messages/SingleSentAlarm.h"
@@ -27,7 +28,6 @@
 #include "17_messages/SentScenario.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/Types.h"
-#include "17_messages/MessagesModule.h"
 #include "17_messages/AlarmObjectLinkTableSync.h"
 
 #include "01_util/Conversion.h"
@@ -196,32 +196,32 @@ namespace synthese
 			if (rows->getBool (COL_IS_TEMPLATE))
 			    continue;
 			
-			shared_ptr<SentAlarm> alarm;
 			uid id = rows->getLongLong (TABLE_COL_ID);
-			if (MessagesModule::getAlarms ().contains (id))
+			if (SentAlarm::Contains (id))
 			{
-			    alarm = MessagesModule::getAlarms().getUpdateable(id);
+			    shared_ptr<SentAlarm> alarm(SentAlarm::GetUpdateable(id));
 			    load(alarm.get(), rows);
 			}
 			else
 			{
 			    uid scenarioId = rows->getLongLong (COL_SCENARIO_ID);
+				SentAlarm* alarm;
 			    if (scenarioId)
 			    {
-				if (!MessagesModule::getScenarii().contains(scenarioId))
-				    continue;
-				
-				shared_ptr<SentScenario> scenario = MessagesModule::getScenarii().getUpdateable(scenarioId);
-				ScenarioSentAlarm* salarm = new ScenarioSentAlarm(*scenario);
-				alarm.reset(salarm);
-				scenario->addAlarm(salarm);
+					if (!SentScenario::Contains(scenarioId))
+						continue;
+					
+					shared_ptr<SentScenario> scenario = SentScenario::GetUpdateable(scenarioId);
+					ScenarioSentAlarm* salarm = new ScenarioSentAlarm(*scenario);
+					scenario->addAlarm(salarm);
+					alarm = static_cast<SentAlarm*>(salarm);
 			    }
 			    else
 			    {
-				alarm.reset(new SingleSentAlarm);
+					alarm = new SingleSentAlarm;
 			    }
-			    load(alarm.get(), rows);
-			    MessagesModule::getAlarms().add (alarm);
+			    load(alarm, rows);
+			    alarm->store();
 			}
 		    }
 		}
@@ -237,7 +237,7 @@ namespace synthese
 			continue;
 		    
 		    uid id = rows->getLongLong (TABLE_COL_ID);
-		    shared_ptr<SentAlarm> alarm = MessagesModule::getAlarms ().getUpdateable(id);
+		    shared_ptr<SentAlarm> alarm = SentAlarm::GetUpdateable(id);
 		    load(alarm.get(), rows);
 		}
 	    }
@@ -250,15 +250,15 @@ namespace synthese
 		while (rows->next ())
 		{
 		    uid id = rows->getLongLong (TABLE_COL_ID);
-		    if (MessagesModule::getAlarms().contains(id))
+		    if (SentAlarm::Contains(id))
 		    {
-			shared_ptr<SentAlarm> alarm = MessagesModule::getAlarms().getUpdateable(id);
+				shared_ptr<SentAlarm> alarm = SentAlarm::GetUpdateable(id);
 			shared_ptr<ScenarioSentAlarm> salarm = dynamic_pointer_cast<ScenarioSentAlarm, SentAlarm>(alarm);
 			if (salarm.get())
 			{
-			    MessagesModule::getScenarii().getUpdateable(salarm->getScenario().getKey())->removeAlarm(salarm.get());
+			    SentScenario::GetUpdateable(salarm->getScenario().getKey())->removeAlarm(salarm.get());
 			}
-			MessagesModule::getAlarms ().remove (id);
+			SentAlarm::Remove (id);
 		    }
 		}
 	    }
@@ -383,10 +383,10 @@ namespace synthese
 			{
 				if (scenarioId)
 				{
-				    if (!MessagesModule::getScenarii().contains(scenarioId))
+				    if (!SentScenario::Contains(scenarioId))
 					throw DBEmptyResultException<Alarm>(key, "No such scenario in RAM");
 				    
-				    shared_ptr<const SentScenario> scenario = MessagesModule::getScenarii().get(scenarioId);
+				    shared_ptr<const SentScenario> scenario = SentScenario::Get(scenarioId);
 				    object.reset(new ScenarioSentAlarm(*scenario));
 				}
 				else

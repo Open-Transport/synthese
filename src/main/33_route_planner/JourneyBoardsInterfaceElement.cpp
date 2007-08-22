@@ -57,7 +57,7 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 			const JourneyBoardJourneys* jv(static_cast<const JourneyBoardJourneys*>(object));
-			shared_ptr<const JourneyBoardInterfacePage> page(_page->getInterface()->getPage<JourneyBoardInterfacePage>());
+			const JourneyBoardInterfacePage* page(_page->getInterface()->getPage<JourneyBoardInterfacePage>());
 			logic::tribool hFilter(Conversion::ToTribool(_handicappedFilter->getValue(parameters, variables, object, request)));
 			logic::tribool bFilter(Conversion::ToTribool(_bikeFilter->getValue(parameters, variables, object, request)));
 

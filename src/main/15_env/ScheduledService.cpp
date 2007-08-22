@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/ScheduledService.h"
+#include "ScheduledService.h"
+
 #include "15_env/Path.h"
 #include "15_env/Edge.h"
 #include "15_env/ReservationRule.h"
@@ -29,6 +30,11 @@ namespace synthese
 {
 	using namespace util;
 	using namespace time;
+
+	namespace util
+	{
+		template<> typename Registrable<uid,env::ScheduledService>::Registry Registrable<uid,env::ScheduledService>::_registry;
+	}
 
 	namespace env
 	{

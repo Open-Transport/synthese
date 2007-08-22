@@ -29,7 +29,7 @@
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
-#include "12_security/SecurityModule.h"
+#include "12_security/Profile.h"
 #include "12_security/UserTableSync.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/User.h"
@@ -69,7 +69,7 @@ namespace synthese
 				user->_email = rows->getText ( UserTableSync::TABLE_COL_EMAIL);
 				user->_phone = rows->getText ( UserTableSync::TABLE_COL_PHONE);
 				user->setConnectionAllowed(rows->getBool ( UserTableSync::COL_LOGIN_AUTHORIZED));
-				user->setProfile(SecurityModule::getProfiles().get(rows->getLongLong ( UserTableSync::TABLE_COL_PROFILE_ID)));
+				user->setProfile(Profile::Get(rows->getLongLong ( UserTableSync::TABLE_COL_PROFILE_ID)));
 				user->setBirthDate(Date::FromSQLDate(rows->getText ( UserTableSync::COL_BIRTH_DATE)));
 			}
 			catch (Profile::RegistryKeyException e)

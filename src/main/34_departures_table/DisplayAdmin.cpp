@@ -42,6 +42,7 @@
 #include "34_departures_table/DisplayAdmin.h"
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplayScreen.h"
+#include "34_departures_table/DisplayType.h"
 #include "34_departures_table/UpdateDisplayScreenAction.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"
@@ -99,57 +100,57 @@ namespace synthese
 		{
 			// Update request
 			ActionFunctionRequest<UpdateDisplayScreenAction,AdminRequest> updateDisplayRequest(request);
-			updateDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			updateDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 			updateDisplayRequest.setObjectId(request->getObjectId());
 
 			// Update request
 			ActionFunctionRequest<UpdateAllStopsDisplayScreenAction,AdminRequest> updateAllDisplayRequest(request);
-			updateAllDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			updateAllDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 			updateAllDisplayRequest.setObjectId(request->getObjectId());
 
 			// Add physical request
 			ActionFunctionRequest<AddDepartureStopToDisplayScreenAction,AdminRequest> addPhysicalRequest(request);
-			addPhysicalRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addPhysicalRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 			addPhysicalRequest.setObjectId(request->getObjectId());
 
 			// Add preselection request
 			ActionFunctionRequest<AddPreselectionPlaceToDisplayScreen,AdminRequest> addPreselRequest(request);
-			addPreselRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addPreselRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 			addPreselRequest.setObjectId(request->getObjectId());
 
 			// Add display request
 			ActionFunctionRequest<DisplayScreenAddDisplayedPlace,AdminRequest> addDisplayRequest(request);
-			addDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 			addDisplayRequest.setObjectId(request->getObjectId());
 
 			// Add not to serve request
 			ActionFunctionRequest<AddForbiddenPlaceToDisplayScreen,AdminRequest> addNSRequest(request);
-			addNSRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			addNSRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 			addNSRequest.setObjectId(request->getObjectId());
 
 			// Update preselection request
 			ActionFunctionRequest<UpdateDisplayPreselectionParametersAction,AdminRequest> updPreselRequest(request);
-			updPreselRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			updPreselRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 			updPreselRequest.setObjectId(request->getObjectId());
 
 			// Remove preselection stop request
 			ActionFunctionRequest<RemovePreselectionPlaceFromDisplayScreenAction,AdminRequest> rmPreselRequest(request);
-			rmPreselRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			rmPreselRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 			rmPreselRequest.setObjectId(request->getObjectId());
 
 			// Remove physical stop request
 			ActionFunctionRequest<DisplayScreenRemovePhysicalStopAction,AdminRequest> rmPhysicalRequest(request);
-			rmPhysicalRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			rmPhysicalRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 			rmPhysicalRequest.setObjectId(request->getObjectId());
 
 			// Remove displayed place request
 			ActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,AdminRequest> rmDisplayedRequest(request);
-			rmDisplayedRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			rmDisplayedRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 			rmDisplayedRequest.setObjectId(request->getObjectId());
 
 			// Remove Forbidden place request
 			ActionFunctionRequest<DisplayScreenRemoveForbiddenPlaceAction,AdminRequest> rmForbiddenRequest(request);
-			rmForbiddenRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			rmForbiddenRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 			rmForbiddenRequest.setObjectId(request->getObjectId());
 
 			// Delete the screen request

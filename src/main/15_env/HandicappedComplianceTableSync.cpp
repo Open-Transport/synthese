@@ -29,7 +29,6 @@
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
-#include "15_env/EnvModule.h"
 #include "HandicappedCompliance.h"
 #include "HandicappedComplianceTableSync.h"
 
@@ -115,9 +114,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<HandicappedCompliance> object(new HandicappedCompliance());
-				load(object.get(), rows);
-				EnvModule::getHandicappedCompliances().add(object);
+				HandicappedCompliance* object(new HandicappedCompliance());
+				load(object, rows);
+				object->store();
 			}
 		}
 
@@ -126,9 +125,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getHandicappedCompliances().contains(id))
+				if (HandicappedCompliance::Contains(id))
 				{
-					shared_ptr<HandicappedCompliance> object = EnvModule::getHandicappedCompliances().getUpdateable(id);
+					shared_ptr<HandicappedCompliance> object = HandicappedCompliance::GetUpdateable(id);
 					load(object.get(), rows);
 				}
 			}
@@ -139,9 +138,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getHandicappedCompliances().contains(id))
+				if (HandicappedCompliance::Contains(id))
 				{
-					EnvModule::getHandicappedCompliances().remove(id);
+					HandicappedCompliance::Remove(id);
 				}
 			}
 		}

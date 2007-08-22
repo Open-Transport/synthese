@@ -25,7 +25,6 @@
 #include "02_db/SQLiteResult.h"
 
 #include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfaceModule.h"
 #include "11_interfaces/InterfaceTableSync.h"
 
 using boost::shared_ptr;
@@ -79,9 +78,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-			    shared_ptr<Interface> obj(new Interface(rows->getLongLong (TABLE_COL_ID)));
-				load(obj.get(), rows);
-				InterfaceModule::getInterfaces().add(obj);
+			    Interface* obj(new Interface(rows->getLongLong (TABLE_COL_ID)));
+				load(obj, rows);
+				obj->store();
 			}
 		}
 

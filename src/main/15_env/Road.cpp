@@ -27,6 +27,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> typename Registrable<uid,env::Road>::Registry Registrable<uid,env::Road>::_registry;
+	}
+
 	namespace env
 	{
 

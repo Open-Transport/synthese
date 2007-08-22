@@ -292,7 +292,7 @@ namespace synthese
 					if (now > rate->getEndDate(transaction->getStartDateTime()))
 					{
 						stream << "Retard : ";
-						shared_ptr<const DurationInterfacePage> page = request->getFunction()->getInterface()->getPage<DurationInterfacePage>();
+						const DurationInterfacePage* page = request->getFunction()->getInterface()->getPage<DurationInterfacePage>();
 						page->display(
 							stream
 							, now - rate->getEndDate(transaction->getStartDateTime())

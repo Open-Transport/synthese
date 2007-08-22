@@ -47,7 +47,7 @@ namespace synthese
 
 			//! \name Request parameters
 			//@{
-			boost::shared_ptr<const interfaces::InterfacePage>	_page;
+			const interfaces::InterfacePage*	_page;
 			server::ParametersMap				_parameters;
 			//@}
 
@@ -70,7 +70,7 @@ namespace synthese
 			virtual bool _runBeforeDisplayIfNoSession(std::ostream& stream);
 
 		public:
-			void setPage(const boost::shared_ptr<const interfaces::InterfacePage> page);
+			void setPage(const interfaces::InterfacePage* page);
 		};
 	}
 }

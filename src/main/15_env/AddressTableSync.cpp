@@ -25,11 +25,13 @@
 
 #include "AddressTableSync.h"
 
-#include "15_env/Address.h"
 #include "15_env/EnvModule.h"
+#include "15_env/Address.h"
 #include "15_env/Crossing.h"
+#include "15_env/Road.h"
 #include "15_env/CrossingTableSync.h"
 #include "15_env/ConnectionPlaceTableSync.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -61,10 +63,10 @@ namespace synthese
 		    uid placeId = rows->getLongLong (AddressTableSync::COL_PLACEID);
 			int tableId = decodeTableId(placeId);
 			if (tableId == CrossingTableSync::TABLE_ID)
-				object->setPlace(Crossing::getElements().get(placeId).get());
+				object->setPlace(Crossing::Get(placeId).get());
 			else if (tableId == ConnectionPlaceTableSync::TABLE_ID)
-				object->setPlace(EnvModule::getPublicTransportStopZones().get(placeId).get());
-			object->setRoad (EnvModule::getRoads ().get (rows->getLongLong (AddressTableSync::COL_ROADID)).get());
+				object->setPlace(PublicTransportStopZoneConnectionPlace::Get(placeId).get());
+			object->setRoad (Road::Get (rows->getLongLong (AddressTableSync::COL_ROADID)).get());
 		    object->setMetricOffset (rows->getDouble (AddressTableSync::COL_METRICOFFSET));
 		    object->setXY (rows->getDouble (AddressTableSync::COL_X), rows->getDouble (AddressTableSync::COL_Y));
 		}
@@ -116,22 +118,22 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				if (EnvModule::getAddresses().contains(rows->getLongLong (TABLE_COL_ID)))
+				if (Address::Contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load (EnvModule::getAddresses().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
+					load (Address::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
 				}
 				else
 				{
-					shared_ptr<Address> object(new Address);
-					load(object.get(), rows);
-					EnvModule::getAddresses().add(object);
+					Address* object(new Address);
+					load(object, rows);
+					object->store();
 					
 					uid placeId = rows->getLongLong(COL_PLACEID);
 
 					shared_ptr<AddressablePlace> place = 
 					    EnvModule::fetchUpdateableAddressablePlace (placeId);
 					    
-					place->addAddress(object.get());
+					place->addAddress(object);
 				}
 			}
 		}
@@ -141,9 +143,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getAddresses().contains(id))
+				if (Address::Contains(id))
 				{
-					load(EnvModule::getAddresses().getUpdateable(id).get(), rows);
+					load(Address::GetUpdateable(id).get(), rows);
 				}
 			}
 		}
@@ -153,9 +155,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getAddresses().contains(id))
+				if (Address::Contains(id))
 				{
-					EnvModule::getAddresses().remove(id);
+					Address::Remove(id);
 				}
 			}
 		}

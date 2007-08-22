@@ -92,7 +92,7 @@ namespace synthese
 
 		void AddRightAction::run()
 		{
-			shared_ptr<Right> right = Factory<Right>::create(_rightName);
+			shared_ptr<Right> right = Factory<Right>::createSharedPtr(_rightName);
 			right->setParameter(_parameter);
 			right->setPrivateLevel(_privateLevel);
 			right->setPublicLevel(_publicLevel);

@@ -24,9 +24,6 @@
 #ifndef SYNTHESE_PlacesListModule_H__
 #define SYNTHESE_PlacesListModule_H__
 
-#include "36_places_list/Site.h"
-#include "36_places_list/SiteCommercialLineLink.h"
-
 #include "01_util/ModuleClass.h"
 
 namespace synthese
@@ -69,19 +66,7 @@ namespace synthese
 		/** 16 Transport website module class. */
 		class PlacesListModule : public util::ModuleClass
 		{
-		private:
-			static Site::Registry			_sites;	//!< Sites Registry
-			static SiteCommercialLineLink::Registry	_siteLineLinks;
-
 		public:
-			/** Sites registry getter.
-				@return Site::Registry& The sites registry
-				@author Hugues Romain
-				@date 2007
-			*/
-			static Site::Registry& getSites();
-
-			static SiteCommercialLineLink::Registry& getSiteLineLinks();
 
 			void initialize();
 		};

@@ -119,12 +119,12 @@ namespace synthese
 		    {
 			uid id = rows->getLongLong (TABLE_COL_ID);
 			
-			if (EnvModule::getCities ().contains (id)) return;
+			if (City::Contains (id)) return;
 			
-			shared_ptr<City> city(new City);
-			load (city.get (), rows);
-			
-			EnvModule::getCities ().add (city);
+			City* city(new City);
+			load (city, rows);
+			city->store();
+
 			EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
 		    }
 		}
@@ -138,13 +138,13 @@ namespace synthese
 			while (rows->next ())
 			{
 			    uid id = rows->getLongLong (TABLE_COL_ID);
-			    shared_ptr<City> city = EnvModule::getCities ().getUpdateable (id);
+			    shared_ptr<City> city = City::GetUpdateable (id);
 			    
-			    EnvModule::getCitiesMatcher ().remove (city->getName ());
+				EnvModule::getCitiesMatcher().remove (city->getName ());
 			    
 			    load(city.get(), rows);
 			    
-			     EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
+			    EnvModule::getCitiesMatcher ().add (city->getName (), city->getKey ());
 			}
 		}
 
@@ -159,8 +159,8 @@ namespace synthese
 			{
 			    uid id =rows->getLongLong (TABLE_COL_ID);
 			    
-			    EnvModule::getCitiesMatcher ().remove (EnvModule::getCities ().get (id)->getName ());
-			    EnvModule::getCities ().remove (id);
+				EnvModule::getCitiesMatcher ().remove (City::Get (id)->getName ());
+			    City::Remove (id);
 			}
 		}
 

@@ -22,7 +22,6 @@
 
 #include "BookReservationAction.h"
 
-#include "36_places_list/PlacesListModule.h"
 #include "36_places_list/Site.h"
 
 #include "33_route_planner/RoutePlannerFunction.h"
@@ -124,7 +123,7 @@ namespace synthese
 				throw ActionException("Not authorized");
 
 			// Site
-			shared_ptr<const Site> site(PlacesListModule::getSites().get(Request::getUidFromParameterMap(map, PARAMETER_SITE, true, FACTORY_KEY)));
+			shared_ptr<const Site> site(Site::Get(Request::getUidFromParameterMap(map, PARAMETER_SITE, true, FACTORY_KEY)));
 
 			// Customer contact phone
 			_customerPhone = Request::getStringFormParameterMap(map, PARAMETER_CUSTOMER_PHONE, !_customer.get(), FACTORY_KEY);

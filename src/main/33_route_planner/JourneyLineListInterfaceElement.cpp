@@ -58,7 +58,7 @@ namespace synthese
 			// Parameters
 			const Journey* journey = static_cast<const Journey*>(object);
 			bool __AfficherLignesPied = Conversion::ToBool(_displayPedestrianLines->getValue(parameters, variables, object, request));
-			shared_ptr<const LineMarkerInterfacePage> lineMarkerInterfacePage = _page->getInterface()->getPage<LineMarkerInterfacePage>();
+			const LineMarkerInterfacePage* lineMarkerInterfacePage = _page->getInterface()->getPage<LineMarkerInterfacePage>();
 
 			// Fabrication de l'affichage
 			for (Journey::ServiceUses::const_iterator it(journey->getServiceUses().begin()); it != journey->getServiceUses().end(); ++it)

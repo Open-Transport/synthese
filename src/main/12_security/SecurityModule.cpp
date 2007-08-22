@@ -22,6 +22,8 @@
 
 #include <vector>
 
+#include "SecurityModule.h"
+
 #include "01_util/Factory.h"
 #include "01_util/Constants.h"
 
@@ -29,7 +31,6 @@
 #include "12_security/UserTableSync.h"
 #include "12_security/User.h"
 #include "12_security/Profile.h"
-#include "12_security/SecurityModule.h"
 #include "12_security/GlobalRight.h"
 
 using namespace std;
@@ -45,7 +46,6 @@ namespace synthese
 		const std::string SecurityModule::ROOT_RIGHTS = "*,*,100,100";
 		const std::string SecurityModule::ROOT_USER = "root";
 
-		Profile::Registry SecurityModule::_profiles;
 		shared_ptr<User> SecurityModule::_rootUser;
 		shared_ptr<Profile> SecurityModule::_rootProfile;
 
@@ -60,7 +60,7 @@ namespace synthese
 				_rootProfile = profiles.front();
 	
 			_rootProfile->setName(ROOT_PROFILE);
-			shared_ptr<Right> r = Factory<Right>::create<GlobalRight>();
+			shared_ptr<Right> r(new GlobalRight);
 			r->setPublicLevel(DELETE_RIGHT);
 			r->setPrivateLevel(DELETE_RIGHT);
 			_rootProfile->cleanRights();
@@ -80,10 +80,7 @@ namespace synthese
 			UserTableSync::save(_rootUser.get());
 		}
 
-		Profile::Registry& SecurityModule::getProfiles()
-		{
-			return _profiles;
-		}
+
 
 		std::vector<pair<string, string> > SecurityModule::getRightsTemplates()
 		{
@@ -98,7 +95,7 @@ namespace synthese
 			vector<pair<uid, string> > m;
 			if (withAll)
 				m.push_back(make_pair(0, "(tous)"));
-			for (Profile::Registry::const_iterator it = _profiles.begin(); it != _profiles.end(); ++it)
+			for (Profile::ConstIterator it(Profile::Begin()); it != Profile::End(); ++it)
 				m.push_back(make_pair(it->first, it->second->getName()));
 			return m;
 		}
@@ -127,7 +124,7 @@ namespace synthese
 		std::vector<shared_ptr<const Profile> > SecurityModule::getSubProfiles(shared_ptr<const Profile> profile )
 		{
 			vector<shared_ptr<const Profile> > v;
-			for (Profile::Registry::const_iterator it = _profiles.begin(); it != _profiles.end(); ++it)
+			for (Profile::ConstIterator it(Profile::Begin()); it != Profile::End(); ++it)
 			{
 				if (!profile.get())
 				{

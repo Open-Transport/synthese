@@ -23,7 +23,6 @@
 #include "FunctionWithSite.h"
 
 #include "36_places_list/Site.h"
-#include "36_places_list/PlacesListModule.h"
 
 #include "30_server/RequestException.h"
 
@@ -56,9 +55,9 @@ namespace synthese
 			it = map.find(PARAMETER_SITE);
 			if (it == map.end())
 				throw RequestException("Site not specified");
-			if (!PlacesListModule::getSites().contains(Conversion::ToLongLong(it->second)))
+			if (!Site::Contains(Conversion::ToLongLong(it->second)))
 				throw RequestException("Specified site not found");
-			_site = PlacesListModule::getSites().get(Conversion::ToLongLong(it->second));
+			_site = Site::Get(Conversion::ToLongLong(it->second));
 		}
 
 		void FunctionWithSite::_copy( boost::shared_ptr<const Function> function )

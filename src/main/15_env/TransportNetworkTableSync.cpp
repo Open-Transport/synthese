@@ -20,9 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/TransportNetworkTableSync.h"
+#include "TransportNetworkTableSync.h"
+
 #include "15_env/TransportNetwork.h"
-#include "15_env/EnvModule.h"
 
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
@@ -92,17 +92,16 @@ namespace synthese
 			{
 			    uid id (rows->getLongLong (TABLE_COL_ID));
 
-			    shared_ptr<TransportNetwork> object;
-			    if (EnvModule::getTransportNetworks().contains(id))
+			    if (TransportNetwork::Contains(id))
 			    {
-				object = EnvModule::getTransportNetworks().getUpdateable(id);
-				load(object.get(), rows);
+					shared_ptr<TransportNetwork> object = TransportNetwork::GetUpdateable(id);
+					load(object.get(), rows);
 			    }
 			    else
 			    {
-				object.reset(new TransportNetwork);
-				load(object.get(), rows);
-				EnvModule::getTransportNetworks ().add (object);
+					TransportNetwork* object(new TransportNetwork);
+					load(object, rows);
+					object->store();
 			    }
 			}
 		}
@@ -113,10 +112,10 @@ namespace synthese
 		    {
 			uid id (rows->getLongLong ( TABLE_COL_ID));
 			
-			if (!EnvModule::getTransportNetworks().contains(id))
+			if (!TransportNetwork::Contains(id))
 			    continue;
 			
-			shared_ptr<TransportNetwork> object = EnvModule::getTransportNetworks().getUpdateable(id);
+			shared_ptr<TransportNetwork> object = TransportNetwork::GetUpdateable(id);
 			load(object.get(), rows);
 		    }
 		}
@@ -129,7 +128,7 @@ namespace synthese
 		    while (rows->next ())
 		    {
 			uid id (rows->getLongLong (TABLE_COL_ID));
-			EnvModule::getTransportNetworks().remove(id);
+			TransportNetwork::Remove(id);
 		    }
 		}
 	    

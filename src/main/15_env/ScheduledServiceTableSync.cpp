@@ -20,6 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "ScheduledServiceTableSync.h"
+
+#include "15_env/ScheduledService.h"
+#include "15_env/Path.h"
+#include "15_env/EnvModule.h"
+#include "15_env/BikeCompliance.h"
+#include "15_env/HandicappedCompliance.h"
+#include "15_env/PedestrianCompliance.h"
+#include "15_env/ReservationRule.h"
+
 #include <sstream>
 
 #include "01_util/Conversion.h"
@@ -30,11 +40,6 @@
 #include "02_db/SQLiteException.h"
 
 #include "04_time/Schedule.h"
-
-#include "15_env/EnvModule.h"
-#include "15_env/ScheduledService.h"
-#include "15_env/Path.h"
-#include "15_env/ScheduledServiceTableSync.h"
 
 #include <boost/tokenizer.hpp>
 #include <sqlite/sqlite3.h>
@@ -129,10 +134,10 @@ namespace synthese
 		    ss->setPath(path.get());
 		    ss->setServiceNumber(serviceNumber);
 		    ss->setKey(id);
-		    ss->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId).get());
-		    ss->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
-		    ss->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
-		    ss->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId).get());
+		    ss->setBikeCompliance (BikeCompliance::Get (bikeComplianceId).get());
+		    ss->setHandicappedCompliance (HandicappedCompliance::Get (handicappedComplianceId).get());
+		    ss->setPedestrianCompliance (PedestrianCompliance::Get (pedestrianComplianceId).get());
+		    ss->setReservationRule (ReservationRule::Get (reservationRuleId).get());
 		    ss->setDepartureSchedules(departureSchedules);
 		    ss->setArrivalSchedules(arrivalSchedules);
 		    ss->getPath()->addService(ss);
@@ -185,18 +190,17 @@ namespace synthese
 		    // Loop on each added row
 		    while (rows->next ())
 		    {
-			boost::shared_ptr<ScheduledService> service;
-			if (EnvModule::getScheduledServices().contains(rows->getLongLong (TABLE_COL_ID)))
+			if (ScheduledService::Contains(rows->getLongLong (TABLE_COL_ID)))
 			{
-			    service = EnvModule::getScheduledServices().getUpdateable(rows->getLongLong (TABLE_COL_ID));
+			    boost::shared_ptr<ScheduledService> service(ScheduledService::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
 			    service->getPath()->removeService(service.get());
 			    load(service.get(), rows);
 			}
 			else
 			{
-			    service.reset(new ScheduledService);
-			    load(service.get(), rows);
-			    EnvModule::getScheduledServices().add(service);
+			    ScheduledService* service(new ScheduledService);
+			    load(service, rows);
+			    service->store();
 			}
 			
 		    }
@@ -209,9 +213,9 @@ namespace synthese
 			while (rows->next ())
 			{
 			    uid id = rows->getLongLong (TABLE_COL_ID);
-			    if (EnvModule::getScheduledServices().contains(id))
+			    if (ScheduledService::Contains(id))
 			    {
-				shared_ptr<ScheduledService> object = EnvModule::getScheduledServices().getUpdateable(id);
+				shared_ptr<ScheduledService> object = ScheduledService::GetUpdateable(id);
 				object->getPath()->removeService(object.get());
 				load(object.get(), rows);
 			    }
@@ -223,11 +227,11 @@ namespace synthese
 		    while (rows->next ())
 		    {
 			uid id = rows->getLongLong (TABLE_COL_ID);
-			if (EnvModule::getScheduledServices().contains(id))
+			if (ScheduledService::Contains(id))
 			{
-			    shared_ptr<ScheduledService> object(EnvModule::getScheduledServices().getUpdateable(id));
+			    shared_ptr<ScheduledService> object(ScheduledService::GetUpdateable(id));
 			    object->getPath()->removeService(object.get());
-			    EnvModule::getScheduledServices().remove(id);
+			    ScheduledService::Remove(id);
 			}
 		    }
 		}

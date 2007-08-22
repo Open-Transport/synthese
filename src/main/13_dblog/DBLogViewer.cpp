@@ -98,7 +98,7 @@ namespace synthese
 				throw AdminParametersException("Log key not specified");
 			if (!Factory<DBLog>::contains(it->second))
 				throw AdminParametersException("Invalid log key : " + it->second);
-			_dbLog = Factory<DBLog>::create(it->second);
+			_dbLog = Factory<DBLog>::createSharedPtr(it->second);
 
 			// Start Date
 			it = map.find(PARAMETER_START_DATE);
@@ -164,7 +164,7 @@ namespace synthese
 		void DBLogViewer::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DBLogViewer>());
+			searchRequest.getFunction()->setPage<DBLogViewer>();
 
 			stream << "<h1>Recherche d'entrées</h1>";
 

@@ -29,9 +29,16 @@
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
-#include "15_env/EnvModule.h"
-#include "Line.h"
-#include "LineTableSync.h"
+#include "15_env/Line.h"
+#include "15_env/Axis.h"
+#include "15_env/CommercialLine.h"
+#include "15_env/ReservationRule.h"
+#include "15_env/BikeCompliance.h"
+#include "15_env/HandicappedCompliance.h"
+#include "15_env/PedestrianCompliance.h"
+#include "15_env/LineTableSync.h"
+#include "15_env/Fare.h"
+#include "15_env/RollingStock.h"
 
 using namespace std;
 using namespace boost;
@@ -74,20 +81,32 @@ namespace synthese
 			uid reservationRuleId (rows->getLongLong (LineTableSync::COL_RESERVATIONRULEID));
 			
 			line->setName(name);
-			line->setAxis(EnvModule::getAxes().get(axisId).get());
+			line->setAxis(Axis::Get(axisId).get());
 			line->setTimetableName (timetableName);
 			line->setDirection (direction);
 			line->setWalkingLine (isWalkingLine);
 			line->setUseInDepartureBoards (useInDepartureBoards);
 			line->setUseInTimetables (useInTimetables);
 			line->setUseInRoutePlanning (useInRoutePlanning);
-			line->setRollingStockId (rollingStockId);
-//			line->setFare (EnvModule::getFares ().get (fareId));
-			line->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId).get());
-			line->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
-			line->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
-			line->setCommercialLine(EnvModule::getCommercialLines().get(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID)).get());
-			line->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId).get());
+			if (rollingStockId > 0)
+				line->setRollingStock(RollingStock::Get(rollingStockId).get());
+			
+			// Fare
+			try
+			{
+				if (fareId > 0)
+					line->setFare (Fare::Get (fareId).get());
+			}
+			catch(...)
+			{
+				Log::GetInstance().warn("Bad value " + Conversion::ToString(fareId) + " for fare in line " + Conversion::ToString(line->getKey()));
+			}
+
+			line->setBikeCompliance (BikeCompliance::Get (bikeComplianceId).get());
+			line->setHandicappedCompliance (HandicappedCompliance::Get (handicappedComplianceId).get());
+			line->setPedestrianCompliance (PedestrianCompliance::Get (pedestrianComplianceId).get());
+			line->setCommercialLine(CommercialLine::Get(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID)).get());
+			line->setReservationRule (ReservationRule::Get (reservationRuleId).get());
 		}
 
 		template<> void SQLiteTableSyncTemplate<Line>::save(Line* object)
@@ -164,9 +183,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<Line> object(new Line);
-				load(object.get(), rows);
-				EnvModule::getLines().add(object);
+				Line* object(new Line);
+				load(object, rows);
+				object->store();
 			}
 		}
 
@@ -175,9 +194,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid lineId = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getLines().contains(lineId))
+				if (Line::Contains(lineId))
 				{
-					shared_ptr<Line> object = EnvModule::getLines().getUpdateable(lineId);
+					shared_ptr<Line> object = Line::GetUpdateable(lineId);
 					load(object.get(), rows);
 				}
 			}
@@ -188,9 +207,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid lineId = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getLines().contains(lineId))
+				if (Line::Contains(lineId))
 				{
-					EnvModule::getLines().remove(lineId);
+					Line::Remove(lineId);
 				}
 			}
 		}

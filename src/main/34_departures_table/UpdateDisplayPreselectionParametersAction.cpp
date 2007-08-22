@@ -92,7 +92,7 @@ namespace synthese
 				t << " Mode de présélection => " << (_activatePreselection ? "OUI" : "NON");
 			if (oldDelay != _preselectionDelay)
 				t << " Délai de préselection : " << oldDelay << " => " << _preselectionDelay;
-			shared_ptr<ArrivalDepartureTableLog> log = Factory<dblog::DBLog>::create<ArrivalDepartureTableLog>();
+			shared_ptr<ArrivalDepartureTableLog> log = Factory<dblog::DBLog>::createSharedPtr<ArrivalDepartureTableLog>();
 			log->addUpdateEntry(_screen, t.str(), _request->getUser());
 
 		}

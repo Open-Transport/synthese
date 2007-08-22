@@ -53,11 +53,9 @@ namespace synthese
 		private:
 			Complements					_complements;
 
-		protected:
+		public:
 			SentAlarm();
 			~SentAlarm();
-
-		public:
 			void setComplements(const Complements& complements);
 
 			virtual bool					getIsEnabled()		const = 0;

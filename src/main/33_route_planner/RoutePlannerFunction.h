@@ -65,20 +65,20 @@ namespace synthese
 		private:
 			//! \name Parameters
 			//@{
-				boost::shared_ptr<const RoutePlannerInterfacePage>	_page;
-				const env::Place*									_departure_place;
-				const env::Place*									_arrival_place;
-				std::string											_originCityText;
-				std::string											_destinationCityText;
-				std::string											_originPlaceText;
-				std::string											_destinationPlaceText;
-				time::DateTime										_startDate;
-				time::DateTime										_endDate;
-				AccessParameters									_accessParameters;
-				int													_maxSolutionsNumber;
-				int													_periodId;
-				const transportwebsite::HourPeriod*					_period;
-				bool												_home;
+				const RoutePlannerInterfacePage*	_page;
+				const env::Place*					_departure_place;
+				const env::Place*					_arrival_place;
+				std::string							_originCityText;
+				std::string							_destinationCityText;
+				std::string							_originPlaceText;
+				std::string							_destinationPlaceText;
+				time::DateTime						_startDate;
+				time::DateTime						_endDate;
+				AccessParameters					_accessParameters;
+				int									_maxSolutionsNumber;
+				int									_periodId;
+				const transportwebsite::HourPeriod*	_period;
+				bool								_home;
 			//@}
 
 
@@ -105,4 +105,5 @@ namespace synthese
 		};
 	}
 }
+
 #endif // SYNTHESE_RoutePlannerFunction_H__

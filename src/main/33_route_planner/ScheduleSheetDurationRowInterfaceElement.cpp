@@ -55,7 +55,7 @@ namespace synthese
 		) const {
 			
 			const JourneyBoardJourneys* jv = static_cast<const JourneyBoardJourneys*>(object);
-			shared_ptr<const DurationInterfacePage> durationInterfacePage = _page->getInterface()->getPage<DurationInterfacePage>();
+			const DurationInterfacePage* durationInterfacePage = _page->getInterface()->getPage<DurationInterfacePage>();
 			
 			for (JourneyBoardJourneys::const_iterator it = jv->begin(); it != jv->end(); ++it)
 			{

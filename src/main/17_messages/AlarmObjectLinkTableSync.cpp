@@ -20,10 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "17_messages/AlarmObjectLinkTableSync.h"
-#include "17_messages/MessagesModule.h"
+#include "AlarmObjectLinkTableSync.h"
+
 #include "17_messages/AlarmRecipient.h"
 #include "17_messages/AlarmObjectLink.h"
+#include "17_messages/SentAlarm.h"
 
 using namespace std;
 using namespace boost;
@@ -92,17 +93,17 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
-				load(aol.get(), rows);
+				AlarmObjectLink* aol(new AlarmObjectLink);
+				load(aol, rows);
 				
 				// Alarm not found in ram : this is a template
-				if (!MessagesModule::getAlarms().contains(aol->getAlarmId()))
+				if (!SentAlarm::Contains(aol->getAlarmId()))
 					continue;
 
-				shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::create(aol->getRecipientKey());
-				shared_ptr<SentAlarm> alarm = MessagesModule::getAlarms().getUpdateable(aol->getAlarmId());
+				shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::createSharedPtr(aol->getRecipientKey());
+				shared_ptr<SentAlarm> alarm(SentAlarm::GetUpdateable(aol->getAlarmId()));
 				ar->addObject(alarm.get(), aol->getObjectId());
-				MessagesModule::getAlarmLinks().add(aol);
+				aol->store();
 			}
 		}
 
@@ -115,19 +116,19 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				if (!MessagesModule::getAlarmLinks().contains(rows->getLongLong (TABLE_COL_ID)))
+				if (!AlarmObjectLink::Contains(rows->getLongLong (TABLE_COL_ID)))
 					continue;
 
-				shared_ptr<AlarmObjectLink> aol = MessagesModule::getAlarmLinks().getUpdateable(rows->getLongLong (TABLE_COL_ID));
+				shared_ptr<AlarmObjectLink> aol = AlarmObjectLink::GetUpdateable(rows->getLongLong (TABLE_COL_ID));
 				
 				// Alarm not found in ram : this is a template
-				if (MessagesModule::getAlarms().contains(aol->getAlarmId()))
+				if (SentAlarm::Contains(aol->getAlarmId()))
 				{
-					shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::create(aol->getRecipientKey());
-					shared_ptr<SentAlarm> alarm = MessagesModule::getAlarms().getUpdateable(aol->getAlarmId());
+					shared_ptr<AlarmRecipient> ar = Factory<AlarmRecipient>::createSharedPtr(aol->getRecipientKey());
+					shared_ptr<SentAlarm> alarm = SentAlarm::GetUpdateable(aol->getAlarmId());
 					ar->removeObject(alarm.get(), aol->getObjectId());
 				}
-				MessagesModule::getAlarmLinks().remove(rows->getLongLong (TABLE_COL_ID));
+				AlarmObjectLink::Remove(rows->getLongLong (TABLE_COL_ID));
 			}
 		}
 

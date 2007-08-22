@@ -25,7 +25,6 @@
 
 #include "15_env/PublicPlaceTableSync.h"
 #include "15_env/PublicPlace.h"
-#include "15_env/EnvModule.h"
 #include "15_env/City.h"
 
 #include "02_db/DBModule.h"
@@ -61,7 +60,7 @@ namespace synthese
 		    std::string name (rows->getText (PublicPlaceTableSync::COL_NAME));
 		    uid cityId (rows->getLongLong (PublicPlaceTableSync::COL_CITYID));
 
-			shared_ptr<const City> city = EnvModule::getCities ().get(cityId);
+			shared_ptr<const City> city(City::Get(cityId));
 
 			object->setName(name);
 			object->setCity(city.get());
@@ -103,21 +102,21 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getPublicPlaces().contains(id))
+				if (PublicPlace::Contains(id))
 				{
-					shared_ptr<PublicPlace> pp = EnvModule::getPublicPlaces ().getUpdateable (id);
-					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (pp->getCity ()->getKey ());
+					shared_ptr<PublicPlace> pp = PublicPlace::GetUpdateable (id);
+					shared_ptr<City> city = City::GetUpdateable (pp->getCity ()->getKey ());
 					city->getPublicPlacesMatcher ().remove (pp->getName ());
 
-					load(EnvModule::getPublicPlaces().getUpdateable(id).get(), rows);
+					load(PublicPlace::GetUpdateable(id).get(), rows);
 
 					city->getPublicPlacesMatcher ().add (pp->getName (), pp.get());
 				}
 				else
 				{
-					shared_ptr<PublicPlace> object(new PublicPlace);
-					load(object.get(), rows);
-					EnvModule::getPublicPlaces().add(object);
+					PublicPlace* object(new PublicPlace);
+					load(object, rows);
+					object->store();
 				}
 			}
 		}
@@ -127,13 +126,13 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getPublicPlaces().contains(id))
+				if (PublicPlace::Contains(id))
 				{
-					shared_ptr<PublicPlace> pp = EnvModule::getPublicPlaces ().getUpdateable (id);
-					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (pp->getCity ()->getKey ());
+					shared_ptr<PublicPlace> pp = PublicPlace::GetUpdateable (id);
+					shared_ptr<City> city = City::GetUpdateable (pp->getCity ()->getKey ());
 					city->getPublicPlacesMatcher ().remove (pp->getName ());
 
-					load(EnvModule::getPublicPlaces().getUpdateable(id).get(), rows);
+					load(PublicPlace::GetUpdateable(id).get(), rows);
 
 					city->getPublicPlacesMatcher ().add (pp->getName (), pp.get());
 				}
@@ -145,13 +144,13 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getPublicPlaces().contains(id))
+				if (PublicPlace::Contains(id))
 				{
-					shared_ptr<const PublicPlace> pp = EnvModule::getPublicPlaces ().get (id);
-					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (pp->getCity ()->getKey ());
+					shared_ptr<const PublicPlace> pp = PublicPlace::Get (id);
+					shared_ptr<City> city = City::GetUpdateable (pp->getCity ()->getKey ());
 					city->getPublicPlacesMatcher ().remove (pp->getName ());
 
-					EnvModule::getPublicPlaces().remove(id);
+					PublicPlace::Remove(id);
 				}
 			}
 		}

@@ -31,7 +31,6 @@
 
 #include "11_interfaces/InterfaceModule.h"
 
-#include "12_security/SecurityModule.h"
 #include "12_security/ProfilesAdmin.h"
 #include "12_security/ProfileAdmin.h"
 #include "12_security/ProfileTableSync.h"
@@ -39,6 +38,7 @@
 #include "12_security/DeleteProfileAction.h"
 #include "12_security/Right.h"
 #include "12_security/SecurityRight.h"
+#include "12_security/SecurityModule.h"
 #include "12_security/Constants.h"
 #include "12_security/UsersAdmin.h"
 
@@ -130,7 +130,7 @@ namespace synthese
 			
 			ActionFunctionRequest<AddProfileAction, AdminRequest> addProfileRequest(request);
 			addProfileRequest.getFunction()->setPage<ProfileAdmin>();
-			addProfileRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<ProfilesAdmin>());
+			addProfileRequest.getFunction()->setActionFailedPage<ProfilesAdmin>();
 			
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 			stream << s.open();
@@ -163,7 +163,7 @@ namespace synthese
 				stream << t.col() << "<ul>";
 
 				if (profile->getParentId())
-					stream << "<li>Fils de " << SecurityModule::getProfiles().get(profile->getParentId())->getName() << "</li>";
+					stream << "<li>Fils de " << Profile::Get(profile->getParentId())->getName() << "</li>";
 				for (RightsVector::const_iterator it = profile->getRights().begin(); it != profile->getRights().end(); ++it)
 				{
 					shared_ptr<const Right> r = it->second;

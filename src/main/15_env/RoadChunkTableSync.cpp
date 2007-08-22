@@ -24,7 +24,8 @@
 
 #include "RoadChunkTableSync.h"
 #include "RoadChunk.h"
-#include "15_env/EnvModule.h"
+#include "15_env/Address.h"
+#include "15_env/Road.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -75,7 +76,7 @@ namespace synthese
 		    
 		    // From address
 		    uid fromAddressId (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID));
-		    shared_ptr<Address> fromAddress = EnvModule::getAddresses ().getUpdateable (fromAddressId);
+		    shared_ptr<Address> fromAddress = Address::GetUpdateable (fromAddressId);
 		    object->setParentPath(fromAddress->getRoad());
 		    object->setFromAddress(fromAddress.get());
 
@@ -139,19 +140,19 @@ namespace synthese
 		while (rows->next ())
 		{
 		    uid id = rows->getLongLong (TABLE_COL_ID);
-		    if (EnvModule::getRoadChunks().contains(id))
+		    if (RoadChunk::Contains(id))
 		    {
-			load(EnvModule::getRoadChunks().getUpdateable(id).get(), rows);
+			load(RoadChunk::GetUpdateable(id).get(), rows);
 		    }
 		    else
 		    {
-			shared_ptr<RoadChunk> object(new RoadChunk);
-			load(object.get(), rows);
-			EnvModule::getRoadChunks().add(object);
+			RoadChunk* object(new RoadChunk);
+			load(object, rows);
+			object->store();
 			
 			uid fromAddressId (rows->getLongLong ( RoadChunkTableSync::COL_ADDRESSID));
-			shared_ptr<const Address> fromAddress = EnvModule::getAddresses ().get (fromAddressId);
-			EnvModule::getRoads ().getUpdateable(fromAddress->getRoad ()->getId ())->addEdge (object.get());
+			shared_ptr<const Address> fromAddress = Address::Get (fromAddressId);
+			Road::GetUpdateable(fromAddress->getRoad ()->getId ())->addEdge (object);
 		    }
 		}
 	    }
@@ -162,9 +163,9 @@ namespace synthese
 		while (rows->next ())
 		{
 		    uid id = rows->getLongLong (TABLE_COL_ID);
-		    if (EnvModule::getRoadChunks().contains(id))
+		    if (RoadChunk::Contains(id))
 		    {
-			load(EnvModule::getRoadChunks().getUpdateable(id).get(), rows);
+			load(RoadChunk::GetUpdateable(id).get(), rows);
 		    }
 		}
 	    }
@@ -176,9 +177,9 @@ namespace synthese
 		while (rows->next ())
 		{
 		    uid id = rows->getLongLong (TABLE_COL_ID);
-		    if (EnvModule::getRoadChunks().contains(id))
+		    if (RoadChunk::Contains(id))
 		    {
-			EnvModule::getRoadChunks().remove(id);
+			RoadChunk::Remove(id);
 		    }
 		}
 	    }

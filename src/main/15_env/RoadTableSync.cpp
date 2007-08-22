@@ -23,8 +23,14 @@
 #include <sstream>
 
 #include "RoadTableSync.h"
-#include "Road.h"
-#include "15_env/EnvModule.h"
+
+#include "15_env/Road.h"
+#include "15_env/City.h"
+#include "15_env/Fare.h"
+#include "15_env/BikeCompliance.h"
+#include "15_env/HandicappedCompliance.h"
+#include "15_env/PedestrianCompliance.h"
+#include "15_env/ReservationRule.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -69,24 +75,24 @@ namespace synthese
 
 			// City
 			uid cityId (rows->getLongLong (RoadTableSync::COL_CITYID));
-			object->setCity(EnvModule::getCities ().get(cityId).get());
+			object->setCity(City::Get(cityId).get());
 
 			// Fare
 			uid fareId (rows->getLongLong (RoadTableSync::COL_FAREID));
-			object->setFare(EnvModule::getFares ().get (fareId).get());
+			object->setFare(Fare::Get (fareId).get());
 
 
 			uid bikeComplianceId (rows->getLongLong (RoadTableSync::COL_BIKECOMPLIANCEID));
-			object->setBikeCompliance (EnvModule::getBikeCompliances ().get (bikeComplianceId).get());
+			object->setBikeCompliance (BikeCompliance::Get (bikeComplianceId).get());
 			
 			uid handicappedComplianceId (rows->getLongLong (RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-			object->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
+			object->setHandicappedCompliance (HandicappedCompliance::Get (handicappedComplianceId).get());
 
 			uid pedestrianComplianceId (rows->getLongLong (RoadTableSync::COL_PEDESTRIANCOMPLIANCEID));
-			object->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
+			object->setPedestrianCompliance (PedestrianCompliance::Get (pedestrianComplianceId).get());
 
 			uid reservationRuleId (rows->getLongLong (RoadTableSync::COL_RESERVATIONRULEID));
-			object->setReservationRule (EnvModule::getReservationRules ().get (reservationRuleId).get()); 
+			object->setReservationRule (ReservationRule::Get (reservationRuleId).get()); 
 
 
 		}
@@ -140,24 +146,24 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getRoads().contains(id))
+				if (Road::Contains(id))
 				{
-					shared_ptr<const Road> road = EnvModule::getRoads().get(id);
-					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (road->getCity ()->getKey ());
+					shared_ptr<const Road> road = Road::Get(id);
+					shared_ptr<City> city = City::GetUpdateable (road->getCity ()->getKey ());
 					city->getRoadsMatcher ().remove (road->getName ());
 
-					load(EnvModule::getRoads().getUpdateable(id).get(), rows);
+					load(Road::GetUpdateable(id).get(), rows);
 
 					city->getRoadsMatcher ().add (road->getName (), road.get());
 				}
 				else
 				{
-					shared_ptr<Road> object(new Road);
-					load(object.get(), rows);
-					EnvModule::getRoads().add(object);
+					Road* object(new Road);
+					load(object, rows);
+					object->store();
 
-					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (object->getCity ()->getKey ());
-					city->getRoadsMatcher ().add (object->getName (), object.get());
+					shared_ptr<City> city = City::GetUpdateable (object->getCity ()->getKey ());
+					city->getRoadsMatcher ().add (object->getName (), object);
 				}
 			}
 		}
@@ -167,13 +173,13 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getRoads().contains(id))
+				if (Road::Contains(id))
 				{
-					shared_ptr<const Road> road = EnvModule::getRoads().get(id);
-					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (road->getCity ()->getKey ());
+					shared_ptr<const Road> road = Road::Get(id);
+					shared_ptr<City> city = City::GetUpdateable (road->getCity ()->getKey ());
 					city->getRoadsMatcher ().remove (road->getName ());
 
-					load(EnvModule::getRoads().getUpdateable(id).get(), rows);
+					load(Road::GetUpdateable(id).get(), rows);
 
 					city->getRoadsMatcher ().add (road->getName (), road.get());
 				}
@@ -185,13 +191,13 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getRoads().contains(id))
+				if (Road::Contains(id))
 				{
-					shared_ptr<const Road> road = EnvModule::getRoads().get(id);
-					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (road->getCity ()->getKey ());
+					shared_ptr<const Road> road = Road::Get(id);
+					shared_ptr<City> city = City::GetUpdateable (road->getCity ()->getKey ());
 					city->getRoadsMatcher ().remove (road->getName ());
 
-					EnvModule::getRoads().remove(id);
+					Road::Remove(id);
 				}
 			}
 		}

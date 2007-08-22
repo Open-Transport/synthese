@@ -35,9 +35,13 @@ namespace synthese
 {
 	using namespace geometry;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,env::LineStop>::Registry Registrable<uid,env::LineStop>::_registry;
+	}
+
 	namespace env
 	{
-
 		LineStop::LineStop (const uid id,
 				    const Line* line,
 				    int rankInPath,

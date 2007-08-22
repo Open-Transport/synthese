@@ -20,24 +20,28 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/Complyer.h"
-#include "15_env/EnvModule.h"
+#include "Complyer.h"
+
 #include "15_env/BikeComplyer.h"
+#include "15_env/BikeCompliance.h"
 #include "15_env/HandicappedComplyer.h"
 #include "15_env/PedestrianComplyer.h"
+#include "15_env/PedestrianCompliance.h"
 #include "15_env/ReservationRuleComplyer.h"
+#include "15_env/ReservationRule.h"
 #include "15_env/Fare.h"
+#include "15_env/HandicappedCompliance.h"
 
 namespace synthese
 {
 	namespace env
 	{
 		Complyer::Complyer()
-			: _bikeCompliance(EnvModule::getBikeCompliances().get(0).get())
-			, _fare(EnvModule::getFares().get(0).get())
-			, _pedestrianCompliance(EnvModule::getPedestrianCompliances().get(0).get())
-			, _reservationRule(EnvModule::getReservationRules().get(0).get())
-			, _handicappedCompliance(EnvModule::getHandicappedCompliances().get(0).get())
+			: _bikeCompliance(BikeCompliance::Get(0).get())
+			, _fare(Fare::Get(0).get())
+			, _pedestrianCompliance(PedestrianCompliance::Get(0).get())
+			, _reservationRule(ReservationRule::Get(0).get())
+			, _handicappedCompliance(HandicappedCompliance::Get(0).get())
 			, _complianceParent(NULL)
 		{
 

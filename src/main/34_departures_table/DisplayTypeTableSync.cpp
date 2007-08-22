@@ -29,11 +29,10 @@
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
-#include "11_interfaces/InterfaceModule.h"
+#include "11_interfaces/Interface.h"
 
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DisplayTypeTableSync.h"
-#include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -55,9 +54,9 @@ namespace synthese
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setName(rows->getText ( DisplayTypeTableSync::TABLE_COL_NAME));
 
-			if (InterfaceModule::getInterfaces().contains(rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID)))
+			if (Interface::Contains(rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID)))
 			{
-			    object->setInterface(InterfaceModule::getInterfaces().get(
+			    object->setInterface(Interface::Get(
 						     rows->getLongLong ( DisplayTypeTableSync::TABLE_COL_INTERFACE_ID)));
 			}
 
@@ -115,9 +114,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<DisplayType> object(new DisplayType());
-				load(object.get(), rows);
-				DeparturesTableModule::getDisplayTypes().add(object);
+				DisplayType* object(new DisplayType());
+				load(object, rows);
+				object->store();
 			}
 		}
 
@@ -125,9 +124,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				if (DeparturesTableModule::getDisplayTypes().contains(rows->getLongLong (TABLE_COL_ID)))
+				if (DisplayType::Contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load(DeparturesTableModule::getDisplayTypes().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
+					load(DisplayType::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
 				}
 			}
 		}
@@ -136,9 +135,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				if (DeparturesTableModule::getDisplayTypes().contains(rows->getLongLong (TABLE_COL_ID)))
+				if (DisplayType::Contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					DeparturesTableModule::getDisplayTypes().remove(rows->getLongLong (TABLE_COL_ID));
+					DisplayType::Remove(rows->getLongLong (TABLE_COL_ID));
 				}
 			}
 		}

@@ -36,12 +36,16 @@
 #include "15_env/ContinuousService.h"
 #include "15_env/Path.h"
 #include "15_env/Line.h"
-#include "15_env/EnvModule.h"
+#include "15_env/BikeCompliance.h"
+#include "15_env/PedestrianCompliance.h"
+#include "15_env/HandicappedCompliance.h"
 #include "15_env/ContinuousServiceTableSync.h"
+#include "15_env/EnvModule.h"
 
 #include "06_geometry/Point2D.h"
 
 #include <set>
+#include <boost/algorithm/string.hpp>
 
 
 using namespace std;
@@ -142,9 +146,9 @@ namespace synthese
 			cs->setPath(path.get());
 			cs->setRange(range);
 			cs->setMaxWaitingTime(maxWaitingTime);
-			cs->setBikeCompliance (EnvModule::getBikeCompliances ().get(bikeComplianceId).get());
-			cs->setHandicappedCompliance (EnvModule::getHandicappedCompliances ().get (handicappedComplianceId).get());
-			cs->setPedestrianCompliance (EnvModule::getPedestrianCompliances ().get (pedestrianComplianceId).get());
+			cs->setBikeCompliance (BikeCompliance::Get(bikeComplianceId).get());
+			cs->setHandicappedCompliance (HandicappedCompliance::Get(handicappedComplianceId).get());
+			cs->setPedestrianCompliance (PedestrianCompliance::Get (pedestrianComplianceId).get());
 			cs->setDepartureSchedules(departureSchedules);
 			cs->setArrivalSchedules(arrivalSchedules);
 
@@ -198,32 +202,31 @@ namespace synthese
 			// Loop on each added row
 			while (rows->next ())
 			{
-				boost::shared_ptr<ContinuousService> service;
-				if (EnvModule::getContinuousServices().contains(rows->getLongLong (TABLE_COL_ID)))
+				if (ContinuousService::Contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					service = EnvModule::getContinuousServices().getUpdateable(rows->getLongLong (TABLE_COL_ID));
+					boost::shared_ptr<ContinuousService> service(ContinuousService::GetUpdateable(rows->getLongLong (TABLE_COL_ID)));
 					service->getPath()->removeService(service.get());
 					load(service.get(), rows);
 				}
 				else
 				{
-					service.reset(new ContinuousService);
-					load(service.get(), rows);
-					EnvModule::getContinuousServices().add(service);
+					ContinuousService* service(new ContinuousService);
+					load(service, rows);
+					service->store();
 				}
-
 			}
-
 		}
 		
+
+
 		void ContinuousServiceTableSync::rowsUpdated(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows)
 		{
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getContinuousServices().contains(id))
+				if (ContinuousService::Contains(id))
 				{
-					shared_ptr<ContinuousService> object = EnvModule::getContinuousServices().getUpdateable(id);
+					shared_ptr<ContinuousService> object = ContinuousService::GetUpdateable(id);
 					object->getPath()->removeService(object.get());
 					load(object.get(), rows);
 				}
@@ -235,11 +238,11 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getContinuousServices().contains(id))
+				if (ContinuousService::Contains(id))
 				{
-					shared_ptr<ContinuousService> object = EnvModule::getContinuousServices().getUpdateable(id);
+					shared_ptr<ContinuousService> object = ContinuousService::GetUpdateable(id);
 					object->getPath()->removeService(object.get());
-					EnvModule::getContinuousServices().remove(id);
+					ContinuousService::Remove(id);
 				}
 			}
 		}

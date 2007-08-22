@@ -23,15 +23,17 @@
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/DisplayTypeTableSync.h"
 #include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/DisplayType.h"
 
-#include "15_env/EnvModule.h"
 #include "15_env/LineStopTableSync.h"
 #include "15_env/LineTableSync.h"
 #include "15_env/PhysicalStopTableSync.h"
 #include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/CommercialLineTableSync.h"
 #include "15_env/CityTableSync.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
+#include "15_env/PhysicalStop.h"
+#include "15_env/Line.h"
 
 #include "13_dblog/DBLogEntryTableSync.h"
 
@@ -65,11 +67,11 @@ namespace synthese
 		template<> void SQLiteTableSyncTemplate<DisplayScreen>::load(DisplayScreen* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey (rows->getLongLong (TABLE_COL_ID));
-			object->setLocalization (EnvModule::getPublicTransportStopZones().get(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID)));
+			object->setLocalization (PublicTransportStopZoneConnectionPlace::Get(rows->getLongLong ( DisplayScreenTableSync::COL_PLACE_ID)));
 			object->setLocalizationComment (rows->getText ( DisplayScreenTableSync::COL_NAME));
 			if (rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID) > 0)
 			{
-			    object->setType(DeparturesTableModule::getDisplayTypes().get(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID)).get());
+				object->setType(DisplayType::Get(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID)).get());
 			}
 			object->setWiringCode (rows->getInt ( DisplayScreenTableSync::COL_WIRING_CODE));
 			object->setTitle (rows->getText ( DisplayScreenTableSync::COL_TITLE));
@@ -84,7 +86,7 @@ namespace synthese
 			{
 			    try
 			    {
-				object->addPhysicalStop(EnvModule::getPhysicalStops().get(Conversion::ToLongLong(*it)).get());
+				object->addPhysicalStop(PhysicalStop::Get(Conversion::ToLongLong(*it)).get());
 			    }
 			    catch (PhysicalStop::RegistryKeyException& e)
 			    {
@@ -100,7 +102,7 @@ namespace synthese
 			{
 			    try
 			    {
-				object->addForbiddenPlace(EnvModule::getPublicTransportStopZones().get(Conversion::ToLongLong(*it)).get());
+					object->addForbiddenPlace(PublicTransportStopZoneConnectionPlace::Get(Conversion::ToLongLong(*it)).get());
 			    }
 			    catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
 			    {
@@ -120,7 +122,7 @@ namespace synthese
 			{
 			    try
 			    {
-				object->addDisplayedPlace(EnvModule::getPublicTransportStopZones().get(Conversion::ToLongLong(*it)).get());
+					object->addDisplayedPlace(PublicTransportStopZoneConnectionPlace::Get(Conversion::ToLongLong(*it)).get());
 			    }
 			    catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
 			    {
@@ -140,7 +142,7 @@ namespace synthese
 			{
 			    try
 			    {
-				object->addForcedDestination(EnvModule::getPublicTransportStopZones().get (Conversion::ToLongLong(*it)).get());
+					object->addForcedDestination(PublicTransportStopZoneConnectionPlace::Get (Conversion::ToLongLong(*it)).get());
 			    }
 			    catch (PublicTransportStopZoneConnectionPlace::RegistryKeyException& e)
 			    {
@@ -325,15 +327,15 @@ namespace synthese
 	    {
 		while (rows->next ())
 		{
-		    if (DeparturesTableModule::getDisplayScreens().contains(rows->getLongLong (TABLE_COL_ID)))
+			if (DisplayScreen::Contains(rows->getLongLong (TABLE_COL_ID)))
 		    {
-			load(DeparturesTableModule::getDisplayScreens().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
+				load(DisplayScreen::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
 		    }
 		    else
 		    {
-			shared_ptr<DisplayScreen> object(new DisplayScreen);
-			load(object.get(), rows);
-			DeparturesTableModule::getDisplayScreens().add(object);
+				DisplayScreen* object(new DisplayScreen);
+				load(object, rows);
+				object->store();
 		    }
 		}
 	    }
@@ -345,7 +347,7 @@ namespace synthese
 	    {
 		while (rows->next ())
 		{
-		    shared_ptr<DisplayScreen> object = DeparturesTableModule::getDisplayScreens().getUpdateable(rows->getLongLong (TABLE_COL_ID));
+			shared_ptr<DisplayScreen> object = DisplayScreen::GetUpdateable(rows->getLongLong (TABLE_COL_ID));
 		    load(object.get(), rows);
 		}
 	    }
@@ -357,7 +359,7 @@ namespace synthese
 	    {
 		while (rows->next ())
 		{
-		    DeparturesTableModule::getDisplayScreens().remove(rows->getLongLong (TABLE_COL_ID));
+			DisplayScreen::Remove(rows->getLongLong (TABLE_COL_ID));
 		}
 	    }
 	    

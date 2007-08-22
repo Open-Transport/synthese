@@ -23,6 +23,7 @@
 #include "05_html/HTMLForm.h"
 
 #include "11_interfaces/InterfaceModule.h"
+#include "11_interfaces/Interface.h"
 
 #include "30_server/ActionFunctionRequest.h"
 

@@ -24,6 +24,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> typename Registrable<uid,transportwebsite::SiteCommercialLineLink>::Registry Registrable<uid,transportwebsite::SiteCommercialLineLink>::_registry;
+	}
+
 	namespace transportwebsite
 	{
 

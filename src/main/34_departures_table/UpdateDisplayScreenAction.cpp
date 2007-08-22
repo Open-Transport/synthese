@@ -31,9 +31,10 @@
 #include "30_server/Request.h"
 
 #include "34_departures_table/UpdateDisplayScreenAction.h"
-#include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/ArrivalDepartureTableLog.h"
+#include "34_departures_table/DisplayType.h"
+#include "34_departures_table/DisplayScreen.h"
 
 using namespace std;
 using namespace boost;
@@ -120,7 +121,7 @@ namespace synthese
 
 				it = map.find(PARAMETER_TYPE);
 				if (it != map.end())
-					_type = DeparturesTableModule::getDisplayTypes().get(Conversion::ToLongLong(it->second));
+					_type = DisplayType::Get(Conversion::ToLongLong(it->second));
 
 			}
 			catch (DBEmptyResultException<DisplayScreen>&)

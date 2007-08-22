@@ -54,7 +54,7 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 			const JourneyBoardJourneys* jv = static_cast<const JourneyBoardJourneys*>(object);
-			shared_ptr<const ReservationRuleInterfacePage> resaInterfacePage = _page->getInterface()->getPage<ReservationRuleInterfacePage>();
+			const ReservationRuleInterfacePage* resaInterfacePage = _page->getInterface()->getPage<ReservationRuleInterfacePage>();
 
 			for (JourneyBoardJourneys::const_iterator it = jv->begin(); it != jv->end(); ++it)
 			{

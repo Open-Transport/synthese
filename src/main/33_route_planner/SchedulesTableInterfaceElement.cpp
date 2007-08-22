@@ -64,15 +64,15 @@ namespace synthese
 
 			if ( jv == NULL || jv->empty())  // No solution or type error
 			{
-				shared_ptr<const RoutePlannerNoSolutionInterfacePage> noSolutionPage = _page->getInterface()->getPage<RoutePlannerNoSolutionInterfacePage>();
+				const RoutePlannerNoSolutionInterfacePage* noSolutionPage = _page->getInterface()->getPage<RoutePlannerNoSolutionInterfacePage>();
 				noSolutionPage->display(stream, request);
 			}
 			else
 			{
 				const PlaceList placesList(getStopsListForScheduleTable(*jv));
 				Hour unknownTime( TIME_UNKNOWN );
-				shared_ptr<const RoutePlannerSheetColumnInterfacePage> columnInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>());
-				shared_ptr<const RoutePlannerSheetLineInterfacePage> lineInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>());
+				const RoutePlannerSheetColumnInterfacePage* columnInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>());
+				const RoutePlannerSheetLineInterfacePage* lineInterfacePage(_page->getInterface()->getPage<RoutePlannerSheetLineInterfacePage>());
 				bool pedestrianMode = false;
 				bool lastPedestrianMode = false;
 				

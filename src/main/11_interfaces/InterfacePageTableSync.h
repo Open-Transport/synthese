@@ -26,26 +26,23 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteTableSync.h"
+#include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace interfaces
 	{
+		class InterfacePage;
 
 		/** InterfacePageTableSync SQLite table synchronizer.
 			@ingroup m11LS refLS
 		*/
-		class InterfacePageTableSync : public db::SQLiteTableSync
+		class InterfacePageTableSync : public db::SQLiteTableSyncTemplate<InterfacePage>
 		{
-		private:
-			static const std::string TABLE_NAME;
-			static const std::string TABLE_COL_ID;
+		public:
 			static const std::string TABLE_COL_INTERFACE;
 			static const std::string TABLE_COL_PAGE;
 			static const std::string TABLE_COL_CONTENT;
-
-		public:
 
 			/** Interface page SQLite table constructor.
 			*/

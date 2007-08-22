@@ -20,9 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "SecurityRight.h"
+
 #include "01_util/Conversion.h"
 
-#include "12_security/SecurityRight.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/Constants.h"
 #include "12_security/Profile.h"
@@ -59,8 +60,8 @@ namespace synthese
 			if (_parameter == GLOBAL_PERIMETER)
 				return "(tous profils)";
 
-			return (SecurityModule::getProfiles().contains(Conversion::ToLongLong(_parameter)))
-				? SecurityModule::getProfiles().get(Conversion::ToLongLong(_parameter))->getName()
+			return (Profile::Contains(Conversion::ToLongLong(_parameter)))
+				? Profile::Get(Conversion::ToLongLong(_parameter))->getName()
 				: "(invalide)";
 		}
 
@@ -71,13 +72,13 @@ namespace synthese
 			if (perimeter == UNKNOWN_PERIMETER)
 				return true;
 
-			if (SecurityModule::getProfiles().contains(Conversion::ToLongLong(_parameter))
-				&& SecurityModule::getProfiles().contains(Conversion::ToLongLong(perimeter)))
+			if (Profile::Contains(Conversion::ToLongLong(_parameter))
+				&& Profile::Contains(Conversion::ToLongLong(perimeter)))
 			{
-				shared_ptr<const Profile> includedProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(perimeter));
-				shared_ptr<const Profile> currentProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(_parameter));
+				shared_ptr<const Profile> includedProfile = Profile::Get(Conversion::ToLongLong(perimeter));
+				shared_ptr<const Profile> currentProfile = Profile::Get(Conversion::ToLongLong(_parameter));
 
-				for (;includedProfile.get(); includedProfile = SecurityModule::getProfiles().get(includedProfile->getParentId()))
+				for (;includedProfile.get(); includedProfile = Profile::Get(includedProfile->getParentId()))
 					if (currentProfile == includedProfile)
 						return true;
 			}

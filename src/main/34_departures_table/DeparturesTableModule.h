@@ -28,9 +28,6 @@
 
 #include "01_util/ModuleClass.h"
 
-#include "34_departures_table/DisplayType.h"
-#include "34_departures_table/DisplayScreen.h"
-
 #include "12_security/Types.h"
 
 namespace synthese
@@ -90,13 +87,7 @@ namespace synthese
 	{
 		class DeparturesTableModule : public util::ModuleClass
 		{
-			static DisplayType::Registry		_displayTypes;
-			static DisplayScreen::Registry		_displayScreens;
-
 		public:
-			static DisplayType::Registry&		getDisplayTypes();
-			static DisplayScreen::Registry&		getDisplayScreens();
-
 			static std::vector<std::pair<uid, std::string> >	getDisplayTypeLabels(bool withAll = false);
 			static std::vector<std::pair<uid, std::string> >	getPlacesWithBroadcastPointsLabels(
 				const security::RightsOfSameClassMap& rights 

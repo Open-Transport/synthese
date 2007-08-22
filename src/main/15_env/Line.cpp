@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> typename Registrable<uid,env::Line>::Registry Registrable<uid,env::Line>::_registry;
+	}
+
 	namespace env
 	{
 		Line::Line (const uid& id,
@@ -38,7 +43,7 @@ namespace synthese
 			, Path ()
 			, _name (name)
 			, _axis (axis)
-			, _rollingStockId (-1)
+			, _rollingStock (NULL)
 			, _isWalkingLine (false)
 			, _useInDepartureBoards (true)
 			, _useInTimetables (true)
@@ -51,7 +56,7 @@ namespace synthese
 		Line::Line()
 		: synthese::util::Registrable<uid,Line>()
 		, Path ()
-		, _rollingStockId (-1)
+		, _rollingStock (NULL)
 		, _isWalkingLine (false)
 		, _useInDepartureBoards (true)
 		, _useInTimetables (true)
@@ -190,18 +195,18 @@ namespace synthese
 
 
 
-		const uid&
-		Line::getRollingStockId () const
+		const RollingStock*
+		Line::getRollingStock () const
 		{
-			return _rollingStockId;
+			return _rollingStock;
 		}
 
 
 
 		void 
-		Line::setRollingStockId (const uid& rollingStockId)
+		Line::setRollingStock (const RollingStock* rollingStock)
 		{
-			_rollingStockId = rollingStockId;
+			_rollingStock = rollingStock;
 		}
 
 

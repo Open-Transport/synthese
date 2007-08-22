@@ -28,6 +28,12 @@ namespace synthese
 {
 	using namespace time;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,messages::SentScenario>::Registry Registrable<uid,messages::SentScenario>::_registry;
+	}
+
+
 	namespace messages
 	{
 		SentScenario::SentScenario()

@@ -49,7 +49,7 @@ namespace synthese
 
 			ElementsList _elements;	//!< The list
 
-			void parse(const std::string& text, boost::shared_ptr<const InterfacePage> page);
+			void parse(const std::string& text, const InterfacePage* page);
 
 		public:
 
@@ -87,7 +87,7 @@ namespace synthese
 						- <tt>{{stop 12 {{param:4}} text {long text}}}</tt>
 						- <tt>{{field hidden name {{cityname {{param 6}} {{param 2}}}} {style="visibility:hidden"}}}</tt>
 			*/
-			ValueElementList(const std::string& text, boost::shared_ptr<const InterfacePage> page);
+			ValueElementList(const std::string& text, const InterfacePage* page);
 
 			/** Empty constructor.
 			*/
@@ -102,7 +102,7 @@ namespace synthese
 				@param vel Object to read
 				@param page Interface page of the elements of the current object
 			*/
-			void	takeFrom(ValueElementList& vel, boost::shared_ptr<const InterfacePage> page);
+			void	takeFrom(ValueElementList& vel, const InterfacePage* page);
 
 			/** Builds a parameters vector from the value element list.
 				@param parameters Parameters to use when filling undefined parameter elements

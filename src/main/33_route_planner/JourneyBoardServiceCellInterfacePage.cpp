@@ -30,6 +30,7 @@
 #include "15_env/HandicappedCompliance.h"
 #include "15_env/BikeCompliance.h"
 #include "15_env/Line.h"
+#include "15_env/RollingStock.h"
 #include "15_env/CommercialLine.h"
 #include "15_env/ContinuousService.h"
 #include "15_env/PhysicalStop.h"
@@ -92,9 +93,9 @@ namespace synthese
 			pv.push_back( continuousServiceRange ? lastDepartureDateTime.getHour().toString() : string() );
 			pv.push_back( serviceUse.getArrivalDateTime().getHour().toString() );
 			pv.push_back( continuousServiceRange ? lastArrivalDateTime.getHour().toString() : string() );
-			pv.push_back( string() ); // 4
-			pv.push_back( string() ); // 5
-			pv.push_back( string() ); // 6
+			pv.push_back( line->getRollingStock() ? Conversion::ToString(line->getRollingStock()->getKey()) : string()  ); // 4
+			pv.push_back( line->getRollingStock() ? line->getRollingStock()->getName() : string() ); // 5
+			pv.push_back( line->getRollingStock() ? line->getRollingStock()->getArticle() : string()  ); // 6
 			pv.push_back( line->getDirection().empty() ? line->getDestination()->getConnectionPlace()->getFullName() : line->getDirection() ); // 7
 			pv.push_back( Conversion::ToString( handicappedFilterStatus ) );
 			pv.push_back( Conversion::ToString( serviceUse.getService()->getHandicappedCompliance ()->getCapacity () ) );

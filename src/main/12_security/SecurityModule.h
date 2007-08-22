@@ -30,8 +30,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "01_util/ModuleClass.h"
-
-#include "12_security/Profile.h"
+#include "01_util/UId.h"
 
 namespace synthese
 {
@@ -69,6 +68,7 @@ namespace synthese
 	namespace security
 	{
 		class User;
+		class Profile;
 
 		/** 12 Security module class.
 		*/
@@ -80,15 +80,11 @@ namespace synthese
 			static const std::string ROOT_USER;
 
 		private:
-			static Profile::Registry _profiles;
-
 			static boost::shared_ptr<Profile>	_rootProfile;
 			static boost::shared_ptr<User>		_rootUser;
 
 		public:
 			void initialize();
-
-			static Profile::Registry& getProfiles();
 
 			static std::vector<std::pair<std::string, std::string> > getRightsTemplates();
 			static std::vector<std::pair<uid, std::string> > getProfileLabels(bool withAll=false, int first=0, int last=-1);

@@ -30,7 +30,6 @@
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
-#include "15_env/EnvModule.h"
 #include "ReservationRule.h"
 #include "ReservationRuleTableSync.h"
 
@@ -150,9 +149,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<ReservationRule> object(new ReservationRule());
-				load(object.get(), rows);
-				EnvModule::getReservationRules().add(object);
+				ReservationRule* object(new ReservationRule());
+				load(object, rows);
+				object->store();
 			}
 		}
 
@@ -161,9 +160,9 @@ namespace synthese
 			while (rows->next ())
 			{
 			    uid id = rows->getLongLong (TABLE_COL_ID);
-			    if (EnvModule::getReservationRules().contains(id))
+			    if (ReservationRule::Contains(id))
 			    {
-				shared_ptr<ReservationRule> object = EnvModule::getReservationRules().getUpdateable(id);
+				shared_ptr<ReservationRule> object = ReservationRule::GetUpdateable(id);
 				load(object.get(), rows);
 			    }
 			}
@@ -174,9 +173,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getReservationRules().contains(id))
+				if (ReservationRule::Contains(id))
 				{
-					EnvModule::getReservationRules().remove(id);
+					ReservationRule::Remove(id);
 				}
 			}
 		}

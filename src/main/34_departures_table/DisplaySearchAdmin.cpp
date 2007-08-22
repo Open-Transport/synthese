@@ -27,12 +27,14 @@
 #include "34_departures_table/DisplayAdmin.h"
 #include "34_departures_table/DisplayMaintenanceAdmin.h"
 #include "34_departures_table/DisplayScreenContentRequest.h"
-#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/DisplayScreen.h"
+#include "34_departures_table/DisplayType.h"
 #include "34_departures_table/ArrivalDepartureTableRight.h"
-
-#include "01_util/Conversion.h"
+#include "34_departures_table/DeparturesTableModule.h"
 
 #include "11_interfaces/InterfaceModule.h"
+
+#include "01_util/Conversion.h"
 
 #include "05_html/ActionResultHTMLTable.h"
 #include "05_html/SearchFormHTMLTable.h"
@@ -45,7 +47,7 @@
 
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/ConnectionPlaceTableSync.h"
-#include "15_env/EnvModule.h"
+#include "15_env/City.h"
 
 using namespace boost;
 using namespace std;
@@ -185,20 +187,20 @@ namespace synthese
 
 
 			ActionFunctionRequest<CreateDisplayScreenAction,AdminRequest> createDisplayRequest(request);
-			createDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
-			createDisplayRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<DisplaySearchAdmin>());
+			createDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
+			createDisplayRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplaySearchAdmin>());
 			createDisplayRequest.getAction()->setPlace(_place);
 
 			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplaySearchAdmin>());
+			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplaySearchAdmin>());
 
 			FunctionRequest<AdminRequest> updateRequest(request);
-			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayAdmin>());
+			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
 
 			FunctionRequest<DisplayScreenContentRequest> viewRequest(request);
 
 			FunctionRequest<AdminRequest> maintRequest(request);
-			maintRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DisplayMaintenanceAdmin>());
+			maintRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayMaintenanceAdmin>());
 
 			if (!_place.get())
 			{
@@ -220,7 +222,15 @@ namespace synthese
 			v.push_back(make_pair(string(), "Actions"));
 			v.push_back(make_pair(string(), "Actions"));
 
-			ActionResultHTMLTable t(v, searchRequest.getHTMLForm("search"), _requestParameters, _resultParameters, createDisplayRequest.getHTMLForm("create"), CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE));
+			ActionResultHTMLTable t(
+				v
+				, searchRequest.getHTMLForm("search")
+				, _requestParameters
+				, _resultParameters
+				, createDisplayRequest.getHTMLForm("create")
+				, CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID
+				, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
+			);
 
 			stream << t.open();
 

@@ -27,7 +27,6 @@
 #include "12_security/UserTableSync.h"
 #include "12_security/Profile.h"
 #include "12_security/User.h"
-#include "12_security/SecurityModule.h"
 
 #include "02_db/DBEmptyResultException.h"
 
@@ -120,7 +119,7 @@ namespace synthese
 				it = map.find(PARAMETER_PROFILE_ID);
 				if (it == map.end())
 					throw ActionException("Profile not specified");
-				_profile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
+				_profile = Profile::Get(Conversion::ToLongLong(it->second));
 			}
 			catch (Profile::RegistryKeyException)
 			{

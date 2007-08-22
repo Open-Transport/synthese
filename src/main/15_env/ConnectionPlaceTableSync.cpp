@@ -29,7 +29,6 @@
 
 #include "15_env/City.h"
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/EnvModule.h"
 
 #include <boost/tokenizer.hpp>
 #include <sqlite/sqlite3.h>
@@ -68,7 +67,7 @@ namespace synthese
 
 			cp->setKey(id);
 			cp->setName (name);
-			cp->setCity(EnvModule::getCities().get(cityId).get());
+			cp->setCity(City::Get(cityId).get());
 			cp->setConnectionType (connectionType);
 			cp->setDefaultTransferDelay (defaultTransferDelay);
 
@@ -137,7 +136,8 @@ namespace synthese
 			{
 			    uid id (rows->getLongLong (TABLE_COL_ID));
 			    
-			    if (EnvModule::getPublicTransportStopZones().contains (id)) return;
+			    if (PublicTransportStopZoneConnectionPlace::Contains (id))
+					continue;
 			    
 			    std::string name (rows->getText (TABLE_COL_NAME));
 			    uid cityId (rows->getLongLong (TABLE_COL_CITYID));
@@ -152,8 +152,8 @@ namespace synthese
 
 			    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 			    
-			    shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cityId);
-			    shared_ptr<PublicTransportStopZoneConnectionPlace> cp(
+			    shared_ptr<City> city = City::GetUpdateable (cityId);
+			    PublicTransportStopZoneConnectionPlace* cp(
 					new PublicTransportStopZoneConnectionPlace(id, name, city.get(), connectionType, defaultTransferDelay)
 				);
 
@@ -174,13 +174,13 @@ namespace synthese
 
 				if (isCityMainConnection)
 				{
-					city->addIncludedPlace (cp.get());
+					city->addIncludedPlace (cp);
 				}
 
 			//    cp->setAlarm (environment.getAlarms ().get (alarmId));
 
-				city->getConnectionPlacesMatcher ().add (cp->getName (), cp.get());
-				EnvModule::getPublicTransportStopZones().add (cp);
+				city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
+				cp->store();
 			}
 		}
 
@@ -193,11 +193,11 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<PublicTransportStopZoneConnectionPlace> cp = EnvModule::getPublicTransportStopZones().getUpdateable(
+				shared_ptr<PublicTransportStopZoneConnectionPlace> cp = PublicTransportStopZoneConnectionPlace::GetUpdateable(
 				    rows->getLongLong (TABLE_COL_ID)
 				);
 				
-				shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cp->getCity ()->getKey ());
+				shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
 				city->getConnectionPlacesMatcher ().remove (cp->getName ());
 				
 				load(cp.get(), rows);
@@ -219,11 +219,11 @@ namespace synthese
 				// TODO not finished...
 			    uid id = rows->getLongLong (TABLE_COL_ID);
 			    
-			    shared_ptr<const ConnectionPlace> cp = EnvModule::getPublicTransportStopZones().get (id);
-			    shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cp->getCity ()->getKey ());
+			    shared_ptr<const ConnectionPlace> cp = PublicTransportStopZoneConnectionPlace::Get (id);
+			    shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
 			    city->getConnectionPlacesMatcher ().remove (cp->getName ());
 			    
-			    EnvModule::getPublicTransportStopZones().remove (id);
+			    PublicTransportStopZoneConnectionPlace::Remove (id);
 			}
 		}
 	    

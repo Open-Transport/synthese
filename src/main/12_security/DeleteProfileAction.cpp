@@ -26,10 +26,9 @@
 #include "01_util/Conversion.h"
 
 #include "12_security/DeleteProfileAction.h"
-#include "12_security/SecurityModule.h"
+#include "12_security/Profile.h"
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
-#include "12_security/Profile.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/SecurityLog.h"
 
@@ -53,9 +52,9 @@ namespace synthese
 
 		void DeleteProfileAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			if (!SecurityModule::getProfiles().contains(_request->getObjectId()))
+			if (!Profile::Contains(_request->getObjectId()))
 				throw ActionException("Specified Profile not found");
-			_profile = SecurityModule::getProfiles().get(_request->getObjectId());
+			_profile = Profile::Get(_request->getObjectId());
 
 			// Search of child profiles
 			vector<shared_ptr<Profile> > profiles = ProfileTableSync::search(_profile, 0, 1);

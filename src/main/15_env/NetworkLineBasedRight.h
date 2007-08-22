@@ -25,11 +25,11 @@
 #ifndef SYNTHESE_env_NetworkLineBasedRight_H__
 #define SYNTHESE_env_NetworkLineBasedRight_H__
 
-#include "15_env/EnvModule.h"
 #include "15_env/TransportNetworkTableSync.h"
 #include "15_env/TransportNetwork.h"
 #include "15_env/CommercialLineTableSync.h"
 #include "15_env/CommercialLine.h"
+#include "15_env/EnvModule.h"
 
 #include "12_security/Constants.h"
 #include "12_security/RightTemplate.h"
@@ -92,13 +92,13 @@ namespace synthese
 				
 				if (tableId == TransportNetworkTableSync::TABLE_ID)
 				{
-					boost::shared_ptr<const TransportNetwork> network(EnvModule::getTransportNetworks().get(id));
+					boost::shared_ptr<const TransportNetwork> network(TransportNetwork::Get(id));
 					return network->getName();
 				}
 
 				if (tableId == CommercialLineTableSync::TABLE_ID)
 				{
-					boost::shared_ptr<const CommercialLine> line(EnvModule::getCommercialLines().get(id));
+					boost::shared_ptr<const CommercialLine> line(CommercialLine::Get(id));
 					return line->getName();
 				}
 			}
@@ -126,8 +126,8 @@ namespace synthese
 						return id1 == id2;
 					if (decodeTableId(id2) == CommercialLineTableSync::TABLE_ID)
 					{
-						boost::shared_ptr<const CommercialLine> line(EnvModule::getCommercialLines().get(id2));
-						boost::shared_ptr<const TransportNetwork> network(EnvModule::getTransportNetworks().get(id1));
+						boost::shared_ptr<const CommercialLine> line(CommercialLine::Get(id2));
+						boost::shared_ptr<const TransportNetwork> network(TransportNetwork::Get(id1));
 						return line->getNetwork() == network.get();
 					}
 				}

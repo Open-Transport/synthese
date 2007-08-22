@@ -28,6 +28,14 @@ namespace synthese
 {
 	using namespace util;
 
+
+	namespace util
+	{
+		template<> typename Registrable<uid,env::BikeCompliance>::Registry Registrable<uid,env::BikeCompliance>::_registry;
+		template<> boost::shared_ptr<const env::BikeCompliance> RegistrableWithNeutralElement<uid,env::BikeCompliance>::_neutral(new env::BikeCompliance);
+	}
+
+
 	namespace env
 	{
 

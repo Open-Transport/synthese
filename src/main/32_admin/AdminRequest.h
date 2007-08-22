@@ -84,13 +84,13 @@ namespace synthese
 		template<class T>
 		void AdminRequest::setActionFailedPage()
 		{
-			_actionFailedPage = Factory<AdminInterfaceElement>::create<T>();
+			_actionFailedPage = Factory<AdminInterfaceElement>::createSharedPtr<T>();
 		}
 
 		template<class T>
 		void AdminRequest::setPage()
 		{
-			_page = Factory<AdminInterfaceElement>::create<T>();
+			_page = Factory<AdminInterfaceElement>::createSharedPtr<T>();
 		}
 	}
 }

@@ -23,7 +23,6 @@
 #include "SiteTableSync.h"
 
 #include "36_places_list/Site.h"
-#include "36_places_list/PlacesListModule.h"
 
 #include "01_util/Conversion.h"
 
@@ -32,7 +31,6 @@
 #include "04_time/Date.h"
 
 #include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfaceModule.h"
 
 #include <sstream>
 #include <boost/tokenizer.hpp>
@@ -59,7 +57,7 @@ namespace synthese
 		{
 		    site->setKey(rows->getLongLong (TABLE_COL_ID));
 		    site->setName(rows->getText (SiteTableSync::TABLE_COL_NAME));
-		    shared_ptr<const Interface> interf = InterfaceModule::getInterfaces().get(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
+			shared_ptr<const Interface> interf = Interface::Get(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
 		    site->setInterface(interf);
 		    site->setStartDate(Date::FromSQLDate(rows->getText (SiteTableSync::TABLE_COL_START_DATE)));
 		    site->setEndDate(Date::FromSQLDate(rows->getText(SiteTableSync::TABLE_COL_END_DATE)));
@@ -137,8 +135,8 @@ namespace synthese
 		    while (rows->next ())
 		    {
 			uid id = rows->getLongLong (TABLE_COL_ID);
-			if (PlacesListModule::getSites().contains(id))
-			    load(PlacesListModule::getSites().getUpdateable(id).get(), rows);
+			if (Site::Contains(id))
+				load(Site::GetUpdateable(id).get(), rows);
 		    }
 		}
 
@@ -149,17 +147,16 @@ namespace synthese
 		    while (rows->next ())
 		    {
 			uid id = rows->getLongLong (TABLE_COL_ID);
-			shared_ptr<Site> site;
-			if (PlacesListModule::getSites().contains(id))
+			if (Site::Contains(id))
 			{
-			    site = PlacesListModule::getSites().getUpdateable(id);
+				shared_ptr<Site> site(Site::GetUpdateable(id));
 			    load(site.get(), rows);
 			}
 			else
 			{
-			    site.reset(new Site);
-			    load(site.get(), rows);
-			    PlacesListModule::getSites().add(site);
+			    Site* site(new Site);
+			    load(site, rows);
+				site->store();
 			}
 		    }
 		}
@@ -170,8 +167,8 @@ namespace synthese
 		    while (rows->next ())
 		    {
 			uid id = rows->getLongLong (TABLE_COL_ID);
-			if (PlacesListModule::getSites().contains(id))
-			    PlacesListModule::getSites().remove(id);
+			if (Site::Contains(id))
+				Site::Remove(id);
 		    }
 		}
 	}

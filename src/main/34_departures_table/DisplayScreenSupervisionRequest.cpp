@@ -25,7 +25,7 @@
 #include "30_server/RequestException.h"
 
 #include "34_departures_table/DisplayScreenSupervisionRequest.h"
-#include "34_departures_table/DeparturesTableModule.h"
+#include "34_departures_table/DisplayScreen.h"
 
 using namespace std;
 
@@ -57,9 +57,9 @@ namespace synthese
 				it = map.find(PARAMETER_DISPLAY_SCREEN_ID);
 				if (it == map.end())
 					throw RequestException("Display screen not specified");
-				if (!DeparturesTableModule::getDisplayScreens().contains(Conversion::ToLongLong(it->second)))
+				if (!DisplayScreen::Contains(Conversion::ToLongLong(it->second)))
 					throw RequestException("Display screen " + it->second + " not found");
-				_displayScreen = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
+				_displayScreen = DisplayScreen::Get(Conversion::ToLongLong(it->second));
 			
 				it = map.find(PARAMETER_STATUS);
 				if (it == map.end())

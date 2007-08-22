@@ -180,10 +180,6 @@
 					RelativePath=".\RegistryKeyException.h"
 					>
 				</File>
-				<File
-					RelativePath=".\RegistryWithNeutralElement.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="XML"

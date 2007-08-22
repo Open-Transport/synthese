@@ -26,7 +26,6 @@
 #include <map>
 #include <string>
 #include <iostream>
-
 #include <boost/shared_ptr.hpp>
 
 #include "01_util/FactoryException.h"
@@ -65,7 +64,7 @@ namespace synthese
 			class CreatorInterface
 			{
 			private:
-				virtual boost::shared_ptr<RootObject> create() = 0;
+				virtual RootObject* create() = 0;
 				friend class Factory;
 				friend class Factory::Iterator;
 			};
@@ -76,14 +75,14 @@ namespace synthese
 			{
 			private:
 				friend class Factory;
-				boost::shared_ptr<RootObject> create ()
+				RootObject* create ()
 				{
-					return boost::static_pointer_cast<RootObject, T>(createTyped());
+					return static_cast<RootObject*>(createTyped());
 				}
 
-				boost::shared_ptr<T> createTyped ()
+				T* createTyped ()
 				{
-					boost::shared_ptr<T> obj(new T);
+					T* obj(new T);
 					obj->setFactoryKey(getKey<T>());
 					return obj;
 				}
@@ -174,13 +173,19 @@ namespace synthese
 			}
 
 			template<class T>
-			static boost::shared_ptr<T> create()
+			static T* create()
 			{
 				Creator<T> creator;
 				return creator.createTyped();
 			}
 
-			static boost::shared_ptr<RootObject> create(const typename Map::key_type& key)
+			template<class T>
+			static boost::shared_ptr<T> createSharedPtr()
+			{
+				return boost::shared_ptr<T>(create<T>());
+			}
+
+			static RootObject* create(const typename Map::key_type& key)
 			{
 				// The factory "single object" was never filled
 				if (size () == 0)
@@ -195,6 +200,11 @@ namespace synthese
 
 				// The key is found : return of an instance of the object
 				return it->second->create();
+			}
+
+			static boost::shared_ptr<RootObject> createSharedPtr(const typename Map::key_type& key)
+			{
+				return boost::shared_ptr<RootObject>(create(key));
 			}
 
 			static void destroy()
@@ -218,7 +228,7 @@ namespace synthese
 				*/
 				boost::shared_ptr<RootObject> operator*()
 				{
-					return _it->second->create();
+					return boost::shared_ptr<RootObject>(_it->second->create());
 				}
 
 				boost::shared_ptr<RootObject> operator->()

@@ -20,7 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/EnvModule.h"
 #include "15_env/PhysicalStop.h"
 
 #include "30_server/ActionException.h"
@@ -29,7 +28,6 @@
 #include "34_departures_table/DisplayScreenRemovePhysicalStopAction.h"
 #include "34_departures_table/DisplayScreen.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
-#include "34_departures_table/DeparturesTableModule.h"
 
 using namespace boost;
 using namespace std;
@@ -63,7 +61,7 @@ namespace synthese
 				it = map.find(PARAMETER_PHYSICAL);
 				if (it == map.end())
 					throw ActionException("Place not specified");
-				_stop = EnvModule::getPhysicalStops().get(Conversion::ToLongLong(it->second));
+				_stop = PhysicalStop::Get(Conversion::ToLongLong(it->second));
 			}
 			catch (DBEmptyResultException<DisplayScreen>& e)
 			{

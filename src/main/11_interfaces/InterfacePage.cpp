@@ -37,6 +37,11 @@ namespace synthese
 {
 	using namespace util;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,interfaces::InterfacePage>::Registry Registrable<uid,interfaces::InterfacePage>::_registry;
+	}
+
 	namespace interfaces
 	{
 
@@ -71,7 +76,7 @@ namespace synthese
 				shared_ptr<LibraryInterfaceElement> lie;
 				try
 				{
-					lie = LibraryInterfaceElement::create(line, getRegisteredSharedPointer());
+					lie = LibraryInterfaceElement::create(line, this);
 					if (!lie.get())
 						continue;
 				}

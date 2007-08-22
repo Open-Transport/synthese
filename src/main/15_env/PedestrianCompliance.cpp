@@ -28,9 +28,14 @@ namespace synthese
 {
 	using namespace util;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,env::PedestrianCompliance>::Registry Registrable<uid,env::PedestrianCompliance>::_registry;
+		template<> boost::shared_ptr<const env::PedestrianCompliance> RegistrableWithNeutralElement<uid,env::PedestrianCompliance>::_neutral(new env::PedestrianCompliance);
+	}
+
 	namespace env
 	{
-
 		PedestrianCompliance::PedestrianCompliance()
 		: RegistrableWithNeutralElement<uid,PedestrianCompliance> ()
 		, Compliance(true, UNKNOWN_VALUE)

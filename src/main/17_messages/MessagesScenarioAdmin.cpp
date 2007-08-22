@@ -108,14 +108,14 @@ namespace synthese
 			updateRequest.setObjectId(_scenario->getId());
 
 			FunctionRequest<AdminRequest> messRequest(request);
-			messRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+			messRequest.getFunction()->setPage<MessageAdmin>();
 
 			ActionFunctionRequest<DeleteAlarmAction,AdminRequest> deleteRequest(request);
-			deleteRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessagesScenarioAdmin>());
+			deleteRequest.getFunction()->setPage<MessagesScenarioAdmin>();
 			deleteRequest.setObjectId(_scenario->getId());
 
 			ActionFunctionRequest<NewMessageAction,AdminRequest> addRequest(request);
-			addRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<MessageAdmin>());
+			addRequest.getFunction()->setPage<MessageAdmin>();
 			addRequest.getAction()->setScenarioId(_scenario->getId());
 			addRequest.getAction()->setIsTemplate(_templateScenario.get() != NULL);
 

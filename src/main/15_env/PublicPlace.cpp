@@ -20,10 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/PublicPlace.h"
+#include "PublicPlace.h"
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> typename Registrable<uid,env::PublicPlace>::Registry Registrable<uid,env::PublicPlace>::_registry;
+	}
+
 	namespace env
 	{
 		PublicPlace::PublicPlace (

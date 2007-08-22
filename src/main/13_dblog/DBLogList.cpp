@@ -74,7 +74,7 @@ namespace synthese
 		void DBLogList::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			FunctionRequest<AdminRequest> goRequest(request);
-			goRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<DBLogViewer>());
+			goRequest.getFunction()->setPage<DBLogViewer>();
 
 			stream << "<h1>Liste des journaux</h1>";
 

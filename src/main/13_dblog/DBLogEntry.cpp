@@ -31,6 +31,11 @@ namespace synthese
 {
 	using namespace time;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,dblog::DBLogEntry>::Registry Registrable<uid,dblog::DBLogEntry>::_registry;
+	}
+
 	namespace dblog
 	{
 		void DBLogEntry::setDate( const time::DateTime& date )

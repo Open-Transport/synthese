@@ -62,10 +62,10 @@ namespace synthese
 			, boost::logic::tribool bikeFilter
 			, const server::Request* request
 		) const {
-			shared_ptr<const DurationInterfacePage> durationInterfacePage = getInterface()->getPage<DurationInterfacePage>();
+			const DurationInterfacePage* durationInterfacePage = getInterface()->getPage<DurationInterfacePage>();
 			stringstream sDuration;
 			durationInterfacePage->display(sDuration, journey->getDuration(), variables, NULL, request);
-			shared_ptr<const DateTimeInterfacePage> dateInterfacePage = getInterface()->getPage<DateTimeInterfacePage>();
+			const DateTimeInterfacePage* dateInterfacePage = getInterface()->getPage<DateTimeInterfacePage>();
 			stringstream sDate;
 			dateInterfacePage->display(sDate, variables, journey->getDepartureTime().getDate(), request);
 			DateTime now(TIME_CURRENT);

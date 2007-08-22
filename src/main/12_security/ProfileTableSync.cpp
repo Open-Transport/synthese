@@ -20,7 +20,6 @@
 */
 
 #include "12_security/ProfileTableSync.h"
-#include "12_security/SecurityModule.h"
 #include "12_security/UserTableSyncException.h"
 #include "12_security/Right.h"
 #include "12_security/Profile.h"
@@ -117,15 +116,15 @@ namespace synthese
 		{
 		    while (rows->next ())
 		    {
-			if (SecurityModule::getProfiles().contains(rows->getLongLong (TABLE_COL_ID)))
+			if (Profile::Contains(rows->getLongLong (TABLE_COL_ID)))
 			{
-			    load(SecurityModule::getProfiles().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
+			    load(Profile::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
 			}
 			else
 			{
-			    shared_ptr<Profile> profile(new Profile(rows->getLongLong (TABLE_COL_ID)));
-			    load(profile.get(), rows);
-			    SecurityModule::getProfiles().add(profile);
+			    Profile* profile(new Profile(rows->getLongLong (TABLE_COL_ID)));
+			    load(profile, rows);
+			    profile->store();
 			}
 		    }
 		}
@@ -135,9 +134,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				if (SecurityModule::getProfiles().contains(rows->getLongLong (TABLE_COL_ID)))
+				if (Profile::Contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					load(SecurityModule::getProfiles().getUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
+					load(Profile::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
 				}
 			}
 		}
@@ -146,9 +145,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				if (SecurityModule::getProfiles().contains(rows->getLongLong (TABLE_COL_ID)))
+				if (Profile::Contains(rows->getLongLong (TABLE_COL_ID)))
 				{
-					SecurityModule::getProfiles().remove(rows->getLongLong (TABLE_COL_ID));
+					Profile::Remove(rows->getLongLong (TABLE_COL_ID));
 				}
 			}
 		}
@@ -267,7 +266,7 @@ namespace synthese
 
 				try
 				{
-					shared_ptr<Right> right = Factory<Right>::create(*it);
+					shared_ptr<Right> right(Factory<Right>::create(*it));
 
 					++it;
 					right->setParameter(*it);

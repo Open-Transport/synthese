@@ -30,6 +30,7 @@
 
 #include "15_env/ConnectionPlaceTableSync.h"
 #include "15_env/City.h"
+#include "15_env/PublicTransportStopZoneConnectionPlace.h"
 #include "15_env/EnvModule.h"
 
 #include "30_server/FunctionRequest.h"
@@ -131,7 +132,7 @@ namespace synthese
 			goRequest.getFunction()->setPage<DisplaySearchAdmin>();
 
 			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<BroadcastPointsAdmin>());
+			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<BroadcastPointsAdmin>());
 
 			vector<pair<int, string> > m;
 			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));

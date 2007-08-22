@@ -27,7 +27,7 @@
 #include "05_html/HTMLForm.h"
 
 #include "11_interfaces/RequestWithInterface.h"
-#include "11_interfaces/InterfaceModule.h"
+#include "11_interfaces/Interface.h"
 #include "11_interfaces/RedirectInterfacePage.h"
 
 #include "30_server/RequestException.h"
@@ -59,7 +59,7 @@ namespace synthese
 		{
 			if (_redirectAfterAction && _interface)
 			{
-				shared_ptr<const RedirectInterfacePage> page = _interface->getPage<RedirectInterfacePage>();
+				const RedirectInterfacePage* page = _interface->getPage<RedirectInterfacePage>();
 				_request->deleteAction();
 				VariablesMap vm;
 				page->display(stream, vm, _request);
@@ -76,7 +76,7 @@ namespace synthese
 				ParametersMap::const_iterator it = map.find(PARAMETER_INTERFACE);
 				if (it != map.end())
 				{
-					_interface = InterfaceModule::getInterfaces().get(Conversion::ToLongLong(it->second));
+					_interface = Interface::Get(Conversion::ToLongLong(it->second));
 				}
 
 				it = map.find(PARAMETER_NO_REDIRECT_AFTER_ACTION);

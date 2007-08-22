@@ -72,7 +72,7 @@ namespace synthese
 			const Axis*				_axis;
 			const CommercialLine*	_commercialLine;
 		    
-			uid _rollingStockId;
+			const RollingStock* _rollingStock;
 
 			std::string _name;			//!< Name (code)
 			std::string _timetableName; //!< Name for timetable
@@ -106,7 +106,7 @@ namespace synthese
 				const std::string&		getDirection ()				const;
 				const std::string&		getTimetableName ()			const;
 				const TransportNetwork* getNetwork ()				const;
-				const uid&				getRollingStockId ()		const;
+				const RollingStock*		getRollingStock()			const;
 				bool					getWalkingLine ()			const;
 				const CommercialLine*	getCommercialLine()			const;
 			//@}
@@ -117,7 +117,7 @@ namespace synthese
 				void setUseInDepartureBoards (bool useInDepartureBoards);
 				void setName (const std::string& name);
 				void setWalkingLine (bool isWalkingLine);
-				void setRollingStockId (const uid& id);
+				void setRollingStock(const RollingStock*);
 				void setTimetableName (const std::string& timetableName);
 				void setDirection (const std::string& direction);
 				void setAxis(const Axis* axis);

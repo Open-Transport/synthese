@@ -81,7 +81,7 @@ namespace synthese
 			}
 			
 			// Text formatted date
-			shared_ptr<const DateTimeInterfacePage> datePage(getInterface()->getPage<DateTimeInterfacePage>());
+			const DateTimeInterfacePage* datePage(getInterface()->getPage<DateTimeInterfacePage>());
 			stringstream sDate;
 			datePage->display(sDate, variables, date, request);
 
@@ -108,7 +108,7 @@ namespace synthese
 			, const server::Request* request /*= NULL  */
 		) const	{
 			// Text formatted date
-			shared_ptr<const DateTimeInterfacePage> datePage(getInterface()->getPage<DateTimeInterfacePage>());
+			const DateTimeInterfacePage* datePage(getInterface()->getPage<DateTimeInterfacePage>());
 			stringstream sDate;
 			datePage->display(sDate, variables, date, request);
 

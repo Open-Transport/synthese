@@ -26,6 +26,11 @@ namespace synthese
 {
 	using namespace util;
 
+	namespace util
+	{
+		template<> Registrable<uid,env::Axis>::Registry Registrable<uid,env::Axis>::_registry;
+	}
+
 	namespace env
 	{
 

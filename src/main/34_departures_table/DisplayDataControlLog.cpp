@@ -22,7 +22,6 @@
 
 #include "34_departures_table/DisplayDataControlLog.h"
 #include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DeparturesTableModule.h"
 
 #include "12_security/User.h"
 
@@ -80,7 +79,7 @@ namespace synthese
 			// Screen
 			try
 			{
-				shared_ptr<const DisplayScreen> screen = DeparturesTableModule::getDisplayScreens().get(id);
+				shared_ptr<const DisplayScreen> screen = DisplayScreen::Get(id);
 				return screen->getFullName();
 			}
 			catch (...)

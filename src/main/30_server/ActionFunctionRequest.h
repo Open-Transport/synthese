@@ -65,7 +65,7 @@ namespace synthese
 		ActionFunctionRequest<A, F>::ActionFunctionRequest(const Request* request)
 			: FunctionRequest<F>(request)
 		{
-			_setAction(util::Factory<Action>::create<A>());
+			_setAction(util::Factory<Action>::createSharedPtr<A>());
 		}
 	}
 }

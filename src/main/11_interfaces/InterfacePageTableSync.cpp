@@ -19,15 +19,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "InterfacePageTableSync.h"
+
+#include "11_interfaces/InterfacePage.h"
+#include "11_interfaces/Interface.h"
+
 #include "01_util/Conversion.h"
 #include "01_util/Log.h"
+#include "01_util/Factory.h"
 
 #include "02_db/Constants.h"
 #include "02_db/SQLiteResult.h"
-
-#include "11_interfaces/InterfaceModule.h"
-#include "11_interfaces/InterfacePage.h"
-#include "11_interfaces/InterfacePageTableSync.h"
 
 using namespace boost;
 
@@ -35,17 +37,39 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
+	using namespace interfaces;
+
+	namespace db
+	{
+		template<> const std::string SQLiteTableSyncTemplate<InterfacePage>::TABLE_NAME = "t023_interface_pages";
+		template<> const int SQLiteTableSyncTemplate<InterfacePage>::TABLE_ID = 23;
+		template<> const bool SQLiteTableSyncTemplate<InterfacePage>::HAS_AUTO_INCREMENT = true;
+
+
+
+		template<> void SQLiteTableSyncTemplate<InterfacePage>::load(InterfacePage* page, const db::SQLiteResultSPtr& rows )
+		{
+			page->setKey(rows->getLongLong (TABLE_COL_ID));
+			page->setCode(rows->getText (InterfacePageTableSync::TABLE_COL_PAGE));
+			page->parse(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
+		}
+
+
+
+		template<> void SQLiteTableSyncTemplate<InterfacePage>::save(InterfacePage* object)
+		{
+
+		}
+	}
 
 	namespace interfaces
 	{
-		const std::string InterfacePageTableSync::TABLE_NAME = "t023_interface_pages";
-		const std::string InterfacePageTableSync::TABLE_COL_ID = "id";
 		const std::string InterfacePageTableSync::TABLE_COL_INTERFACE = "interface_id";
 		const std::string InterfacePageTableSync::TABLE_COL_PAGE = "page_code";
 		const std::string InterfacePageTableSync::TABLE_COL_CONTENT = "content";
 
 		InterfacePageTableSync::InterfacePageTableSync()
-			: SQLiteTableSync ( TABLE_NAME, true, true, TRIGGERS_ENABLED_CLAUSE)
+			: SQLiteTableSyncTemplate<InterfacePage> (true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
 			addTableColumn(TABLE_COL_INTERFACE, "INTEGER", false);
@@ -58,8 +82,8 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-			    shared_ptr<InterfacePage> page = InterfaceModule::getInterfacePages().getUpdateable (rows->getLongLong (TABLE_COL_ID));
-			    page->parse (rows->getText(TABLE_COL_CONTENT) );
+			    shared_ptr<InterfacePage> page = InterfacePage::GetUpdateable (rows->getLongLong (TABLE_COL_ID));
+				load(page.get(), rows);
 			}
 		}
 
@@ -71,23 +95,20 @@ namespace synthese
 			    // Search the specified interface
 			    try
 			    {
-				
-				shared_ptr<InterfacePage> page;
-				if (Factory<InterfacePage>::contains(rows->getText (TABLE_COL_PAGE)))
-				    page = Factory<InterfacePage>::create( rows->getText (TABLE_COL_PAGE) );
-				else
-				    page.reset(new InterfacePage);
-				page->setKey(rows->getLongLong ( TABLE_COL_ID));
-				page->setCode(rows->getText (TABLE_COL_PAGE));
+					InterfacePage* page(
+						Factory<InterfacePage>::contains(rows->getText(TABLE_COL_PAGE))
+						? Factory<InterfacePage>::create(rows->getText(TABLE_COL_PAGE))
+						: new InterfacePage
+					);
 
-				InterfaceModule::getInterfacePages().add(page);
+					load(page, rows);
+					page->store();
 				
-				page->parse( rows->getText ( TABLE_COL_CONTENT) );	// Needs the page to be already registered
-				
-				shared_ptr<Interface> interf = InterfaceModule::getInterfaces().getUpdateable(
-				    rows->getLongLong ( TABLE_COL_INTERFACE ));
-				
-				interf->addPage(rows->getText ( TABLE_COL_PAGE), page );
+					shared_ptr<Interface> interf = Interface::GetUpdateable(
+						rows->getLongLong ( TABLE_COL_INTERFACE )
+					);
+					
+					interf->addPage(rows->getText ( TABLE_COL_PAGE), page );
 				}
 				catch (Interface::RegistryKeyException& e)
 				{
@@ -101,8 +122,10 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				InterfaceModule::getInterfaces().getUpdateable (rows->getLongLong ( TABLE_COL_INTERFACE))
+				/// @todo to be reimplemented
+				Interface::GetUpdateable (rows->getLongLong ( TABLE_COL_INTERFACE))
 				    ->removePage( rows->getText ( TABLE_COL_PAGE) );
+				InterfacePage::Remove(rows->getLongLong(TABLE_COL_ID));
 			}
 		}
 	}

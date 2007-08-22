@@ -24,7 +24,6 @@
 #include "17_messages/SentScenario.h"
 #include "17_messages/ScenarioTemplate.h"
 #include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesModule.h"
 
 #include <sstream>
 
@@ -151,18 +150,17 @@ namespace synthese
 			    if (rows->getBool (COL_IS_TEMPLATE))
 				continue;
 				
-				shared_ptr<SentScenario> scenario;
-				    uid id = rows->getLongLong (TABLE_COL_ID);
-				if (MessagesModule::getScenarii().contains (id))
+				uid id = rows->getLongLong (TABLE_COL_ID);
+				if (SentScenario::Contains (id))
 				{
-					scenario = MessagesModule::getScenarii().getUpdateable(id);
+					shared_ptr<SentScenario> scenario(SentScenario::GetUpdateable(id));
 					load(scenario.get(), rows);
 				}
 				else
 				{
-					scenario.reset(new SentScenario);
-					load(scenario.get(), rows);
-					MessagesModule::getScenarii().add (scenario);
+					SentScenario* scenario(new SentScenario);
+					load(scenario, rows);
+					scenario->store();
 				}
 			}
 		}
@@ -175,7 +173,7 @@ namespace synthese
 					continue;
 
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				shared_ptr<SentScenario> alarm = MessagesModule::getScenarii().getUpdateable(id);
+				shared_ptr<SentScenario> alarm = SentScenario::GetUpdateable(id);
 				load(alarm.get(), rows);
 			}
 		}
@@ -188,7 +186,7 @@ namespace synthese
 					continue;
 
 			    uid id = rows->getLongLong (TABLE_COL_ID);
-			    MessagesModule::getScenarii().remove (id);	/// @todo Not so simple.
+			    SentScenario::Remove (id);	/// @todo Not so simple.
 			}
 		}
 

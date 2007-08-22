@@ -26,6 +26,12 @@
 
 namespace synthese
 {
+
+	namespace util
+	{
+		template<> typename Registrable<uid,env::RoadChunk>::Registry Registrable<uid,env::RoadChunk>::_registry;
+	}
+
 	namespace env
 	{
 		RoadChunk::RoadChunk (

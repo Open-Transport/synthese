@@ -22,7 +22,6 @@
 
 #include "01_util/Conversion.h"
 
-#include "12_security/SecurityModule.h"
 #include "12_security/Profile.h"
 #include "12_security/User.h"
 #include "12_security/UserTableSync.h"
@@ -77,9 +76,9 @@ namespace synthese
 			it = map.find(PARAMETER_PROFILE_ID);
 			if (it == map.end())
 				throw ActionException("Profile not specified");
-			if (!SecurityModule::getProfiles().contains(Conversion::ToLongLong(it->second)))
+			if (!Profile::Contains(Conversion::ToLongLong(it->second)))
 				throw ActionException("Profil inexistant");
-			_profile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
+			_profile = Profile::Get(Conversion::ToLongLong(it->second));
 
 			_request->setObjectId(Request::UID_WILL_BE_GENERATED_BY_THE_ACTION);
 		}

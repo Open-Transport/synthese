@@ -28,30 +28,10 @@
 #include <utility>
 
 #include "01_util/ModuleClass.h"
+#include "01_util/UId.h"
 
 #include "07_lex_matcher/LexicalMatcher.h"
 
-#include "15_env/Address.h"
-#include "15_env/Path.h"
-#include "15_env/PlaceAlias.h"
-#include "15_env/PublicPlace.h"
-#include "15_env/City.h"
-#include "15_env/PhysicalStop.h"
-#include "15_env/PublicTransportStopZoneConnectionPlace.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/Line.h"
-#include "15_env/LineStop.h"
-#include "15_env/Axis.h"
-#include "15_env/Fare.h"
-#include "15_env/BikeCompliance.h"
-#include "15_env/HandicappedCompliance.h"
-#include "15_env/PedestrianCompliance.h"
-#include "15_env/ScheduledService.h"
-#include "15_env/ContinuousService.h"
-#include "15_env/ReservationRule.h"
-#include "15_env/TransportNetwork.h"
-#include "15_env/RoadChunk.h"
-#include "15_env/Road.h"
 #include "15_env/Types.h"
 
 #include "12_security/Types.h"
@@ -255,6 +235,12 @@ namespace synthese
 	namespace env
 	{
 		class Path;
+		class AddressablePlace;
+		class IncludingPlace;
+		class Place;
+		class Vertex;
+		class NonPermanentService;
+		
 
 		/** 15 Transport network module class.
 		*/
@@ -262,55 +248,11 @@ namespace synthese
 		{
 		private:
 
-			static Address::Registry						_addresses;
-			static City::Registry							_cities;
-			static PublicTransportStopZoneConnectionPlace::Registry	_publicTransportStopZones;
-			static PlaceAlias::Registry				_placeAliases;
-			static PublicPlace::Registry			_publicPlaces;
-			static PhysicalStop::Registry			_physicalStops;
-			static CommercialLine::Registry			_commercialLines;
-			static Line::Registry					_lines;
-			static Axis::Registry					_axes;
-			static Fare::Registry					_fares;
-			static BikeCompliance::Registry			_bikeCompliances;
-			static HandicappedCompliance::Registry	_handicappedCompliances;
-			static PedestrianCompliance::Registry	_pedestrianCompliances;
-			static ReservationRule::Registry		_reservationRules;
-			static LineStop::Registry				_lineStops;
-			static ScheduledService::Registry		_scheduledServices;
-			static ContinuousService::Registry		_continuousServices;
-			static TransportNetwork::Registry		_networks;
-			static RoadChunk::Registry				_roadChunks;
-			static Road::Registry					_roads;
-
 			static lexmatcher::LexicalMatcher<uid> _citiesMatcher; //!< @todo To be moved in RoutePlanner
 
 		public:
 		
 			void initialize();
-			
-			
-
-			static Address::Registry&				getAddresses();
-			static City::Registry&					getCities();
-			static PhysicalStop::Registry&			getPhysicalStops();
-			static PublicTransportStopZoneConnectionPlace::Registry&	getPublicTransportStopZones();
-			static CommercialLine::Registry&		getCommercialLines();
-			static Line::Registry&					getLines();
-			static Axis::Registry&					getAxes();
-			static Fare::Registry&					getFares();
-			static BikeCompliance::Registry&		getBikeCompliances();
-			static HandicappedCompliance::Registry&	getHandicappedCompliances();
-			static PedestrianCompliance::Registry&	getPedestrianCompliances();
-			static ReservationRule::Registry&		getReservationRules();
-			static LineStop::Registry&				getLineStops();
-			static ScheduledService::Registry&		getScheduledServices();
-			static ContinuousService::Registry&		getContinuousServices();
-			static TransportNetwork::Registry&		getTransportNetworks();
-			static PlaceAlias::Registry&			getPlaceAliases();
-			static PublicPlace::Registry&			getPublicPlaces();
-			static RoadChunk::Registry&				getRoadChunks();
-			static Road::Registry&					getRoads();
 			
 			
 

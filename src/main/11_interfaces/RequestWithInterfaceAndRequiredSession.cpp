@@ -46,7 +46,7 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<const InterfacePage> page = _interface->getPage(_interface->getNoSessionDefaultPageCode());
+					const InterfacePage* page = _interface->getPage(_interface->getNoSessionDefaultPageCode());
 					ParametersVector pv;
 					VariablesMap vm;
 					page->display(stream, pv, vm, NULL, _request);

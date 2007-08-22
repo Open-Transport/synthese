@@ -26,8 +26,6 @@
 
 #include "05_html/ResultHTMLTable.h"
 
-#include "11_interfaces/InterfaceModule.h"
-
 #include "12_security/Constants.h"
 
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
@@ -47,6 +45,8 @@
 #include "34_departures_table/DisplaySearchAdmin.h"
 #include "34_departures_table/DisplayScreenTableSync.h"
 #include "34_departures_table/ArrivalDepartureTableRight.h"
+#include "34_departures_table/DisplayType.h"
+#include "34_departures_table/DisplayScreen.h"
 
 #include "12_security/User.h"
 #include "12_security/Profile.h"
@@ -228,8 +228,8 @@ namespace synthese
 
 			shared_ptr<const Line> line;
 			it = parameters.find(PARAMETER_SEARCH_LINE);
-			if (it != parameters.end() && EnvModule::getLines().contains(Conversion::ToLongLong(it->second)))
-				line  = EnvModule::getLines().get(Conversion::ToLongLong(it->second));
+			if (it != parameters.end() && Line::Contains(Conversion::ToLongLong(it->second)))
+				line  = Line::Get(Conversion::ToLongLong(it->second));
 
 			AlarmRecipientSearchFieldsMap map;
 			AlarmRecipientFilter arf;
@@ -244,12 +244,12 @@ namespace synthese
 
 		void DisplayScreenAlarmRecipient::addObject(const SentAlarm* alarm, uid objectId )
 		{
-			add(DeparturesTableModule::getDisplayScreens().get(objectId).get(), alarm);
+			add(DisplayScreen::Get(objectId).get(), alarm);
 		}
 
 		void DisplayScreenAlarmRecipient::removeObject(const SentAlarm* alarm, uid objectId )
 		{
-			remove(DeparturesTableModule::getDisplayScreens().get(objectId).get(), alarm);
+			remove(DisplayScreen::Get(objectId).get(), alarm);
 		}
 	}
 }

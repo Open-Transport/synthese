@@ -20,7 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/EnvModule.h"
 #include "15_env/PublicTransportStopZoneConnectionPlace.h"
 
 #include "30_server/ActionException.h"
@@ -64,7 +63,7 @@ namespace synthese
 				if (it == map.end())
 					throw ActionException("Place not specified");
 
-				_place = EnvModule::getPublicTransportStopZones().get(Conversion::ToLongLong(it->second));
+				_place = PublicTransportStopZoneConnectionPlace::Get(Conversion::ToLongLong(it->second));
 			}
 			catch (DBEmptyResultException<DisplayScreen>&)
 			{

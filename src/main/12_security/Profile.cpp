@@ -33,6 +33,11 @@ namespace synthese
 {
 	using namespace util;
 
+	namespace util
+	{
+		template<> Registrable<uid,security::Profile>::Registry Registrable<uid,security::Profile>::_registry;
+	}
+
 	namespace security
 	{
 

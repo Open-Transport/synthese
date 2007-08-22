@@ -52,7 +52,7 @@ namespace synthese
 			uid cityId (rows->getLongLong (CrossingTableSync::TABLE_COL_CITYID));
 			
 			crossing->setKey(id);
-			crossing->setCity(EnvModule::getCities().get(cityId).get());
+			crossing->setCity(City::Get(cityId).get());
 		}
 	}
 
@@ -87,16 +87,16 @@ namespace synthese
 			{
 			    uid id (rows->getLongLong (TABLE_COL_ID));
 			    
-				if (Crossing::getElements().contains (id)) return;
+				if (Crossing::Contains (id)) return;
 			    
 			    uid cityId (rows->getLongLong (TABLE_COL_CITYID));
 
-			    shared_ptr<const City> city = EnvModule::getCities ().get (cityId);
+			    shared_ptr<const City> city = City::Get (cityId);
 			    
-			    shared_ptr<Crossing> crossing(new Crossing (id, city.get()));
+			    Crossing* crossing(new Crossing (id, city.get()));
 
 			    // Add crossing to connection place registry but not in city lexical matcher...
-			    Crossing::getElements().add (crossing);
+			    crossing->store();
 			}
 		}
 
@@ -109,7 +109,7 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<Crossing> crossing = Crossing::getElements().getUpdateable(
+				shared_ptr<Crossing> crossing = Crossing::GetUpdateable(
 				    rows->getLongLong (TABLE_COL_ID)
 				);
 				
@@ -129,7 +129,7 @@ namespace synthese
 			{
 			    uid id = rows->getLongLong (TABLE_COL_ID);
 			    
-			    Crossing::getElements().remove (id);
+			    Crossing::Remove (id);
 			}
 		}
 	    

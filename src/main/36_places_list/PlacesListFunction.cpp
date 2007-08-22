@@ -29,8 +29,9 @@
 
 #include "30_server/RequestException.h"
 
-#include "15_env/EnvModule.h"
 #include "15_env/City.h"
+#include "15_env/EnvModule.h"
+#include "15_env/ConnectionPlace.h"
 
 #include "11_interfaces/Interface.h"
 

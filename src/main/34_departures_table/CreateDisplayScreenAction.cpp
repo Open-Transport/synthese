@@ -60,9 +60,9 @@ namespace synthese
 			it = map.find(PARAMETER_TEMPLATE_ID);
 			if (it != map.end() && Conversion::ToLongLong(it->second))
 			{
-				if (!DeparturesTableModule::getDisplayScreens().contains(Conversion::ToLongLong(it->second)))
+				if (!DisplayScreen::Contains(Conversion::ToLongLong(it->second)))
 					throw ActionException("Specified template not found");
-				_template = DeparturesTableModule::getDisplayScreens().get(Conversion::ToLongLong(it->second));
+				_template = DisplayScreen::Get(Conversion::ToLongLong(it->second));
 			}
 
 			it = map.find(PARAMETER_LOCALIZATION_ID);

@@ -1,5 +1,4 @@
 
-
 /** Fare class implementation.
 	@file Fare.cpp
 
@@ -28,6 +27,12 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+
+	namespace util
+	{
+		template<> typename Registrable<uid,env::Fare>::Registry Registrable<uid,env::Fare>::_registry;
+		template<> boost::shared_ptr<const env::Fare> RegistrableWithNeutralElement<uid,env::Fare>::_neutral(new env::Fare);
+	}
 	
 	namespace env
 	{

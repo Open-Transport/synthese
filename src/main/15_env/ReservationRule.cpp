@@ -30,11 +30,15 @@ namespace synthese
 {
 	using namespace util;
 	using namespace time;
-	
+
+	namespace util
+	{
+		template<> typename Registrable<uid,env::ReservationRule>::Registry Registrable<uid,env::ReservationRule>::_registry;
+		template<> boost::shared_ptr<const env::ReservationRule> RegistrableWithNeutralElement<uid,env::ReservationRule>::_neutral(new env::ReservationRule);
+	}
+
 	namespace env
 	{
-
-
 		ReservationRule::ReservationRule()
 		: RegistrableWithNeutralElement<uid,ReservationRule> ()
 		, Compliance(false, UNKNOWN_VALUE)

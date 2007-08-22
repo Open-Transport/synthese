@@ -33,6 +33,12 @@ namespace synthese
 	using namespace util;
 	using namespace time;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,security::User>::Registry Registrable<uid,security::User>::_registry;
+	}
+
+
 	namespace security
 	{
 		User::User(uid id)

@@ -106,7 +106,7 @@ namespace synthese
 			
 			ActionFunctionRequest<AddScenarioAction,AdminRequest> addScenarioRequest(request);
 			addScenarioRequest.getFunction()->setPage<MessagesScenarioAdmin>();
-			addScenarioRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<MessagesLibraryAdmin>());
+			addScenarioRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::createSharedPtr<MessagesLibraryAdmin>());
 
 			stream << "<h1>Modèles de textes destinés aux messages complémentaires</h1>";
 

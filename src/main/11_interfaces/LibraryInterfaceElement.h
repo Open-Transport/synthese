@@ -54,15 +54,15 @@ namespace synthese
 			, public util::Registrable<int, LibraryInterfaceElement>
 		{
 		protected:
-			boost::shared_ptr<const InterfacePage>	_page;
-			std::string _label;
+			const InterfacePage*	_page;
+			std::string				_label;
 
 			virtual void storeParameters(ValueElementList& vel) = 0;
 
 			friend class ValueElementList;
 
 		public:
-			void setPage(boost::shared_ptr<const InterfacePage> page);
+			void setPage(const InterfacePage* page);
 
 			virtual std::string getLabel() const { return std::string(); }
 			
@@ -76,7 +76,10 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007
 			*/
-			static boost::shared_ptr<interfaces::LibraryInterfaceElement> create( const std::string & text, boost::shared_ptr<const InterfacePage> page );
+			static boost::shared_ptr<interfaces::LibraryInterfaceElement> create(
+				const std::string & text
+				, const InterfacePage* page
+			);
 
 			template<class T>
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> copy( const ParametersVector& parameters )

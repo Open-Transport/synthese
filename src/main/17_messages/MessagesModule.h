@@ -24,11 +24,12 @@
 #define SYNTHESE_MessagesModule_H__
 
 #include "01_util/ModuleClass.h"
+#include "01_util/UId.h"
 
 #include "17_messages/Types.h"
-#include "17_messages/SentAlarm.h"
-#include "17_messages/SentScenario.h"
-#include "17_messages/AlarmObjectLink.h"
+
+#include <vector>
+#include <string>
 
 namespace synthese
 {
@@ -47,16 +48,7 @@ namespace synthese
 		*/
 		class MessagesModule : public util::ModuleClass
 		{
-		private:
-			static SentAlarm::Registry			_alarms;
-			static SentScenario::Registry		_scenarii;
-			static AlarmObjectLink::Registry	_alarmLinks;
-
 		public:
-			static SentAlarm::Registry&			getAlarms();
-			static SentScenario::Registry&		getScenarii();
-			static AlarmObjectLink::Registry&	getAlarmLinks();
-			
 			void initialize();
 
 			static std::vector<std::pair<uid, std::string> >			getScenarioTemplatesLabels(bool withAll = false);

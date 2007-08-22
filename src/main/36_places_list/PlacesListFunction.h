@@ -58,7 +58,7 @@ namespace synthese
 				std::string							_cityText;
 				int									_n;
 				bool								_isForOrigin;
-				boost::shared_ptr<const PlacesListInterfacePage>	_page;
+				const PlacesListInterfacePage*		_page;
 			//@}
 			
 			

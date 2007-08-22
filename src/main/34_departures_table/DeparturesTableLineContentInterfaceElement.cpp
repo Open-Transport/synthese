@@ -68,7 +68,7 @@ namespace synthese
 			, const server::Request* request /*= NULL*/ ) const
 		{
 			const Line* line(static_cast<const LineStop*>(static_cast<const ArrivalDepartureRow*>(object)->first.servicePointer.getEdge())->getLine());
-			shared_ptr<const LineMarkerInterfacePage> page(_page->getInterface()->getPage<LineMarkerInterfacePage>());
+			const LineMarkerInterfacePage* page(_page->getInterface()->getPage<LineMarkerInterfacePage>());
 
 			page->display(
 				stream

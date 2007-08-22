@@ -53,8 +53,8 @@ namespace synthese
 				- 2 : First arrival time
 				- 3 : Last arrival time (will be empty if not continuous service)
 				- 4 : rollingStockId (4) ID of used rolling stock
-				- 5 : rollingStockName (5) Display name of used rolling stock
-				- 6 : rollingStockFullDescription (6) HTML description of used Rolling stock
+				- 5 : rollingStockName ((5) Display name of used rolling stock
+				- 6 : Rolling stock article
 				- 7 : destinationName (7) Destination name of the vehicle
 				- 8 : handicappedFilterStatus (8)
 				- 9 : handicappedPlacesNumber (9)

@@ -79,16 +79,7 @@ namespace synthese
 				  const City* city = NULL);
 			      
 			~Crossing ();
-
-		private:
-			static Crossing::Registry				_elements;
-
-		public:
-			static Crossing::Registry&				getElements();
-
 		};
-
-
 	}
 }
 

@@ -25,8 +25,8 @@
 
 #include "17_messages/ScenarioStopAction.h"
 #include "17_messages/ScenarioTableSync.h"
+#include "17_messages/SentScenario.h"
 #include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesModule.h"
 #include "17_messages/MessagesLog.h"
 
 using namespace std;

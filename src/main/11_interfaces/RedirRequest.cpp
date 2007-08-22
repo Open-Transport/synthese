@@ -63,7 +63,7 @@ namespace synthese
 		{
 			try
 			{
-				shared_ptr<const RedirectInterfacePage> page = _interface->getPage<RedirectInterfacePage>();
+				const RedirectInterfacePage* page = _interface->getPage<RedirectInterfacePage>();
 				VariablesMap vm;
 				page->display(stream, vm, _url, _request);
 			}

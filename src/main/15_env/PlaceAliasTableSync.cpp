@@ -24,6 +24,7 @@
 
 #include "PlaceAliasTableSync.h"
 #include "PlaceAlias.h"
+#include "15_env/City.h"
 #include "15_env/EnvModule.h"
 
 #include "02_db/DBModule.h"
@@ -63,7 +64,7 @@ namespace synthese
 
 			object->setKey (rows->getLongLong (TABLE_COL_ID));
 			object->setName (rows->getText (PlaceAliasTableSync::COL_NAME));
-			object->setCity(EnvModule::getCities ().get (cityId).get());
+			object->setCity(City::Get (cityId).get());
 			object->setAliasedPlace(EnvModule::fetchPlace (aliasedPlaceId).get());
 
 		}
@@ -107,28 +108,28 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getPlaceAliases().contains(id))
+				if (PlaceAlias::Contains(id))
 				{
-					load(EnvModule::getPlaceAliases().getUpdateable(id).get(), rows);
+					load(PlaceAlias::GetUpdateable(id).get(), rows);
 				}
 				else
 				{
-					shared_ptr<PlaceAlias> object(new PlaceAlias);
-					load(object.get(), rows);
-					EnvModule::getPlaceAliases().add(object);
+					PlaceAlias* object(new PlaceAlias);
+					load(object, rows);
+					object->store();
 
 					uid cityId (rows->getLongLong (COL_CITYID));
 					
-					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (cityId);
+					shared_ptr<City> city = City::GetUpdateable (cityId);
 
 					bool isCityMainConnection (rows->getBool ( COL_ISCITYMAINCONNECTION));
 
 					if (isCityMainConnection)
 					{
-						city->addIncludedPlace (object.get());
+						city->addIncludedPlace (object);
 					}
 
-					city->getPlaceAliasesMatcher ().add (object->getName (), object.get() );
+					city->getPlaceAliasesMatcher ().add (object->getName (), object);
 				}
 			}
 		}
@@ -138,12 +139,12 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getPlaceAliases().contains(id))
+				if (PlaceAlias::Contains(id))
 				{
-					shared_ptr<PlaceAlias> object = EnvModule::getPlaceAliases().getUpdateable(id);
+					shared_ptr<PlaceAlias> object = PlaceAlias::GetUpdateable(id);
 					load(object.get(), rows);
 
-					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (object->getCity ()->getKey ());
+					shared_ptr<City> city = City::GetUpdateable (object->getCity ()->getKey ());
 					city->getPlaceAliasesMatcher ().add (object->getName (), object.get());
 					/// @todo Where is the removal of the old name ??
 				}
@@ -155,13 +156,13 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getPlaceAliases().contains(id))
+				if (PlaceAlias::Contains(id))
 				{
-					shared_ptr<const PlaceAlias> pa = EnvModule::getPlaceAliases ().get(id);
-					shared_ptr<City> city = EnvModule::getCities ().getUpdateable (pa->getCity ()->getKey ());
+					shared_ptr<const PlaceAlias> pa = PlaceAlias::Get(id);
+					shared_ptr<City> city = City::GetUpdateable (pa->getCity ()->getKey ());
 					city->getPlaceAliasesMatcher ().remove (pa->getName ());
 
-					EnvModule::getPlaceAliases().remove(id);
+					PlaceAlias::Remove(id);
 				}
 			}
 		}

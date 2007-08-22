@@ -82,11 +82,11 @@ namespace synthese
 		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
 			ActionFunctionRequest<UserUpdateAction, AdminRequest> updateRequest(request);
-			updateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
+			updateRequest.getFunction()->setPage<UserAdmin>();
 			updateRequest.setObjectId(request->getObjectId());
 
 			ActionFunctionRequest<UserPasswordUpdateAction, AdminRequest> userPasswordUpdateRequest(request);
-			userPasswordUpdateRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
+			userPasswordUpdateRequest.getFunction()->setPage<UserAdmin>();
 			userPasswordUpdateRequest.setObjectId(request->getObjectId());
 
 			{

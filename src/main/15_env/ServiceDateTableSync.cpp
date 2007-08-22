@@ -33,6 +33,8 @@
 
 #include "15_env/ServiceDate.h"
 #include "15_env/ServiceDateTableSync.h"
+#include "15_env/NonPermanentService.h"
+#include "15_env/Path.h"
 #include "15_env/EnvModule.h"
 
 using namespace std;

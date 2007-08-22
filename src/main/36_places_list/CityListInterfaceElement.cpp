@@ -50,7 +50,7 @@ namespace synthese
 			, const server::Request* request
 		) const	{
 			const PlacesList& tbCommunes = *static_cast<const PlacesList*>(object);
-			boost::shared_ptr<const PlacesListItemInterfacePage> page(_page->getInterface()->getPage<PlacesListItemInterfacePage>());
+			const PlacesListItemInterfacePage* page(_page->getInterface()->getPage<PlacesListItemInterfacePage>());
 			
 			int i(0);
 			for (PlacesList::const_iterator it(tbCommunes.begin()); it != tbCommunes.end(); ++it, ++i)

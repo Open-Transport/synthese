@@ -42,7 +42,7 @@ namespace synthese
 			, const void* object
 			, const server::Request* request) const
 		{
-			shared_ptr<const InterfacePage> page_to_include = _page->getInterface()->getPage(_page_code->getValue(parameters, variables, object, request));
+			const InterfacePage* page_to_include = _page->getInterface()->getPage(_page_code->getValue(parameters, variables, object, request));
 			page_to_include->display(stream, _parameters.fillParameters( parameters, variables, object, request ), variables, object, request);
 			return string();
 		}

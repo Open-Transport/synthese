@@ -102,9 +102,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<Axis> object(new Axis());
-				load(object.get(), rows);
-				EnvModule::getAxes().add(object);
+				Axis* object(new Axis());
+				load(object, rows);
+				object->store();
 			}
 		}
 
@@ -113,10 +113,11 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid lineId = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getAxes().contains(lineId))
+				if (Axis::Contains(lineId))
 				{
-					shared_ptr<Axis> object = EnvModule::getAxes().getUpdateable(lineId);
+					shared_ptr<Axis> object = Axis::GetUpdateable(lineId);
 					load(object.get(), rows);
+					object->store();
 				}
 			}
 		}
@@ -126,9 +127,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid lineId = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getAxes().contains(lineId))
+				if (Axis::Contains(lineId))
 				{
-					EnvModule::getAxes().remove(lineId);
+					Axis::Remove(lineId);
 				}
 			}
 		}

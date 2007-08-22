@@ -98,8 +98,8 @@ namespace synthese
 
 			// Searched profile
 			it = map.find(PARAM_SEARCH_PROFILE_ID);
-			if (it != map.end() && SecurityModule::getProfiles().contains(Conversion::ToLongLong(it->second)))
-				_searchProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
+			if (it != map.end() && Profile::Contains(Conversion::ToLongLong(it->second)))
+				_searchProfile = Profile::Get(Conversion::ToLongLong(it->second));
 
 			// Table Parameters
 			_requestParameters = ActionResultHTMLTable::getParameters(map, PARAM_SEARCH_LOGIN, 30);
@@ -135,21 +135,21 @@ namespace synthese
 		{
 			// Request for search form
 			FunctionRequest<AdminRequest> searchRequest(request);
-			searchRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
+			searchRequest.getFunction()->setPage<UsersAdmin>();
 			SearchFormHTMLTable searchTable(searchRequest.getHTMLForm("search"));
 			
 			// Request for add user action form
 			ActionFunctionRequest<AddUserAction, AdminRequest> addUserRequest(request);
-			addUserRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
-			addUserRequest.getFunction()->setActionFailedPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
+			addUserRequest.getFunction()->setPage<UserAdmin>();
+			addUserRequest.getFunction()->setActionFailedPage<UsersAdmin>();
 			
 			// Request for delete action form
 			ActionFunctionRequest<DelUserAction, AdminRequest> deleteUserRequest(request);
-			deleteUserRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UsersAdmin>());
+			deleteUserRequest.getFunction()->setPage<UsersAdmin>();
 			
 			// Request for user link
 			FunctionRequest<AdminRequest> userRequest(request);
-			userRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::create<UserAdmin>());
+			userRequest.getFunction()->setPage<UserAdmin>();
 
 			// Search form
 			stream << "<h1>Recherche d'utilisateur</h1>";

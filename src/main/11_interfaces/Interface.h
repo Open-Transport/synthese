@@ -28,8 +28,6 @@
 #include <iostream>
 #include <map>
 
-#include <boost/shared_ptr.hpp>
-
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 #include "01_util/Factory.h"
@@ -55,7 +53,7 @@ namespace synthese
 		class Interface : public util::Registrable<uid, Interface>
 		{
 			private:
-				typedef std::map<std::string, boost::shared_ptr<InterfacePage> > PagesMap;
+				typedef std::map<std::string, InterfacePage*> PagesMap;
 
 				std::string	_name;
 				PagesMap	_pages;
@@ -70,16 +68,16 @@ namespace synthese
 						@return A pointer to the existing wanted page in the interface definition. The pointer does not know the real type of the page.
 						@exception InterfacePageException The code is not available in the factory
 					*/
-					boost::shared_ptr<const InterfacePage> getPage( const std::string& key) const;
+					const InterfacePage* getPage( const std::string& key) const;
 
 					/** Gets a stored page from its class (template).
 						@return The required page, directly known as its type.
 					*/
 					template <class T>
-					boost::shared_ptr<const T> const getPage() const
+					const T* const getPage() const
 					{
-						std::string key = synthese::util::Factory<InterfacePage>::getKey<T>();
-						return boost::dynamic_pointer_cast<const T, const InterfacePage>(getPage(key));
+						std::string key(util::Factory<InterfacePage>::getKey<T>());
+						return static_cast<const T*>(getPage(key));
 					}
 
 					const std::string& getNoSessionDefaultPageCode() const;
@@ -88,7 +86,7 @@ namespace synthese
 
 				//! \name Modifiers
 				//@{
-					void	addPage(const std::string& key, boost::shared_ptr<InterfacePage> page );
+					void	addPage(const std::string& key, InterfacePage* page );
 					void	removePage( const std::string& page_code );
 					void	setNoSessionDefaultPageCode(const std::string&);
 					void	setName(const std::string& name);

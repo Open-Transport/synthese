@@ -31,7 +31,6 @@
 
 #include "Fare.h"
 #include "FareTableSync.h"
-#include "15_env/EnvModule.h"
 
 using namespace std;
 using namespace boost;
@@ -97,9 +96,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<Fare> object(new Fare());
-				load(object.get(), rows);
-				EnvModule::getFares().add(object);
+				Fare* object(new Fare());
+				load(object, rows);
+				object->store();
 			}
 		}
 
@@ -108,9 +107,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getFares().contains(id))
+				if (Fare::Contains(id))
 				{
-					shared_ptr<Fare> object = EnvModule::getFares().getUpdateable(id);
+					shared_ptr<Fare> object = Fare::GetUpdateable(id);
 					load(object.get(), rows);
 				}
 			}
@@ -121,9 +120,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getFares().contains(id))
+				if (Fare::Contains(id))
 				{
-					EnvModule::getFares().remove(id);
+					Fare::Remove(id);
 				}
 			}
 		}

@@ -27,6 +27,8 @@
 
 #include "34_departures_table/DeparturesTableModule.h"
 #include "34_departures_table/AdvancedSelectTableSync.h"
+#include "34_departures_table/DisplayType.h"
+#include "34_departures_table/DisplayScreen.h"
 
 using namespace std;
 using namespace boost;
@@ -38,25 +40,12 @@ namespace synthese
 
 	namespace departurestable
 	{
-		DisplayType::Registry DeparturesTableModule::_displayTypes;
-		DisplayScreen::Registry	DeparturesTableModule::_displayScreens;
-
-		DisplayType::Registry& DeparturesTableModule::getDisplayTypes()
-		{
-			return _displayTypes;
-		}
-
-		DisplayScreen::Registry& DeparturesTableModule::getDisplayScreens()
-		{
-			return _displayScreens;
-		}
-
 		std::vector<pair<uid, std::string> > DeparturesTableModule::getDisplayTypeLabels( bool withAll /*= false*/ )
 		{
 			vector<pair<uid, string> > m;
 			if (withAll)
 				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
-			for(DisplayType::Registry::const_iterator it = _displayTypes.begin(); it != _displayTypes.end(); ++it)
+			for(DisplayType::ConstIterator it(DisplayType::Begin()); it != DisplayType::End(); ++it)
 				m.push_back(make_pair(it->first, it->second->getName()));
 			return m;
 		}

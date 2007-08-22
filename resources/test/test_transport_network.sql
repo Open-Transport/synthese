@@ -189,6 +189,7 @@ INSERT INTO t022_transport_networks VALUES(6192449487677437,'Network2');
 
 DELETE FROM t025_sites;
 INSERT INTO t025_sites(id,name,interface_id,start_date,end_date,online_booking,use_old_data,max_connections,use_dates_range,periods) VALUES(1,'test',2,'','',1,0,10,14,'2:30|2:30|Journée,2:30|11:00|Matin');
+INSERT INTO t025_sites(id,name,interface_id,start_date,end_date,online_booking,use_old_data,max_connections,use_dates_range,periods) VALUES(2,'test',4,'','',1,0,10,14,'2:30|2:30|Journée,2:30|11:00|Matin');
 
 REPLACE INTO t021_reservation_rules(id,reservation_type,online,origin_is_reference,min_delay_minutes,min_delay_days,max_delay_days,hour_deadline,phone_exchange_number,phone_exchange_opening_hours,description,web_site_url) 
 	VALUES(5910974511914805,-1,1,0,10,0,0,"23:59:00","0800 929 929 (gratuit depuis un poste fixe) ou 05 34 25 33 75","entre 6h30 et 22h30","Test","");

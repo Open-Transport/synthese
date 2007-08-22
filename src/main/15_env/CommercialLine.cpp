@@ -24,6 +24,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		template<> Registrable<uid,env::CommercialLine>::Registry Registrable<uid,env::CommercialLine>::_registry;
+	}
+
 	namespace env
 	{
 

@@ -20,10 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "15_env/CommercialLineTableSync.h"
+#include "CommercialLineTableSync.h"
+
 #include "15_env/CommercialLine.h"
 #include "15_env/TransportNetworkTableSync.h"
-#include "15_env/EnvModule.h"
+#include "15_env/TransportNetwork.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -58,7 +59,7 @@ namespace synthese
 		    object->setKey(rows->getLongLong (TABLE_COL_ID));
 
 		    boost::shared_ptr<const TransportNetwork> tn = 
-			EnvModule::getTransportNetworks ().get (rows->getLongLong ( CommercialLineTableSync::COL_NETWORK_ID));
+			TransportNetwork::Get (rows->getLongLong ( CommercialLineTableSync::COL_NETWORK_ID));
 		    
 		    object->setNetwork (tn.get ());
 		    object->setName(rows->getText ( CommercialLineTableSync::COL_NAME));
@@ -121,9 +122,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<CommercialLine> object(new CommercialLine());
-				load(object.get(), rows);
-				EnvModule::getCommercialLines().add(object);
+				CommercialLine* object(new CommercialLine());
+				load(object, rows);
+				object->store();
 			}
 		}
 
@@ -131,7 +132,7 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<CommercialLine> object=EnvModule::getCommercialLines().getUpdateable(rows->getLongLong (TABLE_COL_ID));
+				shared_ptr<CommercialLine> object= CommercialLine::GetUpdateable(rows->getLongLong (TABLE_COL_ID));
 				load(object.get(), rows);
 			}
 		}
@@ -140,7 +141,7 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				EnvModule::getCommercialLines().remove(rows->getLongLong (TABLE_COL_ID));
+				CommercialLine::Remove(rows->getLongLong (TABLE_COL_ID));
 			}
 		}
 

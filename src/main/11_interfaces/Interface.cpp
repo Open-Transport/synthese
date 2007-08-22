@@ -34,6 +34,12 @@ namespace synthese
 {
 	using namespace util;
 
+
+	namespace util
+	{
+		template<> typename Registrable<uid,interfaces::Interface>::Registry Registrable<uid,interfaces::Interface>::_registry;
+	}
+
 	namespace interfaces
 	{
 
@@ -43,7 +49,7 @@ namespace synthese
 		}
 
 
-		shared_ptr<const InterfacePage> Interface::getPage(const std::string& index) const
+		const InterfacePage* Interface::getPage(const std::string& index) const
 		{
 			PagesMap::const_iterator it = _pages.find(index);
 			if (it == _pages.end())
@@ -53,7 +59,7 @@ namespace synthese
 
 
 
-		void Interface::addPage(const string& code, shared_ptr<InterfacePage> page )
+		void Interface::addPage(const string& code, InterfacePage* page )
 		{
 			page->setInterface(getRegisteredSharedPointer());
 			_pages.insert(make_pair( code, page ));

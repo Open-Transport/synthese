@@ -24,6 +24,12 @@
 
 namespace synthese
 {
+
+	namespace util
+	{
+		template<> typename Registrable<uid,messages::AlarmObjectLink>::Registry Registrable<uid,messages::AlarmObjectLink>::_registry;
+	}
+
 	namespace messages
 	{
 

@@ -29,7 +29,6 @@
 
 #include "34_departures_table/DisplayScreenContentRequest.h"
 #include "34_departures_table/DisplayScreen.h"
-#include "34_departures_table/DeparturesTableModule.h"
 
 using namespace std;
 
@@ -68,7 +67,7 @@ namespace synthese
 						throw RequestException("Display screen not specified");
 					screenId = Conversion::ToLongLong(it->second);
 				}
-				_screen = DeparturesTableModule::getDisplayScreens().get(screenId);
+				_screen = DisplayScreen::Get(screenId);
 
 				// Date
 				it = map.find(PARAMETER_DATE);

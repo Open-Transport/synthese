@@ -31,7 +31,6 @@
 
 #include "15_env/BikeCompliance.h"
 #include "15_env/BikeComplianceTableSync.h"
-#include "15_env/EnvModule.h"
 
 using namespace std;
 using boost::logic::tribool;
@@ -113,9 +112,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<BikeCompliance> object(new BikeCompliance());
-				load(object.get(), rows);
-				EnvModule::getBikeCompliances().add(object);
+				BikeCompliance* object(new BikeCompliance());
+				load(object, rows);
+				object->store();
 			}
 		}
 
@@ -125,10 +124,11 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getBikeCompliances().contains(id))
+				if (BikeCompliance::Contains(id))
 				{
-					shared_ptr<BikeCompliance> object = EnvModule::getBikeCompliances().getUpdateable(id);
+					shared_ptr<BikeCompliance> object = BikeCompliance::GetUpdateable(id);
 					load(object.get(), rows);
+					object->store();
 				}
 			}
 		}
@@ -138,9 +138,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getBikeCompliances().contains(id))
+				if (BikeCompliance::Contains(id))
 				{
-					EnvModule::getBikeCompliances().remove(id);
+					BikeCompliance::Remove(id);
 				}
 			}
 		}

@@ -32,6 +32,11 @@ namespace synthese
 {
 	using namespace lexmatcher;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,env::City>::Registry Registrable<uid,env::City>::_registry;
+	}
+
 	namespace env
 	{
 

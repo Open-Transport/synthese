@@ -25,7 +25,6 @@
 #include "12_security/Profile.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/AddProfileAction.h"
-#include "12_security/SecurityModule.h"
 #include "12_security/GlobalRight.h"
 #include "12_security/SecurityLog.h"
 
@@ -70,9 +69,9 @@ namespace synthese
 			it = map.find(PARAMETER_TEMPLATE_ID);
 			if (it != map.end() && Conversion::ToLongLong(it->second) != UNKNOWN_VALUE)
 			{
-				if (!SecurityModule::getProfiles().contains(Conversion::ToLongLong(it->second)))
+				if (!Profile::Contains(Conversion::ToLongLong(it->second)))
 					throw ActionException("Specified root profile not found.");
-				_templateProfile = SecurityModule::getProfiles().get(Conversion::ToLongLong(it->second));
+				_templateProfile = Profile::Get(Conversion::ToLongLong(it->second));
 			}
 
 			// Name unicity

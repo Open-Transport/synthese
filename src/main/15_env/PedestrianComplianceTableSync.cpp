@@ -29,7 +29,6 @@
 #include "02_db/SQLiteQueueThreadExec.h"
 #include "02_db/SQLiteException.h"
 
-#include "15_env/EnvModule.h"
 #include "PedestrianCompliance.h"
 #include "PedestrianComplianceTableSync.h"
 
@@ -114,9 +113,9 @@ namespace synthese
 		{
 			while (rows->next ())
 			{
-				shared_ptr<PedestrianCompliance> object(new PedestrianCompliance());
-				load(object.get(), rows);
-				EnvModule::getPedestrianCompliances().add(object);
+				PedestrianCompliance* object(new PedestrianCompliance());
+				load(object, rows);
+				object->store();
 			}
 		}
 
@@ -125,9 +124,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getPedestrianCompliances().contains(id))
+				if (PedestrianCompliance::Contains(id))
 				{
-					shared_ptr<PedestrianCompliance> object = EnvModule::getPedestrianCompliances().getUpdateable(id);
+					shared_ptr<PedestrianCompliance> object = PedestrianCompliance::GetUpdateable(id);
 					load(object.get(), rows);
 				}
 			}
@@ -138,9 +137,9 @@ namespace synthese
 			while (rows->next ())
 			{
 				uid id = rows->getLongLong (TABLE_COL_ID);
-				if (EnvModule::getPedestrianCompliances().contains(id))
+				if (PedestrianCompliance::Contains(id))
 				{
-					EnvModule::getPedestrianCompliances().remove(id);
+					PedestrianCompliance::Remove(id);
 				}
 			}
 		}

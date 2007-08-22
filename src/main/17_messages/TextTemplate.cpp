@@ -25,6 +25,10 @@
 namespace synthese
 {
 	using namespace util;
+	namespace util
+	{
+		template<> typename Registrable<uid,messages::TextTemplate>::Registry Registrable<uid,messages::TextTemplate>::_registry;
+	}
 
 	namespace messages
 	{

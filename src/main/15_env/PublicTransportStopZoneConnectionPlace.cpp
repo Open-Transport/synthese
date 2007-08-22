@@ -35,6 +35,11 @@ namespace synthese
 {
 	using namespace util;
 
+	namespace util
+	{
+		template<> typename Registrable<uid,env::PublicTransportStopZoneConnectionPlace>::Registry Registrable<uid,env::PublicTransportStopZoneConnectionPlace>::_registry;
+	}
+
 	namespace env
 	{
 		PublicTransportStopZoneConnectionPlace::PublicTransportStopZoneConnectionPlace(
