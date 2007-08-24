@@ -98,6 +98,11 @@ namespace synthese
 
 		};
 
+
+		template<class K, class T> 
+		    typename Registrable<K, T>::Registry Registrable<K, T>::_registry;
+
+
 		template<class K, class T>
 		typename Registrable<K, T>::ConstIterator Registrable<K, T>::Begin()
 		{
