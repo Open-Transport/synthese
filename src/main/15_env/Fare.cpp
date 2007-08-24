@@ -30,7 +30,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> typename Registrable<uid,env::Fare>::Registry Registrable<uid,env::Fare>::_registry;
+		template<> Registrable<uid,env::Fare>::Registry Registrable<uid,env::Fare>::_registry;
 		template<> boost::shared_ptr<const env::Fare> RegistrableWithNeutralElement<uid,env::Fare>::_neutral(new env::Fare);
 	}
 	

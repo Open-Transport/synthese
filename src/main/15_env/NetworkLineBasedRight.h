@@ -60,7 +60,7 @@ namespace synthese
 			static security::ParameterLabelsVector _getStaticParametersLabels()
 			{
 				security::ParameterLabelsVector m;
-				m.push_back(make_pair(GLOBAL_PERIMETER, "(all)"));
+				m.push_back(make_pair(security::GLOBAL_PERIMETER, "(all)"));
 				env::EnvModule::getNetworkLinePlaceRightParameterList(m);
 				return m;
 			}
@@ -82,10 +82,10 @@ namespace synthese
 		template<class T>
 		std::string NetworkLineBasedRight<T>::displayParameter() const
 		{
-			if (_parameter == GLOBAL_PERIMETER)
+			if (this->_parameter == security::GLOBAL_PERIMETER)
 				return "all";
 
-			uid id(util::Conversion::ToLongLong(_parameter));
+			uid id(util::Conversion::ToLongLong(this->_parameter));
 			try
 			{
 				int tableId(decodeTableId(id));
@@ -112,10 +112,10 @@ namespace synthese
 		template<class T>
 		bool NetworkLineBasedRight<T>::perimeterIncludes(const std::string& perimeter) const
 		{
-			if (_parameter == GLOBAL_PERIMETER)
+			if (this->_parameter == security::GLOBAL_PERIMETER)
 				return true;
 
-			uid id1(util::Conversion::ToLongLong(_parameter));
+			uid id1(util::Conversion::ToLongLong(this->_parameter));
 			uid id2(util::Conversion::ToLongLong(perimeter));
 			try
 			{

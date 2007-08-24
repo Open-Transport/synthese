@@ -39,14 +39,13 @@
 #include "02_db/SQLiteTableSyncTemplate.h"
 
 #include "17_messages/AlarmObjectLink.h"
+#include "17_messages/Alarm.h"
 #include "17_messages/MessagesModule.h"
 
 namespace synthese
 {
 	namespace messages
 	{
-		class Alarm;
-
 		/** Alarm object links table synchronizer.
 			@ingroup m17
 			

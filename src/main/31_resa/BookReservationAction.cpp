@@ -58,7 +58,7 @@ namespace synthese
 
 	namespace util
 	{
-		const string FactorableTemplate<Action, resa::BookReservationAction>::FACTORY_KEY("bra");
+		template<> const string FactorableTemplate<Action, resa::BookReservationAction>::FACTORY_KEY("bra");
 	}
 	
 	namespace resa

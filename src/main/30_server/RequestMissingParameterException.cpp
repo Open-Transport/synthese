@@ -32,7 +32,7 @@ namespace synthese
 
 		}
 
-		RequestMissingParameterException::~RequestMissingParameterException()
+		RequestMissingParameterException::~RequestMissingParameterException() throw()
 		{
 
 		}
