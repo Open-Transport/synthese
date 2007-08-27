@@ -22,12 +22,12 @@
 #include "01_util/Log.h"
 #include "01_util/Factory.h"
 #include "01_util/ModuleClass.h"
-#include "01_util/Thread.h"
-#include "01_util/ThreadManager.h"
+#include "01_util/threads/Thread.h"
+#include "01_util/threads/ThreadManager.h"
 
 #include "02_db/DbModuleClass.h"
 
-#include "15_env/EnvModule.h"
+#include "15_env/CommercialLine.h"
 #include "15_env/TridentExport.h"
 
 
@@ -156,8 +156,8 @@ int main( int argc, char **argv )
 		
 		if (commercialLineId == "*")
 		{
-		    for (CommercialLine::Registry::const_iterator it = EnvModule::getCommercialLines ().begin ();
-			 it != EnvModule::getCommercialLines ().end (); ++it)
+		    for (CommercialLine::ConstIterator it = CommercialLine::Begin();
+			 it != CommercialLine::End (); ++it)
 		    {
 			boost::shared_ptr<CommercialLine> cl = it->second;
 			std::string name = cl->getName ();
@@ -189,8 +189,8 @@ int main( int argc, char **argv )
 	    {
 		std::cout << "Commercial lines list :" << std::endl;
 		
-		for (CommercialLine::Registry::const_iterator it = EnvModule::getCommercialLines ().begin ();
-		     it != EnvModule::getCommercialLines ().end (); ++it)
+		for (CommercialLine::ConstIterator it = CommercialLine::Begin ();
+		     it != CommercialLine::End (); ++it)
 		{
 		    boost::shared_ptr<CommercialLine> cl = it->second;
 		    std::cout << cl->getKey () << "   " << cl->getName () << " " << cl->getLongName () << std::endl;
