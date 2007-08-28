@@ -97,7 +97,7 @@ namespace synthese
 
 		void PlacesListFunction::_run( std::ostream& stream ) const
 		{
-			CityList cities(EnvModule::guessCity(_cityText, 10));
+			CityList cities(EnvModule::guessCity(_cityText, 1));
 			if (cities.empty())
 			{
 				return;
@@ -105,11 +105,11 @@ namespace synthese
 			shared_ptr<const City> city(cities.front());
 
 			PlacesList placesList;
-			LexicalMatcher<const ConnectionPlace*>::MatchResult places(city->getConnectionPlacesMatcher().bestMatches(_input, _n));
-
-			for(LexicalMatcher<const ConnectionPlace*>::MatchResult::const_iterator it(places.begin()); it != places.end(); ++it)
+			LexicalMatcher<const Place*>::MatchResult places(city->getAllPlacesMatcher().bestMatches(_input, _n));
+			
+			for(LexicalMatcher<const Place*>::MatchResult::const_iterator it(places.begin()); it != places.end(); ++it)
 			{
-				placesList.push_back(make_pair(it->value->getId(), it->value->getName()));
+				placesList.push_back(make_pair(it->value->getId(), it->key));
 			}
 
 			VariablesMap vm;

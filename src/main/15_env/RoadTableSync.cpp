@@ -155,6 +155,7 @@ namespace synthese
 					load(Road::GetUpdateable(id).get(), rows);
 
 					city->getRoadsMatcher ().add (road->getName (), road.get());
+					city->getAllPlacesMatcher().add(road->getName() + " [voie]", static_cast<const Place*>(road.get()));
 				}
 				else
 				{
@@ -164,6 +165,7 @@ namespace synthese
 
 					shared_ptr<City> city = City::GetUpdateable (object->getCity ()->getKey ());
 					city->getRoadsMatcher ().add (object->getName (), object);
+					city->getAllPlacesMatcher().add(object->getName() + " [voie]", static_cast<const Place*>(object));
 				}
 			}
 		}
@@ -178,10 +180,12 @@ namespace synthese
 					shared_ptr<const Road> road = Road::Get(id);
 					shared_ptr<City> city = City::GetUpdateable (road->getCity ()->getKey ());
 					city->getRoadsMatcher ().remove (road->getName ());
+					city->getAllPlacesMatcher().remove(road->getName() + " [voie]");
 
 					load(Road::GetUpdateable(id).get(), rows);
 
 					city->getRoadsMatcher ().add (road->getName (), road.get());
+					city->getAllPlacesMatcher().add(road->getName() + " [voie]", static_cast<const Place*>(road.get()));
 				}
 			}
 		}
@@ -196,6 +200,7 @@ namespace synthese
 					shared_ptr<const Road> road = Road::Get(id);
 					shared_ptr<City> city = City::GetUpdateable (road->getCity ()->getKey ());
 					city->getRoadsMatcher ().remove (road->getName ());
+					city->getAllPlacesMatcher().remove(road->getName() + " [voie]");
 
 					Road::Remove(id);
 				}

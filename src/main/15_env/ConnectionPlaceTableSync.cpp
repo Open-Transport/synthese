@@ -180,6 +180,7 @@ namespace synthese
 			//    cp->setAlarm (environment.getAlarms ().get (alarmId));
 
 				city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
+				city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp));
 				cp->store();
 			}
 		}
@@ -199,9 +200,12 @@ namespace synthese
 				
 				shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
 				city->getConnectionPlacesMatcher ().remove (cp->getName ());
+				city->getAllPlacesMatcher().remove(cp->getName() + " [arrêt]");
 				
 				load(cp.get(), rows);
+
 				city->getConnectionPlacesMatcher ().add (cp->getName (), cp.get());
+				city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp.get()));
 			}
 		}
 
@@ -222,6 +226,7 @@ namespace synthese
 			    shared_ptr<const ConnectionPlace> cp = PublicTransportStopZoneConnectionPlace::Get (id);
 			    shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
 			    city->getConnectionPlacesMatcher ().remove (cp->getName ());
+				city->getAllPlacesMatcher().remove(cp->getName() + " [arrêt]");
 			    
 			    PublicTransportStopZoneConnectionPlace::Remove (id);
 			}

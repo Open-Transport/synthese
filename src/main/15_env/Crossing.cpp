@@ -22,6 +22,9 @@
 
 #include "Crossing.h"
 
+#include "15_env/Address.h"
+#include "15_env/Road.h"
+
 #include <assert.h>
 
 using namespace std;
@@ -77,6 +80,12 @@ namespace synthese
 		int Crossing::getMinTransferDelay() const
 		{
 			return 0;
+		}
+
+		void Crossing::addAddress( const Address* address )
+		{
+			setName(getName() + "/" + address->getRoad()->getName());
+			AddressablePlace::addAddress(address);
 		}
 	}
 }

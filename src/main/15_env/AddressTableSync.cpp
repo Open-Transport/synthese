@@ -129,11 +129,14 @@ namespace synthese
 					object->store();
 					
 					uid placeId = rows->getLongLong(COL_PLACEID);
+					uid roadId(rows->getLongLong(COL_ROADID));
 
 					shared_ptr<AddressablePlace> place = 
 					    EnvModule::fetchUpdateableAddressablePlace (placeId);
+					shared_ptr<Road> road = Road::GetUpdateable(roadId);
 					    
 					place->addAddress(object);
+					road->addAddress(object);
 				}
 			}
 		}

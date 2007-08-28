@@ -92,7 +92,7 @@ namespace synthese
 					@param address Address to add
 					This methods cancels the caching of the isobarycentre
 				 */
-				void addAddress (const Address* address);
+				virtual void addAddress (const Address* address);
 			//@}
 
 

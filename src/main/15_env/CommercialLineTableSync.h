@@ -40,7 +40,7 @@ namespace synthese
 		class TransportNetwork;
 
 		/** CommercialLine table synchronizer.
-			@ingroup m15
+			@ingroup m15LS refLS
 		*/
 		class CommercialLineTableSync : public db::SQLiteTableSyncTemplate<CommercialLine>
 		{

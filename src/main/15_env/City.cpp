@@ -211,5 +211,15 @@ namespace synthese
 		{
 			return getKey();
 		}
+
+		lexmatcher::LexicalMatcher<const Place*>& City::getAllPlacesMatcher()
+		{
+			return _allPlacesMatcher;
+		}
+
+		const lexmatcher::LexicalMatcher<const Place*>& City::getAllPlacesMatcher() const
+		{
+			return _allPlacesMatcher;
+		}
 	}
 }

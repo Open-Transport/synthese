@@ -73,6 +73,13 @@ namespace synthese
 				virtual uid getId() const;
 
 				virtual int						getMinTransferDelay() const;
+
+				/** Adds an address to this place.
+					@param address Address to add
+					This methods cancels the caching of the isobarycentre
+				*/
+				virtual void addAddress (const Address* address);
+
 			//@}
 
 			Crossing (const uid& key = UNKNOWN_VALUE,

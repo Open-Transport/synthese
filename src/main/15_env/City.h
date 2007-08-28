@@ -54,15 +54,16 @@ A city holds in its included places the main connection places
 
 @ingroup m15
 */
-class City : public synthese::util::Registrable<uid, City>, 
+class City : public util::Registrable<uid, City>, 
     public IncludingPlace
 {
  private:
 
-    synthese::lexmatcher::LexicalMatcher<const ConnectionPlace*> _connectionPlacesMatcher;
-    synthese::lexmatcher::LexicalMatcher<const PublicPlace*> _publicPlacesMatcher;
-    synthese::lexmatcher::LexicalMatcher<const Road*> _roadsMatcher;
-    synthese::lexmatcher::LexicalMatcher<const PlaceAlias*> _placeAliasesMatcher;
+    lexmatcher::LexicalMatcher<const ConnectionPlace*> _connectionPlacesMatcher;
+    lexmatcher::LexicalMatcher<const PublicPlace*> _publicPlacesMatcher;
+    lexmatcher::LexicalMatcher<const Road*> _roadsMatcher;
+    lexmatcher::LexicalMatcher<const PlaceAlias*> _placeAliasesMatcher;
+	lexmatcher::LexicalMatcher<const Place*> _allPlacesMatcher;
 
     std::string _code; //!< Unique code identifier for city within its country (france => INSEE code)
 
@@ -78,21 +79,23 @@ class City : public synthese::util::Registrable<uid, City>,
 
     //! @name Getters/Setters
     //@{
-    const std::string& getCode () const { return _code; }
-    void setCode (const std::string& code) { _code = code; }
+		const std::string& getCode () const { return _code; }
+		void setCode (const std::string& code) { _code = code; }
 
-    synthese::lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher ();
-    const synthese::lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher () const;
+		lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher ();
+		const lexmatcher::LexicalMatcher<const ConnectionPlace*>& getConnectionPlacesMatcher () const;
 
-    synthese::lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher ();
-    const synthese::lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher () const;
-    
-    synthese::lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher ();
-    const synthese::lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher () const;
+		lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher ();
+		const lexmatcher::LexicalMatcher<const PublicPlace*>& getPublicPlacesMatcher () const;
+	    
+		lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher ();
+		const lexmatcher::LexicalMatcher<const Road*>& getRoadsMatcher () const;
 
-    synthese::lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher ();
-    const synthese::lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher () const;
+		lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher ();
+		const lexmatcher::LexicalMatcher<const PlaceAlias*>& getPlaceAliasesMatcher () const;
 
+		lexmatcher::LexicalMatcher<const Place*>& getAllPlacesMatcher ();
+		const lexmatcher::LexicalMatcher<const Place*>& getAllPlacesMatcher () const;
     //@}
 
     //! @name Update methods

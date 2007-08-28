@@ -272,7 +272,7 @@ namespace synthese
 
 			if (!placeName.empty())
 			{
-				LexicalMatcher<const ConnectionPlace*>::MatchResult places = city->getConnectionPlacesMatcher().bestMatches(placeName, 1);
+				LexicalMatcher<const Place*>::MatchResult places = city->getAllPlacesMatcher().bestMatches(placeName, 1);
 				if (!places.empty())
 				{
 					place = places.front().value;
