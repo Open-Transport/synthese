@@ -66,11 +66,23 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_SITE = Action_PARAMETER_PREFIX + "sit";
 		const string BookReservationAction::PARAMETER_ACCESSIBILITY = Action_PARAMETER_PREFIX + "acc";
 
-		const string BookReservationAction::PARAMETER_ORIGIN_CITY = Action_PARAMETER_PREFIX + RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_TEXT;
-		const string BookReservationAction::PARAMETER_ORIGIN_PLACE = Action_PARAMETER_PREFIX + RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT;
-		const string BookReservationAction::PARAMETER_DESTINATION_CITY = Action_PARAMETER_PREFIX + RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT;
-		const string BookReservationAction::PARAMETER_DESTINATION_PLACE = Action_PARAMETER_PREFIX + RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT;
-		const string BookReservationAction::PARAMETER_DATE_TIME = Action_PARAMETER_PREFIX + RoutePlannerFunction::PARAMETER_DATE;
+	    /*
+	      l'ordre des inits statiques de chaque module est impredictible (depend du compiler/linker);
+	      les constantes n'etaient pas initialisées mais cependant utilisées => segfault
+	      je recopie la constante en dur ; c'est une solution temporaire evidemment car il y a ici un pb de design plus global
+
+
+                const string RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_TEXT("dct");
+		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT("act");
+		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT("dpt");
+		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT("apt");
+	    */
+		const string BookReservationAction::PARAMETER_ORIGIN_CITY = Action_PARAMETER_PREFIX + "dct";
+		const string BookReservationAction::PARAMETER_ORIGIN_PLACE = Action_PARAMETER_PREFIX + "dpt";
+		const string BookReservationAction::PARAMETER_DESTINATION_CITY = Action_PARAMETER_PREFIX + "act";
+		const string BookReservationAction::PARAMETER_DESTINATION_PLACE = Action_PARAMETER_PREFIX + "apt";
+	        const string BookReservationAction::PARAMETER_DATE_TIME = Action_PARAMETER_PREFIX + "da";
+
 
 		const string BookReservationAction::PARAMETER_CUSTOMER_ID = Action_PARAMETER_PREFIX + "cuid";
 		const string BookReservationAction::PARAMETER_CUSTOMER_NAME = Action_PARAMETER_PREFIX + "cuna";
