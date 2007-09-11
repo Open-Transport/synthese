@@ -1,12 +1,10 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "doc", "doc\doc.vcproj", "{B611F981-1353-4B13-A6FE-695034268D72}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "34_departures_table", "src\main\34_departures_table\34_departures_table.vcproj", "{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "54_departures_table", "src\main\34_departures_table\34_departures_table.vcproj", "{F3F52407-AF2D-4B4A-AE92-B455037596FD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "01_util", "src\main\01_util\01_util.vcproj", "{266969BE-1E07-4C1B-ABFC-5193858D0B4B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "15_env", "src\main\15_env\15_env.vcproj", "{DFDC896C-0867-4704-896B-43FDE04E3AA8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "35_env", "src\main\15_env\15_env.vcproj", "{DFDC896C-0867-4704-896B-43FDE04E3AA8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "00_tcp", "src\main\00_tcp\00_tcp.vcproj", "{58065149-18AA-438D-81C4-2816E1C6EA99}"
 EndProject
@@ -16,19 +14,19 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04_time", "src\main\04_time
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "31_resa", "src\main\31_resa\31_resa.vcproj", "{8F8F9564-B955-4459-B726-548BECDC4E2A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "35_timetables", "src\main\35_timetables\35_timetables.vcproj", "{796AD0E4-801D-4551-84CB-90C3AD6A97D0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "55_timetables", "src\main\35_timetables\35_timetables.vcproj", "{796AD0E4-801D-4551-84CB-90C3AD6A97D0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "07_lex_matcher", "src\main\07_lex_matcher\07_lex_matcher.vcproj", "{623D048D-A499-44EB-A82C-556F02FD0D76}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "01_util_test", "src\test\01_util\01_util_test.vcproj", "{E26A16FA-CFD6-4B0A-89DE-E6E3BB87E764}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "02_db", "src\main\02_db\02_db.vcproj", "{F0BEDE6D-51E1-4226-9F5E-3D4A72BFE6F4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "10_db", "src\main\02_db\02_db.vcproj", "{F0BEDE6D-51E1-4226-9F5E-3D4A72BFE6F4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "33_route_planner", "src\main\33_route_planner\33_route_planner.vcproj", "{DCB40545-776B-4B6E-A050-D4A513880697}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "53_route_planner", "src\main\33_route_planner\33_route_planner.vcproj", "{DCB40545-776B-4B6E-A050-D4A513880697}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "99_synthese_vinci", "src\main\99_synthese_vinci\99_synthese_vinci.vcproj", "{0215F340-8C69-48B0-8D19-88758740BC47}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "39_map", "src\main\39_map\39_map.vcproj", "{C96EECCD-579E-41C2-ABB8-82E4CBF84290}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "59_map", "src\main\39_map\39_map.vcproj", "{C96EECCD-579E-41C2-ABB8-82E4CBF84290}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12_security", "src\main\12_security\12_security.vcproj", "{EE44C3FB-356B-4319-8226-F628696152EA}"
 EndProject
@@ -36,19 +34,19 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "91_cgi_client", "src\main\9
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "92 rs485_client", "src\main\92_rs485_client\92_rs485_client.vcproj", "{D3DCDED7-8AFB-4A7C-A421-5B2B6C36C5F7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "30_server", "src\main\30_server\30_server.vcproj", "{01E44092-75D3-433D-988C-8B0BB7612AB8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "18_server", "src\main\30_server\30_server.vcproj", "{01E44092-75D3-433D-988C-8B0BB7612AB8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "32_admin", "src\main\32_admin\32_admin.vcproj", "{299F3C8E-6980-42CD-93F3-675F76241B30}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "14_admin", "src\main\32_admin\32_admin.vcproj", "{299F3C8E-6980-42CD-93F3-675F76241B30}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "36_places_list", "src\main\36_places_list\36_places_list.vcproj", "{388CA45F-FEBF-4160-AAB7-39B11FA1E28C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "36_transport_website", "src\main\36_places_list\36_places_list.vcproj", "{388CA45F-FEBF-4160-AAB7-39B11FA1E28C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "00_tcp_test", "src\test\00_tcp\00_tcp_test.vcproj", "{04EC8797-29FB-4912-833F-8D6D08846E00}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "02_db_test", "src\test\02_db\02_db_test.vcproj", "{7D65F41B-4F6D-4B0F-B15C-F3796032D037}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "10_db_test", "src\test\02_db\02_db_test.vcproj", "{7D65F41B-4F6D-4B0F-B15C-F3796032D037}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "71_vinci_bike_rental", "src\main\71_vinci_bike_rental\71_vinci_bike_rental.vcproj", "{D7FE3343-BC3C-4561-988A-C192B3F4CCA7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "57_accounts", "src\main\57_accounting\57_accounting.vcproj", "{2482F13A-2891-4A54-B969-BCE410593E00}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "37_accounting", "src\main\57_accounting\57_accounting.vcproj", "{2482F13A-2891-4A54-B969-BCE410593E00}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "17_messages", "src\main\17_messages\17_messages.vcproj", "{956A4D91-FF39-422F-B767-2F9E425D0183}"
 EndProject
@@ -58,7 +56,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04_time_test", "src\test\04
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "13_dblog", "src\main\13_dblog\13_dblog.vcproj", "{875EB4D5-0C80-48B7-B5BA-15FC8C226AC2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "15_env_test", "src\test\15_env\15_env_test.vcproj", "{7581D48A-170D-41FB-B6D1-C846F78CD414}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "35_env_test", "src\test\15_env\15_env_test.vcproj", "{7581D48A-170D-41FB-B6D1-C846F78CD414}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "synthese_template", "src\main\synthese_template\synthese_template.vcproj", "{46231469-A01B-45F6-A3FC-7E92114C69C2}"
 EndProject
@@ -73,9 +71,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "05_html", "src\main\05_html\05_html.vcproj", "{9AB2D3DE-F6FE-4856-97E2-5268D3D5FF12}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "03_db_grid", "src\main\03_db_ring\03_db_ring.vcproj", "{0ED914AC-1C44-49AF-8034-260628622ECC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "03_db_ring", "src\main\03_db_ring\03_db_ring.vcproj", "{0ED914AC-1C44-49AF-8034-260628622ECC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "14_geography", "src\main\14_geography\14_geography.vcproj", "{9DB64101-C8A0-4275-89E1-529199D1EA73}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "09_geography", "src\main\14_geography\14_geography.vcproj", "{9DB64101-C8A0-4275-89E1-529199D1EA73}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "06_geometry", "src\main\06_geometry\06_geometry.vcproj", "{1FEE17FB-95D3-41DD-A212-BB6209C7A359}"
 EndProject
@@ -85,8 +83,6 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B611F981-1353-4B13-A6FE-695034268D72}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B611F981-1353-4B13-A6FE-695034268D72}.Release|Win32.ActiveCfg = Release|Win32
 		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Debug|Win32.ActiveCfg = Release|Win32
 		{F3F52407-AF2D-4B4A-AE92-B455037596FD}.Release|Win32.ActiveCfg = Release|Win32
 		{266969BE-1E07-4C1B-ABFC-5193858D0B4B}.Debug|Win32.ActiveCfg = Release|Win32

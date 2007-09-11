@@ -38,7 +38,7 @@ namespace synthese
 		*/
 		class TridentExportFunction : public server::Function
 		{
-		public;
+		public:
 			/// @todo request parameter names declaration
 			// eg : static const std::string PARAMETER_xxx;
 			

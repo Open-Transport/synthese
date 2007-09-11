@@ -27,9 +27,9 @@
 #include "01_util/UId.h"
 
 #include <boost/logic/tribool.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <set>
+#include <map>
 
 namespace synthese
 {
@@ -50,11 +50,13 @@ namespace synthese
 		{
 		public:
 			typedef std::set<int> CapacityThresholds;
+			typedef std::map<const env::ReservationRule*, const OnlineReservationRule*> OnlineReservationRuleMap;
 
 		private:
 			//! \name Link with env reservation rules
 			//@{
-				boost::shared_ptr<const env::ReservationRule> _reservationRule;
+				const env::ReservationRule* _reservationRule;
+				static OnlineReservationRuleMap _onlineReservationRuleMap;
 			//@}
 
 			//! \name Addresses for reports sending
@@ -79,23 +81,26 @@ namespace synthese
 			//@}
 
 		public:
+
+			static const OnlineReservationRule* GetOnlineReservationRule(const env::ReservationRule* rule);
+
 			//! \name Getters
 			//@{
-				boost::shared_ptr<const env::ReservationRule>	getReservationRule()		const;
-				const std::string&								getEMail()					const;
-				const std::string&								getCopyEMail()				const;
-				boost::logic::tribool							getNeedsSurname()			const;
-				boost::logic::tribool							getNeedsAddress()			const;
-				boost::logic::tribool							getNeedsPhone()				const;
-				boost::logic::tribool							getNeedsCustomerNumber()	const;
-				boost::logic::tribool							getNeedsEMail()				const;
-				int												getMaxSeats()				const;
-				const CapacityThresholds&						getThresholds()				const;
+				const env::ReservationRule*	getReservationRule()		const;
+				const std::string&			getEMail()					const;
+				const std::string&			getCopyEMail()				const;
+				boost::logic::tribool		getNeedsSurname()			const;
+				boost::logic::tribool		getNeedsAddress()			const;
+				boost::logic::tribool		getNeedsPhone()				const;
+				boost::logic::tribool		getNeedsCustomerNumber()	const;
+				boost::logic::tribool		getNeedsEMail()				const;
+				int							getMaxSeats()				const;
+				const CapacityThresholds&	getThresholds()				const;
 			//@}
 
 			//! \name Setters
 			//@{
-				void	setReservationRule(boost::shared_ptr<const env::ReservationRule>);
+				void	setReservationRule(const env::ReservationRule*);
 				void	setEMail(const std::string& email);
 				void	setCopyEMail(const std::string& email);
 				void	setNeedsSurname(boost::logic::tribool value);

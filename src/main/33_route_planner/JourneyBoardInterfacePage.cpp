@@ -22,9 +22,13 @@
 
 #include "JourneyBoardInterfacePage.h"
 
+#include "31_resa/OnlineReservationRule.h"
+
 #include "15_env/Journey.h"
 #include "15_env/Edge.h"
 #include "15_env/AddressablePlace.h"
+#include "15_env/ReservationRule.h"
+#include "15_env/Service.h"
 
 #include "11_interfaces/DurationInterfacePage.h"
 #include "11_interfaces/DateTimeInterfacePage.h"
@@ -33,6 +37,7 @@
 #include "01_util/Conversion.h"
 
 #include <sstream>
+#include <set>
 
 using namespace std;
 using namespace boost;
@@ -44,6 +49,7 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace time;
+	using namespace resa;
 
 	namespace util
 	{
@@ -72,6 +78,21 @@ namespace synthese
 			stringstream sResa;
 			dateInterfacePage->display(sResa, variables, journey->getReservationDeadLine(), request);
 
+			set<const ReservationRule*> resaRules;
+			for (Journey::ServiceUses::const_iterator it(journey->getServiceUses().begin()); it != journey->getServiceUses().end(); ++it)
+			{
+				if (it->getService()->getReservationRule() && it->getService()->getReservationRule() != ReservationRule::Get(0).get())
+					resaRules.insert(it->getService()->getReservationRule());
+			}
+			stringstream sPhones;
+			bool onlineBooking(!resaRules.empty());
+			for (set<const ReservationRule*>::const_iterator it(resaRules.begin()); it != resaRules.end(); ++it)
+			{
+				sPhones << (*it)->getPhoneExchangeNumber() << " (" << (*it)->getPhoneExchangeOpeningHours() << ") ";
+				if (!OnlineReservationRule::GetOnlineReservationRule(*it))
+					onlineBooking = false;
+			}
+
 			ParametersVector pv;
 			pv.push_back(Conversion::ToString(n));
 			pv.push_back(Conversion::ToString(handicappedFilter));
@@ -86,7 +107,8 @@ namespace synthese
 			pv.push_back(Conversion::ToString(journey->getReservationCompliance() == true));
 			pv.push_back(Conversion::ToString(journey->getReservationDeadLine() - now));
 			pv.push_back(sResa.str());
-
+			pv.push_back(sPhones.str());
+			pv.push_back(Conversion::ToString(onlineBooking));
 			
 			InterfacePage::display(stream, pv, variables, static_cast<const void*>(journey), request);
 		}

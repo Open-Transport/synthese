@@ -24,6 +24,8 @@
 #include "31_resa/OnlineReservationRule.h"
 #include "31_resa/ResaModule.h"
 
+#include "15_env/ReservationRule.h"
+
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
 #include "02_db/SQLiteQueueThreadExec.h"
@@ -41,17 +43,30 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace resa;
+	using namespace env;
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<OnlineReservationRule>::TABLE_NAME = "t046_reservations";
-		template<> const int SQLiteTableSyncTemplate<OnlineReservationRule>::TABLE_ID = 46;
+		template<> const std::string SQLiteTableSyncTemplate<OnlineReservationRule>::TABLE_NAME = "t047_online_reservation_rules";
+		template<> const int SQLiteTableSyncTemplate<OnlineReservationRule>::TABLE_ID = 47;
 		template<> const bool SQLiteTableSyncTemplate<OnlineReservationRule>::HAS_AUTO_INCREMENT = true;
 
 		template<> void SQLiteTableSyncTemplate<OnlineReservationRule>::load(OnlineReservationRule* object, const db::SQLiteResultSPtr& rows )
 		{
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
-			/// @todo Set all other attributes from the row
+			try
+			{
+				object->setReservationRule(ReservationRule::Get(rows->getLongLong(OnlineReservationRuleTableSync::COL_RESERVATION_RULE_ID)).get());
+			}
+			catch (...)
+			{
+				Log::GetInstance().warn("Reservation rule not found for online reservation rule "+ Conversion::ToString(object->getKey()));
+			}
+			object->setEMail(rows->getText(OnlineReservationRuleTableSync::COL_EMAIL));
+			object->setCopyEMail(rows->getText(OnlineReservationRuleTableSync::COL_COPY_EMAIL));
+			object->setMaxSeats(rows->getInt(OnlineReservationRuleTableSync::COL_MAX_SEATS));
+			/// @todo Finish to implement the loader
+
 		}
 
 		template<> void SQLiteTableSyncTemplate<OnlineReservationRule>::save(OnlineReservationRule* object)

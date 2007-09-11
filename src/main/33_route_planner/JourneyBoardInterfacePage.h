@@ -60,6 +60,8 @@ namespace synthese
 			 - 10 : Reservation compulsory
 			 - 11 : Reservation delay (minutes)
 			 - 12 : Reservation deadline
+			 - 13 : Reservation phone number(s) with opening hours
+			 - 14 : Online reservation is available
 		*/
 		class JourneyBoardInterfacePage : public interfaces::InterfacePage
 		{

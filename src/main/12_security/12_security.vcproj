@@ -317,6 +317,14 @@
 				RelativePath=".\UserNameInterfaceElement.h"
 				>
 			</File>
+			<File
+				RelativePath=".\UserPhoneInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UserPhoneInterfaceElement.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\Constants.h"

@@ -1,6 +1,6 @@
 
-/** UserNameInterfaceElement class implementation.
-	@file UserNameInterfaceElement.cpp
+/** UserPhoneInterfaceElement class implementation.
+	@file UserPhoneInterfaceElement.cpp
 	@author Hugues Romain
 	@date 2007
 
@@ -22,7 +22,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "UserNameInterfaceElement.h"
+#include "UserPhoneInterfaceElement.h"
 
 #include "30_server/Request.h"
 
@@ -34,38 +34,32 @@ using namespace boost;
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace server;
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<LibraryInterfaceElement, security::UserNameInterfaceElement>::FACTORY_KEY("user_name");
+		template<> const string FactorableTemplate<LibraryInterfaceElement, security::UserPhoneInterfaceElement>::FACTORY_KEY("user_phone");
 	}
 
 	namespace security
 	{
-		void UserNameInterfaceElement::storeParameters(ValueElementList& vel)
+		void UserPhoneInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			//_parameter1 = vel.front();
-			/// @todo control and Fill the parameters init
 		}
 
-		string UserNameInterfaceElement::display(
+		string UserPhoneInterfaceElement::display(
 			ostream& stream
 			, const ParametersVector& parameters
 			, VariablesMap& variables
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/
 		) const {
-			if (request->getSession())
-			{
-				shared_ptr<const User> user(request->getUser());
-				if (user)
-					stream << user->getFullName();
-			}
+			shared_ptr<const User> user(request->getUser());
+			if (user)
+				stream << user->getPhone();
 			return string();
 		}
 
-		UserNameInterfaceElement::~UserNameInterfaceElement()
+		UserPhoneInterfaceElement::~UserPhoneInterfaceElement()
 		{
 		}
 	}

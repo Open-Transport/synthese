@@ -5,6 +5,7 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::secu
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::security::UserTableSync>("12.02 User");
 
 synthese::security::UserNameInterfaceElement::integrate();
+synthese::security::UserPhoneInterfaceElement::integrate();
 
 synthese::security::UsersAdmin::integrate();
 synthese::security::UserAdmin::integrate();

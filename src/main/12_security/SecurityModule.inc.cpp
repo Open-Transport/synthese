@@ -18,6 +18,7 @@
 #include "12_security/UserPasswordUpdateAction.h"
 
 #include "12_security/UserNameInterfaceElement.h"
+#include "12_security/UserPhoneInterfaceElement.h"
 
 #include "12_security/SecurityRight.h"
 #include "12_security/GlobalRight.h"

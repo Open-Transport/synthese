@@ -27,6 +27,7 @@
 #include "01_util/Constants.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -34,15 +35,16 @@ namespace synthese
 
 	namespace resa
 	{
-
+		OnlineReservationRule::OnlineReservationRuleMap OnlineReservationRule::_onlineReservationRuleMap;
 
 		OnlineReservationRule::OnlineReservationRule()
 			: _maxSeats(UNKNOWN_VALUE)
+			, _reservationRule(NULL)
 		{
 			
 		}
 
-		boost::shared_ptr<const env::ReservationRule> OnlineReservationRule::getReservationRule() const
+		const env::ReservationRule* OnlineReservationRule::getReservationRule() const
 		{
 			return _reservationRule;
 		}
@@ -92,9 +94,16 @@ namespace synthese
 			return _thresholds;
 		}
 
-		void OnlineReservationRule::setReservationRule(shared_ptr<const ReservationRule> rule)
+		void OnlineReservationRule::setReservationRule(const ReservationRule* rule)
 		{
+			if (_reservationRule != NULL)
+			{
+				OnlineReservationRuleMap::iterator it(_onlineReservationRuleMap.find(_reservationRule));
+				assert(it != _onlineReservationRuleMap.end());
+				_onlineReservationRuleMap.erase(it);
+			}
 			_reservationRule = rule;
+			_onlineReservationRuleMap.insert(make_pair(rule, this));
 		}
 
 		void OnlineReservationRule::setEMail( const std::string& email )
@@ -140,6 +149,12 @@ namespace synthese
 		void OnlineReservationRule::setThresholds( const CapacityThresholds& thresholds )
 		{
 			_thresholds = thresholds;
+		}
+
+		const OnlineReservationRule* OnlineReservationRule::GetOnlineReservationRule( const env::ReservationRule* rule )
+		{
+			OnlineReservationRuleMap::const_iterator it(_onlineReservationRuleMap.find(rule));
+			return (it == _onlineReservationRuleMap.end()) ? NULL : it->second;
 		}
 	}
 }

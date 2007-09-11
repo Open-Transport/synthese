@@ -206,6 +206,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OnlineReservationRuleTableSync.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OnlineReservationRuleTableSync.h"
 				>
 			</File>
@@ -256,10 +260,6 @@
 		</Filter>
 		<File
 			RelativePath="..\71_vinci_bike_rental\LICENSE.txt"
-			>
-		</File>
-		<File
-			RelativePath=".\OnlineReservationRuleTableSync.cpp"
 			>
 		</File>
 		<File
