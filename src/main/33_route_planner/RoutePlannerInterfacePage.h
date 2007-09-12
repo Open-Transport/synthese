@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_RoutePlannerInterfacePage_H__
 #define SYNTHESE_RoutePlannerInterfacePage_H__
 
+#include "36_places_list/Types.h"
+
 #include "33_route_planner/Types.h"
 
 #include "15_env/Types.h"
@@ -34,6 +36,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		class HourPeriod;
+		class Site;
 	}
 
 	namespace time
@@ -70,7 +73,9 @@ namespace synthese
 				- 9 : period (id)
 				- 10 : date (text format)
 				- 11 : period (text format)
-				- 12 : solutions number			
+				- 12 : solutions number
+				- 13 : accessibility code
+				- 14 : site id
 		*/
 		class RoutePlannerInterfacePage : public interfaces::InterfacePage
 		{
@@ -89,7 +94,9 @@ namespace synthese
 				, const env::Place* destinationPlace
 				, const transportwebsite::HourPeriod* period
 				, const AccessParameters& accessParameters
-				, const server::Request* request = NULL
+				, const server::Request* request
+				, const transportwebsite::AccessibilityParameter& accessibility
+				, const transportwebsite::Site* site
 			) const;
 
 			void display(
@@ -104,7 +111,9 @@ namespace synthese
 				, const std::string& destinationPlace
 				, const transportwebsite::HourPeriod* period
 				, const AccessParameters& accessParameters
-				, const server::Request* request = NULL
+				, const server::Request* request
+				, const transportwebsite::AccessibilityParameter& accessibility
+				, const transportwebsite::Site* site
 			) const;
 		};
 	}

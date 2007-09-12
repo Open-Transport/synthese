@@ -196,6 +196,10 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath="..\71_vinci_bike_rental\LICENSE.txt"
+			>
+		</File>
+		<File
 			RelativePath=".\PlacesListModule.cpp"
 			>
 		</File>

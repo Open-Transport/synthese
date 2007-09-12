@@ -62,6 +62,7 @@ namespace synthese
 			 - 12 : Reservation deadline
 			 - 13 : Reservation phone number(s) with opening hours
 			 - 14 : Online reservation is available
+			 - 15 : Departure time (internal format)
 		*/
 		class JourneyBoardInterfacePage : public interfaces::InterfacePage
 		{

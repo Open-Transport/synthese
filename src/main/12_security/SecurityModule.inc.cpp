@@ -19,6 +19,7 @@
 
 #include "12_security/UserNameInterfaceElement.h"
 #include "12_security/UserPhoneInterfaceElement.h"
+#include "12_security/UserIdInterfaceElement.h"
 
 #include "12_security/SecurityRight.h"
 #include "12_security/GlobalRight.h"

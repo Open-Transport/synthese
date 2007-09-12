@@ -24,6 +24,7 @@
 #define SYNTHESE_RoutePlannerFunction_H__
 
 #include "36_places_list/FunctionWithSite.h"
+#include "36_places_list/Types.h"
 
 #include "15_env/Types.h"
 
@@ -65,20 +66,21 @@ namespace synthese
 		private:
 			//! \name Parameters
 			//@{
-				const RoutePlannerInterfacePage*	_page;
-				const env::Place*					_departure_place;
-				const env::Place*					_arrival_place;
-				std::string							_originCityText;
-				std::string							_destinationCityText;
-				std::string							_originPlaceText;
-				std::string							_destinationPlaceText;
-				time::DateTime						_startDate;
-				time::DateTime						_endDate;
-				AccessParameters					_accessParameters;
-				int									_maxSolutionsNumber;
-				int									_periodId;
-				const transportwebsite::HourPeriod*	_period;
-				bool								_home;
+				const RoutePlannerInterfacePage*			_page;
+				const env::Place*							_departure_place;
+				const env::Place*							_arrival_place;
+				std::string									_originCityText;
+				std::string									_destinationCityText;
+				std::string									_originPlaceText;
+				std::string									_destinationPlaceText;
+				time::DateTime								_startDate;
+				time::DateTime								_endDate;
+				AccessParameters							_accessParameters;
+				int											_maxSolutionsNumber;
+				int											_periodId;
+				const transportwebsite::HourPeriod*			_period;
+				bool										_home;
+				transportwebsite::AccessibilityParameter	_accessibility;
 			//@}
 
 

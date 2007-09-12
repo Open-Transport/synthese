@@ -310,6 +310,14 @@
 			Name="11 Interface Library"
 			>
 			<File
+				RelativePath=".\UserIdInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UserIdInterfaceElement.h"
+				>
+			</File>
+			<File
 				RelativePath=".\UserNameInterfaceElement.cpp"
 				>
 			</File>

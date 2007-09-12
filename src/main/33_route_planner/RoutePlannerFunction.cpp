@@ -119,10 +119,10 @@ namespace synthese
 				throw RequestException("Bad max solutions number");
 
 			// Accessibility
-			Site::AccessibilityParameter accessibility(static_cast<Site::AccessibilityParameter>(
-				Request::getIntFromParameterMap(map, PARAMETER_ACCESSIBILITY, !_home, string()))
+			_accessibility = static_cast<AccessibilityParameter>(
+				Request::getIntFromParameterMap(map, PARAMETER_ACCESSIBILITY, !_home, string())
 			);
-			_accessParameters = _site->getAccessParameters(accessibility);
+			_accessParameters = _site->getAccessParameters(_accessibility);
 		}
 
 		void RoutePlannerFunction::_run( ostream& stream ) const
@@ -151,6 +151,8 @@ namespace synthese
 					, _period
 					, _accessParameters
 					, _request
+					, _accessibility
+					, _site.get()
 				);
 			}
 			else
@@ -168,6 +170,8 @@ namespace synthese
 					, _period
 					, _accessParameters
 					, _request
+					, _accessibility
+					, _site.get()
 				);
 			}
 		}

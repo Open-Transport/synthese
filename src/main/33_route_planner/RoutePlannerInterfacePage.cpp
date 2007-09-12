@@ -23,6 +23,7 @@
 #include "RoutePlannerInterfacePage.h"
 
 #include "36_places_list/HourPeriod.h"
+#include "36_places_list/Site.h"
 
 #include "15_env/City.h"
 #include "15_env/Place.h"
@@ -52,7 +53,7 @@ namespace synthese
 	{
 
 		void RoutePlannerInterfacePage::display(
-			std::ostream& stream
+			ostream& stream
 			, VariablesMap& variables
 			, const JourneyBoardJourneys& object /*= NULL*/
 			, const time::Date& date
@@ -62,8 +63,9 @@ namespace synthese
 			, const HourPeriod* period
 			, const AccessParameters& accessParameters
 			, const server::Request* request /*= NULL*/
-			) const
-		{
+			, const AccessibilityParameter& accessibility
+			, const Site* site
+		) const	{
 			const void* vobj(static_cast<const void*>(&object));
 			const City* originCity(dynamic_cast<const City*>(originPlace));
 			string originPlaceName;
@@ -99,13 +101,27 @@ namespace synthese
 			pv.push_back(sDate.str());
 			pv.push_back((period == NULL) ? string() : period->getCaption());
 			pv.push_back(Conversion::ToString(object.size()));
+			pv.push_back(Conversion::ToString(accessibility));
+			pv.push_back(Conversion::ToString(site->getKey()));
 
 			InterfacePage::display(stream, pv, variables, vobj, request);
 		}
 
-		void RoutePlannerInterfacePage::display( std::ostream& stream , interfaces::VariablesMap& variables , const time::Date& date , int periodId , bool home, const std::string& originCity , const std::string& originPlace , const std::string& destinationCity , const std::string& destinationPlace , const transportwebsite::HourPeriod* period 
+		void RoutePlannerInterfacePage::display(
+			ostream& stream
+			, interfaces::VariablesMap& variables
+			, const time::Date& date
+			, int periodId
+			, bool home
+			, const string& originCity
+			, const string& originPlace
+			, const string& destinationCity
+			, const string& destinationPlace
+			, const transportwebsite::HourPeriod* period 
 			, const AccessParameters& accessParameters
 			, const server::Request* request /*= NULL  */
+			, const AccessibilityParameter& accessibility
+			, const Site* site
 		) const	{
 			// Text formatted date
 			const DateTimeInterfacePage* datePage(getInterface()->getPage<DateTimeInterfacePage>());
@@ -126,6 +142,8 @@ namespace synthese
 			pv.push_back(sDate.str());
 			pv.push_back((period == NULL) ? string() : period->getCaption());
 			pv.push_back("0");
+			pv.push_back(Conversion::ToString(accessibility));
+			pv.push_back(Conversion::ToString(site->getKey()));
 
 			InterfacePage::display(stream, pv, variables, NULL, request);
 

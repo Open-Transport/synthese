@@ -24,6 +24,7 @@
 #define SYNTHESE_CSITE_H
 
 #include "36_places_list/HourPeriod.h"
+#include "36_places_list/Types.h"
 
 #include "15_env/Types.h"
 
@@ -64,13 +65,7 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<HourPeriod> Periods;
-			typedef enum
-			{
-				HANDICCAPED_ACCESSIBILITY = 1
-				, BIKE_ACCESSIBILITY = 2
-			} AccessibilityParameter;
-
-
+			
 		private:
 			//! \name Properties
 			//@{

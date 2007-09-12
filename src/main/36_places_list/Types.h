@@ -39,6 +39,13 @@ namespace synthese
 
 		typedef std::vector<std::pair<uid, std::string> > PlacesList;
 
+		typedef enum
+		{
+			PEDESTRIAN_ACCESSIBILITY = 0
+			, HANDICCAPED_ACCESSIBILITY = 1
+			, BIKE_ACCESSIBILITY = 2
+		} AccessibilityParameter;
+
 		/** @} */
 	}
 }

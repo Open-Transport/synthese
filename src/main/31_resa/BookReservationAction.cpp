@@ -162,7 +162,7 @@ namespace synthese
 			));
 			DateTime departureDateTime(Request::getDateTimeFromParameterMap(map, PARAMETER_DATE_TIME, true, FACTORY_KEY));
 			// Accessibility
-			Site::AccessibilityParameter accessibility(static_cast<Site::AccessibilityParameter>(
+			AccessibilityParameter accessibility(static_cast<AccessibilityParameter>(
 				Request::getIntFromParameterMap(map, PARAMETER_ACCESSIBILITY, false, string()))
 			);
 			AccessParameters ap(site->getAccessParameters(accessibility));

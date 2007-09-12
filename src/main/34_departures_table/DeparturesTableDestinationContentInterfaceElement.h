@@ -34,6 +34,24 @@ namespace synthese
 	{
 		/** Departure Table Destination Content Interface Element Class.
 			@ingroup m34Library refLibrary
+
+			Parameters :
+				- 0 : destinationsToDisplay
+				- 1 : displayTerminus
+				- 2 : Name to display :
+					- char(13) : 13 chars name if exists, connection place name truncated else
+					- char(26) : 26 chars name if exists, connection place name truncated else
+					- else : connection place name
+				- 3 : stopsSeparator
+				- 4 : Display city name
+					- station_city : adds the city name before the connection place name
+					- station_city_if_new : adds the city name before the connection place name only at city changes
+					- else : do not add the city name before the connection place name
+				- 5 : beforeCity
+				- 6 : afterCity
+			
+			Object : ArrivalDepartureRow object
+
 		*/
 		class DeparturesTableDestinationContentInterfaceElement : public interfaces::LibraryInterfaceElement
 		{
@@ -52,6 +70,7 @@ namespace synthese
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayTerminusVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayTypeVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _stopsSeparatorVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayCityVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _beforeCityVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _afterCityVIE;
 

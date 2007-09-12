@@ -50,13 +50,13 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const std::string DeparturesTableDestinationContentInterfaceElement::DESTINATIONS_TO_DISPLAY_ALL = "all";
-		const std::string DeparturesTableDestinationContentInterfaceElement::DESTINATIONS_TO_DISPLAY_TERMINUS = "terminus";
-		const std::string DeparturesTableDestinationContentInterfaceElement::TYPE_STATION_CITY = "station_city";
-		const std::string DeparturesTableDestinationContentInterfaceElement::TYPE_STATION_CITY_IF_NEW = "station_city_if_new";
-		const std::string DeparturesTableDestinationContentInterfaceElement::TYPE_STATION = "station";
-		const std::string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_13 = "char(13)";
-		const std::string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_26 = "char(26)";
+		const string DeparturesTableDestinationContentInterfaceElement::DESTINATIONS_TO_DISPLAY_ALL = "all";
+		const string DeparturesTableDestinationContentInterfaceElement::DESTINATIONS_TO_DISPLAY_TERMINUS = "terminus";
+		const string DeparturesTableDestinationContentInterfaceElement::TYPE_STATION_CITY = "station_city";
+		const string DeparturesTableDestinationContentInterfaceElement::TYPE_STATION_CITY_IF_NEW = "station_city_if_new";
+		const string DeparturesTableDestinationContentInterfaceElement::TYPE_STATION = "station";
+		const string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_13 = "char(13)";
+		const string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_26 = "char(26)";
 
 		void DeparturesTableDestinationContentInterfaceElement::storeParameters(ValueElementList& vel)
 		{
@@ -67,6 +67,7 @@ namespace synthese
 			_displayTerminusVIE = vel.front();
 			_displayTypeVIE = vel.front();
 			_stopsSeparatorVIE = vel.front();
+			_displayCityVIE = vel.front();
 			_beforeCityVIE = vel.front();
 			_afterCityVIE = vel.front();
 		}
@@ -75,12 +76,13 @@ namespace synthese
 		{
 			const ArrivalDepartureRow* __DP = (const ArrivalDepartureRow*) object;
 
-			std::string __DestinationsAAfficher = _destinationsToDisplayVIE->getValue(parameters, variables, object, request);
+			string __DestinationsAAfficher = _destinationsToDisplayVIE->getValue(parameters, variables, object, request);
 			bool __AfficherTerminus = !_displayTerminusVIE->isZero(parameters, variables, object, request);
-			std::string __TypeAffichage = _displayTypeVIE->getValue(parameters, variables, object, request);
-			std::string __SeparateurEntreArrets = _stopsSeparatorVIE->getValue(parameters, variables, object, request);
-			std::string __AvantCommune = _beforeCityVIE->getValue(parameters, variables, object, request);
-			std::string __ApresCommune = _afterCityVIE->getValue(parameters, variables, object, request);
+			string __TypeAffichage = _displayTypeVIE->getValue(parameters, variables, object, request);
+			string __SeparateurEntreArrets = _stopsSeparatorVIE->getValue(parameters, variables, object, request);
+			string displayCity(_displayCityVIE->getValue(parameters, variables, object, request));
+			string __AvantCommune = _beforeCityVIE->getValue(parameters, variables, object, request);
+			string __ApresCommune = _afterCityVIE->getValue(parameters, variables, object, request);
 
 			const City* __DerniereCommune = __DP->second.at(0)->getCity();
 
@@ -97,17 +99,17 @@ namespace synthese
 					if ( __TypeAffichage == TYPE_STATION_CITY
 						|| __TypeAffichage == TYPE_STATION_CITY_IF_NEW && __DP->second.at(__i)->getCity() != __DerniereCommune
 					){
-						std::stringstream ss;
+						stringstream ss;
 						boost::iostreams::filtering_ostream out;
 						out.push (LowerCaseFilter());
 						out.push (PlainCharFilter());
 						out.push (ss);
 
-						out << __DP->second.at(__i)->getCity () ->getName() << std::flush;
-						std::string cityName (ss.str ());
+						out << __DP->second.at(__i)->getCity () ->getName() << flush;
+						string cityName (ss.str ());
 						
 
-						// std::stringMinuscules __TexteMinuscule;
+						// stringMinuscules __TexteMinuscule;
 						// __TexteMinuscule << __DP->GetGare( __i ) ->getTown() ->getName();
 						if ((cityName.size () > 0) &&
 						    (cityName[0] >= 'a') && (cityName[0]  <= 'z'))

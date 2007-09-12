@@ -109,6 +109,7 @@ namespace synthese
 			pv.push_back(sResa.str());
 			pv.push_back(sPhones.str());
 			pv.push_back(Conversion::ToString(onlineBooking));
+			pv.push_back(journey->getDepartureTime().toInternalString());
 			
 			InterfacePage::display(stream, pv, variables, static_cast<const void*>(journey), request);
 		}
