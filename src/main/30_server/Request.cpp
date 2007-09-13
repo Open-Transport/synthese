@@ -309,6 +309,8 @@ namespace synthese
 			return map;
 		}
 
+
+
 		Request::Request(const std::string& text )
 			: _session(NULL)
 			, _actionException(false)
@@ -317,45 +319,8 @@ namespace synthese
 		{
 			std::string s (_normalizeQueryString(text));
 			ParametersMap map = _parseString(s);
+			ParametersMap::iterator it;
 
-			// Function name
-			ParametersMap::iterator it = map.find(PARAMETER_FUNCTION);
-			if (it == map.end())
-				throw RequestException("Function not specified");
-			if (!Factory<Function>::contains(it->second))
-				throw RequestException("Function not found");
-			_setFunction(Factory<Function>::createSharedPtr(it->second));
-
-			// Object ID
-			it = map.find(PARAMETER_OBJECT_ID);
-			if (it != map.end())
-			{
-				_object_id = Conversion::ToLongLong(it->second);
-			}
-
-			// Action name
-			it = map.find(PARAMETER_ACTION);
-			if (it != map.end())
-			{
-				if (!Factory<Action>::contains(it->second))
-					throw RequestException("Action not found");
-				_setAction(Factory<Action>::createSharedPtr(it->second));
-
-				// Action parameters
-				try
-				{
-					_action->_setFromParametersMap(map);
-
-					// Object ID update
-					map[PARAMETER_OBJECT_ID] = Conversion::ToString(_object_id);
-				}
-				catch (ActionException& e)	// Action parameters error
-				{
-					_actionException = true;
-					_errorLevel = REQUEST_ERROR_WARNING;
-					_errorMessage = "Action error : "+ e.getMessage();
-				}
-			}
 			// IP
 			it = map.find(PARAMETER_IP);
 			if (it == map.end())
@@ -393,6 +358,45 @@ namespace synthese
 						deleteSession();
 						_sessionBroken = true;
 					}
+				}
+			}
+
+			// Function name
+			it = map.find(PARAMETER_FUNCTION);
+			if (it == map.end())
+				throw RequestException("Function not specified");
+			if (!Factory<Function>::contains(it->second))
+				throw RequestException("Function not found");
+			_setFunction(Factory<Function>::createSharedPtr(it->second));
+
+			// Object ID
+			it = map.find(PARAMETER_OBJECT_ID);
+			if (it != map.end())
+			{
+				_object_id = Conversion::ToLongLong(it->second);
+			}
+
+			// Action name
+			it = map.find(PARAMETER_ACTION);
+			if (it != map.end())
+			{
+				if (!Factory<Action>::contains(it->second))
+					throw RequestException("Action not found");
+				_setAction(Factory<Action>::createSharedPtr(it->second));
+
+				// Action parameters
+				try
+				{
+					_action->_setFromParametersMap(map);
+
+					// Object ID update
+					map[PARAMETER_OBJECT_ID] = Conversion::ToString(_object_id);
+				}
+				catch (ActionException& e)	// Action parameters error
+				{
+					_actionException = true;
+					_errorLevel = REQUEST_ERROR_WARNING;
+					_errorMessage = "Action error : "+ e.getMessage();
 				}
 			}
 

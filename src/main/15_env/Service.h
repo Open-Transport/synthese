@@ -117,16 +117,6 @@ namespace synthese
 			virtual uid		getId()	const = 0;
 
 
-			/** Is this service reservable ?
-			@param departureMoment Desired departure moment
-			@param calculationMoment Calculation moment taken as reference 
-			for reservation delay calculation
-			@return false in default implementation.
-			*/
-			virtual bool isReservationPossible ( const synthese::time::DateTime& departureMoment,
-												 const synthese::time::DateTime& calculationMoment ) const;
-
-
 			/** Is this service providen a given day ?
 				@param originDate Departure date of the service from its origin (warning: do not test the customer departure date which can be one or more days later; use getOriginDateTime to compute the origin date)
 				@return true if the service runs at the specified date according to its Calendar

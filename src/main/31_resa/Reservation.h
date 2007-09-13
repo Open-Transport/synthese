@@ -30,8 +30,6 @@
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 
-#include <boost/shared_ptr.hpp>
-
 namespace synthese
 {
 	namespace resa
@@ -52,7 +50,7 @@ namespace synthese
 
 		private:
 
-			boost::shared_ptr<ReservationTransaction>		_transaction;
+			const ReservationTransaction*		_transaction;
 
 			//!	\name Service réservé
 			//@{
@@ -74,34 +72,38 @@ namespace synthese
 		public:
 			//!	\name Setters
 			//@{
-				void setLineId(uid id);
-				void setLineCode(const std::string& code);
-				void setServiceCode(const std::string& code);
-				void setDeparturePlaceId(uid id);
-				void setDeparturePlaceName(const std::string& name);
-				void setArrivalPlaceId(uid id);
-				void setArrivalPlaceName(const std::string& name);
-				void setReservationRuleId(uid id);
-				void setDepartureAddress(const std::string& address);
-				void setArrivalAddress(const std::string& address);
-				void setDepartureTime(const time::DateTime& time);
-				void setArrivalTime(const time::DateTime& time);
+				void setLineId				(uid id);
+				void setLineCode			(const std::string& code);
+				void setServiceCode			(const std::string& code);
+				void setDeparturePlaceId	(uid id);
+				void setDeparturePlaceName	(const std::string& name);
+				void setArrivalPlaceId		(uid id);
+				void setArrivalPlaceName	(const std::string& name);
+				void setReservationRuleId	(uid id);
+				void setDepartureAddress	(const std::string& address);
+				void setArrivalAddress		(const std::string& address);
+				void setDepartureTime		(const time::DateTime& time);
+				void setArrivalTime			(const time::DateTime& time);
+				void setTransaction			(const ReservationTransaction* transaction);
+				void setOriginDateTime		(const time::DateTime& time);
 			//@}
 
 			//!	\name Getters
 			//@{
-				uid						getLineId() const;
-				const std::string&		getLineCode() const;
-				const std::string&		getServiceCode() const;
-				uid						getDeparturePlaceId() const;
-				const std::string&		getDeparturePlaceName() const;
-				uid						getArrivalPlaceId() const;
-				const std::string&		getArrivalPlaceName() const;
-				uid						getReservationRuleId() const;
-				const std::string&		getDepartureAddress() const;
-				const std::string&		getArrivalAddress() const;
-				const time::DateTime&	getDepartureTime() const;
-				const time::DateTime&	getArrivalTime() const;
+				uid								getLineId()				const;
+				const std::string&				getLineCode()			const;
+				const std::string&				getServiceCode()		const;
+				uid								getDeparturePlaceId()	const;
+				const std::string&				getDeparturePlaceName()	const;
+				uid								getArrivalPlaceId()		const;
+				const std::string&				getArrivalPlaceName()	const;
+				uid								getReservationRuleId()	const;
+				const std::string&				getDepartureAddress()	const;
+				const std::string&				getArrivalAddress()		const;
+				const time::DateTime&			getDepartureTime()		const;
+				const time::DateTime&			getArrivalTime()		const;
+				const ReservationTransaction*	getTransaction()		const;
+				const time::DateTime&			getOriginDateTime()		const;
 			//@}
 
 		};

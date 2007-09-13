@@ -94,7 +94,6 @@ namespace synthese
 				virtual time::Schedule getDepartureEndScheduleToIndex(const Edge* edge) const;
 				virtual time::Schedule getArrivalBeginScheduleToIndex(const Edge* edge) const;
 				virtual time::Schedule getArrivalEndScheduleToIndex(const Edge* edge) const;
-	
 			//@}
 
 		};

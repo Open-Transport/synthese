@@ -68,20 +68,6 @@ namespace synthese
 				lastDepartureDateTime += continuousServiceRange;
 			}
 
-			// Reservation
-/*			DateTime maintenant(TIME_CURRENT);
-			const ReservationRule* reservationRule(serviceUse.getService()->getReservationRule ());
-
-			bool openedCompulsoryReservation( 
-				(reservationRule->isCompliant() == true)
-			&&	(reservationRule->isReservationPossible(serviceUse.getOriginDateTime(), maintenant, serviceUse.getDepartureDateTime() )) 
-			);
-			bool openedOptionalReservation(
-				(logic::indeterminate(reservationRule->isCompliant()))
-			&&	(reservationRule->isReservationPossible(serviceUse.getOriginDateTime(), maintenant, serviceUse.getDepartureDateTime() )) 
-			);
-			bool openedReservation = openedCompulsoryReservation || openedOptionalReservation;
-*/
 			// Line extraction
 			const Line* line(static_cast<const Line*>(serviceUse.getService()->getPath()));
 			const CommercialLine* commercialLine(line->getCommercialLine());

@@ -30,8 +30,6 @@
 
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
-
 namespace synthese
 {
 	namespace resa
@@ -43,14 +41,18 @@ namespace synthese
 		*/
 		class ReservationTransaction : public util::Registrable<uid, ReservationTransaction>
 		{
-			std::vector<boost::shared_ptr<Reservation> >	_reservations;
+		public:
+			typedef std::vector<const Reservation*> Reservations;
+			
+		private:
 
 			//!	\name Caractéristiques de la réservation
 			//@{
-				uid								_lastReservation;		//!< Code de la réservation annulée en cas de modification
-				int								_seats;			//!< Nombre de places
-				time::DateTime					_bookingTime;		//!< Date de la réservation
-				time::DateTime					_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
+				Reservations		_reservations;
+				uid					_lastReservation;		//!< Code de la réservation annulée en cas de modification
+				int					_seats;			//!< Nombre de places
+				time::DateTime		_bookingTime;		//!< Date de la réservation
+				time::DateTime		_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
 			//@}
 
 			//!	\name Personnes
@@ -77,27 +79,30 @@ namespace synthese
 		public:
 			ReservationTransaction();
 
-			void setLastReservation(uid id);
-			void setSeats(int seats);
-			void setBookingTime(const time::DateTime& time);
+			void setLastReservation	(uid id);
+			void setSeats			(int seats);
+			void setBookingTime		(const time::DateTime& time);
 			void setCancellationTime(const time::DateTime& time);
-			void setCustomerUserId(uid id);
-			void setCustomerName(const std::string& name);
-			void setCustomerPhone(const std::string& phone);
-			void setBookingUserId(uid id);
-			void setCancelUserId(uid id);
-			void setCustomerEMail(const std::string& email);
+			void setCustomerUserId	(uid id);
+			void setCustomerName	(const std::string& name);
+			void setCustomerPhone	(const std::string& phone);
+			void setBookingUserId	(uid id);
+			void setCancelUserId	(uid id);
+			void setCustomerEMail	(const std::string& email);
+			void addReservation		(Reservation* reservation);
 
-			uid						getLastReservation() const;
-			int						getSeats() const;
-			const time::DateTime&	getBookingTime() const;
-			const time::DateTime&	getCancellationTime() const;
-			uid						getCustomerUserId() const;
-			const std::string&		getCustomerName() const;
-			const std::string&		getCustomerPhone() const;
-			uid						getBookingUserId() const;
-			uid						getCancelUserId() const;
-			const std::string&		getCustomerEMail() const;
+			uid						getLastReservation()	const;
+			int						getSeats()				const;
+			const time::DateTime&	getBookingTime()		const;
+			const time::DateTime&	getCancellationTime()	const;
+			uid						getCustomerUserId()		const;
+			const std::string&		getCustomerName()		const;
+			const std::string&		getCustomerPhone()		const;
+			uid						getBookingUserId()		const;
+			uid						getCancelUserId()		const;
+			const std::string&		getCustomerEMail()		const;
+			const Reservations&		getReservations()		const;
+
 		};
 	}
 }

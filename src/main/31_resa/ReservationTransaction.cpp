@@ -22,6 +22,8 @@
 
 #include "ReservationTransaction.h"
 
+#include "31_resa/Reservation.h"
+
 namespace synthese
 {
 	using namespace util;
@@ -139,6 +141,17 @@ namespace synthese
 		const std::string& ReservationTransaction::getCustomerEMail() const
 		{
 			return _customerEMail;
+		}
+
+		void ReservationTransaction::addReservation(Reservation* reservation )
+		{
+			reservation->setTransaction(this);
+			_reservations.push_back(reservation);
+		}
+
+		const ReservationTransaction::Reservations& ReservationTransaction::getReservations() const
+		{
+			return _reservations;
 		}
 	}
 }

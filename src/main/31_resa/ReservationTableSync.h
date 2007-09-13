@@ -45,6 +45,7 @@ namespace synthese
 			static const std::string COL_LINE_ID;
 			static const std::string COL_LINE_CODE;
 			static const std::string COL_SERVICE_CODE;
+			static const std::string COL_ORIGIN_DATE_TIME;
 			static const std::string COL_DEPARTURE_PLACE_ID;
 			static const std::string COL_DEPARTURE_PLACE_NAME;
 			static const std::string COL_DEPARTURE_TIME;

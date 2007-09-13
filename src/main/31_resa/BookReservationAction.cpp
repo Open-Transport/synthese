@@ -39,6 +39,11 @@
 
 #include "15_env/Place.h"
 #include "15_env/Journey.h"
+#include "15_env/Service.h"
+#include "15_env/Edge.h"
+#include "15_env/Line.h"
+#include "15_env/ReservationRule.h"
+#include "15_env/AddressablePlace.h"
 
 #include "12_security/Types.h"
 #include "12_security/User.h"
@@ -81,7 +86,7 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_ORIGIN_PLACE = Action_PARAMETER_PREFIX + "dpt";
 		const string BookReservationAction::PARAMETER_DESTINATION_CITY = Action_PARAMETER_PREFIX + "act";
 		const string BookReservationAction::PARAMETER_DESTINATION_PLACE = Action_PARAMETER_PREFIX + "apt";
-	        const string BookReservationAction::PARAMETER_DATE_TIME = Action_PARAMETER_PREFIX + "da";
+        const string BookReservationAction::PARAMETER_DATE_TIME = Action_PARAMETER_PREFIX + "da";
 
 
 		const string BookReservationAction::PARAMETER_CUSTOMER_ID = Action_PARAMETER_PREFIX + "cuid";
@@ -197,12 +202,32 @@ namespace synthese
 			rt.setCustomerEMail(_customerEMail);
 			rt.setCustomerUserId(_customer.get() ? _customer->getKey() : UNKNOWN_VALUE);
 			rt.setSeats(_seatsNumber);
-			
+			ReservationTransactionTableSync::save(&rt);
+
 			// New reservation for each bookable journey leg
 			for (Journey::ServiceUses::const_iterator su(_journey.getServiceUses().begin()); su != _journey.getServiceUses().end(); ++su)
 			{
-				Reservation r;
-				
+				if(	su->getService()->getReservationRule()->isReservationPossible(
+						su->getOriginDateTime()
+						, now
+						, su->getDepartureDateTime()
+					)
+				){
+					Reservation r;
+					rt.addReservation(&r);
+					r.setDeparturePlaceId(su->getDepartureEdge()->getPlace()->getId());
+					r.setDeparturePlaceName(su->getDepartureEdge()->getPlace()->getFullName());
+					r.setDepartureTime(su->getDepartureDateTime());
+					r.setOriginDateTime(su->getOriginDateTime());
+					r.setArrivalPlaceId(su->getArrivalEdge()->getPlace()->getId());
+					r.setArrivalPlaceName(su->getArrivalEdge()->getPlace()->getFullName());
+					r.setArrivalTime(su->getArrivalDateTime());
+					r.setLineCode(static_cast<const Line*>(su->getService()->getPath())->getName());
+					r.setLineId(su->getService()->getPath()->getId());
+					r.setReservationRuleId(su->getService()->getReservationRule()->getKey());
+					r.setServiceCode(Conversion::ToString(su->getService()->getServiceNumber()));
+					ReservationTableSync::save(&r);
+				}
 			}
 		}
 

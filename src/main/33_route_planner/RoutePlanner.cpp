@@ -287,7 +287,7 @@ namespace synthese
 
 			// Time loop
 			for(_minDepartureTime = _journeySheetStartTime; 
-				(_minDepartureTime < _journeySheetEndTime
+				(_minDepartureTime <= _journeySheetEndTime
 				&&	(_maxSolutionsNumber == UNKNOWN_VALUE 
 					|| _maxSolutionsNumber > _result.journeys.size()
 					)

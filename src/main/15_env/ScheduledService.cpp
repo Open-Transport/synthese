@@ -183,5 +183,6 @@ namespace synthese
 			Schedules::const_iterator it(_arrivalSchedules.end() - 1);
 			return *it;
 		}
+
 	}
 }

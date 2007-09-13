@@ -87,15 +87,6 @@ namespace synthese
 
 
 
-		bool 
-		Service::isReservationPossible ( const synthese::time::DateTime& departureMoment, 
-						const synthese::time::DateTime& calculationMoment ) const
-		{
-			return false;
-		}
-
-
-
 		void Service::setPath( Path* path )
 		{
 			_path = path;

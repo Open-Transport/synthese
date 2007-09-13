@@ -161,5 +161,24 @@ namespace synthese
 			return _arrivalTime;
 		}
 
+		const ReservationTransaction* Reservation::getTransaction() const
+		{
+			return _transaction;
+		}
+
+		void Reservation::setTransaction( const ReservationTransaction* transaction )
+		{
+			_transaction = transaction;
+		}
+
+		const time::DateTime& Reservation::getOriginDateTime() const
+		{
+			return _originDateTime;
+		}
+
+		void Reservation::setOriginDateTime( const time::DateTime& time )
+		{
+			_originDateTime = time;
+		}
 	}
 }
