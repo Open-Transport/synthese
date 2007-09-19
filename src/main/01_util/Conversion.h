@@ -54,8 +54,6 @@ namespace synthese
 			Conversion ();
 			~Conversion ();
 
-			static char _Buffer[128];
-
 		public:
 
 			/** Converts a string to a boolean value.
@@ -75,6 +73,9 @@ namespace synthese
 
 			static double ToDouble (const std::string& s);
 
+			static std::string ToPrepaddedString (const std::string& s, char padchar, int paddedsize);
+			static std::string ToPostpaddedString (const std::string& s, char padchar, int paddedsize);
+
 			static std::string ToTruncatedString (const std::string& s, int size = 255);
 
 			static std::string ToString (int i);
@@ -84,10 +85,13 @@ namespace synthese
 			static std::string ToString (unsigned long long l);
 
 			static std::string ToString (long l);
+
 			static std::string ToString (unsigned long l);
 
 			static std::string ToString (double d);
 			static std::string ToString (const std::string& s);
+
+			static std::string ToOctalString (long l);
 
 			static std::string ToString (boost::logic::tribool t);
 

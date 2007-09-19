@@ -32,6 +32,7 @@
 #include "15_env/LineStop.h"
 #include "15_env/TransportNetwork.h"
 #include "15_env/City.h"
+#include "15_env/Service.h"
 
 #include "14_geography/Projection.h"
 #include "06_geometry/Point2D.h"
@@ -53,9 +54,10 @@ namespace synthese
 	using namespace geography;
 	using namespace geometry;
 	using namespace time;
+	using namespace env;
 	using namespace util;
 
-	namespace env
+	namespace impex
 	{
 
 
@@ -664,7 +666,7 @@ namespace synthese
 
 
 		std::string 
-		TridentExport::TridentId (const std::string& peer,  const std::string clazz, const Service* service)
+		TridentExport::TridentId (const std::string& peer,  const std::string clazz, const synthese::env::Service* service)
 		{
 			std::stringstream ss;
 			ss << peer << ":" << clazz << ":" << ((const Line*) service->getPath ())->getKey () 

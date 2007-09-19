@@ -31,6 +31,13 @@
 #include "30_server/CleanerThreadExec.h"
 #include "30_server/ServerThreadExec.h"
 
+#ifdef UNIX
+  #define DEFAULT_TEMP_DIR "/tmp"
+#endif
+#ifdef WIN32
+  #define DEFAULT_TEMP_DIR "c:/temp"
+#endif
+
 using namespace boost::posix_time;
 
 namespace synthese
@@ -42,13 +49,20 @@ namespace synthese
     {
 	ServerModule::SessionMap	ServerModule::_sessionMap;
 
+	const std::string ServerModule::MODULE_PARAM_PORT ("port");
+	const std::string ServerModule::MODULE_PARAM_NB_THREADS ("nb_threads");
+	const std::string ServerModule::MODULE_PARAM_LOG_LEVEL ("log_level");
+	const std::string ServerModule::MODULE_PARAM_TMP_DIR ("tmp_dir");
 
 	void ServerModule::preInit ()
 	{
-		RegisterParameter ("port", "3591", &ParameterCallback);
-		RegisterParameter ("nb_threads", "5", &ParameterCallback);
-		RegisterParameter ("log_level", "1", &ParameterCallback);
+		RegisterParameter (MODULE_PARAM_PORT, "3591", &ParameterCallback);
+		RegisterParameter (MODULE_PARAM_NB_THREADS, "5", &ParameterCallback);
+		RegisterParameter (MODULE_PARAM_LOG_LEVEL, "1", &ParameterCallback);
+		RegisterParameter (MODULE_PARAM_TMP_DIR, DEFAULT_TEMP_DIR, &ParameterCallback);
 	}
+
+
 
 	void ServerModule::initialize()
 	{

@@ -31,7 +31,14 @@ namespace synthese
 		class ServerModule : public db::DbModuleClass
 		{
 		public:
-			typedef std::map<std::string, Session*> SessionMap;
+
+		    //! DbModule parameters
+		    static const std::string MODULE_PARAM_PORT;
+		    static const std::string MODULE_PARAM_NB_THREADS;
+		    static const std::string MODULE_PARAM_LOG_LEVEL;
+		    static const std::string MODULE_PARAM_TMP_DIR;
+
+		    typedef std::map<std::string, Session*> SessionMap;
 
 		private:
 

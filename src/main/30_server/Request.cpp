@@ -186,6 +186,8 @@ namespace synthese
 			_function->_run(stream);
 		}
 
+
+
 		void Request::_setAction(shared_ptr<Action> action )
 		{
 			_action = action;

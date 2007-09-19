@@ -36,7 +36,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 
-	namespace env
+	namespace impex
 	{
 		/// @todo Parameter names declarations
 		//const string TridentExportFunction::PARAMETER_PAGE("rub");

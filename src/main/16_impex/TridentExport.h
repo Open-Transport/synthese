@@ -21,8 +21,8 @@
 */
 
 
-#ifndef SYNTHESE_ENV_TRIDENTEXPORT_H
-#define SYNTHESE_ENV_TRIDENTEXPORT_H
+#ifndef SYNTHESE_IMPEX_TRIDENTEXPORT_H
+#define SYNTHESE_IMPEX_TRIDENTEXPORT_H
 
 #include "01_util/UId.h"
 
@@ -33,11 +33,15 @@
 namespace synthese
 {
 
-
 namespace env
 {
-
     class Service;
+}
+
+
+namespace impex
+{
+
 
 
 /** Trident/Chouette export.
@@ -65,7 +69,7 @@ private:
     
     static std::string TridentId (const std::string& peer, const std::string clazz, const uid& id);
     static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
-    static std::string TridentId (const std::string& peer, const std::string clazz, const Service* srv);
+    static std::string TridentId (const std::string& peer, const std::string clazz, const env::Service* srv);
 
 
 };

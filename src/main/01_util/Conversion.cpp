@@ -140,6 +140,15 @@ namespace synthese
 		}
 
 		std::string 
+		Conversion::ToOctalString (long l)
+		{
+			std::stringstream ss;
+			ss << std::oct;
+			ss << l;
+			return ss.str ();
+		}
+
+		std::string 
 		Conversion::ToString (unsigned long l)
 		{
 			std::stringstream ss;
@@ -203,6 +212,28 @@ namespace synthese
 			return result;
 
 		}
+
+
+
+	    std::string Conversion::ToPrepaddedString (const std::string& s, char padchar, int paddedsize) 
+	    {
+		assert (s.length () <= paddedsize);
+		std::stringstream ss;
+		for (int i=0; i<(paddedsize - s.length ()); ++i) ss << padchar;
+		ss << s;
+		return ss.str ();
+	    }
+
+
+	    std::string Conversion::ToPostpaddedString (const std::string& s, char padchar, int paddedsize) 
+	    {
+		assert (s.length () <= paddedsize);
+		std::stringstream ss;
+		ss << s;
+		for (int i=0; i<(paddedsize - s.length ()); ++i) ss << padchar;
+		return ss.str ();
+	    }
+
 
 	    std::string Conversion::ToTruncatedString (const std::string& s, int size)
 	    {

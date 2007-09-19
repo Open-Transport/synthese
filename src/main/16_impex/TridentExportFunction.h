@@ -29,7 +29,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace impex
 	{
 		/** TridentExportFunction Function class.
 			@author Hugues Romain
