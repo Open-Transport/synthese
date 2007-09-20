@@ -114,7 +114,7 @@ def CopyFiles (env, dest, files, recursive = False, onlyIfDifferent = True):
 def DefaultModuleName ( env ):
   mn = env.Dir('.').srcnode ().abspath
   prefix = ''
-  istestmodule = mn.find ('src' + os.sep + 'test' + os.sep) != -1
+  istestmodule = (mn.find ('src' + os.sep + 'test' + os.sep) != -1)
   if istestmodule:
     prefix = 'src' + os.sep + 'test' + os.sep  # be careful with / and os.path.separator when doing string find!!!
   else:
@@ -123,7 +123,7 @@ def DefaultModuleName ( env ):
   mn = mn[mn.rfind (prefix) + len(prefix):].replace(os.sep, '__')
 
   if istestmodule:
-    mn = mn + '_test'
+    mn = 'test_' + mn
     
   return mn
 
@@ -288,16 +288,6 @@ def AddModuleDependency (env, modulename):
     lp = Dir('#' + buildmain).abspath + '/' + modulename.replace ('__', os.sep)
     env.Append ( LIBPATH = [lp] )  
       
-    
-    # print '*** ', Dir('../../main').abspath + '/' + modulename.replace ('.', os.sep)
-    #env.Append ( LIBPATH = [Dir(buildmain).abspath + '/' + modulename.replace ('.', '/')] )  
-    #env.Append ( LIBPATH = [buildmain + '/' + modulename.replace ('.', '/')] )  
-    #libdir = Dir('src/main').abspath + '/' + modulename
-    #print '%' , libdir
-    #env.Append ( LIBPATH = [libdir])
-
-
-
 
 
 
@@ -305,12 +295,13 @@ def AddModuleDependency (env, modulename):
 
 def ModuleBuild (moduleenv, includes = '*.cpp', excludes = [], recursive = True):
 
-  if (goal == "genmsvs"):
+  if goal == "genmsvs":
     moduleenv.GenerateMSVSProject ()
   else:
     # Create module static library
     files = moduleenv.Glob(includes, excludes)
-    moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
+    
+    sl = moduleenv.StaticLibrary ( moduleenv.DefaultModuleName(), files )
   
   moduleenv.RecursiveBuild ()
 
@@ -451,8 +442,8 @@ def GenerateMSVSProject (moduleenv):
   projinfos = []
 
   # [projname, projguid, projrelativepath]
-  projname = moduleenv.DefaultModuleName () + ".gen.vcproj"
-  projinfos.append (moduleenv.DefaultModuleName ())
+  projname = moduleenv.DefaultModuleName ()
+  projinfos.append (projname)
   
   # generate guid for projname (the first part of proj guid is faked)
   # since it is generated from module name , this guid is stable; maybe shouldn't be ?
@@ -460,7 +451,7 @@ def GenerateMSVSProject (moduleenv):
   projguid = '266969BE-1E07-4C1B-ABFC-%(ph)012X' % {'ph': projnamehash}
   projinfos.append (projguid)
   
-  projrelativepath = moduleenv.Dir ('.').srcnode().abspath.replace (moduleenv.Dir ('#').srcnode ().abspath, ".") + "/" + projname
+  projrelativepath = moduleenv.Dir ('.').srcnode().abspath.replace (moduleenv.Dir ('#').srcnode ().abspath, ".") + os.sep + projname + ".gen.vcproj"
   projinfos.append (projrelativepath)
 
   # Glob all project related files
@@ -470,14 +461,14 @@ def GenerateMSVSProject (moduleenv):
   projectFiles.extend (moduleenv.Glob (pattern = 'SConscript', excludes = [], dir = '.' ))
 
   # Create MS VS 2005 Project file
-  mpj = currentpath + '/' + projname
+  mpj = currentpath + '/' + projname + ".gen.vcproj"
   print 'Generating MSVS project ', projinfos
   
   moduleprojfile = open (mpj, "w" )
   moduleprojfile.write ("<?xml version=\"1.0\" encoding=\"Windows-1252\"?>\n")
 
   # todo generate a project guid
-  moduleprojfile.write ("<VisualStudioProject ProjectType=\"Visual C++\" Version=\"8,00\" Name=\"01_util\" ProjectGUID=\"{266969BE-1E07-4C1B-ABFC-5193858D0B4B}\" Keyword=\"MakeFileProj\">\n")
+  moduleprojfile.write ("<VisualStudioProject ProjectType=\"Visual C++\" Version=\"8,00\" Name=\"" + projname + "\" ProjectGUID=\"{266969BE-1E07-4C1B-ABFC-5193858D0B4B}\" Keyword=\"MakeFileProj\">\n")
 
   moduleprojfile.write ("<Platforms> <Platform Name=\"Win32\"/> </Platforms>\n");
 
@@ -487,8 +478,8 @@ def GenerateMSVSProject (moduleenv):
 
   # todo relative path fix ../../..
   for configname in ['Debug', 'Release']:
-    moduleprojfile.write ("<Configuration Name=\"" + configname + "|Win32\" OutputDirectory=\"../../../build/win32/$(ConfigurationName)/main/$(InputName)\" IntermediateDirectory=\"../../../build/win32/$(ConfigurationName)/main/$(InputName)\" ConfigurationType=\"0\" InheritedPropertySheets=\"$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops\">\n")
-    moduleprojfile.write ("<Tool Name=\"VCNMakeTool\" BuildCommandLine=\"../../../vsscons build &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)\" ReBuildCommandLine=\"../../../vsscons rebuild &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)\" CleanCommandLine=\"../../../vsscons clean &quot;mode=$(ConfigurationName)&quot; src/main/$(InputName)\" Output=\"../../../build/win32/$(ConfigurationName)/main/$(InputName)/$(InputName).lib\" PreprocessorDefinitions=\"\" IncludeSearchPath=\"\" ForcedIncludes=\"\" AssemblySearchPath=\"\" ForcedUsingAssemblies=\"\" CompileAsManaged=\"\" />\n")
+    moduleprojfile.write ("<Configuration Name=\"" + configname + "|Win32\" OutputDirectory=\"../../../build/win32/$(ConfigurationName)/main/$(ProjectName)\" IntermediateDirectory=\"../../../build/win32/$(ConfigurationName)/main/$(ProjectName)\" ConfigurationType=\"0\" InheritedPropertySheets=\"$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops\">\n")
+    moduleprojfile.write ("<Tool Name=\"VCNMakeTool\" BuildCommandLine=\"../../../vsscons build &quot;-Dmode=$(ConfigurationName)&quot; &quot;-Dtarget=src/main/$(ProjectName)&quot;\" ReBuildCommandLine=\"../../../vsscons rebuild &quot;-Dmode=$(ConfigurationName)&quot; &quot;-Dtarget=src/main/$(ProjectName)&quot;\" CleanCommandLine=\"../../../vsscons clean &quot;-Dmode=$(ConfigurationName)&quot; &quot;-Dtarget=src/main/$(ProjectName)&quot;\" Output=\"../../../build/win32/$(ConfigurationName)/main/$(ProjectName)/$(ProjectName).lib\" PreprocessorDefinitions=\"\" IncludeSearchPath=\"\" ForcedIncludes=\"\" AssemblySearchPath=\"\" ForcedUsingAssemblies=\"\" CompileAsManaged=\"\" />\n")
     moduleprojfile.write ("</Configuration>\n")
 
   moduleprojfile.write ("</Configurations>\n");
@@ -730,6 +721,7 @@ if goal == "genmsvs":
   rootenv.GenerateMSVSSolution ()
     
     
+
 
 
 

@@ -34,20 +34,21 @@ GOTO END
 
 
 :CLEAN
+echo ant %2 %3 %4 %5 %6 %7 %8 %9 clean
 rem CALL scons -c %2 %3 %4 %5 %6 %7 %8 %9
 CALL ant %2 %3 %4 %5 %6 %7 %8 %9 clean
 GOTO END
 
 :BUILD
-echo scons %2 %3 %4 %5 %6 %7 %8 %9
+echo ant %2 %3 %4 %5 %6 %7 %8 %9 build
 rem CALL scons -j %NUMBER_OF_PROCESSORS% %2 %3 %4 %5 %6 %7 %8 %9
 CALL ant %2 %3 %4 %5 %6 %7 %8 %9 build
 GOTO END
 
 
 :REBUILD
-CALL ant %2 %3 %4 %5 %6 %7 %8 %9 clean
 rem CALL scons -c %2 %3 %4 %5 %6 %7 %8 %9
+CALL ant %2 %3 %4 %5 %6 %7 %8 %9 clean
 GOTO BUILD
 
 

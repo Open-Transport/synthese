@@ -1,5 +1,6 @@
 <project name="synthese" default="build" basedir=".">
 
+
   <import file="../common.xml"/>
 
   <property name="version" value="3_0"/>
@@ -35,6 +36,16 @@
     
   </target>
        
+
+  <target name="clean">
+    <antcall target="sconsbuild">
+      <param name="goal.param" value=""/>
+      <param name="target.param" value="${target}"/>
+      <param name="opts" value="-c"/>
+    </antcall>
+
+  </target>
+
 
 
 
