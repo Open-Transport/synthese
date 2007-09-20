@@ -454,6 +454,7 @@ def GenerateMSVSProject (moduleenv):
   projrelativepath = moduleenv.Dir ('.').srcnode().abspath.replace (moduleenv.Dir ('#').srcnode ().abspath, ".") + os.sep + projname + ".gen.vcproj"
   projinfos.append (projrelativepath)
 
+
   # Glob all project related files
   projectFiles = []
   projectFiles.extend (moduleenv.Glob (pattern = '*.cpp', excludes = [], dir = '.' ))
@@ -467,7 +468,6 @@ def GenerateMSVSProject (moduleenv):
   moduleprojfile = open (mpj, "w" )
   moduleprojfile.write ("<?xml version=\"1.0\" encoding=\"Windows-1252\"?>\n")
 
-  # todo generate a project guid
   moduleprojfile.write ("<VisualStudioProject ProjectType=\"Visual C++\" Version=\"8,00\" Name=\"" + projname + "\" ProjectGUID=\"{266969BE-1E07-4C1B-ABFC-5193858D0B4B}\" Keyword=\"MakeFileProj\">\n")
 
   moduleprojfile.write ("<Platforms> <Platform Name=\"Win32\"/> </Platforms>\n");
@@ -476,10 +476,12 @@ def GenerateMSVSProject (moduleenv):
 
   moduleprojfile.write ("<Configurations>\n");
 
-  # todo relative path fix ../../..
+  projoutputsuffix= moduleenv.Dir ('.').srcnode().abspath.replace (moduleenv.Dir ('#src').srcnode ().abspath, "")
+
   for configname in ['Debug', 'Release']:
-    moduleprojfile.write ("<Configuration Name=\"" + configname + "|Win32\" OutputDirectory=\"../../../build/win32/$(ConfigurationName)/main/$(ProjectName)\" IntermediateDirectory=\"../../../build/win32/$(ConfigurationName)/main/$(ProjectName)\" ConfigurationType=\"0\" InheritedPropertySheets=\"$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops\">\n")
-    moduleprojfile.write ("<Tool Name=\"VCNMakeTool\" BuildCommandLine=\"../../../vsscons build &quot;-Dmode=$(ConfigurationName)&quot; &quot;-Dtarget=src/main/$(ProjectName)&quot;\" ReBuildCommandLine=\"../../../vsscons rebuild &quot;-Dmode=$(ConfigurationName)&quot; &quot;-Dtarget=src/main/$(ProjectName)&quot;\" CleanCommandLine=\"../../../vsscons clean &quot;-Dmode=$(ConfigurationName)&quot; &quot;-Dtarget=src/main/$(ProjectName)&quot;\" Output=\"../../../build/win32/$(ConfigurationName)/main/$(ProjectName)/$(ProjectName).lib\" PreprocessorDefinitions=\"\" IncludeSearchPath=\"\" ForcedIncludes=\"\" AssemblySearchPath=\"\" ForcedUsingAssemblies=\"\" CompileAsManaged=\"\" />\n")
+    moduleprojfile.write ("<Configuration Name=\"" + configname + "|Win32\" OutputDirectory=\"$(SolutionDir)/" + buildroot + projoutputsuffix + "\" IntermediateDirectory=\"$(SolutionDir)/" + buildroot + projoutputsuffix + "\" ConfigurationType=\"0\" InheritedPropertySheets=\"$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops\">\n")
+    
+    moduleprojfile.write ("<Tool Name=\"VCNMakeTool\" BuildCommandLine=\"ant -s build.xml &quot;-Dmode=$(ConfigurationName)&quot; &quot;-Dtarget=src" + projoutputsuffix + "&quot; build\" ReBuildCommandLine=\"ant -s build.xml &quot;-Dmode=$(ConfigurationName)&quot;  &quot;-Dtarget=src" + projoutputsuffix + "&quot; rebuild\" CleanCommandLine=\"ant -s build.xml &quot;-Dmode=$(ConfigurationName)&quot;  &quot;-Dtarget=src" + projoutputsuffix + "&quot;  clean\" Output=\"$(SolutionDir)/" + buildroot + projoutputsuffix + os.sep + projname + ".lib\" PreprocessorDefinitions=\"\" IncludeSearchPath=\"\" ForcedIncludes=\"\" AssemblySearchPath=\"\" ForcedUsingAssemblies=\"\" CompileAsManaged=\"\" />\n")
     moduleprojfile.write ("</Configuration>\n")
 
   moduleprojfile.write ("</Configurations>\n");

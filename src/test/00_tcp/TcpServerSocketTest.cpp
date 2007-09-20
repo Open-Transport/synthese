@@ -1,6 +1,6 @@
 #include "01_util/Conversion.h"
-#include "01_util/Compression.h"
-#include "01_util/Thread.h"
+#include "01_util/iostreams/Compression.h"
+#include "01_util/threads/Thread.h"
 
 #include "00_tcp/TcpService.h"
 #include "00_tcp/TcpServerSocket.h"

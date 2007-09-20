@@ -1,6 +1,6 @@
 Import ('env')
 
-modules = ['00_tcp', '01_util'];
+modules = ['00_tcp', '01_util__threads', '01_util__iostreams', '01_util'];
 
 unittestenv = env.UnitTestEnv (modules)
 unittestenv.UnitTest ()
