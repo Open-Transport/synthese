@@ -14,7 +14,7 @@
   <property name="profile" value="false"/>     
 
 
-  <target name="build">
+  <target name="build" description="[-Dtarget=TARGET] [-Dmode=MODE] : build TARGET">
 
     <fail unless="target"/>
 
@@ -27,7 +27,7 @@
   </target>
 
        
-  <target name="genmsvs">
+  <target name="genmsvs" description=" : generate MS Visual Studio 2005 project files">
 
     <antcall target="sconsbuild">
       <param name="goal.param" value="genmsvs"/>
@@ -37,7 +37,7 @@
   </target>
        
 
-  <target name="clean">
+  <target name="clean" description="[-Dtarget=TARGET] [-Dmode=MODE] : clean TARGET">
     <antcall target="sconsbuild">
       <param name="goal.param" value=""/>
       <param name="target.param" value="${target}"/>
@@ -49,7 +49,7 @@
 
 
 
-  <target name="dist">
+  <target name="dist" description="[-Dtarget=TARGET] [-Dmode=MODE] -Ddistname=DISTNAME : create an installable distribution of TARGET as DISTNAME">
 
     <fail unless="target"/>
     <fail unless="distname"/>
@@ -65,7 +65,7 @@
 
 
 
-  <target name="install" depends="dist">
+  <target name="install" depends="dist" description="[-Dtarget=TARGET] [-Dmode=MODE] -Ddistname=DISTNAME : install TARGET on localhost as DISTNAME">
 
     <propertyregex property="targetname" input="${target}" casesensitive="false"
 		   regexp="^.*/(.*)" select="\1" override="true"/>
@@ -95,7 +95,7 @@
 
 
 
-  <target name="remoteinstall" depends="dist">
+  <target name="remoteinstall" depends="dist" description="[-Dtarget=TARGET] [-Dmode=MODE] -Ddistname=DISTNAME -Dremoteinstall.host=RHOST: install TARGET on RHOST as DISTNAME">
 
     <fail unless="remoteinstall.host"/>
 
