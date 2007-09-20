@@ -1,1 +1,4 @@
-../SConscript.module
+
+Import ('mainenv')
+mainenv.ModuleBuild ();
+
