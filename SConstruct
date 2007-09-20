@@ -452,7 +452,7 @@ def GenerateMSVSProject (moduleenv):
 
   # [projname, projguid, projrelativepath]
   projname = moduleenv.DefaultModuleName () + ".gen.vcproj"
-  projinfos.append (projname)
+  projinfos.append (moduleenv.DefaultModuleName ())
   
   # generate guid for projname (the first part of proj guid is faked)
   # since it is generated from module name , this guid is stable; maybe shouldn't be ?
@@ -504,16 +504,45 @@ def GenerateMSVSProject (moduleenv):
 
   moduleprojfile.write ("</VisualStudioProject>\n");
   
-  
-  
-                        
-                        
-
   moduleprojfile.close ()
-
+  msprojects.append (projinfos)
+  
 
   
   
+def GenerateMSVSSolution (env):
+
+  msvssolname = "synthese3.gen.sln"
+  print 'Generating MSVS solution ', msvssolname
+  
+  msvssol = open (msvssolname, "w")
+  msvssol.write ("Microsoft Visual Studio Solution File, Format Version 9.00\n")
+  msvssol.write ("# Visual Studio 2005\n")
+
+  # all should have been stored in global var msprojects
+  # [projname, projguid, projrelativepath]
+
+  for msproj in msprojects:
+    msvssol.write ("Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"" + msproj[0] + "\", \"" + msproj[2] + "\", \"{" + msproj[1] + "}\"\n")
+    msvssol.write ("EndProject\n")
+
+  msvssol.write ("Global\n");
+  msvssol.write ("GlobalSection(SolutionConfigurationPlatforms) = preSolution\n");
+  msvssol.write ("	Debug|Win32 = Debug|Win32\n");
+  msvssol.write ("      Release|Win32 = Release|Win32\n");
+  msvssol.write ("EndGlobalSection\n");
+  msvssol.write ("GlobalSection(ProjectConfigurationPlatforms) = postSolution\n");
+  msvssol.write ("	Debug|Win32 = Debug|Win32\n");
+  msvssol.write ("      Release|Win32 = Release|Win32\n");
+  msvssol.write ("EndGlobalSection\n");
+  msvssol.write ("GlobalSection(SolutionProperties) = preSolution\n");
+  msvssol.write ("	HideSolutionNode = FALSE\n");
+  msvssol.write ("EndGlobalSection\n");
+  msvssol.write ("EndGlobal\n");
+
+  msvssol.close ()
+  
+    
 
 
 
@@ -602,6 +631,8 @@ SConsEnvironment.IsRelease=IsRelease
 SConsEnvironment.IsProfile=IsProfile
 
 SConsEnvironment.GenerateMSVSProject=GenerateMSVSProject 
+SConsEnvironment.GenerateMSVSSolution=GenerateMSVSSolution
+
 SConsEnvironment.SyntheseBuild=SyntheseBuild
 SConsEnvironment.SyntheseDist=SyntheseDist
 
@@ -694,7 +725,9 @@ builddir = '#' + buildroot
 rootenv.SConscript ('src/main/SConscript', build_dir = builddir + '/main', duplicate = 0)
 rootenv.SConscript ('src/test/SConscript', build_dir = builddir + '/test', duplicate = 0)
 
-
+# Generate MSVS solution at this level if required
+if goal == "genmsvs":
+  rootenv.GenerateMSVSSolution ()
     
     
 
