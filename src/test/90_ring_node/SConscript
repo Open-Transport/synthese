@@ -4,6 +4,6 @@ Import ('env')
 modules = ['03_db_ring', '02_db', '01_util__iostreams', '01_util__threads', '01_util', '00_tcp'];
 syntheseenv = env.SyntheseEnv (modules)
 
-syntheseenv.Program (syntheseenv.DefaultTestModuleName (), 'main.cpp')
+syntheseenv.Program (syntheseenv.DefaultModuleName (), 'main.cpp')
 
 

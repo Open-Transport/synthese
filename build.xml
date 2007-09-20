@@ -24,7 +24,18 @@
     </antcall>
     
   </target>
+
        
+  <target name="genmsvs">
+
+    <antcall target="sconsbuild">
+      <param name="goal.param" value="genmsvs"/>
+      <param name="target.param" value=""/>
+    </antcall>
+    
+  </target>
+       
+
 
 
   <target name="dist">
