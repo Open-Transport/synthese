@@ -62,17 +62,21 @@ namespace synthese
 				Request request(requestString);
 				request.run(tcpStream);
 			}
-			catch (RequestException e)
+			catch (RequestException& e)
 			{
 				Log::GetInstance().debug("Request error", e);
 			}
-			catch (ActionException e)
+			catch (ActionException& e)
 			{
 				Log::GetInstance().debug("Action error", e);
 			}
-			catch(util::Exception e)
+			catch(util::Exception& e)
 			{
 				Log::GetInstance().debug("Exception", e);
+			}
+			catch(std::exception& e)
+			{
+			    Log::GetInstance().debug("An unhandled exception has occured : " + std::string (e.what ()));
 			}
 			catch(...)
 			{

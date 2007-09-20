@@ -37,6 +37,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/regex.hpp>
 
 #include <fstream>
 
@@ -88,13 +89,17 @@ namespace synthese
 			}
 			else
 			{
-			    _commercialLineRegex = it->second;
+			    _archiveBasename = it->second;
 			}
 
 		}
 
 		void TridentExportAction::run()
 		{
+		    // Create the regex 
+		    boost::regex regex (_commercialLineRegex);
+		    
+
 		    // Create archive directory in global temp directory
 		    const boost::filesystem::path& tempDir = ServerModule::GetParameter (ServerModule::MODULE_PARAM_TMP_DIR);
 		    const boost::filesystem::path archiveDir (tempDir / _archiveBasename);
@@ -116,6 +121,9 @@ namespace synthese
 		    {
 			boost::shared_ptr<CommercialLine> cl = it->second;
 			std::string name = cl->getName ();
+			
+			if (boost::regex_match (name, regex) == false) continue;
+			
 			std::string filename ("trident");
 			for (int i=0; i<name.length (); ++i) 
 			{

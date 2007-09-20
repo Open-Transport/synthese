@@ -62,6 +62,8 @@ namespace synthese
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
 
+			bool _beforeSessionControl() const { return true; }
+
 		public:
 			/** Action to run, defined by each subclass.
 			*/

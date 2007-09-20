@@ -146,8 +146,11 @@ namespace synthese
 			if (_action.get() && !_actionException)
 			{
 				if (!_action->_beforeSessionControl()
-					&& _session == NULL && _action->_runBeforeActionIfNoSession())
-						return;
+				    && _session == NULL && _action->_runBeforeActionIfNoSession())
+				{
+				    util::Log::GetInstance().warn("Active session required for this action! Request dropped.");
+				    return;
+				}
 
 				try
 				{

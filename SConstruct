@@ -350,6 +350,7 @@ def SyntheseEnv (env, modules):
     syntheseenv.AddBoostDependency ('boost_date_time')
     syntheseenv.AddBoostDependency ('boost_thread')
     syntheseenv.AddBoostDependency ('boost_iostreams')
+    syntheseenv.AddBoostDependency ('boost_regex')
     syntheseenv.AddSQLiteDependency ()
     syntheseenv.AddZlibDependency ()
     syntheseenv.AppendMultithreadConf ()
