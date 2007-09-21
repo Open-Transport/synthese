@@ -22,7 +22,7 @@ case "$1" in
 		# Make sure we have our PIDDIR, even if it's on a tmpfs
 		install -o root -g root -m 755 -d $PIDDIR
 
-		if ! start-stop-daemon --start --background --make-pidfile --pidfile $PIDFILE --quiet --oknodo --startas #INSTALLDIR#/#DISTNAME#/startup.sh -- --param port=#INSTALLPORT# --param db_port=#INSTALLDBPORT# --param log_level=#INSTALLLOGLEVEL# ; then
+		if ! start-stop-daemon --start --background --make-pidfile --pidfile $PIDFILE --quiet --oknodo --startas #INSTALLDIR#/#DISTNAME#/startup.sh -- --param port=#INSTALLPORT# --param db_port=#INSTALLDBPORT# --param log_level=#INSTALLLOGLEVEL# --param tmp_dir=#TMPDIR# ; then
 			log_end_msg 1
 			exit 1
 		fi

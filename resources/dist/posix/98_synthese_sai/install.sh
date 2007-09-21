@@ -8,6 +8,8 @@ INSTALLPORT=${1:-3593}
 INSTALLDBPORT=${2:-3594}
 INSTALLLOGLEVEL=${3:-0}
 INSTALLLOGFILE=${4:-/srv/log/$DISTNAME.log}
+TMPDIR=${5:-/srv/tmp/}
+
 
 echo Install dir is set to $INSTALLDIR
 mkdir -p $INSTALLDIR/$DISTNAME
@@ -34,6 +36,7 @@ sed -i "s?#INSTALLDIR#?$INSTALLDIR?" /etc/init.d/$DISTNAME
 sed -i "s?#INSTALLPORT#?$INSTALLPORT?" /etc/init.d/$DISTNAME
 sed -i "s?#INSTALLDBPORT#?$INSTALLDBPORT?" /etc/init.d/$DISTNAME
 sed -i "s?#INSTALLLOGLEVEL#?$INSTALLLOGLEVEL?" /etc/init.d/$DISTNAME
+sed -i "s?#TMPDIR#?$TMPDIR?" /etc/init.d/$DISTNAME
 
 sed -i "s?#INSTALLLOGFILE#?$INSTALLLOGFILE?" $INSTALLDIR/$DISTNAME/startup.sh
 
