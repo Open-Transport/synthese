@@ -50,6 +50,8 @@ namespace synthese
 
 		    const SQLData& getSQL () const { return _sql; }
 
+		    
+
 		    int getParameterIndex (const std::string& parameterName) const;
 		    
 		    void reset ();
@@ -81,6 +83,8 @@ namespace synthese
 
 
 		private:
+
+		    sqlite3* getHandle () const;
 
 		    friend class SQLite;
 		    friend class SQLiteLazyResult;

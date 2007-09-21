@@ -24,6 +24,36 @@ SQLiteCachedResult::SQLiteCachedResult (const std::vector<std::string>& columnNa
 }
 
 
+SQLiteCachedResult::SQLiteCachedResult ()
+    : _pos (-1)
+
+{
+
+}
+
+
+void 
+SQLiteCachedResult::addRow (int nbColumns, char** values, char** columns)
+{
+    if (_columnNames.size () == 0) 
+    {
+	for (int i=0; i<nbColumns; ++i) _columnNames.push_back (columns[i]);
+    }
+    SQLiteResultRow row;
+    for (int i=0; i<nbColumns; ++i) 
+    {
+	if (values[i] == 0)
+	{
+	    row.push_back (SQLiteValueSPtr (new SQLiteValue ("")));
+	}
+	else
+	{
+	    row.push_back (SQLiteValueSPtr (new SQLiteValue (values[i])));
+	}
+    }
+    addRow (row);
+}
+
 
 
 

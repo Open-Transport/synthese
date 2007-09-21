@@ -31,6 +31,7 @@ class SQLiteCachedResult : public SQLiteResult
     /** Constructs a new SQLite result by storing in memory all values contained 
      * in another SQLite result.
      */
+    SQLiteCachedResult ();
     SQLiteCachedResult (const std::vector<std::string>& columnNames);
     SQLiteCachedResult (const SQLiteResultSPtr& result);
     ~SQLiteCachedResult ();
@@ -50,6 +51,7 @@ class SQLiteCachedResult : public SQLiteResult
     SQLiteResultRow getRow () const;
     
     void addRow (const SQLiteResultRow& row);
+    void addRow (int nbColumns, char** values, char** columns);
 
     //@}
 

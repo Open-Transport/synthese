@@ -21,6 +21,15 @@ namespace db
 
 
 
+int 
+sqlite_callback (void* result, int nbColumns, char** values, char** columns)
+{
+    SQLiteCachedResult* dbResult = (SQLiteCachedResult*) result;
+    dbResult->addRow (nbColumns, values, columns);
+    return 0;
+}
+
+
 
 
 sqlite3* 
@@ -107,11 +116,17 @@ SQLite::ExecUpdate (sqlite3* handle, const SQLData& sql)
 SQLiteResultSPtr 
 SQLite::ExecQuery (const SQLiteStatementSPtr& statement, bool lazy)
 {
-    lazy = false;  
     // TODO : lazy results are not used right now. stepping keeps the lock 
     // external queries (from interface complain about wrong thread access
     // dbtable adaptation does not work anymore!
+    // This will be fixed naturally when upgrading yo sqlite 3.5 which relaxes
+    // constraints on db connection thread access.
 
+
+    // The poor performances given by frequent access to sqlite_value makes us
+    // override the caching mechanism by value to use all-in-once sqlite fonction
+    // version (which does not exist for precompiled statements, so commenting the following)
+    /*
     SQLiteResultSPtr result (new SQLiteLazyResult (statement));
     if (lazy)
     {
@@ -122,6 +137,9 @@ SQLite::ExecQuery (const SQLiteStatementSPtr& statement, bool lazy)
 	SQLiteCachedResult* cachedResult = new SQLiteCachedResult (result);
 	return SQLiteResultSPtr (cachedResult);
     }
+    */
+    return ExecQuery (statement->getHandle (), statement->getSQL (), false); // force lazy = false
+
 }
 
 
@@ -133,10 +151,30 @@ SQLite::ExecQuery (const SQLiteStatementSPtr& statement, bool lazy)
 SQLiteResultSPtr 
 SQLite::ExecQuery (sqlite3* handle, const std::string& sql, bool lazy)
 {
-    // Compiling a statement on an empty sql string raise errors with sqlite.
-    assert (sql.size () > 0);
-
-    return ExecQuery (CompileStatement (handle, sql), lazy);
+    // Log::GetInstance ().debug ("Executing SQLite query " + sql);
+    SQLiteCachedResult* result = new SQLiteCachedResult();
+    char* errMsg = 0;
+    int retc;
+    try {
+	retc = sqlite3_exec (handle, 
+			     sql.c_str (), 
+			     &sqlite_callback, 
+			     result, &errMsg);
+    }
+    catch(...){
+	delete result;
+	throw SQLiteException("Unknown problem in query "+ sql);
+    }
+    if (retc != SQLITE_OK)
+    {
+	std::string msg (errMsg);
+	sqlite3_free (errMsg);
+	delete result;
+	throw SQLiteException ("Error executing query \"" + sql + " : " + 
+					msg + "\" (error=" + Conversion::ToString (retc) + ")");
+    }
+    // Log::GetInstance ().debug ("Query successful (" + Conversion::ToString (result.getNbRows ()) + " rows).");
+    return SQLiteResultSPtr (result);
 }
 
 

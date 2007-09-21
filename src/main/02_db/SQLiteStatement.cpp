@@ -243,6 +243,11 @@ SQLiteStatement::bindParameterLongLong (const std::string& name, long long param
 }
 
 
+sqlite3* 
+SQLiteStatement::getHandle () const
+{
+    return sqlite3_db_handle(_statement);
+}
 
 
 }

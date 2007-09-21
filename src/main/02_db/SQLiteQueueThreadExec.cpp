@@ -180,7 +180,6 @@ namespace synthese
 			    SQLiteEvent event = _eventQueue.front ();
 			    
 			    _eventQueue.pop_front ();
-			    
 			    try 
 			    {
 				postEvent (event);
@@ -223,7 +222,7 @@ namespace synthese
 			// A good solution would be to implement a special event for queries which would be 
 			// enqueued as well in the SQLiteQueueThread... see if really useful.
 			if (insideSQLiteQueueThread () == false) lazy = false;
-			return SQLiteHandle::execQuery (statement, lazy);
+			return SQLiteHandle::execQuery (statement, false);
 		}
 
 
@@ -232,7 +231,11 @@ namespace synthese
    	    SQLiteResultSPtr 
 	    SQLiteQueueThreadExec::execQuery (const SQLData& sql, bool lazy)
 	    {
-		return this->execQuery (compileStatement (sql), lazy);
+			// Only one thread can use this db at the same time.
+			boost::recursive_mutex::scoped_lock dbLock (*_handleMutex);
+			// all at once!!!!!!!!!
+			return SQLiteHandle::execQuery (sql, false);
+			//return this->execQuery (compileStatement (sql), lazy);
 	    }
  
 
