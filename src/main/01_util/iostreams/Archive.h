@@ -58,14 +58,18 @@ namespace synthese
 		    Archive ();
 		    ~Archive ();
 
-		public:
-
 			/** Tar a file or directory and writes output to os.
 			    This is a naive implementation, yet portable. ustar extension is not handled
 			    nor posix permissions.
 			    This method can be called any number of times to add more entries
 			    to the tarball.
 			*/
+			static void Tar (const boost::filesystem::path& baseDir, 
+					 const boost::filesystem::path& relativePath, 
+					 std::ostream& os, bool recursive);
+
+		public:
+
 			static void Tar (const boost::filesystem::path& baseDir, 
 					 const boost::filesystem::path& relativePath, 
 					 std::ostream& os);

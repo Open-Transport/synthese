@@ -34,10 +34,23 @@ namespace util
     const char Archive::LINK_INDICATOR_CONTIGUOUS_FILE ('7');
 
 
+
     void Archive::Tar (const boost::filesystem::path& baseDir, 
 		       const boost::filesystem::path& relativePath, 
 		       std::ostream& os)
     {
+		Archive::Tar (baseDir, relativePath, os, true);
+	}
+
+
+
+    void Archive::Tar (const boost::filesystem::path& baseDir, 
+		       const boost::filesystem::path& relativePath, 
+		       std::ostream& os, bool recursive)
+    {
+		// The ostream MUST have been opened with std::ios_base::binary
+		// otherwise corrupted archive under windows
+
 	boost::filesystem::path entry (baseDir / relativePath);
 
 	bool isDir (boost::filesystem::is_directory (entry));
@@ -85,6 +98,7 @@ namespace util
 
 	ss << Conversion::ToPostpaddedString ("", '\0', 183);
 
+
 	std::string header = ss.str ();
 	int checksum = 0;
 	for (int i=0; i<512; ++i) checksum += ((int) header[i]);
@@ -93,8 +107,8 @@ namespace util
 	for (int i=0; i<6; ++i) header[148+i] = checksumstr[i]; 
 	header[148+6] = '\0';
 
-	os << header;
-	
+	os << header << std::flush;
+
 	if (isDir)
 	{
 	    // recursively add directory entries
@@ -104,20 +118,25 @@ namespace util
 		  ++dir_itr )
 	    {
 		path p (relativePath / dir_itr->leaf ());
-		Archive::Tar (baseDir, p, os);
+		Archive::Tar (baseDir, p, os, recursive);
 	    }
 	}
 	else
 	{
 	    char buffer[512];
-	    std::ifstream ifs (entry.string ().c_str ());
+		std::ifstream ifs (entry.string ().c_str (), std::ifstream::binary);
 	    while (!ifs.eof ()) 
 	    {
-		memset (buffer, 0, 512);
-		ifs.read (buffer, 512);
-		if (ifs.gcount () > 0)
-		    os.write (buffer, 512);
-	    }
+			memset (buffer, '\0', 512);
+			ifs.read (buffer, 512);
+			if (ifs.gcount () > 0)
+			{
+				os.write (buffer, 512);
+				os.flush ();
+			}
+		}
+
+
 	    ifs.close ();
 
 	}
@@ -127,7 +146,7 @@ namespace util
 
 /* sample code
     {
-	std::ofstream taros ("/tmp/unit.tar");
+	std::ofstream taros ("/tmp/unit.tar", std::ios_base::binary);
 	boost::filesystem::path basedir ("/home/mjambert/Workspace/chouette/src/main/webapp");
 	{
 	    boost::filesystem::path entry ("js");

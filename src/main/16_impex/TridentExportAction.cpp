@@ -132,7 +132,7 @@ namespace synthese
 			filename += ".xml";
 
 			boost::filesystem::path xmlfp (archiveDir.string () + "/" + filename);
-			std::ofstream out (xmlfp.string ().c_str ());
+			std::ofstream out (xmlfp.string ().c_str (), std::ios_base::binary);
 			TridentExport::Export (out, cl->getKey ());
 			out.close ();
 
