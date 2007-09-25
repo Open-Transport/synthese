@@ -119,10 +119,6 @@ namespace synthese
 					triggerNoUpdate);
 			}
 				
-			// Create precompiled statement(s)
-			_getRowByIdStatement =
-			    sqlite->compileStatement ("SELECT * FROM " + _tableName + " WHERE " + getPrimaryKey () + "=:id LIMIT 1");
-			    
 
 			// Callbacks according to what already exists in the table.
 			if (_ignoreCallbacksOnFirstSync == false)
@@ -559,15 +555,13 @@ namespace synthese
 		}
 
 	
-	         SQLiteResultSPtr 
-		 SQLiteTableSync::getRowById (synthese::db::SQLiteQueueThreadExec* sqlite, const uid& id) const
-		 {
-		     _getRowByIdStatement->reset ();
-		     _getRowByIdStatement->clearBindings ();
-		     _getRowByIdStatement->bindParameterLongLong (":id", id);
-		     
-		     return sqlite->execQuery (_getRowByIdStatement, false); // not lazy !
-		 }
+	        SQLiteResultSPtr 
+		SQLiteTableSync::getRowById (synthese::db::SQLiteQueueThreadExec* sqlite, const uid& id) const
+		{
+		    stringstream s;
+		    s << "SELECT * FROM " << _tableName << " WHERE " << getPrimaryKey () << "=" << id << " LIMIT 1";
+		    return sqlite->execQuery (s.str (), false);
+		}
 
 
     }
