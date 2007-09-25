@@ -48,10 +48,13 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<interfaces::LibraryInterfaceElement, departurestable::DeparturesTableDestinationContentInterfaceElement>::FACTORY_KEY("departurestabledestinationcell");
+	}
+
 	namespace departurestable
 	{
-		const string DeparturesTableDestinationContentInterfaceElement::DESTINATIONS_TO_DISPLAY_ALL = "all";
-		const string DeparturesTableDestinationContentInterfaceElement::DESTINATIONS_TO_DISPLAY_TERMINUS = "terminus";
 		const string DeparturesTableDestinationContentInterfaceElement::TYPE_STATION_CITY = "station_city";
 		const string DeparturesTableDestinationContentInterfaceElement::TYPE_STATION_CITY_IF_NEW = "station_city_if_new";
 		const string DeparturesTableDestinationContentInterfaceElement::TYPE_STATION = "station";
@@ -60,83 +63,90 @@ namespace synthese
 
 		void DeparturesTableDestinationContentInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			if (vel.size() < 6)
+			if (vel.size() < 7)
 				throw InterfacePageException("Malformed departure table destination cell declaration");
 
-			_destinationsToDisplayVIE = vel.front();
+			_firstIntermediatesStopsToDisplayVIE = vel.front();
+			_numberOfIntermediatesStopsToDisplayVIE = vel.front();
 			_displayTerminusVIE = vel.front();
 			_displayTypeVIE = vel.front();
 			_stopsSeparatorVIE = vel.front();
-			_displayCityVIE = vel.front();
 			_beforeCityVIE = vel.front();
 			_afterCityVIE = vel.front();
+			
+			//	_displayCityVIE = vel.front();
 		}
 
 		string DeparturesTableDestinationContentInterfaceElement::display(ostream& stream, const ParametersVector& parameters, VariablesMap& variables, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
 			const ArrivalDepartureRow* __DP = (const ArrivalDepartureRow*) object;
 
-			string __DestinationsAAfficher = _destinationsToDisplayVIE->getValue(parameters, variables, object, request);
-			bool __AfficherTerminus = !_displayTerminusVIE->isZero(parameters, variables, object, request);
+			int firstIntermediatesStops(Conversion::ToInt(_firstIntermediatesStopsToDisplayVIE->getValue(parameters, variables, object, request)));
+			int numberOfIntermediatesStops(Conversion::ToInt(_numberOfIntermediatesStopsToDisplayVIE->getValue(parameters, variables, object, request)));
+			bool __AfficherTerminus = !_displayTerminusVIE->isFalse(parameters, variables, object, request);
 			string __TypeAffichage = _displayTypeVIE->getValue(parameters, variables, object, request);
 			string __SeparateurEntreArrets = _stopsSeparatorVIE->getValue(parameters, variables, object, request);
-			string displayCity(_displayCityVIE->getValue(parameters, variables, object, request));
+	//		string displayCity(_displayCityVIE->getValue(parameters, variables, object, request));
 			string __AvantCommune = _beforeCityVIE->getValue(parameters, variables, object, request);
 			string __ApresCommune = _afterCityVIE->getValue(parameters, variables, object, request);
-
+			
 			const City* __DerniereCommune = __DP->second.at(0)->getCity();
 
-			for (int __i = 1; __i < __DP->second.size (); ++__i)
-			{
-				if ( __DestinationsAAfficher == DESTINATIONS_TO_DISPLAY_ALL && ( __i < __DP->second.size () - 1 || __AfficherTerminus )
-					|| __DestinationsAAfficher == DESTINATIONS_TO_DISPLAY_TERMINUS && __i == __DP->second.size () - 1
-					|| synthese::util::Conversion::ToInt(__DestinationsAAfficher) == __i && ( __i < __DP->second.size () - 1 || __AfficherTerminus )
+			int terminusRank(__DP->second.size() - 1);
+			for(int i((numberOfIntermediatesStops != 0) ? firstIntermediatesStops : terminusRank);
+				i != (__AfficherTerminus ? __DP->second.size() : terminusRank);
+				++i
+			){
+				// Max number of destinations
+				if(	numberOfIntermediatesStops != UNKNOWN_VALUE
+					&& i - firstIntermediatesStops >= numberOfIntermediatesStops
+					&& i < terminusRank
+				)	continue;
+
+				if (i > firstIntermediatesStops)
+					stream << __SeparateurEntreArrets;
+
+				// Affichage de la commune dans les cas necessaire
+				if ( __TypeAffichage == TYPE_STATION_CITY
+					|| __TypeAffichage == TYPE_STATION_CITY_IF_NEW && __DP->second.at(i)->getCity() != __DerniereCommune
 				){
-					if ( __i > 1 )
-						stream << __SeparateurEntreArrets;
+					stringstream ss;
+					boost::iostreams::filtering_ostream out;
+					out.push (LowerCaseFilter());
+					out.push (PlainCharFilter());
+					out.push (ss);
 
-					// Affichage de la commune dans les cas necessaire
-					if ( __TypeAffichage == TYPE_STATION_CITY
-						|| __TypeAffichage == TYPE_STATION_CITY_IF_NEW && __DP->second.at(__i)->getCity() != __DerniereCommune
-					){
-						stringstream ss;
-						boost::iostreams::filtering_ostream out;
-						out.push (LowerCaseFilter());
-						out.push (PlainCharFilter());
-						out.push (ss);
+					out << __DP->second.at(i)->getCity () ->getName() << flush;
+					string cityName (ss.str ());
+					
 
-						out << __DP->second.at(__i)->getCity () ->getName() << flush;
-						string cityName (ss.str ());
-						
-
-						// stringMinuscules __TexteMinuscule;
-						// __TexteMinuscule << __DP->GetGare( __i ) ->getTown() ->getName();
-						if ((cityName.size () > 0) &&
-						    (cityName[0] >= 'a') && (cityName[0]  <= 'z'))
-						{
-						    cityName[0] = cityName[0] - 'a' + 'A';
-						}
-						stream << __AvantCommune << cityName << __ApresCommune;
-
-						__DerniereCommune = __DP->second.at(__i)->getCity();
-
-
+					// stringMinuscules __TexteMinuscule;
+					// __TexteMinuscule << __DP->GetGare( __i ) ->getTown() ->getName();
+					if ((cityName.size () > 0) &&
+					    (cityName[0] >= 'a') && (cityName[0]  <= 'z'))
+					{
+					    cityName[0] = cityName[0] - 'a' + 'A';
 					}
+					stream << __AvantCommune << cityName << __ApresCommune;
 
-					// Affichage du nom d'arret dans les cas ou necessaire
-					if ( __TypeAffichage.substr (0, 7) == TYPE_STATION)
-						stream << __DP->second.at(__i)->getName();
+					__DerniereCommune = __DP->second.at(i)->getCity();
 
-					// Affichage de la destination 13 caracteres dans les cas ou necessaire
-					if ( __TypeAffichage == TYPE_CHAR_13)
-						stream << __DP->second.at(__i)->getName13();
 
-					// Affichage de la destination 26 caracteres dans les cas ou necessaire
-					if ( __TypeAffichage == TYPE_CHAR_26)
-						stream << __DP->second.at(__i)->getName26();
-			    }
+				}
+
+				// Affichage du nom d'arret dans les cas ou necessaire
+				if ( __TypeAffichage.substr (0, 7) == TYPE_STATION)
+					stream << __DP->second.at(i)->getName();
+
+				// Affichage de la destination 13 caracteres dans les cas ou necessaire
+				if ( __TypeAffichage == TYPE_CHAR_13)
+					stream << __DP->second.at(i)->getName13();
+
+				// Affichage de la destination 26 caracteres dans les cas ou necessaire
+				if ( __TypeAffichage == TYPE_CHAR_26)
+					stream << __DP->second.at(i)->getName26();
 			}
-			return "";
+			return string();
 		}
 	}
 }

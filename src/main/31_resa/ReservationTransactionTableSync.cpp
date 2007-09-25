@@ -24,7 +24,10 @@
 
 #include "ReservationTransactionTableSync.h"
 #include "ReservationTransaction.h"
+#include "31_resa/ReservationTableSync.h"
 #include "31_resa/ResaModule.h"
+
+#include "15_env/Service.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -42,6 +45,7 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace time;
+	using namespace env;
 
 	namespace util
 	{
@@ -149,21 +153,29 @@ namespace synthese
 		){
 		}
 
-		vector<shared_ptr<ReservationTransaction> > ReservationTransactionTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
-			SQLiteHandle* sqlite(DBModule::GetSQLite());
+		vector<shared_ptr<ReservationTransaction> > ReservationTransactionTableSync::search(
+			const env::Service* service
+			, const time::Date& originDate
+			, bool withCancelled
+			, int first /*= 0*/
+			, int number /*= 0*/
+		){
 
+			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
-				<< " SELECT *"
+				<< " SELECT " << TABLE_NAME << ".*"
 				<< " FROM " << TABLE_NAME
-				<< " WHERE 1 ";
-			/// @todo Fill Where criteria
-			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-				;
-			//if (orderByName)
-			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				<< " INNER JOIN " << ReservationTableSync::TABLE_NAME << " AS r ON "
+				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID
+				<< " WHERE " 
+				<< " r." << ReservationTableSync::COL_SERVICE_ID << "=" << Conversion::ToString(service->getId())
+				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << originDate.toSQLString(false) << " 0:0'"
+				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << "<='" << originDate.toSQLString(false) << " 23:59'";
+			if (!withCancelled)
+				query << " AND " << COL_CANCELLATION_TIME << " IS NOT NULL";
+			query << " GROUP BY " << TABLE_NAME << "." << TABLE_COL_ID;
+			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -175,8 +187,10 @@ namespace synthese
 				vector<shared_ptr<ReservationTransaction> > objects;
 				while (rows->next ())
 				{
-					shared_ptr<ReservationTransaction> object(new ReservationTransaction);
+					shared_ptr<ReservationTransaction> object(new ReservationTransaction());
 					load(object.get(), rows);
+					vector<shared_ptr<Reservation> > reservations(ReservationTableSync::search(object.get()));
+					object->setReservations(reservations);
 					objects.push_back(object);
 				}
 				return objects;

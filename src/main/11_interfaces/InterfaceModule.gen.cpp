@@ -13,6 +13,7 @@ synthese::interfaces::PlainCharFilterValueInterfaceElement::integrate();
 
 synthese::interfaces::CommentInterfaceElement::integrate();
 synthese::interfaces::PrintInterfaceElement::integrate();
+synthese::interfaces::DebugInterfaceElement::integrate();
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::LineLabelInterfaceElement>("label");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::IncludePageInterfaceElement>("include");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::interfaces::GotoInterfaceElement>("goto");

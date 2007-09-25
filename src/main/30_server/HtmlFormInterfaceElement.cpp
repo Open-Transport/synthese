@@ -80,6 +80,9 @@ namespace synthese
 		{
 			try
 			{
+				string functionKey(_function_key->getValue(parameters, variables, object, request));
+				if (functionKey.empty())
+					functionKey = request->_getFunction()->getFactoryKey();
 				string actionKey;
 				if (_action_key)
 					actionKey = _action_key->getValue(parameters, variables, object, request);
@@ -89,9 +92,11 @@ namespace synthese
 				string functionParameters;
 				if (_function_parameters)
 					functionParameters = _function_parameters->getValue(parameters, variables, object, request);
+				if (functionParameters.empty() && functionKey == request->_getFunction()->getFactoryKey())
+					functionParameters = Request::getQueryString(request->_getFunction()->getFixedParametersMap());
 				
 				stringstream s;
-				s	<< Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT << _function_key->getValue(parameters, variables, object, request)
+				s	<< Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT << functionKey
 					<< Request::PARAMETER_SEPARATOR << Request::PARAMETER_IP << Request::PARAMETER_ASSIGNMENT
 					<< Request::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << Request::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
 					;

@@ -70,6 +70,9 @@ namespace synthese
 				- 19 : Alarm message
 				- 20 : Alarm level
 				- 21 : Odd or even color
+
+			Object :
+				- CommercialLine
 		*/
 		class JourneyBoardServiceCellInterfacePage : public interfaces::InterfacePage
 		{

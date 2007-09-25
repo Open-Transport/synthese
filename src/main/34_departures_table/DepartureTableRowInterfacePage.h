@@ -25,6 +25,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include "34_departures_table/Types.h"
 
 namespace synthese
@@ -35,15 +37,16 @@ namespace synthese
 			@code departurestablerow <row_id> <page_number> <message> <display_service_number> @endcode
 
 			Parameters :
-				- <row_id> : Rank of the row in the departure table
-				- <page_number> : Number of the page to display for multiple page protocol (eg Lumiplan)
-				- <message> : Message to display instead of timetables
-				- <display_service_number> : 1|0 Indicates if the service number cell must be displayed in the row
+				- 0 <row_id> : Rank of the row in the departure table
+				- 1 <page_number> : Number of the page to display for multiple page protocol (eg Lumiplan)
+				- 2 <message> : Message to display instead of timetables
+				- 3 <display_service_number> : 1|0 Indicates if the service number cell must be displayed in the row
+				- 4 : Number of intermediates stops to display
 
 			Object :
 				- Must be a ArrivalDepartureRow object
 		*/
-		class DepartureTableRowInterfacePage : public interfaces::InterfacePage
+		class DepartureTableRowInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, DepartureTableRowInterfacePage>
 		{
 		public:
 			/** Display of the admin page.
@@ -54,6 +57,7 @@ namespace synthese
 				, int pageNumber
 				, bool displayQuaiNumber
 				, bool displayServiceNumber
+				, int intermediatesStopsToDisplay
 				, const ArrivalDepartureRow& row
 				, const server::Request* request = NULL
 				) const;

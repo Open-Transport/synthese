@@ -41,6 +41,8 @@ namespace synthese
 
 			A Reservation object can link to its departures and arrival places, commercial lines, etc.
 			In order to prevent from broken links, the object contains a copy of the main informations.
+
+			@warning Do not create a single Reservation object. Use ReservationTransaction::newReservation() instead.
 		*/
 		class Reservation : public util::Registrable<uid,Reservation>
 		{
@@ -56,6 +58,7 @@ namespace synthese
 			//@{
 				uid								_lineId;			//<! ID of the booked CommercialLine
 				std::string						_lineCode;			//<! Comprehensive line code
+				uid								_serviceId;			//!< Code du service au sein l'axe
 				std::string						_serviceCode;			//!< Code du service au sein l'axe
 				uid								_departurePlaceId;		//!< ID of the departure Place
 				std::string						_departurePlaceName;
@@ -74,6 +77,7 @@ namespace synthese
 			//@{
 				void setLineId				(uid id);
 				void setLineCode			(const std::string& code);
+				void setServiceId			(uid id);
 				void setServiceCode			(const std::string& code);
 				void setDeparturePlaceId	(uid id);
 				void setDeparturePlaceName	(const std::string& name);
@@ -92,6 +96,7 @@ namespace synthese
 			//@{
 				uid								getLineId()				const;
 				const std::string&				getLineCode()			const;
+				uid								getServiceId()			const;
 				const std::string&				getServiceCode()		const;
 				uid								getDeparturePlaceId()	const;
 				const std::string&				getDeparturePlaceName()	const;

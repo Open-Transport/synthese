@@ -45,24 +45,20 @@ namespace synthese
 
 			Displays : The defined departure table.
 			Parameters :
-				-# Row multiplier (???)
-				-# Displayed pages : {intermediate|destination|normal} :
-					- intermediate : Show one intermediate stop per page
-					- destination : Show one page with the destination
-					- normal : Don't handle pages
-				-# Separator between pages
-				-# Number of departures to hide (default = 0)
-				-# Message to display
-				-# Display services number (default : false)
-				-# Display quai
+				- 0 : Step to use for going to the next page (if you don't know what to do, put 1)
+				- 1 : Max page number :
+					- 0 : Don't handle page
+					- -1 : Unlimited pages number (one per displayed stop)
+					- n>0 : max of n pages (one per displayed stop)
+				- 2 : Separator between pages
+				- 3 : Number of departures to hide (default = 0)
+				- 4 : Message to display
+				- 5 : Display services number (default : false)
+				- 6 : Display track number
+				- 7 : Number of intermediates stops
 		*/
-		class DeparturesTableInterfaceElement : public interfaces::LibraryInterfaceElement
+		class DeparturesTableInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableInterfaceElement>
 		{
-		public:
-			static const std::string VALUE_NORMAL;
-			static const std::string VALUE_INTERMEDIATE;
-			static const std::string VALUE_DESTINATION;
-
 		private:
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _multiplicateurRangeeVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _pagesVIE;
@@ -71,6 +67,7 @@ namespace synthese
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _message;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayServiceNumber;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayQuai;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _numberOfIntermediatesStops;
 
 		public:
 			void storeParameters(interfaces::ValueElementList& vel);

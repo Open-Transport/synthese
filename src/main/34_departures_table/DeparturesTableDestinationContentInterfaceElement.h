@@ -26,6 +26,8 @@
 
 #include "11_interfaces/LibraryInterfaceElement.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include <string>
 
 namespace synthese
@@ -36,28 +38,27 @@ namespace synthese
 			@ingroup m34Library refLibrary
 
 			Parameters :
-				- 0 : destinationsToDisplay
-				- 1 : displayTerminus
-				- 2 : Name to display :
+				- 0 : Rank of first intermediate stop to display (1 = first intermediate stop)
+				- 1 : Max number of intermediates stops to display (0 = do not display intermediates stops)
+				- 2 : Display terminus name (boolean)
+				- 3 : Name to display (see also 4)
 					- char(13) : 13 chars name if exists, connection place name truncated else
 					- char(26) : 26 chars name if exists, connection place name truncated else
 					- else : connection place name
-				- 3 : stopsSeparator
-				- 4 : Display city name
+					- 4 : Display city name
 					- station_city : adds the city name before the connection place name
 					- station_city_if_new : adds the city name before the connection place name only at city changes
 					- else : do not add the city name before the connection place name
+				- 4 : stopsSeparator
 				- 5 : beforeCity
 				- 6 : afterCity
 			
 			Object : ArrivalDepartureRow object
 
 		*/
-		class DeparturesTableDestinationContentInterfaceElement : public interfaces::LibraryInterfaceElement
+		class DeparturesTableDestinationContentInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableDestinationContentInterfaceElement>
 		{
 		public:
-			static const std::string DESTINATIONS_TO_DISPLAY_ALL;
-			static const std::string DESTINATIONS_TO_DISPLAY_TERMINUS;
 			static const std::string TYPE_STATION_CITY;
 			static const std::string TYPE_STATION_CITY_IF_NEW;
 			static const std::string TYPE_STATION;
@@ -66,7 +67,8 @@ namespace synthese
 			
 
 		private:
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _destinationsToDisplayVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _firstIntermediatesStopsToDisplayVIE;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _numberOfIntermediatesStopsToDisplayVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayTerminusVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayTypeVIE;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _stopsSeparatorVIE;

@@ -64,6 +64,8 @@ namespace synthese
 
 		public:
 
+			virtual server::ParametersMap getFixedParametersMap() const;
+
 			boost::shared_ptr<const Site> getSite() const;
 			void setSite(boost::shared_ptr<const Site>);
 

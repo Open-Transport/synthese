@@ -37,15 +37,16 @@ namespace synthese
 	namespace env
 	{
 		/** LineImageURLInterfaceElement class.
-			@ingroup m15Values refValues
+			@ingroup m15Library refLibrary
+
+			@code line_image @endcode
+
+			Parameters : none
+			Object : CommercialLine
 		*/
 		class LineImageURLInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, LineImageURLInterfaceElement>
 		{
-		private:
-			// Attributes
-			// boost::shared_ptr<interfaces::LibraryInterfaceElement> _xxx;
-
 		public:
 			std::string display(
 				std::ostream&

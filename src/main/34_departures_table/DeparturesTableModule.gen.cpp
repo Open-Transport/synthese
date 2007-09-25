@@ -1,15 +1,15 @@
 
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableInterfaceElement>("departurestable");
+synthese::departurestable::DeparturesTableInterfaceElement::integrate();
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableTimeContentInterfaceElement>("departurestabletimecell");
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableLineContentInterfaceElement>("departurestablelinecell");
-synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableDestinationContentInterfaceElement>("departurestabledestinationcell");
+synthese::departurestable::DeparturesTableDestinationContentInterfaceElement::integrate();
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableRowServiceNumberInterfaceElement>("departurestableservicenumbercell");
 synthese::departurestable::DisplayScreenHasAlarmValueInterfaceElement::integrate();
 synthese::departurestable::DisplayScreenAlarmContentValueInterfaceElement::integrate();
 
-synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::departurestable::DeparturesTableInterfacePage>("departurestable");
-synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::departurestable::DepartureTableRowInterfacePage>("departurestablerow");
-synthese::util::Factory<synthese::interfaces::InterfacePage>::integrate<synthese::departurestable::ParseDisplayReturnInterfacePage>("parse_display_return");
+synthese::departurestable::DeparturesTableInterfacePage::integrate();
+synthese::departurestable::DepartureTableRowInterfacePage::integrate();
+synthese::departurestable::ParseDisplayReturnInterfacePage::integrate();
 
 synthese::departurestable::DisplaySearchAdmin::integrate();
 synthese::departurestable::DisplayTypesAdmin::integrate();
@@ -22,8 +22,8 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::depa
 synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::departurestable::DisplayScreenTableSync>("34.50 Display Screens");
 
 
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateDisplayTypeAction>("createdisplaytype");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayTypeAction>("updatedisplaytype");
+synthese::departurestable::CreateDisplayTypeAction::integrate();
+synthese::departurestable::UpdateDisplayTypeAction::integrate();
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateDisplayScreenAction>("createdisplayscreen");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayScreenAction>("updatedisplayscreen");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::AddPreselectionPlaceToDisplayScreen>("apptds");

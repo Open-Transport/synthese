@@ -213,22 +213,24 @@ namespace synthese
 						, su->getDepartureDateTime()
 					)
 				){
-					Reservation r;
-					rt.addReservation(&r);
-					r.setDeparturePlaceId(su->getDepartureEdge()->getPlace()->getId());
-					r.setDeparturePlaceName(su->getDepartureEdge()->getPlace()->getFullName());
-					r.setDepartureTime(su->getDepartureDateTime());
-					r.setOriginDateTime(su->getOriginDateTime());
-					r.setArrivalPlaceId(su->getArrivalEdge()->getPlace()->getId());
-					r.setArrivalPlaceName(su->getArrivalEdge()->getPlace()->getFullName());
-					r.setArrivalTime(su->getArrivalDateTime());
-					r.setLineCode(static_cast<const Line*>(su->getService()->getPath())->getName());
-					r.setLineId(su->getService()->getPath()->getId());
-					r.setReservationRuleId(su->getService()->getReservationRule()->getKey());
-					r.setServiceCode(Conversion::ToString(su->getService()->getServiceNumber()));
-					ReservationTableSync::save(&r);
+					shared_ptr<Reservation> r(rt.newReservation());
+					r->setDeparturePlaceId(su->getDepartureEdge()->getPlace()->getId());
+					r->setDeparturePlaceName(su->getDepartureEdge()->getPlace()->getFullName());
+					r->setDepartureTime(su->getDepartureDateTime());
+					r->setOriginDateTime(su->getOriginDateTime());
+					r->setArrivalPlaceId(su->getArrivalEdge()->getPlace()->getId());
+					r->setArrivalPlaceName(su->getArrivalEdge()->getPlace()->getFullName());
+					r->setArrivalTime(su->getArrivalDateTime());
+					r->setLineCode(static_cast<const Line*>(su->getService()->getPath())->getName());
+					r->setLineId(su->getService()->getPath()->getId());
+					r->setReservationRuleId(su->getService()->getReservationRule()->getKey());
+					r->setServiceId(su->getService()->getId());
+					r->setServiceCode(Conversion::ToString(su->getService()->getServiceNumber()));
+					ReservationTableSync::save(r.get());
 				}
 			}
+
+			_request->setObjectId(rt.getKey());
 		}
 
 		BookReservationAction::BookReservationAction()

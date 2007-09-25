@@ -174,6 +174,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ReservationsListInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationsListInterfacePage.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ServiceReservationsRoadMapInterfacePage.cpp"
 				>
 			</File>
@@ -250,11 +258,39 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ReservationsListFunction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationsListFunction.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ServiceReservationsRoadMapFunction.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\ServiceReservationsRoadMapFunction.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="11 Interface Library"
+			>
+			<File
+				RelativePath=".\BookableCommercialLinesInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BookableCommercialLinesInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationsListInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ReservationsListInterfaceElement.h"
 				>
 			</File>
 		</Filter>

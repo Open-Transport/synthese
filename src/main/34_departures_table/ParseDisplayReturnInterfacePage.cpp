@@ -31,7 +31,7 @@ namespace synthese
 
 	namespace util
 	{
-		// template<> const string FactoryTemplate<InterfacePage, ParseDisplayReturnInterfacePage>::FACTORY_KEY("parse_display_return");
+		 template<> const string FactorableTemplate<InterfacePage, ParseDisplayReturnInterfacePage>::FACTORY_KEY("parse_display_return");
 	}
 
 	namespace departurestable

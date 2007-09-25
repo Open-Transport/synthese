@@ -90,16 +90,16 @@ namespace synthese
 			pv.push_back( commercialLine->getShortName() ); // 12
 			pv.push_back( commercialLine->getLongName() ); // 13
 			pv.push_back( continuousService ? Conversion::ToString(continuousService->getMaxWaitingTime()) : string() ); // 14
-			pv.push_back( string() /* reservationRule == NULL ? string() : reservationRule->getPhoneExchangeNumber() */ );
-			pv.push_back( string() /* reservationRule == NULL ? string() : reservationRule->getPhoneExchangeOpeningHours() */ );
-			pv.push_back( string() /* reservationRule == NULL ? string() : reservationRule->getWebSiteUrl() */ );
+			pv.push_back( string() );
+			pv.push_back( string() );
+			pv.push_back( string() );
 			pv.push_back( string() );	//18
 			pv.push_back( alarm ? alarm->getLongMessage() : string());
 			pv.push_back( alarm ? Conversion::ToString( alarm->getLevel() ) : string() );
 			pv.push_back( Conversion::ToString( color ) ); // 21
 
 			VariablesMap vm;
-			InterfacePage::display( stream, pv, vm, static_cast<const void*>(line), request );
+			InterfacePage::display( stream, pv, vm, static_cast<const void*>(commercialLine), request );
 		}
 	}
 }

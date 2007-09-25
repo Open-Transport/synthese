@@ -52,6 +52,7 @@ namespace synthese
 			static const std::string COL_COLOR;
 			static const std::string COL_STYLE;
 			static const std::string COL_IMAGE;
+			static const std::string COL_OPTIONAL_RESERVATION_PLACES;
 
 			CommercialLineTableSync();
 
@@ -74,13 +75,29 @@ namespace synthese
 				, bool raisingOrder = true
 				);
 
+
+
 			/** CommercialLine search.
-				(other search parameters)
+				@param rights Rights vector defining the profile, see getSQLLinesList
+				@param totalControl Default authorization level
+				@param neededLevel Right level to reach to be in the results
 				@param first First CommercialLine object to answer
 				@param number Number of CommercialLine objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@param orderByNetwork Orders the result by network, name
+				@param orderByName Orders the result by name
+				@param raisingOrder true = ascendant order, false = descendant order
+				@param mustbeBookable true = only transport on demand lines
 				@return vector<CommercialLine*> Founded CommercialLine objects.
 				@author Hugues Romain
 				@date 2006
+
+				To use the method, specify the rights like this :
+
+				@code
+rights = request->getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+totalControl = request->getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
+neededLevel = READ
+				@endcode
 			*/
 			static std::vector<boost::shared_ptr<CommercialLine> > search(
 				const security::RightsOfSameClassMap& rights
@@ -91,7 +108,10 @@ namespace synthese
 				, bool orderByNetwork = true
 				, bool orderByName = false
 				, bool raisingOrder = true
+				, bool mustBeBookable = false
 				);
+
+
 
 			/** Build of a SQL query selecting all the lines allowed by a profile.
 				@param rights Rights vector defining the profile
@@ -121,6 +141,7 @@ namespace synthese
 				const security::RightsOfSameClassMap& rights
 				, bool totalControl
 				, security::RightLevel neededLevel
+				, bool mustBeBookable
 				, std::string selectedColumns = db::TABLE_COL_ID
 				);
 

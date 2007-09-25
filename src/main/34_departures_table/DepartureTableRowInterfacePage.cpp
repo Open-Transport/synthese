@@ -25,28 +25,36 @@
 #include "DepartureTableRowInterfacePage.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
-	using util::Conversion;
+	using namespace util;
 	using namespace interfaces;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<interfaces::InterfacePage, departurestable::DepartureTableRowInterfacePage>::FACTORY_KEY("departurestablerow");
+	}
 
 	namespace departurestable
 	{
 		void DepartureTableRowInterfacePage::display(std::ostream& stream
-				, VariablesMap& vars
-				, int rowId
-				, int pageNumber
-                , bool displayQuai
-				, bool displayServiceNumber
-				, const ArrivalDepartureRow& ptd
-				, const server::Request* request) const
-		{
+			, VariablesMap& vars
+			, int rowId
+			, int pageNumber
+            , bool displayQuai
+			, bool displayServiceNumber
+			, int intermediatesStopsToDisplay
+			, const ArrivalDepartureRow& ptd
+			, const server::Request* request
+		) const {
 			ParametersVector parameters;
 			parameters.push_back(Conversion::ToString(rowId));
 			parameters.push_back(Conversion::ToString(pageNumber));
 			parameters.push_back(Conversion::ToString(displayQuai));
 			parameters.push_back(Conversion::ToString(displayServiceNumber));
+			parameters.push_back(Conversion::ToString(intermediatesStopsToDisplay));
 			
 			InterfacePage::display(
 				stream

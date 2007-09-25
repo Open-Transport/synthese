@@ -124,20 +124,22 @@ namespace synthese
 
 		std::string Request::getQueryString(bool normalize) const
 		{
-			// Serialize the parameter lists in a synthese querystring
-			std::stringstream ss;
+			return getQueryString(_getParametersMap(), normalize);
+		}
 
-			ParametersMap map = _getParametersMap();
+		std::string Request::getQueryString( const ParametersMap& map, bool normalize/*=true*/ )
+		{
+			stringstream ss;
 			for (ParametersMap::const_iterator iter = map.begin(); 
 				iter != map.end(); 
-				++iter )
-			{
-				if (iter != map.begin ()) ss << PARAMETER_SEPARATOR;
+				++iter
+			){
+				if (iter != map.begin ())
+					ss << PARAMETER_SEPARATOR;
 				ss << iter->first << PARAMETER_ASSIGNMENT << iter->second;
 			}
 
 			return normalize ? _normalizeQueryString(ss.str()) : ss.str();
-
 		}
 
 		void Request::run( std::ostream& stream )
@@ -542,6 +544,12 @@ namespace synthese
 		{
 			const string result(getStringFormParameterMap(map, parameterName, neededParameter, source));
 			return result.empty() ? Date(TIME_UNKNOWN) : Date::FromInternalString(result);
+		}
+
+		bool Request::getBoolFromParameterMap( const ParametersMap& map , const std::string& parameterName , bool neededParameter , bool defaultValue , const std::string& source )
+		{
+			const string result(getStringFormParameterMap(map, parameterName, neededParameter, source));
+			return result.empty() ? defaultValue : Conversion::ToBool(result);
 		}
 	}
 }

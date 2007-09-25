@@ -27,6 +27,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace server
@@ -65,7 +67,7 @@ namespace synthese
 
 			@ingroup m34Pages refPages
 		*/
-		class ParseDisplayReturnInterfacePage : public interfaces::InterfacePage
+		class ParseDisplayReturnInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, ParseDisplayReturnInterfacePage>
 		{
 		public:
 			/** Overloaded display method for specific parameter conversion.

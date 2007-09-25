@@ -24,6 +24,8 @@
 
 #include "31_resa/Reservation.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace util;
@@ -39,6 +41,10 @@ namespace synthese
 			, _cancellationTime(TIME_UNKNOWN)
 			, _originDateTime(TIME_UNKNOWN)
 			, _destinationDateTime(TIME_UNKNOWN)
+			, _cancelUserId(UNKNOWN_VALUE)
+			, _bookingUserId(UNKNOWN_VALUE)
+			, _customerUserId(UNKNOWN_VALUE)
+			, _lastReservation(UNKNOWN_VALUE)
 		{
 
 		}
@@ -143,15 +149,23 @@ namespace synthese
 			return _customerEMail;
 		}
 
-		void ReservationTransaction::addReservation(Reservation* reservation )
+
+		boost::shared_ptr<Reservation> ReservationTransaction::newReservation()
 		{
+			shared_ptr<Reservation> reservation(new Reservation);
 			reservation->setTransaction(this);
 			_reservations.push_back(reservation);
+			return reservation;
 		}
 
 		const ReservationTransaction::Reservations& ReservationTransaction::getReservations() const
 		{
 			return _reservations;
+		}
+
+		void ReservationTransaction::setReservations( const Reservations& reservations )
+		{
+			_reservations = reservations;
 		}
 	}
 }

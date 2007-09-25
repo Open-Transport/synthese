@@ -38,7 +38,12 @@ namespace synthese
 	namespace env
 	{
 		/** Line style.
-			@ingroup m15Values refValues
+			@ingroup m15Library refLibrary
+
+			@code line_style @endcode
+
+			Parameters : none
+			Object : CommercialLine
 		*/
 		class LineStyleInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, LineStyleInterfaceElement>
@@ -53,9 +58,6 @@ namespace synthese
 				, const server::Request* request = NULL) const;
 
 			/** Parser.
-			@param text Optional parameter :
-			- if defined : the uid of the city to name
-			- if empty : the name of the city provided at runtime as current object
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
 		};

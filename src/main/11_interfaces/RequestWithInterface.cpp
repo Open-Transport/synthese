@@ -108,5 +108,10 @@ namespace synthese
 		{
 			return _interface;
 		}
+
+		synthese::server::ParametersMap RequestWithInterface::getFixedParametersMap() const
+		{
+			return _getParametersMap();
+		}
 	}
 }

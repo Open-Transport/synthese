@@ -184,5 +184,11 @@ namespace synthese
 			return *it;
 		}
 
+		const time::Schedule& ScheduledService::getLastDepartureSchedule() const
+		{
+			for (Path::Edges::const_reverse_iterator it(getPath()->getEdges().rbegin()); it != getPath()->getEdges().rend(); ++it)
+				if ((*it)->isDeparture())
+					return _departureSchedules[(*it)->getRankInPath()];
+		}
 	}
 }

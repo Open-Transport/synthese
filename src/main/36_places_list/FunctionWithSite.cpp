@@ -75,5 +75,10 @@ namespace synthese
 		{
 			_site = site;
 		}
+
+		synthese::server::ParametersMap FunctionWithSite::getFixedParametersMap() const
+		{
+			return _getParametersMap();
+		}
 	}
 }

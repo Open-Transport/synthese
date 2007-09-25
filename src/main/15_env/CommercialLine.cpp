@@ -110,5 +110,11 @@ namespace synthese
 		{
 			_color = color;
 		}
+
+		void CommercialLine::addOptionalReservationPlace( const Place* place )
+		{
+			_optionalReservationPlaces.insert(place);
+		}
+
 	}
 }

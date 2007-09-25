@@ -39,19 +39,21 @@ namespace synthese
 		/** UpdateDisplayTypeAction action class.
 		@ingroup m34
 		*/
-		class UpdateDisplayTypeAction : public server::Action
+		class UpdateDisplayTypeAction : public util::FactorableTemplate<server::Action, UpdateDisplayTypeAction>
 		{
 		public:
 			static const std::string PARAMETER_ID;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_INTERFACE_ID;
 			static const std::string PARAMETER_ROWS_NUMBER;
+			static const std::string PARAMETER_MAX_STOPS_NUMBER;
 
 		private:
 			boost::shared_ptr<DisplayType> _dt;
 			std::string _name;
 			boost::shared_ptr<const interfaces::Interface>	_interface;
 			int	_rows_number;
+			int	_max_stops_number;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

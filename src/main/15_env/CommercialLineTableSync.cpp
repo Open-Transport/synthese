@@ -25,6 +25,9 @@
 #include "15_env/CommercialLine.h"
 #include "15_env/TransportNetworkTableSync.h"
 #include "15_env/TransportNetwork.h"
+#include "15_env/LineTableSync.h"
+#include "15_env/Place.h"
+#include "15_env/EnvModule.h"
 
 #include "02_db/DBModule.h"
 #include "02_db/SQLiteResult.h"
@@ -37,6 +40,7 @@
 #include "12_security/Right.h"
 
 #include <sstream>
+#include <boost/tokenizer.hpp>
 
 using namespace std;
 using namespace boost;
@@ -68,6 +72,23 @@ namespace synthese
 		    object->setColor(RGBColor(rows->getText ( CommercialLineTableSync::COL_COLOR)));
 		    object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 		    object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
+
+		    typedef tokenizer<char_separator<char> > tokenizer;
+			string stops(rows->getText(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES));
+
+		    // Parse all optional reservation places separated by ,
+		    char_separator<char> sep1 (",");
+		    tokenizer stopsTokens (stops, sep1);
+		    
+		    for(tokenizer::iterator it(stopsTokens.begin());
+				it != stopsTokens.end ();
+				++it
+			){
+				uid id(Conversion::ToLongLong(*it));
+				shared_ptr<const Place> place(EnvModule::fetchPlace(id));
+				object->addOptionalReservationPlace(place.get());
+		    }
+
 		}
 
 		template<> void SQLiteTableSyncTemplate<CommercialLine>::save(CommercialLine* object)
@@ -104,18 +125,20 @@ namespace synthese
 		const std::string CommercialLineTableSync::COL_COLOR ("color");
 		const std::string CommercialLineTableSync::COL_STYLE ("style");
 		const std::string CommercialLineTableSync::COL_IMAGE ("image");
+		const string CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES("optional_reservation_places");
 
 		CommercialLineTableSync::CommercialLineTableSync()
 			: SQLiteTableSyncTemplate<CommercialLine>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
-			addTableColumn(COL_NETWORK_ID, "INTEGER", false);
-			addTableColumn(COL_NAME, "TEXT", false);
-			addTableColumn(COL_SHORT_NAME, "TEXT", false);
-			addTableColumn(COL_LONG_NAME, "TEXT", false);
-			addTableColumn(COL_COLOR, "TEXT", false);
-			addTableColumn(COL_STYLE, "TEXT", false);
-			addTableColumn(COL_IMAGE, "TEXT", false);
+			addTableColumn(COL_NETWORK_ID, "INTEGER", true);
+			addTableColumn(COL_NAME, "TEXT", true);
+			addTableColumn(COL_SHORT_NAME, "TEXT", true);
+			addTableColumn(COL_LONG_NAME, "TEXT", true);
+			addTableColumn(COL_COLOR, "TEXT", true);
+			addTableColumn(COL_STYLE, "TEXT", true);
+			addTableColumn(COL_IMAGE, "TEXT", true);
+			addTableColumn(COL_OPTIONAL_RESERVATION_PLACES, "TEXT", true);
 		}
 
 		void CommercialLineTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
@@ -202,15 +225,16 @@ namespace synthese
 			, bool orderByNetwork /*= true */
 			, bool orderByName /*= false */
 			, bool raisingOrder /*= true */
+			, bool mustBeBookable
 		){
 			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
-				<< getSQLLinesList(rights, totalControl, neededLevel, "*");
+				<< getSQLLinesList(rights, totalControl, neededLevel, mustBeBookable, "*");
 			if (orderByNetwork)
 				query << " ORDER BY "
 				<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE_NAME << " AS n WHERE n." << TABLE_COL_ID << "=" << TABLE_NAME << "." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
-				<< "," << TABLE_NAME << "." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				<< "," << TABLE_NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByName)
 				query << " ORDER BY " << TABLE_NAME << "." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
@@ -241,6 +265,7 @@ namespace synthese
 			const security::RightsOfSameClassMap& rights
 			, bool totalControl
 			, RightLevel neededLevel
+			, bool mustBeBookable
 			, std::string selectedColumns
 		){
 			RightsOfSameClassMap::const_iterator it;
@@ -326,6 +351,10 @@ namespace synthese
 			{
 				for (set<uid>::const_iterator it(forbiddenLines.begin()); it != forbiddenLines.end(); ++it)
 					query << " AND " << TABLE_COL_ID << "!=" << *it;
+			}
+			if (mustBeBookable)
+			{
+				query << " AND EXISTS(SELECT " << TABLE_COL_ID << " FROM " << LineTableSync::TABLE_NAME << " AS l WHERE l." << LineTableSync::COL_RESERVATIONRULEID << ">0 AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << TABLE_NAME << "." << TABLE_COL_ID << ")";
 			}
 
 			return query.str();

@@ -214,6 +214,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DebugInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DebugInterfaceElement.h"
+				>
+			</File>
+			<File
 				RelativePath=".\EqualsValueInterfaceElement.cpp"
 				>
 			</File>

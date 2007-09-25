@@ -34,6 +34,16 @@
 
 namespace synthese
 {
+	namespace env
+	{
+		class Service;
+	}
+
+	namespace time
+	{
+		class Date;
+	}
+
 	namespace resa
 	{
 		class ReservationTransaction;
@@ -60,7 +70,10 @@ namespace synthese
 
 
 			/** ReservationTransaction search.
-				(other search parameters)
+				The returned reservations transactions includes their child reservations as shared pointer.
+				@param service Booked service
+				@param originDate Date of departure of the service, according to the first schedule
+				@param withCancelled true = return also the cancelled reservations, false = hide it
 				@param first First ReservationTransaction object to answer
 				@param number Number of ReservationTransaction objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@return vector<ReservationTransaction> Founded ReservationTransaction objects.
@@ -68,8 +81,12 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<ReservationTransaction> > search(
-				// other search parameters ,
-				int first = 0, int number = 0);
+				const env::Service* service
+				, const time::Date& originDate
+				, bool withCancelled
+				, int first = 0
+				, int number = 0
+			);
 
 
 		protected:

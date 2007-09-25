@@ -29,6 +29,7 @@
 #include "01_util/UId.h"
 
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
@@ -42,7 +43,7 @@ namespace synthese
 		class ReservationTransaction : public util::Registrable<uid, ReservationTransaction>
 		{
 		public:
-			typedef std::vector<const Reservation*> Reservations;
+			typedef std::vector<boost::shared_ptr<Reservation> > Reservations;
 			
 		private:
 
@@ -89,7 +90,7 @@ namespace synthese
 			void setBookingUserId	(uid id);
 			void setCancelUserId	(uid id);
 			void setCustomerEMail	(const std::string& email);
-			void addReservation		(Reservation* reservation);
+			void setReservations	(const Reservations& reservations);
 
 			uid						getLastReservation()	const;
 			int						getSeats()				const;
@@ -102,6 +103,13 @@ namespace synthese
 			uid						getCancelUserId()		const;
 			const std::string&		getCustomerEMail()		const;
 			const Reservations&		getReservations()		const;
+
+			/** Creation of a child reservation.
+				@return boost::shared_ptr<Reservation> The created reservation
+				@author Hugues Romain
+				@date 2007				
+			*/
+			boost::shared_ptr<Reservation> newReservation();
 
 		};
 	}

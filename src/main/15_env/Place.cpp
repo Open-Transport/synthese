@@ -137,5 +137,9 @@ namespace synthese
 			_city = city;
 		}
 
+		bool Place::includes( const Place* place ) const
+		{
+			return place == this;
+		}
 	}
 }

@@ -33,22 +33,32 @@ namespace synthese
 	}
 	namespace env
 	{
-		class Line;
+		class CommercialLine;
 
 		/** Line marker.
-		@code line_marker @endcode
+			@ingroup 15Library refLibrary
+			@code line_marker @endcode
+
+			Parameters :
+				- 0 : table opening HTML code
+				- 1 : table closing HTML code
+				- 2 : width of the marker (pixels)
+				- 3 : height of the marker (pixels)
+
+			Object : CommercialLine
 		*/
 		class LineMarkerInterfacePage : public interfaces::InterfacePage
 		{
 		public:
 			/** Display of line of schedule sheet.
 				@param stream Stream to write on
+				@param vars Execution variables
 				@param tableOpeningHTML HTML d'ouverture du tableau (RIEN = Pas d'ouverture du tableau)
 				@param tableClosingHTML HTML de fermeture du tableau (RIEN = Pas de fermeture du tableau)
 				@param pixelWidth Largeur de la case en pixels
 				@param pixelHeight Hauteur de la case en pixels
-				@param line Line to display
-				@param site Displayed site
+				@param commercialLine Commercial Line to display
+				@param request Request
 			*/
 			void display(
 				std::ostream& stream
@@ -57,9 +67,9 @@ namespace synthese
 				, const std::string& tableClosingHTML
 				, int pixelWidth
 				, int pixelHeight
-				, const env::Line* line
+				, const env::CommercialLine* commercialLine
 				, const server::Request* request = NULL
-				) const;
+			) const;
 
 		};
 	}

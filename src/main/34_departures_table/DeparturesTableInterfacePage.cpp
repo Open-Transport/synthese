@@ -25,11 +25,17 @@
 #include "01_util/Conversion.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace interfaces;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<interfaces::InterfacePage, departurestable::DeparturesTableInterfacePage>::FACTORY_KEY("departurestable");
+	}
 
 	namespace departurestable
 	{
@@ -38,6 +44,8 @@ namespace synthese
 			, const std::string& title
 			, int wiringCode
 			, bool displayServiceNumber
+			, bool displayTrackNumber
+			, int intermediatesStopsToDisplay
 			, const ArrivalDepartureListWithAlarm& rows
 			, const server::Request* request /*= NULL*/ ) const
 		{
@@ -45,6 +53,8 @@ namespace synthese
 			pv.push_back(title);
 			pv.push_back(Conversion::ToString(wiringCode));
 			pv.push_back(Conversion::ToString(displayServiceNumber));
+			pv.push_back(Conversion::ToString(displayTrackNumber));
+			pv.push_back(Conversion::ToString(intermediatesStopsToDisplay));
 			
 			InterfacePage::display(
 				stream

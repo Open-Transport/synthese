@@ -40,6 +40,7 @@ namespace synthese
 		class Line;
 		class Service;
 		class Address;
+		class Place;
 
 		/** @addtogroup m15
 		@{
@@ -49,6 +50,8 @@ namespace synthese
 
 		typedef std::vector<boost::shared_ptr<const City> > CityList;
 		typedef std::set<boost::shared_ptr<const Line> > LineSet;
+
+		typedef std::set<const Place*> PlacesSet;
 		/** @} */
 	}
 

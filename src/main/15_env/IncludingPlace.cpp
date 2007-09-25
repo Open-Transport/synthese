@@ -92,5 +92,16 @@ namespace synthese
 			}
 			return _isoBarycentre;
 		}
+
+		bool IncludingPlace::includes( const Place* place ) const
+		{
+			if (place == this)
+				return true;
+
+			for (IncludedPlaces::const_iterator it(_includedPlaces.begin()); it != _includedPlaces.end(); ++it)
+				if (*it == place)
+					return true;
+			return false;
+		}
 	}
 }

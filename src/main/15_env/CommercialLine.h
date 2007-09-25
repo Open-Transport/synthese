@@ -25,6 +25,8 @@
 
 #include <string>
 
+#include "15_env/Types.h"
+
 #include "01_util/Registrable.h"
 #include "01_util/UId.h"
 #include "01_util/RGBColor.h"
@@ -52,6 +54,8 @@ namespace synthese
 
 			const TransportNetwork*	_network;	//!< Network
 
+			PlacesSet	_optionalReservationPlaces;
+
 		public:
 			CommercialLine();
 
@@ -75,6 +79,8 @@ namespace synthese
 
 			const std::string& getName () const;
 			void setName (const std::string& name);
+
+			void addOptionalReservationPlace(const Place* place);
 		};
 	}
 }

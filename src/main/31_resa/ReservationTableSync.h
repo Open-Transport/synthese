@@ -35,15 +35,20 @@ namespace synthese
 	namespace resa
 	{
 		class Reservation;
+		class ReservationTransaction;
 
 		/** Reservation table synchronizer.
 			@ingroup m31LS refLS
+
+			@warning The load method does not update the transaction attribute. To do it, load the transaction first and load each reservation which belongs to it.
 		*/
 		class ReservationTableSync : public db::SQLiteTableSyncTemplate<Reservation>
 		{
 		public:
+			static const std::string COL_TRANSACTION_ID;
 			static const std::string COL_LINE_ID;
 			static const std::string COL_LINE_CODE;
+			static const std::string COL_SERVICE_ID;
 			static const std::string COL_SERVICE_CODE;
 			static const std::string COL_ORIGIN_DATE_TIME;
 			static const std::string COL_DEPARTURE_PLACE_ID;
@@ -59,7 +64,8 @@ namespace synthese
 
 
 			/** Reservation search.
-				(other search parameters)
+				The returned reservations includes their corresponding transaction as shared pointer.
+				@param transaction Transaction
 				@param first First Reservation object to answer
 				@param number Number of Reservation objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@return vector<Reservation*> Founded Reservation objects.
@@ -67,8 +73,10 @@ namespace synthese
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<Reservation> > search(
-				// other search parameters ,
-				int first = 0, int number = 0);
+				ReservationTransaction* transaction
+				, int first = 0
+				, int number = 0
+			);
 
 
 		protected:

@@ -59,6 +59,7 @@ namespace synthese
 			IDCounterMap		_idCounter;
 			HiddenFieldsMap		_hiddenFields;
 			HiddenFieldsMap		_initialFields;
+			bool				_updateRight;
 
 
 			/** Field unique ID generator.
@@ -87,6 +88,14 @@ namespace synthese
 			void _removeHiddenFieldIfExists(const std::string& name, const std::string& value);
 
 		public:
+
+			/** Update right setter.
+				@param value Value to set
+				@author Hugues Romain
+				@date 2007				
+			*/
+			void setUpdateRight(bool value);
+
 
 			/** Constructor.
 				@param name Name of the form in the HTML document
@@ -236,21 +245,38 @@ namespace synthese
 		std::string HTMLForm::getSelectInput( const std::string& name, const std::vector<std::pair<K, T> >& choices, const K& value )
 		{
 			std::stringstream s;
-			s << "<select name=\"" << name << "\">";
-			for (typename std::vector<std::pair<K, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
+
+			if (!_updateRight)
 			{
-				s << "<option value=\"" << it->first << "\"";
-				if (it->first == value)
-					s << " selected=\"1\"";
-				s << ">" << it->second << "</option>";
+				for (typename std::vector<std::pair<K, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
+					if (it->first == value)
+						s << it->second;
 			}
-			s << "</select>";
+			else
+			{
+				s << "<select name=\"" << name << "\">";
+				for (typename std::vector<std::pair<K, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
+				{
+					s << "<option value=\"" << it->first << "\"";
+					if (it->first == value)
+						s << " selected=\"1\"";
+					s << ">" << it->second << "</option>";
+				}
+				s << "</select>";
+			}
 			return s.str();
 		}
 
 		template<class K>
 		std::string HTMLForm::getRadioInput(const std::string& name, const K& valueIfSelected, const K& valueToSelect, const std::string label)
 		{
+			if (!_updateRight)
+			{
+				return (valueIfSelected == valueToSelect)
+					? label
+					: std::string();
+			}
+
 			std::stringstream s;
 			s << "<input name=\"" << name << "\" type=\"radio\" value=\"" << valueIfSelected << "\"";
 			if (valueIfSelected == valueToSelect)

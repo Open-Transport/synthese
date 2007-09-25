@@ -1,6 +1,7 @@
 
 synthese::util::Factory<synthese::util::ModuleClass>::integrate<synthese::server::ServerModule>("999_server");
 
+synthese::server::LoginInterfacePage::integrate();
 
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::server::LoginAction>("login");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::server::LogoutAction>("logout");
@@ -11,3 +12,4 @@ synthese::server::LoginHtmlField::integrate();
 synthese::server::PasswordHtmlField::integrate();
 synthese::server::RequestErrorMessageInterfaceElement::integrate();
 synthese::server::ValidSessionInterfaceElement::integrate();
+synthese::server::ObjectIdInterfaceElement::integrate();

@@ -61,6 +61,9 @@ namespace synthese
 			virtual void _copy(boost::shared_ptr<const Function> function);
 
 		public:
+
+			virtual server::ParametersMap getFixedParametersMap() const;
+
 			/** Interface getter.
 				@return Requested interface (can be NULL)
 				@author Hugues Romain

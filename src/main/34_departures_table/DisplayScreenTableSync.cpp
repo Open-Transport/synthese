@@ -414,7 +414,7 @@ namespace synthese
 			// Filtering
 			query << " WHERE 1 ";
 			if (neededLevel > FORBIDDEN)
-			    query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel) << ")";
+			    query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel, false) << ")";
 			if (!cityName.empty())
 			    query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
 			if (!stopName.empty())

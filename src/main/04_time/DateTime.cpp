@@ -23,6 +23,7 @@
 #include "DateTime.h"
 
 #include "04_time/TimeParseException.h"
+#include "04_time/Schedule.h"
 
 #include "01_util/Conversion.h"
 
@@ -62,6 +63,11 @@ namespace synthese
 			: _date(date), _hour(hour)
 		{	}
 
+		DateTime::DateTime( const Date& date, const Schedule& schedule )
+			: _date(date), _hour(schedule.getHour())
+		{
+			_date += schedule.getDaysSinceDeparture();
+		}
 
 		DateTime::~DateTime()
 		{

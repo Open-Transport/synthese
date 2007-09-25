@@ -45,6 +45,7 @@ namespace synthese
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_INTERFACE_ID;
 			static const std::string TABLE_COL_ROWS_NUMBER;
+			static const std::string COL_MAX_STOPS_NUMBER;
 	
 			DisplayTypeTableSync();
 

@@ -27,6 +27,8 @@
 
 #include "11_interfaces/InterfacePage.h"
 
+#include "01_util/FactorableTemplate.h"
+
 #include "34_departures_table/Types.h"
 
 namespace synthese
@@ -38,15 +40,18 @@ namespace synthese
 			@code departurestable P1 P2 P3 @endcode
 			
 			Parameters :
-				-# Title of the screen
-				-# Wiring code
-				-# 1|0 : Service number display
+				- 0 : Title of the screen
+				- 1 : Wiring code
+				- 2 : 1|0 : Service number display
+				- 3 : display the track number
+				- 4 : number of intermediates stops to display
+				
 			Object :
 				- result of table generation
 
 			@ingroup m34Pages refPages
 		*/
-		class DeparturesTableInterfacePage : public interfaces::InterfacePage
+		class DeparturesTableInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, DeparturesTableInterfacePage>
 		{
 		public:
 			/** Overloaded display method for specific parameter conversion.
@@ -62,6 +67,8 @@ namespace synthese
 				, const std::string& title
 				, int wiringCode
 				, bool displayServiceNumber
+				, bool displayTrackNumber
+				, int intermediatesStopsToDisplay
 				, const ArrivalDepartureListWithAlarm& rows
 				, const server::Request* request = NULL) const;
 		};

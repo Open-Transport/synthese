@@ -88,6 +88,8 @@ namespace synthese
 					) const;
 
 				virtual time::Schedule getDepartureSchedule () const;
+				const time::Schedule& getLastDepartureSchedule() const;
+
 				virtual const time::Schedule& getLastArrivalSchedule() const;
 
 				virtual time::Schedule getDepartureBeginScheduleToIndex(const Edge* edge) const;

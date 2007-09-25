@@ -28,6 +28,8 @@
 #include <string>
 #include <iostream>
 
+#include "04_time/Date.h"
+
 #include "02_db/SQLiteTableSyncTemplate.h"
 
 namespace synthese
@@ -35,9 +37,10 @@ namespace synthese
 	namespace env
 	{
 		class ScheduledService;
+		class CommercialLine;
 
 		/** ScheduledService table synchronizer.
-			@ingroup m15
+			@ingroup m15LS refLS
 		*/
 		class ScheduledServiceTableSync : public db::SQLiteTableSyncTemplate<ScheduledService>
 		{
@@ -55,16 +58,23 @@ namespace synthese
 
 
 			/** ScheduledService search.
-				(other search parameters)
+				@param commercialLine Commercial line which the service must belong to
 				@param first First ScheduledService object to answer
 				@param number Number of ScheduledService objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@param orderByOriginTime order chronologically by origin time
+				@param raisingOrder true = ascending order, false = descending order
 				@return vector<ScheduledService*> Founded ScheduledService objects.
 				@author Hugues Romain
 				@date 2006
 			*/
 			static std::vector<boost::shared_ptr<ScheduledService> > search(
-				// other search parameters ,
-				int first = 0, int number = 0);
+				env::CommercialLine* commercialLine = NULL
+				, time::Date date = time::Date(time::TIME_UNKNOWN)
+				, int first = 0
+				, int number = 0
+				, bool orderByOriginTime = true
+				, bool raisingOrder = true
+			);
 
 
 		protected:

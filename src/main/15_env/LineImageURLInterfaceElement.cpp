@@ -22,7 +22,6 @@
 
 #include "LineImageURLInterfaceElement.h"
 
-#include "15_env/Line.h"
 #include "15_env/CommercialLine.h"
 
 #include <string>
@@ -56,7 +55,7 @@ namespace synthese
 			, const server::Request* request) const
 		{
 			if (object != NULL)
-				stream << static_cast<const Line*>(object)->getCommercialLine()->getImage();
+				stream << static_cast<const CommercialLine*>(object)->getImage();
 			return string();
 		}
 

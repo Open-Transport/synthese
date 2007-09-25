@@ -79,5 +79,15 @@ namespace synthese
 		{
 			_name = name;
 		}
+
+		void DisplayType::setMaxStopsNumber( int number )
+		{
+			_maxStopsNumber = number;
+		}
+
+		int DisplayType::getMaxStopsNumber() const
+		{
+			return _maxStopsNumber;
+		}
 	}
 }

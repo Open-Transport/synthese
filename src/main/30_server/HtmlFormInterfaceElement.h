@@ -33,6 +33,13 @@ namespace synthese
 	{
 		/** HTML Form generator Value Interface Element Class.
 			@ingroup m18
+
+			Parameters :
+				- 0 : form name
+				- 1 : function key (optional) (empty = current function)
+				- 2 : function parameters (query string format) (empty = current fixed parameters)
+				- 3 : action key (optional)
+				- 4 : action parameters (query string format)
 		*/
 		class HtmlFormInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, HtmlFormInterfaceElement>
@@ -47,11 +54,7 @@ namespace synthese
 
 		public:
 			/** Parameters parser.
-			Parameters order :
-				-# function name
-				-# function parameters (query string format)
-				-# action name (blank if no action to do)
-				-# action parameters (query string format)
+				@param vel Standard list of parameters
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
 			std::string display(

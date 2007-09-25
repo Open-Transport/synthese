@@ -6,3 +6,9 @@
 #include "31_resa/ResaRight.h"
 
 #include "31_resa/BookReservationAction.h"
+
+#include "31_resa/ReservationsListFunction.h"
+
+#include "31_resa/ReservationsListInterfacePage.h"
+
+#include "31_resa/BookableCommercialLinesInterfaceElement.h"

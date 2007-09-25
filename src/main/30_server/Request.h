@@ -151,8 +151,6 @@ namespace synthese
 			//! \name Protected getters
 			//@{
 
-				boost::shared_ptr<Function> _getFunction();
-				boost::shared_ptr<const Function> _getFunction() const;
 
 				/** Action getter.
 					@return const Action* The action of the request
@@ -196,6 +194,10 @@ namespace synthese
 				);
 				
 		public:
+
+			boost::shared_ptr<Function> _getFunction();
+			boost::shared_ptr<const Function> _getFunction() const;
+
 			/** Search for the value of a parameter in a ParameterMap object.
 				@param map Map to search in
 				@param parameterName Name of the searched parameter
@@ -247,6 +249,26 @@ namespace synthese
 				, const std::string& source
 			);
 
+
+			/** Search for the value of a parameter in a ParameterMap object and converts into an integer.
+				@param map Map to search in
+				@param parameterName Name of the searched parameter
+				@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
+				@param defaultValue Value to return if the parameter is not found
+				@param source Name of the action or function that requested the parameter (for the error message only)
+				@return int Value of the parameter (defaultValue if parameter nor found)
+				@throw RequestMissingParameterException if the parameter is not found and if it is needed
+				@author Hugues Romain
+				@date 2007
+			*/
+			static bool getBoolFromParameterMap(
+				const ParametersMap& map
+				, const std::string& parameterName
+				, bool neededParameter
+				, bool defaultValue
+				, const std::string& source
+			);
+
 			/** Search for the value of a parameter in a ParameterMap object and converts into an DateTime object.
 				@param map Map to search in
 				@param parameterName Name of the searched parameter
@@ -282,6 +304,16 @@ namespace synthese
 				, bool neededParameter
 				, const std::string& source
 			);
+
+			/** Builds a query string upon a parameters map.
+				@param map Parameters map to convert
+				@param normalize Apply normalization filter to the generated query string
+				@return std::string the generated query string
+				@author Hugues Romain
+				@date 2007
+				
+			*/
+			static std::string getQueryString(const ParametersMap& map, bool normalize=true);
 
 			void _setErrorMessage(const std::string& message);
 			void _setActionException(bool value);

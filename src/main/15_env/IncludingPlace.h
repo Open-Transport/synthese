@@ -73,6 +73,8 @@ namespace synthese
 
 				virtual const geometry::Point2D& getPoint() const;
 
+				virtual bool includes(const Place* place) const;
+
 			//@}
 
 

@@ -41,7 +41,7 @@ namespace synthese
 			, const string& tableClosingHTML
 			, int pixelWidth
 			, int pixelHeight
-			, const Line* line
+			, const CommercialLine* line
 			, const Request* request /*= NULL */
 		) const {
 			ParametersVector pv;

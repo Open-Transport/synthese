@@ -35,7 +35,7 @@
 #include "34_departures_table/DisplayTypeTableSync.h"
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -45,7 +45,7 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<DisplayType>::TABLE_NAME = "t036_display_types";
+		template<> const string SQLiteTableSyncTemplate<DisplayType>::TABLE_NAME = "t036_display_types";
 		template<> const int SQLiteTableSyncTemplate<DisplayType>::TABLE_ID = 36;
 		template<> const bool SQLiteTableSyncTemplate<DisplayType>::HAS_AUTO_INCREMENT = true;
 
@@ -61,33 +61,24 @@ namespace synthese
 			}
 
 	    object->setRowNumber(rows->getInt ( DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER));
+		object->setMaxStopsNumber(rows->getInt ( DisplayTypeTableSync::COL_MAX_STOPS_NUMBER));
 	}
     
 
 		template<> void SQLiteTableSyncTemplate<DisplayType>::save(DisplayType* object)
 		{
 			SQLiteHandle* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() > 0)
-			{
-				query
-					<< "UPDATE " << TABLE_NAME << " SET "
-					<< DisplayTypeTableSync::TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(object->getName())
-					<< "," << DisplayTypeTableSync::TABLE_COL_INTERFACE_ID << "="  << Conversion::ToString(object->getInterface()->getKey())
-					<< "," << DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER << "="  << Conversion::ToString(object->getRowNumber())
-					<< " WHERE " << TABLE_COL_ID << "=" << Conversion::ToString(object->getKey());
-			}
-			else
-			{
+			if (object->getKey() <= 0)
 				object->setKey(getId());
-                query
-					<< " INSERT INTO " << TABLE_NAME << " VALUES("
-					<< Conversion::ToString(object->getKey())
-					<< "," << Conversion::ToSQLiteString(object->getName())
-					<< "," << Conversion::ToString(object->getInterface()->getKey())
-					<< "," << Conversion::ToString(object->getRowNumber())
-					<< ")";
-			}
+			stringstream query;
+			query
+				<< "REPLACE INTO " << TABLE_NAME << " VALUES("
+				<< Conversion::ToString(object->getKey())
+				<< "," << Conversion::ToSQLiteString(object->getName())
+				<< "," << Conversion::ToString(object->getInterface()->getKey())
+				<< "," << Conversion::ToString(object->getRowNumber())
+				<< "," << Conversion::ToString(object->getMaxStopsNumber())
+				<< ")";
 			sqlite->execUpdate(query.str());
 		}
 
@@ -95,9 +86,10 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const std::string DisplayTypeTableSync::TABLE_COL_NAME = "name";
-		const std::string DisplayTypeTableSync::TABLE_COL_INTERFACE_ID = "interface_id";
-		const std::string DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER = "rows_number";
+		const string DisplayTypeTableSync::TABLE_COL_NAME = "name";
+		const string DisplayTypeTableSync::TABLE_COL_INTERFACE_ID = "interface_id";
+		const string DisplayTypeTableSync::TABLE_COL_ROWS_NUMBER = "rows_number";
+		const string DisplayTypeTableSync::COL_MAX_STOPS_NUMBER("max_stops_number");
 
 		/// @todo Other fields
 
@@ -108,15 +100,21 @@ namespace synthese
 			addTableColumn(TABLE_COL_NAME, "TEXT", true);
 			addTableColumn(TABLE_COL_INTERFACE_ID, "INTEGER", true);
 			addTableColumn(TABLE_COL_ROWS_NUMBER, "INTEGER", true);
+			addTableColumn(COL_MAX_STOPS_NUMBER, "INTEGER", true);
 		}
 
 		void DisplayTypeTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)
 		{
 			while (rows->next ())
 			{
-				DisplayType* object(new DisplayType());
-				load(object, rows);
-				object->store();
+				if (DisplayType::Contains(rows->getLongLong (TABLE_COL_ID)))
+				{
+					load(DisplayType::GetUpdateable(rows->getLongLong (TABLE_COL_ID)).get(), rows);
+				} else {
+					DisplayType* object(new DisplayType());
+					load(object, rows);
+					object->store();
+				}
 			}
 		}
 
@@ -142,8 +140,8 @@ namespace synthese
 			}
 		}
 
-		std::vector<shared_ptr<DisplayType> > DisplayTypeTableSync::search(
-			std::string exactName
+		vector<shared_ptr<DisplayType> > DisplayTypeTableSync::search(
+			string exactName
 			, int first /*= 0*/
 			, int number /*= 0*/
 			, bool orderByName

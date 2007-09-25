@@ -180,5 +180,15 @@ namespace synthese
 		{
 			_originDateTime = time;
 		}
+
+		void Reservation::setServiceId( uid id )
+		{
+			_serviceId = id;
+		}
+
+		uid Reservation::getServiceId() const
+		{
+			return _serviceId;
+		}
 	}
 }

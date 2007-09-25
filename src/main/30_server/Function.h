@@ -46,12 +46,23 @@ namespace synthese
 		protected:
 			Request* _request;
 
-		private:
-			
+		public:
+			/** Conversion from fixed attributes to generic parameter map.
+				@return synthese::server::ParametersMap The generater parameters map
+				@author Hugues Romain
+				@date 2007
+				
+				The fixed attributes are those which concern the session and other "always the same" information, like interface number, etc.
+				The variables attributes are the business parameters of the function.
+			*/
+			virtual ParametersMap getFixedParametersMap() const { return ParametersMap(); }
+
 			/** Conversion from attributes to generic parameter maps.
 				@return The generated parameters map
 			*/
 			virtual ParametersMap _getParametersMap() const = 0;
+
+		private:
 
 			/** Conversion from generic parameters map to attributes.
 				@param map The map to interpret (comes from _parseString())

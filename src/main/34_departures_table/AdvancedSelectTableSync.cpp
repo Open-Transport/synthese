@@ -80,7 +80,7 @@ namespace synthese
 			// Where	
 			query << " WHERE 1 ";
 			if (neededLevel > FORBIDDEN)
-				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel) << ")";
+				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel, false) << ")";
 			if (lineId != UNKNOWN_VALUE)
 				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId;
 			if (!cityName.empty())

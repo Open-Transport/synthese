@@ -29,6 +29,10 @@
 #include "15_env/HandicappedCompliance.h"
 #include "15_env/PedestrianCompliance.h"
 #include "15_env/ReservationRule.h"
+#include "15_env/LineTableSync.h"
+#include "15_env/CommercialLine.h"
+#include "15_env/CommercialLineTableSync.h"
+#include "15_env/ServiceDateTableSync.h"
 
 #include <sstream>
 
@@ -40,6 +44,7 @@
 #include "02_db/SQLiteException.h"
 
 #include "04_time/Schedule.h"
+#include "04_time/Date.h"
 
 #include <boost/tokenizer.hpp>
 #include <sqlite/sqlite3.h>
@@ -82,35 +87,36 @@ namespace synthese
 		    ScheduledService::Schedules departureSchedules;
 		    ScheduledService::Schedules arrivalSchedules;
 		    
-		    for (tokenizer::iterator schedulesIter = schedulesTokens.begin();
-			 schedulesIter != schedulesTokens.end (); ++schedulesIter)
-		    {
-			std::string arrDep (*schedulesIter);
-			size_t sepPos = arrDep.find ("#");
-			assert (sepPos != std::string::npos);
-			
-			std::string arrivalScheduleStr (arrDep.substr (0, sepPos));
-			std::string departureScheduleStr (arrDep.substr (sepPos+1));
-			
-			// unnecessary : boost::trim (departureScheduleStr);
-			// unnecessary : boost::trim (arrivalScheduleStr);
-			
-			if (departureScheduleStr.empty ())
-			{
-			    assert (arrivalScheduleStr.empty () == false);
-			    departureScheduleStr = arrivalScheduleStr;
-			}
-			if (arrivalScheduleStr.empty ())
-			{
-			    assert (departureScheduleStr.empty () == false);
-			    arrivalScheduleStr = departureScheduleStr;
-			}
-			
-			Schedule departureSchedule (Schedule::FromString (departureScheduleStr));
-			Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
-			
-			departureSchedules.push_back (departureSchedule);
-			arrivalSchedules.push_back (arrivalSchedule);
+		    for(tokenizer::iterator schedulesIter = schedulesTokens.begin();
+				schedulesIter != schedulesTokens.end ();
+				++schedulesIter
+			){
+				std::string arrDep (*schedulesIter);
+				size_t sepPos = arrDep.find ("#");
+				assert (sepPos != std::string::npos);
+				
+				std::string arrivalScheduleStr (arrDep.substr (0, sepPos));
+				std::string departureScheduleStr (arrDep.substr (sepPos+1));
+				
+				// unnecessary : boost::trim (departureScheduleStr);
+				// unnecessary : boost::trim (arrivalScheduleStr);
+				
+				if (departureScheduleStr.empty ())
+				{
+					assert (arrivalScheduleStr.empty () == false);
+					departureScheduleStr = arrivalScheduleStr;
+				}
+				if (arrivalScheduleStr.empty ())
+				{
+					assert (departureScheduleStr.empty () == false);
+					arrivalScheduleStr = departureScheduleStr;
+				}
+				
+				Schedule departureSchedule (Schedule::FromString (departureScheduleStr));
+				Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
+				
+				departureSchedules.push_back (departureSchedule);
+				arrivalSchedules.push_back (arrivalSchedule);
 		    }
 		    
 		    assert (departureSchedules.size () > 0);
@@ -237,17 +243,30 @@ namespace synthese
 		}
 
 
-		std::vector<shared_ptr<ScheduledService> > ScheduledServiceTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		vector<shared_ptr<ScheduledService> > ScheduledServiceTableSync::search(
+			CommercialLine* commercialLine
+			, Date date
+			, int first /*= 0*/
+			, int number /*= 0*/
+			, bool orderByOriginTime
+			, bool raisingOrder
+		){
 			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE_NAME
-				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				;
+				<< " FROM " << TABLE_NAME;
+			if (commercialLine)
+				query << " INNER JOIN " << LineTableSync::TABLE_NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
+			query << " WHERE 1 ";
+			if (commercialLine)
+				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLine->getKey();
+			if (!date.isUnknown())
+				query << " AND (EXISTS(SELECT * FROM " << ServiceDateTableSync::TABLE_NAME << " WHERE " << ServiceDateTableSync::COL_SERVICEID << "=" << TABLE_NAME << "." << TABLE_COL_ID << " AND " << ServiceDateTableSync::COL_DATE << "=" << date.toSQLString() << ")";
+			query << " ORDER BY ";
+			if (orderByOriginTime)
+				query << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
+
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)

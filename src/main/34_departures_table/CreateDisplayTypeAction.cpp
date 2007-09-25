@@ -40,12 +40,18 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace interfaces;
-	
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<server::Action, departurestable::CreateDisplayTypeAction>::FACTORY_KEY("createdisplaytype");
+	}
+
 	namespace departurestable
 	{
 		const string CreateDisplayTypeAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "dtc_name";
 		const string CreateDisplayTypeAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "dtc_interf";
 		const string CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "dtc_rows";
+		const string CreateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER(Action_PARAMETER_PREFIX + "dtc_stops");
 
 
 		ParametersMap CreateDisplayTypeAction::getParametersMap() const
@@ -55,46 +61,35 @@ namespace synthese
 			if (_interface.get())
 				map.insert(make_pair(PARAMETER_INTERFACE_ID, Conversion::ToString(_interface->getKey())));
 			map.insert(make_pair(PARAMETER_ROWS_NUMBER, Conversion::ToString(_rows_number)));
+			map.insert(make_pair(PARAMETER_MAX_STOPS_NUMBER, Conversion::ToString(_max_stops_number)));
 			return map;
 		}
 
 		void CreateDisplayTypeAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
+			// Name
+			_name = Request::getStringFormParameterMap(map, PARAMETER_NAME, true, FACTORY_KEY);
+			if (_name.empty())
+				throw ActionException("Le nom ne peut être vide.");
+			vector<shared_ptr<DisplayType> > v(DisplayTypeTableSync::search(_name, 0, 1));
+			if (!v.empty())
+				throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 
-			it = map.find(PARAMETER_NAME);
-			if (it != map.end())
-			{
-				_name = it->second;
+			// Rows number
+			_rows_number = Request::getIntFromParameterMap(map, PARAMETER_ROWS_NUMBER, true, FACTORY_KEY);
+			if (_rows_number < 0)
+				throw ActionException("Un nombre positif de lignes doit être choisi");
 
-				if (_name.empty())
-					throw ActionException("Le nom ne peut être vide.");
+			// Max stops number
+			_max_stops_number = Request::getIntFromParameterMap(map, PARAMETER_MAX_STOPS_NUMBER, true, FACTORY_KEY);
+			if (_max_stops_number < UNKNOWN_VALUE)
+				throw ActionException("Un nombre positif d'arrêts intermédiaires lignes doit être choisi");
 
-				vector<shared_ptr<DisplayType> > v(DisplayTypeTableSync::search(_name, 0, 1));
-				if (!v.empty())
-					throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
-			}
-
-			it = map.find(PARAMETER_ROWS_NUMBER);
-			if (it != map.end())
-			{
-				_rows_number = Conversion::ToInt(it->second);
-				if (_rows_number < 0)
-					throw ActionException("Un nombre positif de lignes doit être choisi");
-			}
-
-			it = map.find(PARAMETER_INTERFACE_ID);
-			if (it != map.end())
-			{
-				if (Interface::Contains(Conversion::ToLongLong(it->second)))
-				{
-					_interface = Interface::Get(Conversion::ToLongLong(it->second));
-				}
-				else
-				{
-					throw ActionException("Interface not found");
-				}
-			}
+			// Interface
+			uid id(Request::getUidFromParameterMap(map, PARAMETER_INTERFACE_ID, true, FACTORY_KEY));
+			if (!Interface::Contains(id))
+				throw ActionException("Interface not found");
+			_interface = Interface::Get(id);
 		}
 
 		void CreateDisplayTypeAction::run()
@@ -103,6 +98,7 @@ namespace synthese
 			dt->setName(_name);
 			dt->setInterface(_interface);
 			dt->setRowNumber(_rows_number);
+			dt->setMaxStopsNumber(_max_stops_number);
 			DisplayTypeTableSync::save(dt.get());
 
 			// Log

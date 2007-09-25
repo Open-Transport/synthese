@@ -116,7 +116,7 @@ namespace synthese
 				, const server::Request* request = NULL
 			) const;
 
-			bool isZero(
+			bool isFalse(
 				const ParametersVector&
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL

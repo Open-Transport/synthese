@@ -69,7 +69,6 @@ namespace synthese
 	{
 		void DisplayTypesAdmin::setFromParametersMap(const ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
 		}
 
 		string DisplayTypesAdmin::getTitle() const
@@ -79,6 +78,9 @@ namespace synthese
 
 		void DisplayTypesAdmin::display(ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request) const
 		{
+			// Right
+			bool writeRight(request->isAuthorized<ArrivalDepartureTableRight>(WRITE, FORBIDDEN, GLOBAL_PERIMETER));
+
 			vector<shared_ptr<DisplayType> > searchResult(DisplayTypeTableSync::search(string()));
 
 			ActionFunctionRequest<CreateDisplayTypeAction,AdminRequest> createRequest(request);
@@ -92,7 +94,7 @@ namespace synthese
 			
 			stream
 				<< "<h1>Liste des types d'afficheurs disponibles</h1>"
-				<< "<table id=\"searchresult\"><tr><th>Nom</th><th>Interface</th><th>Lignes</th><th>Actions</th></tr>";
+				<< "<table id=\"searchresult\"><tr><th>Nom</th><th>Interface</th><th>Lignes</th><th>Max arrêts intermédiaires</th><th>Actions</th></tr>";
 
 			// Display types loop
 			for (vector<shared_ptr<DisplayType> >::const_iterator it = searchResult.begin(); it != searchResult.end(); ++it)
@@ -101,6 +103,7 @@ namespace synthese
 				deleteRequest.getAction()->setType(dt);
 
 				HTMLForm uf(updateRequest.getHTMLForm("update" + Conversion::ToString(dt->getKey())));
+				uf.setUpdateRight(writeRight);
 				uf.addHiddenField(UpdateDisplayTypeAction::PARAMETER_ID, Conversion::ToString(dt->getKey()));
 				stream << uf.open();
 				stream
@@ -108,30 +111,38 @@ namespace synthese
 					<< "<td>" << uf.getTextInput(UpdateDisplayTypeAction::PARAMETER_NAME, dt->getName()) << "</td>"
 					<< "<td>" << uf.getSelectInput(UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), dt->getInterface()->getKey()) << "</td>"
 					<< "<td>" << uf.getSelectNumberInput(UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99, dt->getRowNumber()) << "</td>"
-					<< "<td>" << uf.getSubmitButton("Modifier") << "</td>"
-					<< "<td>" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le type " + dt->getName() + " ?", "monitor_delete.png")
-					<< "</tr>"
+					<< "<td>" << uf.getSelectNumberInput(UpdateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER, UNKNOWN_VALUE, 99, dt->getMaxStopsNumber()) << "</td>";
 					;
+				if (writeRight)
+					stream
+						<< "<td>" << uf.getSubmitButton("Modifier") << "</td>"
+						<< "<td>" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le type " + dt->getName() + " ?", "monitor_delete.png");
+				stream << "</tr>";
 				stream << uf.close();
 			}
 
 			// New type
-			HTMLForm cf(createRequest.getHTMLForm("create"));
-			stream << cf.open();
-			stream
-				<< "<tr>"
-				<< "<td>" << cf.getTextInput(CreateDisplayTypeAction::PARAMETER_NAME, "", "(Entrez le nom ici)") << "</td>"
-				<< "<td>" << cf.getSelectInput(CreateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), (uid) 0) << "</td>"
-				<< "<td>" << cf.getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99) << "</td>"
-				<< "<td>" << cf.getSubmitButton("Ajouter") << "</td>"
-				<< "</tr>";
-			stream << cf.close();
+			if (writeRight)
+			{
+				HTMLForm cf(createRequest.getHTMLForm("create"));
+				stream << cf.open();
+				stream
+					<< "<tr>"
+					<< "<td>" << cf.getTextInput(CreateDisplayTypeAction::PARAMETER_NAME, "", "(Entrez le nom ici)") << "</td>"
+					<< "<td>" << cf.getSelectInput(CreateDisplayTypeAction::PARAMETER_INTERFACE_ID, InterfaceModule::getInterfaceLabels(), (uid) 0) << "</td>"
+					<< "<td>" << cf.getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER, 1, 99) << "</td>"
+					<< "<td>" << cf.getSelectNumberInput(CreateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER, UNKNOWN_VALUE, 99) << "</td>"
+					<< "<td>" << cf.getSubmitButton("Ajouter") << "</td>"
+					<< "</tr>";
+				stream << cf.close();
+			}
+
 			stream << "</table>";
 		}
 
 		bool DisplayTypesAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
-			return request->isAuthorized<ArrivalDepartureTableRight>(WRITE, FORBIDDEN, GLOBAL_PERIMETER);
+			return request->isAuthorized<ArrivalDepartureTableRight>(READ, FORBIDDEN, GLOBAL_PERIMETER);
 		}
 
 		DisplayTypesAdmin::DisplayTypesAdmin()

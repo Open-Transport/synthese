@@ -37,7 +37,12 @@ namespace synthese
 	namespace env
 	{
 		/** LineShortNameInterfaceElement class.
-			@ingroup m15Values refValues
+			@ingroup m15Library refLibrary
+
+			@code line_short_name @endcode
+
+			Parameters : none
+			Object : CommercialLine
 		*/
 		class LineShortNameInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, LineShortNameInterfaceElement>

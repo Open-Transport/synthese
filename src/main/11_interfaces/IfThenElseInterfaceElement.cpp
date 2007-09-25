@@ -26,29 +26,31 @@
 #include "11_interfaces/StaticValueInterfaceElement.h"
 #include "11_interfaces/InterfacePageException.h"
 
+#include "01_util/Conversion.h"
+
 using namespace boost;
 using namespace std;
 
 namespace synthese
 {
 	using namespace interfaces;
+	using namespace util;
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<LibraryInterfaceElement, IfThenElseInterfaceElement>::FACTORY_KEY = "if";
+		template<> const string FactorableTemplate<LibraryInterfaceElement, IfThenElseInterfaceElement>::FACTORY_KEY = "if";
 	}
 
 	namespace interfaces
 	{
-		std::string IfThenElseInterfaceElement::display(
+		string IfThenElseInterfaceElement::display(
 			ostream& stream
 			, const ParametersVector& parameters
 			, interfaces::VariablesMap& variables
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			std::string result = _criteria->getValue(parameters, variables, object, request);
-			return ( result.size() == 0 || result == "0" )
+			return _criteria->isFalse(parameters, variables, object, request)
 				? _to_return_if_false->display(stream, parameters, variables, object, request)
 				: _to_return_if_true->display(stream, parameters, variables, object, request);
 		}

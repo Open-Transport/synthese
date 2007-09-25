@@ -211,6 +211,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ObjectIdInterfaceElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ObjectIdInterfaceElement.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PasswordHtmlField.cpp"
 				>
 			</File>
@@ -232,6 +240,18 @@
 			</File>
 			<File
 				RelativePath=".\ValidSessionInterfaceElement.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="11 Interface pages"
+			>
+			<File
+				RelativePath=".\LoginInterfacePage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LoginInterfacePage.h"
 				>
 			</File>
 		</Filter>

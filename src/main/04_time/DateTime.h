@@ -36,7 +36,9 @@ namespace synthese
 {
 	namespace time
 	{
-		/** DateTime
+		class Schedule;
+
+		/** A date and a time.
 			@ingroup m04
 		*/
 		class DateTime
@@ -53,12 +55,16 @@ namespace synthese
 
 			DateTime (
 				int day
-				, int month = TIME_SAME, int year = TIME_SAME,
-					int hours = TIME_SAME, int minutes = TIME_SAME );
+				, int month = TIME_SAME
+				, int year = TIME_SAME
+				, int hours = TIME_SAME
+				, int minutes = TIME_SAME
+			);
 
 			DateTime ( const DateTime& ref);
 			DateTime ( const Date& date );
 			DateTime(const Date& date, const Hour& hour);
+			DateTime(const Date& date, const Schedule& schedule);
 
 			~DateTime();
 

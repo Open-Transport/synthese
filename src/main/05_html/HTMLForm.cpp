@@ -23,21 +23,27 @@
 #include <sstream>
 #include <map>
 
+#include "HTMLForm.h"
+
 #include "04_time/DateTime.h"
 #include "04_time/Date.h"
 
-#include "05_html/HTMLForm.h"
+#include "01_util/Conversion.h"
 
 using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace html
 	{
 
-
 		std::string HTMLForm::open(const std::string htmlComplement)
 		{
+			if (!_updateRight)
+				return string();
+
 			stringstream s;
 			s	<< "<form "
 				<< "name=\"" << _name << "\" "
@@ -49,13 +55,16 @@ namespace synthese
 		}
 
 		HTMLForm::HTMLForm( const string& name, const string& action)
-			: _name(name), _action(action)
+			: _name(name), _action(action), _updateRight(true)
 		{
 
 		}
 
 		std::string HTMLForm::getSelectNumberInput(const std::string& name, int mini, int maxi, int value/*=UNKNOWN_VALUE*/, int step )
 		{
+			if (!_updateRight)
+				return Conversion::ToString(value);
+
 			std::vector<pair<int,int> > m;
 			for (int i=mini; i<=maxi; i += step)
 				m.push_back(std::make_pair(i,i));
@@ -64,6 +73,9 @@ namespace synthese
 
 		std::string HTMLForm::getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping/*=""*/)
 		{
+			if (!_updateRight)
+				return value;
+
 			_removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<input "
@@ -82,6 +94,9 @@ namespace synthese
 
 		std::string HTMLForm::getSubmitButton( const std::string& caption )
 		{
+			if (!_updateRight)
+				return string();
+
 			stringstream s;
 			s	<< "<input "
 				<< "type=\"submit\" "
@@ -92,6 +107,9 @@ namespace synthese
 
 		std::string HTMLForm::setFocus(const std::string& fieldName )
 		{
+			if (_updateRight)
+				return string();
+
 			stringstream s;
 			s	<< "<script type=\"text/javascript\">"
 				<< "document.getElementById('" << _getFieldId(fieldName, false) << "').focus();"
@@ -101,6 +119,9 @@ namespace synthese
 
 		std::string HTMLForm::getTextAreaInput( const std::string& name, const std::string& value, int rows, int cols )
 		{
+			if (_updateRight)
+				return value;
+
 			_removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<textarea "
@@ -123,6 +144,9 @@ namespace synthese
 
 		std::string HTMLForm::getCheckBox( const std::string& name, const std::string& value, bool checked )
 		{
+			if (!_updateRight)
+				return string();
+
 			_removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<input "
@@ -136,6 +160,9 @@ namespace synthese
 
 		std::string HTMLForm::getPasswordInput( const std::string& name, const std::string& value )
 		{
+			if (!_updateRight)
+				return string();
+		
 			_removeHiddenFieldIfExists(name, value);
 			stringstream s;
 			s	<< "<input "
@@ -149,6 +176,9 @@ namespace synthese
 
 		std::string HTMLForm::getCalendarInput( const std::string& name, const time::DateTime& value )
 		{
+			if (!_updateRight)
+				return value.toString();
+
 			_removeHiddenFieldIfExists(name, value.toString());
 			string fieldId = _getFieldId(name);
 			string triggerId = _getFieldId(name + "TRIGGER");
@@ -186,6 +216,9 @@ namespace synthese
 
 		std::string HTMLForm::getCalendarInput( const std::string& name, const time::Date& value )
 		{
+			if (!_updateRight)
+				return value.toString();
+
 			_removeHiddenFieldIfExists(name, value.toString());
 			string fieldId = _getFieldId(name);
 			string triggerId = _getFieldId(name + "TRIGGER");
@@ -223,6 +256,9 @@ namespace synthese
 
 		std::string HTMLForm::close()
 		{
+			if (!_updateRight)
+				return string();
+
 			stringstream s;
 			s << getHiddenFields();
 			s << "</form>";
@@ -268,6 +304,9 @@ namespace synthese
 
 		std::string HTMLForm::getHiddenFields() const
 		{
+			if (!_updateRight)
+				return string();
+
 			stringstream s;
 			for (HiddenFieldsMap::const_iterator it = _hiddenFields.begin(); it != _hiddenFields.end(); ++it)
 				s << "<input type=\"hidden\" name=\"" << it->first << "\" value=\"" << it->second << "\" />";
@@ -302,6 +341,11 @@ namespace synthese
 			}
 
 			return url.str();
+		}
+
+		void HTMLForm::setUpdateRight( bool value )
+		{
+			_updateRight = value;
 		}
 	}
 }

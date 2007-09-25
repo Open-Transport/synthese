@@ -44,6 +44,9 @@ namespace synthese
 		@defgroup m15Pages 15 Pages
 		@ingroup m15
 
+		@defgroup m15Library 15 Interface library
+		@ingroup m15
+
 		@defgroup m15Functions 35 Functions
 		@ingroup m15
 

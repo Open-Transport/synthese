@@ -43,12 +43,13 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 
+	namespace util
+	{
+		template<> const string FactorableTemplate<interfaces::LibraryInterfaceElement, departurestable::DeparturesTableInterfaceElement>::FACTORY_KEY("departurestable");
+	}
+
 	namespace departurestable
 	{
-		const string DeparturesTableInterfaceElement::VALUE_DESTINATION = "destination";
-		const string DeparturesTableInterfaceElement::VALUE_INTERMEDIATE = "intermediate";
-		const string DeparturesTableInterfaceElement::VALUE_NORMAL = "normal";
-
 		void DeparturesTableInterfaceElement::storeParameters( ValueElementList& vel )
 		{
 			if (vel.size() < 3)
@@ -69,6 +70,10 @@ namespace synthese
 
 			if (!vel.isEmpty())
 				_displayQuai = vel.front();
+
+			if (!vel.isEmpty())
+				_numberOfIntermediatesStops = vel.front();
+
 		}
 
 		string DeparturesTableInterfaceElement::display(
@@ -80,17 +85,21 @@ namespace synthese
 		{
 			const ArrivalDepartureList& ptds(static_cast<const ArrivalDepartureListWithAlarm*>(object)->map);
 			
-			int __MultiplicateurRangee = _multiplicateurRangeeVIE->isZero(parameters, variables, object, request) ? 1 : Conversion::ToInt(_multiplicateurRangeeVIE->getValue(parameters, variables, object, request));
-			const string& __Pages = _pagesVIE->getValue(parameters, variables, object, request);
+			int __MultiplicateurRangee(_multiplicateurRangeeVIE->isFalse(parameters, variables, object, request)
+				? 1 
+				: Conversion::ToInt(_multiplicateurRangeeVIE->getValue(parameters, variables, object, request))
+			);
+			int __Pages = Conversion::ToInt(_pagesVIE->getValue(parameters, variables, object, request));
 			const string& __SeparateurPage = _pageSeparator->getValue(parameters, variables, object, request);
 			int departuresToHide(_departuresToHide ? Conversion::ToInt(_departuresToHide->getValue(parameters, variables, object, request)) : 0);
 			const string message (_message ? _message->getValue(parameters, variables, object, request) : string());
 			bool displayServiceNumber(_displayServiceNumber ? Conversion::ToBool(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
 			bool displayQuai(_displayQuai ? Conversion::ToBool(_displayQuai->getValue(parameters, variables, object, request)) : false);
+			int numberOfIntermediatesStops(_numberOfIntermediatesStops ? Conversion::ToInt(_numberOfIntermediatesStops->getValue(parameters, variables, object, request)) : UNKNOWN_VALUE);
 
 			// Gestion des pages
 			int __NombrePages(1);
-			if ((__Pages == VALUE_INTERMEDIATE) || (__Pages == VALUE_DESTINATION))
+			if (__Pages != 0)
 			{
 				int departuresNumber = ptds.size() - departuresToHide;
 				for (ArrivalDepartureList::const_iterator it = ptds.begin(); departuresNumber && (it != ptds.end()); ++it, --departuresNumber)
@@ -99,10 +108,9 @@ namespace synthese
 					if (displayedList.size () - 2 > __NombrePages )
 						__NombrePages = displayedList.size () - 2;
 				}
+				if (__Pages != UNKNOWN_VALUE && __NombrePages > __Pages)
+					__NombrePages = __Pages;
 			}
-
-			if (__Pages == VALUE_DESTINATION)
-				++__NombrePages;
 
 			// Boucle sur les pages
 			for ( int __NumeroPage = 1; __NumeroPage <= __NombrePages; __NumeroPage++ )
@@ -118,14 +126,24 @@ namespace synthese
 				{
 					const ArrivalDepartureRow& ___DP = *it;
 
-					int __NombrePagesRangee = ___DP.second.size () - 2 + ( __Pages == VALUE_DESTINATION ? 1 : 0 );
+					int __NombrePagesRangee = ___DP.second.size () - 2;
 					int pageNumber = ( !__NombrePagesRangee || __NumeroPage > __NombrePagesRangee * ( __NombrePages / __NombrePagesRangee ) )
 						? __NumeroPage
 						: (1 + __NumeroPage % __NombrePagesRangee);     // 1 : Numero de page
 
 					// Lancement de l'affichage de la rangee
 					const DepartureTableRowInterfacePage* page(_page->getInterface()->getPage<DepartureTableRowInterfacePage>());
-					page->display(stream, variables, __Rangee, pageNumber, displayQuai, displayServiceNumber, ___DP, request);
+					page->display(
+						stream
+						, variables
+						, __Rangee
+						, pageNumber
+						, displayQuai
+						, displayServiceNumber
+						, numberOfIntermediatesStops
+						, ___DP
+						, request
+					);
 
 					// Incrementation du numero de rangee
 					__Rangee += __MultiplicateurRangee;

@@ -135,6 +135,8 @@ namespace synthese
 			virtual const geometry::Point2D& getPoint() const = 0;
 
 			virtual uid getId() const = 0;
+
+			virtual bool includes(const Place* place) const;
 			//@}
 
 		    

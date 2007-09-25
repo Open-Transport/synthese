@@ -31,6 +31,7 @@
 
 #include "15_env/LineMarkerInterfacePage.h"
 #include "15_env/LineStop.h"
+#include "15_env/Line.h"
 
 #include "30_server/Request.h"
 
@@ -77,7 +78,7 @@ namespace synthese
 				, _htmlEndLine->getValue(parameters, variables, object, request)
 				, Conversion::ToInt(_cellWidth->getValue(parameters, variables, object, request))
 				, Conversion::ToInt(_cellHeight->getValue(parameters, variables, object,request))
-				, line
+				, line->getCommercialLine()
 				, request
 				);
 			return string();

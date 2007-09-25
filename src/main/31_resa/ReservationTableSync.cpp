@@ -32,6 +32,7 @@
 #include "04_time/DateTime.h"
 
 #include "31_resa/Reservation.h"
+#include "31_resa/ReservationTransaction.h"
 #include "31_resa/ReservationTableSync.h"
 
 using namespace std;
@@ -57,6 +58,7 @@ namespace synthese
 			object->setKey(rows->getLongLong (TABLE_COL_ID));
 			object->setLineId(rows->getLongLong ( ReservationTableSync::COL_LINE_ID));
 			object->setLineCode(rows->getText ( ReservationTableSync::COL_LINE_CODE));
+			object->setServiceId(rows->getLongLong(ReservationTableSync::COL_SERVICE_ID));
 			object->setServiceCode(rows->getText ( ReservationTableSync::COL_SERVICE_CODE));
 			object->setDeparturePlaceId(rows->getLongLong ( ReservationTableSync::COL_DEPARTURE_PLACE_ID));
 			object->setDeparturePlaceName(rows->getText ( ReservationTableSync::COL_DEPARTURE_PLACE_NAME));
@@ -78,8 +80,10 @@ namespace synthese
 			 query
 				<< " REPLACE INTO " << TABLE_NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
+				<< "," << Conversion::ToString(object->getTransaction()->getKey())
 				<< "," << Conversion::ToString(object->getLineId())
 				<< "," << Conversion::ToSQLiteString(object->getLineCode())
+				<< "," << Conversion::ToString(object->getServiceId())
 				<< "," << Conversion::ToSQLiteString(object->getServiceCode())
 				<< "," << Conversion::ToString(object->getDeparturePlaceId())
 				<< "," << Conversion::ToSQLiteString(object->getDeparturePlaceName())
@@ -97,8 +101,10 @@ namespace synthese
 
 	namespace resa
 	{
+		const string ReservationTableSync::COL_TRANSACTION_ID("transaction_id");
 		const string ReservationTableSync::COL_LINE_ID = "line_id";
 		const string ReservationTableSync::COL_LINE_CODE = "line_code";
+		const string ReservationTableSync::COL_SERVICE_ID = "service_id";
 		const string ReservationTableSync::COL_SERVICE_CODE = "service_code";
 		const string ReservationTableSync::COL_DEPARTURE_PLACE_ID = "departure_place_id";
 		const string ReservationTableSync::COL_DEPARTURE_PLACE_NAME = "departure_place_name";
@@ -113,8 +119,10 @@ namespace synthese
 			: SQLiteTableSyncTemplate<Reservation>(true, true, TRIGGERS_ENABLED_CLAUSE)
 		{
 			addTableColumn(TABLE_COL_ID, "INTEGER", false);
+			addTableColumn(COL_TRANSACTION_ID, "INTEGER");
 			addTableColumn(COL_LINE_ID, "INTEGER");
 			addTableColumn(COL_LINE_CODE, "TEXT");
+			addTableColumn(COL_SERVICE_ID, "INTEGER");
 			addTableColumn(COL_SERVICE_CODE, "TEXT");
 			addTableColumn(COL_DEPARTURE_PLACE_ID, "INTEGER");
 			addTableColumn(COL_DEPARTURE_PLACE_NAME, "TEXT");
@@ -141,17 +149,19 @@ namespace synthese
 		{
 		}
 
-		std::vector<shared_ptr<Reservation> > ReservationTableSync::search(int first /*= 0*/, int number /*= 0*/ )
-		{
+		vector<shared_ptr<Reservation> > ReservationTableSync::search(
+			ReservationTransaction* transaction
+			, int first /*= 0*/
+			, int number /*= 0*/
+		){
 			SQLiteHandle* sqlite = DBModule::GetSQLite();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE_NAME
 				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				;
+				<< COL_TRANSACTION_ID << "=" << Conversion::ToString(transaction->getKey());
+			query << " ORDER BY " << COL_DEPARTURE_TIME;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -163,7 +173,7 @@ namespace synthese
 				vector<shared_ptr<Reservation> > objects;
 				while (rows->next ())
 				{
-					shared_ptr<Reservation> object(new Reservation());
+					shared_ptr<Reservation> object(transaction->newReservation());
 					load(object.get(), rows);
 					objects.push_back(object);
 				}
