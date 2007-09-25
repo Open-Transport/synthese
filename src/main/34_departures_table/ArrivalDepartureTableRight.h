@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ARRIVAL_DEPARTURE_TABLE_RIGHT_H
 #define SYNTHESE_ARRIVAL_DEPARTURE_TABLE_RIGHT_H
 
-#include "12_security/RightTemplate.h"
+#include "15_env/NetworkLineBasedRight.h"
 
 namespace synthese
 {
@@ -47,11 +47,9 @@ namespace synthese
 					- si le point de diffusion est un arrêt physique, alors il doit être desservi par la ligne
 					- si le point de diffusion n'est pas un arrêt physique, alors au moins un arrêt physique du lieu auquel appartient le point de diffusion doit être desservi par la ligne
 		*/
-		class ArrivalDepartureTableRight : public security::RightTemplate<ArrivalDepartureTableRight>
+		class ArrivalDepartureTableRight : public env::NetworkLineBasedRight<ArrivalDepartureTableRight>
 		{
 		public:
-			std::string displayParameter() const;
-			bool perimeterIncludes(const std::string& perimeter) const;
 		};
 	}
 }

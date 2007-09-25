@@ -119,6 +119,7 @@ namespace synthese
 				int					_blinkingDelay;
 				bool				_trackNumberDisplay;
 				bool				_serviceNumberDisplay;
+				bool				_displayTeam;
 			//@}
 
 			//! \name Content
@@ -185,6 +186,7 @@ namespace synthese
 				void	setType(const DisplayType*);
 				void	setWiringCode(int);				
 				void	setComplements(const Complements& complements);
+				void	setDisplayTeam(bool value);
 			//@}
 
 			//! \name Modifiers
@@ -230,6 +232,7 @@ namespace synthese
 				bool							getIsOnline()					const;
 				const std::string&				getMaintenanceMessage()			const;
 				const Complements&				getComplements()				const;
+				bool							getDisplayTeam()				const;
 			//@}
 
 			//! \name Queries

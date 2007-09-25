@@ -24,15 +24,24 @@
 #include "12_security/ProfileTableSync.h"
 #include "12_security/SecurityModule.h"
 #include "12_security/Right.h"
+#include "12_security/SecurityLog.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
+
+#include "13_dblog/DBLogModule.h"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace server;
+	using namespace dblog;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<server::Action,security::UpdateRightAction>::FACTORY_KEY("ura");
+	}
 	
 	namespace security
 	{
@@ -68,39 +77,33 @@ namespace synthese
 			}
 
 			// Right code
-			string rightCode;
-			it = map.find(PARAMETER_RIGHT_CODE);
-			if (it == map.end())
-				throw ActionException("Right code not specified");
-			rightCode = it->second;
+			string rightCode(Request::getStringFormParameterMap(map, PARAMETER_RIGHT_CODE, true, FACTORY_KEY));
 
 			// Right parameter
-			it = map.find(PARAMETER_RIGHT_PARAMETER);
-			if (it == map.end())
-				throw ActionException("Right parameter not specified");
-
-			_right = _profile->getRight(rightCode, it->second);
+			string parameter(Request::getStringFormParameterMap(map, PARAMETER_RIGHT_PARAMETER, true, FACTORY_KEY));
+			_right = _profile->getRight(rightCode, parameter);
 			if (!_right.get())
 				throw ActionException("Specified right not found on profile");
 
 			// Public level
-			it = map.find(PARAMETER_PUBLIC_VALUE);
-			if (it == map.end())
-				throw ActionException("Public level not specified");
-			_publicLevel = static_cast<RightLevel>(Conversion::ToInt(it->second));
+			_publicLevel = static_cast<RightLevel>(Request::getIntFromParameterMap(map, PARAMETER_PUBLIC_VALUE, true, FACTORY_KEY));
 
 			// Private level
-			it = map.find(PARAMETER_PRIVATE_VALUE);
-			if (it == map.end())
-				throw ActionException("Private level not specified");
-			_privateLevel = static_cast<RightLevel>(Conversion::ToInt(it->second));
+			_privateLevel = static_cast<RightLevel>(Request::getIntFromParameterMap(map, PARAMETER_PRIVATE_VALUE, false, FACTORY_KEY));
 		}
 
 		void UpdateRightAction::run()
 		{
+			stringstream log;
+			DBLogModule::appendToLogIfChange(log, "Droits publics", Right::getLevelLabel(_right->getPublicRightLevel()), Right::getLevelLabel(_publicLevel));
+			DBLogModule::appendToLogIfChange(log, "Droits privés", Right::getLevelLabel(_right->getPrivateRightLevel()), Right::getLevelLabel(_privateLevel));
+
 			_right->setPrivateLevel(_privateLevel);
 			_right->setPublicLevel(_publicLevel);
+
 			ProfileTableSync::save(_profile.get());
+
+			SecurityLog::addProfileAdmin(_request->getUser(), _profile, _right->getFactoryKey() + "/" + _right->getParameter() + log.str());
 		}
 	}
 }

@@ -81,6 +81,7 @@ namespace synthese
 				static const std::string COL_MAINTENANCE_CHECKS_PER_DAY;
 				static const std::string COL_MAINTENANCE_IS_ONLINE;
 				static const std::string COL_MAINTENANCE_MESSAGE;
+				static const std::string COL_DISPLAY_TEAM;
 			//@}
 			
 

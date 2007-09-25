@@ -508,5 +508,15 @@ namespace synthese
 		{
 			_complements = complements;
 		}
+
+		void DisplayScreen::setDisplayTeam( bool value )
+		{
+			_displayTeam = value;
+		}
+
+		bool DisplayScreen::getDisplayTeam() const
+		{
+			return _displayTeam;
+		}
 	}
 }

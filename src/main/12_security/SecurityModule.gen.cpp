@@ -17,10 +17,10 @@ synthese::util::Factory<synthese::server::Action>::integrate<synthese::security:
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::DelUserAction>("sdu");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::AddProfileAction>("apa");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::DeleteProfileAction>("dpa");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::AddRightAction>("ara");
+synthese::security::AddRightAction::integrate();
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::DeleteRightAction>("dra");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UpdateRightAction>("ura");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UpdateProfileAction>("upa");
+synthese::security::UpdateRightAction::integrate();
+synthese::security::UpdateProfileAction::integrate();
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UserUpdateAction>("uua");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::security::UserPasswordUpdateAction>("upua");
 

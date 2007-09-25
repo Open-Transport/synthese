@@ -29,6 +29,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -38,7 +40,7 @@ namespace synthese
 		/** AddRightAction action class.
 			@ingroup m12Actions refActions
 		*/
-		class AddRightAction : public server::Action
+		class AddRightAction : public util::FactorableTemplate<server::Action, AddRightAction>
 		{
 		public:
 			static const std::string PARAMETER_RIGHT;
@@ -55,11 +57,11 @@ namespace synthese
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
+				@warning Not yet implemented
 			*/
 			server::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
-			Removes the used parameters from the map.
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
 

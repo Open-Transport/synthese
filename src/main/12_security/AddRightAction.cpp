@@ -26,6 +26,7 @@
 #include "12_security/SecurityModule.h"
 #include "12_security/ProfileTableSync.h"
 #include "12_security/Right.h"
+#include "12_security/SecurityLog.h"
 
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
@@ -38,6 +39,11 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace db;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action, security::AddRightAction>::FACTORY_KEY("ara");
+	}
 	
 	namespace security
 	{
@@ -50,7 +56,6 @@ namespace synthese
 		ParametersMap AddRightAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
@@ -60,29 +65,13 @@ namespace synthese
 			{
 				_profile = ProfileTableSync::get(_request->getObjectId());
 
-				ParametersMap::const_iterator it;
-
-				it = map.find(PARAMETER_RIGHT);
-				if (it == map.end())
-					throw ActionException("Right class not specified");
-				_rightName = it->second;
+				_rightName = Request::getStringFormParameterMap(map, PARAMETER_RIGHT, true, FACTORY_KEY);
 				if (!Factory<Right>::contains(_rightName))
 					throw ActionException("Specified right class not found");
 				
-				it = map.find(PARAMETER_PARAMETER);
-				if (it == map.end())
-					throw ActionException("Parameter not specified");
-				_parameter = it->second;
-
-				it = map.find(PARAMETER_PUBLIC_LEVEL);
-				if (it == map.end())
-					throw ActionException("Public level not specified");
-				_publicLevel = (RightLevel) Conversion::ToInt(it->second);
-
-				it = map.find(PARAMETER_PRIVATE_LEVEL);
-				if (it == map.end())
-					throw ActionException("Private level not specified");
-				_privateLevel = (RightLevel) Conversion::ToInt(it->second);
+				_parameter = Request::getStringFormParameterMap(map, PARAMETER_PARAMETER, true, FACTORY_KEY);
+				_publicLevel = static_cast<RightLevel>(Request::getIntFromParameterMap(map, PARAMETER_PUBLIC_LEVEL, true, FACTORY_KEY));
+				_privateLevel = static_cast<RightLevel>(Request::getIntFromParameterMap(map, PARAMETER_PRIVATE_LEVEL, false, FACTORY_KEY));
 			}
 			catch(DBEmptyResultException<Profile>)
 			{
@@ -97,7 +86,10 @@ namespace synthese
 			right->setPrivateLevel(_privateLevel);
 			right->setPublicLevel(_publicLevel);
 			_profile->addRight(right);
+
 			ProfileTableSync::save(_profile.get());
+
+			SecurityLog::addProfileAdmin(_request->getUser(), _profile, "Ajout habilitation " + _rightName + "/" + _parameter);
 		}
 	}
 }

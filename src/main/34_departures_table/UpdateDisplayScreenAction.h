@@ -43,9 +43,9 @@ namespace synthese
 		class DisplayType;
 		
 		/** UpdateDisplayScreenAction action class.
-			@ingroup m34
+			@ingroup m34Actions refActions
 		*/
-		class UpdateDisplayScreenAction : public server::Action
+		class UpdateDisplayScreenAction : public util::FactorableTemplate<server::Action, UpdateDisplayScreenAction>
 		{
 		public:
 			static const std::string PARAMETER_NAME;
@@ -55,6 +55,7 @@ namespace synthese
 			static const std::string PARAMETER_DISPLAY_PLATFORM;
 			static const std::string PARAMETER_DISPLAY_SERVICE_NUMBER;
 			static const std::string PARAMETER_DISPLAY_DEPARTURE_ARRIVAL;
+			static const std::string PARAMETER_DISPLAY_TEAM;
 			static const std::string PARAMETER_DISPLAY_END_FILTER;
 			static const std::string PARAMETER_DISPLAY_MAX_DELAY;
 			static const std::string PARAMETER_TYPE;
@@ -69,6 +70,7 @@ namespace synthese
 			int											_cleaningDelay;
 			bool										_displayPlatform;
 			bool										_displayServiceNumber;
+			bool										_displayTeam;
 			DeparturesTableDirection					_direction;
 			EndFilter									_endFilter;
 			int											_maxDelay;
@@ -77,11 +79,12 @@ namespace synthese
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
+				@warning Not yet implemented;
 			*/
 			server::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
-			Removes the used parameters from the map.
+				@param map Map to read
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
 

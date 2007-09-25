@@ -151,7 +151,8 @@ namespace synthese
 						form.addHiddenField(UpdateRightAction::PARAMETER_RIGHT_PARAMETER, right->getParameter());
 						stream << form.open();
 						stream << "Public : " << form.getSelectInput(UpdateRightAction::PARAMETER_PUBLIC_VALUE, privatePublicMap, (int) right->getPublicRightLevel());
-						stream << " Privé : " << form.getSelectInput(UpdateRightAction::PARAMETER_PRIVATE_VALUE, privatePublicMap, (int) right->getPrivateRightLevel());
+						if (right->getUsePrivateRights())
+							stream << " Privé : " << form.getSelectInput(UpdateRightAction::PARAMETER_PRIVATE_VALUE, privatePublicMap, (int) right->getPrivateRightLevel());
 						stream << form.getSubmitButton("Modifier");
 						stream << form.close();
 					}
@@ -198,7 +199,11 @@ namespace synthese
 				stream
 					<< "</td>"
 					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, (int) USE) << "</td>"
-					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, (int) USE) << "</td>"
+					<< "<td>";
+				if ((*it)->getUsePrivateRights())
+					stream << form.getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, (int) USE);
+				stream
+					<< "</td>"
 					<< "<td>" 
 					<< form.getSubmitButton("Ajouter") << "</td>"
 					<< form.close()

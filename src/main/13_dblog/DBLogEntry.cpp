@@ -108,7 +108,7 @@ namespace synthese
 		}
 
 		DBLogEntry::DBLogEntry()
-			: _date(TIME_UNKNOWN)
+			: _date(TIME_CURRENT)
 		{
 
 		}

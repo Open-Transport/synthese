@@ -36,6 +36,8 @@
 #include "34_departures_table/DisplayType.h"
 #include "34_departures_table/DisplayScreen.h"
 
+#include "13_dblog/DBLogModule.h"
+
 using namespace std;
 using namespace boost;
 
@@ -45,27 +47,32 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace db;
-	
+	using namespace dblog;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<server::Action, departurestable::UpdateDisplayScreenAction>::FACTORY_KEY("updatedisplayscreen");
+	}
+
 	namespace departurestable
 	{
 		const string UpdateDisplayScreenAction::PARAMETER_NAME(Action_PARAMETER_PREFIX + "name");
-		const std::string UpdateDisplayScreenAction::PARAMETER_WIRING_CODE = Action_PARAMETER_PREFIX + "wc";
-		const std::string UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY = Action_PARAMETER_PREFIX + "bd";
-		const std::string UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY = Action_PARAMETER_PREFIX + "cd";
-		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_PLATFORM = Action_PARAMETER_PREFIX + "dp";
-		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_SERVICE_NUMBER = Action_PARAMETER_PREFIX + "ds";
-		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_DEPARTURE_ARRIVAL = Action_PARAMETER_PREFIX + "da";
-		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER = Action_PARAMETER_PREFIX + "ef";
-		const std::string UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY = Action_PARAMETER_PREFIX + "md";
-		const std::string UpdateDisplayScreenAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
-		const std::string UpdateDisplayScreenAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "tt";
-
+		const string UpdateDisplayScreenAction::PARAMETER_WIRING_CODE = Action_PARAMETER_PREFIX + "wc";
+		const string UpdateDisplayScreenAction::PARAMETER_BLINKING_DELAY = Action_PARAMETER_PREFIX + "bd";
+		const string UpdateDisplayScreenAction::PARAMETER_CLEANING_DELAY = Action_PARAMETER_PREFIX + "cd";
+		const string UpdateDisplayScreenAction::PARAMETER_DISPLAY_PLATFORM = Action_PARAMETER_PREFIX + "dp";
+		const string UpdateDisplayScreenAction::PARAMETER_DISPLAY_SERVICE_NUMBER = Action_PARAMETER_PREFIX + "ds";
+		const string UpdateDisplayScreenAction::PARAMETER_DISPLAY_DEPARTURE_ARRIVAL = Action_PARAMETER_PREFIX + "da";
+		const string UpdateDisplayScreenAction::PARAMETER_DISPLAY_END_FILTER = Action_PARAMETER_PREFIX + "ef";
+		const string UpdateDisplayScreenAction::PARAMETER_DISPLAY_MAX_DELAY = Action_PARAMETER_PREFIX + "md";
+		const string UpdateDisplayScreenAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
+		const string UpdateDisplayScreenAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "tt";
+		const string UpdateDisplayScreenAction::PARAMETER_DISPLAY_TEAM(Action_PARAMETER_PREFIX + "dt");
 
 
 		ParametersMap UpdateDisplayScreenAction::getParametersMap() const
 		{
 			ParametersMap map;
-			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
 
@@ -73,55 +80,25 @@ namespace synthese
 		{
 			try
 			{
+				// The screen
 				_screen = DisplayScreenTableSync::get(_request->getObjectId());
 
-				ParametersMap::const_iterator it;
+				// Properties
+				_name = Request::getStringFormParameterMap(map, PARAMETER_NAME, true, FACTORY_KEY);
+				_title = Request::getStringFormParameterMap(map, PARAMETER_TITLE, true, FACTORY_KEY);
+				_wiringCode = Request::getIntFromParameterMap(map, PARAMETER_WIRING_CODE, true, FACTORY_KEY);
+				_blinkingDelay = Request::getIntFromParameterMap(map, PARAMETER_BLINKING_DELAY, true, FACTORY_KEY);
+				_cleaningDelay = Request::getIntFromParameterMap(map, PARAMETER_CLEANING_DELAY, true, FACTORY_KEY);
+				_maxDelay = Request::getIntFromParameterMap(map, PARAMETER_DISPLAY_MAX_DELAY, true, FACTORY_KEY);
+				_displayPlatform = Request::getBoolFromParameterMap(map, PARAMETER_DISPLAY_PLATFORM, true, true, FACTORY_KEY);
+				_displayServiceNumber = Request::getBoolFromParameterMap(map, PARAMETER_DISPLAY_SERVICE_NUMBER, true, true, FACTORY_KEY);
+				_displayTeam = Request::getBoolFromParameterMap(map, PARAMETER_DISPLAY_TEAM, true, true, FACTORY_KEY);
+				_direction = static_cast<DeparturesTableDirection>(Request::getIntFromParameterMap(map, PARAMETER_DISPLAY_DEPARTURE_ARRIVAL, true, FACTORY_KEY));
+				_endFilter = static_cast<EndFilter>(Request::getIntFromParameterMap(map, PARAMETER_DISPLAY_END_FILTER, true, FACTORY_KEY));
 
-				it = map.find(PARAMETER_NAME);
-				if (it == map.end())
-					throw ActionException("Name not specified");
-				_name = it->second;
-
-				it= map.find(PARAMETER_TITLE);
-				if (it == map.end())
-					throw ActionException("Title not specified");
-				_title = it->second;
-
-				it = map.find(PARAMETER_WIRING_CODE);
-				if (it != map.end())
-					_wiringCode = Conversion::ToInt(it->second);
-
-				it = map.find(PARAMETER_BLINKING_DELAY);
-				if (it != map.end())
-					_blinkingDelay = Conversion::ToInt(it->second);
-
-				it = map.find(PARAMETER_CLEANING_DELAY);
-				if (it != map.end())
-					_cleaningDelay = Conversion::ToInt(it->second);
-
-				it = map.find(PARAMETER_DISPLAY_MAX_DELAY);
-				if (it != map.end())
-					_maxDelay = Conversion::ToInt(it->second);
-
-				it = map.find(PARAMETER_DISPLAY_PLATFORM);
-				if (it != map.end())
-					_displayPlatform = Conversion::ToBool(it->second);
-
-				it = map.find(PARAMETER_DISPLAY_SERVICE_NUMBER);
-				if (it != map.end())
-					_displayServiceNumber = Conversion::ToBool(it->second);
-
-				it = map.find(PARAMETER_DISPLAY_DEPARTURE_ARRIVAL);
-				if (it != map.end())
-					_direction = (DeparturesTableDirection) Conversion::ToInt(it->second);
-
-				it = map.find(PARAMETER_DISPLAY_END_FILTER);
-				if (it != map.end())
-					_endFilter = (EndFilter) Conversion::ToInt(it->second);
-
-				it = map.find(PARAMETER_TYPE);
-				if (it != map.end())
-					_type = DisplayType::Get(Conversion::ToLongLong(it->second));
+				// Type
+				uid id(Request::getUidFromParameterMap(map, PARAMETER_TYPE, true, FACTORY_KEY));
+				_type = DisplayType::Get(id);
 
 			}
 			catch (DBEmptyResultException<DisplayScreen>&)
@@ -132,34 +109,28 @@ namespace synthese
 			{
 				throw ActionException("Specified display type not found");
 			}
+			catch(...)
+			{
+				throw ActionException("Unknown error at display screen update");
+			}
 		}
 
 		void UpdateDisplayScreenAction::run()
 		{
 			// Comparison for log text generation
 			stringstream log;
-			if (_screen->getLocalizationComment() != _name)
-				log << " - Nom : " << _screen->getLocalizationComment() << " => " << _name;
-			if (_screen->getWiringCode() != _wiringCode)
-				log << " - Code de branchement : " << _screen->getWiringCode() << " => " << _wiringCode;
-			if (_screen->getBlinkingDelay() != _blinkingDelay)
-				log << " - Délai de clignotement : " << _screen->getBlinkingDelay() << " => " << _blinkingDelay;
-			if (_screen->getTrackNumberDisplay() != _displayPlatform)
-				log << " - Affichage du numéro de quai : " << _screen->getTrackNumberDisplay() << " => " << _displayPlatform;
-			if (_screen->getServiceNumberDisplay() != _displayServiceNumber)
-				log << " - Affichage du numéro de service : " << _screen->getServiceNumberDisplay() << " => " << _displayServiceNumber;
-			if (_screen->getDirection() != _direction)
-				log << " - Type de tableau : " << _screen->getDirection() << " => " << _direction;
-			if (_screen->getDirection() != _endFilter)
-				log << " - Affichage des terminus seulement : " << _screen->getDirection() << " => " << _endFilter;
-			if (_screen->getClearingDelay() != _cleaningDelay)
-				log << " - Délai d'effacement : " << _screen->getClearingDelay() << " => " << _cleaningDelay;
-			if (_screen->getMaxDelay() != _maxDelay)
-				log << " - Délai d'apparition : " << _screen->getMaxDelay() << " => " << _maxDelay;
-			if (_screen->getType() && _screen->getType() != _type.get())
-				log << " - Type de panneau : " << _screen->getType()->getName() << " => " << _type->getName();
-			if (_screen->getTitle() != _title)
-				log << " - Titre : " << _screen->getTitle() << " => " << _title;
+			DBLogModule::appendToLogIfChange(log, "Nom", _screen->getLocalizationComment(), _name);
+			DBLogModule::appendToLogIfChange(log, "Code de branchement", _screen->getWiringCode(), _wiringCode);
+			DBLogModule::appendToLogIfChange(log, "Délai de clignotement", _screen->getBlinkingDelay(), _blinkingDelay);
+			DBLogModule::appendToLogIfChange(log, "Affichage du numéro de quai", _screen->getTrackNumberDisplay(), _displayPlatform);
+			DBLogModule::appendToLogIfChange(log, "Affichage du numéro de service", _screen->getServiceNumberDisplay(), _displayServiceNumber);
+			DBLogModule::appendToLogIfChange(log, "Affichage du numéro d'équipe", _screen->getDisplayTeam(), _displayTeam);
+			DBLogModule::appendToLogIfChange(log, "Type de tableau", _screen->getDirection(), _direction);
+			DBLogModule::appendToLogIfChange(log, "Affichage des terminus seulement", _screen->getEndFilter(), _endFilter);
+			DBLogModule::appendToLogIfChange(log, "Délai d'effacement", _screen->getClearingDelay(), _cleaningDelay);
+			DBLogModule::appendToLogIfChange(log, "Délai d'apparition", _screen->getMaxDelay(), _maxDelay);
+			DBLogModule::appendToLogIfChange(log, "Type de panneau", _screen->getType()->getName(), _type->getName());
+			DBLogModule::appendToLogIfChange(log, "Titre", _screen->getTitle(), _title);
 
 			// Preparation of the action
 			_screen->setLocalizationComment(_name);
@@ -173,6 +144,7 @@ namespace synthese
 			_screen->setMaxDelay(_maxDelay);
 			_screen->setType(_type.get());
 			_screen->setTitle(_title);
+			_screen->setDisplayTeam(_displayTeam);
 
 			// The action
 			DisplayScreenTableSync::save(_screen.get());

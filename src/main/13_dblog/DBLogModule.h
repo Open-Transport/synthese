@@ -49,6 +49,13 @@ namespace synthese
 			static std::vector<std::pair<int, std::string> >	getEntryLevelLabels(bool withAll=false);
 			static std::string					getEntryLevelLabel(const DBLogEntry::Level& level);
 			static std::string					getEntryIcon(const DBLogEntry::Level& level);
+
+			template<class T>
+			static void appendToLogIfChange(std::stringstream& s, const std::string& label, const T& oldValue, const T& newValue)
+			{
+				if (oldValue != newValue)
+					s << " - " << label << " : " << oldValue << " => " << newValue;
+			}
 		};
 	}
 

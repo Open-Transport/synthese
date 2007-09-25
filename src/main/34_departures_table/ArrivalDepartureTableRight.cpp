@@ -57,14 +57,5 @@ namespace synthese
 
 	namespace departurestable
 	{
-		std::string ArrivalDepartureTableRight::displayParameter() const
-		{
-			return _parameter;
-		}
-
-		bool ArrivalDepartureTableRight::perimeterIncludes( const std::string& perimeter ) const
-		{
-			return true;
-		}
 	}
 }

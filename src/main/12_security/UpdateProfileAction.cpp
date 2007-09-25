@@ -29,6 +29,8 @@
 #include "30_server/ActionException.h"
 #include "30_server/Request.h"
 
+#include "13_dblog/DBLogModule.h"
+
 using namespace std;
 using namespace boost;
 
@@ -36,7 +38,13 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
-	
+	using namespace dblog;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<server::Action,security::UpdateProfileAction>::FACTORY_KEY("upa");
+	}
+
 	namespace security
 	{
 		const string UpdateProfileAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
@@ -51,8 +59,6 @@ namespace synthese
 
 		void UpdateProfileAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			ParametersMap::const_iterator it;
-
 			// Profile
 			try
 			{
@@ -64,12 +70,7 @@ namespace synthese
 			}
 
 			// Name
-			it = map.find(PARAMETER_NAME);
-			if (it == map.end())
-				throw ActionException("Name not specified");
-			_name = it->second;
-
-			// Name unicity
+			_name = Request::getStringFormParameterMap(map, PARAMETER_NAME, true, FACTORY_KEY);
 			vector<shared_ptr<Profile> > existingProfiles = ProfileTableSync::search(string(), _name, string(), 0,1);
 			if (!existingProfiles.empty())
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
@@ -78,14 +79,15 @@ namespace synthese
 		void UpdateProfileAction::run()
 		{
 			// Old value
-			string oldName = _name;
+			stringstream log;
+			DBLogModule::appendToLogIfChange(log, "Nom", _profile->getName(), _name);
 
 			// Action
 			_profile->setName(_name);
 			ProfileTableSync::save(_profile.get());
 
 			// Log
-			SecurityLog::addProfileAdmin(_request->getUser(), _profile, "Changement de nom : " + oldName + " => " + _name);
+			SecurityLog::addProfileAdmin(_request->getUser(), _profile, log.str());
 		}
 	}
 }

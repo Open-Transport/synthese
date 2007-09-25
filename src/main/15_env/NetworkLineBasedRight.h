@@ -133,8 +133,11 @@ namespace synthese
 				}
 				if (tableId1 == CommercialLineTableSync::TABLE_ID)
 				{
-					if (decodeTableId(id2) == CommercialLineTableSync::TABLE_ID)
+					int tableId2(decodeTableId(id2));
+					if (tableId2 == CommercialLineTableSync::TABLE_ID)
 						return id1 == id2;
+//					if (tableId2 == ConnectionPlaceTableSync::TABLE_ID)
+//						return isPlaceServedByCommercialLine(id1, id2);
 				}
 			}
 			catch(...)

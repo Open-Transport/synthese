@@ -47,7 +47,7 @@
 #include <sstream>
 
 using namespace std;
-using boost::shared_ptr;
+using namespace boost;
 
 namespace synthese
 {
@@ -60,7 +60,7 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<DisplayScreen>::TABLE_NAME = "t041_display_screens";
+		template<> const string SQLiteTableSyncTemplate<DisplayScreen>::TABLE_NAME = "t041_display_screens";
 		template<> const int SQLiteTableSyncTemplate<DisplayScreen>::TABLE_ID = 41;
 		template<> const bool SQLiteTableSyncTemplate<DisplayScreen>::HAS_AUTO_INCREMENT = true;
 
@@ -154,6 +154,7 @@ namespace synthese
 			object->setMaintenanceChecksPerDay (rows->getInt ( DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY));
 			object->setMaintenanceIsOnline (rows->getBool ( DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE));
 			object->setMaintenanceMessage (rows->getText ( DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE));
+			object->setDisplayTeam(rows->getBool(DisplayScreenTableSync::COL_DISPLAY_TEAM));
 		}
 
 
@@ -175,6 +176,7 @@ namespace synthese
 				<< "," << Conversion::ToString(object->getBlinkingDelay())
 				<< "," << Conversion::ToString(object->getTrackNumberDisplay())
 				<< "," << Conversion::ToString(object->getServiceNumberDisplay())
+				<< "," << Conversion::ToString(object->getDisplayTeam())
 				<< ",'";
 
 			int count=0;
@@ -260,36 +262,37 @@ namespace synthese
 
 	namespace departurestable
 	{
-		const std::string DisplayScreenTableSync::_COL_LINE_EXISTS = "line_exists";
-		const std::string DisplayScreenTableSync::_COL_LAST_MAINTENANCE_CONTROL = "last_maintenance_control";
-		const std::string DisplayScreenTableSync::_COL_LAST_OK_MAINTENANCE_CONTROL = "last_ok_maintenance_control";
-		const std::string DisplayScreenTableSync::_COL_CORRUPTED_DATA_START_DATE = "corrupted_data_start_date";
-		const std::string DisplayScreenTableSync::_COL_TYPE_NAME = "type_name";
+		const string DisplayScreenTableSync::_COL_LINE_EXISTS = "line_exists";
+		const string DisplayScreenTableSync::_COL_LAST_MAINTENANCE_CONTROL = "last_maintenance_control";
+		const string DisplayScreenTableSync::_COL_LAST_OK_MAINTENANCE_CONTROL = "last_ok_maintenance_control";
+		const string DisplayScreenTableSync::_COL_CORRUPTED_DATA_START_DATE = "corrupted_data_start_date";
+		const string DisplayScreenTableSync::_COL_TYPE_NAME = "type_name";
 
-		const std::string DisplayScreenTableSync::COL_PLACE_ID = "broadcast_point_id";
-		const std::string DisplayScreenTableSync::COL_NAME = "broadcast_point_comment";
-		const std::string DisplayScreenTableSync::COL_TYPE_ID = "type_id";
-		const std::string DisplayScreenTableSync::COL_WIRING_CODE = "wiring_code";
-		const std::string DisplayScreenTableSync::COL_TITLE = "title";
-		const std::string DisplayScreenTableSync::COL_BLINKING_DELAY = "blinking_delay";
-		const std::string DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY = "track_number_display";
-		const std::string DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY = "service_number_display";
-		const std::string DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS = "physical_stops_ids";	// List of physical stops uids, separated by comas
-		const std::string DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED = "all_physicals";
-		const std::string DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS = "forbidden_arrival_places_ids";	// List of forbidden connection places uids, separated by comas
-		const std::string DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS = "forbidden_lines_ids";	// List of forbidden lines uids, separated by comas
-		const std::string DisplayScreenTableSync::COL_DIRECTION = "direction";
-		const std::string DisplayScreenTableSync::COL_ORIGINS_ONLY = "origins_only";
-		const std::string DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS = "displayed_places_ids";	// List of displayed places uids, separated by comas
-		const std::string DisplayScreenTableSync::COL_MAX_DELAY = "max_delay";
-		const std::string DisplayScreenTableSync::COL_CLEARING_DELAY = "clearing_delay";
-		const std::string DisplayScreenTableSync::COL_FIRST_ROW = "first_row";
-		const std::string DisplayScreenTableSync::COL_GENERATION_METHOD = "generation_method";
-		const std::string DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS = "forced_destinations_ids";	// List of forced destination uids in preselection, separated by comas
-		const std::string DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY = "destination_force_delay";
-		const std::string DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY = "maintenance_checks";
-		const std::string DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE = "is_online";
-		const std::string DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE = "maintenance_message";
+		const string DisplayScreenTableSync::COL_PLACE_ID = "broadcast_point_id";
+		const string DisplayScreenTableSync::COL_NAME = "broadcast_point_comment";
+		const string DisplayScreenTableSync::COL_TYPE_ID = "type_id";
+		const string DisplayScreenTableSync::COL_WIRING_CODE = "wiring_code";
+		const string DisplayScreenTableSync::COL_TITLE = "title";
+		const string DisplayScreenTableSync::COL_BLINKING_DELAY = "blinking_delay";
+		const string DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY = "track_number_display";
+		const string DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY = "service_number_display";
+		const string DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS = "physical_stops_ids";	// List of physical stops uids, separated by comas
+		const string DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED = "all_physicals";
+		const string DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS = "forbidden_arrival_places_ids";	// List of forbidden connection places uids, separated by comas
+		const string DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS = "forbidden_lines_ids";	// List of forbidden lines uids, separated by comas
+		const string DisplayScreenTableSync::COL_DIRECTION = "direction";
+		const string DisplayScreenTableSync::COL_ORIGINS_ONLY = "origins_only";
+		const string DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS = "displayed_places_ids";	// List of displayed places uids, separated by comas
+		const string DisplayScreenTableSync::COL_MAX_DELAY = "max_delay";
+		const string DisplayScreenTableSync::COL_CLEARING_DELAY = "clearing_delay";
+		const string DisplayScreenTableSync::COL_FIRST_ROW = "first_row";
+		const string DisplayScreenTableSync::COL_GENERATION_METHOD = "generation_method";
+		const string DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS = "forced_destinations_ids";	// List of forced destination uids in preselection, separated by comas
+		const string DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY = "destination_force_delay";
+		const string DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY = "maintenance_checks";
+		const string DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE = "is_online";
+		const string DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE = "maintenance_message";
+		const string DisplayScreenTableSync::COL_DISPLAY_TEAM("display_team");
 
 		DisplayScreenTableSync::DisplayScreenTableSync()
 			: SQLiteTableSyncTemplate<DisplayScreen>(true, true, TRIGGERS_ENABLED_CLAUSE)
@@ -303,6 +306,7 @@ namespace synthese
 			addTableColumn(COL_BLINKING_DELAY, "INTEGER");
 			addTableColumn(COL_TRACK_NUMBER_DISPLAY, "INTEGER");
 			addTableColumn(COL_SERVICE_NUMBER_DISPLAY, "INTEGER");
+			addTableColumn(COL_DISPLAY_TEAM, "INTEGER");
 			addTableColumn(COL_PHYSICAL_STOPS_IDS, "TEXT");
 			addTableColumn(COL_ALL_PHYSICAL_DISPLAYED, "INTEGER");
 			addTableColumn(COL_FORBIDDEN_ARRIVAL_PLACES_IDS, "TEXT");
@@ -365,7 +369,7 @@ namespace synthese
 	    
 
 	    
-	    std::vector<shared_ptr<DisplayScreen> > DisplayScreenTableSync::search(
+	    vector<shared_ptr<DisplayScreen> > DisplayScreenTableSync::search(
 			const security::RightsOfSameClassMap& rights 
 			, bool totalControl 
 			, RightLevel neededLevel
@@ -373,9 +377,9 @@ namespace synthese
 			, uid localizationid
 			, uid lineid
 			, uid typeuid
-			, std::string cityName
-			, std::string stopName
-			, std::string name
+			, string cityName
+			, string stopName
+			, string name
 			, int state 
 			, int message 
 			, int first /*= 0*/

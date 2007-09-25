@@ -303,25 +303,20 @@ namespace synthese
 			stringstream query;
 			query << " SELECT " << selectedColumns << " FROM " << TABLE_NAME << " WHERE 1 ";
 
-			if (all && (!forbiddenNetworks.empty() || !allowedLines.empty()))
+			if (all && !forbiddenNetworks.empty())
 			{
-				query << " AND (";
-				if (!forbiddenNetworks.empty())
+				query << " AND ((";
+				for (set<uid>::const_iterator it(forbiddenNetworks.begin()); it != forbiddenNetworks.end(); ++it)
 				{
-					query << "(";
-					for (set<uid>::const_iterator it(forbiddenNetworks.begin()); it != forbiddenNetworks.end(); ++it)
-					{
-						if (it != forbiddenNetworks.begin())
-							query << " AND ";
-						query << CommercialLineTableSync::COL_NETWORK_ID << "!=" << *it;
-					}
-					query << ")";
+					if (it != forbiddenNetworks.begin())
+						query << " AND ";
+					query << CommercialLineTableSync::COL_NETWORK_ID << "!=" << *it;
 				}
+				query << ")";
+
 				if (!allowedLines.empty())
 				{
-					if (!forbiddenNetworks.empty())
-						query << " OR ";
-					query << "(";
+					query << " OR (";
 					for (set<uid>::const_iterator it(allowedLines.begin()); it != allowedLines.end(); ++it)
 					{
 						if (it != allowedLines.begin())

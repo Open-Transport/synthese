@@ -25,7 +25,7 @@ synthese::util::Factory<synthese::db::SQLiteTableSync>::integrate<synthese::depa
 synthese::departurestable::CreateDisplayTypeAction::integrate();
 synthese::departurestable::UpdateDisplayTypeAction::integrate();
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::CreateDisplayScreenAction>("createdisplayscreen");
-synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateDisplayScreenAction>("updatedisplayscreen");
+synthese::departurestable::UpdateDisplayScreenAction::integrate();
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::AddPreselectionPlaceToDisplayScreen>("apptds");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::RemovePreselectionPlaceFromDisplayScreenAction>("rmpsfds");
 synthese::util::Factory<synthese::server::Action>::integrate<synthese::departurestable::UpdateAllStopsDisplayScreenAction>("uasdsa");

@@ -29,6 +29,8 @@
 
 #include "30_server/Action.h"
 
+#include "01_util/FactorableTemplate.h"
+
 namespace synthese
 {
 	namespace security
@@ -38,7 +40,7 @@ namespace synthese
 		/** Right update action class.
 			@ingroup m12Actions refActions
 		*/
-		class UpdateRightAction : public server::Action
+		class UpdateRightAction : public util::FactorableTemplate<server::Action,UpdateRightAction>
 		{
 		public:
 			static const std::string PARAMETER_RIGHT_CODE;

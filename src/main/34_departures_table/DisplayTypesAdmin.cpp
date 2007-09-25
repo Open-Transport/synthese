@@ -94,7 +94,10 @@ namespace synthese
 			
 			stream
 				<< "<h1>Liste des types d'afficheurs disponibles</h1>"
-				<< "<table id=\"searchresult\"><tr><th>Nom</th><th>Interface</th><th>Lignes</th><th>Max arrêts intermédiaires</th><th>Actions</th></tr>";
+				<< "<table id=\"searchresult\"><tr><th>Nom</th><th>Interface</th><th>Lignes</th><th>Max arrêts intermédiaires</th>";
+			if (writeRight)
+				stream << "<th>Actions</th>";
+			stream << "</tr>";
 
 			// Display types loop
 			for (vector<shared_ptr<DisplayType> >::const_iterator it = searchResult.begin(); it != searchResult.end(); ++it)

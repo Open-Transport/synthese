@@ -59,6 +59,7 @@
 #include "34_departures_table/DisplayScreenRemove.h"
 #include "34_departures_table/DisplayMaintenanceAdmin.h"
 #include "34_departures_table/DisplayScreenContentRequest.h"
+#include "34_departures_table/ArrivalDepartureTableRight.h"
 
 using namespace std;
 
@@ -98,6 +99,9 @@ namespace synthese
 
 		void DisplayAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>* request /*= NULL*/ ) const
 		{
+			// Rights
+			bool writeRight(request->isAuthorized<ArrivalDepartureTableRight>(WRITE, FORBIDDEN, Conversion::ToString(_displayScreen->getLocalization()->getKey())));
+
 			// Update request
 			ActionFunctionRequest<UpdateDisplayScreenAction,AdminRequest> updateDisplayRequest(request);
 			updateDisplayRequest.getFunction()->setPage(Factory<AdminInterfaceElement>::createSharedPtr<DisplayAdmin>());
@@ -200,6 +204,7 @@ namespace synthese
 			stream << "<h1>Propriétés</h1>";
 
 			HTMLForm pf(updateDisplayRequest.getHTMLForm("updateprops"));
+			pf.setUpdateRight(writeRight);
 
 			stream << pf.open() << "<h2>Emplacement</h2>";
 
@@ -258,6 +263,10 @@ namespace synthese
 			stream << dt.row();
 			stream << dt.col() << "Affichage numéro de service";
 			stream << dt.col() << pf.getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay());
+
+			stream << dt.row();
+			stream << dt.col() << "Affichage numéro d'équipe";
+			stream << dt.col() << pf.getOuiNonRadioInput(UpdateDisplayScreenAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam());
 
 			stream << dt.close();
 
@@ -465,7 +474,7 @@ namespace synthese
 
 		bool DisplayAdmin::isAuthorized( const server::FunctionRequest<admin::AdminRequest>* request ) const
 		{
-			return true;
+			return request->isAuthorized<ArrivalDepartureTableRight>(READ, FORBIDDEN, Conversion::ToString(request->getObjectId()));
 		}
 
 		DisplayAdmin::DisplayAdmin()
