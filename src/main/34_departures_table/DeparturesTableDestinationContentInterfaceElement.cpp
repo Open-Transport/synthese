@@ -60,6 +60,7 @@ namespace synthese
 		const string DeparturesTableDestinationContentInterfaceElement::TYPE_STATION = "station";
 		const string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_13 = "char(13)";
 		const string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_26 = "char(26)";
+		const string DeparturesTableDestinationContentInterfaceElement::TYPE_CHAR_26_OR_STATION_CITY_IF_NEW("char(26)/station_city_if_new");
 
 		void DeparturesTableDestinationContentInterfaceElement::storeParameters(ValueElementList& vel)
 		{
@@ -103,12 +104,19 @@ namespace synthese
 					&& i < terminusRank
 				)	continue;
 
+				// Place
+				const PublicTransportStopZoneConnectionPlace* place(__DP->second.at(i));
+
 				if (i > firstIntermediatesStops)
 					stream << __SeparateurEntreArrets;
 
 				// Affichage de la commune dans les cas necessaire
-				if ( __TypeAffichage == TYPE_STATION_CITY
-					|| __TypeAffichage == TYPE_STATION_CITY_IF_NEW && __DP->second.at(i)->getCity() != __DerniereCommune
+				if(	__TypeAffichage == TYPE_STATION_CITY
+					||(	__TypeAffichage == TYPE_STATION_CITY_IF_NEW
+						||(	__TypeAffichage == TYPE_CHAR_26_OR_STATION_CITY_IF_NEW 
+							&& place->getName26().empty()
+						) && place->getCity() != __DerniereCommune
+					)
 				){
 					stringstream ss;
 					boost::iostreams::filtering_ostream out;
@@ -116,7 +124,7 @@ namespace synthese
 					out.push (PlainCharFilter());
 					out.push (ss);
 
-					out << __DP->second.at(i)->getCity () ->getName() << flush;
+					out << place->getCity () ->getName() << flush;
 					string cityName (ss.str ());
 					
 
@@ -129,22 +137,23 @@ namespace synthese
 					}
 					stream << __AvantCommune << cityName << __ApresCommune;
 
-					__DerniereCommune = __DP->second.at(i)->getCity();
+					__DerniereCommune = place->getCity();
 
 
 				}
 
 				// Affichage du nom d'arret dans les cas ou necessaire
 				if ( __TypeAffichage.substr (0, 7) == TYPE_STATION)
-					stream << __DP->second.at(i)->getName();
+					stream << place->getName();
 
 				// Affichage de la destination 13 caracteres dans les cas ou necessaire
 				if ( __TypeAffichage == TYPE_CHAR_13)
-					stream << __DP->second.at(i)->getName13();
+					stream << place->getName13OrName();
 
 				// Affichage de la destination 26 caracteres dans les cas ou necessaire
-				if ( __TypeAffichage == TYPE_CHAR_26)
-					stream << __DP->second.at(i)->getName26();
+				if( __TypeAffichage == TYPE_CHAR_26
+				||	__TypeAffichage == TYPE_CHAR_26_OR_STATION_CITY_IF_NEW					
+				)	stream << place->getName26OrName();
 			}
 			return string();
 		}

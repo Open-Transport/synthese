@@ -64,6 +64,7 @@ namespace synthese
 			static const std::string TYPE_STATION;
 			static const std::string TYPE_CHAR_13;
 			static const std::string TYPE_CHAR_26;
+			static const std::string TYPE_CHAR_26_OR_STATION_CITY_IF_NEW;
 			
 
 		private:

@@ -44,15 +44,6 @@ namespace synthese
 			, _city (city)
 			, _isoBarycentreToUpdate(false)
 		{
-			stringstream ss;
-			boost::iostreams::filtering_ostream out;
-			out.push (WithoutAccentsFilter());
-			out.push (PlainCharFilter());
-			out.push (ss);
-			out << _name << std::flush;
-
-			_name13 = ss.str().substr(0, 13);
-			_name26 = ss.str().substr(0, 26);
 		}
 
 
@@ -74,19 +65,7 @@ namespace synthese
 		void 
 		Place::setName (const std::string& name)
 		{
-			stringstream ss;
-			boost::iostreams::filtering_ostream out;
-			out.push (WithoutAccentsFilter());
-			out.push (PlainCharFilter());
-			out.push (ss);
-			out << name << std::flush;
-
 			_name = name;
-			
-			if (_name13.empty())
-				_name13 = ss.str().substr(0, 13);
-			if (_name26.empty())
-				_name26 = ss.str().substr(0, 26);
 		}
 
 
@@ -141,5 +120,51 @@ namespace synthese
 		{
 			return place == this;
 		}
+
+		void Place::setName13( const std::string& name )
+		{
+			_name13 = name;
+		}
+
+		void Place::setName26( const std::string& name )
+		{
+			_name26 = name;
+		}
+
+		string Place::getName13OrName() const
+		{
+			if (_name13.empty())
+			{
+				stringstream ss;
+				boost::iostreams::filtering_ostream out;
+				out.push (WithoutAccentsFilter());
+				out.push (PlainCharFilter());
+				out.push (ss);
+				out << _name << std::flush;
+
+				return ss.str().substr(0, 13);
+			}
+			else
+				return _name13;
+		}
+
+		std::string Place::getName26OrName() const
+		{
+			if (_name26.empty())
+			{
+				stringstream ss;
+				boost::iostreams::filtering_ostream out;
+				out.push (WithoutAccentsFilter());
+				out.push (PlainCharFilter());
+				out.push (ss);
+				out << _name << std::flush;
+
+				return ss.str().substr(0, 26);
+			}
+			else
+				return _name26;
+
+		}
+		
 	}
 }

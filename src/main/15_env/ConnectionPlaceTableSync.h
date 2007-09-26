@@ -52,6 +52,8 @@ namespace synthese
 			static const std::string TABLE_COL_DEFAULTTRANSFERDELAY;
 			static const std::string TABLE_COL_TRANSFERDELAYS;
 			static const std::string TABLE_COL_ALARMID;
+			static const std::string COL_NAME13;
+			static const std::string COL_NAME26;
 
 			ConnectionPlaceTableSync ();
 			~ConnectionPlaceTableSync ();

@@ -45,34 +45,38 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::TABLE_NAME = "t007_connection_places";
+		template<> const string SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::TABLE_NAME = "t007_connection_places";
 		template<> const int SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::TABLE_ID = 7;
 		template<> const bool SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::HAS_AUTO_INCREMENT = true;
 
 		template<> void SQLiteTableSyncTemplate<PublicTransportStopZoneConnectionPlace>::load(PublicTransportStopZoneConnectionPlace* cp, const db::SQLiteResultSPtr& rows )
 		{
+			// Reading of the row
 			uid id (rows->getLongLong (TABLE_COL_ID));
-			std::string name (rows->getText (ConnectionPlaceTableSync::TABLE_COL_NAME));
+			string name (rows->getText (ConnectionPlaceTableSync::TABLE_COL_NAME));
+			string name13(rows->getText(ConnectionPlaceTableSync::COL_NAME13));
+			string name26(rows->getText(ConnectionPlaceTableSync::COL_NAME26));
 			uid cityId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_CITYID));
-			
 			ConnectionPlace::ConnectionType connectionType = 
 			    static_cast<ConnectionPlace::ConnectionType>(rows->getInt (ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE));
-			
 			int defaultTransferDelay (rows->getInt (ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY));
-			
-			std::string transferDelaysStr (rows->getText (ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS));
+			string transferDelaysStr (rows->getText (ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS));
 			uid alarmId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_ALARMID));
 
-			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-
+			// Update of the object
 			cp->setKey(id);
 			cp->setName (name);
+			if (!name13.empty())
+				cp->setName13(name13);
+			if (!name26.empty())
+				cp->setName26(name26);
 			cp->setCity(City::Get(cityId).get());
 			cp->setConnectionType (connectionType);
 			cp->setDefaultTransferDelay (defaultTransferDelay);
 
 			cp->clearTransferDelays ();    
 
+			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 			boost::char_separator<char> sep1 (",");
 			boost::char_separator<char> sep2 (":");
 			tokenizer tripletTokens (transferDelaysStr, sep1);
@@ -92,13 +96,15 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string ConnectionPlaceTableSync::TABLE_COL_NAME = "name";
-		const std::string ConnectionPlaceTableSync::TABLE_COL_CITYID = "city_id";
-		const std::string ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE = "connection_type";
-		const std::string ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION = "is_city_main_connection";
-		const std::string ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY = "default_transfer_delay";
-		const std::string ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
-		const std::string ConnectionPlaceTableSync::TABLE_COL_ALARMID = "alarm_id";
+		const string ConnectionPlaceTableSync::TABLE_COL_NAME = "name";
+		const string ConnectionPlaceTableSync::TABLE_COL_CITYID = "city_id";
+		const string ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE = "connection_type";
+		const string ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION = "is_city_main_connection";
+		const string ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY = "default_transfer_delay";
+		const string ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
+		const string ConnectionPlaceTableSync::TABLE_COL_ALARMID = "alarm_id";
+		const string ConnectionPlaceTableSync::COL_NAME13("short_display_name");
+		const string ConnectionPlaceTableSync::COL_NAME26("long_display_name");
 
 
 		ConnectionPlaceTableSync::ConnectionPlaceTableSync ()
@@ -112,6 +118,8 @@ namespace synthese
 			addTableColumn (TABLE_COL_DEFAULTTRANSFERDELAY, "INTEGER", true);
 			addTableColumn (TABLE_COL_TRANSFERDELAYS, "TEXT", true);
 			addTableColumn (TABLE_COL_ALARMID, "INTEGER", true);
+			addTableColumn (COL_NAME13, "TEXT");
+			addTableColumn (COL_NAME26, "TEXT");
 
 			vector<string> c;
 			c.push_back(TABLE_COL_CITYID);
@@ -127,19 +135,58 @@ namespace synthese
 		}
 
 		    
-		void 
-			ConnectionPlaceTableSync::rowsAdded (synthese::db::SQLiteQueueThreadExec* sqlite, 
-			synthese::db::SQLiteSync* sync,
-			const synthese::db::SQLiteResultSPtr& rows, bool isFirstSync)
-		{
+		void ConnectionPlaceTableSync::rowsAdded(
+			SQLiteQueueThreadExec* sqlite
+			, SQLiteSync* sync
+			, const SQLiteResultSPtr& rows
+			, bool isFirstSync
+		){
 			while (rows->next ())
 			{
 			    uid id (rows->getLongLong (TABLE_COL_ID));
-			    
-			    if (PublicTransportStopZoneConnectionPlace::Contains (id))
-					continue;
-			    
-			    std::string name (rows->getText (TABLE_COL_NAME));
+
+				if (PublicTransportStopZoneConnectionPlace::Contains (id))
+				{
+					shared_ptr<PublicTransportStopZoneConnectionPlace> cp = PublicTransportStopZoneConnectionPlace::GetUpdateable(
+						rows->getLongLong (TABLE_COL_ID)
+						);
+
+					shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
+					city->getConnectionPlacesMatcher ().remove (cp->getName ());
+					city->getAllPlacesMatcher().remove(cp->getName() + " [arrêt]");
+
+					load(cp.get(), rows);
+
+					bool isCityMainConnection (	rows->getBool (TABLE_COL_ISCITYMAINCONNECTION));
+					if (isCityMainConnection)
+					{
+						city->addIncludedPlace (cp.get());
+					}
+					city->getConnectionPlacesMatcher ().add (cp->getName (), cp.get());
+					city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp.get()));
+				}
+				else
+				{
+					PublicTransportStopZoneConnectionPlace* cp(new PublicTransportStopZoneConnectionPlace);
+
+					load(cp, rows);
+
+					shared_ptr<City> city = City::GetUpdateable (cp->getCity ()->getKey ());
+					bool isCityMainConnection (	rows->getBool (TABLE_COL_ISCITYMAINCONNECTION));
+					if (isCityMainConnection)
+					{
+						city->addIncludedPlace (cp);
+					}
+					city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
+					city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp));
+					cp->store();
+				}
+
+
+
+
+/*			    
+			    string name (rows->getText (TABLE_COL_NAME));
 			    uid cityId (rows->getLongLong (TABLE_COL_CITYID));
 			    ConnectionPlace::ConnectionType connectionType = (ConnectionPlace::ConnectionType)
 				rows->getInt (TABLE_COL_CONNECTIONTYPE);
@@ -147,7 +194,7 @@ namespace synthese
 			    bool isCityMainConnection (	rows->getBool (TABLE_COL_ISCITYMAINCONNECTION));
 			    
 			    int defaultTransferDelay (	rows->getInt (TABLE_COL_DEFAULTTRANSFERDELAY));
-			    std::string transferDelaysStr (rows->getText (TABLE_COL_TRANSFERDELAYS));
+			    string transferDelaysStr (rows->getText (TABLE_COL_TRANSFERDELAYS));
 			    uid alarmId (rows->getLongLong (TABLE_COL_ALARMID));
 
 			    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
@@ -172,16 +219,9 @@ namespace synthese
 					cp->addTransferDelay (startStop, endStop, Conversion::ToInt (*(++valueIter)));
 				}
 
-				if (isCityMainConnection)
-				{
-					city->addIncludedPlace (cp);
-				}
+*/
 
-			//    cp->setAlarm (environment.getAlarms ().get (alarmId));
 
-				city->getConnectionPlacesMatcher ().add (cp->getName (), cp);
-				city->getAllPlacesMatcher().add(cp->getName() + " [arrêt]", static_cast<Place*>(cp));
-				cp->store();
 			}
 		}
 

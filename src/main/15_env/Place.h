@@ -87,7 +87,6 @@ namespace synthese
 				/** Gets name of this place.
 				*/
 				const std::string& getName () const;
-
 				const std::string& getName13() const;
 				const std::string& getName26() const;
 
@@ -110,6 +109,8 @@ namespace synthese
 			//@{
 				void setName (const std::string& name);
 				void setCity(const City* city);
+				void setName13(const std::string& name);
+				void setName26(const std::string& name);
 			//@}
 
 
@@ -137,6 +138,25 @@ namespace synthese
 			virtual uid getId() const = 0;
 
 			virtual bool includes(const Place* place) const;
+
+			/** Gets a 13 characters name for the place.
+				@return string :
+					- the name13 record if defined
+					- the 13 first characters of the name else
+				@author Hugues Romain
+				@date 2007				
+			*/
+			std::string getName13OrName() const;
+
+			/** Gets a 26 characters name for the place.
+				@return string :
+					- the name26 record if defined
+					- the 26 first characters of the name else
+				@author Hugues Romain
+				@date 2007				
+			*/
+			std::string getName26OrName() const;
+
 			//@}
 
 		    
