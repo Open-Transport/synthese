@@ -289,12 +289,12 @@ namespace synthese
 
 
 		ServicePointer Edge::getNextService (
-			DateTime departureMoment, 
-			const DateTime& maxDepartureMoment,
-			const DateTime& calculationMoment
+			DateTime departureMoment
+			, const DateTime& maxDepartureMoment
+			, const DateTime& calculationMoment
+			, bool controlIfTheServiceIsReachable
 			, int minNextServiceIndex
-		) const
-		{
+		) const	{
 			// Search schedule
 			int next(getDepartureFromIndex (departureMoment.getHours ()));
 
@@ -313,8 +313,14 @@ namespace synthese
 					{
 						// Saving of the used service
 						ServicePointer servicePointer(
-							getParentPath ()->getService(next)->getFromPresenceTime(ServicePointer::DEPARTURE_TO_ARRIVAL, this, departureMoment, calculationMoment)
-							);
+							getParentPath ()->getService(next)->getFromPresenceTime(
+								ServicePointer::DEPARTURE_TO_ARRIVAL
+								, this
+								, departureMoment
+								, calculationMoment
+								, controlIfTheServiceIsReachable
+							)
+						);
 
 						if (!servicePointer.getService())
 							continue;
@@ -347,6 +353,7 @@ namespace synthese
 			DateTime arrivalMoment
 			, const DateTime& minArrivalMoment
 			, const DateTime& computingDateTime
+			, bool controlIfTheServiceIsReachable
 			, int maxPreviousServiceIndex
 		) const	{
 			int previous(getArrivalFromIndex (arrivalMoment.getHours ()));
@@ -359,8 +366,14 @@ namespace synthese
 					{
 						// Saving of the used service
 						ServicePointer servicePointer(
-							getParentPath ()->getService(previous)->getFromPresenceTime(ServicePointer::ARRIVAL_TO_DEPARTURE, this, arrivalMoment, computingDateTime)
-							);
+							getParentPath ()->getService(previous)->getFromPresenceTime(
+								ServicePointer::ARRIVAL_TO_DEPARTURE
+								, this
+								, arrivalMoment
+								, computingDateTime
+								, controlIfTheServiceIsReachable
+							)
+						);
 
 						if (!servicePointer.getService())
 							continue;

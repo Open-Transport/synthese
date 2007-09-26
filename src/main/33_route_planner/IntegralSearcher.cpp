@@ -213,11 +213,13 @@ namespace synthese
 								departureMoment
 								, _minMaxDateTimeAtDestination
 								, _calculationTime
+								, true
 							)
 						:	edge->getPreviousService(
 								departureMoment
 								, _minMaxDateTimeAtDestination
 								, _calculationTime
+								, true
 							)
 					);
 

@@ -56,6 +56,7 @@ namespace synthese
 				- 5 : Display services number (default : false)
 				- 6 : Display track number
 				- 7 : Number of intermediates stops
+				- 8 : Display team
 		*/
 		class DeparturesTableInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableInterfaceElement>
 		{
@@ -68,6 +69,7 @@ namespace synthese
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayServiceNumber;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayQuai;
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _numberOfIntermediatesStops;
+			boost::shared_ptr<interfaces::LibraryInterfaceElement> _displayTeam;
 
 		public:
 			void storeParameters(interfaces::ValueElementList& vel);

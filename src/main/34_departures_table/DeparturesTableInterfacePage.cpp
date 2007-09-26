@@ -45,6 +45,7 @@ namespace synthese
 			, int wiringCode
 			, bool displayServiceNumber
 			, bool displayTrackNumber
+			, bool displayTeam
 			, int intermediatesStopsToDisplay
 			, const ArrivalDepartureListWithAlarm& rows
 			, const server::Request* request /*= NULL*/ ) const
@@ -55,7 +56,8 @@ namespace synthese
 			pv.push_back(Conversion::ToString(displayServiceNumber));
 			pv.push_back(Conversion::ToString(displayTrackNumber));
 			pv.push_back(Conversion::ToString(intermediatesStopsToDisplay));
-			
+			pv.push_back(Conversion::ToString(displayTeam));
+
 			InterfacePage::display(
 				stream
 				, pv

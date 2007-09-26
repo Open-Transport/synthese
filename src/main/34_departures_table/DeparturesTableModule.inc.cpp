@@ -30,7 +30,6 @@
 
 #include "34_departures_table/DisplayScreenAlarmRecipient.h"
 
-#include "34_departures_table/DisplayScreenContentRequest.h"
 #include "34_departures_table/AddPreselectionPlaceToDisplayScreen.h"
 #include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"
 #include "34_departures_table/RemovePreselectionPlaceFromDisplayScreenAction.h"
@@ -40,6 +39,8 @@
 #include "34_departures_table/UpdateDisplayPreselectionParametersAction.h"
 #include "34_departures_table/DisplayScreenAddDisplayedPlace.h"
 #include "34_departures_table/DeparturesTableInterfacePage.h"
+#include "34_departures_table/DeparturesTableTrackCell.h"
+#include "34_departures_table/DeparturesTableTeamCell.h"
 #include "34_departures_table/DeparturesTableTimeContentInterfaceElement.h"
 #include "34_departures_table/DeparturesTableLineContentInterfaceElement.h"
 #include "34_departures_table/DeparturesTableDestinationContentInterfaceElement.h"
@@ -50,4 +51,6 @@
 #include "34_departures_table/UpdateDisplayMaintenanceAction.h"
 #include "34_departures_table/DisplayScreenHasAlarmValueInterfaceElement.h"
 #include "34_departures_table/DisplayScreenAlarmContentValueInterfaceElement.h"
+
 #include "34_departures_table/DisplayScreenSupervisionRequest.h"
+#include "34_departures_table/DisplayScreenContentRequest.h"

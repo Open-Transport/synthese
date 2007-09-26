@@ -98,7 +98,12 @@ namespace synthese
 					DateTime maxTimeForForcedDestination(_startDateTime);
 					maxTimeForForcedDestination += _persistanceDuration;
 
-					ServicePointer serviceInstance = ls->getNextService(tempStartDateTime, maxTimeForForcedDestination, _calculationDateTime);
+					ServicePointer serviceInstance = ls->getNextService(
+						tempStartDateTime
+						, maxTimeForForcedDestination
+						, _calculationDateTime
+						, false
+					);
 					
 					// No service
 					if (serviceInstance.getService() == NULL)

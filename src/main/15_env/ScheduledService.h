@@ -47,6 +47,7 @@ namespace synthese
 		private:
 			Schedules	_departureSchedules;	//!< Departure schedules
 			Schedules	_arrivalSchedules;		//!< Arrival schedules
+			std::string	_team;
 
 		public:
 
@@ -61,7 +62,7 @@ namespace synthese
 		    
 			//! @name Getters
 			//@{
-				uid		getId()	const;
+				virtual std::string getTeam() const;
 			//@}
 
 			//! @name Setters
@@ -69,18 +70,36 @@ namespace synthese
 				void	setPath(Path* path);
 				void	setDepartureSchedules(const Schedules& schedules);
 				void	setArrivalSchedules(const Schedules& schedules);
+				void	setTeam(const std::string& team);
 			//@}
 
 			//! @name Query methods
 			//@{
-				bool isContinuous () const;
+				virtual uid		getId()	const;
+				virtual bool isContinuous () const;
 				
+				/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
+					@param method Search departure or arrival :
+						- ServicePointer::DEPARTURE_TO_ARRIVAL
+						- ServicePointer::ARRIVAL_TO_DEPARTURE
+					@param edge Edge
+					@param presenceDateTime Goal  time
+					@param computingTime Time of the computing
+					@param controlIfTheServiceIsReachable service selection method :
+						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
+						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
+					@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
+					@author Hugues Romain
+					@date 2007
+					@warning The service index is unknown in the generated ServicePointer.					
+				*/
 				virtual ServicePointer getFromPresenceTime(
 					ServicePointer::DeterminationMethod method
 					, const Edge* edge
 					, const time::DateTime& presenceDateTime
 					, const time::DateTime& computingTime
-					) const;
+					, bool controlIfTheServiceIsReachable
+				) const;
 				
 				virtual time::DateTime getLeaveTime(
 					const ServicePointer& servicePointer
@@ -96,6 +115,8 @@ namespace synthese
 				virtual time::Schedule getDepartureEndScheduleToIndex(const Edge* edge) const;
 				virtual time::Schedule getArrivalBeginScheduleToIndex(const Edge* edge) const;
 				virtual time::Schedule getArrivalEndScheduleToIndex(const Edge* edge) const;
+
+				
 			//@}
 
 		};

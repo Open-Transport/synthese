@@ -117,6 +117,7 @@ namespace synthese
 			, const Edge* edge
 			, const time::DateTime& presenceDateTime
 			, const time::DateTime& computingTime
+			, bool controlIfTheServiceIsReachable
 		) const	{
 
 			ServicePointer ptr(method, edge);
@@ -179,8 +180,15 @@ namespace synthese
 				return ServicePointer();
 
 			// Reservation control
-			if (!ptr.isReservationRuleCompliant(computingTime))
-				return ServicePointer();
+			if (controlIfTheServiceIsReachable)
+			{
+				if (!ptr.isReservationRuleCompliant(computingTime))
+					return ServicePointer();
+			}
+			else
+			{
+				/// @todo Implement the reservation control
+			}
 
 			return ptr;
 		}

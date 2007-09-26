@@ -74,6 +74,8 @@ namespace synthese
 			if (!vel.isEmpty())
 				_numberOfIntermediatesStops = vel.front();
 
+			if (!vel.isEmpty())
+				_displayTeam = vel.front();
 		}
 
 		string DeparturesTableInterfaceElement::display(
@@ -95,6 +97,7 @@ namespace synthese
 			const string message (_message ? _message->getValue(parameters, variables, object, request) : string());
 			bool displayServiceNumber(_displayServiceNumber ? Conversion::ToBool(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
 			bool displayQuai(_displayQuai ? Conversion::ToBool(_displayQuai->getValue(parameters, variables, object, request)) : false);
+			bool displayTeam(_displayTeam ? Conversion::ToBool(_displayTeam->getValue(parameters, variables, object, request)) : false);
 			int numberOfIntermediatesStops(_numberOfIntermediatesStops ? Conversion::ToInt(_numberOfIntermediatesStops->getValue(parameters, variables, object, request)) : UNKNOWN_VALUE);
 
 			// Gestion des pages
@@ -140,6 +143,7 @@ namespace synthese
 						, pageNumber
 						, displayQuai
 						, displayServiceNumber
+						, displayTeam
 						, numberOfIntermediatesStops
 						, ___DP
 						, request

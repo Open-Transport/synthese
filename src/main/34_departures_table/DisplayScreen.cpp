@@ -263,7 +263,18 @@ namespace synthese
 				displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this);
 				const DeparturesTableInterfacePage* page(_displayType->getInterface()->getPage<DeparturesTableInterfacePage>());
 				VariablesMap variables;
-				page->display(stream, variables, getTitle(), getWiringCode(), getServiceNumberDisplay(), getTrackNumberDisplay(), getType()->getMaxStopsNumber(), displayedObject);
+				
+				page->display(
+					stream
+					, variables
+					, getTitle()
+					, getWiringCode()
+					, getServiceNumberDisplay()
+					, getTrackNumberDisplay()
+					, getDisplayTeam()
+					, getType()->getMaxStopsNumber()
+					, displayedObject
+				);
 			}
 			catch (InterfacePageException& e)
 			{

@@ -6,6 +6,8 @@ synthese::departurestable::DeparturesTableDestinationContentInterfaceElement::in
 synthese::util::Factory<synthese::interfaces::LibraryInterfaceElement>::integrate<synthese::departurestable::DeparturesTableRowServiceNumberInterfaceElement>("departurestableservicenumbercell");
 synthese::departurestable::DisplayScreenHasAlarmValueInterfaceElement::integrate();
 synthese::departurestable::DisplayScreenAlarmContentValueInterfaceElement::integrate();
+synthese::departurestable::DeparturesTableTeamCell::integrate();
+synthese::departurestable::DeparturesTableTrackCell::integrate();
 
 synthese::departurestable::DeparturesTableInterfacePage::integrate();
 synthese::departurestable::DepartureTableRowInterfacePage::integrate();

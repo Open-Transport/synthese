@@ -401,11 +401,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DeparturesTableTeamCell.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DeparturesTableTeamCell.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DeparturesTableTimeContentInterfaceElement.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\DeparturesTableTimeContentInterfaceElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DeparturesTableTrackCell.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DeparturesTableTrackCell.h"
 				>
 			</File>
 			<File

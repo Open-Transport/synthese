@@ -110,5 +110,10 @@ namespace synthese
 			originDateTime.setHour(getDepartureSchedule().getHour());
 			return originDateTime;
 		}
+
+		std::string Service::getTeam() const
+		{
+			return std::string();
+		}
 	}
 }

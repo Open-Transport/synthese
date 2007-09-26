@@ -45,6 +45,7 @@ namespace synthese
 				- 2 : 1|0 : Service number display
 				- 3 : display the track number
 				- 4 : number of intermediates stops to display
+				- 5 : display the team identifier
 				
 			Object :
 				- result of table generation
@@ -68,6 +69,7 @@ namespace synthese
 				, int wiringCode
 				, bool displayServiceNumber
 				, bool displayTrackNumber
+				, bool displayTeam
 				, int intermediatesStopsToDisplay
 				, const ArrivalDepartureListWithAlarm& rows
 				, const server::Request* request = NULL) const;

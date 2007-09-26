@@ -45,6 +45,7 @@ namespace synthese
 			, int pageNumber
             , bool displayQuai
 			, bool displayServiceNumber
+			, bool displayTeam
 			, int intermediatesStopsToDisplay
 			, const ArrivalDepartureRow& ptd
 			, const server::Request* request
@@ -55,6 +56,7 @@ namespace synthese
 			parameters.push_back(Conversion::ToString(displayQuai));
 			parameters.push_back(Conversion::ToString(displayServiceNumber));
 			parameters.push_back(Conversion::ToString(intermediatesStopsToDisplay));
+			parameters.push_back(Conversion::ToString(displayTeam));
 			
 			InterfacePage::display(
 				stream

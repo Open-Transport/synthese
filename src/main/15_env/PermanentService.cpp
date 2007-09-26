@@ -34,8 +34,13 @@ namespace synthese
 	namespace env
 	{
 
-		ServicePointer PermanentService::getFromPresenceTime( ServicePointer::DeterminationMethod method , const Edge* edge , const time::DateTime& presenceDateTime , const time::DateTime& computingTime ) const
-		{
+		ServicePointer PermanentService::getFromPresenceTime(
+			ServicePointer::DeterminationMethod method
+			, const Edge* edge
+			, const DateTime& presenceDateTime
+			, const DateTime& computingTime
+			, bool controlIfTheServiceIsReachable
+		) const	{
 			ServicePointer sp(method,edge);
 			sp.setActualTime(presenceDateTime);
 			sp.setOriginDateTime(DateTime(presenceDateTime.getDate(), Hour(TIME_MIN)));

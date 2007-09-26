@@ -64,7 +64,7 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const std::string SQLiteTableSyncTemplate<ScheduledService>::TABLE_NAME = "t016_scheduled_services";
+		template<> const string SQLiteTableSyncTemplate<ScheduledService>::TABLE_NAME = "t016_scheduled_services";
 		template<> const int SQLiteTableSyncTemplate<ScheduledService>::TABLE_ID = 16;
 		template<> const bool SQLiteTableSyncTemplate<ScheduledService>::HAS_AUTO_INCREMENT = true;
 
@@ -76,7 +76,7 @@ namespace synthese
 		    
 		    int serviceNumber (rows->getInt (ScheduledServiceTableSync::COL_SERVICENUMBER));
 		    
-		    std::string schedules (rows->getText (ScheduledServiceTableSync::COL_SCHEDULES));
+		    string schedules (rows->getText (ScheduledServiceTableSync::COL_SCHEDULES));
 
 		    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
@@ -91,12 +91,12 @@ namespace synthese
 				schedulesIter != schedulesTokens.end ();
 				++schedulesIter
 			){
-				std::string arrDep (*schedulesIter);
+				string arrDep (*schedulesIter);
 				size_t sepPos = arrDep.find ("#");
-				assert (sepPos != std::string::npos);
+				assert (sepPos != string::npos);
 				
-				std::string arrivalScheduleStr (arrDep.substr (0, sepPos));
-				std::string departureScheduleStr (arrDep.substr (sepPos+1));
+				string arrivalScheduleStr (arrDep.substr (0, sepPos));
+				string departureScheduleStr (arrDep.substr (sepPos+1));
 				
 				// unnecessary : boost::trim (departureScheduleStr);
 				// unnecessary : boost::trim (arrivalScheduleStr);
@@ -146,7 +146,9 @@ namespace synthese
 		    ss->setReservationRule (ReservationRule::Get (reservationRuleId).get());
 		    ss->setDepartureSchedules(departureSchedules);
 		    ss->setArrivalSchedules(arrivalSchedules);
-		    ss->getPath()->addService(ss);
+			ss->setTeam(rows->getText(ScheduledServiceTableSync::COL_TEAM));
+			ss->getPath()->addService(ss);
+			
 		}
 
 
@@ -169,14 +171,15 @@ namespace synthese
 
 	namespace env
 	{
-		const std::string ScheduledServiceTableSync::COL_SERVICENUMBER ("service_number");
-		const std::string ScheduledServiceTableSync::COL_SCHEDULES ("schedules");
-		const std::string ScheduledServiceTableSync::COL_PATHID ("path_id");
-		const std::string ScheduledServiceTableSync::COL_RANKINPATH ("rank_in_path");
-		const std::string ScheduledServiceTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
-		const std::string ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-		const std::string ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const std::string ScheduledServiceTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
+		const string ScheduledServiceTableSync::COL_SERVICENUMBER ("service_number");
+		const string ScheduledServiceTableSync::COL_SCHEDULES ("schedules");
+		const string ScheduledServiceTableSync::COL_PATHID ("path_id");
+		const string ScheduledServiceTableSync::COL_RANKINPATH ("rank_in_path");
+		const string ScheduledServiceTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
+		const string ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
+		const string ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
+		const string ScheduledServiceTableSync::COL_RESERVATIONRULEID ("reservation_rule_id");
+		const string ScheduledServiceTableSync::COL_TEAM("team");
 
 		ScheduledServiceTableSync::ScheduledServiceTableSync()
 			: SQLiteTableSyncTemplate<ScheduledService>(true, true, TRIGGERS_ENABLED_CLAUSE)
@@ -189,6 +192,7 @@ namespace synthese
 			addTableColumn (COL_HANDICAPPEDCOMPLIANCEID, "INTEGER", true);
 			addTableColumn (COL_PEDESTRIANCOMPLIANCEID, "INTEGER", true);
 			addTableColumn (COL_RESERVATIONRULEID, "INTEGER", true);
+			addTableColumn (COL_TEAM, "TEXT");
 		}
 
 		void ScheduledServiceTableSync::rowsAdded(db::SQLiteQueueThreadExec* sqlite,  db::SQLiteSync* sync, const db::SQLiteResultSPtr& rows, bool isFirstSync)

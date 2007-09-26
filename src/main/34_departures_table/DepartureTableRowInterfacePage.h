@@ -34,14 +34,15 @@ namespace synthese
 	namespace departurestable
 	{
 		/** Departure table row Interface Page.
-			@code departurestablerow <row_id> <page_number> <message> <display_service_number> @endcode
+			@code departurestablerow @endcode
 
 			Parameters :
-				- 0 <row_id> : Rank of the row in the departure table
-				- 1 <page_number> : Number of the page to display for multiple page protocol (eg Lumiplan)
-				- 2 <message> : Message to display instead of timetables
-				- 3 <display_service_number> : 1|0 Indicates if the service number cell must be displayed in the row
+				- 0 : Rank of the row in the departure table
+				- 1 : Number of the page to display for multiple page protocol (eg Lumiplan)
+				- 2 : Display track number
+				- 3 : Display service number
 				- 4 : Number of intermediates stops to display
+				- 5 : Display team number
 
 			Object :
 				- Must be a ArrivalDepartureRow object
@@ -57,6 +58,7 @@ namespace synthese
 				, int pageNumber
 				, bool displayQuaiNumber
 				, bool displayServiceNumber
+				, bool displayTeam
 				, int intermediatesStopsToDisplay
 				, const ArrivalDepartureRow& row
 				, const server::Request* request = NULL

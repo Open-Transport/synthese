@@ -116,6 +116,7 @@ namespace synthese
 			*/
 			virtual uid		getId()	const = 0;
 
+			virtual std::string getTeam() const;
 
 			/** Is this service providen a given day ?
 				@param originDate Departure date of the service from its origin (warning: do not test the customer departure date which can be one or more days later; use getOriginDateTime to compute the origin date)
@@ -128,19 +129,28 @@ namespace synthese
 			virtual time::Schedule getArrivalBeginScheduleToIndex(const Edge* edge) const = 0;
 			virtual time::Schedule getArrivalEndScheduleToIndex(const Edge* edge) const = 0;
 
+
 			/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
-			@param presenceDateTime
-			@param departureTime
-			@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
-			@author Hugues Romain
-			@date 2007
-			@warning The service index is unknown in the generated ServicePointer.					
+				@param method Search departure or arrival :
+					- ServicePointer::DEPARTURE_TO_ARRIVAL
+					- ServicePointer::ARRIVAL_TO_DEPARTURE
+				@param edge Edge
+				@param presenceDateTime Goal  time
+				@param computingTime Time of the computing
+				@param controlIfTheServiceIsReachable service selection method :
+					- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
+					- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
+				@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
+				@author Hugues Romain
+				@date 2007
+				@warning The service index is unknown in the generated ServicePointer.					
 			*/
 			virtual ServicePointer getFromPresenceTime(
 				ServicePointer::DeterminationMethod method
 				, const Edge* edge
 				, const time::DateTime& presenceDateTime
 				, const time::DateTime& computingTime
+				, bool controlIfTheServiceIsReachable
 			) const = 0;
 
 			virtual time::DateTime getLeaveTime(

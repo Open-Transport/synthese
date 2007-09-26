@@ -86,6 +86,7 @@ namespace synthese
 			, const Edge* edge
 			, const time::DateTime& presenceDateTime
 			, const time::DateTime& computingTime
+			, bool controlIfTheServiceIsReachable
 		) const {
 
 			// Initializations
@@ -122,8 +123,16 @@ namespace synthese
 				return ServicePointer();
 
 			// Reservation control
-			if (!ptr.isReservationRuleCompliant(computingTime))
-				return ServicePointer();
+			if (controlIfTheServiceIsReachable)
+			{
+				if (!ptr.isReservationRuleCompliant(computingTime))
+					return ServicePointer();
+			}
+			else
+			{
+				/// @todo Implement the reservation control
+			}
+			
 
 			return ptr;
 		}
@@ -189,6 +198,16 @@ namespace synthese
 			for (Path::Edges::const_reverse_iterator it(getPath()->getEdges().rbegin()); it != getPath()->getEdges().rend(); ++it)
 				if ((*it)->isDeparture())
 					return _departureSchedules[(*it)->getRankInPath()];
+		}
+
+		void ScheduledService::setTeam( const std::string& team )
+		{
+			_team = team;
+		}
+
+		std::string ScheduledService::getTeam() const
+		{
+			return _team;
 		}
 	}
 }

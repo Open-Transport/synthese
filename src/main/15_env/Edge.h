@@ -188,26 +188,43 @@ namespace synthese
 					@param departureMoment Presence hour at departure place
 					@param maxDepartureMoment Maximum departure hour
 					@param calculationMoment Calculation moment for reservation delay checking
+					@param controlIfTheServiceIsReachable service selection method :
+						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
+						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
+					@param minNextServiceIndex First index to scan in the services list (optimization)
+						- UNKNOWN_VALUE / -1 : start at the beginning of the list
 					@return Found service instance index or -1 if none was found.
 					@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
-					0 means scheduled service.
 				*/
 				ServicePointer getNextService (
 					time::DateTime departureMoment
 					, const time::DateTime& maxDepartureMoment
 					, const time::DateTime& calculationMoment
-					, int minNextServiceIndex = UNKNOWN_VALUE
-					) const;
+					, bool controlIfTheServiceIsReachable
+					, int minNextServiceIndex = UNKNOWN_VALUE					
+				) const;
 
 			    
 			 
-
+				/** Provides previous arrival service number
+					@param arrivalMoment Presence hour at arrival place
+					@param minArrivalMoment Minimum arrival hour
+					@param calculationMoment Calculation moment for reservation delay checking
+					@param controlIfTheServiceIsReachable service selection method :
+						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
+						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
+					@param maxPreviousServiceIndex First index to scan in the services list (optimization)
+						- UNKNOWN_VALUE / -1 : start at the end of the list
+					@return Found service instance index or -1 if none was found.
+					@retval arrivalMoment Accurate departure moment. Meaningless if -1 returned.
+				*/
 				ServicePointer getPreviousService(
 					time::DateTime arrivalMoment
-					, const synthese::time::DateTime& minArrivalMoment
+					, const time::DateTime& minArrivalMoment
 					, const time::DateTime& calculationMoment
+					, bool controlIfTheServiceIsReachable
 					, int maxPreviousServiceIndex = UNKNOWN_VALUE
-					) const;
+				) const;
 			    
 			//@}
 
